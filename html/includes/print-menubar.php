@@ -201,22 +201,72 @@ if ($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cro
 </ul></td></tr></table>
 </li>
 
+<?php
+
+# FIXME does not check user permissions...
+$sql = "SELECT sensor_class,COUNT(sensor_id) AS c FROM sensors GROUP BY sensor_class";
+$result = mysql_query($sql);
+while ($row = mysql_fetch_assoc($result))
+{
+  $used_sensors[$row['sensor_class']] = $row['c'];
+}
+
+# Copy the variable so we can use $used_sensors later in other parts of the code
+$menu_sensors = $used_sensors;
+
+?>
 
 <li><a class="menu2four" href="health/"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Health
 <!--[if IE 7]><!--></a><!--<![endif]-->
         <table><tr><td>
         <ul>
-  <li><a href="health/processor/"><img src="images/icons/processor.png" border="0" align="absmiddle" /> Processor</a></li>
         <li><a href="health/mempool/"><img src="images/icons/memory.png" border="0" align="absmiddle" /> Memory</a></li>
+        <li><a href="health/processor/"><img src="images/icons/processor.png" border="0" align="absmiddle" /> Processor</a></li>
         <li><a href="health/storage/"><img src="images/icons/storage.png" border="0" align="absmiddle" /> Storage</a></li>
-        <li><hr width=140 /></li>
-        <li><a href="health/temperature/"><img src="images/icons/temperature.png" border="0" align="absmiddle" /> Temperature</a></li>
-        <li><a href="health/humidity/"><img src="images/icons/humidity.png" border="0" align="absmiddle" /> Humidity</a></li>
-        <li><a href="health/fanspeed/"><img src="images/icons/fanspeed.png" border="0" align="absmiddle" /> Fanspeed</a></li>
-        <li><hr width=140 /></li>
-        <li><a href="health/voltage/"><img src="images/icons/voltage.png" border="0" align="absmiddle" /> Voltage</a></li>
-        <li><a href="health/frequency/"><img src="images/icons/frequency.png" border="0" align="absmiddle" /> Frequency</a></li>
-        <li><a href="health/current/"><img src="images/icons/current.png" border="0" align="absmiddle" /> Current</a></li>
+<?php
+if ($menu_sensors)
+{
+  $sep = 0;
+  echo('<li><hr width="140" /></li>');
+}
+
+foreach (array('fanspeed','humidity','temperature') as $item)
+{
+  if ($menu_sensors[$item])
+  {
+    echo ('<li><a href="health/'.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
+    unset($menu_sensors[$item]);$sep++;
+  }
+}
+
+if ($sep)
+{
+  echo('<li><hr width="140" /></li>');
+  $sep = 0;
+}
+
+foreach (array('current','frequency','power','voltage') as $item)
+{
+  if ($menu_sensors[$item])
+  {
+    echo ('<li><a href="health/'.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
+    unset($menu_sensors[$item]);$sep++;
+  }
+}
+
+if ($menu_sensors && $sep)
+{
+  echo('<li><hr width="140" /></li>');
+  $sep = 0;
+}
+
+foreach (array_keys($menu_sensors) as $item)
+{
+  echo ('<li><a href="health/'.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
+  unset($menu_sensors[$item]);$sep++;
+}
+
+?>
         </ul>
         </td></tr></table>
 <!--[if lte IE 6]></a><![endif]-->
