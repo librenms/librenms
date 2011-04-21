@@ -434,6 +434,14 @@ function match_network($nets, $ip, $first=false)
 function snmp2ipv6($ipv6_snmp)
 {
   $ipv6 = explode('.',$ipv6_snmp);
+
+  # Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
+  # < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
+  if (count($ipv6) == 17 && $ipv6[0] == 16)
+  {
+    array_shift($ipv6);
+  }
+
   for ($i = 0;$i <= 15;$i++) { $ipv6[$i] = zeropad(dechex($ipv6[$i])); }
   for ($i = 0;$i <= 15;$i+=2) { $ipv6_2[] = $ipv6[$i] . $ipv6[$i+1]; }
 
