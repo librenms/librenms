@@ -9,6 +9,7 @@ if ($used_sensors['frequency']) $datas[] = 'frequency';
 if ($used_sensors['current']) $datas[] = 'current';
 if ($used_sensors['power']) $datas[] = 'power';
 
+# FIXME generalize -> static-config ?
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
 $type_text['humidity'] = "Humidity";
@@ -78,23 +79,16 @@ echo('</div>');
 
 print_optionbar_end();
 
-switch ($_GET['opta'])
+if (in_array($_GET['opta'],array_keys($used_sensors)) 
+  || $_GET['opta'] == 'processor'
+  || $_GET['opta'] == 'storage'
+  || $_GET['opta'] == 'mempool')
 {
-  case 'processor':
-  case 'mempool':
-  case 'storage':
-  case 'temperature':
-  case 'humidity':
-  case 'voltage':
-  case 'fanspeed':
-  case 'frequency':
-  case 'current':
-  case 'power':
-    include('pages/health/'.$_GET['opta'].'.inc.php');
-    break;
-  default:
-    include('pages/health/temperature.inc.php'); # FIXME perhaps an error message instead?
-    break;
+  include('pages/health/'.$_GET['opta'].'.inc.php');
+}
+else
+{
+  echo("No sensors of type " . $_GET['opta'] . " found.");
 }
 
 ?>
