@@ -166,7 +166,7 @@ $config['bad_if'] = array("voip-null", "virtual-", "unrouted", "eobc", "mpls", "
              "-atm layer", "-atm subif", "-shdsl", "-aal5", "-atm", "container",
              "async", "plip", "-physical", "-signalling", "container", "unrouted",
              "bri", "-bearer", "bluetooth", "isatap", "ras", "qos", "miniport", "sonet/sdh",
-             "span rp", "span sp", "sslvpn");
+             "span rp", "span sp", "sslvpn", "pppoe-");
 
 $config['bad_if_regexp'] = array("/serial[0-9]:/", "/^ng[0-9]+$/", "/^sl[0-9]/");
 
