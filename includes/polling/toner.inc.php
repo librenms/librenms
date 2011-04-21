@@ -9,6 +9,8 @@ if ($config['enable_printers'])
   {
     echo("Checking toner " . $toner['toner_descr'] . "... ");
 
+# FIXME poll capacity maybe also here, when toner is replaced capacity can change, leading to "154% of toner"
+
     $tonerperc = snmp_get($device, $toner['toner_oid'], "-OUqnv") / $toner['toner_capacity'] * 100;
 
     $tonerrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_descr'] . ".rrd");
@@ -27,9 +29,15 @@ if ($config['enable_printers'])
 
     rrdtool_update($tonerrrd,"N:$tonerperc");
 
-    #FIXME could report for toner out... :)
+    #FIXME should report for toner out... :)
 
-    mysql_query("UPDATE toner SET toner_current = '$tonerperc' WHERE toner_id = '" . $toner['toner_id'] . "'");
+    # Log toner swap    
+    if ($tonerperc > $toner['toner_current'])
+    {
+      log_event('Toner ' . $toner['toner_descr'] . ' was replaced (new level: ' . $tonerperc . '%)', $device, 'toner', $toner['toner_id']);
+    }
+
+    mysql_query("UPDATE toner SET toner_current = '$tonerperc', toner_capacity = '" . $toner['toner_capacity'] . "' WHERE toner_id = '" . $toner['toner_id'] . "'");
   }
 }
 
