@@ -179,6 +179,13 @@ $config['ignore_mount_optical']   = 1; # Ignore mounted optical discs
 $config['device_traffic_iftype']  = array('/loopback/','/tunnel/','/virtual/','/mpls/','/ieee8023adLag/');
 $config['device_traffic_descr']   = array('/loopback/','/vlan/','/tunnel/','/:\d+/','/bond/');
 
+### IRC Bot configuration
+
+$config['irc_host'] = "chat.eu.freenode.net";
+$config['irc_port'] = 6667;
+$config['irc_nick'] = "Observium";
+$config['irc_chan'][] = "#observium";
+
 ### Authentication
 
 $config['allow_unauth_graphs']	  = 0; ## Allow graphs to be viewed by anyone
