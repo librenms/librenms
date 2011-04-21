@@ -36,7 +36,7 @@ if ($device['os'] == "ipoman")
       $current = $entry['inletStatusFrequency'] / 10;
       $low_limit = $entry['inletConfigFrequencyLow'];
       $high_limit = $entry['inletConfigFrequencyHigh'];
-      discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, 'ipoman', $descr, $divisor, '1', $low_limit, NULL, NULL, $high_limit, $current);
+      discover_sensor($valid_sensor, 'frequency', $device, $freq_oid, $index, 'ipoman', $descr, $divisor, '1', $low_limit, NULL, NULL, $high_limit, $current);
       # FIXME: iPoMan 1201 also says it has 2 inlets, at least until firmware 1.06 - wtf?
     }
   }
