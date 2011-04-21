@@ -24,7 +24,8 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   $device = device_by_id_cache($_GET['id']);
   if ($config['os'][$device['os']]['group']) { $device['os_group'] = $config['os'][$device['os']]['group']; }
 
-  echo('<table cellpadding="15" cellspacing="0" class="devicetable" width="100%">');
+  echo('<table style="margin: 0px 7px 7px 7px;" cellpadding="15" cellspacing="0" class="devicetable" width="99%">');
+  #include("includes/hostbox.inc.php");
   include("includes/device-header.inc.php");
   echo('</table>');
 
