@@ -13,6 +13,7 @@ include("includes/discovery/humidity.inc.php");
 include("includes/discovery/voltages.inc.php");
 include("includes/discovery/frequencies.inc.php");
 include("includes/discovery/current.inc.php");
+include("includes/discovery/power.inc.php");
 include("includes/discovery/fanspeeds.inc.php");
 
 unset($valid_sensor);
