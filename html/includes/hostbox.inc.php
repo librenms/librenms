@@ -34,7 +34,7 @@ $sensor_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `
 echo('  <tr class="'.$class.'" bgcolor="' . $bg . '" onmouseover="this.style.backgroundColor=\'#fdd\';" onmouseout="this.style.backgroundColor=\'' . $bg . '\';"
           onclick="location.href=\'device/'.$device['device_id'].'/\'" style="cursor: pointer;">
           <td width="40" align="center" valign="middle">' . $image . '</td>
-          <td width="300">' . generate_device_link($device) . '
+          <td width="300"><span style="font-size: 15px;">' . generate_device_link($device) . '</span>
           <br />' . $device['sysName'] . '</td>'
 	);
 

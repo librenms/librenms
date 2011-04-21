@@ -328,7 +328,6 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
 
 a.list-device, a.list-device-ignored, a.list-device-down, a.list-device-ignored-up, a.list-device-disabled {
         font-weight: bold;
-	font-size: 15px;
 }
 
 tr.list-device, tr.list-device-ignored, tr.list-device-down, tr.list-device-ignored-up, tr.list-device-disabled {
