@@ -58,7 +58,7 @@ while ($sensor = mysql_fetch_assoc($query))
   if ($_GET['optb'] == "graphs")
   {
 
-    echo("<tr bgcolor='$row_colour'><td colspan=6>");
+    echo("<tr bgcolor='$row_colour'><td colspan=7>");
 
     $daily_graph   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=211&amp;height=100";
     $daily_url     = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=400&amp;height=150";
