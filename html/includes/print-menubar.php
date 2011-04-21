@@ -204,7 +204,7 @@ if ($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cro
 <?php
 
 # FIXME does not check user permissions...
-$sql = "SELECT sensor_class,COUNT(sensor_id) AS c FROM sensors GROUP BY sensor_class";
+$sql = "SELECT sensor_class,COUNT(sensor_id) AS c FROM sensors GROUP BY sensor_class ORDER BY sensor_class ";
 $result = mysql_query($sql);
 while ($row = mysql_fetch_assoc($result))
 {
@@ -254,6 +254,7 @@ foreach (array('current','frequency','power','voltage') as $item)
   }
 }
 
+# Show remaining/custom sensor types if there are any in the database
 if ($menu_sensors && $sep)
 {
   echo('<li><hr width="140" /></li>');

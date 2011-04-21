@@ -24,12 +24,10 @@ if ($device['os'] == "ipoman")
   $oids_in = snmpwalk_cache_multi_oid($device, "inletConfigCurrentHigh", $oids_in, "IPOMANII-MIB");
   echo("inletStatusCurrent ");
   $oids_in = snmpwalk_cache_multi_oid($device, "inletStatusCurrent", $oids_in, "IPOMANII-MIB");
-//  $oids_in = snmpwalk_cache_multi_oid($device, "inletStatusKwatt", $oids_in, "IPOMANII-MIB"); // Not implemented yet in Obs?
   echo("outletConfigCurrentHigh ");
   $oids_out = snmpwalk_cache_multi_oid($device, "outletConfigCurrentHigh", $oids_out, "IPOMANII-MIB");
   echo("outletStatusCurrent ");
   $oids_out = snmpwalk_cache_multi_oid($device, "outletStatusCurrent", $oids_out, "IPOMANII-MIB");
-//  $oids_out = snmpwalk_cache_multi_oid($device, "outletStatusKwatt", $oids_out, "IPOMANII-MIB"); // See above
 
   if (is_array($oids_in))
   {

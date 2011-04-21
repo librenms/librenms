@@ -4,6 +4,7 @@ poll_sensor($device,'current','A');
 poll_sensor($device,'frequency', 'Hz');
 poll_sensor($device,'fanspeed', 'rpm');
 poll_sensor($device,'humidity', '%');
+poll_sensor($device,'power', 'W');
 #poll_sensor($device,'voltage', 'V');
 
 # FIXME voltages have other filenames
