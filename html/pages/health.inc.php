@@ -1,6 +1,13 @@
 <?php
 
-$datas = array('processor','mempool','storage','temperature', 'humidity', 'fanspeed', 'voltage', 'frequency', 'current', 'power');
+$datas = array('processor','mempool','storage');
+if ($used_sensors['temperature']) $datas[] = 'temperature';
+if ($used_sensors['humidity']) $datas[] = 'humidity';
+if ($used_sensors['fanspeed']) $datas[] = 'fanspeed';
+if ($used_sensors['voltage']) $datas[] = 'voltage';
+if ($used_sensors['frequency']) $datas[] = 'frequency';
+if ($used_sensors['current']) $datas[] = 'current';
+if ($used_sensors['power']) $datas[] = 'power';
 
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
