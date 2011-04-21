@@ -30,7 +30,7 @@ foreach ($config['graph_sections'] as $section)
       echo('<span class="pagemenu-selected">');
     }
 
-    echo("<a href='".$config['base_url']."/device/".$device['device_id']."/graphs/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . ucfirst($type) ."</a>");
+    echo("<a href='device/".$device['device_id']."/graphs/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . ucfirst($type) ."</a>");
     if ($_GET['opta'] == $type) 
     { 
       echo("</span>"); 

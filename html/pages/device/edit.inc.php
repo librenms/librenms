@@ -33,7 +33,7 @@ if ($_SESSION['userlevel'] < '7')
       #echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
     }
 
-    echo("<a href='".$config['base_url']."/device/".$device['device_id']."/edit/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $text ."</a>");
+    echo("<a href='device/".$device['device_id']."/edit/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $text ."</a>");
     if ($_GET['opta'] == $type) { echo("</span>"); }
     $sep = " | ";
   }

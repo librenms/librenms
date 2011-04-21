@@ -164,13 +164,13 @@ if ($_GET['opta'] == "add")
       echo("
            <tr bgcolor='$row_colour'>
              <td width='7'></td>
-             <td width='250'><a href='".$config['base_url']."/bill/".$bill['bill_id']."/'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a></td>
+             <td width='250'><a href='bill/".$bill['bill_id']."/'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a></td>
              <td>$notes</td>
 	     <td>$type</td>
              <td>$allowed</td>
              <td>$used</td>
              <td width=370>".print_percentage_bar (350, 20, $perc, NULL, "ffffff", $left_background, $percent . "%", "ffffff", $right_background)."</td>
-             <td width=60><a href='".$config['base_url']."/bill/".$bill['bill_id']."/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
+             <td width=60><a href='bill/".$bill['bill_id']."/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
            </tr>
          ");
       $i++;

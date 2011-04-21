@@ -16,7 +16,7 @@ foreach ($periods as $period)
   $graph_array_zoom['height'] = "150";
   $graph_array_zoom['width']  = "400";
 
-  $link = $config['base_url'] . "/graphs/" . $graph_array['id'] . "/" . $graph_array['type'] . "/" . $graph_array['from'] . "/" . $config['now'] . "/";
+  $link = "graphs/" . $graph_array['id'] . "/" . $graph_array['type'] . "/" . $graph_array['from'] . "/" . $config['now'] . "/";
 
   echo(overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL));
 }
