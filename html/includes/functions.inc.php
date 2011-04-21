@@ -22,7 +22,7 @@ function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0
     $graphs = $config['os']['default']['over'];
   }
 
-  $url  = $config['base_url']."/device/" . $device['device_id'] . "/" . $linksuffix;
+  $url  = "device/" . $device['device_id'] . "/" . $linksuffix;
   $contents = "<div class=list-large>".$device['hostname'];
   if ($device['hardware']) { $contents .= " - ".$device['hardware']; }
   $contents .= "</div>";
@@ -41,8 +41,8 @@ function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0
     $graphhead = $entry['text'];
     $contents .= '<div style="width: 708px">';
     $contents .= '<span style="margin-left: 5px; font-size: 12px; font-weight: bold;">'.$graphhead.'</span><br />';
-    $contents .= '<img src="' . $config['base_url'] . "/graph.php?id=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
-    $contents .= '<img src="' . $config['base_url'] . "/graph.php?id=" . $device['device_id'] . "&amp;from=".$config['week']."&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
+    $contents .= "<img src=\"graph.php?id=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
+    $contents .= "<img src=\"graph.php?id=" . $device['device_id'] . "&amp;from=".$config['week']."&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
     $contents .= '</div>';
   }
 
@@ -205,7 +205,7 @@ function generate_graph_tag ($args)
   global $config;
 
   $sep = "?";
-  $url = $config['base_url'] . "/graph.php";
+  $url = "graph.php";
   foreach ($args as $key => $arg)
   {
     $url .= $sep.$key."=".$arg;
@@ -260,7 +260,7 @@ function generate_port_link($args, $text = NULL, $type = NULL)
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
 
-  $url = $config['base_url']."/device/".$args['device_id']."/port/" . $args['interface_id'] . "/";
+  $url = "device/".$args['device_id']."/port/" . $args['interface_id'] . "/";
 
   if (port_permitted($args['interface_id'])) {
     return overlib_link($url, $text, $content, $class);

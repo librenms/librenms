@@ -10,7 +10,7 @@ while ($data = mysql_fetch_assoc($query))
   if (!$_GET['opta']) { $_GET['opta'] = $type; }
   echo($sep);
   if ($_GET['opta'] == $type) { echo("<strong>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ciscosensors/" . $type . "/'>" . htmlspecialchars($type) ."</a>\n");
+  echo("<a href='device/" . $device['device_id'] . "/ciscosensors/" . $type . "/'>" . htmlspecialchars($type) ."</a>\n");
   if ($_GET['opta'] == $type) { echo("</strong>"); }
   $sep = ' | ';
 }
