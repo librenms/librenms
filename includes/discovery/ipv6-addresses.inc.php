@@ -50,7 +50,7 @@ if (!$oids)
     {
       $data = trim($data);
       list($if_ipv6addr,$ipv6_prefixlen) = explode(" ", $data);
-      list($ifIndex,$ipv6addr) = explode("\\.",$if_ipv6addr,2);
+      list($ifIndex,$ipv6addr) = explode(".",$if_ipv6addr,2);
       $ipv6_address = snmp2ipv6($ipv6addr);
       $ipv6_origin = snmp_get($device, "IPV6-MIB::ipv6AddrType.$if_ipv6addr", "-Ovq", "IPV6-MIB");
       discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_origin);
