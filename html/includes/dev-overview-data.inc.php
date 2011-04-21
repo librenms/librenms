@@ -21,6 +21,11 @@ if ($device['hardware'])
       </tr>');
 }
 
+echo('<tr>
+        <td class="list-bold">Operating System</td>
+        <td>' . $device['os_text'] . ' ' . $device['version'] . ' ' . $device['features'] . ' </td>
+      </tr>');
+
 if ($device['serial'])
 {
   echo('<tr>
@@ -28,11 +33,6 @@ if ($device['serial'])
         <td>' . $device['serial']. '</td>
       </tr>');
 }
-
-echo('<tr>
-        <td class="list-bold">Operating System</td>
-        <td>' . $device['os_text'] . ' ' . $device['version'] . ' ' . $device['features'] . ' </td>
-      </tr>');
 
 if ($device['sysContact'])
 {
