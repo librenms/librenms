@@ -92,7 +92,7 @@ function sensor_low_limit($class, $current)
     case 'humidity':
       $limit = "70";
       break;
-    case 'freq':
+    case 'frequency':
       $limit = $current * 0.95;
       break;
     case 'current':
@@ -124,7 +124,7 @@ function sensor_limit($class, $current)
     case 'humidity':
       $limit = "70";
       break;
-    case 'freq':
+    case 'frequency':
       $limit = $current * 1.05;
       break;
     case 'current':
