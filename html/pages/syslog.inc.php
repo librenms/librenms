@@ -66,7 +66,7 @@ if ($_POST['device'])
 
 if ($_SESSION['userlevel'] >= '5')
 {
-  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog
+  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog AS S
           WHERE 1 $where ORDER BY timestamp DESC LIMIT 1000";
 } else {
   $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog AS S, devices_perms AS P
