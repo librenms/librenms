@@ -25,7 +25,7 @@ while ($hrdevice = mysql_fetch_assoc($hrdevices))
     $graph_array['from']     = $day;
     $graph_array_zoom   = $graph_array; $graph_array_zoom['height'] = "150"; $graph_array_zoom['width'] = "400";
 
-    $mini_graph = overlib_link($_SERVER['REQUEST_URI'], generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL);
+    $mini_graph = overlib_link($proc_url, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL);
 
     echo('<td>'.$mini_graph.'</td>');
   }
@@ -45,7 +45,8 @@ while ($hrdevice = mysql_fetch_assoc($hrdevices))
       $graph_array['from']   = $day;
       $graph_array_zoom      = $graph_array; $graph_array_zoom['height'] = "150"; $graph_array_zoom['width'] = "400";
 
-      $mini_graph = overlib_link($_SERVER['REQUEST_URI'], generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL);
+      # FIXME click on graph should also link to port, but can't use generate_port_link here...
+      $mini_graph = overlib_link("#", generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL);
 
       echo("<td>$mini_graph</td>");
     } else {
