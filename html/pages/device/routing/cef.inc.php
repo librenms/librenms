@@ -93,7 +93,7 @@ while ($cef = mysql_fetch_assoc($cef_query))
         echo("</tr>
        ");
 
-  if($_GET['opta'] == "graphs")
+  if($_GET['optb'] == "graphs")
   {
     $graph_array['height'] = "100";
     $graph_array['width']  = "215";
