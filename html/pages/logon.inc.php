@@ -4,7 +4,7 @@
         <tr>
           <td><img src="images/login-hamster.png" alt="Login required" /></td>
           <td>
-            <form action="<?php echo($_SERVER['REQUEST_URI']) ?>" method="post" name="logonform">
+            <form action="" method="post" name="logonform">
               <h3>Please log in:</h3>
               <div style="height: 0px;"></div>
               <table border="0" align="left">

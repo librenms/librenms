@@ -29,7 +29,7 @@ while ($vp = mysql_fetch_assoc($vps))
   {
     $graph_array['from'] = $$period;
     $graph_array_zoom   = $graph_array; $graph_array_zoom['height'] = "150"; $graph_array_zoom['width'] = "400";
-    echo(overlib_link($_SERVER['REQUEST_URI'], generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL));
+    echo(overlib_link("#", generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL));
   }
 
   echo('</td></tr>');
