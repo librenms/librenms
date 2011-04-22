@@ -67,13 +67,13 @@ while ($cef = mysql_fetch_assoc($cef_query))
 
   switch ($cef['cef_path']) {
     case "RP RIB":
-      echo '<a title="Process switching with Cisco Express Forwarding assistance.">RP RIB</a>';
+      echo '<a title="Process switching with CEF assistance.">RP RIB</a>';
       break;
     case "RP LES":
-      echo '<a title="Low-end switching. Centralized Cisco Express Forwarding switch path.">RP LES</a>';
+      echo '<a title="Low-end switching. Centralized CEF switch path.">RP LES</a>';
       break;
     case "RP PAS":
-      echo '<a title="Cisco Express Forwarding turbo switch path.">RP PAS</a>';
+      echo '<a title="CEF turbo switch path.">RP PAS</a>';
       break;
     default:
        echo $cef['cef_path'];
@@ -86,7 +86,7 @@ while ($cef = mysql_fetch_assoc($cef_query))
   echo("<td>".format_si($cef['punt']));
   if($cef['punt'] > $cef['punt_prev']) { echo(" <span style='color:red;'>(".round(($cef['punt']-$cef['punt_prev'])/$interval,2)."/sec)</span>"); }
   echo("</td>");
-  echo("<td>".format_si($cef['punt']));
+  echo("<td>".format_si($cef['punt2host']));
   if($cef['punt2host'] > $cef['punt2host_prev']) { echo(" <span style='color:red;'>(".round(($cef['punt2host']-$cef['punt2host_prev'])/$interval,2)."/sec)</span>"); }
   echo("</td>");
 
