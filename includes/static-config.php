@@ -18,6 +18,11 @@ $config['os']['default']['over'][0]['text']	= "Processor Usage";
 $config['os']['default']['over'][1]['graph'] 	= "device_mempool";
 $config['os']['default']['over'][1]['text']	= "Memory Usage";
 
+$os_group = "unix";
+$config['os_group'][$os_group]['type']  	     = "server";
+$config['os_group'][$os_group]['processor_stacked']  = 1;
+
+
 $os = "generic";
 $config['os'][$os]['text']      	= "Generic Device";
 
@@ -697,6 +702,20 @@ $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
 $config['os'][$os]['icon']  		= "tripplite";
 
+foreach($config['os'] as $this_os => $blah)
+{
+  $this_os_group = $config['os'][$this_os]['group'];
+  if(isset($config['os'][$this_os]['group']) && isset($config['os_group'][$this_os_group]))
+  {
+    foreach ($config['os_group'][$this_os_group] as $property => $value)
+    {
+      if(!isset($config['os'][$this_os][$property]))
+      {
+        $config['os'][$this_os][$property] = $value;
+      }
+    }
+  }
+}
 
 $device_types = array('server', 'network', 'firewall', 'workstation', 'printer', 'power', 'environment');
 

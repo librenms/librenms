@@ -10,12 +10,6 @@ preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', mres($graph_type), $grap
 $type = $graphtype['type'];
 $subtype = $graphtype['subtype'];
 
-if (isset($config['graph'][$type][$subtype])) { $descr = $config['graph'][$type][$subtype]; } else { $descr = $graph_type; }
-
-#$descr = mysql_result(mysql_query("SELECT `graph_descr` FROM `graph_types` WHERE `graph_type` = '".$type."' AND `graph_subtype` = '".$subtype."'"),0);
-
-$descr = $config['graph_types'][$type][$subtype]['descr'];
-
 if (is_file("includes/graphs/".$type."/auth.inc.php"))
 {
   include("includes/graphs/".$type."/auth.inc.php");
@@ -27,7 +21,11 @@ if (!$auth)
 } else {
 
 # Do we really need to show the type? User does not have to see the type of graph (i.e. sensor_temperature)
-#  if (isset($config['graph'][$type][$subtype])) { $title .= " :: ".$config['graph'][$type][$subtype]; } else { $title .= " :: ".$graph_type; }
+
+# Yes, i think we doo, else we have graph titles of "router1". It's nice to show the type here. maybe only the pretty
+# array_type?
+
+  if (isset($config['graph_types'][$type][$subtype]['descr'])) { $title .= " :: ".$config['graph_types'][$type][$subtype]['descr']; } else { $title .= " :: ".$graph_type; }
 
   $graph_array['height'] = "60";
   $graph_array['width']  = "150";
