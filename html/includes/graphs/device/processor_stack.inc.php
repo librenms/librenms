@@ -1,7 +1,7 @@
 <?php
 
-$device = device_by_id_cache($id);
-$query = mysql_query("SELECT * FROM `processors` where `device_id` = '".$id."'");
+#$device = device_by_id_cache($id);
+#$query = mysql_query("SELECT * FROM `processors` where `device_id` = '".$id."'");
 
 $i = 0;
 
@@ -24,13 +24,15 @@ $unit_text = "Load %";
 
 $units = '%';
 $total_units = '%';
-$colours ='mixed';
+$colours ='oranges';
 
 $scale_min = "0";
 $scale_max = "100";
 
+$divider = $i;
+$text_orig = 1;
 $nototal = 1;
 
-include("includes/graphs/generic_multi_line.inc.php");
+include("includes/graphs/generic_multi_simplex_seperated.inc.php");
 
 ?>
