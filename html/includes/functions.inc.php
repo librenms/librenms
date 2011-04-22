@@ -195,27 +195,22 @@ function device_permitted($device_id)
   return $allowed;
 }
 
-function print_graph_tag ($args)
+function print_graph_tag($args)
 {
-  echo(generate_graph_tag ($args));
+  echo(generate_graph_tag($args));
 }
 
-function generate_graph_tag ($args)
+function generate_graph_tag($args)
 {
-  global $config;
-
-  $sep = "?";
-  $url = "graph.php";
   foreach ($args as $key => $arg)
   {
-    $url .= $sep.$key."=".$arg;
-    $sep="&amp;";
+    $urlargs[] = $key."=".$arg;
   }
 
-  return "<img src=\"".$url."\" border=0>";
+  return '<img src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
 }
 
-function print_percentage_bar ($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
+function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
 {
   $output = '
 <div style="font-size:11px;">
