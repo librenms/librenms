@@ -150,7 +150,7 @@ print_optionbar_end();
       <a href="http://www.observium.org/wiki/">Support Wiki</a> |
       <a href="http://www.observium.org/forum/">Forum</a> |
       <a href="http://www.observium.org/bugs/">Bugtracker</a> |
-      <a href="http://www.observium.org/pmwiki.php/Main/MailingLists">Mailing List</a> |
+      <a href="http://www.observium.org/wiki/Mailing_Lists">Mailing List</a> |
 <?php /*
       <a href="http://twitter.com/Observium">Twitter</a> |
 */ ?>
