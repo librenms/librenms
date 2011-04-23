@@ -9,6 +9,7 @@ print_optionbar_start();
 
 $menu_options = array('basic' => 'Basic',
                       'details' => 'Details',
+		      'neighbours' => 'Neighbours',
                       'arp' => 'ARP Table',
                       'adsl' => 'ADSL');
 
@@ -55,7 +56,7 @@ if ($_GET['optc'] == thumbs)
 {
   $timeperiods = array('-1day','-1week','-1month','-1year');
   $from = '-1day';
-  echo("<div style='display: block; clear: both; margin: auto;'>");
+  echo("<div style='display: block; clear: both; margin: auto; min-height: 500px;'>");
   $sql  = "select * from ports WHERE device_id = '".$device['device_id']."' ORDER BY ifIndex";
   $query = mysql_query($sql);
   unset ($seperator);
@@ -75,22 +76,9 @@ if ($_GET['optc'] == thumbs)
   }
   echo("</div>");
 } else {
-  if ($_GET['opta'] == "arp")
+  if ($_GET['opta'] == "arp" || $_GET['opta'] == "adsl" || $_GET['opta'] == "neighbours")
   {
-    include("arp.inc.php");
-  } elseif ($_GET['opta'] == "adsl") {
-    echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
-
-    echo("<tr><th>Port</th><th>Traffic</th><th>Sync Speed</th><th>Attainable Speed</th><th>Attenuation</th><th>SNR Margin</th><th>Output Powers</th></tr>");
-    $i = "0";
-    $interface_query = mysql_query("select * from `ports` AS P, `ports_adsl` AS A WHERE P.device_id = '".$device['device_id']."' AND A.interface_id = P.interface_id AND P.deleted = '0' ORDER BY `ifIndex` ASC");
-    while ($interface = mysql_fetch_assoc($interface_query))
-    {
-      include("includes/print-interface-adsl.inc.php");
-      $i++;
-    }
-    echo("</table></div>");
-    echo("<div style='min-height: 150px;'></div>");
+    include("ports/".$_GET['opta'].".inc.php");
   } else {
     if ($_GET['opta'] == "details") { $port_details = 1; }
     echo("<div style='margin: 0px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
@@ -102,7 +90,6 @@ if ($_GET['optc'] == thumbs)
       $i++;
     }
     echo("</table></div>");
-    echo("<div style='min-height: 150px;'></div>");
   }
 }
 
