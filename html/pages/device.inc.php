@@ -2,7 +2,7 @@
 
 if ($_GET['id']) { $_GET['id'] = mres($_GET['id']); }
 
-if ($_GET['section'] == "interface" && is_numeric($_GET['opta']) && port_permitted($_GET['opta']))
+if ($_GET['section'] == "port" && is_numeric($_GET['opta']) && port_permitted($_GET['opta']))
 {
   $check_device = get_device_id_by_interface_id($_GET['opta']);
   $permit_ports = 1;
@@ -264,18 +264,18 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     </a>
   </li>');
     }
-
     echo("</ul>");
+  }
+
+  if(device_permitted($device['device_id']) || $check_device == $_GET['id']) {
     echo('<div class="contentstyle">');
 
     include("pages/device/".mres(basename($section)).".inc.php");
 
     echo("</div>");
+  } else {
+    include("includes/error-no-perm.inc.php");
   }
-}
-else
-{
-  include("includes/error-no-perm.inc.php");
 }
 
 ?>
