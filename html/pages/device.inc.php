@@ -153,6 +153,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
 
     if ($_SESSION['userlevel'] >= "5" && mysql_result(mysql_query("SELECT count(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"),0))
     {
+      $discovery_links = TRUE;
       echo('<li class="' . $select['map'] . '">
     <a href="device/' . $device['device_id'] . '/map/">
       <img src="images/16/chart_organisation.png" align="absmiddle" border="0" /> Map
