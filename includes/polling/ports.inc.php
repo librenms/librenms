@@ -123,6 +123,21 @@ while ($port = mysql_fetch_assoc($port_query))
 	$this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
     }
 
+    ### rewrite the ifPhysAddress
+
+    if(strpos($this_port['ifPhysAddress'], ":"))
+    {
+      list($a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(":", $this_port['ifPhysAddress']);
+      $ah_a = zeropad(dechex($a_a));
+      $ah_b = zeropad(dechex($a_b));
+      $ah_c = zeropad(dechex($a_c));
+      $ah_d = zeropad(dechex($a_d));
+      $ah_e = zeropad(dechex($a_e));
+      $ah_f = zeropad(dechex($a_f));
+      #$this_port['ifPhysAddress'] = $ah_a.":".$ah_b.":".$ah_c.":".$ah_d.":".$ah_e.":".$ah_f;
+      $this_port['ifPhysAddress'] = $ah_a.$ah_b.$ah_c.$ah_d.$ah_e.$ah_f;
+    }
+
     if (is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts']))
     {
       echo("HC ");

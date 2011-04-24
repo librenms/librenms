@@ -156,9 +156,6 @@ if ($config['enable_pseudowires']) { echo('<li><a href="pseudowires/"><img src="
 if ($config['enable_vrfs']) { echo('<li><a href="vrfs/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li>'); $ifbreak = 1; }
 
 ?>
-<li><a href="ipv4/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
-<li><a href="ipv6/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> IPv6 Search</a></li>
-
 <?php
 
 if ($_SESSION['userlevel'] >= '5')
@@ -280,7 +277,7 @@ foreach (array_keys($menu_sensors) as $item)
 if ($_SESSION['userlevel'] >= '5')
 {
     echo('
-      <li><a class="menu2four" href="routing/"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" />Routing</a>
+      <li><a class="menu2four" href="routing/"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a>
         <table><tr><td>
         <ul>');
 
@@ -316,6 +313,17 @@ if ($_SESSION['userlevel'] >= '5')
 }
 
 ?>
+
+<li><a class="menu2four" href=""><img src="images/16/find.png" border="0" align="absmiddle" /> Search
+<!--[if IE 7]><!--></a><!--<![endif]-->
+        <table><tr><td>
+        <ul>
+          <li><a href="search/ipv4/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
+          <li><a href="search/ipv6/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> IPv6 Search</a></li>
+          <li><a href="search/mac/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> MAC Search</a></li>
+        </ul>
+      </td></tr></table>
+    </li>
 
 <li style="float: right;"><a><img src="images/16/wrench.png" border="0" align="absmiddle" /> System
 <!--[if IE 7]><!--></a><!--<![endif]-->
