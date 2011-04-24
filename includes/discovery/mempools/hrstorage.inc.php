@@ -2,7 +2,7 @@
 
 global $valid_mempool;
 
-$storage_array = snmpwalk_cache_oid($device, "hrStorageEntry", NULL, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES");
+$storage_array = snmpwalk_cache_oid($device, "hrStorageEntry", NULL, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES:NetWare-Host-Ext-MIB");
 
 if (is_array($storage_array))
 {
@@ -16,7 +16,26 @@ if (is_array($storage_array))
     $units  = $storage['hrStorageAllocationUnits'];
     $deny   = 1;
 
-    if ($fstype == "hrStorageVirtualMemory" || $fstype == "hrStorageRam") { $deny = 0; }
+    switch($fstype)
+    {
+      case 'hrStorageVirtualMemory':
+      case 'hrStorageRam';
+      case 'nwhrStorageDOSMemory';
+      case 'nwhrStorageMemoryAlloc';
+      case 'nwhrStorageMemoryPermanent';
+      case 'nwhrStorageMemoryAlloc';
+      case 'nwhrStorageCacheBuffers';
+      case 'nwhrStorageCacheMovable';
+      case 'nwhrStorageCacheNonMovable';
+      case 'nwhrStorageCodeAndDataMemory';
+      case 'nwhrStorageDOSMemory';
+      case 'nwhrStorageIOEngineMemory';
+      case 'nwhrStorageMSEngineMemory';
+      case 'nwhrStorageUnclaimedMemory';
+        $deny = 0;
+        break;
+    }
+
     if ($device['os'] == "routeros" && $descr == "main memory") { $deny = 0; }
 
     if (strstr($descr, "MALLOC") || strstr($descr, "UMA")) { $deny = 1;  } ## Ignore FreeBSD INSANITY
