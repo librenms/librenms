@@ -128,12 +128,12 @@ while ($port = mysql_fetch_assoc($port_query))
     if(strpos($this_port['ifPhysAddress'], ":"))
     {
       list($a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(":", $this_port['ifPhysAddress']);
-      $ah_a = zeropad(dechex($a_a));
-      $ah_b = zeropad(dechex($a_b));
-      $ah_c = zeropad(dechex($a_c));
-      $ah_d = zeropad(dechex($a_d));
-      $ah_e = zeropad(dechex($a_e));
-      $ah_f = zeropad(dechex($a_f));
+      $ah_a = zeropad($a_a);
+      $ah_b = zeropad($a_b);
+      $ah_c = zeropad($a_c);
+      $ah_d = zeropad($a_d);
+      $ah_e = zeropad($a_e);
+      $ah_f = zeropad($a_f);
       #$this_port['ifPhysAddress'] = $ah_a.":".$ah_b.":".$ah_c.":".$ah_d.":".$ah_e.":".$ah_f;
       $this_port['ifPhysAddress'] = $ah_a.$ah_b.$ah_c.$ah_d.$ah_e.$ah_f;
     }
@@ -233,10 +233,10 @@ while ($port = mysql_fetch_assoc($port_query))
       DS:OUTBROADCASTPKTS:DERIVE:600:0:12500000000 \
       DS:INMULTICASTPKTS:DERIVE:600:0:12500000000 \
       DS:OUTMULTICASTPKTS:DERIVE:600:0:12500000000 \
-      RRA:AVERAGE:0.5:1:600 \
-      RRA:AVERAGE:0.5:6:700 \
-      RRA:AVERAGE:0.5:24:775 \
-      RRA:AVERAGE:0.5:288:797 \
+      RRA:AVERAGE:0.5:1:2400 \
+      RRA:AVERAGE:0.5:6:1200 \
+      RRA:AVERAGE:0.5:24:1200 \
+      RRA:AVERAGE:0.5:288:1200 \
       RRA:MAX:0.5:1:600 \
       RRA:MAX:0.5:6:700 \
       RRA:MAX:0.5:24:775 \
