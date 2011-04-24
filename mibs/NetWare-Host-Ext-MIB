@@ -1,0 +1,1094 @@
+NetWare-Host-Ext-MIB DEFINITIONS ::= BEGIN
+
+       --
+       -- This MIB document is 'WORK IN PROGRESS' of Novell, Inc.
+       -- As such, it is subject to change, without notice, until
+       -- such time as it is formally released and this disclaimer
+       -- removed.
+       --
+       -- This MIB defines extensions to the HOST-RESOURCES-MIB
+       -- for Novell NetWare servers.
+       --
+       -- Last Updated: August 9, 1994
+       --
+
+       IMPORTS
+          enterprises, Counter
+             FROM RFC1155-SMI
+
+          OBJECT-TYPE
+             FROM RFC-1212
+          ifIndex
+             FROM RFC1213-MIB
+
+          hrDeviceIndex
+             FROM HOST-RESOURCES-MIB;
+
+
+       --  This data type is used to model textual information in some
+       --  character set.  A network management station should use a local
+       --  algorithm to determine which character set is in use and how it
+       --  should be displayed.  Note that this character set may be encoded
+       --  with more than one octet per symbol, but will most often be NVT
+       --  ASCII.
+
+
+       -- Identifies a transport protocol.
+       --
+       TransportDomain ::= INTEGER {
+                 noAddress(1),
+                 ipx(2),
+                 ip(3),
+                 appleTalkDDP(4)
+            }
+       -- A representation of a transport address in the domain
+       -- specified by a paired object of type TransportDomain.
+       --
+       TransportAddress    ::= OCTET STRING
+       --
+
+
+       novell              OBJECT IDENTIFIER ::= { enterprises 23 }
+       mibDoc              OBJECT IDENTIFIER ::= { novell 2 }
+
+       nwHostExtensions    OBJECT IDENTIFIER ::= { mibDoc 27 }
+
+       nwhrStorage         OBJECT IDENTIFIER ::= { nwHostExtensions 2 }
+       nwhrDevice          OBJECT IDENTIFIER ::= { nwHostExtensions 3 }
+       nwhrOdi             OBJECT IDENTIFIER ::= { nwHostExtensions 10 }
+       --
+       -- Extensions to the hrStorage Group
+       --
+
+       -- Registration for NetWare storage types, for use with
+       -- hrStorageType of hrStorageEntry in HOST-RESOURCES-MIB
+
+       nwhrStorageTypes
+                      OBJECT IDENTIFIER ::= { nwhrStorage 1 }
+
+       nwhrStorageVolume
+                      OBJECT IDENTIFIER ::= { nwhrStorageTypes 1 }
+       nwhrStorageMemoryPermanent
+                      OBJECT IDENTIFIER ::= { nwhrStorageTypes 2 }
+       nwhrStorageMemoryAlloc
+                      OBJECT IDENTIFIER ::= { nwhrStorageTypes 3 }
+       nwhrStorageCacheBuffers
+                      OBJECT IDENTIFIER ::= { nwhrStorageTypes 4 }
+       nwhrStorageCacheMovable
+                      OBJECT IDENTIFIER ::= { nwhrStorageTypes 5 }
+       nwhrStorageCacheNonMovable
+                      OBJECT IDENTIFIER ::= { nwhrStorageTypes 6 }
+       nwhrStorageCodeAndDataMemory
+                      OBJECT IDENTIFIER ::= { nwhrStorageTypes 7 }
+       nwhrStorageDOSMemory
+                      OBJECT IDENTIFIER ::= { nwhrStorageTypes 8 }
+       nwhrStorageIOEngineMemory
+                      OBJECT IDENTIFIER ::= { nwhrStorageTypes 9 }
+       nwhrStorageMSEngineMemory
+                      OBJECT IDENTIFIER ::= { nwhrStorageTypes 10 }
+       nwhrStorageUnclaimedMemory
+                      OBJECT IDENTIFIER ::= { nwhrStorageTypes 11 }
+       --
+       -- Extensions to the hrDevice Group
+       --
+
+       -- Registration for NetWare device types, for use with
+       -- hrDeviceType of hrDeviceEntry in HOST-RESOURCES-MIB
+
+       nwhrDeviceTypes     OBJECT IDENTIFIER ::= { nwhrDevice 1 }
+
+       nwhrDeviceMirroredServerLink
+                      OBJECT IDENTIFIER ::= { nwhrDeviceTypes 1 }
+
+
+       -- memory size, expressed in units of 1024bytes
+       KBytes ::=    INTEGER (0..2147483647)
+
+       InternationalDisplayString ::= OCTET STRING
+       --  This data type is used to model textual information in some
+       --  character set.  A network management station should use a local
+       --  algorithm to determine which character set is in use and how it
+       --  should be displayed.  Note that this character set may be encoded
+       --  with more than one octet per symbol, but will most often be NVT
+       --  ASCII.
+
+       --
+       -- Extensions to the hrDeviceTable
+       --
+
+       nwhrDeviceTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF NwhrDeviceEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "Extensions to the (conceptual) table of devices
+                 contained by the host"
+          ::= { nwhrDevice 2 }
+
+       nwhrDeviceEntry OBJECT-TYPE
+          SYNTAX NwhrDeviceEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "Extensions to a (conceptual) entry for one device
+                 contained by the host"
+          INDEX  { hrDeviceIndex }
+          ::= { nwhrDeviceTable 1 }
+
+       NwhrDeviceEntry ::= SEQUENCE {
+            nwhrDeviceAdapterIndex      INTEGER,
+            nwhrDeviceControllerNumber  INTEGER,
+            nwhrDeviceNumber            INTEGER
+          }
+
+       nwhrDeviceAdapterIndex OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The index into the nwhrAdapterTable of the
+                 adapter/controller to which this device is attached (or
+                 physically manifested by, for logical device).  Zero if
+                 not applicable."
+          ::= { nwhrDeviceEntry 1 }
+
+       nwhrDeviceControllerNumber OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The controller number (relative to its adapter), or
+                 the SCSI target ID, or zero if not applicable.  Note
+                 that zero is a valid value for both controller number
+                 and SCSI Target ID."
+          ::= { nwhrDeviceEntry 2 }
+
+       nwhrDeviceNumber OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The device number (relative to its controller), or the
+                 SCSI LUN (Logical Unit Number), or zero if not
+                 applicable.  Note that zero is a valid value for both
+                 device number and SCSI LUN."
+          ::= { nwhrDeviceEntry 3 }
+
+       nwhrProcessorCount OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of processor devices contained in this
+                 host"
+          ::= { nwhrDevice 3 }
+
+       nwhrPrinterCount OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of printer devices contained in this host"
+          ::= { nwhrDevice 4 }
+
+       nwhrDiskStorageCount  OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of Disk Storage devices contained in this
+                 host."
+          ::= { nwhrDevice 5 }
+
+
+       --
+       -- Extensions to the hrDiskStorageTable
+       --
+
+       nwhrDiskStorageTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF NwhrDiskStorageEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "Extensions to the hrDiskStorageTable"
+          ::= { nwhrDevice 6 }
+
+       nwhrDiskStorageEntry OBJECT-TYPE
+          SYNTAX NwhrDiskStorageEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "Extensions to the hrDiskStorageEntry"
+          INDEX  { hrDeviceIndex }
+          ::= { nwhrDiskStorageTable 1 }
+
+       NwhrDiskStorageEntry ::= SEQUENCE {
+            nwhrDiskStorageHeads        INTEGER,
+            nwhrDiskStorageCylinders    INTEGER,
+            nwhrDiskStorageSectorsPerTrack     INTEGER,
+            nwhrDiskStorageSectorSize   INTEGER,
+            nwhrDiskStorageBlockSize    INTEGER
+          }
+
+       nwhrDiskStorageHeads OBJECT-TYPE
+
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of read/write heads on the drive"
+          ::= { nwhrDiskStorageEntry 1 }
+
+       nwhrDiskStorageCylinders OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of cylinders on the drive."
+          ::= { nwhrDiskStorageEntry 2 }
+
+       nwhrDiskStorageSectorsPerTrack OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of sectors per track on the drive."
+          ::= { nwhrDiskStorageEntry 3 }
+
+       nwhrDiskStorageSectorSize OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The size of a sector in bytes."
+          ::= { nwhrDiskStorageEntry 4 }
+
+       nwhrDiskStorageBlockSize OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The driver maximum I/O request size in bytes."
+          ::= { nwhrDiskStorageEntry 5 }
+
+
+       --
+       -- The Physical Partition Table
+       --
+
+       nwhrPhysicalPartitionTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF NwhrPhysicalPartitionEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "A table of physical partitions for long-term storage
+                 devices contained by the host."
+          ::= { nwhrDevice 7 }
+
+       nwhrPhysicalPartitionEntry OBJECT-TYPE
+          SYNTAX NwhrPhysicalPartitionEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "An entry for one partition.  The hrDeviceIndex in the
+                 index represents the entry in the hrDeviceTable that
+                 corresponds to the nwhrPhysicalPartitionEntry."
+          INDEX  { hrDeviceIndex, nwhrPhysicalPartitionIndex }
+          ::= { nwhrPhysicalPartitionTable 1 }
+       NwhrPhysicalPartitionEntry ::= SEQUENCE {
+            nwhrPhysicalPartitionIndex  INTEGER,
+            nwhrPhysicalPartitionType   INTEGER,
+            nwhrPhysicalPartitionDescr  InternationalDisplayString,
+            nwhrPhysicalPartitionSize   KBytes
+          }
+
+       nwhrPhysicalPartitionIndex OBJECT-TYPE
+          SYNTAX INTEGER (0..2147483647)
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "A unique value for each physical partition on this
+                 long-term storage device.  The value for each long-term
+                 storage device must remain constant from one re-
+                 initialization of the agent to the next re-
+                 initialization."
+          ::= { nwhrPhysicalPartitionEntry 1 }
+
+       nwhrPhysicalPartitionType OBJECT-TYPE
+          SYNTAX INTEGER {
+                      other(1),
+                      netWare(2),
+                      dos(3),
+                      inwDos(4)
+                 }
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The type of this physical partition."
+          ::= { nwhrPhysicalPartitionEntry 2 }
+
+       nwhrPhysicalPartitionDescr OBJECT-TYPE
+          SYNTAX InternationalDisplayString (SIZE (0..128))
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "A textual description of this partition."
+          ::= { nwhrPhysicalPartitionEntry 3 }
+
+       nwhrPhysicalPartitionSize OBJECT-TYPE
+          SYNTAX KBytes
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The size (in Kilobytes) of this physical partition."
+          ::= { nwhrPhysicalPartitionEntry 4 }
+
+
+       --
+       -- The Hotfix Table
+       --
+       -- The table of hotfix redirection areas for all NetWare
+       -- partitions on the host.
+       --
+       -- An entry is placed in the hotfix table for each device in
+       -- the host whose type is `hrDeviceDiskStorage' and it
+       -- contains a NetWare partition.
+       --
+
+       nwhrHotfixTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF NwhrHotfixEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "The table of hotfix areas of diskStorage devices
+                 contained by the host.
+
+                 Note that this table is potentially sparse: an entry
+                 exists if the corresponding value of the hrDeviceType
+                 object is `hrDeviceDiskStorage' and a NetWare partition
+                 exists on the device."
+          ::= { nwhrDevice 8 }
+
+       nwhrHotfixEntry OBJECT-TYPE
+          SYNTAX NwhrHotfixEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "An entry for one hotfix redirection area contained by
+                 the host."
+          INDEX { hrDeviceIndex, nwhrPhysicalPartitionIndex }
+          ::= { nwhrHotfixTable 1 }
+
+       NwhrHotfixEntry ::= SEQUENCE {
+            nwhrHotfixUnits             INTEGER,
+            nwhrHotfixTotal             INTEGER,
+            nwhrHotfixUsed              INTEGER,
+            nwhrHotfixReserved          INTEGER
+            }
+
+       nwhrHotfixUnits OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The size, in bytes, of the hotfix blocks."
+          ::= { nwhrHotfixEntry 1 }
+
+       nwhrHotfixTotal OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The size of the total hotfix redirection area
+                 represented by this entry, in units of
+                 nwhrHotfixUnits."
+          ::= { nwhrHotfixEntry 2 }
+
+       nwhrHotfixUsed OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of hotfix redirected blocks, i.e. the
+                 number of bad blocks that hotfix has found."
+          ::= { nwhrHotfixEntry 3 }
+
+       nwhrHotfixReserved OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of hotfix redirection blocks reserved for
+                 system use."
+          ::= { nwhrHotfixEntry 4 }
+
+
+       --
+       -- The Adapter Table
+       --
+       nwhrAdapterCount OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of adapters contained in this host."
+          ::= { nwhrDevice 9 }
+
+       nwhrAdapterTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF NwhrAdapterEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "General information for each adapter board in the
+                 host: driver name and version, Interrupt, DMA, I/O
+                 address, and number of attached devices."
+          ::= { nwhrDevice 10 }
+
+       nwhrAdapterEntry OBJECT-TYPE
+          SYNTAX NwhrAdapterEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "General information for a particular adapter board in
+                 the host: driver name and version, Interrupt, DMA, I/O
+                 address, and number of attached devices."
+          INDEX  { nwhrAdapterIndex }
+          ::= { nwhrAdapterTable 1 }
+
+       NwhrAdapterEntry ::= SEQUENCE {
+            nwhrAdapterIndex            INTEGER,
+            nwhrAdapterType             OBJECT IDENTIFIER,
+            nwhrAdapterDescr            InternationalDisplayString,
+            nwhrAdapterDriverDescr      InternationalDisplayString,
+            nwhrAdapterDriverMajorVer   INTEGER,
+            nwhrAdapterDriverMinorVer   INTEGER,
+            nwhrAdapterPort1            INTEGER,
+            nwhrAdapterPort1Len         INTEGER,
+            nwhrAdapterPort2            INTEGER,
+            nwhrAdapterPort2Len         INTEGER,
+            nwhrAdapterMem1             INTEGER,
+            nwhrAdapterMem1Len          INTEGER,
+            nwhrAdapterMem2             INTEGER,
+            nwhrAdapterMem2Len          INTEGER,
+            nwhrAdapterDMA1             INTEGER,
+            nwhrAdapterDMA2             INTEGER,
+            nwhrAdapterInterrupt1       INTEGER,
+            nwhrAdapterInterrupt2       INTEGER,
+            nwhrAdapterSlot             INTEGER,
+            nwhrAdapterDevices          INTEGER
+          }
+
+       nwhrAdapterIndex OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "A unique value for each adapter contained in the host.
+                 The value for each adapter must remain constant at
+                 least from one re-initialization of the agent to the
+                 next re-initialization."
+          ::= { nwhrAdapterEntry 1 }
+
+       nwhrAdapterType OBJECT-TYPE
+          SYNTAX OBJECT IDENTIFIER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "An indication of the type of adapter.  This will
+                 typically be one of the possible values of
+                 hrDeviceType."
+          ::= { nwhrAdapterEntry 2 }
+
+       nwhrAdapterDescr OBJECT-TYPE
+          SYNTAX InternationalDisplayString (SIZE(0..128))
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "A description the hardware for this adapter.  This
+                 will usually include manufacturer, model, and version
+                 information.  For LAN adapters, this could include the
+                 short board name and the boards burnt-in MAC address."
+          ::= { nwhrAdapterEntry 3 }
+
+       nwhrAdapterDriverDescr OBJECT-TYPE
+          SYNTAX InternationalDisplayString (SIZE(0..128))
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "A textual description of the driver for this adapter"
+          ::= { nwhrAdapterEntry 4 }
+
+       nwhrAdapterDriverMajorVer OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The major version number of the adapter driver."
+          ::= { nwhrAdapterEntry 5 }
+
+       nwhrAdapterDriverMinorVer OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The minor version number of the adapter driver."
+          ::= { nwhrAdapterEntry 6 }
+
+       nwhrAdapterPort1 OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The primary I/O port block.  This is the base address
+                 of a block of I/O addresses decoded by the adapter.
+                 The value will be zero if there is no I/O address
+                 associated with this adapter."
+          ::= { nwhrAdapterEntry 7 }
+
+       nwhrAdapterPort1Len OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of I/O ports in the block starting at
+                 nwhrAdapterPort1.  This value is used in conjunction
+                 with nwhrAdapterPort1 to determine the I/O block used
+                 by the adapter.  The value will be zero if there is no
+                 I/O address associated with this adapter."
+          ::= { nwhrAdapterEntry 8 }
+
+       nwhrAdapterPort2 OBJECT-TYPE
+
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The secondary I/O port block.  This is the base
+                 address of a block of I/O addresses decoded by the
+                 adapter.  The value will be zero if there is no
+                 secondary I/O address associated with this adapter."
+          ::= { nwhrAdapterEntry 9 }
+
+       nwhrAdapterPort2Len OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of I/O ports in the block starting at
+                 nwhrAdapterPort2.  This value is used in conjunction
+                 with nwhrAdapterPort2 to determine the secondary I/O
+                 block used by the adapter.  The value will be zero if
+                 there is no I/O address associated with this adapter."
+          ::= { nwhrAdapterEntry 10 }
+
+       nwhrAdapterMem1 OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The primary Memory Address.  This is the base address
+                 of the primary block of memory space decoded by the
+                 adapter. The value will be zero if there is no memory
+                 address associated with this adapter."
+          ::= { nwhrAdapterEntry 11 }
+
+       nwhrAdapterMem1Len OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The length, in bytes, of the primary memory address
+                 block. From this value and nwhrAdapterMem1, a
+                 determination can be made as to which memory address
+                 ranges are in use by the adapter."
+          ::= { nwhrAdapterEntry 12 }
+
+       nwhrAdapterMem2 OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The secondary Memory Address.  This is the address of
+                 the secondary block of memory space decoded by the
+                 adapter. The value will be zero if there is no
+                 secondary memory address associated with this adapter."
+          ::= { nwhrAdapterEntry 13 }
+
+       nwhrAdapterMem2Len OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The length, in bytes, of the secondary memory address
+                 block. From this value and nwhrAdapterMem2, a
+                 determination can be made as to which memory address
+                 ranges are in use by the adapter."
+          ::= { nwhrAdapterEntry 14 }
+       nwhrAdapterDMA1 OBJECT-TYPE
+          SYNTAX INTEGER (0..255)
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The primary DMA channel used by the adapter. The value
+                 will be 255 if this adapter does not use any DMA
+                 channel."
+          ::= { nwhrAdapterEntry 15 }
+
+       nwhrAdapterDMA2 OBJECT-TYPE
+          SYNTAX INTEGER (0..255)
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The secondary DMA channel used by the adapter. The
+                 value will be 255 if this adapter does not use a
+                 secondary DMA channel."
+          ::= { nwhrAdapterEntry 16 }
+
+       nwhrAdapterInterrupt1 OBJECT-TYPE
+          SYNTAX INTEGER (0..255)
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The primary interrupt vector used by the adapter. The
+                 value will be 255 if this adapter does not use any
+                 Interrupt."
+          ::= { nwhrAdapterEntry 17 }
+
+       nwhrAdapterInterrupt2 OBJECT-TYPE
+          SYNTAX INTEGER (0..255)
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The secondary interrupt vector used by the adapter.
+                 The value will be 255 if this adapter does not use a
+                 secondary Interrupt."
+          ::= { nwhrAdapterEntry 18 }
+
+       nwhrAdapterSlot OBJECT-TYPE
+          SYNTAX INTEGER (0..65535)
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The slot in which the adapter resides.  The value will
+                 be zero if the slot information is not available on the
+                 platform, such as an ISA based PC, otherwise the value
+                 will be the slot number the adapter resides.  The slot
+                 number starts from 1."
+          ::= { nwhrAdapterEntry 19 }
+
+       nwhrAdapterDevices OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of devices associated with this adapter.
+                 For instance, the number of drives attached to a disk
+                 controller."
+          ::= { nwhrAdapterEntry 20 }
+
+
+       --
+       -- Mirrored Server Link (MSL)
+       --
+
+       nwhrMslCount OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of Mirrored Server Link (MSL) devices
+                 contained in this host."
+          ::= { nwhrDevice 11 }
+
+
+       nwhrMslTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF NwhrMslEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "The (conceptual) table of Mirrored Server Link (MSL)
+                 devices contained by the host.
+
+                 Note that this table is potentially sparse: a
+                 (conceptual) entry exists only if the corresponding
+                 value of the hrDeviceType object is
+                 nwhrDeviceMirroredServerLink"
+          ::= { nwhrDevice 12 }
+
+       nwhrMslEntry OBJECT-TYPE
+          SYNTAX NwhrMslEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 " A (conceptual) entry for one Mirrored Server Link
+                 (MSL) device contained by the host.  The hrDeviceIndex
+                 in the index represents the entry in the hrDeviceTable
+                 that corresponds to the nwhrMslEntry."
+          INDEX  { hrDeviceIndex }
+          ::= { nwhrMslTable 1 }
+
+       NwhrMslEntry ::= SEQUENCE {
+            nwhrMslState                INTEGER,
+            nwhrMslSpeed                INTEGER,
+            nwhrMslSends                Counter,
+            nwhrMslReceives             Counter,
+            nwhrMslInErrors             Counter,
+            nwhrMslOutErrors            Counter
+          }
+
+       nwhrMslState OBJECT-TYPE
+          SYNTAX INTEGER {
+                      offline(1),
+                      startup(2),
+                      standby(3),
+                      active(4)
+                 }
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The current state of this MSL device."
+          ::= { nwhrMslEntry 1 }
+
+       nwhrMslSpeed OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The nominal bandwidth of the MSL link in bits per
+                 second."
+          ::= { nwhrMslEntry 2 }
+
+       nwhrMslSends OBJECT-TYPE
+          SYNTAX Counter
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of sends from this MSL device."
+          ::= { nwhrMslEntry 3 }
+
+       nwhrMslReceives OBJECT-TYPE
+          SYNTAX Counter
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of receives by this MSL device."
+          ::= { nwhrMslEntry 4 }
+
+       nwhrMslInErrors OBJECT-TYPE
+          SYNTAX Counter
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of errors in receives by this MSL device."
+          ::= { nwhrMslEntry 5 }
+
+       nwhrMslOutErrors OBJECT-TYPE
+          SYNTAX Counter
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The number of errors on sends by this MSL device."
+          ::= { nwhrMslEntry 6 }
+
+
+       --
+       -- The Printer Table
+       --
+
+       nwhrPrinterTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF NwhrPrinterEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "A set of data for each accessible printer, whether
+                 local or remote."
+          ::= { nwhrDevice 13 }
+
+       nwhrPrinterEntry OBJECT-TYPE
+          SYNTAX NwhrPrinterEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "A set of data for a particular printer."
+          INDEX  { nwhrPrinterID }
+          ::= { nwhrPrinterTable 1 }
+       NwhrPrinterEntry ::= SEQUENCE {
+            nwhrPrinterID               INTEGER,
+            nwhrPrinterType             INTEGER,
+            nwhrPrinterLocalName        InternationalDisplayString,
+            nwhrPrinterQueueName        InternationalDisplayString,
+            nwhrPrinterServerName       InternationalDisplayString,
+            nwhrPrinterTransportDomain  TransportDomain,
+            nwhrPrinterTransportAddress TransportAddress,
+            nwhrPrinterDeviceIndex      INTEGER
+          }
+
+       nwhrPrinterID OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "A unique value for each accessible printer.  This
+                 value will be constant for the lifetime of the
+                 mapping."
+          ::= { nwhrPrinterEntry 1 }
+
+       nwhrPrinterType OBJECT-TYPE
+          SYNTAX INTEGER {
+                      other(1),
+                      local(2),
+                      netware(3),
+                      unixware(4)
+                 }
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The type of the printer."
+          ::= { nwhrPrinterEntry 2 }
+
+       nwhrPrinterLocalName OBJECT-TYPE
+          SYNTAX InternationalDisplayString
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The local name for the printer."
+          ::= { nwhrPrinterEntry 3 }
+
+       nwhrPrinterQueueName OBJECT-TYPE
+          SYNTAX InternationalDisplayString
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The name of the print queue associated with this
+                 printer.  Zero length string if printer is local."
+          ::= { nwhrPrinterEntry 4 }
+
+       nwhrPrinterServerName OBJECT-TYPE
+          SYNTAX InternationalDisplayString
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The name of the server containing the print queue.
+                 Zero length string if printer is local."
+          ::= { nwhrPrinterEntry 5 }
+
+       nwhrPrinterTransportDomain OBJECT-TYPE
+          SYNTAX TransportDomain
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The transport domain associated with the printer
+                 (print queue)."
+          ::= { nwhrPrinterEntry 6 }
+
+       nwhrPrinterTransportAddress OBJECT-TYPE
+          SYNTAX TransportAddress
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The transport address associated with this printer
+                 (print queue).  Zero length string if printer is
+                 local."
+          ::= { nwhrPrinterEntry 7 }
+
+       nwhrPrinterDeviceIndex OBJECT-TYPE
+          SYNTAX INTEGER (0..2147483647)
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The value of hrDeviceIndex for this printer.  Zero if
+                 non-local."
+          ::= { nwhrPrinterEntry 8 }
+       --
+       -- The ODI (Open Datalink Interface) Group
+       --
+
+       -- The ODI Group provides information about Link Support Layer
+       -- (LSL), LAN cards, WAN cards, logical LAN (frame), and
+       -- protocols.  No statistics (except for LSL which is Novell
+       -- proprietary) are provided in these tables, management
+       -- stations should collect LAN statistics through the
+       -- standard MIB II, various Transmission MIBs and Protocol
+       -- MIBs.
+
+       nwhrLslOutPkts OBJECT-TYPE
+          SYNTAX Counter
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The total number of of SendPacket requests made to the
+                 LSL."
+          ::= { nwhrOdi 1 }
+
+       nwhrLslInPkts OBJECT-TYPE
+          SYNTAX Counter
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The total number of GetStackECB requests made by MLIDs
+                 to the LSL."
+          ::= { nwhrOdi 2 }
+
+       nwhrLslUnclaimedPkts OBJECT-TYPE
+          SYNTAX Counter
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The total number of times a packet was received and
+                 not consumed by a protocol stack."
+          ::= { nwhrOdi 3 }
+
+
+       --
+       -- the Protocol Table
+       --
+
+       nwhrProtocolTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF NwhrProtocolEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "The Protocol Table provides basic information about
+                 protocols running in the host, management stations
+                 should refer to the appropriate protocol MIBs for the
+                 details about each protocol."
+          ::= { nwhrOdi 4 }
+
+       nwhrProtocolEntry OBJECT-TYPE
+          SYNTAX NwhrProtocolEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "Information about a particular protocol."
+          INDEX  { INTEGER, nwhrProtocolName }
+          ::= { nwhrProtocolTable 1 }
+       NwhrProtocolEntry ::= SEQUENCE {
+            nwhrProtocolName            InternationalDisplayString,
+            nwhrProtocolID              OCTET STRING,
+            nwhrProtocolAddress         InternationalDisplayString,
+            nwhrProtocolOutPkts         Counter,
+            nwhrProtocolInPkts          Counter,
+            nwhrProtocolIgnoredPkts     Counter,
+            nwhrProtocolFullName        InternationalDisplayString
+          }
+
+       nwhrProtocolName OBJECT-TYPE
+          SYNTAX InternationalDisplayString (SIZE(0..20))
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The protocol name, for example, IPX, IP, ARP."
+          ::= { nwhrProtocolEntry 1 }
+
+       nwhrProtocolID OBJECT-TYPE
+          SYNTAX OCTET STRING (SIZE(0..6))
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The protocol identifier For example:
+                 000000000800 - IP for Ethernet II
+                 00080007809B - AppleTalk for Ethernet SNAP"
+          ::= { nwhrProtocolEntry 2 }
+
+       nwhrProtocolAddress OBJECT-TYPE
+          SYNTAX InternationalDisplayString
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "This object provides protocol address information, for
+                 example, the Network Address on IPX network, the IP
+                 address on IP network. Note there is no format in the
+                 InternationalDisplayString and the information is not
+                 guaranteed available."
+          ::= { nwhrProtocolEntry 3 }
+
+       nwhrProtocolOutPkts OBJECT-TYPE
+          SYNTAX Counter
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The total number of send packet requests made to the
+                 LSL."
+          ::= { nwhrProtocolEntry 4 }
+
+       nwhrProtocolInPkts OBJECT-TYPE
+          SYNTAX Counter
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The total number of incoming packets that were
+                 consumed by the protocol."
+          ::= { nwhrProtocolEntry 5 }
+
+       nwhrProtocolIgnoredPkts OBJECT-TYPE
+          SYNTAX Counter
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The total number of times the protocol receive handler
+                 was called with look ahead and the protocol did not
+                 return a receive ECB to the MLID to receive the packet"
+          ::= { nwhrProtocolEntry 6 }
+
+       nwhrProtocolFullName OBJECT-TYPE
+          SYNTAX InternationalDisplayString
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The full name of the protocol name, for example,
+                 'DOD Internet Protocol'."
+          ::= { nwhrProtocolEntry 7 }
+
+
+       --
+       -- Extensions to the MIB-II Interfaces table
+       --
+
+       nwhrIfTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF NwhrIfEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "Extensions to MIB-II's Interfaces table to add some
+                 NetWare specific info."
+          ::= { nwhrOdi 5 }
+
+       nwhrIfEntry OBJECT-TYPE
+          SYNTAX NwhrIfEntry
+          ACCESS not-accessible
+          STATUS mandatory
+          DESCRIPTION
+                 "NetWare specific info for a particular interface."
+          INDEX  { INTEGER }
+          ::= { nwhrIfTable 1 }
+
+       NwhrIfEntry ::= SEQUENCE {
+            nwhrIfLogicalBoardNumber    INTEGER,
+            nwhrIfFrameType             InternationalDisplayString,
+            nwhrIfLogicalBoardName      InternationalDisplayString
+          }
+
+       nwhrIfLogicalBoardNumber OBJECT-TYPE
+          SYNTAX INTEGER
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The logical board number."
+          ::= { nwhrIfEntry 1 }
+
+       nwhrIfFrameType OBJECT-TYPE
+          SYNTAX InternationalDisplayString
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The frame type for this logical board."
+          ::= { nwhrIfEntry 2 }
+
+       nwhrIfLogicalBoardName OBJECT-TYPE
+          SYNTAX InternationalDisplayString (SIZE(0..18))
+          ACCESS read-only
+          STATUS mandatory
+          DESCRIPTION
+                 "The name assigned to this logical board."
+          ::= { nwhrIfEntry 3 }
+       END

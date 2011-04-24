@@ -2,7 +2,8 @@
 
 echo("Storage : ");
 
-include("storage-hrstorage.inc.php");
+include_dir("includes/discovery/storage");
+
 
 ### Remove storage which weren't redetected here
 
