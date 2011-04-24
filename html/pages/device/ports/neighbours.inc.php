@@ -19,7 +19,7 @@ while($neighbour = mysql_fetch_assoc($query))
   if ($bg_colour == $list_colour_b) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
   echo('<tr bgcolor="'.$bg_colour.'">');
-  echo("<td>".generate_port_link($neighbour)."<br />".$neighbour['ifAlias']."</td>");
+  echo('<td><span style="font-weight: bold;">'.generate_port_link($neighbour).'</span><br />'.$neighbour['ifAlias'].'</td>');
 
   if(is_numeric($neighbour['remote_interface_id']) && $neighbour['remote_interface_id'])  
   {

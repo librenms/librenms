@@ -7,7 +7,7 @@ if($config['os'][$device['os']]['processor_stacked'] == 1)
 {
   include("includes/graphs/device/processor_stack.inc.php");
 } else {
-  include("includes/graphs/device/processor_seperate.inc.php");
+  include("includes/graphs/device/processor_separate.inc.php");
 }
 
 ?>
