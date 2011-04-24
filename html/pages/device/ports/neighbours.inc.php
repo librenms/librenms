@@ -10,7 +10,7 @@ $i = "1";
 echo('<tr><th>Local Port</th>
           <th>Remote Port</th>
           <th>Remote Device</th>
-          <th></th>
+          <th>Protocol</th>
       </tr>');
 
 while($neighbour = mysql_fetch_assoc($query))
@@ -32,6 +32,8 @@ while($neighbour = mysql_fetch_assoc($query))
     echo("<td>".$neighbour['remote_hostname']."
           <br />".$neighbour['remote_platform']."</td>");
   }
+  echo("<td>".$neighbour['protocol']."</td>");
+  echo("</tr>");
   $i++;
 }
 
