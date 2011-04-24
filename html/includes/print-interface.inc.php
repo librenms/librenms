@@ -112,7 +112,7 @@ if ($port_adsl['adslLineCoding'])
   echo("<br />");
   if ($ifHardType && $ifHardType != "") { echo("<span class=box-desc>" . $ifHardType . "</span>"); } else { echo("-"); }
   echo("</td><td width=150>");
-  if ($interface['ifPhysAddress'] && $interface['ifPhysAddress'] != "") { echo("<span class=box-desc>" . $interface['ifPhysAddress'] . "</span>"); } else { echo("-"); }
+  if ($interface['ifPhysAddress'] && $interface['ifPhysAddress'] != "") { echo("<span class=box-desc>" . formatMac($interface['ifPhysAddress']) . "</span>"); } else { echo("-"); }
   echo("<br />");
   if ($interface['ifMtu'] && $interface['ifMtu'] != "") { echo("<span class=box-desc>MTU " . $interface['ifMtu'] . "</span>"); } else { echo("-"); }
 }
