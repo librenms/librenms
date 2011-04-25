@@ -1,5 +1,18 @@
 <?php
 
+function get_percentage_colours($percentage)
+{
+
+  if ($percentage > '90') { $background['left']='c4323f'; $background['right']='C96A73'; }
+  elseif ($percentage > '75') { $background['left']='bf5d5b'; $background['right']='d39392'; }
+  elseif ($percentage > '50') { $background['left']='bf875b'; $background['right']='d3ae92'; }
+  elseif ($percentage > '25') { $background['left']='5b93bf'; $background['right']='92b7d3'; }
+  else { $background['left']='9abf5b'; $background['right']='bbd392'; }
+
+  return($background);
+
+}
+
 function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0)
 {
   global $twoday, $day, $now, $config;

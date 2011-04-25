@@ -127,12 +127,9 @@ if (bill_permitted($bill_id))
     <br />Transferred ".formatStorage($total_data * 1024 * 1024)." of ".formatStorage($bill_data['bill_gb'] * 1024 * 1024 * 1024)." (".$percent."%)
     <br />Average rate " . formatRates($rate_average * 1000));
 
-    if ($percent > 100) { $perc = "100"; } else { $perc = $percent; }
-    if ($perc > '90') { $left_background='c4323f'; $right_background='C96A73';
-    } elseif ($perc > '75') { $left_background='bf5d5b'; $right_background='d39392';
-    } elseif ($perc > '50') { $left_background='bf875b'; $right_background='d3ae92';
-    } elseif ($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3';
-    } else { $left_background='9abf5b'; $right_background='bbd392'; }
+    $background = get_percentage_colours($percent);
+    $right_background = $background['right'];
+    $left_background  = $background['left'];
 
     echo("<p>".print_percentage_bar (350, 20, $perc, NULL, "ffffff", $left_background, $percent . "%", "ffffff", $right_background)."</p>");
 
