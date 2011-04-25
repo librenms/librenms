@@ -39,18 +39,14 @@ while ($proc = mysql_fetch_assoc($procs))
 
     $perc = round($proc['processor_usage']);
 
-    if ($perc > '90') { $left_background='c4323f'; $right_background='C96A73'; }
-    elseif ($perc > '75') { $left_background='bf5d5b'; $right_background='d39392'; }
-    elseif ($perc > '50') { $left_background='bf875b'; $right_background='d3ae92'; }
-    elseif ($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3'; }
-    else { $left_background='9abf5b'; $right_background='bbd392'; }
+    $background = get_percentage_colours($perc);
 
     echo("    <tr bgcolor=\"$row_colour\">
                <td>".generate_device_link($proc)."</td>
                <td class=\"tablehead\"><a href='".$proc_url."' $proc_popup>" . $text_descr . "</a></td>
                <td width=\"90\"><a href=\"".$proc_url."\"  $proc_popup><img src=\"$mini_url\" /></a></td>
                <td width=\"200\"><a href=\"".$proc_url."\" $proc_popup>
-           ".print_percentage_bar (400, 20, $perc, $perc."%", "ffffff", $left_background, (100 - $perc)."%" , "ffffff", $right_background));
+           ".print_percentage_bar (400, 20, $perc, $perc."%", "ffffff", $background['left'], (100 - $perc)."%" , "ffffff", $background['right']));
     echo('</a></td>
              </tr>');
 

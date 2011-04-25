@@ -27,11 +27,9 @@ while ($mempool = mysql_fetch_assoc($mempools))
 
   $perc = round($mempool['mempool_used'] / $mempool['mempool_total'] * 100);
 
-  if ($perc > '90') { $left_background='c4323f'; $right_background='C96A73'; }
-  elseif ($perc > '75') { $left_background='bf5d5b'; $right_background='d39392'; }
-  elseif ($perc > '50') { $left_background='bf875b'; $right_background='d3ae92'; }
-  elseif ($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3'; }
-  else { $left_background='9abf5b'; $right_background='bbd392'; }
+  $background = get_percentage_colours($percent);
+  $right_background = $background['right'];
+  $left_background  = $background['left'];
 
   echo("<tr bgcolor=$row_colour><td class=tablehead><a href='".$mempool_url."' $mempool_popup>" . $text_descr . "</a></td>
            <td width=90><a href='".$mempool_url."'  $mempool_popup><img src='$mini_url'></a></td>

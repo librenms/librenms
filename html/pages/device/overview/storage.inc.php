@@ -54,15 +54,11 @@ if (mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device
 
     $mini_graph = $config['base_url'] . "/graph.php?id=".$drive['storage_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 
-    if ($perc > '90') { $left_background='c4323f'; $right_background='C96A73'; }
-    elseif ($perc > '75') { $left_background='bf5d5b'; $right_background='d39392'; }
-    elseif ($perc > '50') { $left_background='bf875b'; $right_background='d3ae92'; }
-    elseif ($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3'; }
-    else { $left_background='9abf5b'; $right_background='bbd392'; }
+    $background = get_percentage_colours($perc);
 
     echo("<tr bgcolor=$row_colour><td class=tablehead><a href='".$fs_url."' $fs_popup>" . $drive['storage_descr'] . "</a></td>
             <td width=90><a href='".$fs_url."' $fs_popup><img src='$mini_graph' /></a></td>
-            <td width=200><a href='".$fs_url."' $fs_popup>".print_percentage_bar (200, 20, $perc, "$used / $total", "ffffff", $left_background, $perc . "%", "ffffff", $right_background)."</a></td>
+            <td width=200><a href='".$fs_url."' $fs_popup>".print_percentage_bar (200, 20, $perc, "$used / $total", "ffffff", $background['left'], $perc . "%", "ffffff", $background['right'])."</a></td>
           </tr>");
     $drive_rows++;
   }

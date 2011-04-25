@@ -153,12 +153,9 @@ if ($_GET['opta'] == "add")
          $percent = round(($rate_data['total_data'] / ($bill['bill_gb'] * 1024)) * 100,2);
       }
 
-      if ($percent > 100) { $perc = "100"; } else { $perc = $percent; }
-      if ($perc > '90') { $left_background='c4323f'; $right_background='C96A73'; }
-      elseif ($perc > '75') { $left_background='bf5d5b'; $right_background='d39392'; }
-      elseif ($perc > '50') { $left_background='bf875b'; $right_background='d3ae92'; }
-      elseif ($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3'; }
-      else { $left_background='9abf5b'; $right_background='bbd392'; }
+      $background = get_percentage_colours($percent);
+      $right_background = $background['right'];
+      $left_background  = $background['left'];
 
       if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
       echo("
@@ -169,7 +166,7 @@ if ($_GET['opta'] == "add")
 	     <td>$type</td>
              <td>$allowed</td>
              <td>$used</td>
-             <td width=370>".print_percentage_bar (350, 20, $perc, NULL, "ffffff", $left_background, $percent . "%", "ffffff", $right_background)."</td>
+             <td width=370>".print_percentage_bar (350, 20, $perc, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right'])."</td>
              <td width=60><a href='bill/".$bill['bill_id']."/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
            </tr>
          ");

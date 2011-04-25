@@ -37,3 +37,4 @@ ALTER TABLE  `mac_accounting` CHANGE  `peer_mac`  `mac` VARCHAR( 32 ) CHARACTER 
 ALTER TABLE `mac_accounting`  DROP `peer_ip`,  DROP `peer_desc`,  DROP `peer_asn`;
 UPDATE sensors SET sensor_class='frequency' WHERE sensor_class='freq';
 ALTER TABLE  `cef_switching` ADD  `cef_switching_id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
+ALTER TABLE  `mempools` ADD  `mempool_perc` INT NOT NULL AFTER  `device_id`;
