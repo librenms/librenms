@@ -363,7 +363,7 @@ $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 $os = "netscaler";
 $config['os'][$os]['text']              = "Citrix Netscaler";
 $config['os'][$os]['type']              = "network";
-$config['os'][$os]['icon']              = "netscaler";
+$config['os'][$os]['icon']              = "Citrix";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
