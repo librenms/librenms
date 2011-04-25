@@ -270,6 +270,7 @@ $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 $os = "fortigate";
 $config['os'][$os]['text']              = "Fortinet Fortigate";
 $config['os'][$os]['type']              = "firewall";
+$config['os'][$os]['icon']		= "fortinet";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 #$config['os'][$os]['over'][1]['graph']  = "device_processor";
