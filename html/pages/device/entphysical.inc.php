@@ -37,6 +37,8 @@ function printEntPhysical($ent, $level, $class)
       echo("<strong>".$ent['entPhysicalModelName']  . "</strong> (".$ent['entPhysicalName'].")");
     } elseif ($ent['entPhysicalModelName']) {
       echo("<strong>".$ent['entPhysicalModelName']  . "</strong>");
+    } elseif (is_numeric($ent['entPhysicalName']) && $ent['entPhysicalVendorType']) {
+      echo("<strong>".$ent['entPhysicalName']." ".$ent['entPhysicalVendorType']."</strong>");
     } elseif ($ent['entPhysicalName']) {
       echo("<strong>".$ent['entPhysicalName']."</strong>");
     } elseif ($ent['entPhysicalDescr']) {
