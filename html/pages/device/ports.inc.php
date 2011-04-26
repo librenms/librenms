@@ -7,11 +7,18 @@ if ($_GET['opta'] == 'graphs')
 
 print_optionbar_start();
 
-$menu_options = array('basic' => 'Basic',
-                      'details' => 'Details',
-		      'neighbours' => 'Neighbours',
-                      'arp' => 'ARP Table',
-                      'adsl' => 'ADSL');
+$menu_options['basic']   = 'Basic';
+$menu_options['details'] = 'Details';
+$menu_options['arp']     = 'ARP Table';
+
+if(mysql_result(mysql_query("SELECT * FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"),0))
+{
+  $menu_options['neighbours'] = 'Neighbours';  
+}
+if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `ifType` = 'adsl'"),0))
+{
+  $menu_options['adsl'] = 'ADSL';
+}
 
 if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
 
