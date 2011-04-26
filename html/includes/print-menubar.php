@@ -252,17 +252,17 @@ foreach (array('current','frequency','power','voltage') as $item)
 }
 
 # Show remaining/custom sensor types if there are any in the database
-if ($menu_sensors && $sep)
-{
-  echo('<li><hr width="140" /></li>');
-  $sep = 0;
-}
+#if ($menu_sensors && $sep)
+#{
+#  echo('<li><hr width="140" /></li>');
+#  $sep = 0;
+#}
 
-foreach (array_keys($menu_sensors) as $item)
-{
-  echo ('<li><a href="health/'.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
-  unset($menu_sensors[$item]);$sep++;
-}
+#foreach (array_keys($menu_sensors) as $item)
+#{
+#  echo ('<li><a href="health/'.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
+#  unset($menu_sensors[$item]);$sep++;
+#}
 
 ?>
         </ul>
