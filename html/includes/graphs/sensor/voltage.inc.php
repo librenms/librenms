@@ -4,8 +4,6 @@ $scale_min = "0";
 
 include("includes/graphs/common.inc.php");
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/voltage-" . safename($sensor['sensor_type']."-".$sensor['sensor_index']) . ".rrd";
-
 $rrd_options .= " -A ";
 $rrd_options .= " COMMENT:'                           Last    Max\\n'";
 

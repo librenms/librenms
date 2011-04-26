@@ -2,6 +2,21 @@
 
 ## Common Functions
 
+function get_sensor_rrd($device, $sensor)
+{
+  global $config;
+
+  if($config['os'][$device['os']]['sensor_descr'] || $sensor['poller_type'] == "ipmi") 
+  {
+    $rrd_file = $config['rrd_dir']."/".$device['hostname']."/".safename("sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_descr'] . ".rrd");
+  } else {
+    $rrd_file = $config['rrd_dir']."/".$device['hostname']."/".safename("sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_index'] . ".rrd");
+  }
+
+  return($rrd_file);
+
+}
+
 function get_port_by_id($port_id)
 {
   if (is_numeric($port_id))

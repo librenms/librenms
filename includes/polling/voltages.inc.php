@@ -15,8 +15,8 @@ while ($sensor = mysql_fetch_assoc($sensor_data))
   if ($sensor['sensor_divisor'])    { $sensor_value = $sensor_value / $sensor['sensor_divisor']; }
   if ($sensor['sensor_multiplier']) { $sensor_value = $sensor_value * $sensor['sensor_multiplier']; }
 
-  $old_rrd_file  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("$class-" . $sensor['sensor_descr'] . ".rrd");
-  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/$class-" . safename($sensor['sensor_type']."-".$sensor['sensor_index']) . ".rrd";
+  $old_rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/$class-" . safename($sensor['sensor_type']."-".$sensor['sensor_index']) . ".rrd";
+  $rrd_file = get_sensor_rrd($device, $sensor);
 
   if (is_file($old_rrd_file)) { rename($old_rrd_file, $rrd_file); }
 

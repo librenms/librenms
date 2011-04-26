@@ -4,8 +4,6 @@ $scale_min = "0";
 
 include("includes/graphs/common.inc.php");
 
-$rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("current-" . $sensor['sensor_descr'] . ".rrd");
-
 $rrd_options .= " COMMENT:'                       Min     Last    Max\\n'";
 
 $sensor['sensor_descr_fixed'] = substr(str_pad($sensor['sensor_descr'], 18),0,18);

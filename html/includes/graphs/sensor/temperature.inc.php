@@ -5,8 +5,6 @@ $scale_max = "60";
 
 include("includes/graphs/common.inc.php");
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/temperature-" . safename($sensor['sensor_type']."-".$sensor['sensor_index']) . ".rrd";
-
 $rrd_options .= " COMMENT:'                          Min     Last   Max\\n'";
 
 $sensor['sensor_descr_fixed'] = substr(str_pad($sensor['sensor_descr'], 21),0,21);

@@ -16,20 +16,35 @@ function poll_sensor($device, $class, $unit)
     if ($sensor['sensor_divisor'])    { $sensor_value = $sensor_value / $sensor['sensor_divisor']; }
     if ($sensor['sensor_multiplier']) { $sensor_value = $sensor_value * $sensor['sensor_multiplier']; }
 
-    $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("$class-" . $sensor['sensor_descr'] . ".rrd");
+    $rrd_file = get_sensor_rrd($device, $sensor);
+
+    #$rrd_file = $config['rrd_dir']."/".$device['hostname']."/".safename("sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_index'] . ".rrd");
+
+    ## FIXME - sensor name format change 2011/04/26 - remove this in $amount_of_time. 
+    ## We don't want to reduce performance forever because douchebags don't svn up!
+    $old_rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("$class-" . $sensor['sensor_descr'] . ".rrd");
+    $old_rrd_file_b = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("$class-" . $sensor['sensor_index'] . ".rrd");
+    if (is_file($old_rrd_file) && is_file($old_rrd_file_b)) 
+    { 
+      rename($old_rrd_file, $rrd_file); 
+      unlink($old_rrd_file_b);
+    } elseif (is_file($old_rrd_file)) {
+      rename($old_rrd_file, $rrd_file);
+    } elseif (is_file($old_rrd_file_b)) {
+      rename($old_rrd_file_b, $rrd_file);
+    }
 
     if (!is_file($rrd_file))
     {
-
       rrdtool_create($rrd_file,"--step 300 \
       DS:sensor:GAUGE:600:-20000:20000 \
       RRA:AVERAGE:0.5:1:1200 \
       RRA:AVERAGE:0.5:12:2400 \
-      RRA:AVERAGE:0.5:288:750 \
+      RRA:AVERAGE:0.5:288:1200 \
       RRA:MAX:0.5:12:2400 \
-      RRA:MAX:0.5:288:750 \
+      RRA:MAX:0.5:288:1200 \
       RRA:MIN:0.5:12:2400 \
-      RRA:MIN:0.5:288:750");
+      RRA:MIN:0.5:288:1200");
     }
 
     echo("$sensor_value $unit\n");
