@@ -1,4 +1,4 @@
-<?
+<?php
 
 $device = device_by_id_cache($id);
 $query = mysql_query("SELECT * FROM `processors` where `device_id` = '".$id."'");
