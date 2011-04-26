@@ -1,0 +1,2887 @@
+-- Extracted from draft-ietf-mpls-ldp-mib-07.txt
+--
+-- Network Working Group                                       J. Cucchiara
+-- Internet-Draft                                             Brix Networks
+-- Expires February 2001                                       H. Sjostrand
+--                                                                 Ericsson
+--                                                               J. Luciani
+--                                                  TollBridge Technologies
+--                                                              August 2000
+--
+--                    Definitions of Managed Objects for
+--  the Multiprotocol Label Switching, Label Distribution Protocol (LDP)
+--
+--                     <draft-ietf-mpls-ldp-mib-07.txt>
+
+MPLS-LDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
+    experimental,
+    Integer32, Counter32, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+
+    TEXTUAL-CONVENTION, RowStatus, TimeInterval, TruthValue,
+    TimeStamp, StorageType
+        FROM SNMPv2-TC
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    -- AtmInterfaceType, AtmVcIdentifier,
+    AtmVpIdentifier
+    FROM ATM-TC-MIB
+    AddressFamilyNumbers
+        FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
+    ;
+
+
+mplsLdpMIB MODULE-IDENTITY
+    LAST-UPDATED "200008291200Z"  -- August 29, 2000
+    ORGANIZATION "Multiprotocol Label Switching (mpls)
+                  Working Group"
+    CONTACT-INFO
+        "Joan Cucchiara (jcucchiara@brixnet.com)
+         Brix Networks
+
+         Hans Sjostrand (hans.sjostrand@ericsson.com)
+         Ericsson
+
+         James V. Luciani (jluciani@tollbridgetech.com)
+         TollBridge Technologies"
+    DESCRIPTION
+        "This MIB contains managed object definitions for the
+        'Multiprotocol Label Switching, Label Distribution
+        Protocol, LDP' document."
+    ::= { experimental 97 } -- to be assigned
+
+--****************************************************************
+-- MPLS LDP Textual Conventions
+--****************************************************************
+--
+
+MplsLsrIdentifier ::= TEXTUAL-CONVENTION
+
+    STATUS      current
+    DESCRIPTION
+        "The Label Switch Router (LSR) identifier
+        is the first 4 bytes or the Router Id component
+        of the Label Distribution Protocol (LDP) identifier."
+    SYNTAX      OCTET STRING (SIZE (4))
+
+
+--
+-- A similar TC is also used in RFC2677.txt.  NOTE:  since
+-- MPLS's goal is to be any layer2 over any layer3, this
+-- MIB makes every attempt to define a TC which would
+-- satisfy L2 and L3 address sizes for now and in
+-- the future.  0..64 seems was adopted from RFC2677.
+--
+
+MplsLdpGenAddr ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of an network layer or data link
+        layer address."
+    SYNTAX      OCTET STRING (SIZE (0..64))
+
+-- following Textual Convention was
+-- originally copied from the LSR MIB.
+
+-- It is reproduced here and modified slightly.
+
+MplsLabel ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "This value represents an MPLS label.
+        The label contents are specific to
+        the label being represented.
+
+        The label carried in an MPLS shim header
+        (for LDP, the Generic Label) is a 20-bit number
+        represented by 4 octets. Bits 0-19 contain a
+        label or a reserved label value.  Bits 20-31 MUST
+        be zero.
+
+        The frame relay label can be either 10-bits or
+        23-bits depending on the DLCI field size and the
+        upper 22-bits or upper 9-bits must be zero, respectively.
+
+        For an ATM label the lower 16-bits represents the VCI,
+        the next 12-bits represents the VPI and the remaining
+        bits MUST be zero."
+   SYNTAX       Integer32(0..2147483647)
+
+
+MplsLdpIdentifier ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The LDP identifier is a six octet quantity
+        which is used to identify an Label Switch Router
+        (LSR) label space.
+
+        The first four octets encode an IP address
+        assigned to the LSR, and the last two octets
+        identify a specific label space within the LSR."
+    SYNTAX      OCTET STRING (SIZE (6))
+
+
+MplsLdpLabelTypes ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Layer 2 label types which are defined for
+        MPLS LDP are generic(1), atm(2), or frameRelay(3)."
+    SYNTAX              INTEGER {
+                           generic(1),
+                           atm(2),
+                           frameRelay(3)
+                        }
+
+
+-- This was taken from rfc2514.txt (AtmVcIdentifier) and
+-- modified here for MPLS.
+-- This TC agrees with "MPLS using LDP and ATM VC Switching"
+-- document which specifies that VC values need
+-- to be greater than 31, or in other words, 0-31 are
+-- reserved for other uses by the ITU and ATM Forum.
+MplsAtmVcIdentifier ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+            "The VCI value for a VCL. The maximum VCI value
+            cannot exceed the value allowable by
+            atmInterfaceMaxVciBits defined in ATM-MIB.
+            The minimum value is 32, values 0 to 31 are
+            reserved for other uses by the ITU and ATM
+            Forum.  32 is typically the default value
+            for the Control VC."
+        SYNTAX   Integer32 (32..65535)
+
+
+-- Top-level structure of the MIB (the following is proposed)
+--mpls                 OBJECT IDENTIFIER ::= { mplsProtocols }
+
+--mplsProtocols        OBJECT IDENTIFIER ::= { mplsLdpObjects }
+-- under mplsProtocols will be LDP, CR-LDP,
+--       and other MPLS "Protocols".
+
+mplsLdpObjects       OBJECT IDENTIFIER ::= { mplsLdpMIB 1 }
+mplsLdpNotifications OBJECT IDENTIFIER ::= { mplsLdpMIB 2 }
+mplsLdpConformance   OBJECT IDENTIFIER ::= { mplsLdpMIB 3 }
+
+--****************************************************************
+-- MPLS LDP Objects
+--****************************************************************
+
+mplsLdpLsrObjects    OBJECT IDENTIFIER ::= { mplsLdpObjects 1 }
+
+mplsLdpEntityObjects OBJECT IDENTIFIER ::= { mplsLdpObjects 2 }
+
+--
+-- The MPLS Label Distribution Protocol's
+-- Label Switch Router Objects
+--
+
+mplsLdpLsrId OBJECT-TYPE
+    SYNTAX      MplsLsrIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LSR's Identifier."
+    ::= { mplsLdpLsrObjects 1 }
+
+mplsLdpLsrLoopDetectionCapable OBJECT-TYPE
+    SYNTAX      INTEGER {
+                           none(1),
+                           other(2),
+                           hopCount(3),
+                           pathVector(4),
+                           hopCountAndPathVector(5)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A indication of whether this LSR supports
+        loop detection.
+
+        none(1) -- Loop Detection is not supported
+                   on this LSR.
+
+        other(2) -- Loop Detection is supported but
+                    by a method other than those
+                    listed below.
+
+        hopCount(3) -- Loop Detection is supported by
+                       Hop Count only.
+
+        pathVector(4) -- Loop Detection is supported by
+                        Path Vector only.
+
+        hopCountAndPathVector(5) -- Loop Detection is
+                             supported by both Hop Count
+                             And Path Vector.
+
+        Since Loop Detection is determined during
+        Session Initialization, an individual session
+        may not be running with loop detection.  This
+        object simply gives an indication of whether or not the
+        LSR has the ability to support Loop Detection and
+        which types."
+    ::= { mplsLdpLsrObjects 2 }
+
+
+--
+-- The MPLS Label Distribution Protocol Entity Objects
+--
+
+
+mplsLdpEntityIndexNext  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "This object contains an appropriate value to
+        be used for mplsLdpEntityIndex when creating
+        entries in the mplsLdpEntityTable. The value
+        0 indicates that no unassigned entries are
+        available. To obtain the mplsLdpEntityIndex
+        value for a new entry, the manager issues a
+        management protocol retrieval operation to obtain
+        the current value of this object.  After each
+        retrieval, the agent should modify the value to
+        the next unassigned index."
+   ::= { mplsLdpEntityObjects 1 }
+
+
+mplsLdpEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information about the
+        MPLS Label Distribution Protocol Entities which
+        exist on this Label Switch Router (LSR)."
+    ::= { mplsLdpEntityObjects 2 }
+
+mplsLdpEntityEntry OBJECT-TYPE
+    SYNTAX      MplsLdpEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents an LDP entity.
+        An entry can be created by a network administrator
+        or by an SNMP agent as instructed by LDP."
+    INDEX       {  mplsLdpEntityLdpId, mplsLdpEntityIndex  }
+    ::= { mplsLdpEntityTable 1 }
+
+MplsLdpEntityEntry ::= SEQUENCE {
+    mplsLdpEntityLdpId                       MplsLdpIdentifier,
+    mplsLdpEntityIndex                       Unsigned32,
+    mplsLdpEntityProtocolVersion             Integer32,
+    mplsLdpEntityAdminStatus                 INTEGER,
+    mplsLdpEntityOperStatus                  INTEGER,
+    mplsLdpEntityWellKnownTcpDiscoveryPort      Unsigned32,
+    mplsLdpEntityWellKnownUdpDiscoveryPort      Unsigned32,
+    mplsLdpEntityMaxPduLength                Unsigned32,
+    mplsLdpEntityKeepAliveHoldTimer          Integer32,
+    mplsLdpEntityHelloHoldTimer              Integer32,
+    mplsLdpEntityFailedInitSessionTrapEnable INTEGER,
+    mplsLdpEntityFailedInitSessionThreshold  Integer32,
+    mplsLdpEntityLabelDistributionMethod     INTEGER,
+    mplsLdpEntityLabelRetentionMode          INTEGER,
+    mplsLdpEntityPVLimitMismatchTrapEnable   INTEGER,
+    mplsLdpEntityPathVectorLimit             Integer32,
+    mplsLdpEntityHopCountLimit               Integer32,
+    mplsLdpEntityTargetedPeer                TruthValue,
+    mplsLdpEntityTargetedPeerAddrType        AddressFamilyNumbers,
+    mplsLdpEntityTargetedPeerAddr            MplsLdpGenAddr,
+    mplsLdpEntityOptionalParameters          MplsLdpLabelTypes,
+    mplsLdpEntityDiscontinuityTime           TimeStamp,
+    mplsLdpEntityStorageType                 StorageType,
+    mplsLdpEntityRowStatus                   RowStatus
+}
+
+
+mplsLdpEntityLdpId OBJECT-TYPE
+    SYNTAX      MplsLdpIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The LDP identifier.
+
+        The first four octets encode an IP address
+        assigned to the LSR, and the last two octets
+        identify a specific label space within the
+        LSR."
+    REFERENCE
+        "LDP Specification, Section on LDP Identifiers."
+    ::= { mplsLdpEntityEntry 1 }
+
+mplsLdpEntityIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is used as a secondary index to uniquely
+        identify this row.  Before creating a row in this table,
+        the 'mplsLdpEntityIndexNext' object should be retrieved.
+        That value should be used for the value of this index
+        when creating a row in this table.  (NOTE:  if a value
+        of zero (0) is retrieved, that indicates that no rows
+        can be created in this table at this time.
+
+        A secondary index (this object) is needed by some
+        but not all, LDP implementations.  For example
+        in an LDP implementation which uses PPP, this
+        index may be needed."
+    ::= { mplsLdpEntityEntry 2 }
+
+mplsLdpEntityProtocolVersion OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The version number of the protocol.  The value of 0 on a
+       read indicates that the version of the protocol is unknown.
+       Otherwise, the value of this object represents the version
+       of the LDP protocol."
+    DEFVAL { 1 }
+    ::= { mplsLdpEntityEntry 3 }
+
+mplsLdpEntityAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  enable(1),
+                  disable(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administrative status of this LDP Entity.
+        If this object is changed from 'enable' to 'disable'
+        and this entity has already attempted to establish
+        contact with a Peer (which implies that the
+        'mplsLdpEntityRowStatus' object has been set to
+        'active'), then all contact with that
+        Peer is lost and all information from that Peer
+        needs to be removed from the MIB.
+        At this point the user is able to change values
+        which are related to this entity.
+
+        When the admin status is set back to 'up', then
+        this Entity will attempt to establish new sessions
+        with the Peer."
+    DEFVAL  { enable }
+    ::= { mplsLdpEntityEntry 4 }
+
+
+mplsLdpEntityOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  unknown(0),
+                  enabled(1),
+                  disabled(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational status of this LDP Entity."
+    ::= { mplsLdpEntityEntry 5 }
+
+mplsLdpEntityWellKnownTcpDiscoveryPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The well known TCP Discovery Port for
+        LDP."
+    DEFVAL { 646 }
+    ::= { mplsLdpEntityEntry 6 }
+
+mplsLdpEntityWellKnownUdpDiscoveryPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The well known UDP Discovery Port for
+        LDP."
+    DEFVAL { 646 }
+    ::= { mplsLdpEntityEntry 7 }
+
+mplsLdpEntityMaxPduLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The maximum PDU Length that is sent in
+       the Common Session Parameters of an Initialization
+       Message. A value of 255 or less specifies the
+       default maximum length of 4096 octets."
+    REFERENCE
+       "See Section on the 'Initialization Message' in the
+       LDP Specification."
+    DEFVAL { 4096 }
+    ::= { mplsLdpEntityEntry 8 }
+
+mplsLdpEntityKeepAliveHoldTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The two octet value which is the proposed keep alive hold
+        timer for this LDP Entity."
+    DEFVAL { 40 }
+    ::= { mplsLdpEntityEntry 9 }
+
+mplsLdpEntityHelloHoldTimer OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The two octet value which is the proposed Hello hold
+        timer for this LDP Entity. A value of 0 means use the
+        default, which is 15 seconds for Link Hellos and 45
+        seconds for Targeted Hellos.  A value of 65535 means
+        infinite."
+    DEFVAL { 0 }
+    ::= { mplsLdpEntityEntry 10 }
+
+mplsLdpEntityFailedInitSessionTrapEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+                           enabled(1),
+                           disabled(2)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the
+        'mplsLdpFailedInitSessionThresholdExceeded'
+        trap should be generated.
+
+        If the value of this object is 'enabled(1)'
+        then the trap will generated.  If the value
+        of this object is 'disabled(2)' then the
+        trap will not be generated.  The DEFVAL
+        is set to 'enabled(1)'."
+    DEFVAL { enabled }
+    ::= { mplsLdpEntityEntry 11 }
+
+
+mplsLdpEntityFailedInitSessionThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When attempting to establish a session with a
+        given Peer, the given LDP Entity should
+        send out the SNMP notification,
+        'mplsLdpFailedInitSessionThresholdExceeded', when
+        the number of Session Initialization messages sent
+        exceeds this threshold.
+
+        A value of 0 (zero) for this object
+        indicates that the threshold is infinity, and
+        the SNMP notification will never be sent
+        when the value of this object is 0 (zero)."
+    DEFVAL { 8 }
+    ::= { mplsLdpEntityEntry 12 }
+
+
+mplsLdpEntityLabelDistributionMethod OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   downstreamOnDemand(1),
+                   downstreamUnsolicited(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "For any given LDP session, the method of
+        label distribution must be specified."
+    ::= { mplsLdpEntityEntry 13 }
+
+mplsLdpEntityLabelRetentionMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    conservative(1),
+                    liberal(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The LDP Entity can be configured to use either
+        conservative or liberal label retention mode.
+
+        If the value of this object is conservative(1)
+        then advertized label mappings are retained
+        only if they will be used to forward packets,
+        i.e. if label came from a valid next hop.
+
+        If the value of this object is liberal(2)
+        then all advertized label mappings are retained
+        whether they are from a valid next hop or not."
+    ::= { mplsLdpEntityEntry 14 }
+
+mplsLdpEntityPVLimitMismatchTrapEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+                           enabled(1),
+                           disabled(2)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the 'mplsLdpPathVectorLimitMismatch'
+        trap should be generated.
+
+        If the value of this object is 'enabled(1)'
+        then the trap will generated.  If the value
+        of this object is 'disabled(2)' then the
+        trap will not be generated.  The DEFVAL
+        is set to 'enabled(1)'."
+    DEFVAL { enabled }
+    ::= { mplsLdpEntityEntry 15 }
+
+
+mplsLdpEntityPathVectorLimit OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the value of this object is 0 (zero) then
+        Loop Dection for Path Vectors is disabled.
+
+        Otherwise, if this object has a value greater than
+        zero, then Loop Dection for Path Vectors is enabled,
+        and the Path Vector Limit is this value.
+        Also, the value of the object,
+        'mplsLdpLsrLoopDetectionCapable', must be set to
+        either 'pathVector(4)' or 'hopCountAndPathVector(5)',
+        if this object has a value greater than 0 (zero)."
+    ::= { mplsLdpEntityEntry 16 }
+
+
+mplsLdpEntityHopCountLimit OBJECT-TYPE
+    SYNTAX       Integer32 (0..255)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "If the value of this object is 0 (zero),
+        then Loop Detection using Hop Counters is
+        disabled.
+
+        If the value of this object is greater than
+        0 (zero) then Loop Detection using Hop
+        Counters is enabled, and this object
+        specifies this Entity's maximum allowable
+        value for the Hop Count.
+        Also, the value of the object
+        mplsLdpLsrLoopDetectionCapable must be set
+        to either 'hopCount(3)' or
+        'hopCountAndPathVector(5)' if this object
+        has a value greater than 0 (zero)."
+    ::= { mplsLdpEntityEntry 17 }
+
+mplsLdpEntityTargetedPeer OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If this LDP entity uses targeted peer then set
+        this to true."
+    DEFVAL { false }
+    ::= { mplsLdpEntityEntry 18 }
+
+mplsLdpEntityTargetedPeerAddrType OBJECT-TYPE
+    SYNTAX      AddressFamilyNumbers
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of the internetwork layer address used for
+        the Extended Discovery. This object indicates how
+        the value of mplsLdpEntityTargetedPeerAddr is to
+        be interpreted."
+    ::= { mplsLdpEntityEntry 19 }
+
+mplsLdpEntityTargetedPeerAddr OBJECT-TYPE
+    SYNTAX      MplsLdpGenAddr
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the internetwork layer address used for
+        the Extended Discovery."
+   ::= { mplsLdpEntityEntry 20 }
+
+mplsLdpEntityOptionalParameters OBJECT-TYPE
+    SYNTAX      MplsLdpLabelTypes
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the optional parameters for the LDP
+        Initialization Message.  If the value is generic(1)
+        then no optional parameters will be sent in
+        the LDP Initialization message associated with
+        this Entity.
+
+        If the value is atmParameters(2) then
+        a row must be created in the mplsLdpEntityAtmParms
+        Table, which corresponds to this entry.
+
+        If the value is frameRelayParameters(3) then
+        a row must be created in the mplsLdpEntityFrameRelayParms
+        Table, which corresponds to this entry."
+    ::= { mplsLdpEntityEntry 21 }
+
+
+mplsLdpEntityDiscontinuityTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion
+        at which any one or more of this entity's counters
+        suffered a discontinuity.  The relevant counters are the
+        specific instances associated with this entity of
+        any Counter32, or Counter64 object contained
+        in the 'mplsLdpEntityStatsTable'.  If no such
+        discontinuities have occurred since the last
+        re-initialization of the local management
+        subsytem, then this object contains a zero
+        value."
+    ::= { mplsLdpEntityEntry 22 }
+
+mplsLdpEntityStorageType  OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "The storage type for this entry."
+    ::= { mplsLdpEntityEntry 23 }
+
+mplsLdpEntityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An object that allows entries in this table to
+         be created and deleted using the
+         RowStatus convention.
+         Once the 'mplsLdpEntityAdminStatus' object has
+         the value of 'up' and this object has the value
+         of 'active' then the Entity will atttempt to
+         contact an LDP Peer.  If the value of this object
+         is changed to 'notInService', then the Entity looses
+         contact with the LDP Peer and all information related
+         to that Peer must be removed from the MIB.  This has
+         the same effect as changing 'mplsLdpEntityAdminStatus'
+         from 'enable' to 'disable'.
+
+         When this object is set to 'active' and the value of
+         the 'mplsLdpEntityAdminStatus' is 'enable' then
+         this Entity will attempt to contact the Peer and
+         establish new sessions."
+    ::= { mplsLdpEntityEntry 24 }
+
+--
+-- Ldp Entity Objects for Generic Labels
+--
+
+
+mplsLdpEntityGenericObjects  OBJECT IDENTIFIER ::=
+                              { mplsLdpEntityObjects 3 }
+
+
+--
+-- The MPLS LDP Entity Configurable Generic Label Range Table
+--
+
+mplsLdpEntityConfGenericLabelRangeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MplsLdpEntityConfGenericLabelRangeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The MPLS LDP Entity Configurable Generic Label Range Table.
+        The purpose of this table is to provide a mechanism
+        for specifying a contiguous range of generic labels,
+        or a 'label range' for LDP Entities.
+
+        LDP Entities which use Generic Labels must have at least one
+        entry in this table."
+    ::= { mplsLdpEntityGenericObjects 1 }
+
+mplsLdpEntityConfGenericLabelRangeEntry OBJECT-TYPE
+    SYNTAX MplsLdpEntityConfGenericLabelRangeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the LDP Entity Configurable Generic Label
+        Range Table.  One entry in this table contains
+        information on a single range of labels
+        represented by the configured Upper and Lower
+        Bounds pairs.  NOTE: there is NO corresponding
+        LDP message which relates to the information
+        in this table, however, this table does provide
+        a way for a user to 'reserve' a generic label
+        range.
+
+        NOTE:  The ranges for a specific LDP Entity
+        are UNIQUE and non-overlapping.
+
+        A row will not be created unless a unique and
+        non-overlapping range is specified.  Thus, row
+        creation implies a one-shot row creation of
+        LDP EntityID and LowerBound and
+        UpperBound."
+    INDEX       {  mplsLdpEntityLdpId,
+                   mplsLdpEntityIndex,
+                   mplsLdpEntityConfGenericLabelRangeMinimum,
+                   mplsLdpEntityConfGenericLabelRangeMaximum
+                }
+    ::= { mplsLdpEntityConfGenericLabelRangeTable 1 }
+
+MplsLdpEntityConfGenericLabelRangeEntry ::= SEQUENCE {
+    mplsLdpEntityConfGenericLabelRangeMinimum     Unsigned32,
+    mplsLdpEntityConfGenericLabelRangeMaximum     Unsigned32,
+    mplsLdpEntityConfGenericIfIndexOrZero         InterfaceIndexOrZero,
+    mplsLdpEntityConfGenericLabelRangeStorageType StorageType,
+    mplsLdpEntityConfGenericLabelRangeRowStatus   RowStatus
+}
+
+mplsLdpEntityConfGenericLabelRangeMinimum OBJECT-TYPE
+    SYNTAX     Unsigned32(0..1048575)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The minimum label configured for this range."
+    ::= { mplsLdpEntityConfGenericLabelRangeEntry 1 }
+
+mplsLdpEntityConfGenericLabelRangeMaximum OBJECT-TYPE
+    SYNTAX     Unsigned32(0..1048575)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The maximum label configured for this range."
+    ::= { mplsLdpEntityConfGenericLabelRangeEntry 2 }
+
+
+mplsLdpEntityConfGenericIfIndexOrZero OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This value represents either the InterfaceIndex of
+       the 'ifLayer' where these Generic Label would be created, or
+       0 (zero).  The value of zero means that the InterfaceIndex
+       is not known.  For example, if the InterfaceIndex is
+       created subsequent to the Generic Label's creation, then
+       it would not be known.  However, if the InterfaceIndex
+       is known, then it must be represented by this value.
+
+       If an InterfaceIndex becomes known, then the
+       network management entity (e.g. SNMP agent) responsible
+       for this object MUST change the value from 0 (zero) to the
+       value of the InterfaceIndex.  If this Generic Label is
+       being used in forwarding data, then the value of this
+       object MUST be the InterfaceIndex."
+    ::= { mplsLdpEntityConfGenericLabelRangeEntry 3 }
+
+mplsLdpEntityConfGenericLabelRangeStorageType  OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "The storage type for this entry."
+    ::= { mplsLdpEntityConfGenericLabelRangeEntry 4 }
+
+mplsLdpEntityConfGenericLabelRangeRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "An object that allows entries in this
+        table to be created and deleted using
+        the RowStatus convention.
+
+        There must exist at least one entry in this
+        table for every LDP Entity that has a
+        generic label configured.
+
+        NOTE:  This RowStatus object should
+        have the same value of the 'mplsLdpEntityRowStatus'
+        related to this entry."
+    ::= { mplsLdpEntityConfGenericLabelRangeEntry 5 }
+
+
+--
+-- Ldp Entity Objects for ATM
+--
+mplsLdpEntityAtmObjects  OBJECT IDENTIFIER ::=
+                              { mplsLdpEntityObjects 4 }
+
+mplsLdpEntityAtmParmsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpEntityAtmParmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information about the
+        ATM specific information which could be used
+        in the 'Optional Parameters' and other ATM specific
+        information."
+    ::= { mplsLdpEntityAtmObjects 1 }
+
+mplsLdpEntityAtmParmsEntry OBJECT-TYPE
+    SYNTAX      MplsLdpEntityAtmParmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents the ATM parameters
+        and ATM information for this LDP entity."
+    INDEX       {  mplsLdpEntityLdpId,
+                   mplsLdpEntityIndex
+                }
+    ::= { mplsLdpEntityAtmParmsTable 1 }
+
+
+MplsLdpEntityAtmParmsEntry ::= SEQUENCE {
+    mplsLdpEntityAtmIfIndexOrZero        InterfaceIndexOrZero,
+    mplsLdpEntityAtmMergeCap             INTEGER,
+    mplsLdpEntityAtmLabelRangeComponents Unsigned32,
+    mplsLdpEntityAtmVcDirectionality     INTEGER,
+    mplsLdpEntityAtmLsrConnectivity      INTEGER,
+    mplsLdpEntityDefaultControlVpi       AtmVpIdentifier,
+    mplsLdpEntityDefaultControlVci       MplsAtmVcIdentifier,
+    mplsLdpEntityUnlabTrafVpi            AtmVpIdentifier,
+    mplsLdpEntityUnlabTrafVci            MplsAtmVcIdentifier,
+    mplsLdpEntityAtmStorageType          StorageType,
+    mplsLdpEntityAtmRowStatus            RowStatus
+}
+
+
+mplsLdpEntityAtmIfIndexOrZero  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This value represents either the InterfaceIndex of
+       the 'ifLayer' where the ATM Labels 'owned' by this
+       entry were created, or 0 (zero).  The value of zero
+       means that the InterfaceIndex is not known.  For example,
+       if the InterfaceIndex is created subsequent to the
+       ATM Label's creation, then it would not be known.
+       However, if the InterfaceIndex is known, then it must
+       be represented by this value.
+
+       If an InterfaceIndex becomes known, then the
+       network management entity (e.g. SNMP agent) responsible
+       for this object MUST change the value from 0 (zero) to the
+       value of the InterfaceIndex.  If an ATM Label is
+       being used in forwarding data, then the value of this
+       object MUST be the InterfaceIndex."
+    ::= { mplsLdpEntityAtmParmsEntry 1 }
+
+
+mplsLdpEntityAtmMergeCap OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notSupported(0),
+                    vcMerge(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "Denotes the Merge Capability of this Entity."
+    ::= { mplsLdpEntityAtmParmsEntry 2 }
+
+mplsLdpEntityAtmLabelRangeComponents OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Number of LabelRange Components in the Initialization
+        message.  This also represents the number of entries
+        in the mplsLdpLabelRangeComponentsTable which correspond
+        to this entry."
+    ::= { mplsLdpEntityAtmParmsEntry 3 }
+
+mplsLdpEntityAtmVcDirectionality OBJECT-TYPE
+    SYNTAX      INTEGER {
+                           bidirectional(0),
+                           unidirectional(1)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the value of this object is 'bidirectional(0)',
+        a given VCI, within a given VPI, is used as a
+        label for both directions independently.
+
+        If the value of this object is 'unidirectional(1)',
+        a given VCI within a VPI designates one direction."
+    ::= { mplsLdpEntityAtmParmsEntry 4 }
+
+mplsLdpEntityAtmLsrConnectivity OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   direct(1),
+                   indirect(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The peer LSR may be connected indirectly by means of an
+        ATM VP so that the VPI values may be different on either
+        endpoint so the label MUST be encoded entirely within the
+        VCI field."
+    DEFVAL { direct }
+    ::= { mplsLdpEntityAtmParmsEntry 5 }
+
+mplsLdpEntityDefaultControlVpi OBJECT-TYPE
+    SYNTAX      AtmVpIdentifier
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The default VPI value for the non-MPLS connection.  The
+        default value of this is 0 (zero) but other values may
+        be configured.  This object allows a different value
+        to be configured."
+    DEFVAL
+        { 0 }
+    ::= { mplsLdpEntityAtmParmsEntry 6 }
+
+mplsLdpEntityDefaultControlVci OBJECT-TYPE
+    SYNTAX      MplsAtmVcIdentifier
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Default VCI value for a non-MPLS connection.  The
+        default value of this is 32 but other values may be
+        configured.  This object allows a different value to
+        be configured."
+    DEFVAL
+        { 32 }
+    ::= { mplsLdpEntityAtmParmsEntry 7 }
+
+mplsLdpEntityUnlabTrafVpi OBJECT-TYPE
+    SYNTAX      AtmVpIdentifier
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VPI value of the VCC supporting unlabelled traffic.  This
+        non-MPLS connection is used to carry unlabelled (IP)
+        packets.  The default value is the same as the default
+        value of the 'mplsLdpEntityDefaultControlVpi', however
+        another value may be configured."
+    DEFVAL  { 0 }
+    ::= { mplsLdpEntityAtmParmsEntry 8 }
+
+mplsLdpEntityUnlabTrafVci OBJECT-TYPE
+    SYNTAX      MplsAtmVcIdentifier
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VCI value of the VCC supporting unlabelled traffic.
+        This non-MPLS connection is used to carry unlabelled (IP)
+        packets. The default value is the same as the default
+        value of the 'mplsLdpEntityDefaultControlVci', however
+        another value may be configured."
+    DEFVAL  { 32 }
+    ::= { mplsLdpEntityAtmParmsEntry 9 }
+
+mplsLdpEntityAtmStorageType  OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "The storage type for this entry."
+    ::= { mplsLdpEntityAtmParmsEntry 10 }
+
+mplsLdpEntityAtmRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An object that allows entries in this table to
+        be created and deleted using the
+        RowStatus convention.
+
+        NOTE:  This RowStatus object should
+        have the same value of the 'mplsLdpEntityRowStatus'
+        related to this entry."
+    ::= { mplsLdpEntityAtmParmsEntry 11 }
+
+--
+-- The MPLS LDP Entity Configurable ATM Label Range Table
+--
+
+mplsLdpEntityConfAtmLabelRangeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MplsLdpEntityConfAtmLabelRangeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The MPLS LDP Entity Configurable ATM Label Range Table.
+        The purpose of this table is to provide a mechanism
+        for specifying a contiguous range of vpi's
+        with a contiguous range of vci's, or a 'label range'
+        for LDP Entities.
+
+        LDP Entities which use ATM must have at least one
+        entry in this table."
+    ::= { mplsLdpEntityAtmObjects 2 }
+
+mplsLdpEntityConfAtmLabelRangeEntry OBJECT-TYPE
+    SYNTAX MplsLdpEntityConfAtmLabelRangeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the LDP Entity Configurable ATM Label
+        Range Table.  One entry in this table contains
+        information on a single range of labels
+        represented by the configured Upper and Lower
+        Bounds VPI/VCI pairs.  These are the same
+        data used in the Initialization Message.
+
+        NOTE:  The ranges for a specific LDP Entity
+        are UNIQUE and non-overlapping.  For example,
+        for a specific LDP Entity index, there could
+        be one entry having ConfLowerBound vpi/vci == 0/32, and
+        ConfUpperBound vpi/vci == 0/100, and a second entry
+        for this same interface with ConfLowerBound
+        vpi/vci == 0/101 and ConfUpperBound vpi/vci == 0/200.
+        However, there could not be a third entry with
+        ConfLowerBound vpi/vci == 0/200 and
+        ConfUpperBound vpi/vci == 0/300 because this label
+        range overlaps with the second entry (i.e. both
+        entries now have 0/200).
+
+        A row will not be created unless a unique and
+        non-overlapping range is specified.  Thus, row
+        creation implies a one-shot row creation of
+        LDP EntityID and ConfLowerBound vpi/vci and
+        ConfUpperBound vpi/vci.  At least one label
+        range entry for a specific LDP Entity MUST
+        include the default VPI/VCI  values denoted
+        in the LDP Entity Table."
+    INDEX       {  mplsLdpEntityLdpId,
+                   mplsLdpEntityIndex,
+                   mplsLdpEntityConfAtmLabelRangeMinimumVpi,
+                   mplsLdpEntityConfAtmLabelRangeMinimumVci
+                }
+    ::= { mplsLdpEntityConfAtmLabelRangeTable 1 }
+
+MplsLdpEntityConfAtmLabelRangeEntry ::= SEQUENCE {
+    mplsLdpEntityConfAtmLabelRangeMinimumVpi  AtmVpIdentifier,
+    mplsLdpEntityConfAtmLabelRangeMinimumVci  MplsAtmVcIdentifier,
+    mplsLdpEntityConfAtmLabelRangeMaximumVpi  AtmVpIdentifier,
+    mplsLdpEntityConfAtmLabelRangeMaximumVci  MplsAtmVcIdentifier,
+    mplsLdpEntityConfAtmLabelRangeStorageType StorageType,
+    mplsLdpEntityConfAtmLabelRangeRowStatus   RowStatus
+}
+
+mplsLdpEntityConfAtmLabelRangeMinimumVpi OBJECT-TYPE
+    SYNTAX AtmVpIdentifier
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The minimum VPI number configured for this range."
+    ::= { mplsLdpEntityConfAtmLabelRangeEntry 1 }
+
+mplsLdpEntityConfAtmLabelRangeMinimumVci OBJECT-TYPE
+    SYNTAX MplsAtmVcIdentifier
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The minimum VCI number configured for this range."
+    ::= { mplsLdpEntityConfAtmLabelRangeEntry 2 }
+
+mplsLdpEntityConfAtmLabelRangeMaximumVpi OBJECT-TYPE
+    SYNTAX AtmVpIdentifier
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The maximum VPI number configured for this range."
+    ::= { mplsLdpEntityConfAtmLabelRangeEntry 3 }
+
+mplsLdpEntityConfAtmLabelRangeMaximumVci OBJECT-TYPE
+    SYNTAX MplsAtmVcIdentifier
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The maximum VCI number configured for this range."
+   ::= { mplsLdpEntityConfAtmLabelRangeEntry 4 }
+
+
+mplsLdpEntityConfAtmLabelRangeStorageType  OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "The storage type for this entry."
+    ::= { mplsLdpEntityConfAtmLabelRangeEntry 5 }
+mplsLdpEntityConfAtmLabelRangeRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "An object that allows entries in this
+        table to be created and deleted using
+        the RowStatus convention.
+
+        There must exist at least one entry in this
+        table for every LDP Entity that has
+        'mplsLdpEntityOptionalParameters' object with
+        a value of 'atmSessionParameters'.
+
+        NOTE:  This RowStatus object should
+        have the same value of the 'mplsLdpEntityRowStatus'
+        related to this entry."
+    ::= { mplsLdpEntityConfAtmLabelRangeEntry 6 }
+
+
+--
+-- Ldp Entity Objects for Frame Relay
+--
+
+mplsLdpEntityFrameRelayObjects OBJECT IDENTIFIER ::=
+                                    { mplsLdpEntityObjects 5 }
+
+mplsLdpEntityFrameRelayParmsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpEntityFrameRelayParmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information about the
+        Optional Parameters to specify what this Entity is
+        going to specify for Frame Relay specific
+        LDP Intialization Messages."
+    ::= { mplsLdpEntityFrameRelayObjects 1 }
+
+mplsLdpEntityFrameRelayParmsEntry OBJECT-TYPE
+    SYNTAX      MplsLdpEntityFrameRelayParmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents the Frame Relay
+        optional parameters associated with the LDP entity."
+    INDEX       {  mplsLdpEntityLdpId,
+                   mplsLdpEntityIndex
+                }
+    ::= { mplsLdpEntityFrameRelayParmsTable 1 }
+
+MplsLdpEntityFrameRelayParmsEntry ::= SEQUENCE {
+    mplsLdpEntityFrIfIndexOrZero        InterfaceIndexOrZero,
+    mplsLdpEntityFrMergeCap             INTEGER,
+    mplsLdpEntityFrLabelRangeComponents Unsigned32,
+    mplsLdpEntityFrLen                  INTEGER,
+    mplsLdpEntityFrVcDirectionality     INTEGER,
+    mplsLdpEntityFrParmsStorageType     StorageType,
+    mplsLdpEntityFrParmsRowStatus       RowStatus
+}
+
+mplsLdpEntityFrIfIndexOrZero OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This value represents either the InterfaceIndex of
+       the 'ifLayer' where the Frame Relay Labels 'owned' by this
+       entry were created, or 0 (zero).  The value of zero
+       means that the InterfaceIndex is not known.  For example,
+       if the InterfaceIndex is created subsequent to the
+       Frame Relay Label's creation, then it would not be known.
+       However, if the InterfaceIndex is known, then it must
+       be represented by this value.
+
+       If an InterfaceIndex becomes known, then the
+       network management entity (e.g. SNMP agent) responsible
+       for this object MUST change the value from 0 (zero) to the
+       value of the InterfaceIndex.  If an Frame Relay Label is
+       being used in forwarding data, then the value of this
+       object MUST be the InterfaceIndex."
+    ::= { mplsLdpEntityFrameRelayParmsEntry 1 }
+
+mplsLdpEntityFrMergeCap OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notSupported(0),
+                    supported(1)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This represents whether or not Frame Relay merge
+        capability is supported."
+    ::= { mplsLdpEntityFrameRelayParmsEntry 2 }
+
+mplsLdpEntityFrLabelRangeComponents OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Number of LabelRange Components in the Initialization
+        message.  This also represents the number of entries
+        in the mplsLdpEntityConfFrLabelRangeTable which correspond
+        to this entry."
+    ::= { mplsLdpEntityFrameRelayParmsEntry 3 }
+
+mplsLdpEntityFrLen OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    tenDlciBits(0),
+                    twentyThreeDlciBits(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the DLCI bits."
+    ::= { mplsLdpEntityFrameRelayParmsEntry 4 }
+
+mplsLdpEntityFrVcDirectionality OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          bidirectional(0),
+                          unidirection(1)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the value of this object is 'bidirectional(0)', then
+        the LSR supports the use of a given DLCI as a label for
+        both directions independently.  If the value of
+        this object is 'unidirectional(1)', then the LSR
+        uses the given DLCI as a label in only one direction."
+    ::= { mplsLdpEntityFrameRelayParmsEntry 5 }
+
+
+mplsLdpEntityFrParmsStorageType  OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "The storage type for this entry."
+    ::= { mplsLdpEntityFrameRelayParmsEntry 6 }
+
+
+mplsLdpEntityFrParmsRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An object that allows entries in this table to
+        be created and deleted using the
+        RowStatus convention.
+        NOTE:  This RowStatus object should
+        have the same value of the 'mplsLdpEntityRowStatus'
+        related to this entry."
+    ::= { mplsLdpEntityFrameRelayParmsEntry 7 }
+
+
+--
+-- Frame Relay Label Range Components
+--
+
+mplsLdpEntityConfFrLabelRangeTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpEntityConfFrLabelRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information about the
+        Optional Parameters to specify what this Entity is
+        going to specify for Frame Relay specific
+        LDP Intialization Messages."
+    ::= { mplsLdpEntityFrameRelayObjects 2 }
+
+mplsLdpEntityConfFrLabelRangeEntry OBJECT-TYPE
+    SYNTAX      MplsLdpEntityConfFrLabelRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents the Frame Relay
+        optional parameters associated with the LDP entity."
+    INDEX       {  mplsLdpEntityLdpId,
+                   mplsLdpEntityIndex,
+                   mplsLdpConfFrMinimumDlci
+                }
+    ::= { mplsLdpEntityConfFrLabelRangeTable 1 }
+
+MplsLdpEntityConfFrLabelRangeEntry ::= SEQUENCE {
+    mplsLdpConfFrMinimumDlci                  Integer32,
+    mplsLdpConfFrMaximumDlci                  Integer32,
+    mplsLdpConfFrStorageType                  StorageType,
+    mplsLdpConfFrRowStatus                    RowStatus
+}
+
+mplsLdpConfFrMinimumDlci OBJECT-TYPE
+    SYNTAX      Integer32(0..4194303)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The lower bound which is supported.  This value should
+        be the same as that in the Frame Relay Label Range
+        Component's Minimum DLCI field."
+    ::= { mplsLdpEntityConfFrLabelRangeEntry 1 }
+
+mplsLdpConfFrMaximumDlci OBJECT-TYPE
+    SYNTAX      Integer32 (0..4194303)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The upper bound which is supported.  This value should
+        be the same as that in the Frame Relay Label Range
+        Component's Maximum DLCI field."
+    ::= { mplsLdpEntityConfFrLabelRangeEntry 2 }
+
+
+mplsLdpConfFrStorageType  OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "The storage type for this entry."
+    ::= { mplsLdpEntityConfFrLabelRangeEntry 3 }
+
+
+mplsLdpConfFrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An object that allows entries in this table to
+        be created and deleted using the
+        RowStatus convention.
+
+        If the value of the object
+        'mplsLdpEntityOptionalParameters' contains the
+        value of 'frameRelaySessionParameters(3)' then
+        there must be at least one corresponding entry
+        in this table.
+
+        NOTE:  This RowStatus object should
+        have the same value of the 'mplsLdpEntityRowStatus'
+        related to this entry."
+    ::= { mplsLdpEntityConfFrLabelRangeEntry 4 }
+
+--
+-- The MPLS LDP Entity Statistics Table
+--
+
+mplsLdpEntityStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpEntityStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is a read-only table which augments
+        the mplsLdpEntityTable.  The purpose of this
+        table is to keep statistical information about
+        the LDP Entities on the LSR."
+    ::= { mplsLdpEntityObjects 6 }
+
+mplsLdpEntityStatsEntry OBJECT-TYPE
+    SYNTAX      MplsLdpEntityStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in this table contains statistical information
+        about an LDP Entity.  Some counters contained in a
+        row are for fatal errors received during a former
+        LDP Session associated with this entry.  For example,
+        an Ldp Pdu received on a TCP connection during an
+        LDP Session contains a fatal error.  That
+        error is counted here, because the
+        session is terminated.
+
+        If the error is NOT fatal (i.e. and the Session
+        remains), then the error is counted in the
+        mplsLdpSessionStatsEntry."
+    AUGMENTS       {   mplsLdpEntityEntry  }
+    ::= { mplsLdpEntityStatsTable 1 }
+
+MplsLdpEntityStatsEntry ::= SEQUENCE {
+    mplsLdpAttemptedSessions                  Counter32,
+    mplsLdpSessionRejectedNoHelloErrors       Counter32,
+    mplsLdpSessionRejectedAdvertisementErrors Counter32,
+    mplsLdpSessionRejectedMaxPduErrors        Counter32,
+    mplsLdpSessionRejectedLabelRangeErrors    Counter32,
+    mplsLdpBadLdpIdentifierErrors             Counter32,
+    mplsLdpBadPduLengthErrors                 Counter32,
+    mplsLdpBadMessageLengthErrors             Counter32,
+    mplsLdpBadTlvLengthErrors                 Counter32,
+    mplsLdpMalformedTlvValueErrors            Counter32,
+    mplsLdpKeepAliveTimerExpiredErrors        Counter32,
+    mplsLdpShutdownNotifReceived              Counter32,
+    mplsLdpShutdownNotifSent                  Counter32
+}
+
+mplsLdpAttemptedSessions OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the total attempted sessions for
+        this LDP Entity."
+    ::= { mplsLdpEntityStatsEntry 1 }
+
+mplsLdpSessionRejectedNoHelloErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the Session Rejected/No Hello Error
+        Notification Messages sent or received by
+        this LDP Entity."
+    ::= { mplsLdpEntityStatsEntry 2 }
+
+mplsLdpSessionRejectedAdvertisementErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the Session Rejected/Parameters
+        Advertisement Mode Error Notification Messages sent
+        or received by this LDP Entity."
+    ::= { mplsLdpEntityStatsEntry 3 }
+
+
+mplsLdpSessionRejectedMaxPduErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the Session Rejected/Parameters
+        Max Pdu Length Error Notification Messages sent
+        or received by this LDP Entity."
+    ::= { mplsLdpEntityStatsEntry 4 }
+
+mplsLdpSessionRejectedLabelRangeErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the Session Rejected/Parameters
+        Label Range Notification Messages sent
+        or received by this LDP Entity."
+    ::= { mplsLdpEntityStatsEntry 5 }
+
+
+mplsLdpBadLdpIdentifierErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Bad LDP Identifier
+        Fatal Errors detected by the session(s)
+        (past and present) associated with this LDP Entity."
+    REFERENCE
+       "LDP Specification, Section 3.5.1.2."
+    ::= { mplsLdpEntityStatsEntry 6 }
+
+mplsLdpBadPduLengthErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Bad Pdu Length
+        Fatal Errors detected by the session(s)
+        (past and present) associated with this LDP Entity."
+    REFERENCE
+       "LDP Specification, Section 3.5.1.2."
+    ::= { mplsLdpEntityStatsEntry 7 }
+
+mplsLdpBadMessageLengthErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Bad Message
+        Length Fatal Errors detected by the session(s)
+        (past and present) associated with this LDP Entity."
+    REFERENCE
+       "LDP Specification, Section 3.5.1.2."
+    ::= { mplsLdpEntityStatsEntry 8 }
+
+mplsLdpBadTlvLengthErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Bad TLV
+        Length Fatal Errors detected by the session(s)
+        (past and present) associated with this LDP Entity."
+    REFERENCE
+       "LDP Specification, Section 3.5.1.2."
+    ::= { mplsLdpEntityStatsEntry 9 }
+
+mplsLdpMalformedTlvValueErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Malformed TLV
+        Value Fatal Errors detected by the session(s)
+        (past and present) associated with this
+        LDP Entity."
+    REFERENCE
+       "LDP Specification, Section 3.5.1.2."
+    ::= { mplsLdpEntityStatsEntry 10 }
+
+mplsLdpKeepAliveTimerExpiredErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Session Keep Alive
+        Timer Expired Errors detected by the session(s)
+        (past and present) associated with this LDP Entity."
+    REFERENCE
+       "LDP Specification, Section 3.5.1.2."
+    ::= { mplsLdpEntityStatsEntry 11 }
+
+mplsLdpShutdownNotifReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Shutdown Notfications
+        received related to session(s) (past and present)
+        associated with this LDP Entity."
+    ::= { mplsLdpEntityStatsEntry 12 }
+
+mplsLdpShutdownNotifSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Shutdown Notfications
+        sent related to session(s) (past and present) associated
+        with this LDP Entity."
+    ::= { mplsLdpEntityStatsEntry 13 }
+
+
+--
+-- The MPLS LDP Peer Table
+--
+
+mplsLdpSessionObjects OBJECT IDENTIFIER ::=
+                                         { mplsLdpObjects 3 }
+
+mplsLdpPeerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about LDP peers known by Entities in
+        the mplsLdpEntityTable.  The information in this table
+        is based on information from the Entity-Peer interaction
+        during session initialization but is not appropriate
+        for the mplsLdpSessionTable, because objects in this
+        table may or may not be used in session establishment."
+    ::= { mplsLdpSessionObjects 1 }
+
+mplsLdpPeerEntry OBJECT-TYPE
+    SYNTAX      MplsLdpPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a single Peer which is related
+        to a Session.  NOTE:  this table is used to
+        augment the mplsLdpSessionTable."
+    INDEX       { mplsLdpEntityLdpId,
+                  mplsLdpEntityIndex,
+                  mplsLdpPeerLdpId }
+    ::= { mplsLdpPeerTable 1 }
+
+MplsLdpPeerEntry ::= SEQUENCE {
+    mplsLdpPeerLdpId                      MplsLdpIdentifier,
+    mplsLdpPeerLabelDistributionMethod    INTEGER,
+    mplsLdpPeerLoopDetectionForPV         INTEGER,
+    mplsLdpPeerPathVectorLimit            Integer32
+}
+
+mplsLdpPeerLdpId OBJECT-TYPE
+    SYNTAX      MplsLdpIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The LDP identifier of this LDP Peer."
+    ::= { mplsLdpPeerEntry 1 }
+
+mplsLdpPeerLabelDistributionMethod OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   downstreamOnDemand(1),
+                   downstreamUnsolicited(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "For any given LDP session, the method of
+        label distribution must be specified."
+    ::= { mplsLdpPeerEntry 2 }
+
+mplsLdpPeerLoopDetectionForPV OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   disabled(0),
+                   enabled(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An indication of whether loop detection based
+        on path vectors is disabled or enabled for this Peer.
+
+        If this object has a value of disabled(0),
+        then loop detection is disabled.  Otherwise, if this
+        object has a value of enabled(1), then loop detection
+        based on path vectors is enabled."
+    ::= { mplsLdpPeerEntry 3 }
+
+
+mplsLdpPeerPathVectorLimit OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the value of 'mplsLdpPeerLoopDetectionForPV' for
+        this entry is 'enabled(1)', the this object represents
+        that Path Vector Limit for this peer.
+
+        If the value of 'mplsLdpPeerLoopDetectionForPV' for
+        this entry is 'disabled(0)', then this value should
+        be 0 (zero)."
+    ::= { mplsLdpPeerEntry 4 }
+
+
+
+--
+-- The MPLS LDP Hello Adjacency Table
+--
+
+mplsLdpHelloAdjacencyObjects OBJECT IDENTIFIER ::=
+                              { mplsLdpSessionObjects 2 }
+
+mplsLdpHelloAdjacencyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpHelloAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Hello Adjacencies for Sessions."
+    ::= { mplsLdpHelloAdjacencyObjects 1 }
+
+mplsLdpHelloAdjacencyEntry OBJECT-TYPE
+    SYNTAX      MplsLdpHelloAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a single LDP Hello Adjacency.
+        An LDP Session can have one or more Hello adjacencies."
+         INDEX       { mplsLdpEntityLdpId,
+                       mplsLdpEntityIndex,
+                       mplsLdpPeerLdpId,
+                       mplsLdpHelloAdjacencyIndex }
+    ::= { mplsLdpHelloAdjacencyTable 1 }
+
+MplsLdpHelloAdjacencyEntry ::= SEQUENCE {
+    mplsLdpHelloAdjacencyIndex                  Unsigned32,
+    mplsLdpHelloAdjacencyHoldTimeRemaining      TimeInterval,
+    mplsLdpHelloAdjacencyType                   INTEGER
+}
+
+mplsLdpHelloAdjacencyIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An identifier for this specific adjacency."
+    ::= { mplsLdpHelloAdjacencyEntry 1 }
+
+mplsLdpHelloAdjacencyHoldTimeRemaining OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time remaining for this Hello Adjacency.
+        This interval will change when the 'next'
+        Hello message which corresponds to this
+        Hello Adjacency is received."
+    ::= { mplsLdpHelloAdjacencyEntry 2 }
+
+mplsLdpHelloAdjacencyType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   link(1),
+                   targeted(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This adjacency is the result of a 'link'
+        hello if the value of this object is link(1).
+        Otherwise, it is a result of a 'targeted'
+        hello, targeted(2)."
+    ::= { mplsLdpHelloAdjacencyEntry 3 }
+
+
+
+--
+-- The MPLS LDP Sessions Table
+--
+
+mplsLdpSessionUpDownTrapEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+                           enabled(1),
+                           disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the traps, 'mplsLdpSessionUp' and
+        'mplsLdpSessionDown' will be generated or not.
+
+        If the value of this object is 'enabled(1)'
+        then the traps will generated.  If the value
+        of this object is 'disabled(2)' then the
+        traps will not be generated.  The DEFVAL
+        is set to 'disabled(2)'."
+    DEFVAL { disabled }
+    ::= { mplsLdpSessionObjects 3 }
+
+
+mplsLdpSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Sessions between the LDP Entities and
+        LDP Peers.  Each row represents a single session."
+    ::= { mplsLdpSessionObjects 4 }
+
+mplsLdpSessionEntry OBJECT-TYPE
+    SYNTAX      MplsLdpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a
+        single session between an LDP Entity and LDP Peer.
+        The information contained in a row is read-only.
+
+        Please note:  the Path Vector Limit for the
+        Session is the value which is configured in
+        the corresponding mplsLdpEntityEntry. The
+        Peer's Path Vector Limit is in noted in the
+        mplsLdpPeerTable.
+
+        Values which may differ from those configured are
+        noted in the objects of this table, the
+        mplsLdpAtmSessionTable and the
+        mplsLdpFrameRelaySessionTable. A value will
+        differ if it was negotiated between the
+        Entity and the Peer. Values may or may not
+        be negotiated. For example, if the values
+        are the same then no negotiation takes place.
+        If they are negotiated, then they may differ."
+    AUGMENTS { mplsLdpPeerEntry }
+    ::= { mplsLdpSessionTable 1 }
+
+MplsLdpSessionEntry ::= SEQUENCE {
+    mplsLdpSessionState                          INTEGER,
+    mplsLdpSessionProtocolVersion                Integer32,
+    mplsLdpSessionKeepAliveHoldTimeRemaining     TimeInterval,
+    mplsLdpSessionMaxPduLength                   Unsigned32,
+    mplsLdpSessionDiscontinuityTime              TimeStamp
+}
+
+
+mplsLdpSessionState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   nonexistent(1),
+                   initialized(2),
+                   openrec(3),
+                   opensent(4),
+                   operational(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the session, all of the
+        states 1 - 5 are based on the state machine for
+        session negotiation behavior."
+    ::= { mplsLdpSessionEntry 1 }
+
+mplsLdpSessionProtocolVersion OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of the LDP Protocol which
+        this session is using."
+    ::= { mplsLdpSessionEntry 2 }
+
+mplsLdpSessionKeepAliveHoldTimeRemaining OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The keep alive hold time remaining for this session."
+    ::= { mplsLdpSessionEntry 3 }
+
+mplsLdpSessionMaxPduLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of maximum allowable length for LDP PDUs for
+        this session.  This value may have been negotiated during
+        the Session Initialization."
+    ::= { mplsLdpSessionEntry 4 }
+
+mplsLdpSessionDiscontinuityTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion at
+        which any one or more of this session's counters
+        suffered a discontinuity.  The relevant counters are
+        the specific instances associated with this session
+        of any Counter32 or Counter64 object contained in the
+        mplsLdpSessionStatsTable.  If no such discontinuities have
+        occurred since the last re-initialization of the local
+        management subsystem, then this object contains a zero
+        value.
+
+        Also, an NMS can distinguish when a session
+        between a given Entity and Peer goes away and then is
+        're-established'.  This value would change and
+        thus indicate to the NMS that this is a
+        different session."
+    ::= { mplsLdpSessionEntry 5 }
+
+
+--
+-- MPLS LDP ATM Session Information
+--
+
+mplsLdpAtmSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpAtmSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which relates Sessions in the
+        'mplsLdpSessionTable' and their label
+        range intersections.  There could be one
+        or more label range intersections between an
+        LDP Entity and LDP Peer using ATM as the underlying
+        media. Each row represents a single label range
+        intersection.
+
+        NOTE:  this table cannot use the 'AUGMENTS'
+        clause because there is not necessarily a one-to-one
+        mapping between this table and the mplsLdpSessionTable."
+    ::= { mplsLdpSessionObjects 5 }
+
+mplsLdpAtmSessionEntry OBJECT-TYPE
+    SYNTAX      MplsLdpAtmSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a
+        single label range intersection between an LDP Entity
+        and LDP Peer.
+
+        The information contained in a row is read-only."
+    INDEX       { mplsLdpEntityLdpId,
+                  mplsLdpEntityIndex,
+                  mplsLdpPeerLdpId,
+                  mplsLdpSessionAtmLabelRangeLowerBoundVpi,
+                  mplsLdpSessionAtmLabelRangeLowerBoundVci
+
+                }
+    ::= { mplsLdpAtmSessionTable 1 }
+
+MplsLdpAtmSessionEntry ::= SEQUENCE {
+    mplsLdpSessionAtmLabelRangeLowerBoundVpi     AtmVpIdentifier,
+    mplsLdpSessionAtmLabelRangeLowerBoundVci     MplsAtmVcIdentifier,
+    mplsLdpSessionAtmLabelRangeUpperBoundVpi     AtmVpIdentifier,
+    mplsLdpSessionAtmLabelRangeUpperBoundVci     MplsAtmVcIdentifier
+}
+
+mplsLdpSessionAtmLabelRangeLowerBoundVpi OBJECT-TYPE
+    SYNTAX AtmVpIdentifier
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The minimum VPI number for this range."
+    ::= { mplsLdpAtmSessionEntry 1 }
+
+mplsLdpSessionAtmLabelRangeLowerBoundVci OBJECT-TYPE
+    SYNTAX MplsAtmVcIdentifier
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The minimum VCI number for this range."
+    ::= { mplsLdpAtmSessionEntry 2 }
+
+mplsLdpSessionAtmLabelRangeUpperBoundVpi OBJECT-TYPE
+    SYNTAX AtmVpIdentifier
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum VPI number for this range."
+    ::= { mplsLdpAtmSessionEntry 3 }
+
+mplsLdpSessionAtmLabelRangeUpperBoundVci OBJECT-TYPE
+    SYNTAX MplsAtmVcIdentifier
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum VCI number for this range."
+    ::= { mplsLdpAtmSessionEntry 4 }
+
+
+--
+-- MPLS LDP Frame Relay Session Information
+--
+
+mplsLdpFrameRelaySessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpFrameRelaySessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Frame Relay label range intersections
+        between the LDP Entities and LDP Peers.
+        Each row represents a single label range intersection.
+
+        NOTE:  this table cannot use the 'AUGMENTS'
+        clause because there is not necessarily a one-to-one
+        mapping between this table and the mplsLdpSessionTable."
+    ::= { mplsLdpSessionObjects 6 }
+
+mplsLdpFrameRelaySessionEntry OBJECT-TYPE
+    SYNTAX      MplsLdpFrameRelaySessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a
+        single label range intersection between an
+        LDP Entity and LDP Peer.
+
+        The information contained in a row is read-only."
+    INDEX       { mplsLdpEntityLdpId,
+                  mplsLdpEntityIndex,
+                  mplsLdpPeerLdpId,
+                  mplsLdpFrSessionMinDlci
+                }
+    ::= { mplsLdpFrameRelaySessionTable 1 }
+
+MplsLdpFrameRelaySessionEntry ::= SEQUENCE {
+    mplsLdpFrSessionMinDlci    Integer32,
+    mplsLdpFrSessionMaxDlci    Integer32,
+    mplsLdpFrSessionLen        INTEGER
+}
+
+
+mplsLdpFrSessionMinDlci OBJECT-TYPE
+    SYNTAX      Integer32(0..4194303)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The lower bound of DLCIs which are supported."
+    ::= { mplsLdpFrameRelaySessionEntry 1 }
+
+mplsLdpFrSessionMaxDlci OBJECT-TYPE
+    SYNTAX      Integer32 (0..4194303)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The upper bound of DLCIs which are supported."
+    ::= { mplsLdpFrameRelaySessionEntry 2 }
+
+mplsLdpFrSessionLen OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    tenDlciBits(0),
+                    twentyThreeDlciBits(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the DLCI bits."
+    ::= { mplsLdpFrameRelaySessionEntry 3 }
+
+
+--
+-- The MPLS LDP Session Statistics Table
+--
+
+
+mplsLdpSessionStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpSessionStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of statistics for Sessions between
+        LDP Entities and LDP Peers."
+    ::= { mplsLdpSessionObjects 7 }
+
+mplsLdpSessionStatsEntry OBJECT-TYPE
+    SYNTAX      MplsLdpSessionStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents statistical
+        information on a single session between an LDP
+        Entity and LDP Peer."
+    AUGMENTS       { mplsLdpPeerEntry }
+    ::= { mplsLdpSessionStatsTable 1 }
+
+MplsLdpSessionStatsEntry ::= SEQUENCE {
+    mplsLdpSessionStatsUnknownMessageTypeErrors Counter32,
+    mplsLdpSessionStatsUnknownTlvErrors         Counter32
+}
+
+mplsLdpSessionStatsUnknownMessageTypeErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Unknown Message Type
+        Errors detected during this session.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        mplsLdpSeeionDiscontinuityTime."
+    ::= { mplsLdpSessionStatsEntry 1 }
+
+mplsLdpSessionStatsUnknownTlvErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of Unknown TLV Errors
+        detected during this session.
+
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        mplsLdpSeeionDiscontinuityTime."
+    ::= { mplsLdpSessionStatsEntry 2 }
+
+
+
+
+--
+-- Mpls FEC Table
+--
+mplsFecObjects OBJECT IDENTIFIER ::=
+                                      { mplsLdpSessionObjects 8 }
+
+mplsFecIndexNext  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "This object contains an appropriate value to
+        be used for mplsFecIndex when creating
+        entries in the mplsFecTable. The value
+        0 indicates that no unassigned entries are
+        available. To obtain the mplsFecIndex
+        value for a new entry, the manager issues a
+        management protocol retrieval operation to obtain
+        the current value of this object.  After each
+        retrieval, the agent should modify the value to
+        the next unassigned index."
+   ::= { mplsFecObjects 1 }
+
+
+mplsFecTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsFecEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents the FEC
+        (Forwarding Equivalence Class)
+        Information associated with an LSP."
+    ::= { mplsFecObjects 2 }
+
+mplsFecEntry OBJECT-TYPE
+    SYNTAX      MplsFecEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a single FEC Element."
+    INDEX       { mplsFecIndex }
+    ::= { mplsFecTable 1 }
+
+MplsFecEntry ::= SEQUENCE {
+    mplsFecIndex             Unsigned32,
+    mplsFecType              INTEGER,
+    mplsFecAddressLength     Integer32,
+    mplsFecAddressFamily     AddressFamilyNumbers,
+    mplsFecAddress           MplsLdpGenAddr,
+    mplsFecStorageType       StorageType,
+    mplsFecRowStatus         RowStatus
+}
+
+mplsFecIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index which uniquely identifies this entry."
+    ::= { mplsFecEntry 1 }
+
+mplsFecType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   prefix(1),
+                   hostAddress(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of the FEC.  If the value of this object
+        is 'prefix(1)' then the FEC type described by this
+        row is for address prefixes.
+
+        If the value of this object is 'hostAddress(2)' then
+        the FEC type described by this row is a host address."
+    ::= { mplsFecEntry 2 }
+
+mplsFecAddressLength  OBJECT-TYPE
+    SYNTAX      Integer32(0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the value of 'mplsFecType' is 'prefix(1)'
+        then the value of this object is the length in
+        bits of the address prefix represented by
+        'mplsFecAddress', or if the length is zero then
+        this is a special value which indicates that the
+        prefix matches all addresses.  In this case the
+        prefix is also zero (i.e. 'mplsFecAddress' will
+        have the value of zero.)"
+    ::= { mplsFecEntry 3 }
+
+mplsFecAddressFamily  OBJECT-TYPE
+    SYNTAX      AddressFamilyNumbers
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of this object is from the Address Family
+        Numbers."
+    ::= { mplsFecEntry 4 }
+
+
+mplsFecAddress  OBJECT-TYPE
+    SYNTAX      MplsLdpGenAddr
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the value of 'mplsFecType' is 'prefix(1)'
+        then the value of this object is the address prefix.
+        If the value of the 'mplsFecAddressLength'
+        is object is zero, then this object should also be
+        zero.
+
+        If the value of the 'mplsFecType' is 'host(2)'
+        then this is the host address."
+    ::= { mplsFecEntry 5 }
+
+mplsFecStorageType  OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "The storage type for this entry."
+    ::= { mplsFecEntry 6 }
+
+mplsFecRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An object that allows entries in this table to
+         be created and deleted using the
+         RowStatus convention."
+    ::= { mplsFecEntry 7 }
+
+
+--
+--  Mapping Tables between Sessions and the LSR MIB.
+--
+
+
+--
+--  SessionInLabels and InSegment
+--
+
+mplsLdpSessionInLabelMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpSessionInLabelMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Session's Ingress Labels which
+        are Mapped to the LSR MIB's mplsInSegmentTable.
+        Each row represents a single Ingress Label."
+    ::= { mplsLdpSessionObjects 9 }
+
+mplsLdpSessionInLabelMapEntry OBJECT-TYPE
+    SYNTAX      MplsLdpSessionInLabelMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a
+        single LDP LSP which is represented by
+        a session's index triple (mplsLdpEntityLdpId,
+        mplsLdpEntityIndex, mplsLdpPeerLdpId) AND the
+        index tuple (mplsLdpSessionInLabel, mplsInSegmentIfIndex)
+        from the LSR MIB's mplsInSegmentTable.
+        The information contained in a row is read-only."
+    INDEX       { mplsLdpEntityLdpId,
+                  mplsLdpEntityIndex,
+                  mplsLdpPeerLdpId,
+                  mplsLdpSessionInLabelIfIndex,
+                  mplsLdpSessionInLabel
+                }
+    ::= { mplsLdpSessionInLabelMapTable 1 }
+
+MplsLdpSessionInLabelMapEntry ::= SEQUENCE {
+    mplsLdpSessionInLabelIfIndex           InterfaceIndex,
+    mplsLdpSessionInLabel                  MplsLabel,
+    mplsLdpSessionInLabelType              MplsLdpLabelTypes,
+    mplsLdpSessionInLabelConnectionType    INTEGER
+}
+
+mplsLdpSessionInLabelIfIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The ifIndex of the 'mplsLdpSessionInLabel' which should
+        have the same value as the 'mplsInSegmentIfIndex' in
+        the LSR MIB."
+    ::= { mplsLdpSessionInLabelMapEntry 1 }
+
+mplsLdpSessionInLabel OBJECT-TYPE
+    SYNTAX        MplsLabel
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The incoming label of this LSP.  This has the same value
+        as the 'mplsInSegmentLabel' in the LSR MIB."
+    ::= { mplsLdpSessionInLabelMapEntry 2 }
+
+mplsLdpSessionInLabelType  OBJECT-TYPE
+    SYNTAX        MplsLdpLabelTypes
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The Layer 2 Label Type for 'mplsLdpInLabel'."
+    ::= { mplsLdpSessionInLabelMapEntry 3 }
+
+mplsLdpSessionInLabelConnectionType OBJECT-TYPE
+    SYNTAX         INTEGER {
+                      unknown(1),
+                      xconnect(2),
+                      terminates(3)
+                   }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The type of LSP connection.
+        The possible values are:
+
+        unknown(1) --    this may be the value if the LSP
+                         is in a state of flux.  It is
+                         considered to be a temporary
+                         situation.
+        xconnect(2) --   if the mapping between the
+                         session and the insegment
+                         is associated with an LSP which
+                         is a true cross-connection.
+        terminates(3) -- if the mapping between the
+                         session and the insegment
+                         is associated with an LSP which
+                         terminates on this LSR and is
+                         not a cross-connection."
+    ::= { mplsLdpSessionInLabelMapEntry 4 }
+
+
+--
+--  SessionOutLabels and OutSegment
+--
+
+mplsLdpSessionOutLabelMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpSessionOutLabelMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Session's Egress Labels which
+        are Mapped to the LSR MIB.
+        Each row represents a single Egress Label."
+    ::= { mplsLdpSessionObjects 10 }
+
+mplsLdpSessionOutLabelMapEntry OBJECT-TYPE
+    SYNTAX      MplsLdpSessionOutLabelMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a
+        single session between an LDP Entity and LDP Peer.
+        The information contained in a row is read-only."
+    INDEX       { mplsLdpEntityLdpId,
+                  mplsLdpEntityIndex,
+                  mplsLdpPeerLdpId,
+                  mplsLdpSessionOutLabelIfIndex,
+                  mplsLdpSessionOutLabel
+                }
+    ::= { mplsLdpSessionOutLabelMapTable 1 }
+
+MplsLdpSessionOutLabelMapEntry ::= SEQUENCE {
+    mplsLdpSessionOutLabelIfIndex        InterfaceIndex,
+    mplsLdpSessionOutLabel               MplsLabel,
+    mplsLdpSessionOutLabelType           MplsLdpLabelTypes,
+    mplsLdpSessionOutLabelConnectionType INTEGER,
+    mplsLdpSessionOutSegmentIndex        Integer32
+}
+
+mplsLdpSessionOutLabelIfIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The ifIndex of the 'mplsLdpSessionOutLabel'."
+    ::= { mplsLdpSessionOutLabelMapEntry 1 }
+
+mplsLdpSessionOutLabel OBJECT-TYPE
+    SYNTAX        MplsLabel
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The outgoing label of this LSP."
+    ::= { mplsLdpSessionOutLabelMapEntry 2 }
+
+
+mplsLdpSessionOutLabelType  OBJECT-TYPE
+    SYNTAX        MplsLdpLabelTypes
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The Layer 2 Label Type for 'mplsLdpOutLabel'."
+    ::= { mplsLdpSessionOutLabelMapEntry 3 }
+
+mplsLdpSessionOutLabelConnectionType OBJECT-TYPE
+    SYNTAX         INTEGER {
+                      unknown(1),
+                      xconnect(2),
+                      starts(3)
+                   }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The type of LSP connection.
+        The possible values are:
+
+        unknown(1) --  this may be the value if the LSP
+                       is in a state of flux.  It is
+                       considered to be a temporary
+                       situation.
+        xconnect(2) -- if the mapping between the
+                       session and the outsegment
+                       is associated with an LSP which
+                       is a true cross-connection.
+        starts(3) -- if the mapping between the
+                      session and the insegment
+                      is associated with an LSP which
+                      starts on this LSR and is
+                      considered an ingress to the LSP."
+    ::= { mplsLdpSessionOutLabelMapEntry 4 }
+
+mplsLdpSessionOutSegmentIndex  OBJECT-TYPE
+   SYNTAX        Integer32(1..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This value should contain the same value as
+       the 'mplsOutSegmentIndex' in the LSR MIB.
+
+       NOTE: this value will never be zero, because
+       this table only maps from Sessions to true
+       outsegments."
+   ::= { mplsLdpSessionOutLabelMapEntry 5 }
+
+
+--
+--  Sessions and XConnects  (LIB Information)
+--
+
+mplsLdpSessionXCMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpSessionXCMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Session's Labels which
+        are Mapped to the LSR MIB 's XConnect table.
+        Each row represents a single cross connect."
+    ::= { mplsLdpSessionObjects 11 }
+
+mplsLdpSessionXCMapEntry OBJECT-TYPE
+    SYNTAX      MplsLdpSessionXCMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a
+        single session between an LDP Entity and LDP Peer.
+        The information contained in a row is read-only."
+    INDEX       { mplsLdpEntityLdpId,
+                  mplsLdpEntityIndex,
+                  mplsLdpPeerLdpId,
+                  mplsLdpSessionInLabelIfIndex,
+                  mplsLdpSessionInLabel,
+                  mplsLdpSessionOutLabelIfIndex,
+                  mplsLdpSessionOutLabel
+                }
+    ::= { mplsLdpSessionXCMapTable 1 }
+
+MplsLdpSessionXCMapEntry ::= SEQUENCE {
+    mplsLdpSessionXCIndex                 Integer32
+}
+
+mplsLdpSessionXCIndex  OBJECT-TYPE
+   SYNTAX        Integer32(1..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This value should contain the same value as
+       the 'mplsXCIndex' in the LSR MIB.
+
+       NOTE: this value will never be zero, because
+       this table only maps from Sessions to true
+       cross connects."
+   ::= { mplsLdpSessionXCMapEntry 1 }
+
+
+
+--
+--  XcrossConnectsFECs Table
+--
+
+mplsXCsFecsTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF MplsXCsFecsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A table which shows the relationship between
+      cross-connects and FECs.  Each row represents
+      a single cross connect to FEC association.
+      This table is read-only."
+  ::= { mplsLdpSessionObjects 13 }
+
+mplsXCsFecsEntry OBJECT-TYPE
+   SYNTAX     MplsXCsFecsEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "An entry represents a single cross connect
+      to FEC association."
+   INDEX       { mplsLdpEntityLdpId,
+                 mplsLdpEntityIndex,
+                 mplsLdpPeerLdpId,
+                 mplsLdpSessionInLabelIfIndex,
+                 mplsLdpSessionInLabel,
+                 mplsLdpSessionOutLabelIfIndex,
+                 mplsLdpSessionOutLabel,
+                 mplsFecIndex
+   }
+   ::= { mplsXCsFecsTable 1 }
+
+MplsXCsFecsEntry ::= SEQUENCE {
+   mplsXCFecOperStatus           INTEGER,
+   mplsXCFecOperStatusLastChange TimeStamp
+
+}
+
+mplsXCFecOperStatus  OBJECT-TYPE
+   SYNTAX      INTEGER {
+                         unknown(1),
+                         inUse(2),
+                         notInUse(3)
+                       }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "An indication of the operational status of
+      the FEC associated with this cross connect.
+
+      unknown(1) - this is a temporary state which
+                   may indicate the LSP-FEC association
+                   is in a state of transition.
+
+      inUse(2) - the FEC associated with the XC is
+                 currently being applied.
+
+      notInUse(3) - the FEC associated with the XC is
+                    not being applied.  Eventually, this
+                    entry may be aged out."
+   ::= { mplsXCsFecsEntry 1 }
+
+mplsXCFecOperStatusLastChange  OBJECT-TYPE
+   SYNTAX     TimeStamp
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "This value of sysUpTime when the
+      mplsXCFecOperStatus last changed state."
+   ::= { mplsXCsFecsEntry 2 }
+
+
+--
+-- Address Message/Address Withdraw Message Information
+--
+-- This information is associated with a specific Session
+-- because Label Address Messages are sent after session
+-- initialization has taken place.
+--
+
+mplsLdpSessionPeerAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpSessionPeerAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table 'extends' the mplsLdpSessionTable.
+        This table is used to store Label Address Information
+        from Label Address Messages received by this LSR from
+        Peers.  This table is read-only and should be updated
+        when Label Withdraw Address Messages are received, i.e.
+        Rows should be deleted as apropriate.
+
+        NOTE:  since more than one address may be contained
+        in a Label Address Message, this table 'extends',
+        rather than 'AUGMENTS' the mplsLdpSessionTable's
+        information."
+    ::= { mplsLdpSessionObjects 12 }
+
+mplsLdpSessionPeerAddressEntry OBJECT-TYPE
+    SYNTAX      MplsLdpSessionPeerAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on
+        session's for a single next hop address which was
+        advertised in an Address Message from the LDP peer.
+        The information contained in a row is read-only."
+    INDEX       { mplsLdpEntityLdpId,
+                  mplsLdpEntityIndex,
+                  mplsLdpPeerLdpId,
+                  mplsLdpSessionPeerAddressIndex
+                }
+    ::= { mplsLdpSessionPeerAddressTable 1 }
+
+MplsLdpSessionPeerAddressEntry ::= SEQUENCE {
+    mplsLdpSessionPeerAddressIndex           Unsigned32,
+    mplsLdpSessionPeerNextHopAddressType     AddressFamilyNumbers,
+    mplsLdpSessionPeerNextHopAddress         MplsLdpGenAddr
+}
+
+mplsLdpSessionPeerAddressIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index which uniquely identifies this entry within
+        a given session."
+    ::= { mplsLdpSessionPeerAddressEntry 1 }
+
+mplsLdpSessionPeerNextHopAddressType OBJECT-TYPE
+    SYNTAX      AddressFamilyNumbers
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The internetwork layer address type of this Next Hop
+        Address as specified in the Label Address Message
+        associated with this Session. The value of this
+        object indicates how to interpret the value of
+        mplsLdpSessionPeerNextHopAddress."
+    ::= { mplsLdpSessionPeerAddressEntry 2 }
+
+mplsLdpSessionPeerNextHopAddress OBJECT-TYPE
+    SYNTAX      MplsLdpGenAddr
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the next hop address."
+    REFERENCE
+        "LDP Specification [18] defines only IPv4 for LDP Protocol
+        Version 1, see section 3.4.3."
+    ::= { mplsLdpSessionPeerAddressEntry 3 }
+
+
+---
+--- Notifications
+---
+
+mplsLdpNotificationPrefix   OBJECT IDENTIFIER ::=
+                                 { mplsLdpNotifications 0 }
+
+mplsLdpFailedInitSessionThresholdExceeded NOTIFICATION-TYPE
+     OBJECTS     {
+                   mplsLdpEntityFailedInitSessionThreshold
+                 }
+     STATUS      current
+     DESCRIPTION
+        "This notification is generated when the value of
+        the 'mplsLdpEntityFailedInitSessionTrapEnable' object
+        is 'enabled(1)' and the value of the
+        'mplsLdpEntityFailedInitSessionThreshold' object has
+        been exceeded."
+     ::= { mplsLdpNotificationPrefix 1 }
+
+mplsLdpPathVectorLimitMismatch NOTIFICATION-TYPE
+     OBJECTS     {
+                   mplsLdpEntityPathVectorLimit,
+                   mplsLdpPeerPathVectorLimit
+                 }
+     STATUS      current
+     DESCRIPTION
+        "This notification is generated when the value
+        of the value of the
+        'mplsLdpEntityFailedInitSessionTrapEnable'
+        object is 'enabled(1)' and the
+        'mplsLdpEntityPathVectorLimit' does NOT match
+        the value of the 'mplsLdpPeerPathVectorLimit' for
+        a specific Entity."
+     REFERENCE
+        "LDP Specification, Section 3.5.3."
+     ::= { mplsLdpNotificationPrefix 2 }
+
+mplsLdpSessionUp NOTIFICATION-TYPE
+     OBJECTS     {
+                    mplsLdpSessionState
+                 }
+     STATUS      current
+     DESCRIPTION
+        "Generation of this trap occurs when the
+        'mplsLdpSessionUpDownTrapEnable' object is 'enabled(1)'
+        and the value of 'mplsLdpSessionState' changes from
+        any state except 'nonexistent(1)' to 'operational(5)'."
+     ::= { mplsLdpNotificationPrefix 3 }
+
+mplsLdpSessionDown NOTIFICATION-TYPE
+     OBJECTS     {
+                    mplsLdpSessionState
+                 }
+     STATUS      current
+     DESCRIPTION
+        "Generation of this trap occurs when the
+        'mplsLdpSessionUpDownTrapEnable' object is
+        'enabled(1)' and the value of
+        'mplsLdpSessionState' changes from
+        'operational(5)' to any other state."
+     ::= { mplsLdpNotificationPrefix 4 }
+
+
+--****************************************************************
+-- Module Conformance Statement
+--****************************************************************
+
+
+mplsLdpGroups
+    OBJECT IDENTIFIER ::= { mplsLdpConformance 1 }
+
+mplsLdpCompliances
+    OBJECT IDENTIFIER ::= { mplsLdpConformance 2 }
+
+--
+-- Compliance Statements
+--
+
+mplsLdpModuleCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The basic implentation requirements for agents that
+        support the MPLS LDP MIB."
+    MODULE -- this module
+        MANDATORY-GROUPS    { mplsLdpGeneralGroup,
+                              mplsLdpNotificationsGroup
+                            }
+
+    GROUP mplsLdpGenericGroup
+    DESCRIPTION
+        "This group must be supported if Generic Labels
+        are used in the MPLS LDP implementation."
+
+    GROUP mplsLdpAtmGroup
+    DESCRIPTION
+        "This group must be supported if ATM is used in the
+        MPLS LDP implementation."
+
+    GROUP mplsLdpFrameRelayGroup
+    DESCRIPTION
+        "This group must be supported if Frame Relay is used
+        in the MPLS LDP implementation."
+
+    GROUP mplsLdpMappingGroup
+    DESCRIPTION
+        "This group must be supported if the LSR MIB is
+        implemented, specifically the mplsInSegmentTable,
+        the mplsOutSegmentTable or the mplsXCTable."
+
+    ::= { mplsLdpCompliances 1 }
+
+
+
+-- units of conformance
+
+mplsLdpGeneralGroup OBJECT-GROUP
+    OBJECTS {
+    mplsLdpLsrId,
+    mplsLdpLsrLoopDetectionCapable,
+    mplsLdpEntityIndexNext,
+    mplsLdpEntityProtocolVersion,
+    mplsLdpEntityAdminStatus,
+    mplsLdpEntityOperStatus,
+    mplsLdpEntityWellKnownTcpDiscoveryPort,
+    mplsLdpEntityWellKnownUdpDiscoveryPort,
+    mplsLdpEntityMaxPduLength,
+    mplsLdpEntityKeepAliveHoldTimer,
+    mplsLdpEntityHelloHoldTimer,
+    mplsLdpEntityFailedInitSessionTrapEnable,
+    mplsLdpEntityFailedInitSessionThreshold,
+    mplsLdpEntityLabelDistributionMethod,
+    mplsLdpEntityLabelRetentionMode,
+    mplsLdpEntityPVLimitMismatchTrapEnable,
+    mplsLdpEntityPathVectorLimit,
+    mplsLdpEntityHopCountLimit,
+    mplsLdpEntityTargetedPeer,
+    mplsLdpEntityTargetedPeerAddrType,
+    mplsLdpEntityTargetedPeerAddr,
+    mplsLdpEntityOptionalParameters,
+    mplsLdpEntityDiscontinuityTime,
+    mplsLdpEntityStorageType,
+    mplsLdpEntityRowStatus,
+    mplsLdpAttemptedSessions,
+    mplsLdpSessionRejectedNoHelloErrors,
+    mplsLdpSessionRejectedAdvertisementErrors,
+    mplsLdpSessionRejectedMaxPduErrors,
+    mplsLdpSessionRejectedLabelRangeErrors,
+    mplsLdpBadLdpIdentifierErrors,
+    mplsLdpBadPduLengthErrors,
+    mplsLdpBadMessageLengthErrors,
+    mplsLdpBadTlvLengthErrors,
+    mplsLdpMalformedTlvValueErrors,
+    mplsLdpKeepAliveTimerExpiredErrors,
+    mplsLdpShutdownNotifReceived,
+    mplsLdpShutdownNotifSent,
+    mplsLdpPeerLabelDistributionMethod,
+    mplsLdpPeerLoopDetectionForPV,
+    mplsLdpPeerPathVectorLimit,
+    mplsLdpHelloAdjacencyHoldTimeRemaining,
+    mplsLdpHelloAdjacencyType,
+    mplsLdpSessionUpDownTrapEnable,
+    mplsLdpSessionState,
+    mplsLdpSessionProtocolVersion,
+    mplsLdpSessionKeepAliveHoldTimeRemaining,
+    mplsLdpSessionMaxPduLength,
+    mplsLdpSessionDiscontinuityTime,
+    mplsLdpSessionStatsUnknownMessageTypeErrors,
+    mplsLdpSessionStatsUnknownTlvErrors,
+    mplsLdpSessionPeerNextHopAddressType,
+    mplsLdpSessionPeerNextHopAddress,
+    mplsFecIndexNext,
+    mplsFecType,
+    mplsFecAddressFamily,
+    mplsFecAddressLength,
+    mplsFecAddress,
+    mplsFecStorageType,
+    mplsFecRowStatus
+    }
+    STATUS    current
+    DESCRIPTION
+        "Objects that apply to all MPLS LDP implementations."
+    ::= { mplsLdpGroups 1 }
+
+
+mplsLdpGenericGroup OBJECT-GROUP
+    OBJECTS {
+    mplsLdpEntityConfGenericIfIndexOrZero,
+    mplsLdpEntityConfGenericLabelRangeStorageType,
+    mplsLdpEntityConfGenericLabelRangeRowStatus
+    }
+    STATUS    current
+    DESCRIPTION
+        "Objects that apply to all MPLS LDP implementations
+        using Generic Lables."
+    ::= { mplsLdpGroups 2 }
+
+
+mplsLdpAtmGroup OBJECT-GROUP
+    OBJECTS {
+    mplsLdpEntityAtmIfIndexOrZero,
+    mplsLdpEntityAtmMergeCap,
+    mplsLdpEntityAtmLabelRangeComponents,
+    mplsLdpEntityAtmVcDirectionality,
+    mplsLdpEntityAtmLsrConnectivity,
+    mplsLdpEntityDefaultControlVpi,
+    mplsLdpEntityDefaultControlVci,
+    mplsLdpEntityUnlabTrafVpi,
+    mplsLdpEntityUnlabTrafVci,
+    mplsLdpEntityAtmStorageType,
+    mplsLdpEntityAtmRowStatus,
+    mplsLdpEntityConfAtmLabelRangeMaximumVpi,
+    mplsLdpEntityConfAtmLabelRangeMaximumVci,
+    mplsLdpEntityConfAtmLabelRangeStorageType,
+    mplsLdpEntityConfAtmLabelRangeRowStatus,
+    mplsLdpSessionAtmLabelRangeUpperBoundVpi,
+    mplsLdpSessionAtmLabelRangeUpperBoundVci
+
+    }
+    STATUS    current
+    DESCRIPTION
+        "Objects that apply to all MPLS LDP implementations
+        over ATM."
+    ::= { mplsLdpGroups 3 }
+
+mplsLdpFrameRelayGroup OBJECT-GROUP
+    OBJECTS {
+    mplsLdpEntityFrIfIndexOrZero,
+    mplsLdpEntityFrMergeCap,
+    mplsLdpEntityFrLabelRangeComponents,
+    mplsLdpEntityFrLen,
+    mplsLdpEntityFrVcDirectionality,
+    mplsLdpEntityFrParmsStorageType,
+    mplsLdpEntityFrParmsRowStatus,
+    mplsLdpConfFrMaximumDlci,
+    mplsLdpConfFrStorageType,
+    mplsLdpConfFrRowStatus,
+    mplsLdpFrSessionMaxDlci,
+    mplsLdpFrSessionLen
+    }
+    STATUS    current
+    DESCRIPTION
+        "Objects that apply to all MPLS LDP implementations over
+        Frame Relay."
+    ::= { mplsLdpGroups 4 }
+
+
+mplsLdpMappingGroup OBJECT-GROUP
+    OBJECTS {
+    mplsLdpSessionInLabelType,
+    mplsLdpSessionInLabelConnectionType,
+    mplsLdpSessionOutLabelType,
+    mplsLdpSessionOutLabelConnectionType,
+    mplsLdpSessionOutSegmentIndex,
+    mplsLdpSessionXCIndex,
+    mplsXCFecOperStatus,
+    mplsXCFecOperStatusLastChange
+    }
+    STATUS    current
+    DESCRIPTION
+        "These objects are optional and only need to be supported
+        for LDP implementations which support the
+        tables, mplsInSegmentTable, mplsOutSegmentTable
+        and mplsXCTable, in the LSR MIB."
+    ::= { mplsLdpGroups 5 }
+
+
+mplsLdpNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { mplsLdpFailedInitSessionThresholdExceeded,
+                    mplsLdpPathVectorLimitMismatch,
+                    mplsLdpSessionUp,
+                    mplsLdpSessionDown
+                       }
+    STATUS   current
+    DESCRIPTION
+        "The notification(s) which an MPLS LDP implemention
+         is required to implement."
+    ::= { mplsLdpGroups 6 }
+
+
+END

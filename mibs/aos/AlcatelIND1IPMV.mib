@@ -1,0 +1,439 @@
+ALCATEL-IND1-IPM-VLAN-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY, 
+                OBJECT-IDENTITY,
+		OBJECT-TYPE  			FROM SNMPv2-SMI
+		OBJECT-GROUP,
+                MODULE-COMPLIANCE	        FROM SNMPv2-CONF
+		softentIND1IPMVlanMgt 		FROM ALCATEL-IND1-BASE
+                RowStatus 			FROM SNMPv2-TC
+		InterfaceIndex 			FROM IF-MIB
+		InetAddressType,
+		InetAddress,	
+                InetAddressPrefixLength		FROM INET-ADDRESS-MIB
+		;
+
+        alcatelIND1IPMVlanMIB MODULE-IDENTITY
+		LAST-UPDATED "200707020000Z"
+		ORGANIZATION "ALCATEL - Architects Of An Internet World"
+		CONTACT-INFO
+                "Please consult with Customer Service to insure the most appropriate
+                version of this document is used with the products in question:
+
+                  Alcatel-Lucent, Enterprise Solutions Division
+                 (Formerly Alcatel Internetworking, Incorporated)
+                26801 West Agoura Road Agoura Hills, CA  91301-5122
+			      		           United States Of America
+	
+                Telephone:	North America	+1 800 995 2696
+				                    Latin America 	+1 877 919 9526
+                                Europe		+31 23 556 0100
+                                Asia		+65 394 7933
+                                All Other	+1 818 878 4507
+	
+                Electronic Mail:	support@ind.alcatel.com
+                World Wide Web:		http://alcatel-lucent.com/wps/portal/enterprise
+                File Transfer Protocol:	ftp://ftp.ind.alcatel.com/pub/products/mibs"
+                DESCRIPTION
+                "The parameters for configuration of the IPM Vlan feature, 
+                including the association between ports and ipaddresses with vlans.
+
+                The right to make changes in specification and other information
+                contained in this document without prior notice is reserved.
+
+                No liability shall be assumed for any incidental, indirect, special, or
+                consequential damages whatsoever arising from or related to this 
+                document or the information contained herein.
+
+                Vendors, end-users, and other interested parties are granted
+                non-exclusive license to use this specification in connection with 
+                management of the products for which it is intended to be used.
+
+                Copyright ¨ 1995-2007 Alcatel-Lucent
+	        ALL RIGHTS RESERVED WORLDWIDE"
+			::= { softentIND1IPMVlanMgt 1}
+
+alcatelIND1IPMVlanMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For IPM Vlan Managed Objects."
+     	::= { alcatelIND1IPMVlanMIB 1 }
+
+alcatelIND1IPMVlanMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For IPM Vlan Conformance Information."
+    	::= { alcatelIND1IPMVlanMIB 2 }
+
+alcatelIND1IPMVlanMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For IPM Vlan Units Of Conformance."
+     	::= { alcatelIND1IPMVlanMIBConformance 1 }
+
+alcatelIND1IPMVlanMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For IPM Vlan Compliance Statements."
+    	 ::= { alcatelIND1IPMVlanMIBConformance 2 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The IPM Vlan Port Table 
+
+     alaipmvVlanPort OBJECT IDENTIFIER ::= { alcatelIND1IPMVlanMIBObjects 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+alaipmvVlanPortTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AlaIpmvVlanPortEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"A table that contains port specific information for the IP 
+	Multicast VLAN. An entry is this table is created when a port 
+	is configured as a receiver / sender port for a IPMVLAN."
+	::= { alaipmvVlanPort 1 }
+	
+alaipmvVlanPortEntry OBJECT-TYPE
+	SYNTAX AlaIpmvVlanPortEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"A IPMV Port entry."
+	INDEX { alaipmvVlanPortIPMVlanNumber, alaipmvVlanPortNumber, alaipmvVlanPortType}
+	::= { alaipmvVlanPortTable 1 }
+	
+AlaIpmvVlanPortEntry ::= SEQUENCE 
+	{
+		alaipmvVlanPortIPMVlanNumber INTEGER,
+		alaipmvVlanPortNumber InterfaceIndex,
+		alaipmvVlanPortType INTEGER,
+		alaipmvVlanPortRowStatus RowStatus
+	}
+
+alaipmvVlanPortIPMVlanNumber OBJECT-TYPE
+	SYNTAX INTEGER (2..4094)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The VLAN number component of this IPMVLAN instance. Valid range
+	 from 2 to 4094."
+	::= { alaipmvVlanPortEntry 1 }
+	
+	alaipmvVlanPortNumber OBJECT-TYPE
+	SYNTAX InterfaceIndex 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The port ifindex of the port which is associated to the IPMVLAN."
+	::= { alaipmvVlanPortEntry 2 }
+
+	alaipmvVlanPortType OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		receiverPort(1),
+		senderPort(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The type of this port associated to the IPMVLAN. receiverPort(1)
+	 is the receiver port associated to the IPMVLAN, senderPort(2) is
+	 the sender port associated to the IPMVLAN. In the VLAN Stacking
+	 environment, these ports are the VLAN Stacking ports.
+         Configuration of IPMVLAN logical/physical receiver port on 
+         multiple IPMVlans, that are associated with same IPv4/IPv6 
+         multicast group addresses are not allowed."
+	::= { alaipmvVlanPortEntry 3 }
+	
+	alaipmvVlanPortRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"The status of this table entry. The values supported are CreateAndGo(4)
+	 and destroy(6), to create or delete the port as a receiver / sender port
+	 in an IPMVLAN. Of course the corresponding vlan and port must exist."
+	::= { alaipmvVlanPortEntry 4 }
+		
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The IPM Vlan ipmvlan/ipaddress association Table 
+
+    alaipmvVlanIpAddr OBJECT IDENTIFIER ::= { alcatelIND1IPMVlanMIBObjects 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+alaipmvVlanIpAddrTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AlaIpmvVlanIpAddrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"A list of IP addresses assigned to an IPMVLAN."
+	::= { alaipmvVlanIpAddr 1 }
+
+alaipmvVlanIpAddrEntry OBJECT-TYPE
+	SYNTAX AlaIpmvVlanIpAddrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"A IPMVLAN IP address entry."
+	INDEX { alaipmvVlanIpAddrVlanNumber, alaipmvVlanIpAddrType ,alaipmvVlanIpAddress}
+	::= { alaipmvVlanIpAddrTable 1 }
+
+AlaIpmvVlanIpAddrEntry ::= SEQUENCE 
+	{
+		alaipmvVlanIpAddrVlanNumber INTEGER,
+		alaipmvVlanIpAddrType InetAddressType,
+		alaipmvVlanIpAddress InetAddress,
+		alaipmvVlanIpAddrRowStatus RowStatus
+	}
+
+alaipmvVlanIpAddrVlanNumber OBJECT-TYPE
+	SYNTAX INTEGER (2..4094)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The VLAN number component of this IPMVLAN instance. Valid range from 2 to 4094."
+	::= { alaipmvVlanIpAddrEntry 1 }
+
+alaipmvVlanIpAddrType OBJECT-TYPE
+	SYNTAX InetAddressType (1..2)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The IP address type."
+	::= { alaipmvVlanIpAddrEntry 2 }
+
+alaipmvVlanIpAddress OBJECT-TYPE
+	SYNTAX InetAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The Multicast IP address based on the address type. 
+	 This IP multicast group address can be associated to multiple IPMVLANs.
+         Configuration of IPv4/IPv6 Multicast Group address on multiple IPMVlans,
+         that are associated with same physical/logical receiver ports are not allowed."
+	::= { alaipmvVlanIpAddrEntry 3 }
+	
+alaipmvVlanIpAddrRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"This is used to create or delete the Multicast IP address in an IPMVLAN. 
+	Of course the corresponding vlan must exist."
+	::= { alaipmvVlanIpAddrEntry 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The IPM Vlan ipmvlan/ctag association Table 
+
+    alaipmvVlanCtagT OBJECT IDENTIFIER ::= { alcatelIND1IPMVlanMIBObjects 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaipmvVlanCtagTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AlaIpmvVlanCtagEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    " A table that contains ipmvlan-ctag association for the IPMV feature."
+    ::= { alaipmvVlanCtagT 1 }
+
+alaipmvVlanCtagEntry OBJECT-TYPE
+    SYNTAX AlaIpmvVlanCtagEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A IPMVLAN-Ctag entry."
+    INDEX { alaipmvVlanNumber, alaipmvVlanCtag}
+    ::= { alaipmvVlanCtagTable 1 }
+
+AlaIpmvVlanCtagEntry ::= SEQUENCE {
+    alaipmvVlanNumber INTEGER,
+    alaipmvVlanCtag INTEGER,
+    alaipmvVlanCtagRowStatus RowStatus
+    }
+
+alaipmvVlanNumber OBJECT-TYPE
+    SYNTAX INTEGER (2..4094)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The VLAN number component of this IPMVLAN instance. Valid range from 2 to 4094."
+    ::= { alaipmvVlanCtagEntry 1 }
+
+alaipmvVlanCtag OBJECT-TYPE
+    SYNTAX INTEGER (1..4094)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    " The customer vlan id associated to the IPMVLAN.
+      This customer vlan id is unique and can't be associated 
+      to more than one IPM Vlan"
+    ::= { alaipmvVlanCtagEntry 2 }
+
+alaipmvVlanCtagRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+    "The status of this table entry.  The supported value for set are 
+    createAndGo (4) and destroy(6), to add or remove an IPMVLAN-ctag association."
+    ::= { alaipmvVlanCtagEntry 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The IPM Vlan ipaddress/prefixlen association Table 
+
+    alaipmvVlanIpAddrMask OBJECT IDENTIFIER ::= { alcatelIND1IPMVlanMIBObjects 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+alaipmvVlanIpAddrMaskTable OBJECT-TYPE
+SYNTAX SEQUENCE OF AlaIpmvVlanIpAddrMaskEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of IP addresses assigned to an IPMVLAN."
+::= { alaipmvVlanIpAddr 2 }
+
+alaipmvVlanIpAddrMaskEntry OBJECT-TYPE
+SYNTAX AlaIpmvVlanIpAddrMaskEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A IPMVLAN IP address entry."
+INDEX { alaipmvVlanIpAddrMaskVlanNumber, alaipmvVlanIpAddrMaskType ,alaipmvVlanIpAddrMaskAddress, alaipmvVlanIpAddrMaskPrefixLen}
+::= { alaipmvVlanIpAddrMaskTable 1 }
+
+AlaIpmvVlanIpAddrMaskEntry ::= SEQUENCE {
+alaipmvVlanIpAddrMaskVlanNumber INTEGER,
+alaipmvVlanIpAddrMaskType InetAddressType,
+alaipmvVlanIpAddrMaskAddress InetAddress,
+alaipmvVlanIpAddrMaskPrefixLen InetAddressPrefixLength,
+alaipmvVlanIpAddrMaskRowStatus RowStatus
+}
+
+alaipmvVlanIpAddrMaskVlanNumber OBJECT-TYPE
+SYNTAX INTEGER (2..4094)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The VLAN number component of this IPMVLAN instance. Valid range from 2 to 4094."
+::= { alaipmvVlanIpAddrMaskEntry 1 }
+
+alaipmvVlanIpAddrMaskType OBJECT-TYPE
+SYNTAX InetAddressType (1..2)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The IP address type.The allowed values are ipv4(1) and ipv6(2)."
+::= { alaipmvVlanIpAddrMaskEntry 2 }
+
+alaipmvVlanIpAddrMaskAddress OBJECT-TYPE
+SYNTAX InetAddress (SIZE (4 | 16))
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The Multicast IP address based on the address type indicated by alaipmvVlanIpAddrMaskType. This IP multicast group address can be associated to multiple IPMVLANs. alaipmvVlanIpAddrMaskPrefixLen is used to specify a mask. The host bits of the address should be zero."
+::= { alaipmvVlanIpAddrMaskEntry 3 }
+
+alaipmvVlanIpAddrMaskPrefixLen OBJECT-TYPE
+SYNTAX InetAddressPrefixLength
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The Multicast IP address-mask length based on the address type. It must be 0-32 for alaipmvVlanIpAddrMaskType ipv4 and 128 for alaipmvVlanIpAddrMaskType ipv6. The host bits of the address alaipmvVlanIpAddrMaskAddress should be zero."
+::= { alaipmvVlanIpAddrMaskEntry 4 }
+
+alaipmvVlanIpAddrMaskRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This is used to create or delete the Multicast IP address in an IPMVLAN. Of course the corresponding vlan must exist."
+::= { alaipmvVlanIpAddrMaskEntry 5 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alcatelIND1IPMVlanMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+        "Compliance statement for IPM Vlan."
+        MODULE  MANDATORY-GROUPS
+                {
+                        alaipmvlanPortGroup,
+        		alaipmvlanIPAddressGroup,
+                        alaipmvlanIPAddrMaskGroup,
+                        alaipmvlanCtagGroup
+                }
+        ::= { alcatelIND1IPMVlanMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaipmvlanPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+		    alaipmvVlanPortIPMVlanNumber, --  The IPMVLAN Port Table
+		    alaipmvVlanPortNumber,
+		    alaipmvVlanPortType,
+		    alaipmvVlanPortRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of IPM Vlan Ports."
+        ::= { alcatelIND1IPMVlanMIBGroups 1 }
+
+alaipmvlanIPAddressGroup OBJECT-GROUP
+        OBJECTS
+        {
+		    alaipmvVlanIpAddrVlanNumber, --  The IPM Vlan IP Address Table
+		    alaipmvVlanIpAddrType,
+		    alaipmvVlanIpAddress,
+		    alaipmvVlanIpAddrRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of IPM Vlan Address."
+        ::= { alcatelIND1IPMVlanMIBGroups 2 }
+       
+alaipmvlanCtagGroup OBJECT-GROUP
+        OBJECTS
+        {
+	    alaipmvVlanNumber, --  The IPM Vlan Ctag Table
+            alaipmvVlanCtag,
+            alaipmvVlanCtagRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of IPM Vlan Address."
+        ::= { alcatelIND1IPMVlanMIBGroups 3 }
+
+alaipmvlanIPAddrMaskGroup OBJECT-GROUP
+        OBJECTS
+        {
+		    alaipmvVlanIpAddrMaskRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of IPM Vlan Address."
+        ::= { alcatelIND1IPMVlanMIBGroups 4 }
+
+END
+

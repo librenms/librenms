@@ -1,0 +1,2210 @@
+ALCATEL-IND1-PORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, Counter64,
+        NOTIFICATION-TYPE, MODULE-IDENTITY,
+	TimeTicks, Integer32              FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP,
+        NOTIFICATION-GROUP                FROM SNMPv2-CONF
+        ifIndex, ifInErrors, ifOutErrors
+					  FROM IF-MIB
+	softentIND1Port, cmmEsmDrvTraps
+			   		  FROM ALCATEL-IND1-BASE
+	DisplayString            FROM SNMPv2-TC;
+
+alcatelIND1PortMIB MODULE-IDENTITY
+
+   LAST-UPDATED  "200704030000Z"
+   ORGANIZATION  "Alcatel-Lucent"
+   CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This group contains the configuration information data
+			for the Ethernet Switching Module.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { softentIND1Port 1}
+
+alcatelIND1PortNotifications	OBJECT IDENTIFIER ::= { alcatelIND1PortMIB 0 }
+alcatelIND1PortMIBObjects 		OBJECT IDENTIFIER ::= { alcatelIND1PortMIB 1 }
+alcatelIND1PortMIBConformance		OBJECT IDENTIFIER ::= { alcatelIND1PortMIB 2 }
+
+--
+-- alcatelIND1PortMIBObjects
+--
+
+esmConfTrap						OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 1 }
+physicalPort					OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 2 }
+ddmConfiguration				OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 4 }
+ddmNotifications				OBJECT IDENTIFIER ::= { alcatelIND1PortNotifications 1 }
+esmViolationRecovery				OBJECT IDENTIFIER ::= { alcatelIND1PortMIBObjects 5 }
+esmViolationNotifications                       OBJECT IDENTIFIER ::= { alcatelIND1PortNotifications 2 } 
+
+-- Ethernet Driver object related to Trap *********************
+
+esmDrvTrapDrops   OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Partitioned port (separated due to errors)."
+	::= { esmConfTrap 1 }
+
+-- Ethernet Driver Tables *****************************
+
+        --  EsmConf group.  This group contains the configuration
+        --  information data for the Ethernet Switching Module.
+        --  Implementation of this group is mandantory.
+        --
+        --  Note that this MIB can NOT be used for row creation (this
+        --  would imply that you could override the actual physical
+        --  characteristics of the physical card!).
+
+        esmConfTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF EsmConfEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A list of ESM Physical Port instances."
+            ::= { physicalPort 1 }
+
+        esmConfEntry  OBJECT-TYPE
+            SYNTAX  EsmConfEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A ESM Physical Port entry."
+            INDEX { ifIndex }
+            ::= { esmConfTable 1 }
+
+        EsmConfEntry ::= SEQUENCE {
+	    esmPortSlot
+	        Integer32,
+	    esmPortIF
+	        Integer32,
+            esmPortAutoSpeed
+                INTEGER,
+            esmPortAutoDuplexMode
+                INTEGER,
+            esmPortCfgSpeed
+                INTEGER,
+            esmPortCfgDuplexMode
+                INTEGER,
+            esmPortCfgIFG
+                Integer32,
+            esmPortPauseSlotTime
+                Integer32,
+            esmPortMaxFloodRate
+                INTEGER,
+            esmPortFloodMcastEnable
+                INTEGER,
+            esmPortCfgMaxFrameSize
+                Integer32,
+            esmPortCfgLongEnable
+                INTEGER,
+            esmPortCfgRuntEnable
+                INTEGER,
+            esmPortCfgRuntSize
+                Integer32,
+	    esmPortCfgAutoNegotiation
+			INTEGER,
+	    esmPortCfgCrossover
+			INTEGER,
+	    esmPortCfgFlow
+			INTEGER,
+	    esmPortCfgHybridActiveType
+	    		INTEGER,
+	    esmPortCfgHybridMode
+	    		INTEGER,
+            esmPortOperationalHybridType
+                        INTEGER,
+            esmPortCfgMMULowWaterMarkCellSetLimit
+                	INTEGER,
+            esmPortCfgMMUDynamicCellSetLimit
+                	INTEGER,
+            esmPortViolationBitMap
+                        BITS,
+            esmPortViolationClearAll
+                        INTEGER,
+	    esmPortFloodBcastEnable
+		INTEGER,
+	    esmPortFloodUnknownUcastEnable
+		INTEGER,
+	    esmPortMaxUnknownUcastFloodRate
+		INTEGER,
+	    esmPortMaxMcastFloodRate
+		INTEGER,
+	    esmPortMaxFloodRateLimit
+		Integer32,
+	    esmPortMaxUnknownUcastFloodRateLimit
+		Integer32,
+	    esmPortMaxMcastFloodRateLimit
+		Integer32,
+	    esmPortCfgSFPType
+		DisplayString 
+            }
+
+        esmPortSlot OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The physical Slot number for this Ethernet Port.
+	     Slot number has been added to be used by the private Trap."
+        ::= { esmConfEntry 1 }
+
+        esmPortIF OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The on-board interface number for this Ethernet Port.
+	     Port Number has been added to be used by the private Trap."
+        ::= { esmConfEntry 2 }
+
+        esmPortAutoSpeed OBJECT-TYPE
+            SYNTAX INTEGER {
+                speed100(1),
+                speed10(2),
+                speedAuto(3),
+                unknown(4),
+                speed1000(5),
+	        speed10000(6)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The automatically detected port line speed
+             of this ESM port."
+        ::= { esmConfEntry 3 }
+
+        esmPortAutoDuplexMode OBJECT-TYPE
+            SYNTAX INTEGER {
+                fullDuplex(1),
+                halfDuplex(2),
+                autoDuplex(3),
+                unknown(4)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The automatically detected port duplex mode
+             of this ESM port.
+
+	     Note: GigaEthernet supports only Full duplex mode.
+	           Default value for 10/100 = Half duplex mode."
+        ::= { esmConfEntry 4 }
+
+        esmPortCfgSpeed OBJECT-TYPE
+            SYNTAX INTEGER {
+                speed100(1),
+                speed10(2),
+                speedAuto(3),
+                speed1000(5),
+	        speed10000(6),
+	        speedMax100(8),
+		speedMax1000(9)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "The configured port line speed of this ESM port."
+        ::= { esmConfEntry 5 }
+
+        esmPortCfgDuplexMode OBJECT-TYPE
+            SYNTAX INTEGER {
+                fullDuplex(1),
+                halfDuplex(2),
+                autoDuplex(3)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "The configured port duplex mode of this ESM port.
+            Note: GigaEthernet support only full-duplex."
+        ::= { esmConfEntry 6 }
+
+        esmPortCfgIFG OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Contains the setting of Inter-Frame Gap (IFG), in bytes
+            for receive and transmit.
+	    The range is from 9 to 12 bytes.
+
+	    Note: The default value changed according to the Port type
+	    Default    Bandwidth    value
+	    12 bytes    10Mbps       9600 nsec
+	               100Mbps        960 nsec
+	 	         1Gbps         96 nsec
+			10Gbps        9.6 nsec."
+	    DEFVAL { 12 }
+        ::= { esmConfEntry 7 }
+
+        esmPortPauseSlotTime OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Indicates the number of microseconds the other
+             end-station waits after the reception
+             of a pause frame.
+
+	     Note: Pause Flow control is not available for 10Mbps.
+	           For 100Mbps, the possible value range is
+		   5120 nanosec to 0.3 sec.
+	   	   For 1Gbps, the possible value range is
+		   512 nanosec to 0.03 sec."
+        ::= { esmConfEntry 8 }
+
+        esmPortMaxFloodRate    OBJECT-TYPE
+            SYNTAX INTEGER {
+                      mbps(1),
+                      percentage(2),
+		      pps(3)
+                   }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Broadcast flood threshold type. To set the type, set esmPortMaxFloodRateLimit also."
+	    DEFVAL { mbps }
+          ::= { esmConfEntry 9 }
+
+        esmPortFloodMcastEnable    OBJECT-TYPE
+            SYNTAX INTEGER {
+                      disableMulticastFlood(2),
+                      enableMulticastFlood(1)
+                   }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Enable/disable the maximum flood rate
+                  for multicast."
+	    DEFVAL { disableMulticastFlood }
+          ::= { esmConfEntry 10 }
+
+        esmPortCfgMaxFrameSize   OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Configure the value of the maximum frame
+                  size allow.
+		  For 10/100:
+		  It is a range between 1518(untagged) and 1553 bytes.
+		  For GigaEthernet:
+	          It is a range between 1518 and 10240 bytes.(OS7700,OS7800,OS8800)
+                  It is a range between 1518 and 9216 bytes.(OS6800)"
+          ::= { esmConfEntry 11 }
+
+        esmPortCfgLongEnable   OBJECT-TYPE
+            SYNTAX INTEGER {
+                disable(0),
+                enable(1)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Allow the user to change the maximun Frame size.
+                  Note: It is not configurable for 10/100 Ethernet port."
+	    DEFVAL { disable }
+          ::= { esmConfEntry 12 }
+
+        esmPortCfgRuntEnable   OBJECT-TYPE
+            SYNTAX INTEGER {
+                disable(2),
+                enable(3)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Allow the user to change the minimum Frame size."
+	    DEFVAL { disable }
+          ::= { esmConfEntry 13 }
+
+        esmPortCfgRuntSize   OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Configure the value of the minimum frame
+                  size allow per ports.
+		  The range is 0 to 64."
+	    DEFVAL { 64 }
+          ::= { esmConfEntry 14 }
+
+        esmPortCfgAutoNegotiation   OBJECT-TYPE
+            SYNTAX INTEGER {
+                enable(1),
+                disable(2)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Allow the user to enable or disable the port auto negotiation."
+	    DEFVAL { disable }
+          ::= { esmConfEntry 15 }
+
+        esmPortCfgCrossover   OBJECT-TYPE
+            SYNTAX INTEGER {
+                	mdi(1),
+                	mdix(2),
+			auto(3)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Allow the user to configure port crossover."
+	    DEFVAL { auto }
+          ::= { esmConfEntry 16 }
+
+        esmPortCfgFlow   OBJECT-TYPE
+            SYNTAX INTEGER {
+                enable(1),
+                disable(2)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Use the dot3PauseAdminMode from the standard MIB to configure the flow control."
+	    DEFVAL { disable }
+          ::= { esmConfEntry 17 }
+
+ 	esmPortCfgHybridActiveType OBJECT-TYPE
+            SYNTAX INTEGER {
+                notapplicable(0),
+                fiber(1),
+                copper(2)
+            }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                 "This object is only applicable to hybrid ports .
+                  It indicates configured active media type.(the operational media
+                  type may be different if esmPortCfgHybridMode is configured to be
+                  preferredFiber or preferredCopper)
+                  For non hybrid ports notapplicable is returned as a status."
+          ::= { esmConfEntry 18 }
+
+	esmPortCfgHybridMode OBJECT-TYPE
+            SYNTAX INTEGER {
+                notapplicable(0),
+                preferredCopper(1),
+                forcedCopper(2),
+                preferredFiber(3),
+                forcedFiber(4)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "This object is only applicable to hybrid ports. 
+                  This allows the user the user to configure the media type
+                  with which the port should come up. 
+                  The user can configure the port to come as copper only 
+                  or fiber only or either fiber/copper 
+                  (with preference to one of them)."
+	    DEFVAL { preferredFiber }
+          ::= { esmConfEntry 19 }
+
+ 	esmPortOperationalHybridType OBJECT-TYPE
+            SYNTAX INTEGER {
+		none(0),
+                fiber(1),
+                copper(2)
+            }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                 "This object is only applicable to hybrid ports .
+                  It indicates  the actual media type that has link up and is or will be
+                  passing traffic. If link is not present the object will return none(0) value."
+          ::= { esmConfEntry 20 }
+
+	esmPortCfgMMULowWaterMarkCellSetLimit OBJECT-TYPE
+	    SYNTAX INTEGER (0..16383)
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+		" Per-port-per-CoS Head of Line blocking cell limits. Range is 0 - 16383
+		  Firebolt register Offset: 0x006pp30 - 0x37
+		  Bits: 13:0 CellSetLimit , Default: 0x0100
+		  This setting allocates the guaranteed cells for one port's CoSx queue.
+		  After cell count over this limit, it will start using dynamic cells in
+		  port dynamic space."
+	    DEFVAL { 256 }
+	  ::= { esmConfEntry 21 }
+
+	esmPortCfgMMUDynamicCellSetLimit OBJECT-TYPE
+	    SYNTAX INTEGER (0..16383)
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+		"Per-egress port cell-based dynamic (shared buffer pool) memory
+		usage drop and resume thresholds. This sets the limit for which
+		the eight CoS-Qs within a port may share once the LWMCOSCELL
+		limit is exceeded. Range is 0 - 16383
+		Firebolt register Offset: 0x006pp040
+		Bits: 13:0 Dynamic CellSetLimit , 
+                Chip Default: 0x0400 (1024).
+                The system default value for Dynamic CellSetLimit is 0x100 (256)."
+	    DEFVAL { 1024 }
+	  ::= { esmConfEntry 22 }
+
+
+
+	esmPortViolationBitMap OBJECT-TYPE
+          SYNTAX      BITS{
+              bEniSecurityBlockPortENI(0),         -- ENI App blocking this port
+              bEniSecurityBlockPortSTP(1),         -- STP App blocking this port
+ 	      bEniSecurityBlockPortSL(2),          -- SL App blocking this port
+	      bEniSecurityBlockPortQoS(3),         -- QoS App blocking this port
+ 	      bEniSecurityBlockPortUDLD(4),        -- UDLD App blocking this port
+	      bEniSecurityBlockPortETHBLK(5)       -- ETHBLK App blocking this port
+          }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION "A bit map that identifies the set of Application that have blocked 
+                       a port as a result of a particular violation "
+
+          ::= { esmConfEntry 23 }
+
+      esmPortViolationClearAll OBJECT-TYPE
+          SYNTAX      INTEGER(0) 
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION "Clear all port vioaltion "
+
+          ::= { esmConfEntry 24 }
+
+
+	esmPortFloodBcastEnable    OBJECT-TYPE
+            SYNTAX INTEGER {
+                      disableBcastFlood(2),
+                      enableBcastFlood(1)
+                   }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Enable/disable the maximum flood rate
+                  for Broadcast."
+	    DEFVAL { enableBcastFlood }
+          ::= { esmConfEntry 25 }
+
+	esmPortFloodUnknownUcastEnable    OBJECT-TYPE
+            SYNTAX INTEGER {
+                      disableUnknownUcastFlood(2),
+                      enableUnknownUcastFlood(1)
+                   }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Enable/disable the maximum flood rate
+                  for unknown unicast."
+	    DEFVAL { enableUnknownUcastFlood }
+          ::= { esmConfEntry 26 }
+
+	esmPortMaxUnknownUcastFloodRate    OBJECT-TYPE
+            SYNTAX INTEGER {
+                      mbps(1),
+                      percentage(2),
+		      pps(3)
+                   }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Unknown-Unicast flood threshold type. To set the type, set esmPortMaxUnknownUcastFloodRateLimit also"
+	    DEFVAL { mbps }
+          ::= { esmConfEntry 27 }
+
+	esmPortMaxMcastFloodRate    OBJECT-TYPE
+            SYNTAX INTEGER {
+                      mbps(1),
+                      percentage(2),
+		      pps(3)
+                   }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Multicast flood threshold type. To set the type, set esmPortMaxFloodRateLimit also."
+	    DEFVAL { mbps }
+          ::= { esmConfEntry 28 }
+
+	esmPortMaxFloodRateLimit    OBJECT-TYPE
+            SYNTAX  Integer32
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "The value of the maximum broadcast flood limit.
+		  The actual range of the flood limit depends on the port speed.
+		     example:	
+		     Percentage: 1 - 100
+		     Mbps: 1 - 1000 (1G speed)
+		     PPS: 244 - 244262 (1G speed)
+		  To set the limit, set esmPortMaxFloodRate first" 
+          ::= { esmConfEntry 29 }
+
+
+	esmPortMaxUnknownUcastFloodRateLimit    OBJECT-TYPE
+            SYNTAX  Integer32
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "The value of the maximum unknown-unicast flood limit
+		  The actual range of the flood limit depends on the port speed.
+		     example:	
+		     Percentage: 1 - 100
+		     Mbps: 1 - 1000 (1G speed)
+		     PPS: 244 - 244262 (1G speed)
+		  To set the limit, set esmPortMaxUnknownUcastFloodRate first"
+          ::= { esmConfEntry 30 }
+
+       esmPortMaxMcastFloodRateLimit    OBJECT-TYPE
+            SYNTAX  Integer32
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "The value of the maximum multicast flood limit
+		  The actual range of the flood limit depends on the port speed.
+		     example:	
+		     Percentage: 1 - 100
+		     Mbps: 1 - 1000 (1G speed)
+		     PPS: 244 - 244262 (1G speed)
+		  To set the limit, set esmPortMaxMcastFloodRate first"
+          ::= { esmConfEntry 31 }
+
+       esmPortCfgSFPType OBJECT-TYPE   
+            SYNTAX      DisplayString (SIZE (0..64))   
+            MAX-ACCESS read-only   
+            STATUS      current   
+            DESCRIPTION   
+                 "This object is only applicable to fiber ports.   
+                  The string indicates the type of SFP/GBIC of active media."   
+          ::= {  esmConfEntry 32 }  
+
+    
+
+-- Ethernet Port Mode Tables *****************************
+        --  EsmPortMode group.  This group contains the configuration
+        --  information data for the Ethernet Switching Module.
+        --  Implementation of this group is mandantory.
+        --
+        --  Note that this MIB can NOT be used for row creation (this
+        --  would imply that you could override the actual physical
+        --  characteristics of the physical card!).
+
+        esmPortModeTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF EsmPortModeEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A list of ESM Physical Port Mode instances."
+            ::= { physicalPort 6 }
+
+        esmPortModeEntry  OBJECT-TYPE
+            SYNTAX  EsmPortModeEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A ESM Physical Port Mode entry."
+            INDEX { esmPortModeIndex }
+            ::= { esmPortModeTable 1 }
+
+        EsmPortModeEntry ::= SEQUENCE {
+	    esmPortModeIndex
+		INTEGER,
+            esmPortRunningMode
+                INTEGER,
+            esmPortSavedMode
+                INTEGER
+            }
+
+	esmPortModeIndex OBJECT-TYPE
+	    SYNTAX INTEGER (1001..8128)
+	    MAX-ACCESS not-accessible
+	    STATUS current
+	    DESCRIPTION
+	    "Valid ni/port values"
+	::= { esmPortModeEntry 1 }
+
+        esmPortRunningMode OBJECT-TYPE
+            SYNTAX INTEGER {
+                uplink(1),
+                stackable(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "Currently configured Etna port 25,26 as 10G uplink user port or stacking port.
+             Default is uplink 10G port. User can not set the current mode."
+        ::= { esmPortModeEntry 2 }
+
+        esmPortSavedMode OBJECT-TYPE
+            SYNTAX INTEGER {
+                uplink(1),
+                stackable(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Next configured Etna port 25,26 as 10G uplink user port or stacking port.
+             At boot up, it has the same value as current esmPortRunningMode. It takes some time to
+             write to the EEPROM. Have at least more than 7 sec between each write operation"
+        ::= { esmPortModeEntry 3 }
+
+          -- The Ethernet Statistics Group
+          --
+          -- The ethernet statistics group contains statistics
+          -- measured by the probe for each monitored interface on
+          -- this device.  These statistics take the form of free
+          -- running counters that start from zero when a valid entry
+          -- is created.
+          --
+          -- This group currently has statistics defined only for
+          -- Ethernet interfaces.  Each alcetherStatsEntry contains
+          -- statistics for one Ethernet interface.  The probe must
+          -- create one alcetherStats entry for each monitored Ethernet
+          -- interface on the device.
+
+          alcetherStatsTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF AlcetherStatsEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                  "A list of Ethernet statistics entries."
+              ::= { physicalPort 2 }
+
+          alcetherStatsEntry OBJECT-TYPE
+              SYNTAX AlcetherStatsEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                  "A collection of statistics kept for a particular
+                  Ethernet interface.  As an example, an instance of the
+                  etherStatsPkts object might be named alcetherStatsPkts.1"
+              INDEX { ifIndex }
+              ::= { alcetherStatsTable 1 }
+
+          AlcetherStatsEntry ::= SEQUENCE {
+	      alcetherClearStats		    INTEGER,
+	      alcetherLastClearStats                TimeTicks,
+              alcetherStatsCRCAlignErrors           Counter64,
+              alcetherStatsRxUndersizePkts          Counter64,
+              alcetherStatsTxUndersizePkts          Counter64,
+              alcetherStatsTxOversizePkts           Counter64,
+              alcetherStatsRxJabbers                Counter64,
+              alcetherStatsRxCollisions             Counter64,
+              alcetherStatsTxCollisions             Counter64,
+              alcetherStatsPkts64Octets             Counter64,
+              alcetherStatsPkts65to127Octets        Counter64,
+              alcetherStatsPkts128to255Octets       Counter64,
+              alcetherStatsPkts256to511Octets       Counter64,
+              alcetherStatsPkts512to1023Octets      Counter64,
+              alcetherStatsPkts1024to1518Octets     Counter64,
+              gigaEtherStatsPkts1519to4095Octets    Counter64,
+              gigaEtherStatsPkts4096to9215Octets    Counter64,
+		alcetherStatsPkts1519to2047Octets 	Counter64,
+		alcetherStatsPkts2048to4095Octets 	Counter64,
+		alcetherStatsPkts4096Octets 		Counter64,
+		alcetherStatsRxGiantPkts 		Counter64,
+		alcetherStatsRxDribbleNibblePkts 	Counter64,
+		alcetherStatsRxLongEventPkts 		Counter64,
+		alcetherStatsRxVlanTagPkts 		Counter64,
+		alcetherStatsRxControlPkts 		Counter64,
+		alcetherStatsRxLenChkErrPkts 		Counter64,
+		alcetherStatsRxCodeErrPkts 		Counter64,
+		alcetherStatsRxDvEventPkts 		Counter64,
+		alcetherStatsRxPrevPktDropped 	Counter64,
+		alcetherStatsTx64Octets 		Counter64,
+		alcetherStatsTx65to127Octets 		Counter64,
+		alcetherStatsTx128to255Octets 	Counter64,
+		alcetherStatsTx256to511Octets 	Counter64,
+		alcetherStatsTx512to1023Octets 	Counter64,
+		alcetherStatsTx1024to1518Octets 	Counter64,
+		alcetherStatsTx1519to2047Octets 	Counter64,
+		alcetherStatsTx2048to4095Octets 	Counter64,
+		alcetherStatsTx4096Octets 		Counter64,
+		alcetherStatsTxRetryCount 		Counter64,
+		alcetherStatsTxVlanTagPkts 		Counter64,
+		alcetherStatsTxControlPkts 		Counter64,
+		alcetherStatsTxLatePkts 		Counter64,
+		alcetherStatsTxTotalBytesOnWire 	Counter64,
+		alcetherStatsTxLenChkErrPkts 		Counter64,
+		alcetherStatsTxExcDeferPkts		Counter64
+		}
+
+          alcetherClearStats OBJECT-TYPE
+              SYNTAX INTEGER
+		{	default(0),
+	 		reset(1)
+		}
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+                  "Used to Clear all Statistics counters.
+		   By default, this object contains zero value."
+              ::= { alcetherStatsEntry 1 }
+
+          alcetherLastClearStats OBJECT-TYPE
+              SYNTAX TimeTicks
+	      MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The value of SysUpTime at the time of all
+		   the statistics counters are cleared.
+		   By default, this object contains a zero value."
+              ::= { alcetherStatsEntry 2 }
+
+          alcetherStatsCRCAlignErrors OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets received that
+                  had a length (excluding framing bits, but
+                  including FCS octets) of between 64 and 1518
+                  octets, inclusive, but but had either a bad
+                  Frame Check Sequence (FCS) with an integral
+                  number of octets (FCS Error) or a bad FCS with
+                  a non-integral number of octets (Alignment Error)."
+              ::= { alcetherStatsEntry 3 }
+
+          alcetherStatsRxUndersizePkts OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets received that were
+                  less than 64 octets long (excluding framing bits,
+                  but including FCS octets) and were otherwise well
+                  formed."
+              ::= { alcetherStatsEntry 4 }
+
+          alcetherStatsTxUndersizePkts OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets transmitted that were
+                  less than 64 octets long (excluding framing bits,
+                  but including FCS octets) and were otherwise well
+                  formed."
+              ::= { alcetherStatsEntry 5 }
+
+          alcetherStatsTxOversizePkts OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets transmitted that were
+                  longer than 1518 octets long (excluding framing bits,
+                  but including FCS octets) and were otherwise well
+                  formed."
+              ::= { alcetherStatsEntry 6 }
+
+          alcetherStatsRxJabbers OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets received that were
+                  longer than 1518 octets (excluding framing bits,
+                  but including FCS octets), and had either a bad
+                  Frame Check Sequence (FCS) with an integral number
+                  of octets (FCS Error) or a bad FCS with a
+                  non-integral number of octets (Alignment Error).
+
+                  Note that this definition of jabber is different
+                  than the definition in IEEE-802.3 section 8.2.1.5
+                  (10BASE5) and section 10.3.1.4 (10BASE2).  These
+                  documents define jabber as the condition where any
+                  packet exceeds 20 ms.  The allowed range to detect
+                  jabber is between 20 ms and 150 ms."
+              ::= { alcetherStatsEntry 7 }
+
+          alcetherStatsRxCollisions OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The best estimate of the total number of collisions
+                  on this Ethernet segment (in reception).
+		  Only for Ethernet Interfaces.
+
+                  The value returned will depend on the location of
+                  the RMON probe. Section 8.2.1.3 (10BASE-5) and
+                  section 10.3.1.3 (10BASE-2) of IEEE standard 802.3
+                  states that a station must detect a collision, in
+                  the receive mode, if three or more stations are
+                  transmitting simultaneously.  A repeater port must
+                  detect a collision when two or more stations are
+                  transmitting simultaneously.  Thus a probe placed on
+                  a repeater port could record more collisions than a
+                  probe connected to a station on the same segment
+                  would.
+
+                  Probe location plays a much smaller role when
+                  considering 10BASE-T.  14.2.1.4 (10BASE-T) of IEEE
+                  standard 802.3 defines a collision as the
+                  simultaneous presence of signals on the DO and RD
+                  circuits (transmitting and receiving at the same
+                  time).  A 10BASE-T station can only detect
+                  collisions when it is transmitting.  Thus probes
+                  placed on a station and a repeater, should report
+                  the same number of collisions.
+
+                  Note also that an RMON probe inside a repeater
+                  should ideally report collisions between the
+                  repeater and one or more other hosts (transmit
+                  collisions as defined by IEEE 802.3k) plus receiver
+                  collisions observed on any coax segments to which
+                  the repeater is connected."
+              ::= { alcetherStatsEntry 8 }
+
+          alcetherStatsTxCollisions OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The best estimate of the total number of collisions
+                  on this Ethernet segment (in transmition).
+		  Only for Ethernet Interfaces.
+
+                  The value returned will depend on the location of
+                  the RMON probe. Section 8.2.1.3 (10BASE-5) and
+                  section 10.3.1.3 (10BASE-2) of IEEE standard 802.3
+                  states that a station must detect a collision, in
+                  the receive mode, if three or more stations are
+                  transmitting simultaneously.  A repeater port must
+                  detect a collision when two or more stations are
+                  transmitting simultaneously.  Thus a probe placed on
+                  a repeater port could record more collisions than a
+                  probe connected to a station on the same segment
+                  would.
+
+                  Probe location plays a much smaller role when
+                  considering 10BASE-T.  14.2.1.4 (10BASE-T) of IEEE
+                  standard 802.3 defines a collision as the
+                  simultaneous presence of signals on the DO and RD
+                  circuits (transmitting and receiving at the same
+                  time).  A 10BASE-T station can only detect
+                  collisions when it is transmitting.  Thus probes
+                  placed on a station and a repeater, should report
+                  the same number of collisions.
+
+                  Note also that an RMON probe inside a repeater
+                  should ideally report collisions between the
+                  repeater and one or more other hosts (transmit
+                  collisions as defined by IEEE 802.3k) plus receiver
+                  collisions observed on any coax segments to which
+                  the repeater is connected."
+              ::= { alcetherStatsEntry 9 }
+
+          alcetherStatsPkts64Octets OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were 64 octets in length
+                  (excluding framing bits but including FCS octets)."
+              ::= { alcetherStatsEntry 10 }
+
+          alcetherStatsPkts65to127Octets OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  65 and 127 octets in length inclusive
+                  (excluding framing bits but including FCS octets)."
+              ::= { alcetherStatsEntry 11 }
+
+          alcetherStatsPkts128to255Octets OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  128 and 255 octets in length inclusive
+                  (excluding framing bits but including FCS octets)."
+              ::= { alcetherStatsEntry 12 }
+
+          alcetherStatsPkts256to511Octets OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  256 and 511 octets in length inclusive
+                  (excluding framing bits but including FCS octets)."
+              ::= { alcetherStatsEntry 13 }
+
+          alcetherStatsPkts512to1023Octets OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  512 and 1023 octets in length inclusive
+                  (excluding framing bits but including FCS octets)."
+              ::= { alcetherStatsEntry 14 }
+
+          alcetherStatsPkts1024to1518Octets OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  1024 and 1518 octets in length inclusive
+                  (excluding framing bits but including FCS octets).
+	          For both Ethernet and GigaEthernet."
+              ::= { alcetherStatsEntry 15 }
+
+          gigaEtherStatsPkts1519to4095Octets OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  1519 and 4095 octets in length inclusive
+                  (excluding framing bits but including FCS octets).
+		  Only for GigaEthernet interfaces"
+              ::= { alcetherStatsEntry 16 }
+
+          gigaEtherStatsPkts4096to9215Octets OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets (including bad
+                  packets) received that were between
+                  4096 and 9215 octets in length inclusive
+                  (excluding framing bits but including FCS octets).
+		  Only for GigaEthernet interfaces"
+              ::= { alcetherStatsEntry 17 }
+
+
+		alcetherStatsPkts1519to2047Octets 	OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames(including error packets) received
+		   that were between 1519 and 2047 bytes in length inclusive
+		   (excluding framing bits but including FCS bytes).
+		   "
+              ::= { alcetherStatsEntry 18 }
+
+		alcetherStatsPkts2048to4095Octets 	OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames(including error packets) received
+		   that were between 2048 and 4095 bytes in length inclusive
+		   (excluding framing bits but including FCS bytes).
+		   "
+              ::= { alcetherStatsEntry 19 }
+
+		alcetherStatsPkts4096Octets 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames(including error packets) received
+		   that were greater than or equal to 4096 bytes in length inclusive
+		   (excluding framing bits but including FCS bytes).
+		   "
+              ::= { alcetherStatsEntry 20 }
+
+		alcetherStatsRxGiantPkts 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames that are greater than the specified
+		   Max length value, with a valid CRC, dropped because too long.
+		   "
+              ::= { alcetherStatsEntry 21 }
+
+		alcetherStatsRxDribbleNibblePkts 	OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames for which a dribble nibble has been
+		   received and CRC is correct.
+		   "
+              ::= { alcetherStatsEntry 22 }
+
+		alcetherStatsRxLongEventPkts 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames for which the Carrier sense exceeds
+		   50000 bit times for 10 Mbits/sec or 80000 bit times for
+		   100 Mbits/sec."
+              ::= { alcetherStatsEntry 23 }
+
+		alcetherStatsRxVlanTagPkts 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames for which Type/Length field
+		   contains the VLAN protocol identifier (0x8100). "
+              ::= { alcetherStatsEntry 24 }
+
+		alcetherStatsRxControlPkts 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames that were recognized as control frames."
+              ::= { alcetherStatsEntry 25 }
+
+		alcetherStatsRxLenChkErrPkts 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames for which the frame length field value
+		   in the Type/Length field does not match the actual data bytes
+		    length and is NOT a type field."
+              ::= { alcetherStatsEntry 26 }
+
+		alcetherStatsRxCodeErrPkts 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames for which one or more nibbles were
+		   signaled as errors during reception of the frame."
+              ::= { alcetherStatsEntry 27 }
+
+		alcetherStatsRxDvEventPkts 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames for which a RX_DV event (packet not
+		   too long enough to be valid packet) has been seen before the
+		    correct frame."
+              ::= { alcetherStatsEntry 28 }
+
+		alcetherStatsRxPrevPktDropped 	OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames for which a packet has been dropped
+		   (because of too small IFG) before the correct frame."
+              ::= { alcetherStatsEntry 29 }
+
+		alcetherStatsTx64Octets 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames of 64 bytes."
+              ::= { alcetherStatsEntry 30 }
+
+		alcetherStatsTx65to127Octets 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames that were between
+		   65 and 127 bytes in length inclusive (excluding framing bits
+		    but including FCS bytes)."
+              ::= { alcetherStatsEntry 31 }
+
+		alcetherStatsTx128to255Octets 	OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames that were between
+		   128 and 255 bytes in length inclusive (excluding framing bits
+		    but including FCS bytes)."
+              ::= { alcetherStatsEntry 32 }
+
+		alcetherStatsTx256to511Octets 	OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames that were between
+		   256 and 511 bytes in length inclusive (excluding framing bits
+		    but including FCS bytes)."
+              ::= { alcetherStatsEntry 33 }
+
+		alcetherStatsTx512to1023Octets 	OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames that were between
+		   512 and 1023 bytes in length inclusive (excluding framing bits
+		    but including FCS bytes)."
+              ::= { alcetherStatsEntry 34 }
+
+		alcetherStatsTx1024to1518Octets 	OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames that were between
+		   1024 and 1518 bytes in length inclusive (excluding framing bits
+		    but including FCS bytes)."
+              ::= { alcetherStatsEntry 35 }
+
+		alcetherStatsTx1519to2047Octets 	OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames that were between
+		   1519 and 2047 bytes in length inclusive (excluding framing bits
+		    but including FCS bytes)."
+              ::= { alcetherStatsEntry 36 }
+
+		alcetherStatsTx2048to4095Octets 	OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames that were between
+		   2048 and 4095 bytes in length inclusive (excluding framing bits
+		    but including FCS bytes)."
+              ::= { alcetherStatsEntry 37 }
+
+		alcetherStatsTx4096Octets 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames that were greater than
+		    or equal to 4096 bytes in length and less than Max frame length
+		    (excluding framing bits but including FCS bytes)."
+              ::= { alcetherStatsEntry 38 }
+
+		alcetherStatsTxRetryCount 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of collisions that the frames faced during
+		   transmission attempts."
+              ::= { alcetherStatsEntry 39 }
+
+		alcetherStatsTxVlanTagPkts 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames for which Type/Length field contains the
+		   VLAN protocol identifier (0x8100)."
+              ::= { alcetherStatsEntry 40 }
+
+		alcetherStatsTxControlPkts 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames that were recognised as control frames."
+              ::= { alcetherStatsEntry 41 }
+
+		alcetherStatsTxLatePkts 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of late collisions that occured beyond the collision window."
+              ::= { alcetherStatsEntry 42 }
+
+		alcetherStatsTxTotalBytesOnWire 	OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of bytes transmitted on wire, including all bytes from collided
+		  attempts."
+              ::= { alcetherStatsEntry 43 }
+
+		alcetherStatsTxLenChkErrPkts 		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of transmitted frames for which the frame length field value
+		  in the Type/Length field does not match the actual data bytes length and
+		   is NOT a Type field."
+              ::= { alcetherStatsEntry 44 }
+
+		alcetherStatsTxExcDeferPkts		OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of frames that were deferred in excess of 6071 nibble-times
+		   in 100 Mbps, 24287 bit-times in 10 Mbps mode. These frames are dropped.(This
+		   stat is only in case of Half duplex and excessive defer bit reset)."
+              ::= { alcetherStatsEntry 45 }
+
+-- 10 GIG specifics parameters
+
+         alcether10GigTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF Alcether10GigEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                  "A list of 10 Gig specifics entries."
+              ::= { physicalPort 4 }
+
+	alcether10GigEntry OBJECT-TYPE
+              SYNTAX Alcether10GigEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                  "This table will be populated with the 10 gig only entries.
+                  The management interface can use it to specify if A or B is the primary."
+              INDEX { ifIndex }
+              ::= { alcether10GigTable 1 }
+
+          Alcether10GigEntry ::= SEQUENCE {
+	      alcether10GigPrimary	    INTEGER
+	      }
+
+	  alcether10GigPrimary OBJECT-TYPE
+              SYNTAX INTEGER
+		{	phyAprimary(1),
+	 		phyBprimary(2),
+	 		notApplicable(3)
+		}
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION
+                  "Setting the object to 1 will make phy A as primary, 2- phy B as pirmary.
+                  Value 3 should not be set. "
+              ::= { alcether10GigEntry 1 }
+
+-- End of 10 GIG specifics parameters
+
+
+
+-- Ethernet Driver Tables *****************************
+
+        --  EsmHybridConf table contains the configuration
+        --  information about the configured inactive media for the 
+        --  hybrid port only.
+        --  Implementation of this group is mandantory.
+        --
+        --  Note that entries in this MIB Table can NOT be created by the user, only modified
+
+
+        esmHybridConfTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF EsmHybridConfEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A list of inactive hybrid port instances."
+            ::= { physicalPort 3 }
+
+        esmHybridConfEntry  OBJECT-TYPE
+            SYNTAX  EsmHybridConfEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A ESM Physical Port entry."
+            INDEX { ifIndex }
+            ::= { esmHybridConfTable 1 }
+
+        EsmHybridConfEntry ::= SEQUENCE {
+            esmHybridPortCfgSpeed
+                INTEGER,
+            esmHybridPortCfgDuplexMode
+                INTEGER,
+	    esmHybridPortCfgAutoNegotiation
+			INTEGER,
+	    esmHybridPortCfgCrossover
+			INTEGER,
+	    esmHybridPortCfgFlow
+			INTEGER,
+            esmHybridPortCfgInactiveType
+			INTEGER,
+	    esmHybridPortCfgSFPType
+			DisplayString
+            }
+
+        esmHybridPortCfgSpeed OBJECT-TYPE
+            SYNTAX INTEGER {
+                speed100(1),
+                speed10(2),
+                speedAuto(3),
+                speed1000(5),
+	        speed10000(6),
+	        speedMax100(8),
+		speedMax1000(9)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "The configured port line speed of this ESM port."
+        ::= { esmHybridConfEntry 1 }
+
+        esmHybridPortCfgDuplexMode OBJECT-TYPE
+            SYNTAX INTEGER {
+                fullDuplex(1),
+                halfDuplex(2),
+                autoDuplex(3)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "The configured port duplex mode of this ESM port.
+            Note: GigaEthernet support only full-duplex."
+        ::= { esmHybridConfEntry 2 }
+
+        esmHybridPortCfgAutoNegotiation   OBJECT-TYPE
+            SYNTAX INTEGER {
+                enable(1),
+                disable(2)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Allow the user to enable or disable the port auto negotiation."
+	    DEFVAL { disable }
+          ::= { esmHybridConfEntry 3 }
+
+        esmHybridPortCfgCrossover   OBJECT-TYPE
+            SYNTAX INTEGER {
+                	mdi(1),
+                	mdix(2),
+			auto(3)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "Allow the user to configure port crossover."
+	    DEFVAL { auto }
+          ::= { esmHybridConfEntry 4 }
+
+        esmHybridPortCfgFlow   OBJECT-TYPE
+            SYNTAX INTEGER {
+                disable(1),
+				enabledXmit(2),
+                enabledRcv(3),
+                enabledXmitAndRcv(4)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "This object is used for flow control of hybrid ports. It is similar to the dot3PauseAdminMode
+		  object in dot3PauseTable. It is used to configure pause for fiber media."
+	    DEFVAL { disable }
+          ::= { esmHybridConfEntry 5 }
+
+ 	esmHybridPortCfgInactiveType OBJECT-TYPE
+            SYNTAX INTEGER {
+                fiber(1),
+                copper(2)
+            }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                 "This object is only applicable to hybrid ports .
+                  It indicates the configured inactive media type."
+          ::= { esmHybridConfEntry 6 }
+
+	esmHybridPortCfgSFPType OBJECT-TYPE      
+            SYNTAX      DisplayString (SIZE (0..64))      
+            MAX-ACCESS read-only      
+            STATUS      current     
+            DESCRIPTION      
+                "This object is only applicable to fiber ports.      
+                The string indicates the type of SFP/GBIC of active media."      
+          ::= { esmHybridConfEntry 7 }    
+
+
+-- End-to-End Flow Vlan Configuration *****************
+
+	esmE2EFlowVlan OBJECT-TYPE
+	    SYNTAX INTEGER (0 .. 4094)
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+		"0 - Deleting End-to-End flow control
+		 1-4094 - Enable End-to-End flow control and use the Vlan configured as for End-to-End flow"
+	    ::= { alcatelIND1PortMIBObjects 3 }
+
+
+-- Digital Diagnostics Monitoring (DDM) **************************
+
+ddmConfig OBJECT-TYPE
+	SYNTAX		INTEGER {
+					enable(1),
+					disable(2)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This object enables/disables DDM software feature in the system."
+	DEFVAL		{ disable }
+	::= { ddmConfiguration 1 }
+
+ddmTrapConfig OBJECT-TYPE
+	SYNTAX		INTEGER {
+					enable(1),
+					disable(2)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This objects enables/disables traps for DDM warning/alarm threshold violations."
+	DEFVAL		{ disable }
+	::= { ddmConfiguration 2 }
+
+ddmNotificationType	OBJECT-TYPE
+	SYNTAX		INTEGER 
+				{
+					clearViolation(1),
+					highAlarm(2),
+					highWarning(3),
+					lowWarning(4),
+					lowAlarm(5)
+				}
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This object defines the trap type for monitored DDM parameters."
+	::=	{ ddmConfiguration 3 }
+
+
+
+-- esmViolationRecoveryTime Configuration *****************
+
+esmViolationRecoveryTrap OBJECT-TYPE
+	SYNTAX		INTEGER {
+					enable(1),
+					disable(2)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This objects enables/disables traps for user-port shutdown"
+	DEFVAL		{ disable }
+	::= { esmViolationRecovery 1 }
+
+
+esmViolationRecoveryTime OBJECT-TYPE
+	    SYNTAX INTEGER (0 .. 600)
+	    MAX-ACCESS read-write
+	    STATUS current
+	    DESCRIPTION
+		"0 - Disable the timer
+		30 - 600 - timeout value to re-enable the UserPort ports"
+	    ::= { esmViolationRecovery 2 }
+
+esmViolationRecoveryNotificationType	OBJECT-TYPE
+	SYNTAX		INTEGER 
+				{
+					clearViolation(1)
+				}
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This object defines the trap type for monitored violation-recovery parameters."
+	::=	{ esmViolationRecovery 3 }
+
+
+ddmInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DdmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ddmInfoTable has an entry for each SFP/XFP in the
+         system that supports Digital Diagnostic Monitoring (DDM). The table is
+         indexed by ifIndex. Each row in this table is dynamically added
+         and removed internally by the system based on the presence or absence
+         of DDM capable SFP/XFP components."
+    ::= { physicalPort 5 }
+
+ddmInfoEntry OBJECT-TYPE
+    SYNTAX      DdmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a particular SFP/XFP that supports Digital
+         Diagnostic Monitoring.
+         Entries are created and deleted internally by the system."
+    INDEX { ifIndex }
+    ::= { ddmInfoTable 1}
+
+DdmEntry ::= SEQUENCE
+    {
+        ddmTemperature                   Integer32,
+        ddmTempLowWarning                Integer32,
+        ddmTempLowAlarm                  Integer32,
+        ddmTempHiWarning                 Integer32,
+        ddmTempHiAlarm                   Integer32,
+        ddmSupplyVoltage                 Integer32,
+        ddmSupplyVoltageLowWarning       Integer32,
+        ddmSupplyVoltageLowAlarm         Integer32,
+        ddmSupplyVoltageHiWarning        Integer32,
+        ddmSupplyVoltageHiAlarm          Integer32,
+        ddmTxBiasCurrent                 Integer32,
+        ddmTxBiasCurrentLowWarning       Integer32,
+        ddmTxBiasCurrentLowAlarm         Integer32,
+        ddmTxBiasCurrentHiWarning        Integer32,
+        ddmTxBiasCurrentHiAlarm          Integer32,
+        ddmTxOutputPower                 Integer32,
+        ddmTxOutputPowerLowWarning       Integer32,
+        ddmTxOutputPowerLowAlarm         Integer32,
+        ddmTxOutputPowerHiWarning        Integer32,
+        ddmTxOutputPowerHiAlarm          Integer32,
+        ddmRxOpticalPower                Integer32,
+        ddmRxOpticalPowerLowWarning      Integer32,
+        ddmRxOpticalPowerLowAlarm        Integer32,
+        ddmRxOpticalPowerHiWarning       Integer32,
+        ddmRxOpticalPowerHiAlarm         Integer32
+    }
+
+ddmTemperature                 OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -150000..150000)
+	UNITS		"thousandth of a degree celcius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTemperature indicates the current temperature
+         of the SFP/XFP in 1000s of degrees Celsius.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 1 }
+
+ddmTempLowWarning              OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -150000..150000)
+	UNITS       "thousandth of a degree celcius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTempLowWarning indicates the temperature
+         of the SFP/XFP in 1000s of degrees Celsius that triggers a low-warning.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 2 }
+
+ddmTempLowAlarm                OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -150000..150000)
+	UNITS       "thousandth of a degree celcius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTempLowAlarm indicates the temperature
+         of the SFP/XFP in 1000s of degrees Celsius that triggers a low-alarm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 3 }
+
+ddmTempHiWarning               OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -150000..150000)
+	UNITS       "thousandth of a degree celcius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTempHiWarning indicates the temperature
+         of the SFP/XFP in 1000s of degrees Celsius that triggers a hi-warning.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 4 }
+
+ddmTempHiAlarm                 OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -150000..150000)
+	UNITS       "thousandth of a degree celcius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTempHiAlarm indicates the temperature
+         of the SFP/XFP in 1000s of degrees Celsius that triggers a hi-alarm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 5 }
+
+ddmSupplyVoltage               OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | 0..10000)
+	UNITS       "thousandth of a volt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmSupplyVoltage indicates the current supply
+         voltage of the SFP/XFP in 1000s of Volts (V).
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 6 }
+
+ddmSupplyVoltageLowWarning     OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | 0..10000)
+	UNITS       "thousandth of a volt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmSupplyVoltageLowWarning indicates the supply
+         voltage of the SFP/XFP in 1000s of Volts (V) that triggers a low-warning.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 7 }
+
+ddmSupplyVoltageLowAlarm       OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | 0..10000)
+	UNITS       "thousandth of a volt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmSupplyVoltageLowAlarm indicates the supply
+         voltage of the SFP/XFP in 1000s of Volts (V) that triggers a low-alarm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 8 }
+
+ddmSupplyVoltageHiWarning      OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | 0..10000)
+	UNITS       "thousandth of a volt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmSupplyVoltageHiWarning indicates the supply
+         voltage of the SFP/XFP in 1000s of Volts (V) that triggers a hi-warning.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 9 }
+
+ddmSupplyVoltageHiAlarm        OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | 0..10000)
+	UNITS       "thousandth of a volt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmSupplyVoltageHiAlarm indicates the supply
+         voltage of the SFP/XFP in 1000s of Volts (V) that triggers a hi-alarm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 10 }
+
+ddmTxBiasCurrent               OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | 0..10000)
+	UNITS       "thousandth of a milli-Ampere"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTxBiasCurrent indicates the current Transmit
+         Bias Current of the SFP/XFP in 1000s of milli-Amperes (mA).
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 11 }
+
+ddmTxBiasCurrentLowWarning     OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | 0..10000)
+	UNITS       "thousandth of a milli-Ampere"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTxBiasCurrentLowWarning indicates the Transmit
+         Bias Current of the SFP/XFP in 1000s of milli-Amperes (mA) that triggers a
+         low-warning.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 12 }
+
+ddmTxBiasCurrentLowAlarm       OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | 0..10000)
+	UNITS       "thousandth of a milli-Ampere"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTxBiasCurrentLowAlarm indicates the Transmit
+         Bias Current of the SFP/XFP in 1000s of milli-Amperes (mA) that triggers a
+         low-alarm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 13 }
+
+ddmTxBiasCurrentHiWarning      OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | 0..10000)
+	UNITS       "thousandth of a milli-Ampere"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTxBiasCurrentHiWarning indicates the Transmit
+         Bias Current of the SFP/XFP in 1000s milli-Amperes (mA) that triggers a
+         hi-warning.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 14 }
+
+ddmTxBiasCurrentHiAlarm        OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | 0..10000)
+	UNITS       "thousandth of a milli-Ampere"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTxBiasCurrentHiAlarm indicates the Transmit
+         Bias Current of the SFP/XFP in 1000s milli-Amperes (mA) that triggers a
+         hi-alarm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 15 }
+
+ddmTxOutputPower               OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -40000..10000)
+	UNITS       "thousandth of a dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTxOutputPower indicates the current Output
+         Power of the SFP/XFP in 1000s of dBm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 16 }
+
+ddmTxOutputPowerLowWarning     OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -40000..10000)
+	UNITS       "thousandth of a dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTxOutputPowerLowWarning indicates the Output Power
+         of the SFP/XFP in 1000s of dBm that triggers a low-warning.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 17 }
+
+ddmTxOutputPowerLowAlarm       OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -40000..10000)
+	UNITS       "thousandth of a dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTxOutputPowerLowAlarm indicates the Output Power
+         of the SFP/XFP in 1000s of dBm that triggers a low-alarm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 18 }
+
+ddmTxOutputPowerHiWarning      OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -40000..10000)
+	UNITS       "thousandth of a dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTxOutputPowerHiWarning indicates the Output Power
+         of the SFP/XFP in 1000s of dBm that triggers a hi-alarm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 19 }
+
+ddmTxOutputPowerHiAlarm        OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -40000..10000)
+	UNITS       "thousandth of a dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmTxOutputPowerHiAlarm indicates the Output Power
+         of the SFP/XFP in 1000s of dBm that triggers a hi-alarm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 20 }
+
+ddmRxOpticalPower              OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -40000..10000)
+	UNITS       "thousandth of a dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmRxOpticalPower indicates the current Received
+         Optical Power of the SFP/XFP in 1000s of dBm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 21 }
+
+ddmRxOpticalPowerLowWarning    OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -40000..10000)
+	UNITS       "thousandth of a dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmRxOpticalPowerLowWarning indicates the Received
+         Optical Power of the SFP/XFP in 1000s of dBm that triggers a
+         low-warning.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 22 }
+
+ddmRxOpticalPowerLowAlarm      OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -40000..10000)
+	UNITS       "thousandth of a dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmRxOpticalPowerLowAlarm indicates the Received
+         Optical Power of the SFP/XFP in 1000s of dBm that triggers a
+         low-alarm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 23 }
+
+ddmRxOpticalPowerHiWarning     OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -40000..10000)
+	UNITS       "thousandth of a dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmRxOpticalPowerHiWarning indicates the Received
+         Optical Power of the SFP/XFP in 1000s of dBm that triggers a
+         hi-warning.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 24 }
+
+ddmRxOpticalPowerHiAlarm       OBJECT-TYPE
+    SYNTAX      Integer32 (-200000 | -40000..10000)
+	UNITS       "thousandth of a dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of ddmRxOpticalPowerHiAlarm indicates the Received
+         Optical Power of the SFP/XFP in 1000s of dBm that triggers a
+         hi-alarm.
+		 A value of -200000 indicates this object is not applicable."
+    ::= { ddmInfoEntry 25 }
+
+-- Ethernet Driver Trap *********************
+
+esmDrvTrapDropsLink  NOTIFICATION-TYPE
+    OBJECTS    {
+                  esmPortSlot,
+		  esmPortIF,
+                  ifInErrors,
+                  ifOutErrors,
+		  esmDrvTrapDrops
+               }
+    STATUS  current
+    DESCRIPTION
+           "When the Ethernet code drops the link because of
+            excessive errors, a Trap is sent."
+    ::= { cmmEsmDrvTraps 0 1 }
+
+e2eStackTopoChangeTrap NOTIFICATION-TYPE
+     OBJECTS    {
+                   esmE2EFlowVlan
+                }
+     STATUS  current
+     DESCRIPTION
+            "Trap  Generated when  Stack Topology changes."
+     ::= { cmmEsmDrvTraps 0 2 }
+
+ddmTemperatureThresholdViolated NOTIFICATION-TYPE
+	OBJECTS		{
+					ifIndex,
+					ddmNotificationType, 
+					ddmTemperature
+				}
+	STATUS		current
+	DESCRIPTION
+		"This object notifies management station if an SFP/XFP/SFP+ temperature has crossed any 
+		 threshold or reverted from previous threshold violation for a port represented by ifIndex.
+		 It also provides the current realtime value of SFP/XFP/SFP+ temperature."
+	::=	{ ddmNotifications 0 1 }
+
+ddmVoltageThresholdViolated NOTIFICATION-TYPE
+    OBJECTS     {
+                    ifIndex,
+                    ddmNotificationType,
+                    ddmSupplyVoltage
+                }
+    STATUS      current
+    DESCRIPTION
+        "This object notifies management station if an SFP/XFP/SFP+ supply voltage has crossed any
+         threshold or reverted from previous threshold violation for a port represented by ifIndex.
+         It also provides the current realtime value of SFP/XFP/SFP+ supply voltage."
+    ::= { ddmNotifications 0 2 }
+
+ddmCurrentThresholdViolated NOTIFICATION-TYPE
+    OBJECTS     {
+                    ifIndex,
+                    ddmNotificationType,
+                    ddmTxBiasCurrent
+                }
+    STATUS      current
+    DESCRIPTION
+        "This object notifies management station if an SFP/XFP/SFP+ Tx bias current has crossed any
+         threshold or reverted from previous threshold violation for a port represented by ifIndex.
+         It also provides the current realtime value of SFP/XFP/SFP+ Tx bias current."
+    ::= { ddmNotifications 0 3 }
+
+ddmTxPowerThresholdViolated NOTIFICATION-TYPE
+    OBJECTS     {
+                    ifIndex,
+                    ddmNotificationType,
+                    ddmTxOutputPower
+                }
+    STATUS      current
+    DESCRIPTION
+        "This object notifies management station if an SFP/XFP/SFP+ Tx output power has crossed any
+         threshold or reverted from previous threshold violation for a port represented by ifIndex.
+         It also provides the current realtime value of SFP/XFP/SFP+ Tx output power."
+    ::= { ddmNotifications 0 4 }
+
+
+ddmRxPowerThresholdViolated NOTIFICATION-TYPE
+    OBJECTS     {
+                    ifIndex,
+                    ddmNotificationType,
+                    ddmRxOpticalPower
+                }
+    STATUS      current
+    DESCRIPTION
+        "This object notifies management station if an SFP/XFP/SFP+ Rx optical power has crossed any
+         threshold or reverted from previous threshold violation for a port represented by ifIndex.
+         It also provides the current realtime value of SFP/XFP/SFP+ Rx optical power."
+    ::= { ddmNotifications 0 5 }
+
+
+esmViolationRecoveryTimeout NOTIFICATION-TYPE
+    OBJECTS     {
+                    ifIndex,
+                    esmViolationRecoveryNotificationType
+                }
+    STATUS      current
+    DESCRIPTION
+        "This object notifies management station if User-Port ports get re-enabled after esm violation recovery time"
+    ::= { esmViolationNotifications 0 1 }
+
+-- conformance information
+
+alcatelIND1PortMIBCompliances OBJECT IDENTIFIER ::= { alcatelIND1PortMIBConformance 1 }
+alcatelIND1PortMIBGroups      OBJECT IDENTIFIER ::= { alcatelIND1PortMIBConformance 2 }
+
+-- compliance statements
+
+esmConfPortCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for the configuration of Ethernet
+            ports."
+    MODULE  -- this module
+        MANDATORY-GROUPS { 	esmConfMIBGroup, 
+							esmDetectedConfMIBGroup, 
+							esmPortModeMIBGroup,
+							ddmInfoGroup,
+							ddmConfigGroup,
+							ddmNotificationsGroup,
+							violationRecoveryGroup,
+							violationNotificationsGroup
+						 }
+    ::= { alcatelIND1PortMIBCompliances 1 }
+
+alcEtherStatsCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for the Statistics of the Ethernet
+            ports."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alcEtherStatsMIBGroup }
+
+    ::= { alcatelIND1PortMIBCompliances 2 }
+
+-- units of conformance
+
+
+
+esmConfMIBGroup OBJECT-GROUP
+    OBJECTS { esmPortCfgSpeed,
+              esmPortCfgDuplexMode, esmPortCfgIFG,
+              esmPortPauseSlotTime, esmPortMaxFloodRate,
+	      esmPortFloodMcastEnable, esmPortCfgMaxFrameSize, esmPortCfgAutoNegotiation,
+	      esmPortCfgCrossover, esmPortCfgFlow, esmPortFloodUnknownUcastEnable,
+	      esmPortMaxUnknownUcastFloodRate,esmPortMaxMcastFloodRate,esmPortFloodBcastEnable,
+	      esmPortMaxFloodRateLimit,esmPortMaxUnknownUcastFloodRateLimit,esmPortMaxMcastFloodRateLimit, esmPortCfgSFPType     	
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support the management of global
+            configuration parameters of the Ethernet ports."
+    ::= { alcatelIND1PortMIBGroups 1 }
+
+esmDetectedConfMIBGroup OBJECT-GROUP
+    OBJECTS { esmPortAutoSpeed, esmPortAutoDuplexMode
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support the Detected
+            configuration parameters of the Ethernet ports."
+    ::= { alcatelIND1PortMIBGroups 2 }
+
+alcEtherStatsMIBGroup OBJECT-GROUP
+    OBJECTS { alcetherClearStats, alcetherLastClearStats,
+	      alcetherStatsCRCAlignErrors, alcetherStatsRxUndersizePkts,
+              alcetherStatsTxUndersizePkts, alcetherStatsTxOversizePkts,
+	      alcetherStatsRxJabbers, alcetherStatsRxCollisions,
+	      alcetherStatsTxCollisions, alcetherStatsPkts64Octets,
+              alcetherStatsPkts65to127Octets, alcetherStatsPkts128to255Octets,
+              alcetherStatsPkts256to511Octets,
+	      alcetherStatsPkts512to1023Octets,
+	      alcetherStatsPkts1024to1518Octets,
+              gigaEtherStatsPkts1519to4095Octets,
+	      gigaEtherStatsPkts4096to9215Octets,
+		alcetherStatsPkts1519to2047Octets,
+		alcetherStatsPkts2048to4095Octets,
+		alcetherStatsPkts4096Octets,
+		alcetherStatsRxGiantPkts,
+		alcetherStatsRxDribbleNibblePkts,
+		alcetherStatsRxLongEventPkts,
+		alcetherStatsRxVlanTagPkts,
+		alcetherStatsRxControlPkts,
+		alcetherStatsRxLenChkErrPkts,
+		alcetherStatsRxCodeErrPkts,
+		alcetherStatsRxDvEventPkts,
+		alcetherStatsRxPrevPktDropped,
+		alcetherStatsTx64Octets,
+		alcetherStatsTx65to127Octets,
+		alcetherStatsTx128to255Octets,
+		alcetherStatsTx256to511Octets,
+		alcetherStatsTx512to1023Octets,
+		alcetherStatsTx1024to1518Octets,
+		alcetherStatsTx1519to2047Octets,
+		alcetherStatsTx2048to4095Octets,
+		alcetherStatsTx4096Octets,
+		alcetherStatsTxRetryCount,
+		alcetherStatsTxVlanTagPkts,
+		alcetherStatsTxControlPkts,
+		alcetherStatsTxLatePkts,
+		alcetherStatsTxTotalBytesOnWire,
+		alcetherStatsTxLenChkErrPkts,
+		alcetherStatsTxExcDeferPkts
+
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to provide all the statistics related
+             to the Ethernet and GigaEthernert ports."
+    ::= { alcatelIND1PortMIBGroups 3 }
+
+alcPortNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+	esmDrvTrapDropsLink
+	}
+    STATUS current
+    DESCRIPTION
+ 	    "The Port MIB Notification Group."
+    ::= { alcatelIND1PortMIBGroups 4 }
+
+esmPortModeMIBGroup OBJECT-GROUP
+    OBJECTS { esmPortRunningMode,
+              esmPortSavedMode  
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support the management of global
+            configuration parameters of the stacking ports."
+    ::= { alcatelIND1PortMIBGroups 5 }
+
+	ddmInfoGroup	OBJECT-GROUP
+	OBJECTS	{
+				ddmTemperature,
+        		ddmTempLowWarning,
+        		ddmTempLowAlarm,
+        		ddmTempHiWarning,
+        		ddmTempHiAlarm,
+        		ddmSupplyVoltage,
+        		ddmSupplyVoltageLowWarning,
+        		ddmSupplyVoltageLowAlarm,
+        		ddmSupplyVoltageHiWarning,
+        		ddmSupplyVoltageHiAlarm,
+        		ddmTxBiasCurrent,
+        		ddmTxBiasCurrentLowWarning,
+        		ddmTxBiasCurrentLowAlarm,
+        		ddmTxBiasCurrentHiWarning,
+        		ddmTxBiasCurrentHiAlarm,
+        		ddmTxOutputPower,
+        		ddmTxOutputPowerLowWarning,
+        		ddmTxOutputPowerLowAlarm,
+        		ddmTxOutputPowerHiWarning,
+        		ddmTxOutputPowerHiAlarm,
+        		ddmRxOpticalPower,
+        		ddmRxOpticalPowerLowWarning,
+        		ddmRxOpticalPowerLowAlarm,
+        		ddmRxOpticalPowerHiWarning,
+        		ddmRxOpticalPowerHiAlarm
+			}
+	STATUS	current
+	DESCRIPTION
+			"A collection of objects to provide digital diagnostics information
+			 related to SFPs, XFPs, and SFP+s."
+	::=	{ alcatelIND1PortMIBGroups 6 }
+
+	ddmConfigGroup	OBJECT-GROUP
+	OBJECTS {
+				ddmConfig,
+				ddmTrapConfig			
+			}
+	STATUS	current
+	DESCRIPTION
+			"A collection of objects to allow configuration of DDM and DDM traps."
+	::=	{ alcatelIND1PortMIBGroups 7 }
+
+	ddmNotificationsGroup	NOTIFICATION-GROUP
+	NOTIFICATIONS	{
+						ddmTemperatureThresholdViolated,
+						ddmVoltageThresholdViolated,
+						ddmCurrentThresholdViolated,
+						ddmTxPowerThresholdViolated,
+						ddmRxPowerThresholdViolated
+					}
+	STATUS	current
+	DESCRIPTION
+			"A collection of notifications used to indicate DDM threshold violations."
+	::= { alcatelIND1PortMIBGroups 8 }
+
+	violationRecoveryGroup	OBJECT-GROUP
+	OBJECTS {
+				esmViolationRecoveryTrap,
+				esmViolationRecoveryTime			
+			}
+	STATUS	current
+	DESCRIPTION
+			"A collection of objects to allow configuration of violationRecovery."
+	::=	{ alcatelIND1PortMIBGroups 9 }
+
+	violationNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS	{
+						esmViolationRecoveryTimeout
+			}
+	STATUS	current
+	DESCRIPTION
+			"A collection of notifications used to indicate esm violation recovery timeout."
+	::= { alcatelIND1PortMIBGroups 10 }
+	END
+
+

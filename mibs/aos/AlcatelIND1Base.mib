@@ -1,0 +1,776 @@
+ALCATEL-IND1-BASE DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+FROM
+	SNMPv2-SMI;
+
+
+alcatelIND1BaseMIB MODULE-IDENTITY
+
+    LAST-UPDATED  "200704020008Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This module provides base definitions for modules
+             developed to manage Alcatel-Lucent infrastructure products.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704020008Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { alcatel 800 }
+
+
+
+alcatel OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Alcatel-Lucent Corporate Private Enterprise Number."
+    ::= { enterprises 6486 }
+
+
+
+alcatelIND1Management OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	    "Internetworking Division 1 Management Branch."
+    ::= { alcatelIND1BaseMIB 1 }
+
+
+
+managementIND1Hardware OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Hardware Feature Management Branch."
+    ::= { alcatelIND1Management 1 }
+
+
+managementIND1Software OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Software Feature Management Branch."
+    ::= { alcatelIND1Management 2 }
+
+
+managementIND1Notifications OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Notifications Related Management Branch."
+    ::= { alcatelIND1Management 3 }
+
+
+managementIND1AgentCapabilities OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Notifications Related Management Branch."
+    ::= { alcatelIND1Management 4 }
+
+
+
+hardwareIND1Entities OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Hardware Feature Related ENTITY-MIB Extensions."
+    ::= { managementIND1Hardware 1 }
+
+
+hardwareIND1Devices OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch Where Object Indentifiers For Chassis And Modules Are Defined."
+    ::= { managementIND1Hardware 2 }
+
+
+softwareIND1Entities OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Software Feature Related Extensions."
+    ::= { managementIND1Software 1 }
+
+softwareIND1Services OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Software Features Related to any service related extensions.
+        Usually management for non AOS devices or software."
+    ::= { managementIND1Software 2 }
+
+notificationIND1Entities OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Notification Related ENTITY-MIB Extensions."
+    ::= { managementIND1Notifications 1 }
+
+
+notificationIND1Traps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Notification/Trap Definitions."
+    ::= { managementIND1Notifications 2 }
+
+
+aipAMAPTraps  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Alcatel-Lucent/Xylan Mapping Adjaceny Protocol Notification/Trap Definitions."
+    ::= { notificationIND1Traps 1 }
+
+aipGMAPTraps  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Group Mobility Advertising Protocol Notification/Trap Definitions."
+    ::= { notificationIND1Traps 2 }
+
+
+policyManagerTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Policy Manager Notification/Trap Definitions."
+    ::= { notificationIND1Traps 3 }
+
+
+chassisTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Chassis Notification/Trap Definitions."
+    ::= { notificationIND1Traps 4 }
+
+
+healthMonTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Chassis Notification/Trap Definitions."
+    ::= { notificationIND1Traps 5 }
+
+
+cmmEsmDrvTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For CMM Ethernet Driver Notification/Trap Definitions."
+    ::= { notificationIND1Traps 6 }
+
+spanningTreeTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For CMM Spanning Tree Notification/Trap Definitions."
+    ::= { notificationIND1Traps 7 }
+
+portMirroringMonitoringTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Branch for Port mirroring and monitoring Notification/Trap Definitions."
+    ::= { notificationIND1Traps 8 }
+
+sourceLearningTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Branch for Source Learning Notification/Trap Definitioins."
+    ::= { notificationIND1Traps 9 }
+
+slbTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Branch for Server Load Balancing Notification/Trap Definitions."
+    ::= { notificationIND1Traps 10 }
+
+switchMgtTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Branch for Switch Management Notification/Trap Definitions."
+    ::= { notificationIND1Traps 11 }
+
+trapMgrTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Branch for Trap Manager Notification Definitions."
+    ::= { notificationIND1Traps 12 }
+
+groupmobilityTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Group Mobility Notification/Trap Definitions."
+    ::= { notificationIND1Traps 13 }
+
+lnkaggTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Branch for Link Aggregation  Notification/Trap Definitions."
+    ::= { notificationIND1Traps 14 }
+
+trafficEventTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"OID branch for network traffic event Trap/Notification Definitions."
+    ::= { notificationIND1Traps 15 }
+
+atmTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for ATM Notification/Trap Definitions."
+    ::= { notificationIND1Traps 16 }
+
+pethTraps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for power over ethernet Notification/Trap Definitions."
+    ::= { notificationIND1Traps 17 }
+
+wccpTraps OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+		  "Branch for Web Cache Coordination Protocol Notification/Trap Definitions."
+  ::= { notificationIND1Traps 18 }
+
+alaNMSTraps OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+		  "Branch for Network Management Software Notification/Trap Definitions."
+  ::= { notificationIND1Traps 19 }
+
+alaNetSecTraps OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+		  "Branch for Network Security Notification/Trap Definitions."
+  ::= { notificationIND1Traps 20 }
+
+alaAaaTraps OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+		  "Branch for AAA Notification/Trap Definitions."
+  ::= { notificationIND1Traps 21 }
+
+alaLbdTraps OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+                  "Branch for Loop Back Detection Notification/Trap Definitions."
+  ::= { notificationIND1Traps 22 }
+
+alaDhcpClientTraps OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+                  "Branch for DHCP Client Notification/Trap Definitions."
+  ::= { notificationIND1Traps 23 }
+
+
+hardentIND1Physical OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Physical Hardware Feature Related ENTITY-MIB Extensions."
+    ::= { hardwareIND1Entities 1 }
+
+
+hardentIND1System OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For System Wide Hardware Feature Related ENTITY-MIB Extensions."
+    ::= { hardwareIND1Entities 2 }
+
+
+hardentIND1Chassis OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Chassis Hardware Feature Related ENTITY-MIB Extensions."
+    ::= { hardwareIND1Entities 3 }
+
+
+hardentIND1Pcam OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Pseudo-CAM Hardware Feature Related ENTITY-MIB Extensions."
+    ::= { hardwareIND1Entities 4 }
+
+
+softentIND1SnmpAgt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For SNMP Agent Information."
+    ::= { softwareIND1Entities 1 }
+
+
+softentIND1TrapMgr OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Trap Manager Information."
+    ::= { softwareIND1Entities 2 }
+
+
+softentIND1VlanMgt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For VLAN Manager Information."
+    ::= { softwareIND1Entities 3 }
+
+
+softentIND1GroupMobility OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Group Mobility Information."
+    ::= { softwareIND1Entities 4 }
+
+
+softentIND1Port OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Port Manager Information."
+    ::= { softwareIND1Entities 5 }
+
+
+softentIND1Sesmgr OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Session Manager Information."
+    ::= { softwareIND1Entities 7 }
+
+
+softentIND1MacAddress OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Source Learning MAC Address Information."
+    ::= { softwareIND1Entities 8 }
+
+
+softentIND1Aip OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Interswitch Protocol Information."
+    ::= { softwareIND1Entities 9 }
+
+
+softentIND1Routing OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Routing Information."
+    ::= { softwareIND1Entities 10 }
+
+
+softentIND1Confmgr OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Configuration Manager Information."
+    ::= { softwareIND1Entities 11 }
+
+
+softentIND1VlanStp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For VLAN Spanning Tree Protocol Information."
+    ::= { softwareIND1Entities 12 }
+
+
+softentIND1LnkAgg OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Link Aggregation Information."
+    ::= { softwareIND1Entities 13 }
+
+
+softentIND1Policy OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Policy Information."
+    ::= { softwareIND1Entities 14 }
+
+
+softentIND1AAA OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Authentication, Authorization, and Accounting (AAA) Information."
+    ::= { softwareIND1Entities 15 }
+
+
+softentIND1Health OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Health Information."
+    ::= { softwareIND1Entities 16 }
+
+
+softentIND1WebMgt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For WebView Information."
+    ::= { softwareIND1Entities 17 }
+
+softentIND1Ipms OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For IPMS Information."
+    ::= { softwareIND1Entities 18 }
+
+softentIND1PortMirroringMonitoring OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	" Branch for Port Mirroring and Monitoring information."
+    ::= { softwareIND1Entities 19 }
+
+softentIND1Slb OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	" Branch for Server Load Balancing information."
+    ::= { softwareIND1Entities 20 }
+
+softentIND1Dot1Q OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For 802.1Q Information."
+    ::= { softwareIND1Entities 21 }
+
+softentIND1QoS OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For QoS and Filtering Information."
+    ::= { softwareIND1Entities 22 }
+
+softentIND1Ip OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for IP private information."
+    ::= { softwareIND1Entities 23 }
+
+softentIND1StackMgr OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Stack Manager private information."
+    ::= { softwareIND1Entities 24 }
+
+softentIND1Partmgr OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Partitioned Manager Information."
+    ::= { softwareIND1Entities 25 }
+
+softentIND1Ntp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Network Time Protocol Information."
+    ::= { softwareIND1Entities 26 }
+
+softentIND1InLinePower OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for In Line Power management Information."
+    ::= { softwareIND1Entities 27 }
+
+softentIND1Vrrp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for VRRP."
+    ::= { softwareIND1Entities 28 }
+
+softentIND1Ipv6 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for IPv6 private information."
+    ::= { softwareIND1Entities 29 }
+
+softentIND1Dot1X OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for 802.1x private information."
+    ::= { softwareIND1Entities 30 }
+
+softentIND1Sonet OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Software Feature Related to Sonet"
+    ::= { softwareIND1Entities 31 }
+
+softentIND1Atm OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for ATM information."
+    ::= { softwareIND1Entities 32 }
+
+softentIND1PortMapping OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Port Mapping private information."
+    ::= { softwareIND1Entities 33 }
+
+softentIND1Igmp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for IGMP proprietary information."
+    ::= { softwareIND1Entities 34 }
+
+softentIND1Mld OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for MLD proprietary nformation."
+    ::= { softwareIND1Entities 35 }
+
+softentIND1Gvrp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for GVRP information."
+    ::= { softwareIND1Entities 36 }
+
+
+softentIND1VlanStackingMgt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Vlan Stacking Management proprietary information."
+    ::= { softwareIND1Entities 37 }
+
+softentIND1Wccp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Web Cache Coordination Protocol information."
+    ::= { softwareIND1Entities 38 }
+
+softentIND1Ssh OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for SSH proprietary information."
+    ::= { softwareIND1Entities 39 }
+
+softentIND1EthernetOam OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Configuration Fault Management Information for Ethernet OAM"
+    ::= { softwareIND1Entities 40 }
+
+softentIND1IPMVlanMgt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+       "Branch for IPM Vlan Management proprietary information."
+    ::= { softwareIND1Entities 41 }
+
+softentIND1IPsec OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for IPsec proprietary information."
+    ::= { softwareIND1Entities 43 }
+
+softentIND1Udld OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for UDLD information."
+    ::= { softwareIND1Entities 44 }
+
+softentIND1BFD OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for BFD information."
+    ::= { softwareIND1Entities 45 }
+
+softentIND1Erp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Ethernet Ring Protection proprietary information."
+    ::= { softwareIND1Entities 46 }
+
+softentIND1NetSec OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Network Security information."
+    ::= { softwareIND1Entities 48 }
+
+softentIND1eService OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for E-Serices proprietary information."
+    ::= { softwareIND1Entities 50 }
+
+softentIND1serviceMgr OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Service Manager proprietary information."
+    ::= { softwareIND1Entities 51 }
+
+softentIND1Dot3Oam OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for 802.3ah proprietary information."
+    ::= { softwareIND1Entities 52 }
+
+softentIND1MplsFrr OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for MPLS FRR proprietary information."
+    ::= { softwareIND1Entities 53 }
+
+softentIND1LicenseManager OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for License Manager proprietary information."
+    ::= { softwareIND1Entities 54 }
+
+softentIND1Saa OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+	"Branch for Service Assurance Agent proprietary information."
+    ::= { softwareIND1Entities 55 }
+
+softentIND1Lbd OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Loop Back Detection information."
+    ::= { softwareIND1Entities 56 }
+
+softentIND1Mvrp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for MVRP information."
+    ::= { softwareIND1Entities 57 }
+
+softentIND1LldpMed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for LLDP MED information."
+    ::= { softwareIND1Entities 58 }
+
+softentIND1DhcpSrv OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for DHCP Server information."
+    ::= { softwareIND1Entities 59 }
+
+routingIND1Tm OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For DRC Task Manager Information."
+    ::= { softentIND1Routing 1 }
+
+
+routingIND1Iprm OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For IP Route Manager Information."
+    ::= { softentIND1Routing 2 }
+
+
+routingIND1Rip OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Routing Information Protocol (RIP) Information."
+    ::= { softentIND1Routing 3 }
+
+
+routingIND1Ospf OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Open Shortest Path First (OSPF) Information."
+    ::= { softentIND1Routing 4 }
+
+
+routingIND1Bgp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Border Gateway Protocol (BGP) Information."
+    ::= { softentIND1Routing 5 }
+
+
+routingIND1Pim OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Protocol Independent Multicast (PIM-SM and PIM-DM) Information."
+    ::= { softentIND1Routing 6 }
+
+
+routingIND1Dvmrp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Distance-Vector Multicast Routing Protocol (DVMRP) Information."
+    ::= { softentIND1Routing 7 }
+
+
+routingIND1Ipx OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Novell Internetwork Packet Exchange (IPX) Protocol Information."
+    ::= { softentIND1Routing 8 }
+
+routingIND1UdpRelay OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For UDP Relay Agent."
+    ::= { softentIND1Routing 9 }
+
+routingIND1Ipmrm OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For IP Multicast Route Manager Information."
+    ::= { softentIND1Routing 10 }
+
+routingIND1RDP OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For IP Multicast Route Manager Information."
+    ::= { softentIND1Routing 11 }
+
+routingIND1Ripng OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"Branch For RIPng."
+	::= { softentIND1Routing 12 }
+
+routingIND1Ospf3 OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "Branch For OSPF3."
+  ::= { softentIND1Routing 13 }
+
+routingIND1ISIS OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "Branch For ISIS Routing."
+  ::= { softentIND1Routing 14 }
+
+routingIND1Vrf OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Virtual Router support."
+    ::= { softentIND1Routing 15 }
+
+
+serventIND1Aqe OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"Branch For AQE."
+	::= { softwareIND1Services 1 }
+
+
+END
+
+
+
+
+

@@ -1,0 +1,856 @@
+ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		DisplayString, RowStatus, TEXTUAL-CONVENTION	FROM SNMPv2-TC
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		OBJECT-TYPE, IpAddress, Unsigned32				FROM SNMPv2-SMI
+		MODULE-COMPLIANCE, OBJECT-GROUP          		FROM SNMPv2-CONF
+		softentIND1VlanMgt								FROM ALCATEL-IND1-BASE;
+
+
+	alcatelIND1VLANMgrMIB MODULE-IDENTITY
+		LAST-UPDATED "200704030000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+		DESCRIPTION
+			"This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 Vlan Manager for the distribution of vlan configuration information,
+				 including the association between vlans and ports.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION      "200704030000Z"
+        DESCRIPTION
+            "The latest version of this MIB Module."
+		::= { softentIND1VlanMgt 1}
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	IpxNetworkAddress ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT "x"
+		STATUS current
+		DESCRIPTION
+			"Textual convention for ipx network address.
+			 This is an unsigned integer (32 bits) that should be
+			 represented as a hexedecimal value."
+		SYNTAX Unsigned32
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	alcatelIND1VLANMgrMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For VLAN Manager
+            Subsystem Managed Objects."
+        ::= { alcatelIND1VLANMgrMIB 1 }
+
+
+    alcatelIND1VLANMgrMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For VLAN Manager
+            Subsystem Conformance Information."
+        ::= { alcatelIND1VLANMgrMIB 2 }
+
+
+    alcatelIND1VLANMgrMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For VLAN Manager
+            Subsystem Units Of Conformance."
+        ::= { alcatelIND1VLANMgrMIBConformance 1 }
+
+
+    alcatelIND1VLANMgrMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For VLAN Manager
+            Subsystem Compliance Statements."
+        ::= { alcatelIND1VLANMgrMIBConformance 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	vlanMgrVlan  OBJECT IDENTIFIER ::= { alcatelIND1VLANMgrMIBObjects 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	vlanTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VlanEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		 "A list of Virtual LAN instances in this device."
+	    ::= { vlanMgrVlan 1 }
+
+	vlanEntry  OBJECT-TYPE
+	    SYNTAX  VlanEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		 "A VLAN entry."
+	    INDEX { vlanNumber }
+	    ::= { vlanTable 1 }
+
+	VlanEntry ::= SEQUENCE {
+		vlanNumber
+			INTEGER,
+	    vlanDescription
+			DisplayString,
+	    vlanAdmStatus
+			INTEGER,
+	    vlanOperStatus
+			INTEGER,
+		vlanStatus
+			RowStatus,
+		vlanStpStatus
+        	INTEGER,
+		vlanAuthentStatus
+			INTEGER,
+		vlanVoiceStatus
+			INTEGER,
+		vlanIpAddress
+			IpAddress,
+		vlanIpMask
+			IpAddress,
+		vlanIpEncap
+			INTEGER,
+		vlanIpForward
+			INTEGER,
+		vlanIpStatus
+			INTEGER,
+		vlanIpxNet
+			IpxNetworkAddress,
+		vlanIpxEncap
+			INTEGER,
+		vlanIpxRipSapMode
+			INTEGER,
+		vlanIpxDelayTicks
+			INTEGER,
+		vlanIpxStatus
+			INTEGER,
+		vlanTagMobilePortStatus
+			INTEGER,
+		vlanPortMacStatus
+			INTEGER,
+		vlanLocalProxyArp
+			INTEGER,
+		vlanMtu
+                        INTEGER,
+                vlan1x1StpStatus
+        		INTEGER,
+		vlanflatStpStatus
+        		INTEGER,
+        	vlanHABandwidth
+    	                INTEGER,
+                vlanSvlanTrafficType
+                        INTEGER,
+                vlanSvlanPriority
+        		INTEGER,
+                vlanMacLearningControlStatus          
+                        INTEGER
+	}
+
+	vlanNumber  OBJECT-TYPE
+	    SYNTAX  INTEGER (1..4094)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		 "The VLAN number identifying this instance. Valid
+		  range from 1 to 4094."
+	    ::= { vlanEntry 1 }
+
+	vlanDescription  OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..32))
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		 "Textual description of the VLAN instance."
+	    ::= { vlanEntry 2 }
+
+	vlanAdmStatus  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+	    	enabled(1),
+	    	disabled(2)
+	    }
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"The administrative status which can be set by
+		 configuration. Disable(1) will disable ALL vports
+		 that are connected to this VLAN, enable(2) will enable
+		 ALL ports on this VLAN, delete(3) will detach and
+		 delete the ports/routers AND remove the VLAN."
+		 DEFVAL { enabled }
+		::= { vlanEntry 3 }
+
+	vlanOperStatus  OBJECT-TYPE
+		SYNTAX  INTEGER {
+			active(1),
+			inactive(2)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Provide operating status of a particular VLAN environment."
+		::= { vlanEntry 4 }
+
+	 vlanStatus  OBJECT-TYPE
+	 	SYNTAX  RowStatus
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Row status to control creation/deletion of vlans."
+		::= { vlanEntry 5 }
+
+	vlanStpStatus  OBJECT-TYPE
+		SYNTAX  INTEGER {
+			enabled(1),
+			disabled(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Indicates status of spanning tree for the current VLAN."
+		DEFVAL { enabled }
+		::= { vlanEntry 6 }
+
+	vlanAuthentStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			enabled(1),
+			disabled(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Indicates status of authentication for the current VLAN."
+		DEFVAL { disabled }
+		::= { vlanEntry 7 }
+
+
+	vlanVoiceStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			enabled(1),
+			disabled(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Indicates status of voice usage for the current VLAN."
+		DEFVAL { disabled }
+		::= { vlanEntry 8 }
+
+
+	vlanIpAddress  OBJECT-TYPE
+		SYNTAX  IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"IP address of the VLAN's virtual router port.
+			 Note:  a vlan does not necessarily have an ip address.
+			 Setting one requires that the ip address be set, and optionally the
+			 following since they have defaults:  ip mask, ip encap, ip forward.
+			 Then setting vlanIpStatus to add will create the ip router port
+			 for the given vlan (the index)."
+		 ::= { vlanEntry 9 }
+
+	vlanIpMask OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Subnetwork mask for VLAN IP Address.
+			 Default is class level mask for the ip address."
+		::= { vlanEntry 10 }
+
+	vlanIpEncap OBJECT-TYPE
+		SYNTAX INTEGER {
+			ethernet2 (1),
+			snap (2),
+			notApplicable(3)
+		}
+		MAX-ACCESS read-write
+	    STATUS current
+		DESCRIPTION
+		"VLAN's IP router port encapsulation.
+		 Not applicable when there is no ip router port."
+		DEFVAL { ethernet2 }
+		::= { vlanEntry 11 }
+
+	vlanIpForward OBJECT-TYPE
+		SYNTAX INTEGER {
+			enable(1),
+			disable(2),
+			notApplicable(3)
+		}
+		MAX-ACCESS read-write
+	    STATUS current
+		DESCRIPTION
+		"VLAN's IP router port ip frame forwarding (disabled = ip host only).
+		 Not applicable when there is no ip router port."
+		DEFVAL { enable }
+		::= { vlanEntry 12 }
+
+	vlanIpStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			add(1),
+			delete(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"Provides ability to add and remove the VLAN ip address."
+		::= { vlanEntry 13 }
+
+	vlanIpxNet OBJECT-TYPE
+		SYNTAX IpxNetworkAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"IPX network address.
+		 Note:  a vlan does not necessarily have an ipx net number.
+		 Setting one requires that the ipx net be set, and optionally the
+		 ipx encap, ipx rip-sap mode, and delay ticks (all have defaults).
+		 Then the vlanIpxStatus should be set to add to create the
+		 ipx router port."
+		::= { vlanEntry 14 }
+
+	vlanIpxEncap OBJECT-TYPE
+		SYNTAX INTEGER {
+			ethernet2 (1),
+			novellraw (2),
+			llc (3),
+			snap (4),
+			notApplicable(5)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"IPX of frame enapsulation of IPX VLAN router port.
+		 Not applicable when there is no ipx router port."
+		DEFVAL { ethernet2 }
+		::= { vlanEntry 15 }
+
+	vlanIpxRipSapMode OBJECT-TYPE
+		SYNTAX INTEGER {
+			riponly (1),
+			ripsap (2),
+			triggered (3),
+			inactive(4),
+			notApplicable(5)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"IPX advertisement mode.
+		 Not applicable when there is no ipx router port."
+		DEFVAL { ripsap }
+		::= { vlanEntry 16 }
+
+	vlanIpxDelayTicks OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"Tick metric to use for supporting IPX routing decisions."
+		DEFVAL { 0 }
+		::= {vlanEntry 17 }
+
+	vlanIpxStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			add(1),
+			delete(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"Provides ability to add and remove the VLAN ipx network node."
+		::= { vlanEntry 18 }
+
+	vlanTagMobilePortStatus OBJECT-TYPE
+                SYNTAX INTEGER {
+                        enable(1),
+                        disable(2)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                "When enabled for a VLAN, a mobile port will be moved to the
+		 VLAN based on the tag."
+                ::= { vlanEntry 19 }
+
+	vlanPortMacStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			enable(1),
+			disable(2)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"When enabled for a VLAN, it will be considered a special VLAN not
+		 affected by the ordinary vlan commands except the command to
+		 delete a VLAN"
+		::= { vlanEntry 20 }
+
+	vlanLocalProxyArp OBJECT-TYPE
+     		SYNTAX INTEGER {
+       			enable(1),
+       			disable(2)
+     		}
+     		MAX-ACCESS read-write
+     		STATUS current
+     		DESCRIPTION
+       		"When enabled for a VLAN, local proxy ARP processing happens on this=
+ 		 VLAN."
+     		::= { vlanEntry 21 }
+
+	vlanMtu  OBJECT-TYPE
+                SYNTAX  INTEGER (1280..9198)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                 "Maximum transmission unit i.e. the maximum size of packet that this
+                  vlan can handle. It ranges from 1280 to 9198."
+                ::= { vlanEntry 22 }
+
+	vlan1x1StpStatus  OBJECT-TYPE
+		SYNTAX  INTEGER {
+			enabled(1),
+			disabled(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Indicates status of 1x1 spanning tree for the current VLAN."
+		DEFVAL { enabled }
+		::= { vlanEntry  23}
+
+	vlanflatStpStatus  OBJECT-TYPE
+		SYNTAX  INTEGER {
+			enabled(1),
+			disabled(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Indicates status of flat spanning tree for the current VLAN."
+		DEFVAL { enabled }
+		::= { vlanEntry  24}
+
+	vlanHABandwidth OBJECT-TYPE
+                SYNTAX  INTEGER (0..50)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Bandwidth of flood queue allocated by Q-driver for High Availability
+		 vlans. The value ranges from 1 to 50 Mega bits per second."
+                ::= { vlanEntry 25 }
+
+        vlanSvlanTrafficType OBJECT-TYPE
+                        SYNTAX  INTEGER {
+                                notApplicable(0),
+                                customer(1),
+                                provider(2),
+                                multicastEnterprise(3),
+                                multicastVlanStacking(4),
+                                eServiceCustomer(6),
+                                eServiceManagement(7),
+                                eServiceMulticastVlanStacking(8)
+                        }
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The created SVLAN is desired for carrying customer or
+                provider traffic, default is customer. When creating
+                standard Vlans the value should be notApplicable"
+		        DEFVAL { 0 }
+                ::= { vlanEntry 26 }
+
+   	vlanSvlanPriority OBJECT-TYPE
+                SYNTAX  INTEGER (-1..7)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "All traffic getting mapped to this Svlan should be either
+                priority mapped or mapped to a specific priority 0-7, default
+                is priority 0. For standard Vlans the value should be -1"
+		        DEFVAL { 0 }
+                ::= { vlanEntry 27 }
+        vlanMacLearningControlStatus   OBJECT-TYPE
+                SYNTAX          INTEGER{
+                                      enabled (1),
+                                      disabled (2)
+                                       }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                "Status of Mac Learning on a vlan"
+                        DEFVAL { enabled }
+                ::= { vlanEntry 28 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	vlanMgrVpa  OBJECT IDENTIFIER ::= { alcatelIND1VLANMgrMIBObjects 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	vpaTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF VpaEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		 "A list of Virtual LAN instances in this device."
+	    ::= { vlanMgrVpa 1 }
+
+	vpaEntry  OBJECT-TYPE
+	    SYNTAX  VpaEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		 "A VLAN-Port Association (VPA) entry."
+	    INDEX { vpaVlanNumber, vpaIfIndex }
+	    ::= { vpaTable 1 }
+
+	VpaEntry ::= SEQUENCE {
+		vpaVlanNumber
+			INTEGER,
+		vpaIfIndex
+			Unsigned32,
+		vpaType
+			INTEGER,
+		vpaState
+			INTEGER,
+		vpaStatus
+			RowStatus,
+		vpaPortMacType
+			INTEGER
+	}
+
+	vpaVlanNumber  OBJECT-TYPE
+		SYNTAX  INTEGER (1..4094)
+		MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		 "The VLAN number component of this instance. Valid
+		  range from 1 to 4094."
+	    ::= { vpaEntry 1 }
+
+	vpaIfIndex  OBJECT-TYPE
+		SYNTAX  Unsigned32 (1001..4294967295)
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"The ifIndex component of this instance."
+		::= {vpaEntry 2 }
+
+        vpaType  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        cfgDefault(1),
+                        qTagged(2),
+                        mobile(3),
+                        mirrored(4),
+                        svlan(6),
+                        dynamic(7)
+                }
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                "The type of this vpa.  Two are statically configured:
+                 configured default VPA and qTagged VPA. The mirrored
+                 is an internal type set for mirrored ports and the
+                 rest are dynamic vlan's
+     
+                 1. cfgDefault - Default vlan VPA Type
+                 2. qTagged    - The qTagged vlan VPA Type
+                 3. mobile     - The vpa is dynamically created according
+                                 to rules/policies.
+                 4. mirrored   - Set internally when the vpa created is on
+              	                 a mirrored port.
+                 6. slvan      - Service vlan vpa's which are created.
+                 7. dynamic    - Created by dynamic GVRP or MVRP Protocol."
+
+                ::= { vpaEntry 3 }
+
+	vpaState  OBJECT-TYPE
+		SYNTAX  INTEGER {
+			inactive(1),
+			blocking(2),
+			forwarding(3),
+			filtering(4)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+		"The state of this vpa:
+			1. inactive   - link down
+			2. blocking   - link up, forwarding down
+			3. forwarding - link up, forwarding up, sources learned normally
+			4. filtering  - link up, forwarding up, sources filtered."
+		::= { vpaEntry 4 }
+
+	vpaStatus  OBJECT-TYPE
+		SYNTAX  RowStatus
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"This is used to create or delete staticPrimary VPAs (default vlans
+		 on a port ).  Creation replaces the existing staticPrimary VPA
+		 while deletion replaces the existing VPA so that the vlan number
+		 is 1 for the given port.  Of course the corresponding vlan and
+		 port must exist."
+		 ::= { vpaEntry 5 }
+
+	vpaPortMacType OBJECT-TYPE
+		SYNTAX INTEGER {
+			ingress(1),
+			egress(2),
+			inapplicable(3)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"Value of this field will decide whether the port represented by vpaIfIndex is a ingress port or egress port. This fiels is applicable only for portMac vlans"
+		::= { vpaEntry 6 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	vlanMgrVlanSet  OBJECT IDENTIFIER ::= { alcatelIND1VLANMgrMIBObjects 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	vlanSetVlanCount  OBJECT-TYPE
+	    SYNTAX  INTEGER (1..4094)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		 "Count of existing VLANs on switch."
+	    ::= { vlanMgrVlanSet 1 }
+
+	vlanSetVlanRouterCount  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..4094)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		 "Count of VLANs on switch with at least one router port configured."
+	    ::= { vlanMgrVlanSet 2 }
+
+	vlanSetIpRouterCount  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..4094)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		 "Count of VLANs on switch with IP router port configured."
+	    ::= { vlanMgrVlanSet 3 }
+
+	vlanSetIpxRouterCount  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..256)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		 "Count of VLANs on switch with IPX router port configured."
+	    ::= { vlanMgrVlanSet 4 }
+
+	vlanSetMultiRtrMacStatus  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+			enable(1),
+			disable(2)
+		}
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		 "Controls whether unique mac assigned to each vlan
+		  with router port (limit 64)."
+		DEFVAL { disable }
+	    ::= { vlanMgrVlanSet 5 }
+
+--YP
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        vlanMgrHAPort  OBJECT IDENTIFIER ::= { alcatelIND1VLANMgrMIBObjects 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        vlanHAPortTable     OBJECT-TYPE
+                SYNTAX  SEQUENCE OF VlanHAPortEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "A list of Port To HA vlan binding."
+                ::= { vlanMgrHAPort 1 }
+
+        vlanHAPortEntry     OBJECT-TYPE
+                SYNTAX  VlanHAPortEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "Port To HA vlan binding entry."
+                INDEX { vlanHAPortVlanId, vlanHAPortIfIndex, vlanHAPortType }
+                ::= { vlanHAPortTable 1 }
+
+
+        VlanHAPortEntry ::= SEQUENCE {
+                vlanHAPortVlanId         INTEGER,
+                vlanHAPortIfIndex        Unsigned32,
+		vlanHAPortType		 INTEGER,
+                vlanHAPortRowStatus      RowStatus
+                }
+
+        vlanHAPortVlanId            OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The vlan Id in which this port is a HA port"
+                ::= { vlanHAPortEntry 1 }
+
+
+        vlanHAPortIfIndex   OBJECT-TYPE
+                SYNTAX  Unsigned32
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "This port is associated with a HA vlan."
+                ::= { vlanHAPortEntry 2 }
+
+	vlanHAPortType	  OBJECT-TYPE
+		SYNTAX INTEGER {
+                        ingress(1),
+                        egress(2)
+                }
+		MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Value of this field will decide whether the port represented by vlanHAPortIfIndex is a ingress port or egress port."
+		::= { vlanHAPortEntry 3 }
+
+        vlanHAPortRowStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "This indicate whether to add or delete the ifIndex"
+                ::= { vlanHAPortEntry 4 }
+
+
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alcatelIND1VLANMgrMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for
+             VLAN Manager."
+        MODULE
+            MANDATORY-GROUPS
+            {
+                vlanMgrVlanGroup,
+                vlanMgrVpaGroup,
+				vlanMgrVlanSetGroup
+            }
+
+        ::= { alcatelIND1VLANMgrMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    vlanMgrVlanGroup OBJECT-GROUP
+        OBJECTS
+        {
+			vlanNumber,		   -- vlan table
+	    	vlanDescription,
+	    	vlanAdmStatus,
+	    	vlanOperStatus,
+			vlanStatus,
+			vlan1x1StpStatus,
+			vlanflatStpStatus,
+			vlanStpStatus,
+			vlanAuthentStatus,
+			vlanVoiceStatus,
+			vlanIpAddress,
+			vlanIpMask,
+			vlanIpEncap,
+			vlanIpForward,
+			vlanIpStatus,
+			vlanIpxNet,
+			vlanIpxEncap,
+			vlanIpxRipSapMode,
+			vlanIpxDelayTicks,
+			vlanIpxStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of Vlan Manager VLANs."
+        ::= { alcatelIND1VLANMgrMIBGroups 1 }
+
+
+    vlanMgrVpaGroup OBJECT-GROUP
+        OBJECTS
+        {
+			vpaVlanNumber,		  -- vpa table
+			vpaIfIndex,
+			vpaType,
+			vpaState,
+			vpaStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of Vlan Manager VPAs."
+        ::= { alcatelIND1VLANMgrMIBGroups 2 }
+
+	vlanMgrVlanSetGroup OBJECT-GROUP
+		OBJECTS
+		{
+		   vlanSetVlanCount,
+		   vlanSetVlanRouterCount,
+		   vlanSetIpRouterCount,
+		   vlanSetIpxRouterCount,
+		   vlanSetMultiRtrMacStatus
+		}
+		STATUS current
+		DESCRIPTION
+			"Collection of objects for Vlan Manager global properties."
+		::= { alcatelIND1VLANMgrMIBGroups 3 }
+
+	END
+

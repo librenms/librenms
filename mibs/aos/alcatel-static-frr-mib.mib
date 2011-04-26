@@ -1,0 +1,478 @@
+--  MPLS Static Fast Reroute Management Information Base Using SMIv2
+--                                
+--                   draft-alcatel-static-frr-mib-00.txt
+ALCATEL-STATIC-FRR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32,
+        Unsigned32, IpAddress                  FROM SNMPv2-SMI
+
+        softentIND1MplsFrr                     FROM ALCATEL-IND1-BASE
+
+        DisplayString, RowStatus,
+        TruthValue                             FROM SNMPv2-TC
+                                                        
+	InterfaceIndexOrZero		       FROM IF-MIB	
+
+	InetAddressType,InetAddressIPv4        FROM INET-ADDRESS-MIB
+
+        MplsLabel, MplsObjectOwner             FROM MPLS-LSR-MIB
+
+        TmnxOperState                          FROM TIMETRA-TC-MIB;
+
+
+alcatelStaticFrrMIBModule MODULE-IDENTITY
+        LAST-UPDATED    "0801010000Z"
+        ORGANIZATION    "Alcatel-Lucent Inc"
+	CONTACT-INFO
+	    "Please consult with Customer Service to ensure the most appropriate
+	     version of this document is used with the products in question:
+ 
+			Alcatel-Lucent, Enterprise Solutions Division
+		       (Formerly Alcatel Internetworking, Incorporated)
+			       26801 West Agoura Road
+			    Agoura Hills, CA  91301-5122
+			      United States Of America
+	
+	    Telephone:               North America  +1 800 995 2696
+				     Latin America  +1 877 919 9526
+				     Europe         +31 23 556 0100
+				     Asia           +65 394 7933
+				     All Other      +1 818 878 4507
+	
+	    Electronic Mail:         support@ind.alcatel.com
+	    World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+	    File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision 
+        Static FRR extensions for the Alcatel 9x00 device.
+
+        Copyright 2000-2009 Alcatel-Lucent. All rights reserved.
+        Reproduction of this document is authorized on the condition that
+        the foregoing copyright notice is included.
+
+        This SNMP MIB module (Specification) embodies Alcatel's
+        proprietary intellectual property.  Alcatel retains 
+        all title and ownership in the Specification, including any 
+        revisions.
+
+        Alcatel grants all interested parties a non-exclusive 
+        license to use and distribute an unmodified copy of this 
+        Specification in connection with management of Alcatel 
+        products, and without fee, provided this copyright notice and 
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Alcatel 
+        makes no warranty, either express or implied, as to the use, 
+        operation, condition, or performance of the Specification."
+--
+--  Revision History
+--
+        REVISION        "0902020000Z"   
+        DESCRIPTION     "Rev 1.0                28 Mar 2009 00:00
+                         1.0 release of the ALCATEL-STATIC-FRR-MIB."
+
+
+        ::= { softentIND1MplsFrr 1 }
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+alcatelStaticFrrMIBModuleObjs  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+     "Branch for ALU FRR  Managed Objects."
+     ::= {alcatelStaticFrrMIBModule 1}
+
+--
+-- Protected Static FRR InSegment Table
+--
+
+vRtrStaticFrrMplsInSegmentTable  OBJECT-TYPE
+
+   SYNTAX        SEQUENCE OF VRtrStaticFrrMplsInSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains a collection of incoming
+        segments to an LSR."
+   ::= { alcatelStaticFrrMIBModuleObjs 1 }
+
+vRtrStaticFrrMplsInSegmentEntry  OBJECT-TYPE
+   SYNTAX        VRtrStaticFrrMplsInSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents one incoming
+        segment.  An entry can be created by a network
+            administrator or an SNMP agent. The creator of the entry is 
+        denoted by vRtrStaticFrrMplsInSegmentOwner.  An entry in this table is
+        indexed by the ifIndex of the incoming interface and
+        the (top) label."
+   INDEX         { vRtrStaticFrrMplsInSegmentIfIndex, vRtrStaticFrrMplsInSegmentLabel }
+   ::= { vRtrStaticFrrMplsInSegmentTable 1 }
+
+VRtrStaticFrrMplsInSegmentEntry ::= SEQUENCE {
+  vRtrStaticFrrMplsInSegmentIfIndex              InterfaceIndexOrZero,
+  vRtrStaticFrrMplsInSegmentLabel                MplsLabel,
+  vRtrStaticFrrMplsInSegmentNPop                 Integer32,
+  vRtrStaticFrrMplsInSegmentXCIndex              Integer32,
+  vRtrStaticFrrMplsInSegmentOwner                MplsObjectOwner,
+  vRtrStaticFrrMplsInSegmentRowStatus            RowStatus
+}
+
+vRtrStaticFrrMplsInSegmentIfIndex OBJECT-TYPE
+   SYNTAX        InterfaceIndexOrZero
+   MAX-ACCESS    accessible-for-notify
+   STATUS        current
+   DESCRIPTION
+       "This is a unique index for an entry in the
+        StaticFrrMplsInSegmentTable.  This value represents the
+        interface index for the incoming MPLS interface.  A
+        value of zero represents an incoming label from the
+        per-platform label space.  In this case, the
+        vRtrStaticFrrMplsInSegmentLabel is interpreted to be an MPLS-type
+        label."
+   ::= { vRtrStaticFrrMplsInSegmentEntry 1 }
+
+vRtrStaticFrrMplsInSegmentLabel OBJECT-TYPE
+   SYNTAX        MplsLabel
+   MAX-ACCESS    accessible-for-notify
+   STATUS        current
+   DESCRIPTION
+       "The incoming label for this protected ingress segment."
+   ::= { vRtrStaticFrrMplsInSegmentEntry 2 }
+
+vRtrStaticFrrMplsInSegmentNPop OBJECT-TYPE
+   SYNTAX        Integer32 (1..2147483647)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The number of labels to pop from the incoming
+        packet.  Normally only the top label is popped from
+        the packet and used for all switching decisions for
+        that packet. "
+   DEFVAL        { 1 }
+   ::= { vRtrStaticFrrMplsInSegmentEntry 3 }
+
+vRtrStaticFrrMplsInSegmentXCIndex OBJECT-TYPE
+SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Index into vRtrStaticFrrMplsXCTable which identifies which cross-
+        connect entry this segment is part of.  A value of
+        zero indicates that this entry is not referred to by
+        any cross-connect entry.  When a cross-connect entry
+        is created which this in-segment is a part of, this
+        object is automatically updated to reflect the value
+        of vRtrStaticFrrMplsXCIndex of that cross-connect entry."
+   DEFVAL        { 0 }
+   ::= { vRtrStaticFrrMplsInSegmentEntry 4 }
+   
+vRtrStaticFrrMplsInSegmentOwner OBJECT-TYPE
+   SYNTAX        MplsObjectOwner
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Denotes the entity that created and is responsible
+        for managing this segment."
+   DEFVAL { unknown }
+   ::= { vRtrStaticFrrMplsInSegmentEntry 5 }
+
+vRtrStaticFrrMplsInSegmentRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This variable is used to create, modify, and/or
+        delete a row in this table."
+   ::= { vRtrStaticFrrMplsInSegmentEntry 6 }
+   
+-- End of vRtrStaticFrrMplsInSegmentTable
+
+--
+-- Protecting Static FRR Out-segment table
+--
+
+vRtrStaticFrrMplsOutSegmentIndexNext OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object contains the next appropriate value to
+        be used for vRtrStaticFrrMplsOutSegmentIndex when creating
+        entries in the vRtrStaticFrrMplsOutSegmentTable.  If the number
+        of unassigned entries is exhausted, this object will
+        take on the value of 0.  To obtain the
+        vRtrStaticFrrMplsOutSegmentIndex value for a new entry, the
+        manager must first issue a management protocol
+        retrieval operation to obtain the current value of
+        this object.  The agent should modify the value to
+        reflect the next unassigned index after each
+        retrieval operation.  After a manager retrieves a
+        value the agent will determine through its local
+        policy when this index value will be made available
+        for reuse."
+   ::= { alcatelStaticFrrMIBModuleObjs 2 }
+
+
+vRtrStaticFrrMplsOutSegmentTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF StaticFrrMplsOutSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains a representation of the outgoing
+        segments from an LSR."
+   ::= { alcatelStaticFrrMIBModuleObjs 3 }
+
+vRtrStaticFrrMplsOutSegmentEntry  OBJECT-TYPE
+   SYNTAX        StaticFrrMplsOutSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents one outgoing
+        segment.  An entry can be created by a network
+             administrator or an SNMP agent.  The object 
+        vRtrStaticFrrMplsOutSegmentOwner indicates
+        the creator of this entry."
+   INDEX         { vRtrStaticFrrMplsOutSegmentIndex }
+   ::= { vRtrStaticFrrMplsOutSegmentTable 1 }
+
+StaticFrrMplsOutSegmentEntry ::= SEQUENCE {
+  vRtrStaticFrrMplsOutSegmentIndex                Integer32,
+  vRtrStaticFrrMplsOutSegmentIfIndex              InterfaceIndexOrZero,
+  vRtrStaticFrrMplsOutSegmentPushTopLabel         TruthValue,
+  vRtrStaticFrrMplsOutSegmentTopLabel             MplsLabel,
+  vRtrStaticFrrMplsOutSegmentNextHopIpAddrType    InetAddressType,
+--  vRtrStaticFrrMplsOutSegmentNextHopIpv4Addr      InetAddressIPv4,
+  vRtrStaticFrrMplsOutSegmentNextHopIpv4Addr      IpAddress,
+  vRtrStaticFrrMplsOutSegmentXCIndex              Integer32,
+  vRtrStaticFrrMplsOutSegmentOwner                MplsObjectOwner,
+  vRtrStaticFrrMplsOutSegmentRowStatus            RowStatus
+}
+
+vRtrStaticFrrMplsOutSegmentIndex                OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    accessible-for-notify
+   STATUS        current
+   DESCRIPTION
+       "This value contains a unique index for this row.
+        While a value of 0 is not valid as an index for this
+        row it can be supplied as a valid value to index
+        vRtrStaticFrrMplsXCTable to access entries for 
+        which no out-segment has been configured."
+   ::= { vRtrStaticFrrMplsOutSegmentEntry  1 }
+
+-- mplsOutSegmentIfIndex can take a value of 0. 
+vRtrStaticFrrMplsOutSegmentIfIndex              OBJECT-TYPE
+   SYNTAX        InterfaceIndexOrZero
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This value contains the interface index of the
+        outgoing protecting interface."
+   ::= { vRtrStaticFrrMplsOutSegmentEntry  2 }
+
+vRtrStaticFrrMplsOutSegmentPushTopLabel       OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This value indicates whether or not a top label
+        should be pushed onto the outgoing packet's label
+        stack. "
+   ::= { vRtrStaticFrrMplsOutSegmentEntry  3 }
+
+vRtrStaticFrrMplsOutSegmentTopLabel            OBJECT-TYPE
+   SYNTAX        MplsLabel
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "If mplsOutSegmentPushTopLabel is true then this
+        represents the label that should be pushed onto the
+        top of the outgoing packet's label stack."
+   ::= { vRtrStaticFrrMplsOutSegmentEntry  4 }
+
+vRtrStaticFrrMplsOutSegmentNextHopIpAddrType      OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Indicates whether the protecting next hop address is IPv4 or
+        IPv6.  Note that a value of unknown (0) is valid
+        only when the outgoing interface is of type point-to-
+        point."
+   DEFVAL        { unknown }
+   ::= { vRtrStaticFrrMplsOutSegmentEntry  5 }
+
+vRtrStaticFrrMplsOutSegmentNextHopIpv4Addr      OBJECT-TYPE
+   SYNTAX        IpAddress
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "IPv4 Address of the protecting next hop.  Its value is
+        significant only when  mplsOutSegmentNextHopIpAddrType is ipV4 (1),
+        otherwise it should return a value of 0."
+   ::= { vRtrStaticFrrMplsOutSegmentEntry  6 }
+
+vRtrStaticFrrMplsOutSegmentXCIndex              OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Index into vRtrStaticFrrMplsXCTable which identifies which 
+        cross-connect entry this segment is part of.  A value of
+        zero indicates that this entry is not referred to by
+        any cross-connect entry.  When a cross-connect entry
+        is created which this out-segment is a part of, this
+        object is automatically updated to reflect the value
+        of vRtrStaticFrrMplsXCIndex of that cross-connect entry."
+   DEFVAL        { 0 }
+   ::= { vRtrStaticFrrMplsOutSegmentEntry  7 }
+
+vRtrStaticFrrMplsOutSegmentOwner               OBJECT-TYPE
+   SYNTAX        MplsObjectOwner
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Denotes the entity which created and is responsible
+        for managing this segment."
+   DEFVAL { unknown }
+   ::= { vRtrStaticFrrMplsOutSegmentEntry  8 }
+
+vRtrStaticFrrMplsOutSegmentRowStatus          OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "For creating, modifying, and deleting this row."
+   ::= { vRtrStaticFrrMplsOutSegmentEntry  9 }
+
+-- End of vRtrStaticFrrMplsOutSegmentTable
+
+--
+-- Protected Static FRR Cross-connect table.
+--
+
+vRtrStaticFrrMplsXCIndexNext OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object contains an appropriate value to be used
+        for vRtrStaticFrrMplsXCIndex when creating entries in the
+        vRtrStaticFrrMplsXCTable on a Transit LSR.  The value 0 
+        indicates that no unassigned entries are available.  To obtain the
+        value of vRtrStaticFrrMplsXCIndex for a new entry in the
+        vRtrStaticFrrMplsXCTable, the manager issues a management
+        protocol retrieval operation to obtain the current
+        value of vRtrStaticFrrMplsXCIndex.  After each retrieval
+        operation, the agent should modify the value to
+        reflect the next unassigned index.  After a manager
+        retrieves a value the agent will determine through
+        its local policy when this index value will be made
+        available for reuse."
+   ::= { alcatelStaticFrrMIBModuleObjs 4 }
+
+vRtrStaticFrrMplsXCTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF VRtrStaticFrrMplsXCEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies information for switching
+        between LSP segments.  It supports point-to-point
+        connections.  mplsLabelStackTable specifies the
+        label stack information for a cross-connect LSR and
+        is referred to from vRtrStaticFrrMplsXCTable."
+   ::= { alcatelStaticFrrMIBModuleObjs 5 }
+
+vRtrStaticFrrMplsXCEntry  OBJECT-TYPE
+   SYNTAX        VRtrStaticFrrMplsXCEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "A row in this table represents one backup cross-connect
+        entry.  The following objects index it:
+       
+        - cross-connect index vRtrStaticFrrMplsXCIndex that uniquely
+          identifies a backup cross-connect entry
+        - interface index of the in-segment,  vRtrStaticFrrMplsInSegmentIfIndex
+        - incoming label(s), vRtrStaticFrrMplsInSegmentLabel
+        - out-segment index, vRtrStaticFrrMplsOutSegmentIndex
+       
+       Originating LSPs and Terminating LSPs are unsupported in this Table.
+
+       Special labels are not allowed in this Table.
+       
+        An entry can be created by a network administrator
+        or by an SNMP agent."
+   INDEX  { vRtrStaticFrrMplsXCIndex, vRtrStaticFrrMplsInSegmentIfIndex,
+            vRtrStaticFrrMplsInSegmentLabel,
+            vRtrStaticFrrMplsOutSegmentIndex }
+      ::= { vRtrStaticFrrMplsXCTable 1 }
+
+VRtrStaticFrrMplsXCEntry ::= SEQUENCE {
+      vRtrStaticFrrMplsXCIndex           Integer32,
+      vRtrStaticFrrMplsXCOwner           MplsObjectOwner,
+      vRtrStaticFrrMplsXCRowStatus       RowStatus,
+      vRtrStaticFrrMplsXCAdminStatus     INTEGER,
+      vRtrStaticFrrMplsXCOperStatus      INTEGER
+   }
+
+vRtrStaticFrrMplsXCIndex OBJECT-TYPE
+   SYNTAX        Integer32 (1..2147483647)
+   MAX-ACCESS    accessible-for-notify
+   STATUS        current
+   DESCRIPTION
+       "Primary index for the conceptual row identifying 
+        a backing cross-connect segment on a transit LSR. "
+   ::= { vRtrStaticFrrMplsXCEntry 1 }
+
+vRtrStaticFrrMplsXCOwner OBJECT-TYPE
+   SYNTAX    MplsObjectOwner
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Denotes the entity that created and is responsible
+        for managing this cross-connect."
+   ::= { vRtrStaticFrrMplsXCEntry 2 }
+
+vRtrStaticFrrMplsXCRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "For creating, modifying, and deleting this row."
+   ::= { vRtrStaticFrrMplsXCEntry 3 }
+   
+vRtrStaticFrrMplsXCAdminStatus OBJECT-TYPE
+   SYNTAX   INTEGER {
+                up(1),  -- ready to pass packets
+                down(2)
+                }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The desired operational status of this backup segment."
+   ::= { vRtrStaticFrrMplsXCEntry 4 }
+
+vRtrStaticFrrMplsXCOperStatus OBJECT-TYPE
+   SYNTAX   INTEGER {
+         up(1),        -- ready to pass packets
+         down(2),
+         unknown(4)    -- status cannot be determined
+                       -- for some reason.
+      }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The actual operational status of this backup cross-connect."
+   ::= { vRtrStaticFrrMplsXCEntry 5 }
+
+-- End of vRtrStaticFrrMplsXCTable
+
+END
+--  End of MPLS Static Fast Reroute Management Information Base Using SMIv2
+--                                

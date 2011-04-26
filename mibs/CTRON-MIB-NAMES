@@ -10,17 +10,44 @@ mibs OBJECT IDENTIFIER ::= { cabletron 4 }
 --  Organization
 --    Enterasys Networks
 --  ContactInfo
---    Postal: Enterasys Networks
---            35 Industrial Way, P.O. Box 5005
---            Rochester, NH 03867-0505
---    Phone:  (603) 332-9400
---    E-mail: support@enterasys.com
---    WWW:    http://www.enterasys.com
+--   "Postal:  Enterasys Networks
+--             50 Minuteman Rd.
+--             Andover, MA 01810-1008
+--             USA
+--    Phone:   +1 978 684 1000
+--    E-mail:  support@enterasys.com
+--    WWW:     http://www.enterasys.com"
 --  Description
 --    ctron-mib-names.txt
---    Revision: 1.04.17
+--    Revision:
 --    Part Number: 
---    Date:  September 11, 2001
+--    Date:  July 23, 2008
+--    
+--    REVISION     "200807231507Z"  - Wed Jul 23 15:07 UTC 2008
+--    DESCRIPTION  "Added the following OIDs:
+--                  ctArpAclExpMib, ctDhcpSnoopingExpMib, 
+--                  ctDynamicArpInspectionExpMib."
+--   
+--    REVISION     "200603061501Z"  - Mon Mar  6 15:01 UTC 2006
+--    DESCRIPTION  "Added the ctFastPathProtectedPortMib OID."
+--   
+--    REVISION     "200601161932Z"  - Mon Jan 16 19:32 UTC 2006
+--    DESCRIPTION  "Added the ctDhcpServerExpMib OID."
+--
+--    REVISION     "200503251526Z"  - Fri Mar 25 15:26 GMT 2005
+--    DESCRIPTION  "Added the ctEntityStateTC and ctEntityStateMib OIDs."
+--   
+--    REVISION     "200503051336Z"  - Sat Mar  5 13:36 GMT 2005
+--    DESCRIPTION  "Added the ctronTrapeze OID."
+--    
+--    REVISION     "200410281452Z"  - Thu Oct 28 14:52 GMT 2004
+--    DESCRIPTION  "Added the ctronWslMIB OID."
+--    
+--    REVISION     "200403251446Z"  - Thu Mar 25 14:46 GMT 2004
+--    DESCRIPTION  "Added the ctronAP3000 OID."
+--    
+--    REVISION     "200312122049Z"  - Fri Dec 12 20:49 GMT 2003
+--    DESCRIPTION  "Added the ctronV2H and v2h124-24MIB OIDs."
 --    
 --    This module provides authoritative definitions for part
 --    of the naming tree below:
@@ -47,7 +74,7 @@ mibs OBJECT IDENTIFIER ::= { cabletron 4 }
 --    with the management of Enterasys or Cabletron products.
 --    
 --    Copyright February 1999 Cabletron Systems
---    Copyright September 2001 Enterasys Networks
+--    Copyright March (2000-2006) Enterasys Networks
 --    
 --    The assigned enterprise MIB tree for Cabletron System
 
@@ -397,7 +424,6 @@ ctVVD OBJECT IDENTIFIER ::= { ctronVVD 1 }
 --  Descr
 --    Voice Video and Data branch
 
- 
 ctVoiceOverIP OBJECT IDENTIFIER ::= { ctVVD 1 }
 -- OBJECT-IDENTITY
 --  Status
@@ -781,6 +807,56 @@ ctFWDebug  OBJECT IDENTIFIER ::= { ctronExp 29 }
 --    This mib is for specific firmware debug
 --    it will be filled in as needed. 
 
+ctEntityStateTC  OBJECT IDENTIFIER ::= { ctronExp 30 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is an OID registration for the draft entityStateTc Module.
+
+ctEntityStateMib  OBJECT IDENTIFIER ::= { ctronExp 31 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is an OID registration for the draft entityStateMIB Module.
+
+ctDhcpServerExpMib  OBJECT IDENTIFIER ::= { ctronExp 32 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is an OID registration for a third party DHCP server MIB.
+
+ctFastPathProtectedPortMib  OBJECT IDENTIFIER ::= { ctronExp 33 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is an OID registration for a third party protected port MIB.
+
+ctArpAclExpMib  OBJECT IDENTIFIER ::= { ctronExp 34 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is an OID registration for a third party ARP ACL MIB.
+
+ctDhcpSnoopingExpMib  OBJECT IDENTIFIER ::= { ctronExp 35 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is an OID registration for a third party DHCP snooping MIB.
+
+ctDynamicArpInspectionExpMib  OBJECT IDENTIFIER ::= { ctronExp 36 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is an OID registration for a third party dynamic ARP 
+--    inspection MIB.
+
 ctronExtn OBJECT IDENTIFIER ::= { mibs 3 }
 -- OBJECT-IDENTITY
 --  Status
@@ -854,6 +930,41 @@ ctGateWay OBJECT IDENTIFIER ::= { ctMidManager 1 }
 --  Descr
 --    This is used for the SPMA Gateway agent.
 
+ctronV2H OBJECT IDENTIFIER ::= { mibs 12 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is used for the V2H.
+
+v2h124-24MIB OBJECT IDENTIFIER ::= { ctronV2H 30 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This is the V2H MIB.
+
+ctronAP3000 OBJECT IDENTIFIER ::= { mibs 13 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is used for the AP3000.
+
+ctronWslMIB OBJECT IDENTIFIER ::= { mibs 14 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is used for the Wsl MIB.
+
+ctronTrapeze OBJECT IDENTIFIER ::= { mibs 15 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is used for the Trapeze MIBs.
+
 ctronInternal OBJECT IDENTIFIER ::= { mibs 100 }
 -- OBJECT IDENTITY
 --  Status
@@ -874,6 +985,5 @@ ctEnet OBJECT IDENTIFIER ::= { ctronInternal 2 }
 --    optional
 --  Descr
 --    This branch is for the Enet mib.
-
 
 END

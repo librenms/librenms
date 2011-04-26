@@ -1,0 +1,4483 @@
+CABLETRON-TRAPS DEFINITIONS ::= BEGIN
+
+        --  cabletron-traps.txt
+        --  Revision: 01.04.03
+        --  Part Number:  2170994
+        --  Date: January 10, 1999
+
+        --  Date        "200402061530Z"  - Fri Feb  6 15:30 GMT 2004
+        --  Added boardOperational and boardNonOperational traps.
+
+        -- "Postal:  Enterasys Networks
+        --           50 Minuteman Rd.
+        --           Andover, MA 01810-1008
+        --           USA
+        --  Phone:   +1 978 684 1000
+        --  E-mail:  support@enterasys.com
+        --  WWW:     http://www.enterasys.com"
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  use of IETF and enterprise-specific snmp traps.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Enterasys Networks reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Enterasys Networks
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Enterasys Networks be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Enterasys 
+        --  Networks has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Enterasys grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this specification in connection
+        --  with the management of Enterasys products.
+
+        --  Copyright (c)1998 Cabletron Systems
+        --  Copyright (c)2004 Enterasys Networks
+
+--  ---------------------
+--  Top Level Definitions
+--  ---------------------
+
+-- Imports
+
+IMPORTS
+        cabletron
+                        FROM CTRON-OIDS
+        TRAP-TYPE
+                        FROM RFC-1215
+        ifIndex
+                        FROM RFC1213-MIB
+
+        logEventIndex, logIndex, logTime, logDescription
+                        FROM RFC1271-MIB
+
+        lecRowStatus    FROM LAN-EMULATION-CLIENT-MIB
+
+        fddimibSMTIndex, fddimibPORTIndex, fddimibMACIndex, fddimibSMTCFState,
+        fddimibPORTConnectState, fddimibSMTMasterCts, fddimibPORTAction,
+        fddimibPORTLerEstimate, fddimibMACRMTState, fddimibMACCurrentPath,
+        fddimibMACFrameErrorRatio 
+                        FROM FDDI-SMT73-MIB     -- rfc1512
+
+        ctsmtmibRingTopology, ctsmtmibRingSmtIndex, ctsmtmibRingMacIndex,
+        ctsmtmibRingNodeIndex, ctsmtmibRingMacAddr
+                        FROM CTSMTMIB-MIB
+
+        nwAppnFwdLsAdjCpName, nwAppnFwdLsAdjCpType,
+        nwAppnFwdLsName, nwAppnEventTextString
+                        FROM CTRON-APPN-MIB
+
+        nwAtEventTextString
+                        FROM CTRON-AppleTalk-ROUTER-MIB
+
+        snmpPollDestination, snmpPollOwner, snmpOIDDestination,
+        snmpOIDOwner, snmpOIDSequence, snmpOIDObject
+                        FROM DLM-MIB
+        bdgdeviceStatus
+                        FROM CTRON-BDG-MIB
+
+        rptrSrcAddrMgmtPortLock, rptrPortAlarmBroadThreshold,
+        rptrMgmtInterfaceNum, rptrAlarmsTrafThreshold, 
+        rptrAlarmsErrThreshold, rptrAlarmsErrSource, 
+        rptrAlarmsCollThreshold, rptrPortGrpAlarmBroadThreshold, 
+        rptrAlarmsBroadThreshold, rptrAlarmsAlarmTimebase, 
+        rptrPortGrpMgmtGrpId, rptrPortGrpAlarmTrafThreshold, 
+        rptrPortGrpAlarmErrThreshold, rptrPortGrpAlarmErrSource, 
+        rptrPortGrpAlarmCollThreshold, rptrPortSecurityLockStatus,
+        rptrPortMgmtPortType, rptrPortMgmtPortId, 
+        rptrPortRedundCrctNum, rptrPortSrcAddrTopoState, 
+        rptrPortSrcAddrAddressList, rptrPortAlarmTrafThreshold, 
+        rptrPortAlarmErrThreshold, rptrPortAlarmErrSource, 
+        rptrPortAlarmCollThreshold,  rptrPortSecurityPortGrpId,
+        rptrPortSecurityPortId, rptrPortSecuritySecureState,
+        rptrSecurityLearnState, rptrPortGrpSrcAddrLockGrpId,
+        rptrPortGrpSASecurityLearnState, 
+        rptrPortSecurityLearnState, rptrSecurityLearnMode,
+        rptrPortGrpSASecurityLearnMode,
+        rptrPortSecurityLearnMode
+                        FROM REPEATER-REV4-MIB
+
+        chSlotID, chSlotModuleType
+                        FROM CHASSIS-MIB
+
+        powerSupplyNum, deviceType 
+                        FROM CTRON-COMMON-MIB
+
+        ctFpRedundActivePort
+                        FROM CTRON-FRONTPANEL-MIB
+
+        nwIpEventTextString
+                        FROM CTRON-IP-ROUTER-MIB
+
+        nwIpxEventTextString
+                        FROM CTRON-IPX-ROUTER-MIB
+
+        nwDecIVEventTextString
+                        FROM CTRON-DECIV-ROUTER-MIB
+
+
+        ctIfNumber, ctIfPortPortNumber, ctIfPortType
+                        FROM CTIF-EXT-MIB
+
+        psPowerSlotStatusID, boardPowerSlotStatusID, psPowerSlotID,
+        chPowerMainVoltageStatus, chPowerMainVoltage, 
+        chPowerDiagVoltageStatus, chPowerDiagVoltage, termPowerStatus,
+        termPowerVoltage, boardPowerSlotID, boardPowerID, 
+        boardPowerStatus, termPowerModule1Status, termPowerModule2Status,
+        boardPowerCurrent, boardPowerLocalAdminStatus, boardPowerLocalStatus,
+        boardPowerOperationalStatus, psPowerID, psPowerOperationalStatus,
+        psPowerAdmin, psPowerCurrent, psPowerStatus, psPowerVoltage,
+        boardPowerVoltage, chPowerLineMaxSupply, chPowerLineTotalSupply 
+                        FROM CTRON-POWER-SUPPLY-MIB
+     
+        psEnvFanStatus, psEnvSlotID, psEnvFanSpeed, psEnvTemp,
+        psEnvTempStatus, chEnvFanSpeed, chEnvFanStatus, chEnvFanID,
+        chEnvAmbientStatus, chEnvAmbientTemp, chEnvHumidityStatus,
+        chEnvHumidity, boardEnvSlotID, boardEnvTemp, boardEnvTempStatus,
+        boardEnvTempRelStatus 
+                        FROM  CTRON-ENVIRONMENT-MIB
+
+        contTypePhysicalChanges, contTypeLogicalChanges, 
+        contPhysicalEntryID
+                        FROM CT-CONTAINER-MIB
+                           
+        tRingAlarmsRingRingPurgesThreshold, 
+        tRingStatsRingLastBeaconType,
+        tRingAlarmsRingTimebase,
+        tRingAlarmsRingAMPErrsThreshold, 
+        tRingAlarmsRingTokenErrsThreshold,
+        tRingAlarmsRingClaimTknThreshold, 
+        tRingAlarmsRingLostFramesThreshold,
+        tRingAlarmsRingBeaconStateThreshold, 
+        tRingAlarmsRingFrameCountThreshold,
+        tRingAlarmsStnThrshLineErrsThreshold,
+        tRingAlarmsStnThrshInternalErrsThreshold, 
+        tRingAlarmsStnThrshBurstErrsThreshold,
+        tRingAlarmsStnThrshACErrsThreshold,
+        tRingAlarmsStnThrshRcvrCongestThreshold, 
+        tRingAlarmsStnThrshAddress,
+        tRingMgmtStnName,tRingMgmtStnBoard,
+        tRingMgmtStnPort,tRingMgmtStnUNA,
+        tRingMgmtSecurityAddressAdd,
+        tRingMgmtSecurityAddressRemove,
+        tRingStatsRingLastBeacon, tRingMgmtStnAddress,
+        tRingPortMgmtPortId, tRingPortGrpId,
+        tRingMgmtStnDNA
+                        FROM DOT5-LOG-MIB
+
+        ctATMPhyRedundIfIndex
+                        FROM CTATM-CONFIG-MIB
+
+        ctBroadcastDesiredBroadcastThreshold, ctBroadcastCtlSlotID,
+        ctBroadcastCtlInterface
+                        FROM CT-BROADCAST-MIB
+
+        ctChasPowerSupplyNum, ctChasPowerSupplyType
+                        FROM CTRON-CHASSIS-MIB
+
+        upsIndex, upsStatusFault, upsExtMeasAlarmStatus,
+        upsAddlFuncsStatusFault
+                        FROM UPS2-MIB
+
+        atmInterfaceMyNeighborIpAddress,
+        atmInterfaceMyNeighborIfName,atmVpCrossConnectRowStatus,
+        atmVcCrossConnectRowStatus
+                        FROM ATM-MIB
+
+        sfpsNodeTablePort,sfpsNodeTableBaseAddress
+                        FROM CTRON-SFPS-DIRECTORY-MIB
+
+        sfpsDirViolationType, sfpsDirViolationAOValue
+                        FROM CTRON-SFPS-TOPOLOGY-MIB
+
+        sfpsInPortConfigType, sfpsInPortConfigPort
+                        FROM CTRON-SFPS-PORT-MIB
+        sfpsBlockResolveTableAOValue
+                        FROM CTRON-SFPS-RESOLVE-MIB
+        sfpsBlockSourceMAC
+                        FROM CTRON-SFPS-BASE-MIB;
+
+-- ===================================================================
+
+--
+--  Cabletron`s Enterprise Trap Definitions
+--
+
+    ctdlswTConnUp TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is sent each time a transport connection
+                    becomes enabled on this DLSw."
+            ::= 1
+ 
+    ctdlswTConnDown TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is sent each time a transport connection
+                    becomes disabled on this DLSw."
+            ::= 2
+
+
+    portSegmenting TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES   { rptrPortGrpMgmtGrpId,
+                        rptrPortMgmtPortId }
+            DESCRIPTION
+                    "When a port goes from operational to segmented, a
+                    trap will be generated.  For these purposes, the
+                    port state will be sampled every XXX seconds, thus
+                    it will be statistically possible to miss oscillating
+                    circuits."
+            ::= 257 -- 0x0101
+
+    portUnsegementing TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES   { rptrPortGrpMgmtGrpId,
+                        rptrPortMgmtPortId }
+            DESCRIPTION
+                    "When it is detected that a previously segmented port
+                    has gone operational, a trap will be generated.  This
+                    is also sampled, thus a trap may not be generated for
+                    each transition."
+            ::= 258 -- 0x0102
+
+
+
+    portLinkUp TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES   { rptrPortGrpMgmtGrpId,
+                        rptrPortMgmtPortId }
+            DESCRIPTION
+                    "This trap will be generated when it is determined
+                    that a MAU has been attached to the MMAC.  This is
+                    only appropriate for MIMs that support the concept
+                    of a link state."
+            ::= 259 -- 0x0103
+
+    portLinkDown TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES   { rptrPortGrpMgmtGrpId,
+                        rptrPortMgmtPortId }
+            DESCRIPTION
+                    "This trap will be generated when a previously attached
+                    MAU is removed or powered down.  Again, this is only
+                    appropriate for MIM's that support link state."
+            ::= 260 -- 0x0104
+
+    srcaddrNew TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES   { rptrPortGrpMgmtGrpId,
+                        rptrPortMgmtPortId,
+                        rptrPortSrcAddrAddressList }
+            DESCRIPTION
+                    "This trap will be generated when the MMAC detects
+                    the existence of a new source address on one of it's
+                    ports."
+            ::= 261 -- 0x0105
+
+    srcaddrTimeout TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES   { rptrPortGrpMgmtGrpId,
+                        rptrPortMgmtPortId,
+                        rptrPortSrcAddrAddressList }
+            DESCRIPTION
+                    "This trap will indicate that the MMAC has not
+                    detected a packet generated by this source address
+                    within a certain timeout."
+            ::= 262 -- 0x0106
+
+    boardRemoval TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { chSlotID }
+            DESCRIPTION
+                    "This trap will be generated when the MMAC detects
+                    that a MIM has been removed."
+            ::= 263 -- 0x0107
+
+    boardInsertion TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { chSlotID,
+                      deviceType }
+            DESCRIPTION
+                    "This trap will generated when the MMAC determines
+                    that a new board has been inserted."
+            ::= 264 -- 0x0108
+
+
+     redundActivePortInCircuitFailed TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES   { rptrPortGrpMgmtGrpId,
+                        rptrPortMgmtPortId,
+                        rptrPortRedundCrctNum }
+            DESCRIPTION
+                    "This trap will be generated when the active port in
+                    a redundant circuit has failed polling.  This will
+                    indicate the activation of redundancy."
+            ::= 265 -- 0x0109
+
+    redundPortActivated TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES   { rptrPortGrpMgmtGrpId,
+                        rptrPortMgmtPortId,
+                        rptrPortRedundCrctNum }
+            DESCRIPTION
+                    "This trap indicates that a new port has been
+                    activated in a redundant circuit.  This does NOT
+                    indicate that this port is usable, but is being
+                    tested.  If the port fails, a failure trap (above)
+                    will be generated."
+            ::= 266 -- 0x010A
+
+    redundPortTestFailed TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES   { rptrPortGrpMgmtGrpId,
+                        rptrPortMgmtPortId,
+                        rptrPortRedundCrctNum }
+            DESCRIPTION
+                    "This trap will be generated when the MMAC executes
+                    it's periodic redundancy diagnostics and finds one
+                    of the ports in a redundant circuit has failed.
+                    This message will not indicate that redundancy has
+                    been activated, just that the port has failed and
+                    should be fixed before it is needed."
+            ::= 267 -- 0x010B
+
+ 
+    boardTrafficThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortGrpAlarmTrafThreshold,
+                      rptrAlarmsAlarmTimebase,
+                      rptrPortGrpMgmtGrpId }
+            DESCRIPTION
+                    "This trap will be generated when the traffic (good
+                    packets per time interval) has been exceeded for a
+                    particular MIM."
+            ::= 271 -- 0x010F
+
+
+    boardErrorThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortGrpAlarmErrThreshold,
+                      rptrPortGrpAlarmErrSource,
+                      rptrAlarmsAlarmTimebase,
+                      rptrPortGrpMgmtGrpId }
+             DESCRIPTION
+                    "This trap will be generated when packets of the
+                    selected error type exceeds a threshold percentage of
+                    the good packets for a particular interval for a
+                    particular MIM."
+            ::= 272 -- 0x0110
+
+
+    boardCollsionThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortGrpAlarmCollThreshold,
+                      rptrAlarmsAlarmTimebase,
+                      rptrPortGrpMgmtGrpId }
+            DESCRIPTION
+                    "This trap will be generated when collisions exceed a
+                    threshold percentage of the good packets for a particular
+                    interval for a particular MIM."
+            ::= 273 -- 0x0111
+
+
+    portTrafficThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortAlarmTrafThreshold,
+                      rptrAlarmsAlarmTimebase,
+                      rptrPortGrpMgmtGrpId,
+                      rptrPortMgmtPortId }
+            DESCRIPTION
+                    "This trap will be generated when the traffic (good
+                    packets per time interval) has been exceeded for a
+                    particular port."
+            ::= 274 -- 0x0112
+
+
+    portErrorThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortAlarmErrThreshold,
+                      rptrPortAlarmErrSource,
+                      rptrAlarmsAlarmTimebase,
+                      rptrPortGrpMgmtGrpId,
+                      rptrPortMgmtPortId }
+            DESCRIPTION
+                    "This trap will be generated when packets of the
+                    selected error type exceeds a threshold percentage of
+                    the good packets for a particular interval for a
+                    particular port."
+            ::= 275 -- 0x0113
+
+
+    portCollsionThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortAlarmCollThreshold,
+                      rptrAlarmsAlarmTimebase,
+                      rptrPortGrpMgmtGrpId,
+                      rptrPortMgmtPortId }
+            DESCRIPTION
+                    "This trap will be generated when collisions exceed a
+                    threshold percentage of the good packets for a particular
+                    interval for a particular port."
+            ::= 276 -- 0x0114
+
+
+    portTypeChanged TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortGrpMgmtGrpId,
+                      rptrPortMgmtPortId,
+                      rptrPortSrcAddrTopoState }
+            DESCRIPTION
+                    "This trap indicates that a port has changed from a
+                    station port to a trunk port or vice versa."
+            ::= 277 -- 0x0115
+
+    portSecurityViolation TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortGrpMgmtGrpId,
+                      rptrPortMgmtPortId,
+                      rptrPortSrcAddrAddressList }
+
+            DESCRIPTION
+                    "This trap is generated when a source address other
+                    than those locked to a port is seen."
+            ::= 279 -- 0x0117
+
+    portViolationReset TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortGrpMgmtGrpId,
+                      rptrPortMgmtPortId }
+            DESCRIPTION
+                    "This trap is generated when management intervention
+                    has reset a port after a violation has occurred."
+            ::= 280 -- 0x0118
+
+    envTempWarm TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { chSlotID }
+            DESCRIPTION
+                    "This trap is generated when the device detects that
+                    the temperature within a MIM has reached a WARM
+                    condition."
+            ::= 281 -- 0x0119
+
+    envTempHot TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { chSlotID }
+            DESCRIPTION
+                    "This trap is generated when the device detects that
+                    the temperature within a MIM has reached a HOT
+                    condition."
+            ::= 282 -- 0x011A
+
+    envVoltageLow TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { powerSupplyNum }
+            DESCRIPTION
+                    "This trap is generated when a power supply's voltage
+                    is LOW."
+            ::= 283 -- 0x011B
+
+    envTempNormal TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { chSlotID }
+            DESCRIPTION
+                    "This trap is generated when the device detects that
+                    the temperature within a MIM has returned to a
+                    NORMAL state."
+            ::= 284 -- 0x011C
+
+
+    envVoltageNormal TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated when all power supplies' voltage
+                    have returned to a NORMAL state."
+            ::= 285 -- 0x011D
+
+
+    fanFail TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated when the device detects that
+                    the system fans have failed."
+            ::= 286 -- 0x011E
+    
+    fanNormal TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated when the device detects that
+                    the system fans have returned to normal."
+            ::= 287 -- 0x011F
+
+    
+    boardBroadcastThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortGrpAlarmBroadThreshold,
+                      rptrAlarmsAlarmTimebase,
+                      rptrPortGrpMgmtGrpId }
+            DESCRIPTION
+                    "This trap is generated when the broadcast packets
+                    (per time interval) have exceeded the threshold for
+                    the given board."
+            ::= 289 -- 0x0121
+
+
+    portBroadcastThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortAlarmBroadThreshold,
+                      rptrAlarmsAlarmTimebase,
+                      rptrPortGrpMgmtGrpId,
+                      rptrPortMgmtPortId }
+            DESCRIPTION
+                    "This trap is generated when the broadcast packets
+                    (per time interval) have exceeded the threshold for
+                    the given port."
+            ::= 290 -- 0x0122
+
+    systemVoltageLow TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated when the device detects that
+                    the power to the EMME is low."
+            ::= 293 -- 0x0125    
+
+    systemVoltageNormal TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated when the device detects that
+                    the power to the EMME has returned to normal."
+            ::= 294 -- 0x0126
+
+
+    epimRemoval TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES   { rptrPortGrpMgmtGrpId,
+                        rptrPortMgmtPortId }
+            DESCRIPTION
+                    "This trap is generated when it is detected that an
+                    EPIM has been removed."
+            ::= 295 -- 0x0127
+
+    epimInsertion TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES   { rptrPortGrpMgmtGrpId,
+                        rptrPortMgmtPortId,
+                        rptrPortMgmtPortType }
+            DESCRIPTION
+                    "This trap is generated when it is detected that an
+                    EPIM has been inserted."
+            ::= 296 -- 0x0128
+
+
+    rptrTrafficThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrAlarmsTrafThreshold,
+                      rptrAlarmsAlarmTimebase,
+                      rptrMgmtInterfaceNum }
+            DESCRIPTION
+                    "This trap will be generated when the traffic (good
+                    packets per time interval) has been exceeded for a
+                    network."
+            ::= 297 -- 0x0129
+
+
+    rptrErrorThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrAlarmsErrThreshold,
+                      rptrAlarmsErrSource,
+                      rptrAlarmsAlarmTimebase,
+                      rptrMgmtInterfaceNum }
+            DESCRIPTION
+                    "This trap will be generated when packets of the
+                    selected error type exceeds a threshold percentage of
+                    the good packets for a particular interval for an
+                    entire network."
+            ::= 304 -- 0x0130
+
+
+    rptrCollsionThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrAlarmsCollThreshold,
+                      rptrAlarmsAlarmTimebase,
+                      rptrMgmtInterfaceNum }
+            DESCRIPTION
+                    "This trap will be generated when collisions exceed a
+                    threshold percentage of the good packets for a particular
+                    interval for an entire network."
+            ::= 305 -- 0x0131
+
+
+    rptrLockStatusChanged TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrSrcAddrMgmtPortLock,
+                      rptrMgmtInterfaceNum }
+            DESCRIPTION
+                    "This trap is generated when the status of the address
+                    lock changes for a certain network."
+            ::= 306 -- 0x0132
+
+     rptrBroadcastThresholdExceeded TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrAlarmsBroadThreshold,
+                      rptrAlarmsAlarmTimebase,
+                      rptrMgmtInterfaceNum }
+            DESCRIPTION
+                        "This trap is generated when the broadcast packets 
+                        (per time interval) have exceeded the threshold for 
+                        the given repeater."
+            ::= 307 -- 0x0133
+
+
+     srcAddressPortLockStatusChange TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortGrpMgmtGrpId,
+                      rptrPortMgmtPortId,
+                      rptrPortSecurityLockStatus }
+            DESCRIPTION
+                        "This trap is generated when a change to the 
+                        source address locking is detected at the port level."
+            ::= 309 -- 0x0135
+
+    chBoardInsertion TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { chSlotID,
+                      chSlotModuleType }
+            DESCRIPTION
+                    "This trap will generated when the MMAC determines
+                    that a new board has been inserted."
+            ::= 310 -- 0x0136
+
+        portSecureStateChanged TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { rptrPortSecurityPortGrpId,
+                rptrPortSecurityPortId,
+                rptrPortSecuritySecureState}
+        DESCRIPTION
+                "This trap is generated when the status of the secure state
+                changes for a specific port."
+        ::= 313         -- 0x139
+
+
+        rptrLearnStateChanged TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { rptrMgmtInterfaceNum,
+                rptrSecurityLearnState }
+        DESCRIPTION
+                "This trap is generated when network learning is reset.  
+                When learning is reset, all secure addresses on each 
+                port, within the network, will be deleted and ports will 
+                learn source addresses, again."
+        ::= 314         -- 0x13A
+   
+        rptrPortGrpLearnStateChanged TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { rptrPortGrpSrcAddrLockGrpId,
+                rptrPortGrpSASecurityLearnState }
+        DESCRIPTION
+                "This trap is generated when port group learning is reset.  
+                When learning is reset, all secure addresses on each port, 
+                within the port group, will be deleted and ports will learn 
+                source addresses, again."
+        ::= 315         -- 0x13B 
+
+        rptrPortLearnStateChanged TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { rptrPortSecurityPortGrpId,
+                rptrPortSecurityPortId,
+                rptrPortSecurityLearnState }
+        DESCRIPTION
+                "This trap is generated when learning on a port is reset.  
+                When learning is reset, all secure addresses on the port 
+                will be deleted and the port will learn source addresses, 
+                again."
+        ::= 316         -- 0x13C 
+
+        rptrLearnModeChanged TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { rptrMgmtInterfaceNum,
+                rptrSecurityLearnMode }
+        DESCRIPTION
+                "This trap is generated when network learn mode is
+                changed between one-time learn mode and continuous 
+                learn mode."
+        ::= 317         -- 0x13D 
+
+        portGrpLearnModeChanged TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { rptrPortGrpSrcAddrLockGrpId,
+                rptrPortGrpSASecurityLearnMode }
+        DESCRIPTION
+                "This trap is generated when the port group learn 
+                mode is changed between one-time learn mode and 
+                continuous learn mode."
+        ::= 318         -- 0x13E 
+
+        portLearnModeChanged TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { rptrPortSecurityPortGrpId,
+                rptrPortSecurityPortId,
+                rptrPortSecurityLearnMode }
+        DESCRIPTION
+                "This trap is generated when the port learn 
+                mode is changed between one-time learn mode and 
+                continuous learn mode."
+        ::= 319         -- 0x13F
+
+
+
+    fpportActivated TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { rptrPortMgmtPortId }
+            DESCRIPTION
+                    "This trap is generated when a port is activated in
+                    redundancy due to another port failing."
+            ::= 400 -- 0x0190
+
+
+        interfacePortInsertion TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { ctIfNumber, ctIfPortPortNumber, ctIfPortType }
+            DESCRIPTION
+                "This trap  will be generated when it is detected that an
+                interface port has been inserted."
+        ::= 416 -- 0x1A0
+
+
+        interfacePortRemoval TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { ctIfNumber, ctIfPortPortNumber }
+            DESCRIPTION
+                "This trap  will be generated when it is detected that an
+                interface port has been removed."
+        ::= 417 -- 0x1A1
+
+        interfacePortLinkUp TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { ctIfNumber, ctIfPortPortNumber }
+            DESCRIPTION
+                "This trap will be generated when it is determined that
+                a port on a strictly bridging interface (not a 'repeater')
+                has been connected to a LAN. This is only appropriate
+         for ports that support the concept of a link state."
+        ::= 418 -- 0x1A2
+
+        interfacePortLinkDown TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { ctIfNumber, ctIfPortPortNumber }
+            DESCRIPTION
+                "This trap will be generated when a previously attached
+                bridging port has been disconnected from a LAN. This is
+                only appropriate for ports that support the concept of a
+                link state."
+        ::= 419 -- 0x1A3
+
+    portInserted TRAP-TYPE
+--      STATUS  deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingPortGrpId,
+                      tRingPortMgmtPortId }
+            DESCRIPTION
+                    "This trap is sent when a stations port's link state
+                    turns on while the management state of the port is
+                    Enabled."
+            ::= 513 -- 0x0201
+
+    portDeInserted TRAP-TYPE
+--      STATUS  deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingPortGrpId,
+                      tRingPortMgmtPortId }
+            DESCRIPTION
+                    "This trap is sent when a stations port's link state
+                    turns off while the management state of the port is
+                    Enabled."
+            ::= 514 -- 0x0202
+
+
+    ringSpeedFault TRAP-TYPE
+--      STATUS  deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingPortGrpId }
+            DESCRIPTION
+                    "This trap is sent when a board enters the ring speed
+                    fault state due to a station or ring port attaching
+                    to the board as a different speed than the board is
+                    configured for."
+            ::= 515 -- 0x0203
+
+    ringSpeedFaultCleared TRAP-TYPE
+--      STATUS  deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingPortGrpId }
+            DESCRIPTION
+                    "This trap is sent when a board leaves the ring
+                    speed fault state."
+            ::= 516 -- 0x0204
+
+
+    ringPortFaulted TRAP-TYPE
+--      STATUS  deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingPortGrpId,
+                      tRingPortMgmtPortId }
+            DESCRIPTION
+                    "This trap is sent when a ring port wraps when its
+                    management state is Active, without regard for the
+                    selected type of the ring port."
+            ::= 517 -- 0x0205
+
+    ringPortFaultCleared TRAP-TYPE
+--      STATUS  deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingPortGrpId,
+                      tRingPortMgmtPortId }
+            DESCRIPTION
+                    "This trap is sent when a ring port unwraps when its
+                    management state is Active, without regard for the
+                    selected type of the ring port."
+            ::= 518 -- 0x0206
+
+
+    beaconState TRAP-TYPE
+--      STATUS  deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingStatsRingLastBeaconType,
+                      tRingMgmtStnName,
+                      tRingMgmtStnUNA,
+                      tRingMgmtStnBoard,
+                      tRingMgmtStnPort }
+            DESCRIPTION
+                    "This trap occurs when a Beacon is detected on the
+                    ring while the ring is in the Operational state, or
+                    when the Beacon contains different information than
+                    the last Beacon received."
+            ::= 519 -- 0x0207
+
+    beaconStateCleared TRAP-TYPE
+--      STATUS  deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingStatsRingLastBeacon }
+            DESCRIPTION
+                    "This trap occurs when a ring returns to the
+                    Operational state."
+            ::= 520 -- 0x0208
+
+
+    stationAdded TRAP-TYPE
+--      STATUS  deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingMgmtSecurityAddressAdd }
+            DESCRIPTION
+                    "This trap is sent when a new station address is
+                    added to the security allowed list"
+            ::= 521 -- 0x0209
+
+
+    stationRemoved TRAP-TYPE
+--      STATUS  deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingMgmtSecurityAddressRemove }
+            DESCRIPTION
+                    "This trap is sent when a station is rejected
+                     from the ring with a REMOVE MAC command sent
+                     by the ring security."
+            ::= 522 -- 0x020a
+
+
+    ringConfigurationChanged TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is sent when the TRMM has built a
+                    new station map."
+            ::= 523 -- 0x020B
+
+    faultRecoveryPortRemoved TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingPortGrpId,
+                      tRingPortMgmtPortId }
+            DESCRIPTION
+                    "This trap is sent after a fault recovery condition
+                    has been corrected, and reports that a port was
+                    removed in the process of correcting the condition."
+            ::= 524 -- 0x020C
+
+
+    faultRecoveryBoardBypassed TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingPortGrpId }
+            DESCRIPTION
+                    "This trap is sent after a fault recovery condition
+                    has been corrected, and reports that a board was
+                    bypassed in the process of correcting the condition."
+            ::= 525 -- 0x020D
+
+
+    portViolation TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingPortGrpId,
+                      tRingPortMgmtPortId }
+            DESCRIPTION
+                    "This trap is sent when a port link state turns on
+                    and the port's management state is Disabled."
+            ::= 526 -- 0x020E
+
+    portViolationCleared TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingPortGrpId,
+                      tRingPortMgmtPortId }
+            DESCRIPTION
+                    "This trap is sent when a port link state turns off
+                    and the port's management state is Disabled."
+            ::= 527 -- 0x020F
+
+
+
+    faultRecoveryOscillation TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is sent when the ring has oscillated several
+                    times within a short amount of time.  The ring is
+                    considered oscillating if it has failed a short time
+                    after recovering."
+            ::= 528 -- 0x0210
+
+    ringPurgeThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsRingRingPurgesThreshold,
+                    tRingAlarmsRingTimebase }
+            DESCRIPTION
+                "This trap is sent when ring purge errors have exceeded
+                the specified threshold value."
+            ::= 529 -- 0x0211
+
+
+    amErrorsThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsRingAMPErrsThreshold,
+                      tRingAlarmsRingTimebase }
+            DESCRIPTION
+                "This trap is sent when Active Monitor errors have exceeded
+                the specified threshold value."
+            ::= 530 -- 0x0212
+
+
+    tokenErrorsThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsRingTokenErrsThreshold,
+                      tRingAlarmsRingTimebase }
+            DESCRIPTION
+                    "This trap is sent when Token errors have exceeded
+                    the specified threshold value."
+            ::= 531 -- 0x0213
+
+
+    claimTokenThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsRingClaimTknThreshold,
+                      tRingAlarmsRingTimebase  }
+            DESCRIPTION
+                "This trap is sent when claim tokens have exceeded
+                the specified threshold value."
+            ::= 532 -- 0x0214
+
+
+    lostFramesThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsRingLostFramesThreshold,
+                      tRingAlarmsRingTimebase }
+            DESCRIPTION
+                "This trap is sent when the Lost Frame count has exceeded
+                the specified threshold value."
+            ::= 533 -- 0x0215
+
+
+    beaconStateThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsRingBeaconStateThreshold,
+                      tRingAlarmsRingTimebase }
+            DESCRIPTION
+                "This trap is sent when the Beacon State count has exceeded
+                the specified threshold value."
+            ::= 534 -- 0x0216
+
+
+    frameCountThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsRingFrameCountThreshold,
+                      tRingAlarmsRingTimebase }
+            DESCRIPTION
+                "This trap is sent when the frame count has exceeded
+                the specified threshold value."
+            ::= 535 -- 0x0217
+
+
+    lineErrorsThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsStnThrshLineErrsThreshold,
+                      tRingAlarmsRingTimebase,
+                      tRingAlarmsStnThrshAddress }
+            DESCRIPTION
+                "This trap is sent when the line errors have exceeded
+                the specified threshold value for the station."
+            ::= 536 -- 0x0218
+
+
+    internalErrorsThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsStnThrshInternalErrsThreshold,
+                      tRingAlarmsRingTimebase,
+                      tRingAlarmsStnThrshAddress }
+            DESCRIPTION
+                "This trap is sent when the Lost internal errors have exceeded
+                the specified threshold value for the station."
+            ::= 537 -- 0x0219
+
+
+    burstErrorsThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsStnThrshBurstErrsThreshold,
+                      tRingAlarmsRingTimebase,
+                      tRingAlarmsStnThrshAddress }
+            DESCRIPTION
+                "This trap is sent when the Lost burst errors have exceeded
+                the specified threshold value for the station."
+            ::= 538 -- 0x021A
+
+
+    acErrorsThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsStnThrshACErrsThreshold,
+                      tRingAlarmsRingTimebase,
+                      tRingAlarmsStnThrshAddress }
+            DESCRIPTION
+                "This trap is sent when address/copied errors have exceeded
+                the specified threshold value for the station."
+            ::= 539 -- 0x021B
+
+
+    receiverCongestionThreshold TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingAlarmsStnThrshRcvrCongestThreshold,
+                      tRingAlarmsRingTimebase,
+                      tRingAlarmsStnThrshAddress }
+            DESCRIPTION
+                "This trap is sent when receiver congestion errors have exceeded
+                the specified threshold value for the station."
+            ::= 540 -- 0x021C
+
+
+    removeStationFailure TRAP-TYPE
+--      STATUS  deprecated
+            ENTERPRISE cabletron
+            VARIABLES { tRingMgmtSecurityAddressRemove }
+            DESCRIPTION
+                    "This trap is sent when a station breaks through security
+                    and cannot be removed from the ring."
+            ::= 541 -- 0x021D
+
+        ringSpeedPortFault      TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE  cabletron
+            VARIABLES { tRingPortGrpId, tRingPortMgmtPortId }
+            DESCRIPTION
+                "This  trap is generated when a port enters the ring speed
+                fault state due to a station or ring port attaching to the
+                port at a different speed than the port is configured for."
+            ::= 542     -- 0x21E
+
+        ringSpeedPortFaultCleared       TRAP-TYPE
+--          STATUS      deprecated
+            ENTERPRISE  cabletron
+            VARIABLES { tRingPortGrpId, tRingPortMgmtPortId }
+            DESCRIPTION
+                "This  trap is generated when a port leaves the ring speed
+                fault state."
+            ::= 543     -- 0x21F
+
+        stnPortInserted TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID, 
+                tRingPortGrpId,
+                tRingPortMgmtPortId }
+        DESCRIPTION
+                "This trap is sent when a stations port's link state
+                turns on while the management state of the port is
+                Enabled."
+        ::= 544 -- 0x0220
+
+        stnPortDeInserted TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID,
+                tRingPortGrpId,
+                tRingPortMgmtPortId }
+        DESCRIPTION
+                "This trap is sent when a stations port's link state
+                turns off while the management state of the port is
+                Enabled."
+        ::= 545 -- 0x0221
+
+        boardRingSpeedFault TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID}
+        DESCRIPTION
+                "This trap is sent when a 'active NON-93 series' board
+                enters the ring speed fault state due to a station or ring
+                port attaching to the board as a different speed than the
+                board is configured for."
+        ::= 546 -- 0x0222
+
+        boardRingSpeedFaultCleared TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID}
+        DESCRIPTION
+                "This trap is sent when a board leaves the ring
+                speed fault state."
+        ::= 547 -- 0x0223
+
+        ringPortWrapped TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID, 
+                tRingPortGrpId,
+                tRingPortMgmtPortId }
+        DESCRIPTION
+                "This trap is sent when a ring port wraps when its
+                management state is Active, without regard for the
+                selected type of the ring port."
+        ::= 548 -- 0x0224
+
+        ringPortWrapCleared TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID,
+                tRingPortGrpId,
+                tRingPortMgmtPortId }
+        DESCRIPTION
+                "This trap is sent when a ring port unwraps when its
+                management state is Active, without regard for the
+                selected type of the ring port."
+        ::= 549 -- 0x225
+
+
+        beaconingState TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                  tRingMgmtStnName,
+                  tRingMgmtStnAddress,
+                  tRingMgmtStnUNA,
+                  tRingMgmtStnBoard,
+                  tRingPortGrpId,
+                  tRingMgmtStnPort,
+                  tRingStatsRingLastBeaconType }
+        DESCRIPTION
+            "This trap occurs, if beacon recovery is enabled,
+            when Beaconing, Ring Purging or Claim Tokens are detected 
+            on the ring while the ring is in the Operational state, or
+            when the Beacon contains different information than
+            the last Beacon received."
+        ::= 550 -- 0x0226
+
+        beaconingStateCleared TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex, 
+                tRingStatsRingLastBeacon }
+        DESCRIPTION
+            "This trap occurs when a ring returns to the
+            Operational state."
+        ::= 551 -- 0x0227
+
+        stnAdded        TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { ifIndex, tRingMgmtSecurityAddressAdd }
+        DESCRIPTION
+                "This trap is sent when a new station is added to the
+                security allowed list."
+        ::= 552 -- 0x0228
+
+        stnRemoved TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingMgmtSecurityAddressRemove }
+        DESCRIPTION
+        "This trap is sent when a station is rejected
+        from the ring with a REMOVE MAC command sent
+        by the ring security."
+        ::= 553 -- 0x0229
+
+        removeStnFailure TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingMgmtSecurityAddressRemove }
+        DESCRIPTION
+                "This trap is sent when a station breaks through security
+                and cannot be removed from the ring."
+        ::= 554 -- 0x022A
+        
+
+        ringSecurityPortRemoved  TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID,
+                tRingPortGrpId,
+                tRingPortMgmtPortId }
+        DESCRIPTION
+        "This trap is sent when a ring security break
+        has been corrected, and reports that a port was
+        removed (disabled) in the process of correcting the condition."
+        ::= 555 -- 0x022B
+
+        beaconRecoveryPortRemoved TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID,
+                tRingPortGrpId,
+                tRingPortMgmtPortId }
+        DESCRIPTION
+                "This trap is sent after a fault recovery condition
+                has been corrected, and reports that a port was
+                removed in the process of correcting the condition."
+        ::= 556 -- 0x022C
+
+
+        beaconRecoveryPortGroupBypassed TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID,tRingPortGrpId }
+        DESCRIPTION
+                "This trap is sent after a fault recovery condition
+                has been corrected, and reports that a port group was
+                bypassed in the process of correcting the condition."
+        ::= 557 -- 0x022D
+
+        beaconRecoveryBoardBypassed TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID }
+        DESCRIPTION
+                "This trap is sent after a fault recovery condition
+                has been corrected, and reports that a board was
+                bypassed in the process of correcting the condition."
+        ::= 558 -- 0x022E
+
+        portLinkViolation TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID,
+                tRingPortGrpId,
+                tRingPortMgmtPortId }
+        DESCRIPTION
+                "This trap is sent when a port link state turns on
+                and the port's management state is Disabled."
+        ::= 559 -- 0x022F
+
+        portLinkViolationCleared TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID,
+                tRingPortGrpId,
+                tRingPortMgmtPortId }
+        DESCRIPTION
+                "This trap is sent when a port link state turns off
+                and the port's management state is Disabled."
+        ::= 560 -- 0x0230
+
+        ringPurgeTotalThreshold TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingAlarmsRingRingPurgesThreshold,
+                tRingAlarmsRingTimebase }
+        DESCRIPTION
+                "This trap is sent when ring purge errors have exceeded
+                the specified threshold value."
+        ::= 561 -- 0x0231
+
+
+        amErrorsTotalThreshold TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingAlarmsRingAMPErrsThreshold,
+                tRingAlarmsRingTimebase }
+        DESCRIPTION
+                "This trap is sent when Active Monitor errors have exceeded
+                the specified threshold value."
+        ::= 562 -- 0x0232
+
+
+        tokenErrorsTotalThreshold TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingAlarmsRingTokenErrsThreshold,
+                tRingAlarmsRingTimebase }
+        DESCRIPTION
+                "This trap is sent when Token errors have exceeded
+                the specified threshold value."
+        ::= 563 -- 0x0233
+
+
+        claimTokenTotalThreshold TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingAlarmsRingClaimTknThreshold,
+                tRingAlarmsRingTimebase  }
+        DESCRIPTION
+                "This trap is sent when claim tokens have exceeded
+                the specified threshold value."
+        ::= 564 -- 0x0234
+
+        lostFramesTotalThreshold TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingAlarmsRingLostFramesThreshold,
+                tRingAlarmsRingTimebase }
+        DESCRIPTION
+                "This trap is sent when the Lost Frame count has exceeded
+                the specified threshold value."
+        ::= 565 -- 0x0235
+
+        frameCountTotalThreshold TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingAlarmsRingFrameCountThreshold,
+                tRingAlarmsRingTimebase }
+        DESCRIPTION
+                "This trap is sent when the frame count has exceeded
+                the specified threshold value."
+        ::= 566 -- 0x0236
+
+
+        lineErrorsStnThreshold TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingAlarmsStnThrshLineErrsThreshold,
+                tRingAlarmsRingTimebase,
+                tRingAlarmsStnThrshAddress }
+        DESCRIPTION
+                "This trap is sent when the line errors have exceeded
+                the specified threshold value for the station."
+        ::= 567 -- 0x0237
+
+
+        internalErrorsStnThreshold TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingAlarmsStnThrshInternalErrsThreshold,
+                tRingAlarmsRingTimebase,
+                tRingAlarmsStnThrshAddress }
+        DESCRIPTION
+                "This trap is sent when the Lost internal errors have exceeded
+                the specified threshold value for the station."
+        ::= 568 -- 0x0238
+
+
+        burstErrorsStnThreshold TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingAlarmsStnThrshBurstErrsThreshold,
+                tRingAlarmsRingTimebase,
+                tRingAlarmsStnThrshAddress }
+        DESCRIPTION
+                "This trap is sent when the Lost burst errors have exceeded
+                the specified threshold value for the station."
+        ::= 569 -- 0x0239
+
+
+        acErrorsStnThreshold TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingAlarmsStnThrshACErrsThreshold,
+                tRingAlarmsRingTimebase,
+                tRingAlarmsStnThrshAddress }
+        DESCRIPTION
+                "This trap is sent when address/copied errors have exceeded
+                the specified threshold value for the station."
+        ::= 570 -- 0x023A
+
+
+        receiverCongestionStnThreshold TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex,
+                tRingAlarmsStnThrshRcvrCongestThreshold,
+                tRingAlarmsRingTimebase,
+                tRingAlarmsStnThrshAddress }
+        DESCRIPTION
+                "This trap is sent when receiver congestion errors have exceeded
+                the specified threshold value for the station."
+        ::= 571 -- 0x023B
+
+
+        ringSpeedPortFaulted    TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES { chSlotID, 
+                tRingPortGrpId, 
+                tRingPortMgmtPortId }
+        DESCRIPTION
+                "This  trap is generated when a port enters the ring speed
+                fault state due to a station or ring port attaching to the
+                port at a different speed than the port is configured for."
+        ::= 572 -- 0x023C
+
+
+        ringSpeedPortFaultedCleared     TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES { chSlotID,
+                tRingPortGrpId, 
+                tRingPortMgmtPortId }
+        DESCRIPTION
+                "This trap is generated when a port leaves the ring speed
+                fault state."
+        ::= 573 -- 0x023D
+
+
+        tpimInserted TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES { chSlotID,
+                tRingPortGrpId, 
+                tRingPortMgmtPortId }
+        DESCRIPTION
+                "This trap is generated when a TPIM is installed."
+        ::= 574 -- 0x023E
+
+        tpimRemoved TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES { chSlotID,
+                tRingPortGrpId, 
+                tRingPortMgmtPortId }
+        DESCRIPTION
+                "This  trap is generated when a TPIM is removed."
+        ::= 575 -- 0x023F
+
+        neighborNotificationInc TRAP-TYPE             
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex }
+        DESCRIPTION
+                "This trap is sent each time the neighbor notification (ring
+                poll) does not complete."
+        ::= 576 -- 0x0240
+
+        fltRecoveryOscillation TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { ifIndex }
+        DESCRIPTION
+                "This trap is sent when the ring has oscillated (in 
+                and out of beaconing) when beacon recovery is enabled. 
+                The ring is considered oscillating if it has 
+                failed 21 secs after recovering from the previous."
+        ::= 577 -- 0x0241
+
+    ringPollFailureEventCorrected  TRAP-TYPE             
+    ENTERPRISE cabletron
+    VARIABLES { ifIndex,
+        tRingMgmtStnAddress,
+        tRingMgmtStnDNA,
+        tRingMgmtStnBoard,
+        tRingMgmtStnPort }
+    DESCRIPTION
+        "This trap is sent after the management  module successfully
+        recovered the Ring Poll Failure condition."
+    ::= 578 -- 0x0242
+
+    ringPollFailureEventNotCorrected  TRAP-TYPE             
+    ENTERPRISE cabletron
+    VARIABLES { ifIndex,  
+        tRingMgmtStnAddress }
+    DESCRIPTION
+        "This trap is sent after the management module has failed to
+        recover the Ring Poll Failure condition.  The interesting
+        information includes the interface number and the MAC address
+        of the last successful ring poll station."
+    ::= 579 -- 0x0243
+
+    sPVP  TRAP-TYPE
+    ENTERPRISE cabletron
+--  VARIABLES { spvpAtmAddress,
+--      timeStamp,
+--      releaseCause }
+    DESCRIPTION
+        "This trap indicates that a SPVP was rerouted. 
+        The variables indicates the address of a rerouted spvp, the time 
+        stamp of when rerouting occurred, and the cause of rerouting. 
+        The cause codes are as follows: 
+        Unallocated (unassigned) number = 1 
+        No route to specified transit network = 2 
+        No route to destination = 3 
+        Normal call clearing = 16
+        User busy = 17
+        No user responding = 18
+        Call rejected = 21
+        Number changed = 22
+        User rejects all calls with calling line
+                                identification restriction (CLIR) = 23
+        Destination out of order = 27
+        Invalid number format (address incomplete) = 28
+        Response to STATUS ENQUIRY = 30
+        Normal, unspecified = 31
+        Requested VPCI/VCI not available = 35
+        VPCI/VCI assignment failure = 36
+        User cell rate not available = 37
+        Network out of order = 38
+                        Temporary failure = 41
+        Access information discarded = 43
+        No VPCI/VCI available = 45
+        Resource unavailable, unspecified = 47
+        Quality of Service unavailable = 49
+        Bearer capability not authorized = 57
+        Bearer capability not presently available = 58
+        Service or option not available, unspecified = 63
+        Bearer capability not implemented = 65
+        Unsupported combination of traffic parameters = 73
+        AAL parameters cannot be supported = 78
+        Invalid call reference value = 81
+        Identified channel does not exist = 82
+        Incompatible destination = 88
+        Invalid endpoint reference = 89
+        Invalid transit network selection = 91
+        Too many pending add party requests = 92
+        Mandatory information element missing = 96
+        Message type non-existent or not implemented = 97
+        Information element non existent or not implemented = 99
+        Invalid information element contents = 100
+        Message not compatible with call state = 101
+        Recovery on timer expiry = 102
+        Incorrect message length = 104
+        Protocol error, unspecified = 111"
+    ::= 580 -- 0x0244 
+
+    sPVC  TRAP-TYPE             
+    ENTERPRISE cabletron 
+--  VARIABLES { spvcAtmAddress,  
+--      timeStamp,
+--      releaseCause } 
+    DESCRIPTION 
+        "This trap indicates that a SPVC was rerouted. 
+        The variables indicates the address of a rerouted spvc, the time 
+        stamp of when rerouting occurred, and the cause of rerouting. 
+        The cause codes are as follows: 
+        Unallocated (unassigned) number = 1 
+        No route to specified transit network = 2 
+        No route to destination = 3 
+        Normal call clearing = 16
+        User busy = 17
+        No user responding = 18
+        Call rejected = 21
+        Number changed = 22
+        User rejects all calls with calling line identification
+                                                restriction (CLIR) = 23
+        Destination out of order = 27
+        Invalid number format (address incomplete) = 28
+        Response to STATUS ENQUIRY = 30
+        Normal, unspecified = 31
+        Requested VPCI/VCI not available = 35
+        VPCI/VCI assignment failure = 36
+        User cell rate not available = 37
+        Network out of order = 38
+        Temporary failure = 41
+        Access information discarded = 43
+        No VPCI/VCI available = 45
+        Resource unavailable, unspecified = 47
+        Quality of Service unavailable = 49
+        Bearer capability not authorized = 57
+        Bearer capability not presently available = 58
+        Service or option not available, unspecified = 63
+        Bearer capability not implemented = 65
+        Unsupported combination of traffic parameters = 73
+        AAL parameters cannot be supported = 78
+        Invalid call reference value = 81
+        Identified channel does not exist = 82
+        Incompatible destination = 88
+        Invalid endpoint reference = 89
+        Invalid transit network selection = 91
+        Too many pending add party requests = 92
+        Mandatory information element missing = 96
+        Message type non-existent or not implemented = 97
+        Information element non existent or not implemented = 99
+        Invalid information element contents = 100
+        Message not compatible with call state = 101
+        Recovery on timer expiry = 102
+        Incorrect message length = 104
+        Protocol error, unspecified = 111"
+    ::= 581 -- 0x0245
+
+--    deviceNotResponding TRAP-TYPE
+--          ENTERPRISE cabletron
+--          VARIABLES {  }
+--          DESCRIPTION
+--                  "  "
+--          ::= 700  0x02BC
+
+
+--    deviceConnected TRAP-TYPE
+--          ENTERPRISE cabletron
+--          VARIABLES {  }
+--          DESCRIPTION
+--                  "  "
+--          ::= 701  0x02BD
+
+
+--    deviceStatusUnknown TRAP-TYPE
+--          ENTERPRISE cabletron
+--          VARIABLES {  }
+--          DESCRIPTION
+--                  "  "
+--          ::= 702  0x02BE
+
+    deviceDiagnosticMessage TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated for diagnostic purposes."
+            ::= 703  -- 0x02BF
+
+
+    bridgeStatusChanged TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { bdgdeviceStatus }
+            DESCRIPTION
+                    "This trap is generated when the status of the bridge
+                     changes."
+            ::= 769 -- 0x0301
+
+    aquiredDatabaseFull TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated when the acquired portion of
+                    the bridge's filtering database is full."
+            ::= 770 -- 0x0302
+
+boardPortActivate TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES   { ctFpRedundActivePort }
+        DESCRIPTION
+                "This Trap is generated when Front Panel Redundancy
+                 changes the active port." 
+        ::= 849 -- 0x0351
+
+boardNightVision  TRAP-TYPE
+        ENTERPRISE cabletron
+        DESCRIPTION
+                "This trap is generated when night vision turns off or
+                on.  If power to the device is lost, this trap is sent
+                with a value of 0, indicating that power has been lost
+                but the device is running on 'night vision'. If power 
+                is not restored within 10 minutes, the device shuts down
+                completely.  If power is restored in that time frame,
+                the trap is sent with a value of 1 indicating as such."
+        ::= 900 -- 0x384        
+                
+snmpLostContact TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { snmpPollDestination, snmpPollOwner }
+        DESCRIPTION
+                "A LostContact signifies that a the Cabletron hub has lost
+                contact with the destination IP address host/device.  This trap
+                is only sent at the 'trap-wait' intervals.  Note that this trap
+                indicates a poll failure, not a threshold failure.  Threshold
+                alarms are generated independently.  The snmpPollDestination
+                indicates the lost device."
+        ::= 1000 -- 0x03E8
+
+snmpThresholdTrap TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { snmpOIDDestination, snmpOIDOwner, snmpOIDSequence, 
+                    snmpOIDObject }
+        DESCRIPTION
+                "This trap signifies that an OID value/threshold comparison
+                has failed.  The snmpOIDObject specifies which Object Identifier
+                and instance (destination IP address, owner IP address, and
+                sequence number) was used to trigger the alarm condition.   The 
+                snmpOIDDestination indicates the node address that failed the
+                OID poll."
+        ::= 1001
+
+snmpReestabContact TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { snmpPollDestination, snmpPollOwner }
+        DESCRIPTION
+                "A ReestabContact signifies that a the Cabletron hub has 
+                reestablished contact with the destination IP address
+                host/device.  This trap is sent immediately after contact 
+                has been reestablished." 
+        ::= 1002 -- 0x03EA
+
+-- There are a other traps associated with ctBroadcast at 289 and 290.
+
+ctBroadcastThresholdReached  TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { ctBroadcastDesiredBroadcastThreshold,
+                      ctBroadcastCtlSlotID,
+                      ctBroadcastCtlInterface}
+            DESCRIPTION
+                    "This trap is generated when the configured
+                    broadcast threshold on a port is reached and
+                    will include the slot number and port number
+                    the threshold was reached on."
+            ::= 1003 -- 0x03EB
+
+ctLecStatus TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { lecRowStatus }
+            DESCRIPTION
+                    "This trap is generated when the operational
+                    state of the LAN Emulation Client has changed."
+            ::= 1004 -- 0x03EC
+
+    fddiPortConnectStateChange  TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { fddimibSMTIndex, fddimibPORTIndex, 
+                        fddimibPORTConnectState }
+        DESCRIPTION
+                "This trap is generated for FDDI port connection state
+                changes.  The variables are found in IETF FDDI MIB
+                RFC-1512."
+        ::= 1024        --  0x400
+
+    fddiSMTMasterPortIncrease   TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { fddimibSMTIndex, fddimibSMTMasterCts }
+        DESCRIPTION
+                "This trap is generated whenever there is an increase in
+                the number of SMT master ports."
+        ::= 1025        -- 0x401
+
+    fddiSMTMasterPortDecrease   TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { fddimibSMTIndex, fddimibSMTMasterCts }
+        DESCRIPTION
+                "This trap is generated anytime there is a decrease in
+                the number of SMT master ports."
+        ::= 1026        -- 0x402
+
+
+    fddiPortAction  TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { fddimibSMTIndex, fddimibPORTIndex, 
+                        fddimibPORTAction }
+        DESCRIPTION
+                "This trap is generated for every action against a
+                FDDI port.  The variables are found in IETF FDDI MIB
+                RFC-1512."
+        ::= 1027        --  0x403
+
+    fddiPortLerAlarm  TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { fddimibSMTIndex, fddimibPORTIndex,
+                        fddimibPORTLerEstimate }
+        DESCRIPTION
+                "This trap is generated when the long term link
+                error rate, fddimibPORTLerEstimate, crosses the
+                fddimibPORTLerAlarm threshold.  The variables are
+                found in IETF FDDI MIB RFC-1512."
+        ::= 1028        --  0x404
+
+    fddiModuleFNBbypassed  TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { chSlotID }
+        DESCRIPTION
+                "This trap is generated when a FDDI module
+                is bypassed on the FNB."
+        ::= 1030        --  0x406
+
+    fddiModuleFNBinserted  TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { chSlotID }
+        DESCRIPTION
+                "This trap is generated when a FDDI module
+                is inserted on the FNB."
+        ::= 1031        --  0x407
+
+    fddiMACRMTState  TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { fddimibSMTIndex, fddimibMACIndex, 
+                        fddimibMACRMTState }
+        DESCRIPTION
+                "This trap is generated when there is a
+                change in the FDDI ring state.  The variables
+                are found in IETF FDDI MIB RFC-1512."
+        ::= 1032        --  0x408
+
+    fddiMACCurrentPath  TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { fddimibSMTIndex, fddimibMACIndex,
+                        fddimibMACCurrentPath }
+        DESCRIPTION
+                "This trap is generated when there is a
+                change in the insertion of the MAC to the
+                FDDI ring.  The variables are found in IETF
+                FDDI MIB RFC-1512."
+        ::= 1033        --  0x409
+
+    fddiSMTCFState  TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { fddimibSMTIndex, fddimibSMTCFState }
+        DESCRIPTION
+                "This trap is generated when there is a
+                change in the attachment configuration for
+                the station or concentrator.  The variables
+                are found in IETF FDDI MIB RFC-1512."
+        ::= 1034        --  0x40A
+
+    fddiRingTopology TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { ctsmtmibRingSmtIndex, ctsmtmibRingMacIndex,
+                        ctsmtmibRingNodeIndex, ctsmtmibRingMacAddr, 
+                        ctsmtmibRingTopology }
+        DESCRIPTION
+                "This trap is generated when there is a
+                change in the attachment configuration for
+                the station or concentrator.  It provides
+                information additional to fddiSMTCFState,
+                twisted ring conditions in particular.  The
+                variables are found in the Cabletron SMT MIB."
+        ::= 1035        --  0x40B
+
+    fddiMACFrameErrorRatio TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { fddimibSMTIndex, fddimibMACIndex, 
+                        fddimibMACFrameErrorRatio }
+        DESCRIPTION
+                "This trap is generated when the frame error
+                ratio exceeds the frame error threshold,
+                fddimibMACFrameErrorThreshold.  The variables
+                are found in IETF FDDI MIB RFC-1512."
+        ::= 1036        --  0x40C
+
+    fddiMACDuplicateMACAddress TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { fddimibSMTIndex, fddimibMACIndex }
+        DESCRIPTION
+                "This trap is generated when the SMT detects
+                a duplicate MAC address on the ring."
+        ::= 1037        --  0x40D
+
+--================== The end of the list of FDDI Traps ======================== 
+
+--========================== container traps ==================================
+
+    contLogicalChangesTrap TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { contTypeLogicalChanges }
+        DESCRIPTION
+                    "This trap is generated when any change occurs
+            in the contLogicalEntryTable group of the container MIB."
+            ::= 1200
+ 
+ 
+    contPhysicalChangesTrap TRAP-TYPE
+            ENTERPRISE cabletron
+            VARIABLES { contTypePhysicalChanges }
+        DESCRIPTION
+                    "This trap is generated when any change occurs to
+            contPhysicalEntryTable group of the container MIB."
+            ::= 1201
+
+--=============================================================================
+
+    rtrIpEventLogChange TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { nwIpEventTextString }
+        DESCRIPTION
+                "This trap is generated for changes to IP event log."
+        ::= 1280        -- 0x500
+
+    rtrIPXEventLogChange        TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { nwIpxEventTextString }
+        DESCRIPTION
+                "This trap is generated whenever an entry is made to the
+                router IPX event log for where nwIpEventSeverity has a
+                value of highest(1)."
+        ::= 1281        -- 0x501
+
+    rtrDecIVEventLogChange      TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { nwDecIVEventTextString }
+        DESCRIPTION
+                "This trap is generated whenever an entry is made to the
+                router Dec Net IV event log."
+        ::= 1282        -- 0x502
+
+    rtrAppleEventLogChange      TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { nwAtEventTextString }
+        DESCRIPTION
+                "This trap is generated whenever an entry is made to the
+                router Apple Talk event log."
+        ::= 1283        -- 0x503
+
+    rtrAppnEventLogChange       TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { nwAppnEventTextString }
+        DESCRIPTION
+                "This trap is generated whenever an entry is made to the
+                router APPN event log."
+        ::= 1284        -- 0x504
+
+nwAppnLsUp TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES   { nwAppnFwdLsName }
+        DESCRIPTION
+                "When a link station becomes active, a trap is
+                 generated. nwAppnFwdLsName identifies the link
+                 station name."
+        ::= 1285        -- 0x505
+
+nwAppnLsDown TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES       { nwAppnFwdLsName, nwAppnFwdLsAdjCpName,
+                         nwAppnFwdLsAdjCpType }
+        DESCRIPTION
+                "When a link station is deactivated, a trap is
+                 generated. nwAppnFwdLsName identifies the link
+                 station name, nwAppnFwdLsAdjCpName identifies the
+                 fully qualified CP name of the adjacent node and
+                 nwAppnFwdLsAdjCpType is the type of that node."
+        ::= 1286        -- 0x506
+
+--      All traps between 0x578 (1400) and 0x5DB (1499) are reserved
+--      for secure fast switching
+
+-- SecureFast Traps [Trap Ids 1400 - 1499 (0578h - 05DBh)]
+
+-- SecureFast Traps are by default Disabled.  To Enable SecureFast Traps, 
+-- the "service.trap" element in the Bindery must be enabled.  In addition,
+-- Individual SecureFast Traps can be disabled via the SFPSTrapAPI Mib.  
+-- (Disabling a Trap is Persistant, therefore next reboot, the trap will 
+-- stay disabled).  The SFPSTrap Mib can be used to view the current 
+-- OperStatus of the individual traps, as well as how many of each trap 
+-- have been sent, and when the last one was sent.
+
+-- Below - <h> = Hash Value; <i> = Index Value; <p> = Port
+
+
+-- Trap #1400 - New User
+--
+-- 1.3.6.1.4.1.52.4.2.4.2.2.3.5.1.1.5.<h>.<i> = [Int] Port Number
+-- 1.3.6.1.4.1.52.4.2.4.2.2.3.5.1.1.7.<h>.<i> = [Str] Node's Mac Address
+
+sfpsNewUser      TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { sfpsNodeTablePort, sfpsNodeTableBaseAddress }
+        DESCRIPTION
+                 "This trap is generated when a new user enters the SFPS 
+                  fabric."
+        ::= 1400       -- 0x578
+                                                  
+
+-- Trap #1401 - Directory Violation
+--
+-- 1.3.6.1.4.1.52.4.2.4.2.2.3.15.1.1.1.3.<h>.<i> = [Int] Violation Type
+-- 1.3.6.1.4.1.52.4.2.4.2.2.3.15.1.1.1.6.<h>.<i> = [Str] L2/L3 Address Value
+
+sfpsDirectoryViolation      TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { sfpsDirViolationType,sfpsDirViolationAOValue }
+        DESCRIPTION
+                 "This trap is generated when one of 6 violation types have occurred.
+                        1 UserLock
+                        2 RestrictedPort
+                        3 IPNotLearned
+                        4 IPInvalid
+                        5 RestrictedMobility
+                        6 UserLockSamePort      "
+         ::= 1401       -- 0x579
+                                                  
+
+-- Trap #1402 - Source Blocked
+--
+-- 1.3.6.1.4.1.52.4.2.4.2.2.14.2.1.1.2.<i> = [Str] Source Mac Address Blocked
+
+sfpsSourceBlocked      TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { sfpsBlockSourceMAC }
+        DESCRIPTION
+                 "This trap is generated when a user (source MAC address)  has
+                  surpassed the Source Blocker thresholds and is being blocked from
+                  sending traffic on the network."
+         ::= 1402       -- 0x57A
+                                                  
+
+-- Trap #1403 - Flood Suppressed
+--
+-- 1.3.6.1.4.1.52.4.2.4.2.2.2.4.1.4.1.1.4.<h>.<i> = [Str] L2/L3 Address Blocked
+
+sfpsFloodSurpressed      TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { sfpsBlockResolveTableAOValue }
+        DESCRIPTION
+                 "A destination address has been unresolvable past the thresholds
+                  and is now being flood suppressed (only 1 per X seconds will pass)."
+         ::= 1403       -- 0x57B
+                                                  
+
+-- Trap #1404 - Port to Standby
+--
+-- 1.3.6.1.4.1.52.4.2.4.2.1.2.1.1.1.1.<p> = [Int] Port Number
+-- 1.3.6.1.4.1.52.4.2.4.2.1.2.1.1.1.5.<p> = [Int] New Port State
+
+sfpsPortToStandby      TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { sfpsInPortConfigPort, sfpsInPortConfigType }
+        DESCRIPTION
+                 "This trap is generated when a port has entered standby.
+                 There are different standby states:
+                 9      STAND_BY (manually set)
+                 14     STAND_BY_FCL (one way neighbor)
+                 15     STAND_BY_LOOPED (self originated Hello seen on port)
+                 16     STAND_BY_RTA (redundant access port is standby/backup  "
+        ::= 1404       -- 0x57C
+
+
+-- Trap #1405 - Port from Standby
+--
+-- 1.3.6.1.4.1.52.4.2.4.2.1.2.1.1.1.1.<p> = [Int] Port Number
+-- 1.3.6.1.4.1.52.4.2.4.2.1.2.1.1.1.5.<p> = [Int] New Port State
+ 
+ sfpsPortFromStandby      TRAP-TYPE
+         ENTERPRISE      cabletron
+         VARIABLES       { sfpsInPortConfigPort, sfpsInPortConfigType }
+         DESCRIPTION
+                  "This trap is generated when a port that was in standby is
+                  now not in standby. Most common is that either a one-way 
+                  neighbor situation is gone or a standby RA port is now primary."
+            ::= 1405       -- 0x57D
+
+-- ======================================================================
+
+--      All traps between 0x600 (1536) and 0x6FF (1791) are reserved
+--      for mid level managers.
+
+
+    nmsMapAdded TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { logEventIndex,
+                        logIndex,
+                        logTime,
+                        logDescription }
+        DESCRIPTION
+                "This trap is generated when the SOS Gateway agent detects
+                that a third party NMS has added a new map to its database."
+        ::= 1536
+
+    nmsMapDeleted TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { logEventIndex,
+                        logIndex,
+                        logTime,
+                        logDescription }
+        DESCRIPTION
+                "This trap is generated when the SOS Gateway agent detects
+                that a third party NMS has deleted a map from its database."
+        ::= 1537
+
+    nmsMapChanged TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { logEventIndex,
+                        logIndex,
+                        logTime,
+                        logDescription }
+        DESCRIPTION
+                "This trap is generated when the SOS Gateway agent detects
+                that a third party NMS has changed an attribute of a map
+                in its database."
+        ::= 1538
+
+    nmsMapOpened TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { logEventIndex,
+                        logIndex,
+                        logTime,
+                        logDescription }
+        DESCRIPTION
+                "This trap is generated when the SOS Gateway agent detects
+                that a third party NMS has opened a map."
+        ::= 1539
+
+    nmsMapClosed TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { logEventIndex,
+                        logIndex,
+                        logTime,
+                        logDescription }
+        DESCRIPTION
+                "This trap is generated when the SOS Gateway agent detects
+                that a third party NMS has closed a map."
+        ::= 1540
+
+    nmsElementAdded TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { logEventIndex,
+                        logIndex,
+                        logTime,
+                        logDescription }
+        DESCRIPTION
+                "This trap is generated when the SOS Gateway agent detects
+                that a third party NMS has added a new element to its database."
+        ::= 1541
+
+    nmsElementDeleted TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { logEventIndex,
+                        logIndex,
+                        logTime,
+                        logDescription }
+        DESCRIPTION
+                "This trap is generated when the SOS Gateway agent detects
+                that a third party NMS has deleted an element from its
+                database."
+        ::= 1542
+
+    nmsElementChanged TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { logEventIndex,
+                        logIndex,
+                        logTime,
+                        logDescription }
+        DESCRIPTION
+                "This trap is generated when the SOS Gateway agent detects
+                that a third party NMS has changed an attribute of an element
+                in its database."
+        ::= 1543
+
+    nmsSymbolAdded TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { logEventIndex,
+                        logIndex,
+                        logTime,
+                        logDescription }
+        DESCRIPTION
+                "This trap is generated when the SOS Gateway agent detects
+                that a third party NMS has added a new symbol to its database."
+        ::= 1544
+
+    nmsSymbolDeleted TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { logEventIndex,
+                        logIndex,
+                        logTime,
+                        logDescription }
+        DESCRIPTION
+                "This trap is generated when the SOS Gateway agent detects
+                that a third party NMS has deleted a symbol from its database."
+        ::= 1545
+
+    nmsSymbolChanged TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { logEventIndex,
+                        logIndex,
+                        logTime,
+                        logDescription }
+        DESCRIPTION
+                "This trap is generated when the SOS Gateway agent detects
+                that a third party NMS has changed an attribute of a symbol
+                in its database."
+        ::= 1546
+
+-- ======================================================================
+
+--      All traps between 0x708 (1800) and 0x76C (1900) are reserved
+--      for the 5 Slot Work Group chassis.
+
+    wgPsInstalled TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { ctChasPowerSupplyNum,
+                          ctChasPowerSupplyType }
+        DESCRIPTION
+                "This trap is generated when the device detects that the
+                 power supply has been installed."
+        ::= 1800
+
+    wgPsRemoved TRAP-TYPE
+        ENTERPRISE      cabletron
+        VARIABLES       { ctChasPowerSupplyNum }
+        DESCRIPTION    
+                "This trap is generated when the device detects that the 
+                power supply has been removed."
+        ::= 1801
+
+    wgPsNormal TRAP-TYPE  
+        ENTERPRISE      cabletron 
+        VARIABLES       { ctChasPowerSupplyNum } 
+        DESCRIPTION     
+                "This trap is generated when the device detects that the power 
+                supply has returned to normal."
+        ::= 1802 
+
+    wgPsFail TRAP-TYPE  
+        ENTERPRISE      cabletron 
+        VARIABLES       { ctChasPowerSupplyNum } 
+        DESCRIPTION     
+                "This trap is generated when the device detects that the power 
+                supply has failed."
+        ::= 1803 
+    
+    wgPsRedundant TRAP-TYPE  
+        ENTERPRISE      cabletron 
+        VARIABLES       { ctChasPowerSupplyNum } 
+        DESCRIPTION     
+                "This trap is generated when the device detects that the power
+                supply is in the redundant state."
+        ::= 1804 
+ 
+    
+    wgPsNotRedundant TRAP-TYPE  
+        ENTERPRISE      cabletron 
+        VARIABLES       { ctChasPowerSupplyNum } 
+        DESCRIPTION     
+                "This trap is generated when the device detects that the power 
+                supply is not in the redundant state."
+        ::= 1805 
+
+    wgBoardInserted TRAP-TYPE
+        ENTERPRISE     cabletron
+        VARIABLES      { contPhysicalEntryID }
+        DESCRIPTION
+                "This trap is generated when a module is inserted."
+        ::= 1806
+
+     wgBoardRemoved TRAP-TYPE
+        ENTERPRISE     cabletron
+        VARIABLES      { contPhysicalEntryID }
+        DESCRIPTION
+                "This trap is generated when a module is removed."
+        ::= 1807
+
+ 
+-- ======================================================================
+
+    aPCLineFail TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated in the event of an AC
+                     utility line failure"
+            ::= 4353 -- 0x1101
+
+
+    aPCLineFailRecovery TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated when the UPS switches back
+                    to line, and only if the aPCLineFail trap was issued
+                    first"
+            ::= 4354 -- 0x1102
+
+
+    aPCLowBattery TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated in the event that the UPS'
+                    battery is found to be low"
+            ::= 4355 -- 0x1103
+
+
+    aPCLowBatteryRecovery TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated when the UPS' battery has
+                     charged above the low-battery point, and only if the 
+                     aPCLowBattery trap was issued first"
+            ::= 4356 -- 0x1104
+
+
+    aPCAbnormalCondition TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated in the event that the UPS
+                    has entered an abnormal condition, such as an 
+                    overload or trip on low battery.  This trap is also
+                    sent, when the UPS is first turned on."
+            ::= 4357 -- 0x1105
+
+
+    aPCAbnormConditionRecovery TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated when the UPS has recovered
+                    from an abnormal condition, and only if the
+                    aPCAbnormalCondition trap was issued first"
+            ::= 4358 -- 0x1106
+
+
+    aPCShuttingDown TRAP-TYPE
+            ENTERPRISE cabletron
+            DESCRIPTION
+                    "This trap is generated in the event that the UPS
+                    has been ordered to shut itself, or the load, off
+                    over the serial line."
+            ::= 4359 -- 0x1107
+
+-- =====================================================================
+--      The range of trap IDs from 5001 to 5400 decimal are reserved
+--      for WAN traps.
+-- ======================================================================
+--      The range of trap IDs from 11001 to 11999 decimal are reserved
+--      for MMAC+ traps.
+
+emTermOverVoltage TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the term power bus is over voltage."
+    ::= 11001
+
+emTermUnderVoltage TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the term power bus is under voltage."
+    ::= 11002
+
+emTermNormalVoltage TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the term power bus is at an acceptable
+        voltage. It will only be sent out after a trap was sent to say that
+        the term voltage was under or over."
+    ::= 11003
+
+chHotTemp TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated because the chassis is hot."
+    ::= 11004
+
+chWarmTemp TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated because the chassis is warm."
+    ::= 11005
+
+chCoolTemp TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated because the chassis is cool."
+    ::= 11006
+
+chColdTemp TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated because the chassis is cold."
+    ::= 11007
+
+chTempOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated because the chassis has returned to normal
+        after being warm, hot, cool or cold."
+    ::= 11008
+
+chTempSensorBroken TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the chassis's temperature sensor is
+        broken."
+     ::= 11009
+
+chHumidityStaticRisk TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the chassis determines there is a
+        humidity static risk."
+    ::= 11010
+
+chHumidityNormal TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the chassis determines the humidity
+        has returned to normal after being moist or static risk."
+    ::= 11011
+
+chHumidityMoist TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the chassis determines there is a
+        humidity moist risk."
+    ::= 11012
+
+chHumiditySensorBroken TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the chassis determines the humidity
+        sensor is broken."
+    ::= 11013
+
+chMod1INBInstalled TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the INV termination has been installed
+        for module 1."
+    ::= 11014
+
+chMod1INBFaulty TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the INV termination is faulty for
+        module 1."
+    ::= 11015
+
+chMod1INBRemoved TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the INV termination has been removed for
+        module 1."
+    ::= 11016
+
+chMod1INBNormal TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the INV termination (module 1) has
+        returned to normal after already sending a trap to say it was faulty."
+    ::= 11017
+
+chMod2INBInstalled TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the INV termination has been installed
+        for module 2."
+    ::= 11018
+
+chMod2INBFaulty TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the INV termination is faulty for
+        module 2."
+    ::= 11019
+
+chMod2INBRemoved TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the INV termination has been removed for
+        module 2."
+    ::= 11020
+
+chMod2INBNormal TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the INV termination (module 2) has
+        returned to normal after already sending a trap to say it was faulty."
+    ::= 11021
+
+emFanFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    DESCRIPTION
+        "This trap is generated when the chassis detects a fan failure."
+    ::= 11022
+
+boardHotTempShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board is hot and the board has shut 
+        itself down."
+    ::= 11023
+
+boardWarmTemp TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board is warm."
+    ::= 11024
+
+boardCoolTemp TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board is cool."
+    ::= 11025
+
+boardColdTemp TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board is cold."
+    ::= 11026
+
+boardTempOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board has returned to normal after 
+        being warm or hot."
+    ::= 11027
+
+boardTempSensorBroken TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when the board's temperature sensor is
+        broken."
+    ::= 11028
+
+boardTempHotNoAdmin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board is hot."
+    ::= 11029
+
+boardRelWarmTemp TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board's relative temp is warm."
+    ::= 11030
+
+boardRelTempOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board's relative temp has returned 
+        to normal after being warm or hot."
+    ::= 11031
+
+boardRelTempHotNoAdmin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board's relative temp is hot but it
+        cannot shutdown. It will need to be turned off remotely."
+    ::= 11032
+
+boardRelTempHotShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when the board's relative temperature is hot 
+        and is being powered off."
+    ::= 11033
+
+boardRelWarmTempMaxFans TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board's relative temp is warm. The
+        fans are on MAX."
+    ::= 11034
+
+boardRelTempOKMaxFans TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board's relative temp has returned 
+        to normal after being warm or hot. The fans are on MAX."
+    ::= 11035
+
+boardRelTempHotNoAdminMaxFans TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board's relative temp is hot but it
+        cannot shutdown. It will need to be turned off remotely. The fans are
+        on MAX."
+    ::= 11036
+
+boardRelTempHotShutdownMaxFans TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when the board's relative temperature is hot 
+        and is being powered off. The fans are on MAX."
+    ::= 11037
+
+boardInputVoltageOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a boards input voltage is over max."
+    ::= 11038
+
+boardInputVoltageUnderMin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a boards input voltage is under
+        minimum."
+    ::= 11039
+
+boardInputVoltageOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board input voltage has returned to 
+        normal after being over or under."
+    ::= 11040
+
+boardOutputVoltageOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board output voltage is over MAX."
+    ::= 11041
+
+boardOutputVoltageUnderMin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board output voltage is under MIN."
+    ::= 11042
+
+boardOutputVoltageOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board output voltage has returned to 
+        normal after being over or under."
+    ::= 11043
+
+boardAuxVoltageOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a boards auxiliary voltage is over
+        MAX."
+    ::= 11044
+
+boardAuxVoltageUnderMin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board auxiliary voltage is under
+        MIN."
+    ::= 11045
+
+boardAuxVoltageOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board auxiliary voltage has returned 
+        to normal after being over or under."
+    ::= 11046
+
+boardInputCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board input current is
+        over MAX. The power supply has therefore been shutdown."
+    ::= 11047
+
+boardOutputCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a boards output current is
+        over MAX. The power supply has therefore been shutdown."
+    ::= 11048
+
+boardInputCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board input current is 
+        over MAX. The ability of the power supply to turn itself off has been 
+        disabled therefore outside intervention is needed."
+    ::= 11049
+
+boardOutputCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because a board output current is
+        over MAX. The ability of the power supply to turn itself off has been
+        disabled therefore outside intervention is needed."
+    ::= 11050
+
+boardRemotePowerOff TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board is being powered
+        off due to outside intervention."
+    ::= 11051
+
+boardRemotePowerOn TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board is being powered
+        on due to outside intervention."
+    ::= 11052
+
+boardRemotePowerReset TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board is being reset due to
+        outside intervention."
+    ::= 11053
+
+boardPowerOn TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board power has been powered on."
+    ::= 11054
+
+boardPowerOff TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board power has been powered off."
+    ::= 11055
+
+boardPowerReset TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board has been reset."
+    ::= 11056
+
+boardRemOverCurrentShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board has been shutdown remotely 
+        due to being over current."
+    ::= 11057
+
+boardRemPowerConservationShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board has been shutdown remotely 
+        due to power conservation."
+    ::= 11058
+
+boardRemTemperatureShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board has been shutdown remotely 
+        due to it's temperature."
+    ::= 11059
+
+boardReqFPDisableDCDC TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board has had an unauthorized
+        front panel disable."
+    ::= 11060
+
+boardFPDisableDCDC TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board has been disabled through
+        the front panel."
+    ::= 11061
+
+boardReqFPEnableDCDC TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board has had an unauthorized
+        front panel enable."
+    ::= 11062
+
+boardFPEnableDCDC TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board has been enabled through the
+        front panel."
+    ::= 11063
+
+boardReqFPResetDCDC TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board has had an unauthorized
+        front panel reset."
+    ::= 11064
+
+boardFPResetDCDC TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board has been reset through the 
+        front panel."
+    ::= 11065
+
+boardADConvertorFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board's A/D converter is broken."
+    ::= 11066
+
+boardPICFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because of a board PIC failure."
+    ::= 11067
+
+boardPICOk TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board PIC is now OK.
+        This trap will only be sent AFTER a PIC failure trap has been
+        generated."
+    ::= 11068
+
+boardLLAPDupAddress TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when the board LLAP address already exists
+        in this chassis."
+    ::= 11069
+
+boardMailboxFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because of a board mailbox failure."
+    ::= 11070
+
+boardMailboxOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the board mailbox is now OK."
+    ::= 11071
+
+psACHotTempShutdown TRAP-TYPE
+    ENTERPRISE  cabletron 
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply is hot and the
+        power supply has shut itself down."
+    ::= 11072
+
+psACWarmTemp TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply is warm."
+    ::= 11073
+
+psACTempOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply has returned
+        to normal after being warm or hot."
+    ::= 11074
+
+psACTempOKNoAdmin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply has returned 
+        to normal after being shutdown remotely. It will need to be powerOn
+        remotely."
+    ::= 11075
+
+psACTempSensorBroken TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when the AC power supply's temperature
+        sensor is broken."
+    ::= 11076
+
+psACTempHot TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply is hot."
+    ::= 11077
+
+psACInputVoltageOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply input voltage
+        is over max."
+    ::= 11078
+
+psACInputVoltageUnderMin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply input voltage
+        is under minimum."
+    ::= 11079
+
+psACInputVoltageOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply input voltage has
+        returned to normal after being over or under."
+    ::= 11080
+
+psACSystemVoltageOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply system voltage is
+        over MAX."
+    ::= 11081
+
+psACSystemVoltageUnderMin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply system voltage is
+        under MIN."
+    ::= 11082
+
+psACSystemVoltageOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply system voltage has
+        returned to normal after being over or under."
+    ::= 11083
+
+psACLogicVoltageOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply logic voltage is
+        over MAX."
+    ::= 11084
+
+psACLogicVoltageUnderMin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply logic voltage is 
+        under MIN."
+    ::= 11085
+
+psACLogicVoltageOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply logic voltage has
+        returned to normal after being over or under."
+    ::= 11086
+
+psACTermVoltageOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply term voltage is
+        over MAX."
+    ::= 11087
+
+psACTermVoltageUnderMin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply term voltage is 
+        under MIN."
+    ::= 11088
+
+psACTermVoltageOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply term voltage has
+        returned to normal after being over or under."
+    ::= 11089
+
+psACLogicSenseCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply logic current is
+        over MAX. The ability of the power supply to turn itself off has been 
+        disabled therefore outside intervention is needed."
+    ::= 11090
+
+psACTermSenseCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply term current is
+        over MAX. The ability of the power supply to turn itself off has been 
+        disabled therefore outside intervention is needed."
+    ::= 11091
+
+psACInputCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply input current is
+        over MAX. The power supply has therefore been shutdown."
+    ::= 11092
+
+psACSystemCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply system current is
+        over MAX. The power supply has therefore been shutdown."
+    ::= 11093
+
+psACLogicCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply logic current is
+        over MAX. The power supply has therefore been shutdown."
+    ::= 11094
+
+psACTermCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply term current is 
+        over MAX. The power supply has therefore been shutdown."
+    ::= 11095
+
+psACLogicSenseCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply logic sense current 
+        is over MAX. The power supply has therefore been shutdown."
+    ::= 11096
+
+psACTermSenseCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply term sense current
+        is over MAX. The power supply has therefore been shutdown."
+    ::= 11097
+
+psACInputCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply input current is 
+        over MAX. The ability of the power supply to turn itself off has been 
+        disabled therefore outside intervention is needed."
+    ::= 11098
+
+psACSystemCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply system current is
+        over MAX. The ability of the power supply to turn itself off has been
+        disabled therefore outside intervention is needed."
+    ::= 11099
+
+psACLogicCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply logic current is
+        over MAX. The ability of the power supply to turn itself off has been
+        disabled therefore outside intervention is needed."
+    ::= 11100
+
+psACTermCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an AC power supply term current is
+        over MAX. The ability of the power supply to turn itself off has been 
+        disabled therefore outside intervention is needed."
+    ::= 11101
+
+psACRemotePowerOff TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply is being powered
+        off due to outside intervention."
+    ::= 11102
+
+psACSystemPowerOn TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply system power has
+        been powered on."
+    ::= 11103
+
+psACSystemPowerOff TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply system power has
+        been powered off."
+    ::= 11104
+
+psACLogicPowerOn TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply logic power has
+        been powered on."
+    ::= 11105
+
+psACLogicPowerOff TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply logic power has
+        been powered off."
+    ::= 11106
+
+psACTermPowerOn TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply term power has
+        been powered on."
+    ::= 11107
+
+psACTermPowerOff TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply term power has
+        been powered off."
+    ::= 11108
+
+psACRemOverCurrentShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply has been shutdown
+        remotely due to being over current."
+    ::= 11109
+
+psACRemPowerConservationShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply has been shutdown
+        remotely due to power conservation."
+    ::= 11110
+
+psACADConvertorFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply A/D converter
+        is broken."
+    ::= 11111
+
+psACPICFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because of an AC power supply PIC failure."
+    ::= 11112
+
+psACPICOk TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply PIC is now OK.
+        This trap will only be sent AFTER a PIC failure trap has been
+        generated."
+    ::= 11113
+
+psACLLAPDupAddress TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when the AC power supply LLAP address already
+        exists in this chassis."
+    ::= 11114
+
+psACFanFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because of an AC power supply fan failure."
+    ::= 11115
+
+psACFanOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the AC power supply fan is now OK.
+        This trap will only be sent AFTER a fan failure trap has been
+        generated."
+    ::= 11116
+
+psDCHotTempShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply is hot and the
+        power supply has shut itself down."
+    ::= 11117
+
+psDCWarmTemp TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply is warm."
+    ::= 11118
+
+psDCTempOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply has returned
+        to normal after being warm or hot."
+    ::= 11119
+
+psDCTempOKNoAdmin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply has returned 
+        to normal after being shutdown remotely. It will need to be powerOn
+        remotely."
+    ::= 11120
+
+psDCTempSensorBroken TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when the DC power supply's temperature
+        sensor is broken."
+    ::= 11121
+
+psDCTempHot TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply is hot."
+    ::= 11122
+
+psDCInputVoltageOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply input voltage
+        is over max."
+    ::= 11123
+
+psDCInputVoltageUnderMin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply input voltage
+        is under minimum."
+    ::= 11124
+
+psDCInputVoltageOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply input voltage has
+        returned to normal after being over or under."
+    ::= 11125
+
+psDCSystemVoltageOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply system voltage is
+        over MAX."
+    ::= 11126
+
+psDCSystemVoltageUnderMin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply system voltage is
+        under MIN."
+    ::= 11127
+
+psDCSystemVoltageOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply system voltage has
+        returned to normal after being over or under."
+    ::= 11128
+
+psDCLogicVoltageOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply logic voltage is
+        over MAX."
+    ::= 11129
+
+psDCLogicVoltageUnderMin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply logic voltage is 
+        under MIN."
+    ::= 11130
+
+psDCLogicVoltageOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply logic voltage has
+        returned to normal after being over or under."
+    ::= 11131
+
+psDCTermVoltageOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply term voltage is
+        over MAX."
+    ::= 11132
+
+psDCTermVoltageUnderMin TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply term voltage is 
+        under MIN."
+    ::= 11133
+
+psDCTermVoltageOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply term voltage has
+        returned to normal after being over or under."
+    ::= 11134
+
+psDCLogicSenseCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply logic current is
+        over MAX. The ability of the power supply to turn itself off has been 
+        disabled therefore outside intervention is needed."
+    ::= 11135
+
+psDCTermSenseCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply term current is
+        over MAX. The ability of the power supply to turn itself off has been 
+        disabled therefore outside intervention is needed."
+    ::= 11136
+
+psDCInputCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply input current is
+        over MAX. The power supply has therefore been shutdown."
+    ::= 11137
+
+psDCSystemCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply system current is
+        over MAX. The power supply has therefore been shutdown."
+    ::= 11138
+
+psDCLogicCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply logic current is
+        over MAX. The power supply has therefore been shutdown."
+    ::= 11139
+
+psDCTermCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply term current is 
+        over MAX. The power supply has therefore been shutdown."
+    ::= 11140
+
+psDCLogicSenseCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply logic sense current 
+        is over MAX. The power supply has therefore been shutdown."
+    ::= 11141
+
+psDCTermSenseCurrentOverMaxShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply term sense current
+        is over MAX. The power supply has therefore been shutdown."
+    ::= 11142
+
+psDCInputCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply input current is 
+        over MAX. The ability of the power supply to turn itself off has been 
+        disabled therefore outside intervention is needed."
+    ::= 11143
+
+psDCSystemCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply system current is
+        over MAX. The ability of the power supply to turn itself off has been
+        disabled therefore outside intervention is needed."
+    ::= 11144
+
+psDCLogicCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply logic current is
+        over MAX. The ability of the power supply to turn itself off has been
+        disabled therefore outside intervention is needed."
+    ::= 11145
+
+psDCTermCurrentOverMax TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because an DC power supply term current is
+        over MAX. The ability of the power supply to turn itself off has been 
+        disabled therefore outside intervention is needed."
+    ::= 11146
+
+psDCRemotePowerOff TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply is being powered
+        off due to outside intervention."
+    ::= 11147
+
+psDCSystemPowerOn TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply system power has
+        been powered on."
+    ::= 11148
+
+psDCSystemPowerOff TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply system power has
+        been powered off."
+    ::= 11149
+
+psDCLogicPowerOn TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply logic power has
+        been powered on."
+    ::= 11150
+
+psDCLogicPowerOff TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply logic power has
+        been powered off."
+    ::= 11151
+
+psDCTermPowerOn TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply term power has
+        been powered on."
+    ::= 11152
+
+psDCTermPowerOff TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply term power has
+        been powered off."
+    ::= 11153
+
+psDCRemOverCurrentShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply has been shutdown
+        remotely due to being over current."
+    ::= 11154
+
+psDCRemPowerConservationShutdown TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply has been shutdown
+        remotely due to power conservation."
+    ::= 11155
+
+psDCADConvertorFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply A/D converter
+        is broken."
+    ::= 11156
+
+psADPICFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because of an DC power supply PIC failure."
+    ::= 11157
+
+psADPICOk TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply PIC is now OK.
+        This trap will only be sent AFTER a PIC failure trap has been
+        generated."
+    ::= 11158
+
+psADLLAPDupAddress TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when the DC power supply LLAP address already
+        exists in this chassis."
+    ::= 11159
+
+psADFanFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because of an DC power supply fan failure."
+    ::= 11160
+
+psDCFanOK TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated because the DC power supply fan is now OK.
+        This trap will only be sent AFTER a fan failure trap has been
+        generated."
+    ::= 11161
+
+psADConvertorFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotID }
+    DESCRIPTION
+        "This trap is generated because the power supply A/D converter
+        is broken."
+    ::= 11162
+
+psPicFailure TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotID }
+    DESCRIPTION
+        "This trap is generated because of a power supply PIC failure."
+    ::= 11163
+
+psPICok TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotID }
+    DESCRIPTION
+        "This trap is generated because the power supply PIC is now OK.
+        This trap will only be sent AFTER a PIC failure trap has been
+        generated."
+    ::= 11164
+
+psLLAPDupAddress TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotID }
+    DESCRIPTION
+        "This trap is generated when the power supply LLAP address already
+        exists in this chassis."
+    ::= 11165
+
+chEnvAmbientTempChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { chEnvAmbientStatus, chEnvAmbientTemp }
+    DESCRIPTION
+        "This trap is generated for each and every time the chassis
+         ambient temperature crosses over a threshold value
+         of either one of the chassis set thresholds chEnvAmbientHot,
+         chEnvAmbientWarm, chEnvAmbientCool, or chEnvAmbientCold
+         to another. This trap is also sent when the chassis temperature
+         sensor is detected to be broken or not supported."
+    ::= 11166
+
+chEnvHumidityChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { chEnvHumidityStatus, chEnvHumidity }
+    DESCRIPTION
+        "This trap is generated for each and every time the chassis
+         humidity crosses a threshold value of either chEnvHumidityMoist,
+         or chEnvHumidityDry, or when the humidity sensor is detected to
+         be broken or not supported."
+    ::= 11167
+
+boardEnvTempChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardEnvSlotID, boardEnvTemp, boardEnvTempStatus }
+    DESCRIPTION
+        "This trap is generated for each and every time the board
+         temperature crosses over a threshold value of either
+         one of the board set thresholds boardEnvTempHot,
+         boardEnvTempWarm, boardEnvTempCool, or boardEnvTempCold
+         to another. This trap is also sent when the board temperature
+         sensor is detected to be broken or not supported."
+    ::= 11168
+
+boardEnvTempRelChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardEnvSlotID, boardEnvTempRelStatus, 
+                boardEnvTemp, chEnvAmbientTemp }
+    DESCRIPTION
+        "This trap is generated for each and every time the board
+         temperature relative to the chassis ambient temperature
+         crosses a threshold value of either boardEnvTempRelHot,
+         or boardEnvTempRelWarm. This trap is also sent when either
+         temperature sensor located on the board or on the chassis
+         is detected to be broken or not supported."
+    ::= 11169
+
+boardEnvTempMaxFanRelChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardEnvSlotID, boardEnvTempRelStatus, 
+                boardEnvTemp, chEnvAmbientTemp }
+    DESCRIPTION
+        "This trap is generated for each and every time the board
+         temperature relative to the chassis ambient temperature
+         crosses a threshold value of either boardEnvTempMaxFanRelHot,
+         or boardEnvTempMaxFanRelWarm when all fans in the chassis are
+         operating at there maximum speed. This trap is also sent when
+         either temperature sensor located on the board or on the chassis
+         is detected to be broken or not supported."
+    ::= 11170
+
+chPowerMainVoltageChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { chPowerMainVoltageStatus, chPowerMainVoltage }
+    DESCRIPTION
+        "This trap is generated for each and every time the chassis
+         main voltage rail deviates and causes the chPowerMainVoltageStatus
+         to switch state from powerOK(1), overCurrent(2), overVoltage(3),
+       or underVoltage(4) to another."
+    ::= 11171
+
+chPowerDiagVoltageChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { chPowerDiagVoltageStatus, chPowerDiagVoltage }
+    DESCRIPTION
+        "This trap is generated for each and every time the chassis
+         diag voltage deviates and causes the chPowerDiagVoltageStatus
+         to switch state from powerOK(1), overCurrent(2), overVoltage(3),
+         or underVoltage(4) to another."
+    ::= 11172
+
+termPowerVoltageChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { termPowerStatus, termPowerVoltage }
+    DESCRIPTION
+        "This trap is generated for each and every time the module's
+         termination unit changes state and causes the termPowerStatus
+         to switch from any states to either powerOK(1), overVoltage(3), or
+         underVolatge(4) state."
+    ::= 11173
+
+boardPowerVoltageChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotID, boardPowerID,
+                boardPowerStatus, boardPowerVoltage }
+    DESCRIPTION
+        "This trap is generated for each and every time the module's
+         power line voltage deviates and causes the boardPowerStatus
+         to switch from any states to either powerOK(1), overVoltage(4),
+         or underVoltage(5) state."
+    ::= 11174
+
+termPowerModule1Changes TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { termPowerModule1Status  }
+    DESCRIPTION
+        "This trap is generated for each and every time the module's
+         front panel button changes state and causes the termPowerModule1Status
+         to switch state from either one of normal(1), iNBaFault(2),
+         iNBbFault(3), fault(4), termModuleNotInstalled(5) to another."
+    ::= 11175
+
+termPowerModule2Changes TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { termPowerModule2Status  }
+    DESCRIPTION
+        "This trap is generated for each and every time the module's
+         front panel button changes state and causes the termPowerModule2Status
+         to switch state from either one of normal(1), iNBaFault(2),
+         iNBbFault(3), fault(4), termModuleNotInstalled(5) to another."
+    ::= 11176
+
+chEnvFanChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { chEnvFanID, chEnvFanStatus, chEnvFanSpeed }
+    DESCRIPTION
+        "This trap is generated for each and every time the chassis
+         fan changes over its status from either one value unknown(1),
+         normal(2), testing(3), slow(4), inoperative(5), or off(6)
+         to another."
+    ::= 11177
+
+boardPowerCurrentChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotID, boardPowerID,
+                boardPowerStatus, boardPowerCurrent }
+    DESCRIPTION
+        "This trap is generated for each and every time the module's
+         power line current deviates and causes the boardPowerStatus
+         to switch from any states to powerOK(1), or overCurrent(3) state."
+    ::= 11182
+
+boardPowerFrontPanelChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID, boardPowerLocalAdminStatus, 
+                boardPowerLocalStatus }
+    DESCRIPTION
+        "This trap is generated for each and every time the module's
+         front panel button state changes, it is caused when the
+         boardPowerLocalStatus switching state from either one
+         of resetRequest(1), powerDownRequest(2), powerOnRequest(3),
+         or normal(4) to another."
+    ::= 11183
+
+boardPowerOperationalChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { boardPowerSlotStatusID, boardPowerOperationalStatus }
+    DESCRIPTION
+        "This trap is generated for each and every time the module's
+         DC-DC converter power supply voltage deviates and causes the
+         boardPowerOperationalStatus to switch state from powerOn(1),
+         powerOff(2), reset(3), overVoltage(4), underVoltage(5),
+         overCurrent(6), overCurrentShutdown(7), temperatureShutdown(8),
+         remotePowerOff(9), powerConservationShutdown(10), or
+         frontPanelPowerOff(11) to another."
+    ::= 11184
+
+psEnvTempChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES {  psEnvSlotID, psEnvTempStatus, psEnvTemp }
+    DESCRIPTION
+        "This trap is generated for each and every time the power
+         supply temperature crosses over a threshold value of either
+         one of the power supply set thresholds psEnvTempHot,
+         psEnvTempWarm, psEnvTempCool, or psEnvTempCold to another.
+         This trap is also sent when the power supply temperature
+         sensor is detected to be broken or not supported."
+    ::= 11185
+
+psEnvFanChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psEnvSlotID, psEnvFanStatus, psEnvFanSpeed }
+    DESCRIPTION
+        "This trap is generated for each and every time the power
+         supply fan changes over its status from either one value
+         unknown(1), normal(2), testing(3), slow(4), inoperative(5),
+         or off(6) to another."
+    ::= 11186
+
+psPowerVoltageChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotID, psPowerID,
+                psPowerStatus, psPowerVoltage }
+    DESCRIPTION
+        "This trap is generated for each and every time the module's
+         power line voltage deviates and causes the psPowerStatus
+         to switch from any states to either powerOK(1), overVoltage(4),
+         or underVoltage(5) state."
+    ::= 11187
+
+psPowerCurrentChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotID, psPowerID,
+                psPowerStatus, psPowerCurrent }
+    DESCRIPTION
+        "This trap is generated for each and every time the module's
+         power line current deviates and causes the psPowerStatus
+         to switch from any states to powerOK(1), or overCurrent(3) state."
+    ::= 11188
+
+psPowerAdminChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES { psPowerSlotID, psPowerID, psPowerAdmin }
+    DESCRIPTION
+        "This trap is generated for each and every time the power
+         supply power line changes state from one operational mode
+         to another switching between powerOn(1) and powerOff(2)."
+    ::= 11189
+
+psPowerOperationalChanges TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES {  psPowerSlotStatusID, psPowerOperationalStatus}
+    DESCRIPTION
+        "This trap is generated for each and every time the module's
+         DC-DC converter power supply voltage deviates and causes the
+         psPowerOperationalStatus to switch state from either one
+         of powerOn(1), powerOff(2), reset(3), overVoltage(4),
+         underVoltage(5), overCurrent(6), overCurrentShutdown(7),
+         temperatureShutdown(8), or remotePowerOff(9) to another."
+    ::= 11190
+
+boardInserted TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when an MMACplus card
+         is inserted in the chassis."
+    ::= 11191 
+
+boardRemoved TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { boardPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when an MMACplus card
+         is removed from the chassis."
+    ::= 11192 
+
+psInserted TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when an MMACplus power supply
+         is inserted in the chassis."
+    ::= 11193 
+
+psRemoved TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when an MMACplus power supply
+         is removed from the chassis."
+    ::= 11194 
+
+psRedundant TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when an MMACplus power supply
+        has a redundant power supply"
+    ::= 11195
+
+psNotRedundant TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { chPowerLineMaxSupply, chPowerLineTotalSupply }
+    DESCRIPTION
+        "This trap is generated when an MMACplus power supply
+        has no redundant power supply"
+    ::= 11196
+
+psNormal TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when an MMACplus board is
+        transitioning to a normal state from a fault state"
+    ::= 11197
+
+psFault TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { psPowerSlotStatusID }
+    DESCRIPTION
+        "This trap is generated when an MMACplus power supply
+        is not operational"
+    ::= 11198
+
+upsLineFail  TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES  { upsIndex }
+    DESCRIPTION
+        "This trap is generated in the event of an AC utility
+         line failure."
+    ::= 11200
+
+upsLineFailRecovery  TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES  { upsIndex }
+    DESCRIPTION
+        "This trap is generated when the UPS switches back
+         to line, and only if the upsLineFail trap was issued
+         first."
+    ::= 11201
+
+upsLowBattery  TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES  { upsIndex }
+    DESCRIPTION
+        "This trap is generated in the event that the UPS's
+         battery is found to be low."
+    ::= 11202
+
+upsLowBatteryRecovery  TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES  { upsIndex }
+    DESCRIPTION
+        "This trap is generated when the UPS's battery has
+         charged above the low-battery point, and only if the
+         upsLowBattery trap was issued first."
+    ::= 11203
+
+upsAbnormalCondition  TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES  { upsIndex, upsStatusFault, upsAddlFuncsStatusFault }
+    DESCRIPTION
+        "This trap is generated in the event that the UPS
+         has entered an abnormal condition, such as an
+         overload or trip on low battery.  This trap is also
+         sent when the UPS is first turned on."
+    ::= 11204
+
+upsAbnormalConditionRecovery  TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES  { upsIndex }
+    DESCRIPTION
+        "This trap is generated when the UPS has recovered
+         from an abnormal condition, and only if the
+         upsAbnormalCondition trap was issued first."
+    ::= 11205
+
+upsShuttingDown  TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES  { upsIndex }
+    DESCRIPTION
+        "This trap is generated in the event that the UPS
+         has been ordered to shut itself, or the load, off
+         over the serial line."
+    ::= 11206
+
+upsReplaceBattery  TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES  { upsIndex }
+    DESCRIPTION
+        "This trap is generated when the UPS's battery test
+         has determined that a UPS battery is unable to retain
+         adequate charge.  This trap will be generated every
+         five hours until a new battery test is run or the
+         UPS is turned off."
+    ::= 11207
+
+upsExtMeasAlarm  TRAP-TYPE
+    ENTERPRISE  cabletron
+    VARIABLES  { upsIndex, upsExtMeasAlarmStatus }
+    DESCRIPTION
+        "This trap is generated when the External Measurement Unit
+         has detected that an ambient temperature or humidity limit
+         extreme has been exceeded, or that one of the contact closure
+         inputs has changed from the selected `normal' state.  In
+         the case of multiple alarms, a trap is generated for every
+         alarm condition detected.  In addition, the trap is sent
+         every two minutes whenever an alarm condition exists.  It
+         is discontinued when all alarm conditions are reset.  This
+         trap is sent only for alarm states that have been enabled."
+    ::= 11208
+
+nvmpUdefTrap  TRAP-TYPE
+    ENTERPRISE cabletron
+    DESCRIPTION
+        "This trap is generated when a new NVMP trap is sent that
+        does not have an SNMP counterpart."
+    ::= 11999
+
+--
+-- ================================================================
+-- Trap values from 12000 - 12500 are reserved for ATM specific traps.
+--
+
+activePortInATMRedundancyFailed TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { ctATMPhyRedundIfIndex }
+    DESCRIPTION
+         "This trap will be generated when the active port, on a physical ATM
+          interface that has redundancy enabled, has failed (become quiet)."
+    ::= 12000
+           
+aTMRedundantPortActivated TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { ctATMPhyRedundIfIndex }
+    DESCRIPTION
+         "This trap indicates that a new port has been activated on a 
+          physical ATM interface that has redundancy enabled.  This does 
+          not indicate that this port is usable, but that it is being 
+          tested as a possible replacement."
+    ::= 12001
+
+aTMRedundanctPortTestFailed TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { ctATMPhyRedundIfIndex }
+    DESCRIPTION
+         "This trap will be generated when the phyRedundIfTestTOD or the
+          phyRedundIfPerformTest has tested a port and determined that it
+          is not usable.  The port should be fixed prior to it being needed."
+    ::= 12002
+
+aTMRedundPrimaryPortSkipped TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { ctATMPhyRedundIfIndex }
+    DESCRIPTION
+         "This trap will be generated when redundancy finds that the primary
+          port as designated be PhyRedundIfPrimaryPort is usable but cannot be
+          used because PhyRedundIfPrimaryRevert is set to manual (2).  This
+          trap is generated only when redundancy is enabled (PhyRedundIfStatus 
+          is enable (1)) and the active port fails."
+    ::= 12003
+
+--atmHostAddressRegister TRAP-TYPE
+--    ENTERPRISE cabletron
+--    VARIABLES { atmIfAdminAddrRowStatus }
+--    DESCRIPTION
+--      "This trap signifies that the agent has detected
+--       an atm address registration on a port."
+--    ::= 12004 
+
+-- atmHostAddressDeRegister TRAP-TYPE
+--    ENTERPRISE cabletron
+--    VARIABLES  { atmIfAdminAddrRowStatus }
+--    DESCRIPTION
+--      "This trap signifies that the agent has detected
+--       an atm address deregistration on a port."
+--    ::= 12005
+
+atmCTMUp TRAP-TYPE
+    ENTERPRISE cabletron
+    DESCRIPTION
+      "This trap signifies that the agent has detected
+       the CTM operational. Connection set maps are allowed
+       through the switch"
+    ::= 12006
+
+atmCTMDown TRAP-TYPE
+    ENTERPRISE cabletron
+    DESCRIPTION
+      "This trap signifies that the agent has detected
+       the CTM unoperational. A list of Cross Connect Ids
+       will be sent indicating connections that need to be removed."
+    ::= 12007
+
+atmVcCrossConnectOperChange TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { atmVcCrossConnectRowStatus }
+    DESCRIPTION
+      "This trap signifies that the agent has detected
+       a change in the operational status to down. A list of VC cross
+       connections will be sent to be remapped."
+    ::= 12008
+
+atmVpCrossConnectOperChange TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { atmVpCrossConnectRowStatus }
+    DESCRIPTION
+      "This trap signifies that the agent has detected
+       a change in the operational status to down. A list of VP cross
+       connections will be sent to be remapped."
+   ::= 12009
+
+atmNeighborSwitchUp TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { atmInterfaceMyNeighborIpAddress,
+                atmInterfaceMyNeighborIfName }
+    DESCRIPTION
+      "This trap signifies that the agent has detected
+       a neighbor switch on a port."
+    ::= 12010
+
+atmNeighborSwitchDown TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES  { atmInterfaceMyNeighborIpAddress,
+                 atmInterfaceMyNeighborIfName }
+    DESCRIPTION
+      "This trap signifies that the agent has detected
+       a lost neighbor switch on a port."
+    ::= 12011
+
+callFailure TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex }
+     DESCRIPTION
+       "SPVC Call Failures."
+     ::= 12012
+
+allocBwHiFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Allocated bandwidth for this port has exceeded the 
+        allocBwThresholdHiFwd."
+     ::= 12013
+
+allocBwHiRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Allocated bandwidth for this port has exceeded the
+       allocBwThresholdHiRev."
+     ::= 12014
+
+allocBwLoFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Allocated bandwidth for this port is below the 
+        allocBwThresholdLoFwd."
+     ::= 12015
+
+allocBwLoRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Allocated bandwidth for this port is below the 
+        allocBwThresholdLoRev."
+     ::= 12016
+
+aggPcrFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "The total of all the aggregate peak cell rates for the VCs using 
+        this port exceeds the physical bandwidth of the port in the forward 
+        direction."
+     ::= 12017
+
+aggPcrRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "The total of all the aggregate peak cell rates for the VCs using 
+        this port exceeds the physical bandwidth of the port in the reverse
+        direction."
+     ::= 12018
+
+peakFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "The peak allocated bandwidth has exceeded the peakBwTholdFwd
+        value."
+     ::= 12019
+
+peakRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "The peak allocated bandwidth has exceeded the peakBwTholdRev
+        value."
+     ::= 12020
+
+cbrConnCountTholdHiFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active constant bit rate connections exceeding
+        the CBRConnectionCountTholdHiFwd threshold."
+     ::= 12021
+
+cbrConnCountTholdHiRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active CBR connections exceeding the 
+        CBRConnectionCountTholdHiRev threshold."
+     ::= 12022
+
+cbrConnCountTholdLoFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active CBR connections exceeding the 
+        CBRConnectionCountTholdLoFwd threshold."
+     ::= 12023
+
+cbrConnCountTholdLoRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active CBR connections exceeding the 
+        CBRConnectionCountTholdLoRev threshold."
+     ::= 12024
+
+cbrAllocBwTholdHiFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which CBR exceeds the 
+        CBRAllocatedBwTholdHiFwd threshold."
+     ::= 12025
+
+cbrAllocBwTholdHiRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which CBR exceeds the 
+        CBRAllocatedBwTholdHiRev threshold."
+     ::= 12026
+
+cbrAllocBwTholdLoFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which CBR exceeds the 
+        CBRAllocatedBwTholdLoFwd threshold."
+      ::= 12027
+
+cbrAllocBwTholdLoRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which CBR exceeds the 
+        CBRAllocatedBwTholdLoRev threshold."
+     ::= 12028
+
+vbrConnCountTholdHiFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active variable bit rate connections exceeding 
+       the VBRConnectionCountTholdHiFwd threshold."
+     ::= 12029
+
+vbrConnCountTholdHiRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active VBR connections exceeding the
+       VBRConnectionCountTholdHiRev threshold."
+     ::= 12030
+
+vbrConnCountTholdLoFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active VBR connections exceeding the
+       VBRConnectionCountTholdLoFwd threshold."
+     ::= 12031
+
+vbrConnCountTholdLoRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active VBR connections exceeding the
+       VBRConnectionCountTholdLoRev threshold."
+     ::= 12032
+
+vbrAllocBwTholdHiFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which VBR exceeds the
+        VBRAllocatedBwTholdHiFwd threshold."
+     ::= 12033
+
+vbrAllocBwTholdHiRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which VBR exceeds the
+        VBRAllocatedBwTholdHiRev threshold."
+     ::= 12034
+
+vbrAllocBwTholdLoFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which VBR exceeds the
+        VBRAllocatedBwTholdLoFwd threshold."
+     ::= 12035
+
+vbrAllocBwTholdLoRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which VBR exceeds the
+        VBRAllocatedBwTholdLoRev threshold."
+     ::= 12036
+
+abrConnCountTholdHiFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active available bit rate connections 
+        exceeding the ABRConnectionCountTholdHiFwd threshold."
+     ::= 12037
+
+abrConnCountTholdHiRev  TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active ABR connections exceeding the 
+        ABRConnectionCountTholdHiRev threshold."
+     ::= 12038
+
+abrConnCountTholdLoFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active ABR connections exceeding the 
+        ABRConnectionCountTholdLoFwd threshold."
+     ::= 12039
+
+abrConnCountTholdLoRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active ABR connections exceeding the 
+        ABRConnectionCountTholdLoRev threshold."
+     ::= 12040
+
+abrAllocBwTholdHiFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which ABR exceeds the
+        ABRAllocatedBwTholdHiFwd threshold."
+     ::= 12041
+
+abrAllocBwTholdHiRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which ABR exceeds the
+        ABRAllocatedBwTholdHiRev threshold."
+     ::= 12042
+
+abrAllocBwTholdLoFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which ABR exceeds the
+        ABRAllocatedBwTholdLoFwd threshold."
+     ::= 12043
+
+abrAllocBwTholdLoRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which ABR exceeds the
+        ABRAllocatedBwTholdLoRev threshold."
+     ::= 12044
+
+ubrConnCountTholdHiFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active unavailable bit rate connections 
+        exceeding the UBRConnectionCountTholdHiFwd threshold."
+     ::= 12045
+
+ubrConnCountTholdHiRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active UBR connections exceeding the 
+        UBRConnectionCountTholdHiRev threshold."
+     ::= 12046
+
+ubrConnCountTholdLoFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active UBR connections exceeding the 
+        UBRConnectionCountTholdLoFwd threshold."
+     ::= 12047
+
+ubrConnCountTholdLoRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Count of currently active UBR connections exceeding the 
+        UBRConnectionCountTholdLoRev threshold."
+     ::= 12048
+
+ubrAllocBwTholdHiFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which UBR exceeds the
+        UBRAllocatedBwTholdHiFwd threshold."
+     ::= 12049
+
+-- 12050 is ATM services specific...see below
+
+ubrAllocBwTholdLoFwd TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which UBR exceeds the
+        UBRAllocatedBwTholdLoFwd threshold."
+     ::= 12051
+
+ubrAllocBwTholdLoRev TRAP-TYPE
+     ENTERPRISE cabletron
+     VARIABLES { ifIndex } 
+     DESCRIPTION
+       "Bandwidth currently allocated which UBR exceeds the
+        UBRAllocatedBwTholdLoRev threshold."
+     ::= 12052
+
+
+ubrAllocBwTholdHiRev TRAP-TYPE
+  ENTERPRISE cabletron
+  VARIABLES { ifIndex }
+  DESCRIPTION
+    "Bandwidth currently allocated which UBR exceeds the
+     UBRAllocatedBwTholdHiRev threshold."
+   ::= 12053
+
+--Values 12010-12050 reserved for future ATM traps. 
+
+atmLecStatus TRAP-TYPE
+    ENTERPRISE cabletron
+    VARIABLES { lecRowStatus }
+    DESCRIPTION
+        "This trap is generated when the operational
+        state of the LAN Emulation Client has changed."
+    ::= 12050
+
+--Values 13000-13001 reserved for future ATM traps. 
+
+boardOperational TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID, deviceType }
+        DESCRIPTION
+            "This trap will be generated when an entity detects
+             that a module has become operational."
+        ::= 13000
+
+boardNonOperational TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { chSlotID }
+        DESCRIPTION
+            "This trap will be generated when an entity detects
+             that a module is no longer operational."
+        ::= 13001
+
+END
