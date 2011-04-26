@@ -1,0 +1,3834 @@
+ALCATEL-ISIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        Integer32, IpAddress, MODULE-IDENTITY,
+        NOTIFICATION-TYPE, TimeTicks,
+        OBJECT-TYPE, Unsigned32, Counter32              FROM SNMPv2-SMI
+
+        MODULE-COMPLIANCE, OBJECT-GROUP,
+        NOTIFICATION-GROUP                              FROM SNMPv2-CONF
+
+        DisplayString, RowStatus, TruthValue, TimeStamp,
+        TimeInterval,TEXTUAL-CONVENTION                 FROM SNMPv2-TC
+        
+	  routingIND1ISIS						  FROM ALCATEL-IND1-BASE
+
+	  InterfaceIndex	                                FROM IF-MIB
+
+        isisISAdjEntry, isisSysInstance,
+        isisSysL1State, isisSysL2State,
+        isisISAdjState, isisManAreaAddrExistState,
+        SystemID, SNPAAddress                           FROM ISIS-MIB
+
+        InetAddressType, InetAddress, 
+        InetAddressPrefixLength                         FROM INET-ADDRESS-MIB
+        ;
+
+timetraIsisMIBModule MODULE-IDENTITY
+     LAST-UPDATED    "200707020000Z"
+        ORGANIZATION    "Alcatel - Architects Of An Internet World"
+        CONTACT-INFO    
+        "Please consult with Customer Service to insure the most appropriate
+         version of this document is used with the products in question:
+ 
+                 Alcatel-Lucent, Enterprise Solutions Division
+                (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+ 
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+ 
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+        
+    DESCRIPTION
+     "This module describes an authoritative enterprise-specific Simple
+        Network Management Protocol (SNMP) Management Information Base (MIB):
+ 
+             For the Birds Of Prey Product Line
+             Configuration Of Global ISIS Configuration Parameters.
+      
+        This MIB has been taken from Alcatel 7x50 device ISIS MIB 
+        with minor modifications.
+ 
+                Copyright 2003-2007 Alcatel-Lucent.
+        	        ALL RIGHTS RESERVED WORLDWIDE
+
+        Reproduction of this document is authorized on the condition that
+        the foregoing copyright notice is included.
+ 
+        This SNMP MIB module (Specification) embodies Alcatel's
+        proprietary intellectual property.  Alcatel retains
+        all title and ownership in the Specification, including any
+        revisions.
+ 
+        Alcatel grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Alcatel
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+ 
+        This Specification is supplied 'as is', and Alcatel
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."    
+ 
+        
+--
+--  Revision History
+--
+
+        REVISION        "200707020000Z"
+        DESCRIPTION     "Rev 4.1                02 Aug 2007 00:00
+                         Updated copyright information."
+
+        REVISION        "0603160000Z"   
+        DESCRIPTION     "Rev 4.0                16 Mar 2006 00:00
+                         Porting MIB to ALCATEL AOS & renamed as ALCATEL-ISIS-MIB."
+
+        REVISION        "0508310000Z"   
+        DESCRIPTION     "Rev 3.0                31 Aug 2005 00:00
+                         3.0 release of the TIMETRA-ISIS-MIB."
+
+        REVISION        "0501240000Z"   
+        DESCRIPTION     "Rev 2.1                24 Jan 2005 00:00
+                         2.1 release of the TIMETRA-ISIS-MIB."
+
+        REVISION        "0406020000Z"
+        DESCRIPTION     "Rev 2.1                02 Jun 2004 00:00
+                         2.1 release of the TIMETRA-ISIS-MIB."
+
+        REVISION        "0401150000Z"
+        DESCRIPTION     "Rev 2.0                15 Jan 2004 00:00
+                         2.0 release of the TIMETRA-ISIS-MIB."
+
+        REVISION        "0308150000Z"
+        DESCRIPTION     "Rev 1.2                15 Aug 2003 00:00
+                         1.2 release of the TIMETRA-ISIS-MIB."
+
+        REVISION        "0301200000Z"
+        DESCRIPTION     "Rev 1.0                20 Jan 2003 00:00
+                         1.0 Release of the TIMETRA-ISIS-MIB."
+
+        REVISION        "0109210000Z"
+        DESCRIPTION     "Rev 0.1                21 Sep 2001 00:00
+                         Initial version of the TIMETRA-ISIS-MIB."
+
+        ::= { routingIND1ISIS 1 }
+
+
+TmnxAdminState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "The TmnxAdminState data type is an enumerated integer that describes
+        the values used to identify the administratively desired state of
+        functional modules."
+    SYNTAX  INTEGER {
+                noop (1),
+                inService (2),
+                outOfService (3)
+                }
+
+TmnxOperState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "The TmnxOperState data type is an enumerated integer that describes
+        the values used to identify the current operational state of functional
+        modules."
+    SYNTAX  INTEGER {
+                unknown (1),
+                inService (2),
+                outOfService (3),
+                transition (4)
+                }
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  Alcatel 7x50 SR series IS-IS protocol extensions
+--
+
+vRtrIsisObjs               OBJECT IDENTIFIER ::= { timetraIsisMIBModule 10 }
+vRtrIsisScalarObjs         OBJECT IDENTIFIER ::= { vRtrIsisObjs 1 }
+vRtrIsisSystemObjs         OBJECT IDENTIFIER ::= { vRtrIsisObjs 2 }
+vRtrIsisIfObjs             OBJECT IDENTIFIER ::= { vRtrIsisObjs 3 }
+vRtrIsisAdjObjs            OBJECT IDENTIFIER ::= { vRtrIsisObjs 4 }
+vRtrIsisNotificationObjs   OBJECT IDENTIFIER ::= { vRtrIsisObjs 5 }
+vRtrIsisDatabaseClearObjs  OBJECT IDENTIFIER ::= { vRtrIsisObjs 6 }
+
+
+vRtrIsisNotifications      OBJECT IDENTIFIER ::= { timetraIsisMIBModule 11 }
+vRtrIsisMIBConformance     OBJECT IDENTIFIER ::= { timetraIsisMIBModule 12 }
+
+
+vRtrIsisStatisticsClear    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                              default(0),
+                              reset(1)
+                            } 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object defines ISIS statistics information clear or reset.
+        Note:It clears global statistics information and all interfacess 
+        statistics information."
+    ::= { vRtrIsisScalarObjs 1 }
+
+vRtrIsisLSPClear OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         default(0),
+                         reset(1)
+                       } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object defines the ISIS lsp database clear."
+   ::= { vRtrIsisScalarObjs 2 }
+
+vRtrIsisISAdjClear OBJECT-TYPE
+         SYNTAX  INTEGER {
+                           default(0),
+                           reset(1)
+                         } 
+         MAX-ACCESS read-write
+         STATUS current
+         DESCRIPTION
+             "This object defines the ISIS adjacency database clear."
+     ::= { vRtrIsisScalarObjs 3 }
+
+vRtrIsisSpfClear OBJECT-TYPE
+      SYNTAX    INTEGER {
+                          default(0),
+                          reset(1)
+                        } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object defines the ISIS SpfLog database clear."
+    ::= { vRtrIsisScalarObjs 4 }
+
+
+
+--
+--  Extensions to isisSystemTable in ISIS-MIB
+--
+--  NOTE:   The vRtrIsisTable is in reality an augmentation of the
+--          isisSystemTable.  However defining it as an augment table causes
+--          implementation problems in the agent because the number of writable
+--          objects in the combined tables becomes > 32. Instead, vRtrIsisTable
+--          is defined with the same index as the isisSystemTable,
+--          isisSysInstance, which also has the same value as the vRtrID for
+--          a particular instance of the IS-IS protocol the system.
+--
+--  A one-to-one dependent relationship exists between a row in the base
+--  table, isisSystemTable, and the extention table, vRtrIsisTable.
+--  This in effect extends the isisSystemTable with additional columns.
+--  Creation (or deletion) of a row in the isisSystemTable results in the same
+--  fate for the equivantly indexed row in the vRtrIsisTable.
+--
+
+vRtrIsisTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisTable provides an extention of the isisSystemTable in
+         the ISIS-MIB."
+    ::= { vRtrIsisSystemObjs 1 }
+
+vRtrIsisEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisTable represents additional columns
+         for attributes specific to the Alcatel 7x50 series IS-IS protocol 
+         instance on this router."
+    INDEX { isisSysInstance }
+   ::= { vRtrIsisTable 1 }
+
+VRtrIsisEntry ::=
+    SEQUENCE {
+            vRtrIsisLastEnabledTime         DisplayString,
+            vRtrIsisAuthKey                 OCTET STRING,
+            vRtrIsisAuthType                INTEGER,
+            vRtrIsisAuthCheck               TruthValue,
+            vRtrIsisLspLifetime             Unsigned32,
+            vRtrIsisOverloadTimeout         Unsigned32,
+            vRtrIsisOperState               TmnxOperState,
+            vRtrIsisShortCuts               TruthValue,
+            vRtrIsisSpfHoldTime             Integer32,
+            vRtrIsisLastSpfRun              DisplayString,
+            vRtrIsisGracefulRestart         TruthValue,
+            vRtrIsisOverloadOnBoot          INTEGER,
+            vRtrIsisOverloadOnBootTimeout   Unsigned32,
+            vRtrIsisSpfWait                 Unsigned32,
+            vRtrIsisSpfInitialWait          Unsigned32,
+            vRtrIsisSpfSecondWait           Unsigned32,
+            vRtrIsisLspMaxWait              Unsigned32,
+            vRtrIsisLspInitialWait          Unsigned32,
+            vRtrIsisLspSecondWait           Unsigned32,
+            vRtrIsisCsnpAuthentication      TruthValue,
+            vRtrIsisHelloAuthentication     TruthValue,
+            vRtrIsisPsnpAuthentication      TruthValue,
+            vRtrIsisGRRestartDuration       Unsigned32,
+            vRtrIsisGRHelperMode            TruthValue,
+            vRtrIsisStrictAdjacencyCheck    TruthValue
+         }
+
+vRtrIsisLastEnabledTime    OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..40))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The vRtrIsisLastEnabledTime variable contains the sysUpTime
+             value when vRtrIsisAdminState was last set to enabled (1) to
+             run the IS-IS protocol in the router."
+        ::= { vRtrIsisEntry 1 }
+
+vRtrIsisAuthKey     OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..118))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "vRtrIsisAuthKey is the authentication key string used to verify
+             the authenticity of packets sent by neighboring routers on an
+             IS-IS interface.  For authentication to succeed both the
+             authentication key and the authentication type defined by the
+             vRtrIsisAuthType variable must match.  If vRtrIsisAuthType
+             is set to 'password', vRtrIsisAuthKey can include any ASCII
+             character.
+
+             Authentication can be configured globally and applied to all
+             ISIS levels or it can be configured on a per level basis.
+             The most specific value is used.
+
+             When read, vRtrIsisAuthKey always returns an Octet String of
+             length zero."
+        DEFVAL { ''H }   
+        ::= { vRtrIsisEntry 2 }
+
+vRtrIsisAuthType        OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        none (1),
+                        password (2),
+                        md5 (3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisAuthType indicates the method of
+             authentication used to verify the authenticity of packets sent
+             by neighboring routers on an IS-IS interface.  For authentication
+             to succeed both the authentication key defined in the
+             vRtrIsisAuthKey variable and the authentication type must match.
+
+             Authentication can be configured globally and applied to all
+             ISIS levels or it can be configured on a per level basis.  The
+             most specific value is used."
+        DEFVAL { none }
+        ::= { vRtrIsisEntry 3 }
+
+vRtrIsisAuthCheck       OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When vRtrIsisAuthCheck has a value of 'true', all IS-IS protocol
+             packets that have a mismatch on either the authentication type,
+             specified by the value of vRtrIsisAuthType, or the authentication
+             key, given in vRtrIsisAuthKey are rejected.
+
+             When vRtrIsisAuthCheck has a value of 'false', authentication is
+             performed on received IS-IS protocol packets but mismatched
+             packets are not rejected."
+        DEFVAL { true }
+        ::= { vRtrIsisEntry 4 }
+
+vRtrIsisLspLifetime     OBJECT-TYPE
+        SYNTAX      Unsigned32 (350..65535)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisLspLifetime specifies how long, in seconds,
+             a given LSP is considered valid without the originating router
+             having refreshed the LSP.  The actual LSP refresh timer is the
+             value of vRtrIsisLspLifetime minus 317 seconds."
+        DEFVAL { 1200 }
+        ::= { vRtrIsisEntry 10 }
+
+vRtrIsisOverloadTimeout     OBJECT-TYPE
+        SYNTAX      Unsigned32 (0|60..1800)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisOverloadTimeout is the amount of time, in
+             seconds, the router operates in the overload state before
+             attempting to reestablish normal operations.  While in overload
+             state, this IS-IS router will only be used if the destination is
+             only reachable via this router; it is not used for other transit
+             traffic.  Operationally placing the router into the overload
+             state is often used as a precursor to shutting down the IS-IS
+             protocol operation.
+             This variable is an extension to the isisSysWaitTime to accept an
+             additional value of 0. This value means the router is in overload
+             infinitely."
+        DEFVAL { 0 }
+        ::= { vRtrIsisEntry 11 }
+
+vRtrIsisOperState    OBJECT-TYPE
+        SYNTAX      TmnxOperState
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "vRtrIsisOperState indicates the current operating state
+             of this IS-IS protocol instance on this router."
+        ::= { vRtrIsisEntry 12 }
+
+
+vRtrIsisShortCuts       OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When the value of vRtrIsisShortCuts is 'true', MPLS label switched
+             paths of LSPs are used as next hops whenever BGP need to resolve
+             the next hop within the IS-IS domain.  When the value of
+             vRtrIsisShortCuts is 'false', IGP shortcuts are not required by
+             BGP. This doesn't have any meaning if vRtrIsisTrafficEng is set to
+             false."
+        DEFVAL { false }
+        ::= { vRtrIsisEntry 13 }
+
+vRtrIsisSpfHoldTime      OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Time interval at which SPF is run."
+        DEFVAL { 10 }
+        ::= { vRtrIsisEntry 14 }
+
+vRtrIsisLastSpfRun    OBJECT-TYPE
+        SYNTAX      DisplayString  (SIZE (0..40))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The vRtrIsisLastSpfRun contains the sysUpTime value when the last
+             SPF run was performed for this instance of the IS-IS protocol in 
+             the router."
+        ::= { vRtrIsisEntry 15 }
+
+vRtrIsisGracefulRestart    OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisGracefulRestart specifies whether the 
+             graceful restart is enabled or disabled for this instance of IS-IS
+             on the router."
+        DEFVAL { false }
+        ::= { vRtrIsisEntry 16 }
+
+vRtrIsisOverloadOnBoot     OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  disabled(1),
+                  enabled(2),     
+                  enabledWaitForBgp(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisOverloadOnBoot specifies if the router should
+             be in overload state right after the boot up process.
+             If the vRtrIsisOverloadOnBoot is set to 'enabled' the overload 
+             timeout is maintained by vRtrIsisOverloadOnBootTimeout."
+         DEFVAL { disabled }
+        ::= { vRtrIsisEntry 17 }
+
+vRtrIsisOverloadOnBootTimeout     OBJECT-TYPE
+        SYNTAX      Unsigned32 (0|60..1800)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisOverloadOnBootTimeout is the amount of time,
+             in seconds for which the router operates in the overload state 
+             before attempting to reestablish normal operations when the 
+             system comes up after a fresh boot.  
+             While in overload state, this IS-IS router will only be used if 
+             the destination is only reachable via this router; it is not used
+             for other transit traffic."
+        DEFVAL { 0 }
+        ::= { vRtrIsisEntry 18 }
+
+vRtrIsisSpfWait     OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..120)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisSpfWait defines the Maximum interval 
+            between two consecutive spf calculations in seconds."
+        DEFVAL { 10 }
+        ::= { vRtrIsisEntry 19 }
+
+vRtrIsisSpfInitialWait     OBJECT-TYPE
+        SYNTAX      Unsigned32 (10..100000)
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisSpfInitialWait defines the initial SPF 
+            calculation delay (in milliseconds) after a topology change."
+        DEFVAL { 1000 }
+        ::= { vRtrIsisEntry 20 }
+
+vRtrIsisSpfSecondWait     OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..100000)
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisSpfInitialWait defines the hold time 
+            between the first and second SPF calculation (in milliseconds).
+
+            Subsequent SPF runs will occur at exponentially increasing 
+            intervals of spf-second-wait i.e. if spf-second-wait is 1000, 
+            then the next SPF will run after 2000 msec, the next one at 
+            4000 msec etc until it is capped off at spf-wait value. 
+
+            The SPF interval will stay at spf-wait value until there are no 
+            more SPF runs scheduled in that interval. After a full interval
+            without any SPF runs, the SPF interval will drop back to
+            spf-initial-wait."
+        DEFVAL { 1000 }
+        ::= { vRtrIsisEntry 21 }
+
+vRtrIsisLspMaxWait     OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..120)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisLspWait dDefines the maximum interval 
+            (in seconds) between two consecutive ocurrences of an LSP 
+            being generated."
+        DEFVAL { 5 }
+        ::= { vRtrIsisEntry 22 }
+
+vRtrIsisLspInitialWait     OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..100)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisLspInitialWait defines the initial LSP 
+            generation delay (in seconds)."
+        DEFVAL { 0 }
+        ::= { vRtrIsisEntry 23 }
+
+vRtrIsisLspSecondWait     OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..100)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisLspInitialWait defines the hold time
+            between the first and second LSP generation (in seconds)."
+        DEFVAL { 1 }
+        ::= { vRtrIsisEntry 24 }
+
+vRtrIsisCsnpAuthentication       OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When vRtrIsisCsnpAuthentication has a value of 'true', enables
+             authentication of individual ISIS packets of CSNP type. 
+             The value of 'false'  
+
+             When vRtrIsisCsnpAuthentication has a value of 'false',
+             supresses authentication of CSNP packets."
+        DEFVAL { true }
+        ::= { vRtrIsisEntry 25 }
+
+vRtrIsisHelloAuthentication       OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When vRtrIsisHelloAuthentication has a value of 'true', enables
+             authentication of individual ISIS packets of HELLO type. 
+             The value of 'false'  
+
+             When vRtrIsisHelloAuthentication has a value of 'false',
+             supresses authentication of HELLO packets."
+        DEFVAL { true }
+        ::= { vRtrIsisEntry 26 }
+
+vRtrIsisPsnpAuthentication       OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When vRtrIsisPsnpAuthentication has a value of 'true', enables
+             authentication of individual ISIS packets of PSNP type. 
+             The value of 'false'  
+
+             When vRtrIsisPsnpAuthentication has a value of 'false',
+             supresses authentication of PSNP packets."
+        DEFVAL { true }
+        ::= { vRtrIsisEntry 27 }
+
+vRtrIsisGRRestartDuration       OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..3600)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisGRRestartDuration specifies the maximum
+             amount of time, in seconds, needed to re-establish ISIS
+             adjacencies in all areas."
+        DEFVAL { 180 }
+        ::= { vRtrIsisEntry 28 }
+
+vRtrIsisGRHelperMode  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIsisGRHelperMode specifies whether the 
+         graceful restart helper mode is enabled or disabled for this 
+         instance of IS-IS on the router.
+         vRtrIsisGRHelperMode is valid only if the value of 
+         vRtrIsisGracefulRestart is 'true'.
+        
+         When vRtrIsisGRHelperMode has a value of 'true' graceful
+         restart helper capabilaities are enabled.  When it has a value
+         of 'false' the graceful restart helper capabilities are disabled."
+    DEFVAL { false }
+    ::= { vRtrIsisEntry 29 }
+
+
+vRtrIsisStrictAdjacencyCheck    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIsisStrictAdjacencyCheck specifies whether an
+         ISIS adjacency can be formed when two routers do not run the 
+         same IP versions.
+         
+         When the value is 'true', both routers have to run the same IP
+         versions in the ISIS protocol. When it is 'false', having one 
+         common IP version running is enough to form an adjacency."
+    DEFVAL { false }
+    ::= { vRtrIsisEntry 30}
+
+--
+--  vRtrIsisLevelTable
+--
+
+vRtrIsisLevelTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisLevelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisLevelTable provides attributes to be applied on a specific
+         IS-IS protocol level."
+    ::= { vRtrIsisSystemObjs 2 }
+
+vRtrIsisLevelEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisLevelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisLevelTable represents IS-IS level
+         default global attributes to be used with interfaces belonging to
+         a specific IS-IS protocol instance on a specific
+         router instance.  The rows in this table cannot be created nor
+         destroyed by SNMP SET requests.  There are always two rows in this
+         table that are created by the agent with default values upon system
+         initialization."
+    INDEX { isisSysInstance, vRtrIsisLevel }
+    ::= { vRtrIsisLevelTable 1 }
+
+VRtrIsisLevelEntry ::=
+    SEQUENCE {
+            vRtrIsisLevel                    INTEGER,
+            vRtrIsisLevelAuthKey             OCTET STRING,
+            vRtrIsisLevelAuthType            INTEGER,
+            vRtrIsisLevelWideMetricsOnly     TruthValue,
+            vRtrIsisLevelOverloadStatus      INTEGER,
+            vRtrIsisLevelOverloadTimeLeft    TimeInterval,
+            vRtrIsisLevelNumLSPs             Unsigned32,
+            vRtrIsisLevelCsnpAuthentication  TruthValue,
+            vRtrIsisLevelHelloAuthentication TruthValue,
+            vRtrIsisLevelPsnpAuthentication  TruthValue
+
+        }
+
+vRtrIsisLevel       OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        level1 (1),
+                        level2 (2)
+                    }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisLevel indicates the IS-IS protocol level
+             to which these row attributes are applied."
+        ::= { vRtrIsisLevelEntry 1 }
+
+vRtrIsisLevelAuthKey     OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..118))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "vRtrIsisLevelAuthKey is the authentication key string used to
+             verify the authenticity of packets sent by neighboring routers on
+             an IS-IS interface at this level.  For authentication to succeed
+             both the authentication key and the authentication type defined
+             by the vRtrIsisLevelAuthType variable must match.  If
+             vRtrIsisLevelAuthType is set to 'password', vRtrIsisLevelAuthKey
+             can include any ASCII character.
+
+             Authentication can be configured globally and applied to all
+             ISIS levels or it can be configured on a per level basis.
+             The most specific value is used.  If the value of
+             vRtrIsisLevelAuthType is 'useGlobal', then the global
+             values, if any, defined in vRtrIsisAuthKey and vRtrIsisAuthType
+             are used instead.
+
+             When read, vRtrIsisLevelAuthKey always returns an Octet String of
+             length zero."
+        DEFVAL { ''H }   
+        ::= { vRtrIsisLevelEntry 2 }
+
+vRtrIsisLevelAuthType        OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        useGlobal (0),
+                        none (1),
+                        password (2),
+                        md5 (3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisLevelAuthType indicates the method of
+             authentication used to verify the authenticity of packets sent
+             by neighboring routers on an IS-IS interface at this level.  For
+             authentication to succeed both the authentication key defined in
+             the vRtrIsisLevelAuthKey variable and the authentication type
+             must match.
+
+             Authentication can be configured globally and applied to all
+             ISIS levels or it can be configured on a per level basis.  The
+             most specific value is used.  When vRtrIsisLevelAuthType has a
+             value of 'useGlobal', the values of vRtrIsisAuthKey and
+             vRtrIsisAuthType are applied to the interfaces for this level."
+        DEFVAL { useGlobal }
+        ::= { vRtrIsisLevelEntry 3 }
+
+
+vRtrIsisLevelWideMetricsOnly        OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "IS-IS metrics can have values between 1 and 63, referred to as
+             small metrics.  IS-IS generates two TLVs: one for the adjacency
+             and one for the IP prefix.  In order to support traffic
+             engineering, wider metrics are required; a second pair of TLV's
+             are also generated.
+
+             When vRtrIsisLevelWideMetricsOnly has a value of 'false', both the
+             small and wide metric pairs of TLV's are generated.
+
+             When vRtrIsisLevelWideMetricsOnly has a value of 'true', only the
+             wide metric pair of TLV's is generated."
+        DEFVAL { false }
+        ::= { vRtrIsisLevelEntry 4 }
+
+vRtrIsisLevelOverloadStatus     OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        notInOverload (1),
+                        dynamic (2),
+                        manual (3),
+                        manualOnBoot (4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisLevelOverloadStatus indicates whether or not
+             this level is in overload state.  When has the value
+             'notInOverload', the IS-IS level is normal state.  When the value
+             is 'dynamic', the level is in the overload state because of
+             insufficient memeory to add additional entries to the IS-IS
+             database for this level.  When the value is 'manual', the level
+             has been put into the overload state administratively as a result
+             of the isisSysSetOverload object in the ISIS-MIB having been set."
+       ::= { vRtrIsisLevelEntry 5 }
+
+vRtrIsisLevelOverloadTimeLeft   OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisOverloadTimeLeft specifies the remaining
+             time, measured in units of 0.01 seconds, before this level
+             will attempt to enter its normal state.
+
+             If vRtrIsisLevelOverloadStatus has a value of 'notInOverload',
+             then a read of vRtrIsisLevelOverloadTimeLeft returns zero (0)."
+       ::= { vRtrIsisLevelEntry 6 }
+
+vRtrIsisLevelNumLSPs    OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisLevelNumLSPs specifies the number of LSPs
+             existing in the system for the particular level."
+       ::= { vRtrIsisLevelEntry 7 }
+
+vRtrIsisLevelCsnpAuthentication       OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When vRtrIsisLevelCsnpAuthentication has a value of 'true', enables
+             authentication of individual ISIS packets of CSNP type at this level. 
+             The value of 'false'  
+
+             When vRtrIsisLevelCsnpAuthentication has a value of 'false',
+             supresses authentication of CSNP packets at this level."
+        DEFVAL { true }
+        ::= { vRtrIsisLevelEntry 8 }
+
+vRtrIsisLevelHelloAuthentication       OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When vRtrIsisLevelHelloAuthentication has a value of 'true', enables
+             authentication of individual ISIS packets of HELLO type at this level. 
+             The value of 'false'  
+
+             When vRtrIsisLevelHelloAuthentication has a value of 'false',
+             supresses authentication of HELLO packets at this level."
+        DEFVAL { true }
+        ::= { vRtrIsisLevelEntry 9 }
+
+vRtrIsisLevelPsnpAuthentication       OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When vRtrIsisLevelPsnpAuthentication has a value of 'true', enables
+             authentication of individual ISIS packets of PSNP type at this level. 
+             The value of 'false'  
+
+             When vRtrIsisLevelPsnpAuthentication has a value of 'false',
+             supresses authentication of PSNP packets at this level."
+        DEFVAL { true }
+        ::= { vRtrIsisLevelEntry 10 }
+--
+--  vRtrIsisStatsTable
+--
+
+vRtrIsisStatsTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisStatsTable provides statsistics for each instance of IS-IS
+         protocol configured. There is a one-to-one dependent relationship
+         between the tables vRtrIsisTable and vRtrIsisStatsTable."
+    ::= { vRtrIsisSystemObjs 3 }
+
+vRtrIsisStatsEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisStatsTable stores statistics for an
+         instance of IS-IS protocol configured."
+    INDEX { isisSysInstance }
+    ::= { vRtrIsisStatsTable 1 }
+
+VRtrIsisStatsEntry ::=
+    SEQUENCE {
+            vRtrIsisSpfRuns                 Counter32,
+            vRtrIsisLSPRegenerations        Counter32,
+            vRtrIsisInitiatedPurges         Counter32,
+            vRtrIsisLSPRecd                 Counter32,
+            vRtrIsisLSPDrop                 Counter32,
+            vRtrIsisLSPSent                 Counter32,
+            vRtrIsisLSPRetrans              Counter32,
+            vRtrIsisIIHRecd                 Counter32,
+            vRtrIsisIIHDrop                 Counter32,
+            vRtrIsisIIHSent                 Counter32,
+            vRtrIsisIIHRetrans              Counter32,
+            vRtrIsisCSNPRecd                Counter32,
+            vRtrIsisCSNPDrop                Counter32,
+            vRtrIsisCSNPSent                Counter32,
+            vRtrIsisCSNPRetrans             Counter32,
+            vRtrIsisPSNPRecd                Counter32,
+            vRtrIsisPSNPDrop                Counter32,
+            vRtrIsisPSNPSent                Counter32,
+            vRtrIsisPSNPRetrans             Counter32,
+            vRtrIsisUnknownRecd             Counter32,
+            vRtrIsisUnknownDrop             Counter32,
+            vRtrIsisUnknownSent             Counter32,
+            vRtrIsisUnknownRetrans          Counter32,
+            vRtrIsisCSPFRequests            Counter32,
+            vRtrIsisCSPFDroppedRequests     Counter32,
+            vRtrIsisCSPFPathsFound          Counter32,
+            vRtrIsisCSPFPathsNotFound       Counter32
+        }
+
+vRtrIsisSpfRuns OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisSpfRuns specifies the number of times shortest
+         path first calculations have been made."
+    ::= { vRtrIsisStatsEntry 1 }
+
+vRtrIsisLSPRegenerations OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisLSPRegenerations maintains the count of LSP
+         regenerations."
+    ::= { vRtrIsisStatsEntry 2 }
+
+vRtrIsisInitiatedPurges OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInitiatedPurges counts the number of times purges
+         have been initiated."
+    ::= { vRtrIsisStatsEntry 3 }
+
+vRtrIsisLSPRecd OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs received by this instance of the
+         protocol is maintained by vRtrIsisLSPRecd."
+    ::= { vRtrIsisStatsEntry 4 }
+
+vRtrIsisLSPDrop OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs dropped by this instance of the
+         protocol is maintained by vRtrIsisLSPDrop."
+    ::= { vRtrIsisStatsEntry 5 }
+
+vRtrIsisLSPSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs sent out by this instance of the
+         protocol is maintained by vRtrIsisLSPSent."
+    ::= { vRtrIsisStatsEntry 6 }
+
+vRtrIsisLSPRetrans OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs that had to be retransmitted by this
+         instance of the protocol is maintained by vRtrIsisLSPRetrans."
+    ::= { vRtrIsisStatsEntry 7 }
+
+vRtrIsisIIHRecd OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs received by this instance of the
+         protocol is maintained by vRtrIsisIIHRecd."
+    ::= { vRtrIsisStatsEntry 8 }
+
+vRtrIsisIIHDrop OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs dropped by this instance of the
+         protocol is maintained by vRtrIsisIIHDrop."
+    ::= { vRtrIsisStatsEntry 9 }
+
+vRtrIsisIIHSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs sent out by this instance of the
+         protocol is maintained by vRtrIsisIIHSent."
+    ::= { vRtrIsisStatsEntry 10 }
+
+vRtrIsisIIHRetrans OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs that had to be retransmitted by this
+         instance of the protocol is maintained by vRtrIsisIIHRetrans."
+    ::= { vRtrIsisStatsEntry 11 }
+
+vRtrIsisCSNPRecd OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs received by this instance of the
+         protocol is maintained by vRtrIsisCSNPRecd."
+    ::= { vRtrIsisStatsEntry 12 }
+
+vRtrIsisCSNPDrop OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs dropped by this instance of the
+         protocol is maintained by vRtrIsisCSNPDrop."
+    ::= { vRtrIsisStatsEntry 13 }
+
+vRtrIsisCSNPSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs sent out by this instance of the
+         protocol is maintained by vRtrIsisCSNPSent."
+    ::= { vRtrIsisStatsEntry 14 }
+
+vRtrIsisCSNPRetrans OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs that had to be retransmitted by this
+         instance of the protocol is maintained by vRtrIsisCSNPRetrans."
+    ::= { vRtrIsisStatsEntry 15 }
+
+vRtrIsisPSNPRecd OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs received by this instance of the
+         protocol is maintained by vRtrIsisPSNPRecd."
+    ::= { vRtrIsisStatsEntry 16 }
+
+vRtrIsisPSNPDrop OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs dropped by this instance of the
+         protocol is maintained by vRtrIsisPSNPDrop."
+    ::= { vRtrIsisStatsEntry 17 }
+
+vRtrIsisPSNPSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs sent out by this instance of the
+         protocol is maintained by vRtrIsisPSNPSent."
+    ::= { vRtrIsisStatsEntry 18 }
+
+vRtrIsisPSNPRetrans OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs that had to be retransmitted by this
+         instance of the protocol is maintained by vRtrIsisPSNPRetrans."
+    ::= { vRtrIsisStatsEntry 19 }
+
+vRtrIsisUnknownRecd OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs received by this instance of the
+         protocol is maintained by vRtrIsisUnknownRecd."
+    ::= { vRtrIsisStatsEntry 20 }
+
+vRtrIsisUnknownDrop OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs dropped by this instance of the
+         protocol is maintained by vRtrIsisUnknownDrop."
+    ::= { vRtrIsisStatsEntry 21 }
+
+vRtrIsisUnknownSent OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs sent out by this instance of the
+         protocol is maintained by vRtrIsisUnknownSent."
+    ::= { vRtrIsisStatsEntry 22 }
+
+vRtrIsisUnknownRetrans OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The count of link state PDUs that had to be retransmitted by this
+         instance of the protocol is maintained by vRtrIsisUnknownRetrans."
+    ::= { vRtrIsisStatsEntry 23 }
+
+vRtrIsisCSPFRequests OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisCSPFRequests maintains the number of CSPF requests made to
+        the protocol."
+    ::= { vRtrIsisStatsEntry 24 }
+
+vRtrIsisCSPFDroppedRequests OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisCSPFDroppedRequests maintains the number of dropped CSPF
+        requests by the protocol."
+    ::= { vRtrIsisStatsEntry 25 }
+
+vRtrIsisCSPFPathsFound OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisCSPFPathsFound maintains the number of responses to CSPF
+        requests for which paths satisfying the constraints were found."
+    ::= { vRtrIsisStatsEntry 26 }
+
+vRtrIsisCSPFPathsNotFound OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisCSPFPathsFound maintains the number of responses to CSPF
+        requests for which no paths satisfying the constraints were found."
+    ::= { vRtrIsisStatsEntry 27 }
+
+
+--
+--  vRtrIsisHostnameTable
+--
+
+vRtrIsisHostnameTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisHostnameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisHostnameTable provides the mapping of a system-id for an
+         IS to the hostname as provided by the system.
+         This table may not have mapping of all system-id to hostname as it is
+         not mandatory to exchange hostnames."
+    ::= { vRtrIsisSystemObjs 4 }
+
+vRtrIsisHostnameEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisHostnameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisHostnameTable stores the mapping of a
+         system-id to a hostname."
+    INDEX { isisSysInstance, vRtrIsisSysID }
+    ::= { vRtrIsisHostnameTable 1 }
+
+VRtrIsisHostnameEntry ::=
+    SEQUENCE {
+            vRtrIsisSysID              SystemID,
+            vRtrIsisHostname           DisplayString
+           }
+
+vRtrIsisSysID OBJECT-TYPE
+    SYNTAX       SystemID
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisSysID is the system-id for which we map the hostname in the
+         object vRtrIsisHostname."
+    ::= { vRtrIsisHostnameEntry 1 }
+
+vRtrIsisHostname OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisHostname maps the hostname for the corresponding system-id
+         as stored in."
+    ::= { vRtrIsisHostnameEntry 2 }
+
+--
+-- vRtrIsisRouteTable
+--
+
+vRtrIsisRouteTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisRouteTable maintain the routes learnt by an instance of
+         IS-IS protocol."
+    ::= { vRtrIsisSystemObjs 5 }
+
+vRtrIsisRouteEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisRouteTable stores a route for a given
+         instance of the IS-IS protocol."
+    INDEX { isisSysInstance,
+            vRtrIsisRouteDest,
+            vRtrIsisRouteMask,
+            vRtrIsisRouteNexthopIP }
+    ::= { vRtrIsisRouteTable 1 }
+
+VRtrIsisRouteEntry ::=
+    SEQUENCE {
+            vRtrIsisRouteDest          IpAddress,
+            vRtrIsisRouteMask          IpAddress,
+            vRtrIsisRouteNexthopIP     IpAddress,
+            vRtrIsisRouteLevel         INTEGER,
+            vRtrIsisRouteSpfVersion    Counter32,
+            vRtrIsisRouteMetric        Unsigned32,
+            vRtrIsisRouteType          INTEGER,
+            vRtrIsisRouteNHopSysID     SystemID
+           }
+
+vRtrIsisRouteDest OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisRouteDest is the destination IP address of this route.
+
+         This object may not have any Multicast (Class D) address value.
+
+         Any instance of this object should be used in conjunction with the
+         corresponding instance of vRtrIsisRouteMask object. The prefix is
+         obtained by bitwise logical-AND of the two specified objects."
+    ::= { vRtrIsisRouteEntry 1 }
+
+vRtrIsisRouteMask OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisRouteMask indicates the mask to be logical-ANDed with the
+         destination address to get the network prefix."
+    ::= { vRtrIsisRouteEntry 2 }
+
+vRtrIsisRouteNexthopIP OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisRouteNexthopIP refers to the IP address of the nexthop for 
+        this route."
+    ::= { vRtrIsisRouteEntry 3 }
+
+vRtrIsisRouteLevel OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    level1IS (1),
+                    level2IS (2)
+                   }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisRouteLevel maintains the IS-IS Level at which the prefix
+         was learnt."
+    ::= { vRtrIsisRouteEntry 4 }
+
+vRtrIsisRouteSpfVersion OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The version of spf calculation in which this route was selected is
+         maintained by an instance of vRtrIsisRouteSpfVersion."
+    ::= { vRtrIsisRouteEntry 5 }
+
+vRtrIsisRouteMetric OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisRouteMetric associates a metric value with the route. This
+         is obtained by the SPF calculations and is used by the instance of the
+         protocol. For a given prefix, the route with the lower metric is the
+         shorter route."
+    ::= { vRtrIsisRouteEntry 6 }
+
+vRtrIsisRouteType OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    internal(1),
+                    external(2)
+                   }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisRouteType indicates the type of route represented
+         by this row entry."
+    ::= { vRtrIsisRouteEntry 7 }
+
+vRtrIsisRouteNHopSysID OBJECT-TYPE
+    SYNTAX       SystemID
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisRouteNHopSysID maintains the system-id of one nexthop IS
+         through which this route is reachable."
+    ::= { vRtrIsisRouteEntry 8 }
+
+--
+-- vRtrIsisPathTable
+--
+
+vRtrIsisPathTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisPathTable maintain information regarding SPF calculation
+         for each instance of IS-IS protocol."
+    ::= { vRtrIsisSystemObjs 6 }
+
+vRtrIsisPathEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisPathTable"
+    INDEX { isisSysInstance,
+            vRtrIsisLevel,
+            vRtrIsisPathID,
+            vRtrIsisPathIfIndex }
+    ::= { vRtrIsisPathTable 1 }
+
+VRtrIsisPathEntry ::=
+    SEQUENCE {
+            vRtrIsisPathID                OCTET STRING,
+            vRtrIsisPathIfIndex           InterfaceIndex,
+            vRtrIsisPathNHopSysID         SystemID,
+            vRtrIsisPathMetric            Unsigned32,
+            vRtrIsisPathSNPA              SNPAAddress
+            }
+
+vRtrIsisPathID OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE(0..7))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The path identifier is maintained by vRtrIsisPathID. It has first 6
+         octets as the system-id followed by one octet of the LanId."
+    ::= { vRtrIsisPathEntry 1 }
+
+vRtrIsisPathIfIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisPathIfIndex maintains the ifIndex of the outgoing interface
+         for the path."
+    ::= { vRtrIsisPathEntry 2 }
+
+vRtrIsisPathNHopSysID OBJECT-TYPE
+    SYNTAX       SystemID
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The nexthop IS for this route is referenced by the system-id of the
+         nexthop and is maintained in the instance of vRtrIsisPathNHopSysID."
+    ::= { vRtrIsisPathEntry 3 }
+
+vRtrIsisPathMetric OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The metric assigned to this entry after SPF calculations is stored in
+         vRtrIsisPathMetric. The lower the metric value, the shorter is the
+         path and hence more preferred by the protocol."
+    ::= { vRtrIsisPathEntry 4 }
+
+vRtrIsisPathSNPA OBJECT-TYPE
+    SYNTAX       SNPAAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisPathSNPA stores the subnet point of attachment for this path."
+    ::= { vRtrIsisPathEntry 5 }
+
+--
+-- vRtrIsisLSPTable
+--
+
+vRtrIsisLSPTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisLSPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisLSPTable maintain information regarding all the LSPs
+         in the LSP database of each instance of IS-IS protocol for a given
+         level."
+    ::= { vRtrIsisSystemObjs 7 }
+
+vRtrIsisLSPEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisLSPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisLSPTable represents an LSP in the LSP
+         database."
+    INDEX { isisSysInstance,
+            vRtrIsisLevel,
+            vRtrIsisLSPId }
+    ::= { vRtrIsisLSPTable 1 }
+
+VRtrIsisLSPEntry ::=
+    SEQUENCE {
+            vRtrIsisLSPId               OCTET STRING,
+            vRtrIsisLSPSeq              Counter32,
+            vRtrIsisLSPChecksum         Integer32,
+            vRtrIsisLSPLifetimeRemain   Integer32,
+            vRtrIsisLSPVersion          Integer32,
+            vRtrIsisLSPPktType          Integer32,
+            vRtrIsisLSPPktVersion       Integer32,
+            vRtrIsisLSPMaxArea          Integer32,
+            vRtrIsisLSPSysIdLen         Integer32,
+            vRtrIsisLSPAttributes       Integer32,
+            vRtrIsisLSPUsedLen          Integer32,
+            vRtrIsisLSPAllocLen         Integer32,
+            vRtrIsisLSPBuff             OCTET STRING,
+            vRtrIsisLSPZeroRLT          TruthValue
+          }
+
+vRtrIsisLSPId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LSP Id. The format of the vRtrIsisLSPId is given as 6 octets of
+         ajacency system-id followed by 1 octet LanId and 1 octet LSP Number."
+    ::= { vRtrIsisLSPEntry 1 }
+
+vRtrIsisLSPSeq OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sequence number of an LSP. The sequence number is a four byte
+         quantity that represents the version of an LSP. The higher the
+         sequence number, the more up to date the information. The sequence
+         number is always incremented by the system that originated the LSP
+         and ensures that there is only one version of that LSP in the entire
+         network."
+    ::= { vRtrIsisLSPEntry 2 }
+
+vRtrIsisLSPChecksum OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisLSPChecksum is the checksum of contents of LSP from the
+         SourceID field in the LSP till the end. The checksum is computed
+         using the Fletcher checksum algorithm. "
+    ::= { vRtrIsisLSPEntry 3 }
+
+vRtrIsisLSPLifetimeRemain OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remaining lifetime of this LSP. This is stored in
+         vRtrIsisLSPLifetimeRemain which is a decrementing counter that
+         decrements in seconds starting from the value as received in the
+         LSP if not self-originated OR from vRtrIsisLspLifetime for self
+         originated LSPs. When the remaining lifetime becomes zero, the
+         contents of the LSP should not be considered for SPF calculation."
+    ::= { vRtrIsisLSPEntry 4 }
+
+vRtrIsisLSPVersion OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisLSPVersion stores the version of the ISIS protocol that has
+         generated the LSP"
+    ::= { vRtrIsisLSPEntry 5 }
+
+vRtrIsisLSPPktType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Packet type for instance Hello PDUs, LSPs, CSNPs OR PSNPs at both
+         IS-IS protocol levels i.e. L1 and L2 as maintained in
+         vRtrIsisLSPPktType. "
+    ::= { vRtrIsisLSPEntry 6 }
+
+vRtrIsisLSPPktVersion OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisLSPVersion stores the version of the ISIS protocol that has
+         generated the Packet."
+    ::= { vRtrIsisLSPEntry 7 }
+
+vRtrIsisLSPMaxArea OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of areas supported by the originator of the LSP. A
+         value of 0 for vRtrIsisLSPMaxArea indicates a default of 3 areas. "
+    ::= { vRtrIsisLSPEntry 8 }
+
+vRtrIsisLSPSysIdLen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisLSPSysIdLen is the length of the system-id as used by the
+         originator."
+    ::= { vRtrIsisLSPEntry 9 }
+
+vRtrIsisLSPAttributes OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Attributes associated with the LSP. These include the attached bit,
+         overload bit, IS type of the system originating the LSP and the
+         partition repair capability. The attached bit and the overload bit
+         are of significance only when present in the LSP numbered zero and
+         should be ignored on receipt in any other LSP."
+    ::= { vRtrIsisLSPEntry 10 }
+
+vRtrIsisLSPUsedLen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The used length for the LSP. For an LSP that is not self originated,
+         the used length is always equal to vRtrIsisLSPAllocLen. For self
+         originated LSPs, the used length is less than or equal to
+         vRtrIsisLSPAllocLen."
+    ::= { vRtrIsisLSPEntry 11 }
+
+vRtrIsisLSPAllocLen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The length allocated for the LSP to be stored. This size is stored in
+         vRtrIsisLSPAllocLen."
+    ::= { vRtrIsisLSPEntry 12 }
+
+vRtrIsisLSPBuff OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(27..1492))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisLSPBuff stores the LSP as existing in the LSP database."
+    ::= { vRtrIsisLSPEntry 13 }
+
+vRtrIsisLSPZeroRLT OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisLSPZeroRLT stores the LSP state if it has once reached zero
+        remaining lifetime. If this object is 'true' then the object
+        vRtrIsisLSPLifetimeRemain will maintain the time remaining after which
+        this LSP will be discarded."
+    ::= { vRtrIsisLSPEntry 14 }
+
+
+
+--
+--  vRtrIsisIfTable  IS-IS Interfaces Table
+--
+
+vRtrIsisIfTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisIfTable has an entry for each router interface configured
+         for the IS-IS protocol."
+    ::= { vRtrIsisIfObjs 1 }
+
+vRtrIsisIfEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisIfTable represents an interface on
+         this router that participates in the IS-IS protocol.  An entry in
+         this table can be created or destroyed by an SNMP SET request to
+         vRtrIsisIfRowStatus.  An attempt to destroy a row will fail if
+         vRtrIsisIfAdminState has not first been set to 'outOfService'."
+    INDEX { isisSysInstance, vRtrIsisIfIndex }
+    ::= { vRtrIsisIfTable 1 }
+
+VRtrIsisIfEntry ::=
+    SEQUENCE {    	
+            vRtrIsisIfIndex	            InterfaceIndex,
+            vRtrIsisIfRowStatus             RowStatus,
+            vRtrIsisIfLastChangeTime        TimeStamp,
+            vRtrIsisIfAdminState            TmnxAdminState,
+            vRtrIsisIfOperState             TmnxOperState,
+            vRtrIsisIfCsnpInterval          Unsigned32,
+            vRtrIsisIfHelloAuthKey          OCTET STRING,
+            vRtrIsisIfHelloAuthType         INTEGER,
+            vRtrIsisIfLspPacingInterval     Unsigned32,
+            vRtrIsisIfCircIndex             Integer32,
+            vRtrIsisIfRetransmitInterval    Unsigned32,
+            vRtrIsisIfTypeDefault           TruthValue
+            
+        }
+
+
+vRtrIsisIfIndex       OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+       "A unique value, greater than zero, for each interface
+        or interface sub-layer in the managed system.  It is
+        recommended that values are assigned contiguously
+        starting from 1.  The value for each interface sub-
+        layer must remain constant at least from one re-
+        initialization of the entity's network management
+        system to the next re-initialization."
+        ::= { vRtrIsisIfEntry 1 }
+
+vRtrIsisIfRowStatus       OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The row status used for creation, deletion, or control of
+             vRtrIsisIfTable entries.  Before this row can be destroyed,
+             vRtrIsisIfAdminState must have been set to 'outOfService'."
+        ::= { vRtrIsisIfEntry 2 }
+
+vRtrIsisIfLastChangeTime       OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The sysUpTime when this row was last modified."
+        ::= { vRtrIsisIfEntry 3 }
+
+vRtrIsisIfAdminState       OBJECT-TYPE
+        SYNTAX      TmnxAdminState
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The desired administrative state for IS-IS protocol on this
+             interface."
+        DEFVAL { outOfService }
+        ::= { vRtrIsisIfEntry 4 }
+
+vRtrIsisIfOperState        OBJECT-TYPE
+        SYNTAX      TmnxOperState
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current operational state of IS-IS protocol on this
+             interface."
+        ::= { vRtrIsisIfEntry 5 }
+
+vRtrIsisIfCsnpInterval      OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..65535)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisIfCsnpInterval specifies the interval of
+             time, in seconds, between transmission of Complete Sequence
+             Number PDUs (CSNP).  If the value of isisCircType for this
+             interface is 'broadcast' and this router is the designated router
+             on a LAN, the default frequency is ten seconds.  if the value of
+             isisCircType for this  interface is 'ptToPt', point-to-point,
+             the default frequency is every five seconds."
+        DEFVAL { 10 } 
+        ::= { vRtrIsisIfEntry 6 }
+
+vRtrIsisIfHelloAuthKey      OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..118))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "vRtrIsisIfHelloAuthKey is the authentication key string used to
+             verify the authenticity of packets sent by neighboring routers on
+             this IS-IS interface.  For authentication to succeed both the
+             authentication key and the authentication type defined by the
+             vRtrIsisIfHelloAuthType variable must match.  If
+             vRtrIsisIfHelloAuthType is set to 'password',
+             vRtrIsisIfHelloAuthKey can include any ASCII character.
+
+             Authentication can be configured globally and applied to all
+             ISIS levels running on this interface or it can be configured
+             on a per level basis.  The most specific value is used.
+
+             When read, vRtrIsisIfHelloAuthKey always returns an Octet String
+             of length zero."
+        DEFVAL { ''H }   
+        ::= { vRtrIsisIfEntry 7 }
+
+vRtrIsisIfHelloAuthType     OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        none (1),
+                        password (2),
+                        md5 (3)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisIfHelloAuthType indicates the method of
+             authentication used to verify the authenticity of packets sent
+             by neighboring routers on this IS-IS interface.  For
+             authentication to succeed both the authentication key defined in
+             the vRtrIsisIfHelloAuthKey variable and the authentication type
+             must match.
+
+             Authentication can be configured globally and applied to all
+             ISIS levels running on this interface or it can be configured on
+             a per level basis.  The most specific value is used."
+        DEFVAL { none }
+        ::= { vRtrIsisIfEntry 8 }
+
+vRtrIsisIfLspPacingInterval       OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..65535)
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisIfLspPacingInterval specifies the minimal 
+             interval
+             of time, in milliseconds, between transmission of Link State
+             PDUs (LSPs) for all ISIS levels running on this interface.
+
+             If the value of vRtrIsisIfLspInterval is zero (0), no LSPs will
+             be sent on this interface."
+        DEFVAL { 100 }
+        ::= { vRtrIsisIfEntry 9 }
+
+vRtrIsisIfCircIndex       OBJECT-TYPE
+        SYNTAX      Integer32 (1..2000000000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisIfCircIndex is a cross reference index to
+             the isisCircTable."
+        ::= { vRtrIsisIfEntry 10 }
+
+vRtrIsisIfRetransmitInterval       OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..65535)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisIfRetransmitInterval specifies the minimal
+             interval of time, in seconds between retransmission of an LSP on 
+             point-to-point interfaces."
+        DEFVAL { 5 }     
+        ::= { vRtrIsisIfEntry 11 }
+
+vRtrIsisIfTypeDefault       OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisIfTypeDefault complements the object 
+             isisCircType. It indicates if the circuit type is default or has 
+             been modified. Setting vRtrIsisIfTypeDefault to 'true' resets
+             isisCircType to the default for that interface. Similarly any 
+             modification to the object isisCircType triggers this object to 
+             become 'false'. There is no effect of setting this object to 
+             'false'."
+        DEFVAL { true }     
+        ::= { vRtrIsisIfEntry 12 }
+
+--
+--  vRtrIsisIfLevelTable  IS-IS Interfaces Level Table
+--
+
+vRtrIsisIfLevelTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisIfLevelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisIfLevelTable provides attributes to be applied on a
+         specific IS-IS interface operating at a specific IS-IS protocol
+         level."
+    ::= { vRtrIsisIfObjs 2 }
+
+vRtrIsisIfLevelEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisIfLevelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisIfLevelTable represents IS-IS level
+         attributes to be used with an interface belonging to a specific IS-IS
+         protocol instance on a specific router instance.
+         Rows for Level 1 and 2 are created as an action of creating a row in
+         the vRtrIsisIfTable."
+    INDEX { isisSysInstance, vRtrIsisIfIndex, vRtrIsisIfLevel }
+    ::= { vRtrIsisIfLevelTable 1 }
+
+VRtrIsisIfLevelEntry ::=
+    SEQUENCE {
+            vRtrIsisIfLevel                     INTEGER,
+            vRtrIsisIfLevelLastChangeTime       TimeStamp,
+            vRtrIsisIfLevelHelloAuthKey         OCTET STRING,
+            vRtrIsisIfLevelHelloAuthType        INTEGER,
+            vRtrIsisIfLevelPassive              TruthValue,
+            vRtrIsisIfLevelTeMetric             Unsigned32,
+            vRtrIsisIfLevelNumAdjacencies       Unsigned32,
+            vRtrIsisIfLevelISPriority           Unsigned32,
+            vRtrIsisIfLevelHelloTimer           Unsigned32,
+            vRtrIsisIfLevelAdminMetric          Unsigned32,
+            vRtrIsisIfLevelOperMetric           Unsigned32
+        }
+
+vRtrIsisIfLevel     OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        level1 (1),
+                        level2 (2)
+                    }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIfLevelIndex specifies the IS-IS protocol
+             level that this row entry describes."
+        ::= { vRtrIsisIfLevelEntry 1 }
+
+vRtrIsisIfLevelLastChangeTime       OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The sysUpTime when this row was last modified."
+        ::= { vRtrIsisIfLevelEntry 2 }
+
+vRtrIsisIfLevelHelloAuthKey     OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..118))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "vRtrIsisIfLevelHelloAuthKey is the authentication key string used
+             to verify the authenticity of packets sent by neighboring routers
+             on this IS-IS interface at this level.  For authentication to
+             succeed both the authentication key and the authentication type
+             defined by the vRtrIsisIfLevelHelloAuthType variable must match.
+             If vRtrIsisIfLevelHelloAuthType is set to 'password',
+             vRtrIsisIfLevelHelloAuthKey can include any ASCII character.
+
+             Authentication can be configured globally and applied to all
+             ISIS levels or it can be configured on a per level basis.
+             The most specific value is used.  If the value of
+             vRtrIsisIfLevelHelloAuthType is 'useGlobal', then the global
+             values, if any, defined in vRtrIsisIfHelloAuthKey and
+             vRtrIsisIfHelloAuthType are used instead.
+
+             When read, vRtrIsisIfLevelHelloAuthKey always returns an Octet
+             String of length zero."
+        DEFVAL { ''H }   
+        ::= { vRtrIsisIfLevelEntry 3 }
+
+vRtrIsisIfLevelHelloAuthType        OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        useGlobal (0),
+                        none (1),
+                        password (2),
+                        md5 (3)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisIfLevelHelloAuthType indicates the method of
+             authentication used to verify the authenticity of packets sent
+             by neighboring routers on this IS-IS interface at this level. For
+             authentication to succeed both the authentication key defined in
+             the vRtrIsisIfLevelHelloAuthKey variable and the authentication
+             type must match.
+
+             Authentication can be configured globally and applied to all
+             ISIS levels running on this interface or it can be configured on
+             a per level basis.  The most specific value is used.  When
+             vRtrIsisIfLevelHelloAuthType has a value of 'useGlobal', the
+             values of vRtrIsisIfLevelHelloAuthKey and
+             vRtrIsisIfLevelHelloAuthType are applied to the interfaces for
+             this level."
+        DEFVAL { useGlobal }
+        ::= { vRtrIsisIfLevelEntry 4 }
+
+vRtrIsisIfLevelPassive  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "If vRtrIsisIfLevelPassive has a value of 'true', this interface
+             address is advertised for this level without running the IS-IS
+             protocol on this interface level.  While in passive mode, the
+             interface level ignores ingress IS-IS protocol packets and does
+             not transmit any IS-IS protocol packets.
+
+             If the value of vRtrIsisIfLevelPassive is 'false', this interface
+             address is advertised at this IS-IS level only if it is configured
+             as with the IS-IS protocol as enabled."
+        DEFVAL { false }
+        ::= { vRtrIsisIfLevelEntry 5 }
+
+vRtrIsisIfLevelTeMetric     OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4261412864)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The value of vRtrIsisIfLevelTeMetric specifies the metric that
+             is used exclusively by IS-IS traffic engineered traffic.
+
+             Normal IS-IS traffic specifies metrics values between 1 and 63.
+             Wider metrics are needed to support traffic engineering.  See
+             vRtrIsisLevelWideMetricsOnly description for more details..
+             
+             The value '0' means not configured."
+        DEFVAL { 0 }
+        ::= { vRtrIsisIfLevelEntry 6 }
+
+vRtrIsisIfLevelNumAdjacencies  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "vRtrIsisIfLevelNumAdjacencies maintains the number of adjacencies
+             on this particular level of the interface."
+        ::= { vRtrIsisIfLevelEntry 7 }
+
+vRtrIsisIfLevelISPriority  OBJECT-TYPE
+        SYNTAX      Unsigned32(0..127)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "vRtrIsisIfLevelISPriority shadows the object 
+            isisCircLevelISPriority to have an additional accepted value of 0."
+        ::= { vRtrIsisIfLevelEntry 8 }
+
+vRtrIsisIfLevelHelloTimer  OBJECT-TYPE
+        SYNTAX      Unsigned32(1..20000)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "vRtrIsisIfLevelHellotimer shadows isisCircLevelHelloTimer to have
+            store the values of hello timer in seconds."
+        ::= { vRtrIsisIfLevelEntry 9 }
+
+vRtrIsisIfLevelAdminMetric  OBJECT-TYPE
+        SYNTAX      Unsigned32(0..16777215)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "The default metric value of this circuit for this level.
+              
+              A value of 0 means that the metric is not configured. In such
+              a case if the vRtrIsisReferenceBw is configured, the value of 
+              the metric should be calculated using the formula :
+                    
+                 Metric = reference-bandwidth / bandwidth.
+
+              If the vRtrIsisReferenceBw is configured as Ten Gig
+              (10,000,000,000) a 100-Mbps interface has a default metric of
+              100. In order for metrics in excess of 63 to be configured
+              wide metrics must be deployed.
+
+              If the reference bandwidth is not configured then all levels
+              will have a default metric of 10.
+
+              The operational value of the metric is maintained in the 
+              object vRtrIsisIfLevelOperMetric."
+        DEFVAL { 0 }
+        ::= { vRtrIsisIfLevelEntry 10 }
+
+vRtrIsisIfLevelOperMetric  OBJECT-TYPE
+        SYNTAX      Unsigned32(1..16777215)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The operational value of the metric being used in this 
+              circuit for this level."
+        ::= { vRtrIsisIfLevelEntry 11 }
+
+
+--
+--  Augmentation of the isisISAdjTable
+--  Use of AUGMENTS clause implies a one-to-one dependent relationship
+--  between the base table, isisISAdjTable, and the augmenting table,
+--  vRtrIsisISAdjTable. This in effect extends the isisISAdjTable with
+--  additional columns. Creation (or deletion) of a row in the isisISAdjTable
+--  results in the same fate for the row in the vRtrIsisISAdjTable.
+--
+
+vRtrIsisISAdjTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisISAdjEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisISAdjTable is the table of adjacencies to Intermediate Systems
+        and their operational status information."
+    ::= { vRtrIsisAdjObjs 1 }
+
+vRtrIsisISAdjEntry OBJECT-TYPE
+    SYNTAX      VRtrIsisISAdjEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisISAdjTable represents additional
+         columns for attributes specific to the Alcatel 7x50 SR series
+         ISIS implementation."
+    AUGMENTS { isisISAdjEntry }
+    ::= { vRtrIsisISAdjTable 1 }
+
+VRtrIsisISAdjEntry ::=
+    SEQUENCE {
+             vRtrIsisISAdjExpiresIn         INTEGER,
+             vRtrIsisISAdjCircLevel         INTEGER,
+             vRtrIsisISAdjNeighborIP        IpAddress,
+             vRtrIsisISAdjRestartSupport    TruthValue,
+             vRtrIsisISAdjRestartStatus     INTEGER,
+             vRtrIsisISAdjRestartSupressed  TruthValue,
+             vRtrIsisISAdjNumRestarts       Unsigned32,
+             vRtrIsisISAdjLastRestartTime   TimeStamp,
+             vRtrIsisISAdjNeighborIPv6Type  InetAddressType,
+             vRtrIsisISAdjNeighborIpv6      InetAddress
+             }
+
+vRtrIsisISAdjExpiresIn OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisISAdjExpiresIn maintains the time in which the adjacency will
+         expire if no hello packets are received."
+    ::= { vRtrIsisISAdjEntry 1 }
+
+vRtrIsisISAdjCircLevel OBJECT-TYPE
+    SYNTAX INTEGER
+       {
+         level1(1),
+         level2(2),
+         level1L2(3),
+         unknown(4)
+       }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "vRtrIsisISAdjCircLevel specifies the circuit type of the adjacency as
+         advertised."
+    DEFVAL { unknown }
+    ::= { vRtrIsisISAdjEntry 2 }
+
+vRtrIsisISAdjNeighborIP OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "The ip-address of the neighbor with which adjacency is formed is 
+         maintained in vRtrIsisISAdjNeighborIP."
+    ::= { vRtrIsisISAdjEntry 3 }
+
+vRtrIsisISAdjRestartSupport  OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisISAdjRestartSupport indicates whether adjacency supports ISIS 
+         graceful restart. If vRtrIsisISAdjRestartSupport has a value of 'true'
+         the adjacency supports graceful restart."
+    ::= { vRtrIsisISAdjEntry 4 }
+
+vRtrIsisISAdjRestartStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+   {
+        notHelping (1),         -- Adjacency is not currently being helped
+        restarting (2),         -- Received restart request from the nbr
+        restart-complete (3),   -- The nbr has completed the most recent restart
+        helping (4)             -- Nbr is helping us in restarting and has sent us a
+                                 -- restart ack in response to our restart request.
+    }
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+    "vRtrIsisISAdjRestartStatus indicates the graceful restart status 
+     of the adjacency."
+    ::= { vRtrIsisISAdjEntry 5 }
+
+vRtrIsisISAdjRestartSupressed OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisISAdjRestartSupressed indicates if the adjacency has requested this 
+         router to suppress advertisement of the adjacency in this router's LSPs.
+         If vRtrIsisISAdjRestartSupressed has a value of 'true' the adjacency 
+         has requested to suppress advertisement of the LSPs."
+    ::= { vRtrIsisISAdjEntry 6 }
+
+vRtrIsisISAdjNumRestarts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisISAdjNumRestarts indicates the number 
+         of times the adjacency has attempted restart."
+    ::= { vRtrIsisISAdjEntry 7 }
+
+vRtrIsisISAdjLastRestartTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrIsisISAdjLastRestartTime indicates the  
+         last time the adjacency attempted restart."
+    ::= { vRtrIsisISAdjEntry 8 }
+
+vRtrIsisISAdjNeighborIPv6Type   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIsisISAdjNeighborIPv6Type indicates the IP address type
+         of vRtrIsisISAdjNeighborIpv6. It will always be 'ipv6'."
+    ::= { vRtrIsisISAdjEntry 9 }
+
+vRtrIsisISAdjNeighborIpv6       OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIsisISAdjNeighborIpv6 indicates the IP address of the
+         neighbor with which an IPv6-adjacency is formed. This will always be an
+         IPv6 address."
+    ::= { vRtrIsisISAdjEntry 10 }
+
+
+
+--
+-- vRtrIsisSpfLogTable
+--
+
+vRtrIsisSpfLogTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisSpfLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisSpfLogTable maintains information regarding SPF 
+        runs for each instance of IS-IS protocol.
+        
+        There is a maximum of 20 log entries stored per IS-IS protocol
+        instance."
+    ::= { vRtrIsisSystemObjs 8 }
+
+vRtrIsisSpfLogEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisSpfLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry maintains log information about a specific SPF run
+        made on a particular IS-IS protocol instance."
+    INDEX { isisSysInstance,
+            vRtrIsisSpfTimeStamp }
+    ::= { vRtrIsisSpfLogTable 1 }
+
+VRtrIsisSpfLogEntry ::=
+    SEQUENCE {
+            vRtrIsisSpfTimeStamp            TimeStamp,
+            vRtrIsisSpfRunTime              TimeTicks,
+            vRtrIsisSpfL1Nodes              Unsigned32,
+            vRtrIsisSpfL2Nodes              Unsigned32,
+            vRtrIsisSpfEventCount           Unsigned32,
+            vRtrIsisSpfLastTriggerLSPId     OCTET STRING,
+            vRtrIsisSpfTriggerReason        BITS
+            }
+
+vRtrIsisSpfTimeStamp OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisSpfTimeStamp maintains the timestamp when the 
+        SPF run started on the system."
+    ::= { vRtrIsisSpfLogEntry 1 }
+
+vRtrIsisSpfRunTime OBJECT-TYPE
+    SYNTAX       TimeTicks
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisSpfRunTime maintains the time (in hundredths of a
+         second) required to complete the SPF run "
+    ::= { vRtrIsisSpfLogEntry 2 }
+
+vRtrIsisSpfL1Nodes OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisSpfL1Nodes maintains the number of level 1 nodes involved 
+        in the SPF run."
+    ::= { vRtrIsisSpfLogEntry 3 }
+
+vRtrIsisSpfL2Nodes OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisSpfL2Nodes maintains the number of level 2 nodes involved 
+        in the SPF run."
+    ::= { vRtrIsisSpfLogEntry 4 }
+
+vRtrIsisSpfEventCount OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisSpfEventCount specifies the number of SPF events that 
+        triggered the SPF calculation."
+    ::= { vRtrIsisSpfLogEntry 5 }
+
+vRtrIsisSpfLastTriggerLSPId OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE(0..8))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisSpfLastTriggerLSPId maintains the LSPId of the last LSP 
+        processed before the SPF run."
+    ::= { vRtrIsisSpfLogEntry 6 }
+
+vRtrIsisSpfTriggerReason OBJECT-TYPE
+    SYNTAX       BITS {
+                    newAdjacency (0),
+                    newLSP (1),
+                    newArea (2),
+                    reach (3),
+                    ecmpChanged (4),
+                    newMetric (5),
+                    teChanged (6),
+                    restart (7),
+                    lspExpired (8),
+                    lspDbChanged (9),
+                    lspChanged (10),
+                    newPreference (11),
+                    newNLPID (12)
+                    }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisSpfTriggerReason indicates the reasons 
+         that triggered this SPF run.
+         
+         newAdjacency (0)    - a new adjacency was formed.
+         newLSP (1)          - a new LSP was received.
+         newArea (2)         - a new area was joined.
+         reach (3)           - a new prefix can be reached.
+         ecmpChanged (4)     - the number of ecmp routes to a destination
+                               changed.
+         newMetric (5)       - a route has a new metric.
+         teChanged (6)       - traffic engineering changed.
+         restart (7)         - the IS-IS router was restarted.
+         lspExpired (8)      - an LSP expired.
+         lspDbChanged (9)    - the IS-IS LSP database was cleared.
+         lspChanged (10)     - an LSP changed.
+         newPreference (11)  - a route preference changed.
+         newNLPID (12)       - a Network Layer Protocol was added to the 
+                               IS-IS router protocl set."
+    ::= { vRtrIsisSpfLogEntry 7 }
+
+
+
+--
+-- vRtrIsisSummaryTable
+--
+
+vRtrIsisSummaryTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisSummaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisSummaryTable maintains the summary prefixes for a 
+         specific instance of IS-IS protocol."
+    ::= { vRtrIsisSystemObjs 9 }
+
+vRtrIsisSummaryEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisSummaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisSummaryTable stores a summary 
+         prefix for a specific instance of the IS-IS protocol."
+    INDEX { isisSysInstance,
+            vRtrIsisSummPrefix,
+            vRtrIsisSummMask }
+    ::= { vRtrIsisSummaryTable 1 }
+
+VRtrIsisSummaryEntry ::=
+    SEQUENCE {
+            vRtrIsisSummPrefix         IpAddress,
+            vRtrIsisSummMask           IpAddress,
+            vRtrIsisSummRowStatus      RowStatus,
+            vRtrIsisSummLevel          INTEGER
+           }
+
+vRtrIsisSummPrefix OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisSummPrefix specifies the prefix for the summary address entry.
+
+         Any instance of this object should be used in conjunction with the
+         corresponding instance of vRtrIsisSummMask object. The prefix is
+         obtained by bitwise logical-AND of the two specified objects."
+    ::= { vRtrIsisSummaryEntry 1 }
+
+vRtrIsisSummMask OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisSummMask specifies the mask for the summary address entry.
+
+         Any instance of this object should be used in conjunction with the
+         corresponding instance of vRtrIsisSummPrefix object. The prefix is
+         obtained by bitwise logical-AND of the two specified objects."
+    ::= { vRtrIsisSummaryEntry 2 }
+
+vRtrIsisSummRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisSummRowStatus is used to create an entry in this table."
+    ::= { vRtrIsisSummaryEntry 3 }
+
+vRtrIsisSummLevel OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    level1 (1),
+                    level2 (2),
+                    level1L2 (3)
+                   }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "vRtrIsisSummLevel specifies the IS-IS Level from which the prefix
+         should be summarized."
+    DEFVAL { level1L2 }
+    ::= { vRtrIsisSummaryEntry 4 }
+
+
+--
+-- vRtrIsisInetRouteTable
+--
+
+-- vRtrIsisInetRouteTable replaces the vRtrIsisRouteTable 
+-- that displays IS-IS routes using only the 
+-- IPv4 address style. The vRtrIsisInetRouteTable is IP version 
+-- neutral and allows IPv4 or IPv6 InetAddress styles.
+
+vRtrIsisInetRouteTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisInetRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisInetRouteTable maintains the routes learnt by an instance of
+         IS-IS protocol."
+    ::= { vRtrIsisSystemObjs 10 }
+
+vRtrIsisInetRouteEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisInetRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisInetRouteTable stores a route for a given
+         instance of the IS-IS protocol."
+    INDEX { isisSysInstance,
+            vRtrIsisInetRouteDestType,
+            vRtrIsisInetRouteDest,
+            vRtrIsisInetRoutePrefixLength,
+            vRtrIsisInetRouteNexthopIPType,
+            vRtrIsisInetRouteNexthopIP }
+    ::= { vRtrIsisInetRouteTable 1 }
+
+VRtrIsisInetRouteEntry ::=
+    SEQUENCE {
+            vRtrIsisInetRouteDestType      InetAddressType,
+            vRtrIsisInetRouteDest          InetAddress,
+            vRtrIsisInetRoutePrefixLength  InetAddressPrefixLength,
+            vRtrIsisInetRouteNexthopIPType InetAddressType,
+            vRtrIsisInetRouteNexthopIP     InetAddress,
+            vRtrIsisInetRouteLevel         INTEGER,
+            vRtrIsisInetRouteSpfRunNumber  Counter32,
+            vRtrIsisInetRouteMetric        Unsigned32,
+            vRtrIsisInetRouteType          INTEGER,
+            vRtrIsisInetRouteNHopSysID     SystemID
+           }
+
+vRtrIsisInetRouteDestType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIsisInetRouterDestType indicates the IP 
+         address type for vRtrIsisInetRouteDest."
+    ::= { vRtrIsisInetRouteEntry 1 }
+
+vRtrIsisInetRouteDest OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetRouteDest indicates the destination 
+         IP address of this route. The address type of vRtrIsisInetRouteDest
+         is indicated by vRtrIsisInetRouteDestType."
+    ::= { vRtrIsisInetRouteEntry 2 }
+
+vRtrIsisInetRoutePrefixLength OBJECT-TYPE
+    SYNTAX       InetAddressPrefixLength
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetRoutePrefixLength indicates the prefix length 
+         to be used with vRtrIsisInetRouteDest to get the network prefix."
+    ::= { vRtrIsisInetRouteEntry 3 }
+
+vRtrIsisInetRouteNexthopIPType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIsisInetRouteNexthopIPType indicates the IP address
+         type for vRtrIsisInetRouteNexthopIP."
+    ::= { vRtrIsisInetRouteEntry 4 }
+
+vRtrIsisInetRouteNexthopIP OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetRouteNexthopIP indicates the IP address of 
+         the nexthop for this route.The address type of 
+         vRtrIsisInetRouteNexthopIPType is indicated by 
+         vRtrIsisInetRouteNexthopIPType"
+    ::= { vRtrIsisInetRouteEntry 5 }
+
+vRtrIsisInetRouteLevel OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    level1IS (1),
+                    level2IS (2)
+                   }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetRouteLevel indicates the IS-IS Level at 
+         which the destination prefix was learnt."
+    ::= { vRtrIsisInetRouteEntry 6 }
+
+vRtrIsisInetRouteSpfRunNumber OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetRouteSpfRunNumber indicates the run of spf 
+         calculation in which this route was selected."
+    ::= { vRtrIsisInetRouteEntry 7 }
+
+vRtrIsisInetRouteMetric OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetRouteMetric indicates the metric value 
+         associated with the route. This is obtained by the SPF calculations 
+         and is used by the instance of the protocol. For a given 
+         destination prefix, the route with the lower metric is the 
+         shorter route."
+    ::= { vRtrIsisInetRouteEntry 8 }
+
+vRtrIsisInetRouteType OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    internal(1),
+                    external(2)
+                   }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetRouteType indicates the type of route 
+         represented by this row entry."
+    ::= { vRtrIsisInetRouteEntry 9 }
+
+vRtrIsisInetRouteNHopSysID OBJECT-TYPE
+    SYNTAX       SystemID
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetRouteNHopSysID indicates the system-id of 
+         the nexthop IS through which this route is reachable."
+    ::= { vRtrIsisInetRouteEntry 10 }
+
+
+--
+-- vRtrIsisInetSummaryTable
+--
+
+-- vRtrIsisInetSummaryTable replaces the vRtrIsisSummaryTable 
+-- that displays IS-IS routes using only the 
+-- IPv4 address style. The vRtrIsisInetSummaryTable is IP version 
+-- neutral and allows IPv4 or IPv6 InetAddress styles.
+
+vRtrIsisInetSummaryTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIsisInetSummaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIsisInetSummaryTable maintains the summary prefixes for a 
+         specific instance of the IS-IS protocol."
+    ::= { vRtrIsisSystemObjs 11 }
+
+vRtrIsisInetSummaryEntry    OBJECT-TYPE
+    SYNTAX      VRtrIsisInetSummaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrIsisInetSummaryTable stores a summary 
+         prefix for a specific instance of the IS-IS protocol."
+    INDEX { isisSysInstance,
+            vRtrIsisInetSummPrefixType,
+            vRtrIsisInetSummPrefix,
+            vRtrIsisInetSummPrefixLength }
+    ::= { vRtrIsisInetSummaryTable 1 }
+
+VRtrIsisInetSummaryEntry ::=
+    SEQUENCE {
+            vRtrIsisInetSummPrefixType     InetAddressType,
+            vRtrIsisInetSummPrefix         InetAddress,
+            vRtrIsisInetSummPrefixLength   InetAddressPrefixLength,
+            vRtrIsisInetSummRowStatus      RowStatus,
+            vRtrIsisInetSummLevel          INTEGER
+           }
+
+vRtrIsisInetSummPrefixType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIsisInetSummPrefixType indicates the IP
+         address type of vRtrIsisInetSummPrefix."
+    ::= { vRtrIsisInetSummaryEntry 1 }
+
+vRtrIsisInetSummPrefix OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetSummPrefix indicates the prefix for this 
+         summary address entry."
+    ::= { vRtrIsisInetSummaryEntry 2 }
+
+vRtrIsisInetSummPrefixLength OBJECT-TYPE
+    SYNTAX       InetAddressPrefixLength
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetSummMask indicates the prefix length to
+         be used with vRtrIsisInetSummPrefix to get the network prefix."
+    ::= { vRtrIsisInetSummaryEntry 3 }
+
+vRtrIsisInetSummRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetSummRowStatus specifies the row status. 
+         It allows entries to be created and deleted in the 
+         vRtrIsisInetSummaryTable."
+    ::= { vRtrIsisInetSummaryEntry 4 }
+
+vRtrIsisInetSummLevel OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    level1 (1),
+                    level2 (2),
+                    level1L2 (3)
+                   }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The value of vRtrIsisInetSummLevel specifies the IS-IS Level from 
+         which the prefix should be summarized."
+    DEFVAL { level1L2 }
+    ::= { vRtrIsisInetSummaryEntry 5 }
+
+--
+--  vRtrIsisNotificationTable
+--
+--  The ISIS Notification Table records fields that are required for 
+--  notifications. This is a temporary table and will be removed when
+--  we up-rev to the newer version of the standard ISIS mib provided by
+--  the IETF.
+--
+
+    vRtrIsisNotificationTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF VRtrIsisNotificationEntry
+         MAX-ACCESS not-accessible
+         STATUS current
+         DESCRIPTION
+             "Objects seen in the most recent notification this instance of 
+              the IS-IS protocol."
+    ::= { vRtrIsisNotificationObjs 1 }
+
+    vRtrIsisNotificationEntry OBJECT-TYPE
+         SYNTAX VRtrIsisNotificationEntry
+         MAX-ACCESS not-accessible
+         STATUS current
+         DESCRIPTION
+             "Each entry defines variables relevant to notifications for one 
+              instance of the IS-IS protocol."
+         INDEX {  isisSysInstance }
+     ::= { vRtrIsisNotificationTable 1 }
+
+     VRtrIsisNotificationEntry ::=
+        SEQUENCE {
+             vRtrIsisTrapLSPID               OCTET STRING,
+             vRtrIsisSystemLevel             INTEGER,
+             vRtrIsisPDUFragment             OCTET STRING,
+             vRtrIsisFieldLen                Integer32,
+             vRtrIsisMaxAreaAddress          Integer32,
+             vRtrIsisProtocolVersion         Integer32,
+             vRtrIsisLSPSize                 Integer32,
+             vRtrIsisOriginatingBufferSize   Integer32,
+             vRtrIsisProtocolsSupported      OCTET STRING
+        }
+
+     vRtrIsisTrapLSPID OBJECT-TYPE
+         SYNTAX OCTET STRING(SIZE(0|8))
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "An Octet String that uniquely identifies a Link State PDU."
+     ::= { vRtrIsisNotificationEntry 1 }
+
+     vRtrIsisSystemLevel OBJECT-TYPE
+         SYNTAX INTEGER
+                    {
+                       l1(1),
+                       l2(2),
+                       l1l2(3)
+                    }
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "Identifies the level the notification applies to."
+     ::= { vRtrIsisNotificationEntry 2 }
+
+     vRtrIsisPDUFragment OBJECT-TYPE
+         SYNTAX OCTET STRING (SIZE(0..64))
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "Holds up to the first 64 bytes of a PDU that triggered the 
+              notification."
+     ::= { vRtrIsisNotificationEntry 3 }
+
+     vRtrIsisFieldLen OBJECT-TYPE
+         SYNTAX Integer32 (0..255)
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "Holds the System ID length reported in PDU we recieved."
+     ::= { vRtrIsisNotificationEntry 4 }
+
+     vRtrIsisMaxAreaAddress OBJECT-TYPE
+         SYNTAX Integer32 (0..255)
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "Holds the Max Area Addresses reported in a PDU we recieved."
+     ::= { vRtrIsisNotificationEntry 5 }
+
+     vRtrIsisProtocolVersion OBJECT-TYPE
+         SYNTAX Integer32 (0..255)
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "Holds the Protocol version reported in PDU we received."
+     ::= { vRtrIsisNotificationEntry 6 }
+
+     vRtrIsisLSPSize OBJECT-TYPE
+         SYNTAX Integer32 (0..2147483647)
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "Holds the size of LSP we received that is too big to forward."
+     ::= { vRtrIsisNotificationEntry 7 }
+
+     vRtrIsisOriginatingBufferSize OBJECT-TYPE
+         SYNTAX Integer32 (0..2147483647)
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "Holds the size of vRtrIsisSysOrigL1LSPBuffSize or
+              vRtrIsisSysOrigL2LSPBuffSize advertised by peer in TLV."
+     ::= { vRtrIsisNotificationEntry 8 }
+
+     vRtrIsisProtocolsSupported OBJECT-TYPE
+         SYNTAX OCTET STRING (SIZE(0..255))
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "The list of protocols supported by an adjacent system.  This 
+              may be empty."
+     ::= { vRtrIsisNotificationEntry 9 }
+
+--
+--  vRtrIsisDatabaseClearTable
+--
+--  The ISIS DatabaseClear Table fields are used to clear ISIS database
+--  for given index.Those databases are Adajacency database and Lsp database
+--  
+
+    vRtrIsisDatabaseClearTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF VRtrIsisDatabaseClearEntry
+         MAX-ACCESS not-accessible
+         STATUS current
+         DESCRIPTION
+             "This vRtrIsisDatabaseClearTable defined to clear ISIS related data-bases." 
+         
+    ::= { vRtrIsisDatabaseClearObjs 1 }
+     
+
+    vRtrIsisDatabaseClearEntry OBJECT-TYPE
+         SYNTAX VRtrIsisDatabaseClearEntry
+         MAX-ACCESS not-accessible
+         STATUS current
+         DESCRIPTION
+             "Each entry defines variables relevant to ISIS data-base clear for given  
+              system-id index."
+
+         INDEX {isisSysInstance,vRtrIsisSysID }
+
+    ::= { vRtrIsisDatabaseClearTable 1 }
+
+    VRtrIsisDatabaseClearEntry ::=
+        SEQUENCE {
+                    vRtrIsisAdjDatabaseClear  INTEGER,
+                    vRtrIsisLSPDatabaseClear  INTEGER 
+                 }
+  
+     
+     vRtrIsisAdjDatabaseClear OBJECT-TYPE
+         SYNTAX    INTEGER {
+                             default(0),
+                             reset(1)
+                           } 
+         MAX-ACCESS read-write
+         STATUS current
+         DESCRIPTION
+             "This object is defined to clear the ISIS Adjacency database for given  
+         system-id index."
+     ::= { vRtrIsisDatabaseClearEntry 1 }
+
+
+     vRtrIsisLSPDatabaseClear OBJECT-TYPE
+         SYNTAX    INTEGER {
+                             default(0),
+                             reset(1)
+                           } 
+         MAX-ACCESS read-write
+         STATUS current
+         DESCRIPTION
+             "This object is defined to clear the ISIS Adjacency database for given  
+         system-id index."
+     ::= { vRtrIsisDatabaseClearEntry 2 }
+
+
+
+--
+-- Trap definitions
+--
+
+vRtrIsisDatabaseOverload NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisSystemLevel,
+        isisSysL1State,
+        isisSysL2State
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification is generated when the system enters or leaves the
+         Overload state."
+   ::= { vRtrIsisNotifications 0 1 }
+
+vRtrIsisManualAddressDrops NOTIFICATION-TYPE
+    OBJECTS {
+        isisManAreaAddrExistState
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification is generated when one of the manual areaAddresses
+         assigned to this system is ignored when computing routes. The object
+         vRtrIsisManAreaAddrExistState describes the area that has been 
+         dropped.
+
+         This notification is edge triggered, and should not be regenerated
+         until an address that was used in the previous computation has been 
+         dropped."
+    ::= { vRtrIsisNotifications 0 2 }
+
+vRtrIsisCorruptedLSPDetected NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisSystemLevel,
+        vRtrIsisTrapLSPID
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification is generated when we find that and LSP that was 
+         stored in memory has become corrupted.  
+
+         We forward an LSP ID. We may have independent knowledge of the ID,
+         but in some implementations there is a chance that the ID itself will
+         be corrupted."
+    ::= { vRtrIsisNotifications 0 3 }
+
+vRtrIsisMaxSeqExceedAttempt NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisSystemLevel,
+        vRtrIsisTrapLSPID
+    }
+    STATUS  current
+    DESCRIPTION
+        "When the sequence number on an LSP we generate wraps the 32 bit
+         sequence counter, we purge and wait to re-announce this information.
+         This notification describes that event.  Since these should not be 
+         generated rapidly, we generate an event each time this happens.
+
+         While the first 6 bytes of the LSPID are ours, the other two contain
+         useful information."
+    ::= { vRtrIsisNotifications 0 4 }
+
+vRtrIsisIDLenMismatch  NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisFieldLen,
+        vRtrIsisIfIndex,
+        vRtrIsisPDUFragment
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when we receive a PDU with a different value of 
+         the System ID Length. This notification includes the an index to 
+         identify the circuit where we saw the PDU and the header of the PDU 
+         which may help a network manager identify the source of the confusion.
+
+         This should be an edge-triggered notification. We should not send a
+         second notification about PDUs received from what seem to be the same
+         source. This decision is up to the agent to make, and may be based on
+         the circuit or on some MAC level information."
+    ::= { vRtrIsisNotifications 0 5 }
+
+vRtrIsisMaxAreaAddrsMismatch NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisMaxAreaAddress,
+        vRtrIsisIfIndex,
+        vRtrIsisPDUFragment
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when we receive a PDU with a different value of 
+         the Maximum Area Addresses.  This notification includes the header of
+         the packet, which may help a network manager identify the source of 
+         the confusion.
+
+         This should be an edge-triggered notification. We should not send a 
+         second notification about PDUs received from what seem to be the same
+         source."
+    ::= { vRtrIsisNotifications 0 6 }
+
+vRtrIsisOwnLSPPurge NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisIfIndex,
+        vRtrIsisTrapLSPID,
+        vRtrIsisSystemLevel
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when we receive a PDU with our systemID and zero
+         age.  This notification includes the circuit Index if available, 
+         which may help a network manager identify the source of the 
+         confusion."
+    ::= { vRtrIsisNotifications 0 7 }
+
+vRtrIsisSequenceNumberSkip NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisTrapLSPID,
+        vRtrIsisIfIndex,
+        vRtrIsisSystemLevel
+    }
+    STATUS  current
+    DESCRIPTION
+        "When we recieve an LSP with out System ID and different contents, we
+         may need to reissue the LSP with a higher sequence number.
+
+         We send this notification if we need to increase the sequence number 
+         by more than one.  If two Intermediate Systems are configured with 
+         the same System ID, this notification will fire."
+    ::= { vRtrIsisNotifications 0 8 }
+
+vRtrIsisAutTypeFail NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisSystemLevel,
+        vRtrIsisPDUFragment,
+        vRtrIsisIfIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when we receive a PDU with the wrong 
+         authentication type field. This notification includes the header of 
+         the packet, which may help a network manager identify the source of 
+         the confusion.
+
+         This should be an edge-triggered notification. We should not send a 
+         second notification about PDUs received from what seem to be the 
+         same source."
+    ::= { vRtrIsisNotifications 0 9 }
+
+vRtrIsisAuthFail NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisSystemLevel,
+        vRtrIsisPDUFragment,
+        vRtrIsisIfIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when we receive a PDU with incorrent 
+         authentication information field. This notification includes the 
+         header of the packet, which may help a network manager
+         identify the source of the confusion.
+
+         This should be an edge-triggered notification. We should not send a 
+         second notification about PDUs received from what seem to be the same
+         source."
+    ::= { vRtrIsisNotifications 0 10 }
+
+vRtrIsisVersionSkew NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisProtocolVersion,
+        vRtrIsisSystemLevel,
+        vRtrIsisPDUFragment,
+        vRtrIsisIfIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when we receive a Hello
+         PDU from an IS running a different version
+         of the protocol. This notification includes
+         the header of the packet, which may help a
+         network manager identify the source of the
+         confusion.
+
+         This should be an edge-triggered notification.
+         We should not send a second notification about
+         PDUs received from what seem to be the same source.
+         This decision is up to the agent to make, and may
+         be based on the circuit or on some MAC level
+         information."
+
+    ::= { vRtrIsisNotifications 0 11 }
+
+vRtrIsisAreaMismatch NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisLSPSize,
+        vRtrIsisSystemLevel,
+        vRtrIsisIfIndex,
+        vRtrIsisPDUFragment
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when we receive a Hello
+         PDU from an IS which does not share any
+         area address. This notification includes
+         the header of the packet, which may help a
+         network manager identify the source of the
+         confusion.
+
+         This should be an edge-triggered notification.
+         We should not send a second notification about
+         PDUs received from what seem to be the same source.
+         This decision is up to the agent to make, and may
+         be based on the circuit or on some MAC level
+         information."
+    ::= { vRtrIsisNotifications 0 12 }
+
+vRtrIsisRejectedAdjacency NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisSystemLevel,
+        vRtrIsisIfIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when we receive a Hello
+         PDU from an IS, but do not establish an
+         adjacency due to a lack of resources.
+
+         This should be an edge-triggered notification.
+         We should not send a second notification about
+         PDUs received from the same source."
+    ::= { vRtrIsisNotifications 0 13 }
+
+vRtrIsisLSPTooLargeToPropagate NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisLSPSize,
+        vRtrIsisSystemLevel,
+        vRtrIsisTrapLSPID,
+        vRtrIsisIfIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when we attempt to propagate
+         an LSP which is larger than the dataLinkBlockSize
+         for a circuit.
+
+         This should be an edge-triggered notification.
+         We should not send a second notification about
+         PDUs received from the same source."
+    ::= { vRtrIsisNotifications 0 14 }
+
+vRtrIsisOrigLSPBufSizeMismatch NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisOriginatingBufferSize,
+        vRtrIsisSystemLevel,
+        vRtrIsisTrapLSPID,
+        vRtrIsisIfIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when a Level 1 LSP or Level
+         2 LSP is received which is larger than the local
+         value for originatingL1LSPBufferSize or
+         originatingL2LSPBufferSize respectively, or when
+         a Level 1 LSP or Level2 LSP is received containing
+         the originatingLSPBufferSize option and the value in
+         the PDU option field does not match the local value
+         for originatingL1LSPBufferSize or originatingL2LSPBufferSize
+         respectively.  We pass up the size from the option
+         field or the size of the LSP that exceeds our
+         configuration.
+
+         This should be an edge-triggered notification.
+         We should not send a second notification about
+         PDUs received from the same source."
+    ::= { vRtrIsisNotifications 0 15 }
+
+vRtrIsisProtoSuppMismatch NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisProtocolsSupported,
+        vRtrIsisSystemLevel,
+        vRtrIsisTrapLSPID,
+        vRtrIsisIfIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when a non-pseudonode
+         segment 0 LSP is received that has no matching
+         protocols supported.
+         This may be because the system does not generate
+         the field, or because there are no common elements.
+         The list of protocols supported should be included
+         in the notification: it may be empty if the TLV
+         is not supported, or if the TLV is empty.
+
+         This should be an edge-triggered notification.
+         We should not send a second notification about
+         PDUs received from the same source."
+    ::= { vRtrIsisNotifications 0 16 }
+
+vRtrIsisAdjacencyChange NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisSystemLevel,
+        vRtrIsisIfIndex,
+        vRtrIsisTrapLSPID,
+        isisISAdjState
+    }
+    STATUS current
+    DESCRIPTION
+        "A notification sent when an adjacency changes state, 
+        entering or leaving state up. The first 6 bytes of the
+        vRtrIsisTrapLSPID are the SystemID of the adjacent IS.
+        The isisISAdjState is the new state of the adjacency."
+    ::= { vRtrIsisNotifications 0 17 }
+
+vRtrIsisCircIdExhausted NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisIfIndex
+    }
+    STATUS current
+    DESCRIPTION
+        "A notification sent when ISIS cannot be started on a 
+        LAN interface as a unique circid could not be assigned
+        due to the exhaustion of the circId space.
+        
+        This could happen only on the broadcast interfaces.
+
+        In such a case the interface is marked operationally 
+        down. When an operationally up interface is deleted, the 
+        circId can be reused by any interface which is waiting to
+        receive a unique circId."
+    ::= { vRtrIsisNotifications 0 18 }
+
+vRtrIsisAdjRestartStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        vRtrIsisSystemLevel,
+        vRtrIsisIfIndex,
+        vRtrIsisISAdjRestartStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "A notification sent when an adjancency's
+        graceful restart status changes.
+        The vRtrIsisISAdjRestartStatus is the new 
+        graceful restart state of the adjacency."
+    ::= { vRtrIsisNotifications 0 19 }
+
+--
+-- Conformance Information
+--
+
+vRtrIsisMIBConformances OBJECT IDENTIFIER ::= { vRtrIsisMIBConformance 1 }
+vRtrIsisMIBGroups       OBJECT IDENTIFIER ::= { vRtrIsisMIBConformance 2 }
+
+--
+-- Compliance Statements
+--
+
+vRtrIsisMIBCompliance MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for revision 2.0 of TIMETRA-ISIS-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            vRtrIsisGroup,
+            vRtrIsisHostGroup,
+            vRtrIsisRouteGroup,
+            vRtrIsisLSPGroup,
+            vRtrIsisIfGroup,
+            vRtrIsisAdjGroup,
+            vRtrIsisNotificationObjGroup,
+            vRtrIsisNotificationsGroup
+        }
+    ::= { vRtrIsisMIBConformances 1 }
+
+vRtrIsisMIBR2r1Compliance MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for revision 2.1 of TIMETRA-ISIS-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            vRtrIsisR2r1Group,
+            vRtrIsisHostGroup,
+            vRtrIsisRouteGroup,
+            vRtrIsisLSPGroup,
+            vRtrIsisIfGroup,
+            vRtrIsisAdjGroup,
+            vRtrIsisNotificationObjGroup,
+            vRtrIsisNotificationsGroup,
+            vRtrIsisSpfGroup,
+            vRtrIsisSummaryGroup
+        }
+    ::= { vRtrIsisMIBConformances 2 }
+
+vRtrIsisMIBV3v0Compliance MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for revision 3.0 of TIMETRA-ISIS-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            vRtrIsisV3v0Group,
+            vRtrIsisHostGroup,
+            vRtrIsisRouteGroup,
+            vRtrIsisLSPGroup,
+            vRtrIsisIfGroup,
+            vRtrIsisAdjV3v0Group,
+            vRtrIsisNotificationObjGroup,
+            vRtrIsisNotificationV3v0Group,
+            vRtrIsisSpfGroup,
+            vRtrIsisSummaryGroup
+        }
+    ::= { vRtrIsisMIBConformances 3 }
+
+vRtrIsisMIBV4v0Compliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for revision 4.0 of TIMETRA-ISIS-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            vRtrIsisV4v0Group,
+            vRtrIsisHostGroup,
+            vRtrIsisRouteV4v0Group,
+            vRtrIsisLSPGroup,
+            vRtrIsisIfGroup,
+            vRtrIsisAdjV3v0Group,
+            vRtrIsisNotificationObjGroup,
+            vRtrIsisNotificationV3v0Group,
+            vRtrIsisSpfGroup,
+            vRtrIsisSummaryV4v0Group,
+            vRtrIsisScalarObjsGroup,
+            vRtrIsisDBClearObjsGroup
+        }
+    ::= { vRtrIsisMIBConformances 4 }
+
+--
+-- Units of conformance
+--
+
+vRtrIsisGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisLastEnabledTime,
+                vRtrIsisAuthKey,
+                vRtrIsisAuthType,
+                vRtrIsisAuthCheck,
+                vRtrIsisLspLifetime,
+                vRtrIsisOverloadTimeout,
+                vRtrIsisOperState,
+                vRtrIsisShortCuts,
+                vRtrIsisSpfHoldTime,
+                vRtrIsisLastSpfRun,
+                vRtrIsisGracefulRestart,
+                vRtrIsisOverloadOnBoot,
+                vRtrIsisOverloadOnBootTimeout,
+                vRtrIsisSpfWait,
+                vRtrIsisSpfInitialWait,
+                vRtrIsisSpfSecondWait,
+                vRtrIsisLspMaxWait,
+                vRtrIsisLspInitialWait,
+                vRtrIsisLspSecondWait,
+                vRtrIsisLevelAuthKey,
+                vRtrIsisLevelAuthType,
+                vRtrIsisLevelWideMetricsOnly,
+                vRtrIsisLevelOverloadStatus,
+                vRtrIsisLevelOverloadTimeLeft,
+                vRtrIsisLevelNumLSPs,
+                vRtrIsisSpfRuns,
+                vRtrIsisLSPRegenerations,
+                vRtrIsisInitiatedPurges,
+                vRtrIsisLSPRecd,
+                vRtrIsisLSPDrop,
+                vRtrIsisLSPSent,
+                vRtrIsisLSPRetrans,
+                vRtrIsisIIHRecd,
+                vRtrIsisIIHDrop,
+                vRtrIsisIIHSent,
+                vRtrIsisIIHRetrans,
+                vRtrIsisCSNPRecd,
+                vRtrIsisCSNPDrop,
+                vRtrIsisCSNPSent,
+                vRtrIsisCSNPRetrans,
+                vRtrIsisPSNPRecd,
+                vRtrIsisPSNPDrop,
+                vRtrIsisPSNPSent,
+                vRtrIsisPSNPRetrans,
+                vRtrIsisUnknownRecd,
+                vRtrIsisUnknownDrop,
+                vRtrIsisUnknownSent,
+                vRtrIsisUnknownRetrans,
+                vRtrIsisCSPFRequests,
+                vRtrIsisCSPFDroppedRequests,
+                vRtrIsisCSPFPathsFound,
+                vRtrIsisCSPFPathsNotFound
+            }
+    STATUS    obsolete
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS system objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 1 }
+
+vRtrIsisHostGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisSysID,
+                vRtrIsisHostname
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS host-name objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 2 }
+
+vRtrIsisRouteGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisRouteDest,
+                vRtrIsisRouteMask,
+                vRtrIsisRouteNexthopIP,
+                vRtrIsisRouteLevel,
+                vRtrIsisRouteSpfVersion,
+                vRtrIsisRouteMetric,
+                vRtrIsisRouteType,
+                vRtrIsisRouteNHopSysID
+            }
+    STATUS    obsolete
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS route objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 3 }
+
+vRtrIsisPathGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisPathID,
+                vRtrIsisPathIfIndex,
+                vRtrIsisPathNHopSysID,
+                vRtrIsisPathMetric,
+                vRtrIsisPathSNPA
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS path objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 4 }
+
+vRtrIsisLSPGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisLSPId,
+                vRtrIsisLSPSeq,
+                vRtrIsisLSPChecksum,
+                vRtrIsisLSPLifetimeRemain,
+                vRtrIsisLSPVersion,
+                vRtrIsisLSPPktType,
+                vRtrIsisLSPPktVersion,
+                vRtrIsisLSPMaxArea,
+                vRtrIsisLSPSysIdLen,
+                vRtrIsisLSPAttributes,
+                vRtrIsisLSPUsedLen,
+                vRtrIsisLSPAllocLen,
+                vRtrIsisLSPBuff,
+                vRtrIsisLSPZeroRLT
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS LSP objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 5 }
+
+vRtrIsisIfGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisIfRowStatus,
+                vRtrIsisIfLastChangeTime,
+                vRtrIsisIfAdminState,
+                vRtrIsisIfOperState,
+                vRtrIsisIfCsnpInterval,
+                vRtrIsisIfHelloAuthKey,
+                vRtrIsisIfHelloAuthType,
+                vRtrIsisIfLspPacingInterval,
+                vRtrIsisIfCircIndex,
+                vRtrIsisIfRetransmitInterval,
+                vRtrIsisIfTypeDefault,
+                vRtrIsisIfLevelLastChangeTime,
+                vRtrIsisIfLevelHelloAuthKey,
+                vRtrIsisIfLevelHelloAuthType,
+                vRtrIsisIfLevelPassive,
+                vRtrIsisIfLevelTeMetric,
+                vRtrIsisIfLevelNumAdjacencies,
+                vRtrIsisIfLevelISPriority,
+                vRtrIsisIfLevelHelloTimer,
+                vRtrIsisIfLevelAdminMetric,
+                vRtrIsisIfLevelOperMetric
+            }
+    STATUS    obsolete
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS interface objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 6 }
+
+
+vRtrIsisAdjGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisISAdjExpiresIn,
+                vRtrIsisISAdjCircLevel,
+                vRtrIsisISAdjNeighborIP
+            }
+    STATUS    obsolete
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS adjacency objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 7 }
+
+
+vRtrIsisNotificationObjGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisTrapLSPID,
+                vRtrIsisSystemLevel,
+                vRtrIsisPDUFragment,
+                vRtrIsisFieldLen,
+                vRtrIsisMaxAreaAddress,
+                vRtrIsisProtocolVersion,
+                vRtrIsisLSPSize,
+                vRtrIsisOriginatingBufferSize,
+                vRtrIsisProtocolsSupported
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS notification objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 8 }
+
+
+vRtrIsisNotificationsGroup NOTIFICATION-GROUP
+     NOTIFICATIONS {
+                 vRtrIsisDatabaseOverload,
+                 vRtrIsisManualAddressDrops,
+                 vRtrIsisCorruptedLSPDetected,
+                 vRtrIsisMaxSeqExceedAttempt,
+                 vRtrIsisIDLenMismatch,
+                 vRtrIsisMaxAreaAddrsMismatch,
+                 vRtrIsisOwnLSPPurge,
+                 vRtrIsisSequenceNumberSkip,
+                 vRtrIsisAutTypeFail,
+                 vRtrIsisAuthFail,
+                 vRtrIsisVersionSkew,
+                 vRtrIsisAreaMismatch,
+                 vRtrIsisRejectedAdjacency,
+                 vRtrIsisLSPTooLargeToPropagate,
+                 vRtrIsisOrigLSPBufSizeMismatch,
+                 vRtrIsisProtoSuppMismatch,
+                 vRtrIsisAdjacencyChange,
+                 vRtrIsisCircIdExhausted
+            }
+     STATUS obsolete
+     DESCRIPTION
+         "The group of notifications supporting management of
+          ISIS notifications on Alcatel 7x50 SR series systems."
+     ::= { vRtrIsisMIBGroups 9 }
+
+
+vRtrIsisSpfGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisSpfRunTime,
+                vRtrIsisSpfL1Nodes,
+                vRtrIsisSpfL2Nodes,
+                vRtrIsisSpfEventCount,
+                vRtrIsisSpfLastTriggerLSPId,
+                vRtrIsisSpfTriggerReason
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS SPF objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 10 }
+
+
+vRtrIsisSummaryGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisSummRowStatus,
+                vRtrIsisSummLevel
+            }
+    STATUS    obsolete
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS Summary Addresses on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 11 }
+
+vRtrIsisR2r1Group OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisLastEnabledTime,
+                vRtrIsisAuthKey,
+                vRtrIsisAuthType,
+                vRtrIsisAuthCheck,
+                vRtrIsisLspLifetime,
+                vRtrIsisOverloadTimeout,
+                vRtrIsisOperState,
+                vRtrIsisShortCuts,
+                vRtrIsisSpfHoldTime,
+                vRtrIsisLastSpfRun,
+                vRtrIsisGracefulRestart,
+                vRtrIsisOverloadOnBoot,
+                vRtrIsisOverloadOnBootTimeout,
+                vRtrIsisSpfWait,
+                vRtrIsisSpfInitialWait,
+                vRtrIsisSpfSecondWait,
+                vRtrIsisLspMaxWait,
+                vRtrIsisLspInitialWait,
+                vRtrIsisLspSecondWait,
+                vRtrIsisCsnpAuthentication,
+                vRtrIsisHelloAuthentication,
+                vRtrIsisPsnpAuthentication,
+                vRtrIsisLevelAuthKey,
+                vRtrIsisLevelAuthType,
+                vRtrIsisLevelWideMetricsOnly,
+                vRtrIsisLevelOverloadStatus,
+                vRtrIsisLevelOverloadTimeLeft,
+                vRtrIsisLevelNumLSPs,
+                vRtrIsisLevelCsnpAuthentication,
+                vRtrIsisLevelHelloAuthentication,
+                vRtrIsisLevelPsnpAuthentication,
+                vRtrIsisSpfRuns,
+                vRtrIsisLSPRegenerations,
+                vRtrIsisInitiatedPurges,
+                vRtrIsisLSPRecd,
+                vRtrIsisLSPDrop,
+                vRtrIsisLSPSent,
+                vRtrIsisLSPRetrans,
+                vRtrIsisIIHRecd,
+                vRtrIsisIIHDrop,
+                vRtrIsisIIHSent,
+                vRtrIsisIIHRetrans,
+                vRtrIsisCSNPRecd,
+                vRtrIsisCSNPDrop,
+                vRtrIsisCSNPSent,
+                vRtrIsisCSNPRetrans,
+                vRtrIsisPSNPRecd,
+                vRtrIsisPSNPDrop,
+                vRtrIsisPSNPSent,
+                vRtrIsisPSNPRetrans,
+                vRtrIsisUnknownRecd,
+                vRtrIsisUnknownDrop,
+                vRtrIsisUnknownSent,
+                vRtrIsisUnknownRetrans,
+                vRtrIsisCSPFRequests,
+                vRtrIsisCSPFDroppedRequests,
+                vRtrIsisCSPFPathsFound,
+                vRtrIsisCSPFPathsNotFound
+            }
+    STATUS    obsolete
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS system objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 12 }
+
+vRtrIsisV3v0Group OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisLastEnabledTime,
+                vRtrIsisAuthKey,
+                vRtrIsisAuthType,
+                vRtrIsisAuthCheck,
+                vRtrIsisLspLifetime,
+                vRtrIsisOverloadTimeout,
+                vRtrIsisOperState,
+                vRtrIsisShortCuts,
+                vRtrIsisSpfHoldTime,
+                vRtrIsisLastSpfRun,
+                vRtrIsisGracefulRestart,
+                vRtrIsisOverloadOnBoot,
+                vRtrIsisOverloadOnBootTimeout,
+                vRtrIsisSpfWait,
+                vRtrIsisSpfInitialWait,
+                vRtrIsisSpfSecondWait,
+                vRtrIsisLspMaxWait,
+                vRtrIsisLspInitialWait,
+                vRtrIsisLspSecondWait,
+                vRtrIsisCsnpAuthentication,
+                vRtrIsisHelloAuthentication,
+                vRtrIsisPsnpAuthentication,
+                vRtrIsisGRRestartDuration,
+                vRtrIsisGRHelperMode,
+                vRtrIsisLevelAuthKey,
+                vRtrIsisLevelAuthType,
+                vRtrIsisLevelWideMetricsOnly,
+                vRtrIsisLevelOverloadStatus,
+                vRtrIsisLevelOverloadTimeLeft,
+                vRtrIsisLevelNumLSPs,
+                vRtrIsisLevelCsnpAuthentication,
+                vRtrIsisLevelHelloAuthentication,
+                vRtrIsisLevelPsnpAuthentication,
+                vRtrIsisSpfRuns,
+                vRtrIsisLSPRegenerations,
+                vRtrIsisInitiatedPurges,
+                vRtrIsisLSPRecd,
+                vRtrIsisLSPDrop,
+                vRtrIsisLSPSent,
+                vRtrIsisLSPRetrans,
+                vRtrIsisIIHRecd,
+                vRtrIsisIIHDrop,
+                vRtrIsisIIHSent,
+                vRtrIsisIIHRetrans,
+                vRtrIsisCSNPRecd,
+                vRtrIsisCSNPDrop,
+                vRtrIsisCSNPSent,
+                vRtrIsisCSNPRetrans,
+                vRtrIsisPSNPRecd,
+                vRtrIsisPSNPDrop,
+                vRtrIsisPSNPSent,
+                vRtrIsisPSNPRetrans,
+                vRtrIsisUnknownRecd,
+                vRtrIsisUnknownDrop,
+                vRtrIsisUnknownSent,
+                vRtrIsisUnknownRetrans,
+                vRtrIsisCSPFRequests,
+                vRtrIsisCSPFDroppedRequests,
+                vRtrIsisCSPFPathsFound,
+                vRtrIsisCSPFPathsNotFound
+            }
+    STATUS    obsolete
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS system objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 13 }
+
+vRtrIsisAdjV3v0Group OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisISAdjExpiresIn,
+                vRtrIsisISAdjCircLevel,
+                vRtrIsisISAdjNeighborIP,
+                vRtrIsisISAdjRestartSupport,
+                vRtrIsisISAdjRestartStatus,
+                vRtrIsisISAdjRestartSupressed,
+                vRtrIsisISAdjNumRestarts,
+                vRtrIsisISAdjLastRestartTime 
+            }
+    STATUS    obsolete
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS adjacency objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 14 }
+
+vRtrIsisNotificationV3v0Group NOTIFICATION-GROUP
+     NOTIFICATIONS {
+                 vRtrIsisDatabaseOverload,
+                 vRtrIsisManualAddressDrops,
+                 vRtrIsisCorruptedLSPDetected,
+                 vRtrIsisMaxSeqExceedAttempt,
+                 vRtrIsisIDLenMismatch,
+                 vRtrIsisMaxAreaAddrsMismatch,
+                 vRtrIsisOwnLSPPurge,
+                 vRtrIsisSequenceNumberSkip,
+                 vRtrIsisAutTypeFail,
+                 vRtrIsisAuthFail,
+                 vRtrIsisVersionSkew,
+                 vRtrIsisAreaMismatch,
+                 vRtrIsisRejectedAdjacency,
+                 vRtrIsisLSPTooLargeToPropagate,
+                 vRtrIsisOrigLSPBufSizeMismatch,
+                 vRtrIsisProtoSuppMismatch,
+                 vRtrIsisAdjacencyChange,
+                 vRtrIsisCircIdExhausted,
+                 vRtrIsisAdjRestartStatusChange
+            }
+     STATUS current
+     DESCRIPTION
+         "The group of notifications supporting management of
+          ISIS notifications on Alcatel 7x50 SR series systems."
+     ::= { vRtrIsisMIBGroups 15 }
+
+vRtrIsisV4v0Group OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisLastEnabledTime,
+                vRtrIsisAuthKey,
+                vRtrIsisAuthType,
+                vRtrIsisAuthCheck,
+                vRtrIsisLspLifetime,
+                vRtrIsisOverloadTimeout,
+                vRtrIsisOperState,
+                vRtrIsisShortCuts,
+                vRtrIsisSpfHoldTime,
+                vRtrIsisLastSpfRun,
+                vRtrIsisGracefulRestart,
+                vRtrIsisOverloadOnBoot,
+                vRtrIsisOverloadOnBootTimeout,
+                vRtrIsisSpfWait,
+                vRtrIsisSpfInitialWait,
+                vRtrIsisSpfSecondWait,
+                vRtrIsisLspMaxWait,
+                vRtrIsisLspInitialWait,
+                vRtrIsisLspSecondWait,
+                vRtrIsisCsnpAuthentication,
+                vRtrIsisHelloAuthentication,
+                vRtrIsisPsnpAuthentication,
+                vRtrIsisGRRestartDuration,
+                vRtrIsisGRHelperMode,
+                vRtrIsisStrictAdjacencyCheck,
+                vRtrIsisLevelAuthKey,
+                vRtrIsisLevelAuthType,
+                vRtrIsisLevelWideMetricsOnly,
+                vRtrIsisLevelOverloadStatus,
+                vRtrIsisLevelOverloadTimeLeft,
+                vRtrIsisLevelNumLSPs,
+                vRtrIsisLevelCsnpAuthentication,
+                vRtrIsisLevelHelloAuthentication,
+                vRtrIsisLevelPsnpAuthentication,
+                vRtrIsisSpfRuns,
+                vRtrIsisLSPRegenerations,
+                vRtrIsisInitiatedPurges,
+                vRtrIsisLSPRecd,
+                vRtrIsisLSPDrop,
+                vRtrIsisLSPSent,
+                vRtrIsisLSPRetrans,
+                vRtrIsisIIHRecd,
+                vRtrIsisIIHDrop,
+                vRtrIsisIIHSent,
+                vRtrIsisIIHRetrans,
+                vRtrIsisCSNPRecd,
+                vRtrIsisCSNPDrop,
+                vRtrIsisCSNPSent,
+                vRtrIsisCSNPRetrans,
+                vRtrIsisPSNPRecd,
+                vRtrIsisPSNPDrop,
+                vRtrIsisPSNPSent,
+                vRtrIsisPSNPRetrans,
+                vRtrIsisUnknownRecd,
+                vRtrIsisUnknownDrop,
+                vRtrIsisUnknownSent,
+                vRtrIsisUnknownRetrans,
+                vRtrIsisCSPFRequests,
+                vRtrIsisCSPFDroppedRequests,
+                vRtrIsisCSPFPathsFound,
+                vRtrIsisCSPFPathsNotFound
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS system objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 16 }
+
+vRtrIsisRouteV4v0Group OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisRouteDest,
+                vRtrIsisRouteMask,
+                vRtrIsisRouteNexthopIP,
+                vRtrIsisRouteLevel,
+                vRtrIsisRouteSpfVersion,
+                vRtrIsisRouteMetric,
+                vRtrIsisRouteType,
+                vRtrIsisRouteNHopSysID,
+                vRtrIsisInetRouteLevel,
+                vRtrIsisInetRouteSpfRunNumber,
+                vRtrIsisInetRouteMetric,
+                vRtrIsisInetRouteType,
+                vRtrIsisInetRouteNHopSysID
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS route objects on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 17 }
+
+vRtrIsisSummaryV4v0Group OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisSummRowStatus,
+                vRtrIsisSummLevel,
+                vRtrIsisInetSummRowStatus,  
+                vRtrIsisInetSummLevel
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS Summary Addresses on Alcatel 7x50 SR series systems."
+    ::= { vRtrIsisMIBGroups 18 }
+
+vRtrIsisAdjV4v0Group OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisISAdjExpiresIn,
+                vRtrIsisISAdjCircLevel,
+                vRtrIsisISAdjNeighborIP,
+                vRtrIsisISAdjRestartSupport,
+                vRtrIsisISAdjRestartStatus,
+                vRtrIsisISAdjRestartSupressed,
+                vRtrIsisISAdjNumRestarts,
+                vRtrIsisISAdjLastRestartTime,
+                vRtrIsisISAdjNeighborIPv6Type,
+                vRtrIsisISAdjNeighborIpv6
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS adjacency objects on Alcatel 7x50 SR 4.0 
+         series systems."
+    ::= { vRtrIsisMIBGroups 19 }
+
+vRtrIsisIfV4v0Group OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisIfRowStatus,
+                vRtrIsisIfLastChangeTime,
+                vRtrIsisIfAdminState,
+                vRtrIsisIfOperState,
+                vRtrIsisIfCsnpInterval,
+                vRtrIsisIfHelloAuthKey,
+                vRtrIsisIfHelloAuthType,
+                vRtrIsisIfLspPacingInterval,
+                vRtrIsisIfCircIndex,
+                vRtrIsisIfRetransmitInterval,
+                vRtrIsisIfTypeDefault,
+                vRtrIsisIfLevelLastChangeTime,
+                vRtrIsisIfLevelHelloAuthKey,
+                vRtrIsisIfLevelHelloAuthType,
+                vRtrIsisIfLevelPassive,
+                vRtrIsisIfLevelTeMetric,
+                vRtrIsisIfLevelNumAdjacencies,
+                vRtrIsisIfLevelISPriority,
+                vRtrIsisIfLevelHelloTimer,
+                vRtrIsisIfLevelAdminMetric,
+                vRtrIsisIfLevelOperMetric
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS interface objects on Alcatel 7x50 SR 4.0 series systems."
+    ::= { vRtrIsisMIBGroups 20 }
+
+vRtrIsisScalarObjsGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisStatisticsClear,
+                vRtrIsisLSPClear,
+                vRtrIsisISAdjClear,
+                vRtrIsisSpfClear
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS clear objects on Alcatel 7x50 SR 4.0 series systems."
+    ::= { vRtrIsisMIBGroups 21 }
+
+vRtrIsisDBClearObjsGroup OBJECT-GROUP
+    OBJECTS {
+                vRtrIsisAdjDatabaseClear,
+                vRtrIsisLSPDatabaseClear
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of
+         ISIS clear objects on Alcatel 7x50 SR 4.0 series systems."
+    ::= { vRtrIsisMIBGroups 22 }
+
+END

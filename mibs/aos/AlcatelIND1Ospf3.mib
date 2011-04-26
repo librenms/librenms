@@ -1,0 +1,183 @@
+ALCATEL-IND1-OSPF3-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+				FROM SNMPv2-SMI
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    routingIND1Ospf3
+        FROM ALCATEL-IND1-BASE;
+
+alcatelIND1OSPF3MIB MODULE-IDENTITY
+
+    LAST-UPDATED  "200704030000Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This proprietary MIB contains management information for
+             the configuration of OSPFv3 global configuration parameters.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, o
+r
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2003 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { routingIND1Ospf3 1 }
+
+alcatelIND1OSPF3MIBObjects    OBJECT IDENTIFIER ::= { alcatelIND1OSPF3MIB 1 }
+alaProtocolOspf3    OBJECT IDENTIFIER ::= { alcatelIND1OSPF3MIBObjects 1 }
+
+alaOspf3OrigRouteTag	OBJECT-TYPE
+		SYNTAX			Unsigned32
+    MAX-ACCESS 	read-write
+    STATUS     	current
+    DESCRIPTION
+		"Route tag that is originated with ASEs"
+    DEFVAL     { 0 }
+    ::= {alaProtocolOspf3 1 }
+
+alaOspf3TimerSpfDelay	OBJECT-TYPE
+		SYNTAX			INTEGER ( 0 .. 65535 )
+    MAX-ACCESS 	read-write
+    STATUS     	current
+    DESCRIPTION
+		"Delay (in seconds) between topology change and SPF run"
+    DEFVAL     { 5 }
+    ::= {alaProtocolOspf3 2 }
+
+alaOspf3TimerSpfHold	OBJECT-TYPE
+		SYNTAX			INTEGER ( 0 .. 65535 )
+    MAX-ACCESS 	read-write
+    STATUS     	current
+    DESCRIPTION
+		"Delay (in seconds) between subsequent SPF executions"
+    DEFVAL     { 10 }
+    ::= {alaProtocolOspf3 3 }
+
+alaOspf3RestartHelperSupport	OBJECT-TYPE
+		SYNTAX			INTEGER
+								{
+									enable (1),
+									disable (2)
+								}
+    MAX-ACCESS 	read-write
+    STATUS     	current
+    DESCRIPTION
+		"This router can be a helper to another restarting router"
+    DEFVAL     { enable }
+    ::= {alaProtocolOspf3 4 }
+
+alaOspf3RestartStrictLsaChecking	OBJECT-TYPE
+		SYNTAX			INTEGER
+								{
+									enable (1),
+									disable (2)
+								}
+    MAX-ACCESS 	read-write
+    STATUS     	current
+    DESCRIPTION
+		"Will changed LSA result in restart termination"
+    DEFVAL     { enable }
+    ::= {alaProtocolOspf3 5 }
+
+alaOspf3RestartInitiate	OBJECT-TYPE
+		SYNTAX			INTEGER
+								{
+									enable (1),
+									disable (2)
+								}
+    MAX-ACCESS 	read-write
+    STATUS     	current
+    DESCRIPTION
+		"Start a graceful restart"
+    ::= {alaProtocolOspf3 6 }
+
+alaOspf3MTUCheck	OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  enable (1),
+                  disable (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Verify the MTU of a neighbor matches our own."
+    ::= {alaProtocolOspf3 7 }
+
+
+-- conformance information
+
+alcatelIND1OSPF3MIBConformance OBJECT IDENTIFIER ::= { alcatelIND1OSPF3MIB 2 }
+alcatelIND1OSPF3MIBCompliances OBJECT IDENTIFIER ::=
+                                          { alcatelIND1OSPF3MIBConformance 1 }
+alcatelIND1OSPF3MIBGroups      OBJECT IDENTIFIER ::=
+                                          { alcatelIND1OSPF3MIBConformance 2 }
+
+-- compliance statements
+
+alcatelIND1OSPF3MIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for OSPFv3
+             and implementing the ALCATEL-IND1-OSPF3 MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaOSPF3ConfigMIBGroup }
+
+    ::= { alcatelIND1OSPF3MIBCompliances 1 }
+
+-- units of conformance
+
+alaOSPF3ConfigMIBGroup OBJECT-GROUP
+    OBJECTS {        
+			alaOspf3OrigRouteTag,
+			alaOspf3TimerSpfDelay,
+			alaOspf3TimerSpfHold,
+			alaOspf3RestartHelperSupport,
+			alaOspf3RestartStrictLsaChecking,
+			alaOspf3RestartInitiate,
+			alaOspf3MTUCheck
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of OSPF3."
+    ::= { alcatelIND1OSPF3MIBGroups 1 }
+
+END

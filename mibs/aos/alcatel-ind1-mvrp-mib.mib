@@ -1,0 +1,840 @@
+ALCATEL-IND1-MVRP-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		Counter32, MODULE-IDENTITY, 
+		OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32 
+							FROM SNMPv2-SMI
+                VlanId                  FROM Q-BRIDGE-MIB
+		InterfaceIndex		FROM IF-MIB
+		MODULE-COMPLIANCE, OBJECT-GROUP
+							FROM SNMPv2-CONF
+		softentIND1Mvrp		FROM ALCATEL-IND1-BASE
+                MacAddress		FROM SNMPv2-TC
+		EnabledStatus		FROM P-BRIDGE-MIB
+		TEXTUAL-CONVENTION 	FROM SNMPv2-TC;
+
+
+	alcatelIND1MVRPMIB MODULE-IDENTITY
+		LAST-UPDATED "200908070000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+			"Please consult with Customer Service to insure the most appropriate
+			version of this document is used with the products in question:
+
+			Alcatel-Lucent, Enterprise Solutions Division
+			(Formerly Alcatel Internetworking, Incorporated)
+			26801 West Agoura Road
+			Agoura Hills, CA  91301-5122
+			United States Of America
+
+			Telephone:				North America  +1 800 995 2696
+								Latin America  +1 877 919 9526
+								Europe         +31 23 556 0100
+								Asia           +65 394 7933
+								All Other      +1 818 878 4507
+
+			Electronic Mail:		support@ind.alcatel.com
+			World Wide Web:			http://alcatel-lucent.com/wps/portal/enterprise
+			File Transfer Protocol:	ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+		DESCRIPTION
+			"This module describes an authoritative enterprise-specific Simple
+			Network Management Protocol (SNMP) Management Information Base (MIB):
+
+			For the Birds Of Prey Product Line
+			MVRP for the distribution of VLAN configuration information.
+
+			The right to make changes in specification and other information
+			contained in this document without prior notice is reserved.
+
+			No liability shall be assumed for any incidental, indirect, special, or
+			consequential damages whatsoever arising from or related to this
+			document or the information contained herein.
+
+			Vendors, end-users, and other interested parties are granted
+			non-exclusive license to use this specification in connection with
+			management of the products for which it is intended to be used.
+
+			Copyright (C) 1995-2009 Alcatel-Lucent, Incorporated
+			ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION	"200908070000Z"
+
+		DESCRIPTION
+			"The MVRP MIB defines a set of MVRP related management objects for VLANs 
+			and ports that support Multiple VLAN Registration Protocol (MVRP). MVRP as a 
+			protocol provides mechanisms to dynamically learn and further propagate VLAN 
+			membership information across a bridged network, as recommended in standards 
+			IEEE Std. 802.1ak-2007, which is an amendment to IEEE Std 802.1Q-2005 Edition. 
+	
+			This MVRP MIB extends already existing IETF_Q_BRIDGE MIB which is based on 
+			RFC 2674 (Bridges with Traffic Classes, Multicast Filtering and Virtual LAN 
+			Extensions), to accomodate the proprietary behavior of the device and for 
+			defining objects as recommended by standards. 
+
+			This MIB comprises proprietary managed objects as well the objects required 
+			for conforming to the standards. However, the set of objects defined in this MIB, 
+			do not duplicate, nor conflict with any MIB object definitions defined in the 
+			IETF_Q_BRIDGE_MIB."
+		::= { softentIND1Mvrp 1}
+
+----------------------------------------------------------------
+	alaMvrpEvents OBJECT IDENTIFIER ::= { alcatelIND1MVRPMIB 0 }
+ 
+	alcatelIND1MVRPMIBObjects OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"Branch For MVRP Subsystem Managed Objects."
+		::= { alcatelIND1MVRPMIB 1 }
+
+	alcatelIND1MVRPMIBConformance OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"Branch for MVRP Module MIB Subsystem Conformance Information."
+		::= { alcatelIND1MVRPMIB 2 }
+
+	alcatelIND1MVRPMIBGroups OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"Branch for MVRP Module MIB Subsystem Units of Conformance."
+		::= { alcatelIND1MVRPMIBConformance 1 }
+
+	alcatelIND1MVRPMIBCompliances OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"Branch for MVRP Module MIB Subsystem Compliance Statements."
+		::= { alcatelIND1MVRPMIBConformance 2 }
+
+-- textual conventions
+MvrpPortVlanRestrictBitmap  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "The bitmap that includes the status value for different type of restrictions that could be 
+            applied for a port VLAN combination.
+            Each bit in the bitmap corresponds to the status of the restriction applied for a VLAN on a port.
+
+            Having the bit 'noRestriction(0)' set indicates that the no restriction is applied for the VLAN 
+            on the port. No other option can be applied along with this option.
+
+            Having the bit 'restrictRegistration(1)' set indicates that the VLAN is restricted from 
+            getting registered on the port.
+
+            Having the bit 'restrictAdvertisement(2)' set indicates that the advertisement for the 
+            VLAN is restricted on the port.
+
+            Having the bit 'restrictStaticVlanRegistration(3)' set indicates that the registration 
+            on a port for a static VLAN is restricted."
+
+    SYNTAX  BITS {
+            	noRestriction(0),
+            	restrictRegistration(1),
+            	restrictAdvertisement(2),
+            	restrictStaticVlanRegistration(3)
+            }
+
+----------------------------------------------------------------
+       
+----------------------------------------------------------------
+--MVRP MIB
+----------------------------------------------------------------
+
+	alaMvrpGlobalStatus OBJECT-TYPE
+	SYNTAX      EnabledStatus
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The administrative global status requested by management for
+		MVRP.  The value enabled(1) indicates that MVRP should
+		be enabled on this device.  When disabled(2), MVRP
+		is disabled in the system and all MVRP packets will be
+		forwarded transparently if transparent switching status is 
+		also enabled.  This object affects all MVRP Applicant and Registrar 
+		state machines.  A transition from disabled(2) to enabled(1) will cause a reset of all
+		MVRP state machines on all ports."
+	DEFVAL      { disabled }
+	::= { alcatelIND1MVRPMIBObjects 1 }
+		
+	alaMvrpGlobalClearStats OBJECT-TYPE
+		SYNTAX	INTEGER 
+				{
+					default(0),
+					reset(1)
+				}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Defines the global clear statistics control for MVRP.  
+			The value reset (1) indicates that MVRP should clear all statistic 
+			counters related to all ports in the system. By default, this object
+			contains a zero value."
+		DEFVAL	{ default }
+	::= { alcatelIND1MVRPMIBObjects 2 }
+
+	alaMvrpTransparentSwitching OBJECT-TYPE
+		SYNTAX      EnabledStatus
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Defines the behavior when MVRP is globally disabled on a device.			
+			The value enabled (1) indicates that device behaves like a MVRP 
+			transparent device and the MVRP frames will be flooded transparently.
+			Value disabled (2) disabled indicates that the device will not flood 
+			MVRP frames and will simply discard the received MVRP frames."
+		DEFVAL	{ disabled }
+	::= { alcatelIND1MVRPMIBObjects 3 }
+		
+	alaMvrpMaxVlanLimit OBJECT-TYPE
+		SYNTAX	Integer32 (32 .. 4094)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Defines the maximum number of dynamic VLANs that can be created on the system by MVRP. 
+			If the number of VLANs created by MVRP reaches this limit, the system will prevent 
+			MVRP from creating additional VLANs."
+		DEFVAL	{ 256 }
+	::= { alcatelIND1MVRPMIBObjects 4 }
+
+	alaMvrpVlanConflictInfo OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(0 .. 100))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"MVRP has received registration for Vlan which is configured for End To End Flow Control.
+			Notify the Management with the Port in which the MVRP PDU was recieved and the Vlan."
+	::= { alcatelIND1MVRPMIBObjects 5 }
+
+	alaVlanRegistrationProtocolType OBJECT-TYPE
+		SYNTAX	INTEGER
+				{
+					gvrp(0),
+					mvrp(1)
+				}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Defines which VLAN registration mode is running in the system."
+		DEFVAL	{ mvrp }
+	::= { alcatelIND1MVRPMIBObjects 6 }
+	                                                             
+----------------------------------------------------------------
+--	NOTIFICATIONS (TRAPS)
+--	These notifications will be sent to the management entity
+--	whenever dynamically learnt vlans by mvrp across system reaches the defined limit
+--	and when dynamically learnt vlans by mvrp at each NI reaches a defined limit.
+----------------------------------------------------------------
+ 
+	alaMvrpVlanLimitReachedEvent NOTIFICATION-TYPE
+		OBJECTS	
+			{
+				alaMvrpMaxVlanLimit
+			}
+		STATUS	current
+		DESCRIPTION
+			"The number of vlans learnt dynamically by MVRP has
+			reached a configured limit. Notify the management
+			entity with number of vlans learnt dynamically by
+			MVRP and the configured MVRP vlan limit."
+	::= { alaMvrpEvents 1 }
+
+	alaMvrpE2eVlanConflict NOTIFICATION-TYPE
+		OBJECTS	
+			{
+				alaMvrpVlanConflictInfo
+			}
+		STATUS	current
+		DESCRIPTION
+			"MVRP has recieved a registration for Vlan which is configured for End To End Flow Control.
+			Notify the Management with the Port in which the MVRP PDU was recieved and the Vlan."
+	::= { alaMvrpEvents 2 }
+	 
+---------------------------------------------------------------
+--MVRP Port Config Table
+---------------------------------------------------------------
+        
+--	DESCRIPTION:
+--	"Port configuration information
+--	data for the MVRP Module.
+--	Implementation of this group is mandantory"
+
+
+	alaMvrpPortConfig OBJECT IDENTIFIER ::= { alcatelIND1MVRPMIBObjects 7 }
+       
+	
+	alaMvrpPortConfigTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF AlaMvrpPortConfigEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table containing MVRP port configuration information."
+	::= { alaMvrpPortConfig 1 }
+            
+	alaMvrpPortConfigEntry OBJECT-TYPE
+		SYNTAX	AlaMvrpPortConfigEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A MVRP port configuration entry."
+		INDEX { alaMvrpPortConfigIfIndex }
+	::= { alaMvrpPortConfigTable 1 }
+
+	AlaMvrpPortConfigEntry ::= SEQUENCE {
+		alaMvrpPortConfigIfIndex				InterfaceIndex,
+		alaMvrpPortStatus					EnabledStatus,
+		alaMvrpPortConfigRegistrarMode				INTEGER,
+		alaMvrpPortConfigApplicantMode				INTEGER,
+		alaMvrpPortConfigJoinTimer				Integer32,
+		alaMvrpPortConfigLeaveTimer				Integer32,
+		alaMvrpPortConfigLeaveAllTimer				Integer32,
+		alaMvrpPortConfigPeriodicTimer				Integer32,
+		alaMvrpPortConfigPeriodicTransmissionStatus		EnabledStatus
+	}	    
+
+	alaMvrpPortConfigIfIndex OBJECT-TYPE
+		SYNTAX	InterfaceIndex
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The ifindex of the port on which MVRP is running"
+	::= { alaMvrpPortConfigEntry 1 }
+	    
+	alaMvrpPortStatus OBJECT-TYPE
+		SYNTAX		EnabledStatus
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"The state of MVRP operation on this port.  The value
+			enabled(1) indicates that MVRP is enabled on this port.
+			When disabled(2), MVRP is disabled on this port.
+			Any MVRP packets received will be silently discarded on 
+			this port and no MVRP registrations will be propagated from 
+			this port. This object affects all MVRP Applicant and
+			Registrar state machines on this port.  A transition
+			from disabled(2) to enabled(1) will cause a reset of all
+			MVRP state machines on this port."
+		DEFVAL	{ disabled }
+	::= { alaMvrpPortConfigEntry 2 }
+
+	alaMvrpPortConfigRegistrarMode OBJECT-TYPE
+		SYNTAX	INTEGER
+				{
+					normal(1),
+					fixed(2),
+					forbidden(3)                             
+				}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Defines the mode of operation of all the registrar state machines associated to the port.
+			normal - registration as well as de-registration of VLANs are allowed. 
+			fixed  - A VLAN that was previously mapped onto such a port either dynamically or statically 
+			cannot be de-registered through MVRP. When the port registration mode is set to fixed, 
+			VLAN(s) can only be mapped onto such port statically.
+			forbidden - dynamic VLAN registration or de-registration are not allowed on the port. 
+		
+			NOTE: The registrar state machines for the default VLAN will operate in Fixed Registration Mode 
+			for all the ports on the switch."
+		DEFVAL	{ normal }
+	::= { alaMvrpPortConfigEntry 3 }
+	    
+	    
+	alaMvrpPortConfigApplicantMode OBJECT-TYPE
+		SYNTAX	INTEGER
+				{
+					participant (1),
+					nonparticipant (2),
+					active (3)
+				}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Defines the mode of operation of all the applicant state machines associated to the port.
+			participant - The state machines participates normally  in MVRP protocol exchanges.
+			nonparticipant - The state machines does not send any MVRP PDU(s).
+			active - The state machines send MVRP frames even on ports that are in blocking state on 
+			the active spanning tree instance."
+		DEFVAL	{ active }
+	::= { alaMvrpPortConfigEntry 4 }
+	    
+	    
+	alaMvrpPortConfigJoinTimer OBJECT-TYPE
+		SYNTAX	Integer32 (250 .. 2147483647) 
+		UNITS	"milliseconds"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Maximum period of time that a MVRP instance waits before making declarations for VLANs."
+		DEFVAL  { 600 }
+	::= { alaMvrpPortConfigEntry 5 }
+  
+	alaMvrpPortConfigLeaveTimer OBJECT-TYPE
+		SYNTAX	Integer32 (750 .. 2147483647) 
+		UNITS	"milliseconds"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Period of time that a registrar state machine of a MVRP instance waits, after receiving 
+			a leave message on a port for a particular VLAN, to remove the registration of that VLAN 
+			on the port.
+			The value for the Leave Timer must be greater than twice the value for the Join timer, 
+			plus six times the timer resolution."
+		DEFVAL  { 1800 }
+	::= { alaMvrpPortConfigEntry 6 }
+		
+	alaMvrpPortConfigLeaveAllTimer OBJECT-TYPE
+		SYNTAX	Integer32 (750 .. 2147483647) 
+		UNITS	"milliseconds"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Interval at which the Leave All state machine of a MVRP instance generates Leave All 
+			messages. A Leave All message instructs MVRP to modify the state of all VLANs registered 
+			on a port to Leaving.
+			The value for the LeaveAll Timer must be greater than the value for the Leave
+			timer."		
+		DEFVAL	{ 30000  }
+	::= { alaMvrpPortConfigEntry 7 }
+
+	alaMvrpPortConfigPeriodicTimer OBJECT-TYPE
+		SYNTAX	Integer32 (1 .. 2147483647) 
+		UNITS	"seconds"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Interval at which the Periodic transmission state machine of a MVRP instance generates 
+			transmission opportunities for the MVRP instance."		
+		DEFVAL	{ 1 }
+	::= { alaMvrpPortConfigEntry 8 }
+	   
+	alaMvrpPortConfigPeriodicTransmissionStatus OBJECT-TYPE
+		SYNTAX      EnabledStatus
+		MAX-ACCESS	read-write
+		STATUS		current	
+		DESCRIPTION
+			"Used to enable or disable the Periodic transmission state machine of a MVRP instance."
+		DEFVAL	{ enabled }
+	::= { alaMvrpPortConfigEntry 9 }
+
+---------------------------------------------------------------
+
+---------------------------------------------------------------
+--MVRP Port Statistics Table
+---------------------------------------------------------------
+        
+--	DESCRIPTION:
+--	"Port statistics information
+--	for the MVRP Module.
+--	Implementation of this group is mandantory"
+
+	alaMvrpPortStats OBJECT IDENTIFIER ::= { alcatelIND1MVRPMIBObjects 8 }
+
+
+	alaMvrpPortStatsTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF AlaMvrpPortStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table containing MVRP port statistics information."
+	::= { alaMvrpPortStats 1 }
+
+	alaMvrpPortStatsEntry OBJECT-TYPE
+		SYNTAX  AlaMvrpPortStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A MVRP port statistics entry."
+		INDEX { alaMvrpPortStatsIfIndex }
+	::= { alaMvrpPortStatsTable 1 }
+
+	AlaMvrpPortStatsEntry ::= SEQUENCE {    
+		alaMvrpPortStatsIfIndex			InterfaceIndex,
+		alaMvrpPortStatsNewReceived		Counter32,
+		alaMvrpPortStatsJoinInReceived		Counter32,
+		alaMvrpPortStatsJoinEmptyReceived	Counter32,
+		alaMvrpPortStatsLeaveReceived		Counter32,
+		alaMvrpPortStatsInReceived		Counter32,
+		alaMvrpPortStatsEmptyReceived		Counter32,
+		alaMvrpPortStatsLeaveAllReceived	Counter32,
+		alaMvrpPortStatsNewTransmitted		Counter32,
+		alaMvrpPortStatsJoinInTransmitted	Counter32,
+		alaMvrpPortStatsJoinEmptyTransmitted	Counter32,
+		alaMvrpPortStatsLeaveTransmitted	Counter32,
+		alaMvrpPortStatsInTransmitted		Counter32,
+		alaMvrpPortStatsEmptyTransmitted	Counter32,
+		alaMvrpPortStatsLeaveAllTransmitted	Counter32,
+		alaMvrpPortStatsTotalPDUReceived	Counter32,
+		alaMvrpPortStatsTotalPDUTransmitted	Counter32,
+		alaMvrpPortStatsTotalMsgsReceived	Counter32,
+		alaMvrpPortStatsTotalMsgsTransmitted	Counter32,		
+		alaMvrpPortStatsInvalidMsgsReceived	Counter32,
+		alaMvrpPortFailedRegistrations		Counter32,
+		alaMvrpPortLastPduOrigin		MacAddress,
+		alaMvrpPortStatsClearStats		INTEGER
+	}                                      
+	    
+	alaMvrpPortStatsIfIndex OBJECT-TYPE
+		SYNTAX	InterfaceIndex
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The ifindex of the port on which MVRP is running"
+	::= { alaMvrpPortStatsEntry 1 } 
+	    
+	alaMvrpPortStatsNewReceived OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of New messages received."
+	::= { alaMvrpPortStatsEntry 2}
+
+	alaMvrpPortStatsJoinInReceived OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of Join In messages received."
+	::= { alaMvrpPortStatsEntry 3}
+	
+	alaMvrpPortStatsJoinEmptyReceived OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of Join Empty messages received."
+	::= { alaMvrpPortStatsEntry 4}
+
+	alaMvrpPortStatsLeaveReceived OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of Leave messages received."
+	::= { alaMvrpPortStatsEntry 5}
+	
+	alaMvrpPortStatsInReceived OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of In messages received."
+	::= { alaMvrpPortStatsEntry 6}
+	
+	alaMvrpPortStatsEmptyReceived OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of Empty messages received."
+	::= { alaMvrpPortStatsEntry 7}
+
+	alaMvrpPortStatsLeaveAllReceived OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of Leave all messages received."
+	::= { alaMvrpPortStatsEntry 8}
+            
+	alaMvrpPortStatsNewTransmitted OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of New messages transmitted."
+	::= { alaMvrpPortStatsEntry 9}
+
+	alaMvrpPortStatsJoinInTransmitted OBJECT-TYPE
+		SYNTAX  Counter32
+		MAX-ACCESS  read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of Join In messages transmitted."
+	::= { alaMvrpPortStatsEntry 10}
+	
+	alaMvrpPortStatsJoinEmptyTransmitted OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of Join Empty messages transmitted."
+	::= { alaMvrpPortStatsEntry 11}
+
+	alaMvrpPortStatsLeaveTransmitted OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of Leave messages transmitted."
+	::= { alaMvrpPortStatsEntry 12}
+	
+	alaMvrpPortStatsInTransmitted OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of In messages transmitted."
+	::= { alaMvrpPortStatsEntry 13}
+	
+	alaMvrpPortStatsEmptyTransmitted OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of Empty messages transmitted."
+	::= { alaMvrpPortStatsEntry 14}
+
+	alaMvrpPortStatsLeaveAllTransmitted OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of Leave all messages transmitted."
+	::= { alaMvrpPortStatsEntry 15}
+  
+	alaMvrpPortStatsTotalPDUReceived OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The total number of MVRP PDUs received."
+	::= { alaMvrpPortStatsEntry 16}
+            
+	alaMvrpPortStatsTotalPDUTransmitted	OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The total number of MVRP PDUs transmitted."
+	::= { alaMvrpPortStatsEntry 17}
+            	                                      
+	alaMvrpPortStatsTotalMsgsReceived OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The total number of MVRP messages received."
+	::= { alaMvrpPortStatsEntry 18}
+            
+	alaMvrpPortStatsTotalMsgsTransmitted OBJECT-TYPE
+		SYNTAX	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The total number of MVRP messages transmitted."
+	::= { alaMvrpPortStatsEntry 19}
+
+	alaMvrpPortStatsInvalidMsgsReceived OBJECT-TYPE
+		SYNTAX  	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of Invalid messages received."
+	::= { alaMvrpPortStatsEntry 20}
+
+	alaMvrpPortFailedRegistrations OBJECT-TYPE
+		SYNTAX  	Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The total number of failed GVRP registrations, 
+			for any reason, on this port."
+	::= { alaMvrpPortStatsEntry 21}
+            	     	  
+	alaMvrpPortLastPduOrigin OBJECT-TYPE
+		SYNTAX  	MacAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The Source MAC Address of the last GVRP message
+			received on this port."
+	::= { alaMvrpPortStatsEntry 22}
+
+	alaMvrpPortStatsClearStats OBJECT-TYPE
+		SYNTAX	INTEGER
+				{
+					default(0),
+					reset(1)
+				}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Reset all statistics parameters corresponding to this port.
+			By default, this objects contains a zero value."
+		DEFVAL  { default }
+	::= { alaMvrpPortStatsEntry 23}   
+
+---------------------------------------------------------------
+--MVRP Port Restrict VLAN Config Table
+---------------------------------------------------------------
+        
+--	DESCRIPTION:
+--	"Port Restrict VLAN configuration information
+--	data for the MVRP Module.
+--	Implementation of this group is mandantory"
+
+
+	alaMvrpPortRestrictVlanConfig OBJECT IDENTIFIER ::= { alcatelIND1MVRPMIBObjects 9 }
+
+	alaMvrpPortRestrictVlanConfigTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF AlaMvrpPortRestrictVlanConfigEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table containing MVRP port restrict VLAN configuration information."
+	::= { alaMvrpPortRestrictVlanConfig 1 }
+            
+	alaMvrpPortRestrictVlanConfigEntry OBJECT-TYPE
+		SYNTAX	AlaMvrpPortRestrictVlanConfigEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A MVRP port restrict VLAN configuration entry."
+		INDEX { alaMvrpPortRestrictVlanIfIndex, alaMvrpPortRestrictVlanID}
+	::= { alaMvrpPortRestrictVlanConfigTable 1 }
+
+	AlaMvrpPortRestrictVlanConfigEntry ::= SEQUENCE {
+		alaMvrpPortRestrictVlanIfIndex		InterfaceIndex,
+		alaMvrpPortRestrictVlanID		VlanId,
+		alaMvrpPortVlanRestrictions		MvrpPortVlanRestrictBitmap
+	}
+
+	alaMvrpPortRestrictVlanIfIndex OBJECT-TYPE
+		SYNTAX		InterfaceIndex
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The ifindex of the port on which MVRP is running"
+	::= { alaMvrpPortRestrictVlanConfigEntry 1 }
+	    
+	alaMvrpPortRestrictVlanID OBJECT-TYPE
+		SYNTAX		VlanId
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An integer indicating VLAN-ID."
+	::= { alaMvrpPortRestrictVlanConfigEntry 2 }
+	    
+	 alaMvrpPortVlanRestrictions OBJECT-TYPE
+		SYNTAX		MvrpPortVlanRestrictBitmap
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+                       "The bitmap includes the status value for different type of restrictions that could be 
+                        applied for a port VLAN combination. Each bit in the bitmap corresponds to the status 
+                        of a particular restriction applied for a VLAN on the port. 
+                        If the bit is set, the particular restriction is enabled for the VLAN port combination.
+
+                        Having the bit 'noRestriction(0)' set indicates that the no restriction is applied for 
+                        the VLAN on the port. No other option can be applied along with this option.
+
+                        Having the bit 'restrictRegistration(1)' set indicates that the VLAN is restricted from 
+                        getting registered on the port.
+
+                        Having the bit 'restrictAdvertisement(2)' set indicates that the advertisement for the 
+                        VLAN is restricted on the port.
+
+                        Having the bit 'restrictStaticVlanRegistration(3)' set indicates that the registration 
+                        on a port for a static VLAN is restricted."
+		DEFVAL  { {noRestriction} }
+	::= { alaMvrpPortRestrictVlanConfigEntry 3 }
+
+----------------------------------------------------------------
+ 
+---------------------------------------------------------------
+--COMPLIANCE
+---------------------------------------------------------------
+
+	alcatelIND1MVRPMIBCompliance MODULE-COMPLIANCE
+		STATUS	current
+		DESCRIPTION
+			"Compliance statement for MVRP."
+		MODULE
+		MANDATORY-GROUPS
+			{
+				alaMvrpBaseGroup,
+				alaMvrpPortConfigGroup,
+				alaMvrpPortStatsGroup,
+				alaMvrpPortRestrictVlanConfigGroup
+			}
+	::= { alcatelIND1MVRPMIBCompliances 1 }
+
+---------------------------------------------------------------
+--UNITS OF CONFORMANCE
+---------------------------------------------------------------
+
+	alaMvrpBaseGroup OBJECT-GROUP
+		OBJECTS
+			{
+				alaMvrpGlobalStatus,
+				alaMvrpGlobalClearStats,
+				alaMvrpTransparentSwitching,
+				alaMvrpMaxVlanLimit,
+				alaMvrpVlanConflictInfo,
+				alaVlanRegistrationProtocolType
+			}   
+		STATUS	current
+		DESCRIPTION
+			"Collection of objects for management of MVRP Base Group."
+	::= { alcatelIND1MVRPMIBGroups 1 }
+
+	alaMvrpPortConfigGroup OBJECT-GROUP
+		OBJECTS
+			{
+				alaMvrpPortStatus,
+				alaMvrpPortConfigRegistrarMode,
+				alaMvrpPortConfigApplicantMode,
+				alaMvrpPortConfigJoinTimer,
+				alaMvrpPortConfigLeaveTimer,
+				alaMvrpPortConfigLeaveAllTimer,
+				alaMvrpPortConfigPeriodicTimer,
+				alaMvrpPortConfigPeriodicTransmissionStatus
+			}
+		STATUS	current
+		DESCRIPTION
+			"Collection of objects for management of MVRP Port Configuration Table."
+	::= { alcatelIND1MVRPMIBGroups 2 }
+
+	alaMvrpPortStatsGroup OBJECT-GROUP
+		OBJECTS
+			{
+				alaMvrpPortStatsNewReceived,
+				alaMvrpPortStatsJoinInReceived,
+				alaMvrpPortStatsJoinEmptyReceived,
+				alaMvrpPortStatsLeaveReceived,
+				alaMvrpPortStatsInReceived,
+				alaMvrpPortStatsEmptyReceived,
+				alaMvrpPortStatsLeaveAllReceived,
+				alaMvrpPortStatsNewTransmitted,
+				alaMvrpPortStatsJoinInTransmitted,
+				alaMvrpPortStatsJoinEmptyTransmitted,
+				alaMvrpPortStatsLeaveTransmitted,
+				alaMvrpPortStatsInTransmitted,
+				alaMvrpPortStatsEmptyTransmitted,
+				alaMvrpPortStatsLeaveAllTransmitted,
+				alaMvrpPortStatsTotalPDUReceived,
+				alaMvrpPortStatsTotalPDUTransmitted,
+				alaMvrpPortStatsTotalMsgsReceived,
+				alaMvrpPortStatsTotalMsgsTransmitted,		
+				alaMvrpPortStatsInvalidMsgsReceived,
+				alaMvrpPortFailedRegistrations,
+				alaMvrpPortLastPduOrigin,
+				alaMvrpPortStatsClearStats
+			}			
+		STATUS	current
+		DESCRIPTION
+			"Collection of objects for management of MVRP Statistics Table."
+	::= { alcatelIND1MVRPMIBGroups 3 }
+
+	alaMvrpPortRestrictVlanConfigGroup OBJECT-GROUP
+		OBJECTS
+			{
+				alaMvrpPortVlanRestrictions
+			}
+		STATUS	current
+		DESCRIPTION
+			"Collection of objects for management of MVRP Port Restrict VLAN Configuration Table."
+	::= { alcatelIND1MVRPMIBGroups 4 }
+
+--------------------------------------------------------------- 
+
+END

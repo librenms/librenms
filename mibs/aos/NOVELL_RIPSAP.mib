@@ -1,0 +1,427 @@
+RIPSAP DEFINITIONS ::= BEGIN 
+
+-- This MIB defines the management information for the RIP and SAP    
+-- protocols running in an IPX enviroment.  It provides information in    
+-- addition to that contained in the IPX MIB itself.  All tables in this    
+-- MIB are linked to an instance of IPX via the system instance
+-- identifier as defined in the IPX MIB.
+
+IMPORTS
+   enterprises, Counter32, OBJECT-TYPE
+      FROM SNMPv2-SMI;
+
+
+novell  OBJECT IDENTIFIER ::= {enterprises 23}
+mibDoc  OBJECT IDENTIFIER ::= {novell 2}
+ripsap  OBJECT IDENTIFIER ::= {mibDoc 20}
+    
+
+-- Groups 
+
+ripsapSystem  OBJECT IDENTIFIER ::= {ripsap 1}
+ripsapCircuit OBJECT IDENTIFIER ::= {ripsap 2}
+
+
+-- Types    
+
+-- NetNumber ::= OCTET STRING (SIZE(4)) 
+
+
+-- System Group 
+--   This group contains global information about each instance of 
+--   RIP/SAP running on one system. 
+
+
+-- RIP System Table    
+--   This table contains an entry for each instance of RIP    
+--   running on the system.    
+
+ripSysTable OBJECT-TYPE    
+  SYNTAX      SEQUENCE OF RIPSysEntry
+  MAX-ACCESS  not-accessible    
+  STATUS      current
+  DESCRIPTION "The RIP system table."    
+  ::= {ripsapSystem 1}
+
+ripSysEntry OBJECT-TYPE    
+  SYNTAX      RIPSysEntry    
+  MAX-ACCESS  not-accessible    
+  STATUS      current 
+  DESCRIPTION "Each entry corresponds to one instance of RIP
+               running on the system."
+  INDEX       {
+              ripSysInstance
+              }
+  ::= {ripSysTable 1}
+
+RIPSysEntry ::= SEQUENCE {
+                   ripSysInstance
+                      INTEGER,
+                   ripSysState
+                      INTEGER,
+                   ripSysIncorrectPackets
+                      Counter32
+                   }
+
+ripSysInstance OBJECT-TYPE
+  SYNTAX      INTEGER
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "The unique identifier of the instance of RIP to
+               which this row corresponds.  This value links the
+               instance of RIP to an instance of IPX running on the
+               system  (i.e. the value of ripSysInstance should be the
+               same as a value of ipxSysInstance).  This value may be
+               written only when creating a new entry in the table."
+  ::= {ripSysEntry 1}
+
+ripSysState OBJECT-TYPE
+  SYNTAX      INTEGER {
+              off(1),
+              on(2)
+              }
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "Indicates the operational state of this instance of RIP."    
+  ::= {ripSysEntry 2}
+
+ripSysIncorrectPackets OBJECT-TYPE    
+  SYNTAX      Counter32 
+  MAX-ACCESS  read-only 
+  STATUS      current    
+  DESCRIPTION "The number of times that an incorrectly formatted RIP
+               packet was received." 
+  ::= {ripSysEntry 3}
+
+
+-- SAP System Table 
+--   This table contains an entry for each instance of SAP 
+--   running on the system. 
+
+sapSysTable OBJECT-TYPE    
+  SYNTAX      SEQUENCE OF SAPSysEntry
+  MAX-ACCESS  not-accessible 
+  STATUS      current 
+  DESCRIPTION "The SAP system table."    
+  ::= {ripsapSystem 2}
+
+sapSysEntry OBJECT-TYPE    
+  SYNTAX      SAPSysEntry    
+  MAX-ACCESS  not-accessible    
+  STATUS      current    
+  DESCRIPTION "Each entry corresponds to one instance of SAP                 
+               running on the system." 
+  INDEX       {
+              sapSysInstance
+              }
+  ::= {sapSysTable 1}
+             
+SAPSysEntry ::= SEQUENCE {
+                   sapSysInstance
+                      INTEGER,
+                   sapSysState
+                      INTEGER,
+                   sapSysIncorrectPackets
+                      Counter32
+                   }
+
+                         
+sapSysInstance OBJECT-TYPE
+  SYNTAX      INTEGER
+  MAX-ACCESS      read-write
+  STATUS      current
+  DESCRIPTION "The unique identifier of the instance of SAP to
+               which this row corresponds.  This value links the
+               instance of SAP to an instance of IPX running on the
+               system  (i.e. the value of SApSysInstance should be the
+               same as a value of ipxSysInstance).  This value may be
+               written only when creating a new entry in the table."
+  ::= {sapSysEntry 1}
+
+sapSysState OBJECT-TYPE
+  SYNTAX      INTEGER { 
+              off(1), 
+              on(2)    
+              }
+  MAX-ACCESS  read-write    
+  STATUS      current    
+  DESCRIPTION "Indicates the operational state of this instance of SAP."
+  ::= {sapSysEntry 2}
+
+sapSysIncorrectPackets OBJECT-TYPE    
+  SYNTAX      Counter32    
+  MAX-ACCESS  read-only 
+  STATUS      current    
+  DESCRIPTION "The number of times that an incorrectly formatted SAP    
+               packet was received."    
+  ::= {sapSysEntry 3}
+
+
+-- Circuit Group 
+--   This group contains RIP and SAP management information for each    
+--   circuit known to this system. 
+
+-- RIP Circuit Table    
+--   The RIP Circuit table contains an entry for the RIP information for
+--   each circuit known to the system.
+
+ripCircTable OBJECT-TYPE    
+  SYNTAX      SEQUENCE OF RIPCircEntry
+  MAX-ACCESS  not-accessible    
+  STATUS      current    
+  DESCRIPTION "The RIP Circuit table."    
+  ::= {ripsapCircuit 1}
+
+ripCircEntry OBJECT-TYPE    
+  SYNTAX      RIPCircEntry    
+  MAX-ACCESS  not-accessible 
+  STATUS      current    
+  DESCRIPTION "Each entry corresponds to one circuit known to the    
+               system."
+  INDEX       {    
+              ripCircSysInstance,
+              ripCircIndex
+              }
+  ::= {ripCircTable 1}
+
+RIPCircEntry ::= SEQUENCE {
+                   ripCircSysInstance
+                      INTEGER,
+                   ripCircIndex
+                      INTEGER,
+                   ripCircState
+                      INTEGER,
+                   ripCircPace
+                      INTEGER,
+                   ripCircUpdate
+                      INTEGER,
+                   ripCircAgeMultiplier
+                      INTEGER,
+                   ripCircPacketSize
+                      INTEGER,
+                   ripCircOutPackets
+                      Counter32,
+                   ripCircInPackets
+                      Counter32
+                   }
+
+ripCircSysInstance OBJECT-TYPE
+  SYNTAX      INTEGER
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "The unique identifier of the instance of RIP and IPX
+               (via ipxSysInstance) to which this entry corresponds.
+               This value may be written only when creating a new entry in
+               the table."
+  ::= {ripCircEntry 1}
+
+ripCircIndex OBJECT-TYPE
+  SYNTAX      INTEGER
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "The identifier of this circuit, unique within the
+               instance of RIP.  This value corresponds to the circuit
+               identifier found in ipxCircIndex.   This value may be 
+               written only when creating a new entry in the table."
+  ::= {ripCircEntry 2}
+
+ripCircState OBJECT-TYPE 
+  SYNTAX      INTEGER { 
+              off(1), 
+              on(2),
+              auto-on(3),
+              auto-off(4)
+              }
+  MAX-ACCESS  read-write    
+  STATUS      current    
+  DESCRIPTION "Indicates whether RIP information may be sent/received
+               over this circuit."    
+  DEFVAL      { auto-off }
+  ::= {ripCircEntry 3}
+
+ripCircPace OBJECT-TYPE    
+  SYNTAX      INTEGER    
+  MAX-ACCESS  read-write    
+  STATUS      current    
+  DESCRIPTION "The maximum pace, in packets per second, at which RIP
+               packets may be sent on this circuit."    
+  ::= {ripCircEntry 4}
+    
+ripCircUpdate OBJECT-TYPE    
+  SYNTAX      INTEGER 
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "The RIP periodic update interval, in seconds."
+  DEFVAL      { 60 }
+  ::= {ripCircEntry 5}
+
+ripCircAgeMultiplier OBJECT-TYPE
+  SYNTAX      INTEGER
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "The holding multiplier for information received in RIP
+               periodic updates."    
+  DEFVAL      { 4 }
+  ::= {ripCircEntry 6}
+
+ripCircPacketSize OBJECT-TYPE    
+  SYNTAX      INTEGER
+  MAX-ACCESS  read-write    
+  STATUS      current 
+  DESCRIPTION "The RIP packet size used on this circuit."    
+  ::= {ripCircEntry 7}
+
+ripCircOutPackets OBJECT-TYPE    
+  SYNTAX      Counter32    
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "The number of RIP packets sent on this circuit."    
+  ::= {ripCircEntry 8}
+
+ripCircInPackets OBJECT-TYPE    
+  SYNTAX      Counter32    
+  MAX-ACCESS  read-only    
+  STATUS      current    
+  DESCRIPTION "The number of RIP packets received on this circuit."    
+  ::= {ripCircEntry 9}
+
+   
+-- SAP Circuit Table 
+--   The SAP Circuit table contains an entry for the SAP information for 
+--   each circuit known to the system.    
+
+sapCircTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF SAPCircEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "The SAP Circuit table."    
+  ::= {ripsapCircuit 2}
+    
+sapCircEntry OBJECT-TYPE
+  SYNTAX      SAPCircEntry    
+  MAX-ACCESS  not-accessible    
+  STATUS      current    
+  DESCRIPTION "Each entry corresponds to one circuit known to the 
+               system."    
+  INDEX       {    
+              sapCircSysInstance,    
+              sapCircIndex    
+              }
+  ::= {sapCircTable 1}
+
+SAPCircEntry ::= SEQUENCE {
+                   sapCircSysInstance
+                      INTEGER,
+                   sapCircIndex
+                      INTEGER,
+                   sapCircState
+                      INTEGER,
+                   sapCircPace
+                      INTEGER,
+                   sapCircUpdate
+                      INTEGER,
+                   sapCircAgeMultiplier
+                      INTEGER,
+                   sapCircPacketSize
+                      INTEGER,
+                   sapCircGetNearestServerReply
+                      INTEGER,
+                   sapCircOutPackets
+                      Counter32,
+                   sapCircInPackets
+                      Counter32
+                   }
+ 
+sapCircSysInstance OBJECT-TYPE    
+  SYNTAX      INTEGER    
+  MAX-ACCESS  read-write    
+  STATUS      current 
+  DESCRIPTION "The unique identifier of the instance of SAP and IPX
+               (via ipxSysInstance) to which this entry corresponds.
+               This value may be written only when creating a new entry in    
+               the table."    
+  ::= {sapCircEntry 1}
+
+sapCircIndex OBJECT-TYPE 
+  SYNTAX      INTEGER    
+  MAX-ACCESS  read-write    
+  STATUS      current    
+  DESCRIPTION "The identifier of this circuit, unique within the    
+               instance of SAP.  This value corresponds to the circuit
+               identifier found in ipxCircIndex.   This value may be
+               written only when creating a new entry in the table."    
+  ::= {sapCircEntry 2}
+
+sapCircState OBJECT-TYPE 
+  SYNTAX      INTEGER {
+              off(1), 
+              on(2),    
+              auto-on(3),    
+              auto-off(4)    
+              }
+  MAX-ACCESS  read-write    
+  STATUS      current    
+  DESCRIPTION "Indicates whether SAP information may be sent/received
+               over this circuit."    
+  DEFVAL      { auto-off }
+  ::= {sapCircEntry 3}
+
+sapCircPace OBJECT-TYPE
+  SYNTAX      INTEGER    
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "The maximum pace, in packets per second, at which SAP
+               packets may be sent on this circuit."    
+  ::= {sapCircEntry 4}
+
+sapCircUpdate OBJECT-TYPE 
+  SYNTAX      INTEGER
+  MAX-ACCESS  read-write
+  STATUS      current   
+  DESCRIPTION "The SAP periodic update interval, in seconds."
+  DEFVAL      { 60 }
+  ::= {sapCircEntry 5}
+
+sapCircAgeMultiplier OBJECT-TYPE
+  SYNTAX      INTEGER 
+  MAX-ACCESS  read-write     
+  STATUS      current 
+  DESCRIPTION "The holding multiplier for information received in SAP                 
+               periodic updates."    
+  DEFVAL      { 4 }
+  ::= {sapCircEntry 6}
+
+sapCircPacketSize OBJECT-TYPE    
+  SYNTAX      INTEGER    
+  MAX-ACCESS  read-write    
+  STATUS      current    
+  DESCRIPTION "The SAP packet size used on this circuit."    
+  ::= {sapCircEntry 7}
+
+sapCircGetNearestServerReply OBJECT-TYPE    
+  SYNTAX      INTEGER {
+              no(1),
+              yes(2)
+              }
+  MAX-ACCESS  read-write    
+  STATUS      current    
+  DESCRIPTION "Indicates whether to respond to SAP get nearest server
+               requests received on this circuit."    
+  DEFVAL      { yes }
+  ::= {sapCircEntry 8}
+
+sapCircOutPackets OBJECT-TYPE    
+  SYNTAX      Counter32    
+  MAX-ACCESS  read-only    
+  STATUS      current    
+  DESCRIPTION "The number of SAP packets sent on this circuit."    
+  ::= {sapCircEntry 9}
+
+sapCircInPackets OBJECT-TYPE    
+  SYNTAX      Counter32    
+  MAX-ACCESS  read-only    
+  STATUS      current    
+  DESCRIPTION "The number of SAP packets received on this circuit."    
+  ::= {sapCircEntry 10}
+
+END 

@@ -1,0 +1,95 @@
+RBTWS-CLIENT-SESSION-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    rbtwsMibs
+        FROM RBTWS-ROOT-MIB;
+
+rbtwsClientSessionTc MODULE-IDENTITY
+    LAST-UPDATED "200609262029Z"
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "www.enterasys.com"
+    DESCRIPTION
+        "Textual Conventions used by Enterasys Networks wireless switches.
+
+        Copyright 2006 Enterasys Networks, Inc.
+        All rights reserved.
+        This SNMP Management Information Base
+        Specification (Specification) embodies
+        confidential and proprietary intellectual property.
+
+        This Specification is supplied 'AS IS' and Enterasys Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200609260001Z"
+    DESCRIPTION "v1.0.1: initial version"
+
+    ::= { rbtwsMibs 10 }
+
+
+RbtwsUserAccessType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Describes the access type by the user"
+    SYNTAX      INTEGER {
+            mac                 (1),
+            web                 (2),
+            dot1x               (3),
+            last-resort         (4)
+        }
+
+RbtwsClientSessionState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the client session states.
+        Value 'associated(1)' applies only to wireless sessions.
+        Value 'wired(8)' applies only to wired sessions."
+    SYNTAX      INTEGER {
+            associated          (1),
+            authorizing         (2),
+            authorized          (3),
+            active              (4),
+            de-associated       (5),
+            roaming-away        (6),
+            updated-to-roam     (7),
+            wired               (8),
+            clearing            (9),
+            invalid             (10),
+            web-authing         (11)
+            }
+
+RbtwsClientDot1xState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the dot1x states for a client."
+    SYNTAX      INTEGER {
+            initialize          (1),
+            disconnected        (2),
+            connecting          (3),
+            authenticating      (4),
+            authenticated       (5),
+            wired               (6),
+            aborting            (7),
+            held                (8)
+        }
+
+RbtwsClientAuthenProtocolType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of the dot1x client authentication protocol types."
+    SYNTAX      INTEGER {
+            none                (1),
+            eap-tls             (2),
+            eap-ttls            (3),
+            md5                 (4),
+            peap                (5),
+            leap                (6),
+            pass-through        (7)
+        }
+
+END

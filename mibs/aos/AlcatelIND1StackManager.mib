@@ -1,0 +1,823 @@
+ALCATEL-IND1-STACK-MANAGER-MIB DEFINITIONS ::= BEGIN
+
+     	IMPORTS
+    		NOTIFICATION-TYPE, 
+		MODULE-IDENTITY, 
+		OBJECT-TYPE,
+		Counter32	FROM SNMPv2-SMI
+                TEXTUAL-CONVENTION	FROM SNMPv2-TC
+                RowStatus               FROM SNMPv2-TC
+                InterfaceIndex          FROM IF-MIB
+		softentIND1StackMgr     FROM ALCATEL-IND1-BASE
+		MODULE-COMPLIANCE, 
+		OBJECT-GROUP, 
+		NOTIFICATION-GROUP	FROM SNMPv2-CONF	;
+
+        alcatelIND1StackMgrMIB MODULE-IDENTITY
+                LAST-UPDATED "200902060000Z"
+                ORGANIZATION "Alcatel-Lucent"
+                CONTACT-INFO
+                "Please consult with Customer Service to ensure the most appropriate
+                version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+                Telephone:               North America  +1 800 995 2696
+                                         Latin America  +1 877 919 9526
+                                         Europe         +31 23 556 0100
+                                         Asia           +65 394 7933
+                                         All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+                DESCRIPTION
+                "This module describes an authoritative enterprise-specific Simple
+                Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                For the Birds Of Prey Product Line
+                Stack Manager
+
+                The right to make changes in specification and other information
+                contained in this document without prior notice is reserved.
+
+                No liability shall be assumed for any incidental, indirect, special, or
+                consequential damages whatsoever arising from or related to this
+                document or the information contained herein.
+
+                Vendors, end-users, and other interested parties are granted
+                non-exclusive license to use this specification in connection with
+                management of the products for which it is intended to be used.
+
+                       Copyright (C) 1995-2007 Alcatel-Lucent
+                           ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION      "200902060000Z" -- Feb 06, 2009
+		DESCRIPTION   "Added alaStackMgrOperStackingMode and alaStackMgrAdminStackingMode 
+			      objects.
+			      Added AlaStackMgrStackingMode TEXTUAL-CONVENTION."
+
+                REVISION      "200704030000Z" -- Apr 02, 2007
+                DESCRIPTION   "Updated copyright information."
+                
+                REVISION      "200507150000Z" -- Jul 15, 2005
+                DESCRIPTION   "New trap alaStackMgrBadMixTrap has been added.
+		               AlaStackMgrSlotState & AlaStackMgrLinkNumber textual convention 
+			       have been modified."
+
+                REVISION      "200407010000Z" -- Jul 01, 2004
+                DESCRIPTION   "Updates on definitions for link states.
+                               Updates on pass through slot range."
+
+                REVISION      "200404230000Z" -- Apr 23, 2004
+                DESCRIPTION   "New trap alaStackMgrOutOfPassThruSlotsTrap has been added."
+
+                REVISION      "200404080000Z" -- Apr 08, 2004
+                DESCRIPTION   "alaStackMgrPassThruTrap has been split in three traps to assure
+                               backwards compatibility with previous releases of the Birds Of 
+                               Prey products."
+
+                REVISION      "200404040000Z" -- Apr 04, 2004
+                DESCRIPTION   "-Command action and command status objects added to the chassis table.
+                               -Link state textual conventions have been updated."
+
+                REVISION      "200403220000Z" -- Mar 23, 2004
+                DESCRIPTION   "Objects to handle information about token usage."
+
+                REVISION      "200403080000Z" -- Mar 08, 2004
+                DESCRIPTION   "Objects to support the pass through mode added."
+
+                REVISION      "200108270000Z" -- Aug 27, 2001
+                DESCRIPTION   "Addressing discrepancies with Alcatel Standard."
+             
+                ::= { softentIND1StackMgr 1 }
+
+alcatelIND1StackMgrMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1StackMgrMIB 1 }
+alcatelIND1StackMgrMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1StackMgrMIB 2 }
+alcatelIND1StackMgrTrapObjects OBJECT IDENTIFIER ::= { alcatelIND1StackMgrMIB 3 }
+alaStackMgrTraps OBJECT IDENTIFIER ::= { alcatelIND1StackMgrMIB 4 }
+
+AlaStackMgrLinkNumber ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION "Lists the port numbers that the stackable ports can hold.
+	Also the values are the same as the one marked on the Stack chassis pannel.
+        These values are hardware dependent as follows:
+        - First generation stackable switches - 24 ports: linkA27=27, linkB28=28,
+        - First generation stackable switches - 48 ports: linkA51=51, linkB52=52,
+        - 1st version of 2nd generation stackable switches          : linkA31=31, linkB32=32.
+	- 2nd version of 2nd generation stackable switches 24-port  : linkA25=25, linkB26=26,
+	- 2nd version of 2nd generation stackable switches 48-port  : linkA29=29, linkB30=30."
+	SYNTAX  INTEGER { linkA27(27),
+                          linkB28(28),
+                          linkA51(51),
+                          linkB52(52),
+                          linkA31(31),
+                          linkB32(32),
+			  linkA25(25),
+			  linkB26(26),
+			  linkA29(29),
+			  linkB30(30),
+                          linkA(1),
+                          linkB(2) }
+
+AlaStackMgrNINumber ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION "The numbers allocated for the stack NIs are as follows: 
+	- 0 = invalid slot number; 
+        - 1..8 = valid and assigned slot numbers corresponding values from the entPhysicalTable; 
+        - 1001..1008 = switches operating in pass through mode; 
+        - 255 = unassigned slot number."
+	SYNTAX  INTEGER (0..1008)
+
+
+AlaStackMgrLinkStatus ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION "Provides the logical stack link status. The logical link is 
+        considered operational if the physical link is operational and communication
+        with the adjacent switch is active. The possible values are:
+        - up(1),
+        - down(2)."
+	SYNTAX  INTEGER { up(1), down(2) }
+
+AlaStackMgrSlotRole ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION "Indicates the role of each switch within the stack as follows:
+        - unassigned(0),
+        - primary(1),
+        - secondary(2),
+        - idle(3),
+        - standalone(4),
+        - passthrough(5)"
+	SYNTAX  INTEGER { unassigned (0), 
+                          primary (1), 
+                          secondary (2), 
+                          idle (3), 
+                          standalone (4), 
+                          passthrough (5) }
+
+AlaStackMgrStackStatus ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION "Indicates whether the stack ring is or not in loop as follows:
+        - loop(1),
+        - noloop(2)"
+	SYNTAX  INTEGER { loop(1), noloop(2) }
+
+AlaStackMgrSlotState ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION "Current operational state of a stack element as follows:
+        - running(1)      : switch is fully operational,
+        - duplicateSlot(2): switch operates in pass through mode due to slot duplication,
+        - clearedSlot(3)  : switch operates in pass through mode upon management command,
+        - outOfSlots(4)   : switch operates in pass through because the maximum number of 
+                            allowed stackable swicthes has been reached,
+        - outOfTokens(5)  : switch operates in pass through mode because no tokens are
+                            available to be assigned.
+	- badMix (6)      : switch operates in pass through mode because it's not compatible 
+	                    with the existing stack."
+        SYNTAX  INTEGER { running (1), 
+                          duplicateSlot (2), 
+                          clearedSlot (3), 
+                          outOfSlots (4), 
+                          outOfTokens (5),
+			  badMix (6) }
+
+AlaStackMgrCommandAction ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION "Identifies which of the following actions is to be performed:
+        - notSiginificant(0)   : no action,
+        - clearSlot(1)         : saved slot number will be removed from persistent database,
+        - clearSlotImmediately : saved slot number will be cleared and change will be in effect
+                                 right away causing the switch to enter in pass through mode,
+        - reloadAny(3)         : reboot an element regardless of its operational mode,
+        - reloadPassThru(4)    : reboot an element that is operating in pass thru mode."
+	SYNTAX  INTEGER { notSignificant(0), 
+                          clearSlot(1), 
+                          clearSlotImmediately(2), 
+                          reloadAny(3),
+                          reloadPassThru(4) }
+
+AlaStackMgrCommandStatus ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION "Identifies the current status of the last action command 
+        received as follows:
+        - notSignificant(0),
+        - clearSlotInProgress(1),
+        - clearSlotFailed(2),
+        - clearSlotSuccess(3),
+        - setSlotInProgress(4),
+        - setSlotFailed(5),
+        - setSlotSuccess(6)."
+	SYNTAX  INTEGER { notSignificant(0), 
+                          clearSlotInProgress(1), 
+                          clearSlotFailed(2),
+                          clearSlotSuccess(3),
+                          setSlotInProgress(4),
+                          setSlotFailed(5),
+                          setSlotSuccess(6) }
+
+AlaStackMgrStackingMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "Stacking mode, which specifies the ability of a switch 
+                to be part of a set of switches or virtual chassis: 
+                - stackable(1)  :the switch may be stacked with other 
+				  switches in the same virtual chassis.
+                - standalone(2) :the switch is not allowed to be stacked together 
+				  with other switches."
+    SYNTAX  INTEGER {
+			stackable(1),
+			standalone(2)
+                    }
+
+-----------------------------------------------
+-- Stack Chassis Table 
+-----------------------------------------------
+
+alaStackMgrChassisTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AlaStackMgrChassisEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Maintains a list with information about all the switches 
+        that participate on the stack herein refered to as chassis."
+	::= { alcatelIND1StackMgrMIBObjects 1 }
+
+alaStackMgrChassisEntry OBJECT-TYPE
+	SYNTAX  AlaStackMgrChassisEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Each entry corresponds to a chassis and lists its role and 
+        neighbors in the stack."
+	INDEX { alaStackMgrSlotNINumber }
+	::= { alaStackMgrChassisTable 1 }
+
+AlaStackMgrChassisEntry ::= SEQUENCE {
+	alaStackMgrSlotNINumber       AlaStackMgrNINumber,
+	alaStackMgrSlotCMMNumber      INTEGER,
+	alaStackMgrChasRole           AlaStackMgrSlotRole,
+	alaStackMgrLocalLinkStateA    AlaStackMgrLinkStatus,
+	alaStackMgrRemoteNISlotA      AlaStackMgrNINumber,
+	alaStackMgrRemoteLinkA        AlaStackMgrLinkNumber,
+	alaStackMgrLocalLinkStateB    AlaStackMgrLinkStatus,
+	alaStackMgrRemoteNISlotB      AlaStackMgrNINumber,
+	alaStackMgrRemoteLinkB        AlaStackMgrLinkNumber,
+    alaStackMgrChasState          AlaStackMgrSlotState,
+    alaStackMgrSavedSlotNINumber  AlaStackMgrNINumber,
+    alaStackMgrCommandAction      AlaStackMgrCommandAction,
+    alaStackMgrCommandStatus      AlaStackMgrCommandStatus,
+    alaStackMgrOperStackingMode   AlaStackMgrStackingMode,
+    alaStackMgrAdminStackingMode  AlaStackMgrStackingMode 
+	} 
+
+alaStackMgrSlotNINumber OBJECT-TYPE
+	SYNTAX  AlaStackMgrNINumber
+	MAX-ACCESS  read-only
+	STATUS  current
+        DESCRIPTION "Numbers allocated for the stack NIs as follows:
+        - 0:          invalid slot number
+        - 1..8:       valid and assigned slot numbers corresponding to values from the entPhysicalTable
+        - 1001..1008: swicthes operating in pass through mode
+        - 255:        unassigned slot number."
+	::= { alaStackMgrChassisEntry 1 }
+
+alaStackMgrSlotCMMNumber OBJECT-TYPE
+	SYNTAX  INTEGER (0..72)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The numbers allocated for the stack CMMs are from 65..72 or 0 if not present"
+	::= { alaStackMgrChassisEntry 2 }
+
+alaStackMgrChasRole OBJECT-TYPE
+	SYNTAX  AlaStackMgrSlotRole 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current role of the chassis as follows:
+        - unassigned(0), 
+        - primary(1), 
+        - secondary(2),
+        - idle(3),
+        - standalone(4),
+        - passthrough(5)."
+	::= { alaStackMgrChassisEntry 3 }
+
+alaStackMgrLocalLinkStateA OBJECT-TYPE
+	SYNTAX  AlaStackMgrLinkStatus
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "1 indicates that the stacking link A is up, which means it knows its adjacent node. 
+	2 indicates that the stacking link A is inactive and RemoteNISlotA and RemoteLinkA are not significants."
+	::= { alaStackMgrChassisEntry 4 }
+
+alaStackMgrRemoteNISlotA OBJECT-TYPE
+	SYNTAX  AlaStackMgrNINumber
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION " This is the remote NI slot seen by the current NI through its stacking link A.
+        The numbers allocated for the Stack NIs are 1..8, 1001..1008 or 0 if not present"
+	::= { alaStackMgrChassisEntry 5 }
+
+alaStackMgrRemoteLinkA OBJECT-TYPE
+	SYNTAX  AlaStackMgrLinkNumber 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "This is the remote link of the remote NI slot seen through the stacking link A.
+	The values for these ports are platform dependent. The possible values are:
+        - 0:     not present
+        - linkA: 25, 27, 29, 31 or 51
+        - linkB: 26, 28, 30, 32 or 52."
+	::= { alaStackMgrChassisEntry 6 }
+
+alaStackMgrLocalLinkStateB OBJECT-TYPE
+	SYNTAX  AlaStackMgrLinkStatus
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "1 indicates that the stacking link B is up, which means it knows its adjacent node. 
+	2 indicates that the stacking link B is inactive and RemoteNISlotB and RemoteLinkB are not significants."
+	::= { alaStackMgrChassisEntry 7 }
+
+alaStackMgrRemoteNISlotB OBJECT-TYPE
+	SYNTAX  AlaStackMgrNINumber
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION " This is the remote NI slot seen by the current NI through its stacking link B.
+        The numbers allocated for the Stack NIs are 1..8, 1001..1008 or 0 if not present"
+	::= { alaStackMgrChassisEntry 8 }
+
+alaStackMgrRemoteLinkB OBJECT-TYPE
+	SYNTAX  AlaStackMgrLinkNumber 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "This is the remote link of the remote NI slot seen through the stacking link B.
+	The values for these ports are platform dependent. The possible values are:
+        - 0: not present
+        - linkA: 25, 27, 29, 31 or 51
+        - linkB: 26, 28, 30, 32 or 52."
+	::= { alaStackMgrChassisEntry 9 }
+
+alaStackMgrChasState OBJECT-TYPE
+        SYNTAX  AlaStackMgrSlotState
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION "This current state of the chassis: running (1), duplicateSlot (2), clearedSlot (3),
+        outOfSlots (4), outOfTokens (5), or badMix (6)."
+        ::= { alaStackMgrChassisEntry 10 }
+
+alaStackMgrSavedSlotNINumber OBJECT-TYPE
+        SYNTAX  AlaStackMgrNINumber
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION "Slot number stored in persistent memory that will be in effect if the stack
+        element reboots. Only slot numbers in the range 1..8 are allowed." 
+        ::= { alaStackMgrChassisEntry 11 }
+
+alaStackMgrCommandAction OBJECT-TYPE
+        SYNTAX  AlaStackMgrCommandAction
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION "This object identifies which of the following Actions is to be performed:
+        clearSlot(1), clearSlotImmediately (2) or reload (3). Whenever a new command is received, 
+        the value of the object alaStackMgrCommandStatus will be updated accordingly."
+        ::= { alaStackMgrChassisEntry 12 }
+
+alaStackMgrCommandStatus OBJECT-TYPE
+        SYNTAX  AlaStackMgrCommandStatus
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION "This object provides the current status of last command received from the management
+        as follows: notSignificant(0), clearSlotInProgress(1), clearSlotFailed(2), clearSlotSuccess(3), 
+        setSlotInProgress(4), setSlotFailed(5) or setSlotSuccess(6).
+        New commands are only accepted if the value of this object is different than setSlotInProgress
+        and clearSlotInProgress."
+        ::= { alaStackMgrChassisEntry 13 }
+
+alaStackMgrOperStackingMode OBJECT-TYPE
+		SYNTAX  AlaStackMgrStackingMode 
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION "This object specifies the current running mode of the switch."
+ 		::= { alaStackMgrChassisEntry 14 }
+
+alaStackMgrAdminStackingMode OBJECT-TYPE
+		SYNTAX  AlaStackMgrStackingMode
+		MAX-ACCESS  read-write
+		STATUS  current
+                DESCRIPTION "This object specifies the stack mode atained on reload."
+		::= { alaStackMgrChassisEntry 15 }
+ 
+----------------------------------------------------------
+-- Stack Mgr Statistics Table
+----------------------------------------------------------
+
+alaStackMgrStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AlaStackMgrStatsEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Stack port statistics table."
+	::= { alcatelIND1StackMgrMIBObjects 2 }
+
+alaStackMgrStatsEntry OBJECT-TYPE
+	SYNTAX  AlaStackMgrStatsEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION " Stats table for stackable ports."
+	INDEX { alaStackMgrSlotNINumber, alaStackMgrStatLinkNumber}
+	::= { alaStackMgrStatsTable 1 }
+
+AlaStackMgrStatsEntry ::= SEQUENCE {
+	alaStackMgrStatLinkNumber AlaStackMgrLinkNumber,
+	alaStackMgrStatPktsRx Counter32,
+	alaStackMgrStatPktsTx Counter32,
+	alaStackMgrStatErrorsRx Counter32,
+	alaStackMgrStatErrorsTx Counter32,
+	alaStackMgrStatDelayFromLastMsg INTEGER 
+	}
+	
+alaStackMgrStatLinkNumber OBJECT-TYPE
+	SYNTAX  AlaStackMgrLinkNumber 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION " Local link refers to the stacking port on each slot. 
+        The values of these ports are:
+        - linkA: 25, 27, 29, 31 or 51
+        - linkB: 26, 28, 30, 32 or 52."
+	::= { alaStackMgrStatsEntry 1 }
+	
+alaStackMgrStatPktsRx OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	         "The total number of packets recieved on this port."
+	::= { alaStackMgrStatsEntry 2 }
+	
+alaStackMgrStatPktsTx OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	         "The total number of packets transmitted on this port."
+	::= { alaStackMgrStatsEntry 3 }
+	
+alaStackMgrStatErrorsRx OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets in error - received on the port."
+     ::= { alaStackMgrStatsEntry 4 }	
+
+
+alaStackMgrStatErrorsTx OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets in error - transmitted on the port."
+     ::= { alaStackMgrStatsEntry 5 }	
+     
+alaStackMgrStatDelayFromLastMsg OBJECT-TYPE
+     SYNTAX     INTEGER ( 0 .. 2147483647 )
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The delay since the last message."
+     ::= { alaStackMgrStatsEntry 6 }	
+     	
+----------------------------------------------------------
+-- Stack Mgr Global Properties
+----------------------------------------------------------
+
+alaStackMgrStackStatus OBJECT-TYPE  
+    SYNTAX 	AlaStackMgrStackStatus 
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+    "Indicates whether the Stack is or not in Loop."
+    ::= { alcatelIND1StackMgrMIBObjects 3 }
+
+alaStackMgrTokensUsed OBJECT-TYPE  
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+    "Indicates the total number of tokens that have been allocated to all the
+    elements in the stack."
+    ::= { alcatelIND1StackMgrMIBObjects 4 }
+
+alaStackMgrTokensAvailable OBJECT-TYPE  
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+    "Indicates the total number of tokens that are still available and that 
+    potentially may be allocated to elements of the stack."
+    ::= { alcatelIND1StackMgrMIBObjects 5 }
+
+
+-----------------------------------------------
+-- Stack Static Route Table 
+-----------------------------------------------
+
+alaStackMgrStaticRouteTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AlaStackMgrStaticRouteEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Maintains a list with information about all the static 
+         routes in the stack."
+	::= { alcatelIND1StackMgrMIBObjects 6 }
+
+alaStackMgrStaticRouteEntry OBJECT-TYPE
+	SYNTAX  AlaStackMgrStaticRouteEntry 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Each entry corresponds to a static route and lists its source and 
+        destination in the stack."
+	INDEX { alaStackMgrStaticRouteSrcStartIf,alaStackMgrStaticRouteSrcEndIf,alaStackMgrStaticRouteDstStartIf,alaStackMgrStaticRouteDstEndIf}
+	::= { alaStackMgrStaticRouteTable 1 }
+
+AlaStackMgrStaticRouteEntry ::= SEQUENCE {
+	alaStackMgrStaticRouteSrcStartIf      InterfaceIndex,
+	alaStackMgrStaticRouteSrcEndIf        InterfaceIndex,
+	alaStackMgrStaticRouteDstStartIf      InterfaceIndex ,
+	alaStackMgrStaticRouteDstEndIf        InterfaceIndex ,
+	alaStackMgrStaticRoutePort            AlaStackMgrLinkNumber,
+	alaStackMgrStaticRoutePortState       AlaStackMgrLinkStatus,
+	alaStackMgrStaticRouteStatus          INTEGER,
+	alaStackMgrStaticRouteRowStatus       RowStatus
+	} 
+
+alaStackMgrStaticRouteSrcStartIf OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	MAX-ACCESS  not-accessible
+	STATUS  current
+        DESCRIPTION "The physical identification number for start source range of the static route"
+	::= { alaStackMgrStaticRouteEntry 1 }
+
+alaStackMgrStaticRouteSrcEndIf OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	MAX-ACCESS  not-accessible
+	STATUS  current
+        DESCRIPTION "The physical identification number for end source  range of the static route"
+	::= { alaStackMgrStaticRouteEntry 2 }
+
+
+alaStackMgrStaticRouteDstStartIf OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	MAX-ACCESS  not-accessible
+	STATUS  current
+        DESCRIPTION "The physical identification number for  start destination range of the static route"
+	::= { alaStackMgrStaticRouteEntry 3 }
+
+
+alaStackMgrStaticRouteDstEndIf OBJECT-TYPE
+	SYNTAX  InterfaceIndex
+	MAX-ACCESS  not-accessible
+	STATUS  current
+        DESCRIPTION "The physical identification number for  end destination range of the static route"
+	::= { alaStackMgrStaticRouteEntry 4 }
+
+
+alaStackMgrStaticRoutePort OBJECT-TYPE
+	SYNTAX  AlaStackMgrLinkNumber 
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "This is the  stack link to the destination NI slot  .
+	The values for these ports are platform dependent. The possible values are:
+        - 0:     not present
+        - linkA: 25, 27, 29, 31 or 51
+        - linkB: 26, 28, 30, 32 or 52.
+        Incase of static routesthe value is either 1(STACKA) or 2(STACKB)"
+        DEFVAL  { 1 }
+	::= { alaStackMgrStaticRouteEntry  5 }
+
+
+alaStackMgrStaticRoutePortState OBJECT-TYPE
+	SYNTAX  AlaStackMgrLinkStatus
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "1 indicates that the static route stacking link  is up . 
+	2 indicates that the stacking link  is inactive."
+	::= { alaStackMgrStaticRouteEntry 6 }
+
+
+ alaStackMgrStaticRouteStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                on (1),
+                off (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Whether this static route  is enabled or disabled ."
+            DEFVAL  { on }
+            ::= { alaStackMgrStaticRouteEntry 7 }
+
+
+alaStackMgrStaticRouteRowStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                        "The status of this table entry.
+                         "
+           ::= { alaStackMgrStaticRouteEntry 8 }
+
+-------------------------------------------------------
+-- Stack Manager Trap Objects 
+-------------------------------------------------------
+
+alaStackMgrTrapLinkNumber OBJECT-TYPE  
+    SYNTAX 	AlaStackMgrLinkNumber 
+    MAX-ACCESS	accessible-for-notify
+    STATUS	current
+    DESCRIPTION
+    "Holds the link number, when the stack is not in loop."
+    ::= { alcatelIND1StackMgrTrapObjects 1 }
+
+alaStackMgrPrimary OBJECT-TYPE  
+    SYNTAX 	AlaStackMgrNINumber 
+    MAX-ACCESS	accessible-for-notify
+    STATUS	current
+    DESCRIPTION
+    "Holds the slot number of the stack element that plays the role of Primary."
+    ::= { alcatelIND1StackMgrTrapObjects 2 }
+
+alaStackMgrSecondary OBJECT-TYPE
+    SYNTAX     	AlaStackMgrNINumber
+    MAX-ACCESS	accessible-for-notify
+    STATUS	current
+    DESCRIPTION
+    "Holds the slot number of the stack element that plays the role of Secondary."
+    ::= { alcatelIND1StackMgrTrapObjects 3 }
+ 
+-------------------------------------------------------
+-- Stack Manager Traps 
+-------------------------------------------------------   
+
+alaStackMgrDuplicateSlotTrap NOTIFICATION-TYPE
+    OBJECTS    {
+               alaStackMgrSlotNINumber	  
+               }
+    STATUS  current
+    DESCRIPTION
+           "The element specified by alaStackMgrSlotNINumber has the same slot number of
+            another element of the stack and it must relinquish its operational status
+            because it has a higher election key (up time, slot, mac).
+            The elements will be put in pass through mode."
+    ::= { alaStackMgrTraps 0 1 }
+
+
+alaStackMgrNeighborChangeTrap NOTIFICATION-TYPE
+    OBJECTS    {
+               alaStackMgrStackStatus,
+               alaStackMgrSlotNINumber,
+               alaStackMgrTrapLinkNumber
+               }
+    STATUS  current
+    DESCRIPTION
+           "Indicates whether the stack is in loop or not.
+            In case of no loop, alaStackMgrSlotNINumber and alaStackMgrTrapLinkNumber
+            indicate where the Stack is broken"
+    ::= { alaStackMgrTraps 0 2 }
+
+
+alaStackMgrRoleChangeTrap NOTIFICATION-TYPE
+    OBJECTS    {
+    		alaStackMgrPrimary,
+		alaStackMgrSecondary		  
+               }
+    STATUS  current
+    DESCRIPTION
+           " Role Change Trap. Indicates that a new primary or secondary is elected."
+    ::= { alaStackMgrTraps 0 3 }
+
+
+alaStackMgrDuplicateRoleTrap NOTIFICATION-TYPE
+    OBJECTS    {
+                alaStackMgrSlotNINumber,
+                alaStackMgrChasRole
+               }
+    STATUS  current
+    DESCRIPTION
+           "The element identified by alaStackMgrSlotNINumber detected the presence of
+            two elements with the same primary or secondary role as specified by
+            alaStackMgrChasRole on the stack."
+    ::= { alaStackMgrTraps 0 4 }
+
+alaStackMgrClearedSlotTrap NOTIFICATION-TYPE
+    OBJECTS    {
+                alaStackMgrSlotNINumber
+               }
+    STATUS  current
+    DESCRIPTION
+           "The element identified by alaStackMgrSlotNINumber will enter the pass through 
+            mode because its operational slot was cleared with immediate effect."
+    ::= { alaStackMgrTraps 0 5 }
+
+alaStackMgrOutOfSlotsTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+           "One element of the stack will enter the pass through mode because there 
+            are no slot numbers available to be assigned to this element."
+    ::= { alaStackMgrTraps 0 6 }
+
+alaStackMgrOutOfTokensTrap NOTIFICATION-TYPE
+    OBJECTS    {
+                alaStackMgrSlotNINumber
+               }
+    STATUS  current
+    DESCRIPTION
+           "The element identified by alaStackMgrSlotNINumber will enter the pass through
+            mode because there are no tokens available to be assigned to this element."
+    ::= { alaStackMgrTraps 0 7 }
+
+alaStackMgrOutOfPassThruSlotsTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+           "There are no pass through slots available to be assigned to an element
+            that is supposed to enter the pass through mode."
+    ::= { alaStackMgrTraps 0 8 }
+
+
+alaStackMgrBadMixTrap NOTIFICATION-TYPE
+    OBJECTS    {
+                alaStackMgrSlotNINumber
+               }
+    STATUS  current
+    DESCRIPTION
+           "The element identified by alaStackMgrSlotNINumber will enter the pass through
+            mode because it is not compatible with the existing stack."
+    ::= { alaStackMgrTraps 0 9 }
+
+-- StackMgr Conformance 
+
+alcatelIND1StackMgrMIBGroups OBJECT IDENTIFIER ::= 
+{ alcatelIND1StackMgrMIBConformance 1 }
+
+
+alcatelIND1StackMgrMIBCompliances OBJECT IDENTIFIER ::= 
+{ alcatelIND1StackMgrMIBConformance 2 }
+
+
+alaStackMgrCfgMgrGroup OBJECT-GROUP
+    OBJECTS {
+		alaStackMgrSlotNINumber,
+		alaStackMgrSlotCMMNumber,
+		alaStackMgrChasRole,
+		alaStackMgrLocalLinkStateA,
+		alaStackMgrRemoteNISlotA,
+		alaStackMgrRemoteLinkA,
+		alaStackMgrLocalLinkStateB,
+		alaStackMgrRemoteNISlotB,
+		alaStackMgrRemoteLinkB,
+        alaStackMgrChasState,
+        alaStackMgrSavedSlotNINumber,
+        alaStackMgrCommandAction,
+        alaStackMgrCommandStatus,
+	alaStackMgrOperStackingMode,
+	alaStackMgrAdminStackingMode
+    	}
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about 
+	the topology of the stack ."
+    ::= { alcatelIND1StackMgrMIBGroups 1 }
+
+
+alaStackMgrNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { alaStackMgrDuplicateSlotTrap,
+                    alaStackMgrNeighborChangeTrap,
+		    alaStackMgrRoleChangeTrap,
+                    alaStackMgrDuplicateRoleTrap,
+                    alaStackMgrClearedSlotTrap,
+                    alaStackMgrOutOfSlotsTrap,
+                    alaStackMgrOutOfTokensTrap,
+                    alaStackMgrOutOfPassThruSlotsTrap,
+		    alaStackMgrBadMixTrap
+                  }
+    STATUS  current
+    DESCRIPTION
+            "A collection of notifications for signaling Stack manager events."
+    ::= { alcatelIND1StackMgrMIBGroups 2 }
+
+
+alcatelIND1StackMgrMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for device support of Stack Manager."
+    MODULE
+        MANDATORY-GROUPS {
+            alaStackMgrCfgMgrGroup,
+            alaStackMgrNotificationGroup
+        }
+    ::= { alcatelIND1StackMgrMIBCompliances 1 }
+
+
+
+END
+
+
+
