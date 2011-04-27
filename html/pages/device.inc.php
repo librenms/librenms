@@ -229,7 +229,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     if ($device_config_file)
     {
       echo('<li class="' . $select['showconfig'] . '">
-    <a href="/device/' . $device['device_id'] . '/showconfig/">
+    <a href="device/' . $device['device_id'] . '/showconfig/">
       <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Config
     </a>
   </li>');
