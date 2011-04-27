@@ -1,4 +1,4 @@
-#<?php
+<?php
 
 #  This file prints a table row for each interface
 
@@ -225,7 +225,6 @@ if ($interface['pagpGroupIfIndex'] && $interface['pagpGroupIfIndex'] != $interfa
 }
 
 $higher_ifs = mysql_query("SELECT * FROM `ports_stack` WHERE `interface_id_low` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
-echo(mysql_error());
 while ($higher_if = mysql_fetch_assoc($higher_ifs))
 {
   if($higher_if['interface_id_high']) 
@@ -237,7 +236,6 @@ while ($higher_if = mysql_fetch_assoc($higher_ifs))
 }
 
 $lower_ifs = mysql_query("SELECT * FROM `ports_stack` WHERE `interface_id_high` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
-echo(mysql_error());
 while ($lower_if = mysql_fetch_assoc($lower_ifs))
 {
   if($lower_if['interface_id_low'])
