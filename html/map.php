@@ -153,9 +153,9 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
   if ($links > 10) ### Unflatten if there are more than 10 links. beyond that it gets messy
   {
-    $maptool = 'unflatten -f -l 5 | twopi';
+    $maptool = 'unflatten -f -l 5 | dot';
   } else {
-    $maptool = 'twopi';
+    $maptool = 'dot';
   }
 
   if ($where == '') { $maptool = 'neato -Gpack'; }
