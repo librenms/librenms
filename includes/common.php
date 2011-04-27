@@ -165,6 +165,14 @@ function getifindexbyid($id)
   return $result;
 }
 
+function get_port_by_ifIndex($device, $ifIndex)
+{
+  $sql = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
+  $result = @mysql_fetch_assoc($sql);
+
+  return $result;
+}
+
 function getifbyid($id)
 {
   $sql = mysql_query("SELECT * FROM `ports` WHERE `interface_id` = '$id'");

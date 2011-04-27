@@ -175,6 +175,7 @@ while ($device = mysql_fetch_assoc($device_query))
     }
   } else {
     include("includes/discovery/ports.inc.php");
+    include("includes/discovery/ports-stack.inc.php");
     include("includes/discovery/entity-physical.inc.php");
     include("includes/discovery/processors.inc.php");
     include("includes/discovery/mempools.inc.php");

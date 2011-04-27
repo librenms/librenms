@@ -3,7 +3,10 @@
 echo("OSPF: ");
 echo("Processes: ");
 
-$ospf_instance_count = 0;
+$ospf_instance_count  = 0;
+$ospf_port_count      = 0;
+$ospf_area_count      = 0;
+$ospf_neighbour_count = 0;
 
 $ospf_oids_db = array('ospfRouterId', 'ospfAdminStat', 'ospfVersionNumber', 'ospfAreaBdrRtrStatus', 'ospfASBdrRtrStatus',
                       'ospfExternLsaCount', 'ospfExternLsaCksumSum', 'ospfTOSSupport', 'ospfOriginateNewLsas', 'ospfRxNewLsas',
@@ -135,6 +138,7 @@ if (is_array($ospf_areas_db))
     }
     unset($ospf_area_poll);
     unset($ospf_area_db);
+    $ospf_area_count++;
   }
 }
 
@@ -213,13 +217,33 @@ if (is_array($ospf_ports_db)){
       }
       unset($ospf_port_poll);
       unset($ospf_port_db);
-    
+      $ospf_port_count++;
     } else {
       mysql_query("DELETE FROM `ospf_ports` WHERE `device_id` = '".$device['device_id']."' AND `ospf_port_id` = '".$ospf_port_db['ospf_port_id']."'");
       echo("-");
     }
   }
 }
+
+## Create device-wide statistics RRD
+
+$filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("ospf-statistics.rrd");
+
+if (!is_file($filename))
+{
+          rrdtool_create($filename, "--step 300 \
+          DS:instances:GAUGE:600:0:1000000 \
+          DS:areas:GAUGE:600:0:1000000 \
+          DS:ports:GAUGE:600:0:1000000 \
+          DS:neighbours:GAUGE:600:0:1000000 \
+          RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 \
+          RRA:MIN:0.5:1:600     RRA:MIN:0.5:6:700     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797 \
+          RRA:MAX:0.5:1:600     RRA:MAX:0.5:6:700     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797 \
+          RRA:LAST:0.5:1:600    RRA:LAST:0.5:6:700    RRA:LAST:0.5:24:775    RRA:LAST:0.5:288:797");
+}
+
+$rrd_update  = "N:".$ospf_instance_count.":".$ospf_area_count.":".$ospf_port_count.":".$ospf_neighbour_count;
+$ret = rrdtool_update("$filename", $rrd_update);
 
 unset($ospf_ports_db);
 unset($ospf_ports_poll);
