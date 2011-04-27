@@ -130,6 +130,8 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>';
     }
 
+    if ($config['enable_ospf']) { $ospf_menu = 1; }
+
     if(isset($bgp_menu) || isset($ospf_menu) || isset($isis_menu) || isset($eigrp_menu) || isset($bgp_menu)) 
     {
       echo('<li class="' . $select['routing'] . '">

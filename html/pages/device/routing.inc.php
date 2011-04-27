@@ -9,9 +9,14 @@ if ($bgp_count) { $datas[] = 'bgp'; }
 $cef_count = mysql_result(mysql_query("select count(*) from cef_switching WHERE device_id = '" . $device['device_id'] . "'"), 0);
 if ($cef_count) { $datas[] = 'cef'; }
 
+$ospf_count = mysql_result(mysql_query("select count(*) from ospf_instances WHERE device_id = '" . $device['device_id'] . "'"), 0);
+if ($ospf_count) { $datas[] = 'ospf'; }
+
+
 $type_text['overview'] = "Overview";
 $type_text['bgp'] = "BGP";
 $type_text['cef'] = "CEF";
+$type_text['ospf'] = "OSPF";
 
 print_optionbar_start();
 
