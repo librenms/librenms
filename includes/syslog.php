@@ -36,7 +36,15 @@ function process_syslog ($entry, $update)
   if ($entry['device_id'] && !$delete)
   {
     $os = mysql_result(mysql_query("SELECT `os` FROM `devices` WHERE `device_id` = '".$entry['device_id']."'"),0);
-    if ($os == "ios" || $os == "iosxe")
+    if ($os == 'catos')
+    {
+      $matches = array();
+      preg_match('#%(?P<program>[A-Z0-9\-_]*):(?P<msg>(.*))#', $entry['msg'], $matches);
+      $entry['msg'] = $matches['msg'];
+      $entry['program'] = $matches['program'];
+      unset($matches);
+    }
+    elseif ($os == "ios" || $os == "iosxe")
     {
       if (strstr($entry[msg], "%"))
       {
