@@ -224,4 +224,6 @@ if (is_array($ospf_ports_db)){
 unset($ospf_ports_db);
 unset($ospf_ports_poll);
 
+echo("\n");
+
 ?>
