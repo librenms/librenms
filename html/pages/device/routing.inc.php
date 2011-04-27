@@ -53,8 +53,9 @@ if (is_file("pages/device/routing/".mres($_GET['opta']).".inc.php"))
         if (!is_integer($g_i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
         echo('<div style="background-color: '.$row_colour.';">');
-        echo('<div style="padding:4px 0px 0px 8px;" class=graphhead>'.$type_text[$type].'</div>');
+        echo('<div style="padding:4px 0px 0px 8px;"><span class=graphhead>'.$type_text[$type].'</span>');
         include("pages/device/routing/overview/".mres($type).".inc.php");
+        echo('</div>');
         echo('</div>');
       } else {
         $graph_title = $type_text[$type];

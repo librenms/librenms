@@ -13,58 +13,67 @@ $ospf_oids_db = array('ospfRouterId', 'ospfAdminStat', 'ospfVersionNumber', 'osp
 $query = mysql_query("SELECT * FROM `ospf_instances` WHERE `device_id` = '".$device['device_id']."'");
 while($entry = mysql_fetch_assoc($query))
 {
-  $ospf[$entry['ospf_instance_id']] = $entry;
+  $ospf_instances_db[$entry['ospf_instance_id']] = $entry;
 }
 
 ### Pull data from device
-$ospf_data = snmpwalk_cache_oid($device, "OSPF-MIB::ospfGeneralGroup", array(), "OSPF-MIB");
-foreach($ospf_data as $ospf_instances => $ospf_entry)
+$ospf_instances_poll = snmpwalk_cache_oid($device, "OSPF-MIB::ospfGeneralGroup", array(), "OSPF-MIB");
+foreach($ospf_instances_poll as $ospf_instance_id => $ospf_entry)
 {
   ### If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
-  if(!isset($ospf[$ospf_instances]))
+  if(!isset($ospf_instances_db[$ospf_instance_id]))
   {
-    $query = "INSERT INTO `ospf_instances` (`device_id`, `ospf_instance_id`) VALUES ('".$device['device_id']."','".$ospf_instances."')";
+    $query = "INSERT INTO `ospf_instances` (`device_id`, `ospf_instance_id`) VALUES ('".$device['device_id']."','".$ospf_instance_id."')";
     echo($query);
     mysql_query($query);
     echo(mysql_error());
     echo("+");
-    $entry = mysql_fetch_assoc(mysql_query("SELECT * FROM `ospf_instances` WHERE `device_id` = '".$device['device_id']."' AND `ospf_instance_id` = '".$ospf_instances."'"));
-    $ospf[$entry['ospf_instance_id']] = $entry;
+    $entry = mysql_fetch_assoc(mysql_query("SELECT * FROM `ospf_instances` WHERE `device_id` = '".$device['device_id']."' AND `ospf_instance_id` = '".$ospf_instance_id."'"));
+    $ospf_instances_db[$entry['ospf_instance_id']] = $entry;
   }
 }
 
+if($debug) {
+  echo("\nPolled: ");
+  print_r($ospf_instances_poll);
+  echo("Database: ");
+  print_r($ospf_instances_db);
+  echo("\n");
+}
+
 ### Loop array of entries and update 
-if (is_array($ospf))
+if (is_array($ospf_instances_db))
 { 
-  foreach($ospf as $ospf_db)
+  foreach($ospf_instances_db as $ospf_instance_db)
   {
-    $ospf_poll = $ospf_data[$ospf_db['ospf_instance_id']];
+    $ospf_instance_poll = $ospf_instances_poll[$ospf_db['ospf_instance_id']];
     foreach ($ospf_oids_db as $oid)
     { // Loop the OIDs
-      if ($ospf_db[$oid] != $ospf_poll[$oid])
+      if ($ospf_instance_db[$oid] != $ospf_instance_poll[$oid])
       { // If data has changed, build a query
-        $update .= ", `$oid` = '".mres($ospf_poll[$oid])."'";
-        #log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['interface_id']);
+        $ospf_instance_update .= ", `$oid` = '".mres($ospf_instance_poll[$oid])."'";
+        #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['interface_id']); ## FIXME
       }
     }
     if($update) 
     {
-      $query = "UPDATE `ospf_instances` SET `ospf_instance_id` = '".$ospf_db['ospf_instance_id']."'".$update." WHERE `device_id` = '".$device['device_id']."' AND `ospf_instance_id` = '".$ospf_instances."'";
-      echo($query);
+      $query = "UPDATE `ospf_instances` SET `ospf_instance_id` = '".$ospf_instance_db['ospf_instance_id']."'".$ospf_instance_update." WHERE `device_id` = '".$device['device_id']."' AND `ospf_instance_id` = '".$ospf_instance_id."'";
+      if($debug) {echo($query);} ## Debug
       mysql_query($query);
-      echo(mysql_error());
+      if($debug) {echo(mysql_error());} ## Debug
       echo("U");
-      unset($update);
+      unset($ospf_instance_update);
     } else {
       echo(".");
     }
-    unset($ospf_poll);
-    unset($ospf_db);
+    unset($ospf_instance_poll);
+    unset($ospf_instance_db);
+    $ospf_instance_count++;
   }
 }
 
-unset($ospf_data);
-unset($ospf);
+unset($ospf_instances_poll);
+unset($ospf_instances_db);
 
 echo(" Areas: ");
 
@@ -92,30 +101,42 @@ foreach($ospf_areas_poll as $ospf_area_id => $ospf_area)
   }
 }
 
+if($debug) {
+  echo("\nPolled: ");
+  print_r($ospf_areas_poll);
+  echo("Database: ");
+  print_r($ospf_areas_db);
+  echo("\n");
+}
+
+
 ### Loop array of entries and update
-if (is_array($ospf_areas_db)){ foreach($ospf_areas_db as $ospf_area_db)
-{
-  $ospf_area_poll = $ospf_areas_poll[$ospf_area_db['ospfAreaId']];
-  foreach ($ospf_area_oids as $oid)
-  { ## Loop the OIDs
-    if ($ospf_area_db[$oid] != $ospf_area_poll[$oid])
-    { ## If data has changed, build a query
-      $update .= ", `$oid` = '".mres($ospf_area_poll[$oid])."'";
-#      log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['interface_id']);
-    }
-  }
-  if($update)
+if (is_array($ospf_areas_db))
+{ 
+  foreach($ospf_areas_db as $ospf_area_db)
   {
-    mysql_query("UPDATE `ospf_areas` SET `ospfAreaId` = '".$ospf_area_db['ospfAreaId']."'".$update." WHERE `device_id` = '".$device['device_id']."' AND `ospfAreaId` = '".$ospf_area_id."'");
-    echo("UPDATE `ospf_instances` SET `ospfAreaId` = '".$ospf_area_db['ospfAreaId']."'".$update." WHERE `device_id` = '".$device['device_id']."' AND `ospfAreaId` = '".$ospf_area_id."'");
-    echo("U");
-    unset($update);
-  } else {
-    echo(".");
+    $ospf_area_poll = $ospf_areas_poll[$ospf_area_db['ospfAreaId']];
+    foreach ($ospf_area_oids as $oid)
+    { ## Loop the OIDs
+      if ($ospf_area_db[$oid] != $ospf_area_poll[$oid])
+      { ## If data has changed, build a query
+        $ospf_area_update .= ", `$oid` = '".mres($ospf_area_poll[$oid])."'";
+        #log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['interface_id']); ## FIXME
+      }
+    }
+    if($update)
+    {
+      mysql_query("UPDATE `ospf_areas` SET `ospfAreaId` = '".$ospf_area_db['ospfAreaId']."'".$ospf_area_update." WHERE `device_id` = '".$device['device_id']."' AND `ospfAreaId` = '".$ospf_area_id."'");
+      if($debug) { echo("UPDATE `ospf_instances` SET `ospfAreaId` = '".$ospf_area_db['ospfAreaId']."'".$ospf_area_update." WHERE `device_id` = '".$device['device_id']."' AND `ospfAreaId` = '".$ospf_area_id."'");}
+      echo("U");
+      unset($ospf_area_update);
+    } else {
+      echo(".");
+    }
+    unset($ospf_area_poll);
+    unset($ospf_area_db);
   }
-  unset($ospf_area_poll);
-  unset($ospf_area_db);
-}}
+}
 
 unset($ospf_areas_db);
 unset($ospf_areas_poll);
@@ -157,6 +178,7 @@ if($debug) {
   print_r($ospf_ports_db);
   echo("\n");
 }
+
 ### Loop array of entries and update
 if (is_array($ospf_ports_db)){
   foreach($ospf_ports_db as $ospf_port_db)
@@ -175,17 +197,17 @@ if (is_array($ospf_ports_db)){
       { // Loop the OIDs
         if ($ospf_port_db[$oid] != $ospf_port_poll[$oid])
         { // If data has changed, build a query
-          $update .= ", `$oid` = '".mres($ospf_port_poll[$oid])."'";
-    #      log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['interface_id']);
+          $ospf_port_update .= ", `$oid` = '".mres($ospf_port_poll[$oid])."'";
+          #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['interface_id']); ## FIXME
         }
       }
       if($update)
       {
-        $update = "UPDATE `ospf_ports` SET `ospf_port_id` = '".$ospf_port_db['ospf_port_id']."'".$update." WHERE `device_id` = '".$device['device_id']."' AND `ospf_port_id` = '".$ospf_port_id."'";
-        mysql_query($update);
-        echo("$update");
+        $query = "UPDATE `ospf_ports` SET `ospf_port_id` = '".$ospf_port_db['ospf_port_id']."'".$ospf_port_update." WHERE `device_id` = '".$device['device_id']."' AND `ospf_port_id` = '".$ospf_port_id."'";
+        mysql_query($query);
+        if($debug) { echo("$query"); }
         echo("U");
-        unset($update);
+        unset($ospf_port_update);
       } else {
         echo(".");
       }
