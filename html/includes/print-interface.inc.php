@@ -1,4 +1,4 @@
-<?php
+#<?php
 
 #  This file prints a table row for each interface
 
@@ -223,6 +223,31 @@ if ($interface['pagpGroupIfIndex'] && $interface['pagpGroupIfIndex'] != $interfa
   echo("$br<img src='images/16/bricks.png' align=absmiddle> <strong>" . generate_port_link($parent) . " (PAgP)</strong>");
   $br = "<br />";
 }
+
+$higher_ifs = mysql_query("SELECT * FROM `ports_stack` WHERE `interface_id_low` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
+echo(mysql_error());
+while ($higher_if = mysql_fetch_assoc($higher_ifs))
+{
+  if($higher_if['interface_id_high']) 
+  {
+    $this_port = get_port_by_ifIndex($device, $higher_if['interface_id_high']);
+    echo("$br<img src='images/16/arrow_divide.png' align=absmiddle> <strong>" . generate_port_link($this_port) . "</strong>");
+    $br = "<br />";
+  }
+}
+
+$lower_ifs = mysql_query("SELECT * FROM `ports_stack` WHERE `interface_id_high` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
+echo(mysql_error());
+while ($lower_if = mysql_fetch_assoc($lower_ifs))
+{
+  if($lower_if['interface_id_low'])
+  {
+    $this_port = get_port_by_ifIndex($device, $lower_if['interface_id_low']);
+    echo("$br<img src='images/16/arrow_join.png' align=absmiddle> <strong>" . generate_port_link($this_port) . "</strong>");
+    $br = "<br />";
+  }
+}
+
 
 unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 
