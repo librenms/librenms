@@ -31,6 +31,11 @@ if (isset($_GET['logout']) && $_SESSION['authenticated'])
   $auth_message = "Logged Out";
 }
 
+if(isset($config['auth_mechanism']) and $config['auth_mechanism'] == 'http-auth' and !isset($_GET['logout'])){
+   $_GET['username'] = '';
+   $_GET['password'] = '';
+}
+
 if (isset($_GET['username']) && isset($_GET['password']))
 {
   $_SESSION['username'] = mres($_GET['username']);
