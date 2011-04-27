@@ -47,9 +47,20 @@ if (is_file("pages/device/routing/".mres($_GET['opta']).".inc.php"))
   {
     if ($type != "overview")
     {
-      $graph_title = $type_text[$type];
-      $graph_type = "device_".$type;
-      include("includes/print-device-graph.php");
+      if(is_file("pages/device/routing/overview/".mres($type).".inc.php")) {
+
+        $g_i++;
+        if (!is_integer($g_i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+
+        echo('<div style="background-color: '.$row_colour.';">');
+        echo('<div style="padding:4px 0px 0px 8px;" class=graphhead>'.$type_text[$type].'</div>');
+        include("pages/device/routing/overview/".mres($type).".inc.php");
+        echo('</div>');
+      } else {
+        $graph_title = $type_text[$type];
+        $graph_type = "device_".$type;
+        include("includes/print-device-graph.php");
+      }
     }
   }
 }
