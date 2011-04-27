@@ -26,11 +26,20 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
     $sensor = $ipmi_sensor[$ipmisensors['sensor_descr']][$ipmisensors['sensor_class']]['value'];
     $unit   = $ipmi_sensor[$ipmisensors['sensor_descr']][$ipmisensors['sensor_class']]['unit'];
 
-    $sensorrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($ipmisensors['sensor_class'].'-'.$ipmisensors['sensor_type'].'-'.$ipmisensors['sensor_index'] . ".rrd");
+    $rrd_file = get_sensor_rrd($device, $ipmisensors);
 
-    if (!is_file($sensorrrd))
+    ## FIXME - sensor name format change 2011/04/26 - remove this in $amount_of_time. 
+    ## We don't want to reduce performance forever because douchebags don't svn up!
+    $old_rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($ipmisensors['sensor_class'].'-'.$ipmisensors['sensor_type'].'-'.$ipmisensors['sensor_index'] . ".rrd");
+
+    if (is_file($old_rrd_file))
     {
-      rrdtool_create($sensorrrd,"--step 300 \
+      rename($old_rrd_file, $rrd_file);
+    }
+
+    if (!is_file($rrd_file))
+    {
+      rrdtool_create($rrd_file,"--step 300 \
       DS:sensor:GAUGE:600:-20000:20000 \
       RRA:AVERAGE:0.5:1:600 \
       RRA:AVERAGE:0.5:6:700 \
@@ -48,7 +57,7 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
 
     echo($sensor . " $unit\n");
 
-    rrdtool_update($sensorrrd,"N:$sensor");
+    rrdtool_update($rrd_file,"N:$sensor");
 
     ## FIXME warnings in event & mail not done here yet!
 
