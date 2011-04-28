@@ -4,7 +4,7 @@ if (is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list
 
 echo("<tr bgcolor='$bg_colour'>");
 
-echo("<td width=200 class=list-large><a href='vrf/".$vrf['mplsVpnVrfRouteDistinguisher']."/'>" . $vrf['vrf_name'] . "</a></td>");
+echo("<td width=200 class=list-large><a href='routing/vrf/".$vrf['mplsVpnVrfRouteDistinguisher']."/'>" . $vrf['vrf_name'] . "</a></td>");
 echo("<td width=150 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
 echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "</td>");
 
@@ -12,9 +12,9 @@ echo('<td class="list-bold">');
 $ports_query = mysql_query("SELECT * FROM ports WHERE `device_id` = '" . $device['device_id'] . "' AND `ifVrf` = '" . $vrf['vrf_id'] . "' ");
 while ($port = mysql_fetch_assoc($ports_query))
 {
-  if ($_GET['opta'] == "graphs")
+  if ($_GET['optb'] == "graphs")
   {
-    $graph_type = "port_" . $_GET['optb'];
+    $graph_type = "port_" . $_GET['optc'];
     echo("<div style='display: block; padding: 2px; margin: 2px; min-width: 139px; max-width:139px; min-height:85px; max-height:85px; text-align: center; float: left; background-color: #e9e9e9;'>
     <div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>
     <a href='device/".$device['device_id']."/port/".$port['interface_id']."/' onmouseover=\"return overlib('\

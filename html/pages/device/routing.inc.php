@@ -3,6 +3,11 @@
 
 $datas[] = 'overview';
 
+if (@mysql_result(mysql_query("select count(*) from vrfs WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') 
+{
+  $datas[] = 'vrf';
+}
+
 $bgp_count = mysql_result(mysql_query("select count(*) from bgpPeers WHERE device_id = '" . $device['device_id'] . "'"), 0);
 if ($bgp_count) { $datas[] = 'bgp'; }
 
@@ -12,11 +17,11 @@ if ($cef_count) { $datas[] = 'cef'; }
 $ospf_count = mysql_result(mysql_query("select count(*) from ospf_instances WHERE device_id = '" . $device['device_id'] . "'"), 0);
 if ($ospf_count) { $datas[] = 'ospf'; }
 
-
 $type_text['overview'] = "Overview";
 $type_text['bgp'] = "BGP";
 $type_text['cef'] = "CEF";
 $type_text['ospf'] = "OSPF";
+$type_text['vrf'] = "VRFs";
 
 print_optionbar_start();
 

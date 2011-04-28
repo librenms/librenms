@@ -110,14 +110,14 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (@mysql_result(mysql_query("select count(*) from vrfs WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
-    {
-      echo('<li class="' . $select['vrfs'] . '">
-    <a href="device/' . $device['device_id'] . '/vrfs/">
-      <img src="images/16/layers.png" align="absmiddle" border="0" /> VRFs
-    </a>
-  </li>');
-    }
+#    if (@mysql_result(mysql_query("select count(*) from vrfs WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
+#    {
+#      echo('<li class="' . $select['vrfs'] . '">
+#    <a href="device/' . $device['device_id'] . '/vrfs/">
+#      <img src="images/16/layers.png" align="absmiddle" border="0" /> VRFs
+#    </a>
+#  </li>');
+#    }
 
     
 
