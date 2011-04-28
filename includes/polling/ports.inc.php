@@ -1,7 +1,9 @@
 <?php
 
-unset($ports);
-$ports = snmp_cache_ifIndex($device); // Cache Port List
+# FIXME Removed 28/4/2011 - this can go, right?
+#unset($ports);
+#$ports = snmp_cache_ifIndex($device); // Cache Port List
+# /FIXME
 
 #mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`) VALUES ('".$device['device_id']."','$ifIndex')");
 

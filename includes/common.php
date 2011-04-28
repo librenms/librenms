@@ -2,20 +2,24 @@
 
 ## Common Functions
 
-function sgn($int){
-  if($int < 0)
+function sgn($int)
+{
+  if ($int < 0)
+  {
     return -1;
-  elseif($int == 0)
+  } elseif ($int == 0) {
     return 0;
-  else
+  } else {
     return 1;
+  }
 }
 
 function get_sensor_rrd($device, $sensor)
 {
   global $config;
 
-  if($config['os'][$device['os']]['sensor_descr'] || $sensor['poller_type'] == "ipmi") 
+  # For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
+  if ($config['os'][$device['os']]['sensor_descr'] || $sensor['poller_type'] == "ipmi") 
   {
     $rrd_file = $config['rrd_dir']."/".$device['hostname']."/".safename("sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_descr'] . ".rrd");
   } else {
@@ -23,7 +27,6 @@ function get_sensor_rrd($device, $sensor)
   }
 
   return($rrd_file);
-
 }
 
 function get_port_by_id($port_id)
