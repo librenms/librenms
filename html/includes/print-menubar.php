@@ -153,8 +153,6 @@ if ($config['enable_billing']) { echo('<li><a href="bills/"><img src="images/16/
 
 if ($config['enable_pseudowires']) { echo('<li><a href="pseudowires/"><img src="images/16/arrow_switch.png" border="0" align="absmiddle" /> Pseudowires</a></li>'); $ifbreak = 1; }
 
-if ($config['enable_vrfs']) { echo('<li><a href="vrfs/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li>'); $ifbreak = 1; }
-
 ?>
 <?php
 
@@ -280,6 +278,8 @@ if ($_SESSION['userlevel'] >= '5')
       <li><a class="menu2four" href="routing/"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a>
         <table><tr><td>
         <ul>');
+
+  if ($config['enable_vrfs']) { echo('<li><a href="routing/vrfs/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li> <li><hr width=140></li> '); }
 
   ## BGP Sessions
   if ($_SESSION['userlevel'] >= '5' && (isset($config['enable_bgp']) && $config['enable_bgp']))

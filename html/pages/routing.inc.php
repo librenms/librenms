@@ -18,6 +18,21 @@ print_optionbar_start('', '');
   echo('<a href="routing/bgp/all/'.$graphs.'/">BGP</a>');
   if ($_GET['opta'] == "bgp") { echo("</span>"); }
 
+  echo(" | ");
+
+  ## Start OSPF Menu -- FIXME only show if BGP enabled?
+  if ($_GET['opta'] == "ospf") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/ospf/all/'.$graphs.'/">OSPF</a>');
+  if ($_GET['opta'] == "ospf") { echo("</span>"); }
+
+  echo(" | ");
+
+  ## Start VRF Menu -- FIXME only show if BGP enabled?
+  if ($_GET['opta'] == "vrf") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/vrf/all/'.$graphs.'/">VRF</a>');
+  if ($_GET['opta'] == "vrf") { echo("</span>"); }
+
+
 
 print_optionbar_end('', '');
 
@@ -25,6 +40,7 @@ switch ($_GET['opta'])
 {
   case 'overview':
   case 'bgp':
+  case 'vrf':
     include('pages/routing/'.$_GET['opta'].'.inc.php');
     break;
   default:
