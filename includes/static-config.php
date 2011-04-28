@@ -713,14 +713,16 @@ $config['os'][$os]['icon']  		= "tripplite";
 
 foreach($config['os'] as $this_os => $blah)
 {
-  if (isset($config['os'][$this_os]['group'])) { $this_os_group = $config['os'][$this_os]['group']; }
-  if (isset($config['os'][$this_os]['group']) && isset($config['os_group'][$this_os_group]))
-  {
-    foreach ($config['os_group'][$this_os_group] as $property => $value)
+  if (isset($config['os'][$this_os]['group'])){
+    $this_os_group = $config['os'][$this_os]['group'];
+    if (isset($config['os_group'][$this_os_group]))
     {
-      if (!isset($config['os'][$this_os][$property]))
+      foreach ($config['os_group'][$this_os_group] as $property => $value)
       {
-        $config['os'][$this_os][$property] = $value;
+        if (!isset($config['os'][$this_os][$property]))
+        {
+          $config['os'][$this_os][$property] = $value;
+        }
       }
     }
   }
