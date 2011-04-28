@@ -85,7 +85,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
 
     if (@mysql_result(mysql_query("select count(interface_id) from ports WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
     {
-      echo('<li class="' . $select['ports'] . '">
+      echo('<li class="' . $select['ports'] . $select['port'] . '">
     <a href="device/' . $device['device_id'] . '/ports/' .$config['ports_page_default']. '">
       <img src="images/16/connect.png" align="absmiddle" border="0" /> Ports
     </a>
