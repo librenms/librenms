@@ -289,18 +289,14 @@ if ($_SESSION['userlevel'] >= '5')
 
         <li><a href="routing/bgp/external/nographs/"><img src="images/16/world_link.png" border="0" align="absmiddle" /> BGP External</a></li>
         <li><a href="routing/bgp/internal/nographs/"><img src="images/16/brick_link.png" border="0" align="absmiddle" /> BGP Internal</a></li>');
-
-    echo('
-        <li><hr width=140></li>');
   }
-
-  $routing_alert_sep = "";
 
   ## Do Alerts at the bottom
   if ($bgp_alerts)
   {
     echo('
-      <li><a href="routing/bgp/alerts/"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerted BGP (' . $bgp_alerts . ')</a></li>
+        <li><hr width=140></li>
+        <li><a href="routing/bgp/alerts/"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerted BGP (' . $bgp_alerts . ')</a></li>
    ');
   }
 
