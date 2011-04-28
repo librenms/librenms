@@ -2,6 +2,15 @@
 
 ## Common Functions
 
+function sgn($int){
+  if($int < 0)
+    return -1;
+  elseif($int == 0)
+    return 0;
+  else
+    return 1;
+}
+
 function get_sensor_rrd($device, $sensor)
 {
   global $config;
