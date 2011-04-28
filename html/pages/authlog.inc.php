@@ -18,7 +18,7 @@ if ($_SESSION['userlevel'] == '10')
      <td class=list-bold width=125>
        ".$entry['user']."
      </td>
-     <td class=syslog width=150>
+     <td class=syslog width=250>
        ".$entry['address']."
      </td>
      <td class=syslog width=150>
