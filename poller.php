@@ -350,7 +350,7 @@ while ($device = mysql_fetch_assoc($device_query))
   if ($debug) { echo("Updating " . $device['hostname'] . " - $poll_update_query \n"); }
   if (!mysql_query($poll_update_query))
   {
-    echo "ERROR: " . mysql_error() . "\nSQL: $poll_update_query\n";
+    echo("ERROR: " . mysql_error() . "\nSQL: $poll_update_query\n");
   }
   if (mysql_affected_rows() == "1") { echo("UPDATED!\n"); } else { echo("NOT UPDATED!\n"); }
 
