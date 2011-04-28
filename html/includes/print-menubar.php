@@ -279,7 +279,7 @@ if ($_SESSION['userlevel'] >= '5')
         <table><tr><td>
         <ul>');
 
-  if ($config['enable_vrfs']) { echo('<li><a href="routing/vrfs/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li> <li><hr width=140></li> '); }
+  if ($config['enable_vrfs']) { echo('<li><a href="routing/vrf/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li> <li><hr width=140></li> '); }
 
   ## BGP Sessions
   if ($_SESSION['userlevel'] >= '5' && (isset($config['enable_bgp']) && $config['enable_bgp']))
