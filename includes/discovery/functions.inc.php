@@ -87,7 +87,7 @@ function sensor_low_limit($class, $current)
       $limit = $current * 0.7;
       break;
     case 'voltage':
-      $limit = $current * 0.85;
+      $limit = $current * (1 - (sgn($current) * 0.15));
       break;
     case 'humidity':
       $limit = "70";
@@ -119,7 +119,7 @@ function sensor_limit($class, $current)
       $limit = $current * 1.60;
       break;
     case 'voltage':
-      $limit = $current * 1.15;
+      $limit = $current * (1 + (sgn($current) * 0.15));
       break;
     case 'humidity':
       $limit = "70";
