@@ -12,7 +12,7 @@ foreach ($menu_options as $option => $text)
 {
   echo($sep);
   if ($_GET['opta'] == $option) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/vrfs/' . $option . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $text
+  echo('<a href="device/' . $device['device_id'] . '/routing/vrf/' . $option . ($_GET['optc'] ? '/' . $_GET['optc'] : ''). '/">' . $text
  . '</a>');
   if ($_GET['opta'] == $option) { echo("</span>"); }
   $sep = " | ";
@@ -31,9 +31,9 @@ $graph_types = array("bits" => "Bits",
 foreach ($graph_types as $type => $descr)
 {
   echo("$type_sep");
-  if ($_GET['optb'] == $type) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/vrfs/graphs/'.$type.'/">'.$descr.'</a>');
-  if ($_GET['optb'] == $type) { echo("</span>"); }
+  if ($_GET['optc'] == $type) { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="device/' . $device['device_id'] . '/routing/vrf/graphs/'.$type.'/">'.$descr.'</a>');
+  if ($_GET['optc'] == $type) { echo("</span>"); }
 
 #  echo('(');
 #  if ($_GET['optb'] == $type) { echo("<span class='pagemenu-selected'>"); }
