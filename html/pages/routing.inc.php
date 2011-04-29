@@ -1,23 +1,22 @@
 <?php
 
-if (!$_GET['opta']) { $_GET['opta'] = "overview"; }
 if ($_GET['optb'] == "graphs" || $_GET['optc'] == "graphs") { $graphs = "graphs"; } else { $graphs = "nographs"; }
 
-$datas[] = 'overview';
+#$datas[] = 'overview';
 
-$vrf_count = @mysql_result(mysql_query("SELECT COUNT(*) FROM `vrfs`"), 0);
-if($vrf_count) {  $datas[] = 'vrf'; }
+$routing_count['bgp'] = mysql_result(mysql_query("select count(*) from bgpPeers"), 0);
+if ($routing_count['bgp']) { $datas[] = 'bgp'; }
 
-$bgp_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `bgpPeers`"), 0);
-if ($bgp_count) { $datas[] = 'bgp'; }
+$routing_count['ospf'] = mysql_result(mysql_query("select count(*) from ospf_ports"), 0);
+if ($routing_count['ospf']) { $datas[] = 'ospf'; }
 
-$cef_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `cef_switching`"), 0);
-if ($cef_count) { $datas[] = 'cef'; }
+$routing_count['cef'] = mysql_result(mysql_query("select count(*) from cef_switching"), 0);
+if ($routing_count['cef']) { $datas[] = 'cef'; }
 
-$ospf_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_instances`"), 0);
-if ($ospf_count) { $datas[] = 'ospf'; }
+$routing_count['vrf'] = @mysql_result(mysql_query("select count(*) from vrfs"), 0);
+if($routing_count['vrf']) { $datas[] = 'vrf'; }
 
-$type_text['overview'] = "Overview";
+#$type_text['overview'] = "Overview";
 $type_text['bgp'] = "BGP";
 $type_text['cef'] = "CEF";
 $type_text['ospf'] = "OSPF";
@@ -25,13 +24,16 @@ $type_text['vrf'] = "VRFs";
 
 print_optionbar_start();
 
-if (!$_GET['opta']) { $_GET['opta'] = "overview"; }
+#if (!$_GET['opta']) { $_GET['opta'] = "overview"; }
 
 echo("<span style='font-weight: bold;'>Routing</span> &#187; ");
 
 unset($sep);
 foreach ($datas as $type)
 {
+
+  if (!$_GET['opta']) { $_GET['opta'] = $type; }
+
   echo($sep);
 
   if ($_GET['opta'] == $type)
@@ -39,7 +41,7 @@ foreach ($datas as $type)
     echo('<span class="pagemenu-selected">');
   }
 
-  echo("<a href='routing/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ."</a>");
+  echo("<a href='routing/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ." (".$routing_count[$type].")</a>");
   if ($_GET['opta'] == $type) { echo("</span>"); }
   $sep = " | ";
 }
