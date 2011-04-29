@@ -12,6 +12,7 @@ $config['afi']['ipv4']['multiicast'] = "IPv4 Multicast";
 $config['afi']['ipv4']['vpn']        = "VPNv4";
 $config['afi']['ipv6']['unicast']    = "IPv6";
 $config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
+$config['afi']['ipv4']['vpn']        = "VPNv6";
 
 $config['os']['default']['over'][0]['graph']	= "device_processor";
 $config['os']['default']['over'][0]['text']	= "Processor Usage";

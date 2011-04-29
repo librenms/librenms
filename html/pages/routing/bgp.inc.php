@@ -11,6 +11,8 @@ else
 
   echo('<span style="font-weight: bold;">BGP</span> &#187; ');
 
+  if(!$_GET['optb']) { $_GET['optb'] = "all"; }
+
   if ($_GET['opta'] == "bgp" && $_GET['optb'] == "all") { echo("<span class='pagemenu-selected'>"); }
   echo('<a href="routing/bgp/all/'.$graphs.'/">All</a>');
   if ($_GET['opta'] == "bgp" && $_GET['optb'] == "all") { echo("</span>"); }
@@ -34,42 +36,52 @@ else
   echo('');
   ## End BGP Menu
 
-  if(!isset($graphs)) { $graphs == "nographs"; }
-
   echo('<div style="float: right;">');
 
-  if ($graphs == "graphs") { echo('<span class="pagemenu-selected">'); }
+  if(!$_GET['optc']) { $_GET['optc'] = "nographs"; }
 
-  if(!isset($_GET['optc']))
-  {
-    echo('<a href="routing/'. $_GET['opta'].'/graphs/"> Graphs</a>');
-  } else {
-    echo('<a href="routing/'. $_GET['opta'].'/'.$_GET['optb'].'/graphs/"> Graphs</a>');
-  }
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "nographs") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/'.$_GET['optb'].'/nographs/">No Graphs</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "nographs") { echo("</span>"); }
+  echo(" | ");
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "updates") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/'.$_GET['optb'].'/updates/">Updates</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "updates") { echo("</span>"); }
 
-  if ($graphs == "graphs")
-  {
-    echo('</span>');
-  }
+  echo(" | Prefixes: Unicast (");
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4unicast") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/'.$_GET['optb'].'/prefixes_ipv4unicast/">IPv4</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4unicast") { echo("</span>"); }
+  echo("|");
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv6unicast") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/'.$_GET['optb'].'/prefixes_ipv6unicast/">IPv6</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv6unicast") { echo("</span>"); }
+  echo("|");
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4vpn") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/'.$_GET['optb'].'/prefixes_ipv4vpn/">VPNv4</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4vpn") { echo("</span>"); }
+  echo(")");
 
-  echo(' | ');
+  echo(" | Multicast (");
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4multicast") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/'.$_GET['optb'].'/prefixes_ipv4multicast/">IPv4</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4multicast") { echo("</span>"); }
+  echo("|");
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv6multicast") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/'.$_GET['optb'].'/prefixes_ipv6multicast/">IPv6</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv6multicast") { echo("</span>"); }
+  echo(")");
 
-  if ($graphs == "nographs")
-  {
-    echo('<span class="pagemenu-selected">');
-  }
+  echo(" | MAC (");
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "macaccounting_bits") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/'.$_GET['optb'].'/macaccounting_bits/">Bits</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "macaccounting_bits") { echo("</span>"); }
+  echo("|");
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "macaccounting_pkts") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/'.$_GET['optb'].'/macaccounting_pkts/">Packets</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "macaccounting_pkts") { echo("</span>"); }
+  echo(")");
 
-  if(!isset($_GET['optc']))
-  {
-    echo('<a href="routing/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
-  } else {
-    echo('<a href="routing/'. $_GET['opta'].'/'.$_GET['optb'].'/nographs/"> No Graphs</a>');
-  }
-
-  if ($graphs == "nographs")
-  {
-    echo('</span>');
-  }
 
   echo('</div>');
 
@@ -77,7 +89,7 @@ else
 
 
   echo("<table border=0 cellspacing=0 cellpadding=5 width=100% class='sortable'>");
-  echo('<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>');
+  echo('<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>State</th><th width=200>Uptime / Updates</th></tr>');
 
   $i = "1";
 
@@ -122,11 +134,28 @@ else
 
     echo('<tr bgcolor="'.$bg_colour.'"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">");
 
+    $af_query = mysql_query("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = '".$peer['device_id']."' AND bgpPeerIdentifier = '".$peer['bgpPeerIdentifier']."'");
+
+    unset($sep);
+    while ($afisafi = mysql_fetch_assoc($af_query))
+    {
+      $afi = $afisafi['afi'];
+      $safi = $afisafi['safi'];
+      $this_afisafi = $afi.$safi;
+      #$peer['afi'] .= $sep . $config['afi'][$afi][$safi];          ##### CLEAN ME UP, I AM MESSY AND I SMELL OF CHEESE! FIXME!
+      $peer['afi'] .= $sep . $afi .".".$safi;
+      $sep = "<br />";
+      $peer['afisafi'][$this_afisafi] = 1; ## Build a list of valid AFI/SAFI for this peer
+    }
+    unset($sep);
+
+
     echo("  <td></td>
             <td width=150>" . $localaddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), 'routing/bgp/')."</td>
-	     <td width=30>-></td>
+	    <td width=30>-></td>
             <td width=150>" . $peeraddresslink . "</td>
-	     <td width=50><b>$peer_type</b></td>
+	    <td width=50><b>$peer_type</b></td>
+            <td width=50>".$peer['afi']."</td>
             <td><strong>AS" . $peer['bgpPeerRemoteAs'] . "</strong><br />" . $peer['astext'] . "</td>
             <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></strong></td>
             <td>" .formatUptime($peer['bgpPeerFsmEstablishedTime']). "<br />
@@ -134,19 +163,47 @@ else
                         <img src='images/16/arrow_up.png' align=absmiddle /> " . format_si($peer['bgpPeerOutUpdates']) . "</td></tr>");
 
 
-    if($graphs == "graphs")
+    unset($invalid);
+    switch ($_GET['optc'])
     {
-      $graph_array['height'] = "100";
-      $graph_array['width']  = "216";
-      $graph_array['to']     = $now;
-      $graph_array['id']     = $peer['bgpPeer_id'];
-      $graph_array['type']   = "bgp_updates";
+      case 'prefixes_ipv4unicast':
+      case 'prefixes_ipv4multicast':
+      case 'prefixes_ipv4vpn':
+      case 'prefixes_ipv6unicast':
+      case 'prefixes_ipv6multicast':
+        list(,$afisafi) = explode("_", $_GET['optc']);
+        if (isset($peer['afisafi'][$afisafi])) { $peer['graph'] = 1; }
+      case 'updates':      
+        $graph_array['type']   = "bgp_" . $_GET['optc'];
+        $graph_array['id']     = $peer['bgpPeer_id'];
+    }
 
-      echo('<tr bgcolor="'.$bg_colour.'"' . ($bg_image ? ' background="'.$bg_image.'"' : '') . '"><td colspan="8">');
+    switch ($_GET['optc'])
+    {
+      case 'macaccounting_bits':
+      case 'macaccounting_pkts':
+        $acc = mysql_fetch_assoc(mysql_query("SELECT * FROM `ipv4_mac` AS I, mac_accounting AS M, ports AS P WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id"));
+        $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
+        if (is_array($acc) && is_file($database))
+        {
+          $peer['graph']       = 1;
+          $graph_array['id']   = $acc['ma_id'];
+          $graph_array['type'] = $_GET['optc'];
+        }
+    }
 
-      include("includes/print-quadgraphs.inc.php");
+    if ($_GET['optc'] == 'updates') { $peer['graph'] = 1; }
 
-      echo("</td></tr>");
+    if($peer['graph'])
+    {
+        $graph_array['height'] = "100";
+        $graph_array['width']  = "220";
+        $graph_array['to']     = $now;
+#        $graph_array['type']   = "bgp_" . $_GET['optc'];
+#        $graph_array['id']     = $peer['bgpPeer_id'];
+        echo('<tr bgcolor="'.$bg_colour.'"' . ($bg_image ? ' background="'.$bg_image.'"' : '') . '"><td colspan="9">');
+        include("includes/print-quadgraphs.inc.php");
+        echo("</td></tr>");
     }
 
     $i++;

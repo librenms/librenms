@@ -3,44 +3,56 @@
 if (!$_GET['opta']) { $_GET['opta'] = "overview"; }
 if ($_GET['optb'] == "graphs" || $_GET['optc'] == "graphs") { $graphs = "graphs"; } else { $graphs = "nographs"; }
 
-print_optionbar_start('', '');
+$datas[] = 'overview';
 
-  echo('<span style="font-weight: bold;">Routing</span> &#187; ');
+$vrf_count = @mysql_result(mysql_query("SELECT COUNT(*) FROM `vrfs`"), 0);
+if($vrf_count) {  $datas[] = 'vrf'; }
 
-  if ($_GET['opta'] == "overview") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/overview/'.$graphs.'/">Overview</a>');
-  if ($_GET['opta'] == "overview") { echo("</span>"); }
+$bgp_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `bgpPeers`"), 0);
+if ($bgp_count) { $datas[] = 'bgp'; }
 
-  echo(" | ");
+$cef_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `cef_switching`"), 0);
+if ($cef_count) { $datas[] = 'cef'; }
 
-  ## Start BGP Menu -- FIXME only show if BGP enabled?
-  if ($_GET['opta'] == "bgp") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/all/'.$graphs.'/">BGP</a>');
-  if ($_GET['opta'] == "bgp") { echo("</span>"); }
+$ospf_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_instances`"), 0);
+if ($ospf_count) { $datas[] = 'ospf'; }
 
-  echo(" | ");
+$type_text['overview'] = "Overview";
+$type_text['bgp'] = "BGP";
+$type_text['cef'] = "CEF";
+$type_text['ospf'] = "OSPF";
+$type_text['vrf'] = "VRFs";
 
-  ## Start OSPF Menu -- FIXME only show if BGP enabled?
-  if ($_GET['opta'] == "ospf") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/ospf/all/'.$graphs.'/">OSPF</a>');
-  if ($_GET['opta'] == "ospf") { echo("</span>"); }
+print_optionbar_start();
 
-  echo(" | ");
+if (!$_GET['opta']) { $_GET['opta'] = "overview"; }
 
-  ## Start VRF Menu -- FIXME only show if BGP enabled?
-  if ($_GET['opta'] == "vrf") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/vrf/all/'.$graphs.'/">VRF</a>');
-  if ($_GET['opta'] == "vrf") { echo("</span>"); }
+echo("<span style='font-weight: bold;'>Routing</span> &#187; ");
 
+unset($sep);
+foreach ($datas as $type)
+{
+  echo($sep);
 
+  if ($_GET['opta'] == $type)
+  {
+    echo('<span class="pagemenu-selected">');
+  }
 
-print_optionbar_end('', '');
+  echo("<a href='routing/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ."</a>");
+  if ($_GET['opta'] == $type) { echo("</span>"); }
+  $sep = " | ";
+}
+
+print_optionbar_end();
 
 switch ($_GET['opta'])
 {
   case 'overview':
   case 'bgp':
   case 'vrf':
+  case 'cef':
+  case 'ospf':
     include('pages/routing/'.$_GET['opta'].'.inc.php');
     break;
   default:
