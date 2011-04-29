@@ -4,16 +4,16 @@ if ($_GET['optb'] == "graphs" || $_GET['optc'] == "graphs") { $graphs = "graphs"
 
 #$datas[] = 'overview';
 
-$routing_count['bgp'] = mysql_result(mysql_query("select count(*) from bgpPeers"), 0);
+$routing_count['bgp'] = mysql_result(mysql_query("SELECT COUNT(*) from `bgpPeers`"), 0);
 if ($routing_count['bgp']) { $datas[] = 'bgp'; }
 
-$routing_count['ospf'] = mysql_result(mysql_query("select count(*) from ospf_ports"), 0);
+$routing_count['ospf'] = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'"), 0);
 if ($routing_count['ospf']) { $datas[] = 'ospf'; }
 
-$routing_count['cef'] = mysql_result(mysql_query("select count(*) from cef_switching"), 0);
+$routing_count['cef'] = mysql_result(mysql_query("SELECT COUNT(*) from `cef_switching`"), 0);
 if ($routing_count['cef']) { $datas[] = 'cef'; }
 
-$routing_count['vrf'] = @mysql_result(mysql_query("select count(*) from vrfs"), 0);
+$routing_count['vrf'] = @mysql_result(mysql_query("SELECT COUNT(*) from `vrfs`"), 0);
 if($routing_count['vrf']) { $datas[] = 'vrf'; }
 
 #$type_text['overview'] = "Overview";
