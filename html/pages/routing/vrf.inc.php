@@ -78,7 +78,7 @@ if($_GET['optb'] == "all" ) {
         switch ($_GET['optc'])
         {
           case 'bits':
-          case 'pkts':
+          case 'upkts':
           case 'nupkts':
           case 'errors':
             $port['width'] = "130";
