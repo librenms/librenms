@@ -154,9 +154,9 @@ if ($_GET['optd'] == "top10")
 
     if ($_GET['optc'])
     {
-      $graph_type = "port_mac_acc_" . $_GET['optc'];
+      $graph_type = "macaccounting_" . $_GET['optc'];
     } else {
-      $graph_type = "port_mac_acc_bits";
+      $graph_type = "macaccounting_bits";
     }
 
     if ($_GET['optd'] == "thumbs")

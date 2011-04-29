@@ -182,7 +182,7 @@ else
     {
       case 'macaccounting_bits':
       case 'macaccounting_pkts':
-        $acc = mysql_fetch_assoc(mysql_query("SELECT * FROM `ipv4_mac` AS I, mac_accounting AS M, ports AS P WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id"));
+        $acc = mysql_fetch_assoc(mysql_query("SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id AND D.device_id = P.device_id"));
         $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
         if (is_array($acc) && is_file($database))
         {
@@ -199,8 +199,6 @@ else
         $graph_array['height'] = "100";
         $graph_array['width']  = "220";
         $graph_array['to']     = $now;
-#        $graph_array['type']   = "bgp_" . $_GET['optc'];
-#        $graph_array['id']     = $peer['bgpPeer_id'];
         echo('<tr bgcolor="'.$bg_colour.'"' . ($bg_image ? ' background="'.$bg_image.'"' : '') . '"><td colspan="9">');
         include("includes/print-quadgraphs.inc.php");
         echo("</td></tr>");
