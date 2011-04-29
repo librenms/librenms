@@ -105,7 +105,7 @@ while ($peer = mysql_fetch_assoc($peer_query))
 
   $af_query = mysql_query("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['bgpPeerIdentifier']."'");
   unset($peer_af);
-
+  unset($sep);
   while ($afisafi = mysql_fetch_assoc($af_query))
   {
     $afi = $afisafi['afi'];

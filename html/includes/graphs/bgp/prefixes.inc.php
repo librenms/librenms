@@ -4,8 +4,6 @@ include("includes/graphs/common.inc.php");
 
 $scale_min = "0";
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/". safename("cbgp-" . $data['bgpPeerIdentifier'] . ".".$_GET['afi'].".".$_GET['safi'].".rrd");
-
 $rra = "AcceptedPrefixes";
 
 $colour_area = "AA66AA";
