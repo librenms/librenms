@@ -38,7 +38,7 @@ while ($data = mysql_fetch_assoc($query))
 
 print_optionbar_end();
 
-echo('<table width="100%" cellspacing="0" cellpadding="2">');
+echo('<table width="100%" cellspacing="0" cellpadding="5">');
 
 $where = "AND `ifPhysAddress` LIKE '%".$_POST['address']."%'";
 if (is_numeric($_POST['device_id'])) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
@@ -67,6 +67,8 @@ while ($entry = mysql_fetch_assoc($query))
 
     if (port_permitted($entry['interface_id']))
     {
+      $interface = ifLabel ($interface, $interface);
+
       echo('<tr bgcolor="' . $row_colour . '">
           <td class="list-bold">' . generate_device_link($entry) . '</td>
           <td class="list-bold">' . generate_port_link($entry, makeshortif(fixifname($entry['ifDescr']))) . ' ' . $error_img . '</td>

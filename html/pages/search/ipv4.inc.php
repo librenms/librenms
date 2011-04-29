@@ -38,7 +38,7 @@ while ($data = mysql_fetch_assoc($query))
 
 print_optionbar_end();
 
-echo('<table width="100%" cellspacing="0" cellpadding="2">');
+echo('<table width="100%" cellspacing="0" cellpadding="5">');
 
 if (is_numeric($_POST['device_id'])) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
 if ($_POST['interface']) { $where .= " AND I.ifDescr LIKE '".mres($_POST['interface'])."'"; }
@@ -76,9 +76,11 @@ while ($interface = mysql_fetch_assoc($query))
 
     if (port_permitted($interface['interface_id']))
     {
+      $interface = ifLabel ($interface, $interface);
+
       echo('<tr bgcolor="' . $row_colour . '">
           <td class="list-bold">' . generate_device_link($interface) . '</td>
-          <td class="list-bold">' . generate_port_link($interface, makeshortif(fixifname($interface['ifDescr']))) . ' ' . $error_img . '</td>
+          <td class="list-bold">' . generate_port_link($interface) . ' ' . $error_img . '</td>
           <td>' . $interface['ipv4_address'] . '/'.$length.'</td>
           <td>' . $interface['ifAlias'] . "</td>
         </tr>\n");

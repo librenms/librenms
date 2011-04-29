@@ -310,7 +310,7 @@ if ($_SESSION['userlevel'] >= '5')
 
 ?>
 
-<li><a class="menu2four" href=""><img src="images/16/find.png" border="0" align="absmiddle" /> Search
+<li><a class="menu2four" href="search/"><img src="images/16/find.png" border="0" align="absmiddle" /> Search
 <!--[if IE 7]><!--></a><!--<![endif]-->
         <table><tr><td>
         <ul>
