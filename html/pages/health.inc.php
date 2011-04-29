@@ -28,6 +28,8 @@ if (!$_GET['optb']) { $_GET['optb'] = "nographs"; }
 
 print_optionbar_start('', '');
 
+echo('<span style="font-weight: bold;">Health</span> &#187; ');
+
 $sep = "";
 foreach ($datas as $texttype)
 {

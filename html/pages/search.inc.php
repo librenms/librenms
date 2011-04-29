@@ -6,6 +6,8 @@ if (!$_GET['opta']) { $_GET['opta'] = "ipv4"; }
 
 print_optionbar_start('', '');
 
+ echo('<span style="font-weight: bold;">Search</span> &#187; ');
+
 unset($sep);
 foreach ($sections as $type => $texttype)
 {
