@@ -848,6 +848,8 @@ $config['graph_types']['device']['uptime']['section'] = 'system';
 $config['graph_types']['device']['uptime']['order'] = '0';
 $config['graph_types']['device']['uptime']['descr'] = 'System Uptime';
 
+#$config['graph_types']['macaccounting']['bits']['descr'] = "MAC Accounting (Bits/sec)";
+#$config['graph_types']['macaccounting']['bits']['descr'] = "MAC Accounting (Packets/sec)";
 
 ### Device Types
 

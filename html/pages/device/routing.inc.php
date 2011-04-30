@@ -1,19 +1,19 @@
 <?php
 
 
-#$datas[] = 'overview';
+unset($datas);
 
-$routing_count['bgp'] = mysql_result(mysql_query("select count(*) from bgpPeers WHERE device_id = '" . $device['device_id'] . "'"), 0);
-if ($routing_count['bgp']) { $datas[] = 'bgp'; }
+$device_routing_count['bgp'] = mysql_result(mysql_query("select count(*) from bgpPeers WHERE device_id = '" . $device['device_id'] . "'"), 0);
+if ($device_routing_count['bgp']) { $datas[] = 'bgp'; }
 
-$routing_count['ospf'] = mysql_result(mysql_query("select count(*) from ospf_ports WHERE device_id = '" . $device['device_id'] . "'"), 0);
-if ($routing_count['ospf']) { $datas[] = 'ospf'; }
+$device_routing_count['ospf'] = mysql_result(mysql_query("select count(*) from ospf_ports WHERE device_id = '" . $device['device_id'] . "'"), 0);
+if ($device_routing_count['ospf']) { $datas[] = 'ospf'; }
 
-$routing_count['cef'] = mysql_result(mysql_query("select count(*) from cef_switching WHERE device_id = '" . $device['device_id'] . "'"), 0);
-if ($routing_count['cef']) { $datas[] = 'cef'; }
+$device_routing_count['cef'] = mysql_result(mysql_query("select count(*) from cef_switching WHERE device_id = '" . $device['device_id'] . "'"), 0);
+if ($device_routing_count['cef']) { $datas[] = 'cef'; }
 
-$routing_count['vrf'] = @mysql_result(mysql_query("select count(*) from vrfs WHERE device_id = '" . $device['device_id'] . "'"), 0);
-if($routing_count['vrf']) { $datas[] = 'vrf'; }
+$device_routing_count['vrf'] = @mysql_result(mysql_query("select count(*) from vrfs WHERE device_id = '" . $device['device_id'] . "'"), 0);
+if($device_routing_count['vrf']) { $datas[] = 'vrf'; }
 
 #$type_text['overview'] = "Overview";
 $type_text['bgp'] = "BGP";
@@ -38,7 +38,7 @@ foreach ($datas as $type)
     echo('<span class="pagemenu-selected">');
   }
 
-  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/routing/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ." (".$routing_count[$type].")</a>");
+  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/routing/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ." (".$device_routing_count[$type].")</a>");
   if ($_GET['opta'] == $type) { echo("</span>"); }
   $sep = " | ";
 }

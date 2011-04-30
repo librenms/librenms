@@ -13,7 +13,7 @@ $current = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_c
 $freqs = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='frequency' AND device_id = '" . $device['device_id'] . "'"), 0);
 $power = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='power' AND device_id = '" . $device['device_id'] . "'"), 0);
 
-
+unset($datas);
 $datas[] = 'overview';
 if ($processor) { $datas[] = 'processor'; }
 if ($mempools) { $datas[] = 'mempool'; }
@@ -41,6 +41,8 @@ $type_text['current'] = "Current";
 $type_text['power'] = "Power";
 
 print_optionbar_start();
+
+echo("<span style='font-weight: bold;'>Health</span> &#187; ");
 
 if (!$_GET['opta']) { $_GET['opta'] = "overview"; }
 

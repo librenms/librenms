@@ -17,7 +17,7 @@ if (is_numeric($id))
     $device = device_by_id_cache($port['device_id']);
     $title  = generate_device_link($device);
     $title .= " :: Port  ".generate_port_link($port);
-    $title .= " :: " . $acc['mac'];
+    $title .= " :: " . formatMac($acc['mac']);
     $auth   = TRUE;
 
   }
