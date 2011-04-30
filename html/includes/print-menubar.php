@@ -272,6 +272,19 @@ foreach (array_keys($menu_sensors) as $item)
 <!-- <li><a class="menu2four" href="inventory/"><img src="images/16/bricks.png" border="0" align="absmiddle" /> Inventory</a></li> -->
 
 <?php
+
+$routing_count['bgp'] = mysql_result(mysql_query("SELECT COUNT(*) from `bgpPeers`"), 0);
+if ($routing_count['bgp']) { $datas[] = 'bgp'; }
+
+$routing_count['ospf'] = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'"), 0);
+if ($routing_count['ospf']) { $datas[] = 'ospf'; }
+
+$routing_count['cef'] = mysql_result(mysql_query("SELECT COUNT(*) from `cef_switching`"), 0);
+if ($routing_count['cef']) { $datas[] = 'cef'; }
+
+$routing_count['vrf'] = @mysql_result(mysql_query("SELECT COUNT(*) from `vrfs`"), 0);
+if($routing_count['vrf']) { $datas[] = 'vrf'; }
+
 if ($_SESSION['userlevel'] >= '5')
 {
     echo('
@@ -279,10 +292,19 @@ if ($_SESSION['userlevel'] >= '5')
         <table><tr><td>
         <ul>');
 
-  if ($config['enable_vrfs']) { echo('<li><a href="routing/vrf/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li> <li><hr width=140></li> '); }
+  if ($_SESSION['userlevel'] >= '5' && $routing_count['vrf']) { echo('<li><a href="routing/vrf/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li> <li><hr width=140></li> '); }
+
+  if ($_SESSION['userlevel'] >= '5' && $routing_count['ospf'])
+  {
+    echo('
+        <li><a href="routing/ospf/all/nographs/"><img src="images/16/text_letter_omega.png" border="0" align="absmiddle" /> OSPF Devices </a></li>
+        <li><hr width=140></li>
+        ');
+  }
+
 
   ## BGP Sessions
-  if ($_SESSION['userlevel'] >= '5' && (isset($config['enable_bgp']) && $config['enable_bgp']))
+  if ($_SESSION['userlevel'] >= '5' && $routing_count['bgp'])
   {
     echo('
         <li><a href="routing/bgp/all/nographs/"><img src="images/16/link.png" border="0" align="absmiddle" /> BGP All Sessions </a></li>

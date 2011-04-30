@@ -4,17 +4,7 @@ if ($_GET['optb'] == "graphs" || $_GET['optc'] == "graphs") { $graphs = "graphs"
 
 #$datas[] = 'overview';
 
-$routing_count['bgp'] = mysql_result(mysql_query("SELECT COUNT(*) from `bgpPeers`"), 0);
-if ($routing_count['bgp']) { $datas[] = 'bgp'; }
-
-$routing_count['ospf'] = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'"), 0);
-if ($routing_count['ospf']) { $datas[] = 'ospf'; }
-
-$routing_count['cef'] = mysql_result(mysql_query("SELECT COUNT(*) from `cef_switching`"), 0);
-if ($routing_count['cef']) { $datas[] = 'cef'; }
-
-$routing_count['vrf'] = @mysql_result(mysql_query("SELECT COUNT(*) from `vrfs`"), 0);
-if($routing_count['vrf']) { $datas[] = 'vrf'; }
+### $routing_count is populated by print-menubar.inc.php
 
 #$type_text['overview'] = "Overview";
 $type_text['bgp'] = "BGP";

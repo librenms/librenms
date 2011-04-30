@@ -31,7 +31,7 @@ while($instance = mysql_fetch_assoc($query))
   if($instance['ospfASBdrRtrStatus'] == "true") { $asbr = '<span style="color: #00aa00">yes</span>'; } else { $asbr = '<span style="color: #aaaaaa">no</span>'; }
 
   echo('<tr bgcolor="'.$instance_bg.'">');
-  echo('  <td class="list-large">'.generate_device_link($device). '</td>');
+  echo('  <td class="list-large">'.generate_device_link($device, 0, "routing/ospf/"). '</td>');
   echo('  <td class="list-large">'.$instance['ospfRouterId'] . '</td>');
   echo('  <td>' . $enabled . '</td>');
   echo('  <td>' . $abr . '</td>');

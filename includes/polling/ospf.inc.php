@@ -185,7 +185,7 @@ if($debug) {
 
 ### Loop array of entries and update
 if (is_array($ospf_ports_db)){
-  foreach($ospf_ports_db as $ospf_port_db)
+  foreach($ospf_ports_db as $ospf_port_id => $ospf_port_db)
   {
     if(is_array($ospf_ports_poll[$ospf_port_db['ospf_port_id']])) {
       $ospf_port_poll = $ospf_ports_poll[$ospf_port_db['ospf_port_id']];
@@ -205,7 +205,7 @@ if (is_array($ospf_ports_db)){
           #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['interface_id']); ## FIXME
         }
       }
-      if($update)
+      if($ospf_port_update)
       {
         $query = "UPDATE `ospf_ports` SET `ospf_port_id` = '".$ospf_port_db['ospf_port_id']."'".$ospf_port_update." WHERE `device_id` = '".$device['device_id']."' AND `ospf_port_id` = '".$ospf_port_id."'";
         mysql_query($query);
@@ -220,6 +220,97 @@ if (is_array($ospf_ports_db)){
       $ospf_port_count++;
     } else {
       mysql_query("DELETE FROM `ospf_ports` WHERE `device_id` = '".$device['device_id']."' AND `ospf_port_id` = '".$ospf_port_db['ospf_port_id']."'");
+      echo("-");
+    }
+  }
+}
+
+#OSPF-MIB::ospfNbrIpAddr.172.22.203.98.0 172.22.203.98
+#OSPF-MIB::ospfNbrAddressLessIndex.172.22.203.98.0 0
+#OSPF-MIB::ospfNbrRtrId.172.22.203.98.0 172.22.203.128
+#OSPF-MIB::ospfNbrOptions.172.22.203.98.0 2
+#OSPF-MIB::ospfNbrPriority.172.22.203.98.0 0
+#OSPF-MIB::ospfNbrState.172.22.203.98.0 full
+#OSPF-MIB::ospfNbrEvents.172.22.203.98.0 6
+#OSPF-MIB::ospfNbrLsRetransQLen.172.22.203.98.0 1
+#OSPF-MIB::ospfNbmaNbrStatus.172.22.203.98.0 active
+#OSPF-MIB::ospfNbmaNbrPermanence.172.22.203.98.0 dynamic
+#OSPF-MIB::ospfNbrHelloSuppressed.172.22.203.98.0 false
+
+echo(' Neighbours: ');
+
+$ospf_nbr_oids_db  = array('ospfNbrIpAddr', 'ospfNbrAddressLessIndex', 'ospfNbrRtrId', 'ospfNbrOptions', 'ospfNbrPriority', 'ospfNbrState', 'ospfNbrEvents', 'ospfNbrLsRetransQLen', 'ospfNbmaNbrStatus', 'ospfNbmaNbrPermanence', 'ospfNbrHelloSuppressed');
+$ospf_nbr_oids_rrd = array();
+$ospf_nbr_oids = array_merge($ospf_nbr_oids_db, $ospf_nbr_oids_rrd);
+
+### Build array of existing entries
+$nbr_query = mysql_query("SELECT * FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."'");
+while($nbr_entry = mysql_fetch_assoc($nbr_query))
+{
+  $ospf_nbrs_db[$nbr_entry['ospf_nbr_id']] = $nbr_entry;
+}
+
+### Pull data from device
+$ospf_nbrs_poll = snmpwalk_cache_oid($device, "OSPF-MIB::ospfNbrEntry", array(), "OSPF-MIB");
+
+foreach($ospf_nbrs_poll as $ospf_nbr_id => $ospf_nbr)
+{
+  ### If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
+  if(!isset($ospf_nbrs_db[$ospf_nbr_id]))
+  {
+    mysql_query("INSERT INTO `ospf_nbrs` (`device_id`, `ospf_nbr_id`) VALUES ('".$device['device_id']."','".$ospf_nbr_id."') ");
+    echo("+");
+    $entry = mysql_fetch_assoc(mysql_query("SELECT * FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."' AND `ospf_nbr_id` = '".$ospf_nbr_id."'"));
+    $ospf_nbrs_db[$entry['ospf_nbr_id']] = $entry;
+  }
+}
+
+if($debug) {
+  echo("\nPolled: ");
+  print_r($ospf_nbrs_poll);
+  echo("Database: ");
+  print_r($ospf_nbrs_db);
+  echo("\n");
+}
+
+### Loop array of entries and update
+if (is_array($ospf_nbrs_db)){
+  foreach($ospf_nbrs_db as $ospf_nbr_id => $ospf_nbr_db)
+  {
+    if(is_array($ospf_nbrs_poll[$ospf_nbr_db['ospf_nbr_id']])) {
+      $ospf_nbr_poll = $ospf_nbrs_poll[$ospf_nbr_db['ospf_nbr_id']];
+
+      $ospf_nbr_poll['interface_id'] = @mysql_result(mysql_query("SELECT A.`interface_id` FROM ipv4_addresses AS A, nbrs AS I WHERE A.ipv4_address = '".$ospf_nbr_poll['ospfNbrIpAddr']."' AND I.interface_id = A.interface_id AND I.device_id = '".$device['device_id']."'"),0);
+
+      if ($ospf_nbr_db['interface_id'] != $ospf_nbr_poll['interface_id'])
+      {
+        $ospf_nbr_update = " ";
+      }
+
+      foreach ($ospf_nbr_oids as $oid)
+      { // Loop the OIDs
+        echo($ospf_nbr_db[$oid]."|".$ospf_nbr_poll[$oid]."\n");
+        if ($ospf_nbr_db[$oid] != $ospf_nbr_poll[$oid])
+        { // If data has changed, build a query
+          $ospf_nbr_update .= ", `$oid` = '".mres($ospf_nbr_poll[$oid])."'";
+          #log_event("$oid -> ".$this_nbr[$oid], $device, 'ospf', $nbr['interface_id']); ## FIXME
+        }
+      }
+      if($ospf_nbr_update)
+      {
+        $query = "UPDATE `ospf_nbrs` SET `interface_id` = '".$ospf_nbr_poll['interface_id']."'".$ospf_nbr_update." WHERE `device_id` = '".$device['device_id']."' AND `ospf_nbr_id` = '".$ospf_nbr_id."'";
+        mysql_query($query);
+        if($debug) { echo("$query"); }
+        echo("U");
+        unset($ospf_nbr_update);
+      } else {
+        echo(".");
+      }
+      unset($ospf_nbr_poll);
+      unset($ospf_nbr_db);
+      $ospf_nbr_count++;
+    } else {
+      mysql_query("DELETE FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."' AND `ospf_nbr_id` = '".$ospf_nbr_db['ospf_nbr_id']."'");
       echo("-");
     }
   }

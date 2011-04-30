@@ -9,6 +9,8 @@ echo('<div style="clear: both;">');
 
 print_optionbar_start('', '');
 
+echo("<span style='font-weight: bold;'>Graphs</span> &#187; ");
+
 $sep = "";
 $query = mysql_query("SELECT * FROM device_graphs WHERE device_id = '".$device['device_id']."'");
 
