@@ -142,13 +142,11 @@ else
       $afi = $afisafi['afi'];
       $safi = $afisafi['safi'];
       $this_afisafi = $afi.$safi;
-      #$peer['afi'] .= $sep . $config['afi'][$afi][$safi];          ##### CLEAN ME UP, I AM MESSY AND I SMELL OF CHEESE! FIXME!
       $peer['afi'] .= $sep . $afi .".".$safi;
       $sep = "<br />";
       $peer['afisafi'][$this_afisafi] = 1; ## Build a list of valid AFI/SAFI for this peer
     }
     unset($sep);
-
 
     echo("  <td></td>
             <td width=150>" . $localaddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), 'routing/bgp/')."</td>

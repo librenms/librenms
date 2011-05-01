@@ -137,7 +137,7 @@ else
       {
         $afi = $peer_afi['afi'];
         $safi = $peer_afi['safi'];
-        if ($debug) { echo("$afi $safi". $config['afi'][$afi][$safi]. "\n"); }
+        if ($debug) { echo("$afi $safi\n"); }
 
         if ($device['os_group'] == "ios")
         {

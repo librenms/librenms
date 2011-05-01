@@ -87,15 +87,16 @@ if ($updated && $update_message)
         <select name="type">
 <?php
 $unknown = 1;
-foreach ($device_types as $type)
+
+foreach ($config['device_types'] as $type)
 {
-  echo('          <option value="'.$type.'"');
-  if ($device['type'] == $type)
+  echo('          <option value="'.$type['type'].'"');
+  if ($device['type'] == $type['type'])
   {
-    echo('selected="1"');
+    echo(' selected="1"');
     $unknown = 0;
   }
-  echo(' >' . ucfirst($type) . '</option>');
+  echo(' >' . ucfirst($type['type']) . '</option>');
 }
   if ($unknown)
   {
