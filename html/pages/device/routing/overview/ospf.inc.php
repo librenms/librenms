@@ -9,9 +9,8 @@ echo('<table width=100%>');
 
 #### Loop Instances
 
-while($instance = mysql_fetch_assoc($query))
+while ($instance = mysql_fetch_assoc($query))
 {
-
   if (!is_integer($i_i/2)) { $instance_bg = $list_colour_a; } else { $instance_bg = $list_colour_b; }
 
   $area_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = '".$device['device_id']."'"),0);
@@ -22,9 +21,9 @@ while($instance = mysql_fetch_assoc($query))
   $query .= " AND I.device_id = '".$device['device_id']."'";
   $ipv4_host = mysql_fetch_assoc(mysql_query($query));
 
-  if($instance['ospfAdminStat'] == "enabled") { $enabled = '<span style="color: #00aa00">enabled</span>'; } else { $enabled = '<span style="color: #aaaaaa">disabled</span>'; }
-  if($instance['ospfAreaBdrRtrStatus'] == "true") { $abr = '<span style="color: #00aa00">yes</span>'; } else { $abr = '<span style="color: #aaaaaa">no</span>'; }
-  if($instance['ospfASBdrRtrStatus'] == "true") { $asbr = '<span style="color: #00aa00">yes</span>'; } else { $asbr = '<span style="color: #aaaaaa">no</span>'; }
+  if ($instance['ospfAdminStat'] == "enabled") { $enabled = '<span style="color: #00aa00">enabled</span>'; } else { $enabled = '<span style="color: #aaaaaa">disabled</span>'; }
+  if ($instance['ospfAreaBdrRtrStatus'] == "true") { $abr = '<span style="color: #00aa00">yes</span>'; } else { $abr = '<span style="color: #aaaaaa">no</span>'; }
+  if ($instance['ospfASBdrRtrStatus'] == "true") { $asbr = '<span style="color: #00aa00">yes</span>'; } else { $asbr = '<span style="color: #aaaaaa">no</span>'; }
 
   echo('<tr><th>Router Id</th><th>Status</th><th>ABR</th><th>ASBR</th><th>Areas</th><th>Ports</th><th>Neighbours</th></tr>');
   echo('<tr bgcolor="'.$instance_bg.'">');
@@ -37,9 +36,7 @@ while($instance = mysql_fetch_assoc($query))
   echo('  <td>' . ($neighbour_count+0) . '</td>');
   echo('</tr>');
 
-
   $i_i++;
-
 } ### End loop instances
 
 echo('</table>');

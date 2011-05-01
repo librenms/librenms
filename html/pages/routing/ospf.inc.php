@@ -10,9 +10,8 @@ echo('<tr><th>Device</th><th>Router Id</th><th>Status</th><th>ABR</th><th>ASBR</
 
 #### Loop Instances
 
-while($instance = mysql_fetch_assoc($query))
+while ($instance = mysql_fetch_assoc($query))
 {
-
   if (!is_integer($i_i/2)) { $instance_bg = $list_colour_a; } else { $instance_bg = $list_colour_b; }
 
   $device = device_by_id_cache($instance['device_id']);
@@ -26,9 +25,9 @@ while($instance = mysql_fetch_assoc($query))
   $ip_query .= " AND I.device_id = '".$device['device_id']."'";
   $ipv4_host = mysql_fetch_assoc(mysql_query($ip_query));
 
-  if($instance['ospfAdminStat'] == "enabled") { $enabled = '<span style="color: #00aa00">enabled</span>'; } else { $enabled = '<span style="color: #aaaaaa">disabled</span>'; }
-  if($instance['ospfAreaBdrRtrStatus'] == "true") { $abr = '<span style="color: #00aa00">yes</span>'; } else { $abr = '<span style="color: #aaaaaa">no</span>'; }
-  if($instance['ospfASBdrRtrStatus'] == "true") { $asbr = '<span style="color: #00aa00">yes</span>'; } else { $asbr = '<span style="color: #aaaaaa">no</span>'; }
+  if ($instance['ospfAdminStat'] == "enabled") { $enabled = '<span style="color: #00aa00">enabled</span>'; } else { $enabled = '<span style="color: #aaaaaa">disabled</span>'; }
+  if ($instance['ospfAreaBdrRtrStatus'] == "true") { $abr = '<span style="color: #00aa00">yes</span>'; } else { $abr = '<span style="color: #aaaaaa">no</span>'; }
+  if ($instance['ospfASBdrRtrStatus'] == "true") { $asbr = '<span style="color: #00aa00">yes</span>'; } else { $asbr = '<span style="color: #aaaaaa">no</span>'; }
 
   echo('<tr bgcolor="'.$instance_bg.'">');
   echo('  <td class="list-large">'.generate_device_link($device, 0, "routing/ospf/"). '</td>');
@@ -42,7 +41,6 @@ while($instance = mysql_fetch_assoc($query))
   echo('</tr>');
 
   $i_i++;
-
 } ### End loop instances
 
 echo('</table>');

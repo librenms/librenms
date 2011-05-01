@@ -21,7 +21,6 @@ echo("<span style='font-weight: bold;'>Routing</span> &#187; ");
 unset($sep);
 foreach ($datas as $type)
 {
-
   if (!$_GET['opta']) { $_GET['opta'] = $type; }
 
   echo($sep);

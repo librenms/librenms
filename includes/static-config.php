@@ -6,14 +6,6 @@
 #                 YES, THAT MEANS YOU                   #
 #########################################################
 
-## AFI / SAFI pairs for BGP (and other stuff, perhaps)
-$config['afi']['ipv4']['unicast']    = "IPv4";
-$config['afi']['ipv4']['multiicast'] = "IPv4 Multicast";
-$config['afi']['ipv4']['vpn']        = "VPNv4";
-$config['afi']['ipv6']['unicast']    = "IPv6";
-$config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
-$config['afi']['ipv4']['vpn']        = "VPNv6";
-
 $config['os']['default']['over'][0]['graph']	= "device_processor";
 $config['os']['default']['over'][0]['text']	= "Processor Usage";
 $config['os']['default']['over'][1]['graph'] 	= "device_mempool";
@@ -22,7 +14,6 @@ $config['os']['default']['over'][1]['text']	= "Memory Usage";
 $os_group = "unix";
 $config['os_group'][$os_group]['type']  	     = "server";
 $config['os_group'][$os_group]['processor_stacked']  = 1;
-
 
 $os = "generic";
 $config['os'][$os]['text']      	= "Generic Device";
@@ -714,7 +705,8 @@ $config['os'][$os]['icon']  		= "tripplite";
 
 foreach($config['os'] as $this_os => $blah)
 {
-  if (isset($config['os'][$this_os]['group'])){
+  if (isset($config['os'][$this_os]['group']))
+  {
     $this_os_group = $config['os'][$this_os]['group'];
     if (isset($config['os_group'][$this_os_group]))
     {
@@ -728,8 +720,6 @@ foreach($config['os'] as $this_os => $blah)
     }
   }
 }
-
-$device_types = array('server', 'network', 'firewall', 'workstation', 'printer', 'power', 'environment');
 
 ### Graph Types
 
@@ -885,7 +875,6 @@ if (isset($config['enable_printers']) && $config['enable_printers'])
   $config['device_types'][$i]['type'] = 'printer';
   $config['device_types'][$i]['icon'] = 'printer.png';
 }
-
 
 
 ##############################
