@@ -5,46 +5,45 @@
 <?php
 print_optionbar_start();
 
-  echo("<span style='font-weight: bold;'>BGP</span> &#187; ");
+echo("<span style='font-weight: bold;'>BGP</span> &#187; ");
 
-  if (!isset($_GET['optb'])) { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='/device/" . $device['device_id'] . "/routing/bgp/'>Basic</a>");
-  if (!isset($_GET['optb'])) { echo("</span>"); }
+if (!isset($_GET['optb'])) { echo("<span class='pagemenu-selected'>"); }
+echo("<a href='device/" . $device['device_id'] . "/routing/bgp/'>Basic</a>");
+if (!isset($_GET['optb'])) { echo("</span>"); }
 
-  echo(" | ");
+echo(" | ");
 
-  if ($_GET['optb'] == "updates") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='/device/" . $device['device_id'] . "/routing/bgp/updates/'>Updates</a>");
-  if ($_GET['optb'] == "updates") { echo("</span>"); }
+if ($_GET['optb'] == "updates") { echo("<span class='pagemenu-selected'>"); }
+echo("<a href='device/" . $device['device_id'] . "/routing/bgp/updates/'>Updates</a>");
+if ($_GET['optb'] == "updates") { echo("</span>"); }
 
-  echo(" | Prefixes: ");
+echo(" | Prefixes: ");
 
-  if ($_GET['optb'] == "prefixes_ipv4unicast") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/routing/bgp/prefixes_ipv4unicast/'>IPv4</a>");
-  if ($_GET['optb'] == "prefixes_ipv4unicast") { echo("</span>"); }
+if ($_GET['optb'] == "prefixes_ipv4unicast") { echo("<span class='pagemenu-selected'>"); }
+echo("<a href='device/" . $device['device_id'] . "/routing/bgp/prefixes_ipv4unicast/'>IPv4</a>");
+if ($_GET['optb'] == "prefixes_ipv4unicast") { echo("</span>"); }
 
-  echo(" | ");
+echo(" | ");
 
-  if ($_GET['optb'] == "prefixes_vpnv4unicast") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/routing/bgp/prefixes_vpnv4unicast/'>VPNv4</a>");
-  if ($_GET['optb'] == "prefixes_vpnv4unicast") { echo("</span>"); }
+if ($_GET['optb'] == "prefixes_vpnv4unicast") { echo("<span class='pagemenu-selected'>"); }
+echo("<a href='device/" . $device['device_id'] . "/routing/bgp/prefixes_vpnv4unicast/'>VPNv4</a>");
+if ($_GET['optb'] == "prefixes_vpnv4unicast") { echo("</span>"); }
 
-  echo(" | ");
+echo(" | ");
 
-  if ($_GET['optb'] == "prefixes_ipv6unicast") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/routing/bgp/prefixes_ipv6unicast/'>IPv6</a>");
-  if ($_GET['optb'] == "prefixes_ipv6unicast") { echo("</span>"); }
+if ($_GET['optb'] == "prefixes_ipv6unicast") { echo("<span class='pagemenu-selected'>"); }
+echo("<a href='device/" . $device['device_id'] . "/routing/bgp/prefixes_ipv6unicast/'>IPv6</a>");
+if ($_GET['optb'] == "prefixes_ipv6unicast") { echo("</span>"); }
 
-  echo(" | Traffic: ");
+echo(" | Traffic: ");
 
-  if ($_GET['optb'] == "macaccounting_bits") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/routing/bgp/macaccounting_bits/'>Bits</a>");
-  if ($_GET['optb'] == "macaccounting_bits") { echo("</span>"); }
-  echo(" | ");
-  if ($_GET['optb'] == "macaccounting_pkts") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/routing/bgp/macaccounting_pkts/'>Packets</a>");
-  if ($_GET['optb'] == "macaccounting_pkts") { echo("</span>"); }
-
+if ($_GET['optb'] == "macaccounting_bits") { echo("<span class='pagemenu-selected'>"); }
+echo("<a href='device/" . $device['device_id'] . "/routing/bgp/macaccounting_bits/'>Bits</a>");
+if ($_GET['optb'] == "macaccounting_bits") { echo("</span>"); }
+echo(" | ");
+if ($_GET['optb'] == "macaccounting_pkts") { echo("<span class='pagemenu-selected'>"); }
+echo("<a href='device/" . $device['device_id'] . "/routing/bgp/macaccounting_pkts/'>Packets</a>");
+if ($_GET['optb'] == "macaccounting_pkts") { echo("</span>"); }
 
 print_optionbar_end();
 
@@ -59,7 +58,6 @@ while ($peer = mysql_fetch_assoc($peer_query))
   $has_macaccounting = mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address"),0);
   unset($bg_image);
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
-
 
   unset ($alert, $bg_image);
 
@@ -83,13 +81,9 @@ while ($peer = mysql_fetch_assoc($peer_query))
   if ($ipv4_host)
   {
     $peerhost = $ipv4_host;
-  }
-  elseif ($ipv6_host)
-  {
+  } elseif ($ipv6_host) {
     $peerhost = $ipv6_host;
-  }
-  else
-  {
+  } else {
     unset($peerhost);
   }
 
@@ -111,17 +105,15 @@ while ($peer = mysql_fetch_assoc($peer_query))
   $af_query = mysql_query("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['bgpPeerIdentifier']."'");
   unset($peer_af);
   unset($sep);
+
   while ($afisafi = mysql_fetch_assoc($af_query))
   {
     $afi = $afisafi['afi'];
     $safi = $afisafi['safi'];
     $this_afisafi = $afi.$safi;
-    #$peer['afi'] .= $sep . $config['afi'][$afi][$safi];          ##### CLEAN ME UP, I AM MESSY AND I SMELL OF CHEESE! FIXME!
     $peer['afi'] .= $sep . $afi .".".$safi;
     $sep = "<br />";
     $peer['afisafi'][$this_afisafi] = 1; ## Build a list of valid AFI/SAFI for this peer
-
-
   }
 
   unset($sep);
@@ -133,7 +125,6 @@ while ($peer = mysql_fetch_assoc($peer_query))
   echo('<tr bgcolor="'.$bg_colour.'"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') .
                                         ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">
   ");
-
 
   echo("   <td width=20><span class=list-large>".$i."</span></td>
            <td>" . $peeraddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), 'bgp/')."</td>
@@ -147,49 +138,50 @@ while ($peer = mysql_fetch_assoc($peer_query))
           </tr>
           <tr height=5></tr>");
 
+  unset($invalid);
 
-    unset($invalid);
-    switch ($_GET['optb'])
-    {
-      case 'prefixes_ipv4unicast':
-      case 'prefixes_ipv4multicast':
-      case 'prefixes_ipv4vpn':
-      case 'prefixes_ipv6unicast':
-      case 'prefixes_ipv6multicast':
-        list(,$afisafi) = explode("_", $_GET['optb']);
-        if (isset($peer['afisafi'][$afisafi])) { $peer['graph'] = 1; }
-      case 'updates':
-        $graph_array['type']   = "bgp_" . $_GET['optb'];
-        $graph_array['id']     = $peer['bgpPeer_id'];
-    }
+  switch ($_GET['optb'])
+  {
+    case 'prefixes_ipv4unicast':
+    case 'prefixes_ipv4multicast':
+    case 'prefixes_ipv4vpn':
+    case 'prefixes_ipv6unicast':
+    case 'prefixes_ipv6multicast':
+      list(,$afisafi) = explode("_", $_GET['optb']);
+      if (isset($peer['afisafi'][$afisafi])) { $peer['graph'] = 1; }
+      # FIXME no break??
+    case 'updates':
+      $graph_array['type']   = "bgp_" . $_GET['optb'];
+      $graph_array['id']     = $peer['bgpPeer_id'];
+  }
 
-    switch ($_GET['optb'])
-    {
-      case 'macaccounting_bits':
-      case 'macaccounting_pkts':
-        $acc = mysql_fetch_assoc(mysql_query("SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id AND D.device_id = P.device_id"));
-        $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
-        if (is_array($acc) && is_file($database))
-        {
-          $peer['graph']       = 1;
-          $graph_array['id']   = $acc['ma_id'];
-          $graph_array['type'] = $_GET['optb'];
-        }
-    }
+  switch ($_GET['optb'])
+  {
+    case 'macaccounting_bits':
+    case 'macaccounting_pkts':
+      $acc = mysql_fetch_assoc(mysql_query("SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id AND D.device_id = P.device_id"));
+      $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
+      if (is_array($acc) && is_file($database))
+      {
+        $peer['graph']       = 1;
+        $graph_array['id']   = $acc['ma_id'];
+        $graph_array['type'] = $_GET['optb'];
+      }
+  }
 
-    if ($_GET['optb'] == 'updates') { $peer['graph'] = 1; }
+  if ($_GET['optb'] == 'updates') { $peer['graph'] = 1; }
 
-    if($peer['graph'])
-    {
-        $graph_array['height'] = "100";
-        $graph_array['width']  = "216";
-        $graph_array['to']     = $now;
-        echo('<tr bgcolor="'.$bg_colour.'"' . ($bg_image ? ' background="'.$bg_image.'"' : '') . '"><td colspan="7">');
-        include("includes/print-quadgraphs.inc.php");
-        echo("</td></tr>");
-    }
+  if($peer['graph'])
+  {
+    $graph_array['height'] = "100";
+    $graph_array['width']  = "216";
+    $graph_array['to']     = $now;
+    echo('<tr bgcolor="'.$bg_colour.'"' . ($bg_image ? ' background="'.$bg_image.'"' : '') . '"><td colspan="7">');
+    include("includes/print-quadgraphs.inc.php");
+    echo("</td></tr>");
+  }
 
-    $i++;
+  $i++;
 
   unset($valid_afi_safi);
 }
