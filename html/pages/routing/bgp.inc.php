@@ -124,13 +124,13 @@ else
 
     // display overlib graphs
 
-    $graph_type       = "bgp_prefixes";
+    $graph_type       = "bgp_updates";
     $local_daily_url  = "graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150&&afi=ipv4&safi=unicast";
-    $localaddresslink = "<span class=list-large><a href='device/" . $peer['device_id'] . "/routing/bgp/prefixes/ipv4.unicast/' onmouseover=\"return overlib('<img src=\'$local_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpLocalAddr'] . "</a></span>";
+    $localaddresslink = "<span class=list-large><a href='device/" . $peer['device_id'] . "/routing/bgp/' onmouseover=\"return overlib('<img src=\'$local_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpLocalAddr'] . "</a></span>";
 
     $graph_type       = "bgp_updates";
     $peer_daily_url   = "graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
-    $peeraddresslink  = "<span class=list-large><a href='device/" . $peer['device_id'] . "/routing/bgp/updates/' onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpPeerIdentifier'] . "</a></span>";
+    $peeraddresslink  = "<span class=list-large><a href='device/" . $peer['device_id'] . "/routing/bgp/' onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpPeerIdentifier'] . "</a></span>";
 
     echo('<tr bgcolor="'.$bg_colour.'"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">");
 
@@ -152,7 +152,7 @@ else
 
     echo("  <td></td>
             <td width=150>" . $localaddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), 'routing/bgp/')."</td>
-	    <td width=30>-></td>
+	    <td width=30><b>&#187;</b></td>
             <td width=150>" . $peeraddresslink . "</td>
 	    <td width=50><b>$peer_type</b></td>
             <td width=50>".$peer['afi']."</td>
@@ -160,7 +160,8 @@ else
             <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></strong></td>
             <td>" .formatUptime($peer['bgpPeerFsmEstablishedTime']). "<br />
                 Updates <img src='images/16/arrow_down.png' align=absmiddle /> " . format_si($peer['bgpPeerInUpdates']) . "
-                        <img src='images/16/arrow_up.png' align=absmiddle /> " . format_si($peer['bgpPeerOutUpdates']) . "</td></tr>");
+                        <img src='images/16/arrow_up.png' align=absmiddle /> " . format_si($peer['bgpPeerOutUpdates']) . "</td></tr>
+         <tr height=5></tr>");
 
 
     unset($invalid);

@@ -31,7 +31,7 @@ foreach ($datas as $type)
     echo('<span class="pagemenu-selected">');
   }
 
-  echo("<a href='routing/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ." (".$routing_count[$type].")</a>");
+  echo("<a href='routing/" . $type . "/'> " . $type_text[$type] ." (".$routing_count[$type].")</a>");
   if ($_GET['opta'] == $type) { echo("</span>"); }
   $sep = " | ";
 }

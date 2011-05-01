@@ -9,7 +9,12 @@ $if_id = $interface['interface_id'];
 
 $interface = ifLabel($interface);
 
-if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+if($int_colour) 
+{
+  $row_colour = $int_colour;
+} else {
+  if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+}
 
 $port_adsl_query = mysql_query("SELECT * FROM `ports_adsl` WHERE `interface_id` = '".$interface['interface_id']."'");
 $port_adsl = mysql_fetch_assoc($port_adsl_query);

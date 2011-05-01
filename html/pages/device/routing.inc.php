@@ -38,7 +38,7 @@ foreach ($datas as $type)
     echo('<span class="pagemenu-selected">');
   }
 
-  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/routing/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ." (".$device_routing_count[$type].")</a>");
+  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/routing/" . $type . "/'> " . $type_text[$type] ." (".$device_routing_count[$type].")</a>");
   if ($_GET['opta'] == $type) { echo("</span>"); }
   $sep = " | ";
 }
