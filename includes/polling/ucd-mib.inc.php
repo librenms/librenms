@@ -179,4 +179,8 @@ if (is_numeric($load1) && is_numeric($load5) && is_numeric($load10))
   $graphs['ucd_load'] = "TRUE";
 }
 
+unset($ss, $load1, $load5, $load10, $load_rrd, $la_load_create, $load_raw, $load_get, $snmpdata);
+unset($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached);
+unset($key, $mem_rrd, $mem_rrd_create, $collect_oids, $value, $filename, $cpu_rrd, $cpu_rrd_create, $oid);
+
 ?>
