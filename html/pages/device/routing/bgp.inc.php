@@ -144,7 +144,8 @@ while ($peer = mysql_fetch_assoc($peer_query))
            <td>" .formatUptime($peer['bgpPeerFsmEstablishedTime']). "<br />
                Updates <img src='images/16/arrow_down.png' align=absmiddle> " . $peer['bgpPeerInUpdates'] . "
                        <img src='images/16/arrow_up.png' align=absmiddle> " . $peer['bgpPeerOutUpdates'] . "</td>
-          </tr>");
+          </tr>
+          <tr height=5></tr>");
 
 
     unset($invalid);
