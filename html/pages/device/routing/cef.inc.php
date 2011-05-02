@@ -6,7 +6,7 @@ $menu_options = array('basic' => 'Basic',
 		      'graphs' => 'Graphs',
                       );
 
-if (!$_GET['optb']) { $_GET['opta'] = "basic"; }
+if (!$_GET['optb']) { $_GET['optb'] = "basic"; }
 
 echo('<span style="font-weight: bold;">CEF</span> &#187; ');
 
