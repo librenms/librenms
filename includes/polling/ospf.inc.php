@@ -27,16 +27,17 @@ foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry)
   if (!isset($ospf_instances_db[$ospf_instance_id]))
   {
     $query = "INSERT INTO `ospf_instances` (`device_id`, `ospf_instance_id`) VALUES ('".$device['device_id']."','".$ospf_instance_id."')";
-    echo($query);
+    if ($debug) { echo($query); }
     mysql_query($query);
-    echo(mysql_error());
+    if ($debug) { echo(mysql_error()); }
     echo("+");
     $entry = mysql_fetch_assoc(mysql_query("SELECT * FROM `ospf_instances` WHERE `device_id` = '".$device['device_id']."' AND `ospf_instance_id` = '".$ospf_instance_id."'"));
     $ospf_instances_db[$entry['ospf_instance_id']] = $entry;
   }
 }
 
-if ($debug) {
+if ($debug)
+{
   echo("\nPolled: ");
   print_r($ospf_instances_poll);
   echo("Database: ");
@@ -44,9 +45,9 @@ if ($debug) {
   echo("\n");
 }
 
-### Loop array of entries and update 
+### Loop array of entries and update
 if (is_array($ospf_instances_db))
-{ 
+{
   foreach ($ospf_instances_db as $ospf_instance_db)
   {
     $ospf_instance_poll = $ospf_instances_poll[$ospf_instance_db['ospf_instance_id']];
@@ -58,17 +59,18 @@ if (is_array($ospf_instances_db))
         #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['interface_id']); ## FIXME
       }
     }
-    if ($ospf_instance_update) 
+    if ($ospf_instance_update)
     {
       $query = "UPDATE `ospf_instances` SET `ospf_instance_id` = '".$ospf_instance_db['ospf_instance_id']."'".$ospf_instance_update." WHERE `device_id` = '".$device['device_id']."' AND `ospf_instance_id` = '".$ospf_instance_id."'";
-      if ($debug) {echo($query);} ## Debug
+      if ($debug) { echo($query); }
       mysql_query($query);
-      if ($debug) {echo(mysql_error());} ## Debug
+      if ($debug) { echo(mysql_error()); }
       echo("U");
       unset($ospf_instance_update);
     } else {
       echo(".");
     }
+
     unset($ospf_instance_poll);
     unset($ospf_instance_db);
     $ospf_instance_count++;
@@ -104,7 +106,8 @@ foreach ($ospf_areas_poll as $ospf_area_id => $ospf_area)
   }
 }
 
-if ($debug) {
+if ($debug)
+{
   echo("\nPolled: ");
   print_r($ospf_areas_poll);
   echo("Database: ");
@@ -115,7 +118,7 @@ if ($debug) {
 
 ### Loop array of entries and update
 if (is_array($ospf_areas_db))
-{ 
+{
   foreach ($ospf_areas_db as $ospf_area_db)
   {
     $ospf_area_poll = $ospf_areas_poll[$ospf_area_db['ospfAreaId']];
@@ -194,11 +197,11 @@ if (is_array($ospf_ports_db))
     {
       $ospf_port_poll = $ospf_ports_poll[$ospf_port_db['ospf_port_id']];
 
-      if ($ospf_port_poll['ospfAddressLessIf']) 
-      { 
-        $ospf_port_poll['interface_id'] = @mysql_result(mysql_query("SELECT `interface_id` FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$ospf_port_poll['ospfAddressLessIf']."'"),0); 
+      if ($ospf_port_poll['ospfAddressLessIf'])
+      {
+        $ospf_port_poll['interface_id'] = @mysql_result(mysql_query("SELECT `interface_id` FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$ospf_port_poll['ospfAddressLessIf']."'"),0);
       } else {
-        $ospf_port_poll['interface_id'] = @mysql_result(mysql_query("SELECT A.`interface_id` FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '".$ospf_port_poll['ospfIfIpAddress']."' AND I.interface_id = A.interface_id AND I.device_id = '".$device['device_id']."'"),0);        
+        $ospf_port_poll['interface_id'] = @mysql_result(mysql_query("SELECT A.`interface_id` FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '".$ospf_port_poll['ospfIfIpAddress']."' AND I.interface_id = A.interface_id AND I.device_id = '".$device['device_id']."'"),0);
       }
 
       foreach ($ospf_port_oids as $oid)
@@ -296,7 +299,7 @@ if (is_array($ospf_nbrs_db))
 
       foreach ($ospf_nbr_oids as $oid)
       { // Loop the OIDs
-        echo($ospf_nbr_db[$oid]."|".$ospf_nbr_poll[$oid]."\n");
+        if ($debug) { echo($ospf_nbr_db[$oid]."|".$ospf_nbr_poll[$oid]."\n"); }
         if ($ospf_nbr_db[$oid] != $ospf_nbr_poll[$oid])
         { // If data has changed, build a query
           $ospf_nbr_update .= ", `$oid` = '".mres($ospf_nbr_poll[$oid])."'";
