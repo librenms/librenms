@@ -236,28 +236,13 @@ while ($device = mysql_fetch_assoc($device_query))
         include("includes/polling/".$options['m'].".inc.php");
       }
     } else {
-      include("includes/polling/ipmi.inc.php");
-      include("includes/polling/sensors.inc.php");
-      include("includes/polling/processors.inc.php");
-      include("includes/polling/mempools.inc.php");
-      include("includes/polling/storage.inc.php");
-      include("includes/polling/netstats.inc.php");
-      include("includes/polling/hr-mib.inc.php");
-      include("includes/polling/ucd-mib.inc.php");
-      include("includes/polling/ipSystemStats.inc.php");
-      include("includes/polling/ports.inc.php");
-      include("includes/polling/cisco-mac-accounting.inc.php");
-      include("includes/polling/bgp-peers.inc.php");
-      include("includes/polling/junose-atm-vp.inc.php");
-      include("includes/polling/toner.inc.php");
-      include("includes/polling/ucd-diskio.inc.php");
-      include("includes/polling/applications.inc.php");
-      include("includes/polling/wifi.inc.php");
-      include("includes/polling/ospf.inc.php");
-      #include("includes/polling/altiga-ssl.inc.php");
-      include("includes/polling/cisco-ipsec-flow-monitor.inc.php");
-      include("includes/polling/cisco-remote-access-monitor.inc.php");
-      include("includes/polling/cisco-cef.inc.php");
+      foreach($config['poller_modules'] as $module => $module_status)
+      {
+        if($module_status || $device_attribs['poller_module'][$module])
+        {
+          include('includes/polling/'.$module.'.inc.php');
+        }
+      }
     }
 
     unset($update);
