@@ -1,5 +1,10 @@
 <?php
 
+if(!isset($_SESSION['username']))
+{
+  $_SESSION['username'] = '';
+}
+
 function authenticate($username,$password)
 {
   global $config;

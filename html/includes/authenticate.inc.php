@@ -60,18 +60,9 @@ else
 
 $auth_success = 0;
 
-if (isset($_SESSION['username']) or ($config['auth_mechanism'] == 'http-auth' and !isset($_GET['logout'])))
+if (isset($_SESSION['username']))
 {
-  if($config['auth_mechanism'] == 'http-auth')
-  {
-    $authenticateResult = authenticate(false,false);
-  }
-  else
-  {
-    $authenticateResult = authenticate($_SESSION['username'],$_SESSION['password']);
-  }
-  
-  if ($authenticateResult)
+  if (authenticate($_SESSION['username'],$_SESSION['password']))
   {
     $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
     $_SESSION['user_id'] = get_userid($_SESSION['username']);
