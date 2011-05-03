@@ -11,7 +11,7 @@ function authenticate($username,$password)
     $sql = "SELECT username FROM `users` WHERE `username`='".$_SESSION['username'] . "'";;
     $query = mysql_query($sql);
     $row = @mysql_fetch_assoc($query);
-    if ($row['username'] && $row['username'] == $_SESSION['username'])
+    if (isset($row['username']) && $row['username'] == $_SESSION['username'])
     {
       return 1;
     }
