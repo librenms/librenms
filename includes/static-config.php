@@ -7,6 +7,9 @@
 #########################################################
 
 
+## List of poller modules. Need to be in the array to be 
+## considered for execution.
+
 $config['poller_modules']['ipmi']                         = 1;
 $config['poller_modules']['sensors']                      = 1;
 $config['poller_modules']['processors']                   = 1;
@@ -30,6 +33,9 @@ $config['poller_modules']['cisco-cef']                    = 1;
 $config['poller_modules']['cisco-mac-accounting.inc.php'] = 1;
 
       #include("includes/polling/altiga-ssl.inc.php");
+
+## List of discovery modules. Need to be in this array to be
+## considered for execution.
 
 $config['discovery_modules']['ports']                     = 1;
 $config['discovery_modules']['ports-stack']               = 1;
@@ -145,6 +151,8 @@ $config['os'][$os]['type']              = "server";
 $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['text']              = "OpenIndiana";
 
+## Alcatel
+
 $os = "aos";
 $config['os'][$os]['group']             = "aos";
 $config['os'][$os]['text']              = "Alcatel-Lucent OS";
@@ -155,16 +163,16 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['icon']              = "alcatellucent";
 
-
 $os = "timos";
 $config['os'][$os]['group']             = "timos";
 $config['os'][$os]['text']              = "Alcatel-Lucent TimOS";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['ifXmcbc']           = 1;
-#$config['os'][$os]['ifname']            = 1;
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['icon']              = "alcatellucent";
+
+## Cisco OSes
 
 $os = "ios";
 $config['os'][$os]['group']		= "ios";
@@ -278,15 +286,30 @@ $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
+## Huawei
+
 $os = "vrp";
 $config['os'][$os]['group'] 		= "vrp";
 $config['os'][$os]['text']  		= "Huawei VRP";
 $config['os'][$os]['type']  		= "network";
 $config['os'][$os]['icon']  		= "huawei";
 
+# Juniper
+
 $os = "junos";
 $config['os'][$os]['text']		= "Juniper JunOS";
 $config['os'][$os]['type']		= "network";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['over'][1]['graph']  = "device_processor";
+$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+$config['os'][$os]['over'][2]['graph']  = "device_mempool";
+$config['os'][$os]['over'][2]['text']   = "Memory Usage";
+
+$os = "junose";
+$config['os'][$os]['text']              = "Juniper JunOSe";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "junos";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -324,17 +347,6 @@ $os = "routeros";
 $config['os'][$os]['text']		= "Mikrotik RouterOS";
 $config['os'][$os]['type']		= "network";
 $config['os'][$os]['nobulk']		= 1;
-$config['os'][$os]['over'][0]['graph']  = "device_bits";
-$config['os'][$os]['over'][0]['text']   = "Device Traffic";
-$config['os'][$os]['over'][1]['graph']  = "device_processor";
-$config['os'][$os]['over'][1]['text']   = "CPU Usage";
-$config['os'][$os]['over'][2]['graph']  = "device_mempool";
-$config['os'][$os]['over'][2]['text']   = "Memory Usage";
-
-$os = "junose";
-$config['os'][$os]['text']		= "Juniper JunOSe";
-$config['os'][$os]['type']		= "network";
-$config['os'][$os]['icon']		= "junos";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -888,9 +900,6 @@ $config['graph_types']['device']['uptime']['section'] = 'system';
 $config['graph_types']['device']['uptime']['order'] = '0';
 $config['graph_types']['device']['uptime']['descr'] = 'System Uptime';
 
-#$config['graph_types']['macaccounting']['bits']['descr'] = "MAC Accounting (Bits/sec)";
-#$config['graph_types']['macaccounting']['bits']['descr'] = "MAC Accounting (Packets/sec)";
-
 ### Device Types
 
 $i = 0;
@@ -992,6 +1001,7 @@ $config['twoweek']    = time() - (2 * 7 * 24 * 60 * 60);
 $config['month']      = time() - (31 * 24 * 60 * 60);
 $config['twomonth']   = time() - (2 * 31 * 24 * 60 * 60);
 $config['threemonth'] = time() - (3 * 31 * 24 * 60 * 60);
+$config['sixmonth']   = time() - (6 * 31 * 24 * 60 * 60);
 $config['year']       = time() - (365 * 24 * 60 * 60);
 
 # IPMI sensor type mappings
