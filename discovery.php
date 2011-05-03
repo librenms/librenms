@@ -148,6 +148,14 @@ $discovered_devices = 0;
 $device_query = mysql_query("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC");
 while ($device = mysql_fetch_assoc($device_query))
 {
+  discover_device($device, $options);
+}
+
+function discover_device($device, $options) 
+{
+
+  global $config;
+
   $device_start = utime();  // Start counting device poll time
 
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
@@ -201,7 +209,9 @@ while ($device = mysql_fetch_assoc($device_query))
   $update_result = mysql_query($update_query);
 
   echo("Discovered in $device_time seconds\n");
-  unset($cache); // Clear cache (unify all things here?)
+
+  global $discovered_devices;
+
   echo("\n"); $discovered_devices++;
 }
 
