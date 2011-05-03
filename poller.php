@@ -41,7 +41,15 @@ elseif ($options['h'])
 
 if (isset($options['i']) && $options['i'] && isset($options['n']))
 {
-  $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";
+  $where = true; // FIXME
+  $query = 'SELECT `device_id` FROM (SELECT @rownum :=0) r,
+              (
+                SELECT @rownum := @rownum +1 AS rownum, `device_id`
+                FROM `devices`
+                WHERE `disabled` = 0 
+                ORDER BY `device_id` ASC
+              ) temp
+            WHERE MOD(temp.rownum, '.$options['i'].') = '.$options['n'].';';
   $doing = $options['n'] ."/".$options['i'];
 }
 
@@ -79,7 +87,11 @@ if (isset($options['d']))
 
 echo("Starting polling run:\n\n");
 $polled_devices = 0;
-$device_query = mysql_query("SELECT `device_id` FROM `devices` WHERE `disabled` = 0 $where  ORDER BY `device_id` ASC");
+if(!isset($query))
+  $device_query = mysql_query("SELECT `device_id` FROM `devices` WHERE `disabled` = 0 $where  ORDER BY `device_id` ASC");
+else
+  $device_query = mysql_query($query);
+print mysql_error();
 
 while ($device = mysql_fetch_assoc($device_query))
 {
