@@ -99,6 +99,15 @@ while ($device = mysql_fetch_assoc($device_query))
 {
   $device = mysql_fetch_assoc(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'"));
 
+  poll_device($device, $options);
+
+}
+
+
+function poll_device($device, $options) {
+
+  global $config;
+
   $status = 0; unset($array);
   $device_start = utime();  // Start counting device poll time
 
@@ -110,8 +119,7 @@ while ($device = mysql_fetch_assoc($device_query))
   }
   echo("\n");
 
-  unset($poll_update); unset($poll_update_query); unset($poll_separator); unset($version); unset($uptime); unset($features);
-  unset($sysLocation); unset($hardware); unset($sysDescr); unset($sysContact); unset($sysName); unset($serial);
+  unset($poll_update); unset($poll_update_query); unset($poll_separator); 
 
   $host_rrd = $config['rrd_dir'] . "/" . $device['hostname'];
   if (!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
@@ -147,88 +155,6 @@ while ($device = mysql_fetch_assoc($device_query))
     $graphs = array();
     $oldgraphs = array();
 
-    $snmpdata = snmp_get_multi($device, "sysUpTime.0 sysLocation.0 sysContact.0 sysName.0", "-OQUs", "SNMPv2-MIB");
-    foreach (array_keys($snmpdata[0]) as $key) { $$key = $snmpdata[0][$key]; }
-
-    $sysDescr = snmp_get($device, "sysDescr.0", "-Oqv", "SNMPv2-MIB");
-
-    $sysName = strtolower($sysName);
-
-    $hrSystemUptime = snmp_get($device, "hrSystemUptime.0", "-Oqv", "HOST-RESOURCES-MIB");
-    $sysObjectID = snmp_get($device, "sysObjectID.0", "-Oqvn");
-
-#    echo("UPTIMES: ".$hrSystemUptime."|".$sysUpTime."]");
-
-    if ($hrSystemUptime != "" && !strpos($hrSystemUptime, "No") && ($device['os'] != "windows"))
-    {
-      echo("Using hrSystemUptime\n");
-      $agent_uptime = $uptime; ## Move uptime into agent_uptime
-      #HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (63050465) 7 days, 7:08:24.65
-      $hrSystemUptime = str_replace("(", "", $hrSystemUptime);
-      $hrSystemUptime = str_replace(")", "", $hrSystemUptime);
-      list($days,$hours, $mins, $secs) = explode(":", $hrSystemUptime);
-      list($secs, $microsecs) = explode(".", $secs);
-      $hours = $hours + ($days * 24);
-      $mins = $mins + ($hours * 60);
-      $secs = $secs + ($mins * 60);
-      $uptime = $secs;
-    } else {
-      echo("Using Agent Uptime\n");
-      #SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
-      $sysUpTime = str_replace("(", "", $sysUpTime);
-      $sysUpTime = str_replace(")", "", $sysUpTime);
-      list($days, $hours, $mins, $secs) = explode(":", $sysUpTime);
-      list($secs, $microsecs) = explode(".", $secs);
-      $hours = $hours + ($days * 24);
-      $mins = $mins + ($hours * 60);
-      $secs = $secs + ($mins * 60);
-      $uptime = $secs;
-    }
-
-    if (is_numeric($uptime))
-    {
-      if ($uptime < $device['uptime'])
-      {
-        notify($device,"Device rebooted: " . $device['hostname'],  "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.");
-        log_event('Device rebooted after '.formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
-      }
-
-      $uptimerrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";
-
-      if (!is_file($uptimerrd))
-      {
-        rrdtool_create ($uptimerrd, "DS:uptime:GAUGE:600:0:U RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797");
-      }
-      rrdtool_update($uptimerrd, "N:$uptime");
-
-      $graphs['uptime'] = TRUE;
-
-      echo("Uptime: ".formatUptime($uptime)."\n");
-
-      $poll_update .= $poll_separator . "`uptime` = '$uptime'";
-      $poll_separator = ", ";
-    }
-
-    if (is_file($config['install_dir'] . "/includes/polling/os/".$device['os'].".inc.php"))
-    {
-      /// OS Specific
-      include($config['install_dir'] . "/includes/polling/os/".$device['os'].".inc.php");
-    }
-    elseif ($device['os_group'] && is_file($config['install_dir'] . "/includes/polling/os/".$device['os_group'].".inc.php"))
-    {
-      /// OS Group Specific
-      include($config['install_dir'] . "/includes/polling/os/".$device['os_group'].".inc.php");
-    }
-    else
-    {
-      echo("Generic :(\n");
-    }
-
-    echo("Hardware: ".$hardware." Version: ".$version." Features: ".$features."\n");
-
-    $sysLocation = str_replace("\"","", $sysLocation);
-    $sysContact  = str_replace("\"","", $sysContact);
-
     if ($options['m'])
     {
       if (is_file("includes/polling/".$options['m'].".inc.php"))
@@ -245,133 +171,44 @@ while ($device = mysql_fetch_assoc($device_query))
       }
     }
 
-    unset($update);
-    unset($seperator);
+    $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
+    $device['db_update'] = " `last_polled` = NOW() " . $device['db_update'];
+    $device['db_update'] .= ", `last_polled_timetaken` = '$device_time'";
+    #echo("$device_end - $device_start; $device_time $device_run");
+    echo("Polled in $device_time seconds\n");
 
-    if ($serial && $serial != $device['serial'])
+    $device['db_update_query']  = "UPDATE `devices` SET ";
+    $device['db_update_query'] .= $device['db_update'];
+    $device['db_update_query'] .= " WHERE `device_id` = '" . $device['device_id'] . "'";
+    if ($debug) { echo("Updating " . $device['hostname'] . " - ".$device['db_update_query']." \n"); }
+    if (!mysql_query($device['db_update_query']))
     {
-      $poll_update .= $poll_separator . "`serial` = '".mres($serial)."'";
-      $poll_separator = ", ";
-      log_event("Serial -> $serial", $device, 'system');
+    echo("ERROR: " . mysql_error() . "\nSQL: ".$device['db_update_query']."\n");
     }
+    if (mysql_affected_rows() == "1") { echo("UPDATED!\n"); } else { echo("NOT UPDATED!\n"); }
 
-    if ($sysContact && $sysContact != $device['sysContact'])
-    {
-      $poll_update .= $poll_separator . "`sysContact` = '".mres($sysContact)."'";
-      $poll_separator = ", ";
-      log_event("Contact -> $sysContact", $device, 'system');
-    }
-
-    if ($sysName && $sysName != $device['sysName'])
-    {
-      $poll_update .= $poll_separator . "`sysName` = '".mres($sysName)."'";
-      $poll_separator = ", ";
-      log_event("sysName -> $sysName", $device, 'system');
-    }
-
-    if ($sysDescr && $sysDescr != $device['sysDescr'])
-    {
-      $poll_update .= $poll_separator . "`sysDescr` = '".mres($sysDescr)."'";
-      $poll_separator = ", ";
-      log_event("sysDescr -> $sysDescr", $device, 'system');
-    }
-
-    if ($sysLocation && $device['location'] != $sysLocation)
-    {
-      if (!get_dev_attrib($device,'override_sysLocation_bool'))
-      {
-        $poll_update .= $poll_separator . "`location` = '".mres($sysLocation)."'";
-        $poll_separator = ", ";
-      }
-      log_event("Location -> $sysLocation", $device, 'system');
-    }
-
-    if ($version && $device['version'] != $version)
-    {
-      $poll_update .= $poll_separator . "`version` = '".mres($version)."'";
-      $poll_separator = ", ";
-      log_event("OS Version -> $version", $device, 'system');
-    }
-
-    if ($features != $device['features'])
-    {
-      $poll_update .= $poll_separator . "`features` = '".mres($features)."'";
-      $poll_separator = ", ";
-      log_event("OS Features -> $features", $device, 'system');
-    }
-
-    if ($hardware && $hardware != $device['hardware'])
-    {
-      $poll_update .= $poll_separator . "`hardware` = '".mres($hardware)."'";
-      $poll_separator = ", ";
-      log_event("Hardware -> $hardware", $device, 'system');
-    }
-
-    $poll_update .= $poll_separator . "`last_polled` = NOW()";
-    $poll_separator = ", ";
-    $polled_devices++;
-    echo("\n");
-
+    unset($storage_cache); // Clear cache of hrStorage ** MAYBE FIXME? **
+    unset($cache); // Clear cache (unify all things here?)
   }
 
-  ## FIXME EVENTLOGGING
-  ### This code cycles through the graphs already known in the database and the ones we've defined as being polled here
-  ### If there any don't match, they're added/deleted from the database.
-  ### Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
-
-  $query = mysql_query("SELECT `graph` FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."'");
-  while ($graph = mysql_fetch_assoc($query))
-  {
-    if (!isset($graphs[$graph["graph"]]))
-    {
-      mysql_query("DELETE FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."' AND `graph` = '".$graph["graph"]."'");
-    } else {
-      $oldgraphs[$graph["graph"]] = TRUE;
-    }
-  }
-
-  foreach ($graphs as $graph => $value)
-  {
-    if (!isset($oldgraphs[$graph]))
-    {
-      mysql_query("INSERT INTO `device_graphs` (`device_id`, `graph`) VALUES ('".$device['device_id']."','".$graph."')");
-    }
-  }
-
-  $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
-  $poll_update .= $poll_separator . "`last_polled_timetaken` = '$device_time'";
-  #echo("$device_end - $device_start; $device_time $device_run");
-  echo("Polled in $device_time seconds\n");
-
-  $poll_update_query  = "UPDATE `devices` SET ";
-  $poll_update_query .= $poll_update;
-  $poll_update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-  if ($debug) { echo("Updating " . $device['hostname'] . " - $poll_update_query \n"); }
-  if (!mysql_query($poll_update_query))
-  {
-    echo("ERROR: " . mysql_error() . "\nSQL: $poll_update_query\n");
-  }
-  if (mysql_affected_rows() == "1") { echo("UPDATED!\n"); } else { echo("NOT UPDATED!\n"); }
-
-  unset($storage_cache); // Clear cache of hrStorage ** MAYBE FIXME? **
-  unset($cache); // Clear cache (unify all things here?)
 }
 
-$poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);
+  $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);
 
-if ($polled_devices)
-{
-  mysql_query("INSERT INTO `perf_times` (`type`, `doing`, `start`, `duration`, `devices`)
-                               VALUES ('poll', '$doing', '$poller_start', '$poller_time', '$polled_devices')");
-}
+  if ($polled_devices)  
+  {
+    mysql_query("INSERT INTO `perf_times` (`type`, `doing`, `start`, `duration`, `devices`)
+                   VALUES ('poll', '$doing', '$poller_start', '$poller_time', '$polled_devices')");
+  }
 
-$string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
-if ($debug) echo("$string\n");
+  $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
+  if ($debug) echo("$string\n");
 
-logfile($string);
+  logfile($string);
 
-unset($config); ### Remove this for testing
+  unset($config); ### Remove this for testing
 
-#print_r(get_defined_vars());
+  #print_r(get_defined_vars());
+
 
 ?>
