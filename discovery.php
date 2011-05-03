@@ -174,30 +174,15 @@ while ($device = mysql_fetch_assoc($device_query))
       include("includes/discovery/".$options['m'].".inc.php");
     }
   } else {
-    include("includes/discovery/ports.inc.php");
-    include("includes/discovery/ports-stack.inc.php");
-    include("includes/discovery/entity-physical.inc.php");
-    include("includes/discovery/processors.inc.php");
-    include("includes/discovery/mempools.inc.php");
-    include("includes/discovery/ipv4-addresses.inc.php");
-    include("includes/discovery/ipv6-addresses.inc.php");
-    include("includes/discovery/sensors.inc.php");
-    include("includes/discovery/storage.inc.php");
-    include("includes/discovery/hr-device.inc.php");
-    include("includes/discovery/discovery-protocols.inc.php");
-    include("includes/discovery/arp-table.inc.php");
-    include("includes/discovery/junose-atm-vp.inc.php");
-    include("includes/discovery/bgp-peers.inc.php");
-    include("includes/discovery/q-bridge-mib.inc.php");
-    include("includes/discovery/cisco-vlans.inc.php");
-    include("includes/discovery/cisco-mac-accounting.inc.php");
-    include("includes/discovery/cisco-pw.inc.php");
-    include("includes/discovery/cisco-vrf.inc.php");
-    include("includes/discovery/vmware-vminfo.inc.php");
-    include("includes/discovery/libvirt-vminfo.inc.php");
-    include("includes/discovery/toner.inc.php");
-    include("includes/discovery/ucd-diskio.inc.php");
-    include("includes/discovery/services.inc.php");
+
+    foreach($config['discovery_modules'] as $module => $module_status)
+    {
+      if($module_status || $device_attribs['discovery_module'][$module])
+      {
+        include('includes/discovery/'.$module.'.inc.php');
+      }
+    }
+
   }
   if ($device['type'] == "unknown" || $device['type'] == "")
   {
