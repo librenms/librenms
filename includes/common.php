@@ -249,6 +249,18 @@ function set_dev_attrib($device, $attrib_type, $attrib_value)
   return mysql_affected_rows();
 }
 
+function get_dev_attribs($device)
+{
+  $attribs = array();
+  $sql = "SELECT attrib_type, attrib_value FROM devices_attribs WHERE `device_id` = '" . mres($device['device_id']) . "'";
+  $data = mysql_query($sql);
+  while($entry = mysql_fetch_array($data))
+  {
+    $attribs[$entry['attrib_type']] = $attribs['attrib_value'];
+  }
+  return $attribs;
+}
+
 function get_dev_attrib($device, $attrib_type)
 {
   $sql = "SELECT attrib_value FROM devices_attribs WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
