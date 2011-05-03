@@ -9,7 +9,7 @@ list($hardware, $version, $features) = explode("\n", shell_exec($snmp_cmd));
 
 if (strstr($hardware,"No Such Object available"))
 {
-  $hardware = $sysDescr;
+  $hardware = $poll_device[sysDescr];
 }
 
 ?>

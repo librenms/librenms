@@ -1,5 +1,5 @@
 <?php
 
-$hardware = $sysDescr;
+$hardware = $poll_device[sysDescr];
 
 ?>

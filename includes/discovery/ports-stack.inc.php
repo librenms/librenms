@@ -35,4 +35,6 @@ foreach($stack_poll_array as $interface_id_high => $entry_high)
   }
 }
 
+echo("\n");
+
 ?>
