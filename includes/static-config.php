@@ -18,10 +18,10 @@ $config['poller_modules']['storage']                      = 1;
 $config['poller_modules']['netstats']                     = 1;
 $config['poller_modules']['hr-mib']                       = 1;
 $config['poller_modules']['ucd-mib']                      = 1;
-$config['poller_modules']['ipSystemStats.inc.php']        = 1;
+$config['poller_modules']['ipSystemStats']                = 1;
 $config['poller_modules']['ports']                        = 1;
-$config['poller_modules']['bgp-peers.inc.php']            = 1;
-$config['poller_modules']['junose-atm-vp.inc.php']        = 1;
+$config['poller_modules']['bgp-peers']                    = 1;
+$config['poller_modules']['junose-atm-vp']                = 1;
 $config['poller_modules']['toner.inc.php']                = 1;
 $config['poller_modules']['ucd-diskio']                   = 1;
 $config['poller_modules']['applications']                 = 1;
@@ -30,7 +30,7 @@ $config['poller_modules']['ospf']                         = 1;
 $config['poller_modules']['cisco-ipsec-flow-monitor']     = 1;
 $config['poller_modules']['cisco-remote-access-monitor']  = 1;
 $config['poller_modules']['cisco-cef']                    = 1;
-$config['poller_modules']['cisco-mac-accounting.inc.php'] = 1;
+$config['poller_modules']['cisco-mac-accounting'] = 1;
 
       #include("includes/polling/altiga-ssl.inc.php");
 
