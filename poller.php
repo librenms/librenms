@@ -88,9 +88,11 @@ if (isset($options['d']))
 echo("Starting polling run:\n\n");
 $polled_devices = 0;
 if(!isset($query))
+{
   $device_query = mysql_query("SELECT `device_id` FROM `devices` WHERE `disabled` = 0 $where  ORDER BY `device_id` ASC");
-else
+} else {
   $device_query = mysql_query($query);
+}
 print mysql_error();
 
 while ($device = mysql_fetch_assoc($device_query))
