@@ -13,7 +13,13 @@ if ($config['enable_printers'])
 
     $tonerperc = snmp_get($device, $toner['toner_oid'], "-OUqnv") / $toner['toner_capacity'] * 100;
 
-    $tonerrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_descr'] . ".rrd");
+    $old_tonerrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_descr'] . ".rrd");
+    $tonerrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_index'] . ".rrd");
+
+    if (!is_file($tonerrrd) && is_file($old_tonerrrd))
+    {
+      rename($old_tonerrrd, $tonerrrd);
+    }
 
     if (!is_file($tonerrrd))
     {

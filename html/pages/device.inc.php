@@ -21,7 +21,9 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
 
   $select[$section] = "selected";
 
-  $device = device_by_id_cache($_GET['id']);
+  $device  = device_by_id_cache($_GET['id']);
+  $attribs = get_dev_attribs($device['device_id']);
+
   if ($config['os'][$device['os']]['group']) { $device['os_group'] = $config['os'][$device['os']]['group']; }
 
   echo('<table style="margin: 0px 7px 7px 7px;" cellpadding="15" cellspacing="0" class="devicetable" width="99%">');
