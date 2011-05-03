@@ -19,6 +19,7 @@ while ($instance = mysql_fetch_assoc($query))
   $area_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = '".$device['device_id']."'"),0);
   $port_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = '".$device['device_id']."'"),0);
   $port_count_enabled = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = '".$device['device_id']."'"),0);
+  $neighbour_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."'"),0);
 
   $ip_query = "SELECT * FROM ipv4_addresses AS A, ports AS I WHERE ";
   $ip_query .= "(A.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id)";
@@ -37,7 +38,7 @@ while ($instance = mysql_fetch_assoc($query))
   echo('  <td>' . $asbr . '</td>');
   echo('  <td>' . $area_count . '</td>');
   echo('  <td>' . $port_count . '('.$port_count_enabled.')</td>');
-  echo('  <td>' . ($neighbour_count+0) . '</td>');
+  echo('  <td>' . $neighbour_count . '</td>');
   echo('</tr>');
 
   $i_i++;
