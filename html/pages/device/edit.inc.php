@@ -10,6 +10,8 @@ if ($_SESSION['userlevel'] < '7')
   $panes['ports']    = 'Port Settings';
   $panes['apps']     = 'Applications';
   $panes['alerts']   = 'Alerts';
+  $panes['modules']  = 'Modules';
+
 
   if ($config['enable_services'])
   {
