@@ -2,7 +2,7 @@
 
 $serial = "";
 #list(,$hardware,) = explode(" ", $hardware);
-$hardware = $sysDescr;
+$hardware = $poll_device[sysDescr];
 
 $features = "";
 
