@@ -10,6 +10,8 @@
 ## List of poller modules. Need to be in the array to be 
 ## considered for execution.
 
+#$config['poller_modules']['system']                       = 1;
+#$config['poller_modules']['os']                           = 1;
 $config['poller_modules']['ipmi']                         = 1;
 $config['poller_modules']['sensors']                      = 1;
 $config['poller_modules']['processors']                   = 1;
