@@ -24,9 +24,6 @@ if (mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` =
         $descr = trim($descr);
 
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'cisco', $descr, '1', '1', NULL, NULL, NULL, NULL, $temperature);
-
-	print_r($valid['sensor']);
-
       }
     }
   }
