@@ -18,7 +18,6 @@ while ($instance = mysql_fetch_assoc($query))
   $port_count_enabled = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = '".$device['device_id']."'"),0);
   $nbr_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."'"),0);
 
-
   $query = "SELECT * FROM ipv4_addresses AS A, ports AS I WHERE ";
   $query .= "(A.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id)";
   $query .= " AND I.device_id = '".$device['device_id']."'";
@@ -104,6 +103,46 @@ while ($instance = mysql_fetch_assoc($query))
 
     $i_a++;
   } ### End loop areas
+
+  echo('<tr bgcolor="#ffffff"><th></th><th>Router Id</th><th>Device</th><th>IP Address</th><th>Status</th></tr>');
+
+  ## Loop Neigbours
+  $i_n = 1;
+  $n_sql   = "SELECT * FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."'";
+  $n_query = mysql_query($n_sql);
+  while ($nbr = mysql_fetch_assoc($n_query))
+  {
+    if (!is_integer($i_n/2)) { $nbr_bg = $list_colour_b_a; } else { $nbr_bg = $list_colour_b_b; }
+
+    $host = @mysql_fetch_assoc(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = '".$nbr['ospfNbrRtrId']."'
+                                            AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
+
+    if(is_array($host)) { $rtr_id = generate_dev_link($host, $nbr['ospfNbrRtrId']); } else { $rtr_id = "unknown"; }
+
+    echo('<tr bgcolor="'.$nbr_bg.'">');
+    echo('  <td width=5></td>');
+    echo('  <td><span class="list-large">' . $nbr['ospfNbrRtrId'] . '</span></td>');
+    echo('  <td>' . $rtr_id . '</td>');
+    echo('  <td>' . $nbr['ospfNbrIpAddr'] . '</td>');
+    echo('  <td>');
+    switch ($nbr['ospfNbrState'])
+    {
+      case 'full':
+        echo('<span class=green>'.$nbr['ospfNbrState'].'</span>');
+        break;
+      case 'down':
+        echo('<span class=red>'.$nbr['ospfNbrState'].'</span>');
+        break;
+      default:
+        echo('<span class=blue>'.$nbr['ospfNbrState'].'</span>');
+        break;
+    }
+    echo('</td>');
+    echo('</tr>');
+
+    $i_n++;
+
+  }
 
   echo('</table>');
   echo('</td>');
