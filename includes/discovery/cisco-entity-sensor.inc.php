@@ -1,13 +1,11 @@
 <?php
 
-
-
 if ($device['os'] == "ios" || $device['os_group'] == "ios")
 {
-  echo("\nCISCO-ENTITY-SENSOR");
+  echo(" CISCO-ENTITY-SENSOR: ");
 
   $oids = array();
-  echo("\nCaching OIDs:");
+  echo(" Caching OIDs: ");
 
   if (!is_array($entity_array))
   {
@@ -36,8 +34,6 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
   $t_oids = snmpwalk_cache_twopart_oid($device, "entSensorThresholdRelation", $t_oids, "CISCO-ENTITY-SENSOR-MIB");
   echo(" entSensorThresholdValue");
   $t_oids = snmpwalk_cache_twopart_oid($device, "entSensorThresholdValue", $t_oids, "CISCO-ENTITY-SENSOR-MIB");
-
-  echo("\nSensors: ");
 
   if ($debug) { print_r($oids); }
 

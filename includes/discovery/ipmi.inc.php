@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## IPMI
 if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
 {
