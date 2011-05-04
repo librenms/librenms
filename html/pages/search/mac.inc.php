@@ -40,7 +40,7 @@ print_optionbar_end();
 
 echo('<table width="100%" cellspacing="0" cellpadding="5">');
 
-$where = "AND `ifPhysAddress` LIKE '%".$_POST['address']."%'";
+$where = "AND `ifPhysAddress` LIKE '%".str_replace(':','',mres($_POST['address']))."%'";
 if (is_numeric($_POST['device_id'])) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
 if ($_POST['interface']) { $where .= " AND I.ifDescr LIKE '".mres($_POST['interface'])."'"; }
 
