@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if (strstr($device['hardware'], "dell"))
 {
@@ -18,7 +18,7 @@ if (strstr($device['hardware'], "dell"))
       $fulloid = ".1.3.6.1.4.1.674.10892.1.700.20.1.6.$oid";
       $temp = snmp_get($device, $fulloid, "-Oqv");
 
-      discover_sensor($valid_sensor, 'temperature', $device, $fulloid, $oid, 'dell', $descr, '10', '1', NULL, NULL, NULL, NULL, $temp);
+      discover_sensor($valid['sensor'], 'temperature', $device, $fulloid, $oid, 'dell', $descr, '10', '1', NULL, NULL, NULL, NULL, $temp);
     }
   }
 }

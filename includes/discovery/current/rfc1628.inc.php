@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## RFC1628 UPS
 if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'] == "poweralert")
@@ -25,7 +25,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
       $type = "rfc1628";
       $index = 500+$current_id;
 
-      discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', NULL, NULL, NULL, NULL, $current);
+      discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 
@@ -41,7 +41,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
     $precision  = 1;
     $index      = $i;
 
-    discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
@@ -56,7 +56,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
     $precision  = 1;
     $index      = 100+$i;
 
-    discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
@@ -71,7 +71,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
     $precision  = 1;
     $index      = 200+$i;
 
-    discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 

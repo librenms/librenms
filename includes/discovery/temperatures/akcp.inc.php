@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "akcp" || $device['os'] == "minkelsrms")
 {
@@ -32,7 +32,7 @@ if ($device['os'] == "akcp" || $device['os'] == "minkelsrms")
         $limit        = snmp_get($device, $limit_oid, "-Oqv", "");
         $lowlimit     = snmp_get($device, $lowlimit_oid, "-Oqv", "");
 
-        discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $temperature_id, 'akcp', $descr, '1', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $temperature);
+        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'akcp', $descr, '1', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $temperature);
       }
     }
   }

@@ -1,7 +1,5 @@
 <?php
 
-global $valid_sensor;
-
 ## LMSensors Voltages
 if ($device['os'] == "linux")
 {
@@ -22,7 +20,7 @@ if ($device['os'] == "linux")
       $oid  = "1.3.6.1.4.1.2021.13.16.4.1.3." . $index;
       $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB") / $divisor;
 
-      discover_sensor($valid_sensor, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+      discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 }

@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## APC Voltages
 if ($device['os'] == "apc")
@@ -21,7 +21,7 @@ if ($device['os'] == "apc")
       $oid  = "1.3.6.1.4.1.318.1.1.8.5.3.3.1.3." . $index . ".1.1";
       $descr = "Input Feed " . chr(64+$index);
 
-      discover_sensor($valid_sensor, 'voltage', $device, $oid, "3.3.1.3.$index", $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "3.3.1.3.$index", $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 
@@ -41,7 +41,7 @@ if ($device['os'] == "apc")
       $oid  = "1.3.6.1.4.1.318.1.1.8.5.4.3.1.3." . $index . ".1.1";
       $descr = "Output Feed"; if (count(explode("\n", $oids)) > 1) { $descr .= " $index"; }
 
-      discover_sensor($valid_sensor, 'voltage', $device, $oid, "4.3.1.3.$index", $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "4.3.1.3.$index", $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 
@@ -56,7 +56,7 @@ if ($device['os'] == "apc")
     $index = "3.2.1.0";
     $descr = "Input";
 
-    discover_sensor($valid_sensor, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.1.4.2.1.0", "-OsqnU", "");
@@ -70,7 +70,7 @@ if ($device['os'] == "apc")
     $index = "4.2.1.0";
     $descr = "Output";
 
-    discover_sensor($valid_sensor, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   #PDU
@@ -86,7 +86,7 @@ if ($device['os'] == "apc")
     $index = "1";
     $descr = "Input";
 
-    discover_sensor($valid_sensor, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 

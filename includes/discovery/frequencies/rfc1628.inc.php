@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## RFC1628
 if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'] == "poweralert")
@@ -18,7 +18,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
     $type       = "rfc1628";
     $divisor  = 10;
     $index      = '3.2.0.'.$i;
-    discover_sensor($valid_sensor, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $freq_oid   = "1.3.6.1.2.1.33.1.4.2.0";
@@ -27,7 +27,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
   $type       = "rfc1628";
   $divisor  = 10;
   $index      = '4.2.0';
-  discover_sensor($valid_sensor, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+  discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
 
   $freq_oid   = "1.3.6.1.2.1.33.1.5.1.0";
   $descr      = "Bypass";
@@ -35,7 +35,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
   $type       = "rfc1628";
   $divisor  = 10;
   $index      = '5.1.0';
-  discover_sensor($valid_sensor, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+  discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
 }
 
 ?>

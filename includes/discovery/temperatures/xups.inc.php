@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "powerware")
 {
@@ -25,7 +25,7 @@ if ($device['os'] == "powerware")
       $temperature = snmp_get($device, $temperature_oid, "-Ovq");
       $descr = "Ambient" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($temperature_id+1));
 
-      discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, '1.6.1.'.$temperature_id, 'powerware', $descr, '1', '1', $lowlimit, NULL, NULL, $highlimit, $temperature);
+      discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, '1.6.1.'.$temperature_id, 'powerware', $descr, '1', '1', $lowlimit, NULL, NULL, $highlimit, $temperature);
     }
   }
 }

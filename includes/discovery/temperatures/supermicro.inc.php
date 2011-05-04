@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "linux")
 {
@@ -31,7 +31,7 @@ if ($device['os'] == "linux")
         if ($monitor == 'true')
         {
           $descr = trim(str_ireplace("temperature", "", $descr));
-          discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, trim($index,'.'), 'supermicro', $descr, $divisor, '1', NULL, NULL, NULL, $limit, $temperature);
+          discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, trim($index,'.'), 'supermicro', $descr, $divisor, '1', NULL, NULL, NULL, $limit, $temperature);
         }
       }
     }

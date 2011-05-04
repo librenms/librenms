@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## IPMI
 if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
@@ -21,7 +21,7 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
     $index++;
     if (trim($current) != "na" && $ipmi_unit[trim($unit)])
     {
-      discover_sensor($valid_sensor, $ipmi_unit[trim($unit)], $device, trim($desc), $index, 'ipmi', trim($desc), '1', '1',
+      discover_sensor($valid['sensor'], $ipmi_unit[trim($unit)], $device, trim($desc), $index, 'ipmi', trim($desc), '1', '1',
         (trim($low_limit) == 'na' ? NULL : trim($low_limit)), (trim($low_warn) == 'na' ? NULL : trim($low_warn)),
         (trim($high_warn) == 'na' ? NULL : trim($high_warn)), (trim($high_limit) == 'na' ? NULL : trim($high_limit)),
         $current, 'ipmi');

@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## MGE UPS Voltages
 if ($device['os'] == "mgeups")
@@ -24,7 +24,7 @@ if ($device['os'] == "mgeups")
     $divisor    = 10;
     $index      = $i;
 
-    discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "mgeinputVoltage", "-OsqnU", "MG-SNMP-UPS-MIB"));
@@ -45,7 +45,7 @@ if ($device['os'] == "mgeups")
     $divisor    = 10;
     $index      = 100+$i;
 
-    discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 

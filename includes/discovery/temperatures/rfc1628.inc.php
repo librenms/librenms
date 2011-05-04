@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'] == "poweralert")
 {
@@ -20,7 +20,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
       $temperature = snmp_get($device, $temperature_oid, "-Ovq");
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($temperature_id+1));
 
-      discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $temperature_id, 'rfc1628', $descr, '1', '1', NULL, NULL, NULL, NULL, $temperature);
+      discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'rfc1628', $descr, '1', '1', NULL, NULL, NULL, NULL, $temperature);
     }
   }
 }

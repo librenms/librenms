@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 echo(" ENTITY-SENSOR ");
 
@@ -82,7 +82,7 @@ if (is_array($oids))
       if ($valid && mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."' AND `sensor_class` = '".$type."' AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = '".$index."'"),0) == "0")
       ## Check to make sure we've not already seen this sensor via cisco's entity sensor mib
       {
-        discover_sensor($valid_sensor, $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $current);
+        discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $current);
       }
     }
   }

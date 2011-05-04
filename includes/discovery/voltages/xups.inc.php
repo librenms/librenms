@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## XUPS-MIB
 if ($device['os'] == "powerware")
@@ -26,7 +26,7 @@ if ($device['os'] == "powerware")
       $type = "xups";
       $index = '1.2.5.'.$volt_id;
 
-      discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
+      discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
     }
   }
 
@@ -44,7 +44,7 @@ if ($device['os'] == "powerware")
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = '3.4.1.2.'.$i;
 
-    discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   # XUPS-MIB::xupsOutputNumPhases.0 = INTEGER: 1
@@ -61,7 +61,7 @@ if ($device['os'] == "powerware")
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = '4.4.1.2.'.$i;
 
-    discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   # XUPS-MIB::xupsBypassNumPhases.0 = INTEGER: 1
@@ -77,7 +77,7 @@ if ($device['os'] == "powerware")
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = '5.3.1.2.'.$i;
 
-    discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 

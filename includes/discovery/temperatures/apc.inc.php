@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "apc")
 {
@@ -15,7 +15,7 @@ if ($device['os'] == "apc")
     $index = 0;
     $descr = "Internal Temperature";
 
-    discover_sensor($valid_sensor, 'temperature', $device, $oid, $index, 'apc', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'apc', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
   }
   # InRow Chiller.
   # A silly check to find out if it's the right hardware.
@@ -35,7 +35,7 @@ if ($device['os'] == "apc")
       list($oid,$current) = explode(' ',$oids);
       $divisor = 10;
       $sensorType = substr($descr, 0, 2);
-      echo(discover_sensor($valid_sensor, 'temperature', $device, $oid, '0', $sensorType, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
+      echo(discover_sensor($valid['sensor'], 'temperature', $device, $oid, '0', $sensorType, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
     }
   }
 }

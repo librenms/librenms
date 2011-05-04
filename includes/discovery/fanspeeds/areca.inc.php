@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## Areca Fanspeeds
 if ($device['os'] == "areca")
@@ -19,7 +19,7 @@ if ($device['os'] == "areca")
       $oid  = "1.3.6.1.4.1.18928.1.2.2.1.9.1.3." . $index;
       $current = snmp_get($device, $oid, "-Oqv", "");
 
-      discover_sensor($valid_sensor, 'fanspeed', $device, $oid, $index, 'areca', trim($descr,'"'), '1', '1', NULL, NULL, NULL, NULL, $current);
+      discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'areca', trim($descr,'"'), '1', '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 }

@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == 'sentry3')
 {
@@ -29,7 +29,7 @@ if ($device['os'] == 'sentry3')
       $current         = snmp_get($device,"$humidity_oid", "-Ovq", "Sentry3-MIB");
 
       if ($current >= 0) {
-        discover_sensor($valid_sensor, 'humidity', $device, $humidity_oid, $index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        discover_sensor($valid['sensor'], 'humidity', $device, $humidity_oid, $index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
       }
     }
     unset($data);

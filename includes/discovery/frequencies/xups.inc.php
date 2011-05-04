@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## XUPS
 if ($device['os'] == "powerware")
@@ -16,7 +16,7 @@ if ($device['os'] == "powerware")
   $current  = snmp_get($device, $freq_oid, "-Oqv") / $divisor;
   $type     = "xups";
   $index    = '3.1.0';
-  discover_sensor($valid_sensor, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+  discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
 
   # XUPS-MIB::xupsOutputFrequency.0 = INTEGER: 500
   $freq_oid = "1.3.6.1.4.1.534.1.4.2.0";
@@ -25,7 +25,7 @@ if ($device['os'] == "powerware")
   $current  = snmp_get($device, $freq_oid, "-Oqv") / $divisor;
   $type     = "xups";
   $index    = '4.2.0';
-  discover_sensor($valid_sensor, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+  discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
 
   # XUPS-MIB::xupsBypassFrequency.0 = INTEGER: 500
   $freq_oid = "1.3.6.1.4.1.534.1.5.1.0";
@@ -38,7 +38,7 @@ if ($device['os'] == "powerware")
     $current /= $divisor;
     $type     = "xups";
     $index    = '5.1.0';
-    discover_sensor($valid_sensor, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 
