@@ -1,7 +1,5 @@
 <?php
 
-
-
 echo(" ENTITY-SENSOR ");
 
 echo("\nCaching OIDs:");
@@ -56,7 +54,7 @@ if (is_array($oids))
         $descr = rewrite_entity_descr($descr);
       }
 
-      $valid = TRUE;
+      $thisisnotbullshit = TRUE;
 
       $type = $entitysensor[$entry['entPhySensorType']];
 
@@ -73,13 +71,13 @@ if (is_array($oids))
       if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > "0") { $divisor = $divisor . str_pad('', $entry['entPhySensorPrecision'], "0"); }
       $current = $current * $multiplier / $divisor;
 
-      if ($type == "temperature") { if ($current > "200"){ $valid = FALSE; } $descr = preg_replace("/[T|t]emperature[|s]/", "", $descr); }
+      if ($type == "temperature") { if ($current > "200"){ $thisisnotbullshit = FALSE; } $descr = preg_replace("/[T|t]emperature[|s]/", "", $descr); }
 
       #echo($descr . "|" . $index . "|" .$current . "|" . $multiplier . "|" . $divisor ."|" . $entry['entPhySensorScale'] . "|" . $entry['entPhySensorPrecision'] . "\n");
 
-      if ($current == "-127") { $valid = FALSE; }
+      if ($current == "-127") { $thisisnotbullshit = FALSE; }
 
-      if ($valid && mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."' AND `sensor_class` = '".$type."' AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = '".$index."'"),0) == "0")
+      if ($thisisnotbullshit && mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."' AND `sensor_class` = '".$type."' AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = '".$index."'"),0) == "0")
       ## Check to make sure we've not already seen this sensor via cisco's entity sensor mib
       {
         discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $current);
