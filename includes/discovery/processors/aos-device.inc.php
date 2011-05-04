@@ -1,7 +1,5 @@
 <?php
 
-global $valid_processor;
-
 ##  Hardcoded discovery of device CPU usage on Alcatel-Lucent Omniswitches.
 
 if ($device['os'] == "aos")
@@ -13,7 +11,7 @@ if ($device['os'] == "aos")
 
   if (is_numeric($usage))
   {
-    discover_processor($valid_processor, $device, "1.3.6.1.4.1.6486.800.1.2.1.16.1.1.1.13.0", "0", "aos-system", $descr, "1", $usage, NULL, NULL);
+    discover_processor($valid['processor'], $device, "1.3.6.1.4.1.6486.800.1.2.1.16.1.1.1.13.0", "0", "aos-system", $descr, "1", $usage, NULL, NULL);
   }
 }
 

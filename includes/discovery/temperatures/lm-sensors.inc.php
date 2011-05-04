@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == "linux")
 {
   $oids = snmp_walk($device, "lmTempSensorsDevice", "-Osqn", "LM-SENSORS-MIB");

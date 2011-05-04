@@ -1,7 +1,5 @@
 <?php
 
-global $valid_processor;
-
 if ($device['os'] == "ironware" || $device['os_group'] == "ironware")
 {
   echo("IronWare : ");
@@ -36,7 +34,7 @@ if ($device['os'] == "ironware" || $device['os_group'] == "ironware")
 
       if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "")
       {
-        discover_processor($valid_processor, $device, $usage_oid, $index, "ironware", $descr, $precision, $usage, $entPhysicalIndex, NULL);
+        discover_processor($valid['processor'], $device, $usage_oid, $index, "ironware", $descr, $precision, $usage, $entPhysicalIndex, NULL);
       }
     }
   }

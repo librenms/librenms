@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == "areca")
 {
   $oids = snmp_walk($device, "1.3.6.1.4.1.18928.1.1.2.14.1.2", "-Osqn", "");

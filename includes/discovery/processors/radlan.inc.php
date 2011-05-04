@@ -1,7 +1,5 @@
 <?php
 
-global $valid_processor;
-
 ##
 ##  Hardcoded discovery of cpu usage on RADLAN devices.
 ##
@@ -15,7 +13,7 @@ if ($device['os'] == "radlan")
 
   if (is_numeric($usage))
   {
-    discover_processor($valid_processor, $device, ".1.3.6.1.4.1.89.1.9.0", "0", "radlan", $descr, "1", $usage, NULL, NULL);
+    discover_processor($valid['processor'], $device, ".1.3.6.1.4.1.89.1.9.0", "0", "radlan", $descr, "1", $usage, NULL, NULL);
   }
 }
 

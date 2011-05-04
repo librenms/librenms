@@ -1,7 +1,5 @@
 <?php
 
-global $valid_processor;
-
 ## JUNOS Processors
 if ($device['os'] == "junos")
 {
@@ -23,7 +21,7 @@ if ($device['os'] == "junos")
         $usage = $entry['jnxOperatingCPU'];
         if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "")
         {
-          discover_processor($valid_processor, $device, $usage_oid, $index, "junos", $descr, "1", $usage, NULL, NULL);
+          discover_processor($valid['processor'], $device, $usage_oid, $index, "junos", $descr, "1", $usage, NULL, NULL);
         }
       } ## End if checks
     } ## End Foreach

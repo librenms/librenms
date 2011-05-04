@@ -14,7 +14,7 @@ if ($device['os_group'] == "unix" && $count == "0")
 
   if (is_numeric($percent))
   {
-    discover_processor($valid_processor, $device, 0, 0, "ucd-old", "CPU", "1", $system+$user, NULL, NULL);
+    discover_processor($valid['processor'], $device, 0, 0, "ucd-old", "CPU", "1", $system+$user, NULL, NULL);
   }
 }
 

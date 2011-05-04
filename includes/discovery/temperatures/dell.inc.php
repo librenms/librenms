@@ -1,7 +1,5 @@
 <?php
 
-
-
 if (strstr($device['hardware'], "dell"))
 {
   $oids = snmp_walk($device, "coolingDeviceDiscreteReading", "-Osqn", "MIB-Dell-10892");

@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == "powerware")
 {
   # XUPS-MIB::xupsEnvAmbientTemp.0 = INTEGER: 52

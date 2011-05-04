@@ -1,7 +1,5 @@
 <?php
 
-
-
 ### Force10 E-Series
 
 #F10-CHASSIS-MIB::chSysCardType.1 = INTEGER: rpmCardEF3(206)
@@ -28,8 +26,6 @@ if ($device['os'] == "ftos" || $device['os_group'] == "ftos")
       discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'ftos-eseries', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
     }
   }
-
-  unset($oids);
 }
 
 ?>

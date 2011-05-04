@@ -1,7 +1,5 @@
 <?php
 
-global $valid_processor;
-
 ## JUNOSe Processors
 if ($device['os'] == "junose")
 {
@@ -21,7 +19,7 @@ if ($device['os'] == "junose")
 
       if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "")
       {
-        discover_processor($valid_processor, $device, $usage_oid, $index, "junose", $descr, "1", $usage, $entPhysicalIndex, NULL);
+        discover_processor($valid['processor'], $device, $usage_oid, $index, "junose", $descr, "1", $usage, $entPhysicalIndex, NULL);
       }
     }
   }

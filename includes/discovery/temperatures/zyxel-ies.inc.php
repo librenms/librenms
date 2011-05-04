@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == 'ies')
 {
   echo("ZyXEL IES ");

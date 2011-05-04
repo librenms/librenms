@@ -1,7 +1,5 @@
 <?php
 
-
-
 ### Force10 C-Series
 
 #F10-C-SERIES-CHASSIS-MIB::chSysCardType.1 = INTEGER: lc4802E48TB(1024)
@@ -12,9 +10,7 @@
 if ($device['os'] == "ftos" || $device['os_group'] == "ftos")
 {
   echo("FTOS C-Series ");
-
   $oids = snmpwalk_cache_oid($device, "chSysCardTemp", array(), "F10-C-SERIES-CHASSIS-MIB", $config['mib_dir'].":".$config['mib_dir']."/ftos" );
-
   if (is_array($oids))
   {
     foreach ($oids as $index => $entry)
@@ -22,16 +18,9 @@ if ($device['os'] == "ftos" || $device['os_group'] == "ftos")
       $entry['descr'] = "Slot ".$index;
       $entry['oid'] = ".1.3.6.1.4.1.6027.3.8.1.2.1.1.5.".$index;
       $entry['current'] = $entry['chSysCardTemp'];
-
       discover_sensor($valid['sensor'], 'temperature', $device, $entry['oid'], $index, 'ftos-cseries', $entry['descr'], '1', '1', NULL, NULL, NULL, NULL, $entry['current']);
-
     }
-
-    unset($entry);
-
   }
-
-  unset($oids);
 }
 
 ?>
