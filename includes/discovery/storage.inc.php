@@ -2,6 +2,8 @@
 
 echo("Storage : ");
 
+global $valid_storage;
+
 include_dir("includes/discovery/storage");
 
 

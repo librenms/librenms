@@ -2,6 +2,8 @@
 
 echo("IPv6 Addresses : ");
 
+global $valid_v6;
+
 $oids = snmp_walk($device, "ipAddressIfIndex.ipv6", "-Ln -Osq", "IP-MIB");
 $oids = str_replace("ipAddressIfIndex.ipv6.", "", $oids);
 $oids = str_replace("\"", "", $oids);

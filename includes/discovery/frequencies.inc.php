@@ -1,4 +1,5 @@
 <?php
+
 echo("Frequencies: ");
 
 include_dir("includes/discovery/frequencies");

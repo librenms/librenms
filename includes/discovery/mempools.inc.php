@@ -2,6 +2,8 @@
 
 echo("Memory : ");
 
+global $valid_mempool; ## FIXME PLEASE!
+
 include_dir("includes/discovery/mempools");
 
 ### Remove memory pools which weren't redetected here

@@ -2,6 +2,8 @@
 
 echo("Discovery protocols:");
 
+global $link_exists;
+
 $community = $device['community'];
 
 if ($device['os'] == "ironware")
