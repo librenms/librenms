@@ -458,54 +458,6 @@ function ipv62snmp($ipv6)
   return implode('.',$ipv6_split);
 }
 
-function discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_origin)
-{
-  global $valid_v6,$device,$config;
-
-  $ipv6_network = Net_IPv6::getNetmask("$ipv6_address/$ipv6_prefixlen") . '/' . $ipv6_prefixlen;
-  $ipv6_compressed = Net_IPv6::compress($ipv6_address);
-
-  if (Net_IPv6::getAddressType($ipv6_address) == NET_IPV6_LOCAL_LINK)
-  {
-    # ignore link-locals (coming from IPV6-MIB)
-    return;
-  }
-
-  if (mysql_result(mysql_query("SELECT count(*) FROM `ports`
-        WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1')
-  {
-    $i_query = "SELECT interface_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
-    $interface_id = mysql_result(mysql_query($i_query), 0);
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0) < '1')
-    {
-      mysql_query("INSERT INTO `ipv6_networks` (`ipv6_network`) VALUES ('$ipv6_network')");
-      echo("N");
-    }
-
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0) < '1')
-    {
-      mysql_query("INSERT INTO `ipv6_networks` (`ipv6_network`) VALUES ('$ipv6_network')");
-      echo("N");
-    }
-
-    $ipv6_network_id = @mysql_result(mysql_query("SELECT `ipv6_network_id` from `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0);
-
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = '$ipv6_address' AND `ipv6_prefixlen` = '$ipv6_prefixlen' AND `interface_id` = '$interface_id'"), 0) == '0')
-    {
-     mysql_query("INSERT INTO `ipv6_addresses` (`ipv6_address`, `ipv6_compressed`, `ipv6_prefixlen`, `ipv6_origin`, `ipv6_network_id`, `interface_id`)
-                                   VALUES ('$ipv6_address', '$ipv6_compressed', '$ipv6_prefixlen', '$ipv6_origin', '$ipv6_network_id', '$interface_id')");
-     echo("+");
-    }
-    else
-    {
-      echo(".");
-    }
-    $full_address = "$ipv6_address/$ipv6_prefixlen";
-    $valid = $full_address  . "-" . $interface_id;
-    $valid_v6[$valid] = 1;
-  }
-}
-
 function get_astext($asn)
 {
   global $config,$cache;
@@ -647,7 +599,7 @@ function isHexString($str)
 # Include all .inc.php files in $dir
 function include_dir($dir, $regex = "")
 {
-  global $device, $config, $debug;
+  global $device, $config, $debug, $valid;
   if ($regex == "")
   {
     $regex = "/\.inc\.php$/";

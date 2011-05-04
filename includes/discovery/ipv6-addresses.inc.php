@@ -2,8 +2,6 @@
 
 echo("IPv6 Addresses : ");
 
-global $valid_v6;
-
 $oids = snmp_walk($device, "ipAddressIfIndex.ipv6", "-Ln -Osq", "IP-MIB");
 $oids = str_replace("ipAddressIfIndex.ipv6.", "", $oids);
 $oids = str_replace("\"", "", $oids);
@@ -36,7 +34,7 @@ foreach (explode("\n", $oids) as $data)
 
     $ipv6_origin = snmp_get($device, ".1.3.6.1.2.1.4.34.1.6.2.16.$oid", "-Ovq", "IP-MIB");
 
-    discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_origin);
+    discover_process_ipv6($valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_origin);
   } // if $data
 } // foreach
 
@@ -55,7 +53,7 @@ if (!$oids)
       list($ifIndex,$ipv6addr) = explode(".",$if_ipv6addr,2);
       $ipv6_address = snmp2ipv6($ipv6addr);
       $ipv6_origin = snmp_get($device, "IPV6-MIB::ipv6AddrType.$if_ipv6addr", "-Ovq", "IPV6-MIB");
-      discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_origin);
+      discover_process_ipv6($valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_origin);
     } // if $data
   } // foreach
 } // if $oids
@@ -67,8 +65,8 @@ while ($row = mysql_fetch_assoc($data))
 {
   $full_address = $row['ipv6_address'] . "/" . $row['ipv6_prefixlen'];
   $interface_id = $row['interface_id'];
-  $valid = $full_address  . "-" . $interface_id;
-  if (!$valid_v6[$valid])
+  $valid_address = $full_address  . "-" . $interface_id;
+  if (!$valid['ipv6'][$valid_address])
   {
     echo("-");
     $query = @mysql_query("DELETE FROM `ipv6_addresses` WHERE `ipv6_address_id` = '".$row['ipv6_address_id']."'");
@@ -78,8 +76,6 @@ while ($row = mysql_fetch_assoc($data))
     }
   }
 }
-
-unset($valid_v6);
 
 echo("\n");
 
