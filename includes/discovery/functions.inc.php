@@ -147,6 +147,8 @@ function check_valid_sensors($device, $class, $valid)
   {
     while ($test = mysql_fetch_assoc($query))
     {
+
+      print_r($test);
       $index = $test['sensor_index'];
       $type = $test['sensor_type'];
       if ($debug) { echo($index . " -> " . $type . "\n"); }
