@@ -155,6 +155,7 @@ function discover_device($device, $options)
 {
 
   global $config;
+  global $valid; $valid = array(); ## Reset $valid array
 
   $device_start = utime();  // Start counting device poll time
 
@@ -175,6 +176,8 @@ function discover_device($device, $options)
 
   #include("includes/discovery/os.inc.php");
 
+  ### If we've specified a module, use that, else walk the modules array
+
   if ($options['m'])
   {
     if (is_file("includes/discovery/".$options['m'].".inc.php"))
@@ -182,7 +185,6 @@ function discover_device($device, $options)
       include("includes/discovery/".$options['m'].".inc.php");
     }
   } else {
-
     foreach($config['discovery_modules'] as $module => $module_status)
     {
       if($module_status || $device_attribs['discovery_module'][$module])
@@ -190,8 +192,10 @@ function discover_device($device, $options)
         include('includes/discovery/'.$module.'.inc.php');
       }
     }
-
   }
+
+  ### Set type to a predefined type for the OS if it's not already set
+
   if ($device['type'] == "unknown" || $device['type'] == "")
   {
     if ($config['os'][$device['os']]['type'])
