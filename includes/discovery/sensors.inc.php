@@ -1,5 +1,7 @@
 <?php
 
+global $valid_sensor;
+
 $valid_sensor = array();
 
 echo("Sensors: ");

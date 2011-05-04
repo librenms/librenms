@@ -1,4 +1,5 @@
 <?php
+
 echo("Power: ");
 
 include_dir("includes/discovery/power");

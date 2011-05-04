@@ -2,6 +2,8 @@
 
 echo("Processors : ");
 
+global $valid_processor;
+
 include_dir("includes/discovery/processors");
 
 ## Last-resort discovery here
