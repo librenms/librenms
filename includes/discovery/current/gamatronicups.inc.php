@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "gamatronicups")
 {
@@ -16,7 +16,7 @@ if ($device['os'] == "gamatronicups")
     $warnlimit = NULL;
     $limit = NULL;
 
-    discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, NULL, NULL, NULL, $current);
   }
 
   for ($i = 1; $i <= 3; $i++)
@@ -31,7 +31,7 @@ if ($device['os'] == "gamatronicups")
     $warnlimit = NULL;
     $limit = NULL;
 
-    discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, NULL, NULL, NULL, $current);
   }
 }
 

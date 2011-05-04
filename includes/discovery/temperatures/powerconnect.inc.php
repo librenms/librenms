@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "powerconnect")
 {
@@ -16,7 +16,7 @@ if ($device['os'] == "powerconnect")
     $index = "0";
     $descr = "Internal Temperature";
 
-    discover_sensor($valid_sensor, 'temperature', $device, $oid, $index, $type, $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $current);
   }
 }
 

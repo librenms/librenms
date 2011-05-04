@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## Supermicro Fanspeeds
 if ($device['os'] == "linux")
@@ -35,7 +35,7 @@ if ($device['os'] == "linux")
         $descr         = str_replace(' Speed','',$descr);
         if ($monitor == 'true')
         {
-          discover_sensor($valid_sensor, 'fanspeed', $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', $low_limit, NULL, NULL, NULL, $current);
+          discover_sensor($valid['sensor'], 'fanspeed', $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', $low_limit, NULL, NULL, NULL, $current);
         }
       }
     }

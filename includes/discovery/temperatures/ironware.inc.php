@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "ironware")
 {
@@ -32,7 +32,7 @@ if ($device['os'] == "ironware")
 
         $current = $temperature / 2;
 
-        discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $oid, 'ironware', $descr, '2', '1', NULL, NULL, NULL, NULL, $current);
+        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'ironware', $descr, '2', '1', NULL, NULL, NULL, NULL, $current);
       }
     }
   }

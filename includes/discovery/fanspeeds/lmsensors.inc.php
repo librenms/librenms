@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## LMSensors Fanspeeds
 if ($device['os'] == "linux")
@@ -22,7 +22,7 @@ if ($device['os'] == "linux")
       $descr = trim(str_ireplace("fan-", "", $descr));
       if ($current > '0')
       {
-        discover_sensor($valid_sensor, 'fanspeed', $device, $oid, $index, 'lmsensors', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
+        discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'lmsensors', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
       }
     }
   }

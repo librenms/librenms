@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "cometsystem-p85xx")
 {
@@ -56,7 +56,7 @@ if ($device['os'] == "cometsystem-p85xx")
         $limit = trim($sensor['limit_high'], ' "');
         $temperature = $sensor['temp_intval'];
 
-        discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $temperature_id, 'cometsystem-p85xx', $descr, '10', '1', $lowlimit, NULL, NULL, $limit, $temperature);
+        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'cometsystem-p85xx', $descr, '10', '1', $lowlimit, NULL, NULL, $limit, $temperature);
       }
     }
   }

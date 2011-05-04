@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## RFC1628 UPS Voltages
 #if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
@@ -27,7 +27,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
       $type = "rfc1628";
       $index = "1.2.5.".$volt_id;
 
-      discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
+      discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
     }
   }
 
@@ -43,7 +43,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = $i;
 
-    discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
@@ -59,7 +59,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = 100+$i;
 
-    discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
@@ -75,7 +75,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = 200+$i;
 
-    discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 

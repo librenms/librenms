@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == 'sentry3')
 {
@@ -41,7 +41,7 @@ if ($device['os'] == 'sentry3')
         $current         = snmp_get($device,"$infeed_oid", "-Ovq", "Sentry3-MIB") / $divisor;
 
         if ($current >= 0) {
-          discover_sensor($valid_sensor, 'current', $device, $infeed_oid, $towers, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+          discover_sensor($valid['sensor'], 'current', $device, $infeed_oid, $towers, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
 
         #################################
@@ -75,7 +75,7 @@ if ($device['os'] == 'sentry3')
             $outlet_current         = snmp_get($device,"$outlet_oid", "-Ovq", "Sentry3-MIB") / $outlet_divisor;
 
             if ($outlet_current >= 0) {
-              discover_sensor($valid_sensor, 'current', $device, $outlet_oid, $outlet_insert_index, 'sentry3', $outlet_descr, $outlet_divisor, $multiplier, $outlet_low_limit, $outlet_low_warn_limit, $outlet_high_warn_limit, $outlet_high_limit, $outlet_current);
+              discover_sensor($valid['sensor'], 'current', $device, $outlet_oid, $outlet_insert_index, 'sentry3', $outlet_descr, $outlet_divisor, $multiplier, $outlet_low_limit, $outlet_low_warn_limit, $outlet_high_warn_limit, $outlet_high_limit, $outlet_current);
             }
           } // if ($outlet_data)
 

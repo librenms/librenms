@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor, $cache;
+
 
 ## IPOMANII-MIB
 if ($device['os'] == "ipoman")
@@ -39,7 +39,7 @@ if ($device['os'] == "ipoman")
       $current = $entry['inletStatusCurrent'] / $divisor;
       $high_limit = $entry['inletConfigCurrentHigh'] / 10;
 
-      discover_sensor($valid_sensor, 'current', $device, $cur_oid, '1.3.1.3.'.$index, 'ipoman', $descr, $divisor, '1', NULL, NULL, NULL, $high_limit, $current);
+      discover_sensor($valid['sensor'], 'current', $device, $cur_oid, '1.3.1.3.'.$index, 'ipoman', $descr, $divisor, '1', NULL, NULL, NULL, $high_limit, $current);
       # FIXME: iPoMan 1201 also says it has 2 inlets, at least until firmware 1.06 - wtf?
     }
   }
@@ -54,7 +54,7 @@ if ($device['os'] == "ipoman")
       $current = $entry['outletStatusCurrent'] / $divisor;
       $high_limit = $entry['outletConfigCurrentHigh'] / 10;
 
-      discover_sensor($valid_sensor, 'current', $device, $cur_oid, '2.3.1.3.'.$index, 'ipoman', $descr, $divisor, '1', NULL, NULL, NULL, $high_limit, $current);
+      discover_sensor($valid['sensor'], 'current', $device, $cur_oid, '2.3.1.3.'.$index, 'ipoman', $descr, $divisor, '1', NULL, NULL, NULL, $high_limit, $current);
     }
   }
 }

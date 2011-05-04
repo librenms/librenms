@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "ios" || $device['os_group'] == "ios")
 {
@@ -141,8 +141,8 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 	if ($descr == "") { $ok = FALSE; }				## Invalid description. Lots of these on Nexus
 
         if ($ok) {
-#          echo("\n$valid_sensor, $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $limit, $warn_limit, $current");
-          discover_sensor($valid_sensor, $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $limit, $warn_limit, $current);
+#          echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $limit, $warn_limit, $current");
+          discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $limit, $warn_limit, $current);
         }
         $cisco_entity_temperature = 1;
         unset($limit, $limit_low, $warn_limit, $warn_limit_low);

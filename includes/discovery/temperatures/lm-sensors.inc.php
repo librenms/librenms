@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "linux")
 {
@@ -23,7 +23,7 @@ if ($device['os'] == "linux")
       $descr = trim($descr);
       if ($temperature != "0" && $temperature <= "1000")
       {
-        discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $temperature_id, 'lmsensors', $descr, '1000', '1', NULL, NULL, NULL, NULL, $temperature);
+        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'lmsensors', $descr, '1000', '1', NULL, NULL, NULL, NULL, $temperature);
       }
     }
   }

@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 if ($device['os'] == "areca")
 {
@@ -21,7 +21,7 @@ if ($device['os'] == "areca")
       $descr = "Hard disk $temperature_id";
       if ($temperature != -128) # -128 = not measured/present
       {
-        discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, zeropad($temperature_id), 'areca', $descr, '1', '1', NULL, NULL, NULL, NULL, $temperature);
+        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, zeropad($temperature_id), 'areca', $descr, '1', '1', NULL, NULL, NULL, NULL, $temperature);
       }
     }
   }
@@ -42,7 +42,7 @@ if ($device['os'] == "areca")
       $oid  = "1.3.6.1.4.1.18928.1.2.2.1.10.1.3." . $index;
       $current = snmp_get($device, $oid, "-Oqv", "");
 
-      discover_sensor($valid_sensor, 'temperature', $device, $oid, $index, 'areca', trim($descr,'"'), '1', '1', NULL, NULL, NULL, NULL, $current);
+      discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'areca', trim($descr,'"'), '1', '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 }

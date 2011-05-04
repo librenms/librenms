@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor, $cache;
+
 
 ## IPOMANII-MIB
 if ($device['os'] == "ipoman")
@@ -37,7 +37,7 @@ if ($device['os'] == "ipoman")
       $low_limit = $entry['inletConfigVoltageLow'];
       $high_limit = $entry['inletConfigVoltageHigh'];
 
-      discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, 'ipoman', $descr, $divisor, '1', $low_limit, NULL, NULL, $high_limit, $current);
+      discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, 'ipoman', $descr, $divisor, '1', $low_limit, NULL, NULL, $high_limit, $current);
       # FIXME: iPoMan 1201 also says it has 2 inlets, at least until firmware 1.06 - wtf?
     }
   }

@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## Supermicro Voltages
 if ($device['os'] == "linux")
@@ -36,7 +36,7 @@ if ($device['os'] == "linux")
 
         if ($monitor == 'true')
         {
-          discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', $lowlimit, NULL, NULL, $limit, $current);
+          discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', $lowlimit, NULL, NULL, $limit, $current);
         }
       }
     }

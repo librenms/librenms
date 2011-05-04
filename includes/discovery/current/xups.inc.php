@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ## XUPS-MIB
 if ($device['os'] == "powerware")
@@ -25,7 +25,7 @@ if ($device['os'] == "powerware")
       $type = "xups";
       $index = "1.2.3.".$current_id;
 
-      discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+      discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 
@@ -41,7 +41,7 @@ if ($device['os'] == "powerware")
     $divisor    = 1;
     $index      = "4.4.1.3.".$i;
 
-    discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "xupsInputCurrent", "-OsqnU", "XUPS-MIB"));
@@ -56,7 +56,7 @@ if ($device['os'] == "powerware")
     $divisor    = 1;
     $index      = "3.4.1.3.".$i;
 
-    discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 

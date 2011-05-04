@@ -1,6 +1,6 @@
 <?php
 
-global $valid_sensor;
+
 
 ### Force10 C-Series
 
@@ -23,7 +23,7 @@ if ($device['os'] == "ftos" || $device['os_group'] == "ftos")
       $entry['oid'] = ".1.3.6.1.4.1.6027.3.8.1.2.1.1.5.".$index;
       $entry['current'] = $entry['chSysCardTemp'];
 
-      discover_sensor($valid_sensor, 'temperature', $device, $entry['oid'], $index, 'ftos-cseries', $entry['descr'], '1', '1', NULL, NULL, NULL, NULL, $entry['current']);
+      discover_sensor($valid['sensor'], 'temperature', $device, $entry['oid'], $index, 'ftos-cseries', $entry['descr'], '1', '1', NULL, NULL, NULL, NULL, $entry['current']);
 
     }
 
