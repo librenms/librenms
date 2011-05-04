@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == "sentry3")
 {
   $oids = snmp_walk($device, "tempHumidSensorTempValue", "-Osqn", "Sentry3-MIB");
@@ -32,9 +30,7 @@ if ($device['os'] == "sentry3")
         discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
       }
     }
-    unset($data);
   }
-  unset($oids);
 }
 
 ?>

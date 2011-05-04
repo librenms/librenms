@@ -1,7 +1,7 @@
 <?php
 
 ### Discover sensors
-function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL, $poller_type = 'snmp')
+function discover_sensor(&$this_valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL, $poller_type = 'snmp')
 {
   global $config, $debug;
 
@@ -74,7 +74,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       if ($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
     }
   }
-  $valid[$class][$type][$index] = 1;
+  $this_valid[$class][$type][$index] = 1;
 }
 
 function sensor_low_limit($class, $current)
@@ -140,19 +140,17 @@ function sensor_limit($class, $current)
   return $limit;
 }
 
-function check_valid_sensors($device, $class, $valid)
+function check_valid_sensors($device, $class, $this_valid)
 {
   $sql = "SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class='".$class."' AND S.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
   if ($query = mysql_query($sql))
   {
     while ($test = mysql_fetch_assoc($query))
     {
-
-      print_r($test);
       $index = $test['sensor_index'];
       $type = $test['sensor_type'];
       if ($debug) { echo($index . " -> " . $type . "\n"); }
-      if (!$valid[$class][$type][$index])
+      if (!$this_valid[$class][$type][$index])
       {
         echo("-");
         mysql_query("DELETE FROM `sensors` WHERE sensor_class='".$class."' AND sensor_id = '" . $test['sensor_id'] . "'");
@@ -163,8 +161,7 @@ function check_valid_sensors($device, $class, $valid)
   }
 }
 
-
-function discover_juniAtmVp(&$valid, $interface_id, $vp_id, $vp_descr)
+function discover_juniAtmVp(&$this_valid, $interface_id, $vp_id, $vp_descr)
 {
   global $config, $debug;
 
@@ -180,7 +177,7 @@ function discover_juniAtmVp(&$valid, $interface_id, $vp_id, $vp_descr)
   {
     echo(".");
   }
-  $valid[$interface_id][$vp_id] = 1;
+  $this_valid[$interface_id][$vp_id] = 1;
 }
 
 function discover_link($local_interface_id, $protocol, $remote_interface_id, $remote_hostname, $remote_port, $remote_platform, $remote_version)
@@ -213,7 +210,7 @@ function discover_link($local_interface_id, $protocol, $remote_interface_id, $re
   $link_exists[$local_interface_id][$remote_hostname][$remote_port] = 1;
 }
 
-function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, $units, $used = NULL)
+function discover_storage(&$this_valid, $device, $index, $type, $mib, $descr, $size, $units, $used = NULL)
 {
   global $config, $debug;
 
@@ -236,12 +233,12 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
       mysql_query($query);
       if ($debug) { print $query . "\n"; }
     }
-    $valid[$mib][$index] = 1;
+    $this_valid[$mib][$index] = 1;
   }
 }
 
 
-function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $precision = "1", $current = NULL, $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
+function discover_processor(&$this_valid, $device, $oid, $index, $type, $descr, $precision = "1", $current = NULL, $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
 {
   global $config, $debug;
 
@@ -266,12 +263,12 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
       mysql_query($query);
       if ($debug) { print $query . "\n"; }
     }
-    $valid[$type][$index] = 1;
+    $this_valid[$type][$index] = 1;
   }
 }
 
 
-function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = "1", $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
+function discover_mempool(&$this_valid, $device, $index, $type, $descr, $precision = "1", $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
 {
   global $config, $debug;
 
@@ -296,11 +293,11 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
       mysql_query($query);
       if ($debug) { print $query . "\n"; }
     }
-    $valid[$type][$index] = 1;
+    $this_valid[$type][$index] = 1;
   }
 }
 
-function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity = NULL, $current = NULL)
+function discover_toner(&$this_valid, $device, $oid, $index, $type, $descr, $capacity = NULL, $current = NULL)
 {
   global $config, $debug;
 
@@ -327,10 +324,10 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
       echo("U");
     }
   }
-  $valid[$type][$index] = 1;
+  $this_valid[$type][$index] = 1;
 }
 
-function discover_process_ipv6(&$valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_origin)
+function discover_process_ipv6(&$this_valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_origin)
 {
   global $device,$config;
 
@@ -373,8 +370,8 @@ function discover_process_ipv6(&$valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$
       echo(".");
     }
     $full_address = "$ipv6_address/$ipv6_prefixlen";
-    $valid_address = $full_address  . "-" . $interface_id;
-    $valid['ipv6'][$valid_address] = 1;
+    $this_valid_address = $full_address  . "-" . $interface_id;
+    $this_valid['ipv6'][$this_valid_address] = 1;
   }
 }
 

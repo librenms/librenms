@@ -1,7 +1,5 @@
 <?php
 
-global $valid_processor;
-
 echo("hrDevice ");
 $hrDevice_oids = array('hrDevice','hrProcessorLoad');
 unset($hrDevice_array);
@@ -40,7 +38,7 @@ if (is_array($hrDevice_array))
       }
       if (isset($descr) && $descr != "An electronic chip that makes the computer work.")
       {
-        discover_processor($valid_processor, $device, $usage_oid, $index, "hr", $descr, "1", $usage, NULL, $hrDeviceIndex);
+        discover_processor($valid['processor'], $device, $usage_oid, $index, "hr", $descr, "1", $usage, NULL, $hrDeviceIndex);
       }
       unset($old_rrd,$new_rrd,$descr,$entry,$usage_oid,$index,$usage,$hrDeviceIndex,$descr_array);
     }

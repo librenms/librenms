@@ -11,7 +11,7 @@ if ($device['os'] == "screenos" && mysql_result(mysql_query("SELECT COUNT(*) FRO
 
   if (is_numeric($percent))
   {
-    discover_processor($valid_processor, $device, ".1.3.6.1.4.1.3224.16.1.3.0", "1", "screenos", "Processor", "1", $percent, NULL, NULL);
+    discover_processor($valid['processor'], $device, ".1.3.6.1.4.1.3224.16.1.3.0", "1", "screenos", "Processor", "1", $percent, NULL, NULL);
   }
 }
 

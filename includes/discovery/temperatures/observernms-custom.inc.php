@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os_group'] == "unix")
 {
   # FIXME snmp_walk

@@ -2,8 +2,6 @@
 
  echo("Physical Inventory : ");
 
- unset($valid);
-
  if ($config['enable_inventory']) {
 
 
@@ -85,8 +83,6 @@
       mysql_query("DELETE FROM `entPhysical` WHERE entPhysical_id = '".$test['entPhysical_id']."'");
     }
   }
-
- unset($valid);
 
  echo("\n");
 

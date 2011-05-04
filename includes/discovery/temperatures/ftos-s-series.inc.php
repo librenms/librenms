@@ -1,7 +1,5 @@
 <?php
 
-
-
 ### Force10 S-Series
 
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitTemp.1 = Gauge32: 47
@@ -21,12 +19,9 @@ if ($device['os'] == "ftos" || $device['os_group'] == "ftos")
       $descr = "Unit ".$index . " " . $entry['chStackUnitSysType'];
       $oid = ".1.3.6.1.4.1.6027.3.10.1.2.2.1.14.".$index;
       $current = $entry['chStackUnitTemp'];
-
       discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'ftos-sseries', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
     }
   }
-
-  unset($oids);
 }
 
 ?>

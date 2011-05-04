@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == "powerconnect")
 {
   $oids = snmp_get($device, ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.4.0", "-OsqnU", "");

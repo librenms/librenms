@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == "papouch-tme")
 {
   echo("Papouch TME ");

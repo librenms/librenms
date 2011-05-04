@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## JunOSe Temperatures
 
 if ($device['os'] == "junose")

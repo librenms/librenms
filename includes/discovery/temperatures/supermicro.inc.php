@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == "linux")
 {
   # Supermicro sensors

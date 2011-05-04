@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == "junos" || $device['os_group'] == "junos")
 {
   echo("JunOS ");
