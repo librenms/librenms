@@ -3,12 +3,12 @@
 
 echo($config['version']);
 
-if (file_exists('.svn/entries'))
-{
-  $svn = File('.svn/entries');
-  echo('-SVN r' . trim($svn[3]));
-  unset($svn);
-}
+#if (file_exists('.svn/entries'))
+#{
+#  $svn = File('.svn/entries');
+#  echo('-SVN r' . trim($svn[3]));
+#  unset($svn);
+#}
 
   ?></h3>
   <div style="float: right; padding: 0px; width: 49%">
@@ -81,7 +81,7 @@ echo("
         <td><img src='images/icons/apps.png' class='optionicon'> <b>Applications</b></td><td align=right>$stat_apps</td>
       </tr>
       <tr>
-        <td ><img src='images/icons/processors.png' class='optionicon'> <b>Processors</b></td><td align=right>$stat_processors</td>
+        <td ><img src='images/icons/processor.png' class='optionicon'> <b>Processors</b></td><td align=right>$stat_processors</td>
         <td><img src='images/icons/memory.png' class='optionicon'> <b>Memory</b></td><td align=right>$stat_memory</td>
       </tr>
       <tr>
@@ -110,12 +110,12 @@ print_optionbar_end(); ?>
 <?php
 
 $Observium_version = $config['version'];
-if (file_exists('.svn/entries'))
-{
-  $svn = File('.svn/entries');
-  $Observium_version .='-SVN r' . trim($svn[3]);
-  unset($svn);
-}
+#if (file_exists('.svn/entries'))
+#{
+#  $svn = File('.svn/entries');
+#  $Observium_version .='-SVN r' . trim($svn[3]);
+#  unset($svn);
+#}
 
 $apache_version = str_replace("Apache/", "", $_SERVER['SERVER_SOFTWARE']);
 
