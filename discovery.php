@@ -130,6 +130,11 @@ if (file_exists('.svn'))
       echo("Running pre-revision 1435 SQL update script...\n");
       shell_exec("scripts/update-sql.php database-update-pre1435.sql");
     }
+    if ($db_rev+0 < "2245")
+    {
+      echo("Running pre-revision 2245 (0.11.5) SQL update script...\n");
+      shell_exec("scripts/update-sql.php database-update-pre2245.sql");
+    }
     echo("Running development SQL update script to update from r$db_rev to r" . trim($dbu_rev) . "...\n");
     shell_exec("scripts/update-sql.php database-update.sql");
     if ($db_rev == 0)
