@@ -1,4 +1,4 @@
-<?
+<?php
 
 $sql   = "SELECT * FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id";
 $query = mysql_query($sql);
