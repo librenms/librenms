@@ -274,18 +274,11 @@ foreach (array_keys($menu_sensors) as $item)
 <?php
 
 $routing_count['bgp'] = mysql_result(mysql_query("SELECT COUNT(*) from `bgpPeers`"), 0);
-if ($routing_count['bgp']) { $datas[] = 'bgp'; }
-
 $routing_count['ospf'] = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'"), 0);
-if ($routing_count['ospf']) { $datas[] = 'ospf'; }
-
 $routing_count['cef'] = mysql_result(mysql_query("SELECT COUNT(*) from `cef_switching`"), 0);
-if ($routing_count['cef']) { $datas[] = 'cef'; }
-
 $routing_count['vrf'] = @mysql_result(mysql_query("SELECT COUNT(*) from `vrfs`"), 0);
-if($routing_count['vrf']) { $datas[] = 'vrf'; }
 
-if ($_SESSION['userlevel'] >= '5')
+if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']) > "0")
 {
     echo('
       <li><a class="menu2four" href="routing/"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a>
