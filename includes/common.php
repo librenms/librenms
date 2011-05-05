@@ -100,7 +100,7 @@ function device_by_id_cache($device_id)
 {
   global $device_cache;
 
-  if (is_array($device_cache[$device_id]))
+  if (isset($device_cache[$device_id]) && is_array($device_cache[$device_id]))
   {
     $device = $device_cache[$device_id];
   } else {

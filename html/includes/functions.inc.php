@@ -26,7 +26,7 @@ function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0
   {
     $graphs = $config['os'][$device['os']]['over'];
   }
-  elseif (isset($config['os'][$device['os_group']]['over']))
+  elseif (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over']))
   {
     $graphs = $config['os'][$device['os_group']]['over'];
   }
@@ -244,7 +244,7 @@ function generate_port_link($args, $text = NULL, $type = NULL)
   $args = ifNameDescr($args);
   if (!$text) { $text = fixIfName($args['label']); }
   if ($type) { $args['graph_type'] = $type; }
-  if (!$args['graph_type']) { $args['graph_type'] = 'port_bits'; }
+  if (!isset($args['graph_type'])) { $args['graph_type'] = 'port_bits'; }
 
   $class = ifclass($args['ifOperStatus'], $args['ifAdminStatus']);
   if (!isset($args['hostname'])) { $args = array_merge($args, device_by_id_cache($args['device_id'])); }
