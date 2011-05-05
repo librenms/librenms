@@ -884,7 +884,7 @@ CREATE TABLE IF NOT EXISTS `processors` (
   `processor_descr` varchar(64) CHARACTER SET latin1 NOT NULL,
   `processor_precision` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`processor_id`),
-  KEY `device_id` (`device_id`),
+  KEY `device_id` (`device_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -980,7 +980,7 @@ CREATE TABLE IF NOT EXISTS `storage` (
   `storage_perc` text NOT NULL,
   `storage_perc_warn` int(11) DEFAULT '60',
   PRIMARY KEY (`storage_id`),
-  KEY `device_id` (`device_id`),
+  KEY `device_id` (`device_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -1038,7 +1038,7 @@ CREATE TABLE IF NOT EXISTS `ucd_diskio` (
   `diskio_index` int(11) NOT NULL,
   `diskio_descr` varchar(32) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`diskio_id`),
-  KEY `device_id` (`device_id`),
+  KEY `device_id` (`device_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
