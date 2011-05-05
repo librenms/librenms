@@ -32,7 +32,7 @@ echo("</div>");
 echo("<div style='width: 300px; float: right;'>");
 echo("<div style='background-color: #e5e5e5; border: solid #e5e5e5 10px; margin-bottom:10px;'>");
 
-if (passwordscanchange())
+if (passwordscanchange($_SESSION['username']))
 {
   echo("<div style='font-size: 18px; font-weight: bold; margin-bottom: 5px;'>Change Password</div>");
   echo($changepass_message);
