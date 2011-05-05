@@ -108,6 +108,8 @@ function poll_device($device, $options) {
 
   global $config;
 
+  $attribs = get_dev_attribs($device['device_id']);
+
   $status = 0; unset($array);
   $device_start = utime();  // Start counting device poll time
 
@@ -164,9 +166,13 @@ function poll_device($device, $options) {
     } else {
       foreach($config['poller_modules'] as $module => $module_status)
       {
-        if($module_status || $device_attribs['poller_module'][$module])
+        if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module])))
         {
           include('includes/polling/'.$module.'.inc.php');
+        } elseif (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == "0") {
+          echo("Module [ $module ] disabled on host.\n");
+        } else {
+          echo("Module [ $module ] disabled globally.\n");
         }
       }
     }

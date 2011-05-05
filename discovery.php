@@ -162,6 +162,8 @@ function discover_device($device, $options)
   global $config;
   global $valid; $valid = array(); ## Reset $valid array
 
+  $attribs = get_dev_attribs($device['device_id']);
+
   $device_start = utime();  // Start counting device poll time
 
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
@@ -192,9 +194,13 @@ function discover_device($device, $options)
   } else {
     foreach($config['discovery_modules'] as $module => $module_status)
     {
-      if($module_status || $device_attribs['discovery_module'][$module])
+      if ($attribs['discover_'.$module] || ( $module_status && !isset($attribs['discover_'.$module])))
       {
         include('includes/discovery/'.$module.'.inc.php');
+      } elseif (isset($attribs['discover_'.$module]) && $attribs['discover_'.$module] == "0") {
+        echo("Module [ $module ] disabled on host.\n");
+      } else {
+        echo("Module [ $module ] disabled globally.\n");
       }
     }
   }
