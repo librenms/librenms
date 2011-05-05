@@ -160,6 +160,7 @@ function discover_device($device, $options)
 {
 
   global $config;
+  global $device;
   global $valid; $valid = array(); ## Reset $valid array
 
   $attribs = get_dev_attribs($device['device_id']);
@@ -181,10 +182,7 @@ function discover_device($device, $options)
 
   echo("\n");
 
-  #include("includes/discovery/os.inc.php");
-
   ### If we've specified a module, use that, else walk the modules array
-
   if ($options['m'])
   {
     if (is_file("includes/discovery/".$options['m'].".inc.php"))

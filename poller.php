@@ -107,6 +107,7 @@ while ($device = mysql_fetch_assoc($device_query))
 function poll_device($device, $options) {
 
   global $config;
+  global $device;
 
   $attribs = get_dev_attribs($device['device_id']);
 
