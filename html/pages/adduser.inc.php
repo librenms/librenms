@@ -18,8 +18,15 @@ else
       {
         if (!user_exists($_POST['new_username']))
         {
+          
+          if (isset($_POST['can_modify_passwd'])) {
+            $_POST['can_modify_passwd'] = 1;
+          } else {
+            $_POST['can_modify_passwd'] = 0;
+          }
+          
           # FIXME: missing email field here on the form
-          if (adduser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], '', $_POST['realname']))
+          if (adduser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], '', $_POST['realname'], $_POST['can_modify_passwd']))
           {
             echo("<span class=info>User " . $_POST['username'] . " added!</span>");
           }
@@ -45,14 +52,12 @@ else
       echo("<span class=red>Please enter a password!</span><br />");
     }
     echo("Realname <input style='margin: 1px;' name='new_realname'></input><br />");
-  ?>
-  <?php
     echo("Level <select style='margin: 5px;' name='new_level'>
           <option value='1'>Normal User</option>
           <option value='5'>Global Read</option>
           <option value='10'>Administrator</option>
-        </select><br /><br />");
-
+        </select><br />");
+    echo("<input type='checkbox' checked='checked' style='margin: 1px;' name='can_modify_passwd'></input> Allow the user to change his password.<br /><br />");
     echo(" <input type='submit' Value='Add' >");
     echo("</form>");
   }

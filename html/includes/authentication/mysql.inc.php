@@ -27,9 +27,20 @@ function authenticate($username,$password)
   return 0;
 }
 
-function passwordscanchange()
+function passwordscanchange($username="")
 {
-  return 1;
+  
+  
+  /*
+   * By default allow the password to be modified, unless the existing
+   * user is explicitly prohibited to do so.
+   */
+  
+  if (empty($username) || !user_exists($username)) {
+    return 1;
+  } else {
+    return @mysql_result(mysql_query("SELECT can_modify_passwd FROM users WHERE username = '".mres($username)."'"),0);
+  }
 }
 
 /**
@@ -65,12 +76,12 @@ function auth_usermanagement()
   return 1;
 }
 
-function adduser($username, $password, $level, $email = "", $realname = "")
+function adduser($username, $password, $level, $email = "", $realname = "", $can_modify_passwd='1')
 {
   if (!user_exists($username))
   {
     $encrypted = crypt($password,'$1$' . generateSalt(8).'$');
-    mysql_query("INSERT INTO `users` (`username`,`password`,`level`, `email`, `realname`) VALUES ('".mres($username)."','".mres($encrypted)."','".mres($level)."','".mres($email)."','".mres($realname)."')");
+    mysql_query("INSERT INTO `users` (`username`,`password`,`level`, `email`, `realname`, `can_modify_passwd`) VALUES ('".mres($username)."','".mres($encrypted)."','".mres($level)."','".mres($email)."','".mres($realname)."','".mres($can_modify_passwd)."')");
   }
 
   return mysql_affected_rows();
