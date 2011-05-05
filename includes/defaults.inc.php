@@ -167,23 +167,59 @@ $config['nfsen_enable'] = 0;
 
 ### Ignores & Allows
 
-$config['bad_if'] = array("voip-null", "virtual-", "unrouted", "eobc", "mpls", "lp0", "faith0",
-             "-atm layer", "-atm subif", "-shdsl", "-aal5", "-atm", "container",
-             "async", "plip", "-physical", "-signalling", "container", "unrouted",
-             "bri", "-bearer", "bluetooth", "isatap", "ras", "qos", "miniport", "sonet/sdh",
-             "span rp", "span sp", "sslvpn", "pppoe-");
+$config['bad_if'][] = "voip-null";
+$config['bad_if'][] = "virtual-";
+$config['bad_if'][] = "unrouted";
+$config['bad_if'][] = "eobc";
+$config['bad_if'][] = "mpls";
+$config['bad_if'][] = "lp0";
+$config['bad_if'][] = "faith0";
+$config['bad_if'][] = "-atm layer";
+$config['bad_if'][] = "-atm subif";
+$config['bad_if'][] = "-shdsl";
+$config['bad_if'][] = "-aal5";
+$config['bad_if'][] = "-atm";
+$config['bad_if'][] = "container";
+$config['bad_if'][] = "async"; 
+$config['bad_if'][] = "plip"; 
+$config['bad_if'][] = "-physical"; 
+$config['bad_if'][] = "-signalling"; 
+$config['bad_if'][] = "container"; 
+$config['bad_if'][] = "unrouted"; 
+$config['bad_if'][] = "bri"; 
+$config['bad_if'][] = "-bearer"; 
+$config['bad_if'][] = "bluetooth"; 
+$config['bad_if'][] = "isatap"; 
+$config['bad_if'][] = "ras"; 
+$config['bad_if'][] = "qos"; 
+$config['bad_if'][] = "miniport"; 
+$config['bad_if'][] = "sonet/sdh"; 
+$config['bad_if'][] = "span rp"; 
+$config['bad_if'][] = "span sp"; 
+$config['bad_if'][] = "sslvpn"; 
+$config['bad_if'][] = "pppoe-";
 
-$config['bad_if_regexp'] = array("/serial[0-9]:/", "/^ng[0-9]+$/", "/^sl[0-9]/");
+$config['bad_if_regexp'][] = "/serial[0-9]:/";
+$config['bad_if_regexp'][] = "/^ng[0-9]+$/";
+$config['bad_if_regexp'][] = "/^sl[0-9]/";
 
 $config['processor_filter'][] = "An electronic chip that makes the computer work.";
 
-$config['ignore_mount_removable'] = 1; # Ignore removable disk storage
-$config['ignore_mount_network']   = 1; # Ignore network mounted storage
-$config['ignore_mount_optical']   = 1; # Ignore mounted optical discs
+$config['ignore_mount_removable']  = 1; # Ignore removable disk storage
+$config['ignore_mount_network']    = 1; # Ignore network mounted storage
+$config['ignore_mount_optical']    = 1; # Ignore mounted optical discs
 
-$config['device_traffic_iftype']  = array('/loopback/','/tunnel/','/virtual/','/mpls/','/ieee8023adLag/');
-$config['device_traffic_descr']   = array('/loopback/','/vlan/','/tunnel/','/:\d+/','/bond/');
+$config['device_traffic_iftype'][] = '/loopback/';
+$config['device_traffic_iftype'][] = '/tunnel/';
+$config['device_traffic_iftype'][] = '/virtual/';
+$config['device_traffic_iftype'][] = '/mpls/';
+$config['device_traffic_iftype'][] = '/ieee8023adLag/';
 
+$config['device_traffic_descr'][]  = '/loopback/';
+$config['device_traffic_descr'][]  = '/vlan/';
+$config['device_traffic_descr'][]  = '/tunnel/';
+$config['device_traffic_descr'][]  = '/:\d+/';
+$config['device_traffic_descr'][]  = '/bond/';
 ### IRC Bot configuration
 
 $config['irc_host'] = "chat.eu.freenode.net";
@@ -193,9 +229,9 @@ $config['irc_chan'][] = "#observium";
 
 ### Authentication
 
-$config['allow_unauth_graphs']	  = 0; ## Allow graphs to be viewed by anyone
+$config['allow_unauth_graphs']	    = 0; ## Allow graphs to be viewed by anyone
 $config['allow_unauth_graphs_cidr'] = array(); # Allow graphs to be viewed without authorisation from certain IP ranges
-$config['auth_mechanism']         = "mysql";   # Available mechanisms: mysql (default), ldap, http-auth
+$config['auth_mechanism']           = "mysql";   # Available mechanisms: mysql (default), ldap, http-auth
 
 ### Sensors
 
@@ -210,14 +246,27 @@ $config['allow_entity_sensor']['specialEnum'] = 1;
 
 ### Filesystems
 
-$config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/proc", "/dev");
+$config['ignore_mount'][] = "/kern";
+$config['ignore_mount'][] = "/mnt/cdrom";
+$config['ignore_mount'][] = "/proc";
+$config['ignore_mount'][] = "/dev";
 
-$config['ignore_mount_string'] = array("packages", "devfs", "procfs", "UMA", "MALLOC");
+$config['ignore_mount_string'][] = "packages";
+$config['ignore_mount_string'][] = "devfs";
+$config['ignore_mount_string'][] = "procfs";
+$config['ignore_mount_string'][] = "UMA";
+$config['ignore_mount_string'][] = "MALLOC";
 
-$config['ignore_mount_regexp'] = array("/on: \/packages/", "/on: \/dev/", "/on: \/proc/", "/on: \/junos^/",           ## JunOS Drives
-                                       "/on: \/junos\/dev/", "/on: \/jail\/dev/", "/^(dev|proc)fs/", "/^\/dev\/md0/", ## JunOS Drives
-                                       "/^\/var\/dhcpd\/dev,/", "/UMA/"                                  	      ## BSD Drives
-                                       );
+$config['ignore_mount_regexp'] = "/on: \/packages/";
+$config['ignore_mount_regexp'] = "/on: \/dev/";
+$config['ignore_mount_regexp'] = "/on: \/proc/";
+$config['ignore_mount_regexp'] = "/on: \/junos^/";
+$config['ignore_mount_regexp'] = "/on: \/junos\/dev/";
+$config['ignore_mount_regexp'] = "/on: \/jail\/dev/";
+$config['ignore_mount_regexp'] = "/^(dev|proc)fs/";
+$config['ignore_mount_regexp'] = "/^\/dev\/md0/";
+$config['ignore_mount_regexp'] = "/^\/var\/dhcpd\/dev,/";
+$config['ignore_mount_regexp'] = "/UMA/";
 
 $config['ignore_mount_removable'] = 1; # Ignore removable disk storage
 $config['ignore_mount_network']   = 1; # Ignore network mounted storage
@@ -225,9 +274,10 @@ $config['ignore_mount_network']   = 1; # Ignore network mounted storage
 ### Syslog Settings
 
 $config['syslog_age']       = "1 month";        ## Entries older than this will be removed
-$config['syslog_filter'] = array("last message repeated", "Connection from UDP: [",
-                                 "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented",
-                                 "diskio.c: don't know how to handle");  ## Ignore some crappy stuff from SNMP daemon
+$config['syslog_filter'][] = "last message repeated";
+$config['syslog_filter'][] = "Connection from UDP: [";
+$config['syslog_filter'][] = "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented";
+$config['syslog_filter'][] = "diskio.c: don't know how to handle";  ## Ignore some crappy stuff from SNMP daemon
 
 ### Virtualization
 
