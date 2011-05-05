@@ -15,7 +15,7 @@ if(mysql_result(mysql_query("SELECT * FROM links AS L, ports AS I WHERE I.device
 {
   $menu_options['neighbours'] = 'Neighbours';  
 }
-if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `ifType` = 'adsl'"),0))
+if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl'"),0))
 {
   $menu_options['adsl'] = 'ADSL';
 }
