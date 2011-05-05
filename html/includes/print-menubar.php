@@ -336,8 +336,8 @@ if ($_SESSION['userlevel'] >= '5')
 <!--[if IE 7]><!--></a><!--<![endif]-->
         <table><tr><td>
         <ul>
-          <li><a href="search/ipv4/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
-          <li><a href="search/ipv6/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> IPv6 Search</a></li>
+          <li><a href="search/ipv4/"><img src="images/icons/ipv4.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
+          <li><a href="search/ipv6/"><img src="images/icons/ipv6.png" border="0" align="absmiddle" /> IPv6 Search</a></li>
           <li><a href="search/mac/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> MAC Search</a></li>
         </ul>
       </td></tr></table>

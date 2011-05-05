@@ -124,6 +124,12 @@ $config['show_overview_tab'] = true;
 
 $config['overview_show_sysDescr'] = true;
 
+### Enable version checker & stats
+
+$config['version_check']                = 1; # Enable checking of version in discovery
+                                             # and submittal of basic stats used
+                                             # to prioritise development effort :)
+
 ### Poller/Discovery Modules
 
 $config['enable_bgp']           	= 1; # Enable BGP session collection and display

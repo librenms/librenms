@@ -884,7 +884,18 @@ if (isset($config['enable_printers']) && $config['enable_printers'])
 # No changes below this line #
 ##############################
 
-$config['version'] = "0.11";
+$config['version']  = "0.11.5.2245";
+
+if (file_exists('.svn/entries'))
+{
+  $svn = File('.svn/entries');
+  $svn_rev = trim($svn[3]);
+  list($svn_date) = explode("T", trim($svn[9]));
+  list($svn_year, $svn_month, $svn_day) = explode("-", $svn_date);
+  $config['version'] = "0." . ($svn_year-2000) . "." . ($svn_month+0) . "." . $svn_rev;
+} else {
+  $config['version'] = $config['version'] . "." . $config['release'];
+}
 
 if (isset($config['rrdgraph_def_text']))
 {
