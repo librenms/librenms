@@ -2,12 +2,14 @@ For more granular updates check:
 
 http://www.observium.org/websvn/listing.php?repname=observer
 
+SVN
+
 0.10.5.2248 ( 5th May 2011 )
 
 * Improve poller/discovery
 * Improve option bar option highlighting
 * Add support for OSPF discovery
-* Add support for CEF switching statistics
+* Add support for CEF switching statistics from CISCO-CEF-MIB
 * Add support for UDP6 transport (and others) for SNMP.
 * Improved Microsoft Windows detection.
 * Juniper ScreenOS CPU/Memory.
