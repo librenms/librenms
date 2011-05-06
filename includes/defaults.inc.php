@@ -263,16 +263,16 @@ $config['ignore_mount_string'][] = "procfs";
 $config['ignore_mount_string'][] = "UMA";
 $config['ignore_mount_string'][] = "MALLOC";
 
-$config['ignore_mount_regexp'] = "/on: \/packages/";
-$config['ignore_mount_regexp'] = "/on: \/dev/";
-$config['ignore_mount_regexp'] = "/on: \/proc/";
-$config['ignore_mount_regexp'] = "/on: \/junos^/";
-$config['ignore_mount_regexp'] = "/on: \/junos\/dev/";
-$config['ignore_mount_regexp'] = "/on: \/jail\/dev/";
-$config['ignore_mount_regexp'] = "/^(dev|proc)fs/";
-$config['ignore_mount_regexp'] = "/^\/dev\/md0/";
-$config['ignore_mount_regexp'] = "/^\/var\/dhcpd\/dev,/";
-$config['ignore_mount_regexp'] = "/UMA/";
+$config['ignore_mount_regexp'][] = "/on: \/packages/";
+$config['ignore_mount_regexp'][] = "/on: \/dev/";
+$config['ignore_mount_regexp'][] = "/on: \/proc/";
+$config['ignore_mount_regexp'][] = "/on: \/junos^/";
+$config['ignore_mount_regexp'][] = "/on: \/junos\/dev/";
+$config['ignore_mount_regexp'][] = "/on: \/jail\/dev/";
+$config['ignore_mount_regexp'][] = "/^(dev|proc)fs/";
+$config['ignore_mount_regexp'][] = "/^\/dev\/md0/";
+$config['ignore_mount_regexp'][] = "/^\/var\/dhcpd\/dev,/";
+$config['ignore_mount_regexp'][] = "/UMA/";
 
 $config['ignore_mount_removable'] = 1; # Ignore removable disk storage
 $config['ignore_mount_network']   = 1; # Ignore network mounted storage
