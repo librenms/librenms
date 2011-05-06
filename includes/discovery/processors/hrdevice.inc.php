@@ -36,6 +36,9 @@ if (is_array($hrDevice_array))
         rename($old_rrd,$new_rrd);
         echo("Moved RRD ");
       }
+
+      if($device['os'] = "arista-eos" && $index == "1") { unset($descr); }
+
       if (isset($descr) && $descr != "An electronic chip that makes the computer work.")
       {
         discover_processor($valid['processor'], $device, $usage_oid, $index, "hr", $descr, "1", $usage, NULL, $hrDeviceIndex);
