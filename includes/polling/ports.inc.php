@@ -73,6 +73,22 @@ if ($device['adsl_count'] > "0")
   $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.7", $port_stats, "ADSL-LINE-MIB");
 }
 
+## Alcatel Detailed Statistics ## FIXME make this disableable
+if($device['os'] == "aos") {
+  $stat_oids = array('alcetherStatsCRCAlignErrors', 'alcetherStatsRxUndersizePkts','alcetherStatsTxUndersizePkts', 'alcetherStatsTxOversizePkts','alcetherStatsRxJabbers', 'alcetherStatsRxCollisions', 'alcetherStatsTxCollisions',
+                   'alcetherStatsPkts64Octets','alcetherStatsPkts65to127Octets', 'alcetherStatsPkts128to255Octets','alcetherStatsPkts256to511Octets','alcetherStatsPkts512to1023Octets','alcetherStatsPkts1024to1518Octets',
+                   'gigaEtherStatsPkts1519to4095Octets','gigaEtherStatsPkts4096to9215Octets','alcetherStatsPkts1519to2047Octets','alcetherStatsPkts2048to4095Octets','alcetherStatsPkts4096Octets','alcetherStatsRxGiantPkts',
+                   'alcetherStatsRxDribbleNibblePkts','alcetherStatsRxLongEventPkts','alcetherStatsRxVlanTagPkts','alcetherStatsRxControlPkts','alcetherStatsRxLenChkErrPkts','alcetherStatsRxCodeErrPkts','alcetherStatsRxDvEventPkts',
+                   'alcetherStatsRxPrevPktDropped','alcetherStatsTx64Octets','alcetherStatsTx65to127Octets','alcetherStatsTx128to255Octets','alcetherStatsTx256to511Octets','alcetherStatsTx512to1023Octets',
+                   'alcetherStatsTx1024to1518Octets','alcetherStatsTx1519to2047Octets','alcetherStatsTx2048to4095Octets','alcetherStatsTx4096Octets','alcetherStatsTxRetryCount','alcetherStatsTxVlanTagPkts',
+                   'alcetherStatsTxControlPkts','alcetherStatsTxLatePkts','alcetherStatsTxTotalBytesOnWire','alcetherStatsTxLenChkErrPkts','alcetherStatsTxExcDeferPkts');
+
+  foreach($stat_oids as $oid)
+  {
+    $port_stats = snmpwalk_cache_oid($device, "alcetherStatsEntry", $port_stats, "ALCATEL-IND1-PORT-MIB");
+  }
+}
+
 echo("\n");
 
 /// FIXME This probably needs re-enabled. We need to clear these things when they get unset, too.
@@ -287,6 +303,10 @@ while ($port = mysql_fetch_assoc($port_query))
 
     /// Do PoE MIBs
     if ($config['enable_ports_poe']) { include("port-poe.inc.php"); }
+
+    /// Do Alcatel Detailed Stats
+    if($device['os'] == "aos") { include("port-alcatel.inc.php"); }
+
 
     // Update MySQL
     if ($update)
