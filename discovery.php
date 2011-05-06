@@ -22,9 +22,12 @@ $runtime_stats = array();
 
 ### Observium Device Discovery
 
-echo("Observium v".$config['version']." Discovery\n\n");
+$options = getopt("h:m:i:n:d::a::q");
 
-$options = getopt("h:m:i:n:d::a::");
+if (!isset($options['q']))
+{
+  echo("Observium v".$config['version']." Discovery\n\n");
+}
 
 if (isset($options['h']))
 {
@@ -240,7 +243,7 @@ if ($discovered_devices)
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $discovered_devices devices discovered in $proctime secs";
 if ($debug) echo("$string\n");
 
-if($config['version_check']) {
+if($config['version_check'] && !isset($options['q'])) {
   include("includes/versioncheck.inc.php");
 }
 
