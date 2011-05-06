@@ -49,6 +49,7 @@ function dhtml_response_list(&$items, $method) {
 print_optionbar_start();
 
     $plugins = collectd_list_plugins($device['hostname']);
+    unset($sep);
     foreach ($plugins as &$plugin) {
        if (!$_GET['opta']) { $_GET['opta'] = $plugin; }
        echo($sep);
