@@ -26,6 +26,7 @@ echo("<div style='width: 50%; float: left;'>");
 #}
 
 include("overview/ports.inc.php");
+include("overview/current.inc.php");
 
 if ($services['total'])
 {
