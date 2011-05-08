@@ -33,6 +33,7 @@ $mem_rrd   = $host_rrd . "/ucd_mem.rrd";
 #UCD-SNMP-MIB::ssRawSwapOut.0 = Counter32: 937422
 
 $ss = snmpwalk_cache_oid($device, "systemStats", array());
+$ss = $ss[0]; ### Insert Nazi joke here.
 
 ## Create CPU RRD if it doesn't already exist
 $cpu_rrd_create = " --step 300 \
@@ -60,6 +61,7 @@ if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_num
     rrdtool_create($cpu_rrd, $cpu_rrd_create);
   }
   rrdtool_update($cpu_rrd,  "N:".$ss['ssCpuRawUser'].":".$ss['ssCpuRawSystem'].":".$ss['ssCpuRawNice'].":".$ss['ssCpuRawIdle']);
+  $graphs['ucd_cpu'] = TRUE;
 }
 
 ### This is how we'll collect in the future, start now so people don't have zero data.
@@ -87,7 +89,6 @@ if (is_numeric($ss['ssRawSwapIn'])) { $graphs['ucd_swap_io'] = TRUE; }
 if (is_numeric($ss['ssIORawSent'])) { $graphs['ucd_io'] = TRUE; }
 if (is_numeric($ss['ssRawContexts'])) { $graphs['ucd_contexts'] = TRUE; }
 if (is_numeric($ss['ssRawInterrupts'])) { $graphs['ucd_interrupts'] = TRUE; }
-
 
 ############################################################################################################################################
 

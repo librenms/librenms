@@ -16,6 +16,7 @@ $query = mysql_query("SELECT * FROM device_graphs WHERE device_id = '".$device['
 
 while ($graph = mysql_fetch_assoc($query))
 {
+  echo($graph['graph']."</br>");
   $section = $config['graph_types']['device'][$graph['graph']]['section'];
   $graph_enable[$section][$graph['graph']] = $graph['graph'];
 }
