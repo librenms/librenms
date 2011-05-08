@@ -178,6 +178,35 @@ function poll_device($device, $options) {
       }
     }
 
+if (!$options['m'])
+{
+
+  ## FIXME EVENTLOGGING -- MAKE IT SO WE DO THIS PER-MODULE?
+  ### This code cycles through the graphs already known in the database and the ones we've defined as being polled here
+  ### If there any don't match, they're added/deleted from the database.
+  ### Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
+
+  $query = mysql_query("SELECT `graph` FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."'");
+  while ($graph = mysql_fetch_assoc($query))
+  {
+    if (!isset($graphs[$graph["graph"]]))
+    {
+      mysql_query("DELETE FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."' AND `graph` = '".$graph["graph"]."'");
+    } else {
+      $oldgraphs[$graph["graph"]] = TRUE;
+    }
+  }
+
+  foreach ($graphs as $graph => $value)
+  {
+    if (!isset($oldgraphs[$graph]))
+    {
+      mysql_query("INSERT INTO `device_graphs` (`device_id`, `graph`) VALUES ('".$device['device_id']."','".$graph."')");
+    }
+  }
+
+}
+
     $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
     $device['db_update'] = " `last_polled` = NOW() " . $device['db_update'];
     $device['db_update'] .= ", `last_polled_timetaken` = '$device_time'";
