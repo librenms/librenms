@@ -960,11 +960,11 @@ $config['sixmonth']   = time() - (6 * 31 * 24 * 60 * 60);
 $config['year']       = time() - (365 * 24 * 60 * 60);
 
 # IPMI sensor type mappings
-$ipmi_unit['Volts']     = 'voltage';
-$ipmi_unit['degrees C'] = 'temperature';
-$ipmi_unit['RPM']       = 'fanspeed';
-$ipmi_unit['Watts']     = 'power';
-$ipmi_unit['discrete']  = '';
+$config['ipmi_unit']['Volts']     = 'voltage';
+$config['ipmi_unit']['degrees C'] = 'temperature';
+$config['ipmi_unit']['RPM']       = 'fanspeed';
+$config['ipmi_unit']['Watts']     = 'power';
+$config['ipmi_unit']['discrete']  = '';
 
 ## INCLUDE THE VMWARE DEFINITION FILE.
 require_once("vmware_guestid.inc.php");

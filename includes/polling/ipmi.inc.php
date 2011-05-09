@@ -15,8 +15,8 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
   foreach (explode("\n",$results) as $row)
   {
     list($desc,$value,$type,$status) = explode(',',$row);
-    $ipmi_sensor[$desc][$ipmi_unit[$type]]['value'] = $value;
-    $ipmi_sensor[$desc][$ipmi_unit[$type]]['unit'] = $type;
+    $ipmi_sensor[$desc][$config['ipmi_unit'][$type]]['value'] = $value;
+    $ipmi_sensor[$desc][$config['ipmi_unit'][$type]]['unit'] = $type;
   }
 
   while ($ipmisensors = mysql_fetch_assoc($ipmi_data))
