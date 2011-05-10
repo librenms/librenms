@@ -27,8 +27,8 @@ print_optionbar_start(62);
         <select name='os' id='os'>
           <option value=''>All OSes</option>
           <?php
-$query = mysql_query("SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`");
-while ($data = mysql_fetch_assoc($query))
+
+foreach($db->query('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`') as $data)
 {
   if ($data['os'])
   {
@@ -43,8 +43,8 @@ while ($data = mysql_fetch_assoc($query))
         <select name='version' id='version'>
           <option value=''>All Versions</option>
           <?php
-$query = mysql_query("SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`");
-while ($data = mysql_fetch_assoc($query))
+
+foreach($db->query('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`') as $data)
 {
   if ($data['version'])
   {
@@ -60,8 +60,7 @@ while ($data = mysql_fetch_assoc($query))
         <select name="hardware" id="hardware">
           <option value="">All Platforms</option>
           <?php
-$query = mysql_query("SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`");
-while ($data = mysql_fetch_assoc($query))
+foreach($db->query('SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`') as $data)
 {
   if ($data['hardware'])
   {
@@ -76,8 +75,8 @@ while ($data = mysql_fetch_assoc($query))
         <select name="features" id="features">
           <option value="">All Featuresets</option>
           <?php
-$query = mysql_query("SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`");
-while ($data = mysql_fetch_assoc($query))
+
+foreach($db->query('SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`') as $data)
 {
   if ($data['features'])
   {
@@ -93,7 +92,8 @@ while ($data = mysql_fetch_assoc($query))
         <select name="location" id="location">
           <option value="">All Locations</option>
           <?php
-foreach (getlocations() as $location)
+
+foreach (getlocations() as $location) ## FIXME function name sucks maybe get_locations ?
 {
   if ($location)
   {
@@ -123,8 +123,7 @@ if ($_GET['status'] == "alerted")
 echo('<table cellpadding="7" cellspacing="0" class="devicetable sortable" width="100%">
 <tr class="tablehead"><th></th><th>Device</th><th></th><th>Operating System</th><th>Platform</th><th>Uptime/Location</th></tr>');
 
-$device_query = mysql_query($sql);
-while ($device = mysql_fetch_assoc($device_query))
+foreach($db->query($sql) as $device)
 {
   if (device_permitted($device['device_id']))
   {
