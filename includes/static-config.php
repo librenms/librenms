@@ -943,7 +943,6 @@ try {
     $db = new PDO('mysql:host='.$config['db_host'].';dbname='.$config['db_name'], $config['db_user'], $config['db_pass']);
 } catch (PDOException $e) {
     print "Error!: " . $e->getMessage() . "<br/>";
-    die();
 }
 
 # Set some times needed by loads of scripts (it's dynamic, so we do it here!)
