@@ -55,14 +55,6 @@ function shorthost($hostname, $len=16)
   return ($shorthost);
 }
 
-function device_array($device_id)
-{
-  $sql = "SELECT * FROM `devices` WHERE `device_id` = '".$device_id."'";
-  $query = mysql_query($sql);
-  $device = mysql_fetch_assoc($query);
-  return $device;
-}
-
 function getHostOS($device)
 {
   global $config, $debug;
