@@ -116,18 +116,15 @@ function print_graph_popup($graph_array)
 function permissions_cache($user_id)
 {
   $permissions = array();
-  $query = mysql_query("SELECT * FROM devices_perms WHERE user_id = '".$user_id."'");
-  while ($device = mysql_fetch_assoc($query))
+  foreach (dbFetchRows("SELECT * FROM devices_perms WHERE user_id = '".$user_id."'") as $device)
   {
     $permissions['device'][$device['device_id']] = 1;
   }
-  $query = mysql_query("SELECT * FROM ports_perms WHERE user_id = '".$user_id."'");
-  while ($port = mysql_fetch_assoc($query))
+  foreach (dbFetchRows("SELECT * FROM ports_perms WHERE user_id = '".$user_id."'") as $port)
   {
     $permissions['port'][$port['interface_id']] = 1;
   }
-  $query = mysql_query("SELECT * FROM bill_perms WHERE user_id = '".$user_id."'");
-  while ($bill = mysql_fetch_assoc($query))
+  foreach (dbFetchRows("SELECT * FROM bill_perms WHERE user_id = '".$user_id."'") as $bill)
   {
     $permissions['bill'][$bill['bill_id']] = 1;
   }
@@ -366,8 +363,8 @@ function devclass($device)
 function getlocations()
 {
   # Fetch override locations, not through get_dev_attrib, this would be a huge number of queries
-  $result = mysql_query("SELECT attrib_type,attrib_value,device_id FROM devices_attribs WHERE attrib_type LIKE 'override_sysLocation%' ORDER BY attrib_type");
-  while ($row = mysql_fetch_assoc($result))
+  $rows = dbFetchRows("SELECT attrib_type,attrib_value,device_id FROM devices_attribs WHERE attrib_type LIKE 'override_sysLocation%' ORDER BY attrib_type");
+  foreach ($rows as $row)
   {
     if ($row['attrib_type'] == 'override_sysLocation_bool' && $row['attrib_value'] == 1)
     {
@@ -383,12 +380,12 @@ function getlocations()
   # Fetch regular locations
   if ($_SESSION['userlevel'] >= '5')
   {
-    $result = mysql_query("SELECT D.device_id,location FROM devices AS D GROUP BY location ORDER BY location");
+    $rows = dbFetchRows("SELECT D.device_id,location FROM devices AS D GROUP BY location ORDER BY location");
   } else {
-    $result = mysql_query("SELECT D.device_id,location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' GROUP BY location ORDER BY location");
+    $rows = dbFetchRows("SELECT D.device_id,location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location", array($_SESSION['user_id']));
   }
 
-  while ($row = mysql_fetch_assoc($result))
+  foreach ($rows as $row)
   {
     # Only add it as a location if it wasn't overridden (and not already there)
     if ($row['location'] != '' && !$ignore_dev_location[$row['device_id']])
