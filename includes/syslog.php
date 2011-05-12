@@ -25,8 +25,7 @@ function process_syslog ($entry, $update)
   }
   else
   {
-    $device_id_ip = @dbFetchCell("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE
-    A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id");
+    $device_id_ip = @dbFetchCell("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id");
     if ($device_id_ip)
     {
       $entry['device_id'] = $device_id_ip;
@@ -87,10 +86,12 @@ function process_syslog ($entry, $update)
 #      }
     }
     $entry['program'] = strtoupper($entry['program']);
-    $x  = "UPDATE `syslog` set `device_id` = '".$entry['device_id']."', `program` = '".$entry['program']."', `msg` = '" . mres($entry['msg']) . "', processed = '1' WHERE `seq` = '" . $entry['seq'] . "'";
-    $x  = "INSERT INTO `syslog` (`device_id`,`program`,`facility`,`priority`, `level`, `tag`, `msg`, `timestamp`) ";
-    $x .= "VALUES ('".$entry['device_id']."','".$entry['program']."','".$entry['facility']."','".$entry['priority']."', '".$entry['level']."', '".$entry['tag']."', '".$entry['msg']."','".$entry['timestamp']."')";
-    if ($update && $entry['device_id']) { mysql_query($x); }
+    #$x  = "UPDATE `syslog` set `device_id` = '".$entry['device_id']."', `program` = '".$entry['program']."', `msg` = '" . mres($entry['msg']) . "', processed = '1' WHERE `seq` = '" . $entry['seq'] . "'";
+
+    $insert_array = array('device_id' => $entry['device_id'], 'program' => $entry['program'], 'facility' => $entry['facility'], 'priority' => $entry['priority'],
+                          'level' => $entry['level'], 'tag' => $entry['tag'], 'msg' => $entry['msg'], 'timestamp' => $entry['timestamp']);
+
+    if ($update && $entry['device_id']) { $dbInsert($insert_array, 'syslog'); }
     unset ($fix);
   } else { print_r($entry); echo("D-$delete"); }
 

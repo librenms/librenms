@@ -109,9 +109,10 @@ function interface_errors($rrd_file, $period = '-1d') // Returns the last in/out
 
 function getImage($host)
 {
+  ## FIXME why not pass $device? (my shitty ancient code here!)
+
   global $config;
-  $sql = "SELECT * FROM `devices` WHERE `device_id` = '$host'";
-  $data = mysql_fetch_assoc(mysql_query($sql));
+  $data = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($host));
   $type = strtolower($data['os']);
   if ($config['os'][$type]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$type]['icon']  . ".png"))
   {
@@ -138,9 +139,9 @@ function renamehost($id, $new, $source = 'console')
 {
   global $config;
 
-  $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = '$id'");
+  $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
   rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new");
-  mysql_query("UPDATE devices SET hostname = '$new' WHERE device_id = '$id'");
+  $return = dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
   log_event("Hostname changed -> $new ($source)", $id, 'system');
 }
 
@@ -148,17 +149,18 @@ function delete_port($int_id)
 {
   global $config;
 
-  $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.interface_id = '".$int_id."' AND D.device_id = P.device_id"));
-  mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '$int_id'");
-  mysql_query("DELETE from `links` WHERE `local_interface_id` = '$int_id'");
-  mysql_query("DELETE from `links` WHERE `remote_interface_id` = '$int_id'");
-  mysql_query("DELETE from `ipaddr` WHERE `interface_id` = '$int_id'");
-  mysql_query("DELETE from `ip6adjacencies` WHERE `interface_id` = '$int_id'");
-  mysql_query("DELETE from `ip6addr` WHERE `interface_id` = '$int_id'");
-  mysql_query("DELETE from `mac_accounting` WHERE `interface_id` = '$int_id'");
-  mysql_query("DELETE FROM `bill_ports` WHERE `port_id` = '$int_id'");
-  mysql_query("DELETE from `pseudowires` WHERE `interface_id` = '$int_id'");
-  mysql_query("DELETE FROM `ports` WHERE `interface_id` = '$int_id'");
+  $interface = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.interface_id = ? AND D.device_id = P.device_id", array($int_id));
+
+  $interface_tables = array('adjacencies', 'ipaddr', 'ip6adjacencies', 'ip6addr', 'mac_accounting', 'bill_ports', 'pseudowires', 'ports');
+  
+  foreach($interface_tables as $table) {
+    dbDelete($table, "`interface_id` =  ?", array($int_id));
+  }
+
+  dbDelete('links', "`local_interface_id` =  ?", array($int_id));
+  dbDelete('links', "`remote_interface_id` =  ?", array($int_id));
+  dbDelete('bill_ports', "`port_id` =  ?", array($int_id));
+
   unlink(trim($config['rrd_dir'])."/".trim($interface['hostname'])."/".$interface['ifIndex'].".rrd");
 }
 
@@ -166,34 +168,25 @@ function delete_device($id)
 {
   global $config;
 
-  $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = '$id'");
-  mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
-  $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
-  while ($int_data = mysql_fetch_assoc($int_query))
+  $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?", array($id));
+
+  dbDelete('devices', "`device_id` =  ?", array($id));
+
+  foreach (dbFetch("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int_data)
   {
     $int_if = $int_data['ifDescr'];
     $int_id = $int_data['interface_id'];
     delete_port($int_id);
     $ret .= "Removed interface $int_id ($int_if)\n";
   }
+  
+  $device_tables = array('entPhysical', 'devices_attribs', 'devices_perms', 'bgpPeers', 'vlans', 'vrfs', 'storage', 'alerts', 'eventlog', 
+                         'syslog', 'ports', 'services', 'alerts', 'toner', 'frequency', 'current', 'sensors');
 
-  mysql_query("DELETE FROM `entPhysical` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `devices_perms` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `bgpPeers` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `vlans` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `vrfs` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `storage` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `eventlog` WHERE `host` = '$id'");
-  mysql_query("DELETE FROM `syslog` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `ports` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `services` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `toner` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `frequency` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `current` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `sensors` WHERE `device_id` = '$id'");
+  foreach($device_tables as $table) {
+    dbDelete($table, "`device_id` =  ?", array($id));
+  }
+
   shell_exec("rm -rf ".trim($config['rrd_dir'])."/$host");
 
   $ret = "Removed Device $host\n";
@@ -395,10 +388,7 @@ function isDomainResolves($domain)
 
 function hoststatus($id)
 {
-  $sql = mysql_query("SELECT `status` FROM `devices` WHERE `device_id` = '$id'");
-  $result = @mysql_result($sql, 0);
-
-  return $result;
+  return dbFetchCell("SELECT `status` FROM `devices` WHERE `device_id` = ?", array($id));
 }
 
 function match_network($nets, $ip, $first=false)
@@ -478,14 +468,6 @@ function get_astext($asn)
   }
 }
 
-# FIXME DEPRECATED -- only used in dead file includes/polling/interfaces.inc.php - if we no longer need that one, this can go too.
-function eventlog($eventtext,$device_id = "", $interface_id = "")
-{
-  $event_query = "INSERT INTO eventlog (host, interface, datetime, message) VALUES (" . ($device_id ? $device_id : "NULL");
-  $event_query .= ", " . ($interface_id ? $interface_id : "NULL") . ", NOW(), '" . mysql_escape_string($eventtext) . "')";
-  mysql_query($event_query);
-}
-
 # Use this function to write to the eventlog table
 function log_event($text, $device = NULL, $type = NULL, $reference = NULL)
 {
@@ -493,10 +475,14 @@ function log_event($text, $device = NULL, $type = NULL, $reference = NULL)
 
   if (!is_array($device)) { $device = device_by_id_cache($device); }
 
-  $event_query = "INSERT INTO eventlog (host, reference, type, datetime, message) VALUES (" . ($device['device_id'] ? $device['device_id'] : "NULL");
-  $event_query .= ", '" . ($reference ? $reference : "NULL") . "', '" . ($type ? $type : "NULL") . "', NOW(), '" . mres($text) . "')";
-  if ($debug) { echo($event_query . "\n"); }
-  mysql_query($event_query);
+  $insert = array('host' => ($device['device_id'] ? $device['device_id'] : "NULL"),
+                  'reference' => ($reference ? $reference : "NULL"),
+                  'type' => ($type ? $type : "NULL"),
+                  'datetime' => array("NOW()"), 
+                  'message' => $text);
+ 
+  return $dbInsert($insert, 'eventlog');
+
 }
 
 function notify($device,$title,$message)

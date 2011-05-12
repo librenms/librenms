@@ -95,12 +95,7 @@ if (file_exists('.svn'))
 {
   list(,$dbu_rev) = preg_split('/: /',@shell_exec('svn info database-update.sql|grep ^Revision'));
 
-  $device_query = mysql_query("SELECT revision FROM `dbSchema`");
-  if ($rev = @mysql_fetch_assoc($device_query))
-  {
-    $db_rev = $rev['revision'];
-  }
-  else
+  if ($db_rev = @dbFetchCell("SELECT revision FROM `dbSchema`")) {} else
   {
     $db_rev = 0;
   }
@@ -142,19 +137,18 @@ if (file_exists('.svn'))
     shell_exec("scripts/update-sql.php database-update.sql");
     if ($db_rev == 0)
     {
-      mysql_query("INSERT INTO dbSchema VALUES ($dbu_rev)");
+      dbInsert(array('revision' => $dbu_rev), 'dbSchema');
     }
     else
     {
-      mysql_query("UPDATE dbSchema set revision=$dbu_rev");
+      dbUpdate(array('revision' => $dbu_rev), 'dbSchema');
     }
   }
 }
 
 $discovered_devices = 0;
 
-$device_query = mysql_query("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC");
-while ($device = mysql_fetch_assoc($device_query))
+foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC") as $device)
 {
   discover_device($device, $options);
 }
@@ -173,8 +167,8 @@ function discover_device($device, $options)
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
   if ($device['os'] != strtolower($device['os']))
   {
-    mysql_query("UPDATE `devices` SET `os` = '".strtolower($device['os'])."' WHERE device_id = '".$device['device_id']."'");
     $device['os'] = strtolower($device['os']);
+    dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
     echo("OS lowercased.");
   }
   if ($config['os'][$device['os']]['group'])
@@ -218,11 +212,7 @@ function discover_device($device, $options)
 
   $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
 
-  $update_query  = "UPDATE `devices` SET ";
-  $update_query .= " `last_discovered` = NOW(), `type` = '" . $device['type'] . "'";
-  $update_query .= ", `last_discovered_timetaken` = '$device_time'";
-  $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-  $update_result = mysql_query($update_query);
+  dbUpdate(array('last_discovered' => array('NOW()'), 'type' => $device['type'], 'last_discovered_timetaken' => $device_time), 'devices', '`device_id` = ?', array($device['device_id']));
 
   echo("Discovered in $device_time seconds\n");
 
@@ -236,8 +226,7 @@ $proctime = substr($run, 0, 5);
 
 if ($discovered_devices)
 {
-  mysql_query("INSERT INTO `perf_times` (`type`, `doing`, `start`, `duration`, `devices`)
-    VALUES ('discover', '$doing', '$start', '$proctime', '$discovered_devices')");
+  dbInsert(array('type' => 'discover', 'doing' => $doing, 'start' => $start, 'duration' => $proctime, 'devices' => $discovered_devices), 'perf_times');
 }
 
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $discovered_devices devices discovered in $proctime secs";

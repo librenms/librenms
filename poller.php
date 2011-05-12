@@ -49,7 +49,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n']))
                 WHERE `disabled` = 0 
                 ORDER BY `device_id` ASC
               ) temp
-            WHERE MOD(temp.rownum, '.$options['i'].') = '.$options['n'].';';
+            WHERE MOD(temp.rownum, '.mres($options['i']).') = '.mres($options['n']).';';
   $doing = $options['n'] ."/".$options['i'];
 }
 
@@ -89,15 +89,12 @@ echo("Starting polling run:\n\n");
 $polled_devices = 0;
 if(!isset($query))
 {
-  $device_query = mysql_query("SELECT `device_id` FROM `devices` WHERE `disabled` = 0 $where  ORDER BY `device_id` ASC");
-} else {
-  $device_query = mysql_query($query);
+  $query = "SELECT `device_id` FROM `devices` WHERE `disabled` = 0 $where ORDER BY `device_id` ASC";
 }
-print mysql_error();
 
-while ($device = mysql_fetch_assoc($device_query))
+foreach (dbFetch($query) as $device)
 {
-  $device = mysql_fetch_assoc(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'"));
+  $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'");
 
   poll_device($device, $options);
 
@@ -147,8 +144,10 @@ function poll_device($device, $options) {
   {
     $poll_update .= $poll_separator . "`status` = '$status'";
     $poll_separator = ", ";
-    mysql_query("UPDATE `devices` SET `status` = '".$status."' WHERE `device_id` = '".$device['device_id']."'");
-    mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " .($status == '1' ? 'up' : 'down') . "')");
+
+    dbUpdate(array('status' => $status), 'devices', 'device_id=?', array($device['device_id']));
+    dbInsert(array('importance' => '0', 'device_id' => $device['device_id'], 'message' => "Device is " .($status == '1' ? 'up' : 'down')), 'alerts');
+
     log_event('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device, ($status == '1' ? 'up' : 'down'));
     notify($device, "Device ".($status == '1' ? 'Up' : 'Down').": " . $device['hostname'], "Device ".($status == '1' ? 'up' : 'down').": " . $device['hostname'] . " at " . date($config['timestamp_format']));
   }
@@ -186,12 +185,11 @@ if (!$options['m'])
   ### If there any don't match, they're added/deleted from the database.
   ### Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
 
-  $query = mysql_query("SELECT `graph` FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."'");
-  while ($graph = mysql_fetch_assoc($query))
+  foreach (dbFetch("SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?", array($device['device_id'])) as $graph)
   {
     if (!isset($graphs[$graph["graph"]]))
     {
-      mysql_query("DELETE FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."' AND `graph` = '".$graph["graph"]."'");
+      dbDelete('device_graphs', "`device_id` = ? AND `graph` = ?", array($device['device_id'], $graph["graph"]));
     } else {
       $oldgraphs[$graph["graph"]] = TRUE;
     }
@@ -201,7 +199,7 @@ if (!$options['m'])
   {
     if (!isset($oldgraphs[$graph]))
     {
-      mysql_query("INSERT INTO `device_graphs` (`device_id`, `graph`) VALUES ('".$device['device_id']."','".$graph."')");
+      dbInsert(array('device_id' => $device['device_id'], 'graph' => $graph), 'device_graphs');
     }
   }
 
@@ -217,7 +215,7 @@ if (!$options['m'])
     $device['db_update_query'] .= $device['db_update'];
     $device['db_update_query'] .= " WHERE `device_id` = '" . $device['device_id'] . "'";
     if ($debug) { echo("Updating " . $device['hostname'] . " - ".$device['db_update_query']." \n"); }
-    if (!mysql_query($device['db_update_query']))
+    if (!mysql_query($device['db_update_query']))  ## FIXME some work to be done to build the update array then dbUpdate()
     {
     echo("ERROR: " . mysql_error() . "\nSQL: ".$device['db_update_query']."\n");
     }
@@ -233,8 +231,7 @@ if (!$options['m'])
 
   if ($polled_devices)  
   {
-    mysql_query("INSERT INTO `perf_times` (`type`, `doing`, `start`, `duration`, `devices`)
-                   VALUES ('poll', '$doing', '$poller_start', '$poller_time', '$polled_devices')");
+    dbInsert(array('type' => 'poll', 'doing' => $doing, 'start' => $poller_start, 'duration' => $poller_time, 'device' => $polled_devices ), 'perf_times');
   }
 
   $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
