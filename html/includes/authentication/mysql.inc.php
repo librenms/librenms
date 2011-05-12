@@ -85,22 +85,23 @@ function adduser($username, $password, $level, $email = "", $realname = "", $can
 
 function user_exists($username)
 {
-  return @dbFetchCell("SELECT * FROM users WHERE username = ?", array($username));
+  return @dbFetchCell("SELECT COUNT(*) FROM users WHERE username = ?", array($username));
 }
 
 function get_userlevel($username)
 {
-  return dbFetchRow("SELECT `level` FROM `users` WHERE `username` = ?", array($username));
+  return dbFetchCell("SELECT `level` FROM `users` WHERE `username` = ?", array($username));
 }
 
 function get_userid($username)
 {
-  return dbFetchRow("SELECT `user_id` FROM `users` WHERE `username` = ?", array($username));
+  return dbFetchCell("SELECT `user_id` FROM `users` WHERE `username` = ?", array($username));
 }
 
 function deluser($username)
 {
   return dbDelete('users', "`username` =  ?", array($username));
 }
+
 
 ?>
