@@ -1,23 +1,23 @@
 <?php
 
-$service_alerts = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0'"),0);
-$if_alerts = mysql_result(mysql_query("SELECT count(*) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'"),0);
-$device_alerts = "0";
+$service_alerts = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '0'");
+$if_alerts      = dbFetchCell("SELECT count(*) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
+
+$device_alerts  = "0";
 $device_alert_sql = "WHERE 0";
 
 if (isset($config['enable_bgp']) && $config['enable_bgp'])
 {
-  $bgp_alerts = mysql_result(mysql_query("SELECT COUNT(*) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'"), 0);
+  $bgp_alerts = dbFetchCell("SELECT COUNT(*) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'");
 }
 
-$query_a = mysql_query("SELECT * FROM `devices`");
-while ($device = mysql_fetch_assoc($query_a))
+foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
 {
   $this_alert = 0;
   if ($device['status'] == 0 && $device['ignore'] == '0') { $this_alert = "1"; } elseif ($device['ignore'] == '0')
   {
-    if (mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND device_id = '".$device['device_id']."'"),0)) { $this_alert = "1"; }
-    if (mysql_result(mysql_query("SELECT count(*) FROM ports WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '" . $device['device_id'] . "' AND `ignore` = '0'"),0)) { $this_alert = "1"; }
+    if (dbFetchCell("SELECT count(service_id) FROM services WHERE service_status = '0' AND device_id = ?", array($device['device_id']))) { $this_alert = "1"; }
+    if (dbFetchCell("SELECT count(*) FROM ports WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = ? AND `ignore` = '0'", array($device['device_id']))) { $this_alert = "1"; }
   }
   if ($this_alert)
   {
@@ -174,10 +174,8 @@ if (isset($interface_alerts))
   echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerts ('.$interface_alerts.')</a></li>');
 }
 
-$sql = "SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id";
-$query = mysql_query($sql);
 $deleted_ports = 0;
-while ($interface = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id") as $interface)
 {
   if (port_permitted($interface['interface_id'], $interface['device_id']))
   {
@@ -199,9 +197,7 @@ if ($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cro
 <?php
 
 # FIXME does not check user permissions...
-$sql = "SELECT sensor_class,COUNT(sensor_id) AS c FROM sensors GROUP BY sensor_class ORDER BY sensor_class ";
-$result = mysql_query($sql);
-while ($row = mysql_fetch_assoc($result))
+foreach (dbFetchRows("SELECT sensor_class,COUNT(sensor_id) AS c FROM sensors GROUP BY sensor_class ORDER BY sensor_class ") as $row)
 {
   $used_sensors[$row['sensor_class']] = $row['c'];
 }
@@ -273,10 +269,10 @@ foreach (array_keys($menu_sensors) as $item)
 
 <?php
 
-$routing_count['bgp'] = mysql_result(mysql_query("SELECT COUNT(*) from `bgpPeers`"), 0);
-$routing_count['ospf'] = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'"), 0);
-$routing_count['cef'] = mysql_result(mysql_query("SELECT COUNT(*) from `cef_switching`"), 0);
-$routing_count['vrf'] = @mysql_result(mysql_query("SELECT COUNT(*) from `vrfs`"), 0);
+$routing_count['bgp']  = dbFetchCell("SELECT COUNT(*) from `bgpPeers`");
+$routing_count['ospf'] = dbFetchCell("SELECT COUNT(*) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'");
+$routing_count['cef']  = dbFetchCell("SELECT COUNT(*) from `cef_switching`");
+$routing_count['vrf']  = dbFetchCell("SELECT COUNT(*) from `vrfs`");
 
 if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']) > "0")
 {
