@@ -914,15 +914,6 @@ if (!isset($config['mibdir']))
 }
 $config['mib_dir'] = $config['mibdir'];
 
-if (isset($config['enable_nagios']) && $config['enable_nagios']) {
-  $nagios_link = mysql_connect($config['nagios_db_host'], $config['nagios_db_user'], $config['nagios_db_pass']);
-  if (!$nagios_link) {
-    echo("<h2>Nagios MySQL Error</h2>");
-    die;
-}
-$nagios_db = mysql_select_db($config['nagios_db_name'], $nagios_link);
-}
-
 # If we're on SSL, let's properly detect it
 if (isset($_SERVER['HTTPS']))
 {

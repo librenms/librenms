@@ -33,7 +33,7 @@ function get_port_by_id($port_id)
 {
   if (is_numeric($port_id))
   {
-    $port = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE `interface_id` = '".$port_id."'"));
+    $port = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($port_id));
   }
   if (is_array($port))
   {
@@ -47,7 +47,7 @@ function get_application_by_id($application_id)
 {
   if (is_numeric($application_id))
   {
-    $application = mysql_fetch_assoc(mysql_query("SELECT * FROM `applications` WHERE `app_id` = '".$application_id."'"));
+    $application = dbFetchRow("SELECT * FROM `applications` WHERE `app_id` = ?", array($application_id));
   }
   if (is_array($application))
   {
@@ -61,7 +61,7 @@ function get_sensor_by_id($sensor_id)
 {
   if (is_numeric($sensor_id))
   {
-    $sensor = mysql_fetch_assoc(mysql_query("SELECT * FROM `sensors` WHERE `sensor_id` = '".$sensor_id."'"));
+    $sensor = dbFetchRow("SELECT * FROM `sensors` WHERE `sensor_id` = ?", array($sensor_id));
   }
   if (is_array($sensor))
   {
@@ -75,7 +75,7 @@ function get_device_id_by_interface_id($interface_id)
 {
   if (is_numeric($interface_id))
   {
-    $device_id = mysql_result(mysql_query("SELECT `device_id` FROM `ports` WHERE `interface_id` = '".$interface_id."'"),0);
+    $device_id = dbFetchCell("SELECT `device_id` FROM `ports` WHERE `interface_id` = ?", array($interface_id));
   }
   if (is_numeric($device_id))
   {
@@ -104,7 +104,7 @@ function device_by_id_cache($device_id)
   {
     $device = $device_cache[$device_id];
   } else {
-    $device = mysql_fetch_assoc(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device_id."'"));
+    $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
     if (get_dev_attrib($device,'override_sysLocation_bool'))
     {
       $device['real_location'] = $device['location'];
@@ -130,18 +130,12 @@ function mres($string)
 
 function getifhost($id)
 {
-  $sql = mysql_query("SELECT `device_id` from `ports` WHERE `interface_id` = '$id'");
-  $result = @mysql_result($sql, 0);
-
-  return $result;
+  return dbFetchCell("SELECT `device_id` from `ports` WHERE `interface_id` = ?", array($id));
 }
 
 function gethostbyid($id)
 {
-  $sql = mysql_query("SELECT `hostname` FROM `devices` WHERE `device_id` = '$id'");
-  $result = @mysql_result($sql, 0);
-
-  return $result;
+  return dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
 }
 
 function strgen ($length = 16)
@@ -163,58 +157,37 @@ function strgen ($length = 16)
 
 function getpeerhost($id)
 {
-  $sql = mysql_query("SELECT `device_id` from `bgpPeers` WHERE `bgpPeer_id` = '$id'");
-  $result = @mysql_result($sql, 0);
-
-  return $result;
+  return dbFetchCell("SELECT `device_id` from `bgpPeers` WHERE `bgpPeer_id` = ?", array($id));
 }
 
 function getifindexbyid($id)
 {
-  $sql = mysql_query("SELECT `ifIndex` FROM `ports` WHERE `interface_id` = '$id'");
-  $result = @mysql_result($sql, 0);
-
-  return $result;
+  return dbFetchCell("SELECT `ifIndex` FROM `ports` WHERE `interface_id` = ?", array($id));
 }
 
 function get_port_by_ifIndex($device, $ifIndex)
 {
-  $sql = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
-  $result = @mysql_fetch_assoc($sql);
-
-  return $result;
+  return dbFetchCell("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device['device_id'], $ifIndex));
 }
 
 function getifbyid($id)
 {
-  $sql = mysql_query("SELECT * FROM `ports` WHERE `interface_id` = '$id'");
-  $result = @mysql_fetch_assoc($sql);
-
-  return $result;
+  return dbFetchCell("SELECT * FROM `ports` WHERE `interface_id` = ?", array($id));
 }
 
 function getifdescrbyid($id)
 {
-  $sql = mysql_query("SELECT `ifDescr` FROM `ports` WHERE `interface_id` = '$id'");
-  $result = @mysql_result($sql, 0);
-
-  return $result;
+  return dbFetchCell("SELECT `ifDescr` FROM `ports` WHERE `interface_id` = ?", array($id));
 }
 
 function getidbyname($domain)
 {
-  $sql = mysql_query("SELECT `device_id` FROM `devices` WHERE `hostname` = '$domain'");
-  $result = @mysql_result($sql, 0);
-
-  return $result;
+  return dbFetchCell("SELECT `device_id` FROM `devices` WHERE `hostname` = ?", mres($domain));
 }
 
 function gethostosbyid($id)
 {
-  $sql = mysql_query("SELECT `os` FROM `devices` WHERE `device_id` = '$id'");
-  $result = @mysql_result($sql, 0);
-
-  return $result;
+  return dbFetchCell("SELECT `os` FROM `devices` WHERE `device_id` = ?", array($id));
 }
 
 function safename($name)
@@ -234,27 +207,21 @@ function zeropad($num, $length = 2)
 
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
-  $count_sql = "SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
-  if (mysql_result(mysql_query($count_sql),0))
+  if (dbFetchCell("SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ?", array($device['device_id'],$attrib_type)))
   {
-    $update_sql = "UPDATE devices_attribs SET attrib_value = '$attrib_value' WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
-    mysql_query($update_sql);
+    $return = dbUpdate(array('attrib_value' => $attrib_value), 'devices_attribs', 'device_id=? and attrib_type=?', array($device['device_id'], $attrib_type));
   }
   else
   {
-    $insert_sql = "INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . mres($device['device_id'])."', '$attrib_type', '$attrib_value')";
-    mysql_query($insert_sql);
+    $return = dbInsert(array('device_id' => $device['device_id'], 'attrib_type' => $attrib_type, 'attrib_value' => $attrib_value), 'devices_attribs');
   }
-
-  return mysql_affected_rows();
+  return $return;
 }
 
 function get_dev_attribs($device)
 {
   $attribs = array();
-  $sql = "SELECT * FROM devices_attribs WHERE `device_id` = '" . mres($device) . "'";
-  $query = mysql_query($sql);
-  while($entry = mysql_fetch_assoc($query))
+  foreach(dbFetch("SELECT * FROM devices_attribs WHERE `device_id` = ?", array($device)) as $entry)
   {
     $attribs[$entry['attrib_type']] = $entry['attrib_value'];
   }
@@ -263,8 +230,7 @@ function get_dev_attribs($device)
 
 function get_dev_attrib($device, $attrib_type)
 {
-  $sql = "SELECT attrib_value FROM devices_attribs WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
-  if ($row = mysql_fetch_assoc(mysql_query($sql)))
+  if ($row = dbFetchRow("SELECT attrib_value FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ?", array($device['device_id'], $attrib_type)))
   {
     return $row['attrib_value'];
   }
@@ -276,8 +242,7 @@ function get_dev_attrib($device, $attrib_type)
 
 function del_dev_attrib($device, $attrib_type)
 {
-  $sql = "DELETE FROM devices_attribs WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
-  return mysql_query($sql);
+  return dbDelete('devices_attribs', "`device_id` = ? AND `attrib_type` = ?", array($device['device_id'], $attrib_type));
 }
 
 function formatRates($rate)
