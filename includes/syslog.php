@@ -17,7 +17,7 @@ function process_syslog ($entry, $update)
     $delete = 1;
   }
 
-  $device_id_host = @mysql_result(mysql_query("SELECT device_id FROM devices WHERE `hostname` = '".$entry['host']."' OR `sysName` = '".$entry['host']."'"),0);
+  $device_id_host = @dbFetchCell("SELECT device_id FROM devices WHERE `hostname` = '".mres($entry['host'])."' OR `sysName` = '".mres($entry['host'])."'");
 
   if ($device_id_host)
   {
@@ -25,8 +25,8 @@ function process_syslog ($entry, $update)
   }
   else
   {
-    $device_id_ip = @mysql_result(mysql_query("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE
-    A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id"),0);
+    $device_id_ip = @dbFetchCell("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE
+    A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id");
     if ($device_id_ip)
     {
       $entry['device_id'] = $device_id_ip;
@@ -35,7 +35,7 @@ function process_syslog ($entry, $update)
 
   if ($entry['device_id'] && !$delete)
   {
-    $os = mysql_result(mysql_query("SELECT `os` FROM `devices` WHERE `device_id` = '".$entry['device_id']."'"),0);
+    $os = dbFetchCell("SELECT `os` FROM `devices` WHERE `device_id` = '".mres($entry['device_id'])."'");
     if ($os == 'catos')
     {
       $matches = array();
