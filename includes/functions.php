@@ -365,15 +365,17 @@ function utime()
 function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
 {
   $host = trim(strtolower($host));
-  $device = deviceArray($host, $community, $snmpver, $port, $transport);
-  $host_os = getHostOS($device);
+  $device = array('hostname' => $host, 'sysName' => $host, 'community' => $community, 'port' => $port, 'transport' => $transport, 'status' => '1', 'snmpver' => $snmpver);
+  $device['os'] = getHostOS($device);
 
-  if ($host_os)
+  if ($device['os'])
   {
-    $sql = mysql_query("INSERT INTO `devices` (`hostname`, `sysName`, `community`, `port`, `transport`, `os`, `status`,`snmpver`) VALUES ('$host', '$host', '$community', '$port', '$transport', '$host_os', '1','$snmpver')");
-    if (mysql_affected_rows())
+
+    $id = dbInsert($device, 'devices');
+
+    if ($id)
     {
-      return("Created host : $host (id:".mysql_insert_id().") (os:$host_os)");
+      return("Created host : $host (id:".$id.") (os:".$device['os'].")");
     }
     else
     {
