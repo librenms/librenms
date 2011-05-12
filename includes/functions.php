@@ -481,7 +481,7 @@ function log_event($text, $device = NULL, $type = NULL, $reference = NULL)
                   'datetime' => array("NOW()"), 
                   'message' => $text);
  
-  return $dbInsert($insert, 'eventlog');
+  dbInsert($insert, 'eventlog');
 
 }
 

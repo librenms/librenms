@@ -91,7 +91,7 @@ function process_syslog ($entry, $update)
     $insert_array = array('device_id' => $entry['device_id'], 'program' => $entry['program'], 'facility' => $entry['facility'], 'priority' => $entry['priority'],
                           'level' => $entry['level'], 'tag' => $entry['tag'], 'msg' => $entry['msg'], 'timestamp' => $entry['timestamp']);
 
-    if ($update && $entry['device_id']) { $dbInsert($insert_array, 'syslog'); }
+    if ($update && $entry['device_id']) { dbInsert($insert_array, 'syslog'); }
     unset ($fix);
   } else { print_r($entry); echo("D-$delete"); }
 

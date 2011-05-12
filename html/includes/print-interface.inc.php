@@ -16,15 +16,14 @@ if($int_colour)
   if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 }
 
-$port_adsl_query = mysql_query("SELECT * FROM `ports_adsl` WHERE `interface_id` = '".$interface['interface_id']."'");
-$port_adsl = mysql_fetch_assoc($port_adsl_query);
+$port_adsl = dbFetchRow("SELECT * FROM `ports_adsl` WHERE `interface_id` = ?", array($interface['interface_id']));
 
 if ($interface['ifInErrors_delta'] > 0 || $interface['ifOutErrors_delta'] > 0)
 {
   $error_img = generate_port_link($interface, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", "port_errors");
 } else { $error_img = ""; }
 
-if (mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0))
+if (dbFetchCell("SELECT COUNT(*) FROM `mac_accounting` WHERE `interface_id` = ?", array($interface['interface_id'])))
 {
   $mac = "<a href='device/".$interface['device_id']."/port/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'></a>";
 } else { $mac = ""; }
@@ -41,13 +40,13 @@ unset ($break);
 
 if ($port_details)
 {
-  $ipdata = mysql_query("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
-  while ($ip = mysql_fetch_Array($ipdata)) {
+  foreach (dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = ?", array($interface['interface_id'])) as $ip) 
+  {
     echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=$ip[ipv4_address]')\">$ip[ipv4_address]/$ip[ipv4_prefixlen]</a>");
     $break = "<br />";
   }
-  $ip6data = mysql_query("SELECT * FROM `ipv6_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
-  while ($ip6 = mysql_fetch_Array($ip6data)) {
+  foreach (dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `interface_id` = ?", array($interface['interface_id'])) as $ip6)
+  {
     echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address'])."/".$ip6['ipv6_prefixlen']."</a>");
     $break = "<br />";
   }
@@ -94,7 +93,7 @@ if ($device['os'] == "ios" || $device['os'] == "iosxe")
   } elseif ($interface['ifVlan']) {
     echo("<span class=box-desc><span class=blue>VLAN " . $interface['ifVlan'] . "</span></span>");
   } elseif ($interface['ifVrf']) {
-    $vrf = mysql_fetch_assoc(mysql_query("SELECT * FROM vrfs WHERE vrf_id = '".$interface['ifVrf']."'"));
+    $vrf = dbFetchRow("SELECT * FROM vrfs WHERE vrf_id = ?", array($interface['ifVrf']));
     echo("<span style='color: green;'>" . $vrf['vrf_name'] . "</span>");
   }
 }
@@ -126,8 +125,7 @@ echo("</td>");
 echo("<td width=375 valign=top class=interface-desc>");
 if (strpos($interface['label'], "oopback") === false && !$graph_type)
 {
-  $link_query = mysql_query("select * from links AS L, ports AS I, devices AS D WHERE L.local_interface_id = '$if_id' AND L.remote_interface_id = I.interface_id AND I.device_id = D.device_id");
-  while ($link = mysql_fetch_assoc($link_query))
+  foreach(dbFetchRows("SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_interface_id = ? AND L.remote_interface_id = I.interface_id AND I.device_id = D.device_id", array($if_id)) as $link)
   {
 #         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generate_port_link($link, makeshortif($link['label'])) . " on " . generate_device_link($link, shorthost($link['hostname'])) . "</a><br />");
 #         $br = "<br />";
@@ -139,17 +137,15 @@ if (strpos($interface['label'], "oopback") === false && !$graph_type)
 
   if ($port_details)
   { ## Show which other devices are on the same subnet as this interface
-    $sql = "SELECT `ipv4_network_id` FROM `ipv4_addresses` WHERE `interface_id` = '".$interface['interface_id']."' AND `ipv4_address` NOT LIKE '127.%'";
-    $nets_query = mysql_query($sql);
-    while ($net = mysql_fetch_assoc($nets_query))
+    foreach (dbFetchRows("SELECT `ipv4_network_id` FROM `ipv4_addresses` WHERE `interface_id` = ? AND `ipv4_address` NOT LIKE '127.%'", array($interface['interface_id'])) as $net)
     {
       $ipv4_network_id = $net['ipv4_network_id'];
       $sql = "SELECT I.interface_id FROM ipv4_addresses AS A, ports AS I, devices AS D
            WHERE A.interface_id = I.interface_id
-           AND A.ipv4_network_id = '".$net['ipv4_network_id']."' AND D.device_id = I.device_id
-           AND D.device_id != '".$device['device_id']."'";
-      $new_query = mysql_query($sql);
-      while ($new = mysql_fetch_assoc($new_query))
+           AND A.ipv4_network_id = ? AND D.device_id = I.device_id
+           AND D.device_id != ?";
+      $array = array($net['ipv4_network_id'], $device['device_id']);
+      foreach(dbFetchRow($sql, $array) AS $new)
       {
         echo($new['ipv4_network_id']);
         $this_ifid = $new['interface_id'];
@@ -161,17 +157,16 @@ if (strpos($interface['label'], "oopback") === false && !$graph_type)
       }
     }
 
-    $sql = "SELECT ipv6_network_id FROM ipv6_addresses WHERE interface_id = '".$interface['interface_id']."'";
-    $nets_query = mysql_query($sql);
-    while ($net = mysql_fetch_assoc($nets_query))
+    foreach (dbFetchRows("SELECT ipv6_network_id FROM ipv6_addresses WHERE interface_id = ?", array($interface['interface_id'])) as $net)
     {
       $ipv6_network_id = $net['ipv6_network_id'];
       $sql = "SELECT I.interface_id FROM ipv6_addresses AS A, ports AS I, devices AS D
            WHERE A.interface_id = I.interface_id
-           AND A.ipv6_network_id = '".$net['ipv6_network_id']."' AND D.device_id = I.device_id
-           AND D.device_id != '".$device['device_id']."' AND A.ipv6_origin != 'linklayer' AND A.ipv6_origin != 'wellknown'";
-      $new_query = mysql_query($sql);
-      while ($new = mysql_fetch_assoc($new_query))
+           AND A.ipv6_network_id = ? AND D.device_id = I.device_id
+           AND D.device_id != ? AND A.ipv6_origin != 'linklayer' AND A.ipv6_origin != 'wellknown'";
+      $array = array($net['ipv6_network_id'], $device['device_id']);
+
+      foreach(dbFetchRow($sql, $array) AS $new)
       {
         echo($new['ipv6_network_id']);
           $this_ifid = $new['interface_id'];
@@ -186,7 +181,7 @@ if (strpos($interface['label'], "oopback") === false && !$graph_type)
 
   foreach ($int_links as $int_link)
   {
-    $link_if = mysql_fetch_assoc(mysql_query("SELECT * from ports AS I, devices AS D WHERE I.device_id = D.device_id and I.interface_id = '".$int_link."'"));
+    $link_if = dbFetchRow("SELECT * from ports AS I, devices AS D WHERE I.device_id = D.device_id and I.interface_id = ?", array($int_link));
 
     echo("$br");
 
@@ -202,21 +197,18 @@ if (strpos($interface['label'], "oopback") === false && !$graph_type)
 #     unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 }
 
-$pseudowires = mysql_query("SELECT * FROM `pseudowires` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
-while ($pseudowire = mysql_fetch_assoc($pseudowires))
+foreach (dbFetchRows("SELECT * FROM `pseudowires` WHERE `interface_id` = ?", array($interface['interface_id'])) as $pseudowire)
 {
 #`interface_id`,`peer_device_id`,`peer_ldp_id`,`cpwVcID`,`cpwOid`
-  $pw_peer_dev = mysql_fetch_assoc(mysql_query("SELECT * from `devices` WHERE `device_id` = '" . $pseudowire['peer_device_id'] . "'"));
-  $pw_peer_int = mysql_fetch_assoc(mysql_query("SELECT * from `ports` AS I, pseudowires AS P WHERE I.device_id = '".$pseudowire['peer_device_id']."' AND
-                                                                                                        P.cpwVcID = '".$pseudowire['cpwVcID']."' AND
-                                                                                                        P.interface_id = I.interface_id"));
+  $pw_peer_dev = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($pseudowire['peer_device_id']));
+  $pw_peer_int = dbFetchRow("SELECT * FROM `ports` AS I, pseudowires AS P WHERE I.device_id = ? AND P.cpwVcID = ? AND P.interface_id = I.interface_id", array($pseudowire['peer_device_id'], $pseudowire['cpwVcID']));
+  
   $pw_peer_int = ifNameDescr($pw_peer_int);
   echo("$br<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generate_port_link($pw_peer_int, makeshortif($pw_peer_int['label'])) ." on ". generate_device_link($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . "</b>");
   $br = "<br />";
 }
 
-$members = mysql_query("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
-while ($member = mysql_fetch_assoc($members))
+foreach(dbFetchRows("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?", array($interface['ifIndex'], $device['device_id'])) as $member)
 {
   echo("$br<img src='images/16/brick_link.png' align=absmiddle> <strong>" . generate_port_link($member) . " (PAgP)</strong>");
   $br = "<br />";
@@ -224,13 +216,12 @@ while ($member = mysql_fetch_assoc($members))
 
 if ($interface['pagpGroupIfIndex'] && $interface['pagpGroupIfIndex'] != $interface['ifIndex'])
 {
-  $parent = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE `ifIndex` = '".$interface['pagpGroupIfIndex']."' and `device_id` = '".$device['device_id']."'"));
+  $parent = dbFetchRow("SELECT * FROM `ports` WHERE `ifIndex` = ? and `device_id` = ?", array($interface['pagpGroupIfIndex'], $device['device_id']));
   echo("$br<img src='images/16/bricks.png' align=absmiddle> <strong>" . generate_port_link($parent) . " (PAgP)</strong>");
   $br = "<br />";
 }
 
-$higher_ifs = mysql_query("SELECT * FROM `ports_stack` WHERE `interface_id_low` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
-while ($higher_if = mysql_fetch_assoc($higher_ifs))
+foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? and `device_id` = ?", array($interface['ifIndex'], $device['device_id'])) as $higher_if)
 {
   if($higher_if['interface_id_high']) 
   {
@@ -240,8 +231,7 @@ while ($higher_if = mysql_fetch_assoc($higher_ifs))
   }
 }
 
-$lower_ifs = mysql_query("SELECT * FROM `ports_stack` WHERE `interface_id_high` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
-while ($lower_if = mysql_fetch_assoc($lower_ifs))
+foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_high` = ? and `device_id` = ?", array($interface['ifIndex'], $device['device_id'])) as $lower_if)
 {
   if($lower_if['interface_id_low'])
   {

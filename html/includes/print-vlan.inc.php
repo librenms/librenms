@@ -8,8 +8,7 @@ echo("<td width=100 class=list-large> Vlan " . $vlan['vlan_vlan'] . "</td>");
 echo("<td width=200 class=box-desc>" . $vlan['vlan_descr'] . "</td>");
 
 echo("<td class=list-bold>");
-$ports_query = mysql_query("SELECT * FROM ports WHERE `device_id` = '" . $device['device_id'] . "' AND `ifVlan` = '" . $vlan['vlan_vlan'] . "' ");
-while ($port = mysql_fetch_assoc($ports_query))
+foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?", array($device['device_id'], $vlan['vlan_vlan'])) as $port)
 {
   if ($_GET['opta'])
   {

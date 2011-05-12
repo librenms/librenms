@@ -13,9 +13,7 @@ function authenticate($username,$password)
   {
     $_SESSION['username'] = mres($_SERVER['REMOTE_USER']);
 
-    $sql = "SELECT username FROM `users` WHERE `username`='".$_SESSION['username'] . "'";;
-    $query = mysql_query($sql);
-    $row = @mysql_fetch_assoc($query);
+    $row = @dbFetchRow("SELECT username FROM `users` WHERE `username`=?", array($_SESSION['username']));
     if (isset($row['username']) && $row['username'] == $_SESSION['username'])
     {
       return 1;
@@ -46,28 +44,23 @@ function auth_usermanagement()
 
 function adduser($username, $password, $level, $email = "", $realname = "")
 {
-  mysql_query("INSERT INTO `users` (`username`,`password`,`level`, `email`, `realname`) VALUES ('".mres($username)."',MD5('".mres($password)."'),'".mres($level)."','".mres($email)."','".mres($realname)."')");
-
-  return mysql_affected_rows();
+  return dbInsert(array('username' => $username, 'password' => $password. 'level' => $level, 'email' => $email, 'realname' => $realname), 'users');
 }
 
 function user_exists($username)
 {
-  return mysql_result(mysql_query("SELECT * FROM users WHERE username = '".mres($username)."'"),0);
+  ## FIXME this doesn't seem right? (adama)
+  return dbFetchCell("SELECT * FROM `users` WHERE `username` = ?", array($username));
 }
 
 function get_userlevel($username)
 {
-  $sql = "SELECT level FROM `users` WHERE `username`='".mres($username)."'";
-  $row = mysql_fetch_assoc(mysql_query($sql));
-  return $row['level'];
+  return dbFetchCell("SELECT `level` FROM `users` WHERE `username`= ?", array($username));
 }
 
 function get_userid($username)
 {
-  $sql = "SELECT user_id FROM `users` WHERE `username`='".mres($username)."'";
-  $row = mysql_fetch_assoc(mysql_query($sql));
-  return $row['user_id'];
+  return dbFetchCell("SELECT `user_id` FROM `users` WHERE `username`= ?", array($username));
 }
 
 function deluser($username)

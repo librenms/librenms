@@ -3,16 +3,13 @@
 function authenticate($username,$password)
 {
   $encrypted_old = md5($password);
-  $sql = "SELECT username,password FROM `users` WHERE `username`='".$username."'";
-  $query = mysql_query($sql);
-  $row = @mysql_fetch_assoc($query);
+  $row = dbFetchRow("SELECT username,password FROM `users` WHERE `username`= ?", array($username));
   if ($row['username'] && $row['username'] == $username)
   {
     // Migrate from old, unhashed password
     if ($row['password'] == $encrypted_old)
     {
-      $query = mysql_query("DESCRIBE users password");
-      $row = mysql_fetch_assoc($query);
+      $row = dbFetchRow("DESCRIBE users password");
       if ($row['Type'] == 'varchar(34)')
       {
         changepassword($username,$password);
@@ -39,7 +36,7 @@ function passwordscanchange($username="")
   if (empty($username) || !user_exists($username)) {
     return 1;
   } else {
-    return @mysql_result(mysql_query("SELECT can_modify_passwd FROM users WHERE username = '".mres($username)."'"),0);
+    return dbFetchCell("SELECT can_modify_passwd FROM users WHERE username = ?", array($username));
   }
 }
 
@@ -67,8 +64,7 @@ function generateSalt($max = 15)
 function changepassword($username,$password)
 {
   $encrypted = crypt($password,'$1$' . generateSalt(8).'$');
-  $sql = "UPDATE `users` SET `password` = '$encrypted' WHERE `username`='".$username."'";
-  $query = mysql_query($sql);
+  return dbUpdate(array('password' => $encrypted), 'users', '`username` = ?', array($username));
 }
 
 function auth_usermanagement()
@@ -81,35 +77,30 @@ function adduser($username, $password, $level, $email = "", $realname = "", $can
   if (!user_exists($username))
   {
     $encrypted = crypt($password,'$1$' . generateSalt(8).'$');
-    mysql_query("INSERT INTO `users` (`username`,`password`,`level`, `email`, `realname`, `can_modify_passwd`) VALUES ('".mres($username)."','".mres($encrypted)."','".mres($level)."','".mres($email)."','".mres($realname)."','".mres($can_modify_passwd)."')");
+    return dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd), 'users');
+  } else {
+    return FALSE;
   }
-
-  return mysql_affected_rows();
 }
 
 function user_exists($username)
 {
-  return @mysql_result(mysql_query("SELECT * FROM users WHERE username = '".mres($username)."'"),0);
+  return @dbFetchCell("SELECT * FROM users WHERE username = ?", array($username));
 }
 
 function get_userlevel($username)
 {
-  $sql = "SELECT level FROM `users` WHERE `username`='".mres($username)."'";
-  $row = mysql_fetch_assoc(mysql_query($sql));
-  return $row['level'];
+  return dbFetchRow("SELECT `level` FROM `users` WHERE `username` = ?", array($username));
 }
 
 function get_userid($username)
 {
-  $sql = "SELECT user_id FROM `users` WHERE `username`='".mres($username)."'";
-  $row = mysql_fetch_assoc(mysql_query($sql));
-  return $row['user_id'];
+  return dbFetchRow("SELECT `user_id` FROM `users` WHERE `username` = ?", array($username));
 }
 
 function deluser($username)
 {
-  mysql_query("DELETE FROM `users` WHERE `user_id` = '" . mres($_GET['user_id']) . "'");
-  return mysql_affected_rows();
+  return dbDelete('users', "`username` =  ?", array($username));
 }
 
 ?>
