@@ -52,11 +52,11 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     </a>
   </li>');
 
-    $health =  mysql_result(mysql_query("select count(*) from storage WHERE device_id = '" . $device['device_id'] . "'"), 0) +
-               mysql_result(mysql_query("select count(sensor_id) from sensors WHERE device_id = '" . $device['device_id'] . "'"), 0) +
-               mysql_result(mysql_query("select count(*) from cempMemPool WHERE device_id = '" . $device['device_id'] . "'"), 0) +
-               mysql_result(mysql_query("select count(*) from cpmCPU WHERE device_id = '" . $device['device_id'] . "'"), 0) +
-               mysql_result(mysql_query("select count(*) from processors WHERE device_id = '" . $device['device_id'] . "'"), 0);
+    $health =  dbFetchCell("select count(*) from storage WHERE device_id = '" . $device['device_id'] . "'") +
+               dbFetchCell("select count(sensor_id) from sensors WHERE device_id = '" . $device['device_id'] . "'") +
+               dbFetchCell("select count(*) from cempMemPool WHERE device_id = '" . $device['device_id'] . "'") +
+               dbFetchCell("select count(*) from cpmCPU WHERE device_id = '" . $device['device_id'] . "'") +
+               dbFetchCell("select count(*) from processors WHERE device_id = '" . $device['device_id'] . "'");
 
     if ($health)
     {
@@ -67,7 +67,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     </li>');
     }
 
-    if (@mysql_result(mysql_query("select count(app_id) from applications WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
+    if (@dbFetchCell("select count(app_id) from applications WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['apps'] . '">
     <a href="device/' . $device['device_id'] . '/apps/">
@@ -85,7 +85,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (@mysql_result(mysql_query("select count(interface_id) from ports WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
+    if (@dbFetchCell("select count(interface_id) from ports WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['ports'] . $select['port'] . '">
     <a href="device/' . $device['device_id'] . '/ports/' .$config['ports_page_default']. '">
@@ -94,7 +94,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (@mysql_result(mysql_query("select count(vlan_id) from vlans WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
+    if (@dbFetchCell("select count(vlan_id) from vlans WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['vlans'] . '">
     <a href="device/' . $device['device_id'] . '/vlans/">
@@ -103,7 +103,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (@mysql_result(mysql_query("SELECT COUNT(id) FROM vminfo WHERE device_id = '" . $device["device_id"] . "'"), 0) > '0')
+    if (@dbFetchCell("SELECT COUNT(id) FROM vminfo WHERE device_id = '" . $device["device_id"] . "'") > '0')
     {
       echo('<li class="' . $select['vm'] . '">
     <a href="device/' . $device['device_id'] . '/vm/">
@@ -111,17 +111,6 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     </a>
   </li>');
     }
-
-#    if (@mysql_result(mysql_query("select count(*) from vrfs WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
-#    {
-#      echo('<li class="' . $select['vrfs'] . '">
-#    <a href="device/' . $device['device_id'] . '/vrfs/">
-#      <img src="images/16/layers.png" align="absmiddle" border="0" /> VRFs
-#    </a>
-#  </li>');
-#    }
-
-    
 
     if ($config['enable_bgp'] && $device['bgpLocalAs'])
     {
@@ -134,7 +123,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
 
     if ($config['enable_ospf'])
     {
-      $ospf_count = mysql_result(mysql_query("select count(*) from ospf_instances WHERE device_id = '" . $device['device_id'] . "'"), 0);
+      $ospf_count = dbFetchCell("select count(*) from ospf_instances WHERE device_id = '" . $device['device_id'] . "'");
       if ($ospf_count) { $ospf_menu = 1; }
     }
 
@@ -147,19 +136,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-#    $cef_query = mysql_query("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = '".$device['device_id']."'");
-#    $cef_count = mysql_result($cef_query,0);
-
-#    if ($cef_count)
-#    {
-#      echo('<li class="' . $select['cefswitching'] . '">
-#    <a href="device/' . $device['device_id'] . '/cefswitching/">
-#      <img src="images/16/car.png" align="absmiddle" border="0" /> CEF
-#    </a>
-#    </li>');
-#    }
-
-    if ($_SESSION['userlevel'] >= "5" && mysql_result(mysql_query("SELECT count(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"),0))
+    if ($_SESSION['userlevel'] >= "5" && dbFetchCell("SELECT count(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"))
     {
       $discovery_links = TRUE;
       echo('<li class="' . $select['map'] . '">
@@ -169,7 +146,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if ($config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$device['device_id']."'"), 0) > '0')
+    if ($config['enable_inventory'] && @dbFetchCell("SELECT * FROM `entPhysical` WHERE device_id = '".$device['device_id']."'") > '0')
     {
       echo('<li class="' . $select['entphysical'] . '">
     <a href="device/' . $device['device_id'] . '/entphysical/">
@@ -177,7 +154,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     </a>
   </li>');
     }
-    elseif (device_permitted($device['device_id']) && $config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `hrDevice` WHERE device_id = '".$device['device_id']."'"), 0) > '0')
+    elseif (device_permitted($device['device_id']) && $config['enable_inventory'] && @dbFetchCell("SELECT * FROM `hrDevice` WHERE device_id = '".$device['device_id']."'") > '0')
     {
       echo('<li class="' . $select['hrdevice'] . '">
     <a href="device/' . $device['device_id'] . '/hrdevice/">
@@ -186,7 +163,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (mysql_result(mysql_query("select count(service_id) from services WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
+    if (dbFetchCell("select count(service_id) from services WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['srv'] . '">
     <a href="device/' . $device['device_id'] . '/services/">
@@ -195,7 +172,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (@mysql_result(mysql_query("select count(toner_id) from toner WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
+    if (@dbFetchCell("select count(toner_id) from toner WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['toner'] . '">
     <a href="device/' . $device['device_id'] . '/toner/">
