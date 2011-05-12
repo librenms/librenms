@@ -22,7 +22,7 @@ if (!is_writable($config['temp_dir']))
 
 if (isset($_GET['logout']) && $_SESSION['authenticated'])
 {
-  mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('" . $_SESSION['username'] . "', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
+  dbInsert(array('user' => $_SESSION['username'], 'address' => $_SERVER["REMOTE_ADDR"], 'result' => 'Logged Out'), 'authlog');
   unset($_SESSION);
   session_destroy();
   header('Location: /');
@@ -69,7 +69,7 @@ if (isset($_SESSION['username']))
     if (!$_SESSION['authenticated'])
     {
       $_SESSION['authenticated'] = true;
-      mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('".$_SESSION['username']."', '".$_SERVER["REMOTE_ADDR"]."', 'logged in')");
+      dbInsert(array('user' => $_SESSION['username'], 'address' => $_SERVER["REMOTE_ADDR"], 'result' => 'Logged In'), 'authlog');
       header("Location: ".$_SERVER['REQUEST_URI']);
     }
     if (isset($_POST['remember']))
@@ -84,7 +84,7 @@ if (isset($_SESSION['username']))
   {
     $auth_message = "Authentication Failed";
     unset ($_SESSION['authenticated']);
-    mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('".$_SESSION['username']."', '".$_SERVER["REMOTE_ADDR"]."', 'authentication failure')");
+    dbInsert(array('user' => $_SESSION['username'], 'address' => $_SERVER["REMOTE_ADDR"], 'result' => 'Authentication Failure'), 'authlog');
   }
 }
 ?>
