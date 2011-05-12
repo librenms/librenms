@@ -138,7 +138,7 @@ function renamehost($id, $new, $source = 'console')
 {
   global $config;
 
-  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
+  $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = '$id'");
   rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new");
   mysql_query("UPDATE devices SET hostname = '$new' WHERE device_id = '$id'");
   log_event("Hostname changed -> $new ($source)", $id, 'system');
@@ -166,7 +166,7 @@ function delete_device($id)
 {
   global $config;
 
-  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
+  $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = '$id'");
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
   $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
   while ($int_data = mysql_fetch_assoc($int_query))
@@ -209,7 +209,7 @@ function addHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
   {
     if (isPingable($host))
     {
-      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0')
+      if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'") == '0')
       {
         # FIXME internalize -- but we don't have $device yet!
         # FIXME this needs to be addhost.php's content instead, kindof, also use this function there then.

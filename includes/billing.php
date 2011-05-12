@@ -19,9 +19,8 @@ function getDates($dayofmonth)
 
     $date_from = $year . $month . $dayofmonth;
     $date_to   = $newyear . $newmonth . $dayofmonth;
-    $dt_q = mysql_query("SELECT DATE_SUB(DATE_ADD('$date_from', INTERVAL 1 MONTH), INTERVAL 1 DAY);");
-    $date_to = mysql_result($dt_q,0);
-    $date_to = str_replace("-","",$date_to);
+    $date_to   = dbFetchCell("SELECT DATE_SUB(DATE_ADD('".mres($date_from)."', INTERVAL 1 MONTH), INTERVAL 1 DAY)");
+    $date_to   = str_replace("-","",$date_to);
   }
   else
   {
@@ -36,17 +35,14 @@ function getDates($dayofmonth)
 
     $date_from = $newyear . $newmonth . $dayofmonth;
     $date_to   = $year . $month . $dayofmonth;
-    $dt_q = mysql_query("SELECT DATE_SUB(DATE_ADD('$date_to', INTERVAL 1 MONTH, INTERVAL 1 DAY);");
-    $date_from = mysql_result($dt_q,0);
+    $date_from = dbFetchCell("SELECT DATE_SUB(DATE_ADD('".mres($date_to)."', INTERVAL 1 MONTH, INTERVAL 1 DAY)");
     $date_from = str_replace("-","",$date_from);
   }
 
-  $lq_from = mysql_query("SELECT DATE_SUB('$date_from', INTERVAL 1 MONTH);");
-  $last_from = mysql_result($lq_from,0);
+  $last_from = dbFetchCell("SELECT DATE_SUB('".mres($date_from)."', INTERVAL 1 MONTH)");
   $last_from = str_replace("-","",$last_from);
 
-  $lq_to   = mysql_query("SELECT DATE_SUB('$date_to', INTERVAL 1 MONTH);");
-  $last_to = mysql_result($lq_to,0);
+  $last_to = dbFetchCell("SELECT DATE_SUB('".mres($date_to)."', INTERVAL 1 MONTH)");
   $last_to = str_replace("-","",$last_to);
 
   $return['0'] = $date_from . "000000";
@@ -63,7 +59,7 @@ function getValue($host, $port, $id, $inout)
   global $config;
 
   $oid  = "IF-MIB::ifHC" . $inout . "Octets." . $id;
-  $device = mysql_fetch_assoc(mysql_query("SELECT * from `devices` WHERE `hostname` = '" . $host . "' LIMIT 1"));
+  $device = dbFetchRow("SELECT * from `devices` WHERE `hostname` = '".mres($host)."' LIMIT 1");
   $value = snmp_get($device, $oid, "-O qv");
 
   if (!is_numeric($value))
@@ -77,15 +73,13 @@ function getValue($host, $port, $id, $inout)
 
 function getLastPortCounter($port_id,$inout)
 {
-  $query = mysql_query("SELECT count(counter) from port_" . $inout . "_measurements WHERE port_id=" . $port_id);
-  $rows = mysql_result($query, 0);
+  $rows = dbFetchCell("SELECT count(counter) from `port_" . mres($inout) . "_measurements` WHERE `port_id`='" . mres($port_id)."'");
 
   if ($rows > 0)
   {
-    $query = mysql_query("SELECT counter,delta FROM port_" . $inout . "_measurements WHERE port_id=$port_id ORDER BY timestamp DESC");
-    $row = mysql_fetch_row($query);
-    $return[counter] = $row[0];
-    $return[delta] = $row[1];
+    $row = dbFetchRow("SELECT counter,delta FROM `port_".mres($inout)."_measurements` WHERE `port_id`='".mres($port_id)."' ORDER BY timestamp DESC");
+    $return[counter] = $row['counter'];
+    $return[delta] = $row['delta'];
     $return[state] = "ok";
   } else {
     $return[state] = "failed";
@@ -96,17 +90,15 @@ function getLastPortCounter($port_id,$inout)
 
 function getLastMeasurement($bill_id)
 {
-  $query = mysql_query("SELECT count(delta) from bill_data WHERE bill_id=" . $bill_id);
-  $rows  = mysql_result($query, 0);
+  $rows = dbFetchCell("SELECT count(delta) from bill_data WHERE bill_id='".mres($bill_id)."'");
 
   if ($rows > 0)
   {
-    $query = mysql_query("SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id=$bill_id ORDER BY timestamp DESC");
-    $row = mysql_fetch_row($query);
-    $return[delta] = $row[1];
-    $return[delta] = $row[2];
-    $return[delta] = $row[3];
-    $return[timestamp] = $row[0];
+    $row = dbFetchRow("SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id='".mres($bill_id)."' ORDER BY timestamp DESC");
+    $return[delta]     = $row['delta'];
+    $return[delta_in]  = $row['delta_in'];
+    $return[delta_out] = $row['delta_out'];
+    $return[timestamp] = $row['timestamp'];
     $return[state] = "ok";
   } else {
     $return[state] = "failed";
@@ -117,32 +109,31 @@ function getLastMeasurement($bill_id)
 
 function get95thin($bill_id,$datefrom,$dateto)
 {
-  $mq_text = "SELECT count(delta) FROM bill_data WHERE bill_id = $bill_id";
-  $mq_text .= " AND timestamp > $datefrom AND timestamp <= $dateto";
-  $m_query = mysql_query($mq_text);
-  $measurements = mysql_result($m_query,0);
+  $mq_sql = "SELECT count(delta) FROM bill_data WHERE bill_id = '".mres($bill_id)."'";
+  $mq_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'";
+  $measurements = dbFetchCell($mq_sql);
   $measurement_95th = round($measurements /100 * 95) - 1;
 
-  $q_95_text = "SELECT (in_delta / period / 1000 * 8) AS rate FROM bill_data  WHERE bill_id = $bill_id";
-  $q_95_text .= " AND timestamp > $datefrom AND timestamp <= $dateto ORDER BY in_delta ASC";
-  $q_95th = mysql_query($q_95_text);
-  $m_95th = mysql_result($q_95th,$measurement_95th);
+  $q_95_sql = "SELECT (in_delta / period / 1000 * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
+  $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY in_delta ASC";
+  $a_95th = dbFetchColumn($q_95_sql);
+  $m_95th = $a_95th[$measurement_95th];
 
   return(round($m_95th, 2));
 }
 
 function get95thout($bill_id,$datefrom,$dateto)
 {
-  $mq_text = "SELECT count(delta) FROM bill_data WHERE bill_id = $bill_id";
-  $mq_text .= " AND timestamp > $datefrom AND timestamp <= $dateto";
-  $m_query = mysql_query($mq_text);
-  $measurements = mysql_result($m_query,0);
+  $mq_sql = "SELECT count(delta) FROM bill_data WHERE bill_id = '".mres($bill_id)."'";
+  $mq_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'";
+  $measurements = dbFetchCell($mq_sql);
   $measurement_95th = round($measurements /100 * 95) - 1;
 
-  $q_95_text = "SELECT (out_delta / period / 1000 * 8) AS rate FROM bill_data  WHERE bill_id = $bill_id";
-  $q_95_text .= " AND timestamp > $datefrom AND timestamp <= $dateto ORDER BY out_delta ASC";
-  $q_95th = mysql_query($q_95_text);
-  $m_95th = mysql_result($q_95th,$measurement_95th);
+  $q_95_sql = "SELECT (out_delta / period / 1000 * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
+  $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY out_delta ASC";
+
+  $a_95th = dbFetchColumn($q_95_sql);
+  $m_95th = $a_95th[$measurement_95th];
 
   return(round($m_95th, 2));
 }
@@ -150,19 +141,19 @@ function get95thout($bill_id,$datefrom,$dateto)
 function getRates($bill_id,$datefrom,$dateto)
 {
   $mq_text = "SELECT count(delta) FROM bill_data ";
-  $mq_text = $mq_text . " WHERE bill_id = $bill_id";
-  $mq_text = $mq_text . " AND timestamp > $datefrom AND timestamp <= $dateto";
-  $m_query = mysql_query($mq_text);
-  $measurements = mysql_result($m_query,0);
+  $mq_text .= " WHERE bill_id = '".mres($bill_id)."'";
+  $mq_text .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'";
+  $measurements = dbFetchCell($mq_sql);
   $measurement_95th = round($measurements /100 * 95) - 1;
 
-  $q_95_text = "SELECT delta FROM bill_data  WHERE bill_id = $bill_id";
-  $q_95_text = $q_95_text . " AND timestamp > $datefrom AND timestamp <= $dateto ORDER BY delta ASC";
-  $q_95th = mysql_query($q_95_text);
-  $m_95th = mysql_result($q_95th,$measurement_95th);
+  $q_95_sql = "SELECT delta FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
+  $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY delta ASC";
 
-  $mt_q = mysql_query("SELECT SUM(delta) FROM bill_data WHERE bill_id = '$bill_id' AND timestamp > '$datefrom' AND timestamp <= '$dateto'");
-  $mtot = mysql_result($mt_q,0);
+  $a_95th = dbFetchColumn($q_95_sql);
+  $m_95th = $a_95th[$measurement_95th];
+
+  $mtot = getTotal($bill_id,$datefrom,$dateto);
+
   $data['rate_95th_in'] = get95thIn($bill_id,$datefrom,$dateto);
   $data['rate_95th_out'] = get95thOut($bill_id,$datefrom,$dateto);
 
@@ -183,8 +174,7 @@ function getRates($bill_id,$datefrom,$dateto)
 
 function getTotal($bill_id,$datefrom,$dateto)
 {
-  $mt_q = mysql_query("SELECT sum(delta) FROM bill_data  WHERE bill_id = $bill_id AND timestamp > $datefrom AND timestamp <= $dateto");
-  $mtot = mysql_result($mt_q,0);
+  $mtot = dbFetchCell("SELECT SUM(delta) FROM bill_data WHERE bill_id = '".mres($bill_id)."' AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'");
 
   return($mtot);
 }
