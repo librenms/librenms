@@ -2,11 +2,7 @@
 
 if ($_GET['id'] && is_numeric($_GET['id'])) { $atm_vp_id = $_GET['id']; }
 
-$sql =  "SELECT * FROM `juniAtmVp` as J, `ports` AS I, `devices` AS D";
-$sql .= " WHERE J.juniAtmVp_id = '".$atm_vp_id."' AND I.interface_id = J.interface_id AND I.device_id = D.device_id";
-
-$query = mysql_query($sql);
-$vp = mysql_fetch_assoc($query);
+$vp = dbFetchRow("SELECT * FROM `juniAtmVp` as J, `ports` AS I, `devices` AS D WHERE J.juniAtmVp_id = ? AND I.interface_id = J.interface_id AND I.device_id = D.device_id", array($atm_vp_id));
 
 if ($config['allow_unauth_graphs'] || port_permitted($vp['interface_id']))
 {
