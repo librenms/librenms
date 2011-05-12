@@ -24,6 +24,7 @@ Usage
 function dbQuery($sql, $parameters = array()) {
 	global $fullSql;
 	$fullSql = dbMakeQuery($sql, $parameters);
+        echo("$fullSql");
 	/*
 	if($this->logFile)
 		$time_start = microtime(true);
@@ -61,7 +62,7 @@ function dbInsert($data, $table) {
 		//trigger_error('QDB - Parameters passed to insert() were in reverse order, but it has been allowed', E_USER_NOTICE);
 	}
 
-	$sql = 'insert into ' . $table . ' (' . implode(',', array_keys($data)) . ') values(' . implode(',', dbPlaceHolders($data)) . ')';
+	$sql = 'INSERT INTO `' . $table . '` (`' . implode('`,`', array_keys($data)) . '`)  VALUES (' . implode(',', dbPlaceHolders($data)) . ')';
 
 	dbBeginTransaction();
 	$result = dbQuery($sql, $data);
@@ -79,7 +80,7 @@ function dbInsert($data, $table) {
 }
 
 /*
- * Passed an array, table name, where clause, and placeholder parameters, it attempts to update a record.
+ * Passed an array, table name, WHERE clause, and placeholder parameters, it attempts to update a record.
  * Returns the number of affected rows
  * */
 function dbUpdate($data, $table, $where = null, $parameters = array()) {
@@ -96,15 +97,15 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
 	}
 
 	// need field name and placeholder value
-	// but how merge these field placeholders with actual $parameters array for the where clause
-	$sql = 'update ' . $table . ' set ';
+	// but how merge these field placeholders with actual $parameters array for the WHERE clause
+	$sql = 'UPDATE `' . $table . '` set ';
 	foreach($data as $key => $value) {
-		$sql .= $key . '=:' . $key . ',';
+                $sql .= "`".$key."` ". '=:' . $key . ',';
 	}
 	$sql = substr($sql, 0, -1); // strip off last comma
 
 	if($where) {
-		$sql .= ' where ' . $where;
+		$sql .= ' WHERE ' . $where;
 		$data = array_merge($data, $parameters);
 	}
 
@@ -117,9 +118,9 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
 }
 
 function dbDelete($table, $where = null, $parameters = array()) {
-	$sql = 'delete from ' . $table;
+	$sql = 'DELETE FROM `' . $table.'`';
 	if($where) {
-		$sql .= ' where ' . $where;
+		$sql .= ' WHERE ' . $where;
 	}
 	if(dbQuery($sql, $parameters)) {
 		return mysql_affected_rows();
@@ -228,65 +229,71 @@ function dbFetchKeyValue($sql, $parameters = array()) {
  * PDO drivers don't need to use this
  */
 function dbMakeQuery($sql, $parameters) {
-	// bypass extra logic if we have no parameters
-	if(sizeof($parameters) == 0)
-		return $sql;
-	$parts = explode('?', $sql);
-	$query = array_shift($parts); // put on first part
+    // bypass extra logic if we have no parameters
+    if(sizeof($parameters) == 0)
+			return $sql;
 
-	$parameters = dbPrepareData($parameters);
-	$newParams = array();
-	// replace question marks first
-	foreach($parameters as $key => $value) {
-		if(is_numeric($key)) {
-			$query .= $value . array_shift($parts);
-			//$newParams[ $key ] = $value;
-		} else {
-			$newParams[ ':' . $key ] = $value;
+		$parameters = dbPrepareData($parameters);
+		// separate the two types of parameters for easier handling
+		$questionParams = array();
+		$namedParams = array();
+		foreach($parameters as $key => $value) {
+			if(is_numeric($key)) {
+				$questionParams[] = $value;
+			} else {
+				$namedParams[ ':' . $key ] = $value;
+			}
 		}
-	}
-	// now replace name place-holders
-	// replace place-holders with quoted, escaped values
-	/*
-	var_dump($query);
-	var_dump($newParams);exit;
-	*/
+		// sort namedParams in reverse to stop substring squashing
+		krsort($namedParams);
 
-	// sort newParams in reverse to stop substring squashing
-	krsort($newParams);
-	$query = str_replace( array_keys($newParams), $newParams, $query);
-	//die($query);
-	return $query;
+		// split on question-mark and named placeholders
+		$result = preg_split('/(\?|:[a-zA-Z0-9_-]+)/', $sql, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+
+		// every-other item in $result will be the placeholder that was found
+
+		$query = '';
+		for($i = 0; $i < sizeof($result); $i+=2) {
+			$query .= $result[ $i ];
+
+			$j = $i+1;
+			if(array_key_exists($j, $result)) {
+				$test = $result[ $j ];
+				if($test == '?') {
+					$query .= array_shift($questionParams);
+				} else {
+					$query .= $namedParams[ $test ]; 
+				}
+			}
+		}
+		return $query;
 }
 
 
-
-/*
- * This should be protected and overloadable by driver classes
- */
 function dbPrepareData($data) {
-	$values = array();
+		$values = array();
 
-	foreach($data as $key=>$value) {
-		$escape = true;
-		// new way to determine whether to quote and escape
-		// if value is an array, we treat it as a "decorator" that tells us not to escape the
-		// value contained in the array
-		if(is_array($value) && !is_object($value)) {
-			$escape = false;
-			$value = array_shift($value);
+		foreach($data as $key=>$value) {
+			$escape = true;
+			// don't quote or esc if value is an array, we treat it
+			// as a "decorator" that tells us not to escape the
+			// value contained in the array
+			if(is_array($value) && !is_object($value)) {
+				$escape = false;
+				$value = array_shift($value);
+			}
+			// it's not right to worry about invalid fields in this method because we may be operating on fields
+			// that are aliases, or part of other tables through joins 
+			//if(!in_array($key, $columns)) // skip invalid fields
+			//	continue;
+			if($escape) {
+				$values[$key] = "'" . mysql_real_escape_string($value) . "'";
+			} else
+				$values[$key] = $value;
 		}
-		// it's not right to worry about invalid fields in this method because we may be operating on fields
-		// that are aliases, or part of other tables through joins 
-		//if(!in_array($key, $columns)) // skip invalid fields
-		//	continue;
-		if($escape)
-			$values[$key] = "'" . mysql_real_escape_string($value) . "'";
-		else
-			$values[$key] = $value;
+		return $values;
 	}
-	return $values;
-}
+
 
 /*
  * Given a data array, this returns an array of placeholders
