@@ -2,17 +2,16 @@
 
 ### Generate some statistics to send along with the version request.
 
-$stats['ports']        = mysql_result(mysql_query("SELECT count(*) FROM ports"),0);
-$stats['devices']      = mysql_result(mysql_query("SELECT count(*) FROM devices"),0);
-$stats['sensors']      = mysql_result(mysql_query("SELECT count(*) FROM sensors"),0);
-$stats['services']     = mysql_result(mysql_query("SELECT count(*) FROM services"),0);
-$stats['applications'] = mysql_result(mysql_query("SELECT count(*) FROM applications"),0);
-$stats['bgp']          = mysql_result(mysql_query("SELECT count(*) FROM bgpPeers"),0);
+$stats['ports']        = dbFetchCell("SELECT count(*) FROM ports");
+$stats['devices']      = dbFetchCell("SELECT count(*) FROM devices");
+$stats['sensors']      = dbFetchCell("SELECT count(*) FROM sensors");
+$stats['services']     = dbFetchCell("SELECT count(*) FROM services");
+$stats['applications'] = dbFetchCell("SELECT count(*) FROM applications");
+$stats['bgp']          = dbFetchCell("SELECT count(*) FROM bgpPeers");
 
-$dt_query      = mysql_query("SELECT `os` FROM `devices` GROUP BY `os`");
-while($dt_data = mysql_fetch_assoc($dt_query))
+foreach(dbFetch("SELECT `os` FROM `devices` GROUP BY `os`") as $dt_data)
 {
-  $stats['devicetypes'][$dt_data[os]] = mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `os` = '".$dt_data['os']."'"),0);
+  $stats['devicetypes'][$dt_data[os]] = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `os` = '".$dt_data['os']."'");
 }
 
 $stats = serialize($stats[$dt_data[os]]);
