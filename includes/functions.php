@@ -15,6 +15,7 @@ include_once($config['install_dir'] . "/includes/syslog.php");
 include_once($config['install_dir'] . "/includes/rewrites.php");
 include_once($config['install_dir'] . "/includes/snmp.inc.php");
 include_once($config['install_dir'] . "/includes/services.inc.php");
+include_once($config['install_dir'] . "/includes/dbFacile.php");
 
 function mac_clean_to_readable($mac)
 {
