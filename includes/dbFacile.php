@@ -24,7 +24,6 @@ Usage
 function dbQuery($sql, $parameters = array()) {
 	global $fullSql;
 	$fullSql = dbMakeQuery($sql, $parameters);
-        echo("$fullSql");
 	/*
 	if($this->logFile)
 		$time_start = microtime(true);
