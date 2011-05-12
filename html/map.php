@@ -1,14 +1,21 @@
 <?php
 
 ### FIXME : remove link when port/host is not in the database (things /seen/ but not *discovered*)
+###         No, that should be there... I like to see that stuff :> (adama)
+
+#  ini_set('display_errors', 1);
+#  ini_set('display_startup_errors', 1);
+#  ini_set('log_errors', 1);
+#  ini_set('error_reporting', E_ALL);
 
 $links = 1;
 
-include("../includes/defaults.inc.php");
-include("../config.php");
-include("../includes/functions.php");
-include("includes/functions.inc.php");
-include("includes/authenticate.inc.php");
+include_once("../includes/defaults.inc.php");
+include_once("../config.php");
+include_once("../includes/functions.php");
+include_once("../includes/dbFacile.php");
+include_once("includes/functions.inc.php");
+include_once("includes/authenticate.inc.php");
 
 if (is_array($config['branding']))
 {
@@ -26,8 +33,9 @@ if (is_array($config['branding']))
   }
 }
 
-if (isset($_GET['device'])) { $where = "WHERE device_id = ".$_GET['device']; } else { $where = ""; }
-$deviceresult = mysql_query("SELECT * from devices $where");
+if (isset($_GET['device'])) { $where = "WHERE device_id = ".mres($_GET['device']); } else { $where = ""; }
+
+## FIXME this shit probably needs tidied up.
 
 if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 {
@@ -42,33 +50,28 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
   }
   else
   {
-    while ($device = mysql_fetch_assoc($deviceresult))
+    foreach (dbFetch("SELECT * from devices ".$where) as $device)
     {
       if ($device)
       {
-        $sql = "SELECT * from ports AS I, links AS L WHERE I.device_id = ".$device['device_id']." AND L.local_interface_id = I.interface_id ORDER BY L.remote_hostname";
-        $links = mysql_query($sql);
+        $links = dbFetch("SELECT * from ports AS I, links AS L WHERE I.device_id = ? AND L.local_interface_id = I.interface_id ORDER BY L.remote_hostname", array($device['device_id']));
 
-        if (mysql_num_rows($links))
+        if (count($links))
         {
           $map .= "\"".$device['hostname']."\" [fontsize=20 fillcolor=\"lightblue\" URL=\"{$config['base_url']}/device/".$device['device_id']."/map/\" shape=box3d]\n";
         }
 
-        while ($link = mysql_fetch_assoc($links))
+        foreach  ($links as $link)
         {
           $local_interface_id = $link['local_interface_id'];
           $remote_interface_id = $link['remote_interface_id'];
 
           $i = 0; $done = 0;
-          while (isset($linkdone) && $i < count($linkdone))
-          {
-            if ($linkdone[$i] == "$remote_interface_id $local_interface_id") { $done = 1; }
-            $i++;
-          }
+          if ($linkdone[$remote_interface_id][$local_interface_id]) { $done = 1; }
 
           if (!$done)
           {
-            $linkdone[] = "$local_interface_id $remote_interface_id";
+            $linkdone[$local_interface_id][$remote_interface_id] = TRUE;
 
 	    $links++;
 
@@ -88,17 +91,17 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
             $src = $device['hostname'];
             if ($remote_interface_id)
             {
-              $dst = mysql_result(mysql_query("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
-              $dst_host = mysql_result(mysql_query("SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
+              $dst = dbFetchCell("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.interface_id = ? AND D.device_id = I.device_id", array($remote_interface_id));
+              $dst_host = dbFetchCell("SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.interface_id = ?  AND D.device_id = I.device_id", array($remote_interface_id));
             } else {
 	      unset($dst_host);
               $dst = $link['remote_hostname'];
             }
 
-            $sif = ifNameDescr(mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['local_interface_id'])),$device);
+            $sif = ifNameDescr(dbFetchRow("SELECT * FROM ports WHERE `interface_id` = ?", array($link['local_interface_id'])),$device);
             if ($remote_interface_id)
             {
-              $dif = ifNameDescr(mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['remote_interface_id'])));
+              $dif = ifNameDescr(dbFetchRow("SELECT * FROM ports WHERE `interface_id` = ?", array($link['remote_interface_id'])), $device);
             } else {
               $dif['label'] = $link['remote_port'];
 	      $dif['interface_id'] = $link['remote_hostname'] . $link['remote_port'];
