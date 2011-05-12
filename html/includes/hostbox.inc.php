@@ -28,8 +28,8 @@ $image = getImage($device['device_id']);
 if ($device['os'] == "ios") { formatCiscoHardware($device, true); }
 $device['os_text'] = $config['os'][$device['os']]['text'];
 
-$port_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."'"),0);
-$sensor_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."'"),0);
+$port_count   = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ?", array($device['device_id']));
+$sensor_count = dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ?", array($device['device_id']));
 
 echo('  <tr class="'.$class.'" bgcolor="' . $bg . '" onmouseover="this.style.backgroundColor=\'#fdd\';" onmouseout="this.style.backgroundColor=\'' . $bg . '\';"
           onclick="location.href=\'device/'.$device['device_id'].'/\'" style="cursor: pointer;">

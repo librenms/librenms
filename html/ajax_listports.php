@@ -9,19 +9,20 @@ if ($_GET['debug'])
   ini_set('error_reporting', E_ALL);
 }
 
-include("../includes/defaults.inc.php");
-include("../config.php");
-include("includes/functions.inc.php");
-include("../includes/common.php");
-include("../includes/rewrites.php");
-include("includes/authenticate.inc.php");
+include_once("../includes/defaults.inc.php");
+include_once("../config.php");
+include_once("includes/functions.inc.php");
+include_once("../includes/dbFacile.php");
+include_once("../includes/common.php");
+
+include_once("../includes/rewrites.php");
+include_once("includes/authenticate.inc.php");
 
 if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 
 if (is_numeric($_GET['device_id']))
 {
-  $ports = mysql_query("SELECT * FROM ports WHERE device_id = '".$_GET['device_id']."'");
-  while ($interface = mysql_fetch_assoc($ports))
+  foreach (dbFetch("SELECT * FROM ports WHERE device_id = ?", array($_GET['device_id'])) as $interface)
   {
     echo("obj.options[obj.options.length] = new Option('".$interface['ifDescr']." - ".$interface['ifAlias']."','".$interface['interface_id']."');\n");
   }

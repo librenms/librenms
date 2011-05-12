@@ -13,7 +13,7 @@
 
     $insert = array('device_id' => $id, 'service_ip' => $hostname, 'service_type' => $service, 'service_desc' => "auto discovered: $service", 'service_param' => "", 'service_ignore' => "0");
 
-    return $dbInsert($insert, 'services');    
+    return dbInsert($insert, 'services');    
 
   }
 

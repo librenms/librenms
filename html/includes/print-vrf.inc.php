@@ -9,8 +9,7 @@ echo("<td width=150 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
 echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "</td>");
 
 echo('<td class="list-bold">');
-$ports_query = mysql_query("SELECT * FROM ports WHERE `device_id` = '" . $device['device_id'] . "' AND `ifVrf` = '" . $vrf['vrf_id'] . "' ");
-while ($port = mysql_fetch_assoc($ports_query))
+foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVrf` = ?", array($device['device_id'], $vrf['vrf_id'])) as $port))
 {
   if ($_GET['optb'] == "graphs")
   {

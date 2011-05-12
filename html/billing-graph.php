@@ -50,19 +50,17 @@ if ($type == "date") { $date_format = "%d %b %H:%i"; $tickinterval = "2"; } else
 $datefrom = date('Ymt', $start) . "000000";
 $dateto = date('Ymt',   $end) . "235959";
 
-$datefrom = mysql_result(mysql_query("SELECT FROM_UNIXTIME($start, '%Y%m%d')"),0) . "000000";
-$dateto = mysql_result(mysql_query("SELECT FROM_UNIXTIME($end, '%Y%m%d')"),0) . "235959";
+$datefrom = dbFetchCell("SELECT FROM_UNIXTIME($start, '%Y%m%d')") . "000000";
+$dateto   = dbFetchCell("SELECT FROM_UNIXTIME($end, '%Y%m%d')") . "235959";
 
 $rate_data = getRates($bill_id,$datefrom,$dateto);
 $rate_95th = $rate_data['rate_95th'] * 1000;
 $rate_average = $rate_data['rate_average'] * 1000;
 
-$bi_q = mysql_query("SELECT * FROM bills WHERE bill_id = $bill_id");
-$bi_a = mysql_fetch_assoc($bi_q);
+$bi_a = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id)");
 $bill_name = $bi_a['bill_name'];
 
-$countsql = mysql_query("SELECT count(`delta`) FROM `bill_data` WHERE `bill_id` = '$bill_id' AND `timestamp` >= '$datefrom' AND `timestamp` <= '$dateto'");
-$counttot = mysql_result($countsql,0);
+$counttot = dbFetchCell("SELECT count(`delta`) FROM `bill_data` WHERE `bill_id` = ? AND `timestamp` >= ? AND `timestamp` <= ?", array($bill_id, $datefrom, $dateto));
 
 $count = round($counttot / (($ysize - 100) * 2), 0);
 if ($count <= 1) { $count = 2; }
@@ -72,19 +70,18 @@ if ($count <= 1) { $count = 2; }
 #$count = round($counttot / 260, 0);
 #if ($count <= 1) { $count = 2; }
 
-$max = mysql_result(mysql_query("SELECT delta FROM bill_data WHERE bill_id = $bill_id AND timestamp >= $datefrom AND timestamp <= $dateto ORDER BY delta DESC LIMIT 0,1"),0);
+$max = dbFetchCell("SELECT delta FROM bill_data WHERE bill_id = ? AND timestamp >= ? AND timestamp <= ? ORDER BY delta DESC LIMIT 0,1", array($bill_id, $datefrom, $dateto));
 if ($max > 1000000) { $div = "1000000"; $yaxis = "Mbit/sec";  } else { $div = "1000"; $yaxis = "Kbit/sec"; }
 
 $i = '0';
 
-#$start = mysql_result(mysql_query("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >=$datefrom AND timestamp <= $dateto ORDER BY timestamp ASC LIMIT 0,1"),0);
-#$end   = mysql_result(mysql_query("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >=$datefrom AND timestamp <= $dateto ORDER BY timestamp DESC LIMIT 0,1"),0);
+#$start = "SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >=$datefrom AND timestamp <= $dateto ORDER BY timestamp ASC LIMIT 0,1"),0);
+#$end   = "SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >=$datefrom AND timestamp <= $dateto ORDER BY timestamp DESC LIMIT 0,1"),0);
 $dur = $end - $start;
 
-$sql = "SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >= $datefrom AND timestamp <= $dateto ORDER BY timestamp ASC";
-$data = mysql_query($sql);
+#$sql = "SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >= $datefrom AND timestamp <= $dateto ORDER BY timestamp ASC";
 
-while ($row = mysql_fetch_assoc($data))
+foreach (dbFetch("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = ? AND timestamp >= ? AND timestamp <= ? ORDER BY timestamp ASC", array($bill_id, $datefrom, $dateto)) as $row)
 {
   @$timestamp = $row['formatted_date'];
   if (!$first) { $first = $timestamp; }

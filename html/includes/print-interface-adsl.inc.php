@@ -30,14 +30,12 @@ if ($interface['ifAlias']) { echo("<br />"); }
 unset ($break);
 if ($port_details)
 {
-  $ipdata = mysql_query("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
-  while ($ip = mysql_fetch_assoc($ipdata))
+  foreach (dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = ?", array($interface['interface_id'])) as $ip)
   {
     echo("$break <a class=interface-desc href=\"javascript:popUp('netcmd.php?cmd=whois&amp;query=".$ip['ipv4_address']."')\">".$ip['ipv4_address']."/".$ip['ipv4_prefixlen']."</a>");
     $break = ",";
   }
-  $ip6data = mysql_query("SELECT * FROM `ipv6_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
-  while ($ip6 = mysql_fetch_assoc($ip6data))
+  foreach (dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `interface_id` = ?", array($interface['interface_id']) as $ip6);
   {
     echo("$break <a class=interface-desc href=\"javascript:popUp('netcmd.php?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address'])."/".$ip6['ipv6_prefixlen']."</a>");
     $break = ",";

@@ -2,15 +2,11 @@
 
   $updated = '1';
 
-  $sql = "INSERT INTO `services` (`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`)
-                          VALUES ('" . mres($_POST['device']). "','" . mres($_POST['ip']) . "','" . mres($_POST['type']) . "',
-                                  '" . mres($_POST['descr']) . "','" . mres($_POST['params']) . "','0')";
+  $service_id = dbInsert(array('device_id' => $_POST['device'], 'service_ip' => $_POST['ip'], 'service_type' => $_POST['type'], 'service_desc' => $_POST['descr'], 'service_param' => $_POST['params'], 'service_ignore' => '0'), 'services');
 
-  $query = mysql_query($sql);
-  $affected = mysql_affected_rows() . "records affected";
-
-  $message .= $message_break . "Service added!";
-  $message_break .= "<br />"
-
+  if($service_id) {
+    $message .= $message_break . "Service added (".$service_id.")!";
+    $message_break .= "<br />"
+  }
 
 ?>

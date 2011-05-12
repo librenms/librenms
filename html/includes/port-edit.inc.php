@@ -24,14 +24,7 @@ foreach ($_POST as $key => $val)
       continue;
     }
 
-    if (!mysql_query('UPDATE `ports` SET `ignore`='.$newign.' WHERE `device_id`='.$device_id.' AND `interface_id`='.$interface_id))
-    {
-      $n = -1;
-    }
-    else
-    {
-      $n = mysql_affected_rows();
-    }
+    $n = dbUpdate(array('ignore' => $newign), 'ports', '`device_id` = ? AND `interface_id` = ?', array($device_id, $interface_id));
 
     if ($n <0)
     {
@@ -58,14 +51,7 @@ foreach ($_POST as $key => $val)
       continue;
     }
 
-    if (!mysql_query('UPDATE `ports` SET `disabled`='.$newdis.' WHERE `device_id`='.$device_id.' AND `interface_id`='.$interface_id))
-    {
-      $n = -1;
-    }
-    else
-    {
-      $n = mysql_affected_rows();
-    }
+    $n = dbUpdate(array('disabled' => $newdis), 'ports', '`device_id` = ? AND `interface_id` = ?', array($device_id, $interface_id));
 
     if ($n <0)
     {
