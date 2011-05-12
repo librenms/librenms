@@ -167,12 +167,12 @@ function getifindexbyid($id)
 
 function get_port_by_ifIndex($device, $ifIndex)
 {
-  return dbFetchCell("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device['device_id'], $ifIndex));
+  return dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device['device_id'], $ifIndex));
 }
 
 function getifbyid($id)
 {
-  return dbFetchCell("SELECT * FROM `ports` WHERE `interface_id` = ?", array($id));
+  return dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($id));
 }
 
 function getifdescrbyid($id)
@@ -221,7 +221,7 @@ function set_dev_attrib($device, $attrib_type, $attrib_value)
 function get_dev_attribs($device)
 {
   $attribs = array();
-  foreach(dbFetch("SELECT * FROM devices_attribs WHERE `device_id` = ?", array($device)) as $entry)
+  foreach(dbFetchRow("SELECT * FROM devices_attribs WHERE `device_id` = ?", array($device)) as $entry)
   {
     $attribs[$entry['attrib_type']] = $entry['attrib_value'];
   }

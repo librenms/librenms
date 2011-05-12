@@ -42,7 +42,7 @@ if ($port_details)
 {
   foreach (dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = ?", array($interface['interface_id'])) as $ip) 
   {
-    echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=$ip[ipv4_address]')\">$ip[ipv4_address]/$ip[ipv4_prefixlen]</a>");
+    echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=$ip[ipv4_address]')\">".$ip['ipv4_address']."/".$ip['ipv4_prefixlen']."</a>");
     $break = "<br />";
   }
   foreach (dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `interface_id` = ?", array($interface['interface_id'])) as $ip6)
@@ -145,7 +145,7 @@ if (strpos($interface['label'], "oopback") === false && !$graph_type)
            AND A.ipv4_network_id = ? AND D.device_id = I.device_id
            AND D.device_id != ?";
       $array = array($net['ipv4_network_id'], $device['device_id']);
-      foreach(dbFetchRow($sql, $array) AS $new)
+      foreach(dbFetchRows($sql, $array) AS $new)
       {
         echo($new['ipv4_network_id']);
         $this_ifid = $new['interface_id'];
@@ -166,7 +166,7 @@ if (strpos($interface['label'], "oopback") === false && !$graph_type)
            AND D.device_id != ? AND A.ipv6_origin != 'linklayer' AND A.ipv6_origin != 'wellknown'";
       $array = array($net['ipv6_network_id'], $device['device_id']);
 
-      foreach(dbFetchRow($sql, $array) AS $new)
+      foreach(dbFetchRows($sql, $array) AS $new)
       {
         echo($new['ipv6_network_id']);
           $this_ifid = $new['interface_id'];
