@@ -939,11 +939,11 @@ if (!$observium_link)
 }
 $observium_db = mysql_select_db($config['db_name'], $observium_link);
 
-try {
-    $db = new PDO('mysql:host='.$config['db_host'].';dbname='.$config['db_name'], $config['db_user'], $config['db_pass']);
-} catch (PDOException $e) {
-    print "Error!: " . $e->getMessage() . "<br/>";
-}
+#try {
+#    $db = new PDO('mysql:host='.$config['db_host'].';dbname='.$config['db_name'], $config['db_user'], $config['db_pass']);
+#} catch (PDOException $e) {
+#    print "Error!: " . $e->getMessage() . "<br/>";
+#}
 
 # Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 
