@@ -5,8 +5,7 @@ include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
 
-$alert_query = mysql_query("SELECT *, A.id as id FROM `alerts` as A, `devices` as D where A.device_id = D.device_id AND alerted = '0'");
-while ($alert = mysql_fetch_assoc($alert_query))
+foreach (dbFetchRows("SELECT *, A.id AS id FROM `alerts` AS A, `devices` AS D WHERE A.device_id = D.device_id AND alerted = '0'") as $alert)
 {
   $id = $alert['id'];
   $host = $alert['hostname'];
@@ -14,7 +13,8 @@ while ($alert = mysql_fetch_assoc($alert_query))
   $msg = $alert['message'];
   $alert_text .= "$date $host $msg";
 
-  mysql_query("UPDATE `alerts` SET alerted = '1' WHERE `id` = '$id'");
+  dbUpdate(array('alerted' => '1'), 'alerts', '`id` = ?' array($id))
+
 }
 
 if ($alert_text)

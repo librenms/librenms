@@ -7,13 +7,11 @@ include("includes/functions.php");
 
 ## Check all of our interface RRD files for errors
 
-if ($argv[1]) { $where = "AND `interface_id` = '$argv[1]'"; }
+if ($argv[1]) { $where = "AND `interface_id` = ?"; $params = array($argv[1]); }
 
 $i = '0';
 
-$interface_query = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id $where");
-
-while ($interface = mysql_fetch_assoc($interface_query))
+foreach (dbFetchRows("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id $where", $params) as $interface)
 {
   $errors = $interface['ifInErrors_delta'] + $interface['ifOutErrors_delta'];
   if ($errors > '1')

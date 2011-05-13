@@ -69,7 +69,7 @@
 
     echo("Uptime: ".formatUptime($uptime)."\n");
 
-    $device['db_update'] .= ", `uptime` = '".mres($uptime)."'";
+    $update_array['uptime'] = $uptime;
   }
 
   $poll_device['sysLocation'] = str_replace("\"","", $poll_device['sysLocation']);
@@ -77,19 +77,19 @@
 
   if ($poll_device['sysContact'] && $poll_device['sysContact'] != $device['sysContact'])
   {
-    $device['db_update'] .= ", `sysContact` = '".mres($poll_device['sysContact'])."'";
+    $update_array['sysContact'] = $poll_device['sysContact'];
     log_event("Contact -> ".$poll_device['sysContact'], $device, 'system');
   }
 
   if ($poll_device['sysName'] && $poll_device['sysName'] != $device['sysName'])
   {
-    $device['db_update'] .= ", `sysName` = '".mres($poll_device['sysName'])."'";
+    $update_array['sysName'] = $poll_device['sysName'];
     log_event("sysName -> ".$poll_device['sysName'], $device, 'system');
   }
 
   if ($poll_device['sysDescr'] && $poll_device['sysDescr'] != $device['sysDescr'])
   {
-    $device['db_update'] .= ", `sysDescr` = '".mres($poll_device['sysDescr'])."'";
+    $update_array['sysDescr'] = $poll_device['sysDescr'];
     log_event("sysDescr -> ".$poll_device['sysDescr'], $device, 'system');
   }
 
@@ -97,9 +97,9 @@
   {
       if (!get_dev_attrib($device,'override_sysLocation_bool'))
       {
-      $device['db_update'] .= ", `location` = '".mres($poll_device['sysLocation'])."'";
+        $update_array['location'] = $poll_device['sysLocation'];
+        log_event("Location -> ".$poll_device['sysLocation'], $device, 'system');
       }
-      log_event("Location -> ".$poll_device['sysLocation'], $device, 'system');
   }
 
 ?>

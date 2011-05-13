@@ -4,10 +4,7 @@ include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
 
-$sql = "SELECT * FROM devices AS D, services AS S WHERE S.device_id = D.device_id ORDER by D.device_id DESC";
-$query = mysql_query($sql);
-
-while ($service = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `devices` AS D, `services` AS S WHERE S.device_id = D.device_id ORDER by D.device_id DESC") as $service)
 {
   if ($service['status'] = "1")
   {
@@ -27,9 +24,12 @@ while ($service = mysql_fetch_assoc($query))
       $check = "Error : Script not found ($checker_script)";
     }
 
+    $update = array();
+
     if ($service_status != $status)
     {
-      $updated = ", `service_changed` = '" . time() . "' ";
+      $update['service_changed'] = time();
+      
       if ($service['sysContact']) { $email = $service['sysContact']; } else { $email = $config['email_default']; }
       if ($status == "1")
       {
@@ -45,8 +45,10 @@ while ($service = mysql_fetch_assoc($query))
       }
     } else { unset($updated); }
 
-    $update_sql = "UPDATE `services` SET `service_status` = '$status', `service_message` = '" . addslashes($check) . "', `service_checked` = '" . time() . "' $updated WHERE `service_id` = '" . $service['service_id']. "'";
-    mysql_query($update_sql);
+    $update = array_merge(array('service_status' => $status, 'service_message' => $check, 'service_checked' => time()), $update);
+    dbUpdate($update, 'services', '`service_id` = ?', array($service['service_id']));
+    unset($update);    
+
   } else {
     $status = "0";
   }
