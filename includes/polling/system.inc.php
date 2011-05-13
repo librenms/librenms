@@ -75,6 +75,16 @@
   $poll_device['sysLocation'] = str_replace("\"","", $poll_device['sysLocation']);
   $poll_device['sysContact']  = str_replace("\"","", $poll_device['sysContact']);
 
+  if ($poll_device['sysLocation'] == "not set")
+  {
+    $poll_device['sysLocation'] = "";
+  }
+
+  if ($poll_device['sysContact'] == "not set")
+  {
+    $poll_device['sysContact'] = "";
+  }
+
   if ($poll_device['sysContact'] && $poll_device['sysContact'] != $device['sysContact'])
   {
     $update_array['sysContact'] = $poll_device['sysContact'];
