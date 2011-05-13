@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-$debug = "1";
-
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
