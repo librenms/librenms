@@ -52,11 +52,11 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     </a>
   </li>');
 
-    $health =  dbFetchCell("select count(*) from storage WHERE device_id = '" . $device['device_id'] . "'") +
-               dbFetchCell("select count(sensor_id) from sensors WHERE device_id = '" . $device['device_id'] . "'") +
-               dbFetchCell("select count(*) from cempMemPool WHERE device_id = '" . $device['device_id'] . "'") +
-               dbFetchCell("select count(*) from cpmCPU WHERE device_id = '" . $device['device_id'] . "'") +
-               dbFetchCell("select count(*) from processors WHERE device_id = '" . $device['device_id'] . "'");
+    $health =  dbFetchCell("SELECT COUNT(*) FROM storage WHERE device_id = '" . $device['device_id'] . "'") +
+               dbFetchCell("SELECT COUNT(sensor_id) FROM sensors WHERE device_id = '" . $device['device_id'] . "'") +
+               dbFetchCell("SELECT COUNT(*) FROM cempMemPool WHERE device_id = '" . $device['device_id'] . "'") +
+               dbFetchCell("SELECT COUNT(*) FROM cpmCPU WHERE device_id = '" . $device['device_id'] . "'") +
+               dbFetchCell("SELECT COUNT(*) FROM processors WHERE device_id = '" . $device['device_id'] . "'");
 
     if ($health)
     {
@@ -67,7 +67,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     </li>');
     }
 
-    if (@dbFetchCell("select count(app_id) from applications WHERE device_id = '" . $device['device_id'] . "'") > '0')
+    if (@dbFetchCell("SELECT COUNT(app_id) FROM applications WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['apps'] . '">
     <a href="device/' . $device['device_id'] . '/apps/">
@@ -85,7 +85,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (@dbFetchCell("select count(interface_id) from ports WHERE device_id = '" . $device['device_id'] . "'") > '0')
+    if (@dbFetchCell("SELECT COUNT(interface_id) FROM ports WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['ports'] . $select['port'] . '">
     <a href="device/' . $device['device_id'] . '/ports/' .$config['ports_page_default']. '">
@@ -94,7 +94,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (@dbFetchCell("select count(vlan_id) from vlans WHERE device_id = '" . $device['device_id'] . "'") > '0')
+    if (@dbFetchCell("SELECT COUNT(vlan_id) FROM vlans WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['vlans'] . '">
     <a href="device/' . $device['device_id'] . '/vlans/">
@@ -112,22 +112,21 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if ($config['enable_bgp'] && $device['bgpLocalAs'])
-    {
-      $bgp_menu = '<li class="' . $select['bgp'] . '">
-    <a href="device/' . $device['device_id'] . '/bgp/">
-      <img src="images/16/link.png" align="absmiddle" border="0" /> BGP
-    </a>
-  </li>';
-    }
+    ### $routing_tabs is used in device/routing/ to build the tabs menu. we built it here to save some queries
 
-    if ($config['enable_ospf'])
-    {
-      $ospf_count = dbFetchCell("select count(*) from ospf_instances WHERE device_id = '" . $device['device_id'] . "'");
-      if ($ospf_count) { $ospf_menu = 1; }
-    }
+    $device_routing_count['bgp'] = dbFetchCell("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ?", array($device['device_id']));
+    if ($device_routing_count['bgp']) { $routing_tabs[] = 'bgp'; }
+  
+    $device_routing_count['ospf'] = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = ?", array($device['device_id']));
+    if ($device_routing_count['ospf']) { $routing_tabs[] = 'ospf'; }
 
-    if (isset($bgp_menu) || isset($ospf_menu) || isset($isis_menu) || isset($eigrp_menu)) 
+    $device_routing_count['cef'] = dbFetchCell("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = ?", array($device['device_id']));
+    if ($device_routing_count['cef']) { $routing_tabs[] = 'cef'; }
+
+    $device_routing_count['vrf'] = @dbFetchCell("SELECT COUNT(*) FROM `vrfs` WHERE `device_id` = ?", array($device['device_id']));
+    if($device_routing_count['vrf']) { $routing_tabs[] = 'vrf'; }
+
+    if (is_array($routing_tabs)) 
     {
       echo('<li class="' . $select['routing'] . '">
     <a href="device/' . $device['device_id'] . '/routing/">
@@ -136,7 +135,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if ($_SESSION['userlevel'] >= "5" && dbFetchCell("SELECT count(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"))
+    if ($_SESSION['userlevel'] >= "5" && dbFetchCell("SELECT COUNT(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"))
     {
       $discovery_links = TRUE;
       echo('<li class="' . $select['map'] . '">
@@ -163,7 +162,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (dbFetchCell("select count(service_id) from services WHERE device_id = '" . $device['device_id'] . "'") > '0')
+    if (dbFetchCell("SELECT COUNT(service_id) FROM services WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['srv'] . '">
     <a href="device/' . $device['device_id'] . '/services/">
@@ -172,7 +171,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (@dbFetchCell("select count(toner_id) from toner WHERE device_id = '" . $device['device_id'] . "'") > '0')
+    if (@dbFetchCell("SELECT COUNT(toner_id) FROM toner WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['toner'] . '">
     <a href="device/' . $device['device_id'] . '/toner/">
