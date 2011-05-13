@@ -14,17 +14,14 @@ $entry = explode(",", $argv[1]);
 
 print_r($entry);
 
-$device = @mysql_fetch_assoc(mysql_query("SELECT * FROM devices WHERE `hostname` = '".$entry['0']."'"));
+$device = @dbFetchRow("SELECT * FROM devices WHERE `hostname` = ?", array($entry['0']));
 
 if (!$device['device_id'])
 {
-  $device = @mysql_fetch_assoc(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I WHERE
-  A.ipv4_address = '" . $entry['0']."' AND I.interface_id = A.interface_id"));
+  $device = @dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id", array($entry['0']));
 }
 
 if (!$device['device_id']) { exit; } else { }
-
-print_r($device);
 
 $file = $config['install_dir'] . "/includes/snmptrap/".$entry['1'].".inc.php";
 if (is_file($file)) { include("$file"); } else { echo("unknown trap ($file)"); exit; }

@@ -7,8 +7,7 @@ include("includes/functions.php");
 
 $handle = fopen("ips.txt", "w");
 
-$query = mysql_query("SELECT * FROM `ipv4_networks`");
-while ($data = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `ipv4_networks`"))
 {
   $cidr = $data['ipv4_network'];
   list ($network, $bits) = explode("/", $cidr);
@@ -21,7 +20,7 @@ while ($data = mysql_fetch_assoc($query))
     while ($ip < $end)
     {
       $ipdotted = long2ip($ip);
-      if (mysql_result(mysql_query("SELECT count(ipv4_address_id) FROM ipv4_addresses WHERE ipv4_address = '$ipdotted'"),0) == '0' && match_network($config['nets'], $ipdotted))
+      if (dbFetchCell("SELECT COUNT(ipv4_address_id) FROM `ipv4_addresses` WHERE `ipv4_address` = ?", array($ipdotted)) == '0' && match_network($config['nets'], $ipdotted))
       {
         fputs($handle, $ipdotted . "\n");
       }
