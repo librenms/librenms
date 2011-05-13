@@ -240,7 +240,7 @@ function set_dev_attrib($device, $attrib_type, $attrib_value)
 function get_dev_attribs($device)
 {
   $attribs = array();
-  foreach(dbFetchRow("SELECT * FROM devices_attribs WHERE `device_id` = ?", array($device)) as $entry)
+  foreach(dbFetchRows("SELECT * FROM devices_attribs WHERE `device_id` = ?", array($device)) as $entry)
   {
     $attribs[$entry['attrib_type']] = $entry['attrib_value'];
   }
