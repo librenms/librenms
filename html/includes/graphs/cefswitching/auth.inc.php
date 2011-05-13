@@ -2,8 +2,7 @@
 
 if (is_numeric($id))
 {
-  $query = mysql_query("SELECT * FROM `cef_switching` AS C, `devices` AS D WHERE C.cef_switching_id = '".$id."' AND C.device_id = D.device_id");
-  $cef = mysql_fetch_assoc($query);
+  $cef = dbFetchRow("SELECT * FROM `cef_switching` AS C, `devices` AS D WHERE C.cef_switching_id = ? AND C.device_id = D.device_id", array($id));
 
   if (is_numeric($cef['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($cef['device_id'])))
   {

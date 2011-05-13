@@ -2,8 +2,7 @@
 
 if (is_numeric($id))
 {
-  $sql = mysql_query("SELECT * FROM `storage` WHERE `storage_id` = '".mres($id)."'");
-  $storage = mysql_fetch_assoc($sql);
+  $storage = dbFetchRow("SELECT * FROM `storage` WHERE `storage_id` = ?", array($id));
 
   if (is_numeric($storage['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($storage['device_id'])))
   {

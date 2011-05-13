@@ -3,10 +3,7 @@
 if (is_numeric($id))
 {
 
-  $query = mysql_query("SELECT * FROM `mac_accounting` AS M, `ports` AS I, `devices` AS D WHERE M.ma_id = '".mres($id)."'
-                        AND I.interface_id = M.interface_id AND I.device_id = D.device_id");
-
-  $acc = mysql_fetch_assoc($query);
+  $acc = dbFetchRow("SELECT * FROM `mac_accounting` AS M, `ports` AS I, `devices` AS D WHERE M.ma_id = ? AND I.interface_id = M.interface_id AND I.device_id = D.device_id", array($id));
 
   if (($config['allow_unauth_graphs'] || port_permitted($acc['interface_id']))
        && is_file($config['rrd_dir'] . "/" . $acc['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd")))
@@ -19,8 +16,6 @@ if (is_numeric($id))
     $title .= " :: Port  ".generate_port_link($port);
     $title .= " :: " . formatMac($acc['mac']);
     $auth   = TRUE;
-
   }
-
 }
 ?>
