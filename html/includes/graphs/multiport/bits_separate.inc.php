@@ -4,8 +4,7 @@ $i = 0;
 
 foreach (explode(",", $id) as $ifid)
 {
-  $query = mysql_query("SELECT * FROM `ports` AS I, devices as D WHERE I.interface_id = '" . mres($ifid) . "' AND I.device_id = D.device_id");
-  $port = mysql_fetch_assoc($query);
+  $port = dbFetchRow("SELECT * FROM `ports` AS I, devices as D WHERE I.interface_id = ? AND I.device_id = D.device_id", array($ifid));
   if (is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd"))) 
   {
     $rrd_list[$i]['filename'] = $config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");

@@ -9,8 +9,7 @@ $i = 1;
 
 foreach (explode(",", $_GET['id']) as $ifid)
 {
-  $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . mres($ifid) . "' AND I.device_id = D.device_id");
-  $int = mysql_fetch_row($query);
+  $int = dbFetchRow("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = ? AND I.device_id = D.device_id", array($ifid));
   if (is_file($config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd"))
   {
     $rrd_options .= " DEF:inoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:INOCTETS:AVERAGE";
@@ -27,8 +26,7 @@ unset($seperator); unset($plus);
 
 foreach (explode(",", $_GET['idb']) as $ifid)
 {
-  $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . mres($ifid) . "' AND I.device_id = D.device_id");
-  $int = mysql_fetch_row($query);
+  $int = dbFetchRow("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = ? AND I.device_id = D.device_id", array($ifid));
   if (is_file($config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd"))
   {
     $rrd_options .= " DEF:inoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:INOCTETS:AVERAGE";

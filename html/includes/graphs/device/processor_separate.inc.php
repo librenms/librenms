@@ -1,13 +1,8 @@
 <?php
 
-#$device = device_by_id_cache($id);
-#$query = mysql_query("SELECT * FROM `processors` where `device_id` = '".$id."'");
-
-
-
 $i = 0;
 
-while ($proc = mysql_fetch_assoc($query))
+foreach ($procs as $proc)
 {
   $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("processor-" . $proc['processor_type'] . "-" . $proc['processor_index'] . ".rrd");
 

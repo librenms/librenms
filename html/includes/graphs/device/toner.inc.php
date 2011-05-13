@@ -6,9 +6,8 @@ $device = device_by_id_cache($id);
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM toner where device_id = '$id'");
 $rrd_options .= " COMMENT:'Toner level            Cur     Min      Max\\n'";
-while ($toner = mysql_fetch_assoc($sql))
+foreach (dbFetchRows("SELECT * FROM toner where device_id = ?", array($id)) as $toner)
 {
   # FIXME generic colour function
   switch ($iter)

@@ -8,10 +8,9 @@ include("includes/graphs/common.inc.php");
 $device = device_by_id_cache($id);
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM storage where device_id = '$id'");
 $rrd_options .= " COMMENT:'                    Size      Used    %age\\l'";
 
-while ($storage = mysql_fetch_assoc($sql))
+foreach (dbFetchRows("SELECT * FROM storage where device_id = ?", array($id)) as $storage)
 {
   # FIXME generic colour function
   if ($iter=="1") { $colour="CC0000"; } elseif ($iter=="2") { $colour="008C00"; } elseif ($iter=="3") { $colour="4096EE"; }
