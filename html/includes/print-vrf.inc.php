@@ -9,7 +9,7 @@ echo("<td width=150 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
 echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "</td>");
 
 echo('<td class="list-bold">');
-foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVrf` = ?", array($device['device_id'], $vrf['vrf_id'])) as $port))
+foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVrf` = ?", array($device['device_id'], $vrf['vrf_id'])) as $port)
 {
   if ($_GET['optb'] == "graphs")
   {
