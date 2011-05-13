@@ -9,13 +9,12 @@ if ($_SESSION['userlevel'] == "10")
 
 if (bill_permitted($bill_id))
 {
-  $bi_q = mysql_query("SELECT * FROM bills WHERE bill_id = $bill_id");
-  $bill_data = mysql_fetch_assoc($bi_q);
+  $bill_data = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
 
-  $today = str_replace("-", "", mysql_result(mysql_query("SELECT CURDATE()"), 0));
-  $yesterday = str_replace("-", "", mysql_result(mysql_query("SELECT DATE_SUB(CURDATE(), INTERVAL 1 DAY)"), 0));
-  $tomorrow = str_replace("-", "", mysql_result(mysql_query("SELECT DATE_ADD(CURDATE(), INTERVAL 1 DAY)"), 0));
-  $last_month = str_replace("-", "", mysql_result(mysql_query("SELECT DATE_SUB(CURDATE(), INTERVAL 1 MONTH)"), 0));
+  $today = str_replace("-", "", dbFetchCell("SELECT CURDATE()"));
+  $yesterday = str_replace("-", "", dbFetchCell("SELECT DATE_SUB(CURDATE(), INTERVAL 1 DAY)"));
+  $tomorrow = str_replace("-", "", dbFetchCell("SELECT DATE_ADD(CURDATE(), INTERVAL 1 DAY)"));
+  $last_month = str_replace("-", "", dbFetchCell("SELECT DATE_SUB(CURDATE(), INTERVAL 1 MONTH)"));
 
   $rightnow = $today . date(His);
   $before = $yesterday . date(His);
@@ -54,13 +53,13 @@ if (bill_permitted($bill_id))
     $bill_color = "#0000cc";
   }
 
-  $fromtext = mysql_result(mysql_query("SELECT DATE_FORMAT($datefrom, '%M %D %Y')"), 0);
-  $totext   = mysql_result(mysql_query("SELECT DATE_FORMAT($dateto, '%M %D %Y')"), 0);
-  $unixfrom = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP('$datefrom')"), 0);
-  $unixto = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP('$dateto')"), 0);
+  $fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '%M %D %Y')");
+  $totext   = dbFetchCell("SELECT DATE_FORMAT($dateto, '%M %D %Y')");
+  $unixfrom = dbFetchCell("SELECT UNIX_TIMESTAMP('$datefrom')");
+  $unixto   = dbFetchCell("SELECT UNIX_TIMESTAMP('$dateto')");
 
-  $unix_prev_from = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP('$lastfrom')"), 0); 
-  $unix_prev_to   = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP('$lastto')"), 0);
+  $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')"); 
+  $unix_prev_to   = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastto')");
 
   echo("<font face=\"Verdana, Arial, Sans-Serif\"><h2>
   Bill : " . $bill_name . "</h2>");
@@ -103,11 +102,11 @@ if (bill_permitted($bill_id))
 
   echo("<h3>Billed Ports</h3>");
 
-  $ports = mysql_query("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-                        WHERE B.bill_id = '".$bill_id."' AND P.interface_id = B.port_id
-                        AND D.device_id = P.device_id");
+  $ports = dbFetchRows("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
+                        WHERE B.bill_id = ? AND P.interface_id = B.port_id
+                        AND D.device_id = P.device_id", array($bill_id));
 
-  while ($port = mysql_fetch_assoc($ports))
+  foreach ($ports as $port)
   {
     echo(generate_port_link($port) . " on " . generate_device_link($port) . "<br />");
   }
@@ -184,8 +183,8 @@ if (bill_permitted($bill_id))
   $bi .= "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
   $bi .= "&amp;width=715&amp;height=200&amp;total=1'>";
 
-  $lastmonth = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))"), 0);
-  $yesterday = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))"), 0);
+  $lastmonth = dbFetchCell("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))");
+  $yesterday = dbFetchCell("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))");
   $rightnow = date(U);
 
 

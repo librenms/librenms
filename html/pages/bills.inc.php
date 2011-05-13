@@ -4,14 +4,10 @@ if ($_POST['addbill'] == "yes")
 {
   $updated = '1';
 
-  $sql = "INSERT INTO `bills` (`bill_name`,`bill_type`,`bill_cdr`,`bill_day`,`bill_gb`, `bill_custid`, `bill_ref`, `bill_notes`)
-          VALUES ('" . mres($_POST['bill_name']) . "','" . mres($_POST['bill_type']) . "',
-                                  '" . mres($_POST['bill_cdr']) . "','" . mres($_POST['bill_day']) . "',
-                                  '" . mres($_POST['bill_quota']) . "','" . mres($_POST['bill_custid']) . "',
-                                  '" . mres($_POST['bill_ref']) . "','" . mres($_POST['bill_notes']) . "' )";
+  $insert = array('bill_name' => $_POST['bill_name'], 'bill_type' => $_POST['bill_type'], 'bill_cdr' => $_POST['bill_cdr'], 'bill_day' => $_POST['bill_day'], 'bill_gb' => $_POST['bill_quota'],
+                  'bill_custid' => $_POST['bill_custid'], 'bill_ref' => $_POST['bill_ref'], 'bill_notes' => $_POST['bill_notes']);
 
-  $query = mysql_query($sql);
-  $affected = mysql_affected_rows() . "records affected";
+  $affected = dbInsert($insert, 'bills');
 
   $message .= $message_break . "Bill ".mres($_POST['bill_name'])." added!";
   $message_break .= "<br />";
@@ -119,11 +115,9 @@ if ($_GET['opta'] == "add")
 
   print_optionbar_end();
 
-  $sql  = "SELECT * FROM `bills` ORDER BY `bill_name`";
-  $query = mysql_query($sql);
   echo("<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>");
   $i=1;
-  while ($bill = mysql_fetch_assoc($query))
+  foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
   {
     #echo("<pre>");
     #print_r($permissions);

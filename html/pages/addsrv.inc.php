@@ -26,8 +26,7 @@ else
     closedir($handle);
   }
 
-  $query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
-  while ($device = mysql_fetch_assoc($query))
+  foreach(dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $device)
   {
     $devicesform .= "<option value='" . $device['device_id'] . "'>" . $device['hostname'] . "</option>";
   }

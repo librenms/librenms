@@ -12,10 +12,7 @@ list($opta, $optb, $optc, $optd, $opte) = explode("/", $_GET['opta']);
 
 echo("<table cellpadding=5 cellspacing=0 class=devicetable width=100%>");
 
-$sql = "SELECT * FROM pseudowires AS P, ports AS I, devices AS D WHERE P.interface_id = I.interface_id AND I.device_id = D.device_id ORDER BY D.hostname,I.ifDescr";
-$query = mysql_query($sql);
-
-while ($pw_a = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM pseudowires AS P, ports AS I, devices AS D WHERE P.interface_id = I.interface_id AND I.device_id = D.device_id ORDER BY D.hostname,I.ifDescr") as $pw_a)
 {
   $i = 0;
   while ($i < count($linkdone))
@@ -25,10 +22,8 @@ while ($pw_a = mysql_fetch_assoc($query))
     $i++;
   }
 
-  $pw_b = mysql_fetch_assoc(mysql_query("SELECT * from `devices` AS D, `ports` AS I, `pseudowires` AS P WHERE D.device_id = '".$pw_a['peer_device_id']."' AND
-                                                                                                          D.device_id = I.device_id AND
-                                                                                                          P.cpwVcID = '".$pw_a['cpwVcID']."' AND
-                                                                                                          P.interface_id = I.interface_id"));
+  $pw_b = dbFetchRow("SELECT * from `devices` AS D, `ports` AS I, `pseudowires` AS P WHERE D.device_id = ? AND D.device_id = I.device_id 
+                      AND P.cpwVcID = ? AND P.interface_id = I.interface_id", array($pw_a['peer_device_id'], $pw_a['cpwVcID']));
 
   if (!port_permitted($pw_a['interface_id'])) { $skip = "yes"; }
   if (!port_permitted($pw_b['interface_id'])) { $skip = "yes"; }
