@@ -145,25 +145,6 @@ function renamehost($id, $new, $source = 'console')
   log_event("Hostname changed -> $new ($source)", $id, 'system');
 }
 
-function delete_port($int_id)
-{
-  global $config;
-
-  $interface = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.interface_id = ? AND D.device_id = P.device_id", array($int_id));
-
-  $interface_tables = array('adjacencies', 'ipaddr', 'ip6adjacencies', 'ip6addr', 'mac_accounting', 'bill_ports', 'pseudowires', 'ports');
-  
-  foreach($interface_tables as $table) {
-    dbDelete($table, "`interface_id` =  ?", array($int_id));
-  }
-
-  dbDelete('links', "`local_interface_id` =  ?", array($int_id));
-  dbDelete('links', "`remote_interface_id` =  ?", array($int_id));
-  dbDelete('bill_ports', "`port_id` =  ?", array($int_id));
-
-  unlink(trim($config['rrd_dir'])."/".trim($interface['hostname'])."/".$interface['ifIndex'].".rrd");
-}
-
 function delete_device($id)
 {
   global $config;
