@@ -57,7 +57,7 @@ if ($device['location'])
         <td class="list-bold">Location</td>
         <td>' . $device['location']. '</td>
       </tr>');
-  if (get_dev_attrib($device,'override_sysLocation_bool'))
+  if (get_dev_attrib($device,'override_sysLocation_bool') && !empty($device['real_location']))
   {
     echo('<tr>
         <td class="list-bold">SNMP Location</td>

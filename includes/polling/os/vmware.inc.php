@@ -16,20 +16,6 @@ $version  = preg_replace("/^VMware /", "", $data[0]["vmwProdName"]) . " " . $dat
 $features = "build-" . $data[0]["vmwProdBuild"];
 
 /*
- * VMware ESXi returns "not set" instead of a NULL value.
- */
-
-if ($sysLocation == "not set")
-{
-  $sysLocation = "";
-}
-
-if ($sysContact == "not set")
-{
-  $sysContact = "";
-}
-
-/*
  * CONSOLE: Start the VMware discovery process.
  */
 

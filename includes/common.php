@@ -182,7 +182,7 @@ function getifdescrbyid($id)
 
 function getidbyname($domain)
 {
-  return dbFetchCell("SELECT `device_id` FROM `devices` WHERE `hostname` = ?", mres($domain));
+  return dbFetchCell("SELECT `device_id` FROM `devices` WHERE `hostname` = ?", array($domain));
 }
 
 function gethostosbyid($id)
