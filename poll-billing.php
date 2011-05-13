@@ -11,8 +11,7 @@ $iter = "0";
 
 echo("Starting Polling Session ... \n\n");
 
-$bill_query = mysql_query("select * from bills");
-while ($bill_data = mysql_fetch_assoc($bill_query))
+foreach (dbFetchRows("SELECT * FROM `bills`") as $bill_data)
 {
   echo("Bill : ".$bill_data['bill_name']."\n");
   CollectData($bill_data['bill_id']);
@@ -21,9 +20,7 @@ while ($bill_data = mysql_fetch_assoc($bill_query))
 
 function CollectData($bill_id)
 {
-  $port_query = mysql_query("select * from bill_ports as P, ports as I, devices as D where P.bill_id='$bill_id' AND I.interface_id = P.port_id AND D.device_id = I.device_id");
-
-  while ($port_data = mysql_fetch_assoc($port_query))
+  foreach (dbFetchRows("SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.interface_id = P.port_id AND D.device_id = I.device_id", array($bill_id)) as $port_data)
   {
     unset($port_in_measurement);
     unset($port_in_delta);
@@ -43,7 +40,7 @@ function CollectData($bill_id)
     $port_in_measurement = getValue($host, $port, $port_data['ifIndex'], "In");
     $port_out_measurement = getValue($host, $port, $port_data['ifIndex'], "Out");
 
-    $now = mysql_result(mysql_query("SELECT NOW()"), 0);
+    $now = dbFetchCell("SELECT NOW()");
 
     $last_data = getLastPortCounter($port_id,in);
     if ($last_data[state] == "ok")
@@ -59,9 +56,8 @@ function CollectData($bill_id)
     } else {
       $port_in_delta = '0';
     }
-    $pim = "INSERT INTO port_in_measurements (port_id,timestamp,counter,delta) VALUES ($port_id, '$now', $port_in_measurement, $port_in_delta) ";
-    #echo("$pim \n");
-    $pim_query = mysql_query($pim);
+    dbInsert(array('port_id' => $port_id, 'timestamp' => $now, 'counter' => $port_in_measurement, 'delta' => $port_in_delta), 'port_in_measurements');
+
     unset($last_data, $last_port_in_measurement, $last_port_in_delta);
 
     $last_data = getLastPortCounter($port_id,out);
@@ -78,9 +74,7 @@ function CollectData($bill_id)
     } else {
       $port_out_delta = '0';
     }
-    $pom = "INSERT INTO port_out_measurements (port_id,timestamp,counter,delta) VALUES ($port_id, '$now', $port_out_measurement, $port_out_delta) ";
-    #echo("$pom \n");
-    $pom_query = mysql_query($pom);
+    dbInsert(array('port_id' => $port_id, 'timestamp' => $now, 'counter' => $port_out_measurement, 'delta' => $port_out_delta), 'port_out_measurements');
     unset($last_data, $last_port_in_measurement, $last_port_in_delta);
 
     $delta = $delta + $port_in_delta + $port_out_delta;
@@ -97,7 +91,7 @@ function CollectData($bill_id)
     $prev_in_delta  = $last_data[in_delta];
     $prev_out_delta = $last_data[out_delta];
     $prev_timestamp = $last_data[timestamp];
-    $period = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('$prev_timestamp')"),0);
+    $period = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('".mres($prev_timestamp)."')");
   } else {
     $prev_delta = '0';
     $period   = '0';
@@ -112,8 +106,7 @@ function CollectData($bill_id)
     $out_delta = $prev_out_delta;
 
   }
-  $insert_string = "INSERT INTO bill_data (bill_id,timestamp,period,delta,in_delta,out_delta) VALUES ('$bill_id','$now','$period','$delta','$in_delta','$out_delta')";
-  $insert_measurement = mysql_query($insert_string);
+  dbInsert(array('bill_id' => $bill_id, 'timestamp' => $now, 'period' => $period, 'delta' => $delta, 'in_delta' => $in_delta, 'out_delta' => $out_delta), 'bill_data');
 }
 
 if ($argv[1]) { CollectData($argv[1]); }
