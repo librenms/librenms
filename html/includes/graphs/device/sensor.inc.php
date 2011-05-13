@@ -7,9 +7,9 @@ if ($_GET['width'] > "300") { $descr_len = "40"; } else { $descr_len = "22"; }
 
 $rrd_options .= " -l 0 -E ";
 $iter = "1";
-$sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='".$class."' AND device_id = '$id' ORDER BY sensor_index");
 $rrd_options .= " COMMENT:'".str_pad($unit_long,$descr_len)."    Cur     Min    Max\\n'";
-while ($sensor = mysql_fetch_assoc($sql))
+
+foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_index`", array($class, $id)) as $sensor)
 {
   # FIXME generic colour function
   switch ($iter)
