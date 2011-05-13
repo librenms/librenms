@@ -10,12 +10,11 @@ if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
-  echo($sep);
-  if ($_GET['opta'] == $option) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="device/' . $device['device_id'] . '/routing/vrf/' . $option . ($_GET['optc'] ? '/' . $_GET['optc'] : ''). '/">' . $text
+  if ($_GET['optb'] == $option) { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="device/' . $device['device_id'] . '/routing/vrf/' . $option . '/">' . $text
  . '</a>');
-  if ($_GET['opta'] == $option) { echo("</span>"); }
-  $sep = " | ";
+  if ($_GET['optb'] == $option) { echo("</span>"); }
+  echo(" | ");
 }
 
 unset($sep);
@@ -47,8 +46,7 @@ print_optionbar_end();
 
 echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
 $i = "0";
-$vrf_query = mysql_query("select * from vrfs WHERE device_id = '".$device['device_id']."' ORDER BY 'vrf_name'");
-while ($vrf = mysql_fetch_assoc($vrf_query))
+foreach (dbFetchRows("SELECT * FROM `vrfs` WHERE `device_id` = ? ORDER BY `vrf_name`", array($device['device_id'])) as $vrf)
 {
   include("includes/print-vrf.inc.php");
   $i++;
