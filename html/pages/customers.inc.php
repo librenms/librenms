@@ -1,8 +1,5 @@
 <?php
 
-$sql  = "SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GROUP BY `port_descr_descr` ORDER BY `port_descr_descr`";
-$cust_query = mysql_query($sql);
-
 echo("<table border=0 cellspacing=0 cellpadding=2 class=devicetable width=100%>");
 
 echo("
@@ -19,7 +16,7 @@ echo("
 
 $i = 1;
 
-while ($customer = mysql_fetch_assoc($cust_query))
+foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GROUP BY `port_descr_descr` ORDER BY `port_descr_descr`") as $customer)
 {
   $i++;
 

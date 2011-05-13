@@ -38,29 +38,29 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
     <h3>Statistics</h3>
 
 <?php
-$stat_devices = mysql_result(mysql_query("SELECT COUNT(*) FROM `devices`"),0);
-$stat_ports = mysql_result(mysql_query("SELECT COUNT(*) FROM `ports`"),0);
-$stat_syslog = mysql_result(mysql_query("SELECT COUNT(*) FROM `syslog`"),0);
-$stat_events = mysql_result(mysql_query("SELECT COUNT(*) FROM `eventlog`"),0);
-$stat_apps = mysql_result(mysql_query("SELECT COUNT(*) FROM `applications`"),0);
-$stat_services = mysql_result(mysql_query("SELECT COUNT(*) FROM `services`"),0);
-$stat_storage = mysql_result(mysql_query("SELECT COUNT(*) FROM `storage`"),0);
-$stat_diskio = mysql_result(mysql_query("SELECT COUNT(*) FROM `ucd_diskio`"),0);
-$stat_processors = mysql_result(mysql_query("SELECT COUNT(*) FROM `processors`"),0);
-$stat_memory = mysql_result(mysql_query("SELECT COUNT(*) FROM `mempools`"),0);
-$stat_sensors = mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors`"),0);
-$stat_toner = mysql_result(mysql_query("SELECT COUNT(*) FROM `toner`"),0);
-$stat_hrdev = mysql_result(mysql_query("SELECT COUNT(*) FROM `hrDevice`"),0);
-$stat_entphys = mysql_result(mysql_query("SELECT COUNT(*) FROM `entPhysical`"),0);
+$stat_devices = dbFetchCell("SELECT COUNT(*) FROM `devices`");
+$stat_ports = dbFetchCell("SELECT COUNT(*) FROM `ports`");
+$stat_syslog = dbFetchCell("SELECT COUNT(*) FROM `syslog`");
+$stat_events = dbFetchCell("SELECT COUNT(*) FROM `eventlog`");
+$stat_apps = dbFetchCell("SELECT COUNT(*) FROM `applications`");
+$stat_services = dbFetchCell("SELECT COUNT(*) FROM `services`");
+$stat_storage = dbFetchCell("SELECT COUNT(*) FROM `storage`");
+$stat_diskio = dbFetchCell("SELECT COUNT(*) FROM `ucd_diskio`");
+$stat_processors = dbFetchCell("SELECT COUNT(*) FROM `processors`");
+$stat_memory = dbFetchCell("SELECT COUNT(*) FROM `mempools`");
+$stat_sensors = dbFetchCell("SELECT COUNT(*) FROM `sensors`");
+$stat_toner = dbFetchCell("SELECT COUNT(*) FROM `toner`");
+$stat_hrdev = dbFetchCell("SELECT COUNT(*) FROM `hrDevice`");
+$stat_entphys = dbFetchCell("SELECT COUNT(*) FROM `entPhysical`");
 
-$stat_ipv4_addy = mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_addresses`"),0);
-$stat_ipv4_nets = mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_networks`"),0);
-$stat_ipv6_addy = mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_addresses`"),0);
-$stat_ipv6_nets = mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks`"),0);
+$stat_ipv4_addy = dbFetchCell("SELECT COUNT(*) FROM `ipv4_addresses`");
+$stat_ipv4_nets = dbFetchCell("SELECT COUNT(*) FROM `ipv4_networks`");
+$stat_ipv6_addy = dbFetchCell("SELECT COUNT(*) FROM `ipv6_addresses`");
+$stat_ipv6_nets = dbFetchCell("SELECT COUNT(*) FROM `ipv6_networks`");
 
-$stat_pw = mysql_result(mysql_query("SELECT COUNT(*) FROM `pseudowires`"),0);
-$stat_vrf = mysql_result(mysql_query("SELECT COUNT(*) FROM `vrfs`"),0);
-$stat_vlans = mysql_result(mysql_query("SELECT COUNT(*) FROM `vlans`"),0);
+$stat_pw = dbFetchCell("SELECT COUNT(*) FROM `pseudowires`");
+$stat_vrf = dbFetchCell("SELECT COUNT(*) FROM `vrfs`");
+$stat_vlans = dbFetchCell("SELECT COUNT(*) FROM `vlans`");
 
 echo("
     <table width=95% cellpadding=5 cellspacing=0>
@@ -121,9 +121,7 @@ $apache_version = str_replace("Apache/", "", $_SERVER['SERVER_SOFTWARE']);
 
 $php_version = phpversion();
 
-$t = mysql_query("select version() as ve");
-$r = mysql_fetch_object($t);
-$mysql_version = $r->ve;
+$mysql_version = dbFetchCell("SELECT version()");
 
 $netsnmp_version = shell_exec($config['snmpget'] . " --version");
 
