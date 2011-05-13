@@ -38,7 +38,7 @@ if (isset($argv[1]) && $argv[1])
   }
 
   list($hostshort) = explode(".", $host);
-  if (mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '".mres($host)."'"), 0) == '0')
+  if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0')
   {
     if (isDomainResolves($argv[1]))
     {

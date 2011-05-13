@@ -105,6 +105,7 @@ function poll_device($device, $options) {
 
   global $config;
   global $device;
+  global $polled_devices;
 
   $attribs = get_dev_attribs($device['device_id']);
 
@@ -120,6 +121,7 @@ function poll_device($device, $options) {
   echo("\n");
 
   unset($poll_update); unset($poll_update_query); unset($poll_separator); 
+  $poll_update_array = array();
 
   $host_rrd = $config['rrd_dir'] . "/" . $device['hostname'];
   if (!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
@@ -202,28 +204,28 @@ if (!$options['m'])
       dbInsert(array('device_id' => $device['device_id'], 'graph' => $graph), 'device_graphs');
     }
   }
-
 }
 
     $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
-    $device['db_update'] = " `last_polled` = NOW() " . $device['db_update'];
-    $device['db_update'] .= ", `last_polled_timetaken` = '$device_time'";
+
+    $update_array['last_polled'] = array('NOW()'); 
+    $update_array['last_polled_timetaken'] = $device_time;
+
     #echo("$device_end - $device_start; $device_time $device_run");
     echo("Polled in $device_time seconds\n");
 
-    $device['db_update_query']  = "UPDATE `devices` SET ";
-    $device['db_update_query'] .= $device['db_update'];
-    $device['db_update_query'] .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-    if ($debug) { echo("Updating " . $device['hostname'] . " - ".$device['db_update_query']." \n"); }
-    if (!mysql_query($device['db_update_query']))  ## FIXME some work to be done to build the update array then dbUpdate()
-    {
-    echo("ERROR: " . mysql_error() . "\nSQL: ".$device['db_update_query']."\n");
-    }
-    if (mysql_affected_rows() == "1") { echo("UPDATED!\n"); } else { echo("NOT UPDATED!\n"); }
+    
+
+    if ($debug) { echo("Updating " . $device['hostname'] . " - ".print_r($update_array)." \n"); }
+
+    $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
+    if($updated) { echo("UPDATED!\n"); }
 
     unset($storage_cache); // Clear cache of hrStorage ** MAYBE FIXME? **
     unset($cache); // Clear cache (unify all things here?)
   }
+
+  $polled_devices++;
 
 }
 

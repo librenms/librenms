@@ -22,8 +22,9 @@ Usage
  * Used by the other _query functions.
  * */
 function dbQuery($sql, $parameters = array()) {
-	global $fullSql;
+	global $fullSql, $debug;
 	$fullSql = dbMakeQuery($sql, $parameters);
+        if($debug) { echo(" SQL[".$fullSql."] "); }
 	/*
 	if($this->logFile)
 		$time_start = microtime(true);
@@ -111,6 +112,7 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
 	if(dbQuery($sql, $data)) {
 		return mysql_affected_rows();
 	} else {
+                #echo("$fullSql");
 		trigger_error('QDB - Update failed.', E_WARNING);
 		return false;
 	}
