@@ -4,8 +4,7 @@
 
 $device = device_by_id_cache($id);
 
-$query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$id."'");
-while ($int = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int)
 {
   $ignore = 0;
   if (is_array($config['device_traffic_iftype']))

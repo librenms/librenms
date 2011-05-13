@@ -4,7 +4,7 @@
 
 $i = 0;
 
-while ($port = mysql_fetch_assoc($ports))
+foreach ($ports as $port)
 {
   if (is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd")))
   {

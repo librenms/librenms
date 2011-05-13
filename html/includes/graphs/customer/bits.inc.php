@@ -2,8 +2,7 @@
 
 ## Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$query = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_type` = 'cust' AND `port_descr_descr` = '".mres($_GET['id'])."' AND D.device_id = I.device_id");
-while ($int = mysql_fetch_assoc($query))
+foreach(dbFetchRows("SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_type` = 'cust' AND `port_descr_descr` = ? AND D.device_id = I.device_id", array($_GET['id'])) as $int)
 {
   if (is_file($config['rrd_dir'] . "/" . $int['hostname'] . "/port-" . safename($int['ifIndex'] . ".rrd")))
   {
