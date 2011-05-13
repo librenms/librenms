@@ -9,12 +9,11 @@ foreach (dbFetchRows("SELECT * FROM `ucd_diskio` AS U, `devices` AS D WHERE D.de
   {
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $disk['diskio_descr'];
-    $rrd_list[$i]['rra_in'] = "reads";
-    $rrd_list[$i]['rra_out'] = "writes";
+    $rrd_list[$i]['rra_in'] = $rra_in;
+    $rrd_list[$i]['rra_out'] = $rra_out;
     $i++;
   }
 }
 
-include("includes/graphs/generic_multi_bits_separated.inc.php");
 
 ?>
