@@ -2,7 +2,7 @@
 
 if (is_numeric($id))
 {
-  $sensor = mysql_fetch_assoc(mysql_query("SELECT * FROM sensors WHERE sensor_id = '".mres($id)."'"));
+  $sensor = dbFetchRow("SELECT * FROM sensors WHERE sensor_id = ?", array($id));
 
   if (is_numeric($sensor['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($sensor['device_id'])))
   {

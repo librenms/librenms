@@ -2,8 +2,7 @@
 
 if (is_numeric($id))
 {
-  $sql = mysql_query("SELECT * FROM `mempools` AS C, `devices` AS D where C.`mempool_id` = '".mres($id)."' AND C.device_id = D.device_id");
-  $mempool = mysql_fetch_assoc($sql);
+  $mempool = dbFetchRow("SELECT * FROM `mempools` AS C, `devices` AS D where C.`mempool_id` = ? AND C.device_id = D.device_id", array($id));
 
   if (is_numeric($mempool['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($mempool['device_id'])))
   {

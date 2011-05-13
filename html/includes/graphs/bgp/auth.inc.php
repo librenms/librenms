@@ -3,7 +3,7 @@
 if (is_numeric($id))
 {
 
-  $data = mysql_fetch_assoc(mysql_query("SELECT * FROM bgpPeers WHERE bgpPeer_id = '".$id."'"));
+  $data = dbFetchRow("SELECT * FROM bgpPeers WHERE bgpPeer_id = ?", array($id));
 
   if (is_numeric($data['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($data['device_id'])))
   {

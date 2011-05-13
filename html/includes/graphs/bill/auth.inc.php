@@ -6,27 +6,14 @@ include("../includes/billing.php");
 
 if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || bill_permitted($_GET['id'])))
 {
-  $bill_query   = mysql_query("SELECT * FROM `bills` WHERE bill_id = '".mres($_GET['id'])."'");
-  $bill         = mysql_fetch_assoc($bill_query);
+  $bill     = dbFetchRow("SELECT * FROM `bills` WHERE bill_id = ?", array($_GET['id']));
 
-#  $day_data     = getDates($bill['bill_day']);
-#  $datefrom     = $day_data['0'];
-#  $dateto       = $day_data['1'];
-
-#print_r($day_data);
-
-
-   $datefrom = date('YmdHis', $_GET['from']);
-   $dateto   = date('YmdHis', $_GET['to']);
-
-
-
+  $datefrom = date('YmdHis', $_GET['from']);
+  $dateto   = date('YmdHis', $_GET['to']);
 
   $rates = getRates($_GET['id'], $datefrom,  $dateto);
 
-  $ports = mysql_query("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-                        WHERE B.bill_id = '".mres($_GET['id'])."' AND P.interface_id = B.port_id
-                        AND D.device_id = P.device_id");
+  $ports = dbFetchRows("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D WHERE B.bill_id = ? AND P.interface_id = B.port_id AND D.device_id = P.device_id", array($_GET['id']));
 
   $auth = TRUE;
 }

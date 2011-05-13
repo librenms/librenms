@@ -2,7 +2,7 @@
 
 if (is_numeric($id))
 {
-  $service = mysql_fetch_assoc(mysql_query("SELECT * FROM services WHERE service_id = '".mres($id)."'"));
+  $service = dbFetchRow("SELECT * FROM services WHERE service_id = ?", array($id));
 
   if (is_numeric($service['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($service['device_id'])))
   {

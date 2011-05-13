@@ -1,7 +1,6 @@
 <?php
 
-$sql = mysql_query("SELECT * FROM `processors` where `processor_id` = '".mres($id)."'");
-$proc = mysql_fetch_assoc($sql);
+$proc = dbFetchRow("SELECT * FROM `processors` where `processor_id` = ?", array($id));
 
 if (is_numeric($proc['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($proc['device_id'])))
 {
