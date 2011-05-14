@@ -52,9 +52,8 @@ if ($_SESSION['userlevel'] == '10') { echo("<strong class='blue'>Global Administ
 if ($_SESSION['userlevel'] == '5')  { echo("<strong class='green'>Global Viewing Access</strong>"); }
 if ($_SESSION['userlevel'] == '1')
 {
-  $perms = mysql_query("SELECT * FROM `devices_perms` AS P, `devices` AS D WHERE `user_id` = '" . $user_id . "' AND P.device_id = D.device_id");
 
-  while ($perm = mysql_fetch_assoc($perms))
+  foreach (dbFetchRows("SELECT * FROM `devices_perms` AS P, `devices` AS D WHERE `user_id` = ? AND P.device_id = D.device_id", array($user_id)) as $perm)
   {
     echo("<a href='?page=device&id=" . $perm['device_id'] . "'>" . $perm['hostname'] . "</a><br />");
     $dev_access = 1;

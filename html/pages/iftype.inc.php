@@ -7,16 +7,16 @@ if ($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg = "#ffffff"; }
 $type_where = " (";
 foreach (explode(",", $_GET['opta']) as $type)
 {
-  $type_where .= " $or `port_descr_type` = '" . mres($type) . "' ";
+  $type_where .= " $or `port_descr_type` = ?";
   $or = "OR";
+  $type_param[] = $type; 
 }
 
 $type_where .= ") ";
+$ports = dbFetchRows("SELECT * FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias", $type_param);
 
-$sql  = "SELECT * FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias";
 
-$query = mysql_query($sql);
-while ($interface = mysql_fetch_assoc($query))
+foreach ($ports as $interface)
 {
   $if_list .= $seperator . $interface['interface_id'];
   $seperator = ",";
@@ -38,9 +38,7 @@ if ($if_list)
   include("includes/print-interface-graphs.inc.php");
   echo("</td></tr>");
 
-  $sql  = "select * from ports as I, devices as D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias";
-  $query = mysql_query($sql);
-  while ($interface = mysql_fetch_assoc($query))
+  foreach ($ports as $interface)
   {
     $done = "yes";
     unset($class);
