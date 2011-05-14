@@ -4,6 +4,7 @@ $sql = "SELECT * FROM ipv4_mac AS M, ports AS I WHERE I.interface_id = M.interfa
 $query = mysql_query($sql);
 
 echo('<table border="0" cellspacing="0" cellpadding="5" width="100%">');
+echo('<tr><th>Port</th><th>MAC address</th><th>IPv4 address</th><th>Remote device</th><th>Remote port</th></tr>');
 
 $i = "1";
 
@@ -23,8 +24,8 @@ while ($arp = mysql_fetch_assoc($query))
   <tr bgcolor=$bg_colour>
     <td width=200><b>".generate_port_link(array_merge($arp, $device))."</b></td>
     <td width=160>".formatmac($arp['mac_address'])."</td>
-    <td width=140>".$arp['ipv4_address']."</td>
-    <td width=200>$arp_name</td>
+    <td width=160>".$arp['ipv4_address']."</td>
+    <td width=280>$arp_name</td>
     <td>$arp_if</td>
   </tr>");
   $i++;
