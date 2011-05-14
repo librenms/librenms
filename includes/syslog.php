@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @package syslog
+ */
+
+/**
+ * function process_syslog
+ */
 function process_syslog ($entry, $update) {
 
   global $config;

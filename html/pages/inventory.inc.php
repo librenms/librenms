@@ -10,8 +10,7 @@
     <select name="part" id="part">
       <option value="">All Parts</option>
       <?php
-        $query = mysql_query("SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY `entPhysicalModelName` ORDER BY `entPhysicalModelName`");
-        while ($data = mysql_fetch_assoc($query))
+        foreach (dbFetchRows("SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY `entPhysicalModelName` ORDER BY `entPhysicalModelName`") as $data)
         {
           echo("<option value='".$data['entPhysicalModelName']."'");
           if ($data['entPhysicalModelName'] == $_POST['part']) { echo("selected"); }
@@ -28,8 +27,7 @@
     <select name="device" id="device">
       <option value="">All Devices</option>
       <?php
-        $query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
-        while ($data = mysql_fetch_assoc($query))
+        foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data)
         {
           echo("<option value='".$data['device_id']."'");
 
@@ -40,52 +38,57 @@
       ?>
     </select>
   </label>
-  <input type="text" size=24 name="device_string" id="device_string" value="<?php echo($_POST['device_string']); ?>" />
+  <input type="text" size=24 name="device_string" id="device_string" value="<?php if($_POST['device_string']) { echo($_POST['device_string']); } ?>" />
   <input style type=submit class=submit value=Search>
 
 <?php
 
 print_optionbar_end();
 
-if ($_POST['string'])
-{
-  $where .= " AND E.entPhysicalDescr LIKE '%".$_POST['string']."%'";
-}
-
-if ($_POST['device_string'])
-{
-  $where .= " AND D.hostname LIKE '%".$_POST['device_string']."%'";
-}
-
-if ($_POST['part'])
-{
-  $where .= " AND E.entPhysicalModelName = '".$_POST['part']."'";
-}
-
-if ($_POST['serial'])
-{
-  $where .= " AND E.entPhysicalSerialNum LIKE '%".$_POST['serial']."%'";
-}
-
-if ($_POST['device'])
-{
-  $where .= " AND D.device_id = '".$_POST['device']."'";
-}
+$param = array();
 
 if ($_SESSION['userlevel'] >= '5')
 {
-  $sql = "SELECT * from entPhysical AS E, devices AS D WHERE E.device_id = D.device_id $where ORDER BY D.hostname";
+  $sql = "SELECT * from entPhysical AS E, devices AS D WHERE D.device_id = E.device_id";
 } else {
-  $sql = "SELECT * from entPhysical AS E, devices AS D, devices_perms AS P
-          WHERE E.device_id = D.device_id AND D.device_id = P.device_id $where ORDER BY D.hostname";
+  $sql = "SELECT * from entPhysical AS E, devices AS D, devices_perms AS P WHERE D.device_id = E.device_id AND P.device_id = D.device_id AND P.user_id = ?";
+  $param[] = $_SESSION['user_id'];
 }
 
-$query = mysql_query($sql);
-echo("<table cellspacing=0 cellpadding=2 width=100%>");
+if (isset($_POST['string']) && strlen($_POST['string']))
+{
+  $sql  .= " AND E.entPhysicalDescr LIKE ?";
+  $param[] = "%".$_POST['string']."%"; 
+}
 
+if (isset($_POST['device_string']) && strlen($_POST['device_string']))
+{
+  $sql .= " AND D.hostname LIKE ?";
+  $param[] = "%".$_POST['device_string']."%";
+}
+
+if (isset($_POST['part']) && strlen($_POST['part']))
+{
+  $sql .= " AND E.entPhysicalModelName = ?";
+  $param[] = $_POST['part'];
+}
+
+if (isset($_POST['serial']) && strlen($_POST['serial']))
+{
+  $sql .= " AND E.entPhysicalSerialNum LIKE ?";
+  $param[] = "%".$_POST['serial']."%";
+}
+
+if (isset($_POST['device']) && is_numeric($_POST['device']))
+{
+  $sql .= " AND D.device_id = ?";
+  $param[] = $_POST['device'];
+}
+
+echo("<table cellspacing=0 cellpadding=2 width=100%>");
 echo("<tr><th>Hostname</th><th>Description</th><th>Name</th><th>Part No</th><th>Serial No</th></tr>");
 
-while ($entry = mysql_fetch_assoc($query))
+foreach (dbFetchRows($sql, $param) as $entry)
 {
   if ($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
   echo("<tr style=\"background-color: $bg\"><td>" . generate_device_link($entry, shortHost($entry['hostname'])) . "</td><td>" . $entry['entPhysicalDescr']  .
