@@ -50,7 +50,7 @@ if ($if_list)
              <td><span class=list-large>" . generate_port_link($interface,$interface['port_descr_descr']) . "</span><br />
             <span class=interface-desc style='float: left;'>".generate_device_link($interface)." ".generate_port_link($interface)." </span>");
 
-    if (mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0))
+    if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE interface_id = ?", array($interface['interface_id'])))
     {
       echo("<span style='float: right;'><a href='".$config['base_url']."/device/".$interface['device_id']."/port/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'> MAC Accounting</a></span>");
     }
