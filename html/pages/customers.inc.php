@@ -20,9 +20,6 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GRO
 {
   $i++;
 
-  $port_sql = "SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' AND `port_descr_descr` = '".$customer['port_descr_descr']."'";
-  $port_query = mysql_query($port_sql);
-
   $customer_name = $customer['port_descr_descr'];
 
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }

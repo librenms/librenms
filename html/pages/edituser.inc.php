@@ -8,7 +8,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 {
   if ($_GET['user_id'])
   {
-    $user_data = mysql_fetch_assoc(mysql_query("SELECT * FROM users WHERE user_id = '" . $_GET['user_id'] . "'"));
+    $user_data = dbFetchRow("SELECT * FROM users WHERE user_id = ?", array($_GET['user_id']));
       echo("<p><h2>" . $user_data['realname'] . "</h2><a href='?page=edituser'>Change...</a></p>");
     // Perform actions if requested
 
@@ -169,14 +169,14 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 
   } else {
 
-    $user_list = mysql_query("SELECT * FROM `users`");
+    $user_list = dbFetchRows("SELECT * FROM `users`");
 
     echo("<h3>Select a user to edit</h3>");
 
     echo("<form method='get' action=''>
             <input type='hidden' value='edituser' name='page'>
             <select name='user_id'>");
-    while ($user_entry = mysql_fetch_assoc($user_list))
+    foreach($user_list as $user_entry)
     {
       echo("<option value='" . $user_entry['user_id']  . "'>" . $user_entry['username'] . "</option>");
     }
