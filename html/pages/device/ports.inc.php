@@ -11,11 +11,11 @@ $menu_options['basic']   = 'Basic';
 $menu_options['details'] = 'Details';
 $menu_options['arp']     = 'ARP Table';
 
-if(mysql_result(mysql_query("SELECT * FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"),0))
+if(dbFetchCell("SELECT * FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"))
 {
   $menu_options['neighbours'] = 'Neighbours';  
 }
-if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl'"),0))
+if(dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl'"))
 {
   $menu_options['adsl'] = 'ADSL';
 }
@@ -64,10 +64,8 @@ if ($_GET['optc'] == thumbs)
   $timeperiods = array('-1day','-1week','-1month','-1year');
   $from = '-1day';
   echo("<div style='display: block; clear: both; margin: auto; min-height: 500px;'>");
-  $sql  = "select * from ports WHERE device_id = '".$device['device_id']."' ORDER BY ifIndex";
-  $query = mysql_query($sql);
   unset ($seperator);
-  while ($interface = mysql_fetch_assoc($query))
+  foreach (dbFetchRows("select * from ports WHERE device_id = ? ORDER BY ifIndex", array($device['device_id'])) as $interface)
   {
     echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
     <div style='font-weight: bold;'>".makeshortif($interface['ifDescr'])."</div>
@@ -90,8 +88,7 @@ if ($_GET['optc'] == thumbs)
     if ($_GET['opta'] == "details") { $port_details = 1; }
     echo("<div style='margin: 0px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
     $i = "1";
-    $interface_query = mysql_query("select * from ports WHERE device_id = '".$device['device_id']."' AND deleted = '0' ORDER BY `ifIndex` ASC");
-    while ($interface = mysql_fetch_assoc($interface_query))
+    foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' ORDER BY `ifIndex` ASC", array($device['device_id'])) as $interface)
     {
       include("includes/print-interface.inc.php");
       $i++;

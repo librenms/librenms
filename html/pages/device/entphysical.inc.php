@@ -4,8 +4,8 @@ function printEntPhysical($ent, $level, $class)
 {
   global $device;
 
-  $query = mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalContainedIn = '".$ent."' ORDER BY entPhysicalContainedIn,entPhysicalIndex");
-  while ($ent = mysql_fetch_assoc($query))
+  $ents = dbFetchRows("SELECT * FROM `entPhysical` WHERE device_id = ? AND entPhysicalContainedIn = ? ORDER BY entPhysicalContainedIn,entPhysicalIndex", array($device['device_id'], $ent));
+  foreach ($ents as $ent)
   {
     echo("
  <li class='$class'>");
@@ -28,7 +28,7 @@ function printEntPhysical($ent, $level, $class)
 
     if ($ent['ifIndex'])
     {
-      $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE ifIndex = '".$ent['ifIndex']."' AND device_id = '".$device['device_id']."'"));
+      $interface = dbFetchRow("SELECT * FROM `ports` WHERE ifIndex = ? AND device_id = ?", array($ent['ifIndex'], $device['device_id']));
       $ent['entPhysicalName'] = generate_port_link($interface);
     }
 
@@ -61,7 +61,7 @@ function printEntPhysical($ent, $level, $class)
 
     echo("</div>");
 
-    $count = mysql_result(mysql_query("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalContainedIn = '".$ent['entPhysicalIndex']."'"),0);
+    $count = dbFetchCell("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalContainedIn = '".$ent['entPhysicalIndex']."'");
     if ($count)
     {
       echo("<ul>");

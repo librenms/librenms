@@ -12,9 +12,8 @@ print_optionbar_start('', '');
 echo("<span style='font-weight: bold;'>Graphs</span> &#187; ");
 
 $sep = "";
-$query = mysql_query("SELECT * FROM device_graphs WHERE device_id = '".$device['device_id']."'");
 
-while ($graph = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM device_graphs WHERE device_id = ?", array($device['device_id'])) as $graph)
 {
   $section = $config['graph_types']['device'][$graph['graph']]['section'];
   $graph_enable[$section][$graph['graph']] = $graph['graph'];

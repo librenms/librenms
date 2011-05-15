@@ -2,15 +2,13 @@
 
 echo('<table width="100%">');
 
-$hrdevices = mysql_query("SELECT * FROM `hrDevice` WHERE `device_id` = '".$device['device_id']."' ORDER BY `hrDeviceIndex`");
-
-while ($hrdevice = mysql_fetch_assoc($hrdevices))
+foreach (dbFetchRows("SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `hrDeviceIndex`", array($device['device_id'])) as $hrdevice)
 {
   echo("<tr><td>".$hrdevice['hrDeviceIndex']."</td>");
 
   if ($hrdevice['hrDeviceType'] == "hrDeviceProcessor")
   {
-    $proc_id = mysql_result(mysql_query("SELECT processor_id FROM processors WHERE device_id = '".$device['device_id']."' AND hrDeviceIndex = '".$hrdevice['hrDeviceIndex']."'"),0);
+    $proc_id = dbFetchCell("SELECT processor_id FROM processors WHERE device_id = '".$device['device_id']."' AND hrDeviceIndex = '".$hrdevice['hrDeviceIndex']."'");
     $proc_url   = "device/".$device['device_id']."/health/processor/";
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$hrdevice['hrDeviceDescr'];
     $proc_popup .= "</div><img src=\'graph.php?id=" . $proc_id . "&amp;type=processor_usage&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";
@@ -32,7 +30,7 @@ while ($hrdevice = mysql_fetch_assoc($hrdevices))
   elseif ($hrdevice['hrDeviceType'] == "hrDeviceNetwork")
   {
     $int = str_replace("network interface ", "", $hrdevice['hrDeviceDescr']);
-    $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE device_id = '".$device['device_id']."' AND ifDescr = '".$int."'"));
+    $interface = dbFetchRow("SELECT * FROM ports WHERE device_id = ? AND ifDescr = ?", array($device['device_id'], $int));
     if ($interface['ifIndex'])
     {
       echo("<td>".generate_port_link($interface)."</td>");

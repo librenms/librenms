@@ -2,8 +2,7 @@
 
 if (!isset($_GET['optb']) ) { $_GET['optb'] = "graphs"; }
 
-$interface_query = mysql_query("select * from ports WHERE interface_id = '".$_GET['opta']."'");
-$interface = mysql_fetch_assoc($interface_query);
+$interface = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($_GET['opta']));
 
 $port_details = 1;
 
@@ -57,7 +56,7 @@ echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/
 if ($_GET['optb'] == "graphs" || !$_GET['optb']) { echo("</span>"); }
 
 
-if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$interface['interface_id']."'"),0) )
+if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$interface['interface_id']."'") )
 {
   echo(" | ");
   if ($_GET['optb'] == "adsl") { echo("<span class='pagemenu-selected'>"); }
@@ -71,8 +70,8 @@ if ($_GET['optb'] == "arp") { echo("<span class='pagemenu-selected'>"); }
 echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/arp/'>ARP Table</a>");
 if ($_GET['optb'] == "arp") { echo("</span>"); }
 
-if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '".
-                              $interface['ifIndex']."' and `device_id` = '".$device['device_id']."'"),0) )
+if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '".
+                              $interface['ifIndex']."' and `device_id` = '".$device['device_id']."'") )
 {
   echo(" | ");
   if ($_GET['optb'] == "pagp") { echo("<span class='pagemenu-selected'>"); }
@@ -81,7 +80,7 @@ if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfInd
 }
 
 
-if (mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0) > "0" )
+if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'") > "0" )
 {
   echo(" | Mac Accounting : ");
   if ($_GET['optb'] == "macaccounting" && $_GET['optc'] == "bits" && !$_GET['optd']) { echo("<span class='pagemenu-selected'>"); }
@@ -106,7 +105,7 @@ if (mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interfac
   echo(")");
 }
 
-if (mysql_result(mysql_query("SELECT COUNT(*) FROM juniAtmVp WHERE interface_id = '".$interface['interface_id']."'"),0) > "0" )
+if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE interface_id = '".$interface['interface_id']."'") > "0" )
 {
   echo(" | ATM VPs : ");
   if ($_GET['optb'] == "junose-atm-vp" && $_GET['optc'] == "bits") { echo("<span class='pagemenu-selected'>"); }

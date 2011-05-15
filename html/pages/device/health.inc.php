@@ -1,17 +1,17 @@
 <?php
 
-$storage = mysql_result(mysql_query("select count(*) from storage WHERE device_id = '" . $device['device_id'] . "'"), 0);
-$diskio = mysql_result(mysql_query("select count(*) from ucd_diskio WHERE device_id = '" . $device['device_id'] . "'"), 0);
-$mempools = mysql_result(mysql_query("select count(*) from mempools WHERE device_id = '" . $device['device_id'] . "'"), 0);
-$processor  = mysql_result(mysql_query("select count(*) from processors WHERE device_id = '" . $device['device_id'] . "'"), 0);
+$storage      = dbFetchCell("select count(*) from storage WHERE device_id = ?", array($device['device_id']));
+$diskio       = dbFetchCell("select count(*) from ucd_diskio WHERE device_id = ?", array($device['device_id']));
+$mempools     = dbFetchCell("select count(*) from mempools WHERE device_id = ?", array($device['device_id']));
+$processor    = dbFetchCell("select count(*) from processors WHERE device_id = ?", array($device['device_id']));
 
-$temperatures = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='temperature' AND device_id = '" . $device['device_id'] . "'"), 0);
-$humidity = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='humidity' AND device_id = '" . $device['device_id'] . "'"), 0);
-$fans = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='fanspeed' AND device_id = '" . $device['device_id'] . "'"), 0);
-$volts = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='voltage' AND device_id = '" . $device['device_id'] . "'"), 0);
-$current = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "'"), 0);
-$freqs = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='frequency' AND device_id = '" . $device['device_id'] . "'"), 0);
-$power = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='power' AND device_id = '" . $device['device_id'] . "'"), 0);
+$temperatures = dbFetchCell("select count(*) from sensors WHERE sensor_class='temperature' AND device_id = ?", array($device['device_id']));
+$humidity     = dbFetchCell("select count(*) from sensors WHERE sensor_class='humidity' AND device_id = ?", array($device['device_id']));
+$fans         = dbFetchCell("select count(*) from sensors WHERE sensor_class='fanspeed' AND device_id = ?", array($device['device_id']));
+$volts        = dbFetchCell("select count(*) from sensors WHERE sensor_class='voltage' AND device_id = ?", array($device['device_id']));
+$current      = dbFetchCell("select count(*) from sensors WHERE sensor_class='current' AND device_id = ?", array($device['device_id']));
+$freqs        = dbFetchCell("select count(*) from sensors WHERE sensor_class='frequency' AND device_id = ?", array($device['device_id']));
+$power        = dbFetchCell("select count(*) from sensors WHERE sensor_class='power' AND device_id = ?", array($device['device_id']));
 
 unset($datas);
 $datas[] = 'overview';
