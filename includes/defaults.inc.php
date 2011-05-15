@@ -198,7 +198,6 @@ $config['bad_if'][] = "bluetooth";
 $config['bad_if'][] = "isatap"; 
 $config['bad_if'][] = "ras"; 
 $config['bad_if'][] = "qos"; 
-$config['bad_if'][] = "miniport"; 
 $config['bad_if'][] = "sonet/sdh"; 
 $config['bad_if'][] = "span rp"; 
 $config['bad_if'][] = "span sp"; 
