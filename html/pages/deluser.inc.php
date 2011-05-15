@@ -10,11 +10,11 @@ if ($_SESSION['userlevel'] < '10') { include("includes/error-no-perm.inc.php"); 
   {
     if ($_GET['action'] == "del")
     {
-      $delete_username = mysql_result(mysql_query("SELECT username FROM users WHERE user_id = '" . mres($_GET['user_id']) . "'"),0);
+      $delete_username = dbFetchCell("SELECT username FROM users WHERE user_id = ?", array($_GET['user_id']));
 
       if ($_GET['confirm'] == "yes")
       {
-        mysql_query("DELETE FROM `devices_perms` WHERE `user_id` = '" . mres($_GET['user_id']) . "'");
+        dbDelete('devices_perms', "`user_id` =  ?", array($_GET['user_id']));
         if (deluser($_GET['user_id'])) { echo("<span class=info>User '$delete_username' deleted!</span>"); }
       }
       else
@@ -24,8 +24,8 @@ if ($_SESSION['userlevel'] < '10') { include("includes/error-no-perm.inc.php"); 
     }
 
     # FIXME v mysql query should be replaced by authmodule
-    $userlist = mysql_query("SELECT * FROM `users`");
-    while ($userentry = mysql_fetch_assoc($userlist))
+    $userlist = dbFetchRows("SELECT * FROM `users`");
+    foreach ($userlist as $userentry)
     {
       $i++;
       echo($i . ". " . $userentry['username'] . "

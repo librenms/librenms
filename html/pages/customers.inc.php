@@ -27,7 +27,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GRO
 
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
-  while ($port = mysql_fetch_assoc($port_query))
+  foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' AND `port_descr_descr` = ?", array($customer['port_descr_descr'])) as $port)
   {
     $device = device_by_id_cache($port['device_id']);
 
