@@ -32,7 +32,7 @@ while($neighbour = mysql_fetch_assoc($query))
     echo("<td>".$neighbour['remote_hostname']."
           <br />".$neighbour['remote_platform']."</td>");
   }
-  echo("<td>".$neighbour['protocol']."</td>");
+  echo("<td>".strtoupper($neighbour['protocol'])."</td>");
   echo("</tr>");
   $i++;
 }
