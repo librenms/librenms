@@ -11,13 +11,11 @@ if ($_POST['editing'])
     $retries = mres($_POST['retries']);
 
     #FIXME needs more sanity checking! and better feedback
-    $sql = "UPDATE `devices` SET `community` = '" . $community . "', `snmpver` = '" . $snmpver . "', `port` = '$port', ";
-    if ($timeout) { $sql .= "`timeout` = '$timeout', "; } else { $sql .= "`timeout` = NULL, "; }
-    if ($retries) { $sql .= "`retries` = '$retries'"; } else { $sql .= "`retries` = NULL"; }
-    $sql .= " WHERE `device_id` = '".$device['device_id']."'";
-    $query = mysql_query($sql);
-
-    $rows_updated = mysql_affected_rows();
+    $update = array('community' => $_POST['community'], 'snmpver' => $_POST['snmpver'], 'port' => $_POST['port']);
+    if ($_POST['timeout']) { $update['timeout'] = $_POST['timeout']; } else { $update['timeout'] = array(NULL); }
+    if ($_POST['retries'])  { $update['retries'] = $_POST['retries']; } else { $update['retries'] = array(NULL); }
+ 
+    $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?',array($device['device_id']));
 
     if ($rows_updated > 0)
     {
@@ -33,7 +31,7 @@ if ($_POST['editing'])
   }
 }
 
-$device = mysql_fetch_assoc(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'"));
+$device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device['device_id']));
 $descr  = $device['purpose'];
 
 if ($updated && $update_message)
