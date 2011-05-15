@@ -2,15 +2,15 @@
 
 $overview = 1;
 
-$ports['total'] = mysql_result(mysql_query("SELECT count(*) FROM ports  WHERE device_id = '" . $device['device_id'] . "'"),0);
-$ports['up'] = mysql_result(mysql_query("SELECT count(*) FROM ports  WHERE device_id = '" . $device['device_id'] . "' AND ifOperStatus = 'up'"),0);
-$ports['down'] = mysql_result(mysql_query("SELECT count(*) FROM ports WHERE device_id = '" . $device['device_id'] . "' AND ifOperStatus = 'down' AND ifAdminStatus = 'up'"),0);
-$ports['disabled'] = mysql_result(mysql_query("SELECT count(*) FROM ports WHERE device_id = '" . $device['device_id'] . "' AND ifAdminStatus = 'down'"),0);
+$ports['total']    = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ?", array($device['device_id']));
+$ports['up']       = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifOperStatus` = 'up'", array($device['device_id']));
+$ports['down']     = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up'", array($device['device_id']));
+$ports['disabled'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifAdminStatus` = 'down'", array($device['device_id']));
 
-$services['total'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE device_id = '" . $device['device_id'] . "'"),0);
-$services['up'] = mysql_result(mysql_query("SELECT count(service_id) FROM services  WHERE device_id = '" . $device['device_id'] . "' AND service_status = '1' AND service_ignore ='0'"),0);
-$services['down'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE device_id = '" . $device['device_id'] . "' AND service_status = '0' AND service_ignore = '0'"),0);
-$services['disabled'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE device_id = '" . $device['device_id'] . "' AND service_ignore = '1'"),0);
+$services['total']    = dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE `device_id` = ?", array($device['device_id']));
+$services['up']       = dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE `device_id` = ? AND `service_status` = '1' AND `service_ignore` ='0'", array($device['device_id']));
+$services['down']     = dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE `device_id` = ? AND `service_status` = '0' AND `service_ignore` = '0'", array($device['device_id']));
+$services['disabled'] = dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE `device_id` = ? AND `service_ignore` = '1'", array($device['device_id']));
 
 if ($services['down']) { $services_colour = $warn_colour_a; } else { $services_colour = $list_colour_a; }
 if ($ports['down']) { $ports_colour = $warn_colour_a; } else { $ports_colour = $list_colour_a; }
@@ -44,9 +44,7 @@ if ($services['total'])
 
   echo("<div style='padding: 8px; font-size: 11px; font-weight: bold;'>");
 
-  $sql = "SELECT * FROM services WHERE device_id = '" . $device['device_id'] . "' ORDER BY service_type";
-  $query = mysql_query($sql);
-  while ($data = mysql_fetch_assoc($query))
+  foreach (dbFetchRows("SELECT * FROM services WHERE device_id = ? ORDER BY service_type", array($device['device_id'])) as $data)
   {
     if ($data[service_status] == "0" && $data[service_ignore] == "1") { $status = "grey"; }
     if ($data[service_status] == "1" && $data[service_ignore] == "1") { $status = "green"; }
@@ -60,16 +58,15 @@ if ($services['total'])
   echo("</div>");
 }
 
-$sql =  "SELECT *, DATE_FORMAT(timestamp, '%d/%b/%y %T') AS date from syslog WHERE device_id = '" . $device['device_id'] . "' $where";
-$sql .= " ORDER BY timestamp DESC LIMIT 20";
-$query = mysql_query($sql);
 
-if (mysql_affected_rows() > "0")
+### FIXME - split this into overview/syslog.inc.php?
+$syslog =  dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '%d/%b/%y %T') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20");
+if (is_array($syslog))
 {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$device['base_url']."/images/16/printer.png'> Recent Syslog</p>");
   echo("<table cellspacing=0 cellpadding=2 width=100%>");
-  while ($entry = mysql_fetch_assoc($query)) { include("includes/print-syslog.inc.php"); }
+  foreach ($syslog as $entry) { include("includes/print-syslog.inc.php"); }
   echo("</table>");
   echo("</div>");
 }
@@ -81,9 +78,6 @@ echo("<div style='float:right; width: 50%;'>");
 ### Right Pane
 include("overview/processors.inc.php");
 include("overview/mempools.inc.php");
-#include("overview/cemp.inc.php");
-#include("overview/cmp.inc.php");
-#include("overview/hrStorage.inc.php");
 include("overview/storage.inc.php");
 include("overview/sensors/temperatures.inc.php");
 include("overview/sensors/humidity.inc.php");
@@ -98,12 +92,10 @@ echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
 echo('<a class="sectionhead" href="device/'.$device['device_id'].'/events/">');
 echo("<img align='absmiddle' src='".$config['base_url']."/images/16/report.png'> Recent Events</a></p>");
 
-$query = "SELECT *,DATE_FORMAT(datetime, '%d/%b/%y %T') as humandate FROM `eventlog` WHERE `host` = '" . $device['device_id'] . "' ORDER BY `datetime` DESC LIMIT 0,10";
-$data = mysql_query($query);
-
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
 
-while ($entry = mysql_fetch_assoc($data))
+$eventlog = dbFetchRows("SELECT *,DATE_FORMAT(datetime, '%d/%b/%y %T') as humandate FROM `eventlog` WHERE `host` = ? ORDER BY `datetime` DESC LIMIT 0,10", array($device['device_id']));
+foreach ($eventlog as $entry)
 {
   include("includes/print-event-short.inc.php");
 }

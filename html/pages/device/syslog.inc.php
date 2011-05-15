@@ -13,8 +13,8 @@ print_optionbar_start('25');
     <select name="program" id="program">
       <option value="">All Programs</option>
       <?php
-        $query = mysql_query("SELECT `program` FROM `syslog` WHERE device_id = '" . $device['device_id'] . "' GROUP BY `program` ORDER BY `program`");
-        while ($data = mysql_fetch_assoc($query)) {
+        $datas = dbFetchRows("SELECT `program` FROM `syslog` WHERE device_id = ? GROUP BY `program` ORDER BY `program`", array($device['device_id']));
+        foreach ($datas as $data) {
           echo("<option value='".$data['program']."'");
           if ($data['program'] == $_POST['program']) { echo("selected"); }
           echo(">".$data['program']."</option>");
@@ -29,21 +29,24 @@ print_optionbar_start('25');
 
 print_optionbar_end();
 
+$param = array($device['device_id']);
+
 if ($_POST['string'])
 {
-  $where = " AND msg LIKE '%".$_POST['string']."%'";
+  $where   = " AND msg LIKE ?";
+  $param[] = "%".$_POST['string']."%";
 }
 
 if ($_POST['program'])
 {
-  $where .= " AND program = '".$_POST['program']."'";
+  $where  .= " AND program = ?";
+  $param[] = $_POST['program'];
 }
 
-$sql =  "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog WHERE device_id = '" . $device['device_id'] . "' $where";
+$sql =  "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog WHERE device_id = ? $where";
 $sql .= " ORDER BY timestamp DESC LIMIT 1000";
-$query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
-while ($entry = mysql_fetch_assoc($query)) { include("includes/print-syslog.inc.php"); }
+foreach (dbFetchRows($sql, $param) as $entry) { include("includes/print-syslog.inc.php"); }
 echo("</table>");
 
 ?>

@@ -25,12 +25,11 @@ unset($sep);
 
 print_optionbar_end();
 
-if (mysql_result(mysql_query("select count(service_id) from services WHERE device_id = '".$device['device_id']."'"), 0) > '0')
+if (dbFetchCell"select count(service_id) from services WHERE device_id = ?", array($device['device_id'])) > '0')
 {
   echo("<div style='margin: 5px;'><table cellpadding=7 border=0 cellspacing=0 width=100%>");
   $i = "1";
-  $service_query = mysql_query("select * from services WHERE device_id = '".$device['device_id']."' ORDER BY service_type");
-  while ($service = mysql_fetch_assoc($service_query))
+  foreach (mysql_query("SELECT * FROM `services` WHERE `device_id` = ? ORDER BY `service_type`", array($device['device_id'])) as $service)
   {
     include("includes/print-service.inc.php");
 
@@ -53,9 +52,7 @@ if (mysql_result(mysql_query("select count(service_id) from services WHERE devic
          }
          echo("</td></tr>");
        }
-
   }
-
   echo("</table></div>");
 }
 else

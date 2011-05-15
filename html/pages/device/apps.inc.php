@@ -1,12 +1,10 @@
 <?php
 
-$query = mysql_query("SELECT * FROM `applications` WHERE `device_id` = '".$device['device_id']."'");
-
 print_optionbar_start();
 
 unset($sep);
 
-while ($app = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `applications` WHERE `device_id` = ?", array($device['device_id'])) as $app)
 {
   echo($sep);
 
@@ -26,7 +24,7 @@ while ($app = mysql_fetch_assoc($query))
 
 print_optionbar_end();
 
-$app = mysql_fetch_assoc(mysql_query("SELECT * FROM `applications` WHERE `device_id` = '".$device['device_id']."' AND `app_type` = '".$_GET['opta']."'"));
+$app = dbFetchRow("SELECT * FROM `applications` WHERE `device_id` = ? AND `app_type` = ?", array($device['device_id'], $_GET['opta']));
 
 if (is_file("pages/device/apps/".mres($_GET['opta']).".inc.php"))
 {
