@@ -24,17 +24,16 @@ if ($_POST['editing'])
     if (isset($override_sysLocation_string)) { set_dev_attrib($device, 'override_sysLocation_string', $override_sysLocation_string); };
 
     #FIXME needs more sanity checking! and better feedback
-    $sql = "UPDATE `devices` SET `purpose` = '" . $descr . "', `type` = '$type'";
-    $sql .= ", `ignore` = '$ignore',  `disabled` = '$disabled'";
-    $sql .= " WHERE `device_id` = '".$device['device_id']."'";
-    $query = mysql_query($sql);
 
-    $rows_updated = mysql_affected_rows();
+    $param = array('purpose' => $_POST['descr'], 'type' => $_POST['type'], 'ignore' => $_POST['ignore'], 'disabled' => $_POST['disabled']);
+
+    $rows_updated = dbUpdate($param, 'devices', '`device_id` = ?', array($device['device_id']));
 
     if ($rows_updated > 0 || $updated)
     {
       $update_message = "Device record updated.";
       $updated = 1;
+      $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device['device_id']));
     } elseif ($rows_updated = '-1') {
       $update_message = "Device record unchanged. No update necessary.";
       $updated = -1;

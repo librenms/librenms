@@ -27,19 +27,18 @@ if ($handle = opendir($config['install_dir'] . "/includes/services/"))
   closedir($handle);
 }
 
-$query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
-while ($device = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $dev);
 {
-  $devicesform .= "<option value='" . $device['device_id'] . "'>" . $device['hostname'] . "</option>";
+  $devicesform .= "<option value='" . $dev['device_id'] . "'>" . $dev['hostname'] . "</option>";
 }
 
 if ($updated) { print_message("Device Settings Saved"); }
 
-if (mysql_result(mysql_query("SELECT COUNT(*) from `services` WHERE `device_id` = '".$device['device_id']."'"), 0) > '0')
+if (dbFetchCell("SELECT COUNT(*) from `services` WHERE `device_id` = ?" array($device['device_id'])) > '0')
 {
   $i = "1";
   $service_query = mysql_query("select * from services WHERE device_id = '".$device['device_id']."' ORDER BY service_type");
-  while ($service = mysql_fetch_assoc($service_query))
+  foreach (dbFetchRows("select * from services WHERE device_id = ? ORDER BY service_type", array($device['device_id'])) as $service)
   {
     $existform .= "<option value='" . $service['service_id'] . "'>" . $service['service_type'] . "</option>";
   }

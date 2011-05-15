@@ -105,8 +105,7 @@ $(document).ready(function(){
 
 $row=1;
 
-$query = mysql_query("SELECT * FROM `ports` WHERE device_id='".$device['device_id']."' ORDER BY `ifIndex` ");
-while ($port = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY `ifIndex` ", array($device['device_id'])) as $port)
 {
   $port = ifLabel($port);
 
