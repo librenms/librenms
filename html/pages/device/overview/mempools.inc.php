@@ -2,7 +2,9 @@
 
 $graph_type = "mempool_usage";
 
-if (mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '" . $device['device_id'] . "'"),0))
+$mempools = dbFetchRows("SELECT * FROM `mempools` WHERE device_id = ?", array($device['device_id']));
+
+if (count($mempools))
 {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
@@ -10,9 +12,8 @@ if (mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '"
   echo("<img align='absmiddle' src='".$config['base_url']."/images/icons/memory.png'> Memory Pools</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
   $mempool_rows = '0';
-  $mempools = mysql_query("SELECT * FROM `mempools` WHERE device_id = '" . $device['device_id'] . "'");
 
-  while ($mempool = mysql_fetch_assoc($mempools))
+  foreach($mempools as $mempool)
   {
     if (is_integer($mempool_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     $perc = round($mempool['mempool_perc'],0);

@@ -53,9 +53,8 @@ if($_GET['optb'] == "all" ) {
     echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "</td>");
     #echo("<td width=200 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
     echo("<td><table border=0 cellspacing=0 cellpadding=5 width=100%>");
-    $devices = mysql_query("SELECT * FROM `vrfs` AS V, `devices` AS D WHERE `mplsVpnVrfRouteDistinguisher` = '".$vrf['mplsVpnVrfRouteDistinguisher']."' AND D.device_id = V.device_id");
     $x=1;
-    while ($device = mysql_fetch_assoc($devices))
+    foreach (dbFetchRows("SELECT * FROM `vrfs` AS V, `devices` AS D WHERE `mplsVpnVrfRouteDistinguisher` = ? AND D.device_id = V.device_id", array($vrf['mplsVpnVrfRouteDistinguisher'])) as $device)
     {
       if (!is_integer($i/2))
       {

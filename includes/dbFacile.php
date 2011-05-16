@@ -135,6 +135,7 @@ function dbDelete($table, $where = null, $parameters = array()) {
  * Most other retrieval functions build off this
  * */
 function dbFetchRows($sql, $parameters = array()) {
+        global $db_stats;
 	$result = dbQuery($sql, $parameters);
 	if(mysql_num_rows($result) > 0) {
 		$rows = array();
@@ -144,7 +145,14 @@ function dbFetchRows($sql, $parameters = array()) {
 		mysql_free_result($result);
 		return $rows;
 	}
-	mysql_free_result($result);
+
+        $time_start = microtime(true);
+        mysql_free_result($result);
+        $time_end = microtime(true);
+
+        $db_stats['fetchrows_sec'] += number_format($time_end - $time_start, 8);
+        $db_stats['fetchrows']++;
+
 	// no records, thus return empty array
 	// which should evaluate to false, and will prevent foreach notices/warnings 
 	return array();
@@ -172,10 +180,20 @@ function dbFetch($sql, $parameters = array()) {
  * The first argument is an sprintf-ready query stringTypes
  * */
 function dbFetchRow($sql = null, $parameters = array()) {
+        global $db_stats;
+        $time_start = microtime(true);
+
 	$result = dbQuery($sql, $parameters);
+        $time_start = microtime(true);
+
 	if($result) {
 		$row = mysql_fetch_assoc($result);
 		mysql_free_result($result);
+                $time_end = microtime(true);
+
+                $db_stats['fetchrow_sec'] += number_format($time_end - $time_start, 8);
+                $db_stats['fetchrow']++;
+
 		return $row;
 	} else {
 		return null;
@@ -186,10 +204,18 @@ function dbFetchRow($sql = null, $parameters = array()) {
  * Fetches the first call from the first row returned by the query
  * */
 function dbFetchCell($sql, $parameters = array()) {
+        global $db_stats;
+        $time_start = microtime(true);
+
 	$row = dbFetchRow($sql, $parameters);
 	if($row) {
 		return array_shift($row); // shift first field off first row
 	}
+        $time_end = microtime(true);
+
+        $db_stats['fetchcell_sec'] += number_format($time_end - $time_start, 8);
+        $db_stats['fetchcell']++;
+
 	return null;
 }
 
@@ -198,10 +224,17 @@ function dbFetchCell($sql, $parameters = array()) {
  * It fetches one cell from each row and places all the values in 1 array
  * */
 function dbFetchColumn($sql, $parameters = array()) {
+        global $db_stats;
+        $time_start = microtime(true);
 	$cells = array();
 	foreach(dbFetch($sql, $parameters) as $row) {
 		$cells[] = array_shift($row);
 	}
+        $time_end = microtime(true);
+
+        $db_stats['fetchcol_sec'] += number_format($time_end - $time_start, 8);
+        $db_stats['fetchcol']++;
+
 	return $cells;
 }
 

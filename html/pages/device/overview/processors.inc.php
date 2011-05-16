@@ -2,7 +2,9 @@
 
 $graph_type = "processor_usage";
 
-if (mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = '" . $device['device_id'] . "'"),0))
+$processors = dbFetchRows("SELECT * FROM `processors` WHERE device_id = ?", array($device['device_id']));
+
+if (count($processors))
 {
   $processor_rows = 0;
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
@@ -10,8 +12,8 @@ if (mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = 
   echo('<a class="sectionhead" href="device/'.$device['device_id'].'/health/processor/">');
   echo("<img align='absmiddle' src='".$config['base_url']."/images/icons/processor.png'> Processors</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
-  $procs = mysql_query("SELECT * FROM `processors` WHERE device_id = '" . $device['device_id'] . "' ORDER BY processor_descr ASC");
-  while ($proc = mysql_fetch_assoc($procs))
+
+  foreach($processors as $proc)
   {
     if (is_integer($processor_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 

@@ -19,7 +19,7 @@ print_optionbar_start();
 echo("<span style='font-weight: bold;'>Routing</span> &#187; ");
 
 unset($sep);
-foreach ($datas as $type)
+foreach ($routing_count as $type => $value)
 {
   if (!$_GET['opta']) { $_GET['opta'] = $type; }
 

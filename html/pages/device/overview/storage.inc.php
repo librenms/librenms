@@ -2,7 +2,9 @@
 
 $graph_type = "storage_usage";
 
-if (mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device_id = '" . $device['device_id'] . "'"),0))
+$drives = dbFetchRows("SELECT * FROM `storage` WHERE device_id = ? ORDER BY `storage_descr` ASC", array($device['device_id']));
+
+if (count($drives))
 {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
@@ -11,8 +13,7 @@ if (mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device
   echo("<table width=100% cellspacing=0 cellpadding=5>");
   $drive_rows = '0';
 
-  $drives = mysql_query("SELECT * FROM `storage` WHERE device_id = '" . $device['device_id'] . "' ORDER BY storage_descr ASC");
-  while ($drive = mysql_fetch_assoc($drives))
+  foreach ($drives as $drive)
   {
     $skipdrive = 0;
 

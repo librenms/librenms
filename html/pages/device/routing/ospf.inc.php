@@ -1,15 +1,12 @@
 <?php
 
-$sql   = "SELECT * FROM `ospf_instances` WHERE `device_id` = '".$device['device_id']."'";
-$query = mysql_query($sql);
-
 $i_i = "0";
 
 echo('<table width=100% border=0 cellpadding=5>');
 
 #### Loop Instances
 
-while ($instance = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `device_id` = ?", array($device['device_id'])) as $instance)
 {
   if (!is_integer($i_i/2)) { $instance_bg = $list_colour_a; } else { $instance_bg = $list_colour_b; }
 

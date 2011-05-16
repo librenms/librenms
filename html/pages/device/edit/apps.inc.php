@@ -22,37 +22,33 @@ if ($handle = opendir($config['install_dir'] . "/includes/polling/applications/"
 if ($_POST['device'])
 {
   $updated = 0;
-
+  $param = array($device['device_id']);
   foreach (array_keys($_POST) as $key)
   {
     if (substr($key,0,4) == 'app_')
     {
-      $enabled[] = "'" . substr($key,4) . "'";
+      $param[] = substr($key,4);
+      $enabled[] = substr($key,4);
+      $query[] = "?";
     }
   }
 
-  $sql = "DELETE FROM applications WHERE device_id=" . $device['device_id'];
-  if ($enabled)
-  {
-    $sql .= " AND app_type NOT IN (" . implode(',',$enabled) . ")";
+  if(count($enabled)) {
+    $updated += dbDelete('applications', "`device_id` = ? AND `app_type` NOT IN (".implode(',',$query).")", array($param));
+  } else {
+    $updated += dbDelete('applications', "`device_id` = ?", array($param));
   }
-  mysql_query($sql);
-  $updated += mysql_affected_rows();
 
-  $sql = "SELECT app_type FROM applications WHERE device_id=" . $device['device_id'];
-  $result = mysql_query($sql);
-  while ($row = mysql_fetch_assoc($result))
+  foreach (dbFetchRows( "SELECT `app_type` FROM `applications` WHERE `device_id` = ?", array($device['device_id'])) as $row)
   {
     $app_in_db[] = $row['app_type'];
   }
 
   foreach ($enabled as $app)
   {
-    if (!in_array(trim($app,"'"),$app_in_db))
+    if (!in_array($app,$app_in_db))
     {
-      $sql = "INSERT INTO applications (device_id,app_type) VALUES (" . $device['device_id'] . ", " . $app . ")";
-      mysql_query($sql);
-      $updated += mysql_affected_rows();
+      $updated += dbInsert(array('device_id' => $device['device_id'], 'app_type' => $app), 'applications');
     }
   }
 
@@ -69,10 +65,10 @@ if ($_POST['device'])
 # Show list of apps with checkboxes
 echo('<div style="padding: 10px;">');
 
-if (mysql_result(mysql_query("SELECT COUNT(*) from `applications` WHERE `device_id` = '".$device['device_id']."'"), 0) > '0')
+$apps_enabled = dbFetchRows("SELECT * from `applications` WHERE `device_id` = ? ORDER BY app_type", array($device['device_id']));
+if (count($apps_enabled))
 {
-  $app_query = mysql_query("select * from applications WHERE device_id = '".$device['device_id']."' ORDER BY app_type");
-  while ($application = mysql_fetch_assoc($app_query))
+  foreach ($apps_enabled as $application)
   {
     $app_enabled[] = $application['app_type'];
   }
