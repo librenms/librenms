@@ -37,7 +37,6 @@ if ($updated) { print_message("Device Settings Saved"); }
 if (dbFetchCell("SELECT COUNT(*) from `services` WHERE `device_id` = ?" array($device['device_id'])) > '0')
 {
   $i = "1";
-  $service_query = mysql_query("select * from services WHERE device_id = '".$device['device_id']."' ORDER BY service_type");
   foreach (dbFetchRows("select * from services WHERE device_id = ? ORDER BY service_type", array($device['device_id'])) as $service)
   {
     $existform .= "<option value='" . $service['service_id'] . "'>" . $service['service_type'] . "</option>";

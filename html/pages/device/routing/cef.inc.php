@@ -29,8 +29,6 @@ print_optionbar_end();
 echo('<div id="content">
         <table  border="0" cellspacing="0" cellpadding="5" width="100%">');
 
-$cef_query = mysql_query("SELECT * FROM `cef_switching` WHERE `device_id` = '".$device['device_id']."' ORDER BY `entPhysicalIndex`, `afi`, `cef_index`");
-
 echo('<tr><th><a title="Physical hardware entity">Entity</a></th>
           <th><a title="Address Family">AFI</a></th>
           <th><a title="CEF Switching Path">Path</a></th>
@@ -41,11 +39,10 @@ echo('<tr><th><a title="Physical hardware entity">Entity</a></th>
 
 $i=0;
 
-while ($cef = mysql_fetch_assoc($cef_query))
+foreach (dbFetchRows("SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER BY `entPhysicalIndex`, `afi`, `cef_index`", array($device['device_id'])) as $cef)
 {
 
-  $entity_query = mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND `entPhysicalIndex` = '".$cef['entPhysicalIndex']."'");
-  $entity = mysql_fetch_assoc($entity_query);
+  $entity = dbFetchRow("SELECT * FROM `entPhysical` WHERE device_id = ? AND `entPhysicalIndex` = ?", array($device['device_id'], $cef['entPhysicalIndex']));
 
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
@@ -53,8 +50,7 @@ while ($cef = mysql_fetch_assoc($cef_query))
 
   if(!$entity['entPhysicalModelName'] && $entity['entPhysicalContainedIn']) 
   {
-    $parent_entity_query = mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND `entPhysicalIndex` = '".$entity['entPhysicalContainedIn']."'");
-    $parent_entity = mysql_fetch_assoc($parent_entity_query); 
+    $parent_entity = dbFetchRow("SELECT * FROM `entPhysical` WHERE device_id = ? AND `entPhysicalIndex` = ?", array($device['device_id'], $entity['entPhysicalContainedIn']));
     $entity_descr = $entity['entPhysicalName'] . " (" . $parent_entity['entPhysicalModelName'] .")";
   } else {
     $entity_descr = $entity['entPhysicalName'] . " (" . $entity['entPhysicalModelName'] .")";
