@@ -16,15 +16,16 @@ while ($instance = mysql_fetch_assoc($query))
 
   $device = device_by_id_cache($instance['device_id']);
 
-  $area_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = '".$device['device_id']."'"),0);
-  $port_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = '".$device['device_id']."'"),0);
-  $port_count_enabled = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = '".$device['device_id']."'"),0);
-  $neighbour_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."'"),0);
+  $area_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = '".$device['device_id']."'");
+  $port_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = '".$device['device_id']."'");
+  $port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = '".$device['device_id']."'");
+  $neighbour_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."'");
 
   $ip_query = "SELECT * FROM ipv4_addresses AS A, ports AS I WHERE ";
-  $ip_query .= "(A.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id)";
-  $ip_query .= " AND I.device_id = '".$device['device_id']."'";
-  $ipv4_host = mysql_fetch_assoc(mysql_query($ip_query));
+  $ip_query .= "(A.ipv4_address = ? AND I.interface_id = A.interface_id)";
+  $ip_query .= " AND I.device_id = ?";
+
+  $ipv4_host = dbFetchArray($ip_query, array($peer['bgpPeerIdentifier'], $device['device_id']));
 
   if ($instance['ospfAdminStat'] == "enabled") { $enabled = '<span style="color: #00aa00">enabled</span>'; } else { $enabled = '<span style="color: #aaaaaa">disabled</span>'; }
   if ($instance['ospfAreaBdrRtrStatus'] == "true") { $abr = '<span style="color: #00aa00">yes</span>'; } else { $abr = '<span style="color: #aaaaaa">no</span>'; }

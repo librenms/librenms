@@ -7,8 +7,7 @@
       <select name="device_id" id="device_id">
       <option value="">All Devices</option>
 <?php
-$query = mysql_query("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
-while ($data = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`") as $data)
 {
   echo('<option value="'.$data['device_id'].'"');
   if ($data['device_id'] == $_POST['device_id']) { echo("selected"); }
@@ -40,18 +39,25 @@ print_optionbar_end();
 
 echo('<table width="100%" cellspacing="0" cellpadding="5">');
 
-if (is_numeric($_POST['device_id'])) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
-if ($_POST['interface']) { $where .= " AND I.ifDescr LIKE '".mres($_POST['interface'])."'"; }
+$query = "SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D, `ipv4_networks` AS N WHERE I.interface_id = A.interface_id AND I.device_id = D.device_id AND N.ipv4_network_id = A.ipv4_network_id ";
 
-$sql = "SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D, `ipv4_networks` AS N WHERE I.interface_id = A.interface_id AND I.device_id = D.device_id AND N.ipv4_network_id = A.ipv4_network_id $where ORDER BY A.ipv4_address";
-
-$query = mysql_query($sql);
+if (is_numeric($_POST['device_id']))
+{
+  $query  .= " AND I.device_id = ?";
+  $param[] = $_POST['device_id'];
+}
+if ($_POST['interface'])
+{
+  $query .= " AND I.ifDescr LIKE ?";
+  $param[] = $_POST['interface'];
+}
+$query .= " ORDER BY A.ipv4_address";
 
 echo('<tr class="tablehead"><th>Device</a></th><th>Interface</th><th>Address</th><th>Description</th></tr>');
 
 $row = 1;
 
-while ($interface = mysql_fetch_assoc($query))
+foreach (dbFetchRows($query, $param) as $interface)
 {
   if ($_POST['address'])
   {

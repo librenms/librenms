@@ -30,7 +30,7 @@ if ($_POST['action'] == "update_bill")
 {
 
   if (dbUpdate(array('bill_name' => $_POST['bill_name'], 'bill_day' => $_POST['bill_day'], 'bill_gb' => $_POST['bill_gb'], 
-                 'bill_cdr' => $_POST['bill_cdr'], 'bill_type' => $_POST['bill_type']), 'bills', '`bill_id` = ?' array($bill_id)))
+                 'bill_cdr' => $_POST['bill_cdr'], 'bill_type' => $_POST['bill_type']), 'bills', '`bill_id` = ?', array($bill_id)))
   {
     print_message("Bill Properties Updated");
   }

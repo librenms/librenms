@@ -45,8 +45,7 @@ if($_GET['optb'] == "all" ) {
 
   echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
   $i = "1";
-  $vrf_query = mysql_query("SELECT * FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`");
-  while ($vrf = mysql_fetch_assoc($vrf_query))
+  foreach (dbFetchRows("SELECT * FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`") as $vrf)
   {
     if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
     echo("<tr valign=top bgcolor='$bg_colour'>");
@@ -68,10 +67,9 @@ if($_GET['optb'] == "all" ) {
 
       if ($device['vrf_name'] != $vrf['vrf_name']) { echo("<a href='#' onmouseover=\" return overlib('Expected Name : ".$vrf['vrf_name']."<br />Configured : ".$device['vrf_name']."', CAPTION, '<span class=list-large>VRF Inconsistency</span>' ,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"> <img align=absmiddle src=images/16/exclamation.png></a>"); }
       echo("</td><td>");
-      $ports = mysql_query("SELECT * FROM `ports` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
       unset($seperator);
 
-      while ($port = mysql_fetch_assoc($ports))
+      foreach(dbFetchRows("SELECT * FROM `ports` WHERE `ifVrf` = ? AND `device_id` = ?", array($device['vrf_id'], $device['device_id'])) as $port)
       {
         $port = array_merge ($device, $port);
 
@@ -114,29 +112,27 @@ if($_GET['optb'] == "all" ) {
 } else {
 
   echo("<div style='background: $list_colour_a; padding: 10px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
-  $vrf_query = mysql_query("SELECT * FROM `vrfs` WHERE mplsVpnVrfRouteDistinguisher = '".$_GET['optb']."'");
-  $vrf = mysql_fetch_assoc($vrf_query);
+  $vrf = dbFetchRow("SELECT * FROM `vrfs` WHERE mplsVpnVrfRouteDistinguisher = ?", array($_GET['optb']));
   echo("<tr valign=top bgcolor='$bg_colour'>");
   echo("<td width=200 class=list-large><a href='routing/vrf/".$vrf['mplsVpnVrfRouteDistinguisher']."/".$_GET['optc']."/'>" . $vrf['vrf_name'] . "</a></td>");
   echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "</td>");
   echo("<td width=200 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
   echo("</table></div>");
 
-  $devices = mysql_query("SELECT * FROM `vrfs` AS V, `devices` AS D WHERE `mplsVpnVrfRouteDistinguisher` = '".$vrf['mplsVpnVrfRouteDistinguisher']."' AND D.device_id = V.device_id");
   $x=0;
 
-  while ($device = mysql_fetch_assoc($devices))
+  $devices = dbFetchRows("SELECT * FROM `vrfs` AS V, `devices` AS D WHERE `mplsVpnVrfRouteDistinguisher` = ? AND D.device_id = V.device_id", array($vrf['mplsVpnVrfRouteDistinguisher']));
+  foreach ($devices as $device)
   {
     $hostname = $device['hostname'];
     if (!is_integer($x/2)) { $device_colour = $list_colour_a; } else { $device_colour = $list_colour_b; }
     echo("<table cellpadding=10 cellspacing=0 class=devicetable width=100%>");
     include("includes/device-header.inc.php");
     echo("</table>");
-    $ports = mysql_query("SELECT * FROM `ports` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
     unset($seperator);
     echo('<div style="margin: 0 0 0 60px;"><table cellspacing=0 cellpadding=7>');
     $i=1;
-    while ($interface = mysql_fetch_assoc($ports))
+    foreach (dbFetchRows("SELECT * FROM `ports` WHERE `ifVrf` = ? AND `device_id` = ?", array($device['vrf_id'], $device['device_id'])) as $interface)
     {
       if (!is_integer($x/2))
       {
