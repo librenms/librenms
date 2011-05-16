@@ -1,8 +1,5 @@
 <?php
 
-$sql = "SELECT * FROM `ucd_diskio` WHERE device_id = '" . $device['device_id'] . "' ORDER BY diskio_descr";
-$query = mysql_query($sql);
-
 echo('<table cellspacing="0" cellpadding="5" width="100%">');
 
 #echo("<tr class=tablehead>
@@ -14,7 +11,7 @@ echo('<table cellspacing="0" cellpadding="5" width="100%">');
 
 $row = 1;
 
-while ($drive = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr", array($device['device_id'])) as $drive)
 {
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
