@@ -1,8 +1,6 @@
 <?php
 
-$query = "SELECT * FROM processors WHERE device_id = '" . $device['device_id'] . "'";
-$proc_data = mysql_query($query);
-while ($processor = mysql_fetch_assoc($proc_data))
+foreach (dbFetchRows("SELECT * FROM processors WHERE device_id = ?", array($device['device_id'])) as $processor)
 {
   echo("Processor " . $processor['processor_descr'] . "... ");
 
@@ -35,8 +33,7 @@ while ($processor = mysql_fetch_assoc($proc_data))
   echo($proc . "%\n");
 
   rrdtool_update($procrrd,"N:$proc");
-
-  mysql_query("UPDATE `processors` SET `processor_usage` = '$proc' WHERE `processor_id` = '".$processor['processor_id']."'");
+  dbUpdate(array('processor_usage' => $proc), 'processors', '`processor_id` = ?', array($processor['processor_id']));
 }
 
 ?>

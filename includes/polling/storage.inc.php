@@ -2,11 +2,7 @@
 
 $storage_cache = array();
 
-#echo("Storage: ");
-
-$query = "SELECT * FROM storage WHERE device_id = '" . $device['device_id'] . "'";
-$storage_data = mysql_query($query);
-while ($storage = mysql_fetch_assoc($storage_data))
+foreach (dbFetchRows("SELECT * FROM storage WHERE device_id = ?", array($device['device_id'])) as $storage)
 {
   echo("Storage ".$storage['storage_descr'] . ": ");
 
@@ -54,12 +50,8 @@ while ($storage = mysql_fetch_assoc($storage_data))
 
   rrdtool_update($storage_rrd,"N:".$storage['used'].":".$storage['free']);
 
-  $update_query  = "UPDATE `storage` SET `storage_used` = '".$storage['used']."'";
-  $update_query .= ", `storage_free` = '".$storage['free']."', `storage_size` = '".$storage['size']."'";
-  $update_query .= ", `storage_units` = '".$storage['units']."', `storage_perc` = '".$percent."'";
-  $update_query .= " WHERE `storage_id` = '".$storage['storage_id']."'";
-  if ($debug) { echo("$update_query\n"); }
-  mysql_query($update_query);
+  $update = dbUpdate(array('storage_used' => $storage['used'], 'storage_free' => $storage['free'], 'storage_size' => $storage['size'], 'storage_units' => $storage['units'], 'storage_perc' => $percent),
+                     'storage', '`storage_id` = ?', array($storage['storage_id']));
 
   echo("\n");
 }

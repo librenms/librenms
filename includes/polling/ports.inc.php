@@ -73,24 +73,6 @@ if ($device['adsl_count'] > "0")
   $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.7", $port_stats, "ADSL-LINE-MIB");
 }
 
-## Alcatel Detailed Statistics ## FIXME make this disableable
-if($device['os'] == "aos") {
-  $stat_oids = array('alcetherStatsCRCAlignErrors', 'alcetherStatsRxUndersizePkts','alcetherStatsTxUndersizePkts', 'alcetherStatsTxOversizePkts','alcetherStatsRxJabbers', 'alcetherStatsRxCollisions', 'alcetherStatsTxCollisions',
-                   'alcetherStatsPkts64Octets','alcetherStatsPkts65to127Octets', 'alcetherStatsPkts128to255Octets','alcetherStatsPkts256to511Octets','alcetherStatsPkts512to1023Octets','alcetherStatsPkts1024to1518Octets',
-                   'gigaEtherStatsPkts1519to4095Octets','gigaEtherStatsPkts4096to9215Octets','alcetherStatsPkts1519to2047Octets','alcetherStatsPkts2048to4095Octets','alcetherStatsPkts4096Octets','alcetherStatsRxGiantPkts',
-                   'alcetherStatsRxDribbleNibblePkts','alcetherStatsRxLongEventPkts','alcetherStatsRxVlanTagPkts','alcetherStatsRxControlPkts','alcetherStatsRxLenChkErrPkts','alcetherStatsRxCodeErrPkts','alcetherStatsRxDvEventPkts',
-                   'alcetherStatsRxPrevPktDropped','alcetherStatsTx64Octets','alcetherStatsTx65to127Octets','alcetherStatsTx128to255Octets','alcetherStatsTx256to511Octets','alcetherStatsTx512to1023Octets',
-                   'alcetherStatsTx1024to1518Octets','alcetherStatsTx1519to2047Octets','alcetherStatsTx2048to4095Octets','alcetherStatsTx4096Octets','alcetherStatsTxRetryCount','alcetherStatsTxVlanTagPkts',
-                   'alcetherStatsTxControlPkts','alcetherStatsTxLatePkts','alcetherStatsTxTotalBytesOnWire','alcetherStatsTxLenChkErrPkts','alcetherStatsTxExcDeferPkts');
-
-  foreach($stat_oids as $oid)
-  {
-    $port_stats = snmpwalk_cache_oid($device, "alcetherStatsEntry", $port_stats, "ALCATEL-IND1-PORT-MIB");
-  }
-}
-
-echo("\n");
-
 /// FIXME This probably needs re-enabled. We need to clear these things when they get unset, too.
 #foreach ($etherlike_oids as $oid) { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "EtherLike-MIB"); }
 #foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
@@ -115,24 +97,45 @@ $polled = time();
 
 if ($debug) { print_r($port_stats); }
 
+### Build array of ports in the database
+
+## FIXME -- this stuff is a little messy, looping the array to make an array just seems wrong. :>
+
+$ports_db = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($device['device_id']));
+foreach ($ports_db as $port) { $ports[$port['ifIndex']] = $port; }
+
 /// New interface detection
-///// FIXME
+foreach ($port_stats as $ifIndex => $port)
+{
+  if (!is_array($ports[$port['ifIndex']]))
+  {
+    $interface_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
+    $ports[$port['ifIndex']] = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($interface_id));
+    mysql_error();
+    echo("Adding: ".$port['ifName']."(".$ifIndex.")(".$ports[$port['ifIndex']]['interface_id'].")");
+    #print_r($ports);
+  } elseif ($ports[$ifIndex]['deleted'] == "1") {   
+    dbUpdate(array('deleted' => '0'), 'ports', '`interface_id` = ?', array($ports[$ifIndex]['interface_id']));
+    $ports[$ifIndex]['deleted'] = "0";
+  }
+}
 /// End New interface detection
 
+echo("\n");
 /// Loop ports in the DB and update where necessary
-$port_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `deleted` = 0");
-while ($port = mysql_fetch_assoc($port_query))
+foreach ($ports as $port)
 {
-  echo("Port " . $port['ifDescr'] . " ");
+  echo ("Port " . $port['ifDescr'] . "(".$port['ifIndex'].") ");
   if ($port_stats[$port['ifIndex']] && $port['disabled'] != "1")
   { // Check to make sure Port data is cached.
     $this_port = &$port_stats[$port['ifIndex']];
     if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $this_port['ifDescr'], $matches)) { $this_port['ifDescr'] = $matches[1]; }
     $polled_period = $polled - $port['poll_time'];
 
-    $update .= "`poll_time` = '".$polled."'";
-    $update .= ", `poll_prev` = '".$port['poll_time']."'";
-    $update .= ", `poll_period` = '".$polled_period."'";
+    $port['update'] = array();
+    $port['update']['poll_time'] = $polled;
+    $port['update']['poll_prev'] = $port['poll_time'];
+    $port['update']['poll_period'] = $polled_period;
 
     ### Copy ifHC[In|Out]Octets values to non-HC if they exist
     if ($this_port['ifHCInOctets'] > 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] > 0 && is_numeric($this_port['ifHCOutOctets']))
@@ -144,7 +147,7 @@ while ($port = mysql_fetch_assoc($port_query))
 
     ### rewrite the ifPhysAddress
 
-    if(strpos($this_port['ifPhysAddress'], ":"))
+    if (strpos($this_port['ifPhysAddress'], ":"))
     {
       list($a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(":", $this_port['ifPhysAddress']);
       $ah_a = zeropad($a_a);
@@ -185,12 +188,12 @@ while ($port = mysql_fetch_assoc($port_query))
     {
       if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]))
       {
-        $update .= ", `$oid` = NULL";
+        $port['update'][$oid] = array(NULL);
         log_event($oid . ": ".$port[$oid]." -> NULL", $device, 'interface', $port['interface_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> NULL "); } else { echo($oid . " "); }
       } elseif ($port[$oid] != $this_port[$oid]) {
-        $update .= ", `$oid` = '".mres($this_port[$oid])."'";
-	  log_event($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device, 'interface', $port['interface_id']);
+        $port['update'][$oid] = $this_port[$oid];
+        log_event($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device, 'interface', $port['interface_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> " . $this_port[$oid]." "); } else { echo($oid . " "); }
       }
     }
@@ -207,7 +210,7 @@ while ($port = mysql_fetch_assoc($port_query))
         $attrib_key = "port_descr_".$attrib;
         if ($port_ifAlias[$attrib] != $port[$attrib_key])
         {
-          $update .= ", `".$attrib_key."` = '".$port_ifAlias[$attrib]."'";
+          $port['update'][$attrib_key] = $port_ifAlias[$attrib];
           log_event($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device, 'interface', $port['interface_id']);
         }
       }
@@ -218,19 +221,22 @@ while ($port = mysql_fetch_assoc($port_query))
     /// Update IF-MIB metrics
     foreach ($stat_oids_db as $oid)
     {
-	$update .= ", `$oid` = '".$this_port[$oid]."'";
-      $update .= ", `".$oid."_prev` = '".$port[$oid]."'";
+      $port['update'][$oid] = $this_port[$oid];
+      $port['update'][$oid.'_prev'] = $port[$oid];
       $oid_prev = $oid . "_prev";
       if ($port[$oid])
       {
         $oid_diff = $this_port[$oid] - $port[$oid];
         $oid_rate  = $oid_diff / $polled_period;
         if ($oid_rate < 0) { $oid_rate = "0"; }
-        $update .= ", `".$oid."_rate` = '".$oid_rate."'";
-        $update .= ", `".$oid."_delta` = '".$oid_diff."'";
+        $port['update'][$oid.'_rate'] = $oid_rate;
+        $port['update'][$oid.'_delta'] = $oid_diff;
         if ($debug) {echo("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n"); }
       }
     }
+
+    echo('bits('.formatRates($port['update']['ifInOctets_rate']).'/'.formatRates($port['update']['ifOutOctets_rate']).')');
+    echo('pkts('.format_si($port['update']['ifInUcastPkts_rate']).'pps/'.format_si($port['update']['ifOutUcastPkts_rate']).'pps)');
 
     /// Update RRDs
     $rrdfile = $host_rrd . "/port-" . safename($port['ifIndex'] . ".rrd");
@@ -287,7 +293,7 @@ while ($port = mysql_fetch_assoc($port_query))
       { // Loop the OIDs
         if ($this_port[$oid] != $port[$oid])
         { // If data has changed, build a query
-          $update .= ", `$oid` = '".mres($this_port[$oid])."'";
+          $port['update'][$oid] = $this_port[$oid];
           echo("PAgP ");
 	  log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['interface_id']);
         }
@@ -309,15 +315,12 @@ while ($port = mysql_fetch_assoc($port_query))
 
 
     // Update MySQL
-    if ($update)
+    if (count($port['update']))
     {
-      $update_query  = "UPDATE `ports` SET ".$update." WHERE `interface_id` = '" . $port['interface_id'] . "'";
-      @mysql_query($update_query);
-      if ($debug) {echo("\nMYSQL : [ $update_query ]"); }
+      $updated = dbUpdate($port['update'], 'ports', '`interface_id` = ?', array($port['interface_id']));
+      if($debug) { echo("$updated updated"); }
     }
     // End Update MySQL
-
-    unset($update_query); unset($update);
 
     // Send alerts for interface flaps.
     if ($config['warn']['ifdown'] && ($port['ifOperStatus'] != $this_port['ifOperStatus']) && $port['ignore'] == 0)
@@ -342,7 +345,7 @@ while ($port = mysql_fetch_assoc($port_query))
   elseif ($port['disabled'] != "1")
   {
     echo("Port Deleted"); // Port missing from SNMP cache.
-    mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$this_port['ifIndex']."'");
+    dbUpdate(array('deleted' => '1'), 'ports',  '`device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $port['ifIndex']));
   } else {
     echo("Port Disabled.");
   }

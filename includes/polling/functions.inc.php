@@ -11,7 +11,20 @@ function poll_sensor($device, $class, $unit)
   {
     echo("Checking $class " . $sensor['sensor_descr'] . "... ");
 
-    $sensor_value = snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
+    if($class == "temperature")
+    {  
+      for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
+      {
+        if ($debug) echo("Attempt $i ");
+        $sensor_value = snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
+        $sensor_value = trim(str_replace("\"", "", $sensor_value));
+
+        if ($sensor_value != 9999) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
+        sleep(1); # Give the TME some time to reset
+      }
+    } else {
+      $sensor_value = snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
+    }
 
     if ($sensor['sensor_divisor'])    { $sensor_value = $sensor_value / $sensor['sensor_divisor']; }
     if ($sensor['sensor_multiplier']) { $sensor_value = $sensor_value * $sensor['sensor_multiplier']; }
