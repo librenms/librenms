@@ -1,8 +1,5 @@
 <?php
 
-$sql   = "SELECT * FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'";
-$query = mysql_query($sql);
-
 $i_i = "0";
 
 echo('<table width=100% border=0 cellpadding=10>');
@@ -10,7 +7,7 @@ echo('<tr><th>Device</th><th>Router Id</th><th>Status</th><th>ABR</th><th>ASBR</
 
 #### Loop Instances
 
-while ($instance = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'") as $instance)
 {
   if (!is_integer($i_i/2)) { $instance_bg = $list_colour_a; } else { $instance_bg = $list_colour_b; }
 

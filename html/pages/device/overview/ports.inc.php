@@ -44,11 +44,9 @@ if ($ports['total'])
 
   echo('  <div style="margin: 8px; font-size: 11px; font-weight: bold;">');
 
-  $sql = "SELECT * FROM ports WHERE `device_id` = '" . $device['device_id'] . "' AND deleted != '1'";
-  $query = mysql_query($sql);
   $ifsep = "";
 
-  while ($data = mysql_fetch_assoc($query))
+  foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1'", array($device['device_id'])) as $data)
   {
     $data = ifNameDescr($data);
     $data = array_merge($data, $device);

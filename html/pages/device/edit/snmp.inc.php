@@ -19,7 +19,7 @@ if ($_POST['editing'])
 
     if ($rows_updated > 0)
     {
-      $update_message = mysql_affected_rows() . " Device record updated.";
+      $update_message = $rows_updated . " Device record updated.";
       $updated = 1;
     } elseif ($rows_updated = '-1') {
       $update_message = "Device record unchanged. No update necessary.";
