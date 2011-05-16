@@ -14,8 +14,7 @@ echo("<tr class=tablehead>
       </tr>");
 
 $i = '1';
-$mempools = mysql_query("SELECT * FROM `mempools` AS M, `devices` as D WHERE D.device_id = M.device_id ORDER BY D.hostname");
-while ($mempool = mysql_fetch_assoc($mempools))
+foreach (dbFetchRows("SELECT * FROM `mempools` AS M, `devices` as D WHERE D.device_id = M.device_id ORDER BY D.hostname") as $mempool)
 {
   if (device_permitted($mempool['device_id']))
   {
