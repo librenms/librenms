@@ -63,16 +63,16 @@ echo('
 
 echo("<hr />");
 
-$ports_array = mysql_query("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-                            WHERE B.bill_id = '".$bill_data['bill_id']."' AND P.interface_id = B.port_id
-                            AND D.device_id = P.device_id");
+$ports = dbFetchRows("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
+                      WHERE B.bill_id = ? AND P.interface_id = B.port_id
+                      AND D.device_id = P.device_id", array($bill_data['bill_id']));
 
-if (mysql_affected_rows())
+if (is_array($ports))
 {
   echo("<h3>Billed Ports</h3>");
 
   echo("<table cellpadding=5 cellspacing=0>");
-  while ($port = mysql_fetch_assoc($ports_array))
+  foreach ($ports as $port)
   {
     if ($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
     echo("<tr style=\"background-color: $bg\">");
@@ -98,8 +98,8 @@ echo("<form action='' method='post'>
        <td><select id='device' class='selector' name='device' onchange='getInterfaceList(this)'>
         <option value=''>Select a device</option>");
 
-$device_list = mysql_query("SELECT * FROM `devices` ORDER BY hostname");
-while ($device = mysql_fetch_assoc($device_list))
+$devices = dbFetchRows("SELECT * FROM `devices` ORDER BY hostname");
+foreach ($devices as $device)
 {
   unset($done);
   foreach ($access_list as $ac) { if ($ac == $device['device_id']) { $done = 1; } }

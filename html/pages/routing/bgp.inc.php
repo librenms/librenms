@@ -104,8 +104,8 @@ else
    $where = "AND D.bgpLocalAs = B.bgpPeerRemoteAs";
   }
 
-  $peer_query = mysql_query("select * from bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id $where ORDER BY D.hostname, B.bgpPeerRemoteAs, B.bgpPeerIdentifier");
-  while ($peer = mysql_fetch_assoc($peer_query))
+  $peer_query = "select * from bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id ".$where." ORDER BY D.hostname, B.bgpPeerRemoteAs, B.bgpPeerIdentifier";
+  foreach(dbFetchRows($peer_query) as $peer)
   {
     unset ($alert, $bg_image);
 
@@ -118,7 +118,7 @@ else
      if ($peer['bgpPeerRemoteAS'] >= '64512' && $peer['bgpPeerRemoteAS'] <= '65535') { $peer_type = "<span style='color: #f00;'>Priv eBGP</span>"; }
     }
 
-    $peerhost = mysql_fetch_assoc(mysql_query("SELECT * FROM ipaddr AS A, ports AS I, devices AS D WHERE A.addr = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
+    $peerhost = dbFetchRow("SELECT * FROM ipaddr AS A, ports AS I, devices AS D WHERE A.addr = ? AND I.interface_id = A.interface_id AND D.device_id = I.device_id", array($peer['bgpPeerIdentifier']));
 
     if ($peerhost) { $peername = generate_device_link($peerhost, shorthost($peerhost['hostname'])); } else { unset($peername); }
 
@@ -134,10 +134,8 @@ else
 
     echo('<tr bgcolor="'.$bg_colour.'"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">");
 
-    $af_query = mysql_query("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = '".$peer['device_id']."' AND bgpPeerIdentifier = '".$peer['bgpPeerIdentifier']."'");
-
     unset($sep);
-    while ($afisafi = mysql_fetch_assoc($af_query))
+    foreach (dbFetchRows("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?", array($peer['device_id'], $peer['bgpPeerIdentifier'])) as $afisafi)
     {
       $afi = $afisafi['afi'];
       $safi = $afisafi['safi'];
@@ -181,7 +179,7 @@ else
     {
       case 'macaccounting_bits':
       case 'macaccounting_pkts':
-        $acc = mysql_fetch_assoc(mysql_query("SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id AND D.device_id = P.device_id"));
+        $acc = dbFetchRow("SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = ? AND M.mac = I.mac_address AND P.interface_id = M.interface_id AND D.device_id = P.device_id", array($peer['bgpPeerIdentifier']));
         $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
         if (is_array($acc) && is_file($database))
         {

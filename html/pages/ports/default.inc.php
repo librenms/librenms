@@ -6,8 +6,7 @@
       <select name='device_id' id='device_id'>
       <option value=''>All Devices</option>
 <?php
-$query = mysql_query("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
-while ($data = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`") as $dat)
 {
   echo("<option value='".$data['device_id']."'");
   if ($data['device_id'] == $_POST['device_id']) { echo("selected"); }
@@ -36,8 +35,7 @@ while ($data = mysql_fetch_assoc($query))
       <select name='ifSpeed' id='ifSpeed'>
       <option value=''>All Speeds</option>
 <?php
-$query = mysql_query("SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`");
-while ($data = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`") as $data)
 {
   if ($data['ifSpeed'])
   {
@@ -53,8 +51,7 @@ while ($data = mysql_fetch_assoc($query))
       <select name='ifType' id='ifType'>
       <option value=''>All Media</option>
 <?php
-$query = mysql_query("SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`");
-while ($data = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`") as $data)
 {
   if ($data['ifType'])
   {
@@ -88,6 +85,8 @@ while ($data = mysql_fetch_assoc($query))
 #  $sql = "SELECT * FROM `ports` AS I, `devices` AS D, `devices_perms` AS P WHERE I.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, I.ifDescr";
 #}
 
+$param = array();
+
 # FIXME block below is not totally used, at least the iftype stuff is bogus?
 if ($_GET['opta'] == "down" || $_GET['type'] == "down" || $_POST['state'] == "down")
 {
@@ -114,20 +113,37 @@ if ($_GET['opta'] == "down" || $_GET['type'] == "down" || $_POST['state'] == "do
   $where .= " AND I.ifType = 'ppp'";
 }
 
-if (is_numeric($_POST['device_id'])) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
-if ($_POST['ifType']) { $where .= " AND I.ifType = '".mres($_POST['ifType'])."'"; }
-if (is_numeric($_POST['ifSpeed'])) { $where .= " AND I.ifSpeed = '".$_POST['ifSpeed']."'"; }
-if ($_POST['ifAlias']) { $where .= " AND I.ifAlias LIKE '%".mres($_POST['ifAlias'])."%'"; }
+if (is_numeric($_POST['device_id'])) 
+{ 
+  $where .= " AND I.device_id = ?";
+  $param[] = $_POST['device_id'];
+}
+if ($_POST['ifType']) 
+{
+  $where .= " AND I.ifType = ?"; 
+  $param[] = $_POST['ifType'];
+}
+
+if (is_numeric($_POST['ifSpeed'])) 
+{
+  $where .= " AND I.ifSpeed = ?"; 
+  $param[] = $_POST['ifSpeed'];
+}
+
+if ($_POST['ifAlias']) {
+  $where .= " AND I.ifAlias LIKE ?"; 
+  $param[] = "%".$_POST['ifAlias']."%";
+}
+
 if ($_POST['deleted'] || $_GET['type'] == "deleted") { $where .= " AND I.deleted = '1'";  }
 
-$sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id $where ORDER BY D.hostname, I.ifIndex";
-$query = mysql_query($sql);
+$query = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ".$where." ORDER BY D.hostname, I.ifIndex";
 
 echo("<tr class=tablehead><td></td><th>Device</a></th><th>Interface</th><th>Speed</th><th>Media</th><th>Description</th></tr>");
 
 $row = 1;
 
-while ($interface = mysql_fetch_assoc($query))
+foreach (dbFetchRows($query, $param) as $interface)
 {
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 

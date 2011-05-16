@@ -2,9 +2,7 @@
 
 if ($_GET['optb'] == "purge" && $_GET['optc'] == "all")
 {
-  $sql = "SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id";
-  $query = mysql_query($sql);
-  while ($interface = mysql_fetch_assoc($query))
+  foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id") as $interface)
   {
     if (port_permitted($interface['interface_id'], $interface['device_id']))
     {
@@ -13,7 +11,7 @@ if ($_GET['optb'] == "purge" && $_GET['optc'] == "all")
     }
   }
 } elseif ($_GET['optb'] == "purge" && $_GET['optc']) {
-  $interface = mysql_fetch_assoc(mysql_query("SELECT * from `ports` AS P, `devices` AS D WHERE `interface_id` = '".mres($_GET['optc'])."' AND D.device_id = P.device_id"));
+  $interface = dbFetchRow("SELECT * from `ports` AS P, `devices` AS D WHERE `interface_id` = ? AND D.device_id = P.device_id", array($_GET['optc']));
   if (port_permitted($interface['interface_id'], $interface['device_id']))
   delete_port($interface['interface_id']);
   echo("<div class=infobox>Deleted ".generate_device_link($interface)." - ".generate_port_link($interface)."</div>");
@@ -24,9 +22,7 @@ $i_deleted = 1;
 echo("<table cellpadding=5 cellspacing=0 border=0 width=100%>");
 echo("<tr><td></td><td></td><td></td><td><a href='".$config['base_url'] . "/ports/deleted/purge/all/'><img src='images/16/cross.png' align=absmiddle></img> Purge All</a></td></tr>");
 
-$sql = "SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id";
-$query = mysql_query($sql);
-while ($interface = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id") as $interface)
 {
   $interface = ifLabel($interface, $interface);
   if (port_permitted($interface['interface_id'], $interface['device_id']))

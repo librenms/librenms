@@ -7,8 +7,7 @@
       <select name="device_id" id="device_id">
       <option value="">All Devices</option>
 <?php
-$query = mysql_query("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
-while ($data = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`") as $data)
 {
   echo('<option value="'.$data['device_id'].'"');
   if ($data['device_id'] == $_POST['device_id']) { echo("selected"); }
@@ -40,17 +39,25 @@ print_optionbar_end();
 
 echo('<table width="100%" cellspacing="0" cellpadding="5">');
 
-$where = "AND `ifPhysAddress` LIKE '%".str_replace(':','',mres($_POST['address']))."%'";
-if (is_numeric($_POST['device_id'])) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
-if ($_POST['interface']) { $where .= " AND I.ifDescr LIKE '".mres($_POST['interface'])."'"; }
+$query = "SELECT * FROM `ports` AS P, `devices` AS D WHERE P.device_id = D.device_id ";
+$query .= "AND `ifPhysAddress` LIKE ?";
+$param = array("%".str_replace(':','',mres($_POST['address']))."%");
 
-$sql = "SELECT * FROM `ports` AS P, `devices` AS D WHERE P.device_id = D.device_id $where ORDER BY P.ifPhysAddress";
-
-$query = mysql_query($sql);
+if (is_numeric($_POST['device_id'])) 
+{ 
+  $query  .= " AND I.device_id = ?"; 
+  $param[] = $_POST['device_id']; 
+}
+if ($_POST['interface']) 
+{ 
+  $query .= " AND I.ifDescr LIKE ?"; 
+  $param[] = $_POST['interface'];
+}
+$query .= " ORDER BY P.ifPhysAddress";
 
 echo('<tr class="tablehead"><th>Device</a></th><th>Interface</th><th>MAC Address</th><th>Description</th></tr>');
 $row = 1;
-while ($entry = mysql_fetch_assoc($query))
+foreach (dbFetchRows($query, $param) as $entry)
 {
 
   if (!$ignore)
