@@ -140,6 +140,7 @@ echo('</a>. Copyright &copy; 2006-'. date("Y"). ' by Adam Armstrong. All rights 
 
 if ($config['page_gen'])
 {
+    echo('<br />MySQL: Cell '.($db_stats['fetchcell']+0).'/'.($db_stats['fetchcell_sec']+0).'s Row '.($db_stats['fetchrow']+0).'/'.($db_stats['fetchrow_sec']+0).'s Rows '.($db_stats['fetchrows']+0).'/'.($db_stats['fetchrows_sec']+0).'s Column '.($db_stats['fetchcol']+0).'/'.($db_stats['fetchcol_sec']+0));
     echo('<br />Generated in ' . $gentime . ' seconds.');
 }
 
