@@ -88,21 +88,18 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding']))
     $this_port[$oid] = $this_port[$oid] / 10;
   }
 
-  if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$port['interface_id']."'"),0) == "0")
+  if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = ?", array($port['interface_id'])) == "0")
   {
-    mysql_query("INSERT INTO `ports_adsl` (`interface_id`) VALUES ('".$port['interface_id']."')");
+    dbInsert(array('interface_id' => $port['interface_id']), 'ports_adsl');
   }
 
-  $mysql_update = "UPDATE `ports_adsl` SET `port_adsl_updated` = NOW()";
+  $port['adsl_update'] = array('port_adsl_updated' => array('NOW()'));
   foreach ($adsl_db_oids as $oid)
   {
-    $data = str_replace("\"", "", $this_port[$oid]);
-    $mysql_update .= ",`".$oid."` = '".$data."'";
+    $data = str_replace("\"", "", $this_port[$oid]);  ## FIXME - do we need this?
+    $port['adsl_update'][$oid] = $data;
   }
-  $mysql_update .= "WHERE `interface_id` = '".$port['interface_id']."'";
-  mysql_query($mysql_update);
-
-  if ($debug) { echo($mysql_update); echo(mysql_affected_rows()); echo(mysql_error()); }
+  dbUpdate($port['adsl_update'], 'ports_adsl', '`interface_id` = ?', array($port['interface_id']));
 
   $rrdupdate = "N";
   foreach ($adsl_oids as $oid)
@@ -117,7 +114,7 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding']))
   if (!is_file($rrdfile)) { rrdtool_create ($rrdfile, $rrd_create); }
   rrdtool_update ($rrdfile, $rrdupdate);
 
-  echo("ADSL ");
+  echo("ADSL (".$this_port['adslLineCoding']."/".formatRates($this_port['adslAtucChanCurrTxRate'])."/".formatRates($this_port['adslAturChanCurrTxRate']).")");
 }
 
 ?>

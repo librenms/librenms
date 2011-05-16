@@ -2,14 +2,13 @@
 
 if ($config['enable_printers'])
 {
-  $query = "SELECT * FROM toner WHERE device_id = '" . $device['device_id'] . "'";
-  $toner_data = mysql_query($query);
+  $toner_data = dbFetchRows("SELECT * FROM toner WHERE device_id = ?", array($device['device_id']));
 
-  while ($toner = mysql_fetch_assoc($toner_data))
+  foreach ($toner_data as $toner)
   {
     echo("Checking toner " . $toner['toner_descr'] . "... ");
 
-# FIXME poll capacity maybe also here, when toner is replaced capacity can change, leading to "154% of toner"
+    # FIXME poll capacity maybe also here, when toner is replaced capacity can change, leading to "154% of toner"
 
     $tonerperc = snmp_get($device, $toner['toner_oid'], "-OUqnv") / $toner['toner_capacity'] * 100;
 
@@ -43,7 +42,7 @@ if ($config['enable_printers'])
       log_event('Toner ' . $toner['toner_descr'] . ' was replaced (new level: ' . $tonerperc . '%)', $device, 'toner', $toner['toner_id']);
     }
 
-    mysql_query("UPDATE toner SET toner_current = '$tonerperc', toner_capacity = '" . $toner['toner_capacity'] . "' WHERE toner_id = '" . $toner['toner_id'] . "'");
+    dbUpdate(array('toner_current' => $tonerperc, 'toner_capacity' => $toner['toner_capacity']), 'toner', '`toner_id` = ?', array($toner['toner_id']));
   }
 }
 

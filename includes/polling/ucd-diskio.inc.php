@@ -1,17 +1,15 @@
 <?php
 
-$sql = "SELECT * FROM `ucd_diskio` WHERE `device_id`  = '".$device['device_id']."'";
-if ($debug) { echo("$sql"); }
-$diskio_data = mysql_query($sql);
+$diskio_data = dbFetchRows("SELECT * FROM `ucd_diskio` WHERE `device_id`  = ?".array($device['device_id']));
 
-if (mysql_affected_rows())
+if (count($diskio_data))
 {
   $diskio_cache = array();
   $diskio_cache = snmpwalk_cache_oid($device, "diskIOEntry", $diskio_cache, "UCD-DISKIO-MIB");
 
   echo("Checking UCD DiskIO MIB: ");
 
-  while ($diskio = mysql_fetch_assoc($diskio_data))
+  foreach ($diskio_data as $diskio)
   {
     $index = $diskio['diskio_index'];
 
