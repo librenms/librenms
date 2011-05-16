@@ -25,7 +25,7 @@ while ($instance = mysql_fetch_assoc($query))
   $ip_query .= "(A.ipv4_address = ? AND I.interface_id = A.interface_id)";
   $ip_query .= " AND I.device_id = ?";
 
-  $ipv4_host = dbFetchArray($ip_query, array($peer['bgpPeerIdentifier'], $device['device_id']));
+  $ipv4_host = dbFetchRow($ip_query, array($peer['bgpPeerIdentifier'], $device['device_id']));
 
   if ($instance['ospfAdminStat'] == "enabled") { $enabled = '<span style="color: #00aa00">enabled</span>'; } else { $enabled = '<span style="color: #aaaaaa">disabled</span>'; }
   if ($instance['ospfAreaBdrRtrStatus'] == "true") { $abr = '<span style="color: #00aa00">yes</span>'; } else { $abr = '<span style="color: #aaaaaa">no</span>'; }
