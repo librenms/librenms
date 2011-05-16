@@ -1,7 +1,6 @@
 <?php
 
-$query = "SELECT * FROM sensors WHERE device_id = '" . $device['device_id'] . "' AND poller_type='ipmi'";
-$ipmi_data = mysql_query($query);
+$ipmi_rows = dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND poller_type='ipmi'", array($device['device_id']));
 
 if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
 {
@@ -19,7 +18,7 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
     $ipmi_sensor[$desc][$config['ipmi_unit'][$type]]['unit'] = $type;
   }
 
-  while ($ipmisensors = mysql_fetch_assoc($ipmi_data))
+  foreach ($ipmi_rows as $ipmisensors)
   {
     echo("Updating IPMI sensor " . $ipmisensors['sensor_descr'] . "... ");
 
@@ -61,7 +60,8 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
 
     ## FIXME warnings in event & mail not done here yet!
 
-    mysql_query("UPDATE sensors SET sensor_current = '$sensor' WHERE poller_type='ipmi' AND sensor_class= AND sensor_id = '" . $ipmisensors['sensor_id'] . "'");
+    dbUpdate(array('sensor_current' => $sensor), 'sensors', 'poller_type = ? AND sensor_class = ? AND sensor_id = ?', array('ipmi', $ipmisensors['sensor_class'], $ipmisensors['sensor_id']));
+
   }
 
   unset($ipmi_sensor);

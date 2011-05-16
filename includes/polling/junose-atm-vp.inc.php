@@ -1,9 +1,8 @@
 <?php
 
-$sql = "SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id`  = '".$device['device_id']."' AND J.interface_id = P.interface_id";
-$vp_data = mysql_query($sql);
+$vp_rows = dbFetchRows("SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id` = ? AND J.interface_id = P.interface_id", array($device['device_id']));
 
-if (mysql_affected_rows())
+if (count($vp_rows))
 {
   $vp_cache = array();
   $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsInCells", $vp_cache, "Juniper-UNI-ATM-MIB" , $config['install_dir']."/mibs/junose");
@@ -17,7 +16,7 @@ if (mysql_affected_rows())
 
   echo("Checking JunOSe ATM vps: ");
 
-  while ($vp = mysql_fetch_assoc($vp_data))
+  foreach ($vp_rows as $vp)
   {
     echo(".");
 
@@ -31,7 +30,7 @@ if (mysql_affected_rows())
     $vp_update .= ":".$t_vp['juniAtmVpStatsInPackets'].":".$t_vp['juniAtmVpStatsOutPackets'];
     $vp_update .= ":".$t_vp['juniAtmVpStatsInPacketOctets'].":".$t_vp['juniAtmVpStatsOutPacketOctets'];
     $vp_update .= ":".$t_vp['juniAtmVpStatsInPacketErrors'].":".$t_vp['juniAtmVpStatsOutPacketErrors'];
-
+   
     $rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("vp-" . $vp['ifIndex'] . "-".$vp['vp_id'].".rrd");
 
     if ($debug) { echo("$rrd "); }

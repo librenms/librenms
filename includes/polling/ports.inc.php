@@ -5,8 +5,6 @@
 #$ports = snmp_cache_ifIndex($device); // Cache Port List
 # /FIXME
 
-#mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`) VALUES ('".$device['device_id']."','$ifIndex')");
-
 // Build SNMP Cache Array
 $data_oids = array('ifName','ifDescr','ifAlias', 'ifAdminStatus', 'ifOperStatus', 'ifMtu', 'ifSpeed', 'ifHighSpeed', 'ifType', 'ifPhysAddress',
                    'ifPromiscuousMode','ifConnectorPresent','ifDuplex');
@@ -45,7 +43,7 @@ if ($config['enable_ports_etherlike'])
 
 if ($config['enable_ports_adsl'])
 {
-  $device['adsl_count'] = mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifType` = 'adsl'"),0);
+  $device['adsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` = 'adsl'", array($device['device_id']));
 }
 
 if ($device['adsl_count'] > "0")
@@ -111,7 +109,6 @@ foreach ($port_stats as $ifIndex => $port)
   {
     $interface_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
     $ports[$port['ifIndex']] = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($interface_id));
-    mysql_error();
     echo("Adding: ".$port['ifName']."(".$ifIndex.")(".$ports[$port['ifIndex']]['interface_id'].")");
     #print_r($ports);
   } elseif ($ports[$ifIndex]['deleted'] == "1") {   
@@ -314,13 +311,13 @@ foreach ($ports as $port)
     if($device['os'] == "aos") { include("port-alcatel.inc.php"); }
 
 
-    // Update MySQL
+    // Update Database
     if (count($port['update']))
     {
       $updated = dbUpdate($port['update'], 'ports', '`interface_id` = ?', array($port['interface_id']));
       if($debug) { echo("$updated updated"); }
     }
-    // End Update MySQL
+    // End Update Database
 
     // Send alerts for interface flaps.
     if ($config['warn']['ifdown'] && ($port['ifOperStatus'] != $this_port['ifOperStatus']) && $port['ignore'] == 0)

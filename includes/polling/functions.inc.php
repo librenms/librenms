@@ -4,10 +4,7 @@ function poll_sensor($device, $class, $unit)
 {
   global $config;
 
-  $query = "SELECT * FROM sensors WHERE sensor_class='$class' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";  
-  $sensor_data = mysql_query($query);
-
-  while ($sensor = mysql_fetch_assoc($sensor_data))
+  foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `poller_type` = 'snmp'", array($class, $device['device_id'])) as $sensor)
   {
     echo("Checking $class " . $sensor['sensor_descr'] . "... ");
 
@@ -82,7 +79,7 @@ function poll_sensor($device, $class, $unit)
       log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . " above threshold: " . $sensor_value . " $unit (> " . $sensor['sensor_limit'] . " $unit)", $device, $class, $sensor['sensor_id']);
     }
 
-    mysql_query("UPDATE sensors SET sensor_current = '$sensor_value' WHERE sensor_class='$class' AND sensor_id = '" . $sensor['sensor_id'] . "'");
+    dbUpdate(array('sensor_current' => $sensor_value), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
   }
 }
 
