@@ -124,25 +124,23 @@ if ($_GET['optd'] == "top10")
   else
   {
 
-  $query = mysql_query("SELECT *, (M.cipMacHCSwitchedBytes_input_rate + M.cipMacHCSwitchedBytes_output_rate) as bps FROM `mac_accounting` AS M,
-                       `ports` AS I, `devices` AS D WHERE M.interface_id = '".$interface['interface_id']."' AND I.interface_id = M.interface_id
-                       AND I.device_id = D.device_id ORDER BY bps DESC");
+  $query = "SELECT *, (M.cipMacHCSwitchedBytes_input_rate + M.cipMacHCSwitchedBytes_output_rate) as bps FROM `mac_accounting` AS M,
+                       `ports` AS I, `devices` AS D WHERE M.interface_id = ? AND I.interface_id = M.interface_id AND I.device_id = D.device_id ORDER BY bps DESC";
+  $param = array($interface['interface_id']);
 
-
-  while ($acc = mysql_fetch_assoc($query))
+  foreach (dbFetchRows($query, $param) as $acc)
   {
     if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-    $addy = mysql_fetch_assoc(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."'"));
+    $addy = dbFetchRow("SELECT * FROM ipv4_mac where mac_address = ?", array($acc['mac']));
     #$name = gethostbyaddr($addy['ipv4_address']); FIXME - Maybe some caching for this?
-    $arp_host = mysql_fetch_assoc(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = '".$addy['ipv4_address']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
+    $arp_host = dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id AND D.device_id = I.device_id", array($addy['ipv4_address']));
     if ($arp_host) { $arp_name = generate_device_link($arp_host); $arp_name .= " ".generate_port_link($arp_host); } else { unset($arp_if); }
 
 
     if ($name == $addy['ipv4_address']) { unset ($name); }
-    if (mysql_result(mysql_query("SELECT count(*) FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'"),0))
+    if (dbFetchCell("SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?", array($acc['device_id'], $addy['ipv4_address'])))
     {
-      $peer_query = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'");
-      $peer_info = mysql_fetch_assoc($peer_query);
+      $peer_info = dbFetchRow("SELECT * FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?", array($acc['device_id'], $addy['ipv4_address']));
     } else { unset ($peer_info); }
 
     if ($peer_info)
