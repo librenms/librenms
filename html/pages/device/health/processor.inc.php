@@ -6,8 +6,7 @@ echo("<div style='margin-top: 5px; padding: 0px;'>");
 echo("<table width=100% cellpadding=6 cellspacing=0>");
 
 $i = '1';
-$procs = mysql_query("SELECT * FROM `processors` WHERE device_id = '" . $device['device_id'] . "'");
-while ($proc = mysql_fetch_assoc($procs))
+foreach (dbFetchRows("SELECT * FROM `processors` WHERE device_id = ?", array($device['device_id'])) as $proc)
 {
   $proc_url   = "device/".$device['device_id']."/health/processor/";
 

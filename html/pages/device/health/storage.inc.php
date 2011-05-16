@@ -2,9 +2,6 @@
 
 $graph_type = "storage_usage";
 
-$sql = "SELECT * FROM `storage` WHERE device_id = '" . $device['device_id'] . "' ORDER BY storage_descr";
-$query = mysql_query($sql);
-
 echo("<table cellspacing=0 cellpadding=5 width=100%>");
 
 echo("<tr class=tablehead>
@@ -16,7 +13,7 @@ echo("<tr class=tablehead>
 
 $row = 1;
 
-while ($drive = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `storage` WHERE device_id = ? ORDER BY storage_descr", array($device['device_id'])) as $drive)
 {
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
