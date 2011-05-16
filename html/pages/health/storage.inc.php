@@ -2,10 +2,6 @@
 
 $graph_type = "storage_usage";
 
-$sql  = "SELECT * FROM `storage` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY D.hostname, S.storage_descr";
-
-$query = mysql_query($sql);
-
 echo("<div style='padding: 5px;'>
         <table width=100% cellspacing=0 cellpadding=6 class='sortable'>");
 
@@ -19,7 +15,7 @@ echo("<tr class=tablehead>
 
 $row = 1;
 
-while ($drive = mysql_fetch_assoc($query))
+foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY D.hostname, S.storage_descr") as $drive)
 {
   if (device_permitted($drive['device_id']))
   {

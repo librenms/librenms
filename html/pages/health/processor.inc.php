@@ -13,8 +13,7 @@ echo("<tr class=tablehead>
       </tr>");
 
 $i = '1';
-$procs = mysql_query("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.device_id = P.device_id ORDER BY D.hostname");
-while ($proc = mysql_fetch_assoc($procs))
+foreach (dbFetchRows("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.device_id = P.device_id ORDER BY D.hostname") as $proc)
 {
   if (device_permitted($proc['device_id']))
   {
