@@ -7,8 +7,7 @@ if (!$graph_type) { $graph_type = "atmvp_bits"; }
 
 echo('<table cellspacing="0" cellpadding="5" border="0">');
 
-$vps = mysql_query("SELECT * FROM juniAtmVp WHERE interface_id = '".$interface['interface_id']."'");
-while ($vp = mysql_fetch_assoc($vps))
+foreach (dbFetchRows("SELECT * FROM juniAtmVp WHERE interface_id = ?", array($interface['interface_id'])) as $vp)
 {
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
   echo('<tr bgcolor="'.$row_colour.'">');

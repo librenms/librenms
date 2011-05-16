@@ -25,8 +25,7 @@ echo("<a href='device/".$device['device_id']."/port/".$interface['interface_id']
 echo("<a href='device/".$device['device_id']."/port/".$interface['interface_id']."/' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\">
       <img src='$yearly_traffic' border=0></a>");
 
-$members = mysql_query("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
-while ($member = mysql_fetch_assoc($members))
+foreach (dbFetchRows("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?", array($interface['ifIndex'], $device['device_id'])) as $member)
 {
   echo("$br<img src='images/16/brick_link.png' align=absmiddle> <strong>" . generate_port_link($member) . " (PAgP)</strong>");
   $br = "<br />";
