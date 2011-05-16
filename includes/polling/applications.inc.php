@@ -2,12 +2,13 @@
 
 $sql = "SELECT * FROM `applications` WHERE `device_id`  = '".$device['device_id']."'";
 if ($debug) { echo($sql."\n"); }
-$app_data = mysql_query($sql);
 
-if (mysql_affected_rows())
+$app_rows = dbFetchRows("SELECT * FROM `applications` WHERE `device_id`  = ?", array($device['device_id']));
+
+if (count($app_rows))
 {
   echo('Applications: ');
-  while ($app = mysql_fetch_assoc($app_data))
+  foreach ($app_rows as $app)
   {
     $app_include = $config['install_dir'].'/includes/polling/applications/'.$app['app_type'].'.inc.php';
     if (is_file($app_include))

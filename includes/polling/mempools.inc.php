@@ -1,8 +1,6 @@
 <?php
 
-$query = "SELECT * FROM mempools WHERE device_id = '" . $device['device_id'] . "'";
-$mempool_data = mysql_query($query);
-while ($mempool = mysql_fetch_assoc($mempool_data))
+foreach (dbFetchRows("SELECT * FROM mempools WHERE device_id = ?", array($device['device_id'])) as $mempool)
 {
   echo("Mempool ". $mempool['mempool_descr'] . ": ");
 
@@ -48,16 +46,9 @@ while ($mempool = mysql_fetch_assoc($mempool_data))
 
   rrdtool_update($mempoolrrd,"N:".$mempool['used'].":".$mempool['free']);
 
-  $update_query  = "UPDATE `mempools` SET `mempool_used` = '".$mempool['used']."'";
-  $update_query .= ", `mempool_perc` = '".$percent."'";
-  $update_query .= ", `mempool_free` = '".$mempool['free']."'";
-  $update_query .= ", `mempool_total` = '".$mempool['total']."'";
-  $update_query .= ", `mempool_largestfree` = '".$mempool['largestfree']."'";
-  $update_query .= ", `mempool_lowestfree` = '".$mempool['lowestfree']."'";
-  $update_query .= " WHERE `mempool_id` = '".$mempool['mempool_id']."'";
-
-  mysql_query($update_query);
-  if ($debug) { echo($update_query); }
+  dbUpdate(array('mempool_used' => $mempool['used'], 'mempool_perc' => $percent, 'mempool_free' => $mempool['free'],
+                 'mempool_total' => $mempool['total'], 'mempool_largestfree' => $mempool['largestfree'], 'mempool_lowestfree' => $mempool['lowestfree']),
+                 'mempools', '`mempool_id` = ?', array($mempool['mempool_id']));
 
   echo("\n");
 }

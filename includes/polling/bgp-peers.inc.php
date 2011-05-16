@@ -1,5 +1,7 @@
 <?php
 
+## We should walk, so we can discover here too.
+
 echo("Polling BGP peers\n");
 
 if (!$config['enable_bgp'])
@@ -8,8 +10,7 @@ if (!$config['enable_bgp'])
 }
 else
 {
-  $peers = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '" . $device['device_id'] . "'");
-  while ($peer = mysql_fetch_assoc($peers))
+  foreach (dbFetchRows("SELECT * FROM bgpPeers WHERE device_id = ?", array($device['device_id'])) as $peer)
   {
     ### Poll BGP Peer
 
@@ -124,16 +125,20 @@ else
 
     rrdtool_update("$peerrrd", "N:$bgpPeerOutUpdates:$bgpPeerInUpdates:$bgpPeerOutTotalMessages:$bgpPeerInTotalMesages:$bgpPeerFsmEstablishedTime");
 
-    $update  = "UPDATE bgpPeers SET bgpPeerState = '$bgpPeerState', bgpPeerAdminStatus = '$bgpPeerAdminStatus', ";
-    $update .= "bgpPeerFsmEstablishedTime = '$bgpPeerFsmEstablishedTime', bgpPeerInUpdates = '$bgpPeerInUpdates' , bgpLocalAddr = '$bgpLocalAddr' , bgpPeerOutUpdates = '$bgpPeerOutUpdates'";
-    $update .= " WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "'";
-    mysql_query($update);
+    $peer['update']['bgpPeerState'] = $bgpPeerState;
+    $peer['update']['bgpPeerAdminStatus'] = $bgpPeerAdminStatus;
+    $peer['update']['bgpPeerFsmEstablishedTime'] = $bgpPeerFsmEstablishedTime;
+    $peer['update']['bgpPeerInUpdates'] = $bgpPeerInUpdates;
+    $peer['update']['bgpLocalAddr'] = $bgpLocalAddr;
+    $peer['update']['bgpPeerOutUpdates'] = $bgpPeerOutUpdates;
+
+    dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
 
     if ($device['os_group'] == "ios" || $device['os'] == "junos")
     {
       ## Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
-      $afi_query = mysql_query("SELECT * FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "'");
-      while ($peer_afi = mysql_fetch_assoc($afi_query))
+      $peer_afis = dbFetchRows("SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?", array($device['device_id'], $peer['bgpPeerIdentifier']));
+      foreach ($peer_afis as $peer_afi)
       {
         $afi = $peer_afi['afi'];
         $safi = $peer_afi['safi'];
@@ -202,17 +207,16 @@ else
 
         # FIXME THESE FIELDS DO NOT EXIST IN THE DATABASE!
         $update  = "UPDATE bgpPeers_cbgp SET";
-        $update .= " `cbgpPeerAcceptedPrefixes` = '$cbgpPeerAcceptedPrefixes'";
-        $update .= ", `cbgpPeerDeniedPrefixes` = '$cbgpPeerDeniedPrefixes'";
-        $update .= ", `cbgpPeerPrefixAdminLimit` = '$cbgpPeerAdminLimit'";
-        $update .= ", `cbgpPeerPrefixThreshold` = '$cbgpPeerPrefixThreshold'";
-        $update .= ", `cbgpPeerPrefixClearThreshold` = '$cbgpPeerPrefixClearThreshold'";
-        $update .= ", `cbgpPeerAdvertisedPrefixes` = '$cbgpPeerAdvertisedPrefixes'";
-        $update .= ", `cbgpPeerSuppressedPrefixes` = '$cbgpPeerSuppressedPrefixes'";
-        $update .= ", `cbgpPeerWithdrawnPrefixes` = '$cbgpPeerWithdrawnPrefixes'";
-        $update .= " WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "' AND afi = '$afi' AND safi = '$safi'";
-        if ($debug) { echo("MYSQL: $update\n"); }
-        mysql_query($update);
+        $peer['c_update']['AcceptedPrefixes'] = $cbgpPeerAcceptedPrefixes;
+        $peer['c_update']['DeniedPrefixes'] = $cbgpPeerDeniedPrefixes;
+        $peer['c_update']['PrefixAdminLimit'] = $cbgpPeerAdminLimit;
+        $peer['c_update']['PrefixThreshold'] = $cbgpPeerPrefixThreshold;
+        $peer['c_update']['PrefixClearThreshold'] = $cbgpPeerPrefixClearThreshold;
+        $peer['c_update']['AdvertisedPrefixes'] = $cbgpPeerAdvertisedPrefixes;
+        $peer['c_update']['SuppressedPrefixes'] = $cbgpPeerSuppressedPrefixes;
+        $peer['c_update']['WithdrawnPrefixes'] = $cbgpPeerWithdrawnPrefixes;
+
+        dbUpdate($peer['c_update'], 'bgpPeers_cbgp', '`device_id` = ? AND bgpPeerIdentifier = ? AND afi = ? AND safi = ?', array($device['device_id'], $peer['bgpPeerIdentifier'], $afi, $safi));
 
         $cbgp_rrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cbgp-" . $peer['bgpPeerIdentifier'] . ".$afi.$safi.rrd");
         if (!is_file($cbgp_rrd))
