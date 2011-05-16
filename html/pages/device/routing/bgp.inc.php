@@ -51,11 +51,10 @@ echo('<table border="0" cellspacing="0" cellpadding="5" width="100%">');
 echo('<tr style="height: 30px"><td width=1></td><th></th><th>Peer address</th><th>Type</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>');
 
 $i = "1";
-$peer_query = mysql_query("select * from bgpPeers WHERE device_id = '".$device['device_id']."' ORDER BY bgpPeerRemoteAs, bgpPeerIdentifier");
 
-while ($peer = mysql_fetch_assoc($peer_query))
+foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `bgpPEerRemoteAs`, `bgpPeerIdentifier`", array($device['device_id'])) as $peer)
 {
-  $has_macaccounting = mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address"),0);
+  $has_macaccounting = dbFetchCell("SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = ? AND M.mac = I.mac_address", array($peer['bgpPeerIdentifier']));
   unset($bg_image);
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
@@ -69,14 +68,14 @@ while ($peer = mysql_fetch_assoc($peer_query))
   if ($peer['bgpPeerRemoteAs'] == $device['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; }
 
   $query = "SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE ";
-  $query .= "(A.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id)";
+  $query .= "(A.ipv4_address = ? AND I.interface_id = A.interface_id)";
   $query .= " AND D.device_id = I.device_id";
-  $ipv4_host = mysql_fetch_assoc(mysql_query($query));
+  $ipv4_host = dbFetchRow($query,array($peer['bgpPeerIdentifier']));
 
   $query = "SELECT * FROM ipv6_addresses AS A, ports AS I, devices AS D WHERE ";
-  $query .= "(A.ipv6_address = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id)";
+  $query .= "(A.ipv6_address = ? AND I.interface_id = A.interface_id)";
   $query .= " AND D.device_id = I.device_id";
-  $ipv6_host = mysql_fetch_assoc(mysql_query($query));
+  $ipv6_host = dbFetchRow($query,array($peer['bgpPeerIdentifier']));
 
   if ($ipv4_host)
   {
@@ -102,11 +101,10 @@ while ($peer = mysql_fetch_assoc($peer_query))
     }
   }
 
-  $af_query = mysql_query("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['bgpPeerIdentifier']."'");
   unset($peer_af);
   unset($sep);
 
-  while ($afisafi = mysql_fetch_assoc($af_query))
+  foreach (dbFetchRows("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?", array($device['device_id'], $peer['bgpPeerIdentifier'])) as $afisafi)
   {
     $afi = $afisafi['afi'];
     $safi = $afisafi['safi'];
@@ -159,7 +157,7 @@ while ($peer = mysql_fetch_assoc($peer_query))
   {
     case 'macaccounting_bits':
     case 'macaccounting_pkts':
-      $acc = mysql_fetch_assoc(mysql_query("SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id AND D.device_id = P.device_id"));
+      $acc = dbFetchRow("SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = ? AND M.mac = I.mac_address AND P.interface_id = M.interface_id AND D.device_id = P.device_id", array($peer['bgpPeerIdentifier']));
       $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
       if (is_array($acc) && is_file($database))
       {

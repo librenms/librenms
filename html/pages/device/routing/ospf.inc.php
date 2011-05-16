@@ -13,15 +13,15 @@ while ($instance = mysql_fetch_assoc($query))
 {
   if (!is_integer($i_i/2)) { $instance_bg = $list_colour_a; } else { $instance_bg = $list_colour_b; }
 
-  $area_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = '".$device['device_id']."'"),0);
-  $port_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = '".$device['device_id']."'"),0);
-  $port_count_enabled = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = '".$device['device_id']."'"),0);
-  $nbr_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."'"),0);
+  $area_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = ?", array($device['device_id']));
+  $port_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = ?", array($device['device_id']));
+  $port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = ?", array($device['device_id']));
+  $nbr_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = ?", array($device['device_id']));
 
   $query = "SELECT * FROM ipv4_addresses AS A, ports AS I WHERE ";
-  $query .= "(A.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id)";
-  $query .= " AND I.device_id = '".$device['device_id']."'";
-  $ipv4_host = mysql_fetch_assoc(mysql_query($query));
+  $query .= "(A.ipv4_address = ? AND I.interface_id = A.interface_id)";
+  $query .= " AND I.device_id = ?";
+  $ipv4_host = dbFetchRow($query, array($peer['bgpPeerIdentifier'], $device['device_id']));
 
   if ($instance['ospfAdminStat'] == "enabled") { $enabled = '<span style="color: #00aa00">enabled</span>'; } else { $enabled = '<span style="color: #aaaaaa">disabled</span>'; }
   if ($instance['ospfAreaBdrRtrStatus'] == "true") { $abr = '<span style="color: #00aa00">yes</span>'; } else { $abr = '<span style="color: #aaaaaa">no</span>'; }
@@ -45,14 +45,12 @@ while ($instance = mysql_fetch_assoc($query))
 
   ##### Loop Areas
   $i_a = 0;
-  $a_sql   = "SELECT * FROM `ospf_areas` WHERE `device_id` = '".$device['device_id']."'";
-  $a_query = mysql_query($a_sql);
-  while ($area = mysql_fetch_assoc($a_query))
+  foreach (dbFetchRows("SELECT * FROM `ospf_areas` WHERE `device_id` = ?", array($device['device_id'])) as $area)
   {
     if (!is_integer($i_a/2)) { $area_bg = $list_colour_b_a; } else { $area_bg = $list_colour_b_b; }
 
-    $area_port_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = '".$device['device_id']."' AND `ospfIfAreaId` = '".$area['ospfAreaId']."'"),0);
-    $area_port_count_enabled = mysql_result(mysql_query("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = '".$device['device_id']."' AND `ospfIfAreaId` = '".$area['ospfAreaId']."'"),0);
+    $area_port_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = ? AND `ospfIfAreaId` = ?", array($device['device_id'], $area['ospfAreaId']));
+    $area_port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = ? AND `ospfIfAreaId` = ?", array($device['device_id'], $area['ospfAreaId']));
 
     echo('<tr bgcolor="'.$area_bg.'">');
     echo('  <td width=5></td>');
@@ -68,9 +66,8 @@ while ($instance = mysql_fetch_assoc($query))
 
     ##### Loop Ports
     $i_p = $i_a + 1;
-    $p_sql   = "SELECT * FROM `ospf_ports` AS O, `ports` AS P WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = '".$device['device_id']."' AND O.`ospfIfAreaId` = '".$area['ospfAreaId']."' AND P.interface_id = O.interface_id";
-    $p_query = mysql_query($p_sql);
-    while ($ospfport = mysql_fetch_assoc($p_query))
+    $p_sql   = "SELECT * FROM `ospf_ports` AS O, `ports` AS P WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = ? AND O.`ospfIfAreaId` = ? AND P.interface_id = O.interface_id";
+    foreach (dbFetchRows($p_sql, array($device['device_id'], $area['ospfAreaId'])) as $ospfport)
     {
       if (!is_integer($i_a/2))
       {
@@ -108,14 +105,12 @@ while ($instance = mysql_fetch_assoc($query))
 
   ## Loop Neigbours
   $i_n = 1;
-  $n_sql   = "SELECT * FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."'";
-  $n_query = mysql_query($n_sql);
-  while ($nbr = mysql_fetch_assoc($n_query))
+  foreach (dbFetchRows("SELECT * FROM `ospf_nbrs` WHERE `device_id` = ?", array($device['device_id'])) as $nbr)
   {
     if (!is_integer($i_n/2)) { $nbr_bg = $list_colour_b_a; } else { $nbr_bg = $list_colour_b_b; }
 
-    $host = @mysql_fetch_assoc(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = '".$nbr['ospfNbrRtrId']."'
-                                            AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
+    $host = @dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ?
+                                            AND I.interface_id = A.interface_id AND D.device_id = I.device_id", array($nbr['ospfNbrRtrId']));
 
     if(is_array($host)) { $rtr_id = generate_dev_link($host, $nbr['ospfNbrRtrId']); } else { $rtr_id = "unknown"; }
 
