@@ -67,14 +67,14 @@ if (is_numeric($_POST['device']))
 
 if ($_SESSION['userlevel'] >= '5')
 {
-  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog AS S";
+  $sql = "SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog AS S";
   if(count($array))
   {
     $sql .= " WHERE 1 ".$where;
   }
   $sql .= " ORDER BY timestamp DESC LIMIT 1000";
 } else {
-  $sql  = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog AS S, devices_perms AS P";
+  $sql  = "SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog AS S, devices_perms AS P";
   $sql .= "WHERE S.device_id = P.device_id AND P.user_id = ?";
   if(count($array))
   {
