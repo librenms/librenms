@@ -13,7 +13,8 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     if (!$low_limit)  { $low_limit  = sensor_low_limit($class, $current); }
 
     $insert = array('poller_type' => $poller_type, 'sensor_class' => $class, 'device_id' => $device['device_id'], 'sensor_oid' => $oid, 'sensor_index' => $index, 'sensor_type' => $type, 'sensor_descr' => $descr,
-                    'sensor_divisor' => $divisor, 'sensor_multiplier' => $multiplier, 'sensor_limit' => $high_limit, 'sensor_limit_warn' => $warn_limit, 'sensor_limit_low' => $low_limit, 'sensor_limit_low_warn' => $low_warn_limit, 'current' => $current);
+                    'sensor_divisor' => $divisor, 'sensor_multiplier' => $multiplier, 'sensor_limit' => $high_limit, 'sensor_limit_warn' => $warn_limit, 'sensor_limit_low' => $low_limit, 
+                    'sensor_limit_low_warn' => $low_warn_limit, 'current' => $current, 'entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalIndex_measured' => $entPhysicalIndex_measured );
 
     $inserted = dbInsert($insert, 'sensors');
 
@@ -39,7 +40,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     {
 
       $update = array('sensor_limit' => ($high_limit == NULL ? NULL : $high_limit));
-      $updated = dbUpdate($update, '`sensor_id` = ?', array($sensor_entry['sensor_id']));
+      $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
       if ($debug) { echo("( $updated updated )\n"); }
       echo("H");
       log_event("Sensor High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$high_limit.")", $device, 'sensor', $sensor_id);
@@ -58,7 +59,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     if ($sensor_entry['sensor_limit_low'] != $low_limit)
     {
       $update = array('sensor_limit_low' => ($low_limit == NULL ? NULL : $low_limit));
-      $updated = dbUpdate($update, '`sensor_id` = ?', array($sensor_entry['sensor_id']));
+      $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
       if ($debug) { echo("( $updated updated )\n"); }
       echo("L");
       log_event("Sensor Low Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$low_limit.")", $device, 'sensor', $sensor_id);
@@ -72,7 +73,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     {
       $update = array('sensor_oid' => $oid, 'sensor_descr' => $descr, 'sensor_multiplier' => $multiplier, 'sensor_divisor' => $divisor,
                       'entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalIndex_measured' => $entPhysicalIndex_measured);
-      $updated = dbUpdate($update, '`sensor_id` = ?', array($sensor_entry['sensor_id']));
+      $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
        echo("U");
       log_event("Sensor Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device, 'sensor', $sensor_id);
       if ($debug) { echo("( $updated updated )\n"); }
