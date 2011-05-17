@@ -43,7 +43,7 @@ if ($_POST['program'])
   $param[] = $_POST['program'];
 }
 
-$sql =  "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog WHERE device_id = ? $where";
+$sql =  "SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog WHERE device_id = ? $where";
 $sql .= " ORDER BY timestamp DESC LIMIT 1000";
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
 foreach (dbFetchRows($sql, $param) as $entry) { include("includes/print-syslog.inc.php"); }
