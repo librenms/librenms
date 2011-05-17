@@ -26,7 +26,9 @@ include("../includes/functions.php");
 include("includes/functions.inc.php");
 
 $start = utime();
+
 $now = time();
+$fourhour = time() - (4 * 60 * 60);
 $day = time() - (24 * 60 * 60);
 $twoday = time() - (2 * 24 * 60 * 60);
 $week = time() - (7 * 24 * 60 * 60);

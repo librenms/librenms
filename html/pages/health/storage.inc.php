@@ -52,15 +52,22 @@ foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.devic
     $free = formatStorage($drive['storage_free']);
     $used = formatStorage($drive['storage_used']);
 
-    $store_url = "graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125";
-    $store_popup = "onmouseover=\"return overlib('<img src=\'$store_url\'>', LEFT);\" onmouseout=\"return nd();\"";
-
-    $mini_graph = $config['base_url'] . "/graph.php?id=".$drive['storage_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
+    $graph_array['type']        = $graph_type;
+    $graph_array['id']          = $drive['storage_id'];
+    $graph_array['from']        = $config['time']['day'];
+    $graph_array['to']          = $config['time']['now'];
+    $graph_array['height']      = "20";
+    $graph_array['width']       = "80";
+    $graph_array_zoom           = $graph_array;
+    $graph_array_zoom['height'] = "150";
+    $graph_array_zoom['width']  = "400";
+    $link = "graphs/" . $graph_array['id'] . "/" . $graph_array['type'] . "/" . $graph_array['from'] . "/" . $graph_array['to'] . "/";
+    $mini_graph = overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), NULL);
 
     $background = get_percentage_colours($perc);
 
     echo("<tr bgcolor='$row_colour'><td>" . generate_device_link($drive) . "</td><td class=tablehead>" . $drive['storage_descr'] . "</td>
-         <td><img src='$mini_graph'></td>
+         <td>$mini_graph</td>
          <td>
           <a href='#' $store_popup>".print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $background['left'], $free, "ffffff", $background['right'])."</a>
           </td><td>$perc"."%</td></tr>");
@@ -70,26 +77,14 @@ foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.devic
 
       echo("<tr bgcolor='$row_colour'><td colspan=5>");
 
-      $daily_graph   = "graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=211&amp;height=100";
-      $daily_url       = "graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=400&amp;height=150";
+      $graph_array['height'] = "100";
+      $graph_array['width']  = "216";
+      $graph_array['to']     = $config['time']['now'];
+      $graph_array['id']     = $drive['storage_id'];
+      $graph_array['type']   = $graph_type;
 
-      $weekly_graph  = "graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=211&amp;height=100";
-      $weekly_url      = "graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=400&amp;height=150";
+      include("includes/print-quadgraphs.inc.php");
 
-      $monthly_graph = "graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=211&amp;height=100";
-      $monthly_url     = "graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=150";
-
-      $yearly_graph  = "graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$year&amp;to=$now&amp;width=211&amp;height=100";
-      $yearly_url  = "graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$year&amp;to=$now&amp;width=400&amp;height=150";
-
-      echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$daily_graph' border=0></a> ");
-      echo("<a onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$weekly_graph' border=0></a> ");
-      echo("<a onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$monthly_graph' border=0></a> ");
-      echo("<a onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$yearly_graph' border=0></a>");
       echo("</td></tr>");
 
     } # endif graphs

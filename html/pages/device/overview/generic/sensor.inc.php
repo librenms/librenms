@@ -12,17 +12,19 @@ if (count($sensors))
   {
     if (is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
+    ### FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
+
     $graph_colour = str_replace("#", "", $row_colour);
 
-    $sensor_day    = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=300&amp;height=100";
-    $sensor_week   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=300&amp;height=100";
-    $sensor_month  = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=300&amp;height=100";
-    $sensor_year   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$year&amp;to=$now&amp;width=300&amp;height=100";
-    $sensor_minigraph = "<img src='graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=80&amp;height=20&amp;bg=$graph_colour' align='absmiddle'>";
+    $sensor_day    = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=210&amp;height=100";
+    $sensor_week   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['week']."&amp;to=".$config['time']['now']."&amp;width=210&amp;height=100";
+    $sensor_month  = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['month']."&amp;to=".$config['time']['now']."&amp;width=210&amp;height=100";
+    $sensor_year   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['year']."&amp;to=".$config['time']['now']."&amp;width=210&amp;height=100";
+    $sensor_minigraph = "<img src='graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=80&amp;height=20&amp;bg=$graph_colour' align='absmiddle'>";
 
     $sensor_link  = "<a href='graphs/".$sensor['sensor_id']."/" . $graph_type . "/' onmouseover=\"return ";
     $sensor_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$sensor['sensor_descr'];
-    $sensor_link .= "</div><div style=\'width: 750px\'><img src=\'$sensor_day\'><img src=\'$sensor_week\'><img src=\'$sensor_month\'><img src=\'$sensor_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
+    $sensor_link .= "</div><div style=\'width: 570px\'><img src=\'$sensor_day\'><img src=\'$sensor_week\'><img src=\'$sensor_month\'><img src=\'$sensor_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
     $sensor_link_c = $sensor_link . "<span " . ($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '') . '>' . $sensor['sensor_current'] . $sensor_unit . "</span></a>";
     $sensor_link_b = $sensor_link . $sensor_minigraph . "</a>";

@@ -59,11 +59,11 @@ echo("</td><td width=100>");
 if ($port_details)
 {
   $interface['graph_type'] = "port_bits";
-  echo(generate_port_link($interface, "<img src='graph.php?type=port_bits&amp;id=".$interface['interface_id']."&amp;from=".$day."&amp;to=".$now."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
+  echo(generate_port_link($interface, "<img src='graph.php?type=port_bits&amp;id=".$interface['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
   $interface['graph_type'] = "port_upkts";
-  echo(generate_port_link($interface, "<img src='graph.php?type=port_upkts&amp;id=".$interface['interface_id']."&amp;from=".$day."&amp;to=".$now."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
+  echo(generate_port_link($interface, "<img src='graph.php?type=port_upkts&amp;id=".$interface['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
   $interface['graph_type'] = "port_errors";
-  echo(generate_port_link($interface, "<img src='graph.php?type=port_errors&amp;id=".$interface['interface_id']."&amp;from=".$day."&amp;to=".$now."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
+  echo(generate_port_link($interface, "<img src='graph.php?type=port_errors&amp;id=".$interface['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
 }
 
 echo("</td><td width=120>");
@@ -259,30 +259,9 @@ if ($graph_type && is_file($graph_file))
 {
   $type = $graph_type;
 
-  $daily_traffic = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=210&amp;height=100";
-  $daily_url = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
-
-  $weekly_traffic = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$week&amp;to=$now&amp;width=210&amp;height=100";
-  $weekly_url = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
-
-  $monthly_traffic = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$month&amp;to=$now&amp;width=210&amp;height=100";
-  $monthly_url = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$month&amp;to=$now&amp;width=500&amp;height=150";
-
-  $yearly_traffic = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$year&amp;to=$now&amp;width=210&amp;height=100";
-  $yearly_url = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$year&amp;to=$now&amp;width=500&amp;height=150";
-
-  echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=7>");
+  echo("<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>");
 
   include("includes/print-interface-graphs.inc.php");
-
-#  echo("<a href='device/" . $interface['device_id'] . "/port/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\"
-#        onmouseout=\"return nd();\"> <img src='$daily_traffic' border=0></a>");
-#  echo("<a href='device/" . $interface['device_id'] . "/port/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\"
-#        onmouseout=\"return nd();\"> <img src='$weekly_traffic' border=0></a>");
-#  echo("<a href='device/" . $interface['device_id'] . "/port/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
-#        onmouseout=\"return nd();\"> <img src='$monthly_traffic' border=0></a>");
-#  echo("<a href='device/" . $interface['device_id'] . "/port/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
-#        onmouseout=\"return nd();\"> <img src='$yearly_traffic' border=0></a>");
 
   echo("</td></tr>");
 }

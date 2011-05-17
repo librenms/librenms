@@ -938,6 +938,8 @@ $observium_db = mysql_select_db($config['db_name'], $observium_link);
 
 # Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 
+## Please remove these where found replacing with $config['time']
+
 $now = time();
 $day = time() - (24 * 60 * 60);
 $twoday = time() - (2 * 24 * 60 * 60);
@@ -945,16 +947,20 @@ $week = time() - (7 * 24 * 60 * 60);
 $month = time() - (31 * 24 * 60 * 60);
 $year = time() - (365 * 24 * 60 * 60);
 
-$config['now']        = time();
-$config['day']        = time() - (24 * 60 * 60);
-$config['twoday']     = time() - (2 * 24 * 60 * 60);
-$config['week']       = time() - (7 * 24 * 60 * 60);
-$config['twoweek']    = time() - (2 * 7 * 24 * 60 * 60);
-$config['month']      = time() - (31 * 24 * 60 * 60);
-$config['twomonth']   = time() - (2 * 31 * 24 * 60 * 60);
-$config['threemonth'] = time() - (3 * 31 * 24 * 60 * 60);
-$config['sixmonth']   = time() - (6 * 31 * 24 * 60 * 60);
-$config['year']       = time() - (365 * 24 * 60 * 60);
+
+$config['time']['now']        = time();
+$config['time']['fourhour']   = time() - (4 * 60 * 60);
+$config['time']['sixhour']    = time() - (6 * 60 * 60);
+$config['time']['twelvehour'] = time() - (12 * 60 * 60);
+$config['time']['day']        = time() - (24 * 60 * 60);
+$config['time']['twoday']     = time() - (2 * 24 * 60 * 60);
+$config['time']['week']       = time() - (7 * 24 * 60 * 60);
+$config['time']['twoweek']    = time() - (2 * 7 * 24 * 60 * 60);
+$config['time']['month']      = time() - (31 * 24 * 60 * 60);
+$config['time']['twomonth']   = time() - (2 * 31 * 24 * 60 * 60);
+$config['time']['threemonth'] = time() - (3 * 31 * 24 * 60 * 60);
+$config['time']['sixmonth']   = time() - (6 * 31 * 24 * 60 * 60);
+$config['time']['year']       = time() - (365 * 24 * 60 * 60);
 
 # IPMI sensor type mappings
 $config['ipmi_unit']['Volts']     = 'voltage';

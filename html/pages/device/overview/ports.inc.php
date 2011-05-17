@@ -17,13 +17,13 @@ if ($ports['total'])
   $content .= "<div style=\'width: 850px\'>";
   $graph_array['legend']   = "yes";
   $graph_array['width']    = "340";
-  $graph_array['from']     = $day;
+  $graph_array['from']     = $config['time']['day'];
   $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $week;
+  $graph_array['from']     = $config['time']['week'];
   $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $month;
+  $graph_array['from']     = $config['time']['month'];
   $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $year;
+  $graph_array['from']     = $config['time']['year'];
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
 
