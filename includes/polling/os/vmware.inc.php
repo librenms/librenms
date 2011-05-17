@@ -25,9 +25,9 @@ echo("VMware VM: ");
  * Get a list of all the known Virtual Machines for this host.
  */
 
-$db_info_list = mysql_query("SELECT id, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState FROM vminfo WHERE device_id = '" . $device["device_id"] . "'");
+$db_info_list = dbFetchRows("SELECT id, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState FROM vminfo WHERE device_id = ?", array($device["device_id"]));
 
-while ($db_info = mysql_fetch_assoc($db_info_list))
+foreach ($db_info_list as $db_info)
 {
   /*
    * Fetch the Virtual Machine information.
@@ -70,7 +70,9 @@ while ($db_info = mysql_fetch_assoc($db_info_list))
 
     if ($vm_info[$property] != $db_info[$property])
     {
-      mysql_query("UPDATE vminfo SET " . $property ." = '" . mres($vm_info[$property]) ."' WHERE id = '" . $db_info["id"] . "'");
+
+      ## FIXME - this should loop building a query and then run the query after the loop (bad geert!)
+      dbUpdate(array($property => $vm_info[$property]), 'vminfo', '`id` = ?', array($db_info["id"]));
       log_event($db_info["vmwVmDisplayName"] . " (" . preg_replace("/^vmwVm/", "", $property) . ") -> " . $vm_info[$property], $device);
     }
   }
