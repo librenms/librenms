@@ -138,7 +138,7 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 
         if ($ok) {
 #          echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $limit, $warn_limit, $current");
-          discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $limit, $warn_limit, $current, $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
+          discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $limit, $warn_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
         }
         $cisco_entity_temperature = 1;
         unset($limit, $limit_low, $warn_limit, $warn_limit_low);
