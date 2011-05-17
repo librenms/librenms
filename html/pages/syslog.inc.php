@@ -59,19 +59,29 @@ if ($_POST['program'])
   $array[] = $_POST['program'];
 }
 
-if ($_POST['device'])
+if (is_numeric($_POST['device']))
 {
-  $where .= " AND D.device_id = ?";
+  $where .= " AND S.device_id = ?";
   $array[] = $_POST['device'];
 }
 
 if ($_SESSION['userlevel'] >= '5')
 {
-  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog AS S
-          WHERE 1 $where ORDER BY timestamp DESC LIMIT 1000";
+  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog AS S";
+  if(count($array))
+  {
+    $sql .= " WHERE 1 ".$where;
+  }
+  $sql .= " ORDER BY timestamp DESC LIMIT 1000";
 } else {
-  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog AS S, devices_perms AS P
-          WHERE S.device_id = P.device_id AND P.user_id = ? $where ORDER BY timestamp DESC LIMIT 1000";
+  $sql  = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog AS S, devices_perms AS P";
+  $sql .= "WHERE S.device_id = P.device_id AND P.user_id = ?";
+  if(count($array))
+  {
+    $sql .= " WHERE 1 ".$where;
+  }
+  $sql .= " ORDER BY timestamp DESC LIMIT 1000";
+
   $array = array_merge(array($_SESSION['user_id']), $array);
 }
 
