@@ -60,7 +60,7 @@ if ($services['total'])
 
 
 ### FIXME - split this into overview/syslog.inc.php?
-$syslog =  dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '%d/%b/%y %T') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20");
+$syslog =  dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '%d/%b/%y %T') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20", array($device['device_id']));
 if (is_array($syslog))
 {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
