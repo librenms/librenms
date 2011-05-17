@@ -13,12 +13,18 @@ function get_percentage_colours($percentage)
 
 }
 
+function generate_device_url($device, $linksuffix="")
+{
+  return "device/" . $device['device_id'] . "/" . $linksuffix;
+}
+
 function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0)
 {
-  global $twoday, $day, $now, $config;
+  global $config;
 
-  if (!$start) { $start = $day; }
-  if (!$end) { $end = $now; }
+  if (!$start) { $start = $config['time']['day']; }
+  if (!$end)   { $end   = $config['time']['now']; }
+
   $class = devclass($device);
   if (!$text) { $text = $device['hostname']; }
 
@@ -35,7 +41,7 @@ function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0
     $graphs = $config['os']['default']['over'];
   }
 
-  $url  = "device/" . $device['device_id'] . "/" . $linksuffix;
+  $url = generate_device_url($device, $linksuffix);
   $contents = "<div class=list-large>".$device['hostname'];
   if ($device['hardware']) { $contents .= " - ".$device['hardware']; }
   $contents .= "</div>";
@@ -55,7 +61,7 @@ function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0
     $contents .= '<div style="width: 708px">';
     $contents .= '<span style="margin-left: 5px; font-size: 12px; font-weight: bold;">'.$graphhead.'</span><br />';
     $contents .= "<img src=\"graph.php?id=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
-    $contents .= "<img src=\"graph.php?id=" . $device['device_id'] . "&amp;from=".$config['week']."&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
+    $contents .= "<img src=\"graph.php?id=" . $device['device_id'] . "&amp;from=".$config['time']['week']."&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
     $contents .= '</div>';
   }
 
@@ -95,13 +101,13 @@ function generate_graph_popup($graph_array)
   $graph_array['legend']   = "yes";
   $graph_array['height']   = "100";
   $graph_array['width']    = "340";
-  $graph_array['from']     = $config['day'];
+  $graph_array['from']     = $config['time']['day'];
   $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['week'];
+  $graph_array['from']     = $config['time']['week'];
   $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['month'];
+  $graph_array['from']     = $config['time']['month'];
   $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['year'];
+  $graph_array['from']     = $config['time']['year'];
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
 
@@ -236,7 +242,7 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
 
 function generate_port_link($args, $text = NULL, $type = NULL)
 {
-  global $twoday, $now, $config, $day, $month;
+  global $config;
 
   $args = ifNameDescr($args);
   if (!$text) { $text = fixIfName($args['label']); }
@@ -253,25 +259,29 @@ function generate_port_link($args, $text = NULL, $type = NULL)
   $graph_array['legend']   = "yes";
   $graph_array['height']   = "100";
   $graph_array['width']    = "340";
-  $graph_array['to']	   = $config['now'];
-  $graph_array['from']     = $config['day'];
+  $graph_array['to']	   = $config['time']['now'];
+  $graph_array['from']     = $config['time']['day'];
   $graph_array['id']       = $args['interface_id'];
   $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['week'];
+  $graph_array['from']     = $config['time']['week'];
   $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['month'];
+  $graph_array['from']     = $config['time']['month'];
   $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['year'];
+  $graph_array['from']     = $config['time']['year'];
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
 
-  $url = "device/".$args['device_id']."/port/" . $args['interface_id'] . "/";
+  $url = generate_port_url($args);
 
   if (port_permitted($args['interface_id'])) {
     return overlib_link($url, $text, $content, $class);
   } else {
     return fixifName($text);
   }
+}
+
+function generate_port_url($args) {
+  return $url = "device/".$args['device_id']."/port/" . $args['interface_id'] . "/";
 }
 
 function generate_port_thumbnail($args)

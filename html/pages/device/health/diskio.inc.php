@@ -17,11 +17,17 @@ foreach (dbFetchRows("SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY di
 
   $fs_url   = "device/".$device['device_id']."/health/diskio/";
 
-  $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['diskio_descr'];
-  $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['diskio_id'] . "&amp;type=diskio_ops&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";
-  $fs_popup .= "', RIGHT, FGCOLOR, '#e5e5e5');\" onmouseout=\"return nd();\"";
+  $graph_array_zoom['id']     = $drive['diskio_id'];
+  $graph_array_zoom['type']   = "diskio_ops";
+  $graph_array_zoom['width']  = "400";
+  $graph_array_zoom['height'] = "125";
+  $graph_array_zoom['from']   = $config['time']['twoday'];
+  $graph_array_zoom['to']     = $config['time']['now'];
+  
 
-  echo("<tr bgcolor='$row_colour'><th><a href='$fs_url' $fs_popup>" . $drive['diskio_descr'] . "</a></td></tr>");
+  echo("<tr bgcolor='$row_colour'><th>");
+  echo(overlib_link($fs_url, $drive['diskio_descr'], generate_graph_tag($graph_array_zoom),  NULL));
+  echo("</th></tr>");
 
   $types = array("diskio_bits", "diskio_ops");
 
@@ -29,6 +35,7 @@ foreach (dbFetchRows("SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY di
   {
     echo('<tr bgcolor="'.$row_colour.'"><td colspan=5>');
 
+    $graph_array           = array();
     $graph_array['id']     = $drive['diskio_id'];
     $graph_array['type']   = $graph_type;
 

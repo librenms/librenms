@@ -72,7 +72,7 @@ function dbInsert($data, $table) {
 		return $id;
 	} else {
 		if($table != 'Contact') {
-			trigger_error('QDB - Insert failed.', E_WARNING);
+			trigger_error('QDB - Insert failed.', E_USER_WARNING);
 		}
 		dbRollbackTransaction();
 		return false;
@@ -113,7 +113,7 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
 		return mysql_affected_rows();
 	} else {
                 #echo("$fullSql");
-		trigger_error('QDB - Update failed.', E_WARNING);
+		trigger_error('QDB - Update failed.', E_USER_WARNING);
 		return false;
 	}
 }

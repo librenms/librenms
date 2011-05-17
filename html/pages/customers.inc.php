@@ -56,12 +56,17 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GRO
     unset($customer_name);
   }
 
-  echo("<tr bgcolor='$bg_colour'><td></td><td colspan=6>
-       <img src='graph.php?id=".rawurlencode($customer['port_descr_descr'])."&amp;type=customer_bits&amp;from=$day&amp;to=$now&amp;width=215&amp;height=100'>
-       <img src='graph.php?id=".rawurlencode($customer['port_descr_descr'])."&amp;type=customer_bits&amp;from=$week&amp;to=$now&amp;width=215&amp;height=100'>
-       <img src='graph.php?id=".rawurlencode($customer['port_descr_descr'])."&amp;type=customer_bits&amp;from=$month&amp;to=$now&amp;width=215&amp;height=100'>
-       <img src='graph.php?id=".rawurlencode($customer['port_descr_descr'])."&amp;type=customer_bits&amp;from=$year&amp;to=$now&amp;width=215&amp;height=100'>
-       </td></tr>");
+  echo("<tr bgcolor='$bg_colour'><td></td><td colspan=6>");
+
+  $graph_array['type']   = "customer_bits";
+  $graph_array['height'] = "100";
+  $graph_array['width']  = "220";
+  $graph_array['to']     = $config['time']['now'];
+  $graph_array['id']     = $customer['port_descr_descr'];
+
+  include("includes/print-quadgraphs.inc.php");
+
+  echo("</tr>");
 }
 
 echo("</table>");

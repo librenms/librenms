@@ -1,7 +1,7 @@
 <?php
 
 $service_alerts = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '0'");
-$if_alerts      = dbFetchCell("SELECT count(*) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
+$if_alerts      = dbFetchCell("SELECT COUNT(interface_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
 
 $device_alerts  = "0";
 $device_alert_sql = "WHERE 0";
@@ -16,8 +16,11 @@ foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
   $this_alert = 0;
   if ($device['status'] == 0 && $device['ignore'] == '0') { $this_alert = "1"; } elseif ($device['ignore'] == '0')
   {
-    if (dbFetchCell("SELECT count(service_id) FROM services WHERE service_status = '0' AND device_id = ?", array($device['device_id']))) { $this_alert = "1"; }
-    if (dbFetchCell("SELECT count(*) FROM ports WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = ? AND `ignore` = '0'", array($device['device_id']))) { $this_alert = "1"; }
+
+  ## sluggish. maybe we cache this at poll-time?
+
+#    if (dbFetchCell("SELECT count(service_id) FROM services WHERE service_status = '0' AND device_id = ?", array($device['device_id']))) { $this_alert = "1"; }
+#    if (dbFetchCell("SELECT count(*) FROM ports WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = ? AND `ignore` = '0'", array($device['device_id']))) { $this_alert = "1"; }
   }
   if ($this_alert)
   {

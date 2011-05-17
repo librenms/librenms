@@ -7,21 +7,23 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
   if ($debug) { echo("Discover sensor: $oid, $index, $type, $descr, $precision\n"); }
 
-  if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE poller_type='" . mres($poller_type) . "' AND sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
+  if (dbFetchCell("SELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ?", array($poller_type, $class, $device['device_id'], $type, $index)) == '0')
   {
     if (!$high_limit) { $high_limit = sensor_limit($class, $current); }
     if (!$low_limit)  { $low_limit  = sensor_low_limit($class, $current); }
 
-    $query = "INSERT INTO sensors (`poller_type`,`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_divisor`, `sensor_multiplier`, `sensor_limit`, `sensor_limit_warn`, `sensor_limit_low`, `sensor_limit_low_warn`, `sensor_current`) ";
-    $query .= " VALUES ('" . mres($poller_type) . "','" . mres($class) . "', '".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$divisor', '$multiplier', '$high_limit', '$warn_limit', '$low_limit', '$low_warn_limit', '$current')";
-    mysql_query($query);
-    if ($debug) { echo("$query\n". mysql_affected_rows() . " inserted\n"); }
+    $insert = array('poller_type' => $poller_type, 'sensor_class' => $class, 'device_id' => $device['device_id'], 'sensor_oid' => $oid, 'sensor_index' => $index, 'sensor_type' => $type, 'sensor_descr' => $descr,
+                    'sensor_divisor' => $divisor, 'sensor_multiplier' => $multiplier, 'sensor_limit' => $high_limit, 'sensor_limit_warn' => $warn_limit, 'sensor_limit_low' => $low_limit, 'sensor_limit_low_warn' => $low_warn_limit, 'current' => $current);
+
+    $inserted = dbInsert($insert, 'sensors');
+
+    if ($debug) { echo("( $inserted inserted )\n"); }
     echo("+");
     log_event("Sensor Added: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device, 'sensor', mysql_insert_id());
   }
   else
   {
-    $sensor_entry = mysql_fetch_assoc(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
+    $sensor_entry = dbFetchRow("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ?", array($class, $device['device_id'], $type, $index));
 
     if (!$high_limit)
     {
@@ -35,9 +37,10 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     if ($high_limit != $sensor_entry['sensor_limit'])
     {
-      $query = "UPDATE sensors SET `sensor_limit` = " . ($high_limit == NULL ? 'NULL' : "'".$high_limit."'") . " WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'";
-      mysql_query($query);
-      if ($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
+
+      $update = array('sensor_limit' => ($high_limit == NULL ? NULL : $high_limit));
+      $updated = dbUpdate($update, '`sensor_id` = ?', array($sensor_entry['sensor_id']));
+      if ($debug) { echo("( $updated updated )\n"); }
       echo("H");
       log_event("Sensor High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$high_limit.")", $device, 'sensor', $sensor_id);
     }
@@ -54,9 +57,9 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     if ($sensor_entry['sensor_limit_low'] != $low_limit)
     {
-      $query = "UPDATE sensors SET `sensor_limit_low` = " . ($low_limit == NULL ? 'NULL' : "'".$low_limit."'") . " WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'";
-      mysql_query($query);
-      if ($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
+      $update = array('sensor_limit_low' => ($low_limit == NULL ? NULL : $low_limit));
+      $updated = dbUpdate($update, '`sensor_id` = ?', array($sensor_entry['sensor_id']));
+      if ($debug) { echo("( $updated updated )\n"); }
       echo("L");
       log_event("Sensor Low Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$low_limit.")", $device, 'sensor', $sensor_id);
     }
@@ -67,11 +70,12 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     }
     else
     {
-      $query = "UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_multiplier` = '$multiplier', `sensor_divisor` = '$divisor' WHERE `sensor_class` = '" . mres($class) . "' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index'";
-      mysql_query($query);
-      echo("U");
+
+      $update = array('sensor_oid' => $oid, 'sensor_descr' => $descr, 'sensor_multiplier' => $multiplier, 'sensor_divisor' => $divisor);
+      $updated = dbUpdate($update, '`sensor_id` = ?', array($sensor_entry['sensor_id']));
+       echo("U");
       log_event("Sensor Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device, 'sensor', $sensor_id);
-      if ($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
+      if ($debug) { echo("( $updated updated )\n"); }
     }
   }
   $valid[$class][$type][$index] = 1;
@@ -142,19 +146,20 @@ function sensor_limit($class, $current)
 
 function check_valid_sensors($device, $class, $valid)
 {
-  $sql = "SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class='".$class."' AND S.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
-  if ($query = mysql_query($sql))
+  $entries = dbFetchRows("SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ?", array($class, $device['device_id']));
+
+  if (count($entries))
   {
-    while ($test = mysql_fetch_assoc($query))
+    foreach ($entries as $entry)
     {
-      $index = $test['sensor_index'];
-      $type = $test['sensor_type'];
+      $index = $entry['sensor_index'];
+      $type = $entry['sensor_type'];
       if ($debug) { echo($index . " -> " . $type . "\n"); }
       if (!$valid[$class][$type][$index])
       {
         echo("-");
-        mysql_query("DELETE FROM `sensors` WHERE sensor_class='".$class."' AND sensor_id = '" . $test['sensor_id'] . "'");
-        log_event("Sensor Deleted: ".$test['sensor_class']." ".$test['sensor_type']." ". $test['sensor_index']." ".$test['sensor_descr'], $device, 'sensor', $sensor_id);
+        dbDelete('sensors', "`sensor_id` =  ?", array($entry['sensor_id']));
+        log_event("Sensor Deleted: ".$entry['sensor_class']." ".$entry['sensor_type']." ". $entry['sensor_index']." ".$entry['sensor_descr'], $device, 'sensor', $sensor_id);
       }
       unset($oid); unset($type);
     }
@@ -165,11 +170,10 @@ function discover_juniAtmVp(&$valid, $interface_id, $vp_id, $vp_descr)
 {
   global $config, $debug;
 
-  if (mysql_result(mysql_query("SELECT COUNT(*) FROM `juniAtmVp` WHERE `interface_id` = '".$interface_id."' AND `vp_id` = '".$vp_id."'"),0) == "0")
+  if (dbFetchCell("SELECT COUNT(*) FROM `juniAtmVp` WHERE `interface_id` = ? AND `vp_id` = ?", array($interface_id, $vp_id)) == "0")
   {
-     $sql = "INSERT INTO `juniAtmVp` (`interface_id`,`vp_id`,`vp_descr`) VALUES ('".$interface_id."','".$vp_id."','".$vp_descr."')";
-     mysql_query($sql); echo("+");
-     if ($debug) { echo($sql . " - " . mysql_affected_rows() . "inserted "); }
+     $inserted = dbInsert(array('interface_id' => $interface_id,'vp_id' => $vp_id,'vp_descr' => $vp_descr), 'juniAtmVp');
+     if ($debug) { echo("( $inserted inserted )\n"); }
      #FIXME vv no $device!
      log_event("Juniper ATM VP Added: port ".mres($interface_id)." vp ".mres($vp_id)." descr". mres($vp_descr), 'juniAtmVp', mysql_insert_id());
   }
@@ -184,27 +188,26 @@ function discover_link($local_interface_id, $protocol, $remote_interface_id, $re
 {
   global $config, $debug, $link_exists;
 
-  if (mysql_result(mysql_query("SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = '$remote_hostname' AND `local_interface_id` = '$local_interface_id'
-                                     AND `protocol` = '$protocol' AND `remote_port` = '$remote_port'"),0) == "0")
+  if (dbFetchCell("SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = ? AND `local_interface_id` = ? AND `protocol` = ? AND `remote_port` = ?", 
+                  array($remote_hostname, $local_interface_id, $protocol, $remote_port)) == "0")
   {
-    $sql = "INSERT INTO `links` (`local_interface_id`,`protocol`,`remote_interface_id`,`remote_hostname`,`remote_port`,`remote_platform`,`remote_version`)
-                             VALUES ('$local_interface_id','$protocol','$remote_interface_id','$remote_hostname','$remote_port','$remote_platform','$remote_version')";
-    mysql_query($sql);
-    echo("+"); if ($debug) { echo("$sql"); }
+
+    $inserted = dbInsert(array('local_interface_id' => $local_interface_id,'protocol' => $protocol,'remote_interface_id' => $remote_interface_id,'remote_hostname' => $remote_hostname,
+             'remote_port' => $remote_port,'remote_platform' => $remote_platform,'remote_version' => $remote_version), 'links');
+
+    echo("+"); if ($debug) { echo("( $inserted inserted )"); }
   }
   else
   {
-    $data = mysql_fetch_assoc(mysql_query("SELECT * FROM `links` WHERE `remote_hostname` = '$remote_hostname' AND `local_interface_id` = '$local_interface_id'
-                                               AND `protocol` = '$protocol' AND `remote_port` = '$remote_port'"));
+    $data = dbFetchRow("SELECT * FROM `links` WHERE `remote_hostname` = ? AND `local_interface_id` = ? AND `protocol` = ? AND `remote_port` = ?", array($remote_hostname, $local_interface_id, $protocol, $remote_port));
     if ($data['remote_interface_id'] == $remote_interface_id && $data['remote_platform'] == $remote_platform && $remote_version == $remote_version)
     {
       echo(".");
     }
     else
     {
-      $sql = "UPDATE `links` SET `remote_interface_id` = $remote_interface_id, `remote_platform` = '$remote_platform', `remote_version` = '$remote_version' WHERE `id` = '".$data['id']."'";
-      mysql_query($sql);
-      echo("U"); if ($debug) {echo("$sql"); }
+      $updated = dbUpdate(array('remote_interface_id' => $remote_interface_id, 'remote_platform' => $remote_platform, 'remote_version' => $remote_version), 'links', '`id` = ?', array($data['id']));
+      echo("U"); if ($debug) { echo("( $updated updated )"); }
     }
   }
   $link_exists[$local_interface_id][$remote_hostname][$remote_port] = 1;
@@ -217,21 +220,18 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
   if ($debug) { echo("$device, $index, $type, $mib, $descr, $units, $used, $size\n"); }
   if ($descr && $size > "0")
   {
-    if (mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE `storage_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `storage_mib` = '$mib'"),0) == '0')
+    $storage = dbFetchRow("SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?", array($index, $device['device_id'], $mib));
+    if (!count($storage))
     {
-      $query = "INSERT INTO storage (`device_id`, `storage_descr`, `storage_index`, `storage_mib`, `storage_type`, `storage_units`,`storage_size`,`storage_used`)
-                      values ('".$device['device_id']."', '$descr', '$index', '$mib','$type', '$units', '$size', '$used')";
-      mysql_query($query);
-      if ($debug) { print $query . "\n"; mysql_error(); }
+      $insert = dbInsert(array('device_id' => $device['device_id'], 'storage_descr' => $descr, 'storage_index' => $index, 'storage_mib' => $mib, 'storage_type' => $type, 
+                               'storage_units' => $units, 'storage_size' => $size, 'storage_used' => $used), 'storage');
+      if ($debug) { mysql_error(); }
       echo("+");
     }
     else
     {
-      echo(".");
-      $query = "UPDATE `storage` SET `storage_descr` = '".$descr."', `storage_type` = '".$type."', `storage_units` = '".$units."', `storage_size` = '".$size."'
-                      WHERE `device_id` = '".$device['device_id']."' AND `storage_index` = '".$index."' AND `storage_mib` = '".$mib."'";
-      mysql_query($query);
-      if ($debug) { print $query . "\n"; }
+      $updated = dbUpdate(array('storage_descr' => $descr, 'storage_type' => $type, 'storage_units' => $units, 'storage_size' => $size), 'storage', '`device_id` = ? AND `storage_index` = ? AND `storage_mib` = ?', array($device['device_id'], $index, $mib));
+      if($updated) { echo("U"); } else { echo("."); }
     }
     $valid[$mib][$index] = 1;
   }
