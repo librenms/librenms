@@ -138,8 +138,8 @@ foreach ($ports as $port)
     if ($this_port['ifHCInOctets'] > 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] > 0 && is_numeric($this_port['ifHCOutOctets']))
     {
       echo("HC ");
-      $this_port['ifInOctets'] = $this_port['ifHCInOctets'];
-	$this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
+      $this_port['ifInOctets']  = $this_port['ifHCInOctets'];
+      $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
     }
 
     ### rewrite the ifPhysAddress
@@ -196,7 +196,6 @@ foreach ($ports as $port)
     }
 
     /// Parse description (usually ifAlias) if config option set
-
     if (isset($config['port_descr_parser']) && is_file($config['install_dir'] . "/" . $config['port_descr_parser']))
     {
       $port_attribs = array('type','descr','circuit','speed','notes');
@@ -212,8 +211,7 @@ foreach ($ports as $port)
         }
       }
     }
-
-    /// Ende parse ifAlias
+    /// End parse ifAlias
 
     /// Update IF-MIB metrics
     foreach ($stat_oids_db as $oid)
@@ -225,7 +223,7 @@ foreach ($ports as $port)
       {
         $oid_diff = $this_port[$oid] - $port[$oid];
         $oid_rate  = $oid_diff / $polled_period;
-        if ($oid_rate < 0) { $oid_rate = "0"; }
+        if ($oid_rate < 0) { $oid_rate = "0"; echo("negative $oid"); }
         $port['update'][$oid.'_rate'] = $oid_rate;
         $port['update'][$oid.'_delta'] = $oid_diff;
         if ($debug) {echo("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n"); }
