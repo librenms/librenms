@@ -582,4 +582,42 @@ function include_dir($dir, $regex = "")
   }
 }
 
+function is_port_valid($port, $device)
+{
+
+  global $config;
+
+  if (!strstr($port['ifDescr'], "irtual"))
+  {
+    $valid = 1;
+    $if = strtolower($port['ifDescr']);
+    foreach ($config['bad_if'] as $bi)
+    {
+      if (strstr($if, $bi))
+      {
+        $valid = 0;
+        if($debug) { echo("ignored : $bi : $if"); }
+      }
+    }
+    if (is_array($config['bad_if_regexp']))
+    {
+      foreach ($config['bad_if_regexp'] as $bi)
+      {
+        if (preg_match($bi ."i", $if))
+        {
+          $valid = 0;
+          if($debug) { echo("ignored : $bi : ".$if); }
+        }
+      }
+    }
+    if (empty($port['ifDescr'])) { $valid = 0; }
+    if ($device['os'] == "catos" && strstr($if, "vlan")) { $valid = 0; }
+  } else {
+    $valid = 0;
+  }
+
+  return $valid;
+}
+
+
 ?>

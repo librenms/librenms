@@ -4,70 +4,42 @@
 
 echo("Ports : ");
 
-$ports = snmp_walk($device, "ifDescr", "-Onsq", "IF-MIB");
 
-$ports = str_replace("\"", "", $ports);
-$ports = str_replace("ifDescr.", "", $ports);
-#$ports = str_replace(" ", "||", $ports);
+$ports = array();
+$ports = snmpwalk_cache_oid($device, "ifDescr", $port_stats, "IF-MIB");
+#$ports = snmpwalk_cache_oid($device, "ifName", $port_stats, "IF-MIB");
+#$ports = snmpwalk_cache_oid($device, "ifType", $port_stats, "IF-MIB");
 
 $interface_ignored = 0;
 $interface_added   = 0;
 
-foreach (explode("\n", $ports) as $entry)
+foreach ($ports as $ifIndex => $port)
 {
-  $entry = trim($entry);
-  list($ifIndex, $ifDescr) = explode(" ", $entry, 2);
-  if (!strstr($entry, "irtual"))
-  {
-    $if = trim(strtolower($ifDescr));
-    $nullintf = 0;
-    foreach ($config['bad_if'] as $bi)
-    {
-      if (strstr($if, $bi))
-      {
-        $nullintf = 1;
-        if($debug) { echo("ignored : $bi : $if"); }
-      }
-    }
-    if (is_array($config['bad_if_regexp']))
-    {
-      foreach ($config['bad_if_regexp'] as $bi)
-      {
-        if (preg_match($bi ."i", $if))
-        {
-          $nullintf = 1;
-          if($debug) { echo("ignored : $bi : $if"); }
-        }
-      }
-    }
 
-    if (empty($ifDescr)) { $nullintf = 1; }
-    if ($device['os'] == "catos" && strstr($if, "vlan")) { $nullintf = 1; }
-    if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $ifDescr, $matches)) { $ifDescr = $matches[1]; }
-    $ifDescr = fixifName($ifDescr);
+  if (is_port_valid($port, $device))
+  {
+    if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $port['ifDescr'], $matches)) { $port['ifDescr'] = $matches[1]; }
+    $port['ifDescr'] = fixifName($port['ifDescr']);
     if ($debug) echo("\n $if ");
-    if ($nullintf == 0)
+    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0')
     {
-      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0')
-      {
-        mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','".mres($ifDescr)."')");
-        # Add Interface
-        echo("+");
-      } else {
-        mysql_query("UPDATE `ports` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
-        echo(".");
-      }
-      $int_exists[] = "$ifIndex";
+      mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','".mres($port['ifDescr'])."')");
+      # Add Interface
+      echo("+");
     } else {
-      # Ignored Interface
-      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0')
-      {
-        mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
-        # Delete Interface
-        echo("-"); ## Deleted Interface
-      } else {
-        echo("X"); ## Ignored Interface
-      }
+      mysql_query("UPDATE `ports` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
+      echo(".");
+    }
+    $int_exists[] = "$ifIndex";
+  } else {
+    # Ignored Interface
+    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0')
+    {
+      mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
+      # Delete Interface
+      echo("-"); ## Deleted Interface
+    } else {
+      echo("X"); ## Ignored Interface
     }
   }
 }

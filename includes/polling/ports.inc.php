@@ -105,15 +105,18 @@ foreach ($ports_db as $port) { $ports[$port['ifIndex']] = $port; }
 /// New interface detection
 foreach ($port_stats as $ifIndex => $port)
 {
-  if (!is_array($ports[$port['ifIndex']]))
+  if (is_port_valid($port, $device))
   {
-    $interface_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
-    $ports[$port['ifIndex']] = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($interface_id));
-    echo("Adding: ".$port['ifName']."(".$ifIndex.")(".$ports[$port['ifIndex']]['interface_id'].")");
-    #print_r($ports);
-  } elseif ($ports[$ifIndex]['deleted'] == "1") {   
-    dbUpdate(array('deleted' => '0'), 'ports', '`interface_id` = ?', array($ports[$ifIndex]['interface_id']));
-    $ports[$ifIndex]['deleted'] = "0";
+    if (!is_array($ports[$port['ifIndex']]))
+    {
+      $interface_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
+      $ports[$port['ifIndex']] = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($interface_id));
+      echo("Adding: ".$port['ifName']."(".$ifIndex.")(".$ports[$port['ifIndex']]['interface_id'].")");
+      #print_r($ports);
+    } elseif ($ports[$ifIndex]['deleted'] == "1") {   
+      dbUpdate(array('deleted' => '0'), 'ports', '`interface_id` = ?', array($ports[$ifIndex]['interface_id']));
+      $ports[$ifIndex]['deleted'] = "0";
+    }
   }
 }
 /// End New interface detection
