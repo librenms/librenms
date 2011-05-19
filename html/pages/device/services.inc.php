@@ -25,7 +25,7 @@ unset($sep);
 
 print_optionbar_end();
 
-if (dbFetchCell"select count(service_id) from services WHERE device_id = ?", array($device['device_id'])) > '0')
+if (dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE device_id = ?", array($device['device_id'])) > '0')
 {
   echo("<div style='margin: 5px;'><table cellpadding=7 border=0 cellspacing=0 width=100%>");
   $i = "1";
