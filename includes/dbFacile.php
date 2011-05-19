@@ -136,7 +136,10 @@ function dbDelete($table, $where = null, $parameters = array()) {
  * */
 function dbFetchRows($sql, $parameters = array()) {
         global $db_stats;
+
+        $time_start = microtime(true);
 	$result = dbQuery($sql, $parameters);
+
 	if(mysql_num_rows($result) > 0) {
 		$rows = array();
 		while($row = mysql_fetch_assoc($result)) {
@@ -146,10 +149,9 @@ function dbFetchRows($sql, $parameters = array()) {
 		return $rows;
 	}
 
-        $time_start = microtime(true);
         mysql_free_result($result);
-        $time_end = microtime(true);
 
+        $time_end = microtime(true);
         $db_stats['fetchrows_sec'] += number_format($time_end - $time_start, 8);
         $db_stats['fetchrows']++;
 
@@ -181,11 +183,9 @@ function dbFetch($sql, $parameters = array()) {
  * */
 function dbFetchRow($sql = null, $parameters = array()) {
         global $db_stats;
-        $time_start = microtime(true);
 
+        $time_start = microtime(true);
 	$result = dbQuery($sql, $parameters);
-        $time_start = microtime(true);
-
 	if($result) {
 		$row = mysql_fetch_assoc($result);
 		mysql_free_result($result);
@@ -198,6 +198,8 @@ function dbFetchRow($sql = null, $parameters = array()) {
 	} else {
 		return null;
 	}
+        $time_start = microtime(true);
+
 }
 
 /*
@@ -206,7 +208,6 @@ function dbFetchRow($sql = null, $parameters = array()) {
 function dbFetchCell($sql, $parameters = array()) {
         global $db_stats;
         $time_start = microtime(true);
-
 	$row = dbFetchRow($sql, $parameters);
 	if($row) {
 		return array_shift($row); // shift first field off first row

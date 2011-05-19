@@ -48,6 +48,42 @@ function get_sensor_rrd($device, $sensor)
   return($rrd_file);
 }
 
+function get_port_by_index_cache($device_id, $ifIndex)
+{
+  global $port_index_cache;
+
+  if (isset($port_index_cache[$device_id][$ifIndex]) && is_array($port_index_cache[$device_id][$ifIndex]))
+  {
+    $port = $port_index_cache[$device_id][$ifIndex];
+  } else {
+    $port = get_port_by_ifIndex($device_id, $ifIndex);
+    $port_index_cache[$device_id][$ifIndex] = $port;
+  }
+
+  return $port;
+}
+
+function get_port_by_ifIndex($device_id, $ifIndex)
+{
+  return dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device_id, $ifIndex));
+}
+
+
+function port_by_id_cache($port_id)
+{
+  global $port_cache;
+
+  if (isset($port_cache[$port_id]) && is_array($port_cache[$device_id]))
+  {
+    $port = $port_cache[$port_id];
+  } else {
+    $port = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($port_id));
+    $port_cache[$port_id] = $port;
+  }
+  return $port;
+}
+
+
 function get_port_by_id($port_id)
 {
   if (is_numeric($port_id))
@@ -182,11 +218,6 @@ function getpeerhost($id)
 function getifindexbyid($id)
 {
   return dbFetchCell("SELECT `ifIndex` FROM `ports` WHERE `interface_id` = ?", array($id));
-}
-
-function get_port_by_ifIndex($device, $ifIndex)
-{
-  return dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device['device_id'], $ifIndex));
 }
 
 function getifbyid($id)

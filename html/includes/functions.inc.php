@@ -250,6 +250,7 @@ function generate_port_link($args, $text = NULL, $type = NULL)
   if (!isset($args['graph_type'])) { $args['graph_type'] = 'port_bits'; }
 
   $class = ifclass($args['ifOperStatus'], $args['ifAdminStatus']);
+
   if (!isset($args['hostname'])) { $args = array_merge($args, device_by_id_cache($args['device_id'])); }
 
   $content = "<div class=list-large>".$args['hostname']." - " . fixifName($args['label']) . "</div>";
@@ -273,7 +274,7 @@ function generate_port_link($args, $text = NULL, $type = NULL)
 
   $url = generate_port_url($args);
 
-  if (port_permitted($args['interface_id'])) {
+  if (port_permitted($args['interface_id'], $args['device_id'])) {
     return overlib_link($url, $text, $content, $class);
   } else {
     return fixifName($text);

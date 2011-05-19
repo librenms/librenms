@@ -225,7 +225,7 @@ foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? an
 {
   if($higher_if['interface_id_high']) 
   {
-    $this_port = get_port_by_ifIndex($device, $higher_if['interface_id_high']);
+    $this_port = get_port_by_index_cache($device['device_id'], $higher_if['interface_id_high']);
     echo("$br<img src='images/16/arrow_divide.png' align=absmiddle> <strong>" . generate_port_link($this_port) . "</strong>");
     $br = "<br />";
   }
@@ -235,11 +235,12 @@ foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_high` = ? a
 {
   if($lower_if['interface_id_low'])
   {
-    $this_port = get_port_by_ifIndex($device, $lower_if['interface_id_low']);
+    $this_port = get_port_by_index_cache($device['device_id'], $lower_if['interface_id_low']);
     echo("$br<img src='images/16/arrow_join.png' align=absmiddle> <strong>" . generate_port_link($this_port) . "</strong>");
     $br = "<br />";
   }
 }
+
 
 
 unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
