@@ -5,7 +5,7 @@ if (is_numeric($id))
 
   $acc = dbFetchRow("SELECT * FROM `mac_accounting` AS M, `ports` AS I, `devices` AS D WHERE M.ma_id = ? AND I.interface_id = M.interface_id AND I.device_id = D.device_id", array($id));
 
-  if (($config['allow_unauth_graphs'] || port_permitted($acc['interface_id']))
+  if (($config['allow_unauth_graphs'] || port_permitted($acc['interface_id'])))
   {
     if(is_file($config['rrd_dir'] . "/" . $acc['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd")))
       {
