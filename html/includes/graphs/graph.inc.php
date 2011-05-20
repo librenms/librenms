@@ -91,14 +91,19 @@ function graph_error($string)
   exit();
 }
 
-if (!$auth)
-{
+if ($error_msg) {
+
+  graph_error($graph_error);
+
+} elseif (!$auth) {
+ 
   if ($width < 200)
   {
    graph_error("No Auth");
   } else {
    graph_error("No Authorisation");
   }
+
 } else {
   #$rrd_options .= " HRULE:0#999999";
   if ($no_file)
