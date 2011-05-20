@@ -285,8 +285,13 @@ if (is_array($ospf_nbrs_db))
 
       if ($ospf_nbr_db['interface_id'] != $ospf_nbr_poll['interface_id'])
       {
-        $ospf_nbr_update = " ";
+        if($ospf_nbr_poll['interface_id']) {
+          $ospf_nbr_update = array('interface_id' => $ospf_nbr_poll['interface_id']);
+        } else {
+          $ospf_nbr_update = array('interface_id' => array('NULL'));
+        }
       }
+
 
       foreach ($ospf_nbr_oids as $oid)
       { // Loop the OIDs
