@@ -51,6 +51,7 @@ function dbQuery($sql, $parameters = array()) {
  * */
 function dbInsert($data, $table) {
 	global $fullSql;
+        global $db_stats;
 	// the following block swaps the parameters if they were given in the wrong order.
 	// it allows the method to work for those that would rather it (or expect it to)
 	// follow closer with SQL convention:
@@ -64,19 +65,26 @@ function dbInsert($data, $table) {
 
 	$sql = 'INSERT INTO `' . $table . '` (`' . implode('`,`', array_keys($data)) . '`)  VALUES (' . implode(',', dbPlaceHolders($data)) . ')';
 
+        $time_start = microtime(true);
 	dbBeginTransaction();
 	$result = dbQuery($sql, $data);
 	if($result) {
 		$id = mysql_insert_id();
 		dbCommitTransaction();
-		return $id;
+		#return $id;
 	} else {
 		if($table != 'Contact') {
 			trigger_error('QDB - Insert failed.', E_USER_WARNING);
 		}
 		dbRollbackTransaction();
-		return false;
+		#$id = false;
 	}
+        $time_end = microtime(true);
+        $db_stats['insert_sec'] += number_format($time_end - $time_start, 8);
+        $db_stats['insert']++;
+
+        return $id;
+
 }
 
 /*
@@ -85,6 +93,7 @@ function dbInsert($data, $table) {
  * */
 function dbUpdate($data, $table, $where = null, $parameters = array()) {
 	global $fullSql;
+        global $db_stats;
 	// the following block swaps the parameters if they were given in the wrong order.
 	// it allows the method to work for those that would rather it (or expect it to)
 	// follow closer with SQL convention:
@@ -109,13 +118,20 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
 		$data = array_merge($data, $parameters);
 	}
 
+        $time_start = microtime(true);
 	if(dbQuery($sql, $data)) {
-		return mysql_affected_rows();
+		$return = mysql_affected_rows();
 	} else {
                 #echo("$fullSql");
 		trigger_error('QDB - Update failed.', E_USER_WARNING);
-		return false;
+		$return = false;
 	}
+        $time_end = microtime(true);
+        $db_stats['update_sec'] += number_format($time_end - $time_start, 8);
+        $db_stats['update']++;
+
+        return $return;
+
 }
 
 function dbDelete($table, $where = null, $parameters = array()) {

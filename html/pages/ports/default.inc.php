@@ -6,7 +6,7 @@
       <select name='device_id' id='device_id'>
       <option value=''>All Devices</option>
 <?php
-foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`") as $dat)
+foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`") as $data)
 {
   echo("<option value='".$data['device_id']."'");
   if ($data['device_id'] == $_POST['device_id']) { echo("selected"); }

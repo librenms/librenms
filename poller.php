@@ -106,6 +106,7 @@ function poll_device($device, $options) {
   global $config;
   global $device;
   global $polled_devices;
+  global $db_stats;
 
   $attribs = get_dev_attribs($device['device_id']);
 
@@ -238,6 +239,16 @@ if (!$options['m'])
 
   $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
   if ($debug) echo("$string\n");
+
+  echo('MySQL: Cell['.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0,2).'s]'.
+              ' Row['   .($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0,2).'s]'.
+             ' Rows['   .($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0,2).'s]'.
+           ' Column['.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0,2).'s]'.
+           ' Update['   .($db_stats['update']+0).'/'.round($db_stats['update_sec']+0,2).'s]'.
+           ' Insert['.($db_stats['insert']+0). '/'.round($db_stats['insert_sec']+0,2).'s]'.
+           ' Delete['.($db_stats['delete']+0). '/'.round($db_stats['delete_sec']+0,2).'s]');
+
+  echo("\n");
 
   logfile($string);
 
