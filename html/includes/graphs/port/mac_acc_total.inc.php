@@ -61,7 +61,7 @@ foreach ($accs as $acc)
         $name = $peer['hostname'] . " " . makeshortif($peer['ifDescr']) . " (".$mac.")";
       }
 
-      if (dbFetchCell("SELECT count(*) FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = ?", array($addy['ipv4_address'])),0))
+      if (dbFetchCell("SELECT count(*) FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = ?", array($addy['ipv4_address'])))
       {
         $peer_info = dbFetchRow("SELECT * FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?", array($acc['device_id'], $addy['ipv4_address']));
         $name .= " - AS".$peer_info['bgpPeerRemoteAs'];
