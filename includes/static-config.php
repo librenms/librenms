@@ -452,6 +452,12 @@ $config['os'][$os]['text']  		= "Delta UPS";
 $config['os'][$os]['type']  		= "power";
 $config['os'][$os]['icon']  		= "delta";
 
+$os = "liebert";
+$config['os'][$os]['text']              = "Liebert";
+$config['os'][$os]['type']              = "power";
+$config['os'][$os]['icon']              = "liebert";
+
+
 $os = "engenius";
 $config['os'][$os]['type'] 		= "network";
 $config['os'][$os]['text']  		= "EnGenius Access Point";
