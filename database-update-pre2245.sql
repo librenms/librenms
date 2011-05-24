@@ -38,7 +38,7 @@ ALTER TABLE `mac_accounting`  DROP `peer_ip`,  DROP `peer_desc`,  DROP `peer_asn
 UPDATE sensors SET sensor_class='frequency' WHERE sensor_class='freq';
 ALTER TABLE  `cef_switching` ADD  `cef_switching_id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
 ALTER TABLE  `mempools` ADD  `mempool_perc` INT NOT NULL AFTER  `device_id`;
-ALTER TABLE  `observer_dev`.`ports` ADD UNIQUE  `device_ifIndex` (  `device_id` ,  `ifIndex` );
+ALTER TABLE  `ports` ADD UNIQUE  `device_ifIndex` (  `device_id` ,  `ifIndex` );
 ALTER TABLE  `ports` DROP INDEX  `host`;
 ALTER TABLE  `ports` DROP INDEX  `snmpid`;
 CREATE TABLE IF NOT EXISTS `ospf_areas` (  `device_id` int(11) NOT NULL,  `ospfAreaId` varchar(32) COLLATE utf8_unicode_ci NOT NULL,  `ospfAuthType` varchar(64) COLLATE utf8_unicode_ci NOT NULL,  `ospfImportAsExtern` varchar(128) COLLATE utf8_unicode_ci NOT NULL,  `ospfSpfRuns` int(11) NOT NULL,  `ospfAreaBdrRtrCount` int(11) NOT NULL,  `ospfAsBdrRtrCount` int(11) NOT NULL,  `ospfAreaLsaCount` int(11) NOT NULL,  `ospfAreaLsaCksumSum` int(11) NOT NULL,  `ospfAreaSummary` varchar(64) COLLATE utf8_unicode_ci NOT NULL,  `ospfAreaStatus` varchar(64) COLLATE utf8_unicode_ci NOT NULL,  UNIQUE KEY `device_area` (`device_id`,`ospfAreaId`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
