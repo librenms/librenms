@@ -1,9 +1,7 @@
 <?php
 
-
-
 ## RFC1628 UPS
-if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'] == "poweralert")
+if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']])
 {
   echo("RFC1628 ");
 

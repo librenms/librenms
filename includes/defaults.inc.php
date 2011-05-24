@@ -361,5 +361,9 @@ $config['discovery_modules']['toner']                     = 1;
 $config['discovery_modules']['ucd-diskio']                = 1;
 $config['discovery_modules']['services']                  = 1;
 
+$config['modules_compat']['rfc1628']['liebert']           = 1;
+$config['modules_compat']['rfc1628']['netmanplus']        = 1;
+$config['modules_compat']['rfc1628']['deltaups']          = 1;
+$config['modules_compat']['rfc1628']['poweralert']        = 1;
 
 ?>
