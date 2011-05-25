@@ -14,7 +14,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     $insert = array('poller_type' => $poller_type, 'sensor_class' => $class, 'device_id' => $device['device_id'], 'sensor_oid' => $oid, 'sensor_index' => $index, 'sensor_type' => $type, 'sensor_descr' => $descr,
                     'sensor_divisor' => $divisor, 'sensor_multiplier' => $multiplier, 'sensor_limit' => $high_limit, 'sensor_limit_warn' => $warn_limit, 'sensor_limit_low' => $low_limit, 
-                    'sensor_limit_low_warn' => $low_warn_limit, 'current' => $current, 'entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalIndex_measured' => $entPhysicalIndex_measured );
+                    'sensor_limit_low_warn' => $low_warn_limit, 'sensor_current' => $current, 'entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalIndex_measured' => $entPhysicalIndex_measured );
 
     $inserted = dbInsert($insert, 'sensors');
 
