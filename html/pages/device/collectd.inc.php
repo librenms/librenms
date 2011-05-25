@@ -94,19 +94,19 @@ print_optionbar_end();
        $daily_url       = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['day']."&to=".$config['time']['now']."&width=400&height=150";
        $daily_url      .= $args;
 
-       $weekly_traffic   = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['day']."&to=".$config['time']['now']."&width=215&height=100";
+       $weekly_traffic   = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['week']."&to=".$config['time']['now']."&width=215&height=100";
        $weekly_traffic  .= $args;
-       $weekly_url       = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['day']."&to=".$config['time']['now']."&width=400&height=150";
+       $weekly_url       = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['week']."&to=".$config['time']['now']."&width=400&height=150";
        $weekly_url      .= $args;
 
-       $monthly_traffic   = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['day']."&to=".$config['time']['now']."&width=215&height=100";
+       $monthly_traffic   = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['month']."&to=".$config['time']['now']."&width=215&height=100";
        $monthly_traffic  .= $args;
-       $monthly_url       = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['day']."&to=".$config['time']['now']."&width=400&height=150";
+       $monthly_url       = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['month']."&to=".$config['time']['now']."&width=400&height=150";
        $monthly_url      .= $args;
 
-       $yearly_traffic   = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['day']."&to=".$config['time']['now']."&width=215&height=100";
+       $yearly_traffic   = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['year']."&to=".$config['time']['now']."&width=215&height=100";
        $yearly_traffic  .= $args;
-       $yearly_url       = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['day']."&to=".$config['time']['now']."&width=400&height=150";
+       $yearly_url       = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['year']."&to=".$config['time']['now']."&width=400&height=150";
        $yearly_url      .= $args;
 
 
