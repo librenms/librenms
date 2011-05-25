@@ -153,7 +153,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
             <input type='hidden' value='addbillperm' name='action'>
             <select name='bill_id' class=selector>");
 
-    $bills dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`");
+    $bills = dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`");
     foreach ($bills as $bill)
     {
       unset($done);
