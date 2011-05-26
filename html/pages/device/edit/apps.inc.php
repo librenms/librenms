@@ -22,11 +22,12 @@ if ($handle = opendir($config['install_dir'] . "/includes/polling/applications/"
 if ($_POST['device'])
 {
   $updated = 0;
-  $param[] = array($device['device_id']);
+  $param[] = $device['device_id'];
   foreach (array_keys($_POST) as $key)
   {
     if (substr($key,0,4) == 'app_')
     {
+      echo($key);
       $param[] = substr($key,4);
       $enabled[] = substr($key,4);
       $replace[] = "?";
