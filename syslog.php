@@ -4,6 +4,7 @@
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/syslog.php");
+include("includes/dbFacile.php");
 include("includes/common.php");
 
 $i = "1";

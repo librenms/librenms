@@ -14,12 +14,17 @@ if ($_SESSION['userlevel'] < '10') { include("includes/error-no-perm.inc.php"); 
 
       if ($_GET['confirm'] == "yes")
       {
+        dbDelete('bill_perms', "`user_id` =  ?", array($_GET['user_id']));
         dbDelete('devices_perms', "`user_id` =  ?", array($_GET['user_id']));
+	dbDelete('ports_perms', "`user_id` =  ?", array($_GET['user_id']));
+        dbDelete('users_prefs', "`user_id` =  ?", array($_GET['user_id']));
+        dbDelete('users', "`user_id` =  ?", array($_GET['user_id']));
+
         if (deluser($_GET['user_id'])) { echo("<span class=info>User '$delete_username' deleted!</span>"); }
       }
       else
       {
-        echo("<span class=alert>You have requested deletion of the user '$delete_username'. This action can not be reversed.<br /><a href='?page=deluser&action=del&user_id=" . $_GET['user_id'] . "&confirm=yes'>Click to confirm</a></span>");
+        echo("<div class=errorbox>You have requested deletion of the user '$delete_username'. This action can not be reversed.<br /><a href='?page=deluser&action=del&user_id=" . $_GET['user_id'] . "&confirm=yes'>Click to confirm</a></div>");
       }
     }
 
