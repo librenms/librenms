@@ -36,11 +36,12 @@ $vertical = mres($_GET['vertical']);
 $legend   = mres($_GET['legend']);
 $id       = mres($_GET['id']);
 
-if (!$config['allow_unauth_graphs'])
+if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs'])
 {
+} else {
   if (!$_SESSION['authenticated']) { graph_error("Session not authenticated"); exit; }
 } else {
-  $auth = TRUE; ## hardcode auth for all
+  $auth = "1"; ## hardcode auth for all
 }
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', mres($_GET['type']), $graphtype);
@@ -60,7 +61,7 @@ if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.p
     {
       if (Net_IPv4::ipInNetwork($_SERVER['REMOTE_ADDR'], $range))
       {
-        $auth = TRUE;
+        $auth = "1";
         break;
       }
     }
@@ -68,7 +69,7 @@ if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.p
 
   include($config['install_dir'] . "/html/includes/graphs/$type/auth.inc.php");
 
-  if ($auth)
+  if (isset($auth) && $auth)
   {
     include($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php");
   }

@@ -22,19 +22,19 @@ if ($handle = opendir($config['install_dir'] . "/includes/polling/applications/"
 if ($_POST['device'])
 {
   $updated = 0;
-  $param = array($device['device_id']);
+  $param[] = array($device['device_id']);
   foreach (array_keys($_POST) as $key)
   {
     if (substr($key,0,4) == 'app_')
     {
       $param[] = substr($key,4);
       $enabled[] = substr($key,4);
-      $query[] = "?";
+      $replace[] = "?";
     }
   }
 
   if(count($enabled)) {
-    $updated += dbDelete('applications', "`device_id` = ? AND `app_type` NOT IN (".implode(',',$query).")", array($param));
+    $updated += dbDelete('applications', "`device_id` = ? AND `app_type` NOT IN (".implode(",",$replace).")", $param);
   } else {
     $updated += dbDelete('applications', "`device_id` = ?", array($param));
   }
