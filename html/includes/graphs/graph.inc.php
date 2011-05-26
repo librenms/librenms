@@ -38,10 +38,13 @@ $id       = mres($_GET['id']);
 
 if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs'])
 {
+  $auth = "1"; ## hardcode auth for all with config function
 } else {
-  if (!$_SESSION['authenticated']) { graph_error("Session not authenticated"); exit; }
-} else {
-  $auth = "1"; ## hardcode auth for all
+  if (!$_SESSION['authenticated']) 
+  { 
+    graph_error("Session not authenticated"); 
+    exit; 
+  }
 }
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', mres($_GET['type']), $graphtype);
@@ -95,9 +98,7 @@ function graph_error($string)
 }
 
 if ($error_msg) {
-
   graph_error($graph_error);
-
 } elseif (!$auth) {
  
   if ($width < 200)
