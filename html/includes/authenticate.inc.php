@@ -34,13 +34,13 @@ if (isset($_GET['logout']) && $_SESSION['authenticated'])
 if (isset($_GET['username']) && isset($_GET['password']))
 {
   $_SESSION['username'] = mres($_GET['username']);
-  $_SESSION['password'] = mres($_GET['password']);
+  $_SESSION['password'] = $_GET['password'];
 } elseif (isset($_POST['username']) && isset($_POST['password'])) {
   $_SESSION['username'] = mres($_POST['username']);
-  $_SESSION['password'] = mres($_POST['password']);
+  $_SESSION['password'] = $_POST['password'];
 } elseif (isset($_COOKIE['username']) && isset($_COOKIE['password'])) {
   $_SESSION['username'] = mres($_COOKIE['username']);
-  $_SESSION['password'] = mres($_COOKIE['password']);
+  $_SESSION['password'] = $_COOKIE['password'];
 }
 
 if (!isset($config['auth_mechanism']))
