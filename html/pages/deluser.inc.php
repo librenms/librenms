@@ -14,13 +14,15 @@ if ($_SESSION['userlevel'] < '10') { include("includes/error-no-perm.inc.php"); 
 
       if ($_GET['confirm'] == "yes")
       {
-        dbDelete('bill_perms', "`user_id` =  ?", array($_GET['user_id']));
-        dbDelete('devices_perms', "`user_id` =  ?", array($_GET['user_id']));
-	dbDelete('ports_perms', "`user_id` =  ?", array($_GET['user_id']));
-        dbDelete('users_prefs', "`user_id` =  ?", array($_GET['user_id']));
-        dbDelete('users', "`user_id` =  ?", array($_GET['user_id']));
+#        del_user($_GET['user_id']);
 
-        if (deluser($_GET['user_id'])) { echo("<span class=info>User '$delete_username' deleted!</span>"); }
+#        dbDelete('bill_perms', "`user_id` =  ?", array($_GET['user_id']));
+#        dbDelete('devices_perms', "`user_id` =  ?", array($_GET['user_id']));
+#	dbDelete('ports_perms', "`user_id` =  ?", array($_GET['user_id']));
+#        dbDelete('users_prefs', "`user_id` =  ?", array($_GET['user_id']));
+#        dbDelete('users', "`user_id` =  ?", array($_GET['user_id']));
+
+        if (deluser($delete_username)) { echo("<div class=infobox>User '$delete_username' deleted!</div>"); }
       }
       else
       {

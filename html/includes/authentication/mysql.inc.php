@@ -100,7 +100,15 @@ function get_userid($username)
 
 function deluser($username)
 {
+
+  dbDelete('bill_perms', "`user_name` =  ?", array($username));
+  dbDelete('devices_perms', "`user_name` =  ?", array($username));
+  dbDelete('ports_perms', "`user_name` =  ?", array($username));
+  dbDelete('users_prefs', "`user_name` =  ?", array($username));
+  dbDelete('users', "`user_name` =  ?", array($username));
+
   return dbDelete('users', "`username` =  ?", array($username));
+
 }
 
 
