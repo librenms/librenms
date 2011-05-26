@@ -198,7 +198,7 @@ if (bill_permitted($bill_id))
 #  $di = $di . "$type'>";
 
   $di = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
-  $di .= "&amp;from=" . $config['day'] .  "&amp;to=" . $config['now'];
+  $di .= "&amp;from=" . $config['time']['day'] .  "&amp;to=" . $config['time']['now'];
   $di .= "&amp;width=715&amp;height=200&amp;total=1'>";
 
 
