@@ -7,7 +7,7 @@ if (is_numeric($id))
 
   if (is_array($acc))
   {
-    if($auth || port_permitted($acc['interface_id'])))
+    if($auth || port_permitted($acc['interface_id']))
     {
       if(is_file($config['rrd_dir'] . "/" . $acc['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd")))
         {
