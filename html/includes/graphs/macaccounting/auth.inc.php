@@ -10,7 +10,7 @@ if (is_numeric($id))
     if($auth || port_permitted($acc['interface_id']))
     {
       if(is_file($config['rrd_dir'] . "/" . $acc['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd")))
-        {
+      {
         $rrd_filename = $config['rrd_dir'] . "/" . $acc['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");    
 
         $port   = get_port_by_id($acc['interface_id']);  
@@ -19,12 +19,16 @@ if (is_numeric($id))
         $title .= " :: Port  ".generate_port_link($port);
         $title .= " :: " . formatMac($acc['mac']);
         $auth   = TRUE;
+      } else {
+        $graph_error = "file not found";
       }
     } else {
-      $graph_error = "file not found";
+      $graph_error = "unauthenticated";
     }
   } else {
     $graph_error = "entry not found";
   }
+} else {
+  $graph_error = "invalid id";
 }
 ?>
