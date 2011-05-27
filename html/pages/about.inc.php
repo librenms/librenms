@@ -15,7 +15,7 @@ echo($config['version']);
 <?php print_optionbar_start(NULL); ?>
     <h3>License</h3>
     <pre>Observium Network Management and Monitoring System
-Copyright (C) 2006-2010 Adam Armstrong
+Copyright (C) 2006-<?php echo date("Y"); ?> Adam Armstrong
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
