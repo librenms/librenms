@@ -20,8 +20,8 @@ if (is_numeric($id))
 
       if(is_file($config['rrd_dir'] . "/" . $acc['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd")))
       {
+        if($debug) { echo("exists"); }
         $rrd_filename = $config['rrd_dir'] . "/" . $acc['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");    
-
         $port   = get_port_by_id($acc['interface_id']);  
         $device = device_by_id_cache($port['device_id']);
         $title  = generate_device_link($device);
