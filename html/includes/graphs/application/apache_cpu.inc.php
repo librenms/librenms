@@ -1,5 +1,7 @@
 <?php
 
+$scale_min = 0;
+
 include("includes/graphs/common.inc.php");
 
 $apache_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-apache-".$app['app_id'].".rrd";
