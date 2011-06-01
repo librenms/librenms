@@ -85,7 +85,8 @@ foreach ($acc_rows as $acc)
 
     if ($acc['update'])
     { /// Do Updates
-      dbUpdate($acc['update'], 'mac_accounting', 'WHERE `ma_id` = ?', array($acc['ma_id']));
+      print_r($acc['update']);
+      dbUpdate($acc['update'], 'mac_accounting', '`ma_id` = ?', array($acc['ma_id']));
     } /// End Updates
   }
 }
