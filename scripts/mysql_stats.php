@@ -40,8 +40,8 @@ if (!array_key_exists('SCRIPT_FILENAME', $_SERVER)
 # here, you can define them in another file named the same as this file, with a
 # .cnf extension.
 # ============================================================================
-$mysql_user = 'cactiuser';
-$mysql_pass = 'cactiuser';
+$mysql_user = 'user';
+$mysql_pass = 'password';
 $mysql_port = 3306;
 $mysql_ssl  = FALSE;   # Whether to use SSL to connect to MySQL.
 
