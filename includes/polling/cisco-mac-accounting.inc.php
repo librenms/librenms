@@ -3,7 +3,7 @@
 ## FIXME -- we're walking, so we can discover here too.
 
 $cip_oids = array('cipMacHCSwitchedBytes', 'cipMacHCSwitchedPkts');
-echo("Caching OID: ");
+echo("Cisco MAC - Caching OID: ");
 $cip_array = array();
 
 foreach ($cip_oids as $oid)
@@ -63,7 +63,7 @@ foreach ($acc_rows as $acc)
 
     if ($debug) { echo("\n" . $acc['hostname']." ".$acc['ifDescr'] . "  $mac -> $b_in:$b_out:$p_in:$p_out "); }
 
-    $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd")
+    $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");
 
     if (!is_file($rrdfile))
     {
