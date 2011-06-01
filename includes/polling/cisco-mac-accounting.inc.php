@@ -62,7 +62,8 @@ foreach ($acc_rows as $acc)
     }
 
     if ($debug) { echo("\n" . $acc['hostname']." ".$acc['ifDescr'] . "  $mac -> $b_in:$b_out:$p_in:$p_out "); }
-    $rrdfile = $host_rrd . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");
+
+    $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd")
 
     if (!is_file($rrdfile))
     {
