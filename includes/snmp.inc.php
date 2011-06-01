@@ -258,7 +258,9 @@ function snmpwalk_cache_cip($device, $oid, $array, $mib = 0)
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oid;
 
   if (!$debug) { $cmd .= " 2>/dev/null"; }
+  if ($debug) { echo("$cmd\n"); }
   $data = trim(shell_exec($cmd));
+  if ($debug) { echo("$data\n"); }
   $device_id = $device['device_id'];
 
   #echo("Caching: $oid\n");
