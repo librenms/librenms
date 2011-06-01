@@ -29,10 +29,10 @@ if (is_numeric($id))
         $title .= " :: " . formatMac($acc['mac']);
         $auth   = TRUE;
       } else {
-        $graph_error = "file not found";
+        graph_error("file not found");
       }
     } else {
-      $graph_error = "unauthenticated";
+      graph_error("unauthenticated");
     }
   } else {
     $graph_error = "entry not found";
