@@ -122,7 +122,7 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
 	if(dbQuery($sql, $data)) {
 		$return = mysql_affected_rows();
 	} else {
-                #echo("$fullSql");
+                echo("$fullSql");
 		trigger_error('QDB - Update failed.', E_USER_WARNING);
 		$return = false;
 	}
