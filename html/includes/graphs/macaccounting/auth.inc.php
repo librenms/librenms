@@ -35,9 +35,9 @@ if (is_numeric($id))
       graph_error("unauthenticated");
     }
   } else {
-    $graph_error = "entry not found";
+    graph_error("entry not found");
   }
 } else {
-  $graph_error = "invalid id";
+  graph_error("invalid id");
 }
 ?>
