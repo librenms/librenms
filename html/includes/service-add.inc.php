@@ -6,7 +6,7 @@
 
   if($service_id) {
     $message .= $message_break . "Service added (".$service_id.")!";
-    $message_break .= "<br />"
+    $message_break .= "<br />";
   }
 
 ?>
