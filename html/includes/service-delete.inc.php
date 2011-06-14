@@ -7,7 +7,7 @@
   if($affected) 
   {
     $message .= $message_break . $rows .  " service deleted!";
-    $message_break .= "<br />"
+    $message_break .= "<br />";
   }
 
 ?>

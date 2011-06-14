@@ -226,6 +226,28 @@ function generate_graph_tag($args)
   return '<img src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
 }
 
+function generate_graph_js_state($args) {
+  // we are going to assume we know roughly what the graph url looks like here.
+  // TODO: Add sensible defaults
+  $from   = (is_numeric($args['from'])   ? $args['from']   : 0);
+  $to     = (is_numeric($args['to'])     ? $args['to']     : 0);
+  $width  = (is_numeric($args['width'])  ? $args['width']  : 0);
+  $height = (is_numeric($args['height']) ? $args['height'] : 0);
+  $legend = str_replace("'", "", $args['legend']);
+
+  $state = <<<STATE
+<script type="text/javascript" language="JavaScript">
+document.graphFrom = $from;
+document.graphTo = $to;
+document.graphWidth = $width;
+document.graphHeight = $height;
+document.graphLegend = '$legend';
+</script>
+STATE;
+
+  return $state;
+}
+
 function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
 {
   $output = '
