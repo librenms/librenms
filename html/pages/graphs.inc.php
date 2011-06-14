@@ -118,6 +118,8 @@ if (!$auth)
   $graph_array['to']     = $to;
   $graph_array['legend'] = "yes";
 
+  echo generate_graph_js_state($graph_array);
+
   echo("<div style='width:1150px; margin: auto;'>");
   echo(generate_graph_tag($graph_array));
   echo("</div>");
