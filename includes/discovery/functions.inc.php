@@ -222,7 +222,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
   if ($descr && $size > "0")
   {
     $storage = dbFetchRow("SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?", array($index, $device['device_id'], $mib));
-    if (!count($storage))
+    if ($storage === FALSE || !count($storage))
     {
       $insert = dbInsert(array('device_id' => $device['device_id'], 'storage_descr' => $descr, 'storage_index' => $index, 'storage_mib' => $mib, 'storage_type' => $type, 
                                'storage_units' => $units, 'storage_size' => $size, 'storage_used' => $used), 'storage');
