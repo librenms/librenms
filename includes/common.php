@@ -18,7 +18,7 @@ function delete_port($int_id)
   dbDelete('links', "`remote_interface_id` =  ?", array($int_id));
   dbDelete('bill_ports', "`port_id` =  ?", array($int_id));
 
-  unlink(trim($config['rrd_dir'])."/".trim($interface['hostname'])."/".$interface['ifIndex'].".rrd");
+  unlink(trim($config['rrd_dir'])."/".trim($interface['hostname'])."/port-".$interface['ifIndex'].".rrd");
 }
 
 function sgn($int)

@@ -151,8 +151,6 @@ function delete_device($id)
 
   $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?", array($id));
 
-  dbDelete('devices', "`device_id` =  ?", array($id));
-
   foreach (dbFetch("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int_data)
   {
     $int_if = $int_data['ifDescr'];
@@ -160,6 +158,8 @@ function delete_device($id)
     delete_port($int_id);
     $ret .= "Removed interface $int_id ($int_if)\n";
   }
+
+  dbDelete('devices', "`device_id` =  ?", array($id));
   
   $device_tables = array('entPhysical', 'devices_attribs', 'devices_perms', 'bgpPeers', 'vlans', 'vrfs', 'storage', 'alerts', 'eventlog', 
                          'syslog', 'ports', 'services', 'alerts', 'toner', 'frequency', 'current', 'sensors');
