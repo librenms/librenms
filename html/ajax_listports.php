@@ -24,7 +24,9 @@ if (is_numeric($_GET['device_id']))
 {
   foreach (dbFetch("SELECT * FROM ports WHERE device_id = ?", array($_GET['device_id'])) as $interface)
   {
-    echo("obj.options[obj.options.length] = new Option('".$interface['ifDescr']." - ".$interface['ifAlias']."','".$interface['interface_id']."');\n");
+    $string = mres($interface['ifDescr']." - ".$interface['ifAlias']);
+    echo("obj.options[obj.options.length] = new Option('".$string."','".$interface['interface_id']."');\n");
+    #echo("obj.options[obj.options.length] = new Option('".$interface['ifDescr']." - ".$interface['ifAlias']."','".$interface['interface_id']."');\n");
   }
 }
 
