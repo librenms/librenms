@@ -188,7 +188,7 @@ foreach ($ports as $port)
     {
       if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]))
       {
-        $port['update'][$oid] = array(NULL);
+        $port['update'][$oid] = NULL;
         log_event($oid . ": ".$port[$oid]." -> NULL", $device, 'interface', $port['interface_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> NULL "); } else { echo($oid . " "); }
       } elseif ($port[$oid] != $this_port[$oid]) {
