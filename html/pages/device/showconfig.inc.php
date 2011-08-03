@@ -30,7 +30,7 @@ if ($_SESSION['userlevel'] >= "7")
   if (function_exists('svn_log')) {
     
     $sep     = " | ";
-    $svnlogs = svn_log($file, SVN_REVISION_HEAD, NULL, 10);
+    $svnlogs = svn_log($file, SVN_REVISION_HEAD, NULL, 5);
     $revlist = array();
     
     foreach ($svnlogs as $svnlog) {
@@ -40,7 +40,7 @@ if ($_SESSION['userlevel'] >= "7")
       
       if ($_GET['opta'] == $svnlog["rev"]) { echo('<span class="pagemenu-selected">'); }
     
-      echo("<a href='device/".$device['device_id']."/showconfig/" . $svnlog["rev"] .  "/'> r" . $svnlog["rev"] ."</a>");
+      echo("<a href='device/".$device['device_id']."/showconfig/" . $svnlog["rev"] .  "/'> r" . $svnlog["rev"] ." <small>". date("d M H:i", strtotime($svnlog["date"])) . "</small></a>");
       if ($_GET['opta'] == $svnlog["rev"]) { echo("</span>");  }
      
       $sep = " | ";
