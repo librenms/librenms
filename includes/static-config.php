@@ -695,6 +695,13 @@ $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
 $config['os'][$os]['icon']  		= "servertech";
 
+$os = "raritan";
+$config['os'][$os]['text']             = "Raritan PDU";
+$config['os'][$os]['type']             = "power";
+$config['os'][$os]['over'][0]['graph'] = "device_current";
+$config['os'][$os]['over'][0]['text']  = "Current";
+$config['os'][$os]['icon']             = "raritan";
+
 $os = "vmware";
 $config['os'][$os]['type']              = "server";
 $config['os'][$os]['text']              = "VMware";
