@@ -1,6 +1,67 @@
 
 <table border=0 cellpadding=10 cellspacing=10 width=100%>
   <tr>
+    <td colspan=2>
+
+<?php
+
+echo("<table><tr>");
+
+$dev_list = array('6'  => 'Central Fileserver', 
+                  '7'  => 'NE61 Fileserver', 
+                  '34' => 'DE56 Fileserver');
+
+foreach($dev_list as $device_id => $descr) 
+{
+
+  echo("<td>");
+  echo("<div style='font-size: 16px; font-weight: bold; color: #555555;'>".$descr."</div>");
+  $graph_array['height'] = "100";
+  $graph_array['width']  = "310";
+  $graph_array['to']     = $now;
+  $graph_array['id']     = $device_id;
+  $graph_array['type']   = "device_bits";
+  $graph_array['from']   = $day;
+  $graph_array['legend'] = "no";
+  $graph_array['popup_title'] = $descr;
+#  $graph_array['link']   = generate_device_link($device_id);
+  print_graph_popup($graph_array);
+
+  $graph_array['height'] = "50";
+  $graph_array['width']  = "180";
+
+  echo("<div style='margin: 1px; float: left; padding: 5px; background-color: #e5e5e5;'>");
+  $graph_array['type']   = "device_ucd_memory";
+  print_graph_popup($graph_array);
+  echo("</div>");
+
+  echo("<div style='margin: 1px; float: left; padding: 5px; background-color: #e5e5e5;'>");
+  $graph_array['type']   = "device_processor";
+  print_graph_popup($graph_array);
+  echo("</div>");
+
+  echo("<div style='margin: 1px; float: left; padding: 5px; background-color: #e5e5e5;'>");
+  $graph_array['type']   = "device_storage";
+  print_graph_popup($graph_array);
+  echo("</div>");
+
+  echo("<div style='margin: 1px; float: left; padding: 5px; background-color: #e5e5e5;'>");
+  $graph_array['type']   = "device_diskio";
+  print_graph_popup($graph_array);
+  echo("</div>");
+
+  echo("</td>");
+
+}
+
+echo("</tr></table>");
+
+
+?>
+
+    </td>
+  </tr>
+  <tr>
     <td bgcolor=#e5e5e5 valign=top>
 <?php
 
@@ -111,99 +172,6 @@ while ($entry = mysql_fetch_array($query))
 }
 
 echo("</table>");
-
-
-echo("</div>
-   </td>
-   <td bgcolor=#e5e5e5 width=470 valign=top>");
-
-/// this stuff can be customised to show whatever you want....
-  $ports['fileserver'] = "78";
-  $ports['broadband'] = "228,251,182";
-  $ports['homeserver'] = "256,245,74";
-
-echo("<div style=' margin-bottom: 5px;'>");
-
-if ($ports['fileserver'])
-{
-  echo("<div style='width: 470px;'>");
-  echo("<div style='font-size: 16px; font-weight: bold; color: #555555;'>Central Fileserver</div>");
-
-  $graph_array['height'] = "100";
-  $graph_array['width']  = "385";
-  $graph_array['to']     = $now;
-  $graph_array['id']   = $ports['fileserver'];
-  $graph_array['type']   = "port_bits";
-  $graph_array['from']   = $day;
-  $graph_array['legend'] = "no";
-
-  $graph_array['popup_title'] = "Central Fileserver";
-
-  print_graph_popup($graph_array);
-
-  echo("</div>");
-}
-
-echo("</div>");
-
-echo("<div style=' margin-bottom: 5px;'>");
-echo("<div style='width: 235px; float: left;'>
-    <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=port_bits&amp;id=182&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    <img src=\'graph.php?type=port_bits&amp;id=182&amp;from=".$week."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".    "
-    <div style='font-size: 16px; font-weight: bold; color: #555555;'>NE61 Broadband</div>".
-    "<img src='graph.php?type=port_bits&amp;id=182&amp;from=".$day."&amp;to=".$now."&amp;width=155&amp;height=100&amp;inverse=0&amp;legend=no'></a></div>");
-
-echo("<div style='width: 235px; float: right;'>
-    <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=port_bits&amp;id=28&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    <img src=\'graph.php?type=port_bits&amp;id=28&amp;from=".$week."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".    "
-    <div style='font-size: 16px; font-weight: bold; color: #555555;'>NE61 Server</div>".
-    "<img src='graph.php?type=port_bits&amp;id=28&amp;from=".$day."&amp;to=".$now."&amp;width=155&amp;height=100&amp;inverse=0&amp;legend=no'></a></div>");
-
-echo("</div>");
-
-echo("<div style=' margin-bottom: 5px;'>");
-
-echo("<div style='width: 235px; float: left;'>
-    <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=port_bits&amp;id=251&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    <img src=\'graph.php?type=port_bits&amp;id=251&amp;from=".$week."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".    "
-    <div style='font-size: 16px; font-weight: bold; color: #555555;'>DE56 Broadband</div>".
-    "<img src='graph.php?type=port_bits&amp;id=251&amp;from=".$day."&amp;to=".$now."&amp;width=155&amp;height=100&amp;inverse=0&amp;legend=no'></a></div>");
-
-echo("<div style='width: 235px; float: right;'>
-    <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=port_bits&amp;id=256&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    <img src=\'graph.php?type=port_bits&amp;id=256&amp;from=".$week."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".    "
-    <div style='font-size: 16px; font-weight: bold; color: #555555;'>DE56 Server</div>".
-    "<img src='graph.php?type=port_bits&amp;id=256&amp;from=".$day."&amp;to=".$now."&amp;width=155&amp;height=100&amp;inverse=0&amp;legend=no'></a></div>");
-
-echo("</div>");
-
-echo("<div style=' margin-bottom: 5px;'>");
-
-echo("<div style='width: 235px; float: left;'>
-    <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=port_bits&amp;id=228&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    <img src=\'graph.php?type=port_bits&amp;id=228&amp;from=".$week."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".    "
-    <div style='font-size: 16px; font-weight: bold; color: #555555;'>DE24 Broadband</div>".
-    "<img src='graph.php?type=port_bits&amp;id=228&amp;from=".$day."&amp;to=".$now."&amp;width=155&amp;height=100&amp;inverse=0&amp;legend=no'></a></div>");
-
-echo("<div style='width: 235px; float: right;'>
-    <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=port_bits&amp;id=245&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    <img src=\'graph.php?type=port_bits&amp;id=245&amp;from=".$week."&amp;to=".$now."&amp;width=400&amp;height=150&amp;inverse=0&amp;legend=1\'>\
-    ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".    "
-    <div style='font-size: 16px; font-weight: bold; color: #555555;'>DE24 Server</div>".
-    "<img src='graph.php?type=port_bits&amp;id=245&amp;from=".$day."&amp;to=".$now."&amp;width=155&amp;height=100&amp;inverse=0&amp;legend=no'></a></div>");
-
-echo("</div>");
 
 ?>
 </td>
