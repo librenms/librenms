@@ -155,6 +155,18 @@ print_optionbar_end();
       <a href="http://www.facebook.com/pages/Observer/128354461353">Facebook</a>
     </p>
 
+ 
+    <h3>Observium is a Free, Open project. Please donate to support continued development.</h3>
+
+  <div style="margin-top:10px;">
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input type="hidden" name="cmd" value="_s-xclick">
+    <input type="hidden" name="hosted_button_id" value="W2ZJ3JRZR72Z6">
+    <input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal . The safer, easier way to pay online.">
+    <img alt="" border="0" src="https://www.paypalobjects.com/en_GB/i/scr/pixel.gif" width="1" height="1">
+    </form>
+  </div>
+
     <h4>The Team</h4>
 
     <img src="images/icons/flags/gb.png"> <strong>Adam Armstrong</strong> Project Founder<br />
