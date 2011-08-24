@@ -216,7 +216,7 @@ CREATE TABLE IF NOT EXISTS `devices` (
   `sysName` varchar(128) CHARACTER SET latin1 DEFAULT NULL,
   `community` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `snmpver` varchar(4) CHARACTER SET latin1 NOT NULL DEFAULT 'v2c',
-  `port` smallint(5) NOT NULL DEFAULT '161',
+  `port` smallint(5) unsigned NOT NULL DEFAULT '161',
   `transport` varchar(16) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'udp',
   `timeout` int(11) DEFAULT NULL,
   `retries` int(11) DEFAULT NULL,
