@@ -44,7 +44,7 @@ function auth_usermanagement()
 
 function adduser($username, $password, $level, $email = "", $realname = "")
 {
-  return dbInsert(array('username' => $username, 'password' => $password. 'level' => $level, 'email' => $email, 'realname' => $realname), 'users');
+  return dbInsert(array('username' => $username, 'password' => $password, 'level' => $level, 'email' => $email, 'realname' => $realname), 'users');
 }
 
 function user_exists($username)
