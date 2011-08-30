@@ -14,6 +14,11 @@ $config['os']['default']['over'][1]['text']	= "Memory Usage";
 $os_group = "unix";
 $config['os_group'][$os_group]['type']  	     = "server";
 $config['os_group'][$os_group]['processor_stacked']  = 1;
+$config['os_group'][$os_group]['over'][0]['graph']  = "device_processor";
+$config['os_group'][$os_group]['over'][0]['text']   = "Processor Usage";
+$config['os_group'][$os_group]['over'][1]['graph']  = "device_ucd_memory";
+$config['os_group'][$os_group]['over'][1]['text']   = "Memory Usage";
+
 
 $os = "generic";
 $config['os'][$os]['text']      	= "Generic Device";
@@ -30,6 +35,11 @@ $config['os'][$os]['type']              = "server";
 $config['os'][$os]['group'] 		= "unix";
 $config['os'][$os]['text']  		= "Linux";
 $config['os'][$os]['ifXmcbc']		= 1;
+$config['os'][$os]['over'][0]['graph']  = "device_processor";
+$config['os'][$os]['over'][0]['text']   = "Processor Usage";
+$config['os'][$os]['over'][1]['graph']  = "device_ucd_memory";
+$config['os'][$os]['over'][1]['text']   = "Memory Usage";
+
 
 $os = "qnap";
 $config['os'][$os]['type']              = "server";
@@ -471,6 +481,8 @@ $config['os'][$os]['icon']  		= "apple";
 $os = "windows";
 $config['os'][$os]['text']        	= "Microsoft Windows";
 $config['os'][$os]['ifname']		= 1;
+$config['os'][$os]['processor_stacked']  = 1;
+
 
 $os = "bnt";
 $config['os'][$os]['text']              = "Blade Network Technologies";
