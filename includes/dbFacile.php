@@ -30,6 +30,8 @@ function dbQuery($sql, $parameters = array()) {
 		$time_start = microtime(true);
 	*/
 
+#	echo($fullSql);
+
 	$result = mysql_query($fullSql); // sets $this->result
 	/*
 	if($this->logFile) {
@@ -79,6 +81,9 @@ function dbInsert($data, $table) {
 		dbRollbackTransaction();
 		#$id = false;
 	}
+
+	logfile($fullSql);
+
         $time_end = microtime(true);
         $db_stats['insert_sec'] += number_format($time_end - $time_start, 8);
         $db_stats['insert']++;
@@ -122,7 +127,7 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
 	if(dbQuery($sql, $data)) {
 		$return = mysql_affected_rows();
 	} else {
-                echo("$fullSql");
+                #echo("$fullSql");
 		trigger_error('QDB - Update failed.', E_USER_WARNING);
 		$return = false;
 	}
