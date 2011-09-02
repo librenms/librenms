@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.cursor.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+	
+	<style type="text/css">
+	  .jqplot-cursor-legend {
+	    width: 160px;
+	    font-family: "Courier New";
+	    font-size: 0.85em;
+	  }
+	  
+	  td.jqplot-cursor-legend-swatch {
+	    width: 1.3em;
+	  }
+	  
+	  div.jqplot-cursor-legend-swatch {
+/*      width: 15px;*/
+	  }
+	</style>
+	
+	<script type="text/javascript" language="javascript">
+		$(document).ready(function(){
+      // $.jqplot.config.enablePlugins = true;
+		  
+    var goog = [["6/22/2009",425.32],
+    ["6/8/2009",424.84],
+    ["5/26/2009",417.23],
+    ["5/11/2009",390],
+    ["4/27/2009",393.69],
+    ["4/13/2009",392.24],
+    ["3/30/2009",369.78],
+    ["3/16/2009",330.16],
+    ["3/2/2009",308.57],
+    ["2/17/2009",346.45],
+    ["2/2/2009",371.28],
+    ["1/20/2009",324.7],
+    ["1/5/2009",315.07],
+    ["12/22/2008",300.36],
+    ["12/8/2008",315.76],
+    ["11/24/2008",292.96],
+    ["11/10/2008",310.02],
+    ["10/27/2008",359.36],
+    ["10/13/2008",372.54],
+    ["9/29/2008",386.91],
+    ["9/15/2008",449.15],
+    ["9/2/2008",444.25],
+    ["8/25/2008",463.29],
+    ["8/11/2008",510.15],
+    ["7/28/2008",467.86],
+    ["7/14/2008",481.32],
+    ["6/30/2008",537],
+    ["6/16/2008",546.43],
+    ["6/2/2008",567],
+    ["5/19/2008",544.62],
+    ["5/5/2008",573.2],
+    ["4/21/2008",544.06],
+    ["4/7/2008",457.45],
+    ["3/24/2008",438.08],
+    ["3/10/2008",437.92],
+    ["2/25/2008",471.18],
+    ["2/11/2008",529.64],
+    ["1/28/2008",515.9],
+    ["1/14/2008",600.25],
+    ["12/31/2007",657],
+    ["12/17/2007",696.69],
+    ["12/3/2007",714.87],
+    ["11/19/2007",676.7],
+    ["11/5/2007",663.97],
+    ["10/22/2007",674.6],
+    ["10/8/2007",637.39],
+    ["9/24/2007",567.27],
+    ["9/10/2007",528.75],
+    ["8/27/2007",515.25]];
+
+
+    var plot1 = $.jqplot('chart1', [goog], { 
+        // title: 'Google, Inc.', 
+        series: [{ 
+            // label: 'Google, Inc.', 
+            neighborThreshold: -1 
+        }], 
+        axes: { 
+            xaxis: { 
+                renderer:$.jqplot.DateAxisRenderer, 
+                min:'August 1, 2007', 
+                tickInterval: '4 months', 
+                tickOptions:{formatString:'%Y/%#m/%#d'} 
+            }, 
+            yaxis: { 
+                renderer: $.jqplot.LogAxisRenderer, 
+                tickOptions:{formatString:'$%.2f'} 
+            } 
+        }, 
+        cursor:{show:true, zoom:true} 
+    });
+
+
+    var plot2 = $.jqplot('chart2', [goog], { 
+        // title: 'Google, Inc.', 
+        series: [{ 
+            // label: 'Google, Inc.', 
+            neighborThreshold: -1 
+        }], 
+        axes: { 
+            xaxis: { 
+                renderer:$.jqplot.DateAxisRenderer, 
+                min:'August 1, 2007', 
+                tickInterval: '4 months', 
+                tickOptions:{formatString:'%Y/%#m/%#d'} 
+            }, 
+            yaxis: { 
+                renderer: $.jqplot.LogAxisRenderer, 
+                tickOptions:{formatString:'$%.2f'} 
+            } 
+        }, 
+        cursor:{show: true, zoom: true, looseZoom: true} 
+    });
+});
+</script>
+		
+</head>
+<body>
+<?php include "nav.inc"; ?>
+
+<div class="jqPlot" id="chart1" style="height:400px; width:600px;"></div>
+
+<button onclick="plot1.resetZoom()">Reset</button>
+
+<div class="jqPlot" id="chart2" style="height:400px; width:600px;"></div>
+<button onclick="plot2.resetZoom()">Reset</button>
+</body>
+
+
+</html>

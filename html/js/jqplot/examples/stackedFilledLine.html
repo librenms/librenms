@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+  <!-- END: load jqplot -->
+  <style type="text/css" media="screen">
+    .jqplot-axis {
+      font-size: 0.85em;
+    }
+  </style>
+  <script type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+line1 = [[2006, 4], [2007, 2], [2008, 9], [2009, 16]];
+line2 = [[2006, 3], [2007, 7], [2008, 6], [2009, 3]];
+line3 = [[2006, 5], [2007, 1], [2008, 5], [2009, 4]];
+plot3 = $.jqplot('chart', [line1, line2, line3], {
+    stackSeries: true,
+    legend: {
+        show: true,
+        location: 'nw'
+    },
+    title: 'Acme Company Unit Sales',
+    seriesDefaults: {
+        fill: true,
+        showMarker: false
+    },
+    series: [{
+        label: 'Traps Division'
+    },
+    {
+        label: 'Decoy Division',
+        fill: true
+    },
+    {
+        label: 'Harmony Division'
+    }],
+    axes: {
+        xaxis: {
+            ticks: [2006, 2007, 2008, 2009],
+            tickOptions: {
+                formatString: '%d'
+            }
+        },
+        yaxis: {
+            min: 0,
+            max: 30
+        }
+    }
+});
+
+
+  });
+  </script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+    <div id="chart" style="margin-top:20px; margin-left:20px; width:400px; height:300px;"></div>
+  </body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+  <!-- END: load jqplot -->
+  <style type="text/css" media="screen">
+    .jqplot-axis {
+      font-size: 0.85em;
+    }
+    .jqplot-legend {
+      font-size: 0.75em;
+    }
+  </style>
+  <script type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+var cosPoints1 = [];
+var cosPoints2 = [];
+var cosPoints3 = [];
+var cosPoints4 = [];
+for (var i = 0; i < 2 * Math.PI; i += 0.1) {
+    cosPoints1.push([i, Math.cos(i)]);
+    cosPoints2.push([i, Math.cos(i)+1]);
+    cosPoints3.push([i, Math.cos(i)+2]);
+    cosPoints4.push([i, Math.cos(i)+3]);
+}
+plot = $.jqplot('chart', [cosPoints1, cosPoints2, cosPoints3, cosPoints4], {
+    title: 'New Shadow Algorithm',
+    seriesDefaults:{showMarker: false},
+    series: [{lineWidth: 1.5}, {lineWidth: 2.5}, {lineWidth: 5}, {lineWidth: 8}]
+});
+
+
+line1 = [1, 4, 9, 16];
+line2 = [25, 12.5, 6.25, 3.125];
+line3 = [2, 7, 15, 30];
+plot2 = $.jqplot('chart2', [line1, line2, line3], {
+    stackSeries: true,
+    legend: {
+        show: true,
+        location: 'nw',
+        xoffset: 55
+    },
+    title: 'Bar Chart with Shadows',
+    seriesDefaults: {
+        renderer: $.jqplot.BarRenderer,
+        rendererOptions: {
+            barPadding: 2,
+            barMargin: 40
+        }
+    },
+    series: [{
+        label: 'Profits'
+    },
+    {
+        label: 'Expenses'
+    },
+    {
+        label: 'Sales'
+    }],
+    axes: {
+        xaxis: {
+            renderer: $.jqplot.CategoryAxisRenderer,
+            ticks: ['1st Qtr', '2nd Qtr', '3rd Qtr', '4th Qtr']
+        }
+    }
+});
+
+
+
+line1 = [1, 4, 3, 2];
+line2 = [7, 1, 2, 1];
+line3 = [2, 7, 1, 3];
+plot3 = $.jqplot('chart3', [line1, line2, line3], {
+    legend: {
+        show: true,
+        location: 'nw',
+        xoffset: 55
+    },
+    title: 'Bar Chart with Shadows',
+    seriesDefaults: {
+        renderer: $.jqplot.BarRenderer,
+        rendererOptions: {
+            barPadding: 10,
+            barMargin: 10
+        }
+    },
+    series: [{
+        label: 'Profits'
+    },
+    {
+        label: 'Expenses'
+    },
+    {
+        label: 'Sales'
+    }],
+    axes: {
+        xaxis: {
+            renderer: $.jqplot.CategoryAxisRenderer,
+            ticks: ['1st Qtr', '2nd Qtr', '3rd Qtr', '4th Qtr']
+        },
+        yaxis: {min:0}
+    }
+});
+
+  });
+  </script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+    <div id="chart" style="margin-top:20px; margin-left:20px; width:400px; height:400px;"></div>
+    <div id="chart2" style="margin-top:20px; margin-left:20px; width:400px; height:400px;"></div>
+    <div id="chart3" style="margin-top:20px; margin-left:20px; width:400px; height:400px;"></div>
+  </body>
+</html>

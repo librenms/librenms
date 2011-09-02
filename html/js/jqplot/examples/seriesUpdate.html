@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+
+  <!-- END: load jqplot -->
+  <style type="text/css" media="screen">
+    .jqplot-axis {
+      font-size: 0.85em;
+    }
+    .jqplot-title {
+      font-size: 1.1em;
+    }
+    select, input {
+        margin-right: 15px;
+    }
+    #chart1 {
+        margin-bottom: 40px;
+    }
+  </style>
+  <script type="text/javascript" language="javascript">
+    
+    function updatePoint() {
+        var f = document.forms[0];
+        var seriesIndex = f.seriesId.selectedIndex;
+        var series = plot1.series[seriesIndex];
+        var data = series.data[f.pointId.selectedIndex];
+        var xval = parseFloat(f.xvalue.value);
+        var yval = parseFloat(f.yvalue.value);
+        data[0] = xval;
+        data[1] = yval;
+        plot1.drawSeries({}, seriesIndex);
+        return false;
+    }
+    
+    function updateSeries() {
+        plot1.series[2].data = [[1,4], [2,6], [3,4], [4,1], [5,7]];
+        plot1.drawSeries({}, 2);
+        return false;
+    }
+  
+  $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+    var l1 = [2, 3, 1, 4, 3];
+    var l2 = [1, 4, 3, 2, 5];
+    var l3 = [7, 9, 11, 6, 8];
+
+
+    plot1 = $.jqplot('chart1', [l1, l2, l3], {
+        legend:{show:true},
+        series:[{label:'lions'}, {label:'tigers'}, {label:'bears'}]
+    });
+
+  });
+  </script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+<p>This example demonstrates how to update a point in a series and then redraw just that series.  You can select a series, a point and change it's x and y value with the form below the chart.</p>
+
+    <div id="chart1" style="margin-top:20px; margin-left:20px; width:360px; height:300px;"></div>
+    
+    <form action="#" onsubmit="return updatePoint();">
+        Series: <select name="seriesId">
+            <option value="0">lions</option>
+            <option value="1">tigers</option>
+            <option value="2">bears</option>
+        </select>
+        Point: <select name="pointId">
+            <option value="0">first</option>
+            <option value="1">second</option>
+            <option value="2">third</option>
+            <option value="3">fourth</option>
+            <option value="4">fifth</option>
+        </select>
+        X: <input type="text" size="3" name="xvalue" />
+        Y: <input type="text" size="3" name="yvalue" />
+        <input type="submit" name="submit" value="Update" />
+    </form>
+
+<p>The mechanism to update data in a series and then redraw the series is simple.  update the data in the "plot.series[seriesIndex].data[dataIndex]" and then redraw just that series with "plot.drawSeries(options, seriesIndex);"  Here is the relavent code which updates the series on this chart:</p>
+
+<pre>
+    var f = document.forms[0];
+    var seriesIndex = f.seriesId.selectedIndex;
+    var series = plot1.series[seriesIndex];
+    var data = series.data[f.pointId.selectedIndex];
+    var xval = parseFloat(f.xvalue.value);
+    var yval = parseFloat(f.yvalue.value);
+    data[0] = xval;
+    data[1] = yval;
+    plot1.drawSeries({}, seriesIndex);
+</pre>
+
+<p>You can also update an entire series dataset at once and redraw the series like so:</p>
+
+<pre>
+    plot1.series[2].data = [[1,4], [2,6], [3,4], [4,1], [5,7]];
+    plot1.drawSeries({}, 2);
+</pre>
+
+<p> You can test this by clicking the button below.  You should see the entire "bears" line drop lower on the chart.</p>
+<button onclick="return updateSeries();">Update Series</button>
+
+
+<p> Note that the redrawSeries method does not do any axes scaling or redraw any other elements on the chart.  It is intended to be a lightweight method to redraw just one series.  Also note, if no series Index is passed in as the second parameter to drawSeries, it will redraw all series without rescaling or redrawing other plot elements.</p>
+  </body>
+</html>

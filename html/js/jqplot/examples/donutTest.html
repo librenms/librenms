@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Donut Chart Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.donutRenderer.js"></script>
+  <!-- END: load jqplot -->
+
+  <script type="text/javascript" src="donutTest.js"></script>
+  <style type="text/css">
+    #code {
+        font: 10pt "Andale Mono", Monaco, "Courier New", sans-serif ;
+        white-space: pre;
+    }
+  </style>
+  
+    <script type="text/javascript">    
+    $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+        $('#code').load('donutTest.js');
+        $('#code').dialog({
+			height: 'auto',
+			width: 600,
+			modal: true,
+			autoOpen: false,
+			resizable: true,
+			draggable: true,
+			show: 'fold'
+		});
+
+    });
+    </script> 
+    
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+<div id="code"></div>
+    <p>To create donut plots, you have to include the "jqplot.donutRenderer.js" file in your source.  You can view the javascript that generated these plots by clicking the "View Code" button below.</p>
+    <button id="seecode" onclick="$('#code').dialog('open');">View Code</button>
+
+    <p>Below is a default donut plot.  Slices will highlight on mouseover.  Events are triggered when you mouseover a slice and also when you click on a slice.  Here We capture the 'jqplotDataClick' event and display the clicked series index, point index and data values.<p>
+    
+    <div><span>You Clicked: </span><span id="info1">Nothing yet</span></div>
+        
+    <div id="chart1" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+
+    <p>Below is a customized donut plot with 2 series.  Renderer options for sliceMargin, innerDiameter, and startAngle have been specified.  Here We capture the 'jqplotDataHighlight' event and display the currently highlighted series index, point index and data values.<p>
+    
+    <p>The plot target also fires a 'jqplotDataMouseOver' when the cursor is moused over a slice even if highlighting is turned off.  This event will fire continuously as the user mouses over the slice.  'jqplotDataHighlight' fires only once when the user first passes over the slice.  Additionally, a 'jqplotDataUnhighlight' event is fired when the user moves out of a slice (if highlighting is enabled).<p>
+
+    <div><span>Moused Over: </span><span id="info2">Nothing</span></div>
+    
+    <div id="chart2" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+    
+    <p>The next example has the plot's 'captureRightClick' option set to true.  This causes the plot to fire a 'jqplotRightClick' event the the user clicks the right mouse button over a slice.  Note, click highlighting is the same for both right and left clicks, although separate events are triggered.<p>
+
+    <div><span>You Right Clicked: </span><span id="info3">Nothing yet</span></div>
+    
+    <div id="chart3" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+    
+    <p>The fourth example shows a plot with no sliceMargin and with the shadow turned on.</p>
+    
+    <div id="chart4" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+    
+    <p style="margin-top:40px;">The last example shows a donut with all of the default colors.  Mouse over to see the default highlight colors.  Series colors can be specified with the "seriesColors" option on the plot or on the series.  The highlight colors are specified with the 'highlightColors' option on the series renderer.</p>
+    
+        <div id="chart5" style="margin-top:20px; margin-left:20px; width:400px; height:400px;"></div>
+        
+<p>A simple line chart is added to test for imcompatabilities.</p>
+        <div id="chart6" style="margin-top:20px; margin-left:20px; width:100px; height:100px;"></div>
+  </body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.enhancedLegendRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.pieRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+  <!-- END: load jqplot -->
+
+<style type="text/css">
+    div.plot {
+        margin-bottom: 70px;
+    }
+    
+    p {
+        margin: 2em 0;
+    }
+    
+    .jqplot-target {
+        border: 1px solid #cccccc;
+    }
+</style>
+
+<script id="example_1" type="text/javascript">$(document).ready(function(){
+   s1 = [1,6,9,8];
+   s2 = [4,3,1,2];
+   s3 = [6,2,4,1];
+   s4 = [1,2,3,4];
+   s5 = [4,3,2,1];
+   s6 = [8,2,6,3];
+
+   plot1 = $.jqplot('chart1',[s1, s2, s3, s4, s5, s6],{
+       stackSeries: true,
+        seriesDefaults: {
+            fill: true,
+            showMarker: false,
+        },
+       legend:{
+           renderer: $.jqplot.EnhancedLegendRenderer,
+           show:true,
+           labels:['Fog', 'Rain', 'Frost', 'Sleet', 'Hail', 'Snow'],
+           rendererOptions:{
+               numberRows: 1
+           },
+           placement: 'outsideGrid',
+           location: 's'
+		},
+		axes: {
+		    xaxis:{min:1, max:4},
+		    yaxis:{min:0, max:35}
+		}
+   });
+});
+</script>
+  
+<script id="example_2" type="text/javascript">$(document).ready(function(){
+    plot2 = $.jqplot('chart2',[s1, s2, s3, s4, s5, s6],{
+        stackSeries: true,
+        title: 'Precipitation Potential',
+        seriesDefaults: {
+            renderer: $.jqplot.BarRenderer
+        },
+        legend:{
+            renderer: $.jqplot.EnhancedLegendRenderer,
+            show:true,
+            showLabels: true,
+            labels:['Fog', 'Rain', 'Frost', 'Sleet', 'Hail', 'Snow'],
+            rendererOptions:{
+                numberColumns:1,
+                seriesToggle: 900,
+                disableIEFading: false
+            },
+            placement:'outsideGrid',
+            marginLeft: '25px',
+            marginTop: '0px'
+        },
+        axes: {
+            xaxis:{renderer: $.jqplot.CategoryAxisRenderer},
+            yaxis:{min:0, max:35}
+        }
+    });
+});
+</script>
+  
+<script id="example_3" type="text/javascript">$(document).ready(function(){
+    plot3 = $.jqplot('chart3',[s1, s2, s3, s4, s5, s6],{
+        stackSeries: true,
+        seriesDefaults: {
+            fill: false,
+            showMarker: false
+        },
+        series : [
+            {yaxis: 'y2axis'},
+            {yaxis: 'y3axis'}
+        ],
+        legend:{
+            renderer: $.jqplot.EnhancedLegendRenderer,
+            show:true,
+            labels:['Fog', 'Rain', 'Frost', 'Sleet', 'Hail', 'Snow'],
+            rendererOptions:{
+                numberColumns:1
+            },
+            placement:'outsideGrid',
+            location: 'e',
+            marginLeft: '0px'  // the y3 axis will already pad itself, don't need extra margin.
+        },
+        axes: {
+            xaxis:{min:1, max:4},
+            yaxis:{min:0, max:35}
+        }
+    });
+});
+</script>
+
+<script id="example_4" type="text/javascript">$(document).ready(function(){
+   plot4 = $.jqplot('chart4',[s1, s2, s3, s4, s5, s6],{
+       stackSeries: true,
+       title: 'Progressive Projection',
+        seriesDefaults: {
+            fill: true,
+            showMarker: false,
+        },
+        series: [
+            {xaxis: 'x2axis'}
+        ],
+       legend:{
+           renderer: $.jqplot.EnhancedLegendRenderer,
+           show:true,
+           labels:['Fog', 'Rain', 'Frost', 'Sleet', 'Hail', 'Snow'],
+           rendererOptions:{
+               numberRows: 1
+           },
+           placement: 'outsideGrid',
+           location: 's'
+		},
+		axes: {
+		    xaxis:{min:1, max:4, label: 'Dilution Count'},
+		    x2axis:{min:1, max:4},
+		    yaxis:{min:0, max:35}
+		}
+   });
+});
+</script>
+
+<script id="example_5" type="text/javascript">$(document).ready(function(){
+   plot5 = $.jqplot('chart5',[s1, s2, s3, s4, s5, s6],{
+       stackSeries: true,
+       title: 'Progressive Projection',
+        seriesDefaults: {
+            fill: true,
+            showMarker: false,
+        },
+        series: [
+            {xaxis: 'x2axis'}
+        ],
+       legend:{
+           renderer: $.jqplot.EnhancedLegendRenderer,
+           show:true,
+           labels:['Fog', 'Rain', 'Frost', 'Sleet', 'Hail', 'Snow'],
+           rendererOptions:{
+               numberRows: 1
+           },
+           placement: 'outsideGrid',
+           location: 'n'
+		},
+		axes: {
+		    xaxis:{min:1, max:4},
+		    x2axis:{min:1, max:4},
+		    yaxis:{min:0, max:35}
+		}
+   });
+});
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+        $('#code_1').html($('#example_1').html());
+        $('#code_2').html($('#example_2').html());
+        $('#code_3').html($('#example_3').html());
+        $('#code_4').html($('#example_4').html());
+        $('#code_5').html($('#example_5').html());
+        $(document).unload(function() {$('*').unbind(); });
+
+    });
+</script> 
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+
+<p>This example demonstrates how to use the legend "location: 'outsideGrid'" option.  This option will place the legend outside of the grid but inside of the plot target.  It will shrink the grid to accommodate the plot target.  Borders have been added to the plot target container elements to clarify how the legend is drawn in each case.</p>
+
+<div id="chart1" class="plot" style="width:500px;height:300px;"></div>
+
+    <pre id="code_1" class="code-block"></pre>
+    
+<div id="chart2" class="plot" style="width:500px;height:300px;"></div>
+
+    <pre id="code_2" class="code-block"></pre>
+
+<div id="chart3" class="plot" style="width:500px;height:300px;"></div>
+
+    <pre id="code_3" class="code-block"></pre>
+
+<div id="chart4" class="plot" style="width:500px;height:300px;"></div>
+
+    <pre id="code_4" class="code-block"></pre>
+
+<div id="chart5" class="plot" style="width:500px;height:300px;"></div>
+
+    <pre id="code_5" class="code-block"></pre>
+    
+  </body>
+</html>

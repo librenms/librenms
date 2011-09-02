@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Enhanced Tick Algorithm</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasTextRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisTickRenderer.js"></script>
+  <!-- END: load jqplot -->
+<style type="text/css">
+.jqplot-target {
+    margin-bottom: 30px;
+}
+</style>
+<script language="javascript" type="text/javascript">
+$(document).ready(function(){
+
+   // s1 = [[0, 1], [1,3]];
+   // 
+   // plot1 = $.jqplot('chart1',[s1],{
+   //     seriesDefaults: {renderer: $.jqplot.BarRenderer},
+   //     axes: {
+   //         xaxis: {
+   //             renderer: $.jqplot.CategoryAxisRenderer
+   //         },
+   //         yaxis: {
+   //             // autoscale: true,
+   //             tickOptions: {
+   //                 formatString: '%d'
+   //             }
+   //         }
+   //     },
+   //     legend: {show: true}
+   // });
+   // 
+   // s1 = [[0, 1]];
+   // 
+   // plot2 = $.jqplot('chart2',[s1],{
+   //     seriesDefaults: {renderer: $.jqplot.BarRenderer},
+   //     axes: {
+   //         xaxis: {
+   //             renderer: $.jqplot.CategoryAxisRenderer
+   //         },
+   //         yaxis: {
+   //             // autoscale: true,
+   //             tickOptions: {
+   //                 formatString: '%d'
+   //             }
+   //         }
+   //     },
+   //     legend: {show: true}
+   // });
+   // 
+   // s1 = [3,1.5,2,0.5,2,1,2.5];
+   // 
+   // plot3 = $.jqplot('chart3',[s1],{
+   //     axes: {
+   //         yaxis: {
+   //             tickOptions: {
+   //                 formatString: '%d'
+   //             }
+   //         }
+   //     },
+   //     title: 'Default Tick Renderer',
+   //     legend: {show: true}
+   // });
+   // 
+   // s1 = [3,1.5,2,0.5,2,1,2.5];
+   // 
+   // plot4 = $.jqplot('chart4',[s1],{
+   //     axes: {
+   //         yaxis: {
+   //             tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+   //             tickOptions: {
+   //                 formatString: '%d',
+   //                 angle: -30
+   //             }
+   //         }
+   //     },
+   //     title: 'Canvas Tick Renderer',
+   //     legend: {show: true}
+   // });
+   // 
+   // s1 = [.4,.3,.5,.1,.6,.2];
+   // 
+   // plot5 = $.jqplot('chart5',[s1],{
+   //     axes: {
+   //         yaxis: {
+   //             tickOptions: {
+   //                 formatString: '%d'
+   //             }
+   //         }
+   //     },
+   //     legend: {show: true}
+   // });
+   // 
+   // s1 = [[0, 1]];
+   // 
+   // plot6 = $.jqplot('chart6',[s1],{
+   //     seriesDefaults: {renderer: $.jqplot.BarRenderer},
+   //     axes: {
+   //         xaxis: {
+   //             renderer: $.jqplot.CategoryAxisRenderer
+   //         },
+   //         yaxis: {
+   //             // autoscale: true,
+   //             tickOptions: {
+   //                 formatString: '%d'
+   //             },
+   //             tickInterval: 1,
+   //             min: 0
+   //         }
+   //     },
+   //     legend: {show: true}
+   // });
+   // 
+   s1 = [3,1.5,2,0.5,2,1,2.5];
+
+   plot7 = $.jqplot('chart7',[s1],{
+       axes: {
+           yaxis: {
+               min: 0,
+               tickOptions: {
+                   formatString: '%d',
+                   numberTicks: 6
+               }
+           }
+       },
+   });
+   
+   s1 = [3,1.5,2,0.5,2,1,2.5];
+
+   plot8 = $.jqplot('chart8',[s1],{
+       axes: {
+           yaxis: {
+               min: 0,
+               max: 6,
+               tickOptions: {
+                   formatString: '%d'
+               }
+           }
+       }
+   });
+   
+ });
+</script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+<p>Tests of enhancements to axis tick generation algorithm.  Axis now checks to see if the tick interval (delta between ticks) is less than the precision of the tick format string.  If it is, it will try to increase the tick interval, number of ticks or change the axis minimum or maximum so that it is at least as great as the tick label precision.</p>
+
+<p>Note, if the user has specified the axis tickInterval, numberTicks, min or max options, the algorithm may not be able to produce the desired ticks.</p>
+
+<p>This helps in situations where the user wants to display ticks formatted as integer values on a plot with a very small range.  For example, a plot with a y axis range from 0 to 2 and 6 ticks will have a tickInterval of 0.4 and ticks like [0, 0.4, 0.8, 1.2, 1.6, 2].  When formatted as integers, the plot displays ticks like [0, 0, 1, 1, 2, 2].  The new algorithm will try to adjust the number of ticks or the axis minimum or maximum to generate ticks like [0, 1, 2].</p>
+
+<div id="chart1" class="plot" style="width:400px;height:300px;"></div>
+<div id="chart2" class="plot" style="width:400px;height:300px;"></div>
+<div id="chart3" class="plot" style="width:400px;height:300px;"></div>
+<div id="chart4" class="plot" style="width:400px;height:300px;"></div>
+<div id="chart5" class="plot" style="width:400px;height:300px;"></div>
+<div id="chart6" class="plot" style="width:400px;height:300px;"></div>
+<div id="chart7" class="plot" style="width:400px;height:300px;"></div>
+<div id="chart8" class="plot" style="width:400px;height:300px;"></div>
+  </body>
+</html>

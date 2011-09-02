@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.min.js"></script><![endif]-->
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+  <!-- // <script language="javascript" type="text/javascript" src="../plugins/jqplot.pointLabels.js"></script> -->
+	
+	<style type="text/css">
+	  div.jqplot {
+	    margin: 40px;
+	  }
+	</style>
+	
+	<script type="text/javascript" language="javascript">
+		$(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+		  line0a = [[-8.69, -5],[465.234, 48]];
+		  line0 = [-4, -7, 9, 16, 3, 5, -2, 1, -6, -3, -2, 8];
+		  line1 = [4, -7, 9, 16];
+      line2 = [3, -3, 6.25, 3.125];
+      line3 = [8, -5, 6, 22];
+      line4 = [12, 5, 8, 15];		  
+      line5 = [4, 3, 9, 16];
+      line6 = [3, 7, 6.25, 3.125];
+      line7 = [8, 5, 6, 22];
+      
+      plot1 = $.jqplot('chart1', [line0], {
+        legend: {show: false, location: 'nw'},
+        // stackSeries:true,
+        seriesDefaults: {
+          fill:true, 
+          fillToZero: true,
+          showMarker: false},
+        series: [
+          {label: 'Traps Division'}
+        ],
+        axes: {
+            xaxis: {
+                renderer:$.jqplot.CategoryAxisRenderer,
+                ticks:[1900,1910,1920,1930,1940,1950,1960,1970,1980,1990,2000,2010], 
+                tickOptions:{showGridline:false, formatString:'%d'}
+            }, 
+            // yaxis: {min: -5, max: 25, numberTicks:7}
+            yaxis:{autoscale:true}
+        }
+      });
+      
+      plot1b = $.jqplot('chart1b', [line0a], {
+        legend: {show: false, location: 'nw'},
+        seriesDefaults: {
+          fill:true, 
+          fillToZero: true,
+          showMarker: false},
+        series: [
+          {label: 'Traps Division'}
+        ],
+        axes: {
+          xaxis:{autoscale:true, pad:1.4},
+            yaxis:{pad:1.1, autoscale:true, tickOptions:{formatString:'%.2f'}}
+        }
+      });
+      
+      plot2 = $.jqplot('chart2', [line1, line2], {
+        legend: {show: false, location: 'nw'},
+        seriesDefaults: {fill:true, fillToZero:true, showMarker: false, renderer:$.jqplot.BarRenderer},
+        series: [
+          {label: 'Traps Division'}, 
+          {label: 'Decoy Division'}
+        ],
+        axes: {
+            xaxis: {
+                renderer:$.jqplot.CategoryAxisRenderer,
+                ticks:[2006,2007,2008,2009], 
+                tickOptions:{formatString:'%d'}
+            }, 
+            // yaxis: {min: -5, max: 25, numberTicks:7}
+            yaxis:{autoscale:true}
+        }
+      });
+      
+      plot3 = $.jqplot('chart3', [line5, line6, line7], {
+        stackSeries: true,
+        legend: {show: true, location: 'nw'},
+        seriesDefaults: {fill:true, 
+          // fillToZero:true, 
+          showMarker: false, renderer:$.jqplot.BarRenderer, rendererOptions:{barMargin:30}},
+        series: [
+          {label: 'Traps Division'}, 
+          {label: 'Decoy Division'},
+          {label: 'Bonuses', renderer:$.jqplot.LineRenderer, disableStack:true, fill:false}
+        ],
+        axes: {
+            xaxis: {
+                renderer:$.jqplot.CategoryAxisRenderer,
+                ticks:[2006,2007,2008,2009], 
+                tickOptions:{formatString:'%d'}
+            }, 
+            // yaxis: {min: -5, max: 25, numberTicks:7}
+            yaxis:{autoscale:true}
+        }
+      });  
+    });
+</script>
+		
+</head>
+<body>
+<?php include "nav.inc"; ?>
+<div class="jqPlot" id="chart1" style="height:320px; width:420px;"></div>
+<div class="jqPlot" id="chart1b" style="height:320px; width:420px;"></div>
+<div class="jqPlot" id="chart2" style="height:320px; width:420px;"></div>
+<div class="jqPlot" id="chart3" style="height:320px; width:420px;"></div>
+ 
+</body>
+
+
+</html>

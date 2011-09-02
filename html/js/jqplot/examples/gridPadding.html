@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <!-- END: load jqplot -->
+ 
+<script class="code" type="text/javascript">$(document).ready(function(){   
+    plot1a = $.jqplot('chart1a', [[1,2,1]], 
+        {
+            title: 'Sample Grid Padding'
+        }
+    );
+});</script> 
+  
+<script class="code" type="text/javascript">$(document).ready(function(){   
+    plot1 = $.jqplot('chart1', [[1,2,1]], 
+        {
+            title: 'Sample Grid Padding',
+            gridPadding: {top:0, right:0, bottom:0, left:0}
+        }
+    );
+});</script>  
+
+<script class="code" type="text/javascript">$(document).ready(function(){   
+    plot2 = $.jqplot('chart2', [[1,2,1]], 
+        {
+            title: 'Sample Grid Padding',
+            gridPadding: {top:null, right:0, bottom:62, left:0}
+        }
+    );
+});</script>
+  
+<script class="code" type="text/javascript">$(document).ready(function(){   
+    plot3 = $.jqplot('chart3', [[1,2,1]], 
+        {
+            gridPadding: {right:60}
+        }
+    );
+});</script>
+
+<script type="text/javascript">    
+    $(document).ready(function(){
+        $('script.code').each(function(index) {
+            $('pre.code').eq(index).text($(this).html());
+        });
+        $(document).unload(function() {$('*').unbind(); });
+    });
+</script>
+
+<style type="text/css">
+    .jqplot-target {
+        border: 1px solid red;
+        margin-left: 20px;
+        margin-top: 20px;
+        width: 400px;
+        height: 300px;
+    }
+
+    pre.code {
+        margin-top: 35px;
+    }
+</style>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+<p>Setting custom gridPadding on charts.  The red border indicates the plot target container.  By default, the grid will size itself to fit axes, titles, etc. within the plot target.  This values will be overridden if a "gridPadding" option is specified.</p>
+<p>The default computed gridPadding:</p>
+    <div id="chart1a"></div>
+    <pre class="code"></pre>
+<p>Setting all gridPadding to 0 hides the title under the plot:</p>
+    <div id="chart1"></div>
+    <pre class="code"></pre>
+<p>If a gridPadding member is null or undefined, the default will be used:</p>
+    <div id="chart2"></div>
+    <pre class="code"></pre>
+<p>Just specify padding on the sides we need, defaults used for others:</p>
+    <div id="chart3"></div>
+    <pre class="code"></pre>
+  </body>
+</html>

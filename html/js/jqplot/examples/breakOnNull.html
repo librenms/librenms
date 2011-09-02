@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Break On Null Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+
+
+  <!-- END: load jqplot -->
+<script language="javascript" type="text/javascript">
+  
+$(document).ready(function(){
+
+   s1 = [null, 13, 43, null, 18, 25, 26, 41, 42, null, null, null, 37, 29, 27, 19]; 
+
+   plot1 = $.jqplot('chart1',[s1],{ 
+       title: 'breakOnNull true', 
+        series:[ 
+            {breakOnNull: true} 
+        ],
+        axes: {
+            xaxis: {
+                min: 0,
+                max:18,
+                tickInterval: 2
+            }
+        }
+   });
+       
+});
+
+
+</script>
+
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+<div id="chart1" style="margin:20px;height:300px; width:600px;"></div>
+  </body>
+</html>

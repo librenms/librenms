@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+  <!-- END: load jqplot -->
+  <style type="text/css" media="screen">
+    .jqplot-axis {
+      font-size: 0.85em;
+    }
+  </style>
+  <script type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+line1 = [['June 6, 2009', 2], ['June 7, 2009', 33], ['June 8, 2009', 14], ['June 9, 2009', 19]];
+today = [['2009/06/08', 2], ['2009/06/08', 33]];
+plot2 = $.jqplot('chart', [line1, today], {
+    title: 'Date Data with line at today',
+    axes: {
+        xaxis: {
+            renderer: $.jqplot.DateAxisRenderer,
+            numberTicks: 5
+        }
+    },
+    series:[{},{lineWidth:1, color:'#999999', showMarker:false}]
+});
+
+
+  });
+  </script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+    <div id="chart" style="margin-top:20px; margin-left:20px; width:500px; height:300px;"></div>
+  </body>
+</html>

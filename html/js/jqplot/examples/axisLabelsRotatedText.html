@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.min.js"></script><![endif]-->
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.logAxisRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasTextRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisLabelRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisTickRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+	
+	<style type="text/css">
+	  .jqplot-point-label {white-space: nowrap;}
+/*    .jqplot-yaxis-label {font-size: 14pt;}*/
+/*    .jqplot-yaxis-tick {font-size: 7pt;}*/
+    .jqplot { margin: 70px;}
+	</style>
+	
+	
+		<script class="code" type="text/javascript" language="javascript">
+$(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+	line1 = [6.5, 9.2, 14, 19.65, 26.4, 35, 51];
+
+	plot1 = $.jqplot('chart1', [line1], {
+	    legend: {show:false},
+	    axes:{
+	      xaxis:{
+          tickOptions:{
+            // formatString:'%.4f', 
+            angle: -30
+          },
+          // tickRenderer:$.jqplot.CanvasAxisTickRenderer,
+	        label:'Core Motor Amperage', 
+          labelOptions:{
+            // fontFamily:'Helvetica',
+            fontSize: '13pt'
+          },
+          labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+	      }, 
+	      yaxis:{
+          renderer:$.jqplot.LogAxisRenderer,
+          tickOptions:{
+            formatString:'%.2f', 
+            labelPosition: 'middle', 
+            angle:-30
+          },
+          tickRenderer:$.jqplot.CanvasAxisTickRenderer,
+          labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+          labelOptions:{
+            // fontFamily:'Helvetica',
+            fontSize: '13pt'
+          },
+	        label:'Core Motor Voltage'
+	      }
+	    }
+	});
+
+});
+</script>
+<script class="code" type="text/javascript" language="javascript">
+$(document).ready(function(){	
+      $.jqplot.config.enablePlugins = true;
+    line2 = [['1/1/2008', 42], ['2/14/2008', 56], ['3/7/2008', 39], ['4/22/2008', 81]];
+	plot2 = $.jqplot('chart2', [line2], {
+	  axes: {
+	    xaxis: {
+	      renderer: $.jqplot.DateAxisRenderer,
+	      label: 'Incliment Occurrance',
+	      labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+	      tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+	      tickOptions: {
+          // labelPosition: 'middle',
+          angle: 15
+	      }
+	      
+	    },
+	    yaxis: {
+	      label: 'Incliment Factor',
+	      labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+	    }
+	  }
+	});
+
+});
+</script>
+<script class="code" type="text/javascript" language="javascript">
+$(document).ready(function(){   
+      $.jqplot.config.enablePlugins = true;
+line3 = [['Cup Holder Pinion Bob', 7], ['Generic Fog Lamp Marketing Gimmick', 9], ['HDTV Receiver', 15], ['8 Track Control Module', 12], ['SSPFM (Sealed Sludge Pump Fourier Modulator)', 3], ['Transcender/Spice Rack', 6], ['Hair Spray Rear View Mirror Danger Indicator', 18]];
+
+	plot3 = $.jqplot('chart3', [line3], {
+	  series:[{renderer:$.jqplot.BarRenderer}],
+	  axes: {
+	    xaxis: {
+	      renderer: $.jqplot.CategoryAxisRenderer,
+	      label: 'Warranty Concern',
+	      labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+	      tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+	      tickOptions: {
+          angle: -30,
+          fontFamily: 'Times',
+          fontSize: '12pt'
+	      }
+	      
+	    },
+	    yaxis: {
+	      label: 'Occurance',
+	      labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+	    }
+	  }
+	});
+	
+	
+});
+		</script>
+    
+<script type="text/javascript" src="example.js"></script>
+		
+</head>
+<body>
+<?php include "nav.inc"; ?>
+		<div class="jqplot code" id="chart1"></div>
+		<div class="jqplot code" id="chart2"></div>
+		<div class="jqplot code" id="chart3"></div>
+
+</body>
+
+
+</html>

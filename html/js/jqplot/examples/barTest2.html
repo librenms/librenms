@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <!-- Use Compatibility mode in IE -->
+  <title>Bar Charts</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+  <!-- END: load jqplot -->
+
+  <style type="text/css">
+    .jqplot-target {
+        margin-bottom: 2em;
+    }
+    
+    pre {
+        background: #D8F4DC;
+        border: 1px solid rgb(200, 200, 200);
+        padding-top: 1em;
+        padding-left: 3em;
+        padding-bottom: 1em;
+        margin-top: 1em;
+        margin-bottom: 4em;
+        
+    }
+    
+    p {
+        margin: 2em 0;
+    }
+    
+    .note {
+        font-size: 0.8em;
+    }
+  </style>
+  
+  <script class="code" type="text/javascript">
+  $(document).ready(function(){
+    var s1 = [200, 600, 700, 1000];
+    var s2 = [460, -210, 690, 820];
+    var s3 = [-260, -440, 320, 200];
+    var ticks = ['a', 'b', 'c', 'd'];
+
+    plot1 = $.jqplot('chart1', [s1, s2, s3], {
+      seriesDefaults:{
+        renderer:$.jqplot.BarRenderer,
+        rendererOptions: {fillToZero: true}
+      },
+      series:[
+        {label:'Hotel'},
+        {label:'Event Regristration'},
+        {label:'Airfare'}
+      ],
+      legend: {
+        show: true,
+        placement: 'outsideGrid'
+      },
+      axes: {
+        xaxis: {
+          renderer: $.jqplot.CategoryAxisRenderer,
+          ticks: ticks
+        },
+        yaxis: {
+          autoscale: true,
+          tickOptions: {formatString: '$%d'}
+        }
+      }
+    });
+  });
+  </script>
+  
+    <script type="text/javascript">    
+        $(document).ready(function(){
+            $('script.code').each(function(index) {
+                $('pre.code').eq(index).text($(this).html());
+            });
+            $('script.common').each(function(index) {
+                $('pre.common').eq(index).html($(this).html());
+            });
+            $(document).unload(function() {$('*').unbind(); });
+        });
+    </script> 
+    
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+        
+    <div id="chart1" style="margin-top:20px; margin-left:20px; width:600px; height:300px;"></div>
+    <pre class="code"></pre>
+
+  </body>
+</html>

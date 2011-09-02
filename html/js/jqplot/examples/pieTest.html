@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.pieRenderer.js"></script>
+  <!-- END: load jqplot -->
+
+  <style type="text/css">
+  div.jqplot-target { margin-bottom: 45px; }
+  </style>
+  
+<script class="code" type="text/javascript">$(document).ready(function(){
+    plot1 = $.jqplot('pie1', [[['a',25],['b',14],['c',7]]], {
+        gridPadding: {top:0, bottom:38, left:0, right:0},
+      seriesDefaults:{renderer:$.jqplot.PieRenderer, trendline:{show:false}, rendererOptions: { padding: 8, showDataLabels: true}},
+                  legend:{
+                      show:true, 
+                      placement: 'outside', 
+                      rendererOptions: {
+                          numberRows: 1
+                      }, 
+                      location:'s',
+                      marginTop: '15px'
+                  }       
+    });
+});</script>
+
+<script class="code" type="text/javascript">$(document).ready(function(){
+    plot2 = $.jqplot('pie2', [[['a',25],['b',14],['c',7]]], {
+      seriesDefaults:{renderer:$.jqplot.PieRenderer, trendline:{show:true}},
+      legend:{show:true}    
+    });
+});</script>
+
+<script class="code" type="text/javascript">$(document).ready(function(){    
+    plot3 = $.jqplot('pie3', [[['a',1],['b',9],['c',1]]], {
+      seriesDefaults:{shadow: false, renderer:$.jqplot.PieRenderer, rendererOptions:{sliceMargin: 4, startAngle: -90}, trendline:{show:true}},
+      legend:{show:true}      
+    });
+});</script>
+ 
+<script class="code" type="text/javascript">$(document).ready(function(){   
+    plot4 = $.jqplot('pie4', [[["a",0],["b",1],["c",.01]]], {
+      seriesDefaults:{renderer:$.jqplot.PieRenderer, rendererOptions:{sliceMargin: 0},  trendline:{show:true}},
+      legend:{show:true}      
+    });
+});</script> 
+  
+<script class="code" type="text/javascript">$(document).ready(function(){  
+    plot5 = $.jqplot('pie5', [[["none",23],["error",0],["click",5],["impression",25]]], {
+      seriesDefaults:{renderer:$.jqplot.PieRenderer},
+      legend:{show:true}      
+    });   
+});</script>
+  
+<script class="code" type="text/javascript">$(document).ready(function(){  
+    plot6 = $.jqplot('pie6', [[["none",0],["error",0],["click",0],["impression",0]]], {
+      seriesDefaults:{renderer:$.jqplot.PieRenderer},
+      legend:{show:true}      
+    });   
+});</script>
+
+  
+<script type="text/javascript">    
+    $(document).ready(function(){
+        $('script.code').each(function(index) {
+            $('pre.code').eq(index).text($(this).html());
+        });
+        $(document).unload(function() {$('*').unbind(); });
+    });
+</script>
+
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+    <p>This page tests for 3 conditions.  Plotting pies with a slice that begins at 0 and ends at and near 2*pi (360 degrees), disabling the trendline plugin on pies, and plotting a pie that has a 0 value (or a very small value relative to other values) in the data set.</p>
+    <div id="pie1" style="margin-top:20px; margin-left:20px; width:200px; height:200px;"></div>
+<pre class="code"></pre>
+    <div id="pie2" style="margin-top:20px; margin-left:20px; width:200px; height:200px;"></div>
+<pre class="code"></pre>
+    <div id="pie3" style="margin-top:20px; margin-left:20px; width:200px; height:200px;"></div>
+<pre class="code"></pre>
+    <div id="pie4" style="margin-top:20px; margin-left:20px; width:200px; height:200px;"></div>
+<pre class="code"></pre>
+    <div id="pie5" style="margin-top:20px; margin-left:20px; width:400px; height:240px;"></div>
+<pre class="code"></pre>
+    <div id="pie6" style="margin-top:20px; margin-left:20px; width:400px; height:240px;"></div>
+<pre class="code"></pre>
+  </body>
+</html>

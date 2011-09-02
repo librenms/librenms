@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>Test 3</title>
+		
+		<!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+		  
+		<link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+		
+		<!-- BEGIN: load jquery -->
+		<script language="javascript" type="text/javascript" src="../jquery.js"></script>
+		<!-- END: load jquery -->
+		
+		<!-- BEGIN: load jqplot -->
+		<script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+		<script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+		<script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+		<!-- END: load jqplot -->
+
+	<script type="text/javascript" language="javascript">
+	  
+	$(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+    line1 = [[2,4], [1,6], [3,2], [4,9], [5,16]];
+    plot1 = $.jqplot('chart', [line1], {    
+        series: [{label: '1st Qtr'}],
+        axes: {
+            xaxis: {
+                ticks:['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+                renderer: $.jqplot.CategoryAxisRenderer
+            }
+        }
+    });
+
+    line1 = [[4, 1], [2, 2], [9, 3], [16, 4]];
+    line2 = [[3, 1], [7, 2], [6.25, 3], [3.125, 4]];
+    plot2 = $.jqplot('chart2', [line1, line2], {
+        stackSeries: true,
+        legend: {
+            show: true,
+            location: 'se'
+        },
+        title: 'Unit Sales: Acme Decoy Division',
+        seriesDefaults: {
+            renderer: $.jqplot.BarRenderer,
+            rendererOptions: {
+                barDirection: 'horizontal',
+                barPadding: 6,
+                barMargin: 40
+            }
+        },
+        series: [{
+            label: '1st Qtr'
+        },
+        {
+            label: '2nd Qtr'
+        }],
+        axes: {
+            yaxis: {
+                renderer: $.jqplot.CategoryAxisRenderer,
+                ticks: ['Q1', 'Q2', 'Q3', 'Q4']
+            },
+            xaxis: {min: 0, max: 20, numberTicks:5}
+        }
+    });
+
+});
+
+	</script>
+
+	</head>
+	<body>
+<?php include "nav.inc"; ?>
+    <div id="chart" style="margin-top:20px; margin-left:20px; width:400px; height:240px;"></div>
+    <div id="chart2" style="margin-top:20px; margin-left:20px; width:320px; height:270px;"></div>
+
+	</body>
+</html>

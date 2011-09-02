@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+  <!-- END: load jqplot -->
+  <style type="text/css" media="screen">
+    .jqplot-axis {
+      font-size: 0.85em;
+    }
+    div.plot {
+        margin-bottom: 70px;
+    }
+    
+    p {
+        margin: 2em 0;
+    }
+</style>
+  <script id="example_1" type="text/javascript" language="javascript">$(document).ready(function(){
+    data = [ [25,100], [26,0], [27,100], [28,0], [29,0], [30,300], [31,300]];
+    plot1 = $.jqplot('chartdiv', [data], {
+        title: 'test',
+    	axes: {
+    		xaxis: {renderer: $.jqplot.CategoryAxisRenderer},
+    		yaxis: {min:0, tickOptions:{prefix: '$'}}
+    	},
+    	seriesDefaults: {
+    		color: '#F90',
+    		renderer: $.jqplot.BarRenderer,
+    		shadow: false
+    	}
+    });
+  });
+  </script>
+  
+  <script id="example_2" type="text/javascript" language="javascript">$(document).ready(function(){
+    $.jqplot.config.defaultTickFormatString = '$%d';
+    
+    data = [ [25,100], [26,0], [27,100], [28,0], [29,0], [30,300], [31,300]];
+    ticks = [0, 100, 200, 300, 400];
+    plot1 = $.jqplot('chartdiv2', [data], {
+        title: 'test',
+    	axes: {
+    		xaxis: {renderer: $.jqplot.CategoryAxisRenderer},
+    		yaxis: {min:0, ticks: ticks}
+    	},
+    	seriesDefaults: {
+    		color: '#F90',
+    		renderer: $.jqplot.BarRenderer,
+    		shadow: false
+    	}
+    });
+  });
+  </script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+        $('#code_1').html($('#example_1').html());
+        $('#code_2').html($('#example_2').html());
+        $(document).unload(function() {$('*').unbind(); });
+
+    });
+</script> 
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+<p>Example of the "prefix" axis tick option.  This option adds a prefix to the tick label if and only if no formatString option is specified.</p>
+    <div id="chartdiv" style="margin-top:20px; margin-left:20px; width:500px; height:300px;"></div>
+    <pre id="code_1" class="code-block"></pre>
+    
+    <p>A new configuration option, $.jqplot.config.defaultTickFormatString, has been added as well.  When no user formatString is specified, linear axes previously used a hard coded '%.1f' default format string.  The config option controls this default format string.  This allows an alternative way to format tick labels, with or without a prefix, if no formatString option is specified.</p>
+    <div id="chartdiv2" style="margin-top:20px; margin-left:20px; width:500px; height:300px;"></div>
+    <pre id="code_2" class="code-block"></pre>
+  </body>
+</html>

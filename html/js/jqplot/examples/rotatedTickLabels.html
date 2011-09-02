@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>jqPlot Test 2</title>
+		
+		<!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+		  
+		<link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+		
+		<!-- BEGIN: load jquery -->
+		<script language="javascript" type="text/javascript" src="../jquery.js"></script>
+		<!-- END: load jquery -->
+		
+		<!-- BEGIN: load jqplot -->
+		<script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+		<!-- to render rotated axis ticks, include both the canvasText and canvasAxisTick renderers -->
+		<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasTextRenderer.js"></script>
+		<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisTickRenderer.js"></script>
+		<script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+		<!-- END: load jqplot -->
+
+<style type="text/css" media="screen">
+  .jqplot-axis-tick {
+
+  }
+</style>
+
+	<script type="text/javascript" language="javascript">
+	  
+	$(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+	
+	line1=[['2008-09-30', 4], ['2008-10-30', 6.5], ['2008-11-30', 5.7], ['2008-12-30', 9], ['2009-01-30', 8.2]];
+	
+    plot1 = $.jqplot('chart', [line1], {
+        title:'Rotated Axis Text',
+        axes:{
+            xaxis:{
+                renderer:$.jqplot.DateAxisRenderer, 
+                min:'August 30, 2008', 
+                tickInterval:'1 month',
+                rendererOptions:{
+                    tickRenderer:$.jqplot.CanvasAxisTickRenderer},
+                    tickOptions:{formatString:'%b %#d, %Y', fontSize:'10pt', fontFamily:'Tahoma', angle:-40, fontWeight:'normal', fontStretch:1}
+            }
+        },
+        series:[{lineWidth:4, markerOptions:{style:'square'}}]
+    });
+	
+	});
+	</script>
+
+	</head>
+	<body>
+<?php include "nav.inc"; ?>
+    <div id="chart" style="margin-top:20px; margin-left:60px; width:500px; height:300px;"></div>
+
+	</body>
+</html>

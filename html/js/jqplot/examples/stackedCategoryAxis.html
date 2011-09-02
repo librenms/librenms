@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+  <!-- END: load jqplot -->
+<style type="text/css">
+div.plot {
+    margin-top: 40px;
+}
+
+.jqplot-xaxis-label {
+    font-size: 12pt;
+}
+
+.jqplot-xaxis-groupLabel {
+    font-size: 12pt;
+}
+
+</style>
+
+<script language="javascript" type="text/javascript">
+$(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+line1 = [20, 10, 20, 30, 40, 50];
+line2 = [80, 90, 80, 70, 60, 50];
+xticks = ['2010', '2040', '2010', '2040', '2010', '2040'];
+plot1 = $.jqplot('chart1', [line1, line2], {
+    stackSeries: true,
+    grid:{
+        drawGridlines:true,
+        background: '#ffffff',
+        borderWidth: 0,
+        shadow: false
+    },
+    seriesDefaults:{
+        renderer:$.jqplot.BarRenderer,
+        yaxis: 'y2axis',
+        rendererOptions: {
+            groups: 3,
+            barWidth: 35
+        } 
+    },
+    series:[
+        {color:'#73C3E8'},
+        {color:'#333'}
+    ],
+    axes:{
+        xaxis:{
+            renderer:$.jqplot.CategoryAxisRenderer,
+            ticks: xticks,
+            rendererOptions: {
+                groupLabels:['Onshore', 'Coastal', 'Offshore']
+            }, 
+            tickOptions:{
+                showGridline:false, 
+                markSize:0
+            }
+        },
+        y2axis: {
+                ticks:[0, 100], 
+                tickOptions:{formatString:'%d\%'}
+        }
+    }
+});
+   
+ });
+</script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+<div id="chart1" class="plot" style="width:400px;height:330px;"></div>
+  </body>
+</html>

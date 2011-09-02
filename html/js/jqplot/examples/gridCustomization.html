@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.logAxisRenderer.js"></script>
+
+  <!-- END: load jqplot -->
+  <style type="text/css" media="screen">
+    .jqplot-axis {
+      font-size: 0.85em;
+    }
+    .jqplot-title {
+      font-size: 1.1em;
+    }
+  </style>
+  <script type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+    var l1 = [[1,2], [4,5], [8,9], [15,16], [18,40]];
+    var l2 = [[2,1], [5,4], [12,7], [16,12], [19,29]];
+
+
+    plot1 = $.jqplot('chart', [l1, l2], {
+      title:'Plot with Grid Customization',
+      // axes:{xaxis:{tickInterval:2, min:0, max:19}},
+      // axes:{xaxis:{tickInterval:2}},
+      axes:{xaxis:{tickInterval:2, min:0},
+        yaxis:{renderer:$.jqplot.LogAxisRenderer}},
+      grid:{background:'rgba(0,0,0,0)', gridLineColor:'#accf9b', borderWidth:2.5}
+    });
+
+
+  });
+  </script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+    <div id="chart" style="margin-top:20px; margin-left:20px; width:360px; height:300px;"></div>
+  </body>
+</html>

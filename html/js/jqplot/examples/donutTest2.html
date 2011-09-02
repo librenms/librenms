@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.donutRenderer.js"></script>
+  <!-- END: load jqplot -->
+
+  <style type="text/css">
+  div.jqplot-target { margin-bottom: 45px; }
+  </style>
+  
+<script class="code" type="text/javascript">$(document).ready(function() {
+    s1 = [['a',20], ['b',2], ['c',2], ['d',2]];
+    
+    plot1 = $.jqplot('chart1', [s1], {
+        seriesDefaults:{
+            renderer:$.jqplot.DonutRenderer,
+            rendererOptions: {
+                showDataLabels: true,
+                dataLabels: 'value'
+            }
+        },
+        legend: {show:true}
+    });
+});
+</script>
+
+  
+<script type="text/javascript">    
+    $(document).ready(function(){
+        $('script.code').each(function(index) {
+            $('pre.code').eq(index).text($(this).html());
+        });
+        $(document).unload(function() {$('*').unbind(); });
+    });
+</script>
+
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+    <p></p>
+    <div id="chart1" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+<pre class="code"></pre>
+  </body>
+</html>
