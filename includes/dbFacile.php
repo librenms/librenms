@@ -82,7 +82,7 @@ function dbInsert($data, $table) {
 		#$id = false;
 	}
 
-	logfile($fullSql);
+	#logfile($fullSql);
 
         $time_end = microtime(true);
         $db_stats['insert_sec'] += number_format($time_end - $time_start, 8);

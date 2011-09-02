@@ -42,56 +42,6 @@ function process_syslog ($entry, $update) {
       echo('D-'.$bi);
       return $entry;
     }
-
-  $entry['device_id'] = get_cache($entry['host'], 'device_id');
-
-  if($entry['device_id']) {
-    dbInsert(
-      array(
-        'device_id' => $entry['device_id'],
-        'host' => $entry['host'],
-        'program' => $entry['program'],
-        'facility' => $entry['facility'],
-        'priority' => $entry['priority'],
-        'level' => $entry['level'],
-        'tag' => $entry['tag'],
-        'msg' => $entry['msg'],
-        'datetime' => $entry['timestamp']
-      ),
-      'logs'
-    );
-
-    dbInsert(
-      array(
-        'device_id' => $entry['device_id'],
-        'program' => $entry['program'],
-        'facility' => $entry['facility'],
-        'priority' => $entry['priority'],
-        'level' => $entry['level'],
-        'tag' => $entry['tag'],
-        'msg' => $entry['msg'],
-        'timestamp' => $entry['timestamp']
-      ),
-      'syslog'
-    );
-  }
-
-
-  return $entry;
-}
-
-
-
-function process_syslog_old ($entry, $update) {
-  global $config;
-  global $dev_cache;
-
-  foreach($config['syslog_filter'] as $bi)
-    if(strpos($entry['msg'], $bi) !== FALSE){
-      print_r($entry);
-      echo('D-'.$bi);
-      return $entry;
-    }
     
   $entry['device_id'] = get_cache($entry['host'], 'device_id');
   if($entry['device_id']) {
@@ -99,11 +49,40 @@ function process_syslog_old ($entry, $update) {
 
     if(in_array($os, array('ios', 'iosxe', 'catos'))){
       $matches = array();
-      if(preg_match('#%(?P<program>.*):( ?)(?P<msg>.*)#', $entry['msg'], $matches)){
-        $entry['msg'] = $matches['msg'];
-        $entry['program'] = $matches['program'];
+#      if(preg_match('#%(?P<program>.*):( ?)(?P<msg>.*)#', $entry['msg'], $matches)){
+#        $entry['msg'] = $matches['msg'];
+#        $entry['program'] = $matches['program'];
+#      }
+#      unset($matches);
+
+
+      if (strstr($entry[msg], "%"))
+      {
+        $entry['msg'] = preg_replace("/^%(.+?):\ /", "\\1||", $entry['msg']);
+        list(,$entry[msg]) = split(": %", $entry['msg']);
+        $entry['msg'] = "%" . $entry['msg'];
+        $entry['msg'] = preg_replace("/^%(.+?):\ /", "\\1||", $entry['msg']);
       }
-      unset($matches);
+      else
+      {
+        $entry['msg'] = preg_replace("/^.*[0-9]:/", "", $entry['msg']);
+        $entry['msg'] = preg_replace("/^[0-9][0-9]\ [A-Z]{3}:/", "", $entry['msg']);
+        $entry['msg'] = preg_replace("/^(.+?):\ /", "\\1||", $entry['msg']);
+      }
+
+      $entry['msg'] = preg_replace("/^.+\.[0-9]{3}:/", "", $entry['msg']);
+      $entry['msg'] = preg_replace("/^.+-Traceback=/", "Traceback||", $entry['msg']);
+
+      list($entry['program'], $entry['msg']) = explode("||", $entry['msg']);
+      $entry['msg'] = preg_replace("/^[0-9]+:/", "", $entry['msg']);
+
+      if (!$entry['program'])
+      {
+         $entry['msg'] = preg_replace("/^([0-9A-Z\-]+?):\ /", "\\1||", $entry['msg']);
+         list($entry['program'], $entry['msg']) = explode("||", $entry['msg']);
+      }
+
+      if (!$entry['msg']) { $entry['msg'] = $entry['program']; unset ($entry['program']); }
 
     } elseif($os == 'linux' and get_cache($entry['host'], 'version') == 'Point'){
       //Cisco WAP200 and similar
@@ -131,12 +110,15 @@ function process_syslog_old ($entry, $update) {
         $entry['msg'] = $matches['msg'];
         $entry['program'] = $matches['program'];
       }
+
       //SYSLOG CONNECTION BROKEN; FD='6', SERVER='AF_INET(123.213.132.231:514)', time_reopen='60'
       //pam_krb5: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
-      elseif($pos = strpos($entry['msg'], ';') or $pos = strpos($entry['msg'], ':')){
-        $entry['program'] = substr($entry['msg'], 0, $pos);
-        $entry['msg'] = substr($entry['msg'], $pos+1);
-      }
+      ## Disabled because broke this:
+      //diskio.c: don't know how to handle 10 request
+      #elseif($pos = strpos($entry['msg'], ';') or $pos = strpos($entry['msg'], ':')){
+      #  $entry['program'] = substr($entry['msg'], 0, $pos);
+      #  $entry['msg'] = substr($entry['msg'], $pos+1);
+      #}
       //fallback, better than nothing...
       elseif(empty($entry['program']) and !empty($entry['facility'])){
         $entry['program'] = $entry['facility'];
