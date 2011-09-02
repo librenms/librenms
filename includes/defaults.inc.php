@@ -280,10 +280,11 @@ $config['ignore_mount_network']   = 1; # Ignore network mounted storage
 ### Syslog Settings
 
 $config['syslog_age']       = "1 month";        ## Entries older than this will be removed
+
 $config['syslog_filter'][] = "last message repeated";
 $config['syslog_filter'][] = "Connection from UDP: [";
 $config['syslog_filter'][] = "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented";
-$config['syslog_filter'][] = "diskio.c: don't know how to handle";  ## Ignore some crappy stuff from SNMP daemon
+$config['syslog_filter'][] = "diskio.c";  ## Ignore some crappy stuff from SNMP daemon
 
 ### Virtualization
 
