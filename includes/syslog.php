@@ -1,21 +1,28 @@
 <?php
 
+## FIXME : use db functions properly
+
+# $device_id_host = @dbFetchCell("SELECT device_id FROM devices WHERE `hostname` = '".mres($entry['host'])."' OR `sysName` = '".mres($entry['host'])."'");
+
+# $device_id_ip = @dbFetchCell("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id");
+
 function get_cache($host, $value){
   global $dev_cache;
   if(!isset($dev_cache[$host][$value])){
     switch($value){
       case 'device_id':
         //Try by hostname
-        $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname`=\''.$host.'\' OR `sysName`=\''.$host.'\'');
+        $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ?', array($host, $host));
         //If failed, try by IP
-        if($dev_cache[$host]['device_id'] == null)
-          $dev_cache[$host]['device_id'] = dbFetchCell('SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = \'' . $entry['host'].'\' AND I.interface_id = A.interface_id');
+        if(!is_numeric($dev_cache[$host]['device_id'])) {
+          $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM `ipv4_addresses` AS A, `ports` AS I WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id', array($host));
+        } 
         break;
       case 'os':
-        $dev_cache[$host]['os'] = dbFetchCell('SELECT `os` FROM devices WHERE `device_id`='.get_cache($host, 'device_id'));
+        $dev_cache[$host]['os'] = dbFetchCell('SELECT `os` FROM devices WHERE `device_id` = ?', array(get_cache($host, 'device_id')));
         break;
       case 'version':
-        $dev_cache[$host]['version'] = dbFetchCell('SELECT `version` FROM devices WHERE `device_id`='.get_cache($host, 'device_id'));
+        $dev_cache[$host]['version'] = dbFetchCell('SELECT `version` FROM devices WHERE `device_id`= ?', array(get_cache($host, 'device_id')));
         break;
       default:
         return null;
@@ -24,7 +31,58 @@ function get_cache($host, $value){
   return $dev_cache[$host][$value];
 }
 
+
 function process_syslog ($entry, $update) {
+  global $config;
+  global $dev_cache;
+
+  foreach($config['syslog_filter'] as $bi)
+    if(strpos($entry['msg'], $bi) !== FALSE){
+      print_r($entry);
+      echo('D-'.$bi);
+      return $entry;
+    }
+
+  $entry['device_id'] = get_cache($entry['host'], 'device_id');
+
+  if($entry['device_id']) {
+    dbInsert(
+      array(
+        'device_id' => $entry['device_id'],
+        'host' => $entry['host'],
+        'program' => $entry['program'],
+        'facility' => $entry['facility'],
+        'priority' => $entry['priority'],
+        'level' => $entry['level'],
+        'tag' => $entry['tag'],
+        'msg' => $entry['msg'],
+        'datetime' => $entry['timestamp']
+      ),
+      'logs'
+    );
+
+    dbInsert(
+      array(
+        'device_id' => $entry['device_id'],
+        'program' => $entry['program'],
+        'facility' => $entry['facility'],
+        'priority' => $entry['priority'],
+        'level' => $entry['level'],
+        'tag' => $entry['tag'],
+        'msg' => $entry['msg'],
+        'timestamp' => $entry['timestamp']
+      ),
+      'syslog'
+    );
+  }
+
+
+  return $entry;
+}
+
+
+
+function process_syslog_old ($entry, $update) {
   global $config;
   global $dev_cache;
 
@@ -38,6 +96,7 @@ function process_syslog ($entry, $update) {
   $entry['device_id'] = get_cache($entry['host'], 'device_id');
   if($entry['device_id']) {
     $os = get_cache($entry['host'], 'os');
+
     if(in_array($os, array('ios', 'iosxe', 'catos'))){
       $matches = array();
       if(preg_match('#%(?P<program>.*):( ?)(?P<msg>.*)#', $entry['msg'], $matches)){
@@ -45,6 +104,7 @@ function process_syslog ($entry, $update) {
         $entry['program'] = $matches['program'];
       }
       unset($matches);
+
     } elseif($os == 'linux' and get_cache($entry['host'], 'version') == 'Point'){
       //Cisco WAP200 and similar
       $matches = array();
@@ -53,6 +113,7 @@ function process_syslog ($entry, $update) {
         $entry['program'] = $matches['program'];
       }
       unset($matches);
+
     } elseif($os == 'linux'){
       $matches = array();
       //User_CommonName/123.213.132.231:39872 VERIFY OK: depth=1, /C=PL/ST=Malopolska/O=VLO/CN=v-lo.krakow.pl/emailAddress=root@v-lo.krakow.pl
@@ -82,12 +143,14 @@ function process_syslog ($entry, $update) {
       }
       unset($matches);
     }
+
     if(!isset($entry['program'])){
       $entry['program'] = $entry['msg'];
       unset($entry['msg']);
     }
     $entry['program'] = strtoupper($entry['program']);
     array_walk($entry, 'trim');
+
     if($update)
       dbInsert(
         array(
