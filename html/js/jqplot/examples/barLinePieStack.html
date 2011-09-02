@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Multiple Chart types on same page</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+		<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasTextRenderer.js"></script>
+		<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisTickRenderer.js"></script>
+		<script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+		<script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+		<script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+		<script language="javascript" type="text/javascript" src="../plugins/jqplot.pieRenderer.js"></script>
+
+  <!-- END: load jqplot -->
+  <style type="text/css" media="screen">
+    .jqplot-axis {
+      font-size: 0.85em;
+    }
+    .jqplot-title {
+      font-size: 1.1em;
+    }
+  </style>
+  <script class="code" type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+    l1 = [2, 3, 1, 4, 3];
+    l2 = [1, 4, 3, 2, 5];
+    
+    
+    plot1 = $.jqplot('chart1', [l1, l2], {
+      title:'Stacked Filled Line Plot with Transparency (transparency not supported in IE6)',
+        stackSeries: true,
+        grid:{background:'#fefbf3', borderWidth:2.5},
+        seriesDefaults: {fill: true, showMarker: false, shadow: false},
+        axes:{xaxis:{pad:1.0, numberTicks:5, autoscale:false}},
+        series:[{color:'rgba(68, 124, 147, 0.7)'}, {color:'rgba(150, 35, 90, 0.7)'}]
+    });
+  });
+  </script>
+  <script class="code" type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+    
+    
+    
+    line1=[['2008-09-30', 4], ['2008-10-30', 6.5], ['2008-11-30', 5.7], ['2008-12-30', 9], ['2009-01-30', 8.2]];
+     
+    plot2 = $.jqplot('chart2', [line1], {
+        title:'Rotated Axis Text',
+        axes:{
+            xaxis:{
+                renderer:$.jqplot.DateAxisRenderer, 
+                min:'August 30, 2008', 
+                tickInterval:'1 month',
+                rendererOptions:{
+                    tickRenderer:$.jqplot.CanvasAxisTickRenderer},
+                    tickOptions:{formatString:'%b %#d, %Y', fontSize:'10pt', fontFamily:'Tahoma', angle:-40, fontWeight:'normal', fontStretch:1}
+            }
+        },
+        series:[{lineWidth:4, markerOptions:{style:'square'}}]
+    });
+  });
+  </script>
+  <script class="code" type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+    
+     line1 = [[4, 1], [4, 2], [3, 3], [16, 4]];
+     line2 = [[3, 1], [7, 2], [4, 3], [3.125, 4]];
+     plot3 = $.jqplot('chart3', [line1, line2], {
+         stackSeries: true,
+         legend: {
+             show: true,
+             location: 'se'
+         },
+         title: 'Unit Sales: Acme Decoy Division',
+         seriesDefaults: {
+             renderer: $.jqplot.BarRenderer,
+             rendererOptions: {
+                 barDirection: 'horizontal',
+                 barPadding: 6,
+                 barMargin: 40
+             }
+         },
+         series: [{
+             label: '1st Qtr'
+         },
+         {
+             label: '2nd Qtr'
+         }],
+         axes: {
+             yaxis: {
+                 renderer: $.jqplot.CategoryAxisRenderer,
+                 ticks: ['Q1', 'Q2', 'Q3', 'Q4']
+             },
+         }
+     });
+  });
+  </script>
+  <script class="code" type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+     
+     line1 = [4, 2, 9, 16];
+     line2 = [3, 7, 6.25, 3.125];
+     plot3b = $.jqplot('chart3b', [line1, line2], {
+         stackSeries: true,
+         legend: {
+             show: true,
+             location: 'nw'
+         },
+         title: 'Unit Sales: Acme Decoy Division',
+         seriesDefaults: {
+             renderer: $.jqplot.BarRenderer,
+             rendererOptions: {
+                 barPadding: 6,
+                 barMargin: 40
+             }
+         },
+         series: [{
+             label: '1st Qtr'
+         },
+         {
+             label: '2nd Qtr'
+         }],
+         axes: {
+             xaxis: {
+                 renderer: $.jqplot.CategoryAxisRenderer,
+                 ticks: ['Q1', 'Q2', 'Q3', 'Q4']
+             },
+         }
+     }); 
+  });
+  </script> 
+  <script class="code" type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+     
+     line1 = [4, 2, 9, 16];
+     line2 = [3, 7, 6.25, 3.125];
+     plot3c = $.jqplot('chart3c', [line1, line2], {
+         legend: {
+             show: true,
+             location: 'nw'
+         },
+         title: 'Unit Sales: Acme Decoy Division',
+         seriesDefaults: {
+             renderer: $.jqplot.BarRenderer,
+             rendererOptions: {
+                 barPadding: 6,
+                 barMargin: 20
+             }
+         },
+         series: [{
+             label: '1st Qtr'
+         },
+         {
+             label: '2nd Qtr'
+         }],
+         axes: {
+             xaxis: {
+                 renderer: $.jqplot.CategoryAxisRenderer,
+                 ticks: ['Q1', 'Q2', 'Q3', 'Q4']
+             },
+         }
+     }); 
+  });
+  </script>  
+  <script class="code" type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+   
+   line1 = [['frogs', 3], ['buzzards', 7], ['deer', 2.5], ['turkeys', 6], ['moles', 5], ['ground hogs', 4]];
+   line2 = [3, 7, 2.5, 6, 5, 4];
+   
+   plot4 = $.jqplot('chart4', [line1], {
+     title: 'Pie Chart with Legend and sliceMargin',
+     seriesDefaults:{renderer:$.jqplot.PieRenderer, rendererOptions:{sliceMargin:8}}, 
+     legend:{show:true}
+   });
+  });
+  </script>
+  <script class="code" type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+   
+     l1 = [2.2, 3, .6, 4.8, 3];
+     l2 = [1, 4, 3, 2, 5.7];
+  
+  
+    plot5 = $.jqplot('chart5', [l1, l2]);
+
+  });
+  </script>
+  <script class="code" type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+  
+    plot6 = $.jqplot('chart6', [[3,7,3,2,9,11,8]], {
+    });
+
+  });
+  </script>
+<script type="text/javascript" src="example.js"></script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+    <div id="chart1" style="margin-top:20px; margin-left:50px; width:360px; height:300px;"></div>
+    <div id="chart2" style="margin-top:20px; margin-left:50px; width:360px; height:300px;"></div>
+    <div id="chart3" style="margin-top:20px; margin-left:50px; width:360px; height:300px;"></div>
+    <div id="chart3b" style="margin-top:20px; margin-left:50px; width:360px; height:300px;"></div>
+    <div id="chart3c" style="margin-top:20px; margin-left:50px; width:360px; height:300px;"></div>
+    <div id="chart4" style="margin-top:20px; margin-left:50px; width:360px; height:300px;"></div>
+    <div id="chart5" style="margin-top:20px; margin-left:50px; width:360px; height:300px;"></div>
+    <div id="chart6" style="margin-top:20px; margin-left:50px; width:360px; height:300px;"></div>
+  </body>
+</html>

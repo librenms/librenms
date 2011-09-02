@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.highlighter.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.enhancedLegendRenderer.js"></script>
+
+  <!-- END: load jqplot -->
+  <style type="text/css" media="screen">
+    .jqplot-axis {
+      font-size: 0.85em;
+    }
+    .jqplot-title {
+      font-size: 1.1em;
+    }
+    select, input {
+        margin-right: 15px;
+    }
+    #chart1 {
+        margin-bottom: 40px;
+    }
+  </style>
+  <script type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+    var l1 = [3, 4, 1, 4, 2];
+    var l2 = [2, 5, 1, 4, 2];
+    var l3 = [1, 6, 1, 4, 2];
+
+
+    plot1 = $.jqplot('chart1', [l1, l2, l3], {
+        legend:{show:true, renderer:$.jqplot.EnhancedLegendRenderer},
+        seriesDefaults: {lineWidth:4},
+        series:[{label:'lions'}, {label:'tigers'}, {label:'bears'}],
+        seriesColors:['#cc6666', '#66cc66', '#6666cc'],
+        highlighter: {bringSeriesToFront: true}
+    });
+
+  });
+  </script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+
+    <p>When lines overlap each other it can be difficult to tell what is going on with the series below the top.  The highlighter plugin, the enhancedLegendRenderer plugin and special methods of plot help with this situation.</p>
+    
+    <p>The highlighter plugin has been enhanced with a "bringSeriesToFront" option which will bring the series of the highlighted point to the front when a data point is highlighted.  Note, however, when highlighting a point which coincides with multiple series, highlighter will detect this as the top most series and no highlighting effect will be noticed.</p>
+    
+    <p>The enhancedLegendRenderer plugin enabled clickable legend labels which will show/hide series.  This functionality can be disabled by setting the "seriesToggle" option on the legend renderer to false.  You can also change the fade duration of the series by setting the seriesToggle option to a millisecond value like 450, or the 'slow' or 'fast' keywords.</p>
+    
+    <p>On IE, series are simple toggled without the fading.  This avoids some erratic behaviour with fading elements on IE.  IE fading can be re-enabled be setting the disableIEFading option to false.</p>
+    
+    <p> The plot object has 4 methods which can bring a series forward or push it backward on the stack.  Click the buttons below to bring individual series to the front.  The "Last Order" button will toggle the current series order with the last displayed series order.  The "Original" button will reset the series to display in the order when the plot was created.</p>
+    
+    
+    <div id="chart1" style="margin-top:20px; margin-left:20px; width:360px; height:300px;"></div>
+    
+    <button onclick="plot1.moveSeriesToFront(0);">Lions</button> 
+    <button onclick="plot1.moveSeriesToFront(1);">Tigers</button> 
+    <button onclick="plot1.moveSeriesToFront(2);">Bears</button> 
+    
+    <button onclick="plot1.restorePreviousSeriesOrder();">Last Order</button> 
+    <button onclick="plot1.restoreOriginalSeriesOrder();">Original Order</button>
+    
+    <p>The 4 methods to achieve this effect are:</p>
+    
+<pre>
+    plot.moveSeriesToFront(series index);
+    plot.restorePreviousSeriesOrder();
+    plot.restoreOriginalSeriesOrder();
+    plot.moveSeriesToBack(series index);
+</pre>
+
+<p>moveSeriesToBack is not demonstrated here, but is available.</p>
+    
+  </body>
+</html>

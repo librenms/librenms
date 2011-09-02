@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.pointLabels.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.enhancedLegendRenderer.js"></script>
+		
+		 
+
+<script type="text/javascript" language="javascript">
+  
+ $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+		
+var line1 = [6.75, 14, 10.75, 0, 10];
+var line2 = [4.88, 9.63, 7.25, 15.5, 11.75];
+
+var tickers = ['2008-03-01', '2008-04-01', '2008-05-01', '2008-06-01', '2008-07-01'];
+		
+		plot1 = $.jqplot('chart1', [line1, line2], {
+			stackSeries: true,
+			legend: {
+                renderer: $.jqplot.EnhancedLegendRenderer,
+				show: true,
+				location: 'ne'
+			},
+			title: 'Data per month stack by user',
+			seriesDefaults: {
+				renderer: $.jqplot.BarRenderer,
+				rendererOptions: {
+                    // barPadding: 6,
+          // barMargin: 15,
+          barWidth: 20
+				},
+				pointLabels: {
+					hideZeros: true
+				}
+        // shadowAngle: 135
+			},
+			series: [{
+				label: 'User1'
+			},
+			{
+				label: 'User2'
+			}],
+			axes: {
+				xaxis: {
+					renderer: $.jqplot.CategoryAxisRenderer,
+          ticks: tickers         
+				},
+				yaxis: {
+					min: 0
+				}
+			}	
+		});
+		
+    line1 = [20, 10];
+    line2 = [80, 90];
+    plot2 = $.jqplot('chart2', [line1, line2], {
+        grid:{drawGridlines:false},
+        stackSeries: true, 
+        seriesColors: ["#82BC24","#363636"],
+        seriesDefaults: {
+            renderer: $.jqplot.BarRenderer,
+            rendererOptions:{barMargin: 25}, 
+            pointLabels:{stackedValue: true},
+            yaxis:'y2axis'
+        },
+        series:[
+            {pointLabels:{ypadding: -15}},
+            {pointLabels:{ypadding:9000}}
+        ],
+        axes: {
+            xaxis:{renderer:$.jqplot.CategoryAxisRenderer},
+            y2axis:{ticks:[0, 100], tickOptions:{formatString:'%d\%'}}
+        }
+    });
+
+});
+
+
+
+
+</script>
+</head>
+<body>
+<?php include "nav.inc"; ?>
+<div id="chart1" class='plot' style="margin-top:20px; margin-left:20px; width:400px; height:300px;"></div>
+<div id="chart2" class='plot' style="margin-top:20px; margin-left:20px; width:200px; height:200px;"></div>
+ 
+</body>
+
+
+</html>

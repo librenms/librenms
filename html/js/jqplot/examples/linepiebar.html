@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+ <head>
+     
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+    <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+    <script src="../jquery.js" type="text/javascript"></script>
+    <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+
+    <script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasTextRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisTickRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisLabelRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="../plugins/jqplot.highlighter.js"></script>
+    <script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasOverlay.js"></script>
+    <script language="javascript" type="text/javascript" src="../plugins/jqplot.cursor.js"></script>
+    <script language="javascript" type="text/javascript" src="../plugins/jqplot.pointLabels.js"></script>
+    <script language="javascript" type="text/javascript" src="../plugins/jqplot.pieRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+    <script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+
+    <script type="text/javascript">
+
+
+         interval = 1500;
+         niters = 0;
+         maxIterations = 200;
+         GraphUpdate = null;
+
+         function UpdateGraph() {
+             StopGraphLoop();
+             GraphUpdate = setInterval(runUpdate, interval);
+         }
+         
+         
+         function runUpdate() {
+             if (niters < maxIterations) {
+                 window.location.reload(true);
+                 niters++;
+             }
+             else {
+                 StopGraphLoop();
+             }
+         }
+
+         function StopGraphLoop() {
+
+             clearInterval(GraphUpdate);
+         }
+
+
+        $(document).ready(function(){
+            
+            var linedata = [];
+            var start = 1301630400000;
+            for (var i=0; i< 30; i++) {
+                linedata.push([start + i*1000*60*60*24, (Math.random() - 0.4)*(30+i) + 100]);
+            }
+
+            var line = $.jqplot('chart1', [linedata], {
+                title: 'Unique Visitors by Day',
+                cursor: { show: true },
+                highlighter: { show: true },
+                seriesDefaults: { pointLabels: { show: true }},
+                axesDefaults: {
+                    labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    labelOptions: {
+                        fontSize: '13pt'
+                    }
+                },
+
+                axes: {
+                    xaxis: {
+                        label: 'Date',
+                        renderer: $.jqplot.DateAxisRenderer,
+                        min: '03/30/2011 00:00:00',
+                        tickInterval: '3 days',
+                        tickOptions: { formatString: '%b %#d' }
+                    },
+                    yaxis: {
+                        label: 'Unique Visitors' 
+                    }
+                }
+            });
+
+            var piedata = [['FireFox', 3783], ['IE 9', 856], ['IE other', 1635], ['Chrome', 2321], ['Safari', 456], ['Opera', 321]];
+
+            var pie = $.jqplot('chart2', [piedata], {
+                title: 'Browser Statistics',
+                series:[{ 
+                    renderer: $.jqplot.PieRenderer,
+                    rendererOptions: {
+                        sliceMargin: 3,
+                        showDataLabels: true,
+                        dataLabelNudge: 20
+                    } 
+                }],
+                legend: {
+                    show: true
+                }
+            });
+
+            function mr(a, b) {
+                b = b || 5;
+                return a + (Math.random()- 0.5) * b;
+            }
+            var b1 = [mr(20,10), mr(14,12), mr(28,20), mr(36,20), mr(9,18)];
+            var b2 = [mr(8), mr(12), mr(16), mr(9), mr(14)];
+            var b3 = [mr(21,40), mr(31,30), mr(19), mr(7,1), mr(22,22)];
+            var bardata = [[23, 14, 28, 36, 9], [8, 12, 16, 9, 14], [21, 31, 19, 7, 22]];
+            var ticks = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+
+            bar = $.jqplot('chart3', [b1, b2, b3], {
+                title: 'Breakfast Bar Summary',
+                legend: { show: true, placement: 'outside' },
+                axesDefaults: {
+                    labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    labelOptions: {
+                        fontSize: '13pt'
+                    }
+                },
+                seriesDefaults: { renderer: $.jqplot.BarRenderer, pointLabels: {show: true} },
+                series:[
+                    { label: 'Toast with Jam' },
+                    { label: 'Toast with Peanut Butter' },
+                    { label: 'Dry Cereal' }
+                ],
+
+                axes: {
+                    xaxis: {
+                        renderer: $.jqplot.CategoryAxisRenderer,
+                        ticks: ticks,
+                        // label: 'Day of Week'
+                    },
+                    yaxis: {
+                        label: 'Number of Servings' 
+                    }
+                }
+            });
+
+            // UpdateGraph();
+
+        });
+
+    </script>
+
+ </head>
+ <body>
+<?php include "nav.inc"; ?>
+
+ <div id="chart1" style="height:300px; width:600px;"></div>
+ <div id="chart2" style="height:340px; width:500px;"></div>
+ <div id="chart3" style="height:340px; width:500px;"></div>
+
+ </body>
+ </html>

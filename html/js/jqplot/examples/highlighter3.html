@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Highlighter Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.highlighter.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.cursor.js"></script>
+  <!-- END: load jqplot -->
+
+
+<script language="javascript" type="text/javascript">
+
+function editit(str, si, pi, plot) {
+    return "<b><i>NHT: "+plot.targetId+', Series: '+si+', Point: '+pi+', '+str+"</b></i>";
+}
+
+$(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+   s1 = [['23-May-08',1],['24-May-08',4],['25-May-08',2],['26-May-08',
+6]];
+
+    s2 = [3,5,7,4,8];
+    s3 = [9,11,15,8,15];
+    s4 = [8,7,12,18,4];
+    s5 = [13,17,21,19,11];
+    l1 = [];
+    l2 = [];
+    l3 = [];
+    
+    for (var i=0; i<100; i++) {
+        l1.push(Math.random()*7);
+        l2.push(Math.random()*13);
+        l3.push(Math.random()*2);
+    }
+
+
+   plot1 = $.jqplot('chart1',[s1],{
+       title: 'Highlighting',
+       axes: {
+           xaxis: {
+               renderer: $.jqplot.DateAxisRenderer,
+               tickOptions: {
+                   formatString: '%b %#d, %Y'
+               },
+               numberTicks: 4
+           },
+           yaxis: {
+               tickOptions: {
+                   formatString: '$%.2f'
+               }
+           }
+       },
+       highlighter: {
+           sizeAdjust: 10,
+           tooltipLocation: 'n',
+           useAxesFormatters: false,
+           formatString: 'Hello %s dayglow %d',
+           tooltipContentEditor: editit
+       },
+       cursor: {
+           show: true,
+           zoom: true
+       }
+   });
+   
+});
+
+</script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+<div id="chart1" class="plot" style="width:500px;height:300px;"></div>
+<div id="chart2" class="plot" style="width:500px;height:300px;"></div>
+<div id="chart3" class="plot" style="width:500px;height:300px;"></div>
+<div id="chart4" class="plot" style="width:500px;height:300px;"></div>
+<div id="chart5" class="plot" style="width:500px;height:300px;"></div>
+
+
+
+  </body>
+</html>

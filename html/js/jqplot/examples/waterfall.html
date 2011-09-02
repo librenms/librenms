@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Waterfall Chart</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisTickRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasTextRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.pointLabels.js"></script>
+  <!-- END: load jqplot -->
+  <style type="text/css" media="screen">
+    .jqplot-axis {
+      font-size: 0.85em;
+    }
+    .jqplot-title {
+      font-size: 16px;
+    }
+	  p {
+	    margin: 20px;
+	    font-family:Arial,Helvetica,Sans-serif;
+	  }
+  </style>
+
+<script id="example_1" type="text/javascript">$(document).ready(function(){
+    var line1 = [14, 3, 4, -3, 5, 2, -3, -7];
+    var ticks = ['2008', 'Apricots', 'Tomatoes', 'Potatoes', 'Rhubarb', 'Squash', 'Grapes', 'Peanuts', '2009'];
+
+
+    plot1 = $.jqplot('chart1', [line1], {
+        title: 'Crop Yield Charnge, 2008 to 2009',
+        seriesDefaults:{
+            renderer:$.jqplot.BarRenderer, 
+            rendererOptions:{
+                waterfall:true,
+                varyBarColor: true
+            },
+            pointLabels: {
+                hideZeros: true
+            },
+            yaxis:'y2axis'
+        },
+        axes:{
+            xaxis:{
+                renderer:$.jqplot.CategoryAxisRenderer, 
+                ticks:ticks,
+                tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                tickOptions: {
+                    angle: -90,
+                    fontSize: '10pt',
+                    showMark: false,
+                    showGridline: false
+                }
+            },
+            y2axis: {
+                min: 0,
+                tickInterval: 5
+            }
+        }
+    });
+});</script>
+
+
+<script id="example_2" type="text/javascript">$(document).ready(function(){
+
+    var line1 = [14, 3, 4, -3, 5, 2, -3, -7];
+    var ticks = ['2008', 'Apricots', 'Tomatoes', 'Potatoes', 'Rhubarb', 'Squash', 'Grapes', 'Peanuts', '2009'];
+    plot2 = $.jqplot('chart2', [line1], {
+        title: 'Crop Yield Charnge, 2008 to 2009',
+        seriesColors:['#333333', '#999999', '#3EA140', '#3EA140', '#3EA140', '#783F16', '#783F16', '#783F16', '#333333'],
+        seriesDefaults:{
+            renderer:$.jqplot.BarRenderer, 
+            rendererOptions:{
+                waterfall:true,
+                varyBarColor: true,
+                useNegativeColors: false
+            },
+            pointLabels: {
+                hideZeros: true
+            },
+            yaxis:'y2axis'
+        },
+        axes:{
+            xaxis:{
+                renderer:$.jqplot.CategoryAxisRenderer, 
+                ticks:ticks,
+                tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                tickOptions: {
+                    angle: -90,
+                    fontSize: '10pt',
+                    showMark: false,
+                    showGridline: false
+                }
+            },
+            y2axis: {
+                min: 0,
+                tickInterval: 5
+            }
+        }
+    });
+});</script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+        $('#code_1').html($('#example_1').text());
+        $('#code_2').html($('#example_2').text());
+        $(document).unload(function() {$('*').unbind(); });
+
+    });
+</script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+    <p>Waterfall chart using default bar colors.</p>
+    <div id="chart1" style="margin-top:20px; margin-left:20px; width:350px; height:350px;"></div>
+    <pre id="code_1" class="code-block"></pre>
+    <p>Waterfall chart using custom colors and "useNegativeColors" set to "false".</p>
+    <div id="chart2" style="margin-top:20px; margin-left:20px; width:350px; height:350px;"></div>
+    <pre id="code_2" class="code-block"></pre>
+  </body>
+</html>

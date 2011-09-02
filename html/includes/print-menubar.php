@@ -30,10 +30,13 @@ foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
 }
 ?>
 
-<div class="menu2">
-<ul>
-<li><a class="menu2four" href="overview/"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a>
-        <table><tr><td>
+<ul id="menium">  
+  
+    <li><a href="/overview/" class="drop"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a><!-- Begin Home Item -->  
+  
+        <div class="dropdown_1column">
+  
+            <div class="col_1">  
         <ul>
         <?php if (isset($config['enable_map']) && $config['enable_map']) {
           echo('<li><a href="map/"><img src="images/16/map.png" border="0" align="absmiddle" /> Network Map</a></li>');
@@ -44,17 +47,33 @@ foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
   } ?>
 <!--        <li><a href="alerts/"><img src="images/16/exclamation.png" border="0" align="absmiddle" /> Alerts</a></li> -->
         <li><a href="inventory/"><img src="images/16/bricks.png" border="0" align="absmiddle" /> Inventory</a></li>
-        </ul>
-        </td></tr></table>
+        </ul>              
+            </div>  
 
-</li>
-</ul>
-<ul>
-<li><a class="menu2four" href="devices/"><img src="images/16/server.png" border="0" align="absmiddle" /> Devices</a>
-        <table><tr><td>
+            <div class="col_1">
+	      <h3>Search</h3>
+            </div>
+  
+            <div class="col_1">
         <ul>
-        <li><a href="devices/"><img src="images/16/server.png" border="0" align="absmiddle" /> All Devices</a></li>
-        <li><hr width="140" /></li>
+          <li><a href="search/ipv4/"><img src="images/icons/ipv4.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
+          <li><a href="search/ipv6/"><img src="images/icons/ipv6.png" border="0" align="absmiddle" /> IPv6 Search</a></li>
+          <li><a href="search/mac/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> MAC Search</a></li>
+        </ul>
+            </div>
+
+
+        </div> 
+
+    </li>
+  
+    <li><a href="#" class="drop"><img src="images/16/server.png" border="0" align="absmiddle" /> Devices</a>
+
+     <div class="dropdown_4columns"><!-- Begin 4 columns container -->
+      <div class="col_1">
+        <ul>
+          <li><a href="devices/"><img src="images/16/server.png" border="0" align="absmiddle" /> All Devices</a></li>
+          <li><hr width="140" /></li>
 
 <?php
 
@@ -75,18 +94,54 @@ if ($_SESSION['userlevel'] >= '10') {
 }
 ?>
 
-        </ul>
-        </td></tr></table>
-</li>
-<?php
-## Display Services entry if $config['show_services']
-if (!isset($config['show_services']) || $config['show_services'])
-{
-?>
-<li><a class="menu2four" href="services/"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services</a>
-        <table><tr><td>
-        <ul>
+          </ul>
+
+       </div>
+  
+       <div id="devices_chart" class="col_3" style="height: 300px";>      
+       </div>
+
+<script class="code" type="text/javascript">
+$(document).ready(function(){
+  var data = [
+    ['Up', <?php echo($devices['up']); ?>],
+    ['Down', <?php echo($devices['down']); ?>], 
+    ['Ignored', <?php echo($devices['ignored']); ?>]
+    ['Disabled', <?php echo($devices['disabled']); ?>]
+  ];
+  var plot1 = jQuery.jqplot ('devices_chart', [data],
+    {
+      seriesDefaults: {
+        renderer: jQuery.jqplot.PieRenderer,
+        rendererOptions: {
+          // Turn off filling of slices.
+          fill: true,
+          showDataLabels: true,
+          // Add a margin to seperate the slices.
+          sliceMargin: 0,
+          // stroke the slices with a little thicker line.
+          lineWidth: 5
+        }
+      },
+      legend: { show:true, location: 'e' }
+    }
+  );
+});
+</script>
+
+
+      </div>
+
+    </li><!-- End 5 columns Item -->  
+  
+    <li><a href="#" class="drop"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services</a><!-- Begin 4 columns Item -->  
+  
+        <div class="dropdown_4columns"><!-- Begin 4 columns container -->  
+  
+            <div class="col_1">  
+<ul>
         <li><a href="services/"><img src="images/16/cog.png" border="0" align="absmiddle" /> All Services </a></li>
+
 <?php if ($service_alerts) {
 echo('  <li><hr width=140 /></li>
         <li><a href="services/?status=0"><img src="images/16/cog_error.png" border="0" align="absmiddle" /> Alerts ('.$service_alerts.')</a></li>');
@@ -100,23 +155,55 @@ if ($_SESSION['userlevel'] >= '10') {
         <li><a href="delsrv/"><img src="images/16/cog_delete.png" border="0" align="absmiddle" /> Delete Service</a></li>');
 }
 ?>
-        </ul>
-        </td></tr></table>
-</li>
+        </ul>            
+        </div>  
+
+       <div id="services_chart" class="col_3" style="height: 300px";>
+       </div>
+
+<script class="code" type="text/javascript">
+$(document).ready(function(){
+  var data = [
+    ['Up', <?php echo($services['up']); ?>],
+    ['Down', <?php echo($services['down']); ?>],
+  ];
+  var plot2 = jQuery.jqplot ('services_chart', [data],
+    {
+      seriesDefaults: {
+        renderer: jQuery.jqplot.PieRenderer,
+        rendererOptions: {
+          // Turn off filling of slices.
+          fill: true,
+          showDataLabels: true,
+          // Add a margin to seperate the slices.
+          sliceMargin: 0,
+          // stroke the slices with a little thicker line.
+          lineWidth: 5
+        }
+      },
+      legend: { show:true, location: 'e' }
+    }
+  );
+});
+</script>
+
+  
+        </div><!-- End 4 columns container -->  
+  
+    </li><!-- End 4 columns Item -->  
 
 <?php
-}
-
-## Display Locations entry if $config['show_locations']
-if ($config['show_locations'])
-{
+if ($config['show_locations']) {
 ?>
-<li><a class="menu2four" href="locations/"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a>
+    <li><a href="#" class="drop"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a><!-- Begin Home Item -->
+
 <?php
   if ($config['show_locations_dropdown'])
   {
 ?>
-        <table><tr><td>
+        <div class="dropdown_4columns"><!-- Begin 2 columns container -->
+            <div class="col_2">
+
         <ul>
 <?php
     foreach (getlocations() as $location)
@@ -125,19 +212,28 @@ if ($config['show_locations'])
     }
 ?>
         </ul>
-        </td></tr></table>
+
 <?php
-  }
+}
 ?>
-</li>
+            </div>
+        </div><!-- End 4 columns container -->
+    </li><!-- End 4 columns Item -->
+
 <?php
 }
 ?>
 
-<li><a class="menu2four" href="ports/"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports</a>
 
-<table><tr><td>
-        <ul>
+
+    <!-- PORTS -->
+
+    <li><a href="#" class="drop"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports</a><!-- Begin Home Item -->
+
+        <div class="dropdown_4columns"><!-- Begin 2 columns container -->
+        
+          <div class="col_1">
+             <ul>
 <li><a href="ports/"><img src="images/16/connect.png" border="0" align="absmiddle" /> All Ports</a></li>
 
 <?php
@@ -194,8 +290,46 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
 if ($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cross.png" border="0" align="absmiddle" /> Deleted ('.$deleted_ports.')</a></li>'); }
 
 ?>
-</ul></td></tr></table>
-</li>
+</ul>
+          </div> 
+
+          <div id="ports_chart" class="col_3" style="height: 300px";>
+          </div>          
+
+<script class="code" type="text/javascript">
+$(document).ready(function(){
+  var data = [
+    ['Up', <?php echo($ports['up']); ?>],
+    ['Down', <?php echo($ports['down']); ?>],
+    ['Shutdown', <?php echo($ports['admindown']); ?>],
+    ['Ignored', <?php echo($ports['ignored']); ?>],
+    ['Deleted', <?php echo($ports['deleted']); ?>]
+  ];
+  var plot3 = jQuery.jqplot ('ports_chart', [data],
+    {
+      seriesDefaults: {
+        renderer: jQuery.jqplot.PieRenderer,
+        rendererOptions: {
+          // Turn off filling of slices.
+          fill: true,
+          showDataLabels: true,
+          // Add a margin to seperate the slices.
+          sliceMargin: 0,
+          // stroke the slices with a little thicker line.
+          lineWidth: 5
+        }
+      },
+      legend: { show:true, location: 'e' }
+    }
+  );
+});
+</script>
+
+
+        </div><!-- End 4 columns container -->
+
+    </li><!-- End 4 columns Item -->
+
 
 <?php
 
@@ -210,10 +344,12 @@ $menu_sensors = $used_sensors;
 
 ?>
 
-<li><a class="menu2four" href="health/"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Health
-<!--[if IE 7]><!--></a><!--<![endif]-->
-        <table><tr><td>
-        <ul>
+    <li><a href="#" class="drop"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Health</a><!-- Begin Home Item -->
+
+        <div class="dropdown_1column"><!-- Begin 2 columns container -->
+            <div class="col_1">
+
+<ul>
         <li><a href="health/mempool/"><img src="images/icons/memory.png" border="0" align="absmiddle" /> Memory</a></li>
         <li><a href="health/processor/"><img src="images/icons/processor.png" border="0" align="absmiddle" /> Processor</a></li>
         <li><a href="health/storage/"><img src="images/icons/storage.png" border="0" align="absmiddle" /> Storage</a></li>
@@ -238,23 +374,6 @@ if ($sep)
   echo('<li><hr width="140" /></li>');
   $sep = 0;
 }
-
-foreach (array('current','frequency','power','voltage') as $item)
-{
-  if ($menu_sensors[$item])
-  {
-    echo ('<li><a href="health/'.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
-    unset($menu_sensors[$item]);$sep++;
-  }
-}
-
-# Show remaining/custom sensor types if there are any in the database
-if ($menu_sensors && $sep)
-{
-  echo('<li><hr width="140" /></li>');
-  $sep = 0;
-}
-
 foreach (array_keys($menu_sensors) as $item)
 {
   echo ('<li><a href="health/'.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
@@ -263,12 +382,12 @@ foreach (array_keys($menu_sensors) as $item)
 
 ?>
         </ul>
-        </td></tr></table>
-<!--[if lte IE 6]></a><![endif]-->
-</li>
 
+            </div>
 
-<!-- <li><a class="menu2four" href="inventory/"><img src="images/16/bricks.png" border="0" align="absmiddle" /> Inventory</a></li> -->
+        </div><!-- End 4 columns container -->
+
+    </li><!-- End 4 columns Item -->
 
 <?php
 
@@ -279,11 +398,16 @@ $routing_count['vrf']  = dbFetchCell("SELECT COUNT(*) from `vrfs`");
 
 if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']) > "0")
 {
-    echo('
-      <li><a class="menu2four" href="routing/"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a>
-        <table><tr><td>
-        <ul>');
 
+?>
+
+    <li><a href="#" class="drop"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a><!-- Begin Home Item -->
+
+        <div class="dropdown_3columns"><!-- Begin 2 columns container -->
+
+          <ul>
+
+<?php
   if ($_SESSION['userlevel'] >= '5' && $routing_count['vrf']) { echo('<li><a href="routing/vrf/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li> <li><hr width=140></li> '); }
 
   if ($_SESSION['userlevel'] >= '5' && $routing_count['ospf'])
@@ -315,57 +439,118 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
   }
 
 
-  echo('      </ul>
-        </td></tr></table>
-    </li>
-    ');
+  echo('      </ul>');
+?>   
+         
+        </div><!-- End 4 columns container -->
 
+    </li><!-- End 4 columns Item -->
+
+<?php
 }
-
 ?>
 
-<li><a class="menu2four" href="search/"><img src="images/16/find.png" border="0" align="absmiddle" /> Search
-<!--[if IE 7]><!--></a><!--<![endif]-->
-        <table><tr><td>
-        <ul>
-          <li><a href="search/ipv4/"><img src="images/icons/ipv4.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
-          <li><a href="search/ipv6/"><img src="images/icons/ipv6.png" border="0" align="absmiddle" /> IPv6 Search</a></li>
-          <li><a href="search/mac/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> MAC Search</a></li>
-        </ul>
-      </td></tr></table>
-    </li>
 
-<li style="float: right;"><a><img src="images/16/wrench.png" border="0" align="absmiddle" /> System
-<!--[if IE 7]><!--></a><!--<![endif]-->
-  <table><tr><td>
-    <ul>
+    <li class="menu_right"><a href="#" class="drop"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System</a><!-- Begin Home Item -->
+
+        <div class="dropdown_3columns align_right"><!-- Begin 2 columns container -->
+
+
+            <div class="col_3">
+                <h2>Observium <?php echo($config['version']); ?> </h2>
+            </div>
+
+
+            <div class="col_2">
+                <p>Network Management and Monitoring<br />
+                Copyright (C) 2006-<?php echo date("Y"); ?> Adam Armstrong</p>
+            </div>
+
+            <div class="col_1">
+              <p>
+                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=W2ZJ3JRZR72Z6" class="external text" rel="nofollow">
+                <img src="https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif" alt="btn_donateCC_LG.gif" />
+                </a>
+              </p>
+            </div>
+
+            <div class="col_3">
+              <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=W2ZJ3JRZR72Z6" class="external text" rel="nofollow">
+                Please donate to support continued development!
+              </a>
+            </div>
+
+            <div class="col_2">
+                <h2>The Team</h2>
+                <p>
+                  <img src="images/icons/flags/gb.png"> <strong>Adam Armstrong</strong> Project Founder<br />
+                  <img src="images/icons/flags/be.png"> <strong>Geert Hauwaerts</strong> Developer<br />
+                  <img src="images/icons/flags/be.png"> <strong>Tom Laermans</strong> Developer<br />
+                </p>
+            </div>
+
+
+            <div class="col_1">
+                <h2>Settings</h2>
+<ul>
      <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About</a></li>
      <?php if ($_SESSION['userlevel'] >= '10') {
       echo('
-        <li><hr width="140" /></li>
         <li><a href="settings/"><img src="images/16/wrench.png" border="0" align="absmiddle" /> Global Settings</a></li>');
         }
      ?>
-     <li><hr width="140" /></li>
       <li><a href="preferences/"><img src="images/16/wrench_orange.png" border="0" align="absmiddle" /> My Settings</a></li>
-    <?php if ($_SESSION['userlevel'] >= '10') {
-      echo('
-        <li><hr width="140" /></li>');
+        </ul>
+            </div>
 
+
+<?php
+$apache_version = str_replace("Apache/", "", $_SERVER['SERVER_SOFTWARE']);
+$php_version = phpversion();
+$mysql_version = dbFetchCell("SELECT version()");
+$netsnmp_version = shell_exec($config['snmpget'] . " --version");
+?>
+
+            <div class="col_2">
+                <h2>Versions</h2>
+                <p>
+<?php echo("                     <table width=100% cellpadding=3 cellspacing=0 border=0>
+      <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
+      <tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
+      <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
+    </table>");
+?>
+                </p>
+                <ul>
+                  <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About Observium</a></li>
+                </ul>
+            </div>
+
+<div class="col_1">
+                <h2>Users</h2>
+<ul>
+
+    <?php if ($_SESSION['userlevel'] >= '10') {
       if (auth_usermanagement())
       {
       echo('
         <li><a href="adduser/"><img src="images/16/user_add.png" border="0" align="absmiddle" /> Add User</a></li>
         <li><a href="deluser/"><img src="images/16/user_delete.png" border="0" align="absmiddle" /> Remove User</a></li>
         <li><a href="?page=edituser"><img src="images/16/user_edit.png" border="0" align="absmiddle" /> Edit User</a></li>
-        <li><hr width="140" /></li>');
+        ');
       }
       echo('
         <li><a href="authlog/"><img src="images/16/lock.png" border="0" align="absmiddle" /> Authlog</a></li>');
     } ?>
+
+
+
         </ul>
-      </td></tr></table>
-<!--[if lte IE 6]></a><![endif]-->
-    </li>
-  </ul>
-</div>
+            </div>
+
+
+        </div><!-- End 2 columns container -->
+
+    </li><!-- End Home Item -->
+  
+</ul>  

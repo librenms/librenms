@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Multiple lines Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+
+  <!-- END: load jqplot -->
+  <script type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+    l1 = [18, 36, 14, 11];
+    l2 = [[2, 14], [7, 2], [8,5]];
+    l3 = [4, 7, 9, 2, 11, 5, 9, 13, 8, 7];
+
+    $.jqplot('chart1', [l1, l2, l3], {
+      legend:{show:true},
+      series:[
+        {showLabel:true},
+        {showLabel:true},
+        {showLabel:false}
+      ]
+    });
+
+  });
+  
+  </script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+    <div id="chart1" style="margin-top:20px; margin-left:20px; width:400px; height:300px;"></div>
+  </body>
+</html>

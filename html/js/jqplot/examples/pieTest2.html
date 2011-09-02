@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Pie Chart Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->  
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.pieRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.pointLabels.js"></script>
+  <!-- END: load jqplot -->
+
+  <script type="text/javascript" src="pieTest2.js"></script>
+  <style type="text/css">
+    #code {
+        font: 10pt "Andale Mono", Monaco, "Courier New", sans-serif ;
+        white-space: pre;
+    }
+  </style>
+  
+    <script type="text/javascript">   
+    
+$(document).ready(function(){
+
+    $.jqplot.config.enablePlugins = true;
+
+    s1 = [['a',2], ['b',6], ['c',7], ['d',10]];
+    s2 = [['a', 4], ['b', 7], ['c', 6], ['d', 3]];
+    s3 = [['a', 2], ['b', 1], ['c', 3], ['d', 3]];
+    s4 = [['a', 4], ['b', 3], ['c', 2], ['d', 1]];
+    
+    s5 = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+    
+    plot1 = $.jqplot('chart1', [s1], {
+        seriesDefaults:{
+            renderer:$.jqplot.PieRenderer
+        },
+        legend: {show:true}
+    });
+    
+    plot2 = $.jqplot('chart2', [s2], {
+        seriesDefaults: {
+            renderer:$.jqplot.PieRenderer,
+            rendererOptions:{
+                sliceMargin: 4,
+                startAngle: -90
+            }
+        }
+    });
+
+    plot3 = $.jqplot('chart3', [s3], {
+        captureRightClick: true,
+        seriesDefaults:{
+            renderer:$.jqplot.PieRenderer,
+            shadow: false,
+            rendererOptions:{
+                startAngle: 90,
+                sliceMargin: 4,
+                highlightMouseDown: true
+            }
+        },
+        legend: {
+            show: true,
+            location: 'e',
+            placement: 'outside'
+        }      
+    });
+
+    plot5 = $.jqplot('chart5', [s5], {
+        seriesDefaults:{
+            renderer:$.jqplot.PieRenderer
+        }
+    });
+    
+    plot6 = $.jqplot('chart6', [[1,2,3,4]]);
+    
+    $('#chart1').bind('jqplotDataClick', 
+        function (ev, seriesIndex, pointIndex, data) {
+            $('#info1').html('series: '+seriesIndex+', point: '+pointIndex+', data: '+data);
+        }
+    );
+    
+    $('#chart2').bind('jqplotDataHighlight', 
+        function (ev, seriesIndex, pointIndex, data) {
+            $('#info2').html('series: '+seriesIndex+', point: '+pointIndex+', data: '+data);
+        }
+    );
+    
+    $('#chart2').bind('jqplotDataUnhighlight', 
+        function (ev) {
+            $('#info2').html('Nothing');
+        }
+    ); 
+    
+    $('#chart3').bind('jqplotDataRightClick', 
+        function (ev, seriesIndex, pointIndex, data) {
+            $('#info3').html('series: '+seriesIndex+', point: '+pointIndex+', data: '+data);
+        }
+    );  
+    
+    $(document).unload(function() {$('*').unbind(); });
+});    
+    
+    
+     
+    // $(document).ready(function(){
+  //     $.jqplot.config.enablePlugins = true;
+  //       $('#code').load('pieTest2.js');
+  //       $('#code').dialog({
+		// 	height: 'auto',
+		// 	width: 600,
+		// 	modal: true,
+		// 	autoOpen: false,
+		// 	resizable: true,
+		// 	draggable: true,
+		// 	show: 'fold'
+		// });
+
+    // });
+    </script> 
+    
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+<div id="code"></div>
+    <p>To create pie plots, you have to include the "jqplot.pieRenderer.js" file in your source.</p>
+
+    <p>Below is a default pie plot.  Slices will highlight on mouseover.  Events are triggered when you mouseover a slice and also when you click on a slice.  Here We capture the 'jqplotDataClick' event and display the clicked series index, point index and data values.<p>
+    
+    <div><span>You Clicked: </span><span id="info1">Nothing yet</span></div>
+        
+    <div id="chart1" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+
+    <p>Below is a customized customized pie plot where options for sliceMargin and startAngle have been specified.  Here We capture the 'jqplotDataHighlight' event and display the currently highlighted series index, point index and data values.<p>
+    
+    <p>The plot target also fires a 'jqplotDataMouseOver' when the cursor is moused over a slice even if highlighting is turned off.  This event will fire continuously as the user mouses over the slice.  'jqplotDataHighlight' fires only once when the user first passes over the slice.  Additionally, a 'jqplotDataUnhighlight' event is fired when the user moves out of a slice (if highlighting is enabled).<p>
+
+    <div><span>Moused Over: </span><span id="info2">Nothing</span></div>
+    
+    <div id="chart2" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+    
+    <p>The next example has the plot's 'captureRightClick' option set to true.  This causes the plot to fire a 'jqplotRightClick' event the the user clicks the right mouse button over a slice.<p>
+        
+    <p>The 'highlightMouseDown' option is also set to true.  This will highlight a slice on mouse down instead of on move over.  Highlighting will occur for either left or right click.</p>
+
+    <div><span>You Right Clicked: </span><span id="info3">Nothing yet</span></div>
+    
+    <div id="chart3" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+    
+    <p style="margin-top:40px;">The last example shows a pie with all of the default colors.  Mouse over to see the default highlight colors.  Series colors can be specified with the "seriesColors" option on the plot.  The highlight colors are specified with the 'highlightColors' option on the series renderer.</p>
+    
+        <div id="chart5" style="margin-top:20px; margin-left:20px; width:400px; height:400px;"></div>
+        
+<p>A simple line chart is added to test for imcompatabilities.</p>
+        <div id="chart6" style="margin-top:20px; margin-left:20px; width:160px; height:100px;"></div>
+  </body>
+</html>

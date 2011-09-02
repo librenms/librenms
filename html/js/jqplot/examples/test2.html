@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+ <title>Simple Test</title>
+ <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.min.js"></script><![endif]-->
+
+ <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+
+ <!-- BEGIN: load jquery -->
+ <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+ <!-- END: load jquery -->
+
+ <!-- BEGIN: load jqplot -->
+ <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+ <script language="javascript" type="text/javascript" src="../plugins/jqplot.logAxisRenderer.js"></script>
+ <script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+ <script language="javascript" type="text/javascript" src="../plugins/jqplot.highlighter.js"></script>
+ <script language="javascript" type="text/javascript" src="../plugins/jqplot.cursor.js"></script>
+
+ <!-- END: load jqplot -->
+ <style type="text/css" media="screen">
+   .jqplot-axis {
+     font-size: 0.85em;
+   }
+ </style>
+ 
+ <script type="text/javascript" language="javascript">
+
+ $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+  var goog = [["2009/6/22 2:12",425.32],["2009/6/22 9:11",420.09],["2009/6/22 9:13",424.84],["2009/6/22 9:14",444.32],["2009/6/22 10:15",417.23],["2009/6/22 12:15",393.5]];
+
+  plot = $.jqplot('chart', [goog], {
+     title: 'Google, Inc.',
+     series: [{
+         label: 'Google, Inc.',
+         neighborThreshold: -1
+     }],
+     axes: {
+         xaxis: {
+           renderer:$.jqplot.DateAxisRenderer,
+           min:'2009/6/22 1:00',
+           tickInterval: "1 hours", 
+           tickOptions:{formatString:"%H:%M"}
+         },
+         yaxis: {
+             renderer: $.jqplot.LogAxisRenderer,
+             tickOptions:{formatString:'$%.2f'}
+         }
+     },
+     cursor:{zoom:true, showTooltip:false, clickReset:true}
+  });
+ });
+ </script>
+ </head>
+ <body>
+<?php include "nav.inc"; ?>
+   <div id="chart" style="margin-top:20px; margin-left:20px; width:1000px; height:300px;"></div>
+   <div style="padding-top:20px"><button value="reset" type="button" onclick="$.jqplot.Cursor.resetZoom(plot)">Zoom Out</button></div>
+ </body>
+</html>

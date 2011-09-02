@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.pointLabels.js"></script>
+		
+		 
+
+<script type="text/javascript" language="javascript">
+  
+ $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;		
+    line1 = [20, 10];
+    line2 = [80, 90];
+    plot2 = $.jqplot('chart2', [line1, line2], {
+        grid:{
+            drawGridlines:true,
+            background: '#ffffff',
+            borderWidth: 0,
+            shadow: false
+        },
+        stackSeries: true, 
+        seriesColors: ["#82BC24","#363636"],
+        seriesDefaults: {
+            renderer: $.jqplot.BarRenderer,
+            rendererOptions:{barMargin: 25}, 
+            pointLabels:{stackedValue: true},
+            yaxis:'y2axis',
+            shadow: false
+        },
+        series:[
+            {pointLabels:{ypadding: -15}},
+            {pointLabels:{ypadding:9000}}   // this hack will push the labels for the top series off of the page so they don't appear.
+        ],
+        axes: {
+            xaxis:{
+                ticks:[2010, 2040], 
+                renderer:$.jqplot.CategoryAxisRenderer, 
+                tickOptions:{
+                    showGridline:false, 
+                    markSize:0
+                }
+            },
+            y2axis:{
+                ticks:[0, 100], 
+                tickOptions:{formatString:'%d\%'}
+            }
+        }
+    });
+});
+
+
+
+
+</script>
+</head>
+<body>
+<?php include "nav.inc"; ?>
+<div id="chart2" class='plot' style="margin-top:20px; margin-left:20px; width:200px; height:200px;"></div>
+ 
+</body>
+
+
+</html>

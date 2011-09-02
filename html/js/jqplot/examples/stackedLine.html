@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.dateAxisRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisTickRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasTextRenderer.js"></script>
+		
+		 
+
+<script type="text/javascript" language="javascript">
+
+$(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+var line1 = [['04-05-2006',4], ['04-06-2006',5],['05-03-2006',9], ['05-15-2006',6]];
+var line2 = [['04-05-2006',1], ['04-06-2006',2],['05-03-2006',6], ['05-15-2006',1]];
+plot1 = $.jqplot("chart4", [line1,line2], {
+       stackSeries: true,
+       legend: {show: true, location: 'nw'},
+       title: 'Test Results',
+       seriesDefaults: {fill:true, showMarker:false},
+       series: [{label: 'Traps'},{label:'Decoy'}],
+       axes: {
+               xaxis: {renderer:$.jqplot.DateAxisRenderer,
+                       rendererOptions:{tickRenderer:$.jqplot.CanvasAxisTickRenderer},
+                       tickOptions:{
+                               formatString:'%b %#d, %Y',
+                               fontSize:'10pt',
+                               fontFamily:'Tahoma',
+                               angle:-30
+                       }
+               }
+       }
+});
+});
+
+             
+</script>
+</head>
+<body>
+<?php include "nav.inc"; ?>
+<div id="chart4" class='plot' style="margin-top:20px; margin-left:20px; width:400px; height:300px;"></div>
+ 
+</body>
+
+
+</html>

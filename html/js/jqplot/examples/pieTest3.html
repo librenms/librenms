@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->  
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.pieRenderer.js"></script>
+  <!-- END: load jqplot -->
+
+  <style type="text/css">
+    #code {
+        font: 10pt "Andale Mono", Monaco, "Courier New", sans-serif ;
+        white-space: pre;
+    }
+    
+    pre {
+        background: #D8F4DC;
+        border: 1px solid rgb(200, 200, 200);
+        padding-top: 1em;
+        padding-left: 3em;
+        padding-bottom: 1em;
+        margin-top: 1em;
+        margin-bottom: 3em;
+        
+    }
+    
+    p {
+        margin: 2em 0;
+    }
+  </style>
+  
+<script id="example_1" type="text/javascript">$(document).ready(function(){
+    s1 = [['Sony',7], ['Samsumg',13.3], ['LG',14.7], ['Vizio',5.2], ['Insignia', 1.2]];
+        
+    plot1 = $.jqplot('chart1', [s1], {
+        grid: {
+            drawBorder: false, 
+            drawGridlines: false,
+            background: '#ffffff',
+            shadow:false
+        },
+        axesDefaults: {
+            
+        },
+        seriesDefaults:{
+            renderer:$.jqplot.PieRenderer,
+            rendererOptions: {
+                showDataLabels: true
+            }
+        },
+        legend: {
+            show: true,
+            rendererOptions: {
+                numberRows: 1
+            },
+            location: 's'
+        }
+    }); 
+});
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+        $('#code_1').html($('#example_1').html());
+        $(document).unload(function() {$('*').unbind(); });
+
+    });
+</script> 
+    
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+
+
+               
+    <div id="chart1" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+    
+    <pre id="code_1"></pre>
+ 
+    
+ 
+  </body>
+</html>

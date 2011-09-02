@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Sparkline Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+
+  <!-- END: load jqplot -->
+  <script type="text/javascript" language="javascript">
+  
+  $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+
+    myvalues = [1242573966, 14400, 1242573966, 5000, 1242573966, 0];
+
+    $.jqplot('curr_sparkline', [myvalues], { 
+      gridPadding: {top:0, right:0, bottom:0, left:0}, 
+      axes: { 
+        xaxis: { showTicks: false, showTickMarks: false }, 
+        yaxis: { showTicks: false, showTickMarks: false } }, 
+        title: { text: '', show: false }, 
+        series: [
+        {lineWidth: 1, markerOptions: { show: true, style: 'filledCircle',  lineWidth: .5, size: 2, color: '#666666', shadow: false} }
+        ], 
+        grid: { drawGridLines: false, gridLineColor: '#fffdf6', background: '#fffdf6',  borderColor: '#999999', borderWidth: 1, shadow: false } 
+    });
+
+  });
+  
+  </script>
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+    <div id="curr_sparkline" style="margin-top:20px; margin-left:20px; width:100px; height:40px;"></div>
+  </body>
+</html>

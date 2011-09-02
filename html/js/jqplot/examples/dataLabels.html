@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Test</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+
+  
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.funnelRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.pieRenderer.js"></script>
+  <!-- END: load jqplot -->
+
+  <style type="text/css">
+    #code {
+        font: 10pt "Andale Mono", Monaco, "Courier New", sans-serif ;
+        white-space: pre;
+    }
+    
+    pre {
+        background: #D8F4DC;
+        border: 1px solid rgb(200, 200, 200);
+        padding-top: 1em;
+        padding-left: 3em;
+        padding-bottom: 1em;
+        margin-top: 1em;
+        margin-bottom: 3em;
+        
+    }
+    
+    p {
+        margin: 2em 0;
+    }
+  </style>
+  
+<script id="example_1" type="text/javascript">$(document).ready(function(){
+    s1 = [['Sony',7], ['Samsumg',13.3], ['LG',14.7], ['Vizio',5.2], ['Insignia', 1.2]];
+        
+    plot1 = $.jqplot('chart1', [s1], {
+        grid: {
+            drawBorder: false, 
+            drawGridlines: false,
+            background: '#ffffff',
+            shadow:false
+        },
+        axesDefaults: {
+            
+        },
+        seriesDefaults:{
+            renderer:$.jqplot.PieRenderer,
+            rendererOptions: {
+                showDataLabels: true,
+                // dataLabelCenterOn: false,   // This is an expreimental feature.
+                dataLabelPositionFactor: 0.6,
+                dataLabelNudge: 0,
+                dataLabels: ['Longer', 'B', 'C', 'Longer', 'None']
+            }
+        },
+        legend: {
+            show: true,
+            placement: 'outside'
+        }
+    }); 
+});
+</script>
+  
+<script id="example_2" type="text/javascript">$(document).ready(function(){
+    s1 = [['Sony',7], ['Samsumg',13.3], ['LG',14.7], ['Vizio',5.2], ['Insignia', 1.2]];
+        
+    plot2 = $.jqplot('chart2', [s1], {
+        seriesDefaults:{
+            renderer:$.jqplot.PieRenderer,
+            rendererOptions: {
+                showDataLabels: true,
+                dataLabelThreshold: 1,
+                dataLabelFormatString: '%.1f%%'
+            }
+        },
+        legend: {
+            show: true,
+            placement: 'outside'
+        }
+    }); 
+});
+</script>
+  
+<script id="example_3" type="text/javascript">$(document).ready(function(){
+    s1 = [['Sony',7], ['Samsumg',13.3], ['LG',14.7], ['Vizio',5.2], ['Insignia', 1.2]];
+        
+    plot3 = $.jqplot('chart3', [s1], {
+        seriesDefaults:{
+            renderer:$.jqplot.FunnelRenderer,
+            rendererOptions: {
+                showDataLabels: true,
+                dataLabels: 'label'
+            }
+        }
+    });
+});
+</script>
+  
+<script id="example_4" type="text/javascript">$(document).ready(function(){
+    s1 = [['Sony',7], ['Samsumg',13.3], ['LG',14.7], ['Vizio',5.2], ['Insignia', 1.2]];
+        
+    plot4 = $.jqplot('chart4', [s1], {
+        seriesDefaults:{
+            renderer:$.jqplot.FunnelRenderer,
+            rendererOptions: {
+                showDataLabels: true,
+                dataLabels: ['47 years', '28 years', '22 years', '14 years', '7 years']
+            }
+        },
+        legend: {
+            show: true,
+            placement: 'outside'
+        }
+    });
+});
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+        $('#code_1').html($('#example_1').html());
+        $('#code_2').html($('#example_2').html());
+        $('#code_3').html($('#example_3').html());
+        $('#code_4').html($('#example_4').html());
+        $(document).unload(function() {$('*').unbind(); });
+
+    });
+</script> 
+    
+  </head>
+  <body>
+<?php include "nav.inc"; ?>
+
+    <p>Data labels can be automatically added to pie chart and donut chart slices as well as funnel chart areas.  what labels are displayed is controlled by the series "dataLabel" option.  There are 4 types of data labels to display:<p>
+    <ul>
+        <li>"label" - label of the point.
+        <li>"value" - value of the point.
+        <li>"percent" - percent of the whole (pie/donut/funnel) of the point.
+        <li>Array - custom array of data point labels, one for each point.
+    </ul>
+        
+    <p>Formatting of labels is controlled through the series "dataLabelsFormatString" option.  By default, the format string will be set based on the label type:
+     <ul>
+        <li>"label" - '%s', raw string.
+        <li>"value" - '%d', integer format.
+        <li>"percent" - '%d%%', integer with % sign appended.
+        <li>Array - '%s', raw string.
+    </ul>       
+  
+    <p>The following examples will clarify usage as well as other options.  By default, data labels are turned off.  They are enabled by setting the "showDataLabels: true" option.  Below is the default configuration for a pie chart:</p>
+               
+    <div id="chart1" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+    
+    <pre id="code_1"></pre>
+ 
+    <p>Notice that no data label was shown for "Insignia".  This is because the area of its slice is less than the "dataLabelThreshold" (3% by default).  The threshold is applicable no matter what type of label we used.  We can change the threshold and the format string for the label in the following example:<p>
+
+    <div id="chart2" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+    
+    <pre id="code_2"></pre>
+    
+    <p>Data labels function similarly for funnel and donut plots.  Here is a funnel plot with the "dataLabels" option set to display the point label.  Note that the label for "Insignia" is not displayed because Insignia represents less than 3% of the overall chart area, which is below the dataLabelThreshold:<p>
+    
+    <div id="chart3" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+    
+    <pre id="code_3"></pre>
+    
+    <p>The last example shows usage of a custom dataLabels array.  Again, labels for small sections will not be displayed unless the "dataLabelThreshold" is reduced (it is set to 3 percent by default).</p>
+    
+    <div id="chart4" style="margin-top:20px; margin-left:20px; width:300px; height:300px;"></div>
+    
+    <pre id="code_4"></pre>
+    
+ 
+  </body>
+</html>

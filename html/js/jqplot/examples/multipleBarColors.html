@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+	
+	<style type="text/css">
+	  .jqplot-point-label {white-space: nowrap;}
+	  p {
+	    margin: 20px;
+	    font-family:Arial,Helvetica,Sans-serif;
+	  }
+	</style>
+	
+	
+		<script type="text/javascript" language="javascript"><!--
+  $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+         line1 = [[4,'Nissan'],[6,'Porche'],[2,'Acura'],[5,'Aston Martin'],[6,'Rolls Royce']];
+         line2 = [5,-5,5,-5,5,-5,5,-5,5,-5,5,-5,5,-5,5,-5,5,-5,5,-5,5,-5,5,-5,5,-5,5,-5,5,-5,5,-5];
+
+         plot1 = $.jqplot('chart1', [line1], {
+            title:'Default Colors',
+             seriesDefaults:{
+               renderer:$.jqplot.BarRenderer, 
+               rendererOptions:{
+                 barWidth:25, 
+                 barPadding:-25, 
+                 barMargin:25, 
+                 barDirection: 'horizontal',
+                 varyBarColor: true
+               }, 
+               shadow:false
+             },
+             legend: {show:false},
+             axes:{
+                 xaxis:{min:0, tickOptions: {formatString: '%.0f',showGridLine: false}},
+                 yaxis:{show: true, renderer: $.jqplot.CategoryAxisRenderer,
+                            tickOptions: {show: true, showLabel: true},
+                            showTicks: true}
+                 }
+         });
+
+         plot2 = $.jqplot('chart2', [line1], {
+            title:'Custom Colors',
+            seriesColors:['#85802b', '#00749F', '#85802b', '#85802b', '#85802b'],
+             seriesDefaults:{
+               renderer:$.jqplot.BarRenderer, 
+               rendererOptions:{
+                 barWidth:25, 
+                 barPadding:-25, 
+                 barMargin:25, 
+                 barDirection: 'horizontal',
+                 varyBarColor: true
+               }, 
+               shadow:false
+             },
+             legend: {show:false},
+             axes:{
+                 xaxis:{min:0, tickOptions: {formatString: '%.0f',showGridLine: false}},
+                 yaxis:{show: true, renderer: $.jqplot.CategoryAxisRenderer,
+                            tickOptions: {show: true, showLabel: true},
+                            showTicks: true}
+                 }
+         });
+
+         plot3 = $.jqplot('chart3', [line2], {
+            title:'All Default Positive and Negative Colors Colors',
+             seriesDefaults:{
+               renderer:$.jqplot.BarRenderer, 
+               rendererOptions:{
+                 barMargin:2, 
+                 varyBarColor: true,
+                 fillToZero: true
+               }
+             },
+             legend: {show:false},
+             axes:{
+                 yaxis:{
+                   
+                   tickOptions: {
+                     showGridLine: false
+                   }
+                 },
+                 xaxis:{
+                   renderer: $.jqplot.CategoryAxisRenderer
+                }
+            }
+         });
+
+         plot4 = $.jqplot('chart4', [line2], {
+            title:'All Colors, useNegativeColors Turned Off',
+             seriesDefaults:{
+               renderer:$.jqplot.BarRenderer, 
+               rendererOptions:{
+                 barMargin:2, 
+                 varyBarColor: true,
+                 fillToZero: true,
+                 useNegativeColors: false
+               }
+             },
+             legend: {show:false},
+             axes:{
+                 yaxis:{
+                   
+                   tickOptions: {
+                     showGridLine: false
+                   }
+                 },
+                 xaxis:{
+                   renderer: $.jqplot.CategoryAxisRenderer
+                }
+            }
+         });
+  });
+			-->
+		</script>
+		
+</head>
+<body>
+<?php include "nav.inc"; ?>
+    <p>Individual bars can now have different colors.  This is achieved by setting the "varyBarColor" option to true in the series rendererOptions.  The default is to assign each bar a different color from the default "seriesColors" array.  You can customize the seriesColors array to assign whatever colors you like to the bars.</p>
+		<div id="chart1" style="width:500px;height:250px;margin:20px;"></div>
+		<div id="chart2" style="width:500px;height:250px;margin:20px;"></div>
+  
+    <p>Bars and filled series are colored differently for positive and negative values by default.  Negative values will be a slightly darker and less saturated than their positive counterparts for visual effect.  This applies to only bar and filled line charts by default.</p>
+		
+		<div id="chart3" style="width:700px;height:250px;margin:20px;"></div>
+    
+    <p>If you want to use only the colors defined in the "seriesColors" array and not colors from the "negativeSeriesColors" array, set the "useNegativeColors" option to false.  This way negative values and positive values will pull their colors from the same color array.</p>
+    
+    <p>Note that there are only 16 colors defined in the default color arrays.  Color arrays will cylcle through colors continuously when the last color is used.</p>
+    
+		<div id="chart4" style="width:700px;height:250px;margin:20px;"></div>
+ 
+</body>
+
+
+</html>

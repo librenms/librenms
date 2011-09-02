@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>untitled</title>
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasTextRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisTickRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+	
+	<script type="text/javascript">
+
+  $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;	
+line1 = [['Cup Holder Pinion Bob', 7], ['Generic Fog Lamp', 9], ['HDTV Receiver', 15], 
+['8 Track Control Module', 12], [' Sludge Pump Fourier Modulator', 3], 
+['Transcender/Spice Rack', 6], ['Hair Spray Danger Indicator', 18]];
+
+line2 = [['Nickle', 28], ['Aluminum', 13], ['Xenon', 54], ['Silver', 47], 
+['Sulfer', 16], ['Silicon', 14], ['Vanadium', 23]];
+
+plot2 = $.jqplot('chart2', [line1, line2], {
+  series:[{renderer:$.jqplot.BarRenderer}, {xaxis:'x2axis', yaxis:'y2axis'}],
+  axesDefaults: {
+      tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
+      tickOptions: {
+        angle: 30
+      }
+  },
+  axes: {
+    xaxis: {
+      renderer: $.jqplot.CategoryAxisRenderer
+    },
+    x2axis: {
+      renderer: $.jqplot.CategoryAxisRenderer
+    },
+    yaxis: {
+      autoscale:true
+    },
+    y2axis: {
+      autoscale:true
+    }
+  }
+});
+
+});
+
+</script>
+</head>
+<body>
+<?php include "nav.inc"; ?>
+
+<div class="jqPlot" id="chart2" style="height:320px; width:480px;"></div>
+
+
+</body>
+</html>

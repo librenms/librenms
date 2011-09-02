@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="examples.css" />
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
+  
+  <!-- BEGIN: load jquery -->
+  <script language="javascript" type="text/javascript" src="../jquery.js"></script>
+
+  <!-- END: load jquery -->
+  
+  <!-- BEGIN: load jqplot -->
+  <script language="javascript" type="text/javascript" src="../jquery.jqplot.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasTextRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisLabelRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="../plugins/jqplot.canvasAxisTickRenderer.js"></script>
+  <script language="javascript" type="text/javascript" src="../plugins/jqplot.enhancedLegendRenderer.js"></script>
+	
+	<style type="text/css">
+    .jqplot-y2axis { margin-left: 4px; }
+    .jqplot { margin: 70px;}
+    table.jqplot-table-legend { border: 0px;}
+
+	</style>
+	
+
+    <script type="text/javascript" language="javascript"><!--
+        $(document).ready(function(){
+      $.jqplot.config.enablePlugins = true;
+            l1 = [[2011,1200], [2039,1200]];
+            l2 = [[2011,0], [2039,800]];
+            l3 = [[2011,0], [2039,400]];
+
+            plot1 = $.jqplot('chart1', [l1,l2,l3], {
+                grid: { 
+                    background:'#ffffff',
+                    // turn off the border.  Note, should set
+                    // borderColor as well due to way axes shares color
+                    // defaults with the grid.
+                    borderWidth:0,
+                    borderColor:'#ffffff',
+                    shadow:true,
+                    // give a wide shadow
+                    shadowWidth: 10,
+                    shadowOffset: 3,
+                    shadowDepth: 8,
+                    // use new shadowColor option to give a custom lighter color 
+                    // because the high shadowDepth will make it look too dark.
+                    shadowColor: 'rgba(230, 230, 230, 0.07)'
+                },
+                legend: {
+                    renderer: $.jqplot.EnhancedLegendRenderer,
+                    show:true,
+                    location: 's',
+                    placement:'outside',
+                    yoffset: 30,
+                    rendererOptions:{
+                        numberRows: 2
+                    }
+                },
+                stackSeries:true,
+                // use the new fillToValue option to make filled series "hover" above the x axis.
+                seriesDefaults:{fill:true, fillToZero:true, fillToValue: 100, yaxis:'y2axis'},
+                series:[{label:'oil'}, {label:'renewables'}, {label:'wind and water'}],
+                axesDefaults: {
+                    showTickMarks:false, 
+                    tickOptions: {
+                        formatString: '%d'
+                    }
+                },
+                axes:{ 
+                    xaxis: {
+                        borderWidth:2,
+                        borderColor:'#999999',
+                        ticks:[2010, 2040],
+                        tickOptions:{
+                            showGridline: false
+                        }
+                    },
+                    y2axis:{
+                        borderWidth:0,
+                        borderColor:'#ffffff',
+                        autoscale: true,
+                        min:0,
+                        max: 3000,
+                        numberTicks:4,
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                        label:'energy use'
+                    },
+                    x2axis: {
+                        borderWidth:0,
+                        borderColor:'#ffffff'
+                    },
+                    yaxis: {
+                        borderWidth:2,
+                        borderColor: '#999999'
+                    }
+                }
+            });
+            
+            // Going to post process the css position of the y2axis label so it appears on the left side of the grid.
+            // Can't specify this in a css rule because jqPlot figures out the correct position of the label and then
+            // sets the style attributes on the label itself.  This will override those element style attributes.
+            // Note, this fails in IE for some reason, probably due to VML emulated canvas elements.
+            var r = plot1._width - plot1._gridPadding.left - 5;
+            r = r+'px';
+            $('.jqplot-y2axis-label').css({top:'10px', right:r});
+        });
+    -->
+    </script>
+
+</head>
+<body>
+<?php include "nav.inc"; ?>
+		<div class="jqplot" id="chart1" style="height:300px;width:400px;"></div>
+ 
+</body>
+
+
+</html>

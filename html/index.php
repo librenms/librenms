@@ -52,8 +52,8 @@ if (isset($config['branding']) && is_array($config['branding']))
   }
 }
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML>
+<html>
 <head>
   <title><?php echo($config['page_title']); ?></title>
   <base href="<?php echo($config['base_url']); ?>" />
@@ -73,6 +73,12 @@ if ($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$conf
   <script type="text/javascript" src="js/jquery-1.5.2.min.js"></script>
   <script type="text/javascript" src="js/jquery-checkbox.js"></script>
   <script type="text/javascript" src="js/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>
+
+  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="js/jqplot/excanvas.js"></script><![endif]-->
+  <script language="javascript" type="text/javascript" src="js/jqplot/jquery.jqplot.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="js/jqplot/jquery.jqplot.css" />
+  <script type="text/javascript" src="js/jqplot/plugins/jqplot.pieRenderer.min.js"></script>
+  <script type="text/javascript" src="js/jqplot/plugins/jqplot.donutRenderer.min.js"></script>
   <script type="text/javascript">
 <!-- Begin
 function popUp(URL)
