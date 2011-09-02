@@ -24,6 +24,7 @@ while ($test_processor = mysql_fetch_assoc($query))
   {
     echo("-");
     mysql_query("DELETE FROM `processors` WHERE processor_id = '" . $test_processor['processor_id'] . "'");
+    log_event("Processor removed: type ".$processor_type." index ".$processor_index." descr ". $test_processor['processor_descr'], $device, 'processor', $test_processor['processor_id']);
   }
   unset($processor_oid); unset($processor_type);
 }
