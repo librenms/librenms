@@ -73,7 +73,9 @@ if ($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$conf
   <script type="text/javascript" src="js/jquery-1.5.2.min.js"></script>
   <script type="text/javascript" src="js/jquery-checkbox.js"></script>
   <script type="text/javascript" src="js/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>
-
+  <!--[if IE]>  
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>  
+  <![endif]--> 
   <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="js/jqplot/excanvas.js"></script><![endif]-->
   <script language="javascript" type="text/javascript" src="js/jqplot/jquery.jqplot.min.js"></script>
   <link rel="stylesheet" type="text/css" href="js/jqplot/jquery.jqplot.css" />
