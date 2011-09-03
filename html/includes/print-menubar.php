@@ -106,7 +106,7 @@ $(document).ready(function(){
   var data = [
     ['Up', <?php echo($devices['up']); ?>],
     ['Down', <?php echo($devices['down']); ?>], 
-    ['Ignored', <?php echo($devices['ignored']); ?>]
+    ['Ignored', <?php echo($devices['ignored']); ?>],
     ['Disabled', <?php echo($devices['disabled']); ?>]
   ];
   var plot1 = jQuery.jqplot ('devices_chart', [data],
