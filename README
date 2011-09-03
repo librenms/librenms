@@ -23,6 +23,8 @@ Observium is an auto-discovering network monitoring system.
 It's designed to be an easily-navigable interface to the health of your network.
 It's not designed to be a Nagios replacement.
 
+Automatic host discovery is currently disabled.
+
 Installation
 ------------
 
