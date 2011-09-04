@@ -3,6 +3,16 @@
         <tr>
           <td align="left"></td>
           <td align="right">
+
+<?php
+if($_SESSION['widescreen'] === 1){
+  echo('<a href="/?widescreen=no">Switch to Normal Width</a>');
+}else{
+  echo('<a href="/?widescreen=yes">Switch to Widescreen</a>');
+}
+?>
+
+
 <?php
 if ($_SESSION['authenticated'])
 {

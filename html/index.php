@@ -25,6 +25,12 @@ include("../config.php");
 include("../includes/functions.php");
 include("includes/functions.inc.php");
 
+include("includes/authenticate.inc.php");
+
+if($_GET['widescreen'] == "yes") { $_SESSION['widescreen'] = 1; }
+if($_GET['widescreen'] == "no")  { unset($_SESSION['widescreen']); }
+
+
 $start = utime();
 
 $now = time();
@@ -66,6 +72,11 @@ if ($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$conf
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <link rel="shortcut icon" href="<?php echo($config['favicon']);  ?>" />
   <link rel="stylesheet" href="css/mktree.css" type="text/css" />
+
+  <?php
+    if ($_SESSION['widescreen']) { echo('<link rel="stylesheet" href="css/styles-wide.css" type="text/css" />'); }
+  ?>
+
 </head>
 <body>
   <script type="text/javascript" src="js/mktree.js"></script>
@@ -96,7 +107,6 @@ function popUp(URL)
 
 <?php
 
-include("includes/authenticate.inc.php");
 include("includes/".$config['web_header']);
 
 if ($_SESSION['authenticated']) { include("includes/print-menubar.php"); } else { echo('<hr color="#444444" />'); }

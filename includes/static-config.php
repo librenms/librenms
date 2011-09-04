@@ -986,6 +986,8 @@ $config['time']['twomonth']   = time() - (2 * 31 * 24 * 60 * 60);
 $config['time']['threemonth'] = time() - (3 * 31 * 24 * 60 * 60);
 $config['time']['sixmonth']   = time() - (6 * 31 * 24 * 60 * 60);
 $config['time']['year']       = time() - (365 * 24 * 60 * 60);
+$config['time']['twoyear']    = time() - (2 * 365 * 24 * 60 * 60);
+
 
 # IPMI sensor type mappings
 $config['ipmi_unit']['Volts']     = 'voltage';

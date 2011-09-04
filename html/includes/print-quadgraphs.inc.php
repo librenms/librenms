@@ -2,12 +2,17 @@
 
 global $config;
 
-if(!$graph_array['height']) { $graph_array['height'] = "100"; }
-if(!$graph_array['width']) { $graph_array['width']  = "215"; }
+if($_SESSION['widescreen']) {
+  if(!$graph_array['height']) { $graph_array['height'] = "110"; }
+  if(!$graph_array['width']) { $graph_array['width']  = "215"; }
+} else {
+  if(!$graph_array['height']) { $graph_array['height'] = "100"; }
+  if(!$graph_array['width']) { $graph_array['width']  = "215"; }
+}
 
 $graph_array['to']     = $config['time']['now'];
 
-$periods = array('day', 'week', 'month', 'year');
+$periods = array('sixhour', 'day', 'week', 'month', 'year', 'twoyear');
 
 foreach ($periods as $period)
 {
