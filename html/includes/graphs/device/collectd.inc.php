@@ -16,24 +16,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-if($_GET['debug']) {
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 0);
-  ini_set('log_errors', 0);
-  ini_set('allow_url_fopen', 0);
-  ini_set('error_reporting', E_ALL);
-}
-
-include("../includes/defaults.inc.php");
-include("../config.php");
-include("../includes/functions.php");
-include("includes/functions.inc.php");
 require('includes/collectd/config.php');
 require('includes/collectd/functions.php');
 require('includes/collectd/definitions.php');
-include("includes/authenticate.inc.php");
-
-if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
 
 function makeTextBlock($text, $fontfile, $fontsize, $width) {
   // TODO: handle explicit line-break!
@@ -131,7 +116,8 @@ function error400($title, $msg) {
 }
 
 // Process input arguments
-$host   = read_var('host', $_GET, null);
+#$host   = read_var('host', $_GET, null);
+$host   = $device['hostname'];
 if (is_null($host))
   return error400("?/?-?/?", "Missing host name");
 else if (!is_string($host))
@@ -139,7 +125,7 @@ else if (!is_string($host))
 else if (strlen($host) == 0)
   return error400("?/?-?/?", "Host name may not be blank");
 
-$plugin   = read_var('plugin', $_GET, null);
+$plugin   = read_var('c_plugin', $_GET, null);
 if (is_null($plugin))
   return error400($host.'/?-?/?', "Missing plugin name");
 else if (!is_string($plugin))
@@ -147,11 +133,11 @@ else if (!is_string($plugin))
 else if (strlen($plugin) == 0)
   return error400($host.'/?-?/?', "Plugin name may not be blank");
 
-$pinst  = read_var('plugin_instance', $_GET, '');
+$pinst  = read_var('c_plugin_instance', $_GET, '');
 if (!is_string($pinst))
   return error400($host.'/'.$plugin.'-?/?', "Plugin instance name must be a string");
 
-$type   = read_var('type', $_GET, '');
+$type   = read_var('c_type', $_GET, '');
 if (is_null($type))
   return error400($host.'/'.$plugin.(strlen($pinst) ? '-'.$pinst : '').'/?', "Missing type name");
 else if (!is_string($type))
@@ -159,7 +145,7 @@ else if (!is_string($type))
 else if (strlen($type) == 0)
   return error400($host.'/'.$plugin.(strlen($pinst) ? '-'.$pinst : '').'/?', "Type name may not be blank");
 
-$tinst  = read_var('type_instance', $_GET, '');
+$tinst  = read_var('c_type_instance', $_GET, '');
 
 $graph_identifier = $host.'/'.$plugin.(strlen($pinst) ? '-'.$pinst : '').'/'.$type.(strlen($tinst) ? '-'.$tinst : '-*');
 

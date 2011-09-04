@@ -74,8 +74,6 @@ print_optionbar_end();
 
      if ($MetaGraphDefs[$type]) { $typeinstances = array($MetaGraphDefs[$type]); }
 
-
-
      foreach ($typeinstances as &$tinst) {
        $i++;
        if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
@@ -88,6 +86,16 @@ print_optionbar_end();
         echo($_GET['opta']." $instance - $type");
        }
        echo("</div>");
+
+       $graph_array['type']    		= "device_collectd";
+       $graph_array['id']      		= $device['device_id'];
+
+       $graph_array['c_plugin']  	 = $_GET['opta'];
+       $graph_array['c_plugin_instance'] = $instance;
+       $graph_array['c_type']		 = $type;
+       $graph_array['c_type_instance']   = $tinst;
+
+       include("includes/print-quadgraphs.inc.php");
 
        $daily_traffic   = "collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=".$config['time']['day']."&to=".$config['time']['now']."&width=215&height=100";
        $daily_traffic  .= $args;
