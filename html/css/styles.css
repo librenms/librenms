@@ -1,3 +1,13 @@
+body {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    margin: 0px;
+    padding: 0px 0px 0px 0px;
+    background-color: #fff;
+    color: #666;
+    font-size: 10pt;
+    line-height: 20px;
+}
+
 .pagemenu-selected {
   font-weight: bold; 
   background-color: #cecece; 
@@ -22,7 +32,6 @@ input,select {
   border-color:#B2B2B2 #d2d2d2 #d2d2d2 #B2B2B2;
   border-style:solid;
   border-width:1px;
-  font-family:'Trebuchet MS','Lucida Grande',Verdana,Arial,sans-serif;
   margin:1px;
   padding:1px;
 }
@@ -252,7 +261,6 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
 }
 
 .header-text {
-        font-family: sans-serif;
         font-size: 16px;
         font-style: normal;
         font-weight: bold;
@@ -260,7 +268,6 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
 }
 
 .interface-header {
-        font-family: sans-serif;
         font-size: 20px;
         font-style: normal;
         font-weight: bold;
@@ -275,7 +282,6 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
 }
 
 .tablehead {
-        font-family: Verdana, arial, sans-serif;
         font-weight: bold;
         font-size: 13px;
         font-style: normal;
@@ -284,33 +290,28 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
 }
 
 .box-desc {
-        font-family: "Verdana", Arial, Helvetica, sans-serif;
         font-size: 12px;
         font-style: italic;
 }
 
 .interface-desc {
-  	font-family: "Verdana", Arial, Helvetica, sans-serif;
         font-size: 11px;
         font-style: normal;
 }
 
 .syslog {
-        font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 12px;
         font-style: normal;
         color: #000000;
 }
 
 .page-header, .device-header {
-        font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 24px;
         font-weight: bold;
         color: black;
 }
 
 .top-subtitle {
-        font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 22px;
         font-weight: bold;
         vertical-align: middle;
@@ -321,7 +322,6 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
 }
 
 .device-head {
-        font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 16px;
         font-weight: bold;
 }
@@ -366,7 +366,6 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .footer-text {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 12px;
         font-style: normal;
         font-weight: bold;
@@ -374,7 +373,6 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .header-text-3 {
-        font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 13px;
         font-style: normal;
         font-weight: bold;
@@ -382,7 +380,6 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .body-1 {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 13px;
         font-style: normal;
         font-weight: normal;
@@ -390,7 +387,6 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .body-date-1 {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 10px;
         font-style: normal;
         font-weight: normal;
@@ -398,7 +394,6 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .copy {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 10px;
         font-style: italic;
         font-weight: normal;
@@ -406,7 +401,6 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .body-2 {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 14px;
         font-style: normal;
         font-weight: normal;
@@ -414,7 +408,6 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .body-field-1 {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 13px;
         font-style: normal;
         font-weight: bold;
@@ -422,7 +415,6 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .body-head-1 {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 16px;
         font-style: normal;
         font-weight: bold;
@@ -430,7 +422,6 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .body-head {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 32px;
         font-style: normal;
         font-weight: bold;
@@ -438,7 +429,6 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .body-head-2, .table-head-2 {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 14px;
         font-style: normal;
         font-weight: bold;
@@ -451,7 +441,6 @@ a.list-device-disabled, a.list-device-disabled:visited {
 
 
 .text-more {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 10px;
         font-style: normal;
         font-weight: bold;
@@ -489,20 +478,12 @@ a.list-device-disabled, a.list-device-disabled:visited {
 	position: relative;
 	background-color: #eeeeee;
 	text-align: center;
-        font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 10px;
         font-style: italic;
         font-weight: normal;
         color: #000000;
         width: 360px;
 	padding: 10px;
-}
-
-body {
-    margin: 0px; padding: 0px 0px 0px 0px;
-    background-color: #fff; color: #666;
-    font: 10pt Verdana;
-    line-height: 20px;
 }
 
 table { border-collapse: collapse; margin: 0px; }
@@ -670,7 +651,6 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 }
 
 .infobox,.infobox-down {
-        font-family: Verdana, Arial, Helvetica, sans-serif;
         border: 2px dashed #AAAACC;
         background-color: #CCCCFF;
         padding: 8px;
@@ -683,7 +663,6 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 }
 
 .errorbox {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
 	border: 2px dashed #CC0000;
 	background-color: #FFCCCC;
 	padding: 5px;
@@ -692,115 +671,12 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 }
 
 .messagebox {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
 	border: thin dashed #009900;
 	background-color: #ccffaa;
 	padding: 5px;
 	font-size: small;
 	margin: 5px;
 }
-
-
-/* Fancy menu */
-
-.menu2 { float:left; width:100%; font-family: Verdana, arial, sans-serif; font-weight: bold ; font-size: 11px; border:1px solid #aaaaaa;
-background:#ddd url(../images/menu2.gif) repeat-x;
-z-index: 9;
-}
-.menu2 ul {
-padding:0;margin:0;list-style-type:none;
-}
-.menu2 ul li {
-float:left; position:relative;
-}
-.menu2 ul li.group {display:block; text-indent:10px; background:#666; color:#cc0000; width:150px; padding:4px 0;}
-
-.menu2 ul li a, .menu2 ul li a:visited {
-float:left; display:block; text-decoration:none; color:#666; padding:0px 16px; line-height:25px; height:25px;
-}
-
-.menu2 ul li:hover {width:auto;}
-
-.menu2 ul li a:hover {background:#aaa url(../images/sub2a.gif); color:#356AA0;}
-
-.menu2 ul li:hover a {background:#aaa url(../images/sub2a.gif); color:#356AA0;}
-
-.menu2 ul li ul {
-display: none;
-}
-.menu2 table {
-margin:0; border-collapse:collapse; font-size:11px; position:absolute; top:0; left:0; font-size: 10px;
-}
-
-/* specific to non IE browsers */
-.menu2 ul li:hover ul {
-display:block; position:absolute;top:24px; background:#aaa; margin-top:1px; left:0; width:140px;
-}
-
-.menu2 ul li:hover ul.scroller {
-height:138px; width:172px; overflow:auto;}
-
-.menu2 ul li:hover ul.endstop {
-left:-90px;
-}
-.menu2 ul li:hover ul li ul {
-display: none;
-}
-.menu2 ul li:hover ul li a {
-display:block; background:#aaa; color:#fff;height:auto;line-height:15px;padding:4px 10px; width:120px;
-}
-.menu2 ul li:hover ul li a.drop {
-background:#888;
-}
-.menu2 ul li:hover ul li a:hover {
-color:#ff0; background: #888;
-}
-.menu2 ul li:hover ul li a:hover.drop {
-background: #888; color:#ff0;
-}
-.menu2 ul li:hover ul li:hover ul {
-display:block; position:absolute; left:153px; top:-70px; color:#000; left:152px; height:138px; width:172px; overflow:auto; background:#888;
-}
-.menu2 ul li:hover ul li:hover ul li a {background:#888;}
-.menu2 ul li:hover ul li:hover ul li.group {width:152px; padding:5px 0;}
-
-
-.menu2 ul li:hover ul li:hover ul.left {
-left:-172px;
-}
-.menu2 ul li:hover ul li:hover ul li a:hover {background:#666; color:#0ff;}
-
-/* specific to IE5.5 and IE6 browsers */
-.menu2 ul li a:hover ul {
-display:block;position:absolute;top:30px; t\op:29px; background:#aaa;left:0; marg\in-top:1px;
-}
-.menu2 ul li a:hover ul.scroller {
-height:138px; overflow:auto;}
-
-.menu2 ul li a:hover ul.endstop {
-left: -90px;
-}
-.menu2 ul li a:hover ul li a {
-display:block; color:#fff; height:1px; line-height:15px; padding:4px 16px; width:152px; w\idth:120px;
-}
-.menu2 ul li a:hover ul li a.drop {
-background:#888; padding-bottom:5px;
-}
-.menu2 ul li a:hover ul li a ul {
-visibility:hidden; position:absolute; height:0; width:0;
-}
-.menu2 ul li a:hover ul li a:hover {
-color:#ff0; background: #888;
-}
-.menu2 ul li a:hover ul li a:hover.drop {
- background: #888; color:#ff0;
-}
-.menu2 ul li a:hover ul li a:hover ul {
-visibility:visible; position:absolute; top:-69px; t\op:-70px; color:#000; left:152px; height:138px; width:172px; overflow:auto; background:#888;
-}
-.menu2 ul li a:hover ul li a:hover ul.left { left:-170px; }
-
-.menu2 ul li a:hover ul li a:hover ul li a:hover {background:#666; color:#0ff;}
 
 .left {clear:both;}
 
@@ -812,7 +688,6 @@ visibility:visible; position:absolute; top:-69px; t\op:-70px; color:#000; left:1
  margin-left: 0;
  margin-top: 1px;
  margin-bottom: 0px;
- font-family: Verdana, arial, sans-serif;
  font-weight: normal;
  font-size: 12px;
  list-style-type: none;
@@ -957,7 +832,6 @@ color: #cc0000;
 }  
   
 #menium li a {  
-    font-family: Trebuchet, Arial, Helvetica, sans-serif;  
     font-weight: bold;
     font-size:13px;  
     color: #666;  
@@ -1047,6 +921,7 @@ color: #cc0000;
     float:right;  
     margin-right:0px;  
 }  
+
 #menium li .align_right {  
     /* Rounded Corners */  
     -moz-border-radius: 4px 0px 4px 4px;  
@@ -1063,12 +938,12 @@ color: #cc0000;
 /* Drop Down Content Stylings */  
   
 #menium p, #menium h2, #menium h3, #menium ul li {  
-    font-family:Arial, Helvetica, sans-serif;  
     line-height:21px;  
     font-size:12px;  
     text-align:left;  
     #text-shadow: 1px 1px 1px #FFFFFF;  
 }  
+
 #menium h2 {  
     font-size:21px;  
     font-weight:400;  
@@ -1077,12 +952,14 @@ color: #cc0000;
     padding-bottom:14px;  
     border-bottom:1px solid #666666;  
 }  
+
 #menium h3 {  
     font-size:14px;  
     margin:7px 0 14px 0;  
     padding-bottom:7px;  
     border-bottom:1px solid #888888;  
 }  
+
 #menium p {  
     line-height:18px;  
     margin:0 0 10px 0;  
@@ -1092,15 +969,19 @@ color: #cc0000;
     font-size:12px;  
     color:#015b86;  
 }  
+
 #menium li:hover div a:hover {  
     color:#029feb;  
 }  
+
 .strong {  
     font-weight:bold;  
 }  
+
 .italic {  
     font-style:italic;  
 }  
+
 .imgshadow {  
     background:#FFFFFF;  
     padding:4px;  
@@ -1110,11 +991,13 @@ color: #cc0000;
     -webkit-box-shadow:0px 0px 5px #666666;  
     box-shadow:0px 0px 5px #666666;  
 }  
+
 .img_left { /* Image sticks to the left */  
     width:auto;  
     float:left;  
     margin:5px 15px 5px 5px;  
 }  
+
 #menium li .black_box {  
     background-color:#333333;  
     color: #eeeeee;  
