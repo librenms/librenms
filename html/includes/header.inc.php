@@ -1,8 +1,14 @@
-    <div id="top" style="background: <?php echo($config['header_color']); ?>;">
-      <table cellpadding="0" cellspacing="0" width="100%">
-        <tr>
-          <td align="left"></td>
-          <td align="right">
+<div id="gumax-header">
+  <div id="gumax-p-logo">
+    <div id="p-logo">
+      <a style="background-image: url('images/observium-logo.png');" accesskey="z"></a>
+    </div>
+    <script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+  </div>
+  <!-- end of gumax-p-logo -->
+
+  <!-- Login Tools -->
+  <div id="gumax-p-login">
 
 <?php
 if($_SESSION['widescreen'] === 1){
@@ -23,27 +29,21 @@ if ($_SESSION['authenticated'])
 
 if (Net_IPv6::checkIPv6($_SERVER['REMOTE_ADDR'])) { echo(" via <b>IPv6</b>"); } else { echo(" via <b>IPv4</b>"); }
 ?>
-          </td>
-        </tr>
-      </table>
-    </div>
 
-    <div id="header" style="border: 1px none #ccf;">
-      <table width="100%" style="padding: 0px; margin:0px;">
-        <tr>
-          <td style="padding: 0px; margin:0px; border: none;">
-            <div id="logo" style="padding: 10px"><a href="index.php"><img src="<?php echo($config['title_image']); ?>" alt="Logo" border="0" /></a></div>
-          </td>
-          <td align="right" style="margin-right: 10px;">
-            <div id="topnav" style="float: right;">
+  </div>
+  <div style="float: right;">
+
+
 <?php
 if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'])
 {
   include("includes/topnav.inc.php");
 }
 ?>
-            </div>
-          </td>
-        </tr>
-      </table>
-    </div>
+  </div>
+</div>
+
+	<!-- ///// end of gumax-header ///// -->
+
+
+

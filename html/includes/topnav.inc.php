@@ -46,10 +46,10 @@ if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['
 
 ?>
 
-<table cellpadding="2" cellspacing="0" border="0">
+<table cellpadding="1" cellspacing="0" border="0" width=400>
   <tr style="background-color: <?php echo($devices[bgcolour]); ?>">
     <td width="5"></td>
-    <td>Devices : </td>
+    <td><strong>Devices</strong></td>
     <td><?php echo($devices['count']) ?></td>
     <td> ( </td>
     <td style="text-align: right"><span class="green"> <?php echo($devices['up']) ?> up</span></td>
@@ -60,7 +60,8 @@ if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['
     <td width="5"></td>
   </tr>
   <tr style="background-color: <?php echo($ports['bgcolour']) ?>">
-      <td width="5"></td><td>Ports : </td>
+      <td width="5"></td>
+      <td><strong>Ports</strong></td>
     <td><?php echo($ports['count']) ?></td>
     <td> ( </td>
     <td style="text-align: right"><span class="green"> <?php echo($ports['up']) ?> up </span></td>
@@ -73,7 +74,7 @@ if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['
 <?php if ($config['show_services']) { ?>
   <tr style="background-color: <?php echo($services['bgcolour']) ?>">
     <td width="5"></td>
-    <td>Services : </td>
+    <td><strong>Services</strong></td>
     <td><?php echo($services['count']) ?></td>
     <td> ( </td>
     <td style="text-align: right"><span class="green"><?php echo($services['up']) ?> up</span></td>
