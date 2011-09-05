@@ -1,11 +1,18 @@
 body {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    margin: 0px;
-    padding: 0px 0px 0px 0px;
-    background-color: #fff;
-    color: #666;
-    font-size: 10pt;
-    line-height: 20px;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  margin: 0px;
+  padding: 0px 0px 0px 0px;
+  background: rgb(249,249,249); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(249,249,249,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(249,249,249,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(249,249,249,1) 0%,rgba(255,255,255,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(249,249,249,1) 0%,rgba(255,255,255,1) 100%); /* Opera11.10+ */
+  background: -ms-linear-gradient(top, rgba(249,249,249,1) 0%,rgba(255,255,255,1) 100%); /* IE10+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f9f9f9', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+  background: linear-gradient(top, rgba(249,249,249,1) 0%,rgba(255,255,255,1) 100%); /* W3C */
+  color: #666;
+  font-size: 10pt;
+  line-height: 20px;
 }
 
 .pagemenu-selected {
@@ -502,13 +509,13 @@ a:active { color: #00f; }
 
 .vspace { margin-top: 4px; margin-bottom: 4px; }
 p.vspace { padding-top: 3px; padding-bottom: 3px; }
-.content-mat { padding: 0px; margin: auto; background: none; }
+.content-mat { padding: 0px; margin: auto; }
 
 .clearer { clear: both; display: block; padding: 0px; height: 0px; line-height: 1px; font-size: 0px; }
 
 .borderless-table tr td { border: none }
 
-#header { width: 100%; margin: 0px 0px 0px 0px; background-color: #fff; }
+#header { width: 100%; margin: 0px 0px 0px 0px; bbackground-color: #fff; }
 #header #page-title { color: #555; font: 18pt Arial; font-weight: bold; }
 #header #page-subtitle { color: #555; font: 12pt Arial; font-weight: bold; }
 #header a { color: #eeeeee; }
@@ -1017,23 +1024,24 @@ color: #cc0000;
 #menium li ul {  
     list-style:none;  
     padding:0;  
-    margin:0 0 12px 0;  
+    margin:0 0 12px 0; 
+    width: 100%;
 }  
 #menium li ul li {  
     font-size:12px;  
     line-height:24px;  
     position:relative;  
-    #text-shadow: 1px 1px 1px #ffffff;  
-    padding:0;  
+    text-shadow: 1px 1px 1px #ffffff;  
+    padding:1px;  
     margin:0;  
     float:none;  
     text-align:left;  
-    width:130px;  
+    width: 100%; 
 }  
 #menium li ul li:hover {  
-    background:none;  
+    background: #F4F4F4;  
     border:none;  
-    padding:0;  
+    padding:1px;  
     margin:0;  
 }  
 #menium li .greybox li {  
@@ -1054,3 +1062,70 @@ color: #cc0000;
     padding:4px 6px 4px 6px;  
     margin:0px 0px 4px 0px;  
 }  
+
+
+/* Header
+-----------------------------------------------------------------------------*/
+/* gumax-header */
+#gumax-header {
+    /* border: 1px solid #000; /*debuging*/
+    position: relative;
+    z-index: 100;  /* make logo visible over content*/
+    min-height: 100px;  /* height of header */
+    height: 102px;  /* need for IE */
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* Login
+-----------------------------------------------------------------------------*/
+#gumax-p-login {
+    /* border: 1px solid #000; /*debuging*/
+    font-size: 90%;
+    margin: 0; padding: 7px 0 5px 0;
+    text-align: right;
+}
+
+#gumax-p-login ul {
+    position: relative;
+    width: auto;
+    list-style: none;
+    padding: 0; margin: 0;
+}
+
+#gumax-p-login ul li {
+    position: relative;
+    display: inline;
+    margin: 0; padding: 0;
+    font-size: 100%;
+}
+
+#gumax-p-login ul li a {
+    color: #777;
+    padding: 2px 0 2px 10px;
+    text-decoration: none;
+}
+
+#gumax-p-login ul li a:hover { color: #333; }
+
+/* Logo
+-----------------------------------------------------------------------------*/
+#p-logo,
+#p-logo a,
+#p-logo a:hover {
+    /* border: 1px solid #000; /*debuging*/
+    width: 350px;
+    height: 96px;
+}
+#p-logo {
+    z-index: 200; position: absolute;
+    top: 00px; left: 0px; /* logo position */
+    overflow: visible;
+}
+#p-logo h5 { display: none; }
+#p-logo a, #p-logo a:hover {
+    display: block;
+    background-repeat: no-repeat;
+    background-position: center left !important;
+    text-decoration: none;
+}
