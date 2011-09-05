@@ -46,7 +46,7 @@ if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['
 
 ?>
 
-<table cellpadding="1" cellspacing="0" border="0" width=400>
+<table cellpadding="0" cellspacing="0" border="0" width=500>
   <tr style="background-color: <?php echo($devices[bgcolour]); ?>">
     <td width="5"></td>
     <td><strong>Devices</strong></td>
