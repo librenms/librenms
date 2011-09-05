@@ -8,23 +8,35 @@ function getDates($dayofmonth)
 
   if (date('d') > $dayofmonth)
   {
-    $newmonth = $month + 1;
+    $newmonth = zeropad($month + 1);
     if ($newmonth == 13)
     {
-      $newmonth = 1;
-      $newyear = year + 1;
+      $newmonth = "01";
+      $newyear = $year + 1;
     } else {
       $newyear = $year;
     }
 
+    $lastmonth = zeropad($month - 1);
+    if ($lastmonth == 0)
+    {
+      $lastmonth = 12;
+      $lastyear = $year - 1;
+    } else {
+      $lastyear = $year;
+    }
+
+
     $date_from = $year . $month . $dayofmonth;
     $date_to   = $newyear . $newmonth . $dayofmonth;
-    $date_to   = dbFetchCell("SELECT DATE_SUB(DATE_ADD('".mres($date_from)."', INTERVAL 1 MONTH), INTERVAL 1 DAY)");
-    $date_to   = str_replace("-","",$date_to);
+
+    $last_from = $lastyear . $lastmonth . $dayofmonth;
+    $last_to   = $year . $month . $dayofmonth;
+
   }
   else
   {
-    $newmonth = $month - 1;
+    $newmonth = zeropad($month - 1);
     if ($newmonth == 0)
     {
       $newmonth = 12;
@@ -33,22 +45,34 @@ function getDates($dayofmonth)
       $newyear = $year;
     }
 
+    $lastmonth = zeropad($month - 2);
+    if ($lastmonth == -1)
+    {
+      $lastmonth = 10;
+      $lastyear = $year - 1;
+    } elseif ($lastmonth == 0) 
+    {
+      $lastmonth = 11;
+      $lastyear = $year - 1;
+    } else {
+      $lastyear = $year;
+    }
+
+
     $date_from = $newyear . $newmonth . $dayofmonth;
     $date_to   = $year . $month . $dayofmonth;
-    $date_from = dbFetchCell("SELECT DATE_SUB(DATE_ADD('".mres($date_to)."', INTERVAL 1 MONTH, INTERVAL 1 DAY)");
-    $date_from = str_replace("-","",$date_from);
+
+    $last_from = $lastyear . $lastmonth . $dayofmonth;
+    $last_to   = $newyear . $newmonth . $dayofmonth;
+
   }
 
-  $last_from = dbFetchCell("SELECT DATE_SUB('".mres($date_from)."', INTERVAL 1 MONTH)");
-  $last_from = str_replace("-","",$last_from);
+  $return['0'] = $date_from . "000001";
+  $return['1'] = $date_to . "000000";
+  $return['2'] = $last_from . "000001";
+  $return['3'] = $last_to . "000000";
 
-  $last_to = dbFetchCell("SELECT DATE_SUB('".mres($date_to)."', INTERVAL 1 MONTH)");
-  $last_to = str_replace("-","",$last_to);
-
-  $return['0'] = $date_from . "000000";
-  $return['1'] = $date_to . "235959";
-  $return['2'] = $last_from . "000000";
-  $return['3'] = $last_to . "235959";
+  print_r($return);
 
   return($return);
 }
@@ -153,6 +177,8 @@ function getRates($bill_id,$datefrom,$dateto)
   $m_95th = $a_95th[$measurement_95th];
 
   $mtot = getTotal($bill_id,$datefrom,$dateto);
+  $ptot = getPeriod($bill_id,$datefrom,$dateto);
+
 
   $data['rate_95th_in'] = get95thIn($bill_id,$datefrom,$dateto);
   $data['rate_95th_out'] = get95thOut($bill_id,$datefrom,$dateto);
@@ -167,7 +193,9 @@ function getRates($bill_id,$datefrom,$dateto)
   }
 
   $data['total_data'] = round($mtot / 1000 / 1000, 2);
-  $data['rate_average'] = round($mtot / $measurements / 1000 / 300 * 8, 2);
+  $data['rate_average'] = round($mtot / $ptot / 1000 * 8, 2);
+
+#  print_r($data);
 
   return($data);
 }
@@ -175,8 +203,14 @@ function getRates($bill_id,$datefrom,$dateto)
 function getTotal($bill_id,$datefrom,$dateto)
 {
   $mtot = dbFetchCell("SELECT SUM(delta) FROM bill_data WHERE bill_id = '".mres($bill_id)."' AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'");
-
   return($mtot);
 }
+
+function getPeriod($bill_id,$datefrom,$dateto)
+{
+  $ptot = dbFetchCell("SELECT SUM(period) FROM bill_data WHERE bill_id = '".mres($bill_id)."' AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'");
+  return($ptot);
+}
+
 
 ?>

@@ -30,6 +30,7 @@ if (bill_permitted($bill_id))
   if ($paidrate >= 1000000) { $paidrate_text = $paid_mb . "Mbps is the CDR."; }
 
   $day_data     = getDates($dayofmonth);
+
   $datefrom     = $day_data['0'];
   $dateto       = $day_data['1'];
   $lastfrom	= $day_data['2'];
