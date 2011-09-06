@@ -133,6 +133,12 @@ $(document).ready(function(){
       </div>
 
     </li><!-- End 5 columns Item -->  
+
+<?php
+
+if ($config['show_services'])
+{
+?>
   
     <li><a href="#" class="drop"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services</a><!-- Begin 4 columns Item -->  
   
@@ -193,7 +199,10 @@ $(document).ready(function(){
     </li><!-- End 4 columns Item -->  
 
 <?php
-if ($config['show_locations']) {
+}
+
+if ($config['show_locations'])
+{
 ?>
     <li><a href="#" class="drop"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a><!-- Begin Home Item -->
 
