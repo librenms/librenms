@@ -96,7 +96,7 @@ function process_syslog ($entry, $update) {
     } elseif($os == 'linux'){
       $matches = array();
       //User_CommonName/123.213.132.231:39872 VERIFY OK: depth=1, /C=PL/ST=Malopolska/O=VLO/CN=v-lo.krakow.pl/emailAddress=root@v-lo.krakow.pl
-      if($entry['facility'] == 'daemon' and preg_match('#/([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{4,} ([A-Z]([A-Za-z)+( ?)){2,}:#', $entry['msg'])){
+      if($entry['facility'] == 'daemon' and preg_match('#/([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{4,} ([A-Z]([A-Za-z])+( ?)){2,}:#', $entry['msg'])){
         $entry['program'] = 'OpenVPN';
       }
       //pop3-login: Login: user=<username>, method=PLAIN, rip=123.213.132.231, lip=123.213.132.231, TLS
