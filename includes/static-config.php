@@ -734,6 +734,11 @@ $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
 $config['os'][$os]['icon']  		= "tripplite";
 
+$os = "symbol";
+$config['os'][$os]['type'] 		= "network";
+$config['os'][$os]['text']  		= "Symbol AP";
+$config['os'][$os]['icon']  		= "symbol";
+
 foreach($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))

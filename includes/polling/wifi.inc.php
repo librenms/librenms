@@ -45,6 +45,15 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall')
       unset($wirelesscards);
     }
   }
+  
+  if ($device['os'] == 'symbol' AND (stristr($device['hardware'],"AP")))
+  {
+    echo("Checking Symbol Wireless clients... ");
+
+    $wificlients1 = snmp_get($device, ".1.3.6.1.4.1.388.11.2.4.2.100.10.1.18.1", "-Ovq");
+
+    echo(($wificlients1 +0) . " clients on wireless connector, ");
+  }
 
 
   ##### RRD Filling Code
