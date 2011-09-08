@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ERROR);
+
 ### Default directories
 
 $config['temp_dir']      = "/tmp";

@@ -370,16 +370,6 @@ function humanspeed($speed)
   return $speed;
 }
 
-function print_error($text)
-{
-  echo('<div class="errorbox"><img src="/images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
-}
-
-function print_message($text)
-{
-  echo('<div class="messagebox"><img src="/images/16/tick.png" align="absmiddle"> '.$text.'</div>');
-}
-
 function devclass($device)
 {
   if (isset($device['status']) && $device['status'] == '0') { $class = "list-device-down"; } else { $class = "list-device"; }

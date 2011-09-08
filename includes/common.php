@@ -2,6 +2,34 @@
 
 ## Common Functions
 
+function isCli() {
+ 
+     if(php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
+          return true;
+     } else {
+          return false;
+     }
+}
+
+function print_error($text)
+{
+  if(isCli()) {
+    print Console_Color::convert("%r".$text."%n\n", false);
+  } else {
+    echo('<div class="errorbox"><img src="/images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
+  }
+}
+
+function print_message($text)
+{
+  if(isCli()) {
+    print Console_Color::convert("%g".$text."%n\n", false);
+  } else {
+    echo('<div class="messagebox"><img src="/images/16/tick.png" align="absmiddle"> '.$text.'</div>');
+  }
+}
+
+
 function delete_port($int_id)
 {
   global $config;
