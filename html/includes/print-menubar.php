@@ -67,7 +67,7 @@ foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
 
     </li>
   
-    <li><a href="#" class="drop"><img src="images/16/server.png" border="0" align="absmiddle" /> Devices</a>
+    <li><a href="devices/" class="drop"><img src="images/16/server.png" border="0" align="absmiddle" /> Devices</a>
 
      <div class="dropdown_4columns"><!-- Begin 4 columns container -->
       <div class="col_1">
@@ -140,7 +140,7 @@ if ($config['show_services'])
 {
 ?>
   
-    <li><a href="#" class="drop"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services</a><!-- Begin 4 columns Item -->  
+    <li><a href="services/" class="drop"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services</a><!-- Begin 4 columns Item -->  
   
         <div class="dropdown_4columns"><!-- Begin 4 columns container -->  
   
@@ -204,7 +204,7 @@ $(document).ready(function(){
 if ($config['show_locations'])
 {
 ?>
-    <li><a href="#" class="drop"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a><!-- Begin Home Item -->
+    <li><a href="locations/" class="drop"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a><!-- Begin Home Item -->
 
 <?php
   if ($config['show_locations_dropdown'])
@@ -237,7 +237,7 @@ if ($config['show_locations'])
 
     <!-- PORTS -->
 
-    <li><a href="#" class="drop"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports</a><!-- Begin Home Item -->
+    <li><a href="ports/" class="drop"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports</a><!-- Begin Home Item -->
 
         <div class="dropdown_4columns"><!-- Begin 2 columns container -->
         
@@ -353,7 +353,7 @@ $menu_sensors = $used_sensors;
 
 ?>
 
-    <li><a href="#" class="drop"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Health</a><!-- Begin Home Item -->
+    <li><a href="health/" class="drop"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Health</a><!-- Begin Home Item -->
 
         <div class="dropdown_1column"><!-- Begin 2 columns container -->
             <div class="col_1">
@@ -410,7 +410,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
 ?>
 
-    <li><a href="#" class="drop"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a><!-- Begin Home Item -->
+    <li><a href="routing/" class="drop"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a><!-- Begin Home Item -->
 
         <div class="dropdown_3columns"><!-- Begin 2 columns container -->
 
