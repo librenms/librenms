@@ -1,56 +1,58 @@
 <?php
 
+### FIXME - do this in a function and/or do it in graph-realtime.php
+
+
+if($_GET['optc']) {
+  $interval = $_GET['optc'];
+} else {
+  if($device['os'] == "linux") {
+    $interval = "15";
+  } else {
+    $interval = "2";
+  }
+}
+
 print_optionbar_start();
 
 echo("Polling Interval: ");
 
-if ($_GET['optc'] == "0.25" || !$_GET['optc']) { echo("<span class='pagemenu-selected'>"); }
+if ($interval == "0.25" || !$interval) { echo("<span class='pagemenu-selected'>"); }
 echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/realtime/0.25/'>0.25s</a>");
-if ($_GET['optc'] == "0.25" || !$_GET['optc']) { echo("</span>"); }
+if ($interval == "0.25" || !$interval) { echo("</span>"); }
 
 echo(" | ");
 
-if ($_GET['optc'] == "1" || !$_GET['optc']) { echo("<span class='pagemenu-selected'>"); }
+if ($interval == "1" || !$interval) { echo("<span class='pagemenu-selected'>"); }
 echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/realtime/1/'>1s</a>");
-if ($_GET['optc'] == "1" || !$_GET['optc']) { echo("</span>"); }
+if ($interval == "1" || !$interval) { echo("</span>"); }
 
 
 echo(" | ");
 
-if ($_GET['optc'] == "2" || !$_GET['optc']) { echo("<span class='pagemenu-selected'>"); }
+if ($interval == "2" || !$interval) { echo("<span class='pagemenu-selected'>"); }
 echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/realtime/2/'>2s</a>");
-if ($_GET['optc'] == "2" || !$_GET['optc']) { echo("</span>"); }
+if ($interval == "2" || !$interval) { echo("</span>"); }
 
 echo(" | ");
 
-if ($_GET['optc'] == "5" || !$_GET['optc']) { echo("<span class='pagemenu-selected'>"); }
+if ($interval == "5" || !$interval) { echo("<span class='pagemenu-selected'>"); }
 echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/realtime/5/'>5s</a>");
-if ($_GET['optc'] == "5" || !$_GET['optc']) { echo("</span>"); }
+if ($interval == "5" || !$interval) { echo("</span>"); }
 
 echo(" | ");
 
-if ($_GET['optc'] == "15" || !$_GET['optc']) { echo("<span class='pagemenu-selected'>"); }
+if ($interval == "15" || !$interval) { echo("<span class='pagemenu-selected'>"); }
 echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/realtime/15/'>15s</a>");
-if ($_GET['optc'] == "15" || !$_GET['optc']) { echo("</span>"); }
+if ($interval == "15" || !$interval) { echo("</span>"); }
 
 echo(" | ");
 
-if ($_GET['optc'] == "60" || !$_GET['optc']) { echo("<span class='pagemenu-selected'>"); }
+if ($interval == "60" || !$interval) { echo("<span class='pagemenu-selected'>"); }
 echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/realtime/60/'>60s</a>");
-if ($_GET['optc'] == "60" || !$_GET['optc']) { echo("</span>"); }
+if ($interval == "60" || !$interval) { echo("</span>"); }
 
 print_optionbar_end();
-
-
-### FIXME - do this in a function and/or do it in graph-realtime.php
-
-if($device['os'] == "linux") { 
-  $interval = "15"; 
-} else {
-  $interval = "2";
-}
-
-if($_GET['optc']) { $interval = $_GET['optc']; }
 
 ?>
 
