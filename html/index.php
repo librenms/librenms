@@ -27,9 +27,8 @@ include("includes/functions.inc.php");
 
 include("includes/authenticate.inc.php");
 
-if($_GET['widescreen'] == "yes") { $_SESSION['widescreen'] = 1; }
-if($_GET['widescreen'] == "no")  { unset($_SESSION['widescreen']); }
-
+if(strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) { $_SESSION['widescreen'] = 1; }
+if(strstr($_SERVER['REQUEST_URI'], 'widescreen=no'))  { unset($_SESSION['widescreen']); }
 
 $start = utime();
 
