@@ -16,6 +16,8 @@ include_once($config['install_dir'] . "/includes/rewrites.php");
 include_once($config['install_dir'] . "/includes/snmp.inc.php");
 include_once($config['install_dir'] . "/includes/services.inc.php");
 include_once($config['install_dir'] . "/includes/dbFacile.php");
+include_once($config['install_dir'] . "/includes/console_colour.php");
+
 
 function mac_clean_to_readable($mac)
 {
@@ -173,27 +175,51 @@ function delete_device($id)
   return $ret;
 }
 
-function addHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
+function addHost($host, $community, $snmpver, $port = '161', $transport = 'udp')
 {
   global $config;
 
   list($hostshort) = explode(".", $host);
-  if (isDomainResolves($host))
+  /// Test Database Exists
+  if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0')
   {
-    if (isPingable($host))
+    /// Test DNS lookup
+    if (isDomainResolves($argv[1]))
     {
-      if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'") == '0')
+      /// Test reachability
+      if (isPingable($argv[1]))
       {
-        # FIXME internalize -- but we don't have $device yet!
-        # FIXME this needs to be addhost.php's content instead, kindof, also use this function there then.
-        $snmphost = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c $community $host:$port sysName.0");
-        if ($snmphost == $host || $hostshort = $host)
+        $added = 0;
+        /// try each community from config
+        foreach ($config['snmp']['community'] as $community)
         {
-          createHost($host, $community, $snmpver, $port, $transport);
-        } else { print_error("Given hostname does not match SNMP-read hostname!\n"); }
-      } else { print_error("Already got host $host\n"); }
-    } else { print_error("Could not ping $host\n"); }
-  } else { print_error("Could not resolve $host\n"); }
+          $device = deviceArray($host, $community, $snmpver, $port, $transport);
+
+          if (isSNMPable($device))
+          {
+            $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+            if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host)))
+            {
+              $added = createHost ($host, $community, $snmpver, $port, $transport);
+              if($added) { echo($added . "\n"); }
+            } else { 
+              print_error("Given hostname does not match SNMP-read hostname ($snmphost)!"); 
+            }
+          }
+        }
+        if (!$added) 
+        { 
+          /// Faild SNMP
+          print_error("Could not reach $host with given SNMP community"); }
+      } else { 
+        /// failed Reachability
+        print_error("Could not ping $host"); }
+    } else { 
+      /// Failed DNS lookup
+      print_error("Could not resolve $host"); }
+  } else { 
+    /// found in database
+    print_error("Already got host $host"); }
 }
 
 function scanUDP($host, $port, $timeout)

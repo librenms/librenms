@@ -1,6 +1,19 @@
 #!/usr/bin/env php
 <?php
 
+/* Observium Network Management and Monitoring System
+ * Copyright (C) 2006-2011, Observium Developers - http://www.observium.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * See COPYING for more details.
+ */
+
+$debug=1;
+
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
@@ -37,36 +50,18 @@ if (isset($argv[1]) && $argv[1])
     $config['snmp']['community'][] = $community;
   }
 
-  list($hostshort) = explode(".", $host);
-  if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0')
-  {
-    if (isDomainResolves($argv[1]))
-    {
-      if (isPingable($argv[1]))
-      {
-        $added = 0;
+  addHost($host, $community, $snmpver, $port = '161', $transport = 'udp');
 
-        foreach ($config['snmp']['community'] as $community)
-        {
-          $device = deviceArray($host, $community, $snmpver, $port, $transport);
+} else { 
 
-          if (isSNMPable($device))
-          {
-            $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+print Console_Color::convert("
+Observium v".$config['version']." Add Host Tool
 
-            if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host)))
-            {
-              $added = createHost ($host, $community, $snmpver, $port, $transport);
-              if($added) { echo($added . "\n"); break; }
+Usage: ./addhost.php <%Whostname%n> [community] [v1|v2c] [port] [" . join("|",$config['snmp']['transports']) . "]
 
-            } else { echo("Given hostname does not match SNMP-read hostname ($snmphost)!\n"); }
-          }
-        }
+%rRemeber to discover the host afterwards.%n
 
-        if (!$added) { echo("Could not reach $host with given SNMP community\n"); }
-      } else { echo("Could not ping $host\n"); }
-    } else { echo("Could not resolve $host\n"); }
-  } else { echo("Already got host $host\n"); }
-} else { echo("Add Host Tool\nUsage: ./addhost.php <hostname> [community] [v1|v2c] [port] [" . join("|",$config['snmp']['transports']) . "]\n"); }
+");
+}
 
 ?>
