@@ -184,10 +184,10 @@ function addHost($host, $community, $snmpver, $port = '161', $transport = 'udp')
   if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0')
   {
     /// Test DNS lookup
-    if (isDomainResolves($argv[1]))
+    if (gethostbyname($host) != $host)
     {
       /// Test reachability
-      if (isPingable($argv[1]))
+      if (isPingable($host))
       {
         $added = 0;
         /// try each community from config
