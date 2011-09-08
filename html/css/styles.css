@@ -1031,7 +1031,7 @@ color: #cc0000;
     font-size:12px;  
     line-height:24px;  
     position:relative;  
-    text-shadow: 1px 1px 1px #ffffff;  
+    #text-shadow: 1px 1px 1px #ffffff;  
     padding:1px;  
     margin:0;  
     float:none;  
