@@ -55,6 +55,12 @@ if ($_GET['optb'] == "graphs" || !$_GET['optb']) { echo("<span class='pagemenu-s
 echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/'>Graphs</a>");
 if ($_GET['optb'] == "graphs" || !$_GET['optb']) { echo("</span>"); }
 
+echo(" | ");
+
+if ($_GET['optb'] == "realtime" || !$_GET['optb']) { echo("<span class='pagemenu-selected'>"); }
+echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/realtime/'>Real Time</a>");
+if ($_GET['optb'] == "realtime" || !$_GET['optb']) { echo("</span>"); }
+
 
 if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$interface['interface_id']."'") )
 {

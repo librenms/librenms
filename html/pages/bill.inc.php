@@ -194,9 +194,11 @@ if (bill_permitted($bill_id))
   $li .= "&amp;width=715&amp;height=200&amp;total=1'>";
 
 
-#  $di =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
-#  $di = $di . "&amp;from=" . $yesterday .  "&amp;to=" . $rightnow . "&amp;x=715&amp;y=250";
-#  $di = $di . "$type'>";
+  $di =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+  $di = $di . "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to . "&amp;x=715&amp;y=250";
+  $di = $di . "$type'>";
+
+echo("$di");
 
   $di = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
   $di .= "&amp;from=" . $config['time']['day'] .  "&amp;to=" . $config['time']['now'];

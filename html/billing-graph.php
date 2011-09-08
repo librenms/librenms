@@ -1,13 +1,22 @@
 <?php
 
-if ($_GET['debug'])
+ini_set('allow_url_fopen', 0);
+ini_set('display_errors', 0);
+
+if (strpos($_SERVER['REQUEST_URI'], "debug"))
 {
+  $debug = "1";
   ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  ini_set('log_errors', 1);
+  ini_set('error_reporting', E_ALL);
+} else {
+  $debug = FALSE;
+  ini_set('display_errors', 0);
   ini_set('display_startup_errors', 0);
   ini_set('log_errors', 0);
-  ini_set('allow_url_fopen', 0);
-  ini_set('error_reporting', E_ALL);
-} else { ini_set('display_errors', 0); }
+  ini_set('error_reporting', 0);
+}
 
 include("../includes/defaults.inc.php");
 include("../config.php");
@@ -47,17 +56,21 @@ $dur = $end - $start;
 
 if ($type == "date") { $date_format = "%d %b %H:%i"; $tickinterval = "2"; } else { $date_format = "%H"; $tickinterval = "1"; }
 
-$datefrom = date('Ymt', $start) . "000000";
-$dateto = date('Ymt',   $end) . "235959";
+$datefrom = date('Ymthis', $start);
+$dateto = date('Ymthis',   $end);
 
-$datefrom = dbFetchCell("SELECT FROM_UNIXTIME($start, '%Y%m%d')") . "000000";
-$dateto   = dbFetchCell("SELECT FROM_UNIXTIME($end, '%Y%m%d')") . "235959";
+#echo("$start || $end || ");
+
+#echo("$datefrom || $dateto");
+
+#$datefrom = dbFetchCell("SELECT FROM_UNIXTIME($start, '%Y%m%d')") . "000000";
+#$dateto   = dbFetchCell("SELECT FROM_UNIXTIME($end, '%Y%m%d')") . "235959";
 
 $rate_data = getRates($bill_id,$datefrom,$dateto);
 $rate_95th = $rate_data['rate_95th'] * 1000;
 $rate_average = $rate_data['rate_average'] * 1000;
 
-$bi_a = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id)");
+$bi_a = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
 $bill_name = $bi_a['bill_name'];
 
 $counttot = dbFetchCell("SELECT count(`delta`) FROM `bill_data` WHERE `bill_id` = ? AND `timestamp` >= ? AND `timestamp` <= ?", array($bill_id, $datefrom, $dateto));
@@ -149,6 +162,9 @@ foreach (dbFetch("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bil
 
 #print_r($ticks);
 #print_r($tot_data);
+
+#echo("<pre>");
+#print_r($in_data);
 
 $graph_name = date('M j g:ia', $start) . " - " . date('M j g:ia', $last);
 

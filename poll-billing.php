@@ -20,65 +20,53 @@ function CollectData($bill_id)
 {
   foreach (dbFetchRows("SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.interface_id = P.port_id AND D.device_id = I.device_id", array($bill_id)) as $port_data)
   {
-    unset($port_in_measurement);
-    unset($port_in_delta);
-    unset($last_port_in_measurement);
-    unset($last_port_in_delta);
-    unset($port_out_measurement);
-    unset($port_out_delta);
-    unset($last_port_out_measurement);
-    unset($last_port_out_delta);
 
     $port_id = $port_data['port_id'];
     $host    = $port_data['hostname'];
-		$port	 = $port_data['port'];
+    $port    = $port_data['port'];
 
     echo("\nPolling ".$port_data['ifDescr']." on ".$port_data['hostname']."\n");
 
-    $port_in_measurement = getValue($host, $port, $port_data['ifIndex'], "In");
-    $port_out_measurement = getValue($host, $port, $port_data['ifIndex'], "Out");
+    $port_data['in_measurement'] = getValue($host, $port, $port_data['ifIndex'], "In");
+    $port_data['out_measurement'] = getValue($host, $port, $port_data['ifIndex'], "Out");
 
     $now = dbFetchCell("SELECT NOW()");
 
     $last_data = getLastPortCounter($port_id,in);
     if ($last_data[state] == "ok")
     {
-      $last_port_in_measurement = $last_data[counter];
-      $last_port_in_delta = $last_data[delta];
-      if ($port_in_measurement > $last_port_in_measurement)
+      $port_data['last_in_measurement'] = $last_data[counter];
+      $port_data['last_in_delta'] = $last_data[delta];
+      if ($port_data['in_measurement'] > $port_data['last_in_measurement'])
       {
-        $port_in_delta = $port_in_measurement - $last_port_in_measurement;
+        $port_data['in_delta'] = $port_data['in_measurement'] - $port_data['last_in_measurement'];
       } else {
-        $port_in_delta = $last_port_in_delta;
+        $port_data['in_delta'] = $port_data['last_in_delta'];
       }
     } else {
-      $port_in_delta = '0';
+      $port_data['in_delta'] = '0';
     }
-    dbInsert(array('port_id' => $port_id, 'timestamp' => $now, 'counter' => $port_in_measurement, 'delta' => $port_in_delta), 'port_in_measurements');
-
-    unset($last_data, $last_port_in_measurement, $last_port_in_delta);
+    dbInsert(array('port_id' => $port_id, 'timestamp' => $now, 'counter' => $port_data['in_measurement'], 'delta' => $port_data['in_delta']), 'port_in_measurements');
 
     $last_data = getLastPortCounter($port_id,out);
     if ($last_data[state] == "ok")
     {
-      $last_port_out_measurement = $last_data[counter];
-      $last_port_out_delta = $last_data[delta];
-      if ($port_out_measurement > $last_port_out_measurement)
+      $port_data['last_out_measurement'] = $last_data[counter];
+      $port_data['last_out_delta'] = $last_data[delta];
+      if ($port_data['out_measurement'] > $port_data['last_out_measurement'])
       {
-        $port_out_delta = $port_out_measurement - $last_port_out_measurement;
+        $port_data['out_delta'] = $port_data['out_measurement'] - $port_data['last_out_measurement'];
       } else {
-        $port_out_delta = $last_port_out_delta;
+        $port_data['out_delta'] = $port_data['last_out_delta'];
       }
     } else {
-      $port_out_delta = '0';
+      $port_data['out_delta'] = '0';
     }
-    dbInsert(array('port_id' => $port_id, 'timestamp' => $now, 'counter' => $port_out_measurement, 'delta' => $port_out_delta), 'port_out_measurements');
-    unset($last_data, $last_port_in_measurement, $last_port_in_delta);
+    dbInsert(array('port_id' => $port_id, 'timestamp' => $now, 'counter' => $port_data['out_measurement'], 'delta' => $port_data['out_delta']), 'port_out_measurements');
 
-    $delta = $delta + $port_in_delta + $port_out_delta;
-    $in_delta = $in_delta + $port_in_delta;
-    $out_delta = $out_delta + $port_out_delta;
-    unset($port_in_delta,$port_out_delta,$prev_delta,$prev_timestamp,$period);
+    $delta = $delta + $port_data['in_delta'] + $port_data['out_delta'];
+    $in_delta = $in_delta + $port_data['in_delta'];
+    $out_delta = $out_delta + $port_data['out_delta'];
 
   }
   $last_data = getLastMeasurement($bill_id);
@@ -104,7 +92,12 @@ function CollectData($bill_id)
     $out_delta = $prev_out_delta;
 
   }
-  dbInsert(array('bill_id' => $bill_id, 'timestamp' => $now, 'period' => $period, 'delta' => $delta, 'in_delta' => $in_delta, 'out_delta' => $out_delta), 'bill_data');
+
+  if($period < "0") { 
+    logfile("BILLING: negative period! id:$bill_id period:$period delta:$delta in_delta:$in_delta out_delta:$out_delta"); 
+  } else {
+    dbInsert(array('bill_id' => $bill_id, 'timestamp' => $now, 'period' => $period, 'delta' => $delta, 'in_delta' => $in_delta, 'out_delta' => $out_delta), 'bill_data');
+  }
 }
 
 if ($argv[1]) { CollectData($argv[1]); }
