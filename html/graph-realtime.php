@@ -41,17 +41,19 @@ $ifname=$device['hostname']. " ". @$port['ifDescr'];  //Interface name that will
 /********* Other conf *******/
 $scale_type="follow";               //Autoscale default setup : "up" = only increase scale; "follow" = increase and decrease scale according to current graphed datas
 $nb_plot=240;                   //NB plot in graph
+
 if(is_numeric($_GET['interval'])) {
  $time_interval=$_GET['interval'];
 } else {
  $time_interval=1;		//Refresh time Interval
 }
+
 $fetch_link = "data.php?id=".$_GET[id];
 
 //SVG attributes
 $attribs['axis']='fill="black" stroke="black"';
-$attribs['in']='fill="#435370" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="7"';
-$attribs['out']='fill="#8092B3" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="7"';
+$attribs['in']='fill="green" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="7"';
+$attribs['out']='fill="blue" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="7"';
 $attribs['graph_in']='fill="none" stroke="green" stroke-opacity="0.8"';
 $attribs['graph_out']='fill="none" stroke="blue" stroke-opacity="0.8"';
 $attribs['legend']='fill="black" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4"';
