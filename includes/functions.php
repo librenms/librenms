@@ -190,10 +190,10 @@ function addHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
         if ($snmphost == $host || $hostshort = $host)
         {
           createHost($host, $community, $snmpver, $port, $transport);
-        } else { echo("Given hostname does not match SNMP-read hostname!\n"); }
-      } else { echo("Already got host $host\n"); }
-    } else { echo("Could not ping $host\n"); }
-  } else { echo("Could not resolve $host\n"); }
+        } else { print_error("Given hostname does not match SNMP-read hostname!\n"); }
+      } else { print_error("Already got host $host\n"); }
+    } else { print_error("Could not ping $host\n"); }
+  } else { print_error("Could not resolve $host\n"); }
 }
 
 function scanUDP($host, $port, $timeout)

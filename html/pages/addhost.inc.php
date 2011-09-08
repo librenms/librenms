@@ -8,12 +8,12 @@ if ($_SESSION['userlevel'] < 10)
 
 echo("<h2>Add Device</h2>");
 
-if ($_POST['hostname'] && $_POST['community'])
+if ($_POST['hostname'])
 {
   if ($_SESSION['userlevel'] > '5')
   {
     $hostname = mres($_POST['hostname']);
-    $community = mres($_POST['community']);
+    if ($_POST['community']) { $community = mres($_POST['community']); } else { $community = $config['snmp']['community']; }
     $snmpver = mres($_POST['snmpver']);
     if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = "161"; }
     print_message("Adding host $hostname community $community port $port");
@@ -21,10 +21,6 @@ if ($_POST['hostname'] && $_POST['community'])
   } else {
     print_error("You don't have the necessary privileges to add hosts.");
   }
-} elseif ($_POST['hostname'] && !$_POST['community']) {
-  print_error("A community string is required.");
-} elseif (!$_POST['hostname'] && $_POST['community']) {
-  print_error("A hostname is required.");
 }
 
 ?>
