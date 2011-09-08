@@ -165,12 +165,17 @@ function discover_device($device, $options)
   $device_start = utime();  // Start counting device poll time
 
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
-  if ($device['os'] != strtolower($device['os']))
+
+  if($device['os'] == 'generic') // verify if OS has changed from generic
   {
-    $device['os'] = strtolower($device['os']);
-    dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
-    echo("OS lowercased.");
+      $device['os']= getHostOS($device); 
+      if($device['os'] != 'generic')
+      {
+          echo "Device os was updated to".$device['os']."!";
+          dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
+      }
   }
+
   if ($config['os'][$device['os']]['group'])
   {
     $device['os_group'] = $config['os'][$device['os']]['group'];
