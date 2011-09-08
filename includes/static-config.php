@@ -566,6 +566,14 @@ $config['os'][$os]['type']		= "power";
 $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
 
+$os = "netbotz";
+$config['os'][$os]['text']             = "Netbotz Environment sensor";
+$config['os'][$os]['type']             = "environment";
+$config['os'][$os]['over'][0]['graph']  = "device_temperature";
+$config['os'][$os]['over'][0]['text']   = "Temperature";
+$config['os'][$os]['over'][1]['graph']  = "device_humidity";
+$config['os'][$os]['over'][1]['text']   = "Humidity";
+
 $os = "netvision";
 $config['os'][$os]['text']             = "Socomec Net Vision";
 $config['os'][$os]['type']             = "power";
