@@ -1,39 +1,42 @@
 <?php
 /*
-	$Id$
-	part of m0n0wall (http://m0n0.ch/wall)
+	Originally part of m0n0wall (http://m0n0.ch/wall)
 	
 	Copyright (C) 2004-2006 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>
 	and Jonathan Watt <jwatt@jwatt.org>.
 	All rights reserved.
 	
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
-	
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
-	
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
-	
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
 */
+
+include_once("../includes/defaults.inc.php");
+include_once("../config.php");
+include_once("../includes/common.php");
+include_once("../includes/dbFacile.php");
+include_once("../includes/rewrites.php");
+include_once("includes/functions.inc.php");
+include_once("includes/authenticate.inc.php");
+
+include_once("../includes/snmp.inc.php");
+
+if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || port_permitted($_GET['id'])))
+{
+  $port   = get_port_by_id($_GET['id']);
+  $device = device_by_id_cache($port['device_id']);
+  $title  = generate_device_link($device);
+  $title .= " :: Port  ".generate_port_link($port);
+  $auth   = TRUE;
+} else {
+
+  echo("Unauthenticad");
+  die;
+
+}
 
 header("Content-type: image/svg+xml");
 
 /********** HTTP GET Based Conf ***********/
-$ifnum=@$_GET["ifnum"];  // BSD / SNMP interface name / number
-$ifname=@$_GET["ifname"]?$_GET["ifname"]:"Interface $ifnum";  //Interface name that will be showed on top right of graph
+$ifnum=@$port['ifIndex'];  // BSD / SNMP interface name / number
+$ifname=$device['hostname']. " ". @$port['ifDescr'];  //Interface name that will be showed on top right of graph
 
 /********* Other conf *******/
 $scale_type="follow";               //Autoscale default setup : "up" = only increase scale; "follow" = increase and decrease scale according to current graphed datas
@@ -63,8 +66,8 @@ $attribs['collect_initial']='fill="gray" font-family="Tahoma, Verdana, Arial, He
 //Error text if we cannot fetch data : depends on which method is used
 $error_text = "Cannot get data about interface $ifnum";
 
-$height=100;            //SVG internal height : do not modify
-$width=200;             //SVG internal width : do not modify
+$height=125;            //SVG internal height : do not modify
+$width=300;             //SVG internal width : do not modify
 
 /********* Graph DATA **************/
 print('<?xml version="1.0" encoding="iso-8859-1"?>' . "\n");?>
