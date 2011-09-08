@@ -372,7 +372,7 @@ function humanspeed($speed)
 
 function print_error($text)
 {
-  echo('<div class="errorbox"><img src="/images/15/exclamation.png" align="absmiddle"> '.$text.'</div>');
+  echo('<div class="errorbox"><img src="/images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
 }
 
 function print_message($text)
