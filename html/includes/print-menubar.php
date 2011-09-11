@@ -32,7 +32,7 @@ foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
 
 <ul id="menium">  
   
-    <li><a href="/overview/" class="drop"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a><!-- Begin Home Item -->  
+    <li><a href="overview/" class="drop"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a><!-- Begin Home Item -->  
   
         <div class="dropdown_1column">
   
