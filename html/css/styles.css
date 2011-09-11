@@ -111,8 +111,8 @@ input,select {
   margin-right: 1px;
   padding-right: 1px;
   padding-left: 1px;
-  border-left: 1px solid #fcfcfc;
-  border-right: 1px solid #fcfcfc;
+  border-left: 1px solid #FBFBFB;
+  border-right: 1px solid #FBFBFB;
   background: #e9e9e9;
 }
 .content-box3 {
@@ -726,8 +726,6 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
  margin-left: 0;
  margin-top: 1px;
  margin-bottom: 0px;
- font-weight: normal;
- font-size: 12px;
  list-style-type: none;
  text-align: left; /*set to left, center, or right to align the menu as desired*/
 }
@@ -739,10 +737,12 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 
 .shadetabs li a {
  text-decoration: none;
- padding: 3px 7px;
+ padding: 3px 6px;
  margin-right: 3px;
  border: 1px solid #aaa;
- color: #2d2b2b;
+ font-weight: bold;
+ font-size: 12px;
+ color: #5e5e5e;
 
   /* Gradient background */
   background:#F4F4F4;
@@ -756,13 +756,18 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 
 }
 
+.shadetabs li a img {
+  margin-top: -3px;
+}
+
+
 .shadetabs li a:visited {
-color: #2d2b2b;
+  color: #5e5e5e;
 }
 
 .shadetabs li a:hover {
-text-decoration: none;
-color: #cc0000;
+  text-decoration: none;
+  color: #029feb;
 
   /* Gradient background */
   background:#F4F4F4;
@@ -790,8 +795,6 @@ color: #cc0000;
 }
 
 .shadetabs li.selected a:hover { /*hovered tab style */
-  text-decoration: none;
-  color: #cc0000;
 }
 
 .contentstyle {
@@ -849,11 +852,11 @@ color: #cc0000;
   border-radius: 4px;  
   
   /* Gradient background */
-  background:#F4F4F4;
-  background: -moz-linear-gradient(top, #FFF, #DDD);
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#DDD));
-  background: -ms-linear-gradient(top, #FFF, #DDD);
-  background: -webkit-linear-gradient(top, #FFF, #DDD);  
+  background:#FBFBFB;
+  background: -moz-linear-gradient(top, #FBFBFB, #DDD);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DDD));
+  background: -ms-linear-gradient(top, #FBFBFB, #DDD);
+  background: -webkit-linear-gradient(top, #FBFBFB, #DDD);  
 
   /* Borders */  
   
@@ -869,22 +872,26 @@ color: #cc0000;
   float:left;  
   text-align:center;  
   position:relative;  
-  padding: 1px 1px 1px 1px;  
+  padding: 1px 1px 0px 1px;  
   margin-right:0px;  
   margin-top:4px;  
   border:none;  
 }  
   
 #menium li:hover {  
-  border: 1px solid #aaa;  
+
+   z-index: 100;
+
+  border: 1px solid #aaa;
+  border-bottom: 1px solid #FBFBFB;  
   padding: 0px 0px 4px 0px;  
   
   /* Gradient background */
   background:#F4F4F4;
-  background: -moz-linear-gradient(top, #DDD, #FFF);
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#DDD), to(#FFF));
-  background: -ms-linear-gradient(top, #DDD, #FFF);
-  background: -webkit-linear-gradient(top, #DDD, #FFF);
+  background: -moz-linear-gradient(top, #DDD, #EEEEEE);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#DDD), to(#EEEEEE));
+  background: -ms-linear-gradient(top, #DDD, #EEEEEE);
+  background: -webkit-linear-gradient(top, #DDD, #EEEEEE);
   
   /* Rounded corners */  
   
@@ -896,7 +903,7 @@ color: #cc0000;
 #menium li a {  
   font-weight: bold;
   font-size:13px;  
-  color: #666;  
+  color: #5e5e5e;  
   display:block;  
   outline:0;  
   text-decoration:none;  
@@ -904,7 +911,7 @@ color: #cc0000;
 }  
   
 #menium li:hover a {  
-  color:#161616;  
+  color:#029feb;  
   #text-shadow: 1px 1px 1px #FFFFFF;  
 }  
 
@@ -931,11 +938,11 @@ color: #cc0000;
   border-top:none;  
   
   /* Gradient background */
-  background:#F4F4F4;
-  background: -moz-linear-gradient(top, #FFF, #DDD);
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#DDD));
-  background: -ms-linear-gradient(top, #FFF, #DDD);
-  background: -webkit-linear-gradient(top, #FFF, #DDD);
+  background:#eeeeee;
+#  background: -moz-linear-gradient(top, #FFF, #DDD);
+#  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DDD));
+#  background: -ms-linear-gradient(top, #FBFBFB, #DDD);
+#  background: -webkit-linear-gradient(top, #FBFBFB, #DDD);
   
   /* Rounded Corners */  
   -moz-border-radius: 0px 4px 4px 4px;  
