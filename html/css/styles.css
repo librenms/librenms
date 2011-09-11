@@ -743,7 +743,17 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
  margin-right: 3px;
  border: 1px solid #aaa;
  color: #2d2b2b;
- background: white url(../images/menu2.gif) top left repeat-x;
+
+  /* Gradient background */
+  background:#F4F4F4;
+  background: -moz-linear-gradient(top, #FFF, #CCC);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#CCC));
+
+  /* Rounded Corners */
+  -moz-border-radius: 0px 3px 3px 3px;
+  -webkit-border-radius: 3px 3px 0px 0px;
+  border-radius: 3px 3px 0px 0px;
+
 }
 
 .shadetabs li a:visited {
@@ -753,18 +763,35 @@ color: #2d2b2b;
 .shadetabs li a:hover {
 text-decoration: none;
 color: #cc0000;
+
+  /* Gradient background */
+  background:#F4F4F4;
+  background: -moz-linear-gradient(top, #FFF, #CCC);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#CCC));
+
+
 }
 
 .shadetabs li.selected {
 }
 
 .shadetabs li.selected a { /*selected main tab style */
-  background-image: url(../images/shadeactive.gif);
   border-bottom-color: white;
+  /* Gradient background */
+  background:#EEEEEE;
+  background: -moz-linear-gradient(top, #EEE, #FFFFFF);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EEE), to(#FFFFFF));
+
+  /* Box Shadow */
+  -moz-box-shadow: 0 -1px 2px #DDD;
+  -webkit-box-shadow: 0 -1px 2px #DDD;
+  box-shadow: 0 -1px 2px #DDD;
+
 }
 
-.shadetabs li.selected a:hover { /*selected main tab style */
+.shadetabs li.selected a:hover { /*hovered tab style */
   text-decoration: none;
+  color: #cc0000;
 }
 
 .contentstyle {
@@ -821,12 +848,13 @@ color: #cc0000;
   -webkit-border-radius: 4px;  
   border-radius: 4px;  
   
-  /* Background color and gradients */  
-  
-  background: #f3f3f3;  
-  background: -moz-linear-gradient(top, #f3f3f3, #e2e2e2);  
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#f3f3f3), to(#e2e2e2));  
-  
+  /* Gradient background */
+  background:#F4F4F4;
+  background: -moz-linear-gradient(top, #FFF, #DDD);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#DDD));
+  background: -ms-linear-gradient(top, #FFF, #DDD);
+  background: -webkit-linear-gradient(top, #FFF, #DDD);  
+
   /* Borders */  
   
   border: 1px solid #aaaaaa;  
@@ -851,11 +879,12 @@ color: #cc0000;
   border: 1px solid #aaa;  
   padding: 0px 0px 4px 0px;  
   
-  /* Background color and gradients */  
-  
-  background: #f3f3f3;  
-  background: -moz-linear-gradient(top, #e2e2e2, #f3f3f3);  
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e2e2e2), to(#f2f2f2));  
+  /* Gradient background */
+  background:#F4F4F4;
+  background: -moz-linear-gradient(top, #DDD, #FFF);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#DDD), to(#FFF));
+  background: -ms-linear-gradient(top, #DDD, #FFF);
+  background: -webkit-linear-gradient(top, #DDD, #FFF);
   
   /* Rounded corners */  
   
@@ -898,13 +927,15 @@ color: #cc0000;
   left:-999em; /* Hides the drop down */  
   text-align:left;  
   padding:10px 5px 10px 5px;  
-  border:1px solid #777777;  
+  border:1px solid #AAA;  
   border-top:none;  
   
-  /* Gradient background */  
-  background:#F4F4F4;  
-  background: -moz-linear-gradient(top, #EEEEEE, #BBBBBB);  
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EEEEEE), to(#BBBBBB));  
+  /* Gradient background */
+  background:#F4F4F4;
+  background: -moz-linear-gradient(top, #FFF, #DDD);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#DDD));
+  background: -ms-linear-gradient(top, #FFF, #DDD);
+  background: -webkit-linear-gradient(top, #FFF, #DDD);
   
   /* Rounded Corners */  
   -moz-border-radius: 0px 4px 4px 4px;  
@@ -1016,7 +1047,7 @@ color: #cc0000;
 .imgshadow {  
   background:#FFFFFF;  
   padding:4px;  
-  border:1px solid #777777;  
+  border:1px solid #AAA;  
   margin-top:5px;  
   -moz-box-shadow:0px 0px 5px #666666;  
   -webkit-box-shadow:0px 0px 5px #666666;  
