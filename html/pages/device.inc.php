@@ -243,7 +243,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
 
     if ($_SESSION['userlevel'] >= "7")
     {
-      echo('<li class="' . $select['edit'] . '">
+      echo('<li class="' . $select['edit'] . '" style="text-align: right;">
     <a href="device/' . $device['device_id'] . '/edit/">
       <img src="images/16/server_edit.png" align="absmiddle" border="0" /> Settings
     </a>
