@@ -20,7 +20,7 @@ if ($device['os'] != "Snom")
   {
     $oid_ds = truncate($oid, 19, '');
     $rrd_create .= " DS:$oid_ds:COUNTER:600:U:100000000000";
-    $snmpstring .= " $oid.0";
+    $snmpstring .= " IP-MIB::".$oid.".0";
   }
 
   $data = snmp_get_multi($device, $snmpstring);
