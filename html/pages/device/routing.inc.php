@@ -1,6 +1,7 @@
 <?php
 
 #$type_text['overview'] = "Overview";
+$type_text['ipsec_tunnels'] = "IPSEC Tunnels";
 $type_text['bgp'] = "BGP";
 $type_text['cef'] = "CEF";
 $type_text['ospf'] = "OSPF";
