@@ -72,8 +72,6 @@ function getDates($dayofmonth)
   $return['2'] = $last_from . "000001";
   $return['3'] = $last_to . "000000";
 
-  print_r($return);
-
   return($return);
 }
 

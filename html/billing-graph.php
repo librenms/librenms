@@ -24,9 +24,10 @@ include("../includes/functions.php");
 include("includes/functions.inc.php");
 include("includes/authenticate.inc.php");
 if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
-require("includes/jpgraph/src/jpgraph.php");
-include("includes/jpgraph/src/jpgraph_line.php");
-include("includes/jpgraph/src/jpgraph_utils.inc.php");
+require("src/jpgraph.php");
+include("src/jpgraph_line.php");
+include("src/jpgraph_utils.inc.php");
+include("src/jpgraph_date.php");
 
 if (is_numeric($_GET['bill_id']))
 {
@@ -54,17 +55,8 @@ if ($_GET[type]) { $type = $_GET[type]; } else { $type = "date"; }
 
 $dur = $end - $start;
 
-if ($type == "date") { $date_format = "%d %b %H:%i"; $tickinterval = "2"; } else { $date_format = "%H"; $tickinterval = "1"; }
-
 $datefrom = date('Ymthis', $start);
 $dateto = date('Ymthis',   $end);
-
-#echo("$start || $end || ");
-
-#echo("$datefrom || $dateto");
-
-#$datefrom = dbFetchCell("SELECT FROM_UNIXTIME($start, '%Y%m%d')") . "000000";
-#$dateto   = dbFetchCell("SELECT FROM_UNIXTIME($end, '%Y%m%d')") . "235959";
 
 $rate_data = getRates($bill_id,$datefrom,$dateto);
 $rate_95th = $rate_data['rate_95th'] * 1000;
@@ -73,28 +65,22 @@ $rate_average = $rate_data['rate_average'] * 1000;
 $bi_a = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
 $bill_name = $bi_a['bill_name'];
 
-$counttot = dbFetchCell("SELECT count(`delta`) FROM `bill_data` WHERE `bill_id` = ? AND `timestamp` >= ? AND `timestamp` <= ?", array($bill_id, $datefrom, $dateto));
+$dur = $end - $start;
 
-$count = round($counttot / (($ysize - 100) * 2), 0);
+$counttot = dbFetchCell("SELECT count(`delta`) FROM `bill_data` WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? )", array($bill_id, $start, $end));
+
+$count = round($dur / 300 / (($ysize - 100) * 3), 0);
 if ($count <= 1) { $count = 2; }
-
-#$count = 8;
 
 #$count = round($counttot / 260, 0);
 #if ($count <= 1) { $count = 2; }
 
-$max = dbFetchCell("SELECT delta FROM bill_data WHERE bill_id = ? AND timestamp >= ? AND timestamp <= ? ORDER BY delta DESC LIMIT 0,1", array($bill_id, $datefrom, $dateto));
+$max = dbFetchCell("SELECT delta FROM bill_data WHERE bill_id = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? ) ORDER BY delta DESC LIMIT 0,1", array($bill_id, $start, $end));
 if ($max > 1000000) { $div = "1000000"; $yaxis = "Mbit/sec";  } else { $div = "1000"; $yaxis = "Kbit/sec"; }
 
 $i = '0';
 
-#$start = "SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >=$datefrom AND timestamp <= $dateto ORDER BY timestamp ASC LIMIT 0,1"),0);
-#$end   = "SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >=$datefrom AND timestamp <= $dateto ORDER BY timestamp DESC LIMIT 0,1"),0);
-$dur = $end - $start;
-
-#$sql = "SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >= $datefrom AND timestamp <= $dateto ORDER BY timestamp ASC";
-
-foreach (dbFetch("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = ? AND timestamp >= ? AND timestamp <= ? ORDER BY timestamp ASC", array($bill_id, $datefrom, $dateto)) as $row)
+foreach (dbFetch("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? ) ORDER BY timestamp ASC", array($bill_id, $start, $end)) as $row)
 {
   @$timestamp = $row['formatted_date'];
   if (!$first) { $first = $timestamp; }
@@ -105,53 +91,25 @@ foreach (dbFetch("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bil
   @$in_value = round($in_delta * 8 / $period / $div, 2);
   @$out_value = round($out_delta * 8 / $period / $div, 2);
 
-  #@$data[] = $in_value + $out_value;
-  #@$in_data[] = $in_value;
-  #@$out_data[] = $out_value;
-  #  @$ticks[] = $timestamp;
-  #@$per_data[] = $rate_95th / 1000;
-  #@$ave_data[] = $rate_average / 1000;
-
   @$last = $timestamp;
 
-  $iter_in    = $iter_in + $in_delta;
-  $iter_out     = $iter_out + $out_delta;
-  $iter_period  = $iter_period + $period;
+  $iter_in      += $in_delta;
+  $iter_out     += $out_delta;
+  $iter_period  += $period;
 
   if ($iter == $count)
   {
     $out_data[$i]   = round($iter_out * 8 / $iter_period / $div, 2);
+    $out_data_inv[$i]   = $out_data[$i] * -1;
     $in_data[$i]   = round($iter_in * 8 / $iter_period / $div, 2);
     $tot_data[$i]   = $out_data[$i] + $in_data[$i];
-    $ticks[$i]   = date('M j g:ia', $timestamp);
-    $ticks[$i]  = $timestamp;
+    $tot_data_inv[$i]   = $tot_data[$i] * -1;
 
-    if ($dur < 172800)
-    {
-      $hour = date('h', $timestamp);
-      if ($hour != $lasthour) { $tickPositions[] = $i; $tickLabels[] = date('ga', $timestamp); }
-      $lasthour = $hour;
-    } elseif ($dur < 604800) {
-      $day = date('d', $timestamp);
-      if ($day != $lastday) { $tickPositions[] = $i; $tickLabels[] = date('D', $timestamp); $h = 0; }
-      $lastday = $day;
+    if($tot_data[$i] > $max_value) { $max_value = $tot_data[$i]; }
 
-      $hour = trim(date('g', $timestamp));
-      if ($hour != $lasthour)
-      {
-        if ($hour == '12') { $tickMinPositions[] = $i; $h = 0;  } $h++;
-      }
-
-      $lasthour = $hour;
-    } else {
-      $day = date('d', $timestamp);
-      if ($day != $lastday) { $tickPositions[] = $i; $tickLabels[] = date('dS', $timestamp); }
-      $lastday = $day;
-    }
-
+    $ticks[$i]      = $timestamp;
     $per_data[$i]   = $rate_95th / $div;
     $ave_data[$i]   = $rate_average / $div;
-    $timestamps[$i] = $timestamp;
     $iter       = "1";
     $i++;
     unset($iter_out, $iter_in, $iter_period);
@@ -159,12 +117,6 @@ foreach (dbFetch("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bil
 
   $iter++;
 }
-
-#print_r($ticks);
-#print_r($tot_data);
-
-#echo("<pre>");
-#print_r($in_data);
 
 $graph_name = date('M j g:ia', $start) . " - " . date('M j g:ia', $last);
 
@@ -174,24 +126,16 @@ $xmax = $ticks[$n-1];
 
 $graph_name = date('M j g:ia', $xmin) . " - " . date('M j g:ia', $xmax);
 
-
 $graph = new Graph($xsize, $ysize, $graph_name);
 $graph->img->SetImgFormat("png");
-#$graph->img->SetAntiAliasing(true);
-$graph->SetScale( "intlin");
-#$graph->SetScale('intlin',0,0,$xmin,$xmax);
+
+$graph->SetScale('datlin',0,0,$start,$end);
+
 $graph->title->Set("$graph_name");
 $graph->title->SetFont(FF_FONT2,FS_BOLD,10);
 $graph->xaxis->SetFont(FF_FONT1,FS_BOLD);
 
-#$graph->xaxis->SetTickLabels($ticks);
-
-if (count($tickPositions) > 24)
-{
-  $graph->xaxis->SetTextLabelInterval(6);
-} elseif (count($tickPositions) > 12) {
-  $graph->xaxis->SetTextLabelInterval(2);
-}
+$graph->xaxis->SetTextLabelInterval(2);
 
 $graph->xaxis->SetPos('min');
 #$graph->xaxis->SetLabelAngle(15);
@@ -205,11 +149,23 @@ $graph->xaxis->SetTitleMargin(30);
 #$graph->xaxis->HideLastTickLabel();
 #$graph->xaxis->HideFirstTickLabel();
 #$graph->yaxis->scale->SetAutoMin(1);
-#$graph->xaxis->title->Set("$type");
-$graph->yaxis->title->Set("$yaxis");
+$graph->xaxis->title->Set($type);
+$graph->yaxis->title->Set($yaxis);
 
-$graph->xaxis->SetTickPositions($tickPositions,$tickMinPositions,$tickLabels);
-$graph->xaxis->SetMajTickPositions($tickPositions,$tickLabels);
+function TimeCallback($aVal) { 
+    global $dur;
+
+    if ($dur < 172800)
+    {
+      return Date('H:i',$aVal);
+    } elseif ($dur < 604800) {
+      return Date('D',$aVal);
+    } else {
+      return Date('j M',$aVal); 
+    }
+}
+
+$graph->xaxis->SetLabelFormatCallback('TimeCallBack');
 
 $graph->ygrid->SetFill(true,'#EFEFEF@0.5','#FFFFFF@0.5');
 $graph->xgrid->Show(true,true);
@@ -219,33 +175,47 @@ $graph->SetFrame(false);
 $graph->SetMargin(75,30,30,45);
 $graph->legend->SetFont(FF_FONT1,FS_NORMAL);
 
-$lineplot = new LinePlot($tot_data);
-#$lineplot->SetLegend("Traffic total");
+$lineplot = new LinePlot($tot_data, $ticks);
+$lineplot->SetLegend("Traffic total");
 $lineplot->SetColor("#d5d5d5");
-$lineplot->SetFillColor("#d5d5d5");
-$lineplot_in = new LinePlot($in_data);
-#$lineplot_in->SetLegend("Traffic In");
-$lineplot_in->SetColor("#009900");
-$lineplot_out = new LinePlot($out_data);
-#$lineplot_out->SetLegend("Traffic Out");
-$lineplot_out->SetColor("blue");
+$lineplot->SetFillColor("#d5d5d5@0.5");
+
+#$lineplot2 = new LinePlot($tot_data_inv, $ticks);
+#$lineplot2->SetColor("#d5d5d5");
+#$lineplot2->SetFillColor("#d5d5d5@0.5");
+
+
+$lineplot_in = new LinePlot($in_data, $ticks);
+
+$lineplot_in->SetLegend("Traffic In");
+$lineplot_in->SetColor('darkgreen');
+$lineplot_in->SetFillColor('lightgreen@0.4');
+$lineplot_in->SetWeight(1);
+
+$lineplot_out = new LinePlot($out_data_inv, $ticks);
+$lineplot_out->SetLegend("Traffic Out");
+$lineplot_out->SetColor('darkblue');
+$lineplot_out->SetFillColor('lightblue@0.4');
+$lineplot_out->SetWeight(1);
 
 if ($_GET['95th'])
 {
-  $lineplot_95th = new LinePlot($per_data);
+  $lineplot_95th = new LinePlot($per_data, $ticks);
   $lineplot_95th ->SetColor("red");
 }
 
 if ($_GET['ave'])
 {
-  $lineplot_ave = new LinePlot($ave_data);
+  $lineplot_ave = new LinePlot($ave_data, $ticks);
   $lineplot_ave ->SetColor("red");
 }
 
-#$graph->legend->SetLayout(LEGEND_HOR);
-#$graph->legend->Pos(0.52, 0.85, 'center');
+$graph->legend->SetLayout(LEGEND_HOR);
+$graph->legend->Pos(0.52, 0.90, 'center');
 
 $graph->Add($lineplot);
+#$graph->Add($lineplot2);
+
 $graph->Add($lineplot_in);
 $graph->Add($lineplot_out);
 

@@ -119,9 +119,6 @@ if ($_GET['opta'] == "add")
   $i=1;
   foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
   {
-    #echo("<pre>");
-    #print_r($permissions);
-    #echo("</pre>");
     if (bill_permitted($bill['bill_id']))
     {
       unset($class);
