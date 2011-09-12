@@ -23,7 +23,7 @@ if ($device['os'] != "Snom")
     $rrd_create .= " DS:$oid_ds:COUNTER:600:U:100000000000";
   }
 
-  $data_array = snmpwalk_cache_oid($device, "SNMPv2-MIB::snmp", array());
+  $data_array = snmpwalk_cache_oid($device, "snmp", array(), "SNMPv2-MIB");
 
   $rrdupdate = "N";
 

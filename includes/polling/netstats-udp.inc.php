@@ -19,7 +19,7 @@ if ($device['os'] != "Snom")
   {
     $oid_ds = truncate($oid, 19, '');
     $rrd_create .= " DS:$oid_ds:COUNTER:600:U:1000000"; ## Limit to 1MPPS?
-    $snmpstring .= " $oid.0";
+    $snmpstring .= " UDP-MIB::".$oid.".0";
   }
 
   $data = snmp_get_multi($device, $snmpstring);
