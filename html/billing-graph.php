@@ -24,10 +24,10 @@ include("../includes/functions.php");
 include("includes/functions.inc.php");
 include("includes/authenticate.inc.php");
 if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
-require("src/jpgraph.php");
-include("src/jpgraph_line.php");
-include("src/jpgraph_utils.inc.php");
-include("src/jpgraph_date.php");
+require("includes/jpgraph/src/jpgraph.php");
+include("includes/jpgraph/src/jpgraph_line.php");
+include("includes/jpgraph/src/jpgraph_utils.inc.php");
+include("includes/jpgraph/src/jpgraph_date.php");
 
 if (is_numeric($_GET['bill_id']))
 {
