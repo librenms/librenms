@@ -25,7 +25,7 @@ if ($device['os'] != "Snom")
     $snmpstring .= " $oid.0";
   }
 
-  $data_array = snmpwalk_cache_oid($device, "icmp", array());
+  $data_array = snmpwalk_cache_oid($device, "IP-MIB::icmp", array());
 
   $rrdupdate = "N";
 

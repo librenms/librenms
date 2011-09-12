@@ -18,9 +18,14 @@ body {
 .pagemenu-selected {
   font-weight: bold; 
   background-color: #cecece; 
-  -moz-border-radius: 15px; 
-  border-radius: 15px; 
-  padding: 2px 8px 3px 8px;
+
+  padding:3px 8px 4px 8px;
+
+  /* Rounded Corners */
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+
 }
 
 .submit {
@@ -746,8 +751,8 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 
   /* Gradient background */
   background:#F4F4F4;
-  background: -moz-linear-gradient(top, #FFF, #CCC);
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#CCC));
+  background: -moz-linear-gradient(top, #FBFBFB, #DDD);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DDD));
 
   /* Rounded Corners */
   -moz-border-radius: 0px 3px 3px 3px;
