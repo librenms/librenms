@@ -44,28 +44,28 @@ print_optionbar_start();
 
 echo("<span style='font-weight: bold;'>Health</span> &#187; ");
 
-if (!$_GET['opta']) { $_GET['opta'] = "overview"; }
+if (!$_GET['optc']) { $_GET['optc'] = "overview"; }
 
 unset($sep);
 foreach ($datas as $type)
 {
   echo($sep);
 
-  if ($_GET['opta'] == $type)
+  if ($_GET['optc'] == $type)
   {
     echo('<span class="pagemenu-selected">');
   }
 
-  echo("<a href='device/".$device['device_id']."/health/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ."</a>");
-  if ($_GET['opta'] == $type) { echo("</span>"); }
+  echo("<a href='device/".$device['device_id']."/health/" . $type . ($_GET['optd'] ? "/" . $_GET['optd'] : ''). "/'> " . $type_text[$type] ."</a>");
+  if ($_GET['optc'] == $type) { echo("</span>"); }
   $sep = " | ";
 }
 
 print_optionbar_end();
 
-if (is_file("pages/device/health/".mres($_GET['opta']).".inc.php"))
+if (is_file("pages/device/health/".mres($_GET['optc']).".inc.php"))
 {
-   include("pages/device/health/".mres($_GET['opta']).".inc.php");
+   include("pages/device/health/".mres($_GET['optc']).".inc.php");
 } else {
   foreach ($datas as $type)
   {

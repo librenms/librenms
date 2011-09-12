@@ -8,44 +8,12 @@ RewriteCond %{REQUEST_URI} !^(.*)\.jpg$
 RewriteCond %{REQUEST_URI} !^(.*)\.gif$
 RewriteCond %{REQUEST_URI} !^(.*)\.png$
 
-RewriteRule ^cust/ ?page=cust
-
-RewriteRule ^bare/(.+)/ index-bare.php?page=$1
-RewriteRule ^bare/(.+)/(.+)/ index-bare.php?page=$1&opta=$2
-RewriteRule ^bare/(.+)/(.+)/(.+)/ index-bare.php?page=$1&opta=$2&optb=$3
-
-RewriteRule ^mobile/([a-z|0-9]+)/(.+)/(.+)/ mobile.php?page=$1&opta=$2&optb=$3
-RewriteRule ^mobile/([a-z|0-9]+)/(.+)/ mobile.php?page=$1&opta=$2
-RewriteRule ^mobile/([a-z|0-9]+)/ mobile.php?page=$1
-RewriteRule ^mobile/ mobile.php
-
-## Rewrites for Devices
-
-RewriteRule ^devices/location/(.+)/ ?page=devices&location=$1
-RewriteRule ^devices/alerted/ ?page=devices&status=alerted
-RewriteRule ^devices/alerted/ ?page=devices&status=alerted
-RewriteRule ^devices/(.+)/ ?page=devices&type=$1
-
-RewriteRule ^interfaces/(.+)/ ?page=interfaces&type=$1
-
-RewriteRule ^vrf/(.+)/(.+)/(.+)/ ?page=vrf&id=$1&opta=$2&optb=$3
-RewriteRule ^vrf/(.+)/(.+)/ ?page=vrf&id=$1&opta=$2
-RewriteRule ^vrf/(.+)/ ?page=vrf&id=$1
-RewriteRule ^device/([0-9]+)/([a-z]+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/ ?page=device&id=$1&section=$2&opta=$3&optb=$4&optc=$5&optd=$6&opte=$7&optf=$8&optg=$9
-RewriteRule ^device/([0-9]+)/([a-z]+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/ ?page=device&id=$1&section=$2&opta=$3&optb=$4&optc=$5&optd=$6&opte=$7&optf=$8
-RewriteRule ^device/([0-9]+)/([a-z]+)/(.+)/(.+)/(.+)/(.+)/(.+)/ ?page=device&id=$1&section=$2&opta=$3&optb=$4&optc=$5&optd=$6&opte=$7
-RewriteRule ^device/([0-9]+)/([a-z]+)/(.+)/(.+)/(.+)/(.+)/ ?page=device&id=$1&section=$2&opta=$3&optb=$4&optc=$5&optd=$6
-RewriteRule ^device/([0-9]+)/([a-z]+)/(.+)/(.+)/(.+)/ ?page=device&id=$1&section=$2&opta=$3&optb=$4&optc=$5
-RewriteRule ^device/([0-9]+)/([a-z]+)/(.+)/(.+)/ ?page=device&id=$1&section=$2&opta=$3&optb=$4
-RewriteRule ^device/([0-9]+)/([a-z]+)/(.+)/ ?page=device&id=$1&section=$2&opta=$3
-RewriteRule ^device/([0-9]+)/([a-z]+)/ ?page=device&id=$1&section=$2
-RewriteRule ^device/([0-9]+) ?page=device&id=$1
-
-RewriteRule ^([a-z|0-9\-]+)/$ ?page=$1
-
-RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/(.+)/(.+)/$ ?page=$1&opta=$2&optb=$3&optc=$4&optd=$5&opte=$6
-RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/(.+)/$ ?page=$1&opta=$2&optb=$3&optc=$4&optd=$5
-RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/$ ?page=$1&opta=$2&optb=$3&optc=$4
-RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/$ ?page=$1&opta=$2&optb=$3
-RewriteRule ^([a-z|0-9]+)/(.+)/$ ?page=$1&opta=$2
-
+RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/$ 	?page=$1&opta=$2&optb=$3&optc=$4&optd=$5&opte=$6&optf=$7&optg=$8&opth=$9
+RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/$ 		?page=$1&opta=$2&optb=$3&optc=$4&optd=$5&opte=$6&optf=$7&optg=$8
+RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/(.+)/(.+)/(.+)/$ 		?page=$1&opta=$2&optb=$3&optc=$4&optd=$5&opte=$6&optf=$7
+RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/(.+)/(.+)/$      		?page=$1&opta=$2&optb=$3&optc=$4&optd=$5&opte=$6
+RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/(.+)/$ 	  		?page=$1&opta=$2&optb=$3&optc=$4&optd=$5
+RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/$ 		  		?page=$1&opta=$2&optb=$3&optc=$4
+RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/$ 			  		?page=$1&opta=$2&optb=$3
+RewriteRule ^([a-z|0-9]+)/(.+)/$ 			  		?page=$1&opta=$2
+RewriteRule ^([a-z|0-9]+)/$	                                        ?page=$1

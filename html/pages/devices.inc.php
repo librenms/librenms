@@ -1,18 +1,30 @@
 <?php
 
+### FIXME - this code might suck cock. is there a better way?
+
+### Turn /devices/os|linux/location|France/ into 
+### $_POST[os] = "linux"; $_POST['location'] = "France"
+
+foreach($_GET as $key=>$get_var) {
+  if(strstr($key, "opt")) {
+    list($name, $value) = explode("|", $get_var);
+    $_POST[$name] = $value;
+  }
+}
+
+### FIXME - build this string in new method
+
 if ($_POST['hostname']) { $where .= " AND hostname LIKE '%".mres($_POST['hostname'])."%'"; }
 if ($_POST['os'])       { $where .= " AND os = '".mres($_POST['os'])."'"; }
 if ($_POST['version'])  { $where .= " AND version = '".mres($_POST['version'])."'"; }
 if ($_POST['hardware']) { $where .= " AND hardware = '".mres($_POST['hardware'])."'"; }
 if ($_POST['features']) { $where .= " AND features = '".mres($_POST['features'])."'"; }
-if ($_GET['type'])      { $where .= " AND type = '" .mres($_GET[type]). "'"; }
 
-if (isset($_REQUEST['location']))
-{
-  if ($_GET['location'] == "Unset") { $location_filter = ''; }
-  if ($_GET['location'] && !isset($_POST['location']))  { $location_filter = $_GET['location']; }
-  if ($_POST['location']) { $location_filter = $_POST['location']; }
-}
+if ($_GET['location'] == "Unset") { $location_filter = ''; }
+if ($_GET['location'] && !isset($_POST['location']))  { $location_filter = $_GET['location']; }
+if ($_POST['location']) { $location_filter = $_POST['location']; }
+
+print_r($_POST);
 
 print_optionbar_start(62);
 ?>

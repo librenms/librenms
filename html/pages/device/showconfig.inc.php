@@ -19,7 +19,7 @@ if ($_SESSION['userlevel'] >= "7")
 
   echo("<span style='font-weight: bold;'>Config</span> &#187; ");
   
-  if (!$_GET['opta']) {
+  if (!$_GET['optc']) {
     echo('<span class="pagemenu-selected">');
     echo("<a href='device/".$device['device_id']."/showconfig/'> Latest</a>");
     echo("</span>");
@@ -38,10 +38,10 @@ if ($_SESSION['userlevel'] >= "7")
       echo($sep);
       $revlist[] = $svnlog["rev"];
       
-      if ($_GET['opta'] == $svnlog["rev"]) { echo('<span class="pagemenu-selected">'); }
+      if ($_GET['optc'] == $svnlog["rev"]) { echo('<span class="pagemenu-selected">'); }
     
       echo("<a href='device/".$device['device_id']."/showconfig/" . $svnlog["rev"] .  "/'> r" . $svnlog["rev"] ." <small>". date("d M H:i", strtotime($svnlog["date"])) . "</small></a>");
-      if ($_GET['opta'] == $svnlog["rev"]) { echo("</span>");  }
+      if ($_GET['optc'] == $svnlog["rev"]) { echo("</span>");  }
      
       $sep = " | ";
     }
@@ -49,8 +49,8 @@ if ($_SESSION['userlevel'] >= "7")
   
   print_optionbar_end();
   
-  if (function_exists('svn_log') && in_array($_GET['opta'], $revlist)) {
-    list($diff, $errors) = svn_diff($file, $_GET['opta']-1, $file, $_GET['opta']);
+  if (function_exists('svn_log') && in_array($_GET['optc'], $revlist)) {
+    list($diff, $errors) = svn_diff($file, $_GET['optc']-1, $file, $_GET['optc']);
     if (!$diff) {
       $text = "No Difference";
     } else {

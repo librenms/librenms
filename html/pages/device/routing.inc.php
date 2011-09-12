@@ -14,25 +14,25 @@ unset($sep);
 foreach ($routing_tabs as $type)
 {
 
-  if (!$_GET['opta']) { $_GET['opta'] = $type; }
+  if (!$_GET['optc']) { $_GET['optc'] = $type; }
 
   echo($sep);
 
-  if ($_GET['opta'] == $type)
+  if ($_GET['optc'] == $type)
   {
     echo('<span class="pagemenu-selected">');
   }
 
   echo("<a href='".$config['base_url']."/device/".$device['device_id']."/routing/" . $type . "/'> " . $type_text[$type] ." (".$device_routing_count[$type].")</a>");
-  if ($_GET['opta'] == $type) { echo("</span>"); }
+  if ($_GET['optc'] == $type) { echo("</span>"); }
   $sep = " | ";
 }
 
 print_optionbar_end();
 
-if (is_file("pages/device/routing/".mres($_GET['opta']).".inc.php"))
+if (is_file("pages/device/routing/".mres($_GET['optc']).".inc.php"))
 {
-   include("pages/device/routing/".mres($_GET['opta']).".inc.php");
+   include("pages/device/routing/".mres($_GET['optc']).".inc.php");
 } else {
   foreach ($routing_tabs as $type)
   {
