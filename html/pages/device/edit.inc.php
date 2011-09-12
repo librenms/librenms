@@ -25,9 +25,9 @@ if ($_SESSION['userlevel'] < '7')
   unset($sep);
   foreach ($panes as $type => $text)
   {
-    if (!isset($_GET['opta'])) { $_GET['opta'] = $type; }
+    if (!isset($_GET['optc'])) { $_GET['optc'] = $type; }
     echo($sep);
-    if ($_GET['opta'] == $type)
+    if ($_GET['optc'] == $type)
     {
       echo("<span class='pagemenu-selected'>");
       #echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
@@ -35,16 +35,16 @@ if ($_SESSION['userlevel'] < '7')
       #echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
     }
 
-    echo("<a href='device/".$device['device_id']."/edit/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $text ."</a>");
-    if ($_GET['opta'] == $type) { echo("</span>"); }
+    echo("<a href='device/".$device['device_id']."/edit/" . $type . ($_GET['optd'] ? "/" . $_GET['optd'] : ''). "/'> " . $text ."</a>");
+    if ($_GET['optc'] == $type) { echo("</span>"); }
     $sep = " | ";
   }
 
   print_optionbar_end();
 
-  if (is_file("pages/device/edit/".mres($_GET['opta']).".inc.php"))
+  if (is_file("pages/device/edit/".mres($_GET['optc']).".inc.php"))
   {
-    include("pages/device/edit/".mres($_GET['opta']).".inc.php");
+    include("pages/device/edit/".mres($_GET['optc']).".inc.php");
   }
 }
 

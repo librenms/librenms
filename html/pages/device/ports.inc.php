@@ -1,8 +1,8 @@
 <?php
 
-if ($_GET['opta'] == 'graphs')
+if ($_GET['optc'] == 'graphs')
 {
-  if ($_GET['optb']) { $graph_type = "port_" . $_GET['optb']; } else { $graph_type = "port_bits"; }
+  if ($_GET['optd']) { $graph_type = "port_" . $_GET['optd']; } else { $graph_type = "port_bits"; }
 }
 
 print_optionbar_start();
@@ -20,15 +20,15 @@ if(dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl'"))
   $menu_options['adsl'] = 'ADSL';
 }
 
-if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
+if (!$_GET['optc']) { $_GET['optc'] = "basic"; }
 
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
   echo($sep);
-  if ($_GET['opta'] == $option) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ports/' . $option . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $text . '</a>');
-  if ($_GET['opta'] == $option) { echo("</span>"); }
+  if ($_GET['optc'] == $option) { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ports/' . $option . ($_GET['optd'] ? '/' . $_GET['optd'] : ''). '/">' . $text . '</a>');
+  if ($_GET['optc'] == $option) { echo("</span>"); }
   $sep = " | ";
 }
 
@@ -45,21 +45,21 @@ $graph_types = array("bits" => "Bits",
 foreach ($graph_types as $type => $descr)
 {
   echo("$type_sep");
-  if ($_GET['optb'] == $type && $_GET['optc'] != "thumbs") { echo("<span class='pagemenu-selected'>"); }
+  if ($_GET['optd'] == $type && $_GET['opte'] != "thumbs") { echo("<span class='pagemenu-selected'>"); }
   echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ports/graphs/'.$type.'/">'.$descr.'</a>');
-  if ($_GET['optb'] == $type && $_GET['optc'] != "thumbs") { echo("</span>"); }
+  if ($_GET['optd'] == $type && $_GET['opte'] != "thumbs") { echo("</span>"); }
 
   echo('(');
-  if ($_GET['optb'] == $type && $_GET['optc'] == "thumbs") { echo("<span class='pagemenu-selected'>"); }
+  if ($_GET['optd'] == $type && $_GET['opte'] == "thumbs") { echo("<span class='pagemenu-selected'>"); }
   echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ports/graphs/'.$type.'/thumbs/">Mini</a>');
-  if ($_GET['optb'] == $type && $_GET['optc'] == "thumbs") { echo("</span>"); }
+  if ($_GET['optd'] == $type && $_GET['opte'] == "thumbs") { echo("</span>"); }
   echo(')');
   $type_sep = " | ";
 }
 
 print_optionbar_end();
 
-if ($_GET['optc'] == thumbs)
+if ($_GET['opte'] == thumbs)
 {
   $timeperiods = array('-1day','-1week','-1month','-1year');
   $from = '-1day';
@@ -81,11 +81,11 @@ if ($_GET['optc'] == thumbs)
   }
   echo("</div>");
 } else {
-  if ($_GET['opta'] == "arp" || $_GET['opta'] == "adsl" || $_GET['opta'] == "neighbours")
+  if ($_GET['optc'] == "arp" || $_GET['optc'] == "adsl" || $_GET['optc'] == "neighbours")
   {
-    include("ports/".$_GET['opta'].".inc.php");
+    include("ports/".$_GET['optc'].".inc.php");
   } else {
-    if ($_GET['opta'] == "details") { $port_details = 1; }
+    if ($_GET['optc'] == "details") { $port_details = 1; }
     echo("<div style='margin: 0px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
     $i = "1";
 

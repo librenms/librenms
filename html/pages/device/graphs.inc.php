@@ -24,15 +24,15 @@ foreach ($config['graph_sections'] as $section)
   if (isset($graph_enable) && is_array($graph_enable[$section]))
   {
     $type = strtolower($section);
-    if (!$_GET['opta']) { $_GET['opta'] = $type; }
+    if (!$_GET['optc']) { $_GET['optc'] = $type; }
     echo($sep);
-    if ($_GET['opta'] == $type)
+    if ($_GET['optc'] == $type)
     {
       echo('<span class="pagemenu-selected">');
     }
 
-    echo("<a href='device/".$device['device_id']."/graphs/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . ucfirst($type) ."</a>");
-    if ($_GET['opta'] == $type) 
+    echo("<a href='device/".$device['device_id']."/graphs/" . $type . ($_GET['optd'] ? "/" . $_GET['optd'] : ''). "/'> " . ucfirst($type) ."</a>");
+    if ($_GET['optc'] == $type) 
     { 
       echo("</span>"); 
     }
@@ -43,7 +43,7 @@ foreach ($config['graph_sections'] as $section)
 unset ($sep);
 print_optionbar_end();
 
-$graph_enable = $graph_enable[$_GET['opta']];
+$graph_enable = $graph_enable[$_GET['optc']];
 
 foreach ($config['graph_types']['device'] as $graph => $entry)
 {

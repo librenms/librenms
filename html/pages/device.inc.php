@@ -1,18 +1,18 @@
 <?php
 
-if ($_GET['id']) { $_GET['id'] = mres($_GET['id']); }
+if ($_GET['opta']) { $_GET['opta'] = mres($_GET['opta']); }
 
-if ($_GET['section'] == "port" && is_numeric($_GET['opta']) && port_permitted($_GET['opta']))
+if ($_GET['optb'] == "port" && is_numeric($_GET['opta']) && port_permitted($_GET['optc']))
 {
   $check_device = get_device_id_by_interface_id($_GET['opta']);
   $permit_ports = 1;
 }
 
-if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
+if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
 {
   $selected['iface'] = "selected";
 
-  $section = str_replace(".", "", mres($_GET['section']));
+  $section = str_replace(".", "", mres($_GET['optb']));
 
   if (!$section)
   {
@@ -21,7 +21,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
 
   $select[$section] = "selected";
 
-  $device  = device_by_id_cache($_GET['id']);
+  $device  = device_by_id_cache($_GET['opta']);
   $attribs = get_dev_attribs($device['device_id']);
 
   if ($config['os'][$device['os']]['group']) { $device['os_group'] = $config['os'][$device['os']]['group']; }
@@ -252,7 +252,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     echo("</ul>");
   }
 
-  if(device_permitted($device['device_id']) || $check_device == $_GET['id']) {
+  if(device_permitted($device['device_id']) || $check_device == $_GET['opta']) {
     echo('<div class="contentstyle">');
 
     include("pages/device/".mres(basename($section)).".inc.php");

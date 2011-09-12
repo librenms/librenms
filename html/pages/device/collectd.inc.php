@@ -51,11 +51,11 @@ print_optionbar_start();
     $plugins = collectd_list_plugins($device['hostname']);
     unset($sep);
     foreach ($plugins as &$plugin) {
-       if (!$_GET['opta']) { $_GET['opta'] = $plugin; }
+       if (!$_GET['optc']) { $_GET['optc'] = $plugin; }
        echo($sep);
-       if ($_GET['opta'] == $plugin) { echo("<span class='pagemenu-selected'>"); }
+       if ($_GET['optc'] == $plugin) { echo("<span class='pagemenu-selected'>"); }
        echo("<a href='device/" . $device['device_id'] . "/collectd/" . $plugin . "/'>" . htmlspecialchars($plugin) ."</a>");
-       if ($_GET['opta'] == $plugin) { echo("</span>"); }
+       if ($_GET['optc'] == $plugin) { echo("</span>"); }
        $sep = ' | ';
     }
     unset ($sep);
@@ -64,13 +64,13 @@ print_optionbar_end();
 
    $i=0;
 
-    $pinsts = collectd_list_pinsts($device['hostname'], $_GET['opta']);
+    $pinsts = collectd_list_pinsts($device['hostname'], $_GET['optc']);
     foreach ($pinsts as &$instance) {
 
-     $types = collectd_list_types($device['hostname'], $_GET['opta'], $instance);
+     $types = collectd_list_types($device['hostname'], $_GET['optc'], $instance);
      foreach ($types as &$type) {
 
-     $typeinstances = collectd_list_tinsts($device['hostname'], $_GET['opta'], $instance, $type);
+     $typeinstances = collectd_list_tinsts($device['hostname'], $_GET['optc'], $instance, $type);
 
      if ($MetaGraphDefs[$type]) { $typeinstances = array($MetaGraphDefs[$type]); }
 
@@ -81,16 +81,16 @@ print_optionbar_end();
        echo('<div style="background-color: '.$row_colour.';">');
        echo('<div class="graphhead" style="padding:4px 0px 0px 8px;">');
        if ($tinst) {
-       echo($_GET['opta']." $instance - $type - $tinst");
+       echo($_GET['optc']." $instance - $type - $tinst");
        } else {
-        echo($_GET['opta']." $instance - $type");
+        echo($_GET['optc']." $instance - $type");
        }
        echo("</div>");
 
        $graph_array['type']    		= "device_collectd";
        $graph_array['id']      		= $device['device_id'];
 
-       $graph_array['c_plugin']  	 = $_GET['opta'];
+       $graph_array['c_plugin']  	 = $_GET['optc'];
        $graph_array['c_plugin_instance'] = $instance;
        $graph_array['c_type']		 = $type;
        $graph_array['c_type_instance']   = $tinst;

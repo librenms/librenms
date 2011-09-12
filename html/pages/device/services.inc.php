@@ -5,18 +5,18 @@ echo("<span style='font-weight: bold;'>Services</span> &#187; ");
 $menu_options = array('basic' => 'Basic',
                       'details' => 'Details');
 
-if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
+if (!$_GET['optc']) { $_GET['optc'] = "basic"; }
 
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
   echo($sep);
-  if ($_GET['opta'] == $option)
+  if ($_GET['optc'] == $option)
   {
     echo("<span class='pagemenu-selected'>");
   }
-  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/services/' . $option . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $text . '</a>');
-  if ($_GET['opta'] == $option)
+  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/services/' . $option . ($_GET['optd'] ? '/' . $_GET['optd'] : ''). '/">' . $text . '</a>');
+  if ($_GET['optc'] == $option)
   {
     echo("</span>");
   }
@@ -35,7 +35,7 @@ if (dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE device_id = ?", 
   {
     include("includes/print-service.inc.php");
 
-       if ($_GET['opta'] == "details")
+       if ($_GET['optc'] == "details")
        {
          $graph_array['height'] = "100";
          $graph_array['width']  = "210";
