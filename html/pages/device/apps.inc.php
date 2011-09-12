@@ -2,6 +2,8 @@
 
 print_optionbar_start();
 
+echo("<span style='font-weight: bold;'>Apps</span> &#187; ");
+
 unset($sep);
 
 foreach (dbFetchRows("SELECT * FROM `applications` WHERE `device_id` = ?", array($device['device_id'])) as $app)

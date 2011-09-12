@@ -139,7 +139,7 @@ if ($_POST['deleted'] || $_GET['type'] == "deleted") { $where .= " AND I.deleted
 
 $query = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ".$where." ORDER BY D.hostname, I.ifIndex";
 
-echo("<tr class=tablehead><td></td><th>Device</a></th><th>Interface</th><th>Speed</th><th>Media</th><th>Description</th></tr>");
+echo("<tr class=tablehead><td></td><th>Device</a></th><th>Interface</th><th>Speed</th><th>Down</th><th>Up</th><th>Media</th><th>Description</th></tr>");
 
 $row = 1;
 
@@ -149,6 +149,10 @@ foreach (dbFetchRows($query, $param) as $interface)
 
   $speed = humanspeed($interface['ifSpeed']);
   $type = humanmedia($interface['ifType']);
+
+  $interface['in_rate'] = formatRates($interface['ifInOctets_rate'] * 8);
+  $interface['out_rate'] = formatRates($interface['ifOutOctets_rate'] * 8);
+
 
   if ($interface['in_errors'] > 0 || $interface['out_errors'] > 0)
   {
@@ -163,6 +167,8 @@ foreach (dbFetchRows($query, $param) as $interface)
           <td width=200 class=list-bold>" . generate_device_link($interface) . "</td>
           <td width=150 class=list-bold>" . generate_port_link($interface) . " $error_img</td>
           <td width=110 >$speed</td>
+          <td width=110 class=green>".$interface['in_rate']."</td>
+          <td width=110 class=blue>".$interface['out_rate']."</td>
           <td width=200>$type</td>
           <td>" . $interface['ifAlias'] . "</td>
         </tr>\n");

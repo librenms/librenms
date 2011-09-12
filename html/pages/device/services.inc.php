@@ -1,5 +1,7 @@
 <?php print_optionbar_start();
 
+echo("<span style='font-weight: bold;'>Services</span> &#187; ");
+
 $menu_options = array('basic' => 'Basic',
                       'details' => 'Details');
 
