@@ -114,6 +114,9 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
 
     ### $routing_tabs is used in device/routing/ to build the tabs menu. we built it here to save some queries
 
+    $device_routing_count['ipsec_tunnels'] = dbFetchCell("SELECT COUNT(*) FROM `ipsec_tunnels` WHERE `device_id` = ?", array($device['device_id']));
+    if ($device_routing_count['ipsec_tunnels']) { $routing_tabs[] = 'ipsec_tunnels'; }
+
     $device_routing_count['bgp'] = dbFetchCell("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ?", array($device['device_id']));
     if ($device_routing_count['bgp']) { $routing_tabs[] = 'bgp'; }
   

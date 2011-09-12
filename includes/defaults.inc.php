@@ -334,6 +334,7 @@ $config['poller_modules']['cisco-ipsec-flow-monitor']     = 1;
 $config['poller_modules']['cisco-remote-access-monitor']  = 1;
 $config['poller_modules']['cisco-cef']                    = 1;
 $config['poller_modules']['cisco-mac-accounting']         = 1;
+$config['poller_modules']['cipsec-tunnels']		  = 1;
 
       #include("includes/polling/altiga-ssl.inc.php");
 
