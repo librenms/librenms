@@ -1,0 +1,71 @@
+README FOR JPGRAPH 3.0.x
+========================
+
+This package contains JpGraph, an Object Oriented PHP5 Graph Plotting library.
+
+The library is Copyright (C) 2001-2009 Aditus Consulting and
+released under dual license QPL 1.0 for open source and educational
+use and JpGraph Professional License for commercial use. 
+
+Please see full license details at http://www.aditus.nu/jpgraph/
+
+* --------------------------------------------------------------------
+* PHP4 IS NOT SUPPORTED in the 2.x or 3.x series
+* --------------------------------------------------------------------
+		
+Requirements:
+-------------
+Miminum:
+* PHP 5.1.0 or higher 
+* GD 2.0.28 or higher
+Note: Earlier versions might work but is unsupported.
+
+Recommended:
+* PHP >= 5.2.0
+* PHP Built-in GD library
+
+Installation
+------------
+0. Make sure that the PHP version is compatible with the stated requirements
+   and that the PHP installation has support for the GD library. 
+   Please run phpinfo() to check if GD library
+   is supported in the installation. 
+   If the GD library doesn't seem to be installed 
+   please consult the PHP manual under section "Image" for
+   instructions on where to find this library. Please refer to
+   the manual section "Verifying your PHP installation"
+   
+1. Unzip and copy the files to a directory of your choice where Your
+   httpd sever can access them. 
+   For a global site installation you should copy the files to 
+   somewhere in the PHP search path. 
+
+2. Check that the default directory paths in jpg-config.inc
+   for cache directory and TTF directory suits your installation. 
+   Note1: The default directories are different depending on if
+   the library is running on Windows or UNIX.
+   Note2: Apache/PHP must have write permission to your cache 
+   directory if you enable the cache feature. By default the cache
+   is disabled.
+
+3. Check that all rest of the DEFINE in jpg-config.inc 
+   is setup to your preference. The default should be fine
+   for most users. 
+
+4. Read the chapters on installation in the manual.
+
+
+Documentation
+-------------
+The installation includes HTML documentation and reference guide for the
+library. The portal page for all the documentation is
+<YOUR-INSTALLATION-DIRECTORY>/docs/index.html
+
+
+Bug reports and suggestions
+---------------------------
+Should be reported using the the issue tracker at
+
+http://www.aditus.nu/bugtraq
+
+<EOF>

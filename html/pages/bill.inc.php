@@ -33,8 +33,10 @@ if (bill_permitted($bill_id))
 
   $datefrom     = $day_data['0'];
   $dateto       = $day_data['1'];
+
   $lastfrom	= $day_data['2'];
   $lastto	= $day_data['3'];
+
   $rate_data    = getRates($bill_id,$datefrom,$dateto);
   $rate_95th    = $rate_data['rate_95th'];
   $dir_95th     = $rate_data['dir_95th'];
@@ -69,8 +71,14 @@ if (bill_permitted($bill_id))
 
   if (!$_GET['optb']) { $_GET['optb'] = "details"; }
 
+  if ($_GET['optb'] == "basic") { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='bill/".$bill_id."/basic/'>Quick Graphs</a>");
+  if ($_GET['optb'] == "basic") { echo("</span>"); }
+
+  echo(" | ");
+
   if ($_GET['optb'] == "details") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='bill/".$bill_id."/details/'>Details</a>");
+  echo("<a href='bill/".$bill_id."/details/'>Accurate Graphs</a>");
   if ($_GET['optb'] == "details") { echo("</span>"); }
 
   if ($_SESSION['userlevel'] == "10")
@@ -98,7 +106,7 @@ if (bill_permitted($bill_id))
   {
     include("pages/bill/delete.inc.php");
   }
-  elseif ($_GET['optb'] == "details")
+  elseif ($_GET['optb'] == "details" || $_GET['optb'] == "basic")
   {
 
   echo("<h3>Billed Ports</h3>");
@@ -173,46 +181,49 @@ if (bill_permitted($bill_id))
 
   }
 
-#  echo("</td><td><img src='images/billing-key.png'></td></tr></table>");
-
-#  $bi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
-#  $bi = $bi . "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
-#  $bi = $bi . "&amp;x=715&amp;y=250";
-#  $bi = $bi . "$type'>";
-
-  $bi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
-  $bi .= "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
-  $bi .= "&amp;width=715&amp;height=200&amp;total=1'>";
-
   $lastmonth = dbFetchCell("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))");
   $yesterday = dbFetchCell("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))");
   $rightnow = date(U);
 
+  if ($_GET['optb'] == "details") {
 
-  $li = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
-  $li .= "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to;
-  $li .= "&amp;width=715&amp;height=200&amp;total=1'>";
+    $bi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+    $bi = $bi . "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
+    $bi = $bi . "&amp;x=800&amp;y=250";
+    $bi = $bi . "$type'>";
+
+    $li =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+    $li = $li . "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to . "&amp;x=800&amp;y=250";
+    $li = $li . "$type'>";
+
+    $di =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+    $di = $di . "&amp;from=" . $config['time']['day'] .  "&amp;to=" . $config['time']['now'] . "&amp;x=800&amp;y=250";
+    $di = $di . "$type'>";
+
+    $mi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+    $mi = $mi . "&amp;from=" . $lastmonth .  "&amp;to=" . $rightnow . "&amp;x=800&amp;y=250";
+    $mi = $mi . "$type'>";
+
+  } else {
+
+    $bi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
+    $bi .= "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
+    $bi .= "&amp;width=715&amp;height=200&amp;total=1'>";
 
 
-  $di =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
-  $di = $di . "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to . "&amp;x=715&amp;y=250";
-  $di = $di . "$type'>";
+    $li = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
+    $li .= "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to;
+    $li .= "&amp;width=715&amp;height=200&amp;total=1'>";
 
-echo("$di");
+    $di = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
+    $di .= "&amp;from=" . $config['time']['day'] .  "&amp;to=" . $config['time']['now'];
+    $di .= "&amp;width=715&amp;height=200&amp;total=1'>";
 
-  $di = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
-  $di .= "&amp;from=" . $config['time']['day'] .  "&amp;to=" . $config['time']['now'];
-  $di .= "&amp;width=715&amp;height=200&amp;total=1'>";
+    $mi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
+    $mi .= "&amp;from=" . $lastmonth .  "&amp;to=" . $rightnow;
+    $mi .= "&amp;width=715&amp;height=200&amp;total=1'>";
 
-
-#  $mi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
-#  $mi = $mi . "&amp;from=" . $lastmonth .  "&amp;to=" . $rightnow . "&amp;x=715&amp;y=250";
-#  $mi = $mi . "$type'>";
-
-  $mi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
-  $mi .= "&amp;from=" . $lastmonth .  "&amp;to=" . $rightnow;
-  $mi .= "&amp;width=715&amp;height=200&amp;total=1'>";
-
+  }
 
   if ($null)
   {
