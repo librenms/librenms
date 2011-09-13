@@ -31,7 +31,7 @@ include("overview/ports.inc.php");
 if ($services['total'])
 {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/16/cog.png'> Services</p><div style='height: 5px;'></div>");
+  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='images/16/cog.png'> Services</p><div style='height: 5px;'></div>");
 
   echo("
 <table class=tablehead cellpadding=2 cellspacing=0 width=100%>
@@ -64,7 +64,7 @@ $syslog =  dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date 
 if (is_array($syslog))
 {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/16/printer.png'> Recent Syslog</p>");
+  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='images/16/printer.png'> Recent Syslog</p>");
   echo("<table cellspacing=0 cellpadding=2 width=100%>");
   foreach ($syslog as $entry) { include("includes/print-syslog.inc.php"); }
   echo("</table>");
@@ -90,7 +90,7 @@ include("overview/sensors/frequencies.inc.php");
 echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
 echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
 echo('<a class="sectionhead" href="device/'.$device['device_id'].'/events/">');
-echo("<img align='absmiddle' src='".$config['base_url']."/images/16/report.png'> Recent Events</a></p>");
+echo("<img align='absmiddle' src='images/16/report.png'> Recent Events</a></p>");
 
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
 
