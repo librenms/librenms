@@ -24,8 +24,6 @@ if ($_GET['location'] == "Unset") { $location_filter = ''; }
 if ($_GET['location'] && !isset($_POST['location']))  { $location_filter = $_GET['location']; }
 if ($_POST['location']) { $location_filter = $_POST['location']; }
 
-print_r($_POST);
-
 print_optionbar_start(62);
 ?>
 <form method="post" action="">
