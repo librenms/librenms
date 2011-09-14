@@ -42,6 +42,7 @@ if (!array_key_exists('SCRIPT_FILENAME', $_SERVER)
 # ============================================================================
 $mysql_user = 'user';
 $mysql_pass = 'password';
+$mysql_host = 'localhost';
 $mysql_port = 3306;
 $mysql_ssl  = FALSE;   # Whether to use SSL to connect to MySQL.
 
@@ -160,9 +161,9 @@ if (!function_exists('array_change_key_case') ) {
 # ============================================================================
 function validate_options($options) {
    debug($options);
-   $opts = array('host', 'items', 'user', 'pass', 'heartbeat', 'nocache', 'port');
+   $opts = array('items', 'user', 'pass', 'heartbeat', 'nocache', 'port');
    # Required command-line options
-   foreach ( array('host') as $option ) {
+   foreach ( array() as $option ) {
       if (!isset($options[$option]) || !$options[$option] ) {
          usage("Required option --$option is missing");
       }
@@ -251,6 +252,8 @@ function ss_get_mysql_stats( $options ) {
    $user = isset($options['user']) ? $options['user'] : $mysql_user;
    $pass = isset($options['pass']) ? $options['pass'] : $mysql_pass;
    $port = isset($options['port']) ? $options['port'] : $mysql_port;
+   $port = isset($options['host']) ? $options['host'] : $mysql_host;
+
    $heartbeat = isset($options['heartbeat']) ? $options['heartbeat'] : $heartbeat;
    # If there is a port, or if it's a non-standard port, we add ":$port" to the
    # hostname.
