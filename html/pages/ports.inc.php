@@ -166,18 +166,18 @@ echo('<div style="float: right;">');
 
   if($vars['searchbar'] == "hide")
   {
-    echo('<a href="'. generate_url($vars, array('searchbar' => '')).'">Restore Search</a>');
+    echo('<a href="'. generate_url($vars, array('searchbar' => '')).'">Search</a>');
   } else {
-    echo('<a href="'. generate_url($vars, array('searchbar' => 'hide')).'">Remove Search</a>');
+    echo('<a href="'. generate_url($vars, array('searchbar' => 'hide')).'">Search</a>');
   }
 
   echo("  | ");
 
   if($vars['bare'] == "yes")
   {
-    echo('<a href="'. generate_url($vars, array('bare' => '')).'">Restore Header</a>');
+    echo('<a href="'. generate_url($vars, array('bare' => '')).'">Header</a>');
   } else {
-    echo('<a href="'. generate_url($vars, array('bare' => 'yes')).'">Remove Header</a>');
+    echo('<a href="'. generate_url($vars, array('bare' => 'yes')).'">Header</a>');
   }
 
 
