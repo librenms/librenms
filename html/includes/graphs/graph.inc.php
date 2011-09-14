@@ -84,17 +84,36 @@ else
 
 function graph_error($string)
 {
-  global $width, $height, $debug;
+  global $config, $width, $height, $debug, $graphfile, $rrd_options, $rrd_switches;
 
-  if (!$debug) { header('Content-type: image/png'); }
-  if ($height > "99")  { $width +=75; }
-  $im     = imagecreate($width, $height);
-  $orange = imagecolorallocate($im, 255, 225, 225);
-  $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
-  imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
-  imagepng($im);
-  imagedestroy($im);
-  exit();
+  #$rrd_options .= " HRULE:0#cc0000";
+
+  #$rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
+  $rrd_cmd = $config['rrdtool'] . " graph $graphfile  --title='".$string."'  -l 0 -u 100 -E --start -10y --end now --width 315 --height 110 -c BACK#ff9999cc -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal --font LEGEND:8:DejaVuSansMono --font AXIS:7:DejaVuSansMono --font-render-mode normal HRULE:0#cc0000" . $rrd_switches;
+
+
+  $woo = shell_exec($rrd_cmd);
+  if ($debug) { echo("<pre>".$rrd_cmd."</pre>"); }
+  if (is_file($graphfile) && !$debug)
+  {
+    header('Content-type: image/png');
+    $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
+    unlink($graphfile);
+  }
+
+
+
+
+#  if (!$debug) { header('Content-type: image/png'); }
+#  if ($height > "99")  { $width +=75; }
+#  $im     = imagecreate($width, $height);
+#  $orange = imagecolorallocate($im, 255, 225, 225);
+#  $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
+#  imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
+#  imagepng($im);
+#  imagedestroy($im);
+#  exit();
+
 }
 
 if ($error_msg) {

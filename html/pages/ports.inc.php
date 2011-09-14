@@ -44,6 +44,7 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hos
         <option value='loopback' <?php if ($vars['state'] == "loopback") { echo("selected"); } ?>>Loopback</option>
       </select>
     </td>
+
     <td width=110>
       <select name='ifSpeed' id='ifSpeed'>
       <option value=''>All Speeds</option>
@@ -75,6 +76,23 @@ foreach (dbFetchRows("SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `i
 }
 ?>
        </select>
+<br />
+      <select name='port_descr_type' id='port_descr_type'>
+      <option value=''>All Port Types</option>
+<?php
+foreach (dbFetchRows("SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`") as $data)
+{
+  if ($data['port_descr_type'])
+  {
+    echo("<option value='".$data['port_descr_type']."'");
+    if ($data['port_descr_type'] == $vars['port_descr_type']) { echo("selected"); }
+    echo(">".ucfirst($data['port_descr_type'])."</option>");
+  }
+}
+?>
+       </select>
+
+
              </td>
              <td>
         <input type="text" name="ifAlias" id="ifAlias" size=40 value="<?php echo($vars['ifAlias']); ?>" />
@@ -202,6 +220,7 @@ if ($_GET['opta'] == "down" || $_GET['type'] == "down" || $vars['state'] == "dow
   $where .= " AND I.ifType = 'ppp'";
 }
 
+
 if (is_numeric($vars['device_id'])) 
 { 
   $where .= " AND I.device_id = ?";
@@ -212,7 +231,11 @@ if ($vars['ifType'])
   $where .= " AND I.ifType = ?"; 
   $param[] = $vars['ifType'];
 }
-
+if ($vars['port_descr_type'])
+{
+  $where .= " AND I.port_descr_type = ?";
+  $param[] = $vars['port_descr_type'];
+}
 if (is_numeric($vars['ifSpeed'])) 
 {
   $where .= " AND I.ifSpeed = ?"; 

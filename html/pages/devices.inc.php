@@ -178,8 +178,10 @@ foreach ($menu_options as $option => $text)
 $menu_options = array('bits'      => 'Bits',
                       'processor' => 'CPU',
                       'mempool'   => 'Memory',
-                      'uptime'    => 'Uptime');
-
+                      'uptime'    => 'Uptime',
+                      'storage'   => 'Storage',
+                      'diskio'    => 'Disk I/O'
+                      );
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
