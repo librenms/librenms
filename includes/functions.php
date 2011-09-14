@@ -175,7 +175,7 @@ function delete_device($id)
   return $ret;
 }
 
-function addHost($host, $community, $snmpver, $port = '161', $transport = 'udp')
+function addHost($host, $community = NULL, $snmpver = 'v2c', $port = '161', $transport = 'udp')
 {
   global $config;
 
@@ -194,23 +194,26 @@ function addHost($host, $community, $snmpver, $port = '161', $transport = 'udp')
         foreach ($config['snmp']['community'] as $community)
         {
           $device = deviceArray($host, $community, $snmpver, $port, $transport);
-
           if (isSNMPable($device))
           {
+            print_message("Trying community $community");
             $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
             if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host)))
             {
-              $added = createHost ($host, $community, $snmpver, $port, $transport);
-              if($added) { echo($added . "\n"); }
+              $device_id = createHost ($host, $community, $snmpver, $port, $transport);
+              return $device_id;
             } else { 
               print_error("Given hostname does not match SNMP-read hostname ($snmphost)!"); 
             }
+          } else {
+            print_error("No reply on community $community");
           }
         }
-        if (!$added) 
+        if (!$device_id) 
         { 
           /// Faild SNMP
-          print_error("Could not reach $host with given SNMP community"); }
+          print_error("Could not reach $host with given SNMP community"); 
+        }
       } else { 
         /// failed Reachability
         print_error("Could not ping $host"); }
@@ -364,17 +367,25 @@ function utime()
 function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
 {
   $host = trim(strtolower($host));
-  $device = array('hostname' => $host, 'sysName' => $host, 'community' => $community, 'port' => $port, 'transport' => $transport, 'status' => '1', 'snmpver' => $snmpver);
+
+  $device = array('hostname' => $host,
+                  'sysName' => $host,
+                  'community' => $community,
+                  'port' => $port,
+                  'transport' => $transport,
+                  'status' => '1',
+                  'snmpver' => $snmpver);
+
   $device['os'] = getHostOS($device);
 
   if ($device['os'])
   {
 
-    $id = dbInsert($device, 'devices');
+    $device_id = dbInsert($device, 'devices');
 
-    if ($id)
+    if ($device_id)
     {
-      return("Created host : $host (id:".$id.") (os:".$device['os'].")");
+      return($device_id);
     }
     else
     {

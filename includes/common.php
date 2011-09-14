@@ -179,11 +179,11 @@ function ifclass($ifOperStatus, $ifAdminStatus)
   return $ifclass;
 }
 
-function device_by_id_cache($device_id)
+function device_by_id_cache($device_id, $refresh = '0')
 {
   global $device_cache;
 
-  if (isset($device_cache[$device_id]) && is_array($device_cache[$device_id]))
+  if (!$refresh && isset($device_cache[$device_id]) && is_array($device_cache[$device_id]))
   {
     $device = $device_cache[$device_id];
   } else {
