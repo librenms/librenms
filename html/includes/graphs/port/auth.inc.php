@@ -6,6 +6,9 @@ if (is_numeric($id) && ($config['allow_unauth_graphs'] || port_permitted($id)))
   $device = device_by_id_cache($port['device_id']);
   $title  = generate_device_link($device);
   $title .= " :: Port  ".generate_port_link($port);
+
+  $graph_title = $device['hostname'] . "::" . $port['ifDescr'];
+
   $auth   = TRUE;
 
   $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");

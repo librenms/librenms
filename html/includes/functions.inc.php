@@ -1,5 +1,26 @@
 <?php
 
+function generate_url($vars, $new_vars = array())
+{
+
+  $vars = array_merge($vars, $new_vars);
+
+  $url = "/".$vars['page']."/";
+  unset($vars['page']);
+
+  foreach($vars as $var => $value)
+  {
+    if($value != "")
+    {
+      $url .= $var ."=".$value."/";
+    }
+  }
+
+  return($url);
+
+}
+
+
 function get_percentage_colours($percentage)
 {
 
@@ -314,7 +335,7 @@ function generate_port_thumbnail($args)
   echo(generate_port_link($args, $args['content']));
 }
 
-function print_optionbar_start ($height = 20, $width = 0, $marginbottom = 5)
+function print_optionbar_start ($height = 0, $width = 0, $marginbottom = 5)
 {
   echo("
     <div style='text-align: center; margin-top: 0px; margin-bottom: ".$marginbottom."px; " . ($width ? 'max-width: ' . $width . (strstr($width,'%') ? '' : 'px') . '; ' : '') . "'>

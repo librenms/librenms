@@ -21,7 +21,7 @@ $rrd_options .= 'DEF:g='.$rrd_filename.':sb_closing:AVERAGE ';
 $rrd_options .= 'DEF:h='.$rrd_filename.':sb_logging:AVERAGE ';
 $rrd_options .= 'DEF:i='.$rrd_filename.':sb_graceful:AVERAGE ';
 $rrd_options .= 'DEF:j='.$rrd_filename.':sb_idle:AVERAGE ';
-$rrd_options .= 'COMMENT:"Scoreboard    Current    Average   Maximum" ';
+$rrd_options .= 'COMMENT:"Scoreboard    Current    Average   Maximum\n" ';
 $rrd_options .= 'AREA:a#4444FFFF:"Waiting   "  ';
 $rrd_options .= 'GPRINT:a:LAST:"%6.2lf %s"  ';
 $rrd_options .= 'GPRINT:a:AVERAGE:"%6.2lf %s"  ';

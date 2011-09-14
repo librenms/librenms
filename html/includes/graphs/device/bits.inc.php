@@ -39,6 +39,8 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) 
 $rra_in  = "INOCTETS";
 $rra_out = "OUTOCTETS";
 
+$graph_title .= "::bits";
+
 $colour_line_in = "006600";
 $colour_line_out = "000099";
 $colour_area_in = "CDEB8B";
