@@ -2,9 +2,9 @@
 
 ### Set Defaults here
 
-$sql_param = array();
+if(!isset($vars['format'])) { $vars['format'] = "list_detail"; }
 
-if(!isset($graph)) { $graph = "bits"; }
+$sql_param = array();
 
 if ($vars['hostname']) { $where .= " AND hostname LIKE ?"; $sql_param[] = "%".$vars['hostname']."%"; }
 if ($vars['os'])       { $where .= " AND os = ?";          $sql_param[] = $vars['os']; }
@@ -261,7 +261,10 @@ if($format == "graph")
 } else {
 
   echo('<table cellpadding="7" cellspacing="0" class="devicetable sortable" width="100%">');
-#  <tr class="tablehead"><th></th><th>Device</th><th></th><th>Operating System</th><th>Platform</th><th>Uptime/Location</th></tr>');
+  if($subformat = "detail")
+  {
+    echo('<tr class="tablehead"><th></th><th>Device</th><th></th><th>Operating System</th><th>Platform</th><th>Uptime/Location</th></tr>');
+  }
 
   foreach (dbFetchRows($query, $sql_param) as $device)
   {
