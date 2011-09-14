@@ -9,6 +9,7 @@ if (!$nototal) { $rrd_options .= " COMMENT:'Total      '"; }
 $rrd_options .= " COMMENT:'Out\: Current     Maximum'";
 if (!$nototal) { $rrd_options .= " COMMENT:'     Total'"; }
 $rrd_options .= " COMMENT:'\\n'";
+if(!isset($multiplier)) { $multiplier = "8"; }
 
 foreach ($rrd_list as $rrd)
 {

@@ -28,13 +28,28 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) 
     }
   }
 
-  if (is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($int['ifIndex'] . ".rrd")) && $ignore != 1)
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($int['ifIndex'] . ".rrd");
+  if (is_file($rrd_filename) && $ignore != 1)
   {
-    $rrd_filenames[] = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($int['ifIndex'] . ".rrd");
+    $rrd_filenames[] = $rrd_filename;
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = $port['ifDescr'];
+    $rrd_list[$i]['rra_in'] = $rra_in;
+    $rrd_list[$i]['rra_out'] = $rra_out;
+    $i++;
   }
 
   unset($ignore);
 }
+
+$units ='bps';
+$total_units ='B';
+$colours_in ='greens';
+$multiplier = "8";
+$colours_out = 'blues';
+
+$nototal = 1;
+
 
 $rra_in  = "INOCTETS";
 $rra_out = "OUTOCTETS";
@@ -46,6 +61,6 @@ $colour_line_out = "000099";
 $colour_area_in = "CDEB8B";
 $colour_area_out = "C3D9FF";
 
-include("includes/graphs/generic_multi_bits.inc.php");
+include("includes/graphs/generic_multi_bits_separated.inc.php");
 
 ?>
