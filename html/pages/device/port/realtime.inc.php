@@ -3,8 +3,8 @@
 ### FIXME - do this in a function and/or do it in graph-realtime.php
 
 
-if($_GET['optc']) {
-  $interval = $_GET['optc'];
+if($_GET['opte']) {
+  $interval = $_GET['opte'];
 } else {
   if($device['os'] == "linux") {
     $interval = "15";
