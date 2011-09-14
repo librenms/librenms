@@ -111,7 +111,3 @@ foreach (dbFetchRows("SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
 echo("</table></div>");
 
 ?>
-
-<script class="content_tooltips" type="text/javascript"> 
-$(document).ready(function() { $('#content a[title]').qtip({ content: { text: false }, style: 'light' }); });
-</script> 

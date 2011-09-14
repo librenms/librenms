@@ -1195,3 +1195,16 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   background-position: center left !important;
   text-decoration: none;
 }
+
+
+/* Tooltip */
+
+.bubbleInfo {
+    position: relative;
+}
+
+.popup {
+    position: absolute;
+    display: none; /* keeps the popup hidden if no JS available */
+}
+

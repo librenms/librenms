@@ -1,4 +1,35 @@
 <?php
+
+print_optionbar_start();
+
+ echo('<span style="font-weight: bold;">Locations</span> &#187; ');
+
+$menu_options = array('basic' => 'Basic',
+                      'traffic' => 'Traffic');
+
+if (!$vars['view']) { $vars['view'] = "basic"; }
+
+$sep = "";
+foreach ($menu_options as $option => $text)
+{
+  echo($sep);
+  if ($vars['view'] == $option)
+  {
+    echo("<span class='pagemenu-selected'>");
+  }
+  echo('<a href="locations/view=' . $option . '/">' . $text . '</a>');
+  if ($vars['view'] == $option)
+  {
+    echo("</span>");
+  }
+  $sep = " | ";
+}
+
+unset($sep);
+
+print_optionbar_end();
+
+
 echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">');
 
 foreach (getlocations() as $location)
@@ -25,7 +56,7 @@ foreach (getlocations() as $location)
   if ($location != "")
   {
     echo('      <tr bgcolor="' . $bg . '">
-             <td class="interface" width="300"><a class="list-bold" href="?page=devices&amp;location=' . urlencode($location) . '">' . $location . '</a></td>
+             <td class="interface" width="300"><a class="list-bold" href="devices/location=' . urlencode($location) . '/">' . $location . '</a></td>
              <td width="100">' . $alert . '</td>
              <td width="100">' . $num . ' devices</td>
              <td width="100">' . $net . ' network</td>
@@ -34,6 +65,21 @@ foreach (getlocations() as $location)
            </tr>
          ');
 
+    if($vars['view'] == "traffic")
+    {
+      echo('<tr bgcolor="' . $bg . '"><td colspan=6>');
+
+  $graph_array['type']   = "location_bits";
+  $graph_array['height'] = "100";
+  $graph_array['width']  = "220";
+  $graph_array['to']     = $config['time']['now'];
+  $graph_array['id']     = $location;
+
+  include("includes/print-quadgraphs.inc.php");
+
+
+      echo("</tr></td>");
+    }
     $done = "yes";
   }
 }

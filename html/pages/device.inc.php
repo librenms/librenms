@@ -167,7 +167,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
 
     if (dbFetchCell("SELECT COUNT(service_id) FROM services WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
-      echo('<li class="' . $select['srv'] . '">
+      echo('<li class="' . $select['services'] . '">
     <a href="device/' . $device['device_id'] . '/services/">
       <img src="images/icons/services.png" align="absmiddle" border="0" /> Services
     </a>

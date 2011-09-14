@@ -217,7 +217,7 @@ if ($config['show_locations'])
 <?php
     foreach (getlocations() as $location)
     {
-      echo('        <li><a href="devices/location|' . urlencode($location) . '/"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $location . ' </a></li>');
+      echo('        <li><a href="devices/location=' . urlencode($location) . '/"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $location . ' </a></li>');
     }
 ?>
         </ul>

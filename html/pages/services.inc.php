@@ -1,4 +1,6 @@
-<?php print_optionbar_start();
+<?php 
+
+print_optionbar_start();
 
  echo('<span style="font-weight: bold;">Services</span> &#187; ');
 

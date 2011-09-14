@@ -1,5 +1,9 @@
 <?php
 
+#echo($_SERVER['PATH_INFO']);
+
+#phpinfo();
+
 ob_start();
 
 ini_set('allow_url_fopen', 0);
@@ -26,6 +30,69 @@ include("../includes/functions.php");
 include("includes/functions.inc.php");
 
 include("includes/authenticate.inc.php");
+
+foreach($_GET as $key=>$get_var) {
+  if(strstr($key, "opt")) {
+    list($name, $value) = explode("|", $get_var);
+    if(!isset($value)) { $value = "yes"; }
+    $vars[$name] = $value;
+  }
+}
+
+$segments = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+foreach($segments as $pos => $segment) {
+  $segment = urldecode($segment);
+  if($pos == "0") 
+  {
+    $vars['page'] = $segment;
+  } else {
+    if(TRUE)  // do this to keep everything working whilst we fiddle 
+    {
+      if ($pos == "1")
+      {
+        $_GET['opta'] = $segment;
+      }
+      if ($pos == "2")
+      {
+        $_GET['optb'] = $segment;
+      }
+      if ($pos == "3")
+      {
+        $_GET['optc'] = $segment;
+      }
+      if ($pos == "4")
+      {
+        $_GET['optd'] = $segment;
+      }
+      if ($pos == "5")
+      {
+        $_GET['opte'] = $segment;
+      }
+      if ($pos == "6")
+      {
+        $_GET['optf'] = $segment;
+      }
+    }
+    list($name, $value) = explode("=", $segment);
+    if($value == "" || !isset($value))
+    {
+      $vars[$name] = yes;
+    } else {
+      $vars[$name] = $value;
+    }
+  }
+}
+
+foreach($_POST as $name => $value)
+{
+#  if($value == "" || !isset($value)) 
+#  {
+#  } else {
+    $vars[$name] = $value;
+#  }
+}
+
+#print_r($vars);
 
 if(strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) { $_SESSION['widescreen'] = 1; }
 if(strstr($_SERVER['REQUEST_URI'], 'widescreen=no'))  { unset($_SESSION['widescreen']); }
@@ -92,6 +159,68 @@ if ($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$conf
   <script type="text/javascript" src="js/jqplot/plugins/jqplot.pieRenderer.min.js"></script>
   <script type="text/javascript" src="js/jqplot/plugins/jqplot.donutRenderer.min.js"></script>
   <script type="text/javascript">
+    <!--
+
+    $(function () {
+        $('.bubbleInfo').each(function () {
+            var distance = 10;
+            var time = 250;
+            var hideDelay = 500;
+
+            var hideDelayTimer = null;
+
+            var beingShown = false;
+            var shown = false;
+            var trigger = $('.trigger', this);
+            var info = $('.popup', this).css('opacity', 0);
+
+
+            $([trigger.get(0), info.get(0)]).mouseover(function () {
+                if (hideDelayTimer) clearTimeout(hideDelayTimer);
+                if (beingShown || shown) {
+                    // don't trigger the animation again
+                    return;
+                } else {
+                    // reset position of info box
+                    beingShown = true;
+
+                    info.css({
+                        top: -90,
+                        left: -33,
+                        display: 'block'
+                    }).animate({
+                        top: '-=' + distance + 'px',
+                        opacity: 1
+                    }, time, 'swing', function() {
+                        beingShown = false;
+                        shown = true;
+                    });
+                }
+
+                return false;
+            }).mouseout(function () {
+                if (hideDelayTimer) clearTimeout(hideDelayTimer);
+                hideDelayTimer = setTimeout(function () {
+                    hideDelayTimer = null;
+                    info.animate({
+                        top: '-=' + distance + 'px',
+                        opacity: 0
+                    }, time, 'swing', function () {
+                        shown = false;
+                        info.css('display', 'none');
+                    });
+
+                }, hideDelay);
+
+                return false;
+            });
+        });
+    });
+    
+    //-->
+    </script>
+  <script type="text/javascript">
+
 <!-- Begin
 function popUp(URL)
 {
@@ -106,9 +235,13 @@ function popUp(URL)
 
 <?php
 
-include("includes/".$config['web_header']);
+if(!$vars['bare'] == "yes") { 
 
-if ($_SESSION['authenticated']) { include("includes/print-menubar.php"); } else { echo('<hr color="#444444" />'); }
+  include("includes/".$config['web_header']);
+
+  if ($_SESSION['authenticated']) { include("includes/print-menubar.php"); } else { echo('<hr color="#444444" />'); }
+
+}
 
 ?>
     <div class="clearer"></div>
@@ -119,9 +252,9 @@ if ($_SESSION['authenticated']) { include("includes/print-menubar.php"); } else 
 if ($_SESSION['authenticated'])
 {
   ## Authenticated. Print a page.
-  if (isset($_GET['page']) && !strstr("..", $_GET['page']) &&  is_file("pages/" . $_GET['page'] . ".inc.php"))
+  if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php"))
   {
-    include("pages/" . $_GET['page'] . ".inc.php");
+    include("pages/" . $vars['page'] . ".inc.php");
   } else {
     if (isset($config['front_page']) && is_file($config['front_page']))
     {
@@ -159,15 +292,20 @@ echo('</a>. Copyright &copy; 2006-'. date("Y"). ' by Adam Armstrong. All rights 
 
 if ($config['page_gen'])
 {
-    echo('<br />MySQL: Cell    '.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0,2).'s'.
-                      ' Row    '.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0,2).'s'.
-                      ' Rows   '.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0,2).'s'.
-                      ' Column '.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0,2).'s');
+    echo('<br />MySQL: Cell    '.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0,3).'s'.
+                      ' Row    '.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0,3).'s'.
+                      ' Rows   '.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0,3).'s'.
+                      ' Column '.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0,3).'s');
 
     echo('<br />Generated in ' . $gentime . ' seconds.');
 }
 
 echo('</div>');
 ?>
+
+<script class="content_tooltips" type="text/javascript">
+$(document).ready(function() { $('#content a[title]').qtip({ content: { text: false }, style: 'light' }); });
+</script>
+
 </body>
 </html>
