@@ -4,11 +4,10 @@
 
 if(!isset($vars['format'])) { $vars['format'] = "list_basic"; }
 
+print_optionbar_start();
 
 if($vars['searchbar'] != "hide")
 {
-
-print_optionbar_start(); 
 
 ?>
 <table style="text-align: left;" cellpadding=0 cellspacing=5 class=devicetable width=100%>
