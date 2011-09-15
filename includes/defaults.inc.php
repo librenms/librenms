@@ -71,7 +71,7 @@ $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
 
 ### Autodiscovery Settings
 
-$config['cdp_autocreate']         = false; ## Autodiscover unknown hosts seen via CDP
+$config['dp_autocreate']          = false; ## Autodiscover unknown hosts seen via discovery protocols
 $config['snmp_autodiscovery']     = false; ## Autodiscover hosts on new subnets
 $config['discover_services']      = false; ## Autodiscover services via SNMP on devices of type "server"
 

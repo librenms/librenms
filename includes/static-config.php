@@ -946,6 +946,11 @@ if (!isset($config['log_file']))
   $config['log_file']     = $config['install_dir'] . "/observium.log";
 }
 
+if (isset($config['cdp_autocreate']))
+{
+  $config['dp_autocreate'] = $config['cdp_autocreate'];
+}
+
 if (!isset($config['mibdir']))
 {
   $config['mibdir'] =  $config['install_dir']."/mibs/";
