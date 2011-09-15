@@ -44,18 +44,18 @@ if (!$auth)
 
   echo("<div style='margin: 0px 0px 0px 0px'>");
 
-  echo("<div style='width: 1200px; margin:10px;'>");
+  echo("<div style='margin: auto;'>");
 
   $graph_array['from']   = $config['time']['sixhour'];
-  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;'>
+  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;' class='rounded-3px'>
     <span class=device-head>6 Hour</span><br />
-     <a href='".$config['base_url']."/graphs/$id/$graph_type/".$graph_array['from']."/$to/'>");
+     <a href='".$config['base_url']."/graphs/$id/$graph_type/".$graph_array['from']."/".$graph_array['to']."/'>");
   echo(generate_graph_tag($graph_array));
   echo("   </a>
   </div>");
 
   $graph_array['from']   = $config['time']['day'];
-  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;'>
+  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;' class='rounded-3px'>
     <span class=device-head>24 Hour</span><br />
      <a href='".$config['base_url']."/graphs/$id/$graph_type/".$graph_array['from']."/$to/'>");
   echo(generate_graph_tag($graph_array));
@@ -63,7 +63,7 @@ if (!$auth)
   </div>");
 
   $graph_array['from']   = $config['time']['twoday'];
-  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;'>
+  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;' class='rounded-3px'>
     <span class=device-head>48 Hour</span><br />
      <a href='".$config['base_url']."/graphs/$id/$graph_type/".$graph_array['from']."/$to/'>");
   echo(generate_graph_tag($graph_array));
@@ -71,7 +71,7 @@ if (!$auth)
   </div>");
 
   $graph_array['from']   = $config['time']['week'];
-  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;'>
+  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;' class='rounded-3px'>
     <span class=device-head>Week</span><br />
      <a href='".$config['base_url']."/graphs/$id/$graph_type/".$graph_array['from']."/$to/'>");
   echo(generate_graph_tag($graph_array));
@@ -79,7 +79,7 @@ if (!$auth)
   </div>");
 
   $graph_array['from']   = $config['time']['twoweek'];
-  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;'>
+  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;' class='rounded-3px'>
     <span class=device-head>Two Week</span><br />
      <a href='".$config['base_url']."/graphs/$id/$graph_type/".$graph_array['from']."/$to/'>");
   echo(generate_graph_tag($graph_array));
@@ -87,7 +87,7 @@ if (!$auth)
   </div>");
 
   $graph_array['from']   = $config['time']['month'];
-  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;'>
+  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;' class='rounded-3px'>
     <span class=device-head>Month</span><br />
      <a href='".$config['base_url']."/graphs/$id/$graph_type/".$graph_array['from']."/$to/'>");
   echo(generate_graph_tag($graph_array));
@@ -95,7 +95,7 @@ if (!$auth)
   </div>");
 
   $graph_array['from']   = $config['time']['twomonth'];
-  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;'>
+  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;' class='rounded-3px'>
     <span class=device-head>Two Month</span><br />
      <a href='".$config['base_url']."/graphs/$id/$graph_type/".$graph_array['from']."/$to/'>");
   echo(generate_graph_tag($graph_array));
@@ -103,7 +103,7 @@ if (!$auth)
   </div>");
 
   $graph_array['from']   = $config['time']['year'];
-  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;'>
+  echo("<div style='width: ${width}px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;' class='rounded-3px'>
     <span class=device-head>Year</span><br />
      <a href='".$config['base_url']."/graphs/$id/$graph_type/".$graph_array['from']."/$to/'>");
   echo(generate_graph_tag($graph_array));

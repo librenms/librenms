@@ -15,6 +15,34 @@ body {
   line-height: 20px;
 }
 
+.rounded-2px {
+  /* Rounded Corners */
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+}
+
+.rounded-3px {
+  /* Rounded Corners */
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.rounded-5px {
+  /* Rounded Corners */
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.rounded-10px {
+  /* Rounded Corners */
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+
 .pagemenu-selected {
   font-weight: bold; 
   background-color: #cecece; 
