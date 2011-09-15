@@ -33,6 +33,4 @@ $time = time();
 
 printf("%lf|%u|%u\n", time(), $in, $out);
 
-
-
 ?>
