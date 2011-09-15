@@ -249,12 +249,12 @@ if ($config['show_locations'])
 
 if ($ports['errored'])
 {
-  echo('<li><a href="ports/errors/"><img src="images/16/chart_curve_error.png" border="0" align="absmiddle" /> Errored ('.$ports['errored'].')</a></li>');
+  echo('<li><a href="ports/errors=1/"><img src="images/16/chart_curve_error.png" border="0" align="absmiddle" /> Errored ('.$ports['errored'].')</a></li>');
 }
 
 if ($ports['ignored'])
 {
-  echo('<li><a href="ports/ignored/"><img src="images/16/chart_curve_link.png" border="0" align="absmiddle" /> Ignored ('.$ports['ignored'].')</a></li>');
+  echo('<li><a href="ports/ignored=1/"><img src="images/16/chart_curve_link.png" border="0" align="absmiddle" /> Ignored ('.$ports['ignored'].')</a></li>');
 }
 
 if ($config['enable_billing']) { echo('<li><a href="bills/"><img src="images/16/money.png" border="0" align="absmiddle" /> Traffic Bills</a></li>'); $ifbreak = 1; }
@@ -279,7 +279,7 @@ if ($ifbreak) { echo('<li><hr width="140" /></li>'); }
 
 if (isset($interface_alerts))
 {
-  echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerts ('.$interface_alerts.')</a></li>');
+  echo('<li><a href="ports/alerted=yes/"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerts ('.$interface_alerts.')</a></li>');
 }
 
 $deleted_ports = 0;
@@ -292,11 +292,11 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
 }
 ?>
 
-<li><a href="ports/down/"><img src="images/16/if-disconnect.png" border="0" align="absmiddle" /> Down</a></li>
-<li><a href="ports/admindown/"><img src="images/16/if-disable.png" border="0" align="absmiddle" /> Disabled</a></li>
+<li><a href="ports/state=down/"><img src="images/16/if-disconnect.png" border="0" align="absmiddle" /> Down</a></li>
+<li><a href="ports/state=admindown/"><img src="images/16/if-disable.png" border="0" align="absmiddle" /> Disabled</a></li>
 <?php
 
-if ($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cross.png" border="0" align="absmiddle" /> Deleted ('.$deleted_ports.')</a></li>'); }
+if ($deleted_ports) { echo('<li><a href="deleted-ports/"><img src="images/16/cross.png" border="0" align="absmiddle" /> Deleted ('.$deleted_ports.')</a></li>'); }
 
 ?>
 </ul>
