@@ -64,10 +64,8 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
 
     $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oids;
     if (!$debug) { $cmd .= " 2>/dev/null"; }
-    if ($debug) { echo("$cmd\n"); }
-    $data = trim(shell_exec($cmd));
+    $data = trim(external_exec($cmd));
     $runtime_stats['snmpget']++;
-    if ($debug) { echo("$data\n"); }
     foreach (explode("\n", $data) as $entry)
     {
       list($oid,$value) = explode("=", $entry);
@@ -141,9 +139,7 @@ function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 
     $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oid;
     if (!$debug) { $cmd .= " 2>/dev/null"; }
-    if ($debug) { echo("$cmd\n"); }
-    $data = trim(shell_exec($cmd));
-    if ($debug) { echo("$data\n"); }
+    $data = trim(external_exec($cmd));
   }
   $runtime_stats['snmpget']++;
   if (is_string($data) && (preg_match("/No Such Instance/i", $data) || preg_match("/No Such Object/i", $data) || preg_match("/No more variables left/i", $data)))
@@ -198,9 +194,7 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oid;
 
   if (!$debug) { $cmd .= " 2>/dev/null"; }
-  if ($debug) { echo("$cmd\n"); }
-  $data = trim(shell_exec($cmd));
-  if ($debug) { echo("$data\n"); }
+  $data = trim(external_exec($cmd));
 
   if (is_string($data) && (preg_match("/No Such (Object|Instance)/i", $data)))
   {
@@ -258,9 +252,7 @@ function snmpwalk_cache_cip($device, $oid, $array, $mib = 0)
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oid;
 
   if (!$debug) { $cmd .= " 2>/dev/null"; }
-  if ($debug) { echo("$cmd\n"); }
-  $data = trim(shell_exec($cmd));
-  if ($debug) { echo("$data\n"); }
+  $data = trim(external_exec($cmd));
   $device_id = $device['device_id'];
 
   #echo("Caching: $oid\n");
@@ -324,7 +316,7 @@ function snmp_cache_ifIndex($device)
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
   if (!$debug) { $cmd .= " 2>/dev/null"; }
-  $data = trim(shell_exec($cmd));
+  $data = trim(external_exec($cmd));
   $device_id = $device['device_id'];
 
   foreach (explode("\n", $data) as $entry)
@@ -469,7 +461,9 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
   if (isset($retries)) { $cmd .= " -r " . $retries; }
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oid;
   if (!$debug) { $cmd .= " 2>/dev/null"; }
-  $data = trim(shell_exec($cmd));
+
+  $data = trim(external_exec($cmd));
+
   $device_id = $device['device_id'];
   foreach (explode("\n", $data) as $entry)
   {
@@ -525,7 +519,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
   if (isset($retries)) { $cmd .= " -r " . $retries; }
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oid;
   if (!$debug) { $cmd .= " 2>/dev/null"; }
-  $data = trim(shell_exec($cmd));
+  $data = trim(external_exec($cmd));
 
   $device_id = $device['device_id'];
   foreach (explode("\n", $data) as $entry)
@@ -582,7 +576,7 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0)
   if (isset($retries)) { $cmd .= " -r " . $retries; }
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oid;
   if (!$debug) { $cmd .= " 2>/dev/null"; }
-  $data = trim(shell_exec($cmd));
+  $data = trim(external_exec($cmd));
   $device_id = $device['device_id'];
 
   foreach (explode("\n", $data) as $entry)
@@ -642,7 +636,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0)
   $cmd .= " -t " . $timeout . " -r " . $retries;
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$string;
   if (!$debug) { $cmd .= " 2>/dev/null"; }
-  $data = trim(shell_exec($cmd));
+  $data = trim(external_exec($cmd));
   $x=0;
   $values = explode("\n", $data);
   #echo("Caching: ifIndex $port\n");
@@ -685,7 +679,7 @@ function snmp_cache_portIfIndex($device, $array)
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." portIfIndex";
-  $output = trim(shell_exec($cmd));
+  $output = trim(external_exec($cmd));
   $device_id = $device['device_id'];
 
   foreach (explode("\n", $output) as $entry)
@@ -729,7 +723,7 @@ function snmp_cache_portName($device, $array)
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." portName";
-  $output = trim(shell_exec($cmd));
+  $output = trim(external_exec($cmd));
   $device_id = $device['device_id'];
   #echo("Caching: portName\n");
 
