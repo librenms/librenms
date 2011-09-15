@@ -71,9 +71,12 @@ $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
 
 ### Autodiscovery Settings
 
-$config['dp_autocreate']          = false; ## Autodiscover unknown hosts seen via discovery protocols
-$config['snmp_autodiscovery']     = false; ## Autodiscover hosts on new subnets
-$config['discover_services']      = false; ## Autodiscover services via SNMP on devices of type "server"
+$config['autodiscovery']['xdp']		= true; ## Autodiscover hosts via discovery protocols
+$config['autodiscovery']['ospf']   	= true; ## Autodiscover hosts via OSPF
+$config['autodiscovery']['bgp']         = true; ## Autodiscover hosts via BGP
+$config['autodiscovery']['snmpscan']	= true; ## autodiscover hosts via SNMP scanning
+
+$config['discover_services']      	= false; ## Autodiscover services via SNMP on devices of type "server"
 
 ### Alerting Settings
 

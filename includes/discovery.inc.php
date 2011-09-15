@@ -16,21 +16,18 @@ function discover_new_device($hostname)
 {
   global $config;
 
-  if ($config['dp_autocreate'])
-  {
-    if (isDomainResolves($hostname . "." . $config['mydomain']))
-    {
+  if($config['autodiscovery']['xdp']) {
+    if ( isDomainResolves($hostname . "." . $config['mydomain']) ) {
       $dst_host = $hostname . "." . $config['mydomain'];
     } else {
       $dst_host = $hostname;
     }
     $ip = gethostbyname($dst_host);
 
-    if (match_network($config['nets'], $ip))
+    if ( match_network($config['nets'], $ip) )
     {
       $remote_device_id = addHost ($dst_host, NULL, "v2c");
-      if($remote_device_id)
-      {
+      if($remote_device_id) {
         $remote_device = device_by_id_cache($remote_device_id, 1);
         echo("+[".$remote_device['hostname']."(".$remote_device['device_id'].")]");
         discover_device($remote_device);
@@ -38,6 +35,8 @@ function discover_new_device($hostname)
         return $remote_device_id;
       }
     }
+  } else {
+    return FALSE;
   }
 }
 
