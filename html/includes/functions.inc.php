@@ -338,28 +338,14 @@ function generate_port_thumbnail($args)
 function print_optionbar_start ($height = 0, $width = 0, $marginbottom = 5)
 {
   echo("
-    <div style='text-align: center; margin-top: 0px; margin-bottom: ".$marginbottom."px; " . ($width ? 'max-width: ' . $width . (strstr($width,'%') ? '' : 'px') . '; ' : '') . "'>
-    <b class='rounded'>
-    <b class='rounded1'><b></b></b>
-    <b class='rounded2'><b></b></b>
-    <b class='rounded3'></b>
-    <b class='rounded4'></b>
-    <b class='rounded5'></b></b>
-    <div class='roundedfg' style='padding: 0px 5px;'>
-    <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; " . ($height ? 'height:' . $height . 'px;' : '') . "'>");
+    <div class='rounded-5px' style='display: block; background: #e5e5e5; text-align: left; margin-top: 0px; 
+    margin-bottom: ".$marginbottom."px; " . ($width ? 'max-width: ' . $width . (strstr($width,'%') ? '' : 'px') . '; ' : '') . "
+    padding: 7px 14px'>");
 }
 
 function print_optionbar_end()
 {
-  echo('  </div>
-    </div>
-    <b class="rounded">
-    <b class="rounded5"></b>
-    <b class="rounded4"></b>
-    <b class="rounded3"></b>
-    <b class="rounded2"><b></b></b>
-    <b class="rounded1"><b></b></b></b>
-  </div>');
+  echo('  </div>');
 }
 
 function geteventicon($message)

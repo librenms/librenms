@@ -140,7 +140,7 @@ foreach ($menu_options as $option => $text)
 
 <?php
 
-$menu_options = array('bits' => 'Basic',
+$menu_options = array('bits' => 'Bits',
                       'upkts' => 'Unicast Packets',
                       'nupkts' => 'Non-Unicast Packets',
                       'errors' => 'Errors');
