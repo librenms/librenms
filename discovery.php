@@ -152,9 +152,6 @@ $discovered_devices = 0;
 foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC") as $device)
 {
   discover_device($device, $options);
-
-print_r($options);
-
 }
 
 $end = utime(); $run = $end - $start;
