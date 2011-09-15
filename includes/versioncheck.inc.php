@@ -30,19 +30,19 @@ if($dataHandle)
                 list($cur, $tag) = explode("-", $config['version']);
                 list($cur_omnipotence, $cur_year, $cur_month, $cur_revision) = explode(".", $cur);
 
-             if($argv[1] == "--cron") {
+             if($argv[1] == "--cron" || isset($options['q'])) {
 
                $fd = fopen($config['log_file'],'a');
                fputs($fd,$string . "\n");
                fclose($fd);
 
-                shell_exec("echo $omnipotence.$year.$month.$month > rrd/version.txt ");
+                shell_exec("echo $omnipotence.$year.$month.$month > ".$config['rrd_dir']."/version.txt ");
 
              } else {
 
                 if($cur != $data) {
                   echo("Current Version : $cur_omnipotence.$cur_year.$cur_month.$cur_revision \n");
-                
+
                   if($omnipotence > $cur_omnipotence) {
                     echo("New version     : $omnipotence.$year.$month.$revision\n");
                   } elseif ($year > $cur_year) {
