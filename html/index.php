@@ -249,6 +249,17 @@ if(!$vars['bare'] == "yes") {
       <div id="content" style="border: 1px none #ccc; min-height:650px;">
         <div style="margin: 7px;"></div>
 <?php
+
+### To help debug the new URLs :)
+if($devel || $vars['devel']) 
+{
+  echo("<pre>");
+  print_r($_GET);
+  print_r($vars);
+  echo("</pre>");
+}
+
+
 if ($_SESSION['authenticated'])
 {
   ## Authenticated. Print a page.

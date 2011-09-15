@@ -1,10 +1,5 @@
 <?php
 
-echo("<pre>");
-print_r($_GET);
-print_r($vars);
-echo("</pre>");
-
 if ($_GET['optc'] == 'graphs')
 {
   if ($_GET['optd']) { $graph_type = "port_" . $_GET['optd']; } else { $graph_type = "port_bits"; }
