@@ -164,7 +164,7 @@ if ($discovered_devices)
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $discovered_devices devices discovered in $proctime secs";
 if ($debug) echo("$string\n");
 
-if($config['version_check'] && !isset($options['q'])) {
+if(!$options['h'] == "new" && $config['version_check'] && !isset($options['q'])) {
   include("includes/versioncheck.inc.php");
 
   echo('MySQL: Cell['.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0,2).'s]'.
