@@ -35,6 +35,16 @@ foreach($stack_poll_array as $interface_id_high => $entry_high)
   }
 }
 
+foreach ($stack_db_array AS $interface_id_high => $array)
+{
+  foreach ($array AS $interface_id_low => $blah)
+  {
+    echo($device['device_id']." ".$interface_id_low." ".$interface_id_high. "\n");
+    dbDelete('ports_stack', "`device_id` =  ? AND interface_id_high = ? AND interface_id_low = ?", array($device['device_id'], $interface_id_high, $interface_id_low));
+    echo("-");
+  }
+}
+
 echo("\n");
 
 ?>

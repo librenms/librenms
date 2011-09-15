@@ -4,14 +4,14 @@
 
 $device = device_by_id_cache($id);
 
-foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int)
+foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $port)
 {
   $ignore = 0;
   if (is_array($config['device_traffic_iftype']))
   {
     foreach ($config['device_traffic_iftype'] as $iftype)
     {
-      if (preg_match($iftype ."i", $int['ifType']))
+      if (preg_match($iftype ."i", $port['ifType']))
       {
         $ignore = 1;
       }
@@ -21,14 +21,14 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) 
   {
     foreach ($config['device_traffic_descr'] as $ifdescr)
     {
-      if (preg_match($ifdescr."i", $int['ifDescr']) || preg_match($ifdescr."i", $int['ifName']) || preg_match($ifdescr."i", $int['portName']))
+      if (preg_match($ifdescr."i", $port['ifDescr']) || preg_match($ifdescr."i", $port['ifName']) || preg_match($ifdescr."i", $port['portName']))
       {
         $ignore = 1;
       }
     }
   }
 
-  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($int['ifIndex'] . ".rrd");
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
   if (is_file($rrd_filename) && $ignore != 1)
   {
     $rrd_filenames[] = $rrd_filename;
