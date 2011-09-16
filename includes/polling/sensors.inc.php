@@ -1,17 +1,29 @@
 <?php
 
-poll_sensor($device,'current','A');
-poll_sensor($device,'frequency', 'Hz');
-poll_sensor($device,'fanspeed', 'rpm');
-poll_sensor($device,'humidity', '%');
-poll_sensor($device,'power', 'W');
-poll_sensor($device,'voltage', 'V');
-poll_sensor($device,'temperature', 'C');
+/* Observium Network Management and Monitoring System
+ * Copyright (C) 2006-2011, Observium Developers - http://www.observium.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * See COPYING for more details.
+ */
 
-# FIXME voltages have other filenames
-#include('includes/polling/voltages.inc.php');
+## Call poll_sensor for each sensor type that we support.
 
-# FIXME also convert temperature, but there's some special code in there?
-#include('includes/polling/temperatures.inc.php');
+$supported_sensors = array('current' => 'A',
+                           'frequency' => 'Hz',
+                           'humidity' => '%',
+                           'fanspeed' => 'rpm',
+                           'power' => 'W',
+                           'voltage' => 'V',
+                           'temperature' => 'C');
+
+foreach ($supported_sensors as $sensor_type => $sensor_unit)
+{
+  poll_sensor($device, $sensor_type, $sensor_unit);
+}
 
 ?>
