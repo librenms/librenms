@@ -885,7 +885,7 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   border-radius: 4px;  
   
   /* Gradient background */
-  background:#FBFBFB;
+  background:#DDD;
   background: -moz-linear-gradient(top, #FBFBFB, #DDD);
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DDD));
   background: -ms-linear-gradient(top, #FBFBFB, #DDD);
@@ -913,18 +913,20 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   
 #menium li:hover {  
 
-   z-index: 100;
+  z-index: 100;
+
+
 
   border: 1px solid #aaa;
   border-bottom: 1px solid #FBFBFB;  
   padding: 0px 0px 4px 0px;  
   
   /* Gradient background */
-  background:#F4F4F4;
-  background: -moz-linear-gradient(top, #DDD, #EEEEEE);
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#DDD), to(#EEEEEE));
-  background: -ms-linear-gradient(top, #DDD, #EEEEEE);
-  background: -webkit-linear-gradient(top, #DDD, #EEEEEE);
+  background:#EEEEEE;
+  background: -moz-linear-gradient(top, #DDDDDD, #EEEEEE);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#DDDDDD), to(#EEEEEE));
+  background: -ms-linear-gradient(top, #DDDDDD, #EEEEEE);
+  background: -webkit-linear-gradient(top, #DDDDDD, #EEEEEE);
   
   /* Rounded corners */  
   
