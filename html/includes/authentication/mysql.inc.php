@@ -26,14 +26,13 @@ function authenticate($username,$password)
 
 function passwordscanchange($username="")
 {
-  
-  
   /*
    * By default allow the password to be modified, unless the existing
    * user is explicitly prohibited to do so.
    */
   
-  if (empty($username) || !user_exists($username)) {
+  if (empty($username) || !user_exists($username))
+  {
     return 1;
   } else {
     return dbFetchCell("SELECT can_modify_passwd FROM users WHERE username = ?", array($username));
