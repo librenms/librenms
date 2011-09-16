@@ -26,9 +26,8 @@ if($vars['searchbar'] != "hide")
 <form method="post" action="">
   <table cellpadding="4" cellspacing="0" class="devicetable" width="100%">
     <tr>
-      <td width="30" align="center" valign="middle"></td>
-      <td width="300"><span style="font-weight: bold; font-size: 14px;"></span>
-        <input type="text" name="hostname" id="hostname" size="40" value="<?php echo($vars['hostname']); ?>" />
+      <td width="290"><span style="font-weight: bold; font-size: 14px;"></span>
+        <input type="text" name="hostname" id="hostname" size="38" value="<?php echo($vars['hostname']); ?>" />
       </td>
       <td width="200">
         <select name='os' id='os'>
@@ -129,13 +128,13 @@ foreach(dbFetch('SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER
           ?>
         </select>
 
-        <input class="submit" type="submit" class="submit"  style="float: right;" value="Search">
       </td>
-      <td align=center>
-      <a href="<?php echo(generate_url($vars)); ?>" title="Update the browser URL to reflect the search criteria." >Update URL</a>
-      <a href="<?php echo(generate_url(array('page' => 'monitor', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>" title="Reset critera to default." >Reset</a>
+      <td align="center">
+      <a href="<?php echo(generate_url($vars)); ?>" title="Update the browser URL to reflect the search criteria." >Update URL</a> | 
+      <a href="<?php echo(generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>" title="Reset critera to default." >Reset</a>
+      <br />
+      <input class="submit" type="submit" class="submit" value="Search">
       </td>
-      <td width="10"></td>
     </tr>
   </table>
 </form>
