@@ -29,7 +29,6 @@ unset($sep);
 
 print_optionbar_end();
 
-
 echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">');
 
 foreach (getlocations() as $location)

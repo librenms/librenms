@@ -136,7 +136,7 @@ if (is_array($ospf_areas_db))
       unset($ospf_area_db);
       $ospf_area_count++;
     } else {
-      dbDelete('ospf_ports', '`device_id` = ? AND `ospfAreaId` = ?', array($device['device_id'], $ospf_area_db['ospfAreaId']));      
+      dbDelete('ospf_ports', '`device_id` = ? AND `ospfAreaId` = ?', array($device['device_id'], $ospf_area_db['ospfAreaId']));
     }
   }
 }

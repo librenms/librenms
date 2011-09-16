@@ -21,9 +21,11 @@ include_once($config['install_dir'] . "/includes/console_colour.php");
 function external_exec($command)
 {
   global $debug;
-  if($debug) { echo($command."/n"); }
+
+  if($debug) { echo($command."\n"); }
   $output = shell_exec($command);
-  if($debug) { echo($output."/n"); }
+  if($debug) { echo($output."\n"); }
+
   return $output;
 }
 
@@ -48,6 +50,7 @@ function only_alphanumeric($string)
 function logfile($string)
 {
   global $config;
+
   $fd = fopen($config['log_file'],'a');
   fputs($fd,$string . "\n");
   fclose($fd);
@@ -120,8 +123,8 @@ function interface_errors($rrd_file, $period = '-1d') // Returns the last in/out
 function getImage($host)
 {
   ## FIXME why not pass $device? (my shitty ancient code here!)
-
   global $config;
+
   $data = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($host));
   $type = strtolower($data['os']);
   if ($config['os'][$type]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$type]['icon']  . ".png"))
@@ -170,8 +173,8 @@ function delete_device($id)
   }
 
   dbDelete('devices', "`device_id` =  ?", array($id));
-  
-  $device_tables = array('entPhysical', 'devices_attribs', 'devices_perms', 'bgpPeers', 'vlans', 'vrfs', 'storage', 'alerts', 'eventlog', 
+
+  $device_tables = array('entPhysical', 'devices_attribs', 'devices_perms', 'bgpPeers', 'vlans', 'vrfs', 'storage', 'alerts', 'eventlog',
                          'syslog', 'ports', 'services', 'alerts', 'toner', 'frequency', 'current', 'sensors');
 
   foreach($device_tables as $table) {
@@ -211,25 +214,25 @@ function addHost($host, $community = NULL, $snmpver = 'v2c', $port = '161', $tra
             {
               $device_id = createHost ($host, $community, $snmpver, $port, $transport);
               return $device_id;
-            } else { 
-              print_error("Given hostname does not match SNMP-read hostname ($snmphost)!"); 
+            } else {
+              print_error("Given hostname does not match SNMP-read hostname ($snmphost)!");
             }
           } else {
             print_error("No reply on community $community");
           }
         }
-        if (!$device_id) 
-        { 
-          /// Faild SNMP
-          print_error("Could not reach $host with given SNMP community"); 
+        if (!$device_id)
+        {
+          /// Failed SNMP
+          print_error("Could not reach $host with given SNMP community");
         }
-      } else { 
+      } else {
         /// failed Reachability
         print_error("Could not ping $host"); }
-    } else { 
+    } else {
       /// Failed DNS lookup
       print_error("Could not resolve $host"); }
-  } else { 
+  } else {
     /// found in database
     print_error("Already got host $host"); }
 }
@@ -504,11 +507,10 @@ function log_event($text, $device = NULL, $type = NULL, $reference = NULL)
   $insert = array('host' => ($device['device_id'] ? $device['device_id'] : "NULL"),
                   'reference' => ($reference ? $reference : "NULL"),
                   'type' => ($type ? $type : "NULL"),
-                  'datetime' => array("NOW()"), 
+                  'datetime' => array("NOW()"),
                   'message' => $text);
- 
-  dbInsert($insert, 'eventlog');
 
+  dbInsert($insert, 'eventlog');
 }
 
 function notify($device,$title,$message)
@@ -607,6 +609,7 @@ function isHexString($str)
 function include_dir($dir, $regex = "")
 {
   global $device, $config, $debug, $valid;
+
   if ($regex == "")
   {
     $regex = "/\.inc\.php$/";
@@ -663,6 +666,5 @@ function is_port_valid($port, $device)
 
   return $valid;
 }
-
 
 ?>
