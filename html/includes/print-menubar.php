@@ -210,7 +210,7 @@ if ($config['show_locations'])
   if ($config['show_locations_dropdown'])
   {
 ?>
-        <div class="dropdown_4columns"><!-- Begin 2 columns container -->
+        <div class="dropdown_2columns"><!-- Begin 2 columns container -->
             <div class="col_2">
 
         <ul>
