@@ -79,7 +79,7 @@ foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
 
 foreach ($config['device_types'] as $devtype)
 {
-  echo('        <li><a href="devices/' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['icon'] . '" border="0" align="absmiddle" /> ' . $devtype['text'] . '</a></li>');
+  echo('        <li><a href="devices/type=' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['icon'] . '" border="0" align="absmiddle" /> ' . $devtype['text'] . '</a></li>');
 }
 
 ?>
