@@ -412,7 +412,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
     <li><a href="routing/" class="drop"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a><!-- Begin Home Item -->
 
-        <div class="dropdown_3columns"><!-- Begin 2 columns container -->
+        <div class="dropdown_1column"><!-- Begin 1 column container -->
 
           <ul>
 
