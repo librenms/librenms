@@ -292,13 +292,6 @@ $gentime = substr($run, 0, 5);
 echo('<br /> <br /> <br /> <br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : ''));
 echo('<br />Powered by <a href="http://www.observium.org" target="_blank">Observium ' . $config['version']);
 
-#if (file_exists('.svn/entries'))
-#{
-#  $svn = File('.svn/entries');
-#  echo('-SVN r' . trim($svn[3]));
-#  unset($svn);
-#}
-
 echo('</a>. Copyright &copy; 2006-'. date("Y"). ' by Adam Armstrong. All rights reserved.');
 
 if ($config['page_gen'])
