@@ -67,13 +67,13 @@ function user_exists($username)
 function get_userlevel($username)
 {
   # FIXME should come from LDAP
-  return dbFetchRow("SELECT `level` FROM `users` WHERE `username` = ?", array($username));
+  return dbFetchCell("SELECT `level` FROM `users` WHERE `username` = ?", array($username));
 }
 
 function get_userid($username)
 {
   # FIXME should come from LDAP
-  return dbFetchRow("SELECT `user_id` FROM `users` WHERE `username` = ?", array($username));
+  return dbFetchCell("SELECT `user_id` FROM `users` WHERE `username` = ?", array($username));
 }
 
 function deluser($username)
