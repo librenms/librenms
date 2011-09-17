@@ -52,7 +52,7 @@ if ($if_list)
 
     if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE interface_id = ?", array($interface['interface_id'])))
     {
-      echo("<span style='float: right;'><a href='".$config['base_url']."/device/".$interface['device_id']."/port/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'> MAC Accounting</a></span>");
+      echo("<span style='float: right;'><a href='device/".$interface['device_id']."/port/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'> MAC Accounting</a></span>");
     }
 
     echo("</td></tr><tr bgcolor='$bg'><td>");

@@ -2,8 +2,8 @@
 
 print_optionbar_start();
 
-echo("<a href='".$config['base_url']."/pseudowires/'>Details</a> | Graphs :
-<a href='".$config['base_url']."/pseudowires/graphs/mini/'>Mini</a>
+echo("<a href='pseudowires/'>Details</a> | Graphs :
+<a href='pseudowires/graphs/mini/'>Mini</a>
 ");
 
 print_optionbar_end();
@@ -34,7 +34,7 @@ foreach (dbFetchRows("SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
   } else {
     if ($bg == "ffffff") { $bg = "e5e5e5"; } else { $bg="ffffff"; }
     echo("<tr style=\"background-color: #$bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>".$pw_a['cpwVcID']."</td><td>".generate_device_link($pw_a)."</td><td>".generate_port_link($pw_a)."</td>
-                                                                                          <td rowspan=2> <img src='".$config['base_url']."/images/16/arrow_right.png'> </td>
+                                                                                          <td rowspan=2> <img src='images/16/arrow_right.png'> </td>
                                                                                           <td>".generate_device_link($pw_b)."</td><td>".generate_port_link($pw_b)."</td></tr>");
     echo("<tr style=\"background-color: #$bg;\"><td colspan=2>".$pw_a['ifAlias']."</td><td colspan=2>".$pw_b['ifAlias']."</td></tr>");
 
