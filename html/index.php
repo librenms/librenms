@@ -1,15 +1,11 @@
 <?php
 
-#echo($_SERVER['PATH_INFO']);
-
-#phpinfo();
-
 ob_start();
 
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
 
-if (strpos($_SERVER['REQUEST_URI'], "debug"))
+if (strpos($_SERVER['PATH_INFO'], "debug"))
 {
   $debug = "1";
   ini_set('display_errors', 1);
@@ -39,7 +35,7 @@ foreach($_GET as $key=>$get_var) {
   }
 }
 
-$segments = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+$segments = explode('/', trim($_SERVER['PATH_INFO'], '/'));
 foreach($segments as $pos => $segment) {
   $segment = urldecode($segment);
   if($pos == "0") 
