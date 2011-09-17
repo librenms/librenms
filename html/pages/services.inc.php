@@ -17,7 +17,7 @@ foreach ($menu_options as $option => $text)
   {
     echo("<span class='pagemenu-selected'>");
   }
-  echo('<a href="'.$config['base_url'].'/services/' . $option . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $text . '</a>');
+  echo('<a href="services/' . $option . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $text . '</a>');
   if ($_GET['opta'] == $option)
   {
     echo("</span>");

@@ -36,7 +36,7 @@ if (passwordscanchange($_SESSION['username']))
 {
   echo("<div style='font-size: 18px; font-weight: bold; margin-bottom: 5px;'>Change Password</div>");
   echo($changepass_message);
-  echo("<form method='post' action='".$config['base_url']."/preferences/'><input type=hidden name='action' value='changepass'>
+  echo("<form method='post' action='preferences/'><input type=hidden name='action' value='changepass'>
         <table>
         <tr><td>Old Password</td><td><input type=password name=old_pass autocomplete='off'></input></td></tr>
         <tr><td>New Password</td><td><input type=password name=new_pass autocomplete='off'></input></td></tr>
