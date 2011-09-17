@@ -13,9 +13,16 @@ if ($ports['total'])
   $graph_array['legend'] = "no";
   $graph = generate_graph_tag($graph_array);
 
+  $link_array = $graph_array;
+  $link_array['page'] = "graphs";
+  unset($link_array['height'], $link_array['width']);
+  $link = generate_url($link_array);
+
+
+
   $content = "<div class=list-large>".$device['hostname']." - Device Traffic</div>";
   $content .= "<div style=\'width: 850px\'>";
-  $graph_array['legend']   = "yes";
+  $graph_array['legend']   = "no";
   $graph_array['width']    = "340";
   $graph_array['from']     = $config['time']['day'];
   $content .= generate_graph_tag($graph_array);
@@ -26,8 +33,6 @@ if ($ports['total'])
   $graph_array['from']     = $config['time']['year'];
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
-
-  $link = $config['base_url'] . "/graphs/" . $graph_array['id'] . "/" . $graph_array['type'] . "/" . $day . "/" . $config['now'] . "/";
 
   echo(overlib_link($link, $graph, $content, NULL));
 

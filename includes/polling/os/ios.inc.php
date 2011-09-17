@@ -1,6 +1,5 @@
 <?php
 
-
 $poll_device['sysDescr'] = str_replace("IOS (tm)", "IOS (tm),", $poll_device['sysDescr']);
 list(,$features,$version) = explode(",", $poll_device['sysDescr']);
 $version = str_replace(" Version ", "", $version);
@@ -35,12 +34,12 @@ list($version) = explode(",", $version);
 #   $ciscomodel = str_replace("\"","",$ciscomodel);
 #   if ($ciscomodel) { $hardware = $ciscomodel; unset($ciscomodel); }
 
-#   if (strpos($poll_device['sysDescr'], "IOS XR")) {
-#    list(,$version) = explode(",", $poll_device['sysDescr']);
-#    $version = trim($version);
-#    list(,$version) = explode(" ", $version);
-#    list($version) = explode("\n", $version);
-#    trim($version);
-#   }
+if (strpos($poll_device['sysDescr'], "IOS XR")) {
+ list(,$version) = explode(",", $poll_device['sysDescr']);
+ $version = trim($version);
+ list(,$version) = explode(" ", $version);
+ list($version) = explode("\n", $version);
+ trim($version);
+}
 
 ?>
