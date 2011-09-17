@@ -14,25 +14,43 @@ if (count($sensors))
 
     ### FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
 
+    ### FIXME - So now we need to clean this up and move it into a function. Isn't it just "print-quadgraphs"?
+
     $graph_colour = str_replace("#", "", $row_colour);
 
-    $sensor_day    = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=210&amp;height=100";
-    $sensor_week   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['week']."&amp;to=".$config['time']['now']."&amp;width=210&amp;height=100";
-    $sensor_month  = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['month']."&amp;to=".$config['time']['now']."&amp;width=210&amp;height=100";
-    $sensor_year   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['year']."&amp;to=".$config['time']['now']."&amp;width=210&amp;height=100";
-    $sensor_minigraph = "<img src='graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=80&amp;height=20&amp;bg=$graph_colour' align='absmiddle'>";
+    $graph_array	   = array();
+    $graph_array['height'] = "100";
+    $graph_array['width']  = "210";
+    $graph_array['to']     = $now;
+    $graph_array['id']     = $sensor['sensor_id'];
+    $graph_array['type']   = $graph_type;
+    $graph_array['from']   = $day;
+    $graph_array['legend'] = "no";
 
-    $sensor_link  = "<a href='graphs/".$sensor['sensor_id']."/" . $graph_type . "/' onmouseover=\"return ";
-    $sensor_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$sensor['sensor_descr'];
-    $sensor_link .= "</div><div style=\'width: 570px\'><img src=\'$sensor_day\'><img src=\'$sensor_week\'><img src=\'$sensor_month\'><img src=\'$sensor_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
+    $link_array = $graph_array;
+    $link_array['page'] = "graphs";
+    unset($link_array['height'], $link_array['width'], $link_array['legend']);
+    $link = generate_url($link_array);
 
-    $sensor_link_c = $sensor_link . "<span " . ($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '') . '>' . $sensor['sensor_current'] . $sensor_unit . "</span></a>";
-    $sensor_link_b = $sensor_link . $sensor_minigraph . "</a>";
-    $sensor_link_a = $sensor_link . $sensor['sensor_descr'] . "</a>";
+    $overlib_content = '<div style="width: 580px;"><h2>'.$device['hostname']." - ".$sensor['sensor_descr']."</h1>";
+    foreach (array('day','week','month','year') as $period)
+    {
+      $graph_array['from']        = $config['time'][$period];
+      $overlib_content .= str_replace('"', "\'", generate_graph_tag($graph_array));
+    }
+    $overlib_content .= "</div>";
+
+    $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = $graph_colour;
+    $sensor_minigraph =  generate_graph_tag($graph_array);
 
     $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 25, '');
-    echo("<tr bgcolor='$row_colour'><td class=tablehead><strong>$sensor_link_a</strong></td><td width=80 align=right class=tablehead>$sensor_link_b<td width=80 align=right class=tablehead>$sensor_link_c</td></tr>");
+    echo("<tr bgcolor='$row_colour'>
+           <td class=tablehead><strong>".overlib_link($link, $sensor['sensor_descr'], $overlib_content)."</strong></td>
+           <td width=80 align=right class=tablehead>".overlib_link($link, $sensor_minigraph, $overlib_content)."</td>
+           <td width=80 align=right class=tablehead>".overlib_link($link, "<span " . ($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '') . '>' . $sensor['sensor_current'] . $sensor_unit . "</span>", $overlib_content)."</td>
+          </tr>");
     $i++;
+
   }
 
   echo("</table>");

@@ -1,5 +1,7 @@
 <?php
 
+
+
 function generate_url($vars, $new_vars = array())
 {
 
@@ -17,6 +19,22 @@ function generate_url($vars, $new_vars = array())
   }
 
   return($url);
+
+}
+
+function generate_overlib_content($graph_array, $text)
+{
+    global $config;
+
+    $overlib_content = '<div style="width: 580px;"><h2>'.$text."</h2>";
+    foreach (array('day','week','month','year') as $period)
+    {
+      $graph_array['from']        = $config['time'][$period];
+      $overlib_content .= str_replace('"', "\'", generate_graph_tag($graph_array));
+    }
+    $overlib_content .= "</div>";
+
+    return $overlib_content;
 
 }
 
