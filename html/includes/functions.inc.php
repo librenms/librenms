@@ -5,7 +5,7 @@ function generate_url($vars, $new_vars = array())
 
   $vars = array_merge($vars, $new_vars);
 
-  $url = "/".$vars['page']."/";
+  $url = $vars['page']."/";
   unset($vars['page']);
 
   foreach($vars as $var => $value)
