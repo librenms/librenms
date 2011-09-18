@@ -1,9 +1,11 @@
 <?php
 
-function rrdtool_graph($rrdfile, $options)
+function rrdtool_graph($graph_file, $options)
 {
 
-  global $config;
+  global $config, $debug;
+
+  if($debug) { echo("$options"); }
 
   if ($config['rrdcached'])
   {
@@ -29,7 +31,9 @@ function rrdtool_graph($rrdfile, $options)
     // 1 => readable handle connected to child stdout
     // Any error output will be appended to /tmp/error-output.txt
 
-    fwrite($pipes[0], "graph $rrdfile $options");
+#    echo (strlen("graph $graph_file $options"));
+
+    fwrite($pipes[0], "graph $graph_file $options");
     fclose($pipes[0]);
     fclose($pipes[1]);
 
