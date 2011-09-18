@@ -60,7 +60,7 @@ $config['int_l2tp']                = 0;  # Enable L2TP Port Types
 $config['show_locations']          = 1;  # Enable Locations on menu
 $config['show_locations_dropdown'] = 1;  # Enable Locations dropdown on menu
 $config['show_services']           = 1;  # Enable Services on menu
-$config['ports_page_default']      = "details/"; ## eg "details/" "graphs/bits/"
+$config['ports_page_default']      = "details"; ## eg "details" "graphs/bits" ### THIS NO LONGER WORKS
 
 ### SNMP Settings - Timeouts/Retries disabled as default
 #$config['snmp']['timeout'] = 1;            # timeout in seconds

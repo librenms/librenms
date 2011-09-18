@@ -1,119 +1,107 @@
 <?php
 
+## FIXME - REWRITE!
 
 $hostname = $device['hostname'];
 $hostid   = $device['interface_id'];
-$ifname   = $interface['ifDescr'];
-$ifIndex   = $interface['ifIndex'];
-$speed = humanspeed($interface['ifSpeed']);
+$ifname   = $port['ifDescr'];
+$ifIndex   = $port['ifIndex'];
+$speed = humanspeed($port['ifSpeed']);
 
-$ifalias = $interface['name'];
+$ifalias = $port['name'];
 
-if ($interface['ifPhysAddress']) { $mac = "$interface[ifPhysAddress]"; }
+if ($port['ifPhysAddress']) { $mac = $port['ifPhysAddress']; }
 
 $color = "black";
-if ($interface['ifAdminStatus'] == "down") { $status = "<span class='grey'>Disabled</span>"; }
-if ($interface['ifAdminStatus'] == "up" && $interface['ifOperStatus'] == "down") { $status = "<span class='red'>Enabled / Disconnected</span>"; }
-if ($interface['ifAdminStatus'] == "up" && $interface['ifOperStatus'] == "up") { $status = "<span class='green'>Enabled / Connected</span>"; }
+if ($port['ifAdminStatus'] == "down") { $status = "<span class='grey'>Disabled</span>"; }
+if ($port['ifAdminStatus'] == "up" && $port['ifOperStatus'] == "down") { $status = "<span class='red'>Enabled / Disconnected</span>"; }
+if ($port['ifAdminStatus'] == "up" && $port['ifOperStatus'] == "up") { $status = "<span class='green'>Enabled / Connected</span>"; }
 
 $i = 1;
 $inf = fixifName($ifname);
 
 echo("<div style='clear: both;'>");
 
-if ($_GET['optd'] == "top10")
+if ($vars['subview'] == "top10")
 {
-  if ($_GET['opte'])
-  {
-    $period = $_GET['opte'];
-  } else { $period = "1day"; }
 
-  $from = "-" . $period;
-  if ($_GET['optc'])
-  {
-    $stat = $_GET['optc'];
-  } else { $stat = "bits"; }
+  if(!isset($vars['sort'])) { $vars['sort'] = "in"; }
+  if(!isset($vars['period'])) { $vars['period'] = "1day"; }
+  $from = "-" . $vars['period'];
 
-  if ($_GET['optf'])
-  {
-    $sort = $_GET['optf'];
-  } else { $sort = "in"; }
 
   echo("<div style='margin: 0px 0px 0px 0px'>
          <div style=' margin:0px; float: left;';>
            <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Day</span><br />
-           <a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id'].
-                    "/macaccounting/$stat/top10/1day/$sort/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id'].
-                    "&amp;stat=$stat&amp;type=port_mac_acc_total&amp;sort=$sort&amp;from=-1day&amp;to=now&amp;width=150&amp;height=50' />
+
+           <a href='".generate_url($link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>$vars['graph'], sort => $vars['sort'], 'period' => '1day'))."'>
+
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=".$port['interface_id'].
+                    "&amp;stat=".$vars['graph']."&amp;type=port_mac_acc_total&amp;sort=".$vars['sort']."&amp;from=-1day&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Two Day</span><br />
-           <a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id'].
-                    "/macaccounting/$stat/top10/2day/$sort/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id'].
-                    "&amp;stat=$stat&amp;type=port_mac_acc_total&amp;sort=$sort&amp;from=-2day&amp;to=now&amp;width=150&amp;height=50' />
+           <a href='".generate_url($link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>$vars['graph'], sort => $vars['sort'], 'period' => '2day'))."/'>
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=".$port['interface_id'].
+                    "&amp;stat=".$vars['graph']."&amp;type=port_mac_acc_total&amp;sort=".$vars['sort']."&amp;from=-2day&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Week</span><br />
-            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/$stat/top10/1week/$sort/'>
-            <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;type=port_mac_acc_total&amp;sort=$sort&amp;stat=$stat&amp;from=-1week&amp;to=now&amp;width=150&amp;height=50' />
+            <a href='".generate_url($link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>$vars['graph'], sort => $vars['sort'], 'period' => '1week'))."/'>
+            <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=".$port['interface_id']."&amp;type=port_mac_acc_total&amp;sort=".$vars['sort']."&amp;stat=".$vars['graph']."&amp;from=-1week&amp;to=now&amp;width=150&amp;height=50' />
             </a>
             </div>
             <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Month</span><br />
-            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/$stat/top10/1month/$sort/'>
-            <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;type=port_mac_acc_total&amp;sort=$sort&amp;stat=$stat&amp;from=-1month&amp;to=now&amp;width=150&amp;height=50' />
+            <a href='".generate_url($link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>$vars['graph'], sort => $vars['sort'], 'period' => '1month'))."/'>
+            <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=".$port['interface_id']."&amp;type=port_mac_acc_total&amp;sort=".$vars['sort']."&amp;stat=".$vars['graph']."&amp;from=-1month&amp;to=now&amp;width=150&amp;height=50' />
             </a>
             </div>
             <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Year</span><br />
-            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/$stat/top10/1year/$sort/'>
-            <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;type=port_mac_acc_total&amp;sort=$sort&amp;stat=$stat&amp;from=-1year&amp;to=now&amp;width=150&amp;height=50' />
+            <a href='".generate_url($link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>$vars['graph'], sort => $vars['sort'], 'period' => '1year'))."/'>
+            <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=".$port['interface_id']."&amp;type=port_mac_acc_total&amp;sort=".$vars['sort']."&amp;stat=".$vars['graph']."&amp;from=-1year&amp;to=now&amp;width=150&amp;height=50' />
             </a>
             </div>
        </div>
        <div style='float: left;'>
-         <img src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;type=port_mac_acc_total&amp;sort=$sort&amp;stat=$stat&amp;from=$from&amp;to=now&amp;width=745&amp;height=300' />
+         <img src='graph.php?id=".$port['interface_id']."&amp;type=port_mac_acc_total&amp;sort=".$vars['sort']."&amp;stat=".$vars['graph']."&amp;from=$from&amp;to=now&amp;width=745&amp;height=300' />
        </div>
        <div style=' margin:0px; float: left;';>
             <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Traffic</span><br />
-           <a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/bits/top10/$period/$sort/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;stat=bits&amp;type=port_mac_acc_total&amp;sort=$sort&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
+           <a href='".generate_url($link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>'bits', sort => $vars['sort'], 'period' => $vars['period']))."'>
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=".$port['interface_id']."&amp;stat=bits&amp;type=port_mac_acc_total&amp;sort=".$vars['sort']."&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Packets</span><br />
-           <a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/pkts/top10/$period/$sort/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;stat=pkts&amp;type=port_mac_acc_total&amp;sort=$sort&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
+           <a href='".generate_url($link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>'pkts', sort => $vars['sort'], 'period' => $vars['period']))."/'>
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=".$port['interface_id']."&amp;stat=pkts&amp;type=port_mac_acc_total&amp;sort=".$vars['sort']."&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Top Input</span><br />
-           <a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id'].
-                    "/macaccounting/$stat/top10/$period/in/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id'].
-                    "&amp;stat=$stat&amp;type=port_mac_acc_total&amp;sort=in&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
+           <a href='".generate_url($link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>$vars['graph'], sort => 'in', 'period' => $vars['period']))."'>
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=".$port['interface_id'].
+                    "&amp;stat=".$vars['graph']."&amp;type=port_mac_acc_total&amp;sort=in&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Top Output</span><br />
-           <a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id'].
-                    "/macaccounting/$stat/top10/$period/out/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id'].
-                    "&amp;stat=$stat&amp;type=port_mac_acc_total&amp;sort=out&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
+           <a href='".generate_url($link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>$vars['graph'], sort => 'out', 'period' => $vars['period']))."'>
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=".$port['interface_id'].
+                    "&amp;stat=".$vars['graph']."&amp;type=port_mac_acc_total&amp;sort=out&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Top Aggregate</span><br />
-           <a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id'].
-                    "/macaccounting/$stat/top10/$period/both/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id'].
-                    "&amp;stat=$stat&amp;type=port_mac_acc_total&amp;sort=both&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
+           <a href='".generate_url($link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>$vars['graph'], sort => 'both', 'period' => $vars['period']))."'>
+             <img style='border: #5e5e5e 2px;' valign=middle src='graph.php?id=".$port['interface_id'].
+                    "&amp;stat=".$vars['graph']."&amp;type=port_mac_acc_total&amp;sort=both&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
        </div>
@@ -126,7 +114,7 @@ if ($_GET['optd'] == "top10")
 
   $query = "SELECT *, (M.cipMacHCSwitchedBytes_input_rate + M.cipMacHCSwitchedBytes_output_rate) as bps FROM `mac_accounting` AS M,
                        `ports` AS I, `devices` AS D WHERE M.interface_id = ? AND I.interface_id = M.interface_id AND I.device_id = D.device_id ORDER BY bps DESC";
-  $param = array($interface['interface_id']);
+  $param = array($port['interface_id']);
 
   foreach (dbFetchRows($query, $param) as $acc)
   {
@@ -150,14 +138,14 @@ if ($_GET['optd'] == "top10")
       unset ($as); unset ($astext); unset($asn);
     }
 
-    if ($_GET['optc'])
+    if ($vars['graph'])
     {
-      $graph_type = "macaccounting_" . $_GET['optc'];
+      $graph_type = "macaccounting_" . $vars['graph'];
     } else {
       $graph_type = "macaccounting_bits";
     }
 
-    if ($_GET['optd'] == "thumbs")
+    if ($vars['subview'] == "minigraphs")
     {
       if (!$asn) { $asn = "No Session"; }
 

@@ -5,7 +5,7 @@ if ($ports['total'])
   echo('<div style="background-color: #eeeeee; margin: 5px; padding: 5px;">');
 
   $graph_array['height'] = "100";
-  $graph_array['width']  = "490";
+  $graph_array['width']  = "485";
   $graph_array['to']     = $now;
   $graph_array['id'] 	 = $device['device_id'];
   $graph_array['type']   = "device_bits";
@@ -18,23 +18,10 @@ if ($ports['total'])
   unset($link_array['height'], $link_array['width']);
   $link = generate_url($link_array);
 
+  $graph_array['width']  = "210";
+  $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - Device Traffic");
 
-
-  $content = "<div class=list-large>".$device['hostname']." - Device Traffic</div>";
-  $content .= "<div style=\'width: 850px\'>";
-  $graph_array['legend']   = "no";
-  $graph_array['width']    = "340";
-  $graph_array['from']     = $config['time']['day'];
-  $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['time']['week'];
-  $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['time']['month'];
-  $content .= generate_graph_tag($graph_array);
-  $graph_array['from']     = $config['time']['year'];
-  $content .= generate_graph_tag($graph_array);
-  $content .= "</div>";
-
-  echo(overlib_link($link, $graph, $content, NULL));
+  echo(overlib_link($link, $graph, $overlib_content, NULL));
 
   echo('  <div style="height: 5px;"></div>');
 

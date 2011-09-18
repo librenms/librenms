@@ -54,7 +54,7 @@ foreach (dbFetchRows($sql, $param) as $sensor)
           <td>" . (isset($sensor['sensor_notes']) ? $sensor['sensor_notes'] : '') . "</td>
         </tr>\n");
 
-  if ($_GET['optb'] == "graphs")
+  if ($vars['view'] == "graphs")
   {
     echo("<tr bgcolor='$row_colour'><td colspan=7>");
 

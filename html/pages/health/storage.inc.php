@@ -72,7 +72,7 @@ foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.devic
           <a href='#' $store_popup>".print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $background['left'], $free, "ffffff", $background['right'])."</a>
           </td><td>$perc"."%</td></tr>");
 
-    if ($_GET['optb'] == "graphs")
+    if ($vars['view'] == "graphs")
     {
 
       echo("<tr bgcolor='$row_colour'><td colspan=5>");

@@ -23,8 +23,10 @@ $type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
 $type_text['power'] = "Power";
 
-if (!$_GET['opta']) { $_GET['opta'] = "processor"; }
-if (!$_GET['optb']) { $_GET['optb'] = "nographs"; }
+if (!$vars['metric']) { $vars['metric'] = "processor"; }
+if (!$vars['view']) { $vars['view'] = "detail"; }
+
+$link_array = array('page'    => 'health');
 
 print_optionbar_start('', '');
 
@@ -33,16 +35,16 @@ echo('<span style="font-weight: bold;">Health</span> &#187; ');
 $sep = "";
 foreach ($datas as $texttype)
 {
-  $type = strtolower($texttype);
+  $metric = strtolower($texttype);
   echo($sep);
-  if ($_GET['opta'] == $type)
+  if ($vars['metric'] == $metric)
   {
     echo("<span class='pagemenu-selected'>"); 
   }
 
-  echo('<a href="health/' . $type . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $type_text[$type] .'</a>');
- 
-  if ($_GET['opta'] == $type) { echo("</span>"); }
+  echo(generate_link($type_text[$metric],$link_array,array('metric'=> $metric, 'view' => $vars['view'])));
+
+  if ($vars['metric'] == $metric) { echo("</span>"); }
 
   $sep = ' | ';
 }
@@ -51,28 +53,26 @@ unset ($sep);
 
 echo('<div style="float: right;">');
 
-if ($_GET['optb'] == "graphs")
+if ($vars['view'] == "graphs")
 {
   echo('<span class="pagemenu-selected">');
 }
-
-echo('<a href="health/'. $_GET['opta'].'/graphs/"> Graphs</a>');
-
-if ($_GET['optb'] == "graphs")
+echo(generate_link("Graphs",$link_array,array('metric'=> $vars['metric'], 'view' => "graphs")));
+if ($vars['view'] == "graphs")
 {
   echo('</span>');
 }
 
 echo(' | ');
 
-if ($_GET['optb'] == "nographs")
+if ($vars['view'] == "nographs")
 {
   echo('<span class="pagemenu-selected">');
 }
 
-echo('<a href="health/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
+echo(generate_link("No Graphs",$link_array,array('metric'=> $vars['metric'], 'view' => "detail")));
 
-if ($_GET['optb'] == "nographs") 
+if ($vars['view'] == "nographs") 
 { 
   echo('</span>'); 
 }
@@ -81,16 +81,16 @@ echo('</div>');
 
 print_optionbar_end();
 
-if (in_array($_GET['opta'],array_keys($used_sensors)) 
-  || $_GET['opta'] == 'processor'
-  || $_GET['opta'] == 'storage'
-  || $_GET['opta'] == 'mempool')
+if (in_array($vars['metric'],array_keys($used_sensors)) 
+  || $vars['metric'] == 'processor'
+  || $vars['metric'] == 'storage'
+  || $vars['metric'] == 'mempool')
 {
-  include('pages/health/'.$_GET['opta'].'.inc.php');
+  include('pages/health/'.$vars['metric'].'.inc.php');
 }
 else
 {
-  echo("No sensors of type " . $_GET['opta'] . " found.");
+  echo("No sensors of type " . $vars['metric'] . " found.");
 }
 
 ?>
