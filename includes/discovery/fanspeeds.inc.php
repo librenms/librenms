@@ -1,7 +1,11 @@
 <?php
 
 echo("Fanspeeds : ");
-include_dir("includes/discovery/fanspeeds");
+
+### Include all discovery modules
+
+$include_dir = "includes/discovery/fanspeeds";
+include("includes/include-dir.inc.php");
 
 if ($debug) { print_r($valid['sensor']['fanspeed']); }
 

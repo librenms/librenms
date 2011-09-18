@@ -21,10 +21,10 @@ function rrdtool_fetch($rrdfile, $rrdupdate)
   return rrdtool("fetch", $rrdfile, $rrdupdate);
 }
 
-function rrdtool_graph($rrdfile, $rrdupdate)
-{
-  return rrdtool("graph", $rrdfile, $rrdupdate);
-}
+#function rrdtool_graph($rrdfile, $rrdupdate)
+#{
+#  return rrdtool("graph", $rrdfile, $rrdupdate);
+#}
 
 function rrdtool_last($rrdfile, $rrdupdate)
 {

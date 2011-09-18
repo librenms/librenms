@@ -2,8 +2,6 @@
 
 $hrstorage_array = snmpwalk_cache_oid($device, "hrStorageEntry", NULL, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES:NetWare-Host-Ext-MIB");
 
-global $valid_storage;
-
 if (is_array($hrstorage_array))
 {
   echo("hrStorage : ");

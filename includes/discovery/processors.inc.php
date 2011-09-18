@@ -2,7 +2,10 @@
 
 echo("Processors : ");
 
-include_dir("includes/discovery/processors");
+### Include all discovery modules
+
+$include_dir = "includes/discovery/processors";
+include("includes/include-dir.inc.php");
 
 ## Last-resort discovery here
 

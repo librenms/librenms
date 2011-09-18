@@ -1,7 +1,5 @@
 <?php
 
-global $valid_mempool;
-
 #NETSWITCH-MIB::hpLocalMemSlotIndex.1 = INTEGER: 1
 #NETSWITCH-MIB::hpLocalMemSlabCnt.1 = Counter32: 3966
 #NETSWITCH-MIB::hpLocalMemFreeSegCnt.1 = Counter32: 166

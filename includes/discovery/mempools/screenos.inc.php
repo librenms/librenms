@@ -1,7 +1,5 @@
 <?php
 
-global $valid_mempool;
-
 if ($device['os'] == "screenos")
 {
   echo("ScreenOS: ");

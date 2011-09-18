@@ -221,17 +221,21 @@ $config['ignore_mount_removable']  = 1; # Ignore removable disk storage
 $config['ignore_mount_network']    = 1; # Ignore network mounted storage
 $config['ignore_mount_optical']    = 1; # Ignore mounted optical discs
 
+### Per-device interface graph filters
+
 $config['device_traffic_iftype'][] = '/loopback/';
 $config['device_traffic_iftype'][] = '/tunnel/';
 $config['device_traffic_iftype'][] = '/virtual/';
 $config['device_traffic_iftype'][] = '/mpls/';
 $config['device_traffic_iftype'][] = '/ieee8023adLag/';
+$config['device_traffic_iftype'][] = '/l2vlan/';
 
 $config['device_traffic_descr'][]  = '/loopback/';
 $config['device_traffic_descr'][]  = '/vlan/';
 $config['device_traffic_descr'][]  = '/tunnel/';
 $config['device_traffic_descr'][]  = '/:\d+/';
 $config['device_traffic_descr'][]  = '/bond/';
+
 ### IRC Bot configuration
 
 $config['irc_host'] = "chat.eu.freenode.net";

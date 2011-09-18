@@ -1,7 +1,5 @@
 <?php
 
-global $valid_sensor;
-
 // blindly copied from sentry3
 
 if ($device['os'] == 'raritan')

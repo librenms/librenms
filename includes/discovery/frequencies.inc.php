@@ -2,7 +2,10 @@
 
 echo("Frequencies: ");
 
-include_dir("includes/discovery/frequencies");
+### Include all discovery modules
+
+$include_dir = "includes/discovery/frequencies";
+include("includes/include-dir.inc.php");
 
 if ($debug) { print_r($valid['sensor']['frequency']); }
 

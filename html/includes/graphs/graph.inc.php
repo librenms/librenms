@@ -88,7 +88,8 @@ function graph_error($string)
 
   #$rrd_options .= " HRULE:0#cc0000";
   #$rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
-  $rrd_cmd = $config['rrdtool'] . " graph $graphfile  --title='".$string."'  -l 0 -u 100 -E --start -10y --end now --width $width --height $height -c BACK#ff9999cc -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal --font LEGEND:8:DejaVuSansMono --font AXIS:7:DejaVuSansMono --font-render-mode normal HRULE:0#cc0000" . $rrd_switches;
+
+  echo(rrdtool_graph($graphfile, " --title='".$string."'  -l 0 -u 100 -E --start -10y --end now --width $width --height $height -c BACK#ff9999cc -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal --font LEGEND:8:DejaVuSansMono --font AXIS:7:DejaVuSansMono --font-render-mode normal HRULE:0#cc0000"));
 
   if ($height > "99")  {
     #$rrd_cmd .= " --only-graph"; }
@@ -140,8 +141,7 @@ if ($error_msg) {
     if ($rrd_options)
     {
       if ($config['rrdcached']) { $rrd_switches = " --daemon ".$config['rrdcached'] . " "; }
-      $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
-      $woo = shell_exec($rrd_cmd);
+      rrdtool_graph($graphfile, " $rrd_options");
       if ($debug) { echo("<pre>".$rrd_cmd."</pre>"); }
       if (is_file($graphfile) && !$debug)
       {

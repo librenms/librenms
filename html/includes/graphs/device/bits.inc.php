@@ -29,7 +29,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) 
   }
 
   $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
-  if (is_file($rrd_filename) && $ignore != 1)
+  if ($ignore != 1 && is_file($rrd_filename))
   {
     $rrd_filenames[] = $rrd_filename;
     $rrd_list[$i]['filename'] = $rrd_filename;
