@@ -49,7 +49,7 @@ foreach (dbFetchRows("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.de
     echo('</a></td>
              </tr>');
 
-    if ($_GET['optb'] == "graphs")
+    if ($vars['view'] == "graphs")
     { ## If graphs are requested, do them, else not!
       echo('    <tr bgcolor="'.$row_colour.'"><td colspan="5">');
 

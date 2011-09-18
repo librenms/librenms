@@ -1,27 +1,25 @@
 <?php
 
-if ($_GET['opta']) { $_GET['opta'] = mres($_GET['opta']); }
-
-if ($_GET['optb'] == "port" && is_numeric($_GET['opta']) && port_permitted($_GET['optc']))
+if ($vars['tab'] == "port" && is_numeric($vars['device']) && port_permitted($vars['port']))
 {
-  $check_device = get_device_id_by_interface_id($_GET['opta']);
+  $check_device = get_device_id_by_interface_id($vars['device']);
   $permit_ports = 1;
 }
 
-if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
+if (device_permitted($vars['device']) || $check_device == $vars['device'])
 {
   $selected['iface'] = "selected";
 
-  $section = str_replace(".", "", mres($_GET['optb']));
+  $tab = str_replace(".", "", mres($vars['tab']));
 
-  if (!$section)
+  if (!$tab)
   {
-    $section = "overview";
+    $tab = "overview";
   }
 
-  $select[$section] = "selected";
+  $select[$tab] = "selected";
 
-  $device  = device_by_id_cache($_GET['opta']);
+  $device  = device_by_id_cache($vars['device']);
   $attribs = get_dev_attribs($device['device_id']);
 
   if ($config['os'][$device['os']]['group']) { $device['os_group'] = $config['os'][$device['os']]['group']; }
@@ -40,14 +38,14 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     {
       echo('
   <li class="' . $select['overview'] . '">
-    <a href="device/' . $device['device_id'] . '/overview/">
+    <a href="'.generate_device_url($device, array('tab' => 'overview')).'">
       <img src="images/16/server_lightning.png" align="absmiddle" border="0"> Overview
     </a>
   </li>');
     }
 
     echo('<li class="' . $select['graphs'] . '">
-    <a href="device/' . $device['device_id'] . '/graphs/">
+    <a href="'.generate_device_url($device, array('tab' => 'graphs')).'">
       <img src="images/16/server_chart.png" align="absmiddle" border="0"> Graphs
     </a>
   </li>');
@@ -61,7 +59,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if ($health)
     {
       echo('<li class="' . $select['health'] . '">
-      <a href="device/' . $device['device_id'] . '/health/">
+      <a href="'.generate_device_url($device, array('tab' => 'health')).'">
         <img src="images/icons/sensors.png" align="absmiddle" border="0" /> Health
       </a>
     </li>');
@@ -70,7 +68,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if (@dbFetchCell("SELECT COUNT(app_id) FROM applications WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['apps'] . '">
-    <a href="device/' . $device['device_id'] . '/apps/">
+    <a href="'.generate_device_url($device, array('tab' => 'apps')).'">
       <img src="images/icons/apps.png" align="absmiddle" border="0" /> Apps
     </a>
   </li>');
@@ -79,7 +77,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if (is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/"))
     {
       echo('<li class="' . $select['collectd'] . '">
-    <a href="device/' . $device['device_id'] . '/collectd/">
+    <a href="'.generate_device_url($device, array('tab' => 'collectd')).'">
       <img src="images/16/chart_line.png" align="absmiddle" border="0" /> CollectD
     </a>
   </li>');
@@ -88,7 +86,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if (@dbFetchCell("SELECT COUNT(interface_id) FROM ports WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['ports'] . $select['port'] . '">
-    <a href="device/' . $device['device_id'] . '/ports/' .$config['ports_page_default']. '">
+    <a href="'.generate_device_url($device, array('tab' => 'ports')). '">
       <img src="images/16/connect.png" align="absmiddle" border="0" /> Ports
     </a>
   </li>');
@@ -97,7 +95,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if (@dbFetchCell("SELECT COUNT(vlan_id) FROM vlans WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['vlans'] . '">
-    <a href="device/' . $device['device_id'] . '/vlans/">
+    <a href="'.generate_device_url($device, array('tab' => 'vlans')).'">
       <img src="images/16/vlans.png" align="absmiddle" border="0" /> VLANs
     </a>
   </li>');
@@ -106,7 +104,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if (@dbFetchCell("SELECT COUNT(id) FROM vminfo WHERE device_id = '" . $device["device_id"] . "'") > '0')
     {
       echo('<li class="' . $select['vm'] . '">
-    <a href="device/' . $device['device_id'] . '/vm/">
+    <a href="'.generate_device_url($device, array('tab' => 'vm')).'">
       <img src="images/16/server_cog.png" align="absmiddle" border="0" /> Virtual Machines
     </a>
   </li>');
@@ -132,7 +130,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if (is_array($routing_tabs)) 
     {
       echo('<li class="' . $select['routing'] . '">
-    <a href="device/' . $device['device_id'] . '/routing/">
+    <a href="'.generate_device_url($device, array('tab' => 'routing')).'">
       <img src="images/16/arrow_branch.png" align="absmiddle" border="0" /> Routing
     </a>
   </li>');
@@ -142,7 +140,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     {
       $discovery_links = TRUE;
       echo('<li class="' . $select['map'] . '">
-    <a href="device/' . $device['device_id'] . '/map/">
+    <a href="'.generate_device_url($device, array('tab' => 'map')).'">
       <img src="images/16/chart_organisation.png" align="absmiddle" border="0" /> Map
     </a>
   </li>');
@@ -151,7 +149,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if ($config['enable_inventory'] && @dbFetchCell("SELECT * FROM `entPhysical` WHERE device_id = '".$device['device_id']."'") > '0')
     {
       echo('<li class="' . $select['entphysical'] . '">
-    <a href="device/' . $device['device_id'] . '/entphysical/">
+    <a href="'.generate_device_url($device, array('tab' => 'entphysical')).'">
       <img src="images/16/bricks.png" align="absmiddle" border="0" /> Inventory
     </a>
   </li>');
@@ -159,7 +157,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     elseif (device_permitted($device['device_id']) && $config['enable_inventory'] && @dbFetchCell("SELECT * FROM `hrDevice` WHERE device_id = '".$device['device_id']."'") > '0')
     {
       echo('<li class="' . $select['hrdevice'] . '">
-    <a href="device/' . $device['device_id'] . '/hrdevice/">
+    <a href="'.generate_device_url($device, array('tab' => 'hrdevice')).'">
       <img src="images/16/bricks.png" align="absmiddle" border="0" /> Inventory
     </a>
   </li>');
@@ -168,7 +166,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if (dbFetchCell("SELECT COUNT(service_id) FROM services WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['services'] . '">
-    <a href="device/' . $device['device_id'] . '/services/">
+    <a href="'.generate_device_url($device, array('tab' => 'services')).'">
       <img src="images/icons/services.png" align="absmiddle" border="0" /> Services
     </a>
   </li>');
@@ -177,7 +175,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if (@dbFetchCell("SELECT COUNT(toner_id) FROM toner WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['toner'] . '">
-    <a href="device/' . $device['device_id'] . '/toner/">
+    <a href="'.generate_device_url($device, array('tab' => 'toner')).'">
       <img src="images/icons/toner.png" align="absmiddle" border="0" /> Toner
     </a>
   </li>');
@@ -186,7 +184,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if (device_permitted($device['device_id']))
     {
       echo('<li class="' . $select['events'] . '">
-      <a href="device/' . $device['device_id'] . '/events/">
+      <a href="'.generate_device_url($device, array('tab' => 'events')).'">
         <img src="images/16/report_magnify.png" align="absmiddle" border="0" /> Events
       </a>
     </li>');
@@ -195,7 +193,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if ($config['enable_syslog'])
     {
       echo('<li class="' . $select['syslog'] . '">
-    <a href="device/' . $device['device_id'] . '/syslog/">
+    <a href="'.generate_device_url($device, array('tab' => 'syslog')).'">
       <img src="images/16/printer.png" align="absmiddle" border="0" /> Syslog
     </a>
   </li>');
@@ -214,7 +212,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if ($device_config_file)
     {
       echo('<li class="' . $select['showconfig'] . '">
-    <a href="device/' . $device['device_id'] . '/showconfig/">
+    <a href="'.generate_device_url($device, array('tab' => 'showconfig')).'/">
       <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Config
     </a>
   </li>');
@@ -237,7 +235,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if ($nfsen_rrd_file)
     {
       echo('<li class="' . $select['nfsen'] . '">
-    <a href="device/' . $device['device_id'] . '/nfsen/">
+    <a href="'.generate_device_url($device, array('tab' => 'nfsen')).'">
       <img src="images/16/rainbow.png" align="absmiddle" border="0" /> Netflow
     </a>
   </li>');
@@ -247,7 +245,7 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     if ($_SESSION['userlevel'] >= "7")
     {
       echo('<li class="' . $select['edit'] . '" style="text-align: right;">
-    <a href="device/' . $device['device_id'] . '/edit/">
+    <a href="'.generate_device_url($device, array('tab' => 'edit')).'">
       <img src="images/16/server_edit.png" align="absmiddle" border="0" /> Settings
     </a>
   </li>');
@@ -255,10 +253,10 @@ if (device_permitted($_GET['opta']) || $check_device == $_GET['opta'])
     echo("</ul>");
   }
 
-  if(device_permitted($device['device_id']) || $check_device == $_GET['opta']) {
+  if(device_permitted($device['device_id']) || $check_device == $vars['device']) {
     echo('<div class="contentstyle">');
 
-    include("pages/device/".mres(basename($section)).".inc.php");
+    include("pages/device/".mres(basename($tab)).".inc.php");
 
     echo("</div>");
   } else {

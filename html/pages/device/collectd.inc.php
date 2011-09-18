@@ -48,14 +48,18 @@ function dhtml_response_list(&$items, $method) {
 
 print_optionbar_start();
 
+$link_array = array('page'    => 'device',
+                    'device'  => $device['device_id'],
+                    'tab' => 'collectd');
+
     $plugins = collectd_list_plugins($device['hostname']);
     unset($sep);
     foreach ($plugins as &$plugin) {
-       if (!$_GET['optc']) { $_GET['optc'] = $plugin; }
+       if (!$vars['plugin']) { $vars['plugin'] = $plugin; }
        echo($sep);
-       if ($_GET['optc'] == $plugin) { echo("<span class='pagemenu-selected'>"); }
-       echo("<a href='device/" . $device['device_id'] . "/collectd/" . $plugin . "/'>" . htmlspecialchars($plugin) ."</a>");
-       if ($_GET['optc'] == $plugin) { echo("</span>"); }
+       if ($vars['plugin'] == $plugin) { echo("<span class='pagemenu-selected'>"); }
+       echo(generate_link(htmlspecialchars($plugin),$link_array,array('plugin'=>$plugin)));
+       if ($vars['plugin'] == $plugin) { echo("</span>"); }
        $sep = ' | ';
     }
     unset ($sep);
@@ -64,13 +68,13 @@ print_optionbar_end();
 
    $i=0;
 
-    $pinsts = collectd_list_pinsts($device['hostname'], $_GET['optc']);
+    $pinsts = collectd_list_pinsts($device['hostname'], $vars['plugin']);
     foreach ($pinsts as &$instance) {
 
-     $types = collectd_list_types($device['hostname'], $_GET['optc'], $instance);
+     $types = collectd_list_types($device['hostname'], $vars['plugin'], $instance);
      foreach ($types as &$type) {
 
-     $typeinstances = collectd_list_tinsts($device['hostname'], $_GET['optc'], $instance, $type);
+     $typeinstances = collectd_list_tinsts($device['hostname'], $vars['plugin'], $instance, $type);
 
      if ($MetaGraphDefs[$type]) { $typeinstances = array($MetaGraphDefs[$type]); }
 
@@ -81,16 +85,16 @@ print_optionbar_end();
        echo('<div style="background-color: '.$row_colour.';">');
        echo('<div class="graphhead" style="padding:4px 0px 0px 8px;">');
        if ($tinst) {
-       echo($_GET['optc']." $instance - $type - $tinst");
+       echo($vars['plugin']." $instance - $type - $tinst");
        } else {
-        echo($_GET['optc']." $instance - $type");
+        echo($vars['plugin']." $instance - $type");
        }
        echo("</div>");
 
        $graph_array['type']    		= "device_collectd";
        $graph_array['id']      		= $device['device_id'];
 
-       $graph_array['c_plugin']  	 = $_GET['optc'];
+       $graph_array['c_plugin']  	 = $vars['plugin'];
        $graph_array['c_plugin_instance'] = $instance;
        $graph_array['c_type']		 = $type;
        $graph_array['c_type_instance']   = $tinst;

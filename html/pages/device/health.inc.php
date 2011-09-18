@@ -40,32 +40,35 @@ $type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
 $type_text['power'] = "Power";
 
+$link_array = array('page'    => 'device',
+                    'device'  => $device['device_id'],
+                    'tab' => 'health');
+
+
 print_optionbar_start();
 
 echo("<span style='font-weight: bold;'>Health</span> &#187; ");
 
-if (!$_GET['optc']) { $_GET['optc'] = "overview"; }
+if (!$vars['metric']) { $vars['metric'] = "overview"; }
 
 unset($sep);
 foreach ($datas as $type)
 {
   echo($sep);
 
-  if ($_GET['optc'] == $type)
-  {
-    echo('<span class="pagemenu-selected">');
-  }
+  if ($vars['metric'] == $type)
+  { echo('<span class="pagemenu-selected">'); }
 
-  echo("<a href='device/".$device['device_id']."/health/" . $type . ($_GET['optd'] ? "/" . $_GET['optd'] : ''). "/'> " . $type_text[$type] ."</a>");
-  if ($_GET['optc'] == $type) { echo("</span>"); }
+  echo(generate_link($type_text[$type],$link_array,array('metric'=>$type)));
+  if ($vars['metric'] == $type) { echo("</span>"); }
   $sep = " | ";
 }
 
 print_optionbar_end();
 
-if (is_file("pages/device/health/".mres($_GET['optc']).".inc.php"))
+if (is_file("pages/device/health/".mres($vars['metric']).".inc.php"))
 {
-   include("pages/device/health/".mres($_GET['optc']).".inc.php");
+   include("pages/device/health/".mres($vars['metric']).".inc.php");
 } else {
   foreach ($datas as $type)
   {

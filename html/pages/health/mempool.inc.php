@@ -45,7 +45,7 @@ foreach (dbFetchRows("SELECT * FROM `mempools` AS M, `devices` as D WHERE D.devi
             <td width=50>".$mempool['mempool_perc']."%</td>
          </tr>");
 
-    if ($_GET['optb'] == "graphs")
+    if ($vars['view'] == "graphs")
     {
       echo("<tr bgcolor='$row_colour'><td colspan=5>");
 

@@ -1,5 +1,9 @@
 <?php
 
+function generate_link($text, $vars, $new_vars = array())
+{
+  return '<a href="'.generate_url($vars, $new_vars).'">'.$text.'</a>';
+}
 
 
 function generate_url($vars, $new_vars = array())
@@ -52,12 +56,12 @@ function get_percentage_colours($percentage)
 
 }
 
-function generate_device_url($device, $linksuffix="")
+function generate_device_url($device, $vars=array())
 {
-  return "device/" . $device['device_id'] . "/" . $linksuffix;
+  return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
 }
 
-function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0)
+function generate_device_link($device, $text=0, $vars=array(), $start=0, $end=0)
 {
   global $config;
 
@@ -80,7 +84,8 @@ function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0
     $graphs = $config['os']['default']['over'];
   }
 
-  $url = generate_device_url($device, $linksuffix);
+  $url = generate_device_url($device, $vars);
+
   $contents = "<div class=list-large>".$device['hostname'];
   if ($device['hardware']) { $contents .= " - ".$device['hardware']; }
   $contents .= "</div>";
@@ -345,8 +350,9 @@ function generate_port_link($args, $text = NULL, $type = NULL)
   }
 }
 
-function generate_port_url($args) {
-  return $url = "device/".$args['device_id']."/port/" . $args['interface_id'] . "/";
+function generate_port_url($port, $vars=array())
+{
+  return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'section' => 'port', 'port' => $port['interface_id']), $vars);
 }
 
 function generate_port_thumbnail($args)

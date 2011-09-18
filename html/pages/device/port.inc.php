@@ -1,25 +1,25 @@
 <?php
 
-if (!isset($_GET['optd']) ) { $_GET['optd'] = "graphs"; }
+if (!isset($vars['view']) ) { $vars['view'] = "graphs"; }
 
-$interface = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($_GET['optc']));
+$port = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($vars['port']));
 
 $port_details = 1;
 
 $hostname = $device['hostname'];
 $hostid   = $device['interface_id'];
-$ifname   = $interface['ifDescr'];
-$ifIndex   = $interface['ifIndex'];
-$speed = humanspeed($interface['ifSpeed']);
+$ifname   = $port['ifDescr'];
+$ifIndex   = $port['ifIndex'];
+$speed = humanspeed($port['ifSpeed']);
 
-$ifalias = $interface['name'];
+$ifalias = $port['name'];
 
-if ($interface['ifPhysAddress']) { $mac = "$interface[ifPhysAddress]"; }
+if ($port['ifPhysAddress']) { $mac = "$port[ifPhysAddress]"; }
 
 $color = "black";
-if ($interface['ifAdminStatus'] == "down") { $status = "<span class='grey'>Disabled</span>"; }
-if ($interface['ifAdminStatus'] == "up" && $interface['ifOperStatus'] == "down") { $status = "<span class='red'>Enabled / Disconnected</span>"; }
-if ($interface['ifAdminStatus'] == "up" && $interface['ifOperStatus'] == "up") { $status = "<span class='green'>Enabled / Connected</span>"; }
+if ($port['ifAdminStatus'] == "down") { $status = "<span class='grey'>Disabled</span>"; }
+if ($port['ifAdminStatus'] == "up" && $port['ifOperStatus'] == "down") { $status = "<span class='red'>Enabled / Disconnected</span>"; }
+if ($port['ifAdminStatus'] == "up" && $port['ifOperStatus'] == "up") { $status = "<span class='green'>Enabled / Connected</span>"; }
 
 $i = 1;
 $inf = fixifName($ifname);
@@ -51,90 +51,95 @@ echo("<div style='clear: both;'>");
 
 print_optionbar_start();
 
-if ($_GET['optd'] == "graphs" || !$_GET['optd']) { echo("<span class='pagemenu-selected'>"); }
-echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/'>Graphs</a>");
-if ($_GET['optd'] == "graphs" || !$_GET['optd']) { echo("</span>"); }
+$link_array = array('page'    => 'device',
+                    'device'  => $device['device_id'],
+                    'tab' => 'port',
+                    'port'    => $port['interface_id']);
 
-echo(" | ");
+$menu_options['graphs']   = 'Graphs';
+$menu_options['realtime'] = 'Real time';   ### FIXME CONDITIONAL
+$menu_options['arp']      = 'ARP Table';
 
-if ($_GET['optd'] == "realtime" || !$_GET['optd']) { echo("<span class='pagemenu-selected'>"); }
-echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/realtime/'>Real Time</a>");
-if ($_GET['optd'] == "realtime" || !$_GET['optd']) { echo("</span>"); }
+if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$port['interface_id']."'") )
+{  $menu_options['adsl'] = 'ADSL'; }
 
+if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '".$port['ifIndex']."' and `device_id` = '".$device['device_id']."'") )
+{  $menu_options['pagp'] = 'PAgP'; }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$interface['interface_id']."'") )
+$sep = "";
+foreach ($menu_options as $option => $text)
 {
-  echo(" | ");
-  if ($_GET['optd'] == "adsl") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/port/".$interface['interface_id']."/adsl/'>ADSL</a>");
-  if ($_GET['optd'] == "adsl") { echo("</span>"); }
+  echo($sep);
+  if ($vars['view'] == $option) { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link($text,$link_array,array('view'=>$option)));
+  if ($vars['view'] == $option) { echo("</span>"); }
+  $sep = " | ";
 }
+unset($sep);
 
-echo(" | ");
 
-if ($_GET['optd'] == "arp") { echo("<span class='pagemenu-selected'>"); }
-echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/arp/'>ARP Table</a>");
-if ($_GET['optd'] == "arp") { echo("</span>"); }
-
-if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '".
-                              $interface['ifIndex']."' and `device_id` = '".$device['device_id']."'") )
+if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$port['interface_id']."'") > "0" )
 {
-  echo(" | ");
-  if ($_GET['optd'] == "pagp") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/pagp/'>PAgP</a>");
-  if ($_GET['optd'] == "pagp") { echo("</span>"); }
-}
 
+  echo(generate_link($descr,$link_array,array('view'=>'macaccounting','graph'=>$type)));
 
-if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'") > "0" )
-{
   echo(" | Mac Accounting : ");
-  if ($_GET['optd'] == "macaccounting" && $_GET['opte'] == "bits" && !$_GET['optf']) { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/bits/'>Bits</a>");
-  if ($_GET['optd'] == "macaccounting" && $_GET['opte'] == "bits" && !$_GET['optf']) { echo("</span>"); }
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "bits" && $vars['subview'] == "graphs") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("Bits",$link_array,array('view' => 'macaccounting', 'subview' => 'graphs', 'graph'=>'bits')));
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "bits" && $vars['subview'] == "graphs") { echo("</span>"); }
+
   echo("(");
-  if ($_GET['optd'] == "macaccounting" && $_GET['opte'] == "bits" && $_GET['optf'] == "thumbs") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/bits/thumbs/'>Mini</a>");
-  if ($_GET['optd'] == "macaccounting" && $_GET['opte'] == "bits" && $_GET['optf'] == "thumbs") { echo("</span>"); }
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "bits" && $vars['subview'] == "minigraphs") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("Mini",$link_array,array('view' => 'macaccounting', 'subview' => 'minigraphs', 'graph'=>'bits')));
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "bits" && $vars['subview'] == "minigraphs") { echo("</span>"); }
   echo('|');
-  if ($_GET['optd'] == "macaccounting" && $_GET['opte'] == "bits" && $_GET['optf'] == "top10") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/bits/top10/'>Top10</a>");
-  if ($_GET['optd'] == "macaccounting" && $_GET['opte'] == "bits" && $_GET['optf'] == "top10") { echo("</span>"); }
+
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "bits" && $vars['subview'] == "top10") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("Top10",$link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>'bits')));
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "bits" && $vars['subview'] == "top10") { echo("</span>"); }
   echo(") | ");
-  if ($_GET['optd'] == "macaccounting" && $_GET['opte'] == "pkts" && !$_GET['optf']) { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/pkts/'>Packets</a>");
-  if ($_GET['optd'] == "macaccounting" && $_GET['opte'] == "pkts" && !$_GET['optf']) { echo("</span>"); }
+
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "pkts" && $vars['subview'] == "graphs") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("Packets",$link_array,array('view' => 'macaccounting', 'subview' => 'graphs', 'graph'=>'pkts')));
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "pkts" && $vars['subview'] == "graphs") { echo("</span>"); }
   echo("(");
-  if ($_GET['optd'] == "macaccounting" && $_GET['opte'] == "pkts" && $_GET['optf'] == "thumbs") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/pkts/thumbs/'>Mini</a>");
-  if ($_GET['optd'] == "macaccounting" && $_GET['opte'] == "pkts" && $_GET['optf'] == "thumbs") { echo("</span>"); }
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "pkts" && $vars['subview'] == "minigraphs") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("Mini",$link_array,array('view' => 'macaccounting', 'subview' => 'minigraphs', 'graph'=>'pkts')));
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "pkts" && $vars['subview'] == "minigraphs") { echo("</span>"); }
+  echo('|');
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "pkts" && $vars['subview'] == "top10") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("Top10",$link_array,array('view' => 'macaccounting', 'subview' => 'top10', 'graph'=>'pkts')));
+  if ($vars['view'] == "macaccounting" && $vars['graph'] == "pkts" && $vars['subview'] == "top10") { echo("</span>"); }
   echo(")");
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE interface_id = '".$interface['interface_id']."'") > "0" )
+if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE interface_id = '".$port['interface_id']."'") > "0" )
 {
+
+  ### FIXME ATM VPs
+
   echo(" | ATM VPs : ");
-  if ($_GET['optd'] == "junose-atm-vp" && $_GET['opte'] == "bits") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/junose-atm-vp/bits/'>Bits</a>");
-  if ($_GET['optd'] == "junose-atm-vp" && $_GET['opte'] == "bits") { echo("</span>"); }
+  if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$port['interface_id']."/junose-atm-vp/bits/'>Bits</a>");
+  if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
   echo(" | ");
-  if ($_GET['optd'] == "junose-atm-vp" && $_GET['opte'] == "packets") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/junose-atm-vp/packets/'>Packets</a>");
-  if ($_GET['optd'] == "junose-atm-vp" && $_GET['opte'] == "bits") { echo("</span>"); }
+  if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "packets") { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$port['interface_id']."/junose-atm-vp/packets/'>Packets</a>");
+  if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
   echo(" | ");
-  if ($_GET['optd'] == "junose-atm-vp" && $_GET['opte'] == "cells") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/junose-atm-vp/cells/'>Cells</a>");
-  if ($_GET['optd'] == "junose-atm-vp" && $_GET['opte'] == "bits") { echo("</span>"); }
+  if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "cells") { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$port['interface_id']."/junose-atm-vp/cells/'>Cells</a>");
+  if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
   echo(" | ");
-  if ($_GET['optd'] == "junose-atm-vp" && $_GET['opte'] == "errors") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/junose-atm-vp/errors/'>Errors</a>");
-  if ($_GET['optd'] == "junose-atm-vp" && $_GET['opte'] == "bits") { echo("</span>"); }
+  if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "errors") { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$port['interface_id']."/junose-atm-vp/errors/'>Errors</a>");
+  if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
 }
 
 print_optionbar_end();
 
 echo("<div style='margin: 5px;'>");
-include("pages/device/port/".mres($_GET['optd']).".inc.php");
+include("pages/device/port/".mres($vars['view']).".inc.php");
 echo("</div>");
 
 ?>

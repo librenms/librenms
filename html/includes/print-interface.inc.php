@@ -2,12 +2,12 @@
 
 #  This file prints a table row for each interface
 
-$interface['device_id'] = $device['device_id'];
-$interface['hostname'] = $device['hostname'];
+$port['device_id'] = $device['device_id'];
+$port['hostname'] = $device['hostname'];
 
-$if_id = $interface['interface_id'];
+$if_id = $port['interface_id'];
 
-$interface = ifLabel($interface);
+$port = ifLabel($port);
 
 if($int_colour) 
 {
@@ -16,36 +16,36 @@ if($int_colour)
   if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 }
 
-$port_adsl = dbFetchRow("SELECT * FROM `ports_adsl` WHERE `interface_id` = ?", array($interface['interface_id']));
+$port_adsl = dbFetchRow("SELECT * FROM `ports_adsl` WHERE `interface_id` = ?", array($port['interface_id']));
 
-if ($interface['ifInErrors_delta'] > 0 || $interface['ifOutErrors_delta'] > 0)
+if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0)
 {
-  $error_img = generate_port_link($interface, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", "port_errors");
+  $error_img = generate_port_link($port, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", "port_errors");
 } else { $error_img = ""; }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `mac_accounting` WHERE `interface_id` = ?", array($interface['interface_id'])))
+if (dbFetchCell("SELECT COUNT(*) FROM `mac_accounting` WHERE `interface_id` = ?", array($port['interface_id'])))
 {
-  $mac = "<a href='device/".$interface['device_id']."/port/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'></a>";
+  $mac = "<a href='device/".$port['device_id']."/port/".$port['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'></a>";
 } else { $mac = ""; }
 
-echo("<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='device/".$device['device_id']."/port/".$interface['interface_id']."/'\" style='cursor: pointer;'>
+echo("<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='device/".$device['device_id']."/port/".$port['interface_id']."/'\" style='cursor: pointer;'>
          <td valign=top width=350>");
 echo("        <span class=list-large>
-              " . generate_port_link($interface, $interface['ifIndex'] . ". ".$interface['label']) . " $error_img $mac
-           </span><br /><span class=interface-desc>".$interface['ifAlias']."</span>");
+              " . generate_port_link($port, $port['ifIndex'] . ". ".$port['label']) . " $error_img $mac
+           </span><br /><span class=interface-desc>".$port['ifAlias']."</span>");
 
-if ($interface['ifAlias']) { echo("<br />"); }
+if ($port['ifAlias']) { echo("<br />"); }
 
 unset ($break);
 
 if ($port_details)
 {
-  foreach (dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = ?", array($interface['interface_id'])) as $ip) 
+  foreach (dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = ?", array($port['interface_id'])) as $ip) 
   {
     echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=$ip[ipv4_address]')\">".$ip['ipv4_address']."/".$ip['ipv4_prefixlen']."</a>");
     $break = "<br />";
   }
-  foreach (dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `interface_id` = ?", array($interface['interface_id'])) as $ip6)
+  foreach (dbFetchRows("SELECT * FROM `ipv6_addresses` WHERE `interface_id` = ?", array($port['interface_id'])) as $ip6)
   {
     echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address'])."/".$ip6['ipv6_prefixlen']."</a>");
     $break = "<br />";
@@ -58,42 +58,42 @@ echo("</td><td width=100>");
 
 if ($port_details)
 {
-  $interface['graph_type'] = "port_bits";
-  echo(generate_port_link($interface, "<img src='graph.php?type=port_bits&amp;id=".$interface['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
-  $interface['graph_type'] = "port_upkts";
-  echo(generate_port_link($interface, "<img src='graph.php?type=port_upkts&amp;id=".$interface['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
-  $interface['graph_type'] = "port_errors";
-  echo(generate_port_link($interface, "<img src='graph.php?type=port_errors&amp;id=".$interface['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
+  $port['graph_type'] = "port_bits";
+  echo(generate_port_link($port, "<img src='graph.php?type=port_bits&amp;id=".$port['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
+  $port['graph_type'] = "port_upkts";
+  echo(generate_port_link($port, "<img src='graph.php?type=port_upkts&amp;id=".$port['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
+  $port['graph_type'] = "port_errors";
+  echo(generate_port_link($port, "<img src='graph.php?type=port_errors&amp;id=".$port['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
 }
 
 echo("</td><td width=120>");
 
-if ($interface['ifOperStatus'] == "up")
+if ($port['ifOperStatus'] == "up")
 {
-  $interface['in_rate'] = $interface['ifInOctets_rate'] * 8;
-  $interface['out_rate'] = $interface['ifOutOctets_rate'] * 8;
-  $in_perc = @round($interface['in_rate']/$interface['ifSpeed']*100);
-  $out_perc = @round($interface['in_rate']/$interface['ifSpeed']*100);
-  echo("<img src='images/16/arrow_left.png' align=absmiddle> <span style='color: " . percent_colour($in_perc) . "'>".formatRates($interface['in_rate'])."<br />
-        <img align=absmiddle src='images/16/arrow_out.png'> <span style='color: " . percent_colour($out_perc) . "'>".formatRates($interface['out_rate']) . "<br />
-        <img src='images/icons/arrow_pps_in.png' align=absmiddle> ".format_bi($interface['ifInUcastPkts_rate'])."pps</span><br />
-        <img src='images/icons/arrow_pps_out.png' align=absmiddle> ".format_bi($interface['ifOutUcastPkts_rate'])."pps</span>");
+  $port['in_rate'] = $port['ifInOctets_rate'] * 8;
+  $port['out_rate'] = $port['ifOutOctets_rate'] * 8;
+  $in_perc = @round($port['in_rate']/$port['ifSpeed']*100);
+  $out_perc = @round($port['in_rate']/$port['ifSpeed']*100);
+  echo("<img src='images/16/arrow_left.png' align=absmiddle> <span style='color: " . percent_colour($in_perc) . "'>".formatRates($port['in_rate'])."<br />
+        <img align=absmiddle src='images/16/arrow_out.png'> <span style='color: " . percent_colour($out_perc) . "'>".formatRates($port['out_rate']) . "<br />
+        <img src='images/icons/arrow_pps_in.png' align=absmiddle> ".format_bi($port['ifInUcastPkts_rate'])."pps</span><br />
+        <img src='images/icons/arrow_pps_out.png' align=absmiddle> ".format_bi($port['ifOutUcastPkts_rate'])."pps</span>");
 }
 
 echo("</td><td width=75>");
-if ($interface['ifSpeed']) { echo("<span class=box-desc>".humanspeed($interface['ifSpeed'])."</span>"); }
+if ($port['ifSpeed']) { echo("<span class=box-desc>".humanspeed($port['ifSpeed'])."</span>"); }
 echo("<br />");
 
-if ($interface[ifDuplex] != "unknown") { echo("<span class=box-desc>" . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
+if ($port[ifDuplex] != "unknown") { echo("<span class=box-desc>" . $port['ifDuplex'] . "</span>"); } else { echo("-"); }
 
 if ($device['os'] == "ios" || $device['os'] == "iosxe")
 {
-  if ($interface['ifTrunk']) {
-    echo("<span class=box-desc><span class=red>" . $interface['ifTrunk'] . "</span></span>");
-  } elseif ($interface['ifVlan']) {
-    echo("<span class=box-desc><span class=blue>VLAN " . $interface['ifVlan'] . "</span></span>");
-  } elseif ($interface['ifVrf']) {
-    $vrf = dbFetchRow("SELECT * FROM vrfs WHERE vrf_id = ?", array($interface['ifVrf']));
+  if ($port['ifTrunk']) {
+    echo("<span class=box-desc><span class=red>" . $port['ifTrunk'] . "</span></span>");
+  } elseif ($port['ifVlan']) {
+    echo("<span class=box-desc><span class=blue>VLAN " . $port['ifVlan'] . "</span></span>");
+  } elseif ($port['ifVrf']) {
+    $vrf = dbFetchRow("SELECT * FROM vrfs WHERE vrf_id = ?", array($port['ifVrf']));
     echo("<span style='color: green;'>" . $vrf['vrf_name'] . "</span>");
   }
 }
@@ -112,18 +112,18 @@ if ($port_adsl['adslLineCoding'])
   echo("SNR:".$port_adsl['adslAtucCurrSnrMgn'] . "dB/". $port_adsl['adslAturCurrSnrMgn']. "dB");
 } else {
   echo("</td><td width=150>");
-  if ($interface['ifType'] && $interface['ifType'] != "") { echo("<span class=box-desc>" . fixiftype($interface['ifType']) . "</span>"); } else { echo("-"); }
+  if ($port['ifType'] && $port['ifType'] != "") { echo("<span class=box-desc>" . fixiftype($port['ifType']) . "</span>"); } else { echo("-"); }
   echo("<br />");
   if ($ifHardType && $ifHardType != "") { echo("<span class=box-desc>" . $ifHardType . "</span>"); } else { echo("-"); }
   echo("</td><td width=150>");
-  if ($interface['ifPhysAddress'] && $interface['ifPhysAddress'] != "") { echo("<span class=box-desc>" . formatMac($interface['ifPhysAddress']) . "</span>"); } else { echo("-"); }
+  if ($port['ifPhysAddress'] && $port['ifPhysAddress'] != "") { echo("<span class=box-desc>" . formatMac($port['ifPhysAddress']) . "</span>"); } else { echo("-"); }
   echo("<br />");
-  if ($interface['ifMtu'] && $interface['ifMtu'] != "") { echo("<span class=box-desc>MTU " . $interface['ifMtu'] . "</span>"); } else { echo("-"); }
+  if ($port['ifMtu'] && $port['ifMtu'] != "") { echo("<span class=box-desc>MTU " . $port['ifMtu'] . "</span>"); } else { echo("-"); }
 }
 
 echo("</td>");
 echo("<td width=375 valign=top class=interface-desc>");
-if (strpos($interface['label'], "oopback") === false && !$graph_type)
+if (strpos($port['label'], "oopback") === false && !$graph_type)
 {
   foreach(dbFetchRows("SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_interface_id = ? AND L.remote_interface_id = I.interface_id AND I.device_id = D.device_id", array($if_id)) as $link)
   {
@@ -137,7 +137,7 @@ if (strpos($interface['label'], "oopback") === false && !$graph_type)
 
   if ($port_details)
   { ## Show which other devices are on the same subnet as this interface
-    foreach (dbFetchRows("SELECT `ipv4_network_id` FROM `ipv4_addresses` WHERE `interface_id` = ? AND `ipv4_address` NOT LIKE '127.%'", array($interface['interface_id'])) as $net)
+    foreach (dbFetchRows("SELECT `ipv4_network_id` FROM `ipv4_addresses` WHERE `interface_id` = ? AND `ipv4_address` NOT LIKE '127.%'", array($port['interface_id'])) as $net)
     {
       $ipv4_network_id = $net['ipv4_network_id'];
       $sql = "SELECT I.interface_id FROM ipv4_addresses AS A, ports AS I, devices AS D
@@ -157,7 +157,7 @@ if (strpos($interface['label'], "oopback") === false && !$graph_type)
       }
     }
 
-    foreach (dbFetchRows("SELECT ipv6_network_id FROM ipv6_addresses WHERE interface_id = ?", array($interface['interface_id'])) as $net)
+    foreach (dbFetchRows("SELECT ipv6_network_id FROM ipv6_addresses WHERE interface_id = ?", array($port['interface_id'])) as $net)
     {
       $ipv6_network_id = $net['ipv6_network_id'];
       $sql = "SELECT I.interface_id FROM ipv6_addresses AS A, ports AS I, devices AS D
@@ -197,7 +197,7 @@ if (strpos($interface['label'], "oopback") === false && !$graph_type)
 #     unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 }
 
-foreach (dbFetchRows("SELECT * FROM `pseudowires` WHERE `interface_id` = ?", array($interface['interface_id'])) as $pseudowire)
+foreach (dbFetchRows("SELECT * FROM `pseudowires` WHERE `interface_id` = ?", array($port['interface_id'])) as $pseudowire)
 {
 #`interface_id`,`peer_device_id`,`peer_ldp_id`,`cpwVcID`,`cpwOid`
   $pw_peer_dev = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($pseudowire['peer_device_id']));
@@ -208,20 +208,20 @@ foreach (dbFetchRows("SELECT * FROM `pseudowires` WHERE `interface_id` = ?", arr
   $br = "<br />";
 }
 
-foreach(dbFetchRows("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?", array($interface['ifIndex'], $device['device_id'])) as $member)
+foreach(dbFetchRows("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $member)
 {
   echo("$br<img src='images/16/brick_link.png' align=absmiddle> <strong>" . generate_port_link($member) . " (PAgP)</strong>");
   $br = "<br />";
 }
 
-if ($interface['pagpGroupIfIndex'] && $interface['pagpGroupIfIndex'] != $interface['ifIndex'])
+if ($port['pagpGroupIfIndex'] && $port['pagpGroupIfIndex'] != $port['ifIndex'])
 {
-  $parent = dbFetchRow("SELECT * FROM `ports` WHERE `ifIndex` = ? and `device_id` = ?", array($interface['pagpGroupIfIndex'], $device['device_id']));
+  $parent = dbFetchRow("SELECT * FROM `ports` WHERE `ifIndex` = ? and `device_id` = ?", array($port['pagpGroupIfIndex'], $device['device_id']));
   echo("$br<img src='images/16/bricks.png' align=absmiddle> <strong>" . generate_port_link($parent) . " (PAgP)</strong>");
   $br = "<br />";
 }
 
-foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? and `device_id` = ?", array($interface['ifIndex'], $device['device_id'])) as $higher_if)
+foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $higher_if)
 {
   if($higher_if['interface_id_high']) 
   {
@@ -231,7 +231,7 @@ foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? an
   }
 }
 
-foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_high` = ? and `device_id` = ?", array($interface['ifIndex'], $device['device_id'])) as $lower_if)
+foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_high` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $lower_if)
 {
   if($lower_if['interface_id_low'])
   {
@@ -251,9 +251,9 @@ echo("</td></tr>");
 
 if ($graph_type == "etherlike")
 {
-  $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-". safename($interface['ifIndex']) . "-dot3.rrd";
+  $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-". safename($port['ifIndex']) . "-dot3.rrd";
 } else {
-  $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-". safename($interface['ifIndex']) . ".rrd";
+  $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-". safename($port['ifIndex']) . ".rrd";
 }
 
 if ($graph_type && is_file($graph_file))

@@ -1,7 +1,11 @@
 <?php
 
-### Sections are printed in the order they exist in $config['graph_sections']
+### Sections are printed in the order they exist in $config['graph_tabs']
 ### Graphs are printed in the order they exist in $config['graph_types']
+
+$link_array = array('page'    => 'device',
+                    'device'  => $device['device_id'],
+                    'tab' => 'graphs');
 
 $bg="#ffffff";
 
@@ -15,15 +19,15 @@ $sep = "";
 
 foreach (dbFetchRows("SELECT * FROM device_graphs WHERE device_id = ?", array($device['device_id'])) as $graph)
 {
-  $section = $config['graph_types']['device'][$graph['graph']]['section'];
-  $graph_enable[$section][$graph['graph']] = $graph['graph'];
+  $tab = $config['graph_types']['device'][$graph['graph']]['tab'];
+  $graph_enable[$tab][$graph['graph']] = $graph['graph'];
 }
 
-foreach ($config['graph_sections'] as $section)
+foreach ($config['graph_tabs'] as $tab)
 {
-  if (isset($graph_enable) && is_array($graph_enable[$section]))
+  if (isset($graph_enable) && is_array($graph_enable[$tab]))
   {
-    $type = strtolower($section);
+    $type = strtolower($tab);
     if (!$_GET['optc']) { $_GET['optc'] = $type; }
     echo($sep);
     if ($_GET['optc'] == $type)
