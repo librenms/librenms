@@ -2,10 +2,10 @@
 
 echo("Storage : ");
 
-global $valid_storage;
+### Include all discovery modules
 
-include_dir("includes/discovery/storage");
-
+$include_dir = "includes/discovery/storage";
+include("includes/include-dir.inc.php");
 
 ### Remove storage which weren't redetected here
 

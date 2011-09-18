@@ -2,9 +2,10 @@
 
 echo("Memory : ");
 
-global $valid_mempool; ## FIXME PLEASE!
+### Include all discovery modules
 
-include_dir("includes/discovery/mempools");
+$include_dir = "includes/discovery/mempools";
+include("includes/include-dir.inc.php");
 
 ### Remove memory pools which weren't redetected here
 

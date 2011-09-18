@@ -1,7 +1,5 @@
 <?php
 
-global $valid_mempool;
-
 if ($device['os'] == "ironware" || $device['os_type'] == "ironware")
 {
   echo("Ironware Dynamic: ");

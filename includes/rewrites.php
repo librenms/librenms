@@ -766,6 +766,7 @@ $rewrite_ios_features = array(
 
   $rewrite_shortif = array (
     'tengigabitethernet' => 'Te',
+    'tengige' => 'Te',
     'gigabitethernet' => 'Gi',
     'fastethernet' => 'Fa',
     'ethernet' => 'Et',
@@ -779,6 +780,7 @@ $rewrite_ios_features = array(
     'vlan' => 'Vlan',
     'tunnel' => 'Tunnel',
     'serviceinstance' => 'SI',
+    'dwdm' => 'DWDM',
   );
 
   $rewrite_iftype = array (
@@ -841,7 +843,7 @@ function makeshortif($if)
   $if = fixifName ($if);
   $if = strtolower($if);
   $if = array_str_replace($rewrite_shortif, $if);
-
+  $if = ucfirst($if);
   return $if;
 }
 

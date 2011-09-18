@@ -23,6 +23,8 @@ function poll_sensor($device, $class, $unit)
       $sensor_value = snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
     }
 
+    if($sensor_value == -32768) { echo("Invalid (-32768) "); $sensor_value = 0; }
+
     if ($sensor['sensor_divisor'])    { $sensor_value = $sensor_value / $sensor['sensor_divisor']; }
     if ($sensor['sensor_multiplier']) { $sensor_value = $sensor_value * $sensor['sensor_multiplier']; }
 

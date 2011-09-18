@@ -2,7 +2,10 @@
 
 echo("Power: ");
 
-include_dir("includes/discovery/power");
+### Include all discovery modules
+
+$include_dir = "includes/discovery/power";
+include("includes/include-dir.inc.php");
 
 if ($debug) { print_r($valid['sensor']['power']); }
 
