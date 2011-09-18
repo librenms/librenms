@@ -5,8 +5,6 @@ function rrdtool_graph($graph_file, $options)
 
   global $config, $debug;
 
-  if($debug) { echo("$options"); }
-
   if ($config['rrdcached'])
   {
     $command = $config['rrdtool'] . " --daemon " . $config['rrdcached'] . " -";
@@ -31,8 +29,6 @@ function rrdtool_graph($graph_file, $options)
     // 1 => readable handle connected to child stdout
     // Any error output will be appended to /tmp/error-output.txt
 
-#    echo (strlen("graph $graph_file $options"));
-
     fwrite($pipes[0], "graph $graph_file $options");
     fclose($pipes[0]);
     fclose($pipes[1]);
@@ -40,7 +36,15 @@ function rrdtool_graph($graph_file, $options)
     // It is important that you close any pipes before calling
     // proc_close in order to avoid a deadlock
     $return_value = proc_close($process);
-#   echo "command returned $return_value\n";
+
+    if($debug) 
+    {
+        echo("<p>");
+        if($debug) { echo("graph $graph_file $options"); }
+        echo("</p><p>");
+        echo "command returned $return_value\n";
+        echo("</p>");
+    }
   }
 }
 
