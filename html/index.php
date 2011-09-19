@@ -303,6 +303,14 @@ echo('</div>');
 
 <script class="content_tooltips" type="text/javascript">
 $(document).ready(function() { $('#content a[title]').qtip({ content: { text: false }, style: 'light' }); });
+
+$('INPUT.auto-hint, TEXTAREA.auto-hint').focus(function(){
+    if($(this).val() == $(this).attr('title')){
+        $(this).val('');
+        $(this).removeClass('auto-hint');
+    }
+});
+
 </script>
 
 </body>
