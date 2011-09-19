@@ -11,9 +11,9 @@ echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "<
 echo('<td class="list-bold">');
 foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVrf` = ?", array($device['device_id'], $vrf['vrf_id'])) as $port)
 {
-  if ($_GET['optb'] == "graphs")
+  if ($vars['view'] == "graphs")
   {
-    $graph_type = "port_" . $_GET['optc'];
+    $graph_type = "port_" . $vars['graph'];
     echo("<div style='display: block; padding: 2px; margin: 2px; min-width: 139px; max-width:139px; min-height:85px; max-height:85px; text-align: center; float: left; background-color: #e9e9e9;'>
     <div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>
     <a href='device/".$device['device_id']."/port/".$port['interface_id']."/' onmouseover=\"return overlib('\

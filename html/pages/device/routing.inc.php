@@ -1,5 +1,9 @@
 <?php
 
+$link_array = array('page'    => 'device',
+                    'device'  => $device['device_id'],
+                    'tab'     => 'routing');
+
 #$type_text['overview'] = "Overview";
 $type_text['ipsec_tunnels'] = "IPSEC Tunnels";
 $type_text['bgp'] = "BGP";
@@ -15,25 +19,25 @@ unset($sep);
 foreach ($routing_tabs as $type)
 {
 
-  if (!$_GET['optc']) { $_GET['optc'] = $type; }
+  if (!$vars['proto']) { $vars['proto'] = $type; }
 
   echo($sep);
 
-  if ($_GET['optc'] == $type)
+  if ($vars['proto'] == $type)
   {
     echo('<span class="pagemenu-selected">');
   }
 
-  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/routing/" . $type . "/'> " . $type_text[$type] ." (".$device_routing_count[$type].")</a>");
-  if ($_GET['optc'] == $type) { echo("</span>"); }
+  echo(generate_link($type_text[$type] ." (".$device_routing_count[$type].")",$link_array,array('proto'=>$type)));
+  if ($vars['proto'] == $type) { echo("</span>"); }
   $sep = " | ";
 }
 
 print_optionbar_end();
 
-if (is_file("pages/device/routing/".mres($_GET['optc']).".inc.php"))
+if (is_file("pages/device/routing/".mres($vars['proto']).".inc.php"))
 {
-   include("pages/device/routing/".mres($_GET['optc']).".inc.php");
+   include("pages/device/routing/".mres($vars['proto']).".inc.php");
 } else {
   foreach ($routing_tabs as $type)
   {
