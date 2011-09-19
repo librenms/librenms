@@ -10,7 +10,7 @@ if ($config['enable_printers'])
 
     # FIXME poll capacity maybe also here, when toner is replaced capacity can change, leading to "154% of toner"
 
-    $tonerperc = snmp_get($device, $toner['toner_oid'], "-OUqnv") / $toner['toner_capacity'] * 100;
+    $tonerperc = round(snmp_get($device, $toner['toner_oid'], "-OUqnv") / $toner['toner_capacity'] * 100);
 
     $old_tonerrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_descr'] . ".rrd");
     $tonerrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_index'] . ".rrd");
