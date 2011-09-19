@@ -1,23 +1,31 @@
 <?php
 
 ## Generate a list of ports and then call the multi_bits grapher to generate from the list
-
-foreach(dbFetchRows("SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_type` = 'cust' AND `port_descr_descr` = ? AND D.device_id = I.device_id", array($_GET['id'])) as $int)
+$i=0;
+foreach(dbFetchRows("SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_type` = 'cust' AND `port_descr_descr` = ? AND D.device_id = I.device_id", array($id)) as $port)
 {
-  if (is_file($config['rrd_dir'] . "/" . $int['hostname'] . "/port-" . safename($int['ifIndex'] . ".rrd")))
+  if (is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd")))
   {
-    $rrd_filenames[] = $config['rrd_dir'] . "/" . $int['hostname'] . "/port-" . safename($int['ifIndex'] . ".rrd");
+    $rrd_filename = $config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = $port['hostname'] ."-". $port['ifDescr'];
+    $i++;
   }
 }
+
+#echo($config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd"));
+
+$units ='bps';
+$total_units ='B';
+$colours_in ='greens';
+$multiplier = "8";
+$colours_out = 'blues';
+
+$nototal = 1;
 
 $rra_in  = "INOCTETS";
 $rra_out = "OUTOCTETS";
 
-$colour_line_in = "006600";
-$colour_line_out = "000099";
-$colour_area_in = "CDEB8B";
-$colour_area_out = "C3D9FF";
-
-include("includes/graphs/generic_multi_bits.inc.php");
+include("includes/graphs/generic_multi_bits_separated.inc.php");
 
 ?>
