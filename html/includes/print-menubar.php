@@ -353,33 +353,49 @@ $menu_sensors = $used_sensors;
             <div class="col_1">
 
 <ul>
-        <li><a href="health/mempool/"><img src="images/icons/memory.png" border="0" align="absmiddle" /> Memory</a></li>
-        <li><a href="health/processor/"><img src="images/icons/processor.png" border="0" align="absmiddle" /> Processor</a></li>
-        <li><a href="health/storage/"><img src="images/icons/storage.png" border="0" align="absmiddle" /> Storage</a></li>
+        <li><a href="health/metric=mempool/"><img src="images/icons/memory.png" border="0" align="absmiddle" /> Memory</a></li>
+        <li><a href="health/metric=processor/"><img src="images/icons/processor.png" border="0" align="absmiddle" /> Processor</a></li>
+        <li><a href="health/metric=storage/"><img src="images/icons/storage.png" border="0" align="absmiddle" /> Storage</a></li>
 <?php
 if ($menu_sensors)
 {
   $sep = 0;
-  echo('<li><hr width="140" /></li>');
+  echo('<li><hr width="97%" /></li>');
 }
 
 foreach (array('fanspeed','humidity','temperature') as $item)
 {
   if ($menu_sensors[$item])
   {
-    echo ('<li><a href="health/'.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
+    echo ('<li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
     unset($menu_sensors[$item]);$sep++;
   }
 }
 
 if ($sep)
 {
-  echo('<li><hr width="140" /></li>');
+  echo('<li><hr width="97%" /></li>');
   $sep = 0;
 }
+
+foreach (array('current','frequency','power','voltage') as $item)
+{
+  if ($menu_sensors[$item])
+  {
+    echo ('<li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
+    unset($menu_sensors[$item]);$sep++;
+  }
+}
+
+if ($sep && array_keys($menu_sensors))
+{
+  echo('<li><hr width="97%" /></li>');
+  $sep = 0;
+}
+
 foreach (array_keys($menu_sensors) as $item)
 {
-  echo ('<li><a href="health/'.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
+  echo ('<li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
   unset($menu_sensors[$item]);$sep++;
 }
 

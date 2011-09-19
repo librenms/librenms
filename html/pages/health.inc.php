@@ -65,14 +65,14 @@ if ($vars['view'] == "graphs")
 
 echo(' | ');
 
-if ($vars['view'] == "nographs")
+if ($vars['view'] != "graphs")
 {
   echo('<span class="pagemenu-selected">');
 }
 
 echo(generate_link("No Graphs",$link_array,array('metric'=> $vars['metric'], 'view' => "detail")));
 
-if ($vars['view'] == "nographs") 
+if ($vars['view'] != "graphs") 
 { 
   echo('</span>'); 
 }
