@@ -39,6 +39,9 @@ $config['os'][$os]['over'][0]['graph']  = "device_processor";
 $config['os'][$os]['over'][0]['text']   = "Processor Usage";
 $config['os'][$os]['over'][1]['graph']  = "device_ucd_memory";
 $config['os'][$os]['over'][1]['text']   = "Memory Usage";
+$config['os'][$os]['over'][2]['graph']  = "device_storage";
+$config['os'][$os]['over'][2]['text']   = "Storage Usage";
+
 
 
 $os = "qnap";
