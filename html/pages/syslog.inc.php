@@ -5,6 +5,7 @@
 <?php print_optionbar_start('25'); ?>
 
 <form method="post" action="">
+  <span style="font-weight: bold;">Syslog</span> &#187;
   <label><strong>Search</strong>
     <input type="text" name="string" id="string" value="<?php echo($_POST['string']); ?>" />
   </label>
