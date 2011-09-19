@@ -115,7 +115,7 @@ foreach (dbFetchRows("SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr
 
         </td>
 
-        <td width=60>
+        <td width=80>
         <label for="ignore">
         <input type=checkbox id="ignore" name="ignore" value=1 <?php if ($vars['ignore']) { echo("checked"); } ?> ></input> Ignored
         </label>
