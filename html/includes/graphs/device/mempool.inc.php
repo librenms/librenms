@@ -26,7 +26,7 @@ foreach(dbFetchRows("SELECT * FROM `mempools` where `device_id` = ?", array($id)
     $rrd_options .= " DEF:mempoolused$i=$rrd_filename:used:AVERAGE ";
     $rrd_options .= " CDEF:mempooltotal$i=mempoolused$i,mempoolused$i,mempoolfree$i,+,/,100,* ";
 
-    $rrd_optionsb .= " AREA:mempooltotal$i#" . $colour . "10";
+    $rrd_options .= " AREA:mempooltotal$i#" . $colour . "10";
 
     $rrd_optionsb .= " LINE1:mempooltotal$i#" . $colour . ":'" . $descr . "' ";
     $rrd_optionsb .= " GPRINT:mempooltotal$i:MIN:%3.0lf%%";

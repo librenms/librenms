@@ -3,47 +3,55 @@
 </div>
 
 <?php
+
+$link_array = array('page'    => 'device',
+                    'device'  => $device['device_id'],
+                    'tab'     => 'routing',
+                    'proto'   => 'bgp');
+
+if(!isset($vars['view'])) { $vars['view'] = "basic"; }
+
 print_optionbar_start();
 
 echo("<span style='font-weight: bold;'>BGP</span> &#187; ");
 
-if (!isset($_GET['optb'])) { echo("<span class='pagemenu-selected'>"); }
-echo("<a href='device/" . $device['device_id'] . "/routing/bgp/'>Basic</a>");
-if (!isset($_GET['optb'])) { echo("</span>"); }
+if ($vars['view'] == "basic") { echo("<span class='pagemenu-selected'>"); }
+echo(generate_link("Basic", $link_array,array('view'=>'basic')));
+if ($vars['view'] == "basic") { echo("</span>"); }
 
 echo(" | ");
 
-if ($_GET['optb'] == "updates") { echo("<span class='pagemenu-selected'>"); }
-echo("<a href='device/" . $device['device_id'] . "/routing/bgp/updates/'>Updates</a>");
-if ($_GET['optb'] == "updates") { echo("</span>"); }
+if ($vars['view'] == "updates") { echo("<span class='pagemenu-selected'>"); }
+echo(generate_link("Updates", $link_array,array('view'=>'updates')));
+if ($vars['view'] == "updates") { echo("</span>"); }
 
 echo(" | Prefixes: ");
 
-if ($_GET['optb'] == "prefixes_ipv4unicast") { echo("<span class='pagemenu-selected'>"); }
-echo("<a href='device/" . $device['device_id'] . "/routing/bgp/prefixes_ipv4unicast/'>IPv4</a>");
-if ($_GET['optb'] == "prefixes_ipv4unicast") { echo("</span>"); }
+if ($vars['view'] == "prefixes_ipv4unicast") { echo("<span class='pagemenu-selected'>"); }
+echo(generate_link("IPv4", $link_array,array('view'=>'prefixes_ipv4unicast')));
+if ($vars['view'] == "prefixes_ipv4unicast") { echo("</span>"); }
 
 echo(" | ");
 
-if ($_GET['optb'] == "prefixes_vpnv4unicast") { echo("<span class='pagemenu-selected'>"); }
-echo("<a href='device/" . $device['device_id'] . "/routing/bgp/prefixes_vpnv4unicast/'>VPNv4</a>");
-if ($_GET['optb'] == "prefixes_vpnv4unicast") { echo("</span>"); }
+if ($vars['view'] == "prefixes_vpnv4unicast") { echo("<span class='pagemenu-selected'>"); }
+echo(generate_link("VPNv4", $link_array,array('view'=>'prefixes_vpnv4unicast')));
+if ($vars['view'] == "prefixes_vpnv4unicast") { echo("</span>"); }
 
 echo(" | ");
 
-if ($_GET['optb'] == "prefixes_ipv6unicast") { echo("<span class='pagemenu-selected'>"); }
-echo("<a href='device/" . $device['device_id'] . "/routing/bgp/prefixes_ipv6unicast/'>IPv6</a>");
-if ($_GET['optb'] == "prefixes_ipv6unicast") { echo("</span>"); }
+if ($vars['view'] == "prefixes_ipv6unicast") { echo("<span class='pagemenu-selected'>"); }
+echo(generate_link("IPv6", $link_array,array('view'=>'prefixes_ipv6unicast')));
+if ($vars['view'] == "prefixes_ipv6unicast") { echo("</span>"); }
 
 echo(" | Traffic: ");
 
-if ($_GET['optb'] == "macaccounting_bits") { echo("<span class='pagemenu-selected'>"); }
-echo("<a href='device/" . $device['device_id'] . "/routing/bgp/macaccounting_bits/'>Bits</a>");
-if ($_GET['optb'] == "macaccounting_bits") { echo("</span>"); }
+if ($vars['view'] == "macaccounting_bits") { echo("<span class='pagemenu-selected'>"); }
+echo(generate_link("Bits", $link_array,array('view'=>'macaccounting_bits')));
+if ($vars['view'] == "macaccounting_bits") { echo("</span>"); }
 echo(" | ");
-if ($_GET['optb'] == "macaccounting_pkts") { echo("<span class='pagemenu-selected'>"); }
-echo("<a href='device/" . $device['device_id'] . "/routing/bgp/macaccounting_pkts/'>Packets</a>");
-if ($_GET['optb'] == "macaccounting_pkts") { echo("</span>"); }
+if ($vars['view'] == "macaccounting_pkts") { echo("<span class='pagemenu-selected'>"); }
+echo(generate_link("Packets", $link_array,array('view'=>'macaccounting_pkts')));
+if ($vars['view'] == "macaccounting_pkts") { echo("</span>"); }
 
 print_optionbar_end();
 
@@ -138,22 +146,22 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
 
   unset($invalid);
 
-  switch ($_GET['optb'])
+  switch ($vars['view'])
   {
     case 'prefixes_ipv4unicast':
     case 'prefixes_ipv4multicast':
     case 'prefixes_ipv4vpn':
     case 'prefixes_ipv6unicast':
     case 'prefixes_ipv6multicast':
-      list(,$afisafi) = explode("_", $_GET['optb']);
+      list(,$afisafi) = explode("_", $vars['view']);
       if (isset($peer['afisafi'][$afisafi])) { $peer['graph'] = 1; }
       # FIXME no break??
     case 'updates':
-      $graph_array['type']   = "bgp_" . $_GET['optb'];
+      $graph_array['type']   = "bgp_" . $vars['view'];
       $graph_array['id']     = $peer['bgpPeer_id'];
   }
 
-  switch ($_GET['optb'])
+  switch ($vars['view'])
   {
     case 'macaccounting_bits':
     case 'macaccounting_pkts':
@@ -163,11 +171,11 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
       {
         $peer['graph']       = 1;
         $graph_array['id']   = $acc['ma_id'];
-        $graph_array['type'] = $_GET['optb'];
+        $graph_array['type'] = $vars['view'];
       }
   }
 
-  if ($_GET['optb'] == 'updates') { $peer['graph'] = 1; }
+  if ($vars['view'] == 'updates') { $peer['graph'] = 1; }
 
   if($peer['graph'])
   {

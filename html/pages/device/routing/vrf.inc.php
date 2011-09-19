@@ -1,8 +1,20 @@
 <?php
 
+$link_array = array('page'    => 'device',
+                    'device'  => $device['device_id'],
+                    'tab'     => 'routing',
+                    'proto'   => 'vrf');
+
+#echo(generate_link("Basic", $link_array,array('view'=>'basic')));
+
+if(!isset($vars['view'])) { $vars['view'] = "basic"; }
+
 print_optionbar_start();
 
+echo("<span style='font-weight: bold;'>VRFs</span> &#187; ");
+
 $menu_options = array('basic' => 'Basic',
+#                      'detail' => 'Detail',
                       );
 
 if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
@@ -10,10 +22,9 @@ if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
-  if ($_GET['optb'] == $option) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="device/' . $device['device_id'] . '/routing/vrf/' . $option . '/">' . $text
- . '</a>');
-  if ($_GET['optb'] == $option) { echo("</span>"); }
+  if ($vars['view'] == $option) { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link($text, $link_array,array('view'=>$option)));
+  if ($vars['view'] == $option) { echo("</span>"); }
   echo(" | ");
 }
 
@@ -30,14 +41,14 @@ $graph_types = array("bits" => "Bits",
 foreach ($graph_types as $type => $descr)
 {
   echo("$type_sep");
-  if ($_GET['optc'] == $type) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="device/' . $device['device_id'] . '/routing/vrf/graphs/'.$type.'/">'.$descr.'</a>');
-  if ($_GET['optc'] == $type) { echo("</span>"); }
+  if ($vars['graph'] == $type) { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link($descr, $link_array,array('view'=>'graphs','graph'=>$type)));
+  if ($vars['graph'] == $type) { echo("</span>"); }
 
 #  echo('(');
-#  if ($_GET['optb'] == $type) { echo("<span class='pagemenu-selected'>"); }
+#  if ($vars['view'] == $type) { echo("<span class='pagemenu-selected'>"); }
 #  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/vrfs/'.$type.'/thumbs/">Mini</a>');
-#  if ($_GET['optb'] == $type) { echo("</span>"); }
+#  if ($vars['view'] == $type) { echo("</span>"); }
 #  echo(')');
   $type_sep = " | ";
 }

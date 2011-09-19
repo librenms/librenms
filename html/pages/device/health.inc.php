@@ -40,11 +40,6 @@ $type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
 $type_text['power'] = "Power";
 
-$link_array = array('page'    => 'device',
-                    'device'  => $device['device_id'],
-                    'tab' => 'health');
-
-
 print_optionbar_start();
 
 echo("<span style='font-weight: bold;'>Health</span> &#187; ");
