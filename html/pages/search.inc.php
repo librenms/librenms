@@ -2,7 +2,7 @@
 
 $sections = array('ipv4' => 'IPv4 Address', 'ipv6' => 'IPv6 Address', 'mac' => 'MAC Address');
 
-if (!$_GET['opta']) { $_GET['opta'] = "ipv4"; }
+if (!isset($vars['search'])) { $vars['search'] = "ipv4"; }
 
 print_optionbar_start('', '');
 
@@ -12,14 +12,15 @@ unset($sep);
 foreach ($sections as $type => $texttype)
 {
   echo($sep);
-  if ($_GET['opta'] == $type)
+  if ($vars['search'] == $type)
   {
     echo("<span class='pagemenu-selected'>");
   }
 
-  echo('<a href="search/' . $type . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $texttype .'</a>');
+#  echo('<a href="search/' . $type . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $texttype .'</a>');
+  echo(generate_link($texttype, array('page'=>'search','search'=>$type)));
 
-  if ($_GET['opta'] == $type) { echo("</span>"); }
+  if ($vars['search'] == $type) { echo("</span>"); }
 
   $sep = ' | ';
 }
@@ -27,12 +28,12 @@ unset ($sep);
 
 print_optionbar_end('', '');
 
-switch ($_GET['opta'])
+switch ($vars['search'])
 {
   case 'ipv4':
   case 'ipv6':
   case 'mac':
-    include('pages/search/'.$_GET['opta'].'.inc.php');
+    include('pages/search/'.$vars['search'].'.inc.php');
     break;
   default:
     echo("<h2>Error. Please report this to observium developers.</h2>");

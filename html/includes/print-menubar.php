@@ -30,35 +30,33 @@ foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
 }
 ?>
 
-<ul id="menium">  
-  
-    <li><a href="overview/" class="drop"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a><!-- Begin Home Item -->  
-  
+<ul id="menium">
+
+    <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="drop"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a>
         <div class="dropdown_1column">
-  
-            <div class="col_1">  
+            <div class="col_1">
         <ul>
         <?php if (isset($config['enable_map']) && $config['enable_map']) {
-          echo('<li><a href="map/"><img src="images/16/map.png" border="0" align="absmiddle" /> Network Map</a></li>');
+          echo('<li><a href="'.generate_url(array('page'=>'overview')).'"><img src="images/16/map.png" border="0" align="absmiddle" /> Network Map</a></li>');
         } ?>
-        <li><a href="eventlog/"><img src="images/16/report.png" border="0" align="absmiddle" /> Eventlog</a></li>
+        <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><img src="images/16/report.png" border="0" align="absmiddle" /> Eventlog</a></li>
   <?php if (isset($config['enable_syslog']) && $config['enable_syslog']) {
-      echo('<li><a href="syslog/"><img src="images/16/page.png" border="0" align="absmiddle" /> Syslog</a></li>');
+      echo('<li><a href="'.generate_url(array('page'=>'syslog')).'"><img src="images/16/page.png" border="0" align="absmiddle" /> Syslog</a></li>');
   } ?>
-<!--        <li><a href="alerts/"><img src="images/16/exclamation.png" border="0" align="absmiddle" /> Alerts</a></li> -->
-        <li><a href="inventory/"><img src="images/16/bricks.png" border="0" align="absmiddle" /> Inventory</a></li>
-        </ul>              
-            </div>  
+<!--        <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><img src="images/16/exclamation.png" border="0" align="absmiddle" /> Alerts</a></li> -->
+        <li><a href="<?php echo(generate_url(array('page'=>'inventory'))); ?>"><img src="images/16/bricks.png" border="0" align="absmiddle" /> Inventory</a></li>
+        </ul>
+            </div>
 
             <div class="col_1">
 	      <h3>Search</h3>
             </div>
-  
+
             <div class="col_1">
         <ul>
-          <li><a href="search/ipv4/"><img src="images/icons/ipv4.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
-          <li><a href="search/ipv6/"><img src="images/icons/ipv6.png" border="0" align="absmiddle" /> IPv6 Search</a></li>
-          <li><a href="search/mac/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> MAC Search</a></li>
+          <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv4'))); ?>"><img src="images/icons/ipv4.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
+          <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv6'))); ?>"><img src="images/icons/ipv6.png" border="0" align="absmiddle" /> IPv6 Search</a></li>
+          <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'mac'))); ?>"><img src="images/16/email_link.png" border="0" align="absmiddle" /> MAC Search</a></li>
         </ul>
             </div>
 
@@ -83,8 +81,6 @@ foreach ($config['device_types'] as $devtype)
 }
 
 ?>
-        <li><hr width="140" /></li>
-        <li><a href="devices/alerted/"><img src="images/icons/alerts.png" border="0" align="absmiddle" /> Alerts (<?php echo($device_alerts) ?>)</a></li>
 <?php
 if ($_SESSION['userlevel'] >= '10') {
   echo('
@@ -128,29 +124,27 @@ $(document).ready(function(){
   );
 });
 </script>
-
-
       </div>
 
-    </li><!-- End 5 columns Item -->  
+    </li><!-- End 5 columns Item -->
 
 <?php
 
 if ($config['show_services'])
 {
 ?>
-  
-    <li><a href="services/" class="drop"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services</a><!-- Begin 4 columns Item -->  
-  
-        <div class="dropdown_4columns"><!-- Begin 4 columns container -->  
-  
-            <div class="col_1">  
+
+    <li><a href="services/" class="drop"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services</a><!-- Begin 4 columns Item -->
+
+        <div class="dropdown_4columns"><!-- Begin 4 columns container -->
+
+            <div class="col_1">
 <ul>
         <li><a href="services/"><img src="images/16/cog.png" border="0" align="absmiddle" /> All Services </a></li>
 
 <?php if ($service_alerts) {
 echo('  <li><hr width=140 /></li>
-        <li><a href="services/?status=0"><img src="images/16/cog_error.png" border="0" align="absmiddle" /> Alerts ('.$service_alerts.')</a></li>');
+        <li><a href="services/status=0/"><img src="images/16/cog_error.png" border="0" align="absmiddle" /> Alerts ('.$service_alerts.')</a></li>');
 } ?>
 
 <?php
@@ -161,8 +155,8 @@ if ($_SESSION['userlevel'] >= '10') {
         <li><a href="delsrv/"><img src="images/16/cog_delete.png" border="0" align="absmiddle" /> Delete Service</a></li>');
 }
 ?>
-        </ul>            
-        </div>  
+        </ul>
+        </div>
 
        <div id="services_chart" class="col_3" style="height: 300px";>
        </div>
