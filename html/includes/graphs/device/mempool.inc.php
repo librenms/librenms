@@ -25,13 +25,18 @@ foreach(dbFetchRows("SELECT * FROM `mempools` where `device_id` = ?", array($id)
     $rrd_options .= " DEF:mempoolfree$i=$rrd_filename:free:AVERAGE ";
     $rrd_options .= " DEF:mempoolused$i=$rrd_filename:used:AVERAGE ";
     $rrd_options .= " CDEF:mempooltotal$i=mempoolused$i,mempoolused$i,mempoolfree$i,+,/,100,* ";
-    $rrd_options .= " LINE1:mempooltotal$i#" . $colour . ":'" . $descr . "' ";
-    $rrd_options .= " GPRINT:mempooltotal$i:MIN:%3.0lf%%";
-    $rrd_options .= " GPRINT:mempooltotal$i:LAST:%3.0lf%%";
-    $rrd_options .= " GPRINT:mempooltotal$i:MAX:%3.0lf%%\\\l ";
+
+    $rrd_optionsb .= " AREA:mempooltotal$i#" . $colour . "10";
+
+    $rrd_optionsb .= " LINE1:mempooltotal$i#" . $colour . ":'" . $descr . "' ";
+    $rrd_optionsb .= " GPRINT:mempooltotal$i:MIN:%3.0lf%%";
+    $rrd_optionsb .= " GPRINT:mempooltotal$i:LAST:%3.0lf%%";
+    $rrd_optionsb .= " GPRINT:mempooltotal$i:MAX:%3.0lf%%\\\l ";
     $iter++; $i++;
   }
 }
+
+$rrd_options .= $rrd_optionsb;
 
 $rrd_options .= " HRULE:0#999999";
 

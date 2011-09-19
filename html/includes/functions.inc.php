@@ -5,6 +5,8 @@ function rrdtool_graph($graph_file, $options)
 
   global $config, $debug;
 
+  if($debug) { echo("$options"); }
+
   if ($config['rrdcached'])
   {
     $command = $config['rrdtool'] . " --daemon " . $config['rrdcached'] . " -";
