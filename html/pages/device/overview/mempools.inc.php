@@ -16,12 +16,12 @@ if (count($mempools))
   foreach($mempools as $mempool)
   {
     if (is_integer($mempool_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-    $perc = round($mempool['mempool_perc'],0);
+    $percent= round($mempool['mempool_perc'],0);
     $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
     $total = formatStorage($mempool['mempool_total']);
     $used = formatStorage($mempool['mempool_used']);
     $free = formatStorage($mempool['mempool_free']);
-    $background = get_percentage_colours($perc);
+    $background = get_percentage_colours($percent);
 
     $graph_array           = array();
     $graph_array['height'] = "100";

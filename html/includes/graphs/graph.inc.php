@@ -84,16 +84,17 @@ else
 
 function graph_error($string)
 {
-  global $config, $width, $height, $debug, $graphfile, $rrd_options, $rrd_switches;
+  global $_GET, $config, $debug, $graphfile;
 
-  #$rrd_options .= " HRULE:0#cc0000";
-  #$rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
+  $_GET['bg'] = "FFBBBB";
 
-  echo(rrdtool_graph($graphfile, " --title='".$string."'  -l 0 -u 100 -E --start -10y --end now --width $width --height $height -c BACK#ff9999cc -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal --font LEGEND:8:DejaVuSansMono --font AXIS:7:DejaVuSansMono --font-render-mode normal HRULE:0#cc0000"));
+  include("includes/graphs/common.inc.php");
+  $rrd_options .= " HRULE:0#555555";
+  $rrd_options .= " --title='".$string."'";
+
+  rrdtool_graph($graphfile, $rrd_options);
 
   if ($height > "99")  {
-    #$rrd_cmd .= " --only-graph"; }
-
     $woo = shell_exec($rrd_cmd);
     if ($debug) { echo("<pre>".$rrd_cmd."</pre>"); }
     if (is_file($graphfile) && !$debug)

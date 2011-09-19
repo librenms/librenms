@@ -42,11 +42,11 @@ if (count($drives))
 
     if ($skipdrive) { continue; }
     if (is_integer($drive_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-    $perc  = round($drive['storage_perc'], 0);
+    $percent  = round($drive['storage_perc'], 0);
     $total = formatStorage($drive['storage_size']);
     $free = formatStorage($drive['storage_free']);
     $used = formatStorage($drive['storage_used']);
-    $background = get_percentage_colours($perc);
+    $background = get_percentage_colours($percent);
 
     $graph_array           = array();
     $graph_array['height'] = "100";
@@ -69,7 +69,7 @@ if (count($drives))
     $minigraph =  generate_graph_tag($graph_array);
 
     echo("<tr bgcolor=$row_colour>
-           <td class=tablehead>".overlib_link($link, $text_descr, $overlib_content)."</td>
+           <td class=tablehead>".overlib_link($link, $drive['storage_descr'], $overlib_content)."</td>
            <td width=90>".overlib_link($link, $minigraph, $overlib_content)."</td>
            <td width=200>".overlib_link($link, print_percentage_bar (200, 20, $percent, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right']), $overlib_content)."
            </a></td>
