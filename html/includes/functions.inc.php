@@ -7,12 +7,7 @@ function rrdtool_graph($graph_file, $options)
 
   if($debug) { echo("$options"); }
 
-  if ($config['rrdcached'])
-  {
-    $command = $config['rrdtool'] . " --daemon " . $config['rrdcached'] . " -";
-  } else {
-    $command = $config['rrdtool'] . " -";
-  }
+  $command = $config['rrdtool'] . " -";
 
   $descriptorspec = array(
      0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
@@ -31,7 +26,12 @@ function rrdtool_graph($graph_file, $options)
     // 1 => readable handle connected to child stdout
     // Any error output will be appended to /tmp/error-output.txt
 
-    fwrite($pipes[0], "graph $graph_file $options");
+    if ($config['rrdcached']) {
+      fwrite($pipes[0], "graph --daemon " . $config['rrdcached'] . " $graph_file $options");
+    } else {
+      fwrite($pipes[0], "graph $graph_file $options");
+    }
+
     fclose($pipes[0]);
     fclose($pipes[1]);
 
