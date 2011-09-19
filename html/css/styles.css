@@ -576,7 +576,7 @@ a:active { color: #00f; }
 
 .vspace { margin-top: 4px; margin-bottom: 4px; }
 p.vspace { padding-top: 3px; padding-bottom: 3px; }
-.content-mat { padding: 0px; margin: auto; }
+.content-mat { padding: 0px; margin: auto; display:block; }
 
 .clearer { clear: both; display: block; padding: 0px; height: 0px; line-height: 1px; font-size: 0px; }
 
@@ -712,10 +712,9 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   color: #aaaaaa;
 }
 
-#center {
+#container {
   width:1200px;
-  margin:0px auto 0px auto;
-
+  margin:0 auto;
 }
 
 #logo {
@@ -1236,5 +1235,24 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 .popup {
     position: absolute;
     display: none; /* keeps the popup hidden if no JS available */
+}
+
+.div-normal {
+  
+}
+.div-alert {
+  border: 2px solid; 
+  #border-radius: 10px;
+  border-color: #cc0000;
+}
+.div-ignore {
+  
+}
+.div-ignore-alert {
+
+}
+
+.div-disabled {
+
 }
 
