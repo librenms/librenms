@@ -227,7 +227,7 @@ function popUp(URL)
 // End -->
   </script>
   <script type="text/javascript" src="js/overlib.js"></script>
-  <div id="center">
+  <div id="container">
 
 <?php
 
@@ -241,9 +241,8 @@ if(!$vars['bare'] == "yes") {
 
 ?>
     <div class="clearer"></div>
-    <div class="content-mat" style="border: 1px none #fcc;">
-      <div id="content" style="border: 1px none #ccc; min-height:650px;">
-        <div style="margin: 7px;"></div>
+      <div id="content" style="min-height:650px; width:auto; display:block;">
+        <div style="clear:both; height:6px; display:block;"></div>
 <?php
 
 ### To help debug the new URLs :)
@@ -279,7 +278,6 @@ if ($_SESSION['authenticated'])
 ?>
         </div>
       <div class="clearer"></div>
-    </div>
   </div>
 <?php
 $end = utime(); $run = $end - $start;

@@ -49,8 +49,32 @@ if ($_POST['editing'])
 
 $descr  = $device['purpose'];
 
+function foldersize($path) {
+    $total_size = 0;
+    $files = scandir($path);
+    $total_files = 0;
+    foreach($files as $t) {
+        if (is_dir(rtrim($path, '/') . '/' . $t)) {
+            if ($t<>"." && $t<>"..") {
+                $size = foldersize(rtrim($path, '/') . '/' . $t);
+                $total_size += $size;
+            }
+        } else {
+            $size = filesize(rtrim($path, '/') . '/' . $t);
+            $total_size += $size;
+            $total_files++;
+        }
+    }
+    return array($total_size, $total_files);
+}
+
 $override_sysLocation_bool = get_dev_attrib($device,'override_sysLocation_bool');
 $override_sysLocation_string = get_dev_attrib($device,'override_sysLocation_string');
+
+list($sizeondisk, $numrrds) = foldersize($config['rrd_dir']."/".$device['hostname']);
+
+echo("<b>Size on Disk:" . formatStorage($sizeondisk) . " in " . $numrrds . " RRD files.</b>");
+
 
 if ($updated && $update_message)
 {
