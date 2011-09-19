@@ -402,7 +402,7 @@ function generate_port_link($args, $text = NULL, $type = NULL)
 
 function generate_port_url($port, $vars=array())
 {
-  return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'section' => 'port', 'port' => $port['interface_id']), $vars);
+  return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['interface_id']), $vars);
 }
 
 function generate_port_thumbnail($args)
