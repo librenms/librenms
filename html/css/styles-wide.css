@@ -2,6 +2,7 @@
   width: 1800px;
 }
 
-.contentstyle {
+#container {
+  margin:0 auto;
   width: 1776px;
 }
