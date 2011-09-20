@@ -8,7 +8,7 @@ echo("<table width=100% cellpadding=6 cellspacing=0>");
 $i = '1';
 foreach (dbFetchRows("SELECT * FROM `processors` WHERE device_id = ?", array($device['device_id'])) as $proc)
 {
-  $proc_url   = "device/".$device['device_id']."/health/processor/";
+  $proc_url   = "device/device=".$device['device_id']."/tab=health/metric=processor/";
 
   $mini_url = "graph.php?id=".$proc['processor_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 

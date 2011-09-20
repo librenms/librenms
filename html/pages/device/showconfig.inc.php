@@ -2,6 +2,8 @@
 
 include("includes/geshi/geshi.php");
 
+# FIXME svn stuff still using optc etc, won't work, needs updating!
+
 if ($_SESSION['userlevel'] >= "7")
 {
 
@@ -21,10 +23,10 @@ if ($_SESSION['userlevel'] >= "7")
 
   if (!$_GET['optc']) {
     echo('<span class="pagemenu-selected">');
-    echo("<a href='device/".$device['device_id']."/showconfig/'> Latest</a>");
+    echo("<a href='device/device=".$device['device_id']."/showconfig/'> Latest</a>");
     echo("</span>");
   } else {
-    echo("<a href='device/".$device['device_id']."/showconfig/'> Latest</a>");
+    echo("<a href='device/device=".$device['device_id']."/showconfig/'> Latest</a>");
   }
 
   if (function_exists('svn_log')) {
@@ -40,7 +42,7 @@ if ($_SESSION['userlevel'] >= "7")
 
       if ($_GET['optc'] == $svnlog["rev"]) { echo('<span class="pagemenu-selected">'); }
 
-      echo("<a href='device/".$device['device_id']."/showconfig/" . $svnlog["rev"] .  "/'> r" . $svnlog["rev"] ." <small>". date("d M H:i", strtotime($svnlog["date"])) . "</small></a>");
+      echo("<a href='device/device=".$device['device_id']."/showconfig/" . $svnlog["rev"] .  "/'> r" . $svnlog["rev"] ." <small>". date("d M H:i", strtotime($svnlog["date"])) . "</small></a>");
       if ($_GET['optc'] == $svnlog["rev"]) { echo("</span>");  }
 
       $sep = " | ";
