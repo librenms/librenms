@@ -85,4 +85,126 @@ function poll_sensor($device, $class, $unit)
   }
 }
 
+function poll_device($device, $options)
+{
+  global $config, $device, $polled_devices, $db_stats;
+
+  $attribs = get_dev_attribs($device['device_id']);
+
+  $status = 0; unset($array);
+  $device_start = utime();  // Start counting device poll time
+
+  echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
+  if ($config['os'][$device['os']]['group'])
+  {
+    $device['os_group'] = $config['os'][$device['os']]['group'];
+    echo("(".$device['os_group'].")");
+  }
+  echo("\n");
+
+  unset($poll_update); unset($poll_update_query); unset($poll_separator);
+  $poll_update_array = array();
+
+  $host_rrd = $config['rrd_dir'] . "/" . $device['hostname'];
+  if (!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
+
+  $device['pingable'] = isPingable($device['hostname']);
+  if ($device['pingable'])
+  {
+    $device['snmpable'] = isSNMPable($device);
+    if ($device['snmpable'])
+    {
+      $status = "1";
+    } else {
+      echo("SNMP Unreachable");
+      $status = "0";
+    }
+  } else {
+    echo("Unpingable");
+    $status = "0";
+  }
+
+  if ($device['status'] != $status)
+  {
+    $poll_update .= $poll_separator . "`status` = '$status'";
+    $poll_separator = ", ";
+
+    dbUpdate(array('status' => $status), 'devices', 'device_id=?', array($device['device_id']));
+    dbInsert(array('importance' => '0', 'device_id' => $device['device_id'], 'message' => "Device is " .($status == '1' ? 'up' : 'down')), 'alerts');
+
+    log_event('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device, ($status == '1' ? 'up' : 'down'));
+    notify($device, "Device ".($status == '1' ? 'Up' : 'Down').": " . $device['hostname'], "Device ".($status == '1' ? 'up' : 'down').": " . $device['hostname'] . " at " . date($config['timestamp_format']));
+  }
+
+  if ($status == "1")
+  {
+    $graphs = array();
+    $oldgraphs = array();
+
+    if ($options['m'])
+    {
+      if (is_file("includes/polling/".$options['m'].".inc.php"))
+      {
+        include("includes/polling/".$options['m'].".inc.php");
+      }
+    } else {
+      foreach($config['poller_modules'] as $module => $module_status)
+      {
+        if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module])))
+        {
+          include('includes/polling/'.$module.'.inc.php');
+        } elseif (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == "0") {
+          echo("Module [ $module ] disabled on host.\n");
+        } else {
+          echo("Module [ $module ] disabled globally.\n");
+        }
+      }
+    }
+
+    if (!$options['m'])
+    {
+      ## FIXME EVENTLOGGING -- MAKE IT SO WE DO THIS PER-MODULE?
+      ### This code cycles through the graphs already known in the database and the ones we've defined as being polled here
+      ### If there any don't match, they're added/deleted from the database.
+      ### Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
+
+      foreach (dbFetch("SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?", array($device['device_id'])) as $graph)
+      {
+        if (!isset($graphs[$graph["graph"]]))
+        {
+          dbDelete('device_graphs', "`device_id` = ? AND `graph` = ?", array($device['device_id'], $graph["graph"]));
+        } else {
+          $oldgraphs[$graph["graph"]] = TRUE;
+        }
+      }
+
+      foreach ($graphs as $graph => $value)
+      {
+        if (!isset($oldgraphs[$graph]))
+        {
+          dbInsert(array('device_id' => $device['device_id'], 'graph' => $graph), 'device_graphs');
+        }
+      }
+    }
+
+    $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
+
+    $update_array['last_polled'] = array('NOW()');
+    $update_array['last_polled_timetaken'] = $device_time;
+
+    #echo("$device_end - $device_start; $device_time $device_run");
+    echo("Polled in $device_time seconds\n");
+
+    if ($debug) { echo("Updating " . $device['hostname'] . " - ".print_r($update_array)." \n"); }
+
+    $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
+    if ($updated) { echo("UPDATED!\n"); }
+
+    unset($storage_cache); // Clear cache of hrStorage ** MAYBE FIXME? **
+    unset($cache); // Clear cache (unify all things here?)
+  }
+
+  $polled_devices++;
+}
+
 ?>
