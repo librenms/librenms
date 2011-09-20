@@ -15,20 +15,20 @@
 
   foreach ($entity_array as $entPhysicalIndex => $entry) {
 
-    $entPhysicalDescr		= $entry['entPhysicalDescr'];
-    $entPhysicalContainedIn	= $entry['entPhysicalContainedIn'];
-    $entPhysicalClass		= $entry['entPhysicalClass'];
-    $entPhysicalName		= $entry['entPhysicalName'];
-    $entPhysicalSerialNum	= $entry['entPhysicalSerialNum'];
-    $entPhysicalModelName	= $entry['entPhysicalModelName'];
-    $entPhysicalMfgName		= $entry['entPhysicalMfgName'];
-    $entPhysicalVendorType	= $entry['entPhysicalVendorType'];
-    $entPhysicalParentRelPos	= $entry['entPhysicalParentRelPos'];
-    $entPhysicalHardwareRev 	= $entry['entPhysicalHardwareRev'];
-    $entPhysicalFirmwareRev 	= $entry['entPhysicalFirmwareRev'];
-    $entPhysicalSoftwareRev 	= $entry['entPhysicalSoftwareRev'];
-    $entPhysicalIsFRU 		= $entry['entPhysicalIsFRU'];
-    $entPhysicalAlias     	= $entry['entPhysicalAlias'];
+    $entPhysicalDescr                = $entry['entPhysicalDescr'];
+    $entPhysicalContainedIn        = $entry['entPhysicalContainedIn'];
+    $entPhysicalClass                = $entry['entPhysicalClass'];
+    $entPhysicalName                = $entry['entPhysicalName'];
+    $entPhysicalSerialNum        = $entry['entPhysicalSerialNum'];
+    $entPhysicalModelName        = $entry['entPhysicalModelName'];
+    $entPhysicalMfgName                = $entry['entPhysicalMfgName'];
+    $entPhysicalVendorType        = $entry['entPhysicalVendorType'];
+    $entPhysicalParentRelPos        = $entry['entPhysicalParentRelPos'];
+    $entPhysicalHardwareRev         = $entry['entPhysicalHardwareRev'];
+    $entPhysicalFirmwareRev         = $entry['entPhysicalFirmwareRev'];
+    $entPhysicalSoftwareRev         = $entry['entPhysicalSoftwareRev'];
+    $entPhysicalIsFRU                 = $entry['entPhysicalIsFRU'];
+    $entPhysicalAlias             = $entry['entPhysicalAlias'];
     $entPhysicalAssetID         = $entry['entPhysicalAssetID'];
 
     if (isset($entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier'])) { $ifIndex = $entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier']; }

@@ -15,7 +15,7 @@ if ($device['os'] == "ironware" || $device['os_group'] == "ironware")
       {
         $usage_oid = ".1.3.6.1.4.1.1991.1.1.2.11.1.1.6." . $index;
         $usage = $entry['snAgentCpuUtil100thPercent'];
-	  $precision = 100;
+          $precision = 100;
       } elseif ($entry['snAgentCpuUtilValue']) {
         $usage_oid = ".1.3.6.1.4.1.1991.1.1.2.11.1.1.4." . $index;
         $usage = $entry['snAgentCpuUtilValue'];

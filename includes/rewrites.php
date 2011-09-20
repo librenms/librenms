@@ -45,7 +45,7 @@ function ifLabel ($interface, $device = NULL)
   {
     $interface['label'] = $interface['ifName'];
 
-    if($interface['ifName'] == "")
+    if ($interface['ifName'] == "")
     {
       $interface['label'] = $interface['ifDescr'];
     } else {
@@ -977,7 +977,7 @@ function rewrite_adslLineType($adslLineType)
 
   foreach($adslLineTypes as $type => $text)
   {
-    if($adslLineType == $type)
+    if ($adslLineType == $type)
     {
       $adslLineType = $text;
     }

@@ -4,7 +4,7 @@
 
 function isCli() {
 
-     if(php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
+     if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
           return true;
      } else {
           return false;
@@ -13,7 +13,7 @@ function isCli() {
 
 function print_error($text)
 {
-  if(isCli()) {
+  if (isCli()) {
     print Console_Color::convert("%r".$text."%n\n", false);
   } else {
     echo('<div class="errorbox"><img src="/images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
@@ -22,7 +22,7 @@ function print_error($text)
 
 function print_message($text)
 {
-  if(isCli()) {
+  if (isCli()) {
     print Console_Color::convert("%g".$text."%n\n", false);
   } else {
     echo('<div class="messagebox"><img src="/images/16/tick.png" align="absmiddle"> '.$text.'</div>');

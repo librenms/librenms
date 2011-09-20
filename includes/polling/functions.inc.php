@@ -8,7 +8,7 @@ function poll_sensor($device, $class, $unit)
   {
     echo("Checking $class " . $sensor['sensor_descr'] . "... ");
 
-    if($class == "temperature")
+    if ($class == "temperature")
     {
       for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
       {
@@ -23,7 +23,7 @@ function poll_sensor($device, $class, $unit)
       $sensor_value = snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
     }
 
-    if($sensor_value == -32768) { echo("Invalid (-32768) "); $sensor_value = 0; }
+    if ($sensor_value == -32768) { echo("Invalid (-32768) "); $sensor_value = 0; }
 
     if ($sensor['sensor_divisor'])    { $sensor_value = $sensor_value / $sensor['sensor_divisor']; }
     if ($sensor['sensor_multiplier']) { $sensor_value = $sensor_value * $sensor['sensor_multiplier']; }

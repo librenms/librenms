@@ -6,13 +6,13 @@
 #                 YES, THAT MEANS YOU                   #
 #########################################################
 
-$config['os']['default']['over'][0]['graph']	= "device_processor";
-$config['os']['default']['over'][0]['text']	= "Processor Usage";
-$config['os']['default']['over'][1]['graph'] 	= "device_mempool";
-$config['os']['default']['over'][1]['text']	= "Memory Usage";
+$config['os']['default']['over'][0]['graph']        = "device_processor";
+$config['os']['default']['over'][0]['text']        = "Processor Usage";
+$config['os']['default']['over'][1]['graph']         = "device_mempool";
+$config['os']['default']['over'][1]['text']        = "Memory Usage";
 
 $os_group = "unix";
-$config['os_group'][$os_group]['type']  	     = "server";
+$config['os_group'][$os_group]['type']               = "server";
 $config['os_group'][$os_group]['processor_stacked']  = 1;
 $config['os_group'][$os_group]['over'][0]['graph']  = "device_processor";
 $config['os_group'][$os_group]['over'][0]['text']   = "Processor Usage";
@@ -21,7 +21,7 @@ $config['os_group'][$os_group]['over'][1]['text']   = "Memory Usage";
 
 
 $os = "generic";
-$config['os'][$os]['text']      	= "Generic Device";
+$config['os'][$os]['text']              = "Generic Device";
 
 $os = "vyatta";
 $config['os'][$os]['text']              = "Vyatta";
@@ -32,9 +32,9 @@ $config['os'][$os]['ifname']            = 1;
 
 $os = "linux";
 $config['os'][$os]['type']              = "server";
-$config['os'][$os]['group'] 		= "unix";
-$config['os'][$os]['text']  		= "Linux";
-$config['os'][$os]['ifXmcbc']		= 1;
+$config['os'][$os]['group']                 = "unix";
+$config['os'][$os]['text']                  = "Linux";
+$config['os'][$os]['ifXmcbc']                = 1;
 $config['os'][$os]['over'][0]['graph']  = "device_processor";
 $config['os'][$os]['over'][0]['text']   = "Processor Usage";
 $config['os'][$os]['over'][1]['graph']  = "device_ucd_memory";
@@ -54,54 +54,54 @@ $config['os'][$os]['ifXmcbc']           = 1;
 
 $os = "freebsd";
 $config['os'][$os]['type']              = "server";
-$config['os'][$os]['group'] 		= "unix";
-$config['os'][$os]['text']  		= "FreeBSD";
+$config['os'][$os]['group']                 = "unix";
+$config['os'][$os]['text']                  = "FreeBSD";
 
 $os = "openbsd";
 $config['os'][$os]['type']              = "server";
-$config['os'][$os]['group'] 		= "unix";
-$config['os'][$os]['text']  		= "OpenBSD";
+$config['os'][$os]['group']                 = "unix";
+$config['os'][$os]['text']                  = "OpenBSD";
 
 $os = "netbsd";
 $config['os'][$os]['type']              = "server";
-$config['os'][$os]['group'] 		= "unix";
-$config['os'][$os]['text']  		= "NetBSD";
+$config['os'][$os]['group']                 = "unix";
+$config['os'][$os]['text']                  = "NetBSD";
 
 $os = "dragonfly";
 $config['os'][$os]['type']              = "server";
-$config['os'][$os]['group'] 		= "unix";
-$config['os'][$os]['text']  		= "DragonflyBSD";
+$config['os'][$os]['group']                 = "unix";
+$config['os'][$os]['text']                  = "DragonflyBSD";
 
 $os = "netware";
 $config['os'][$os]['type']              = "server";
-$config['os'][$os]['text']  		= "Novell Netware";
-$config['os'][$os]['icon']  		= "novell";
+$config['os'][$os]['text']                  = "Novell Netware";
+$config['os'][$os]['icon']                  = "novell";
 
 $os = "monowall";
-$config['os'][$os]['group'] 		= "unix";
-$config['os'][$os]['text']  		= "m0n0wall";
-$config['os'][$os]['type']  		= "firewall";
+$config['os'][$os]['group']                 = "unix";
+$config['os'][$os]['text']                  = "m0n0wall";
+$config['os'][$os]['type']                  = "firewall";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 
 $os = "solaris";
-$config['os'][$os]['group'] 		= "unix";
-$config['os'][$os]['text']  		= "Sun Solaris";
+$config['os'][$os]['group']                 = "unix";
+$config['os'][$os]['text']                  = "Sun Solaris";
 $config['os'][$os]['type']              = "server";
 
 $os = "adva";
 $config['os'][$os]['type']              = "network";
-$config['os'][$os]['text']  		= "Adva Optical";
+$config['os'][$os]['text']                  = "Adva Optical";
 
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 $os = "opensolaris";
 $config['os'][$os]['type']              = "server";
-$config['os'][$os]['group']		= "unix";
-$config['os'][$os]['text']		= "Sun OpenSolaris";
+$config['os'][$os]['group']                = "unix";
+$config['os'][$os]['text']                = "Sun OpenSolaris";
 
 $os = "openindiana";
 $config['os'][$os]['type']              = "server";
@@ -132,23 +132,23 @@ $config['os'][$os]['icon']              = "alcatellucent";
 ## Cisco OSes
 
 $os = "ios";
-$config['os'][$os]['group']		= "ios";
-$config['os'][$os]['text']		= "Cisco IOS";
-$config['os'][$os]['type']		= "network";
-$config['os'][$os]['ifXmcbc']		= 1;
-$config['os'][$os]['over'][0]['graph']	= "device_bits";
-$config['os'][$os]['over'][0]['text']	= "Device Traffic";
-$config['os'][$os]['over'][1]['graph']	= "device_processor";
-$config['os'][$os]['over'][1]['text']	= "CPU Usage";
-$config['os'][$os]['over'][2]['graph']	= "device_mempool";
-$config['os'][$os]['over'][2]['text']	= "Memory Usage";
+$config['os'][$os]['group']                = "ios";
+$config['os'][$os]['text']                = "Cisco IOS";
+$config['os'][$os]['type']                = "network";
+$config['os'][$os]['ifXmcbc']                = 1;
+$config['os'][$os]['over'][0]['graph']        = "device_bits";
+$config['os'][$os]['over'][0]['text']        = "Device Traffic";
+$config['os'][$os]['over'][1]['graph']        = "device_processor";
+$config['os'][$os]['over'][1]['text']        = "CPU Usage";
+$config['os'][$os]['over'][2]['graph']        = "device_mempool";
+$config['os'][$os]['over'][2]['text']        = "Memory Usage";
 $config['os'][$os]['icon']              = "cisco";
 
 $os = "cat1900";
-$config['os'][$os]['group']		= "cat1900";
-$config['os'][$os]['text']		= "Cisco Catalyst 1900";
-$config['os'][$os]['type']        	= "network";
-$config['os'][$os]['icon']        	= "cisco-old";
+$config['os'][$os]['group']                = "cat1900";
+$config['os'][$os]['text']                = "Cisco Catalyst 1900";
+$config['os'][$os]['type']                = "network";
+$config['os'][$os]['icon']                = "cisco-old";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -157,24 +157,24 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "iosxe";
-$config['os'][$os]['group']		= "ios";
-$config['os'][$os]['text']		= "Cisco IOS-XE";
-$config['os'][$os]['type']		= "network";
-$config['os'][$os]['ifXmcbc']       	= 1;
+$config['os'][$os]['group']                = "ios";
+$config['os'][$os]['text']                = "Cisco IOS-XE";
+$config['os'][$os]['type']                = "network";
+$config['os'][$os]['ifXmcbc']               = 1;
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
-$config['os'][$os]['icon']		= "cisco";
+$config['os'][$os]['icon']                = "cisco";
 
 $os = "iosxr";
-$config['os'][$os]['group']		= "ios";
-$config['os'][$os]['text']		= "Cisco IOS-XR";
-$config['os'][$os]['type']		= "network";
-$config['os'][$os]['ifXmcbc']       	= 1;
-$config['os'][$os]['icon']		= "cisco";
+$config['os'][$os]['group']                = "ios";
+$config['os'][$os]['text']                = "Cisco IOS-XR";
+$config['os'][$os]['type']                = "network";
+$config['os'][$os]['ifXmcbc']               = 1;
+$config['os'][$os]['icon']                = "cisco";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -183,21 +183,21 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "asa";
-$config['os'][$os]['group']		= "ios";
-$config['os'][$os]['text']		= "Cisco ASA";
-$config['os'][$os]['ifname']		= 1;
-$config['os'][$os]['type']		= "firewall";
-$config['os'][$os]['icon']		= "cisco";
+$config['os'][$os]['group']                = "ios";
+$config['os'][$os]['text']                = "Cisco ASA";
+$config['os'][$os]['ifname']                = 1;
+$config['os'][$os]['type']                = "firewall";
+$config['os'][$os]['icon']                = "cisco";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 
 $os = "pix";
-$config['os'][$os]['group'] 		= "ios";
-$config['os'][$os]['text']		= "Cisco PIX-OS";
-$config['os'][$os]['ifname']		= 1;
-$config['os'][$os]['type']		= "firewall";
+$config['os'][$os]['group']                 = "ios";
+$config['os'][$os]['text']                = "Cisco PIX-OS";
+$config['os'][$os]['ifname']                = 1;
+$config['os'][$os]['type']                = "firewall";
 $config['os'][$os]['icon']              = "cisco";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
@@ -207,9 +207,9 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "nxos";
-$config['os'][$os]['group'] 		= "ios";
-$config['os'][$os]['text']  		= "Cisco NX-OS";
-$config['os'][$os]['type']  		= "network";
+$config['os'][$os]['group']                 = "ios";
+$config['os'][$os]['text']                  = "Cisco NX-OS";
+$config['os'][$os]['type']                  = "network";
 $config['os'][$os]['icon']              = "cisco";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
@@ -231,10 +231,10 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "catos";
-$config['os'][$os]['group']		= "ios";
-$config['os'][$os]['text']		= "Cisco CatOS";
-$config['os'][$os]['ifname']		= 1;
-$config['os'][$os]['type']		= "network";
+$config['os'][$os]['group']                = "ios";
+$config['os'][$os]['text']                = "Cisco CatOS";
+$config['os'][$os]['ifname']                = 1;
+$config['os'][$os]['type']                = "network";
 $config['os'][$os]['icon']              = "cisco-old";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
@@ -246,16 +246,16 @@ $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 ## Huawei
 
 $os = "vrp";
-$config['os'][$os]['group'] 		= "vrp";
-$config['os'][$os]['text']  		= "Huawei VRP";
-$config['os'][$os]['type']  		= "network";
-$config['os'][$os]['icon']  		= "huawei";
+$config['os'][$os]['group']                 = "vrp";
+$config['os'][$os]['text']                  = "Huawei VRP";
+$config['os'][$os]['type']                  = "network";
+$config['os'][$os]['icon']                  = "huawei";
 
 # Juniper
 
 $os = "junos";
-$config['os'][$os]['text']		= "Juniper JunOS";
-$config['os'][$os]['type']		= "network";
+$config['os'][$os]['text']                = "Juniper JunOS";
+$config['os'][$os]['type']                = "network";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -275,13 +275,13 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "jwos";
-$config['os'][$os]['text']		= "Juniper JWOS";
-$config['os'][$os]['type']		= "network";
-$config['os'][$os]['icon']  		= "junos";
+$config['os'][$os]['text']                = "Juniper JWOS";
+$config['os'][$os]['type']                = "network";
+$config['os'][$os]['icon']                  = "junos";
 
 $os = "screenos";
-$config['os'][$os]['text']		= "Juniper ScreenOS";
-$config['os'][$os]['type']		= "firewall";
+$config['os'][$os]['text']                = "Juniper ScreenOS";
+$config['os'][$os]['type']                = "firewall";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -292,7 +292,7 @@ $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 $os = "fortigate";
 $config['os'][$os]['text']              = "Fortinet Fortigate";
 $config['os'][$os]['type']              = "firewall";
-$config['os'][$os]['icon']		= "fortinet";
+$config['os'][$os]['icon']                = "fortinet";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 #$config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -301,9 +301,9 @@ $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 #$config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "routeros";
-$config['os'][$os]['text']		= "Mikrotik RouterOS";
-$config['os'][$os]['type']		= "network";
-$config['os'][$os]['nobulk']		= 1;
+$config['os'][$os]['text']                = "Mikrotik RouterOS";
+$config['os'][$os]['type']                = "network";
+$config['os'][$os]['nobulk']                = 1;
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -312,8 +312,8 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "ironware";
-$config['os'][$os]['text']       	= "Brocade IronWare";
-$config['os'][$os]['type']       	= "network";
+$config['os'][$os]['text']               = "Brocade IronWare";
+$config['os'][$os]['type']               = "network";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -322,10 +322,10 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "extremeware";
-$config['os'][$os]['text']    		= "Extremeware";
-$config['os'][$os]['type']    		= "network";
-$config['os'][$os]['ifname']  		= 1;
-$config['os'][$os]['icon']    		= "extreme";
+$config['os'][$os]['text']                    = "Extremeware";
+$config['os'][$os]['type']                    = "network";
+$config['os'][$os]['ifname']                  = 1;
+$config['os'][$os]['icon']                    = "extreme";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -334,15 +334,15 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "packetshaper";
-$config['os'][$os]['text']   		= "Blue Coat Packetshaper";
-$config['os'][$os]['type']   		= "network";
+$config['os'][$os]['text']                   = "Blue Coat Packetshaper";
+$config['os'][$os]['type']                   = "network";
 
 $os = "xos";
-$config['os'][$os]['text']    		= "Extreme XOS";
-$config['os'][$os]['type']    		= "network";
-$config['os'][$os]['ifname']  		= 1;
-$config['os'][$os]['group']		= "extremeware";
-$config['os'][$os]['icon']		= "extreme";
+$config['os'][$os]['text']                    = "Extreme XOS";
+$config['os'][$os]['type']                    = "network";
+$config['os'][$os]['ifname']                  = 1;
+$config['os'][$os]['group']                = "extremeware";
+$config['os'][$os]['icon']                = "extreme";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -351,9 +351,9 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "ftos";
-$config['os'][$os]['text']		= "Force10 FTOS";
-$config['os'][$os]['type']		= "network";
-$config['os'][$os]['icon']		= "force10";
+$config['os'][$os]['text']                = "Force10 FTOS";
+$config['os'][$os]['type']                = "network";
+$config['os'][$os]['icon']                = "force10";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -388,15 +388,15 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 $os = "powerconnect";
-$config['os'][$os]['text']   		= "Dell PowerConnect";
-$config['os'][$os]['ifname'] 		= 1;
-$config['os'][$os]['type']   		= "network";
-$config['os'][$os]['icon']   		= "dell";
+$config['os'][$os]['text']                   = "Dell PowerConnect";
+$config['os'][$os]['ifname']                 = 1;
+$config['os'][$os]['type']                   = "network";
+$config['os'][$os]['icon']                   = "dell";
 
 $os = "radlan";
-$config['os'][$os]['text']         	= "Radlan";
-$config['os'][$os]['ifname']       	= 1;
-$config['os'][$os]['type']         	= "network";
+$config['os'][$os]['text']                 = "Radlan";
+$config['os'][$os]['ifname']               = 1;
+$config['os'][$os]['type']                 = "network";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -405,22 +405,22 @@ $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 #$config['os'][$os]['over'][2]['text']    = "Memory Usage";
 
 $os = "powervault";
-$config['os'][$os]['text']     		= "Dell PowerVault";
-$config['os'][$os]['icon']     		= "dell";
+$config['os'][$os]['text']                     = "Dell PowerVault";
+$config['os'][$os]['icon']                     = "dell";
 
 $os = "drac";
-$config['os'][$os]['text']           	= "Dell DRAC";
-$config['os'][$os]['icon']           	= "dell";
+$config['os'][$os]['text']                   = "Dell DRAC";
+$config['os'][$os]['icon']                   = "dell";
 
 $os = "bcm963";
-$config['os'][$os]['text']		= "Broadcom BCM963xx";
-$config['os'][$os]['icon']		= "broadcom";
+$config['os'][$os]['text']                = "Broadcom BCM963xx";
+$config['os'][$os]['icon']                = "broadcom";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 $os = "netopia";
-$config['os'][$os]['text']        	= "Motorola Netopia";
-$config['os'][$os]['type']        	= "network";
+$config['os'][$os]['text']                = "Motorola Netopia";
+$config['os'][$os]['type']                = "network";
 
 $os = "tranzeo";
 $config['os'][$os]['text']              = "Tranzeo";
@@ -428,31 +428,31 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 $os = "dlink";
-$config['os'][$os]['text']          	= "D-Link Switch";
-$config['os'][$os]['type']          	= "network";
-$config['os'][$os]['icon']          	= "dlink";
+$config['os'][$os]['text']                  = "D-Link Switch";
+$config['os'][$os]['type']                  = "network";
+$config['os'][$os]['icon']                  = "dlink";
 
 $os = "dlinkap";
-$config['os'][$os]['text']        	= "D-Link Access Point";
-$config['os'][$os]['type']        	= "network";
-$config['os'][$os]['icon']        	= "dlink";
+$config['os'][$os]['text']                = "D-Link Access Point";
+$config['os'][$os]['type']                = "network";
+$config['os'][$os]['icon']                = "dlink";
 
 $os = "axiscam";
-$config['os'][$os]['text']        	= "AXIS Network Camera";
-$config['os'][$os]['icon']        	= "axis";
+$config['os'][$os]['text']                = "AXIS Network Camera";
+$config['os'][$os]['icon']                = "axis";
 
 $os = "axisdocserver";
-$config['os'][$os]['text']  		= "AXIS Network Document Server";
-$config['os'][$os]['icon']  		= "axis";
+$config['os'][$os]['text']                  = "AXIS Network Document Server";
+$config['os'][$os]['icon']                  = "axis";
 
 $os = "gamatronicups";
-$config['os'][$os]['text']  		= "Gamatronic UPS Stack";
-$config['os'][$os]['type']  		= "power";
+$config['os'][$os]['text']                  = "Gamatronic UPS Stack";
+$config['os'][$os]['type']                  = "power";
 
 $os = "powerware";
-$config['os'][$os]['text']  		= "Powerware UPS";
-$config['os'][$os]['type']  		= "power";
-$config['os'][$os]['icon']  		= "eaton";
+$config['os'][$os]['text']                  = "Powerware UPS";
+$config['os'][$os]['type']                  = "power";
+$config['os'][$os]['icon']                  = "eaton";
 $config['os'][$os]['over'][0]['graph']  = "device_voltages";
 $config['os'][$os]['over'][0]['text']   = "Voltages";
 $config['os'][$os]['over'][1]['graph']  = "device_current";
@@ -461,9 +461,9 @@ $config['os'][$os]['over'][2]['graph']  = "device_frequencies";
 $config['os'][$os]['over'][2]['text']   = "Frequencies";
 
 $os = "deltaups";
-$config['os'][$os]['text']  		= "Delta UPS";
-$config['os'][$os]['type']  		= "power";
-$config['os'][$os]['icon']  		= "delta";
+$config['os'][$os]['text']                  = "Delta UPS";
+$config['os'][$os]['type']                  = "power";
+$config['os'][$os]['icon']                  = "delta";
 
 $os = "liebert";
 $config['os'][$os]['text']              = "Liebert";
@@ -472,18 +472,18 @@ $config['os'][$os]['icon']              = "liebert";
 
 
 $os = "engenius";
-$config['os'][$os]['type'] 		= "network";
-$config['os'][$os]['text']  		= "EnGenius Access Point";
-$config['os'][$os]['icon']  		= "engenius";
+$config['os'][$os]['type']                 = "network";
+$config['os'][$os]['text']                  = "EnGenius Access Point";
+$config['os'][$os]['icon']                  = "engenius";
 
 $os = "airport";
-$config['os'][$os]['type'] 		= "network";
-$config['os'][$os]['text']  		= "Apple AirPort";
-$config['os'][$os]['icon']  		= "apple";
+$config['os'][$os]['type']                 = "network";
+$config['os'][$os]['text']                  = "Apple AirPort";
+$config['os'][$os]['icon']                  = "apple";
 
 $os = "windows";
-$config['os'][$os]['text']        	= "Microsoft Windows";
-$config['os'][$os]['ifname']		= 1;
+$config['os'][$os]['text']                = "Microsoft Windows";
+$config['os'][$os]['ifname']                = 1;
 $config['os'][$os]['processor_stacked']  = 1;
 
 
@@ -493,9 +493,9 @@ $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "bnt";
 
 $os = "procurve";
-$config['os'][$os]['text']       	= "HP ProCurve";
-$config['os'][$os]['type']       	= "network";
-$config['os'][$os]['icon']       	= "hp";
+$config['os'][$os]['text']               = "HP ProCurve";
+$config['os'][$os]['type']               = "network";
+$config['os'][$os]['icon']               = "hp";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
@@ -504,68 +504,68 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "speedtouch";
-$config['os'][$os]['text']     		= "Thomson Speedtouch";
-$config['os'][$os]['ifname']		= 1;
-$config['os'][$os]['type']     		= "network";
+$config['os'][$os]['text']                     = "Thomson Speedtouch";
+$config['os'][$os]['ifname']                = 1;
+$config['os'][$os]['type']                     = "network";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Traffic";
 
 $os = "sonicwall";
-$config['os'][$os]['text']     		= "SonicWALL";
-$config['os'][$os]['type']     		= "firewall";
-$config['os'][$os]['over'][0]['graph'] 	= "device_bits";
-$config['os'][$os]['over'][0]['text']  	= "Traffic";
+$config['os'][$os]['text']                     = "SonicWALL";
+$config['os'][$os]['type']                     = "firewall";
+$config['os'][$os]['over'][0]['graph']         = "device_bits";
+$config['os'][$os]['over'][0]['text']          = "Traffic";
 
 $os = "zywall";
-$config['os'][$os]['text']		= "ZyXEL ZyWALL";
-$config['os'][$os]['type']		= "firewall";
-$config['os'][$os]['over'][0]['graph']	= "device_bits";
-$config['os'][$os]['over'][0]['text']	= "Traffic";
-$config['os'][$os]['icon']         	= "zyxel";
+$config['os'][$os]['text']                = "ZyXEL ZyWALL";
+$config['os'][$os]['type']                = "firewall";
+$config['os'][$os]['over'][0]['graph']        = "device_bits";
+$config['os'][$os]['over'][0]['text']        = "Traffic";
+$config['os'][$os]['icon']                 = "zyxel";
 
 $os = "prestige";
-$config['os'][$os]['text']     		= "ZyXEL Prestige";
-$config['os'][$os]['type']     		= "network";
-$config['os'][$os]['icon']       	= "zyxel";
+$config['os'][$os]['text']                     = "ZyXEL Prestige";
+$config['os'][$os]['type']                     = "network";
+$config['os'][$os]['icon']               = "zyxel";
 
 $os = "zyxeles";
-$config['os'][$os]['text']     		= "ZyXEL Ethernet Switch";
-$config['os'][$os]['type']     		= "network";
-$config['os'][$os]['icon']        	= "zyxel";
+$config['os'][$os]['text']                     = "ZyXEL Ethernet Switch";
+$config['os'][$os]['type']                     = "network";
+$config['os'][$os]['icon']                = "zyxel";
 
 $os = "zyxelnwa";
-$config['os'][$os]['text']     		= "ZyXEL NWA";
-$config['os'][$os]['type']     		= "network";
-$config['os'][$os]['icon']        	= "zyxel";
+$config['os'][$os]['text']                     = "ZyXEL NWA";
+$config['os'][$os]['type']                     = "network";
+$config['os'][$os]['icon']                = "zyxel";
 
 $os = "ies";
-$config['os'][$os]['text']     		= "ZyXEL DSLAM";
-$config['os'][$os]['type']     		= "network";
-$config['os'][$os]['icon']            	= "zyxel";
+$config['os'][$os]['text']                     = "ZyXEL DSLAM";
+$config['os'][$os]['type']                     = "network";
+$config['os'][$os]['icon']                    = "zyxel";
 
 $os = "allied";
-$config['os'][$os]['text']         	= "AlliedWare";
-$config['os'][$os]['type']         	= "network";
-$config['os'][$os]['ifname']		= 1;
+$config['os'][$os]['text']                 = "AlliedWare";
+$config['os'][$os]['type']                 = "network";
+$config['os'][$os]['ifname']                = 1;
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Traffic";
 
 $os = "mgeups";
-$config['os'][$os]['text']         	= "MGE UPS";
-$config['os'][$os]['group']        	= "ups";
-$config['os'][$os]['type']		= "power";
-$config['os'][$os]['icon']		= "mge";
+$config['os'][$os]['text']                 = "MGE UPS";
+$config['os'][$os]['group']                = "ups";
+$config['os'][$os]['type']                = "power";
+$config['os'][$os]['icon']                = "mge";
 $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
 
 $os = "mgepdu";
-$config['os'][$os]['text']         	= "MGE PDU";
-$config['os'][$os]['type']		= "power";
-$config['os'][$os]['icon']		= "mge";
+$config['os'][$os]['text']                 = "MGE PDU";
+$config['os'][$os]['type']                = "power";
+$config['os'][$os]['icon']                = "mge";
 
 $os = "apc";
-$config['os'][$os]['text']            	= "APC Management Module";
-$config['os'][$os]['type']		= "power";
+$config['os'][$os]['text']                    = "APC Management Module";
+$config['os'][$os]['type']                = "power";
 $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
 
@@ -584,15 +584,15 @@ $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
 
 $os = "areca";
-$config['os'][$os]['text']          	= "Areca RAID Subsystem";
+$config['os'][$os]['text']                  = "Areca RAID Subsystem";
 $config['os'][$os]['over'][0]['graph']  = "";
 $config['os'][$os]['over'][0]['text']   = "";
 
 $os = "netmanplus";
-$config['os'][$os]['text']        	= "NetMan Plus";
-$config['os'][$os]['group']	   	= "ups";
-$config['os'][$os]['nobulk']	   	= 1;
-$config['os'][$os]['type']	   	= "power";
+$config['os'][$os]['text']                = "NetMan Plus";
+$config['os'][$os]['group']                   = "ups";
+$config['os'][$os]['nobulk']                   = 1;
+$config['os'][$os]['type']                   = "power";
 $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
 
@@ -603,8 +603,8 @@ $config['os'][$os]['over'][0]['graph']  = "device_temperature";
 $config['os'][$os]['over'][0]['text']   = "temperature";
 
 $os = "minkelsrms";
-$config['os'][$os]['text']        	= "Minkels RMS";
-$config['os'][$os]['type']        	= "environment";
+$config['os'][$os]['text']                = "Minkels RMS";
+$config['os'][$os]['type']                = "environment";
 $config['os'][$os]['over'][0]['graph']  = "device_temperature";
 $config['os'][$os]['over'][0]['text']   = "temperature";
 
@@ -622,88 +622,88 @@ $config['os'][$os]['over'][0]['graph']  = "device_temperature";
 $config['os'][$os]['over'][0]['text']   = "temperature";
 
 $os = "papouch-tme";
-$config['os'][$os]['text']       	= "Papouch TME";
-$config['os'][$os]['type']       	= "environment";
+$config['os'][$os]['text']               = "Papouch TME";
+$config['os'][$os]['type']               = "environment";
 $config['os'][$os]['over'][0]['graph']  = "device_temperature";
 $config['os'][$os]['over'][0]['text']   = "temperature";
 
 $os = "cometsystem-p85xx";
-$config['os'][$os]['text']       	= "Comet System P85xx";
-$config['os'][$os]['type']       	= "environment";
-$config['os'][$os]['icon']        	= "comet";
+$config['os'][$os]['text']               = "Comet System P85xx";
+$config['os'][$os]['type']               = "environment";
+$config['os'][$os]['icon']                = "comet";
 $config['os'][$os]['over'][0]['graph']  = "device_temperature";
 $config['os'][$os]['over'][0]['text']   = "temperature";
 
 $os = "dell-laser";
-$config['os'][$os]['group'] 	   	= "printer";
-$config['os'][$os]['text']  	   	= "Dell Laser";
-$config['os'][$os]['ifname']	   	= 1;
-$config['os'][$os]['type']        	= "printer";
-$config['os'][$os]['icon']        	= "dell";
+$config['os'][$os]['group']                    = "printer";
+$config['os'][$os]['text']                     = "Dell Laser";
+$config['os'][$os]['ifname']                   = 1;
+$config['os'][$os]['type']                = "printer";
+$config['os'][$os]['icon']                = "dell";
 $config['os'][$os]['over'][0]['graph']  = "device_toner";
 $config['os'][$os]['over'][0]['text']   = "Toner";
 
 $os = "ricoh";
-$config['os'][$os]['group'] 	   	= "printer";
-$config['os'][$os]['text']  	   	= "Ricoh Printer";
-$config['os'][$os]['type']        	= "printer";
-$config['os'][$os]['icon']        	= "ricoh";
+$config['os'][$os]['group']                    = "printer";
+$config['os'][$os]['text']                     = "Ricoh Printer";
+$config['os'][$os]['type']                = "printer";
+$config['os'][$os]['icon']                = "ricoh";
 $config['os'][$os]['over'][0]['graph']  = "device_toner";
 $config['os'][$os]['over'][0]['text']   = "Toner";
 
 $os = "xerox";
-$config['os'][$os]['group'] 	   	= "printer";
-$config['os'][$os]['text']  	   	= "Xerox Printer";
-$config['os'][$os]['ifname']	   	= 1;
-$config['os'][$os]['type']             	= "printer";
+$config['os'][$os]['group']                    = "printer";
+$config['os'][$os]['text']                     = "Xerox Printer";
+$config['os'][$os]['ifname']                   = 1;
+$config['os'][$os]['type']                     = "printer";
 $config['os'][$os]['over'][0]['graph']  = "device_toner";
 $config['os'][$os]['over'][0]['text']   = "Toner";
 
 $os = "jetdirect";
-$config['os'][$os]['group'] 	   	= "printer";
-$config['os'][$os]['text']  	   	= "HP Print server";
-$config['os'][$os]['ifname']	   	= 1;
-$config['os'][$os]['type']         	= "printer";
-$config['os'][$os]['icon']         	= "hp";
+$config['os'][$os]['group']                    = "printer";
+$config['os'][$os]['text']                     = "HP Print server";
+$config['os'][$os]['ifname']                   = 1;
+$config['os'][$os]['type']                 = "printer";
+$config['os'][$os]['icon']                 = "hp";
 $config['os'][$os]['over'][0]['graph']  = "device_toner";
 $config['os'][$os]['over'][0]['text']   = "Toner";
 
 $os = "richoh";
-$config['os'][$os]['group'] 	   	= "printer";
-$config['os'][$os]['text']  	   	= "Ricoh Printer";
-$config['os'][$os]['type']		= "printer";
+$config['os'][$os]['group']                    = "printer";
+$config['os'][$os]['text']                     = "Ricoh Printer";
+$config['os'][$os]['type']                = "printer";
 $config['os'][$os]['over'][0]['graph']  = "device_toner";
 $config['os'][$os]['over'][0]['text']   = "Toner";
 
 $os = "okilan";
-$config['os'][$os]['group'] 	   	= "printer";
-$config['os'][$os]['text']  	   	= "OKI Printer";
+$config['os'][$os]['group']                    = "printer";
+$config['os'][$os]['text']                     = "OKI Printer";
 $config['os'][$os]['overgraph'][]       = "device_toner";
 $config['os'][$os]['overtext']          = "Toner";
 $config['os'][$os]['type']              = "printer";
 $config['os'][$os]['icon']              = "oki";
 
 $os = "brother";
-$config['os'][$os]['group'] 	   	= "printer";
-$config['os'][$os]['text']  	   	= "Brother Printer";
-$config['os'][$os]['type']           	= "printer";
+$config['os'][$os]['group']                    = "printer";
+$config['os'][$os]['text']                     = "Brother Printer";
+$config['os'][$os]['type']                   = "printer";
 $config['os'][$os]['over'][0]['graph']  = "device_toner";
 $config['os'][$os]['over'][0]['text']   = "Toner";
 
 $os = "konica";
-$config['os'][$os]['group'] 	   	= "printer";
-$config['os'][$os]['text']  	   	= "Konica-Minolta Printer";
-$config['os'][$os]['type']            	= "printer";
+$config['os'][$os]['group']                    = "printer";
+$config['os'][$os]['text']                     = "Konica-Minolta Printer";
+$config['os'][$os]['type']                    = "printer";
 $config['os'][$os]['over'][0]['graph']  = "device_toner";
 $config['os'][$os]['over'][0]['text']   = "Toner";
 
 $os = "kyocera";
-$config['os'][$os]['group'] 	   	= "printer";
-$config['os'][$os]['text']  	   	= "Kyocera Mita Printer";
-$config['os'][$os]['over'][0]['graph'] 	= "device_toner";
-$config['os'][$os]['over'][0]['text']  	= "Toner";
-$config['os'][$os]['ifname']	   	= 1;
-$config['os'][$os]['type']           	= "printer";
+$config['os'][$os]['group']                    = "printer";
+$config['os'][$os]['text']                     = "Kyocera Mita Printer";
+$config['os'][$os]['over'][0]['graph']         = "device_toner";
+$config['os'][$os]['over'][0]['text']          = "Toner";
+$config['os'][$os]['ifname']                   = 1;
+$config['os'][$os]['type']                   = "printer";
 
 $os = "3com";
 $config['os'][$os]['text']              = "3Com";
@@ -712,11 +712,11 @@ $config['os'][$os]['over'][0]['text']   = "Traffic";
 $config['os'][$os]['type']              = "network";
 
 $os = "sentry3";
-$config['os'][$os]['text']            	= "ServerTech Sentry3";
-$config['os'][$os]['type']		= "power";
+$config['os'][$os]['text']                    = "ServerTech Sentry3";
+$config['os'][$os]['type']                = "power";
 $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
-$config['os'][$os]['icon']  		= "servertech";
+$config['os'][$os]['icon']                  = "servertech";
 
 $os = "raritan";
 $config['os'][$os]['text']             = "Raritan PDU";
@@ -733,22 +733,22 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 $os = "mrvld";
-$config['os'][$os]['group']		= "mrv";
-$config['os'][$os]['text']		= "MRV LambdaDriver";
-$config['os'][$os]['type']		= "network";
-$config['os'][$os]['icon']  		= "mrv";
+$config['os'][$os]['group']                = "mrv";
+$config['os'][$os]['text']                = "MRV LambdaDriver";
+$config['os'][$os]['type']                = "network";
+$config['os'][$os]['icon']                  = "mrv";
 
 $os = "poweralert";
-$config['os'][$os]['text']            	= "Tripp Lite PowerAlert";
-$config['os'][$os]['type']		= "power";
+$config['os'][$os]['text']                    = "Tripp Lite PowerAlert";
+$config['os'][$os]['type']                = "power";
 $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
-$config['os'][$os]['icon']  		= "tripplite";
+$config['os'][$os]['icon']                  = "tripplite";
 
 $os = "symbol";
-$config['os'][$os]['type'] 		= "network";
-$config['os'][$os]['text']  		= "Symbol AP";
-$config['os'][$os]['icon']  		= "symbol";
+$config['os'][$os]['type']                 = "network";
+$config['os'][$os]['text']                  = "Symbol AP";
+$config['os'][$os]['icon']                  = "symbol";
 
 foreach($config['os'] as $this_os => $blah)
 {

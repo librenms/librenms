@@ -14,11 +14,11 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 
       if (isset($entry['cpmCPUTotal5minRev']))
       {
-	$usage_oid = ".1.3.6.1.4.1.9.9.109.1.1.1.1.8." . $index;
-	$usage = $entry['cpmCPUTotal5minRev'];
+        $usage_oid = ".1.3.6.1.4.1.9.9.109.1.1.1.1.8." . $index;
+        $usage = $entry['cpmCPUTotal5minRev'];
       } elseif (isset($entry['cpmCPUTotal5min'])) {
-	$usage_oid = ".1.3.6.1.4.1.9.9.109.1.1.1.1.5." . $index;
-	$usage = $entry['cpmCPUTotal5min'];
+        $usage_oid = ".1.3.6.1.4.1.9.9.109.1.1.1.1.5." . $index;
+        $usage = $entry['cpmCPUTotal5min'];
       }
 
       if ($entPhysicalIndex) {
@@ -32,16 +32,16 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 
       if (is_file($old_rrd))
       {
-	rename($old_rrd,$new_rrd);
+        rename($old_rrd,$new_rrd);
         if ($debug) { echo("$old_rrd $new_rrd"); }
-	echo("Moved RRD ");
+        echo("Moved RRD ");
       }
 
       #echo("|".$descr."|");
 
       if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "")
       {
-	discover_processor($valid['processor'], $device, $usage_oid, $index, "cpm", $descr, "1", $entry['juniSystemModuleCpuUtilPct'], $entPhysicalIndex, NULL);
+        discover_processor($valid['processor'], $device, $usage_oid, $index, "cpm", $descr, "1", $entry['juniSystemModuleCpuUtilPct'], $entPhysicalIndex, NULL);
       }
     }
   }

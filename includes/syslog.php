@@ -8,13 +8,14 @@
 
 function get_cache($host, $value){
   global $dev_cache;
-  if(!isset($dev_cache[$host][$value])){
+
+  if (!isset($dev_cache[$host][$value])){
     switch($value){
       case 'device_id':
         //Try by hostname
         $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ?', array($host, $host));
         //If failed, try by IP
-        if(!is_numeric($dev_cache[$host]['device_id'])) {
+        if (!is_numeric($dev_cache[$host]['device_id'])) {
           $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM `ipv4_addresses` AS A, `ports` AS I WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id', array($host));
         }
         break;
@@ -34,22 +35,23 @@ function get_cache($host, $value){
 
 function process_syslog ($entry, $update) {
   global $config;
+
   global $dev_cache;
 
   foreach($config['syslog_filter'] as $bi)
-    if(strpos($entry['msg'], $bi) !== FALSE){
+    if (strpos($entry['msg'], $bi) !== FALSE){
       print_r($entry);
       echo('D-'.$bi);
       return $entry;
     }
 
   $entry['device_id'] = get_cache($entry['host'], 'device_id');
-  if($entry['device_id']) {
+  if ($entry['device_id']) {
     $os = get_cache($entry['host'], 'os');
 
-    if(in_array($os, array('ios', 'iosxe', 'catos'))){
+    if (in_array($os, array('ios', 'iosxe', 'catos'))){
       $matches = array();
-#      if(preg_match('#%(?P<program>.*):( ?)(?P<msg>.*)#', $entry['msg'], $matches)){
+#      if (preg_match('#%(?P<program>.*):( ?)(?P<msg>.*)#', $entry['msg'], $matches)){
 #        $entry['msg'] = $matches['msg'];
 #        $entry['program'] = $matches['program'];
 #      }
@@ -87,7 +89,7 @@ function process_syslog ($entry, $update) {
     } elseif($os == 'linux' and get_cache($entry['host'], 'version') == 'Point'){
       //Cisco WAP200 and similar
       $matches = array();
-      if(preg_match('#Log: \[(?P<program>.*)\] - (?P<msg>.*)#', $entry['msg'], $matches)){
+      if (preg_match('#Log: \[(?P<program>.*)\] - (?P<msg>.*)#', $entry['msg'], $matches)){
         $entry['msg'] = $matches['msg'];
         $entry['program'] = $matches['program'];
       }
@@ -96,7 +98,7 @@ function process_syslog ($entry, $update) {
     } elseif($os == 'linux'){
       $matches = array();
       //User_CommonName/123.213.132.231:39872 VERIFY OK: depth=1, /C=PL/ST=Malopolska/O=VLO/CN=v-lo.krakow.pl/emailAddress=root@v-lo.krakow.pl
-      if($entry['facility'] == 'daemon' and preg_match('#/([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{4,} ([A-Z]([A-Za-z])+( ?)){2,}:#', $entry['msg'])){
+      if ($entry['facility'] == 'daemon' and preg_match('#/([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{4,} ([A-Z]([A-Za-z])+( ?)){2,}:#', $entry['msg'])){
         $entry['program'] = 'OpenVPN';
       }
       //pop3-login: Login: user=<username>, method=PLAIN, rip=123.213.132.231, lip=123.213.132.231, TLS
@@ -126,14 +128,14 @@ function process_syslog ($entry, $update) {
       unset($matches);
     }
 
-    if(!isset($entry['program'])){
+    if (!isset($entry['program'])){
       $entry['program'] = $entry['msg'];
       unset($entry['msg']);
     }
     $entry['program'] = strtoupper($entry['program']);
     array_walk($entry, 'trim');
 
-    if($update)
+    if ($update)
       dbInsert(
         array(
           'device_id' => $entry['device_id'],

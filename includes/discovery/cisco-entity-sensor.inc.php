@@ -77,7 +77,7 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
         }
 
         ### Bit dirty also, clean later
-	$descr = str_replace("Temp: ", "", $descr);
+        $descr = str_replace("Temp: ", "", $descr);
         $descr = str_ireplace("temperature ", "", $descr);
 
         $oid = ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.".$index;
@@ -132,9 +132,9 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 
         $ok = TRUE;
 
-	if ($current == "-127") { $ok = FALSE; }                      	## False reading
-#        if ($type == "temperature" && $current < 1) { $ok = FALSE; }	## False reading. Temperature <1 :)
-	if ($descr == "") { $ok = FALSE; }				## Invalid description. Lots of these on Nexus
+        if ($current == "-127") { $ok = FALSE; }                              ## False reading
+#        if ($type == "temperature" && $current < 1) { $ok = FALSE; }        ## False reading. Temperature <1 :)
+        if ($descr == "") { $ok = FALSE; }                                ## Invalid description. Lots of these on Nexus
 
         if ($ok) {
 #          echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $limit, $warn_limit, $current");

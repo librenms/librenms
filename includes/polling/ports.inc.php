@@ -293,7 +293,7 @@ foreach ($ports as $port)
         { // If data has changed, build a query
           $port['update'][$oid] = $this_port[$oid];
           echo("PAgP ");
-	  log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['interface_id']);
+          log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['interface_id']);
         }
       }
     }
@@ -309,14 +309,14 @@ foreach ($ports as $port)
     if ($config['enable_ports_poe']) { include("port-poe.inc.php"); }
 
     /// Do Alcatel Detailed Stats
-    if($device['os'] == "aos") { include("port-alcatel.inc.php"); }
+    if ($device['os'] == "aos") { include("port-alcatel.inc.php"); }
 
 
     // Update Database
     if (count($port['update']))
     {
       $updated = dbUpdate($port['update'], 'ports', '`interface_id` = ?', array($port['interface_id']));
-      if($debug) { echo("$updated updated"); }
+      if ($debug) { echo("$updated updated"); }
     }
     // End Update Database
 

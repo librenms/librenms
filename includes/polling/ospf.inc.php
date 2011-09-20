@@ -285,7 +285,7 @@ if (is_array($ospf_nbrs_db))
 
       if ($ospf_nbr_db['interface_id'] != $ospf_nbr_poll['interface_id'])
       {
-        if($ospf_nbr_poll['interface_id']) {
+        if ($ospf_nbr_poll['interface_id']) {
           $ospf_nbr_update = array('interface_id' => $ospf_nbr_poll['interface_id']);
         } else {
           $ospf_nbr_update = array('interface_id' => array('NULL'));

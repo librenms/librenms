@@ -32,8 +32,8 @@ elseif ($device['os'] == "freebsd")
 {
   $poll_device[sysDescr] = str_replace(" 0 ", " ", $poll_device[sysDescr]);
   list(,,$version) = explode (" ", $poll_device[sysDescr]);
-  if(strstr($poll_device[sysDescr], "i386")) { $hardware = "i386"; }
-  else if(strstr($poll_device[sysDescr], "amd64")) { $hardware = "amd64"; }
+  if (strstr($poll_device[sysDescr], "i386")) { $hardware = "i386"; }
+  else if (strstr($poll_device[sysDescr], "amd64")) { $hardware = "amd64"; }
   else { $hardware = "i386"; }
   $features = "GENERIC";
 }

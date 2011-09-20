@@ -22,9 +22,9 @@ function external_exec($command)
 {
   global $debug;
 
-  if($debug) { echo($command."\n"); }
+  if ($debug) { echo($command."\n"); }
   $output = shell_exec($command);
-  if($debug) { echo($output."\n"); }
+  if ($debug) { echo($output."\n"); }
 
   return $output;
 }
@@ -325,6 +325,7 @@ function isSNMPable($device)
 function isPingable($hostname)
 {
    global $config;
+
    $status = shell_exec($config['fping'] . " $hostname 2>/dev/null");
    if (strstr($status, "alive"))
    {
@@ -348,6 +349,7 @@ function is_odd($number)
 function isValidInterface($if)
 {
       global $config;
+
       $if = strtolower($if);
       $nullintf = 0;
       foreach ($config['bad_if'] as $bi)
@@ -644,7 +646,7 @@ function is_port_valid($port, $device)
       if (strstr($if, $bi))
       {
         $valid = 0;
-        if($debug) { echo("ignored : $bi : $if"); }
+        if ($debug) { echo("ignored : $bi : $if"); }
       }
     }
     if (is_array($config['bad_if_regexp']))
@@ -654,7 +656,7 @@ function is_port_valid($port, $device)
         if (preg_match($bi ."i", $if))
         {
           $valid = 0;
-          if($debug) { echo("ignored : $bi : ".$if); }
+          if ($debug) { echo("ignored : $bi : ".$if); }
         }
       }
     }
