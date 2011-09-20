@@ -11,7 +11,7 @@ if ($device['os'] == 'sentry3')
   # These PDUs may have > 1 "tower" accessible via a single management interface
   $tower_count = snmp_get($device,"systemTowerCount.0", "-Ovq", "Sentry3-MIB");
   $towers=1;
-  while($towers <= $tower_count) {
+  while ($towers <= $tower_count) {
 
     #################################
     # Check for Infeeds
@@ -107,7 +107,7 @@ if ($device['os'] == 'sentry3')
 
     $towers++;
 
-  } // while($towers <= $tower_count)
+  } // while ($towers <= $tower_count)
 
   unset($towers);
 }

@@ -3,15 +3,15 @@
 if ($device['os'] == "cometsystem-p85xx")
 {
   $regexp = '/
-	\.1\.3\.6\.1\.4\.1\.22626\.1\.5\.2\.
-	(?P<id>\d+)
-	\.
-	(?:
-		1\.0 (?P<name>.*)|
-		3\.0 (?P<temp_intval>.*)|
-		5\.0 (?P<limit_high>.*)|
-		6\.0 (?P<limit_low>.*)|
-	)
+        \.1\.3\.6\.1\.4\.1\.22626\.1\.5\.2\.
+        (?P<id>\d+)
+        \.
+        (?:
+                1\.0 (?P<name>.*)|
+                3\.0 (?P<temp_intval>.*)|
+                5\.0 (?P<limit_high>.*)|
+                6\.0 (?P<limit_low>.*)|
+        )
 /x';
 
   $oids = snmp_walk($device, ".1.3.6.1.4.1.22626.1.5.2", "-OsqnU", "");

@@ -34,13 +34,13 @@ $config['virsh']          = "/usr/bin/virsh";
 
 if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
 {
-  $config['base_url'] 	    = "http://" . $_SERVER["SERVER_NAME"] .":".$_SERVER["SERVER_PORT"]."/";
+  $config['base_url']             = "http://" . $_SERVER["SERVER_NAME"] .":".$_SERVER["SERVER_PORT"]."/";
 }
 
 $config['title_image']      = "images/observium-logo.png";
 $config['stylesheet']       = "css/styles.css";
 $config['mono_font']        = "DejaVuSansMono";
-#$config['mono_font']	    = "LiberationMono";
+#$config['mono_font']            = "LiberationMono";
 $config['favicon']          = "images/observium-icon.png";
 $config['header_color']     = "#1F334E";
 $config['page_refresh']     = "300";  ## Refresh the page every xx seconds
@@ -48,7 +48,7 @@ $config['front_page']       = "pages/front/default.php";
 $config['page_title']       = "Observium :: Network Observation and Monitoring";
 $config['timestamp_format'] = 'd-m-Y H:i:s';
 $config['page_gen']         = 1;
-$config['web_header']	    = "header.inc.php";  # in html/includes
+$config['web_header']            = "header.inc.php";  # in html/includes
 $config['login_message']    = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
 
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
@@ -66,23 +66,23 @@ $config['ports_page_default']      = "details"; ## eg "details" "graphs/bits" ##
 #$config['snmp']['timeout'] = 1;            # timeout in seconds
 #$config['snmp']['retries'] = 5;            # how many times to retry the query
 $config['snmp']['community'][0] = "public"; # Communities to try during adding hosts and discovery
-$config['snmp']['internal'] = false;	   # Enable php_snmp functions to make gets faster
+$config['snmp']['internal'] = false;           # Enable php_snmp functions to make gets faster
 $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
 
 ### Autodiscovery Settings
 
-$config['autodiscovery']['xdp']		= true; ## Autodiscover hosts via discovery protocols
-$config['autodiscovery']['ospf']   	= true; ## Autodiscover hosts via OSPF
+$config['autodiscovery']['xdp']                = true; ## Autodiscover hosts via discovery protocols
+$config['autodiscovery']['ospf']           = true; ## Autodiscover hosts via OSPF
 $config['autodiscovery']['bgp']         = true; ## Autodiscover hosts via BGP
-$config['autodiscovery']['snmpscan']	= true; ## autodiscover hosts via SNMP scanning
+$config['autodiscovery']['snmpscan']        = true; ## autodiscover hosts via SNMP scanning
 
-$config['discover_services']      	= false; ## Autodiscover services via SNMP on devices of type "server"
+$config['discover_services']              = false; ## Autodiscover services via SNMP on devices of type "server"
 
 ### Alerting Settings
 
 $config['alerts']['email']['default']      = NULL;    ## Default alert recipient
 $config['alerts']['email']['default_only'] = FALSE;   ## Only use default recipient
-$config['alerts']['email']['enable']	   = TRUE;    ## Enable email alerts
+$config['alerts']['email']['enable']           = TRUE;    ## Enable email alerts
 $config['uptime_warning']                  = "84600"; ## Time in seconds to display a "Device Rebooted" Alert. 0 to disable warnings.
 
 ### Cosmetics
@@ -139,16 +139,16 @@ $config['version_check']                = 1; # Enable checking of version in dis
 
 ### Poller/Discovery Modules
 
-$config['enable_bgp']           	= 1; # Enable BGP session collection and display
+$config['enable_bgp']                   = 1; # Enable BGP session collection and display
 $config['enable_rip']                   = 1; # Enable RIP session collection and display
 $config['enable_ospf']                  = 1; # Enable OSPF session collection and display
 $config['enable_isis']                  = 1; # Enable ISIS session collection and display
 $config['enable_eigrp']                 = 1; # Enable EIGRP session collection and display
-$config['enable_syslog']        	= 0; # Enable Syslog
-$config['enable_inventory']     	= 1; # Enable Inventory
-$config['enable_pseudowires']   	= 1; # Enable Pseudowires
-$config['enable_vrfs']   		= 1; # Enable VRFs
-$config['enable_printers']  		= 0; # Enable Printer support
+$config['enable_syslog']                = 0; # Enable Syslog
+$config['enable_inventory']             = 1; # Enable Inventory
+$config['enable_pseudowires']           = 1; # Enable Pseudowires
+$config['enable_vrfs']                   = 1; # Enable VRFs
+$config['enable_printers']                  = 0; # Enable Printer support
 
 ### Ports extension modules
 
@@ -162,15 +162,15 @@ $config['enable_ports_poe']             = 0; # Enable PoE stats collection
 ### Billing System Configuration
 
 $config['enable_billing']               = 0; # Enable Billing
-$config['billing']['customer_autoadd']	= 0; # Enable Auto-add bill per customer
-$config['billing']['circuit_autoadd']	= 0; # Enable Auto-add bill per circuit_id
-$config['billing']['bill_autoadd']	= 0; # Enable Auto-add bill per bill_id
+$config['billing']['customer_autoadd']        = 0; # Enable Auto-add bill per customer
+$config['billing']['circuit_autoadd']        = 0; # Enable Auto-add bill per circuit_id
+$config['billing']['bill_autoadd']        = 0; # Enable Auto-add bill per bill_id
 
 ### External Integration
 
-#$config['rancid_configs'][]       	= '/var/lib/rancid/network/configs/';
-$config['rancid_ignorecomments'] 	= 0; # Ignore lines starting with #
-#$config['collectd_dir']         	= '/var/lib/collectd/rrd';
+#$config['rancid_configs'][]               = '/var/lib/rancid/network/configs/';
+$config['rancid_ignorecomments']         = 0; # Ignore lines starting with #
+#$config['collectd_dir']                 = '/var/lib/collectd/rrd';
 
 # NFSen RRD dir.
 $config['nfsen_enable'] = 0;
@@ -245,7 +245,7 @@ $config['irc_chan'][] = "#observium";
 
 ### Authentication
 
-$config['allow_unauth_graphs']	    = 0; ## Allow graphs to be viewed by anyone
+$config['allow_unauth_graphs']            = 0; ## Allow graphs to be viewed by anyone
 $config['allow_unauth_graphs_cidr'] = array(); # Allow graphs to be viewed without authorisation from certain IP ranges
 $config['auth_mechanism']           = "mysql";   # Available mechanisms: mysql (default), ldap, http-auth
 
@@ -342,7 +342,7 @@ $config['poller_modules']['cisco-ipsec-flow-monitor']     = 1;
 $config['poller_modules']['cisco-remote-access-monitor']  = 1;
 $config['poller_modules']['cisco-cef']                    = 1;
 $config['poller_modules']['cisco-mac-accounting']         = 1;
-$config['poller_modules']['cipsec-tunnels']		  = 1;
+$config['poller_modules']['cipsec-tunnels']                  = 1;
 
       #include("includes/polling/altiga-ssl.inc.php");
 

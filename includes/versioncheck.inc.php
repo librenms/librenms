@@ -24,13 +24,13 @@ if($dataHandle)
         {
                 $data.= fread($dataHandle, 4096);
         }
-        if($data)
+        if ($data)
         {
                 list($omnipotence, $year, $month, $revision) = explode(".", $data);
                 list($cur, $tag) = explode("-", $config['version']);
                 list($cur_omnipotence, $cur_year, $cur_month, $cur_revision) = explode(".", $cur);
 
-             if($argv[1] == "--cron" || isset($options['q'])) {
+             if ($argv[1] == "--cron" || isset($options['q'])) {
 
                $fd = fopen($config['log_file'],'a');
                fputs($fd,$string . "\n");
@@ -40,10 +40,10 @@ if($dataHandle)
 
              } else {
 
-                if($cur != $data) {
+                if ($cur != $data) {
                   echo("Current Version : $cur_omnipotence.$cur_year.$cur_month.$cur_revision \n");
 
-                  if($omnipotence > $cur_omnipotence) {
+                  if ($omnipotence > $cur_omnipotence) {
                     echo("New version     : $omnipotence.$year.$month.$revision\n");
                   } elseif ($year > $cur_year) {
                     echo("New version     : $omnipotence.$year.$month.$revision\n");

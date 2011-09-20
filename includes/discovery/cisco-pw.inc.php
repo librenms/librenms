@@ -21,19 +21,19 @@ if ($config['enable_pseudowires'] && $device['os_group'] == "ios")
 
       if ($cpwOid)
       {
-	list($cpw_remote_id) = explode(":", shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -m CISCO-IETF-PW-MPLS-MIB -Ln -Osqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " cpwVcMplsPeerLdpID." . $cpwOid));
-	$interface_descr = trim(shell_exec($config['snmpwalk'] . " -M " . $config['mibdir'] . " -m CISCO-IETF-PW-MIB -Oqvn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " cpwVcName." . $cpwOid));
-	$cpw_remote_device = @mysql_result(mysql_query("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '".$cpw_remote_id."' AND A.interface_id = I.interface_id"),0);
-	$if_id = @mysql_result(mysql_query("SELECT `interface_id` FROM `ports` WHERE `ifDescr` = '$interface_descr' AND `device_id` = '".$device['device_id']."'"),0);
+        list($cpw_remote_id) = explode(":", shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -m CISCO-IETF-PW-MPLS-MIB -Ln -Osqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " cpwVcMplsPeerLdpID." . $cpwOid));
+        $interface_descr = trim(shell_exec($config['snmpwalk'] . " -M " . $config['mibdir'] . " -m CISCO-IETF-PW-MIB -Oqvn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " cpwVcName." . $cpwOid));
+        $cpw_remote_device = @mysql_result(mysql_query("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '".$cpw_remote_id."' AND A.interface_id = I.interface_id"),0);
+        $if_id = @mysql_result(mysql_query("SELECT `interface_id` FROM `ports` WHERE `ifDescr` = '$interface_descr' AND `device_id` = '".$device['device_id']."'"),0);
 
-	if ($cpw_remote_device && $if_id)
-	{
-	  $hostname = gethostbyid($cpw_remote_device);
+        if ($cpw_remote_device && $if_id)
+        {
+          $hostname = gethostbyid($cpw_remote_device);
 #echo("\nOid: " . $cpwOid . " cpwVcID: " . $cpwVcID . " Remote Id: " . $cpw_remote_id . "($hostname(".$cpw_remote_device.") -> $interface_descr($if_id))");
-	  if (mysql_result(mysql_query("SELECT count(*) FROM pseudowires WHERE `interface_id` = '$if_id'
-		  AND `cpwVcID`='".$cpwVcID."'"),0))
+          if (mysql_result(mysql_query("SELECT count(*) FROM pseudowires WHERE `interface_id` = '$if_id'
+                  AND `cpwVcID`='".$cpwVcID."'"),0))
           {
-	    echo(".");
+            echo(".");
           }
           else
           {
@@ -44,7 +44,7 @@ if ($config['enable_pseudowires'] && $device['os_group'] == "ios")
 #echo($device['device_id'] . " $cpwOid $cpw_remote_device $if_id $cpwVcID\n");
           }
           $cpw_exists[] = $device['device_id'] . " $cpwOid $cpw_remote_device $if_id $cpwVcID";
-	}
+        }
       }
     }
   }

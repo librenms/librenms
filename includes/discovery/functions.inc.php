@@ -15,7 +15,7 @@ function discover_new_device($hostname)
 {
   global $config;
 
-  if($config['autodiscovery']['xdp']) {
+  if ($config['autodiscovery']['xdp']) {
     if ( isDomainResolves($hostname . "." . $config['mydomain']) ) {
       $dst_host = $hostname . "." . $config['mydomain'];
     } else {
@@ -26,7 +26,7 @@ function discover_new_device($hostname)
     if ( match_network($config['nets'], $ip) )
     {
       $remote_device_id = addHost ($dst_host, NULL, "v2c");
-      if($remote_device_id) {
+      if ($remote_device_id) {
         $remote_device = device_by_id_cache($remote_device_id, 1);
         echo("+[".$remote_device['hostname']."(".$remote_device['device_id'].")]");
         discover_device($remote_device);
@@ -51,10 +51,10 @@ function discover_device($device, $options = NULL)
 
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
 
-  if($device['os'] == 'generic') // verify if OS has changed from generic
+  if ($device['os'] == 'generic') // verify if OS has changed from generic
   {
       $device['os']= getHostOS($device);
-      if($device['os'] != 'generic')
+      if ($device['os'] != 'generic')
       {
           echo "Device os was updated to".$device['os']."!";
           dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
@@ -343,7 +343,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
     else
     {
       $updated = dbUpdate(array('storage_descr' => $descr, 'storage_type' => $type, 'storage_units' => $units, 'storage_size' => $size), 'storage', '`device_id` = ? AND `storage_index` = ? AND `storage_mib` = ?', array($device['device_id'], $index, $mib));
-      if($updated) { echo("U"); } else { echo("."); }
+      if ($updated) { echo("U"); } else { echo("."); }
     }
     $valid[$mib][$index] = 1;
   }

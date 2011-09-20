@@ -33,13 +33,13 @@ if (is_array($cefs))
         echo(" | |-".$path.": ".$cef_stat['cefSwitchingPath']);
 
 
-        if(dbFetchCell("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path)) != "1")
+        if (dbFetchCell("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path)) != "1")
         {
           dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $entity, 'afi' => $afi, 'cef_index' => $path, 'cef_path' => $cef_stat['cefSwitchingPath']), 'cef_switching');
           echo("+");
         }
 
-	$cef_entry = dbFetchRow("SELECT * FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path));
+        $cef_entry = dbFetchRow("SELECT * FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path));
 
         $filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cefswitching-".$entity."-".$afi."-".$path.".rrd");
 
@@ -74,7 +74,7 @@ if (is_array($cefs))
         $rrd_update  = "N:".$cef_stat['cefSwitchingDrop'].":".$cef_stat['cefSwitchingPunt'].":".$cef_stat['cefSwitchingPunt2Host'];
         $ret = rrdtool_update("$filename", $rrd_update);
 
-        if($debug) { echo(" Values: ".$cef_stat['cefSwitchingDrop'].":".$cef_stat['cefSwitchingPunt'].":".$cef_stat['cefSwitchingPunt2Host']); }
+        if ($debug) { echo(" Values: ".$cef_stat['cefSwitchingDrop'].":".$cef_stat['cefSwitchingPunt'].":".$cef_stat['cefSwitchingPunt2Host']); }
 
         echo("\n");
 
