@@ -18,7 +18,7 @@ if (count($sensors))
 
     $graph_colour = str_replace("#", "", $row_colour);
 
-    $graph_array	   = array();
+    $graph_array           = array();
     $graph_array['height'] = "100";
     $graph_array['width']  = "210";
     $graph_array['to']     = $now;

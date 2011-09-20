@@ -14,7 +14,7 @@ foreach($stats as $stat)
   $rrd_list[$i]['filename'] = $rrd_filename;
   $rrd_list[$i]['descr'] = str_replace("tcp", "", $stat);
   $rrd_list[$i]['rra'] = $stat;
-  if(strpos($stat, "Out") !== FALSE || strpos($stat, "Retrans") !== FALSE || strpos($stat, "Attempt") !== FALSE)
+  if (strpos($stat, "Out") !== FALSE || strpos($stat, "Retrans") !== FALSE || strpos($stat, "Attempt") !== FALSE)
   {
     $rrd_list[$i]['invert'] = TRUE;
   }

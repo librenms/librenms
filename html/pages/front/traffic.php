@@ -81,7 +81,7 @@ foreach (dbFetchRows("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerA
 
 if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)
 {
-  foreach (dbFetchRows("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE A.attrib_value < ? AND A.attrib_type = 'uptime' AND A.device_id = D.device_id AND ignore = '0' AND disabled = '0'", array($config['uptime_warning'])) as $device){
+  foreach (dbFetchRows("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE A.attrib_value < ? AND A.attrib_type = 'uptime' AND A.device_id = D.device_id AND ignore = '0' AND disabled = '0'", array($config['uptime_warning'])) as $device) {
      if (device_permitted($device['device_id']) && $device['attrib_value'] < $config['uptime_warning'] && $device['attrib_type'] == "uptime") {
         echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ddffdd;'>
         <strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
@@ -95,7 +95,7 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
 
 echo("
 
-	<div style='clear: both;'>$errorboxes</div> <div style='margin: 0px; clear: both;'>
+        <div style='clear: both;'>$errorboxes</div> <div style='margin: 0px; clear: both;'>
 
 <h3>Recent Syslog Messages</h3>
 

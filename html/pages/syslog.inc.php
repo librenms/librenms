@@ -17,7 +17,7 @@
         foreach (dbFetchRows("SELECT `program` FROM `syslog` GROUP BY `program` ORDER BY `program`") as $data)
         {
           echo("<option value='".$data['program']."'");
-	  if ($data['program'] == $_POST['program']) { echo("selected"); }
+          if ($data['program'] == $_POST['program']) { echo("selected"); }
           echo(">".$data['program']."</option>");
         }
       ?>
@@ -32,7 +32,7 @@
         {
           echo("<option value='".$data['device_id']."'");
 
-	  if ($data['device_id'] == $_POST['device']) { echo("selected"); }
+          if ($data['device_id'] == $_POST['device']) { echo("selected"); }
 
           echo(">".$data['hostname']."</option>");
         }
@@ -69,7 +69,7 @@ if (is_numeric($_POST['device']))
 if ($_SESSION['userlevel'] >= '5')
 {
   $sql = "SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog AS S";
-  if(count($array))
+  if (count($array))
   {
     $sql .= " WHERE 1 ".$where;
   }
@@ -77,7 +77,7 @@ if ($_SESSION['userlevel'] >= '5')
 } else {
   $sql  = "SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog AS S, devices_perms AS P";
   $sql .= "WHERE S.device_id = P.device_id AND P.user_id = ?";
-  if(count($array))
+  if (count($array))
   {
     $sql .= " WHERE 1 ".$where;
   }

@@ -2,8 +2,8 @@
 
 if ($_SESSION['userlevel'] >= '5') {
 
-  if(!isset($_GET['optb'])) { $_GET['optb'] = "all"; }
-  if(!isset($_GET['optc'])) { $_GET['optc'] = "basic"; }
+  if (!isset($_GET['optb'])) { $_GET['optb'] = "all"; }
+  if (!isset($_GET['optc'])) { $_GET['optc'] = "basic"; }
 
   print_optionbar_start();
 

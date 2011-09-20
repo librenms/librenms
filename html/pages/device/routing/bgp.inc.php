@@ -134,7 +134,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
 
   echo("   <td width=20><span class=list-large>".$i."</span></td>
            <td>" . $peeraddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), 'bgp/')."</td>
-	     <td>$peer_type</td>
+             <td>$peer_type</td>
            <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>" . (isset($peer['afi']) ? $peer['afi'] : '') . "</td>
            <td><strong>AS" . $peer['bgpPeerRemoteAs'] . "</strong><br />" . $peer['astext'] . "</td>
            <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "<span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></strong></td>
@@ -177,7 +177,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
 
   if ($vars['view'] == 'updates') { $peer['graph'] = 1; }
 
-  if($peer['graph'])
+  if ($peer['graph'])
   {
     $graph_array['height'] = "100";
     $graph_array['width']  = "216";

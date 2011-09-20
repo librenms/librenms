@@ -36,7 +36,7 @@ echo('  <tr class="'.$class.'" bgcolor="' . $bg . '" onmouseover="this.style.bac
           <td width="40" align="center" valign="middle">' . $image . '</td>
           <td width="300"><span style="font-size: 15px;">' . generate_device_link($device) . '</span>
           <br />' . $device['sysName'] . '</td>'
-	);
+        );
 
 echo ('<td width="55">');
 if ($port_count) { echo(' <img src="images/icons/port.png" align=absmiddle /> '.$port_count); }

@@ -27,7 +27,7 @@ function dbQuery($sql, $parameters = array()) {
         $fullSql = dbMakeQuery($sql, $parameters);
         if ($debug) { echo(" SQL[".$fullSql."] "); }
         /*
-        if($this->logFile)
+        if ($this->logFile)
                 $time_start = microtime(true);
         */
 
@@ -35,13 +35,13 @@ function dbQuery($sql, $parameters = array()) {
 
         $result = mysql_query($fullSql); // sets $this->result
         /*
-        if($this->logFile) {
+        if ($this->logFile) {
                 $time_end = microtime(true);
                 fwrite($this->logFile, date('Y-m-d H:i:s') . "\n" . $fullSql . "\n" . number_format($time_end - $time_start, 8) . " seconds\n\n");
         }
         */
 
-        if($result === false && (error_reporting() & 1)) {
+        if ($result === false && (error_reporting() & 1)) {
                 // aye. this gets triggers on duplicate Contact insert
                 //trigger_error('QDB - Error in query: ' . $fullSql . ' : ' . mysql_error(), E_USER_WARNING);
         }
@@ -61,7 +61,7 @@ function dbInsert($data, $table) {
         // it allows the method to work for those that would rather it (or expect it to)
         // follow closer with SQL convention:
         // insert into the TABLE this DATA
-        if(is_string($data) && is_array($table)) {
+        if (is_string($data) && is_array($table)) {
                 $tmp = $data;
                 $data = $table;
                 $table = $tmp;
@@ -73,12 +73,12 @@ function dbInsert($data, $table) {
         $time_start = microtime(true);
         dbBeginTransaction();
         $result = dbQuery($sql, $data);
-        if($result) {
+        if ($result) {
                 $id = mysql_insert_id();
                 dbCommitTransaction();
                 #return $id;
         } else {
-                if($table != 'Contact') {
+                if ($table != 'Contact') {
                         trigger_error('QDB - Insert failed.', E_USER_WARNING);
                 }
                 dbRollbackTransaction();
@@ -108,7 +108,7 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
         // it allows the method to work for those that would rather it (or expect it to)
         // follow closer with SQL convention:
         // update the TABLE with this DATA
-        if(is_string($data) && is_array($table)) {
+        if (is_string($data) && is_array($table)) {
                 $tmp = $data;
                 $data = $table;
                 $table = $tmp;
@@ -123,13 +123,13 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
         }
         $sql = substr($sql, 0, -1); // strip off last comma
 
-        if($where) {
+        if ($where) {
                 $sql .= ' WHERE ' . $where;
                 $data = array_merge($data, $parameters);
         }
 
         $time_start = microtime(true);
-        if(dbQuery($sql, $data)) {
+        if (dbQuery($sql, $data)) {
                 $return = mysql_affected_rows();
         } else {
                 #echo("$fullSql");
@@ -146,10 +146,10 @@ function dbUpdate($data, $table, $where = null, $parameters = array()) {
 
 function dbDelete($table, $where = null, $parameters = array()) {
         $sql = 'DELETE FROM `' . $table.'`';
-        if($where) {
+        if ($where) {
                 $sql .= ' WHERE ' . $where;
         }
-        if(dbQuery($sql, $parameters)) {
+        if (dbQuery($sql, $parameters)) {
                 return mysql_affected_rows();
         } else {
                 return false;
@@ -166,7 +166,7 @@ function dbFetchRows($sql, $parameters = array()) {
         $time_start = microtime(true);
         $result = dbQuery($sql, $parameters);
 
-        if(mysql_num_rows($result) > 0) {
+        if (mysql_num_rows($result) > 0) {
                 $rows = array();
                 while ($row = mysql_fetch_assoc($result)) {
                         $rows[] = $row;
@@ -194,7 +194,7 @@ function dbFetch($sql, $parameters = array()) {
         /*
         // for now, don't do the iterator thing
         $result = dbQuery($sql, $parameters);
-        if($result) {
+        if ($result) {
                 // return new iterator
                 return new dbIterator($result);
         } else {
@@ -212,7 +212,7 @@ function dbFetchRow($sql = null, $parameters = array()) {
 
         $time_start = microtime(true);
         $result = dbQuery($sql, $parameters);
-        if($result) {
+        if ($result) {
                 $row = mysql_fetch_assoc($result);
                 mysql_free_result($result);
                 $time_end = microtime(true);
@@ -236,7 +236,7 @@ function dbFetchCell($sql, $parameters = array()) {
 
         $time_start = microtime(true);
         $row = dbFetchRow($sql, $parameters);
-        if($row) {
+        if ($row) {
                 return array_shift($row); // shift first field off first row
         }
         $time_end = microtime(true);
@@ -276,7 +276,7 @@ function dbFetchKeyValue($sql, $parameters = array()) {
         $data = array();
         foreach(dbFetch($sql, $parameters) as $row) {
                 $key = array_shift($row);
-                if(sizeof($row) == 1) { // if there were only 2 fields in the result
+                if (sizeof($row) == 1) { // if there were only 2 fields in the result
                         // use the second for the value
                         $data[ $key ] = array_shift($row);
                 } else { // if more than 2 fields were fetched
@@ -301,7 +301,7 @@ function dbMakeQuery($sql, $parameters) {
                 $questionParams = array();
                 $namedParams = array();
                 foreach($parameters as $key => $value) {
-                        if(is_numeric($key)) {
+                        if (is_numeric($key)) {
                                 $questionParams[] = $value;
                         } else {
                                 $namedParams[ ':' . $key ] = $value;
@@ -320,9 +320,9 @@ function dbMakeQuery($sql, $parameters) {
                         $query .= $result[ $i ];
 
                         $j = $i+1;
-                        if(array_key_exists($j, $result)) {
+                        if (array_key_exists($j, $result)) {
                                 $test = $result[ $j ];
-                                if($test == '?') {
+                                if ($test == '?') {
                                         $query .= array_shift($questionParams);
                                 } else {
                                         $query .= $namedParams[ $test ];
@@ -341,7 +341,7 @@ function dbPrepareData($data) {
                         // don't quote or esc if value is an array, we treat it
                         // as a "decorator" that tells us not to escape the
                         // value contained in the array
-                        if(is_array($value) && !is_object($value)) {
+                        if (is_array($value) && !is_object($value)) {
                                 $escape = false;
                                 $value = array_shift($value);
                         }
@@ -349,7 +349,7 @@ function dbPrepareData($data) {
                         // that are aliases, or part of other tables through joins
                         //if(!in_array($key, $columns)) // skip invalid fields
                         //        continue;
-                        if($escape) {
+                        if ($escape) {
                                 $values[$key] = "'" . mysql_real_escape_string($value) . "'";
                         } else
                                 $values[$key] = $value;
@@ -365,7 +365,7 @@ function dbPrepareData($data) {
 function dbPlaceHolders($values) {
         $data = array();
         foreach($values as $key => $value) {
-                if(is_numeric($key))
+                if (is_numeric($key))
                         $data[] = '?';
                 else
                         $data[] = ':' . $key;
@@ -410,7 +410,7 @@ class dbIterator implements Iterator {
         public function next() {
                 $this->i++;
                 $a = mysql_data_seek($this->result, $this->i);
-                if($a === false) {
+                if ($a === false) {
                         $this->i = 0;
                 }
                 return $a;

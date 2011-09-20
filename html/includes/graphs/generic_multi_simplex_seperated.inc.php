@@ -48,7 +48,7 @@ foreach ($rrd_list as $i => $rrd)
   }
 
   ## Are our text values related to te multiplier/divisor or not?
-  if(isset($text_orig) && $text_orig)
+  if (isset($text_orig) && $text_orig)
   {
     $t_defname = $rrd['rra'];
   } else {

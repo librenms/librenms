@@ -18,7 +18,7 @@ if ($_SESSION['userlevel'] < '10') { include("includes/error-no-perm.inc.php"); 
 
 #        dbDelete('bill_perms', "`user_id` =  ?", array($_GET['user_id']));
 #        dbDelete('devices_perms', "`user_id` =  ?", array($_GET['user_id']));
-#	dbDelete('ports_perms', "`user_id` =  ?", array($_GET['user_id']));
+#        dbDelete('ports_perms', "`user_id` =  ?", array($_GET['user_id']));
 #        dbDelete('users_prefs', "`user_id` =  ?", array($_GET['user_id']));
 #        dbDelete('users', "`user_id` =  ?", array($_GET['user_id']));
 

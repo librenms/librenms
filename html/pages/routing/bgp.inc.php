@@ -11,7 +11,7 @@ else
 
   echo('<span style="font-weight: bold;">BGP</span> &#187; ');
 
-  if(!$_GET['optb']) { $_GET['optb'] = "all"; }
+  if (!$_GET['optb']) { $_GET['optb'] = "all"; }
 
   if ($_GET['opta'] == "bgp" && $_GET['optb'] == "all") { echo("<span class='pagemenu-selected'>"); }
   echo('<a href="routing/bgp/all/'.$graphs.'/">All</a>');
@@ -38,7 +38,7 @@ else
 
   echo('<div style="float: right;">');
 
-  if(!$_GET['optc']) { $_GET['optc'] = "nographs"; }
+  if (!$_GET['optc']) { $_GET['optc'] = "nographs"; }
 
   if ($_GET['opta'] == "bgp" && $_GET['optc'] == "nographs") { echo("<span class='pagemenu-selected'>"); }
   echo('<a href="routing/bgp/'.$_GET['optb'].'/nographs/">No Graphs</a>');
@@ -148,9 +148,9 @@ else
 
     echo("  <td></td>
             <td width=150>" . $localaddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), 'routing/bgp/')."</td>
-	    <td width=30><b>&#187;</b></td>
+            <td width=30><b>&#187;</b></td>
             <td width=150>" . $peeraddresslink . "</td>
-	    <td width=50><b>$peer_type</b></td>
+            <td width=50><b>$peer_type</b></td>
             <td width=50>".$peer['afi']."</td>
             <td><strong>AS" . $peer['bgpPeerRemoteAs'] . "</strong><br />" . $peer['astext'] . "</td>
             <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></strong></td>
@@ -191,7 +191,7 @@ else
 
     if ($_GET['optc'] == 'updates') { $peer['graph'] = 1; }
 
-    if($peer['graph'])
+    if ($peer['graph'])
     {
         $graph_array['height'] = "100";
         $graph_array['width']  = "220";

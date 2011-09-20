@@ -109,7 +109,7 @@ foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `device_id` = ?", arr
     $host = @dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ?
                                             AND I.interface_id = A.interface_id AND D.device_id = I.device_id", array($nbr['ospfNbrRtrId']));
 
-    if(is_array($host)) { $rtr_id = generate_dev_link($host, $nbr['ospfNbrRtrId']); } else { $rtr_id = "unknown"; }
+    if (is_array($host)) { $rtr_id = generate_dev_link($host, $nbr['ospfNbrRtrId']); } else { $rtr_id = "unknown"; }
 
     echo('<tr bgcolor="'.$nbr_bg.'">');
     echo('  <td width=5></td>');

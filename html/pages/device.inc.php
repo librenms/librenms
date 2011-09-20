@@ -125,7 +125,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     if ($device_routing_count['cef']) { $routing_tabs[] = 'cef'; }
 
     $device_routing_count['vrf'] = @dbFetchCell("SELECT COUNT(*) FROM `vrfs` WHERE `device_id` = ?", array($device['device_id']));
-    if($device_routing_count['vrf']) { $routing_tabs[] = 'vrf'; }
+    if ($device_routing_count['vrf']) { $routing_tabs[] = 'vrf'; }
 
     if (is_array($routing_tabs))
     {
@@ -253,7 +253,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     echo("</ul>");
   }
 
-  if(device_permitted($device['device_id']) || $check_device == $vars['device']) {
+  if (device_permitted($device['device_id']) || $check_device == $vars['device']) {
     echo('<div class="contentstyle">');
 
     include("pages/device/".mres(basename($tab)).".inc.php");

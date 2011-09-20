@@ -134,14 +134,14 @@ function getImage($host)
   {
     $image = '<img src="'.$config['base_url'].'/images/os/'.$config['os'][$type]['icon'].'.gif" />';
   } else {
-    if (file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.png" />';
-    } elseif (file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.gif" />'; }
+    if (file_exists($config['html_dir'] . "/images/os/$type" . ".png")) { $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.png" />';
+    } elseif (file_exists($config['html_dir'] . "/images/os/$type" . ".gif")) { $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.gif" />'; }
     if ($type == "linux")
     {
       $features = strtolower(trim($data['features']));
       list($distro) = explode(" ", $features);
-      if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.png" />';
-      } elseif (file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.gif" />'; }
+      if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")) { $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.png" />';
+      } elseif (file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")) { $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.gif" />'; }
     }
   }
 

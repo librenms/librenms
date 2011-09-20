@@ -49,7 +49,7 @@ foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
             </div>
 
             <div class="col_1">
-	      <h3>Search</h3>
+              <h3>Search</h3>
             </div>
 
             <div class="col_1">
@@ -98,7 +98,7 @@ if ($_SESSION['userlevel'] >= '10') {
        </div>
 
 <script class="code" type="text/javascript">
-$(document).ready(function(){
+$(document).ready(function() {
   var data = [
     ['Up', <?php echo($devices['up']); ?>],
     ['Down', <?php echo($devices['down']); ?>],
@@ -162,7 +162,7 @@ if ($_SESSION['userlevel'] >= '10') {
        </div>
 
 <script class="code" type="text/javascript">
-$(document).ready(function(){
+$(document).ready(function() {
   var data = [
     ['Up', <?php echo($services['up']); ?>],
     ['Down', <?php echo($services['down']); ?>],
@@ -300,7 +300,7 @@ if ($deleted_ports) { echo('<li><a href="deleted-ports/"><img src="images/16/cro
           </div>
 
 <script class="code" type="text/javascript">
-$(document).ready(function(){
+$(document).ready(function() {
   var data = [
     ['Up', <?php echo($ports['up']); ?>],
     ['Down', <?php echo($ports['down']); ?>],

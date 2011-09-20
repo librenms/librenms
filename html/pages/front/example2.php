@@ -28,7 +28,7 @@ while ($device = mysql_fetch_assoc($sql))
 }
 
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
-while ($device = mysql_fetch_assoc($sql)){
+while ($device = mysql_fetch_assoc($sql)) {
 
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffbbbb; margin: 4px;'>
       <center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
@@ -39,7 +39,7 @@ while ($device = mysql_fetch_assoc($sql)){
 }
 
 $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
-while ($interface = mysql_fetch_assoc($sql)){
+while ($interface = mysql_fetch_assoc($sql)) {
 
       echo("<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
       <center><strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
@@ -51,7 +51,7 @@ while ($interface = mysql_fetch_assoc($sql)){
 }
 
 $sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'");
-while ($service = mysql_fetch_assoc($sql)){
+while ($service = mysql_fetch_assoc($sql)) {
 
       echo("<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
       <center><strong>".generate_device_link($service, shorthost($service['hostname']))."</strong><br />
@@ -63,7 +63,7 @@ while ($service = mysql_fetch_assoc($sql)){
 }
 
 $sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerState != 'established' AND B.device_id = D.device_id");
-while ($peer = mysql_fetch_assoc($sql)){
+while ($peer = mysql_fetch_assoc($sql)) {
 
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
       <center><strong>".generate_device_link($peer, shorthost($peer['hostname']))."</strong><br />
@@ -77,7 +77,7 @@ while ($peer = mysql_fetch_assoc($sql)){
 if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)
 {
   $sql = mysql_query("SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value < '" . $config['uptime_warning'] . "'");
-  while ($device = mysql_fetch_assoc($sql)){
+  while ($device = mysql_fetch_assoc($sql)) {
 
         echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ddffdd; margin: 4px;'>
         <center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
@@ -89,7 +89,7 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
 
 echo("
 
-	<div style='clear: both;'>$errorboxes</div> <div style='margin: 4px; clear: both;'>
+        <div style='clear: both;'>$errorboxes</div> <div style='margin: 4px; clear: both;'>
 
 <h3>Recent Syslog Messages</h3>
 

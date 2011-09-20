@@ -19,8 +19,8 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hos
     <td width="200" style="padding: 1px;">
       <select name="interface" id="interface">
       <option value="">All Interfaces</option>
-      <option value="Loopback%" <?php if ($_POST['interface'] == "Loopback%"){ echo("selected"); } ?> >Loopbacks</option>
-      <option value="Vlan%" <?php if ($_POST['interface'] == "Vlan%"){ echo("selected"); } ?> >VLANs</option>
+      <option value="Loopback%" <?php if ($_POST['interface'] == "Loopback%") { echo("selected"); } ?> >Loopbacks</option>
+      <option value="Vlan%" <?php if ($_POST['interface'] == "Vlan%") { echo("selected"); } ?> >VLANs</option>
       </select>
     </td>
     <td>

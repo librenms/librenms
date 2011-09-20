@@ -8,7 +8,7 @@
 #Cisco Systems, Inc. WS-C4003 Cisco Catalyst Operating System Software, Version 6.4(13) Copyright (c) 1995-2004 by Cisco Systems, Inc.
 #Cisco Systems, Inc. WS-C4006 Cisco Catalyst Operating System Software, Version 6.3(9) Copyright (c) 1995-2002 by Cisco Systems, Inc.
 
-if (strstr($ciscomodel, "OID")){ unset($ciscomodel); }
+if (strstr($ciscomodel, "OID")) { unset($ciscomodel); }
 
 if (!strstr($ciscomodel, " ") && strlen($ciscomodel) >= '3')
 {

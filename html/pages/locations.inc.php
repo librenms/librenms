@@ -59,12 +59,12 @@ foreach (getlocations() as $location)
              <td width="100">' . $alert . '</td>
              <td width="100">' . $num . ' devices</td>
              <td width="100">' . $net . ' network</td>
-	     <td width="100">' . $srv . ' servers</td>
+             <td width="100">' . $srv . ' servers</td>
              <td width="100">' . $fwl . ' firewalls</td>
            </tr>
          ');
 
-    if($vars['view'] == "traffic")
+    if ($vars['view'] == "traffic")
     {
       echo('<tr bgcolor="' . $bg . '"><td colspan=6>');
 

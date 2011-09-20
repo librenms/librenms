@@ -223,7 +223,7 @@ if ($port['pagpGroupIfIndex'] && $port['pagpGroupIfIndex'] != $port['ifIndex'])
 
 foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $higher_if)
 {
-  if($higher_if['interface_id_high'])
+  if ($higher_if['interface_id_high'])
   {
     $this_port = get_port_by_index_cache($device['device_id'], $higher_if['interface_id_high']);
     echo("$br<img src='images/16/arrow_divide.png' align=absmiddle> <strong>" . generate_port_link($this_port) . "</strong>");
@@ -233,7 +233,7 @@ foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? an
 
 foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_high` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $lower_if)
 {
-  if($lower_if['interface_id_low'])
+  if ($lower_if['interface_id_low'])
   {
     $this_port = get_port_by_index_cache($device['device_id'], $lower_if['interface_id_low']);
     echo("$br<img src='images/16/arrow_join.png' align=absmiddle> <strong>" . generate_port_link($this_port) . "</strong>");

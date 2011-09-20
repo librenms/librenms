@@ -45,7 +45,7 @@ foreach($config['poller_modules'] as $module => $module_status)
 
   echo('</td><td>');
 
-  if(isset($attribs['poll_'.$module]))
+  if (isset($attribs['poll_'.$module]))
   {
     if ($attribs['poll_'.$module]) {echo("<span class=green>enabled</span>");} else { echo('<span class=red>disabled</span>'); }
   } else {
@@ -82,7 +82,7 @@ foreach($config['discovery_modules'] as $module => $module_status)
 
   echo('</td><td>');
 
-  if(isset($attribs['discover_'.$module]))
+  if (isset($attribs['discover_'.$module]))
   {
     if ($attribs['discover_'.$module]) {echo("<span class=green>enabled</span>");} else { echo('<span class=red>disabled</span>'); }
   } else {

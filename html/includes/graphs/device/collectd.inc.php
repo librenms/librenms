@@ -27,7 +27,7 @@ function makeTextBlock($text, $fontfile, $fontsize, $width) {
   $currentLine = 0;
   foreach ($words as $word) {
     $lineSize = imagettfbbox($fontsize, 0, $fontfile, $lines[$currentLine] . ' ' . $word);
-    if($lineSize[2] - $lineSize[0] < $width) {
+    if ($lineSize[2] - $lineSize[0] < $width) {
       $lines[$currentLine] .= ' ' . $word;
     } else {
       $currentLine++;
@@ -47,6 +47,7 @@ function makeTextBlock($text, $fontfile, $fontsize, $width) {
  */
 function error($code, $code_msg, $title, $msg) {
   global $config;
+
   header(sprintf("HTTP/1.0 %d %s", $code, $code_msg));
   header("Pragma: no-cache");
   header("Expires: Mon, 01 Jan 2008 00:00:00 CET");
@@ -197,9 +198,9 @@ if (isset($MetaGraphDefs[$type])) {
 
 if(isset($rrd_cmd))
 {
-  if($config['rrdcached']) { $rrd_cmd .= " --daemon ".$config['rrdcached'] . " "; }
-    if($_GET['from'])  { $from   = mres($_GET['from']);   }
-      if($_GET['to'])    { $to   = mres($_GET['to']);   }
+  if ($config['rrdcached']) { $rrd_cmd .= " --daemon ".$config['rrdcached'] . " "; }
+    if ($_GET['from'])  { $from   = mres($_GET['from']);   }
+      if ($_GET['to'])    { $to   = mres($_GET['to']);   }
         $rrd_cmd .= " -s " . $from . " -e " . $to;
 }
 

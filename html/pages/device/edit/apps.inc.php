@@ -29,7 +29,7 @@ if ($_POST['device'])
     }
   }
 
-  if(count($enabled)) {
+  if (count($enabled)) {
     $updated += dbDelete('applications', "`device_id` = ? AND `app_type` NOT IN (".implode(",",$replace).")", $param);
   } else {
     $updated += dbDelete('applications', "`device_id` = ?", array($param));

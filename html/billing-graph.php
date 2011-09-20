@@ -105,7 +105,7 @@ foreach (dbFetch("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bil
     $tot_data[$i]   = $out_data[$i] + $in_data[$i];
     $tot_data_inv[$i]   = $tot_data[$i] * -1;
 
-    if($tot_data[$i] > $max_value) { $max_value = $tot_data[$i]; }
+    if ($tot_data[$i] > $max_value) { $max_value = $tot_data[$i]; }
 
     $ticks[$i]      = $timestamp;
     $per_data[$i]   = $rate_95th / $div;
