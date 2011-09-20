@@ -8,7 +8,7 @@ if ($debug) { print_r($cefs); }
 
 if (is_array($cefs))
 {
-  if (!is_array($entity_array)) 
+  if (!is_array($entity_array))
   {
     echo("Caching OIDs: ");
     $entity_array = array();
@@ -31,10 +31,10 @@ if (is_array($cefs))
         echo(" | |-".$path.": ".$path_name['cefSwitchingPath']."\n");
 
 
-        if(mysql_result(mysql_query("SELECT COUNT(*) FROM `cef` WHERE `device_id` = '".$device['device_id']."' AND `entPhysicalIndex` = '".$entity."' 
+        if(mysql_result(mysql_query("SELECT COUNT(*) FROM `cef` WHERE `device_id` = '".$device['device_id']."' AND `entPhysicalIndex` = '".$entity."'
                                      AND `afi` = '".$afi."' AND `cef_index` = '".$path."'"),0) != "1")
         {
-	  $sql = "INSERT INTO `cef` (`device_id`, `entPhysicalIndex`, `afi`, `cef_index`, `cef_path`) 
+	  $sql = "INSERT INTO `cef` (`device_id`, `entPhysicalIndex`, `afi`, `cef_index`, `cef_path`)
                   VALUES ('".$device['device_id']."', '".$entity."', '".$afi."', '".$path."', '".$path_name['cefSwitchingPath']."')";
 	  mysql_query($sql);
           echo("+");

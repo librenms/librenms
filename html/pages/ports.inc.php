@@ -163,9 +163,9 @@ foreach ($menu_options as $option => $text)
 }
 ?>
 
- | 
+ |
 
-<span style="font-weight: bold;">Graphs</span> &#187; 
+<span style="font-weight: bold;">Graphs</span> &#187;
 
 <?php
 
@@ -193,7 +193,7 @@ foreach ($menu_options as $option => $text)
 echo('<div style="float: right;">');
 ?>
 
-  <a href="<?php echo(generate_url($vars)); ?>" title="Update the browser URL to reflect the search criteria." >Update URL</a> | 
+  <a href="<?php echo(generate_url($vars)); ?>" title="Update the browser URL to reflect the search criteria." >Update URL</a> |
 
 <?php
   if($vars['searchbar'] == "hide")

@@ -9,7 +9,7 @@ function poll_sensor($device, $class, $unit)
     echo("Checking $class " . $sensor['sensor_descr'] . "... ");
 
     if($class == "temperature")
-    {  
+    {
       for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
       {
         if ($debug) echo("Attempt $i ");
@@ -32,13 +32,13 @@ function poll_sensor($device, $class, $unit)
 
     #$rrd_file = $config['rrd_dir']."/".$device['hostname']."/".safename("sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_index'] . ".rrd");
 
-    ## FIXME - sensor name format change 2011/04/26 - remove this in $amount_of_time. 
+    ## FIXME - sensor name format change 2011/04/26 - remove this in $amount_of_time.
     ## We don't want to reduce performance forever because douchebags don't svn up!
     $old_rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("$class-" . $sensor['sensor_descr'] . ".rrd");
     $old_rrd_file_b = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("$class-" . $sensor['sensor_index'] . ".rrd");
-    if (is_file($old_rrd_file) && is_file($old_rrd_file_b)) 
-    { 
-      rename($old_rrd_file, $rrd_file); 
+    if (is_file($old_rrd_file) && is_file($old_rrd_file_b))
+    {
+      rename($old_rrd_file, $rrd_file);
       unlink($old_rrd_file_b);
     } elseif (is_file($old_rrd_file)) {
       rename($old_rrd_file, $rrd_file);

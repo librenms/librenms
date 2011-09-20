@@ -40,10 +40,10 @@ if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs'])
 {
   $auth = "1"; ## hardcode auth for all with config function
 } else {
-  if (!$_SESSION['authenticated']) 
-  { 
-    graph_error("Session not authenticated"); 
-    exit; 
+  if (!$_SESSION['authenticated'])
+  {
+    graph_error("Session not authenticated");
+    exit;
   }
 }
 
@@ -120,7 +120,7 @@ function graph_error($string)
 if ($error_msg) {
   graph_error($graph_error);
 } elseif (!$auth) {
- 
+
   if ($width < 200)
   {
    graph_error("No Auth");

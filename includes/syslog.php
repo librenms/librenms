@@ -16,7 +16,7 @@ function get_cache($host, $value){
         //If failed, try by IP
         if(!is_numeric($dev_cache[$host]['device_id'])) {
           $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM `ipv4_addresses` AS A, `ports` AS I WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id', array($host));
-        } 
+        }
         break;
       case 'os':
         $dev_cache[$host]['os'] = dbFetchCell('SELECT `os` FROM devices WHERE `device_id` = ?', array(get_cache($host, 'device_id')));
@@ -42,7 +42,7 @@ function process_syslog ($entry, $update) {
       echo('D-'.$bi);
       return $entry;
     }
-    
+
   $entry['device_id'] = get_cache($entry['host'], 'device_id');
   if($entry['device_id']) {
     $os = get_cache($entry['host'], 'os');
@@ -137,7 +137,7 @@ function process_syslog ($entry, $update) {
       dbInsert(
         array(
           'device_id' => $entry['device_id'],
-          'program' => $entry['program'], 
+          'program' => $entry['program'],
           'facility' => $entry['facility'],
           'priority' => $entry['priority'],
           'level' => $entry['level'],
@@ -149,7 +149,7 @@ function process_syslog ($entry, $update) {
       );
     unset($os);
   }
-  return $entry; 
+  return $entry;
 }
 
 ?>

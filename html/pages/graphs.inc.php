@@ -8,7 +8,7 @@ if($_SESSION['widescreen'])
 {
   $graph_width=1700;
   $thumb_width=180;
-} else { 
+} else {
   $graph_width=1075;
   $thumb_width=113;
 }
@@ -79,7 +79,7 @@ if (!$auth)
 
   $graph_array['height'] = "300";
   $graph_array['width']  = $graph_width;
-  
+
   echo generate_graph_js_state($graph_array);
 
   echo("<div style='width: ".$graph_array['width']."; margin: auto;'>");

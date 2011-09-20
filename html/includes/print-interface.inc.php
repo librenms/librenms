@@ -9,7 +9,7 @@ $if_id = $port['interface_id'];
 
 $port = ifLabel($port);
 
-if($int_colour) 
+if($int_colour)
 {
   $row_colour = $int_colour;
 } else {
@@ -40,7 +40,7 @@ unset ($break);
 
 if ($port_details)
 {
-  foreach (dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = ?", array($port['interface_id'])) as $ip) 
+  foreach (dbFetchRows("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = ?", array($port['interface_id'])) as $ip)
   {
     echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=$ip[ipv4_address]')\">".$ip['ipv4_address']."/".$ip['ipv4_prefixlen']."</a>");
     $break = "<br />";
@@ -202,7 +202,7 @@ foreach (dbFetchRows("SELECT * FROM `pseudowires` WHERE `interface_id` = ?", arr
 #`interface_id`,`peer_device_id`,`peer_ldp_id`,`cpwVcID`,`cpwOid`
   $pw_peer_dev = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($pseudowire['peer_device_id']));
   $pw_peer_int = dbFetchRow("SELECT * FROM `ports` AS I, pseudowires AS P WHERE I.device_id = ? AND P.cpwVcID = ? AND P.interface_id = I.interface_id", array($pseudowire['peer_device_id'], $pseudowire['cpwVcID']));
-  
+
   $pw_peer_int = ifNameDescr($pw_peer_int);
   echo("$br<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generate_port_link($pw_peer_int, makeshortif($pw_peer_int['label'])) ." on ". generate_device_link($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . "</b>");
   $br = "<br />";
@@ -223,7 +223,7 @@ if ($port['pagpGroupIfIndex'] && $port['pagpGroupIfIndex'] != $port['ifIndex'])
 
 foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $higher_if)
 {
-  if($higher_if['interface_id_high']) 
+  if($higher_if['interface_id_high'])
   {
     $this_port = get_port_by_index_cache($device['device_id'], $higher_if['interface_id_high']);
     echo("$br<img src='images/16/arrow_divide.png' align=absmiddle> <strong>" . generate_port_link($this_port) . "</strong>");

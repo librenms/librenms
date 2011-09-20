@@ -39,7 +39,7 @@ foreach ($datas as $texttype)
   echo($sep);
   if ($vars['metric'] == $metric)
   {
-    echo("<span class='pagemenu-selected'>"); 
+    echo("<span class='pagemenu-selected'>");
   }
 
   echo(generate_link($type_text[$metric],$link_array,array('metric'=> $metric, 'view' => $vars['view'])));
@@ -72,16 +72,16 @@ if ($vars['view'] != "graphs")
 
 echo(generate_link("No Graphs",$link_array,array('metric'=> $vars['metric'], 'view' => "detail")));
 
-if ($vars['view'] != "graphs") 
-{ 
-  echo('</span>'); 
+if ($vars['view'] != "graphs")
+{
+  echo('</span>');
 }
 
 echo('</div>');
 
 print_optionbar_end();
 
-if (in_array($vars['metric'],array_keys($used_sensors)) 
+if (in_array($vars['metric'],array_keys($used_sensors))
   || $vars['metric'] == 'processor'
   || $vars['metric'] == 'storage'
   || $vars['metric'] == 'mempool')

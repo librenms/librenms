@@ -4,10 +4,10 @@ $check = shell_exec($config['nagios_plugins'] . "/check_smtp -H ".$service['host
 
 list($check, $time) = split("\|", $check);
 
-if(strstr($check, "SMTP OK")) { 
-  $status = '1'; 
-} else { 
-  $status = '0'; 
+if(strstr($check, "SMTP OK")) {
+  $status = '1';
+} else {
+  $status = '0';
 }
 
 ?>

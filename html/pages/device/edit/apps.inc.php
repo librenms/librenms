@@ -1,10 +1,5 @@
 <?php
 
-##  Who the fuck wrote this? it's like it was written by a retard challenged 
-##  to use as many string manipulation functions as possible.
-
-
-
 # Load our list of available applications
 if ($handle = opendir($config['install_dir'] . "/includes/polling/applications/"))
 {

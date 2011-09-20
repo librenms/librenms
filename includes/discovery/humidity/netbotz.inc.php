@@ -5,7 +5,7 @@ if ($device['os'] == 'netbotz')
   $oids = snmp_walk($device, ".1.3.6.1.4.1.5528.100.4.1.2.1.4", "-Osqn", "");
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
-  if ($oids) 
+  if ($oids)
   {
     echo("Netbotz ");
     foreach (explode("\n", $oids) as $data)

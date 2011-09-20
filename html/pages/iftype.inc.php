@@ -9,7 +9,7 @@ foreach (explode(",", $vars['type']) as $type)
 {
   $type_where .= " $or `port_descr_type` = ?";
   $or = "OR";
-  $type_param[] = $type; 
+  $type_param[] = $type;
 }
 
 $type_where .= ") ";

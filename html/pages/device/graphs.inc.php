@@ -37,9 +37,9 @@ foreach ($config['graph_sections'] as $section)
 
     echo(generate_link(ucfirst($type),$link_array,array('group'=>$type)));
 
-    if ($vars['group'] == $type) 
-    { 
-      echo("</span>"); 
+    if ($vars['group'] == $type)
+    {
+      echo("</span>");
     }
     $sep = " | ";
   }

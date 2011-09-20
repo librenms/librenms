@@ -43,14 +43,14 @@ $query = "SELECT * FROM `ports` AS P, `devices` AS D WHERE P.device_id = D.devic
 $query .= "AND `ifPhysAddress` LIKE ?";
 $param = array("%".str_replace(':','',mres($_POST['address']))."%");
 
-if (is_numeric($_POST['device_id'])) 
-{ 
-  $query  .= " AND I.device_id = ?"; 
-  $param[] = $_POST['device_id']; 
+if (is_numeric($_POST['device_id']))
+{
+  $query  .= " AND I.device_id = ?";
+  $param[] = $_POST['device_id'];
 }
-if ($_POST['interface']) 
-{ 
-  $query .= " AND I.ifDescr LIKE ?"; 
+if ($_POST['interface'])
+{
+  $query .= " AND I.ifDescr LIKE ?";
   $param[] = $_POST['interface'];
 }
 $query .= " ORDER BY P.ifPhysAddress";

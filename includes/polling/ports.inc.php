@@ -113,7 +113,7 @@ foreach ($port_stats as $ifIndex => $port)
       $ports[$port['ifIndex']] = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($interface_id));
       echo("Adding: ".$port['ifName']."(".$ifIndex.")(".$ports[$port['ifIndex']]['interface_id'].")");
       #print_r($ports);
-    } elseif ($ports[$ifIndex]['deleted'] == "1") {   
+    } elseif ($ports[$ifIndex]['deleted'] == "1") {
       dbUpdate(array('deleted' => '0'), 'ports', '`interface_id` = ?', array($ports[$ifIndex]['interface_id']));
       $ports[$ifIndex]['deleted'] = "0";
     }

@@ -53,7 +53,7 @@ foreach($ipsec_array as $index => $tunnel)
     $updated   = dbUpdate($db_update, 'ipsec_tunnels', '`tunnel_id` = ?', array($tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id']));
   }
 
-  if (is_numeric($tunnel['cipSecTunHcInOctets']) && is_numeric($tunnel['cipSecTunHcInDecompOctets']) && 
+  if (is_numeric($tunnel['cipSecTunHcInOctets']) && is_numeric($tunnel['cipSecTunHcInDecompOctets']) &&
         is_numeric($tunnel['cipSecTunHcOutOctets']) && is_numeric($tunnel['cipSecTunHcOutUncompOctets']))
   {
     echo("HC ");

@@ -61,10 +61,10 @@ foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
             </div>
 
 
-        </div> 
+        </div>
 
     </li>
-  
+
     <li><a href="devices/" class="drop"><img src="images/16/server.png" border="0" align="absmiddle" /> Devices</a>
 
      <div class="dropdown_4columns"><!-- Begin 4 columns container -->
@@ -93,15 +93,15 @@ if ($_SESSION['userlevel'] >= '10') {
           </ul>
 
        </div>
-  
-       <div id="devices_chart" class="col_3" style="height: 300px";>      
+
+       <div id="devices_chart" class="col_3" style="height: 300px";>
        </div>
 
 <script class="code" type="text/javascript">
 $(document).ready(function(){
   var data = [
     ['Up', <?php echo($devices['up']); ?>],
-    ['Down', <?php echo($devices['down']); ?>], 
+    ['Down', <?php echo($devices['down']); ?>],
     ['Ignored', <?php echo($devices['ignored']); ?>],
     ['Disabled', <?php echo($devices['disabled']); ?>]
   ];
@@ -187,10 +187,10 @@ $(document).ready(function(){
 });
 </script>
 
-  
-        </div><!-- End 4 columns container -->  
-  
-    </li><!-- End 4 columns Item -->  
+
+        </div><!-- End 4 columns container -->
+
+    </li><!-- End 4 columns Item -->
 
 <?php
 }
@@ -234,7 +234,7 @@ if ($config['show_locations'])
     <li><a href="ports/" class="drop"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports</a><!-- Begin Home Item -->
 
         <div class="dropdown_4columns"><!-- Begin 2 columns container -->
-        
+
           <div class="col_1">
              <ul>
 <li><a href="ports/"><img src="images/16/connect.png" border="0" align="absmiddle" /> All Ports</a></li>
@@ -294,10 +294,10 @@ if ($deleted_ports) { echo('<li><a href="deleted-ports/"><img src="images/16/cro
 
 ?>
 </ul>
-          </div> 
+          </div>
 
           <div id="ports_chart" class="col_3" style="height: 300px";>
-          </div>          
+          </div>
 
 <script class="code" type="text/javascript">
 $(document).ready(function(){
@@ -459,8 +459,8 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
 
   echo('      </ul>');
-?>   
-         
+?>
+
         </div><!-- End 4 columns container -->
 
     </li><!-- End 4 columns Item -->
@@ -571,5 +571,5 @@ $netsnmp_version = shell_exec($config['snmpget'] . " --version");
         </div><!-- End 2 columns container -->
 
     </li><!-- End Home Item -->
-  
-</ul>  
+
+</ul>

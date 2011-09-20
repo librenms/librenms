@@ -28,7 +28,7 @@ class observiumbot
 
 
 ###
-# Get HELP! 
+# Get HELP!
 ###
   function help_info(&$irc, &$data)
   {
@@ -46,7 +46,7 @@ mysql_close();
 
 
 ###
-# Get status on !version 
+# Get status on !version
 ###
   function version_info(&$irc, &$data)
   {
@@ -63,7 +63,7 @@ mysql_close();
   }
 
 ###
-# Get last eventlog entry 
+# Get last eventlog entry
 ###
   function log_info(&$irc, &$data)
   {
@@ -200,7 +200,7 @@ echo "LISTDEVICES\n";
 
 
 ###
-# !status <dev prt srv> gives overall status 
+# !status <dev prt srv> gives overall status
 ###
   function status_info(&$irc, &$data)
   {

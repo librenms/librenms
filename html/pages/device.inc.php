@@ -117,7 +117,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
 
     $device_routing_count['bgp'] = dbFetchCell("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ?", array($device['device_id']));
     if ($device_routing_count['bgp']) { $routing_tabs[] = 'bgp'; }
-  
+
     $device_routing_count['ospf'] = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = ?", array($device['device_id']));
     if ($device_routing_count['ospf']) { $routing_tabs[] = 'ospf'; }
 
@@ -127,7 +127,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     $device_routing_count['vrf'] = @dbFetchCell("SELECT COUNT(*) FROM `vrfs` WHERE `device_id` = ?", array($device['device_id']));
     if($device_routing_count['vrf']) { $routing_tabs[] = 'vrf'; }
 
-    if (is_array($routing_tabs)) 
+    if (is_array($routing_tabs))
     {
       echo('<li class="' . $select['routing'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'routing')).'">
@@ -219,7 +219,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     }
 
     if ($config['nfsen_enable'])
-    {   
+    {
       if (!is_array($config['nfsen_rrds'])) { $config['nfsen_rrds'] = array($config['nfsen_rrds']); }
       foreach ($config['nfsen_rrds'] as $nfsenrrds)
       {

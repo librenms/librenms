@@ -7,11 +7,11 @@
 
 echo("<table><tr>");
 
-$dev_list = array('6'  => 'Central Fileserver', 
-                  '7'  => 'NE61 Fileserver', 
+$dev_list = array('6'  => 'Central Fileserver',
+                  '7'  => 'NE61 Fileserver',
                   '34' => 'DE56 Fileserver');
 
-foreach($dev_list as $device_id => $descr) 
+foreach($dev_list as $device_id => $descr)
 {
 
   echo("<td>");
@@ -139,9 +139,9 @@ while ($peer = mysql_fetch_array($sql))
   }
 }
 
-if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)  
+if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)
 {
-  $sql = mysql_query("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE 
+  $sql = mysql_query("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE
   A.attrib_value < '" . $config['uptime_warning'] . "' AND A.attrib_type = 'uptime' AND A.device_id = D.device_id AND ignore = '0' AND disabled = '0'");
   while ($device = mysql_fetch_array($sql))
   {

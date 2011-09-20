@@ -9,7 +9,7 @@ if (is_file($mysql_rrd))
   $rrd_filename = $mysql_rrd;
 }
 
-$rrd_options .= ' -b 1024 '; 
+$rrd_options .= ' -b 1024 ';
 $rrd_options .= ' DEF:a='.$rrd_filename.':BRd:AVERAGE ';
 $rrd_options .= ' DEF:b='.$rrd_filename.':BSt:AVERAGE ';
 $rrd_options .= ' CDEF:c=a,-1,* ';

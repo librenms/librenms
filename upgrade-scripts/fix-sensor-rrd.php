@@ -18,13 +18,13 @@
 			echo(round(($i / $count) * 100, 2) . "%  \r");
 	}
 
-	function sensor_getDirectoryTree( $outerDir, &$files = array()){ 
+	function sensor_getDirectoryTree( $outerDir, &$files = array()){
 
-		$dirs = array_diff( scandir( $outerDir ), Array( ".", ".." ) ); 
-    		foreach ( $dirs as $d ){ 
-        		if (is_dir($outerDir."/".$d)  ){ 
+		$dirs = array_diff( scandir( $outerDir ), Array( ".", ".." ) );
+    		foreach ( $dirs as $d ){
+        		if (is_dir($outerDir."/".$d)  ){
 				sensor_getDirectoryTree($outerDir.'/'. $d, $files);
-        		} else { 
+        		} else {
 				if ((preg_match('/^fan-.*.rrd$/', $d)) ||
 				     (preg_match('/^current-.*.rrd$/', $d)) ||
 				     (preg_match('/^freq-.*.rrd$/', $d)) ||
@@ -34,9 +34,9 @@
 					array_push($files, preg_replace('/\/+/', '/',  $outerDir.'/'. $d));
 
 			}
-    		} 
-  		return $files; 
-	} 
+    		}
+  		return $files;
+	}
 
 
 	function sensor_fixRdd($file){
@@ -72,7 +72,7 @@
 		  rename($file,str_replace('/temp-','/temperature-',$file));
 		}
 	}
-	
+
 	echo("\n");
 
 ?>

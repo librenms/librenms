@@ -74,7 +74,7 @@ while ($peer = mysql_fetch_assoc($sql)){
 
 }
 
-if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)  
+if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)
 {
   $sql = mysql_query("SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value < '" . $config['uptime_warning'] . "'");
   while ($device = mysql_fetch_assoc($sql)){

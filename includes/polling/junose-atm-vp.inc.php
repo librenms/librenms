@@ -30,7 +30,7 @@ if (count($vp_rows))
     $vp_update .= ":".$t_vp['juniAtmVpStatsInPackets'].":".$t_vp['juniAtmVpStatsOutPackets'];
     $vp_update .= ":".$t_vp['juniAtmVpStatsInPacketOctets'].":".$t_vp['juniAtmVpStatsOutPacketOctets'];
     $vp_update .= ":".$t_vp['juniAtmVpStatsInPacketErrors'].":".$t_vp['juniAtmVpStatsOutPacketErrors'];
-   
+
     $rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("vp-" . $vp['ifIndex'] . "-".$vp['vp_id'].".rrd");
 
     if ($debug) { echo("$rrd "); }

@@ -6,10 +6,10 @@ $check = shell_exec($config['nagios_plugins'] . "/check_telnet -H ".$service['ho
 
 list($check, $time) = split("\|", $check);
 
-if(strstr($check, "TCP OK - ")) { 
-  $status = '1'; 
-} else { 
-  $status = '0'; 
+if(strstr($check, "TCP OK - ")) {
+  $status = '1';
+} else {
+  $status = '0';
 }
 
 ?>

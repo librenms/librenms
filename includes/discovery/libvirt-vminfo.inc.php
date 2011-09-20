@@ -22,7 +22,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
     {
       $uri = $method.'://' . $device['hostname'];
     }
-    
+
     if (strstr($method,'ssh') && !$ssh_ok)
     {
       # Check if we are using SSH if we can log in without password - without blocking the discovery
@@ -31,7 +31,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
       if ($ret != 255) { $ssh_ok = 1; }
     }
 
-    if ($ssh_ok || !strstr($method,'ssh'))	
+    if ($ssh_ok || !strstr($method,'ssh'))
     {
       # Fetch virtual machine list
       unset($domlist);
@@ -107,7 +107,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
         }
       }
     }
-    
+
     # If we found VMs, don't cycle the other protocols anymore.
     if (count($libvirt_vmlist)) { break; }
   }

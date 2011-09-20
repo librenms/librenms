@@ -50,7 +50,7 @@ function getDates($dayofmonth)
     {
       $lastmonth = 10;
       $lastyear = $year - 1;
-    } elseif ($lastmonth == 0) 
+    } elseif ($lastmonth == 0)
     {
       $lastmonth = 11;
       $lastyear = $year - 1;

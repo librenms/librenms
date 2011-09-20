@@ -48,7 +48,7 @@ foreach (dbFetchRows("SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
 
   $interval = $cef['updated'] - $cef['updated_prev'];
 
-  if(!$entity['entPhysicalModelName'] && $entity['entPhysicalContainedIn']) 
+  if(!$entity['entPhysicalModelName'] && $entity['entPhysicalContainedIn'])
   {
     $parent_entity = dbFetchRow("SELECT * FROM `entPhysical` WHERE device_id = ? AND `entPhysicalIndex` = ?", array($device['device_id'], $entity['entPhysicalContainedIn']));
     $entity_descr = $entity['entPhysicalName'] . " (" . $parent_entity['entPhysicalModelName'] .")";

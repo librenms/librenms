@@ -23,7 +23,7 @@ $rrd_options .= " AREA:sensor_min#ffffffff";
 #  $rrd_options .= " AREA:sensorcold#CCCCFF";
 #  $rrd_options .= " LINE1:sensor#cc0000:'" . str_replace(':','\:',str_replace('\*','*',quotemeta($sensor['sensor_descr_fixed'])))."'"; # Ugly hack :(
 
-$rrd_options .= " LINE1.5:sensor#cc0000:'" . $sensor['sensor_descr_fixed']."'"; 
+$rrd_options .= " LINE1.5:sensor#cc0000:'" . $sensor['sensor_descr_fixed']."'";
 #  $rrd_options .= " LINE1.5:sensorwarm#660000";
 $rrd_options .= " GPRINT:sensor_min:MIN:%4.1lfC";
 $rrd_options .= " GPRINT:sensor:LAST:%4.1lfC";

@@ -30,7 +30,7 @@ function passwordscanchange($username="")
    * By default allow the password to be modified, unless the existing
    * user is explicitly prohibited to do so.
    */
-  
+
   if (empty($username) || !user_exists($username))
   {
     return 1;

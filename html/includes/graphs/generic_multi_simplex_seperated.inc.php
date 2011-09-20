@@ -38,7 +38,7 @@ foreach ($rrd_list as $i => $rrd)
     $g_defname = $rrd['rra'] . "_cdef";
     $rrd_options .= " CDEF:" . $g_defname . $i . "=" . $rrd['rra'] . $i . "," . $multiplier . ",*";
     $rrd_options .= " CDEF:" . $g_defname . $i . "max=" . $rrd['rra'] . $i . "max," . $multiplier . ",*";
-  
+
   ## If we've been passed a divider (divisor!) we make a CDEF for it.
   } elseif (is_numeric($divider))
   {
