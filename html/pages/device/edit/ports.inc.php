@@ -45,58 +45,58 @@ echo("<table cellpadding=3 cellspacing=0 width=100%>
 ?>
 
 <script>
-$(document).ready(function(){
-    $('#disable-toggle').click(function(event){
-	// invert selection on all disable buttons
-	event.preventDefault();
-	$('[name^="disabled_"]').check('toggle');
+$(document).ready(function() {
+    $('#disable-toggle').click(function(event) {
+        // invert selection on all disable buttons
+        event.preventDefault();
+        $('[name^="disabled_"]').check('toggle');
     });
-    $('#ignore-toggle').click(function(event){
-	// invert selection on all ignore buttons
-	event.preventDefault();
-	$('[name^="ignore_"]').check('toggle');
+    $('#ignore-toggle').click(function(event) {
+        // invert selection on all ignore buttons
+        event.preventDefault();
+        $('[name^="ignore_"]').check('toggle');
     });
-    $('#disable-select').click(function(event){
-	// select all disable buttons
-	event.preventDefault();
-	$('[name^="disabled_"]').check();
+    $('#disable-select').click(function(event) {
+        // select all disable buttons
+        event.preventDefault();
+        $('[name^="disabled_"]').check();
     });
-    $('#ignore-select').click(function(event){
-	// select all ignore buttons
-	event.preventDefault();
-	$('[name^="ignore_"]').check();
+    $('#ignore-select').click(function(event) {
+        // select all ignore buttons
+        event.preventDefault();
+        $('[name^="ignore_"]').check();
     });
-    $('#down-select').click(function(event){
-	// select ignore buttons for all ports which are down
-	event.preventDefault();
-	$('[name^="operstatus_"]').each(function(){
-	    var name = $(this).attr('name');
-	    var text = $(this).text();
-	    if (name && text == 'down') {
-		// get the interface number from the object name
-		var interface_id = name.split('_')[1];
-		// find its corresponding checkbox and toggle it
-		$('[name="ignore_' + interface_id + '"]').check();
-	    }
-	});
+    $('#down-select').click(function(event) {
+        // select ignore buttons for all ports which are down
+        event.preventDefault();
+        $('[name^="operstatus_"]').each(function() {
+            var name = $(this).attr('name');
+            var text = $(this).text();
+            if (name && text == 'down') {
+                // get the interface number from the object name
+                var interface_id = name.split('_')[1];
+                // find its corresponding checkbox and toggle it
+                $('[name="ignore_' + interface_id + '"]').check();
+            }
+        });
     });
-    $('#alerted-toggle').click(function(event){
-	// toggle ignore buttons for all ports which are in class red
-	event.preventDefault();
-	$('.red').each(function(){
-	    var name = $(this).attr('name');
-	    if (name) {
-		// get the interface number from the object name
-		var interface_id = name.split('_')[1];
-		// find its corresponding checkbox and toggle it
-		$('[name="ignore_' + interface_id + '"]').check('toggle');
-	    }
-	});
+    $('#alerted-toggle').click(function(event) {
+        // toggle ignore buttons for all ports which are in class red
+        event.preventDefault();
+        $('.red').each(function() {
+            var name = $(this).attr('name');
+            if (name) {
+                // get the interface number from the object name
+                var interface_id = name.split('_')[1];
+                // find its corresponding checkbox and toggle it
+                $('[name="ignore_' + interface_id + '"]').check('toggle');
+            }
+        });
     });
-    $('#form-reset').click(function(event){
-	// reset objects in the form to their previous values
-	event.preventDefault();
-	$('#ignoreport')[0].reset();
+    $('#form-reset').click(function(event) {
+        // reset objects in the form to their previous values
+        event.preventDefault();
+        $('#ignoreport')[0].reset();
     });
 });
 </script>

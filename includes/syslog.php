@@ -6,11 +6,11 @@
 
 # $device_id_ip = @dbFetchCell("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id");
 
-function get_cache($host, $value){
+function get_cache($host, $value) {
   global $dev_cache;
 
-  if (!isset($dev_cache[$host][$value])){
-    switch($value){
+  if (!isset($dev_cache[$host][$value])) {
+    switch($value) {
       case 'device_id':
         //Try by hostname
         $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ?', array($host, $host));
@@ -39,7 +39,7 @@ function process_syslog ($entry, $update) {
   global $dev_cache;
 
   foreach($config['syslog_filter'] as $bi)
-    if (strpos($entry['msg'], $bi) !== FALSE){
+    if (strpos($entry['msg'], $bi) !== FALSE) {
       print_r($entry);
       echo('D-'.$bi);
       return $entry;
@@ -49,9 +49,9 @@ function process_syslog ($entry, $update) {
   if ($entry['device_id']) {
     $os = get_cache($entry['host'], 'os');
 
-    if (in_array($os, array('ios', 'iosxe', 'catos'))){
+    if (in_array($os, array('ios', 'iosxe', 'catos'))) {
       $matches = array();
-#      if (preg_match('#%(?P<program>.*):( ?)(?P<msg>.*)#', $entry['msg'], $matches)){
+#      if (preg_match('#%(?P<program>.*):( ?)(?P<msg>.*)#', $entry['msg'], $matches)) {
 #        $entry['msg'] = $matches['msg'];
 #        $entry['program'] = $matches['program'];
 #      }
@@ -86,29 +86,29 @@ function process_syslog ($entry, $update) {
 
       if (!$entry['msg']) { $entry['msg'] = $entry['program']; unset ($entry['program']); }
 
-    } elseif($os == 'linux' and get_cache($entry['host'], 'version') == 'Point'){
+    } elseif($os == 'linux' and get_cache($entry['host'], 'version') == 'Point') {
       //Cisco WAP200 and similar
       $matches = array();
-      if (preg_match('#Log: \[(?P<program>.*)\] - (?P<msg>.*)#', $entry['msg'], $matches)){
+      if (preg_match('#Log: \[(?P<program>.*)\] - (?P<msg>.*)#', $entry['msg'], $matches)) {
         $entry['msg'] = $matches['msg'];
         $entry['program'] = $matches['program'];
       }
       unset($matches);
 
-    } elseif($os == 'linux'){
+    } elseif($os == 'linux') {
       $matches = array();
       //User_CommonName/123.213.132.231:39872 VERIFY OK: depth=1, /C=PL/ST=Malopolska/O=VLO/CN=v-lo.krakow.pl/emailAddress=root@v-lo.krakow.pl
-      if ($entry['facility'] == 'daemon' and preg_match('#/([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{4,} ([A-Z]([A-Za-z])+( ?)){2,}:#', $entry['msg'])){
+      if ($entry['facility'] == 'daemon' and preg_match('#/([0-9]{1,3}\.) {3}[0-9]{1,3}:[0-9]{4,} ([A-Z]([A-Za-z])+( ?)) {2,}:#', $entry['msg'])) {
         $entry['program'] = 'OpenVPN';
       }
       //pop3-login: Login: user=<username>, method=PLAIN, rip=123.213.132.231, lip=123.213.132.231, TLS
       //POP3(username): Disconnected: Logged out top=0/0, retr=0/0, del=0/1, size=2802
-      elseif($entry['facility'] == 'mail' and preg_match('#^(((pop3|imap)\-login)|((POP3|IMAP)\(.*\))):', $entry['msg'])){
+      elseif($entry['facility'] == 'mail' and preg_match('#^(((pop3|imap)\-login)|((POP3|IMAP)\(.*\))):', $entry['msg'])) {
         $entry['program'] = 'Dovecot';
       }
       //pam_krb5(sshd:auth): authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
       //pam_krb5[sshd:auth]: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
-      elseif(preg_match('#^(?P<program>(.*((\(|\[).*(\)|\])))):(?P<msg>.*)$#', $entry['msg'], $matches)){
+      elseif(preg_match('#^(?P<program>(.*((\(|\[).*(\)|\])))):(?P<msg>.*)$#', $entry['msg'], $matches)) {
         $entry['msg'] = $matches['msg'];
         $entry['program'] = $matches['program'];
       }
@@ -117,18 +117,18 @@ function process_syslog ($entry, $update) {
       //pam_krb5: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
       ## Disabled because broke this:
       //diskio.c: don't know how to handle 10 request
-      #elseif($pos = strpos($entry['msg'], ';') or $pos = strpos($entry['msg'], ':')){
+      #elseif($pos = strpos($entry['msg'], ';') or $pos = strpos($entry['msg'], ':')) {
       #  $entry['program'] = substr($entry['msg'], 0, $pos);
       #  $entry['msg'] = substr($entry['msg'], $pos+1);
       #}
       //fallback, better than nothing...
-      elseif(empty($entry['program']) and !empty($entry['facility'])){
+      elseif(empty($entry['program']) and !empty($entry['facility'])) {
         $entry['program'] = $entry['facility'];
       }
       unset($matches);
     }
 
-    if (!isset($entry['program'])){
+    if (!isset($entry['program'])) {
       $entry['program'] = $entry['msg'];
       unset($entry['msg']);
     }

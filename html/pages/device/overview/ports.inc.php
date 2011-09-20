@@ -7,7 +7,7 @@ if ($ports['total'])
   $graph_array['height'] = "100";
   $graph_array['width']  = "485";
   $graph_array['to']     = $now;
-  $graph_array['id'] 	 = $device['device_id'];
+  $graph_array['id']          = $device['device_id'];
   $graph_array['type']   = "device_bits";
   $graph_array['from']   = $day;
   $graph_array['legend'] = "no";

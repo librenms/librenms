@@ -5,7 +5,7 @@ function rrdtool_graph($graph_file, $options)
 
   global $config, $debug;
 
-  if($debug) { echo("$options"); }
+  if ($debug) { echo("$options"); }
 
   $command = $config['rrdtool'] . " -";
 
@@ -39,10 +39,10 @@ function rrdtool_graph($graph_file, $options)
     // proc_close in order to avoid a deadlock
     $return_value = proc_close($process);
 
-    if($debug)
+    if ($debug)
     {
         echo("<p>");
-        if($debug) { echo("graph $graph_file $options"); }
+        if ($debug) { echo("graph $graph_file $options"); }
         echo("</p><p>");
         echo "command returned $return_value\n";
         echo("</p>");
@@ -66,7 +66,7 @@ function generate_url($vars, $new_vars = array())
 
   foreach($vars as $var => $value)
   {
-    if($value != "")
+    if ($value != "")
     {
       $url .= $var ."=".$value."/";
     }
@@ -187,6 +187,7 @@ function overlib_link($url, $text, $contents, $class)
 function generate_graph_popup($graph_array)
 {
   global $config;
+
   ## Take $graph_array and print day,week,month,year graps in overlib, hovered over graph
 
   $graph = generate_graph_tag($graph_array);
@@ -270,6 +271,7 @@ function port_permitted($interface_id, $device_id = NULL)
 function application_permitted($app_id, $device_id = NULL)
 {
   global $permissions;
+
   if (is_numeric($app_id))
   {
     if (!$device_id) { $device_id = device_by_id_cache ($app_id); }
@@ -345,7 +347,7 @@ STATE;
 function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
 {
 
-  if($percent > "100") { $size_percent = "100"; } else { $size_percent = $percent; }
+  if ($percent > "100") { $size_percent = "100"; } else { $size_percent = $percent; }
 
   $output = '
 <div style="font-size:11px;">
@@ -379,7 +381,7 @@ function generate_port_link($args, $text = NULL, $type = NULL)
   $graph_array['legend']   = "yes";
   $graph_array['height']   = "100";
   $graph_array['width']    = "340";
-  $graph_array['to']	   = $config['time']['now'];
+  $graph_array['to']           = $config['time']['now'];
   $graph_array['from']     = $config['time']['day'];
   $graph_array['id']       = $args['interface_id'];
   $content .= generate_graph_tag($graph_array);

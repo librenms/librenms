@@ -16,8 +16,8 @@ echo('<table cellspacing="0" cellpadding="6" width="100%">');
 echo('<tr class=tablehead>
         <th width="280">Device</th>
         <th width="180">Sensor</th>
-	<th></th>
-	<th></th>
+        <th></th>
+        <th></th>
         <th width="100">Current</th>
         <th width="250">Range limit</th>
         <th>Notes</th>
@@ -47,8 +47,8 @@ foreach (dbFetchRows($sql, $param) as $sensor)
   echo("<tr bgcolor=$row_colour>
           <td class=list-bold>" . generate_device_link($sensor) . "</td>
           <td>$sensor_popup</td>
-	  <td width=100>$sensor_minigraph</td>
-	  <td width=50>$alert</td>
+          <td width=100>$sensor_minigraph</td>
+          <td width=50>$alert</td>
           <td style='text-align: center; font-weight: bold;'>" . $sensor['sensor_current'] . $unit . "</td>
           <td style='text-align: center'>" . round($sensor['sensor_limit_low'],2) . $unit . " - " . round($sensor['sensor_limit'],2) . $unit . "</td>
           <td>" . (isset($sensor['sensor_notes']) ? $sensor['sensor_notes'] : '') . "</td>

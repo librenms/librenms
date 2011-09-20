@@ -34,16 +34,16 @@ load_graph_definitions();
  * @method Name of Javascript method that will be called to process data
  */
 function dhtml_response_list(&$items, $method) {
-	header("Content-Type: text/xml");
+        header("Content-Type: text/xml");
 
-	print('<?xml version="1.0" encoding="utf-8" ?>'."\n");
-	print("<response>\n");
-	printf(" <method>%s</method>\n", htmlspecialchars($method));
-	print(" <result>\n");
-	foreach ($items as &$item)
-		printf('  <option>%s</option>'."\n", htmlspecialchars($item));
-	print(" </result>\n");
-	print("</response>");
+        print('<?xml version="1.0" encoding="utf-8" ?>'."\n");
+        print("<response>\n");
+        printf(" <method>%s</method>\n", htmlspecialchars($method));
+        print(" <result>\n");
+        foreach ($items as &$item)
+                printf('  <option>%s</option>'."\n", htmlspecialchars($item));
+        print(" </result>\n");
+        print("</response>");
 }
 
 print_optionbar_start();
@@ -91,12 +91,12 @@ print_optionbar_end();
        }
        echo("</div>");
 
-       $graph_array['type']    		= "device_collectd";
-       $graph_array['id']      		= $device['device_id'];
+       $graph_array['type']                    = "device_collectd";
+       $graph_array['id']                      = $device['device_id'];
 
-       $graph_array['c_plugin']  	 = $vars['plugin'];
+       $graph_array['c_plugin']           = $vars['plugin'];
        $graph_array['c_plugin_instance'] = $instance;
-       $graph_array['c_type']		 = $type;
+       $graph_array['c_type']                 = $type;
        $graph_array['c_type_instance']   = $tinst;
 
        include("includes/print-quadgraphs.inc.php");

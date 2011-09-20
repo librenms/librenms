@@ -20,7 +20,7 @@ foreach($stats as $stat => $array)
   $rrd_list[$i]['filename'] = $rrd_filename;
   $rrd_list[$i]['descr'] = str_replace("ip", "", $stat);
   $rrd_list[$i]['rra'] = $stat;
-  if(strpos($stat, "Out") !== FALSE)
+  if (strpos($stat, "Out") !== FALSE)
   {
     $rrd_list[$i]['invert'] = TRUE;
   }

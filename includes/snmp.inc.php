@@ -640,7 +640,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0)
   $x=0;
   $values = explode("\n", $data);
   #echo("Caching: ifIndex $port\n");
-  foreach ($oids as $oid){
+  foreach ($oids as $oid) {
     if (!strstr($values[$x], "at this OID"))
     {
       $array[$port][$oid] = $values[$x];
@@ -686,7 +686,7 @@ function snmp_cache_portIfIndex($device, $array)
   {
     $entry = str_replace("CISCO-STACK-MIB::portIfIndex.", "", $entry);
     list($slotport, $ifIndex) = explode(" ", $entry);
-    if ($slotport && $ifIndex){
+    if ($slotport && $ifIndex) {
       $array[$ifIndex]['portIfIndex'] = $slotport;
       $array[$slotport]['ifIndex'] = $ifIndex;
     }

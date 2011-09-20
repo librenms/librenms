@@ -3,12 +3,12 @@
 global $config;
 
 if($_SESSION['widescreen']) {
-  if(!$graph_array['height']) { $graph_array['height'] = "110"; }
-  if(!$graph_array['width']) { $graph_array['width']  = "215"; }
+  if (!$graph_array['height']) { $graph_array['height'] = "110"; }
+  if (!$graph_array['width']) { $graph_array['width']  = "215"; }
   $periods = array('sixhour', 'day', 'week', 'month', 'year', 'twoyear');
 } else {
-  if(!$graph_array['height']) { $graph_array['height'] = "100"; }
-  if(!$graph_array['width']) { $graph_array['width']  = "215"; }
+  if (!$graph_array['height']) { $graph_array['height'] = "100"; }
+  if (!$graph_array['width']) { $graph_array['width']  = "215"; }
   $periods = array('day', 'week', 'month', 'year');
 }
 

@@ -3,7 +3,7 @@
 print_optionbar_start();
 
 $menu_options = array('basic' => 'Basic',
-		      'graphs' => 'Graphs',
+                      'graphs' => 'Graphs',
                       );
 
 if (!$_GET['optb']) { $_GET['optb'] = "basic"; }
@@ -48,7 +48,7 @@ foreach (dbFetchRows("SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
 
   $interval = $cef['updated'] - $cef['updated_prev'];
 
-  if(!$entity['entPhysicalModelName'] && $entity['entPhysicalContainedIn'])
+  if (!$entity['entPhysicalModelName'] && $entity['entPhysicalContainedIn'])
   {
     $parent_entity = dbFetchRow("SELECT * FROM `entPhysical` WHERE device_id = ? AND `entPhysicalIndex` = ?", array($device['device_id'], $entity['entPhysicalContainedIn']));
     $entity_descr = $entity['entPhysicalName'] . " (" . $parent_entity['entPhysicalModelName'] .")";
@@ -77,19 +77,19 @@ foreach (dbFetchRows("SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
 
   echo("</td>");
   echo("<td>".format_si($cef['drop']));
-  if($cef['drop'] > $cef['drop_prev']) { echo(" <span style='color:red;'>(".round(($cef['drop']-$cef['drop_prev'])/$interval,2)."/sec)</span>"); }
+  if ($cef['drop'] > $cef['drop_prev']) { echo(" <span style='color:red;'>(".round(($cef['drop']-$cef['drop_prev'])/$interval,2)."/sec)</span>"); }
   echo("</td>");
   echo("<td>".format_si($cef['punt']));
-  if($cef['punt'] > $cef['punt_prev']) { echo(" <span style='color:red;'>(".round(($cef['punt']-$cef['punt_prev'])/$interval,2)."/sec)</span>"); }
+  if ($cef['punt'] > $cef['punt_prev']) { echo(" <span style='color:red;'>(".round(($cef['punt']-$cef['punt_prev'])/$interval,2)."/sec)</span>"); }
   echo("</td>");
   echo("<td>".format_si($cef['punt2host']));
-  if($cef['punt2host'] > $cef['punt2host_prev']) { echo(" <span style='color:red;'>(".round(($cef['punt2host']-$cef['punt2host_prev'])/$interval,2)."/sec)</span>"); }
+  if ($cef['punt2host'] > $cef['punt2host_prev']) { echo(" <span style='color:red;'>(".round(($cef['punt2host']-$cef['punt2host_prev'])/$interval,2)."/sec)</span>"); }
   echo("</td>");
 
         echo("</tr>
        ");
 
-  if($_GET['optb'] == "graphs")
+  if ($_GET['optb'] == "graphs")
   {
     $graph_array['height'] = "100";
     $graph_array['width']  = "215";

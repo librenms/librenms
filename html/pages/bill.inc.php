@@ -34,8 +34,8 @@ if (bill_permitted($bill_id))
   $datefrom     = $day_data['0'];
   $dateto       = $day_data['1'];
 
-  $lastfrom	= $day_data['2'];
-  $lastto	= $day_data['3'];
+  $lastfrom        = $day_data['2'];
+  $lastto        = $day_data['3'];
 
   $rate_data    = getRates($bill_id,$datefrom,$dateto);
   $rate_95th    = $rate_data['rate_95th'];

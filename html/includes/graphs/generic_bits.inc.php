@@ -38,8 +38,8 @@ $rrd_options .= " CDEF:inbits=inoctets,8,*";
 $rrd_options .= " CDEF:inbits_max=inoctets_max,8,*";
 
 if ($config['rrdgraph_real_95th']) {
-	$rrd_options .= " CDEF:highbits=inoctets,outoctets,MAX,8,*";
-	$rrd_options .= " VDEF:95thhigh=highbits,95,PERCENT";
+        $rrd_options .= " CDEF:highbits=inoctets,outoctets,MAX,8,*";
+        $rrd_options .= " VDEF:95thhigh=highbits,95,PERCENT";
 }
 
 $rrd_options .= " VDEF:totin=inoctets,TOTAL";
@@ -67,8 +67,8 @@ $rrd_options .= " GPRINT:outbits_max:MAX:%6.2lf%s";
 $rrd_options .= " GPRINT:95thout:%6.2lf%s\\\\n";
 
 if ($config['rrdgraph_real_95th']) {
-	$rrd_options .= " HRULE:95thhigh#FF0000:\"Highest\"";
-	$rrd_options .= " GPRINT:95thhigh:\"%30.2lf%s\\n\"";
+        $rrd_options .= " HRULE:95thhigh#FF0000:\"Highest\"";
+        $rrd_options .= " GPRINT:95thhigh:\"%30.2lf%s\\n\"";
 }
 
 $rrd_options .= " GPRINT:tot:'Total %6.2lf%s'";

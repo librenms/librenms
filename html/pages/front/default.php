@@ -15,7 +15,7 @@ $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = 
 } else {
 $sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '0' AND D.ignore = '0'");
 }
-while ($device = mysql_fetch_assoc($sql)){
+while ($device = mysql_fetch_assoc($sql)) {
 
       generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> <br />

@@ -18,7 +18,7 @@ foreach(dbFetchRows("SELECT * FROM links AS L, ports AS I WHERE I.device_id = ? 
   echo('<tr bgcolor="'.$bg_colour.'">');
   echo('<td><span style="font-weight: bold;">'.generate_port_link($neighbour).'</span><br />'.$neighbour['ifAlias'].'</td>');
 
-  if(is_numeric($neighbour['remote_interface_id']) && $neighbour['remote_interface_id'])
+  if (is_numeric($neighbour['remote_interface_id']) && $neighbour['remote_interface_id'])
   {
     $remote_port   = get_port_by_id($neighbour['remote_interface_id']);
     $remote_device = device_by_id_cache($remote_port['device_id']);

@@ -27,7 +27,7 @@ foreach ($rrd_list as $rrd)
 
   $rrd_options .= " DEF:".$id."=$filename:$rra:AVERAGE";
 
-  if(!$basicrrd)
+  if (!$basicrrd)
   {
     $rrd_options .= " DEF:".$id."min=$filename:$rra:MIN";
     $rrd_options .= " DEF:".$id."max=$filename:$rra:MAX";
@@ -45,7 +45,7 @@ foreach ($rrd_list as $rrd)
 
   }
 
-  if(!$basicrrd)
+  if (!$basicrrd)
   {
     $rrd_optionsb .= " GPRINT:".$id.":LAST:%5.2lf%s GPRINT:".$id."min:MIN:%5.2lf%s";
     $rrd_optionsb .= " GPRINT:".$id."max:MAX:%5.2lf%s GPRINT:".$id.":AVERAGE:'%5.2lf%s\\n'";

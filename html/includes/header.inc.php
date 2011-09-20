@@ -48,7 +48,7 @@ if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'])
   </div>
 </div>
 
-	<!-- ///// end of gumax-header ///// -->
+        <!-- ///// end of gumax-header ///// -->
 
 
 

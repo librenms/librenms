@@ -9,14 +9,14 @@ $config['db_pass'] = "PASSWORD";
 $config['db_name'] = "observium";
 
 ### Locations
-$config['install_dir'] 	= "/opt/observium";
-$config['html_dir']	= $config['install_dir'] . "/html";
-$config['rrd_dir'] 	= $config['install_dir'] . "/rrd";
+$config['install_dir']         = "/opt/observium";
+$config['html_dir']        = $config['install_dir'] . "/html";
+$config['rrd_dir']         = $config['install_dir'] . "/rrd";
 $config['log_file']     = $config['install_dir'] . "/observium.log";
 
 ### Thie should *only* be set if you want to *force* a particular hostname/port
 ### It will prevent the web interface being usable form any other hostname
-#$config['base_url']	= "http://observium.company.com";
+#$config['base_url']        = "http://observium.company.com";
 
 ### Enable the below to use rrdcached. be sure rrd_dir is within the rrdcached dir
 ### and that your web server has permission to talk to rrdcached.

@@ -203,7 +203,7 @@ foreach ($menu_options as $option => $text)
 
 <?php
 
-  if($vars['searchbar'] == "hide")
+  if ($vars['searchbar'] == "hide")
   {
     echo('<a href="'. generate_url($vars, array('searchbar' => '')).'">Restore Search</a>');
   } else {
@@ -212,7 +212,7 @@ foreach ($menu_options as $option => $text)
 
   echo("  | ");
 
-  if($vars['bare'] == "yes")
+  if ($vars['bare'] == "yes")
   {
     echo('<a href="'. generate_url($vars, array('bare' => '')).'">Restore Header</a>');
   } else {
@@ -262,7 +262,7 @@ if($format == "graph")
 } else {
 
   echo('<table cellpadding="7" cellspacing="0" class="devicetable sortable" width="100%">');
-  if($subformat = "detail")
+  if ($subformat = "detail")
   {
     echo('<tr class="tablehead"><th></th><th>Device</th><th></th><th>Operating System</th><th>Platform</th><th>Uptime/Location</th></tr>');
   }
@@ -274,7 +274,7 @@ if($format == "graph")
       if (!$location_filter || ((get_dev_attrib($device,'override_sysLocation_bool') && get_dev_attrib($device,'override_sysLocation_string') == $location_filter)
         || $device['location'] == $location_filter))
       {
-        if($subformat == "detail")
+        if ($subformat == "detail")
         {
           include("includes/hostbox.inc.php");
         } else {

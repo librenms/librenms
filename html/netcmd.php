@@ -27,7 +27,7 @@ if ($_GET['query'] && $_GET['cmd'])
     switch ($_GET['cmd'])
     {
       case 'whois':
-	$cmd = $config['whois'] . " $host | grep -v \%";
+        $cmd = $config['whois'] . " $host | grep -v \%";
         break;
       case 'ping':
         $cmd = $config['ping'] . " -c 5 $host";

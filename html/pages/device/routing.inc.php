@@ -43,7 +43,7 @@ if (is_file("pages/device/routing/".mres($vars['proto']).".inc.php"))
   {
     if ($type != "overview")
     {
-      if(is_file("pages/device/routing/overview/".mres($type).".inc.php")) {
+      if (is_file("pages/device/routing/overview/".mres($type).".inc.php")) {
 
         $g_i++;
         if (!is_integer($g_i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }

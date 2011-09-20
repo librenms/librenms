@@ -71,7 +71,7 @@ if (is_array($oids))
       if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > "0") { $divisor = $divisor . str_pad('', $entry['entPhySensorPrecision'], "0"); }
       $current = $current * $multiplier / $divisor;
 
-      if ($type == "temperature") { if ($current > "200"){ $thisisnotbullshit = FALSE; } $descr = preg_replace("/[T|t]emperature[|s]/", "", $descr); }
+      if ($type == "temperature") { if ($current > "200") { $thisisnotbullshit = FALSE; } $descr = preg_replace("/[T|t]emperature[|s]/", "", $descr); }
 
       #echo($descr . "|" . $index . "|" .$current . "|" . $multiplier . "|" . $divisor ."|" . $entry['entPhySensorScale'] . "|" . $entry['entPhySensorPrecision'] . "\n");
 

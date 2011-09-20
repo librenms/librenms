@@ -69,7 +69,7 @@ $nodes = array();
 
 $sql = mysql_query("SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'");
 
-while ($device = mysql_fetch_array($sql)){
+while ($device = mysql_fetch_array($sql)) {
   unset($already);
   $i = 0;
   while ($i <= count($nodes)) {
@@ -84,7 +84,7 @@ while ($device = mysql_fetch_array($sql)){
 
 
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
-while ($device = mysql_fetch_array($sql)){
+while ($device = mysql_fetch_array($sql)) {
    if (device_permitted($device['device_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #d0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffbbbb;'>
        <strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
@@ -157,7 +157,7 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
 }
 
 echo("
-	<div style='clear: both;'>$errorboxes</div> <div style='margin: 0px; clear: both;'>
+        <div style='clear: both;'>$errorboxes</div> <div style='margin: 0px; clear: both;'>
 
 <h3>Recent Syslog Messages</h3>
 ");

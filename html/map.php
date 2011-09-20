@@ -73,7 +73,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
           {
             $linkdone[$local_interface_id][$remote_interface_id] = TRUE;
 
-	    $links++;
+            $links++;
 
             if ($link['ifSpeed'] >= "10000000000")
             {
@@ -94,7 +94,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
               $dst = dbFetchCell("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.interface_id = ? AND D.device_id = I.device_id", array($remote_interface_id));
               $dst_host = dbFetchCell("SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.interface_id = ?  AND D.device_id = I.device_id", array($remote_interface_id));
             } else {
-	      unset($dst_host);
+              unset($dst_host);
               $dst = $link['remote_hostname'];
             }
 
@@ -104,8 +104,8 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
               $dif = ifNameDescr(dbFetchRow("SELECT * FROM ports WHERE `interface_id` = ?", array($link['remote_interface_id'])), $device);
             } else {
               $dif['label'] = $link['remote_port'];
-	      $dif['interface_id'] = $link['remote_hostname'] . $link['remote_port'];
-	    }
+              $dif['interface_id'] = $link['remote_hostname'] . $link['remote_port'];
+            }
 
             $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue URL=\"{$config['base_url']}/device/".$device['device_id']."/port/$local_interface_id/\"]\n";
             if (!$ifdone[$src][$sif['interface_id']])
@@ -114,7 +114,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
               $ifdone[$src][$sif['interface_id']] = 1;
             }
 
-            if($dst_host) {
+            if ($dst_host) {
               $map .= "\"$dst\" [URL=\"{$config['base_url']}/device/$dst_host/map/\" fontsize=20 shape=box3d]\n";
             } else {
               $map .= "\"$dst\" [ fontsize=20 shape=box3d]\n";
