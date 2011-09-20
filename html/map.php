@@ -161,7 +161,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
     $maptool = 'dot';
   }
 
-  if ($where == '') { $maptool = 'neato -Gpack'; }
+  if ($where == '') { $maptool = 'sfdp -Gpack -Gcharset=latin1 -Gsize=200,200'; }
 
   $img = shell_exec("echo \"".addslashes($map)."\" | $maptool -T".$_GET['format']."");
   if ($_GET['format'] == "png")

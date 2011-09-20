@@ -9,9 +9,9 @@ $config['db_pass'] = "PASSWORD";
 $config['db_name'] = "observium";
 
 ### Locations
-$config['install_dir']         = "/opt/observium";
-$config['html_dir']        = $config['install_dir'] . "/html";
-$config['rrd_dir']         = $config['install_dir'] . "/rrd";
+$config['install_dir']  = "/opt/observium";
+$config['html_dir']     = $config['install_dir'] . "/html";
+$config['rrd_dir']      = $config['install_dir'] . "/rrd";
 $config['log_file']     = $config['install_dir'] . "/observium.log";
 
 ### Thie should *only* be set if you want to *force* a particular hostname/port
