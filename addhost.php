@@ -48,19 +48,20 @@ if (isset($argv[1]) && $argv[1])
   }
   $device_id = addHost($host, $community, $snmpver, $port = '161', $transport = 'udp');
 
-  if ($device_id) {
+  if ($device_id)
+  {
     $device = device_by_id_cache($device_id);
     echo("Added device ".$device['hostname']." (".$device['device_id'].")\n");
   }
 
 } else {
 
-print Console_Color::convert("
+  print Console_Color::convert("
 Observium v".$config['version']." Add Host Tool
 
 Usage: ./addhost.php <%Whostname%n> [community] [v1|v2c] [port] [" . join("|",$config['snmp']['transports']) . "]
 
-%rRemeber to discover the host afterwards.%n
+%rRemember to run discovery for the host afterwards.%n
 
 ");
 }
