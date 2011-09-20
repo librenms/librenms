@@ -144,11 +144,14 @@ if ($error_msg) {
       if ($config['rrdcached']) { $rrd_switches = " --daemon ".$config['rrdcached'] . " "; }
       rrdtool_graph($graphfile, " $rrd_options");
       if ($debug) { echo("<pre>".$rrd_cmd."</pre>"); }
-      if (is_file($graphfile) && !$debug)
+      if (is_file($graphfile))
       {
-        header('Content-type: image/png');
-        $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
-        unlink($graphfile);
+        if (!$debug)
+        {
+          header('Content-type: image/png');
+          $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
+          unlink($graphfile);
+        }
       }
       else
       {
