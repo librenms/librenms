@@ -23,43 +23,36 @@ echo "Timestamp         Command\n";
 echo "----------------- ------- \n";
 
 class observiumbot
-
 {
-
 
 ###
 # Get HELP!
 ###
   function help_info(&$irc, &$data)
   {
+    global $config;
 
-global $config;
+    $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Commands: !help, !log, !status, !version, !down, !port, !device, !listdevices");
 
-$irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Commands: !help, !log, !status, !version, !down, !port, !device, !listdevices");
+    echo date("m-d-y H:i:s ");
+    echo "HELP\n";
 
-echo date("m-d-y H:i:s ");
-echo "HELP\n";
-
-mysql_close();
-
+    mysql_close();
   }
-
 
 ###
 # Get status on !version
 ###
   function version_info(&$irc, &$data)
   {
+    global $config;
 
-global $config;
+    $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Observium Version " . $config['version']);
 
-$irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Observium Version " . $config['version']);
+    echo date("m-d-y H:i:s ");
+    echo "VERSION\t\t". $config['version'] . "\n";
 
-echo date("m-d-y H:i:s ");
-echo "VERSION\t\t". $config['version'] . "\n";
-
-mysql_close();
-
+    mysql_close();
   }
 
 ###
@@ -67,35 +60,32 @@ mysql_close();
 ###
   function log_info(&$irc, &$data)
   {
+    global $config;
 
-global $config;
-
-mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
-mysql_select_db($config['db_name']);
+    mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
+    mysql_select_db($config['db_name']);
 
     $device = dbFetchRow("SELECT `event_id`,`host`,`datetime`,`message`,`type` FROM `eventlog` ORDER BY `event_id` DESC LIMIT 1");
-     $host=$device['host'];
-     $hostid = dbFetchRow("SELECT `hostname` FROM `devices` WHERE `device_id` = $host");
+    $host = $device['host'];
+    $hostid = dbFetchRow("SELECT `hostname` FROM `devices` WHERE `device_id` = $host");
 
-$irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, $device['event_id'] ." ". $hostid['hostname'] ." ". $device['datetime'] ." ". $device['message'] ." ". $device['type']);
+    $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, $device['event_id'] ." ". $hostid['hostname'] ." ". $device['datetime'] ." ". $device['message'] ." ". $device['type']);
 
-echo date("m-d-y H:i:s ");
-echo "LOG\n";
+    echo date("m-d-y H:i:s ");
+    echo "LOG\n";
 
-mysql_close();
-
+    mysql_close();
   }
-
 
 ###
 # Get status on !down devices
 ###
   function down_info(&$irc, &$data)
   {
+    global $config;
 
-global $config;
-mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
-mysql_select_db($config['db_name']);
+    mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
+    mysql_select_db($config['db_name']);
 
     foreach (dbFetchRows("SELECT * FROM `devices` where status=0") as $device)
     {
@@ -104,11 +94,10 @@ mysql_select_db($config['db_name']);
     }
     $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, $message);
 
-mysql_close();
+    mysql_close();
 
-echo date("m-d-y H:i:s ");
-echo "DOWN\n";
-
+    echo date("m-d-y H:i:s ");
+    echo "DOWN\n";
   }
 
 ###
@@ -116,16 +105,16 @@ echo "DOWN\n";
 ###
   function device_info(&$irc, &$data)
   {
+    global $config;
 
     $hostname = $data->messageex[1];
 
-global $config;
-mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
-mysql_select_db($config['db_name']);
+    mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
+    mysql_select_db($config['db_name']);
 
     $device = dbFetchRow("SELECT * FROM `devices` WHERE `hostname` = ?",array($hostname));
 
-mysql_close();
+    mysql_close();
 
     if ($device['status'] == 1) { $status = "Up " . formatUptime($device['uptime'] . " "); } else { $status = "Down "; }
     if ($device['ignore']) { $status = "*Ignored*"; }
@@ -134,28 +123,27 @@ mysql_close();
     $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, $device['os'] . " " . $device['version'] . " " .
       $device['features'] . " " . $status);
 
-echo date("m-d-y H:i:s ");
-echo "DEVICE\t\t". $device['hostname']."\n";
-
+    echo date("m-d-y H:i:s ");
+    echo "DEVICE\t\t". $device['hostname']."\n";
   }
-
 
 ###
 # Get status on !port <hostname port>
 ###
   function port_info(&$irc, &$data)
   {
+    global $config;
+
     $hostname = $data->messageex[1];
     $ifname = $data->messageex[2];
 
-global $config;
-mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
-mysql_select_db($config['db_name']);
+    mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
+    mysql_select_db($config['db_name']);
 
     $device = dbFetchRow("SELECT * FROM `devices` WHERE `hostname` = ?",array($device));
     $port   = dbFetchRow("SELECT * FROM `ports` WHERE `ifName` = ? OR `ifDescr` = ? AND device_id = ?", array($ifname, $ifname, $device['device_id']));
 
-mysql_close();
+    mysql_close();
 
     $bps_in = formatRates($port['ifInOctets_rate']);
     $bps_out = formatRates($port['ifOutOctets_rate']);
@@ -165,22 +153,21 @@ mysql_close();
     $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, $port['ifAdminStatus'] . "/" . $port['ifOperStatus'] . " " .
       $bps_in. " > bps > " . $bps_out . " | " . $pps_in. "pps > PPS > " . $pps_out ."pps");
 
-echo date("m-d-y H:i:s ");
-echo "PORT\t\t\t" . $hostname . "\t". $ifname . "\n";
-
+    echo date("m-d-y H:i:s ");
+    echo "PORT\t\t\t" . $hostname . "\t". $ifname . "\n";
   }
-
 
 ###
 # !listdevices lists all devices
 ###
   function list_devices(&$irc, &$data)
   {
+    global $config;
+
     unset ($message);
 
-global $config;
-mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
-mysql_select_db($config['db_name']);
+    mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
+    mysql_select_db($config['db_name']);
 
     foreach (dbFetchRows("SELECT `hostname` FROM `devices`") as $device)
     {
@@ -188,63 +175,58 @@ mysql_select_db($config['db_name']);
       $sep = ", ";
     }
 
-mysql_close();
+    mysql_close();
 
     $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, $message);
     unset($sep);
 
-echo date("m-d-y H:i:s ");
-echo "LISTDEVICES\n";
-
+    echo date("m-d-y H:i:s ");
+    echo "LISTDEVICES\n";
   }
-
 
 ###
 # !status <dev prt srv> gives overall status
 ###
   function status_info(&$irc, &$data)
   {
+    global $config;
+
     $statustype = $data->messageex[1];
 
-global $config;
-mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
-mysql_select_db($config['db_name']);
+    mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
+    mysql_select_db($config['db_name']);
 
-    if ($statustype == "dev") {
-        $devcount = array_pop(dbFetchRow("SELECT count(*) FROM devices"));
-        $devup = array_pop(dbFetchRow("SELECT count(*) FROM devices  WHERE status = '1' AND `ignore` = '0'"));
-        $devdown = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE status = '0' AND `ignore` = '0'"));
-        $devign = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE `ignore` = '1'"));
-        $devdis = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE `disabled` = '1'"));
-        $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Devices: " .$devcount . " (" .$devup . " up, " .$devdown . " down, " .$devign . " ignored, " .$devdis . " disabled" . ")"); }
-
-    else if ($statustype == "prt") {
-        $prtcount = array_pop(dbFetchRow("SELECT count(*) FROM ports"));
-        $prtup = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D  WHERE I.ifOperStatus = 'up' AND I.ignore = '0' AND I.device_id = D.device_id AND D.ignore = '0'"));
-        $prtdown = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE I.ifOperStatus = 'down' AND I.ifAdminStatus = 'up' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'"));
-        $prtsht = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE I.ifAdminStatus = 'down' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'"));
-        $prtign = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '1' OR D.ignore = '1')"));
-        $prterr = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')"));
-        $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Ports: " .$prtcount . " (" .$prtup . " up, " .$prtdown . " down, " .$prtign . " ignored, " .$prtsht . " shutdown" . ")");}
-
-    else if ($statustype == "srv") {
-        $srvcount = array_pop(dbFetchRow("SELECT count(service_id) FROM services"));
-        $srvup = array_pop(dbFetchRow("SELECT count(service_id) FROM services  WHERE service_status = '1' AND service_ignore ='0'"));
-        $srvdown = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_ignore = '0'"));
-        $srvign = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_ignore = '1'"));
-        $srvdis = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_disabled = '1'"));
-        $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Services: " .$srvcount . " (" .$srvup . " up, " .$srvdown . " down, " .$srvign . " ignored, " .$srvdis . " disabled" . ")"); }
-
-    else {
+    if ($statustype == "dev")
+    {
+      $devcount = array_pop(dbFetchRow("SELECT count(*) FROM devices"));
+      $devup = array_pop(dbFetchRow("SELECT count(*) FROM devices  WHERE status = '1' AND `ignore` = '0'"));
+      $devdown = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE status = '0' AND `ignore` = '0'"));
+      $devign = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE `ignore` = '1'"));
+      $devdis = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE `disabled` = '1'"));
+      $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Devices: " .$devcount . " (" .$devup . " up, " .$devdown . " down, " .$devign . " ignored, " .$devdis . " disabled" . ")");
+    } else if ($statustype == "prt") {
+      $prtcount = array_pop(dbFetchRow("SELECT count(*) FROM ports"));
+      $prtup = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D  WHERE I.ifOperStatus = 'up' AND I.ignore = '0' AND I.device_id = D.device_id AND D.ignore = '0'"));
+      $prtdown = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE I.ifOperStatus = 'down' AND I.ifAdminStatus = 'up' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'"));
+      $prtsht = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE I.ifAdminStatus = 'down' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'"));
+      $prtign = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '1' OR D.ignore = '1')"));
+      $prterr = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')"));
+      $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Ports: " .$prtcount . " (" .$prtup . " up, " .$prtdown . " down, " .$prtign . " ignored, " .$prtsht . " shutdown" . ")");
+    } else if ($statustype == "srv") {
+      $srvcount = array_pop(dbFetchRow("SELECT count(service_id) FROM services"));
+      $srvup = array_pop(dbFetchRow("SELECT count(service_id) FROM services  WHERE service_status = '1' AND service_ignore ='0'"));
+      $srvdown = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_ignore = '0'"));
+      $srvign = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_ignore = '1'"));
+      $srvdis = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_disabled = '1'"));
+      $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Services: " .$srvcount . " (" .$srvup . " up, " .$srvdown . " down, " .$srvign . " ignored, " .$srvdis . " disabled" . ")");
+    } else {
         $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Error: STATUS requires one of the following <dev prt srv>"); }
 
-mysql_close();
+    mysql_close();
 
-echo date("m-d-y H:i:s ");
-echo "STATUS\t\t$statustype\n";
-
+    echo date("m-d-y H:i:s ");
+    echo "STATUS\t\t$statustype\n";
   }
-
 }
 
 $bot = &new observiumbot();

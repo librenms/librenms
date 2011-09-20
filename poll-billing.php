@@ -93,7 +93,7 @@ function CollectData($bill_id)
 
   }
 
-  if($period < "0") {
+  if ($period < "0") {
     logfile("BILLING: negative period! id:$bill_id period:$period delta:$delta in_delta:$in_delta out_delta:$out_delta");
   } else {
     dbInsert(array('bill_id' => $bill_id, 'timestamp' => $now, 'period' => $period, 'delta' => $delta, 'in_delta' => $in_delta, 'out_delta' => $out_delta), 'bill_data');
