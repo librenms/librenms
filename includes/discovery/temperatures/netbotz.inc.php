@@ -22,7 +22,7 @@ if ($device['os'] == "netbotz")
       {
         discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'netbotz', $descr, '1', '1', NULL, NULL, NULL, NULL, $temperature);
       }
-    } 
+    }
   }
 }
 

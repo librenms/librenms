@@ -2,18 +2,18 @@
 
 if ($bg == $list_colour_b) { $bg = $list_colour_a; } else { $bg = $list_colour_b; }
 
-if ($device['status'] == '0') 
+if ($device['status'] == '0')
 {
-  $class = "list-device-down"; 
-} else { 
+  $class = "list-device-down";
+} else {
   $class = "list-device";
 }
-if ($device['ignore'] == '1') 
+if ($device['ignore'] == '1')
 {
   $class = "list-device-ignored";
-  if ($device['status'] == '1') 
-  { 
-    $class = "list-device-ignored-up"; 
+  if ($device['status'] == '1')
+  {
+    $class = "list-device-ignored-up";
   }
 }
 if ($device['disabled'] == '1')

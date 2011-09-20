@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 print_optionbar_start();
 
@@ -72,7 +72,7 @@ if ($_SESSION['userlevel'] >= '5')
        }
     }
     unset ($samehost);
-  }	
+  }
 
   echo("</table></div>");
 

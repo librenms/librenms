@@ -61,7 +61,7 @@ if (bill_permitted($bill_id))
   $unixfrom = dbFetchCell("SELECT UNIX_TIMESTAMP('$datefrom')");
   $unixto   = dbFetchCell("SELECT UNIX_TIMESTAMP('$dateto')");
 
-  $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')"); 
+  $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')");
   $unix_prev_to   = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastto')");
 
   echo("<font face=\"Verdana, Arial, Sans-Serif\"><h2>

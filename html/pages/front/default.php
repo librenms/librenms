@@ -82,7 +82,7 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
   {
   $sql = mysql_query("SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime < '" . $config['uptime_warning'] . "' AND D.ignore = 0");
   } else {
-  $sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '1' AND D.uptime < '" . 
+  $sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '1' AND D.uptime < '" .
   $config['uptime_warning'] . "' AND D.ignore = 0");
   }
 

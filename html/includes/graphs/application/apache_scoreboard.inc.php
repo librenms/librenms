@@ -61,6 +61,6 @@ $rrd_options .= 'GPRINT:i:MAX:"%6.2lf %s\n"  ';
 $rrd_options .= 'AREA:j#FF4105FF:"Idle      ":STACK ';
 $rrd_options .= 'GPRINT:j:LAST:"%6.2lf %s"  ';
 $rrd_options .= 'GPRINT:j:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:j:MAX:"%6.2lf %s\n"'; 
+$rrd_options .= 'GPRINT:j:MAX:"%6.2lf %s\n"';
 
 ?>

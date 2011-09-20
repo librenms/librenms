@@ -7,10 +7,10 @@ $check = shell_exec($config['nagios_plugins'] . "/check_mysql -H ".$service['hos
 
 list($check, $time) = split("\|", $check);
 
-if(strstr($check, "Uptime:")) { 
-  $status = '1'; 
-} else { 
-  $status = '0'; 
+if(strstr($check, "Uptime:")) {
+  $status = '1';
+} else {
+  $status = '0';
 }
 
 ?>

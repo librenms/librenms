@@ -10,7 +10,7 @@ if ($debug) { print_r($cefs); }
 
 if (is_array($cefs))
 {
-  if (!is_array($entity_array)) 
+  if (!is_array($entity_array))
   {
     echo("Caching OIDs: ");
     $entity_array = array();

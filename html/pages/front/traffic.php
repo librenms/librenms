@@ -7,7 +7,7 @@
 $nodes = array();
 $param = array();
 $uptimesql = "";
-if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)  
+if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)
 {
   $uptimesql = " AND A.attrib_value < ?";
   $param = array($config['uptime_warning']);
@@ -79,7 +79,7 @@ foreach (dbFetchRows("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerA
    }
 }
 
-if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)  
+if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)
 {
   foreach (dbFetchRows("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE A.attrib_value < ? AND A.attrib_type = 'uptime' AND A.device_id = D.device_id AND ignore = '0' AND disabled = '0'", array($config['uptime_warning'])) as $device){
      if (device_permitted($device['device_id']) && $device['attrib_value'] < $config['uptime_warning'] && $device['attrib_type'] == "uptime") {

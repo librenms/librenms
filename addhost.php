@@ -53,7 +53,7 @@ if (isset($argv[1]) && $argv[1])
     echo("Added device ".$device['hostname']." (".$device['device_id'].")\n");
   }
 
-} else { 
+} else {
 
 print Console_Color::convert("
 Observium v".$config['version']." Add Host Tool

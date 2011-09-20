@@ -23,20 +23,20 @@
 			echo(round(($i / $count) * 100, 2) . "%  \r");
 	}
 
-	function getDirectoryTree( $outerDir, &$files = array()){ 
+	function getDirectoryTree( $outerDir, &$files = array()){
 
-		$dirs = array_diff( scandir( $outerDir ), Array( ".", ".." ) ); 
-    		foreach ( $dirs as $d ){ 
-        		if (is_dir($outerDir."/".$d)  ){ 
+		$dirs = array_diff( scandir( $outerDir ), Array( ".", ".." ) );
+    		foreach ( $dirs as $d ){
+        		if (is_dir($outerDir."/".$d)  ){
 				getDirectoryTree($outerDir.'/'. $d, $files);
-        		}else{ 
+        		}else{
 				if (preg_match('/^[\d]+.rrd$/', $d))
 					array_push($files, preg_replace('/\/+/', '/',  $outerDir.'/'. $d));
 
 			}
-    		} 
-  		return $files; 
-	} 
+    		}
+  		return $files;
+	}
 
 
 	function fixRdd($file){
@@ -44,7 +44,7 @@
                 global $rrdcached;
 		$fileC = shell_exec( "{$config['rrdtool']} dump $file $rrdcached" );
 
-#---------------------------------------------------------------------------------------------------------		
+#---------------------------------------------------------------------------------------------------------
 
 $first = <<<FIRST
         <ds>
@@ -125,7 +125,7 @@ $first = <<<FIRST
                 <unknown_sec> 0 </unknown_sec>
         </ds>
 
-<!-- Round Robin Archives --> 
+<!-- Round Robin Archives -->
 FIRST;
 
 
@@ -185,9 +185,9 @@ THIRD;
 
 #---------------------------------------------------------------------------------------------------------
 		if (!preg_match('/DISCARDS/', $fileC)){
-			$fileC = str_replace('<!-- Round Robin Archives -->', $first, $fileC);		
-			$fileC = str_replace('</cdp_prep>', $second, $fileC);		
-			$fileC = str_replace('</row>', $third, $fileC);		
+			$fileC = str_replace('<!-- Round Robin Archives -->', $first, $fileC);
+			$fileC = str_replace('</cdp_prep>', $second, $fileC);
+			$fileC = str_replace('</row>', $third, $fileC);
 			$tmpfname = tempnam("/tmp", "OBS");
 			file_put_contents($tmpfname, $fileC);
 			@unlink($file);
@@ -198,9 +198,9 @@ THIRD;
 
 		}
 
-		
+
 	}
-	
+
 	echo("\n");
 
 ?>

@@ -3,25 +3,25 @@
  * Color.php
  *
  * PHP version 4
- * 
+ *
  * Copyright (c) 2007 Stefan Walk
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy 
- * of this software and associated documentation files (the "Software"), to 
- * deal in the Software without restriction, including without limitation the 
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
- * sell copies of the Software, and to permit persons to whom the Software is 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in 
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
  * @category Console
@@ -68,11 +68,11 @@ $GLOBALS['_CONSOLE_COLOR_CODES'] = array (
     )
 );
 
-    
+
 /**
  * A simple class to use ANSI Colorcodes.
  *
- * Of all the functions, you probably only want to use convert() and escape(). 
+ * Of all the functions, you probably only want to use convert() and escape().
  * They are easier to use. However, if you want to access colorcodes more
  * directly, look into the other functions.
  *
@@ -87,14 +87,14 @@ class Console_Color
 
     /**
      * Returns an ANSI-Controlcode
-     * 
+     *
      * Takes 1 to 3 Arguments: either 1 to 3 strings containing the name of the
      * FG Color, style and BG color, or one array with the indices color, style
      * or background.
      *
      * @param mixed  $color      Optional.
      *                           Either a string with the name of the foreground
-     *                           color, or an array with the indices 'color', 
+     *                           color, or an array with the indices 'color',
      *                           'style', 'background' and corresponding names as
      *                           values.
      * @param string $style      Optional name of the style
@@ -150,7 +150,7 @@ class Console_Color
         $colors = &$GLOBALS['_CONSOLE_COLOR_CODES'];
         return "\033[".$colors['color'][$name].'m';
     }
-    
+
     /**
      * Returns a style controlcode
      *
@@ -164,7 +164,7 @@ class Console_Color
         $colors = &$GLOBALS['_CONSOLE_COLOR_CODES'];
         return "\033[".$colors['style'][$name].'m';
     }
-    
+
     /**
      * Returns a BG color controlcode
      *
@@ -183,7 +183,7 @@ class Console_Color
      * Converts colorcodes in the format %y (for yellow) into ansi-control
      * codes. The conversion table is: ('bold' meaning 'light' on some
      * terminals). It's almost the same conversion table irssi uses.
-     * <pre> 
+     * <pre>
      *                  text      text            background
      *      ------------------------------------------------
      *      %k %K %0    black     dark grey       black
@@ -273,13 +273,13 @@ class Console_Color
 
     /**
      * Escapes % so they don't get interpreted as color codes
-     * 
+     *
      * @param string $string String to escape
      *
      * @access public
      * @return string
      */
-    function escape($string) 
+    function escape($string)
     {
         return str_replace('%', '%%', $string);
     }
@@ -292,7 +292,7 @@ class Console_Color
      * @acess public
      * @return string
      */
-    function strip($string) 
+    function strip($string)
     {
         return preg_replace('/\033\[[\d;]+m/', '', $string);
     }

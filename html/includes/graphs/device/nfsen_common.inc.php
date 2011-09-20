@@ -5,7 +5,7 @@ $device = device_by_id_cache($id);
 if (!is_array($config['nfsen_rrds'])) { $config['nfsen_rrds'] = array($config['nfsen_rrds']); }
 
 foreach ( $config['nfsen_rrds'] as $nfsenrrds )
-{ 
+{
   if ($configs[strlen($nfsenrrds)-1] != '/') { $nfsenrrds .= '/'; }
 
   # convert dots in filename to underscores
@@ -16,7 +16,7 @@ foreach ( $config['nfsen_rrds'] as $nfsenrrds )
 
   if (is_file($nfsenrrds . $nfsen_filename . ".rrd"))
   {
-    $rrd_filename = $nfsenrrds . $nfsen_filename . ".rrd"; 
+    $rrd_filename = $nfsenrrds . $nfsen_filename . ".rrd";
 
     $flowtypes = array('tcp', 'udp', 'icmp', 'other');
 

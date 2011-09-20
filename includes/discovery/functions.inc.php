@@ -124,7 +124,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     if (!$low_limit)  { $low_limit  = sensor_low_limit($class, $current); }
 
     $insert = array('poller_type' => $poller_type, 'sensor_class' => $class, 'device_id' => $device['device_id'], 'sensor_oid' => $oid, 'sensor_index' => $index, 'sensor_type' => $type, 'sensor_descr' => $descr,
-                    'sensor_divisor' => $divisor, 'sensor_multiplier' => $multiplier, 'sensor_limit' => $high_limit, 'sensor_limit_warn' => $warn_limit, 'sensor_limit_low' => $low_limit, 
+                    'sensor_divisor' => $divisor, 'sensor_multiplier' => $multiplier, 'sensor_limit' => $high_limit, 'sensor_limit_warn' => $warn_limit, 'sensor_limit_low' => $low_limit,
                     'sensor_limit_low_warn' => $low_warn_limit, 'sensor_current' => $current, 'entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalIndex_measured' => $entPhysicalIndex_measured );
 
     $inserted = dbInsert($insert, 'sensors');
@@ -300,7 +300,7 @@ function discover_link($local_interface_id, $protocol, $remote_interface_id, $re
 {
   global $config, $debug, $link_exists;
 
-  if (dbFetchCell("SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = ? AND `local_interface_id` = ? AND `protocol` = ? AND `remote_port` = ?", 
+  if (dbFetchCell("SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = ? AND `local_interface_id` = ? AND `protocol` = ? AND `remote_port` = ?",
                   array($remote_hostname, $local_interface_id, $protocol, $remote_port)) == "0")
   {
 
@@ -335,7 +335,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
     $storage = dbFetchRow("SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?", array($index, $device['device_id'], $mib));
     if ($storage === FALSE || !count($storage))
     {
-      $insert = dbInsert(array('device_id' => $device['device_id'], 'storage_descr' => $descr, 'storage_index' => $index, 'storage_mib' => $mib, 'storage_type' => $type, 
+      $insert = dbInsert(array('device_id' => $device['device_id'], 'storage_descr' => $descr, 'storage_index' => $index, 'storage_mib' => $mib, 'storage_type' => $type,
                                'storage_units' => $units, 'storage_size' => $size, 'storage_used' => $used), 'storage');
       if ($debug) { mysql_error(); }
       echo("+");

@@ -9,7 +9,7 @@ echo("
       <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vlans/bits/'>Bits</a> |
       <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vlans/pkts/'>Packets</a> |
       <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vlans/nupkts/'>NU Packets</a> |
-      <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vlans/errors/'>Errors</a> 
+      <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vlans/errors/'>Errors</a>
      ");
 
 print_optionbar_end();

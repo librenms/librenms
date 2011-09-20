@@ -1,6 +1,6 @@
 <?php
 
-if ($_SESSION['userlevel'] >= '5') { 
+if ($_SESSION['userlevel'] >= '5') {
 
   if(!isset($_GET['optb'])) { $_GET['optb'] = "all"; }
   if(!isset($_GET['optc'])) { $_GET['optc'] = "basic"; }
@@ -36,7 +36,7 @@ if ($_SESSION['userlevel'] >= '5') {
   if ($_GET['opta'] == "vrf" && $_GET['optc'] == "errors") { echo("<span class='pagemenu-selected'>"); }
   echo('<a href="routing/vrf/'.$_GET['optb'].'/errors/">Errors</a>');
   if ($_GET['opta'] == "vrf" && $_GET['optc'] == "errors") { echo("</span>"); }
-  
+
   echo(" )");
 
   print_optionbar_end();

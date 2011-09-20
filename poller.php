@@ -46,7 +46,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n']))
               (
                 SELECT @rownum := @rownum +1 AS rownum, `device_id`
                 FROM `devices`
-                WHERE `disabled` = 0 
+                WHERE `disabled` = 0
                 ORDER BY `device_id` ASC
               ) temp
             WHERE MOD(temp.rownum, '.mres($options['i']).') = '.mres($options['n']).';';
@@ -121,7 +121,7 @@ function poll_device($device, $options) {
   }
   echo("\n");
 
-  unset($poll_update); unset($poll_update_query); unset($poll_separator); 
+  unset($poll_update); unset($poll_update_query); unset($poll_separator);
   $poll_update_array = array();
 
   $host_rrd = $config['rrd_dir'] . "/" . $device['hostname'];
@@ -209,13 +209,13 @@ if (!$options['m'])
 
     $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
 
-    $update_array['last_polled'] = array('NOW()'); 
+    $update_array['last_polled'] = array('NOW()');
     $update_array['last_polled_timetaken'] = $device_time;
 
     #echo("$device_end - $device_start; $device_time $device_run");
     echo("Polled in $device_time seconds\n");
 
-    
+
 
     if ($debug) { echo("Updating " . $device['hostname'] . " - ".print_r($update_array)." \n"); }
 
@@ -232,7 +232,7 @@ if (!$options['m'])
 
   $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);
 
-  if ($polled_devices)  
+  if ($polled_devices)
   {
     dbInsert(array('type' => 'poll', 'doing' => $doing, 'start' => $poller_start, 'duration' => $poller_time, 'devices' => $polled_devices ), 'perf_times');
   }

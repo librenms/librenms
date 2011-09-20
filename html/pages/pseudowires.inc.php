@@ -22,7 +22,7 @@ foreach (dbFetchRows("SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
     $i++;
   }
 
-  $pw_b = dbFetchRow("SELECT * from `devices` AS D, `ports` AS I, `pseudowires` AS P WHERE D.device_id = ? AND D.device_id = I.device_id 
+  $pw_b = dbFetchRow("SELECT * from `devices` AS D, `ports` AS I, `pseudowires` AS P WHERE D.device_id = ? AND D.device_id = I.device_id
                       AND P.cpwVcID = ? AND P.interface_id = I.interface_id", array($pw_a['peer_device_id'], $pw_a['cpwVcID']));
 
   if (!port_permitted($pw_a['interface_id'])) { $skip = "yes"; }

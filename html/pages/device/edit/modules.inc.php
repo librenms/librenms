@@ -3,10 +3,10 @@
 if($_POST['toggle_poller'] && isset($config['poller_modules'][$_POST['toggle_poller']]))
 {
   $module = mres($_POST['toggle_poller']);
-  if (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] != $config['poller_modules'][$_POST['toggle_poller']]) 
+  if (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] != $config['poller_modules'][$_POST['toggle_poller']])
   {
     del_dev_attrib($device, 'poll_' . $module);
-  } elseif ($config['poller_modules'][$_POST['toggle_poller']] == 0) {  
+  } elseif ($config['poller_modules'][$_POST['toggle_poller']] == 0) {
     set_dev_attrib($device, 'poll_' . $module, "1");
   } else {
     set_dev_attrib($device, 'poll_' . $module, "0");

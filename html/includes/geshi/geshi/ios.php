@@ -9,7 +9,7 @@ $language_data = array (
 'OOLANG' => false,
 'NUMBERS' =>  GESHI_NUMBER_OCT_PREFIX | GESHI_NUMBER_HEX_PREFIX,
 'KEYWORDS' => array(
-    1 => array( 
+    1 => array(
         'no', 'shutdown'
      ),
 #    2 => array(
@@ -32,7 +32,7 @@ $language_data = array (
 #        'isis', 'ospf', 'eigrp', 'rip', 'igrp', 'bgp', 'ipv4', 'unicast', 'multicast', 'ipv6', 'connected', 'static', 'subnets', 'tcl'
 #    ),
 #    4 => array(
-#        'point-to-point', 'aal5snap', 'rj45', 'auto', 'full', 'half', 'precedence', 'percent', 'datetime', 'msec', 'locatime', 'summer-time', 'md5', 'wait-for-bgp', 'wide', 
+#        'point-to-point', 'aal5snap', 'rj45', 'auto', 'full', 'half', 'precedence', 'percent', 'datetime', 'msec', 'locatime', 'summer-time', 'md5', 'wait-for-bgp', 'wide',
 #        'level-1', 'level-2', 'log-neighbor-changes', 'directed-request', 'password-encryption', 'common', 'origin-as', 'bgp-nexthop', 'random-detect', 'localtime', 'sso', 'stm-1',
 #        'dot1q', 'isl', 'new-model', 'always', 'summary-only', 'freeze', 'global', 'forwarded', 'access', 'trunk', 'edge', 'transparent'
 #    ),
@@ -108,7 +108,7 @@ $language_data = array (
              GESHI_REPLACE => '\\2',
              GESHI_BEFORE => '\\1 '
     ),
-    
+
 ),
 
 'STYLES' => array(
@@ -163,7 +163,7 @@ $language_data = array (
         2 => '',
         3 => ''
         )
-    
+
 )
 
 

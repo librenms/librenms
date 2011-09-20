@@ -39,7 +39,7 @@ function rrdtool_graph($graph_file, $options)
     // proc_close in order to avoid a deadlock
     $return_value = proc_close($process);
 
-    if($debug) 
+    if($debug)
     {
         echo("<p>");
         if($debug) { echo("graph $graph_file $options"); }
@@ -415,7 +415,7 @@ function generate_port_thumbnail($args)
 function print_optionbar_start ($height = 0, $width = 0, $marginbottom = 5)
 {
   echo("
-    <div class='rounded-5px' style='display: block; background: #e5e5e5; text-align: left; margin-top: 0px; 
+    <div class='rounded-5px' style='display: block; background: #e5e5e5; text-align: left; margin-top: 0px;
     margin-bottom: ".$marginbottom."px; " . ($width ? 'max-width: ' . $width . (strstr($width,'%') ? '' : 'px') . '; ' : '') . "
     padding: 7px 14px'>");
 }
@@ -443,7 +443,7 @@ function overlibprint($text)
 
 function humanmedia($media)
 {
-  array_preg_replace($rewrite_iftype, $media);	
+  array_preg_replace($rewrite_iftype, $media);
   return $media;
 }
 

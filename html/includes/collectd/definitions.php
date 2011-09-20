@@ -505,7 +505,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false) {
 		'GPRINT:temp_max:MAX:%4.1lf%%',
 		'GPRINT:temp_avg:LAST:%4.1lf%%\l');
 	$GraphDefs['if_errors'] = array(
-		#'-v', 'Errors/s', 
+		#'-v', 'Errors/s',
                 '--units=si',
 		'DEF:tx_min={file}:tx:MIN',
 		'DEF:tx_avg={file}:tx:AVERAGE',
@@ -551,7 +551,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false) {
 		'GPRINT:max:MAX:%5.1lf%s',
 		'GPRINT:avg:LAST:%5.1lf%s\l');
 	$GraphDefs['if_dropped'] = array(
-		#'-v', 'Packets/s', 
+		#'-v', 'Packets/s',
                 '--units=si',
 		'DEF:tx_min={file}:tx:MIN',
 		'DEF:tx_avg={file}:tx:AVERAGE',
@@ -734,7 +734,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false) {
 		'GPRINT:spam:LAST:%4.1lf',
 		'HRULE:0#000000');
 	$GraphDefs['memory'] = array(
-		'-b', '1024', 
+		'-b', '1024',
                 #'-v', 'Bytes',
 		'DEF:avg={file}:value:AVERAGE',
 		'DEF:min={file}:value:MIN',
@@ -1290,7 +1290,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false) {
 		'GPRINT:max:MAX:%9.3lf',
 		'GPRINT:avg:LAST:%9.3lf\l');
 	$GraphDefs['swap'] = array(
-		#'-v', 'Bytes', 
+		#'-v', 'Bytes',
                 '-b', '1024',
 		'DEF:avg={file}:value:AVERAGE',
 		'DEF:min={file}:value:MIN',
@@ -1396,7 +1396,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false) {
 		'GPRINT:s_max:MAX:%5.2lf%s',
 		'GPRINT:s_avg:LAST:%5.2lf%s');
 	$GraphDefs['if_octets'] = array(
-		#'-v', 'Bits/s', 
+		#'-v', 'Bits/s',
                 '--units=si',
 		'DEF:out_min_raw={file}:tx:MIN',
 		'DEF:out_avg_raw={file}:tx:AVERAGE',
@@ -1755,7 +1755,7 @@ function meta_graph_memory($host, $plugin, $plugin_instance, $type, $type_instan
 		$opts['title'] = $title;
 	$opts['number_format'] = '%5.1lf%s';
 	$opts['rrd_opts']      = array('-b', '1024', 'COMMENT:Bytes          Cur     Min      Ave     Max\l');
-        
+
 
         # BYTES
 

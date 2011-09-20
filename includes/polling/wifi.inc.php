@@ -45,7 +45,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall')
       unset($wirelesscards);
     }
   }
-  
+
   if ($device['os'] == 'symbol' AND (stristr($device['hardware'],"AP")))
   {
     echo("Checking Symbol Wireless clients... ");

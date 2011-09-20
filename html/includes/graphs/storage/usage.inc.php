@@ -13,7 +13,7 @@ $rrd_options .= " COMMENT:'                    Size      Free   % Used\\n'";
 
 $hostname = gethostbyid($storage['device_id']);
 
-$colour="CC0000"; 
+$colour="CC0000";
 $colour_area="ffaaaa";
 
 $descr = substr(str_pad($storage[storage_descr], 12),0,12);

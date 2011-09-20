@@ -18,13 +18,13 @@ else
       {
         if (!user_exists($_POST['new_username']))
         {
-          
+
           if (isset($_POST['can_modify_passwd'])) {
             $_POST['can_modify_passwd'] = 1;
           } else {
             $_POST['can_modify_passwd'] = 0;
           }
-          
+
           # FIXME: missing email field here on the form
           if (adduser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], '', $_POST['realname'], $_POST['can_modify_passwd']))
           {

@@ -36,7 +36,7 @@ if ($config['enable_printers'])
 
     #FIXME should report for toner out... :)
 
-    # Log toner swap    
+    # Log toner swap
     if ($tonerperc > $toner['toner_current'])
     {
       log_event('Toner ' . $toner['toner_descr'] . ' was replaced (new level: ' . $tonerperc . '%)', $device, 'toner', $toner['toner_id']);

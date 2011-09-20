@@ -29,7 +29,7 @@ foreach (dbFetchRows("SELECT * FROM `devices` AS D, `services` AS S WHERE S.devi
     if ($service_status != $status)
     {
       $update['service_changed'] = time();
-      
+
       if ($service['sysContact']) { $email = $service['sysContact']; } else { $email = $config['email_default']; }
       if ($status == "1")
       {
@@ -47,7 +47,7 @@ foreach (dbFetchRows("SELECT * FROM `devices` AS D, `services` AS S WHERE S.devi
 
     $update = array_merge(array('service_status' => $status, 'service_message' => $check, 'service_checked' => time()), $update);
     dbUpdate($update, 'services', '`service_id` = ?', array($service['service_id']));
-    unset($update);    
+    unset($update);
 
   } else {
     $status = "0";

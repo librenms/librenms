@@ -152,7 +152,7 @@ $graph->xaxis->SetTitleMargin(30);
 $graph->xaxis->title->Set($type);
 $graph->yaxis->title->Set($yaxis);
 
-function TimeCallback($aVal) { 
+function TimeCallback($aVal) {
     global $dur;
 
     if ($dur < 172800)
@@ -161,7 +161,7 @@ function TimeCallback($aVal) {
     } elseif ($dur < 604800) {
       return Date('D',$aVal);
     } else {
-      return Date('j M',$aVal); 
+      return Date('j M',$aVal);
     }
 }
 

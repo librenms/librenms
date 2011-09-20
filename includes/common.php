@@ -3,7 +3,7 @@
 ## Common Functions
 
 function isCli() {
- 
+
      if(php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
           return true;
      } else {
@@ -66,7 +66,7 @@ function get_sensor_rrd($device, $sensor)
   global $config;
 
   # For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
-  if ($config['os'][$device['os']]['sensor_descr'] || $sensor['poller_type'] == "ipmi") 
+  if ($config['os'][$device['os']]['sensor_descr'] || $sensor['poller_type'] == "ipmi")
   {
     $rrd_file = $config['rrd_dir']."/".$device['hostname']."/".safename("sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_descr'] . ".rrd");
   } else {

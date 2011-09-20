@@ -7,7 +7,7 @@ This code is covered by the MIT license http://en.wikipedia.org/wiki/MIT_License
 
 By Alan Szlosek from http://www.greaterscope.net/projects/dbFacile
 
-The non-OO version of dbFacile. It's a bit simplistic, but gives you the 
+The non-OO version of dbFacile. It's a bit simplistic, but gives you the
 really useful bits in non-class form.
 
 Usage
@@ -177,7 +177,7 @@ function dbFetchRows($sql, $parameters = array()) {
         $db_stats['fetchrows']++;
 
 	// no records, thus return empty array
-	// which should evaluate to false, and will prevent foreach notices/warnings 
+	// which should evaluate to false, and will prevent foreach notices/warnings
 	return array();
 }
 /*
@@ -318,7 +318,7 @@ function dbMakeQuery($sql, $parameters) {
 				if($test == '?') {
 					$query .= array_shift($questionParams);
 				} else {
-					$query .= $namedParams[ $test ]; 
+					$query .= $namedParams[ $test ];
 				}
 			}
 		}
@@ -339,7 +339,7 @@ function dbPrepareData($data) {
 				$value = array_shift($value);
 			}
 			// it's not right to worry about invalid fields in this method because we may be operating on fields
-			// that are aliases, or part of other tables through joins 
+			// that are aliases, or part of other tables through joins
 			//if(!in_array($key, $columns)) // skip invalid fields
 			//	continue;
 			if($escape) {
@@ -384,7 +384,7 @@ function dbRollbackTransaction() {
 class dbIterator implements Iterator {
 	private $result;
 	private $i;
-	
+
 	public function __construct($r) {
 		$this->result = $r;
 		$this->i = 0;

@@ -170,7 +170,7 @@ else
       case 'prefixes_ipv6multicast':
         list(,$afisafi) = explode("_", $_GET['optc']);
         if (isset($peer['afisafi'][$afisafi])) { $peer['graph'] = 1; }
-      case 'updates':      
+      case 'updates':
         $graph_array['type']   = "bgp_" . $_GET['optc'];
         $graph_array['id']     = $peer['bgpPeer_id'];
     }

@@ -1,6 +1,6 @@
 <?php
 
-#Sentry3-MIB::towerModelNumber	"CW-24V2-L30M"	
+#Sentry3-MIB::towerModelNumber	"CW-24V2-L30M"
 #Sentry3-MIB::systemVersion	"Sentry Switched CDU Version 6.0g"
 #Sentry3-MIB::towerProductSN	"ABEF0001561"
 

@@ -14,7 +14,7 @@ if ($_POST['editing'])
     $update = array('community' => $_POST['community'], 'snmpver' => $_POST['snmpver'], 'port' => $_POST['port']);
     if ($_POST['timeout']) { $update['timeout'] = $_POST['timeout']; } else { $update['timeout'] = array(NULL); }
     if ($_POST['retries'])  { $update['retries'] = $_POST['retries']; } else { $update['retries'] = array(NULL); }
- 
+
     $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?',array($device['device_id']));
 
     if ($rows_updated > 0)

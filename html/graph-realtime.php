@@ -1,11 +1,11 @@
 <?php
 /*
 	Originally part of m0n0wall (http://m0n0.ch/wall)
-	
+
 	Copyright (C) 2004-2006 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>
 	and Jonathan Watt <jwatt@jwatt.org>.
 	All rights reserved.
-	
+
 */
 
 include_once("../includes/defaults.inc.php");
@@ -184,7 +184,7 @@ function fetch_data() {
 function plot_data(obj) {
   // Show datetimelegend
   var now = new Date();
-  var datetime = (now.getMonth()+1) + "/" + now.getDate() + "/" + now.getFullYear() + ' ' + 
+  var datetime = (now.getMonth()+1) + "/" + now.getDate() + "/" + now.getFullYear() + ' ' +
     LZ(now.getHours()) + ":" + LZ(now.getMinutes()) + ":" + LZ(now.getSeconds());
   SVGDoc.getElementById('datetime').firstChild.data = datetime;
 
@@ -210,7 +210,7 @@ function plot_data(obj) {
   last_ugmt = ugmt;
   last_ifin = ifin;
   last_ifout = ifout;
-  
+
   switch (plot_in.length) {
   	case 0:
   		SVGDoc.getElementById("collect_initial").setAttributeNS(null, 'visibility', 'visible');
@@ -283,7 +283,7 @@ function plot_data(obj) {
         rmax *= 1.25;
       else
         rmax *= 2;
-      
+
       if (i == 8)
         rmax *= 1.024;
     }

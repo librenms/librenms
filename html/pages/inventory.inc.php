@@ -58,7 +58,7 @@ if ($_SESSION['userlevel'] >= '5')
 if (isset($_POST['string']) && strlen($_POST['string']))
 {
   $sql  .= " AND E.entPhysicalDescr LIKE ?";
-  $param[] = "%".$_POST['string']."%"; 
+  $param[] = "%".$_POST['string']."%";
 }
 
 if (isset($_POST['device_string']) && strlen($_POST['device_string']))
