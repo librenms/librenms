@@ -31,12 +31,6 @@ if (!$auth)
 {
   include("includes/error-no-perm.inc.php");
 } else {
-
-# Do we really need to show the type? User does not have to see the type of graph (i.e. sensor_temperature)
-
-# Yes, i think we doo, else we have graph titles of "router1". It's nice to show the type here. maybe only the pretty
-# array_type?
-
   if (isset($config['graph_types'][$type][$subtype]['descr'])) { $title .= " :: ".$config['graph_types'][$type][$subtype]['descr']; } else { $title .= " :: ".$graph_type; }
 
   $graph_array['height'] = "60";
@@ -50,11 +44,10 @@ if (!$auth)
   echo($title);
   print_optionbar_end();
 
-  echo("<div style='margin: auto;'>");
+  echo('<div style="margin: auto;">');
 
   $thumb_array = array('sixhour' => '6 Hours', 'day' => '24 Hours', 'twoday' => '48 Hours', 'week' => 'One Week', 'twoweek' => 'Two Weeks',
                        'month' => 'One Month', 'twomonth' => 'Two Months','year' => 'One Year', 'twoyear' => 'Two Years');
-
 
   foreach ($thumb_array as $period => $text)
   {
@@ -66,9 +59,9 @@ if (!$auth)
     $link_array['page'] = "graphs";
     $link = generate_url($link_array);
 
-    echo("<div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;' class='rounded-3px'>
-      <span class=device-head>".$text."</span><br />
-       <a href='".$link."'>");
+    echo('<div style="margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;" class="rounded-3px">
+      <span class="device-head">'.$text.'</span><br />
+       <a href="'.$link.'">');
     echo(generate_graph_tag($graph_array));
     echo("   </a>
     </div>");
@@ -82,7 +75,7 @@ if (!$auth)
 
   echo generate_graph_js_state($graph_array);
 
-  echo("<div style='width: ".$graph_array['width']."; margin: auto;'>");
+  echo('<div style="width: '.$graph_array['width'].'; margin: auto;">');
   echo(generate_graph_tag($graph_array));
   echo("</div>");
 }
