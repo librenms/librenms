@@ -15,7 +15,7 @@ foreach (dbFetchRows("SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY di
 {
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-  $fs_url   = "device/".$device['device_id']."/health/diskio/";
+  $fs_url   = "device/device=".$device['device_id']."/tab=health/metric=diskio/";
 
   $graph_array_zoom['id']     = $drive['diskio_id'];
   $graph_array_zoom['type']   = "diskio_ops";

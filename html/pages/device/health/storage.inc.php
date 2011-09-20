@@ -25,7 +25,7 @@ foreach (dbFetchRows("SELECT * FROM `storage` WHERE device_id = ? ORDER BY stora
   $total = formatStorage($total);
   $free = formatStorage($free);
 
-  $fs_url   = "device/".$device['device_id']."/health/storage/";
+  $fs_url   = "device/device=".$device['device_id']."/tab=health/metric=storage/";
 
   $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr'];
   $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";
