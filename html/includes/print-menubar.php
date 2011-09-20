@@ -555,7 +555,7 @@ $netsnmp_version = shell_exec($config['snmpget'] . " --version");
       echo('
         <li><a href="adduser/"><img src="images/16/user_add.png" border="0" align="absmiddle" /> Add User</a></li>
         <li><a href="deluser/"><img src="images/16/user_delete.png" border="0" align="absmiddle" /> Remove User</a></li>
-        <li><a href="?page=edituser"><img src="images/16/user_edit.png" border="0" align="absmiddle" /> Edit User</a></li>
+        <li><a href="edituser/"><img src="images/16/user_edit.png" border="0" align="absmiddle" /> Edit User</a></li>
         ');
       }
       echo('
