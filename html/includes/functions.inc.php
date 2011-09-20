@@ -205,6 +205,8 @@ function generate_graph_popup($graph_array)
   $graph_array['from']     = $config['time']['year'];
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
+  
+  $graph_array['link'] = "graphs/type=" . $graph_array['type'] . "/id=" . $graph_array['id'];
 
   return overlib_link($graph_array['link'], $graph, $content, NULL);
 }
