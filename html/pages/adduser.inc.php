@@ -42,7 +42,7 @@ else
       }
     }
 
-    echo("<form method='post' action='?page=adduser'> <input type='hidden' value='add' name='action'>");
+    echo("<form method='post' action='adduser/'> <input type='hidden' value='add' name='action'>");
     echo("Username <input style='margin: 1px;' name='new_username'></input><br />");
   ?>
   Password <input style='margin: 1px;' name='new_password' id='new_password' type=password  /><br />
