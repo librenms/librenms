@@ -310,6 +310,11 @@ $config['auth_ldap_prefix'] = "uid=";
 $config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
 $config['auth_ldap_group']  = "cn=observium,ou=groups,dc=example,dc=com";
 
+$config['auth_ldap_groupbase'] = "ou=group,dc=luciad,dc=com";
+$config['auth_ldap_groups']['admin']['level'] = 10;
+$config['auth_ldap_groups']['pfy']['level'] = 7;
+$config['auth_ldap_groups']['support']['level'] = 1;
+
 ### Hardcoded ASN descriptions
 $config['astext'][65333] = "Cymru Bogon Feed";
 
