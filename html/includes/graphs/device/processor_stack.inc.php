@@ -12,7 +12,7 @@ foreach ($procs as $proc)
 
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;
-    $rrd_list[$i]['rra'] = "usage";
+    $rrd_list[$i]['ds'] = "usage";
     $i++;
   }
 }

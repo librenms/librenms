@@ -4,8 +4,8 @@ $scale_min = "0";
 
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("bgp-" . $data['bgpPeerIdentifier'] . ".rrd");
 
-$rra_in = "bgpPeerInUpdates";
-$rra_out = "bgpPeerOutUpdates";
+$ds_in = "bgpPeerInUpdates";
+$ds_out = "bgpPeerOutUpdates";
 
 $colour_area_in = "AA66AA";
 $colour_line_in = "330033";

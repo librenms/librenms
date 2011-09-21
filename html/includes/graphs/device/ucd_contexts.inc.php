@@ -4,7 +4,7 @@ include("includes/graphs/common.inc.php");
 
 $rrd_filename   = $config['rrd_dir'] . "/" . $device['hostname'] . "/ucd_ssRawContexts.rrd";
 
-$rra = "value";
+$ds = "value";
 
 $colour_area = "9999cc";
 $colour_line = "0000cc";

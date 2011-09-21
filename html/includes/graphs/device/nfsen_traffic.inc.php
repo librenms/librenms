@@ -1,5 +1,5 @@
 <?php
-$rradescr = "Byts/s ";
-$rraprefix = "traffic_";
+$dsdescr = "Byts/s ";
+$dsprefix = "traffic_";
 include("nfsen_common.inc.php");
 ?>

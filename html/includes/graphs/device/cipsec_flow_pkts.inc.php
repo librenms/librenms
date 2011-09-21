@@ -2,8 +2,8 @@
 
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cipsec_flow.rrd";
 
-$rra_in = "InPkts";
-$rra_out = "OutPkts";
+$ds_in = "InPkts";
+$ds_out = "OutPkts";
 
 $colour_area_in = "AA66AA";
 $colour_line_in = "330033";

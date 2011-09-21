@@ -11,8 +11,8 @@ foreach ($rrd_filenames as $key => $rrd_filename)
 {
   if ($rrd_inverted[$key]) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
 
-  $rrd_options .= " DEF:".$in."octets" . $i . "=".$rrd_filename.":".$rra_in.":AVERAGE";
-  $rrd_options .= " DEF:".$out."octets" . $i . "=".$rrd_filename.":".$rra_out.":AVERAGE";
+  $rrd_options .= " DEF:".$in."octets" . $i . "=".$rrd_filename.":".$ds_in.":AVERAGE";
+  $rrd_options .= " DEF:".$out."octets" . $i . "=".$rrd_filename.":".$ds_out.":AVERAGE";
   $in_thing .= $seperator . "inoctets" . $i . ",UN,0," . "inoctets" . $i . ",IF";
   $out_thing .= $seperator . "outoctets" . $i . ",UN,0," . "outoctets" . $i . ",IF";
   $pluses .= $plus;

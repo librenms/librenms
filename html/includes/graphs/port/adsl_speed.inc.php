@@ -4,11 +4,11 @@ $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safe
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr'] = "Downstream";
-$rrd_list[0]['rra'] = "AturChanCurrTxRate";
+$rrd_list[0]['ds'] = "AturChanCurrTxRate";
 
 $rrd_list[1]['filename'] = $rrd_filename;
 $rrd_list[1]['descr'] = "Upstream";
-$rrd_list[1]['rra'] = "AtucChanCurrTxRate";
+$rrd_list[1]['ds'] = "AtucChanCurrTxRate";
 
 
 $unit_text = "Bits/sec";

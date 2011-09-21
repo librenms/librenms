@@ -4,11 +4,11 @@ $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safe
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr'] = "Downstream";
-$rrd_list[0]['rra'] = "AturCurrOutputPwr";
+$rrd_list[0]['ds'] = "AturCurrOutputPwr";
 
 $rrd_list[1]['filename'] = $rrd_filename;
 $rrd_list[1]['descr'] = "Upstream";
-$rrd_list[1]['rra'] = "AtucCurrOutputPwr";
+$rrd_list[1]['ds'] = "AtucCurrOutputPwr";
 
 $unit_text = "dBm";
 

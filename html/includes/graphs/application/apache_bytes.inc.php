@@ -11,7 +11,7 @@ if (is_file($apache_rrd))
   $rrd_filename = $apache_rrd;
 }
 
-$rra = "kbyte";
+$ds = "kbyte";
 
 $colour_area = "CDEB8B";
 $colour_line = "006600";

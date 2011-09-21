@@ -1,7 +1,7 @@
 <?php
 
-$rra_in = "read";
-$rra_out = "written";
+$ds_in = "read";
+$ds_out = "written";
 
 include("includes/graphs/generic_bytes.inc.php");
 
