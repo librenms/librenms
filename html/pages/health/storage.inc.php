@@ -61,7 +61,7 @@ foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.devic
     $graph_array_zoom           = $graph_array;
     $graph_array_zoom['height'] = "150";
     $graph_array_zoom['width']  = "400";
-    $link = "graphs/" . $graph_array['id'] . "/" . $graph_array['type'] . "/" . $graph_array['from'] . "/" . $graph_array['to'] . "/";
+    $link = "graphs/id=" . $graph_array['id'] . "/type=" . $graph_array['type'] . "/from=" . $graph_array['from'] . "/to=" . $graph_array['to'] . "/";
     $mini_graph = overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), NULL);
 
     $background = get_percentage_colours($perc);
