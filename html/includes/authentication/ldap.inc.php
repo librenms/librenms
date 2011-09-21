@@ -1,10 +1,11 @@
 <?php
 
+$ds = @ldap_connect($config['auth_ldap_server'],$config['auth_ldap_port']);
+
 function authenticate($username,$password)
 {
-  global $config;
+  global $config, $ds;
 
-  $ds=@ldap_connect($config['auth_ldap_server'],$config['auth_ldap_port']);
   if ($ds)
   {
     if ($config['auth_ldap_version'])
@@ -61,19 +62,57 @@ function adduser($username, $password, $level, $email = "", $realname = "")
 
 function user_exists($username)
 {
-  return 0; # FIXME to be implemented
+  global $config, $ds;
+
+  $filter = "(" . $config['auth_ldap_prefix'] . $username . ")";
+  $search = ldap_search($ds, trim($config['auth_ldap_suffix'],','), $filter);
+  $entries = ldap_get_entries($ds, $search);
+  if ($entries['count'])
+  {
+    return 1;
+  }
+  
+  return 0;
 }
 
 function get_userlevel($username)
 {
-  # FIXME should come from LDAP
-  return dbFetchCell("SELECT `level` FROM `users` WHERE `username` = ?", array($username));
+  global $config, $ds;
+
+  $userlevel = 0;
+
+  # Find all defined groups $username is in
+  $filter = "(&(|(cn=" . join(")(cn=", array_keys($config['auth_ldap_groups'])) . "))(memberUid=" . $username . "))";
+  $search = ldap_search($ds, $config['auth_ldap_groupbase'], $filter);
+  $entries = ldap_get_entries($ds, $search);
+
+  # Loop the list and find the highest level
+  foreach ($entries as $entry)
+  {
+    $groupname = $entry['cn'][0];
+    if ($config['auth_ldap_groups'][$groupname]['level'] > $userlevel)
+    {
+      $userlevel = $config['auth_ldap_groups'][$groupname]['level'];
+    }
+  }
+  
+  return $userlevel;
 }
 
 function get_userid($username)
 {
-  # FIXME should come from LDAP
-  return dbFetchCell("SELECT `user_id` FROM `users` WHERE `username` = ?", array($username));
+  global $config, $ds;
+
+  $filter = "(" . $config['auth_ldap_prefix'] . $username . ")";
+  $search = ldap_search($ds, trim($config['auth_ldap_suffix'],','), $filter);
+  $entries = ldap_get_entries($ds, $search);
+
+  if ($entries['count'])
+  {
+    return $entries[0]['uidnumber'][0];
+  }
+  
+  return -1;
 }
 
 function deluser($username)
