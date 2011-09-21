@@ -7,8 +7,8 @@ $multiplier = "8";
 $colours_out = 'blues';
 
 $nototal = 1;
-$rra_in  = "read";
-$rra_out = "written";
+$ds_in  = "read";
+$ds_out = "written";
 
 include("includes/graphs/device/diskio_common.inc.php");
 

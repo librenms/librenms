@@ -1,7 +1,7 @@
 <?php
 
-$rra_in = "INUCASTPKTS";
-$rra_out = "OUTUCASTPKTS";
+$ds_in = "INUCASTPKTS";
+$ds_out = "OUTUCASTPKTS";
 
 $colour_area_in = "AA66AA";
 $colour_line_in = "330033";

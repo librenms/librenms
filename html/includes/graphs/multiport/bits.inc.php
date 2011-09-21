@@ -18,8 +18,8 @@ foreach (explode(",", $id) as $ifid)
   }
 }
 
-$rra_in  = "INOCTETS";
-$rra_out = "OUTOCTETS";
+$ds_in  = "INOCTETS";
+$ds_out = "OUTOCTETS";
 
 $colour_line_in = "006600";
 $colour_line_out = "000099";

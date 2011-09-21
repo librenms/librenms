@@ -1,7 +1,7 @@
 <?php
 
-$rra_in = "inpackets";
-$rra_out = "outpackets";
+$ds_in = "inpackets";
+$ds_out = "outpackets";
 
 $colour_area_in = "AA66AA";
 $colour_line_in = "330033";

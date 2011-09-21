@@ -1,7 +1,7 @@
 <?php
 
 /// Draw generic bits graph
-/// args: rra_in, rra_out, rrd_filename, bg, legend, from, to, width, height, inverse, $percentile
+/// args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, $percentile
 
 include("includes/graphs/common.inc.php");
 
@@ -16,10 +16,10 @@ $unit_text = str_pad(truncate($unit_text,$length),$length);
 $in_text   = str_pad(truncate($in_text,$length),$length);
 $out_text   = str_pad(truncate($out_text,$length),$length);
 
-$rrd_options .= " DEF:".$out."=".$rrd_filename.":".$rra_out.":AVERAGE";
-$rrd_options .= " DEF:".$in."=".$rrd_filename.":".$rra_in.":AVERAGE";
-$rrd_options .= " DEF:".$out."_max=".$rrd_filename.":".$rra_out.":MAX";
-$rrd_options .= " DEF:".$in."_max=".$rrd_filename.":".$rra_in.":MAX";
+$rrd_options .= " DEF:".$out."=".$rrd_filename.":".$ds_out.":AVERAGE";
+$rrd_options .= " DEF:".$in."=".$rrd_filename.":".$ds_in.":AVERAGE";
+$rrd_options .= " DEF:".$out."_max=".$rrd_filename.":".$ds_out.":MAX";
+$rrd_options .= " DEF:".$in."_max=".$rrd_filename.":".$ds_in.":MAX";
 
 $rrd_options .= " CDEF:dout_max=out_max,-1,*";
 $rrd_options .= " CDEF:dout=out,-1,*";

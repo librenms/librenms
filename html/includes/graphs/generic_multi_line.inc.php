@@ -17,7 +17,7 @@ foreach ($rrd_list as $rrd)
 
   $colour=$config['graph_colours'][$colours][$iter];
 
-  $rra = $rrd['rra'];
+  $ds = $rrd['ds'];
   $filename = $rrd['filename'];
   $descr = $rrd['descr'];
   $descr = substr(str_pad($descr, 10),0,10);
@@ -25,12 +25,12 @@ foreach ($rrd_list as $rrd)
 
   $id = "ds".$i;
 
-  $rrd_options .= " DEF:".$id."=$filename:$rra:AVERAGE";
+  $rrd_options .= " DEF:".$id."=$filename:$ds:AVERAGE";
 
   if (!$basicrrd)
   {
-    $rrd_options .= " DEF:".$id."min=$filename:$rra:MIN";
-    $rrd_options .= " DEF:".$id."max=$filename:$rra:MAX";
+    $rrd_options .= " DEF:".$id."min=$filename:$ds:MIN";
+    $rrd_options .= " DEF:".$id."max=$filename:$ds:MAX";
   }
 
   if ($rrd['invert'])

@@ -21,8 +21,8 @@ $multiplier = "8";
 $colours_out = 'blues';
 
 $nototal = 1;
-$rra_in  = "INOCTETS";
-$rra_out = "OUTOCTETS";
+$ds_in  = "INOCTETS";
+$ds_out = "OUTOCTETS";
 
 #print_r($rates);
 

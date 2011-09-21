@@ -19,8 +19,8 @@ foreach ($rrd_list as $rrd)
   if ($rrd['colour_area_in']) { $colour_in = $rrd['colour_area_in']; }
   if ($rrd['colour_area_out']) { $colour_out = $rrd['colour_area_out']; }
 
-  $rrd_options .= " DEF:in".$i."=".$rrd['filename'].":".$rrd['rra_in'].":AVERAGE ";
-  $rrd_options .= " DEF:out".$i."=".$rrd['filename'].":".$rrd['rra_out'].":AVERAGE ";
+  $rrd_options .= " DEF:in".$i."=".$rrd['filename'].":".$rrd['ds_in'].":AVERAGE ";
+  $rrd_options .= " DEF:out".$i."=".$rrd['filename'].":".$rrd['ds_out'].":AVERAGE ";
   $rrd_options .= " CDEF:inB".$i."=in".$i.",$multiplier,* ";
   $rrd_options .= " CDEF:outB".$i."=out".$i.",$multiplier,*";
   $rrd_options .= " CDEF:outB".$i."_neg=outB".$i.",-1,*";

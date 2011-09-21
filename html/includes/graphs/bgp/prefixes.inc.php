@@ -4,7 +4,7 @@ include("includes/graphs/common.inc.php");
 
 $scale_min = "0";
 
-$rra = "AcceptedPrefixes";
+$ds = "AcceptedPrefixes";
 
 $colour_area = "AA66AA";
 $colour_line = "FFDD88";

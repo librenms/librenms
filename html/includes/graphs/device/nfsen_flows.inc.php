@@ -1,5 +1,5 @@
 <?php
-$rradescr = "Flows/s ";
-$rraprefix = "flows_";
+$dsdescr = "Flows/s ";
+$dsprefix = "flows_";
 include("nfsen_common.inc.php");
 ?>

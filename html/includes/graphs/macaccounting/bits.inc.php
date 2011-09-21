@@ -1,7 +1,7 @@
 <?php
 
-$rra_in = "IN";
-$rra_out = "OUT";
+$ds_in = "IN";
+$ds_out = "OUT";
 
 include("includes/graphs/generic_bits.inc.php");
 

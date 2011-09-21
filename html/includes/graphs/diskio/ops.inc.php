@@ -1,7 +1,7 @@
 <?php
 
-$rra_in = "reads";
-$rra_out = "writes";
+$ds_in = "reads";
+$ds_out = "writes";
 
 $colour_area_in = "FF3300";
 $colour_line_in = "FF0000";

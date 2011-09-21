@@ -1,7 +1,7 @@
 <?php
 
 /// Draw generic bits graph
-/// args: rra_in, rra_out, rrd_filename, bg, legend, from, to, width, height, inverse
+/// args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse
 
 include("includes/graphs/common.inc.php");
 
@@ -11,19 +11,19 @@ if ($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
 
 if ($multiplier)
 {
-  $rrd_options .= " DEF:p".$out."octets=".$rrd_filename_out.":".$rra_out.":AVERAGE";
-  $rrd_options .= " DEF:p".$in."octets=".$rrd_filename_in.":".$rra_in.":AVERAGE";
-  $rrd_options .= " DEF:p".$out."octets_max=".$rrd_filename_out.":".$rra_out.":MAX";
-  $rrd_options .= " DEF:p".$in."octets_max=".$rrd_filename_in.":".$rra_in.":MAX";
+  $rrd_options .= " DEF:p".$out."octets=".$rrd_filename_out.":".$ds_out.":AVERAGE";
+  $rrd_options .= " DEF:p".$in."octets=".$rrd_filename_in.":".$ds_in.":AVERAGE";
+  $rrd_options .= " DEF:p".$out."octets_max=".$rrd_filename_out.":".$ds_out.":MAX";
+  $rrd_options .= " DEF:p".$in."octets_max=".$rrd_filename_in.":".$ds_in.":MAX";
   $rrd_options .= " CDEF:inoctets=pinoctets,$multiplier,*";
   $rrd_options .= " CDEF:outoctets=poutoctets,$multiplier,*";
   $rrd_options .= " CDEF:inoctets_max=pinoctets_max,$multiplier,*";
   $rrd_options .= " CDEF:outoctets_max=poutoctets_max,$multiplier,*";
 } else {
-  $rrd_options .= " DEF:".$out."octets=".$rrd_filename_out.":".$rra_out.":AVERAGE";
-  $rrd_options .= " DEF:".$in."octets=".$rrd_filename_in.":".$rra_in.":AVERAGE";
-  $rrd_options .= " DEF:".$out."octets_max=".$rrd_filename_out.":".$rra_out.":MAX";
-  $rrd_options .= " DEF:".$in."octets_max=".$rrd_filename_in.":".$rra_in.":MAX";
+  $rrd_options .= " DEF:".$out."octets=".$rrd_filename_out.":".$ds_out.":AVERAGE";
+  $rrd_options .= " DEF:".$in."octets=".$rrd_filename_in.":".$ds_in.":AVERAGE";
+  $rrd_options .= " DEF:".$out."octets_max=".$rrd_filename_out.":".$ds_out.":MAX";
+  $rrd_options .= " DEF:".$in."octets_max=".$rrd_filename_in.":".$ds_in.":MAX";
 }
 
 $rrd_options .= " CDEF:octets=inoctets,outoctets,+";

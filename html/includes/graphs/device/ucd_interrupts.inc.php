@@ -4,7 +4,7 @@ include("includes/graphs/common.inc.php");
 
 $rrd_filename   = $config['rrd_dir'] . "/" . $device['hostname'] . "/ucd_ssRawInterrupts.rrd";
 
-$rra = "value";
+$ds = "value";
 
 $colour_area = "CC9999";
 $colour_line = "CC0000";

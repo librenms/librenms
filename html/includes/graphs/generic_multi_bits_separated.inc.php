@@ -3,12 +3,29 @@
 include("includes/graphs/common.inc.php");
 
 $i = 0;
+if($width > "500")
+{
+  $descr_len=18;
+} else {
+  $descr_len=8;
+  $descr_len += round(($width - 250) / 8);
+}
 
-$rrd_options .= " COMMENT:'                     In\: Current     Maximum      '";
-if (!$nototal) { $rrd_options .= " COMMENT:'Total      '"; }
-$rrd_options .= " COMMENT:'Out\: Current     Maximum'";
-if (!$nototal) { $rrd_options .= " COMMENT:'     Total'"; }
-$rrd_options .= " COMMENT:'\\n'";
+$unit_text = "Bits/sec";
+$rrd_options  .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."'";
+
+if($width > "500")
+{
+  $rrd_options .= " COMMENT:'In\: Current     Maximum      '";
+  if (!$nototal) { $rrd_options .= " COMMENT:'Total      '"; }
+  $rrd_options .= " COMMENT:'Out\: Current     Maximum'";
+  if (!$nototal) { $rrd_options .= " COMMENT:'     Total'"; }
+  $rrd_options .= " COMMENT:'\l'";
+} else {
+  $rrd_options .= " COMMENT:'    Now       Ave      Max\l'";
+
+}
+
 if(!isset($multiplier)) { $multiplier = "8"; }
 
 foreach ($rrd_list as $rrd)
@@ -18,10 +35,15 @@ foreach ($rrd_list as $rrd)
   $colour_in=$config['graph_colours'][$colours_in][$iter];
   $colour_out=$config['graph_colours'][$colours_out][$iter];
 
-  $descr = str_replace(":", "\:", substr(str_pad($rrd['descr'], 18),0,18));
+  $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr'], $descr_len),0,$descr_len)) . "  In";
+  if(isset($rrd['descr_in']))
+  {
+    $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr_in'], $descr_len),0,$descr_len)) . "  In";
+  }
+  $descr_out = str_replace(":", "\:", substr(str_pad($rrd['descr_out'], $descr_len),0,$descr_len)). " Out";
 
-  $rrd_options .= " DEF:".$in.$i."=".$rrd['filename'].":".$rra_in.":AVERAGE ";
-  $rrd_options .= " DEF:".$out.$i."=".$rrd['filename'].":".$rra_out.":AVERAGE ";
+  $rrd_options .= " DEF:".$in.$i."=".$rrd['filename'].":".$ds_in.":AVERAGE ";
+  $rrd_options .= " DEF:".$out.$i."=".$rrd['filename'].":".$ds_out.":AVERAGE ";
   $rrd_options .= " CDEF:inB".$i."=in".$i.",$multiplier,* ";
   $rrd_options .= " CDEF:outB".$i."=out".$i.",$multiplier,*";
   $rrd_options .= " CDEF:outB".$i."_neg=outB".$i.",-1,*";
@@ -34,24 +56,23 @@ foreach ($rrd_list as $rrd)
     $rrd_options .= " VDEF:tot".$i."=octets".$i.",TOTAL";
   }
 
-  $rrd_options .= " HRULE:999999999999999#" . $colour_out . ":\\\s:";
-
   if ($i) { $stack="STACK"; }
 
   $rrd_options .= " AREA:inB".$i."#" . $colour_in . ":'" . $descr . "':$stack";
-  $rrd_optionsb .= " AREA:outB".$i."_neg#" . $colour_out . "::$stack";
   $rrd_options .= " GPRINT:inB".$i.":LAST:%6.2lf%s$units";
-  $rrd_options .= " GPRINT:inB".$i.":MAX:%6.2lf%s$units";
+  $rrd_options .= " GPRINT:inB".$i.":AVERAGE:%6.2lf%s$units";
+  $rrd_options .= " GPRINT:inB".$i.":MAX:%6.2lf%s$units\l";
 
   if (!$nototal) { $rrd_options .= " GPRINT:totin".$i.":%6.2lf%s$total_units"; }
 
-  $rrd_options .= " COMMENT:'    '";
+  $rrd_options .= " 'AREA:outB".$i."_neg#" . $colour_out . ":".$descr_out.":$stack'";
   $rrd_options .= " GPRINT:outB".$i.":LAST:%6.2lf%s$units";
-  $rrd_options .= " GPRINT:outB".$i.":MAX:%6.2lf%s$units";
+  $rrd_options .= " GPRINT:outB".$i.":AVERAGE:%6.2lf%s$units";
+  $rrd_options .= " GPRINT:outB".$i.":MAX:%6.2lf%s$units\l";
 
   if (!$nototal) { $rrd_options .= " GPRINT:totout".$i.":%6.2lf%s$total_unit"; }
 
-  $rrd_options .= " COMMENT:\\\\n";
+  $rrd_options .= " 'COMMENT:\l'";
   $i++; $iter++;
 }
 

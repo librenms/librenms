@@ -1,7 +1,7 @@
 <?php
 
-$rra_in = "TunInPkts";
-$rra_out = "TunOutPkts";
+$ds_in = "TunInPkts";
+$ds_out = "TunOutPkts";
 
 $colour_area_in = "AA66AA";
 $colour_line_in = "330033";

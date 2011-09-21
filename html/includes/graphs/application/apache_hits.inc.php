@@ -11,7 +11,7 @@ if (is_file($apache_rrd))
   $rrd_filename = $apache_rrd;
 }
 
-$rra = "access";
+$ds = "access";
 
 $colour_area = "AA66AA";
 $colour_line = "FFDD88";

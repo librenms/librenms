@@ -1,7 +1,7 @@
 <?php
 
-$rra_in = "inpacketerrors";
-$rra_out = "outpacketerrors";
+$ds_in = "inpacketerrors";
+$ds_out = "outpacketerrors";
 
 $colour_area_in = "FF3300";
 $colour_line_in = "FF0000";

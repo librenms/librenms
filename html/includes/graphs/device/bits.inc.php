@@ -34,15 +34,15 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) 
     $rrd_filenames[] = $rrd_filename;
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $port['ifDescr'];
-    $rrd_list[$i]['rra_in'] = $rra_in;
-    $rrd_list[$i]['rra_out'] = $rra_out;
+    $rrd_list[$i]['ds_in'] = $ds_in;
+    $rrd_list[$i]['ds_out'] = $ds_out;
     $i++;
   }
 
   unset($ignore);
 }
 
-$units ='bps';
+$units ='b';
 $total_units ='B';
 $colours_in ='greens';
 $multiplier = "8";
@@ -51,8 +51,8 @@ $colours_out = 'blues';
 $nototal = 1;
 
 
-$rra_in  = "INOCTETS";
-$rra_out = "OUTOCTETS";
+$ds_in  = "INOCTETS";
+$ds_out = "OUTOCTETS";
 
 $graph_title .= "::bits";
 

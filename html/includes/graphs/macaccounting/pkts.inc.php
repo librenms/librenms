@@ -1,7 +1,7 @@
 <?php
 
-$rra_in = "PIN";
-$rra_out = "POUT";
+$ds_in = "PIN";
+$ds_out = "POUT";
 
 $colour_area_in = "AA66AA";
 $colour_line_in = "330033";
