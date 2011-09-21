@@ -5,6 +5,8 @@ ob_start();
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
 
+#$_SERVER['PATH_INFO'] = (isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : $_SERVER['ORIG_PATH_INFO']);
+
 if (strpos($_SERVER['PATH_INFO'], "debug"))
 {
   $debug = "1";
