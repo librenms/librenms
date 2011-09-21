@@ -2,7 +2,6 @@
 
 include("includes/graphs/common.inc.php");
 
-
 $descrlen = "18";
 $unitlen  = "10";
 if($nototal) { $descrlen += "2"; $unitlen += "2";}
@@ -15,11 +14,17 @@ $rrd_options .= " COMMENT:'\\n'";
 $colour_iter=0;
 foreach ($rrd_list as $i => $rrd)
 {
-  if (!$config['graph_colours'][$colours][$colour_iter]) { $colour_iter = 0; }
-  $colour = $config['graph_colours'][$colours][$colour_iter];
-  $colour_iter++;
+  if($rrd['colour']) 
+  {
+    $colour = $rrd['colour'];
+  } else {
+    if (!$config['graph_colours'][$colours][$colour_iter]) { $colour_iter = 0; }
+    $colour = $config['graph_colours'][$colours][$colour_iter];
+    $colour_iter++;
+  }
 
   $rrd_options .= " DEF:".$rrd['rra'].$i."=".$rrd['filename'].":".$rrd['rra'].":AVERAGE ";
+  $rrd_options .= " DEF:".$rrd['rra'].$i."min=".$rrd['filename'].":".$rrd['rra'].":MIN ";
   $rrd_options .= " DEF:".$rrd['rra'].$i."max=".$rrd['filename'].":".$rrd['rra'].":MAX ";
 
   ## Suppress totalling?
