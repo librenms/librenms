@@ -55,7 +55,8 @@ if ($_SESSION['userlevel'] == '1')
 
   foreach (dbFetchRows("SELECT * FROM `devices_perms` AS P, `devices` AS D WHERE `user_id` = ? AND P.device_id = D.device_id", array($user_id)) as $perm)
   {
-    echo("<a href='?page=device&id=" . $perm['device_id'] . "'>" . $perm['hostname'] . "</a><br />");
+   #FIXME generatedevicelink?
+    echo("<a href='device/device" . $perm['device_id'] . "'>" . $perm['hostname'] . "</a><br />");
     $dev_access = 1;
   }
 

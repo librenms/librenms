@@ -8,25 +8,24 @@ if ($_SESSION['userlevel'] < '10') { include("includes/error-no-perm.inc.php"); 
 
   if (auth_usermanagement())
   {
-    if ($_GET['action'] == "del")
+    if ($vars['action'] == "del")
     {
-      $delete_username = dbFetchCell("SELECT username FROM users WHERE user_id = ?", array($_GET['user_id']));
+      $delete_username = dbFetchCell("SELECT username FROM users WHERE user_id = ?", array($vars['id']));
 
-      if ($_GET['confirm'] == "yes")
+      if ($vars['confirm'] == "yes")
       {
-#        del_user($_GET['user_id']);
-
-#        dbDelete('bill_perms', "`user_id` =  ?", array($_GET['user_id']));
-#        dbDelete('devices_perms', "`user_id` =  ?", array($_GET['user_id']));
-#        dbDelete('ports_perms', "`user_id` =  ?", array($_GET['user_id']));
-#        dbDelete('users_prefs', "`user_id` =  ?", array($_GET['user_id']));
-#        dbDelete('users', "`user_id` =  ?", array($_GET['user_id']));
-
-        if (deluser($delete_username)) { echo("<div class=infobox>User '$delete_username' deleted!</div>"); }
+        if (deluser($delete_username))
+        {
+          echo('<div class="infobox">User "' . $delete_username . '" deleted!</div>');
+        }
+        else
+        {
+          echo('<div class="errorbox">Error deleting user "' . $delete_username . '"!</div>');
+        }
       }
       else
       {
-        echo("<div class=errorbox>You have requested deletion of the user '$delete_username'. This action can not be reversed.<br /><a href='?page=deluser&action=del&user_id=" . $_GET['user_id'] . "&confirm=yes'>Click to confirm</a></div>");
+        echo('<div class="errorbox">You have requested deletion of the user "' . $delete_username . '". This action can not be reversed.<br /><a href="deluser/action=del/id=' . $vars['id'] . '/confirm=yes">Click to confirm</a></div>');
       }
     }
 
@@ -36,7 +35,7 @@ if ($_SESSION['userlevel'] < '10') { include("includes/error-no-perm.inc.php"); 
     {
       $i++;
       echo($i . ". " . $userentry['username'] . "
-         <a href='?page=deluser&action=del&user_id=" . $userentry['user_id'] . "'><img src='images/16/cross.png' align=absmiddle border=0></a><br/>");
+         <a href='deluser/action=del/id=" . $userentry['user_id'] . "'><img src='images/16/cross.png' align=absmiddle border=0></a><br/>");
     }
   }
   else
