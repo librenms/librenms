@@ -1,34 +1,35 @@
 <?php
 
-include("includes/graphs/common.inc.php");
+include('includes/graphs/common.inc.php');
 
-$mysql_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
+$rrd_filename = $config["rrd_dir"] . '/' . $device["hostname"] . '/app-mysql-'.$app["app_id"].'.rrd';
 
-if (is_file($mysql_rrd))
+$array = array('IBIIs'  => 'Inserts',
+               'IBIMRd' => 'Merged Records',
+               'IBIMs'  => 'Merges',
+);
+
+$i = 0;
+if (is_file($rrd_filename))
 {
-  $rrd_filename = $mysql_rrd;
-}
+  foreach ($array as $ds => $vars)
+  {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    if(is_array($vars))
+    {
+      $rrd_list[$i]['descr'] = $vars['descr'];
+    } else {
+      $rrd_list[$i]['descr'] = $vars;
+    }
+    $rrd_list[$i]['ds'] = $ds;
+    $i++;
+  }
+} else { echo("file missing: $file");  }
 
-$rrd_options .= ' -b 1024 ';
-$rrd_options .= ' DEF:a='.$rrd_filename.':IBIIs:AVERAGE ';
-$rrd_options .= ' DEF:b='.$rrd_filename.':IBIMRd:AVERAGE ';
-$rrd_options .= ' DEF:c='.$rrd_filename.':IBIMs:AVERAGE ';
+$colours   = "mixed";
+$nototal   = 1;
+$unit_text = "Commands";
 
-$rrd_options .= 'COMMENT:"    Current    Average   Maximum\n" ';
-
-$rrd_options .= 'LINE1:a#22FF22:"Inserts"\ \     ';
-$rrd_options .= 'GPRINT:a:LAST:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:a:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:a:MAX:"%6.2lf %s\n"  ';
-
-$rrd_options .= 'LINE1:b#0022FF:"Merged Records"\ \   ';
-$rrd_options .= 'GPRINT:b:LAST:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:b:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:b:MAX:"%6.2lf %s\n"  ';
-
-$rrd_options .= 'LINE1:c#FF0000:"Merges"\ \   ';
-$rrd_options .= 'GPRINT:c:LAST:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:c:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:c:MAX:"%6.2lf %s\n"  ';
+include("includes/graphs/generic_multi_simplex_seperated.inc.php");
 
 ?>
