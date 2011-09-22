@@ -16,10 +16,8 @@ $rrd_options  .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_
 
 if($width > "500")
 {
-  $rrd_options .= " COMMENT:'In\: Current     Maximum      '";
+  $rrd_options .= " COMMENT:'    Current      Average     Maximum      '";
   if (!$nototal) { $rrd_options .= " COMMENT:'Total      '"; }
-  $rrd_options .= " COMMENT:'Out\: Current     Maximum'";
-  if (!$nototal) { $rrd_options .= " COMMENT:'     Total'"; }
   $rrd_options .= " COMMENT:'\l'";
 } else {
   $rrd_options .= " COMMENT:'    Now       Ave      Max\l'";
