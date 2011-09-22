@@ -14,7 +14,7 @@ $rrd_options .= " COMMENT:'\\n'";
 $colour_iter=0;
 foreach ($rrd_list as $i => $rrd)
 {
-  if($rrd['colour']) 
+  if ($rrd['colour'])
   {
     $colour = $rrd['colour'];
   } else {

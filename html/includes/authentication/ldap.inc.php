@@ -71,7 +71,7 @@ function user_exists($username)
   {
     return 1;
   }
-  
+
   return 0;
 }
 
@@ -95,7 +95,7 @@ function get_userlevel($username)
       $userlevel = $config['auth_ldap_groups'][$groupname]['level'];
     }
   }
-  
+
   return $userlevel;
 }
 
@@ -111,7 +111,7 @@ function get_userid($username)
   {
     return $entries[0]['uidnumber'][0];
   }
-  
+
   return -1;
 }
 

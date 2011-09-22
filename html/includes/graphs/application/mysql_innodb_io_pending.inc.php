@@ -19,7 +19,7 @@ if (is_file($rrd_filename))
   foreach ($array as $ds => $vars)
   {
     $rrd_list[$i]['filename'] = $rrd_filename;
-    if(is_array($vars))
+    if (is_array($vars))
     {
       $rrd_list[$i]['descr'] = $vars['descr'];
     } else {
