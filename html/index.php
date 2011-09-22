@@ -81,16 +81,16 @@ foreach($segments as $pos => $segment) {
   }
 }
 
-foreach($_POST as $name => $value)
+foreach($_GET as $name => $value)
 {
-#  if ($value == "" || !isset($value))
-#  {
-#  } else {
-    $vars[$name] = $value;
-#  }
+  $vars[$name] = $value;
 }
 
-#print_r($vars);
+foreach($_POST as $name => $value)
+{
+  $vars[$name] = $value;
+}
+
 
 if(strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) { $_SESSION['widescreen'] = 1; }
 if(strstr($_SERVER['REQUEST_URI'], 'widescreen=no'))  { unset($_SESSION['widescreen']); }

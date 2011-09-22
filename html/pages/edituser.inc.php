@@ -72,7 +72,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 
     // Display devices this user doesn't have access to
     echo("<h4>Grant access to new device</h4>");
-    echo("<form method='get' action=''>
+    echo("<form method='post' action=''>
             <input type='hidden' value='" . $vars['user_id'] . "' name='user_id'>
             <input type='hidden' value='edituser' name='page'>
             <input type='hidden' value='adddevperm' name='action'>
@@ -109,7 +109,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
     // Display devices this user doesn't have access to
     echo("<h4>Grant access to new interface</h4>");
 
-    echo("<form action='' method='get'>
+    echo("<form action='' method='post'>
         <input type='hidden' value='" . $vars['user_id'] . "' name='user_id'>
         <input type='hidden' value='edituser' name='page'>
         <input type='hidden' value='addifperm' name='action'>
@@ -147,7 +147,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 
     // Display devices this user doesn't have access to
     echo("<h4>Grant access to new bill</h4>");
-    echo("<form method='get' action=''>
+    echo("<form method='post' action=''>
             <input type='hidden' value='" . $vars['user_id'] . "' name='user_id'>
             <input type='hidden' value='edituser' name='page'>
             <input type='hidden' value='addbillperm' name='action'>
@@ -173,7 +173,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 
     echo("<h3>Select a user to edit</h3>");
 
-    echo("<form method='get' action=''>
+    echo("<form method='post' action=''>
             <input type='hidden' value='edituser' name='page'>
             <select name='user_id'>");
     foreach($user_list as $user_entry)

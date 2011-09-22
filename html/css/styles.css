@@ -834,6 +834,7 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   margin-bottom: 1em;
   padding: 10px;
   float: left;
+  width: 100%;
 }
 
 .optionicon {
