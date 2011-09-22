@@ -34,7 +34,7 @@ foreach ($rrd_list as $rrd)
   $colour_out=$config['graph_colours'][$colours_out][$iter];
 
   $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr'], $descr_len),0,$descr_len)) . "  In";
-  if(isset($rrd['descr_in']))
+  if (isset($rrd['descr_in']))
   {
     $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr_in'], $descr_len),0,$descr_len)) . "  In";
   }
