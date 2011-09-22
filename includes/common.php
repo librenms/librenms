@@ -2,6 +2,17 @@
 
 ## Common Functions
 
+function external_exec($command)
+{
+  global $debug;
+
+  if ($debug) { echo($command."\n"); }
+  $output = shell_exec($command);
+  if ($debug) { echo($output."\n"); }
+
+  return $output;
+}
+
 function shorthost($hostname, $len=12)
 {
   $parts = explode(".", $hostname);
