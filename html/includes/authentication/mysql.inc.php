@@ -110,5 +110,9 @@ function deluser($username)
 
 }
 
+function get_userlist()
+{
+  return dbFetchRows("SELECT * FROM `users`");
+}
 
 ?>
