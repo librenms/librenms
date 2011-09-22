@@ -2,7 +2,7 @@
 
 if ($vars['tab'] == "port" && is_numeric($vars['device']) && port_permitted($vars['port']))
 {
-  $check_device = get_device_id_by_interface_id($vars['device']);
+  $check_device = get_device_id_by_interface_id($vars['port']);
   $permit_ports = 1;
 }
 
