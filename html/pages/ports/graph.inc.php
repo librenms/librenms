@@ -21,14 +21,36 @@ foreach ($ports as $port)
 
     $graph_type = "port_" . $subformat;
 
-    echo("<div style='display: block; padding: 1px; margin: 2px; min-width: 393px; max-width:393px; min-height:180px; max-height:180px; text-align: center; float: left; background-color: #f5f5f5;'>
-    <a href='device/".$port['device_id']."/port/".$port['interface_id']."/' onmouseover=\"return overlib('\
-    <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
-    <img src=\'graph.php?type=$graph_type&amp;id=".$port['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150&amp;title=yes\'>\
-    ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
-    "<img src='graph.php?type=$graph_type&amp;id=".$port['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=315&amp;height=110&amp;legend=no&amp;title=yes'>
-    </a>
-    </div>");
+    $graph_array           = array();
+    $graph_array['height'] = "100";
+    $graph_array['width']  = "210";
+    $graph_array['to']     = $now;
+    $graph_array['id']     = $port['interface_id'];
+    $graph_array['type']   = $graph_type;
+    $graph_array['from']   = $day;
+    $graph_array['legend'] = "no";
+
+    $link_array = $graph_array;
+    $link_array['page'] = "graphs";
+    unset($link_array['height'], $link_array['width'], $link_array['legend']);
+    $link = generate_url($link_array);
+    $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - " . $port['ifDescr']);
+    $graph_array['title']  = "yes";
+    $graph_array['width'] = 315; $graph_array['height'] = 119; 
+    $graph =  generate_graph_tag($graph_array);
+
+    echo("<div style='display: block; padding: 1px; margin: 2px; min-width: 393px; max-width:393px; min-height:180px; max-height:180px; text-align: center; float: left; background-color: #f5f5f5;'>");
+    echo(overlib_link($link, $graph, $overlib_content));
+    echo("</div>");
+
+#    echo("<div style='display: block; padding: 1px; margin: 2px; min-width: 393px; max-width:393px; min-height:180px; max-height:180px; text-align: center; float: left; background-color: #f5f5f5;'>
+#    <a href='".generate_port_url($port)."/' onmouseover=\"return overlib('\
+#    <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
+#    <img src=\'graph.php?type=$graph_type&amp;id=".$port['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150&amp;title=yes\'>\
+#    ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
+#    "<img src='graph.php?type=$graph_type&amp;id=".$port['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=315&amp;height=110&amp;legend=no&amp;title=yes'>
+#    </a>
+#    </div>");
   }
 }
 ?>
