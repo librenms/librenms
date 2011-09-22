@@ -169,7 +169,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 
   } else {
 
-    $user_list = dbFetchRows("SELECT * FROM `users`");
+    $user_list = get_userlist();
 
     echo("<h3>Select a user to edit</h3>");
 
