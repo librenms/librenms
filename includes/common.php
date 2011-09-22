@@ -2,6 +2,19 @@
 
 ## Common Functions
 
+function shorthost($hostname, $len=12)
+{
+  $parts = explode(".", $hostname);
+  $shorthost = $parts[0];
+  $i = 1;
+  while ($i < count($parts) && strlen($shorthost.'.'.$parts[$i]) < $len)
+  {
+    $shorthost = $shorthost.'.'.$parts[$i];
+    $i++;
+  }
+  return ($shorthost);
+}
+
 function isCli() {
 
      if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {

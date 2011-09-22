@@ -6,7 +6,7 @@ if (count($sensors))
 {
   echo('<div style="background-color: #eeeeee; margin: 5px; padding: 5px;">');
   echo('<p style="padding: 0px 5px 5px;" class="sectionhead"><a class="sectionhead" href="device/device='.$device['device_id'].'/tab=health/metric=' . strtolower($sensor_type) . '/"><img align="absmiddle" src="'.$config['base_url'].'/images/icons/' . strtolower($sensor_type) . '.png"> ' . $sensor_type . '</a></p>');
-  $i = '1';
+  $i = '0';
   echo('<table width="100%" valign="top">');
   foreach ($sensors as $sensor)
   {
@@ -45,7 +45,7 @@ if (count($sensors))
 
     $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 25, '');
     echo("<tr bgcolor='$row_colour'>
-           <td class=tablehead><strong>".overlib_link($link, $sensor['sensor_descr'], $overlib_content)."</strong></td>
+           <td class=tablehead style='padding-left:5px;'><strong>".overlib_link($link, $sensor['sensor_descr'], $overlib_content)."</strong></td>
            <td width=80 align=right class=tablehead>".overlib_link($link, $sensor_minigraph, $overlib_content)."</td>
            <td width=80 align=right class=tablehead>".overlib_link($link, "<span " . ($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '') . '>' . $sensor['sensor_current'] . $sensor_unit . "</span>", $overlib_content)."</td>
           </tr>");

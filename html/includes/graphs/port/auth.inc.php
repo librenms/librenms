@@ -7,7 +7,7 @@ if (is_numeric($id) && ($config['allow_unauth_graphs'] || port_permitted($id)))
   $title  = generate_device_link($device);
   $title .= " :: Port  ".generate_port_link($port);
 
-  $graph_title = $device['hostname'] . "::" . $port['ifDescr'];
+  $graph_title = shorthost($device['hostname']) . "::" . strtolower(makeshortif($port['ifDescr']));
 
   $auth   = TRUE;
 
