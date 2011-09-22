@@ -20,13 +20,15 @@ function rrdtool_graph($graph_file, $options)
 
   $process = proc_open($command, $descriptorspec, $pipes, $cwd, $env);
 
-  if (is_resource($process)) {
+  if (is_resource($process))
+  {
     // $pipes now looks like this:
     // 0 => writeable handle connected to child stdin
     // 1 => readable handle connected to child stdout
     // Any error output will be appended to /tmp/error-output.txt
 
-    if ($config['rrdcached']) {
+    if ($config['rrdcached'])
+    {
       fwrite($pipes[0], "graph --daemon " . $config['rrdcached'] . " $graph_file $options");
     } else {
       fwrite($pipes[0], "graph $graph_file $options");

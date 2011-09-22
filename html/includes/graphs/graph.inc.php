@@ -36,6 +36,8 @@ $vertical = mres($_GET['vertical']);
 $legend   = mres($_GET['legend']);
 $id       = mres($_GET['id']);
 
+$graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
+
 if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs'])
 {
   $auth = "1"; ## hardcode auth for all with config function
@@ -53,8 +55,6 @@ $type = $graphtype['type'];
 $subtype = $graphtype['subtype'];
 
 if ($debug) {print_r($graphtype); }
-
-$graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 
 if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php"))
 {
