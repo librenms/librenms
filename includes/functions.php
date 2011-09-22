@@ -56,19 +56,6 @@ function logfile($string)
   fclose($fd);
 }
 
-function shorthost($hostname, $len=16)
-{
-  $parts = explode(".", $hostname);
-  $shorthost = $parts[0];
-  $i = 1;
-  while ($i < count($parts) && strlen($shorthost.'.'.$parts[$i]) < $len)
-  {
-    $shorthost = $shorthost.'.'.$parts[$i];
-    $i++;
-  }
-  return ($shorthost);
-}
-
 function getHostOS($device)
 {
   global $config, $debug;
