@@ -511,4 +511,29 @@ function getlocations()
   return $locations;
 }
 
+function foldersize($path)
+{
+  $total_size = 0;
+  $files = scandir($path);
+  $total_files = 0;
+
+  foreach($files as $t)
+  {
+    if (is_dir(rtrim($path, '/') . '/' . $t))
+    {
+      if ($t<>"." && $t<>"..")
+      {
+        $size = foldersize(rtrim($path, '/') . '/' . $t);
+        $total_size += $size;
+      }
+    } else {
+      $size = filesize(rtrim($path, '/') . '/' . $t);
+      $total_size += $size;
+      $total_files++;
+    }
+  }
+
+  return array($total_size, $total_files);
+}
+
 ?>
