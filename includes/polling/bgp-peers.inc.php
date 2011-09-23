@@ -83,7 +83,7 @@ else
 
     if ($bgpPeerFsmEstablishedTime)
     {
-      if (!(is_array($config['alerts']['bgp']['whitelist']) && in_array($bgppeerremoteas, $config['alerts']['bgp']['whitelist'])) && ($bgpPeerFsmEstablishedTime < $peer['bgpPeerFsmEstablishedTime'] || $bgpPeerState != $peer['bgpPeerState']))
+      if (!(is_array($config['alerts']['bgp']['whitelist']) && !in_array($bgppeerremoteas, $config['alerts']['bgp']['whitelist'])) && ($bgpPeerFsmEstablishedTime < $peer['bgpPeerFsmEstablishedTime'] || $bgpPeerState != $peer['bgpPeerState']))
       {
         if ($peer['bgpPeerState'] == $bgpPeerState)
         {
