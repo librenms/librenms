@@ -82,7 +82,9 @@ $config['discover_services']              = false; ## Autodiscover services via 
 
 $config['alerts']['email']['default']      = NULL;    ## Default alert recipient
 $config['alerts']['email']['default_only'] = FALSE;   ## Only use default recipient
-$config['alerts']['email']['enable']           = TRUE;    ## Enable email alerts
+$config['alerts']['email']['enable']       = TRUE;    ## Enable email alerts
+$config['alerts']['bgp']['whitelist']	   = NULL;    ## Populate as an array() with ASNs to alert on.
+
 $config['uptime_warning']                  = "84600"; ## Time in seconds to display a "Device Rebooted" Alert. 0 to disable warnings.
 
 ### Cosmetics

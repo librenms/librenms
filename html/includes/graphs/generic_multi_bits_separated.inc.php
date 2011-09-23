@@ -12,15 +12,14 @@ if($width > "500")
 }
 
 $unit_text = "Bits/sec";
-$rrd_options  .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."'";
 
 if($width > "500")
 {
-  $rrd_options .= " COMMENT:'    Current      Average     Maximum      '";
+  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."    Current      Average     Maximum      '";
   if (!$nototal) { $rrd_options .= " COMMENT:'Total      '"; }
   $rrd_options .= " COMMENT:'\l'";
 } else {
-  $rrd_options .= " COMMENT:'     Now         Ave          Max\l'";
+  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."     Now         Ave          Max\l'";
 
 }
 

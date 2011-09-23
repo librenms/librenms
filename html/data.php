@@ -1,11 +1,6 @@
 <?php
 
-#  $debug = TRUE;
-#  ini_set('display_errors', 1);
-#  ini_set('display_startup_errors', 0);
-#  ini_set('log_errors', 0);
-#  ini_set('error_reporting', E_ALL);
-
+## FIXME - fewer includes!
 
 include_once("../includes/defaults.inc.php");
 include_once("../config.php");
