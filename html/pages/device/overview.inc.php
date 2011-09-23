@@ -61,7 +61,7 @@ if ($services['total'])
 
 ### FIXME - split this into overview/syslog.inc.php?
 $syslog =  dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20", array($device['device_id']));
-if (is_array($syslog))
+if (count($syslog))
 {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='images/16/printer.png'> Recent Syslog</p>");
