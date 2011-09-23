@@ -6,13 +6,13 @@ echo("<tr bgcolor='$bg_colour'>");
 
 echo("<td width=100 class=list-large> Vlan " . $vlan['vlan_vlan'] . "</td>");
 echo("<td width=200 class=box-desc>" . $vlan['vlan_descr'] . "</td>");
-
 echo("<td class=list-bold>");
+
 foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?", array($device['device_id'], $vlan['vlan_vlan'])) as $port)
 {
-  if ($_GET['opta'])
+  if ($vars['view'])
   {
-    $graph_type = $_GET['opta'];
+    $graph_type = $vars['view'];
 
     echo("<div style='display: block; padding: 2px; margin: 2px; min-width: 139px; max-width:139px; min-height:85px; max-height:85px; text-align: center; float: left; background-color: ".$list_colour_b_b.";'>
     <div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>
