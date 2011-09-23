@@ -1,0 +1,461 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-SRVCFG-EAP-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--       
+-- =================================================================
+
+        HUAWEI-BRAS-SRVCFG-EAP-MIB DEFINITIONS ::= BEGIN
+ 
+                IMPORTS
+                        hwBRASMib                     
+                                FROM HUAWEI-MIB
+                        InterfaceIndex, ifDescr                  
+                                FROM IF-MIB                     
+                        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE                       
+                                FROM SNMPv2-SMI  
+                        VlanIdOrNone, VlanId     
+                    FROM Q-BRIDGE-MIB   
+                        RowStatus, MacAddress, TruthValue, DisplayString                        
+                                FROM SNMPv2-TC
+            EnabledStatus
+                FROM P-BRIDGE-MIB;
+        
+                hwBRASSrvcfgEap MODULE-IDENTITY 
+                        LAST-UPDATED "200403041608Z"
+                        ORGANIZATION 
+                                "Huawei Technologies Co., Ltd.
+                                "
+                CONTACT-INFO 
+                        "
+                        NanJing Institute,Huawei Technologies Co.,Ltd.
+                        HuiHong Mansion,No.91 BaiXia Rd.
+                        NanJing, P.R. of China
+                        Zipcode:210001
+                         
+                        Http://www.huawei.com                                       
+                        E-mail:support@huawei.com "
+            
+                DESCRIPTION 
+                        "The MIB contains objects of module SRVCFG."
+                ::= { hwBRASMib 4 }
+        
+                hwSrvcfgEapMibObjects OBJECT IDENTIFIER ::= { hwBRASSrvcfgEap 1 }
+                                        
+        hwDot1xSystemConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot1xSystemConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table describes 802.1x configuration information of template."
+            ::= { hwSrvcfgEapMibObjects 1 }
+        
+        hwDot1xSystemConfigEntry OBJECT-TYPE
+            SYNTAX HwDot1xSystemConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            INDEX { hwDot1xTemplateIndex }
+            ::= { hwDot1xSystemConfigTable 1 }
+        
+        HwDot1xSystemConfigEntry ::=
+            SEQUENCE { 
+                hwDot1xTemplateIndex
+                    Integer32,
+                hwDot1xHandshakeSwitch
+                    TruthValue,
+                hwDot1xHandshakeCount
+                    Integer32,
+                hwDot1xHandshakeInterval
+                    Integer32,
+                hwDot1xIfEAPEnd
+                    TruthValue,
+                hwDot1xEAPEndPapChap
+                    INTEGER,
+                hwDot1xIfSendEAPSIMParameter
+                    TruthValue,                    
+                    hwDot1xRowStatus
+                        RowStatus
+             }
+
+        hwDot1xTemplateIndex OBJECT-TYPE
+            SYNTAX Integer32(1..256)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "802.1x template index."
+            ::= { hwDot1xSystemConfigEntry 1 }
+
+        hwDot1xHandshakeSwitch OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Handshake switch."
+            DEFVAL { close }
+            ::= { hwDot1xSystemConfigEntry 2 }
+        
+        hwDot1xHandshakeCount OBJECT-TYPE
+            SYNTAX Integer32 (0..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Max handshake times."
+            DEFVAL { 3 }
+            ::= { hwDot1xSystemConfigEntry 3 }
+        
+        hwDot1xHandshakeInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..1800)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Handshake interval."
+            DEFVAL { 20 }
+            ::= { hwDot1xSystemConfigEntry 4 }
+
+        hwDot1xIfEAPEnd OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether to end the eap packet."
+            DEFVAL { false }
+            ::= { hwDot1xSystemConfigEntry 5 }
+
+        hwDot1xEAPEndPapChap OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                pap(0),
+                chap(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Type of eap end."
+            DEFVAL { chap }
+            ::= { hwDot1xSystemConfigEntry 6 }
+
+        hwDot1xIfSendEAPSIMParameter OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether to send parameter of eap-sim."            
+            DEFVAL { false }
+            ::= { hwDot1xSystemConfigEntry 7 }
+        
+            hwDot1xRowStatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                    " 
+                    "
+                ::= { hwDot1xSystemConfigEntry 8 }
+                
+           hwDot1xGlobal OBJECT-TYPE
+                SYNTAX     EnabledStatus
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Global 802.1x configuration. Enable this before you want to enable
+             other interfaces 802.1x authentication."
+            DEFVAL { disable }            
+            ::= { hwSrvcfgEapMibObjects 2 }        
+            
+               hwDot1xAuthenMethod OBJECT-TYPE
+                    SYNTAX     INTEGER
+            {
+             chap(1),
+             pap(2),
+             eap(3)
+            }
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Specify system authentication method."
+            DEFVAL { chap }            
+            ::= { hwSrvcfgEapMibObjects 3 }     
+            
+               hwDot1xDhcpTrigger OBJECT-TYPE
+                    SYNTAX     EnabledStatus
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Trigger system authentication when receiving DHCP packet(s)."
+            DEFVAL { disable }            
+            ::= { hwSrvcfgEapMibObjects 4 }     
+            
+                hwDot1xHandshake  OBJECT-TYPE
+                SYNTAX     EnabledStatus
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Shake hand of 802.1x."
+            DEFVAL { disable }            
+            ::= { hwSrvcfgEapMibObjects 5 }     
+            
+               hwDot1xQuietPeriod  OBJECT-TYPE
+                    SYNTAX     EnabledStatus
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Enable quiet period function."
+            DEFVAL { disable }            
+            ::= { hwSrvcfgEapMibObjects 6 }                                             
+
+               hwDot1xRetry  OBJECT-TYPE
+                    SYNTAX     Integer32 (1..10)
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Specify maximal request times."
+            DEFVAL { 2 }            
+            ::= { hwSrvcfgEapMibObjects 7 }         
+            
+
+               hwDot1xTimerHandshakePeriod  OBJECT-TYPE
+                    SYNTAX     Integer32 (5..1024)
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Value of handshake interval with 8021x supplicant."
+            DEFVAL { 15 }            
+            ::= { hwSrvcfgEapMibObjects 8 }     
+
+               hwDot1xTimerQuietPeriod  OBJECT-TYPE
+            SYNTAX     Integer32 (10..3600)
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Interval following failed authentication."
+            DEFVAL { 60 }            
+            ::= { hwSrvcfgEapMibObjects 9 }     
+                
+            
+               hwDot1xTimerServerTimeout  OBJECT-TYPE
+                    SYNTAX     Integer32 (1..120)
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Value of server timeout."
+            DEFVAL { 30 }            
+            ::= { hwSrvcfgEapMibObjects 10 }         
+            
+               hwDot1xTimerClientTimeout  OBJECT-TYPE
+                    SYNTAX     Integer32 (1..120)
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Value of Client timeout."
+            DEFVAL { 30 }            
+            ::= { hwSrvcfgEapMibObjects 11 }     
+                
+               hwDot1xTimerTxPeriod  OBJECT-TYPE
+                    SYNTAX     Integer32 (1..120)
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Interval between identity requests."
+            DEFVAL { 30 }            
+            ::= { hwSrvcfgEapMibObjects 12 }         
+            
+               hwDot1xReauthenPeriod  OBJECT-TYPE
+                    SYNTAX     Integer32 (60..7200)
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reauthenticate period."
+            DEFVAL { 3600 }            
+            ::= { hwSrvcfgEapMibObjects 13 }                                                             
+     
+               hwDot1xPortConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDot1xPortConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table describes 802.1x configuration information of template."
+            ::= { hwSrvcfgEapMibObjects 14 }
+        
+           hwDot1xPortConfigEntry OBJECT-TYPE
+            SYNTAX HwDot1xPortConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the 802.1x configuration table."
+            INDEX { hwDot1xPortIndex }
+            ::= { hwDot1xPortConfigTable 1 }
+        
+        HwDot1xPortConfigEntry ::=
+            SEQUENCE { 
+                hwDot1xPortIndex
+                    Integer32,
+                hwDot1xPortSwitch
+                    EnabledStatus,
+                hwDot1xPortGuestVlan
+                    VlanIdOrNone,
+                hwDot1xPortMaxUser
+                    Integer32,
+                hwDot1xPortControl
+                    INTEGER,
+                hwDot1xPortMethod
+                    INTEGER,
+                hwDot1xPortReauthen
+                    EnabledStatus                    
+             }
+
+        hwDot1xPortIndex OBJECT-TYPE
+            SYNTAX Integer32(1..512)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Index of L2-Switch Interface."
+            ::= { hwDot1xPortConfigEntry 1 }
+
+        hwDot1xPortSwitch OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Whether to enable 802.1x on this interface."
+            DEFVAL { disable }
+            ::= { hwDot1xPortConfigEntry 2 }
+        
+        hwDot1xPortGuestVlan OBJECT-TYPE
+            SYNTAX VlanIdOrNone
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specify guest vlan configuration information for ports."
+            ::= { hwDot1xPortConfigEntry 3 }
+
+        hwDot1xPortMaxUser OBJECT-TYPE
+            SYNTAX Integer32(1..256)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specify maximal on-line user number per port."
+            DEFVAL { 256 }
+            ::= { hwDot1xPortConfigEntry 4 }
+
+        hwDot1xPortControl OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                auto(1),
+                authorizedForce(2),
+                unauthorizedForce(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specify port authenticated status."
+            DEFVAL { auto }
+            ::= { hwDot1xPortConfigEntry 5 }
+    
+        hwDot1xPortMethod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                mac(1),
+                port(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specify port controlled method."
+            DEFVAL { mac }
+            ::= { hwDot1xPortConfigEntry 6 }
+    
+        hwDot1xPortReauthen OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Enable periodic reauthentication of the client."
+            DEFVAL { disable }
+            ::= { hwDot1xPortConfigEntry 7 }
+
+    
+    
+--
+-- Traps Identifier
+--
+        hwSrvcfgEapMibTraps OBJECT IDENTIFIER ::= { hwBRASSrvcfgEap 2 }
+        
+            hwSrvcfgEapMaxUserAlarm NOTIFICATION-TYPE
+                   OBJECTS { ifDescr } 
+                   STATUS current     
+                   DESCRIPTION 
+                           "The number of ahthenticate users is reached the max number. "
+                   ::= { hwSrvcfgEapMibTraps 1 }
+        
+        
+                        
+     --  ============== conformance information ==============
+        hwSrvcfgEapConformance OBJECT IDENTIFIER ::= { hwBRASSrvcfgEap 3 }
+        hwSrvcfgEapCompliances OBJECT IDENTIFIER ::= { hwSrvcfgEapConformance 1 }
+        
+        hwSrvcfgEapCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS
+                   {
+                       hwDot1xSystemConfigGroup,
+                       hwDot1xPortConfigGroup
+                   }  
+                                              
+              ::= { hwSrvcfgEapCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwDot1xSystemConfigGroups OBJECT IDENTIFIER ::= { hwSrvcfgEapConformance 2 } 
+        
+        hwDot1xSystemConfigGroup OBJECT-GROUP
+            OBJECTS { 
+                hwDot1xTemplateIndex,
+                hwDot1xHandshakeSwitch,
+                hwDot1xHandshakeCount,
+                hwDot1xHandshakeInterval,
+                hwDot1xIfEAPEnd,
+                hwDot1xEAPEndPapChap,
+                hwDot1xIfSendEAPSIMParameter,                    
+                    hwDot1xRowStatus
+             }       
+            STATUS current
+            DESCRIPTION 
+                "The Dot1x System Config group."
+            ::= { hwDot1xSystemConfigGroups 1 }
+            
+
+        hwDot1xPortConfigGroup OBJECT-GROUP
+            OBJECTS { 
+                                hwDot1xGlobal, hwDot1xAuthenMethod, hwDot1xDhcpTrigger, hwDot1xHandshake, hwDot1xQuietPeriod, 
+                                hwDot1xRetry, hwDot1xTimerHandshakePeriod, hwDot1xTimerQuietPeriod,hwDot1xTimerServerTimeout, 
+                                hwDot1xTimerClientTimeout, hwDot1xTimerTxPeriod, hwDot1xReauthenPeriod, hwDot1xPortSwitch, 
+                                hwDot1xPortGuestVlan, hwDot1xPortMaxUser, hwDot1xPortControl, hwDot1xPortMethod, 
+                                hwDot1xPortReauthen
+             }       
+            STATUS current
+            DESCRIPTION 
+                "The Dot1x Port Config group."
+            ::= { hwDot1xSystemConfigGroups 2 }
+                
+                
+        hwDot1xPortTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwSrvcfgEapMaxUserAlarm }
+            STATUS current
+            DESCRIPTION 
+                "The Dot1x's Notification group."
+            ::= { hwDot1xSystemConfigGroups 3 } 
+                
+        --  ============== conformance information define end ==============
+
+                        
+        END

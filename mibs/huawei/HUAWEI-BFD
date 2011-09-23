@@ -1,0 +1,1802 @@
+-- =================================================================
+-- Copyright (C) 2005 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: Huawei BFD MIB
+-- Reference:   
+-- Version:     V1.00
+-- History:     
+-- =================================================================
+
+    HUAWEI-BFD-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            EnabledStatus            
+                FROM P-BRIDGE-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            IpAddress, Integer32, Unsigned32, Counter32, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            RowStatus, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+    
+    
+--  December 27, 2006 at 00:00 GMT
+        hwBFDMIB MODULE-IDENTITY 
+            LAST-UPDATED "200612270000Z"        -- December 27, 2006 at 00:00 GMT
+            ORGANIZATION 
+                "Organization."
+            CONTACT-INFO 
+                "Contact-info."
+            DESCRIPTION 
+                "Description."
+            ::= { hwDatacomm 38 }
+
+        
+    
+--
+-- Textual conventions
+--
+        BfdInterval ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            SYNTAX Integer32
+
+        BfdDiag ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            SYNTAX Integer32
+
+    
+--
+-- Node definitions
+--
+        hwBfdScalarsObjects OBJECT IDENTIFIER ::= { hwBFDMIB 1 }
+
+        
+        hwBfdVersionNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current version number of the BFD protocol is 1."
+            DEFVAL { 1 }
+            ::= { hwBfdScalarsObjects 1 }
+
+        
+        hwBfdAdminStatus OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Describe the administrative status of a BFD protocol.   
+                The value 'enabled' denotes that the BFD Process is active on all interface;  
+                The value 'disabled' denotes that the BFD process is disabled on all interfaces."
+            DEFVAL { 2 }
+            ::= { hwBfdScalarsObjects 2 }
+
+        
+        hwBfdSessLimitNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Define the maximum number of BFD sessions allowed in the logic router."
+            DEFVAL { 0 }
+            ::= { hwBfdScalarsObjects 3 }
+
+        
+        hwBfdSessInterfaceLimitNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Define the maximum number of BFD sessions allowed per board."
+            DEFVAL { 0 }
+            ::= { hwBfdScalarsObjects 4 }
+
+        
+        hwBfdSessStaticNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of BFD static sessions."
+            ::= { hwBfdScalarsObjects 5 }
+
+        
+        hwBfdSessDynamicNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of BFD dynamic sessions."
+            ::= { hwBfdScalarsObjects 6 }
+
+        
+        hwBfdSessGlobalDefaultIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Define the default multicast IP address used in BFD multicast detection."
+            ::= { hwBfdScalarsObjects 7 }
+
+        
+        hwBfdEchoPassiveStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The passive Echo function of BFD."
+            DEFVAL { 2 }
+            ::= { hwBfdScalarsObjects 8 }
+
+        
+        hwBfdEchoAclNum OBJECT-TYPE
+            SYNTAX Unsigned32 (0 | 2000..2999)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Acl Number for passive Echo function of BFD."
+            ::= { hwBfdScalarsObjects 9 }
+
+        
+        hwBfdSessDynamicPingInterval OBJECT-TYPE
+            SYNTAX Unsigned32 (30..600)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Define the sending interval of the MPLS echo packet.
+                The unit is second."   
+            DEFVAL { 60 }
+            ::= { hwBfdScalarsObjects 10 }
+
+        
+        hwBfdSessDynamicSupportPassive OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The capability of automatically creating BFD sessions on the LSP egress  
+                'enable'denotes that the egress can create BFD sessions;
+                'disabled'denotes that the egress can not create BFD sessions."
+            DEFVAL {2}
+            ::= { hwBfdScalarsObjects 11 }
+
+        hwBfdSessDelayUpTime OBJECT-TYPE
+            SYNTAX Unsigned32 (0..600)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Define delay interval before the session turns to up.
+                The unit is second."   
+            DEFVAL { 0 }
+            ::= { hwBfdScalarsObjects 12 }
+
+
+        hwBfdSessMultiDstPort OBJECT-TYPE
+            SYNTAX Integer32 (0|3784|4784)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The destination UDP port of multi-hop BFD session. When the 
+                administrative status of BFD protocol is disabled, this value 
+                will be 0."   
+            ::= { hwBfdScalarsObjects 13 }
+
+        hwBfdTrapSendInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..600)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Define the sending interval of TRAP message.
+                The unit is seconds."   
+            DEFVAL { 120 }    
+            ::= { hwBfdScalarsObjects 14 }
+                        
+        
+        hwBfdObjects OBJECT IDENTIFIER ::= { hwBFDMIB 2 }
+
+        
+        hwBfdIfConfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBfdIfConfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The interface configuration table of BFD entries."
+            ::= { hwBfdObjects 1 }
+
+        
+        hwBfdIfConfEntry OBJECT-TYPE
+            SYNTAX HwBfdIfConfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The BFD Interface Entry describes BFD Interface."
+            INDEX { hwBfdIfConfIndex }
+            ::= { hwBfdIfConfTable 1 }
+
+        
+        HwBfdIfConfEntry ::=
+            SEQUENCE { 
+                hwBfdIfConfIndex
+                    INTEGER,
+                hwBfdIfConfName
+                    OCTET STRING,
+                hwBfdIfConfEnable
+                    Integer32,
+                hwBfdIfConfDeleting
+                    Integer32,
+                hwBfdIfConfAvailable
+                    Integer32,
+                hwBfdIfConfSessCnt
+                    Integer32,
+                hwBfdIfConfRowStatus
+                    RowStatus
+             }
+
+        hwBfdIfConfIndex OBJECT-TYPE
+            SYNTAX INTEGER (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "It is the Configuration's Index of this interface."
+            ::= { hwBfdIfConfEntry 1 }
+
+        
+        hwBfdIfConfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..47))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is the name of this Interface."
+            ::= { hwBfdIfConfEntry 2 }
+
+        
+        hwBfdIfConfEnable OBJECT-TYPE
+            SYNTAX Integer32 (0..1)
+            MAX-ACCESS read-only
+            STATUS obsolete
+            DESCRIPTION
+                "The flag that whether the interface has enabled BFD."
+            ::= { hwBfdIfConfEntry 3 }
+
+        
+        hwBfdIfConfDeleting OBJECT-TYPE
+            SYNTAX Integer32 (0..1)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The flag that whether the interface is in deleting.
+                0:The interface is not deleted.
+                1:The interface is deleted"
+            ::= { hwBfdIfConfEntry 4 }
+
+        
+        hwBfdIfConfAvailable OBJECT-TYPE
+            SYNTAX Integer32 (0..1)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The flag that whether the interface is available.
+                0:The interface is not available.
+                1:The interface is available."
+            ::= { hwBfdIfConfEntry 5 }
+
+        
+        hwBfdIfConfSessCnt OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of sessions that has been bound to this interface."
+            ::= { hwBfdIfConfEntry 6 }
+
+        
+        hwBfdIfConfRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "used to manage the creation and deletion of conceptual rows."
+            ::= { hwBfdIfConfEntry 7 }
+
+        
+        hwBfdSessionConfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBfdSessionConfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The BFD Session Configuration Table describes the BFD sessions."
+            ::= { hwBfdObjects 2 }
+
+        
+        hwBfdSessionConfEntry OBJECT-TYPE
+            SYNTAX HwBfdSessionConfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The BFD Session Configuration Entry describes BFD session."
+            INDEX { hwBfdSessConfName }
+            ::= { hwBfdSessionConfTable 1 }
+
+        
+        HwBfdSessionConfEntry ::=
+            SEQUENCE { 
+                hwBfdSessConfName
+                    OCTET STRING,
+                hwBfdSessConfMIndex
+                    Unsigned32,
+                hwBfdSessConfLocalDiscr
+                    Unsigned32,
+                hwBfdSessConfRemoteDiscr
+                    Unsigned32,
+                hwBfdSessConfPeerAddr
+                    IpAddress,
+                hwBfdSessConfBindIfIndex
+                    Unsigned32,
+                hwBfdSessConfBindIfName
+                    OCTET STRING,
+                hwBfdSessConfDemandEnable
+                    INTEGER,
+                hwBfdSessConfDemandTimerInterval
+                    Unsigned32,
+                hwBfdSessConfDetectMult
+                    Unsigned32,
+                hwBfdSessConfDesiredMinRxInterval
+                    BfdInterval,
+                hwBfdSessConfDesiredMinTxInterval
+                    BfdInterval,
+                hwBfdSessConfWTRInterval
+                    INTEGER,
+                hwBfdSessConfTOS
+                    INTEGER,
+                hwBfdSessConfPSTFlag
+                    INTEGER,
+                hwBfdSessConfCommitFlag
+                    INTEGER,
+                hwBfdSessConfAdminStatus
+                    INTEGER,
+                hwBfdSessConfRowStatus
+                    RowStatus,
+                hwBfdSessConfSourceAddr
+                    IpAddress,
+                hwBfdSessConfVrfIndex
+                    Unsigned32,
+                hwBfdSessConfVPNName
+                    OCTET STRING,
+                hwBfdSessConfDefaultIp
+                    INTEGER,
+                hwBfdSessConfPISFlag
+                    INTEGER,
+                hwBfdSessConfBindType
+                    INTEGER,
+                hwBfdSessConfNextHop
+                    IpAddress,
+                hwBfdSessConfStaticLspName
+                    OCTET STRING,
+                hwBfdSessConfPWSecondaryFlag
+                    INTEGER,
+                hwBfdSessConfTunnelDetectType
+                    INTEGER,
+                hwBfdSessConfVcId
+                    Unsigned32,
+                hwBfdSessConfVsiName
+                    OCTET STRING,
+                hwBfdSessConfVsiPeerAddr
+                    IpAddress,
+                hwBfdSessConfDiscrAuto
+                    EnabledStatus
+             }
+
+        hwBfdSessConfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..15))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "It is the name of this Configuration model."
+            ::= { hwBfdSessionConfEntry 1 }
+
+        
+        hwBfdSessConfMIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (1..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the Configuration's Index of this session."
+            ::= { hwBfdSessionConfEntry 2 }
+
+        
+        hwBfdSessConfLocalDiscr OBJECT-TYPE
+            SYNTAX Unsigned32 (1..16384)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Define the local discriminator of the BFD session."
+            ::= { hwBfdSessionConfEntry 3 }
+
+        
+        hwBfdSessConfRemoteDiscr OBJECT-TYPE
+            SYNTAX Unsigned32 (1..16384)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Define the remote discriminator of the BFD session."
+            ::= { hwBfdSessionConfEntry 4 }
+
+        
+        hwBfdSessConfPeerAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Define the IP address of the peer in the BFD session."
+            ::= { hwBfdSessionConfEntry 5 }
+
+        
+        hwBfdSessConfBindIfIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the index of the binding interface in the BFD configuration."
+            ::= { hwBfdSessionConfEntry 6 }
+
+        
+        hwBfdSessConfBindIfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..47))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is the name of the binding interface in the BFD configuration."
+            ::= { hwBfdSessionConfEntry 7 }
+
+        
+        hwBfdSessConfDemandEnable OBJECT-TYPE
+            SYNTAX INTEGER (0..1)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is the flag of the BFD demand mode.
+                 0:Disable the BFD demand mode.
+                 1:Enable the BFD demand mode."  
+            DEFVAL { 0 }
+            ::= { hwBfdSessionConfEntry 8 }
+
+        
+        hwBfdSessConfDemandTimerInterval OBJECT-TYPE
+            SYNTAX Unsigned32 (0 | 500..300000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Define the detecting interval in the BFD session with the demand mode.
+                The unit is millisecond."
+            ::= { hwBfdSessionConfEntry 9 }
+
+        
+        hwBfdSessConfDetectMult OBJECT-TYPE
+            SYNTAX Unsigned32 (3..50)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is Detect time multiplier of the configuration. The 
+                negotiated transmit interval, multiplied by this value,
+                provides the detection time for the transmitting 
+                system in Asynchronous mode."
+           ::= { hwBfdSessionConfEntry 10 }
+
+        
+        hwBfdSessConfDesiredMinRxInterval OBJECT-TYPE
+            SYNTAX BfdInterval (3..1000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This is the minimum interval of the configuration,in 
+                milliseconds, between received BFD Control packets 
+                that this system is capable of supporting."
+            ::= { hwBfdSessionConfEntry 11 }
+
+        
+        hwBfdSessConfDesiredMinTxInterval OBJECT-TYPE
+            SYNTAX BfdInterval (3..1000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This is the minimum interval of the configuration,
+                in milliseconds, that the local system would 
+                like to use when transmitting BFD Control packets."
+            ::= { hwBfdSessionConfEntry 12 }
+
+        
+        hwBfdSessConfWTRInterval OBJECT-TYPE
+            SYNTAX INTEGER (0..60)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This is the WTR interval of bfd session.
+                The unit is minute."
+            ::= { hwBfdSessionConfEntry 13 }
+
+        
+        hwBfdSessConfTOS OBJECT-TYPE
+            SYNTAX INTEGER (0..7)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This is the TOS value of bfd packet."
+            DEFVAL { 7 }
+            ::= { hwBfdSessionConfEntry 14 }
+
+        
+        hwBfdSessConfPSTFlag OBJECT-TYPE
+            SYNTAX INTEGER (0..1)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The PST flag of the BFD session configuration."
+            DEFVAL { 0 }
+            ::= { hwBfdSessionConfEntry 15 }
+
+        
+        hwBfdSessConfCommitFlag OBJECT-TYPE
+            SYNTAX INTEGER (0..1)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is the commit flag of the configuration entry.
+                0: not commit
+                1: commit "
+            ::= { hwBfdSessionConfEntry 16 }
+
+        
+        hwBfdSessConfAdminStatus OBJECT-TYPE
+            SYNTAX INTEGER (0..1)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "There may be circumstances where it is desirable to 
+                administratively enable or disable a BFD session of
+                the configuration. The AdminStatus exists so that 
+                a session can be administratively put down indefinitely."
+            ::= { hwBfdSessionConfEntry 17 }
+
+        
+        hwBfdSessConfRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "used to manage the creation and deletion of conceptual rows."
+            ::= { hwBfdSessionConfEntry 18 }
+
+        
+        hwBfdSessConfSourceAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Define the source IP address of the BFD session."
+            ::= { hwBfdSessionConfEntry 19 }
+
+        
+        hwBfdSessConfVrfIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the VPN interface."
+            ::= { hwBfdSessionConfEntry 20 }
+
+        
+        hwBfdSessConfVPNName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The name of VPN interface."
+            ::= { hwBfdSessionConfEntry 21 }
+
+        
+        hwBfdSessConfDefaultIp OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                no(1),
+                yes(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "BFD session use default multicast IP as the detect peer-ip
+                1 : do not use the default multicast IP 
+                2 : use the default multicast IP
+                default value is 1 (do not use)"
+            DEFVAL { 1 }
+            ::= { hwBfdSessionConfEntry 22 }
+
+        
+        hwBfdSessConfPISFlag OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                false(1),
+                true(2),
+                subif(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The state of BFD session is associated with the state of the binding interface
+                1 : do not associate with interface state
+                2 : associate with interface state
+                3 : associate with interface and correlative sub interface .
+                default value is 1 (do not associate)"
+            DEFVAL { 1 }
+            ::= { hwBfdSessionConfEntry 23 }
+
+        
+        hwBfdSessConfBindType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                interfaceIp(1),
+                peerIp(2),
+                sourceIp(3),
+                ifAndSourceIp(4),
+                fec(5),
+                tunnelIf(6),
+                ospf(7),
+                isis(8),
+                ldpLsp(9),
+                staticLsp(10),
+                teLsp(11),
+                teTunnel(12),
+                pw(13),
+                vsiPw (15)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The binding type of the BFD session:
+                1: BFD for IP with peer-ip and interface;        
+                2: BFD for IP only with peer-ip;
+                3: BFD for IP with peer-ip and source-ip;  
+                4: BFD for IP with peer-ip, interface and source-ip;
+                5: BFD for FEC(NOT support now); 
+                6: BFD for Tunnel interface(NOT support now); 
+                7: BFD for OSPF;
+                8: BFD for ISIS;
+                9: BFD for LDP-LSP;
+                10: BFD for static LSP;
+                11: BFD for TE-LSP;
+                12: BFD for TE-Tunnel;
+                13: BFD for PW;
+                15: BFD for VSI PW;"
+            ::= { hwBfdSessionConfEntry 24 }
+
+        
+        hwBfdSessConfNextHop OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is the next hop of the BFD session."
+            ::= { hwBfdSessionConfEntry 25 }
+
+        
+        hwBfdSessConfStaticLspName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..16))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is the static LSP name of the BFD session."
+            ::= { hwBfdSessionConfEntry 26 }
+
+        
+        hwBfdSessConfPWSecondaryFlag OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                flagMasterPW(1),
+                flagSecondaryPW(2),
+                flagNoPW(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The role of the PW bound with BFD session:
+                1: master PW;        
+                2: secondary PW;
+                3: no PW"
+            DEFVAL { 1 }
+            ::= { hwBfdSessionConfEntry 27 }
+
+        
+        hwBfdSessConfTunnelDetectType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                flagBothDown(1),
+                flagNeighborDown(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set the failure notifies policy type:
+                1: Notify applications when detecting both Detect-Down and Neighbor-Down;        
+                2: Notify applications only when detecting Neighbor-Down;"
+            DEFVAL { 1 }
+            ::= { hwBfdSessionConfEntry 28 }
+
+        
+        hwBfdSessConfVcId OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is the ID of VC."
+            ::= { hwBfdSessionConfEntry 29 }
+
+        
+        hwBfdSessConfVsiName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is the name of VSI."
+            ::= { hwBfdSessionConfEntry 30 }
+
+        
+        hwBfdSessConfVsiPeerAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is the peer-ip of VSI."
+            ::= { hwBfdSessionConfEntry 31 }
+
+        hwBfdSessConfDiscrAuto OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Describe whether the discriminator can be auto allocated:
+                disabled: The discriminator can not be allocated automatically;        
+                enabled: The discriminator can be allocated automatically."
+            DEFVAL { disabled }
+            ::= { hwBfdSessionConfEntry 32 }
+        
+        hwBfdSessionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBfdSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The BFD Session Table describes the BFD sessions."
+            ::= { hwBfdObjects 3 }
+
+        
+        hwBfdSessionEntry OBJECT-TYPE
+            SYNTAX HwBfdSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The BFD Session Entry describes BFD session."
+            INDEX { hwBfdSessIndex }
+            ::= { hwBfdSessionTable 1 }
+
+        
+        HwBfdSessionEntry ::=
+            SEQUENCE { 
+                hwBfdSessIndex
+                    Unsigned32,
+                hwBfdSessMIndex
+                    Unsigned32,
+                hwBfdSessBindVRRP
+                    INTEGER,
+                hwBfdSessCfgName
+                    OCTET STRING,
+                hwBfdSessPeerAddr
+                    IpAddress,
+                hwBfdSessBindIfIndex
+                    INTEGER,
+                hwBfdSessBindIfName
+                    OCTET STRING,
+                hwBfdSessLocalDiscr
+                    Unsigned32,
+                hwBfdSessRemoteDiscr
+                    Unsigned32,
+                hwBfdSessOperMode
+                    Integer32,
+                hwBfdSessDetectMult
+                    Unsigned32,
+                hwBfdSessDemandTimerInterval
+                    BfdInterval,
+                hwBfdSessActualRxInterval
+                    BfdInterval,
+                hwBfdSessActualTxInterval
+                    BfdInterval,
+                hwBfdSessWTRInterval
+                    INTEGER,
+                hwBfdSessTOS
+                    INTEGER,
+                hwBfdSessState
+                    Integer32,
+                hwBfdSessDiag
+                    Integer32,
+                hwBfdSessSourceAddr
+                    IpAddress,
+                hwBfdSessVrfIndex
+                    Unsigned32,
+                hwBfdSessVPNName
+                    OCTET STRING,
+                hwBfdSessType
+                    INTEGER,
+                hwBfdSessBindAppType
+                    INTEGER,
+                hwBfdSessDefaultIp
+                    INTEGER,
+                hwBfdSessPISFlag
+                    INTEGER,
+                hwBfdSessBindType
+                    INTEGER,
+                hwBfdSessNextHop
+                    IpAddress,
+                hwBfdSessStaticLspName
+                    OCTET STRING,
+                hwBfdSessLspIndex
+                    Unsigned32,
+                hwBfdSessPWSecondaryFlag
+                    INTEGER,
+                hwBfdSessTunnelDetectType
+                    INTEGER,
+                hwBfdSessVcId
+                    Unsigned32,
+                hwBfdSessVsiName
+                    OCTET STRING,
+                hwBfdSessVsiPeerAddr
+                    IpAddress,
+                hwBfdSessDiscrAuto
+                    EnabledStatus
+             }
+
+        hwBfdSessIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (1..4294967295)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "It is unique and the Index of this session."
+            ::= { hwBfdSessionEntry 1 }
+
+        
+        hwBfdSessMIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (1..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value indicate the configuration has Main Index."
+            ::= { hwBfdSessionEntry 2 }
+
+        
+        hwBfdSessBindVRRP OBJECT-TYPE
+            SYNTAX INTEGER (0..1)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Describe the capability of bound with VRRP for the BFD session.
+                0: not bind
+                1: bind"
+            ::= { hwBfdSessionEntry 3 }
+
+        
+        hwBfdSessCfgName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..15))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This indicate the name of the session which
+                will be display course information or statistic
+                information of the session."
+            ::= { hwBfdSessionEntry 4 }
+
+        
+        hwBfdSessPeerAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Define the peer IP address of the BFD session."
+            ::= { hwBfdSessionEntry 5 }
+
+        
+        hwBfdSessBindIfIndex OBJECT-TYPE
+            SYNTAX INTEGER (0..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the index of the binding interface in the BFD session"
+            ::= { hwBfdSessionEntry 6 }
+
+        
+        hwBfdSessBindIfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..47))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the name of the binding interface in the BFD session."
+            ::= { hwBfdSessionEntry 7 }
+
+        
+        hwBfdSessLocalDiscr OBJECT-TYPE
+            SYNTAX Unsigned32 (1..16384)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A unique, nonzero discriminator value generated by the 
+                transmitting system, used to demultiplex multiple BFD 
+                sessions between the same pair of system."
+            ::= { hwBfdSessionEntry 8 }
+
+        
+        hwBfdSessRemoteDiscr OBJECT-TYPE
+            SYNTAX Unsigned32 (0..16383)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The discriminator received from the corresponding remote
+                system. This field reflects back the received value of My
+                Discriminator, or is zero if that value is unknown."
+            ::= { hwBfdSessionEntry 9 }
+
+        
+        hwBfdSessOperMode OBJECT-TYPE
+            SYNTAX Integer32 (0..3)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Describe the current operating mode configured with the BFD session.
+                0: Asynchronous mode with echo function;               
+                1: Asynchronous mode without echo function;
+                2: Demand mode with echo function;
+                3: Demand mode without echo function;"
+            ::= { hwBfdSessionEntry 10 }
+
+        
+        hwBfdSessDetectMult OBJECT-TYPE
+            SYNTAX Unsigned32 (3..50)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Detect time multiplier. The negotiated transmit interval,
+                multiplied by this value, provides the detection time for
+                the transmitting system in Asynchronous mode."
+            ::= { hwBfdSessionEntry 11 }
+
+        
+        hwBfdSessDemandTimerInterval OBJECT-TYPE
+            SYNTAX BfdInterval 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the detecting interval in the BFD session with the demand mode.
+                The unit is millisecond."
+            ::= { hwBfdSessionEntry 12 }
+
+        
+        hwBfdSessActualRxInterval OBJECT-TYPE
+            SYNTAX BfdInterval (3..30000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This is the minimum interval, in milliseconds, between 
+                received BFD Control packets that this system is capable
+                of supporting."
+            ::= { hwBfdSessionEntry 13 }
+
+        
+        hwBfdSessActualTxInterval OBJECT-TYPE
+            SYNTAX BfdInterval (3..30000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This is the minimum interval, in milliseconds, that the
+                local system would like to use when transmitting BFD 
+                Control packets."
+            ::= { hwBfdSessionEntry 14 }
+
+        
+        hwBfdSessWTRInterval OBJECT-TYPE
+            SYNTAX INTEGER (0..60)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The WTR interval of the BFD session.
+                The unit is minute."
+            ::= { hwBfdSessionEntry 15 }
+
+        
+        hwBfdSessTOS OBJECT-TYPE
+            SYNTAX INTEGER (0..7)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This is the TOS value of bfd packet."
+            ::= { hwBfdSessionEntry 16 }
+
+        
+        hwBfdSessState OBJECT-TYPE
+            SYNTAX Integer32 (0..3)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Describe the current state of the BFD session.
+                0: Admin Down;               
+                1: Down;
+                2: Init;
+                3: Up;"
+            ::= { hwBfdSessionEntry 17 }
+
+        
+        hwBfdSessDiag OBJECT-TYPE
+            SYNTAX Integer32 (0..31)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A diagnostic code specifying the local system's reason for
+                the last session state change.
+                Values are:
+                0--No Diagnostic
+                1--Control Detection Time Expired
+                2--Echo Function Failed
+                3--Neighbor Signaled Session Down
+                4--Forwarding Plane Reset
+                5--Path Down
+                6--Concatenated Path Down
+                7--Administratively Down
+                8--Reverse Concatenated  Path Down
+                9--Neighbor Signaled Session Down (Receive AdminDown)
+                10-31--Reserved for future use
+                "
+            ::= { hwBfdSessionEntry 18 }
+
+        
+        hwBfdSessSourceAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The source address of the session."
+            ::= { hwBfdSessionEntry 19 }
+
+        
+        hwBfdSessVrfIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the VPN interface."
+            ::= { hwBfdSessionEntry 20 }
+
+        
+        hwBfdSessVPNName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of VPN interface."
+            ::= { hwBfdSessionEntry 21 }
+
+        
+        hwBfdSessType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                static(1),
+                dynamic(2),
+                entireDynamic(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of the BFD session.
+                1:static
+                2:dynamic
+                3:entire dynamic"
+            ::= { hwBfdSessionEntry 22 }
+
+        
+--   other or unknown
+        hwBfdSessBindAppType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                noApplication(1),
+                vrrp(2),
+                ifnet(3),
+                vrrpAndIfnet(4),
+                bgp(5),
+                ospf(6),
+                bgpAndOspf(7),
+                oamLspmL2vpn(8),
+                oamLspmTnlL2vpn(9),
+                lspmTnlL2vpnTnlps(10),
+                oamMplsfwL2vpn(11),
+                isis(12),
+                vsiPw(13),
+                vrrpOamLspmL2vpn(14),
+                vrrpOamTnlL2vpn(15),
+                vrrpLspmTnlL2vpnTnlps(16),
+                vrrpOamMplsfwL2vpn(17),
+                pim(18),
+                bgpIsis(19),
+                bgpPim(20),
+                ospfIsis(21),  
+                ospfPim(22),        
+                isisPim(23),
+                bgpOspfIsis(24),
+                bgpIspfPim(25),
+                bgpIsisPim(26),
+                ospfIsisPim(27),
+                bgpOspfIsisPim(28)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Application type that this BFD session has been bound to
+                1:No application
+                2:VRRP
+                3:IFNET
+                4:VRRP&IFNET
+                5:BGP
+                6:OSPF
+                7:BGP&OSPF
+                8:OAM&LSPM&L2VPN (for LDP LSP and static LSP)
+                9:OAM&LSPM&TUNNEL&L2VPN (for TE_Tunnnel) 
+                10:LSPM&TUNNEL&TUNNEL_PS&L2VPN (for TE_LSP)
+                11:OAM&MPLSFW&L2VPN (for PW)
+                12:ISIS
+                13:VSIPW (for VSI PW)
+                14:VRRP&OAM&LSPM&L2VPN
+                15:VRRP&OAM&TUNNEL&L2VPN
+                16:VRRP&LSPM&TUNNEL&TUNNEL_PS&L2VPN
+                17:VRRP&OAM&MPLSFW&L2VPN
+                18:PIM
+                19:BGP&ISIS
+                20:BGP&PIM
+                21:OSPF&ISIS
+                22:OSPF&PIM
+                23:ISIS&PIM
+                24:BGP&OSPF&ISIS
+                25:BGP&OSPF&PIM
+                26:BGP&ISIS&PIM
+                27:OSPF&ISIS&PIM
+                28:BGPOSPF&ISIS&PIM"
+            ::= { hwBfdSessionEntry 23 }
+
+        
+        hwBfdSessDefaultIp OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                no(1),
+                yes(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "BFD session use default multicast IP as the detect peer-ip
+                1 : do not use the default multicast IP 
+                2 : use the default multicast IP"
+            ::= { hwBfdSessionEntry 24 }
+
+        
+        hwBfdSessPISFlag OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                false(1),
+                true(2),
+                subif(3)                
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The state of BFD session is associated with the state of the binding interface
+                1 : do not associate with interface state
+                2 : associate with interface state
+                3 : associate with interface and correlative sub interface."
+            ::= { hwBfdSessionEntry 25 }
+
+        
+        hwBfdSessBindType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                interfaceIp(1),
+                peerIp(2),
+                sourceIp(3),
+                ifAndSourceIp(4),
+                fec(5),
+                tunnelIf(6),
+                ospf(7),
+                isis(8),
+                ldpLsp(9),
+                staticLsp(10),
+                teLsp(11),
+                teTunnel(12),
+                pw(13),
+                vsiPw (15)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The binding type of the BFD session:
+                1: BFD for IP with peer-ip and interface;        
+                2: BFD for IP only with peer-ip;
+                3: BFD for IP with peer-ip and source-ip;  
+                4: BFD for IP with peer-ip, interface and source-ip;
+                5: BFD for FEC(NOT support now); 
+                6: BFD for Tunnel interface(NOT support now); 
+                7: BFD for OSPF;
+                8: BFD for ISIS;
+                9: BFD for LDP-LSP;
+                10: BFD for static LSP;
+                11: BFD for TE-LSP;
+                12: BFD for TE-Tunnel;
+                13: BFD for PW;
+                15: BFD for VSI PW;"
+            ::= { hwBfdSessionEntry 26 }
+
+        
+        hwBfdSessNextHop OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the next hop of the BFD session."
+            ::= { hwBfdSessionEntry 27 }
+
+        
+        hwBfdSessStaticLspName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..16))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the static LSP name of the BFD session."
+            ::= { hwBfdSessionEntry 28 }
+
+        
+        hwBfdSessLspIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the index of the static LSP or LDP LSP in BFD session, mapping the channel index in MPLS network."
+            ::= { hwBfdSessionEntry 29 }
+
+        
+        hwBfdSessPWSecondaryFlag OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                flagMasterPW(1),
+                flagSecondaryPW(2),
+                flagNoPW(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The role of the PW bound with BFD session:
+                1: master PW;        
+                2: secondary PW;
+                3: no PW;"
+            DEFVAL { 1 }
+            ::= { hwBfdSessionEntry 30 }
+
+        
+        hwBfdSessTunnelDetectType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                flagBothDown(1),
+                flagNeighborDown(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Set the failure notifies policy type:
+                1: Notify applications when detecting both Detect-Down and Neighbor-Down;        
+                2: Notify applications only when detecting Neighbor-Down;"
+            DEFVAL { 1 }
+            ::= { hwBfdSessionEntry 31 }
+
+        
+        hwBfdSessVcId OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the ID of VC."
+            ::= { hwBfdSessionEntry 32 }
+
+        
+        hwBfdSessVsiName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the name of VSI."
+            ::= { hwBfdSessionEntry 33 }
+
+        
+        hwBfdSessVsiPeerAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the peer-ip of VSI."
+            ::= { hwBfdSessionEntry 34 }
+
+        hwBfdSessDiscrAuto OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Describe whether the discriminator can be auto allocated:
+                disabled: The discriminator can not be allocated automatically;        
+                enabled: The discriminator can be allocated automatically."
+            DEFVAL { disabled }
+            ::= { hwBfdSessionEntry 35 }
+        
+        hwBfdSessionPerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBfdSessionPerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table specifies BFD Session performance counters."
+            ::= { hwBfdObjects 4 }
+
+        
+        hwBfdSessionPerEntry OBJECT-TYPE
+            SYNTAX HwBfdSessionPerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table is created by a BFD-enabled
+                node for every BFD Session. "
+            INDEX { hwBfdSessPerIndex }
+            ::= { hwBfdSessionPerTable 1 }
+
+        
+        HwBfdSessionPerEntry ::=
+            SEQUENCE { 
+                hwBfdSessPerIndex
+                    Unsigned32,
+                hwBfdSessPerfPktIn
+                    Counter32,
+                hwBfdSessPerfPktInHC
+                    Counter32,
+                hwBfdSessPerfPktOut
+                    Counter32,
+                hwBfdSessPerfPktOutHC
+                    Counter32,
+                hwBfdSessPerfBadIn
+                    Counter32,
+                hwBfdSessPerfBadInHC
+                    Counter32,
+                hwBfdSessPerfBadOut
+                    Counter32,
+                hwBfdSessPerfBadOutHC
+                    Counter32,
+                hwBfdSessPerfLastSessDownTime
+                    OCTET STRING,
+                hwBfdSessPerfSessDownCount
+                    Unsigned32,
+                hwBfdSessPerfSessShortBreakCount
+                    Unsigned32,
+                hwBfdSessionPerStartTime
+                    OCTET STRING
+             }
+
+        hwBfdSessPerIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of BFD session statistics."
+            ::= { hwBfdSessionPerEntry 1 }
+
+        
+        hwBfdSessPerfPktIn OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistical information of the received Octets in local
+                system in this session.The total received packet number."
+            ::= { hwBfdSessionPerEntry 2 }
+
+        
+        hwBfdSessPerfPktInHC OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistical information of the received Octets in local
+                system in this session.The high 4 bytes of total received 
+                packet number."
+            ::= { hwBfdSessionPerEntry 3 }
+
+        
+        hwBfdSessPerfPktOut OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistical information of the send Packets in local
+                system in this session."
+            ::= { hwBfdSessionPerEntry 4 }
+
+        
+        hwBfdSessPerfPktOutHC OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistical information of the send Packets in local
+                system in this session.The high 4 bytes of total send 
+                packet number"
+            ::= { hwBfdSessionPerEntry 5 }
+
+        
+        hwBfdSessPerfBadIn OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistical information of the received Errors in local
+                system in this session."
+            ::= { hwBfdSessionPerEntry 6 }
+
+        
+        hwBfdSessPerfBadInHC OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistical information of the received Errors in local
+                system in this session.The high 4 bytes of total received wrong
+                 packet number."
+            ::= { hwBfdSessionPerEntry 7 }
+
+        
+        hwBfdSessPerfBadOut OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistical information of the send Errors in local
+                system in this session."
+            ::= { hwBfdSessionPerEntry 8 }
+
+        
+        hwBfdSessPerfBadOutHC OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistical information of the send Errors in local
+                system in this session.The high 4 bytes of total send 
+                wrong packet number"
+            ::= { hwBfdSessionPerEntry 9 }
+
+        
+        hwBfdSessPerfLastSessDownTime OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistical information of the trammitted Octets in local
+                system in this session."
+            ::= { hwBfdSessionPerEntry 10 }
+
+        
+        hwBfdSessPerfSessDownCount OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total count of session down."
+            ::= { hwBfdSessionPerEntry 11 }
+
+        
+        hwBfdSessPerfSessShortBreakCount OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total count of session shortbreak."
+            ::= { hwBfdSessionPerEntry 12 }
+
+        
+        hwBfdSessionPerStartTime OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time that session start detection."
+            ::= { hwBfdSessionPerEntry 13 }
+
+        
+        hwBfdSlotTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBfdSlotEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Slot table of BFD entries."
+            ::= { hwBfdObjects 5 }
+
+        
+        hwBfdSlotEntry OBJECT-TYPE
+            SYNTAX HwBfdSlotEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "BFD statistics on specify board of containing the following objects."
+            INDEX { hwBfdSlotID }
+            ::= { hwBfdSlotTable 1 }
+
+        
+        HwBfdSlotEntry ::=
+            SEQUENCE { 
+                hwBfdSlotID
+                    Unsigned32,
+                hwBfdSlotReserveOneHopSessNum
+                    Unsigned32,
+                hwBfdSlotOneHopSessNum
+                    Unsigned32,
+                hwBfdSlotCurrentSessNum
+                    Unsigned32,
+                hwBfdSlotRowStatus
+                    RowStatus
+             }
+
+        hwBfdSlotID OBJECT-TYPE
+            SYNTAX Unsigned32 (0..31)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ID of Slot."
+            ::= { hwBfdSlotEntry 1 }
+
+        
+        hwBfdSlotReserveOneHopSessNum OBJECT-TYPE
+            SYNTAX Unsigned32 (0..512)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of session reserving for one-hop session on the board."
+            ::= { hwBfdSlotEntry 2 }
+
+        
+        hwBfdSlotOneHopSessNum OBJECT-TYPE
+            SYNTAX Unsigned32 (0..512)
+            MAX-ACCESS read-only
+            STATUS obsolete
+            DESCRIPTION
+                "The number of session for one-hop session on the board."
+            ::= { hwBfdSlotEntry 3 }
+
+        
+        hwBfdSlotCurrentSessNum OBJECT-TYPE
+            SYNTAX Unsigned32 (0..512)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of session on the board on current."
+            ::= { hwBfdSlotEntry 4 }
+
+        
+        hwBfdSlotRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Used to manage the creation and deletion of conceptual rows."
+            ::= { hwBfdSlotEntry 5 }
+
+
+        hwBfdTtlConfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBfdTtlConfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The TTL configuration table."
+            ::= { hwBfdObjects 6 }
+
+        
+        hwBfdTtlConfEntry OBJECT-TYPE
+            SYNTAX HwBfdTtlConfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The TTL configuration entry."
+            INDEX { hwBfdTtlConfAddr, hwBfdTtlConfMaskLen,hwBfdTtlConfType}
+            ::= { hwBfdTtlConfTable 1 }
+
+        
+        HwBfdTtlConfEntry ::=
+            SEQUENCE { 
+                hwBfdTtlConfAddr
+                    IpAddress,
+                hwBfdTtlConfMaskLen
+                    Integer32,
+                hwBfdTtlConfType
+                    INTEGER,
+                hwBfdTtlConfValue
+                    Integer32,
+                hwBfdTtlConfRowStatus
+                    RowStatus
+             }
+
+        hwBfdTtlConfAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "IP address."
+            ::= { hwBfdTtlConfEntry 1 }
+
+        
+        hwBfdTtlConfMaskLen OBJECT-TYPE
+            SYNTAX Integer32 (8..32)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Length of IP address mask."
+            ::= { hwBfdTtlConfEntry 2 }
+
+        
+        hwBfdTtlConfType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                singleHop(1),
+                multiHop(2)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Type of BFD session."
+            ::= { hwBfdTtlConfEntry 3 }
+
+        
+        hwBfdTtlConfValue OBJECT-TYPE
+            SYNTAX Integer32(1..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "TTL value."
+            ::= { hwBfdTtlConfEntry 4 }
+
+        
+        hwBfdTtlConfRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of this table entry."
+            ::= { hwBfdTtlConfEntry 50 }
+
+        
+        hwBfdNotifications OBJECT IDENTIFIER ::= { hwBFDMIB 3 }
+
+        
+        hwBfdSessDown NOTIFICATION-TYPE
+            OBJECTS { hwBfdSessCfgName, hwBfdSessPeerAddr, hwBfdSessBindIfIndex, hwBfdSessBindIfName, hwBfdSessDiag, 
+                hwBfdSessVrfIndex, hwBfdSessVPNName, hwBfdSessType, hwBfdSessDefaultIp, hwBfdSessBindType, 
+                hwBfdSessStaticLspName, hwBfdSessPWSecondaryFlag, hwBfdSessNextHop, hwBfdSessVcId, hwBfdSessVsiName, 
+                hwBfdSessVsiPeerAddr, hwBfdSessDiscrAuto }
+            STATUS current
+            DESCRIPTION 
+                "This trap occurred when the state of the BFD session 
+                became down. The BFD session is characterized 
+                by the objects in this node."
+            ::= { hwBfdNotifications 1 }
+
+        
+        hwBfdSessUp NOTIFICATION-TYPE
+            OBJECTS { hwBfdSessCfgName, hwBfdSessPeerAddr, hwBfdSessBindIfIndex, hwBfdSessBindIfName, hwBfdSessDiag, 
+                hwBfdSessVrfIndex, hwBfdSessVPNName, hwBfdSessType, hwBfdSessDefaultIp, hwBfdSessBindType, 
+                hwBfdSessStaticLspName, hwBfdSessPWSecondaryFlag, hwBfdSessNextHop, hwBfdSessVcId, hwBfdSessVsiName, 
+                hwBfdSessVsiPeerAddr, hwBfdSessDiscrAuto }
+            STATUS current
+            DESCRIPTION 
+                "This trap occurred when the state of the BFD session 
+                became up. The BFD session is characterized 
+                by the objects in this node."
+            ::= { hwBfdNotifications 2 }
+
+        
+        hwBfdSessReachLimit NOTIFICATION-TYPE
+            OBJECTS { hwBfdSessLimitNumber }
+            STATUS current
+            DESCRIPTION 
+                "There is the notify when the session number reach the global limit."
+            ::= { hwBfdNotifications 3 }
+
+        
+        hwBfdSessReachLimitBindIf NOTIFICATION-TYPE
+            OBJECTS { hwBfdSessConfBindIfName, hwBfdSessInterfaceLimitNumber }
+            STATUS current
+            DESCRIPTION 
+                "There is the notify when the session number reach the interface limit."
+            ::= { hwBfdNotifications 4 }
+
+        
+        hwBfdConformance OBJECT IDENTIFIER ::= { hwBFDMIB 4 }
+
+        
+        hwBfdCompliances OBJECT IDENTIFIER ::= { hwBfdConformance 1 }
+
+        
+--  this module
+        hwBfdFullCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwBfdGroup, hwBfdSessGroup, hwBfdObsoleteGroup, hwBfdNotificationGroup }
+            ::= { hwBfdCompliances 1 }
+
+        
+        hwBfdGroups OBJECT IDENTIFIER ::= { hwBfdConformance 2 }
+
+        
+        hwBfdGroup OBJECT-GROUP
+            OBJECTS { hwBfdVersionNumber, hwBfdAdminStatus, hwBfdSessLimitNumber, hwBfdSessInterfaceLimitNumber, hwBfdSessStaticNumber, 
+                hwBfdSessDynamicNumber, hwBfdSessGlobalDefaultIpAddr, hwBfdEchoPassiveStatus, hwBfdEchoAclNum, hwBfdSessDynamicPingInterval, 
+                hwBfdSessDynamicSupportPassive, hwBfdSessDelayUpTime, hwBfdSessMultiDstPort, hwBfdTrapSendInterval, hwBfdIfConfName, hwBfdIfConfDeleting, hwBfdIfConfAvailable, hwBfdIfConfSessCnt, 
+                hwBfdIfConfRowStatus, hwBfdSlotReserveOneHopSessNum,hwBfdSlotCurrentSessNum, hwBfdSlotRowStatus
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwBfdGroups 1 }
+
+        
+        hwBfdSessGroup OBJECT-GROUP
+            OBJECTS { hwBfdSessConfMIndex, hwBfdSessConfLocalDiscr, hwBfdSessConfRemoteDiscr, hwBfdSessConfPeerAddr, hwBfdSessConfBindIfIndex, 
+                hwBfdSessConfBindIfName, hwBfdSessConfDemandEnable, hwBfdSessConfDemandTimerInterval, hwBfdSessConfDetectMult, hwBfdSessConfDesiredMinRxInterval, 
+                hwBfdSessConfDesiredMinTxInterval, hwBfdSessConfWTRInterval, hwBfdSessConfTOS, hwBfdSessConfPSTFlag, hwBfdSessConfCommitFlag, 
+                hwBfdSessConfAdminStatus, hwBfdSessConfRowStatus, hwBfdSessConfSourceAddr, hwBfdSessConfVrfIndex, hwBfdSessConfVPNName, 
+                hwBfdSessConfDefaultIp, hwBfdSessConfPISFlag, hwBfdSessConfBindType, hwBfdSessConfNextHop, hwBfdSessConfStaticLspName, 
+                hwBfdSessConfPWSecondaryFlag, hwBfdSessConfTunnelDetectType, hwBfdSessConfVcId, hwBfdSessConfVsiName, hwBfdSessConfVsiPeerAddr, hwBfdSessConfDiscrAuto, hwBfdSessMIndex, hwBfdSessBindVRRP, 
+                hwBfdSessCfgName, hwBfdSessPeerAddr, hwBfdSessBindIfIndex, hwBfdSessBindIfName, hwBfdSessLocalDiscr, 
+                hwBfdSessRemoteDiscr, hwBfdSessOperMode, hwBfdSessDetectMult, hwBfdSessDemandTimerInterval, hwBfdSessActualRxInterval, 
+                hwBfdSessActualTxInterval, hwBfdSessWTRInterval, hwBfdSessTOS, hwBfdSessState, hwBfdSessDiag, 
+                hwBfdSessSourceAddr, hwBfdSessVrfIndex, hwBfdSessVPNName, hwBfdSessType, hwBfdSessBindAppType, 
+                hwBfdSessDefaultIp, hwBfdSessPISFlag, hwBfdSessBindType, hwBfdSessNextHop, hwBfdSessStaticLspName, 
+                hwBfdSessLspIndex, hwBfdSessPWSecondaryFlag, hwBfdSessTunnelDetectType, hwBfdSessVcId, hwBfdSessVsiName, hwBfdSessVsiPeerAddr, hwBfdSessDiscrAuto, hwBfdSessPerfPktIn, 
+                hwBfdSessPerfPktInHC, hwBfdSessPerfPktOut, hwBfdSessPerfPktOutHC, hwBfdSessPerfBadIn, hwBfdSessPerfBadInHC, 
+                hwBfdSessPerfBadOut, hwBfdSessPerfBadOutHC, hwBfdSessPerfLastSessDownTime, hwBfdSessPerfSessDownCount, hwBfdSessPerfSessShortBreakCount, 
+                hwBfdSessionPerStartTime, hwBfdTtlConfValue, hwBfdTtlConfRowStatus}
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwBfdGroups 2 }
+
+        
+        hwBfdObsoleteGroup OBJECT-GROUP
+            OBJECTS { hwBfdIfConfEnable ,hwBfdSlotOneHopSessNum}
+            STATUS obsolete
+            DESCRIPTION 
+                "Description."
+            ::= { hwBfdGroups 3 }
+
+        
+        hwBfdNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwBfdSessDown, hwBfdSessUp, hwBfdSessReachLimit, hwBfdSessReachLimitBindIf }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwBfdGroups 4 }
+
+        
+    
+    END
+
+--
+-- HUAWEI-BFD-MIB.mib
+--

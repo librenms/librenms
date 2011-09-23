@@ -1,0 +1,261 @@
+-- ==================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI VPLS Management MIB
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              Created by MaYe, 2003.05.08
+-- ==================================================================
+HUAWEI-VPLS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwMpls            
+            FROM HUAWEI-MIB
+        InterfaceIndex
+            FROM IF-MIB            
+        OBJECT-GROUP, MODULE-COMPLIANCE            
+            FROM SNMPv2-CONF            
+        OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC;
+
+    hwMplsVpls MODULE-IDENTITY 
+        LAST-UPDATED "200305080900Z"
+        ORGANIZATION 
+            "Huawei Technologies Co., Ltd."
+        CONTACT-INFO 
+            "R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com"
+        DESCRIPTION 
+            "The HUAWEI-VPLS-MIB contains objects to
+            manage VPLS."
+        ::= { hwMpls 5 }
+
+    --
+    -- TEXTUAL-CONVENTION Definition
+    --
+
+    L2VpnState ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "An indication of the L2Vpn's state."
+        SYNTAX  INTEGER { l2VpnStateDown (0),
+                          l2VpnStateUp (1)
+                        }
+                            
+    L2VpnEncapsType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "An indication of the L2Vpn's encapsulation type."
+        SYNTAX  INTEGER { 
+            l2VpnEncapsFr (1),
+            l2VpnEncapsAtmAal5 (2),
+            l2VpnEncapsAtmCellTransport (3),
+            l2VpnEncapsVlan (4),
+            l2VpnEncapsEthernet (5),
+            l2VpnEncapsHdlc (6),
+            l2VpnEncapsPpp (7),
+            l2VpnEncapsCem (8),
+            l2VpnEncapsAtmCellVcc (9),
+            l2VpnEncapsAtmCellVpc (10),
+            l2VpnEncapsMpls (11),
+            l2VpnEncapsVpls (12),
+            l2VpnEncapsIpInterworking (64),
+            l2VpnEncapsUnsupported (255)
+            }
+
+    L2VpnDownReason ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "The type indicates the reason of VC's status down."
+        SYNTAX  INTEGER { 
+            l2VpnReasonOk (0), 
+            l2VpnSessionDown (1),
+            l2VpnTunnelDown (2),
+            l2VpnLabelWithdraw (3),
+            l2VpnLabelRelease (4),
+            l2VpnEncapIfDown (5),
+            l2VpnDeleteVC (6)
+            }
+
+    hwVplsMIBObjects OBJECT IDENTIFIER ::= { hwMplsVpls 1 }
+
+    --        
+    -- The  VPLS's VC State Table
+    --
+
+    hwVplsVCStateTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HwVplsVCStateEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains the VPLS's VC state."
+        ::= { hwVplsMIBObjects 1 }
+        
+    hwVplsVCStateEntry OBJECT-TYPE
+        SYNTAX      HwVplsVCStateEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Provides the information of a VC state entry."
+        INDEX   { hwVplsVCId, hwVplsVCEncapsType }
+        ::= { hwVplsVCStateTable 1 }
+        
+    HwVplsVCStateEntry ::= SEQUENCE {
+        hwVplsVCId          Gauge32,
+        hwVplsVCEncapsType  L2VpnEncapsType,
+        hwVplsVCClientIf    InterfaceIndex,
+        hwVplsVCLocalLabel  Gauge32,
+        hwVplsVCRemoteLabel Gauge32,
+        hwVplsVCTunnelLabel Gauge32,
+        hwVplsVCL2Mtu       Integer32,
+        hwVplsVCState       L2VpnState,
+        hwVplsVCDownReason  L2VpnDownReason
+        }
+        
+    hwVplsVCId OBJECT-TYPE
+        SYNTAX    Gauge32(1..4294967295)
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "This object indicates the VC's ID."
+        ::= { hwVplsVCStateEntry 1 }
+        
+    hwVplsVCEncapsType OBJECT-TYPE
+        SYNTAX    L2VpnEncapsType
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "This object indicates the VC's encapsulation type."
+        ::= { hwVplsVCStateEntry 2 }
+        
+    hwVplsVCClientIf OBJECT-TYPE
+        SYNTAX    InterfaceIndex
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "This object indicates the ifIndex of VC's client interface."
+        ::= { hwVplsVCStateEntry 3 }
+        
+    hwVplsVCLocalLabel OBJECT-TYPE
+        SYNTAX    Gauge32
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "This object indicates the VC's local label."
+        ::= { hwVplsVCStateEntry 4 }
+        
+    hwVplsVCRemoteLabel OBJECT-TYPE
+        SYNTAX    Gauge32
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "This object indicates the VC's remote label."
+        ::= { hwVplsVCStateEntry 5 }
+        
+    hwVplsVCTunnelLabel OBJECT-TYPE
+        SYNTAX    Gauge32
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "This object indicates the VC's tunnel label."
+        ::= { hwVplsVCStateEntry 6 }
+        
+    hwVplsVCL2Mtu OBJECT-TYPE
+        SYNTAX    Integer32
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "This object indicates the VC's layer2 MTU."
+        ::= { hwVplsVCStateEntry 7 }
+        
+    hwVplsVCState OBJECT-TYPE
+        SYNTAX    L2VpnState
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "This object indicates the VC's state."
+        ::= { hwVplsVCStateEntry 8 }
+
+    hwVplsVCDownReason OBJECT-TYPE
+        SYNTAX    L2VpnDownReason
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "This object indicates the reason of VC's status down."
+        ::= { hwVplsVCStateEntry 9 }
+
+    --        
+    -- VPLS MIB Trap Definitions
+    --
+
+    hwVplsMIBTraps      OBJECT IDENTIFIER ::= { hwMplsVpls 2 }
+    
+    hwVplsVCStateDown NOTIFICATION-TYPE
+        OBJECTS {
+            hwVplsVCId,
+            hwVplsVCEncapsType,
+            hwVplsVCDownReason
+            }
+        STATUS    current
+        DESCRIPTION
+            "This notification indicates the VC's state changes to down."
+        ::= { hwVplsMIBTraps 1 }
+
+    hwVplsVCStateUp NOTIFICATION-TYPE
+        OBJECTS {
+            hwVplsVCId,
+            hwVplsVCEncapsType,
+            hwVplsVCDownReason
+            }
+        STATUS    current
+        DESCRIPTION
+            "This notification indicates the VC's state changes to up."
+        ::= { hwVplsMIBTraps 2 }
+        
+    --
+    -- Conformance information
+    --
+    
+    hwVplsMIBConformance OBJECT IDENTIFIER ::= { hwMplsVpls 3 }
+
+    hwVplsMIBCompliances OBJECT IDENTIFIER ::= { hwVplsMIBConformance 1 }
+        
+    hwVplsMIBCompliance  MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "The compliance statement for systems supporting 
+             the HUAWEI-VPLS-MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS {
+            hwVplsVCStateGroup
+            }
+        ::= { hwVplsMIBCompliances 1 }
+        
+    hwVplsMIBGroups OBJECT IDENTIFIER ::= { hwVplsMIBConformance 2 }
+
+    hwVplsVCStateGroup OBJECT-GROUP
+        OBJECTS { 
+            hwVplsVCId,
+            hwVplsVCEncapsType,
+            hwVplsVCClientIf,
+            hwVplsVCLocalLabel,
+            hwVplsVCRemoteLabel,
+            hwVplsVCTunnelLabel,
+            hwVplsVCL2Mtu,
+            hwVplsVCState,
+            hwVplsVCDownReason
+            }
+        STATUS   current
+        DESCRIPTION
+            "The VPLS's VC state group."
+        ::= { hwVplsMIBGroups 1}
+
+END

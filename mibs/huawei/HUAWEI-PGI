@@ -1,0 +1,153 @@
+-- ==================================================================
+-- Copyright (C) 2007 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description:  HUAWEI PGI(PORT GROUP ISOLATION) MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2007-01-20 Created by Ganliguo 60018681       
+-- ==================================================================
+
+    HUAWEI-PGI-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE            
+                FROM SNMPv2-CONF            
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI            
+            RowStatus            
+                FROM SNMPv2-TC;
+    
+    
+        hwPortGroupIsolation MODULE-IDENTITY 
+            LAST-UPDATED "200701010000Z"        -- January 01, 2007 at 00:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co. Ltd."
+            CONTACT-INFO 
+                "Platform Team Huawei Technologies Co. Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100085"
+            DESCRIPTION 
+                "MIB of Port Group Isolation module
+                The HUAWEI-PGI-MIB is defined to configure 
+                and display the status of port group."
+            ::= { hwDatacomm 144 }
+
+        
+    
+    
+--
+-- Node definitions
+--
+
+        hwPortGroupIsolationMibObjects OBJECT IDENTIFIER ::= { hwPortGroupIsolation 1 }
+
+        
+        hwPortGroupIsolationConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPortGroupIsolationConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table containing information about 
+                status of isolation group."
+            ::= { hwPortGroupIsolationMibObjects 1 }
+
+        
+        hwPortGroupIsolationConfigEntry OBJECT-TYPE
+            SYNTAX HwPortGroupIsolationConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Detailed information of a specified isolation group."
+            INDEX { hwPortGroupIsolationIndex }
+            ::= { hwPortGroupIsolationConfigTable 1 }
+
+        
+        HwPortGroupIsolationConfigEntry ::=
+            SEQUENCE { 
+                hwPortGroupIsolationIndex
+                    Integer32,
+                hwPortGroupIsolationIfName
+                    OCTET STRING,
+                hwPortGroupIsolationGroupID
+                    Integer32,
+                hwPortGroupIsolationConfigRowStatus
+                    RowStatus
+             }
+
+        hwPortGroupIsolationIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..1024)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of port isolation group entry."
+            ::= { hwPortGroupIsolationConfigEntry 1 }
+
+        
+        hwPortGroupIsolationIfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The name of port that joins the port isolation 
+                group."
+            ::= { hwPortGroupIsolationConfigEntry 11 }
+
+        
+        hwPortGroupIsolationGroupID OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The ID of group that port joins in."
+            ::= { hwPortGroupIsolationConfigEntry 12 }
+
+        
+        hwPortGroupIsolationConfigRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is responsible for managing the creation
+                and deletion of rows, which support active
+                status and CreatAndGo, destroy operation.
+                "
+            ::= { hwPortGroupIsolationConfigEntry 51 }
+
+        
+        hwPortGroupIsolationConformance OBJECT IDENTIFIER ::= { hwPortGroupIsolation 3 }
+
+        
+        hwPortGroupIsolationCompliances OBJECT IDENTIFIER ::= { hwPortGroupIsolationConformance 1 }
+
+        
+        hwPortGroupIsolationCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-PGI-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwPortGroupIsolationObjectGroup }
+            ::= { hwPortGroupIsolationCompliances 1 }
+
+        
+        hwPortGroupIsolationGroups OBJECT IDENTIFIER ::= { hwPortGroupIsolationConformance 3 }
+
+        
+        hwPortGroupIsolationObjectGroup OBJECT-GROUP
+            OBJECTS { hwPortGroupIsolationIfName, hwPortGroupIsolationGroupID, hwPortGroupIsolationConfigRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The PGI attribute group."
+            ::= { hwPortGroupIsolationGroups 1 }
+
+        
+    
+    END
+
+--
+-- HUAWEI-PGI-MIB.mib
+--

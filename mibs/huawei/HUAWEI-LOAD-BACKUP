@@ -1,0 +1,923 @@
+-- ============================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: The HUAWEI-LOAD-BACKUP-MIB provides information about load and backup 
+-- Reference:  
+-- Version: V3.00
+-- History:
+-- 
+-- ============================================================================
+    HUAWEI-LOAD-BACKUP-MIB DEFINITIONS ::= BEGIN
+         IMPORTS            
+            huaweiUtility            
+                FROM HUAWEI-MIB            
+            HWPCBType                
+                FROM HUAWEI-TC-MIB            
+            IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DisplayString            
+                FROM SNMPv2-TC
+            hwFrameIndex, hwSlotIndex            
+                FROM HUAWEI-DEVICE-MIB;
+    
+    
+        hwLoadBackup MODULE-IDENTITY 
+            LAST-UPDATED "200304280900Z"
+            ORGANIZATION "Fix-Net Dep, Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Floot 5 ,Block 4, R&D Building,
+                Huawei Longgang Production Base,
+                Shenzhen,  P.R.C.
+                http://www.huawei.com
+                Zip:518057
+                "
+            DESCRIPTION 
+                "Huawei load and backup mib."
+            ::= { huaweiUtility 6 }
+--
+-- Node definitions
+--
+    
+--  ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ================================================================== 
+        
+        hwLoadBackupMon OBJECT IDENTIFIER ::= { hwLoadBackup 1 }
+        
+    --  ============== hwLoadParaTable  define beginning ==============
+        
+        hwLoadParaTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLoadParaEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The load parameter table.
+                "
+            ::= { hwLoadBackupMon 1 }
+        
+        hwLoadParaEntry OBJECT-TYPE
+            SYNTAX HwLoadParaEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " 
+                The load parameter table entry.
+                "
+            INDEX { hwFrameIndex, hwSlotIndex }
+            ::= { hwLoadParaTable 1 }
+        
+        HwLoadParaEntry ::=
+            SEQUENCE { 
+                hwLoadServerIpAddr
+                    IpAddress,
+                hwLoadMode
+                    INTEGER,
+                hwLoadFileName
+                    DisplayString,
+                hwLoadContent
+                    INTEGER,
+                hwLoadBoardType
+                    HWPCBType,
+                hwPortId
+                    Integer32,
+                hwLoadProcess
+                    Integer32,
+                hwLoadUserName
+                    DisplayString,
+                hwLoadPassword
+                    DisplayString
+             }
+
+        hwLoadServerIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The IP address of server.
+                "
+            ::= { hwLoadParaEntry 1 }
+        
+        hwLoadMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                tftp(1),
+                modem(2),
+                ftp(3),
+                smbLoadAnyBoards(4),
+                other(255)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The load protocol.
+                "
+            ::= { hwLoadParaEntry 2 }
+        
+        hwLoadFileName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..127))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The file name.
+                "
+            ::= { hwLoadParaEntry 3 }
+        
+        hwLoadContent OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                program(1),        -- program file
+                configuration(2),    -- configuration file¡¡
+                patch(3),        -- patch file
+                shellMacro(4),
+                resLocal(5),
+                resGeneral(6),
+                cpeDrive(7),
+                programDatabase(8),    -- database file         
+                programBios(9),        -- bios file             
+                programApp(10),        -- application program   
+                logicFpga(11),        -- fpga logic file          
+                logicCpld(12),        -- Cpld  logic file     
+                logicPci(13),        -- pci logic file        ¡¡
+                logicAfc(14),        -- afc logic file        
+                programMicroCode(15),    -- micro code file       
+                programFirmware(16),    -- application program of pinch board 
+                programHelp(17),
+                programDataFlow(18),    -- flow file of card management point
+                programBootFile(19),    -- Boot program file of board 
+                logciPa(20),        -- Boot program file of board start 
+                webExp(21),        -- web exp file       web exp
+                webNev(22),        -- web nev file       web nev
+                webHelp(23),        -- web help file      web 
+                programBsp(24),        -- bsp program file   bsp
+                configurationIni(40),    -- configuration file of ini formatini 
+                configurationEfs(41),    -- configuration file with the header of efs  
+                configurationCli(42),    -- configuration file of command line format  
+                programCurrent(45),    -- the program being run  
+                programOther(46),    -- the program that has not been run presently
+                license(49),             -- license file     
+                programchipset(50),     -- AC5 chipset load     
+                programExtendedBios(51) --extended bios file   
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Load content: 
+                
+                enum                 explanation                  
+                **********************************************
+                program(1),        -- program file
+                configuration(2),    -- configuration file¡¡
+                patch(3),        -- patch file
+                shellMacro(4),
+                resLocal(5),
+                resGeneral(6),
+                cpeDrive(7),
+                programDatabase(8),    -- database file         
+                programBios(9),        -- bios file             
+                programApp(10),        -- application program   
+                logicFpga(11),        -- fpga logic file          
+                logicCpld(12),        -- Cpld  logic file     
+                logicPci(13),        -- pci logic file        ¡¡
+                logicAfc(14),        -- afc logic file        
+                programMicroCode(15),    -- micro code file       
+                programFirmware(16),    -- application program of pinch board 
+                programHelp(17),
+                programDataFlow(18),    -- flow file of card management point
+                programBootFile(19),    -- Boot program file of board 
+                logciPa(20),        -- Boot program file of board start 
+                webExp(21),        -- web exp file       web exp
+                webNev(22),        -- web nev file       web nev
+                webHelp(23),        -- web help file      web 
+                programBsp(24),        -- bsp program file   bsp
+                configurationIni(40),    -- configuration file of ini formatini 
+                configurationEfs(41),    -- configuration file with the header of efs  
+                configurationCli(42),    -- configuration file of command line format  
+                programCurrent(45),    -- the program being run  
+                programOther(46),    -- the program that has not been run presently
+                license(49),             -- license file     
+                programchipset(50),     -- AC5 chipset load     
+                               
+                "
+            ::= { hwLoadParaEntry 4 }
+        
+        hwLoadBoardType OBJECT-TYPE
+            SYNTAX HWPCBType
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The board type the system supports. 
+                "
+            ::= { hwLoadParaEntry 5 }
+        
+        hwPortId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The port index.
+                "
+            ::= { hwLoadParaEntry 6 }
+        
+        hwLoadProcess OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The Process of loading.
+                "
+            ::= { hwLoadParaEntry 7 }
+        
+        hwLoadUserName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The load user name£¬which is necessary in FTP mode 
+                and unnecessary in TFTP mode. 
+                "
+            ::= { hwLoadParaEntry 8 }
+        
+        hwLoadPassword OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The load user name,which is necessary in FTP mode ,
+                which is necessary in FTP mode 
+                and unnecessary in TFTP mode. 
+                "
+            ::= { hwLoadParaEntry 9 }
+        
+    --  ============== hwLoadParaTable  define end ==============        
+
+        
+    --  ============== hwBackupParaTable  define beginning ==============
+
+        hwBackupParaTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBackupParaEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The backup parameter table.
+                "
+            ::= { hwLoadBackupMon 2 }
+        
+        hwBackupParaEntry OBJECT-TYPE
+            SYNTAX HwBackupParaEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The backup parameter table entry.
+                "
+            INDEX { hwFrameIndex, hwSlotIndex }
+            ::= { hwBackupParaTable 1 }
+        
+        HwBackupParaEntry ::=
+            SEQUENCE { 
+                hwBackupServerIpAddr
+                    IpAddress,
+                hwBackupMode
+                    INTEGER,
+                hwBackupFileName
+                    DisplayString,
+                hwBackupContent
+                    INTEGER,
+                hwBackupProcess
+                    Integer32,
+                hwBackupUserName
+                    DisplayString,
+                hwBackupPassword
+                    DisplayString,
+                hwBackupBoardType
+                    HWPCBType
+             }
+
+        hwBackupServerIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The IP address of Server
+                "
+            ::= { hwBackupParaEntry 1 }
+        
+        hwBackupMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                tftp(1),
+                modem(2),
+                ftp(3),
+                other(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Load protocol:tftp and MODEM currently supported.
+                "
+            ::= { hwBackupParaEntry 2 }
+        
+        hwBackupFileName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..127))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The file name.
+                "
+            ::= { hwBackupParaEntry 3 }
+        
+        hwBackupContent OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                configuration(1),    -- configuration file¡¡
+                shellMacro(2),
+                log(3),            -- log file
+                bill(4),
+                alarm(5),        -- alarm
+                program(15),        -- program file
+                reslocal(16),
+                resgeneral(17),
+                patch(18),        -- patch file  
+                programDatabase(19),    -- database file  
+                programBios(20),    -- bios file   
+                programApp(21),        -- application file  
+                logicFpga(22),        -- fpga logic file  
+                logicCpld(23),        -- Cpld logic file  
+                logicPci(24),        -- pci logic file   
+                logicAfc(25),        -- afc logic file   
+                programMicroCode(26),    -- micro-code file   
+                programFireware(27),    -- application program of pinch board 
+                programDataFlow(28),    -- flow file of card management point 
+                programBootFile(29),    -- boot program file of the board start 
+                logciPa(30),        -- fpga logic file of the pinch board  
+                webExp(31),        -- web exp file   
+                webNev(32),        -- web nev file  
+                webHelp(33),        -- web help file  
+                programBsp(34),        -- bsp program file 
+                configurationIni(40),
+                configurationEfs(41),
+                configurationCli(42),
+                programCurrent(45),
+                programOther(46),
+                bcdcInfo(47),           -- bcdc decsription system in ini file
+                license(49),            -- license file
+                programExtendedBios(51), --extended bios file  
+                boardinfo(60)           -- board information 
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The backup content.
+                "
+            ::= { hwBackupParaEntry 4 }
+        
+        hwBackupProcess OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The Process of backuping.
+                "
+            ::= { hwBackupParaEntry 5 }
+        
+        hwBackupUserName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The backup user name£¬which is necessary in FTP mode 
+                and unnecessary in TFTP mode. 
+                "
+            ::= { hwBackupParaEntry 6 }
+        
+        hwBackupPassword OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The backup user name,which is necessary in FTP mode ,
+                which is necessary in FTP mode and unnecessary in TFTP mode. 
+                "
+            ::= { hwBackupParaEntry 7 }
+        
+        hwBackupBoardType OBJECT-TYPE
+            SYNTAX HWPCBType
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The type of backup board.
+                "
+            ::= { hwBackupParaEntry 8 }
+            
+    --  ============== hwBackupParaTable  define end ==============        
+
+        
+    --  ============== hwPatchTable  define beginning ==============
+            
+        hwPatch OBJECT IDENTIFIER ::= { hwLoadBackup 2 }
+        
+        hwPatchTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPatchEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The operation and enquiry table of patch.
+                "
+            ::= { hwPatch 1 }
+        
+        hwPatchEntry OBJECT-TYPE
+            SYNTAX HwPatchEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The operation and enquiry table entry of patch.
+                "
+            INDEX { hwFrameIndex, hwSlotIndex, hwPatchId }
+            ::= { hwPatchTable 1 }
+        
+        HwPatchEntry ::=
+            SEQUENCE { 
+                hwPatchId
+                    Unsigned32,
+                hwPatchDescription
+                    DisplayString,
+                hwPatchFuncNum
+                    Integer32,
+                hwPatchTextLen
+                    Integer32,
+                hwPatchDataLen
+                    Integer32,
+                hwPatchType
+                    INTEGER,
+                hwPatchAdminStatus
+                    INTEGER,
+                hwPatchOperState
+                    INTEGER
+             }
+
+        hwPatchId OBJECT-TYPE
+            SYNTAX Unsigned32 (0..7)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The patch number.
+                "
+            ::= { hwPatchEntry 1 }
+        
+        hwPatchDescription OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The description of patch.
+                "
+            ::= { hwPatchEntry 2 }
+        
+        hwPatchFuncNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The number of functions in patch. 
+                "
+            ::= { hwPatchEntry 3 }
+        
+        hwPatchTextLen OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The length of patch code.
+                "
+            ::= { hwPatchEntry 4 }
+        
+        hwPatchDataLen OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The length of patch data.
+                "
+            ::= { hwPatchEntry 5 }
+        
+        hwPatchType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                common(1),
+                temporary(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The type of patch.
+                "
+            ::= { hwPatchEntry 6 }
+        
+        hwPatchAdminStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                active(1),
+                deactive(2),
+                remove(3),
+                running(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The operation of patch.
+                "
+            ::= { hwPatchEntry 7 }
+        
+        hwPatchOperState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                patchActive(1),
+                patchDeActive(2),
+                patchInit(3),
+                patchRunning(4),
+                patchload(5)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The station of patch.
+                "
+            ::= { hwPatchEntry 8 }
+        
+    --  ============== hwPatchTable  define end ==============        
+
+        
+    --  ============== hwPatchStatTable  define beginning ==============
+
+        hwPatchStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPatchStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The table of statistics information of patch.
+                "
+            ::= { hwPatch 2 }
+        
+        hwPatchStatEntry OBJECT-TYPE
+            SYNTAX HwPatchStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The table entry of statistics information of patch.
+                "
+            INDEX { hwFrameIndex, hwSlotIndex }
+            ::= { hwPatchStatTable 1 }
+        
+        HwPatchStatEntry ::=
+            SEQUENCE { 
+                hwPatchStatNumMax
+                    Integer32,
+                hwPatchStatTextMax
+                    Integer32,
+                hwPatchStatDataMax
+                    Integer32,
+                hwPatchStatTextUsed
+                    Integer32,
+                hwPatchStatDataUsed
+                    Integer32
+             }
+
+        hwPatchStatNumMax OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The maximum patch number of system.
+                "
+            ::= { hwPatchStatEntry 1 }
+        
+        hwPatchStatTextMax OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The capacity of patch code area.
+                "
+            ::= { hwPatchStatEntry 2 }
+        
+        hwPatchStatDataMax OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The capacity of patch data area.
+                "
+            ::= { hwPatchStatEntry 3 }
+        
+        hwPatchStatTextUsed OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The used patch code area.
+                "
+            ::= { hwPatchStatEntry 4 }
+        
+        hwPatchStatDataUsed OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The used patch data area.
+                "
+            ::= { hwPatchStatEntry 5 }
+
+    --  ============== hwPatchTable  define end ==============        
+
+        
+    --  ============== hwLoadAndBackupTrapsOID  define beginning ==============
+        
+        snmpTraps OBJECT IDENTIFIER ::= { hwLoadBackupMon 3 }
+        
+        hwLoadAndBackupTrapsOID OBJECT IDENTIFIER ::= { snmpTraps 0 }
+        
+        hwBackupFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwTrapBackupResult }
+            STATUS current
+            DESCRIPTION 
+                "
+                The back up failure alarm trap. 
+                "
+            ::= { hwLoadAndBackupTrapsOID 1 }
+        
+        hwLoadFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwTrapLoadResult }
+            STATUS current
+            DESCRIPTION 
+                "
+                The load failure alarm trap. 
+                "
+            ::= { hwLoadAndBackupTrapsOID 2 }
+        
+        hwBackupFailAlarmSuccess NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex }
+            STATUS current
+            DESCRIPTION 
+                "
+                The backup success notification.            
+                "
+            ::= { hwLoadAndBackupTrapsOID 3 }
+        
+        hwLoadFailAlarmSuccess NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex }
+            STATUS current
+            DESCRIPTION 
+                "
+                The load success notification.    
+                "
+            ::= { hwLoadAndBackupTrapsOID 4 }
+        
+        hwCopyAndSaveFail NOTIFICATION-TYPE
+            OBJECTS { hwCopyAndSaveResult }
+            STATUS current
+            DESCRIPTION 
+                "
+                Save configuration to flash failure trap.
+                "
+            ::= { hwLoadAndBackupTrapsOID 5 }
+        
+        hwCopyAndSaveSuccess NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "
+                Save configuration to flash success notification .
+                "
+            ::= { hwLoadAndBackupTrapsOID 6 }
+        
+        hwConfigurationChangedEvent NOTIFICATION-TYPE
+            OBJECTS { hwConfEventCause }
+            STATUS current
+            DESCRIPTION 
+                "
+                The configuration  changed event alarm.
+                "
+            ::= { hwLoadAndBackupTrapsOID 7 }
+        
+        hwTrapCauseOids OBJECT IDENTIFIER ::= { snmpTraps 1 }
+        
+        hwTrapLoadBackupResult OBJECT IDENTIFIER ::= { hwTrapCauseOids 1 }
+        
+        hwTrapLoadResult OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The load result.
+                "
+            ::= { hwTrapLoadBackupResult 1 }
+        
+        hwTrapBackupResult OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Definition node of the backup failure cause.
+                "
+            ::= { hwTrapLoadBackupResult 2 }
+        
+        hwCopyAndSaveResult OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                copyInProgress(1),
+                copyOperationSuccess(2),
+                copyInvalidOperation(3),
+                copyInvalidProtocol(4),
+                copyInvalidSourceName(5),
+                copyInvalidDestName(6),
+                copyInvalidServerAddress(7),
+                copyDeviceBusy(8),
+                copyDeviceOpenError(9),
+                copyDeviceError(10),
+                copyDeviceNotProgrammable(11),
+                copyDeviceFull(12),
+                copyFileOpenError(13),
+                copyFileTransferError(14),
+                copyFileChecksumError(15),
+                copyNoMemory(16),
+                copyUnknownFailure(17)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The failure cause definition node of the memory running copy and resume.
+                "
+            ::= { hwTrapLoadBackupResult 3 }
+
+        hwTrapEventCauses OBJECT IDENTIFIER ::= { hwTrapCauseOids 2 }
+        hwConfEventCause OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                confChangedDirect(1),
+                confSaved(2),
+                confChangedDuration(3)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The configuration changed cause.  
+                "
+            ::= { hwTrapEventCauses 1 }
+            
+    --  ============== hwLoadAndBackupTrapsOID  define end ==============        
+
+        
+    --  ============== hwBackupAndRestoreConfig  define beginning ==============
+
+        
+        hwBackupAndRestoreConfig OBJECT IDENTIFIER ::= { hwLoadBackupMon 4 }
+        
+        hwBackupAndRestore OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                copyMemToFlash(1),
+                copyFlashToMem(2),
+                copyMemToHardDisk(3),
+                copyHardDiskToMem(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The running configuration in the system has been backup to flash or disk,
+                or been restored from .
+                "
+            ::= { hwBackupAndRestoreConfig 1 }
+    --  ============== hwBackupAndRestoreConfig  define end ==============  
+          
+    --  ============== conformance information ==============
+        hwLoadBackupConformance OBJECT IDENTIFIER ::= { hwLoadBackup 3 }
+        
+        
+        hwLoadBackupCompliances OBJECT IDENTIFIER ::= { hwLoadBackupConformance 1 }
+        hwLoadBackupCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwLoadParaTableGroup, hwBackupParaTableGroup, hwTrapEventCausesGroup,
+                                    hwTrapLoadBackupResultGroup, hwTrapLoadBackupTrapsGroup, hwBackupAndRestoreConfigGroup,
+                                    hwPatchTableGroup, hwPatchStatTableGroup}  
+                                               
+              ::= { hwLoadBackupCompliances 1 }
+              
+    --  ============== groups ==============  
+        hwLoadBackupObjectGroups OBJECT IDENTIFIER ::= { hwLoadBackupConformance 2 } 
+        
+        hwLoadParaTableGroup OBJECT-GROUP
+            OBJECTS { hwLoadServerIpAddr, hwLoadMode, hwLoadFileName,
+                      hwLoadContent, hwLoadBoardType, hwPortId,
+                      hwLoadProcess, hwLoadUserName, hwLoadPassword}
+            STATUS current
+            DESCRIPTION 
+                "The load parameter group objects."
+            ::= { hwLoadBackupObjectGroups 1 }
+
+
+        hwBackupParaTableGroup OBJECT-GROUP
+            OBJECTS { hwBackupServerIpAddr, hwBackupMode, hwBackupFileName,
+                      hwBackupContent, hwBackupProcess, hwBackupUserName,
+                      hwBackupPassword, hwBackupBoardType }
+            STATUS current
+            DESCRIPTION 
+                "The backup parameter group objects."
+            ::= { hwLoadBackupObjectGroups 2 }
+             
+        hwTrapEventCausesGroup OBJECT-GROUP
+            OBJECTS { hwConfEventCause}
+            STATUS current
+            DESCRIPTION 
+                "The trap event causes group objects."
+            ::= { hwLoadBackupObjectGroups 3 } 
+             
+        hwTrapLoadBackupResultGroup OBJECT-GROUP
+            OBJECTS { hwTrapLoadResult, hwTrapBackupResult, hwCopyAndSaveResult}
+            STATUS current
+            DESCRIPTION 
+                "The load and backup result group objects."
+            ::= { hwLoadBackupObjectGroups 4 } 
+            
+        hwTrapLoadBackupTrapsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwBackupFailAlarm, hwLoadFailAlarm, hwBackupFailAlarmSuccess,
+                            hwLoadFailAlarmSuccess, hwCopyAndSaveFail, hwCopyAndSaveSuccess,
+                            hwConfigurationChangedEvent}
+            STATUS current
+            DESCRIPTION 
+                "The load and backup traps group objects."
+            ::= { hwLoadBackupObjectGroups 5 } 
+            
+        hwBackupAndRestoreConfigGroup OBJECT-GROUP
+            OBJECTS { hwBackupAndRestore}
+            STATUS current
+            DESCRIPTION 
+                "The load and backup config group objects."
+            ::= { hwLoadBackupObjectGroups 6 } 
+            
+        hwPatchTableGroup OBJECT-GROUP
+            OBJECTS { hwPatchDescription, hwPatchFuncNum,
+                      hwPatchTextLen, hwPatchDataLen, hwPatchType,
+                      hwPatchAdminStatus, hwPatchOperState}
+            STATUS current
+            DESCRIPTION 
+                "The patch table group objects."
+            ::= { hwLoadBackupObjectGroups 7 } 
+            
+        hwPatchStatTableGroup OBJECT-GROUP
+            OBJECTS { hwPatchStatNumMax, hwPatchStatTextMax, hwPatchStatDataMax,
+                      hwPatchStatTextUsed, hwPatchStatDataUsed}
+            STATUS current
+            DESCRIPTION 
+                "The patch statistics group objects."
+            ::= { hwLoadBackupObjectGroups 8 } 
+        
+    --  ============== conformance information define end ==============         
+    
+    END
+

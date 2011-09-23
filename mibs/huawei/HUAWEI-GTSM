@@ -1,0 +1,651 @@
+-- =================================================================
+-- Copyright (C) 2006 by HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: This MIB defines all the objects that manage GTSM policies,
+--                containing getting or creating GTSM policies, computing
+--                the number of the packets, and resetting statistics.
+-- Reference: rfc4001
+-- Version: V1.00
+-- History:
+-- 
+-- =================================================================
+    
+    
+    HUAWEI-GTSM-MIB DEFINITIONS ::= BEGIN
+           IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI                                       
+            RowStatus            
+                FROM SNMPv2-TC
+            InetAddressType, InetAddress            
+                FROM INET-ADDRESS-MIB;
+             
+            
+            hwGTSMModule MODULE-IDENTITY 
+            LAST-UPDATED "200611131938Z"        
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                "VRP Team Huawei Technologies co.,Ltd. 
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100085
+                "
+            DESCRIPTION 
+                "The HUAWEI-GTSM-MIB contains all the objects 
+                that manages GTSM, it mainly contains the following five parts.    
+                1) Default action that is used to deal with 
+                the received packets when no GTSM policy matches.
+                2) Policy table that is used to get or set 
+                the GTSM policy.
+                3) BGP peer group table that is used to get 
+                or set the GTSM policy for BGP peer group.
+                4) Statistics table that is used to compute 
+                the number of the packets containing
+                received packets, passing packets and 
+                dropped packets.
+                5) Global configuration clear statistics 
+                table that is used to clear all statistics.        
+                The table can be used any time when users want to initialize 
+                the counter."
+            REVISION "200609051938Z"        
+            DESCRIPTION 
+                "The initial revision of this MIB module."
+            ::= { hwDatacomm 126 }   
+        
+        
+--
+-- Node definitions
+--
+    
+--  ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ================================================================== 
+            hwGTSM OBJECT IDENTIFIER ::= { hwGTSMModule 1 }           
+            
+            hwGTSMDefaultAction OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                pass(1),
+                drop(2)
+                }                
+            MAX-ACCESS  read-write
+            STATUS     current
+            DESCRIPTION
+        "The object specifies the default action when
+                no matching policy exists."
+
+            DEFVAL  { pass }
+            ::= { hwGTSM 1 }
+            
+            --  ============== hwGTSMPolicyTable  define beginning ==============
+            hwGTSMPolicyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWGTSMPolicyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information about GTSM policies. This object is used 
+                to get GTSM policy(policies), create a new policy, modify 
+                or delete GTSM policy (policies)."
+        
+            ::= { hwGTSM 2 }  
+            
+            -- hwGTSMPolicyEntry 
+            hwGTSMPolicyEntry OBJECT-TYPE
+            SYNTAX HWGTSMPolicyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information about GTSM policies,it used 
+                to get gtsm policy(policies),to create a 
+                new policy,to modify or to delete gtsm 
+                policy(policies)."
+            INDEX { hwGTSMvrfIndex, hwGTSMPolicyAddressType, hwGTSMPolicyProtocol,
+                    hwGTSMPolicySourceIpAddress, hwGTSMPolicyDestIpAddress,
+                    hwGTSMPolicySourcePort, hwGTSMPolicyDestPort}
+            ::= { hwGTSMPolicyTable 1 }
+              
+            -- HWGTSMPolicyEntry  
+            HWGTSMPolicyEntry ::=              
+                SEQUENCE { 
+                    hwGTSMvrfIndex
+                        Integer32, 
+                    hwGTSMPolicyAddressType   
+                        InetAddressType,                    
+                    hwGTSMPolicyProtocol
+                        Integer32,
+                    hwGTSMPolicySourceIpAddress                    
+                        InetAddress,
+                    hwGTSMPolicyDestIpAddress
+                        InetAddress,
+                    hwGTSMPolicySourcePort
+                        Integer32,
+                    hwGTSMPolicyDestPort
+                        Integer32,
+                    hwGTSMPolicyTTLMin
+                        Integer32, 
+                    hwGTSMPolicyTTLMax
+                        Integer32,
+                    hwGTSMPolicyRowStatus
+                        RowStatus    
+                }                
+                   
+            hwGTSMvrfIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of VPN Routing and Forwarding 
+                table."
+            ::= { hwGTSMPolicyEntry 1 } 
+            
+            hwGTSMPolicyAddressType OBJECT-TYPE
+            SYNTAX   InetAddressType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The type of Internet address by where the 
+                packets received and will go."
+            ::= { hwGTSMPolicyEntry 2 } 
+            
+            hwGTSMPolicyProtocol OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The number of protocol."
+            ::= { hwGTSMPolicyEntry 3 }
+            
+            hwGTSMPolicySourceIpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Source IP address in the GTSM policy that 
+                will be used to    check the matching of source 
+                IP address in the received packets."
+            ::= { hwGTSMPolicyEntry 4 }
+              
+            hwGTSMPolicyDestIpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Destination IP address in the GTSM policy 
+                that will be used to check the matching of 
+                destination IP address in the received packets."
+
+            ::= { hwGTSMPolicyEntry 5 }
+            
+            hwGTSMPolicySourcePort OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Source port number in the GTSM policy 
+                that will be used to check the matching 
+                of source port number in the received packets."
+            ::= { hwGTSMPolicyEntry 6 }
+            
+            hwGTSMPolicyDestPort OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Destination port number in the GTSM policy 
+                that will be used to check the matching of 
+                destination port number in the received packets."                
+            ::= { hwGTSMPolicyEntry 7 }  
+            
+            hwGTSMPolicyTTLMin OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The minimum TTL in the policy table. The minimum 
+                TTL is compared with the TTL in the packets to check 
+                whether the minimum TTL is between the minimum TTL 
+                and maximum TTL, and thus check the validity of the 
+                received packets."
+            ::= { hwGTSMPolicyEntry 11 } 
+            
+            hwGTSMPolicyTTLMax OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum TTL in policy table that is 
+                compared with the TTL in the packets to check whether 
+                it is between the minimum TTL and maximum TTL 
+                ,and thus check the validity of the received packets."            
+            DEFVAL { 255 }
+            ::= { hwGTSMPolicyEntry 12 } 
+            
+            hwGTSMPolicyRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The operating state of the row."
+            ::= { hwGTSMPolicyEntry 51}
+            --  ============== hwGTSMPolicyTable  define end ==============        
+            
+              
+            --  ============== hwGTSMBgpPeergroupTable  define beginning ==============
+            hwGTSMBgpPeergroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWGTSMBgpPeergroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of BGP peer group policies. The table contains 
+                all the BGP peer group policies."                    
+            ::= { hwGTSM 3 }  
+            
+            -- hwGTSMBgpPeergroupEntry 
+            hwGTSMBgpPeergroupEntry OBJECT-TYPE
+            SYNTAX HWGTSMBgpPeergroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information about BGP peer group policies. This table is used 
+                to get BGP peer group policy (policies), create a policy, modify
+                or delete BGP peer group policy (policies)."
+            INDEX { hwGTSMvrfIndex, hwGTSMBgpPeergroupName }
+            ::= { hwGTSMBgpPeergroupTable 1 }
+              
+            -- HWGTSMBgpPeergroupEntry  
+            HWGTSMBgpPeergroupEntry ::=
+                SEQUENCE { 
+                    hwGTSMBgpPeergroupName
+                        OCTET STRING,
+                    hwGTSMBgpPeergroupTTLMin
+                        Integer32,
+                    hwGTSMBgpPeergroupTTLMax
+                        Integer32,
+                    hwGTSMBgpPeergroupRowStatus
+                        RowStatus    
+                }  
+                 
+             
+            hwGTSMBgpPeergroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Peer group name in the BGP policy table that is compared with 
+                the peer group name to decide whether to apply this policy."
+            ::= { hwGTSMBgpPeergroupEntry 1 }
+            
+            hwGTSMBgpPeergroupTTLMin OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The minimum TTL in policy table that is compared with the TTL
+                 in the packets to check whether it is between the minimum TTL 
+                 and maximum TTL, and thus check the validity of the received packets."
+            ::= { hwGTSMBgpPeergroupEntry 11 } 
+            
+            hwGTSMBgpPeergroupTTLMax OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum TTL in policy table that is compared with the TTL
+                 in the packets to check whether it is between the minimum TTL 
+                 and maximum TTL, and check the validity of the received packets." 
+            DEFVAL { 255 }
+            ::= { hwGTSMBgpPeergroupEntry 12 } 
+            
+            hwGTSMBgpPeergroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The operating state of the row."
+            ::= { hwGTSMBgpPeergroupEntry 51}   
+            
+          --  ============== hwGTSMBgpPeergroupTable  define end ==============
+          
+                      
+          --  ============== hwGTSMStatisticsTable  define beginning ==============
+              hwGTSMStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWGTSMStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of GTSM Statistics table. The table contains 
+                the number of the packets containing received 
+                packets, passed packets and discarded packets."                
+            ::= { hwGTSM 4 }  
+            
+            -- hwGTSMBgpPeergroupEntry 
+            hwGTSMStatisticsEntry OBJECT-TYPE
+            SYNTAX HWGTSMStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information of GTSM Statistics,it only can 
+                be read."
+            INDEX { hwGTSMSlotIndex }
+            ::= { hwGTSMStatisticsTable 1 }
+              
+            -- HWGTSMStatisticsEntry  
+            HWGTSMStatisticsEntry ::=
+                SEQUENCE { 
+                    hwGTSMSlotIndex
+                        Integer32,
+                    hwGTSMStatisticsRcvPacketNumber
+                        Counter64,
+                    hwGTSMStatisticsPassPacketNumber
+                        Counter64,
+                    hwGTSMStatisticsDropPacketNumber
+                        Counter64    
+                } 
+            
+            hwGTSMSlotIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..128)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Index of Slot which receives the packets."
+            ::= { hwGTSMStatisticsEntry 1 }  
+            
+            hwGTSMStatisticsRcvPacketNumber OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of received packets of specific 
+                slot."
+            ::= { hwGTSMStatisticsEntry 11 }
+            
+            hwGTSMStatisticsPassPacketNumber OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets that have been transferred 
+                to the up layer    after packets of specific slot are received."
+            ::= { hwGTSMStatisticsEntry 12 }
+            
+            hwGTSMStatisticsDropPacketNumber OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets that do not match 
+                the specific GTSM policy when packets of specific 
+                slot are received."
+
+            ::= { hwGTSMStatisticsEntry 13 } 
+            --  ============== hwGTSMStatisticsTable  define end ==============
+            
+                        
+            --  ============== hwGTSMGlobalConfigTable  define beginning ==============
+            hwGTSMGlobalConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWGTSMGlobalConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of GTSM global configuration table. The table
+                contains all information you have operated to the statistics table."
+            ::= { hwGTSM 5 }  
+            
+            -- hwGTSMBgpPeergroupEntry 
+            hwGTSMGlobalConfigEntry OBJECT-TYPE
+            SYNTAX HWGTSMGlobalConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information of GTSM global configuration table.The table
+                 is used to clear all statistics, you can use this table any 
+                 time when you want to initialize the counter."
+
+            INDEX { hwGTSMSlotIndex }
+            ::= { hwGTSMGlobalConfigTable 1 }
+              
+            -- HWGTSMStatisticsEntry  
+            HWGTSMGlobalConfigEntry ::=
+                SEQUENCE { 
+                    hwGTSMGlobalConfigClearStatistics
+                        INTEGER,
+                    hwGTSMGlobalConfigLogDroppedPacket
+                        INTEGER    
+                }  
+            
+            hwGTSMGlobalConfigClearStatistics OBJECT-TYPE
+            SYNTAX INTEGER 
+                {
+                reset(1),
+                unused(255)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "It is used to clear the statistics of the GTSM global 
+                configuration table."
+            ::= { hwGTSMGlobalConfigEntry 11 }
+            
+            hwGTSMGlobalConfigLogDroppedPacket OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                log(1),
+                nolog(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "It is used to decide whether to log the dropped packets."
+            DEFVAL { nolog }
+            ::= { hwGTSMGlobalConfigEntry 12 } 
+            --  ============== hwGTSMGlobalConfigTable  define end ==============   
+            
+              hwGTSMStatisticsInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwGTSMStatisticsInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of GTSM Statistics Information. The table contains 
+                the number of the packets containing received 
+                packets, passed packets and discarded packets."                
+            ::= { hwGTSM 6 }  
+            
+            hwGTSMStatisticsInfoEntry OBJECT-TYPE
+            SYNTAX HwGTSMStatisticsInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information of GTSM Statistics,it only can 
+                be read."
+            INDEX { hwGTSMSlotNum,hwGTSMPolicyAddressType, hwGTSMPolicyProtocol }
+            ::= { hwGTSMStatisticsInfoTable 1 }
+              
+            HwGTSMStatisticsInfoEntry ::=
+                SEQUENCE { 
+                    hwGTSMSlotNum
+                        Integer32,
+                    hwGTSMStatisticsReceivePacketNum
+                        Counter64,
+                    hwGTSMStatisticsPassPacketNum
+                        Counter64,
+                    hwGTSMStatisticsDropPacketNum
+                        Counter64    
+                } 
+            
+            hwGTSMSlotNum OBJECT-TYPE
+            SYNTAX Integer32 (0..128)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Index of Slot which receives the packets."
+            ::= { hwGTSMStatisticsInfoEntry 1 }  
+            
+            hwGTSMStatisticsReceivePacketNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of received packets of specific 
+                slot."
+            ::= { hwGTSMStatisticsInfoEntry 11 }
+            
+            hwGTSMStatisticsPassPacketNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets that have been transferred 
+                to the up layer    after packets of specific slot are received."
+            ::= { hwGTSMStatisticsInfoEntry 12 }
+            
+            hwGTSMStatisticsDropPacketNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets that do not match 
+                the specific GTSM policy when packets of specific 
+                slot are received."
+
+            ::= { hwGTSMStatisticsInfoEntry 13 } 
+            
+            hwGTSMGlobalConfigInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwGTSMGlobalConfigInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of GTSM global configuration table. The table
+                contains all information you have operated to the statistics table."
+            ::= { hwGTSM 7 }  
+            
+            hwGTSMGlobalConfigInfoEntry OBJECT-TYPE
+            SYNTAX HwGTSMGlobalConfigInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information of GTSM global configuration table.The table
+                 is used to clear all statistics, you can use this table any 
+                 time when you want to initialize the counter."
+
+            INDEX { hwGTSMSlotNum }
+            ::= { hwGTSMGlobalConfigInfoTable 1 }
+              
+            HwGTSMGlobalConfigInfoEntry ::=
+                SEQUENCE { 
+                    hwGTSMGlobalConfigClearStatisticsInfo
+                        INTEGER,
+                    hwGTSMGlobalConfigLogDroppedPacketInfo
+                        INTEGER    
+                }  
+            
+            hwGTSMGlobalConfigClearStatisticsInfo OBJECT-TYPE
+            SYNTAX INTEGER 
+                {
+                reset(1),
+                unused(255)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "It is used to clear the statistics of the GTSM global 
+                configuration table."
+            ::= { hwGTSMGlobalConfigInfoEntry 11 }
+            
+            hwGTSMGlobalConfigLogDroppedPacketInfo OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                log(1),
+                nolog(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "It is used to decide whether to log the dropped packets."
+            DEFVAL { nolog }
+            ::= { hwGTSMGlobalConfigInfoEntry 12 } 
+         
+        --  ============== conformance information ==============
+        hwGTSMConformance OBJECT IDENTIFIER ::= { hwGTSMModule 2 }
+        
+        
+        hwGTSMCompliances OBJECT IDENTIFIER ::= { hwGTSMConformance 1 }
+        hwGTSMCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+            this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwGTSMDefaultActionGroup, hwGTSMPolicyGroup, 
+                                    hwGTSMBgpPeergroupGroup, hwGTSMStatisticsGroup, 
+                                    hwGTSMGlobalConfigGroup,hwGTSMStatisticsInfoGroup,
+                                    hwGTSMGlobalConfigInfoGroup }  
+                                               
+              ::= { hwGTSMCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwGTSMGroups OBJECT IDENTIFIER ::= { hwGTSMConformance 2 } 
+        
+        hwGTSMDefaultActionGroup OBJECT-GROUP
+            OBJECTS { hwGTSMDefaultAction }
+            STATUS current
+            DESCRIPTION 
+                "The default action group."
+            ::= { hwGTSMGroups 1 }
+
+
+        hwGTSMPolicyGroup OBJECT-GROUP
+            OBJECTS { hwGTSMPolicyTTLMin, hwGTSMPolicyTTLMax, hwGTSMPolicyRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The GTSM policy group."
+            ::= { hwGTSMGroups 2 }
+             
+        hwGTSMBgpPeergroupGroup OBJECT-GROUP
+            OBJECTS { hwGTSMBgpPeergroupTTLMin, hwGTSMBgpPeergroupTTLMax, hwGTSMBgpPeergroupRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The GTSM BGP peer group."
+            ::= { hwGTSMGroups 3 } 
+            
+        hwGTSMStatisticsGroup OBJECT-GROUP
+            OBJECTS { hwGTSMStatisticsRcvPacketNumber, hwGTSMStatisticsPassPacketNumber, hwGTSMStatisticsDropPacketNumber }
+            STATUS current
+            DESCRIPTION 
+                "The GTSM statistics group."
+            ::= { hwGTSMGroups 4 }
+            
+        hwGTSMGlobalConfigGroup OBJECT-GROUP
+            OBJECTS {hwGTSMGlobalConfigClearStatistics, hwGTSMGlobalConfigLogDroppedPacket }
+            STATUS current
+            DESCRIPTION 
+                "The GTSM global configuration group."
+            ::= { hwGTSMGroups 5 } 
+            
+        hwGTSMStatisticsInfoGroup OBJECT-GROUP
+            OBJECTS { hwGTSMStatisticsReceivePacketNum, hwGTSMStatisticsPassPacketNum, hwGTSMStatisticsDropPacketNum }
+            STATUS current
+            DESCRIPTION 
+                "The GTSM statistics group."
+            ::= { hwGTSMGroups 6 } 
+            
+        hwGTSMGlobalConfigInfoGroup OBJECT-GROUP
+            OBJECTS {hwGTSMGlobalConfigClearStatisticsInfo, hwGTSMGlobalConfigLogDroppedPacketInfo }
+            STATUS current
+            DESCRIPTION 
+                "The GTSM global configuration group."
+            ::= { hwGTSMGroups 7 }
+        --  ============== conformance information define end ==============
+                        
+    END
+

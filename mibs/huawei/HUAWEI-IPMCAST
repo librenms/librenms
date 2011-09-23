@@ -1,0 +1,1643 @@
+-- ============================================================================
+-- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: hwMcast.my , this Mib module for management 
+--              of IP Multicast, including multicast routing, data
+--              forwarding, and data reception.
+-- Reference: This MIB was extracted from RFC 2934 
+-- Version: V1.0
+-- History:
+--    Created by caibenrui 63321 2007-04-12
+-- 
+-- ============================================================================
+
+
+HUAWEI-IPMCAST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    mib-2, Unsigned32, Counter64,
+    Gauge32, TimeTicks, IpAddress    FROM SNMPv2-SMI
+    RowStatus, TruthValue, DisplayString,
+    StorageType, TimeStamp           FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP  FROM SNMPv2-CONF
+    SnmpAdminString                  FROM SNMP-FRAMEWORK-MIB
+    InterfaceIndexOrZero,
+    InterfaceIndex                   FROM IF-MIB
+    IANAipRouteProtocol,
+    IANAipMRouteProtocol             FROM IANA-RTPROTO-MIB
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength,
+    InetZoneIndex, InetVersion       FROM INET-ADDRESS-MIB
+    hwDatacomm                       FROM HUAWEI-MIB
+    EnabledStatus                    FROM P-BRIDGE-MIB;
+    
+hwMcast  OBJECT IDENTIFIER  ::= { hwDatacomm 149 }
+
+
+hwIpMcastMib MODULE-IDENTITY
+    LAST-UPDATED "200704160000Z" -- 16 April 2007
+    ORGANIZATION "Huawei Technologies co.,Ltd."
+    CONTACT-INFO 
+            " R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com "
+    DESCRIPTION
+            "The Mib module for management of IP Multicast, including
+            multicast routing, data forwarding, and data reception.
+            Huawei Technologies co.,Ltd . Supplementary information may
+            be available at:
+            http://www.huawei.com" 
+    REVISION "200704160000Z" -- 16 April 2007
+    DESCRIPTION 
+            "The initial revision of this Mib module."
+    ::= { hwMcast 1 }
+
+
+
+
+hwIpMcastMibObjects OBJECT IDENTIFIER ::= { hwIpMcastMib 1 }
+hwIpMcastNotifications OBJECT IDENTIFIER ::= { hwIpMcastMib 2 }
+
+hwIpMcast      OBJECT IDENTIFIER ::= { hwIpMcastMibObjects 1 }
+
+hwIpMcastEnable OBJECT-TYPE
+    SYNTAX     EnabledStatus --INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The enabled status of IP Multicast function on this
+            system."
+    ::= { hwIpMcast 1 }
+
+hwIpMcastRouteEntryCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of rows in the hwIpMcastRouteTable.  This can be
+            used to check for multicast routing activity, and to monitor
+            the multicast routing table size."
+    ::= { hwIpMcast 2 }
+
+
+
+hwIpMcastInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwIpMcastInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table used to manage the multicast
+            protocol active on an interface."
+    ::= { hwIpMcast 3 }
+
+hwIpMcastInterfaceEntry OBJECT-TYPE
+    SYNTAX     HwIpMcastInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) containing the multicast protocol
+            information for a particular interface."
+    INDEX      { hwIpMcastInterfaceIpVersion,
+                 hwIpMcastInterfaceIfIndex }
+    ::= { hwIpMcastInterfaceTable 1 }
+
+HwIpMcastInterfaceEntry ::= SEQUENCE {
+    hwIpMcastInterfaceIpVersion         InetVersion,
+    hwIpMcastInterfaceIfIndex           InterfaceIndex,
+    hwIpMcastInterfaceTtl               Unsigned32,
+    hwIpMcastInterfaceRateLimit         Unsigned32,
+    hwIpMcastInterfaceInMcastOctets     Counter64,
+    hwIpMcastInterfaceOutMcastOctets    Counter64,
+    hwIpMcastInterfaceInMcastPkts       Counter64,
+    hwIpMcastInterfaceOutMcastPkts      Counter64,
+    hwIpMcastInterfaceDiscontinuityTime TimeStamp
+}
+
+hwIpMcastInterfaceIpVersion OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The IP version of this row."
+    ::= { hwIpMcastInterfaceEntry 1 }
+
+hwIpMcastInterfaceIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The index value that uniquely identifies the interface to
+            which this entry is applicable.  The interface identified by
+            a particular value of this index is the same interface as
+            identified by the same value of the IF-Mib's ifIndex."
+    ::= { hwIpMcastInterfaceEntry 2 }
+
+hwIpMcastInterfaceTtl OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The datagram TTL threshold for the interface.  Any IP
+            multicast datagrams with a TTL (IPv4) or Hop Limit (IPv6)
+            less than this threshold will not be forwarded out the
+            interface.  The default value of 0 means all multicast
+            packets are forwarded out the interface."
+    DEFVAL     { 0 }
+    ::= { hwIpMcastInterfaceEntry 3 }
+
+hwIpMcastInterfaceRateLimit OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The rate-limit, in kilobits per second, of forwarded
+            multicast traffic on the interface.  A rate-limit of 0
+            indicates that no rate limiting is done."
+    DEFVAL     { 0 }
+    ::= { hwIpMcastInterfaceEntry 4 }
+
+hwIpMcastInterfaceInMcastOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of octets of multicast packets that have arrived
+            on the interface, including framing characters.  This object
+            is similar to ifInOctets in the Interfaces Mib, except that
+            only multicast packets are counted.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            hwIpMcastInterfaceDiscontinuityTime."
+   REFERENCE "RFC 4293 ifInOctets"
+    ::= { hwIpMcastInterfaceEntry 5 }
+
+hwIpMcastInterfaceOutMcastOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of octets of multicast packets that have been
+            sent on the interface, including framing characters.  This
+            object is similar to ifOutOctets in the Interfaces Mib,
+            except that only multicast packets are counted.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            hwIpMcastInterfaceDiscontinuityTime."
+   REFERENCE "RFC 4293 ifOutOctets"
+    ::= { hwIpMcastInterfaceEntry 6 }
+
+hwIpMcastInterfaceInMcastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of multicast packets that have arrived on the
+            interface.  In many cases, this object is identical to
+            ifInMulticastPkts in the Interfaces Mib.
+
+            However, some implementations use ifXTable for Layer 2
+            traffic statistics and hwIpMcastInterfaceTable at Layer 3.  In
+            this case a difference between these objects probably
+            indicates that some Layer 3 multicast packets are being
+            transmitted as unicast at Layer 2.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            hwIpMcastInterfaceDiscontinuityTime."
+    REFERENCE "RFC 4293 ifInMulticastPkts"
+    ::= { hwIpMcastInterfaceEntry 7 }
+
+hwIpMcastInterfaceOutMcastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of multicast packets that have been sent on the
+            interface.  In many cases, this object is identical to
+            ifOutMulticastPkts in the Interfaces Mib.
+
+            However, some implementations use ifXTable for Layer 2
+            traffic statistics and hwIpMcastInterfaceTable at Layer 3.  In
+            this case a difference between these objects probably
+            indicates that some Layer 3 multicast packets are being
+            transmitted as unicast at Layer 2.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            hwIpMcastInterfaceDiscontinuityTime."
+    REFERENCE "RFC 4293 ifOutMulticastPkts"
+    ::= { hwIpMcastInterfaceEntry 8 }
+
+hwIpMcastInterfaceDiscontinuityTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The value of sysUpTime on the most recent occasion at which
+            any one or more of this entry's counters suffered a
+            discontinuity.
+
+            If no such discontinuities have occurred since the last re-
+            initialization of the local management subsystem, then this
+            object contains a zero value."
+    ::= { hwIpMcastInterfaceEntry 9 }
+
+
+
+hwIpMcastRouteTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwIpMcastRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table containing multicast routing
+            information for IP datagrams sent by particular sources to
+            to the IP multicast groups known to this router."
+    ::= { hwIpMcast 5 }
+
+hwIpMcastRouteEntry OBJECT-TYPE
+    SYNTAX     HwIpMcastRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) containing the multicast routing
+            information for IP datagrams from a particular source and
+            addressed to a particular IP multicast group address."
+    INDEX      { hwIpMcastRouteGroupAddressType,
+                 hwIpMcastRouteGroup,
+                 hwIpMcastRouteGroupPrefixLength,
+                 hwIpMcastRouteSourceAddressType,
+                 hwIpMcastRouteSource,
+                 hwIpMcastRouteSourcePrefixLength }
+    ::= { hwIpMcastRouteTable 1 }
+
+HwIpMcastRouteEntry ::= SEQUENCE {
+    hwIpMcastRouteGroupAddressType      InetAddressType,
+    hwIpMcastRouteGroup                 InetAddress,
+    hwIpMcastRouteGroupPrefixLength     InetAddressPrefixLength,
+    hwIpMcastRouteSourceAddressType     InetAddressType,
+    hwIpMcastRouteSource                InetAddress,
+    hwIpMcastRouteSourcePrefixLength    InetAddressPrefixLength,
+    hwIpMcastRouteUpstreamNeighborType  InetAddressType,
+    hwIpMcastRouteUpstreamNeighbor      InetAddress,
+    hwIpMcastRouteInIfIndex             InterfaceIndexOrZero,
+    hwIpMcastRouteTimeStamp             TimeStamp,
+    hwIpMcastRouteExpiryTime            TimeTicks,
+    hwIpMcastRouteProtocol              IANAipMRouteProtocol,
+    hwIpMcastRouteRtProtocol            IANAipRouteProtocol,
+    hwIpMcastRouteRtAddressType         InetAddressType,
+    hwIpMcastRouteRtAddress             InetAddress,
+    hwIpMcastRouteRtPrefixLength        InetAddressPrefixLength,
+    hwIpMcastRouteRtType                INTEGER,
+    hwIpMcastRouteOctets                Counter64,
+    hwIpMcastRoutePkts                  Counter64,
+    hwIpMcastRouteTtlDropOctets         Counter64,
+    hwIpMcastRouteTtlDropPackets        Counter64,
+    hwIpMcastRouteDifferentInIfOctets   Counter64,
+    hwIpMcastRouteDifferentInIfPackets  Counter64
+}
+
+hwIpMcastRouteGroupAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A value indicating the address family of the address
+            contained in hwIpMcastRouteGroup.  Legal values correspond to
+            the subset of address families for which multicast
+            forwarding is supported."
+    ::= { hwIpMcastRouteEntry 1 }
+
+hwIpMcastRouteGroup OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION            
+            "The IP multicast group address which, when combined with
+            the corresponding value specified in
+            hwIpMcastRouteGroupPrefixLength, identifies the groups for
+            which this entry contains multicast routing information.
+
+            This address object is only significant up to
+            hwIpMcastRouteGroupPrefixLength bits.  The remainder of the
+            address bits are zero.  This is especially important for
+            this index field, which is part of the index of this entry.
+            Any non-zero bits would signify an entirely different
+            entry.
+
+            For addresses of type ipv4z or ipv6z, the appended zone
+            index is significant even though it lies beyond the prefix
+            length.  The use of these address types indicate that this
+            forwarding state applies only within the given zone.  Zone
+            index zero is not valid in this table."
+    ::= { hwIpMcastRouteEntry 2 }
+
+hwIpMcastRouteGroupPrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength (4..128)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The length in bits of the mask which, when combined with
+            the corresponding value of hwIpMcastRouteGroup, identifies the
+            groups for which this entry contains multicast routing
+            information."
+    ::= { hwIpMcastRouteEntry 3 }
+
+hwIpMcastRouteSourceAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A value indicating the address family of the address
+            contained in hwIpMcastRouteSource.  The value MUST be the same
+            as the value of IpMcastRouteGroupType."
+    ::= { hwIpMcastRouteEntry 4 }
+
+hwIpMcastRouteSource OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The network address which, when combined with the
+            corresponding value of hwIpMcastRouteSourcePrefixLength,
+            identifies the sources for which this entry contains
+            multicast routing information.
+
+            This address object is only significant up to
+            hwIpMcastRouteGroupPrefixLength bits.  The remainder of the
+            address bits are zero.  This is especially important for
+            this index field, which is part of the index of this entry.
+            Any non-zero bits would signify an entirely different
+            entry.
+
+            For addresses of type ipv4z or ipv6z, the appended zone
+            index is significant even though it lies beyond the prefix
+            length.  The use of these address types indicate that this
+            source address applies only within the given zone.  Zone
+            index zero is not valid in this table."
+    ::= { hwIpMcastRouteEntry 5 }
+
+hwIpMcastRouteSourcePrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength (4..128)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The length in bits of the mask which, when combined with
+            the corresponding value of hwIpMcastRouteSource, identifies
+            the sources for which this entry contains multicast routing
+            information."
+    ::= { hwIpMcastRouteEntry 6 }
+
+hwIpMcastRouteUpstreamNeighborType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "A value indicating the address family of the address
+            contained in hwIpMcastRouteUpstreamNeighbor.
+
+            An address type of unknown(0) indicates that the upstream
+            neighbor is unknown, for example in BIDIR-PIM."
+    REFERENCE "I-D.ietf-pim-bidir"
+    ::= { hwIpMcastRouteEntry 7 }
+
+hwIpMcastRouteUpstreamNeighbor OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address of the upstream neighbor (for example, RPF
+            neighbor) from which IP datagrams from these sources to
+            this multicast address are received."
+    ::= { hwIpMcastRouteEntry 8 }
+
+hwIpMcastRouteInIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of ifIndex for the interface on which IP
+            datagrams sent by these sources to this multicast address
+            are received.  A value of 0 indicates that datagrams are not
+            subject to an incoming interface check, but may be accepted
+            on multiple interfaces (for example, in BIDIR-PIM)."
+    REFERENCE "I-D.ietf-pim-bidir"
+    ::= { hwIpMcastRouteEntry 9 }
+
+hwIpMcastRouteTimeStamp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of sysUpTime at which the multicast routing
+            information represented by this entry was learned by the
+            router.
+
+            If this infomration was present at the most recent re-
+            initialization of the local management subsystem, then this
+            object contains a zero value."
+    ::= { hwIpMcastRouteEntry 10 }
+
+hwIpMcastRouteExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The minimum amount of time remaining before this entry will
+            be aged out.  The value 0 indicates that the entry is not
+            subject to aging.  If hwIpMcastRouteNextHopState is pruned(1),
+            this object represents the remaining time until the prune
+            expires. If this timer expires, state reverts to
+            forwarding(2). Otherwise, this object represents the time
+            until this entry is removed from the table."
+    ::= { hwIpMcastRouteEntry 11 }
+
+hwIpMcastRouteProtocol OBJECT-TYPE
+    SYNTAX     IANAipMRouteProtocol
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The multicast routing protocol via which this multicast
+            forwarding entry was learned."
+    ::= { hwIpMcastRouteEntry 12 }
+
+hwIpMcastRouteRtProtocol OBJECT-TYPE
+    SYNTAX     IANAipRouteProtocol
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The routing mechanism via which the route used to find the
+            upstream or parent interface for this multicast forwarding
+            entry was learned."
+    ::= { hwIpMcastRouteEntry 13 }
+
+hwIpMcastRouteRtAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "A value indicating the address family of the address
+            contained in hwIpMcastRouteRtAddress."
+    ::= { hwIpMcastRouteEntry 14 }
+
+hwIpMcastRouteRtAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address portion of the route used to find the upstream
+            or parent interface for this multicast forwarding entry.
+            This address object is only significant up to
+            hwIpMcastRouteGroupPrefixLength bits.  The remainder of the
+            address bits are zero.
+
+            For addresses of type ipv4z or ipv6z, the appended zone
+            index is significant even though it lies beyond the prefix
+            length.  The use of these address types indicate that this
+            forwarding state applies only within the given zone.  Zone
+            index zero is not valid in this table."
+    ::= { hwIpMcastRouteEntry 15 }
+
+hwIpMcastRouteRtPrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength (4..128)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The length in bits of the mask associated with the route
+            used to find the upstream or parent interface for this
+            multicast forwarding entry."
+    ::= { hwIpMcastRouteEntry 16 }
+
+hwIpMcastRouteRtType OBJECT-TYPE
+    SYNTAX     INTEGER {
+                unicast (1),  -- Unicast route used in multicast RIB
+                multicast (2) -- Multicast route
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The reason the given route was placed in the (logical)
+            multicast Routing Information Base (RIB).  A value of
+            unicast means that the route would normally be placed only
+            in the unicast RIB, but was placed in the multicast RIB
+            (instead or in addition) due to local configuration, such as
+            when running PIM over RIP.  A value of multicast means that
+            the route was explicitly added to the multicast RIB by the
+            routing protocol, such as DVMRP or Multiprotocol BGP."
+    ::= { hwIpMcastRouteEntry 17 }
+
+hwIpMcastRouteOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of octets contained in IP datagrams which were
+            received from these sources and addressed to this multicast
+            group address, and which were forwarded by this router.
+            Discontinuities in this monotonically increasing value
+            occur at re-initialization of the management system.
+            Discontinuities can also occur as a result of routes being
+            removed and replaced, which can be detected by observing
+            the value of hwIpMcastRouteTimeStamp."
+    ::= { hwIpMcastRouteEntry 18 }
+
+hwIpMcastRoutePkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of packets routed using this multicast route
+            entry.
+
+            Discontinuities in this monotonically increasing value
+            occur at re-initialization of the management system.
+            Discontinuities can also occur as a result of routes being
+            removed and replaced, which can be detected by observing
+            the value of hwIpMcastRouteTimeStamp."
+    ::= { hwIpMcastRouteEntry 19 }
+
+hwIpMcastRouteTtlDropOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of octets contained in IP datagrams which this
+            router has received from these sources and addressed to this
+            multicast group address, which were dropped because the TTL
+            (IPv4) or Hop Limit (IPv6) was decremented to zero, or to a
+            value less than hwIpMcastInterfaceTtl for all next hops.
+
+            Discontinuities in this monotonically increasing value
+            occur at re-initialization of the management system.
+            Discontinuities can also occur as a result of routes being
+            removed and replaced, which can be detected by observing
+            the value of hwIpMcastRouteTimeStamp."
+    ::= { hwIpMcastRouteEntry 20 }
+
+hwIpMcastRouteTtlDropPackets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of packets which this router has received from
+            these sources and addressed to this multicast group address,
+            which were dropped because the TTL (IPv4) or Hop Limit
+            (IPv6) was decremented to zero, or to a value less than
+            hwIpMcastInterfaceTtl for all next hops.
+
+            Discontinuities in this monotonically increasing value
+            occur at re-initialization of the management system.
+            Discontinuities can also occur as a result of routes being
+            removed and replaced, which can be detected by observing
+            the value of hwIpMcastRouteTimeStamp."
+    ::= { hwIpMcastRouteEntry 21 }
+
+hwIpMcastRouteDifferentInIfOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of octets contained in IP datagrams which this
+            router has received from these sources and addressed to this
+            multicast group address, which were dropped because they
+            were received on an unexpected interface.
+
+            For RPF checking protocols (such as PIM-SM), these packets
+            arrived on interfaces other than hwIpMcastRouteInIfIndex, and
+            were dropped because of this failed RPF check.  (RPF paths
+            are 'Reverse Path Forwarding' path; the unicast routes to
+            the expected origin of multicast data flows).
+
+            Other protocols may drop packets on an incoming interface
+            check for different reasons (for example, BIDIR-PIM performs
+            a DF check on receipt of packets).  All packets dropped as a
+            result of an incoming interface check are counted here.
+
+            If this counter increases rapidly, this indicates a problem.
+            A significant quantity of multicast data is arriving at this
+            router on unexpected interfaces, and is not being forwarded.
+
+            For guidance, if the rate of increase of this counter
+            exceeds 1% of the rate of increase of hwIpMcastRouteOctets,
+            then there are multicast routing problems that require
+            investigation.
+
+            Discontinuities in this monotonically increasing value
+            occur at re-initialization of the management system.
+            Discontinuities can also occur as a result of routes being
+            removed and replaced, which can be detected by observing
+            the value of hwIpMcastRouteTimeStamp."
+    REFERENCE "RFC 4601 and I-D.ietf-pim-bidir"
+    ::= { hwIpMcastRouteEntry 22 }
+
+hwIpMcastRouteDifferentInIfPackets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of packets which this router has received from
+            these sources and addressed to this multicast group address,
+            which were dropped because they were received on an
+            unexpected interface.
+
+            For RPF checking protocols (such as PIM-SM), these packets
+            arrived on interfaces other than hwIpMcastRouteInIfIndex, and
+            were dropped because of this failed RPF check.  (RPF paths
+            are 'Reverse Path Forwarding' path; the unicast routes to
+            the expected origin of multicast data flows).
+
+            Other protocols may drop packets on an incoming interface
+            check for different reasons (for example, BIDIR-PIM performs
+            a DF check on receipt of packets).  All packets dropped as a
+            result of an incoming interface check are counted here.
+
+            If this counter increases rapidly, this indicates a problem.
+            A significant quantity of multicast data is arriving at this
+            router on unexpected interfaces, and is not being forwarded.
+
+            For guidance, if the rate of increase of this counter
+            exceeds 1% of the rate of increase of hwIpMcastRoutePkts, then
+            there are multicast routing problems that require
+            investigation.
+
+            Discontinuities in this monotonically increasing value
+            occur at re-initialization of the management system.
+            Discontinuities can also occur as a result of routes being
+            removed and replaced, which can be detected by observing
+            the value of hwIpMcastRouteTimeStamp."
+    REFERENCE "RFC 4601 and I-D.ietf-pim-bidir"
+    ::= { hwIpMcastRouteEntry 23 }
+
+
+
+hwIpMcastRouteNextHopTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwIpMcastRouteNextHopEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table containing information on the
+            next-hops on outgoing interfaces for routing IP multicast
+            datagrams.  Each entry is one of a list of next-hops on
+            outgoing interfaces for particular sources sending to a
+            particular multicast group address."
+    ::= { hwIpMcast 6 }
+
+hwIpMcastRouteNextHopEntry OBJECT-TYPE
+    SYNTAX     HwIpMcastRouteNextHopEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the list of next-hops on
+            outgoing interfaces to which IP multicast datagrams from
+            particular sources to an IP multicast group address are
+            routed."
+    INDEX      { hwIpMcastRouteNextHopGroupAddressType,
+                 hwIpMcastRouteNextHopGroup,
+                 hwIpMcastRouteNextHopGroupPrefixLength,
+                 hwIpMcastRouteNextHopSourceAddressType,
+                 hwIpMcastRouteNextHopSource,
+                 hwIpMcastRouteNextHopSourcePrefixLength,
+                 hwIpMcastRouteNextHopIfIndex,
+                 hwIpMcastRouteNextHopAddressType,
+                 hwIpMcastRouteNextHopAddress }
+    ::= { hwIpMcastRouteNextHopTable 1 }
+
+HwIpMcastRouteNextHopEntry ::= SEQUENCE {
+    hwIpMcastRouteNextHopGroupAddressType    InetAddressType,
+    hwIpMcastRouteNextHopGroup               InetAddress,
+    hwIpMcastRouteNextHopGroupPrefixLength   InetAddressPrefixLength,
+    hwIpMcastRouteNextHopSourceAddressType   InetAddressType,
+    hwIpMcastRouteNextHopSource              InetAddress,
+    hwIpMcastRouteNextHopSourcePrefixLength  InetAddressPrefixLength,
+    hwIpMcastRouteNextHopIfIndex             InterfaceIndex,
+    hwIpMcastRouteNextHopAddressType         InetAddressType,
+    hwIpMcastRouteNextHopAddress             InetAddress,
+    hwIpMcastRouteNextHopState               INTEGER,
+    hwIpMcastRouteNextHopTimeStamp           TimeStamp,
+    hwIpMcastRouteNextHopExpiryTime          TimeTicks,
+    hwIpMcastRouteNextHopClosestMemberHops   Unsigned32,
+    hwIpMcastRouteNextHopProtocol            IANAipMRouteProtocol,
+    hwIpMcastRouteNextHopOctets              Counter64,
+    hwIpMcastRouteNextHopPkts                Counter64
+}
+
+hwIpMcastRouteNextHopGroupAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A value indicating the address family of the address
+            contained in hwIpMcastRouteNextHopGroup.  Legal values
+            correspond to the subset of address families for which
+            multicast forwarding is supported."
+    ::= { hwIpMcastRouteNextHopEntry 1 }
+
+hwIpMcastRouteNextHopGroup OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address which, when combined with
+            the corresponding value specified in
+            hwIpMcastRouteNextHopGroupPrefixLength, identifies the groups
+            for which this entry contains multicast forwarding
+            information.
+
+            This address object is only significant up to
+            hwIpMcastRouteNextHopGroupPrefixLength bits.  The remainder of
+            the address bits are zero.  This is especially important for
+            this index field, which is part of the index of this entry.
+            Any non-zero bits would signify an entirely different
+            entry.
+
+            For addresses of type ipv4z or ipv6z, the appended zone
+            index is significant even though it lies beyond the prefix
+            length.  The use of these address types indicate that this
+            forwarding state applies only within the given zone.  Zone
+            index zero is not valid in this table."
+    ::= { hwIpMcastRouteNextHopEntry 2 }
+
+hwIpMcastRouteNextHopGroupPrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength (4..128)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The length in bits of the mask which, when combined with
+            the corresponding value of hwIpMcastRouteGroup, identifies the
+            groups for which this entry contains multicast routing
+            information."
+    ::= { hwIpMcastRouteNextHopEntry 3 }
+
+hwIpMcastRouteNextHopSourceAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A value indicating the address family of the address
+            contained in hwIpMcastRouteNextHopSource.  The value MUST be
+            the same as the value of IpMcastRouteNextHopGroupType."
+    ::= { hwIpMcastRouteNextHopEntry 4 }
+
+hwIpMcastRouteNextHopSource OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The network address which, when combined with the
+            corresponding value of the mask specified in
+            hwIpMcastRouteNextHopSourcePrefixLength, identifies the
+            sources for which this entry specifies a next-hop on an
+            outgoing interface.
+
+            This address object is only significant up to
+            hwIpMcastRouteNextHopSourcePrefixLength bits.  The remainder
+            of the address bits are zero.  This is especially important
+            for this index field, which is part of the index of this
+            entry.  Any non-zero bits would signify an entirely
+            different entry.
+
+            For addresses of type ipv4z or ipv6z, the appended zone
+            index is significant even though it lies beyond the prefix
+            length.  The use of these address types indicate that this
+            source address applies only within the given zone.  Zone
+            index zero is not valid in this table."
+    ::= { hwIpMcastRouteNextHopEntry 5 }
+
+hwIpMcastRouteNextHopSourcePrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength (4..128)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The length in bits of the mask which, when combined with
+            the corresponding value specified in
+            hwIpMcastRouteNextHopSource, identifies the sources for which
+            this entry specifies a next-hop on an outgoing interface."
+    ::= { hwIpMcastRouteNextHopEntry 6 }
+
+hwIpMcastRouteNextHopIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for the outgoing
+            interface for this next-hop."
+    ::= { hwIpMcastRouteNextHopEntry 7 }
+
+hwIpMcastRouteNextHopAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A value indicating the address family of the address
+            contained in hwIpMcastRouteNextHopAddress."
+    ::= { hwIpMcastRouteNextHopEntry 8 }
+
+hwIpMcastRouteNextHopAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address of the next-hop specific to this entry.  For
+            most interfaces, this is identical to
+            hwIpMcastRouteNextHopGroup.  NBMA interfaces, however, may
+            have multiple next-hop addresses out a single outgoing
+            interface."
+    ::= { hwIpMcastRouteNextHopEntry 9 }
+
+hwIpMcastRouteNextHopState OBJECT-TYPE
+    SYNTAX     INTEGER { pruned(1), forwarding(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "An indication of whether the outgoing interface and next-
+            hop represented by this entry is currently being used to
+            forward IP datagrams.  The value 'forwarding' indicates it
+            is currently being used; the value 'pruned' indicates it is
+            not."
+    ::= { hwIpMcastRouteNextHopEntry 10 }
+
+hwIpMcastRouteNextHopTimeStamp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of sysUpTime at which the multicast routing
+            information represented by this entry was learned by the
+            router.
+
+            If this infomration was present at the most recent re-
+            initialization of the local management subsystem, then this
+            object contains a zero value."
+    ::= { hwIpMcastRouteNextHopEntry 11 }
+
+hwIpMcastRouteNextHopExpiryTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The minimum amount of time remaining before this entry will
+            be aged out.  If hwIpMcastRouteNextHopState is pruned(1), the
+            remaining time until the prune expires and the state reverts
+            to forwarding(2).  Otherwise, the remaining time until this
+            entry is removed from the table.  The time remaining may be
+            copied from hwIpMcastRouteExpiryTime if the protocol in use
+            for this entry does not specify next-hop timers.  The value
+            0 indicates that the entry is not subject to aging."
+    ::= { hwIpMcastRouteNextHopEntry 12 }
+
+hwIpMcastRouteNextHopClosestMemberHops OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The minimum number of hops between this router and any
+            member of this IP multicast group reached via this next-hop
+            on this outgoing interface.  Any IP multicast datagrams for
+            the group which have a TTL (IPv4) or Hop Count (IPv6) less
+            than this number of hops will not be forwarded to this
+            next-hop.
+
+            This is an optimization applied by multicast routing
+            protocols that explicitly track hop counts to downstream
+            listeners.  Multicast protocols that are not aware of hop
+            counts to downstream listeners set this object to zero."
+    ::= { hwIpMcastRouteNextHopEntry 13 }
+
+hwIpMcastRouteNextHopProtocol OBJECT-TYPE
+    SYNTAX     IANAipMRouteProtocol
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The routing mechanism via which this next-hop was learned."
+    ::= { hwIpMcastRouteNextHopEntry 14 }
+
+hwIpMcastRouteNextHopOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of octets of multicast packets that have been
+            forwarded using this route.
+
+            Discontinuities in this monotonically increasing value
+            occur at re-initialization of the management system.
+            Discontinuities can also occur as a result of routes being
+            removed and replaced, which can be detected by observing
+            the value of hwIpMcastRouteNextHopTimeStamp."
+    ::= { hwIpMcastRouteNextHopEntry 15 }
+
+hwIpMcastRouteNextHopPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of packets which have been forwarded using this
+            route.
+
+            Discontinuities in this monotonically increasing value
+            occur at re-initialization of the management system.
+            Discontinuities can also occur as a result of routes being
+            removed and replaced, which can be detected by observing
+            the value of hwIpMcastRouteNextHopTimeStamp."
+    ::= { hwIpMcastRouteNextHopEntry 16 }
+
+
+
+hwIpMcastBoundaryTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwIpMcastBoundaryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the system's multicast scope
+            zone boundaries."
+    REFERENCE "RFC 4007 section 5"
+    ::= { hwIpMcast 7 }
+
+hwIpMcastBoundaryEntry OBJECT-TYPE
+    SYNTAX     HwIpMcastBoundaryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) describing one of this device's
+            multicast scope zone boundaries."
+    REFERENCE "RFC 2365 section 5, RFC 4007 section 5"
+    INDEX      { hwIpMcastBoundaryIfIndex,
+                 hwIpMcastBoundaryAddressType,
+                 hwIpMcastBoundaryAddress,
+                 hwIpMcastBoundaryAddressPrefixLength }
+    ::= { hwIpMcastBoundaryTable 1 }
+
+HwIpMcastBoundaryEntry ::= SEQUENCE {
+    hwIpMcastBoundaryIfIndex              InterfaceIndex,
+    hwIpMcastBoundaryAddressType          InetAddressType,
+    hwIpMcastBoundaryAddress              InetAddress,
+    hwIpMcastBoundaryAddressPrefixLength  InetAddressPrefixLength,
+    hwIpMcastBoundaryTimeStamp            TimeStamp,
+    hwIpMcastBoundaryDroppedMcastOctets   Counter64,
+    hwIpMcastBoundaryDroppedMcastPkts     Counter64,
+    hwIpMcastBoundaryStatus               RowStatus,
+    hwIpMcastBoundaryStorageType          StorageType
+}
+
+hwIpMcastBoundaryIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IfIndex value for the interface to which this boundary
+            applies.  Packets with a destination address in the
+            associated address/mask range will not be forwarded over
+            this interface.
+
+            For IPv4, zone boundaries cut through links.  Therefore this
+            is an external interface.  This may be either a physical or
+            virtual interface (tunnel, encapsulation, and so forth.)
+
+            For IPv6, zone boundaries cut through nodes.  Therefore this
+            is a virtual interface within the node.  This is not an
+            external interface, either real or virtual.  Packets
+            crossing this interface neither arrive at nor leave the
+            node, but only move between zones within the node."
+    REFERENCE "RFC 2365 section 5, RFC 4007 section 5"
+    ::= { hwIpMcastBoundaryEntry 1 }
+
+hwIpMcastBoundaryAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A value indicating the address family of the address
+            contained in hwIpMcastBoundaryAddress.  Legal values
+            correspond to the subset of address families for which
+            multicast forwarding is supported."
+    ::= { hwIpMcastBoundaryEntry 2 }
+
+hwIpMcastBoundaryAddress OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The group address which, when combined with the
+            corresponding value of hwIpMcastBoundaryAddressPrefixLength,
+            identifies the group range for which the scoped boundary
+            exists.  Scoped IPv4 multicast address ranges must be
+            prefixed by 239.0.0.0/4.  Scoped IPv6 multicast address
+            ranges are FF0x::/16, where x is a valid RFC 4291 multicast
+            scope.
+
+            An IPv6 address prefixed by FF1x::/16 is a non-permanently-
+            assigned address.  An IPv6 address prefixed by FF3x::/16 is
+            a unicast-prefix-based multicast addresses.  A zone boundary
+            for FF0x::/16 implies an identical boundary for these other
+            prefixes.  No separate FF1x::/16 or FF3x::/16 entries exist
+            in this table.
+
+            This address object is only significant up to
+            hwIpMcastBoundaryAddressPrefixLength bits.  The remainder of
+            the address bits are zero.  This is especially important for
+            this index field, which is part of the index of this entry.
+            Any non-zero bits would signify an entirely different
+            entry.
+
+            For addresses of type ipv4z or ipv6z, the appended zone
+            index is significant even though it lies beyond the prefix
+            length.  Zone index zero is not valid in this table."
+    REFERENCE "RFC 2365, RFC 3306 section 4, RFC 4291 section 2.7"
+    ::= { hwIpMcastBoundaryEntry 3 }
+
+hwIpMcastBoundaryAddressPrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength (4..32)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The length in bits of the mask which when, combined with
+            the corresponding value of hwIpMcastBoundaryAddress,
+            identifies the group range for which the scoped boundary
+            exists.
+
+            The InetAddressType is given by hwIpMcastBoundaryAddressType.
+            For 'ipv4' this object must be in the range 4..32.  For
+            'ipv6', this object must be 16."
+    ::= { hwIpMcastBoundaryEntry 4 }
+
+hwIpMcastBoundaryTimeStamp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The value of sysUpTime at which the multicast boundary
+            information represented by this entry was learned by the
+            router.
+
+            If this infomration was present at the most recent re-
+            initialization of the local management subsystem, then this
+            object contains a zero value."
+    ::= { hwIpMcastBoundaryEntry 5 }
+
+hwIpMcastBoundaryDroppedMcastOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of octets of multicast packets that have been
+            dropped as a result of this zone boundary configuration.
+
+            Discontinuities in this monotonically increasing value
+            occur at re-initialization of the management system.
+            Discontinuities can also occur as a result of boundary
+            configuration being removed and replaced, which can be
+            detected by observing the value of
+            hwIpMcastBoundaryTimeStamp."
+    ::= { hwIpMcastBoundaryEntry 6 }
+
+hwIpMcastBoundaryDroppedMcastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of multicast packets that have been dropped as a
+            result of this zone boundary configuration.
+
+            Discontinuities in this monotonically increasing value
+            occur at re-initialization of the management system.
+            Discontinuities can also occur as a result of boundary
+            configuration being removed and replaced, which can be
+            detected by observing the value of
+            hwIpMcastBoundaryTimeStamp."
+    ::= { hwIpMcastBoundaryEntry 7 }
+
+hwIpMcastBoundaryStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The status of this row, by which rows in this table can
+            be created and destroyed.
+
+            This status object can be set to active(1) without setting
+            any other columnar objects in this entry.
+
+            All writeable objects in this entry can be modified when the
+            status of this entry is active(1)."
+    ::= { hwIpMcastBoundaryEntry 8 }
+
+hwIpMcastBoundaryStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The storage type for this row.  Rows having the value
+           'permanent' need not allow write-access to any columnar
+           objects in the row."
+       DEFVAL { nonVolatile }
+    ::= { hwIpMcastBoundaryEntry 9 }     
+
+--
+-- MCAC TRAP
+--
+
+hwIpMcastChannelName  OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            " Channel name limited by cac on the interface."
+    ::= { hwIpMcast 8 }
+
+hwIpMcastChannelGroup OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current    
+    DESCRIPTION
+             " Group address of the entry."
+    ::= { hwIpMcast 9 }
+    
+hwIpMcastChannelSource OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only 
+    STATUS     current                        
+    DESCRIPTION                               
+             " Source address of the entry."    
+    ::= { hwIpMcast 10 }  
+            
+hwIpMcastChannelDownstreamEntries  OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current                                             
+    DESCRIPTION                                                    
+             " The total number of entries on the interface."                                       
+    ::= { hwIpMcast 11 }   
+
+hwIpMcastChannelDownstreamBandWidth   OBJECT-TYPE                                   
+    SYNTAX       DisplayString (SIZE(1..64))                                     
+    MAX-ACCESS   read-only
+    STATUS       current                                                   
+    DESCRIPTION                                                            
+             " The value of bandwidth on this interface."                    
+    ::= { hwIpMcast 12 } 
+    
+hwIpMcastChannelGlobalEntries  OBJECT-TYPE                                       
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current                                                              
+    DESCRIPTION                                                                   
+             " The total number of entries on the interface."                         
+    ::= { hwIpMcast 13 }   
+    
+hwIpMcastChannelDownstreamLimitBandWidth   OBJECT-TYPE                                   
+    SYNTAX       DisplayString (SIZE(1..64))                                     
+    MAX-ACCESS   read-only
+    STATUS       current                                                   
+    DESCRIPTION                                                            
+             " The configured limit of bandwidth on this interface."                    
+    ::= { hwIpMcast 14 }  
+
+hwIpMcastChannelDownstreamLimitEntries  OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)                               
+    MAX-ACCESS read-only
+    STATUS     current                                             
+    DESCRIPTION                                                    
+             " The configured limit of entries on the interface."                                       
+    ::= { hwIpMcast 15 }   
+    
+hwIpMcastChannelGlobalLimitEntries  OBJECT-TYPE                                       
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current                                                              
+    DESCRIPTION                                                                   
+             " The configured limit of global entries."                         
+    ::= { hwIpMcast 16 }
+    
+hwIpMcastChannelInterfaceIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           " The interface on which this router most recently sent or received a cac trap, or zero if this router has not sent or received a cac trap."
+    ::= { hwIpMcast 17 }
+
+--
+-- MCAC TRAP NODE
+--
+    
+hwIpMcastDownstreamChannelLimit  NOTIFICATION-TYPE
+    OBJECTS { hwIpMcastChannelSource,
+              hwIpMcastChannelGroup,
+              hwIpMcastChannelInterfaceIfIndex,
+              hwIpMcastChannelName,
+              hwIpMcastChannelDownstreamEntries,
+              hwIpMcastChannelDownstreamBandWidth
+            }
+    STATUS    current
+    DESCRIPTION
+              " A hwIpMcastDownstreamChannelLimit notification signifies that a entry belongs to
+              specified channel has been limited.
+              
+              This notification is generated whenever a entry belongs to specified channel
+              failed to add downstream cause channel downstream entry or bandwidth limit."
+    ::= { hwIpMcastNotifications 1 }
+
+hwIpMcastDownstreamTotalLimit  NOTIFICATION-TYPE
+    OBJECTS { hwIpMcastChannelSource,
+              hwIpMcastChannelGroup,
+              hwIpMcastChannelInterfaceIfIndex,
+              hwIpMcastChannelDownstreamEntries,
+              hwIpMcastChannelDownstreamBandWidth
+            }
+    STATUS    current
+    DESCRIPTION
+              " A hwIpMcastDownstreamTotalLimit notification signifies that a entry has been limited.
+              
+              This notification is generated whenever a entry failed to add downstream 
+              cause total downstream entry or bandwidth limit."
+    ::= { hwIpMcastNotifications 2 }
+    
+hwIpMcastGlobalChannelLimit  NOTIFICATION-TYPE
+    OBJECTS { hwIpMcastChannelSource,
+              hwIpMcastChannelGroup,
+              hwIpMcastChannelName,
+              hwIpMcastChannelGlobalEntries
+            }
+    STATUS    current
+    DESCRIPTION
+              " A hwIpMcastGlobalChannelLimit notification signifies that a entry belongs to specified channel
+              has been limited for global limite.
+              
+              This notification is generated whenever a entry belongs to specified channel
+              failed to create as global entries limits."
+    ::= { hwIpMcastNotifications 3 }                                             
+                
+hwIpMcastGlobalTotalLimit  NOTIFICATION-TYPE
+    OBJECTS { hwIpMcastChannelSource,
+              hwIpMcastChannelGroup,
+              hwIpMcastChannelGlobalEntries
+            }
+    STATUS    current
+    DESCRIPTION
+              " A hwIpMcastGlobalTotalLimit notification signifies that a entry 
+              has been limited for global total entries limite.
+              
+              This notification is generated whenever a entry failed to create 
+              as global total entries limits."
+    ::= { hwIpMcastNotifications 4 }                                           
+
+hwIpMcastOutChannelExceededLimit   NOTIFICATION-TYPE                                                                             
+    OBJECTS { hwIpMcastChannelName,
+              hwIpMcastChannelInterfaceIfIndex,
+              hwIpMcastChannelDownstreamEntries,
+              hwIpMcastChannelDownstreamBandWidth,
+              hwIpMcastChannelDownstreamLimitEntries,
+              hwIpMcastChannelDownstreamLimitBandWidth
+            }                                                                             
+    STATUS    current                                                                                            
+    DESCRIPTION                                                                                                  
+              " A hwIpMcastOutChannelExceededLimit notification signifies that existed entries 
+              exceeded channel downstream entry or bandwidth limit of pim routing-table.                                                     
+                                                                                                                 
+              This notification is generated whenever existed entries belongs to specified 
+              channel exceeded downstream entry or bandwidth limit due to downstream 
+              limit config."                                                                     
+    ::= { hwIpMcastNotifications 5 } 
+    
+hwIpMcastOutTotalExceededLimit   NOTIFICATION-TYPE                                                                             
+    OBJECTS { hwIpMcastChannelInterfaceIfIndex,
+              hwIpMcastChannelDownstreamEntries,
+              hwIpMcastChannelDownstreamBandWidth,
+              hwIpMcastChannelDownstreamLimitEntries,
+              hwIpMcastChannelDownstreamLimitBandWidth
+            }                                                                             
+    STATUS    current                                                                                            
+    DESCRIPTION                                                                                                  
+              " A hwIpMcastOutTotalExceededLimit notification signifies that existed entries 
+              exceeded total downstream entry or bandwidth limit of pim routing-table.                                                     
+                                                                                                                 
+              This notification is generated whenever existed entries exceeded total 
+              downstream entry or bandwidth limit due to downstream 
+              limit config."                                                                     
+    ::= { hwIpMcastNotifications 6 } 
+    
+hwIpMcastGlobalChannelExceededLimit   NOTIFICATION-TYPE                                                                             
+    OBJECTS { hwIpMcastChannelName,
+              hwIpMcastChannelGlobalEntries,
+              hwIpMcastChannelGlobalLimitEntries
+            }                                                                             
+    STATUS    current                                                                                            
+    DESCRIPTION                                                                                                  
+              " A hwIpMcastGlobalChannelExceededLimit notification signifies that existed entries exceeded
+              global entry limit of pim routing-table.                                                     
+                                                                                                                 
+              This notification is generated whenever existed entries belongs to specified channel                       
+              exceeded global entry or bandwidth limit due to global limit config."                                                                     
+    ::= { hwIpMcastNotifications 7 }   
+    
+hwIpMcastGlobalTotalExceededLimit   NOTIFICATION-TYPE                                                                             
+    OBJECTS { hwIpMcastChannelGlobalEntries,
+              hwIpMcastChannelGlobalLimitEntries
+            }                                                                             
+    STATUS    current                                                                                            
+    DESCRIPTION                                                                                                  
+              " A hwIpMcastGlobalTotalExceededLimit notification signifies that existed entries exceeded
+              global total entry limit of pim routing-table.                                                     
+                                                                                                                 
+              This notification is generated whenever existed entries  exceeded global total entry 
+              or bandwidth limit due to global limit config."                                                                     
+    ::= { hwIpMcastNotifications 8 }
+                                         
+--
+-- Conformance information
+--
+
+hwIpMcastMibConformance                  OBJECT IDENTIFIER ::= { hwIpMcastMib 3 }
+hwIpMcastMibCompliances                  OBJECT IDENTIFIER ::= { hwIpMcastMibConformance 1 }
+hwIpMcastMibGroups                       OBJECT IDENTIFIER ::= { hwIpMcastMibConformance 2 }
+
+--
+-- Compliance statements
+--
+
+hwIpMcastMibComplianceHost MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for hosts supporting IPMCAST-Mib."
+    MODULE  -- this module
+    MANDATORY-GROUPS { hwIpMcastMibBasicGroup }
+
+      OBJECT       hwIpMcastEnable
+      MIN-ACCESS read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      GROUP        hwIpMcastMibRouteGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibIfPktsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibBoundaryIfGroup
+      DESCRIPTION
+          "This group is optional."
+      
+      GROUP        hwIpMcastMibNotificationObjects
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibNotificationGroup
+      DESCRIPTION
+          "This group is optional."
+
+    ::= { hwIpMcastMibCompliances 1 }
+
+hwIpMcastMibComplianceRouter MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers supporting
+             IPMCAST-Mib."
+
+    MODULE  -- this module
+    MANDATORY-GROUPS { hwIpMcastMibRouteProtoGroup,
+                       hwIpMcastMibBasicGroup,
+                       hwIpMcastMibRouteGroup }
+
+      OBJECT     hwIpMcastEnable
+      MIN-ACCESS read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT     hwIpMcastInterfaceTtl
+      MIN-ACCESS read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT     hwIpMcastInterfaceRateLimit
+      MIN-ACCESS read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      GROUP        hwIpMcastMibIfPktsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibPktsOutGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibHopCountGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibRouteOctetsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibBoundaryIfGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibNotificationObjects
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibNotificationGroup
+      DESCRIPTION
+          "This group is optional."
+
+    ::= { hwIpMcastMibCompliances 2 }
+
+hwIpMcastMibComplianceBorderRouter MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers on scope
+            boundaries supporting IPMCAST-Mib."
+    MODULE  -- this module
+    MANDATORY-GROUPS { hwIpMcastMibRouteProtoGroup,
+                       hwIpMcastMibBasicGroup,
+                       hwIpMcastMibRouteGroup,
+                       hwIpMcastMibBoundaryIfGroup }
+
+      OBJECT     hwIpMcastEnable
+      MIN-ACCESS read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT     hwIpMcastInterfaceTtl
+      MIN-ACCESS read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT     hwIpMcastInterfaceRateLimit
+      MIN-ACCESS read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      GROUP        hwIpMcastMibIfPktsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibPktsOutGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibHopCountGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibRouteOctetsGroup
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibNotificationObjects
+      DESCRIPTION
+          "This group is optional."
+
+      GROUP        hwIpMcastMibNotificationGroup
+      DESCRIPTION
+          "This group is optional."
+
+    ::= { hwIpMcastMibCompliances 3 }
+
+--
+-- Units of conformance
+--
+hwIpMcastMibBasicGroup OBJECT-GROUP
+    OBJECTS { hwIpMcastEnable, hwIpMcastRouteEntryCount }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support basic management of IP
+            Multicast protocols."
+    ::= { hwIpMcastMibGroups 1 }
+
+hwIpMcastMibRouteGroup OBJECT-GROUP
+    OBJECTS { hwIpMcastInterfaceTtl,
+              hwIpMcastInterfaceRateLimit,
+              hwIpMcastInterfaceInMcastOctets,
+              hwIpMcastInterfaceOutMcastOctets,
+              hwIpMcastInterfaceDiscontinuityTime,
+              hwIpMcastRouteUpstreamNeighborType,
+              hwIpMcastRouteUpstreamNeighbor,
+              hwIpMcastRouteInIfIndex,
+              hwIpMcastRouteTimeStamp,
+              hwIpMcastRouteExpiryTime,
+              hwIpMcastRoutePkts,
+              hwIpMcastRouteTtlDropPackets,
+              hwIpMcastRouteDifferentInIfPackets,
+              hwIpMcastRouteNextHopState,
+              hwIpMcastRouteNextHopTimeStamp,
+              hwIpMcastRouteNextHopExpiryTime
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support basic management of IP
+            Multicast routing."
+    ::= { hwIpMcastMibGroups 2 }
+
+hwIpMcastMibIfPktsGroup OBJECT-GROUP
+    OBJECTS { hwIpMcastInterfaceInMcastPkts,
+              hwIpMcastInterfaceOutMcastPkts,
+              hwIpMcastInterfaceDiscontinuityTime }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of packet
+            counters for each interface entry."
+    ::= { hwIpMcastMibGroups 3 }
+
+hwIpMcastMibPktsOutGroup OBJECT-GROUP
+    OBJECTS { hwIpMcastRouteNextHopTimeStamp,
+              hwIpMcastRouteNextHopPkts }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of packet
+            counters for each outgoing interface entry of a route."
+    ::= { hwIpMcastMibGroups 4 }
+
+hwIpMcastMibHopCountGroup OBJECT-GROUP
+    OBJECTS { hwIpMcastRouteNextHopClosestMemberHops }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of the use of
+            hop counts in IP Multicast routing."
+    ::= { hwIpMcastMibGroups 5 }
+
+hwIpMcastMibRouteOctetsGroup OBJECT-GROUP
+    OBJECTS { hwIpMcastRouteTimeStamp,
+              hwIpMcastRouteOctets,
+              hwIpMcastRouteTtlDropOctets,
+              hwIpMcastRouteDifferentInIfOctets,
+              hwIpMcastRouteNextHopTimeStamp,
+              hwIpMcastRouteNextHopOctets }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of octet
+            counters for each forwarding entry."
+    ::= { hwIpMcastMibGroups 6 }
+
+hwIpMcastMibRouteProtoGroup OBJECT-GROUP
+    OBJECTS { hwIpMcastRouteProtocol, hwIpMcastRouteRtProtocol,
+              hwIpMcastRouteRtAddressType, hwIpMcastRouteRtAddress,
+              hwIpMcastRouteRtPrefixLength, hwIpMcastRouteRtType,
+              hwIpMcastRouteNextHopProtocol }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information on the
+            relationship between multicast routing information and the
+            IP Forwarding Table."
+    ::= { hwIpMcastMibGroups 7 }
+
+hwIpMcastMibBoundaryIfGroup OBJECT-GROUP
+    OBJECTS { hwIpMcastBoundaryTimeStamp,
+              hwIpMcastBoundaryDroppedMcastOctets,
+              hwIpMcastBoundaryDroppedMcastPkts,
+              hwIpMcastBoundaryStatus,
+              hwIpMcastBoundaryStorageType
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of multicast
+            scope zone boundaries."
+    ::= { hwIpMcastMibGroups 8 } 
+    
+hwIpMcastMibNotificationObjects OBJECT-GROUP
+    OBJECTS { hwIpMcastChannelName,
+              hwIpMcastChannelGroup,
+              hwIpMcastChannelSource,
+              hwIpMcastChannelDownstreamEntries,
+              hwIpMcastChannelDownstreamBandWidth,
+              hwIpMcastChannelGlobalEntries,
+              hwIpMcastChannelDownstreamLimitBandWidth,
+              hwIpMcastChannelDownstreamLimitEntries,
+              hwIpMcastChannelGlobalLimitEntries,
+              hwIpMcastChannelInterfaceIfIndex
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support notification of MCAC
+            network management events."
+    ::= { hwIpMcastMibGroups 9 }
+
+hwIpMcastMibNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { hwIpMcastDownstreamChannelLimit,
+                    hwIpMcastDownstreamTotalLimit,
+                    hwIpMcastGlobalChannelLimit,
+                    hwIpMcastGlobalTotalLimit,
+                    hwIpMcastOutChannelExceededLimit,
+                    hwIpMcastOutTotalExceededLimit,
+                    hwIpMcastGlobalChannelExceededLimit,
+                    hwIpMcastGlobalTotalExceededLimit
+                  }
+    STATUS  current
+    DESCRIPTION
+            "A collection of notifications for signaling MCAC network
+            management events."
+    ::= { hwIpMcastMibGroups 10 }
+END

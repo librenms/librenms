@@ -1,0 +1,1190 @@
+-- ============================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- DESCRIPTION:  HUAWEI-IPPOOL-MIB
+-- Reference:  
+-- Version: V3.00
+-- History:
+-- 
+-- ============================================================================
+    HUAWEI-IPPOOL-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            huaweiUtility
+                FROM HUAWEI-MIB
+            IpAddress, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            DisplayString, RowStatus, TruthValue
+                FROM SNMPv2-TC;
+
+
+        hwIPpool MODULE-IDENTITY
+            LAST-UPDATED "200408300900Z"
+            ORGANIZATION "Fix-Net Dept, Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Floor 5, Block 4, R&D Building,
+                Huawei Longgang Production Base,
+                Shenzhen,  P.R.C.
+                http://www.huawei.com
+                ZIP:518057
+                "
+            DESCRIPTION 
+                "The MIB contains objects of module IPPOOL."
+            ::= { huaweiUtility 8 }
+        hwIPPoolMibObjects OBJECT IDENTIFIER ::= { hwIPpool 1 }
+
+        hwIPPoolTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIPPoolEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Config-list of IP address pool."
+            ::= { hwIPPoolMibObjects 1 }
+
+        hwIPPoolEntry OBJECT-TYPE
+            SYNTAX HwIPPoolEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "IP address pool entry.
+                Config-list of IP address pool, used to configure the relevant attributes of the IP address pool inside the device.
+                Used by the AAA module and DHCP module to allocate IP address. The index is node HwIPPoolIndex."
+            INDEX { hwIPPoolIndex }
+            ::= { hwIPPoolTable 1 }
+
+        HwIPPoolEntry ::=
+            SEQUENCE {
+                hwIPPoolIndex
+                    Integer32,
+                hwIPPoolName
+                    DisplayString,
+                hwIPPoolRouterIPAddr
+                    IpAddress,
+                hwIPPoolRouterIPMask
+                    IpAddress,
+                hwIPPoolPriDNSIPAddr
+                    IpAddress,
+                hwIPPoolSecDNSIPAddr
+                    IpAddress,
+                hwIPPoolPriNBNSIPAddr
+                    IpAddress,
+                hwIPPoolSecNBNSIPAddr
+                    IpAddress,
+                hwIPPoolIPAddrLease
+                    Integer32,
+                hwIPPoolStatus
+                    RowStatus,
+                hwIPPoolVPNInstance
+                    DisplayString,
+                hwIPPoolType
+                    INTEGER,
+                hwIPPoolNetwork
+                                              IpAddress,
+                hwIPPoolNetworkMask
+                                              IpAddress,
+                     hwIPPoolIPTotalNum
+                    Integer32,    
+                     hwIPPoolIPUsedNum
+                    Integer32,
+                hwIPPoolIPConflictNum
+                    Integer32, 
+                hwIPPoolIPExcludeNum
+                    Integer32, 
+                hwIPPoolIPIdleNum
+                    Integer32,
+                hwIPPoolIPUsedPercent
+                    Integer32
+             }
+
+        hwIPPoolIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Exclusive index of address pool."
+            ::= { hwIPPoolEntry 1 }
+
+        hwIPPoolName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..35))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "IP address pool name, the service module guarantees the exclusiveness of the name."
+            ::= { hwIPPoolEntry 2 }
+
+        hwIPPoolRouterIPAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Gateway IP address.
+                By default, the mask is 255.255.255.255."
+            ::= { hwIPPoolEntry 3 }
+
+        hwIPPoolRouterIPMask OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Gateway mask.
+                By default, the mask is 255.255.255.255."
+            ::= { hwIPPoolEntry 4 }
+
+        hwIPPoolPriDNSIPAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Primary DNS IP address.
+                By default, it is 255.255.255.255."
+            ::= { hwIPPoolEntry 5 }
+
+        hwIPPoolSecDNSIPAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Second DNS IP address.
+                By default, it is 255.255.255.255."
+            ::= { hwIPPoolEntry 6 }
+
+        hwIPPoolPriNBNSIPAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Primary Netbios IP address.
+                By default, it is 255.255.255.255."
+            ::= { hwIPPoolEntry 7 }
+
+        hwIPPoolSecNBNSIPAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Second Netbios IP address.
+                By default, it is 255.255.255.255."
+            ::= { hwIPPoolEntry 8 }
+
+        hwIPPoolIPAddrLease OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "IP address lease: 0~(1000*24*60-1)(m)  unit: minute. It is allowed not to specify the lease during the adding. The default value is 3*24*60(m)."
+            ::= { hwIPPoolEntry 9 }
+
+        hwIPPoolStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row admin status, either Add or Del.
+                Supports adding and deletion."
+            ::= { hwIPPoolEntry 10 }
+
+        hwIPPoolVPNInstance OBJECT-TYPE
+            SYNTAX DisplayString(SIZE (1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "IP vpn-instance name."
+            ::= { hwIPPoolEntry 11 }
+
+        hwIPPoolType OBJECT-TYPE
+            SYNTAX INTEGER {local(1),relay(2)}
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Value indicates the type of pool, 1--local, 2--relay."
+            ::= { hwIPPoolEntry 12 }
+            
+        hwIPPoolNetwork OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Network ip address of a DHCP Server global pool. 
+            To delete a configured network ip, please set
+            hwDHCPSGlobalPoolConfigUndoFlag to 1"
+        ::= { hwIPPoolEntry 13 }
+    
+    hwIPPoolNetworkMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Net mask of a DHCP Server global pool(network).
+            The SET operation to this object ought to be with
+            the SET of hwDHCPSGlobalPoolNetwork together, and
+            any SET operation alone to this object will be
+            regarded as an invalid operation.
+            When a network ip of a DHCP server global pool was 
+            deleted, the net mask would also be deleted
+            automatically, and no further operation needed"
+        ::= { hwIPPoolEntry 14 }    
+hwIPPoolIPTotalNum OBJECT-TYPE
+            SYNTAX Integer32  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of total addresses."
+            ::= { hwIPPoolEntry 15 }
+            
+        hwIPPoolIPUsedNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of used addresses."
+            ::= { hwIPPoolEntry 16 }
+            
+        hwIPPoolIPConflictNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of conflict addresses."
+            ::= { hwIPPoolEntry 17 }
+        
+        hwIPPoolIPExcludeNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of exclude addresses."
+            ::= { hwIPPoolEntry 18 }
+            
+        hwIPPoolIPIdleNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of idle addresses."
+            ::= { hwIPPoolEntry 19 }
+            
+        hwIPPoolIPUsedPercent OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "used percent."
+            ::= { hwIPPoolEntry 20 }        
+
+        hwIPSectionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIPSectionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Config-list of IP section."
+            ::= { hwIPPoolMibObjects 2 }
+
+        hwIPSectionEntry OBJECT-TYPE
+            SYNTAX HwIPSectionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "IPSection Entry.
+                IP section configuration table, used to manage the IP address of user.
+                There are at most eight address sections to each address pool. Its indexes are hwIPPoolIndex (from the external) and HwIPSectionIndex."
+            INDEX { hwIPPoolIndex, hwIPSectionIndex }
+            ::= { hwIPSectionTable 1 }
+
+        HwIPSectionEntry ::=
+            SEQUENCE {
+                hwIPSectionIndex
+                    Integer32,
+                hwIPSectionDesc
+                    DisplayString,
+                hwIPSectionLowAddr
+                    IpAddress,
+                hwIPSectionHighAddr
+                    IpAddress,
+                hwIPSectionLength
+                    Integer32,
+                hwIPSectionUsedNum
+                    Integer32,
+                hwIPSectionConflict
+                    Integer32,
+                hwIPSectionInvalid
+                    Integer32,
+                hwIPSectionAvailableNum
+                    Integer32,
+                hwIPSectionRowStatus
+                    RowStatus
+             }
+
+        hwIPSectionIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..7)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Index of address section."
+            ::= { hwIPSectionEntry 1 }
+
+        hwIPSectionDesc OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "IP section DESCRIPTION, which can be empty."
+            ::= { hwIPSectionEntry 2 }
+
+        hwIPSectionLowAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Start of address."
+            ::= { hwIPSectionEntry 3 }
+
+        hwIPSectionHighAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "End of address."
+            ::= { hwIPSectionEntry 4 }
+
+        hwIPSectionLength OBJECT-TYPE
+            SYNTAX Integer32 (0..65536)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "IP section's length."
+            ::= { hwIPSectionEntry 5 }
+
+        hwIPSectionUsedNum OBJECT-TYPE
+            SYNTAX Integer32 (0..65536)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of Used addresses."
+            ::= { hwIPSectionEntry 6 }
+
+        hwIPSectionConflict OBJECT-TYPE
+            SYNTAX Integer32 (0..65536)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of conflict addresses."
+            ::= { hwIPSectionEntry 7 }
+
+        hwIPSectionInvalid OBJECT-TYPE
+            SYNTAX Integer32 (0..65536)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of invalid addresses."
+            ::= { hwIPSectionEntry 8 }
+
+        hwIPSectionAvailableNum OBJECT-TYPE
+            SYNTAX Integer32 (0..65536)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of available addresses."
+            ::= { hwIPSectionEntry 9 }
+
+        hwIPSectionRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row admin status, either Add or Del."
+            ::= { hwIPSectionEntry 10 }
+
+        hwIPPoolExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIPPoolExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Extend table of the local address pool.
+                 When IP addresses are allocated by the built-in DHCP servers, you need to configure the lease and option."
+            ::= { hwIPPoolMibObjects 3 }
+        
+        hwIPPoolExtEntry OBJECT-TYPE
+            SYNTAX HwIPPoolExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "DESCRIPTION."
+            INDEX { hwIPPoolIndex }
+            ::= { hwIPPoolExtTable 1 }
+        
+        HwIPPoolExtEntry ::=
+            SEQUENCE { 
+                hwIPPoolAvailableStatus
+                    Integer32,
+                hwIPDhcpOptionId1
+                    Integer32,
+                        hwIPDhcpOption1
+                             DisplayString,
+                        hwIPDhcpOptionId2
+                                Integer32,
+                        hwIPDhcpOption2
+                                DisplayString,
+                        hwIPDhcpOptionId3
+                            Integer32,
+                        hwIPDhcpOption3
+                                DisplayString,
+                        hwIPDhcpOptionId4
+                                Integer32,
+                        hwIPDhcpOption4
+                                DisplayString,
+                        hwIPDnsSuffix
+                                DisplayString                    
+                 }
+
+        hwIPPoolAvailableStatus OBJECT-TYPE
+            SYNTAX Integer32(0..1)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether the address is prohibited."
+            ::= { hwIPPoolExtEntry 1 }
+
+        hwIPDhcpOptionId1 OBJECT-TYPE
+            SYNTAX Integer32 (128..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Option ID.
+                 When IP addresses are allocated by the built-in DHCP sever, the option is a configuration parameter, which needs to be defined and explained by the carrier."
+            ::= { hwIPPoolExtEntry 2 }
+        
+        hwIPDhcpOption1 OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Value of the option."
+            ::= { hwIPPoolExtEntry 3 }
+        
+
+        hwIPDhcpOptionId2 OBJECT-TYPE
+            SYNTAX Integer32 (128..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Option ID.
+                 When IP addresses are allocated by the built-in DHCP sever, the option is a configuration parameter, which needs to be defined and explained by the carrier."
+            ::= { hwIPPoolExtEntry 4 }
+        
+        hwIPDhcpOption2 OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Value of the option."
+            ::= { hwIPPoolExtEntry 5 }
+            
+        hwIPDhcpOptionId3 OBJECT-TYPE
+            SYNTAX Integer32 (128..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Option ID.
+                 When IP addresses are allocated by the built-in DHCP sever, the option is a configuration parameter, which needs to be defined and explained by the carrier."
+            ::= { hwIPPoolExtEntry 6 }
+        
+        hwIPDhcpOption3 OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Value of the option."
+            ::= { hwIPPoolExtEntry 7 }
+            
+        hwIPDhcpOptionId4 OBJECT-TYPE
+            SYNTAX Integer32 (128..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Option ID.
+                 When IP addresses are allocated by the built-in DHCP sever, the option is a configuration parameter, which needs to be defined and explained by the carrier."
+            ::= { hwIPPoolExtEntry 8 }
+        
+        hwIPDhcpOption4 OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Value of the option."
+            ::= { hwIPPoolExtEntry 9 }
+
+        hwIPDnsSuffix OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "DNS suffix, a string of 0-32 characters.
+                If the value is 0, it indicates that the suffix is deleted."
+            ::= { hwIPPoolExtEntry 10 }
+
+        hwIPAddressStatusTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIPAddressStatusEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Address status table.
+                 It supports the query and setting of status of the local address pool. 
+                 It does not support the query and setting of status of the remote address pool for the following reasons:
+                  1. The status of the remote address pool cannot be set.
+                  2. The remote and local address pools map different status tables, with different indexes.
+                  3. The remote address pool is managed by the remote equipment, rather than the local equipment. The local equipment displays only the approximate status of the remote address pool."
+            ::= { hwIPPoolMibObjects 4 }
+        
+        hwIPAddressStatusEntry OBJECT-TYPE
+            SYNTAX HwIPAddressStatusEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "DESCRIPTION."
+            INDEX { hwIPPoolIndex, hwIPSectionIndex, hwIPAddress }
+            ::= { hwIPAddressStatusTable 1 }
+        
+        HwIPAddressStatusEntry ::=
+            SEQUENCE { 
+                hwIPAddress
+                    IpAddress,
+                hwIPAddressStatus
+                    INTEGER ,
+                hwPoolName
+                    DisplayString
+                    }
+
+        hwIPAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "IP address."
+            ::= { hwIPAddressStatusEntry 1 }       
+    
+
+        hwIPAddressStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    idle(0),
+                    occupied(1),
+                    prohibitive(2),
+                    conflictive(3)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Status of the address."
+            ::= { hwIPAddressStatusEntry 2 }       
+        
+        
+        hwPoolName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "IP address pool name."
+            ::= { hwIPAddressStatusEntry 3 }
+
+
+        hwDhcpSvrGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDhcpSvrGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Configuration table of the DHCP server group.
+                 To monitor the status of the remote DHCP server, you need to configure the local DHCP server.
+                 You can configure a maximum of 4094 DHCP server groups.
+                 Each server group consists of two DHCP servers. Select the server based on the server status."
+            ::= { hwIPPoolMibObjects 5 }
+        
+        hwDhcpSvrGroupEntry OBJECT-TYPE
+            SYNTAX HwDhcpSvrGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "DESCRIPTION."
+            INDEX { hwIPPoolDhcpSvrGroupIndex }
+            ::= { hwDhcpSvrGroupTable 1 }
+        
+        HwDhcpSvrGroupEntry ::=
+            SEQUENCE { 
+                hwIPPoolDhcpSvrGroupIndex
+                    Integer32,
+                hwIPPoolDhcpSvrGroupName
+                    DisplayString,
+                hwIPDhcpSvrPriAddr
+                    IpAddress,
+                hwIPDhcpSvrScdiAddr
+                    IpAddress,
+                hwIPDhcpSvrPriState
+                    INTEGER,
+                hwIPDhcpScdPriState
+                    INTEGER,
+                hwIPDhcpSvrAutoRelease
+                    TruthValue,
+                hwIPDhcpSvrRefCount
+                    Integer32,
+                hwIPDhcpSvrRowStatus
+                    RowStatus,  
+                hwIPDhcpSvrPriVpnInstance
+                    DisplayString,
+                hwIPDhcpSvrScdVpnInstance
+                    DisplayString    
+             }
+
+        hwIPPoolDhcpSvrGroupIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Index of a DHCP server group.
+                 When you create an address pool, the equipment adds the hwIPPoolDhcpSvrGroupIndex entry by default and sends it to the NMS."
+            ::= { hwDhcpSvrGroupEntry 1 }
+        
+        hwIPPoolDhcpSvrGroupName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Name of the DHCP server group."
+            ::= { hwDhcpSvrGroupEntry 2 }
+        
+        hwIPDhcpSvrPriAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Primary IP address of the DHCP server group."
+            ::= { hwDhcpSvrGroupEntry 3 }
+        
+        hwIPDhcpSvrScdiAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Secondary IP address of the DHCP server group."
+            ::= { hwDhcpSvrGroupEntry 4 }
+        
+        hwIPDhcpSvrPriState OBJECT-TYPE  
+            SYNTAX INTEGER
+                {
+                stop(0),
+                use(1)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Status of the primary DHCP server."
+            ::= { hwDhcpSvrGroupEntry 5 }
+        
+        hwIPDhcpScdPriState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                stop(0),
+                use(1)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Status of the secondary DHCP server."
+            ::= { hwDhcpSvrGroupEntry 6 }
+        
+        hwIPDhcpSvrAutoRelease OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether the server supports the Release packet."
+            ::= { hwDhcpSvrGroupEntry 7 }
+        
+        hwIPDhcpSvrRefCount OBJECT-TYPE
+            SYNTAX Integer32 (0..4096)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of times the server group is referenced."
+            ::= { hwDhcpSvrGroupEntry 8 }
+        
+        hwIPDhcpSvrRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "DHCP server rowstatus."
+            ::= { hwDhcpSvrGroupEntry 9 }  
+            
+        hwIPDhcpSvrPriVpnInstance OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "VPN instance of the primary DHCP server."
+            ::= { hwDhcpSvrGroupEntry 10 }  
+         
+         hwIPDhcpSvrScdVpnInstance OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "VPN instance of the secondary DHCP server."
+            ::= { hwDhcpSvrGroupEntry 11 } 
+        
+        hwRemotePoolTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRemotePoolEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Configuration table of the remote address pool.
+                 The remote address pool must be configured on the local equipment in the following cases:
+                   Users obtain IP addresses through the built-in DHCP client and need to renew the addresses.
+                   The equipment needs to record the IP addresses to be renewed.
+                   The equipment needs to report the routes of the users."
+            ::= { hwIPPoolMibObjects 6 }
+        
+        hwRemotePoolEntry OBJECT-TYPE
+            SYNTAX HwRemotePoolEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "DESCRIPTION."
+            INDEX { hwRemoteIPPoolIndex }
+            ::= { hwRemotePoolTable 1 }
+        
+        HwRemotePoolEntry ::=
+            SEQUENCE { 
+                hwRemoteIPPoolIndex
+                    Integer32,
+                hwRemoteIPPoolName
+                    DisplayString,
+                hwRemoteIPPoolRouterIPAddr
+                    IpAddress,
+                hwRemoteIPPoolRouterIPMask
+                    IpAddress,
+                hwRemoteIPPoolDhcpSvrGroupID
+                    Integer32,
+                hwRemoteIPPoolAvailableStatus
+                    INTEGER,
+                hwRemoteIPPoolRowStatus
+                    RowStatus,
+                hwRemoteIPPoolPriDNSIPAddress
+                    IpAddress,
+                hwRemoteIPPoolSecDNSIPAddress
+                    IpAddress,
+                hwRemoteIPPoolPriNBNSIPAddress
+                    IpAddress,
+                hwRemoteIPPoolSecNBNSIPAddress
+                    IpAddress,
+                  hwRemoteIPPoolVPNInstance
+                      DisplayString,
+                 hwRemoteIPPoolDhcpGroupName
+                      DisplayString
+             }
+
+        hwRemoteIPPoolIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Index of an address pool.
+                 When you create an address pool, the equipment adds the hwRemoteIPPoolIndex x entry by default and sends it the NMS.
+                "
+            ::= { hwRemotePoolEntry 1 }
+        
+        hwRemoteIPPoolName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Name of an address pool.
+                 The service module ensures that the name is unique."
+            ::= { hwRemotePoolEntry 2 }
+        
+        hwRemoteIPPoolRouterIPAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IP address of the gateway."
+            ::= { hwRemotePoolEntry 3 }
+        
+        hwRemoteIPPoolRouterIPMask OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IP address mask."
+            ::= { hwRemotePoolEntry 4 }
+        
+        hwRemoteIPPoolDhcpSvrGroupID OBJECT-TYPE
+            SYNTAX Integer32 (0..4096)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Name of the associated DHCP server group."
+            ::= { hwRemotePoolEntry 5 }
+        
+        hwRemoteIPPoolAvailableStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                 locked(0),
+                 unlocked(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether the address pool is locked, 0: locked, 1: not locked."
+            ::= { hwRemotePoolEntry 6 }
+
+        hwRemoteIPPoolRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                 "
+                 Row status of IP pool.  
+                 "
+            ::= { hwRemotePoolEntry 7 }
+            
+        hwRemoteIPPoolPriDNSIPAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IP address of the active DNS server."
+            ::= { hwRemotePoolEntry 8 }
+
+        hwRemoteIPPoolSecDNSIPAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IP address of the standby DNS server."
+            ::= { hwRemotePoolEntry 9 }
+
+        hwRemoteIPPoolPriNBNSIPAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IP address of the active NBNS server."
+            ::= { hwRemotePoolEntry 10 }
+
+        hwRemoteIPPoolSecNBNSIPAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IP address of the standby NBNS server."
+            ::= { hwRemotePoolEntry 11 }
+
+        hwRemoteIPPoolVPNInstance OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IP vpn-instance name."
+            ::= { hwRemotePoolEntry 12 }
+            
+        hwRemoteIPPoolDhcpGroupName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Dhcp server group name."
+            ::= { hwRemotePoolEntry 13 }
+
+--Statistics of address pool usage
+        hwIPPoolStatistic OBJECT IDENTIFIER ::= { hwIPPoolMibObjects 7 }
+        
+        hwIPPoolNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of configured addresses pools."
+            ::= { hwIPPoolStatistic 1 }
+
+        hwIPIdleTotalNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of idle addresses on the equipment."
+            ::= { hwIPPoolStatistic 2 }
+
+        hwIPUsedTotalNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of addresses in use on the equipment."
+            ::= { hwIPPoolStatistic 3 }
+
+        hwIPConflictTotalNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of conflicting addresses on the equipment."
+            ::= { hwIPPoolStatistic 4 }
+    
+        hwIPExcludeTotalNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of excluded addresses on the equipment."
+            ::= { hwIPPoolStatistic 5 }
+
+        hwIPPoolMibTrap OBJECT IDENTIFIER ::= { hwIPpool 2 }
+
+        hwIPPoolTrapOid OBJECT IDENTIFIER ::= { hwIPPoolMibTrap 1 }
+
+        hwUserIPAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of the user."
+            ::= { hwIPPoolTrapOid 1 }
+
+        hwDHCPServerAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of the DHCP server."
+            ::= { hwIPPoolTrapOid 2 }
+                                      
+        hwDhcpSvrVrfName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "DHCP    VPN instance name."
+            ::= { hwIPPoolTrapOid 3 }
+
+                                      
+        hwIPPoolTrapsDefine OBJECT IDENTIFIER ::= { hwIPPoolMibTrap 2 }
+
+        hwIPPoolTraps OBJECT IDENTIFIER ::= { hwIPPoolTrapsDefine 0 }
+
+        hwUserIPConflictAlarm NOTIFICATION-TYPE
+            OBJECTS { hwUserIPAddress,hwIPPoolName}
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name: IP address conflict error.
+                2 Notice/Trap generation cause: user IP address conflict.
+                3 Repair suggestions:
+                    Check whether to renew configuring the BAS IP pool.
+                    Check whether the IP address of BAS interface conflicts user IP address."
+            ::= { hwIPPoolTraps 1 }
+
+        hwUserIPLeaseAlarm NOTIFICATION-TYPE
+            OBJECTS { hwUserIPAddress }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name: IP address lease alarm.
+                2 Notice/Trap generation cause: The user IP lease is over.
+                3 Repair suggestion:
+                    Check whether to renew configuring BAS IP pool."
+            ::= { hwIPPoolTraps 2 }
+
+        hwAllocUserIPFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hwIPPoolIndex,hwIPPoolName }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name: allocate user IP fail alarm.
+                2 Notice/Trap generation cause: there are no enough IP addresses for users.
+                3 Repair suggestion:
+                    Check whether there are enough addresses in IP pool of the domain."
+            ::= { hwIPPoolTraps 3 }
+
+        hwDhcpServerDown NOTIFICATION-TYPE
+            OBJECTS { hwDHCPServerAddr, hwRemoteIPPoolRouterIPAddr,hwDhcpSvrVrfName}
+            STATUS current
+            DESCRIPTION 
+                "
+                Description: The DHCP server does not respond. This alarm is generated if the network is unstable, the DHCP server is Down, or there is not any available address in the DHCP server when a user applies for an address to the external DHCP server. 
+                Parameter: IP address of the DHCP server, address pool that the user expects (the address pool is identified by the gateway address because there may be multiple address pools on a server), VPN instance name.
+                    "
+            ::= { hwIPPoolTraps 4 }
+            
+        hwLocalIPPoolDifferWithServer NOTIFICATION-TYPE
+            OBJECTS { hwRemoteIPPoolName }
+            STATUS current
+            DESCRIPTION 
+                "
+                The configuration of the IP address pool on the DHCP server is not the same as the configuration of the remote address pool on the local equipment.
+                Solution: Check whether the configuration of the IP address pool on the DHCP server, including the gateway address, mask, and the address range, is the same as the configuration of the remote address pool on the local equipment.
+                "
+            ::= { hwIPPoolTraps 5 }
+            
+        
+        
+        
+    --  ============== conformance information ==============
+
+        hwIpPoolMIBConformance OBJECT IDENTIFIER ::= { hwIPpool 3 }
+            
+        hwIpPoolCompliances OBJECT IDENTIFIER ::= { hwIpPoolMIBConformance 1 }
+        hwIpPoolCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    { hwIpPoolTableGroup, hwIpSectionTableGroup, hwIpPoolExtTableGroup,
+                                     hwIpAddressStatusTableGroup, hwDhcpSvrGroupTableGroup, hwRemotePoolTableGroup,
+                                     hwIpPoolStatisticGroup, hwIpPoolTrapOidGroup, hwIpPoolTrapsGroup}  
+                                               
+              ::= { hwIpPoolCompliances 1 }
+              
+    --  ============== groups ==============  
+        hwIpPoolObjectGroups OBJECT IDENTIFIER ::= { hwIpPoolMIBConformance 2 } 
+
+        hwIpPoolTableGroup OBJECT-GROUP            
+            OBJECTS { hwIPPoolIndex, 
+            hwIPPoolName,
+            hwIPPoolRouterIPAddr,
+            hwIPPoolRouterIPMask,
+            hwIPPoolPriDNSIPAddr,
+            hwIPPoolSecDNSIPAddr,
+            hwIPPoolPriNBNSIPAddr,
+            hwIPPoolSecNBNSIPAddr,
+            hwIPPoolIPAddrLease,
+            hwIPPoolStatus,
+            hwIPPoolVPNInstance,
+                 hwIPPoolType,
+                 hwIPPoolNetwork,
+                 hwIPPoolNetworkMask,
+                 hwIPPoolIPTotalNum,    
+                 hwIPPoolIPUsedNum,
+                 hwIPPoolIPConflictNum, 
+            hwIPPoolIPExcludeNum, 
+            hwIPPoolIPIdleNum,
+            hwIPPoolIPUsedPercent
+                           }
+        STATUS current
+        DESCRIPTION 
+            "The huawei IP pool configuration group."
+        ::= { hwIpPoolObjectGroups 1 }    
+        
+        hwIpSectionTableGroup OBJECT-GROUP            
+            OBJECTS {hwIPSectionIndex,
+            hwIPSectionDesc,
+            hwIPSectionLowAddr,
+            hwIPSectionHighAddr,
+            hwIPSectionLength,
+            hwIPSectionUsedNum,
+            hwIPSectionConflict,
+            hwIPSectionInvalid,
+            hwIPSectionAvailableNum,
+            hwIPSectionRowStatus
+                }
+        STATUS current
+        DESCRIPTION 
+            "The huawei IP section configuration group."
+        ::= { hwIpPoolObjectGroups 2 }    
+        
+        hwIpPoolExtTableGroup OBJECT-GROUP            
+            OBJECTS {hwIPPoolAvailableStatus,
+            hwIPDhcpOptionId1,
+                    hwIPDhcpOption1,
+                    hwIPDhcpOptionId2,
+                    hwIPDhcpOption2,
+                    hwIPDhcpOptionId3,
+                    hwIPDhcpOption3,
+                    hwIPDhcpOptionId4,
+                    hwIPDhcpOption4,
+                    hwIPDnsSuffix
+                }
+        STATUS current
+        DESCRIPTION 
+            "The huawei IP pool extension configuration group."
+        ::= { hwIpPoolObjectGroups 3 }    
+        
+        hwIpAddressStatusTableGroup OBJECT-GROUP            
+            OBJECTS {hwIPAddress,
+            hwIPAddressStatus,
+            hwPoolName
+                }
+        STATUS current
+        DESCRIPTION 
+            "The huawei IP address status configuration group."
+        ::= { hwIpPoolObjectGroups 4 }    
+        
+        hwDhcpSvrGroupTableGroup OBJECT-GROUP            
+            OBJECTS {hwIPPoolDhcpSvrGroupIndex,
+                    hwIPPoolDhcpSvrGroupName,
+                    hwIPDhcpSvrPriAddr,
+                    hwIPDhcpSvrScdiAddr,
+                    hwIPDhcpSvrPriState,
+                    hwIPDhcpScdPriState,
+                    hwIPDhcpSvrAutoRelease,
+                    hwIPDhcpSvrRefCount,
+                    hwIPDhcpSvrRowStatus,  
+                    hwIPDhcpSvrPriVpnInstance,
+                    hwIPDhcpSvrScdVpnInstance
+                }
+        STATUS current
+        DESCRIPTION 
+            "The huawei DHCP service group configuration group."
+        ::= { hwIpPoolObjectGroups 5 }    
+        
+        hwRemotePoolTableGroup OBJECT-GROUP            
+            OBJECTS {hwRemoteIPPoolIndex,
+                    hwRemoteIPPoolName,
+                    hwRemoteIPPoolRouterIPAddr,
+                    hwRemoteIPPoolRouterIPMask,
+                    hwRemoteIPPoolDhcpSvrGroupID,
+                    hwRemoteIPPoolAvailableStatus,
+                    hwRemoteIPPoolRowStatus,
+                    hwRemoteIPPoolPriDNSIPAddress,
+                    hwRemoteIPPoolSecDNSIPAddress,
+                    hwRemoteIPPoolPriNBNSIPAddress,
+                    hwRemoteIPPoolSecNBNSIPAddress,
+                    hwRemoteIPPoolVPNInstance,
+                    hwRemoteIPPoolDhcpGroupName
+                }
+        STATUS current
+        DESCRIPTION 
+            "The huawei remote pool configuration group."
+        ::= { hwIpPoolObjectGroups 6 }
+
+        hwIpPoolStatisticGroup OBJECT-GROUP            
+            OBJECTS {hwIPPoolNum,
+                    hwIPIdleTotalNum,
+                    hwIPUsedTotalNum,
+                    hwIPConflictTotalNum,
+                    hwIPExcludeTotalNum
+                }
+        STATUS current
+        DESCRIPTION 
+            "The huawei IP pool statistics group."
+        ::= { hwIpPoolObjectGroups 7 }
+
+        hwIpPoolTrapOidGroup OBJECT-GROUP            
+            OBJECTS {hwUserIPAddress,
+                    hwDHCPServerAddr,
+                    hwDhcpSvrVrfName
+                }
+        STATUS current
+        DESCRIPTION 
+            "The huawei IP pool trap OID group."
+        ::= { hwIpPoolObjectGroups 8 }
+        
+        hwIpPoolTrapsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwUserIPConflictAlarm, hwUserIPLeaseAlarm, hwAllocUserIPFailAlarm,
+                            hwDhcpServerDown, hwLocalIPPoolDifferWithServer }
+            STATUS current
+            DESCRIPTION 
+                "The huawei IP pool traps group."
+            ::= { hwIpPoolObjectGroups 9 }
+                
+    END
+
