@@ -1,0 +1,244 @@
+-- =================================================================
+-- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: This mib file is used for APS protection
+--               
+-- Reference:
+-- Version:       V1.0
+-- History:
+--                V1.0 2007.12.05 create
+--             
+--                  
+--                 
+--                 
+--                  
+
+-- =================================================================
+HUAWEI-APS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm
+            FROM HUAWEI-MIB 
+        InterfaceIndex            
+        FROM IF-MIB                
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+            FROM SNMPv2-CONF            
+        IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE, 
+        MODULE-IDENTITY, NOTIFICATION-TYPE            
+            FROM SNMPv2-SMI           
+        sysUpTime
+            FROM SNMPv2-MIB                 
+        RowStatus, TruthValue, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC;
+
+     hwApsMIB MODULE-IDENTITY 
+            LAST-UPDATED "200712071432Z"        
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                "VRP Team Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100085
+                "
+            DESCRIPTION 
+                "The HUAWEI-APS-MIB contains objects to 
+        Manage configuration and Monitor running state 
+        for Class Based APS feature."
+            ::= { hwDatacomm 161 }
+            
+-- Textual conventions            
+
+-- Textual conventions   
+
+
+
+        hwApsObjects OBJECT IDENTIFIER ::= { hwApsMIB 1 }    
+        
+        
+-- ==============================================================================
+        hwApsProtectionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwApsProtectionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "APS protection configuration."
+            ::= { hwApsObjects 1 }    
+
+        hwApsProtectionEntry OBJECT-TYPE
+            SYNTAX HwApsProtectionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "APS protection configuration entry."
+            INDEX { hwApsIfIndex }
+            ::= { hwApsProtectionTable 1 }
+        
+        HwApsProtectionEntry ::=
+            SEQUENCE { 
+                hwApsIfIndex 
+                    InterfaceIndex,
+                hwApsProtectionGroupNum 
+                    Unsigned32,
+                hwApsIfType
+                    INTEGER,
+                hwApsRestoreWaitTime  
+                    Integer32,
+                hwApsProtectSwitch 
+                    INTEGER,
+                hwApsWorkingIfType 
+                    INTEGER,
+                hwApsRowStatus
+                    RowStatus  
+             }
+-- ==============================================================================             
+        hwApsIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table's index that is a STM-1 or CSTM-1 interface."
+            ::= { hwApsProtectionEntry 1 }
+        
+        hwApsProtectionGroupNum OBJECT-TYPE
+            SYNTAX Unsigned32  (1..8)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The table's index that is APS protection group number from 1 to 8."
+            ::= { hwApsProtectionEntry 2 }
+        hwApsIfType OBJECT-TYPE
+            SYNTAX INTEGER  
+            {
+            work(1),
+            protection(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The interface type ."
+            ::= { hwApsProtectionEntry 3 }
+         
+        hwApsRestoreWaitTime  OBJECT-TYPE
+            SYNTAX Integer32 (5..12)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The latency time of restoration."
+            ::= { hwApsProtectionEntry 4 }       
+        hwApsProtectSwitch  OBJECT-TYPE
+            SYNTAX INTEGER 
+            {
+            lock(1),
+            force(2),
+            manual(3),
+            auto(4)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The switch of APS protection."
+            ::= { hwApsProtectionEntry 5 }
+        hwApsWorkingIfType  OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            active(1),
+            inactive(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "State of the interface."
+            ::= { hwApsProtectionEntry 6 }
+        hwApsRowStatus  OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Current operation status of the row."
+            ::= { hwApsProtectionEntry 7 }
+            
+            
+-- ==================================================================================
+                                    
+-- ==================================================================================
+-- alarm
+        hwApsNotifications OBJECT IDENTIFIER ::= { hwApsMIB 2 }
+        
+        hwApsProtectSwitchOver NOTIFICATION-TYPE
+            OBJECTS { hwApsProtectionGroupNum,hwApsIfType,hwApsWorkingIfType  }
+            STATUS current
+            DESCRIPTION 
+                "APS protection switch successful."
+            ::= { hwApsNotifications 1 }
+        hwApsProtectSwitchBackOver NOTIFICATION-TYPE
+            OBJECTS { hwApsProtectionGroupNum,hwApsIfType,hwApsWorkingIfType }
+            STATUS current
+            DESCRIPTION 
+                "APS protection restore successful."
+            ::= { hwApsNotifications 2 }
+        hwApsProtectModeFail NOTIFICATION-TYPE
+            OBJECTS { hwApsProtectionGroupNum,hwApsIfType,hwApsWorkingIfType }
+            STATUS current
+            DESCRIPTION 
+                "The type of APS proctection doesn't match."
+            ::= { hwApsNotifications 3 }
+        hwApsProtectChnlFail NOTIFICATION-TYPE
+            OBJECTS { hwApsProtectionGroupNum,hwApsIfType,hwApsWorkingIfType }
+            STATUS current
+            DESCRIPTION 
+                "The tunnle of APS proctection doesn't match."
+            ::= { hwApsNotifications 4 }
+        hwApsProtectInvldK1K2Fail NOTIFICATION-TYPE
+            OBJECTS { hwApsProtectionGroupNum,hwApsIfType,hwApsWorkingIfType }
+            STATUS current
+            DESCRIPTION 
+                "The number K byte is unusable. "
+            ::= { hwApsNotifications 5 }
+        hwApsProtectRemoteFail NOTIFICATION-TYPE
+            OBJECTS { hwApsProtectionGroupNum,hwApsIfType,hwApsWorkingIfType }
+            STATUS current
+            DESCRIPTION 
+                "The remote is inspected  failure."
+            ::= { hwApsNotifications 6 }
+
+-- ===========================================================================================
+        hwApsConformance OBJECT IDENTIFIER ::= { hwApsMIB 3 }
+        
+        hwApsCompliances OBJECT IDENTIFIER ::= { hwApsConformance 1 }
+        
+--  compliance statements
+-- this module
+-- this module
+        hwApsCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for entities that implement 
+                extend APS on a router."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwApsProtectionGroup,hwApsNotificationsGroup }
+            ::= { hwApsCompliances 1 }
+
+
+        hwApsGroups OBJECT IDENTIFIER ::= { hwApsConformance 2 }
+        
+--   units of conformance
+        hwApsProtectionGroup OBJECT-GROUP
+            OBJECTS { hwApsProtectionGroupNum,hwApsIfType,hwApsRestoreWaitTime,hwApsProtectSwitch, 
+                    hwApsWorkingIfType,hwApsRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "This is a optional group of information."
+            ::= { hwApsGroups 1 }
+        hwApsNotificationsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwApsProtectSwitchOver,hwApsProtectSwitchBackOver,hwApsProtectModeFail,
+                    hwApsProtectChnlFail,hwApsProtectInvldK1K2Fail,hwApsProtectRemoteFail }
+            STATUS current
+            DESCRIPTION 
+                "This is a optional group of information."
+            ::= { hwApsGroups 2 }
+
+    END                                                            
+                     

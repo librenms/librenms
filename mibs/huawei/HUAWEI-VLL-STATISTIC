@@ -1,0 +1,408 @@
+-- ==================================================================
+-- Copyright (C) 2009 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI VLL Management Statistic MIB
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              V1.0 HouChengjie, 2009-02-13, publish
+-- ==================================================================
+
+    HUAWEI-VLL-STATISTIC-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            InterfaceIndex
+                FROM IF-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE           
+                FROM SNMPv2-CONF            
+            Counter64, OBJECT-TYPE, MODULE-IDENTITY, TimeTicks
+                FROM SNMPv2-SMI
+            EnabledStatus            
+                FROM P-BRIDGE-MIB            
+            TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+    
+    
+        hwL2VpnVllStatistic MODULE-IDENTITY 
+            LAST-UPDATED "200902132100Z"  -- Feb 13, 2009 at 10:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd."
+            CONTACT-INFO 
+                "R&D BeiJing, Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                Zip:100085 
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com"
+            DESCRIPTION 
+                "The HUAWEI-VLL-STATISTIC-MIB contains objects to
+                manage VLL's statistic."
+            ::= { hwL2Vpn 7 }
+
+
+--
+-- Node definitions
+--
+
+        hwL2Vpn OBJECT IDENTIFIER ::= { hwDatacomm 119 }
+
+        
+--           
+-- The VLL's QoS statistic Attribute Group
+-- 
+        hwVllMIBObjects OBJECT IDENTIFIER ::= { hwL2VpnVllStatistic 1 }
+
+        
+--
+-- The VLL's Statistic Table
+--
+        hwVllStatisticTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVllStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VLL's traffic statistic, based on the interface."
+            ::= { hwVllMIBObjects 1 }
+
+
+        hwVllStatisticEntry OBJECT-TYPE
+            SYNTAX HWVllStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VLL's traffic statistic."
+            INDEX { hwVllStatisticIfIndex, hwVllStatisticPwType }
+            ::= { hwVllStatisticTable 1 }
+
+
+        HWVllStatisticEntry ::=
+            SEQUENCE { 
+                hwVllStatisticIfIndex
+                    InterfaceIndex,
+                hwVllStatisticPwType
+                    INTEGER,
+                hwVllStatisticEnable
+                    EnabledStatus,
+                hwVllStatisticResetTraffic
+                    INTEGER,
+                hwVllStatisticResetTime
+                    TimeTicks,
+                hwVllStatisticPackets
+                    Counter64,
+                hwVllStatisticBytes
+                    Counter64,
+                hwVllStatisticPacketsRate
+                    Counter64,  
+                hwVllStatisticBytesRate
+                    Counter64                 
+            }
+
+
+        hwVllStatisticIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface index."
+            ::= { hwVllStatisticEntry 1 }
+
+
+        hwVllStatisticPwType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                primary(1),
+                secondary(2)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of PW."
+            ::= { hwVllStatisticEntry 2 }
+            
+            
+        hwVllStatisticEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of VSI's traffic statistics,
+                based on the interface."
+            ::= { hwVllStatisticEntry 3 }
+            
+        hwVllStatisticResetTraffic OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                reset(1),
+                unknownStatus(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "reset the traffic statistic."
+            ::= { hwVllStatisticEntry 4 }
+            
+            
+        hwVllStatisticResetTime OBJECT-TYPE
+            SYNTAX TimeTicks
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last time of clean out."
+            ::= { hwVllStatisticEntry 5 }
+            
+                        
+        hwVllStatisticPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The packets sent on the PW."
+            ::= { hwVllStatisticEntry 6 }
+            
+            
+        hwVllStatisticBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes sent on the PW."
+            ::= { hwVllStatisticEntry 7 }
+          
+            
+        hwVllStatisticPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The packet rate sent on the PW."
+            ::= { hwVllStatisticEntry 8 }
+
+            
+        hwVllStatisticBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The byte rate sent on the PW."
+            ::= { hwVllStatisticEntry 9 }
+
+            
+--
+-- The VLL's QoS Statistic Table
+--
+        hwVllQosStatisticTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVllQosStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VLL's traffic statistic, based on the interface."
+            ::= { hwVllMIBObjects 2 }
+
+
+        hwVllQosStatisticEntry OBJECT-TYPE
+            SYNTAX HWVllQosStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VLL's traffic statistic."
+            INDEX { hwVllQosStatisticIfIndex, hwVllQosStatisticPwType, hwVllQosStatisticQueueId }
+            ::= { hwVllQosStatisticTable 1 }
+
+
+        HWVllQosStatisticEntry ::=
+            SEQUENCE { 
+                hwVllQosStatisticIfIndex
+                    InterfaceIndex,
+                hwVllQosStatisticPwType
+                    INTEGER,                 
+                hwVllQosStatisticQueueId
+                    INTEGER,
+                hwVllQosStatisticPassPacket
+                    Counter64,
+                hwVllQosStatisticPassByte
+                    Counter64,
+                hwVllQosStatisticDiscardPacket
+                    Counter64,
+                hwVllQosStatisticDiscardByte
+                    Counter64,
+                hwVllQosStatisticPassPacketRate
+                    Counter64,
+                hwVllQosStatisticPassByteRate
+                    Counter64,
+                hwVllQosStatisticDiscardPacketRate
+                    Counter64,
+                hwVllQosStatisticDiscardByteRate
+                    Counter64
+            }
+
+
+        hwVllQosStatisticIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface index."
+            ::= { hwVllQosStatisticEntry 1 }
+            
+            
+        hwVllQosStatisticPwType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                primary(1),
+                secondary(2)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of PW."
+            ::= { hwVllQosStatisticEntry 2 }            
+
+
+        hwVllQosStatisticQueueId OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                be(1),
+                af1(2),
+                af2(3),
+                af3(4),
+                af4(5),
+                ef(6),
+                cs6(7),
+                cs7(8)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the queue's ID. The value must be 
+                be,af1,af2,af3,af4,ef,cs6,cs7."
+            ::= { hwVllQosStatisticEntry 3 }
+            
+
+        hwVllQosStatisticPassPacket OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of passed packets, based on the interface."
+            ::= { hwVllQosStatisticEntry 4 }
+
+
+        hwVllQosStatisticPassByte OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of passed bytes, based on the interface."
+            ::= { hwVllQosStatisticEntry 5 }
+
+
+        hwVllQosStatisticDiscardPacket OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of discarded packets, based on the interface."
+            ::= { hwVllQosStatisticEntry 6 }
+
+
+        hwVllQosStatisticDiscardByte OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of discarded bytes, based on the interface."
+            ::= { hwVllQosStatisticEntry 7 }
+
+
+        hwVllQosStatisticPassPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed packets for the past 30 seconds, based on the interface. Unit: pps"
+            ::= { hwVllQosStatisticEntry 8 }
+
+
+        hwVllQosStatisticPassByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed bytes for the past 30 seconds, based on the interface. Unit: bps"
+            ::= { hwVllQosStatisticEntry 9 }
+
+
+        hwVllQosStatisticDiscardPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded packets for the past 30 seconds, based on the interface. Unit: pps"
+            ::= { hwVllQosStatisticEntry 10 }
+
+
+        hwVllQosStatisticDiscardByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded bytes for the past 30 seconds, based on the interface. Unit: bps"
+            ::= { hwVllQosStatisticEntry 11 }
+
+--           
+-- VLL's QoS statistic MIB Trap Definitions
+-- 
+        hwVllMIBTraps OBJECT IDENTIFIER ::= { hwL2VpnVllStatistic 2 }
+
+
+--
+--    Conformance information
+--
+        hwVllMIBConformance OBJECT IDENTIFIER ::= { hwL2VpnVllStatistic 3 }
+
+        
+        hwVllMIBCompliances OBJECT IDENTIFIER ::= { hwVllMIBConformance 1 }
+
+        
+--  this module
+        hwVllMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-VLL-STATISTIC-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwVllStatisticGroup, hwVllQosStatisticGroup }
+            ::= { hwVllMIBCompliances 1 }
+
+        
+        hwVllMIBGroups OBJECT IDENTIFIER ::= { hwVllMIBConformance 2 }
+
+        
+        hwVllStatisticGroup OBJECT-GROUP
+            OBJECTS { hwVllStatisticEnable, hwVllStatisticResetTraffic, hwVllStatisticResetTime, hwVllStatisticPackets, hwVllStatisticBytes,
+                 hwVllStatisticPacketsRate, hwVllStatisticBytesRate
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VLL's statistic group."
+            ::= { hwVllMIBGroups 1 }
+            
+        hwVllQosStatisticGroup OBJECT-GROUP
+            OBJECTS { hwVllQosStatisticPassPacket, hwVllQosStatisticPassByte,
+                 hwVllQosStatisticDiscardPacket, hwVllQosStatisticDiscardByte, hwVllQosStatisticPassPacketRate,
+                 hwVllQosStatisticPassByteRate, hwVllQosStatisticDiscardPacketRate, hwVllQosStatisticDiscardByteRate
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VLL's QoS statistic group."
+            ::= { hwVllMIBGroups 2 }
+
+        
+    END
+
+--
+-- HUAWEI-VLL-STATISTIC-MIB.mib
+--

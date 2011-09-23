@@ -29,8 +29,8 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   include("includes/device-header.inc.php");
   echo('</table>');
 
-  echo('<div class="mainpane">');
-  echo('  <ul id="maintab" class="shadetabs">');
+  echo('<div class="tabBox">');
+  echo('  <ul class="tabs">');
 
   if (device_permitted($device['device_id']))
   {
@@ -254,7 +254,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   }
 
   if (device_permitted($device['device_id']) || $check_device == $vars['device']) {
-    echo('<div class="contentstyle">');
+    echo('<div class="tabcontent">');
 
     include("pages/device/".mres(basename($tab)).".inc.php");
 

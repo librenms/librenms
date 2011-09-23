@@ -1,0 +1,1988 @@
+-- ============================================================================
+-- Copyright (C) by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: HUAWEI-DEVICE-MIB
+-- Reference:   
+-- Version:     V3.06
+-- History:     
+--              
+-- ============================================================================
+HUAWEI-DEVICE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+
+        TimeTicks, IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY, 
+        NOTIFICATION-TYPE            
+            FROM SNMPv2-SMI    
+        DisplayString, DateAndTime, RowStatus                
+            FROM SNMPv2-TC
+        HWFrameType, HWPCBType, HWSubPCBType, HWPortType        
+            FROM HUAWEI-TC-MIB    
+        huaweiUtility            
+            FROM HUAWEI-MIB;
+
+    hwDev MODULE-IDENTITY
+        LAST-UPDATED "200406280900Z"
+        ORGANIZATION "Fix-Net Dept, Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+            "Block 4, R&D Building,
+            Huawei Longgang Production Base,
+            Shenzhen,   P.R.C.
+            http://www.huawei.com
+            Zip:518057
+            "
+        DESCRIPTION 
+            "huawei device  mib."
+        ::= { huaweiUtility 3 }
+
+    hwSystemPara OBJECT IDENTIFIER ::= { hwDev 1 }
+    
+    hwSysIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            IP address of the system,IP address of the 
+            net port used for device maintenance.It'd 
+            better not to modify this address when 
+            out-band NMS is used.
+            "
+        ::= { hwSystemPara 1 }
+    
+    hwSysIpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            IP address mask of the system. IP address of the 
+            net port used for device maintenance. It'd be better not to IP address mask
+            together with address mask. It will take no effect to separately
+            configure IP address or address mask. It'd 
+            when out-band NMS is used.
+            "
+        ::= { hwSystemPara 2 }
+    
+    hwSysVersion OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The System Version is consistent with the specification of HUAWEI product.
+            For example, MD5500 V100R001M30B01PXXXX.
+            "
+        ::= { hwSystemPara 3 }
+    
+    hwSysTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The current date and time of the system.
+            "
+        ::= { hwSystemPara 4 }
+    
+    hwNmsParaTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwNmsParaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            "
+        ::= { hwDev 2 }
+    
+    hwNmsParaEntry OBJECT-TYPE
+        SYNTAX HwNmsParaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            NMS parameters configuration table entity.
+            "
+        INDEX { hwNmsIndex }
+        ::= { hwNmsParaTable 1 }
+    
+    HwNmsParaEntry ::=
+        SEQUENCE { 
+            hwNmsIndex
+                INTEGER,
+            hwNmsName
+                OCTET STRING,
+            hwNmsIp
+                IpAddress,
+            hwNmsMask
+                IpAddress,
+            hwNmsMaintainMode
+                INTEGER,
+            hwNmsGetCommunity
+                OCTET STRING,
+            hwNmsSetCommunity
+                OCTET STRING,
+            hwNmsSnmpPort
+                Integer32,
+            hwNmsTrapPort
+                Integer32,
+            hwNmsClass
+                INTEGER,
+            hwNmsStatus
+                RowStatus
+         }
+
+    hwNmsIndex OBJECT-TYPE
+        SYNTAX INTEGER (1..32)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Index(1..32),at most supports 32 NMSs,exclusively identifies a NMS.
+            "
+        ::= { hwNmsParaEntry 1 }
+    
+    hwNmsName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Name of the NMS, which des not have to be 
+            consistent with that of the NMS workstation.
+            "
+        ::= { hwNmsParaEntry 2 }
+    
+    hwNmsIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            IP address of the NMS workstation that can be outband 
+            or inband address.
+            "
+        ::= { hwNmsParaEntry 3 }
+    
+    hwNmsMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+            "
+            IP address mask of the NMS workstation.
+            "
+        ::= { hwNmsParaEntry 4 }
+    
+    hwNmsMaintainMode OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            inBandwidth(1),
+            outBandwidth(2)
+            }
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+            "
+            Maintenance mode of NMS workstation,if the IP address 
+            of the NMS station is in-band, the mode must also be in-band. 
+            "
+        ::= { hwNmsParaEntry 5 }
+    
+    hwNmsGetCommunity OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Community authentication name used for SNMP 
+            protocol GET operation, default value: public.
+            "
+        ::= { hwNmsParaEntry 6 }
+    
+    hwNmsSetCommunity OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Community authentication name used for SNMP 
+            protocol SET operation, default value: private.
+            "
+        ::= { hwNmsParaEntry 7 }
+    
+    hwNmsSnmpPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+            "
+            Snmp communication port of NMS workstation,default value:161.
+            "
+        ::= { hwNmsParaEntry 8 }
+    
+    hwNmsTrapPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+            "
+            Trap receive Port of NMS workstation, default value:162.
+            "
+        ::= { hwNmsParaEntry 9 }
+    
+    hwNmsClass OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            ro(1),
+            rw(2),
+            rwWithTrap(3),
+            trapOnly(4)
+            }
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+            "
+            Class of NMS station,default value is 3.
+            "
+        ::= { hwNmsParaEntry 10 }
+    
+    hwNmsStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Operation status of NMS station,the NMS station 
+            can be added,deleted and modified.
+            "
+        ::= { hwNmsParaEntry 11 }
+    
+    hwSlotConf OBJECT IDENTIFIER ::= { hwDev 3 }
+    
+    hwFrameTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwFrameEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "                
+            Frame description table that describes basic information of a frame.
+            
+            It includes the frame type, the number of slots in the frame, etc. 
+            
+            The number of slots vary with the type of the frame where it is located.
+            For example,, there are has 16 slots in MA5100 while 4 ones in MA5103.
+            This table is also adopted for the case-shaped device with Agent 
+                (For example, the MA5105).
+            There is no frame in this his kind of device. Thus, the device can be 
+            put on the rack with other ones during implementation.
+            Its frame index is specified as 0. The frame type is imported from the 
+            relevant definition of the HW-TC table.
+            "
+        ::= { hwSlotConf 1 }
+    
+    hwFrameEntry OBJECT-TYPE
+        SYNTAX HwFrameEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "                
+            Frame description table entity.
+            "
+        INDEX { hwFrameIndex }
+        ::= { hwFrameTable 1 }
+    
+    HwFrameEntry ::=
+        SEQUENCE { 
+            hwFrameIndex
+                INTEGER,
+            hwFrameType
+                HWFrameType,
+            hwFrameDesc
+                OCTET STRING,
+            hwSlots
+                Integer32,
+            hwFrameOperStatus
+                INTEGER,
+            hwFrameAdminStatus
+                INTEGER,
+            hwFrameRowStatus
+                RowStatus
+         }
+
+    hwFrameIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Frame Index,the number of the frame in the device.
+            
+            This table is also adopted by the case-shaped device with Agent 
+                (For example, the MA5105).
+            There is no frame in this kind of device. Thus it is placed on 
+            the rack with other devices During implementation. The frame index 
+            is specified as 0.
+            "
+        ::= { hwFrameEntry 1 }
+    
+    hwFrameType OBJECT-TYPE
+        SYNTAX HWFrameType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Frame type,one kind of the frame types defined in HW-TC table.
+            According to the private MIB standard of the company, the product 
+            must support read-only mode. In other words, you can query the 
+            frame type the NMS.
+            You can choose for various broadband product to support read-write
+            mode for the dynamic control of frame type.
+            "
+        ::= { hwFrameEntry 2 }
+    
+    hwFrameDesc OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                
+            Frame description, the maximum length of the character 
+            string is 64. This table is used to describe some extra                     
+            information. For example, to facilitate management, use 
+            it to describe the frame that
+            is located in XX frame XX apparatus room.
+            "
+        ::= { hwFrameEntry 3 }
+    
+    hwSlots OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "                
+            Slot number of the frame, refers to the physical 
+            slot number of the frame, which depends on the 
+            frame type and has nothing to  do with the number of boards
+            placed in the slots, whose number varies with the frame type.
+            For example, there are 16 slots in MA5100 while 4 lots in MA5103.       
+            "
+        ::= { hwFrameEntry 4 }
+    
+    hwFrameOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            normal(1),
+            fault(2),
+            other(3),
+            discovery(4)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Frame operation status. This variable is used to indicate whether the
+            frame works in a normal status.                
+            "
+        ::= { hwFrameEntry 5 }
+    
+    hwFrameAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            disable(1),
+            enable(2),
+            reset(3),
+            test(4),
+            confirm(5),
+            delete(6)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Frame administration status. 
+            It only describes the statuses in common use, including
+            "
+        ::= { hwFrameEntry 6 }
+    
+    hwFrameRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Row status of the frame:mainly to support the
+            offline configuration of addition and deletion.
+            You can choose for various broadband products to support this 
+            function.Row status is used to manage the creation or deletion
+            of the concept rows.The following shows six statuses.
+            "
+        ::= { hwFrameEntry 7 }
+    
+    hwSlotTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwSlotEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "                
+            Slot description table, which describes detailed information 
+            of all boards in each slot which is on the frame, including the number of subslots, 
+            the status of the board, the software of the board, the hardware version No., 
+            the working mode of the board, etc.
+            This table must be implemented.
+            "
+        ::= { hwSlotConf 2 }
+    
+    hwSlotEntry OBJECT-TYPE
+        SYNTAX HwSlotEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Slot description table entity.
+            "
+        INDEX { hwFrameIndex, hwSlotIndex }
+        ::= { hwSlotTable 1 }
+    
+    HwSlotEntry ::=
+        SEQUENCE { 
+            hwSlotIndex
+                INTEGER,
+            hwSlotType
+                HWPCBType,
+            hwSlotDesc
+                OCTET STRING,
+            hwSlotPcbVersion
+                OCTET STRING,
+            hwSlotVersion
+                OCTET STRING,
+            hwSlotWorkMode
+                INTEGER,
+            hwSubSlots
+                Integer32,
+            hwSlotOperStatus
+                INTEGER,
+            hwSlotAdminStatus
+                INTEGER,
+            hwSlotRowStatus
+                RowStatus,
+            hwSlotPhySerialNum  
+                DisplayString
+         }
+
+    hwSlotIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "                
+            Slot index that identifies the physical position of a slot.
+            The case-shaped device is treated as the one with only one slot whose index is always set as 0. 
+            If there are ports in the frame, all the ports on the frame must be virtualized as 
+            a fixed slot index (equal to the virtual slots which is the max slot index for the frame plus 
+            1.) Their slot index is also fixedly set as 0. 
+            "
+        ::= { hwSlotEntry 1 }
+    
+    hwSlotType OBJECT-TYPE
+        SYNTAX HWPCBType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            
+            Board type. The board type defined in HW-TC table is recommended.
+            According to the private MIB standard of the company, all the products must support the read-only mode. In other words, you can query the slot type through the NMS. You can choose for various broadband products to support the read-write mode for the dynamic control of slot type.
+            "
+        ::= { hwSlotEntry 2 }
+    
+    hwSlotDesc OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                
+            Slot information description, used to describe extra information of the board.
+            For example, it can be adopted for a user access device to describe the information of a
+            user group connected to the slot.
+            "
+        ::= { hwSlotEntry 3 }
+    
+    hwSlotPcbVersion OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-only
+        STATUS deprecated
+        DESCRIPTION
+            "
+            
+            The PCB version information of the slot. 
+            It has been discarded in the fixed net MIB. The information of PCB version and 
+            other versions are described in the hwSlotVersion.
+            "
+        ::= { hwSlotEntry 4 }
+    
+    hwSlotVersion OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..640))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Board version information.
+            
+            Refer to the technical specifications of Huawei Technologies 
+            Co., Ltd. Use the new-line character \n (ACSII 0x0A) to space
+            various version information.If there is no corresponding
+             version, the new-line character shall also be inserted to 
+            remain the order.
+            
+             Detailed order information:
+            Hardware PCB version \n 
+            Software version \n
+            Logic version \n    
+            DSP version \n         
+            Standby CPU software version \n     
+            Chip version \n    
+            Other software version of the chip with a software \n    
+            Other version information \n
+            "
+        ::= { hwSlotEntry 5 }
+
+    hwSlotWorkMode OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            main(1),
+            standby(2),
+            other(255)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "                
+            Board working mode that describes whether the board is 
+            working in main state or in standby state.
+            "
+        ::= { hwSlotEntry 6 }
+
+    hwSubSlots OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of the subslots. 
+            The subslot is used to plug the subboard in the board.
+            The number subslots can be determined when the board's been made,                 
+            whether the subboard has been inserted in the subslot.
+            "
+        ::= { hwSlotEntry 7 }
+    
+    hwSlotOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            uninstall(1),
+            normal(2),
+            fault(3),
+            forbidden(4),
+            discovery(5),
+            config(6),
+            offline(7),
+            abnormal(8)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Operation status of the board.
+            "
+        ::= { hwSlotEntry 8 }
+    
+    hwSlotAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            disable(1),
+            enable(2),
+            reset(3),
+            test(4),
+            confirm(5),
+            switch(6),
+            delete(7),
+            forbidden(8),
+            unforbidden(9)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                
+            Administration status of the board.
+            "
+    
+        ::= { hwSlotEntry 9 }
+
+    hwSlotRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                            
+            Row status:mainly to support the offline 
+            configuration of board addition and deletion.
+            
+            Various broadband products can be determined whether to support this function.
+            "
+        ::= { hwSlotEntry 10 }
+
+    hwSlotPhySerialNum  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The vendor-specific serial number string for the physical
+            entity.  The preferred value is the serial number string
+            actually printed on the component itself (if present).
+            "
+        ::= { hwSlotEntry  11 }
+
+    hwSubslotTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwSubslotEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "                                
+            Subslot description table that describes detailed information of 
+            each subslot attached to the board.
+            "
+        ::= { hwSlotConf 3 }
+    
+    hwSubslotEntry OBJECT-TYPE
+        SYNTAX HwSubslotEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "                
+            Subslot description table entity.
+            "
+        INDEX { hwFrameIndex, hwSlotIndex, hwSubslotIndex }
+        ::= { hwSubslotTable 1 }
+    
+    HwSubslotEntry ::=
+        SEQUENCE { 
+            hwSubslotIndex
+                INTEGER,
+            hwSubslotType
+                HWSubPCBType,
+            hwSubslotPorts
+                Integer32,
+            hwSubslotOperStatus
+                INTEGER,
+            hwSubslotAdminStatus
+                INTEGER,
+            hwSubslotVersion
+                OCTET STRING,
+            hwSubSlotDesc
+                OCTET STRING,
+            hwSubslotRowStatus
+                RowStatus
+         }
+    
+    hwSubslotIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Subslot Index.  The present subslot index is determined by its                 
+            physical position in the board.
+            "
+        ::= { hwSubslotEntry 1 }
+    
+    hwSubslotType OBJECT-TYPE
+        SYNTAX HWSubPCBType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                
+            Subboard type in the subslot,refer to HW-TC table.                
+            
+            According to the private MIB standard of the company, the product     
+            must support read-only mode. In other words, you can query the subboard             
+            type through the NMS. You can choose for various broadband product to                 
+            support read-write mode for the dynamic control of frame type.
+                    "
+        ::= { hwSubslotEntry 2 }
+    
+    hwSubslotPorts OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "                
+            The number of physical ports owned by the subboard in the subslot.
+            "
+        ::= { hwSubslotEntry 3 }
+    
+    hwSubslotOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            uninstall(1),
+            normal(2),
+            fault(3),
+            forbidden(4)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "                
+            Operation status of the subboard in the subslot.
+            "
+        ::= { hwSubslotEntry 5 }
+    
+    hwSubslotAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            disable(1),
+            enable(2),
+            reset(3),
+            test(4),
+            confirm(5),
+            delete(6)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                
+            Administration status of the subboard in the subslot.
+            
+            The following only describes some statuses in common use. 
+            If there are some other statuses, just extend them.
+            delete(6) - discard this node through hwSubSlotRowStatus.
+            "
+        ::= { hwSubslotEntry 7 }
+    
+    hwSubslotVersion OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..1024))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                
+            Subboard version information.
+            
+            Refer to the technical specifications of Huawei Technologies Co., Ltd.
+             Use the new-line character \n (ACSII 0x0A) to space various
+            version information.
+            "
+        ::= { hwSubslotEntry 8 }
+    
+    hwSubSlotDesc OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                
+            Subboard description.
+            "
+        ::= { hwSubslotEntry 9 }
+    
+    hwSubslotRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                
+            Row status:mainly to support the offline configuration 
+            of subboard addition and deletion.Each product can 
+            determine whether to offer this kind of function.
+            "
+        ::= { hwSubslotEntry 10 }
+    
+    hwPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "                
+            Port configuration table that describes the detailed 
+            information of physical ports in the board, including the type,
+             status and rate of the port.This table must be implemented.
+            "
+        ::= { hwSlotConf 4 }
+    
+    hwPortEntry OBJECT-TYPE
+        SYNTAX HwPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "                
+            Port configuration table entity.
+            "
+        INDEX { hwFrameIndex, hwSlotIndex, hwSubslotIndex, hwPortIndex }
+        ::= { hwPortTable 1 }
+    
+    HwPortEntry ::=
+        SEQUENCE { 
+            hwPortIndex
+                INTEGER,
+            hwPortType
+                HWPortType,
+            hwPortDesc
+                OCTET STRING,
+            hwPortSpeed
+                Integer32,
+            hwPortOperStatus
+                INTEGER,
+            hwPortAdminStatus
+                INTEGER
+         }
+
+    hwPortIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "                
+            Port index, the index of this table, which exclusively 
+            determines all the ports in a subboard.
+            "
+        ::= { hwPortEntry 1 }
+    
+    hwPortType OBJECT-TYPE
+        SYNTAX HWPortType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "                
+            Port type. 
+            According to the private MIB standard of the company, the product must support read-only mode. 
+            In other words, you can query the frame type through the NMS.
+            You can choose for various broadband product to support read-write mode for the 
+            dynamic control of subboard type.
+            "
+        ::= { hwPortEntry 2 }
+    
+    hwPortDesc OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Port description, used to describe extra information of the port.
+            For example, for a user access device it can be adopted to describe the information
+            of the user who is connecting to the port.
+            "
+        ::= { hwPortEntry 3 }
+    
+    hwPortSpeed OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS deprecated
+        DESCRIPTION
+            "
+            The speed of this port.
+            "
+        ::= { hwPortEntry 4 }
+    
+    hwPortOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            normal(1),
+            fault(2),
+            localLoopback(3),
+            forbidden(4),
+            test(5),
+            remoteLoopback(6),
+            activing(10),
+            deactive(11),
+            block(12),
+            nolight(13),
+            innerLocalLoopback(14),
+            innerRemoteLoopback(15)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Port operation status.
+            "
+
+        ::= { hwPortEntry 5 }
+    
+    hwPortAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            active(1),
+            deactive(2),
+            block(3),
+            unblock(4),
+            confirm(5),
+            delete(6),
+            reset(7),
+            localLoopback(8),
+            remoteLoopback(9),
+            stopLoopback(11),
+            innerLocalLoopback(12),
+            innerRemoteLoopback(13),
+            rtuLocalLoopback(14),
+            rtuRemoteLoopback(15)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Port administration status.
+            "
+        ::= { hwPortEntry 6 }
+    
+    hwFrameLinks OBJECT IDENTIFIER ::= { hwSlotConf 5 }
+    
+    hwFrameLinkNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Number of frame Links, which refers to the number of links between the main
+            frame and the standby frame of the presen device. If there are many frames,
+            but the device cannot know the link relation of the frames, then the initial
+            value of this node is 0. If a user manually adds the link between the frames later,
+            then this node shall be renewed.
+            "
+        DEFVAL { 0 }
+        ::= { hwFrameLinks 1 }
+    
+    hwFrameLinkTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwFrameLinkEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The frame link table. It describes the topology relation between the frames.
+            For the device that can automatically discover the link relationship between the devices,
+            this table can be implemented as read-only table. For the device whose inter-frame 
+            relation needs to be configured manually, this table shall support adding and deletion. 
+            All the links must locate on the two existing ports.
+            "
+        ::= { hwFrameLinks 2 }
+    
+    hwFrameLinkEntry OBJECT-TYPE
+        SYNTAX HwFrameLinkEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The entry of the frame link table. There are the left and right node for a frame link.
+            Each node is in the form of frame ID + slot ID + subslot + port.
+            "
+        INDEX { hwFrameLinkIndex }
+        ::= { hwFrameLinkTable 1 }
+    
+    HwFrameLinkEntry ::=
+        SEQUENCE { 
+            hwFrameLinkIndex
+                Integer32,
+            hwFrameLinkLeftFrame
+                Integer32,
+            hwFrameLinkLeftSlot
+                Integer32,
+            hwFrameLinkLeftSubSlot
+                Integer32,
+            hwFrameLinkLeftPort
+                Integer32,
+            hwFrameLinkRightFrame
+                Integer32,
+            hwFrameLinkRightSlot
+                Integer32,
+            hwFrameLinkRightSubSlot
+                Integer32,
+            hwFrameLinkRightPort
+                Integer32,
+            hwFrameLinkOperStatus
+                INTEGER,
+            hwFrameLinkRowStatus
+                RowStatus
+         }
+
+    hwFrameLinkIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Index of the frame link. It is sequentially numerated and exclusively identified in the device.
+            There is no restriction to the coding rule.
+            "
+        ::= { hwFrameLinkEntry 1 }
+    
+    hwFrameLinkLeftFrame OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The ID of the left node linked to the frame, corresponding to the hwFrameIndex in the hwFrameTable
+            "
+        ::= { hwFrameLinkEntry 2 }
+    
+    hwFrameLinkLeftSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The ID of the left slot linked to the frame, corresponding to the hwSlotIndex in the hwSlotTable. 
+            It indicates which slot of the left node is the link entry.
+            "
+        ::= { hwFrameLinkEntry 3 }
+    
+    hwFrameLinkLeftSubSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Link the left subslot, corresponding to the hwSubSlotIndex in the hwSubTable. 
+            It indicates which subslot of the left node is the link entry.
+            "
+        ::= { hwFrameLinkEntry 4 }
+    
+    hwFrameLinkLeftPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The ID of the left port linked to the frame, corresponding to the hwPortIndex in the hwPortTable.
+            It indicates which port of the left node is the link entry.
+            "
+        ::= { hwFrameLinkEntry 5 }
+    
+    hwFrameLinkRightFrame OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The ID of the right node linked to the frame, corresponding to the hwFrameIndex of the hwFrameTable.
+            "
+        ::= { hwFrameLinkEntry 6 }
+    
+    hwFrameLinkRightSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The ID of the right slot linked the frame, corresponding to the hwSlotIndex of the hwSlotTable.
+            It indicates which slot of the right node is the link entry.
+            "
+        ::= { hwFrameLinkEntry 7 }
+    
+    hwFrameLinkRightSubSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Link the right subslot, corresponding to the hwSubSlotIndex in the hwSubSlotTable. 
+            It indicates which subslot of the right node is the link entry.
+            "
+        ::= { hwFrameLinkEntry 8 }
+    
+    hwFrameLinkRightPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The ID of the right port linked to the frame, corresponding to the hwPortIndex in the hwPortTable.
+            It indicates which port of the right port is the link entry.
+            "
+        ::= { hwFrameLinkEntry 9 }
+    
+    hwFrameLinkOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            normal(1),
+            fault(2),
+            unknown(3)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The running status of the link
+            "
+        ::= { hwFrameLinkEntry 10 }
+    
+    hwFrameLinkRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The row status of the frame link, used to add or delete a link.
+            "
+        ::= { hwFrameLinkEntry 11 }
+    
+    hwFrameLinkNextIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..254)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The frame link table indicates adding the index value to be assigned by the new link.
+            This leaf is used to access an index ID of the next frame link dynamically assigned by
+            the host before delivering the adding link. To deliver the adding link, 
+            the value of the leaf shall be accessed, and be delivered together with the 'frame link table'.
+            Otherwise, the host can not execute the operation and will return the error.
+            "
+        DEFVAL { 0 }
+        ::= { hwFrameLinks 3 }
+    
+    hwNarrowBoard OBJECT IDENTIFIER ::= { hwSlotConf 6 }
+    
+    hwBoardAttrTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwBoardAttrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Inquiring or modifying A_ULaw, impedance and current of ASL, A32 and H511POTS ports. 
+            "
+        ::= { hwNarrowBoard 1 }
+    
+    hwBoardAttrEntry OBJECT-TYPE
+        SYNTAX HwBoardAttrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Narrow board attribute table entity
+            "
+        INDEX { hwFrameIndex, hwSlotIndex }
+        ::= { hwBoardAttrTable 1 }
+    
+    HwBoardAttrEntry ::=
+        SEQUENCE { 
+            hwBoardAulaw
+                INTEGER,
+            hwBoardCurrent
+                INTEGER,
+            hwBoardImpedance
+                INTEGER
+         }
+
+    hwBoardAulaw OBJECT-TYPE
+        SYNTAX INTEGER (1..2)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "                
+            Coding method of voice signal when digitalizing.  
+            In different country or area it should be A law or u law.
+            1    --    A law
+            2    --    ulaw
+            "
+        ::= { hwBoardAttrEntry 1 }
+    
+    hwBoardCurrent OBJECT-TYPE
+        SYNTAX INTEGER (1..8)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Port current supported by the board. The value ranges from 1 to 8, 
+            which indicates the port current value supported under certain loopline impedence.
+                1    --    25mA steady current
+                2    --    16mA steady current
+                3    --    35mA 2*200 ohm
+                4    --    35mA 2*250 ohm
+                5    --    35mA 2*400 ohm
+                6    --    47mA 2*200 ohm
+                7    --    47mA 2*250 ohm
+                8    --    47mA 2*400 ohm
+            "
+        ::= { hwBoardAttrEntry 2 }
+    
+    hwBoardImpedance OBJECT-TYPE
+        SYNTAX INTEGER (1..8 | 255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Port impedance of the board. The following values indicates different impedance with 
+            different application circumstances.
+                1    --    Bureau machine in China(200+680|| 100nf)
+                2    --    User Machine in China(200+560|| 100nf)
+                3    --    600 ohm Interface
+                4    --    Interface of russian(150+510|| 47nf)
+                5    --    (220+820|| 115nf )
+                6    --    (220+820|| 120nf )
+                7    --    900 ohm Interface
+                8    --    Interface of Brazil(800|| 50nf)
+                255  --    Private definition
+            "
+        ::= { hwBoardAttrEntry 3 }
+    
+    hwCpuDevTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCpuDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            A table of CPU statistics.
+            "
+        ::= { hwDev 4 }
+    
+    hwCpuDevEntry OBJECT-TYPE
+        SYNTAX HwCpuDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The Entries of hwCpuDevTable.
+            "
+        INDEX { hwFrameIndex, hwSlotIndex, hwCpuDevIndex }
+        ::= { hwCpuDevTable 1 }
+    
+    HwCpuDevEntry ::=
+        SEQUENCE { 
+            hwCpuDevIndex
+                INTEGER,
+            hwCpuDevDuty
+                INTEGER,
+            hwAvgDuty1min
+                INTEGER,
+            hwAvgDuty5min
+                INTEGER
+         }
+
+    hwCpuDevIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Index of hwCpuDevTable. 
+            "
+        ::= { hwCpuDevEntry 1 }
+    
+    hwCpuDevDuty OBJECT-TYPE
+        SYNTAX INTEGER (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The overall CPU duty percentage in the last 5-second period. 
+            "
+        ::= { hwCpuDevEntry 2 }
+    
+    hwAvgDuty1min OBJECT-TYPE
+        SYNTAX INTEGER (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The overall CPU duty percentage in the last 1 minute period. 
+            "
+        ::= { hwCpuDevEntry 3 }
+    
+    hwAvgDuty5min OBJECT-TYPE
+        SYNTAX INTEGER (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The overall CPU duty percentage in the last 5-minute period. 
+            "
+        ::= { hwCpuDevEntry 4 }
+    
+    hwMemoryDev OBJECT IDENTIFIER ::= { hwDev 5 }
+    
+    hwMemoryDevTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwMemoryDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            This table contains memory information.  
+            "
+        ::= { hwMemoryDev 1 }
+    
+    hwMemoryDevEntry OBJECT-TYPE
+        SYNTAX HwMemoryDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The Entries of hwMemoryDevTable.
+            "
+        INDEX { hwFrameIndex, hwSlotIndex, hwMemoryDevModuleIndex }
+        ::= { hwMemoryDevTable 1 }
+    
+    HwMemoryDevEntry ::=
+        SEQUENCE { 
+            hwMemoryDevModuleIndex
+                INTEGER,
+            hwMemoryDevSize
+                Integer32,
+            hwMemoryDevFree
+                Integer32,
+            hwMemoryDevRawSliceUsed
+                Integer32,
+            hwMemoryDevLargestFree
+                Integer32,
+            hwMemoryDevFail
+                Integer32,
+            hwMemoryDevFailNoMem
+                Integer32
+         }
+
+    hwMemoryDevModuleIndex OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Index of hwMemoryDevTable.  
+            "
+        ::= { hwMemoryDevEntry 1 }
+    
+    hwMemoryDevSize OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Indicates the total size of the memory module
+            which is on the managed object.Its unit is byte.
+            "
+        ::= { hwMemoryDevEntry 2 }
+    
+    hwMemoryDevFree OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Indicates the free size of the memory, in the unit of byte.
+            "
+        ::= { hwMemoryDevEntry 3 }
+    
+    hwMemoryDevRawSliceUsed OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Indicates the used size of the raw slice memory, in the unit of byte.
+            "
+        ::= { hwMemoryDevEntry 4 }
+    
+    hwMemoryDevLargestFree OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The maximum size of the memory that can be currently used, in the unit of byte.
+            "
+        ::= { hwMemoryDevEntry 5 }
+    
+    hwMemoryDevFail OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Count of memory allocation failures.
+            "
+        ::= { hwMemoryDevEntry 6 }
+    
+    hwMemoryDevFailNoMem OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Count of the memory allocation
+            "
+        ::= { hwMemoryDevEntry 7 }
+    
+    hwBufferTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwBufferEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Buffer  information table.  
+            "
+        ::= { hwMemoryDev 2 }
+    
+    hwBufferEntry OBJECT-TYPE
+        SYNTAX HwBufferEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The Entries of hwBufferTable.
+            "
+        INDEX { hwFrameIndex, hwSlotIndex, hwBufferModuleIndex, hwBufferSize }
+        ::= { hwBufferTable 1 }
+    
+    HwBufferEntry ::=
+        SEQUENCE { 
+            hwBufferModuleIndex
+                INTEGER,
+            hwBufferSize
+                INTEGER,
+            hwBufferCurrentTotal
+                Integer32,
+            hwBufferCurrentUsed
+                Integer32
+         }
+
+    hwBufferModuleIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Index of hwBufferTable.  
+            "
+        ::= { hwBufferEntry 1 }
+    
+    hwBufferSize OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Contains the size of byte hwBuffers, in the unit of byte.
+            "
+        ::= { hwBufferEntry 2 }
+    
+    hwBufferCurrentTotal OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Contains the total number of hwBuffers currently.
+            "
+        ::= { hwBufferEntry 3 }
+    
+    hwBufferCurrentUsed OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Contains the number of used hwBuffers currently.
+            "
+        ::= { hwBufferEntry 4 }
+    
+    hwFlashDev OBJECT IDENTIFIER ::= { hwDev 6 }
+    
+    hwFlashDevTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwFlashDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            This table contains falsh information.  
+            "
+        ::= { hwFlashDev 1 }
+    
+    hwFlashDevEntry OBJECT-TYPE
+        SYNTAX HwFlashDevEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The Entries of hwFlashDevTable.
+            "
+        INDEX { hwFrameIndex, hwSlotIndex, hwFlashDevIndex }
+        ::= { hwFlashDevTable 1 }
+    
+    HwFlashDevEntry ::=
+        SEQUENCE { 
+            hwFlashDevIndex
+                INTEGER,
+            hwFlashDevSize
+                Integer32,
+            hwFlashDevFree
+                Integer32,
+            hwFlashDevEraseTime
+                TimeTicks,
+            hwFlashDevEraseStatus
+                INTEGER,
+            hwFlashDevStatus
+                INTEGER
+         }
+
+    hwFlashDevIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Index of hwFlashDevTable.
+            "
+        ::= { hwFlashDevEntry 1 }
+    
+    hwFlashDevSize OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Total size in Octets of Flash memory,
+            "
+        ::= { hwFlashDevEntry 2 }
+    
+    hwFlashDevFree OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Unused Size in Octets of Flash memory.
+            "
+        ::= { hwFlashDevEntry 3 }
+    
+    hwFlashDevEraseTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The last time when Flash was erased after powerup.
+            "
+        DEFVAL { 0 }
+        ::= { hwFlashDevEntry 4 }
+    
+    hwFlashDevEraseStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            flashErasing(1),
+            flashErasedSuccessful(2),
+            flashErasedFail(3),
+            flashReadOnly(4),
+            flashOpenFailure(5),
+            bufferAllocationFailure(6),
+            noEraseAfterPowerOn(7)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Status of current or last flash erasing.
+            "
+        ::= { hwFlashDevEntry 5 }
+    
+    hwFlashDevStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            busy(1),
+            available(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Status of the availability of flash.
+            "
+        ::= { hwFlashDevEntry 6 }
+          hwAlarmInfo OBJECT IDENTIFIER ::= { hwDev 7 }
+    
+    hwAlarmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS obsolete
+        DESCRIPTION
+            "
+            The table of Alarms which the device occurred.
+            "
+        ::= { hwAlarmInfo 1 }
+    
+    hwAlarmEntry OBJECT-TYPE
+        SYNTAX HwAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS obsolete
+        DESCRIPTION
+            "
+            The Entry of the Alarm Table.
+            "
+        INDEX { hwAlarmSerialIndex }
+        ::= { hwAlarmTable 1 }
+    
+    HwAlarmEntry ::=
+        SEQUENCE { 
+            hwAlarmSerialIndex
+                INTEGER,
+            hwAlarmType
+                INTEGER,
+            hwAlarmOcurTime
+                DateAndTime,
+            trapObjectIdValue
+                OCTET STRING
+         }
+
+    hwAlarmSerialIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..2147483647)
+        MAX-ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "
+            The Index of Alarms. Serial number.
+            "
+        ::= { hwAlarmEntry 1 }
+    
+    hwAlarmType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            alarm(1),
+            restore(2),
+            event(3)
+            }
+        MAX-ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "
+            The type of the Alarm.
+            "
+        ::= { hwAlarmEntry 2 }
+    
+    hwAlarmOcurTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "
+            The time when this Alarm occurred.
+            "
+        ::= { hwAlarmEntry 3 }
+    
+    trapObjectIdValue OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "
+            The OID String of the trap.
+            "
+        ::= { hwAlarmEntry 4 }
+
+    hwDevTraps OBJECT IDENTIFIER ::= { hwDev 8 }
+    
+    hwDevTrapVbOids OBJECT IDENTIFIER ::= { hwDevTraps 1 }
+    
+    hwFrameAdminResult OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            success(1),
+            fail(2)
+            }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "                
+            Frame administration result.       
+            "
+        ::= { hwDevTrapVbOids 1 }
+    
+    hwSlotAdminResult OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            success(1),
+            fail(2)
+            }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "                
+            Slot administration result.       
+            "
+        ::= { hwDevTrapVbOids 2 }
+    
+    hwSubslotAdminResult OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            success(1),
+            fail(2)
+            }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "                
+            Subslot administration result.       
+            "
+        ::= { hwDevTrapVbOids 3 }
+    
+    hwPortAdminResult OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            success(1),
+            fail(2)
+            }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "                
+            Port administration result.       
+            "
+        ::= { hwDevTrapVbOids 4 }
+   
+    hwDevGeneralTraps OBJECT IDENTIFIER ::= { hwDevTraps 5 0 }
+    
+    hwFrameAdminResultTrap NOTIFICATION-TYPE
+        OBJECTS {hwFrameIndex, hwFrameAdminStatus, hwFrameAdminResult }
+        STATUS current
+        DESCRIPTION 
+            "
+            Frame administration result Trap report
+            "
+        ::= { hwDevGeneralTraps 1 }
+    
+    hwSlotAdminResultTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            hwFrameIndex, 
+            hwSlotIndex, 
+            hwSlotAdminStatus, 
+            hwSlotAdminResult
+            }
+        STATUS current
+        DESCRIPTION 
+            "
+            Slot administration result Trap report
+            "
+        ::= { hwDevGeneralTraps 2 }
+    
+    hwSubSlotAdminResultTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            hwFrameIndex, 
+            hwSlotIndex, 
+            hwSubslotIndex, 
+            hwSubslotAdminStatus, 
+            hwSubslotAdminResult
+            }
+        STATUS current
+        DESCRIPTION 
+            "
+            Subslot administration result Trap report
+            "
+        ::= { hwDevGeneralTraps 3 }
+    
+    hwPortAdminResultTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            hwFrameIndex, 
+            hwSlotIndex, 
+            hwSubslotIndex, 
+            hwPortIndex, 
+            hwPortAdminStatus, 
+            hwPortAdminResult 
+            }
+        STATUS current
+        DESCRIPTION 
+            "
+            Port administration result Trap report
+            "
+        ::= { hwDevGeneralTraps 4 }
+    
+    hwCliUserMgmt OBJECT IDENTIFIER ::= { hwDev 10 }
+
+    hwCliUserParaTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCliUserParaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { hwCliUserMgmt 1 }
+    
+    hwCliUserParaEntry OBJECT-TYPE
+        SYNTAX HwCliUserParaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            CLI user parameters configuration table entity.
+            "
+        INDEX { IMPLIED hwCliUserName }
+        ::= { hwCliUserParaTable 1 }
+    
+    HwCliUserParaEntry ::=
+        SEQUENCE { 
+            hwCliUserName
+                OCTET STRING,
+            hwCliUserPassword
+                OCTET STRING,
+            hwCliUserLevel
+                INTEGER,
+            hwCliUserLogins
+                INTEGER,
+            hwCliUserDecr
+                OCTET STRING,
+            hwCliUserRowStatus
+                RowStatus
+         }
+
+    hwCliUserName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..15))
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Name of the CLI user.
+            "
+        ::= { hwCliUserParaEntry 1 }
+    
+    hwCliUserPassword OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..15))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            password of the CLI user.
+            "
+        ::= { hwCliUserParaEntry 2 }
+    
+    hwCliUserLevel OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            common(1),
+            operator(2),
+            administrator(3)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Level of CLI user(1:common,2:operator,3:administrator).
+            "
+        ::= { hwCliUserParaEntry 3 }
+    
+    hwCliUserLogins OBJECT-TYPE
+        SYNTAX INTEGER(0..4)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The num of user can login in one time.
+            "
+        ::= { hwCliUserParaEntry 4 }
+    
+    hwCliUserDecr OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..30))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Description of CLI user. 
+            "
+        ::= { hwCliUserParaEntry 5 }
+    
+    hwCliUserRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Operation status of CLI user,the CLI user 
+            can be added,deleted and modified.
+            "
+        ::= { hwCliUserParaEntry 6 }
+
+    hwCliClientTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCliClientEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { hwCliUserMgmt 2 }
+    
+    hwCliClientEntry OBJECT-TYPE
+        SYNTAX HwCliClientEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            CLI user parameters configuration table entity.
+            "
+        INDEX { hwCliClientID }
+        ::= { hwCliClientTable 1 }
+    
+    HwCliClientEntry ::=
+        SEQUENCE { 
+            hwCliClientID
+                INTEGER,
+            hwCliClientUserName
+                OCTET STRING,
+            hwCliClientType
+                INTEGER,
+            hwCliClientIp
+                IpAddress,
+            hwCliClientLoginTime
+                DateAndTime,
+            hwCliClientAdminStatus
+                INTEGER
+         }
+
+    hwCliClientID OBJECT-TYPE
+        SYNTAX INTEGER(1..5)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Client ID(1..5).
+            "
+        ::= { hwCliClientEntry 1 }
+    
+    hwCliClientUserName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..15))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            User name of client.
+            "
+        ::= { hwCliClientEntry 2 }
+    
+    hwCliClientType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            serial(1),
+            telnet(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Type of client(1:serial,2:telnet).
+            "
+        ::= { hwCliClientEntry 3 }
+    
+    hwCliClientIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The IP address of client.
+            "
+        ::= { hwCliClientEntry 4 }
+    
+    hwCliClientLoginTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Login time of Client. 
+            "
+        ::= { hwCliClientEntry 5 }
+    
+    hwCliClientAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            disconnect(1)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            admin status of client, can disconnect client.
+            "
+        ::= { hwCliClientEntry 6 }
+            
+END
+
