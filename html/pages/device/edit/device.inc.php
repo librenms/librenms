@@ -49,31 +49,8 @@ if ($_POST['editing'])
 
 $descr  = $device['purpose'];
 
-function foldersize($path) {
-    $total_size = 0;
-    $files = scandir($path);
-    $total_files = 0;
-    foreach($files as $t) {
-        if (is_dir(rtrim($path, '/') . '/' . $t)) {
-            if ($t<>"." && $t<>"..") {
-                $size = foldersize(rtrim($path, '/') . '/' . $t);
-                $total_size += $size;
-            }
-        } else {
-            $size = filesize(rtrim($path, '/') . '/' . $t);
-            $total_size += $size;
-            $total_files++;
-        }
-    }
-    return array($total_size, $total_files);
-}
-
 $override_sysLocation_bool = get_dev_attrib($device,'override_sysLocation_bool');
 $override_sysLocation_string = get_dev_attrib($device,'override_sysLocation_string');
-
-list($sizeondisk, $numrrds) = foldersize($config['rrd_dir']."/".$device['hostname']);
-
-echo("<b>Size on Disk:" . formatStorage($sizeondisk) . " in " . $numrrds . " RRD files.</b>");
 
 
 if ($updated && $update_message)
@@ -91,23 +68,22 @@ if ($updated && $update_message)
         <form id="delete_host" name="delete_host" method="post" action="<?php echo($config['base_url'].'/delhost/'); ?>">
           <img src="images/16/server_delete.png" align="absmiddle">
           <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
-          <input type="submit" class="submit" name="Submit" value="Delete Host">
+          <input type="submit" class="submit" name="Submit" value="Delete device">
         </form>
       </h5>
-
-<form id="edit" name="edit" method="post" action="">
-  <input type=hidden name="editing" value="yes">
-  <table width="500" border="0">
-    <tr>
-      <td colspan="2" align="right">Description:</td>
-      <td colspan="3"><input name="descr" size="32" value="<?php echo($device['purpose']); ?>"></input></td>
-    </tr>
-   <tr>
-      <td colspan="2" align="right">
-        Type:
-      </td>
-      <td>
-        <select name="type">
+      <form id="edit" name="edit" method="post" action="">
+        <input type=hidden name="editing" value="yes">
+        <table width="500" border="0">
+          <tr>
+            <td colspan="2" align="right">Description:</td>
+            <td colspan="3"><input name="descr" size="32" value="<?php echo($device['purpose']); ?>"></input></td>
+          </tr>
+         <tr>
+            <td colspan="2" align="right">
+              Type:
+            </td>
+            <td>
+              <select name="type">
 <?php
 $unknown = 1;
 
@@ -126,25 +102,38 @@ foreach ($config['device_types'] as $type)
     echo('          <option value="other">Other</option>');
   }
 ?>
-        </select>
-      </td>
-    </tr>
-    <tr>
-      <td width="40"><div style="padding-right: 5px; text-align: right"><input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"<?php if ($override_sysLocation_bool) { echo(' checked="1"'); } ?> /></div></td>
-      <td width="150" align="right">Override sysLocation:</td>
-      <td><input name="sysLocation" size="32"<?php if (!$override_sysLocation_bool) { echo(' disabled="1"'); } ?> value="<?php echo($override_sysLocation_string); ?>" /></td>
-    </tr>
-    <tr>
-      <td colspan="2"><div align="right">Disable</div></td>
-      <td><input name="disabled" type="checkbox" id="disabled" value="1" <?php if ($device["disabled"]) { echo("checked=checked"); } ?> /></td>
-      <td><div align="right">Ignore</div></td>
-      <td><input name="ignore" type="checkbox" id="disable" value="1" <?php if ($device['ignore']) { echo("checked=checked"); } ?> /></td>
-    </tr>
-  </table>
-  <input type="submit" name="Submit" value="Save" />
-  <label><br />
-  </label>
-</form>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td width="40"><div style="padding-right: 5px; text-align: right"><input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"<?php if ($override_sysLocation_bool) { echo(' checked="1"'); } ?> /></div></td>
+            <td align="right">Override sysLocation:</td>
+            <td colspan="3"><input name="sysLocation" size="32"<?php if (!$override_sysLocation_bool) { echo(' disabled="1"'); } ?> value="<?php echo($override_sysLocation_string); ?>" /></td>
+          </tr>
+          <tr>
+            <td colspan="2"><div align="right">Disable</div></td>
+            <td><input name="disabled" type="checkbox" id="disabled" value="1" <?php if ($device["disabled"]) { echo("checked=checked"); } ?> /></td>
+            <td><div align="right">Ignore</div></td>
+            <td><input name="ignore" type="checkbox" id="disable" value="1" <?php if ($device['ignore']) { echo("checked=checked"); } ?> />&nbsp;</td>
+          </tr>
+        </table>
+        <input type="submit" name="Submit" value="Save" />
+        <label><br />
+        </label>
+      </form>
+    </td>
+  </tr>
+</table>
+<br />
 
-</td>
-<td width="50"></td><td></td></tr></table>
+<?php
+
+print_optionbar_start();
+
+list($sizeondisk, $numrrds) = foldersize($config['rrd_dir']."/".$device['hostname']);
+
+echo("Size on Disk: <b>" . formatStorage($sizeondisk) . "</b> in <b>" . $numrrds . " RRD files</b>.");
+
+print_optionbar_end();
+
+?>
