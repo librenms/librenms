@@ -4,13 +4,13 @@ print_optionbar_start();
 
 echo("<span style='font-weight: bold;'>VLANs</span> &#187; ");
 
-echo("
-      <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vlans/'>Basic</a> | Graphs :
-      <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vlans/bits/'>Bits</a> |
-      <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vlans/pkts/'>Packets</a> |
-      <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vlans/nupkts/'>NU Packets</a> |
-      <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vlans/errors/'>Errors</a>
-     ");
+echo('
+      <a href="device/device=' . $device['device_id'] . '/tab=vlans/">Basic</a> | Graphs :
+      <a href="device/device=' . $device['device_id'] . '/tab=vlans/view=bits/">Bits</a> |
+      <a href="device/device=' . $device['device_id'] . '/tab=vlans/view=pkts/">Packets</a> |
+      <a href="device/device=' . $device['device_id'] . '/tab=vlans/view=nupkts/">NU Packets</a> |
+      <a href="device/device=' . $device['device_id'] . '/tab=vlans/view=errors/">Errors</a>
+     ');
 
 print_optionbar_end();
 
