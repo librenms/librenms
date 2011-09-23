@@ -118,7 +118,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     $device_routing_count['bgp'] = dbFetchCell("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ?", array($device['device_id']));
     if ($device_routing_count['bgp']) { $routing_tabs[] = 'bgp'; }
 
-    $device_routing_count['ospf'] = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = ?", array($device['device_id']));
+    $device_routing_count['ospf'] = dbFetchCell("SELECT COUNT(*) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'");
     if ($device_routing_count['ospf']) { $routing_tabs[] = 'ospf'; }
 
     $device_routing_count['cef'] = dbFetchCell("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = ?", array($device['device_id']));
