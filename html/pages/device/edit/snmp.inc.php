@@ -41,11 +41,11 @@ if ($updated && $update_message)
   print_error($update_message);
 }
 
-echo("<table cellpadding=0 cellspacing=0><tr><td>
+echo("<br /><table cellpadding=0 cellspacing=0><tr><td>
 
 <form id='edit' name='edit' method='post' action=''>
   <input type=hidden name='editing' value='yes'>
-  <table width='400' border='0'>
+  <table width='500' border='0'>
     <tr>
       <td width='150'><div align='right'>SNMP Community</div></td>
       <td><input name='community' size='20' value='" . $device['community'] . "' />
@@ -82,7 +82,7 @@ echo("  </select>
     <tr>
       <td><div align='right'>SNMP Timeout</div></td>
       <td><input name='timeout' size='20' value='" . ($device['timeout'] ? $device['timeout'] : '') . "' />&nbsp;
-      <em>seconds</em>
+      <em>(milli)seconds</em>
       </td>
     </tr>
     <tr>
