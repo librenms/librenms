@@ -243,6 +243,7 @@ if(!$vars['bare'] == "yes") {
 
 ?>
     <div class="clearer"></div>
+    <div class="content-mat">
       <div id="content" style="min-height:650px; width:auto; display:block;">
         <div style="clear:both; height:6px; display:block;"></div>
 <?php
@@ -300,6 +301,7 @@ if ($config['page_gen'])
     echo('<br />Generated in ' . $gentime . ' seconds.');
 }
 
+echo('</div>');
 echo('</div>');
 ?>
 
