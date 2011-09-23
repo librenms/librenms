@@ -1296,6 +1296,7 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
     float: left;
     height: 1.7em;
     line-height: 1.7em;
+    font-weight: bold;
     -webkit-border-radius: 8px 8px 0 0;
     -moz-border-radius: 8px 8px 0 0;
     border-radius: 8px 8px 0 0;
@@ -1303,7 +1304,7 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
     border: 1px solid #CCC;
     border-bottom: 0;
     padding: 0 8px;
-    color: #000;
+    color: #666;
     text-decoration: none;
     behavior: url(/css/PIE.htc);
 }
