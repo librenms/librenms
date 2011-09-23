@@ -22,6 +22,7 @@ $type_text['fanspeed'] = "Fanspeed";
 $type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
 $type_text['power'] = "Power";
+$type_text['toner'] = "Toner";
 
 if (!$vars['metric']) { $vars['metric'] = "processor"; }
 if (!$vars['view']) { $vars['view'] = "detail"; }
@@ -84,6 +85,7 @@ print_optionbar_end();
 if (in_array($vars['metric'],array_keys($used_sensors))
   || $vars['metric'] == 'processor'
   || $vars['metric'] == 'storage'
+  || $vars['metric'] == 'toner'
   || $vars['metric'] == 'mempool')
 {
   include('pages/health/'.$vars['metric'].'.inc.php');
