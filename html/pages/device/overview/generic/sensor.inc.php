@@ -24,7 +24,7 @@ if (count($sensors))
     $graph_array['to']     = $now;
     $graph_array['id']     = $sensor['sensor_id'];
     $graph_array['type']   = $graph_type;
-    $graph_array['from']   = $day;
+    $graph_array['from']   = $config['time']['day'];
     $graph_array['legend'] = "no";
 
     $link_array = $graph_array;
@@ -41,6 +41,7 @@ if (count($sensors))
     $overlib_content .= "</div>";
 
     $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = $graph_colour;
+    $graph_array['from'] = $config['time']['day'];
     $sensor_minigraph =  generate_graph_tag($graph_array);
 
     $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 25, '');
