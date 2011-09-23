@@ -1,7 +1,7 @@
 body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
   margin: 0px;
-  padding: 0px 0px 0px 0px;
+  padding: 0px;
   background: rgb(249,249,249); /* Old browsers */
   background: -moz-linear-gradient(top, rgba(249,249,249,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6+ */
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(249,249,249,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
@@ -10,10 +10,14 @@ body {
   background: -ms-linear-gradient(top, rgba(249,249,249,1) 0%,rgba(255,255,255,1) 100%); /* IE10+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f9f9f9', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
   background: linear-gradient(top, rgba(249,249,249,1) 0%,rgba(255,255,255,1) 100%); /* W3C */
-  color: #666;
+  color: #555;
   font-size: 10pt;
   line-height: 20px;
 }
+
+ul { margin: 0px; padding: 0px; list-style: disc outside; }
+ul ul { list-style: circle outside; }
+ul ul ul { list-style: square outside; }
 
 .rounded-2px {
   /* Rounded Corners */
@@ -565,10 +569,6 @@ form { margin: 0px; padding: 0px; }
 hr { border: 0px; height: 1px; background-color: #ccc; color: #ccc; }
 p { margin: 0px; padding: 0px; }
 
-ul { margin: 0px 24px; padding: 0px; list-style: disc outside; }
-ul ul { margin-top: 0px; padding-top: 0px; list-style: circle outside; }
-ul ul ul { margin-top: 0px; padding-top: 0px; list-style: square outside; }
-
 a { text-decoration:none; color: #00f; }
 a:visited { text-decoration:none; color: #00f; }
 a:hover { text-decoration:underline; color: #00f; }
@@ -577,7 +577,6 @@ a:active { color: #00f; }
 .vspace { margin-top: 4px; margin-bottom: 4px; }
 p.vspace { padding-top: 3px; padding-bottom: 3px; }
 .content-mat { padding: 0px; margin: auto; display:block; }
-
 .clearer { clear: both; display: block; padding: 0px; height: 0px; line-height: 1px; font-size: 0px; }
 
 .borderless-table tr td { border: none }
@@ -1272,22 +1271,17 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 
 
 
-#### TABS
-
 .tabBox .tabs {
-    margin: 0;
-    padding: 0 10px;
     overflow: hidden;
+    padding: 0px 10px;
     margin-bottom: -1px;
-    height: 2.25em;
+
 }
 
 .tabBox .tabs li {
     float: left;
     list-style: none;
-    margin: 0;
-    padding: .25em .25em 0;
-    height: 2em;
+    padding: .125em .125em 0;
     overflow: hidden;
     position: relative;
     z-index: 1;
@@ -1300,18 +1294,18 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 
 .tabBox .tabs a {
     float: left;
-    height: 2em;
-    line-height: 2em;
+    height: 1.7em;
+    line-height: 1.7em;
     -webkit-border-radius: 8px 8px 0 0;
     -moz-border-radius: 8px 8px 0 0;
     border-radius: 8px 8px 0 0;
     background: #EEE;
     border: 1px solid #CCC;
     border-bottom: 0;
-    padding: 0 10px;
+    padding: 0 8px;
     color: #000;
     text-decoration: none;
-    behavior: url(PIE.htc);
+    behavior: url(/css/PIE.htc);
 }
 
 .tabBox .tabs .selected a {
@@ -1332,10 +1326,12 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 }
 
 .tabBox .tabcontent {
+    margin-top -2px;
+    min-height: 600px;
     clear: left;
     position: relative;
     z-index: 2;
-    padding: 2em 1em;
+    padding: 10px;
     border: 1px solid #CCC;
     background: #FFF;
     -webkit-border-radius: 3px;
@@ -1344,5 +1340,5 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
     -webkit-box-shadow: #CCC 0 0 .25em;
     -moz-box-shadow: #CCC 0 0 .25em;
     box-shadow: #CCC 0 0 .25em;
-    behavior: url(PIE.htc);
+    behavior: url(/css/PIE.htc);
 }

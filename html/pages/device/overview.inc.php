@@ -15,7 +15,7 @@ $services['disabled'] = dbFetchCell("SELECT COUNT(service_id) FROM `services` WH
 if ($services['down']) { $services_colour = $warn_colour_a; } else { $services_colour = $list_colour_a; }
 if ($ports['down']) { $ports_colour = $warn_colour_a; } else { $ports_colour = $list_colour_a; }
 
-echo("<div style='width: 50%; float: left;'>");
+echo("<table width=100% cellspacing=0 cellpadding=0><tr><td style='width: 50%; vertical-align: top;>");
 
 #if (file_exists("includes/dev-data-" . strtolower($device[os]) . ".inc.php")) {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
@@ -71,9 +71,9 @@ if (count($syslog))
   echo("</div>");
 }
 
-echo("</div>");
+echo("</td>");
 
-echo("<div style='float:right; width: 50%;'>");
+echo("<td style='width: 50%; vertical-align: top;'>");
 
 ### Right Pane
 include("overview/processors.inc.php");
@@ -102,5 +102,7 @@ foreach ($eventlog as $entry)
 
 echo("</table>");
 echo("</div>");
+
+echo("</td></tr></table>");
 
 ?>

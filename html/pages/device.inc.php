@@ -30,7 +30,8 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   echo('</table>');
 
   echo('<div class="tabBox">');
-  echo('  <ul class="tabs">');
+
+  echo('<ul class="tabs">');
 
   if (device_permitted($device['device_id']))
   {
@@ -244,14 +245,14 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
 
     if ($_SESSION['userlevel'] >= "7")
     {
-      echo('<li class="' . $select['edit'] . '" style="text-align: right;">
+      echo('<li class="' . $select['edit'] . '" style="float: right;">
     <a href="'.generate_device_url($device, array('tab' => 'edit')).'">
       <img src="images/16/server_edit.png" align="absmiddle" border="0" /> Settings
     </a>
   </li>');
     }
-    echo("</ul>");
-  }
+     echo("</ul>"); 
+ }
 
   if (device_permitted($device['device_id']) || $check_device == $vars['device']) {
     echo('<div class="tabcontent">');
