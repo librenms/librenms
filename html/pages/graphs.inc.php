@@ -36,17 +36,19 @@ if (!$auth)
   $graph_array = $vars;
   $graph_array['height'] = "60";
   $graph_array['width']  = $thumb_width;
-  $graph_array['legend'] = 0;
+  $graph_array['legend'] = "no";
   $graph_array['to']     = $now;
 
   print_optionbar_start();
   echo($title);
   print_optionbar_end();
 
-  echo('<div style="margin: auto;">');
+  print_optionbar_start();
 
   $thumb_array = array('sixhour' => '6 Hours', 'day' => '24 Hours', 'twoday' => '48 Hours', 'week' => 'One Week', 'twoweek' => 'Two Weeks',
                        'month' => 'One Month', 'twomonth' => 'Two Months','year' => 'One Year', 'twoyear' => 'Two Years');
+
+  echo('<table width=100%><tr>');
 
   foreach ($thumb_array as $period => $text)
   {
@@ -58,19 +60,32 @@ if (!$auth)
     $link_array['page'] = "graphs";
     $link = generate_url($link_array);
 
-    echo('<div style="margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;" class="rounded-3px">
-      <span class="device-head">'.$text.'</span><br />
-       <a href="'.$link.'">');
+    echo('<td align=center>');
+    echo('<span class="device-head">'.$text.'</span><br />');
+    echo('<a href="'.$link.'">');
     echo(generate_graph_tag($graph_array));
-    echo("   </a>
-    </div>");
+    echo('</a>');
+    echo('</td>');
+
   }
-  echo("</div>");
+
+  echo('</tr></table>');
 
   $graph_array = $vars;
-
   $graph_array['height'] = "300";
   $graph_array['width']  = $graph_width;
+
+  echo("<hr />");
+
+  if($vars['legend'] == "no")
+  {
+    echo(generate_link("Show Legend",$vars, array('page' => "graphs", 'legend' => NULL)));
+  } else {
+    echo(generate_link("Hide Legend",$vars, array('page' => "graphs", 'legend' => "no")));
+  }
+
+  print_optionbar_end();
+
 
   echo generate_graph_js_state($graph_array);
 

@@ -204,7 +204,7 @@ if(isset($rrd_cmd))
         $rrd_cmd .= " -s " . $from . " -e " . $to;
 }
 
-if ($_GET['legend'] == "no" || $_GET['legend'] == 0)  { $rrd_cmd .= " -g "; }
+if ($_GET['legend'] == "no")  { $rrd_cmd .= " -g "; }
 
 if ($height < "99")  { $rrd_cmd .= " --only-graph "; }
 if ($width <= "300") { $rrd_cmd .= " --font LEGEND:7:" . $config['mono_font'] . " --font AXIS:6:" . $config['mono_font'] . " "; }
