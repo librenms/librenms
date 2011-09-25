@@ -33,12 +33,11 @@ if (!$auth)
 } else {
   if (isset($config['graph_types'][$type][$subtype]['descr'])) { $title .= " :: ".$config['graph_types'][$type][$subtype]['descr']; } else { $title .= " :: ".$graph_type; }
 
+  $graph_array = $vars;
   $graph_array['height'] = "60";
   $graph_array['width']  = $thumb_width;
-  $graph_array['legend'] = "no";
+  $graph_array['legend'] = 0;
   $graph_array['to']     = $now;
-  $graph_array['id']     = $vars['id'];
-  $graph_array['type']   = $vars['type'];
 
   print_optionbar_start();
   echo($title);
