@@ -22,7 +22,6 @@ if ($_POST['device'])
   {
     if (substr($key,0,4) == 'app_')
     {
-      echo($key);
       $param[] = substr($key,4);
       $enabled[] = substr($key,4);
       $replace[] = "?";
