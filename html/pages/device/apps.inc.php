@@ -23,7 +23,7 @@ foreach (dbFetchRows("SELECT * FROM `applications` WHERE `device_id` = ?", array
   } else {
     #echo('<img src="images/icons/greyscale/'.$app['app_type'].'.png" class="optionicon" />');
   }
-  echo(generate_link($app['app_type'],$link_array,array('app'=>$app['app_type'])));
+  echo(generate_link(ucfirst($app['app_type']),$link_array,array('app'=>$app['app_type'])));
   if ($vars['app'] == $app['app_type']) { echo("</span>"); }
   $sep = " | ";
 }
