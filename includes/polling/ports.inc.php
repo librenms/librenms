@@ -192,7 +192,10 @@ foreach ($ports as $port)
     }
 
     /// Set VLAN and Trunk
-    $this_port['ifTrunk'] = $this_port['vlanTrunkPortEncapsulationOperType'];
+    if(isset($this_port['vlanTrunkPortEncapsulationOperType']) && $this_port['vlanTrunkPortEncapsulationOperType'] != "notApplicable")
+    {
+      $this_port['ifTrunk'] = $this_port['vlanTrunkPortEncapsulationOperType'];
+    }
     $this_port['ifVlan']  = $this_port['vmVlan'];
     if(isset($this_port['vlanTrunkPortNativeVlan'])) { $this_port['ifVlan'] = $this_port['vlanTrunkPortNativeVlan']; }
 
