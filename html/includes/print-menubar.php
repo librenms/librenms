@@ -27,6 +27,8 @@ foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
    $device_alerts++;
    $device_alert_sql .= " OR `device_id` = '" . $device['device_id'] . "'";
   }
+
+  $cache['devices'][$device['hostname']] = $device;
 }
 ?>
 
