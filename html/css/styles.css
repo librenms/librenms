@@ -1305,9 +1305,9 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
     height: 1.7em;
     line-height: 1.7em;
     font-weight: bold;
-    -webkit-border-radius: 8px 8px 0 0;
-    -moz-border-radius: 8px 8px 0 0;
-    border-radius: 8px 8px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
+    -moz-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0;
     background: #EEE;
     border: 1px solid #CCC;
     border-bottom: 0;
