@@ -248,7 +248,7 @@ if ($ports['errored'])
 
 if ($ports['ignored'])
 {
-  echo('<li><a href="ports/ignored=1/"><img src="images/16/chart_curve_link.png" border="0" align="absmiddle" /> Ignored ('.$ports['ignored'].')</a></li>');
+  echo('<li><a href="ports/ignore=1/"><img src="images/16/chart_curve_link.png" border="0" align="absmiddle" /> Ignored ('.$ports['ignored'].')</a></li>');
 }
 
 if ($config['enable_billing']) { echo('<li><a href="bills/"><img src="images/16/money.png" border="0" align="absmiddle" /> Traffic Bills</a></li>'); $ifbreak = 1; }
