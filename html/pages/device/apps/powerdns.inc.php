@@ -3,7 +3,7 @@
 global $config;
 
 $graphs = array('powerdns_latency'  => 'Latency',
-                'powerdns_fail' => 'Corrupt - Failed - Timedout',
+                'powerdns_fail' => 'Corrupt - Failed - Timed out',
                 'powerdns_packetcache' => 'Packet Cache',
                 'powerdns_querycache' => 'Query Cache',
                 'powerdns_recursing' => 'Recursing Queries and Answers',

@@ -9,7 +9,7 @@ $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-powerdns-
 
 $array = array('corruptPackets' => array('descr' => 'Corrupt', 'colour' => 'FF8800FF'),
                'servfailPackets' => array('descr' => 'Failed', 'colour' => 'FF0000FF'),
-               'q_timedout' => array('descr' => 'Timedout', 'colour' => 'FFFF00FF'),
+               'q_timedout' => array('descr' => 'Timed out', 'colour' => 'FFFF00FF'),
 );
 
 

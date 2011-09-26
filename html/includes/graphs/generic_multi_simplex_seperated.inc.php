@@ -2,13 +2,13 @@
 
 include("includes/graphs/common.inc.php");
 
-$descrlen = "18";
+$descrlen = "12";
 $unitlen  = "10";
-if($nototal) { $descrlen += "2"; $unitlen += "2";}
+if ($nototal) { $descrlen += "2"; $unitlen += "2";}
 $unit_text = str_pad(truncate($unit_text,$unitlen),$unitlen);
 
-$rrd_options .= " COMMENT:'$unit_text              Cur      Max'";
-if (!$nototal) { $rrd_options .= " COMMENT:'Total      '"; }
+$rrd_options .= " COMMENT:'$unit_text         Cur      Max '";
+if (!$nototal) { $rrd_options .= " COMMENT:'  Total '"; }
 $rrd_options .= " COMMENT:'\\n'";
 
 $colour_iter=0;
