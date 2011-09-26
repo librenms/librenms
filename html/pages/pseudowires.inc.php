@@ -1,14 +1,24 @@
 <?php
 
+if(!isset($vars['view'])) { $vars['view'] = 'detail'; }
+
+$link_array = array('page' => 'pseudowires');
+
 print_optionbar_start();
 
-echo("<a href='pseudowires/'>Details</a> | Graphs :
-<a href='pseudowires/graphs/mini/'>Mini</a>
-");
+echo('<span style="font-weight: bold;">Pseudowires</span> &#187; ');
+
+if ($vars['view'] == "detail") { echo('<span class="pagemenu-selected">'); }
+echo(generate_link("Details",$link_array,array('view'=> 'detail')));
+if ($vars['view'] == "detail") { echo('</span>'); }
+
+echo(" | ");
+
+if ($vars['view'] == "minigraphs") { echo('<span class="pagemenu-selected">'); }
+echo(generate_link("Mini Graphs",$link_array,array('view' => "minigraphs")));
+if ($vars['view'] == "minigraphs") { echo('</span>'); }
 
 print_optionbar_end();
-
-list($opta, $optb, $optc, $optd, $opte) = explode("/", $_GET['opta']);
 
 echo("<table cellpadding=5 cellspacing=0 class=devicetable width=100%>");
 
@@ -38,10 +48,9 @@ foreach (dbFetchRows("SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
                                                                                           <td>".generate_device_link($pw_b)."</td><td>".generate_port_link($pw_b)."</td></tr>");
     echo("<tr style=\"background-color: #$bg;\"><td colspan=2>".$pw_a['ifAlias']."</td><td colspan=2>".$pw_b['ifAlias']."</td></tr>");
 
-    if ($opta == "graphs")
+    if ($vars['view'] == "minigraphs")
     {
       echo("<tr style=\"background-color: #$bg;\"><td></td><td colspan=2>");
-      if (!$optb) { $optb = "mini"; }
 
       if ($pw_a)
       {
@@ -50,10 +59,10 @@ foreach (dbFetchRows("SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         $pw_a['from'] = $day;
         $pw_a['to'] = $now;
         $pw_a['bg'] = $bg;
-        $types = array('bits','pkts','errors');
+        $types = array('bits','upkts','errors');
         foreach ($types as $graph_type)
         {
-          $pw_a['graph_type'] = $graph_type;
+          $pw_a['graph_type'] = "port_".$graph_type;
           generate_port_thumbnail($pw_a);
         }
       }
@@ -66,10 +75,10 @@ foreach (dbFetchRows("SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         $pw_b['from'] = $day;
         $pw_b['to'] = $now;
         $pw_b['bg'] = $bg;
-        $types = array('bits','pkts','errors');
+        $types = array('bits','upkts','errors');
         foreach ($types as $graph_type)
         {
-          $pw_b['graph_type'] = $graph_type;
+          $pw_b['graph_type'] = "port_".$graph_type;
           generate_port_thumbnail($pw_b);
         }
       }

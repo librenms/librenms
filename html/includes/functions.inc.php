@@ -413,8 +413,8 @@ function generate_port_url($port, $vars=array())
 
 function generate_port_thumbnail($args)
 {
-  if (!$args['bg']) { $args['bg'] = "FFFFF"; }
-  $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&amp;id=".$args['interface_id']."&amp;from=".$args['from']."&amp;to=".$args['to']."&amp;width=".$args['width']."&amp;height=".$args['height']."&amp;legend=no&amp;bg=".$args['bg']."'>";
+  if (!$args['bg']) { $args['bg'] = "FFFFFF"; }
+  $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&amp;id=".$args['interface_id']."&amp;from=".$args['from']."&amp;to=".$args['to']."&amp;width=".$args['width']."&amp;height=".$args['height']."&amp;bg=".$args['bg']."'>";
   echo(generate_port_link($args, $args['content']));
 }
 
