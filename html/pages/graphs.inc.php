@@ -82,7 +82,7 @@ if (!$auth)
 
   echo("<hr />");
 
-  if($vars['legend'] == "no")
+  if ($vars['legend'] == "no")
   {
     echo(generate_link("Show Legend",$vars, array('page' => "graphs", 'legend' => NULL)));
   } else {

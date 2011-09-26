@@ -36,7 +36,7 @@ foreach ($ports as $port)
     $link = generate_url($link_array);
     $overlib_content = generate_overlib_content($graph_array, $port['hostname'] . " - " . $port['label']);
     $graph_array['title']  = "yes";
-    $graph_array['width'] = 315; $graph_array['height'] = 119; 
+    $graph_array['width'] = 315; $graph_array['height'] = 119;
     $graph =  generate_graph_tag($graph_array);
 
     echo("<div style='display: block; padding: 1px; margin: 2px; min-width: 393px; max-width:393px; min-height:180px; max-height:180px; text-align: center; float: left; background-color: #f5f5f5;'>");

@@ -247,7 +247,7 @@ if($format == "graph")
       {
         $graph_type = "device_".$subformat;
 
-	if($_SESSION['widescreen']) { $width=270; } else { $width=315; }
+        if ($_SESSION['widescreen']) { $width=270; } else { $width=315; }
 
         echo("<div style='display: block; padding: 1px; margin: 2px; min-width: ".($width+78)."px; max-width:".($width+78)."px; min-height:170px; max-height:170px; text-align: center; float: left; background-color: #f5f5f5;'>
         <a href='device/device=".$device['device_id']."/' onmouseover=\"return overlib('\

@@ -126,10 +126,10 @@ function get_userlist()
   global $config, $ds;
 
   $filter = '(' . $config['auth_ldap_prefix'] . '*)';
-  
+
   $search = ldap_search($ds, trim($config['auth_ldap_suffix'],','), $filter);
   $entries = ldap_get_entries($ds, $search);
-  
+
   if ($entries['count'])
   {
     foreach ($entries as $entry)
@@ -137,14 +137,14 @@ function get_userlist()
       $username = $entry['uid'][0];
       $realname = $entry['cn'][0];
       $user_id  = $entry['uidnumber'][0];
-      
+
       if (!isset($config['auth_ldap_group']) || ldap_compare($ds,$config['auth_ldap_group'],'memberUid',$username))
       {
         $userlist[] = array('username' => $username, 'realname' => $realname, 'user_id' => $user_id);
       }
     }
   }
-  
+
   return $userlist;
 }
 

@@ -55,7 +55,7 @@ else
 
   echo(" | ");
 
-  if ($vars['state'] == "down") 
+  if ($vars['state'] == "down")
   {
     echo("<span class='pagemenu-selected'>");
     echo(generate_link("Down",$vars, array('state' => NULL)));
@@ -66,7 +66,7 @@ else
 
   ## End BGP Menu
 
-  if(!isset($vars['view'])) { $vars['view'] = 'details'; }
+  if (!isset($vars['view'])) { $vars['view'] = 'details'; }
 
   echo('<div style="float: right;">');
 
@@ -133,19 +133,19 @@ else
 
   $i = "1";
 
-  if ($vars['type'] == "external") 
+  if ($vars['type'] == "external")
   {
    $where = "AND D.bgpLocalAs != B.bgpPeerRemoteAs";
   } elseif ($vars['type'] == "internal") {
    $where = "AND D.bgpLocalAs = B.bgpPeerRemoteAs";
   }
 
-  if($vars['adminstatus'] == "stop")
+  if ($vars['adminstatus'] == "stop")
   {
     $where .= " AND (B.bgpPeerAdminStatus = 'stop')";
   }
 
-  if($vars['state'] == "down")
+  if ($vars['state'] == "down")
   {
     $where .= " AND (B.bgpPeerState != 'established')";
   }
