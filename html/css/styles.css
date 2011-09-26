@@ -1317,6 +1317,11 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
     behavior: url(/css/PIE.htc);
 }
 
+.tabBox .tabs img {
+  margin-top: -4px;
+}
+
+
 .tabBox .tabs .selected a {
     background: #FFF;
     -webkit-box-shadow: #CCC 0 0 .25em;
