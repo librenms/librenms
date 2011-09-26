@@ -7,79 +7,108 @@ if ($_SESSION['userlevel'] < '5')
 else
 {
 
+  $link_array = array('page' => 'routing', 'protocol' => 'bgp');
+
   print_optionbar_start('', '');
 
   echo('<span style="font-weight: bold;">BGP</span> &#187; ');
 
-  if (!$_GET['optb']) { $_GET['optb'] = "all"; }
+  if (!$vars['type']) { $vars['type'] = "all"; }
 
-  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "all") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/all/'.$graphs.'/">All</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "all") { echo("</span>"); }
-  echo(' | ');
-  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "internal") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/internal/'.$graphs.'/">Internal</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "internal") { echo("</span>"); }
-  echo(" | ");
-  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "external") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/external/'.$graphs.'/">External</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "external") { echo("</span>"); }
-  echo(" | ");
-  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "disabled") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/disabled/'.$graphs.'/">Disabled</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "disabled") { echo("</span>"); }
-  echo(" | ");
-  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "alerts") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/alerts/'.$graphs.'/">Alerts</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "alerts") { echo("</span>"); }
+  if ($vars['type'] == "all") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("All",$vars, array('type' => 'all')));
+  if ($vars['type'] == "all") { echo("</span>"); }
 
-  echo('');
+  echo(" | ");
+
+  if ($vars['type'] == "internal") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("Internal",$vars, array('type' => 'internal')));
+  if ($vars['type'] == "internal") { echo("</span>"); }
+
+  echo(" | ");
+
+  if ($vars['type'] == "external") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("External",$vars, array('type' => 'external')));
+  if ($vars['type'] == "external") { echo("</span>"); }
+
+  echo(" | ");
+
+  if ($vars['adminstatus'] == "stop")
+  {
+    echo("<span class='pagemenu-selected'>");
+    echo(generate_link("Shutdown",$vars, array('adminstatus' => NULL)));
+    echo("</span>");
+  } else {
+    echo(generate_link("Shutdown",$vars, array('adminstatus' => 'stop')));
+  }
+
+  echo(" | ");
+
+  if ($vars['state'] == "down") 
+  {
+    echo("<span class='pagemenu-selected'>");
+    echo(generate_link("Down",$vars, array('state' => NULL)));
+    echo("</span>");
+  } else {
+    echo(generate_link("Down",$vars, array('state' => 'down')));
+  }
+
   ## End BGP Menu
+
+  if(!isset($vars['view'])) { $vars['view'] = 'details'; }
 
   echo('<div style="float: right;">');
 
-  if (!$_GET['optc']) { $_GET['optc'] = "nographs"; }
+  if ($vars['view'] == "details") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("No Graphs",$vars, array('view' => 'details', 'graph' => 'NULL')));
+  if ($vars['view'] == "details") { echo("</span>"); }
 
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "nographs") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/'.$_GET['optb'].'/nographs/">No Graphs</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "nographs") { echo("</span>"); }
   echo(" | ");
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "updates") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/'.$_GET['optb'].'/updates/">Updates</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "updates") { echo("</span>"); }
+
+  if ($vars['graph'] == "updates") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("Updates",$vars, array('view' => 'graphs', 'graph' => 'updates')));
+  if ($vars['graph'] == "updates") { echo("</span>"); }
 
   echo(" | Prefixes: Unicast (");
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4unicast") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/'.$_GET['optb'].'/prefixes_ipv4unicast/">IPv4</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4unicast") { echo("</span>"); }
+  if ($vars['graph'] == "prefixes_ipv4unicast") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("IPv4",$vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv4unicast')));
+  if ($vars['graph'] == "prefixes_ipv4unicast") { echo("</span>"); }
+
   echo("|");
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv6unicast") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/'.$_GET['optb'].'/prefixes_ipv6unicast/">IPv6</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv6unicast") { echo("</span>"); }
+
+  if ($vars['graph'] == "prefixes_ipv6unicast") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("IPv6",$vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6unicast')));
+  if ($vars['graph'] == "prefixes_ipv6unicast") { echo("</span>"); }
+
   echo("|");
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4vpn") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/'.$_GET['optb'].'/prefixes_ipv4vpn/">VPNv4</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4vpn") { echo("</span>"); }
+
+  if ($vars['graph'] == "prefixes_ipv4vpn") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("VPNv4",$vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv4vpn')));
+  if ($vars['graph'] == "prefixes_ipv4vpn") { echo("</span>"); }
   echo(")");
 
   echo(" | Multicast (");
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4multicast") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/'.$_GET['optb'].'/prefixes_ipv4multicast/">IPv4</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv4multicast") { echo("</span>"); }
+  if ($vars['graph'] == "prefixes_ipv4multicast") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("IPv4",$vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv4multicast')));
+  if ($vars['graph'] == "prefixes_ipv4multicast") { echo("</span>"); }
+
   echo("|");
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv6multicast") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/'.$_GET['optb'].'/prefixes_ipv6multicast/">IPv6</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "prefixes_ipv6multicast") { echo("</span>"); }
+
+  if ($vars['graph'] == "prefixes_ipv6multicast") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("IPv4",$vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6multicast')));
+  if ($vars['graph'] == "prefixes_ipv6multicast") { echo("</span>"); }
   echo(")");
 
   echo(" | MAC (");
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "macaccounting_bits") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/'.$_GET['optb'].'/macaccounting_bits/">Bits</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "macaccounting_bits") { echo("</span>"); }
+  if ($vars['graph'] == "macaccounting_bits") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("Bits",$vars, array('view' => 'graphs', 'graph' => 'macaccounting_bits')));
+  if ($vars['graph'] == "macaccounting_bits") { echo("</span>"); }
+
   echo("|");
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "macaccounting_pkts") { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="routing/bgp/'.$_GET['optb'].'/macaccounting_pkts/">Packets</a>');
-  if ($_GET['opta'] == "bgp" && $_GET['optc'] == "macaccounting_pkts") { echo("</span>"); }
+
+  if ($vars['graph'] == "macaccounting_pkts") { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link("Packets",$vars, array('view' => 'graphs', 'graph' => 'macaccounting_pkts')));
+  if ($vars['graph'] == "macaccounting_pkts") { echo("</span>"); }
   echo(")");
 
 
@@ -93,14 +122,14 @@ else
 
   $i = "1";
 
-  if ($_GET['optb'] == "alerts")
+  if ($vars['type'] == "alerts")
   {
    $where = "AND (B.bgpPeerAdminStatus = 'start' or B.bgpPeerAdminStatus = 'running') AND B.bgpPeerState != 'established'";
-  } elseif ($_GET['optb'] == "disabled") {
+  } elseif ($vars['type'] == "disabled") {
    $where = "AND B.bgpPeerAdminStatus = 'stop'";
-  } elseif ($_GET['optb'] == "external") {
+  } elseif ($vars['type'] == "external") {
    $where = "AND D.bgpLocalAs != B.bgpPeerRemoteAs";
-  } elseif ($_GET['optb'] == "internal") {
+  } elseif ($vars['type'] == "internal") {
    $where = "AND D.bgpLocalAs = B.bgpPeerRemoteAs";
   }
 
@@ -161,21 +190,21 @@ else
 
 
     unset($invalid);
-    switch ($_GET['optc'])
+    switch ($vars['graph'])
     {
       case 'prefixes_ipv4unicast':
       case 'prefixes_ipv4multicast':
       case 'prefixes_ipv4vpn':
       case 'prefixes_ipv6unicast':
       case 'prefixes_ipv6multicast':
-        list(,$afisafi) = explode("_", $_GET['optc']);
+        list(,$afisafi) = explode("_", $vars['graph']);
         if (isset($peer['afisafi'][$afisafi])) { $peer['graph'] = 1; }
       case 'updates':
-        $graph_array['type']   = "bgp_" . $_GET['optc'];
+        $graph_array['type']   = "bgp_" . $vars['graph'];
         $graph_array['id']     = $peer['bgpPeer_id'];
     }
 
-    switch ($_GET['optc'])
+    switch ($vars['graph'])
     {
       case 'macaccounting_bits':
       case 'macaccounting_pkts':
@@ -185,11 +214,11 @@ else
         {
           $peer['graph']       = 1;
           $graph_array['id']   = $acc['ma_id'];
-          $graph_array['type'] = $_GET['optc'];
+          $graph_array['type'] = $vars['graph'];
         }
     }
 
-    if ($_GET['optc'] == 'updates') { $peer['graph'] = 1; }
+    if ($vars['graph'] == 'updates') { $peer['graph'] = 1; }
 
     if ($peer['graph'])
     {

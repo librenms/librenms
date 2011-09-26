@@ -14,37 +14,36 @@ $type_text['vrf'] = "VRFs";
 
 print_optionbar_start();
 
-#if (!$_GET['opta']) { $_GET['opta'] = "overview"; }
+#if (!$vars['protocol']) { $vars['protocol'] = "overview"; }
 
 echo("<span style='font-weight: bold;'>Routing</span> &#187; ");
 
 unset($sep);
 foreach ($routing_count as $type => $value)
 {
-  if (!$_GET['opta']) { $_GET['opta'] = $type; }
+  if (!$vars['protocol']) { $vars['protocol'] = $type; }
 
   echo($sep);
 
-  if ($_GET['opta'] == $type)
+  if ($vars['protocol'] == $type)
   {
     echo('<span class="pagemenu-selected">');
   }
-
-  echo("<a href='routing/" . $type . "/'> " . $type_text[$type] ." (".$routing_count[$type].")</a>");
-  if ($_GET['opta'] == $type) { echo("</span>"); }
+  echo(generate_link($type_text[$type] ." (".$routing_count[$type].")",array('page'=> 'routing', 'protocol' => $type)));
+  if ($vars['protocol'] == $type) { echo("</span>"); }
   $sep = " | ";
 }
 
 print_optionbar_end();
 
-switch ($_GET['opta'])
+switch ($vars['protocol'])
 {
   case 'overview':
   case 'bgp':
   case 'vrf':
   case 'cef':
   case 'ospf':
-    include('pages/routing/'.$_GET['opta'].'.inc.php');
+    include('pages/routing/'.$vars['protocol'].'.inc.php');
     break;
   default:
     echo("<h2>Error. Please report this to observium developers.</h2>");
