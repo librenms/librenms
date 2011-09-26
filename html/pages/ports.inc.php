@@ -329,8 +329,6 @@ list($format, $subformat) = explode("_", $vars['format']);
 
 $ports = dbFetchRows($query, $param);
 
-echo(count($ports));
-
 if(file_exists('pages/ports/'.$format.'.inc.php'))
 {
  include('pages/ports/'.$format.'.inc.php');
