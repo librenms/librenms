@@ -119,6 +119,18 @@ foreach (dbFetchRows("SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr
         <input type=checkbox id="deleted" name="deleted" value=1 <?php if ($vars['deleted']) { echo("checked"); } ?> > Deleted</input>
         </label>
         </td>
+        <td width=120>
+        <select name="sort" id="sort" style="width: 110px;">
+          <option value="">Host & Port Name</option>
+          <option value="traffic"  <?php if ($vars['sort'] == "traffic")  { echo("selected"); } ?>>Traffic</option>
+          <option value="traffic_in"  <?php if ($vars['sort'] == "traffic_in")  { echo("selected"); } ?>>Traffic In</option>
+          <option value="traffic_out" <?php if ($vars['sort'] == "traffic_out") { echo("selected"); } ?>>Traffic Out</option>
+          <option value="packets"  <?php if ($vars['sort'] == "packets")  { echo("selected"); } ?>>Packets</option>
+          <option value="packets_in"  <?php if ($vars['sort'] == "packets_in")  { echo("selected"); } ?>>Packets In</option>
+          <option value="packets_out" <?php if ($vars['sort'] == "packets_out") { echo("selected"); } ?>>Packets Out</option>
+          <option value="errors"  <?php if ($vars['sort'] == "errors")  { echo("selected"); } ?>>Errors</option>
+        </select>
+        </td>
         <td style="text-align: center;" width=50>
         <input style="align:right; padding: 10px;" type=submit class=submit value=Search></div>
         <br />
@@ -206,12 +218,6 @@ echo('</div>');
 
 print_optionbar_end();
 
-#if ($_SESSION['userlevel'] >= '5') {
-#  $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ORDER BY D.hostname, I.ifDescr";
-#} else {
-#  $sql = "SELECT * FROM `ports` AS I, `devices` AS D, `devices_perms` AS P WHERE I.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, I.ifDescr";
-#}
-
 $param = array();
 
 # FIXME block below is not totally used, at least the iftype stuff is bogus?
@@ -288,13 +294,42 @@ foreach($vars as $var => $value)
   }
 }
 
-$query = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ".$where." ORDER BY D.hostname, I.ifIndex";
+switch ($vars['sort'])
+{
+  case 'traffic':
+    $query_sort = " ORDER BY (I.ifInOctets_rate+I.ifOutOctets_rate)";
+    break;
+  case 'traffic_in':
+    $query_sort = " ORDER BY I.ifInOctets_rate";
+    break;
+  case 'traffic_out':
+    $query_sort = " ORDER BY I.ifOutOctets_rate";
+    break;
+  case 'packets':
+    $query_sort = " ORDER BY (I.ifInUcastPkts_rate+I.ifOutUcastPkts_rate)";
+    break;
+  case 'packets_in':
+    $query_sort = " ORDER BY I.ifInUcastPkts_rate";
+    break;
+  case 'packets_out':
+    $query_sort = " ORDER BY I.ifOutUcastPkts_rate";
+    break;
+  case 'errors':
+    $query_sort = " ORDER BY (I.ifInErrors + I.ifOutErrors)";
+    break;
+  default:
+    $query_sort = " ORDER BY D.hostname, I.ifIndex";
+}
+
+$query = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ".$where." ".$query_sort." DESC";
 
 $row = 1;
 
 list($format, $subformat) = explode("_", $vars['format']);
 
 $ports = dbFetchRows($query, $param);
+
+echo(count($ports));
 
 if(file_exists('pages/ports/'.$format.'.inc.php'))
 {
