@@ -34,7 +34,7 @@ foreach ($ports as $port)
     $link_array['page'] = "graphs";
     unset($link_array['height'], $link_array['width'], $link_array['legend']);
     $link = generate_url($link_array);
-    $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - " . $port['ifDescr']);
+    $overlib_content = generate_overlib_content($graph_array, $port['hostname'] . " - " . $port['label']);
     $graph_array['title']  = "yes";
     $graph_array['width'] = 315; $graph_array['height'] = 119; 
     $graph =  generate_graph_tag($graph_array);

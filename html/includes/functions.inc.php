@@ -82,7 +82,7 @@ function generate_overlib_content($graph_array, $text)
 {
     global $config;
 
-    $overlib_content = '<div style="width: 580px;"><span style="font-weight: bold; font-size: 16px;">'.$text."</span>";
+    $overlib_content = '<div style="width: 580px;"><span style="font-weight: bold; font-size: 16px;">'.$text."</span><br />";
     foreach (array('day','week','month','year') as $period)
     {
       $graph_array['from']        = $config['time'][$period];
@@ -421,9 +421,9 @@ function generate_port_thumbnail($args)
 function print_optionbar_start ($height = 0, $width = 0, $marginbottom = 5)
 {
   echo("
-    <div class='rounded-5px' style='display: block; background: #e5e5e5; text-align: left; margin-top: 0px;
+    <div class='rounded-5px' style='border: 1px solid #ccc; display: block; background: #eee; text-align: left; margin-top: 0px;
     margin-bottom: ".$marginbottom."px; " . ($width ? 'max-width: ' . $width . (strstr($width,'%') ? '' : 'px') . '; ' : '') . "
-    padding: 7px 14px'>");
+    padding: 7px 14px 8px 14px'>");
 }
 
 function print_optionbar_end()

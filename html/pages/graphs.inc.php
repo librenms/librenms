@@ -31,7 +31,12 @@ if (!$auth)
 {
   include("includes/error-no-perm.inc.php");
 } else {
-  if (isset($config['graph_types'][$type][$subtype]['descr'])) { $title .= " :: ".$config['graph_types'][$type][$subtype]['descr']; } else { $title .= " :: ".$graph_type; }
+  if (isset($config['graph_types'][$type][$subtype]['descr']))
+  {
+    $title .= " :: ".$config['graph_types'][$type][$subtype]['descr'];
+  } else {
+    $title .= " :: ".ucfirst($subtype);
+  }
 
   $graph_array = $vars;
   $graph_array['height'] = "60";

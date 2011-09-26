@@ -49,7 +49,10 @@ ul ul ul { list-style: square outside; }
 
 .pagemenu-selected {
   font-weight: bold; 
-  background-color: #cecece; 
+  background-color: #dfdfdf; 
+
+  border: 1px solid #c0c0c0;
+  margin: -1px;
 
   padding:3px 8px 4px 8px;
 
@@ -57,6 +60,11 @@ ul ul ul { list-style: square outside; }
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
   border-radius: 10px;
+
+  -webkit-box-shadow: #CCC 0 0 2px;
+  -moz-box-shadow: #CCC 0 0 2px;
+  box-shadow: #CCC 0 0 2px;
+
 
 }
 
