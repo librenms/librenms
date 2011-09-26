@@ -35,14 +35,6 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hos
         <option value="up" <?php if ($vars['state'] == "up") { echo("selected"); } ?>>Up</option>
         <option value="down"<?php if ($vars['state'] == "down") { echo("selected"); } ?>>Down</option>
         <option value="admindown" <?php if ($vars['state'] == "admindown") { echo("selected"); } ?>>Shutdown</option>
-        <option value="errors" <?php if ($vars['state'] == "errors") { echo("selected"); } ?>>Errors</option>
-        <option value="ignored" <?php if ($vars['state'] == "ignored") { echo("selected"); } ?>>Ignored</option>
-        <option value="ethernet" <?php if ($vars['state'] == "ethernet") { echo("selected"); } ?>>Ethernet</option>
-        <option value="l2vlan" <?php if ($vars['state'] == "l2vlan") { echo("selected"); } ?>>L2 VLAN</option>
-        <option value="sonet" <?php if ($vars['state'] == "sonet") { echo("selected"); } ?>>SONET</option>
-        <option value="propvirtual" <?php if ($vars['state'] == "propvirtual") { echo("selected"); } ?>>Virtual</option>
-        <option value="ppp" <?php if ($vars['state'] == "ppp") { echo("selected"); } ?>>PPP</option>
-        <option value="loopback" <?php if ($vars['state'] == "loopback") { echo("selected"); } ?>>Loopback</option>
       </select>
       <br />
 
@@ -270,6 +262,12 @@ foreach($vars as $var => $value)
       case 'port_descr_type':
         $where .= " AND I.$var LIKE ?";
         $param[] = "%".$value."%";
+        break;
+      case 'errors':
+        if ($value == 1)
+        {
+          $where .= " AND (I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0')";
+        }
         break;
       case 'state':
         if ($value == "down")
