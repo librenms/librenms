@@ -11,7 +11,7 @@ $graphs = array('powerdns_latency'  => 'Latency',
                 'powerdns_queries_udp' => 'Detail UDP IPv4/IPv6 Queries and Answers');
 
 foreach ($graphs as $key => $text) {
-  $graph_type 		 = $key;
+  $graph_type                  = $key;
   $graph_array['height'] = "100";
   $graph_array['width']  = "215";
   $graph_array['to']     = $now;

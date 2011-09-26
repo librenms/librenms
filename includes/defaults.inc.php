@@ -71,19 +71,19 @@ $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
 
 ### Autodiscovery Settings
 
-$config['autodiscovery']['xdp']                = true; ## Autodiscover hosts via discovery protocols
+$config['autodiscovery']['xdp']            = true; ## Autodiscover hosts via discovery protocols
 $config['autodiscovery']['ospf']           = true; ## Autodiscover hosts via OSPF
-$config['autodiscovery']['bgp']         = true; ## Autodiscover hosts via BGP
-$config['autodiscovery']['snmpscan']        = true; ## autodiscover hosts via SNMP scanning
+$config['autodiscovery']['bgp']            = true; ## Autodiscover hosts via BGP
+$config['autodiscovery']['snmpscan']       = true; ## autodiscover hosts via SNMP scanning
 
-$config['discover_services']              = false; ## Autodiscover services via SNMP on devices of type "server"
+$config['discover_services']               = false; ## Autodiscover services via SNMP on devices of type "server"
 
 ### Alerting Settings
 
 $config['alerts']['email']['default']      = NULL;    ## Default alert recipient
 $config['alerts']['email']['default_only'] = FALSE;   ## Only use default recipient
 $config['alerts']['email']['enable']       = TRUE;    ## Enable email alerts
-$config['alerts']['bgp']['whitelist']	   = NULL;    ## Populate as an array() with ASNs to alert on.
+$config['alerts']['bgp']['whitelist']      = NULL;    ## Populate as an array() with ASNs to alert on.
 
 $config['uptime_warning']                  = "84600"; ## Time in seconds to display a "Device Rebooted" Alert. 0 to disable warnings.
 
@@ -149,8 +149,8 @@ $config['enable_eigrp']                 = 1; # Enable EIGRP session collection a
 $config['enable_syslog']                = 0; # Enable Syslog
 $config['enable_inventory']             = 1; # Enable Inventory
 $config['enable_pseudowires']           = 1; # Enable Pseudowires
-$config['enable_vrfs']                   = 1; # Enable VRFs
-$config['enable_printers']                  = 0; # Enable Printer support
+$config['enable_vrfs']                  = 1; # Enable VRFs
+$config['enable_printers']              = 0; # Enable Printer support
 
 ### Ports extension modules
 
@@ -164,14 +164,14 @@ $config['enable_ports_poe']             = 0; # Enable PoE stats collection
 ### Billing System Configuration
 
 $config['enable_billing']               = 0; # Enable Billing
-$config['billing']['customer_autoadd']        = 0; # Enable Auto-add bill per customer
-$config['billing']['circuit_autoadd']        = 0; # Enable Auto-add bill per circuit_id
-$config['billing']['bill_autoadd']        = 0; # Enable Auto-add bill per bill_id
+$config['billing']['customer_autoadd']  = 0; # Enable Auto-add bill per customer
+$config['billing']['circuit_autoadd']   = 0; # Enable Auto-add bill per circuit_id
+$config['billing']['bill_autoadd']      = 0; # Enable Auto-add bill per bill_id
 
 ### External Integration
 
-#$config['rancid_configs'][]               = '/var/lib/rancid/network/configs/';
-$config['rancid_ignorecomments']         = 0; # Ignore lines starting with #
+#$config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
+$config['rancid_ignorecomments']        = 0; # Ignore lines starting with #
 #$config['collectd_dir']                 = '/var/lib/collectd/rrd';
 
 # NFSen RRD dir.
@@ -350,8 +350,6 @@ $config['poller_modules']['cisco-remote-access-monitor']  = 1;
 $config['poller_modules']['cisco-cef']                    = 1;
 $config['poller_modules']['cisco-mac-accounting']         = 1;
 $config['poller_modules']['cipsec-tunnels']                  = 1;
-
-      #include("includes/polling/altiga-ssl.inc.php");
 
 ## List of discovery modules. Need to be in this array to be
 ## considered for execution.

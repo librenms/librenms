@@ -251,7 +251,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     </a>
   </li>');
     }
-     echo("</ul>"); 
+     echo("</ul>");
  }
 
   if (device_permitted($device['device_id']) || $check_device == $vars['device']) {
