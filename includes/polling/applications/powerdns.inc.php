@@ -1,5 +1,7 @@
 <?php
 
+## FIXME very oldskool snmp code used instead of 2009+ snmp_* functions...
+
 ## Polls powerdns statistics from script via SNMP
 
 $powerdns_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-powerdns-".$app['app_id'].".rrd";
