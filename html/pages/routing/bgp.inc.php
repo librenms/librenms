@@ -22,13 +22,13 @@ else
   echo(" | ");
 
   if ($vars['type'] == "internal") { echo("<span class='pagemenu-selected'>"); }
-  echo(generate_link("Internal",$vars, array('type' => 'internal')));
+  echo(generate_link("iBGP",$vars, array('type' => 'internal')));
   if ($vars['type'] == "internal") { echo("</span>"); }
 
   echo(" | ");
 
   if ($vars['type'] == "external") { echo("<span class='pagemenu-selected'>"); }
-  echo(generate_link("External",$vars, array('type' => 'external')));
+  echo(generate_link("eBGP",$vars, array('type' => 'external')));
   if ($vars['type'] == "external") { echo("</span>"); }
 
   echo(" | ");
@@ -40,6 +40,17 @@ else
     echo("</span>");
   } else {
     echo(generate_link("Shutdown",$vars, array('adminstatus' => 'stop')));
+  }
+
+  echo("|");
+
+  if ($vars['adminstatus'] == "start")
+  {
+    echo("<span class='pagemenu-selected'>");
+    echo(generate_link("Enabled",$vars, array('adminstatus' => NULL)));
+    echo("</span>");
+  } else {
+    echo(generate_link("Enabled",$vars, array('adminstatus' => 'start')));
   }
 
   echo(" | ");
@@ -122,15 +133,21 @@ else
 
   $i = "1";
 
-  if ($vars['type'] == "alerts")
+  if ($vars['type'] == "external") 
   {
-   $where = "AND (B.bgpPeerAdminStatus = 'start' or B.bgpPeerAdminStatus = 'running') AND B.bgpPeerState != 'established'";
-  } elseif ($vars['type'] == "disabled") {
-   $where = "AND B.bgpPeerAdminStatus = 'stop'";
-  } elseif ($vars['type'] == "external") {
    $where = "AND D.bgpLocalAs != B.bgpPeerRemoteAs";
   } elseif ($vars['type'] == "internal") {
    $where = "AND D.bgpLocalAs = B.bgpPeerRemoteAs";
+  }
+
+  if($vars['adminstatus'] == "stop")
+  {
+    $where .= " AND (B.bgpPeerAdminStatus = 'stop')";
+  }
+
+  if($vars['state'] == "down")
+  {
+    $where .= " AND (B.bgpPeerState != 'established')";
   }
 
   $peer_query = "select * from bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id ".$where." ORDER BY D.hostname, B.bgpPeerRemoteAs, B.bgpPeerIdentifier";
