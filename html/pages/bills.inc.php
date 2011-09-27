@@ -74,7 +74,7 @@ if ($_GET['opta'] == "add")
 
 ?>
 
-	<table cellpadding=7 cellspacing=0 class=devicetable width=100%>
+        <table cellpadding=7 cellspacing=0 class=devicetable width=100%>
 <form method='post' action=''>
 <tr>
              <td width='40' align=center valign=middle><div style='font-weight: bold; font-size: 16px;'>Bills</div></td>
@@ -85,7 +85,7 @@ if ($_GET['opta'] == "add")
       <select name='os' id='os'>
       <option value=''>All Types</option>
       <option value=''>CDR</option>
-      <option value=''>95th</option>			
+      <option value=''>95th</option>
       <option value=''>Quota</option>
        </select>
              </td>
@@ -101,11 +101,11 @@ if ($_GET['opta'] == "add")
       <option value=''>All Customers</option>
        </select>
      </td>
-		 <td>
+                 <td>
          <input type=submit class=submit value=Search>
              </td>
              <td width='80' style='font-weight:bold; font-size: 12px;'>
-						   <a href='bills/add/'><img src="images/16/add.png" align=absmiddle alt="Add"> Add Bill</a>
+                                                   <a href='bills/add/'><img src="images/16/add.png" align=absmiddle alt="Add"> Add Bill</a>
              </td>
            </tr>
   </form>
@@ -133,12 +133,12 @@ if ($_GET['opta'] == "add")
 
       if ($bill['bill_type'] == "cdr")
       {
-         $type = "CDR"; 
+         $type = "CDR";
          $allowed = formatRates($bill['bill_cdr'] * 1000);
          $used    = formatRates($rate_data['rate_95th'] * 1000);
          $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100,2);
       } elseif ($bill['bill_type'] == "quota") {
-         $type = "Quota"; 
+         $type = "Quota";
          $allowed = formatStorage($bill['bill_gb']* 1024 * 1024 * 1024);
          $used    = formatStorage($rate_data['total_data'] * 1024 * 1024);
          $percent = round(($rate_data['total_data'] / ($bill['bill_gb'] * 1024)) * 100,2);
@@ -154,7 +154,7 @@ if ($_GET['opta'] == "add")
              <td width='7'></td>
              <td width='250'><a href='bill/".$bill['bill_id']."/'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a></td>
              <td>$notes</td>
-	     <td>$type</td>
+             <td>$type</td>
              <td>$allowed</td>
              <td>$used</td>
              <td width=370>".print_percentage_bar (350, 20, $perc, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right'])."</td>

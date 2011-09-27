@@ -14,7 +14,7 @@ if ($vars['view'] == 'graphs' || $vars['view'] == 'minigraphs')
 }
 
 if (!$vars['view']) { $vars['view'] = "basic"; }
-  
+
 $menu_options['basic']   = 'Basic';
 #$menu_options['details'] = 'Details';
 
