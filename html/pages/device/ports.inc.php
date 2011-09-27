@@ -95,16 +95,15 @@ if ($vars['view'] == 'minigraphs')
   echo("<div style='margin: 0px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
   $i = "1";
 
-  global $port_cache;
-  global $port_index_cache;  
+  global $port_cache, $port_index_cache;
 
-  $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' ORDER BY `ifIndex` ASC", array($device['device_id'])); 
+  $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' ORDER BY `ifIndex` ASC", array($device['device_id']));
   ### As we've dragged the whole database, lets pre-populate our caches :)
   ### FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
   foreach($ports as $port)
   {
     $port_cache[$port['interface_id']] = $port;
-    $port_index_cache[$port['device_id']][$port['ifIndex']] = $port; 
+    $port_index_cache[$port['device_id']][$port['ifIndex']] = $port;
   }
 
   foreach ($ports as $port)
