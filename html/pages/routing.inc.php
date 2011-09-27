@@ -23,15 +23,19 @@ foreach ($routing_count as $type => $value)
 {
   if (!$vars['protocol']) { $vars['protocol'] = $type; }
 
-  echo($sep);
+  echo($sep); unset($sep);
 
   if ($vars['protocol'] == $type)
   {
     echo('<span class="pagemenu-selected">');
   }
-  echo(generate_link($type_text[$type] ." (".$routing_count[$type].")",array('page'=> 'routing', 'protocol' => $type)));
+  if ($routing_count[$type])
+  {
+    echo(generate_link($type_text[$type] ." (".$routing_count[$type].")",array('page'=> 'routing', 'protocol' => $type)));
+    $sep = " | ";
+  }
+
   if ($vars['protocol'] == $type) { echo("</span>"); }
-  $sep = " | ";
 }
 
 print_optionbar_end();
