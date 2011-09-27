@@ -429,12 +429,12 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
           <ul>
 
 <?php
-  if ($_SESSION['userlevel'] >= '5' && $routing_count['vrf']) { echo('<li><a href="routing/vrf/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li> <li><hr width=140></li> '); }
+  if ($_SESSION['userlevel'] >= '5' && $routing_count['vrf']) { echo('<li><a href="routing/protocol=vrf/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li> <li><hr width=140></li> '); }
 
   if ($_SESSION['userlevel'] >= '5' && $routing_count['ospf'])
   {
     echo('
-        <li><a href="routing/ospf/all/nographs/"><img src="images/16/text_letter_omega.png" border="0" align="absmiddle" /> OSPF Devices </a></li>
+        <li><a href="routing/protocol=ospf/"><img src="images/16/text_letter_omega.png" border="0" align="absmiddle" /> OSPF Devices </a></li>
         <li><hr width=140></li>
         ');
   }
@@ -444,18 +444,18 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
   if ($_SESSION['userlevel'] >= '5' && $routing_count['bgp'])
   {
     echo('
-        <li><a href="routing/bgp/all/nographs/"><img src="images/16/link.png" border="0" align="absmiddle" /> BGP All Sessions </a></li>
+        <li><a href="routing/protocol=bgp/type=all/graph=NULL/"><img src="images/16/link.png" border="0" align="absmiddle" /> BGP All Sessions </a></li>
 
-        <li><a href="routing/bgp/external/nographs/"><img src="images/16/world_link.png" border="0" align="absmiddle" /> BGP External</a></li>
-        <li><a href="routing/bgp/internal/nographs/"><img src="images/16/brick_link.png" border="0" align="absmiddle" /> BGP Internal</a></li>');
+        <li><a href="routing/protocol=bgp/type=external/graph=NULL/"><img src="images/16/world_link.png" border="0" align="absmiddle" /> BGP External</a></li>
+        <li><a href="routing/protocol=bgp/type=internal/graph=NULL/"><img src="images/16/brick_link.png" border="0" align="absmiddle" /> BGP Internal</a></li>');
   }
 
   ## Do Alerts at the bottom
   if ($bgp_alerts)
-  {
+  { ## FIXME link below broken!
     echo('
         <li><hr width=140></li>
-        <li><a href="routing/bgp/alerts/"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerted BGP (' . $bgp_alerts . ')</a></li>
+        <li><a href="routing/protocol=bgp/alerts/"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerted BGP (' . $bgp_alerts . ')</a></li>
    ');
   }
 
