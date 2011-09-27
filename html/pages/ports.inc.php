@@ -321,7 +321,7 @@ switch ($vars['sort'])
     $query_sort = " ORDER BY D.hostname, I.ifIndex ASC";
 }
 
-$query = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ".$where." ".$query_sort." DESC";
+$query = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ".$where." ".$query_sort;
 
 $row = 1;
 
