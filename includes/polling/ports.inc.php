@@ -90,6 +90,8 @@ if ($device['os_group'] == "ios")
 
 }
 
+$port_stats = snmpwalk_cache_oid($device, "dot1qPortVlanTable", $port_stats, "Q-BRIDGE-MIB");
+
 $polled = time();
 
 /// End Building SNMP Cache Array
@@ -192,12 +194,17 @@ foreach ($ports as $port)
     }
 
     /// Set VLAN and Trunk
-    if(isset($this_port['vlanTrunkPortEncapsulationOperType']) && $this_port['vlanTrunkPortEncapsulationOperType'] != "notApplicable")
+    if (isset($this_port['vlanTrunkPortEncapsulationOperType']) && $this_port['vlanTrunkPortEncapsulationOperType'] != "notApplicable")
     {
       $this_port['ifTrunk'] = $this_port['vlanTrunkPortEncapsulationOperType'];
     }
     $this_port['ifVlan']  = $this_port['vmVlan'];
     if(isset($this_port['vlanTrunkPortNativeVlan'])) { $this_port['ifVlan'] = $this_port['vlanTrunkPortNativeVlan']; }
+    
+    if (isset($this_port['dot1qPvid']))
+    {
+      $this_port['ifVlan'] = $this_port['dot1qPvid'];
+    }
 
     /// Update IF-MIB data
     foreach ($data_oids as $oid)
