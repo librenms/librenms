@@ -54,7 +54,7 @@ foreach ($graph_types as $type => $descr)
   echo(generate_link($descr,$link_array,array('view'=>'graphs','graph'=>$type)));
   if ($vars['graph'] == $type && $vars['view'] == "graphs") { echo("</span>"); }
 
-  echo('(');
+  echo(' (');
   if ($vars['graph'] == $type && $vars['view'] == "minigraphs") { echo("<span class='pagemenu-selected'>"); }
   echo(generate_link('Mini',$link_array,array('view'=>'minigraphs','graph'=>$type)));
   if ($vars['graph'] == $type && $vars['view'] == "minigraphs") { echo("</span>"); }
