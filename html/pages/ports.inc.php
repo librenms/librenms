@@ -297,28 +297,28 @@ foreach($vars as $var => $value)
 switch ($vars['sort'])
 {
   case 'traffic':
-    $query_sort = " ORDER BY (I.ifInOctets_rate+I.ifOutOctets_rate)";
+    $query_sort = " ORDER BY (I.ifInOctets_rate+I.ifOutOctets_rate) DESC";
     break;
   case 'traffic_in':
-    $query_sort = " ORDER BY I.ifInOctets_rate";
+    $query_sort = " ORDER BY I.ifInOctets_rate DESC";
     break;
   case 'traffic_out':
-    $query_sort = " ORDER BY I.ifOutOctets_rate";
+    $query_sort = " ORDER BY I.ifOutOctets_rate DESC";
     break;
   case 'packets':
-    $query_sort = " ORDER BY (I.ifInUcastPkts_rate+I.ifOutUcastPkts_rate)";
+    $query_sort = " ORDER BY (I.ifInUcastPkts_rate+I.ifOutUcastPkts_rate) DESC";
     break;
   case 'packets_in':
-    $query_sort = " ORDER BY I.ifInUcastPkts_rate";
+    $query_sort = " ORDER BY I.ifInUcastPkts_rate DESC";
     break;
   case 'packets_out':
-    $query_sort = " ORDER BY I.ifOutUcastPkts_rate";
+    $query_sort = " ORDER BY I.ifOutUcastPkts_rate DESC";
     break;
   case 'errors':
-    $query_sort = " ORDER BY (I.ifInErrors + I.ifOutErrors)";
+    $query_sort = " ORDER BY (I.ifInErrors + I.ifOutErrors) DESC";
     break;
   default:
-    $query_sort = " ORDER BY D.hostname, I.ifIndex";
+    $query_sort = " ORDER BY D.hostname, I.ifIndex ASC";
 }
 
 $query = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ".$where." ".$query_sort." DESC";
