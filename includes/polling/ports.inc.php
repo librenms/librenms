@@ -201,7 +201,7 @@ foreach ($ports as $port)
     $this_port['ifVlan']  = $this_port['vmVlan'];
     if (isset($this_port['vlanTrunkPortNativeVlan'])) { $this_port['ifVlan'] = $this_port['vlanTrunkPortNativeVlan']; }
 
-    if (isset($this_port['dot1qPvid']))
+    if (!isset($this_port['ifVlan']) && isset($this_port['dot1qPvid']))
     {
       $this_port['ifVlan'] = $this_port['dot1qPvid'];
     }
