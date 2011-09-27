@@ -42,7 +42,7 @@ else
     echo(generate_link("Shutdown",$vars, array('adminstatus' => 'stop')));
   }
 
-  echo("|");
+  echo(" | ");
 
   if ($vars['adminstatus'] == "start")
   {

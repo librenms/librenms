@@ -10,10 +10,8 @@ echo("<td class=list-bold>");
 
 foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?", array($device['device_id'], $vlan['vlan_vlan'])) as $port)
 {
-  if ($vars['view'])
+  if ($vars['view'] == "graphs")
   {
-    $graph_type = 'port_' . $vars['view'];
-
     echo("<div style='display: block; padding: 2px; margin: 2px; min-width: 139px; max-width:139px; min-height:85px; max-height:85px; text-align: center; float: left; background-color: ".$list_colour_b_b.";'>
     <div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>
     <a href='device/device=".$device['device_id']."/tab=port/port=".$port['interface_id']."/' onmouseover=\"return overlib('\
