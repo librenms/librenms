@@ -149,7 +149,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     if ($high_limit != $sensor_entry['sensor_limit'])
     {
-      $update = array('sensor_limit' => ($high_limit == NULL ? NULL : $high_limit));
+      $update = array('sensor_limit' => ($high_limit == NULL ? array('NULL') : $high_limit));
       $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
       if ($debug) { echo("( $updated updated )\n"); }
       echo("H");
@@ -168,7 +168,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     if ($sensor_entry['sensor_limit_low'] != $low_limit)
     {
-      $update = array('sensor_limit_low' => ($low_limit == NULL ? NULL : $low_limit));
+      $update = array('sensor_limit_low' => ($low_limit == NULL ? array('NULL') : $low_limit));
       $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
       if ($debug) { echo("( $updated updated )\n"); }
       echo("L");
