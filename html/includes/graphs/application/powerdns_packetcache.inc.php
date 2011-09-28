@@ -1,36 +1,32 @@
 <?php
 
-$scale_min = 0;
+    include("includes/graphs/common.inc.php");
 
-include("includes/graphs/common.inc.php");
+    $scale_min		= 0;
+    $colours		= "blue";
+    $nototal		= 0;
+    $unit_text		= "Packets/sec";
+    $rrd_filename	= $config['rrd_dir'] . "/" . $device['hostname'] . "/app-powerdns-".$app['app_id'].".rrd";
+    $array		= array(
+			    'pc_hit' => array('descr' => 'Hits', 'colour' => '008800FF'),
+			    'pc_miss' => array('descr' => 'Misses', 'colour' => '880000FF'),
+			    'pc_size' => array('descr' => 'Size', 'colour' => '006699FF'),
+			);
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-powerdns-".$app['app_id'].".rrd";
+    $i			= 0;
 
+    if (is_file($rrd_filename)) {
+	foreach ($array as $ds => $vars) {
+	    $rrd_list[$i]['filename']	= $rrd_filename;
+	    $rrd_list[$i]['descr']	= $vars['descr'];
+	    $rrd_list[$i]['ds']		= $ds;
+	    $rrd_list[$i]['colour']	= $vars['colour'];
+	    $i++;
+	}
+    } else {
+	echo("file missing: $file");
+    }
 
-$array = array('pc_hit' => array('descr' => 'Hits', 'colour' => '008800FF'),
-               'pc_miss' => array('descr' => 'Misses', 'colour' => '880000FF'),
-               'pc_size' => array('descr' => 'Size', 'colour' => '006699FF'),
-);
-
-
-$i = 0;
-if (is_file($rrd_filename))
-{
-  foreach ($array as $ds => $vars)
-  {
-    $rrd_list[$i]['filename'] = $rrd_filename;
-    $rrd_list[$i]['descr'] = $vars['descr'];
-    $rrd_list[$i]['ds'] = $ds;
-    $rrd_list[$i]['colour'] = $vars['colour'];
-    $i++;
-  }
-} else { echo("file missing: $file");  }
-
-$colours   = "blue";
-$nototal   = 0;
-$unit_text = "Packets/sec";
-
-include("includes/graphs/generic_multi_simplex_seperated.inc.php");
-
+    include("includes/graphs/generic_multi_simplex_seperated.inc.php");
 
 ?>
