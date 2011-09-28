@@ -30,8 +30,6 @@ function dbQuery($sql, $parameters = array()) {
 		$time_start = microtime(true);
 	*/
 
-#	echo($fullSql);
-
 	$result = mysql_query($fullSql); // sets $this->result
 	/*
 	if($this->logFile) {
@@ -286,6 +284,7 @@ function dbFetchKeyValue($sql, $parameters = array()) {
  */
 function dbMakeQuery($sql, $parameters) {
     // bypass extra logic if we have no parameters
+
     if(sizeof($parameters) == 0)
 			return $sql;
 
@@ -300,6 +299,7 @@ function dbMakeQuery($sql, $parameters) {
 				$namedParams[ ':' . $key ] = $value;
 			}
 		}
+
 		// sort namedParams in reverse to stop substring squashing
 		krsort($namedParams);
 
