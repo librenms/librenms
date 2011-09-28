@@ -9,6 +9,8 @@ foreach (explode(",", $id) as $ifid)
   {
     $rrd_list[$i]['filename'] = $config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
     $rrd_list[$i]['descr'] = $port['hostname'] . " " . $port['ifDescr'];
+    $rrd_list[$i]['descr_in'] = $port['hostname'];
+    $rrd_list[$i]['descr_out'] = $port['ifDescr'];
     $i++;
   }
 }
