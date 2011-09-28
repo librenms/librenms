@@ -179,68 +179,73 @@ if (strpos($port['label'], "oopback") === false && !$graph_type)
     }
   }
 
-  foreach ($int_links as $int_link)
+  if ($port_details)
   {
-    $link_if = dbFetchRow("SELECT * from ports AS I, devices AS D WHERE I.device_id = D.device_id and I.interface_id = ?", array($int_link));
+         foreach ($int_links as $int_link)
+         {
+               $link_if = dbFetchRow("SELECT * from ports AS I, devices AS D WHERE I.device_id = D.device_id and I.interface_id = ?", array($int_link));
 
-    echo("$br");
+               echo("$br");
 
-    if ($int_links_phys[$int_link]) { echo("<img align=absmiddle src='images/16/connect.png'> "); } else {
-                                      echo("<img align=absmiddle src='images/16/bullet_go.png'> "); }
+               if ($int_links_phys[$int_link]) { echo("<img align=absmiddle src='images/16/connect.png'> "); } else {
+                                                                                 echo("<img align=absmiddle src='images/16/bullet_go.png'> "); }
 
-    echo("<b>" . generate_port_link($link_if, makeshortif($link_if['label'])) . " on " . generate_device_link($link_if, shorthost($link_if['hostname'])));
+               echo("<b>" . generate_port_link($link_if, makeshortif($link_if['label'])) . " on " . generate_device_link($link_if, shorthost($link_if['hostname'])));
 
-    if ($int_links_v6[$int_link]) { echo(" <b style='color: #a10000;'>v6</b>"); }
-    if ($int_links_v4[$int_link]) { echo(" <b style='color: #00a100'>v4</b>"); }
-    $br = "<br />";
+               if ($int_links_v6[$int_link]) { echo(" <b style='color: #a10000;'>v6</b>"); }
+               if ($int_links_v4[$int_link]) { echo(" <b style='color: #00a100'>v4</b>"); }
+               $br = "<br />";
+         }
   }
 #     unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 }
 
-foreach (dbFetchRows("SELECT * FROM `pseudowires` WHERE `interface_id` = ?", array($port['interface_id'])) as $pseudowire)
+if ($port_details)
 {
-#`interface_id`,`peer_device_id`,`peer_ldp_id`,`cpwVcID`,`cpwOid`
-  $pw_peer_dev = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($pseudowire['peer_device_id']));
-  $pw_peer_int = dbFetchRow("SELECT * FROM `ports` AS I, pseudowires AS P WHERE I.device_id = ? AND P.cpwVcID = ? AND P.interface_id = I.interface_id", array($pseudowire['peer_device_id'], $pseudowire['cpwVcID']));
+       foreach (dbFetchRows("SELECT * FROM `pseudowires` WHERE `interface_id` = ?", array($port['interface_id'])) as $pseudowire)
+       {
+       #`interface_id`,`peer_device_id`,`peer_ldp_id`,`cpwVcID`,`cpwOid`
+         $pw_peer_dev = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($pseudowire['peer_device_id']));
+         $pw_peer_int = dbFetchRow("SELECT * FROM `ports` AS I, pseudowires AS P WHERE I.device_id = ? AND P.cpwVcID = ? AND P.interface_id = I.interface_id", array($pseudowire['peer_device_id'], $pseudowire['cpwVcID']));
 
-  $pw_peer_int = ifNameDescr($pw_peer_int);
-  echo("$br<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generate_port_link($pw_peer_int, makeshortif($pw_peer_int['label'])) ." on ". generate_device_link($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . "</b>");
-  $br = "<br />";
+         $pw_peer_int = ifNameDescr($pw_peer_int);
+         echo("$br<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generate_port_link($pw_peer_int, makeshortif($pw_peer_int['label'])) ." on ". generate_device_link($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . "</b>");
+         $br = "<br />";
+       }
+
+       foreach(dbFetchRows("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $member)
+       {
+         echo("$br<img src='images/16/brick_link.png' align=absmiddle> <strong>" . generate_port_link($member) . " (PAgP)</strong>");
+         $br = "<br />";
+       }
+
+       if ($port['pagpGroupIfIndex'] && $port['pagpGroupIfIndex'] != $port['ifIndex'])
+       {
+         $parent = dbFetchRow("SELECT * FROM `ports` WHERE `ifIndex` = ? and `device_id` = ?", array($port['pagpGroupIfIndex'], $device['device_id']));
+         echo("$br<img src='images/16/bricks.png' align=absmiddle> <strong>" . generate_port_link($parent) . " (PAgP)</strong>");
+         $br = "<br />";
+       }
+
+       foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $higher_if)
+       {
+         if ($higher_if['interface_id_high'])
+         {
+               $this_port = get_port_by_index_cache($device['device_id'], $higher_if['interface_id_high']);
+               echo("$br<img src='images/16/arrow_divide.png' align=absmiddle> <strong>" . generate_port_link($this_port) . "</strong>");
+               $br = "<br />";
+         }
+       }
+
+       foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_high` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $lower_if)
+       {
+         if ($lower_if['interface_id_low'])
+         {
+               $this_port = get_port_by_index_cache($device['device_id'], $lower_if['interface_id_low']);
+               echo("$br<img src='images/16/arrow_join.png' align=absmiddle> <strong>" . generate_port_link($this_port) . "</strong>");
+               $br = "<br />";
+         }
+       }
 }
-
-foreach(dbFetchRows("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $member)
-{
-  echo("$br<img src='images/16/brick_link.png' align=absmiddle> <strong>" . generate_port_link($member) . " (PAgP)</strong>");
-  $br = "<br />";
-}
-
-if ($port['pagpGroupIfIndex'] && $port['pagpGroupIfIndex'] != $port['ifIndex'])
-{
-  $parent = dbFetchRow("SELECT * FROM `ports` WHERE `ifIndex` = ? and `device_id` = ?", array($port['pagpGroupIfIndex'], $device['device_id']));
-  echo("$br<img src='images/16/bricks.png' align=absmiddle> <strong>" . generate_port_link($parent) . " (PAgP)</strong>");
-  $br = "<br />";
-}
-
-foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $higher_if)
-{
-  if ($higher_if['interface_id_high'])
-  {
-    $this_port = get_port_by_index_cache($device['device_id'], $higher_if['interface_id_high']);
-    echo("$br<img src='images/16/arrow_divide.png' align=absmiddle> <strong>" . generate_port_link($this_port) . "</strong>");
-    $br = "<br />";
-  }
-}
-
-foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_high` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $lower_if)
-{
-  if ($lower_if['interface_id_low'])
-  {
-    $this_port = get_port_by_index_cache($device['device_id'], $lower_if['interface_id_low']);
-    echo("$br<img src='images/16/arrow_join.png' align=absmiddle> <strong>" . generate_port_link($this_port) . "</strong>");
-    $br = "<br />";
-  }
-}
-
 
 
 unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);

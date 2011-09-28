@@ -1,5 +1,5 @@
-<?php
 #!/usr/bin/php -q
+<?php
 /*
  ex: set tabstop=4 shiftwidth=4 autoindent:
  +-------------------------------------------------------------------------+
