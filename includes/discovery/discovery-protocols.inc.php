@@ -25,6 +25,11 @@ if ($device['os'] == "ironware")
         if (!$remote_device_id)
         {
           $remote_device_id = discover_new_device($fdp['snFdpCacheDeviceId']);
+          if ($remote_device_id)
+          {
+            $int = ifNameDescr($interface);
+            log_event("Device autodiscovered through FDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['interface_id']);
+          }
         }
 
         if ($remote_device_id)
@@ -54,11 +59,15 @@ if ($cdp_array)
       $cdp = $cdp_if_array[$entry_key];
       $remote_device_id = @mysql_result(mysql_query("SELECT `device_id` FROM `devices` WHERE `sysName` = '".$cdp['cdpCacheDeviceId']."' OR `hostname`='".$cdp['cdpCacheDeviceId']."'"), 0);
 
-        if (!$remote_device_id)
+      if (!$remote_device_id)
+      {
+        $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId']);
+        if ($remote_device_id)
         {
-          $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId']);
+          $int = ifNameDescr($interface);
+          log_event("Device autodiscovered through CDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['interface_id']);
         }
-
+      }
 
       if ($remote_device_id)
       {
@@ -104,6 +113,11 @@ if ($lldp_array)
         if (!$remote_device_id)
         {
           $remote_device_id = discover_new_device($lldp['lldpRemSysName']);
+          if ($remote_device_id)
+          {
+            $int = ifNameDescr($interface);
+            log_event("Device autodiscovered through LLDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['interface_id']);
+          }
         }
 
         if ($remote_device_id)
@@ -114,8 +128,8 @@ if ($lldp_array)
           $remote_interface_id = "0";
         }
 
-             if (is_numeric($interface['interface_id']) && isset($lldp['lldpRemSysName']) && isset($lldp['lldpRemPortId']))
-             {
+        if (is_numeric($interface['interface_id']) && isset($lldp['lldpRemSysName']) && isset($lldp['lldpRemPortId']))
+        {
           discover_link($interface['interface_id'], 'lldp', $remote_interface_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortId'], NULL, $lldp['lldpRemSysDesc']);
         }
       }

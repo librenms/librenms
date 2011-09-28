@@ -137,11 +137,11 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
   {
     $sensor_entry = dbFetchRow("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ?", array($class, $device['device_id'], $type, $index));
 
-    if (!$high_limit)
+    if (!isset($high_limit))
     {
       if (!$sensor_entry['sensor_limit'])
       {
-        $high_limit  = sensor_limit($class, $current);
+        $high_limit = sensor_limit($class, $current);
       } else {
         $high_limit = $sensor_entry['sensor_limit'];
       }
@@ -149,7 +149,6 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     if ($high_limit != $sensor_entry['sensor_limit'])
     {
-
       $update = array('sensor_limit' => ($high_limit == NULL ? NULL : $high_limit));
       $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
       if ($debug) { echo("( $updated updated )\n"); }
@@ -157,11 +156,11 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       log_event("Sensor High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$high_limit.")", $device, 'sensor', $sensor_id);
     }
 
-    if (!$low_limit)
+    if (!isset($low_limit))
     {
       if (!$sensor_entry['sensor_limit_low'])
       {
-        $low_limit  = sensor_low_limit($class, $current);
+        $low_limit = sensor_low_limit($class, $current);
       } else {
         $low_limit = $sensor_entry['sensor_limit_low'];
       }
