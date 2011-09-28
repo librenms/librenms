@@ -7,10 +7,11 @@ foreach (explode(",", $id) as $ifid)
   $port = dbFetchRow("SELECT * FROM `ports` AS I, devices as D WHERE I.interface_id = ? AND I.device_id = D.device_id", array($ifid));
   if (is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd")))
   {
+    $port = ifLabel($port);
     $rrd_list[$i]['filename'] = $config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
     $rrd_list[$i]['descr'] = $port['hostname'] . " " . $port['ifDescr'];
     $rrd_list[$i]['descr_in'] = $port['hostname'];
-    $rrd_list[$i]['descr_out'] = $port['ifDescr'];
+    $rrd_list[$i]['descr_out'] = makeshortif($port['label']);
     $i++;
   }
 }
