@@ -25,6 +25,9 @@ $config['nmap']           = "/usr/bin/nmap";
 $config['nagios_plugins'] = "/usr/lib/nagios/plugins";
 $config['ipmitool']       = "/usr/bin/ipmitool";
 $config['virsh']          = "/usr/bin/virsh";
+$config['dot']            = "/usr/bin/dot";
+$config['unflatten']      = "/usr/bin/unflatten";
+$config['neato']          = "/usr/bin/neato";
 
 ### RRDCacheD - Make sure it can write to your RRD dir!
 
