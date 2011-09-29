@@ -4,7 +4,7 @@
 
     $scale_min		= 0;
     $colours		= "red";
-    $nototal		= 0;
+    $nototal		= (($width<224) ? 1 : 0);
     $unit_text		= "Packets/sec";
     $rrd_filename	= $config['rrd_dir'] . "/" . $device['hostname'] . "/app-powerdns-".$app['app_id'].".rrd";
     $array		= array(

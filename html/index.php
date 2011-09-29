@@ -140,12 +140,11 @@ if ($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$conf
   <?php
     if ($_SESSION['widescreen']) { echo('<link rel="stylesheet" href="css/styles-wide.css" type="text/css" />'); }
   ?>
-
 </head>
 <body>
   <script type="text/javascript" src="js/mktree.js"></script>
   <script type="text/javascript" src="js/sorttable.js"></script>
-  <script type="text/javascript" src="js/jquery-1.5.2.min.js"></script>
+  <script type="text/javascript" src="js/jquery.min.js"></script>
   <script type="text/javascript" src="js/jquery-checkbox.js"></script>
   <script type="text/javascript" src="js/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>
   <!--[if IE]>
@@ -153,7 +152,7 @@ if ($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$conf
   <![endif]-->
   <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="js/jqplot/excanvas.js"></script><![endif]-->
   <script language="javascript" type="text/javascript" src="js/jqplot/jquery.jqplot.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="js/jqplot/jquery.jqplot.css" />
+  <link rel="stylesheet" type="text/css" href="js/jqplot/jquery.jqplot.min.css" />
   <script type="text/javascript" src="js/jqplot/plugins/jqplot.pieRenderer.min.js"></script>
   <script type="text/javascript" src="js/jqplot/plugins/jqplot.donutRenderer.min.js"></script>
   <script type="text/javascript">
@@ -228,7 +227,7 @@ function popUp(URL)
 }
 // End -->
   </script>
-  <script type="text/javascript" src="js/overlib.js"></script>
+  <script type="text/javascript" src="js/overlib_mini.js"></script>
   <div id="container">
 
 <?php
