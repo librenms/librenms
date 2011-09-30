@@ -1,36 +1,9 @@
 <?php
 
-    $files      = array();
-
-    if ($handle = opendir($config['smokeping']['dir']))
-    {
-        while (false !== ($file = readdir($handle)))
-        {
-            if ($file != "." && $file != "..")
-            {
-                if (eregi(".rrd", $file))
-                {
-                   if (eregi("~", $file))
-                   {
-                      list($target,$slave) = explode("~", str_replace(".rrd", "", $file));
-                      if($target == $device['hostname'])
-                      {
-                        $files[$slave] = $file;
-                      }
-                   } else {
-                      $target = str_replace(".rrd", "", $file);
-                      if($target == $device['hostname'])
-                      {
-                        $files['observium'] = $file;
-                      }
-                   }
-                }
-            }
-        }
-    }
+include("smokeping_common.inc.php");
 
 $i=0;
-foreach($files as $source => $filename)
+foreach($smokeping_files['in'][$device['hostname']] as $source => $filename)
 {
   $i++;
   $rrd_list[$i]['filename'] = $config['smokeping']['dir'] . $filename;
