@@ -36,7 +36,8 @@ header("Content-type: image/svg+xml");
 
 /********** HTTP GET Based Conf ***********/
 $ifnum=@$port['ifIndex'];  // BSD / SNMP interface name / number
-$ifname=$device['hostname']. " ". @$port['ifDescr'];  //Interface name that will be showed on top right of graph
+$ifname=@$port['ifDescr'];  //Interface name that will be showed on top right of graph
+$hostname=$device['hostname'];
 
 /********* Other conf *******/
 $scale_type="follow";               //Autoscale default setup : "up" = only increase scale; "follow" = increase and decrease scale according to current graphed datas
@@ -58,6 +59,7 @@ $attribs['graph_in']='fill="none" stroke="green" stroke-opacity="0.8"';
 $attribs['graph_out']='fill="none" stroke="blue" stroke-opacity="0.8"';
 $attribs['legend']='fill="black" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4"';
 $attribs['graphname']='fill="#435370" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="8"';
+$attribs['hostname']='fill="#435370" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4"';
 $attribs['grid_txt']='fill="gray" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="6"';
 $attribs['grid']='stroke="gray" stroke-opacity="0.5"';
 $attribs['switch_unit']='fill="#435370" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4" text-decoration="underline"';
@@ -89,6 +91,7 @@ print('<?xml version="1.0" encoding="iso-8859-1"?>' . "\n");?>
     <text id="graph_in_txt" x="20" y="8" <?=$attribs['in']?>> </text>
     <text id="graph_out_txt" x="20" y="16" <?=$attribs['out']?>> </text>
     <text id="ifname" x="<?=$width?>" y="8" <?=$attribs['graphname']?> text-anchor="end"><?=$ifname?></text>
+    <text id="hostname" x="<?=$width?>" y="14" <?=$attribs['hostname']?> text-anchor="end"><?=$hostname?></text>
     <text id="switch_unit" x="<?=$width*0.55?>" y="5" <?=$attribs['switch_unit']?>>Switch to bytes/s</text>
     <text id="switch_scale" x="<?=$width*0.55?>" y="11" <?=$attribs['switch_scale']?>>AutoScale (<?=$scale_type?>)</text>
     <text id="datetime" x="<?=$width*0.33?>" y="5" <?=$attribs['legend']?>> </text>
