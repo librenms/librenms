@@ -175,6 +175,8 @@ $config['billing']['bill_autoadd']      = 0; # Enable Auto-add bill per bill_id
 #$config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
 $config['rancid_ignorecomments']        = 0; # Ignore lines starting with #
 #$config['collectd_dir']                 = '/var/lib/collectd/rrd';
+#$config['smokeping']['dir']     = "/var/lib/smokeping/";
+
 
 # NFSen RRD dir.
 $config['nfsen_enable'] = 0;
