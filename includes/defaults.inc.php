@@ -10,6 +10,9 @@ $config['html_dir']      = $config['install_dir'] . "/html";
 $config['rrd_dir']       = $config['install_dir'] . "/rrd";
 $config['log_file']      = $config['install_dir'] . "/observium.log";
 
+### What is my own hostname (used so observium can identify its host in its own database)
+$config['own_hostname'] = "localhost";
+
 ### Location of executables
 
 $config['rrdtool']        = "/usr/bin/rrdtool";
