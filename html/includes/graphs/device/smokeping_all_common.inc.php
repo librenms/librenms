@@ -26,10 +26,9 @@ if($width > "500")
 
 if($width > "500")
 {
-  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT          Loss     Maximum      '";
+  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT      Loss    SDev   RTT\:SDev\l'";
 } else {
   $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT      Loss    SDev   RTT\:SDev\l'";
-
 }
 
 foreach($smokeping_files[$direction][$device['hostname']] as $source => $filename)
@@ -73,7 +72,7 @@ foreach($smokeping_files[$direction][$device['hostname']] as $source => $filenam
   $rrd_options .= " CDEF:s2d$i=sdev$i";
   $rrd_options .= " AREA:dmlow$i";
   $rrd_options .= " AREA:s2d$i#".$colour."30::STACK";
-  $rrd_options .= " LINE1:dm$i#".$colour.":$descr";
+  $rrd_options .= " LINE1:dm$i#".$colour.":'$descr'";
 
 #  $rrd_options .= " LINE1:sdev$i#000000:$descr";
 
