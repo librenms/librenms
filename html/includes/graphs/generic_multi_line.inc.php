@@ -27,8 +27,11 @@ foreach ($rrd_list as $rrd)
 
   $rrd_options .= " DEF:".$id."=$filename:$ds:AVERAGE";
 
-  if (!$basicrrd)
+  if ($simple_rrd || $basicrrd)
   {
+    $rrd_options .= " CDEF:".$id."min=".$id." ";
+    $rrd_options .= " CDEF:".$id."max=".$id." ";
+  } else {
     $rrd_options .= " DEF:".$id."min=$filename:$ds:MIN";
     $rrd_options .= " DEF:".$id."max=$filename:$ds:MAX";
   }
@@ -45,14 +48,9 @@ foreach ($rrd_list as $rrd)
 
   }
 
-  if (!$basicrrd)
-  {
-    $rrd_optionsb .= " GPRINT:".$id.":LAST:%5.2lf%s GPRINT:".$id."min:MIN:%5.2lf%s";
-    $rrd_optionsb .= " GPRINT:".$id."max:MAX:%5.2lf%s GPRINT:".$id.":AVERAGE:'%5.2lf%s\\n'";
-  } else {
-    $rrd_optionsb .= " GPRINT:".$id.":LAST:%5.2lf%s GPRINT:".$id.":MIN:%5.2lf%s";
-    $rrd_optionsb .= " GPRINT:".$id.":MAX:%5.2lf%s GPRINT:".$id.":AVERAGE:'%5.2lf%s\\n'";
-  }
+  $rrd_optionsb .= " GPRINT:".$id.":LAST:%5.2lf%s GPRINT:".$id."min:MIN:%5.2lf%s";
+  $rrd_optionsb .= " GPRINT:".$id."max:MAX:%5.2lf%s GPRINT:".$id.":AVERAGE:'%5.2lf%s\\n'";
+
   $i++; $iter++;
 
 }

@@ -1,6 +1,7 @@
 <?php
 include("includes/graphs/common.inc.php");
-$device = device_by_id_cache($id);
+
+$simple_rrd = TRUE;
 
 if (!is_array($config['nfsen_rrds'])) { $config['nfsen_rrds'] = array($config['nfsen_rrds']); }
 
