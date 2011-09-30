@@ -27,7 +27,7 @@ foreach ($rrd_list as $rrd)
 
   $rrd_options .= " DEF:".$id."=$filename:$ds:AVERAGE";
 
-  if ($simple_rrd || $basicrrd)
+  if ($simple_rrd)
   {
     $rrd_options .= " CDEF:".$id."min=".$id." ";
     $rrd_options .= " CDEF:".$id."max=".$id." ";

@@ -23,7 +23,7 @@ foreach($stats as $stat)
 $colours='mixed';
 
 $nototal = 1;
-$basicrrd = 1;
+$simple_rrd = 1;
 
 include("includes/graphs/generic_multi_line.inc.php");
 
