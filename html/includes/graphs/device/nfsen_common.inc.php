@@ -1,5 +1,4 @@
 <?php
-include("includes/graphs/common.inc.php");
 
 $simple_rrd = TRUE;
 

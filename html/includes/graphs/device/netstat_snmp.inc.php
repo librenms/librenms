@@ -30,7 +30,7 @@ $colours='mixed';
 
 $scale_min = "0";
 $nototal = 1;
-$basicrrd = 1;
+$simple_rrd = TRUE;
 
 include("includes/graphs/generic_multi_line.inc.php");
 
