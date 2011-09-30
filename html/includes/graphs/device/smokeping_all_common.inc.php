@@ -59,6 +59,8 @@ foreach($smokeping_files[$direction][$device['hostname']] as $source => $filenam
     $rrd_options .= " CDEF:p".$i."p".$p."=pin".$i."p".$p.",UN,0,pin".$i."p".$p.",IF";
   }
 
+  unset($pings_options, $m_options, $sdev_options);
+
   foreach(range(2, $pings) as $p)
   {
     $pings_options .= ",p".$i."p".$p.",UN,+";
