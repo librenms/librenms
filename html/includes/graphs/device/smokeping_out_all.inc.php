@@ -1,31 +1,10 @@
 <?php
 
-    $config['smokeping']['dir']     = "/var/lib/smokeping/";
-    $files      = array();
-
-    if ($handle = opendir($config['smokeping']['dir']))
-    {
-        while (false !== ($file = readdir($handle)))
-        {
-            if ($file != "." && $file != "..")
-            {
-                if (eregi(".rrd", $file))
-                {
-                   if (eregi("~", $file))
-                   {
-                      list($target,$slave) = explode("~", str_replace(".rrd", "", $file));
-                      if($slave == $device['hostname'])
-                      {
-                        $files[$target] = $file;
-                      }
-                   }
-                }
-            }
-        }
-    }
-
 $i=0;
-foreach($files as $source => $filename)
+
+include("smokeping_common.inc.php");
+
+foreach($smokeping_files['out'][$device['hostname']] as $source => $filename)
 {
   $i++;
   $rrd_list[$i]['filename'] = $config['smokeping']['dir'] . $filename;

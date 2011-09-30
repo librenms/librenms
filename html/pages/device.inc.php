@@ -75,7 +75,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-    if (is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/"))
+    if (isset($config['collectd_dir']) && is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/"))
     {
       echo('<li class="' . $select['collectd'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'collectd')).'">
@@ -89,6 +89,37 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
       echo('<li class="' . $select['ports'] . $select['port'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'ports')). '">
       <img src="images/16/connect.png" align="absmiddle" border="0" /> Ports
+    </a>
+  </li>');
+    }
+
+  if(isset($config['smokeping']['dir'])) {
+    $smokeping_files      = array();
+    if ($handle = opendir($config['smokeping']['dir'])) {
+        while (false !== ($file = readdir($handle))) {
+            if ($file != "." && $file != "..") {
+                if (eregi(".rrd", $file)) {
+                   if (eregi("~", $file)) {
+                      list($target,$slave) = explode("~", str_replace(".rrd", "", $file));
+                      $smokeping_files['in'][$target][$slave] = $file;
+                      $smokeping_files['out'][$slave][$target] = $file;
+                   } else {
+                      $target = str_replace(".rrd", "", $file);
+                      $smokeping_files['in'][$target][$config['own_hostname']] = $file;
+                      $smokeping_files['out'][$config['own_hostname']][$target] = $file;
+                   }
+                }
+            }
+        }
+    }
+ }
+
+
+    if (count($smokeping_files))
+    {
+      echo('<li class="' . $select['latency'] . '">
+    <a href="'.generate_device_url($device, array('tab' => 'latency')).'">
+      <img src="images/16/arrow_undo.png" align="absmiddle" border="0" /> Latency
     </a>
   </li>');
     }

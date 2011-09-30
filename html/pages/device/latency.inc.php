@@ -1,32 +1,39 @@
 <?php
 
-#if(!$vars['view']) { $vars['view'] = "incoming"; }
 if(!$vars['view']) { $vars['view'] = "outgoing"; }
 
-    $files      = array();
+print_optionbar_start();
 
-    if ($handle = opendir($config['smokeping']['dir'])) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != "." && $file != "..") {
-                if (eregi(".rrd", $file)) {
-                   if (eregi("~", $file)) {
-                      list($target,$slave) = explode("~", str_replace(".rrd", "", $file));
-                      $files[$target][$slave] = $file;
-                      $files_rev[$slave][$target] = $file;
-                   } else {
-                      $target = str_replace(".rrd", "", $file);
-                      $files[$target]['observium'] = $file;
-                   }
-                }
-            }
-        }
-    }
+echo("<span style='font-weight: bold;'>Latency</span> &#187; ");
+
+$menu_options = array('incoming' => 'Incoming',
+                      'outgoing' => 'Outgoing');
+
+$sep = "";
+foreach ($menu_options as $option => $text)
+{
+  echo($sep);
+  if ($vars['view'] == $option)
+  {
+    echo("<span class='pagemenu-selected'>");
+  }
+  echo(generate_link($text,$vars,array('view'=>$option)));
+  if ($vars['view'] == $option)
+  {
+    echo("</span>");
+  }
+  $sep = " | ";
+}
+
+unset($sep);
+
+print_optionbar_end();
 
 
 if($vars['view'] == "incoming")
 {
 
-    if(count($files_rev[$device['hostname']]))
+    if(count($smokeping_files['in'][$device['hostname']]))
     {
 
        $graph_array['type']                    = "device_smokeping_in_all";
@@ -38,7 +45,7 @@ if($vars['view'] == "incoming")
 
 } else {
 
-    if(count($files[$device['hostname']]))
+    if(count($smokeping_files['out'][$device['hostname']]))
     {
 
        $graph_array['type']                    = "device_smokeping_out_all";
@@ -49,11 +56,5 @@ if($vars['view'] == "incoming")
     }
 
 }
-
-
-echo("<pre>");
-print_r($files);
-echo("</pre>");
-
 
 ?>
