@@ -62,7 +62,7 @@ if (count($drives))
     unset($link_array['height'], $link_array['width'], $link_array['legend']);
     $link = generate_url($link_array);
 
-    $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - " . $text_descr);
+    $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - " . $drive['storage_descr']);
 
     $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = $graph_colour;
 
