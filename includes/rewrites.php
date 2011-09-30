@@ -843,7 +843,6 @@ function makeshortif($if)
   $if = fixifName ($if);
   $if = strtolower($if);
   $if = array_str_replace($rewrite_shortif, $if);
-  $if = ucfirst($if);
   return $if;
 }
 
