@@ -2,14 +2,30 @@
 
 include("includes/graphs/common.inc.php");
 
-$unit_text = str_pad($unit_text, 13);
-$unit_text = substr($unit_text,0,13);
+if($width > "500")
+{
+  $descr_len=24;
+} else {
+  $descr_len=12;
+  $descr_len += round(($width - 250) / 8);
+}
+
+
+if ($nototal) { $descrlen += "2"; $unitlen += "2";}
+$unit_text = str_pad(truncate($unit_text,$unitlen),$unitlen);
+
+if($width > "500")
+{
+  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."    Current      Average     Maximum      '";
+  if (!$nototal) { $rrd_options .= " COMMENT:'Total      '"; }
+  $rrd_options .= " COMMENT:'\l'";
+} else {
+  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."     Now         Ave          Max\l'";
+
+}
 
 $i = 0;
 $iter = 0;
-
-$rrd_options .= " COMMENT:'".$unit_text."    Cur     Min     Max     Avg\\n'";
-
 
 foreach ($rrd_list as $rrd)
 {
@@ -19,9 +35,8 @@ foreach ($rrd_list as $rrd)
 
   $ds = $rrd['ds'];
   $filename = $rrd['filename'];
-  $descr = $rrd['descr'];
-  $descr = substr(str_pad($descr, 10),0,10);
-  $descr = str_replace(":", "\:", $descr);
+
+  $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr'], $descr_len),0,$descr_len));
 
   $id = "ds".$i;
 
@@ -40,11 +55,10 @@ foreach ($rrd_list as $rrd)
   {
     $rrd_options .= " CDEF:".$id."i=".$id.",-1,*";
     $rrd_optionsb .= " LINE1.25:".$id."i#".$colour.":'$descr'";
-    $rrd_options .= " AREA:".$id."i#" . $colour . "10";
-
+#    $rrd_options .= " AREA:".$id."i#" . $colour . "10";
   } else {
     $rrd_optionsb .= " LINE1.25:".$id."#".$colour.":'$descr'";
-    $rrd_options .= " AREA:".$id."#" . $colour . "10";
+#    $rrd_options .= " AREA:".$id."#" . $colour . "10";
 
   }
 
