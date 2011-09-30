@@ -11,10 +11,12 @@ if ($_GET['title'] == "yes")  { $rrd_options .= " --title='".$graph_title."' "; 
 if (isset($_GET['graph_title']))  { $rrd_options .= " --title='".$_GET['graph_title']."' "; }
 
 
-if (!$scale_min && !$scale_max) { $rrd_options .= " --alt-autoscale-max"; }
+#if (!isset($scale_min) && !isset($scale_max)) { $rrd_options .= " --alt-autoscale-max"; }
 
 if (isset($scale_min)) { $rrd_options .= " -l $scale_min"; }
 if (isset($scale_max)) { $rrd_options .= " -u $scale_max"; }
+if (isset($scale_rigid)) { $rrd_options .= " -r"; }
+
 
 $rrd_options .= " -E --start ".$from." --end " . $to . " --width ".$width." --height ".$height." ";
 $rrd_options .= $config['rrdgraph_def_text'];
