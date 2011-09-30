@@ -18,21 +18,17 @@ $colourset = "mixed";
 
 if($width > "500")
 {
-  $descr_len=18;
+  $descr_len = 18;
 } else {
-  $descr_len=8;
-  $descr_len += round(($width - 250) / 8);
+  $descr_len = 12 + round(($width - 250) / 8);
 }
 
-$unit_text = "Latency";
 
 if($width > "500")
 {
-  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."    Current      Average     Maximum      '";
-  if (!$nototal) { $rrd_options .= " COMMENT:'Total      '"; }
-  $rrd_options .= " COMMENT:'\l'";
+  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT          Loss     Maximum      '";
 } else {
-  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."     Now         Ave          Max\l'";
+  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT      Loss    SDev   RTT\:SDev\l'";
 
 }
 
@@ -86,11 +82,11 @@ foreach($smokeping_files[$direction][$device['hostname']] as $source => $filenam
   $rrd_options .= " CDEF:msr$i=median$i,POP,avmed$i,avsd$i,/";
   $rrd_options .= " VDEF:avmsr$i=msr$i,AVERAGE";
 
-  $rrd_options .= " GPRINT:avmed$i:'%5.1lf %ss av md '";
-  $rrd_options .= " GPRINT:ploss$i:AVERAGE:'%5.1lf %% av ls'";
+  $rrd_options .= " GPRINT:avmed$i:'%5.1lf%ss'";
+  $rrd_options .= " GPRINT:ploss$i:AVERAGE:'%5.1lf%%'";
 
-#  $rrd_options .= " GPRINT:sdev$i:'%5.1lf %s ms sd'";
-  $rrd_options .= " GPRINT:avmsr$i:'%5.1lf %s am/as\\l'";
+  $rrd_options .= " GPRINT:avsd$i:'%5.1lf%Ss'";
+  $rrd_options .= " GPRINT:avmsr$i:'%5.1lf%s\\l'";
 
 
   $i++;
