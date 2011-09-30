@@ -181,6 +181,7 @@ print_optionbar_end();
     <b>Jonathan De Graeve</b> SNMP code improvements. <br />
     <b>Xiaochi Jin</b> Logo design. <br />
     <b>Bruno Pramont</b> Collectd code. <br />
+    <b>Dennis de Houx</b> Application monitors for PowerDNS, Shoutcast, NTPD (Client, Server). <br />
 
   </div>
 </div>
