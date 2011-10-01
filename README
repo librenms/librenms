@@ -18,18 +18,18 @@ Please see LICENSES/GPLv3-LICENSE.txt for usage requirements and restrictions.
 Introduction
 ------------
 
-Observium is an autodiscovering PHP/MySQL/SNMP based network monitoring which includes 
-support for a wide range of network hardware and operating systems including Cisco, 
+Observium is an autodiscovering PHP/MySQL/SNMP based network monitoring which includes
+support for a wide range of network hardware and operating systems including Cisco,
 Linux, FreeBSD, Juniper, Brocade, Foundry, HP and many more.
 
-Observium has grown out of a lack of easy to configure network monitoring platforms. 
-It is intended to provide a more navigable interface to the health and performance of 
+Observium has grown out of a lack of easy to configure network monitoring platforms.
+It is intended to provide a more navigable interface to the health and performance of
 your network. Its design goals include collecting as much historical data about devices
- as possible, being completely autodiscovered with little or no manual intervention, 
+ as possible, being completely autodiscovered with little or no manual intervention,
 and having a very intuitive interface.
 
-Observium is not intended to replace an up/down alerting system, but rather to 
-complement it with an easy to manage, intuitive representation of historical and 
+Observium is not intended to replace an up/down alerting system, but rather to
+complement it with an easy to manage, intuitive representation of historical and
 current performance statistics, configuration visualisation and syslog capture.
 
 Installation

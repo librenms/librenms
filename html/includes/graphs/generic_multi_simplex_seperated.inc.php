@@ -25,7 +25,7 @@ foreach ($rrd_list as $i => $rrd)
 
   $rrd_options .= " DEF:".$rrd['ds'].$i."=".$rrd['filename'].":".$rrd['ds'].":AVERAGE ";
 
-  if($simple_rrd)
+  if ($simple_rrd)
   {
     $rrd_options .= " CDEF:".$rrd['ds'].$i."min=".$rrd['ds'].$i." ";
     $rrd_options .= " CDEF:".$rrd['ds'].$i."max=".$rrd['ds'].$i." ";
