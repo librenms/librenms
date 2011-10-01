@@ -178,7 +178,14 @@ function rrdtool($command, $filename, $options)
 
 function rrdtool_create($filename, $options)
 {
-  return rrdtool("create", $filename, $options);
+
+  global $config; global $debug;
+  $command = $config['rrdtool'] . " create $filename $options";
+  if ($debug) { echo($command."\n"); }
+
+  return shell_exec($command);
+
+#  return rrdtool("create", $filename, $options);
 }
 
 function rrdtool_update($filename, $options)
