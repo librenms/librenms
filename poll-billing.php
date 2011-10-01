@@ -7,6 +7,8 @@ include("includes/functions.php");
 
 $iter = "0";
 
+rrdtool_pipe_open($rrd_process, $rrd_pipes);
+
 echo("Starting Polling Session ... \n\n");
 
 foreach (dbFetchRows("SELECT * FROM `bills`") as $bill_data)
@@ -101,5 +103,8 @@ function CollectData($bill_id)
 }
 
 if ($argv[1]) { CollectData($argv[1]); }
+
+rrdtool_pipe_close($rrd_process, $rrd_pipes);
+
 
 ?>

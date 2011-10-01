@@ -1,57 +1,5 @@
 <?php
 
-function rrdtool_graph($graph_file, $options)
-{
-
-  global $config, $debug;
-
-  if ($debug) { echo("$options"); }
-
-  $command = $config['rrdtool'] . " -";
-
-  $descriptorspec = array(
-     0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-     1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-     2 => array("file", "/tmp/error-output.txt", "a") // stderr is a file to write to
-  );
-
-  $cwd = $config['rrd_dir'];
-  $env = array();
-
-  $process = proc_open($command, $descriptorspec, $pipes, $cwd, $env);
-
-  if (is_resource($process))
-  {
-    // $pipes now looks like this:
-    // 0 => writeable handle connected to child stdin
-    // 1 => readable handle connected to child stdout
-    // Any error output will be appended to /tmp/error-output.txt
-
-    if ($config['rrdcached'])
-    {
-      fwrite($pipes[0], "graph --daemon " . $config['rrdcached'] . " $graph_file $options");
-    } else {
-      fwrite($pipes[0], "graph $graph_file $options");
-    }
-
-    fclose($pipes[0]);
-    fclose($pipes[1]);
-
-    // It is important that you close any pipes before calling
-    // proc_close in order to avoid a deadlock
-    $return_value = proc_close($process);
-
-    if ($debug)
-    {
-        echo("<p>");
-        if ($debug) { echo("graph $graph_file $options"); }
-        echo("</p><p>");
-        echo "command returned $return_value\n";
-        echo("</p>");
-    }
-  }
-}
-
 function generate_link($text, $vars, $new_vars = array())
 {
   return '<a href="'.generate_url($vars, $new_vars).'">'.$text.'</a>';
