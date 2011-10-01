@@ -1,6 +1,6 @@
 <?php
 
-  if(isset($config['smokeping']['dir'])) {
+  if (isset($config['smokeping']['dir'])) {
     $smokeping_files      = array();
     if ($handle = opendir($config['smokeping']['dir'])) {
         while (false !== ($file = readdir($handle))) {

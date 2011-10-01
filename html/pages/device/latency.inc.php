@@ -33,7 +33,7 @@ print_optionbar_end();
 if($vars['view'] == "incoming")
 {
 
-    if(count($smokeping_files['in'][$device['hostname']]))
+    if (count($smokeping_files['in'][$device['hostname']]))
     {
 
        $graph_array['type']                    = "device_smokeping_in_all";
@@ -45,7 +45,7 @@ if($vars['view'] == "incoming")
 
 } else {
 
-    if(count($smokeping_files['out'][$device['hostname']]))
+    if (count($smokeping_files['out'][$device['hostname']]))
     {
 
        $graph_array['type']                    = "device_smokeping_out_all";
