@@ -1281,7 +1281,7 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 
 .tabBox .tabs {
     overflow: hidden;
-    padding: 0px 10px;
+    padding: 0px 8px;
     margin-bottom: -1px;
 
 }

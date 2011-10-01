@@ -1,54 +1,204 @@
 <?php
 
-function rrdtool_update($rrdfile, $rrdupdate)
-{
-  return rrdtool("update", $rrdfile, $rrdupdate);
-}
+/**
+ * Observium Network Management and Monitoring System
+ * Copyright (C) 2006-2011, Observium Developers - http://www.observium.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * See COPYING for more details.
+ *
+ * @package rrdtool
+ * @author Adam Armstrong <adama@memetic.org>
+ *
+ */
 
-function rrdtool_create($rrdfile, $rrdupdate)
-{
-  global $config, $debug;
+/**
+ * Opens up a pipe to RRDTool using handles provided
+ *
+ * @return boolean
+ * @global config
+ * @global debug
+ * @param &rrd_process
+ * @param &rrd_pipes
+ */
 
-  $command = $config['rrdtool'] . " create $rrdfile $rrdupdate";
-
-  if ($debug) { echo($command."\n"); }
-
-  return shell_exec($command);
-}
-
-function rrdtool_fetch($rrdfile, $rrdupdate)
-{
-  return rrdtool("fetch", $rrdfile, $rrdupdate);
-}
-
-#function rrdtool_graph($rrdfile, $rrdupdate)
-#{
-#  return rrdtool("graph", $rrdfile, $rrdupdate);
-#}
-
-function rrdtool_last($rrdfile, $rrdupdate)
-{
-  return rrdtool("last", $rrdfile, $rrdupdate);
-}
-
-function rrdtool_lastupdate($rrdfile, $rrdupdate)
-{
-  return rrdtool("lastupdate", $rrdfile, $rrdupdate);
-}
-
-function rrdtool($command, $file, $options)
+function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
 {
   global $config, $debug;
 
-  $command = $config['rrdtool'] . " $command $file $options";
-  if ($config['rrdcached'])
+  $command = $config['rrdtool'] . " -";
+
+#  $command = "/usr/bin/php /home/observium/dev/testpipe.php";
+
+  $descriptorspec = array(
+     0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
+     1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
+     2 => array("pipe", "w")   // stderr is a pipe that the child will write to
+  );
+
+  $cwd = $config['rrd_dir'];
+  $env = array();
+
+  $rrd_process = proc_open($command, $descriptorspec, $rrd_pipes, $cwd, $env);
+
+  stream_set_blocking($rrd_pipes[1], 0);
+  stream_set_blocking($rrd_pipes[2], 0);
+
+  if (is_resource($rrd_process))
   {
-    $command .= " --daemon " . $config['rrdcached'];
+    // $pipes now looks like this:
+    // 0 => writeable handle connected to child stdin
+    // 1 => readable handle connected to child stdout
+    // Any error output will be appended to /tmp/error-output.txt
+    return TRUE;
+  }
+}
+
+/**
+ * Closes the pipe to RRDTool
+ *
+ * @return integer
+ * @param resource rrd_process
+ * @param array rrd_pipes
+ */
+
+function rrdtool_pipe_close(&$rrd_process, &$rrd_pipes)
+{
+
+  if($debug)
+  {
+    echo stream_get_contents($rrd_pipes[1]);
+    echo stream_get_contents($rrd_pipes[2]);
   }
 
-  if ($debug) { echo($command."\n"); }
+  fclose($rrd_pipes[0]);
+  fclose($rrd_pipes[1]);
+  fclose($rrd_pipes[2]);
 
-  return shell_exec($command);
+  // It is important that you close any pipes before calling
+  // proc_close in order to avoid a deadlock
+
+  $return_value = proc_close($rrd_process);
+  if($debug)
+  {
+    echo $return_value;
+  }
+}
+
+/**
+ * Generates a graph file at $graph_file using $options
+ * Opens its own rrdtool pipe.
+ *
+ * @return integer
+ * @param string graph_file
+ * @param string options
+ */
+
+function rrdtool_graph($graph_file, $options)
+{
+
+  global $config, $debug;
+
+  rrdtool_pipe_open($rrd_process, $rrd_pipes);
+
+  if (is_resource($rrd_process))
+  {
+    // $pipes now looks like this:
+    // 0 => writeable handle connected to child stdin
+    // 1 => readable handle connected to child stdout
+    // Any error output will be appended to /tmp/error-output.txt
+
+    if ($config['rrdcached'])
+    {
+      fwrite($rrd_pipes[0], "graph --daemon " . $config['rrdcached'] . " $graph_file $options");
+    } else {
+      fwrite($rrd_pipes[0], "graph $graph_file $options");
+    }
+
+    rrdtool_pipe_close($rrd_process, $rrd_pipes);
+
+    if($debug)
+    {
+        echo("<p>");
+        if ($debug) { echo("graph $graph_file $options"); }
+        echo("</p><p>");
+        echo "command returned $return_value\n";
+        echo("</p>");
+    }
+  }
+}
+
+
+
+/**
+ * Generates and pipes a command to rrdtool
+ *
+ * @param string command
+ * @param string filename
+ * @param string options
+ * @global config
+ * @global debug
+ * @global rrd_pipes
+ */
+
+function rrdtool($command, $filename, $options)
+{
+  global $config, $debug, $rrd_pipes;
+
+  $cmd = "$command $filename $options";
+  if ($command != "create" && $config['rrdcached'])
+  {
+    $cmd .= " --daemon " . $config['rrdcached'];
+  }
+
+  fwrite($rrd_pipes[0], $cmd."\n");
+
+  if ($debug)
+  {
+    echo stream_get_contents($rrd_pipes[1]);
+    echo stream_get_contents($rrd_pipes[2]);
+
+    echo("<p>");
+    echo("\n".$cmd."\n");
+    echo("</p>");
+  }
+
+}
+
+/**
+ * Generates an rrd database at $filename using $options
+ *
+ * @param string filename
+ * @param string options
+ */
+
+function rrdtool_create($filename, $options)
+{
+  return rrdtool("create", $filename, $options);
+}
+
+function rrdtool_update($filename, $options)
+{
+  return rrdtool("update", $filename, $options);
+}
+
+function rrdtool_fetch($filename, $options)
+{
+  return rrdtool("fetch", $filename, $options);
+}
+
+function rrdtool_last($filename, $options)
+{
+  return rrdtool("last", $filename, $options);
+}
+
+function rrdtool_lastupdate($filename, $options)
+{
+  return rrdtool("lastupdate", $filename, $options);
 }
 
 ?>

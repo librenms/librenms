@@ -25,6 +25,7 @@ include_once("../includes/common.php");
 include_once("../includes/dbFacile.php");
 include_once("../includes/rewrites.php");
 include_once("includes/functions.inc.php");
+include_once("../includes/rrdtool.inc.php");
 include_once("includes/authenticate.inc.php");
 
 $from     = mres($_GET['from']);
@@ -53,8 +54,6 @@ preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', mres($_GET['type']), $gr
 
 $type = $graphtype['type'];
 $subtype = $graphtype['subtype'];
-
-if ($debug) {print_r($graphtype); }
 
 if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php"))
 {
@@ -141,8 +140,11 @@ if ($error_msg) {
   } else {
     if ($rrd_options)
     {
-      if ($config['rrdcached']) { $rrd_switches = " --daemon ".$config['rrdcached'] . " "; }
-      rrdtool_graph($graphfile, " $rrd_options");
+
+ #rrdtool_graph($filename, $options)
+
+      rrdtool_graph($graphfile, $rrd_options);
+
       if ($debug) { echo("<pre>".$rrd_cmd."</pre>"); }
       if (is_file($graphfile))
       {
@@ -150,8 +152,10 @@ if ($error_msg) {
         {
           header('Content-type: image/png');
           $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
-          unlink($graphfile);
+        } else {
+          echo(`ls -l $graphfile`);
         }
+        unlink($graphfile);
       }
       else
       {

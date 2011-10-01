@@ -85,6 +85,8 @@ if (isset($options['d']))
 #  ini_set('error_reporting', 0);
 }
 
+rrdtool_pipe_open($rrd_process, $rrd_pipes);
+
 echo("Starting polling run:\n\n");
 $polled_devices = 0;
 if (!isset($query))
@@ -120,7 +122,7 @@ echo('MySQL: Cell['.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_se
 echo("\n");
 
 logfile($string);
-
+rrdtool_pipe_close($rrd_process, $rrd_pipes);
 unset($config); ### Remove this for testing
 
 #print_r(get_defined_vars());
