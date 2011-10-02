@@ -13,7 +13,7 @@
     ##              Add the following to your snmpd.conf file:
     ##              extend shoutcast /opt/observium/scripts/shoutcast.php
     ##
-    ##      Version 1.0 By:
+    ##      Version 1.1 By:
     ##              All In One - Dennis de Houx <info@all-in-one.be>
     ##
     ########################################################################################
@@ -36,6 +36,8 @@
 	if (!isset($_SERVER["argv"][0]) || isset($_SERVER['REQUEST_METHOD']) || isset($_SERVER['REMOTE_ADDR'])) {
 	    die('<span style="color: #880000; text-weight: bold; font-size: 1.3em;">This script is only meant to run at the command line.</span>');
 	}
+	
+	$cmd	= (isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : "");
 
 	function get_data($host, $port) {
 	    $fp		= @fsockopen($host, $port, &$errno, &$errstr, 5);
@@ -108,7 +110,7 @@
 	    }
 	}
 
-	if ($_SERVER['argv'][1] == "makeCache") {
+	if ($cmd == "makeCache") {
 	    $servers	= get_list($config);
 	    $data	= doSNMPv2($servers);
 	    makeCacheFile($data, $cache);
