@@ -70,6 +70,6 @@
 	}
 
 	doSNMPv2($mailstats);
-	clearStats($mailstats);
+	//clearStats($mailstats);
 
 ?>

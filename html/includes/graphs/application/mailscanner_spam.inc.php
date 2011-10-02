@@ -4,8 +4,8 @@ include("includes/graphs/common.inc.php");
 
 $scale_min    = 0;
 $nototal      = (($width < 550) ? 1 : 0);
-$unit_text    = "Messages";
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mailscanner-" . $app['app_id'] . ".rrd";
+$unit_text    = "Messages/sec";
+$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mailscannerV2-" . $app['app_id'] . ".rrd";
 $array        = array(
                       'spam' => array('descr' => 'Spam', 'colour' => 'FF8800'),
                       'virus' => array('descr' => 'Virus', 'colour' => 'FF0000')
