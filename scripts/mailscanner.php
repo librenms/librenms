@@ -54,7 +54,22 @@
 		echo $count."\n";
 	    }
 	}
+	
+	function clearStats($mailstats) {
+	    if (file_exists($mailstats) {
+		$fp	= fopen($mailstats, 'w');
+		fwrite($fp, "mess_recv:0\n");
+		fwrite($fp, "mess_rejected:0\n");
+		fwrite($fp, "mess_relay:0\n");
+		fwrite($fp, "mess_sent:0\n");
+		fwrite($fp, "mess_waiting:0\n");
+		fwrite($fp, "spam:0\n");
+		fwrite($fp, "virus:0\n");
+		fclose($fp);
+	    }
+	}
 
 	doSNMPv2($mailstats);
-       $fp = fopen($mailstats, 'w');
-       fwrite($fp, "mess_recv:0\n");
+	clearStats($mailstats);
+
+?>
