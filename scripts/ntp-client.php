@@ -32,7 +32,11 @@
     ########################################################################################
 
 	$cmd	= shell_exec($ntpq." -c rv | grep '^offset'");
-	$cmd2	= shell_exec($ntpq." -c rv | grep '^stability'");
+	if ($newstats_style) {
+	    $cmd2	= shell_exec($ntpq." -c rv | grep '^clk_wander'");
+	} else {
+	    $cmd2	= shell_exec($ntpq." -c rv | grep '^stability'");
+	}
 	$vars	= array();
 	$vars2	= array();
 	$vars	= explode(',', $cmd);
