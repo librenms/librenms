@@ -15,11 +15,11 @@ list ($offset, $frequency, $jitter, $noise, $stability) = explode("\n", $ntpclie
 if (!is_file($rrd_filename))
 {
   rrdtool_create($rrd_filename, "--step 300 \
-        DS:offset:GAUGE:600:-100:125000000000 \
-        DS:frequency:GAUGE:600:-100:125000000000 \
-        DS:jitter:GAUGE:600:-100:125000000000 \
-        DS:noise:GAUGE:600:-100:125000000000 \
-        DS:stability:GAUGE:600:-100:125000000000 \
+        DS:offset:GAUGE:600:-1000:1000 \
+        DS:frequency:GAUGE:600:-1000:1000 \
+        DS:jitter:GAUGE:600:-1000:1000 \
+        DS:noise:GAUGE:600:-1000:1000 \
+        DS:stability:GAUGE:600:-1000:1000 \
         RRA:AVERAGE:0.5:1:600 \
         RRA:AVERAGE:0.5:6:700 \
         RRA:AVERAGE:0.5:24:775 \
