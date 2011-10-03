@@ -502,7 +502,6 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
     $device['transport'] = "udp";
   }
 
-
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   {
     $snmpcommand = $config['snmpwalk'];

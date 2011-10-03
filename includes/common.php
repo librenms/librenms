@@ -203,13 +203,18 @@ function ifclass($ifOperStatus, $ifAdminStatus)
   return $ifclass;
 }
 
+function device_by_name($name, $refresh = 0)
+{
+  return device_by_id_cache(getidbyname($name), $refresh);
+}
+
 function device_by_id_cache($device_id, $refresh = '0')
 {
-  global $device_cache;
+  global $cache;
 
-  if (!$refresh && isset($device_cache[$device_id]) && is_array($device_cache[$device_id]))
+  if (!$refresh && isset($cache['devices']['id'][$device_id]) && is_array($cache['devices']['id'][$device_id]))
   {
-    $device = $device_cache[$device_id];
+    $device = $cache['devices']['id'][$device_id];
   } else {
     $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
     if (get_dev_attrib($device,'override_sysLocation_bool'))
@@ -217,7 +222,7 @@ function device_by_id_cache($device_id, $refresh = '0')
       $device['real_location'] = $device['location'];
       $device['location'] = get_dev_attrib($device,'override_sysLocation_string');
     }
-    $device_cache[$device_id] = $device;
+    $cache['devices']['id'][$device_id] = $device;
   }
 
   return $device;
@@ -242,7 +247,9 @@ function getifhost($id)
 
 function gethostbyid($id)
 {
-  return dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
+  global $cache;
+  
+  return $cache['devices']['id'][$id]['hostname'];
 }
 
 function strgen ($length = 16)
@@ -282,14 +289,18 @@ function getifdescrbyid($id)
   return dbFetchCell("SELECT `ifDescr` FROM `ports` WHERE `interface_id` = ?", array($id));
 }
 
-function getidbyname($domain)
+function getidbyname($hostname)
 {
-  return dbFetchCell("SELECT `device_id` FROM `devices` WHERE `hostname` = ?", array($domain));
+  global $cache;
+  
+  return $cache['devices']['hostname'][$hostname];
 }
 
 function gethostosbyid($id)
 {
-  return dbFetchCell("SELECT `os` FROM `devices` WHERE `device_id` = ?", array($id));
+  global $cache;
+  
+  return $cache['devices']['id'][$id]['os'];
 }
 
 function safename($name)

@@ -6,9 +6,9 @@ echo('<tr bgcolor="' . $bg_colour . '">');
 
 echo('<td class="list">');
 
-if (array_search($vm['vmwVmDisplayName'],array_keys($cache['devices'])))
+if (getidbyname($vm['vmwVmDisplayName']))
 {
-  echo(generate_device_link($cache['devices'][$vm['vmwVmDisplayName']]));
+  echo(generate_device_link(device_by_name($vm['vmwVmDisplayName'])));
 } else {
   echo $vm['vmwVmDisplayName'];
 }
