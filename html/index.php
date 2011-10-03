@@ -29,8 +29,10 @@ include("includes/functions.inc.php");
 
 include("includes/authenticate.inc.php");
 
-foreach($_GET as $key=>$get_var) {
-  if (strstr($key, "opt")) {
+foreach ($_GET as $key=>$get_var)
+{
+  if (strstr($key, "opt"))
+  {
     list($name, $value) = explode("|", $get_var);
     if (!isset($value)) { $value = "yes"; }
     $vars[$name] = $value;
@@ -38,14 +40,16 @@ foreach($_GET as $key=>$get_var) {
 }
 
 $segments = explode('/', trim($_SERVER['PATH_INFO'], '/'));
-foreach($segments as $pos => $segment) {
+
+foreach ($segments as $pos => $segment)
+{
   $segment = urldecode($segment);
   if ($pos == "0")
   {
     $vars['page'] = $segment;
   } else {
-    if (TRUE)  // do this to keep everything working whilst we fiddle
-    {
+    if (TRUE)  // do this to keep everything working whilst we fiddle --AS
+    { // also, who wrote this? Please check php.net/switch ;) --TL
       if ($pos == "1")
       {
         $_GET['opta'] = $segment;
@@ -299,12 +303,10 @@ if ($config['page_gen'])
 
     echo('<br />Generated in ' . $gentime . ' seconds.');
 }
-
-echo('</div>');
-echo('</div>');
 ?>
-
-<script class="content_tooltips" type="text/javascript">
+      </div>
+    </div>
+    <script class="content_tooltips" type="text/javascript">
 $(document).ready(function() { $('#content a[title]').qtip({ content: { text: false }, style: 'light' }); });
 
 $('INPUT.auto-hint, TEXTAREA.auto-hint').focus(function() {
@@ -313,8 +315,9 @@ $('INPUT.auto-hint, TEXTAREA.auto-hint').focus(function() {
         $(this).removeClass('auto-hint');
     }
 });
+    </script>
 
-</script>
+<?php echo "ohai: " . gethostbyid(174); ?>
 
-</body>
+  </body>
 </html>

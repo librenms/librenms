@@ -34,7 +34,7 @@ function ifNameDescr($interface, $device = NULL)
   return ifLabel($interface, $device);
 }
 
-function ifLabel ($interface, $device = NULL)
+function ifLabel($interface, $device = NULL)
 {
   global $config;
 
