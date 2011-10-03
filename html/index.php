@@ -317,7 +317,5 @@ $('INPUT.auto-hint, TEXTAREA.auto-hint').focus(function() {
 });
     </script>
 
-<?php echo "ohai: " . gethostbyid(174); ?>
-
   </body>
 </html>
