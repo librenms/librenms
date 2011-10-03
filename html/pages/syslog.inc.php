@@ -1,5 +1,3 @@
-<meta http-equiv="refresh" content="60">
-
 <?php if ($_GET['opta'] == "expunge" && $_SESSION['userlevel'] >= '10') { dbFetchCell("TRUNCATE TABLE `syslog`"); } ?>
 
 <?php print_optionbar_start('25'); ?>
@@ -14,7 +12,7 @@
     <select name="program" id="program">
       <option value="">All Programs</option>
       <?php
-        foreach (dbFetchRows("SELECT `program` FROM `syslog` GROUP BY `program` ORDER BY `program`") as $data)
+        foreach (dbFetchRows("SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`") as $data)
         {
           echo("<option value='".$data['program']."'");
           if ($data['program'] == $_POST['program']) { echo("selected"); }
@@ -28,18 +26,17 @@
     <select name="device" id="device">
       <option value="">All Devices</option>
       <?php
-        foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data)
+        foreach (get_all_devices() as $hostname)
         {
-          echo("<option value='".$data['device_id']."'");
+          echo("<option value='".getidbyname($hostname)."'");
 
-          if ($data['device_id'] == $_POST['device']) { echo("selected"); }
+          if (getidbyname($hostname) == $_POST['device']) { echo("selected"); }
 
-          echo(">".$data['hostname']."</option>");
+          echo(">".$hostname."</option>");
         }
       ?>
     </select>
   </label>
-
   <input type=submit class=submit value=Search>
 
 </form>
