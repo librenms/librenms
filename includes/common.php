@@ -120,6 +120,13 @@ function get_port_by_ifIndex($device_id, $ifIndex)
   return dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device_id, $ifIndex));
 }
 
+function get_all_devices($device, $type = "")
+{
+  global $cache;
+
+  # FIXME respect $type (server, network, etc) -- needs an array fill in topnav.
+  return array_keys($cache['devices']['hostname']);
+}
 
 function port_by_id_cache($port_id)
 {

@@ -1,6 +1,8 @@
 <?php
 
-foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
+## FIXME queries such as the one below should probably go into index.php?
+
+foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $device)
 {
   if (get_dev_attrib($device,'override_sysLocation_bool'))
   {
