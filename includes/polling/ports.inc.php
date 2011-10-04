@@ -134,10 +134,8 @@ foreach ($ports as $port)
   { /// Check to make sure Port data is cached.
     $this_port = &$port_stats[$port['ifIndex']];
 
-
     #print_r($port);
     #print_r($this_port);
-
 
     if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $this_port['ifDescr'], $matches)) { $this_port['ifDescr'] = $matches[1]; }
     $polled_period = $polled - $port['poll_time'];
@@ -333,7 +331,6 @@ foreach ($ports as $port)
 
     /// Do Alcatel Detailed Stats
     if ($device['os'] == "aos") { include("port-alcatel.inc.php"); }
-
 
     /// Update Database
     if (count($port['update']))

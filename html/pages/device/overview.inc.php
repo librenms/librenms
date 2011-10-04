@@ -58,7 +58,6 @@ if ($services['total'])
   echo("</div>");
 }
 
-
 ### FIXME - split this into overview/syslog.inc.php?
 $syslog =  dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20", array($device['device_id']));
 if (count($syslog))

@@ -25,7 +25,6 @@ unset($sep);
 
 print_optionbar_end();
 
-
 echo('<div id="content">
         <table  border="0" cellspacing="0" cellpadding="5" width="100%">');
 
@@ -55,7 +54,6 @@ foreach (dbFetchRows("SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
   } else {
     $entity_descr = $entity['entPhysicalName'] . " (" . $entity['entPhysicalModelName'] .")";
   }
-
 
   echo("<tr bgcolor=$bg_colour><td>".$entity_descr."</td>
             <td>".$cef['afi']."</td>
@@ -103,7 +101,6 @@ foreach (dbFetchRows("SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
 
     echo("</td></tr>");
   }
-
 
   $i++;
 }

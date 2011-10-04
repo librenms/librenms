@@ -24,7 +24,6 @@ foreach (dbFetchRows("SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY di
   $graph_array_zoom['from']   = $config['time']['twoday'];
   $graph_array_zoom['to']     = $config['time']['now'];
 
-
   echo("<tr bgcolor='$row_colour'><th>");
   echo(overlib_link($fs_url, $drive['diskio_descr'], generate_graph_tag($graph_array_zoom),  NULL));
   echo("</th></tr>");

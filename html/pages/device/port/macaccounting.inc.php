@@ -29,7 +29,6 @@ if ($vars['subview'] == "top10")
   if (!isset($vars['period'])) { $vars['period'] = "1day"; }
   $from = "-" . $vars['period'];
 
-
   echo("<div style='margin: 0px 0px 0px 0px'>
          <div style=' margin:0px; float: left;';>
            <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
@@ -123,7 +122,6 @@ if ($vars['subview'] == "top10")
     #$name = gethostbyaddr($addy['ipv4_address']); FIXME - Maybe some caching for this?
     $arp_host = dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id AND D.device_id = I.device_id", array($addy['ipv4_address']));
     if ($arp_host) { $arp_name = generate_device_link($arp_host); $arp_name .= " ".generate_port_link($arp_host); } else { unset($arp_if); }
-
 
     if ($name == $addy['ipv4_address']) { unset ($name); }
     if (dbFetchCell("SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?", array($acc['device_id'], $addy['ipv4_address'])))

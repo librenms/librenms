@@ -13,5 +13,4 @@ function add_service($device, $service)
   return dbInsert($insert, 'services');
 }
 
-
 ?>

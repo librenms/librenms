@@ -173,7 +173,6 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
     $device['transport'] = "udp";
   }
 
-
   // php has no bulkwalk functionality, so use binary for this.
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   {
@@ -382,7 +381,6 @@ function snmpwalk_cache_multi_oid($device, $oid, $array, $mib = NULL, $mibdir = 
   return $cache['snmp'][$device['device_id']][$oid];
 }
 
-
 function snmpwalk_cache_double_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL)
 {
   $data = snmp_walk($device, $oid, "-OQUs", $mib, $mibdir);
@@ -420,8 +418,6 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = NULL, $mibdir =
 
   return $array;
 }
-
-
 
 function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
 {

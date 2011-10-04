@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## Supermicro Fanspeeds
 if ($device['os'] == "linux")
 {

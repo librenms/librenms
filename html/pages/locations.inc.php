@@ -76,7 +76,6 @@ foreach (getlocations() as $location)
 
   include("includes/print-quadgraphs.inc.php");
 
-
       echo("</tr></td>");
     }
     $done = "yes";

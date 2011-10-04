@@ -26,7 +26,6 @@ function getDates($dayofmonth)
       $lastyear = $year;
     }
 
-
     $date_from = $year . $month . $dayofmonth;
     $date_to   = $newyear . $newmonth . $dayofmonth;
 
@@ -58,7 +57,6 @@ function getDates($dayofmonth)
       $lastyear = $year;
     }
 
-
     $date_from = $newyear . $newmonth . $dayofmonth;
     $date_to   = $year . $month . $dayofmonth;
 
@@ -74,7 +72,6 @@ function getDates($dayofmonth)
 
   return($return);
 }
-
 
 function getValue($host, $port, $id, $inout)
 {
@@ -177,7 +174,6 @@ function getRates($bill_id,$datefrom,$dateto)
   $mtot = getTotal($bill_id,$datefrom,$dateto);
   $ptot = getPeriod($bill_id,$datefrom,$dateto);
 
-
   $data['rate_95th_in'] = get95thIn($bill_id,$datefrom,$dateto);
   $data['rate_95th_out'] = get95thOut($bill_id,$datefrom,$dateto);
 
@@ -209,6 +205,5 @@ function getPeriod($bill_id,$datefrom,$dateto)
   $ptot = dbFetchCell("SELECT SUM(period) FROM bill_data WHERE bill_id = '".mres($bill_id)."' AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'");
   return($ptot);
 }
-
 
 ?>

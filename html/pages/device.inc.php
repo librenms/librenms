@@ -278,7 +278,6 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-
     if ($_SESSION['userlevel'] >= "7")
     {
       echo('<li class="' . $select['edit'] . '" style="float: right;">

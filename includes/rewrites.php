@@ -833,7 +833,6 @@ $rewrite_ios_features = array(
     '  ' => ' ',
   );
 
-
 // Specific rewrite functions
 
 function makeshortif($if)
@@ -864,7 +863,6 @@ function rewrite_fortinet_hardware ($hardware)
   return ($hardware);
 }
 
-
 function rewrite_extreme_hardware ($hardware)
 {
   global $rewrite_extreme_hardware;
@@ -883,7 +881,6 @@ function rewrite_ftos_hardware ($hardware)
 
   return ($hardware);
 }
-
 
 function rewrite_ironware_hardware ($hardware)
 {

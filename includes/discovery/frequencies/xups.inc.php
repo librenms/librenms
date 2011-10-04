@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## XUPS
 if ($device['os'] == "powerware")
 {

@@ -223,7 +223,6 @@ function sensor_low_limit($class, $current)
   return $limit;
 }
 
-
 function sensor_limit($class, $current)
 {
   $limit = NULL;
@@ -348,7 +347,6 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
   }
 }
 
-
 function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $precision = "1", $current = NULL, $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
 {
   global $config, $debug;
@@ -377,7 +375,6 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
     $valid[$type][$index] = 1;
   }
 }
-
 
 function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = "1", $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
 {

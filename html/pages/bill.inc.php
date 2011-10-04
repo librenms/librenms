@@ -210,7 +210,6 @@ if (bill_permitted($bill_id))
     $bi .= "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
     $bi .= "&amp;width=715&amp;height=200&amp;total=1'>";
 
-
     $li = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
     $li .= "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to;
     $li .= "&amp;width=715&amp;height=200&amp;total=1'>";

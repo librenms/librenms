@@ -36,7 +36,6 @@ if($bill['bill_type'] == "cdr") {
    $custom_graph .= " HRULE:" . $rates['rate_average'] * 1000 * -1 . "#cc0000";
 }
 
-
 include("includes/graphs/generic_multi_bits_separated.inc.php");
 
 ?>

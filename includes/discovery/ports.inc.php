@@ -4,7 +4,6 @@
 
 echo("Ports : ");
 
-
 $ports = array();
 $ports = snmpwalk_cache_oid($device, "ifDescr", $port_stats, "IF-MIB");
 #$ports = snmpwalk_cache_oid($device, "ifName", $port_stats, "IF-MIB");

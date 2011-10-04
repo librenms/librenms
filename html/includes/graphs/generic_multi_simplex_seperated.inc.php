@@ -67,7 +67,6 @@ foreach ($rrd_list as $i => $rrd)
     $t_defname = $g_defname;
   }
 
-
   $rrd_options .= " AREA:".$g_defname.$i."#".$colour.":'".substr(str_pad($rrd['descr'], $descrlen),0,$descrlen)."':$stack";
   $rrd_options .= " GPRINT:".$t_defname.$i.":LAST:%6.2lf%s".str_replace("%", "%%", $units)."";
   $rrd_options .= " GPRINT:".$t_defname.$i."max:MAX:%6.2lf%s".str_replace("%", "%%", $units)."";

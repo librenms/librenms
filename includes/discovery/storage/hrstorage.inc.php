@@ -34,7 +34,6 @@ if (is_array($hrstorage_array))
         break;
     }
 
-
     foreach ($config['ignore_mount'] as $bi) { if ($bi == $descr) { $deny = 1; if ($debug) echo("$bi == $descr \n"); } }
     foreach ($config['ignore_mount_string'] as $bi) { if (strpos($descr, $bi) !== FALSE)     { $deny = 1; if ($debug) echo("strpos: $descr, $bi \n"); } }
     foreach ($config['ignore_mount_regexp'] as $bi) { if (preg_match($bi, $descr) > "0") { $deny = 1; if ($debug) echo("preg_match $bi, $descr \n"); } }

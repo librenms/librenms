@@ -247,7 +247,6 @@ if ($port_details)
        }
 }
 
-
 unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 
 echo("</td></tr>");

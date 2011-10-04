@@ -95,7 +95,6 @@ foreach ($_POST as $name => $value)
   $vars[$name] = $value;
 }
 
-
 if(strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) { $_SESSION['widescreen'] = 1; }
 if(strstr($_SERVER['REQUEST_URI'], 'widescreen=no'))  { unset($_SESSION['widescreen']); }
 
@@ -174,7 +173,6 @@ if ($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$conf
             var shown = false;
             var trigger = $('.trigger', this);
             var info = $('.popup', this).css('opacity', 0);
-
 
             $([trigger.get(0), info.get(0)]).mouseover(function () {
                 if (hideDelayTimer) clearTimeout(hideDelayTimer);
@@ -259,7 +257,6 @@ if($devel || $vars['devel'])
   print_r($vars);
   echo("</pre>");
 }
-
 
 if ($_SESSION['authenticated'])
 {

@@ -16,8 +16,6 @@ echo("
 
       <input type=submit value=' Yes, please delete this bill! ' name='Delete'></form>
 
-
-
 ");
 
 ?>

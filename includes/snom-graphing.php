@@ -34,6 +34,4 @@ function callsgraphSNOM ($rrd, $graph, $from, $to, $width, $height, $title, $ver
   }
 }
 
-
-
 ?>

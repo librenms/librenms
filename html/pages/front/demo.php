@@ -1,4 +1,3 @@
-
 <table border=0 cellpadding=10 cellspacing=10 width=100%>
   <tr>
     <td colspan=2>
@@ -56,7 +55,6 @@ foreach ($dev_list as $device_id => $descr)
 
 echo("</tr></table>");
 
-
 ?>
 
     </td>
@@ -81,7 +79,6 @@ while ($device = mysql_fetch_array($sql)) {
   }
   if (!$already) { $nodes[] = $device['device_id']; }
 }
-
 
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
 while ($device = mysql_fetch_array($sql)) {

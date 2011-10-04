@@ -14,7 +14,6 @@
  *
  */
 
-
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/syslog.php");

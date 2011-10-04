@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## Areca Voltages
 if ($device['os'] == "areca")
 {

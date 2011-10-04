@@ -107,7 +107,6 @@ if ($debug)
   echo("\n");
 }
 
-
 ### Loop array of entries and update
 if (is_array($ospf_areas_db))
 {
@@ -143,7 +142,6 @@ if (is_array($ospf_areas_db))
 
 unset($ospf_areas_db);
 unset($ospf_areas_poll);
-
 
 #$ospf_ports = snmpwalk_cache_oid($device, "OSPF-MIB::ospfIfEntry", array(), "OSPF-MIB");
 #print_r($ospf_ports);
@@ -291,7 +289,6 @@ if (is_array($ospf_nbrs_db))
           $ospf_nbr_update = array('interface_id' => array('NULL'));
         }
       }
-
 
       foreach ($ospf_nbr_oids as $oid)
       { // Loop the OIDs

@@ -55,7 +55,6 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall')
     echo(($wificlients1 +0) . " clients on wireless connector, ");
   }
 
-
   ##### RRD Filling Code
   if (isset($wificlients1) && $wificlients1 != "")
   {

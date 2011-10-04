@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## APC
 if ($device['os'] == "apc")
 {

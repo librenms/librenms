@@ -27,7 +27,6 @@ while ($device = mysql_fetch_assoc($sql)) {
   if (!$already) { $nodes[] = $device['device_id']; }
 }
 
-
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
 while ($device = mysql_fetch_assoc($sql)) {
    if (device_permitted($device['device_id'])) {
@@ -93,7 +92,6 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
   }
 }
 
-
 echo("
 
         <div style='clear: both;'>$errorboxes</div> <div style='margin: 0px; clear: both;'>
@@ -108,12 +106,10 @@ echo("<table cellspacing=0 cellpadding=2 width=100%>");
 while ($entry = mysql_fetch_assoc($query)) { include("includes/print-syslog.inc.php"); }
 echo("</table>");
 
-
 echo("</div>
 
    </td>
    <td bgcolor=#e5e5e5 width=470 valign=top>");
-
 
 /// this stuff can be customised to show whatever you want....
 
@@ -136,12 +132,10 @@ if ($_SESSION['userlevel'] >= '5')
     $seperator = ",";
   }
 
-
   $ports['broadband'] = "3294,3295,688,3534";
   $ports['wave_broadband'] = "827";
 
   $ports['new_broadband'] = "3659,4149,4121,4108,3676,4135";
-
 
   echo("<div style=' margin-bottom: 5px;'>");
 
@@ -197,8 +191,6 @@ if ($_SESSION['userlevel'] >= '5')
     "&amp;from=".$day."&amp;to=".$now."&amp;width=385&amp;height=100&amp;legend=no&amp;inverse=c'></a></div>");
   }
 
-
-
   echo("<div style=' margin-bottom: 5px;'>");
 
   if ($ports['broadband']) {
@@ -225,7 +217,6 @@ if ($_SESSION['userlevel'] >= '5')
   }
 
   echo("</div>");
-
 
   if ($ports['wave_broadband']) {
     echo("<div style='width: 235px; float: left;'>

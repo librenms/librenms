@@ -13,7 +13,6 @@ if ($vars['hardware']) { $where .= " AND hardware = ?";    $sql_param[] = $vars[
 if ($vars['features']) { $where .= " AND features = ?";    $sql_param[] = $vars['features']; }
 if ($vars['type'])     { $where .= " AND type = ?";        $sql_param[] = $vars['type']; }
 
-
 if ($vars['location'] == "Unset") { $location_filter = ''; }
 if ($vars['location']) { $location_filter = $vars['location']; }
 
@@ -219,7 +218,6 @@ foreach ($menu_options as $option => $text)
     echo('<a href="'. generate_url($vars, array('bare' => 'yes')).'">Remove Header</a>');
   }
 
-
 ?>
 
 </div>
@@ -287,6 +285,5 @@ if($format == "graph")
   }
   echo("</table>");
 }
-
 
 ?>

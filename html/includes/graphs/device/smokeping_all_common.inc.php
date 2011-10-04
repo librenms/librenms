@@ -10,7 +10,6 @@ $scale_rigid = TRUE;
 include("includes/graphs/common.inc.php");
 include("smokeping_common.inc.php");
 
-
 $i = 0;
 $pings = 20;
 $iter = 0;
@@ -22,7 +21,6 @@ if($width > "500")
 } else {
   $descr_len = 12 + round(($width - 250) / 8);
 }
-
 
 if($width > "500")
 {
@@ -86,7 +84,6 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
 
   $rrd_options .= " GPRINT:avsd$i:'%5.1lf%Ss'";
   $rrd_options .= " GPRINT:avmsr$i:'%5.1lf%s\\l'";
-
 
   $i++;
 }

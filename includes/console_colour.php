@@ -31,7 +31,6 @@
  * @link     http://pear.php.net/package/Console_Color
  */
 
-
 $GLOBALS['_CONSOLE_COLOR_CODES'] = array (
     'color' => array(
             'black'  => 30,
@@ -67,7 +66,6 @@ $GLOBALS['_CONSOLE_COLOR_CODES'] = array (
             'grey'   => 47
     )
 );
-
 
 /**
  * A simple class to use ANSI Colorcodes.

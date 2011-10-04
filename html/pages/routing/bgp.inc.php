@@ -122,11 +122,9 @@ else
   if ($vars['graph'] == "macaccounting_pkts") { echo("</span>"); }
   echo(")");
 
-
   echo('</div>');
 
   print_optionbar_end();
-
 
   echo("<table border=0 cellspacing=0 cellpadding=5 width=100% class='sortable'>");
   echo('<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>State</th><th width=200>Uptime / Updates</th></tr>');
@@ -204,7 +202,6 @@ else
                 Updates <img src='images/16/arrow_down.png' align=absmiddle /> " . format_si($peer['bgpPeerInUpdates']) . "
                         <img src='images/16/arrow_up.png' align=absmiddle /> " . format_si($peer['bgpPeerOutUpdates']) . "</td></tr>
          <tr height=5></tr>");
-
 
     unset($invalid);
     switch ($vars['graph'])

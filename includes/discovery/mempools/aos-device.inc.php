@@ -9,7 +9,6 @@ if ($device['os'] == "aos")
   $used = $total / 100 * $perc_used;
   $free = $total - $used;
 
-
   if (is_numeric($total) && is_numeric($used))
   {
     discover_mempool($valid_mempool, $device, 0, "aos-device", "Device Memory", "1", NULL, NULL);

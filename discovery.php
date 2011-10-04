@@ -72,7 +72,6 @@ if (isset($options['d']))
   #  ini_set('error_reporting', 0);
 }
 
-
 if (!$where)
 {
   echo("-h <device id> | <device hostname wildcard>  Poll single device\n");
@@ -178,7 +177,6 @@ if(!isset($options['q'])) {
          ' Delete['.($db_stats['delete']+0). '/'.round($db_stats['delete_sec']+0,2).'s]');
   echo("\n");
 }
-
 
 logfile($string);
 

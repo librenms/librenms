@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == 'sentry3')
 {
   $oids = snmp_walk($device, "tempHumidSensorHumidValue", "-Osqn", "Sentry3-MIB");

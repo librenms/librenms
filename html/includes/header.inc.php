@@ -50,5 +50,3 @@ if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'])
 
         <!-- ///// end of gumax-header ///// -->
 
-
-

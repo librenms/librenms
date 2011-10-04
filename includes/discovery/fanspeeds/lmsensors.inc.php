@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## LMSensors Fanspeeds
 if ($device['os'] == "linux")
 {

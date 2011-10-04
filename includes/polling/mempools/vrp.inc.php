@@ -23,5 +23,4 @@ $mempool['total'] = $entry['hwEntityMemSize'];
 $mempool['used'] = $entry['hwEntityMemSize'] / 100 * $perc;
 $mempool['free'] = $entry['hwEntityMemSize'] - $mempool['used'];
 
-
 ?>

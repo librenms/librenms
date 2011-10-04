@@ -130,8 +130,6 @@ function rrdtool_graph($graph_file, $options)
   }
 }
 
-
-
 /**
  * Generates and pipes a command to rrdtool
  *

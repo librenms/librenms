@@ -6,7 +6,6 @@ if ($vars['view'] == 'graphs' || $vars['view'] == 'minigraphs')
 }
 if (!$vars['view']) { $vars['view'] = "basic"; }
 
-
 $link_array = array('page'    => 'device',
                     'device'  => $device['device_id'],
                     'tab' => 'ports');
@@ -25,7 +24,6 @@ if(dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl'"))
 {
   $menu_options['adsl'] = 'ADSL';
 }
-
 
 $sep = "";
 foreach ($menu_options as $option => $text)
@@ -113,6 +111,5 @@ if ($vars['view'] == 'minigraphs')
   }
   echo("</table></div>");
 }
-
 
 ?>

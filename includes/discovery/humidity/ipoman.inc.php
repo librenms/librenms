@@ -3,8 +3,6 @@
 # FIXME: EMD "stack" support
 # FIXME: What to do with IPOMANII-MIB::ipmEnvEmdConfigHumiOffset.0 ?
 
-
-
 if ($device['os'] == "ipoman")
 {
   echo(" IPOMANII-MIB ");

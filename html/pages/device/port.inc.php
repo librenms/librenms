@@ -77,7 +77,6 @@ foreach ($menu_options as $option => $text)
 }
 unset($sep);
 
-
 if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$port['interface_id']."'") > "0" )
 {
 

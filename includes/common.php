@@ -143,7 +143,6 @@ function port_by_id_cache($port_id)
   return $port;
 }
 
-
 function get_port_by_id($port_id)
 {
   if (is_numeric($port_id))

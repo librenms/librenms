@@ -52,7 +52,6 @@ foreach ($config['poller_modules'] as $module => $module_status)
     echo(($module_status ? '<span class=green>enabled</span>' : '<span class=red>disabled</span>' ));
   }
 
-
   echo('</td><td>');
 
     echo('<form id="toggle_poller" name="toggle_poller" method="post" action="">
@@ -60,7 +59,6 @@ foreach ($config['poller_modules'] as $module => $module_status)
   <input type="submit" name="Submit" value="Toggle" />
   </label>
 </form>');
-
 
   echo('</td></tr>');
   $i++;
@@ -89,7 +87,6 @@ foreach ($config['discovery_modules'] as $module => $module_status)
     echo(($module_status ? '<span class=green>enabled</span>' : '<span class=red>disabled</span>' ));
   }
 
-
   echo('</td><td>');
 
     echo('<form id="toggle_discovery" name="toggle_discovery" method="post" action="">
@@ -98,14 +95,11 @@ foreach ($config['discovery_modules'] as $module => $module_status)
   </label>
 </form>');
 
-
   echo('</td></tr>');
-
 
   $i++;
 }
 echo('</table>');
 echo('</div>');
-
 
 ?>

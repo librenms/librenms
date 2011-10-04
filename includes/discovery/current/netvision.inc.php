@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == "netvision")
 {
   for ($i = 1; $i <= 3; $i++)

@@ -7,5 +7,4 @@ include("poller.php");
 
 echo("\nPLEASE USE 'poller.php' INSTEAD!\n");
 
-
 ?>

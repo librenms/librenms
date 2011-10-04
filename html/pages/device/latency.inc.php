@@ -29,7 +29,6 @@ unset($sep);
 
 print_optionbar_end();
 
-
 if($vars['view'] == "incoming")
 {
 

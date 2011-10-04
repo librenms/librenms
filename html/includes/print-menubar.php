@@ -40,7 +40,6 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
         </ul>
             </div>
 
-
         </div>
 
     </li>
@@ -167,7 +166,6 @@ $(document).ready(function() {
 });
 </script>
 
-
         </div><!-- End 4 columns container -->
 
     </li><!-- End 4 columns Item -->
@@ -206,8 +204,6 @@ if ($config['show_locations'])
 <?php
 }
 ?>
-
-
 
     <!-- PORTS -->
 
@@ -308,11 +304,9 @@ $(document).ready(function() {
 });
 </script>
 
-
         </div><!-- End 4 columns container -->
 
     </li><!-- End 4 columns Item -->
-
 
 <?php
 
@@ -417,7 +411,6 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
         ');
   }
 
-
   ## BGP Sessions
   if ($_SESSION['userlevel'] >= '5' && $routing_count['bgp'])
   {
@@ -437,7 +430,6 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
    ');
   }
 
-
   echo('      </ul>');
 ?>
 
@@ -449,16 +441,13 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 }
 ?>
 
-
     <li class="menu_right"><a href="#" class="drop"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System</a><!-- Begin Home Item -->
 
         <div class="dropdown_3columns align_right"><!-- Begin 2 columns container -->
 
-
             <div class="col_3">
                 <h2>Observium <?php echo($config['version']); ?> </h2>
             </div>
-
 
             <div class="col_2">
                 <p>Network Management and Monitoring<br />
@@ -488,7 +477,6 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
                 </p>
             </div>
 
-
             <div class="col_1">
                 <h2>Settings</h2>
 <ul>
@@ -501,7 +489,6 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
       <li><a href="preferences/"><img src="images/16/wrench_orange.png" border="0" align="absmiddle" /> My Settings</a></li>
         </ul>
             </div>
-
 
 <?php
 $apache_version = str_replace("Apache/", "", $_SERVER['SERVER_SOFTWARE']);
@@ -542,11 +529,8 @@ $netsnmp_version = shell_exec($config['snmpget'] . " --version");
         <li><a href="authlog/"><img src="images/16/lock.png" border="0" align="absmiddle" /> Authlog</a></li>');
     } ?>
 
-
-
         </ul>
             </div>
-
 
         </div><!-- End 2 columns container -->
 

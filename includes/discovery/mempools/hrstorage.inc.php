@@ -39,7 +39,6 @@ if (is_array($storage_array))
     if (strstr($descr, "MALLOC") || strstr($descr, "UMA")) { $deny = 1;  } ## Ignore FreeBSD INSANITY
     if (strstr($descr, "procfs") || strstr($descr, "/proc")) { $deny = 1;  } ## Ignore ProcFS
 
-
     if (!$deny && is_numeric($index))
     {
       discover_mempool($valid_mempool, $device, $index, "hrstorage", $descr, $units, NULL, NULL);

@@ -108,7 +108,6 @@ function error500($title, $msg) {
   return error(500, "Not found", $title, $msg);
 }
 
-
 /**
  * Incomplete / invalid request
  */
@@ -209,7 +208,6 @@ if ($_GET['legend'] == "no")  { $rrd_cmd .= " -g "; }
 if ($height < "99")  { $rrd_cmd .= " --only-graph "; }
 if ($width <= "300") { $rrd_cmd .= " --font LEGEND:7:" . $config['mono_font'] . " --font AXIS:6:" . $config['mono_font'] . " "; }
 else {                 $rrd_cmd .= " --font LEGEND:8:" . $config['mono_font'] . " --font AXIS:7:" . $config['mono_font'] . " "; }
-
 
 if (isset($_GET['debug'])) {
   header('Content-Type: text/plain; charset=utf-8');

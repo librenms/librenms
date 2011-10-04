@@ -184,7 +184,6 @@ $lineplot->SetFillColor("#d5d5d5@0.5");
 #$lineplot2->SetColor("#d5d5d5");
 #$lineplot2->SetFillColor("#d5d5d5@0.5");
 
-
 $lineplot_in = new LinePlot($in_data, $ticks);
 
 $lineplot_in->SetLegend("Traffic In");

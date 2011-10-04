@@ -8,7 +8,6 @@ if (device_permitted($entry['device_id']))
   echo("<tr style=\"background-color: $bg_colour\">
     <td width=0></td>");
 
-
   $entry['hostname'] = shorthost($entry['hostname'], 20);
 
   if ($_GET['page'] != "device")
