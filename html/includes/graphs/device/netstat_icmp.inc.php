@@ -17,7 +17,7 @@ $stats = array('icmpInMsgs'      => '00cc00',
 
 $i=0;
 
-foreach($stats as $stat => $colour)
+foreach ($stats as $stat => $colour)
 {
   $i++;
   $rrd_list[$i]['filename'] = $rrd_filename;

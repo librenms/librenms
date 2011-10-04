@@ -14,7 +14,7 @@ function generate_url($vars, $new_vars = array())
   $url = $vars['page']."/";
   unset($vars['page']);
 
-  foreach($vars as $var => $value)
+  foreach ($vars as $var => $value)
   {
     if ($value != "" && strstr($var, "opt") === FALSE)
     {
@@ -465,7 +465,7 @@ function foldersize($path)
   $files = scandir($path);
   $total_files = 0;
 
-  foreach($files as $t)
+  foreach ($files as $t)
   {
     if (is_dir(rtrim($path, '/') . '/' . $t))
     {

@@ -68,8 +68,7 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
 
 function rrdtool_pipe_close(&$rrd_process, &$rrd_pipes)
 {
-
-  if($debug)
+  if ($debug)
   {
     echo stream_get_contents($rrd_pipes[1]);
     echo stream_get_contents($rrd_pipes[2]);
@@ -83,7 +82,7 @@ function rrdtool_pipe_close(&$rrd_process, &$rrd_pipes)
   // proc_close in order to avoid a deadlock
 
   $return_value = proc_close($rrd_process);
-  if($debug)
+  if ($debug)
   {
     echo $return_value;
   }
@@ -100,7 +99,6 @@ function rrdtool_pipe_close(&$rrd_process, &$rrd_pipes)
 
 function rrdtool_graph($graph_file, $options)
 {
-
   global $config, $debug;
 
   rrdtool_pipe_open($rrd_process, $rrd_pipes);
@@ -121,7 +119,7 @@ function rrdtool_graph($graph_file, $options)
 
     rrdtool_pipe_close($rrd_process, $rrd_pipes);
 
-    if($debug)
+    if ($debug)
     {
         echo("<p>");
         if ($debug) { echo("graph $graph_file $options"); }
@@ -178,8 +176,8 @@ function rrdtool($command, $filename, $options)
 
 function rrdtool_create($filename, $options)
 {
+  global $config, $debug;
 
-  global $config; global $debug;
   $command = $config['rrdtool'] . " create $filename $options";
   if ($debug) { echo($command."\n"); }
 

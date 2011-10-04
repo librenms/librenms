@@ -3,8 +3,8 @@
 global $config;
 
 $graphs = array('mailscanner_sent' => 'Mailscanner - Sent / Received',
-		'mailscanner_spam' => 'Mailscanner - Spam / Virus',
-		'mailscanner_reject' => 'Mailscanner - Rejected / Waiting / Relayed');
+                'mailscanner_spam' => 'Mailscanner - Spam / Virus',
+                'mailscanner_reject' => 'Mailscanner - Rejected / Waiting / Relayed');
 
 foreach ($graphs as $key => $text)
 {

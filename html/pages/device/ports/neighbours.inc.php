@@ -10,7 +10,7 @@ echo('<tr><th>Local Port</th>
           <th>Protocol</th>
       </tr>');
 
-foreach(dbFetchRows("SELECT * FROM links AS L, ports AS I WHERE I.device_id = ? AND I.interface_id = L.local_interface_id", array($device['device_id'])) as $neighbour)
+foreach (dbFetchRows("SELECT * FROM links AS L, ports AS I WHERE I.device_id = ? AND I.interface_id = L.local_interface_id", array($device['device_id'])) as $neighbour)
 {
 
   if ($bg_colour == $list_colour_b) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }

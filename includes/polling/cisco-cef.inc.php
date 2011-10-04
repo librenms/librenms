@@ -25,10 +25,10 @@ if (is_array($cefs))
   {
     $entity_name = $entity_array[$entity]['entPhysicalName'] ." - ".$entity_array[$entity]['entPhysicalModelName'];
     echo("\n$entity $entity_name\n");
-    foreach($afis as $afi => $paths)
+    foreach ($afis as $afi => $paths)
     {
       echo(" |- $afi\n");
-      foreach($paths as $path => $cef_stat)
+      foreach ($paths as $path => $cef_stat)
       {
         echo(" | |-".$path.": ".$cef_stat['cefSwitchingPath']);
 

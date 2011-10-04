@@ -11,9 +11,9 @@ while ($entry = mysql_fetch_assoc($query))
 
 $stack_poll_array = snmpwalk_cache_twopart_oid($device, "ifStackStatus", array());
 
-foreach($stack_poll_array as $interface_id_high => $entry_high)
+foreach ($stack_poll_array as $interface_id_high => $entry_high)
 {
-  foreach($entry_high as $interface_id_low => $entry_low)
+  foreach ($entry_high as $interface_id_low => $entry_low)
   {
     $ifStackStatus = $entry_low['ifStackStatus'];
     if (isset($stack_db_array[$interface_id_high][$interface_id_low]))

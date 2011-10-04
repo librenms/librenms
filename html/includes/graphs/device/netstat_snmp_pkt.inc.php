@@ -9,7 +9,7 @@ $stats = array('snmpInPkts',
                'snmpOutPkts');
 
 $i=0;
-foreach($stats as $stat)
+foreach ($stats as $stat)
 {
   $i++;
   $rrd_list[$i]['filename'] = $rrd_filename;

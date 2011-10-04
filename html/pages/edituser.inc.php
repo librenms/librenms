@@ -176,7 +176,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
     echo("<form method='post' action=''>
             <input type='hidden' value='edituser' name='page'>
             <select name='user_id'>");
-    foreach($user_list as $user_entry)
+    foreach ($user_list as $user_entry)
     {
       echo("<option value='" . $user_entry['user_id']  . "'>" . $user_entry['username'] . "</option>");
     }

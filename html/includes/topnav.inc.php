@@ -9,13 +9,13 @@ foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $device)
     $device['real_location'] = $device['location'];
     $device['location'] = get_dev_attrib($device,'override_sysLocation_string');
   }
-    
+
   $devices['count']++;
 
   $cache['devices']['hostname'][$device['hostname']] = $device['device_id'];
   $cache['devices']['id'][$device['device_id']] = $device;
 }
-    
+
 if($_SESSION['userlevel'] >= 5)
 {
   $devices['up']        = dbFetchCell("SELECT COUNT(*) FROM devices  WHERE status = '1' AND `ignore` = '0'");

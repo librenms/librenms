@@ -9,7 +9,7 @@ $rrd_options .= " -u 100 -l 0 -E -b 1024 ";
 $iter = "1"; $i=1;
 $rrd_options .= " COMMENT:'                           Min   Cur    Max\\n'";
 
-foreach(dbFetchRows("SELECT * FROM `mempools` where `device_id` = ?", array($id)) as $mempool)
+foreach (dbFetchRows("SELECT * FROM `mempools` where `device_id` = ?", array($id)) as $mempool)
 {
   #  FIXME generic colour function
   if ($iter=="1") { $colour="CC0000"; } elseif ($iter=="2") { $colour="008C00"; } elseif ($iter=="3") { $colour="4096EE"; }

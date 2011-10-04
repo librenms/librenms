@@ -9,7 +9,7 @@ $stats['services']     = dbFetchCell("SELECT count(*) FROM services");
 $stats['applications'] = dbFetchCell("SELECT count(*) FROM applications");
 $stats['bgp']          = dbFetchCell("SELECT count(*) FROM bgpPeers");
 
-foreach(dbFetch("SELECT `os` FROM `devices` GROUP BY `os`") as $dt_data)
+foreach (dbFetch("SELECT `os` FROM `devices` GROUP BY `os`") as $dt_data)
 {
   $stats['devicetypes'][$dt_data[os]] = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `os` = '".$dt_data['os']."'");
 }

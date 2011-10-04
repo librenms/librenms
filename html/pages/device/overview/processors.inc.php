@@ -13,7 +13,7 @@ if (count($processors))
   echo("<img align='absmiddle' src='".$config['base_url']."/images/icons/processor.png'> Processors</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
 
-  foreach($processors as $proc)
+  foreach ($processors as $proc)
   {
     if (is_integer($processor_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     ## REPLACE THIS SHITTY CODE. IT IS ALSO ELSEWHERE.

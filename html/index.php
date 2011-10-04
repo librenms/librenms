@@ -85,12 +85,12 @@ foreach ($segments as $pos => $segment)
   }
 }
 
-foreach($_GET as $name => $value)
+foreach ($_GET as $name => $value)
 {
   $vars[$name] = $value;
 }
 
-foreach($_POST as $name => $value)
+foreach ($_POST as $name => $value)
 {
   $vars[$name] = $value;
 }

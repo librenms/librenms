@@ -151,7 +151,7 @@ else
   }
 
   $peer_query = "select * from bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id ".$where." ORDER BY D.hostname, B.bgpPeerRemoteAs, B.bgpPeerIdentifier";
-  foreach(dbFetchRows($peer_query) as $peer)
+  foreach (dbFetchRows($peer_query) as $peer)
   {
     unset ($alert, $bg_image);
 

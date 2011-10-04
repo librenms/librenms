@@ -148,7 +148,7 @@ function poll_device($device, $options)
         include("includes/polling/".$options['m'].".inc.php");
       }
     } else {
-      foreach($config['poller_modules'] as $module => $module_status)
+      foreach ($config['poller_modules'] as $module => $module_status)
       {
         if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module])))
         {

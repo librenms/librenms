@@ -27,7 +27,7 @@ if ($device['os'] == "apc")
     $temps['airIRRCUnitStatusReturnAirTempMetric'] = "Return Air";
     $temps['airIRRCUnitStatusEnteringFluidTemperatureMetric'] = "Entering Fluid";
     $temps['airIRRCUnitStatusLeavingFluidTemperatureMetric'] = "Leaving Fluid";
-    foreach($temps as $obj => $descr)
+    foreach ($temps as $obj => $descr)
     {
       $oids = snmp_get($device, $obj . ".0", "-OsqnU", "PowerNet-MIB");
       list($oid,$current) = explode(' ',$oids);

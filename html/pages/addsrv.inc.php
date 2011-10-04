@@ -26,7 +26,7 @@ else
     closedir($handle);
   }
 
-  foreach(dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $device)
+  foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $device)
   {
     $devicesform .= "<option value='" . $device['device_id'] . "'>" . $device['hostname'] . "</option>";
   }

@@ -35,7 +35,7 @@ echo('<div style="padding:4px 0px 4px 8px;" class=graphhead>Poller Modules</div>
 
 echo('<table width="100%" cellpadding=5>');
 echo('<tr><th>Module</th><th>Global</th><th>Device</th></tr>');
-foreach($config['poller_modules'] as $module => $module_status)
+foreach ($config['poller_modules'] as $module => $module_status)
 {
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
@@ -73,7 +73,7 @@ $i=0;
 echo('<div style="padding:4px 0px 4px 8px;" class=graphhead>Discovery Modules</div>');
 echo('<table width="100%" cellpadding=5>');
 echo('<tr><th>Module</th><th>Global</th><th>Device</th></tr>');
-foreach($config['discovery_modules'] as $module => $module_status)
+foreach ($config['discovery_modules'] as $module => $module_status)
 {
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
   echo('<tr bgcolor="'.$bg_colour.'"><td><b>'.$module.'</b></td><td>');

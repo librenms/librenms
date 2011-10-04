@@ -17,7 +17,7 @@ $stats = array('icmpInSrcQuenchs' => array(),
 
 $i=0;
 
-foreach($stats as $stat => $array)
+foreach ($stats as $stat => $array)
 {
   $i++;
   $rrd_list[$i]['filename'] = $rrd_filename;
