@@ -18,7 +18,7 @@ include("includes/functions.php");
 
 if (isset($argv[1]) && $argv[1])
 {
-  $host    = strtolower($argv[1]);
+  $host      = strtolower($argv[1]);
   $community = $argv[2];
   $snmpver   = strtolower($argv[3]);
 
@@ -43,19 +43,17 @@ if (isset($argv[1]) && $argv[1])
   if (!$snmpver) $snmpver = "v2c";
   if ($community)
   {
-    unset($config['snmp']['community']);
-    $config['snmp']['community'][] = $community;
+    $config['snmp']['community'][] = array($community);
   }
-  $device_id = addHost($host, $community, $snmpver, $port = '161', $transport = 'udp');
+
+  $device_id = addHost($host, $community, $snmpver, $port, $transport);
 
   if ($device_id)
   {
     $device = device_by_id_cache($device_id);
-    echo("Added device ".$device['hostname']." (".$device['device_id'].")\n");
+    echo("Added device ".$device['hostname']." (".$device_id.")\n");
   }
-
 } else {
-
   print Console_Color::convert("
 Observium v".$config['version']." Add Host Tool
 
