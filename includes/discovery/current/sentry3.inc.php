@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == 'sentry3')
 {
   $divisor = "100";

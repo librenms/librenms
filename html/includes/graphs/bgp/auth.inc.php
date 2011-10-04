@@ -15,7 +15,4 @@ if (is_numeric($id))
   }
 }
 
-
-
-
 ?>

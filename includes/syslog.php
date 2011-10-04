@@ -32,7 +32,6 @@ function get_cache($host, $value) {
   return $dev_cache[$host][$value];
 }
 
-
 function process_syslog ($entry, $update) {
   global $config;
 
@@ -56,7 +55,6 @@ function process_syslog ($entry, $update) {
 #        $entry['program'] = $matches['program'];
 #      }
 #      unset($matches);
-
 
       if (strstr($entry[msg], "%"))
       {

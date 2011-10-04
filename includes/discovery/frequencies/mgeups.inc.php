@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## MGE UPS Frequencies
 if ($device['os'] == "mgeups")
 {

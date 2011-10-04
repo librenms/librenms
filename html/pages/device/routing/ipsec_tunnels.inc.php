@@ -72,18 +72,13 @@ $graph_array['type']   = $graph_type;
 
 include("includes/print-quadgraphs.inc.php");
 
-
    echo("
    </td>
    </tr>");
   }
 
-
 echo("</td>");
 echo("</tr>");
-
-
-
 
   $i++;
 }

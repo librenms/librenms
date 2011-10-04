@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## Supermicro Voltages
 if ($device['os'] == "linux")
 {

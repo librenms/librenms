@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## APC Voltages
 if ($device['os'] == "apc")
 {

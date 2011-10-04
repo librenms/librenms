@@ -4,7 +4,6 @@
 
  if ($config['enable_inventory']) {
 
-
   echo("\nCaching OIDs:");
 
   $entity_array = array();

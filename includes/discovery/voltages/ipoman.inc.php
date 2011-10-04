@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## IPOMANII-MIB
 if ($device['os'] == "ipoman")
 {

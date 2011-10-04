@@ -19,7 +19,6 @@ $config['os_group'][$os_group]['over'][0]['text']   = "Processor Usage";
 $config['os_group'][$os_group]['over'][1]['graph']  = "device_ucd_memory";
 $config['os_group'][$os_group]['over'][1]['text']   = "Memory Usage";
 
-
 $os = "generic";
 $config['os'][$os]['text']              = "Generic Device";
 
@@ -41,7 +40,6 @@ $config['os'][$os]['over'][1]['graph']  = "device_ucd_memory";
 $config['os'][$os]['over'][1]['text']   = "Memory Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_storage";
 $config['os'][$os]['over'][2]['text']   = "Storage Usage";
-
 
 $os = "qnap";
 $config['os'][$os]['type']              = "server";
@@ -378,7 +376,6 @@ $config['os'][$os]['icon']              = "citrix";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
-
 $os = "proxim";
 $config['os'][$os]['text']              = "Proxim";
 $config['os'][$os]['type']              = "network";
@@ -471,7 +468,6 @@ $config['os'][$os]['text']              = "Liebert";
 $config['os'][$os]['type']              = "power";
 $config['os'][$os]['icon']              = "liebert";
 
-
 $os = "engenius";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['text']              = "EnGenius Access Point";
@@ -486,7 +482,6 @@ $os = "windows";
 $config['os'][$os]['text']              = "Microsoft Windows";
 $config['os'][$os]['ifname']            = 1;
 $config['os'][$os]['processor_stacked'] = 1;
-
 
 $os = "bnt";
 $config['os'][$os]['text']              = "Blade Network Technologies";
@@ -921,7 +916,6 @@ if (isset($config['enable_printers']) && $config['enable_printers'])
   $config['device_types'][$i]['icon'] = 'printer.png';
 }
 
-
 ##############################
 # No changes below this line #
 ##############################
@@ -993,7 +987,6 @@ $twoday = time() - (2 * 24 * 60 * 60);
 $week = time() - (7 * 24 * 60 * 60);
 $month = time() - (31 * 24 * 60 * 60);
 $year = time() - (365 * 24 * 60 * 60);
-
 
 $config['time']['now']        = time();
 $config['time']['fourhour']   = time() - (4 * 60 * 60);

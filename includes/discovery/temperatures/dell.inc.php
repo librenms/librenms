@@ -21,5 +21,4 @@ if (strstr($device['hardware'], "Dell"))
   }
 }
 
-
 ?>

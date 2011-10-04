@@ -111,6 +111,4 @@ echo("</select></td></tr><tr>
      </select></td>
      </tr><tr></table><input type='submit' name='Submit' value=' Add '></form>");
 
-
-
 ?>

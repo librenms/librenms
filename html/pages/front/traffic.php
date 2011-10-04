@@ -27,7 +27,6 @@ foreach (dbFetchRows("SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE
   if (!$already) { $nodes[] = $device['device_id']; }
 }
 
-
 foreach (dbFetchRows("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'") as $device)
 {
    if (device_permitted($device['device_id'])) {
@@ -92,7 +91,6 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
   }
 }
 
-
 echo("
 
         <div style='clear: both;'>$errorboxes</div> <div style='margin: 0px; clear: both;'>
@@ -107,12 +105,10 @@ echo("<table cellspacing=0 cellpadding=2 width=100%>");
 while ($entry = mysql_fetch_assoc($query)) { include("includes/print-syslog.inc.php"); }
 echo("</table>");
 
-
 echo("</div>
 
    </td>
    <td bgcolor=#e5e5e5 width=470 valign=top>");
-
 
 /// this stuff can be customised to show whatever you want....
 
@@ -181,7 +177,6 @@ if ($_SESSION['userlevel'] >= '5')
     "<img src='graph.php?type=multiport_bits&amp;id=".$ports['peering'].
     "&amp;from=".$day."&amp;to=".$now."&amp;width=155&amp;height=100&amp;legend=no'></a></div>");
   }
-
 
   if ($ports['core']) {
     echo("<div style='width: 235px;'>

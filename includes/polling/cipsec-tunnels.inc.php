@@ -40,8 +40,6 @@ foreach ($ipsec_array as $index => $tunnel)
                    "cikeTunLocalName" => "tunnel_name",
                    "cikeTunLocalValue" => "local_addr");
 
-
-
   if (!is_array($tunnels[$tunnel['cikeTunRemoteValue']]))
   {
     $tunnel_id = dbInsert(array('device_id' => $device['device_id'], 'peer_addr' => $tunnel['cikeTunRemoteValue'], 'local_addr' => $tunnel['cikeTunLocalValue'], 'tunnel_name' => $tunnel['cikeTunLocalName']), 'ipsec_tunnels');

@@ -101,12 +101,10 @@ echo("<table cellspacing=0 cellpadding=2 width=100%>");
 while ($entry = mysql_fetch_assoc($query)) { include("includes/print-syslog.inc.php"); }
 echo("</table>");
 
-
 echo("</div>
 
    </td>
    <td bgcolor=#e5e5e5 width=275 valign=top>");
-
 
 /// this stuff can be customised to show whatever you want....
 

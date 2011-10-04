@@ -5,7 +5,6 @@
 ##
 ##  STATISTICS-MIB::hpSwitchCpuStat.0 = INTEGER: 10
 
-
 if ($device['os'] == "procurve")
 {
   echo("Procurve : ");

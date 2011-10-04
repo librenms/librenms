@@ -106,5 +106,4 @@ if ($argv[1]) { CollectData($argv[1]); }
 
 rrdtool_pipe_close($rrd_process, $rrd_pipes);
 
-
 ?>

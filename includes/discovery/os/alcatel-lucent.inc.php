@@ -17,5 +17,4 @@ if (!$os)
   if (strpos($sysObjectId, ".1.3.6.1.4.1.6527.1.9.1") !== FALSE) { $os = "timos"; }
 }
 
-
 ?>

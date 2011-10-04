@@ -57,14 +57,12 @@ if ($_GET['opta'] == "add")
     <td><input type="textarea" name="bill_notes" size="32"></td>
   </tr>
 
-
   <tr>
     <td></td><td><input type="submit" class="submit" name="Submit" value=" Add Bill "></td>
   </tr>
   </table>
  </div>
 </form>
-
 
 <?php
 

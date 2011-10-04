@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == "netvision")
 {
   $freq_oid   = "1.3.6.1.4.1.4555.1.1.1.1.3.2.0";

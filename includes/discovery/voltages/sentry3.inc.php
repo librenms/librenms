@@ -1,7 +1,5 @@
 <?php
 
-
-
 if ($device['os'] == "sentry3")
 {
   $oids = snmp_walk($device, "infeedVoltage", "-OsqnU", "Sentry3-MIB");

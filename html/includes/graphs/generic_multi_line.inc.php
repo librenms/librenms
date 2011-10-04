@@ -10,7 +10,6 @@ if($width > "500")
   $descr_len += round(($width - 250) / 8);
 }
 
-
 if ($nototal) { $descrlen += "2"; $unitlen += "2";}
 $unit_text = str_pad(truncate($unit_text,$unitlen),$unitlen);
 

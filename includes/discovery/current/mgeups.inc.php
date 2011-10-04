@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## MGE UPS
 if ($device['os'] == "mgeups")
 {

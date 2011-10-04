@@ -180,7 +180,6 @@ $config['rancid_ignorecomments']        = 0; # Ignore lines starting with #
 #$config['collectd_dir']                 = '/var/lib/collectd/rrd';
 #$config['smokeping']['dir']     = "/var/lib/smokeping/";
 
-
 # NFSen RRD dir.
 $config['nfsen_enable'] = 0;
 #$config['nfsen_split_char']   = "_";

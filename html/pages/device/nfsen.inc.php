@@ -13,5 +13,4 @@ foreach ($datas as $name=>$type)
   include("includes/print-device-graph.php");
 }
 
-
 ?>

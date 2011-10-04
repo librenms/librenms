@@ -52,7 +52,6 @@ $descr  = $device['purpose'];
 $override_sysLocation_bool = get_dev_attrib($device,'override_sysLocation_bool');
 $override_sysLocation_string = get_dev_attrib($device,'override_sysLocation_string');
 
-
 if ($updated && $update_message)
 {
   print_message($update_message);

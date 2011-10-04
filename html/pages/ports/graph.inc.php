@@ -9,7 +9,6 @@ foreach ($ports as $port)
   $port['in_rate'] = formatRates($port['ifInOctets_rate'] * 8);
   $port['out_rate'] = formatRates($port['ifOutOctets_rate'] * 8);
 
-
   if ($port['in_errors'] > 0 || $port['out_errors'] > 0)
   {
     $error_img = generate_port_link($port,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);

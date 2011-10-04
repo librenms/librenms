@@ -1,7 +1,5 @@
 <?php
 
-
-
 ## Areca Fanspeeds
 if ($device['os'] == "areca")
 {

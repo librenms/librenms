@@ -6,7 +6,6 @@ include("includes/graphs/common.inc.php");
 
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-apache-".$app['app_id'].".rrd";
 
-
 $array = array('sb_reading' => array('descr' => 'Reading', 'colour' => '750F7DFF'),
                'sb_writing' => array('descr' => 'Writing', 'colour' => '00FF00FF'),
                'sb_wait' => array('descr' => 'Waiting', 'colour' => '4444FFFF'),
@@ -18,7 +17,6 @@ $array = array('sb_reading' => array('descr' => 'Reading', 'colour' => '750F7DFF
                'sb_graceful' => array('descr' => 'Graceful', 'colour' => 'FF5576FF'),
                'sb_idle' => array('descr' => 'Idle', 'colour' => 'FF4105FF'),
 );
-
 
 $i = 0;
 if (is_file($rrd_filename))
@@ -38,6 +36,5 @@ $nototal   = 1;
 $unit_text = "Workers";
 
 include("includes/graphs/generic_multi_simplex_seperated.inc.php");
-
 
 ?>

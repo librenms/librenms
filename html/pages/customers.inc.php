@@ -52,7 +52,6 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GRO
            </tr>
          ");
 
-
     unset($customer_name);
   }
 

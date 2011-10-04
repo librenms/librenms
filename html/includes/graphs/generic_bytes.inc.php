@@ -9,7 +9,6 @@ if ($rrd_filename) { $rrd_filename_out = $rrd_filename; $rrd_filename_in = $rrd_
 
 if ($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
 
-
 if ($multiplier)
 {
   $rrd_options .= " DEF:p".$out."octets=".$rrd_filename_out.":".$ds_out.":AVERAGE";

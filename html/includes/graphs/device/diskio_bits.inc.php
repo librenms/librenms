@@ -14,5 +14,4 @@ include("includes/graphs/device/diskio_common.inc.php");
 
 include("includes/graphs/generic_multi_bits_separated.inc.php");
 
-
 ?>

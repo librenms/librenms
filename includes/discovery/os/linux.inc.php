@@ -4,7 +4,6 @@ if (!$os)
 {
   if (preg_match("/^Linux/", $sysDescr)) { $os = "linux"; }
 
-
   ## Specific Linux-derivatives
 
   if ($os == "linux") {

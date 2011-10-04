@@ -5,7 +5,6 @@ function generate_link($text, $vars, $new_vars = array())
   return '<a href="'.generate_url($vars, $new_vars).'">'.$text.'</a>';
 }
 
-
 function generate_url($vars, $new_vars = array())
 {
 
@@ -41,7 +40,6 @@ function generate_overlib_content($graph_array, $text)
     return $overlib_content;
 
 }
-
 
 function get_percentage_colours($percentage)
 {
