@@ -751,7 +751,7 @@ $config['os'][$os]['type']              = "network";
 $config['os'][$os]['text']              = "Symbol AP";
 $config['os'][$os]['icon']              = "symbol";
 
-foreach($config['os'] as $this_os => $blah)
+foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
   {

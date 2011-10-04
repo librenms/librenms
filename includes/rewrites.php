@@ -974,7 +974,7 @@ function rewrite_adslLineType($adslLineType)
                           'fastOrInterleaved'  => 'Fast/Interleaved',
                           'fastAndInterleaved' => 'Fast+Interleaved');
 
-  foreach($adslLineTypes as $type => $text)
+  foreach ($adslLineTypes as $type => $text)
   {
     if ($adslLineType == $type)
     {

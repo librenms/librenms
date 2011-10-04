@@ -8,7 +8,7 @@ $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/netstats-udp.
 $stats = array('udpInDatagrams','udpOutDatagrams','udpInErrors','udpNoPorts');
 
 $i=0;
-foreach($stats as $stat)
+foreach ($stats as $stat)
 {
   $i++;
   $rrd_list[$i]['filename'] = $rrd_filename;

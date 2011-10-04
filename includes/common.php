@@ -26,13 +26,14 @@ function shorthost($hostname, $len=12)
   return ($shorthost);
 }
 
-function isCli() {
-
-     if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
-          return true;
-     } else {
-          return false;
-     }
+function isCli()
+{
+  if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR']))
+  {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 function print_error($text)
@@ -53,7 +54,6 @@ function print_message($text)
   }
 }
 
-
 function delete_port($int_id)
 {
   global $config;
@@ -62,7 +62,8 @@ function delete_port($int_id)
 
   $interface_tables = array('adjacencies', 'ipaddr', 'ip6adjacencies', 'ip6addr', 'mac_accounting', 'bill_ports', 'pseudowires', 'ports');
 
-  foreach($interface_tables as $table) {
+  foreach ($interface_tables as $table)
+  {
     dbDelete($table, "`interface_id` =  ?", array($int_id));
   }
 
@@ -255,7 +256,7 @@ function getifhost($id)
 function gethostbyid($id)
 {
   global $cache;
-  
+
   return $cache['devices']['id'][$id]['hostname'];
 }
 
@@ -299,14 +300,14 @@ function getifdescrbyid($id)
 function getidbyname($hostname)
 {
   global $cache;
-  
+
   return $cache['devices']['hostname'][$hostname];
 }
 
 function gethostosbyid($id)
 {
   global $cache;
-  
+
   return $cache['devices']['id'][$id]['os'];
 }
 
@@ -341,7 +342,7 @@ function set_dev_attrib($device, $attrib_type, $attrib_value)
 function get_dev_attribs($device)
 {
   $attribs = array();
-  foreach(dbFetchRows("SELECT * FROM devices_attribs WHERE `device_id` = ?", array($device)) as $entry)
+  foreach (dbFetchRows("SELECT * FROM devices_attribs WHERE `device_id` = ?", array($device)) as $entry)
   {
     $attribs[$entry['attrib_type']] = $entry['attrib_value'];
   }

@@ -14,7 +14,7 @@ print_optionbar_start();
 
 echo("Polling Interval: ");
 
-foreach(array(0.25, 1, 2, 5, 15, 60) as $interval)
+foreach (array(0.25, 1, 2, 5, 15, 60) as $interval)
 {
   echo($thinger);
   if ($vars['interval'] == $interval) { echo("<span class='pagemenu-selected'>"); }

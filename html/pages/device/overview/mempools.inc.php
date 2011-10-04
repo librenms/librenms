@@ -13,7 +13,7 @@ if (count($mempools))
   echo("<table width=100% cellspacing=0 cellpadding=5>");
   $mempool_rows = '0';
 
-  foreach($mempools as $mempool)
+  foreach ($mempools as $mempool)
   {
     if (is_integer($mempool_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     $percent= round($mempool['mempool_perc'],0);

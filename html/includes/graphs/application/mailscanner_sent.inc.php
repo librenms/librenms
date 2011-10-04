@@ -1,21 +1,21 @@
 <?php
 
-$nototal		 = 1;
+$nototal             = 1;
 
-$ds_in			 = "msg_recv";
-$ds_out			 = "msg_sent";
+$ds_in               = "msg_recv";
+$ds_out              = "msg_sent";
 
-$graph_titel		.= "::messages";
-$unit_text		 = "Messages/sec";
+$graph_titel        .= "::messages";
+$unit_text           = "Messages/sec";
 
-$colour_line_in		 = "008800FF";
-$colour_line_out	 = "000088FF";
-$colour_area_in		 = "CEFFCE66";
-$colour_area_out	 = "CECEFF66";
-$colour_area_in_max	 = "CC88CC";
-$colour_area_out_max	 = "FFEFAA";
+$colour_line_in      = "008800FF";
+$colour_line_out     = "000088FF";
+$colour_area_in      = "CEFFCE66";
+$colour_area_out     = "CECEFF66";
+$colour_area_in_max  = "CC88CC";
+$colour_area_out_max = "FFEFAA";
 
-$mailscanner_rrd	 = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mailscannerV2-" . $app['app_id'] . ".rrd";
+$mailscanner_rrd     = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mailscannerV2-" . $app['app_id'] . ".rrd";
 
 if (is_file($mailscanner_rrd))
 {

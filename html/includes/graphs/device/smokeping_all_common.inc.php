@@ -31,7 +31,7 @@ if($width > "500")
   $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT      Loss    SDev   RTT\:SDev\l'";
 }
 
-foreach($smokeping_files[$direction][$device['hostname']] as $source => $filename)
+foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filename)
 {
 
   if (!isset($config['graph_colours'][$colourset][$iter])) { $iter = 0; }
@@ -48,7 +48,7 @@ foreach($smokeping_files[$direction][$device['hostname']] as $source => $filenam
 #  $rrd_options .= " CDEF:dm$i=median$i,0,".$max->{$start}.",LIMIT";
 
   /// start emulate Smokeping::calc_stddev
-  foreach(range(1, $pings) as $p)
+  foreach (range(1, $pings) as $p)
   {
     $rrd_options .= " DEF:pin".$i."p".$p."=".$filename.":ping".$p.":AVERAGE";
     $rrd_options .= " CDEF:p".$i."p".$p."=pin".$i."p".$p.",UN,0,pin".$i."p".$p.",IF";
@@ -56,7 +56,7 @@ foreach($smokeping_files[$direction][$device['hostname']] as $source => $filenam
 
   unset($pings_options, $m_options, $sdev_options);
 
-  foreach(range(2, $pings) as $p)
+  foreach (range(2, $pings) as $p)
   {
     $pings_options .= ",p".$i."p".$p.",UN,+";
     $m_options     .= ",p".$i."p".$p.",+";

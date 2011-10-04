@@ -19,7 +19,7 @@ if ($device['os'] == "cometsystem-p85xx")
   if ($oids)
   {
     $out = array();
-    foreach(explode("\n", $oids) as $line)
+    foreach (explode("\n", $oids) as $line)
     {
       preg_match($regexp, $line, $match);
       if ($match['name'])
@@ -43,7 +43,7 @@ if ($device['os'] == "cometsystem-p85xx")
       }
     }
 
-    foreach($out as $sensor_id=>$sensor)
+    foreach ($out as $sensor_id=>$sensor)
     {
       if ($sensor['temp_intval'] != 9999)
       {

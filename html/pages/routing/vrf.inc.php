@@ -68,7 +68,7 @@ if($_GET['optb'] == "all" ) {
       echo("</td><td>");
       unset($seperator);
 
-      foreach(dbFetchRows("SELECT * FROM `ports` WHERE `ifVrf` = ? AND `device_id` = ?", array($device['vrf_id'], $device['device_id'])) as $port)
+      foreach (dbFetchRows("SELECT * FROM `ports` WHERE `ifVrf` = ? AND `device_id` = ?", array($device['vrf_id'], $device['device_id'])) as $port)
       {
         $port = array_merge ($device, $port);
 

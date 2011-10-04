@@ -38,7 +38,7 @@ function process_syslog ($entry, $update) {
 
   global $dev_cache;
 
-  foreach($config['syslog_filter'] as $bi)
+  foreach ($config['syslog_filter'] as $bi)
     if (strpos($entry['msg'], $bi) !== FALSE) {
       print_r($entry);
       echo('D-'.$bi);

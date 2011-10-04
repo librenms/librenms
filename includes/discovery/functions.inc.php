@@ -77,7 +77,7 @@ function discover_device($device, $options = NULL)
       include("includes/discovery/".$options['m'].".inc.php");
     }
   } else {
-    foreach($config['discovery_modules'] as $module => $module_status)
+    foreach ($config['discovery_modules'] as $module => $module_status)
     {
       if ($attribs['discover_'.$module] || ( $module_status && !isset($attribs['discover_'.$module])))
       {

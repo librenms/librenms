@@ -6,7 +6,7 @@ $ike_array   = snmpwalk_cache_oid($device, "cikeTunnelEntry", array(), "CISCO-IP
 $tunnels_db = dbFetchRows("SELECT * FROM `ipsec_tunnels` WHERE `device_id` = ?", array($device['device_id']));
 foreach ($tunnels_db as $tunnel) { $tunnels[$tunnel['peer_addr']] = $tunnel;}
 
-foreach($ipsec_array as $index => $tunnel)
+foreach ($ipsec_array as $index => $tunnel)
 {
 
   $tunnel = array_merge($tunnel, $ike_array[$tunnel['cipSecTunIkeTunnelIndex']]);
@@ -46,7 +46,7 @@ foreach($ipsec_array as $index => $tunnel)
   {
     $tunnel_id = dbInsert(array('device_id' => $device['device_id'], 'peer_addr' => $tunnel['cikeTunRemoteValue'], 'local_addr' => $tunnel['cikeTunLocalValue'], 'tunnel_name' => $tunnel['cikeTunLocalName']), 'ipsec_tunnels');
   } else {
-    foreach($db_oids as $db_oid => $db_value) {
+    foreach ($db_oids as $db_oid => $db_value) {
       $db_update[$db_value] = $tunnel[$db_oid];
     }
 

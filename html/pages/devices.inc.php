@@ -34,7 +34,7 @@ if($vars['searchbar'] != "hide")
           <option value=''>All OSes</option>
           <?php
 
-foreach(dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`') as $data)
+foreach (dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`') as $data)
 {
   if ($data['os'])
   {
@@ -50,7 +50,7 @@ foreach(dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY 
           <option value=''>All Versions</option>
           <?php
 
-foreach(dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`') as $data)
+foreach (dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`') as $data)
 {
   if ($data['version'])
   {
@@ -66,7 +66,7 @@ foreach(dbFetch('SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version`
         <select name="hardware" id="hardware">
           <option value="">All Platforms</option>
           <?php
-foreach(dbFetch('SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`') as $data)
+foreach (dbFetch('SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`') as $data)
 {
   if ($data['hardware'])
   {
@@ -82,7 +82,7 @@ foreach(dbFetch('SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardwar
           <option value="">All Featuresets</option>
           <?php
 
-foreach(dbFetch('SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`') as $data)
+foreach (dbFetch('SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`') as $data)
 {
   if ($data['features'])
   {
@@ -116,7 +116,7 @@ foreach (getlocations() as $location) ## FIXME function name sucks maybe get_loc
           <option value="">All Device Types</option>
           <?php
 
-foreach(dbFetch('SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`') as $data)
+foreach (dbFetch('SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`') as $data)
 {
   if ($data['type'])
   {

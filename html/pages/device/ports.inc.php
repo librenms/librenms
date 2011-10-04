@@ -100,7 +100,7 @@ if ($vars['view'] == 'minigraphs')
   $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' ORDER BY `ifIndex` ASC", array($device['device_id']));
   ### As we've dragged the whole database, lets pre-populate our caches :)
   ### FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
-  foreach($ports as $port)
+  foreach ($ports as $port)
   {
     $port_cache[$port['interface_id']] = $port;
     $port_index_cache[$port['device_id']][$port['ifIndex']] = $port;

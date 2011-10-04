@@ -125,7 +125,7 @@ echo("</td>");
 echo("<td width=375 valign=top class=interface-desc>");
 if (strpos($port['label'], "oopback") === false && !$graph_type)
 {
-  foreach(dbFetchRows("SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_interface_id = ? AND L.remote_interface_id = I.interface_id AND I.device_id = D.device_id", array($if_id)) as $link)
+  foreach (dbFetchRows("SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_interface_id = ? AND L.remote_interface_id = I.interface_id AND I.device_id = D.device_id", array($if_id)) as $link)
   {
 #         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generate_port_link($link, makeshortif($link['label'])) . " on " . generate_device_link($link, shorthost($link['hostname'])) . "</a><br />");
 #         $br = "<br />";
@@ -145,7 +145,7 @@ if (strpos($port['label'], "oopback") === false && !$graph_type)
            AND A.ipv4_network_id = ? AND D.device_id = I.device_id
            AND D.device_id != ?";
       $array = array($net['ipv4_network_id'], $device['device_id']);
-      foreach(dbFetchRows($sql, $array) AS $new)
+      foreach (dbFetchRows($sql, $array) AS $new)
       {
         echo($new['ipv4_network_id']);
         $this_ifid = $new['interface_id'];
@@ -166,7 +166,7 @@ if (strpos($port['label'], "oopback") === false && !$graph_type)
            AND D.device_id != ? AND A.ipv6_origin != 'linklayer' AND A.ipv6_origin != 'wellknown'";
       $array = array($net['ipv6_network_id'], $device['device_id']);
 
-      foreach(dbFetchRows($sql, $array) AS $new)
+      foreach (dbFetchRows($sql, $array) AS $new)
       {
         echo($new['ipv6_network_id']);
           $this_ifid = $new['interface_id'];
@@ -213,7 +213,7 @@ if ($port_details)
          $br = "<br />";
        }
 
-       foreach(dbFetchRows("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $member)
+       foreach (dbFetchRows("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $member)
        {
          echo("$br<img src='images/16/brick_link.png' align=absmiddle> <strong>" . generate_port_link($member) . " (PAgP)</strong>");
          $br = "<br />";
@@ -226,7 +226,7 @@ if ($port_details)
          $br = "<br />";
        }
 
-       foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $higher_if)
+       foreach (dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_low` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $higher_if)
        {
          if ($higher_if['interface_id_high'])
          {
@@ -236,7 +236,7 @@ if ($port_details)
          }
        }
 
-       foreach(dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_high` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $lower_if)
+       foreach (dbFetchRows("SELECT * FROM `ports_stack` WHERE `interface_id_high` = ? and `device_id` = ?", array($port['ifIndex'], $device['device_id'])) as $lower_if)
        {
          if ($lower_if['interface_id_low'])
          {

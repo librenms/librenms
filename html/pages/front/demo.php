@@ -11,7 +11,7 @@ $dev_list = array('6'  => 'Central Fileserver',
                   '7'  => 'NE61 Fileserver',
                   '34' => 'DE56 Fileserver');
 
-foreach($dev_list as $device_id => $descr)
+foreach ($dev_list as $device_id => $descr)
 {
 
   echo("<td>");
