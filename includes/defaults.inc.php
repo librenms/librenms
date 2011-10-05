@@ -31,6 +31,7 @@ $config['virsh']          = "/usr/bin/virsh";
 $config['dot']            = "/usr/bin/dot";
 $config['unflatten']      = "/usr/bin/unflatten";
 $config['neato']          = "/usr/bin/neato";
+$config['sfdp']            = "/usr/bin/sfdp";
 
 ### RRDCacheD - Make sure it can write to your RRD dir!
 
