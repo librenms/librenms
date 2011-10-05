@@ -1,3 +1,5 @@
+<h1>Delete Host</h1>
+
 <?php
 
 if ($_SESSION['userlevel'] < 10)
@@ -6,16 +8,31 @@ if ($_SESSION['userlevel'] < 10)
   exit;
 }
 
-if ($_REQUEST['id'])
+if (is_numeric($_REQUEST['id']))
 {
-  echo(delete_device(mres($_REQUEST['id'])));
-}
+  if ($_REQUEST['confirm'])
+  {
+    print_message(delete_device(mres($_REQUEST['id'])));
+  }
+  else
+  {
+    $device = device_by_id_cache($_REQUEST['id']);
+    print_message("Are you sure you want to delete device " . $device['hostname'] . "?");
+?>
+<br />
+<form name="form1" method="post" action="">
+    <input type="hidden" name="id" value="<?php echo $_REQUEST['id'] ?>" />
+    <input type="hidden" name="confirm" value="1" />
+    <input type="submit" class="submit" name="Submit" value="Confirm host deletion" />
 
+<?php
+  }
+}
+else
+{
 ?>
 
 <form name="form1" method="post" action="">
-  <h1>Delete Host</h1>
-  <br />
   <p><select name="id">
 
 <?php
@@ -27,7 +44,10 @@ foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data)
 
 ?>
     </select>
-
-    <input type="submit" class="submit" name="Submit" value="Delete Host">
+    <input type="hidden" name="confirm" value="1" />
+    <input type="submit" class="submit" name="Submit" value="Delete Host" />
 </p>
 </form>
+<?php
+}
+?>
