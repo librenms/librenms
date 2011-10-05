@@ -8,7 +8,7 @@ if($width > "500")
   $descr_len=18;
 } else {
   $descr_len=8;
-  $descr_len += round(($width - 250) / 8);
+  $descr_len += round(($width - 260) / 9.5);
 }
 
 $unit_text = "Bits/sec";

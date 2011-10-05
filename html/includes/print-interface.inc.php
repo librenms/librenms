@@ -89,12 +89,12 @@ if ($port[ifDuplex] != "unknown") { echo("<span class=box-desc>" . $port['ifDupl
 if ($device['os'] == "ios" || $device['os'] == "iosxe")
 {
   if ($port['ifTrunk']) {
-    echo("<span class=box-desc><span class=red>" . $port['ifTrunk'] . "</span></span>");
+    echo("<p class=box-desc><span class=red>" . $port['ifTrunk'] . "</span></p>");
   } elseif ($port['ifVlan']) {
-    echo("<span class=box-desc><span class=blue>VLAN " . $port['ifVlan'] . "</span></span>");
+    echo("<p class=box-desc><span class=blue>VLAN " . $port['ifVlan'] . "</span></p>");
   } elseif ($port['ifVrf']) {
     $vrf = dbFetchRow("SELECT * FROM vrfs WHERE vrf_id = ?", array($port['ifVrf']));
-    echo("<span style='color: green;'>" . $vrf['vrf_name'] . "</span>");
+    echo("<p style='color: green;'>" . $vrf['vrf_name'] . "</p>");
   }
 }
 
