@@ -10,7 +10,7 @@ if (count($processors))
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
   echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=health/metric=processor/">');
-  echo("<img align='absmiddle' src='".$config['base_url']."/images/icons/processor.png'> Processors</a></p>");
+  echo("<img align='absmiddle' src='images/icons/processor.png'> Processors</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
 
   foreach ($processors as $proc)

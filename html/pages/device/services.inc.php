@@ -15,7 +15,7 @@ foreach ($menu_options as $option => $text)
   {
     echo("<span class='pagemenu-selected'>");
   }
-  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/services/' . $option . ($_GET['optd'] ? '/' . $_GET['optd'] : ''). '/">' . $text . '</a>');
+  echo('<a href="device/' . $device['device_id'] . '/services/' . $option . ($_GET['optd'] ? '/' . $_GET['optd'] : ''). '/">' . $text . '</a>');
   if ($_GET['optc'] == $option)
   {
     echo("</span>");

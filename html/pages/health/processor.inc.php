@@ -30,7 +30,7 @@ foreach (dbFetchRows("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.de
 
     $proc_url   = "device/".$device['device_id']."/health/processor/";
 
-    $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
+    $mini_url = "graph.php?id=".$proc['processor_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
     $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['processor_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";

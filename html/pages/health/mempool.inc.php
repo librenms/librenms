@@ -23,7 +23,7 @@ foreach (dbFetchRows("SELECT * FROM `mempools` AS M, `devices` as D WHERE D.devi
     $text_descr = $mempool['mempool_descr'];
 
     $mempool_url = "device/device=".$mempool['device_id']."/tab=health/metric=mempool/";
-    $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
+    $mini_url = "graph.php?id=".$mempool['mempool_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 
     $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
     $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['mempool_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";

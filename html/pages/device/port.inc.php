@@ -116,22 +116,23 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE interface_id = '".$port['i
 {
 
   ### FIXME ATM VPs
+  ### FIXME URLs BROKEN
 
   echo(" | ATM VPs : ");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$port['interface_id']."/junose-atm-vp/bits/'>Bits</a>");
+  echo("<a href='/device/device=" . $device['device_id'] . "/tab=port/port=".$port['interface_id']."/junose-atm-vp/bits/'>Bits</a>");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
   echo(" | ");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "packets") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$port['interface_id']."/junose-atm-vp/packets/'>Packets</a>");
+  echo("<a href='device/device=" . $device['device_id'] . "/tab=port/port=".$port['interface_id']."/junose-atm-vp/packets/'>Packets</a>");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
   echo(" | ");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "cells") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$port['interface_id']."/junose-atm-vp/cells/'>Cells</a>");
+  echo("<a href='device/device=" . $device['device_id'] . "/tab=port/port=".$port['interface_id']."/junose-atm-vp/cells/'>Cells</a>");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
   echo(" | ");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "errors") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$port['interface_id']."/junose-atm-vp/errors/'>Errors</a>");
+  echo("<a href='device/device=" . $device['device_id'] . "/tab=port/port=".$port['interface_id']."/junose-atm-vp/errors/'>Errors</a>");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
 }
 

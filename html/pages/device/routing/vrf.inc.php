@@ -45,11 +45,6 @@ foreach ($graph_types as $type => $descr)
   echo(generate_link($descr, $link_array,array('view'=>'graphs','graph'=>$type)));
   if ($vars['graph'] == $type) { echo("</span>"); }
 
-#  echo('(');
-#  if ($vars['view'] == $type) { echo("<span class='pagemenu-selected'>"); }
-#  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/vrfs/'.$type.'/thumbs/">Mini</a>');
-#  if ($vars['view'] == $type) { echo("</span>"); }
-#  echo(')');
   $type_sep = " | ";
 }
 
