@@ -57,27 +57,30 @@ if ($cdp_array)
     foreach (array_keys($cdp_if_array) as $entry_key)
     {
       $cdp = $cdp_if_array[$entry_key];
-      $remote_device_id = @mysql_result(mysql_query("SELECT `device_id` FROM `devices` WHERE `sysName` = '".$cdp['cdpCacheDeviceId']."' OR `hostname`='".$cdp['cdpCacheDeviceId']."'"), 0);
-
-      if (!$remote_device_id)
+      if (ctype_alnum($cdp['cdpCacheDeviceId']))
       {
-        $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId']);
+        $remote_device_id = @mysql_result(mysql_query("SELECT `device_id` FROM `devices` WHERE `sysName` = '".$cdp['cdpCacheDeviceId']."' OR `hostname`='".$cdp['cdpCacheDeviceId']."'"), 0);
+
+        if (!$remote_device_id)
+        {
+          $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId']);
+          if ($remote_device_id)
+          {
+            $int = ifNameDescr($interface);
+            log_event("Device autodiscovered through CDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['interface_id']);
+          }
+        }
+
         if ($remote_device_id)
         {
-          $int = ifNameDescr($interface);
-          log_event("Device autodiscovered through CDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['interface_id']);
+          $if = $cdp['cdpCacheDevicePort'];
+          $remote_interface_id = @mysql_result(mysql_query("SELECT interface_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if') AND `device_id` = '".$remote_device_id."'"),0);
+        } else { $remote_interface_id = "0"; }
+
+        if ($interface['interface_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort'])
+        {
+          discover_link($interface['interface_id'], 'cdp', $remote_interface_id, $cdp['cdpCacheDeviceId'], $cdp['cdpCacheDevicePort'], $cdp['cdpCachePlatform'], $cdp['cdpCacheVersion']);
         }
-      }
-
-      if ($remote_device_id)
-      {
-        $if = $cdp['cdpCacheDevicePort'];
-        $remote_interface_id = @mysql_result(mysql_query("SELECT interface_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if') AND `device_id` = '".$remote_device_id."'"),0);
-      } else { $remote_interface_id = "0"; }
-
-      if ($interface['interface_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort'])
-      {
-        discover_link($interface['interface_id'], 'cdp', $remote_interface_id, $cdp['cdpCacheDeviceId'], $cdp['cdpCacheDevicePort'], $cdp['cdpCachePlatform'], $cdp['cdpCacheVersion']);
       }
     }
   }
