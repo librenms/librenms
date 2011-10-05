@@ -34,11 +34,6 @@ foreach ($graph_types as $type => $descr)
   echo('<a href="device/' . $device['device_id'] . '/routing/ipsec_tunnels/graphs/'.$type.'/">'.$descr.'</a>');
   if ($_GET['opte'] == $type) { echo("</span>"); }
 
-#  echo('(');
-#  if ($_GET['opte'] == $type) { echo("<span class='pagemenu-selected'>"); }
-#  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ipsec_tunnelss/'.$type.'/thumbs/">Mini</a>');
-#  if ($_GET['opte'] == $type) { echo("</span>"); }
-#  echo(')');
   $type_sep = " | ";
 }
 
