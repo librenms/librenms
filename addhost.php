@@ -43,7 +43,7 @@ if (isset($argv[1]) && $argv[1])
   if (!$snmpver) $snmpver = "v2c";
   if ($community)
   {
-    $config['snmp']['community'][] = array($community);
+    $config['snmp']['community'] = array($community);
   }
 
   $device_id = addHost($host, $community, $snmpver, $port, $transport);
