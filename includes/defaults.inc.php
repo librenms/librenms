@@ -219,6 +219,7 @@ $config['bad_if'][] = "span rp";
 $config['bad_if'][] = "span sp";
 $config['bad_if'][] = "sslvpn";
 $config['bad_if'][] = "pppoe-";
+#$config['bad_if'][] = "control plane";  ## Example for cisco control plane
 
 $config['bad_if_regexp'][] = "/serial[0-9]:/";
 $config['bad_if_regexp'][] = "/^ng[0-9]+$/";
