@@ -305,7 +305,7 @@ function getidbyname($hostname)
     $id = $cache['devices']['hostname'][$hostname];
   } else
   {
-    $id = dbFetchCell("SELECT `device_id` FROM `devices` WHERE `hostname` = ?", array($domain));
+    $id = dbFetchCell("SELECT `device_id` FROM `devices` WHERE `hostname` = ?", array($hostname));
   }
 
   return $id;
