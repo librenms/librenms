@@ -46,7 +46,7 @@ if (isset($argv[1]) && $argv[1])
     $config['snmp']['community'] = array($community);
   }
 
-  $device_id = addHost($host, $community, $snmpver, $port, $transport);
+  $device_id = addHost($host, $snmpver, $port, $transport);
 
   if ($device_id)
   {

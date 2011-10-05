@@ -162,7 +162,7 @@ function delete_device($id)
   return $ret;
 }
 
-function addHost($host, $community = NULL, $snmpver = 'v2c', $port = '161', $transport = 'udp')
+function addHost($host, $snmpver = 'v2c', $port = '161', $transport = 'udp')
 {
   global $config;
 
