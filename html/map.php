@@ -156,12 +156,12 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
   if ($links > 10) ### Unflatten if there are more than 10 links. beyond that it gets messy
   {
-    $maptool = $config['unflatten'] ' -f -l 5 | ' . $config['dot'];
+    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['dot'];
   } else {
     $maptool = $config['dot'];
   }
 
-  if ($where == '') { $maptool = $config['sdfp'] ' -Gpack -Gcharset=latin1 -Gsize=200,200'; }
+  if ($where == '') { $maptool = $config['sdfp'] . ' -Gpack -Gcharset=latin1 -Gsize=200,200'; }
 
   $img = shell_exec("echo \"".addslashes($map)."\" | $maptool -T".$_GET['format']."");
   if ($_GET['format'] == "png")
