@@ -37,7 +37,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall')
       {
         echo("Checking RouterOS Wireless clients... ");
 
-        $wificlients1 = snmp_get($device, "mtxrWlApClientCount.10", "-OUqnv", "MIKROTIK-MIB");
+        $wificlients1 = snmp_get($device, "mtxrWlApClientCount", "-OUqnv", "MIKROTIK-MIB");
 
         echo(($wificlients1 +0) . " clients\n");
         break;
