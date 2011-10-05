@@ -13,11 +13,20 @@ if ($_POST['hostname'])
   if ($_SESSION['userlevel'] > '5')
   {
     $hostname = mres($_POST['hostname']);
-    if ($_POST['community']) { $community = mres($_POST['community']); } else { $community = $config['snmp']['community']; }
+
+    if ($_POST['community'])
+    {
+      $config['snmp']['community'] = array($_POST['community']);
+    }
+
     $snmpver = mres($_POST['snmpver']);
     if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = "161"; }
-    print_message("Adding host $hostname community $community port $port");
-    $result = addHost($hostname, $community, $snmpver, $port);
+    print_message("Adding host $hostname communit" . (count($config['snmp']['community']) == 1 ? "y" : "ies") . " "  . implode(', ',$config['snmp']['community']) . " port $port");
+    $result = addHost($hostname, $snmpver, $port);
+    if ($result)
+    {
+      print_message("Device added ($result)");
+    }
   } else {
     print_error("You don't have the necessary privileges to add hosts.");
   }
