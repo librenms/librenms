@@ -38,7 +38,8 @@ function isCli()
 
 function print_error($text)
 {
-  if (isCli()) {
+  if (isCli())
+  {
     print Console_Color::convert("%r".$text."%n\n", false);
   } else {
     echo('<div class="errorbox"><img src="/images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
@@ -47,7 +48,8 @@ function print_error($text)
 
 function print_message($text)
 {
-  if (isCli()) {
+  if (isCli())
+  {
     print Console_Color::convert("%g".$text."%n\n", false);
   } else {
     echo('<div class="messagebox"><img src="/images/16/tick.png" align="absmiddle"> '.$text.'</div>');
@@ -124,9 +126,23 @@ function get_port_by_ifIndex($device_id, $ifIndex)
 function get_all_devices($device, $type = "")
 {
   global $cache;
-
+  
+  # FIXME needs access control checks!
   # FIXME respect $type (server, network, etc) -- needs an array fill in topnav.
-  return array_keys($cache['devices']['hostname']);
+  
+  if (isset($cache['devices']['hostname']))
+  {
+    $devices = array_keys($cache['devices']['hostname']);
+  }
+  else
+  {
+    foreach (dbFetchRows("SELECT `hostname` FROM `devices`") as $data)
+    {
+      $devices[] = $data['hostname'];
+    }
+  }
+
+  return $devices;
 }
 
 function port_by_id_cache($port_id)
@@ -149,6 +165,7 @@ function get_port_by_id($port_id)
   {
     $port = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($port_id));
   }
+
   if (is_array($port))
   {
     return $port;
@@ -163,6 +180,7 @@ function get_application_by_id($application_id)
   {
     $application = dbFetchRow("SELECT * FROM `applications` WHERE `app_id` = ?", array($application_id));
   }
+
   if (is_array($application))
   {
     return $application;
@@ -177,6 +195,7 @@ function get_sensor_by_id($sensor_id)
   {
     $sensor = dbFetchRow("SELECT * FROM `sensors` WHERE `sensor_id` = ?", array($sensor_id));
   }
+
   if (is_array($sensor))
   {
     return $sensor;
@@ -191,6 +210,7 @@ function get_device_id_by_interface_id($interface_id)
   {
     $device_id = dbFetchCell("SELECT `device_id` FROM `ports` WHERE `interface_id` = ?", array($interface_id));
   }
+
   if (is_numeric($device_id))
   {
     return $device_id;
@@ -255,8 +275,17 @@ function getifhost($id)
 function gethostbyid($id)
 {
   global $cache;
-
-  return $cache['devices']['id'][$id]['hostname'];
+  
+  if (isset($cache['devices']['id'][$id]['hostname']))
+  {
+    $hostname = $cache['devices']['id'][$id]['hostname'];
+  }
+  else
+  {
+    $hostname = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
+  }
+  
+  return $hostname;
 }
 
 function strgen ($length = 16)
@@ -300,7 +329,7 @@ function getidbyname($hostname)
 {
   global $cache;
 
-  if ($cache['devices']['hostname'][$hostname])
+  if (isset($cache['devices']['hostname'][$hostname]))
   {
     $id = $cache['devices']['hostname'][$hostname];
   } else
@@ -314,8 +343,17 @@ function getidbyname($hostname)
 function gethostosbyid($id)
 {
   global $cache;
+  
+  if (isset($cache['devices']['id'][$id]['os']))
+  {
+    $os = $cache['devices']['id'][$id]['os'];
+  }
+  else
+  {  
+    $os = dbFetchCell("SELECT `os` FROM `devices` WHERE `device_id` = ?", array($id));
+  }
 
-  return $cache['devices']['id'][$id]['os'];
+  return $os;
 }
 
 function safename($name)
@@ -411,6 +449,21 @@ function format_bi($size, $round = '2')
   $ext = $sizes[0];
   for ($i = 1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i]; }
   return round($size, $round).$ext;
+}
+
+function is_valid_hostname($hostname)
+{
+  // The Internet standards (Request for Comments) for protocols mandate that
+  // component hostname labels may contain only the ASCII letters 'a' through 'z'
+  // (in a case-insensitive manner), the digits '0' through '9', and the hyphen
+  // ('-'). The original specification of hostnames in RFC 952, mandated that
+  // labels could not start with a digit or with a hyphen, and must not end with
+  // a hyphen. However, a subsequent specification (RFC 1123) permitted hostname
+  // labels to start with digits. No other symbols, punctuation characters, or
+  // white space are permitted. While a hostname may not contain other characters,
+  // such as the underscore character (_), other DNS names may contain the underscore
+
+  return ctype_alnum(str_replace('_','',str_replace('-','',str_replace('.','',$hostname))));
 }
 
 ?>
