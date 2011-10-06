@@ -57,7 +57,7 @@ if ($cdp_array)
     foreach (array_keys($cdp_if_array) as $entry_key)
     {
       $cdp = $cdp_if_array[$entry_key];
-      if (ctype_alnum(str_replace('.','',$cdp['cdpCacheDeviceId'])))
+      if (is_valid_hostname($cdp['cdpCacheDeviceId']))
       {
         $remote_device_id = @mysql_result(mysql_query("SELECT `device_id` FROM `devices` WHERE `sysName` = '".$cdp['cdpCacheDeviceId']."' OR `hostname`='".$cdp['cdpCacheDeviceId']."'"), 0);
 
@@ -81,6 +81,10 @@ if ($cdp_array)
         {
           discover_link($interface['interface_id'], 'cdp', $remote_interface_id, $cdp['cdpCacheDeviceId'], $cdp['cdpCacheDevicePort'], $cdp['cdpCachePlatform'], $cdp['cdpCacheVersion']);
         }
+      }
+      else
+      {
+        echo("X");
       }
     }
   }
