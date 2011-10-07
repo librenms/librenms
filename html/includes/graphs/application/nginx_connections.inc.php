@@ -1,39 +1,34 @@
 <?php
 
+$scale_min = 0;
+
 include("includes/graphs/common.inc.php");
 
-$nginx_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-nginx-".$app['app_id'].".rrd";
+$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-nginx-".$app['app_id'].".rrd";
 
-if (is_file($nginx_rrd))
+$array = array('Reading' => array('descr' => 'Reading', 'colour' => '750F7DFF'),
+               'Writing' => array('descr' => 'Writing', 'colour' => '00FF00FF'),
+               'Waiting' => array('descr' => 'Waiting', 'colour' => '4444FFFF'),
+               'Active' => array('descr' => 'Starting', 'colour' => '157419FF'),
+);
+
+$i = 0;
+if (is_file($rrd_filename))
 {
-  $rrd_filename = $nginx_rrd;
-}
+  foreach ($array as $ds => $vars)
+  {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = $vars['descr'];
+    $rrd_list[$i]['ds'] = $ds;
+    $rrd_list[$i]['colour'] = $vars['colour'];
+    $i++;
+  }
+} else { echo("file missing: $file");  }
 
-$rrd_options .= ' DEF:a='.$rrd_filename.':Active:AVERAGE ';
-$rrd_options .= ' DEF:b='.$rrd_filename.':Reading:AVERAGE ';
-$rrd_options .= ' DEF:c='.$rrd_filename.':Writing:AVERAGE ';
-$rrd_options .= ' DEF:d='.$rrd_filename.':Waiting:AVERAGE ';
+$colours   = "mixed";
+$nototal   = 1;
+$unit_text = "Workers";
 
-$rrd_options .= ' COMMENT:"Connections    Current    Average   Maximum\n" ';
-
-$rrd_options .= " LINE1:a#22FF22:'Active      '";
-$rrd_options .= ' GPRINT:a:LAST:"%6.2lf %s"  ';
-$rrd_options .= ' GPRINT:a:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= ' GPRINT:a:MAX:"%6.2lf %s\n"  ';
-
-$rrd_options .= ' LINE1.25:b#0022FF:Reading    ';
-$rrd_options .= ' GPRINT:b:LAST:"%6.2lf %s"  ';
-$rrd_options .= ' GPRINT:b:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= ' GPRINT:b:MAX:"%6.2lf %s\n"  ';
-
-$rrd_options .= ' LINE1.25:c#FF0000:Writing    ';
-$rrd_options .= ' GPRINT:c:LAST:"%6.2lf %s"  ';
-$rrd_options .= ' GPRINT:c:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= ' GPRINT:c:MAX:"%6.2lf %s\n"  ';
-
-$rrd_options .= ' LINE1.25:d#00AAAA:Waiting    ';
-$rrd_options .= ' GPRINT:d:LAST:"%6.2lf %s"  ';
-$rrd_options .= ' GPRINT:d:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= ' GPRINT:d:MAX:"%6.2lf %s\n"  ';
+include("includes/graphs/generic_multi_simplex_seperated.inc.php");
 
 ?>

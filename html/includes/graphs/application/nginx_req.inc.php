@@ -13,7 +13,8 @@ if (is_file($rrd_filename))
 
   $rrd_options .= " COMMENT:'Requests    Current    Average   Maximum\\n'";
 
-  $rrd_options .= " LINE2:a#22FF22:'Requests  '";
+  $rrd_options .= " AREA:a#98FB98";
+  $rrd_options .= " LINE1.5:a#006400:'Requests  '";
   $rrd_options .= " GPRINT:a:LAST:'%6.2lf %s'";
   $rrd_options .= " GPRINT:a:AVERAGE:'%6.2lf %s'";
   $rrd_options .= " GPRINT:a:MAX:'%6.2lf %s\\n'";
