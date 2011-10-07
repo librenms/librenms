@@ -7,8 +7,10 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_des
   if (is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd")))
   {
     $rrd_filename = $config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
-    $rrd_list[$i]['filename'] = $rrd_filename;
-    $rrd_list[$i]['descr'] = $port['hostname'] ."-". $port['ifDescr'];
+    $rrd_list[$i]['filename']  = $rrd_filename;
+    $rrd_list[$i]['descr']     = $port['hostname'] ."-". $port['ifDescr'];
+    $rrd_list[$i]['descr_in']  = shorthost($port['hostname']);
+    $rrd_list[$i]['descr_out'] = makeshortif($port['ifDescr']);
     $i++;
   }
 }
