@@ -12,12 +12,104 @@ echo(" mysql...");
 
 $data = explode("\n", $mysql);
 
-for ($a=0,$n=count($data);$a<$n;$a++)
+$map = array();
+foreach ($data as $str)
 {
-  $elements = explode(":",$data[$a]);
-  $nstring .= (float)trim($elements[1]).":";
-  unset($elements);
+  list($key, $value) = explode(":", $str);
+  $map[$key] = (float)trim($value);
+  #$nstring .= (float)trim($elements[1]).":";
 }
+
+$mapping = array(
+	  'IDBLBSe' => 'cr',
+	  'IBLFh' => 'ct',
+	  'IBLWn' => 'cu',
+	  'IBLWn' => 'cu',
+	  'SRows' => 'ck',
+	  'SRange' => 'cj',
+	  'SMPs' => 'ci',
+	  'SScan' => 'cl',
+	  'IBIRd' => 'ai',
+	  'IBIWr' => 'aj',
+	  'IBILg' => 'ak',
+	  'IBIFSc' => 'ah',
+	  'IDBRDd' => 'b2',
+	  'IDBRId' => 'b0',
+	  'IDBRRd' => 'b3',
+	  'IDBRUd' => 'b1',
+	'IBRd' => 'ae',
+	'IBCd' => 'af',
+	'IBWr' => 'ag',
+	'TLIe' => 'b5',
+	'TLWd' => 'b4',
+	'IBPse' => 'aa',
+	'IBPDBp' => 'ac',
+	'IBPFe' => 'ab',
+	'IBPMps' => 'ad',
+	'TOC' => 'bc',
+	'OFs' => 'b7',
+	'OTs' => 'b8',
+	'OdTs' => 'b9',
+	'IBSRs' => 'ay',
+	'IBSWs' => 'ax',
+	'IBOWs' => 'az',
+	'QCs' => 'c1',
+	'QCeFy' => 'bu',
+	'MaCs' => 'bl',
+	'MUCs' => 'bf',
+	'ACs' => 'bd',
+	'AdCs' => 'be',
+	'TCd' => 'bi',
+	'Cs' => 'bn',
+	'IBTNx' => 'a5',
+	'KRRs' => 'a0',
+	'KRs' => 'a1',
+	'KWR' => 'a2',
+	'KWs' => 'a3',
+	'QCQICe' => 'bz',
+	'QCHs' => 'bv',
+	'QCIs' => 'bw',
+	'QCNCd' => 'by',
+	'QCLMPs' => 'bx',
+	'CTMPDTs' => 'cn',
+	'CTMPTs' => 'cm',
+	'CTMPFs' => 'co',
+	'IBIIs' => 'au',
+	'IBIMRd' => 'av',
+	'IBIMs' => 'aw',
+	'IBILog' => 'al',
+	'IBISc' => 'am',
+	'IBIFLg' => 'an',
+	'IBFBl' => 'aq',
+	'IBIIAo' => 'ap',
+	'IBIAd' => 'as',
+	'IBIAe' => 'at',
+	'SFJn' => 'cd',
+	'SFRJn' => 'ce',
+	'SRe' => 'cf',
+	'SRCk' => 'cg',
+	'SSn' => 'ch',
+	'SQs' => 'b6',
+	'BRd' => 'cq',
+	'BSt' => 'cp',
+	'CDe' => 'c6',
+	'CIt' => 'c4',
+	'CISt' => 'ca',
+	'CLd' => 'c8',
+	'CRe' => 'c7',
+	'CRSt' => 'cc',
+	'CSt' => 'c5',
+	'CUe' => 'c3',
+	'CUMi' => 'c9',
+);
+
+$values = array();
+foreach ($mapping as $key)
+{
+  $values[] = isset($map[$key]) ? $map[$key] : -1;
+}
+$string = implode(':', $values);
+
 
 #$data = explode("\n", $mysql);
 #$nstring = trim(implode(':',$data),':');
@@ -118,7 +210,6 @@ if (!is_file($mysql_rrd))
         RRA:MAX:0.5:288:797");
 }
 
-rrdtool_update($mysql_rrd, "N:$nstring");
+rrdtool_update($mysql_rrd, "N:$string");
 echo("done ");
 
-?>
