@@ -67,5 +67,17 @@ elseif ($device['os'] == "qnap")
   $version  = snmp_get($device, "ENTITY-MIB::entPhysicalFirmwareRev.1", "-Osqnv");
   $serial   = snmp_get($device, "ENTITY-MIB::entPhysicalSerial.1", "-Osqnv");
 }
+elseif ($device['os'] == "endian")
+{
+  list(,,$version) = explode (" ", $poll_device[sysDescr]);
+  if (strstr($poll_device[sysDescr], "386")|| strstr($poll_device[sysDescr], "486")||strstr($poll_device[sysDescr], "586")||strstr($poll_device[sysDescr], "686")) { $hardware = "Generic x86"; }
+  else if (strstr($poll_device[sysDescr], "x86_64")) { $hardware = "Generic x86 64-bit"; }
+  else if (strstr($poll_device[sysDescr], "sparc32")) { $hardware = "Generic SPARC 32-bit"; }
+  else if (strstr($poll_device[sysDescr], "sparc64")) { $hardware = "Generic SPARC 64-bit"; }
+  else if (strstr($poll_device[sysDescr], "armv5")) { $hardware = "Generic ARMv5"; }
+  else if (strstr($poll_device[sysDescr], "armv6")) { $hardware = "Generic ARMv6"; }
+  else if (strstr($poll_device[sysDescr], "armv7")) { $hardware = "Generic ARMv7"; }
+  else if (strstr($poll_device[sysDescr], "armv")) { $hardware = "Generic ARM"; }
+}
 
 ?>

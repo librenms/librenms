@@ -19,7 +19,7 @@ if($width > "500")
 {
   $descr_len = 18;
 } else {
-  $descr_len = 12 + round(($width - 250) / 8);
+  $descr_len = 12 + round(($width - 275) / 8);
 }
 
 if($width > "500")
