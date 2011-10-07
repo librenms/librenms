@@ -13,6 +13,7 @@ if (!$os)
 
     if (strpos($entPhysicalMfgName, "QNAP") !== FALSE) { $os = "qnap";}
     elseif(strstr($sysObjectId, ".1.3.6.1.4.1.5528.100.20.10.2014")) { $os = "netbotz"; }
+    elseif(strstr($sysDescr, "endian")) { $os = "endian"; }
 
   }
 
