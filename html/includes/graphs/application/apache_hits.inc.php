@@ -13,8 +13,8 @@ if (is_file($apache_rrd))
 
 $ds = "access";
 
-$colour_area = "AA66AA";
-$colour_line = "FFDD88";
+$colour_area = "B0C4DE";
+$colour_line = "191970";
 
 $colour_area_max = "FFEE99";
 

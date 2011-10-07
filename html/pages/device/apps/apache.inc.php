@@ -2,8 +2,8 @@
 
 global $config;
 
-$graphs = array('apache_bytes' => 'Traffic - Bytes/sec',
-                'apache_hits' => 'Traffic - Hits',
+$graphs = array('apache_bits' => 'Traffic',
+                'apache_hits' => 'Hits',
                 'apache_cpu'  => 'CPU Utilisation',
                 'apache_scoreboard' => 'Scoreboard Statistics');
 

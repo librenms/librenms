@@ -13,8 +13,8 @@ if (is_file($apache_rrd))
 
 $ds = "cpu";
 
-$colour_area = "AA66AA";
-$colour_line = "FFDD88";
+$colour_area = "F0E68C";
+$colour_line = "FF4500";
 
 $colour_area_max = "FFEE99";
 
