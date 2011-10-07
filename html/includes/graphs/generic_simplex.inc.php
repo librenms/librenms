@@ -8,8 +8,17 @@ include("includes/graphs/common.inc.php");
 $unit_text = str_pad(truncate($unit_text,18,''),18);
 $line_text = str_pad(truncate($line_text,12,''),12);
 
-$rrd_options .= " DEF:".$ds."=".$rrd_filename.":".$ds.":AVERAGE";
-$rrd_options .= " DEF:".$ds."_max=".$rrd_filename.":".$ds.":MAX";
+if($multiplier) 
+{
+  $rrd_options .= " DEF:".$ds."_o=".$rrd_filename.":".$ds.":AVERAGE";
+  $rrd_options .= " DEF:".$ds."_max_o=".$rrd_filename.":".$ds.":MAX";
+  $rrd_options .= " CDEF:".$ds."=".$ds."_o,$multiplier,*";
+  $rrd_options .= " CDEF:".$ds."_max=".$ds."_max_o,$multiplier,*";
+} else {
+  $rrd_options .= " DEF:".$ds."=".$rrd_filename.":".$ds.":AVERAGE";
+  $rrd_options .= " DEF:".$ds."_max=".$rrd_filename.":".$ds.":MAX";
+}
+
 
 if ($print_total)
 {
