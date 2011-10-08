@@ -4,7 +4,8 @@ if ($vars['view'] == 'graphs' || $vars['view'] == 'minigraphs')
 {
   if (isset($vars['graph'])) { $graph_type = "port_" . $vars['graph']; } else { $graph_type = "port_bits"; }
 }
-if (!$vars['view']) { $vars['view'] = "basic"; }
+
+if (!$vars['view']) { $vars['view'] = $config['ports_page_default']; }
 
 $link_array = array('page'    => 'device',
                     'device'  => $device['device_id'],
