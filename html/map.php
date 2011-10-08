@@ -39,14 +39,16 @@ if (isset($_GET['device'])) { $where = "WHERE device_id = ".mres($_GET['device']
 
 if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 {
-  $map = "digraph G { sep=0.01; size=\"12,5.5\"; pack=100; bgcolor=transparent; splines=true; overlap=scale; concentrate=0; epsilon=0.001; rankdir=0;
-     node [ fontname=\"helvetica\", fontstyle=bold, style=filled, color=white, fillcolor=lightgrey, overlap=false;];
-     edge [ bgcolor=white; fontname=\"helvetica\"; fontstyle=bold; arrowhead=dot; arrowtail=dot];
-     graph [bgcolor=transparent;];\n\n";
+  $map = 'digraph G { sep=0.01; size="12,5.5"; pack=100; bgcolor=transparent; splines=true; overlap=scale; concentrate=0; epsilon=0.001; rankdir=0;
+     node [ fontname="helvetica", fontstyle=bold, style=filled, color=white, fillcolor=lightgrey, overlap=false];
+     edge [ bgcolor=white, fontname="helvetica", fontstyle=bold, arrowhead=dot, arrowtail=dot];
+     graph [bgcolor=transparent];
+
+';
 
   if (!$_SESSION['authenticated'])
   {
-    $map .= "\"Not authenticated\" [fontsize=20 fillcolor=\"lightblue\" URL=\"/\" shape=box3d]\n";
+    $map .= "\"Not authenticated\" [fontsize=20 fillcolor=\"lightblue\", URL=\"/\" shape=box3d]\n";
   }
   else
   {
@@ -58,7 +60,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
         if (count($links))
         {
-          $map .= "\"".$device['hostname']."\" [fontsize=20 fillcolor=\"lightblue\" URL=\"{$config['base_url']}/device/device=".$device['device_id']."/tab=map/\" shape=box3d]\n";
+          $map .= "\"".$device['hostname']."\" [fontsize=20, fillcolor=\"lightblue\", URL=\"{$config['base_url']}/device/device=".$device['device_id']."/tab=map/\" shape=box3d]\n";
         }
 
         foreach  ($links as $link)
@@ -107,7 +109,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
               $dif['interface_id'] = $link['remote_hostname'] . $link['remote_port'];
             }
 
-            $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue URL=\"{$config['base_url']}/device/device=".$device['device_id']."/port/$local_interface_id/\"]\n";
+            $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"{$config['base_url']}/device/device=".$device['device_id']."/port/$local_interface_id/\"]\n";
             if (!$ifdone[$src][$sif['interface_id']])
             {
               $map .= "\"$src\" -> \"" . $sif['interface_id'] . "\" [weight=500000, arrowsize=0, len=0];\n";
@@ -115,7 +117,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
             }
 
             if ($dst_host) {
-              $map .= "\"$dst\" [URL=\"{$config['base_url']}/device/device=$dst_host/tab=map/\" fontsize=20 shape=box3d]\n";
+              $map .= "\"$dst\" [URL=\"{$config['base_url']}/device/device=$dst_host/tab=map/\", fontsize=20, shape=box3d]\n";
             } else {
               $map .= "\"$dst\" [ fontsize=20 shape=box3d]\n";
             }
@@ -143,7 +145,10 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
   $map .= "
 };";
 
-  if ($_GET['debug'] == 1) { echo("<pre>$map</pre>");exit(); }
+#  if ($_GET['debug'] == 1) 
+#  {
+#    echo("<pre>$map</pre>");exit(); 
+#  }
 
   switch ($_GET['format'])
   {
@@ -163,7 +168,17 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
   if ($where == '') { $maptool = $config['sdfp'] . ' -Gpack -Gcharset=latin1 -Gsize=200,200'; }
 
-  $img = shell_exec("echo \"".addslashes($map)."\" | $maptool -T".$_GET['format']."");
+  $descriptorspec = array(0 => array("pipe", "r"),1 => array("pipe", "w") );
+  $process = proc_open('/usr/bin/dot -Tsvg',$descriptorspec,$pipes);               
+
+  if (is_resource($process)) {
+    fwrite($pipes[0],  "$map");
+    fclose($pipes[0]);
+    while (! feof($pipes[1])) {$img .= fgets($pipes[1]);}
+    fclose($pipes[1]);
+    $return_value = proc_close($process);
+  }
+
   if ($_GET['format'] == "png")
   {
     header("Content-type: image/".$_GET['format']);
