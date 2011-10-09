@@ -161,6 +161,8 @@ function rrdtool($command, $filename, $options)
     echo("<p>");
     echo("\n".$cmd."\n");
     echo("</p>");
+  } else {
+    $tmp  = stream_get_contents($rrd_pipes[1]).stream_get_contents($rrd_pipes[2]);
   }
 
 }
