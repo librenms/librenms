@@ -39,7 +39,7 @@ if (isset($_GET['device'])) { $where = "WHERE device_id = ".mres($_GET['device']
 
 if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 {
-  $map = 'digraph G { sep=0.01; size="12,5.5"; pack=100; bgcolor=transparent; splines=true; overlap=scale; concentrate=0; epsilon=0.001; rankdir=0;
+  $map = 'digraph G { sep=0.01; size="120,50.5"; pack=100; bgcolor=transparent; splines=true; overlap=scale; concentrate=0; epsilon=0.001; rankdir=0;
      node [ fontname="helvetica", fontstyle=bold, style=filled, color=white, fillcolor=lightgrey, overlap=false];
      edge [ bgcolor=white, fontname="helvetica", fontstyle=bold, arrowhead=dot, arrowtail=dot];
      graph [bgcolor=transparent];
@@ -159,17 +159,18 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
       $_GET['format'] = 'png';
   }
 
-  if ($links > 10) ### Unflatten if there are more than 10 links. beyond that it gets messy
+  if ($links > 30) ### Unflatten if there are more than 10 links. beyond that it gets messy
   {
-    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['dot'];
+    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['neato'];
   } else {
-    $maptool = $config['dot'];
+    $maptool = $config['neato'];
   }
 
-  if ($where == '') { $maptool = $config['sdfp'] . ' -Gpack -Gcharset=latin1 -Gsize=200,200'; }
+#  if ($where == '') { $maptool = $config['sfdp'] . ' -Gpack -Gcharset=latin1 -Gsize=200,200'; }
 
   $descriptorspec = array(0 => array("pipe", "r"),1 => array("pipe", "w") );
-  $process = proc_open('/usr/bin/dot -Tsvg',$descriptorspec,$pipes);               
+
+  $process = proc_open($maptool.' -T'.$_GET['format'],$descriptorspec,$pipes);               
 
   if (is_resource($process)) {
     fwrite($pipes[0],  "$map");
@@ -181,7 +182,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
   if ($_GET['format'] == "png")
   {
-    header("Content-type: image/".$_GET['format']);
+    header("Content-type: image/png");
   } elseif ($_GET['format'] == "svg") {
     header("Content-type: image/svg+xml");
     $img = str_replace("<a ", '<a target="_parent" ', $img);
@@ -193,7 +194,7 @@ else
   if ($_SESSION['authenticated']) ## FIXME level 10 only?
   {
     echo('<center>
-    <object data="'. $config['base_url'] . '/map.php?format=svg" type="image/svg+xml">
+    <object width=1200 height=1000 data="'. $config['base_url'] . '/map.php?format=svg" type="image/svg+xml">
     </object>
 </center>');
   }
