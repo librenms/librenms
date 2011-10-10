@@ -41,7 +41,7 @@ list($version) = explode(",", $version);
 
 if($hardware == "") {   $hardware = snmp_get($device, "sysObjectID.0", "-Osqv", "SNMPv2-MIB:CISCO-PRODUCTS-MIB"); }
 
-if(isset($cisco_hardware_oids[$poll_device['sysObjectID']])) { $hardware = $cisco_hardware_oids[$poll_device['sysObjectID']]; }
+#if(isset($cisco_hardware_oids[$poll_device['sysObjectID']])) { $hardware = $cisco_hardware_oids[$poll_device['sysObjectID']]; }
 
 if (strpos($poll_device['sysDescr'], "IOS XR")) {
  list(,$version) = explode(",", $poll_device['sysDescr']);
