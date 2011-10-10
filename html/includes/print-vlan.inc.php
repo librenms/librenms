@@ -26,7 +26,7 @@ foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?
   }
   else
   {
-    echo($vlan['port_sep'] . generate_port_link($port, makeshortif($port['ifDescr'])));
+    echo($vlan['port_sep'] . generate_port_link($port, makeshortif(ifnamedescr($port))));
     $vlan['port_sep'] = ", ";
   }
 }
