@@ -17,6 +17,7 @@
   foreach (array_keys($snmpdata[0]) as $key) { $poll_device[$key] = $snmpdata[0][$key]; }
 
   $poll_device['sysDescr'] = snmp_get($device, "sysDescr.0", "-Oqv", "SNMPv2-MIB");
+  $poll_device['sysObjectID'] = snmp_get($device, "sysObjectID.0", "-Oqvn", "SNMPv2-MIB");
 
   $poll_device['sysName'] = strtolower($poll_device['sysName']);
 
