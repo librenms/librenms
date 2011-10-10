@@ -6,3 +6,4 @@ ALTER TABLE `ports` ADD UNIQUE  `device_ifIndex` (  `device_id` ,  `ifIndex` );
 ALTER TABLE `devices` CHANGE  `port`  `port` SMALLINT( 5 ) UNSIGNED NOT NULL DEFAULT  '161';
 CREATE TABLE IF NOT EXISTS `ipsec_tunnels` (  `tunnel_id` int(11) NOT NULL AUTO_INCREMENT,  `device_id` int(11) NOT NULL,  `peer_port` int(11) NOT NULL,  `peer_addr` varchar(64) COLLATE utf8_unicode_ci NOT NULL,  `local_addr` varchar(64) COLLATE utf8_unicode_ci NOT NULL,  `local_port` int(11) NOT NULL,  `tunnel_name` varchar(96) COLLATE utf8_unicode_ci NOT NULL,  `tunnel_status` varchar(11) COLLATE utf8_unicode_ci NOT NULL,  PRIMARY KEY (`tunnel_id`),  UNIQUE KEY `unique_index` (`device_id`,`peer_addr`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 ALTER TABLE `syslog` ADD INDEX ( `program` );
+ALTER TABLE  `devices` ADD  `sysObjectID` VARCHAR( 64 ) NULL DEFAULT NULL AFTER  `bgpLocalAs`;

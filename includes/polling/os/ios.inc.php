@@ -1,7 +1,12 @@
 <?php
 
 $poll_device['sysDescr'] = str_replace("IOS (tm)", "IOS (tm),", $poll_device['sysDescr']);
+$poll_device['sysDescr'] = str_replace(")  RELEASE", "), RELEASE", $poll_device['sysDescr']);
+
+echo("\n".$poll_device['sysDescr']."\n");
+
 list(,$features,$version) = explode(",", $poll_device['sysDescr']);
+
 $version = str_replace(" Version ", "", $version);
 list(,$features) = explode("(", $features);
 list(,$features) = explode("-", $features);
@@ -33,6 +38,10 @@ list($version) = explode(",", $version);
 #   if ($contained_1001 == "0" && strpos($model_1001, "No") === FALSE) { $ciscomodel = $model_1001; }
 #   $ciscomodel = str_replace("\"","",$ciscomodel);
 #   if ($ciscomodel) { $hardware = $ciscomodel; unset($ciscomodel); }
+
+if($hardware == "") {   $hardware = snmp_get($device, "sysObjectID.0", "-Osqv", "SNMPv2-MIB:CISCO-PRODUCTS-MIB"); }
+
+if(isset($cisco_hardware_oids[$poll_device['sysObjectID']])) { $hardware = $cisco_hardware_oids[$poll_device['sysObjectID']]; }
 
 if (strpos($poll_device['sysDescr'], "IOS XR")) {
  list(,$version) = explode(",", $poll_device['sysDescr']);

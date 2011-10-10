@@ -132,6 +132,10 @@ $rewrite_junose_hardware = array(
   'juniSsx1440' => 'SSX-1440',
 );
 
+$rewrite_cisco_hardware = array(
+'.1.3.6.1.4.1.9.1.275' => 'C2948G-L3',
+);
+
 $rewrite_ftos_hardware = array (
 '.1.3.6.1.4.1.6027.1.1.1'=> 'E1200',
 '.1.3.6.1.4.1.6027.1.1.2'=> 'E600',
