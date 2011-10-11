@@ -21,12 +21,12 @@ if ($_SESSION['userlevel'] >= "7")
 
   echo("<span style='font-weight: bold;'>Config</span> &#187; ");
 
-  if (!$_GET['optc']) {
+  if (!$vars['rev']) {
     echo('<span class="pagemenu-selected">');
-    echo("<a href='device/device=".$device['device_id']."/showconfig/'> Latest</a>");
+    echo(generate_link('Latest',array('page'=>'device','device'=>$device['device_id'],'tab'=>'showconfig')));
     echo("</span>");
   } else {
-    echo("<a href='device/device=".$device['device_id']."/showconfig/'> Latest</a>");
+    echo(generate_link('Latest',array('page'=>'device','device'=>$device['device_id'],'tab'=>'showconfig')));
   }
 
   if (function_exists('svn_log')) {
@@ -40,10 +40,11 @@ if ($_SESSION['userlevel'] >= "7")
       echo($sep);
       $revlist[] = $svnlog["rev"];
 
-      if ($_GET['optc'] == $svnlog["rev"]) { echo('<span class="pagemenu-selected">'); }
+      if ($vars['rev'] == $svnlog["rev"]) { echo('<span class="pagemenu-selected">'); }
+      $linktext = "r" . $svnlog["rev"] ." <small>". date("d M H:i", strtotime($svnlog["date"])) . "</small>";
+      echo(generate_link($linktext,array('page'=>'device','device'=>$device['device_id'],'tab'=>'showconfig','rev'=>$svnlog["rev"])));
 
-      echo("<a href='device/device=".$device['device_id']."/showconfig/" . $svnlog["rev"] .  "/'> r" . $svnlog["rev"] ." <small>". date("d M H:i", strtotime($svnlog["date"])) . "</small></a>");
-      if ($_GET['optc'] == $svnlog["rev"]) { echo("</span>");  }
+      if ($vars['rev'] == $svnlog["rev"]) { echo("</span>");  }
 
       $sep = " | ";
     }
@@ -51,8 +52,8 @@ if ($_SESSION['userlevel'] >= "7")
 
   print_optionbar_end();
 
-  if (function_exists('svn_log') && in_array($_GET['optc'], $revlist)) {
-    list($diff, $errors) = svn_diff($file, $_GET['optc']-1, $file, $_GET['optc']);
+  if (function_exists('svn_log') && in_array($vars['rev'], $revlist)) {
+    list($diff, $errors) = svn_diff($file, $vars['rev']-1, $file, $vars['rev']);
     if (!$diff) {
       $text = "No Difference";
     } else {
