@@ -177,7 +177,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
   if ($links > 30) ### Unflatten if there are more than 10 links. beyond that it gets messy
   {
-    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['sfdp'] . ' -Gpack -Gcharset=latin1 | dot';
+    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['sfdp'] . ' -Gpack -Gcharset=latin1 | '.$config['dot'];
   } else {
     $maptool = $config['dot'];
   }
