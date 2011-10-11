@@ -1,8 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-include("../config.php");
-include("../includes/functions.php");
+include("includes/defaults.inc.php");
+include("config.php");
+include("includes/functions.php");
 
 $link = mysql_connect($config['db_host'], $config['db_user'], $config['db_pass']);
 $db = mysql_select_db($config['db_name'], $link);
