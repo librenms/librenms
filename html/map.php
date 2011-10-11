@@ -52,63 +52,74 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
   }
   else
   {
+    $loc_count = 1;
     foreach (dbFetch("SELECT * from devices ".$where) as $device)
     {
       if ($device)
       {
         $links = dbFetch("SELECT * from ports AS I, links AS L WHERE I.device_id = ? AND L.local_interface_id = I.interface_id ORDER BY L.remote_hostname", array($device['device_id']));
-
         if (count($links))
         {
-          $map .= "\"".$device['hostname']."\" [fontsize=20, fillcolor=\"lightblue\", URL=\"{$config['base_url']}/device/device=".$device['device_id']."/tab=map/\" shape=box3d]\n";
+
+	  if(!isset($locations[$device['location']])) { $locations[$device['location']] = $loc_count; $loc_count++; }
+          $loc_id = $locations[$device['location']];
+
+          $map .= "\"".$device['hostname']."\" [fontsize=20, fillcolor=\"lightblue\", group=".$loc_id." URL=\"{$config['base_url']}/device/device=".$device['device_id']."/tab=map/\" shape=box3d]\n";
         }
+
+        
 
         foreach  ($links as $link)
         {
-          $local_interface_id = $link['local_interface_id'];
-          $remote_interface_id = $link['remote_interface_id'];
+         $local_interface_id = $link['local_interface_id'];
+         $remote_interface_id = $link['remote_interface_id'];
 
-          $i = 0; $done = 0;
-          if ($linkdone[$remote_interface_id][$local_interface_id]) { $done = 1; }
+         $i = 0; $done = 0;
+         if ($linkdone[$remote_interface_id][$local_interface_id]) { $done = 1; }
 
-          if (!$done)
+         if (!$done)
+         {
+          $linkdone[$local_interface_id][$remote_interface_id] = TRUE;
+
+          $links++;
+
+          if ($link['ifSpeed'] >= "10000000000")
           {
-            $linkdone[$local_interface_id][$remote_interface_id] = TRUE;
+            $info = "color=red3 style=\"setlinewidth(6)\"";
+          } elseif ($link['ifSpeed'] >= "1000000000") {
+            $info = "color=lightblue style=\"setlinewidth(4)\"";
+          } elseif ($link['ifSpeed'] >= "100000000") {
+            $info = "color=lightgrey style=\"setlinewidth(2)\"";
+          } elseif ($link['ifSpeed'] >= "10000000") {
+            $info = "style=\"setlinewidth(1)\"";
+          } else {
+            $info = "style=\"setlinewidth(1)\"";
+          }
 
-            $links++;
+          $src = $device['hostname'];
+          if ($remote_interface_id)
+          {
+            $dst = dbFetchCell("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.interface_id = ? AND D.device_id = I.device_id", array($remote_interface_id));
+            $dst_host = dbFetchCell("SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.interface_id = ?  AND D.device_id = I.device_id", array($remote_interface_id));
+          } else {
+            unset($dst_host);
+            $dst = $link['remote_hostname'];
+          }
 
-            if ($link['ifSpeed'] >= "10000000000")
-            {
-              $info = "color=red3 style=\"setlinewidth(6)\"";
-            } elseif ($link['ifSpeed'] >= "1000000000") {
-              $info = "color=lightblue style=\"setlinewidth(4)\"";
-            } elseif ($link['ifSpeed'] >= "100000000") {
-              $info = "color=lightgrey style=\"setlinewidth(2)\"";
-            } elseif ($link['ifSpeed'] >= "10000000") {
-              $info = "style=\"setlinewidth(1)\"";
-            } else {
-              $info = "style=\"setlinewidth(1)\"";
-            }
+          $sif = ifNameDescr(dbFetchRow("SELECT * FROM ports WHERE `interface_id` = ?", array($link['local_interface_id'])),$device);
+          if ($remote_interface_id)
+          {
+            $dif = ifNameDescr(dbFetchRow("SELECT * FROM ports WHERE `interface_id` = ?", array($link['remote_interface_id'])), $device);
+          } else {
+            $dif['label'] = $link['remote_port'];
+            $dif['interface_id'] = $link['remote_hostname'] . $link['remote_port'];
+          }
+          if($where == "") {
 
-            $src = $device['hostname'];
-            if ($remote_interface_id)
-            {
-              $dst = dbFetchCell("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.interface_id = ? AND D.device_id = I.device_id", array($remote_interface_id));
-              $dst_host = dbFetchCell("SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.interface_id = ?  AND D.device_id = I.device_id", array($remote_interface_id));
-            } else {
-              unset($dst_host);
-              $dst = $link['remote_hostname'];
-            }
+            $map .= "\"$src\" -> \"" . $dst . "\" [weight=500000, arrowsize=0, len=0];\n";
+              $ifdone[$src][$sif['interface_id']] = 1;
 
-            $sif = ifNameDescr(dbFetchRow("SELECT * FROM ports WHERE `interface_id` = ?", array($link['local_interface_id'])),$device);
-            if ($remote_interface_id)
-            {
-              $dif = ifNameDescr(dbFetchRow("SELECT * FROM ports WHERE `interface_id` = ?", array($link['remote_interface_id'])), $device);
-            } else {
-              $dif['label'] = $link['remote_port'];
-              $dif['interface_id'] = $link['remote_hostname'] . $link['remote_port'];
-            }
-
+          } else {
             $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"{$config['base_url']}/device/device=".$device['device_id']."/port/$local_interface_id/\"]\n";
             if (!$ifdone[$src][$sif['interface_id']])
             {
@@ -136,6 +147,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
             }
             $map .= "\"" . $sif['interface_id'] . "\" -> \"" . $dif['interface_id'] . "\" [weight=1, arrowhead=normal, arrowtail=normal, len=2, $info] \n";
           }
+         }
         }
         $done = 0;
       }
@@ -153,22 +165,33 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
   switch ($_GET['format'])
   {
     case 'svg':
-    case 'png':
       break;
+    case 'png':
+      $_GET['format'] = 'png:gd';
+      break;
+    case 'dot':
+      echo($map);exit();
     default:
-      $_GET['format'] = 'png';
+      $_GET['format'] = 'png:gd';
   }
 
   if ($links > 30) ### Unflatten if there are more than 10 links. beyond that it gets messy
   {
-    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['sfdp'] . ' -Gpack -Gcharset=latin1 -Gsize=11,9';
+    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['sfdp'] . ' -Gpack -Gcharset=latin1 | dot';
   } else {
     $maptool = $config['dot'];
   }
 
-#  if ($where == '') { $maptool = $config['sfdp'] . ' -Gpack -Gcharset=latin1 -Gsize=20,20'; }
+  if ($where == '')
+  {
+#    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['sfdp'] . ' -Gpack -Goverlap=prism -Gcharset=latin1 | dot';
+#    $maptool = $config['sfdp'] . ' -Gpack -Goverlap=prism -Gcharset=latin1 -Gsize=20,20';
+     $maptool = $config['neato'];
+}
 
   $descriptorspec = array(0 => array("pipe", "r"),1 => array("pipe", "w") );
+
+  $mapfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 
   $process = proc_open($maptool.' -T'.$_GET['format'],$descriptorspec,$pipes);
 
@@ -180,7 +203,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
     $return_value = proc_close($process);
   }
 
-  if ($_GET['format'] == "png")
+  if ($_GET['format'] == "png:gd")
   {
     header("Content-type: image/png");
   } elseif ($_GET['format'] == "svg") {
