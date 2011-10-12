@@ -19,7 +19,7 @@ if($width > "500")
   if (!$nototal) { $rrd_options .= " COMMENT:'Total      '"; }
   $rrd_options .= " COMMENT:'\l'";
 } else {
-  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."     Now         Ave          Max\l'";
+  $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."Now      Ave      Max     Avg\l'";
 
 }
 
