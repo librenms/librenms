@@ -293,7 +293,7 @@ foreach ($ports as $port)
     foreach ($stat_oids as $oid)
     {  /// Copy values from array to global variables and force numeric.
       $$oid = $this_port[$oid];
-      if (!is_numeric($$oid)) { $$oid = "0"; }
+      if (!is_numeric($$oid)) { $$oid = "U"; }
     }
 
     $if_rrd_update  = "$polled:$ifInOctets:$ifOutOctets:$ifInErrors:$ifOutErrors:$ifInUcastPkts:$ifOutUcastPkts:$ifInNUcastPkts:$ifOutNUcastPkts:$ifInDiscards:$ifOutDiscards:$ifInUnknownProtos";
