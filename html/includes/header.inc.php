@@ -1,7 +1,7 @@
 <div id="gumax-header">
   <div id="gumax-p-logo">
     <div id="p-logo">
-      <a style="background-image: url('images/observium-logo.png');" accesskey="z" href=""></a>
+      <a style="background-image: url('<?php echo($config['title_image']); ?>');" accesskey="z" href=""></a>
     </div>
     <script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
   </div>

@@ -120,6 +120,9 @@ foreach ($port_stats as $ifIndex => $port)
       dbUpdate(array('deleted' => '0'), 'ports', '`interface_id` = ?', array($ports[$ifIndex]['interface_id']));
       $ports[$ifIndex]['deleted'] = "0";
     }
+  } else { 
+    dbUpdate(array('deleted' => '1'), 'ports', '`interface_id` = ?', array($ports[$ifIndex]['interface_id']));
+    $ports[$ifIndex]['deleted'] = "1";
   }
 }
 /// End New interface detection
