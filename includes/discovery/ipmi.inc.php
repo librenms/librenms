@@ -8,7 +8,12 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
   $ipmi['user'] = get_dev_attrib($device,'ipmi_username');
   $ipmi['password'] = get_dev_attrib($device,'ipmi_password');
 
-  $results = shell_exec($config['ipmitool'] . " -H " . $ipmi['host'] . " -U " . $ipmi['user'] . " -P " . $ipmi['password'] . " sensor|sort");
+  if ($config['own_hostname'] != $device['hostname'] || $ipmi['host'] != 'localhost')
+  {
+    $remote = " -H " . $ipmi['host'] . " -U " . $ipmi['user'] . " -P " . $ipmi['password'];
+  }
+
+  $results = external_exec($config['ipmitool'] . $remote . " sensor 2>/dev/null|sort");
 
   $index = 0;
 

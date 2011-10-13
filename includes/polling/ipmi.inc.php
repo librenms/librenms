@@ -8,7 +8,13 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
   $ipmi['password'] = get_dev_attrib($device,'ipmi_password');
 
   echo("Fetching IPMI sensor data...");
-  $results = shell_exec($config['ipmitool'] . " -c -H " . $ipmi['host'] . " -U " . $ipmi['user'] . " -P " . $ipmi['password'] . " sdr");
+
+  if ($config['own_hostname'] != $device['hostname'] || $ipmi['host'] != 'localhost')
+  {
+    $remote = " -H " . $ipmi['host'] . " -U " . $ipmi['user'] . " -P " . $ipmi['password'];
+  }
+
+  $results = external_exec($config['ipmitool'] . " -c " . $remote . " sdr 2>/dev/null");
   echo(" done.\n");
 
   foreach (explode("\n",$results) as $row)
