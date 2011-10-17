@@ -27,7 +27,7 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hos
 ?>
       </select>
       <br />
-      <input type="hostname" name="hostname" id="hostname" title="Hostname" style='width: 180px;' <?php if (strlen($vars['hostname_text'])) {echo('value="'.$vars['hostname'].'"');} ?> />
+      <input type="hostname" name="hostname" id="hostname" title="Hostname" style='width: 180px;' <?php if (strlen($vars['hostname'])) {echo('value="'.$vars['hostname'].'"');} ?> />
     </td>
     <td width="120">
       <select name="state" id="state" style="width: 100px;">
@@ -72,7 +72,10 @@ foreach (dbFetchRows("SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `i
       <select name="port_descr_type" id="port_descr_type" style="width: 150px;">
         <option value="">All Port Types</option>
 <?php
-foreach (dbFetchRows("SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`") as $data)
+$ports = dbFetchRows("SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`");
+$total = count($ports);
+echo("Total: $total");
+foreach ($ports as $data)
 {
   if ($data['port_descr_type'])
   {

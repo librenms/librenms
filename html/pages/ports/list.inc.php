@@ -7,8 +7,15 @@ echo("<tr class=tablehead><td></td><th>Device</a></th><th>Interface</th><th>Spee
 
 $row = 1;
 
+$ports_disabled = 0; $ports_down = 0; $ports_up = 0; $ports_total = 0;
+
 foreach ($ports as $port)
 {
+
+  if ($port['ifAdminStatus'] == "down") { $ports_disabled++;
+  } elseif ($port['ifAdminStatus'] == "up" && $port['ifOperStatus']== "down") { $ports_down++;
+  } elseif ($port['ifAdminStatus'] == "up" && $port['ifOperStatus']== "up") { $ports_up++; }
+  $ports_total++;
 
   if (port_permitted($port['interface_id'], $port['device_id']))
   {
@@ -17,6 +24,8 @@ foreach ($ports as $port)
 
     $speed = humanspeed($port['ifSpeed']);
     $type = humanmedia($port['ifType']);
+    $ifclass = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
+
 
     if ($port['in_errors'] > 0 || $port['out_errors'] > 0)
     {
@@ -30,7 +39,7 @@ foreach ($ports as $port)
     echo("<tr bgcolor=$row_colour>
           <td width=5></td>
           <td width=200 class=list-bold><a href='" . generate_device_url($port) . "'>".$port['hostname']."</a></td>
-          <td width=150 class=list-bold><a href='" . generate_port_url($port) . "'>".fixIfName($port['label'])." $error_img</td>
+          <td width=150 class=list-bold><a class='".$ifclass."'href='" . generate_port_url($port) . "'>".fixIfName($port['label'])." $error_img</td>
           <td width=110 >$speed</td>
           <td width=110 class=green>".$port['in_rate']."</td>
           <td width=110 class=blue>".$port['out_rate']."</td>
@@ -43,5 +52,8 @@ foreach ($ports as $port)
 }
 
 echo("</table>");
+
+echo("Ports: $ports_total ( Up $ports_up | Down $ports_down | Disabled $ports_disabled )");
+
 
 ?>
