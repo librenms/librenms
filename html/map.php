@@ -39,7 +39,7 @@ if (isset($_GET['device'])) { $where = "WHERE device_id = ".mres($_GET['device']
 
 if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 {
-  $map = 'digraph G { sep=0.01; size="12,5.5"; pack=100; bgcolor=transparent; splines=true; overlap=scale; concentrate=0; epsilon=0.001; rankdir=0;
+  $map = 'digraph G { bgcolor=transparent; splines=true; overlap=scale; concentrate=0; epsilon=0.001; rankdir=LR;
      node [ fontname="helvetica", fontstyle=bold, style=filled, color=white, fillcolor=lightgrey, overlap=false];
      edge [ bgcolor=white, fontname="helvetica", fontstyle=bold, arrowhead=dot, arrowtail=dot];
      graph [bgcolor=transparent];
@@ -176,7 +176,8 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
   if ($links > 30) ### Unflatten if there are more than 10 links. beyond that it gets messy
   {
-    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['sfdp'] . ' -Gpack -Gcharset=latin1 | '.$config['dot'];
+#    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['sfdp'] . ' -Gpack -Gcharset=latin1 | '.$config['dot'];
+    $maptool = $config['neato'];
   } else {
     $maptool = $config['dot'];
   }
@@ -185,7 +186,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
   {
 #    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['sfdp'] . ' -Gpack -Goverlap=prism -Gcharset=latin1 | dot';
 #    $maptool = $config['sfdp'] . ' -Gpack -Goverlap=prism -Gcharset=latin1 -Gsize=20,20';
-     $maptool = $config['neato'];
+     $maptool = $config['dot'];
   }
 
   $descriptorspec = array(0 => array("pipe", "r"),1 => array("pipe", "w") );
