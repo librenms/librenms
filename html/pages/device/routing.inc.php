@@ -13,6 +13,8 @@ $type_text['vrf'] = "VRFs";
 
 print_optionbar_start();
 
+$pagetitle[] = "Routing";
+
 echo("<span style='font-weight: bold;'>Routing</span> &#187; ");
 
 unset($sep);

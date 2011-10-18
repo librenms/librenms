@@ -12,4 +12,6 @@ foreach (dbFetchRows("SELECT * FROM vminfo WHERE device_id = ? ORDER BY vmwVmDis
 
 echo("</table>");
 
+$pagetitle[] = "Virtual Machines";
+
 ?>

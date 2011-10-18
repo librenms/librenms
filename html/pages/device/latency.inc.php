@@ -56,4 +56,6 @@ if($vars['view'] == "incoming")
 
 }
 
+$pagetitle[] = "Latency";
+
 ?>

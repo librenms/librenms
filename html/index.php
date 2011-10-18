@@ -312,7 +312,17 @@ $('INPUT.auto-hint, TEXTAREA.auto-hint').focus(function() {
         $(this).removeClass('auto-hint');
     }
 });
+
     </script>
+
+<?php
+if (is_array($pagetitle))
+{
+  array_unshift($pagetitle,$config['page_title']);
+  $title = join(" - ",$pagetitle);
+  echo("<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>");
+}
+?>
 
   </body>
 </html>

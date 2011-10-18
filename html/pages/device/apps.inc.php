@@ -37,4 +37,6 @@ if (is_file("pages/device/apps/".mres($vars['app']).".inc.php"))
    include("pages/device/apps/".mres($vars['app']).".inc.php");
 }
 
+$pagetitle[] = "Apps";
+
 ?>

@@ -87,4 +87,6 @@ $ent['entPhysicalIndex'] = "0";
 printEntPhysical($ent['entPhysicalIndex'], $level, "liOpen");
 echo("</ul></div>");
 
+$pagetitle = "Inventory";
+
 ?>

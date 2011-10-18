@@ -79,4 +79,6 @@ if (is_file("pages/device/health/".mres($vars['metric']).".inc.php"))
   }
 }
 
+$pagetitle[] = "Health";
+
 ?>

@@ -68,4 +68,6 @@ foreach (dbFetchRows("SELECT * FROM `vlans` WHERE `device_id` = ? ORDER BY 'vlan
 
 echo("</table>");
 
+$pagetitle[] = "VLANs";
+
 ?>

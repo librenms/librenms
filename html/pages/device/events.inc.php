@@ -10,4 +10,6 @@ foreach ($entries as $entry)
 
 echo('</table>');
 
+$pagetitle[] = "Events";
+
 ?>
