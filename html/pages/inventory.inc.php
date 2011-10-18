@@ -43,6 +43,8 @@
 
 <?php
 
+$pagetitle[] = "Inventory";
+
 print_optionbar_end();
 
 $param = array();

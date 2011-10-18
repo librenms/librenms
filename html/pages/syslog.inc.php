@@ -1,6 +1,12 @@
-<?php if ($_GET['opta'] == "expunge" && $_SESSION['userlevel'] >= '10') { dbFetchCell("TRUNCATE TABLE `syslog`"); } ?>
+<?php
 
-<?php print_optionbar_start('25'); ?>
+if ($_vars['action'] == "expunge" && $_SESSION['userlevel'] >= '10') { dbFetchCell("TRUNCATE TABLE `syslog`"); }
+
+print_optionbar_start('25');
+
+$pagetitle[] = "Syslog";
+
+?>
 
 <form method="post" action="">
   <span style="font-weight: bold;">Syslog</span> &#187;

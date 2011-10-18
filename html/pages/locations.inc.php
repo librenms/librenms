@@ -1,5 +1,7 @@
 <?php
 
+$pagetitle[] = "Locations";
+
 print_optionbar_start();
 
  echo('<span style="font-weight: bold;">Locations</span> &#187; ');

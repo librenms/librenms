@@ -25,7 +25,13 @@ if ($_SESSION['userlevel'] == '10')
    ");
   }
 
+  $pagetitle[] = "Authlog";
+
   echo("</table>");
+}
+else
+{
+  include("includes/error-no-perm.inc.php");
 }
 
 ?>

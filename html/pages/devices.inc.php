@@ -16,6 +16,8 @@ if ($vars['type'])     { $where .= " AND type = ?";        $sql_param[] = $vars[
 if ($vars['location'] == "Unset") { $location_filter = ''; }
 if ($vars['location']) { $location_filter = $vars['location']; }
 
+$pagetitle[] = "Devices";
+
 print_optionbar_start();
 
 if($vars['searchbar'] != "hide")

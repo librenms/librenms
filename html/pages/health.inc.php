@@ -29,6 +29,8 @@ if (!$vars['view']) { $vars['view'] = "detail"; }
 
 $link_array = array('page'    => 'health');
 
+$pagetitle[] = "Health";
+
 print_optionbar_start('', '');
 
 echo('<span style="font-weight: bold;">Health</span> &#187; ');

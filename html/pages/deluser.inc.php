@@ -6,6 +6,8 @@ if ($_SESSION['userlevel'] < '10') { include("includes/error-no-perm.inc.php"); 
 {
   echo("<h3>Delete User</h3>");
 
+  $pagetitle[] = "Delete user";
+
   if (auth_usermanagement())
   {
     if ($vars['action'] == "del")

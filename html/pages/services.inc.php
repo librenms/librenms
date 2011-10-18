@@ -1,5 +1,7 @@
 <?php
 
+$pagetitle[] = "Services";
+
 print_optionbar_start();
 
  echo('<span style="font-weight: bold;">Services</span> &#187; ');

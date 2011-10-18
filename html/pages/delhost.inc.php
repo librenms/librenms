@@ -8,6 +8,8 @@ if ($_SESSION['userlevel'] < 10)
   exit;
 }
 
+$pagetitle[] = "Delete device";
+
 if (is_numeric($_REQUEST['id']))
 {
   if ($_REQUEST['confirm'])

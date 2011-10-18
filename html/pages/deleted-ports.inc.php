@@ -1,5 +1,7 @@
 <?php
 
+$pagetitle[] = "Deleted ports";
+
 if ($vars['purge'] == "all")
 {
   foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id") as $interface)

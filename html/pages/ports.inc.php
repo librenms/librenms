@@ -1,5 +1,7 @@
 <?php
 
+$pagetitle[] = "Ports";
+
 ### Set Defaults here
 
 if(!isset($vars['format'])) { $vars['format'] = "list_basic"; }
