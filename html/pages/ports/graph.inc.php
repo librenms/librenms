@@ -1,4 +1,5 @@
-<?
+<?php
+
 foreach ($ports as $port)
 {
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
