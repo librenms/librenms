@@ -50,7 +50,7 @@ foreach (dbFetchRows("SELECT * FROM toner where device_id = ?", array($id)) as $
 
   $rrd_options .= " DEF:toner$toner_id=$rrd_filename:toner:AVERAGE";
   $rrd_options .= " LINE2:toner$toner_id#".$colour.":'" . $descr . "'";
-  $rrd_options .= " GPRINT:toner$toner_id:AVERAGE:'%5.0lf%%'";
+  $rrd_options .= " GPRINT:toner$toner_id:LAST:'%5.0lf%%'";
   $rrd_options .= " GPRINT:toner$toner_id:MIN:'%5.0lf%%'";
   $rrd_options .= " GPRINT:toner$toner_id:MAX:%5.0lf%%\\\\l";
 
