@@ -13,6 +13,8 @@ if ($_POST['addbill'] == "yes")
   $message_break .= "<br />";
 }
 
+$pagetitle[] = "Billing";
+
 echo("<meta http-equiv='refresh' content='10000'>");
 
 if ($_GET['opta'] == "add")

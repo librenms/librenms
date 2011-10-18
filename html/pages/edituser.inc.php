@@ -4,6 +4,8 @@ include("includes/javascript-interfacepicker.inc.php");
 
 echo("<div style='margin: 10px;'>");
 
+$pagetitle[] = "Edit user";
+
 if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php"); } else
 {
   if ($vars['user_id'])

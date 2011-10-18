@@ -1,5 +1,7 @@
 <?php
 
+$pagetitle[] = "Routing";
+
 if ($_GET['optb'] == "graphs" || $_GET['optc'] == "graphs") { $graphs = "graphs"; } else { $graphs = "nographs"; }
 
 #$datas[] = 'overview';

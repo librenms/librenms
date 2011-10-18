@@ -4,6 +4,9 @@ if ($_SESSION['userlevel'] < '5')
 {
   include("includes/error-no-perm.inc.php");
 } else {
+
+  $pagetitle[] = "Delete service";
+
   if ($_POST['delsrv'])
   {
     if ($_SESSION['userlevel'] > "5")

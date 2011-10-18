@@ -32,6 +32,8 @@ if ($_POST['hostname'])
   }
 }
 
+$pagetitle[] = "Add host";
+
 ?>
 
 <form name="form1" method="post" action="">

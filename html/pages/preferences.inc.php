@@ -1,4 +1,7 @@
 <?php
+
+$pagetitle[] = "Preferences";
+
 echo("<div style='margin: 10px'>");
 echo("<h3>User Preferences</h3>");
 

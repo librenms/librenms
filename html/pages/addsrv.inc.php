@@ -33,6 +33,8 @@ else
 
   if ($updated) { print_message("Device Settings Saved"); }
 
+  $pagetitle[] = "Add service";
+
   echo("
 <h4>Add Service</h4>
 <form id='addsrv' name='addsrv' method='post' action=''>

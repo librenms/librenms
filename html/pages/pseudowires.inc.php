@@ -1,5 +1,7 @@
 <?php
 
+$pagetitle[] = "Pseudowires";
+
 if(!isset($vars['view'])) { $vars['view'] = 'detail'; }
 
 $link_array = array('page' => 'pseudowires');

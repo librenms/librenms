@@ -16,6 +16,8 @@ echo("
 
 $i = 1;
 
+$pagetitle[] = "Customers";
+
 foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GROUP BY `port_descr_descr` ORDER BY `port_descr_descr`") as $customer)
 {
   $i++;

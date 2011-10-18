@@ -10,6 +10,8 @@ if ($vars['action'] == "expunge" && $_SESSION['userlevel'] >= '10')
 
 $numresults = 250;
 
+$pagetitle[] = "Eventlog";
+
 print_optionbar_start();
 
 if (is_numeric($vars['page']))

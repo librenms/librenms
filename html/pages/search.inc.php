@@ -1,5 +1,7 @@
 <?php
 
+$pagetitle[] = "Search";
+
 $sections = array('ipv4' => 'IPv4 Address', 'ipv6' => 'IPv6 Address', 'mac' => 'MAC Address');
 
 if (!isset($vars['search'])) { $vars['search'] = "ipv4"; }
