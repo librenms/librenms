@@ -113,4 +113,6 @@ if ($vars['view'] == 'minigraphs')
   echo("</table></div>");
 }
 
+$pagetitle[] = "Ports";
+
 ?>

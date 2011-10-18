@@ -53,4 +53,6 @@ if ($_SESSION['userlevel'] < '7')
   }
 }
 
+$pagetitle[] = "Settings";
+
 ?>

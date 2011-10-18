@@ -108,4 +108,5 @@ print_optionbar_end();
 
     }
 
+$pagetitle[] = "CollectD";
 ?>

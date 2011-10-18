@@ -86,4 +86,7 @@ if ($_SESSION['userlevel'] >= "7")
   #$geshi->set_line_style('color: #999999');
   echo($geshi->parse_code());
 }
+
+$pagetitle[] = "Config";
+
 ?>

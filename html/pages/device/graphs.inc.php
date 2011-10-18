@@ -60,4 +60,6 @@ foreach ($config['graph_types']['device'] as $graph => $entry)
   }
 }
 
+$pagetitle[] = "Graphs";
+
 ?>

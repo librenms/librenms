@@ -49,4 +49,6 @@ echo("<table cellspacing=0 cellpadding=2 width=100%>");
 foreach (dbFetchRows($sql, $param) as $entry) { include("includes/print-syslog.inc.php"); }
 echo("</table>");
 
+$pagetitle[] = "Syslog";
+
 ?>

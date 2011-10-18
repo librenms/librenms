@@ -62,4 +62,6 @@ else
    echo("No Services");
 }
 
+$pagetitle[] = "Services";
+
 ?>
