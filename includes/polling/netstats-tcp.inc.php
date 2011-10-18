@@ -37,7 +37,7 @@ if ($device['os'] != "Snom")
     {
       $value = $data[0][$oid];
     } else {
-      $value = "0";
+      $value = "U";
     }
     $rrdupdate .= ":$value";
   }
