@@ -16,7 +16,7 @@ $units='';
 $total_units='';
 $colours='mixed';
 
-$scale_min = "0";
+$scale_min  = "0";
 
 $nototal = 1;
 
