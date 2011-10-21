@@ -5,7 +5,7 @@
     echo("<tr><th>Port</th><th>Traffic</th><th>Sync Speed</th><th>Attainable Speed</th><th>Attenuation</th><th>SNR Margin</th><th>Output Powers</th></tr>");
     $i = "0";
     $ports = dbFetchRows("select * from `ports` AS P, `ports_adsl` AS A WHERE P.device_id = ? AND A.interface_id = P.interface_id AND P.deleted = '0' ORDER BY `ifIndex` ASC", array($device['device_id']));
-    foreach ($ports as $interface)
+    foreach ($ports as $port)
     {
       include("includes/print-interface-adsl.inc.php");
       $i++;

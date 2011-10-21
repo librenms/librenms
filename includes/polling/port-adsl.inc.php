@@ -48,14 +48,14 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding']))
   $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("port-".$port['ifIndex']."-adsl.rrd");
 
   $rrd_create  = " --step 300";
-  $rrd_create .= " DS:AtucCurrSnrMgn:GAUGE:600:0:U";
-  $rrd_create .= " DS:AtucCurrAtn:GAUGE:600:0:U";
-  $rrd_create .= " DS:AtucCurrOutputPwr:GAUGE:600:0:U";
+  $rrd_create .= " DS:AtucCurrSnrMgn:GAUGE:600:0:635";
+  $rrd_create .= " DS:AtucCurrAtn:GAUGE:600:0:635";
+  $rrd_create .= " DS:AtucCurrOutputPwr:GAUGE:600:0:635";
   $rrd_create .= " DS:AtucCurrAttainableR:GAUGE:600:0:U";
   $rrd_create .= " DS:AtucChanCurrTxRate:GAUGE:600:0:U";
-  $rrd_create .= " DS:AturCurrSnrMgn:GAUGE:600:0:U";
-  $rrd_create .= " DS:AturCurrAtn:GAUGE:600:0:U";
-  $rrd_create .= " DS:AturCurrOutputPwr:GAUGE:600:0:U";
+  $rrd_create .= " DS:AturCurrSnrMgn:GAUGE:600:0:635";
+  $rrd_create .= " DS:AturCurrAtn:GAUGE:600:0:635";
+  $rrd_create .= " DS:AturCurrOutputPwr:GAUGE:600:0:635";
   $rrd_create .= " DS:AturCurrAttainableR:GAUGE:600:0:U";
   $rrd_create .= " DS:AturChanCurrTxRate:GAUGE:600:0:U";
   $rrd_create .= " DS:AtucPerfLofs:COUNTER:600:U:100000000000";
@@ -101,13 +101,16 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding']))
   }
   dbUpdate($port['adsl_update'], 'ports_adsl', '`interface_id` = ?', array($port['interface_id']));
 
+  if($this_port['adslAtucCurrSnrMgn'] > "1280") { $this_port['adslAtucCurrSnrMgn'] = "U"; }
+  if($this_port['adslAturCurrSnrMgn'] > "1280") { $this_port['adslAturCurrSnrMgn'] = "U"; }
+
   $rrdupdate = "N";
   foreach ($adsl_oids as $oid)
   {
     $oid = "adsl".$oid;
     $data = str_replace("\"", "", $this_port[$oid]);
     ## Set data to be "unknown" if it's garbled, unexistant or zero
-    if (!is_numeric($data)) { $data = "0"; }
+    if (!is_numeric($data)) { $data = "U"; }
     $rrdupdate .= ":$data";
   }
 
