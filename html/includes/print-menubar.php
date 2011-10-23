@@ -457,7 +457,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
             <div class="col_1">
               <p>
                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=W2ZJ3JRZR72Z6" class="external text" rel="nofollow">
-                <img src="https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif" alt="btn_donateCC_LG.gif" />
+                <img src="images/btn_donate_LG.gif" alt="btn_donateCC_LG.gif" />
                 </a>
               </p>
             </div>
