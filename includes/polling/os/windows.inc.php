@@ -15,7 +15,7 @@ if (strstr($poll_device[sysDescr], "EM64"))    { $hardware = "Intel x64"; }
 if (strstr($poll_device[sysDescr], "AMD64"))   { $hardware = "AMD x64"; }
 if (strstr($poll_device[sysDescr], "Intel64")) { $hardware = "Intel x64"; }
 
-if($sysObjectID == ".1.3.6.1.4.1.311.1.1.3.1.1") { ## Workstation
+if($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.1") { ## Workstation
 
   if (strstr($poll_device[sysDescr], "Build Number: 1057")) { $version = "NT 3.51 Workstation"; }
   if (strstr($poll_device[sysDescr], "Build Number: 1381")) { $version = "NT 4.0 Workstation"; }
@@ -27,7 +27,7 @@ if($sysObjectID == ".1.3.6.1.4.1.311.1.1.3.1.1") { ## Workstation
   if (strstr($poll_device[sysDescr], "Build 6002"))         { $version = "Vista SP2 (NT 6.0)"; }
   if (strstr($poll_device[sysDescr], "Build 7600"))         { $version = "7 (NT 6.1)"; }
 
-} elseif ($sysObjectID == ".1.3.6.1.4.1.311.1.1.3.1.2") { ## Server
+} elseif ($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.2") { ## Server
 
   if (strstr($poll_device[sysDescr], "Build Number: 1057")) { $version = "NT Server 3.51"; }
   if (strstr($poll_device[sysDescr], "Build Number: 1381")) { $version = "NT Server 4.0"; }
@@ -37,7 +37,7 @@ if($sysObjectID == ".1.3.6.1.4.1.311.1.1.3.1.1") { ## Workstation
   if (strstr($poll_device[sysDescr], "Build 6002"))         { $version = "Server 2008 SP2 (NT 6.0)"; }
   if (strstr($poll_device[sysDescr], "Build 7600"))         { $version = "Server 2008 R2(NT 6.1)"; }
 
-} elseif ($sysObjectID == ".1.3.6.1.4.1.311.1.1.3.1.3") { ## Datacentre Server
+} elseif ($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.3") { ## Datacentre Server
 
   if (strstr($poll_device[sysDescr], "Build Number: 1057")) { $version = "NT Datacenter 3.51"; }
   if (strstr($poll_device[sysDescr], "Build Number: 1381")) { $version = "NT Datacenter 4.0"; }

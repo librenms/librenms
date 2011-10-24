@@ -22,7 +22,6 @@
   $poll_device['sysName'] = strtolower($poll_device['sysName']);
 
   $hrSystemUptime = snmp_get($device, "hrSystemUptime.0", "-Oqv", "HOST-RESOURCES-MIB");
-  $sysObjectID = snmp_get($device, "sysObjectID.0", "-Oqvn");
 
   if ($hrSystemUptime != "" && !strpos($hrSystemUptime, "No") && ($device['os'] != "windows"))
   {

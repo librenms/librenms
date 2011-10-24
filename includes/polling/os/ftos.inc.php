@@ -30,15 +30,14 @@ echo("Doing Force10 FTOS ");
 #F10-CHASSIS-MIB::chSysSwRuntimeImgVersion.1.1 = STRING: 7.6.1.2
 #F10-CHASSIS-MIB::chSysSwRuntimeImgVersion.8.1 = STRING: 7.6.1.2
 
-$sysObjectID = snmp_get($device, "sysObjectID.0", "-Oqvn");
-$hardware = rewrite_ftos_hardware($sysObjectID);
+$hardware = rewrite_ftos_hardware($poll_device['sysObjectID']);
 
-if (strstr($sysObjectID, ".1.3.6.1.4.1.6027.1.3."))
+if (strstr($poll_device['sysObjectID'], ".1.3.6.1.4.1.6027.1.3."))
 {
   echo("S-Series ");
   $version = snmp_get($device, "chStackUnitCodeVersion.1", "-Oqvn", "F10-S-SERIES-CHASSIS-MIB");
 }
-elseif (strstr($sysObjectID, ".1.3.6.1.4.1.6027.1.2."))
+elseif (strstr($poll_device['sysObjectID'], ".1.3.6.1.4.1.6027.1.2."))
 {
   echo("C-Series ");
   $version = snmp_get($device, "chSwVersion.0", "-Oqvn", "F10-C-SERIES-CHASSIS-MIB");

@@ -508,6 +508,18 @@ $config['os'][$os]['text']              = "Blade Network Technologies";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "bnt";
 
+$os = "comware";
+$config['os'][$os]['text']              = "HP Comware";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "hp";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Traffic";
+#$config['os'][$os]['over'][1]['graph']  = "device_processor";
+#$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+#$config['os'][$os]['over'][2]['graph']  = "device_mempool";
+#$config['os'][$os]['over'][2]['text']   = "Memory Usage";
+
+
 $os = "procurve";
 $config['os'][$os]['text']              = "HP ProCurve";
 $config['os'][$os]['type']              = "network";
