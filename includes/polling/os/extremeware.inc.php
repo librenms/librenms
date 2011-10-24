@@ -36,8 +36,8 @@ else
   }
 }
 
-$hardware = rewrite_extreme_hardware($sysObjectID);
-if ($hardware == $sysObjectID) { unset($hardware); }
+$hardware = rewrite_extreme_hardware($poll_device['sysObjectID']);
+if ($hardware == $poll_device['sysObjectID']) { unset($hardware); }
 
 $version = str_replace("\"","", $version);
 $features = str_replace("\"","", $features);

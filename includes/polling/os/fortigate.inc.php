@@ -8,9 +8,9 @@ $serial       = snmp_get($device, "FORTINET-MIB-280::fnSysSerial.0", "-Ovq");
 $version = preg_replace("/(.+),(.+),(.+)/", "\\1||\\2||\\3", $fnSysVersion);
 list($version,$features) = explode("||", $version);
 
-if (isset($rewrite_fortinet_hardware[$sysObjectID]))
+if (isset($rewrite_fortinet_hardware[$poll_device['sysObjectID']]))
 {
-  $hardware = $rewrite_fortinet_hardware[$sysObjectID];
+  $hardware = $rewrite_fortinet_hardware[$poll_device['sysObjectID']];
 }
 
 #$cmd  = $config['snmpget'] . " -M ".$config['mibdir']. " -m FORTINET-MIB-280 -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
