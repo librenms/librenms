@@ -11,7 +11,6 @@ if($width > "500")
 }
 
 if ($nototal) { $descrlen += "2"; $unitlen += "2";}
-$unit_text = str_pad(truncate($unit_text,$unitlen),$unitlen);
 
 if($width > "500")
 {
