@@ -49,8 +49,8 @@ if($width > "500")
   $rrd_options .= " GPRINT:$mempool[mempool_id]free:MAX:%5.2lf%sB";
   $rrd_options .= " GPRINT:$mempool[mempool_id]free:AVERAGE:%5.2lf%sB\\\\n";
   $rrd_options .= " COMMENT:'".substr(str_pad('', $descr_len+12),0,$descr_len+12)." '";
-  $rrd_options .= " GPRINT:$mempool[mempool_id]percx:LAST:'%5.2lf%%  '";
-  $rrd_options .= " GPRINT:$mempool[mempool_id]perc:LAST:'%5.2lf%% '";
+  $rrd_options .= " GPRINT:$mempool[mempool_id]perc:LAST:'%5.2lf%%  '";
+  $rrd_options .= " GPRINT:$mempool[mempool_id]percx:LAST:'%5.2lf%% '";
   $rrd_options .= " GPRINT:$mempool[mempool_id]perc:MIN:'%5.2lf%% '";
   $rrd_options .= " GPRINT:$mempool[mempool_id]perc:MAX:'%5.2lf%% '";
   $rrd_options .= " GPRINT:$mempool[mempool_id]perc:AVERAGE:%5.2lf%%\\\\n";
@@ -61,8 +61,8 @@ if($width > "500")
   $rrd_options .= " GPRINT:$mempool[mempool_id]free:LAST:%6.2lf%sB";
   $rrd_options .= " COMMENT:'\l'";
   $rrd_options .= " COMMENT:'".substr(str_pad('', $descr_len+12),0,$descr_len+12)." '";
-  $rrd_options .= " GPRINT:$mempool[mempool_id]percx:LAST:'%5.2lf%%  '";
-  $rrd_options .= " GPRINT:$mempool[mempool_id]perc:LAST:'%5.2lf%% '";
+  $rrd_options .= " GPRINT:$mempool[mempool_id]perc:LAST:'%5.2lf%%  '";
+  $rrd_options .= " GPRINT:$mempool[mempool_id]percx:LAST:'%5.2lf%% '";
   $rrd_options .= " COMMENT:'\l'";
 }
 
