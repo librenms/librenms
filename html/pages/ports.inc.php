@@ -126,14 +126,28 @@ foreach ($ports as $data)
         </td>
         <td width=120>
         <select name="sort" id="sort" style="width: 110px;">
-          <option value="">Host & Port Name</option>
-          <option value="traffic"  <?php if ($vars['sort'] == "traffic")  { echo("selected"); } ?>>Traffic</option>
-          <option value="traffic_in"  <?php if ($vars['sort'] == "traffic_in")  { echo("selected"); } ?>>Traffic In</option>
-          <option value="traffic_out" <?php if ($vars['sort'] == "traffic_out") { echo("selected"); } ?>>Traffic Out</option>
-          <option value="packets"  <?php if ($vars['sort'] == "packets")  { echo("selected"); } ?>>Packets</option>
-          <option value="packets_in"  <?php if ($vars['sort'] == "packets_in")  { echo("selected"); } ?>>Packets In</option>
-          <option value="packets_out" <?php if ($vars['sort'] == "packets_out") { echo("selected"); } ?>>Packets Out</option>
-          <option value="errors"  <?php if ($vars['sort'] == "errors")  { echo("selected"); } ?>>Errors</option>
+<?php
+$sorts = array('device' => 'Device',
+              'port' => 'Port',
+              'speed' => 'Speed',
+              'traffic' => 'Traffic',
+              'traffic_in' => 'Traffic In',
+              'traffic_out' => 'Traffic Out',
+              'packets' => 'Packets',
+              'packets_in' => 'Packets In',
+              'packets_out' => 'Packets Out',
+	      'errors' => 'Errors',
+              'media' => 'Media',
+              'descr' => 'Description');
+
+foreach ($sorts as $sort => $sort_text)
+{
+  echo('<option value="'.$sort.'" ');
+  if ($vars['sort'] == $sort)  { echo("selected"); }
+  echo('>'.$sort_text.'</option>');
+}
+?>
+
         </select>
         </td>
         <td style="text-align: center;" width=50>
@@ -322,6 +336,19 @@ switch ($vars['sort'])
   case 'errors':
     $query_sort = " ORDER BY (I.ifInErrors + I.ifOutErrors) DESC";
     break;
+  case 'speed':
+    $query_sort = " ORDER BY (I.ifSpeed) DESC";
+    break;
+  case 'port':
+    $query_sort = " ORDER BY (I.ifDescr) ASC";
+    break;
+  case 'media':
+    $query_sort = " ORDER BY (I.ifType) ASC";
+    break;
+  case 'descr':
+    $query_sort = " ORDER BY (I.ifAlias) ASC";
+    break;
+  case 'device':
   default:
     $query_sort = " ORDER BY D.hostname, I.ifIndex ASC";
 }

@@ -713,7 +713,7 @@ CREATE TABLE IF NOT EXISTS `ports` (
   `ifName` varchar(64) DEFAULT NULL,
   `portName` varchar(128) DEFAULT NULL,
   `ifIndex` int(11) DEFAULT '0',
-  `ifSpeed` text,
+  `ifSpeed` bigint(20) DEFAULT NULL,
   `ifConnectorPresent` varchar(12) DEFAULT NULL,
   `ifPromiscuousMode` varchar(12) DEFAULT NULL,
   `ifHighSpeed` int(11) DEFAULT NULL,
