@@ -3,7 +3,26 @@
 
 <?php
 
-echo("<tr class=tablehead><td></td><th>Device</a></th><th>Interface</th><th>Speed</th><th>Down</th><th>Up</th><th>Media</th><th>Description</th></tr>");
+echo("<tr class=tablehead><td></td>");
+
+$cols = array('device' => 'Device',
+              'port' => 'Port',
+	      'speed' => 'Speed',
+              'traffic_in' => 'Down',
+              'traffic_out' => 'Up',
+              'media' => 'Media',
+              'descr' => 'Description' );
+
+foreach ($cols as $sort => $col)
+{
+  if($vars['sort'] == $sort) {
+    echo('<th>'.$col.' *</th>');
+  } else {
+    echo('<th><a href="'. generate_url($vars, array('sort' => $sort)).'">'.$col.'</a></th>');
+  }
+}
+
+echo("      </tr>");
 
 $row = 1;
 
@@ -51,9 +70,11 @@ foreach ($ports as $port)
   }
 }
 
-echo("</table>");
 
-echo("Ports: $ports_total ( Up $ports_up | Down $ports_down | Disabled $ports_disabled )");
+echo("<tr><td colspan=7>");
+echo("<strong>Matched Ports: $ports_total ( <span class=green>Up $ports_up</span> | <span class=red>Down $ports_down</span> | Disabled $ports_disabled )</strong>");
+echo("</td></tr>");
 
+echo('</table>');
 
 ?>

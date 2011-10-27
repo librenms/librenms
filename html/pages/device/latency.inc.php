@@ -1,17 +1,19 @@
 <?php
 
-if(!$vars['view']) { $vars['view'] = "outgoing"; }
-
 print_optionbar_start();
 
 echo("<span style='font-weight: bold;'>Latency</span> &#187; ");
 
-$menu_options = array('incoming' => 'Incoming',
-                      'outgoing' => 'Outgoing');
+if(count($smokeping_files['in'][$device['hostname']]))
+      $menu_options['incoming'] = 'Incoming';
+
+if(count($smokeping_files['out'][$device['hostname']]))
+      $menu_options['outgoing'] = 'Outgoing';
 
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
+  if(!$vars['view']) { $vars['view'] = $option; }
   echo($sep);
   if ($vars['view'] == $option)
   {
@@ -29,6 +31,7 @@ unset($sep);
 
 print_optionbar_end();
 
+
 if($vars['view'] == "incoming")
 {
 
@@ -42,7 +45,7 @@ if($vars['view'] == "incoming")
 
     }
 
-} else {
+} elseif ($vars['view'] == "outgoing") {
 
     if (count($smokeping_files['out'][$device['hostname']]))
     {
@@ -51,6 +54,12 @@ if($vars['view'] == "incoming")
        $graph_array['id']                      = $device['device_id'];
 
        include("includes/print-quadgraphs.inc.php");
+
+
+       foreach($smokeping_files['out'][$device['hostname']] AS $host) 
+       {
+         print_r($);
+       }
 
     }
 
