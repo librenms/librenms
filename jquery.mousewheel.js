@@ -1,11 +1,11 @@
-/*! Copyright (c) 2010 Brandon Aaron (http://brandonaaron.net)
+/*! Copyright (c) 2011 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
  *
  * Thanks to: http://adomas.org/javascript-mouse-wheel/ for some pointers.
  * Thanks to: Mathias Bank(http://www.mathias-bank.de) for a scope bug fix.
  * Thanks to: Seamus Leahy for adding deltaX and deltaY
  *
- * Version: 3.0.4
+ * Version: 3.0.5
  * 
  * Requires: 1.2.2+
  */
@@ -13,6 +13,12 @@
 (function($) {
 
 var types = ['DOMMouseScroll', 'mousewheel'];
+
+if ($.event.fixHooks) {
+    for ( var i=types.length; i; ) {
+        $.event.fixHooks[ types[--i] ] = $.event.mouseHooks;
+    }
+}
 
 $.event.special.mousewheel = {
     setup: function() {
@@ -72,7 +78,7 @@ function handler(event) {
     // Add event and delta to the front of the arguments
     args.unshift(event, delta, deltaX, deltaY);
     
-    return $.event.handle.apply(this, args);
+    return ($.event.dispatch || $.event.handle).apply(this, args);
 }
 
 })(jQuery);

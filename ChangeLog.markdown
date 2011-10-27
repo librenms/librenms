@@ -1,5 +1,9 @@
 # Mouse Wheel ChangeLog
 
+# 3.0.5
+
+* jQuery 1.7 compatibility
+
 # 3.0.4
 
 * Fix IE issue
