@@ -55,7 +55,6 @@ if($vars['view'] == "incoming")
        ksort($smokeping_files['in'][$device['hostname']]);
        foreach($smokeping_files['in'][$device['hostname']] AS $src => $host)
        {
-         echo("$src -> $host");
          $hostname = str_replace(".rrd", "", $host);
          $host = device_by_name($src);
          if(is_numeric($host['device_id']))
