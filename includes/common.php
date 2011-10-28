@@ -275,7 +275,7 @@ function getifhost($id)
 function gethostbyid($id)
 {
   global $cache;
-  
+
   if (isset($cache['devices']['id'][$id]['hostname']))
   {
     $hostname = $cache['devices']['id'][$id]['hostname'];
@@ -284,7 +284,7 @@ function gethostbyid($id)
   {
     $hostname = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
   }
-  
+
   return $hostname;
 }
 
