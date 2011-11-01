@@ -39,11 +39,15 @@ if($vars['view'] == "incoming")
     if (count($smokeping_files['in'][$device['hostname']]))
     {
 
-       $graph_array['type']                    = "device_smokeping_in_all";
+       $graph_array['type']                    = "device_smokeping_in_all_avg";
        $graph_array['id']                      = $device['device_id'];
+       echo('<tr><td>');
+       echo('<h3>Average</h3>');
+       include("includes/print-quadgraphs.inc.php");
+       echo('</td></tr>');
 
+       $graph_array['type']                    = "device_smokeping_in_all";
        $graph_array['legend']                  = no;
-
        echo('<tr><td>');
        echo('<h3>Aggregate</h3>');
        include("includes/print-quadgraphs.inc.php");
@@ -78,14 +82,20 @@ if($vars['view'] == "incoming")
     if (count($smokeping_files['out'][$device['hostname']]))
     {
 
-       $graph_array['type']                    = "device_smokeping_out_all";
+       $graph_array['type']                    = "device_smokeping_out_all_avg";
        $graph_array['id']                      = $device['device_id'];
-       $graph_array['legend']                  = no;
-
        echo('<tr><td>');
        echo('<h3>Aggregate</h3>');
        include("includes/print-quadgraphs.inc.php");
        echo('</td></tr>');
+
+       $graph_array['type']                    = "device_smokeping_out_all";
+       $graph_array['legend']                  = no;
+       echo('<tr><td>');
+       echo('<h3>Aggregate</h3>');
+       include("includes/print-quadgraphs.inc.php");
+       echo('</td></tr>');
+
 
        unset($graph_array['legend']);
 
