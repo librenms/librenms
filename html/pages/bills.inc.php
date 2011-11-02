@@ -163,12 +163,6 @@ if ($_GET['opta'] == "add")
            </tr>
          ");
 
-
-$end = utime(); $run = $end - $start;
-$gentime = substr($run, 0, 5);
-
-echo ($gentime);
-
       $i++;
     } ### PERMITTED
   }
