@@ -125,7 +125,8 @@ if ($_GET['opta'] == "add")
       $day_data     = getDates($bill['bill_day']);
       $datefrom     = $day_data['0'];
       $dateto       = $day_data['1'];
-      $rate_data    = getRates($bill['bill_id'],$datefrom,$dateto);
+#      $rate_data    = getRates($bill['bill_id'],$datefrom,$dateto);
+      $rate_data = $bill;
       $rate_95th    = $rate_data['rate_95th'];
       $dir_95th     = $rate_data['dir_95th'];
       $total_data   = $rate_data['total_data'];
@@ -161,6 +162,13 @@ if ($_GET['opta'] == "add")
              <td width=60><a href='bill/".$bill['bill_id']."/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
            </tr>
          ");
+
+
+$end = utime(); $run = $end - $start;
+$gentime = substr($run, 0, 5);
+
+echo ($gentime);
+
       $i++;
     } ### PERMITTED
   }
