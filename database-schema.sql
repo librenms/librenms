@@ -99,13 +99,23 @@ CREATE TABLE IF NOT EXISTS `bills` (
   `bill_cdr` int(11) DEFAULT NULL,
   `bill_day` int(11) NOT NULL DEFAULT '1',
   `bill_gb` int(11) DEFAULT NULL,
+  `rate_95th_in` int(11) NOT NULL,
+  `rate_95th_out` int(11) NOT NULL,
+  `rate_95th` int(11) NOT NULL,
+  `dir_95th` varchar(3) NOT NULL,
+  `total_data` int(11) NOT NULL,
+  `total_data_in` int(11) NOT NULL,
+  `total_data_out` int(11) NOT NULL,
+  `rate_average_in` int(11) NOT NULL,
+  `rate_average_out` int(11) NOT NULL,
+  `rate_average` int(11) NOT NULL,
+  `bill_last_calc` datetime NOT NULL,
   `bill_custid` varchar(64) NOT NULL,
   `bill_ref` varchar(64) NOT NULL,
   `bill_notes` varchar(256) NOT NULL,
   `bill_autoadded` tinyint(1) NOT NULL,
   UNIQUE KEY `bill_id` (`bill_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
 -- --------------------------------------------------------
 
 --
