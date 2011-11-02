@@ -4,6 +4,11 @@ http://www.observium.org/websvn/listing.php?repname=observer
 
 SVN
 
+* Smokeping integration
+* Fixed Cisco VLAN tracking
+* Much improved devices/ports browsing
+* Some improvements to map
+
 0.10.5.2248 ( 5th May 2011 )
 
 * Improve poller/discovery
