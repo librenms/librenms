@@ -37,11 +37,15 @@ if (bill_permitted($bill_id))
   $lastfrom        = $day_data['2'];
   $lastto        = $day_data['3'];
 
-  $rate_data    = getRates($bill_id,$datefrom,$dateto);
-  $rate_95th    = $rate_data['rate_95th'];
-  $dir_95th     = $rate_data['dir_95th'];
-  $total_data   = $rate_data['total_data'];
-  $rate_average = $rate_data['rate_average'];
+#  $rate_data    = getRates($bill_id,$datefrom,$dateto);
+#  $rate_95th    = $rate_data['rate_95th'];
+#  $dir_95th     = $rate_data['dir_95th'];
+#  $total_data   = $rate_data['total_data'];
+#  $rate_average = $rate_data['rate_average'];
+  $rate_95th    = $bill_data['rate_95th'];
+  $dir_95th     = $bill_data['dir_95th'];
+  $total_data   = $bill_data['total_data'];
+  $rate_average = $bill_data['rate_average'];
 
   if ($rate_95th > $paid_kb)
   {
