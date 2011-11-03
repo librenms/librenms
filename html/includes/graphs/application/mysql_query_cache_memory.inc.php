@@ -2,28 +2,34 @@
 
 include("includes/graphs/common.inc.php");
 
-$mysql_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
+$rrd_filename = $config["rrd_dir"] . '/' . $device["hostname"] . '/app-mysql-'.$app["app_id"].'.rrd';
 
-if (is_file($mysql_rrd))
+$array = array( 'QCs' => 'Cache size',
+                'QCeFy' => 'Free mem',
+);
+
+$i = 0;
+if (is_file($rrd_filename))
 {
-  $rrd_filename = $mysql_rrd;
-}
+  foreach ($array as $ds => $vars)
+  {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    if (is_array($vars))
+    {
+      $rrd_list[$i]['descr'] = $vars['descr'];
+    } else {
+      $rrd_list[$i]['descr'] = $vars;
+    }
+    $rrd_list[$i]['ds'] = $ds;
+    $i++;
+  }
+} else { echo("file missing: $file");  }
 
-$rrd_options .= ' -b 1024 ';
-$rrd_options .= ' -l 0 ';
-$rrd_options .= ' DEF:a='.$rrd_filename.':QCs:AVERAGE ';
-$rrd_options .= ' DEF:b='.$rrd_filename.':QCeFy:AVERAGE ';
+$colours   = "mixed";
+$nototal   = 1;
+$unit_text = "Bytes";
 
-$rrd_options .= 'COMMENT:"    Current    Average   Maximum\n" ';
+include("includes/graphs/generic_multi_simplex_seperated.inc.php");
 
-$rrd_options .= 'AREA:a#22FF22:"Cache size"\ \     ';
-$rrd_options .= 'GPRINT:a:LAST:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:a:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:a:MAX:"%6.2lf %s\n"  ';
-
-$rrd_options .= 'AREA:b#0022FF:"Free mem"\ \     ';
-$rrd_options .= 'GPRINT:b:LAST:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:b:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:b:MAX:"%6.2lf %s\n"  ';
 
 ?>

@@ -2,21 +2,33 @@
 
 include("includes/graphs/common.inc.php");
 
-$mysql_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
+$rrd_filename = $config["rrd_dir"] . '/' . $device["hostname"] . '/app-mysql-'.$app["app_id"].'.rrd';
 
-if (is_file($mysql_rrd))
+$array = array('IBTNx' => 'Transactions created',
+);
+
+$i = 0;
+if (is_file($rrd_filename))
 {
-  $rrd_filename = $mysql_rrd;
-}
+  foreach ($array as $ds => $vars)
+  {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    if (is_array($vars))
+    {
+      $rrd_list[$i]['descr'] = $vars['descr'];
+    } else {
+      $rrd_list[$i]['descr'] = $vars;
+    }
+    $rrd_list[$i]['ds'] = $ds;
+    $i++;
+  }
+} else { echo("file missing: $file");  }
 
-$rrd_options .= ' -b 1000 ';
-$rrd_options .= ' DEF:a='.$rrd_filename.':IBTNx:AVERAGE ';
+$colours   = "mixed";
+$nototal   = 1;
+$unit_text = "transactions";
 
-$rrd_options .= 'COMMENT:"    Current    Average   Maximum\n" ';
+include("includes/graphs/generic_multi_simplex_seperated.inc.php");
 
-$rrd_options .= 'LINE1:a#22FF22:"Transactions created"\ \     ';
-$rrd_options .= 'GPRINT:a:LAST:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:a:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:a:MAX:"%6.2lf %s"  ';
 
 ?>
