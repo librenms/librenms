@@ -58,12 +58,14 @@ $dur = $end - $start;
 $datefrom = date('Ymthis', $start);
 $dateto = date('Ymthis',   $end);
 
-$rate_data = getRates($bill_id,$datefrom,$dateto);
+#$rate_data = getRates($bill_id,$datefrom,$dateto);
+$rate_data = dbFetchRow("SELECT * from `bills` WHERE `bill_id`= ? LIMIT 1", array($bill_id));
 $rate_95th = $rate_data['rate_95th'] * 1000;
 $rate_average = $rate_data['rate_average'] * 1000;
 
-$bi_a = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
-$bill_name = $bi_a['bill_name'];
+#$bi_a = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
+#$bill_name = $bi_a['bill_name'];
+$bill_name = $rate_data['bill_name'];
 
 $dur = $end - $start;
 

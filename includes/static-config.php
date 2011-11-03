@@ -34,7 +34,6 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 
-
 ### Linux-based OSes here please.
 
 $os = "linux";
@@ -66,6 +65,7 @@ $config['os'][$os]['over'][1]['graph']  = "device_processor";
 $config['os'][$os]['over'][1]['text']   = "Processor Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
+
 
 ### Other Unix-based OSes here please.
 
@@ -774,6 +774,11 @@ $config['os'][$os]['type']              = "power";
 $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
 $config['os'][$os]['icon']              = "tripplite";
+
+$os = "avocent";
+$config['os'][$os]['text']              = "Avocent";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "avocent";
 
 $os = "symbol";
 $config['os'][$os]['type']              = "network";
