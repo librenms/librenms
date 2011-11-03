@@ -2,21 +2,34 @@
 
 include("includes/graphs/common.inc.php");
 
-$mysql_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
+$rrd_filename = $config["rrd_dir"] . '/' . $device["hostname"] . '/app-mysql-'.$app["app_id"].'.rrd';
 
-if (is_file($mysql_rrd))
+$array = array( 
+                'SQs' => 'Slow queries',
+);
+
+$i = 0;
+if (is_file($rrd_filename))
 {
-  $rrd_filename = $mysql_rrd;
-}
+  foreach ($array as $ds => $vars)
+  {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    if (is_array($vars))
+    {
+      $rrd_list[$i]['descr'] = $vars['descr'];
+    } else {
+      $rrd_list[$i]['descr'] = $vars;
+    }
+    $rrd_list[$i]['ds'] = $ds;
+    $i++;
+  }
+} else { echo("file missing: $file");  }
 
-/* $rrd_options .= ' -b 1024 '; */
-$rrd_options .= ' DEF:a='.$rrd_filename.':SQs:AVERAGE ';
+$colours   = "mixed";
+$nototal   = 1;
+$unit_text = "Queries";
 
-$rrd_options .= 'COMMENT:"    Current    Average   Maximum\n" ';
+include("includes/graphs/generic_multi_simplex_seperated.inc.php");
 
-$rrd_options .= 'LINE2:a#22FF22:"Slow queries"\ \     ';
-$rrd_options .= 'GPRINT:a:LAST:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:a:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:a:MAX:"%6.2lf %s\n"  ';
 
 ?>
