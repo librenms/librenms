@@ -171,8 +171,13 @@ function getRates($bill_id,$datefrom,$dateto)
   $a_95th = dbFetchColumn($q_95_sql);
   $m_95th = $a_95th[$measurement_95th];
 
-  $mtot = getTotal($bill_id,$datefrom,$dateto);
-  $ptot = getPeriod($bill_id,$datefrom,$dateto);
+  $sum_data = getSum($bill_id,$datefrom,$dateto);
+#  $mtot = getTotal($bill_id,$datefrom,$dateto);
+  $mtot = $sum_data['total'];
+  $mtot_in = $sum_data['inbound'];
+  $mtot_out = $sum_data['outbound'];
+#  $ptot = getPeriod($bill_id,$datefrom,$dateto);
+  $ptot = $sum_data['period'];
 
   $data['rate_95th_in'] = get95thIn($bill_id,$datefrom,$dateto);
   $data['rate_95th_out'] = get95thOut($bill_id,$datefrom,$dateto);
@@ -187,6 +192,8 @@ function getRates($bill_id,$datefrom,$dateto)
   }
 
   $data['total_data'] = round($mtot / 1000 / 1000, 2);
+  $data['total_data_in'] = round($mtot_in / 1000 / 1000, 2);
+  $data['total_data_out'] = round($mtot_out / 1000 / 1000, 2);
   $data['rate_average'] = round($mtot / $ptot / 1000 * 8, 2);
 
 #  print_r($data);
@@ -198,6 +205,12 @@ function getTotal($bill_id,$datefrom,$dateto)
 {
   $mtot = dbFetchCell("SELECT SUM(delta) FROM bill_data WHERE bill_id = '".mres($bill_id)."' AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'");
   return($mtot);
+}
+
+function getSum($bill_id,$datefrom,$dateto)
+{
+  $sum = dbFetchRow("SELECT SUM(period) as period, SUM(delta) as total, SUM(in_delta) as inbound, SUM(out_delta) as outbound FROM bill_data WHERE bill_id = '".mres($bill_id)."' AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."'");
+  return($sum);
 }
 
 function getPeriod($bill_id,$datefrom,$dateto)

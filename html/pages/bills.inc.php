@@ -15,9 +15,15 @@ if ($_POST['addbill'] == "yes")
 
 $pagetitle[] = "Billing";
 
+
 echo("<meta http-equiv='refresh' content='10000'>");
 
-if ($_GET['opta'] == "add")
+if ($_GET['opta'] == "history")
+{
+  include("pages/bill/search.inc.php");
+  include("pages/bill/pmonth.inc.php");
+}
+elseif ($_GET['opta'] == "add")
 {
 
 ?>
@@ -70,6 +76,8 @@ if ($_GET['opta'] == "add")
 
 } else {
 
+  include("pages/bill/search.inc.php");
+  /*
   print_optionbar_start('40');
 
 ?>
@@ -104,6 +112,9 @@ if ($_GET['opta'] == "add")
                  <td>
          <input type=submit class=submit value=Search>
              </td>
+             <td width='170' style='font-weight:bold; font-size: 12px;'>
+                     <a href='bills/history/'><img src="images/16/information.png" align=absmiddle alt="Previous Billing Period"> Previous Billing Period</a>
+             </td>
              <td width='80' style='font-weight:bold; font-size: 12px;'>
                                                    <a href='bills/add/'><img src="images/16/add.png" align=absmiddle alt="Add"> Add Bill</a>
              </td>
@@ -114,9 +125,21 @@ if ($_GET['opta'] == "add")
 <?php
 
   print_optionbar_end();
+  */
 
-  echo("<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>");
-  $i=1;
+  $i=0;
+  echo("<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>
+           <tr style=\"font-weight: bold; \">
+             <td width=\"7\"></td>
+             <td width=\"250\">Billing name</td>
+             <td></td>
+             <td>Type</td>
+             <td>Allowed</td>
+             <td>Used</td>
+             <td style=\"text-align: center;\">Overusage</td>
+             <td width=\"250\"></td>
+             <td width=\"60\"></td>
+           </tr>");
   foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
   {
     if (bill_permitted($bill['bill_id']))
@@ -126,7 +149,7 @@ if ($_GET['opta'] == "add")
       $datefrom     = $day_data['0'];
       $dateto       = $day_data['1'];
 #      $rate_data    = getRates($bill['bill_id'],$datefrom,$dateto);
-      $rate_data = $bill;
+      $rate_data    = $bill;
       $rate_95th    = $rate_data['rate_95th'];
       $dir_95th     = $rate_data['dir_95th'];
       $total_data   = $rate_data['total_data'];
@@ -138,28 +161,34 @@ if ($_GET['opta'] == "add")
          $allowed = formatRates($bill['bill_cdr'] * 1000);
          $used    = formatRates($rate_data['rate_95th'] * 1000);
          $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100,2);
+         $background = get_percentage_colours($percent);
+         $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
+         $overuse = (($overuse <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatRates($overuse * 1000)."</span>");
       } elseif ($bill['bill_type'] == "quota") {
          $type = "Quota";
          $allowed = formatStorage($bill['bill_gb']* 1024 * 1024 * 1024);
          $used    = formatStorage($rate_data['total_data'] * 1024 * 1024);
          $percent = round(($rate_data['total_data'] / ($bill['bill_gb'] * 1024)) * 100,2);
+         $background = get_percentage_colours($percent);
+         $overuse = $rate_data['total_data'] - ($bill['bill_gb'] * 1024);
+         $overuse = (($overuse <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatStorage($overuse * 1024 * 1024)."</span>");
       }
 
-      $background = get_percentage_colours($percent);
       $right_background = $background['right'];
       $left_background  = $background['left'];
 
       if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
       echo("
            <tr bgcolor='$row_colour'>
-             <td width='7'></td>
-             <td width='250'><a href='bill/".$bill['bill_id']."/'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a></td>
+             <td></td>
+             <td><a href='bill/".$bill['bill_id']."/'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a><br />".strftime("%F", strtotime($datefrom))." to ".strftime("%F", strtotime($dateto))."</td>
              <td>$notes</td>
              <td>$type</td>
              <td>$allowed</td>
              <td>$used</td>
-             <td width=370>".print_percentage_bar (350, 20, $perc, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right'])."</td>
-             <td width=60><a href='bill/".$bill['bill_id']."/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
+             <td style=\"text-align: center;\">$overuse</td>
+             <td>".print_percentage_bar (250, 20, $perc, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right'])."</td>
+             <td><a href='bill/".$bill['bill_id']."/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
            </tr>
          ");
 
