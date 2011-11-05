@@ -89,6 +89,9 @@ include("includes/functions.php");
                          'rate_95th_in' => $rate_data['rate_95th_in'],
                          'rate_95th_out' => $rate_data['rate_95th_out'],
                          'dir_95th' => $rate_data['dir_95th'],
+                         'rate_average' => $rate_data['rate_average'],
+                         'rate_average_in' => $rate_data['rate_average_in'],
+                         'rate_average_out' => $rate_data['rate_average_out'],
                          'traf_total' => $rate_data['total_data'],
                          'traf_in' => $rate_data['total_data_in'],
                          'traf_out' => $rate_data['total_data_out'],
@@ -104,7 +107,8 @@ include("includes/functions.php");
          dbInsert($update, 'bill_history');
          echo(" * Generated historical data from ".strftime("%x @ %X", strtotime($datefrom_lp))." to ".strftime("%x @ %X", strtotime($dateto_lp))."\n");
       }
-
+*/
+print_r($rate_data);
   }
 
 ?>
