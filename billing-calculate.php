@@ -107,8 +107,6 @@ include("includes/functions.php");
          dbInsert($update, 'bill_history');
          echo(" * Generated historical data from ".strftime("%x @ %X", strtotime($datefrom_lp))." to ".strftime("%x @ %X", strtotime($dateto_lp))."\n");
       }
-*/
-print_r($rate_data);
   }
 
 ?>
