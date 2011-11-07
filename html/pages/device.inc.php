@@ -222,20 +222,11 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
 
     if (device_permitted($device['device_id']))
     {
-      echo('<li class="' . $select['events'] . '">
-      <a href="'.generate_device_url($device, array('tab' => 'events')).'">
-        <img src="images/16/report_magnify.png" align="absmiddle" border="0" /> Events
+      echo('<li class="' . $select['logs'] . '">
+      <a href="'.generate_device_url($device, array('tab' => 'logs')).'">
+        <img src="images/16/report_magnify.png" align="absmiddle" border="0" /> Logs
       </a>
     </li>');
-    }
-
-    if ($config['enable_syslog'])
-    {
-      echo('<li class="' . $select['syslog'] . '">
-    <a href="'.generate_device_url($device, array('tab' => 'syslog')).'">
-      <img src="images/16/printer.png" align="absmiddle" border="0" /> Syslog
-    </a>
-  </li>');
     }
 
     if ($_SESSION['userlevel'] >= "7")

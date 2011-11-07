@@ -928,7 +928,7 @@ CREATE TABLE IF NOT EXISTS `sensors` (
   `poller_type` varchar(16) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'snmp',
   `sensor_oid` varchar(64) CHARACTER SET latin1 NOT NULL,
   `sensor_index` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
-  `sensor_type` varchar(32) CHARACTER SET latin1 NOT NULL,
+  `sensor_type` varchar(255) CHARACTER SET latin1 NOT NULL,
   `sensor_descr` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `sensor_divisor` int(11) NOT NULL DEFAULT '1',
   `sensor_multiplier` int(11) NOT NULL DEFAULT '1',

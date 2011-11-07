@@ -15,7 +15,7 @@ echo('<tr style="background-color: ' . $bg . '">
     ' . $entry['datetime'] . '
   </td>');
 
-if (!isset($_GET['id']) && (!isset($overview) || $overview == 0)) {
+if (!isset($vars['device'])) {
   $dev = device_by_id_cache($entry['host']);
   echo("<td class=list-bold width=150>
     " . generate_device_link($dev, shorthost($dev['hostname'])) . "
@@ -24,7 +24,8 @@ if (!isset($_GET['id']) && (!isset($overview) || $overview == 0)) {
 
 if ($entry['type'] == "interface")
 {
-  $entry['link'] = "<b>".generate_port_link(getifbyid($entry['reference']))."</b>";
+  $this_if = ifLabel(getifbyid($entry['reference']));
+  $entry['link'] = "<b>".generate_port_link($this_if, makeshortif(strtolower($this_if['label'])))."</b>";
 } else {
   $entry['link'] = "System";
 }

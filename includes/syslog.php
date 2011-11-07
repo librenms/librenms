@@ -34,15 +34,17 @@ function get_cache($host, $value) {
 
 function process_syslog ($entry, $update) {
   global $config;
-
   global $dev_cache;
 
   foreach ($config['syslog_filter'] as $bi)
-    if (strpos($entry['msg'], $bi) !== FALSE) {
+  {
+    if (strpos($entry['msg'], $bi) !== FALSE)
+    {
       print_r($entry);
       echo('D-'.$bi);
       return $entry;
     }
+  }
 
   $entry['device_id'] = get_cache($entry['host'], 'device_id');
   if ($entry['device_id']) {
