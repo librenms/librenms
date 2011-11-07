@@ -1,8 +1,5 @@
-<?php
 
-print_optionbar_start('25');
-
-?>
+  <hr />
 
   <form method="post" action="">
   <label><strong>Search</strong>
