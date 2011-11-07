@@ -54,7 +54,7 @@
       echo("
            <tr style=\"background: $row_colour;\">
              <td></td>
-             <td><span style=\"font-weight: bold;\" class=\"interface\">from ".strftime("%x", strtotime($datefrom))." to ".strftime("%x", strtotime($dateto))."</span></td>
+             <td><span style=\"font-weight: bold;\" class=\"interface\">".strftime("%Y", strtotime($datefrom))." to ".strftime("%Y", strtotime($dateto))."</span></td>
              <td>$type</td>
              <td>$allowed</td>
              <td>$in</td>
