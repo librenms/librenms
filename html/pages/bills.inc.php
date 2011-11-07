@@ -20,8 +20,8 @@ echo("<meta http-equiv='refresh' content='10000'>");
 
 if ($_GET['opta'] == "history")
 {
-  include("pages/bill/search.inc.php");
-  include("pages/bill/pmonth.inc.php");
+  include("pages/bills/search.inc.php");
+  include("pages/bills/pmonth.inc.php");
 }
 elseif ($_GET['opta'] == "add")
 {
@@ -77,7 +77,6 @@ elseif ($_GET['opta'] == "add")
 } else {
 
   include("pages/bill/search.inc.php");
-  /*
   print_optionbar_start('40');
 
 ?>
@@ -125,7 +124,6 @@ elseif ($_GET['opta'] == "add")
 <?php
 
   print_optionbar_end();
-  */
 
   $i=0;
   echo("<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>

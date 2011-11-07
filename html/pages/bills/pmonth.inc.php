@@ -1,21 +1,21 @@
 <?php
 
   $pagetitle[] = "Previous Billing Period";
-  $i=1;
+  $i=0;
 
-  echo("<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>
-           <tr style=\"font-weight: bold; border-bottom: ".$list_highlight." 1px solid;\">
-             <td width=\"7\"></td>
-             <td width=\"250\">Billing name</td>
+  echo('<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>
+           <tr style="font-weight: bold;">
+             <td width="7"></td>
+             <td width="250">Billing name</td>
              <td>Type</td>
              <td>Allowed</td>
              <td>Inbound</td>
              <td>Outbound</td>
              <td>Total</td>
              <td>95 percentile</td>
-             <td style=\"text-align: center;\">Overusage</td>
-             <td width=\"250\"></td>
-           </tr>");
+             <td style="text-align: center;">Overusage</td>
+             <td width="250"></td>
+           </tr>');
 
   foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
   {
