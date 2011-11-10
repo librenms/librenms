@@ -1,5 +1,9 @@
 # Mouse Wheel ChangeLog
 
+# 3.0.6
+
+* Fix issue with delta being 0 in Firefox
+
 # 3.0.5
 
 * jQuery 1.7 compatibility
