@@ -102,11 +102,6 @@ if (bill_permitted($bill_id))
 
   if ($_SESSION['userlevel'] == "10")
   {
-#    echo(" | ");
-#    if ($_GET['optb'] == "admin_history") { echo("<span class='pagemenu-selected'>"); }
-#    echo("<a href='bills/history/'>Previous Billing Period</a>");
-#    if ($_GET['optb'] == "admin_history") { echo("</span>"); }
-
     echo(" | ");
     if ($_GET['optb'] == "edit") { echo("<span class='pagemenu-selected'>"); }
     echo("<a href='bill/".$bill_id."/edit/'>Edit</a>");
@@ -118,7 +113,7 @@ if (bill_permitted($bill_id))
     if ($_GET['optb'] == "delete") { echo("</span>"); }
   }
 
-  echo("<div style='font-weight: bold; float: right;'><a href='bills/'>Back to Bills</a></div>");
+  echo('<div style="font-weight: bold; float: right;"><a href="bills/"><img align=absmiddle src="/images/16/arrow_left.png"> Back to Bills</a></div>');
 
 
   print_optionbar_end();
@@ -354,7 +349,7 @@ if (bill_permitted($bill_id))
      else
      {
        echo("<h3>Billing View</h3>$bi");
-       echo("<h3>Previous Bill View</h3>$li");
+#       echo("<h3>Previous Bill View</h3>$li");
        echo("<h3>24 Hour View</h3>$di");
        echo("<h3>Monthly View</h3>$mi");
 #       echo("<br /><a href=\"rate.php?" . $_SERVER['QUERY_STRING'] . "&amp;all=yes\">Graph All Data (SLOW)</a>");
