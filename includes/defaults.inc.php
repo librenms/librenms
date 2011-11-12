@@ -245,6 +245,7 @@ $config['device_traffic_descr'][]  = '/vlan/';
 $config['device_traffic_descr'][]  = '/tunnel/';
 $config['device_traffic_descr'][]  = '/:\d+/';
 $config['device_traffic_descr'][]  = '/bond/';
+$config['device_traffic_descr'][]  = '/null/';
 
 ### IRC Bot configuration
 

@@ -59,6 +59,7 @@ $link_array = array('page'    => 'device',
 $menu_options['graphs']   = 'Graphs';
 $menu_options['realtime'] = 'Real time';   ### FIXME CONDITIONAL
 $menu_options['arp']      = 'ARP Table';
+$menu_options['events']      = 'Eventlog';
 
 if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$port['interface_id']."'") )
 {  $menu_options['adsl'] = 'ADSL'; }
