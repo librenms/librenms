@@ -14,8 +14,8 @@ foreach($entity_state['group']['c6kxbar'] as $index => $entry)
   $entity = dbFetchRow("SELECT * FROM entPhysical WHERE device_id = ? AND entPhysicalIndex = ?", array($device['device_id'], $index));
 
   echo("<tr bgcolor=$row_colour>
-        <td colspan=2 width=200><strong>".$entity['entPhysicalName']."</strong></td>
-        <td colspan=4>".$entry['']['cc6kxbarModuleModeSwitchingMode']."</td>
+        <td colspan=5 width=200><strong>".$entity['entPhysicalName']."</strong></td>
+        <td colspan=2>".$entry['']['cc6kxbarModuleModeSwitchingMode']."</td>
         </tr>");
 
   foreach($entity_state['group']['c6kxbar'][$index] as $subindex => $fabric)
@@ -35,12 +35,34 @@ foreach($entity_state['group']['c6kxbar'] as $index => $entry)
     $percent_out = $fabric['cc6kxbarStatisticsOutUtil'];
     $background_out = get_percentage_colours($percent_out);
 
+    $graph_array           = array();
+    $graph_array['height'] = "100";
+    $graph_array['width']  = "210";
+    $graph_array['to']     = $now;
+    $graph_array['id']     = $device['device_id'];
+    $graph_array['mod']    = $index;
+    $graph_array['chan']   = $subindex;
+    $graph_array['type']   = "c6kxbar_util";
+    $graph_array['from']   = $day;
+    $graph_array['legend'] = "no";
+
+    $link_array = $graph_array;
+    $link_array['page'] = "graphs";
+    unset($link_array['height'], $link_array['width'], $link_array['legend']);
+    $link = generate_url($link_array);
+
+    $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - " . $text_descr);
+
+    $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = $graph_colour;
+
+    $minigraph =  generate_graph_tag($graph_array);
 
     echo("<tr bgcolor=$row_colour>
           <td width=10></td>
           <td width=200><strong>Fabric ".$subindex."</strong></td>
           <td><span style='font-weight: bold;' class=".$fabric['mode_class'].">".$fabric['cc6kxbarModuleChannelFabStatus']."</span></td>
           <td>".formatRates($fabric['cc6kxbarModuleChannelSpeed']*1000000)."</td>
+          <td>".overlib_link($link, $minigraph, $overlib_content)."</td>
           <td>".print_percentage_bar (125, 20, $percent_in, "Ingress", "ffffff", $background['left'], $percent_in . "%", "ffffff", $background['right'])."</td>
           <td>".print_percentage_bar (125, 20, $percent_out, "Egress", "ffffff", $background['left'], $percent_out . "%", "ffffff", $background['right'])."</td>
           </tr>");
