@@ -301,13 +301,6 @@ foreach ($ports as $port)
     $if_rrd_update  = "$polled:$ifInOctets:$ifOutOctets:$ifInErrors:$ifOutErrors:$ifInUcastPkts:$ifOutUcastPkts:$ifInNUcastPkts:$ifOutNUcastPkts:$ifInDiscards:$ifOutDiscards:$ifInUnknownProtos";
     $if_rrd_update .= ":$ifInBroadcastPkts:$ifOutBroadcastPkts:$ifInMulticastPkts:$ifOutMulticastPkts";
     $ret = rrdtool_update("$rrdfile", $if_rrd_update);
-
-#      if ($config['enable_ports_Xbcmc'] && $config['os'][$device['os']]['ifXmcbc']) {
-#        if (!is_file($ifx_rrd)) { shell_exec($ifx_rrd_cmd); }
-#        $ifx_rrd_update = "$polled:$ifHCInBroadcastPkts:$ifHCOutBroadcastPkts:$ifHCInMulticastPkts:$ifHCOutMulticastPkts";
-#        $ret = rrdtool_update($ifx_rrd, $ifx_rrd_update);
-#      }
-
     /// End Update IF-MIB
 
     /// Update PAgP
@@ -377,7 +370,6 @@ foreach ($ports as $port)
 
   /// Clear Per-Port Variables Here
   unset($this_port);
-
 }
 
 /// Clear Variables Here

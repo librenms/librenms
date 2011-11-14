@@ -12,7 +12,9 @@ include("includes/functions.php");
 
 $entry = explode(",", $argv[1]);
 
-print_r($entry);
+logfile($argv[1]);
+
+#print_r($entry);
 
 $device = @dbFetchRow("SELECT * FROM devices WHERE `hostname` = ?", array($entry['0']));
 
@@ -24,6 +26,6 @@ if (!$device['device_id'])
 if (!$device['device_id']) { exit; } else { }
 
 $file = $config['install_dir'] . "/includes/snmptrap/".$entry['1'].".inc.php";
-if (is_file($file)) { include("$file"); } else { echo("unknown trap ($file)"); exit; }
+if (is_file($file)) { include("$file"); } else { echo("unknown trap ($file)"); }
 
 ?>

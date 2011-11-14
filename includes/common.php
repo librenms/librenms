@@ -394,6 +394,17 @@ function get_dev_attribs($device)
   return $attribs;
 }
 
+function get_dev_entity_state($device)
+{
+  $state = array();
+  foreach (dbFetchRows("SELECT * FROM entPhysical_state WHERE `device_id` = ?", array($device)) as $entity)
+  {
+    $state['group'][$entity['group']][$entity['entPhysicalIndex']][$entity['subindex']][$entity['key']] = $entity['value'];
+    $state['index'][$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']] = $entity['value'];
+  }
+  return $state;
+}
+
 function get_dev_attrib($device, $attrib_type)
 {
   if ($row = dbFetchRow("SELECT attrib_value FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ?", array($device['device_id'], $attrib_type)))

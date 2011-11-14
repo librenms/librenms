@@ -78,6 +78,7 @@ echo("<td style='width: 50%; vertical-align: top;'>");
 include("overview/processors.inc.php");
 include("overview/mempools.inc.php");
 include("overview/storage.inc.php");
+if(is_array($entity_state['group']['c6kxbar'])) { include("overview/c6kxbar.inc.php"); }
 include("overview/sensors/temperatures.inc.php");
 include("overview/sensors/humidity.inc.php");
 include("overview/sensors/fanspeeds.inc.php");
