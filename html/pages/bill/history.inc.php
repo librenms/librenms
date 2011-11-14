@@ -6,7 +6,7 @@
   echo("<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>
            <tr style=\"font-weight: bold; \">
              <td width=\"7\"></td>
-             <td width=\"220\">Period</td>
+             <td width=\"300\">Period</td>
              <td>Type</td>
              <td>Allowed</td>
              <td>Inbound</td>
@@ -54,7 +54,7 @@
       echo("
            <tr style=\"background: $row_colour;\">
              <td></td>
-             <td><span style=\"font-weight: bold;\" class=\"interface\">".strftime("%Y", strtotime($datefrom))." to ".strftime("%Y", strtotime($dateto))."</span></td>
+             <td><span style=\"font-weight: bold;\" class=\"interface\">".strftime("%Y-%m-%d", strtotime($datefrom))." -> ".strftime("%Y-%m-%d", strtotime($dateto))."</span></td>
              <td>$type</td>
              <td>$allowed</td>
              <td>$in</td>

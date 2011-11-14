@@ -519,7 +519,6 @@ $config['os'][$os]['over'][0]['text']   = "Traffic";
 #$config['os'][$os]['over'][2]['graph']  = "device_mempool";
 #$config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
-
 $os = "procurve";
 $config['os'][$os]['text']              = "HP ProCurve";
 $config['os'][$os]['type']              = "network";

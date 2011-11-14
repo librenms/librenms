@@ -17,7 +17,7 @@ if($device['os'] == "ios")
    foreach($entry as $key => $value)
    {
      $subindex = NULL;
-     $entPhysical_attribs[$index][$subindex][$group][$key] = $value;
+     $entPhysical_state[$index][$subindex][$group][$key] = $value;
    }
  }
 
@@ -27,7 +27,7 @@ if($device['os'] == "ios")
    $group = 'c6kxbar';
    foreach($entry as $key => $value)
    {
-     $entPhysical_attribs[$index][$subindex][$group][$key] = $value;
+     $entPhysical_state[$index][$subindex][$group][$key] = $value;
    }
 
    // FIXME -- Generate RRD files
@@ -35,31 +35,31 @@ if($device['os'] == "ios")
 
  }
 
-print_r($entPhysical_attribs);
+#print_r($entPhysical_state);
 
 }
 
 
 
-// Set Entity Attribs
-foreach (dbFetch("SELECT * FROM `entPhysical_attribs` WHERE `device_id` = ?", array($device['device_id'])) as $entity)
+// Set Entity state
+foreach (dbFetch("SELECT * FROM `entPhysical_state` WHERE `device_id` = ?", array($device['device_id'])) as $entity)
 {
-  if (!isset($entPhysical_attribs[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']]))
+  if (!isset($entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']]))
   {
-    dbDelete('entPhysical_attribs', "`device_id` = ? AND `entPhysicalIndex` = ? AND `subindex` = ? AND `group` = ? AND `key` = ?",
+    dbDelete('entPhysical_state', "`device_id` = ? AND `entPhysicalIndex` = ? AND `subindex` = ? AND `group` = ? AND `key` = ?",
                                array($device['device_id'], $entity['entPhysicalIndex'], $entity['subindex'], $entity['group'], $entity['key']));
   } else {
-    if($entPhysical_attribs[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']] != $entity['value'])
+    if($entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']] != $entity['value'])
     {
       echo("no match!");
     }
-    unset($entPhysical_attribs[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']]);
+    unset($entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']]);
   }
 }
 // End Set Entity Attrivs
 
-// Delete Entity Attribs
-foreach ($entPhysical_attribs as $epi => $entity)
+// Delete Entity state
+foreach ($entPhysical_state as $epi => $entity)
 {
   foreach($entity as $subindex => $si)
   {
@@ -67,11 +67,11 @@ foreach ($entPhysical_attribs as $epi => $entity)
     {
       foreach($ti as $key => $value)
       {
-        dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $epi, 'subindex' => $subindex, 'group' => $group, 'key' => $key, 'value' => $value), 'entPhysical_attribs');
+        dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $epi, 'subindex' => $subindex, 'group' => $group, 'key' => $key, 'value' => $value), 'entPhysical_state');
       }
     }
   }
 }
-// End Delete Entity Attribs
+// End Delete Entity state
 
 ?>
