@@ -30,8 +30,39 @@ if($device['os'] == "ios")
      $entPhysical_state[$index][$subindex][$group][$key] = $value;
    }
 
-   // FIXME -- Generate RRD files
+   $chan_update = $entry['cc6kxbarStatisticsInUtil'];
+   $chan_update .= ":".$entry['cc6kxbarStatisticsOutUtil'];
+   $chan_update .= ":".$entry['cc6kxbarStatisticsOutDropped'];
+   $chan_update .= ":".$entry['cc6kxbarStatisticsOutErrors'];
+   $chan_update .= ":".$entry['cc6kxbarStatisticsInErrors'];
 
+   $rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("c6kxbar-".$index."-".$subindex.".rrd");
+
+   if ($debug) { echo("$rrd "); }
+
+   if (!is_file($rrd))
+   {
+     rrdtool_create ($rrd, "--step 300 \
+     DS:inutil:GAUGE:600:0:100 \
+     DS:oututil:GAUGE:600:0:100 \
+     DS:outdropped:DERIVE:600:0:125000000000 \
+     DS:outerrors:DERIVE:600:0:125000000000 \
+     DS:inerrors:DERIVE:600:0:125000000000 \
+     RRA:AVERAGE:0.5:1:600 \
+     RRA:AVERAGE:0.5:6:700 \
+     RRA:AVERAGE:0.5:24:775 \
+     RRA:AVERAGE:0.5:288:797 \
+     RRA:MIN:0.5:1:600 \
+     RRA:MIN:0.5:6:700 \
+     RRA:MIN:0.5:24:775 \
+     RRA:MIN:0.5:288:797 \
+     RRA:MAX:0.5:1:600 \
+     RRA:MAX:0.5:6:700 \
+     RRA:MAX:0.5:24:775 \
+     RRA:MAX:0.5:288:797");
+   }
+
+   rrdtool_update($rrd,"N:$chan_update");
 
  }
 
