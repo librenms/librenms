@@ -15,7 +15,7 @@ function generate_url($vars, $new_vars = array())
 
   foreach ($vars as $var => $value)
   {
-    if ($value != "" && strstr($var, "opt") === FALSE)
+    if ($value == "0" || $value != "" && strstr($var, "opt") === FALSE)
     {
       $url .= $var ."=".$value."/";
     }
