@@ -11,7 +11,8 @@ foreach($entity_state['group']['c6kxbar'] as $index => $entry)
 {
   if (is_integer($c6kxbar_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-  $entity = dbFetchRow("SELECT * FROM entPhysical WHERE device_id = ? AND entPhysicalIndex = ?", array($device['device_id'], $index));
+  // fixme i'm not sure if this is the correct way to decide what entphysical index it is. slotnum+1? :>
+  $entity = dbFetchRow("SELECT * FROM entPhysical WHERE device_id = ? AND entPhysicalIndex = ?", array($device['device_id'], $index+1));
 
   echo("<tr bgcolor=$row_colour>
         <td colspan=5 width=200><strong>".$entity['entPhysicalName']."</strong></td>
