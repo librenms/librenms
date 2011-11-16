@@ -59,15 +59,18 @@ if ($services['total'])
 }
 
 ### FIXME - split this into overview/syslog.inc.php?
-$syslog =  dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20", array($device['device_id']));
-if (count($syslog))
+if ($config['enable_syslog'])
 {
-  echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo('<p style="padding: 0px 5px 5px;" class="sectionhead"><a class="sectionhead" href="device/device=' . $device['device_id'] . '/tab=syslog/"><img align="absmiddle" src="images/16/printer.png" /> Recent Syslog</a></p>');
-  echo("<table cellspacing=0 cellpadding=2 width=100%>");
-  foreach ($syslog as $entry) { include("includes/print-syslog.inc.php"); }
-  echo("</table>");
-  echo("</div>");
+  $syslog =  dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20", array($device['device_id']));
+  if (count($syslog))
+  {
+    echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
+    echo('<p style="padding: 0px 5px 5px;" class="sectionhead"><a class="sectionhead" href="device/device=' . $device['device_id'] . '/tab=syslog/"><img align="absmiddle" src="images/16/printer.png" /> Recent Syslog</a></p>');
+    echo("<table cellspacing=0 cellpadding=2 width=100%>");
+    foreach ($syslog as $entry) { include("includes/print-syslog.inc.php"); }
+    echo("</table>");
+    echo("</div>");
+  }
 }
 
 echo("</td>");
