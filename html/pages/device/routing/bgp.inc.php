@@ -97,6 +97,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
   if ($peerhost)
   {
     $peername = generate_device_link($peerhost);
+    $peername = generate_device_link($peerhost) ." ". generate_port_link($peerhost);
   }
   else
   {
@@ -133,7 +134,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
   ");
 
   echo("   <td width=20><span class=list-large>".$i."</span></td>
-           <td>" . $peeraddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), 'bgp/')."</td>
+           <td>" . $peeraddresslink . "<br />".$peername."</td>
              <td>$peer_type</td>
            <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>" . (isset($peer['afi']) ? $peer['afi'] : '') . "</td>
            <td><strong>AS" . $peer['bgpPeerRemoteAs'] . "</strong><br />" . $peer['astext'] . "</td>
