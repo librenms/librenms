@@ -13,7 +13,7 @@ if ($device['os'] == "junos")
   {
     foreach ($processors_array as $index => $entry)
     {
-      if ($entry['jnxOperatingDescr'] == "Routing Engine" || $entry['jnxOperatingDRAMSize'] && !strpos($entry['jnxOperatingDescr'], "sensor") && !strstr($entry['jnxOperatingDescr'], "fan"))
+      if ($entry['jnxOperatingDescr'] == "Routing Engine" || $entry['jnxOperatingDescr'] == "Processor" || $entry['jnxOperatingDRAMSize'] && !strpos($entry['jnxOperatingDescr'], "sensor") && !strstr($entry['jnxOperatingDescr'], "fan"))
       {
         if ($debug) { echo($index . " " . $entry['jnxOperatingDescr'] . " -> " . $entry['jnxOperatingCPU'] . " -> " . $entry['jnxOperatingDRAMSize'] . "\n"); }
         $usage_oid = ".1.3.6.1.4.1.2636.3.1.13.1.8." . $index;
