@@ -178,6 +178,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
   {
 #    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['sfdp'] . ' -Gpack -Gcharset=latin1 | '.$config['dot'];
     $maptool = $config['neato'];
+    $maptool = $config['dot'];
   } else {
     $maptool = $config['dot'];
   }
