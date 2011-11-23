@@ -10,6 +10,7 @@ echo("<td class=list-bold>");
 
 foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?", array($device['device_id'], $vlan['vlan_vlan'])) as $port)
 {
+  $port = ifLabel($port, $device);
   if ($vars['view'] == "graphs")
   {
     echo("<div style='display: block; padding: 2px; margin: 2px; min-width: 139px; max-width:139px; min-height:85px; max-height:85px; text-align: center; float: left; background-color: ".$list_colour_b_b.";'>
@@ -26,7 +27,7 @@ foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?
   }
   else
   {
-    echo($vlan['port_sep'] . generate_port_link($port, makeshortif(ifnamedescr($port))));
+    echo($vlan['port_sep'] . generate_port_link($port, makeshortif($port['label']));
     $vlan['port_sep'] = ", ";
   }
 }
