@@ -239,6 +239,7 @@ $config['device_traffic_iftype'][] = '/virtual/';
 $config['device_traffic_iftype'][] = '/mpls/';
 $config['device_traffic_iftype'][] = '/ieee8023adLag/';
 $config['device_traffic_iftype'][] = '/l2vlan/';
+$config['device_traffic_iftype'][] = '/ppp/';
 
 $config['device_traffic_descr'][]  = '/loopback/';
 $config['device_traffic_descr'][]  = '/vlan/';
@@ -384,6 +385,7 @@ $config['discovery_modules']['cisco-vlans']               = 1;
 $config['discovery_modules']['cisco-mac-accounting']      = 1;
 $config['discovery_modules']['cisco-pw']                  = 1;
 $config['discovery_modules']['cisco-vrf']                 = 1;
+$config['discovery_modules']['cisco-cef']                 = 1;
 $config['discovery_modules']['vmware-vminfo']             = 1;
 $config['discovery_modules']['libvirt-vminfo']            = 1;
 $config['discovery_modules']['toner']                     = 1;
