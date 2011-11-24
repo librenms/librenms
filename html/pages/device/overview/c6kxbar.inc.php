@@ -16,7 +16,25 @@ foreach($entity_state['group']['c6kxbar'] as $index => $entry)
 
   echo("<tr bgcolor=$row_colour>
         <td colspan=5 width=200><strong>".$entity['entPhysicalName']."</strong></td>
-        <td colspan=2>".$entry['']['cc6kxbarModuleModeSwitchingMode']."</td>
+        <td colspan=2>");
+
+    switch ($entry['']['cc6kxbarModuleModeSwitchingMode'])
+    {
+      case "busmode":
+       # echo '<a title="Modules in this mode don't use fabric. Backplane is used for both lookup and data forwarding.">Bus</a>';
+        break;
+      case "crossbarmode":
+        echo '<a title="Modules in this mode use backplane for forwarding decision and fabric for data forwarding.">Crossbar</a>';
+        break;
+      case "dcefmode":
+        echo '<a title="Modules in this mode use fabric for data forwarding and local forwarding is enabled.">DCEF</a>';
+        break;
+      default:
+        echo $entry['']['cc6kxbarModuleModeSwitchingMode'];
+    }
+
+
+    echo("</td>
         </tr>");
 
   foreach($entity_state['group']['c6kxbar'][$index] as $subindex => $fabric)
@@ -63,7 +81,9 @@ foreach($entity_state['group']['c6kxbar'] as $index => $entry)
     echo("<tr bgcolor=$row_colour>
           <td width=10></td>
           <td width=200><strong>Fabric ".$subindex."</strong></td>
-          <td><span style='font-weight: bold;' class=".$fabric['mode_class'].">".$fabric['cc6kxbarModuleChannelFabStatus']."</span></td>
+          <td><span style='font-weight: bold;' class=".$fabric['mode_class'].">".
+
+    $fabric['cc6kxbarModuleChannelFabStatus']."</span></td>
           <td>".formatRates($fabric['cc6kxbarModuleChannelSpeed']*1000000)."</td>
           <td>".overlib_link($link, $minigraph, $overlib_content)."</td>
           <td>".print_percentage_bar (125, 20, $percent_in, "Ingress", "ffffff", $background['left'], $percent_in . "%", "ffffff", $background['right'])."</td>

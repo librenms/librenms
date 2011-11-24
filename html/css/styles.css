@@ -323,6 +323,8 @@ A.black:visited, A.black, .black    { color: #000000; }
 A.green:visited, A.green, .green    { color: #008C00; }
 A.blue:visited, A.blue, .blue       { color: #0000ff; }
 A.orange:visited, a.orange, .orange { color: #FF7400; }
+A.purple:visited, a.purple, .purple { color: #740074; }
+
 
 .pinkbg  { background-color: #ffbbbb; }
 .redbg   { background-color: #ff8585; }
