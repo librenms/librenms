@@ -60,9 +60,9 @@ foreach ($ports as $port)
           <td width=200 class=list-bold><a href='" . generate_device_url($port) . "'>".$port['hostname']."</a></td>
           <td width=150 class=list-bold><a class='".$ifclass."'href='" . generate_port_url($port) . "'>".fixIfName($port['label'])." $error_img</td>
           <td width=110 >$speed</td>
-          <td width=110 class=green>".$port['in_rate']."</td>
-          <td width=110 class=blue>".$port['out_rate']."</td>
-          <td width=200>$type</td>
+          <td width=100 class=green>".$port['in_rate']."</td>
+          <td width=100 class=blue>".$port['out_rate']."</td>
+          <td width=150>$type</td>
           <td>" . $port['ifAlias'] . "</td>
         </tr>\n");
 

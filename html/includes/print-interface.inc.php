@@ -89,7 +89,7 @@ if ($port[ifDuplex] != "unknown") { echo("<span class=box-desc>" . $port['ifDupl
 if ($device['os'] == "ios" || $device['os'] == "iosxe")
 {
   if ($port['ifTrunk']) {
-    echo("<p class=box-desc><span class=red>" . $port['ifTrunk'] . "</span></p>");
+    echo("<p class=box-desc><span class=purple>" . $port['ifTrunk'] . "</span></p>");
   } elseif ($port['ifVlan']) {
     echo("<p class=box-desc><span class=blue>VLAN " . $port['ifVlan'] . "</span></p>");
   } elseif ($port['ifVrf']) {

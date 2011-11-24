@@ -44,7 +44,7 @@ if (count($sensors))
     $graph_array['from'] = $config['time']['day'];
     $sensor_minigraph =  generate_graph_tag($graph_array);
 
-    $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 25, '');
+    $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
     echo("<tr bgcolor='$row_colour'>
            <td class=tablehead style='padding-left:5px;'><strong>".overlib_link($link, $sensor['sensor_descr'], $overlib_content)."</strong></td>
            <td width=80 align=right class=tablehead>".overlib_link($link, $sensor_minigraph, $overlib_content)."</td>
