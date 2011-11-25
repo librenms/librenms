@@ -126,7 +126,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
       }
     }
 
-    if (count($smokeping_files))
+    if (count($smokeping_files['in'][$device['hostname']]) || count($smokeping_files['out'][$device['hostname']]))
     {
       echo('<li class="' . $select['latency'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'latency')).'">
