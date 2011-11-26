@@ -1,6 +1,6 @@
 <?php
 
-$class     = "freqquency";
+$class     = "frequency";
 $unit      = "Hz";
 $unit_long = "Hertz";
 
