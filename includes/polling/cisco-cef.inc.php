@@ -6,6 +6,14 @@ $cefs = array();
 $cefs = snmpwalk_cache_threepart_oid($device, "CISCO-CEF-MIB::cefSwitchingStatsEntry", $cefs);
 $polled = time();
 
+$cefs_query = dbFetchRows("SELECT * FROM `cef_switching` WHERE `device_id` = ?", array($device['device_id']));
+foreach ($cefs_query as $ceftmp)
+{
+  $cef_id = $device['device_id']."-".$ceftmp['entPhysicalIndex']."-".$ceftmp['afi']."-".$ceftmp['cef_index'];
+  $cefs_db[$cef_id] = $ceftmp['cef_switching_id'];
+}
+
+
 if ($debug) { print_r($cefs); }
 
 if (is_array($cefs))
@@ -32,11 +40,15 @@ if (is_array($cefs))
       {
         echo(" | |-".$path.": ".$cef_stat['cefSwitchingPath']);
 
-        if (dbFetchCell("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path)) != "1")
+        $cef_id = $device['device_id']."-".$entity."-".$afi."-".$path;
+
+#        if (dbFetchCell("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path)) != "1")
+        if(!isset($cefs_db[$cef_id]))
         {
           dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $entity, 'afi' => $afi, 'cef_index' => $path, 'cef_path' => $cef_stat['cefSwitchingPath']), 'cef_switching');
           echo("+");
         }
+        unset($cefs_db[$cef_id]);
 
         $cef_entry = dbFetchRow("SELECT * FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path));
 
@@ -83,6 +95,14 @@ if (is_array($cefs))
 }
 
 ## FIXME - need to delete old ones. FIXME REALLY.
+
+print_r($cefs_db);
+
+foreach($cefs_db as $cef_switching_id)
+{
+  dbDelete("cef_switching", "`cef_switching_id` =  ?", array($cef_switching_id));
+  echo("-");
+}
 
 echo("\n");
 

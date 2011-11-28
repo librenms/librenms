@@ -29,6 +29,7 @@ if (is_array($cefs))
       foreach ($paths as $path => $path_name)
       {
         echo(" | |-".$path.": ".$path_name['cefSwitchingPath']."\n");
+        $cef_exists[$device['device_id']][$entity][$afi][$path] = 1;
 
         if (mysql_result(mysql_query("SELECT COUNT(*) FROM `cef` WHERE `device_id` = '".$device['device_id']."' AND `entPhysicalIndex` = '".$entity."'
                                      AND `afi` = '".$afi."' AND `cef_index` = '".$path."'"),0) != "1")
