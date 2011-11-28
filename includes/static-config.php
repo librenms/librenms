@@ -804,7 +804,7 @@ foreach ($config['os'] as $this_os => $blah)
 
 ### Graph Types
 
-$config['graph_sections'] = array('system', 'firewall', 'netstats', 'wireless', 'storage');
+$config['graph_sections'] = array('system', 'firewall', 'netstats', 'wireless', 'storage', 'vpdn');
 
 $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
 $config['graph_types']['device']['wifi_clients']['order'] = '0';
@@ -918,6 +918,15 @@ $config['graph_types']['device']['ucd_interrupts']['descr'] = 'Interrupts';
 $config['graph_types']['device']['uptime']['section'] = 'system';
 $config['graph_types']['device']['uptime']['order'] = '0';
 $config['graph_types']['device']['uptime']['descr'] = 'System Uptime';
+
+$config['graph_types']['device']['vpdn_sessions_l2tp']['section'] = 'vpdn';
+$config['graph_types']['device']['vpdn_sessions_l2tp']['order'] = '0';
+$config['graph_types']['device']['vpdn_sessions_l2tp']['descr'] = 'VPDN L2TP Sessions';
+
+$config['graph_types']['device']['vpdn_tunnels_l2tp']['section'] = 'vpdn';
+$config['graph_types']['device']['vpdn_tunnels_l2tp']['order'] = '0';
+$config['graph_types']['device']['vpdn_tunnels_l2tp']['descr'] = 'VPDN L2TP Tunnels';
+
 
 ### Device Types
 

@@ -360,6 +360,7 @@ $config['poller_modules']['cisco-remote-access-monitor']  = 1;
 $config['poller_modules']['cisco-cef']                    = 1;
 $config['poller_modules']['cisco-mac-accounting']         = 1;
 $config['poller_modules']['cipsec-tunnels']               = 1;
+$config['poller_modules']['cisco-vpdn']			  = 1;
 $config['poller_modules']['entity-physical']              = 1;
 
 
