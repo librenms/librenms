@@ -2,26 +2,24 @@
 
 print_optionbar_start();
 
-$menu_options = array('basic' => 'Basic',
-                      'graphs' => 'Graphs',
-                      );
+$link_array = array('page'    => 'device',
+                    'device'  => $device['device_id'],
+                    'tab'     => 'routing',
+                    'proto'   => 'cef');
 
-if (!$_GET['optb']) { $_GET['optb'] = "basic"; }
+if(!isset($vars['view'])) { $vars['view'] = "basic"; }
 
 echo('<span style="font-weight: bold;">CEF</span> &#187; ');
 
-$sep = "";
-foreach ($menu_options as $option => $text)
-{
-  echo($sep);
-  if ($_GET['optb'] == $option) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="device/' . $device['device_id'] . '/routing/cef/' . $option . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $text
- . '</a>');
-  if ($_GET['optb'] == $option) { echo("</span>"); }
-  $sep = " | ";
-}
+if ($vars['view'] == "basic") { echo("<span class='pagemenu-selected'>"); }
+echo(generate_link("Basic", $link_array,array('view'=>'basic')));
+if ($vars['view'] == "basic") { echo("</span>"); }
 
-unset($sep);
+echo(" | ");
+
+if ($vars['view'] == "graphs") { echo("<span class='pagemenu-selected'>"); }
+echo(generate_link("Graphs", $link_array,array('view'=>'graphs')));
+if ($vars['view'] == "graphs") { echo("</span>"); }
 
 print_optionbar_end();
 
@@ -87,7 +85,7 @@ foreach (dbFetchRows("SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
         echo("</tr>
        ");
 
-  if ($_GET['optb'] == "graphs")
+  if ($vars['view'] == "graphs")
   {
     $graph_array['height'] = "100";
     $graph_array['width']  = "215";
