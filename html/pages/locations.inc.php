@@ -74,6 +74,7 @@ foreach (getlocations() as $location)
   $graph_array['height'] = "100";
   $graph_array['width']  = "220";
   $graph_array['to']     = $config['time']['now'];
+  $graph_array['legend'] = "no";
   $graph_array['id']     = $location;
 
   include("includes/print-quadgraphs.inc.php");
