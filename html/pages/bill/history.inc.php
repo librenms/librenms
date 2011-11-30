@@ -3,6 +3,13 @@
   $pagetitle[] = "Historical Usage";
   $i=0;
 
+  $img  = "<img src=\"bandwidth-graph.php?bill_id=".$bill_id;
+  $img .= "&amp;imgtype=historical";
+  $img .= "&amp;x=1190&amp;y=250";
+  $img .= "\" style=\"margin: 15px 5px 25px 5px;\" />";
+
+  echo($img);
+
   echo("<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>
            <tr style=\"font-weight: bold; \">
              <td width=\"7\"></td>
@@ -62,7 +69,7 @@
              <td>$total_data</td>
              <td>$rate_95th</td>
              <td style=\"text-align: center;\">$overuse</td>
-             <td>".print_percentage_bar (250, 20, $perc, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right'])."</td>
+             <td>".print_percentage_bar(250, 20, $perc, NULL, "ffffff", $background['left'], $percent."%", "ffffff", $background['right'])."</td>
            </tr>");
 
       $i++;
