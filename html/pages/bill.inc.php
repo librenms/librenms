@@ -96,6 +96,12 @@ if (bill_permitted($bill_id))
 
   echo(" | ");
 
+  if ($_GET['optb'] == "bandwidth") { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='bill/".$bill_id."/bandwidth/'>Bandwidth Graphs</a>");
+  if ($_GET['optb'] == "bandwidth") { echo("</span>"); }
+
+  echo(" | ");
+
   if ($_GET['optb'] == "history") { echo("<span class='pagemenu-selected'>"); }
   echo("<a href='bill/".$bill_id."/history/'>Historical Usage</a>");
   if ($_GET['optb'] == "history") { echo("</span>"); }
@@ -129,6 +135,10 @@ if (bill_permitted($bill_id))
   elseif ($_GET['optb'] == "history")
   {
     include("pages/bill/history.inc.php");
+  }
+  elseif ($_GET['optb'] == "bandwidth")
+  {
+    include("pages/bill/bandwidth.inc.php");
   }
   elseif ($_GET['optb'] == "details" || $_GET['optb'] == "basic") {
 
