@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 
-# port_info is broken.  always reports same values no matter host selected
+# port info is broken.  always reports same values no matter host selected
 
 <?php
 
@@ -16,7 +16,7 @@ include_once('Net/SmartIRC.php');
 
 mysql_close();
 
-# Redirect to /dev/null if you aren't using screen to keep tabs
+# Redirect to /dev/null or logfile if you aren't using screen to keep tabs
 echo "Observer Bot Starting ...\n";
 echo "\n";
 echo "Timestamp         Command\n";
@@ -26,13 +26,13 @@ class observiumbot
 {
 
 ###
-# Get HELP!
+# HELP Function 
 ###
   function help_info(&$irc, &$data)
   {
     global $config;
 
-    $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Commands: !help, !log, !status, !version, !down, !port, !device, !listdevices");
+    $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Commands: .help, .log, .status, .version, .down, .port, .device, .listdevices");
 
     echo date("m-d-y H:i:s ");
     echo "HELP\n";
@@ -41,7 +41,7 @@ class observiumbot
   }
 
 ###
-# Get status on !version
+# VERSION Function
 ###
   function version_info(&$irc, &$data)
   {
@@ -56,7 +56,7 @@ class observiumbot
   }
 
 ###
-# Get last eventlog entry
+# LOG Function 
 ###
   function log_info(&$irc, &$data)
   {
@@ -78,7 +78,7 @@ class observiumbot
   }
 
 ###
-# Get status on !down devices
+# DOWN Function
 ###
   function down_info(&$irc, &$data)
   {
@@ -101,7 +101,7 @@ class observiumbot
   }
 
 ###
-# Get status on !device <hostname>
+# DEVICE Function 
 ###
   function device_info(&$irc, &$data)
   {
@@ -116,6 +116,10 @@ class observiumbot
 
     mysql_close();
 
+
+if (!$device) {
+ $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Error: Bad or Missing hostname, use .listdevices to show all devices."); } else {
+
     if ($device['status'] == 1) { $status = "Up " . formatUptime($device['uptime'] . " "); } else { $status = "Down "; }
     if ($device['ignore']) { $status = "*Ignored*"; }
     if ($device['disabled']) { $status = "*Disabled*"; }
@@ -126,9 +130,9 @@ class observiumbot
     echo date("m-d-y H:i:s ");
     echo "DEVICE\t\t". $device['hostname']."\n";
   }
-
+}
 ###
-# Get status on !port <hostname port>
+# PORT Function 
 ###
   function port_info(&$irc, &$data)
   {
@@ -158,7 +162,7 @@ class observiumbot
   }
 
 ###
-# !listdevices lists all devices
+# LISTDEVICES Function
 ###
   function list_devices(&$irc, &$data)
   {
@@ -185,7 +189,7 @@ class observiumbot
   }
 
 ###
-# !status <dev prt srv> gives overall status
+# STATUS Function
 ###
   function status_info(&$irc, &$data)
   {
@@ -233,14 +237,14 @@ $bot = &new observiumbot();
 $irc = &new Net_SmartIRC();
 $irc->setUseSockets(TRUE);
 
-$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '!listdevices', $bot, 'list_devices');
-$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '!device', $bot, 'device_info');
-$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '!port', $bot, 'port_info');
-$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '!down', $bot, 'down_info');
-$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '!version', $bot, 'version_info');
-$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '!status', $bot, 'status_info');
-$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '!log', $bot, 'log_info');
-$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '!help', $bot, 'help_info');
+$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.listdevices', $bot, 'list_devices');
+$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.device', $bot, 'device_info');
+$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.port', $bot, 'port_info');
+$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.down', $bot, 'down_info');
+$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.version', $bot, 'version_info');
+$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.status', $bot, 'status_info');
+$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.log', $bot, 'log_info');
+$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.help', $bot, 'help_info');
 
 $irc->connect($config['irc_host'], $config['irc_port']);
 $irc->login($config['irc_nick'], 'Observium Bot', 0, $config['irc_nick']);
