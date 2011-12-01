@@ -42,7 +42,7 @@ elseif ($_GET['opta'] == "add")
   <tr>
     <td><strong>Billing Type</strong></td>
     <td>
-      <input type="radio" name="bill_type" value="cdr" checked /> CDR 95th: <input type="text" name="bill_cdr" size="10">KBps
+      <input type="radio" name="bill_type" value="cdr" checked /> CDR 95th: <input type="text" name="bill_cdr" size="10">Kbps
       <br />
       <input type="radio" name="bill_type" value="quota" /> Quota: <input type="text" name="bill_quota" size="10">GB
 
