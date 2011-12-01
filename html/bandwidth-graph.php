@@ -42,15 +42,14 @@
     $end	= $_GET['to'];
     $xsize	= (is_numeric($_GET['x']) ? $_GET['x'] : "800" );
     $ysize	= (is_numeric($_GET['y']) ? $_GET['y'] : "250" );
-    $count	= (is_numeric($_GET['count']) ? $_GET['count'] : "0" );
-    $iter	= 1;
-    $type	= (isset($_GET['type']) ? $_GET['type'] : "date" );
-    $dur	= $end - $start;
-    $datefrom	= date('Ymthis', $start);
-    $dateto	= date('Ymthis', $end);
+//    $count	= (is_numeric($_GET['count']) ? $_GET['count'] : "0" );
+//    $type	= (isset($_GET['type']) ? $_GET['type'] : "date" );
+//    $dur	= $end - $start;
+//    $datefrom	= date('Ymthis', $start);
+//    $dateto	= date('Ymthis', $end);
     $imgtype	= (isset($_GET['imgtype']) ? $_GET['imgtype'] : "historical" );
     $imgbill	= (isset($_GET['imgbill']) ? $_GET['imgbill'] : false);
-    $yaxistitle	= "Gigabytes";
+    $yaxistitle	= "Bytes";
 
     $in_data	  = array();
     $out_data	  = array();
@@ -60,12 +59,31 @@
     $overuse_data = array();
     $ticklabels	  = array();
 
-    function yaxisTitle($value) {
-	if ($value == "TB") { $res = "Terabytes"; }
-	elseif ($value == "GB") { $res = "Gigabytes"; }
-	elseif ($value == "MB") { $res = "Megabytes"; }
-	elseif ($value == "KB") { $res = "Kilobytes"; }
-	else { $res = "Bytes"; }
+    function humanReadable($value, $title = false, $max = false, $decimals = 3) {
+	$suffix = array("Bytes", "Kilobytes", "Megabytes", "Gigabytes", "Terabytes", "Petabytes");
+	$max = (($max == false) ? count($suffix) : $max);
+	$i = 0;
+	while($value >= 1024 && ($i < $max)) {
+	    $value /= 1024;
+	    $i++;
+	}
+	if ($title == "suffix") {
+	    $tmp = $i;
+	    $res = $suffix[$tmp];
+	} elseif ($title == "count") {
+	    $res = $i;
+	} else {
+	    $res = round($value, $decimals);
+	}
+	return $res;
+    }
+
+    function formatScale($value, $max, $decimal) {
+	$res = array();
+	foreach($value as $item) {
+	    $tmp = humanReadable($item, false, $max, $decimal);
+	    array_push($res, $tmp);
+	}
 	return $res;
     }
 
@@ -109,46 +127,65 @@
 	$graph_name	= "Historical bandwidth over the last 12 billing periods";
     } else {
 	$data		= array();
+	$max		= 9999999999999999999999999999999999999999999;
+	$min_data	= array("in"=>$max, "out"=>$max, "tot"=>$max);
 	$average	= 0;
 	if ($imgtype == "day") {
 	    foreach(dbFetch("SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC", array($bill_id, $start, $end)) as $data) {
-		$traf['in']	= round(substr(formatStorage($data['traf_in']), 0, -2));
-		$traf['out']	= round(substr(formatStorage($data['traf_out']), 0, -2));
-		$traf['total']	= round(substr(formatStorage($data['traf_total']), 0, -2));
-		$yaxistitle	= yaxisTitle(substr(formatStorage($data['traf_total']), -2));
+		$traf['in']	= (isset($data['traf_in']) ? $data['traf_in'] : 0);
+		$traf['out']	= (isset($data['traf_out']) ? $data['traf_out'] : 0);
+		$traf['total']	= (isset($data['traf_total']) ? $data['traf_total'] : 0);
 		$datelabel	= strftime("%e\n%b", $data['timestamp']);
 		array_push($ticklabels, $datelabel);
 		array_push($in_data, $traf['in']);
 		array_push($out_data, $traf['out']);
 		array_push($tot_data, $traf['total']);
+//		$min_data['in'] = (($traf['in'] < $min_data['in']) ? $traf['in'] : $min_data['in']);
+//		$min_data['out']= (($traf['out'] < $min_data['out']) ? $traf['out'] : $min_data['out']);
+//		$min_data['tot']= (($traf['total'] < $min_data['tot']) ? $traf['total'] : $min_data['tot']);
 		$average += $data['traf_total'];
 	    }
-	    $ave_count = count($tot_data);
+	    $min_data['in']	= min($in_data);
+	    $min_data['out']	= min($out_data);
+	    $min_data['tot']	= min($tot_data);
+	    $ave_count		= count($tot_data);
 	    if ($imgbill != false) {
-		$days	= strftime("%e", date($end - $start)) - $ave_count;
+		$days	= strftime("%e", date($end - $start)) - $ave_count - 1;
 		for ($x=0;$x<$days;$x++) {
 		    array_push($ticklabels, "");
-		    array_push($in_data, "0");
-		    array_push($out_data, "0");
-		    array_push($tot_data, "0");
+		    array_push($in_data, 0);
+		    array_push($out_data, 0);
+		    array_push($tot_data, 0);
 		}
 	    }
 	} elseif ($imgtype == "hour") {
 	    foreach(dbFetch("SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY HOUR(timestamp) ORDER BY timestamp ASC", array($bill_id, $start, $end)) as $data) {
-		$traf['in']	= round(substr(formatStorage($data['traf_in']), 0, -2));
-		$traf['out']	= round(substr(formatStorage($data['traf_out']), 0, -2));
-		$traf['total']	= round(substr(formatStorage($data['traf_total']), 0, -2));
+		$traf['in']	= (isset($data['traf_in']) ? $data['traf_in'] : 0);
+		$traf['out']	= (isset($data['traf_out']) ? $data['traf_out'] : 0);
+		$traf['total']	= (isset($data['traf_total']) ? $data['traf_total'] : 0);
 		$datelabel	= strftime("%H:%M", $data['timestamp']);
-		$yaxistitle	= yaxisTitle(substr(formatStorage($data['traf_total']), -2));
 		array_push($ticklabels, $datelabel);
 		array_push($in_data, $traf['in']);
 		array_push($out_data, $traf['out']);
 		array_push($tot_data, $traf['total']);
+//		$min_data['in'] = (($traf['in'] < $min_data['in']) ? $traf['in'] : $min_data['in']);
+//		$min_data['out']= (($traf['out'] < $min_data['out']) ? $traf['out'] : $min_data['out']);
+//		$min_data['tot']= (($traf['tot'] < $min_data['tot']) ? $traf['tot'] : $min_data['tot']);
 		$average += $data['traf_total'];
 	    }
-	    $ave_count = count($tot_data);
+	    $min_data['in']	= min($in_data);
+	    $min_data['out']	= min($out_data);
+	    $min_data['tot']	= min($tot_data);
+	    $ave_count		= count($tot_data);
 	}
-	$average = round(substr(formatStorage(($average / $ave_count)), 0, -2));
+	$decimal    = 0;
+	$max        = min($min_data);
+	$yaxistitle = humanReadable($max, "suffix");
+	$max        = humanReadable($max, "count");
+	$in_data    = formatScale($in_data, $max, $decimal);
+	$out_data   = formatScale($out_data, $max, $decimal);
+	$tot_data   = formatScale($tot_data, $max, $decimal);
+	$average    = humanReadable(($average / $ave_count), false, $max, $decimal);
 	for ($x=0;$x<=count($tot_data);$x++) {
 	    array_push($ave_data, $average);
 	}
@@ -218,7 +255,6 @@
 	$lineplot_allow = new LinePlot($ave_data);
 	$lineplot_allow->SetLegend("Average per day");
 	$lineplot_allow->SetColor('black');
-	//$lineplot_allow->SetFillColor('lightred@0.4');
 	$lineplot_allow->SetWeight(1);
 
 	$gbplot = new GroupBarPlot(array($barplot_in, $barplot_out, $barplot_tot));
