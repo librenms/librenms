@@ -77,8 +77,8 @@ if ($count <= 1) { $count = 2; }
 #$count = round($counttot / 260, 0);
 #if ($count <= 1) { $count = 2; }
 
-$max = dbFetchCell("SELECT delta FROM bill_data WHERE bill_id = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? ) ORDER BY delta DESC LIMIT 0,1", array($bill_id, $start, $end));
-if ($max > 1000000) { $div = "1000000"; $yaxis = "Mbit/sec";  } else { $div = "1000"; $yaxis = "Kbit/sec"; }
+#$max = dbFetchCell("SELECT delta FROM bill_data WHERE bill_id = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? ) ORDER BY delta DESC LIMIT 0,1", array($bill_id, $start, $end));
+#if ($max > 1000000) { $div = "1000000"; $yaxis = "Mbit/sec";  } else { $div = "1000"; $yaxis = "Kbit/sec"; }
 
 $i = '0';
 
@@ -90,8 +90,8 @@ foreach (dbFetch("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bil
   @$period = $row['period'];
   @$in_delta = $row['in_delta'];
   @$out_delta = $row['out_delta'];
-  @$in_value = round($in_delta * 8 / $period / $div, 2);
-  @$out_value = round($out_delta * 8 / $period / $div, 2);
+  @$in_value = round($in_delta * 8 / $period, 2);
+  @$out_value = round($out_delta * 8 / $period, 2);
 
   @$last = $timestamp;
 
@@ -101,17 +101,17 @@ foreach (dbFetch("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bil
 
   if ($iter == $count)
   {
-    $out_data[$i]   = round($iter_out * 8 / $iter_period / $div, 2);
+    $out_data[$i]   = round($iter_out * 8 / $iter_period, 2);
     $out_data_inv[$i]   = $out_data[$i] * -1;
-    $in_data[$i]   = round($iter_in * 8 / $iter_period / $div, 2);
+    $in_data[$i]   = round($iter_in * 8 / $iter_period, 2);
     $tot_data[$i]   = $out_data[$i] + $in_data[$i];
     $tot_data_inv[$i]   = $tot_data[$i] * -1;
 
     if ($tot_data[$i] > $max_value) { $max_value = $tot_data[$i]; }
 
     $ticks[$i]      = $timestamp;
-    $per_data[$i]   = $rate_95th / $div;
-    $ave_data[$i]   = $rate_average / $div;
+    $per_data[$i]   = $rate_95th;
+    $ave_data[$i]   = $rate_average;
     $iter       = "1";
     $i++;
     unset($iter_out, $iter_in, $iter_period);
@@ -152,7 +152,10 @@ $graph->xaxis->SetTitleMargin(30);
 #$graph->xaxis->HideFirstTickLabel();
 #$graph->yaxis->scale->SetAutoMin(1);
 $graph->xaxis->title->Set($type);
-$graph->yaxis->title->Set($yaxis);
+$graph->yaxis->title->Set("Bits per second");
+$graph->yaxis->SetLabelFormatCallback("format_si");
+
+
 
 function TimeCallback($aVal) {
     global $dur;

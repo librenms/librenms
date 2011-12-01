@@ -434,24 +434,32 @@ function formatStorage($rate, $round = '2')
    return $rate;
 }
 
-function format_si($rate)
+function format_si($rate, $round = 2)
 {
+  if($rate < "0")
+  {
+    $neg = 1;
+    $rate = $rate * -1;
+  }
+
   if ($rate >= "0.1")
   {
     $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
-    $round = Array('2','2','2','2','2','2','2','2','2');
+#    $round = Array('2','2','2','2','2','2','2','2','2');
     $ext = $sizes[0];
     for ($i = 1; (($i < count($sizes)) && ($rate >= 1000)); $i++) { $rate = $rate / 1000; $ext  = $sizes[$i]; }
   }
   else
   {
     $sizes = Array('', 'm', 'u', 'n');
-    $round = Array('2','2','2','2');
+#    $round = Array('2','2','2','2');
     $ext = $sizes[0];
     for ($i = 1; (($i < count($sizes)) && ($rate != 0) && ($rate <= 0.1)); $i++) { $rate = $rate * 1000; $ext  = $sizes[$i]; }
   }
 
-  return round($rate, $round[$i]).$ext;
+  if($neg) { $rate = $rate * -1; }
+
+  return round($rate, $round).$ext;
 }
 
 function format_bi($size, $round = '2')

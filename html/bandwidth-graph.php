@@ -59,32 +59,8 @@
     $overuse_data = array();
     $ticklabels	  = array();
 
-    function humanReadable($value, $title = false, $max = false, $decimals = 3) {
-	$suffix = array("Bytes", "Kilobytes", "Megabytes", "Gigabytes", "Terabytes", "Petabytes");
-	$max = (($max == false) ? count($suffix) : $max);
-	$i = 0;
-	while($value >= 1024 && ($i < $max)) {
-	    $value /= 1024;
-	    $i++;
-	}
-	if ($title == "suffix") {
-	    $tmp = $i;
-	    $res = $suffix[$tmp];
-	} elseif ($title == "count") {
-	    $res = $i;
-	} else {
-	    $res = round($value, $decimals);
-	}
-	return $res;
-    }
-
-    function formatScale($value, $max, $decimal) {
-	$res = array();
-	foreach($value as $item) {
-	    $tmp = humanReadable($item, false, $max, $decimal);
-	    array_push($res, $tmp);
-	}
-	return $res;
+    function format_si_short($val) {
+      return format_si($val, "1");
     }
 
     if ($imgtype == "historical") {
@@ -93,12 +69,13 @@
 	    $datefrom		= strftime("%e %b %Y", strtotime($data['bill_datefrom']));
 	    $dateto		= strftime("%e %b %Y", strtotime($data['bill_dateto']));
 	    $datelabel		= $datefrom."\n".$dateto;
-	    $traf['in']		= round(substr(formatStorage($data['traf_in'] * 1024 * 1024), 0, -2));
-	    $traf['out']	= round(substr(formatStorage($data['traf_out'] * 1024 * 1024), 0, -2));
-	    $traf['total']	= round(substr(formatStorage($data['traf_total'] * 1024 * 1024), 0, -2));
+	    $traf['in']		= $data['traf_in'];
+	    $traf['out']	= $data['traf_out'];
+	    $traf['total']	= $data['traf_total'];
+
 	    if ($data['bill_type'] == "Quota") {
-		$traf['allowed']= round(substr(formatStorage($data['bill_allowed'] * 1024 * 1024), 0, -2));
-		$traf['overuse']= round(substr(formatStorage($data['bill_overuse'] * 1024 * 1024), 0, -2));
+		$traf['allowed']= $data['bill_allowed'];
+		$traf['overuse']= $data['bill_overuse'];
 	    } else {
 		$traf['allowed']= "0";
 		$traf['overuse']= "0";
@@ -127,8 +104,6 @@
 	$graph_name	= "Historical bandwidth over the last 12 billing periods";
     } else {
 	$data		= array();
-	$max		= 9999999999999999999999999999999999999999999;
-	$min_data	= array("in"=>$max, "out"=>$max, "tot"=>$max);
 	$average	= 0;
 	if ($imgtype == "day") {
 	    foreach(dbFetch("SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC", array($bill_id, $start, $end)) as $data) {
@@ -140,14 +115,8 @@
 		array_push($in_data, $traf['in']);
 		array_push($out_data, $traf['out']);
 		array_push($tot_data, $traf['total']);
-//		$min_data['in'] = (($traf['in'] < $min_data['in']) ? $traf['in'] : $min_data['in']);
-//		$min_data['out']= (($traf['out'] < $min_data['out']) ? $traf['out'] : $min_data['out']);
-//		$min_data['tot']= (($traf['total'] < $min_data['tot']) ? $traf['total'] : $min_data['tot']);
 		$average += $data['traf_total'];
 	    }
-	    $min_data['in']	= min($in_data);
-	    $min_data['out']	= min($out_data);
-	    $min_data['tot']	= min($tot_data);
 	    $ave_count		= count($tot_data);
 	    if ($imgbill != false) {
 		$days	= strftime("%e", date($end - $start)) - $ave_count - 1;
@@ -168,24 +137,15 @@
 		array_push($in_data, $traf['in']);
 		array_push($out_data, $traf['out']);
 		array_push($tot_data, $traf['total']);
-//		$min_data['in'] = (($traf['in'] < $min_data['in']) ? $traf['in'] : $min_data['in']);
-//		$min_data['out']= (($traf['out'] < $min_data['out']) ? $traf['out'] : $min_data['out']);
-//		$min_data['tot']= (($traf['tot'] < $min_data['tot']) ? $traf['tot'] : $min_data['tot']);
 		$average += $data['traf_total'];
 	    }
-	    $min_data['in']	= min($in_data);
-	    $min_data['out']	= min($out_data);
-	    $min_data['tot']	= min($tot_data);
 	    $ave_count		= count($tot_data);
 	}
 	$decimal    = 0;
-	$max        = min($min_data);
-	$yaxistitle = humanReadable($max, "suffix");
-	$max        = humanReadable($max, "count");
-	$in_data    = formatScale($in_data, $max, $decimal);
-	$out_data   = formatScale($out_data, $max, $decimal);
-	$tot_data   = formatScale($tot_data, $max, $decimal);
-	$average    = humanReadable(($average / $ave_count), false, $max, $decimal);
+#	$in_data    = formatScale($in_data, $max, $decimal);
+#	$out_data   = formatScale($out_data, $max, $decimal);
+#	$tot_data   = formatScale($tot_data, $max, $decimal);
+	$average    = $average / $ave_count;
 	for ($x=0;$x<=count($tot_data);$x++) {
 	    array_push($ave_data, $average);
 	}
@@ -216,7 +176,8 @@
     $graph->yaxis->SetFont(FF_FONT1);
     $graph->yaxis->SetTitleMargin(50);
     $graph->yaxis->title->SetFont(FF_FONT1, FS_NORMAL, 10);
-    $graph->yaxis->title->Set($yaxistitle);
+    $graph->yaxis->title->Set("Bytes Transferred");
+    $graph->yaxis->SetLabelFormatCallback("format_si");
     $graph->ygrid->SetFill(true,'#EFEFEF@0.5','#FFFFFF@0.5');
 
 
@@ -225,6 +186,8 @@
     $barplot_tot->SetLegend("Traffic total");
     $barplot_tot->SetColor("#d5d5d5");
     $barplot_tot->SetFillColor("#d5d5d5@0.5");
+    $barplot_tot->value->Show();
+    $barplot_tot->value->SetFormatCallback('format_si_short');
 
     $barplot_in = new BarPlot($in_data);
     $barplot_in->SetLegend("Traffic In");
@@ -238,6 +201,7 @@
     $barplot_out->SetFillColor('lightblue@0.4');
     $barplot_out->SetWeight(1);
 
+
     if ($imgtype == "historical") {
 	$barplot_over = new BarPlot($overuse_data);
 	$barplot_over->SetLegend("Traffic Overusage");
@@ -250,14 +214,14 @@
 	$lineplot_allow->SetColor('black');
 	$lineplot_allow->SetWeight(1);
 
-	$gbplot = new GroupBarPlot(array($barplot_in, $barplot_out, $barplot_tot, $barplot_over));
+	$gbplot = new GroupBarPlot(array($barplot_in, $barplot_tot, $barplot_out, $barplot_over));
     } else {
 	$lineplot_allow = new LinePlot($ave_data);
 	$lineplot_allow->SetLegend("Average per day");
 	$lineplot_allow->SetColor('black');
 	$lineplot_allow->SetWeight(1);
 
-	$gbplot = new GroupBarPlot(array($barplot_in, $barplot_out, $barplot_tot));
+	$gbplot = new GroupBarPlot(array($barplot_in, $barplot_tot, $barplot_out));
     }
 
     $graph->Add($gbplot);
