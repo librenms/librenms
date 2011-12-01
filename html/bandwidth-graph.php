@@ -69,9 +69,9 @@
 	    $datefrom		= strftime("%e %b %Y", strtotime($data['bill_datefrom']));
 	    $dateto		= strftime("%e %b %Y", strtotime($data['bill_dateto']));
 	    $datelabel		= $datefrom."\n".$dateto;
-	    $traf['in']		= $data['traf_in'];
-	    $traf['out']	= $data['traf_out'];
-	    $traf['total']	= $data['traf_total'];
+	    $traf['in']		= $data['traf_in'] * 1000 * 1000;
+	    $traf['out']	= $data['traf_out'] * 1000 * 1000;
+	    $traf['total']	= $data['traf_total'] * 1000 * 1000;
 
 	    if ($data['bill_type'] == "Quota") {
 		$traf['allowed']= $data['bill_allowed'];
@@ -101,6 +101,7 @@
 		array_push($ticklabels, "");
 	    }
 	}
+	$yaxistitle	= "Gigabytes";
 	$graph_name	= "Historical bandwidth over the last 12 billing periods";
     } else {
 	$data		= array();
