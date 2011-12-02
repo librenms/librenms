@@ -268,6 +268,14 @@ $config['os'][$os]['text']              = "Huawei VRP";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "huawei";
 
+## ZTE
+
+$os = "zxr10";
+$config['os'][$os]['group']             = "zxr10";
+$config['os'][$os]['text']              = "ZTE ZXR10";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "zte";
+
 # Juniper
 
 $os = "junos";
