@@ -219,6 +219,21 @@ function get_device_id_by_interface_id($interface_id)
   }
 }
 
+function get_device_id_by_app_id($app_id)
+{
+  if (is_numeric($app_id))
+  {
+    $device_id = dbFetchCell("SELECT `device_id` FROM `applications` WHERE `app_id` = ?", array($app_id));
+  }
+
+  if (is_numeric($device_id))
+  {
+    return $device_id;
+  } else {
+    return FALSE;
+  }
+}
+
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
   $ifclass = "interface-upup";

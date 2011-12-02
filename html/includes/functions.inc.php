@@ -224,7 +224,7 @@ function application_permitted($app_id, $device_id = NULL)
 
   if (is_numeric($app_id))
   {
-    if (!$device_id) { $device_id = device_by_id_cache ($app_id); }
+    if (!$device_id) { $device_id = get_device_id_by_app_id ($app_id); }
     if ($_SESSION['userlevel'] >= "5") {
       $allowed = TRUE;
     } elseif (device_permitted($device_id)) {
