@@ -117,12 +117,12 @@ elseif ($_GET['opta'] == "add")
          $overuse = (($overuse <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatRates($overuse * 1000)."</span>");
       } elseif ($bill['bill_type'] == "quota") {
          $type = "Quota";
-         $allowed = formatStorage($bill['bill_gb']* 1024 * 1024 * 1024);
-         $used    = formatStorage($rate_data['total_data'] * 1024 * 1024);
-         $percent = round(($rate_data['total_data'] / ($bill['bill_gb'] * 1024)) * 100,2);
+         $allowed = formatStorage($bill['bill_gb']* 1000 * 1000 * 1000);
+         $used    = formatStorage($rate_data['total_data'] * 1000 * 1000);
+         $percent = round(($rate_data['total_data'] / ($bill['bill_gb'] * 1000)) * 100,2);
          $background = get_percentage_colours($percent);
-         $overuse = $rate_data['total_data'] - ($bill['bill_gb'] * 1024);
-         $overuse = (($overuse <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatStorage($overuse * 1024 * 1024)."</span>");
+         $overuse = $rate_data['total_data'] - ($bill['bill_gb'] * 1000);
+         $overuse = (($overuse <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatStorage($overuse * 1000 * 1000)."</span>");
       }
 
       $right_background = $background['right'];
@@ -132,14 +132,14 @@ elseif ($_GET['opta'] == "add")
       echo("
            <tr bgcolor='$row_colour'>
              <td></td>
-             <td><a href='bill/".$bill['bill_id']."/'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a><br />".strftime("%F", strtotime($datefrom))." to ".strftime("%F", strtotime($dateto))."</td>
+             <td><a href='".generate_url(array('page' => "bill", 'bill_id' => $bill['bill_id']))."'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a><br />".strftime("%F", strtotime($datefrom))." to ".strftime("%F", strtotime($dateto))."</td>
              <td>$notes</td>
              <td>$type</td>
              <td>$allowed</td>
              <td>$used</td>
              <td style=\"text-align: center;\">$overuse</td>
              <td>".print_percentage_bar (250, 20, $perc, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right'])."</td>
-             <td><a href='bill/".$bill['bill_id']."/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
+             <td><a href='".generate_url(array('page' => "bill", 'bill_id' => $bill['bill_id'], 'view' => "edit"))."'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
            </tr>
          ");
 
