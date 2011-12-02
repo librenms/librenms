@@ -2,7 +2,6 @@
 
 $bill_id = mres($vars['bill_id']);
 
-
 if ($_SESSION['userlevel'] == "10")
 {
   include("pages/bill/actions.inc.php");
@@ -10,7 +9,8 @@ if ($_SESSION['userlevel'] == "10")
 
 if (bill_permitted($bill_id))
 {
-  $bill_data = dbFetchRow("SELECT * FROM bills WHERE bill_id = ? LIMIT 1", $bill_id);
+  $bill_data = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
+
   $bill_name = $bill_data['bill_name'];
 
   $today = str_replace("-", "", dbFetchCell("SELECT CURDATE()"));
@@ -35,15 +35,9 @@ if (bill_permitted($bill_id))
 
   $datefrom     = $day_data['0'];
   $dateto       = $day_data['1'];
+  $lastfrom     = $day_data['2'];
+  $lastto       = $day_data['3'];
 
-  $lastfrom        = $day_data['2'];
-  $lastto        = $day_data['3'];
-
-#  $rate_data    = getRates($bill_id,$datefrom,$dateto);
-#  $rate_95th    = $rate_data['rate_95th'];
-#  $dir_95th     = $rate_data['dir_95th'];
-#  $total_data   = $rate_data['total_data'];
-#  $rate_average = $rate_data['rate_average'];
   $rate_95th    = $bill_data['rate_95th'];
   $dir_95th     = $bill_data['dir_95th'];
   $total_data   = $bill_data['total_data'];
@@ -147,64 +141,6 @@ if (bill_permitted($bill_id))
     include("pages/bill/transfer.inc.php");
   }
   elseif ($vars['view'] == "quick" || $vars['view'] == "accurate") {
-
-    $bill_data = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
-
-    $today = str_replace("-", "", dbFetchCell("SELECT CURDATE()"));
-    $tomorrow = str_replace("-", "", dbFetchCell("SELECT DATE_ADD(CURDATE(), INTERVAL 1 DAY)"));
-    $last_month = str_replace("-", "", dbFetchCell("SELECT DATE_SUB(CURDATE(), INTERVAL 1 MONTH)"));
-
-    $rightnow = $today . date(His);
-    $before = $yesterday . date(His);
-    $lastmonth = $last_month . date(His);
-
-#    $bill_name  = $bill_data['bill_name'];
-    $dayofmonth = $bill_data['bill_day'];
-    $paidrate   = $bill_data['bill_paid_rate'];
-    $paid_kb    = $paidrate / 1000;
-    $paid_mb    = $paid_kb / 1000;
-
-    if ($paidrate < 1000000) { $paidrate_text = $paid_kb . "Kbps is the CDR."; }
-    if ($paidrate >= 1000000) { $paidrate_text = $paid_mb . "Mbps is the CDR."; }
-
-    $day_data     = getDates($dayofmonth);
-
-    $datefrom     = $day_data['0'];
-    $dateto       = $day_data['1'];
-
-    $lastfrom        = $day_data['2'];
-    $lastto        = $day_data['3'];
-
-#    $rate_data    = getRates($bill_id,$datefrom,$dateto);
-#    $rate_95th    = $rate_data['rate_95th'];
-#    $dir_95th     = $rate_data['dir_95th'];
-#    $total_data   = $rate_data['total_data'];
-#    $rate_average = $rate_data['rate_average'];
-    $rate_95th    = $bill_data['rate_95th'];
-    $dir_95th     = $bill_data['dir_95th'];
-    $total_data   = $bill_data['total_data'];
-    $rate_average = $bill_data['rate_average'];
-
-    if ($rate_95th > $paid_kb)
-    {
-      $over = $rate_95th - $paid_kb;
-      $bill_text = $over . "Kbit excess.";
-      $bill_color = "#cc0000";
-    }
-    else
-    {
-      $under = $paid_kb - $rate_95th;
-      $bill_text = $under . "Kbit headroom.";
-      $bill_color = "#0000cc";
-    }
-
-    $fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '%M %D %Y')");
-    $totext   = dbFetchCell("SELECT DATE_FORMAT($dateto, '%M %D %Y')");
-    $unixfrom = dbFetchCell("SELECT UNIX_TIMESTAMP('$datefrom')");
-    $unixto   = dbFetchCell("SELECT UNIX_TIMESTAMP('$dateto')");
-
-    $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')");
-    $unix_prev_to   = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastto')");
 
     echo("<h3>Billed Ports</h3>");
 
