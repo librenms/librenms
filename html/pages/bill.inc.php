@@ -78,7 +78,7 @@ if (bill_permitted($bill_id))
 
 
   echo("<font face=\"Verdana, Arial, Sans-Serif\"><h2>
-  Bill : " . $bill_name . "</h2>");
+  Bill : " . $bill_data['bill_name'] . "</h2>");
 
 
   print_optionbar_start();
