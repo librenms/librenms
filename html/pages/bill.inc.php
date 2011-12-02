@@ -278,22 +278,29 @@ if (bill_permitted($bill_id))
 
     if ($_GET['optb'] == "details") {
 
-      $bi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
-      $bi = $bi . "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
-      $bi = $bi . "&amp;x=800&amp;y=250";
-      $bi = $bi . "$type'>";
+      $bi  = "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+      $bi .= "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
+//      $bi .= "&amp;x=800&amp;y=250";
+      $bi .= "&amp;x=1190&amp;y=250";
+      $bi .= "$type'>";
 
-      $li =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
-      $li = $li . "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to . "&amp;x=800&amp;y=250";
-      $li = $li . "$type'>";
+      $li  = "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+      $li .= "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to;
+//      $li .= "&amp;x=800&amp;y=250";
+      $li .= "&amp;x=1190&amp;y=250";
+      $li .= "$type'>";
 
-      $di =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
-      $di = $di . "&amp;from=" . $config['time']['day'] .  "&amp;to=" . $config['time']['now'] . "&amp;x=800&amp;y=250";
-      $di = $di . "$type'>";
+      $di  = "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+      $di .= "&amp;from=" . $config['time']['day'] .  "&amp;to=" . $config['time']['now'];
+//      $di .= "&amp;x=800&amp;y=250";
+      $di .= "&amp;x=1190&amp;y=250";
+      $di .= "$type'>";
 
-      $mi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
-      $mi = $mi . "&amp;from=" . $lastmonth .  "&amp;to=" . $rightnow . "&amp;x=800&amp;y=250";
-      $mi = $mi . "$type'>";
+      $mi  = "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+      $mi .= "&amp;from=" . $lastmonth .  "&amp;to=" . $rightnow;
+//      $mi .= "&amp;x=800&amp;y=250";
+      $mi .= "&amp;x=1190&amp;y=250";
+      $mi .= "$type'>";
 
     } else {
 

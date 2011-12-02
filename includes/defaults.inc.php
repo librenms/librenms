@@ -173,6 +173,7 @@ $config['enable_billing']               = 0; # Enable Billing
 $config['billing']['customer_autoadd']  = 0; # Enable Auto-add bill per customer
 $config['billing']['circuit_autoadd']   = 0; # Enable Auto-add bill per circuit_id
 $config['billing']['bill_autoadd']      = 0; # Enable Auto-add bill per bill_id
+$config['billing']['base']              = 1000; # Set the base to divider bytes to kb, mb, gb ,... (this only works for the text based conversion and not for the graphs)
 
 ### External Integration
 

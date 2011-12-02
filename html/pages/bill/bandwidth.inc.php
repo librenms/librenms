@@ -3,6 +3,7 @@
   $pagetitle[]        = "Bandwidth Graphs";
 
   $bill_data          = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
+  $gbconvert          = $config['billing']['base'];
 
   $today              = str_replace("-", "", dbFetchCell("SELECT CURDATE()"));
   $tomorrow           = str_replace("-", "", dbFetchCell("SELECT DATE_ADD(CURDATE(), INTERVAL 1 DAY)"));
@@ -47,38 +48,38 @@
   $cur_days           = date('d', (strtotime("now") - strtotime($datefrom)));
   $total_days         = date('d', (strtotime($dateto) - strtotime($datefrom)));
 
-  $total['data']      = formatStorage($bill_data['total_data'] * 1024 * 1024);
+  $total['data']      = formatStorage($bill_data['total_data'] * $gbconvert * $gbconvert);
   if ($bill_data['bill_type'] == "quota") {
-    $total['allow']   = formatStorage($bill_data['bill_gb'] * 1024 * 1024 * 1024);
+    $total['allow']   = formatStorage($bill_data['bill_gb'] * $gbconvert * $gbconvert * $gbconvert);
   } else {
     $total['allow']   = "-";
   }
-  $total['ave']       = formatStorage(($bill_data['total_data'] / $cur_days) * 1024 * 1024);
-  $total['est']       = formatStorage(($bill_data['total_data'] / $cur_days * $total_days) * 1024 * 1024);
-  $total['per']       = round((($bill_data['total_data'] / 1024) / $bill_data['bill_gb'] * 100), 2);
+  $total['ave']       = formatStorage(($bill_data['total_data'] / $cur_days) * $gbconvert * $gbconvert);
+  $total['est']       = formatStorage(($bill_data['total_data'] / $cur_days * $total_days) * $gbconvert * $gbconvert);
+  $total['per']       = round((($bill_data['total_data'] / $gbconvert) / $bill_data['bill_gb'] * 100), 2);
   $total['bg']        = get_percentage_colours($total['per']);
 
-  $in['data']         = formatStorage($bill_data['total_data_in'] * 1024 * 1024);
+  $in['data']         = formatStorage($bill_data['total_data_in'] * $gbconvert * $gbconvert);
   $in['allow']        = $total['data'];
-  $in['ave']          = formatStorage(($bill_data['total_data_in'] / $cur_days) * 1024 * 1024);
-  $in['est']          = formatStorage(($bill_data['total_data_in'] / $cur_days * $total_days) * 1024 * 1024);
+  $in['ave']          = formatStorage(($bill_data['total_data_in'] / $cur_days) * $gbconvert * $gbconvert);
+  $in['est']          = formatStorage(($bill_data['total_data_in'] / $cur_days * $total_days) * $gbconvert * $gbconvert);
   $in['per']          = round(($bill_data['total_data_in'] / $bill_data['total_data'] * 100), 2);
   $in['bg']           = get_percentage_colours($in['per']);
 
-  $out['data']        = formatStorage($bill_data['total_data_out'] * 1024 * 1024);
+  $out['data']        = formatStorage($bill_data['total_data_out'] * $gbconvert * $gbconvert);
   $out['allow']       = $total['data'];
-  $out['ave']         = formatStorage(($bill_data['total_data_out'] / $cur_days) * 1024 * 1024);
-  $out['est']         = formatStorage(($bill_data['total_data_out'] / $cur_days * $total_days) * 1024 * 1024);
+  $out['ave']         = formatStorage(($bill_data['total_data_out'] / $cur_days) * $gbconvert * $gbconvert);
+  $out['est']         = formatStorage(($bill_data['total_data_out'] / $cur_days * $total_days) * $gbconvert * $gbconvert);
   $out['per']         = round(($bill_data['total_data_out'] / $bill_data['total_data'] * 100), 2);
   $out['bg']          = get_percentage_colours($out['per']);
 
-  $ousage['over']     = $bill_data['total_data'] - ($bill_data['bill_gb'] * 1024);
+  $ousage['over']     = $bill_data['total_data'] - ($bill_data['bill_gb'] * $gbconvert);
   $ousage['over']     = (($ousage['over'] < 0) ? "0" : $ousage['over']);
-  $ousage['data']     = formatStorage($ousage['over'] * 1024 * 1024);
+  $ousage['data']     = formatStorage($ousage['over'] * $gbconvert * $gbconvert);
   $ousage['allow']    = $total['allow'];
-  $ousage['ave']      = formatStorage(($ousage['over'] / $cur_days ) * 1024 * 1024);
-  $ousage['est']      = formatStorage(($ousage['over'] / $cur_days * $total_days) * 1024 * 1024);
-  $ousage['per']      = round(((($bill_data['total_data'] / 1024) / $bill_data['bill_gb'] * 100) - 100), 2);
+  $ousage['ave']      = formatStorage(($ousage['over'] / $cur_days ) * $gbconvert * $gbconvert);
+  $ousage['est']      = formatStorage(($ousage['over'] / $cur_days * $total_days) * $gbconvert * $gbconvert);
+  $ousage['per']      = round(((($bill_data['total_data'] / $gbconvert) / $bill_data['bill_gb'] * 100) - 100), 2);
   $ousage['per']      = (($ousage['per'] < 0) ? "0" : $ousage['per']);
   $ousage['bg']       = get_percentage_colours($ousage['per']);
 
@@ -144,25 +145,25 @@
 
   $bi  =  "<img src='bandwidth-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
   $bi .= "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
-  $bi .= "&amp;imgtype=day&imgbill=1";
+  $bi .= "&amp;type=day&imgbill=1";
   $bi .= "&amp;x=1190&amp;y=250";
   $bi .= "$type'>";
 
   $li  = "<img src='bandwidth-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
   $li .= "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to;
-  $li .= "&amp;imgtype=day";
+  $li .= "&amp;type=day";
   $li .= "&amp;x=1190&amp;y=250";
   $li .= "$type'>";
 
   $di  = "<img src='bandwidth-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
   $di .= "&amp;from=" . $config['time']['day'] .  "&amp;to=" . $config['time']['now'];
-  $di .= "&amp;imgtype=hour";
+  $di .= "&amp;type=hour";
   $di .= "&amp;x=1190&amp;y=250";
   $di .= "$type'>";
 
   $mi  = "<img src='bandwidth-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
   $mi .= "&amp;from=" . $lastmonth .  "&amp;to=" . $rightnow;
-  $mi .= "&amp;&imgtype=day";
+  $mi .= "&amp;&type=day";
   $mi .= "&amp;x=1190&amp;y=250";
   $mi .= "$type'>";
 

@@ -47,7 +47,7 @@
 //    $dur	= $end - $start;
 //    $datefrom	= date('Ymthis', $start);
 //    $dateto	= date('Ymthis', $end);
-    $imgtype	= (isset($_GET['imgtype']) ? $_GET['imgtype'] : "historical" );
+    $imgtype	= (isset($_GET['type']) ? $_GET['type'] : "historical" );
     $imgbill	= (isset($_GET['imgbill']) ? $_GET['imgbill'] : false);
     $yaxistitle	= "Bytes";
 
@@ -218,7 +218,7 @@
 	$gbplot = new GroupBarPlot(array($barplot_in, $barplot_tot, $barplot_out, $barplot_over));
     } else {
 	$lineplot_allow = new LinePlot($ave_data);
-	$lineplot_allow->SetLegend("Average per day");
+	$lineplot_allow->SetLegend("Average per ".$imgtype);
 	$lineplot_allow->SetColor('black');
 	$lineplot_allow->SetWeight(1);
 
