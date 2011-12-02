@@ -36,10 +36,6 @@
 
   echo("<h3>Billed Ports</h3>");
 
-  $ports = dbFetchRows("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-                        WHERE B.bill_id = ? AND P.interface_id = B.port_id
-                        AND D.device_id = P.device_id", array($bill_id));
-
   foreach ($ports as $port)
   {
     echo(generate_port_link($port) . " on " . generate_device_link($port) . "<br />");

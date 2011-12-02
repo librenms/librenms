@@ -32,7 +32,7 @@
         $percent        = $history['bill_percent'];
         $dir_95th       = $history['dir_95th'];
         $rate_95th      = formatRates($history['rate_95th'] * 1000);
-        $total_data     = formatStorage($history['traf_total'] * 1024 * 1024);
+        $total_data     = formatStorage($history['traf_total'] * 1000 * 1000);
 
         $background = get_percentage_colours($percent);
         $row_colour = ((!is_integer($i/2)) ? $list_colour_a : $list_colour_b);
@@ -45,11 +45,11 @@
           $out     = formatRates($history['rate_95th_out'] * 1000);
           $overuse = (($history['bill_overuse'] <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatRates($history['bill_overuse'] * 1000)."</span>");
         } elseif ($type == "Quota") {
-          $allowed = formatStorage($history['bill_allowed'] * 1024 * 1024);
-          $used    = formatStorage($history['total_data'] * 1024 * 1024);
-          $in      = formatStorage($history['traf_in'] * 1024 * 1024);
-          $out     = formatStorage($history['traf_out'] * 1024 * 1024);
-          $overuse = (($history['bill_overuse'] <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatStorage($history['bill_overuse'] * 1024 * 1024)."</span>");
+          $allowed = formatStorage($history['bill_allowed'] * 1000 * 1000);
+          $used    = formatStorage($history['total_data'] * 1000 * 1000);
+          $in      = formatStorage($history['traf_in'] * 1000 * 1000);
+          $out     = formatStorage($history['traf_out'] * 1000 * 1000);
+          $overuse = (($history['bill_overuse'] <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatStorage($history['bill_overuse'] * 1000 * 1000)."</span>");
         }
 
         $total_data     = (($type == "Quota") ? "<b>".$total_data."</b>" : $total_data);

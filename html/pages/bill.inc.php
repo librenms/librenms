@@ -1,6 +1,7 @@
 <?php
 
-$bill_id = mres($_GET['opta']);
+$bill_id = mres($vars['bill_id']);
+
 
 if ($_SESSION['userlevel'] == "10")
 {
@@ -9,7 +10,7 @@ if ($_SESSION['userlevel'] == "10")
 
 if (bill_permitted($bill_id))
 {
-  $bill_data = dbFetchRow("SELECT * FROM bills WHERE bill_id = ? LIMIT 1", array($bill_id));
+  $bill_data = dbFetchRow("SELECT * FROM bills WHERE bill_id = ? LIMIT 1", $bill_id);
   $bill_name = $bill_data['bill_name'];
 
   $today = str_replace("-", "", dbFetchCell("SELECT CURDATE()"));
@@ -68,8 +69,13 @@ if (bill_permitted($bill_id))
 
   $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')");
   $unix_prev_to   = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastto')");
-
   # Speeds up loading for other included pages by setting it before progessing of mysql data!
+
+  $ports = dbFetchRows("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
+                        WHERE B.bill_id = ? AND P.interface_id = B.port_id
+                        AND D.device_id = P.device_id", array($bill_id));
+
+
 
   echo("<font face=\"Verdana, Arial, Sans-Serif\"><h2>
   Bill : " . $bill_name . "</h2>");
@@ -80,67 +86,67 @@ if (bill_permitted($bill_id))
   echo("<span style='font-weight: bold;'>Bill</span> &#187; ");
 
 
-  if (!$_GET['optb']) { $_GET['optb'] = "details"; }
-  if ($_GET['opta'] == "admin_history") { $_GET['optb'] = $_GET['opta']; }
+  if (!$vars['view']) { $vars['view'] = "quick"; }
+  if ($_GET['opta'] == "admin_history") { $vars['view'] = $_GET['opta']; }
 
 
-  if ($_GET['optb'] == "basic") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='bill/".$bill_id."/basic/'>Quick Graphs</a>");
-  if ($_GET['optb'] == "basic") { echo("</span>"); }
-
-  echo(" | ");
-
-  if ($_GET['optb'] == "details") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='bill/".$bill_id."/details/'>Accurate Graphs</a>");
-  if ($_GET['optb'] == "details") { echo("</span>"); }
+  if ($vars['view'] == "basic") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="'.generate_url($vars, array('view' => 'quick')).'">Quick Graphs</a>');
+  if ($vars['view'] == "basic") { echo("</span>"); }
 
   echo(" | ");
 
-  if ($_GET['optb'] == "bandwidth") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='bill/".$bill_id."/bandwidth/'>Bandwidth Graphs</a>");
-  if ($_GET['optb'] == "bandwidth") { echo("</span>"); }
+  if ($vars['view'] == "details") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="'.generate_url($vars, array('view' => 'accurate')).'">Accurate Graphs</a>');
+  if ($vars['view'] == "details") { echo("</span>"); }
 
   echo(" | ");
 
-  if ($_GET['optb'] == "history") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='bill/".$bill_id."/history/'>Historical Usage</a>");
-  if ($_GET['optb'] == "history") { echo("</span>"); }
+  if ($vars['view'] == "transfer") { echo("<span class='pagemenu-selected'>"); }
+  echo('<A href="'.generate_url($vars, array('view' => 'transfer')).'">Transfer Graphs</a>');
+  if ($vars['view'] == "transfer") { echo("</span>"); }
+
+  echo(" | ");
+
+  if ($vars['view'] == "history") { echo("<span class='pagemenu-selected'>"); }
+  echo('<A href="'.generate_url($vars, array('view' => 'history')).'">Historical Usage</a>');
+  if ($vars['view'] == "history") { echo("</span>"); }
 
   if ($_SESSION['userlevel'] == "10")
   {
     echo(" | ");
-    if ($_GET['optb'] == "edit") { echo("<span class='pagemenu-selected'>"); }
-    echo("<a href='bill/".$bill_id."/edit/'>Edit</a>");
-    if ($_GET['optb'] == "edit") { echo("</span>"); }
+    if ($vars['view'] == "edit") { echo("<span class='pagemenu-selected'>"); }
+    echo('<A href="'.generate_url($vars, array('view' => 'edit')).'">Edit</a>');
+    if ($vars['view'] == "edit") { echo("</span>"); }
 
     echo(" | ");
-    if ($_GET['optb'] == "delete") { echo("<span class='pagemenu-selected'>"); }
-    echo("<a href='bill/".$bill_id."/delete/'>Delete</a>");
-    if ($_GET['optb'] == "delete") { echo("</span>"); }
+    if ($vars['view'] == "delete") { echo("<span class='pagemenu-selected'>"); }
+  echo('<A href="'.generate_url($vars, array('view' => 'delete')).'">Delete</a>');
+    if ($vars['view'] == "delete") { echo("</span>"); }
   }
 
-  echo('<div style="font-weight: bold; float: right;"><a href="bills/"><img align=absmiddle src="/images/16/arrow_left.png"> Back to Bills</a></div>');
+  echo('<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => "bills")).'/"><img align=absmiddle src="/images/16/arrow_left.png"> Back to Bills</a></div>');
 
 
   print_optionbar_end();
 
-  if ($_GET['optb'] == "edit" && $_SESSION['userlevel'] == "10")
+  if ($vars['view'] == "edit" && $_SESSION['userlevel'] == "10")
   {
     include("pages/bill/edit.inc.php");
   }
-  elseif ($_GET['optb'] == "delete" && $_SESSION['userlevel'] == "10")
+  elseif ($vars['view'] == "delete" && $_SESSION['userlevel'] == "10")
   {
     include("pages/bill/delete.inc.php");
   }
-  elseif ($_GET['optb'] == "history")
+  elseif ($vars['view'] == "history")
   {
     include("pages/bill/history.inc.php");
   }
-  elseif ($_GET['optb'] == "bandwidth")
+  elseif ($vars['view'] == "transfer")
   {
-    include("pages/bill/bandwidth.inc.php");
+    include("pages/bill/transfer.inc.php");
   }
-  elseif ($_GET['optb'] == "details" || $_GET['optb'] == "basic") {
+  elseif ($vars['view'] == "quick" || $vars['view'] == "accurate") {
 
     $bill_data = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
 
@@ -202,10 +208,7 @@ if (bill_permitted($bill_id))
 
     echo("<h3>Billed Ports</h3>");
 
-    $ports = dbFetchRows("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-                          WHERE B.bill_id = ? AND P.interface_id = B.port_id
-                          AND D.device_id = P.device_id", array($bill_id));
-
+    ### Collected Earlier
     foreach ($ports as $port)
     {
       echo(generate_port_link($port) . " on " . generate_device_link($port) . "<br />");
@@ -219,11 +222,11 @@ if (bill_permitted($bill_id))
 
       echo("<h4>Quota Bill</h4>");
 
-      $percent = round(($total_data / 1024) / $bill_data['bill_gb'] * 100, 2);
+      $percent = round(($total_data / 1000) / $bill_data['bill_gb'] * 100, 2);
       $unit = "MB";
       $total_data = round($total_data, 2);
       echo("Billing Period from " . $fromtext . " to " . $totext . "
-      <br />Transferred ".formatStorage($total_data * 1024 * 1024)." of ".formatStorage($bill_data['bill_gb'] * 1024 * 1024 * 1024)." (".$percent."%)
+      <br />Transferred ".formatStorage($total_data * 1000 * 1000)." of ".formatStorage($bill_data['bill_gb'] * 1000 * 1000 * 1000)." (".$percent."%)
       <br />Average rate " . formatRates($rate_average * 1000));
 
       $background = get_percentage_colours($percent);
@@ -276,7 +279,7 @@ if (bill_permitted($bill_id))
     $yesterday = dbFetchCell("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))");
     $rightnow = date(U);
 
-    if ($_GET['optb'] == "details") {
+    if ($vars['view'] == "accurate") {
 
       $bi  = "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
       $bi .= "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;

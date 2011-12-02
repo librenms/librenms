@@ -1,8 +1,8 @@
 <?php
 
   $pagetitle[] = "Historical Usage";
-  $detail      = (isset($_GET['detail']) ? $_GET['detail'] : "");
-  $url         = $PHP_SELF."/bill/".$bill_id."/history/";
+//  $detail      = (isset($vars['detail']) ? $vars['detail'] : "");
+//  $url         = $PHP_SELF."/bill/".$bill_id."/history/";
   $i           = 0;
 
   $gbconvert   = $config['billing']['base'];
@@ -14,10 +14,10 @@
 
   echo($img['his']);
 
-  function showDetails($id, $imgtype, $from, $to, $bittype = "Quota")
+  function showDetails($bill_id, $imgtype, $from, $to, $bittype = "Quota")
   {
     if ($imgtype == "bitrate") {
-      $res  = "<img src=\"billing-graph.php?bill_id=".$id;
+      $res  = "<img src=\"billing-graph.php?bill_id=".$bill_id;
       if ($bittype == "Quota")
       {
         $res .= "&amp;ave=yes";
@@ -27,7 +27,7 @@
       }
     } else
     {
-      $res  = "<img src=\"bandwidth-graph.php?bill_id=".$id;
+      $res  = "<img src=\"bandwidth-graph.php?bill_id=".$bill_id;
     }
     //$res .= "&amp;type=".$type;
     $res .= "&amp;type=".$imgtype;
@@ -36,6 +36,9 @@
     $res .= "\" style=\"margin: 15px 5px 25px 5px;\" />";
     return $res;
   }
+
+//  $url        = generate_url($vars, array('detail' => 'yes'));
+  $url        = $PHP_SELF."/bill/".$bill_id."/history/detail=all/";
 
   echo("<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>
            <tr style=\"font-weight: bold; \">
@@ -48,10 +51,10 @@
              <td>Total</td>
              <td>95 percentile</td>
              <td style=\"text-align: center;\">Overusage</td>
-             <td colspan=\"2\" style=\"text-align: right;\"><a href=\"".$url."?detail=all\"><img src=\"images/16/chart_curve.png\" border=\"0\" align=\"absmiddle\" alt=\"Show details\" title=\"Show details\" /> Show all details</a></td>
+             <td colspan=\"2\" style=\"text-align: right;\"><a href=\"".generate_url($vars, array('detail' => "all"))."\"><img src=\"images/16/chart_curve.png\" border=\"0\" align=\"absmiddle\" alt=\"Show details\" title=\"Show details\" /> Show all details</a></td>
            </tr>");
 
-  foreach (dbFetchRows("SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` AND `bill_dateto` DESC LIMIT 24", array($bill_id)) as $history)
+  foreach (dbFetchRows("SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24", array($bill_id)) as $history)
   {
     if (bill_permitted($history['bill_id']))
     {
@@ -85,6 +88,8 @@
       $total_data     = (($type == "Quota") ? "<b>".$total_data."</b>" : $total_data);
       $rate_95th      = (($type == "CDR") ? "<b>".$rate_95th."</b>" : $rate_95th);
 
+      $url            = generate_url($vars, array('detail' => $history['id']));
+
       echo("
            <tr style=\"background: ".$row_colour.";\">
              <td></td>
@@ -98,15 +103,15 @@
              <td style=\"text-align: center;\">$overuse</td>
              <td width=\"250\">".print_percentage_bar(250, 20, $perc, NULL, "ffffff", $background['left'], $percent."%", "ffffff", $background['right'])."</td>
              <td>
-                <a href=\"".$url."?detail=".($i+1)."\"><img src=\"images/16/chart_curve.png\" border=\"0\" align=\"absmiddle\" alt=\"Show details\" title=\"Show details\"/></a>
+                <a href=\"".$url."\"><img src=\"images/16/chart_curve.png\" border=\"0\" align=\"absmiddle\" alt=\"Show details\" title=\"Show details\"/></a>
                 <a href=\"#\"><img src=\"images/16/page_white_acrobat.png\" border=\"0\" align=\"absmiddle\" alt=\"PDF Report\" title=\"PDF Report\"/></a>
              </td>
            </tr>");
 
-      if ($detail == ($i+1) || $detail == "all") {
-        $img['bitrate'] = showDetails($history['bill_id'], "bitrate", strtotime($datefrom), strtotime($dateto), $type);
-        $img['bw_day']  = showDetails($history['bill_id'], "day", strtotime($datefrom), strtotime($dateto));
-        $img['bw_hour'] = showDetails($history['bill_id'], "hour", strtotime($datefrom), strtotime($dateto));
+      if ($vars['detail'] == $history['id'] || $vars['detail'] == "all") {
+        $img['bitrate'] = showDetails($bill_id, "bitrate", strtotime($datefrom), strtotime($dateto), $type);
+        $img['bw_day']  = showDetails($bill_id, "day", strtotime($datefrom), strtotime($dateto));
+        $img['bw_hour'] = showDetails($bill_id, "hour", strtotime($datefrom), strtotime($dateto));
         echo("
            <tr style=\"background: #fff; border-top: 1px solid ".$row_colour."; border-bottom: 1px solid #ccc;\">
              <td colspan=\"11\">
