@@ -137,6 +137,11 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE interface_id = '".$port['i
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
 }
 
+if ($_SESSION['userlevel'] == '10')
+{
+  echo("<span style='float: right;'><a href='bills/add/port=".$port['interface_id']."/'><img src='images/16/money.png' border='0' align='absmiddle'> Create Bill</a></span>");
+}
+
 print_optionbar_end();
 
 echo("<div style='margin: 5px;'>");

@@ -103,7 +103,6 @@ function getLastPortCounter($port_id,$inout)
   } else {
     $return[state] = "failed";
   }
-
   return($return);
 }
 
