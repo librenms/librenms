@@ -46,7 +46,8 @@ if (is_array($oids))
       #ENTITY-SENSOR-MIB::entPhySensorUnitsDisplay.11 = STRING: "C"
 
       $descr = $entity_array[$index]['entPhysicalName'];
-      if ($descr || $device['os'] == "iosxr")
+#      if ($descr || $device['os'] == "iosxr")
+      if ($descr)
       {
         $descr = rewrite_entity_descr($descr);
       } else {
