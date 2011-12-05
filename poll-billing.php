@@ -22,20 +22,19 @@ function CollectData($bill_id)
 {
   foreach (dbFetchRows("SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.interface_id = P.port_id AND D.device_id = I.device_id", array($bill_id)) as $port_data)
   {
-
     $port_id = $port_data['port_id'];
     $host    = $port_data['hostname'];
     $port    = $port_data['port'];
 
     echo("\nPolling ".$port_data['ifDescr']." on ".$port_data['hostname']."\n");
 
-    $port_data['in_measurement'] = getValue($host, $port, $port_data['ifIndex'], "In");
-    $port_data['out_measurement'] = getValue($host, $port, $port_data['ifIndex'], "Out");
+    $port_data['in_measurement'] = getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], "In");
+    $port_data['out_measurement'] = getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], "Out");
 
     $now = dbFetchCell("SELECT NOW()");
 
     $last_data = getLastPortCounter($port_id,in);
-    if ($last_data[state] == "ok")
+    if ($last_data['state'] == "ok")
     {
       $port_data['last_in_measurement'] = $last_data[counter];
       $port_data['last_in_delta'] = $last_data[delta];

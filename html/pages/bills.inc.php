@@ -7,10 +7,17 @@ if ($_POST['addbill'] == "yes")
   $insert = array('bill_name' => $_POST['bill_name'], 'bill_type' => $_POST['bill_type'], 'bill_cdr' => $_POST['bill_cdr'], 'bill_day' => $_POST['bill_day'], 'bill_gb' => $_POST['bill_quota'],
                   'bill_custid' => $_POST['bill_custid'], 'bill_ref' => $_POST['bill_ref'], 'bill_notes' => $_POST['bill_notes']);
 
-  $affected = dbInsert($insert, 'bills');
+  $bill_id = dbInsert($insert, 'bills');
 
-  $message .= $message_break . "Bill ".mres($_POST['bill_name'])." added!";
+  $message .= $message_break . "Bill ".mres($_POST['bill_name'])." (".$bill_id.") added!";
   $message_break .= "<br />";
+
+  if (is_numeric($bill_id) && is_numeric($_POST['port']))
+  {
+    dbInsert(array('bill_id' => $bill_id, 'port_id' => $_POST['port']), 'bill_ports');
+    $message .= $message_break . "Port ".mres($_POST['port'])." added!";
+    $message_break .= "<br />";
+  }
 }
 
 $pagetitle[] = "Billing";
@@ -25,19 +32,33 @@ if ($_GET['opta'] == "history")
 }
 elseif ($_GET['opta'] == "add")
 {
+  if(is_numeric($vars['port']))
+  {
+    $port = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE `interface_id` = ? AND D.device_id = P.device_id", array($vars['port']));
+  }
 
 ?>
-<div style='padding:10px;font-size:20px; font-weight: bold;'>Add Bill</div>
 
+<div style='padding:10px;font-size:20px; font-weight: bold;'>Add Bill</div>
 <form name="form1" method="post" action="bills/">
 
- <input type=hidden name=addbill value=yes>
+<?php
 
+if(is_array($port))
+{
+  echo("<h3>Ports</h3>");
+  echo(generate_port_link($port) . " on " . generate_device_link($port) . "<br />");
+  echo("<input type=hidden name=port value=".$port['interface_id'].">");
+}
+
+?>
+
+ <input type=hidden name=addbill value=yes>
  <div style="padding: 10px; background: #f0f0f0;">
   <table cellpadding=2px width=400px>
   <tr>
     <td><strong>Description</strong></td>
-    <td><input type="text" name="bill_name" size="32"></td>
+    <td><input type="text" name="bill_name" size="32" value="<?php echo($port['port_descr_descr']); ?>"></td>
   </tr>
   <tr>
     <td><strong>Billing Type</strong></td>
@@ -58,11 +79,11 @@ elseif ($_GET['opta'] == "add")
   </tr>
   <tr>
     <td><strong>Billing Reference</strong></td>
-    <td><input type="text" name="bill_ref" size="32"></td>
+    <td><input type="text" name="bill_ref" size="32" value="<?php echo($port['port_descr_circuit']); ?>"></td>
   </tr>
   <tr>
     <td><strong>Notes</strong></td>
-    <td><input type="textarea" name="bill_notes" size="32"></td>
+    <td><input type="textarea" name="bill_notes" size="32" value="<?php echo($port['port_descr_speed']); ?>"></td>
   </tr>
 
   <tr>
