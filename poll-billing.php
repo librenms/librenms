@@ -14,6 +14,16 @@ echo("Starting Polling Session ... \n\n");
 foreach (dbFetchRows("SELECT * FROM `bills`") as $bill_data)
 {
   echo("Bill : ".$bill_data['bill_name']."\n");
+
+  # replace old bill_gb with bill_quota (we're now storing bytes, not gigabytes)
+
+  if($bill_data['bill_type'] == "quota" && !is_numeric($bill_data['bill_quota']))
+  {
+    $bill_data['bill_quota'] = $bill_data['bill_gb'] * $config['billing']['base'] * $config['billing']['base'];
+    dbUpdate(array('bill_quota' => $bill_data['bill_quota']), 'bills', '`bill_id` = ?', array($bill_data['bill_id']));
+    echo("Quota -> ".$bill_data['bill_quota']);
+  }
+
   CollectData($bill_data['bill_id']);
   $iter++;
 }

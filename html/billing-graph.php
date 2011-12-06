@@ -23,7 +23,7 @@ include("../config.php");
 include("../includes/functions.php");
 include("includes/functions.inc.php");
 include("includes/authenticate.inc.php");
-if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
+if ($_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) { if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; } }
 require("includes/jpgraph/src/jpgraph.php");
 include("includes/jpgraph/src/jpgraph_line.php");
 include("includes/jpgraph/src/jpgraph_utils.inc.php");
@@ -31,12 +31,17 @@ include("includes/jpgraph/src/jpgraph_date.php");
 
 if (is_numeric($_GET['bill_id']))
 {
-  if (bill_permitted($_GET['bill_id']))
+  if ($_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR'])
   {
-    $bill_id = $_GET['bill_id'];
+    if (bill_permitted($_GET['bill_id']))
+    {
+      $bill_id = $_GET['bill_id'];
+    } else {
+      echo("Unauthorised Access Prohibited.");
+      exit;
+    }
   } else {
-    echo("Unauthorised Access Prohibited.");
-    exit;
+    $bill_id = $_GET['bill_id'];
   }
 } else {
   echo("Unauthorised Access Prohibited.");
@@ -60,8 +65,8 @@ $dateto = date('Ymthis',   $end);
 
 #$rate_data = getRates($bill_id,$datefrom,$dateto);
 $rate_data = dbFetchRow("SELECT * from `bills` WHERE `bill_id`= ? LIMIT 1", array($bill_id));
-$rate_95th = $rate_data['rate_95th'] * 1000;
-$rate_average = $rate_data['rate_average'] * 1000;
+$rate_95th = $rate_data['rate_95th'];
+$rate_average = $rate_data['rate_average'];
 
 #$bi_a = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
 #$bill_name = $bi_a['bill_name'];

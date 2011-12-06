@@ -8,7 +8,7 @@ if ($_POST['action'] == "delete_bill" && $_POST['confirm'] == "confirm")
     dbDelete('port_out_measurements', '`port_id` = ?', array($port_data['bill_id']));
   }
 
-  dbDelete('bill_history', '`bill_id` = ?', array($bill_id));
+  dbDelete('bill_hist', '`bill_id` = ?', array($bill_id));
   dbDelete('bill_ports', '`bill_id` = ?', array($bill_id));
   dbDelete('bill_data', '`bill_id` = ?', array($bill_id));
   dbDelete('bill_perms', '`bill_id` = ?', array($bill_id));

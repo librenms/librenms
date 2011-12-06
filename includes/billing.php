@@ -1,74 +1,63 @@
 <?php
 
-function getDates($dayofmonth)
+function format_bytes_billing($value)
+{
+  global $config;
+  return format_number($value, $config['billing']['base'])."B";
+}
+
+function format_bytes_billing_short($value)
+{
+  global $config;
+  return format_number($value, $config['billing']['base'], 1);
+}
+
+
+function getDates($dayofmonth, $months=0)
 {
   $dayofmonth = zeropad($dayofmonth);
   $year = date('Y');
   $month = date('m');
 
-  if (date('d') > $dayofmonth)
+  $dayofmonth = "03";
+  $year = date('Y');
+  $month = date('m');
+
+
+  if (date('d') > $dayofmonth) // Billing day is past, so it is next month
   {
-    $newmonth = zeropad($month + 1);
-    if ($newmonth == 13)
-    {
-      $newmonth = "01";
-      $newyear = $year + 1;
-    } else {
-      $newyear = $year;
-    }
-
-    $lastmonth = zeropad($month - 1);
-    if ($lastmonth == 0)
-    {
-      $lastmonth = 12;
-      $lastyear = $year - 1;
-    } else {
-      $lastyear = $year;
-    }
-
-    $date_from = $year . $month . $dayofmonth;
-    $date_to   = $newyear . $newmonth . $dayofmonth;
-
-    $last_from = $lastyear . $lastmonth . $dayofmonth;
-    $last_to   = $year . $month . $dayofmonth;
-
-  }
-  else
-  {
-    $newmonth = zeropad($month - 1);
-    if ($newmonth == 0)
-    {
-      $newmonth = 12;
-      $newyear = $year - 1;
-    } else {
-      $newyear = $year;
-    }
-
-    $lastmonth = zeropad($month - 2);
-    if ($lastmonth == -1)
-    {
-      $lastmonth = 10;
-      $lastyear = $year - 1;
-    } elseif ($lastmonth == 0)
-    {
-      $lastmonth = 11;
-      $lastyear = $year - 1;
-    } else {
-      $lastyear = $year;
-    }
-
-    $date_from = $newyear . $newmonth . $dayofmonth;
-    $date_to   = $year . $month . $dayofmonth;
-
-    $last_from = $lastyear . $lastmonth . $dayofmonth;
-    $last_to   = $newyear . $newmonth . $dayofmonth;
-
+    $date_end   = date_create($year.'-'.$month.'-'.$dayofmonth);
+    $date_start = date_create($year.'-'.$month.'-'.$dayofmonth);
+    date_add($date_end,   date_interval_create_from_date_string('1 month'));
+  } else { // Billing day will happen this month, therefore started last month
+    $date_end   = date_create($year.'-'.$month.'-'.$dayofmonth);
+    $date_start = date_create($year.'-'.$month.'-'.$dayofmonth);
+    date_sub($date_start, date_interval_create_from_date_string('1 month'));
   }
 
-  $return['0'] = $date_from . "000001";
-  $return['1'] = $date_to . "000000";
-  $return['2'] = $last_from . "000001";
-  $return['3'] = $last_to . "000000";
+  if($months > 0)
+  {
+    date_sub($date_start, date_interval_create_from_date_string($months.' month'));
+    date_sub($date_end,   date_interval_create_from_date_string($months.' month'));
+  }
+
+
+#  date_sub($date_start, date_interval_create_from_date_string('1 month'));
+  date_sub($date_end, date_interval_create_from_date_string('1 day'));
+
+  $date_from = date_format($date_start, 'Ymd') . "000000";
+  $date_to   = date_format($date_end, 'Ymd') . "235959";
+
+  date_sub($date_start, date_interval_create_from_date_string('1 month'));
+  date_sub($date_end, date_interval_create_from_date_string('1 month'));
+
+  $last_from = date_format($date_start, 'Ymd') . "000000";
+  $last_to   = date_format($date_end, 'Ymd') . "235959";
+
+  $return['0'] = $date_from;
+  $return['1'] = $date_to;
+  $return['2'] = $last_from;
+  $return['3'] = $last_to;
 
   return($return);
 }
@@ -132,7 +121,7 @@ function get95thin($bill_id,$datefrom,$dateto)
   $measurements = dbFetchCell($mq_sql);
   $measurement_95th = round($measurements /100 * 95) - 1;
 
-  $q_95_sql = "SELECT (in_delta / period / 1000 * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
+  $q_95_sql = "SELECT (in_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
   $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY in_delta ASC";
   $a_95th = dbFetchColumn($q_95_sql);
   $m_95th = $a_95th[$measurement_95th];
@@ -147,7 +136,7 @@ function get95thout($bill_id,$datefrom,$dateto)
   $measurements = dbFetchCell($mq_sql);
   $measurement_95th = round($measurements /100 * 95) - 1;
 
-  $q_95_sql = "SELECT (out_delta / period / 1000 * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
+  $q_95_sql = "SELECT (out_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
   $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY out_delta ASC";
 
   $a_95th = dbFetchColumn($q_95_sql);
@@ -171,11 +160,9 @@ function getRates($bill_id,$datefrom,$dateto)
   $m_95th = $a_95th[$measurement_95th];
 
   $sum_data = getSum($bill_id,$datefrom,$dateto);
-#  $mtot = getTotal($bill_id,$datefrom,$dateto);
   $mtot = $sum_data['total'];
   $mtot_in = $sum_data['inbound'];
   $mtot_out = $sum_data['outbound'];
-#  $ptot = getPeriod($bill_id,$datefrom,$dateto);
   $ptot = $sum_data['period'];
 
   $data['rate_95th_in'] = get95thIn($bill_id,$datefrom,$dateto);
@@ -190,10 +177,10 @@ function getRates($bill_id,$datefrom,$dateto)
     $data['dir_95th'] = 'in';
   }
 
-  $data['total_data'] = round($mtot / 1000 / 1000, 2);
-  $data['total_data_in'] = round($mtot_in / 1000 / 1000, 2);
-  $data['total_data_out'] = round($mtot_out / 1000 / 1000, 2);
-  $data['rate_average'] = round($mtot / $ptot / 1000 * 8, 2);
+  $data['total_data']      = $mtot;
+  $data['total_data_in']   = $mtot_in;
+  $data['total_data_out']  = $mtot_out;
+  $data['rate_average']    = $mtot / $ptot * 8;
 
 #  print_r($data);
 

@@ -1165,35 +1165,32 @@ CREATE TABLE IF NOT EXISTS `vrfs` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 
--- --------------------------------------------------------
-
---
--- Tabel structuur voor tabel `bill_history`
---
-
 CREATE TABLE IF NOT EXISTS `bill_history` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `bill_hist_id` int(11) NOT NULL AUTO_INCREMENT,
   `bill_id` int(11) NOT NULL,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `bill_datefrom` datetime NOT NULL,
   `bill_dateto` datetime NOT NULL,
   `bill_type` text NOT NULL,
-  `bill_allowed` int(11) NOT NULL,
-  `bill_used` int(11) NOT NULL,
-  `bill_overuse` int(11) NOT NULL,
-  `bill_percent` DECIMAL(5,2) NOT NULL,
-  `rate_95th_in` int(11) NOT NULL,
-  `rate_95th_out` int(11) NOT NULL,
-  `rate_95th` int(11) NOT NULL,
+  `bill_allowed` bigint(20) NOT NULL,
+  `bill_used` bigint(20) NOT NULL,
+  `bill_overuse` bigint(20) NOT NULL,
+  `bill_percent` decimal(10,2) NOT NULL,
+  `rate_95th_in` bigint(20) NOT NULL,
+  `rate_95th_out` bigint(20) NOT NULL,
+  `rate_95th` bigint(20) NOT NULL,
   `dir_95th` varchar(3) NOT NULL,
-  `rate_average` int(11) NOT NULL,
-  `rate_average_in` int(11) NOT NULL,
-  `rate_average_out` int(11) NOT NULL,
-  `traf_in` int(11) NOT NULL,
-  `traf_out` int(11) NOT NULL,
-  `traf_total` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
+  `rate_average` bigint(20) NOT NULL,
+  `rate_average_in` bigint(20) NOT NULL,
+  `rate_average_out` bigint(20) NOT NULL,
+  `traf_in` bigint(20) NOT NULL,
+  `traf_out` bigint(20) NOT NULL,
+  `traf_total` bigint(20) NOT NULL,
+  `pdf` longblob,
+  PRIMARY KEY (`bill_hist_id`),
+  UNIQUE KEY `unique_index` (`bill_id`,`bill_datefrom`,`bill_dateto`),
   KEY `bill_id` (`bill_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
 
 CREATE TABLE IF NOT EXISTS `entPhysical_state` (  `device_id` int(11) NOT NULL,  `entPhysicalIndex` varchar(64) NOT NULL,  `subindex` varchar(64) DEFAULT NULL,  `group` varchar(64) NOT NULL,  `key` varchar(64) NOT NULL,  `value` varchar(255) NOT NULL,  KEY `device_id_index` (`device_id`,`entPhysicalIndex`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
