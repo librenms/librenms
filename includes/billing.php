@@ -19,11 +19,6 @@ function getDates($dayofmonth, $months=0)
   $year = date('Y');
   $month = date('m');
 
-  $dayofmonth = "03";
-  $year = date('Y');
-  $month = date('m');
-
-
   if (date('d') > $dayofmonth) // Billing day is past, so it is next month
   {
     $date_end   = date_create($year.'-'.$month.'-'.$dayofmonth);
