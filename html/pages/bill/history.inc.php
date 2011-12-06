@@ -54,7 +54,7 @@
              <td colspan=\"2\" style=\"text-align: right;\"><a href=\"".generate_url($vars, array('detail' => "all"))."\"><img src=\"images/16/chart_curve.png\" border=\"0\" align=\"absmiddle\" alt=\"Show details\" title=\"Show details\" /> Show all details</a></td>
            </tr>");
 
-  foreach (dbFetchRows("SELECT * FROM `bill_hist` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24", array($bill_id)) as $history)
+  foreach (dbFetchRows("SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24", array($bill_id)) as $history)
   {
     if (bill_permitted($history['bill_id']))
     {

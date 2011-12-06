@@ -22,7 +22,7 @@ foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
     $datefrom     = $day_data['0'];
     $dateto       = $day_data['1'];
 
-    $check        = dbFetchRow("SELECT * FROM `bill_hist` WHERE bill_id = ? AND bill_datefrom = ? AND bill_dateto = ? LIMIT 1", array($bill['bill_id'], $datefrom, $dateto));
+    $check        = dbFetchRow("SELECT * FROM `bill_history` WHERE bill_id = ? AND bill_datefrom = ? AND bill_dateto = ? LIMIT 1", array($bill['bill_id'], $datefrom, $dateto));
 
     $period = getPeriod($bill['bill_id'],$datefrom,$dateto);
 
@@ -90,7 +90,7 @@ foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
                          'bill_percent' => $percent,
                          'updated' => array('NOW()'));
 
-        dbUpdate($update, 'bill_hist', '`bill_hist_id` = ?', array($bill['bill_id']));
+        dbUpdate($update, 'bill_history', '`bill_hist_id` = ?', array($bill['bill_id']));
         echo(" Updated history! ");
 
       } else {
@@ -115,7 +115,7 @@ foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
                          'bill_dateto' => $dateto,
                          'bill_id' => $bill['bill_id'] );
 #       print_r($update);
-        dbInsert($update, 'bill_hist');
+        dbInsert($update, 'bill_history');
         echo(" Generated history! ");
       }
       echo("\n\n");

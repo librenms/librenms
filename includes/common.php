@@ -475,12 +475,18 @@ function format_si($rate, $round = 2)
   return round($rate, $round).$ext;
 }
 
-function format_bi($size, $round = '2')
+function format_bi($value, $round = '2')
 {
+  if($value < "0")
+  {
+    $neg = 1;
+    $value = $value * -1;
+  }
   $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
   $ext = $sizes[0];
-  for ($i = 1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i]; }
-  return round($size, $round).$ext;
+  for ($i = 1; (($i < count($sizes)) && ($value >= 1024)); $i++) { $value = $value / 1024; $ext  = $sizes[$i]; }
+  if($neg) { $value = $value * -1; }
+  return round($value, $round).$ext;
 }
 
 function format_number($value, $base = '1000', $round=2)
