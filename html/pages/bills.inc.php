@@ -1,11 +1,12 @@
 <?php
 
+
 if ($_POST['addbill'] == "yes")
 {
   $updated = '1';
 
   ### Multiply bill_quota by base twice for now, as we know it's in GB. Later we should allow different measurements.
-  if(is_numeric($_POST['bill_quota']) { $_POST['bill_quota'] * $config['billing']['base'] * $config['billing']['base']; }
+  if(is_numeric($_POST['bill_quota'])) { $_POST['bill_quota'] * $config['billing']['base'] * $config['billing']['base']; }
 
   $insert = array('bill_name' => $_POST['bill_name'], 'bill_type' => $_POST['bill_type'], 'bill_cdr' => $_POST['bill_cdr'], 'bill_day' => $_POST['bill_day'], 'bill_quota' => $_POST['bill_quota'],
                   'bill_custid' => $_POST['bill_custid'], 'bill_ref' => $_POST['bill_ref'], 'bill_notes' => $_POST['bill_notes']);
@@ -23,8 +24,8 @@ if ($_POST['addbill'] == "yes")
   }
 }
 
-$pagetitle[] = "Billing";
 
+$pagetitle[] = "Billing";
 
 echo("<meta http-equiv='refresh' content='10000'>");
 
@@ -133,20 +134,20 @@ if(is_array($port))
       if ($bill['bill_type'] == "cdr")
       {
          $type = "CDR";
-         $allowed = formatRates($bill['bill_cdr'] * 1000);
-         $used    = formatRates($rate_data['rate_95th'] * 1000);
+         $allowed = format_si($bill['bill_cdr'])."bps";
+         $used    = format_si($rate_data['rate_95th'])."bps";
          $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100,2);
          $background = get_percentage_colours($percent);
          $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
-         $overuse = (($overuse <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatRates($overuse * 1000)."</span>");
+         $overuse = (($overuse <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".format_si($overuse)."bps</span>");
       } elseif ($bill['bill_type'] == "quota") {
          $type = "Quota";
-         $allowed = formatStorage($bill['bill_gb']* 1000 * 1000 * 1000);
-         $used    = formatStorage($rate_data['total_data'] * 1000 * 1000);
-         $percent = round(($rate_data['total_data'] / ($bill['bill_gb'] * 1000)) * 100,2);
+         $allowed = format_bytes_billing($bill['bill_quota']);
+         $used    = format_bytes_billing($rate_data['total_data']);
+         $percent = round(($rate_data['total_data'] / ($bill['bill_quota'])) * 100,2);
          $background = get_percentage_colours($percent);
-         $overuse = $rate_data['total_data'] - ($bill['bill_gb'] * 1000);
-         $overuse = (($overuse <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatStorage($overuse * 1000 * 1000)."</span>");
+         $overuse = $rate_data['total_data'] - $bill['bill_quota'];
+         $overuse = (($overuse <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".format_bytes_billing($overuse)."</span>");
       }
 
       $right_background = $background['right'];
