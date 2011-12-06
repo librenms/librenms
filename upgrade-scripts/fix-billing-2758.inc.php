@@ -58,6 +58,7 @@ mysql_query("ALTER TABLE `bills` ADD `total_data_out` bigint(20) NOT NULL;");
 mysql_query("ALTER TABLE `bills` ADD `rate_average_in` bigint(20) NOT NULL;");
 mysql_query("ALTER TABLE `bills` ADD `rate_average_out` bigint(20) NOT NULL;");
 mysql_query("ALTER TABLE `bills` ADD `rate_average` bigint(20) NOT NULL;");
+mysql_query("ALTER TABLE `bills` ADD `bill_last_calc` datetime NOT NULL;");
 mysql_query("ALTER TABLE `bills` CHANGE `bill_cdr` bigint(20) NOT NULL;");
 
 foreach (dbFetchRows("SELECT * FROM `bills`") as $bill_data)
