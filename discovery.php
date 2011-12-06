@@ -116,7 +116,7 @@ if (file_exists('.svn'))
 
   if ($db_rev+0 < 2758)
   {
-    include('upgrade-scripts/fix-billing-2757.php'); ## Rewrites all sensor RRDs. Nothing will work without this after 1757
+    include('upgrade-scripts/fix-billing-2758.inc.php'); ## Rewrites all sensor RRDs. Nothing will work without this after 1757
   }
 
   if ($dbu_rev+0 > $db_rev)
