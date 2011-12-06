@@ -1,5 +1,8 @@
 <?php
 
+    ini_set('allow_url_fopen', 0);
+    ini_set('display_errors', 0);
+
     if (strpos($_SERVER['REQUEST_URI'], "debug")) {
 	$debug = "1";
 	ini_set('display_errors', 1);
@@ -19,7 +22,7 @@
     include("../includes/functions.php");
     include("includes/functions.inc.php");
     include("includes/authenticate.inc.php");
-    if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
+    if ($_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) { if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; } }
     require_once("includes/jpgraph/src/jpgraph.php");
     require_once("includes/jpgraph/src/jpgraph_line.php");
     require_once("includes/jpgraph/src/jpgraph_bar.php");
@@ -27,11 +30,15 @@
     require_once("includes/jpgraph/src/jpgraph_date.php");
 
     if (is_numeric($_GET['bill_id'])) {
-	if (bill_permitted($_GET['bill_id'])) {
-	    $bill_id = $_GET['bill_id'];
+	if ($_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) {
+	    if (bill_permitted($_GET['bill_id'])) {
+		$bill_id = $_GET['bill_id'];
+	    } else {
+		echo("Unauthorised Access Prohibited.");
+		exit;
+	    }
 	} else {
-	    echo("Unauthorised Access Prohibited.");
-	    exit;
+	    $bill_id = $_GET['bill_id'];
 	}
     } else {
 	echo("Unauthorised Access Prohibited.");
@@ -59,19 +66,16 @@
     $overuse_data = array();
     $ticklabels	  = array();
 
-    function format_si_short($val) {
-      return format_si($val, "1");
-    }
-
     if ($imgtype == "historical") {
 	$i		= "0";
-	foreach (dbFetchRows("SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` LIMIT 12", array($bill_id)) as $data) {
+	foreach (dbFetchRows("SELECT * FROM `bill_hist` WHERE `bill_id` = ? ORDER BY `bill_datefrom` LIMIT 12", array($bill_id)) as $data) {
+
 	    $datefrom		= strftime("%e %b %Y", strtotime($data['bill_datefrom']));
 	    $dateto		= strftime("%e %b %Y", strtotime($data['bill_dateto']));
 	    $datelabel		= $datefrom."\n".$dateto;
-	    $traf['in']		= $data['traf_in'] * 1000 * 1000;
-	    $traf['out']	= $data['traf_out'] * 1000 * 1000;
-	    $traf['total']	= $data['traf_total'] * 1000 * 1000;
+	    $traf['in']		= $data['traf_in'];
+	    $traf['out']	= $data['traf_out'];
+	    $traf['total']	= $data['traf_total'];
 
 	    if ($data['bill_type'] == "Quota") {
 		$traf['allowed']= $data['bill_allowed'];
@@ -113,7 +117,7 @@
 		$traf['total']	= (isset($data['traf_total']) ? $data['traf_total'] : 0);
 		$datelabel	= strftime("%e\n%b", $data['timestamp']);
 		array_push($ticklabels, $datelabel);
-		array_push($in_data, $traf['in']);
+		array_push($in_data,  $traf['in']);
 		array_push($out_data, $traf['out']);
 		array_push($tot_data, $traf['total']);
 		$average += $data['traf_total'];
@@ -178,7 +182,7 @@
     $graph->yaxis->SetTitleMargin(50);
     $graph->yaxis->title->SetFont(FF_FONT1, FS_NORMAL, 10);
     $graph->yaxis->title->Set("Bytes Transferred");
-    $graph->yaxis->SetLabelFormatCallback("format_si");
+    $graph->yaxis->SetLabelFormatCallback('format_bytes_billing');
     $graph->ygrid->SetFill(true,'#EFEFEF@0.5','#FFFFFF@0.5');
 
 
@@ -188,7 +192,7 @@
     $barplot_tot->SetColor("#d5d5d5");
     $barplot_tot->SetFillColor("#d5d5d5@0.5");
     $barplot_tot->value->Show();
-    $barplot_tot->value->SetFormatCallback('format_si_short');
+    $barplot_tot->value->SetFormatCallback('format_bytes_billing_short');
 
     $barplot_in = new BarPlot($in_data);
     $barplot_in->SetLegend("Traffic In");
@@ -218,7 +222,8 @@
 	$gbplot = new GroupBarPlot(array($barplot_in, $barplot_tot, $barplot_out, $barplot_over));
     } else {
 	$lineplot_allow = new LinePlot($ave_data);
-	$lineplot_allow->SetLegend("Average per ".$imgtype);
+	//$lineplot_allow->SetLegend("Average per ".$imgtype);
+	$lineplot_allow->SetLegend("Average");
 	$lineplot_allow->SetColor('black');
 	$lineplot_allow->SetWeight(1);
 

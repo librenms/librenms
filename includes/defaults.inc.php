@@ -173,14 +173,14 @@ $config['enable_billing']               = 0; # Enable Billing
 $config['billing']['customer_autoadd']  = 0; # Enable Auto-add bill per customer
 $config['billing']['circuit_autoadd']   = 0; # Enable Auto-add bill per circuit_id
 $config['billing']['bill_autoadd']      = 0; # Enable Auto-add bill per bill_id
-$config['billing']['base']              = 1000; # Set the base to divider bytes to kb, mb, gb ,... (this only works for the text based conversion and not for the graphs)
+$config['billing']['base']              = 1000; # Set the base to divider bytes to kB, MB, GB ,... (1000|1024)
 
 ### External Integration
 
 #$config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
 $config['rancid_ignorecomments']        = 0; # Ignore lines starting with #
 #$config['collectd_dir']                 = '/var/lib/collectd/rrd';
-#$config['smokeping']['dir']     = "/var/lib/smokeping/";
+#$config['smokeping']['dir']             = "/var/lib/smokeping/";
 
 # NFSen RRD dir.
 $config['nfsen_enable'] = 0;

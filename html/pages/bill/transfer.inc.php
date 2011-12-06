@@ -2,23 +2,24 @@
 
   $pagetitle[]        = "Bandwidth Graphs";
 
-  $bill_data          = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
-  $gbconvert          = $config['billing']['base'];
+#  $bill_data          = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
 
-  $today              = str_replace("-", "", dbFetchCell("SELECT CURDATE()"));
-  $tomorrow           = str_replace("-", "", dbFetchCell("SELECT DATE_ADD(CURDATE(), INTERVAL 1 DAY)"));
-  $last_month         = str_replace("-", "", dbFetchCell("SELECT DATE_SUB(CURDATE(), INTERVAL 1 MONTH)"));
+#  $today              = str_replace("-", "", dbFetchCell("SELECT CURDATE()"));
+#  $tomorrow           = str_replace("-", "", dbFetchCell("SELECT DATE_ADD(CURDATE(), INTERVAL 1 DAY)"));
+#  $last_month         = str_replace("-", "", dbFetchCell("SELECT DATE_SUB(CURDATE(), INTERVAL 1 MONTH)"));
 
-  $rightnow           = $today . date(His);
-  $before             = $yesterday . date(His);
-  $lastmonth          = $last_month . date(His);
+#  $rightnow           = $today . date(His);
+#  $before             = $yesterday . date(His);
+#  $lastmonth          = $last_month . date(His);
 
-  $dayofmonth         = $bill_data['bill_day'];
-  $day_data           = getDates($dayofmonth);
-  $datefrom           = $day_data['0'];
-  $dateto             = $day_data['1'];
-  $lastfrom           = $day_data['2'];
-  $lastto             = $day_data['3'];
+#  $dayofmonth         = $bill_data['bill_day'];
+#  $day_data           = getDates($dayofmonth);
+#  $datefrom           = $day_data['0'];
+#  $dateto             = $day_data['1'];
+#  $lastfrom           = $day_data['2'];
+#  $lastto             = $day_data['3'];
+
+#  print_r($bill_data);
 
   $total_data         = $bill_data['total_data'];
   $in_data            = $bill_data['total_data_in'];
@@ -44,38 +45,38 @@
   $cur_days           = date('d', (strtotime("now") - strtotime($datefrom)));
   $total_days         = date('d', (strtotime($dateto) - strtotime($datefrom)));
 
-  $total['data']      = formatStorage($bill_data['total_data'] * $gbconvert * $gbconvert);
+  $total['data']      = format_bytes_billing($bill_data['total_data']);
   if ($bill_data['bill_type'] == "quota") {
-    $total['allow']   = formatStorage($bill_data['bill_gb'] * $gbconvert * $gbconvert * $gbconvert);
+    $total['allow']   = format_bytes_billing($bill_data['bill_quota']);
   } else {
     $total['allow']   = "-";
   }
-  $total['ave']       = formatStorage(($bill_data['total_data'] / $cur_days) * $gbconvert * $gbconvert);
-  $total['est']       = formatStorage(($bill_data['total_data'] / $cur_days * $total_days) * $gbconvert * $gbconvert);
-  $total['per']       = round((($bill_data['total_data'] / $gbconvert) / $bill_data['bill_gb'] * 100), 2);
+  $total['ave']       = format_bytes_billing($bill_data['total_data'] / $cur_days);
+  $total['est']       = format_bytes_billing($bill_data['total_data'] / $cur_days * $total_days);
+  $total['per']       = round(($bill_data['total_data'] / $bill_data['bill_quota'] * 100), 2);
   $total['bg']        = get_percentage_colours($total['per']);
 
-  $in['data']         = formatStorage($bill_data['total_data_in'] * $gbconvert * $gbconvert);
-  $in['allow']        = $total['data'];
-  $in['ave']          = formatStorage(($bill_data['total_data_in'] / $cur_days) * $gbconvert * $gbconvert);
-  $in['est']          = formatStorage(($bill_data['total_data_in'] / $cur_days * $total_days) * $gbconvert * $gbconvert);
+  $in['data']         = format_bytes_billing($bill_data['total_data_in']);
+  $in['allow']        = $total['allow'];
+  $in['ave']          = format_bytes_billing($bill_data['total_data_in'] / $cur_days);
+  $in['est']          = format_bytes_billing($bill_data['total_data_in'] / $cur_days * $total_days);
   $in['per']          = round(($bill_data['total_data_in'] / $bill_data['total_data'] * 100), 2);
   $in['bg']           = get_percentage_colours($in['per']);
 
-  $out['data']        = formatStorage($bill_data['total_data_out'] * $gbconvert * $gbconvert);
-  $out['allow']       = $total['data'];
-  $out['ave']         = formatStorage(($bill_data['total_data_out'] / $cur_days) * $gbconvert * $gbconvert);
-  $out['est']         = formatStorage(($bill_data['total_data_out'] / $cur_days * $total_days) * $gbconvert * $gbconvert);
+  $out['data']        = format_number($bill_data['total_data_out'] , $config['billing']['base']);
+  $out['allow']       = $total['allow'];
+  $out['ave']         = format_bytes_billing($bill_data['total_data_out'] / $cur_days);
+  $out['est']         = format_bytes_billing($bill_data['total_data_out'] / $cur_days * $total_days);
   $out['per']         = round(($bill_data['total_data_out'] / $bill_data['total_data'] * 100), 2);
   $out['bg']          = get_percentage_colours($out['per']);
 
-  $ousage['over']     = $bill_data['total_data'] - ($bill_data['bill_gb'] * $gbconvert);
+  $ousage['over']     = $bill_data['total_data'] - ($bill_data['bill_gb'] * $config['billing']['base']);
   $ousage['over']     = (($ousage['over'] < 0) ? "0" : $ousage['over']);
-  $ousage['data']     = formatStorage($ousage['over'] * $gbconvert * $gbconvert);
+  $ousage['data']     = format_number($ousage['over'] , $config['billing']['base']);
   $ousage['allow']    = $total['allow'];
-  $ousage['ave']      = formatStorage(($ousage['over'] / $cur_days ) * $gbconvert * $gbconvert);
-  $ousage['est']      = formatStorage(($ousage['over'] / $cur_days * $total_days) * $gbconvert * $gbconvert);
-  $ousage['per']      = round(((($bill_data['total_data'] / $gbconvert) / $bill_data['bill_gb'] * 100) - 100), 2);
+  $ousage['ave']      = format_bytes_billing($ousage['over'] / $cur_days );
+  $ousage['est']      = format_bytes_billing($ousage['over'] / $cur_days * $total_days);
+  $ousage['per']      = round((($bill_data['total_data'] / $bill_data['bill_quota'] * 100) - 100), 2);
   $ousage['per']      = (($ousage['per'] < 0) ? "0" : $ousage['per']);
   $ousage['bg']       = get_percentage_colours($ousage['per']);
 
@@ -109,6 +110,7 @@
   echo("    <td>".$total['est']."</td>");
   echo("    <td width=\"360\">".showPercent($total['per'])."</td>");
   echo("  </tr>");
+
   echo("  <tr style=\"background: ".$list_colour_a.";\">");
   echo("    <td>Inbound</td>");
   echo("    <td>:</td>");

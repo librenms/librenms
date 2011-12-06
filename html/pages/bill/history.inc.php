@@ -54,7 +54,7 @@
              <td colspan=\"2\" style=\"text-align: right;\"><a href=\"".generate_url($vars, array('detail' => "all"))."\"><img src=\"images/16/chart_curve.png\" border=\"0\" align=\"absmiddle\" alt=\"Show details\" title=\"Show details\" /> Show all details</a></td>
            </tr>");
 
-  foreach (dbFetchRows("SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24", array($bill_id)) as $history)
+  foreach (dbFetchRows("SELECT * FROM `bill_hist` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24", array($bill_id)) as $history)
   {
     if (bill_permitted($history['bill_id']))
     {
@@ -64,31 +64,31 @@
       $type           = $history['bill_type'];
       $percent        = $history['bill_percent'];
       $dir_95th       = $history['dir_95th'];
-      $rate_95th      = formatRates($history['rate_95th'] * 1000);
-      $total_data     = formatStorage($history['traf_total'] * $gbconvert * $gbconvert);
+      $rate_95th      = formatRates($history['rate_95th']);
+      $total_data     = format_number($history['traf_total'], $config['billing']['base']);
 
       $background = get_percentage_colours($percent);
       $row_colour = ((!is_integer($i/2)) ? $list_colour_a : $list_colour_b);
 
       if ($type == "CDR")
       {
-         $allowed = formatRates($history['bill_allowed'] * 1000);
-         $used    = formatRates($history['rate_95th'] * 1000);
-         $in      = formatRates($history['rate_95th_in'] * 1000);
-         $out     = formatRates($history['rate_95th_out'] * 1000);
-         $overuse = (($history['bill_overuse'] <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatRates($history['bill_overuse'] * 1000)."</span>");
+         $allowed = formatRates($history['bill_allowed']);
+         $used    = formatRates($history['rate_95th']);
+         $in      = formatRates($history['rate_95th_in']);
+         $out     = formatRates($history['rate_95th_out']);
+         $overuse = (($history['bill_overuse'] <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatRates($history['bill_overuse'])."</span>");
       } elseif ($type == "Quota") {
-         $allowed = formatStorage($history['bill_allowed'] * $gbconvert * $gbconvert);
-         $used    = formatStorage($history['total_data'] * $gbconvert * $gbconvert);
-         $in      = formatStorage($history['traf_in'] * $gbconvert * $gbconvert);
-         $out     = formatStorage($history['traf_out'] * $gbconvert * $gbconvert);
-         $overuse = (($history['bill_overuse'] <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatStorage($history['bill_overuse'] * $gbconvert * $gbconvert)."</span>");
+         $allowed = format_number($history['bill_allowed'], $config['billing']['base']);
+         $used    = format_number($history['total_data'], $config['billing']['base']);
+         $in      = format_number($history['traf_in'], $config['billing']['base']);
+         $out     = format_number($history['traf_out'], $config['billing']['base']);
+         $overuse = (($history['bill_overuse'] <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".format_number($history['bill_overuse'], $config['billing']['base'])."B</span>");
       }
 
       $total_data     = (($type == "Quota") ? "<b>".$total_data."</b>" : $total_data);
       $rate_95th      = (($type == "CDR") ? "<b>".$rate_95th."</b>" : $rate_95th);
 
-      $url            = generate_url($vars, array('detail' => $history['id']));
+      $url            = generate_url($vars, array('detail' => $history['bill_hist_id']));
 
       echo("
            <tr style=\"background: ".$row_colour.";\">
@@ -104,11 +104,11 @@
              <td width=\"250\">".print_percentage_bar(250, 20, $perc, NULL, "ffffff", $background['left'], $percent."%", "ffffff", $background['right'])."</td>
              <td>
                 <a href=\"".$url."\"><img src=\"images/16/chart_curve.png\" border=\"0\" align=\"absmiddle\" alt=\"Show details\" title=\"Show details\"/></a>
-                <a href=\"#\"><img src=\"images/16/page_white_acrobat.png\" border=\"0\" align=\"absmiddle\" alt=\"PDF Report\" title=\"PDF Report\"/></a>
+                <a href=\"pdf.php?type=billing&report=history&bill_id=".$bill_id."&history_id=".$history['id']."\"><img src=\"images/16/page_white_acrobat.png\" border=\"0\" align=\"absmiddle\" alt=\"PDF Report\" title=\"PDF Report\"/></a>
              </td>
            </tr>");
 
-      if ($vars['detail'] == $history['id'] || $vars['detail'] == "all") {
+      if ($vars['detail'] == $history['bill_hist_id'] || $vars['detail'] == "all") {
         $img['bitrate'] = showDetails($bill_id, "bitrate", strtotime($datefrom), strtotime($dateto), $type);
         $img['bw_day']  = showDetails($bill_id, "day", strtotime($datefrom), strtotime($dateto));
         $img['bw_hour'] = showDetails($bill_id, "hour", strtotime($datefrom), strtotime($dateto));

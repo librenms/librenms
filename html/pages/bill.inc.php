@@ -84,15 +84,15 @@ if (bill_permitted($bill_id))
   if ($_GET['opta'] == "admin_history") { $vars['view'] = $_GET['opta']; }
 
 
-  if ($vars['view'] == "basic") { echo("<span class='pagemenu-selected'>"); }
+  if ($vars['view'] == "quick") { echo("<span class='pagemenu-selected'>"); }
   echo('<a href="'.generate_url($vars, array('view' => 'quick')).'">Quick Graphs</a>');
-  if ($vars['view'] == "basic") { echo("</span>"); }
+  if ($vars['view'] == "quick") { echo("</span>"); }
 
   echo(" | ");
 
-  if ($vars['view'] == "details") { echo("<span class='pagemenu-selected'>"); }
+  if ($vars['view'] == "accurate") { echo("<span class='pagemenu-selected'>"); }
   echo('<a href="'.generate_url($vars, array('view' => 'accurate')).'">Accurate Graphs</a>');
-  if ($vars['view'] == "details") { echo("</span>"); }
+  if ($vars['view'] == "accurate") { echo("</span>"); }
 
   echo(" | ");
 
@@ -158,7 +158,7 @@ if (bill_permitted($bill_id))
 
       echo("<h4>Quota Bill</h4>");
 
-      $percent = round(($total_data / 1000) / $bill_data['bill_gb'] * 100, 2);
+      $percent = round(($total_data) / $bill_data['bill_quota'] * 100, 2);
       $unit = "MB";
       $total_data = round($total_data, 2);
       echo("Billing Period from " . $fromtext . " to " . $totext . "
@@ -180,9 +180,7 @@ if (bill_permitted($bill_id))
       echo("<h4>CDR / 95th Bill</h4>");
 
       $unit = "kbps";
-      $cdr = $bill_data['bill_cdr'];
-      if ($rate_95th > "1000") { $rate_95th = $rate_95th / 1000; $cdr = $cdr / 1000; $unit = "Mbps"; }
-      if ($rate_95th > "1000") { $rate_95th = $rate_95th / 1000; $cdr = $cdr / 1000; $unit = "Gps"; }
+      $cdr = $bill_data['bill_cdr'] *1000;
       $rate_95th = round($rate_95th, 2);
 
       $percent = round(($rate_95th) / $cdr * 100, 2);
@@ -190,7 +188,7 @@ if (bill_permitted($bill_id))
       $type="&amp;95th=yes";
 
       echo("<strong>" . $fromtext . " to " . $totext . "</strong>
-      <br />Measured ".$rate_95th."$unit of ".$cdr."$unit (".$percent."%)");
+      <br />Measured ".format_si($rate_95th)."bps of ".format_si($cdr)."bps (".$percent."%)");
 
       if ($percent > 100) { $perc = "100"; } else { $perc = $percent; }
       if ($perc > '90') { $left_background='c4323f'; $right_background='C96A73';
@@ -219,25 +217,25 @@ if (bill_permitted($bill_id))
 
       $bi  = "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
       $bi .= "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
-//      $bi .= "&amp;x=800&amp;y=250";
+//    $bi .= "&amp;x=800&amp;y=250";
       $bi .= "&amp;x=1190&amp;y=250";
       $bi .= "$type'>";
 
       $li  = "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
       $li .= "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to;
-//      $li .= "&amp;x=800&amp;y=250";
+//    $li .= "&amp;x=800&amp;y=250";
       $li .= "&amp;x=1190&amp;y=250";
       $li .= "$type'>";
 
       $di  = "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
       $di .= "&amp;from=" . $config['time']['day'] .  "&amp;to=" . $config['time']['now'];
-//      $di .= "&amp;x=800&amp;y=250";
+//    $di .= "&amp;x=800&amp;y=250";
       $di .= "&amp;x=1190&amp;y=250";
       $di .= "$type'>";
 
       $mi  = "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
       $mi .= "&amp;from=" . $lastmonth .  "&amp;to=" . $rightnow;
-//      $mi .= "&amp;x=800&amp;y=250";
+//    $mi .= "&amp;x=800&amp;y=250";
       $mi .= "&amp;x=1190&amp;y=250";
       $mi .= "$type'>";
 
@@ -245,19 +243,19 @@ if (bill_permitted($bill_id))
 
       $bi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
       $bi .= "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
-      $bi .= "&amp;width=715&amp;height=200&amp;total=1'>";
+      $bi .= "&amp;width=1000&amp;height=200&amp;total=1'>";
 
       $li = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
       $li .= "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to;
-      $li .= "&amp;width=715&amp;height=200&amp;total=1'>";
+      $li .= "&amp;width=1000&amp;height=200&amp;total=1'>";
 
       $di = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
       $di .= "&amp;from=" . $config['time']['day'] .  "&amp;to=" . $config['time']['now'];
-      $di .= "&amp;width=715&amp;height=200&amp;total=1'>";
+      $di .= "&amp;width=1000&amp;height=200&amp;total=1'>";
 
       $mi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
       $mi .= "&amp;from=" . $lastmonth .  "&amp;to=" . $rightnow;
-      $mi .= "&amp;width=715&amp;height=200&amp;total=1'>";
+      $mi .= "&amp;width=1000&amp;height=200&amp;total=1'>";
 
     }
 

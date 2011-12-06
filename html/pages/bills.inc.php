@@ -4,7 +4,10 @@ if ($_POST['addbill'] == "yes")
 {
   $updated = '1';
 
-  $insert = array('bill_name' => $_POST['bill_name'], 'bill_type' => $_POST['bill_type'], 'bill_cdr' => $_POST['bill_cdr'], 'bill_day' => $_POST['bill_day'], 'bill_gb' => $_POST['bill_quota'],
+  ### Multiply bill_quota by base twice for now, as we know it's in GB. Later we should allow different measurements.
+  if(is_numeric($_POST['bill_quota']) { $_POST['bill_quota'] * $config['billing']['base'] * $config['billing']['base']; }
+
+  $insert = array('bill_name' => $_POST['bill_name'], 'bill_type' => $_POST['bill_type'], 'bill_cdr' => $_POST['bill_cdr'], 'bill_day' => $_POST['bill_day'], 'bill_quota' => $_POST['bill_quota'],
                   'bill_custid' => $_POST['bill_custid'], 'bill_ref' => $_POST['bill_ref'], 'bill_notes' => $_POST['bill_notes']);
 
   $bill_id = dbInsert($insert, 'bills');

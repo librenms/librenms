@@ -24,8 +24,8 @@
       $day_data = getDates($bill['bill_day']);
       $datefrom = $day_data['2'];
       $dateto   = $day_data['3'];
-//  foreach (dbFetchRows("SELECT * FROM `bill_history` ORDER BY `bill_datefrom` AND `bill_dateto` DESC LIMIT 24") as $history)
-      foreach (dbFetchRows("SELECT * FROM `bill_history` WHERE `bill_id` = ? AND `bill_datefrom` = ? AND `bill_dateto` = ? ORDER BY `bill_datefrom` AND `bill_dateto` LIMIT 1", array($bill['bill_id'], $datefrom, $dateto)) as $history)
+//  foreach (dbFetchRows("SELECT * FROM `bill_hist` ORDER BY `bill_datefrom` AND `bill_dateto` DESC LIMIT 24") as $history)
+      foreach (dbFetchRows("SELECT * FROM `bill_hist` WHERE `bill_id` = ? AND `bill_datefrom` = ? AND `bill_dateto` = ? ORDER BY `bill_datefrom` AND `bill_dateto` LIMIT 1", array($bill['bill_id'], $datefrom, $dateto)) as $history)
       {
         unset($class);
         $type           = $history['bill_type'];

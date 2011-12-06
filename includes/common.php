@@ -460,14 +460,12 @@ function format_si($rate, $round = 2)
   if ($rate >= "0.1")
   {
     $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
-#    $round = Array('2','2','2','2','2','2','2','2','2');
     $ext = $sizes[0];
     for ($i = 1; (($i < count($sizes)) && ($rate >= 1000)); $i++) { $rate = $rate / 1000; $ext  = $sizes[$i]; }
   }
   else
   {
     $sizes = Array('', 'm', 'u', 'n');
-#    $round = Array('2','2','2','2');
     $ext = $sizes[0];
     for ($i = 1; (($i < count($sizes)) && ($rate != 0) && ($rate <= 0.1)); $i++) { $rate = $rate * 1000; $ext  = $sizes[$i]; }
   }
@@ -483,6 +481,16 @@ function format_bi($size, $round = '2')
   $ext = $sizes[0];
   for ($i = 1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i]; }
   return round($size, $round).$ext;
+}
+
+function format_number($value, $base = '1000', $round=2)
+{
+  if($base == '1000')
+  {
+    return format_si($value, $round);
+  } else {
+    return format_bi($value, $round);
+  }
 }
 
 function is_valid_hostname($hostname)
