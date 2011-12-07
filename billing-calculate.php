@@ -1,11 +1,17 @@
 #!/usr/bin/env php
 <?php
 
-$debug=1;
+#$debug=1;
 
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
+
+$options = getopt("r");
+
+if (isset($options['r'])) { echo("Clearing history table.\n"); mysql_query("TRUNCATE TABLE `bill_history`"); }
+
+
 
 foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
 {
@@ -42,11 +48,16 @@ foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
          $type = "CDR";
          $allowed = $bill['bill_cdr'];
          $used    = $rate_data['rate_95th'];
-         $percent = round(($rate_data['rate_95th'] / $allowed) * 100,2);
+         $overuse = $used - $allowed;
+         $overuse = (($overuse <= 0) ? "0" : $overuse);
+         $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100,2);
+
       } elseif ($bill['bill_type'] == "quota") {
          $type = "Quota";
          $allowed = $bill['bill_quota'];
          $used    = $rate_data['total_data'];
+         $overuse = $used - $allowed;
+         $overuse = (($overuse <= 0) ? "0" : $overuse);
          $percent = round(($rate_data['total_data'] / $bill['bill_quota']) * 100,2);
       }
       echo(strftime("%x @ %X", strtotime($datefrom))." to ".strftime("%x @ %X", strtotime($dateto))." ".str_pad($type,8)." ".str_pad($allowed,10)." ".str_pad($used,10)." ".$percent."%");
