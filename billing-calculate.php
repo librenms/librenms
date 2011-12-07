@@ -19,7 +19,7 @@ foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
   echo(str_pad($bill['bill_id']." ".$bill['bill_name'], 30)." \n");
 
   $i=0;
-  while ($i <= 12)
+  while ($i <= 24)
   {
     unset($class);
     unset($rate_data);

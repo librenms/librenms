@@ -5,8 +5,6 @@
 //  $url         = $PHP_SELF."/bill/".$bill_id."/history/";
   $i           = 0;
 
-  $gbconvert   = $config['billing']['base'];
-
   $img['his']  = "<img src=\"bandwidth-graph.php?bill_id=".$bill_id;
   $img['his'] .= "&amp;type=historical";
   $img['his'] .= "&amp;x=1190&amp;y=250";
