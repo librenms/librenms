@@ -70,7 +70,7 @@
   $out['per']         = round(($bill_data['total_data_out'] / $bill_data['total_data'] * 100), 2);
   $out['bg']          = get_percentage_colours($out['per']);
 
-  $ousage['over']     = $bill_data['total_data'] - ($bill_data['bill_gb'] * $config['billing']['base']);
+  $ousage['over']     = $bill_data['total_data'] - ($bill_data['bill_quota']);
   $ousage['over']     = (($ousage['over'] < 0) ? "0" : $ousage['over']);
   $ousage['data']     = format_number($ousage['over'] , $config['billing']['base']);
   $ousage['allow']    = $total['allow'];

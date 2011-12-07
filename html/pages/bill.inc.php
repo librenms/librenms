@@ -155,9 +155,9 @@ if (bill_permitted($bill_id))
       $percent = round(($total_data) / $bill_data['bill_quota'] * 100, 2);
       $unit = "MB";
       $total_data = round($total_data, 2);
-      echo("Billing Period from " . $fromtext . " to " . $totext . "
-      <br />Transferred ".format_byes_billing($total_data)." of ".format_bytes_billing($bill_data['bill_quota'])." (".$percent."%)
-      <br />Average rate " . formatRates($rate_average));
+      echo("Billing Period from " . $fromtext . " to " . $totext);
+      echo("<br />Transferred ".format_bytes_billing($total_data)." of ".format_bytes_billing($bill_data['bill_quota'])." (".$percent."%)");
+      echo("<br />Average rate " . formatRates($rate_average));
 
       $background = get_percentage_colours($percent);
 

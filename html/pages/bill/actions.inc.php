@@ -30,8 +30,8 @@ if ($_POST['action'] == "delete_bill_port")
 if ($_POST['action'] == "update_bill")
 {
 
-  if (dbUpdate(array('bill_name' => $_POST['bill_name'], 'bill_day' => $_POST['bill_day'], 'bill_gb' => $_POST['bill_gb'],
-                 'bill_cdr' => $_POST['bill_cdr'], 'bill_type' => $_POST['bill_type']), 'bills', '`bill_id` = ?', array($bill_id)))
+  if (dbUpdate(array('bill_name' => $_POST['bill_name'], 'bill_day' => $_POST['bill_day'], 'bill_quota' => ($_POST['bill_quota'] * $config['billing']['base'] * $config['billing']['base'] * $config['billing']['base']),
+                 'bill_cdr' => ($_POST['bill_cdr']*1000), 'bill_type' => $_POST['bill_type']), 'bills', '`bill_id` = ?', array($bill_id)))
   {
     print_message("Bill Properties Updated");
   }
