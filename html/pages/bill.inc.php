@@ -24,12 +24,6 @@ if (bill_permitted($bill_id))
 
   $bill_name  = $bill_data['bill_name'];
   $dayofmonth = $bill_data['bill_day'];
-  $paidrate   = $bill_data['bill_paid_rate'];
-  $paid_kb    = $paidrate / 1000;
-  $paid_mb    = $paid_kb / 1000;
-
-  if ($paidrate < 1000000) { $paidrate_text = $paid_kb . "Kbps is the CDR."; }
-  if ($paidrate >= 1000000) { $paidrate_text = $paid_mb . "Mbps is the CDR."; }
 
   $day_data     = getDates($dayofmonth);
 
@@ -154,7 +148,7 @@ if (bill_permitted($bill_id))
 
     if ($bill_data['bill_type'] == "quota")
     {
-      // The Customer is billed based on a pre-paid quota
+      // The Customer is billed based on a pre-paid quota with overage in xB
 
       echo("<h4>Quota Bill</h4>");
 
@@ -162,14 +156,12 @@ if (bill_permitted($bill_id))
       $unit = "MB";
       $total_data = round($total_data, 2);
       echo("Billing Period from " . $fromtext . " to " . $totext . "
-      <br />Transferred ".formatStorage($total_data * 1000 * 1000)." of ".formatStorage($bill_data['bill_gb'] * 1000 * 1000 * 1000)." (".$percent."%)
-      <br />Average rate " . formatRates($rate_average * 1000));
+      <br />Transferred ".format_byes_billing($total_data)." of ".format_bytes_billing($bill_data['bill_quota'])." (".$percent."%)
+      <br />Average rate " . formatRates($rate_average));
 
       $background = get_percentage_colours($percent);
-      $right_background = $background['right'];
-      $left_background  = $background['left'];
 
-      echo("<p>".print_percentage_bar (350, 20, $perc, NULL, "ffffff", $left_background, $percent . "%", "ffffff", $right_background)."</p>");
+      echo("<p>".print_percentage_bar (350, 20, $perc, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right'])."</p>");
 
       $type="&amp;ave=yes";
     }
@@ -180,7 +172,7 @@ if (bill_permitted($bill_id))
       echo("<h4>CDR / 95th Bill</h4>");
 
       $unit = "kbps";
-      $cdr = $bill_data['bill_cdr'] *1000;
+      $cdr = $bill_data['bill_cdr'];
       $rate_95th = round($rate_95th, 2);
 
       $percent = round(($rate_95th) / $cdr * 100, 2);
@@ -188,16 +180,11 @@ if (bill_permitted($bill_id))
       $type="&amp;95th=yes";
 
       echo("<strong>" . $fromtext . " to " . $totext . "</strong>
-      <br />Measured ".format_si($rate_95th)."bps of ".format_si($cdr)."bps (".$percent."%)");
+      <br />Measured ".format_si($rate_95th)."bps of ".format_si($cdr)."bps (".$percent."%) @ 95th %ile");
 
-      if ($percent > 100) { $perc = "100"; } else { $perc = $percent; }
-      if ($perc > '90') { $left_background='c4323f'; $right_background='C96A73';
-      } elseif ($perc > '75') { $left_background='bf5d5b'; $right_background='d39392';
-      } elseif ($perc > '50') { $left_background='bf875b'; $right_background='d3ae92';
-      } elseif ($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3';
-      } else { $left_background='9abf5b'; $right_background='bbd392'; }
+      $background = get_percentage_colours($percent);
 
-      echo("<p>".print_percentage_bar (350, 20, $perc, NULL, "ffffff", $left_background, $percent . "%", "ffffff", $right_background)."</p>");
+      echo("<p>".print_percentage_bar (350, 20, $percent, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right'])."</p>");
 
       #  echo("<p>Billing Period : " . $fromtext . " to " . $totext . "<br />
       #  " . $paidrate_text . " <br />
@@ -206,7 +193,6 @@ if (bill_permitted($bill_id))
       #  <font face=\"Trebuchet MS, Verdana, Arial, Sans-Serif\" color=" . $bill_color . "><B>" . $rate_95th . "Kbps @ 95th Percentile.</b> (" . $dir_95th . ") (" . $bill_text . ")</font>
       #  </td><td><img src=\"images/billing-key.png\"></td></tr></table>
       #  <br />");
-
     }
 
     $lastmonth = dbFetchCell("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))");

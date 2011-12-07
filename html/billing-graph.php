@@ -138,7 +138,7 @@ $graph->img->SetImgFormat("png");
 
 $graph->SetScale('datlin',0,0,$start,$end);
 
-$graph->title->Set("$graph_name");
+#$graph->title->Set("$graph_name");
 $graph->title->SetFont(FF_FONT2,FS_BOLD,10);
 $graph->xaxis->SetFont(FF_FONT1,FS_BOLD);
 

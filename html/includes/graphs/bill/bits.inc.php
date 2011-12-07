@@ -28,12 +28,12 @@ $ds_out = "OUTOCTETS";
 
 if($bill['bill_type'] == "cdr") {
    $custom_graph = " COMMENT:'\\r' ";
-   $custom_graph .= " HRULE:" . $rates['rate_95th'] * 1000 . "#cc0000:'95th %ile \: ".formatRates($rates['rate_95th']*1000)." (".$rates['dir_95th'].") (CDR\: ".formatRates($bill['bill_cdr']*1000).")'";
-   $custom_graph .= " HRULE:" . $rates['rate_95th'] * 1000 * -1 . "#cc0000";
+   $custom_graph .= " HRULE:" . $rates['rate_95th'] . "#cc0000:'95th %ile \: ".formatRates($rates['rate_95th'])." (".$rates['dir_95th'].") (CDR\: ".formatRates($bill['bill_cdr']).")'";
+   $custom_graph .= " HRULE:" . $rates['rate_95th'] * -1 . "#cc0000";
 } elseif($bill['bill_type'] == "quota") {
    $custom_graph = " COMMENT:'\\r' ";
-   $custom_graph .= " HRULE:" . $rates['rate_average'] * 1000 . "#cc0000:'Usage \: ".formatStorage($rates['total_data']*1024*1024)." (".formatRates($rates['rate_average']*1000).")'";
-   $custom_graph .= " HRULE:" . $rates['rate_average'] * 1000 * -1 . "#cc0000";
+   $custom_graph .= " HRULE:" . $rates['rate_average'] . "#cc0000:'Usage \: ".format_bytes_billing($rates['total_data'])." (".formatRates($rates['rate_average']).")'";
+   $custom_graph .= " HRULE:" . $rates['rate_average'] * -1 . "#cc0000";
 }
 
 include("includes/graphs/generic_multi_bits_separated.inc.php");

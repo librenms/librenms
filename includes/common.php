@@ -2,6 +2,23 @@
 
 ## Common Functions
 
+function format_number_short($number, $sf) 
+{
+  // This formats a number so that we only send back three digits plus an optional decimal point.
+  // Example: 723.42 -> 723    72.34 -> 72.3    2.23 -> 2.23
+
+  list($whole, $decimal) = explode (".", $number);
+
+  if(strlen($whole) >= $sf || !is_numeric($decimal))
+  {
+    $number = $whole;
+  } elseif(strlen($whole) < $sf) {
+    $diff = $sf - strlen($whole);
+    $number = $whole .".".substr($decimal, 0, $diff);
+  }
+  return $number;
+}
+
 function external_exec($command)
 {
   global $debug;
@@ -126,10 +143,10 @@ function get_port_by_ifIndex($device_id, $ifIndex)
 function get_all_devices($device, $type = "")
 {
   global $cache;
-  
+
   # FIXME needs access control checks!
   # FIXME respect $type (server, network, etc) -- needs an array fill in topnav.
-  
+
   if (isset($cache['devices']['hostname']))
   {
     $devices = array_keys($cache['devices']['hostname']);
@@ -165,7 +182,6 @@ function get_port_by_id($port_id)
   {
     $port = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($port_id));
   }
-
   if (is_array($port))
   {
     return $port;
@@ -180,7 +196,6 @@ function get_application_by_id($application_id)
   {
     $application = dbFetchRow("SELECT * FROM `applications` WHERE `app_id` = ?", array($application_id));
   }
-
   if (is_array($application))
   {
     return $application;
@@ -195,7 +210,6 @@ function get_sensor_by_id($sensor_id)
   {
     $sensor = dbFetchRow("SELECT * FROM `sensors` WHERE `sensor_id` = ?", array($sensor_id));
   }
-
   if (is_array($sensor))
   {
     return $sensor;
@@ -210,7 +224,6 @@ function get_device_id_by_interface_id($interface_id)
   {
     $device_id = dbFetchCell("SELECT `device_id` FROM `ports` WHERE `interface_id` = ?", array($interface_id));
   }
-
   if (is_numeric($device_id))
   {
     return $device_id;
@@ -225,7 +238,6 @@ function get_device_id_by_app_id($app_id)
   {
     $device_id = dbFetchCell("SELECT `device_id` FROM `applications` WHERE `app_id` = ?", array($app_id));
   }
-
   if (is_numeric($device_id))
   {
     return $device_id;
@@ -237,11 +249,9 @@ function get_device_id_by_app_id($app_id)
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
   $ifclass = "interface-upup";
-
   if ($ifAdminStatus == "down") { $ifclass = "interface-admindown"; }
   if ($ifAdminStatus == "up" && $ifOperStatus== "down") { $ifclass = "interface-updown"; }
   if ($ifAdminStatus == "up" && $ifOperStatus== "up") { $ifclass = "interface-upup"; }
-
   return $ifclass;
 }
 
@@ -266,7 +276,6 @@ function device_by_id_cache($device_id, $refresh = '0')
     }
     $cache['devices']['id'][$device_id] = $device;
   }
-
   return $device;
 }
 
@@ -358,13 +367,13 @@ function getidbyname($hostname)
 function gethostosbyid($id)
 {
   global $cache;
-  
+
   if (isset($cache['devices']['id'][$id]['os']))
   {
     $os = $cache['devices']['id'][$id]['os'];
   }
   else
-  {  
+  {
     $os = dbFetchCell("SELECT `os` FROM `devices` WHERE `device_id` = ?", array($id));
   }
 
@@ -437,45 +446,45 @@ function del_dev_attrib($device, $attrib_type)
   return dbDelete('devices_attribs', "`device_id` = ? AND `attrib_type` = ?", array($device['device_id'], $attrib_type));
 }
 
-function formatRates($rate)
+function formatRates($value, $round = '2', $sf = '3')
 {
-   $rate = format_si($rate) . "bps";
-   return $rate;
+   $value = format_si($value, $round, $sf) . "bps";
+   return $value;
 }
 
-function formatStorage($rate, $round = '2')
+function formatStorage($value, $round = '2', $sf = '3')
 {
-   $rate = format_bi($rate, $round) . "B";
-   return $rate;
+   $value = format_bi($value, $round) . "B";
+   return $value;
 }
 
-function format_si($rate, $round = 2)
+function format_si($value, $round = '2', $sf = '3')
 {
-  if($rate < "0")
+  if($value < "0")
   {
     $neg = 1;
-    $rate = $rate * -1;
+    $value = $value * -1;
   }
 
-  if ($rate >= "0.1")
+  if ($value >= "0.1")
   {
     $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
     $ext = $sizes[0];
-    for ($i = 1; (($i < count($sizes)) && ($rate >= 1000)); $i++) { $rate = $rate / 1000; $ext  = $sizes[$i]; }
+    for ($i = 1; (($i < count($sizes)) && ($value >= 1000)); $i++) { $value = $value / 1000; $ext  = $sizes[$i]; }
   }
   else
   {
     $sizes = Array('', 'm', 'u', 'n');
     $ext = $sizes[0];
-    for ($i = 1; (($i < count($sizes)) && ($rate != 0) && ($rate <= 0.1)); $i++) { $rate = $rate * 1000; $ext  = $sizes[$i]; }
+    for ($i = 1; (($i < count($sizes)) && ($value != 0) && ($value <= 0.1)); $i++) { $value = $value * 1000; $ext  = $sizes[$i]; }
   }
 
-  if($neg) { $rate = $rate * -1; }
+  if($neg) { $value = $value * -1; }
 
-  return round($rate, $round).$ext;
+  return format_number_short(round($value, $round),$sf).$ext;
 }
 
-function format_bi($value, $round = '2')
+function format_bi($value, $round = '2', $sf = '3')
 {
   if($value < "0")
   {
@@ -485,17 +494,19 @@ function format_bi($value, $round = '2')
   $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
   $ext = $sizes[0];
   for ($i = 1; (($i < count($sizes)) && ($value >= 1024)); $i++) { $value = $value / 1024; $ext  = $sizes[$i]; }
+
   if($neg) { $value = $value * -1; }
-  return round($value, $round).$ext;
+
+  return format_number_short(round($value, $round), $sf).$ext;
 }
 
-function format_number($value, $base = '1000', $round=2)
+function format_number($value, $base = '1000', $round=2, $sf=3)
 {
   if($base == '1000')
   {
-    return format_si($value, $round);
+    return format_si($value, $round, $sf);
   } else {
-    return format_bi($value, $round);
+    return format_bi($value, $round, $sf);
   }
 }
 

@@ -9,7 +9,7 @@ function format_bytes_billing($value)
 function format_bytes_billing_short($value)
 {
   global $config;
-  return format_number($value, $config['billing']['base'], 1);
+  return format_number($value, $config['billing']['base'], 2, 3);
 }
 
 
