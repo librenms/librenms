@@ -147,9 +147,6 @@
 	    $ave_count		= count($tot_data);
 	}
 	$decimal    = 0;
-#	$in_data    = formatScale($in_data, $max, $decimal);
-#	$out_data   = formatScale($out_data, $max, $decimal);
-#	$tot_data   = formatScale($tot_data, $max, $decimal);
 	$average    = $average / $ave_count;
 	for ($x=0;$x<=count($tot_data);$x++) {
 	    array_push($ave_data, $average);
@@ -161,8 +158,11 @@
     // Create the graph. These two calls are always required
     $graph = new Graph($xsize, $ysize, $graph_name);
     $graph->img->SetImgFormat("png");
+
+#    $graph->SetScale("textlin",0,0,$start,$end);
+
     $graph->SetScale("textlin");
-    $graph->title->Set("$graph_name");
+    #$graph->title->Set("$graph_name");
     $graph->title->SetFont(FF_FONT2, FS_BOLD, 10);
     $graph->SetMarginColor("white");
     $graph->SetFrame(false);
@@ -189,8 +189,8 @@
     // Create the bar plots
     $barplot_tot = new BarPlot($tot_data);
     $barplot_tot->SetLegend("Traffic total");
-    $barplot_tot->SetColor("#d5d5d5");
-    $barplot_tot->SetFillColor("#d5d5d5@0.5");
+    $barplot_tot->SetColor("darkred");
+    $barplot_tot->SetFillColor("lightred@0.4");
     $barplot_tot->value->Show();
     $barplot_tot->value->SetFormatCallback('format_bytes_billing_short');
 

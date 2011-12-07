@@ -63,7 +63,7 @@
   $in['per']          = round(($bill_data['total_data_in'] / $bill_data['total_data'] * 100), 2);
   $in['bg']           = get_percentage_colours($in['per']);
 
-  $out['data']        = format_number($bill_data['total_data_out'] , $config['billing']['base']);
+  $out['data']        = format_bytes_billing($bill_data['total_data_out']);
   $out['allow']       = $total['allow'];
   $out['ave']         = format_bytes_billing($bill_data['total_data_out'] / $cur_days);
   $out['est']         = format_bytes_billing($bill_data['total_data_out'] / $cur_days * $total_days);
@@ -84,7 +84,7 @@
     $background       = get_percentage_colours($per);
     $right_background = $background['right'];
     $left_background  = $background['left'];
-    $res              = print_percentage_bar(350, 20, $perc, NULL, "ffffff", $left_background, $per."%", "ffffff", $right_background);
+    $res              = print_percentage_bar(350, 20, $per, NULL, "ffffff", $left_background, $per."%", "ffffff", $right_background);
     return $res;
   }
 
@@ -165,9 +165,8 @@
   $mi .= "&amp;x=1190&amp;y=250";
   $mi .= "$type'>";
 
-  echo("<h3>Billing View</h3>$bi");
-  #echo("<h3>Previous Bill View</h3>$li");
-  echo("<h3>24 Hour View</h3>$di");
-  echo("<h3>Monthly View</h3>$mi");
+  echo("<h3>Billing Period View</h3>$bi");
+  echo("<h3>Rolling 24 Hour View</h3>$di");
+  echo("<h3>Rolling Monthly View</h3>$mi");
 
 ?>
