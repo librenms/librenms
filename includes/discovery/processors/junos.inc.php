@@ -14,7 +14,7 @@ if ($device['os'] == "junos")
   {
     foreach ($processors_array as $index => $entry)
     {
-      if ($entry['jnxOperatingDescr'] == "Routing Engine" || $entry['jnxOperatingDescr'] == "Processor" || $entry['jnxOperatingDRAMSize'] || $entry['jnxOperatingMemory'])
+      if (strlen(strstr($entry['jnxOperatingDescr'], "Routing Engine")) || $entry['jnxOperatingDRAMSize'] && !strpos($entry['jnxOperatingDescr'], "sensor") && !strstr($entry['jnxOperatingDescr'], "fan"))
       {
         if (stripos($entry['jnxOperatingDescr'], "sensor") || stripos($entry['jnxOperatingDescr'], "fan")) continue;
         if ($debug) { echo($index . " " . $entry['jnxOperatingDescr'] . " -> " . $entry['jnxOperatingCPU'] . " -> " . $entry['jnxOperatingDRAMSize'] . "\n"); }
