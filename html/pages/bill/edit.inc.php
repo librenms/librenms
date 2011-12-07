@@ -22,12 +22,12 @@ echo("
     </tr>
     <tr>
       <td width='300'><div align='right'>Monthly Quota</div></td>
-      <td colspan='3'><input name='bill_gb' size='20' value='" . $bill_data['bill_gb'] . "'></input>GB
+      <td colspan='3'><input name='bill_quota' size='20' value='" . $bill_data['bill_quota']/$config['billing']['base']/$config['billing']['base']/$config['billing']['base'] . "'></input>GB
       </td>
     </tr>
     <tr>
       <td width='300'><div align='right'>CDR with 95th</div></td>
-      <td colspan='3'><input name='bill_cdr' size='20' value='" . $bill_data['bill_cdr'] . "'></input>Kbps
+      <td colspan='3'><input name='bill_cdr' size='20' value='" . $bill_data['bill_cdr']/1000 . "'></input>Kbps
       </td>
     </tr>
     <tr>
