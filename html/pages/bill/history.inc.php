@@ -49,7 +49,7 @@
              <td>Inbound</td>
              <td>Outbound</td>
              <td>Total</td>
-             <td>95 percentile</td>
+             <td>95th %ile</td>
              <td style=\"text-align: center;\">Overusage</td>
              <td colspan=\"2\" style=\"text-align: right;\"><a href=\"".generate_url($vars, array('detail' => "all"))."\"><img src=\"images/16/chart_curve.png\" border=\"0\" align=\"absmiddle\" alt=\"Show details\" title=\"Show details\" /> Show all details</a></td>
            </tr>");
