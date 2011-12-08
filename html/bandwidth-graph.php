@@ -189,8 +189,8 @@
     // Create the bar plots
     $barplot_tot = new BarPlot($tot_data);
     $barplot_tot->SetLegend("Traffic total");
-    $barplot_tot->SetColor("darkred");
-    $barplot_tot->SetFillColor("lightred@0.4");
+    $barplot_tot->SetColor('darkgray');
+    $barplot_tot->SetFillColor('lightgray@0.4');
     $barplot_tot->value->Show();
     $barplot_tot->value->SetFormatCallback('format_bytes_billing_short');
 
