@@ -24,32 +24,31 @@
       $day_data = getDates($bill['bill_day']);
       $datefrom = $day_data['2'];
       $dateto   = $day_data['3'];
-//  foreach (dbFetchRows("SELECT * FROM `bill_hist` ORDER BY `bill_datefrom` AND `bill_dateto` DESC LIMIT 24") as $history)
-      foreach (dbFetchRows("SELECT * FROM `bill_hist` WHERE `bill_id` = ? AND `bill_datefrom` = ? AND `bill_dateto` = ? ORDER BY `bill_datefrom` AND `bill_dateto` LIMIT 1", array($bill['bill_id'], $datefrom, $dateto)) as $history)
+      foreach (dbFetchRows("SELECT * FROM `bill_history` WHERE `bill_id` = ? AND `bill_datefrom` = ? ORDER BY `bill_datefrom` LIMIT 1", array($bill['bill_id'], $datefrom, $dateto)) as $history)
       {
         unset($class);
         $type           = $history['bill_type'];
         $percent        = $history['bill_percent'];
         $dir_95th       = $history['dir_95th'];
-        $rate_95th      = formatRates($history['rate_95th'] * 1000);
-        $total_data     = formatStorage($history['traf_total'] * 1000 * 1000);
+        $rate_95th      = format_si($history['rate_95th'])."bps";
+        $total_data     = format_bytes_billing($history['traf_total']);
 
         $background = get_percentage_colours($percent);
         $row_colour = ((!is_integer($i/2)) ? $list_colour_a : $list_colour_b);
 
         if ($type == "CDR")
         {
-          $allowed = formatRates($history['bill_allowed'] * 1000);
-          $used    = formatRates($history['rate_95th'] * 1000);
-          $in      = formatRates($history['rate_95th_in'] * 1000);
-          $out     = formatRates($history['rate_95th_out'] * 1000);
-          $overuse = (($history['bill_overuse'] <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatRates($history['bill_overuse'] * 1000)."</span>");
+          $allowed = format_si($history['bill_allowed'])."bps";
+          $used    = format_si($history['rate_95th'])."bps";
+          $in      = format_si($history['rate_95th_in'])."bps";
+          $out     = format_si($history['rate_95th_out'])."bps";
+          $overuse = (($history['bill_overuse'] <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".format_si($history['bill_overuse'])."bps</span>");
         } elseif ($type == "Quota") {
-          $allowed = formatStorage($history['bill_allowed'] * 1000 * 1000);
-          $used    = formatStorage($history['total_data'] * 1000 * 1000);
-          $in      = formatStorage($history['traf_in'] * 1000 * 1000);
-          $out     = formatStorage($history['traf_out'] * 1000 * 1000);
-          $overuse = (($history['bill_overuse'] <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".formatStorage($history['bill_overuse'] * 1000 * 1000)."</span>");
+          $allowed = format_bytes_billing($history['bill_allowed']);
+          $used    = format_bytes_billing($history['total_data']);
+          $in      = format_bytes_billing($history['traf_in']);
+          $out     = format_bytes_billing($history['traf_out']);
+          $overuse = (($history['bill_overuse'] <= 0) ? "-" : "<span style=\"color: #".$background['left']."; font-weight: bold;\">".format_bytes_billing($history['bill_overuse'])."</span>");
         }
 
         $total_data     = (($type == "Quota") ? "<b>".$total_data."</b>" : $total_data);
@@ -58,7 +57,7 @@
         echo("
                <tr style=\"background: $row_colour;\">
                  <td></td>
-                 <td><a href=\"bill/".$bill['bill_id']."/\"><span style=\"font-weight: bold;\" class=\"interface\">".$bill['bill_name']."</a></span><br />from ".strftime("%x", strtotime($datefrom))." to ".strftime("%x", strtotime($dateto))."</td>
+                 <td><a href=\"".generate_url(array('page' => "bill", 'bill_id' => $bill['bill_id']))."/\"><span style=\"font-weight: bold;\" class=\"interface\">".$bill['bill_name']."</a></span><br />from ".strftime("%x", strtotime($datefrom))." to ".strftime("%x", strtotime($dateto))."</td>
                  <td>$type</td>
                  <td>$allowed</td>
                  <td>$in</td>
