@@ -32,7 +32,7 @@ if ($_SESSION['userlevel'] >= "7")
   if (function_exists('svn_log')) {
 
     $sep     = " | ";
-    $svnlogs = svn_log($file, SVN_REVISION_HEAD, NULL, 5);
+    $svnlogs = svn_log($file, SVN_REVISION_HEAD, NULL, 8);
     $revlist = array();
 
     foreach ($svnlogs as $svnlog) {
