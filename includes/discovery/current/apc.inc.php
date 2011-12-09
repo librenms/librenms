@@ -104,6 +104,56 @@ if ($device['os'] == "apc")
 
   unset($oids);
 
+ #Per Outlet Power Bar
+  $oids = snmp_walk($device, "1.3.6.1.4.1.318.1.1.26.9.4.3.1.1", "-t 30 -OsqnU", "PowerNet-MIB");
+  if ($oids)
+  {
+    echo("APC PowerNet-MIB Outlets ");
+    if ($debug) { echo($oids."\n"); }
+    $oids = trim($oids);
+    $type = "apc";
+    $precision = "10";
+
+    foreach (explode("\n", $oids) as $data)
+    {
+      $data = trim($data);
+      if ($data)
+      {
+        list($oid,$kind) = explode(" ", $data);
+        $split_oid = explode('.',$oid);
+
+        $index = $split_oid[count($split_oid)-1];
+
+	$voltage_oid    = "1.3.6.1.4.1.318.1.1.26.6.3.1.6";                     #rPDU2PhaseStatusVoltage
+
+        $current_oid        = "1.3.6.1.4.1.318.1.1.26.9.4.3.1.6.".$index;                #rPDU2OutletMeteredStatusCurrent
+	$limit_oid	= "1.3.6.1.4.1.318.1.1.26.9.4.1.1.7.".$index;			# rPDU2OutletMeteredConfigOverloadCurrentThreshold
+        $lowlimit_oid        = "1.3.6.1.4.1.318.1.1.26.9.4.1.1.7.".$index;                #rPDU2OutletMeteredConfigLowLoadCurrentThreshold
+        $warnlimit_oid        = "1.3.6.1.4.1.318.1.1.26.9.4.1.1.6.".$index;                #rPDU2OutletMeteredConfigNearOverloadCurrentThreshold
+	$name_oid	= "1.3.6.1.4.1.318.1.1.26.9.4.3.1.3.".$index;			#rPDU2OutletMeteredStatusName
+
+	
+	$voltage   = snmp_get($device, $voltage_oid, "-Oqv", "");
+
+        $current   = snmp_get($device, $current_oid, "-Oqv", "") / $precision;
+        $limit     = snmp_get($device, $limit_oid, "-Oqv", "") / $voltage;
+        $lowlimit  = snmp_get($device, $lowlimit_oid, "-Oqv", "") / $voltage;
+        $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", "") / $voltage;
+	$descr 	   = "Outlet " . $index . " - " .  snmp_get($device, $name_oid, "-Oqv", "");
+
+        discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);
+
+      }
+    }
+
+  }
+
+
+
+   unset($oids);
+
+
+
   # ATS
   $oids = snmp_walk($device, "atsConfigPhaseTableIndex", "-OsqnU", "PowerNet-MIB");
   if ($oids)
