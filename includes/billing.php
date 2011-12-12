@@ -117,7 +117,7 @@ function get95thin($bill_id,$datefrom,$dateto)
   $measurement_95th = round($measurements /100 * 95) - 1;
 
   $q_95_sql = "SELECT (in_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
-  $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY in_delta ASC";
+  $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY rate ASC";
   $a_95th = dbFetchColumn($q_95_sql);
   $m_95th = $a_95th[$measurement_95th];
 
@@ -132,7 +132,7 @@ function get95thout($bill_id,$datefrom,$dateto)
   $measurement_95th = round($measurements /100 * 95) - 1;
 
   $q_95_sql = "SELECT (out_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = '".mres($bill_id)."'";
-  $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY out_delta ASC";
+  $q_95_sql .= " AND timestamp > '".mres($datefrom)."' AND timestamp <= '".mres($dateto)."' ORDER BY rate ASC";
 
   $a_95th = dbFetchColumn($q_95_sql);
   $m_95th = $a_95th[$measurement_95th];
