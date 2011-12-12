@@ -7,6 +7,7 @@ switch ($sensor['entSensorType'])
   case 'celsius':
   case 'watts':
   case 'voltsDC':
+  case 'dBm':
   case 'amperes':
     $scale_min = "0";
     break;
