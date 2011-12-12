@@ -19,7 +19,8 @@ $supported_sensors = array('current' => 'A',
                            'fanspeed' => 'rpm',
                            'power' => 'W',
                            'voltage' => 'V',
-                           'temperature' => 'C');
+                           'temperature' => 'C',
+                           'dbm' => 'dBm');
 
 foreach ($supported_sensors as $sensor_type => $sensor_unit)
 {
