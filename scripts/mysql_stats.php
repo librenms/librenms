@@ -57,7 +57,7 @@ $chk_options = array (
 );
 
 $use_ss    = FALSE; # Whether to use the script server or not
-$debug     = TRUE; # Define whether you want debugging behavior.
+$debug     = FALSE; # Define whether you want debugging behavior.
 $debug_log = FALSE; # If $debug_log is a filename, it'll be used.
 
 # ============================================================================
@@ -179,7 +179,7 @@ function validate_options($options) {
 # Print out a brief usage summary
 # ============================================================================
 function usage($message) {
-   global $mysql_user, $mysql_pass, $mysql_port, $heartbeat;
+   global $mysql_host, $mysql_user, $mysql_pass, $mysql_port, $heartbeat;
 
    $usage = <<<EOF
 $message
@@ -246,19 +246,19 @@ function parse_cmdline( $args ) {
 function ss_get_mysql_stats( $options ) {
    # Process connection options and connect to MySQL.
    global $debug, $mysql_user, $mysql_pass, $heartbeat, $cache_dir, $poll_time,
-          $chk_options, $mysql_port, $mysql_ssl;
+          $chk_options, $mysql_host, $mysql_port, $mysql_ssl;
 
    # Connect to MySQL.
    $user = isset($options['user']) ? $options['user'] : $mysql_user;
    $pass = isset($options['pass']) ? $options['pass'] : $mysql_pass;
    $port = isset($options['port']) ? $options['port'] : $mysql_port;
-   $port = isset($options['host']) ? $options['host'] : $mysql_host;
+   $host = isset($options['host']) ? $options['host'] : $mysql_host;
 
    $heartbeat = isset($options['heartbeat']) ? $options['heartbeat'] : $heartbeat;
    # If there is a port, or if it's a non-standard port, we add ":$port" to the
    # hostname.
-   $host_str  = $options['host']
-              . (isset($options['port']) || $port != 3306 ? ":$port" : '');
+   $host_str  = $host
+              . $port != 3306 ? ":$port" : '';
    debug(array('connecting to', $host_str, $user, $pass));
    if (!extension_loaded('mysql') ) {
       debug("The MySQL extension is not loaded");
@@ -274,10 +274,9 @@ function ss_get_mysql_stats( $options ) {
       die("MySQL: " . mysql_error());
    }
 
-   $sanitized_host
-       = str_replace(array(":", "/"), array("", "_"), $options['host']);
+   $sanitized_host = str_replace(array(":", "/"), array("", "_"), $host);
    $cache_file = "$cache_dir/$sanitized_host-mysql_cacti_stats.txt"
-               . (isset($options['port']) || $port != 3306 ? ":$port" : '');
+               . $port != 3306 ? ":$port" : '';
    debug("Cache file is $cache_file");
 
    # First, check the cache.
