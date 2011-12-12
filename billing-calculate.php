@@ -11,9 +11,7 @@ $options = getopt("r");
 
 if (isset($options['r'])) { echo("Clearing history table.\n"); mysql_query("TRUNCATE TABLE `bill_history`"); }
 
-
-
-foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
+foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_id`") as $bill)
 {
 
   echo(str_pad($bill['bill_id']." ".$bill['bill_name'], 30)." \n");
@@ -96,16 +94,12 @@ foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
                          'traf_total' => $rate_data['total_data'],
                          'traf_in' => $rate_data['total_data_in'],
                          'traf_out' => $rate_data['total_data_out'],
-                         'bill_datefrom' => $datefrom,
-                         'bill_dateto' => $dateto,
-                         'bill_type' => $type,
-                         'bill_allowed' => $allowed,
                          'bill_used' => $used,
                          'bill_overuse' => $overuse,
                          'bill_percent' => $percent,
                          'updated' => array('NOW()'));
 
-        dbUpdate($update, 'bill_history', '`bill_hist_id` = ?', array($bill['bill_id']));
+        dbUpdate($update, 'bill_history', '`bill_hist_id` = ?', array($check['bill_hist_id']));
         echo(" Updated history! ");
 
       } else {
@@ -129,7 +123,6 @@ foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
 			 'bill_datefrom' => $datefrom,
                          'bill_dateto' => $dateto,
                          'bill_id' => $bill['bill_id'] );
-#       print_r($update);
         dbInsert($update, 'bill_history');
         echo(" Generated history! ");
       }
