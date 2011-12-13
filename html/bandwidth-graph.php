@@ -68,7 +68,7 @@
 
     if ($imgtype == "historical") {
 	$i		= "0";
-	foreach (dbFetchRows("SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` LIMIT 12", array($bill_id)) as $data) {
+	foreach (dbFetchRows("SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 12", array($bill_id)) as $data) {
 
 	    $datefrom		= strftime("%e %b %Y", strtotime($data['bill_datefrom']));
 	    $dateto		= strftime("%e %b %Y", strtotime($data['bill_dateto']));
