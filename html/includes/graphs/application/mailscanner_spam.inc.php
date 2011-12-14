@@ -23,8 +23,6 @@ if (is_file($rrd_filename))
     $rrd_list[$i]['colour']   = $vars['colour'];
     $i++;
   }
-} else {
-  echo("file missing: $file");
 }
 
 include("includes/graphs/generic_multi_simplex_seperated.inc.php");

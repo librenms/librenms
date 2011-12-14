@@ -29,8 +29,6 @@ if (is_file($rrd_filename))
     $i++;
     $x++;
   }
-} else {
-  echo("file missing: $file");
 }
 
 include("includes/graphs/generic_multi_line.inc.php");
