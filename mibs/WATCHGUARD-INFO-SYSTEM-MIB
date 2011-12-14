@@ -1,0 +1,50 @@
+WATCHGUARD-INFO-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        OBJECT-IDENTITY, enterprises       FROM SNMPv2-SMI
+        DateAndTime                        FROM SNMPv2-TC
+        watchguard                         FROM WATCHGUARD-MIB;
+        
+    wgInfoModule MODULE-IDENTITY
+        LAST-UPDATED "200701251200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "   Ella Yu
+                      WatchGuard Technologies, Inc.
+                      1841 Zanker Road
+                      San Jose, CA 95112
+                      USA
+
+                      408-519-4888
+                      ella.yu@watchguard.com "
+
+        DESCRIPTION
+            "The MIB module describes general information
+            of WatchGuard system.  Mainly, the information 
+            obtained from this MIB is used by wgInfoSystemMIB,
+            wgClientMIB, wgSystemStatisticsMIB, wgIpsecTunnelMIB."
+
+
+        REVISION      "200701251200Z"
+        DESCRIPTION
+            "Initial revision."
+        ::= { watchguard 6 }
+
+
+    wgInfoSystem OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base system information for all wg Client
+             branches."
+        ::= { wgInfoModule 1 }
+
+    wgInfoSystemCurrentTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The host's notion of the local date and time of day." 
+        ::= {wgInfoSystem 1}
+
+END

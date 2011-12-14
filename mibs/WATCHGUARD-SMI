@@ -1,0 +1,42 @@
+WATCHGUARD-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+
+watchguard MODULE-IDENTITY
+    LAST-UPDATED "200811100000Z"
+    ORGANIZATION "WatchGuard Technologies, Inc."
+    CONTACT-INFO
+            "     Ella Yu
+                  WatchGuard Technologies, Inc.
+                  15901 Red Hill Avenue, Suite 202
+                  Tustin, CA 92780
+                  USA
+
+                  714-258-4598
+                  ella.yu@watchguard.com "
+    DESCRIPTION
+            "The Structure of Management Information for 
+            the WatchGuard enterprise."
+    REVISION        "200811100000Z"
+    DESCRIPTION
+            "Initial version."
+    ::= { enterprises 3097 }
+
+wgProducts OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+            "wgProducts is the root OBJECT IDENTIFIER of
+            WatchGuard Product OIDs."
+    ::= { watchguard 1 }
+
+wgSystemConfigMIB OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+            "wgSystemConfig is the root OBJECT IDENTIFIER of
+            WatchGuard Firebox system configurations."
+    ::= { watchguard 2 }
+
+END
