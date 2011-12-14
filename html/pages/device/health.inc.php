@@ -27,7 +27,7 @@ if ($volts) { $datas[] = 'voltage'; }
 if ($freqs) { $datas[] = 'frequency'; }
 if ($current) { $datas[] = 'current'; }
 if ($power) { $datas[] = 'power'; }
-if ($dBm) { $datas[] = 'dBm'; }
+if ($dBm) { $datas[] = 'dbm'; }
 
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
@@ -41,7 +41,7 @@ $type_text['fanspeed'] = "Fanspeed";
 $type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
 $type_text['power'] = "Power";
-$type_text['dBm'] = "dBm";
+$type_text['dbm'] = "dBm";
 
 $link_array = array('page'    => 'device',
                     'device'  => $device['device_id'],
