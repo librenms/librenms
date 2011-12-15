@@ -8,7 +8,20 @@ echo("<td width=100 class=list-large> Vlan " . $vlan['vlan_vlan'] . "</td>");
 echo("<td width=200 class=box-desc>" . $vlan['vlan_descr'] . "</td>");
 echo("<td class=list-bold>");
 
-foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?", array($device['device_id'], $vlan['vlan_vlan'])) as $port)
+  $vlan_ports = array();
+  $otherports = dbFetchRows("SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.interface_id = V.interface_id", array($device['device_id'], $vlan['vlan_vlan']));
+  foreach($otherports as $otherport)
+  {
+   $vlan_ports[$otherport[ifIndex]] = $otherport;
+  }
+  $otherports = dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?", array($device['device_id'], $vlan['vlan_vlan']));
+  foreach($otherports as $otherport)
+  {
+   $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
+  }
+  ksort($vlan_ports);
+
+foreach ($vlan_ports as $port)
 {
   $port = ifLabel($port, $device);
   if ($vars['view'] == "graphs")
@@ -29,6 +42,8 @@ foreach (dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?
   {
     echo($vlan['port_sep'] . generate_port_link($port, makeshortif($port['label'])));
     $vlan['port_sep'] = ", ";
+    if($port['untagged']) { echo("(U)"); }
+
   }
 }
 
