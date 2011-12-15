@@ -27,7 +27,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
     {
       # Check if we are using SSH if we can log in without password - without blocking the discovery
       # Also automatically add the host key so discovery doesn't block on the yes/no question, and run echo so we don't get stuck in a remote shell ;-)
-      exec('ssh -o "StrictHostKeyChecking no" -o "PreferredAuthentications publickey" -o "IdentitiesOnly yes" ' . $device['hostname'] . ' echo', $out, $ret);
+      exec('ssh -o "StrictHostKeyChecking no" -o "PreferredAuthentications publickey" -o "IdentitiesOnly yes" ' . $device['hostname'] . ' echo -e', $out, $ret);
       if ($ret != 255) { $ssh_ok = 1; }
     }
 
