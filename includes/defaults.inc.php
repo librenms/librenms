@@ -41,7 +41,7 @@ $config['sfdp']           = "/usr/bin/sfdp";
 
 if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
 {
-  $config['base_url']             = "http://" . $_SERVER["SERVER_NAME"] .":".$_SERVER["SERVER_PORT"]."/";
+  $config['base_url']  = "http://" . $_SERVER["SERVER_NAME"] .":".$_SERVER["SERVER_PORT"]."/";
 }
 
 $config['title_image']      = "images/observium-logo.png";
@@ -54,7 +54,7 @@ $config['front_page']       = "pages/front/default.php";
 $config['page_title']       = "Observium :: Network Observation and Monitoring";
 $config['timestamp_format'] = 'd-m-Y H:i:s';
 $config['page_gen']         = 1;
-$config['web_header']            = "header.inc.php";  # in html/includes
+$config['web_header']       = "header.inc.php";  # in html/includes
 $config['login_message']    = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
 
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
