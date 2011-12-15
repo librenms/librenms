@@ -88,9 +88,34 @@ if ($device['os_group'] == "ios")
   $port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortEncapsulationOperType", $port_stats, "CISCO-VTP-MIB");
   $port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortNativeVlan", $port_stats, "CISCO-VTP-MIB");
 
-}
+} else
+{
+  $port_stats = snmpwalk_cache_oid($device, "dot1qPortVlanTable", $port_stats, "Q-BRIDGE-MIB");
 
-$port_stats = snmpwalk_cache_oid($device, "dot1qPortVlanTable", $port_stats, "Q-BRIDGE-MIB");
+  $vlan_ports = snmpwalk_cache_twopart_oid($device, "dot1qVlanCurrentEgressPorts", $vlan_stats, "Q-BRIDGE-MIB");
+  $vlan_ifindex_map = snmpwalk_cache_oid($device, "dot1dBasePortIfIndex", $vlan_stats, "Q-BRIDGE-MIB");
+
+  foreach ($vlan_ports as $instance)
+  {
+    foreach (array_keys($instance) as $vlan_id)
+    {
+      $parts = explode(' ',$instance[$vlan_id]['dot1qVlanCurrentEgressPorts']);
+      $binary = '';
+      foreach ($parts as $part)
+      {
+        $binary .= zeropad(decbin($part),8);
+      }
+      for ($i = 0; $i < strlen($binary); $i++)
+      {
+        if ($binary[$i])
+        {
+          $ifindex = $i; // FIXME $vlan_ifindex_map[$i]
+          $q_bridge_mib[$ifindex][] = $vlan_id;
+        }
+      }
+    }
+  }
+}
 
 $polled = time();
 
@@ -131,14 +156,10 @@ echo("\n");
 /// Loop ports in the DB and update where necessary
 foreach ($ports as $port)
 {
-
   echo ("Port " . $port['ifDescr'] . "(".$port['ifIndex'].") ");
   if ($port_stats[$port['ifIndex']] && $port['disabled'] != "1")
   { /// Check to make sure Port data is cached.
     $this_port = &$port_stats[$port['ifIndex']];
-
-    #print_r($port);
-    #print_r($this_port);
 
     if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $this_port['ifDescr'], $matches)) { $this_port['ifDescr'] = $matches[1]; }
     $polled_period = $polled - $port['poll_time'];
@@ -157,7 +178,6 @@ foreach ($ports as $port)
     }
 
     /// rewrite the ifPhysAddress
-
     if (strpos($this_port['ifPhysAddress'], ":"))
     {
       list($a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(":", $this_port['ifPhysAddress']);
@@ -194,7 +214,7 @@ foreach ($ports as $port)
       $this_port['ifDuplex'] = $this_port['dot3StatsDuplexStatus'];
     }
 
-    /// Set VLAN and Trunk
+    /// Set VLAN and Trunk from Cisco
     if (isset($this_port['vlanTrunkPortEncapsulationOperType']) && $this_port['vlanTrunkPortEncapsulationOperType'] != "notApplicable")
     {
       $this_port['ifTrunk'] = $this_port['vlanTrunkPortEncapsulationOperType'];
@@ -202,10 +222,12 @@ foreach ($ports as $port)
     }
     $this_port['ifVlan']  = $this_port['vmVlan'];
 
+    /// Set VLAN and Trunk from Q-BRIDGE-MIB
     if (!isset($this_port['ifVlan']) && isset($this_port['dot1qPvid']))
     {
       $this_port['ifVlan'] = $this_port['dot1qPvid'];
     }
+    # FIXME use $q_bridge_mib[$this_port['ifIndex'] to see if it is a trunk (>1 array count)
 
     echo("VLAN == ".$this_port['ifVlan']);
 
