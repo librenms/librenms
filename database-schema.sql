@@ -1192,5 +1192,17 @@ CREATE TABLE IF NOT EXISTS `bill_history` (
   KEY `bill_id` (`bill_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
 
-CREATE TABLE IF NOT EXISTS `entPhysical_state` (  `device_id` int(11) NOT NULL,  `entPhysicalIndex` varchar(64) NOT NULL,  `subindex` varchar(64) DEFAULT NULL,  `group` varchar(64) NOT NULL,  `key` varchar(64) NOT NULL,  `value` varchar(255) NOT NULL,  KEY `device_id_index` (`device_id`,`entPhysicalIndex`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `entPhysical_state` (  `device_id` int(11) NOT NULL,  `entPhysicalIndex` varchar(64) NOT NULL,  `subindex` varchar(64) DEFAULT NULL,  `group` varchar(64) NOT NULL,  `key` varchar(64) NOT NULL,  `value` varchar(255) NOT NULL,  KEY `device_id_index` (`device_id`,`entPhysicalIndex`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `ports_vlans` (
+  `port_vlan_id` int(11) NOT NULL AUTO_INCREMENT,
+  `device_id` int(11) NOT NULL,
+  `interface_id` int(11) NOT NULL,
+  `vlan` int(11) NOT NULL,
+  `baseport` int(11) NOT NULL,
+  `priority` bigint(32) NOT NULL,
+  `state` varchar(16) NOT NULL,
+  `cost` int(11) NOT NULL,
+  PRIMARY KEY (`port_vlan_id`),
+  UNIQUE KEY `unique` (`device_id`,`interface_id`,`vlan`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
