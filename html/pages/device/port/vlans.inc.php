@@ -4,7 +4,7 @@ $vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`in
 
 echo('<table border="0" cellspacing="0" cellpadding="5" width="100%">');
 
-echo("<tr><td>VLAN</td><td>Description</td><td>Cost</td><td>Priority</td><td>State</td><td>Other Ports</td></tr>");
+echo("<tr><th>VLAN</th><th>Description</th><th>Cost</th><th>Priority</th><th>State</th><th>Other Ports</th></tr>");
 
 $row=0;
 foreach($vlans as $vlan)
@@ -19,19 +19,16 @@ foreach($vlans as $vlan)
   echo("<td>".$vlan['cost']."</td><td>".$vlan['priority']."</td><td>".$vlan['state']."</td>");
 
   $vlan_ports = array();
-
   $otherports = dbFetchRows("SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.interface_id = V.interface_id", array($device['device_id'], $vlan['vlan']));
   foreach($otherports as $otherport)
   {
    $vlan_ports[$otherport[ifIndex]] = $otherport;
   }
-
   $otherports = dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?", array($device['device_id'], $vlan['vlan']));
   foreach($otherports as $otherport)
   {
-   $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('access' => '1'));
+   $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
   }
-
   ksort($vlan_ports);
 
   echo("<td>");
@@ -39,7 +36,7 @@ foreach($vlans as $vlan)
   foreach($vlan_ports as $otherport)
   {
     echo($vsep.generate_port_link($otherport, makeshortif($otherport['ifDescr'])));
-    if($otherport['access']) { echo("(A)"); }
+    if($otherport['untagged']) { echo("(U)"); }
     $vsep=", ";
   }
   echo("</td>");
