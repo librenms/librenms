@@ -34,24 +34,7 @@ if ($vlanversion == 'version1')
     $this_vlans[] = $vlan;
   }
 
-  $device_vlans = mysql_query("SELECT * FROM `vlans` WHERE `device_id` = '" . $device['device_id'] . "'");
-  while ($dev_vlan = mysql_fetch_assoc($device_vlans))
-  {
-    unset($vlan_exists);
-    foreach ($this_vlans as $test_vlan)
-    {
-      if ($test_vlan == $dev_vlan['vlan_vlan']) { $vlan_exists = 1; }
-    }
-    if (!$vlan_exists)
-    {
-      mysql_query("DELETE FROM `vlans` WHERE `vlan_id` = '" . $dev_vlan['vlan_id'] . "'");
-      echo("-");
-      if ($debug) { echo("Deleted VLAN ". $dev_vlan['vlan_vlan'] ."\n"); }
-    }
-  }
 }
-
-unset($this_vlans);
 
 echo("\n");
 
