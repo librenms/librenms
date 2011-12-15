@@ -89,7 +89,15 @@ if ($port[ifDuplex] != "unknown") { echo("<span class=box-desc>" . $port['ifDupl
 if ($device['os'] == "ios" || $device['os'] == "iosxe")
 {
   if ($port['ifTrunk']) {
-    echo("<p class=box-desc><span class=purple>" . $port['ifTrunk'] . "</span></p>");
+
+    echo('<p class=box-desc><span class=purple><a title="');
+    $vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`interface_id` ='".$port['interface_id']."' and PV.`device_id` = '".$device['device_id']."' AND V.`vlan_vlan` = PV.vlan AND V.device_id = PV.device_id");
+    foreach($vlans as $vlan)
+    {
+      if($vlan['state'] == "blocking") { $class="red"; } elseif ($vlan['state'] == "forwarding" ) { $class="green"; } else { $class = "none"; }
+      echo("<b class=".$class.">".$vlan['vlan'] ."</b> ".$vlan['vlan_descr']."<br />");
+    }
+    echo('">'.$port['ifTrunk'].'</a></span></p>');
   } elseif ($port['ifVlan']) {
     echo("<p class=box-desc><span class=blue>VLAN " . $port['ifVlan'] . "</span></p>");
   } elseif ($port['ifVrf']) {
