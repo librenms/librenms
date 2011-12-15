@@ -1,15 +1,15 @@
 #!/usr/bin/env php
 <?php
 
-include("includes/defaults.inc.php");
-include("config.php");
-include("includes/functions.php");
+include("../includes/defaults.inc.php");
+include("../config.php");
+include("../includes/functions.php");
 
 $link = mysql_connect($config['db_host'], $config['db_user'], $config['db_pass']);
 $db = mysql_select_db($config['db_name'], $link);
 
 
-$query = "SELECT * FROM ipaddr AS A, ports as I, devices as D WHERE A.interface_id = I.interface_id AND I.device_id = D.device_id AND D.os = 'ios'";
+$query = "SELECT * FROM ipv4_addresses AS A, ports as I, devices as D WHERE A.interface_id = I.interface_id AND I.device_id = D.device_id AND D.os = 'ios'";
 $data = mysql_query($query, $link);
 while($ip = mysql_fetch_array($data)) {
   unset($sub);
@@ -17,21 +17,19 @@ while($ip = mysql_fetch_array($data)) {
 
   $real_hostname = $hostname;
 
-  $hostname = str_replace(".jtibs.net", "", $hostname);
-  $hostname = str_replace(".wtibs.net", "", $hostname);
   $hostname = str_replace(".jerseytelecom.net", "", $hostname);
 
   list($cc, $loc, $host) = explode(".", $hostname);
   if($host) {
-    $hostname = "$host.$loc.$cc.v4.jerseytelecom.net";
+    $hostname = "$host.$loc.$cc.v4.data.net.uk";
   } else {
     $host = $cc; unset ($cc);
-    $hostname = "$host.v4.jerseytelecom.net";
+    $hostname = "$host.v4.data.net.uk";
   }
 
   $interface = $ip['ifDescr'];
-  $address = $ip['addr'];
-  $cidr = $ip['cidr'];
+  $address = $ip['ipv4_address'];
+  $cidr = $ip['ipv4_prefixlen'];
   $interface = strtolower(makeshortif(fixifname($interface)));
   $interface = str_replace("/", "-", $interface);
   $interface = str_replace(":", "_", $interface);

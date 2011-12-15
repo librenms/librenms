@@ -67,6 +67,10 @@ if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$po
 if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '".$port['ifIndex']."' and `device_id` = '".$device['device_id']."'") )
 {  $menu_options['pagp'] = 'PAgP'; }
 
+if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `interface_id` = '".$port['interface_id']."' and `device_id` = '".$device['device_id']."'") )
+{  $menu_options['vlans'] = 'VLANs'; }
+
+
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
