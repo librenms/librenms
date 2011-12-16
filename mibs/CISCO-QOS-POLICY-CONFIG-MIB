@@ -1,0 +1,573 @@
+ -- *****************************************************************
+ -- CISCO-QOS-POLICY-CONFIG-MIB: Mib for QoS policy configuration.
+ --
+ -- November 2000, Frank Chao
+ --
+ -- Copyright (c) 2000 by Cisco Systems, Inc.
+ -- All rights reserved.
+ -- *****************************************************************
+ --
+
+CISCO-QOS-POLICY-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+   
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+ 
+    TruthValue,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+ 
+    ifIndex
+        FROM IF-MIB
+ 
+    ciscoMgmt
+        FROM CISCO-SMI
+
+    QosInterfaceQueueType
+        FROM CISCO-QOS-PIB-MIB
+    ;
+ 
+ciscoQosPolicyConfigMIB    MODULE-IDENTITY
+    LAST-UPDATED    "200011021030Z"
+    ORGANIZATION    "Cisco Systems Inc."
+    CONTACT-INFO
+        "Cisco Systems
+         Customer Service
+ 
+         Postal: 170 W. Tasman Drive
+         San Jose, CA 95134, USA
+ 
+         Tel: +1 800 553-NETS
+ 
+         E-mail: cs-wbu@cisco.com"
+    DESCRIPTION
+        "This MIB module defines managed objects that support the
+        policy source configuration of Quality of Service (QoS) on
+        the device.
+ 
+        Terminology :
+ 
+        Common Open Policy Service (COPS) : A client/server model for
+        supporting policy control over QoS Signaling Protocols and
+        provisioned QoS resource management, etc.  COPS is a query and
+        response protocol that can be used to exchange policy
+        information between a policy server (Policy Decision Point or
+        PDP) and its clients (Policy Enforcement Points or PEPs).
+ 
+        Policy Information Base (PIB) : The database of policy
+        information stored in the COPS client device.
+ 
+        QoS : The method which attempts to ensure that the network
+        requirements of different applications can be met by giving
+        preferential forwarding treatment to some traffic, perhaps at
+        the expense of other traffic.
+ 
+        QoS policy : a set of parameters used to achieve QoS purpose.
+        The device uses these parameters in flow classification, flow
+        scheduling, flow policing and codepoint mutation.
+ 
+        RSVP : Resource Reservation Protocol.  RSVP is a signaling
+        mechanism that the application will use to signal parameters
+        to the network, so that network can assign QoS for the
+        application data stream.
+
+        COPS-PR : a COPS client type which supports device's
+        provisioning of QoS policy.
+
+        COPS-RSVP : a COPS client type which supports device's
+        outsourcing of QoS policy (RSVP).
+
+        "
+
+    REVISION    "200011021030Z"
+    DESCRIPTION
+        "Revised version from CISCO-QOS-CONFIG-MIB.  The original OID is
+         assigned to CISCO-QOS-CONFIG-MIB and then after discussing
+         with people in COPS group, we decided to change the name of the
+         MIB. And also adding some objects to reflect the difference
+         between users' QoS policy configuration and runtime QoS policy
+         configuration." 
+
+    REVISION    "200002261930Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+ 
+--        REFERENCE
+--            "See also CISCO-COPS-CLIENT-MIB and CISCO-QOS-PIB-MIB."
+
+    ::= { ciscoMgmt 159 }
+ 
+ -- Textual Conventions used in the Qos Config MIB.
+ 
+QosPolicySource ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION 
+        "The source where a device obtains QoS policy.
+ 
+        none (1) indicates that there is no QoS policy applied on this
+        device.  And this value only can be read and cannot be set by
+        the users.
+ 
+        local (2) indicates that the QoS policy is from local device
+        configuration.  For example, the QoS policy can be configured
+        through command line interface (CLI).
+ 
+        cops (3) indicates that the QoS policy is from a COPS server."
+    SYNTAX    INTEGER {
+                  none (1),   -- read-only, users cannot set this value.
+                  local (2),
+                  cops  (3)
+              }
+ 
+--
+-- Overview of MIB Objects:
+--
+
+ciscoQosPolicyConfigMIBObjects OBJECT IDENTIFIER
+    ::= { ciscoQosPolicyConfigMIB 1 }
+ 
+-- object groups
+ 
+qosPolicyGlobalObjects          OBJECT IDENTIFIER
+    ::= { ciscoQosPolicyConfigMIBObjects 1 }
+ 
+qosPolicyInterfaceObjects       OBJECT IDENTIFIER
+    ::= { ciscoQosPolicyConfigMIBObjects 2 }
+
+--
+--
+-- The qosPolicyGlobalObjects group
+--
+--
+ 
+qosEnabled  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the QoS feature is enabled on the device.
+ 
+        true(1) means that the QoS feature is enabled on this device.
+ 
+        false(2) means that the QoS feature is disabled. All the QoS
+        policy on the device will be ignored."
+    DEFVAL { false }
+    ::= { qosPolicyGlobalObjects 1 }
+ 
+qosPrAdminPolicySource OBJECT-TYPE
+    SYNTAX     QosPolicySource
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Indicates the desired source of a device's provisioning of
+        QoS policy for the whole device.
+
+        Actually, the source of an interface's provisioning of QoS
+        policy is controlled by two level configurations.  The first
+        level is the system level to be the global control for the
+        whole device.  This object is for the system level.  The second
+        level is for each individual interface.  The 
+        qosPrIfAdminPolicySource is for the interface level.  So, the
+        value of this object will decide that the value of
+        qosPrIfAdminPolicySource can take precedence or not.  If this
+        object is configured to cops(3), the value of
+        qosPrIfAdminPolicySource has the precedence configuration of
+        the interface's provisioning of QoS policy source.
+
+        That is to say if this object is configured to local(2), then
+        the value of qosPrIfAdminPolicySource will be ignored.  It
+        means the provisioning of QoS policy source of all the
+        interfaces in this device will be from local information if
+        this MIB is configured to local(2).
+
+        If this object is configured to cops(3), then the final
+        provisioning of QoS policy of an interface is determined by the
+        configuration of the qosPrIfAdminPolicySource object of that
+        interface.
+
+        Changing qosPrIfAdminPolicySource of an interface from cops(3)
+        to local(2) while the value of this object is cops(3) makes the
+        interface discard the QoS provisioning policy from the COPS
+        server and uses the local QoS provisioning policy configuration
+        instead."
+    DEFVAL { local }
+    ::= { qosPolicyGlobalObjects 2 }
+ 
+qosPrOperPolicySource OBJECT-TYPE
+    SYNTAX     QosPolicySource
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the operational source of a device's provisioning of
+        QoS policy.
+
+        Note that when qosPrAdminPolicySource transitions to cops(3),
+        qosPrOperPolicySource will normally also transition to
+        cops(3).  In this situation, it is possible that
+        qosPrOperPolicySource's transition will not occur immediately
+        because the system is initializing the COPS function at the
+        system booting up time, but rather after a small time lag to
+        complete certain operations before going 'cops'."
+    ::= { qosPolicyGlobalObjects 3 }
+ 
+qosRsvpAdminPolicySource OBJECT-TYPE
+    SYNTAX     QosPolicySource
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Indicates the desired source of a device's outsourcing of QoS
+        policy.  Outsourcing means the policy information is from
+        outside source not from local information."
+    DEFVAL { local }
+    ::= { qosPolicyGlobalObjects 4 }
+ 
+qosRsvpOperPolicySource OBJECT-TYPE
+    SYNTAX     QosPolicySource
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the current operational source of a device's
+        outsourcing of QoS policy.
+
+        Note that when qosRsvpAdminPolicySource transitions to
+        cops(3), qosRsvpOperPolicySource will normally also transition
+        to cops(3).  In this situation, it is possible that
+        qosRsvpOperPolicySource's transition will not occur
+        immediately because the system is initializing the COPS
+        function at the system boot up time, but rather after a small
+        time lag to complete certain operations before going 'cops'."
+    ::= { qosPolicyGlobalObjects 5 }
+
+qosCopsPolicyStatus    OBJECT-TYPE
+    SYNTAX     INTEGER { keep(1), discard(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object indicates whether the QoS policy downloaded from
+        COPS server should be kept or discarded by the system while
+        the COPS function is not running in the system or the
+        connection between PDP and PEP is lost or any other reason
+        that system cannot get the QoS policy from COPS server."
+    ::= { qosPolicyGlobalObjects 6 }
+ 
+-- 
+-- The qosPrIfObjects group
+-- 
+ 
+qosPrIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosPrIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of interface entries.  An entry will exist for each
+        interface which can support the provisioning of QoS policy
+        feature."
+    ::= { qosPolicyInterfaceObjects 1 }
+ 
+qosPrIfEntry OBJECT-TYPE
+    SYNTAX      QosPrIfEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the configuration of provisioning of QoS
+        policy of a particular interface."
+    INDEX { ifIndex }
+    ::= { qosPrIfTable 1 }
+ 
+QosPrIfEntry ::= SEQUENCE {
+    qosPrIfAdminPolicySource    QosPolicySource,
+    qosPrIfOperPolicySource     QosPolicySource 
+}
+ 
+qosPrIfAdminPolicySource  OBJECT-TYPE
+    SYNTAX   QosPolicySource
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the desired source of QoS provision policy for
+        this interface.
+ 
+        This object is only effective when the value of
+        qosPrOperPolicySource is cops(3) and the value of qosEnabled
+        is true(1)."
+    DEFVAL { cops }
+    ::= { qosPrIfEntry 1 }
+ 
+qosPrIfOperPolicySource  OBJECT-TYPE
+    SYNTAX   QosPolicySource
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the operational source of QoS provisioning policy
+        for this interface.
+ 
+        When the value of the object qosPrOperPolicySource is
+        local(2), the QoS provisioning policy for this interface is
+        taken from device's local configuration.  If
+        qosPrOperPolicySource is configured to cops(3), the current
+        operational source of QoS provisioning policy will depend on
+        the configuration of qosPrIfAdminPolicySource object.
+
+        Here is the logic.
+
+        IF qosPrOperPolicySource == local(2)
+        THEN qosPrIfOperPolicySource is local(2)
+        ELSE
+            IF qosPrOperPolicySource == cops(3)
+            THEN
+                IF qosPrIfAdminPolicySource == cops(3)
+                THEN qosPrIfOperPolicySource is cops(3)
+                ELSE qosPrIfOperPolicySource is local(2)
+            ELSE
+                qosPrIfOperPolicySource is none(1)
+            END
+        END
+             
+        For example, if qosPrOperPolicySource shows local(2), although
+        the qosPrIfAdminPolicySource is configured cops(3), the QoS
+        provisioning policy running on this interface is from local
+        device configuration.  It means this object will be local(2).
+
+        Note that when qosPrIfAdminPolicySource transitions to
+        cops(3) if qosPrOperPolicySource is cops(3),
+        qosPrIfOperPolicySource will normally also transition to
+        cops(3).  In this situation, it is possible that
+        qosPrIfOperPolicySource's transition will not occur immediately
+        because the system is initializing the COPS function at the
+        system boot up time, but rather after a small time lag to
+        complete certain operations before going 'cops'."
+    ::= { qosPrIfEntry 2 }
+ 
+-- 
+-- QoS Interface Capability Table
+-- 
+
+qosIfCapabilityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosIfCapabilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of interface entries.  An entry will exist for each
+        interface which can support the QoS feature."
+    ::= { qosPolicyInterfaceObjects 2 }
+
+qosIfCapabilityEntry OBJECT-TYPE
+    SYNTAX      QosIfCapabilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A description of an interface's QoS capabilities."
+    INDEX { ifIndex, qosIfDirection, qosIfQType }
+    ::= { qosIfCapabilityTable 1 }
+
+QosIfCapabilityEntry ::= SEQUENCE {
+    qosIfDirection        INTEGER,
+    qosIfQType            QosInterfaceQueueType,
+    qosIfCapabilities     BITS
+}
+
+qosIfDirection     OBJECT-TYPE
+    SYNTAX      INTEGER { ingress(1), egress(2), both(3) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The traffic direction of the interface.
+         'ingress' means the traffic coming in the interface.
+         'egress' means the traffic going out the interface.
+         'both' means the traffic coming in and going out."
+    ::= { qosIfCapabilityEntry 1 }
+
+qosIfQType      OBJECT-TYPE
+    SYNTAX      QosInterfaceQueueType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface type in terms of number of queues and
+        thresholds.  A queue is a buffer for storing network packets.
+        A threshold is a water mark used to control traffic amount of
+        a queue."
+    ::= { qosIfCapabilityEntry 2 }
+
+qosIfCapabilities   OBJECT-TYPE
+    SYNTAX BITS {
+        unspecified (0),
+
+        -- Classification support
+        inputL2Classification (1), inputIpClassification (2),
+        outputL2Classification (3), outputIpClassification (4),
+        inputPortClassification (19), outputPortClassification (20),
+
+        -- Policing support
+        inputUflowPolicing (5), inputAggregatePolicing (6),
+        outputUflowPolicing (7), outputAggregatePolicing (8),
+        policeByMarkingDown (9), policeByDropping (10),
+        inputUflowShaping (21), inputAggregateShaping (22),
+        outputUflowShaping (23), outputAggregateShaping (24),
+
+        -- Supported scheduling mechanisms
+        fifo (11), wrr (12), wfq (13), cq (14), pq (15), cbwfq (16),
+        pqWrr (25), pqCbwfq (26),
+
+        -- Supported congestion control mechanisms
+        tailDrop (17), wred (18)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An enumeration of interface capabilities.  Used by the
+        management side to select policies and configuration to
+        push to the device."
+    ::= { qosIfCapabilityEntry 3 }
+
+--
+-- Notifications
+--
+ 
+ciscoQosPolicyMIBNotifications  OBJECT IDENTIFIER
+    ::= { ciscoQosPolicyConfigMIB 2 }
+ 
+--
+-- Conformance
+--
+ 
+ciscoQosPolicyConfigMIBConformance OBJECT IDENTIFIER
+    ::= { ciscoQosPolicyConfigMIB 3 }
+ 
+ciscoQosPolicyConfigMIBCompliances OBJECT IDENTIFIER
+    ::= { ciscoQosPolicyConfigMIBConformance 1 }
+ 
+ciscoQosPolicyConfigMIBGroups      OBJECT IDENTIFIER
+    ::= { ciscoQosPolicyConfigMIBConformance 2 }
+ 
+ 
+-- Compliance
+ 
+ciscoQosPolicyConfigMIBCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for the
+             CISCO-QOS-POLICY-CONFIG-MIB."
+
+        MODULE
+        GROUP qosGlobalGroup
+        DESCRIPTION
+            "The group must be implemented in the Cisco devices
+            Catalyst 6000 serires switch."
+
+        OBJECT qosEnabled
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "If the device doesn't support the ability to
+            enable/disable QoS function, the object is only required
+            to be read-only."
+
+        GROUP qosPrGlobalGroup
+        DESCRIPTION
+            "If the device supports COPS-PR, it supports this group."
+
+        GROUP qosRsvpGlobalGroup
+        DESCRIPTION
+            "If the device supports COPS-RSVP, it supports this
+             group."
+
+        GROUP qosPrInterfaceGroup
+        DESCRIPTION
+            "A device which allows COPS-PR to be enabled on a
+            per-interface basis supports this group."
+
+        GROUP qosInterfaceCapabilityGroup
+        DESCRIPTION
+            "A device which supports QoS feature to be enabled on a
+            per-interface basis must support this group."
+
+        GROUP qosCopsPolicyStatusGroup
+        DESCRIPTION
+            "The group should be implemented in the Cisco devices
+            which supports QoS feature."
+
+        OBJECT qosCopsPolicyStatus
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "If the device doesn't support the ability to configure
+            to keep or discard the QoS policy which is downloaded from
+            COPS server while the COPS function is not working, this
+            object is only required read-only."
+
+        ::= { ciscoQosPolicyConfigMIBCompliances 1 }
+ 
+-- 
+-- Units of Conformance
+-- Objects Groups Define 
+--
+ 
+qosGlobalGroup OBJECT-GROUP
+    OBJECTS {
+        qosEnabled
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing the ability to
+        enable/disable QoS feature on the device."
+    ::= { ciscoQosPolicyConfigMIBGroups 1 }
+ 
+qosPrGlobalGroup OBJECT-GROUP
+    OBJECTS {
+        qosPrAdminPolicySource,
+        qosPrOperPolicySource
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing the global configuration of
+        the provisioning of QoS policy source on the device."
+    ::= { ciscoQosPolicyConfigMIBGroups 2 }
+
+qosRsvpGlobalGroup OBJECT-GROUP
+    OBJECTS {
+        qosRsvpAdminPolicySource,
+        qosRsvpOperPolicySource
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing the global configuration of
+        the outsourcing of QoS policy source on the device."
+    ::= { ciscoQosPolicyConfigMIBGroups 3 }
+ 
+qosPrInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+        qosPrIfAdminPolicySource,
+        qosPrIfOperPolicySource
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing the interface level
+        configuration of the provisioning of QoS policy source on the
+        device."
+    ::= { ciscoQosPolicyConfigMIBGroups 4 }
+ 
+qosInterfaceCapabilityGroup OBJECT-GROUP
+    OBJECTS {
+        qosIfCapabilities
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of object providing the QoS capabilities of the
+        interface on the device to help QoS policy configuration."
+    ::= { ciscoQosPolicyConfigMIBGroups 5 }
+
+qosCopsPolicyStatusGroup  OBJECT-GROUP
+    OBJECTS {
+        qosCopsPolicyStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of object providing the status of QoS policy
+        downloaded from COPS server."
+    ::= { ciscoQosPolicyConfigMIBGroups 6 }
+
+END
