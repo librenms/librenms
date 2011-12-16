@@ -25,7 +25,7 @@ function discover_new_device($hostname)
 
     if ( match_network($config['nets'], $ip) )
     {
-      $remote_device_id = addHost ($dst_host, NULL, "v2c");
+      $remote_device_id = addHost ($dst_host);
       if ($remote_device_id) {
         $remote_device = device_by_id_cache($remote_device_id, 1);
         echo("+[".$remote_device['hostname']."(".$remote_device['device_id'].")]");
