@@ -84,6 +84,7 @@ if ($device['os_group'] == "ios")
   $data_oids[] = "portName";
 
   /// Grab data to put ports into vlans or make them trunks
+  /// FIXME we probably shouldn't be doing this from the VTP MIB, right?
   $port_stats = snmpwalk_cache_oid($device, "vmVlan", $port_stats, "CISCO-VLAN-MEMBERSHIP-MIB");
   $port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortEncapsulationOperType", $port_stats, "CISCO-VTP-MIB");
   $port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortNativeVlan", $port_stats, "CISCO-VTP-MIB");
