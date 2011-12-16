@@ -52,14 +52,14 @@ if ($cdp_array)
   unset($cdp_links);
   foreach (array_keys($cdp_array) as $key)
   {
-    $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$key."'"));
+    $interface = dbFetchRow("SELECT * FROM `ports` WHERE device_id = ? AND `ifIndex` = ?", array($device['device_id'], $key));
     $cdp_if_array = $cdp_array[$key];
     foreach (array_keys($cdp_if_array) as $entry_key)
     {
       $cdp = $cdp_if_array[$entry_key];
       if (is_valid_hostname($cdp['cdpCacheDeviceId']))
       {
-        $remote_device_id = @mysql_result(mysql_query("SELECT `device_id` FROM `devices` WHERE `sysName` = '".$cdp['cdpCacheDeviceId']."' OR `hostname`='".$cdp['cdpCacheDeviceId']."'"), 0);
+        $remote_device_id = dbFetchCell("SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?", array($cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId']));
 
         if (!$remote_device_id)
         {
@@ -74,7 +74,7 @@ if ($cdp_array)
         if ($remote_device_id)
         {
           $if = $cdp['cdpCacheDevicePort'];
-          $remote_interface_id = @mysql_result(mysql_query("SELECT interface_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if') AND `device_id` = '".$remote_device_id."'"),0);
+          $remote_interface_id = dbFetchCell("SELECT interface_id FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?", array($if, $if, $remote_device_id));
         } else { $remote_interface_id = "0"; }
 
         if ($interface['interface_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort'])
