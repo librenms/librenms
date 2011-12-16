@@ -1,4 +1,3 @@
-
 Dell-Vendor-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -10,23 +9,30 @@ IMPORTS
         DisplayString, RowStatus, TEXTUAL-CONVENTION
                 FROM SNMPv2-TC;
 
+-- Dell MIB tree
+dell OBJECT IDENTIFIER ::= { enterprises 674 }
+-- Dell PowerConnect MIB tree
+dellLan OBJECT IDENTIFIER ::= { dell 10895 }
+-- Dell standard MIB tree for all future PowerConnect product. There
+-- are already some earlier objects registered under 10895 so that it
+-- is necessary to carve out this subtree under dellLan.5000 in order
+-- to prevent conflict with existing MIB objects.
+dellLanStandard OBJECT IDENTIFIER ::= { dellLan 5000 }
+-- Dell common and device independent MIB objects.
+dellLanCommon OBJECT IDENTIFIER ::= { dellLanStandard 1 }
+-- Dell extension MIB objects for specific technology or device.
+dellLanExtension OBJECT IDENTIFIER ::= { dellLanStandard 2 }
 
-dellLan MODULE-IDENTITY
-        LAST-UPDATED "200501180000Z"
-        ORGANIZATION "Dell Computer Corporation"
+powerConnectVendorMIB MODULE-IDENTITY
+        LAST-UPDATED "200501150000Z"
+        ORGANIZATION "Dell Inc."
         CONTACT-INFO
                 "support.dell.com"
         DESCRIPTION
-                "The private MIB module definition for the Dell powerConnect 3000 Devices."
-        REVISION "200501180000Z"
-        DESCRIPTION
-                "Changed module identity to dellLan (674.10895).
-                 Created new MIB nodes powerConnect3000MIB, DellStandard, DellCommon,
-                 DellExtension."
-        REVISION "200211250000Z"
-        DESCRIPTION
-                "Initial version of this MIB."
-        ::= { enterprises dell(674) dellLan(10895)  }
+                "The private MIB module definition for the Dell PowerConnect
+                 Devices.  This MIB allows PowerConnect devices to be
+                 integrated into Dell ITA management system."
+        ::= { dellLan 3000 }
 
 EnvMonState ::= TEXTUAL-CONVENTION
         STATUS  current
@@ -66,23 +72,14 @@ EnvMonState ::= TEXTUAL-CONVENTION
                 }
 
 
-powerConnect3000MIB         OBJECT IDENTIFIER ::= { dellLan 3000 }
-dell-VendorMIBObjects       OBJECT IDENTIFIER ::= { powerConnect3000MIB 1 }
-dellVendorNotifications     OBJECT IDENTIFIER ::= { powerConnect3000MIB 2 }
-dellStandard OBJECT IDENTIFIER ::= { dellLan 5000 }
--- Dell common and device independent MIB objects.
-dellCommon OBJECT IDENTIFIER ::= { dellStandard 1 }
--- Dell extension MIB objects for specific technology or device.
-dellExtension OBJECT IDENTIFIER ::= { dellStandard 2 }
-rndMib        OBJECT IDENTIFIER ::= { dellExtension 89 }
+
+dellVendorMIBObjects       OBJECT IDENTIFIER ::= { powerConnectVendorMIB 1 }
+dellVendorNotifications     OBJECT IDENTIFIER ::= { powerConnectVendorMIB 2 }
 
 
-
-
-hardware              OBJECT IDENTIFIER ::= { dell-VendorMIBObjects 2 }
+hardware              OBJECT IDENTIFIER ::= { dellVendorMIBObjects 2 }
 productIdentification OBJECT IDENTIFIER ::= { hardware 100 }
 productStatus         OBJECT IDENTIFIER ::= { hardware 110 }
-
 
 --
 
@@ -111,7 +108,7 @@ productIdentificationVendor OBJECT-TYPE
        SYNTAX      DisplayString
        MAX-ACCESS  read-only
        STATUS      current
-       DESCRIPTION "The name of the product manufacturer, such as: Dell Computer Corp."
+       DESCRIPTION "The name of the product manufacturer, such as: Dell Inc."
        ::= { productIdentification 3 }
 
 productIdentificationVersion OBJECT-TYPE
@@ -127,6 +124,7 @@ productIdentificationBuildNumber OBJECT-TYPE
        STATUS      current
        DESCRIPTION "The software build number of the product."
        ::= { productIdentification 5 }
+
 
 
 productIdentificationURL  OBJECT-TYPE
@@ -171,7 +169,7 @@ ProductIdentificationPerBoxEntry ::= SEQUENCE {
   productIdentificationSerialNumber         DisplayString,
   productIdentificationAssetTag             DisplayString,
   productIdentificationServiceTag           DisplayString,
-  productIdentificationChassisServiceTag    DisplayString
+  productIdentificationBootromVersion       DisplayString
 }
 
 productIdentificationPerBoxIndex OBJECT-TYPE
@@ -205,13 +203,38 @@ productIdentificationServiceTag OBJECT-TYPE
        DESCRIPTION "Service tag of the product."
        ::= { productIdentificationPerUnitEntry 4 }
 
-productIdentificationChassisServiceTag OBJECT-TYPE
+
+productIdentificationBootromVersion OBJECT-TYPE
        SYNTAX      DisplayString
        MAX-ACCESS  read-only
        STATUS      current
-       DESCRIPTION "Chassis Service tag of the product."
-       ::= { productIdentificationPerUnitEntry 5 }
+       DESCRIPTION "The boot image version of the product."
+       ::= { productIdentificationPerUnitEntry 6 }
 
+
+productIdentificationBannerMotd OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE (0..1500))
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Use to assign CLI attention banner. The banner should support 1500 characters."
+
+
+
+
+
+
+
+       ::= { productIdentification 9 }
+
+productIdentificationBannerMotdAckMode OBJECT-TYPE
+       SYNTAX     INTEGER {
+                    enable(1),
+                    disable(2)
+                 }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "If enable is selected, user will be required to acknowledge the banner displayed on the console. The user would have to type y or n to continue to the login prompt.  If n is typed, the session is terminated and no further communication is allowed on that session. However, serial connection will not get terminated if user does not enter y. Use disable option to disable banner acknowledge."
+       ::= { productIdentification 10 }
 
 --
 -- productStatus
@@ -258,7 +281,7 @@ productStatusTimeStamp  OBJECT-TYPE
        ::= { productStatus 3 }
 
 productStatusGetTimeOut  OBJECT-TYPE
-       SYNTAX      INTEGER
+       SYNTAX      INTEGER(1..1000)
        MAX-ACCESS  read-only
        STATUS      current
        DESCRIPTION "Suggested time out value in milliseconds for how long the SNMP getter
@@ -266,7 +289,7 @@ productStatusGetTimeOut  OBJECT-TYPE
        ::= { productStatus 4 }
 
 productStatusRefreshRate  OBJECT-TYPE
-       SYNTAX      INTEGER
+       SYNTAX      INTEGER(1..100)
        MAX-ACCESS  read-only
        STATUS      current
        DESCRIPTION "Rate in seconds at which the SNMP service cached data is being updated."
@@ -295,7 +318,7 @@ envMonFanStatusTable OBJECT-TYPE
         STATUS     current
         DESCRIPTION
                 "The table of fan status maintained by the environmental
-                monitor."
+                monitor. Not Supported by Dell Modular Blade Server switches."
         ::= { productStatusEnvironment 1 }
 
 envMonFanStatusEntry OBJECT-TYPE
@@ -304,7 +327,8 @@ envMonFanStatusEntry OBJECT-TYPE
         STATUS     current
         DESCRIPTION
                 "An entry in the fan status table, representing the status of
-                the associated fan maintained by the environmental monitor."
+                the associated fan maintained by the environmental monitor. 
+                Not Supported by Dell Modular Blade Server switches."
         INDEX   { envMonFanStatusIndex }
         ::= { envMonFanStatusTable 1 }
 
@@ -320,9 +344,9 @@ envMonFanStatusIndex OBJECT-TYPE
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION
-                "Unique index for the fan being instrumented.
-                This index is for SNMP purposes only, and has no
-                intrinsic meaning."
+                "Unique index for the fan being instrumented. This index is 
+                for SNMP purposes only, and has no intrinsic meaning. Not 
+                Supported by Dell Modular Blade Server switches."
         ::= { envMonFanStatusEntry 1 }
 
 envMonFanStatusDescr OBJECT-TYPE
@@ -332,9 +356,10 @@ envMonFanStatusDescr OBJECT-TYPE
         STATUS     current
         DESCRIPTION
                 "Textual description of the fan being instrumented.
-                This description is a short textual label, suitable as a
-                human-sensible identification for the rest of the
-                information in the entry."
+                This description is a short textual label, suitable 
+                as a human-sensible identification for the rest of 
+                the information in the entry. Not Supported by Dell 
+                Modular Blade Server switches."
         ::= { envMonFanStatusEntry 2 }
 
 envMonFanState OBJECT-TYPE
@@ -343,7 +368,8 @@ envMonFanState OBJECT-TYPE
 
         STATUS     current
         DESCRIPTION
-                "The mandatory  state of the fan being instrumented."
+                "The mandatory  state of the fan being instrumented. 
+                Not Supported by Dell Modular Blade Server switches."
         ::= { envMonFanStatusEntry 3 }
 
 
@@ -439,12 +465,14 @@ envMonSupplySource OBJECT-TYPE
 --
 
 
-    dell-VendorTraps  OBJECT IDENTIFIER ::= { dellVendorNotifications  1 }
-    dell-VendorTrapsPrefix OBJECT IDENTIFIER ::= { dell-VendorTraps 0 }
+    dellVendorTraps  OBJECT IDENTIFIER ::= { dellVendorNotifications  1 }
+    dellVendorTrapsPrefix OBJECT IDENTIFIER ::= { dellVendorTraps 0 }
 
     productStatusGlobalStatusChange NOTIFICATION-TYPE
 
-        OBJECTS     { productStatusGlobalStatus, productStatusLastGlobalStatus, productStatusTimeStamp }
+        OBJECTS     { productStatusGlobalStatus,
+                      productStatusLastGlobalStatus,
+                      productStatusTimeStamp }
         STATUS      current
         DESCRIPTION "This trap is sent when the product global status changes."
         --#TYPE "Product Global Status Change."
@@ -452,7 +480,7 @@ envMonSupplySource OBJECT-TYPE
         --#ARGUMENTS {1,0,2}
 
 
-   ::= {dell-VendorTrapsPrefix 1 }
+   ::= {dellVendorTrapsPrefix 1 }
 
 
 END
