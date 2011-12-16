@@ -16,7 +16,9 @@ foreach($vlans as $vlan)
   echo("<td width=100 class=list-large> Vlan " . $vlan['vlan'] . "</td>");
   echo("<td width=200 class=box-desc>" . $vlan['vlan_descr'] . "</td>");
 
-  echo("<td>".$vlan['cost']."</td><td>".$vlan['priority']."</td><td>".$vlan['state']."</td>");
+  if($vlan['state'] == "blocking") { $class="red"; } elseif ($vlan['state'] == "forwarding" ) { $class="green"; } else { $class = "none"; }
+
+  echo("<td>".$vlan['cost']."</td><td>".$vlan['priority']."</td><td class=$class>".$vlan['state']."</td>");
 
   $vlan_ports = array();
   $otherports = dbFetchRows("SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.interface_id = V.interface_id", array($device['device_id'], $vlan['vlan']));
