@@ -1,5 +1,16 @@
+-- *****************************************************************
+-- DS1-MIB.my:  DS1 Interface MIB
+--
+-- Oct 2001,  Jaime Colom
+--      - extracted from rfc2496.txt
+--
+-- Copyright (c) 2006 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
 
-     DS1-MIB DEFINITIONS ::= BEGIN
+DS1-MIB DEFINITIONS ::= BEGIN
 
      IMPORTS
           MODULE-IDENTITY, OBJECT-TYPE,
@@ -10,7 +21,6 @@
           InterfaceIndex, ifIndex                 FROM IF-MIB
           PerfCurrentCount, PerfIntervalCount,
           PerfTotalCount                          FROM PerfHist-TC-MIB;
-
 
      ds1 MODULE-IDENTITY
          LAST-UPDATED "9808011830Z"
@@ -168,6 +178,7 @@
           MAX-ACCESS  read-write
           STATUS  current
           DESCRIPTION
+
                  "This variable indicates  the  variety  of  DS1
                  Line  implementing  this  circuit.  The type of
                  circuit affects the number of bits  per  second
@@ -704,7 +715,6 @@
                  "The number of Line Code Violations (LCVs)."
           ::= { dsx1CurrentEntry 11 }
 
-
      -- The DS1 Interval Table
      dsx1IntervalTable OBJECT-TYPE
           SYNTAX  SEQUENCE OF Dsx1IntervalEntry
@@ -1060,7 +1070,6 @@
           SEQUENCE {
               dsx1ChanMappedIfIndex  InterfaceIndex
      }
-
 
      dsx1ChanMappedIfIndex OBJECT-TYPE
           SYNTAX  InterfaceIndex
@@ -1525,7 +1534,6 @@
                  as 0."
           ::= { dsx1FarEndTotalEntry 9 }
 
-
      dsx1FarEndTotalDMs OBJECT-TYPE
           SYNTAX PerfTotalCount
           MAX-ACCESS read-only
@@ -1616,7 +1624,6 @@
              dsx1FracIfIndex      INTEGER
          }
 
-
      dsx1FracIndex OBJECT-TYPE
          SYNTAX  INTEGER (1..'7fffffff'h)
          MAX-ACCESS  read-only
@@ -1677,8 +1684,6 @@
      ds1Groups      OBJECT IDENTIFIER ::= { ds1Conformance 1 }
      ds1Compliances OBJECT IDENTIFIER ::= { ds1Conformance 2 }
 
-
-
      -- compliance statements
 
      ds1Compliance MODULE-COMPLIANCE
@@ -1706,11 +1711,11 @@
                  systems that attach to a DS2 Interface."
 
              GROUP       ds1TransStatsGroup
+
              DESCRIPTION
                  "This group is the set of statistics appropriate
                  for all systems which attach to a DS1 Interface
                  running transparent or unFramed lineType."
-
 
              GROUP       ds1ChanMappingGroup
              DESCRIPTION
@@ -1836,7 +1841,6 @@
                       is not required."
          ::= { ds1Compliances 2 }
 
-
      ds1MibE1PriCompliance MODULE-COMPLIANCE
          STATUS current
          DESCRIPTION
@@ -1906,7 +1910,6 @@
                  "The ability to set the channelization is not
                  required."
          ::= { ds1Compliances 3 }
-
 
      ds1Ds2Compliance MODULE-COMPLIANCE
          STATUS current
@@ -2105,4 +2108,5 @@
                  DS3 Channel (ds1ChannelNumber) to ifIndex."
          ::= { ds1Groups 9 }
 
-     END
+END
+
