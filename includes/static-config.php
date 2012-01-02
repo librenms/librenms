@@ -801,6 +801,15 @@ $config['os'][$os]['over'][1]['graph']  = "device_processor";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['icon']              = "watchguard";
 
+$os = "panos";
+$config['os'][$os]['text']              = "PanOS";
+$config['os'][$os]['type']              = "firewall";
+$config['os'][$os]['icon']              = "panos";
+
+$os = "arubaos";
+$config['os'][$os]['text']              = "ArubaOS";
+$config['os'][$os]['type']              = "wireless";
+$config['os'][$os]['icon']              = "arubaos";
 
 foreach ($config['os'] as $this_os => $blah)
 {
@@ -849,6 +858,9 @@ $config['graph_types']['device']['fortigate_sessions']['descr'] = 'Active Sessio
 $config['graph_types']['device']['screenos_sessions']['section'] = 'firewall';
 $config['graph_types']['device']['screenos_sessions']['order'] = '0';
 $config['graph_types']['device']['screenos_sessions']['descr'] = 'Active Sessions';
+$config['graph_types']['device']['panos_sessions']['section'] = 'firewall';
+$config['graph_types']['device']['panos_sessions']['order'] = '0';
+$config['graph_types']['device']['panos_sessions']['descr'] = 'Active Sessions';
 
 $config['graph_types']['device']['bits']['section'] = 'netstats';
 $config['graph_types']['device']['bits']['order'] = '0';
