@@ -460,7 +460,7 @@ $config['os'][$os]['icon']              = "dlink";
 
 $os = "dlinkap";
 $config['os'][$os]['text']              = "D-Link Access Point";
-$config['os'][$os]['type']              = "network";
+$config['os'][$os]['type']              = "wireless";
 $config['os'][$os]['icon']              = "dlink";
 
 $os = "axiscam";
@@ -497,12 +497,12 @@ $config['os'][$os]['type']              = "power";
 $config['os'][$os]['icon']              = "liebert";
 
 $os = "engenius";
-$config['os'][$os]['type']              = "network";
+$config['os'][$os]['type']              = "wireless";
 $config['os'][$os]['text']              = "EnGenius Access Point";
 $config['os'][$os]['icon']              = "engenius";
 
 $os = "airport";
-$config['os'][$os]['type']              = "network";
+$config['os'][$os]['type']              = "wireless";
 $config['os'][$os]['text']              = "Apple AirPort";
 $config['os'][$os]['icon']              = "apple";
 
@@ -969,6 +969,11 @@ $i++;
 $config['device_types'][$i]['text'] = 'Network';
 $config['device_types'][$i]['type'] = 'network';
 $config['device_types'][$i]['icon'] = 'network.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Wireless';
+$config['device_types'][$i]['type'] = 'wireless';
+$config['device_types'][$i]['icon'] = 'wireless.png';
 
 $i++;
 $config['device_types'][$i]['text'] = 'Firewalls';
