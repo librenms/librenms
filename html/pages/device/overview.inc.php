@@ -94,7 +94,7 @@ include("overview/sensors/frequencies.inc.php");
 
 echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
 echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
-echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=events/">');
+echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=logs/section=eventlog/">');
 echo("<img align='absmiddle' src='images/16/report.png'> Recent Events</a></p>");
 
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
