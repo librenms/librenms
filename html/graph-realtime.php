@@ -84,7 +84,7 @@ print('<?xml version="1.0" encoding="iso-8859-1"?>' . "\n");?>
     <line id="axis_y" x1="0" y1="100%" x2="100%" y2="100%" <?php echo($attribs['axis']) ?>/>
     <path id="graph_out" d="M0 <?php echo($height) ?> L 0 <?php echo($height . '" ' . $attribs['graph_out']) ?>/>
     <path id="graph_in"  d="M0 <?php echo($height) ?> L 0 <?php echo($height . '" ' . $attribs['graph_in']) ?>/>
-    <path id="grid"  d="M0 <?php echo($height/4*1) ?> L <?php echo($width) ?> <?pho echo($height/4*1) ?> M0 <?php echo($height/4*2) ?> L <?php echo($width) ?> <?php echo($height/4*2) ?> M0 <?php echo ($height/4*3) ?> L <?php echo($width . ' ' ($height/4*3)) ?>" <?php echo($attribs['grid'])?>/>
+    <path id="grid"  d="M0 <?php echo($height/4*1) ?> L <?php echo($width) ?> <?php echo($height/4*1) ?> M0 <?php echo($height/4*2) ?> L <?php echo($width) ?> <?php echo($height/4*2) ?> M0 <?php echo ($height/4*3) ?> L <?php echo($width . ' ' . ($height/4*3)) ?>" <?php echo($attribs['grid'])?>/>
     <text id="grid_txt1" x="<?php echo($width) ?>" y="<?php echo($height/4*1) ?>" <?php echo($attribs['grid_txt']) ?> text-anchor="end"> </text>
     <text id="grid_txt2" x="<?php echo($width) ?>" y="<?php echo($height/4*2) ?>" <?php echo($attribs['grid_txt']) ?> text-anchor="end"> </text>
     <text id="grid_txt3" x="<?php echo($width) ?>" y="<?php echo($height/4*3) ?>" <?php echo($attribs['grid_txt']) ?> text-anchor="end"> </text>
