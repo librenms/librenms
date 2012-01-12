@@ -45,8 +45,8 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
 
   $rrd_process = proc_open($command, $descriptorspec, $rrd_pipes, $cwd, $env);
 
-  stream_set_blocking($rrd_pipes[1], 0);
-  stream_set_blocking($rrd_pipes[2], 0);
+#  stream_set_blocking($rrd_pipes[1], 0);
+#  stream_set_blocking($rrd_pipes[2], 0);
 
   if (is_resource($rrd_process))
   {
@@ -68,6 +68,8 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
 
 function rrdtool_pipe_close(&$rrd_process, &$rrd_pipes)
 {
+
+  global $debug;
   if ($debug)
   {
     echo stream_get_contents($rrd_pipes[1]);
@@ -82,10 +84,9 @@ function rrdtool_pipe_close(&$rrd_process, &$rrd_pipes)
   // proc_close in order to avoid a deadlock
 
   $return_value = proc_close($rrd_process);
-  if ($debug)
-  {
-    echo $return_value;
-  }
+
+  return $return_value;
+
 }
 
 /**
@@ -117,16 +118,26 @@ function rrdtool_graph($graph_file, $options)
       fwrite($rrd_pipes[0], "graph $graph_file $options");
     }
 
-    rrdtool_pipe_close($rrd_process, $rrd_pipes);
+    fclose($rrd_pipes[0]);
+
+    while (strlen($line) < 1) {
+      $line = fgets($rrd_pipes[1],1024);
+      $data .= $line;
+    }
+
+    $return_value = rrdtool_pipe_close($rrd_process, $rrd_pipes);
 
     if ($debug)
     {
         echo("<p>");
         if ($debug) { echo("graph $graph_file $options"); }
         echo("</p><p>");
-        echo "command returned $return_value\n";
+        echo "command returned $return_value ($data)\n";
         echo("</p>");
     }
+    return $data;
+  } else {
+    return 0;
   }
 }
 
