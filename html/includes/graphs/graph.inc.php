@@ -1,33 +1,5 @@
 <?php
 
-include_once("Net/IPv4.php");
-
-if (isset($_GET['debug']))
-{
-  $debug = TRUE;
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 0);
-  ini_set('log_errors', 0);
-  ini_set('error_reporting', E_ALL);
-}
-else
-{
-  $debug = FALSE;
-  ini_set('display_errors', 0);
-  ini_set('display_startup_errors', 0);
-  ini_set('log_errors', 0);
-  ini_set('error_reporting', 0);
-}
-
-include_once("../includes/defaults.inc.php");
-include_once("../config.php");
-include_once("../includes/common.php");
-include_once("../includes/dbFacile.php");
-include_once("../includes/rewrites.php");
-include_once("includes/functions.inc.php");
-include_once("../includes/rrdtool.inc.php");
-include_once("includes/authenticate.inc.php");
-
 $from     = mres($_GET['from']);
 $to       = mres($_GET['to']);
 $width    = mres($_GET['width']);
@@ -38,17 +10,6 @@ $legend   = mres($_GET['legend']);
 $id       = mres($_GET['id']);
 
 $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
-
-if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs'])
-{
-  $auth = "1"; ## hardcode auth for all with config function
-} else {
-  if (!$_SESSION['authenticated'])
-  {
-    graph_error("Session not authenticated");
-    exit;
-  }
-}
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', mres($_GET['type']), $graphtype);
 
@@ -113,20 +74,17 @@ function graph_error($string)
     imagedestroy($im);
     exit();
   }
-
 }
 
 if ($error_msg) {
   graph_error($graph_error);
 } elseif (!$auth) {
-
   if ($width < 200)
   {
    graph_error("No Auth");
   } else {
    graph_error("No Authorisation");
   }
-
 } else {
   #$rrd_options .= " HRULE:0#999999";
   if ($no_file)
@@ -137,15 +95,21 @@ if ($error_msg) {
     } else {
       graph_error("Missing RRD Datafile");
     }
+  } elseif($command_only) {
+    echo("<div class='infobox'>");
+    echo("<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>");
+    echo("rrdtool graph $graphfile $rrd_options");
+    echo("</span>");
+    $return = rrdtool_graph($graphfile, $rrd_options);
+    echo("<br /><br />");
+    echo("<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>$return");
+    unlink($graphfile);
+    echo("</div>");
   } else {
     if ($rrd_options)
     {
-
- #rrdtool_graph($filename, $options)
-
       rrdtool_graph($graphfile, $rrd_options);
-
-      if ($debug) { echo("<pre>".$rrd_cmd."</pre>"); }
+      if ($debug) { echo($rrd_cmd); }
       if (is_file($graphfile))
       {
         if (!$debug)

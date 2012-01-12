@@ -89,6 +89,17 @@ if (!$auth)
     echo(generate_link("Hide Legend",$vars, array('page' => "graphs", 'legend' => "no")));
   }
 
+  echo('<div style="float: right;">');
+
+  if ($vars['showcommand'] == "yes")
+  {
+    echo(generate_link("Hide RRD Command",$vars, array('page' => "graphs", 'showcommand' => NULL)));
+  } else {
+    echo(generate_link("Show RRD Command",$vars, array('page' => "graphs", 'showcommand' => "yes")));
+  }
+
+  echo('</div>');
+
   print_optionbar_end();
 
   echo generate_graph_js_state($graph_array);
@@ -96,6 +107,13 @@ if (!$auth)
   echo('<div style="width: '.$graph_array['width'].'; margin: auto;">');
   echo(generate_graph_tag($graph_array));
   echo("</div>");
+
+  if($vars['showcommand']) 
+  {
+    $_GET = $graph_array;
+    $command_only = 1;
+    include("includes/graphs/graph.inc.php");
+  }
 }
 
 ?>

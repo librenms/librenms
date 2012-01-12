@@ -162,7 +162,7 @@ $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 $config['os'][$os]['icon']              = "cisco";
 
 $os = "acsw";
-$config['os'][$os]['group']             = "cisco";
+#$config['os'][$os]['group']             = "cisco";
 $config['os'][$os]['text']              = "Cisco ACE";
 $config['os'][$os]['ifname']            = 1;
 $config['os'][$os]['type']              = "network";
@@ -492,11 +492,11 @@ $os = "powerware";
 $config['os'][$os]['text']              = "Powerware UPS";
 $config['os'][$os]['type']              = "power";
 $config['os'][$os]['icon']              = "eaton";
-$config['os'][$os]['over'][0]['graph']  = "device_voltages";
-$config['os'][$os]['over'][0]['text']   = "Voltages";
+$config['os'][$os]['over'][0]['graph']  = "device_voltage";
+$config['os'][$os]['over'][0]['text']   = "Voltage";
 $config['os'][$os]['over'][1]['graph']  = "device_current";
 $config['os'][$os]['over'][1]['text']   = "Current";
-$config['os'][$os]['over'][2]['graph']  = "device_frequencies";
+$config['os'][$os]['over'][2]['graph']  = "device_frequency";
 $config['os'][$os]['over'][2]['text']   = "Frequencies";
 
 $os = "deltaups";
