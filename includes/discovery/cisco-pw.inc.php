@@ -1,6 +1,6 @@
 <?php
 
-if ($config['enable_pseudowires'] && $device['os_group'] == "ios")
+if ($config['enable_pseudowires'] && $device['os_group'] == "cisco")
 {
   unset($cpw_count);
   unset($cpw_exists);
@@ -74,6 +74,6 @@ if ($config['enable_pseudowires'] && $device['os_group'] == "ios")
 
   echo("\n");
 
-} # enable_pseudowires + os_group=ios
+} # enable_pseudowires + os_group=cisco
 
 ?>

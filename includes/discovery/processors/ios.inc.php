@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == "ios" || $device['os_group'] == "ios")
+if ($device['os_group'] == "cisco")
 {
   echo("CISCO-PROCESS-MIB : ");
   $processors_array = snmpwalk_cache_oid($device, "cpmCPU", NULL, "CISCO-PROCESS-MIB");
