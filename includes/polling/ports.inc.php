@@ -76,7 +76,7 @@ if ($device['adsl_count'] > "0")
 #foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
 #foreach ($pagp_oids as $oid)      { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "CISCO-PAGP-MIB"); }
 
-if ($device['os_group'] == "ios")
+if ($device['os_group'] == "cisco")
 {
   $port_stats = snmp_cache_portIfIndex ($device, $port_stats);
   $port_stats = snmp_cache_portName ($device, $port_stats);

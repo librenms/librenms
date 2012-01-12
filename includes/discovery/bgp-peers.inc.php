@@ -80,10 +80,10 @@ if ($config['enable_bgp'])
         echo(".");
       }
 
-      if ($device['os_group'] == "ios" || $device['os'] == "junos")
+      if ($device['os_group'] == "cisco" || $device['os'] == "junos")
       {
 
-        if ($device['os_group'] == "ios")
+        if ($device['os_group'] == "cisco")
         {
           ## Get afi/safi and populate cbgp on cisco ios (xe/xr)
           unset($af_list);
@@ -106,7 +106,7 @@ if ($config['enable_bgp'])
               }
             }
           }
-        } # os=ios
+        } # os_group=cisco
 
         if ($device['os'] == "junos")
         {
@@ -168,7 +168,7 @@ if ($config['enable_bgp'])
             mysql_query("DELETE FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."' AND afi = '$afi' AND safi = '$safi'");
           }
         } # AF list
-      } # os=ios|junos
+      } # os=cisco|junos
     } # Foreach
 
     unset($j_afisafi);

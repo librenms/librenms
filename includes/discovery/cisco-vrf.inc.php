@@ -2,7 +2,7 @@
 
 if ($config['enable_vrfs'])
 {
-  if ($device['os_group'] == "ios" || $device['os_group'] == "junos" || $device['os'] == "ironware")
+  if ($device['os_group'] == "cisco" || $device['os_group'] == "junos" || $device['os'] == "ironware")
   {
     unset($vrf_count);
 
@@ -101,7 +101,7 @@ if ($config['enable_vrfs'])
     unset($valid_vrf);
 
     echo("\n");
-  } # ios/junos/ironware
+  } # cisco/junos/ironware
 } # enable_vrfs
 
 ?>

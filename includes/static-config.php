@@ -149,7 +149,7 @@ $config['os'][$os]['icon']              = "alcatellucent";
 ## Cisco OSes
 
 $os = "ios";
-$config['os'][$os]['group']             = "ios";
+$config['os'][$os]['group']             = "cisco";
 $config['os'][$os]['text']              = "Cisco IOS";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['ifXmcbc']           = 1;
@@ -162,8 +162,8 @@ $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 $config['os'][$os]['icon']              = "cisco";
 
 $os = "acsw";
-$config['os'][$os]['group']             = "ios";
-$config['os'][$os]['text']              = "Cisco Application Control Software";
+$config['os'][$os]['group']             = "cisco";
+$config['os'][$os]['text']              = "Cisco ACE";
 $config['os'][$os]['ifname']            = 1;
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "cisco";
@@ -187,7 +187,7 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "iosxe";
-$config['os'][$os]['group']             = "ios";
+$config['os'][$os]['group']             = "cisco";
 $config['os'][$os]['text']              = "Cisco IOS-XE";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['ifXmcbc']           = 1;
@@ -200,7 +200,7 @@ $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 $config['os'][$os]['icon']              = "cisco";
 
 $os = "iosxr";
-$config['os'][$os]['group']             = "ios";
+$config['os'][$os]['group']             = "cisco";
 $config['os'][$os]['text']              = "Cisco IOS-XR";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['ifXmcbc']           = 1;
@@ -213,7 +213,7 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "asa";
-$config['os'][$os]['group']             = "ios";
+$config['os'][$os]['group']             = "cisco";
 $config['os'][$os]['text']              = "Cisco ASA";
 $config['os'][$os]['ifname']            = 1;
 $config['os'][$os]['type']              = "firewall";
@@ -224,7 +224,7 @@ $config['os'][$os]['over'][1]['graph']  = "device_processor";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 
 $os = "pix";
-$config['os'][$os]['group']             = "ios";
+$config['os'][$os]['group']             = "cisco";
 $config['os'][$os]['text']              = "Cisco PIX-OS";
 $config['os'][$os]['ifname']            = 1;
 $config['os'][$os]['type']              = "firewall";
@@ -237,7 +237,7 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "nxos";
-$config['os'][$os]['group']             = "ios";
+$config['os'][$os]['group']             = "cisco";
 $config['os'][$os]['text']              = "Cisco NX-OS";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "cisco";
@@ -249,7 +249,7 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "sanos";
-$config['os'][$os]['group']             = "ios";
+$config['os'][$os]['group']             = "cisco";
 $config['os'][$os]['text']              = "Cisco SAN-OS";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "cisco";
@@ -261,7 +261,7 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "catos";
-$config['os'][$os]['group']             = "ios";
+$config['os'][$os]['group']             = "cisco";
 $config['os'][$os]['text']              = "Cisco CatOS";
 $config['os'][$os]['ifname']            = 1;
 $config['os'][$os]['type']              = "network";

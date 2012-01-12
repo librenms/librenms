@@ -8,7 +8,7 @@
 #CISCO-VPDN-MGMT-MIB::cvpdnSystemDeniedUsersTotal.l2tp = Counter32: 0 attempts
 #CISCO-VPDN-MGMT-MIB::cvpdnSystemClearSessions.0 = INTEGER: none(1)
 
-if ($device['os_group'] == "ios")
+if ($device['os_group'] == "cisco")
 {
   $data = snmpwalk_cache_oid($device, "cvpdnSystemEntry", NULL, "CISCO-VPDN-MGMT-MIB");
 

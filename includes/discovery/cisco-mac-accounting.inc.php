@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os_group'] == "ios")
+if ($device['os_group'] == "cisco")
 {
   echo("Cisco MAC Accounting : ");
 
@@ -43,7 +43,7 @@ if ($device['os_group'] == "ios")
     }
   }
   echo("\n");
-} # os_group=ios
+} # os_group=cisco
 
 // FIXME - NEEDS TO REMOVE STALE ENTRIES?? :O
 ?>

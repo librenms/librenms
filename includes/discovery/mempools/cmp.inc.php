@@ -4,7 +4,7 @@
 
 $cemp_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `mempools` WHERE `device_id` = '".$device['device_id']."' AND `mempool_type` = 'cemp'"),0);
 
-if (($device['os'] == "ios" || $device['os_group'] == "ios") && $cemp_count == "0")
+if (($device['os_group'] == "cisco") && $cemp_count == "0")
 {
   echo("OLD-CISCO-MEMORY-POOL: ");
 

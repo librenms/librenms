@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os_group'] == "ios")
+if ($device['os_group'] == "cisco")
 {
   echo("Cisco VLANs : ");
 

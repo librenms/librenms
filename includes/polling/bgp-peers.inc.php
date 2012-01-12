@@ -134,7 +134,7 @@ else
 
     dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
 
-    if ($device['os_group'] == "ios" || $device['os'] == "junos")
+    if ($device['os_group'] == "cisco" || $device['os'] == "junos")
     {
       ## Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
       $peer_afis = dbFetchRows("SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?", array($device['device_id'], $peer['bgpPeerIdentifier']));
@@ -144,7 +144,7 @@ else
         $safi = $peer_afi['safi'];
         if ($debug) { echo("$afi $safi\n"); }
 
-        if ($device['os_group'] == "ios")
+        if ($device['os_group'] == "cisco")
         {
           ## FIXME - move to function
           $cbgp_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m CISCO-BGP4-MIB -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
@@ -238,7 +238,7 @@ else
         }
         rrdtool_update("$cbgp_rrd", "N:$cbgpPeerAcceptedPrefixes:$cbgpPeerDeniedPrefixes:$cbgpPeerAdvertisedPrefixes:$cbgpPeerSuppressedPrefixes:$cbgpPeerWithdrawnPrefixes");
       } # while
-    } # os=ios | junos
+    } # os_group=cisco | junos
     echo("\n");
 
   } ## End While loop on peers

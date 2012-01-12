@@ -32,7 +32,7 @@
 #CISCO-IPSEC-FLOW-MONITOR-MIB::cipSecGlobalNoSaFails.0 = Counter32: 5 Failures
 #CISCO-IPSEC-FLOW-MONITOR-MIB::cipSecGlobalSysCapFails.0 = Counter32: 0 Failures
 
-if ($device['os_group'] == "ios")
+if ($device['os_group'] == "cisco")
 {
   $data = snmpwalk_cache_oid($device, "cipSecGlobalStats", NULL, "CISCO-IPSEC-FLOW-MONITOR-MIB");
   $data = $data[0];
