@@ -6,6 +6,8 @@ $link_array = array('page'    => 'device',
 
 #$type_text['overview'] = "Overview";
 $type_text['ipsec_tunnels'] = "IPSEC Tunnels";
+$type_text['loadbalancer_rservers'] = "Rservers";
+$type_text['loadbalancer_vservers'] = "Serverfarms";
 $type_text['bgp'] = "BGP";
 $type_text['cef'] = "CEF";
 $type_text['ospf'] = "OSPF";
