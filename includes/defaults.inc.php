@@ -225,6 +225,7 @@ $config['bad_if'][] = "pppoe-";
 $config['bad_if_regexp'][] = "/serial[0-9]:/";
 $config['bad_if_regexp'][] = "/^ng[0-9]+$/";
 $config['bad_if_regexp'][] = "/^sl[0-9]/";
+$config['bad_if_regexp'][] = "/^voice\ over\ ip\ peer/";
 
 $config['processor_filter'][] = "An electronic chip that makes the computer work.";
 
@@ -361,9 +362,8 @@ $config['poller_modules']['cisco-remote-access-monitor']  = 1;
 $config['poller_modules']['cisco-cef']                    = 1;
 $config['poller_modules']['cisco-mac-accounting']         = 1;
 $config['poller_modules']['cipsec-tunnels']               = 1;
-$config['poller_modules']['cisco-vpdn']			  = 1;
-$config['poller_modules']['entity-physical']              = 1;
-
+$config['poller_modules']['cisco-ace-loadbalancer']       = 1;
+$config['poller_modules']['cisco-ace-serverfarms']	  = 1;
 
 ## List of discovery modules. Need to be in this array to be
 ## considered for execution.
