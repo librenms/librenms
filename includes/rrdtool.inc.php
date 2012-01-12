@@ -45,8 +45,8 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
 
   $rrd_process = proc_open($command, $descriptorspec, $rrd_pipes, $cwd, $env);
 
-#  stream_set_blocking($rrd_pipes[1], 0);
-#  stream_set_blocking($rrd_pipes[2], 0);
+  stream_set_blocking($rrd_pipes[1], 0);
+  stream_set_blocking($rrd_pipes[2], 0);
 
   if (is_resource($rrd_process))
   {
