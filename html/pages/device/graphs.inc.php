@@ -35,7 +35,7 @@ foreach ($config['graph_sections'] as $section)
       echo('<span class="pagemenu-selected">');
     }
 
-    echo(generate_link(ucfirst($type),$link_array,array('group'=>$type)));
+    echo(generate_link(ucwords($type),$link_array,array('group'=>$type)));
 
     if ($vars['group'] == $type)
     {
