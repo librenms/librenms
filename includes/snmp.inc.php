@@ -194,6 +194,7 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 
   if (!$debug) { $cmd .= " 2>/dev/null"; }
   $data = trim(external_exec($cmd));
+  $data = str_replace("\"", "", $data);
 
   if (is_string($data) && (preg_match("/No Such (Object|Instance)/i", $data)))
   {
