@@ -17,11 +17,7 @@ foreach($ns_sensor_array as $descr => $data)
 
   $current = $data['sysHealthCounterValue'];
 
-  $oid = ".1.3.6.1.4.1.5951.4.1.1.41.7.1.2.".strlen($descr);
-  for($i = 0; $i != strlen($descr); $i++)
-  {
-     $oid .= ".".ord($descr[$i]);
-  }
+  $oid = ".1.3.6.1.4.1.5951.4.1.1.41.7.1.2." . string_to_oid($descr);
 
   if     (strpos($descr, "Temp") !== FALSE) { $divisor = 0; $multiplier = 0; $type = "temperature"; }
   elseif (strpos($descr, "Fan")  !== FALSE) { $divisor = 0; $multiplier = 0; $type = "fanspeed"; }

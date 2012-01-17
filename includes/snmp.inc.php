@@ -1,5 +1,16 @@
 <?php
 
+
+function string_to_oid($string)
+{
+  $oid = strlen($string);
+  for($i = 0; $i != strlen($string); $i++)
+  {
+     $oid .= ".".ord($string[$i]);
+  }
+  return $oid;
+}
+
 function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir = NULL)
 {
   global $debug,$config,$runtime_stats,$mibs_loaded;
