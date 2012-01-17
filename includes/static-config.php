@@ -844,7 +844,7 @@ foreach ($config['os'] as $this_os => $blah)
 
 ### Graph Types
 
-$config['graph_sections'] = array('system', 'firewall', 'netstats', 'wireless', 'storage', 'vpdn');
+$config['graph_sections'] = array('system', 'firewall', 'netstats', 'wireless', 'storage', 'vpdn', 'load balancer');
 
 $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
 $config['graph_types']['device']['wifi_clients']['order'] = '0';
@@ -969,6 +969,19 @@ $config['graph_types']['device']['vpdn_sessions_l2tp']['descr'] = 'VPDN L2TP Ses
 $config['graph_types']['device']['vpdn_tunnels_l2tp']['section'] = 'vpdn';
 $config['graph_types']['device']['vpdn_tunnels_l2tp']['order'] = '0';
 $config['graph_types']['device']['vpdn_tunnels_l2tp']['descr'] = 'VPDN L2TP Tunnels';
+
+$config['graph_types']['device']['netscaler_tcp_conn']['section'] = 'load balancer';
+$config['graph_types']['device']['netscaler_tcp_conn']['order'] = '0';
+$config['graph_types']['device']['netscaler_tcp_conn']['descr'] = 'TCP Connections';
+
+$config['graph_types']['device']['netscaler_tcp_bits']['section'] = 'load balancer';
+$config['graph_types']['device']['netscaler_tcp_bits']['order'] = '0';
+$config['graph_types']['device']['netscaler_tcp_bits']['descr'] = 'TCP Traffic';
+
+$config['graph_types']['device']['netscaler_tcp_pkts']['section'] = 'load balancer';
+$config['graph_types']['device']['netscaler_tcp_pkts']['order'] = '0';
+$config['graph_types']['device']['netscaler_tcp_pkts']['descr'] = 'TCP Packets';
+
 
 
 ### Device Types
