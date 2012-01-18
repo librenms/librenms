@@ -3,18 +3,21 @@ NS-ROOT-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 	Counter32, Gauge32, Integer32, IpAddress, NOTIFICATION-TYPE,OBJECT-TYPE, TimeTicks, enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
-		FROM SNMPv2-SMI;
+		FROM SNMPv2-SMI
+	Ipv6Address
+		FROM IPV6-TC;
 
 netScaler MODULE-IDENTITY
-	LAST-UPDATED "200705210000Z"
-	ORGANIZATION  "Netscaler, Inc."
-	CONTACT-INFO "Netscaler Technical Assistance Center
-		Postal: 180 Baytech Dr.
-			San Jose, CA 95134
-			USA
-		Tel: +1-866-NETSCALER
-		E-mail: support@netscaler.com"
-	DESCRIPTION "The enterprise specific MIB for Netscaler NS7.0."
+	LAST-UPDATED "201001280000Z"
+	ORGANIZATION "Citrix Systems, Inc."
+	CONTACT-INFO  "Citrix Technical Assistance Center
+			Postal: Citrix Systems, Inc.
+				851 West Cypress Creek Road
+				Fort Lauderdale, Florida  33309
+				United States
+			Tel: +1-800-4-CITRIX (+1-800-424-8749)
+			E-mail: customercare@citrix.com"
+	DESCRIPTION "The enterprise specific MIB for Netscaler NS8.1."
 	::= { enterprises 5951 }
 
 nsRoot OBJECT IDENTIFIER
@@ -2343,7 +2346,7 @@ vlanconfigEntry OBJECT-TYPE
 VlanconfigEntry ::= SEQUENCE {
     vlancDevno       Integer32,
     tagId       Integer32,
-    interfaces  OCTET STRING,
+    vlancInterfaces  OCTET STRING,
     ipaddress   IpAddress,
     netmask     IpAddress,
     tagging     OCTET STRING
@@ -2371,7 +2374,7 @@ tagId OBJECT-TYPE
 	This object is obsolete.It can be measured through vlanTable.vlanId."
     ::= { vlanconfigEntry 2 }
 
-interfaces OBJECT-TYPE
+vlancInterfaces OBJECT-TYPE
     SYNTAX      OCTET STRING
     MAX-ACCESS  read-only
     STATUS      obsolete
@@ -2692,7 +2695,7 @@ gslbDomainStatsEntry OBJECT-TYPE
 
 GslbDomainStatsEntry ::= SEQUENCE {
     gslbDomainIndex     Integer32,
-    domainName          OCTET STRING,
+    domainname          OCTET STRING,
     gslbDomainQueries   Counter32
 }
 
@@ -2704,7 +2707,7 @@ gslbDomainIndex OBJECT-TYPE
         "The distinguishing Id for each gslb Domain on NetScaler. OBSOLETE"
     ::= { gslbDomainStatsEntry 1 }
 
-domainName OBJECT-TYPE
+domainname OBJECT-TYPE
     SYNTAX      OCTET STRING
     MAX-ACCESS  read-only
     STATUS      obsolete
@@ -4442,13 +4445,13 @@ EntityState ::=
 	INTEGER{ down(1), unknown(2), busy(3), outOfService(4), transitionToOutOfService(5), up(7) }
 
 MepStatus ::=
-	INTEGER{ mepActive(1), mepInactive(2), mepDown(3) }
+	INTEGER{ mepInactive(5), mepActive(6), mepDown(7) }
 
 SiteType ::=
 	INTEGER{ localSite(1), remoteSite(2) }
 
 MetricExchange ::=
-	INTEGER{ disabled(1), enabled(2) }
+	INTEGER{ disabled(3), enabled(4) }
 
 AdminStatus ::=
 	INTEGER{ disabled(1), enabled(2) }
@@ -4463,7 +4466,7 @@ ModeStatus ::=
 	INTEGER{ disabled(0), enabled(1) }
 
 LbPolicy ::=
-	INTEGER{ weightedRoundRobin(1), leastConnections(2), leastResponse(3), asynchronousMAC(4), urlHashed(5), domainHashed(6), destinationIPHashed(7), sourceIPHashed(8), leastBandwidth(9), leastPackets(10), leastLoad(11), token(12), staticProximity(13), rtt(14), sourceIPDestinationIPHashed(15), sourceIPSourcePort(16), lrtm(17), callIDHashed(18) }
+	INTEGER{ weightedRoundRobin(1), leastConnections(2), leastResponse(3), asynchronousMAC(4), urlHashed(5), domainHashed(6), destinationIPHashed(7), sourceIPHashed(8), leastBandwidth(9), leastPackets(10), customLoad(11), token(12), staticProximity(13), rtt(14), sourceIPDestinationIPHashed(15), sourceIPSourcePort(16), lrtm(17), callIDHashed(18) }
 
 PersistanceType ::=
 	INTEGER{ sourceIp(1), cookieInsert(2), cookieDelete(3), cookieRead(4), cookieHash(5), sessionId(6), server(7), rule(8), urlPassive(9), customServerID(10), groupSourceID(11), groupCookieInsert(12), destinationIP(13), spillOver(14), sourceIPdestinationIP(15), callerID(16), none(17) }
@@ -4760,6 +4763,62 @@ featureRewrite  OBJECT-TYPE
 		"This represents whether Rewrite feature is enabled or disabled on NetScaler."
 	::= { nsFeatureInfo 19 }
 
+featureDeltaCompression  OBJECT-TYPE
+	SYNTAX  FeatureStatus
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This represents whether Delta Compression feature is enabled or disabled on NetScaler."
+	::= { nsFeatureInfo 20 }
+
+featureGSLBProximity  OBJECT-TYPE
+	SYNTAX  FeatureStatus
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This represents whether GSLB Proximity feature is enabled or disabled on NetScaler."
+	::= { nsFeatureInfo 21 }
+
+featureIPv6ProtocolTranslation  OBJECT-TYPE
+	SYNTAX  FeatureStatus
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This represents whether IPv6 Protocol Translation feature is enabled or disabled on NetScaler."
+	::= { nsFeatureInfo 22 }
+
+featureApplicationFirewall  OBJECT-TYPE
+	SYNTAX  FeatureStatus
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This represents whether Application Firewall feature is enabled or disabled on NetScaler."
+	::= { nsFeatureInfo 23 }
+
+featureResponder  OBJECT-TYPE
+	SYNTAX  FeatureStatus
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This represents whether Responder feature is enabled or disabled on NetScaler."
+	::= { nsFeatureInfo 24 }
+
+featureHtmlInjection  OBJECT-TYPE
+	SYNTAX  FeatureStatus
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This represents whether Html Injection feature is enabled or disabled on Netscaler."
+	::= { nsFeatureInfo 25 }
+
+featureAGEE  OBJECT-TYPE
+	SYNTAX  FeatureStatus
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This represents whether AGEE feature of SSLVPN is enabled or disabled on Netscaler."
+	::= { nsFeatureInfo 50 }
+
 nsModeInfo OBJECT IDENTIFIER
 	::= { nsSysGroup 21 }
 
@@ -4866,6 +4925,14 @@ modeIntranetRouteAdv  OBJECT-TYPE
 	DESCRIPTION
 		"This represents whether intranet route advertisement mode is enabled or disabled on NetScaler."
 	::= { nsModeInfo 13 }
+
+brgBpdu  OBJECT-TYPE
+	SYNTAX  ModeStatus
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This represents whether Bridging of BPDU is enabled or disabled on NetScaler."
+	::= { nsModeInfo 14 }
 
 nsFiltersGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 22 }
@@ -5005,7 +5072,8 @@ nsAclEntry  OBJECT-TYPE
 NsAclEntry ::= SEQUENCE {
 	aclName  OCTET STRING,
 	aclPriority  Integer32,
-	aclHits  Counter64
+	aclHits  Counter64,
+	aclperHits  Counter64
 }
 
 aclName  OBJECT-TYPE
@@ -5027,10 +5095,18 @@ aclPriority  OBJECT-TYPE
 aclHits  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
+	STATUS  obsolete
+	DESCRIPTION
+		"...OBSOLETE"
+	::= { nsAclEntry 3 }
+
+aclperHits  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
 		"Number of times the acl was hit"
-	::= { nsAclEntry 3 }
+	::= { nsAclEntry 4 }
 
 contentFiltersTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF ContentFiltersEntry
@@ -5088,6 +5164,57 @@ contentFilterHits  OBJECT-TYPE
 		"...OBSOLETE"
 	::= { contentFiltersEntry 4 }
 
+saclStatsGroup OBJECT IDENTIFIER
+	::= { nsFiltersGroup 3 }
+
+saclTotPktsBridged  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total packets that matched a SimpleACL with action BRIDGE and got bridged by NetScaler."
+	::= { saclStatsGroup 1 }
+
+saclTotPktsDenied  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total packets that matched a SimpleACL with action DENY and got dropped by NetScaler."
+	::= { saclStatsGroup 2 }
+
+saclTotPktsAllowed  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total packets that matched a SimpleACL with action ALLOW and got consumed by NetScaler."
+	::= { saclStatsGroup 3 }
+
+saclTotHits  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total packets that matched any SimpleACL"
+	::= { saclStatsGroup 4 }
+
+saclTotMisses  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total packets that did not match any SimpleACL"
+	::= { saclStatsGroup 5 }
+
+saclsCount  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of currently configured SimpleACLs"
+	::= { saclStatsGroup 6 }
+
 nsHighAvailabilityGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 23 }
 
@@ -5120,7 +5247,7 @@ haTotStateTransitions  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Total number of times the master state change from SECONDARY to PRIMARY or vice-versa."
+		"This represents the total number of master state changes that the NetScaler has made from primary to secondary and vice-versa"
 	::= { nsHighAvailabilityGroup 4 }
 
 haTimeofLastStateTransition  OBJECT-TYPE
@@ -5136,7 +5263,7 @@ haTotStateFail  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Total number of times the interfaces and SSL cards failed on the system."
+		"Number of times state changed to PARTIAL_FAIL/PARTIAL_FAIL_SSL/ROUTEMONITOR_FAIL/COMPLETE_FAIL"
 	::= { nsHighAvailabilityGroup 6 }
 
 haErrSyncFailure  OBJECT-TYPE
@@ -5210,6 +5337,14 @@ haLastMasterStateTransitionReason  OBJECT-TYPE
 	DESCRIPTION
 		"The reason for the last master state transition. This gives the conditions under which this node assumed the current state. The current state         is available at the oid sysHighAvailabilityMode.0"
 	::= { nsHighAvailabilityGroup 15 }
+
+haPeerSystemState  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"HA peer system state"
+	::= { nsHighAvailabilityGroup 16 }
 
 vlanTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF VlanEntry
@@ -5460,7 +5595,8 @@ NsIpAddrEntry ::= SEQUENCE {
 	ipNetmask  IpAddress,
 	ipType  IpAddressType,
 	ipMode  IpAddressMode,
-	ipFreePorts  Gauge32
+	ipFreePorts  Gauge32,
+	ipVlan  OCTET STRING
 }
 
 ipAddr  OBJECT-TYPE
@@ -5503,6 +5639,14 @@ ipFreePorts  OBJECT-TYPE
 		"This represents the number of unused ports free on this IP"
 	::= { nsIpAddrEntry 5 }
 
+ipVlan  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The vlan to which this ip address is bound."
+	::= { nsIpAddrEntry 6 }
+
 nsResourceGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 41 }
 
@@ -5511,7 +5655,7 @@ resCpuUsage  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Average CPU utilization percentage"
+		"CPU utilization percentage"
 	::= { nsResourceGroup 1 }
 
 resMemUsage  OBJECT-TYPE
@@ -5627,7 +5771,7 @@ nsSysHealthDiskTable  OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS  current
 	DESCRIPTION
-		"This table contains information about the diks space status of the NetScaler."
+		"This table contains information about the disk space of the NetScaler."
 	::= { nsResourceGroup 8 }
 
 nsSysHealthDiskEntry  OBJECT-TYPE
@@ -5686,6 +5830,14 @@ sysHealthDiskPerusage  OBJECT-TYPE
 	DESCRIPTION
 		"The Percentage of the disk space used."
 	::= { nsSysHealthDiskEntry 5 }
+
+cpuSpeedMHz  OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"CPU speed in MHz"
+	::= { nsResourceGroup 15 }
 
 nsIpStatsGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 43 }
@@ -5887,7 +6039,7 @@ ipTotRxPkts  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP packets received by NetScaler"
+		"Total number of IP packets received by NetScaler."
 	::= { nsIpStatsGroup 25 }
 
 ipTotRxBytes  OBJECT-TYPE
@@ -5895,7 +6047,7 @@ ipTotRxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP bytes received by NetScaler."
+		"Total number of IP bytes received by NetScaler."
 	::= { nsIpStatsGroup 26 }
 
 ipTotRxMbits  OBJECT-TYPE
@@ -5903,7 +6055,7 @@ ipTotRxMbits  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP bits received by the NetScaler, in megabits."
+		"Total number of IP bits received by NetScaler, in megabits."
 	::= { nsIpStatsGroup 27 }
 
 ipTotTxPkts  OBJECT-TYPE
@@ -5911,7 +6063,7 @@ ipTotTxPkts  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP packets transmitted by NetScaler."
+		"Total number of IP packets transmitted by NetScaler."
 	::= { nsIpStatsGroup 28 }
 
 ipTotTxBytes  OBJECT-TYPE
@@ -5919,7 +6071,7 @@ ipTotTxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP bytes transmitted by NetScaler."
+		"Total number of IP bytes transmitted by NetScaler."
 	::= { nsIpStatsGroup 29 }
 
 ipTotTxMbits  OBJECT-TYPE
@@ -5927,7 +6079,7 @@ ipTotTxMbits  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP bits transmitted by the NetScaler, in megabits."
+		"Total number of IP bits transmitted by NetScaler, in megabits."
 	::= { nsIpStatsGroup 30 }
 
 ipTotFragments  OBJECT-TYPE
@@ -5935,7 +6087,7 @@ ipTotFragments  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP fragments received."
+		"Total number of IP fragments received by NetScaler."
 	::= { nsIpStatsGroup 31 }
 
 ipTotBadlens  OBJECT-TYPE
@@ -5943,7 +6095,7 @@ ipTotBadlens  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"The total number of ip packets received with length > 1514."
+		"Total number of IP packets received by NetScaler with length > 1514."
 	::= { nsIpStatsGroup 32 }
 
 ipTotBadMacAddrs  OBJECT-TYPE
@@ -5951,7 +6103,7 @@ ipTotBadMacAddrs  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"The total number of transmitted ip packets with bad MAC addresseses."
+		"Total number of transmitted IP packets received by NetScaler with bad MAC addresses."
 	::= { nsIpStatsGroup 33 }
 
 ipTotMaxClients  OBJECT-TYPE
@@ -5959,7 +6111,7 @@ ipTotMaxClients  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of times one tries to open a new connection to a service having maximum number of allowed open client connections"
+		"Total number of times one tries to open a new connection to a service having maximum number of allowed open client connections."
 	::= { nsIpStatsGroup 34 }
 
 ipTotUnknownSvcs  OBJECT-TYPE
@@ -5967,7 +6119,7 @@ ipTotUnknownSvcs  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of packets received for a NetScaler owned IP, but an un-configured port/service"
+		"Total number of packets received for a NetScaler owned IP, but an un-configured port/service."
 	::= { nsIpStatsGroup 35 }
 
 ipTotLandattacks  OBJECT-TYPE
@@ -5975,7 +6127,7 @@ ipTotLandattacks  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of land attack packets received by NetScaler"
+		"Total number of land attack packets received by NetScaler."
 	::= { nsIpStatsGroup 36 }
 
 ipTotBadChecksums  OBJECT-TYPE
@@ -5983,7 +6135,7 @@ ipTotBadChecksums  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of packets reveived with bad IP checksums."
+		"Total number of packets reveived by NetScaler with bad IP checksums."
 	::= { nsIpStatsGroup 37 }
 
 ipTotReassemblyAttempt  OBJECT-TYPE
@@ -5991,7 +6143,7 @@ ipTotReassemblyAttempt  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP packets for which reassembly was attempted."
+		"Total number of IP packets for which reassembly was attempted by NetScaler."
 	::= { nsIpStatsGroup 38 }
 
 ipTotSuccReassembly  OBJECT-TYPE
@@ -5999,7 +6151,7 @@ ipTotSuccReassembly  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP packets for which successful reassembly was done."
+		"Total number of IP packets for which successful reassembly was done by NetScaler."
 	::= { nsIpStatsGroup 39 }
 
 ipTotUnsuccReassembly  OBJECT-TYPE
@@ -6007,7 +6159,7 @@ ipTotUnsuccReassembly  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP packets for which reassembly failed."
+		"Total number of IP packets for which reassembly failed in NetScaler."
 	::= { nsIpStatsGroup 40 }
 
 ipTotTooBig  OBJECT-TYPE
@@ -6015,7 +6167,7 @@ ipTotTooBig  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP packets for which reassembled data was too big."
+		"Total number of IP packets received by NetScaler for which reassembled data was too big."
 	::= { nsIpStatsGroup 41 }
 
 ipTotZeroFragmentLen  OBJECT-TYPE
@@ -6023,7 +6175,7 @@ ipTotZeroFragmentLen  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP packets received with fragment length zero."
+		"Total number of IP packets received by NetScaler with fragment length zero."
 	::= { nsIpStatsGroup 42 }
 
 ipTotDupFragments  OBJECT-TYPE
@@ -6031,7 +6183,7 @@ ipTotDupFragments  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of duplicate IP fragments received."
+		"Total number of duplicate IP fragments received by NetScaler."
 	::= { nsIpStatsGroup 43 }
 
 ipTotOutOfOrderFrag  OBJECT-TYPE
@@ -6039,7 +6191,7 @@ ipTotOutOfOrderFrag  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of out of order fragments received."
+		"Total number of out of order fragments received by NetScaler."
 	::= { nsIpStatsGroup 44 }
 
 ipTotUnknownDstRcvd  OBJECT-TYPE
@@ -6047,7 +6199,7 @@ ipTotUnknownDstRcvd  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of unknown destinations received, cannot route packet to NSIP."
+		"Total number of unknown destinations received by NetScaler, cannot route packet to NSIP."
 	::= { nsIpStatsGroup 45 }
 
 ipTotBadTransport  OBJECT-TYPE
@@ -6055,7 +6207,7 @@ ipTotBadTransport  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of packets for which the service handler is unknown."
+		"Total number of packets received by NetScaler for which the service handler is unknown."
 	::= { nsIpStatsGroup 46 }
 
 ipTotVIPDown  OBJECT-TYPE
@@ -6063,7 +6215,7 @@ ipTotVIPDown  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of packets received for which the VIP down for natpcb sessions."
+		"Total number of packets received by NetScaler for which the VIP down for natpcb sessions."
 	::= { nsIpStatsGroup 47 }
 
 ipTotFixHeaderFail  OBJECT-TYPE
@@ -6071,7 +6223,7 @@ ipTotFixHeaderFail  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP packets in which there is an error in the IP header."
+		"Total number of IP packets received by NetScaler in which there is an error in the IP header."
 	::= { nsIpStatsGroup 48 }
 
 ipTotAddrLookup  OBJECT-TYPE
@@ -6079,7 +6231,7 @@ ipTotAddrLookup  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP address lookups done"
+		"Total number of IP address lookups done by NetScaler."
 	::= { nsIpStatsGroup 49 }
 
 ipTotAddrLookupFail  OBJECT-TYPE
@@ -6087,7 +6239,7 @@ ipTotAddrLookupFail  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP address lookups which failed."
+		"Total number of IP address lookups done in NetScaler which failed."
 	::= { nsIpStatsGroup 50 }
 
 ipTotUDPfragmentsFwd  OBJECT-TYPE
@@ -6095,7 +6247,7 @@ ipTotUDPfragmentsFwd  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Total number of UDP fragments forwarded."
+		"Total number of UDP fragments forwarded by NetScaler."
 	::= { nsIpStatsGroup 51 }
 
 ipTotTCPfragmentsFwd  OBJECT-TYPE
@@ -6103,7 +6255,7 @@ ipTotTCPfragmentsFwd  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Total number TCP fragments forwarded."
+		"Total number TCP fragments forwarded by NetScaler."
 	::= { nsIpStatsGroup 52 }
 
 ipTotFragPktsGen  OBJECT-TYPE
@@ -6119,7 +6271,7 @@ ipTotInvalidHeaderSz  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of packets with invalid IP header size."
+		"Total number of packets received by NetScaler with invalid IP header size."
 	::= { nsIpStatsGroup 54 }
 
 ipTotInvalidPacketSize  OBJECT-TYPE
@@ -6127,7 +6279,7 @@ ipTotInvalidPacketSize  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of packets with invalid IP packet size."
+		"Total number of packets received by NetScaler with invalid IP packet size."
 	::= { nsIpStatsGroup 55 }
 
 ipTotTruncatedPackets  OBJECT-TYPE
@@ -6135,7 +6287,7 @@ ipTotTruncatedPackets  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Total number of truncated IP packets"
+		"Total number of truncated IP packets received by NetScaler."
 	::= { nsIpStatsGroup 56 }
 
 ipTotZeroNextHop  OBJECT-TYPE
@@ -6143,7 +6295,7 @@ ipTotZeroNextHop  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Total number of IP packets with ZERO next hop."
+		"Total number of IP packets received by NetScaler with ZERO next hop."
 	::= { nsIpStatsGroup 57 }
 
 ipTotTtlExpired  OBJECT-TYPE
@@ -6151,8 +6303,16 @@ ipTotTtlExpired  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of IP packets for which TTL expired during transit."
+		"Total number of IP packets received by NetScaler for which TTL expired during transit."
 	::= { nsIpStatsGroup 58 }
+
+nonIpTotTruncatedPackets  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of truncated non-IP packet received by NetScaler."
+	::= { nsIpStatsGroup 59 }
 
 nsIcmpStatsGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 44 }
@@ -6292,7 +6452,7 @@ icmpCurRateThreshold  OBJECT-TYPE
 	DESCRIPTION
 		"This contains the value set for 10ms rate threshold for icmp packets.
 This implies that within 10ms range , NetScaler can allow
-(receive or pass through ) the set number of ICMP packets "
+(receive or pass through ) the set number of ICMP packets. "
 	::= { nsIcmpStatsGroup 17 }
 
 icmpCurRateThresholdInterval  OBJECT-TYPE
@@ -6332,7 +6492,7 @@ icmpTotRxPkts  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ICMP packets received by NetScaler."
+		"Total number of ICMP packets received by NetScaler."
 	::= { nsIcmpStatsGroup 22 }
 
 icmpTotRxBytes  OBJECT-TYPE
@@ -6340,7 +6500,7 @@ icmpTotRxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ICMP bytes received by NetScaler."
+		"Total number of ICMP bytes received by NetScaler."
 	::= { nsIcmpStatsGroup 23 }
 
 icmpTotTxPkts  OBJECT-TYPE
@@ -6348,7 +6508,7 @@ icmpTotTxPkts  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ICMP packets transmitted by NetScaler."
+		"Total number of ICMP packets transmitted by NetScaler."
 	::= { nsIcmpStatsGroup 24 }
 
 icmpTotTxBytes  OBJECT-TYPE
@@ -6356,7 +6516,7 @@ icmpTotTxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ICMP bytes transmitted by NetScaler."
+		"Total number of ICMP bytes transmitted by NetScaler."
 	::= { nsIcmpStatsGroup 25 }
 
 icmpTotRxEchoReply  OBJECT-TYPE
@@ -6364,7 +6524,7 @@ icmpTotRxEchoReply  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ICMP echo replies received by NetScaler."
+		"Total number of ICMP echo replies received by NetScaler."
 	::= { nsIcmpStatsGroup 26 }
 
 icmpTotTxEchoReply  OBJECT-TYPE
@@ -6372,7 +6532,7 @@ icmpTotTxEchoReply  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ICMP echo replies transmitted by NetScaler."
+		"Total number of ICMP echo replies transmitted by NetScaler."
 	::= { nsIcmpStatsGroup 27 }
 
 icmpTotRxEcho  OBJECT-TYPE
@@ -6380,7 +6540,7 @@ icmpTotRxEcho  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ICMP echos received by NetScaler."
+		"Total number of ICMP echos received by NetScaler."
 	::= { nsIcmpStatsGroup 28 }
 
 icmpTotPktsDropped  OBJECT-TYPE
@@ -6388,7 +6548,7 @@ icmpTotPktsDropped  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ICMP packets dropped by NetScaler."
+		"Total number of ICMP packets dropped by NetScaler."
 	::= { nsIcmpStatsGroup 29 }
 
 icmpTotThresholdExceeds  OBJECT-TYPE
@@ -6396,7 +6556,7 @@ icmpTotThresholdExceeds  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of time ICMP rate threshold was exceeded."
+		"Total number of time ICMP rate threshold was exceeded."
 	::= { nsIcmpStatsGroup 30 }
 
 icmpTotPortUnreachableRx  OBJECT-TYPE
@@ -6404,7 +6564,7 @@ icmpTotPortUnreachableRx  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ICMP port unreachable packets received."
+		"Total number of ICMP port unreachable packets received by NetScaler."
 	::= { nsIcmpStatsGroup 31 }
 
 icmpTotPortUnreachableTx  OBJECT-TYPE
@@ -6412,7 +6572,7 @@ icmpTotPortUnreachableTx  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ICMP port unreachable packets generated by  NetScaler."
+		"Total number of ICMP port unreachable packets generated by NetScaler."
 	::= { nsIcmpStatsGroup 32 }
 
 icmpTotBadChecksum  OBJECT-TYPE
@@ -6420,7 +6580,7 @@ icmpTotBadChecksum  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of packets with bad ICMP checksum received."
+		"Total number of packets with bad ICMP checksum received by Netscaler."
 	::= { nsIcmpStatsGroup 33 }
 
 icmpTotNeedFragRx  OBJECT-TYPE
@@ -6428,7 +6588,7 @@ icmpTotNeedFragRx  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ICMP error message: need fragmentation received."
+		"Total number of ICMP error message: need fragmentation received by NetScaler."
 	::= { nsIcmpStatsGroup 34 }
 
 icmpTotNonFirstIpFrag  OBJECT-TYPE
@@ -6436,7 +6596,7 @@ icmpTotNonFirstIpFrag  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of non-first IP fragments resulting in path MTU error."
+		"Total number of non-first IP fragments resulting in path MTU error."
 	::= { nsIcmpStatsGroup 35 }
 
 icmpTotInvalidBodyLen  OBJECT-TYPE
@@ -6444,7 +6604,7 @@ icmpTotInvalidBodyLen  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of invalid body length received on a need fragmentation ICMP error message."
+		"Total number of invalid body length received on a need fragmentation ICMP error message."
 	::= { nsIcmpStatsGroup 36 }
 
 icmpTotNoTcpConn  OBJECT-TYPE
@@ -6452,7 +6612,7 @@ icmpTotNoTcpConn  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of packets with no tcp connection on src/dst, ip/port information received on a need fragmentation ICMP error message."
+		"Total number of packets with no tcp connection on src/dst, ip/port information received on a need fragmentation ICMP error message."
 	::= { nsIcmpStatsGroup 37 }
 
 icmpTotNoUdpConn  OBJECT-TYPE
@@ -6460,7 +6620,7 @@ icmpTotNoUdpConn  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of packets with no udp connection on src/dst, ip/port information received on a need fragmentation ICMP error message."
+		"Total number of packets with no udp connection on src/dst, ip/port information received on a need fragmentation ICMP error message."
 	::= { nsIcmpStatsGroup 38 }
 
 icmpTotInvalidTcpSeqno  OBJECT-TYPE
@@ -6468,7 +6628,7 @@ icmpTotInvalidTcpSeqno  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Invalid tcp seqno received on need fragmentation ICMP error message."
+		"Total number of invalid tcp seqno received on need fragmentation ICMP error message."
 	::= { nsIcmpStatsGroup 39 }
 
 icmpTotInvalidNextMTUval  OBJECT-TYPE
@@ -6476,7 +6636,7 @@ icmpTotInvalidNextMTUval  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Inval (<576|>1500) next MTU value  received on a need fragmentation ICMP error message."
+		"Total number of inval (<576|>1500) next MTU value received on a need fragmentation ICMP error message."
 	::= { nsIcmpStatsGroup 40 }
 
 icmpTotDstIpLookup  OBJECT-TYPE
@@ -6484,7 +6644,7 @@ icmpTotDstIpLookup  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MTU lookup on destination IP info received on a need fragmentation ICMP error message failed."
+		"Total number of MTU lookup on destination IP info received on a need fragmentation ICMP error message failed."
 	::= { nsIcmpStatsGroup 41 }
 
 icmpTotBigNextMTU  OBJECT-TYPE
@@ -6492,7 +6652,7 @@ icmpTotBigNextMTU  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Next MTU information received on a need fragmentation ICMP error message greater than current MTU."
+		"Total number of next MTU information received on a need fragmentation ICMP error message greater than current MTU."
 	::= { nsIcmpStatsGroup 42 }
 
 icmpTotInvalidProtocol  OBJECT-TYPE
@@ -6500,7 +6660,7 @@ icmpTotInvalidProtocol  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Invalid protocol type received on a need fragmentation ICMP error message."
+		"Total number of invalid protocol type received on a need fragmentation ICMP error message."
 	::= { nsIcmpStatsGroup 43 }
 
 icmpTotBadPMTUIpChecksum  OBJECT-TYPE
@@ -6508,7 +6668,7 @@ icmpTotBadPMTUIpChecksum  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"IP checksum error on the IP fragment in the need fragmentation ICMP error message body."
+		"Total number of IP checksum error on the IP fragment in the need fragmentation ICMP error message body."
 	::= { nsIcmpStatsGroup 44 }
 
 icmpTotPMTUnoLink  OBJECT-TYPE
@@ -6516,7 +6676,7 @@ icmpTotPMTUnoLink  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Need fragmentation ICMP error message received on a pcb with no link."
+		"Total number of need fragmentation ICMP error message received on a pcb with no link."
 	::= { nsIcmpStatsGroup 45 }
 
 icmpTotPMTUDiscoveryDisabled  OBJECT-TYPE
@@ -6524,7 +6684,7 @@ icmpTotPMTUDiscoveryDisabled  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"PMTU Discovery mode is not enabled."
+		"Total number of need fragmentation ICMP error message received for which PMTU Discovery is disabled."
 	::= { nsIcmpStatsGroup 46 }
 
 nsUdpStatsGroup OBJECT IDENTIFIER
@@ -6617,7 +6777,7 @@ udpCurRateThreshold  OBJECT-TYPE
 	DESCRIPTION
 		"This contains the value set for 10ms rate threshold for udp packets.
 This implies that within 10ms range , NetScaler can allow
-(receive or pass through ) the set number of UDP packets "
+(receive or pass through ) the set number of UDP packets. "
 	::= { nsUdpStatsGroup 11 }
 
 udpRateInterval  OBJECT-TYPE
@@ -6657,7 +6817,7 @@ udpTotUnknownSvcPkts  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of UDP packets to unconfigured services"
+		"Total number of UDP packets received by NetScaler to unconfigured services."
 	::= { nsUdpStatsGroup 16 }
 
 udpTotRxPkts  OBJECT-TYPE
@@ -6665,7 +6825,7 @@ udpTotRxPkts  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of UDP packets received"
+		"Total number of UDP packets received by NetScaler."
 	::= { nsUdpStatsGroup 17 }
 
 udpTotRxBytes  OBJECT-TYPE
@@ -6673,7 +6833,7 @@ udpTotRxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of UDP bytes received"
+		"Total number of UDP bytes received by NetScaler."
 	::= { nsUdpStatsGroup 18 }
 
 udpTotTxPkts  OBJECT-TYPE
@@ -6681,7 +6841,7 @@ udpTotTxPkts  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of UDP packets transmitted"
+		"Total number of UDP packets transmitted by NetScaler."
 	::= { nsUdpStatsGroup 19 }
 
 udpTotTxBytes  OBJECT-TYPE
@@ -6689,7 +6849,7 @@ udpTotTxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of UDP bytes transmitted"
+		"Total number of UDP bytes transmitted by NetScaler."
 	::= { nsUdpStatsGroup 20 }
 
 udpCurRateThresholdExceeds  OBJECT-TYPE
@@ -6705,7 +6865,7 @@ udpBadChecksum  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of packets with bad UDP checksum received."
+		"Number of packets with bad UDP checksum received by NetScaler."
 	::= { nsUdpStatsGroup 22 }
 
 nsTcpStatsGroup OBJECT IDENTIFIER
@@ -7399,7 +7559,7 @@ tcpReuseHit  OBJECT-TYPE
 		"Total no of client transactions found the server connection in the reuse-pool."
 	::= { nsTcpStatsGroup 86 }
 
-tcpWaitData  OBJECT-TYPE
+tcpWaitToData  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
 	STATUS  current
@@ -7414,6 +7574,14 @@ tcpErrStrayPkt  OBJECT-TYPE
 	DESCRIPTION
 		"Number of packets received on non existant connection"
 	::= { nsTcpStatsGroup 88 }
+
+tcpTotClientConnOpenRate  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Rate at which connections are opened in the system."
+	::= { nsTcpStatsGroup 89 }
 
 nsSslStatsGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 47 }
@@ -7431,15 +7599,15 @@ sslEngineStatus  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Status of the SSL Engine (1=UP, 0=DOWN)"
+		"Status of the SSL Engine (1=UP/0=DOWN). This state is decided based on SSL Feature/License status and minimum number of cards UP"
 	::= { nsSslStatsGroup 2 }
 
 sslSessionsPerSec  OBJECT-TYPE
-	SYNTAX  Integer32
+	SYNTAX  Gauge32
 	MAX-ACCESS  read-only
-	STATUS  obsolete
+	STATUS  current
 	DESCRIPTION
-		"...OBSOLETE"
+		"SSL sessions/second between client and NetScaler"
 	::= { nsSslStatsGroup 3 }
 
 sslTotTransactionsLow  OBJECT-TYPE
@@ -8895,7 +9063,7 @@ sslTotNewSessions  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of new SSL sessions"
+		"Number of new SSL sessions created."
 	::= { nsSslStatsGroup 209 }
 
 sslTotSessionHits  OBJECT-TYPE
@@ -9527,8 +9695,216 @@ sslNumCardsUP  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of ssl cards UP."
+		"Number of ssl cards UP. If number of cards UP is lower than a threshold, a failover will be initiated."
 	::= { nsSslStatsGroup 299 }
+
+sslCards  OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of SSL crypto cards present in the system"
+	::= { nsSslStatsGroup 300 }
+
+sslTotBkendSessionReNegotiate  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of Backend SSL session renegotiations"
+	::= { nsSslStatsGroup 301 }
+
+sslTotCipherAES128  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of AES 128-bit cipher encryptions"
+	::= { nsSslStatsGroup 302 }
+
+sslTotBkendSslV3Renego  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of Backend SSLv3 session renegotiations"
+	::= { nsSslStatsGroup 303 }
+
+sslTotBkendTlSvlRenego  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of Backend TLSv1 session renegotiations"
+	::= { nsSslStatsGroup 304 }
+
+sslTotCipherAES256  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of AES 256-bit cipher encryptions"
+	::= { nsSslStatsGroup 305 }
+
+sslTotBkendCipherAES128  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Backend AES 128-bit cipher encryptions"
+	::= { nsSslStatsGroup 306 }
+
+sslTotBkendCipherAES256  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Backend AES 256-bit cipher encryptions"
+	::= { nsSslStatsGroup 307 }
+
+sslTotHwEncBE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted in hardware on back-end"
+	::= { nsSslStatsGroup 308 }
+
+sslTotDec  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted"
+	::= { nsSslStatsGroup 309 }
+
+sslTotSwEncFE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted in software on front-end"
+	::= { nsSslStatsGroup 310 }
+
+sslTotEncFE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted on front-end"
+	::= { nsSslStatsGroup 311 }
+
+sslTotEnc  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted"
+	::= { nsSslStatsGroup 312 }
+
+sslTotDecHw  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted in hardware"
+	::= { nsSslStatsGroup 313 }
+
+sslTotSwDecBE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted in software on back-end"
+	::= { nsSslStatsGroup 314 }
+
+sslTotHwDecFE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted in hardware on front-end"
+	::= { nsSslStatsGroup 315 }
+
+sslTotEncHw  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted in hardware"
+	::= { nsSslStatsGroup 316 }
+
+sslTotDecSw  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted in software"
+	::= { nsSslStatsGroup 317 }
+
+sslTotSwEncBE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted in software on back-end"
+	::= { nsSslStatsGroup 318 }
+
+sslTotEncSw  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted in software"
+	::= { nsSslStatsGroup 319 }
+
+sslTotSwDecFE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted in software on front-end"
+	::= { nsSslStatsGroup 320 }
+
+sslTotEncBE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted on back-end"
+	::= { nsSslStatsGroup 321 }
+
+sslTotDecBE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted on back-end"
+	::= { nsSslStatsGroup 322 }
+
+sslTotHwDecBE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted in hardware on back-end"
+	::= { nsSslStatsGroup 323 }
+
+sslTotDecFE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted on front-end"
+	::= { nsSslStatsGroup 324 }
+
+sslTotHwEncFE  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted in hardware on front-end"
+	::= { nsSslStatsGroup 325 }
 
 nsHttpStatsGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 48 }
@@ -10704,7 +11080,7 @@ compTotalRequests  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of compression requests done"
+		"Total number of compression requests done by NetScaler."
 	::= { nsCompressionStatsGroup 1 }
 
 compTotalTxBytes  OBJECT-TYPE
@@ -10712,7 +11088,7 @@ compTotalTxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of compressed bytes transmitted"
+		"Total number of compressed bytes transmitted by NetScaler."
 	::= { nsCompressionStatsGroup 2 }
 
 compTotalRxBytes  OBJECT-TYPE
@@ -10720,7 +11096,7 @@ compTotalRxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of compressible bytes received"
+		"Total number of compressible bytes received by NetScaler."
 	::= { nsCompressionStatsGroup 3 }
 
 compTotalTxPackets  OBJECT-TYPE
@@ -10728,7 +11104,7 @@ compTotalTxPackets  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of compressed packets transmitted"
+		"Total number of compressed packets transmitted by NetScaler."
 	::= { nsCompressionStatsGroup 4 }
 
 compTotalRxPackets  OBJECT-TYPE
@@ -10736,7 +11112,7 @@ compTotalRxPackets  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of compressible packets received"
+		"Total number of compressible packets received by NetScaler."
 	::= { nsCompressionStatsGroup 5 }
 
 compRatio  OBJECT-TYPE
@@ -10752,7 +11128,7 @@ compTotalDataCompressionRatio  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Ratio of total data received to total data transmitted expressed as percentage."
+		"Ratio of total HTTP data received to total HTTP data transmitted expressed as percentage."
 	::= { nsCompressionStatsGroup 7 }
 
 compTcpTotalTxBytes  OBJECT-TYPE
@@ -10760,7 +11136,7 @@ compTcpTotalTxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of compressed bytes transmitted"
+		"Total number of compressed bytes transmitted by NetScaler."
 	::= { nsCompressionStatsGroup 8 }
 
 compTcpTotalRxBytes  OBJECT-TYPE
@@ -10768,7 +11144,7 @@ compTcpTotalRxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of compressible bytes received"
+		"Total number of compressible bytes received by NetScaler."
 	::= { nsCompressionStatsGroup 9 }
 
 compTcpTotalTxPackets  OBJECT-TYPE
@@ -10776,7 +11152,7 @@ compTcpTotalTxPackets  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of compressed packets transmitted"
+		"Total number of compressed packets transmitted by NetScaler."
 	::= { nsCompressionStatsGroup 10 }
 
 compTcpTotalRxPackets  OBJECT-TYPE
@@ -10784,7 +11160,7 @@ compTcpTotalRxPackets  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of compressible packets received"
+		"Total number of compressible packets received by NetScaler."
 	::= { nsCompressionStatsGroup 11 }
 
 compTcpTotalQuantum  OBJECT-TYPE
@@ -10792,7 +11168,7 @@ compTcpTotalQuantum  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of times compression is done on receiving quantum worth of data"
+		"Number of times compression done on receiving quantum worth of data."
 	::= { nsCompressionStatsGroup 12 }
 
 compTcpTotalPush  OBJECT-TYPE
@@ -10800,7 +11176,7 @@ compTcpTotalPush  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of times compression is done on receiving TCP PSH flag"
+		"Number of times compression done on receiving TCP PSH flag."
 	::= { nsCompressionStatsGroup 13 }
 
 compTcpTotalEoi  OBJECT-TYPE
@@ -10808,7 +11184,7 @@ compTcpTotalEoi  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of times compression is done on receiving End Of Input (FIN packet)"
+		"Number of times compression done on receiving End Of Input (FIN packet)."
 	::= { nsCompressionStatsGroup 14 }
 
 compTcpTotalTimer  OBJECT-TYPE
@@ -10816,7 +11192,7 @@ compTcpTotalTimer  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of times compression is done on expiration of data accumulation timer"
+		"Number of times compression done on expiration of data accumulation timer."
 	::= { nsCompressionStatsGroup 15 }
 
 compTcpRatio  OBJECT-TYPE
@@ -10824,7 +11200,7 @@ compTcpRatio  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Compression ratio: transmitted data as fraction of received data."
+		"Ratio of compressible data received to compressed data transmitted expressed as percentage."
 	::= { nsCompressionStatsGroup 16 }
 
 compTcpBandwidthSaving  OBJECT-TYPE
@@ -10832,7 +11208,7 @@ compTcpBandwidthSaving  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Bandwidth saving expressed as percentage."
+		"Bandwidth saving from TCP compression expressed as percentage."
 	::= { nsCompressionStatsGroup 17 }
 
 deCompTcpRxPackets  OBJECT-TYPE
@@ -10840,7 +11216,7 @@ deCompTcpRxPackets  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Total unmber of compressed packets received"
+		"Total number of compressed packets received by NetScaler."
 	::= { nsCompressionStatsGroup 18 }
 
 deCompTcpTxPackets  OBJECT-TYPE
@@ -10848,7 +11224,7 @@ deCompTcpTxPackets  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of decompressed packets transmitted"
+		"Total number of decompressed packets transmitted by NetScaler."
 	::= { nsCompressionStatsGroup 19 }
 
 deCompTcpRxBytes  OBJECT-TYPE
@@ -10856,7 +11232,7 @@ deCompTcpRxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of compressed bytes received"
+		"Total number of compressed bytes received by NetScaler."
 	::= { nsCompressionStatsGroup 20 }
 
 deCompTcpTxBytes  OBJECT-TYPE
@@ -10864,7 +11240,7 @@ deCompTcpTxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of decompressed bytes transmitted"
+		"Total number of decompressed bytes transmitted by NetScaler."
 	::= { nsCompressionStatsGroup 21 }
 
 deCompTcpErrData  OBJECT-TYPE
@@ -10872,7 +11248,7 @@ deCompTcpErrData  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of data errors encoutered while decompressing"
+		"Number of data errors encountered while decompressing."
 	::= { nsCompressionStatsGroup 22 }
 
 deCompTcpErrLessData  OBJECT-TYPE
@@ -10880,7 +11256,7 @@ deCompTcpErrLessData  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Received less data than declared by protocol"
+		"Number of times NetScaler received less data than declared by protocol."
 	::= { nsCompressionStatsGroup 23 }
 
 deCompTcpErrMoreData  OBJECT-TYPE
@@ -10888,7 +11264,7 @@ deCompTcpErrMoreData  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Received more data than declared by protocol"
+		"Number of times NetScaler received more data than declared by protocol."
 	::= { nsCompressionStatsGroup 24 }
 
 deCompTcpErrMemory  OBJECT-TYPE
@@ -10896,7 +11272,7 @@ deCompTcpErrMemory  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of memory faiures"
+		"Number of times memory failures occurred while decompressing."
 	::= { nsCompressionStatsGroup 25 }
 
 deCompTcpErrUnknown  OBJECT-TYPE
@@ -10904,7 +11280,7 @@ deCompTcpErrUnknown  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Unknown errors encountered"
+		"Number of times unknown errors occurred while decompressing."
 	::= { nsCompressionStatsGroup 26 }
 
 deCompTcpRatio  OBJECT-TYPE
@@ -10912,7 +11288,7 @@ deCompTcpRatio  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Compression ratio: received data as fraction of transmitted data."
+		"Ratio of decompressed data transmitted to compressed data received expressed as percentage."
 	::= { nsCompressionStatsGroup 27 }
 
 deCompTcpBandwidthSaving  OBJECT-TYPE
@@ -10920,7 +11296,7 @@ deCompTcpBandwidthSaving  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Bandwidth saving expressed as percentage."
+		"Bandwidth saving from compression expressed as percentage."
 	::= { nsCompressionStatsGroup 28 }
 
 delCompTotalRequests  OBJECT-TYPE
@@ -10928,7 +11304,7 @@ delCompTotalRequests  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of delta compression requests"
+		"Total number of delta compression requests received by NetScaler."
 	::= { nsCompressionStatsGroup 29 }
 
 delCompFirstAccess  OBJECT-TYPE
@@ -10936,7 +11312,7 @@ delCompFirstAccess  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of delta compression first accesses"
+		"Total number of delta compression first accesses."
 	::= { nsCompressionStatsGroup 30 }
 
 delCompDone  OBJECT-TYPE
@@ -10944,7 +11320,7 @@ delCompDone  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of delta compressions done"
+		"Total number of delta compressions done by NetScaler."
 	::= { nsCompressionStatsGroup 31 }
 
 delCompTcpRxBytes  OBJECT-TYPE
@@ -10952,7 +11328,7 @@ delCompTcpRxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of delta-compressed bytes received"
+		"Total number of delta-compressible bytes received by NetScaler."
 	::= { nsCompressionStatsGroup 32 }
 
 delCompTcpTxBytes  OBJECT-TYPE
@@ -10960,7 +11336,7 @@ delCompTcpTxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of delta-compressed bytes transmitted"
+		"Total number of delta-compressed bytes transmitted by NetScaler."
 	::= { nsCompressionStatsGroup 33 }
 
 delCompTcpRxPackets  OBJECT-TYPE
@@ -10968,7 +11344,7 @@ delCompTcpRxPackets  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of delta-compressed packets received"
+		"Number of delta-compressible packets received."
 	::= { nsCompressionStatsGroup 34 }
 
 delCompTcpTxPackets  OBJECT-TYPE
@@ -10976,7 +11352,7 @@ delCompTcpTxPackets  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of delta-compressed packets transmitted"
+		"Total number of delta-compressed packets transmitted by NetScaler."
 	::= { nsCompressionStatsGroup 35 }
 
 delCompBaseServed  OBJECT-TYPE
@@ -10984,7 +11360,7 @@ delCompBaseServed  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of delta-compressed base bytes served"
+		"Total number of basefile requests served by NetScaler."
 	::= { nsCompressionStatsGroup 36 }
 
 delCompBaseTcpTxBytes  OBJECT-TYPE
@@ -10992,7 +11368,7 @@ delCompBaseTcpTxBytes  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of delta-compression basefile bytes transmitted"
+		"Number of basefile bytes transmitted by NetScaler."
 	::= { nsCompressionStatsGroup 37 }
 
 delCompErrBypassed  OBJECT-TYPE
@@ -11000,7 +11376,7 @@ delCompErrBypassed  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of delta-compressions bypassed"
+		"Number of times delta-compression bypassed by NetScaler."
 	::= { nsCompressionStatsGroup 39 }
 
 delCompErrBFileWHdrFailed  OBJECT-TYPE
@@ -11008,7 +11384,7 @@ delCompErrBFileWHdrFailed  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of basefile write header failures"
+		"Number of times basefile could not be updated in NetScaler cache."
 	::= { nsCompressionStatsGroup 40 }
 
 delCompErrNostoreMiss  OBJECT-TYPE
@@ -11016,7 +11392,7 @@ delCompErrNostoreMiss  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of no-store misses"
+		"Number of times basefile was not found in NetScaler cache."
 	::= { nsCompressionStatsGroup 41 }
 
 delCompErrReqinfoToobig  OBJECT-TYPE
@@ -11024,7 +11400,7 @@ delCompErrReqinfoToobig  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of request information too big errors"
+		"Number of times basefile request URL was too large."
 	::= { nsCompressionStatsGroup 42 }
 
 delCompErrReqinfoAllocfail  OBJECT-TYPE
@@ -11032,7 +11408,7 @@ delCompErrReqinfoAllocfail  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of request-info allocation failures"
+		"Number of times requested basefile could not be allocated."
 	::= { nsCompressionStatsGroup 43 }
 
 delCompErrSessallocFail  OBJECT-TYPE
@@ -11040,7 +11416,7 @@ delCompErrSessallocFail  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of session allocation failures"
+		"Number of times delta compression session could not be allocated."
 	::= { nsCompressionStatsGroup 44 }
 
 delCmpRatio  OBJECT-TYPE
@@ -11048,7 +11424,7 @@ delCmpRatio  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Delta compression ratio: transmitted data as fraction of received data."
+		"Ratio of compressible data received to compressed data transmitted expressed as percentage."
 	::= { nsCompressionStatsGroup 45 }
 
 delBwSaving  OBJECT-TYPE
@@ -11056,7 +11432,7 @@ delBwSaving  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Bandwidth saving expressed as percentage."
+		"Bandwidth saving from delta compression expressed as percentage."
 	::= { nsCompressionStatsGroup 46 }
 
 nsGslbGroup OBJECT IDENTIFIER
@@ -11107,7 +11483,13 @@ GslbSitesEntry ::= SEQUENCE {
 	siteType  SiteType,
 	siteMetricExchange  MetricExchange,
 	siteMepStatus  MepStatus,
-	sitePublicIp  IpAddress
+	sitePublicIp  IpAddress,
+	siteTotalRequests  Counter64,
+	siteTotalRequestBytes  Counter64,
+	siteTotalResponses  Counter64,
+	siteTotalResponseBytes  Counter64,
+	siteCurSrvrConnections  Gauge32,
+	siteCurClntConnections  Gauge32
 }
 
 siteName  OBJECT-TYPE
@@ -11123,7 +11505,7 @@ siteIp  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"This is the IP address of the site"
+		"This is the private IP address of the site"
 	::= { gslbSitesEntry 2 }
 
 siteType  OBJECT-TYPE
@@ -11155,8 +11537,56 @@ sitePublicIp  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"This is the public IP address of the site"
+		"This is the public IP address of the GSLB site."
 	::= { gslbSitesEntry 6 }
+
+siteTotalRequests  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of requests received on the Vservers represented by all GSLB services associated with this site."
+	::= { gslbSitesEntry 7 }
+
+siteTotalRequestBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of request bytes received on the Vservers represented by all GSLB services associated with this site."
+	::= { gslbSitesEntry 8 }
+
+siteTotalResponses  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of responses received on the Vservers represented by all GSLB services associated with this site."
+	::= { gslbSitesEntry 9 }
+
+siteTotalResponseBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of response bytes received on the Vservers represented by all GSLB services associated with this site."
+	::= { gslbSitesEntry 10 }
+
+siteCurSrvrConnections  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of current connections to the real servers behind the Vservers represented by all the GSLB services associated with this site."
+	::= { gslbSitesEntry 11 }
+
+siteCurClntConnections  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of current client connections to the Vservers represented by all GSLB services associated with this site."
+	::= { gslbSitesEntry 12 }
 
 gslbPoliciesTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF GslbPoliciesEntry
@@ -11195,6 +11625,47 @@ totalHits  OBJECT-TYPE
 	DESCRIPTION
 		"This is the total hits for the policy"
 	::= { gslbPoliciesEntry 2 }
+
+gslbDomainStats OBJECT IDENTIFIER
+	::= { nsGslbGroup 3 }
+
+nsDomainTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF NsDomainEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This table contains information about the Hits on the Domains."
+	::= { gslbDomainStats 1 }
+
+nsDomainEntry  OBJECT-TYPE
+	SYNTAX  NsDomainEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { domainName   }
+	::= { nsDomainTable 1 }
+
+NsDomainEntry ::= SEQUENCE {
+	domainName  OCTET STRING,
+	dnsTotalQueries  Counter64
+}
+
+domainName  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The domain name"
+	::= { nsDomainEntry 1 }
+
+dnsTotalQueries  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of DNS queries received."
+	::= { nsDomainEntry 2 }
 
 nsPolicyEngineGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 52 }
@@ -11610,7 +12081,7 @@ dnsTotAuthNoNames  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of queries for which no domain was found."
+		"Number of queries for which no record was found."
 	::= { nsDnsServerStatsGroup 44 }
 
 dnsTotNoDataResps  OBJECT-TYPE
@@ -11618,7 +12089,7 @@ dnsTotNoDataResps  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of DNS responses received without data."
+		"Number of DNS responses received without answer."
 	::= { nsDnsServerStatsGroup 45 }
 
 dnsTotResponseBadLen  OBJECT-TYPE
@@ -11626,7 +12097,7 @@ dnsTotResponseBadLen  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of DNS responses received with invalid length."
+		"Number of DNS responses received with invalid resoure data length."
 	::= { nsDnsServerStatsGroup 46 }
 
 dnsTotReqRefusals  OBJECT-TYPE
@@ -11764,6 +12235,38 @@ dnsCurAAAArecord  OBJECT-TYPE
 	DESCRIPTION
 		"Total number of AAAA records."
 	::= { nsDnsServerStatsGroup 63 }
+
+dnsTotANYqueries  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of ANY queries received."
+	::= { nsDnsServerStatsGroup 64 }
+
+dnsTotANYresponse  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of ANY responses received."
+	::= { nsDnsServerStatsGroup 65 }
+
+dnsTotANYrecFailed  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of times ANY query lookup failed."
+	::= { nsDnsServerStatsGroup 66 }
+
+dnsTotSOArecFailed  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of times SOA record lookup failed."
+	::= { nsDnsServerStatsGroup 67 }
 
 nsIfStatsTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF NsIfStatsEntry
@@ -11999,7 +12502,7 @@ ifTotNetScalerPkts  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of Netscaler packets received by this interface"
+		"Number of NetScaler packets received by this interface"
 	::= { nsIfStatsEntry 21 }
 
 ifErrDroppedRxPkts  OBJECT-TYPE
@@ -12031,7 +12534,7 @@ ifErrDuplexMismatch  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of duplex mismatches registered"
+		"Number of duplex mismatches detected"
 	::= { nsIfStatsEntry 25 }
 
 ifErrCongestedPktsDrops  OBJECT-TYPE
@@ -12111,7 +12614,7 @@ ifErrTxHeartBeat  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"No 10Mb link heartbeats (Informational - only valid for 10Mb Half-Duplex)"
+		"No 10Mb link heartbeats (Informational - 10Mb half-duplex only)"
 	::= { nsIfStatsEntry 35 }
 
 ifErrTxOverflow  OBJECT-TYPE
@@ -12301,8 +12804,24 @@ scResetStats  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"This gives the number of times delay stats were reset."
+		"This gives the number of times SureConnect statistics were reset."
 	::= { scPolicyStatistics 9 }
+
+scTotCondTriggered  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of times the SC conditions were triggered."
+	::= { scPolicyStatistics 10 }
+
+scTotReissuedRequests  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of SC reissued requests that Netscaler received."
+	::= { scPolicyStatistics 11 }
 
 scPolicyConfig OBJECT IDENTIFIER
 	::= { nsScPolicyGroup 2 }
@@ -12602,6 +13121,49 @@ thresholdValue  OBJECT-TYPE
 		"Threshold surge count to detect an attack, for this DosPolicy"
 	::= { dosPolicyEntry 2 }
 
+dosPolicyStatistics OBJECT IDENTIFIER
+	::= { nsDosPolicyGroup 2 }
+
+dosTotConditionTriggered  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of times Netscaler triggered the DOS JavaScript due to a condition match"
+	::= { dosPolicyStatistics 1 }
+
+dosTotValidCookies  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of clients from whom Netscaler received a valid DOS cookie."
+	::= { dosPolicyStatistics 2 }
+
+dosTotDosPriorityClients  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of valid clients that were given DOS priority."
+	::= { dosPolicyStatistics 3 }
+
+dosAvgValidClients  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the average number of DOS clients that retruned with a valid DOS cookie."
+	::= { dosPolicyStatistics 4 }
+
+dosAvgDospriClients  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the average number of clients that were given DOS priority"
+	::= { dosPolicyStatistics 5 }
+
 nsExpressionTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF NsExpressionEntry
 	MAX-ACCESS  not-accessible
@@ -12717,6 +13279,49 @@ pqPolicyWeight  OBJECT-TYPE
 		"The weight of this PQ policy."
 	::= { pqPolicyConfigEntry 6 }
 
+pqPolicyStatistics OBJECT IDENTIFIER
+	::= { nsPqPolicyGroup 2 }
+
+pqTotalPolicyMatches  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of times Netscaler matched an incoming request with any PQ policy."
+	::= { pqPolicyStatistics 1 }
+
+pqTotalThresholdFailed  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of times the priority queue threshold criteria was not met."
+	::= { pqPolicyStatistics 2 }
+
+pqPriority1Requests  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of priority 1 requests that Netscaler received."
+	::= { pqPolicyStatistics 3 }
+
+pqPriority2Requests  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of priority 2 requests that Netscaler received."
+	::= { pqPolicyStatistics 4 }
+
+pqPriority3Requests  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of priority 3 requests that Netscaler received."
+	::= { pqPolicyStatistics 5 }
+
 crConfigGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 60 }
 
@@ -12801,6 +13406,717 @@ monitorBindCount  OBJECT-TYPE
 		"Number of monitor bindings in the system"
 	::= { nsSysGroup 62 }
 
+htmlInjectionStatsGroup OBJECT IDENTIFIER
+	::= { nsSysGroup 63 }
+
+htmlInjectedBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of Bytes Injected"
+	::= { htmlInjectionStatsGroup 1 }
+
+htmlInjectionSessions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of HTML Injection Sessions"
+	::= { htmlInjectionStatsGroup 2 }
+
+htmlInjectionTotalSessions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of HTML Injection Sessions"
+	::= { htmlInjectionStatsGroup 3 }
+
+htmlInjectMemAllocFailed  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times Memory Allocation Failed"
+	::= { htmlInjectionStatsGroup 4 }
+
+htmlInitFailed  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times Initialization Failed"
+	::= { htmlInjectionStatsGroup 5 }
+
+appFirewallGroup OBJECT IDENTIFIER
+	::= { nsSysGroup 64 }
+
+appFirewallStatistics OBJECT IDENTIFIER
+	::= { appFirewallGroup 1 }
+
+appFirewallRequests  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of requests received by the application firewall"
+	::= { appFirewallStatistics 1 }
+
+appFirewallResponses  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of responses handled by the application firewall"
+	::= { appFirewallStatistics 2 }
+
+appFirewallAborts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of requests aborted by the application firewall"
+	::= { appFirewallStatistics 3 }
+
+appFirewallRedirects  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of requests redirected by the application firewall (HTTP 302)"
+	::= { appFirewallStatistics 4 }
+
+appFirewallViolStartURL  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of start URL violations seen by the application firewall"
+	::= { appFirewallStatistics 5 }
+
+appFirewallViolDenyURL  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of deny URL violations seen by the application firewall"
+	::= { appFirewallStatistics 6 }
+
+appFirewallViolBufferOverflow  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of buffer overflow violations seen by the application firewall"
+	::= { appFirewallStatistics 7 }
+
+appFirewallViolCookie  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of cookie violations seen by the application firewall"
+	::= { appFirewallStatistics 8 }
+
+appFirewallViolXSS  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of Cross-site scripting violations seen by the application firewall"
+	::= { appFirewallStatistics 9 }
+
+appFirewallViolSQL  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of SQL violations seen by the application firewall"
+	::= { appFirewallStatistics 10 }
+
+appFirewallViolFieldformat  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of field format violations seen by the application firewall"
+	::= { appFirewallStatistics 11 }
+
+appFirewallViolFieldConsistency  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of field consistency violations seen by the application firewall"
+	::= { appFirewallStatistics 12 }
+
+appFirewallViolCreditCard  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of credit card violations seen by the application firewall"
+	::= { appFirewallStatistics 13 }
+
+appFirewallViolSafeObject  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of safe object violations seen by the application firewall"
+	::= { appFirewallStatistics 14 }
+
+appFirewallTotalViol  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of violations seen by the application firewall"
+	::= { appFirewallStatistics 15 }
+
+nsRnatStatsGroup OBJECT IDENTIFIER
+	::= { nsSysGroup 65 }
+
+nsRnatGlobalStats OBJECT IDENTIFIER
+	::= { nsRnatStatsGroup 1 }
+
+rnatTotRxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of bytes received in the rnat sessions."
+	::= { nsRnatGlobalStats 1 }
+
+rnatTotTxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of bytes sent in the rnat sessions."
+	::= { nsRnatGlobalStats 2 }
+
+rnatTotRxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of packets received in the rnat sessions."
+	::= { nsRnatGlobalStats 3 }
+
+rnatTotTxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of packets sent in the rnat sessions."
+	::= { nsRnatGlobalStats 4 }
+
+rnatTotTxSyn  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of syn sent in the rnat sessions."
+	::= { nsRnatGlobalStats 5 }
+
+rnatCurSessions  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Current number of rnat sessions."
+	::= { nsRnatGlobalStats 6 }
+
+nsRnatPerIPStatsTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF NsRnatPerIPStatsEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This table contains statistics related to rnat for the natip"
+	::= { nsRnatStatsGroup 2 }
+
+nsRnatPerIPStatsEntry  OBJECT-TYPE
+	SYNTAX  NsRnatPerIPStatsEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { ipAddr   }
+	::= { nsRnatPerIPStatsTable 1 }
+
+NsRnatPerIPStatsEntry ::= SEQUENCE {
+	ipRnatTotRxBytes  Counter64,
+	ipRnatTotTxBytes  Counter64,
+	ipRnatTotRxPkts  Counter64,
+	ipRnatTotTxPkts  Counter64,
+	ipRnatTotTxSyn  Counter64,
+	ipRnatCurSessions  Gauge32
+}
+
+ipRnatTotRxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of bytes received in the rnat sessions for the natip."
+	::= { nsRnatPerIPStatsEntry 1 }
+
+ipRnatTotTxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of bytes sent in the rnat sessions for the natip."
+	::= { nsRnatPerIPStatsEntry 2 }
+
+ipRnatTotRxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of packets received in the rnat sessions for the natip."
+	::= { nsRnatPerIPStatsEntry 3 }
+
+ipRnatTotTxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of packets sent in the rnat sessions for the natip."
+	::= { nsRnatPerIPStatsEntry 4 }
+
+ipRnatTotTxSyn  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of syn sent in the rnat sessions for the natip."
+	::= { nsRnatPerIPStatsEntry 5 }
+
+ipRnatCurSessions  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Current number of rnat sessions for the natip."
+	::= { nsRnatPerIPStatsEntry 6 }
+
+nsSslVpnStatsGroup OBJECT IDENTIFIER
+	::= { nsSysGroup 66 }
+
+indexHtmlHit  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of login-page request received by SSLVPN server."
+	::= { nsSslVpnStatsGroup 1 }
+
+indexHtmlNoServed  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times login-page has not been delivered by SSLVPN server."
+	::= { nsSslVpnStatsGroup 2 }
+
+cfgHtmlServed  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of SSLVPN-client configuration request received by SSLVPN-server. In response to this SSLVPN-server returns information to configure SSLVPN-client."
+	::= { nsSslVpnStatsGroup 3 }
+
+dnsReqHit  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of DNS query(s) received by SSLVPN server."
+	::= { nsSslVpnStatsGroup 4 }
+
+winsRequestHit  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of WINS query(s) received by SSLVPN server."
+	::= { nsSslVpnStatsGroup 5 }
+
+csRequestHit  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of SSLVPN tunnels created between SSLVPN client and server."
+	::= { nsSslVpnStatsGroup 6 }
+
+csNonHttpProbeHit  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of probes from NetScaler to backend non-HTTP servers. The backend servers are those servers which has been accessed by VPN client. This is an application debug counter."
+	::= { nsSslVpnStatsGroup 7 }
+
+csHttpProbeHit  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of probes from NetScaler to backend HTTP server. The backend servers are those servers which has been accessed by VPN client. This is an application debug counter."
+	::= { nsSslVpnStatsGroup 8 }
+
+totalCsConnSucc  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of successful probes to backend servers (both HTTP and non-HTTP). This is an application debug counter."
+	::= { nsSslVpnStatsGroup 9 }
+
+totalFsRequest  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of file-system request received by SSLVPN server."
+	::= { nsSslVpnStatsGroup 10 }
+
+iipDisabledMIPdisabled  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Both IIP and MIP is disabled."
+	::= { nsSslVpnStatsGroup 11 }
+
+iipFailedMIPdisabled  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times IIP assignment failed and MIP is disabled."
+	::= { nsSslVpnStatsGroup 12 }
+
+iipDisabledMIPused  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times MIP is used as IIP is disabled."
+	::= { nsSslVpnStatsGroup 13 }
+
+iipFailedMIPused  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times MIP is used as IIP assignment failed."
+	::= { nsSslVpnStatsGroup 14 }
+
+socksMethReqRcvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of received SOCKS method request."
+	::= { nsSslVpnStatsGroup 15 }
+
+socksMethReqSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of sent SOCKS method request."
+	::= { nsSslVpnStatsGroup 16 }
+
+socksMethRespRcvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of received SOCKS method response."
+	::= { nsSslVpnStatsGroup 17 }
+
+socksMethRespSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of sent SOCKS method response."
+	::= { nsSslVpnStatsGroup 18 }
+
+socksConnReqRcvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of received SOCKS connect request."
+	::= { nsSslVpnStatsGroup 19 }
+
+socksConnReqSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of sent SOCKS connect request."
+	::= { nsSslVpnStatsGroup 20 }
+
+socksConnRespRcvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of received SOCKS connect response."
+	::= { nsSslVpnStatsGroup 21 }
+
+socksConnRespSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of sent SOCKS connect response."
+	::= { nsSslVpnStatsGroup 22 }
+
+socksServerError  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of SOCKS server error."
+	::= { nsSslVpnStatsGroup 23 }
+
+socksClientError  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of SOCKS client error."
+	::= { nsSslVpnStatsGroup 24 }
+
+staConnSuccess  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA connection success."
+	::= { nsSslVpnStatsGroup 25 }
+
+staConnFailure  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA connection failure."
+	::= { nsSslVpnStatsGroup 26 }
+
+cpsConnSuccess  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of CPS connection success."
+	::= { nsSslVpnStatsGroup 27 }
+
+cpsConnFailure  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of CPS connection failure."
+	::= { nsSslVpnStatsGroup 28 }
+
+staRequestSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA request sent."
+	::= { nsSslVpnStatsGroup 29 }
+
+staResponseRecvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA response received."
+	::= { nsSslVpnStatsGroup 30 }
+
+icaLicenseFailure  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of ICA license failure."
+	::= { nsSslVpnStatsGroup 31 }
+
+staRenewSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA renew requests sent."
+	::= { nsSslVpnStatsGroup 32 }
+
+staRenewRecvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA renew response received."
+	::= { nsSslVpnStatsGroup 33 }
+
+staReassErr  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA response reassembly errors."
+	::= { nsSslVpnStatsGroup 34 }
+
+staRnewNoClnt  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA renew repsonse for missing clients."
+	::= { nsSslVpnStatsGroup 35 }
+
+staRenewNoRfsh  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA renew response missing refesh values."
+	::= { nsSslVpnStatsGroup 36 }
+
+staValidNoClnt  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA validate response for clients that have already closed."
+	::= { nsSslVpnStatsGroup 37 }
+
+staValidNoEst  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA validate responses for clients not in TCP ESTABLISHED state."
+	::= { nsSslVpnStatsGroup 38 }
+
+staMonSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA monitor requests sent."
+	::= { nsSslVpnStatsGroup 39 }
+
+staMonRcvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA monitor responses recieved."
+	::= { nsSslVpnStatsGroup 40 }
+
+staMonSucc  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA monitor successful responses."
+	::= { nsSslVpnStatsGroup 41 }
+
+staMonFail  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of STA monitor failed responses."
+	::= { nsSslVpnStatsGroup 42 }
+
+nsAaaStatsGroup OBJECT IDENTIFIER
+	::= { nsSysGroup 67 }
+
+aaaAuthFail  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Count of authentication failures"
+	::= { nsAaaStatsGroup 1 }
+
+aaaAuthSuccess  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Count of authentication successes"
+	::= { nsAaaStatsGroup 2 }
+
+aaaAuthNonHttpFail  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Count of non HTTP connections that failed authorization"
+	::= { nsAaaStatsGroup 3 }
+
+aaaAuthOnlyHttpFail  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Count of HTTP connections that failed authorization"
+	::= { nsAaaStatsGroup 4 }
+
+aaaAuthNonHttpSuccess  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Count of non HTTP connections that succeeded authorization"
+	::= { nsAaaStatsGroup 5 }
+
+aaaAuthOnlyHttpSuccess  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Count of HTTP connections that succeeded authorization"
+	::= { nsAaaStatsGroup 6 }
+
+aaaTotSessions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Count of all AAA sessions"
+	::= { nsAaaStatsGroup 7 }
+
+aaaTotSessionTimeout  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Count of AAA sessions that have timed out"
+	::= { nsAaaStatsGroup 8 }
+
+aaaCurSessions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Count of current AAA sessions"
+	::= { nsAaaStatsGroup 9 }
+
 nsSvcGroup OBJECT IDENTIFIER
 	::= { rs9000 2 }
 
@@ -12861,7 +14177,12 @@ ServiceEntry ::= SEQUENCE {
 	svcRequestRate  OCTET STRING,
 	svcRxBytesRate  OCTET STRING,
 	svcTxBytesRate  OCTET STRING,
-	svcSynfloodRate  OCTET STRING
+	svcSynfloodRate  OCTET STRING,
+	svcTicksSinceLastStateChange  TimeTicks,
+	svcTotalClients  Counter64,
+	svcTotalServers  Counter64,
+	svcMaxClients  Integer32,
+	svcActiveTransactions  Gauge32
 }
 
 svcServiceName  OBJECT-TYPE
@@ -13184,6 +14505,46 @@ svcSynfloodRate  OBJECT-TYPE
 		"This represents the rate of unacknowledged SYNs for this service/vserver."
 	::= { serviceEntry 45 }
 
+svcTicksSinceLastStateChange  OBJECT-TYPE
+	SYNTAX  TimeTicks
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Time (in 10 milliseconds) since the last state change."
+	::= { serviceEntry 47 }
+
+svcTotalClients  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of established client connections."
+	::= { serviceEntry 48 }
+
+svcTotalServers  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of established server connections."
+	::= { serviceEntry 49 }
+
+svcMaxClients  OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The maximum open connections allowed on this service."
+	::= { serviceEntry 52 }
+
+svcActiveTransactions  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of Active Transactions handled by this service(Includes the surgeQ count also)."
+	::= { serviceEntry 53 }
+
 serverTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF ServerEntry
 	MAX-ACCESS  not-accessible
@@ -13234,7 +14595,7 @@ serverState  OBJECT-TYPE
 
 serverDelay  OBJECT-TYPE
 	SYNTAX  Integer32
-	MAX-ACCESS  write-only
+	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
 		"Specifies time in seconds after which all services in this server are brought down."
@@ -13245,7 +14606,7 @@ serviceScpolicyTable  OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS  current
 	DESCRIPTION
-		"the service sure connect policy relationship table"
+		"The service sure connect policy relationship table"
 	::= { nsSvcGroup 3 }
 
 serviceScpolicyEntry  OBJECT-TYPE
@@ -13264,7 +14625,31 @@ ServiceScpolicyEntry ::= SEQUENCE {
 	svcscpolicyDestPort  Integer32,
 	svcscpolicyAvgServerTransactionTime  Gauge32,
 	svcscpolicyTotClientTransaction  Counter64,
-	svcscpolicyTotOpenConn  Counter32
+	svcscpolicyTotOpenConn  Counter32,
+	svcscpolicydesIpAddress  IpAddress,
+	svcscpolicydestPort  Integer32,
+	svcscpolicyavgServerTransactionTime  Gauge32,
+	svcscpolicytotClientTransaction  Counter64,
+	svcscpolicytotOpenConn  Gauge32,
+	svcscpolicyscPhysicalServiceIP  IpAddress,
+	svcscpolicyscPhysicalServicePort  Integer32,
+	svcscpolicyscCurrentWaitingTime  Gauge32,
+	svcscpolicyscCurrentClientConnections  Gauge32,
+	svcscpolicyscTotalClientConnections  Counter64,
+	svcscpolicyscTotalServerConnections  Counter64,
+	svcscpolicyscTotalRequestsReceived  Counter64,
+	svcscpolicyscTotalRequestBytes  Counter64,
+	svcscpolicyscTotalResponsesReceived  Counter64,
+	svcscpolicyscTotalResponseBytes  Counter64,
+	svcscpolicyscCurrentSurgeQClients  Gauge32,
+	svcscpolicyscCurrentWaitingClients  Gauge32,
+	svcscpolicyscTotalServerTransactions  Counter64,
+	svcscpolicyscTotalServerTTFBTransactions  Counter64,
+	svcscpolicyscTotalServerTTLB  Counter64,
+	svcscpolicyscTotalClientTTLB  Counter64,
+	svcscpolicyscTotalServerTTFB  Counter64,
+	svcscpolicyscAverageClientTTLB  Gauge32,
+	svcscpolicyscAverageServerTTFB  Gauge32
 }
 
 svcscpolicyPrimaryIPAddress  OBJECT-TYPE
@@ -13286,42 +14671,234 @@ svcscpolicyPrimaryPort  OBJECT-TYPE
 svcscpolicyDesIpAddress  OBJECT-TYPE
 	SYNTAX  IpAddress
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"The IP address of the physical service for which sc policy is matched."
+		"...OBSOLETE"
 	::= { serviceScpolicyEntry 5 }
 
 svcscpolicyDestPort  OBJECT-TYPE
 	SYNTAX  Integer32
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Port number of the physical service for which sc policy is matched."
+		"...OBSOLETE"
 	::= { serviceScpolicyEntry 6 }
 
 svcscpolicyAvgServerTransactionTime  OBJECT-TYPE
 	SYNTAX  Gauge32
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Server's average transaction delay."
+		"...OBSOLETE"
 	::= { serviceScpolicyEntry 7 }
 
 svcscpolicyTotClientTransaction  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Total number of client transactions for this policy."
+		"...OBSOLETE"
 	::= { serviceScpolicyEntry 8 }
 
 svcscpolicyTotOpenConn  OBJECT-TYPE
 	SYNTAX  Counter32
 	MAX-ACCESS  read-only
+	STATUS  obsolete
+	DESCRIPTION
+		"...OBSOLETE"
+	::= { serviceScpolicyEntry 9 }
+
+svcscpolicydesIpAddress  OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"IP address of destination physical service."
+	::= { serviceScpolicyEntry 10 }
+
+svcscpolicydestPort  OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Port number of destination physical service."
+	::= { serviceScpolicyEntry 11 }
+
+svcscpolicyavgServerTransactionTime  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Average Server transaction time."
+	::= { serviceScpolicyEntry 12 }
+
+svcscpolicytotClientTransaction  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of client transactions for this policy."
+	::= { serviceScpolicyEntry 13 }
+
+svcscpolicytotOpenConn  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
 		"Total number of open connections for this policy."
-	::= { serviceScpolicyEntry 9 }
+	::= { serviceScpolicyEntry 14 }
+
+svcscpolicyscPhysicalServiceIP  OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The IP address of the physical service for which this statistics is maintained."
+	::= { serviceScpolicyEntry 15 }
+
+svcscpolicyscPhysicalServicePort  OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The port of the physical service for which this statistics is maintained."
+	::= { serviceScpolicyEntry 16 }
+
+svcscpolicyscCurrentWaitingTime  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the value of the currently estimated waiting time for the configured URL."
+	::= { serviceScpolicyEntry 17 }
+
+svcscpolicyscCurrentClientConnections  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of clients that were allowed a server connection for this policy."
+	::= { serviceScpolicyEntry 18 }
+
+svcscpolicyscTotalClientConnections  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of clients that were allowed a server connection for this policy."
+	::= { serviceScpolicyEntry 19 }
+
+svcscpolicyscTotalServerConnections  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of server connections that were established for this policy."
+	::= { serviceScpolicyEntry 20 }
+
+svcscpolicyscTotalRequestsReceived  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of requests received for this policy."
+	::= { serviceScpolicyEntry 21 }
+
+svcscpolicyscTotalRequestBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of request bytes received for this policy."
+	::= { serviceScpolicyEntry 22 }
+
+svcscpolicyscTotalResponsesReceived  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of server responses received for this policy."
+	::= { serviceScpolicyEntry 23 }
+
+svcscpolicyscTotalResponseBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of response bytes received for this policy."
+	::= { serviceScpolicyEntry 24 }
+
+svcscpolicyscCurrentSurgeQClients  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of clients that matched the SC policy but are in the surge queue."
+	::= { serviceScpolicyEntry 25 }
+
+svcscpolicyscCurrentWaitingClients  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the current number of SC priority clients that are waiting for a server connection for this policy."
+	::= { serviceScpolicyEntry 26 }
+
+svcscpolicyscTotalServerTransactions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of 200 OK responses received from the server for this policy."
+	::= { serviceScpolicyEntry 27 }
+
+svcscpolicyscTotalServerTTFBTransactions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of TTFB transcations from the server for this policy."
+	::= { serviceScpolicyEntry 28 }
+
+svcscpolicyscTotalServerTTLB  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the server TTLB calculated for this policy."
+	::= { serviceScpolicyEntry 29 }
+
+svcscpolicyscTotalClientTTLB  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the client TTLB calculated for this policy."
+	::= { serviceScpolicyEntry 30 }
+
+svcscpolicyscTotalServerTTFB  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the server TTFB calculated for this policy."
+	::= { serviceScpolicyEntry 31 }
+
+svcscpolicyscAverageClientTTLB  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the average value of the client TTLB for this policy."
+	::= { serviceScpolicyEntry 32 }
+
+svcscpolicyscAverageServerTTFB  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the average value of the server TTFB for this policy."
+	::= { serviceScpolicyEntry 33 }
 
 serviceAdvanceSslConfigTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF ServiceAdvanceSslConfigEntry
@@ -13551,7 +15128,8 @@ ServiceGroupMemberEntry ::= SEQUENCE {
 	svcGrpMemberRequestRate  OCTET STRING,
 	svcGrpMemberRxBytesRate  OCTET STRING,
 	svcGrpMemberTxBytesRate  OCTET STRING,
-	svcGrpMemberSynfloodRate  OCTET STRING
+	svcGrpMemberSynfloodRate  OCTET STRING,
+	svcGrpMemberTicksSinceLastStateChange  TimeTicks
 }
 
 svcGrpMemberGroupName  OBJECT-TYPE
@@ -13778,13 +15356,131 @@ svcGrpMemberSynfloodRate  OBJECT-TYPE
 		"This represents the rate of unacknowledged SYNs for this service/vserver."
 	::= { serviceGroupMemberEntry 28 }
 
+svcGrpMemberTicksSinceLastStateChange  OBJECT-TYPE
+	SYNTAX  TimeTicks
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Time (in 10 milliseconds) since the last state change."
+	::= { serviceGroupMemberEntry 31 }
+
+serviceDospolicyTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF ServiceDospolicyEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The service DOS policy relationship table"
+	::= { nsSvcGroup 8 }
+
+serviceDospolicyEntry  OBJECT-TYPE
+	SYNTAX  ServiceDospolicyEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { svcServiceName , dosPolicyName }
+	::= { serviceDospolicyTable 1 }
+
+ServiceDospolicyEntry ::= SEQUENCE {
+	svcdospolicydosTotJSSent  Counter64,
+	svcdospolicydosTotJSBytesSent  Counter64,
+	svcdospolicydosTotJSRefused  Counter64,
+	svcdospolicydosTotNonGetPostRequests  Counter64,
+	svcdospolicydosPhysicalServiceIP  IpAddress,
+	svcdospolicydosPhysicalServicePort  Integer32,
+	svcdospolicydosCurrentQueueSize  Gauge32,
+	svcdospolicydosCurrentJSRate  Gauge32,
+	svcdospolicydosTotValidClients  Counter64,
+	svcdospolicydosCurServerRespRate  Gauge32
+}
+
+svcdospolicydosTotJSSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of DOS JavaScript transactions performed for this policy."
+	::= { serviceDospolicyEntry 1 }
+
+svcdospolicydosTotJSBytesSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of DOS JS bytes sent for this policy."
+	::= { serviceDospolicyEntry 2 }
+
+svcdospolicydosTotJSRefused  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of times the DOS JS was not sent because the set JS rate was not met for this policy."
+	::= { serviceDospolicyEntry 3 }
+
+svcdospolicydosTotNonGetPostRequests  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of non GET, POST requests for which DOS JS was sent."
+	::= { serviceDospolicyEntry 4 }
+
+svcdospolicydosPhysicalServiceIP  OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"IP address of the physical service to which this policy is bound."
+	::= { serviceDospolicyEntry 5 }
+
+svcdospolicydosPhysicalServicePort  OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Port address of the physical service to which this policy is bound."
+	::= { serviceDospolicyEntry 6 }
+
+svcdospolicydosCurrentQueueSize  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the current queue size of the server to which this policy is bound."
+	::= { serviceDospolicyEntry 7 }
+
+svcdospolicydosCurrentJSRate  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the current rate at which JS is being sent in response to client requests."
+	::= { serviceDospolicyEntry 8 }
+
+svcdospolicydosTotValidClients  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of valid DOS cookies reveived for this policy."
+	::= { serviceDospolicyEntry 9 }
+
+svcdospolicydosCurServerRespRate  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the current rate at which the server to which this policy is bound is responding."
+	::= { serviceDospolicyEntry 10 }
+
 monitorMemberTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF MonitorMemberEntry
 	MAX-ACCESS  not-accessible
 	STATUS  current
 	DESCRIPTION
 		"The monitor table"
-	::= { nsSvcGroup 8 }
+	::= { nsSvcGroup 9 }
 
 monitorMemberEntry  OBJECT-TYPE
 	SYNTAX  MonitorMemberEntry
@@ -13823,7 +15519,7 @@ responseTimeoutThreshold  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Monitor Response timeout threshold, above which snmp trap will be fired. It is expressed in milliseconds."
+		"Monitor Response timeout threshold, above which snmp trap will be fired.It is expressed in milliseconds."
 	::= { monitorMemberEntry 2 }
 
 monitorType  OBJECT-TYPE
@@ -13839,7 +15535,7 @@ monitorInterval  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Interval between monitoring probes. It is expressed in milliseconds."
+		"Interval between monitoring probes.It is expressed in milliseconds."
 	::= { monitorMemberEntry 4 }
 
 monitorResponseTimeout  OBJECT-TYPE
@@ -13847,7 +15543,7 @@ monitorResponseTimeout  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Maximum time a monitor probe can take to respond. It is expressed in milliseconds."
+		"Maximum time a monitor probe can take to respond.It is expressed in milliseconds."
 	::= { monitorMemberEntry 5 }
 
 monitorDowntime  OBJECT-TYPE
@@ -13855,7 +15551,7 @@ monitorDowntime  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Time for which the monitor probes are not fired once it is down. It is expressed in milliseconds."
+		"Time for which the monitor probes are not fired once it is down.It is expressed in milliseconds."
 	::= { monitorMemberEntry 6 }
 
 monitorRetrys  OBJECT-TYPE
@@ -13887,7 +15583,7 @@ drtmDeviation  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Tolerable Deviation of response time for DRTM. It is expressed in milliseconds."
+		"Tolerable Deviation of response time for DRTM.It is expressed in milliseconds."
 	::= { monitorMemberEntry 10 }
 
 drtmActiveMonitors  OBJECT-TYPE
@@ -13903,7 +15599,7 @@ drtmCumResponseTimeout  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Total cumulative response time of all active DRTM monitors. It is expressed in milliseconds."
+		"Total cumulative response time of all active DRTM monitors.It is expressed in milliseconds."
 	::= { monitorMemberEntry 12 }
 
 monServiceMemberTable  OBJECT-TYPE
@@ -13912,7 +15608,7 @@ monServiceMemberTable  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"The moninfo table, bindings of monitors to services."
-	::= { nsSvcGroup 9 }
+	::= { nsSvcGroup 10 }
 
 monServiceMemberEntry  OBJECT-TYPE
 	SYNTAX  MonServiceMemberEntry
@@ -13920,12 +15616,11 @@ monServiceMemberEntry  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"..."
-	INDEX { monitorName , monServiceName }
+	INDEX { monServiceName , monitorName }
 	::= { monServiceMemberTable 1 }
 
 MonServiceMemberEntry ::= SEQUENCE {
 	monServiceName  OCTET STRING,
-	monitorFailedCount  Gauge32,
 	monitorRTO  Gauge32,
 	monitorState  MonitorState,
 	drtmRTO  Gauge32,
@@ -13946,8 +15641,7 @@ MonServiceMemberEntry ::= SEQUENCE {
 	monitorFailedResponse  Counter32,
 	monitorFailedId  Counter32,
 	monitorProbesNoChange  Counter32,
-	monitorResponseTimeoutThreshExceed  Counter32,
-	monitorCurResponseTime  Gauge32
+	monitorResponseTimeoutThreshExceed  Counter32
 }
 
 monServiceName  OBJECT-TYPE
@@ -13958,21 +15652,13 @@ monServiceName  OBJECT-TYPE
 		"The name of the service to which the monitor is bound."
 	::= { monServiceMemberEntry 1 }
 
-monitorFailedCount  OBJECT-TYPE
-	SYNTAX  Gauge32
-	MAX-ACCESS  read-only
-	STATUS  obsolete
-	DESCRIPTION
-		"...OBSOLETE"
-	::= { monServiceMemberEntry 3 }
-
 monitorRTO  OBJECT-TYPE
 	SYNTAX  Gauge32
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
 		"Smooth response time calculated using LRTM. It is expressed in microseconds."
-	::= { monServiceMemberEntry 4 }
+	::= { monServiceMemberEntry 2 }
 
 monitorState  OBJECT-TYPE
 	SYNTAX  MonitorState
@@ -13980,15 +15666,15 @@ monitorState  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"State of the monitor."
-	::= { monServiceMemberEntry 5 }
+	::= { monServiceMemberEntry 3 }
 
 drtmRTO  OBJECT-TYPE
 	SYNTAX  Gauge32
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"DRTM response timeout average over all drtm active monitors. It is expressed in milliseconds."
-	::= { monServiceMemberEntry 6 }
+		"Monitor probe time (round trip time) for DRTM monitors.It is expressed in milliseconds."
+	::= { monServiceMemberEntry 4 }
 
 drtmLearningProbes  OBJECT-TYPE
 	SYNTAX  Gauge32
@@ -13996,7 +15682,7 @@ drtmLearningProbes  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Current, number of monitoring probes yet to be done to move to dynamic mode in case of DRTM monitors."
-	::= { monServiceMemberEntry 7 }
+	::= { monServiceMemberEntry 5 }
 
 monitorCurFailedCount  OBJECT-TYPE
 	SYNTAX  Gauge32
@@ -14004,7 +15690,7 @@ monitorCurFailedCount  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Current, continuous monitoring probe failure count. gets reset on success only."
-	::= { monServiceMemberEntry 8 }
+	::= { monServiceMemberEntry 6 }
 
 monitorWeight  OBJECT-TYPE
 	SYNTAX  Integer32
@@ -14012,15 +15698,15 @@ monitorWeight  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Weight of the monitor binding."
-	::= { monServiceMemberEntry 9 }
+	::= { monServiceMemberEntry 7 }
 
 alarmMonrespto  OBJECT-TYPE
 	SYNTAX  Gauge32
-	MAX-ACCESS  read-only
-	STATUS  obsolete
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
 	DESCRIPTION
-		"...OBSOLETE"
-	::= { monServiceMemberEntry 10 }
+		"This is the response time taken for the current monitor probe."
+	::= { monServiceMemberEntry 8 }
 
 monitorProbes  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14028,7 +15714,7 @@ monitorProbes  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of monitoring probes sent."
-	::= { monServiceMemberEntry 11 }
+	::= { monServiceMemberEntry 9 }
 
 monitorFailed  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14036,7 +15722,7 @@ monitorFailed  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of monitoring probes failed."
-	::= { monServiceMemberEntry 12 }
+	::= { monServiceMemberEntry 10 }
 
 monitorMaxClient  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14044,7 +15730,7 @@ monitorMaxClient  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of monitoring probes that were not sent due to MaxClients."
-	::= { monServiceMemberEntry 13 }
+	::= { monServiceMemberEntry 11 }
 
 monitorFailedCon  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14052,7 +15738,7 @@ monitorFailedCon  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of failed monitoring probes due to failed connections."
-	::= { monServiceMemberEntry 14 }
+	::= { monServiceMemberEntry 12 }
 
 monitorFailedCode  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14060,7 +15746,7 @@ monitorFailedCode  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of failed monitoring probes due to improper response code."
-	::= { monServiceMemberEntry 15 }
+	::= { monServiceMemberEntry 13 }
 
 monitorFailedStr  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14068,7 +15754,7 @@ monitorFailedStr  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of failed monitoring probes due to invalid response string."
-	::= { monServiceMemberEntry 16 }
+	::= { monServiceMemberEntry 14 }
 
 monitorFailedTimeout  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14076,7 +15762,7 @@ monitorFailedTimeout  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of failed monitoring probes due to timeout."
-	::= { monServiceMemberEntry 17 }
+	::= { monServiceMemberEntry 15 }
 
 monitorFailedSend  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14084,7 +15770,7 @@ monitorFailedSend  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of failed monitoring probes due to inability to send the data."
-	::= { monServiceMemberEntry 18 }
+	::= { monServiceMemberEntry 16 }
 
 monitorFailedFTP  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14092,7 +15778,7 @@ monitorFailedFTP  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of failed monitoring probes due to ftp protocol violation."
-	::= { monServiceMemberEntry 19 }
+	::= { monServiceMemberEntry 17 }
 
 monitorFailedPort  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14100,7 +15786,7 @@ monitorFailedPort  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of failed monitoring probes due to port unreachable response."
-	::= { monServiceMemberEntry 20 }
+	::= { monServiceMemberEntry 18 }
 
 monitorFailedResponse  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14108,7 +15794,7 @@ monitorFailedResponse  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of failed monitoring probes due to invalid response."
-	::= { monServiceMemberEntry 21 }
+	::= { monServiceMemberEntry 19 }
 
 monitorFailedId  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14116,7 +15802,7 @@ monitorFailedId  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of failed monitoring probes due to response id mismatch."
-	::= { monServiceMemberEntry 22 }
+	::= { monServiceMemberEntry 20 }
 
 monitorProbesNoChange  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14124,7 +15810,7 @@ monitorProbesNoChange  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Number of monitoring probes which did not change the state."
-	::= { monServiceMemberEntry 23 }
+	::= { monServiceMemberEntry 21 }
 
 monitorResponseTimeoutThreshExceed  OBJECT-TYPE
 	SYNTAX  Counter32
@@ -14132,15 +15818,7 @@ monitorResponseTimeoutThreshExceed  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		" Number of times the response time has exceeded the configured threshold."
-	::= { monServiceMemberEntry 24 }
-
-monitorCurResponseTime  OBJECT-TYPE
-	SYNTAX  Gauge32
-	MAX-ACCESS  accessible-for-notify
-	STATUS  current
-	DESCRIPTION
-		"This is the response time taken for the current monitor probe in milliseconds."
-	::= { monServiceMemberEntry 25 }
+	::= { monServiceMemberEntry 22 }
 
 nsVserverGroup OBJECT IDENTIFIER
 	::= { rs9000 3 }
@@ -14203,7 +15881,12 @@ VserverEntry ::= SEQUENCE {
 	vsvrRequestRate  OCTET STRING,
 	vsvrRxBytesRate  OCTET STRING,
 	vsvrTxBytesRate  OCTET STRING,
-	vsvrSynfloodRate  OCTET STRING
+	vsvrSynfloodRate  OCTET STRING,
+	vsvrIp6Address  Ipv6Address,
+	vsvrTotHits  Counter64,
+	vsvrTotSpillOvers  Counter32,
+	vsvrTotalClients  Counter64,
+	vsvrClientConnOpenRate  OCTET STRING
 }
 
 vsvrName  OBJECT-TYPE
@@ -14281,9 +15964,9 @@ vsvrAvgTransactionTime  OBJECT-TYPE
 vsvrSurgeCount  OBJECT-TYPE
 	SYNTAX  Counter32
 	MAX-ACCESS  read-only
-	STATUS  obsolete
+	STATUS  current
 	DESCRIPTION
-		"...OBSOLETE"
+		"The number requests in the surge queue."
 	::= { vserverEntry 10 }
 
 vsvrTotalRequestsLow  OBJECT-TYPE
@@ -14533,6 +16216,46 @@ vsvrSynfloodRate  OBJECT-TYPE
 	DESCRIPTION
 		"This represents the rate of unacknowledged SYNs for this service/vserver."
 	::= { vserverEntry 46 }
+
+vsvrIp6Address  OBJECT-TYPE
+	SYNTAX  Ipv6Address
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"IPv6 address of the v server"
+	::= { vserverEntry 47 }
+
+vsvrTotHits  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total vserver hits"
+	::= { vserverEntry 48 }
+
+vsvrTotSpillOvers  OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of times vserver experienced spill over."
+	::= { vserverEntry 54 }
+
+vsvrTotalClients  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of established client connections."
+	::= { vserverEntry 56 }
+
+vsvrClientConnOpenRate  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Rate at which connections are opened for this vserver."
+	::= { vserverEntry 58 }
 
 vserverServiceTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF VserverServiceEntry
@@ -14860,40 +16583,175 @@ VserverPqpolicyEntry ::= SEQUENCE {
 	pqpolicyTotClientTransactionTime  Counter64,
 	pqpolicyTotClientTransactions  Counter64,
 	pqpolicyDropped  Counter64,
-	pqpolicyQdepth  Counter32
+	pqpolicyQdepth  Counter32,
+	pqpolicytotClientTransactionTime  Counter64,
+	pqpolicytotClientTransactions  Counter64,
+	pqpolicypqDropped  Counter64,
+	pqpolicypqQdepth  Gauge32,
+	pqpolicypqAvgClientTransactionTime  Gauge32,
+	pqpolicypqVserverIP  IpAddress,
+	pqpolicypqVserverPort  Integer32,
+	pqpolicypqCurrentClientConnections  Gauge32,
+	pqpolicypqTotQueueDepth  Counter64,
+	pqpolicypqTotClientConnections  Counter64,
+	pqpolicypqTotQueueWaitTime  Counter64,
+	pqpolicypqTotAvgQueueDepth  Gauge32,
+	pqpolicypqTotAvgQueueWaitTime  Gauge32,
+	pqpolicytotClientTransactionTimems  Counter64,
+	pqpolicypqAvgClientTransactionTimems  Gauge32
 }
 
 pqpolicyTotClientTransactionTime  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Total client transaction time in microsec. "
+		"...OBSOLETE"
 	::= { vserverPqpolicyEntry 1 }
 
 pqpolicyTotClientTransactions  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Total number of client transactions."
+		"...OBSOLETE"
 	::= { vserverPqpolicyEntry 2 }
 
 pqpolicyDropped  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Number of dropped transactions."
+		"...OBSOLETE"
 	::= { vserverPqpolicyEntry 3 }
 
 pqpolicyQdepth  OBJECT-TYPE
 	SYNTAX  Counter32
 	MAX-ACCESS  read-only
+	STATUS  obsolete
+	DESCRIPTION
+		"...OBSOLETE"
+	::= { vserverPqpolicyEntry 4 }
+
+pqpolicytotClientTransactionTime  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total client transaction time in microsec. "
+	::= { vserverPqpolicyEntry 5 }
+
+pqpolicytotClientTransactions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of client transactions."
+	::= { vserverPqpolicyEntry 6 }
+
+pqpolicypqDropped  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of dropped transactions."
+	::= { vserverPqpolicyEntry 7 }
+
+pqpolicypqQdepth  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
 		"Number of waiting clients. "
-	::= { vserverPqpolicyEntry 4 }
+	::= { vserverPqpolicyEntry 8 }
+
+pqpolicypqAvgClientTransactionTime  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the average time taken by a PQ client to complete its transaction."
+	::= { vserverPqpolicyEntry 9 }
+
+pqpolicypqVserverIP  OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Gives the IP address of the vserver to which this policy is bound."
+	::= { vserverPqpolicyEntry 10 }
+
+pqpolicypqVserverPort  OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Gives the port of the vserver to which this policy is bound."
+	::= { vserverPqpolicyEntry 11 }
+
+pqpolicypqCurrentClientConnections  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the current number of server connections established for this policy."
+	::= { vserverPqpolicyEntry 12 }
+
+pqpolicypqTotQueueDepth  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total queue depth for this policy."
+	::= { vserverPqpolicyEntry 13 }
+
+pqpolicypqTotClientConnections  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of server connections established for this policy."
+	::= { vserverPqpolicyEntry 14 }
+
+pqpolicypqTotQueueWaitTime  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the amount of time spent by PQ clients in the priority queue."
+	::= { vserverPqpolicyEntry 15 }
+
+pqpolicypqTotAvgQueueDepth  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the average queue depth for this priority queue policy."
+	::= { vserverPqpolicyEntry 16 }
+
+pqpolicypqTotAvgQueueWaitTime  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the average waiting time for this priority queue policy."
+	::= { vserverPqpolicyEntry 17 }
+
+pqpolicytotClientTransactionTimems  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total client transaction time in microsec. "
+	::= { vserverPqpolicyEntry 18 }
+
+pqpolicypqAvgClientTransactionTimems  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the average time taken by a PQ client to complete its transaction."
+	::= { vserverPqpolicyEntry 19 }
 
 vserverScpolicyTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF VserverScpolicyEntry
@@ -14919,7 +16777,31 @@ VserverScpolicyEntry ::= SEQUENCE {
 	vsvrscpolicyDestPort  Integer32,
 	vsvrscpolicyAvgServerTransactionTime  Gauge32,
 	vsvrscpolicyTotClientTransaction  Counter64,
-	vsvrscpolicyTotOpenConn  Counter32
+	vsvrscpolicyTotOpenConn  Counter32,
+	vsvrscpolicydesIpAddress  IpAddress,
+	vsvrscpolicydestPort  Integer32,
+	vsvrscpolicyavgServerTransactionTime  Gauge32,
+	vsvrscpolicytotClientTransaction  Counter64,
+	vsvrscpolicytotOpenConn  Gauge32,
+	vsvrscpolicyscPhysicalServiceIP  IpAddress,
+	vsvrscpolicyscPhysicalServicePort  Integer32,
+	vsvrscpolicyscCurrentWaitingTime  Gauge32,
+	vsvrscpolicyscCurrentClientConnections  Gauge32,
+	vsvrscpolicyscTotalClientConnections  Counter64,
+	vsvrscpolicyscTotalServerConnections  Counter64,
+	vsvrscpolicyscTotalRequestsReceived  Counter64,
+	vsvrscpolicyscTotalRequestBytes  Counter64,
+	vsvrscpolicyscTotalResponsesReceived  Counter64,
+	vsvrscpolicyscTotalResponseBytes  Counter64,
+	vsvrscpolicyscCurrentSurgeQClients  Gauge32,
+	vsvrscpolicyscCurrentWaitingClients  Gauge32,
+	vsvrscpolicyscTotalServerTransactions  Counter64,
+	vsvrscpolicyscTotalServerTTFBTransactions  Counter64,
+	vsvrscpolicyscTotalServerTTLB  Counter64,
+	vsvrscpolicyscTotalClientTTLB  Counter64,
+	vsvrscpolicyscTotalServerTTFB  Counter64,
+	vsvrscpolicyscAverageClientTTLB  Gauge32,
+	vsvrscpolicyscAverageServerTTFB  Gauge32
 }
 
 vsvrscpolicyPrimaryIPAddress  OBJECT-TYPE
@@ -14927,7 +16809,7 @@ vsvrscpolicyPrimaryIPAddress  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"The ip address of the vserver/service to which the scpolicy is bound."
+		"The ip address at which the service is running."
 	::= { vserverScpolicyEntry 1 }
 
 vsvrscpolicyPrimaryPort  OBJECT-TYPE
@@ -14935,48 +16817,240 @@ vsvrscpolicyPrimaryPort  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"The port of the vserver/service to which the scpolicy is bound."
+		"The port at which the service is running."
 	::= { vserverScpolicyEntry 2 }
 
 vsvrscpolicyDesIpAddress  OBJECT-TYPE
 	SYNTAX  IpAddress
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"The IP address of the physical service for which sc policy is matched."
+		"...OBSOLETE"
 	::= { vserverScpolicyEntry 3 }
 
 vsvrscpolicyDestPort  OBJECT-TYPE
 	SYNTAX  Integer32
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Port number of the physical service for which sc policy is matched."
+		"...OBSOLETE"
 	::= { vserverScpolicyEntry 4 }
 
 vsvrscpolicyAvgServerTransactionTime  OBJECT-TYPE
 	SYNTAX  Gauge32
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Server's average transaction delay."
+		"...OBSOLETE"
 	::= { vserverScpolicyEntry 5 }
 
 vsvrscpolicyTotClientTransaction  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Total number of client transactions for this policy."
+		"...OBSOLETE"
 	::= { vserverScpolicyEntry 6 }
 
 vsvrscpolicyTotOpenConn  OBJECT-TYPE
 	SYNTAX  Counter32
 	MAX-ACCESS  read-only
+	STATUS  obsolete
+	DESCRIPTION
+		"...OBSOLETE"
+	::= { vserverScpolicyEntry 7 }
+
+vsvrscpolicydesIpAddress  OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"IP address of destination physical service."
+	::= { vserverScpolicyEntry 8 }
+
+vsvrscpolicydestPort  OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Port number of destination physical service."
+	::= { vserverScpolicyEntry 9 }
+
+vsvrscpolicyavgServerTransactionTime  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Average Server transaction time."
+	::= { vserverScpolicyEntry 10 }
+
+vsvrscpolicytotClientTransaction  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of client transactions for this policy."
+	::= { vserverScpolicyEntry 11 }
+
+vsvrscpolicytotOpenConn  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
 		"Total number of open connections for this policy."
-	::= { vserverScpolicyEntry 7 }
+	::= { vserverScpolicyEntry 12 }
+
+vsvrscpolicyscPhysicalServiceIP  OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The IP address of the physical service for which this statistics is maintained."
+	::= { vserverScpolicyEntry 13 }
+
+vsvrscpolicyscPhysicalServicePort  OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The port of the physical service for which this statistics is maintained."
+	::= { vserverScpolicyEntry 14 }
+
+vsvrscpolicyscCurrentWaitingTime  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the value of the currently estimated waiting time for the configured URL."
+	::= { vserverScpolicyEntry 15 }
+
+vsvrscpolicyscCurrentClientConnections  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of clients that were allowed a server connection for this policy."
+	::= { vserverScpolicyEntry 16 }
+
+vsvrscpolicyscTotalClientConnections  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of clients that were allowed a server connection for this policy."
+	::= { vserverScpolicyEntry 17 }
+
+vsvrscpolicyscTotalServerConnections  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of server connections that were established for this policy."
+	::= { vserverScpolicyEntry 18 }
+
+vsvrscpolicyscTotalRequestsReceived  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of requests received for this policy."
+	::= { vserverScpolicyEntry 19 }
+
+vsvrscpolicyscTotalRequestBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of request bytes received for this policy."
+	::= { vserverScpolicyEntry 20 }
+
+vsvrscpolicyscTotalResponsesReceived  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of server responses received for this policy."
+	::= { vserverScpolicyEntry 21 }
+
+vsvrscpolicyscTotalResponseBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the total number of response bytes received for this policy."
+	::= { vserverScpolicyEntry 22 }
+
+vsvrscpolicyscCurrentSurgeQClients  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of clients that matched the SC policy but are in the surge queue."
+	::= { vserverScpolicyEntry 23 }
+
+vsvrscpolicyscCurrentWaitingClients  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the current number of SC priority clients that are waiting for a server connection for this policy."
+	::= { vserverScpolicyEntry 24 }
+
+vsvrscpolicyscTotalServerTransactions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of 200 OK responses received from the server for this policy."
+	::= { vserverScpolicyEntry 25 }
+
+vsvrscpolicyscTotalServerTTFBTransactions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the number of TTFB transcations from the server for this policy."
+	::= { vserverScpolicyEntry 26 }
+
+vsvrscpolicyscTotalServerTTLB  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the server TTLB calculated for this policy."
+	::= { vserverScpolicyEntry 27 }
+
+vsvrscpolicyscTotalClientTTLB  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the client TTLB calculated for this policy."
+	::= { vserverScpolicyEntry 28 }
+
+vsvrscpolicyscTotalServerTTFB  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the server TTFB calculated for this policy."
+	::= { vserverScpolicyEntry 29 }
+
+vsvrscpolicyscAverageClientTTLB  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the average value of the client TTLB for this policy."
+	::= { vserverScpolicyEntry 30 }
+
+vsvrscpolicyscAverageServerTTFB  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This counter gives the average value of the server TTFB for this policy."
+	::= { vserverScpolicyEntry 31 }
 
 vserverAdvanceSslConfigTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF VserverAdvanceSslConfigEntry
@@ -15234,25 +17308,25 @@ cpuUtilization  NOTIFICATION-TYPE
 linkUp  NOTIFICATION-TYPE
 	STATUS  obsolete
 	DESCRIPTION
-		"The link of the netscaler is up. OBSOLETE"
+		"0"
 	::= { netScalerEventsV2 4 }
 
 linkDown  NOTIFICATION-TYPE
 	STATUS  obsolete
 	DESCRIPTION
-		"The link of the netscaler is down. OBSOLETE"
+		"0"
 	::= { netScalerEventsV2 5 }
 
 discoverFailure  NOTIFICATION-TYPE
 	STATUS  obsolete
 	DESCRIPTION
-		"This indicates the netscaler failed to discover its peer. OBSOLETE"
+		"0"
 	::= { netScalerEventsV2 6 }
 
 memUtilization  NOTIFICATION-TYPE
 	STATUS  obsolete
 	DESCRIPTION
-		"This indicates the utilization of netscaler memory. OBSOLETE"
+		"0"
 	::= { netScalerEventsV2 7 }
 
 entitydown  NOTIFICATION-TYPE
@@ -15335,37 +17409,37 @@ serviceRequestRateNormal  NOTIFICATION-TYPE
 entityRxRate  NOTIFICATION-TYPE
 	STATUS  obsolete
 	DESCRIPTION
-		"This trap is sent when the request bytes/s of a vServer / Service exceeds a threshold value. OBSOLETE"
+		"0"
 	::= { netScalerEventsV2 19 }
 
 entityRxRateNormal  NOTIFICATION-TYPE
 	STATUS  obsolete
 	DESCRIPTION
-		"This trap is sent when the request bytes/s of a vServer / Service returns to normal. OBSOLETE"
+		"0"
 	::= { netScalerEventsV2 20 }
 
 entityTxRate  NOTIFICATION-TYPE
 	STATUS  obsolete
 	DESCRIPTION
-		"This trap is sent when the response bytes/s of a vServer / Service exceeds a threshold value. OBSOLETE"
+		"0"
 	::= { netScalerEventsV2 21 }
 
 entityTxRateNormal  NOTIFICATION-TYPE
 	STATUS  obsolete
 	DESCRIPTION
-		"This trap is sent when the response bytes/s of a vServer / Service returns to normal. OBSOLETE"
+		"0"
 	::= { netScalerEventsV2 22 }
 
 entitySynflood  NOTIFICATION-TYPE
 	STATUS  obsolete
 	DESCRIPTION
-		"This trap is sent when the number of unacknowledged syns for a vServer / Service exceeds a threshold value. OBSOLETE"
+		"0"
 	::= { netScalerEventsV2 23 }
 
 entitySynfloodNormal  NOTIFICATION-TYPE
 	STATUS  obsolete
 	DESCRIPTION
-		"This trap is sent when the number of unacknowledged syns for a vServer / Service returns to normal. OBSOLETE"
+		"0"
 	::= { netScalerEventsV2 24 }
 
 netScalerConfigChange  NOTIFICATION-TYPE
@@ -15561,22 +17635,36 @@ averageCpuUtilizationNormal  NOTIFICATION-TYPE
 	OBJECTS  { resCpuUsage , alarmNormalThreshold , sysIpAddress }
 	STATUS  current
 	DESCRIPTION
-		"This trap indicates that the average CPU usage in the multi-processor NetScaler system has come back to normal"
+		"This trap indicates that the average CPU usage in the multi-processor NetScaler system has come back to normal."
 	::= { netScalerEventsV2 52 }
 
 monRespTimeoutAboveThresh  NOTIFICATION-TYPE
-	OBJECTS  { monServiceName , monitorName , responseTimeoutThreshold , monitorCurResponseTime , sysIpAddress }
+	OBJECTS  { monServiceName , monitorName , responseTimeoutThreshold , alarmMonrespto , sysIpAddress }
 	STATUS  current
 	DESCRIPTION
 		"This trap is sent when the response timeout for a monitor probe exceeds the configured threshold."
 	::= { netScalerEventsV2 53 }
 
 monRespTimeoutBelowThresh  NOTIFICATION-TYPE
-	OBJECTS  { monServiceName , monitorName , responseTimeoutThreshold , monitorCurResponseTime , sysIpAddress }
+	OBJECTS  { monServiceName , monitorName , responseTimeoutThreshold , alarmMonrespto , sysIpAddress }
 	STATUS  current
 	DESCRIPTION
 		"This trap is sent when the response timeout for a monitor probe comes back to normal, less than the threshold set."
 	::= { netScalerEventsV2 54 }
+
+netScalerLoginFailure  NOTIFICATION-TYPE
+	OBJECTS  { nsUserName , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap is sent when a login attempt to the NetScaler fails."
+	::= { netScalerEventsV2 55 }
+
+sslCertificateExpiry  NOTIFICATION-TYPE
+	OBJECTS  { sslCertKeyName , sslDaysToExpire , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap is sent as an advance notification when an SSL certificate is due to expire."
+	::= { netScalerEventsV2 56 }
 
 fanSpeedLow  NOTIFICATION-TYPE
 	OBJECTS  { sysHealthCounterName , sysHealthCounterValue , alarmLowThreshold , sysIpAddress }
@@ -15635,7 +17723,7 @@ diskUsageHigh  NOTIFICATION-TYPE
 	::= { netScalerEventsV2 64 }
 
 diskUsageNormal  NOTIFICATION-TYPE
-	OBJECTS  { sysHealthCounterName , sysHealthCounterValue , alarmNormalThreshold , sysIpAddress }
+	OBJECTS  { sysHealthDiskName , sysHealthDiskPerusage , alarmNormalThreshold , sysIpAddress }
 	STATUS  current
 	DESCRIPTION
 		"This trap indicates that disk usage has returned to normal."
@@ -15654,5 +17742,33 @@ interfaceThroughputNormal  NOTIFICATION-TYPE
 	DESCRIPTION
 		"This trap indicates that interface throughput has returned to normal."
 	::= { netScalerEventsV2 67 }
+
+haVersionMismatch  NOTIFICATION-TYPE
+	OBJECTS  { sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that there is a mismatch in the OS version of the netscalers participating in HA. "
+	::= { netScalerEventsV2 68 }
+
+haSyncFailure  NOTIFICATION-TYPE
+	OBJECTS  { sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that config synchronization has failed on secondary. "
+	::= { netScalerEventsV2 69 }
+
+haNoHeartbeats  NOTIFICATION-TYPE
+	OBJECTS  { haNicsMonitorFailed , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that HA heartbeats are not received from the secondary. "
+	::= { netScalerEventsV2 70 }
+
+haBadSecState  NOTIFICATION-TYPE
+	OBJECTS  { haPeerSystemState , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that the secondary is in DOWN/UNKNOWN/STAY SECONDARY state. "
+	::= { netScalerEventsV2 71 }
 
 END -- end of module NS-ROOT-MIB.
