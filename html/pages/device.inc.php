@@ -171,7 +171,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     {
       echo('<li class="' . $select['loadbalancer'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'loadbalancer')).'">
-      <img src="images/16/arrow_divide.png" align="absmiddle" border="0" /> Load Balancer
+      <img src="images/icons/loadbalancer.png" align="absmiddle" border="0" /> Load Balancer
     </a>
   </li>');
     }
