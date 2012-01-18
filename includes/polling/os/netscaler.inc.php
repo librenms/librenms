@@ -5,6 +5,7 @@
 
 $hardware = str_replace("\"", "", snmp_get($device, "sysHardwareVersionDesc.0", "-Osqv", "SNMPv2-MIB:NS-ROOT-MIB"));
 $version = str_replace("\"", "", snmp_get($device, "sysBuildVersion.0", "-Osqv", "SNMPv2-MIB:NS-ROOT-MIB"));
+$serial = str_replace("\"", "", snmp_get($device, "sysHardwareSerialNumber.0", "-Osqv", "SNMPv2-MIB:NS-ROOT-MIB"));
 
 list($version,$features) = explode(":", $version);
 list(,$version) = explode(" ", $version);
