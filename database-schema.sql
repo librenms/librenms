@@ -1206,3 +1206,24 @@ CREATE TABLE IF NOT EXISTS `ports_vlans` (
   PRIMARY KEY (`port_vlan_id`),
   UNIQUE KEY `unique` (`device_id`,`interface_id`,`vlan`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
+
+--
+-- Table structure for table `netscaler_vservers`
+--
+
+CREATE TABLE IF NOT EXISTS `netscaler_vservers` (
+  `vsvr_id` int(11) NOT NULL AUTO_INCREMENT,
+  `device_id` int(11) NOT NULL,
+  `vsvr_name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
+  `vsvr_ip` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
+  `vsvr_port` int(8) NOT NULL,
+  `vsvr_type` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
+  `vsvr_state` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `vsvr_clients` int(11) NOT NULL,
+  `vsvr_server` int(11) NOT NULL,
+  `vsvr_req_rate` int(11) NOT NULL,
+  `vsvr_bps_in` int(11) NOT NULL,
+  `vsvr_bps_out` int(11) NOT NULL,
+  PRIMARY KEY (`vsvr_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
