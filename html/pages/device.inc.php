@@ -155,8 +155,17 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
 
     ### $routing_tabs is used in device/routing/ to build the tabs menu. we built it here to save some queries
 
-    $device_routing_count['loadbalancer_vservers'] = dbFetchCell("SELECT COUNT(*) FROM `loadbalancer_vservers` WHERE `device_id` = ?", array($device['device_id']));
-    if ($device_routing_count['loadbalancer_vservers']) { $routing_tabs[] = 'loadbalancer_vservers'; }
+    if($device['os'] == "netscaler") /// Netscaler
+    {
+      $device_routing_count['netscaler_vsvr'] = dbFetchCell("SELECT COUNT(*) FROM `netscaler_vservers` WHERE `device_id` = ?", array($device['device_id']));
+      if ($device_routing_count['netscaler_vsvr']) { $routing_tabs[] = 'netscaler_vsvr'; }
+    }
+
+    if($device['os'] == "acsw")  /// Cisco ACE
+    {
+      $device_routing_count['loadbalancer_vservers'] = dbFetchCell("SELECT COUNT(*) FROM `loadbalancer_vservers` WHERE `device_id` = ?", array($device['device_id']));
+      if ($device_routing_count['loadbalancer_vservers']) { $routing_tabs[] = 'loadbalancer_vservers'; }
+    }
 
     $device_routing_count['loadbalancer_rservers'] = dbFetchCell("SELECT COUNT(*) FROM `loadbalancer_rservers` WHERE `device_id` = ?", array($device['device_id']));
     if ($device_routing_count['loadbalancer_rservers']) { $routing_tabs[] = 'loadbalancer_rservers'; }
