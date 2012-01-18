@@ -2,7 +2,7 @@
 
 print_optionbar_start();
 
-echo("<span style='font-weight: bold;'>Serverfarms</span> &#187; ");
+echo("<span style='font-weight: bold;'>VServers</span> &#187; ");
 
 #$auth = TRUE;
 
