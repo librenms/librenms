@@ -24,7 +24,9 @@ unset($sep);
 echo(' Graphs: ');
 $graph_types = array("bits"   => "Bits",
                      "pkts"   => "Packets",
-                     "conns"  => "Connections");
+                     "conns"  => "Connections",
+                     "reqs"   => "Requests",
+                     "hitmiss" => "Hit/Miss");
 
 
 foreach ($graph_types as $type => $descr)
