@@ -56,12 +56,14 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 
 foreach ($config['device_types'] as $devtype)
 {
-  echo('        <li><a href="devices/type=' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['icon'] . '" border="0" align="absmiddle" /> ' . $devtype['text'] . '</a></li>');
+  if (in_array($devtype['type'],array_keys($cache['device_types'])))
+  {
+    echo('        <li><a href="devices/type=' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['icon'] . '" border="0" align="absmiddle" /> ' . $devtype['text'] . '</a></li>');
+  }
 }
 
-?>
-<?php
-if ($_SESSION['userlevel'] >= '10') {
+if ($_SESSION['userlevel'] >= '10')
+{
   echo('
         <li><hr width="140" /></li>
         <li><a href="addhost/"><img src="images/16/server_add.png" border="0" align="absmiddle" /> Add Device</a></li>
@@ -121,13 +123,16 @@ if ($config['show_services'])
 <ul>
         <li><a href="services/"><img src="images/16/cog.png" border="0" align="absmiddle" /> All Services </a></li>
 
-<?php if ($service_alerts) {
-echo('  <li><hr width=140 /></li>
-        <li><a href="services/status=0/"><img src="images/16/cog_error.png" border="0" align="absmiddle" /> Alerts ('.$service_alerts.')</a></li>');
-} ?>
-
 <?php
-if ($_SESSION['userlevel'] >= '10') {
+
+if ($service_alerts)
+{
+  echo('  <li><hr width=140 /></li>
+        <li><a href="services/status=0/"><img src="images/16/cog_error.png" border="0" align="absmiddle" /> Alerts ('.$service_alerts.')</a></li>');
+}
+
+if ($_SESSION['userlevel'] >= '10')
+{
   echo('
         <li><hr width="140" /></li>
         <li><a href="addsrv/"><img src="images/16/cog_add.png" border="0" align="absmiddle" /> Add Service</a></li>
@@ -480,12 +485,14 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
             <div class="col_1">
                 <h2>Settings</h2>
 <ul>
-     <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About</a></li>
-     <?php if ($_SESSION['userlevel'] >= '10') {
-      echo('
+<?php
+
+if ($_SESSION['userlevel'] >= '10')
+{
+  echo('
         <li><a href="settings/"><img src="images/16/wrench.png" border="0" align="absmiddle" /> Global Settings</a></li>');
-        }
-     ?>
+}
+?>
       <li><a href="preferences/"><img src="images/16/wrench_orange.png" border="0" align="absmiddle" /> My Settings</a></li>
         </ul>
             </div>
