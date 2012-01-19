@@ -26,8 +26,11 @@ foreach($this_vlans as $vlan)
 
     echo("VLAN $vlan \n");
 
-    echo(str_pad("dot1d id", 10).str_pad("ifIndex", 10).str_pad("Port Name", 25).
-         str_pad("Priority", 10).str_pad("State", 15).str_pad("Cost", 10)."\n");
+    if ($vlan_data)
+    {
+      echo(str_pad("dot1d id", 10).str_pad("ifIndex", 10).str_pad("Port Name", 25).
+           str_pad("Priority", 10).str_pad("State", 15).str_pad("Cost", 10)."\n");
+    }
 
     foreach($vlan_data as $vlan_port_id => $vlan_port)
     {
