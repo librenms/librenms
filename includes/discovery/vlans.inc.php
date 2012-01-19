@@ -14,10 +14,10 @@ foreach($this_vlans as $vlan)
   #/usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/observium/mibs/ udp:sw2.ahf:161 dot1dStpPortEntry
   #/usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/observium/mibs/ udp:sw2.ahf:161 dot1dBasePortEntry
 
-  if($vlan <1002 || $vlan > 1105) /// Ignore reserved VLAN IDs
+  if(is_numeric($vlan) && ($vlan <1002 || $vlan > 1105)) /// Ignore reserved VLAN IDs
   {
 
-    if($device['os_group'] == "cisco")
+    if($device['os_group'] == "cisco" || $device['os'] == "ios")  /// This shit only seems to work on IOS
     {
       $vlan_device = array_merge($device, array('community' => $device['community']."@".$vlan));
       $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dStpPortEntry", array(), "BRIDGE-MIB:Q-BRIDGE-MIB");
