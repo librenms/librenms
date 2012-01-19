@@ -95,8 +95,8 @@ foreach ($_POST as $name => $value)
   $vars[$name] = $value;
 }
 
-if(strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) { $_SESSION['widescreen'] = 1; }
-if(strstr($_SERVER['REQUEST_URI'], 'widescreen=no'))  { unset($_SESSION['widescreen']); }
+if (strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) { $_SESSION['widescreen'] = 1; }
+if (strstr($_SERVER['REQUEST_URI'], 'widescreen=no'))  { unset($_SESSION['widescreen']); }
 
 $start = utime();
 
@@ -234,7 +234,7 @@ function popUp(URL)
 
 <?php
 
-if(!$vars['bare'] == "yes") {
+if (!$vars['bare'] == "yes") {
 
   include("includes/".$config['web_header']);
 
@@ -250,7 +250,7 @@ if(!$vars['bare'] == "yes") {
 <?php
 
 ### To help debug the new URLs :)
-if($devel || $vars['devel'])
+if ($devel || $vars['devel'])
 {
   echo("<pre>");
   print_r($_GET);
@@ -297,6 +297,12 @@ if ($config['page_gen'])
                       ' Row    '.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0,3).'s'.
                       ' Rows   '.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0,3).'s'.
                       ' Column '.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0,3).'s');
+
+    $fullsize = memory_get_usage();
+    unset($cache);
+    $cachesize = $fullsize - memory_get_usage();
+
+    echo('<br />Cached data in memory is '.formatStorage($cachesize).'. Page memory usage is '.formatStorage($fullsize).', peaked at '. formatStorage(memory_get_peak_usage()) .'.');
 
     echo('<br />Generated in ' . $gentime . ' seconds.');
 }
