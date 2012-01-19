@@ -17,10 +17,12 @@ foreach($this_vlans as $vlan)
   if($vlan <1002 || $vlan > 1105) /// Ignore reserved VLAN IDs
   {
 
-    $vlan_device = array_merge($device, array('community' => $device['community']."@".$vlan));
-
-    $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dStpPortEntry", array(), "BRIDGE-MIB:Q-BRIDGE-MIB");
-    $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dBasePortEntry", $vlan_data, "BRIDGE-MIB:Q-BRIDGE-MIB");
+    if($device['os_group'] == "cisco")
+    {
+      $vlan_device = array_merge($device, array('community' => $device['community']."@".$vlan));
+      $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dStpPortEntry", array(), "BRIDGE-MIB:Q-BRIDGE-MIB");
+      $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dBasePortEntry", $vlan_data, "BRIDGE-MIB:Q-BRIDGE-MIB");
+    }
 
     echo("VLAN $vlan \n");
 
@@ -58,6 +60,9 @@ foreach($this_vlans as $vlan)
 
     }
   }
+
+  unset($vlan_data);
+
 }
 
 
