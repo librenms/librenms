@@ -1226,4 +1226,3 @@ CREATE TABLE IF NOT EXISTS `netscaler_vservers` (
   `vsvr_bps_out` int(11) NOT NULL,
   PRIMARY KEY (`vsvr_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
-
