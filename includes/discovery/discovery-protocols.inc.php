@@ -117,7 +117,7 @@ if ($lldp_array)
         $lldp = $lldp_instance[$entry_instance];
         $remote_device_id = @mysql_result(mysql_query("SELECT `device_id` FROM `devices` WHERE `sysName` = '".$lldp['lldpRemSysName']."' OR `hostname`='".$lldp['lldpRemSysName']."'"), 0);
 
-        if (!$remote_device_id)
+        if (!$remote_device_id && is_valid_hostname($lldp['lldpRemSysName']))
         {
           $remote_device_id = discover_new_device($lldp['lldpRemSysName']);
           if ($remote_device_id)
