@@ -1,10 +1,5 @@
 <?php
 
-# FIXME Removed 28/4/2011 - this can go, right?
-#unset($ports);
-#$ports = snmp_cache_ifIndex($device); /// Cache Port List
-# /FIXME
-
 // Build SNMP Cache Array
 $data_oids = array('ifName','ifDescr','ifAlias', 'ifAdminStatus', 'ifOperStatus', 'ifMtu', 'ifSpeed', 'ifHighSpeed', 'ifType', 'ifPhysAddress',
                    'ifPromiscuousMode','ifConnectorPresent','ifDuplex', 'ifTrunk', 'ifVlan');
@@ -182,14 +177,7 @@ foreach ($ports as $port)
     if (strpos($this_port['ifPhysAddress'], ":"))
     {
       list($a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(":", $this_port['ifPhysAddress']);
-      $ah_a = zeropad($a_a);
-      $ah_b = zeropad($a_b);
-      $ah_c = zeropad($a_c);
-      $ah_d = zeropad($a_d);
-      $ah_e = zeropad($a_e);
-      $ah_f = zeropad($a_f);
-      #$this_port['ifPhysAddress'] = $ah_a.":".$ah_b.":".$ah_c.":".$ah_d.":".$ah_e.":".$ah_f;
-      $this_port['ifPhysAddress'] = $ah_a.$ah_b.$ah_c.$ah_d.$ah_e.$ah_f;
+      $this_port['ifPhysAddress'] = zeropad($ah_a).zeropad($ah_b).zeropad($ah_c).zeropad($ah_d).zeropad($ah_e).zeropad($ah_f);
     }
 
     if (is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts']))
@@ -221,7 +209,11 @@ foreach ($ports as $port)
       $this_port['ifTrunk'] = $this_port['vlanTrunkPortEncapsulationOperType'];
       if (isset($this_port['vlanTrunkPortNativeVlan'])) { $this_port['ifVlan'] = $this_port['vlanTrunkPortNativeVlan']; }
     }
-    $this_port['ifVlan']  = $this_port['vmVlan'];
+
+    if (isset($this_port['vmVlan']))
+    {
+      $this_port['ifVlan']  = $this_port['vmVlan'];
+    }
 
     /// Set VLAN and Trunk from Q-BRIDGE-MIB
     if (!isset($this_port['ifVlan']) && isset($this_port['dot1qPvid']))

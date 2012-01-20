@@ -75,8 +75,6 @@ if (bill_permitted($bill_id))
 
 
   if (!$vars['view']) { $vars['view'] = "quick"; }
-  if ($_GET['opta'] == "admin_history") { $vars['view'] = $_GET['opta']; }
-
 
   if ($vars['view'] == "quick") { echo("<span class='pagemenu-selected'>"); }
   echo('<a href="'.generate_url($vars, array('view' => 'quick')).'">Quick Graphs</a>');

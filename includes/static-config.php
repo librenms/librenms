@@ -412,7 +412,7 @@ $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "netscaler";
 $config['os'][$os]['text']              = "Citrix Netscaler";
-$config['os'][$os]['type']              = "network";
+$config['os'][$os]['type']              = "loadbalancer";
 $config['os'][$os]['icon']              = "citrix";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
@@ -1015,6 +1015,11 @@ $i++;
 $config['device_types'][$i]['text'] = 'Environment';
 $config['device_types'][$i]['type'] = 'environment';
 $config['device_types'][$i]['icon'] = 'environment.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Load Balancers';
+$config['device_types'][$i]['type'] = 'loadbalancer';
+$config['device_types'][$i]['icon'] = 'loadbalancer.png';
 
 if (isset($config['enable_printers']) && $config['enable_printers'])
 {
