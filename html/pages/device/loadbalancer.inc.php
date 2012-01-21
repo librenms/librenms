@@ -21,25 +21,25 @@ unset($sep);
 foreach ($loadbalancer_tabs as $type)
 {
 
-  if (!$vars['proto']) { $vars['proto'] = $type; }
+  if (!$vars['type']) { $vars['type'] = $type; }
 
   echo($sep);
 
-  if ($vars['proto'] == $type)
+  if ($vars['type'] == $type)
   {
     echo('<span class="pagemenu-selected">');
   }
 
-  echo(generate_link($type_text[$type] ." (".$device_loadbalancer_count[$type].")",$link_array,array('proto'=>$type)));
-  if ($vars['proto'] == $type) { echo("</span>"); }
+  echo(generate_link($type_text[$type] ." (".$device_loadbalancer_count[$type].")",$link_array,array('type'=>$type)));
+  if ($vars['type'] == $type) { echo("</span>"); }
   $sep = " | ";
 }
 
 print_optionbar_end();
 
-if (is_file("pages/device/loadbalancer/".mres($vars['proto']).".inc.php"))
+if (is_file("pages/device/loadbalancer/".mres($vars['type']).".inc.php"))
 {
-   include("pages/device/loadbalancer/".mres($vars['proto']).".inc.php");
+   include("pages/device/loadbalancer/".mres($vars['type']).".inc.php");
 } else {
   foreach ($loadbalancer_tabs as $type)
   {
