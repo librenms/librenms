@@ -15,7 +15,7 @@ $sep = "";
 foreach ($menu_options as $option => $text)
 {
   if ($_GET['optd'] == $option) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="device/device=' . $device['device_id'] . '/tab=routing/proto=loadbalancer_vservers/' . $option . '/">' . $text
+  echo('<a href="device/device=' . $device['device_id'] . '/tab=routing/type=loadbalancer_vservers/' . $option . '/">' . $text
  . '</a>');
   if ($_GET['optd'] == $option) { echo("</span>"); }
   echo(" | ");
@@ -34,7 +34,7 @@ foreach ($graph_types as $type => $descr)
 {
   echo("$type_sep");
   if ($_GET['opte'] == $type) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="device/device=' . $device['device_id'] . '/tab=routing/proto=loadbalancer_vservers/graphs/'.$type.'/">'.$descr.'</a>');
+  echo('<a href="device/device=' . $device['device_id'] . '/tab=routing/type=loadbalancer_vservers/graphs/'.$type.'/">'.$descr.'</a>');
   if ($_GET['opte'] == $type) { echo("</span>"); }
 
   $type_sep = " | ";
