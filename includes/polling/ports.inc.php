@@ -177,7 +177,7 @@ foreach ($ports as $port)
     if (strpos($this_port['ifPhysAddress'], ":"))
     {
       list($a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(":", $this_port['ifPhysAddress']);
-      $this_port['ifPhysAddress'] = zeropad($ah_a).zeropad($ah_b).zeropad($ah_c).zeropad($ah_d).zeropad($ah_e).zeropad($ah_f);
+      $this_port['ifPhysAddress'] = zeropad($a_a).zeropad($a_b).zeropad($a_c).zeropad($a_d).zeropad($a_e).zeropad($a_f);
     }
 
     if (is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts']))
