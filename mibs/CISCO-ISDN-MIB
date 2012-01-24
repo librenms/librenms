@@ -1,0 +1,459 @@
+-- *****************************************************************
+-- CISCO-ISDN-MIB.my:  Cisco ISDN MIB file
+--
+-- January 1995, Fred Baker, Bibek A. Das
+--
+-- Copyright (c) 1995-1996, 1999, 2000, 2001, 2002 by cisco Systems, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+CISCO-ISDN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE,
+        Counter32,
+        OBJECT-TYPE,
+	Integer32
+	        FROM SNMPv2-SMI
+	DisplayString,
+	TimeStamp,
+	RowStatus
+		FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+	OBJECT-GROUP
+	        FROM SNMPv2-CONF
+        ciscoMgmt
+	        FROM CISCO-SMI
+        ifIndex
+                FROM IF-MIB
+        isdnLapdOperStatus,
+        isdnSignalingIndex,
+        isdnSignalingIfIndex
+                FROM ISDN-MIB;
+     
+
+ciscoIsdnMib MODULE-IDENTITY
+        LAST-UPDATED    "200102090000Z"
+	ORGANIZATION	"Cisco Systems, Inc."
+	CONTACT-INFO
+		"       Cisco Systems
+			Customer Service
+
+		Postal: 170 W Tasman Drive
+			San Jose, CA  95134
+			USA
+
+		   Tel: +1 800 553-NETS
+
+		E-mail: cs-isdn@cisco.com"
+	DESCRIPTION
+		"The MIB module to describe the status of the ISDN 
+		 Interfaces on the routers."
+        REVISION        "200102090000Z"
+        DESCRIPTION
+                "For a call connects, demandNbrLastDuration, 
+                 demandNbrClearReason, and demandNbrClearCode 
+                 objects are not included in the trap."
+        REVISION        "200003270000Z"
+        DESCRIPTION
+               "Added demandNbrCNANotification when call rejected with
+                channel not available cause code"
+
+        REVISION        "200002230000Z"
+        DESCRIPTION
+               "Removed an instantiated clause in description for 
+                ciscoCallHistoryCallingNumber."
+        REVISION        "9905070000Z"
+        DESCRIPTION
+               "Added a new trap for PRI layer 2 state changes."
+        REVISION        "9602210000Z"
+        DESCRIPTION
+               "Add a new object demandNbrCallOrigin."
+	REVISION        "9508150000Z"
+	DESCRIPTION
+		"Specify a correct (non-negative) range for an index
+		object."
+	REVISION	"9501300000Z"
+	DESCRIPTION
+		"Initial version of Cisco ISDN MIB."
+	::= { ciscoMgmt 26 }
+
+-- The ISDN hardware interface (BRI or PRI) will be represented
+-- by the D channel. This will have an ifType value of basicISDN(20)
+-- or primaryISDN(21), refer to RFC 1213. Each  B channel will
+-- also be represented in an an entry in the ifTable. The B
+-- channels will have an ifType value of other(1).
+-- This model will be used while defining objects and tables
+-- for management.
+-- The ISDN MIB will allow sub-layers. For example, the data transfer
+-- over a B channel may take place with PPP encapsulation. While the
+-- ISDN MIB will describe the B channel, a media specific MIB for
+-- PPP can be used on a layered basis. This will be as per RFC 1573.
+-- The isdn call information will be stored in the neighbor table
+	
+-- Isdn Mib objects definitions
+
+ciscoIsdnMibObjects OBJECT IDENTIFIER ::= { ciscoIsdnMib 1 }
+
+isdnNeighbor OBJECT IDENTIFIER ::= { ciscoIsdnMibObjects 1 }
+
+ 
+demandNbrTable	OBJECT-TYPE
+ 	SYNTAX	SEQUENCE OF DemandNbrEntry
+        MAX-ACCESS   not-accessible
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"The list of neighbors from which the router will accept calls or
+ 	to which it will place them."
+       ::= { isdnNeighbor 1 }
+
+demandNbrEntry	OBJECT-TYPE
+ 	SYNTAX	DemandNbrEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"A single Neighbor. This entry is effectively permanent, and contains
+ 	information describing the neighbor, his permissions, his last call
+ 	attempt, and his cumulative effects."
+ 	INDEX	{demandNbrPhysIf, demandNbrId }
+      ::= { demandNbrTable 1 }
+
+DemandNbrEntry ::=
+ SEQUENCE {
+ 	demandNbrPhysIf		Integer32 (1..2147483647), -- ifIndex value 
+							   -- of  the D channel
+ 	demandNbrId		Integer32 (0..2147483647), -- sequence number
+ 	demandNbrLogIf		Integer32 (1..2147483647), -- ifIndex value of 
+							   -- virtual interface
+ 	demandNbrName		DisplayString,	-- name of the neighbor
+ 	demandNbrAddress	DisplayString,	-- Call Address 
+ 	demandNbrPermission	INTEGER,  -- applicable permissions
+ 	demandNbrMaxDuration	Integer32 (1..2147483647), -- Max call duration
+							   -- in seconds
+ 	demandNbrLastDuration	Integer32 (1..2147483647), -- Duration of last 
+							   -- call
+ 	demandNbrClearReason	DisplayString,	-- reason last call completed
+ 	demandNbrClearCode	OCTET STRING,	-- reason last call completed
+ 	demandNbrSuccessCalls	Counter32,  -- number of completed calls to 
+					    -- neighbor
+ 	demandNbrFailCalls	Counter32,  -- number of failed call attempts
+ 	demandNbrAcceptCalls	Counter32, -- number of calls from neighbor 
+					   -- accepted
+ 	demandNbrRefuseCalls	Counter32, -- number of calls from neighbor 
+					   -- refused
+ 	demandNbrLastAttemptTime	TimeStamp,  -- sysUpTime of last 
+						    -- call attempt
+        demandNbrStatus         RowStatus,
+        demandNbrCallOrigin     INTEGER
+ 	}
+ 
+demandNbrPhysIf	OBJECT-TYPE
+ 	SYNTAX	Integer32 (1..2147483647)
+ 	MAX-ACCESS	not-accessible
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"ifIndex value of the physical interface the neighbor will be
+ 	called on. On an ISDN interface, this is the ifIndex value of
+ 	the D channel."
+        ::= { demandNbrEntry 1 }
+
+demandNbrId	OBJECT-TYPE
+ 	SYNTAX	Integer32 (0..2147483647)
+ 	MAX-ACCESS	not-accessible
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"arbitrary sequence number associated with the neighbor."
+        ::= { demandNbrEntry 2 }
+ 	
+demandNbrLogIf	OBJECT-TYPE
+ 	SYNTAX	Integer32 (1..2147483647)
+ 	MAX-ACCESS	read-create
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"ifIndex value of virtual interface associated with the neighbor.
+ 	This interface maintains a queue of messages holding for the neighbor
+ 	awaiting call completion, and all statistics."
+        ::= { demandNbrEntry 3 }
+ 	
+demandNbrName	OBJECT-TYPE
+ 	SYNTAX	DisplayString
+ 	MAX-ACCESS	read-create
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"ASCII name of the neighbor."
+        ::= { demandNbrEntry 4 }
+ 	
+demandNbrAddress	OBJECT-TYPE
+ 	SYNTAX	DisplayString
+ 	MAX-ACCESS	read-create
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"Call Address  at which the neighbor should be called.
+ 	Think of this as the set of characters following 'ATDT '
+	or the 'phone number' included in a D channel call request."
+        ::= { demandNbrEntry 5 }
+ 	
+demandNbrPermission	OBJECT-TYPE
+ 	SYNTAX	INTEGER {	iCanCallHim (1),
+ 				heCanCallMe (2),
+ 				weCanCallEachOther (3)
+ 			}
+ 	MAX-ACCESS	read-create
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"applicable permissions."
+	DEFVAL { weCanCallEachOther }
+        ::= { demandNbrEntry 6 }
+ 	
+demandNbrMaxDuration	OBJECT-TYPE
+ 	SYNTAX	Integer32 (1..2147483647)
+        UNITS      "seconds"
+ 	MAX-ACCESS	read-create
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"Maximum call duration in seconds."
+	DEFVAL { 2147483647 }
+        ::= { demandNbrEntry 7 }
+ 	
+demandNbrLastDuration	OBJECT-TYPE
+ 	SYNTAX	Integer32 (1..2147483647)
+        UNITS      "seconds"
+ 	MAX-ACCESS	read-only
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"Duration of last call in seconds."
+        ::= { demandNbrEntry 8 }
+ 	
+demandNbrClearReason	OBJECT-TYPE
+ 	SYNTAX	DisplayString
+ 	MAX-ACCESS	read-only
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"ASCII reason that the last call terminated."
+        ::= { demandNbrEntry 9 }
+ 	
+demandNbrClearCode	OBJECT-TYPE
+ 	SYNTAX	OCTET STRING
+ 	MAX-ACCESS	read-only
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"encoded reason for the last call tear down."
+        ::= { demandNbrEntry 10 }
+ 	
+demandNbrSuccessCalls	OBJECT-TYPE
+ 	SYNTAX	Counter32
+ 	MAX-ACCESS	read-only
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"number of completed calls to neighbor since system reset."
+        ::= { demandNbrEntry 11 }
+ 	
+demandNbrFailCalls	OBJECT-TYPE
+ 	SYNTAX	Counter32
+ 	MAX-ACCESS	read-only
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"Number of call attempts that have failed."
+        ::= { demandNbrEntry 12 }
+ 	
+demandNbrAcceptCalls	OBJECT-TYPE
+ 	SYNTAX	Counter32
+ 	MAX-ACCESS	read-only
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"Number of calls accepted from the neighbor."
+        ::= { demandNbrEntry 13 }
+ 	
+demandNbrRefuseCalls	OBJECT-TYPE
+ 	SYNTAX	Counter32
+ 	MAX-ACCESS	read-only
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"Number of calls from neighbor that we have refused."
+        ::= { demandNbrEntry 14 }
+ 	
+demandNbrLastAttemptTime	OBJECT-TYPE
+ 	SYNTAX	TimeStamp
+ 	MAX-ACCESS	read-only
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"sysUpTime of last call attempt."
+        ::= { demandNbrEntry 15 }
+ 	
+demandNbrStatus	OBJECT-TYPE
+ 	SYNTAX	RowStatus
+ 	MAX-ACCESS	read-create
+ 	STATUS	current
+ 	DESCRIPTION
+ 	"Somebody might want to manage the device using SNMP some day..."
+        ::= { demandNbrEntry 16 }
+
+demandNbrCallOrigin OBJECT-TYPE
+       SYNTAX  INTEGER {
+                originate(1),
+                answer(2),
+                callback(3)
+         }
+        MAX-ACCESS  read-only   
+        STATUS  current
+        DESCRIPTION
+        "Indication of outgoing or incoming call."
+          ::= { demandNbrEntry 17 }
+ 
+
+-- Traps related to Connection management
+
+ciscoIsdnMibTrapPrefix OBJECT IDENTIFIER ::= { ciscoIsdnMib 2 }
+ciscoIsdnMibTraps OBJECT IDENTIFIER ::= { ciscoIsdnMibTrapPrefix 0 }
+
+demandNbrCallInformation NOTIFICATION-TYPE
+ 	OBJECTS {
+ 		demandNbrLogIf,
+ 		demandNbrName,
+ 		demandNbrAddress,
+ 		demandNbrLastDuration,
+ 		demandNbrClearReason,
+ 		demandNbrClearCode
+ 	}
+ 	STATUS	obsolete
+ 	DESCRIPTION
+ 	"This trap/inform is sent to the manager whenever a successful 
+	call clears, or a failed call attempt is determined to have 
+	ultimately failed. In the event that call retry is active, 
+	then this is after all retry attempts have failed. However, 
+	only one such trap is sent in between successful call
+ 	attempts; subsequent call attempts result in no trap."
+     ::= { ciscoIsdnMibTraps 1 } 
+
+demandNbrCallDetails NOTIFICATION-TYPE
+        OBJECTS {
+                demandNbrLogIf,
+                demandNbrName,
+                demandNbrAddress,
+                demandNbrLastDuration,
+                demandNbrClearReason,
+                demandNbrClearCode,
+                demandNbrCallOrigin
+        }
+        STATUS  current
+        DESCRIPTION
+        "This trap/inform is sent to the manager whenever a call 
+        connects, or  clears, or a failed call attempt is determined to 
+        have ultimately failed. In the event that call retry is active, 
+        then this is after all retry attempts have failed. However, 
+        only one such trap is sent in between successful call
+        attempts; subsequent call attempts result in no trap.
+         
+        Whenever a call connects, demandNbrLastDuration, 
+        demandNbrClearReason, and demandNbrClearCode objects are not
+        included in the trap."
+       ::= { ciscoIsdnMibTraps 2 } 
+
+demandNbrLayer2Change NOTIFICATION-TYPE
+        OBJECTS {
+                ifIndex,
+                isdnLapdOperStatus
+                }
+        STATUS  current
+        DESCRIPTION
+        "This trap/inform is sent to the manager whenever the
+        D-channel of an interface changes state."
+       ::= { ciscoIsdnMibTraps 3 }
+
+demandNbrCNANotification NOTIFICATION-TYPE
+        OBJECTS {
+                isdnSignalingIfIndex,
+                ifIndex
+                }
+        STATUS  current
+        DESCRIPTION
+        "This trap/inform is sent to the manager whenever the
+         an incoming call request is rejected with cause
+         'requested circuit/channel not available' (CNA),
+         code number 44.
+
+         isdnSignalingIfIndex is the ifIndex value of the interface
+         associated with this signaling channel.
+
+         ifIndex is the interface index of the requested bearer channel 
+        "
+       ::= { ciscoIsdnMibTraps 4 }
+
+-- conformance information
+
+ciscoIsdnMibConformance	OBJECT IDENTIFIER ::= { ciscoIsdnMib 3 }
+ciscoIsdnMibCompliances	OBJECT IDENTIFIER ::= { ciscoIsdnMibConformance 1 }
+ciscoIsdnMibGroups	OBJECT IDENTIFIER ::= { ciscoIsdnMibConformance 2 }
+
+
+-- compliance statements
+
+ciscoIsdnMibCompliance MODULE-COMPLIANCE
+      STATUS	current
+      DESCRIPTION
+		"The compliance statement for entities which implement
+		the Cisco ISDN MIB"
+      MODULE	-- this module
+		MANDATORY-GROUPS { ciscoIsdnMibGroup }
+      ::= { ciscoIsdnMibCompliances 1 }
+
+ciscoIsdnMibComplianceRev1 MODULE-COMPLIANCE
+      STATUS  current
+      DESCRIPTION
+               "The compliance statement for entities which implement
+               the Cisco ISDN MIB"
+      MODULE  -- this module
+               MANDATORY-GROUPS { ciscoIsdnMibGroupRev1 }
+      ::= { ciscoIsdnMibCompliances 2 }
+ 
+
+-- units of conformance
+
+ciscoIsdnMibGroup OBJECT-GROUP
+      OBJECTS {
+ 	demandNbrLogIf,
+ 	demandNbrName,
+ 	demandNbrAddress,
+ 	demandNbrPermission,
+ 	demandNbrMaxDuration,
+ 	demandNbrLastDuration,
+ 	demandNbrClearReason,
+ 	demandNbrClearCode,
+ 	demandNbrSuccessCalls,
+ 	demandNbrFailCalls,
+ 	demandNbrAcceptCalls,
+ 	demandNbrRefuseCalls,
+ 	demandNbrLastAttemptTime,
+ 	demandNbrStatus
+	}
+      STATUS	current
+      DESCRIPTION
+	"A collection of objects providing the ISDN MIB capability."
+      ::= { ciscoIsdnMibGroups 1 }
+  
+ciscoIsdnMibGroupRev1 OBJECT-GROUP
+       OBJECTS {
+         demandNbrLogIf,
+         demandNbrName,
+         demandNbrAddress,
+         demandNbrPermission,
+         demandNbrMaxDuration,
+         demandNbrLastDuration,
+         demandNbrClearReason,
+         demandNbrClearCode,
+         demandNbrSuccessCalls,
+         demandNbrFailCalls,
+         demandNbrAcceptCalls,
+         demandNbrRefuseCalls,
+         demandNbrLastAttemptTime,
+         demandNbrStatus,
+         demandNbrCallOrigin
+        }
+        STATUS  current
+        DESCRIPTION
+        "A collection of objects providing the call origin capability."
+        ::= { ciscoIsdnMibGroups 2 }
+
+END

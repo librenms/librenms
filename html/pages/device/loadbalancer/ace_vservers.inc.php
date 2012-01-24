@@ -14,10 +14,9 @@ if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
-  if ($_GET['optd'] == $option) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="device/device=' . $device['device_id'] . '/tab=routing/type=loadbalancer_vservers/' . $option . '/">' . $text
- . '</a>');
-  if ($_GET['optd'] == $option) { echo("</span>"); }
+  if ($_GET['type'] == $option) { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="'.generate_url($vars, array('type' => $option)).'">'.$text.'</a>')
+  if ($_GET['type'] == $option) { echo("</span>"); }
   echo(" | ");
 }
 
@@ -35,6 +34,7 @@ foreach ($graph_types as $type => $descr)
   echo("$type_sep");
   if ($_GET['opte'] == $type) { echo("<span class='pagemenu-selected'>"); }
   echo('<a href="device/device=' . $device['device_id'] . '/tab=routing/type=loadbalancer_vservers/graphs/'.$type.'/">'.$descr.'</a>');
+  echo('<a href="'.generate_url($vars, array('type' => 'loadbalancer_ace_vservers')).'">'.$text.'</a>')
   if ($_GET['opte'] == $type) { echo("</span>"); }
 
   $type_sep = " | ";
@@ -56,7 +56,7 @@ echo("<td width=700 class=list-small>" . $vserver['classmap'] . "</a></td>");
 #echo("<td width=150 class=box-desc>" . $rserver['farm_id'] . "</td>");
 echo("<td width=230 class=list-small><span class='".$vserver_class."'>" . $vserver['serverstate'] . "</span></td>");
 echo("</tr>");
-  if ($_GET['optd'] == "graphs")
+  if ($_GET['type'] == "graphs")
   {
     echo('<tr class="list-bold">');
     echo("<td colspan = 3>");
