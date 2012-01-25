@@ -97,8 +97,8 @@ if (!isset($query))
 foreach (dbFetch($query) as $device)
 {
   $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'");
-
   poll_device($device, $options);
+  $polled_devices++;
 }
 
 $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);

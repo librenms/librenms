@@ -205,8 +205,6 @@ function poll_device($device, $options)
     unset($storage_cache); // Clear cache of hrStorage ** MAYBE FIXME? **
     unset($cache); // Clear cache (unify all things here?)
   }
-
-  $polled_devices++;
 }
 
 ?>
