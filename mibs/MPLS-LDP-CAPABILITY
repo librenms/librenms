@@ -1,0 +1,482 @@
+-- *****************************************************************
+-- MPLS-LDP-CAPABILITY.my:  Capability statement for MPLS Label
+--				Distribution Protocol MIB
+--
+-- May 10, 2001 - Adrien Grise
+--
+-- Copyright (c) 2000, 2001, 2003 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+MPLS-LDP-CAPABILITY DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY
+      FROM SNMPv2-SMI
+
+   AGENT-CAPABILITIES 
+      FROM SNMPv2-CONF
+
+   ciscoAgentCapability
+      FROM CISCO-SMI;
+
+mplsLdpCapability MODULE-IDENTITY
+   LAST-UPDATED
+      "200308131200Z" -- 13 Aug 2003 12:00:00 EST
+   ORGANIZATION
+      "Cisco Systems, Inc."
+   CONTACT-INFO
+          "             Cisco Systems
+                        Customer Service
+
+                Postal: 170 W. Tasman Drive
+                        San Jose, CA  95134
+                        USA
+
+                Tel: +1 800 553-NETS
+
+                E-mail: mpls-mib@cisco.com"
+   DESCRIPTION
+          "Agent capabilities for MPLS-LDP-MIB"
+
+   -- Revision history.
+
+   REVISION
+          "200308131200Z" -- 13 Aug 2003 12:00:00 EST
+   DESCRIPTION
+          "Adding missing IMPORT for ciscoAgentCapability."
+   REVISION
+          "200105101200Z"  -- 10 May 2001 12:00:00 EST
+   DESCRIPTION
+          "Initial draft version."
+
+   ::= { ciscoAgentCapability 210 }
+
+mplsLdpCapability AGENT-CAPABILITIES
+
+PRODUCT-RELEASE "Cisco IOS 12.0(14)ST, Cisco IOS 12.2(01)T"
+STATUS      current
+DESCRIPTION "MPLS Label Distribution Protocol MIB capabilities"
+
+SUPPORTS    MPLS-LDP-MIB
+INCLUDES    { mplsLdpGeneralGroup, mplsLdpNotificationGroup }
+
+
+-- LDP LSR Objects
+
+    VARIATION mplsLdpLsrId
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpLsrLabelRetentionMode
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpLsrLoopDetectionCapable
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+-- LDP Entity Objects
+
+    VARIATION mplsLdpEntityIndexNext
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityProtocolVersion
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityAdminStatus
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityOperStatus
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityWellKnownDiscoveryPort
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityMaxPduLength
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityKeepAliveHoldTimer
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityHelloHoldTimer
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityFailedInitSessionTrapEnable
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityFailedInitSessionThreshold
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityLableDistrubtionMethod
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityPVLimitMismatchTrapEnable
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityPathVectorLimit
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityHopCountLoopDetection
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityHopCount
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityTargetedPeer
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityTargetedPeerAddrType
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityTargetedPeerAddr
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityOptionalParameters
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityDiscontinuityTime
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityStorageType
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityRowStatus
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+-- LDP Entity Objects for Generic Labels
+
+    VARIATION mplsLdpEntityConfGenericIfIndexOrZero
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityConfGenericLabel
+      ACCESS read-only
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityConfStorageType
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityConfRowStatus
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+-- LDP Entity ATM Objects
+
+    VARIATION mplsLdpEntityAtmIfIndexOrZero
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityAtmMergeCap
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityAtmLabelRangeComponents
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityAtmVcDirectionality
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityAtmLsrConnectivity
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityDefaultControlVpi
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityDefaultControlVci
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityUnlabTrafVpi
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpEntityUnlabTrafVci
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLDPEntityAtmStorageType
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityAtmRowStatus
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+-- LDP Entity ATM Configuration Label Ranges
+    VARIATION mplsLdpEntityConfAtmLabelRangeMaximumVpi
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityConfAtmLabelRangeMaximumVci
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityConfAtmLabelRangeStorageType
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityConfAtmLabelRangeRowStatus
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+-- LDP Entity Frame Relay Objects
+    VARIATION mplsLdpEntityFrIfIndexOrZero
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityFrMergeCap
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityFrLabelRangeComponents
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityFrLen
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityFrVcDirectionality
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityFrParmsStorageType
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpEntityFrParmsRowStatus
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+-- LDP Entity Frame Relay Configuration Label Ranges
+
+    VARIATION mplsLdpConfFrMaximumDlci
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpConfFrStorageType
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpConfFrRowStatus
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+-- LDP Entity Statistics
+
+    VARIATION mplsLdpAttemptedSessions
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpSessionRejectedNoHelloErrors
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpSessionRejectedAdvertisementErrors
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpSessionRejectedMaxPduErrors
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpSessionRejectedLabelRangeErrors
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpBadLdpIdentifierErrors
+      ACCESS read-only
+      DESCRIPTION "read-only implmentation"
+
+    VARIATION mplsLdpBadPduLengthErrors
+      ACCESS read-only
+      DESCRIPTION "read-only implmentation"
+
+    VARIATION mplsLdpBadMessageLengthErrors
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpBadTlvLengthErrors
+      ACCESS read-only
+      DESCRIPTION "read-only implmentation"
+
+    VARIATION mplsLdpMalformedTlvValueErrors
+      ACCESS read-only
+      DESCRIPTION "read-only implmentation"
+
+    VARIATION mplsLdpKeepAliveTimerExpiredErrors
+      ACCESS read-only
+      DESCRIPTION "read-only implmentation"
+
+    VARIATION mplsLdpShutdownNotifReceived
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpShutdownNotifSent
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+-- LDP Peer Objects
+
+    VARIATION mplsLdpPeerLabelDistributionMethod
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpPeerLoopDetectionForPv
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpPeerPathVectorLimit
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+-- LDP Session Objects
+
+    VARIATION mplsLdpSessionState
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpSessionProtocolVersion
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpSessionKeepAliveHoldTimeRemaining
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpSessionMaxPduLength
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpSessionDiscontinuityTime
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+-- LDP ATM Session Objects
+
+    VARIATION mplsLdpSessionAtmLabelRangeUpperBoundVpi
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpSessionAtmLabelRangeUpperBoundVci
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+-- LDP Frame Relay Session Objects
+
+    VARIATION mplsLdpFrSessionMaxDlci
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpFrSessionLen
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+
+-- LDP Session Statistics
+
+    VARIATION mplsLdpSessionStatsUnknownMessageTypeErrors
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpSessionStatsUnknownTlvErrors
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+-- LDP Address/Address Withdraw Messages
+
+    VARIATION mplsLdpSessionPeerNextHopAddressType
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpSessionPeerNextHopAddress
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+-- LDP Hello Adjacency Objects
+
+    VARIATION mplsLdpHelloAdjacencyHoldTimeRemaining
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+    VARIATION mplsLdpHelloAdjacencyType
+      ACCESS read-only
+      DESCRIPTION "read-only implementation"
+
+-- LDP LIB Table
+
+    VARIATION mplsLdpLibLspUpDownTrapEnable
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpLibLabelInIfIndex
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpLibLabelOutIfIndex
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpLibInLabelType
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpLibInLabel
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpLibOutLabelType
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpLibOutLabel
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpLibOperationStatus
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+    VARIATION mplsLdpLibLspLastChange
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"
+
+-- LDP FEC Table
+
+    VARIATION mplsLdpFecSessionRowPointer
+      ACCESS not-implemented
+      DESCRIPTION "Not implemented"    
+
+    ::= { mplsLdpCapability 1 }
+
+END
+
