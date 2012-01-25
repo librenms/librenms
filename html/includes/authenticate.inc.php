@@ -12,7 +12,7 @@ if (!is_dir($config['rrd_dir']))
 
 if (!is_dir($config['temp_dir']))
 {
-  echo("<div class='errorbox'>Temp Directory is missing ({$config['tmp_dir']}).  Graphing may fail.</div>");
+  echo("<div class='errorbox'>Temp Directory is missing ({$config['temp_dir']}).  Graphing may fail.</div>");
 }
 
 if (!is_writable($config['temp_dir']))
