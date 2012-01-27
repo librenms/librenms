@@ -91,6 +91,11 @@ $config['alerts']['email']['default_only'] = FALSE;   ## Only use default recipi
 $config['alerts']['email']['enable']       = TRUE;    ## Enable email alerts
 $config['alerts']['bgp']['whitelist']      = NULL;    ## Populate as an array() with ASNs to alert on.
 
+### Port bandwidth threshold percentage %age utilisation above this will cause an alert
+
+$config['alerts']['port_util_alert'] = FALSE;    ## Disabled as default
+$config['alerts']['port_util_perc']  = 85;       ## %age above which to alert
+
 $config['uptime_warning']                  = "84600"; ## Time in seconds to display a "Device Rebooted" Alert. 0 to disable warnings.
 
 ### Cosmetics

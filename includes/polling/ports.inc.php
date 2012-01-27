@@ -274,8 +274,24 @@ foreach ($ports as $port)
       }
     }
 
-    echo('bits('.formatRates($port['update']['ifInOctets_rate']).'/'.formatRates($port['update']['ifOutOctets_rate']).')');
+    $port['ifInBits_rate'] = $port['update']['ifInOctets_rate'] * 8;
+    $port['ifOutBits_rate'] = $port['update']['ifOutOctets_rate'] * 8;
+    echo('bits('.formatRates($port['ifInBits_rate']).'/'.formatRates($port['ifOutBits_rate']).')');
     echo('pkts('.format_si($port['update']['ifInUcastPkts_rate']).'pps/'.format_si($port['update']['ifOutUcastPkts_rate']).'pps)');
+
+    ### Port utilisation % threshold alerting. ## Fixme allow setting threshold per-port. probably 90% of ports we don't care about.
+    if($config['alerts']['port_util_alert'])
+    {
+      // Check for port saturation of $config['alerts']['port_util_perc'] or higher.  Alert if we see this.
+      // Check both inbound and outbound rates
+      $saturation_threshold = $this_port['ifSpeed'] * ( $config['alerts']['port_util_perc'] / 100 );
+      echo("IN: " . $port['ifInBits_rate'] . " OUT: " . $port['ifOutBits_rate'] . " THRESH: " . $saturation_threshold);
+      if (($port['ifInBits_rate'] >= $saturation_threshold ||  $port['ifOutBits_rate'] >= $saturation_threshold) && $saturation_threshold > 0)
+      {
+          log_event('Port reached saturation threshold: ' . formatRates($port['ifInBits_rate']) . '/' . formatRates($port['ifOutBits_rate']) . ' - ifspeed: ' . formatRates( $this_port['ifSpeed'])  , $device, 'interface', $port['interface_id']);
+          notify($device, 'Port saturation threshold reached on ' . $device['hostname'] , 'Port saturation threshold alarm: ' . $device['hostname'] . ' on ' . $port['ifDescr'] . "\nRates:" . formatRates($port['ifInBits_rate']) . '/' . formatRates($port['ifOutBits_rate']) . ' - ifspeed: ' . formatRates( $this_port['ifSpeed']) . "\nTimestamp: " . date($config['timestamp_format']));
+      }
+    }
 
     /// Update RRDs
     $rrdfile = $host_rrd . "/port-" . safename($port['ifIndex'] . ".rrd");
