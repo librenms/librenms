@@ -408,6 +408,13 @@ $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
+$os = "avaya-ers";
+$config['os'][$os]['text']              = "ERS Firmware";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "avaya";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
 $os = "arista_eos";
 $config['os'][$os]['text']              = "Arista EOS";
 $config['os'][$os]['type']              = "network";
