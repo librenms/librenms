@@ -32,12 +32,16 @@ foreach ($rrd_list as $rrd)
   $colour_in=$config['graph_colours'][$colours_in][$iter];
   $colour_out=$config['graph_colours'][$colours_out][$iter];
 
-  $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr'], $descr_len),0,$descr_len)) . "  In";
   if (isset($rrd['descr_in']))
   {
     $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr_in'], $descr_len),0,$descr_len)) . "  In";
+  } else {
+    $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr'], $descr_len),0,$descr_len)) . "  In";
   }
   $descr_out = str_replace(":", "\:", substr(str_pad($rrd['descr_out'], $descr_len),0,$descr_len)). " Out";
+
+  $descr     = str_replace("'", "", $descr);
+  $descr_out = str_replace("'", "", $descr_out);
 
   $rrd_options .= " DEF:".$in.$i."=".$rrd['filename'].":".$ds_in.":AVERAGE ";
   $rrd_options .= " DEF:".$out.$i."=".$rrd['filename'].":".$ds_out.":AVERAGE ";
