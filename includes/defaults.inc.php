@@ -370,6 +370,7 @@ $config['poller_modules']['cipsec-tunnels']               = 1;
 $config['poller_modules']['cisco-ace-loadbalancer']       = 1;
 $config['poller_modules']['cisco-ace-serverfarms']	  = 1;
 $config['poller_modules']['netscaler-vsvr']               = 1;
+$config['poller_modules']['entity-physical']              = 1;
 
 ## List of discovery modules. Need to be in this array to be
 ## considered for execution.
@@ -398,6 +399,7 @@ $config['discovery_modules']['libvirt-vminfo']            = 1;
 $config['discovery_modules']['toner']                     = 1;
 $config['discovery_modules']['ucd-diskio']                = 1;
 $config['discovery_modules']['services']                  = 1;
+
 
 $config['modules_compat']['rfc1628']['liebert']           = 1;
 $config['modules_compat']['rfc1628']['netmanplus']        = 1;
