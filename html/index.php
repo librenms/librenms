@@ -1,5 +1,12 @@
 <?php
 
+include("../includes/defaults.inc.php");
+include("../config.php");
+include("../includes/functions.php");
+include("includes/functions.inc.php");
+
+$runtime_start = utime();
+
 ob_start();
 
 ini_set('allow_url_fopen', 0);
@@ -21,11 +28,6 @@ if (strpos($_SERVER['PATH_INFO'], "debug"))
   ini_set('log_errors', 0);
   ini_set('error_reporting', 0);
 }
-
-include("../includes/defaults.inc.php");
-include("../config.php");
-include("../includes/functions.php");
-include("includes/functions.inc.php");
 
 include("includes/authenticate.inc.php");
 
@@ -97,8 +99,6 @@ foreach ($_POST as $name => $value)
 
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) { $_SESSION['widescreen'] = 1; }
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=no'))  { unset($_SESSION['widescreen']); }
-
-$start = utime();
 
 $now = time();
 $fourhour = time() - (4 * 60 * 60);
@@ -284,8 +284,8 @@ if ($_SESSION['authenticated'])
       <div class="clearer"></div>
   </div>
 <?php
-$end = utime(); $run = $end - $start;
-$gentime = substr($run, 0, 5);
+$runtime_end = utime(); $runtime = $runtime_end - $runtime_start;
+$gentime = substr($runtime, 0, 5);
 
 echo('<br /> <br /> <br /> <br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : ''));
 echo('<br />Powered by <a href="http://www.observium.org" target="_blank">Observium ' . $config['version']);
