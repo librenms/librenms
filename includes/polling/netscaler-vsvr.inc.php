@@ -61,55 +61,68 @@ if($device['os'] == "netscaler")
   }
 
 
-$vsvr_array = snmpwalk_cache_oid($device, "vserverEntry", array(), "NS-ROOT-MIB");
+  $vsvr_array = snmpwalk_cache_oid($device, "vserverEntry", array(), "NS-ROOT-MIB");
 
-$vsvr_db    = dbFetchRows("SELECT * FROM `netscaler_vservers` WHERE `device_id` = ?", array($device['device_id']));
-foreach ($vsvr_db as $vsvr) { $vsvrs[$vsvr['vsvr_name']] = $vsvr; }
+  $vsvr_db    = dbFetchRows("SELECT * FROM `netscaler_vservers` WHERE `device_id` = ?", array($device['device_id']));
+  foreach ($vsvr_db as $vsvr) { $vsvrs[$vsvr['vsvr_name']] = $vsvr; print_r($vsvr); }
+  if($debug) { print_r($vsvrs); }
 
-foreach($vsvr_array as $index => $vsvr)
-{
-
-  if(isset($vsvr['vsvrName']))
+  foreach($vsvr_array as $index => $vsvr)
   {
 
-    $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/netscaler-vsvr-".safename($vsvr['vsvrName']).".rrd";
-
-    $rrdupdate = "N";
-
-    foreach ($oids as $oid)
+    if(isset($vsvr['vsvrName']))
     {
-      if (is_numeric($vsvr[$oid]))
+
+      $vsvr_exist[$vsvr['vsvrName']] = 1;
+
+      $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/netscaler-vsvr-".safename($vsvr['vsvrName']).".rrd";
+
+      $rrdupdate = "N";
+
+      foreach ($oids as $oid)
       {
-        $rrdupdate .= ":".$vsvr[$oid];
-      } else {
-        $rrdupdate .= ":U";
+        if (is_numeric($vsvr[$oid]))
+        {
+          $rrdupdate .= ":".$vsvr[$oid];
+        } else {
+          $rrdupdate .= ":U";
+        }
       }
+
+      echo(str_pad($vsvr['vsvrName'], 25) . " | " . str_pad($vsvr['vsvrType'],5) . " | " .  str_pad($vsvr['vsvrState'],6) ." | ". str_pad($vsvr['vsvrIpAddress'],16) ." | ". str_pad($vsvr['vsvrPort'],5));
+      echo(" | " . str_pad($vsvr['vsvrRequestRate'],8) . " | " . str_pad($vsvr['vsvrRxBytesRate']."B/s", 8)." | ". str_pad($vsvr['vsvrTxBytesRate']."B/s", 8));
+
+      $db_update = array('vsvr_ip' => $vsvr['vsvrIpAddress'], 'vsvr_port' => $vsvr['vsvrPort'], 'vsvr_state' => $vsvr['vsvrState'], 'vsvr_type' => $vsvr['vsvrType'],
+                         'vsvr_req_rate' => $vsvr['RequestRate'], 'vsvr_bps_in' => $vsvr['vsvrRxBytesRate'], 'vsvr_bps_out' => $vsvr['vsvrTxBytesRate']);
+
+     if(!is_array($vsvrs[$vsvr['vsvrName']]))
+     {
+       $db_insert = array_merge(array('device_id' => $device['device_id'], 'vsvr_name' => $vsvr['vsvrName']), $db_update);
+       $vsvr_id = dbInsert($db_insert, 'netscaler_vservers'); echo (" +");
+     } else {
+       $updated  = dbUpdate($db_update, 'netscaler_vservers', '`vsvr_id` = ?', array($vsvrs[$vsvr['vsvrName']]['vsvr_id']));
+       echo(" U");
+     }
+
+     if (!file_exists($rrd_file)) { rrdtool_create($rrd_file, $rrd_create); }
+     rrdtool_update($rrd_file, $rrdupdate);
+
+     echo("\n");
     }
 
-    echo(str_pad($vsvr['vsvrName'], 25) . " | " . str_pad($vsvr['vsvrType'],5) . " | " .  str_pad($vsvr['vsvrState'],6) ." | ". str_pad($vsvr['vsvrIpAddress'],16) ." | ". str_pad($vsvr['vsvrPort'],5));
-    echo(" | " . str_pad($vsvr['vsvrRequestRate'],8) . " | " . str_pad($vsvr['vsvrRxBytesRate']."B/s", 8)." | ". str_pad($vsvr['vsvrTxBytesRate']."B/s", 8));
-
-    $db_update = array('vsvr_ip' => $vsvr['vsvrIpAddress'], 'vsvr_port' => $vsvr['vsvrPort'], 'vsvr_state' => $vsvr['vsvrState'], 'vsvr_type' => $vsvr['vsvrType'],
-                       'vsvr_req_rate' => $vsvr['RequestRate'], 'vsvr_bps_in' => $vsvr['vsvrRxBytesRate'], 'vsvr_bps_out' => $vsvr['vsvrTxBytesRate']);
-
-
-   if(!is_array($vsvrs[$vsvr['vsvrName']]))
-   {
-     $db_insert = array_merge(array('device_id' => $device['device_id'], 'vsvr_name' => $vsvr['vsvrName']), $db_update);
-
-     $vsvr_id = dbInsert($db_insert, 'netscaler_vservers'); echo (" +");
-   } else {
-     $updated  = dbUpdate($db_update, 'netscaler_vservers', '`vsvr_id` = ?', array($vsvrs[$vsvr['vsvrName']]['vsvr_id']));
-     echo(" U");
-   }
-
-   if (!file_exists($rrd_file)) { rrdtool_create($rrd_file, $rrd_create); }
-   rrdtool_update($rrd_file, $rrdupdate);
-
-   echo("\n");
   }
 
-}
+  if($debug) { print_r($vsvr_exist); }
+
+  foreach($vsvrs as $db_name => $db_id)
+  {
+    if(!$vsvr_exist[$db_name])
+    {
+      echo("-".$db_name);
+      dbDelete('netscaler_vservers', "`vsvr_id` =  ?", array($db_id));
+    }
+  }
+
 
 }
 ?>
