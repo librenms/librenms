@@ -15,10 +15,10 @@ if (!strstr($ciscomodel, " ") && strlen($ciscomodel) >= '3')
   $hardware = $ciscomodel;
 }
 
-$poll_device[sysDescr] = str_replace(", Inc.", "", $poll_device[sysDescr]); ## Make the two formats the same
-$poll_device[sysDescr] = str_replace("\n", " ", $poll_device[sysDescr]);
+$poll_device['sysDescr'] = str_replace(", Inc.", "", $poll_device['sysDescr']); ## Make the two formats the same
+$poll_device['sysDescr'] = str_replace("\n", " ", $poll_device['sysDescr']);
 
-list(,,$hardware,,,,,,,$version,,,$features) = explode(" ", $poll_device[sysDescr]);
+list(,,$hardware,,,,,,,$version,,,$features) = explode(" ", $poll_device['sysDescr']);
 list(,$features) = explode("-", $features);
 
 ?>

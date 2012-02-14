@@ -1,6 +1,6 @@
 <?php
 
-if ($poll_device[sysDescr] == "Neyland 24T")
+if ($poll_device['sysDescr'] == "Neyland 24T")
 {
   #$hardware = snmp_get($device, "productIdentificationVendor.0", "-Ovq", "Dell-Vendor-MIB");
   $hardware = "Dell ".snmp_get($device, "productIdentificationDisplayName.0", "-Ovq", "Dell-Vendor-MIB");
@@ -9,7 +9,7 @@ if ($poll_device[sysDescr] == "Neyland 24T")
 else
 {
   $version  = snmp_get($device, "rndBrgVersion.0", "-Ovq", "RADLAN-MIB");
-  $hardware = str_replace("ATI", "Allied Telesis", $poll_device[sysDescr]);
+  $hardware = str_replace("ATI", "Allied Telesis", $poll_device['sysDescr']);
 }
 $features = snmp_get($device, "rndBaseBootVersion.00", "-Ovq", "RADLAN-MIB");
 

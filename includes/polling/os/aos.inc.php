@@ -1,5 +1,5 @@
 <?php
 
-list(,$hardware,$version) = explode(' ',$poll_device[sysDescr]);
+list(,$hardware,$version) = explode(' ',$poll_device['sysDescr']);
 
 ?>
