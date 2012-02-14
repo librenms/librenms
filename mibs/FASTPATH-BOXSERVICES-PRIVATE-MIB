@@ -1,0 +1,430 @@
+-- Box Services MIB overview:
+-- Box Services MIB falls under fastPath MIB node of the private subtree.
+
+FASTPATH-BOXSERVICES-PRIVATE-MIB DEFINITIONS ::= BEGIN
+
+-- Broadcom Corporation FASTPATH Box Services MIB
+-- Copyright Broadcom Corporation(2004-2008) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Broadcom Corporation's confidential and proprietary
+-- intellectual property.  Broadcom Corporation retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Broadcom Corporation
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32, Integer32               FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION		             	FROM SNMPv2-TC
+    DisplayString		                    FROM RFC1213-MIB
+    fastPath                            FROM BROADCOM-REF-MIB;
+
+    fastPathBoxServices MODULE-IDENTITY
+           LAST-UPDATED "200802220000Z" -- 22 Feb 2008 12:00:00 GMT
+           ORGANIZATION "Broadcom Corporation"
+           CONTACT-INFO
+           "                      Customer Support
+           Postal:                Broadcom Corporation
+                                   100 Perimeter Park Dr., Suite H
+                                   Morrisville, NC 27560
+           Tel:                   +1 919 865 2700"
+ 
+     DESCRIPTION
+          "The Broadcom Private MIB for FASTPATH Box Services Feature."
+
+      -- Revision history.
+      REVISION
+          "200802220000Z" -- 22 Feb 2008 12:00:00 GMT
+      DESCRIPTION
+          "Broadcom branding related changes."
+
+      ::= { fastPath 43 }
+
+--**************************************************************************************
+--    boxServicesGroup
+--
+--    This group provides configuration and status of the Box Services
+--    feature.  
+--
+--**************************************************************************************
+
+	boxServicesGroup               OBJECT IDENTIFIER ::= { fastPathBoxServices 1 }
+  
+   --**************************************************************************************
+   -- Some scalars
+   
+    boxServicesNormalTempRangeMin OBJECT-TYPE
+      SYNTAX     INTEGER (-100..100)
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+       " Lower boundary of normal temperature range."
+      DEFVAL { 0 }
+    ::= { boxServicesGroup 1 }
+
+    boxServicesNormalTempRangeMax OBJECT-TYPE
+      SYNTAX     INTEGER (-100..100)
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+       " Upper boundary of normal temperature range."
+      DEFVAL { 45 }
+    ::= { boxServicesGroup 2 }
+
+    boxServicesTemperatureTrapEnable OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  enable(1),
+                  disable(2)
+                  }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+       " Enable or disable temperature change event trap, raised when temperature crosses boundaries of normal range"
+      DEFVAL { enable }
+    ::= { boxServicesGroup 3 }
+
+    boxServicesPSMStateTrapEnable OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  enable(1),
+                  disable(2)
+                  }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+       " Enable or disable Power Supply Module state change trap."
+      DEFVAL { enable }
+    ::= { boxServicesGroup 4 }
+    
+    boxServicesFanStateTrapEnable OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  enable(1),
+                  disable(2)
+                  }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+       " Enable or disable Fan state change trap."
+      DEFVAL { enable }
+    ::= { boxServicesGroup 5 }
+    
+   --**************************************************************************************
+   -- boxServicesFans
+
+    boxServicesFansTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF BoxServicesFansEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Fan"
+         ::= { boxServicesGroup 6 }
+
+    boxServicesFansEntry OBJECT-TYPE
+         SYNTAX      BoxServicesFansEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Box Services Fan Entry"
+         INDEX { boxServicesFansIndex }
+         ::= { boxServicesFansTable 1 }
+
+    BoxServicesFansEntry ::= SEQUENCE {
+	        boxServicesFansIndex
+              Integer32,
+          boxServicesFanItemType
+              INTEGER,
+          boxServicesFanItemState
+              INTEGER,
+          boxServicesFanSpeed
+              Integer32,
+          boxServicesFanDutyLevel
+              Integer32
+          }
+
+    boxServicesFansIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Unique index of fan table entry"
+         ::= { boxServicesFansEntry 1 }
+
+    boxServicesFanItemType OBJECT-TYPE
+             SYNTAX      INTEGER {
+                                  fixed(1),
+                                  removable(2)
+                                 }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The type of fan"
+         ::= { boxServicesFansEntry 2 }
+
+
+    boxServicesFanItemState OBJECT-TYPE
+             SYNTAX      INTEGER {
+                                  notpresent(1),
+                                  operational(2),
+                                  failed(3)
+                                 }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The status of fan"
+         ::= { boxServicesFansEntry 3 }
+
+
+      boxServicesFanSpeed OBJECT-TYPE
+             SYNTAX      Integer32
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                          "The speed of fan"
+         ::= { boxServicesFansEntry 4}
+         
+      boxServicesFanDutyLevel OBJECT-TYPE
+             SYNTAX      Integer32
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                          "The duty level of fan, in percents"
+         ::= { boxServicesFansEntry 5}
+
+
+   --**************************************************************************************
+   -- boxServicesPowSupplies
+
+    boxServicesPowSuppliesTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF BoxServicesPowSuppliesEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Power supply"
+         ::= { boxServicesGroup 7 }
+
+    boxServicesPowSuppliesEntry OBJECT-TYPE
+         SYNTAX      BoxServicesPowSuppliesEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Box Services Power Supply Entry"
+         INDEX { boxServicesPowSupplyIndex }
+         ::= { boxServicesPowSuppliesTable 1 }
+
+    BoxServicesPowSuppliesEntry ::= SEQUENCE {
+	  boxServicesPowSupplyIndex
+              Integer32,
+          boxServicesPowSupplyItemType
+              INTEGER,
+          boxServicesPowSupplyItemState
+              INTEGER
+          }
+
+    boxServicesPowSupplyIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Unique index of power supply table entry"
+         ::= { boxServicesPowSuppliesEntry 1 }
+
+    boxServicesPowSupplyItemType OBJECT-TYPE
+             SYNTAX      INTEGER {
+                                  fixed(1),
+                                  removable(2)
+                                 }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The type of power supply"
+         ::= { boxServicesPowSuppliesEntry 2 }
+
+
+    boxServicesPowSupplyItemState OBJECT-TYPE
+             SYNTAX      INTEGER {
+                                  notpresent(1),
+                                  operational(2),
+                                  failed(3)
+                                 }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The status of power supply"
+         ::= { boxServicesPowSuppliesEntry 3 }
+
+
+   --**************************************************************************************
+   -- boxServicesTempSensors
+
+
+    boxServicesTempSensorsTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF BoxServicesTempSensorsEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Temperature sensor"
+         ::= { boxServicesGroup 8 }
+
+
+    boxServicesTempSensorsEntry OBJECT-TYPE
+         SYNTAX      BoxServicesTempSensorsEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Box Services Temperature Sensor Entry"
+         INDEX { boxServicesTempSensorIndex }
+         ::= { boxServicesTempSensorsTable 1 }
+
+    BoxServicesTempSensorsEntry ::= SEQUENCE {
+	        boxServicesTempSensorIndex
+              Integer32,
+          boxServicesTempSensorType
+              INTEGER,
+          boxServicesTempSensorState
+              INTEGER,
+          boxServicesTempSensorTemperature
+              Integer32
+          }
+
+    boxServicesTempSensorIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Unique index of temperature sensor table entry"
+         ::= { boxServicesTempSensorsEntry 1 }
+
+
+    boxServicesTempSensorType OBJECT-TYPE
+             SYNTAX      INTEGER {
+                                  fixed(1),
+                                  removable(2)
+                                 }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The type of temperature sensor"
+         ::= { boxServicesTempSensorsEntry 2 }
+
+
+    boxServicesTempSensorState OBJECT-TYPE
+             SYNTAX      INTEGER {
+                                  normal(1),
+                                  warning(2),
+                                  critical(3),
+                                  shutdown(4),
+                                  notpresent(5),
+                                  notoperational(6)
+                                 }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The state of temperature sensor"
+         ::= { boxServicesTempSensorsEntry 3 }
+
+
+      boxServicesTempSensorTemperature OBJECT-TYPE
+             SYNTAX      Integer32
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                          "The temperature value reported by sensor"
+         ::= { boxServicesTempSensorsEntry 4}
+
+
+--**************************************************************************************
+--    boxServicesNotificationsGroup
+--
+--    This group provides notification definitions for the Box Services
+--    feature.  
+--
+--**************************************************************************************
+
+	boxServicesNotificationsGroup               OBJECT IDENTIFIER ::= { fastPathBoxServices 2 }
+
+   --**************************************************************************************
+   -- boxServices notification definitions
+
+      boxsItemStateChangeEvent OBJECT-TYPE
+        SYNTAX INTEGER  {
+             insertion(1),
+             removal(2),
+             becomeoperational(3),
+             failure(4)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+           "This event describes states of the fan or power supply.
+           
+             insertion          - hot-pluggable fan or power supply was inserted
+             removal            - hot-pluggable fan or power supply was removed
+             becomeoperational  - fan or power supply became operational after failure state
+             failure            - fan or power supply failure happened, i.e. it is not able to perform its functions"
+        ::= { boxServicesNotificationsGroup 1 }
+
+      boxsTemperatureChangeEvent OBJECT-TYPE
+        SYNTAX INTEGER  {
+             abovethreshold(1),
+             belowthreshold(2),
+             withinnormalrange(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+           "This event describes change of the temperature. 
+           To avoid flipping on boundary conditions, it is allowed to send the trap 
+           taking into account some margin around thresholds.
+           
+             abovethreshold     - temperature increased and crossed upper threshold value
+             belowthreshold     - temperature decreased and crossed lower threshold value
+             withinnormalrange  - temperature returned to normal range (between threshold)"
+        ::= { boxServicesNotificationsGroup 2 }
+
+
+
+
+--**************************************************************************************
+--   Traps
+--**************************************************************************************
+
+     fastPathBoxServicesTraps OBJECT IDENTIFIER ::= { fastPathBoxServices 0 }
+
+
+
+     boxsFanStateChange NOTIFICATION-TYPE
+         OBJECTS {
+                      boxServicesFansIndex,
+                      boxsItemStateChangeEvent
+                 }
+         STATUS             current
+         DESCRIPTION
+             "Trap is sent when fan state change happens."
+         ::= { fastPathBoxServicesTraps 1 }
+
+     boxsPowSupplyStateChange NOTIFICATION-TYPE
+         OBJECTS {
+                      boxServicesPowSupplyIndex,
+                      boxsItemStateChangeEvent
+                 }
+         STATUS             current
+         DESCRIPTION
+             "Trap is sent when power supply state change happens."
+         ::= { fastPathBoxServicesTraps 2 }
+
+
+     boxsTemperatureChange NOTIFICATION-TYPE
+         OBJECTS {
+                      boxServicesTempSensorIndex,
+                      boxsTemperatureChangeEvent
+                 }
+         STATUS             current
+         DESCRIPTION
+             "Trap is sent when temperature is changing and crossing any of the thresholds"
+         ::= { fastPathBoxServicesTraps 3 }
+
+END
