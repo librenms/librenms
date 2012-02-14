@@ -7,7 +7,7 @@
 # Tranzeo TR6CPQ, OS 6.3.34(1019), FW TR6-2.0.12CPQ, 2.4GHz, 15dBi int. antenna
 # Tranzeo TR900Rt, OS 6.8.0(1024), FW TR900-3.3.3Rt, 900MHz, 17dBi ext. antenna
 
-list($hardware, $version, $features, $hardware_antenna) = explode(", ", $poll_device[sysDescr]);
+list($hardware, $version, $features, $hardware_antenna) = explode(", ", $poll_device['sysDescr']);
 
 list(,$version) = explode(" ", $version);
 list($version) = explode("(", $version);

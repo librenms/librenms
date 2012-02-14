@@ -1,6 +1,6 @@
 <?php
 
-list($hardware, $version, $features) = explode(",", str_replace(", ", ",", $poll_device[sysDescr]));
+list($hardware, $version, $features) = explode(",", str_replace(", ", ",", $poll_device['sysDescr']));
 list($features) = explode("(", $version);
 
 $fdb_rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/fdb_count.rrd";

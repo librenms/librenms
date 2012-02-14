@@ -28,7 +28,7 @@ if (!$hardware && !$version && !$features)
 
 #Allied Telesyn AT-8948 version 2.7.4-02 22-Aug-2005
 
-list($a,$b,$c,$d,$e,$f) = explode(" ", $poll_device[sysDescr]);
+list($a,$b,$c,$d,$e,$f) = explode(" ", $poll_device['sysDescr']);
 
 if (!$hardware && !$version && !$features)
 {

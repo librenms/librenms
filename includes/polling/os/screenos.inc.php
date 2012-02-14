@@ -1,6 +1,6 @@
 <?php
 
-$version = preg_replace("/(.+)\ version\ (.+)\ \(SN:\ (.+)\,\ (.+)\)/", "\\1||\\2||\\3||\\4", $poll_device[sysDescr]);
+$version = preg_replace("/(.+)\ version\ (.+)\ \(SN:\ (.+)\,\ (.+)\)/", "\\1||\\2||\\3||\\4", $poll_device['sysDescr']);
 list($hardware,$version,$serial,$features) = explode("||", $version);
 
 $sessrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/screenos_sessions.rrd";

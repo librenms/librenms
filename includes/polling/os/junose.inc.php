@@ -1,6 +1,6 @@
 <?php
 
-if (strpos($poll_device[sysDescr], "olive"))
+if (strpos($poll_device['sysDescr'], "olive"))
 {
   $hardware = "Olive";
   $serial = "";

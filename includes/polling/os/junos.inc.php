@@ -2,7 +2,7 @@
 
 $jun_ver = snmp_get($device, ".1.3.6.1.2.1.25.6.3.1.2.2", "-Oqv", "HOST-RESOURCES-MIB");
 
-if (strpos($poll_device[sysDescr], "olive"))
+if (strpos($poll_device['sysDescr'], "olive"))
 {
   $hardware = "Olive";
   $serial = "";
