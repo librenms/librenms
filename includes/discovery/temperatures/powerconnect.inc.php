@@ -2,17 +2,20 @@
 
 if ($device['os'] == "powerconnect")
 {
-  $oids = snmp_get($device, ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.4.0", "-OsqnU", "");
-  if ($debug) { echo($oids."\n"); }
-  if ($oids)
+  $temps = snmp_walk($device, "boxServicesTempSensorTemperature", "-OsqnU", "FASTPATH-BOXSERVICES-PRIVATE-MIB");
+  if ($debug) { echo($temps."\n"); }
+  
+  $index = 0;
+  foreach (explode("\n",$temps) as $oids)
   {
     echo("Powerconnect ");
     list($oid,$current) = explode(' ',$oids);
     $divisor = "1";
     $multiplier = "1";
     $type = "powerconnect";
-    $index = "0";
+    $index++;
     $descr = "Internal Temperature";
+    if (count(explode("\n",$temps)) > 1) { $descr .= " $index"; }
 
     discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $current);
   }
