@@ -406,19 +406,30 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
           <ul>
 
 <?php
-  if ($_SESSION['userlevel'] >= '5' && $routing_count['vrf']) { echo('<li><a href="routing/protocol=vrf/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li> <li><hr width=140></li> '); }
+  $separator = 0;
+
+  if ($_SESSION['userlevel'] >= '5' && $routing_count['vrf'])
+  {
+    echo('<li><a href="routing/protocol=vrf/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li> <li><hr width=140></li> ');
+    $separator++;
+  }
 
   if ($_SESSION['userlevel'] >= '5' && $routing_count['ospf'])
   {
     echo('
-        <li><a href="routing/protocol=ospf/"><img src="images/16/text_letter_omega.png" border="0" align="absmiddle" /> OSPF Devices </a></li>
-        <li><hr width=140></li>
-        ');
+        <li><a href="routing/protocol=ospf/"><img src="images/16/text_letter_omega.png" border="0" align="absmiddle" /> OSPF Devices </a></li>');
+    $separator++;
   }
 
   ## BGP Sessions
   if ($_SESSION['userlevel'] >= '5' && $routing_count['bgp'])
   {
+    if ($separator)
+    {
+      echo('
+        <li><hr width=140></li>');
+      $separator = 0;
+    }
     echo('
         <li><a href="routing/protocol=bgp/type=all/graph=NULL/"><img src="images/16/link.png" border="0" align="absmiddle" /> BGP All Sessions </a></li>
 
