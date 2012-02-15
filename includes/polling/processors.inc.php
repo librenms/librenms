@@ -4,7 +4,7 @@ foreach (dbFetchRows("SELECT * FROM processors WHERE device_id = ?", array($devi
 {
   echo("Processor " . $processor['processor_descr'] . "... ");
 
-  $file = $config['install_dir']."/includes/polling/processors-".$processor['processor_type'].".inc.php";
+  $file = $config['install_dir']."/includes/polling/processors/".$processor['processor_type'].".inc.php";
   if (is_file($file))
   {
     include($file);
