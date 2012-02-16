@@ -22,10 +22,10 @@ if ($old_rev = @dbFetchCell("SELECT revision FROM `dbSchema`"))
   echo "-- Transitioning from old revision-based schema to database version system\n";
   $db_rev = 6;
 
-  if ($old_rev < 1000) { $db_rev = 2 };
-  if ($old_rev < 1435) { $db_rev = 3 };
-  if ($old_rev < 2245) { $db_rev = 4 };
-  if ($old_rev < 2804) { $db_rev = 5 };
+  if ($old_rev < 1000) { $db_rev = 2; }
+  if ($old_rev < 1435) { $db_rev = 3; }
+  if ($old_rev < 2245) { $db_rev = 4; }
+  if ($old_rev < 2804) { $db_rev = 5; }
 
   dbQuery("ALTER TABLE `dbSchema` ADD `version` INT NOT NULL");
   dbInsert(array('version' => $db_rev), 'dbSchema');      
