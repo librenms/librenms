@@ -99,7 +99,7 @@ foreach ($filelist as $file)
 
 if ($updating)
 {
-  dbUpdate(array('revision' => $dbu_rev), 'dbSchema');
+  dbUpdate(array('revision' => $db_rev), 'dbSchema');
   echo "-- Done\n";
 }
 
