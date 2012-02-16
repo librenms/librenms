@@ -59,7 +59,7 @@ function generate_device_url($device, $vars=array())
   return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
 }
 
-function generate_device_link($device, $text=0, $vars=array(), $start=0, $end=0)
+function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end=0)
 {
   global $config;
 
@@ -92,10 +92,10 @@ function generate_device_link($device, $text=0, $vars=array(), $start=0, $end=0)
   if ($device['os']) { $contents .= mres($config['os'][$device['os']]['text']); }
   if ($device['version']) { $contents .= " ".mres($device['version']); }
   if ($device['features']) { $contents .= " (".mres($device['features']).")"; }
-#  if ($device['hardware']) { $contents .= " - ".$device['hardware']; }
+  if ($device['hardware']) { $contents .= " - ".$device['hardware']; }
+  if (isset($device['location'])) { $contents .= "<br />" . htmlentities($device['location']); }
   $contents .= "</div>";
 
-#  if (isset($device['location'])) { $contents .= "" . htmlentities($device['location'])."<br />"; }
   foreach ($graphs as $entry)
   {
     $graph     = $entry['graph'];
