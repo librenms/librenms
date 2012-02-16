@@ -439,7 +439,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
   ## Do Alerts at the bottom
   if ($bgp_alerts)
-  { ## FIXME link below broken!
+  {
     echo('
         <li><hr width=140></li>
         <li><a href="routing/protocol=bgp/adminstatus=start/state=down/"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerted BGP (' . $bgp_alerts . ')</a></li>

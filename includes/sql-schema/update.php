@@ -11,6 +11,24 @@
  * See COPYING for more details.
  */
 
+if (!isset($debug))
+{
+  # Not called from within discovery, let's load up the necessary stuff.
+
+  include("config.php");
+  include("includes/functions.php");
+
+  $options = getopt("d");
+  if (isset($options['d']))
+  {
+    $debug = TRUE;
+  }
+  else
+  {
+    $debug = FALSE;
+  }
+}
+
 if ($db_rev = @dbFetchCell("SELECT version FROM `dbSchema`")) {} else
 {
   $db_rev = 0;
