@@ -90,70 +90,7 @@ if (!$where)
   exit;
 }
 
-if (file_exists('.svn'))
-{
-  list(,$dbu_rev) = preg_split('/: /',@shell_exec('svn info database-update.sql|grep ^Revision'));
-
-  if ($db_rev = @dbFetchCell("SELECT revision FROM `dbSchema`")) {} else
-  {
-    $db_rev = 0;
-  }
-
-  if ($db_rev+0 < 1223)
-  {
-    include('upgrade-scripts/fix-events.php'); ## Fix events table (needs to copy some data around, so needs script)
-  }
-
-  if ($db_rev+0 < 1656)
-  {
-    include('upgrade-scripts/fix-port-rrd.php'); ## Rewrites all port RRDs. Nothing will work without this after 1656
-  }
-
-  if ($db_rev+0 < 1757)
-  {
-    include('upgrade-scripts/fix-sensor-rrd.php'); ## Rewrites all sensor RRDs. Nothing will work without this after 1757
-  }
-
-  if ($db_rev+0 < 2758)
-  {
-    include('upgrade-scripts/fix-billing-2758.inc.php'); ## Rewrites all sensor RRDs. Nothing will work without this after 1757
-  }
-
-  if ($dbu_rev+0 > $db_rev)
-  {
-    echo("SVN revision changed.\n");
-    if ($db_rev+0 < "1000")
-    {
-      echo("Running pre-revision 1000 SQL update script...\n");
-      shell_exec("scripts/update-sql.php database-update-pre1000.sql");
-    }
-    if ($db_rev+0 < "1435")
-    {
-      echo("Running pre-revision 1435 SQL update script...\n");
-      shell_exec("scripts/update-sql.php database-update-pre1435.sql");
-    }
-    if ($db_rev+0 < "2245")
-    {
-      echo("Running pre-revision 2245 (0.11.5) SQL update script...\n");
-      shell_exec("scripts/update-sql.php database-update-pre2245.sql");
-    }
-    if ($db_rev+0 < "2804")
-    {
-      echo("Running pre-revision 2804 (0.11.12) SQL update script...\n");
-      shell_exec("scripts/update-sql.php database-update-pre2804.sql");
-    }
-    echo("Running development SQL update script to update from r$db_rev to r" . trim($dbu_rev) . "...\n");
-    shell_exec("scripts/update-sql.php database-update.sql");
-    if ($db_rev == 0)
-    {
-      dbInsert(array('revision' => $dbu_rev), 'dbSchema');
-    }
-    else
-    {
-      dbUpdate(array('revision' => $dbu_rev), 'dbSchema');
-    }
-  }
-}
+include("includes/sql-schema/update.php");
 
 $discovered_devices = 0;
 
