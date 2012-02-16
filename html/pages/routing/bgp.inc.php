@@ -141,6 +141,9 @@ else
   if ($vars['adminstatus'] == "stop")
   {
     $where .= " AND (B.bgpPeerAdminStatus = 'stop')";
+  } elseif ($vars['adminstatus'] == "start")
+  {
+    $where .= " AND (B.bgpPeerAdminStatus = 'start')";
   }
 
   if ($vars['state'] == "down")
