@@ -21,9 +21,12 @@ foreach ($ports as $port)
 
     $graph_type = "port_" . $subformat;
 
+    if ($_SESSION['widescreen']) { $width=357; } else { $width=315; }
+    if ($_SESSION['widescreen']) { $width_div=438; } else { $width_div=393; }
+
     $graph_array           = array();
-    $graph_array['height'] = "100";
-    $graph_array['width']  = "210";
+    $graph_array['height'] = 100;
+    $graph_array['width']  = 210;
     $graph_array['to']     = $now;
     $graph_array['id']     = $port['interface_id'];
     $graph_array['type']   = $graph_type;
@@ -36,10 +39,10 @@ foreach ($ports as $port)
     $link = generate_url($link_array);
     $overlib_content = generate_overlib_content($graph_array, $port['hostname'] . " - " . $port['label']);
     $graph_array['title']  = "yes";
-    $graph_array['width'] = 315; $graph_array['height'] = 119;
+    $graph_array['width'] = $width; $graph_array['height'] = 119;
     $graph =  generate_graph_tag($graph_array);
 
-    echo("<div style='display: block; padding: 1px; margin: 2px; min-width: 393px; max-width:393px; min-height:180px; max-height:180px; text-align: center; float: left; background-color: #f5f5f5;'>");
+    echo("<div style='display: block; padding: 1px; margin: 2px; min-width: ".$width_div."px; max-width:".$width_div."px; min-height:180px; max-height:180px; text-align: center; float: left; background-color: #f5f5f5;'>");
     echo(overlib_link($link, $graph, $overlib_content));
     echo("</div>");
 
