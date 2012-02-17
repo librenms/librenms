@@ -46,7 +46,7 @@ if ($old_rev = @dbFetchCell("SELECT revision FROM `dbSchema`"))
   if ($old_rev < 2804) { $db_rev = 5; }
 
   dbQuery("ALTER TABLE `dbSchema` ADD `version` INT NOT NULL");
-  dbInsert(array('version' => $db_rev), 'dbSchema');      
+  dbInsert(array('version' => $db_rev), 'dbSchema');
 }
 
 $updating = 0;
