@@ -65,8 +65,8 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
   $has_macaccounting = dbFetchCell("SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = ? AND M.mac = I.mac_address", array($peer['bgpPeerIdentifier']));
   unset($bg_image);
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
-
   unset ($alert, $bg_image);
+  unset ($peerhost, $peername);
 
   if (!is_integer($i/2)) { $bg_colour = $list_colour_b; } else { $bg_colour = $list_colour_a; }
   if ($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $peer['alert']=1; }
@@ -98,16 +98,17 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
   {
     $peername = generate_device_link($peerhost);
     $peername = generate_device_link($peerhost) ." ". generate_port_link($peerhost);
+    $peer_url         = "device/device=" . $peer['device_id'] . "/tab=routing/proto=bgp/view=updates/";
   }
   else
   {
-    #$peername = gethostbyaddr($peer['bgpPeerIdentifier']); ## FFffuuu DNS
-    if ($peername == $peer['bgpPeerIdentifier'])
-    {
-      unset($peername);
-    } else {
-      $peername = "<i>".$peername."<i>";
-    }
+    #$peername = gethostbyaddr($peer['bgpPeerIdentifier']); ## FFffuuu DNS ## Cache this in discovery?
+#    if ($peername == $peer['bgpPeerIdentifier'])
+#    {
+#      unset($peername);
+#    } else {
+#      $peername = "<i>".$peername."<i>";
+#    }
   }
 
   unset($peer_af);
@@ -127,7 +128,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
 
   $graph_type       = "bgp_updates";
   $peer_daily_url   = "graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
-  $peeraddresslink  = "<span class=list-large><a href='device/device=" . $peer['device_id'] . "/tab=routing/proto=bgp/view=updates/' onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpPeerIdentifier'] . "</a></span>";
+  $peeraddresslink  = "<span class=list-large><a onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpPeerIdentifier'] . "</a></span>";
 
   echo('<tr bgcolor="'.$bg_colour.'"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') .
                                         ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">
