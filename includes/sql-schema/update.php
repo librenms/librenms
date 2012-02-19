@@ -29,12 +29,13 @@ if (!isset($debug))
   }
 }
 
+$insert = 0;
+
 if ($db_rev = @dbFetchCell("SELECT version FROM `dbSchema`")) {} else
 {
   $db_rev = 0;
+  $insert = 1;
 }
-
-$insert = 0;
 
 # For transition from old system
 if ($old_rev = @dbFetchCell("SELECT revision FROM `dbSchema`"))
@@ -96,11 +97,14 @@ foreach ($filelist as $file)
         if (trim($line))
         {
           if ($debug) { echo("$line \n"); }
-          $update = mysql_query($line);
-          if (!$update)
+          if ($line[0] != "#")
           {
-            $err++;
-            if ($debug) { echo(mysql_error() . "\n"); }
+            $update = mysql_query($line);
+            if (!$update)
+            {
+              $err++;
+              if ($debug) { echo(mysql_error() . "\n"); }
+            }
           }
         }
       }
