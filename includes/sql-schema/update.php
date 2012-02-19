@@ -34,6 +34,8 @@ if ($db_rev = @dbFetchCell("SELECT version FROM `dbSchema`")) {} else
   $db_rev = 0;
 }
 
+$insert = 0;
+
 # For transition from old system
 if ($old_rev = @dbFetchCell("SELECT revision FROM `dbSchema`"))
 {
@@ -46,8 +48,7 @@ if ($old_rev = @dbFetchCell("SELECT revision FROM `dbSchema`"))
   if ($old_rev < 2804) { $db_rev = 4; }
   if ($old_rev < 2827) { $db_rev = 5; }
 
-  dbQuery("ALTER TABLE `dbSchema` ADD `version` INT NOT NULL");
-  dbInsert(array('version' => $db_rev), 'dbSchema');
+  $insert = 1;
 }
 
 $updating = 0;
@@ -118,7 +119,12 @@ foreach ($filelist as $file)
 
 if ($updating)
 {
-  dbUpdate(array('version' => $db_rev), 'dbSchema');
+  if ($insert)
+  {
+    dbInsert(array('version' => $db_rev), 'dbSchema');
+  } else {
+    dbUpdate(array('version' => $db_rev), 'dbSchema');
+  }
   echo "-- Done\n";
 }
 
