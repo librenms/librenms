@@ -94,9 +94,9 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
     unset($peerhost);
   }
 
-  if ($peerhost)
+  if (is_array($peerhost))
   {
-    $peername = generate_device_link($peerhost);
+    #$peername = generate_device_link($peerhost);
     $peername = generate_device_link($peerhost) ." ". generate_port_link($peerhost);
     $peer_url         = "device/device=" . $peer['device_id'] . "/tab=routing/proto=bgp/view=updates/";
   }
