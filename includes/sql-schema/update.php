@@ -31,7 +31,7 @@ if (!isset($debug))
 
 $insert = 0;
 
-if ($db_rev = @dbFetchCell("SELECT version FROM `dbSchema`")) {} else
+if ($db_rev = @dbFetchCell("SELECT version FROM `dbSchema` ORDER BY version LIMIT 1")) {} else
 {
   $db_rev = 0;
   $insert = 1;
@@ -43,11 +43,11 @@ if ($old_rev = @dbFetchCell("SELECT revision FROM `dbSchema`"))
   echo "-- Transitioning from old revision-based schema to database version system\n";
   $db_rev = 6;
 
-  if ($old_rev < 1000) { $db_rev = 1; }
-  if ($old_rev < 1435) { $db_rev = 2; }
-  if ($old_rev < 2245) { $db_rev = 3; }
-  if ($old_rev < 2804) { $db_rev = 4; }
-  if ($old_rev < 2827) { $db_rev = 5; }
+  if ($old_rev <= 1000) { $db_rev = 1; }
+  if ($old_rev <= 1435) { $db_rev = 2; }
+  if ($old_rev <= 2245) { $db_rev = 3; }
+  if ($old_rev <= 2804) { $db_rev = 4; }
+  if ($old_rev <= 2827) { $db_rev = 5; }
 
   $insert = 1;
 }
