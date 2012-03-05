@@ -31,7 +31,7 @@ if (!isset($debug))
 
 $insert = 0;
 
-if ($db_rev = @dbFetchCell("SELECT version FROM `dbSchema` ORDER BY version LIMIT 1")) {} else
+if ($db_rev = @dbFetchCell("SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1")) {} else
 {
   $db_rev = 0;
   $insert = 1;
