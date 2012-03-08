@@ -5,8 +5,10 @@ if ($bg == $list_colour_b) { $bg = $list_colour_a; } else { $bg = $list_colour_b
 if ($device['status'] == '0')
 {
   $class = "list-device-down";
+  $table_tab_colour = "#cc0000";
 } else {
   $class = "list-device";
+  $table_tab_colour = "#00cc00";
 }
 if ($device['ignore'] == '1')
 {
@@ -14,11 +16,13 @@ if ($device['ignore'] == '1')
   if ($device['status'] == '1')
   {
     $class = "list-device-ignored-up";
+    $table_tab_colour = "black";
   }
 }
 if ($device['disabled'] == '1')
 {
   $class = "list-device-disabled";
+  $table_tab_colour = "#aaaaaa";
 }
 
 $type = strtolower($device['os']);
@@ -33,6 +37,7 @@ $sensor_count = dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = 
 
 echo('  <tr class="'.$class.'" bgcolor="' . $bg . '" onmouseover="this.style.backgroundColor=\'#fdd\';" onmouseout="this.style.backgroundColor=\'' . $bg . '\';"
           onclick="location.href=\'device/device='.$device['device_id'].'/\'" style="cursor: pointer;">
+          <td width="1" style="background-color: '.$table_tab_colour.';"></td>
           <td width="40" align="center" valign="middle">' . $image . '</td>
           <td width="300"><span style="font-size: 15px;">' . generate_device_link($device) . '</span>
           <br />' . $device['sysName'] . '</td>'
