@@ -109,11 +109,18 @@ foreach ($filelist as $file)
         }
       }
 
-      echo " done ($err errors).\n";
+      if ($db_rev < 5)
+      {
+        echo(" done.\n");
+      }
+      else
+      {
+        echo(" done ($err errors).\n");
+      }
     }
     else
     {
-      echo " Could not open file!\n";
+      echo(" Could not open file!\n");
     }
 
     $updating++;
