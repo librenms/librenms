@@ -263,10 +263,18 @@ if($format == "graph")
 
 } else {
 
-  echo('<table cellpadding="7" cellspacing="0" class="devicetable sortable" width="100%">');
+  echo('<table cellspacing="0" class="devicetable sortable" width="100%">');
   if ($subformat = "detail")
   {
-    echo('<tr class="tablehead"><th></th><th>Device</th><th></th><th>Operating System</th><th>Platform</th><th>Uptime/Location</th></tr>');
+    echo('<tr class="tablehead">
+    <th></th>
+    <th></th>
+    <th class="paddedcell">Device</th>
+    <th></th>
+    <th class="paddedcell">Operating System</th>
+    <th class="paddedcell">Platform</th>
+    <th class="paddedcell">Uptime/Location</th>
+  </tr>');
   }
 
   foreach (dbFetchRows($query, $sql_param) as $device)
