@@ -7,6 +7,7 @@ if ($device['os'] == "linux" || $device['os'] == "endian")
   else if (strstr($poll_device['sysDescr'], "x86_64")) { $hardware = "Generic x86 64-bit"; }
   else if (strstr($poll_device['sysDescr'], "sparc32")) { $hardware = "Generic SPARC 32-bit"; }
   else if (strstr($poll_device['sysDescr'], "sparc64")) { $hardware = "Generic SPARC 64-bit"; }
+  else if (strstr($poll_device['sysDescr'], "mips")) { $hardware = "Generic MIPS"; }
   else if (strstr($poll_device['sysDescr'], "armv5")) { $hardware = "Generic ARMv5"; }
   else if (strstr($poll_device['sysDescr'], "armv6")) { $hardware = "Generic ARMv6"; }
   else if (strstr($poll_device['sysDescr'], "armv7")) { $hardware = "Generic ARMv7"; }
