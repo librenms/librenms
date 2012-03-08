@@ -1351,3 +1351,12 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
     box-shadow: #CCC 0 0 .25em;
     behavior: url(/css/PIE.htc);
 }
+
+.devicetable {
+    border-collapse: collapse;
+}
+
+.paddedcell {
+  padding: 7px;
+}
+
