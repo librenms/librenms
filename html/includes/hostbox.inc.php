@@ -8,15 +8,16 @@ if ($device['status'] == '0')
   $table_tab_colour = "#cc0000";
 } else {
   $class = "list-device";
-  $table_tab_colour = "#00cc00";
+  $table_tab_colour = "#0000cc";
 }
 if ($device['ignore'] == '1')
 {
   $class = "list-device-ignored";
+  $table_tab_colour = "#aaaaaa";
   if ($device['status'] == '1')
   {
     $class = "list-device-ignored-up";
-    $table_tab_colour = "black";
+    $table_tab_colour = "#009900";
   }
 }
 if ($device['disabled'] == '1')
