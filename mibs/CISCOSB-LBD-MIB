@@ -1,0 +1,86 @@
+CISCOSB-LBD-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCO LBD Configuration
+-- Version:    7.45.00.00
+-- Date:       24-Oct-2007
+--
+
+IMPORTS
+    TruthValue,TEXTUAL-CONVENTION                        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE                         FROM SNMPv2-SMI
+    PortList                                             FROM Q-BRIDGE-MIB
+    switch001                                                 FROM CISCOSB-MIB;
+
+
+
+rlLbd  MODULE-IDENTITY
+       LAST-UPDATED "200711070000Z"
+	   ORGANIZATION "Cisco Small Business"
+
+	   CONTACT-INFO
+	   "Postal: 170 West Tasman Drive
+	   San Jose , CA 95134-1706
+	   USA
+
+	   Website: Cisco Small Business Home http://www.cisco.com/smb>;,
+	   Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+       DESCRIPTION
+                "The private MIB module definition for Loopback Detection MIB."
+       REVISION "200711070000Z"
+       DESCRIPTION
+                "Initial version of this MIB."
+           ::= { switch001 127 }
+
+
+-------------------------------------------------------------------------------
+rlLbdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable Loopback Detection in the switch."
+    ::= { rlLbd 1 }
+
+
+-------------------------------------------------------------------------------
+rlLbdDetectionInterval OBJECT-TYPE
+    SYNTAX      INTEGER(30..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds that should pass between unicast LBD packets."
+    ::= { rlLbd 2 }
+
+
+-------------------------------------------------------------------------------
+
+rlLbdMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        source-mac-addr (1),
+        base-mac-addr (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Loopback detection mode."
+    ::= { rlLbd 3 }
+
+-------------------------------------------------------------------------------
+
+rlLbdIfAdminStatus OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "Loopback Detection admin status. Each port of the system is represented by a
+            single bit within the value of this object.  If that bit has
+            a value of '1' then that port has enabled admin status,;
+            if the port is disabled, its bit has a value of '0'."
+    ::= { rlLbd 4 }
+
+
+
+
+END
