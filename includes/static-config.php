@@ -273,11 +273,11 @@ $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
-## CiscoLinksys
+## Cisco Small Business
 
-$os = "ciscolinksys";
+$os = "ciscosb";
 $config['os'][$os]['group']             = "cisco";
-$config['os'][$os]['text']              = "CiscoLinksys"; 
+$config['os'][$os]['text']              = "Cisco Small Business"; 
 $config['os'][$os]['ifname']            = 1;
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "linksys";
