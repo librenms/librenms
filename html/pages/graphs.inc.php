@@ -58,6 +58,9 @@ if (!$auth)
       $(function()
       {
         $('#dtpickerfrom').datetimepicker({
+	  showOn: 'button',
+	  buttonImage: 'images/16/date.png',
+          buttonImageOnly: true,
           hourGrid: 4,
           minuteGrid: 10,
           onClose: function(dateText, inst) {
@@ -82,6 +85,9 @@ if (!$auth)
           }
         });
         $('#dtpickerto').datetimepicker({
+          showOn: 'button',
+          buttonImage: 'images/16/date.png',
+          buttonImageOnly: true,
           hourGrid: 4,
           minuteGrid: 10,
           maxDate: 0,
