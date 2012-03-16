@@ -5,10 +5,28 @@ if ($_POST['addbill'] == "yes")
 {
   $updated = '1';
 
-  ### Multiply bill_quota by base twice for now, as we know it's in GB. Later we should allow different measurements.
-  if(is_numeric($_POST['bill_quota'])) { $_POST['bill_quota'] * $config['billing']['base'] * $config['billing']['base']; }
+  if(isset($_POST['bill_quota']) or isset($_POST['bill_cdr'])) {
+    if ($_POST['bill_type'] == "quota") {
+      if (isset($_POST['bill_quota_type'])) {
+        if ($_POST['bill_quota_type'] == "MB") { $multiplier = 1 * $config['billing']['base']; }
+        if ($_POST['bill_quota_type'] == "GB") { $multiplier = 1 * $config['billing']['base'] * $config['billing']['base']; }
+        if ($_POST['bill_quota_type'] == "TB") { $multiplier = 1 * $config['billing']['base'] * $config['billing']['base'] * $config['billing']['base']; }
+        $bill_quota = (is_numeric($_POST['bill_quota']) ? $_POST['bill_quota'] * $config['billing']['base'] * $multiplier : 0);
+        $bill_cdr = 0;
+      }
+    }
+    if ($_POST['bill_type'] == "cdr") {
+      if (isset($_POST['bill_cdr_type'])) {
+        if ($_POST['bill_cdr_type'] == "Kbps") { $multiplier = 1 * $config['billing']['base']; }
+        if ($_POST['bill_cdr_type'] == "Mbps") { $multiplier = 1 * $config['billing']['base'] * $config['billing']['base']; }
+        if ($_POST['bill_cdr_type'] == "Gbps") { $multiplier = 1 * $config['billing']['base'] * $config['billing']['base'] * $config['billing']['base']; }
+        $bill_cdr = (is_numeric($_POST['bill_cdr']) ? $_POST['bill_cdr'] * $multiplier : 0);
+        $bill_quota = 0;
+      }
+    }
+  }
 
-  $insert = array('bill_name' => $_POST['bill_name'], 'bill_type' => $_POST['bill_type'], 'bill_cdr' => $_POST['bill_cdr'], 'bill_day' => $_POST['bill_day'], 'bill_quota' => $_POST['bill_quota'],
+  $insert = array('bill_name' => $_POST['bill_name'], 'bill_type' => $_POST['bill_type'], 'bill_cdr' => $bill_cdr, 'bill_day' => $_POST['bill_day'], 'bill_quota' => $bill_quota,
                   'bill_custid' => $_POST['bill_custid'], 'bill_ref' => $_POST['bill_ref'], 'bill_notes' => $_POST['bill_notes']);
 
   $bill_id = dbInsert($insert, 'bills');
@@ -45,6 +63,12 @@ elseif ($_GET['opta'] == "add")
 
 <div style='padding:10px;font-size:20px; font-weight: bold;'>Add Bill</div>
 <form name="form1" method="post" action="bills/">
+  <script type="text/javascript">
+    function billType() {
+      $('#cdrDiv').toggle();
+      $('#quotaDiv').toggle();
+    }
+  </script>
 
 <?php
 
@@ -59,35 +83,61 @@ if(is_array($port))
 
  <input type=hidden name=addbill value=yes>
  <div style="padding: 10px; background: #f0f0f0;">
-  <table cellpadding=2px width=400px>
+  <table cellpadding=2px width=500px>
   <tr>
     <td><strong>Description</strong></td>
-    <td><input type="text" name="bill_name" size="32" value="<?php echo($port['port_descr_descr']); ?>"></td>
+    <td><input style="width: 300px;" type="text" name="bill_name" size="32" value="<?php echo($port['port_descr_descr']); ?>"></td>
   </tr>
   <tr>
-    <td><strong>Billing Type</strong></td>
+    <td style="vertical-align: top;"><strong>Billing Type</strong></td>
     <td>
-      <input type="radio" name="bill_type" value="cdr" checked /> CDR 95th: <input type="text" name="bill_cdr" size="10">Kbps
-      <br />
-      <input type="radio" name="bill_type" value="quota" /> Quota: <input type="text" name="bill_quota" size="10">GB
+      <input type="radio" name="bill_type" value="cdr" checked onchange="javascript: billType();" /> CDR 95th
+      <input type="radio" name="bill_type" value="quota" onchange="javascript: billType();" /> Quota
 
+      <div id="cdrDiv">
+      <input type="text" name="bill_cdr" size="10">
+        <select name="bill_cdr_type" style="width: 200px;">
+          <option value="Kbps">Kilobits per second (Kbps)</option>
+          <option value="Mbps" selected>Megabits per second (Mbps)</option>
+          <option value="Gbps">Gigabites per second (Gbps)</option>
+        </select>
+      </div>
+
+      <div id="quotaDiv" style="display: none">
+        <input type="text" name="bill_quota" size="10">
+        <select name="bill_quota_type" style="width: 200px;">
+          <option value="MB">MegaBytes</option>
+          <option value="GB" selected>GygaBytes</option>
+          <option value="TB">TeraBytes</option>
+        </select>
+      </div>
   </tr>
   <tr>
     <td><strong>Billing Day</strong></td>
-    <td><input type="text" name="bill_day" size="5" value="1"></td>
+    <td>
+      <select name="bill_day" style="width: 301px;">
+<?php
+
+for ($x=1;$x<32;$x++) {
+  echo "        <option value=\"".$x."\">".$x."</option>\n";
+}
+
+?>
+      </select>
+    </td>
   </tr>
   <tr><td colspan=4><h3>Optional Information</h3></td></tr>
   <tr>
     <td><strong>Customer Reference</strong></td>
-    <td><input type="text" name="bill_custid" size="32"></td>
+    <td><input style="width: 300px;" type="text" name="bill_custid" size="32"></td>
   </tr>
   <tr>
     <td><strong>Billing Reference</strong></td>
-    <td><input type="text" name="bill_ref" size="32" value="<?php echo($port['port_descr_circuit']); ?>"></td>
+    <td><input style="width: 300px;" type="text" name="bill_ref" size="32" value="<?php echo($port['port_descr_circuit']); ?>"></td>
   </tr>
   <tr>
     <td><strong>Notes</strong></td>
-    <td><input type="textarea" name="bill_notes" size="32" value="<?php echo($port['port_descr_speed']); ?>"></td>
+    <td><input style="width: 300px;" type="textarea" name="bill_notes" size="32" value="<?php echo($port['port_descr_speed']); ?>"></td>
   </tr>
 
   <tr>
