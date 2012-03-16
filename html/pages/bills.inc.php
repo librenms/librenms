@@ -99,16 +99,16 @@ if(is_array($port))
         <select name="bill_cdr_type" style="width: 200px;">
           <option value="Kbps">Kilobits per second (Kbps)</option>
           <option value="Mbps" selected>Megabits per second (Mbps)</option>
-          <option value="Gbps">Gigabites per second (Gbps)</option>
+          <option value="Gbps">Gigabits per second (Gbps)</option>
         </select>
       </div>
 
       <div id="quotaDiv" style="display: none">
         <input type="text" name="bill_quota" size="10">
         <select name="bill_quota_type" style="width: 200px;">
-          <option value="MB">MegaBytes</option>
-          <option value="GB" selected>GygaBytes</option>
-          <option value="TB">TeraBytes</option>
+          <option value="MB">Megabytes</option>
+          <option value="GB" selected>Gigabytes</option>
+          <option value="TB">Terabytes</option>
         </select>
       </div>
   </tr>
