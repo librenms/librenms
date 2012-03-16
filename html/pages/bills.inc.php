@@ -106,9 +106,9 @@ if(is_array($port))
       <div id="quotaDiv" style="display: none">
         <input type="text" name="bill_quota" size="10">
         <select name="bill_quota_type" style="width: 200px;">
-          <option value="MB">Megabytes</option>
-          <option value="GB" selected>Gigabytes</option>
-          <option value="TB">Terabytes</option>
+          <option value="MB">Megabytes (MB)</option>
+          <option value="GB" selected>Gigabytes (GB)</option>
+          <option value="TB">Terabytes (TB)</option>
         </select>
       </div>
   </tr>
