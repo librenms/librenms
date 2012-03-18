@@ -127,10 +127,14 @@ if (is_array($ports))
   {
     $emptyCheck = true;
     $devicebtn = str_replace("list-device", "btn", generate_device_link($port));
+    $devicebtn = str_replace("overlib('", "overlib('<div style=\'border: 5px solid #e5e5e5; background: #fff; padding: 10px;\'>", $devicebtn);
+    $devicebtn = str_replace("<div>',;", "</div></div>',", $devicebtn);
     $portbtn = str_replace("interface-upup", "btn", generate_port_link($port));
     $portbtn = str_replace("interface-updown", "btn btn-warning", $portbtn);
     $portbtn = str_replace("interface-downdown", "btn btn-warning", $portbtn);
     $portbtn = str_replace("interface-admindown", "btn btn-warning disabled", $portbtn);
+    $portbtn = str_replace("overlib('", "overlib('<div style=\'border: 5px solid #e5e5e5; background: #fff; padding: 10px;\'>", $portbtn);
+    $portbtn = str_replace("<div>',;", "</div></div>',", $portbtn);
     $portalias = (empty($port['ifAlias']) ? "" : " - ".$port['ifAlias']."");
     $devicebtn = str_replace("\">".$port['hostname'], "\" style=\"color: #000;\"><i class=\"icon-asterisk\"></i> ".$port['hostname'], $devicebtn);
     $portbtn = str_replace("\">".strtolower($port['ifName']), "\" style=\"color: #000;\"><i class=\"icon-random\"></i> ".$port['ifName']."".$portalias, $portbtn);

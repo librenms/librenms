@@ -95,7 +95,11 @@ if(is_array($port))
   $portbtn = str_replace("interface-upup", "btn", generate_port_link($port));
   $portalias = (empty($port['ifAlias']) ? "" : " - ".$port['ifAlias']."");
   $devicebtn = str_replace("\">".$port['hostname'], "\" style=\"color: #000;\"><i class=\"icon-asterisk\"></i> ".$port['hostname'], $devicebtn);
+  $devicebtn = str_replace("overlib('", "overlib('<div style=\'border: 5px solid #e5e5e5; background: #fff; padding: 10px;\'>", $devicebtn);
+  $devicebtn = str_replace("<div>',;", "</div></div>',", $devicebtn);
   $portbtn = str_replace("\">".strtolower($port['ifName']), "\" style=\"color: #000;\"><i class=\"icon-random\"></i> ".$port['ifName']."".$portalias, $portbtn);
+  $portbtn = str_replace("overlib('", "overlib('<div style=\'border: 5px solid #e5e5e5; background: #fff; padding: 10px;\'>", $portbtn);
+  $portbtn = str_replace("<div>',;", "</div></div>',", $portbtn);
   echo("  <fieldset>\n");
   echo("    <input type=\"hidden\" name=\"port\" value=\"".$port['interface_id']."\">\n");
   echo("    <legend>Ports</legend>\n");
