@@ -107,8 +107,13 @@ if (bill_permitted($bill_id))
 
     echo(" | ");
     if ($vars['view'] == "delete") { echo("<span class='pagemenu-selected'>"); }
-  echo('<A href="'.generate_url($vars, array('view' => 'delete')).'">Delete</a>');
+    echo('<A href="'.generate_url($vars, array('view' => 'delete')).'">Delete</a>');
     if ($vars['view'] == "delete") { echo("</span>"); }
+
+    echo(" | ");
+    if ($vars['view'] == "reset") { echo("<span class='pagemenu-selected'>"); }
+    echo('<A href="'.generate_url($vars, array('view' => 'reset')).'">Reset</a>');
+    if ($vars['view'] == "reset") { echo("</span>"); }
   }
 
   echo('<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => "bills")).'/"><img align=absmiddle src="/images/16/arrow_left.png"> Back to Bills</a></div>');
@@ -123,6 +128,10 @@ if (bill_permitted($bill_id))
   elseif ($vars['view'] == "delete" && $_SESSION['userlevel'] == "10")
   {
     include("pages/bill/delete.inc.php");
+  }
+  elseif ($vars['view'] == "reset" && $_SESSION['userlevel'] == "10")
+  {
+    include("pages/bill/reset.inc.php");
   }
   elseif ($vars['view'] == "history")
   {

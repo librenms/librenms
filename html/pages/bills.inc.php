@@ -61,90 +61,127 @@ elseif ($_GET['opta'] == "add")
 
 ?>
 
-<div style='padding:10px;font-size:20px; font-weight: bold;'>Add Bill</div>
-<form name="form1" method="post" action="bills/">
+<font face="Verdana, Arial, Sans-Serif"><h2>Bill : Add Bill</h2>
+<?php
+
+  print_optionbar_start();
+  echo("<span style='font-weight: bold;'>Bill</span> &#187; ");
+  if (!$vars['view']) { $vars['view'] = "add"; }
+  if ($_SESSION['userlevel'] == "10")
+  {
+    if ($vars['view'] == "add") { echo("<span class='pagemenu-selected'>"); }
+    echo('<A href="'.generate_url(array('page' => "bills/add")).'">Add</a>');
+    if ($vars['view'] == "add") { echo("</span>"); }
+  }
+  echo('<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => "bills")).'/"><img align=absmiddle src="/images/16/arrow_left.png"> Back to Bills</a></div>');
+  print_optionbar_end();
+
+?>
+
+<form name="form1" method="post" action="bills/" class="form-horizontal">
+  <input type=hidden name=addbill value=yes>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
   <script type="text/javascript">
     function billType() {
       $('#cdrDiv').toggle();
       $('#quotaDiv').toggle();
     }
   </script>
-
 <?php
 
 if(is_array($port))
 {
-  echo("<h3>Ports</h3>");
-  echo(generate_port_link($port) . " on " . generate_device_link($port) . "<br />");
-  echo("<input type=hidden name=port value=".$port['interface_id'].">");
+  $devicebtn = str_replace("list-device", "btn", generate_device_link($port));
+  $portbtn = str_replace("interface-upup", "btn", generate_port_link($port));
+  $portalias = (empty($port['ifAlias']) ? "" : " - ".$port['ifAlias']."");
+  $devicebtn = str_replace("\">".$port['hostname'], "\" style=\"color: #000;\"><i class=\"icon-asterisk\"></i> ".$port['hostname'], $devicebtn);
+  $portbtn = str_replace("\">".strtolower($port['ifName']), "\" style=\"color: #000;\"><i class=\"icon-random\"></i> ".$port['ifName']."".$portalias, $portbtn);
+  echo("  <fieldset>\n");
+  echo("    <input type=\"hidden\" name=\"port\" value=\"".$port['interface_id']."\">\n");
+  echo("    <legend>Ports</legend>\n");
+  echo("    <div class=\"control-group\">\n");
+  echo("      <div class=\"btn-toolbar\">\n");
+  echo("        <div class=\"btn-group\">\n");
+  echo("          ".$devicebtn."\n");
+  echo("          ".$portbtn."\n");
+  echo("        </div>\n");
+  echo("      </div>\n");
+  echo("    </div>\n");
+  echo("  </fieldset>\n");
 }
 
 ?>
-
- <input type=hidden name=addbill value=yes>
- <div style="padding: 10px; background: #f0f0f0;">
-  <table cellpadding=2px width=500px>
-  <tr>
-    <td><strong>Description</strong></td>
-    <td><input style="width: 300px;" type="text" name="bill_name" size="32" value="<?php echo($port['port_descr_descr']); ?>"></td>
-  </tr>
-  <tr>
-    <td style="vertical-align: top;"><strong>Billing Type</strong></td>
-    <td>
-      <input type="radio" name="bill_type" value="cdr" checked onchange="javascript: billType();" /> CDR 95th
-      <input type="radio" name="bill_type" value="quota" onchange="javascript: billType();" /> Quota
-
-      <div id="cdrDiv">
-      <input type="text" name="bill_cdr" size="10">
-        <select name="bill_cdr_type" style="width: 200px;">
-          <option value="Kbps">Kilobits per second (Kbps)</option>
-          <option value="Mbps" selected>Megabits per second (Mbps)</option>
-          <option value="Gbps">Gigabits per second (Gbps)</option>
-        </select>
+  <fieldset>
+    <legend>Bill Properties</legend>
+    <div class="control-group">
+      <label class="control-label" for="bill_name"><strong>Description</strong></label>
+      <div class="controls">
+        <input class="span4" type="text" name="bill_name" value="<?php echo($port['port_descr_descr']); ?>">
       </div>
-
-      <div id="quotaDiv" style="display: none">
-        <input type="text" name="bill_quota" size="10">
-        <select name="bill_quota_type" style="width: 200px;">
-          <option value="MB">Megabytes (MB)</option>
-          <option value="GB" selected>Gigabytes (GB)</option>
-          <option value="TB">Terabytes (TB)</option>
-        </select>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="bill_type"><strong>Billing Type</strong></label>
+      <div class="controls">
+        <input type="radio" name="bill_type" value="cdr" checked onchange="javascript: billType();" /> CDR 95th
+        <input type="radio" name="bill_type" value="quota" onchange="javascript: billType();" /> Quota
+        <div id="cdrDiv">
+          <input class="span1" type="text" name="bill_cdr">
+          <select name="bill_cdr_type" style="width: 233px;">
+            <option value="Kbps">Kilobits per second (Kbps)</option>
+            <option value="Mbps" selected>Megabits per second (Mbps)</option>
+            <option value="Gbps">Gigabits per second (Gbps)</option>
+          </select>
+        </div>
+        <div id="quotaDiv" style="display: none">
+          <input class="span1" type="text" name="bill_quota">
+          <select name="bill_quota_type" style="width: 233px;">
+            <option value="MB">Megabytes (MB)</option>
+            <option value="GB" selected>Gigabytes (GB)</option>
+            <option value="TB">Terabytes (TB)</option>
+          </select>
+        </div>
       </div>
-  </tr>
-  <tr>
-    <td><strong>Billing Day</strong></td>
-    <td>
-      <select name="bill_day" style="width: 301px;">
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="bill_day"><strong>Billing Day</strong></label>
+      <div class="controls">
+        <select name="bill_day" style="width: 60px;">
 <?php
 
 for ($x=1;$x<32;$x++) {
-  echo "        <option value=\"".$x."\">".$x."</option>\n";
+  echo("          <option value=\"".$x."\">".$x."</option>\n");
 }
 
 ?>
-      </select>
-    </td>
-  </tr>
-  <tr><td colspan=4><h3>Optional Information</h3></td></tr>
-  <tr>
-    <td><strong>Customer Reference</strong></td>
-    <td><input style="width: 300px;" type="text" name="bill_custid" size="32"></td>
-  </tr>
-  <tr>
-    <td><strong>Billing Reference</strong></td>
-    <td><input style="width: 300px;" type="text" name="bill_ref" size="32" value="<?php echo($port['port_descr_circuit']); ?>"></td>
-  </tr>
-  <tr>
-    <td><strong>Notes</strong></td>
-    <td><input style="width: 300px;" type="textarea" name="bill_notes" size="32" value="<?php echo($port['port_descr_speed']); ?>"></td>
-  </tr>
-
-  <tr>
-    <td></td><td><input type="submit" class="submit" name="Submit" value=" Add Bill "></td>
-  </tr>
-  </table>
- </div>
+        </select>
+      </div>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Optional Information</legend>
+    <div class="control-group">
+      <label class="control-label" for="bill_custid"><strong>Customer&nbsp;Reference</strong></label>
+      <div class="controls">
+        <input class="span4" type="text" name="bill_custid">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="bill_ref"><strong>Billing Reference</strong></label>
+      <div class="controls">
+        <input class="span4" type="text" name="bill_ref" value="<?php echo($port['port_descr_circuit']); ?>">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="bill_notes"><strong>Notes</strong></label>
+      <div class="controls">
+        <input class="span4" type="textarea" name="bill_notes" value="<?php echo($port['port_descr_speed']); ?>">
+      </div>
+    </div>
+  </fieldset>
+  <div class="form-actions">
+    <!-- <button class="btn btn-danger"><i class="icon-ban-circle icon-white"></i> Cancel</button> //-->
+    <button type="submit" class="btn btn-primary"><i class="icon-ok-sign icon-white"></i> <strong>Add Bill</strong></button>
+  </div>
 </form>
 
 <?php
@@ -224,6 +261,6 @@ for ($x=1;$x<32;$x++) {
   echo("</table>");
 }
 
-echo("</td></tr></table>");
+//echo("</td></tr></table>");
 
 ?>
