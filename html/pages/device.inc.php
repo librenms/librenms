@@ -37,11 +37,11 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
 
   echo('<div class="tabBox">');
 
-  echo('<ul class="tabs">');
-
   if (device_permitted($device['device_id']))
   {
-    if ($config['show_overview_tab'])
+  echo('<ul class="tabs">');
+
+   if ($config['show_overview_tab'])
     {
       echo('
   <li class="' . $select['overview'] . '">
