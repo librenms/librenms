@@ -61,6 +61,7 @@ if (!$auth)
 	  showOn: 'button',
 	  buttonImage: 'images/16/date.png',
           buttonImageOnly: true,
+	  dateFormat: 'yy-mm-dd',
           hourGrid: 4,
           minuteGrid: 10,
           onClose: function(dateText, inst) {
@@ -88,6 +89,7 @@ if (!$auth)
           showOn: 'button',
           buttonImage: 'images/16/date.png',
           buttonImageOnly: true,
+	  dateFormat: 'yy-mm-dd',
           hourGrid: 4,
           minuteGrid: 10,
           maxDate: 0,
@@ -138,8 +140,6 @@ if (!$auth)
     </style>
   ");
 
-
-
   print_optionbar_start();
 
   $thumb_array = array('sixhour' => '6 Hours', 'day' => '24 Hours', 'twoday' => '48 Hours', 'week' => 'One Week', 'twoweek' => 'Two Weeks',
@@ -181,8 +181,8 @@ if (!$auth)
   ");
   echo("<input type=hidden id='selfaction' value='" . $_SERVER['PHP_SELF'] . "'>");
   echo("
-    <strong>From:</strong> <input type='text' id='dtpickerfrom' maxlength=16 value='" . date('m/d/Y H:m', $graph_array['from']) . "'>
-    <strong>To:</strong> <input type='text' id='dtpickerto' maxlength=16 value='" . date('m/d/Y H:m', $graph_array['to']) . "'>
+    <strong>From:</strong> <input type='text' id='dtpickerfrom' maxlength=16 value='" . date('Y-m-d H:j', $graph_array['from']) . "'>
+    <strong>To:</strong> <input type='text' id='dtpickerto' maxlength=16 value='" . date('Y-m-d H:j', $graph_array['to']) . "'>
     <input type='submit' id='submit' value='Update' onclick='javascript:submitCustomRange(this.form);'>
     </p>
     </form>
