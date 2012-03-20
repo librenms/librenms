@@ -32,7 +32,7 @@ $mem_rrd   = $host_rrd . "/ucd_mem.rrd";
 #UCD-SNMP-MIB::ssRawSwapIn.0 = Counter32: 602002
 #UCD-SNMP-MIB::ssRawSwapOut.0 = Counter32: 937422
 
-$ss = snmpwalk_cache_oid($device, "systemStats", array());
+$ss = snmpwalk_cache_oid($device, "systemStats", array(), "UCD-SNMP-MIB");
 $ss = $ss[0]; ### Insert Nazi joke here.
 
 ## Create CPU RRD if it doesn't already exist
