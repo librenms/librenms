@@ -1,5 +1,7 @@
 <?php
 
+print_r($vars);
+
 unset($vars['page']);
 
 ### Setup here
@@ -119,8 +121,8 @@ if (!$auth)
       function submitCustomRange(frmdata){
         var reto = /to=([0-9])+/g;
         var refrom = /from=([0-9])+/g;
-	var tsto = new Date(frmdata.dtpickerto.value);
-	var tsfrom = new Date(frmdata.dtpickerfrom.value);
+	var tsto = new Date(frmdata.dtpickerto.value.replace(' ','T'));
+	var tsfrom = new Date(frmdata.dtpickerfrom.value.replace(' ','T'));
         tsto = tsto.getTime() / 1000;
         tsfrom = tsfrom.getTime() / 1000;
         frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
