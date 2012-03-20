@@ -1,13 +1,16 @@
 <?php
 
-$from     = mres($_GET['from']);
-$to       = mres($_GET['to']);
 $width    = mres($_GET['width']);
 $height   = mres($_GET['height']);
 $title    = mres($_GET['title']);
 $vertical = mres($_GET['vertical']);
 $legend   = mres($_GET['legend']);
 $id       = mres($_GET['id']);
+
+$from     = (isset($_GET['from']) ? mres($_GET['from']) : time() - 60*60*24);
+$to       = (isset($_GET['to']) ? mres($_GET['to']) : time());
+
+if ($from < 0) { $from = $to + $from; }
 
 $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 
