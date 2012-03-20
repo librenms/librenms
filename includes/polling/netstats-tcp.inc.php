@@ -27,7 +27,7 @@ if ($device['os'] != "Snom")
   $snmpstring .= " tcpHCInSegs.0";
   $snmpstring .= " tcpHCOutSegs.0";
 
-  $data = snmp_get_multi($device, $snmpstring);
+  $data = snmp_get_multi($device, $snmpstring, NULL, "TCP-MIB");
 
   $rrdupdate = "N";
 

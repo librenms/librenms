@@ -22,7 +22,7 @@ if ($device['os'] != "Snom")
     $snmpstring .= " UDP-MIB::".$oid.".0";
   }
 
-  $data = snmp_get_multi($device, $snmpstring);
+  $data = snmp_get_multi($device, $snmpstring, NULL, "UDP-MIB");
 
   $rrdupdate = "N";
 

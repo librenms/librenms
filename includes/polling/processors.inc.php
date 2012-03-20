@@ -9,7 +9,7 @@ foreach (dbFetchRows("SELECT * FROM processors WHERE device_id = ?", array($devi
   {
     include($file);
   } else {
-    $proc = snmp_get ($device, $processor['processor_oid'], "-O Uqnv");
+    $proc = snmp_get ($device, $processor['processor_oid'], "-O Uqnv", "\"\"");
   }
 
   $procrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("processor-" . $processor['processor_type'] . "-" . $processor['processor_index'] . ".rrd");

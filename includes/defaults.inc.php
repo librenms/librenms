@@ -41,7 +41,15 @@ $config['sfdp']           = "/usr/bin/sfdp";
 
 if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
 {
+  if (strpos($_SERVER["SERVER_NAME"] , ":"))
+  {
+    # Litteral IPv6
+    $config['base_url']  = "http://[" . $_SERVER["SERVER_NAME"] ."]:".$_SERVER["SERVER_PORT"]."/";
+  }
+  else
+  {
   $config['base_url']  = "http://" . $_SERVER["SERVER_NAME"] .":".$_SERVER["SERVER_PORT"]."/";
+  }
 }
 
 $config['title_image']      = "images/observium-logo.png";
@@ -194,6 +202,7 @@ $config['nfsen_enable'] = 0;
 #$config['nfsen_suffix']   = "_yourdomain_com";
 
 ### Ignores & Allows
+# Has to be lowercase
 
 $config['bad_if'][] = "voip-null";
 $config['bad_if'][] = "virtual-";

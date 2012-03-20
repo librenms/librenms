@@ -321,30 +321,6 @@ function is_odd($number)
   return $number & 1; // 0 = even, 1 = odd
 }
 
-function isValidInterface($if)
-{
-      global $config;
-
-      $if = strtolower($if);
-      $nullintf = 0;
-      foreach ($config['bad_if'] as $bi)
-      {
-        $pos = strpos($if, $bi);
-        if ($pos !== FALSE)
-        {
-          $nullintf = 1;
-          echo("$if matched $bi \n");
-        }
-      }
-      if (preg_match('/serial[0-9]:/', $if)) { $nullintf = '1'; }
-      if ($nullintf != '1')
-      {
-        return 1;
-      } else {
-        return 0;
-      }
-}
-
 function utime()
 {
   $time = explode(" ", microtime());
