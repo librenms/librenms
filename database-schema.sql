@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `alerts` (
   `time_logged` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `alerted` smallint(6) NOT NULL DEFAULT '0',
   KEY `id` (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `applications` (
   `device_id` int(11) NOT NULL,
   `app_type` varchar(64) NOT NULL,
   PRIMARY KEY (`app_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `authlog` (
   `address` text NOT NULL,
   `result` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `bgpPeers` (
   `bgpPeerInUpdateElapsedTime` int(11) NOT NULL,
   PRIMARY KEY (`bgpPeer_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `bgpPeers_cbgp` (
   `afi` varchar(16) NOT NULL,
   `safi` varchar(16) NOT NULL,
   KEY `device_id` (`device_id`,`bgpPeerIdentifier`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -91,31 +91,30 @@ CREATE TABLE IF NOT EXISTS `bgpPeers_cbgp` (
 -- Table structure for table `bills`
 --
 
-DROP TABLE IF EXISTS `bills`;
 CREATE TABLE IF NOT EXISTS `bills` (
-  `bill_id` int(11) NOT NULL AUTO_INCREMENT,
+  `bill_id` int(11) NOT NULL auto_increment,
   `bill_name` text NOT NULL,
   `bill_type` text NOT NULL,
-  `bill_cdr` int(11) DEFAULT NULL,
-  `bill_day` int(11) NOT NULL DEFAULT '1',
-  `bill_gb` int(11) DEFAULT NULL,
-  `rate_95th_in` int(11) NOT NULL,
-  `rate_95th_out` int(11) NOT NULL,
-  `rate_95th` int(11) NOT NULL,
+  `bill_cdr` bigint(20) default NULL,
+  `bill_day` int(11) NOT NULL default '1',
+  `bill_quota` bigint(20) default NULL,
+  `rate_95th_in` bigint(20) NOT NULL,
+  `rate_95th_out` bigint(20) NOT NULL,
+  `rate_95th` bigint(20) NOT NULL,
   `dir_95th` varchar(3) NOT NULL,
-  `total_data` int(11) NOT NULL,
-  `total_data_in` int(11) NOT NULL,
-  `total_data_out` int(11) NOT NULL,
-  `rate_average_in` int(11) NOT NULL,
-  `rate_average_out` int(11) NOT NULL,
-  `rate_average` int(11) NOT NULL,
+  `total_data` bigint(20) NOT NULL,
+  `total_data_in` bigint(20) NOT NULL,
+  `total_data_out` bigint(20) NOT NULL,
+  `rate_average_in` bigint(20) NOT NULL,
+  `rate_average_out` bigint(20) NOT NULL,
+  `rate_average` bigint(20) NOT NULL,
   `bill_last_calc` datetime NOT NULL,
   `bill_custid` varchar(64) NOT NULL,
   `bill_ref` varchar(64) NOT NULL,
   `bill_notes` varchar(256) NOT NULL,
   `bill_autoadded` tinyint(1) NOT NULL,
   UNIQUE KEY `bill_id` (`bill_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;
 -- --------------------------------------------------------
 
 --
@@ -131,7 +130,7 @@ CREATE TABLE IF NOT EXISTS `bill_data` (
   `in_delta` bigint(11) NOT NULL,
   `out_delta` bigint(11) NOT NULL,
   KEY `bill_id` (`bill_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -143,7 +142,7 @@ DROP TABLE IF EXISTS `bill_perms`;
 CREATE TABLE IF NOT EXISTS `bill_perms` (
   `user_id` int(11) NOT NULL,
   `bill_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -156,7 +155,7 @@ CREATE TABLE IF NOT EXISTS `bill_ports` (
   `bill_id` int(11) NOT NULL,
   `port_id` int(11) NOT NULL,
   `bill_port_autoadded` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -182,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `cef_switching` (
   `updated_prev` int(11) NOT NULL,
   PRIMARY KEY (`cef_switching_id`),
   UNIQUE KEY `device_id` (`device_id`,`entPhysicalIndex`,`afi`,`cef_index`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -199,7 +198,7 @@ CREATE TABLE IF NOT EXISTS `customers` (
   `level` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`customer_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -211,7 +210,7 @@ DROP TABLE IF EXISTS `dbSchema`;
 CREATE TABLE IF NOT EXISTS `dbSchema` (
   `revision` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`revision`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -255,7 +254,7 @@ CREATE TABLE IF NOT EXISTS `devices` (
   KEY `hostname` (`hostname`),
   KEY `sysName` (`sysName`),
   KEY `os` (`os`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -271,7 +270,7 @@ CREATE TABLE IF NOT EXISTS `devices_attribs` (
   `attrib_value` text NOT NULL,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`attrib_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -285,7 +284,7 @@ CREATE TABLE IF NOT EXISTS `devices_perms` (
   `device_id` int(11) NOT NULL,
   `access_level` int(4) NOT NULL DEFAULT '0',
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -297,7 +296,7 @@ DROP TABLE IF EXISTS `device_graphs`;
 CREATE TABLE IF NOT EXISTS `device_graphs` (
   `device_id` int(11) NOT NULL,
   `graph` varchar(32) COLLATE utf8_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -328,7 +327,7 @@ CREATE TABLE IF NOT EXISTS `entPhysical` (
   `ifIndex` int(11) DEFAULT NULL,
   PRIMARY KEY (`entPhysical_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -346,7 +345,7 @@ CREATE TABLE IF NOT EXISTS `eventlog` (
   `reference` varchar(64) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`event_id`),
   KEY `host` (`host`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -364,7 +363,7 @@ CREATE TABLE IF NOT EXISTS `graph_types` (
   KEY `graph_type` (`graph_type`),
   KEY `graph_subtype` (`graph_subtype`),
   KEY `graph_section` (`graph_section`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -382,7 +381,7 @@ CREATE TABLE IF NOT EXISTS `graph_types_dead` (
   KEY `graph_type` (`graph_type`),
   KEY `graph_subtype` (`graph_subtype`),
   KEY `graph_section` (`graph_section`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -402,7 +401,7 @@ CREATE TABLE IF NOT EXISTS `hrDevice` (
   `hrProcessorLoad` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`hrDevice_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -419,7 +418,7 @@ CREATE TABLE IF NOT EXISTS `ipv4_addresses` (
   `interface_id` int(11) NOT NULL,
   PRIMARY KEY (`ipv4_address_id`),
   KEY `interface_id` (`interface_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -433,7 +432,7 @@ CREATE TABLE IF NOT EXISTS `ipv4_mac` (
   `mac_address` varchar(32) CHARACTER SET latin1 NOT NULL,
   `ipv4_address` varchar(32) CHARACTER SET latin1 NOT NULL,
   KEY `interface_id` (`interface_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -446,7 +445,7 @@ CREATE TABLE IF NOT EXISTS `ipv4_networks` (
   `ipv4_network_id` int(11) NOT NULL AUTO_INCREMENT,
   `ipv4_network` varchar(64) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`ipv4_network_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -465,7 +464,7 @@ CREATE TABLE IF NOT EXISTS `ipv6_addresses` (
   `interface_id` int(11) NOT NULL,
   PRIMARY KEY (`ipv6_address_id`),
   KEY `interface_id` (`interface_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -478,7 +477,7 @@ CREATE TABLE IF NOT EXISTS `ipv6_networks` (
   `ipv6_network_id` int(11) NOT NULL AUTO_INCREMENT,
   `ipv6_network` varchar(64) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`ipv6_network_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -492,7 +491,7 @@ CREATE TABLE IF NOT EXISTS `juniAtmVp` (
   `interface_id` int(11) NOT NULL,
   `vp_id` int(11) NOT NULL,
   `vp_descr` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -514,7 +513,7 @@ CREATE TABLE IF NOT EXISTS `links` (
   PRIMARY KEY (`id`),
   KEY `src_if` (`local_interface_id`),
   KEY `dst_if` (`remote_interface_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -552,7 +551,7 @@ CREATE TABLE IF NOT EXISTS `mac_accounting` (
   `poll_period` int(11) DEFAULT NULL,
   PRIMARY KEY (`ma_id`),
   KEY `interface_id` (`interface_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -578,7 +577,7 @@ CREATE TABLE IF NOT EXISTS `mempools` (
   `mempool_lowestfree` bigint(16) DEFAULT NULL,
   PRIMARY KEY (`mempool_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -600,7 +599,7 @@ CREATE TABLE IF NOT EXISTS `ospf_areas` (
   `ospfAreaSummary` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
   `ospfAreaStatus` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
   UNIQUE KEY `device_area` (`device_id`,`ospfAreaId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -627,7 +626,7 @@ CREATE TABLE IF NOT EXISTS `ospf_instances` (
   `ospfExitOverflowInterval` int(11) DEFAULT NULL,
   `ospfDemandExtensions` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
   UNIQUE KEY `device_id` (`device_id`,`ospf_instance_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -652,7 +651,7 @@ CREATE TABLE IF NOT EXISTS `ospf_nbrs` (
   `ospfNbmaNbrPermanence` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `ospfNbrHelloSuppressed` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   UNIQUE KEY `device_id` (`device_id`,`ospf_nbr_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -686,7 +685,7 @@ CREATE TABLE IF NOT EXISTS `ospf_ports` (
   `ospfIfDemand` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
   `ospfIfAuthType` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
   UNIQUE KEY `device_id` (`device_id`,`ospf_port_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -702,7 +701,7 @@ CREATE TABLE IF NOT EXISTS `perf_times` (
   `duration` double(8,2) NOT NULL,
   `devices` int(11) NOT NULL,
   KEY `type` (`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -785,7 +784,7 @@ CREATE TABLE IF NOT EXISTS `ports` (
   PRIMARY KEY (`interface_id`),
   UNIQUE KEY `device_ifIndex` (`device_id`,`ifIndex`),
   KEY `if_2` (`ifDescr`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -815,7 +814,7 @@ CREATE TABLE IF NOT EXISTS `ports_adsl` (
   `adslAturCurrOutputPwr` decimal(5,1) NOT NULL,
   `adslAturCurrAttainableRate` int(11) NOT NULL,
   UNIQUE KEY `interface_id` (`interface_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -828,7 +827,7 @@ CREATE TABLE IF NOT EXISTS `ports_perms` (
   `user_id` int(11) NOT NULL,
   `interface_id` int(11) NOT NULL,
   `access_level` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -843,7 +842,7 @@ CREATE TABLE IF NOT EXISTS `ports_stack` (
   `interface_id_low` int(11) NOT NULL,
   `ifStackStatus` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   UNIQUE KEY `device_id` (`device_id`,`interface_id_high`,`interface_id_low`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -858,7 +857,7 @@ CREATE TABLE IF NOT EXISTS `port_in_measurements` (
   `counter` bigint(11) NOT NULL,
   `delta` bigint(11) NOT NULL,
   KEY `port_id` (`port_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -873,7 +872,7 @@ CREATE TABLE IF NOT EXISTS `port_out_measurements` (
   `counter` bigint(11) NOT NULL,
   `delta` bigint(11) NOT NULL,
   KEY `port_id` (`port_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -895,7 +894,7 @@ CREATE TABLE IF NOT EXISTS `processors` (
   `processor_precision` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`processor_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -912,7 +911,7 @@ CREATE TABLE IF NOT EXISTS `pseudowires` (
   `cpwVcID` int(11) NOT NULL,
   `cpwOid` int(11) NOT NULL,
   PRIMARY KEY (`pseudowire_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -943,7 +942,7 @@ CREATE TABLE IF NOT EXISTS `sensors` (
   KEY `sensor_host` (`device_id`),
   KEY `sensor_class` (`sensor_class`),
   KEY `sensor_type` (`sensor_type`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -967,7 +966,7 @@ CREATE TABLE IF NOT EXISTS `services` (
   `service_disabled` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`service_id`),
   KEY `service_host` (`device_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -991,7 +990,7 @@ CREATE TABLE IF NOT EXISTS `storage` (
   `storage_perc_warn` int(11) DEFAULT '60',
   PRIMARY KEY (`storage_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1013,7 +1012,7 @@ CREATE TABLE IF NOT EXISTS `syslog` (
   PRIMARY KEY (`seq`),
   KEY `datetime` (`timestamp`),
   KEY `device_id` (`device_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1033,7 +1032,7 @@ CREATE TABLE IF NOT EXISTS `toner` (
   `toner_current` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`toner_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1049,7 +1048,7 @@ CREATE TABLE IF NOT EXISTS `ucd_diskio` (
   `diskio_descr` varchar(32) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`diskio_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1069,7 +1068,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `can_modify_passwd` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1085,7 +1084,7 @@ CREATE TABLE IF NOT EXISTS `users_prefs` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_id.pref` (`user_id`,`pref`),
   KEY `pref` (`pref`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1102,7 +1101,7 @@ CREATE TABLE IF NOT EXISTS `vlans` (
   `vlan_descr` text,
   PRIMARY KEY (`vlan_id`),
   KEY `device_id` (`device_id`,`vlan_vlan`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1124,7 +1123,7 @@ CREATE TABLE IF NOT EXISTS `vminfo` (
   PRIMARY KEY (`id`),
   KEY `device_id` (`device_id`),
   KEY `vmwVmVMID` (`vmwVmVMID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1145,7 +1144,7 @@ CREATE TABLE IF NOT EXISTS `vmware_vminfo` (
   PRIMARY KEY (`id`),
   KEY `device_id` (`device_id`),
   KEY `vmwVmVMID` (`vmwVmVMID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1163,7 +1162,7 @@ CREATE TABLE IF NOT EXISTS `vrfs` (
   `device_id` int(11) NOT NULL,
   PRIMARY KEY (`vrf_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `bill_history` (
@@ -1191,9 +1190,9 @@ CREATE TABLE IF NOT EXISTS `bill_history` (
   PRIMARY KEY (`bill_hist_id`),
   UNIQUE KEY `unique_index` (`bill_id`,`bill_datefrom`,`bill_dateto`),
   KEY `bill_id` (`bill_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
 
-CREATE TABLE IF NOT EXISTS `entPhysical_state` (  `device_id` int(11) NOT NULL,  `entPhysicalIndex` varchar(64) NOT NULL,  `subindex` varchar(64) DEFAULT NULL,  `group` varchar(64) NOT NULL,  `key` varchar(64) NOT NULL,  `value` varchar(255) NOT NULL,  KEY `device_id_index` (`device_id`,`entPhysicalIndex`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `entPhysical_state` (  `device_id` int(11) NOT NULL,  `entPhysicalIndex` varchar(64) NOT NULL,  `subindex` varchar(64) DEFAULT NULL,  `group` varchar(64) NOT NULL,  `key` varchar(64) NOT NULL,  `value` varchar(255) NOT NULL,  KEY `device_id_index` (`device_id`,`entPhysicalIndex`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `ports_vlans` (
   `port_vlan_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1206,7 +1205,7 @@ CREATE TABLE IF NOT EXISTS `ports_vlans` (
   `cost` int(11) NOT NULL,
   PRIMARY KEY (`port_vlan_id`),
   UNIQUE KEY `unique` (`device_id`,`interface_id`,`vlan`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
 
 --
 -- Table structure for table `netscaler_vservers`
@@ -1226,4 +1225,4 @@ CREATE TABLE IF NOT EXISTS `netscaler_vservers` (
   `vsvr_bps_in` int(11) NOT NULL,
   `vsvr_bps_out` int(11) NOT NULL,
   PRIMARY KEY (`vsvr_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
