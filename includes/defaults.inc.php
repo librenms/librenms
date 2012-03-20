@@ -347,7 +347,7 @@ $config['auth_ldap_groups']['support']['level'] = 1;
 $config['astext'][65333] = "Cymru Bogon Feed";
 
 ### What should we warn about?
-$config['warn']['ifdown'] = false;
+$config['warn']['ifdown'] = true;
 
 ## List of poller modules. Need to be in the array to be
 ## considered for execution.
