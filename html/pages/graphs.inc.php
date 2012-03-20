@@ -181,8 +181,8 @@ if (!$auth)
   ");
   echo("<input type=hidden id='selfaction' value='" . $_SERVER['PHP_SELF'] . "'>");
   echo("
-    <strong>From:</strong> <input type='text' id='dtpickerfrom' maxlength=16 value='" . date('Y-m-d H:j', $graph_array['from']) . "'>
-    <strong>To:</strong> <input type='text' id='dtpickerto' maxlength=16 value='" . date('Y-m-d H:j', $graph_array['to']) . "'>
+    <strong>From:</strong> <input type='text' id='dtpickerfrom' maxlength=16 value='" . date('Y-m-d H:i', $graph_array['from']) . "'>
+    <strong>To:</strong> <input type='text' id='dtpickerto' maxlength=16 value='" . date('Y-m-d H:i', $graph_array['to']) . "'>
     <input type='submit' id='submit' value='Update' onclick='javascript:submitCustomRange(this.form);'>
     </p>
     </form>
