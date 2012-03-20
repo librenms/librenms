@@ -1,7 +1,5 @@
 <?php
 
-print_r($vars);
-
 unset($vars['page']);
 
 ### Setup here
