@@ -2,7 +2,6 @@
 
   if (is_file($config['install_dir'] . "/includes/polling/os/".$device['os'].".inc.php"))
   {
-echo "os = /includes/polling/os/".$device['os'].".inc.php\n";
     /// OS Specific
     include($config['install_dir'] . "/includes/polling/os/".$device['os'].".inc.php");
   }

@@ -2,7 +2,6 @@
 
 if (preg_match('/^Cisco IOS Software, .+? Software \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result))
 {
-
 	$features = $regexp_result[1];
 	$version = $regexp_result[2];
 }
