@@ -10,7 +10,7 @@ echo("
      <span style='color: #990000; font-weight: bold;'>
        <span style='font-size: 16px; font-weight: bold;'>Error</span>
        <br />
-       <span style='font-size: 12px;'>You have insufficent permissions to view this page.</span>
+       <span style='font-size: 12px;'>You have insufficient permissions to view this page.</span>
      </span>
    </td>
    </tr></table>");
