@@ -98,6 +98,7 @@ $config['alerts']['email']['default']      = NULL;    ## Default alert recipient
 $config['alerts']['email']['default_only'] = FALSE;   ## Only use default recipient
 $config['alerts']['email']['enable']       = TRUE;    ## Enable email alerts
 $config['alerts']['bgp']['whitelist']      = NULL;    ## Populate as an array() with ASNs to alert on.
+$config['alerts']['port']['ifdown']	   = FALSE;   ## Generate alerts for ports that go down
 
 ### Port bandwidth threshold percentage %age utilisation above this will cause an alert
 
@@ -352,8 +353,8 @@ $config['auth_ldap_groups']['support']['level'] = 1;
 ### Hardcoded ASN descriptions
 $config['astext'][65333] = "Cymru Bogon Feed";
 
-### What should we warn about?
-$config['warn']['ifdown'] = false;
+### Warnings on front page
+$config['warn']['ifdown'] = TRUE;    ## Show down interfaces
 
 
 ## List of poller modules. Need to be in the array to be
