@@ -234,6 +234,11 @@ $config['bad_if'][] = "span rp";
 $config['bad_if'][] = "span sp";
 $config['bad_if'][] = "sslvpn";
 $config['bad_if'][] = "pppoe-";
+$config['bad_if'][] = "voiceencap";
+$config['bad_if'][] = "voicefxo";
+$config['bad_if'][] = "voicefxs";
+$config['bad_if'][] = "voiceoveratm";
+$config['bad_if'][] = "voiceoverframerelay";
 #$config['bad_if'][] = "control plane";  ## Example for cisco control plane
 
 $config['bad_if_regexp'][] = "/serial[0-9]:/";
@@ -348,7 +353,8 @@ $config['auth_ldap_groups']['support']['level'] = 1;
 $config['astext'][65333] = "Cymru Bogon Feed";
 
 ### What should we warn about?
-$config['warn']['ifdown'] = true;
+$config['warn']['ifdown'] = false;
+
 
 ## List of poller modules. Need to be in the array to be
 ## considered for execution.
