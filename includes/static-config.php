@@ -1105,7 +1105,7 @@ if (isset($config['cdp_autocreate']))
 
 if (!isset($config['mibdir']))
 {
-  $config['mibdir'] =  $config['install_dir']."/mibs/";
+  $config['mibdir'] =  $config['install_dir']."/mibs";
 }
 $config['mib_dir'] = $config['mibdir'];
 
