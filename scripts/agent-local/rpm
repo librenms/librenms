@@ -1,0 +1,6 @@
+#!/bin/bash
+if [ -x /bin/rpm ]; then
+  echo "<<<rpm>>>"
+  /bin/rpm -q --all --queryformat '%{N} %{V} %{R} %{ARCH} %{SIZE}\n'
+fi
+
