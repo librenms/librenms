@@ -215,6 +215,15 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
+    if ($config['poller_modules']['unix-agent'] && @dbFetchCell("SELECT COUNT(*) FROM `packages` WHERE device_id = '".$device['device_id']."'") > '0')
+    {
+      echo('<li class="' . $select['packages'] . '">
+    <a href="'.generate_device_url($device, array('tab' => 'packages')).'">
+      <img src="images/16/box.png" align="absmiddle" border="0" /> Packages
+    </a>
+  </li>');
+    }
+
     if ($config['enable_inventory'] && @dbFetchCell("SELECT * FROM `entPhysical` WHERE device_id = '".$device['device_id']."'") > '0')
     {
       echo('<li class="' . $select['entphysical'] . '">
