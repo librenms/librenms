@@ -457,6 +457,15 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 }
 ?>
 
+    <li><a href="<?php echo(generate_url(array('page'=>'packages'))); ?>" class="drop"><img src="images/16/box.png" border="0" align="absmiddle" /> Packages</a>
+      <div class="dropdown_1column">
+        <div class="col_1">
+          <ul>
+            <li><a href="<?php echo(generate_url(array('page'=>'packages'))); ?>"><img src="images/16/box.png" border="0" align="absmiddle" /> All Packages</a></li>
+          </ul>
+        </div>
+      </div>
+    </li>
     <li class="menu_right"><a href="#" class="drop"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System</a><!-- Begin Home Item -->
 
         <div class="dropdown_3columns align_right"><!-- Begin 2 columns container -->
@@ -492,12 +501,10 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
                   <img src="images/icons/flags/be.png"> <strong>Tom Laermans</strong> Developer<br />
                 </p>
             </div>
-
             <div class="col_1">
                 <h2>Settings</h2>
 <ul>
 <?php
-
 if ($_SESSION['userlevel'] >= '10')
 {
   echo('
