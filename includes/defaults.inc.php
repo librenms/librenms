@@ -388,6 +388,7 @@ $config['poller_modules']['cisco-ace-loadbalancer']       = 1;
 $config['poller_modules']['cisco-ace-serverfarms']	  = 1;
 $config['poller_modules']['netscaler-vsvr']               = 1;
 $config['poller_modules']['entity-physical']              = 1;
+$config['poller_modules']['unix-agent']                   = 0;
 
 ## List of discovery modules. Need to be in this array to be
 ## considered for execution.
