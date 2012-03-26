@@ -8,6 +8,11 @@ if (is_array($hrDevice_array))
 {
   foreach ($hrDevice_array as $index => $entry)
   {
+    # Workaround bsnmpd reporting CPUs as hrDeviceOther (fuck you, FreeBSD.)
+    if ($entry['hrDeviceType'] == "hrDeviceOther" && preg_match('/^cpu[0-9]+:/', $entry['hrDeviceDescr']))
+    {
+      $entry['hrDeviceType'] = "hrDeviceProcessor";
+    }
     if ($entry['hrDeviceType'] == "hrDeviceProcessor")
     {
       $hrDeviceIndex = $entry['hrDeviceIndex'];
