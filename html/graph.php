@@ -1,5 +1,15 @@
 <?php
 
+function utime()
+{
+  $time = explode(" ", microtime());
+  $usec = (double)$time[0];
+  $sec = (double)$time[1];
+  return $sec + $usec;
+}
+
+$start = utime();
+
 include_once("Net/IPv4.php");
 
 if (isset($_GET['debug']))
@@ -40,5 +50,10 @@ if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs'])
 }
 
 include("includes/graphs/graph.inc.php");
+
+$end = utime(); $run = $end - $start;;
+
+if($debug) { echo("runtime ".$run." secs"); }
+
 
 ?>
