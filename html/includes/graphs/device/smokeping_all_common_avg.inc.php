@@ -40,9 +40,10 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
 
   $filename = $config['smokeping']['dir'] . $filename;
   $rrd_options .= " DEF:median$i=".$filename.":median:AVERAGE ";
+  $rrd_options .= " CDEF:dm$i=median$i,UN,0,median$i,IF";
   $rrd_options .= " DEF:loss$i=".$filename.":loss:AVERAGE";
   $rrd_options .= " CDEF:ploss$i=loss$i,$pings,/,100,*";
-  $rrd_options .= " CDEF:dm$i=median$i";
+#  $rrd_options .= " CDEF:dm$i=median$i";
 #  $rrd_options .= " CDEF:dm$i=median$i,0,".$max->{$start}.",LIMIT";
 
   /// start emulate Smokeping::calc_stddev
@@ -81,6 +82,7 @@ $descr = str_replace(":", "\:", substr(str_pad("Average", $descr_len),0,$descr_l
 
   $rrd_options .= " CDEF:ploss_all=0".$ploss_list.",$i,/";
   $rrd_options .= " CDEF:dm_all=0".$dm_list.",$i,/";
+#  $rrd_options .= " CDEF:dm_all_clean=dm_all,UN,NaN,dm_all,IF";
   $rrd_options .= " CDEF:sd_all=0".$sd_list.",$i,/";
   $rrd_options .= " CDEF:dmlow_all=dm_all,sd_all,2,/,-";
 

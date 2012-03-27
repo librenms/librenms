@@ -103,6 +103,7 @@ if($vars['view'] == "incoming")
        foreach($smokeping_files['out'][$device['hostname']] AS $host)
        {
          $hostname = str_replace(".rrd", "", $host);
+	 list($hostname) = explode("~", $hostname);
          $host = device_by_name($hostname);
          if(is_numeric($host['device_id']))
          {
