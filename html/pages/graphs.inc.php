@@ -216,6 +216,19 @@ if (!$auth)
   echo(generate_graph_tag($graph_array));
   echo("</div>");
 
+  if(isset($config['graph_descr'][$vars['type']]))
+  {
+
+    print_optionbar_start();
+
+    echo('<div style="float: left; height: 100%;">
+          <div style="padding: 10px"><img src="images/16/information.png" /></div>
+          </div>');
+    echo($config['graph_descr'][$vars['type']]);
+    print_optionbar_end();
+
+  }
+
   if($vars['showcommand']) 
   {
     $_GET = $graph_array;

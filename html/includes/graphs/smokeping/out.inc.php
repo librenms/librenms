@@ -36,7 +36,7 @@ if($device['hostname'] == $config['own_hostname'])
 {
   $filename = $config['smokeping']['dir'] . $dest['hostname'].'.rrd';
 } else {
-  $filename = $config['smokeping']['dir'] . $device['hostname'] .'~'.$dest['hostname'].'.rrd';
+  $filename = $config['smokeping']['dir'] . $dest['hostname'] .'~'.$device['hostname'].'.rrd';
 }
 
   if (!isset($config['graph_colours'][$colourset][$iter])) { $iter = 0; }
