@@ -1,5 +1,12 @@
 <?php
 
+function data_uri($file, $mime) 
+{  
+  $contents = file_get_contents($file);
+  $base64   = base64_encode($contents); 
+  return ('data:' . $mime . ';base64,' . $base64);
+}
+
 $width    = mres($_GET['width']);
 $height   = mres($_GET['height']);
 $title    = mres($_GET['title']);
@@ -121,6 +128,7 @@ if ($error_msg) {
           $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
         } else {
           echo(`ls -l $graphfile`);
+          echo('<img src="'.data_uri($graphfile,'image/png').'" alt="graph" />');          
         }
         unlink($graphfile);
       }
