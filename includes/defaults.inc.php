@@ -237,11 +237,13 @@ $config['bad_if'][] = "sslvpn";
 $config['bad_if'][] = "pppoe-";
 #$config['bad_if'][] = "control plane";  ## Example for cisco control plane
 
-$config['bad_iftype'][] = "voiceencap";
-$config['bad_iftype'][] = "voicefxo";
-$config['bad_iftype'][] = "voicefxs";
-$config['bad_iftype'][] = "voiceoveratm";
-$config['bad_iftype'][] = "voiceoverframerelay";
+### Ignore ports based on ifType. Case-sensitive.
+
+$config['bad_iftype'][] = "voiceEncap";
+$config['bad_iftype'][] = "voiceFXA";
+$config['bad_iftype'][] = "voiceFXS";
+$config['bad_iftype'][] = "voiceOverAtm";
+$config['bad_iftype'][] = "voiceOverFrameRelay";
 
 $config['bad_if_regexp'][] = "/serial[0-9]:/";
 $config['bad_if_regexp'][] = "/^ng[0-9]+$/";
