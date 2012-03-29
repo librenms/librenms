@@ -97,13 +97,13 @@ if(!empty($agent_raw))
           dbInsert(array('device_id' => $device['device_id'], 'name' => $name, 'manager' => $manager,
                        'status' => 1, 'version' => $version, 'build' => $build, 'arch' => $arch, 'size' => $size), 'packages');
           echo("+".$name."-".$version."-".$build."-".$arch);
-	  log_event('Package installed: '.$name.' '.$arch.' version '.$version.'-'.$build.' '.$arch, $device, 'package');
+	  log_event('Package installed: '.$name.' ('.$arch.') version '.$version.'-'.$build, $device, 'package');
         } elseif(count($pkgs_db[$manager][$name][$arch], 1)) {
           $pkg_c = dbFetchRow("SELECT * FROM `packages` WHERE `device_id` = ? AND `manager` = ? AND `name` = ? and `arch` = ? ORDER BY version DESC, build DESC", array($device['device_id'], $manager, $name, $arch));
 	  echo("U(".$pkg_c['name']."-".$pkg_c['version']."-".$pkg_c['build']."|".$name."-".$version."-".$build.")");
           $pkg_update = array('version' => $version, 'build' => $build, 'status' => '1', 'size' => $size);
 	  dbUpdate($pkg_update, 'packages', '`pkg_id` = ?', array($pkg_c['pkg_id']));
-	  log_event('Package updated: '.$name.' '.$arch.' from '.$version.'-'.$build.' to '.$pkg_c['version'].'-'.$pkg_c['build'], $device, 'package');
+	  log_event('Package updated: '.$name.' ('.$arch.') from '.$pkg_c['version'].'-'.$pkg_c['build'] .' to '.$version.'-'.$build, $device, 'package');
           unset($pkgs_db_id[$pkg_c['pkg_id']]);
         }
       }
