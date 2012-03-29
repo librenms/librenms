@@ -611,6 +611,17 @@ function is_port_valid($port, $device)
         }
       }
     }
+    if (is_array($config['bad_iftype']))
+    {
+      foreach ($config['bad_iftype'] as $bi)
+      {
+      if (strstr($port['ifType'], $bi))
+        {
+          $valid = 0;
+          if ($debug) { echo("ignored ifType : ".$port['ifType']." (matched: ".$bi." )"); }
+        }
+      }
+    }
     if (empty($port['ifDescr'])) { $valid = 0; }
     if ($device['os'] == "catos" && strstr($if, "vlan")) { $valid = 0; }
   } else {
