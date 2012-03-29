@@ -240,7 +240,7 @@ $config['bad_if'][] = "pppoe-";
 ### Ignore ports based on ifType. Case-sensitive.
 
 $config['bad_iftype'][] = "voiceEncap";
-$config['bad_iftype'][] = "voiceFXA";
+$config['bad_iftype'][] = "voiceFXO";
 $config['bad_iftype'][] = "voiceFXS";
 $config['bad_iftype'][] = "voiceOverAtm";
 $config['bad_iftype'][] = "voiceOverFrameRelay";
