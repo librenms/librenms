@@ -221,7 +221,6 @@ $config['bad_if'][] = "container";
 $config['bad_if'][] = "async";
 $config['bad_if'][] = "plip";
 $config['bad_if'][] = "-physical";
-$config['bad_if'][] = "-signalling";
 $config['bad_if'][] = "container";
 $config['bad_if'][] = "unrouted";
 $config['bad_if'][] = "bri";
@@ -244,11 +243,14 @@ $config['bad_iftype'][] = "voiceFXO";
 $config['bad_iftype'][] = "voiceFXS";
 $config['bad_iftype'][] = "voiceOverAtm";
 $config['bad_iftype'][] = "voiceOverFrameRelay";
-
-$config['bad_if_regexp'][] = "/serial[0-9]:/";
+$config['bad_iftype'][] = "voiceOverIp";
+$config['bad_iftype'][] = "ds0";
+$config['bad_iftype'][] = "ds1";
+$config['bad_iftype'][] = "ds3";
+#$config['bad_iftype'][] = "isdn";     #show signaling traffic
+#$config['bad_iftype'][] = "lapd";      #show signaling traffic
 $config['bad_if_regexp'][] = "/^ng[0-9]+$/";
 $config['bad_if_regexp'][] = "/^sl[0-9]/";
-$config['bad_if_regexp'][] = "/^voice\ over\ ip\ peer/";
 
 $config['processor_filter'][] = "An electronic chip that makes the computer work.";
 
