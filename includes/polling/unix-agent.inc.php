@@ -40,7 +40,12 @@ if(!empty($agent_raw))
       $pkgs_db[$pkg_db['manager']][$pkg_db['name']][$pkg_db['arch']][$pkg_db['version']][$pkg_db['build']]['id'] = $pkg_db['pkg_id'];
       $pkgs_db[$pkg_db['manager']][$pkg_db['name']][$pkg_db['arch']][$pkg_db['version']][$pkg_db['build']]['status'] = $pkg_db['status'];
       $pkgs_db[$pkg_db['manager']][$pkg_db['name']][$pkg_db['arch']][$pkg_db['version']][$pkg_db['build']]['size'] = $pkg_db['size'];
-      $pkgs_db_id[$pkg_db['pkg_id']] = $pkg_db['manager'] ."-".$pkg_db['name']."-".$pkg_db['arch']."-".$pkg_db['version']."-".$pkg_db['build'];
+      $pkgs_db_id[$pkg_db['pkg_id']]['text'] = $pkg_db['manager'] ."-".$pkg_db['name']."-".$pkg_db['arch']."-".$pkg_db['version']."-".$pkg_db['build'];
+      $pkgs_db_id[$pkg_db['pkg_id']]['manager'] = $pkg_db['manager'];
+      $pkgs_db_id[$pkg_db['pkg_id']]['name']    = $pkg_db['name'];
+      $pkgs_db_id[$pkg_db['pkg_id']]['arch']    = $pkg_db['arch'];
+      $pkgs_db_id[$pkg_db['pkg_id']]['version'] = $pkg_db['version'];
+      $pkgs_db_id[$pkg_db['pkg_id']]['build']   = $pkg_db['build'];
     }
 
     foreach(explode("\n", $agent_data['rpm']) as $package) 
@@ -92,26 +97,35 @@ if(!empty($agent_raw))
           dbInsert(array('device_id' => $device['device_id'], 'name' => $name, 'manager' => $manager,
                        'status' => 1, 'version' => $version, 'build' => $build, 'arch' => $arch, 'size' => $size), 'packages');
           echo("+".$name."-".$version."-".$build."-".$arch);
+	  log_event('Package installed: '.$name.' '.$arch.' version '.$version.'-'.$build.' '.$arch, $device, 'package');
         } elseif(count($pkgs_db[$manager][$name][$arch], 1)) {
-          $pkg_c = dbFetchRow("SELECT * FROM `packages` WHERE `device_id` = ? AND `manager` = ? AND `name` = ? and `arch` = ? ORDER BY version DESC, build DESC", 
-                                    array($device['device_id'], $manager, $name, $arch));
+          $pkg_c = dbFetchRow("SELECT * FROM `packages` WHERE `device_id` = ? AND `manager` = ? AND `name` = ? and `arch` = ? ORDER BY version DESC, build DESC", array($device['device_id'], $manager, $name, $arch));
 	  echo("U(".$pkg_c['name']."-".$pkg_c['version']."-".$pkg_c['build']."|".$name."-".$version."-".$build.")");
           $pkg_update = array('version' => $version, 'build' => $build, 'status' => '1', 'size' => $size);
 	  dbUpdate($pkg_update, 'packages', '`pkg_id` = ?', array($pkg_c['pkg_id']));
+	  log_event('Package updated: '.$name.' '.$arch.' from '.$version.'-'.$build.' to '.$pkg_c['version'].'-'.$pkg_c['build'], $device, 'package');
           unset($pkgs_db_id[$pkg_c['pkg_id']]);
         }
       }
-       unset($pkg_update);
+      unset($pkg_update);
     }
   }
 
-  foreach($pkgs_db_id as $id => $text) 
+  foreach($pkgs_db_id as $id => $pkg) 
   {
     dbDelete('packages', "`pkg_id` =  ?", array($id));
-    echo("-".$text);
+    echo("-".$pkg['text']);
+    log_event('Package removed: '.$pkg['name'].' '.$pkg['arch'].' '.$pkg['version'].'-'.$pkg['build'], $device, 'package');
   }
 
 }
+
+ unset($pkg);
+ unset($pkgs_db_id);
+ unset($pkg_c);
+ unset($pkgs);
+ unset($pkgs_db);
+ unset($pkgs_db_db);
 
 echo("\n");
 
