@@ -235,12 +235,13 @@ $config['bad_if'][] = "span rp";
 $config['bad_if'][] = "span sp";
 $config['bad_if'][] = "sslvpn";
 $config['bad_if'][] = "pppoe-";
-$config['bad_if'][] = "voiceencap";
-$config['bad_if'][] = "voicefxo";
-$config['bad_if'][] = "voicefxs";
-$config['bad_if'][] = "voiceoveratm";
-$config['bad_if'][] = "voiceoverframerelay";
 #$config['bad_if'][] = "control plane";  ## Example for cisco control plane
+
+$config['bad_iftype'][] = "voiceencap";
+$config['bad_iftype'][] = "voicefxo";
+$config['bad_iftype'][] = "voicefxs";
+$config['bad_iftype'][] = "voiceoveratm";
+$config['bad_iftype'][] = "voiceoverframerelay";
 
 $config['bad_if_regexp'][] = "/serial[0-9]:/";
 $config['bad_if_regexp'][] = "/^ng[0-9]+$/";
