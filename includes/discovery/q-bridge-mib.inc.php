@@ -10,17 +10,15 @@ if ($vlanversion == 'version1')
 
   $vlans = snmp_walk($device, "dot1qVlanFdbId", "-Oqn", "Q-BRIDGE-MIB");
 
+  $vlan_array = snmpwalk_cache_multi_oid($device, "dot1qVlanStaticName", $vlan_array, "Q-BRIDGE-MIB");
+  
   foreach (explode("\n", $vlans) as $vlan_oid)
   {
     list($oid,$vlan_index) = explode(' ',$vlan_oid);
     $oid_ex = explode('.',$oid);
     $vlan = $oid_ex[count($oid_ex)-1];
 
-    $vlan_descr_cmd  = $config['snmpget'] . " -M " . $config['mibdir'] . " -m Q-BRIDGE-MIB -O nvq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
-    $vlan_descr_cmd .= "dot1qVlanStaticName.$vlan|grep -v \"No Such Instance currently exists at this OID\"";
-    $vlan_descr = shell_exec($vlan_descr_cmd);
-
-    $vlan_descr = trim(str_replace("\"", "", $vlan_descr));
+    $vlan_descr = trim(str_replace("\"", "", $vlan_array[$vlan]['dot1qVlanStaticName']));
 
     if (mysql_result(mysql_query("SELECT COUNT(vlan_id) FROM `vlans` WHERE `device_id` = '" . $device['device_id'] . "' AND `vlan_domain` = '' AND `vlan_vlan` = '" . $vlan . "'"), 0) == '0')
     {
