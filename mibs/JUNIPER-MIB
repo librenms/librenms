@@ -1,0 +1,1958 @@
+--
+-- Juniper Enterprise Specific MIB: Chassis MIB
+-- 
+-- Copyright (c) 1998-2008, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Gauge32, Counter32
+        FROM SNMPv2-SMI
+    DisplayString, TimeStamp, TimeInterval, TEXTUAL-CONVENTION, DateAndTime
+        FROM SNMPv2-TC
+    jnxMibs, jnxChassisTraps, jnxChassisOKTraps
+        FROM JUNIPER-SMI;
+
+jnxBoxAnatomy MODULE-IDENTITY
+
+    LAST-UPDATED "201010220000Z" -- Fri Oct 22 00:00:00 2008 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "The MIB modules representing Juniper Networks'
+	    implementation of enterprise specific MIBs 
+	    supported by a single SNMP agent."
+    REVISION      "201010220000Z"
+    DESCRIPTION
+               "Added load average variables"
+    REVISION      "200403230000Z"
+    DESCRIPTION
+               "Added chassis identification objects."
+    REVISION     "200406300000Z"    -- July 30, 2004
+    DESCRIPTION
+               "Added following new traps for chassis
+                alarm conditions: jnxFruFailed, jnxFruOffline
+                and jnxFruOnline."
+    REVISION     "200409170000Z"    -- Sep 17, 2004
+    DESCRIPTION
+               "Added new traps for chassis
+                alarm condition jnxFruCheck."
+    REVISION     "200507180000Z"    -- Jul 18, 2005
+    DESCRIPTION
+               "Added new fru type FEB in jnxFruType enumeration."
+    REVISION     "200507190000Z"    -- Jul 19, 2005
+    DESCRIPTION
+               "Added new offline reason pfeVersionMismatch
+                to jnxFruOfflineReason enumeration."
+    REVISION     "200611200000Z"    -- Nov 20, 2006
+    DESCRIPTION
+               "Added new offline reason fruFebOffline
+                to jnxFruOfflineReason enumeration."
+    REVISION     "200807310000Z"    -- Jul 31, 2008
+    DESCRIPTION
+               "Added jnxBoxSystemDomainType object."
+    REVISION     "200808010000Z"    -- Aug 01, 2008
+    DESCRIPTION
+               "Added new fru type PSD to jnxFruType enumeration and
+                added jcsX chassis IDs to JnxChassisId enumeration."
+    REVISION     "200812310000Z"    -- Dec 31, 2008
+    DESCRIPTION "Added nodeX chassis IDs to JnxChassisId enumeration."
+    REVISION     "200901090000Z"    -- Jan 09, 2009
+    DESCRIPTION 
+               "Added sfcX and lcc4-lcc15 chassis IDs to JnxChassisId
+                enumeration."
+
+
+
+    ::= { jnxMibs 1 }
+
+--
+-- Textual Conventions
+--
+
+JnxChassisId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Identifies a specific router chassis."
+    SYNTAX       INTEGER {
+                     unknown       (1),
+                     singleChassis (2),
+                     scc           (3),
+                     lcc0          (4),
+                     lcc1          (5),
+                     lcc2          (6),
+                     lcc3          (7),
+                     jcs1          (8),
+                     jcs2          (9),
+                     jcs3          (10),
+                     jcs4          (11),
+                     node0         (12),
+                     node1         (13),
+                     sfc0          (14),
+                     sfc1          (15),
+                     sfc2          (16),
+                     sfc3          (17),
+                     sfc4          (18),
+                     lcc4          (19),
+                     lcc5          (20),
+                     lcc6          (21),
+                     lcc7          (22),
+                     lcc8          (23),
+                     lcc9          (24),
+                     lcc10         (25),
+                     lcc11         (26),
+                     lcc12         (27),
+                     lcc13         (28),
+                     lcc14         (29),
+                     lcc15         (30),
+                     member0       (31),
+                     member1       (32),
+                     member2       (33),
+                     member3       (34),
+                     member4       (35),
+                     member5       (36),
+                     member6       (37),
+                     member7       (38)
+                 }
+
+
+
+-- Juniper Box Anatomy MIB
+--
+
+-- Top level objects
+
+    jnxBoxClass OBJECT-TYPE 
+	SYNTAX		OBJECT IDENTIFIER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	        "The class of the box, indicating which product line
+		the box is about, for example, 'Internet Router'."
+	::= { jnxBoxAnatomy 1 }
+
+    jnxBoxDescr OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The name, model, or detailed description of the box,
+		indicating which product the box is about, for example
+		'M40'."
+	::= { jnxBoxAnatomy 2 }
+
+    jnxBoxSerialNo OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The serial number of this subject, blank if unknown 
+		or unavailable."
+	::= { jnxBoxAnatomy 3 }
+
+    jnxBoxRevision OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The revision of this subject, blank if unknown or
+		unavailable."
+	::= { jnxBoxAnatomy 4 }
+
+    jnxBoxInstalled OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The value of sysUpTime when the subject was last
+		installed, up-and-running.  Zero if unknown or 
+		already up-and-running when the agent was up."
+	::= { jnxBoxAnatomy 5 }
+
+--
+-- Box Containers Table
+--
+
+    jnxContainersTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JnxContainersEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A list of containers entries."
+	::= { jnxBoxAnatomy 6 }
+
+    jnxContainersEntry OBJECT-TYPE
+	SYNTAX		JnxContainersEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry of containers table."
+	INDEX 	{ jnxContainersIndex }
+	::= { jnxContainersTable 1 }
+
+    JnxContainersEntry ::= SEQUENCE {
+	    jnxContainersIndex		Integer32,
+	    jnxContainersView		Integer32,
+	    jnxContainersLevel		Integer32,
+	    jnxContainersWithin		Integer32,
+	    jnxContainersType		OBJECT IDENTIFIER,
+	    jnxContainersDescr          DisplayString,
+	    jnxContainersCount		Integer32
+    }
+
+    jnxContainersIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The index for this entry."
+	::= { jnxContainersEntry 1 }
+
+    jnxContainersView OBJECT-TYPE
+	SYNTAX		Integer32 (1..63)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The view(s) from which the specific container
+		appears.
+
+		This variable indicates that the specific container
+		is embedded and accessible from the corresponding
+		view(s).
+
+		The value is a bit map represented as a sum.
+		If multiple bits are set, the specified
+		container(s) are located and accessible from 
+		that set of views.
+
+		The various values representing the bit positions
+		and its corresponding views are:
+		    1   front
+		    2   rear
+		    4   top
+		    8   bottom
+		   16   leftHandSide
+		   32   rightHandSide
+
+		Note 1: 
+		LefHandSide and rightHandSide are referred
+		to based on the view from the front.
+
+		Note 2: 
+		If the specified containers are scattered 
+		around various views, the numbering is according
+		to the following sequence:
+		    front -> rear -> top -> bottom
+			  -> leftHandSide -> rightHandSide
+		For each view plane, the numbering sequence is
+		first from left to right, and then from up to down.
+
+		Note 3: 
+		Even though the value in chassis hardware (e.g. 
+		slot number) may be labelled from 0, 1, 2, and up,
+		all the indices in MIB start with 1 (not 0) 
+		according to network management convention."
+	::= { jnxContainersEntry 2 }
+
+    jnxContainersLevel OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The abstraction level of the box or chassis.
+		It is enumerated from the outside to the inside, 
+		from the outer layer to the inner layer.
+		For example, top level (i.e. level 0) refers to 
+		chassis frame, level 1 FPC slot within chassis 
+		frame, level 2 PIC space within FPC slot."
+	::= { jnxContainersEntry 3 }
+
+    jnxContainersWithin OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The index of its next higher level container 
+		housing	this entry.  The associated 
+		jnxContainersIndex in the jnxContainersTable 
+		represents its next higher level container."
+	::= { jnxContainersEntry 4 }
+
+    jnxContainersType OBJECT-TYPE
+	SYNTAX		OBJECT IDENTIFIER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The type of this container."
+	::= { jnxContainersEntry 5 }
+
+    jnxContainersDescr OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The name or detailed description of this
+		subject."
+	::= { jnxContainersEntry 6 }
+
+    jnxContainersCount OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The maximum number of containers of this level
+		per container of the next higher level.  
+		e.g. if there are six level 2 containers in 
+		level 1 container, then jnxContainersCount for
+		level 2 is six."
+	::= { jnxContainersEntry 7 }
+
+--
+-- Box Contents Table
+--
+
+    jnxContentsLastChange OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The value of sysUpTime when the box contents 
+		table last changed.  Zero if unknown or already 
+		existing when the agent was up."
+	::= { jnxBoxAnatomy 7 }
+
+    jnxContentsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JnxContentsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A list of contents entries."
+	::= { jnxBoxAnatomy 8 }
+
+    jnxContentsEntry OBJECT-TYPE
+	SYNTAX		JnxContentsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry of contents table."
+	INDEX	{ jnxContentsContainerIndex, 
+		  jnxContentsL1Index,
+		  jnxContentsL2Index,
+		  jnxContentsL3Index }
+	::= { jnxContentsTable 1 }
+
+    JnxContentsEntry ::= SEQUENCE {
+	    jnxContentsContainerIndex	Integer32,
+	    jnxContentsL1Index          Integer32,
+	    jnxContentsL2Index          Integer32,
+	    jnxContentsL3Index          Integer32,
+	    jnxContentsType		OBJECT IDENTIFIER,
+	    jnxContentsDescr		DisplayString,
+	    jnxContentsSerialNo		DisplayString,
+	    jnxContentsRevision		DisplayString,
+	    jnxContentsInstalled	TimeStamp,
+            jnxContentsPartNo           DisplayString,
+            jnxContentsChassisId        JnxChassisId,
+            jnxContentsChassisDescr     DisplayString,
+            jnxContentsChassisCleiCode  DisplayString
+    }
+
+    jnxContentsContainerIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The associated jnxContainersIndex in the 
+		jnxContainersTable."
+	::= { jnxContentsEntry 1 }
+	
+    jnxContentsL1Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level one index of the container
+		housing this subject.  Zero if unavailable
+		or inapplicable."
+	::= { jnxContentsEntry 2 }
+
+    jnxContentsL2Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level two index of the container
+		housing this subject.  Zero if unavailable
+		or inapplicable."
+	::= { jnxContentsEntry 3 }
+
+    jnxContentsL3Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level three index of the container
+		housing this subject.  Zero if unavailable
+		or inapplicable."
+	::= { jnxContentsEntry 4 }
+
+    jnxContentsType OBJECT-TYPE
+	SYNTAX		OBJECT IDENTIFIER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The type of this subject.  zeroDotZero
+		if unknown."
+	::= { jnxContentsEntry 5 }
+
+    jnxContentsDescr OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The name or detailed description of this
+		subject."
+	::= { jnxContentsEntry 6 }
+
+    jnxContentsSerialNo OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The serial number of this subject, blank if 
+		unknown or unavailable."
+	::= { jnxContentsEntry 7 }
+
+    jnxContentsRevision OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The revision of this subject, blank if unknown 
+		or unavailable."
+	::= { jnxContentsEntry 8 }
+
+    jnxContentsInstalled OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The value of sysUpTime when the subject was last 
+		installed, up-and-running.  Zero if unknown
+		or already up-and-running when the agent was up."
+	::= { jnxContentsEntry 9 }
+
+    jnxContentsPartNo OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The part number of this subject, blank if unknown 
+		or unavailable."
+	::= { jnxContentsEntry 10 }
+
+    jnxContentsChassisId OBJECT-TYPE
+        SYNTAX          JnxChassisId
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Identifies the chassis on which the contents of this
+                row exists."
+        ::= { jnxContentsEntry 11 }
+
+    jnxContentsChassisDescr OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "A textual description of the chassis on which the
+                contents of this row exists."
+        ::= { jnxContentsEntry 12 }
+
+    jnxContentsChassisCleiCode OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The clei code of this subject, blank if unknown
+                 or unavailable.
+
+                 A CLEI code is an intelligent code that consists of 10
+                 alphanumeric characters with 4 data elements.  The first data
+                 element is considered the basic code with the first 2 characters
+                 indicating the technology or equipment type, and the third and
+                 fourth characters denoting the functional sub-category.  The
+                 second data element represents the features, and its three
+                 characters denote functional capabilities or changes.  The third
+                 data element has one character and denotes a reference to a
+                 manufacturer, system ID, specification, or drawing.  The fourth
+                 data element consists of two characters and contains complementary
+                 data.  These two characters provide a means of differentiating or
+                 providing uniqueness between the eight character CLEI codes by
+                 identifying the manufacturing vintage of the product.  Names are
+                 assigned via procedures defined in [GR485].
+
+                 The assigned maintenance agent for the CLEI code, Telcordia
+                 Technologies, is responsible for assigning certain equipment and
+                 other identifiers (e.g., location, manufacturer/supplier) for the
+                 telecommunications industry."
+        ::= { jnxContentsEntry 13 }
+
+--
+-- Box LED Indicators Table
+--
+
+    jnxLEDLastChange OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The value of sysUpTime when the box LED table 
+		last changed.  Zero if unknown or already at 
+		that state when the agent was up."
+	::= { jnxBoxAnatomy 9 }
+
+    jnxLEDTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JnxLEDEntry
+	MAX-ACCESS	not-accessible
+	STATUS		deprecated
+	DESCRIPTION
+		"A list of status entries."
+	::= { jnxBoxAnatomy 10 }
+
+    jnxLEDEntry OBJECT-TYPE
+	SYNTAX		JnxLEDEntry
+	MAX-ACCESS	not-accessible
+	STATUS		deprecated
+	DESCRIPTION
+		"An entry of status table."
+	INDEX 	{ jnxLEDAssociateTable,
+		  jnxLEDAssociateIndex,
+		  jnxLEDL1Index,
+		  jnxLEDL2Index,
+		  jnxLEDL3Index }
+	::= { jnxLEDTable 1 }
+
+    JnxLEDEntry ::= SEQUENCE {
+	    jnxLEDAssociateTable	INTEGER,
+	    jnxLEDAssociateIndex	Integer32,
+	    jnxLEDL1Index		Integer32,
+	    jnxLEDL2Index		Integer32,
+	    jnxLEDL3Index		Integer32,
+	    jnxLEDOriginator		OBJECT IDENTIFIER,
+	    jnxLEDDescr			DisplayString,
+	    jnxLEDState			INTEGER,
+	    jnxLEDStateOrdered		INTEGER
+    }
+
+    jnxLEDAssociateTable OBJECT-TYPE
+	SYNTAX		INTEGER {
+		other(1),
+		jnxContainersTable(2),
+		jnxContentsTable(3)
+	}
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The associated table that this entry is 
+		related."
+	::= { jnxLEDEntry 1 }
+
+    jnxLEDAssociateIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The index of the associated table that this
+		entry is related."
+	::= { jnxLEDEntry 2 }
+
+    jnxLEDL1Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The level one index of the associated
+		table that this entry is related.  Zero 
+		if unavailable or inapplicable."
+	::= { jnxLEDEntry 3 }
+
+    jnxLEDL2Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The level two index of the associated
+		table that this entry is related.  Zero 
+		if unavailable or inapplicable."
+	::= { jnxLEDEntry 4 }
+
+    jnxLEDL3Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The level three index of the associated
+		table that this entry is related.  Zero
+		if unavailable or inapplicable."
+	::= { jnxLEDEntry 5 }
+
+    jnxLEDOriginator OBJECT-TYPE
+	SYNTAX		OBJECT IDENTIFIER
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The originator of the this entry."
+	::= { jnxLEDEntry 6 }
+
+    jnxLEDDescr OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The name or detailed description of this subject."
+	::= { jnxLEDEntry 7 }
+
+    jnxLEDState OBJECT-TYPE
+	SYNTAX		INTEGER {
+		other(1),     -- unknown or unavailable
+		green(2),     -- ok, good, normally working,
+			      -- or on-line as a standby backup if
+			      -- there is an active primary
+		yellow(3),    -- alarm, warning, marginally working
+		red(4),	      -- alert, failed, not working
+		blue(5),      -- ok, on-line as an active primary
+		amber(6)      -- alarm, off-line, not running
+	}
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The state of the LED indicator."
+	::= { jnxLEDEntry 8 }
+
+    jnxLEDStateOrdered OBJECT-TYPE
+	SYNTAX		INTEGER {
+		blue(1),      -- ok, on-line as an active primary
+		green(2),     -- ok, good, normally working,
+			      -- or on-line as a standby backup if
+			      -- there is an active primary
+		amber(3),     -- alarm, off-line, not running
+		yellow(4),    -- alarm, warning, marginally working
+		red(5),	      -- alert, failed, not working
+		other(6)      -- unknown or unavailable
+	}
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The state of the LED indicator.  Identical to jnxLEDState, but
+                with enums ordered from 'most operational' to 'least
+                operational' states."
+	::= { jnxLEDEntry 9 }
+--
+-- Box Filled Status Table
+--
+-- This table show the empty/filled status of the container in the 
+-- box containers table.
+--
+
+    jnxFilledLastChange OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The value of sysUpTime when the box filled 
+		status table last changed.  Zero if unknown or
+		already at that state when the agent was up."
+	::= { jnxBoxAnatomy 11 }
+	
+    jnxFilledTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JnxFilledEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A list of filled status entries."
+	::= { jnxBoxAnatomy 12 }
+
+    jnxFilledEntry OBJECT-TYPE
+	SYNTAX		JnxFilledEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry of filled status table."
+	INDEX	{ jnxFilledContainerIndex,
+		  jnxFilledL1Index,
+		  jnxFilledL2Index,
+		  jnxFilledL3Index }
+	::= { jnxFilledTable 1 }
+
+    JnxFilledEntry ::= SEQUENCE {
+	    jnxFilledContainerIndex   	Integer32,
+	    jnxFilledL1Index          	Integer32,
+	    jnxFilledL2Index          	Integer32,
+	    jnxFilledL3Index          	Integer32,
+	    jnxFilledDescr              DisplayString,
+            jnxFilledState              INTEGER,
+            jnxFilledChassisId          JnxChassisId,
+            jnxFilledChassisDescr       DisplayString
+    }
+
+    jnxFilledContainerIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The associated jnxContainersIndex in the 
+		jnxContainersTable."
+	::= { jnxFilledEntry 1 }
+	
+    jnxFilledL1Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level one index of the container
+		housing this subject.  Zero if unavailable
+		or inapplicable."
+	::= { jnxFilledEntry 2 }
+
+    jnxFilledL2Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level two index of the container
+		housing this subject.  Zero if unavailable
+		or inapplicable."
+	::= { jnxFilledEntry 3 }
+
+    jnxFilledL3Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level three index of the container
+		housing this subject.  Zero if unavailable
+		or inapplicable."
+	::= { jnxFilledEntry 4 }
+
+    jnxFilledDescr OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The name or detailed description of this
+		subject."
+	::= { jnxFilledEntry 5 }
+
+    jnxFilledState OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown(1),
+		empty(2),
+		filled(3)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The filled state of this subject."
+	::= { jnxFilledEntry 6 }
+
+    jnxFilledChassisId OBJECT-TYPE
+        SYNTAX         JnxChassisId
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+                "Identifies the chassis on which the contents of this
+                row exists."
+        ::= { jnxFilledEntry 7 }
+
+    jnxFilledChassisDescr OBJECT-TYPE
+        SYNTAX         DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS         current
+        DESCRIPTION
+                "A textual description of the chassis on which the
+                contents of this row exists."
+        ::= { jnxFilledEntry 8 }
+
+
+--
+-- Box Operating Status Table
+--
+-- This table reveals the operating status of some subjects 
+-- of interest in the box contents table.
+--
+
+    jnxOperatingTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JnxOperatingEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A list of operating status entries."
+	::= { jnxBoxAnatomy 13 }
+
+    jnxOperatingEntry OBJECT-TYPE
+	SYNTAX		JnxOperatingEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry of operating status table."
+	INDEX	{ jnxOperatingContentsIndex,
+		  jnxOperatingL1Index,
+		  jnxOperatingL2Index,
+		  jnxOperatingL3Index }
+	::= { jnxOperatingTable 1 }
+
+    JnxOperatingEntry ::= SEQUENCE {
+	    jnxOperatingContentsIndex   Integer32,
+	    jnxOperatingL1Index         Integer32,
+	    jnxOperatingL2Index         Integer32,
+	    jnxOperatingL3Index         Integer32,
+	    jnxOperatingDescr           DisplayString,
+	    jnxOperatingState	    	INTEGER,
+	    jnxOperatingTemp            Gauge32,
+	    jnxOperatingCPU		Gauge32,
+	    jnxOperatingISR             Gauge32,
+	    jnxOperatingDRAMSize        Integer32,
+	    jnxOperatingBuffer          Gauge32,
+	    jnxOperatingHeap            Gauge32,
+	    jnxOperatingUpTime          TimeInterval,
+	    jnxOperatingLastRestart     TimeStamp,
+	    jnxOperatingMemory          Integer32,
+            jnxOperatingStateOrdered    INTEGER,
+            jnxOperatingChassisId       JnxChassisId,
+            jnxOperatingChassisDescr    DisplayString,
+            jnxOperatingRestartTime     DateAndTime,
+            jnxOperating1MinLoadAvg     Gauge32,
+            jnxOperating5MinLoadAvg     Gauge32,
+            jnxOperating15MinLoadAvg     Gauge32
+    }
+
+    jnxOperatingContentsIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The associated jnxContentsContainerIndex in the 
+		jnxContentsTable."
+	::= { jnxOperatingEntry 1 }
+	
+    jnxOperatingL1Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level one index associated with this
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxOperatingEntry 2 }
+
+    jnxOperatingL2Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level two index associated with this 
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxOperatingEntry 3 }
+
+    jnxOperatingL3Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level three index associated with this
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxOperatingEntry 4 }
+
+    jnxOperatingDescr OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The name or detailed description of this subject."
+	::= { jnxOperatingEntry 5 }
+
+    jnxOperatingState OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown(1),
+		running(2),   -- up and running,
+			      -- as a active primary
+		ready(3),     -- ready to run, not running yet
+		reset(4),     -- held in reset, not ready yet
+	        runningAtFullSpeed(5),  
+			      -- valid for fans only
+	        down(6),      -- down or off, for power supply
+		standby(7)    -- running as a standby backup
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The operating state of this subject."
+	::= { jnxOperatingEntry 6 }
+
+    jnxOperatingTemp OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The temperature in Celsius (degrees C) of this 
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxOperatingEntry 7 }
+
+    jnxOperatingCPU OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The CPU utilization in percentage of this 
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxOperatingEntry 8 }
+	
+    jnxOperatingISR OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The CPU utilization in percentage of this subject
+		spending in interrupt service routine (ISR).
+		Zero if unavailable or inapplicable."
+	::= { jnxOperatingEntry 9 }
+	
+    jnxOperatingDRAMSize OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION
+		"The DRAM size in bytes of this subject.
+		Zero if unavailable or inapplicable."
+	::= { jnxOperatingEntry 10 }
+	
+    jnxOperatingBuffer OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The buffer pool utilization in percentage
+		of this subject.  Zero if unavailable or 
+		inapplicable."
+	::= { jnxOperatingEntry 11 }
+	
+    jnxOperatingHeap OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The heap utilization in percentage of 
+		this subject.  Zero if unavailable or 
+		inapplicable."
+	::= { jnxOperatingEntry 12 }
+
+    jnxOperatingUpTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-only
+        STATUS          deprecated
+	DESCRIPTION
+		"The time interval in 10-millisecond period
+		that this subject has been up and running.  
+		Zero if unavailable or inapplicable."
+	::= { jnxOperatingEntry 13 }
+
+    jnxOperatingLastRestart OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The value of sysUpTime when this subject 
+		last restarted.  Zero if unavailable or 
+		inapplicable."
+	::= { jnxOperatingEntry 14 }
+
+    jnxOperatingMemory OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The installed memory size in Megabytes 
+		of this subject.  Zero if unavailable or
+		inapplicable."
+	::= { jnxOperatingEntry 15 }
+
+    jnxOperatingStateOrdered OBJECT-TYPE
+	SYNTAX		INTEGER {
+		running(1),   -- up and running,
+			      -- as a active primary
+		standby(2),   -- running as a standby backup
+		ready(3),     -- ready to run, not running yet
+	        runningAtFullSpeed(4),  
+			      -- valid for fans only
+		reset(5),     -- held in reset, not ready yet
+	        down(6),      -- down or off, for power supply
+		unknown(7)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The operating state of this subject.  Identical to
+                 jnxOperatingState, but with enums ordered from 'most
+                 operational' to 'least operational' states."
+	::= { jnxOperatingEntry 16 }
+
+    jnxOperatingChassisId OBJECT-TYPE
+        SYNTAX         JnxChassisId
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+                "Identifies the chassis on which the contents of this
+                row exists."
+        ::= { jnxOperatingEntry 17 }
+
+    jnxOperatingChassisDescr OBJECT-TYPE
+        SYNTAX         DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS         current
+        DESCRIPTION
+                "A textual description of the chassis on which the
+                contents of this row exists."
+        ::= { jnxOperatingEntry 18 }
+
+    jnxOperatingRestartTime OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The time at which this entity
+                last restarted."
+        ::= { jnxOperatingEntry 19 }
+
+        jnxOperating1MinLoadAvg OBJECT-TYPE
+            SYNTAX          Gauge32
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                    "The CPU Load Average over the last 1 minutes
+                     Here it will be shown as percentage value
+                     Zero if unavailable or inapplicable."
+            ::= { jnxOperatingEntry 20 }
+
+        jnxOperating5MinLoadAvg OBJECT-TYPE
+            SYNTAX          Gauge32
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                    "The CPU Load Average over the last 5 minutes
+                     Here it will be shown as percentage value
+                     Zero if unavailable or inapplicable."
+            ::= { jnxOperatingEntry 21 }
+
+        jnxOperating15MinLoadAvg OBJECT-TYPE
+            SYNTAX          Gauge32
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                    "The CPU Load Average over the last 15 minutes
+                     Here it will be shown as percentage value
+                     Zero if unavailable or inapplicable."
+            ::= { jnxOperatingEntry 22 }
+
+--
+-- Box Redundancy Information Table
+--
+-- This table shows the internal configuration setting for the 
+-- available redundant subsystems or components in the box.
+--
+
+    jnxRedundancyTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JnxRedundancyEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A list of redundancy information entries."
+	::= { jnxBoxAnatomy 14 }
+
+    jnxRedundancyEntry OBJECT-TYPE
+	SYNTAX		JnxRedundancyEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the redundancy information table."
+	INDEX	{ jnxRedundancyContentsIndex,
+		  jnxRedundancyL1Index,
+		  jnxRedundancyL2Index,
+		  jnxRedundancyL3Index }
+	::= { jnxRedundancyTable 1 }
+
+    JnxRedundancyEntry ::= SEQUENCE {
+	    jnxRedundancyContentsIndex       Integer32,
+	    jnxRedundancyL1Index             Integer32,
+	    jnxRedundancyL2Index             Integer32,
+	    jnxRedundancyL3Index             Integer32,
+	    jnxRedundancyDescr               DisplayString,
+	    jnxRedundancyConfig	     	     INTEGER,
+	    jnxRedundancyState	     	     INTEGER,
+	    jnxRedundancySwitchoverCount     Counter32,
+	    jnxRedundancySwitchoverTime      TimeStamp,
+	    jnxRedundancySwitchoverReason    INTEGER,
+	    jnxRedundancyKeepaliveHeartbeat  Integer32,
+	    jnxRedundancyKeepaliveTimeout    Integer32,
+	    jnxRedundancyKeepaliveElapsed    Integer32,
+            jnxRedundancyKeepaliveLoss       Counter32,
+            jnxRedundancyChassisId           JnxChassisId,
+            jnxRedundancyChassisDescr        DisplayString
+    }
+
+    jnxRedundancyContentsIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The associated jnxContentsContainerIndex in the 
+		jnxContentsTable."
+	::= { jnxRedundancyEntry 1 }
+ 	
+    jnxRedundancyL1Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level one index associated with this
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxRedundancyEntry 2 }
+
+    jnxRedundancyL2Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level two index associated with this 
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxRedundancyEntry 3 }
+
+    jnxRedundancyL3Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level three index associated with this
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxRedundancyEntry 4 }
+
+    jnxRedundancyDescr OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The name or detailed description of this subject."
+	::= { jnxRedundancyEntry 5 }
+
+    jnxRedundancyConfig OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown(1),
+		master(2),    -- election priority set as a master
+		backup(3),    -- election priority set as a backup
+		disabled(4),  -- election disabled
+		notApplicable(5) -- any among the available can be master
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The election priority of redundancy configuration for
+		this subject.  The value 'notApplicable' means no
+		specific instance is configured to be master or
+		backup; whichever component boots up first becomes a
+		master."
+	::= { jnxRedundancyEntry 6 }
+
+    jnxRedundancyState OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown(1),
+		master(2),    -- master
+		backup(3),    -- backup
+		disabled(4)   -- disabled
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The current running state for this subject."
+	::= { jnxRedundancyEntry 7 }
+
+    jnxRedundancySwitchoverCount OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of switchover as perceived by
+		this subject since routing engine is up and running.
+		The switchover is defined as a change in state of
+		jnxRedundancyState from master to backup or vice
+		versa.	Its value is reset when the routing engine
+		is reset or rebooted."
+	::= { jnxRedundancyEntry 8 }
+
+    jnxRedundancySwitchoverTime OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The value of sysUpTime when the jnxRedundancyState
+		of this subject was last switched over from master
+		to backup or vice versa.  Zero if unknown or never
+		switched over since the routing engine is up and
+		running."
+	::= { jnxRedundancyEntry 9 }
+
+    jnxRedundancySwitchoverReason OBJECT-TYPE
+	SYNTAX		INTEGER {
+		other(1),		-- others
+		neverSwitched(2),	-- never switched
+		userSwitched(3),	-- user-initiated switchover
+		autoSwitched(4)		-- automatic switchover
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The reason of the last switchover for this subject."
+	::= { jnxRedundancyEntry 10 }
+
+    jnxRedundancyKeepaliveHeartbeat OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The period of sending keepalive messages between
+		the master and backup subsystems.  It is a system-wide
+		preset value in seconds used by internal mastership
+		resolution.  Zero if unavailable or inapplicable."
+	::= { jnxRedundancyEntry 11 }
+
+    jnxRedundancyKeepaliveTimeout OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The timeout period in seconds, by the keepalive 
+		watchdog timer, before initiating a switch over to 
+		the backup subsystem.  Zero if unavailable or 
+		inapplicable."
+	::= { jnxRedundancyEntry 12 }
+
+    jnxRedundancyKeepaliveElapsed OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The elapsed time in seconds by this subject since 
+		receiving the last keepalive message from the other
+		subsystems.  Zero if unavailable or inapplicable."
+	::= { jnxRedundancyEntry 13 }
+
+    jnxRedundancyKeepaliveLoss OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of losses on keepalive messages 
+		between the master and backup subsystems as perceived
+		by this subject since the system is up and running.  
+		Zero if unavailable or inapplicable."
+	::= { jnxRedundancyEntry 14 }
+
+    jnxRedundancyChassisId OBJECT-TYPE
+        SYNTAX         JnxChassisId
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+                "Identifies the chassis on which the contents of this
+                row exists."
+        ::= { jnxRedundancyEntry 15 }
+
+    jnxRedundancyChassisDescr OBJECT-TYPE
+        SYNTAX         DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS         current
+        DESCRIPTION
+                "A textual description of the chassis on which the
+                contents of this row exists."
+        ::= { jnxRedundancyEntry 16 }
+
+	
+--
+-- FRU (Field Replaceable Unit) Status Table
+--
+-- This table shows the status of the FRUs in the chassis.
+--
+
+    jnxFruTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF JnxFruEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A list of FRU status entries."
+	::= { jnxBoxAnatomy 15 }
+
+    jnxFruEntry OBJECT-TYPE
+	SYNTAX		JnxFruEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the FRU status table."
+	INDEX	{ jnxFruContentsIndex,
+		  jnxFruL1Index,
+		  jnxFruL2Index,
+		  jnxFruL3Index }
+	::= { jnxFruTable 1 }
+
+    JnxFruEntry ::= SEQUENCE {
+	    jnxFruContentsIndex       Integer32,
+	    jnxFruL1Index             Integer32,
+	    jnxFruL2Index             Integer32,
+	    jnxFruL3Index             Integer32,
+	    jnxFruName                DisplayString,
+	    jnxFruType        	      INTEGER,
+	    jnxFruSlot                Integer32,
+	    jnxFruState	     	      INTEGER,
+	    jnxFruTemp                Gauge32,
+	    jnxFruOfflineReason       INTEGER,
+	    jnxFruLastPowerOff        TimeStamp,
+	    jnxFruLastPowerOn         TimeStamp,
+            jnxFruPowerUpTime         TimeInterval,
+            jnxFruChassisId           JnxChassisId,
+            jnxFruChassisDescr        DisplayString,
+            jnxFruPsdAssignment       Integer32
+    }
+
+    jnxFruContentsIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The associated jnxContentsContainerIndex in the 
+		jnxContentsTable."
+	::= { jnxFruEntry 1 }
+ 	
+    jnxFruL1Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level one index associated with this
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxFruEntry 2 }
+
+    jnxFruL2Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level two index associated with this 
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxFruEntry 3 }
+
+    jnxFruL3Index OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The level three index associated with this
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxFruEntry 4 }
+
+    jnxFruName OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The name or detailed description of this subject."
+	::= { jnxFruEntry 5 }
+
+    jnxFruType OBJECT-TYPE
+	SYNTAX		INTEGER {
+		other(1),                               -- unknown or others
+		clockGenerator(2),                      -- CG
+		flexiblePicConcentrator(3),             -- FPC
+		switchingAndForwardingModule(4),        -- SFM
+		controlBoard(5),                        -- CBD, SCB
+		routingEngine(6),                       -- RE
+		powerEntryModule(7),                    -- PEM
+		frontPanelModule(8),                    -- FPM
+		switchInterfaceBoard(9),                -- SIB
+		processorMezzanineBoardForSIB(10),      -- SPMB
+		portInterfaceCard(11),                  -- PIC
+		craftInterfacePanel(12),                -- CIP
+		fan(13),                                -- fan
+		lineCardChassis(14),                    -- LCC
+                forwardingEngineBoard(15),              -- FEB
+                protectedSystemDomain(16)               -- PSD
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The FRU type for this subject."
+	::= { jnxFruEntry 6 }
+
+    jnxFruSlot OBJECT-TYPE
+	SYNTAX		Integer32 (0..'7fffffff'h)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The slot number of this subject.  This is equivalent
+		to jnxFruL1Index in meaning.  Zero if unavailable or 
+		inapplicable."
+	::= { jnxFruEntry 7 }
+
+    jnxFruState OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown(1),
+		empty(2),
+		present(3),
+		ready(4),
+		announceOnline(5),
+		online(6),
+		anounceOffline(7),
+		offline(8),
+		diagnostic(9),
+		standby(10)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The current state for this subject."
+	::= { jnxFruEntry 8 }
+
+    jnxFruTemp OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The temperature in Celsius (degrees C) of this 
+		subject.  Zero if unavailable or inapplicable."
+	::= { jnxFruEntry 9 }
+
+    jnxFruOfflineReason OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown(1),	                -- unknown or other
+		none(2),	                -- none	
+		error(3),      	                -- error 
+		noPower(4),	                -- no power  
+		configPowerOff(5),              -- configured to power off
+		configHoldInReset(6),           -- configured to hold in reset
+		cliCommand(7),                  -- offlined by cli command
+		buttonPress(8),                 -- offlined by button press
+		cliRestart(9),                  -- restarted by cli command
+		overtempShutdown(10),           -- overtemperature shutdown
+		masterClockDown(11),            -- master clock down
+		singleSfmModeChange(12),        -- single SFM mode change
+		packetSchedulingModeChange(13), -- packet scheduling mode change
+		physicalRemoval(14),            -- physical removal
+		unresponsiveRestart(15),        -- restarting unresponsive board
+		sonetClockAbsent(16),           -- sonet out clock absent
+                rddPowerOff(17),                -- RDD power off
+                majorErrors(18),                -- major errors
+                minorErrors(19),                -- minor errors
+                lccHardRestart(20),             -- LCC hard restart
+                lccVersionMismatch(21),         -- LCC version mismatch
+                powerCycle(22),                 -- power cycle
+                reconnect(23),                  -- reconnect
+                overvoltage(24),                -- overvoltage
+                pfeVersionMismatch(25),         -- PFE version mismatch
+                febRddCfgChange(26),            -- FEB redundancy cfg changed
+                fpcMisconfig(27),               -- FPC is misconfigured
+                fruReconnectFail(28),           -- FRU did not reconnect
+                fruFwddReset(29),               -- FWDD reset the fru
+                fruFebSwitch(30),               -- FEB got switched
+                fruFebOffline(31),              -- FEB was offlined
+                fruInServSoftUpgradeError(32),  -- In Service Software Upgrade Error
+                fruChasdPowerRatingExceed(33),  -- Chassis power rating exceeded
+                fruConfigOffline(34),           -- Configured offline
+                fruServiceRestartRequest(35),   -- restarting request from a service
+                spuResetRequest(36),            -- SPU reset request
+                spuFlowdDown(37),               -- SPU flowd down
+                spuSpi4Down(38),                -- SPU SPI4 down
+                spuWatchdogTimeout(39),         -- SPU Watchdog timeout
+                spuCoreDump(40),                -- SPU kernel core dump
+                fpgaSpi4LinkDown(41),           -- FPGA SPI4 link down
+                i3Spi4LinkDown(42),             -- I3 SPI4 link down
+                cppDisconnect(43),              -- CPP disconnect
+                cpuNotBoot(44),                 -- CPU not boot
+                spuCoreDumpComplete(45),        -- SPU kernel core dump complete
+                rstOnSpcSpuFailure(46),         -- Rst on SPC SPU failure
+                softRstOnSpcSpuFailure(47),     -- Soft Reset on SPC SPU failure
+                hwAuthenticationFailure(48),    -- HW authentication failure
+                reconnectFpcFail(49),           -- Reconnect FPC fail
+                fpcAppFailed(50),               -- FPC app failed
+                fpcKernelCrash(51),             -- FPC kernel crash
+                spuFlowdDownNoCore(52),         -- SPU flowd down, no core dump
+                spuFlowdCoreDumpIncomplete(53), -- SPU flowd crash with incomplete core dump
+                spuFlowdCoreDumpComplete(54),   -- SPU flowd crash with complete core dump
+                spuIdpdDownNoCore(55),          -- SPU idpd down, no core dump
+                spuIdpdCoreDumpIncomplete(56),  -- SPU idpd crash with incomplete core dump
+                spuIdpdCoreDumpComplete(57),    -- SPU idpd crash with complete core dump
+                spuCoreDumpIncomplete(58),      -- SPU kernel crash with incomplete core dump
+                spuIdpdDown(59),                -- SPU idpd down
+                fruPfeReset(60),                -- PFE reset
+                fruReconnectNotReady(61),       -- FPC not ready to reconnect
+                fruSfLinkDown(62),              -- FE - Fabric links down
+                fruFabricDown(63),              -- Fabric transitioned from up to down
+                fruAntiCounterfeitRetry(64),    -- FPC offlined due to Anti Counterfeit Retry
+                fruFPCChassisClusterDisable(65), -- FPC offlined due to Chassis Cluster Disable
+                spuFipsError(66),                -- SPU fips error
+                fruFPCFabricDownOffline(67),     -- FPC offlined due to Fabric down
+                febCfgChange(68),                -- FEB config change
+                routeLocalizationRoleChange(69), -- Route localization role change
+                fruFpcUnsupported(70),           -- FPC unsupported
+                psdVersionMismatch(71),          -- PSD version mismatch
+                fruResetThresholdExceeded(72),   -- FRU Reset Threshold Exceeded
+                picBounce(73),                   -- PIC Bounce
+                badVoltage(74)                   -- bad voltage
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The offline reason of this subject."
+	::= { jnxFruEntry 10 }
+
+    jnxFruLastPowerOff OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The value of sysUpTime when this subject was last 
+		powered off.  Zero if unavailable or inapplicable."
+	::= { jnxFruEntry 11 }
+
+    jnxFruLastPowerOn OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The value of sysUpTime when this subject was last 
+		powered on.  Zero if unavailable or inapplicable."
+	::= { jnxFruEntry 12 }
+
+    jnxFruPowerUpTime OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The time interval in 10-millisecond period
+		that this subject has been up and running
+		since the last power on time.  Zero if 
+		unavailable or inapplicable."
+	::= { jnxFruEntry 13 }
+
+    jnxFruChassisId OBJECT-TYPE
+        SYNTAX         JnxChassisId
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+                "Identifies the chassis on which the contents of this
+                row exists."
+        ::= { jnxFruEntry 14 }
+
+    jnxFruChassisDescr OBJECT-TYPE
+        SYNTAX         DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS         current
+        DESCRIPTION
+                "A textual description of the chassis on which the
+                contents of this row exists."
+        ::= { jnxFruEntry 15 }
+
+    jnxFruPsdAssignment OBJECT-TYPE
+        SYNTAX         Integer32 (0..31)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+                "The PSD assignment of this subject. Zero if unavailable or
+                not applicable."
+        ::= { jnxFruEntry 16 }
+
+--
+-- definition of Kernel Memory Used related stuff
+--
+
+    jnxBoxKernelMemoryUsedPercent OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The percentage of kernel memory used
+		of this subject.  0 if unavailable or
+		inapplicable."
+	::= { jnxBoxAnatomy 16 }
+
+--
+-- definition of system domain information
+--
+
+    jnxBoxSystemDomainType OBJECT-TYPE
+	SYNTAX		INTEGER {
+                     notApplicable(1),
+                     rootSystemDomain(2),
+                     protectedSystemDomain(3)
+        }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The system domain type of this subject, notApplicable will
+		be returned if this feature is not supported."
+	::= { jnxBoxAnatomy 17 }
+
+
+--
+-- definition of chassis related traps
+--
+    -- Traps for chassis alarm conditions   
+
+    jnxPowerSupplyFailure NOTIFICATION-TYPE
+	OBJECTS		{ jnxContentsContainerIndex,
+			  jnxContentsL1Index,
+			  jnxContentsL2Index,
+			  jnxContentsL3Index,
+			  jnxContentsDescr,
+			  jnxOperatingState }
+	STATUS		current
+	DESCRIPTION
+		"A jnxPowerSupplyFailure trap signifies that
+		the SNMP entity, acting in an agent role, has
+		detected that the specified power supply in the
+		chassis has been in the failure (bad DC output) 
+		condition."
+	::= { jnxChassisTraps 1 }
+
+    jnxFanFailure NOTIFICATION-TYPE
+	OBJECTS		{ jnxContentsContainerIndex,
+			  jnxContentsL1Index,
+			  jnxContentsL2Index,
+			  jnxContentsL3Index,
+			  jnxContentsDescr,
+			  jnxOperatingState }
+	STATUS		current
+	DESCRIPTION
+		"A jnxFanFailure trap signifies that the SNMP
+		entity, acting in an agent role, has detected
+		that the specified cooling fan or impeller in 
+		the chassis has been in the failure (not spinning) 
+		condition."
+	::= { jnxChassisTraps 2 }
+
+    jnxOverTemperature NOTIFICATION-TYPE
+	OBJECTS		{ jnxContentsContainerIndex,
+			  jnxContentsL1Index,
+			  jnxContentsL2Index,
+			  jnxContentsL3Index,
+			  jnxContentsDescr,
+			  jnxOperatingTemp }
+	STATUS		current
+	DESCRIPTION
+		"A jnxOverTemperature trap signifies that the 
+		SNMP entity, acting in an agent role, has 
+		detected that the specified hardware component
+		in the chassis has experienced over temperature
+		condition."
+	::= { jnxChassisTraps 3 }
+
+    jnxRedundancySwitchover NOTIFICATION-TYPE
+	OBJECTS		{ jnxRedundancyContentsIndex,
+			  jnxRedundancyL1Index,
+			  jnxRedundancyL2Index,
+			  jnxRedundancyL3Index,
+			  jnxRedundancyDescr,
+			  jnxRedundancyConfig,
+			  jnxRedundancyState,
+			  jnxRedundancySwitchoverCount,
+			  jnxRedundancySwitchoverTime,
+			  jnxRedundancySwitchoverReason }
+	STATUS		current
+	DESCRIPTION
+		"A jnxRedundancySwitchover trap signifies that 
+		the SNMP entity, acting in an agent role, has 
+		detected that the specified hardware component
+		in the chassis has experienced a redundancy 
+		switchover event defined as a change in state
+		of jnxRedundancyState from master to backup or
+		vice versa."
+	::= { jnxChassisTraps 4 }
+
+    jnxFruRemoval NOTIFICATION-TYPE
+	OBJECTS		{ jnxFruContentsIndex,
+			  jnxFruL1Index,
+			  jnxFruL2Index,
+			  jnxFruL3Index,
+			  jnxFruName,
+			  jnxFruType,
+			  jnxFruSlot }
+	STATUS		current
+	DESCRIPTION
+		"A jnxFruRemoval trap signifies that the SNMP 
+		entity, acting in an agent role, has detected 
+		that the specified FRU (Field Replaceable Unit)
+		has been removed from the chassis."
+	::= { jnxChassisTraps 5 }
+
+    jnxFruInsertion NOTIFICATION-TYPE
+	OBJECTS		{ jnxFruContentsIndex,
+			  jnxFruL1Index,
+			  jnxFruL2Index,
+			  jnxFruL3Index,
+			  jnxFruName,
+			  jnxFruType,
+			  jnxFruSlot }
+	STATUS		current
+	DESCRIPTION
+		"A jnxFruInsertion trap signifies that the SNMP 
+		entity,	acting in an agent role, has detected that
+		the specified FRU (Field Replaceable Unit) has been 
+		inserted into the chassis."
+	::= { jnxChassisTraps 6 }
+
+    jnxFruPowerOff NOTIFICATION-TYPE
+	OBJECTS		{ jnxFruContentsIndex,
+			  jnxFruL1Index,
+			  jnxFruL2Index,
+			  jnxFruL3Index,
+			  jnxFruName,
+			  jnxFruType,
+			  jnxFruSlot,
+			  jnxFruOfflineReason,
+			  jnxFruLastPowerOff,
+			  jnxFruLastPowerOn }
+	STATUS		current
+	DESCRIPTION
+		"A jnxFruPowerOff trap signifies that the SNMP 
+		entity, acting in an agent role, has detected 
+		that the specified FRU (Field Replaceable Unit)
+		has been powered off in the chassis."
+	::= { jnxChassisTraps 7 }
+
+    jnxFruPowerOn NOTIFICATION-TYPE
+	OBJECTS		{ jnxFruContentsIndex,
+			  jnxFruL1Index,
+			  jnxFruL2Index,
+			  jnxFruL3Index,
+			  jnxFruName,
+			  jnxFruType,
+			  jnxFruSlot,
+			  jnxFruOfflineReason,
+			  jnxFruLastPowerOff,
+			  jnxFruLastPowerOn }
+	STATUS		current
+	DESCRIPTION
+		"A jnxFruPowerOn trap signifies that the SNMP 
+		entity,	acting in an agent role, has detected that
+		the specified FRU (Field Replaceable Unit) has been 
+		powered on in the chassis."
+	::= { jnxChassisTraps 8 }
+
+    jnxFruFailed NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "This indicates the specified FRU (Field Replaceable Unit)
+                 has failed in the chassis. Most probably this is due toi
+                 some hard error such as fru is not powering up or not
+                 able to load ukernel. In these cases, fru is replaced."
+        ::= { jnxChassisTraps 9 }
+
+    jnxFruOffline NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot,
+                          jnxFruOfflineReason,
+                          jnxFruLastPowerOff,
+                          jnxFruLastPowerOn }
+        STATUS          current
+        DESCRIPTION
+                "A jnxFruOffline trap signifies that the SNMP
+                entity, acting in an agent role, has detected
+                that the specified FRU (Field Replaceable Unit)
+                has gone offline in the chassis."
+        ::= { jnxChassisTraps 10 }
+
+    jnxFruOnline NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxFruOnline trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified FRU (Field Replaceable Unit) has
+                gone online in the chassis."
+        ::= { jnxChassisTraps 11 }
+
+    jnxFruCheck NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxFruCheck trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified FRU (Field Replaceable Unit) has
+                encountered some operational errors and gone into
+                check state in the chassis."
+        ::= { jnxChassisTraps 12 }   
+
+    jnxFEBSwitchover NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxFEBSwitchover trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified FEB (Forwarding Engine Board) has
+                switched over."
+        ::= { jnxChassisTraps 13 }
+
+
+    jnxHardDiskFailed NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxHardDiskFailed trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the Disk in the specified Routing Engine has
+                encountered some operational errors and gone into
+                failed state in the chassis."
+        ::= { jnxChassisTraps 14 }
+
+    jnxHardDiskMissing NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A DiskMissing trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                hard disk in the specified outing Engine is missing
+                from boot device list."
+        ::= { jnxChassisTraps 15 }
+
+    jnxBootFromBackup NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+         STATUS         current
+         DESCRIPTION
+                 "A jnxBootFromBackup trap signifies that the SNMP
+                 entity, acting in an agent role, has detected that
+                 the specified  routing-engine/member has booted from
+                 the back up root partition"
+         ::= { jnxChassisTraps 16 }     
+
+
+    -- Traps for chassis alarm cleared conditions
+
+    jnxPowerSupplyOK NOTIFICATION-TYPE
+	OBJECTS		{ jnxContentsContainerIndex,
+			  jnxContentsL1Index,
+			  jnxContentsL2Index,
+			  jnxContentsL3Index,
+			  jnxContentsDescr,
+			  jnxOperatingState }
+	STATUS		current
+	DESCRIPTION
+		"A jnxPowerSupplyOK trap signifies that the 
+		SNMP entity, acting in an agent role, has
+		detected that the specified power supply in the
+		chassis has recovered from the failure (bad DC output) 
+		condition."
+	::= { jnxChassisOKTraps 1 }
+
+    jnxFanOK NOTIFICATION-TYPE
+	OBJECTS		{ jnxContentsContainerIndex,
+			  jnxContentsL1Index,
+			  jnxContentsL2Index,
+			  jnxContentsL3Index,
+			  jnxContentsDescr,
+			  jnxOperatingState }
+	STATUS		current
+	DESCRIPTION
+		"A jnxFanOK trap signifies that the SNMP
+		entity, acting in an agent role, has detected that
+		the specified cooling fan or impeller in the chassis
+		has recovered from the failure (not spinning) condition."
+	::= { jnxChassisOKTraps 2 }
+
+    jnxTemperatureOK NOTIFICATION-TYPE
+	OBJECTS		{ jnxContentsContainerIndex,
+			  jnxContentsL1Index,
+			  jnxContentsL2Index,
+			  jnxContentsL3Index,
+			  jnxContentsDescr,
+			  jnxOperatingTemp }
+	STATUS		current
+	DESCRIPTION
+		"A jnxTemperatureOK trap signifies that the 
+		SNMP entity, acting in an agent role, has 
+		detected that the specified hardware component
+		in the chassis has recovered from over temperature
+		condition." 
+	::= { jnxChassisOKTraps 3 }
+
+    jnxFruOK NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxFruOK trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified FRU (Field Replaceable Unit) has
+                recovered from previous operational errors and it
+                is in ok state in the chassis."
+        ::= { jnxChassisOKTraps 4 }
+
+
+END
