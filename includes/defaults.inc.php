@@ -1,5 +1,9 @@
 <?php
 
+####
+#### Please don't edit this file -- make changes to the configuration array in config.php
+####
+
 error_reporting(E_ERROR);
 
 ### Default directories
