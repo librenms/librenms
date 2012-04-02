@@ -43,24 +43,44 @@ if ($_SESSION['userlevel'] >= '5') {
 
 if($_GET['optb'] == "all" ) {
 
+  // Pre-Cache in arrays
+  // That's heavier on RAM, but much faster on CPU (1:40)
+
+  // Specifying the fields reduces a lot the RAM used (1:4) .
+  $vrf_fields = "vrf_id, mplsVpnVrfRouteDistinguisher, mplsVpnVrfDescription, vrf_name";
+  $dev_fields = "D.device_id as device_id, hostname, os, hardware, version, features, location, status, `ignore`, disabled";
+  $port_fields = "interface_id, ifvrf, device_id, ifDescr, ifAlias, ifName";
+
+  foreach (dbFetchRows("SELECT $vrf_fields, $dev_fields FROM `vrfs` AS V, `devices` AS D WHERE D.device_id = V.device_id") as $vrf_device)
+  {
+    if (empty($vrf_devices[$vrf_device['mplsVpnVrfRouteDistinguisher']])) { $vrf_devices[$vrf_device['mplsVpnVrfRouteDistinguisher']][0] = $vrf_device; }
+      else { array_push ($vrf_devices[$vrf_device['mplsVpnVrfRouteDistinguisher']], $vrf_device); }
+  }
+
+  foreach (dbFetchRows("SELECT $port_fields FROM `ports` WHERE ifVrf<>0") as $port)
+  {
+    if (empty($ports[$port['ifvrf']][$port['device_id']])) { $ports[$port['ifvrf']][$port['device_id']][0] = $port; }
+      else { array_push ($ports[$port['ifvrf']][$port['device_id']], $port); }
+  }
+
   echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
   $i = "1";
   foreach (dbFetchRows("SELECT * FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`") as $vrf)
   {
-    if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
+    if ($i % 2) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
     echo("<tr valign=top bgcolor='$bg_colour'>");
     echo("<td width=240><a class=list-large href='routing/vrf/".$vrf['mplsVpnVrfRouteDistinguisher']."/".$_GET['optc']."/'>" . $vrf['vrf_name'] . "</a><br /><span class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</span></td>");
     echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "</td>");
     #echo("<td width=200 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
     echo("<td><table border=0 cellspacing=0 cellpadding=5 width=100%>");
     $x=1;
-    foreach (dbFetchRows("SELECT * FROM `vrfs` AS V, `devices` AS D WHERE `mplsVpnVrfRouteDistinguisher` = ? AND D.device_id = V.device_id", array($vrf['mplsVpnVrfRouteDistinguisher'])) as $device)
+    foreach ($vrf_devices[$vrf['mplsVpnVrfRouteDistinguisher']] as $device)
     {
-      if (!is_integer($i/2))
+      if ($i % 2)
       {
-        if (!is_integer($x/2)) { $dev_colour = $list_colour_a_a; } else { $dev_colour = $list_colour_a_b; }
+        if ($x % 2) { $dev_colour = $list_colour_a_a; } else { $dev_colour = $list_colour_a_b; }
       } else {
-        if (!is_integer($x/2)) { $dev_colour = $list_colour_b_b; } else { $dev_colour = $list_colour_b_a; }
+        if ($x % 2) { $dev_colour = $list_colour_b_b; } else { $dev_colour = $list_colour_b_a; }
       }
       echo("<tr bgcolor='$dev_colour'><td width=150>".generate_device_link($device, shorthost($device['hostname'])));
 
@@ -68,7 +88,7 @@ if($_GET['optb'] == "all" ) {
       echo("</td><td>");
       unset($seperator);
 
-      foreach (dbFetchRows("SELECT * FROM `ports` WHERE `ifVrf` = ? AND `device_id` = ?", array($device['vrf_id'], $device['device_id'])) as $port)
+      foreach ($ports[$device['vrf_id']][$device['device_id']] as $port)
       {
         $port = array_merge ($device, $port);
 
@@ -124,7 +144,7 @@ if($_GET['optb'] == "all" ) {
   foreach ($devices as $device)
   {
     $hostname = $device['hostname'];
-    if (!is_integer($x/2)) { $device_colour = $list_colour_a; } else { $device_colour = $list_colour_b; }
+    if ($x % 2) { $device_colour = $list_colour_a; } else { $device_colour = $list_colour_b; }
     echo("<table cellpadding=10 cellspacing=0 class=devicetable width=100%>");
     include("includes/device-header.inc.php");
     echo("</table>");
@@ -133,11 +153,11 @@ if($_GET['optb'] == "all" ) {
     $i=1;
     foreach (dbFetchRows("SELECT * FROM `ports` WHERE `ifVrf` = ? AND `device_id` = ?", array($device['vrf_id'], $device['device_id'])) as $interface)
     {
-      if (!is_integer($x/2))
+      if ($x % 2)
       {
-        if (is_integer($i/2)) { $int_colour = $list_colour_a_b; } else { $int_colour = $list_colour_a_a; }
+        if ($i % 2 === 0) { $int_colour = $list_colour_a_b; } else { $int_colour = $list_colour_a_a; }
       } else {
-        if (is_integer($i/2)) { $int_colour = $list_colour_b_a; } else { $int_colour = $list_colour_b_b; }
+        if ($i % 2 === 0) { $int_colour = $list_colour_b_a; } else { $int_colour = $list_colour_b_b; }
       }
       include("includes/print-interface.inc.php");
       $i++;
