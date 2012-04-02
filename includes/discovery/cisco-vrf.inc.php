@@ -7,59 +7,118 @@ if ($config['enable_vrfs'])
     unset($vrf_count);
 
     echo("VRFs : ");
+    
+    /* 
+      There are 2 MIBs for VPNs : MPLS-VPN-MIB (oldest) and MPLS-L3VPN-STD-MIB (newest)
+      Unfortunately, there is no simple way to find out which one to use, unless we reference
+      all the possible devices and check what they support.
+      Therefore we start testing the MPLS-L3VPN-STD-MIB that is prefered if available.
+    */
 
-    $oid_cmd = $config['snmpwalk'] . " -M " . $config['mibdir'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfRouteDistinguisher";
-    $oids = shell_exec($oid_cmd);
 
-    if ($debug) { echo("$oid_cmd -> $oids \n"); }
+    // Grab all the info first, then use it in the code.
+    // It removes load on the device and makes things much faster
 
-    $oids = str_replace(".1.3.6.1.3.118.1.2.2.1.3.", "", $oids);
-    $oids = str_replace(" \"", "||", $oids);
-    $oids = str_replace("\"", "", $oids);
-
-    $oids = trim($oids);
-    foreach (explode("\n", $oids) as $oid)
+    $rds = snmp_walk($device, "mplsL3VpnVrfRD", "-Osqn", "MPLS-L3VPN-STD-MIB", NULL);
+    
+    if (empty($rds))
     {
+      $rds = snmp_walk($device, "mplsVpnVrfRouteDistinguisher", "-Osqn", "MPLS-VPN-MIB", NULL);
+      $vpnmib = "MPLS-VPN-MIB";
+      $rds = str_replace(".1.3.6.1.3.118.1.2.2.1.3.", "", $rds);
+
+      $descrs_oid = ".1.3.6.1.3.118.1.2.2.1.2";
+      $ports_oid = ".1.3.6.1.3.118.1.2.1.1.2";
+    }
+    else
+    {
+      $vpnmib = "MPLS-L3VPN-STD-MIB";
+      $rds = str_replace(".1.3.6.1.2.1.10.166.11.1.2.2.1.4.", "", $rds);
+      
+      $descrs_oid = ".1.3.6.1.2.1.10.166.11.1.2.2.1.3";
+      $ports_oid = ".1.3.6.1.2.1.10.166.11.1.2.1.1.2";
+    }
+  
+    if ($debug) 
+    { 
+      echo("\n[DEBUG]\nUsing $vpnmib\n[/DEBUG]\n");
+      echo("\n[DEBUG OIDS]\n$rds\n[/DEBUG]\n");
+    }
+    $rds = trim($rds);
+
+    $descrs = snmp_walk($device, $descrs_oid, "-Osqn", $vpnmib, NULL);
+    $ports  = snmp_walk($device, $ports_oid, "-Osqn", $vpnmib, NULL);
+    
+    $descrs = trim(str_replace("$descrs_oid.", "", $descrs));
+    $ports  = trim(str_replace("$ports_oid.", "", $ports));
+
+    $descr_table = array();
+    $port_table = array();
+
+    foreach (explode("\n", $descrs) as $descr)
+    {
+      $t = explode(" ", $descr);
+      $descr_table[$t[0]] = $t[1];
+    }
+
+    foreach (explode("\n", $ports) as $port)
+    {
+      $t = explode(" ", $port);
+      $dotpos = strrpos($t[0], ".");
+      $vrf_oid = substr($t[0], 0, $dotpos);
+      $port_id = substr($t[0], $dotpos+1);
+
+      if (empty($port_table[$vrf_oid])) { $port_table[$vrf_oid][0] = $port_id; }
+        else {array_push($port_table[$vrf_oid], $port_id);}
+    }
+
+    foreach (explode("\n", $rds) as $oid)
+    {
+      echo "\n";
       if ($oid)
       {
-        list($vrf['oid'], $vrf['mplsVpnVrfRouteDistinguisher']) = explode("||", $oid);
-        $vrf['name'] = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -m MPLS-VPN-MIB -Ln -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfRouteDistinguisher.".$vrf['oid']));
-        list(,$vrf['name'],, $vrf['mplsVpnVrfRouteDistinguisher']) = explode("\"", $vrf['name']);
-        $vrf['mplsVpnVrfDescription'] = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -m MPLS-VPN-MIB -Ln -Osqvn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfDescription.".$vrf['oid']));
+        // 8.49.53.48.56.58.49.48.48 "1508:100"
+        // First digit gives number of chars in VRF Name, then it's ASCII
+
+        list($vrf_oid, $vrf_rd) = explode(" ", $oid);
+        $oid_values = explode(".", $vrf_oid);
+        $vrf_name = "";
+        for ($i = 1; $i <= $oid_values[0]; $i++) {$vrf_name .= chr($oid_values[$i]);}
+
+        echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
+        echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
+        echo "\n  [VRF $vrf_name] DESC  - ".$descr_table[$vrf_oid];
 
         if (@mysql_result(mysql_query("SELECT count(*) FROM vrfs WHERE `device_id` = '".$device['device_id']."'
-                                 AND `vrf_oid`='".$vrf['oid']."'"),0))
+                                 AND `vrf_oid`='$vrf_oid'"),0))
         {
-          $update_query  = "UPDATE `vrfs` SET `mplsVpnVrfDescription` = '".$vrf['mplsVpnVrfDescription']."', `mplsVpnVrfRouteDistinguisher` = '".$vrf['mplsVpnVrfRouteDistinguisher']."' ";
-          $update_query .= "WHERE device_id = '".$device['device_id']."' AND vrf_oid = '".$vrf['oid']."'";
+          $update_query  = "UPDATE `vrfs` SET `mplsVpnVrfDescription` = '$descr_table[$vrf_oid]', `mplsVpnVrfRouteDistinguisher` = '$vrf_rd' ";
+          $update_query .= "WHERE device_id = '".$device['device_id']."' AND vrf_oid = '$vrf_oid'";
           mysql_query($update_query);
         }
         else
         {
           $insert_query  = "INSERT INTO `vrfs` (`vrf_oid`,`vrf_name`,`mplsVpnVrfRouteDistinguisher`,`mplsVpnVrfDescription`,`device_id`) ";
-          $insert_query .= "VALUES ('".$vrf['oid']."','".$vrf['name']."','".$vrf['mplsVpnVrfRouteDistinguisher']."','".$vrf['mplsVpnVrfDescription']."','".$device['device_id']."')";
+          $insert_query .= "VALUES ('$vrf_oid','$vrf_name','$vrf_rd','".$descr_table[$vrf_oid]."','".$device['device_id']."')";
           mysql_query($insert_query);
         }
 
-        $vrf_id = @mysql_result(mysql_query("SELECT vrf_id FROM vrfs WHERE `device_id` = '".$device['device_id']."' AND `vrf_oid`='".$vrf['oid']."'"),0);
+        $vrf_id = @mysql_result(mysql_query("SELECT vrf_id FROM vrfs WHERE `device_id` = '".$device['device_id']."' AND `vrf_oid`='$vrf_oid'"),0);
         $valid_vrf[$vrf_id] = 1;
-        echo("\nRD:".$vrf['mplsVpnVrfRouteDistinguisher']." ".$vrf['name']." ".$vrf['mplsVpnVrfDescription']." ");
-        $ports_oid = ".1.3.6.1.3.118.1.2.1.1.2." . $vrf['oid'];
-        $ports = shell_exec($config['snmpwalk'] . " -M " . $config['mibdir'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $ports_oid");
-        $ports = trim(str_replace($ports_oid . ".", "", $ports));
-#       list($ports) = explode(" ", $ports);
-        echo(" ( ");
-        foreach (explode("\n", $ports) as $if_id)
+
+        echo "\n  [VRF $vrf_name] PORTS - ";
+        foreach ($port_table[$vrf_oid] as $if_id)
         {
           $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE ifIndex = '$if_id' AND device_id = '" . $device['device_id'] . "'"));
           echo(makeshortif($interface['ifDescr']) . " ");
-          mysql_query("UPDATE ports SET ifVrf = '".$vrf_id."' WHERE interface_id = '".$interface['interface_id']."'");
+          mysql_query("UPDATE ports SET ifVrf = '$vrf_id' WHERE interface_id = '".$interface['interface_id']."'");
           $if = $interface['interface_id'];
           $valid_vrf_if[$vrf_id][$if] = 1;
         }
-        echo(") ");
       }
     }
+
+    echo "\n";
 
     $sql = "SELECT * FROM ports WHERE device_id = '" . $device['device_id'] . "'";
     $data = mysql_query($sql);
