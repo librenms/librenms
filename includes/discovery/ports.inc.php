@@ -5,9 +5,9 @@
 echo("Ports : ");
 
 $ports = array();
-$ports = snmpwalk_cache_oid($device, "ifDescr", $port_stats, "IF-MIB");
-#$ports = snmpwalk_cache_oid($device, "ifName", $port_stats, "IF-MIB");
-#$ports = snmpwalk_cache_oid($device, "ifType", $port_stats, "IF-MIB");
+$ports = snmpwalk_cache_oid($device, "ifDescr", $ports, "IF-MIB");
+#$ports = snmpwalk_cache_oid($device, "ifName", $ports, "IF-MIB");
+#$ports = snmpwalk_cache_oid($device, "ifType", $ports, "IF-MIB");
 
 $interface_ignored = 0;
 $interface_added   = 0;
