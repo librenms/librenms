@@ -57,7 +57,7 @@ if ($config['enable_vrfs'])
 
     foreach (explode("\n", $descrs) as $descr)
     {
-      $t = explode(" ", $descr);
+      $t = explode(" ", $descr, 2);
       $descr_table[$t[0]] = $t[1];
     }
 
