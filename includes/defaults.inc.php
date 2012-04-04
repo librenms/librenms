@@ -37,6 +37,16 @@ $config['unflatten']      = "/usr/bin/unflatten";
 $config['neato']          = "/usr/bin/neato";
 $config['sfdp']           = "/usr/bin/sfdp";
 
+
+### Memcached - Keep immediate statistics
+
+$config['memcached']['enable']	= FALSE;
+$config['memcached']['host']    = "localhost";
+$config['memcached']['port']    = 11211;
+
+$config['slow_statistics']	= TRUE; ### THIS WILL CHANGE TO FALSE IN FUTURE
+
+
 ### RRDCacheD - Make sure it can write to your RRD dir!
 
 #$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
