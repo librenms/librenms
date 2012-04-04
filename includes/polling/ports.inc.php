@@ -122,6 +122,8 @@ if ($debug) { print_r($port_stats); }
 /// Build array of ports in the database
 
 ## FIXME -- this stuff is a little messy, looping the array to make an array just seems wrong. :>
+##       -- i can make it a function, so that you don't know what it's doing.
+##       -- $ports = adamasMagicFunction($ports_db); ?
 
 $ports_db = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($device['device_id']));
 foreach ($ports_db as $port) { $ports[$port['ifIndex']] = $port; }
