@@ -87,7 +87,7 @@ function poll_sensor($device, $class, $unit)
 
 function poll_device($device, $options)
 {
-  global $config, $device, $polled_devices, $db_stats;
+  global $config, $device, $polled_devices, $db_stats, $memcache;
 
   $attribs = get_dev_attribs($device['device_id']);
 

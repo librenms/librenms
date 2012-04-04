@@ -160,12 +160,29 @@ foreach ($ports as $port)
     $this_port = &$port_stats[$port['ifIndex']];
 
     if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $this_port['ifDescr'], $matches)) { $this_port['ifDescr'] = $matches[1]; }
+
+    if($config['memcached']['enable'])
+    {
+      $port['poll_time'] = $memcache->get('port-'.$port['interface_id'].'-poll_time');
+#      echo("time".$port['poll_time']);
+    }
+
+
     $polled_period = $polled - $port['poll_time'];
 
     $port['update'] = array();
-    $port['update']['poll_time'] = $polled;
-    $port['update']['poll_prev'] = $port['poll_time'];
-    $port['update']['poll_period'] = $polled_period;
+    if($config['slow_statistics'] == TRUE) {
+      $port['update']['poll_time'] = $polled;
+      $port['update']['poll_prev'] = $port['poll_time'];
+      $port['update']['poll_period'] = $polled_period;
+    }
+
+    if($config['memcached']['enable']) 
+    {
+      $memcache->set('port-'.$port['interface_id'].'-poll_time', $polled);
+      $memcache->set('port-'.$port['interface_id'].'-poll_prev', $port['poll_time']);
+      $memcache->set('port-'.$port['interface_id'].'-poll_period', $polled_period);
+    }
 
     /// Copy ifHC[In|Out]Octets values to non-HC if they exist
     if ($this_port['ifHCInOctets'] > 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] > 0 && is_numeric($this_port['ifHCOutOctets']))
@@ -262,24 +279,56 @@ foreach ($ports as $port)
     /// Update IF-MIB metrics
     foreach ($stat_oids_db as $oid)
     {
-      $port['update'][$oid] = $this_port[$oid];
-      $port['update'][$oid.'_prev'] = $port[$oid];
+#      echo("\n".$oid.":");
+
+      if($config['slow_statistics'] == TRUE) {
+        $port['update'][$oid] = $this_port[$oid];
+        $port['update'][$oid.'_prev'] = $port[$oid];
+      }
+
+      if($config['memcached']['enable'])
+      {
+        $port[$oid] = $memcache->get('port-'.$port['interface_id'].'-'.$oid);
+	$memcache->set('port-'.$port['interface_id'].'-'.$oid, $this_port[$oid]);
+        $memcache->set('port-'.$port['interface_id'].'-'.$oid.'_prev', $port[$oid]);
+#        echo("MEMCACHE!");
+      }
+
+#      echo(" old[".$port[$oid]."]");
+#      echo(" new[".$this_port[$oid]."]");
+
       $oid_prev = $oid . "_prev";
-      if ($port[$oid])
+      if (isset($port[$oid]))
       {
         $oid_diff = $this_port[$oid] - $port[$oid];
+#        echo(" diff[".$oid_diff."]");
         $oid_rate  = $oid_diff / $polled_period;
+#        echo(" rate[".$oid_rate."]");
         if ($oid_rate < 0) { $oid_rate = "0"; echo("negative $oid"); }
-        $port['update'][$oid.'_rate'] = $oid_rate;
-        $port['update'][$oid.'_delta'] = $oid_diff;
+        $port['stats'][$oid.'_rate'] = $oid_rate;
+        $port['stats'][$oid.'_diff'] = $oid_diff;
+
+        if($config['slow_statistics'] == TRUE) {
+          $port['update'][$oid.'_rate'] = $oid_rate;
+          $port['update'][$oid.'_delta'] = $oid_diff;
+        }
+
+	if($config['memcached']['enable'])
+    	{
+          $memcache->set('port-'.$port['interface_id'].'-'.$oid.'_rate', $oid_rate);
+          $memcache->set('port-'.$port['interface_id'].'-'.$oid.'_delta', $oid_diff);
+#	  echo($oid."[".$oid_rate."]"); 
+   	}
+
         if ($debug) {echo("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n"); }
       }
     }
 
-    $port['ifInBits_rate'] = $port['update']['ifInOctets_rate'] * 8;
-    $port['ifOutBits_rate'] = $port['update']['ifOutOctets_rate'] * 8;
-    echo('bits('.formatRates($port['ifInBits_rate']).'/'.formatRates($port['ifOutBits_rate']).')');
-    echo('pkts('.format_si($port['update']['ifInUcastPkts_rate']).'pps/'.format_si($port['update']['ifOutUcastPkts_rate']).'pps)');
+    $port['stats']['ifInBits_rate'] = $port['stats']['ifInOctets_rate'] * 8;
+    $port['stats']['ifOutBits_rate'] = $port['stats']['ifOutOctets_rate'] * 8;
+    echo('bps('.formatRates($port['stats']['ifInBits_rate']).'/'.formatRates($port['stats']['ifOutBits_rate']).')');
+    echo('bytes('.formatStorage($port['stats']['ifInOctets_diff']).'/'.formatStorage($port['stats']['ifOutOctets_diff']).')');
+    echo('pkts('.format_si($port['stats']['ifInUcastPkts_rate']).'pps/'.format_si($port['stats']['ifOutUcastPkts_rate']).'pps)');
 
     ### Port utilisation % threshold alerting. ## Fixme allow setting threshold per-port. probably 90% of ports we don't care about.
     if($config['alerts']['port_util_alert'])
@@ -287,11 +336,11 @@ foreach ($ports as $port)
       // Check for port saturation of $config['alerts']['port_util_perc'] or higher.  Alert if we see this.
       // Check both inbound and outbound rates
       $saturation_threshold = $this_port['ifSpeed'] * ( $config['alerts']['port_util_perc'] / 100 );
-      echo("IN: " . $port['ifInBits_rate'] . " OUT: " . $port['ifOutBits_rate'] . " THRESH: " . $saturation_threshold);
-      if (($port['ifInBits_rate'] >= $saturation_threshold ||  $port['ifOutBits_rate'] >= $saturation_threshold) && $saturation_threshold > 0)
+      echo("IN: " . $port['stats']['ifInBits_rate'] . " OUT: " . $port['stats']['ifOutBits_rate'] . " THRESH: " . $saturation_threshold);
+      if (($port['stats']['ifInBits_rate'] >= $saturation_threshold ||  $port['stats']['ifOutBits_rate'] >= $saturation_threshold) && $saturation_threshold > 0)
       {
-          log_event('Port reached saturation threshold: ' . formatRates($port['ifInBits_rate']) . '/' . formatRates($port['ifOutBits_rate']) . ' - ifspeed: ' . formatRates( $this_port['ifSpeed'])  , $device, 'interface', $port['interface_id']);
-          notify($device, 'Port saturation threshold reached on ' . $device['hostname'] , 'Port saturation threshold alarm: ' . $device['hostname'] . ' on ' . $port['ifDescr'] . "\nRates:" . formatRates($port['ifInBits_rate']) . '/' . formatRates($port['ifOutBits_rate']) . ' - ifspeed: ' . formatRates( $this_port['ifSpeed']) . "\nTimestamp: " . date($config['timestamp_format']));
+          log_event('Port reached saturation threshold: ' . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ' - ifspeed: ' . formatRates( $this_port['stats']['ifSpeed'])  , $device, 'interface', $port['interface_id']);
+          notify($device, 'Port saturation threshold reached on ' . $device['hostname'] , 'Port saturation threshold alarm: ' . $device['hostname'] . ' on ' . $port['ifDescr'] . "\nRates:" . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ' - ifspeed: ' . formatRates( $this_port['ifSpeed']) . "\nTimestamp: " . date($config['timestamp_format']));
       }
     }
 
