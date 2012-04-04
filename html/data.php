@@ -26,6 +26,6 @@ $out = snmp_get($device, "ifOutOctets.".$port['ifIndex'], "-OUqnv", "IF-MIB");
 
 $time = time();
 
-printf("%lf|%u|%u\n", time(), $in, $out);
+printf("%lf|%s|%s\n", time(), $in, $out);
 
 ?>
