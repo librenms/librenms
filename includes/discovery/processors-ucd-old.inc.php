@@ -10,10 +10,9 @@ if ($device['os_group'] == "unix" && $count == "0")
   $user   = snmp_get($device, "ssCpuUser.0"  , "-OvQ", "UCD-SNMP-MIB");
   $idle   = snmp_get($device, "ssCpuIdle.0"  , "-OvQ", "UCD-SNMP-MIB");
 
-  $percent = $system + $user + $idle;
-
-  if (is_numeric($percent))
+  if (is_numeric($system))
   {
+    $percent = $system + $user + $idle;
     discover_processor($valid['processor'], $device, 0, 0, "ucd-old", "CPU", "1", $system+$user, NULL, NULL);
   }
 }
