@@ -234,7 +234,7 @@ $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 
-$os = "pix";
+$os = "pixos";
 $config['os'][$os]['group']             = "cisco";
 $config['os'][$os]['text']              = "Cisco PIX-OS";
 $config['os'][$os]['ifname']            = 1;
