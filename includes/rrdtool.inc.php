@@ -68,8 +68,8 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
 
 function rrdtool_pipe_close(&$rrd_process, &$rrd_pipes)
 {
-
   global $debug;
+
   if ($debug)
   {
     echo stream_get_contents($rrd_pipes[1]);

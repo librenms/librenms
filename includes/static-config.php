@@ -33,7 +33,6 @@ $config['os'][$os]['over'][1]['text']   = "Processor Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
-
 ### Linux-based OSes here please.
 
 $os = "linux";
@@ -288,11 +287,11 @@ $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "ciscosb";
 $config['os'][$os]['group']             = "cisco";
-$config['os'][$os]['text']              = "Cisco Small Business"; 
+$config['os'][$os]['text']              = "Cisco Small Business";
 $config['os'][$os]['ifname']            = 1;
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "linksys";
-$config['os'][$os]['over'][0]['graph']  = "device_bits";   
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 ## Huawei
@@ -389,7 +388,6 @@ $config['os'][$os]['icon']              = "brocade";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
-
 $os = "extremeware";
 $config['os'][$os]['text']              = "Extremeware";
 $config['os'][$os]['type']              = "network";
@@ -456,7 +454,6 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['over'][1]['graph']  = "device_processor";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
-
 
 $os = "proxim";
 $config['os'][$os]['text']              = "Proxim";
@@ -1126,11 +1123,11 @@ if (!$observium_link)
 }
 $observium_db = mysql_select_db($config['db_name'], $observium_link);
 
-if($config['memcached']['enable']) 
+if($config['memcached']['enable'])
 {
   $memcache = new Memcached();
   $memcache->addServer($config['memcached']['host'], $config['memcached']['port']);
-  if($debug) { print_r($memcache->getStats()); }
+  if ($debug) { print_r($memcache->getStats()); }
 }
 
 # Set some times needed by loads of scripts (it's dynamic, so we do it here!)
