@@ -455,6 +455,12 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
 <?php
 }
+
+
+$packages  = dbFetchCell("SELECT COUNT(*) from `packages`");
+
+if ($packages)
+{
 ?>
 
     <li><a href="<?php echo(generate_url(array('page'=>'packages'))); ?>" class="drop"><img src="images/16/box.png" border="0" align="absmiddle" /> Packages</a>
@@ -466,6 +472,9 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
         </div>
       </div>
     </li>
+<?php
+} # if ($packages)
+?>
     <li class="menu_right"><a href="#" class="drop"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System</a><!-- Begin Home Item -->
 
         <div class="dropdown_3columns align_right"><!-- Begin 2 columns container -->
