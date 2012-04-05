@@ -8,7 +8,7 @@ include("includes/discovery/cisco-entity-sensor.inc.php");
 include("includes/discovery/entity-sensor.inc.php");
 include("includes/discovery/ipmi.inc.php");
 
-if($device['os'] == "netscaler"){ include("includes/discovery/sensors-netscaler.inc.php"); }
+if($device['os'] == "netscaler") { include("includes/discovery/sensors-netscaler.inc.php"); }
 
 include("includes/discovery/temperatures.inc.php");
 include("includes/discovery/humidity.inc.php");

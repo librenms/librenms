@@ -16,7 +16,7 @@ if ($device['os'] == "junos")
     {
       if ($entry['jnxOperatingDRAMSize'] || $entry['jnxOperatingMemory'])
       {
-	if (stripos($entry['jnxOperatingDescr'], "sensor") || stripos($entry['jnxOperatingDescr'], "fan")) continue;
+        if (stripos($entry['jnxOperatingDescr'], "sensor") || stripos($entry['jnxOperatingDescr'], "fan")) continue;
         if ($debug) { echo($index . " " . $entry['jnxOperatingDescr'] . " -> " . $entry['jnxOperatingBuffer'] . " -> " . $entry['jnxOperatingDRAMSize'] . "\n"); }
         $usage_oid = ".1.3.6.1.4.1.2636.3.1.13.1.8." . $index;
         $descr = $entry['jnxOperatingDescr'];

@@ -7,20 +7,19 @@ if ($config['enable_vrfs'])
     unset($vrf_count);
 
     echo("VRFs : ");
-    
-    /* 
+
+    /*
       There are 2 MIBs for VPNs : MPLS-VPN-MIB (oldest) and MPLS-L3VPN-STD-MIB (newest)
       Unfortunately, there is no simple way to find out which one to use, unless we reference
       all the possible devices and check what they support.
       Therefore we start testing the MPLS-L3VPN-STD-MIB that is prefered if available.
     */
 
-
     // Grab all the info first, then use it in the code.
     // It removes load on the device and makes things much faster
 
     $rds = snmp_walk($device, "mplsL3VpnVrfRD", "-Osqn", "MPLS-L3VPN-STD-MIB", NULL);
-    
+
     if (empty($rds))
     {
       $rds = snmp_walk($device, "mplsVpnVrfRouteDistinguisher", "-Osqn", "MPLS-VPN-MIB", NULL);
@@ -34,13 +33,13 @@ if ($config['enable_vrfs'])
     {
       $vpnmib = "MPLS-L3VPN-STD-MIB";
       $rds = str_replace(".1.3.6.1.2.1.10.166.11.1.2.2.1.4.", "", $rds);
-      
+
       $descrs_oid = ".1.3.6.1.2.1.10.166.11.1.2.2.1.3";
       $ports_oid = ".1.3.6.1.2.1.10.166.11.1.2.1.1.2";
     }
-  
-    if ($debug) 
-    { 
+
+    if ($debug)
+    {
       echo("\n[DEBUG]\nUsing $vpnmib\n[/DEBUG]\n");
       echo("\n[DEBUG OIDS]\n$rds\n[/DEBUG]\n");
     }
@@ -48,7 +47,7 @@ if ($config['enable_vrfs'])
 
     $descrs = snmp_walk($device, $descrs_oid, "-Osqn", $vpnmib, NULL);
     $ports  = snmp_walk($device, $ports_oid, "-Osqn", $vpnmib, NULL);
-    
+
     $descrs = trim(str_replace("$descrs_oid.", "", $descrs));
     $ports  = trim(str_replace("$ports_oid.", "", $ports));
 

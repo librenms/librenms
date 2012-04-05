@@ -2,14 +2,14 @@
 
 ## Common Functions
 
-function format_number_short($number, $sf) 
+function format_number_short($number, $sf)
 {
   // This formats a number so that we only send back three digits plus an optional decimal point.
   // Example: 723.42 -> 723    72.34 -> 72.3    2.23 -> 2.23
 
   list($whole, $decimal) = explode (".", $number);
 
-  if(strlen($whole) >= $sf || !is_numeric($decimal))
+  if (strlen($whole) >= $sf || !is_numeric($decimal))
   {
     $number = $whole;
   } elseif(strlen($whole) < $sf) {
@@ -460,7 +460,7 @@ function formatStorage($value, $round = '2', $sf = '3')
 
 function format_si($value, $round = '2', $sf = '3')
 {
-  if($value < "0")
+  if ($value < "0")
   {
     $neg = 1;
     $value = $value * -1;
@@ -479,14 +479,14 @@ function format_si($value, $round = '2', $sf = '3')
     for ($i = 1; (($i < count($sizes)) && ($value != 0) && ($value <= 0.1)); $i++) { $value = $value * 1000; $ext  = $sizes[$i]; }
   }
 
-  if($neg) { $value = $value * -1; }
+  if ($neg) { $value = $value * -1; }
 
   return format_number_short(round($value, $round),$sf).$ext;
 }
 
 function format_bi($value, $round = '2', $sf = '3')
 {
-  if($value < "0")
+  if ($value < "0")
   {
     $neg = 1;
     $value = $value * -1;
@@ -495,14 +495,14 @@ function format_bi($value, $round = '2', $sf = '3')
   $ext = $sizes[0];
   for ($i = 1; (($i < count($sizes)) && ($value >= 1024)); $i++) { $value = $value / 1024; $ext  = $sizes[$i]; }
 
-  if($neg) { $value = $value * -1; }
+  if ($neg) { $value = $value * -1; }
 
   return format_number_short(round($value, $round), $sf).$ext;
 }
 
 function format_number($value, $base = '1000', $round=2, $sf=3)
 {
-  if($base == '1000')
+  if ($base == '1000')
   {
     return format_si($value, $round, $sf);
   } else {

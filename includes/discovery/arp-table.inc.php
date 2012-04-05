@@ -21,7 +21,7 @@ foreach (explode("\n", $ipNetToMedia_data) as $data)
     $m_a = zeropad($m_a);$m_b = zeropad($m_b);$m_c = zeropad($m_c);$m_d = zeropad($m_d);$m_e = zeropad($m_e);$m_f = zeropad($m_f);
     $md_a = hexdec($m_a);$md_b = hexdec($m_b);$md_c = hexdec($m_c);$md_d = hexdec($m_d);$md_e = hexdec($m_e);$md_f = hexdec($m_f);
     $mac = "$m_a:$m_b:$m_c:$m_d:$m_e:$m_f";
-  
+
     $mac_table[$if][$mac]['ip'] =  $ip;
     $mac_table[$if][$mac]['ciscomac'] = "$m_a$m_b.$m_c$m_d.$m_e$m_f";
     $clean_mac = $m_a . $m_b . $m_c . $m_d . $m_e . $m_f;

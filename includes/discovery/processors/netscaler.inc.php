@@ -4,7 +4,6 @@
 #NS-ROOT-MIB::nsCPUname."cpu0" = STRING: "cpu0"
 #NS-ROOT-MIB::nsCPUusage."cpu0" = Gauge32: 0
 
-
 if($device['os'] == "netscaler")
 {
   echo(" NetScaler ");
@@ -18,7 +17,7 @@ if($device['os'] == "netscaler")
     $nsarray = snmpwalk_cache_multi_oid($device, "nsCPUTable", $nsarray, "NS-ROOT-MIB");
   }
 
-  foreach($nsarray as $descr => $data)
+  foreach ($nsarray as $descr => $data)
   {
 
     $current = $data['nsCPUusage'];

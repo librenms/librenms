@@ -1,6 +1,5 @@
 <?php
 
-
 function string_to_oid($string)
 {
   $oid = strlen($string);

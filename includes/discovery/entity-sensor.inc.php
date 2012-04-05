@@ -31,8 +31,7 @@ $entitysensor['hertz']     = "freq";
 $entitysensor['percentRH'] = "humidity";
 $entitysensor['rpm']       = "fanspeed";
 $entitysensor['celsius']   = "temperature";
-$entitysensor['dBm']   	   = "dbm";
-
+$entitysensor['dBm']       = "dbm";
 
 if (is_array($oids))
 {

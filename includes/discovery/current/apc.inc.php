@@ -40,6 +40,7 @@ if ($device['os'] == "apc")
         {
           $descr     = "Output";
         }
+
         discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);
       }
     }
@@ -83,11 +84,11 @@ if ($device['os'] == "apc")
           if ($index == "1") { $descr = "Bank Total"; }
         }
 
-        $current_oid        = "1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.".$index;                #rPDULoadStatusLoad
-        $bank_oid        = "1.3.6.1.4.1.318.1.1.12.2.3.1.1.5.".$index;                #rPDULoadStatusBankNumber
-        $limit_oid        = "1.3.6.1.4.1.318.1.1.12.2.4.1.1.4.".$index;                #rPDULoadBankConfigOverloadThreshold
-        $lowlimit_oid        = "1.3.6.1.4.1.318.1.1.12.2.4.1.1.2.".$index;                #rPDULoadBankConfigLowLoadThreshold
-        $warnlimit_oid        = "1.3.6.1.4.1.318.1.1.12.2.4.1.1.3.".$index;                #rPDULoadBankConfigNearOverloadThreshold
+        $current_oid   = "1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.".$index;  #rPDULoadStatusLoad
+        $bank_oid      = "1.3.6.1.4.1.318.1.1.12.2.3.1.1.5.".$index;  #rPDULoadStatusBankNumber
+        $limit_oid     = "1.3.6.1.4.1.318.1.1.12.2.4.1.1.4.".$index;  #rPDULoadBankConfigOverloadThreshold
+        $lowlimit_oid  = "1.3.6.1.4.1.318.1.1.12.2.4.1.1.2.".$index;  #rPDULoadBankConfigLowLoadThreshold
+        $warnlimit_oid = "1.3.6.1.4.1.318.1.1.12.2.4.1.1.3.".$index;  #rPDULoadBankConfigNearOverloadThreshold
 
         $bank      = snmp_get($device, $bank_oid, "-Oqv", "");
         $current   = snmp_get($device, $current_oid, "-Oqv", "") / $precision;
@@ -124,35 +125,28 @@ if ($device['os'] == "apc")
 
         $index = $split_oid[count($split_oid)-1];
 
-	$voltage_oid    = "1.3.6.1.4.1.318.1.1.26.6.3.1.6";                     #rPDU2PhaseStatusVoltage
+        $voltage_oid   = "1.3.6.1.4.1.318.1.1.26.6.3.1.6";            #rPDU2PhaseStatusVoltage
 
-        $current_oid        = "1.3.6.1.4.1.318.1.1.26.9.4.3.1.6.".$index;                #rPDU2OutletMeteredStatusCurrent
-	$limit_oid	= "1.3.6.1.4.1.318.1.1.26.9.4.1.1.7.".$index;			# rPDU2OutletMeteredConfigOverloadCurrentThreshold
-        $lowlimit_oid        = "1.3.6.1.4.1.318.1.1.26.9.4.1.1.7.".$index;                #rPDU2OutletMeteredConfigLowLoadCurrentThreshold
-        $warnlimit_oid        = "1.3.6.1.4.1.318.1.1.26.9.4.1.1.6.".$index;                #rPDU2OutletMeteredConfigNearOverloadCurrentThreshold
-	$name_oid	= "1.3.6.1.4.1.318.1.1.26.9.4.3.1.3.".$index;			#rPDU2OutletMeteredStatusName
+        $current_oid   = "1.3.6.1.4.1.318.1.1.26.9.4.3.1.6.".$index;  #rPDU2OutletMeteredStatusCurrent
+        $limit_oid     = "1.3.6.1.4.1.318.1.1.26.9.4.1.1.7.".$index;  #rPDU2OutletMeteredConfigOverloadCurrentThreshold
+        $lowlimit_oid  = "1.3.6.1.4.1.318.1.1.26.9.4.1.1.7.".$index;  #rPDU2OutletMeteredConfigLowLoadCurrentThreshold
+        $warnlimit_oid = "1.3.6.1.4.1.318.1.1.26.9.4.1.1.6.".$index;  #rPDU2OutletMeteredConfigNearOverloadCurrentThreshold
+        $name_oid      = "1.3.6.1.4.1.318.1.1.26.9.4.3.1.3.".$index;  #rPDU2OutletMeteredStatusName
 
-	
-	$voltage   = snmp_get($device, $voltage_oid, "-Oqv", "");
+        $voltage   = snmp_get($device, $voltage_oid, "-Oqv", "");
 
         $current   = snmp_get($device, $current_oid, "-Oqv", "") / $precision;
         $limit     = snmp_get($device, $limit_oid, "-Oqv", "") / $voltage;
         $lowlimit  = snmp_get($device, $lowlimit_oid, "-Oqv", "") / $voltage;
         $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", "") / $voltage;
-	$descr 	   = "Outlet " . $index . " - " .  snmp_get($device, $name_oid, "-Oqv", "");
+        $descr     = "Outlet " . $index . " - " .  snmp_get($device, $name_oid, "-Oqv", "");
 
         discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);
-
       }
     }
-
   }
 
-
-
-   unset($oids);
-
-
+  unset($oids);
 
   # ATS
   $oids = snmp_walk($device, "atsConfigPhaseTableIndex", "-OsqnU", "PowerNet-MIB");
@@ -162,16 +156,16 @@ if ($device['os'] == "apc")
     if ($debug) { print_r($oids); }
     $oids = trim($oids);
     if ($oids) echo("APC PowerNet-MIB ATS ");
-    $current_oid   = "1.3.6.1.4.1.318.1.1.8.5.4.3.1.4.1.1.1";        #atsOutputCurrent
-    $limit_oid     = "1.3.6.1.4.1.318.1.1.8.4.16.1.5.1";        #atsConfigPhaseOverLoadThreshold
-    $lowlimit_oid  = "1.3.6.1.4.1.318.1.1.8.4.16.1.3.1";        #atsConfigPhaseLowLoadThreshold
-    $warnlimit_oid = "1.3.6.1.4.1.318.1.1.8.4.16.1.4.1";        #atsConfigPhaseNearOverLoadThreshold
+    $current_oid   = "1.3.6.1.4.1.318.1.1.8.5.4.3.1.4.1.1.1";  #atsOutputCurrent
+    $limit_oid     = "1.3.6.1.4.1.318.1.1.8.4.16.1.5.1";       #atsConfigPhaseOverLoadThreshold
+    $lowlimit_oid  = "1.3.6.1.4.1.318.1.1.8.4.16.1.3.1";       #atsConfigPhaseLowLoadThreshold
+    $warnlimit_oid = "1.3.6.1.4.1.318.1.1.8.4.16.1.4.1";       #atsConfigPhaseNearOverLoadThreshold
     $index         = 1;
 
     $current   = snmp_get($device, $current_oid, "-Oqv", "") / $precision;
-    $limit     = snmp_get($device, $limit_oid, "-Oqv", "");        # No / $precision here! Nice, APC!
-    $lowlimit  = snmp_get($device, $lowlimit_oid, "-Oqv", "");        # No / $precision here! Nice, APC!
-    $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", "");        # No / $precision here! Nice, APC!
+    $limit     = snmp_get($device, $limit_oid, "-Oqv", "");     # No / $precision here! Nice, APC!
+    $lowlimit  = snmp_get($device, $lowlimit_oid, "-Oqv", "");  # No / $precision here! Nice, APC!
+    $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", ""); # No / $precision here! Nice, APC!
     $descr     = "Output Feed";
 
     discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);

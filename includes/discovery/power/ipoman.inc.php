@@ -20,7 +20,6 @@ if ($device['os'] == "ipoman")
 #  $oids_in = array();
   $oids_out = array();
 
-
 #  echo("inletStatusWH ");
 #  $oids_in = snmpwalk_cache_multi_oid($device, "inletStatusWH", $oids_in, "IPOMANII-MIB");
   echo("outletStatusWH ");
@@ -76,7 +75,6 @@ if ($device['os'] == "ipoman")
 
 #  $oids_in = array();
   $oids_out = array();
-
 
 #  echo("inletStatusWH ");
 #  $oids_in = snmpwalk_cache_multi_oid($device, "inletStatusWH", $oids_in, "IPOMANII-MIB");
