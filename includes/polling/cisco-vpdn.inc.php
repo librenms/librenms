@@ -12,7 +12,7 @@ if ($device['os_group'] == "cisco")
 {
   $data = snmpwalk_cache_oid($device, "cvpdnSystemEntry", NULL, "CISCO-VPDN-MGMT-MIB");
 
-  foreach($data as $type => $vpdn)
+  foreach ($data as $type => $vpdn)
   {
 
     $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("vpdn-".$type.".rrd");

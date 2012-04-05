@@ -101,8 +101,8 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding']))
   }
   dbUpdate($port['adsl_update'], 'ports_adsl', '`interface_id` = ?', array($port['interface_id']));
 
-  if($this_port['adslAtucCurrSnrMgn'] > "1280") { $this_port['adslAtucCurrSnrMgn'] = "U"; }
-  if($this_port['adslAturCurrSnrMgn'] > "1280") { $this_port['adslAturCurrSnrMgn'] = "U"; }
+  if ($this_port['adslAtucCurrSnrMgn'] > "1280") { $this_port['adslAtucCurrSnrMgn'] = "U"; }
+  if ($this_port['adslAturCurrSnrMgn'] > "1280") { $this_port['adslAturCurrSnrMgn'] = "U"; }
 
   $rrdupdate = "N";
   foreach ($adsl_oids as $oid)

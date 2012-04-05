@@ -7,7 +7,6 @@
 
 echo("Comware OS...");
 
-
 $hardware = snmp_get($device, "sysObjectID.0", "-OQsv", "SNMPv2-MIB:HH3C-PRODUCT-ID-MIB", "+".$config['install_dir']."/mibs/h3c");
 
 list(,$version,$features) = explode(",", $poll_device['sysDescr']);

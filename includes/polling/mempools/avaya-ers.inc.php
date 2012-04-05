@@ -1,9 +1,9 @@
 <?php
 
-
 if ($device['os'] == "avaya-ers")
+{
   # Memory information only known to work with 5500 and 5600 switches
-  if (preg_match("/5[56][0-9][0-9]/", $device["sysDescr"])) {
+  if (preg_match("/5[56][0-9][0-9]/", $device["sysDescr"]))
   {
     $index = $mempool['mempool_index'];
 
