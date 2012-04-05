@@ -41,7 +41,7 @@ foreach ($_GET as $key=>$get_var)
   }
 }
 
-$segments = explode('/', trim($_SERVER['PATH_INFO'], '/'));
+$segments = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
 
 foreach ($segments as $pos => $segment)
 {
