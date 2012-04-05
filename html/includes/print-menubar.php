@@ -346,7 +346,7 @@ foreach (array('fanspeed','humidity','temperature') as $item)
 {
   if ($menu_sensors[$item])
   {
-    echo ('<li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
+    echo('<li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
     unset($menu_sensors[$item]);$sep++;
   }
 }
@@ -361,7 +361,7 @@ foreach (array('current','frequency','power','voltage') as $item)
 {
   if ($menu_sensors[$item])
   {
-    echo ('<li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
+    echo('<li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
     unset($menu_sensors[$item]);$sep++;
   }
 }
@@ -374,7 +374,7 @@ if ($sep && array_keys($menu_sensors))
 
 foreach (array_keys($menu_sensors) as $item)
 {
-  echo ('<li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
+  echo('<li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
   unset($menu_sensors[$item]);$sep++;
 }
 
@@ -455,7 +455,6 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
 <?php
 }
-
 
 $packages  = dbFetchCell("SELECT COUNT(package_id) from `packages`");
 

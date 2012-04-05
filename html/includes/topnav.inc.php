@@ -14,7 +14,7 @@ foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $device)
 
   $cache['devices']['hostname'][$device['hostname']] = $device['device_id'];
   $cache['devices']['id'][$device['device_id']] = $device;
-  
+
   $cache['device_types'][$device['type']]++;
 }
 
