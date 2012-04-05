@@ -13,7 +13,6 @@ foreach ($cefs_query as $ceftmp)
   $cefs_db[$cef_id] = $ceftmp['cef_switching_id'];
 }
 
-
 if ($debug) { print_r($cefs); }
 
 if (is_array($cefs))
@@ -43,7 +42,7 @@ if (is_array($cefs))
         $cef_id = $device['device_id']."-".$entity."-".$afi."-".$path;
 
 #        if (dbFetchCell("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path)) != "1")
-        if(!isset($cefs_db[$cef_id]))
+        if (!isset($cefs_db[$cef_id]))
         {
           dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $entity, 'afi' => $afi, 'cef_index' => $path, 'cef_path' => $cef_stat['cefSwitchingPath']), 'cef_switching');
           echo("+");
@@ -98,7 +97,7 @@ if (is_array($cefs))
 
 print_r($cefs_db);
 
-foreach($cefs_db as $cef_switching_id)
+foreach ($cefs_db as $cef_switching_id)
 {
   dbDelete("cef_switching", "`cef_switching_id` =  ?", array($cef_switching_id));
   echo("-");

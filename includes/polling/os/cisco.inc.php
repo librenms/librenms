@@ -2,13 +2,13 @@
 
 if (preg_match('/^Cisco IOS Software, .+? Software \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result))
 {
-	$features = $regexp_result[1];
-	$version = $regexp_result[2];
+  $features = $regexp_result[1];
+  $version = $regexp_result[2];
 }
 elseif( false )
 {
-	# Placeholder
-	# Other regexp for other type of string
+  # Placeholder
+  # Other regexp for other type of string
 }
 
 echo("\n".$poll_device['sysDescr']."\n");
@@ -34,7 +34,6 @@ if ($data[1]['entPhysicalContainedIn'] == "0")
     $hardware = $data[1]['entPhysicalModelName'];
   }
 }
-
 
 #   if ($slot_1 == "-1" && strpos($descr_1, "No") === FALSE) { $ciscomodel = $descr_1; }
 #   if (($contained_1 == "0" || $name_1 == "Chassis") && strpos($model_1, "No") === FALSE) { $ciscomodel = $model_1; list($version_1) = explode(",",$ver_1); }

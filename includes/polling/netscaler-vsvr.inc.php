@@ -31,9 +31,8 @@
 # NS-ROOT-MIB::vsvrTotalClients."observium" = Counter64: 43023
 # NS-ROOT-MIB::vsvrClientConnOpenRate."observium" = STRING: "0"
 
-if($device['os'] == "netscaler")
+if ($device['os'] == "netscaler")
 {
-
   echo("Netscaler VServers\n");
 
   $oids_gauge   = array('vsvrCurClntConnections','vsvrCurSrvrConnections');
@@ -60,23 +59,18 @@ if($device['os'] == "netscaler")
     $rrd_create .= " DS:$oid_ds:COUNTER:600:U:100000000000";
   }
 
-
   $vsvr_array = snmpwalk_cache_oid($device, "vserverEntry", array(), "NS-ROOT-MIB");
 
   $vsvr_db    = dbFetchRows("SELECT * FROM `netscaler_vservers` WHERE `device_id` = ?", array($device['device_id']));
   foreach ($vsvr_db as $vsvr) { $vsvrs[$vsvr['vsvr_name']] = $vsvr; print_r($vsvr); }
-  if($debug) { print_r($vsvrs); }
+  if ($debug) { print_r($vsvrs); }
 
-  foreach($vsvr_array as $index => $vsvr)
+  foreach ($vsvr_array as $index => $vsvr)
   {
-
-    if(isset($vsvr['vsvrName']))
+    if (isset($vsvr['vsvrName']))
     {
-
       $vsvr_exist[$vsvr['vsvrName']] = 1;
-
       $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/netscaler-vsvr-".safename($vsvr['vsvrName']).".rrd";
-
       $rrdupdate = "N";
 
       foreach ($oids as $oid)
@@ -95,10 +89,10 @@ if($device['os'] == "netscaler")
       $db_update = array('vsvr_ip' => $vsvr['vsvrIpAddress'], 'vsvr_port' => $vsvr['vsvrPort'], 'vsvr_state' => $vsvr['vsvrState'], 'vsvr_type' => $vsvr['vsvrType'],
                          'vsvr_req_rate' => $vsvr['RequestRate'], 'vsvr_bps_in' => $vsvr['vsvrRxBytesRate'], 'vsvr_bps_out' => $vsvr['vsvrTxBytesRate']);
 
-     if(!is_array($vsvrs[$vsvr['vsvrName']]))
+     if (!is_array($vsvrs[$vsvr['vsvrName']]))
      {
        $db_insert = array_merge(array('device_id' => $device['device_id'], 'vsvr_name' => $vsvr['vsvrName']), $db_update);
-       $vsvr_id = dbInsert($db_insert, 'netscaler_vservers'); echo (" +");
+       $vsvr_id = dbInsert($db_insert, 'netscaler_vservers'); echo(" +");
      } else {
        $updated  = dbUpdate($db_update, 'netscaler_vservers', '`vsvr_id` = ?', array($vsvrs[$vsvr['vsvrName']]['vsvr_id']));
        echo(" U");
@@ -112,17 +106,16 @@ if($device['os'] == "netscaler")
 
   }
 
-  if($debug) { print_r($vsvr_exist); }
+  if ($debug) { print_r($vsvr_exist); }
 
-  foreach($vsvrs as $db_name => $db_id)
+  foreach ($vsvrs as $db_name => $db_id)
   {
-    if(!$vsvr_exist[$db_name])
+    if (!$vsvr_exist[$db_name])
     {
       echo("-".$db_name);
       dbDelete('netscaler_vservers', "`vsvr_id` =  ?", array($db_id));
     }
   }
-
-
 }
+
 ?>

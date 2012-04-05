@@ -5,7 +5,7 @@ $rserver_db = dbFetchRows("SELECT * FROM `loadbalancer_rservers` WHERE `device_i
 
 foreach ($rserver_db as $serverfarm) { $serverfarms[$serverfarm['farm_id']] = $serverfarm;}
 
-foreach($rserver_array as $index => $serverfarm)
+foreach ($rserver_array as $index => $serverfarm)
 {
 
  $clean_index = preg_replace('@\d+\."(.*?)"\.\d+@', '\\1', $index);
@@ -17,12 +17,11 @@ foreach($rserver_array as $index => $serverfarm)
 
  $db_oids = array($clean_index => 'farm_id', "cesServerFarmRserverStateDescr" => "StateDescr");
 
-
- if(!is_array( $serverfarms[$clean_index]))
+ if (!is_array( $serverfarms[$clean_index]))
   {
    $rserver_id = dbInsert(array('device_id' => $device['device_id'], 'farm_id' => $clean_index, 'StateDescr' => $serverfarm['cesServerFarmRserverStateDescr']), 'loadbalancer_rservers');
   } else {
-    foreach($db_oids as $db_oid => $db_value) {
+    foreach ($db_oids as $db_oid => $db_value) {
       $db_update[$db_value] = $serverfarm[$db_oid];
     }
 
@@ -58,7 +57,6 @@ foreach($rserver_array as $index => $serverfarm)
     if (!file_exists($rrd_file)) { rrdtool_create($rrd_file, $rrd_create); }
     rrdtool_update($rrd_file, $rrdupdate);
   }
-
 
 }
 
