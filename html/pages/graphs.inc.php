@@ -220,16 +220,16 @@ if (!$auth)
   {
 
     print_optionbar_start();
-
-    echo('<div style="float: left; height: 100%;">
-          <div style="padding: 10px"><img src="images/16/information.png" /></div>
+    echo('<div style="float: left; width: 30px;">
+          <div style="margin: auto auto;">
+            <img valign=absmiddle src="images/16/information.png" />
+          </div>
           </div>');
     echo($config['graph_descr'][$vars['type']]);
     print_optionbar_end();
-
   }
 
-  if($vars['showcommand']) 
+  if($vars['showcommand'])
   {
     $_GET = $graph_array;
     $command_only = 1;
