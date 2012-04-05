@@ -67,6 +67,7 @@ foreach ($rrd_list as $i => $rrd)
   {
     $g_defname = $rrd['ds'] . "_cdef";
     $rrd_options .= " CDEF:" . $g_defname . $i . "=" . $rrd['ds'] . $i . "," . $multiplier . ",*";
+    $rrd_options .= " CDEF:" . $g_defname . $i . "min=" . $rrd['ds'] . $i . "min," . $multiplier . ",*";
     $rrd_options .= " CDEF:" . $g_defname . $i . "max=" . $rrd['ds'] . $i . "max," . $multiplier . ",*";
 
   ## If we've been passed a divider (divisor!) we make a CDEF for it.
@@ -74,6 +75,7 @@ foreach ($rrd_list as $i => $rrd)
   {
     $g_defname = $rrd['ds'] . "_cdef";
     $rrd_options .= " CDEF:" . $g_defname . $i . "=" . $rrd['ds'] . $i . "," . $divider . ",/";
+    $rrd_options .= " CDEF:" . $g_defname . $i . "min=" . $rrd['ds'] . $i . "min," . $divider . ",/";
     $rrd_options .= " CDEF:" . $g_defname . $i . "max=" . $rrd['ds'] . $i . "max," . $divider . ",/";
   }
 
