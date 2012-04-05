@@ -237,7 +237,6 @@ if($format == "graph")
   $row = 1;
   foreach (dbFetchRows($query, $sql_param) as $device)
   {
-
     if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
     if (device_permitted($device['device_id']))
