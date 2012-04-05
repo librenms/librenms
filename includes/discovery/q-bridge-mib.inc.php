@@ -11,7 +11,7 @@ if ($vlanversion == 'version1')
   $vlans = snmp_walk($device, "dot1qVlanFdbId", "-Oqn", "Q-BRIDGE-MIB");
 
   $vlan_array = snmpwalk_cache_multi_oid($device, "dot1qVlanStaticName", $vlan_array, "Q-BRIDGE-MIB");
-  
+
   foreach (explode("\n", $vlans) as $vlan_oid)
   {
     list($oid,$vlan_index) = explode(' ',$vlan_oid);

@@ -4,7 +4,7 @@ if ($device['os'] == "powerconnect")
 {
   $temps = snmp_walk($device, "boxServicesTempSensorTemperature", "-OsqnU", "FASTPATH-BOXSERVICES-PRIVATE-MIB");
   if ($debug) { echo($temps."\n"); }
-  
+
   $index = 0;
   foreach (explode("\n",$temps) as $oids)
   {

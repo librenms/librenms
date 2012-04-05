@@ -26,7 +26,7 @@ class observiumbot
 {
 
 ###
-# HELP Function 
+# HELP Function
 ###
   function help_info(&$irc, &$data)
   {
@@ -56,7 +56,7 @@ class observiumbot
   }
 
 ###
-# LOG Function 
+# LOG Function
 ###
   function log_info(&$irc, &$data)
   {
@@ -101,7 +101,7 @@ class observiumbot
   }
 
 ###
-# DEVICE Function 
+# DEVICE Function
 ###
   function device_info(&$irc, &$data)
   {
@@ -115,7 +115,6 @@ class observiumbot
     $device = dbFetchRow("SELECT * FROM `devices` WHERE `hostname` = ?",array($hostname));
 
     mysql_close();
-
 
 if (!$device) {
  $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Error: Bad or Missing hostname, use .listdevices to show all devices."); } else {
@@ -132,7 +131,7 @@ if (!$device) {
   }
 }
 ###
-# PORT Function 
+# PORT Function
 ###
   function port_info(&$irc, &$data)
   {
