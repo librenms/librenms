@@ -474,6 +474,13 @@ if ($packages)
     </li>
 <?php
 } # if ($packages)
+
+### Custom menubar entries.
+if(is_file("includes/print-menubar-custom.inc.php"))
+{
+  include("includes/print-menubar-custom.inc.php");
+}
+
 ?>
     <li class="menu_right"><a href="#" class="drop"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System</a><!-- Begin Home Item -->
 
