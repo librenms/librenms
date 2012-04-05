@@ -32,7 +32,4 @@ $unit_text = "Semaphores";
 
 include("includes/graphs/generic_multi_simplex_seperated.inc.php");
 
-
-
-
 ?>

@@ -31,7 +31,6 @@ if($width > "500")
   $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT      Loss    SDev   RTT\:SDev                              \l'";
 }
 
-
 if($device['hostname'] == $config['own_hostname'])
 {
   $filename = $config['smokeping']['dir'] . $dest['hostname'].'.rrd';

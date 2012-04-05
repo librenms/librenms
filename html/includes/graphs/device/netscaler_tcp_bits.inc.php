@@ -9,5 +9,4 @@ $multiplier = 8;
 
 include("includes/graphs/generic_bits.inc.php");
 
-
 ?>

@@ -1,6 +1,7 @@
 <?php
 
 include("includes/graphs/common.inc.php");
+
 $device = device_by_id_cache($id);
 
 if ($_GET['width'] > "300") { $descr_len = "40"; } else { $descr_len = "22"; }

@@ -5,9 +5,9 @@ include("includes/graphs/common.inc.php");
 $rrd_filename = $config["rrd_dir"] . '/' . $device["hostname"] . '/app-mysql-'.$app["app_id"].'.rrd';
 
 $array = array( 'KRRs' => 'read requests',
-		'KRs' => 'reads',
-		'KWR' => 'write requests',
-		'KWs' => 'writes',
+                'KRs' => 'reads',
+                'KWR' => 'write requests',
+                'KWs' => 'writes',
 );
 
 $i = 0;
@@ -32,6 +32,5 @@ $nototal   = 1;
 $unit_text = "Keys";
 
 include("includes/graphs/generic_multi_simplex_seperated.inc.php");
-
 
 ?>

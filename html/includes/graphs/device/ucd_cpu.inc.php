@@ -1,6 +1,7 @@
 <?php
 
 include("includes/graphs/common.inc.php");
+
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . "ucd_cpu.rrd";
 $rrd_options .= " DEF:user=$rrd_filename:user:AVERAGE";
 $rrd_options .= " DEF:nice=$rrd_filename:nice:AVERAGE";

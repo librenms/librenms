@@ -9,7 +9,6 @@ if (is_file($mysql_rrd))
   $rrd_filename = $mysql_rrd;
 }
 
-
 $array = array('QCQICe'  => array('descr' => 'Queries in cache', 'colour' => '22FF22'),
                'QCHs'  => array('descr' => 'Cache hits', 'colour' => '0022FF'),
                'QCIs' => array('descr' => 'Inserts', 'colour' => 'FF0000'),
@@ -35,7 +34,5 @@ $nototal   = 1;
 $unit_text = "Commands";
 
 include("includes/graphs/generic_multi_simplex_seperated.inc.php");
-
-
 
 ?>

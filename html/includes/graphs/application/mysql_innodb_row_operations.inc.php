@@ -33,6 +33,4 @@ $unit_text = "Rows";
 
 include("includes/graphs/generic_multi_simplex_seperated.inc.php");
 
-
-
 ?>

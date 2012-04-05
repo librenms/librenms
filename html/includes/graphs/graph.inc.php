@@ -1,9 +1,9 @@
 <?php
 
-function data_uri($file, $mime) 
-{  
+function data_uri($file, $mime)
+{
   $contents = file_get_contents($file);
-  $base64   = base64_encode($contents); 
+  $base64   = base64_encode($contents);
   return ('data:' . $mime . ';base64,' . $base64);
 }
 
@@ -59,6 +59,7 @@ function graph_error($string)
   $_GET['bg'] = "FFBBBB";
 
   include("includes/graphs/common.inc.php");
+
   $rrd_options .= " HRULE:0#555555";
   $rrd_options .= " --title='".$string."'";
 
@@ -128,7 +129,7 @@ if ($error_msg) {
           $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
         } else {
           echo(`ls -l $graphfile`);
-          echo('<img src="'.data_uri($graphfile,'image/png').'" alt="graph" />');          
+          echo('<img src="'.data_uri($graphfile,'image/png').'" alt="graph" />');
         }
         unlink($graphfile);
       }

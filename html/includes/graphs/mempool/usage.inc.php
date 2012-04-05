@@ -28,7 +28,6 @@ if($width > "500")
 $descr = substr(str_pad(short_hrDeviceDescr($mempool['mempool_descr']), $descr_len),0,$descr_len);
 $descr = str_replace(":", "\:", $descr);
 
-
 $perc  = round($mempool['mempool_perc'], 0);
 $background = get_percentage_colours($perc);
 
