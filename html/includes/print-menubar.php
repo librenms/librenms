@@ -5,7 +5,7 @@ $if_alerts      = dbFetchCell("SELECT COUNT(interface_id) FROM `ports` WHERE `if
 
 if (isset($config['enable_bgp']) && $config['enable_bgp'])
 {
-  $bgp_alerts = dbFetchCell("SELECT COUNT(*) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'");
+  $bgp_alerts = dbFetchCell("SELECT COUNT(bgpPeer_id) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'");
 }
 
 ?>
@@ -389,10 +389,10 @@ foreach (array_keys($menu_sensors) as $item)
 
 <?php
 
-$routing_count['bgp']  = dbFetchCell("SELECT COUNT(*) from `bgpPeers`");
-$routing_count['ospf'] = dbFetchCell("SELECT COUNT(*) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'");
-$routing_count['cef']  = dbFetchCell("SELECT COUNT(*) from `cef_switching`");
-$routing_count['vrf']  = dbFetchCell("SELECT COUNT(*) from `vrfs`");
+$routing_count['bgp']  = dbFetchCell("SELECT COUNT(bgpPeer_id) from `bgpPeers`");
+$routing_count['ospf'] = dbFetchCell("SELECT COUNT(ospf_instance_id) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'");
+$routing_count['cef']  = dbFetchCell("SELECT COUNT(cef_switching_id) from `cef_switching`");
+$routing_count['vrf']  = dbFetchCell("SELECT COUNT(vrf_id) from `vrfs`");
 
 if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']) > "0")
 {
@@ -457,7 +457,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 }
 
 
-$packages  = dbFetchCell("SELECT COUNT(*) from `packages`");
+$packages  = dbFetchCell("SELECT COUNT(package_id) from `packages`");
 
 if ($packages)
 {
