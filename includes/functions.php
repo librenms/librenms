@@ -575,6 +575,7 @@ function include_dir($dir, $regex = "")
       if (filetype($config['install_dir'] . '/' . $dir . '/' . $file) == 'file' && preg_match($regex, $file))
       {
         if ($debug) { echo("Including: " . $config['install_dir'] . '/' . $dir . '/' . $file . "\n"); }
+
         include($config['install_dir'] . '/' . $dir . '/' . $file);
       }
     }

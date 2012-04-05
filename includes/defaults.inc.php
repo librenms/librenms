@@ -37,15 +37,13 @@ $config['unflatten']      = "/usr/bin/unflatten";
 $config['neato']          = "/usr/bin/neato";
 $config['sfdp']           = "/usr/bin/sfdp";
 
-
 ### Memcached - Keep immediate statistics
 
-$config['memcached']['enable']	= FALSE;
+$config['memcached']['enable']  = FALSE;
 $config['memcached']['host']    = "localhost";
 $config['memcached']['port']    = 11211;
 
-$config['slow_statistics']	= TRUE; ### THIS WILL CHANGE TO FALSE IN FUTURE
-
+$config['slow_statistics']      = TRUE; ### THIS WILL CHANGE TO FALSE IN FUTURE
 
 ### RRDCacheD - Make sure it can write to your RRD dir!
 
@@ -57,7 +55,7 @@ if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
 {
   if (strpos($_SERVER["SERVER_NAME"] , ":"))
   {
-    # Litteral IPv6
+    # Literal IPv6
     $config['base_url']  = "http://[" . $_SERVER["SERVER_NAME"] ."]:".$_SERVER["SERVER_PORT"]."/";
   }
   else
@@ -98,12 +96,12 @@ $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
 
 ### Autodiscovery Settings
 
-$config['autodiscovery']['xdp']            = true; ## Autodiscover hosts via discovery protocols
-$config['autodiscovery']['ospf']           = true; ## Autodiscover hosts via OSPF
-$config['autodiscovery']['bgp']            = true; ## Autodiscover hosts via BGP
-$config['autodiscovery']['snmpscan']       = true; ## autodiscover hosts via SNMP scanning
+$config['autodiscovery']['xdp']            = TRUE; ## Autodiscover hosts via discovery protocols
+$config['autodiscovery']['ospf']           = TRUE; ## Autodiscover hosts via OSPF
+$config['autodiscovery']['bgp']            = TRUE; ## Autodiscover hosts via BGP
+$config['autodiscovery']['snmpscan']       = TRUE; ## autodiscover hosts via SNMP scanning
 
-$config['discover_services']               = false; ## Autodiscover services via SNMP on devices of type "server"
+$config['discover_services']               = FALSE; ## Autodiscover services via SNMP on devices of type "server"
 
 ### Alerting Settings
 
@@ -111,7 +109,7 @@ $config['alerts']['email']['default']      = NULL;    ## Default alert recipient
 $config['alerts']['email']['default_only'] = FALSE;   ## Only use default recipient
 $config['alerts']['email']['enable']       = TRUE;    ## Enable email alerts
 $config['alerts']['bgp']['whitelist']      = NULL;    ## Populate as an array() with ASNs to alert on.
-$config['alerts']['port']['ifdown']	   = FALSE;   ## Generate alerts for ports that go down
+$config['alerts']['port']['ifdown']        = FALSE;   ## Generate alerts for ports that go down
 
 ### Port bandwidth threshold percentage %age utilisation above this will cause an alert
 
@@ -160,11 +158,11 @@ $config['graph_colours']['default'] = $config['graph_colours']['blues'];
 
 ### Device page options
 
-$config['show_overview_tab'] = true;
+$config['show_overview_tab'] = TRUE;
 
 ### The device overview page options
 
-$config['overview_show_sysDescr'] = true;
+$config['overview_show_sysDescr'] = TRUE;
 
 ### Enable version checker & stats
 
@@ -296,9 +294,9 @@ $config['irc_chan'][] = "#observium";
 
 ### Authentication
 
-$config['allow_unauth_graphs']            = 0; ## Allow graphs to be viewed by anyone
+$config['allow_unauth_graphs']      = 0;       # Allow graphs to be viewed by anyone
 $config['allow_unauth_graphs_cidr'] = array(); # Allow graphs to be viewed without authorisation from certain IP ranges
-$config['auth_mechanism']           = "mysql";   # Available mechanisms: mysql (default), ldap, http-auth
+$config['auth_mechanism']           = "mysql"; # Available mechanisms: mysql (default), ldap, http-auth
 
 ### Sensors
 
@@ -372,7 +370,6 @@ $config['astext'][65333] = "Cymru Bogon Feed";
 ### Warnings on front page
 $config['warn']['ifdown'] = TRUE;    ## Show down interfaces
 
-
 ## List of poller modules. Need to be in the array to be
 ## considered for execution.
 
@@ -401,7 +398,7 @@ $config['poller_modules']['cisco-cef']                    = 1;
 $config['poller_modules']['cisco-mac-accounting']         = 1;
 $config['poller_modules']['cipsec-tunnels']               = 1;
 $config['poller_modules']['cisco-ace-loadbalancer']       = 1;
-$config['poller_modules']['cisco-ace-serverfarms']	  = 1;
+$config['poller_modules']['cisco-ace-serverfarms']        = 1;
 $config['poller_modules']['netscaler-vsvr']               = 1;
 $config['poller_modules']['entity-physical']              = 1;
 $config['poller_modules']['unix-agent']                   = 0;
@@ -433,7 +430,6 @@ $config['discovery_modules']['libvirt-vminfo']            = 1;
 $config['discovery_modules']['toner']                     = 1;
 $config['discovery_modules']['ucd-diskio']                = 1;
 $config['discovery_modules']['services']                  = 1;
-
 
 $config['modules_compat']['rfc1628']['liebert']           = 1;
 $config['modules_compat']['rfc1628']['netmanplus']        = 1;

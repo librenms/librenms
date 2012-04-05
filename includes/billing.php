@@ -3,15 +3,16 @@
 function format_bytes_billing($value)
 {
   global $config;
+
   return format_number($value, $config['billing']['base'])."B";
 }
 
 function format_bytes_billing_short($value)
 {
   global $config;
+
   return format_number($value, $config['billing']['base'], 2, 3);
 }
-
 
 function getDates($dayofmonth, $months=0)
 {
@@ -30,12 +31,11 @@ function getDates($dayofmonth, $months=0)
     date_sub($date_start, date_interval_create_from_date_string('1 month'));
   }
 
-  if($months > 0)
+  if ($months > 0)
   {
     date_sub($date_start, date_interval_create_from_date_string($months.' month'));
     date_sub($date_end,   date_interval_create_from_date_string($months.' month'));
   }
-
 
 #  date_sub($date_start, date_interval_create_from_date_string('1 month'));
   date_sub($date_end, date_interval_create_from_date_string('1 day'));
