@@ -44,11 +44,11 @@ echo('  <tr class="'.$class.'" bgcolor="' . $bg . '" onmouseover="this.style.bac
           <br />' . $device['sysName'] . '</td>'
         );
 
-echo ('<td width="55">');
+echo('<td width="55">');
 if ($port_count) { echo(' <img src="images/icons/port.png" align=absmiddle /> '.$port_count); }
 echo('<br />');
 if ($sensor_count) { echo(' <img src="images/icons/sensors.png" align=absmiddle /> '.$sensor_count); }
-echo ('</td>');
+echo('</td>');
 echo('    <td class="paddedcell">' . $device['hardware'] . '<br />' . $device['features'] . '</td>');
 echo('    <td class="paddedcell">' . $device['os_text'] . '<br />' . $device['version'] . '</td>');
 echo('    <td class="paddedcell">' . formatUptime($device['uptime'], 'short') . ' <br />');
@@ -56,6 +56,6 @@ echo('    <td class="paddedcell">' . formatUptime($device['uptime'], 'short') . 
 if (get_dev_attrib($device,'override_sysLocation_bool')) {  $device['location'] = get_dev_attrib($device,'override_sysLocation_string'); }
 echo('    ' . truncate($device['location'],32, '') . '</td>');
 
-echo (' </tr>');
+echo(' </tr>');
 
 ?>

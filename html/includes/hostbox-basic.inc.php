@@ -38,6 +38,6 @@ echo('    <td>' . formatUptime($device['uptime'], 'short') . ' <br />');
 if (get_dev_attrib($device,'override_sysLocation_bool')) {  $device['location'] = get_dev_attrib($device,'override_sysLocation_string'); }
 echo('    ' . truncate($device['location'],32, '') . '</td>');
 
-echo (' </tr>');
+echo(' </tr>');
 
 ?>
