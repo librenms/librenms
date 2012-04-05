@@ -6,7 +6,7 @@ $ds_in  = "INOCTETS";
 $ds_out = "OUTOCTETS";
 
 $i=1;
-foreach($devices as $device)
+foreach ($devices as $device)
 {
  foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($device['device_id'])) as $int)
  {
@@ -63,6 +63,5 @@ $colour_area_in = "CDEB8B";
 $colour_area_out = "C3D9FF";
 
 include("includes/graphs/generic_multi_bits_separated.inc.php");
-
 
 ?>

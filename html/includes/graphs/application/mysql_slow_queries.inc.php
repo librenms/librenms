@@ -4,7 +4,7 @@ include("includes/graphs/common.inc.php");
 
 $rrd_filename = $config["rrd_dir"] . '/' . $device["hostname"] . '/app-mysql-'.$app["app_id"].'.rrd';
 
-$array = array( 
+$array = array(
                 'SQs' => 'Slow queries',
 );
 
@@ -30,6 +30,5 @@ $nototal   = 1;
 $unit_text = "Queries";
 
 include("includes/graphs/generic_multi_simplex_seperated.inc.php");
-
 
 ?>

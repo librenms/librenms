@@ -100,8 +100,6 @@ $descr = str_replace(":", "\:", substr(str_pad("Average", $descr_len),0,$descr_l
   $rrd_options .= " GPRINT:avsd:'%5.1lf%Ss'";
   $rrd_options .= " GPRINT:avmsr:'%5.1lf%s\\l'";
 
-
-
 #  $rrd_options .= " AREA:dmlow$i";
 #  $rrd_options .= " AREA:s2d$i#".$colour."30::STACK";
 #  $rrd_options .= " LINE1:dm$i#".$colour.":'$descr'";

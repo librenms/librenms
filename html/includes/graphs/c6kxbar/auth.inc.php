@@ -15,7 +15,4 @@ if ($auth && is_numeric($_GET['mod']) && is_numeric($_GET['chan']))
   $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/c6kxbar-" . safename($_GET['mod']. "-".$_GET['chan']. ".rrd");
 }
 
-
-
-
 ?>

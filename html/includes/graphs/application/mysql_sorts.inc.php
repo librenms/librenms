@@ -34,6 +34,4 @@ $unit_text = "";
 
 include("includes/graphs/generic_multi_simplex_seperated.inc.php");
 
-
-
 ?>

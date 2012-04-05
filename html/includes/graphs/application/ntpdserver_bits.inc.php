@@ -29,6 +29,7 @@ if (is_file($ntpdserver_rrd))
 }
 
 //    include("includes/graphs/generic_bits.inc.php");
+
 include("includes/graphs/generic_duplex.inc.php");
 
 ?>
