@@ -277,6 +277,7 @@ if ($_SESSION['authenticated'])
 } else {
   ## Not Authenticated. Print login.
   include("pages/logon.inc.php");
+
   exit;
 }
 ?>
