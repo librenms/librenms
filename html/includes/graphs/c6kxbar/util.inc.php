@@ -1,4 +1,4 @@
-<?
+<?php
 
 $ds_in = "inutil";
 $ds_out = "oututil";
