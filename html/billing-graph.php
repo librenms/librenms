@@ -23,6 +23,7 @@ include("../config.php");
 include("../includes/functions.php");
 include("includes/functions.inc.php");
 include("includes/authenticate.inc.php");
+
 if ($_SERVER['REMOTE_ADDR'] != $_SERVER['SERVER_ADDR']) { if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; } }
 require("includes/jpgraph/src/jpgraph.php");
 include("includes/jpgraph/src/jpgraph_line.php");
@@ -159,8 +160,6 @@ $graph->xaxis->SetTitleMargin(30);
 $graph->xaxis->title->Set($type);
 $graph->yaxis->title->Set("Bits per second");
 $graph->yaxis->SetLabelFormatCallback("format_si");
-
-
 
 function TimeCallback($aVal) {
     global $dur;
