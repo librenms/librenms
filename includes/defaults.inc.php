@@ -365,6 +365,7 @@ $config['auth_ldap_groups']['pfy']['level'] = 7;
 $config['auth_ldap_groups']['support']['level'] = 1;
 
 ### Hardcoded ASN descriptions
+$config['astext'][65332] = "Cymru FullBogon Feed";
 $config['astext'][65333] = "Cymru Bogon Feed";
 
 ### Warnings on front page

@@ -10,8 +10,7 @@ $agent = fsockopen($device['hostname'], $port, $errno, $errstr, 10);
 
 if(!$agent)
 {
-  echo "failed";
-  exit();
+  echo "Connection to UNIX agent failed on port ".$port.".";
 } else {
   while (!feof($agent))
   {
