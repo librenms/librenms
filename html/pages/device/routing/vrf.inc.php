@@ -55,6 +55,7 @@ $i = "0";
 foreach (dbFetchRows("SELECT * FROM `vrfs` WHERE `device_id` = ? ORDER BY `vrf_name`", array($device['device_id'])) as $vrf)
 {
   include("includes/print-vrf.inc.php");
+
   $i++;
 }
 

@@ -35,7 +35,7 @@ if ($_POST['string'])
   $where .= " AND E.message LIKE ?";
   $param[] = "%".$_POST['string']."%";
 }
-    
+
 ?>
 
 <form method="post" action="">

@@ -22,10 +22,12 @@ echo("<table width=100% cellspacing=0 cellpadding=0><tr><td style='width: 50%; v
 #  echo("<p class=sectionhead>Device Data</p><div style='height: 5px;'></div>");
 #  include("includes/dev-data-" . strtolower($device[os]) . ".inc.php");
   include("includes/dev-overview-data.inc.php");
+
   echo("</div>");
 #}
 
 include("overview/ports.inc.php");
+
 #include("overview/current.inc.php");
 
 if ($services['total'])
@@ -81,7 +83,9 @@ echo("<td style='width: 50%; vertical-align: top;'>");
 include("overview/processors.inc.php");
 include("overview/mempools.inc.php");
 include("overview/storage.inc.php");
+
 if(is_array($entity_state['group']['c6kxbar'])) { include("overview/c6kxbar.inc.php"); }
+
 include("overview/sensors/temperatures.inc.php");
 include("overview/sensors/humidity.inc.php");
 include("overview/sensors/fanspeeds.inc.php");
@@ -90,7 +94,6 @@ include("overview/sensors/voltages.inc.php");
 include("overview/sensors/current.inc.php");
 include("overview/sensors/power.inc.php");
 include("overview/sensors/frequencies.inc.php");
-
 
 echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
 echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");

@@ -14,7 +14,9 @@ foreach ($graphs as $key => $text) {
   $graph_array['type']   = "application_".$key;
   echo('<h3>'.$text.'</h3>');
   echo("<tr bgcolor='$row_colour'><td colspan=5>");
+
   include("includes/print-quadgraphs.inc.php");
+
   echo("</td></tr>");
 }
 

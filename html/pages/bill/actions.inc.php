@@ -49,10 +49,12 @@ if ($_POST['action'] == "delete_bill_port")
 }
 if ($_POST['action'] == "update_bill")
 {
-
-  if(isset($_POST['bill_quota']) or isset($_POST['bill_cdr'])) {
-    if ($_POST['bill_type'] == "quota") {
-      if (isset($_POST['bill_quota_type'])) {
+  if (isset($_POST['bill_quota']) or isset($_POST['bill_cdr']))
+  {
+    if ($_POST['bill_type'] == "quota")
+    {
+      if (isset($_POST['bill_quota_type']))
+      {
         if ($_POST['bill_quota_type'] == "MB") { $multiplier = 1 * $config['billing']['base']; }
         if ($_POST['bill_quota_type'] == "GB") { $multiplier = 1 * $config['billing']['base'] * $config['billing']['base']; }
         if ($_POST['bill_quota_type'] == "TB") { $multiplier = 1 * $config['billing']['base'] * $config['billing']['base'] * $config['billing']['base']; }
@@ -60,8 +62,10 @@ if ($_POST['action'] == "update_bill")
         $bill_cdr = 0;
       }
     }
-    if ($_POST['bill_type'] == "cdr") {
-      if (isset($_POST['bill_cdr_type'])) {
+    if ($_POST['bill_type'] == "cdr")
+    {
+      if (isset($_POST['bill_cdr_type']))
+      {
         if ($_POST['bill_cdr_type'] == "Kbps") { $multiplier = 1 * $config['billing']['base']; }
         if ($_POST['bill_cdr_type'] == "Mbps") { $multiplier = 1 * $config['billing']['base'] * $config['billing']['base']; }
         if ($_POST['bill_cdr_type'] == "Gbps") { $multiplier = 1 * $config['billing']['base'] * $config['billing']['base'] * $config['billing']['base']; }

@@ -34,7 +34,9 @@ if ($if_list)
   echo("<tr bgcolor='$bg'><td>");
   $graph_type = "multiport_bits_separate";
   $port['interface_id'] = $if_list;
+
   include("includes/print-interface-graphs.inc.php");
+
   echo("</td></tr>");
 
   foreach ($ports as $port)
@@ -59,6 +61,7 @@ if ($if_list)
     if (file_exists($config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . $port['ifIndex'] . ".rrd"))
     {
       $graph_type = "port_bits";
+
       include("includes/print-interface-graphs.inc.php");
     }
 

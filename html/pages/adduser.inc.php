@@ -9,7 +9,7 @@ if ($_SESSION['userlevel'] < '10')
 else
 {
   echo("<h3>Add User</h3>");
-  
+
   $pagetitle[] = "Add user";
 
   if (auth_usermanagement())

@@ -49,9 +49,9 @@ if ($bill_data['bill_type'] == "cdr") {
     <div class="control-group">
       <label class="control-label" for="bill_type"><strong>Billing Type</strong></label>
       <div class="controls">
-        <input type="radio" name="bill_type" value="cdr" onchange="javascript: billType();" <?php if($bill_data['bill_type'] == "cdr") { echo('checked '); } ?>/> CDR 95th
-        <input type="radio" name="bill_type" value="quota" onchange="javascript: billType();" <?php if($bill_data['bill_type'] == "quota") { echo('checked '); } ?>/> Quota
-        <div id="cdrDiv"<?php if($bill_data['bill_type'] == "quota") { echo(' style="display: none"'); } ?>>
+        <input type="radio" name="bill_type" value="cdr" onchange="javascript: billType();" <?php if ($bill_data['bill_type'] == "cdr") { echo('checked '); } ?>/> CDR 95th
+        <input type="radio" name="bill_type" value="quota" onchange="javascript: billType();" <?php if ($bill_data['bill_type'] == "quota") { echo('checked '); } ?>/> Quota
+        <div id="cdrDiv"<?php if ($bill_data['bill_type'] == "quota") { echo(' style="display: none"'); } ?>>
           <input class="span1" type="text" name="bill_cdr" value="<?php echo $cdr['data']; ?>">
           <select name="bill_cdr_type" style="width: 233px;">
             <option value="Kbps"<?php echo $cdr['select_kbps']; ?>>Kilobits per second (Kbps)</option>
@@ -59,7 +59,7 @@ if ($bill_data['bill_type'] == "cdr") {
             <option value="Gbps"<?php echo $cdr['select_gbps']; ?>>Gigabits per second (Gbps)</option>
           </select>
         </div>
-        <div id="quotaDiv"<?php if($bill_data['bill_type'] == "cdr") { echo(' style="display: none"'); } ?>>
+        <div id="quotaDiv"<?php if ($bill_data['bill_type'] == "cdr") { echo(' style="display: none"'); } ?>>
           <input class="span1" type="text" name="bill_quota" value="<?php echo $quota['data']; ?>">
           <select name="bill_quota_type" style="width: 233px;">
             <option value="MB"<?php echo $quota['select_mb']; ?>>Megabytes (MB)</option>
@@ -159,7 +159,6 @@ if (is_array($ports))
     echo("      </div>\n");
   }
 }
-
 
 ?>
     </div>

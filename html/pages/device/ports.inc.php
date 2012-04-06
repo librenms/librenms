@@ -108,6 +108,7 @@ if ($vars['view'] == 'minigraphs')
   foreach ($ports as $port)
   {
     include("includes/print-interface.inc.php");
+
     $i++;
   }
   echo("</table></div>");

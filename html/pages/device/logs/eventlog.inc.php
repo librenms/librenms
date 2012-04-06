@@ -10,7 +10,7 @@
       <option value="">All Types</option>
       <option value="system">System</option>
       <?php
-        foreach (dbFetchRows("SELECT `type` FROM `eventlog` WHERE device_id = ? GROUP BY `type` ORDER BY `type`", array($device['device_id'])) as $data) 
+        foreach (dbFetchRows("SELECT `type` FROM `eventlog` WHERE device_id = ? GROUP BY `type` ORDER BY `type`", array($device['device_id'])) as $data)
         {
           echo("<option value='".$data['type']."'");
           if ($data['type'] == $_POST['type']) { echo("selected"); }

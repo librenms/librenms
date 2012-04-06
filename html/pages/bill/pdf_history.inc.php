@@ -15,9 +15,8 @@
   $portret     = $pdf->serializeTCPDFtagParameters(array('P'));
   $landscape   = $pdf->serializeTCPDFtagParameters(array('L'));
 
-
   // History Database content
-  foreach(dbFetchRows("SELECT * FROM `bill_hist` WHERE `bill_id`= ? AND `id` = ? ORDER BY `bill_datefrom` DESC LIMIT 1", array($bill_id, $history_id)) as $row) {
+  foreach (dbFetchRows("SELECT * FROM `bill_hist` WHERE `bill_id`= ? AND `id` = ? ORDER BY `bill_datefrom` DESC LIMIT 1", array($bill_id, $history_id)) as $row) {
     if (bill_permitted($row['bill_id'])) {
       $history['datefrom']      = strftime("%A, %e %B %Y @ %T", strtotime($row['bill_datefrom']));
       $history['dateto']        = strftime("%A, %e %B %Y @ %T", strtotime($row['bill_dateto']));
@@ -45,9 +44,8 @@
     }
   }
 
-
   // Customer Database content
-  foreach(dbFetchRows("SELECT bill_name, bill_custid, bill_ref, bill_notes FROM `bills` WHERE `bill_id` = ? ORDER BY `bill_id` LIMIT 1", array($bill_id)) as $row) {
+  foreach (dbFetchRows("SELECT bill_name, bill_custid, bill_ref, bill_notes FROM `bills` WHERE `bill_id` = ? ORDER BY `bill_id` LIMIT 1", array($bill_id)) as $row) {
     if (bill_permitted($bill_id)) {
       $customer['id']          = $row['bill_custid'];
       $customer['name']        = $row['bill_name'];
@@ -56,12 +54,10 @@
     }
   }
 
-
   // Billing types
   $bill_type['95per']   = (($history['type'] != "CDR") ? "[&nbsp;&nbsp;&nbsp;] 95 Percentile" : "<b>[X] 95 Percentile</b>");
   $bill_type['quota']   = (($history['type'] != "Quota") ? "[&nbsp;&nbsp;&nbsp;] Quota" : "<b>[X] Quota</b>");
   $bill_type['average'] = (($history['type'] != "Ave") ? "[&nbsp;&nbsp;&nbsp;] Average" : "<b>[X] Average</b>");
-
 
   // QR Tag
   $http        = ((empty($_SERVER['HTTPS'])) ? "http" : "https" );
@@ -73,21 +69,21 @@
   $qrStyle     = array('border' => false, 'vpadding' => auto, 'hpadding' => auto, 'fgcolor' => array(0, 0, 0), 'bgcolor' => false, 'module_width' => 1, 'module_height' => 1);
   $qrTag       = $pdf->serializeTCPDFtagParameters(array($qrInfo, 'QRCODE,H', 162, 68, 50, 50, $qrStyle, 'N'));
 
-
   // Include css
-  include_once("pdf_css.inc.php");
-  $html       .= $css;
 
+  include_once("pdf_css.inc.php");
+
+  $html       .= $css;
 
   // GB Convert (1000 vs 1024)
   function gbConvert($data) {
     global $config;
+
     $count = strlen($data);
     $div   = floor($count / 4);
     $res   = round($data / pow(1000, $div) * pow($config['billing']['base'], $div));
     return $res;
   }
-
 
   // Generate graphs
   function genGraphs($bill_id, $imgtype, $from, $to, $bittype = "Quota") {
@@ -112,7 +108,6 @@
     return $res;
   }
 
-
   // Device Information
   function listBillPorts($bill_id) {
     $res       = "";
@@ -125,7 +120,7 @@
     //$res      .= "    <th>Description</th>";
     //$res      .= "    <th>Notes</th>";
     $res      .= "  </tr>";
-    foreach(dbFetchRows("SELECT * FROM `bill_ports` as b, `ports` as p, `devices` as d WHERE b.bill_id = ? AND p.interface_id = b.port_id AND d.device_id = p.device_id", array($bill_id)) as $row) {
+    foreach (dbFetchRows("SELECT * FROM `bill_ports` as b, `ports` as p, `devices` as d WHERE b.bill_id = ? AND p.interface_id = b.port_id AND d.device_id = p.device_id", array($bill_id)) as $row) {
       if (bill_permitted($bill_id)) {
         $device['name']   = $row['sysName'];
         //$device['port']   = $row['ifName']." (".$row['ifDescr'].")";
@@ -148,10 +143,10 @@
     return $res;
   }
 
-
   // Bitrate Graph overview
   function graphOverviewBitrate($bill_id, $history) {
     global $pdf;
+
     $img['bitrate'] = genGraphs($bill_id, "bitrate", $history['timestampfrom'], $history['timestampto'], $history['type']);
     $bitrate        = $pdf->serializeTCPDFtagParameters(array($img['bitrate'], 10, 44, 280, '', 'PNG', '', 'T'));
     $res       = "";
@@ -159,10 +154,10 @@
     return $res;
   }
 
-
   // Transfer Graph overview
   function graphOverviewTransfer($bill_id, $history) {
     global $pdf;
+
     $img['bw_day']  = genGraphs($bill_id, "day", $history['timestampfrom'], $history['timestampto']);
     $img['bw_hour'] = genGraphs($bill_id, "hour", $history['timestampfrom'], $history['timestampto']);
     $bw_day         = $pdf->serializeTCPDFtagParameters(array($img['bw_day'], 10, 44, 280, '', 'PNG', '', 'T'));
@@ -173,10 +168,10 @@
     return $res;
   }
 
-
   // Transfer overview
   function transferOverview($bill_id, $history) {
     global $list_colour_a, $list_colour_b, $config['billing']['base'];
+
     $i         = 0;
     $tot       = array();
     $traf      = array();
@@ -191,7 +186,7 @@
     $res      .= "    <th class=\"outbound\">Outbound</th>";
     $res      .= "    <th class=\"total\">Total</th>";
     $res      .= "  </tr>";
-    foreach(dbFetch("SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id`= ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC", array($bill_id, $start, $end)) as $data) {
+    foreach (dbFetch("SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id`= ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC", array($bill_id, $start, $end)) as $data) {
       $date        = strftime("%A, %e %B %Y", $data['timestamp']);
       $tot['in']  += gbConvert($data['traf_in']);
       $tot['out'] += gbConvert($data['traf_out']);
@@ -220,7 +215,6 @@
     $res      .= "</table>";
     return $res;
   }
-
 
   // Html template
   $logo        = $pdf->serializeTCPDFtagParameters(array('images/observium-logo.png', 15, 18, 100, '', '', 'www.observium.org', 'T'));

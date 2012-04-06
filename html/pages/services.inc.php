@@ -51,6 +51,7 @@ if ($_SESSION['userlevel'] >= '5')
     foreach (dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?", array($host_data['device_id'])) as $service)
     {
        include("includes/print-service.inc.php");
+
 #       $samehost = 1;
        if ($_GET['opta'] == "details")
        {

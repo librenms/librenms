@@ -70,7 +70,6 @@ if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '".$por
 if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `interface_id` = '".$port['interface_id']."' and `device_id` = '".$device['device_id']."'") )
 {  $menu_options['vlans'] = 'VLANs'; }
 
-
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
@@ -149,7 +148,9 @@ if ($_SESSION['userlevel'] == '10')
 print_optionbar_end();
 
 echo("<div style='margin: 5px;'>");
+
 include("pages/device/port/".mres($vars['view']).".inc.php");
+
 echo("</div>");
 
 ?>

@@ -8,6 +8,7 @@
     foreach ($ports as $port)
     {
       include("includes/print-interface-adsl.inc.php");
+
       $i++;
     }
     echo("</table></div>");

@@ -146,7 +146,9 @@ if($_GET['optb'] == "all" ) {
     $hostname = $device['hostname'];
     if ($x % 2) { $device_colour = $list_colour_a; } else { $device_colour = $list_colour_b; }
     echo("<table cellpadding=10 cellspacing=0 class=devicetable width=100%>");
+
     include("includes/device-header.inc.php");
+
     echo("</table>");
     unset($seperator);
     echo('<div style="margin: 0 0 0 60px;"><table cellspacing=0 cellpadding=7>');
@@ -159,7 +161,9 @@ if($_GET['optb'] == "all" ) {
       } else {
         if ($i % 2 === 0) { $int_colour = $list_colour_b_a; } else { $int_colour = $list_colour_b_b; }
       }
+
       include("includes/print-interface.inc.php");
+
       $i++;
     }
     $x++;
