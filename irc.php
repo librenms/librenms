@@ -1,7 +1,5 @@
 #!/usr/bin/env php
 
-# port info is broken.  always reports same values no matter host selected
-
 <?php
 
 # Disable annoying messages... well... all messages actually :)
