@@ -29,7 +29,7 @@ foreach (dbFetchRows("SELECT * FROM `packages` WHERE 1 $where GROUP BY `name`", 
     $entry['blah'][$entry_v['version']][$entry_v['build']][$entry_v['device_id']] = 1;
   }
 
-  foreach ($entry['blah'] as $version => $bleu) 
+  foreach ($entry['blah'] as $version => $bleu)
   {
 
     $content = '<div style="width: 800px;">';

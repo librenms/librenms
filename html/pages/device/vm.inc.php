@@ -7,6 +7,7 @@ $i = "1";
 foreach (dbFetchRows("SELECT * FROM vminfo WHERE device_id = ? ORDER BY vmwVmDisplayName", array($device['device_id'])) as $vm)
 {
   include("includes/print-vm.inc.php");
+
   $i++;
 }
 

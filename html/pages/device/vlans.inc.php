@@ -63,6 +63,7 @@ $i = "1";
 foreach (dbFetchRows("SELECT * FROM `vlans` WHERE `device_id` = ? ORDER BY 'vlan_vlan'", array($device['device_id'])) as $vlan)
 {
   include("includes/print-vlan.inc.php");
+
   $i++;
 }
 

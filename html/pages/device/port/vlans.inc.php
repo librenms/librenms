@@ -7,7 +7,7 @@ echo('<table border="0" cellspacing="0" cellpadding="5" width="100%">');
 echo("<tr><th>VLAN</th><th>Description</th><th>Cost</th><th>Priority</th><th>State</th><th>Other Ports</th></tr>");
 
 $row=0;
-foreach($vlans as $vlan)
+foreach ($vlans as $vlan)
 {
   $row++;
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
@@ -16,18 +16,18 @@ foreach($vlans as $vlan)
   echo("<td width=100 class=list-large> Vlan " . $vlan['vlan'] . "</td>");
   echo("<td width=200 class=box-desc>" . $vlan['vlan_descr'] . "</td>");
 
-  if($vlan['state'] == "blocking") { $class="red"; } elseif ($vlan['state'] == "forwarding" ) { $class="green"; } else { $class = "none"; }
+  if ($vlan['state'] == "blocking") { $class="red"; } elseif ($vlan['state'] == "forwarding" ) { $class="green"; } else { $class = "none"; }
 
   echo("<td>".$vlan['cost']."</td><td>".$vlan['priority']."</td><td class=$class>".$vlan['state']."</td>");
 
   $vlan_ports = array();
   $otherports = dbFetchRows("SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.interface_id = V.interface_id", array($device['device_id'], $vlan['vlan']));
-  foreach($otherports as $otherport)
+  foreach ($otherports as $otherport)
   {
    $vlan_ports[$otherport[ifIndex]] = $otherport;
   }
   $otherports = dbFetchRows("SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?", array($device['device_id'], $vlan['vlan']));
-  foreach($otherports as $otherport)
+  foreach ($otherports as $otherport)
   {
    $vlan_ports[$otherport[ifIndex]] = array_merge($otherport, array('untagged' => '1'));
   }
@@ -35,10 +35,10 @@ foreach($vlans as $vlan)
 
   echo("<td>");
   $vsep='';
-  foreach($vlan_ports as $otherport)
+  foreach ($vlan_ports as $otherport)
   {
     echo($vsep.generate_port_link($otherport, makeshortif($otherport['ifDescr'])));
-    if($otherport['untagged']) { echo("(U)"); }
+    if ($otherport['untagged']) { echo("(U)"); }
     $vsep=", ";
   }
   echo("</td>");

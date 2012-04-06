@@ -1,4 +1,3 @@
-
 <form name="form1" action="" method="post" class="form-horizontal">
   <link rel="stylesheet" href="<?php echo $config['base_url']; ?>/css/bootstrap.min.css">
   <script type="text/javascript">

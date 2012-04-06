@@ -28,7 +28,6 @@ $graph_types = array("bits"   => "Bits",
                      "pkts"   => "Packets",
                      "conns"  => "Connections");
 
-
 foreach ($graph_types as $type => $descr)
 {
   echo("$type_sep");

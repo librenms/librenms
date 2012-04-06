@@ -183,7 +183,9 @@ if ($vars['subview'] == "top10")
      $graph_array['width']  = "216";
      $graph_array['to']     = $now;
      echo('<tr bgcolor="'.$bg_colour.'"' . ($bg_image ? ' background="'.$bg_image.'"' : '') . '"><td colspan="7">');
+
      include("includes/print-quadgraphs.inc.php");
+
      echo("</td></tr>");
 
      $i++;

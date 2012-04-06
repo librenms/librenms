@@ -35,7 +35,7 @@ $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D, devices_perms AS
 
 if ($config['warn']['ifdown'])
 {
-  while ($interface = mysql_fetch_assoc($sql))  
+  while ($interface = mysql_fetch_assoc($sql))
   {
     if (!$interface['deleted'])
     {
@@ -111,6 +111,7 @@ if ($config['enable_syslog'])
   while ($entry = mysql_fetch_assoc($query))
   {
     $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
+
     include("includes/print-syslog.inc.php");
   }
   echo("</table>");

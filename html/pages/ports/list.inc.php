@@ -1,13 +1,13 @@
 
-<table cellpadding=3 cellspacing=0 class="devicetable sortable" width=100%>
+<table cellpadding="3" cellspacing="0" class="devicetable sortable" width="100%">
 
 <?php
 
-echo("<tr class=tablehead><td></td>");
+echo('<tr class="tablehead"><td></td>');
 
 $cols = array('device' => 'Device',
               'port' => 'Port',
-	      'speed' => 'Speed',
+              'speed' => 'Speed',
               'traffic_in' => 'Down',
               'traffic_out' => 'Up',
               'media' => 'Media',
@@ -15,7 +15,8 @@ $cols = array('device' => 'Device',
 
 foreach ($cols as $sort => $col)
 {
-  if($vars['sort'] == $sort) {
+  if ($vars['sort'] == $sort)
+  {
     echo('<th>'.$col.' *</th>');
   } else {
     echo('<th><a href="'. generate_url($vars, array('sort' => $sort)).'">'.$col.'</a></th>');
@@ -38,13 +39,11 @@ foreach ($ports as $port)
 
   if (port_permitted($port['interface_id'], $port['device_id']))
   {
-
     if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
     $speed = humanspeed($port['ifSpeed']);
     $type = humanmedia($port['ifType']);
     $ifclass = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
-
 
     if ($port['in_errors'] > 0 || $port['out_errors'] > 0)
     {
@@ -70,11 +69,8 @@ foreach ($ports as $port)
   }
 }
 
-
-echo("<tr><td colspan=7>");
+echo('<tr><td colspan="7">');
 echo("<strong>Matched Ports: $ports_total ( <span class=green>Up $ports_up</span> | <span class=red>Down $ports_down</span> | Disabled $ports_disabled )</strong>");
-echo("</td></tr>");
-
-echo('</table>');
+echo('</td></tr></table>');
 
 ?>

@@ -72,6 +72,7 @@ $graph_array['id']     = $rserver['rserver_id'];
 $graph_array['type']   = $graph_type;
 
 include("includes/print-quadgraphs.inc.php");
+
 #include("includes/print-interface-graphs.inc.php");
 
    echo("

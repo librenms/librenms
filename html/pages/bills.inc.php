@@ -1,11 +1,10 @@
 <?php
 
-
 if ($_POST['addbill'] == "yes")
 {
   $updated = '1';
 
-  if(isset($_POST['bill_quota']) or isset($_POST['bill_cdr'])) {
+  if (isset($_POST['bill_quota']) or isset($_POST['bill_cdr'])) {
     if ($_POST['bill_type'] == "quota") {
       if (isset($_POST['bill_quota_type'])) {
         if ($_POST['bill_quota_type'] == "MB") { $multiplier = 1 * $config['billing']['base']; }
@@ -42,7 +41,6 @@ if ($_POST['addbill'] == "yes")
   }
 }
 
-
 $pagetitle[] = "Billing";
 
 echo("<meta http-equiv='refresh' content='10000'>");
@@ -54,7 +52,7 @@ if ($_GET['opta'] == "history")
 }
 elseif ($_GET['opta'] == "add")
 {
-  if(is_numeric($vars['port']))
+  if (is_numeric($vars['port']))
   {
     $port = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE `interface_id` = ? AND D.device_id = P.device_id", array($vars['port']));
   }

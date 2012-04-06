@@ -93,6 +93,7 @@ echo("<table cellspacing=0 cellpadding=2 width=100%>");
 foreach (dbFetchRows($sql, $array) as $entry)
 {
   $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
+
   include("includes/print-syslog.inc.php");
 }
 echo("</table>");

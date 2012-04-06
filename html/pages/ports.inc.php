@@ -136,7 +136,7 @@ $sorts = array('device' => 'Device',
               'packets' => 'Packets',
               'packets_in' => 'Packets In',
               'packets_out' => 'Packets Out',
-	      'errors' => 'Errors',
+              'errors' => 'Errors',
               'media' => 'Media',
               'descr' => 'Description');
 

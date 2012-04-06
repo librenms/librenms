@@ -22,7 +22,7 @@ foreach (dbFetchRows("SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? A
 
   if (is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
-  if($vsvr['vsvr_state'] == "up") { $vsvr_class="green"; } else { $vsvr_class="red"; }
+  if ($vsvr['vsvr_state'] == "up") { $vsvr_class="green"; } else { $vsvr_class="red"; }
 
   echo("<tr bgcolor='$bg_colour'>");
   echo('<td width=320 class=list-large><a href="'.generate_url($vars, array('vsvr' => $vsvr['vsvr_id'], 'view' => NULL, 'graph' => NULL)).'">' . $vsvr['vsvr_name'] . '</a></td>');
@@ -32,7 +32,7 @@ foreach (dbFetchRows("SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? A
   echo("<td width=320 class=list-small>" . format_si($vsvr['vsvr_bps_out']*8) . "bps</a></td>");
   echo("</tr>");
 
-  foreach($graph_types as $graph_type => $graph_text)
+  foreach ($graph_types as $graph_type => $graph_text)
   {
     $i++;
     echo('<tr class="list-bold" bgcolor="'.$bg_colour.'">');
@@ -55,7 +55,6 @@ foreach (dbFetchRows("SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? A
 }
 
 echo("</table></div>");
-
 
 } else {
 
@@ -85,7 +84,6 @@ $graph_types = array("bits"   => "Bits",
                      "reqs"   => "Requests",
                      "hitmiss" => "Hit/Miss");
 
-
 foreach ($graph_types as $type => $descr)
 {
   echo("$type_sep");
@@ -103,7 +101,7 @@ foreach (dbFetchRows("SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? O
 {
   if (is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
-  if($vsvr['vsvr_state'] == "up") { $vsvr_class="green"; } else { $vsvr_class="red"; }
+  if ($vsvr['vsvr_state'] == "up") { $vsvr_class="green"; } else { $vsvr_class="red"; }
 
   echo("<tr bgcolor='$bg_colour'>");
   echo('<td width=320 class=list-large><a href="'.generate_url($vars, array('vsvr' => $vsvr['vsvr_id'], 'view' => NULL, 'graph' => NULL)).'">' . $vsvr['vsvr_name'] . '</a></td>');

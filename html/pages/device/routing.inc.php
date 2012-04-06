@@ -60,12 +60,15 @@ if (is_file("pages/device/routing/".mres($vars['proto']).".inc.php"))
 
         echo('<div style="background-color: '.$row_colour.';">');
         echo('<div style="padding:4px 0px 0px 8px;"><span class=graphhead>'.$type_text[$type].'</span>');
+
         include("pages/device/routing/overview/".mres($type).".inc.php");
+
         echo('</div>');
         echo('</div>');
       } else {
         $graph_title = $type_text[$type];
         $graph_type = "device_".$type;
+
         include("includes/print-device-graph.php");
       }
     }

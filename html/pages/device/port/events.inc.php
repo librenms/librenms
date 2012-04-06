@@ -12,5 +12,4 @@ echo('</table>');
 
 $pagetitle[] = "Events";
 
-
 ?>

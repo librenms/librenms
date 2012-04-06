@@ -58,10 +58,10 @@ if (!$auth)
       $(function()
       {
         $('#dtpickerfrom').datetimepicker({
-	  showOn: 'button',
-	  buttonImage: 'images/16/date.png',
+          showOn: 'button',
+          buttonImage: 'images/16/date.png',
           buttonImageOnly: true,
-	  dateFormat: 'yy-mm-dd',
+          dateFormat: 'yy-mm-dd',
           hourGrid: 4,
           minuteGrid: 10,
           onClose: function(dateText, inst) {
@@ -76,7 +76,7 @@ if (!$auth)
               toDateTextBox.val(dateText);
             }
           },
-          onSelect: function (selectedDateTime){
+          onSelect: function (selectedDateTime) {
             var toDateTextBox = $('#dtpickerto');
             var toValue = toDateTextBox.val();
             var start = $(this).datetimepicker('getDate');
@@ -89,7 +89,7 @@ if (!$auth)
           showOn: 'button',
           buttonImage: 'images/16/date.png',
           buttonImageOnly: true,
-	  dateFormat: 'yy-mm-dd',
+          dateFormat: 'yy-mm-dd',
           hourGrid: 4,
           minuteGrid: 10,
           maxDate: 0,
@@ -105,7 +105,7 @@ if (!$auth)
               startDateTextBox.val(dateText);
             }
           },
-          onSelect: function (selectedDateTime){
+          onSelect: function (selectedDateTime) {
             var fromDateTextBox = $('#dtpickerfrom');
             var fromValue = fromDateTextBox.val();
             var end = $(this).datetimepicker('getDate');
@@ -116,17 +116,17 @@ if (!$auth)
         });
       });
 
-      function submitCustomRange(frmdata){
+      function submitCustomRange(frmdata) {
         var reto = /to=([0-9])+/g;
         var refrom = /from=([0-9])+/g;
-	var tsto = new Date(frmdata.dtpickerto.value.replace(' ','T'));
-	var tsfrom = new Date(frmdata.dtpickerfrom.value.replace(' ','T'));
+        var tsto = new Date(frmdata.dtpickerto.value.replace(' ','T'));
+        var tsfrom = new Date(frmdata.dtpickerfrom.value.replace(' ','T'));
         tsto = tsto.getTime() / 1000;
         tsfrom = tsfrom.getTime() / 1000;
         frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
         frmdata.selfaction.value = frmdata.selfaction.value.replace(refrom, 'from=' + tsfrom);
-	frmdata.action = frmdata.selfaction.value
-	return true;
+        frmdata.action = frmdata.selfaction.value
+        return true;
       }
     </script>
     <style type='text/css'>
@@ -176,7 +176,7 @@ if (!$auth)
 
   // datetime range picker
   echo("
-    <form id='customrange' action=\"test\"> 
+    <form id='customrange' action=\"test\">
     <p>
   ");
   echo("<input type=hidden id='selfaction' value='" . $_SERVER['PHP_SELF'] . "'>");
@@ -216,7 +216,7 @@ if (!$auth)
   echo(generate_graph_tag($graph_array));
   echo("</div>");
 
-  if(isset($config['graph_descr'][$vars['type']]))
+  if (isset($config['graph_descr'][$vars['type']]))
   {
 
     print_optionbar_start();
@@ -229,10 +229,11 @@ if (!$auth)
     print_optionbar_end();
   }
 
-  if($vars['showcommand'])
+  if ($vars['showcommand'])
   {
     $_GET = $graph_array;
     $command_only = 1;
+
     include("includes/graphs/graph.inc.php");
   }
 }

@@ -63,16 +63,12 @@ if (bill_permitted($bill_id))
                         WHERE B.bill_id = ? AND P.interface_id = B.port_id
                         AND D.device_id = P.device_id", array($bill_id));
 
-
-
   echo("<font face=\"Verdana, Arial, Sans-Serif\"><h2>
   Bill : " . $bill_data['bill_name'] . "</h2>");
-
 
   print_optionbar_start();
 
   echo("<span style='font-weight: bold;'>Bill</span> &#187; ");
-
 
   if (!$vars['view']) { $vars['view'] = "quick"; }
 
@@ -117,7 +113,6 @@ if (bill_permitted($bill_id))
   }
 
   echo('<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => "bills")).'/"><img align=absmiddle src="/images/16/arrow_left.png"> Back to Bills</a></div>');
-
 
   print_optionbar_end();
 
