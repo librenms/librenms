@@ -143,7 +143,7 @@ if (!$device) {
     mysql_connect($config['db_host'],$config['db_user'],$config['db_pass']);
     mysql_select_db($config['db_name']);
 
-    $device = dbFetchRow("SELECT * FROM `devices` WHERE `hostname` = ?",array($device));
+    $device = dbFetchRow("SELECT * FROM `devices` WHERE `hostname` = ?",array($hostname));
     $port   = dbFetchRow("SELECT * FROM `ports` WHERE `ifName` = ? OR `ifDescr` = ? AND device_id = ?", array($ifname, $ifname, $device['device_id']));
 
     mysql_close();
