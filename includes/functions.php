@@ -127,6 +127,7 @@ function renamehost($id, $new, $source = 'console')
 {
   global $config;
 
+  ## FIXME does not check if destination exists!
   $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
   rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new");
   $return = dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
