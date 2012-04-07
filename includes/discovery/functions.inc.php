@@ -56,7 +56,7 @@ function discover_device($device, $options = NULL)
       $device['os']= getHostOS($device);
       if ($device['os'] != 'generic')
       {
-          echo "Device os was updated to".$device['os']."!";
+          echo "Device os was updated to ".$device['os']."!";
           dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
       }
   }
@@ -64,7 +64,7 @@ function discover_device($device, $options = NULL)
   if ($config['os'][$device['os']]['group'])
   {
     $device['os_group'] = $config['os'][$device['os']]['group'];
-    echo("(".$device['os_group'].")");
+    echo(" (".$device['os_group'].")");
   }
 
   echo("\n");
