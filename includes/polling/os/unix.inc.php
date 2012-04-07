@@ -28,6 +28,9 @@ if ($device['os'] == "linux" || $device['os'] == "endian")
   $hw = trim(str_replace("\"", "", $hw));
   if ($hw) { $hardware = "Dell " . $hw; }
 
+  $serial = snmp_get($device, ".1.3.6.1.4.1.674.10892.1.300.10.1.11.1", "-Oqv", "MIB-Dell-10892");
+  $serial = trim(str_replace("\"", "", $serial));
+
 }
 elseif ($device['os'] == "freebsd")
 {
