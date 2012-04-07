@@ -85,7 +85,7 @@ $config['int_l2tp']                = 0;  # Enable L2TP Port Types
 
 $config['show_locations']          = 1;  # Enable Locations on menu
 $config['show_locations_dropdown'] = 1;  # Enable Locations dropdown on menu
-$config['show_services']           = 1;  # Enable Services on menu
+$config['show_services']           = 0;  # Enable Services on menu
 $config['ports_page_default']      = "details"; ## eg "details" or "basic"
 
 ### SNMP Settings - Timeouts/Retries disabled as default
