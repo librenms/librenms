@@ -3,6 +3,9 @@
 list($hardware, $version, $features) = explode(",", str_replace(", ", ",", $poll_device['sysDescr']));
 list($features) = explode("(", $version);
 
+$serial = snmp_get($device, ".1.3.6.1.4.1.11.2.36.1.1.2.9.0", "-Oqv", "SEMI-MIB");
+$serial = trim(str_replace("\"", "", $serial));
+
 $fdb_rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/fdb_count.rrd";
 
 $FdbAddressCount = snmp_get ($device, "hpSwitchFdbAddressCount.0", "-Ovqn", "STATISTICS-MIB");
