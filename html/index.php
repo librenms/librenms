@@ -303,6 +303,7 @@ if ($config['page_gen'])
     $fullsize = memory_get_usage();
     unset($cache);
     $cachesize = $fullsize - memory_get_usage();
+    if ($cachesize < 0) { $cachesize = 0; } // Silly PHP!
 
     echo('<br />Cached data in memory is '.formatStorage($cachesize).'. Page memory usage is '.formatStorage($fullsize).', peaked at '. formatStorage(memory_get_peak_usage()) .'.');
 
