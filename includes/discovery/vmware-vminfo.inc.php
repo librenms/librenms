@@ -6,7 +6,7 @@
  * Try to discover any Virtual Machines.
  */
 
-if ($device['os'] == "vmware")
+if (($device['os'] == "vmware") || ($device['os'] == "linux"))
 {
   /*
    * Variable to hold the discovered Virtual Machines.
