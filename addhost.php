@@ -12,6 +12,8 @@
  * See COPYING for more details.
  */
 
+chdir(dirname($argv[0]));
+
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");

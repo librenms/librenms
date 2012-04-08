@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+chdir(dirname($argv[0]));
+
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");

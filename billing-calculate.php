@@ -3,6 +3,8 @@
 
 #$debug=1;
 
+chdir(dirname($argv[0]));
+
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
