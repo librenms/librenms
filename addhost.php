@@ -42,13 +42,25 @@ if (isset($argv[1]) && $argv[1])
     $transport = $argv[5];
   }
 
-  if (!$snmpver) $snmpver = "v2c";
   if ($community)
   {
     $config['snmp']['community'] = array($community);
   }
+  
+  if ($snmpver)
+  {
+    $snmpversions[] = $snmpver;
+  }
+  else
+  {
+    $snmpversions = array('v2c','v1');
+  }
 
-  $device_id = addHost($host, $snmpver, $port, $transport);
+  while (!$device_id && count($snmpversions))
+  {
+    $snmpver = array_shift($snmpversions);
+    $device_id = addHost($host, $snmpver, $port, $transport);
+  }
 
   if ($device_id)
   {
