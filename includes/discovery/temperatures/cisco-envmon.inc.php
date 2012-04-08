@@ -2,7 +2,7 @@
 
 if (mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."' AND `sensor_class` = 'temperature' AND (`sensor_type` = 'cisco-entity-sensor' OR `sensor_type` = 'entity-sensor')"),0) == "0" && ($device['os_group'] == "cisco"))
 {
-  echo("Cisco ");
+  echo("CISCO-ENVMON-MIB ");
   $oids = snmp_walk($device, ".1.3.6.1.4.1.9.9.13.1.3.1.2", "-Osqn", "CISCO-ENVMON-MIB");
   $oids = str_replace('.1.3.6.1.4.1.9.9.13.1.3.1.2.','',$oids);
   $oids = trim($oids);
