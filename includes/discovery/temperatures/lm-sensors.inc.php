@@ -5,7 +5,7 @@ if ($device['os'] == "linux")
   $oids = snmp_walk($device, "lmTempSensorsDevice", "-Osqn", "LM-SENSORS-MIB");
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
-  if ($oids) echo("LM-SENSORS ");
+  if ($oids) echo("LM-SENSORS-MIB ");
   foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
