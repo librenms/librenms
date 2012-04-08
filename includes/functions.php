@@ -18,6 +18,12 @@ include_once($config['install_dir'] . "/includes/services.inc.php");
 include_once($config['install_dir'] . "/includes/dbFacile.php");
 include_once($config['install_dir'] . "/includes/console_colour.php");
 
+function nicecase($item)
+{
+  if ($item == "dbm") { return "dBm"; }
+  else return ucfirst($item);
+}
+
 function mac_clean_to_readable($mac)
 {
   $r = substr($mac, 0, 2);
