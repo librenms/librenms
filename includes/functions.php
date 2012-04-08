@@ -194,13 +194,13 @@ function addHost($host, $snmpver = 'v2c', $port = '161', $transport = 'udp')
               print_error("Given hostname does not match SNMP-read hostname ($snmphost)!");
             }
           } else {
-            print_error("No reply on community $community");
+            print_error("No reply on community $community using $snmpver");
           }
         }
         if (!$device_id)
         {
           /// Failed SNMP
-          print_error("Could not reach $host with given SNMP community");
+          print_error("Could not reach $host with given SNMP community using $snmpver");
         }
       } else {
         /// failed Reachability
