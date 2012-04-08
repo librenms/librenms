@@ -2,7 +2,7 @@
 
 if ($device['os_group'] == "cisco")
 {
-  echo("CISCO-ENHANCED-MEMORY-POOL: ");
+  echo(" CISCO-ENHANCED-MEMORY-POOL: ");
 
   $array = snmpwalk_cache_multi_oid($device, "cempMemPoolEntry", NULL, "CISCO-ENHANCED-MEMPOOL-MIB");
 

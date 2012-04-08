@@ -2,7 +2,7 @@
 
 if ($device['os_group'] == "cisco" || $device['os'] == "acsw")
 {
-  echo("CISCO-PROCESS-MIB : ");
+  echo("CISCO-PROCESS-MIB: ");
   $processors_array = snmpwalk_cache_oid($device, "cpmCPU", NULL, "CISCO-PROCESS-MIB");
   if ($debug) { print_r($processors_array); }
 
@@ -36,8 +36,6 @@ if ($device['os_group'] == "cisco" || $device['os'] == "acsw")
         if ($debug) { echo("$old_rrd $new_rrd"); }
         echo("Moved RRD ");
       }
-
-      #echo("|".$descr."|");
 
       if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "")
       {
