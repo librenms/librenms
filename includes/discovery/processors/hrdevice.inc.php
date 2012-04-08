@@ -1,6 +1,6 @@
 <?php
 
-echo("hrDevice ");
+echo(" hrDevice: ");
 $hrDevice_oids = array('hrDevice','hrProcessorLoad');
 unset($hrDevice_array);
 foreach ($hrDevice_oids as $oid) { $hrDevice_array = snmpwalk_cache_oid($device, $oid, $hrDevice_array, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES"); }

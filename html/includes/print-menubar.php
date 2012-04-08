@@ -374,7 +374,7 @@ if ($sep && array_keys($menu_sensors))
 
 foreach (array_keys($menu_sensors) as $item)
 {
-  echo('<li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.ucfirst($item).'</a></li>');
+  echo('<li><a href="health/metric='.$item.'/"><img src="images/icons/'.$item.'.png" border="0" align="absmiddle" /> '.nicecase($item).'</a></li>');
   unset($menu_sensors[$item]);$sep++;
 }
 
