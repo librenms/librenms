@@ -5,5 +5,4 @@ RewriteBase /
 RewriteCond %{REQUEST_URI} !\.(js|ico|txt|gif|jpg|png|css|php)
 RewriteRule ^(.*)$ index.php/$1/
 
-SetOutputFilter INCLUDES
 AcceptPathInfo On
