@@ -40,7 +40,7 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
 <?php
 $stat_devices = dbFetchCell("SELECT COUNT(device_id) FROM `devices`");
 $stat_ports = dbFetchCell("SELECT COUNT(interface_id) FROM `ports`");
-$stat_syslog = dbFetchCell("SELECT COUNT(*) FROM `syslog`");
+$stat_syslog = dbFetchCell("SELECT COUNT(seq) FROM `syslog`");
 $stat_events = dbFetchCell("SELECT COUNT(event_id) FROM `eventlog`");
 $stat_apps = dbFetchCell("SELECT COUNT(app_id) FROM `applications`");
 $stat_services = dbFetchCell("SELECT COUNT(service_id) FROM `services`");
