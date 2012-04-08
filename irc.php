@@ -2,6 +2,8 @@
 
 <?php
 
+chdir(dirname($argv[0]));
+
 # Disable annoying messages... well... all messages actually :)
 error_reporting(0);
 
