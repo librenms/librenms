@@ -143,8 +143,10 @@ foreach ($port_stats as $ifIndex => $port)
       $ports[$ifIndex]['deleted'] = "0";
     }
   } else {
-    dbUpdate(array('deleted' => '1'), 'ports', '`interface_id` = ?', array($ports[$ifIndex]['interface_id']));
-    $ports[$ifIndex]['deleted'] = "1";
+    if($ports[$port['ifIndex']]['deleted'] != "1") {
+      dbUpdate(array('deleted' => '1'), 'ports', '`interface_id` = ?', array($ports[$ifIndex]['interface_id']));
+      $ports[$ifIndex]['deleted'] = "1";
+    }
   }
 }
 ### End New interface detection
@@ -443,7 +445,10 @@ foreach ($ports as $port)
   elseif ($port['disabled'] != "1")
   {
     echo("Port Deleted"); ### Port missing from SNMP cache.
-    dbUpdate(array('deleted' => '1'), 'ports',  '`device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $port['ifIndex']));
+    if($port['deleted'] != "1")
+    {
+      dbUpdate(array('deleted' => '1'), 'ports',  '`device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $port['ifIndex']));
+    }
   } else {
     echo("Port Disabled.");
   }
