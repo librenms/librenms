@@ -39,7 +39,7 @@ list($version) = explode(",", $version);
 #   $ciscomodel = str_replace("\"","",$ciscomodel);
 #   if ($ciscomodel) { $hardware = $ciscomodel; unset($ciscomodel); }
 
-if($hardware == "") {   $hardware = snmp_get($device, "sysObjectID.0", "-Osqv", "SNMPv2-MIB:CISCO-PRODUCTS-MIB"); }
+if($hardware == "") { $hardware = snmp_get($device, "sysObjectID.0", "-Osqv", "SNMPv2-MIB:CISCO-PRODUCTS-MIB:ALTEON-ROOT-MIB"); }
 
 #if(isset($cisco_hardware_oids[$poll_device['sysObjectID']])) { $hardware = $cisco_hardware_oids[$poll_device['sysObjectID']]; }
 
