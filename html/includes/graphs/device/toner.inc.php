@@ -40,8 +40,9 @@ foreach (dbFetchRows("SELECT * FROM toner where device_id = ?", array($id)) as $
 
   if (stripos($toner['toner_descr'],"cyan"   ) !== false || substr($toner['toner_descr'],-1) == 'C') { $colour = "55D6D3"; }
   if (stripos($toner['toner_descr'],"magenta") !== false || substr($toner['toner_descr'],-1) == 'M') { $colour = "F24AC8"; }
-  if (stripos($toner['toner_descr'],"yellow" ) !== false || substr($toner['toner_descr'],-1) == 'Y') { $colour = "FFF200"; }
-  if (stripos($toner['toner_descr'],"black"  ) !== false || substr($toner['toner_descr'],-1) == 'K') { $colour = "000000"; }
+  if (stripos($toner['toner_descr'],"yellow" ) !== false || substr($toner['toner_descr'],-1) == 'Y' || stripos($toner['toner_descr'],"giallo"  ) !== false) { $colour = "FFF200"; }
+  if (stripos($toner['toner_descr'],"black"  ) !== false || substr($toner['toner_descr'],-1) == 'K' || stripos($toner['toner_descr'],"nero"    ) !== false) { $colour = "000000"; }
+
 
   $hostname = gethostbyid($toner['device_id']);
 
