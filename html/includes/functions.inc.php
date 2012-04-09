@@ -1,5 +1,20 @@
 <?php
 
+function toner2colour($descr)
+{
+  $colour = NULL;
+
+  if (substr($descr,-1) == 'C' || stripos($descr,"cyan"   ) !== false) { $colour = "55D6D3"; }
+  if (substr($descr,-1) == 'M' || stripos($descr,"magenta") !== false) { $colour = "F24AC8"; }
+  if (substr($descr,-1) == 'Y' || stripos($descr,"yellow" ) !== false
+                               || stripos($descr,"giallo" ) !== false
+                               || stripos($descr,"gul"    ) !== false) { $colour = "FFF200"; }
+  if (substr($descr,-1) == 'K' || stripos($descr,"black"  ) !== false
+                               || stripos($descr,"nero"   ) !== false) { $colour = "000000"; }
+
+  return $colour;       
+}
+
 function generate_link($text, $vars, $new_vars = array())
 {
   return '<a href="'.generate_url($vars, $new_vars).'">'.$text.'</a>';

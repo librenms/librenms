@@ -48,10 +48,10 @@ if ($services['total'])
 
   foreach (dbFetchRows("SELECT * FROM services WHERE device_id = ? ORDER BY service_type", array($device['device_id'])) as $data)
   {
-    if ($data[service_status] == "0" && $data[service_ignore] == "1") { $status = "grey"; }
-    if ($data[service_status] == "1" && $data[service_ignore] == "1") { $status = "green"; }
-    if ($data[service_status] == "0" && $data[service_ignore] == "0") { $status = "red"; }
-    if ($data[service_status] == "1" && $data[service_ignore] == "0") { $status = "blue"; }
+    if ($data['service_status'] == "0" && $data['service_ignore'] == "1") { $status = "grey"; }
+    if ($data['service_status'] == "1" && $data['service_ignore'] == "1") { $status = "green"; }
+    if ($data['service_status'] == "0" && $data['service_ignore'] == "0") { $status = "red"; }
+    if ($data['service_status'] == "1" && $data['service_ignore'] == "0") { $status = "blue"; }
     echo("$break<a class=$status>" . strtolower($data[service_type]) . "</a>");
     $break = ", ";
   }
@@ -86,6 +86,7 @@ include("overview/storage.inc.php");
 
 if(is_array($entity_state['group']['c6kxbar'])) { include("overview/c6kxbar.inc.php"); }
 
+include("overview/toner.inc.php");
 include("overview/sensors/temperatures.inc.php");
 include("overview/sensors/humidity.inc.php");
 include("overview/sensors/fanspeeds.inc.php");

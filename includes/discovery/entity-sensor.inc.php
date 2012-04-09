@@ -2,7 +2,7 @@
 
 echo(" ENTITY-SENSOR: ");
 
-echo("\nCaching OIDs:");
+echo("Caching OIDs:");
 
 if (!is_array($entity_array))
 {

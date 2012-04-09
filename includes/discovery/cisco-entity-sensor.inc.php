@@ -5,7 +5,7 @@ if ($device['os_group'] == "cisco")
   echo(" CISCO-ENTITY-SENSOR: ");
 
   $oids = array();
-  echo(" Caching OIDs: ");
+  echo("Caching OIDs:");
 
   if (!is_array($entity_array))
   {
