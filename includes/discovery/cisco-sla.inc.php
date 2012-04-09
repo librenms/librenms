@@ -5,26 +5,27 @@ if ($config['enable_sla'] && $device['os_group'] == "cisco")
   echo("SLAs : ");
 
   $slas = snmp_walk($device, "ciscoRttMonMIB.ciscoRttMonObjects.rttMonCtrl", "-Osq", "+CISCO-RTTMON-MIB");
-  
+
   $sla_table = array();
-  foreach (explode("\n", $slas) as $sla) {
+  foreach (explode("\n", $slas) as $sla)
+  {
     $key_val = explode(" ", $sla, 2);
     if (count($key_val) != 2)
       $key_val[] = "";
-    
+
     $key = $key_val[0];
     $value = $key_val[1];
-    
+
     $prop_id = explode(".", $key);
     if ((count($prop_id) != 2) || !ctype_digit($prop_id[1]))
       continue;
-      
+
     $property = $prop_id[0];
     $id = intval($prop_id[1]);
-      
+
     $sla_table[$id][$property] = trim($value);
   }
-  
+
   #var_dump($sla_table);
 
   // Get existing SLAs
@@ -37,7 +38,7 @@ if ($config['enable_sla'] && $device['os_group'] == "cisco")
       'sla_nr' => $sla_nr,
     );
     $sla_id = dbFetchCell("SELECT `sla_id` FROM `slas` WHERE `device_id` = :device_id AND `sla_nr` = :sla_nr", $query_data);
-    
+
     $data = array(
       'device_id' => $device['device_id'],
       'sla_nr' => $sla_nr,
@@ -47,7 +48,7 @@ if ($config['enable_sla'] && $device['os_group'] == "cisco")
       'status' => ($sla_config['rttMonCtrlAdminStatus'] == 'active') ? 1 : 0,
       'deleted' => 0,
     );
-    
+
     // Some fallbacks for when the tag is empty
     if (!$data['tag'])
     {
@@ -56,11 +57,11 @@ if ($config['enable_sla'] && $device['os_group'] == "cisco")
         case 'http':
           $data['tag'] = $sla_config['rttMonEchoAdminURL'];
           break;
-        
+
         case 'dns':
           $data['tag'] = $sla_config['rttMonEchoAdminTargetAddressString'];
           break;
-        
+
         case 'echo':
           $parts = explode(" ", $sla_config['rttMonEchoAdminTargetAddress']);
           if (count($parts) == 4)
@@ -77,8 +78,8 @@ if ($config['enable_sla'] && $device['os_group'] == "cisco")
           break;
       }
     }
-    
-    if( !$sla_id )
+
+    if (!$sla_id)
     {
       $sla_id = dbInsert($data, 'slas');
       echo "+";
@@ -92,14 +93,14 @@ if ($config['enable_sla'] && $device['os_group'] == "cisco")
       echo ".";
     }
   }
-  
+
   // Mark all remaining SLAs as deleted
   foreach ($existing_slas as $existing_sla)
   {
     dbUpdate(array('deleted' => 1), 'slas', "`sla_id` = :sla_id", array('sla_id' => $existing_sla));
     echo "-";
   }
-    
+
   echo("\n");
 } # enable_sla && cisco
 

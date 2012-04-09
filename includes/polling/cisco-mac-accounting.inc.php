@@ -7,42 +7,42 @@ if ($device['os_group'] == "cisco")
   $cip_oids = array('cipMacHCSwitchedBytes', 'cipMacHCSwitchedPkts');
   echo("Cisco MAC - Caching OID: ");
   $cip_array = array();
-  
+
   foreach ($cip_oids as $oid)
   {
     echo("$oid ");
     $cip_array = snmpwalk_cache_cip($device, $oid, $cip_array, "CISCO-IP-STAT-MIB");
   }
-  
+
   $polled = time();
-  
+
   $mac_entries = 0;
-  
+
   $acc_rows = dbFetchRows("SELECT *, A.poll_time AS poll_time FROM `mac_accounting` as A, `ports` AS I where A.interface_id = I.interface_id AND I.device_id = ?", array($device['device_id']));
-  
+
   foreach ($acc_rows as $acc)
   {
     $device_id = $acc['device_id'];
     $ifIndex = $acc['ifIndex'];
     $mac = $acc['mac'];
-  
+
     $polled_period = $polled - $acc['poll_time'];
-  
+
     if ($cip_array[$ifIndex][$mac])
     {
       $acc['update']['poll_time'] = $polled;
       $acc['update']['poll_prev'] = $acc['poll_time'];
       $acc['update']['poll_period'] = $polled_period;
-  
+
       $mac_entries++;
-  
+
       $b_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['input'];
       $b_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['output'];
       $p_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['input'];
       $p_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['output'];
-  
+
       $this_ma = &$cip_array[$ifIndex][$mac];
-  
+
       /// Update metrics
       foreach ($cip_oids as $oid)
       {
@@ -62,11 +62,11 @@ if ($device['os_group'] == "cisco")
           }
         }
       }
-  
+
       if ($debug) { echo("\n" . $acc['hostname']." ".$acc['ifDescr'] . "  $mac -> $b_in:$b_out:$p_in:$p_out "); }
-  
+
       $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");
-  
+
       if (!is_file($rrdfile))
       {
         rrdtool_create($rrdfile,"DS:IN:COUNTER:600:0:12500000000 \
@@ -84,19 +84,19 @@ if ($device['os_group'] == "cisco")
       }
       $woo = "N:".($b_in+0).":".($b_out+0).":".($p_in+0).":".($p_out+0);
       $ret = rrdtool_update("$rrdfile", $woo);
-  
+
       if ($acc['update'])
       { /// Do Updates
         dbUpdate($acc['update'], 'mac_accounting', '`ma_id` = ?', array($acc['ma_id']));
       } /// End Updates
     }
   }
-  
+
   unset($cip_array);
-  
+
   if ($mac_entries) { echo(" $mac_entries MAC accounting entries\n"); }
-  
+
   echo("\n");
 }
-  
+
 ?>

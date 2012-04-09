@@ -46,7 +46,7 @@ if (isset($argv[1]) && $argv[1])
   {
     $config['snmp']['community'] = array($community);
   }
-  
+
   if ($snmpver)
   {
     $snmpversions[] = $snmpver;
