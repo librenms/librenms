@@ -118,10 +118,28 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
   if ($debug) { echo("Discover sensor: $oid, $index, $type, $descr, $precision, $entPhysicalIndex\n"); }
 
+  if (is_null($low_warn_limit) || !is_null($warn_limit))
+  {
+    // Warn limits only make sense when we have both a high and a low limit
+    $low_warn_limit = NULL;
+    $warn_limit = NULL;
+  }
+  elseif ($low_warn_limit > $warn_limit)
+  {
+    // Fix high/low thresholds (i.e. on negative numbers)
+    list($warn_limit, $low_warn_limit) = array($low_warn_limit, $warn_limit);
+  }
+  
   if (dbFetchCell("SELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ?", array($poller_type, $class, $device['device_id'], $type, $index)) == '0')
   {
     if (!$high_limit) { $high_limit = sensor_limit($class, $current); }
     if (!$low_limit)  { $low_limit  = sensor_low_limit($class, $current); }
+
+    if ($low_limit > $high_limit)
+    {
+      // Fix high/low thresholds (i.e. on negative numbers)
+      list($high_limit, $low_limit) = array($low_limit, $high_limit);
+    }
 
     $insert = array('poller_type' => $poller_type, 'sensor_class' => $class, 'device_id' => $device['device_id'], 'sensor_oid' => $oid, 'sensor_index' => $index, 'sensor_type' => $type, 'sensor_descr' => $descr,
                     'sensor_divisor' => $divisor, 'sensor_multiplier' => $multiplier, 'sensor_limit' => $high_limit, 'sensor_limit_warn' => $warn_limit, 'sensor_limit_low' => $low_limit,
@@ -141,10 +159,30 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     {
       if (!$sensor_entry['sensor_limit'])
       {
+        // Calculate a reasonable limit
         $high_limit = sensor_limit($class, $current);
       } else {
+        // Use existing limit
         $high_limit = $sensor_entry['sensor_limit'];
       }
+    }
+
+    if (!isset($low_limit))
+    {
+      if (!$sensor_entry['sensor_limit_low'])
+      {
+        // Calculate a reasonable limit
+        $low_limit = sensor_low_limit($class, $current);
+      } else {
+        // Use existing limit
+        $low_limit = $sensor_entry['sensor_limit_low'];
+      }
+    }
+
+    // Fix high/low thresholds (i.e. on negative numbers)
+    if ($low_limit > $high_limit)
+    {
+      list($high_limit, $low_limit) = array($low_limit, $high_limit);
     }
 
     if ($high_limit != $sensor_entry['sensor_limit'])
@@ -156,16 +194,6 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       log_event("Sensor High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$high_limit.")", $device, 'sensor', $sensor_id);
     }
 
-    if (!isset($low_limit))
-    {
-      if (!$sensor_entry['sensor_limit_low'])
-      {
-        $low_limit = sensor_low_limit($class, $current);
-      } else {
-        $low_limit = $sensor_entry['sensor_limit_low'];
-      }
-    }
-
     if ($sensor_entry['sensor_limit_low'] != $low_limit)
     {
       $update = array('sensor_limit_low' => ($low_limit == NULL ? array('NULL') : $low_limit));
@@ -173,6 +201,24 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       if ($debug) { echo("( $updated updated )\n"); }
       echo("L");
       log_event("Sensor Low Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$low_limit.")", $device, 'sensor', $sensor_id);
+    }
+
+    if ($warn_limit != $sensor_entry['sensor_limit_warn'])
+    {
+      $update = array('sensor_limit_warn' => ($warn_limit == NULL ? array('NULL') : $warn_limit));
+      $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
+      if ($debug) { echo("( $updated updated )\n"); }
+      echo("WH");
+      log_event("Sensor Warn High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$warn_limit.")", $device, 'sensor', $sensor_id);
+    }
+
+    if ($sensor_entry['sensor_limit_low_warn'] != $low_warn_limit)
+    {
+      $update = array('sensor_limit_low_warn' => ($low_warn_limit == NULL ? array('NULL') : $low_warn_limit));
+      $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
+      if ($debug) { echo("( $updated updated )\n"); }
+      echo("WL");
+      log_event("Sensor Warn Low Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$low_warn_limit.")", $device, 'sensor', $sensor_id);
     }
 
     if ($oid == $sensor_entry['sensor_oid'] && $descr == $sensor_entry['sensor_descr'] && $multiplier == $sensor_entry['sensor_multiplier'] && $divisor == $sensor_entry['sensor_divisor'] && $entPhysicalIndex_measured == $sensor_entry['entPhysicalIndex_measured'] && $entPhysicalIndex == $sensor_entry['entPhysicalIndex'])
@@ -202,7 +248,14 @@ function sensor_low_limit($class, $current)
       $limit = $current * 0.7;
       break;
     case 'voltage':
-      $limit = $current * (1 - (sgn($current) * 0.15));
+      if ($current < 0)
+      {
+        $limit = $current * (1 + (sgn($current) * 0.15));
+      }
+      else
+      {
+        $limit = $current * (1 - (sgn($current) * 0.15));
+      }
       break;
     case 'humidity':
       $limit = "70";
@@ -233,7 +286,14 @@ function sensor_limit($class, $current)
       $limit = $current * 1.60;
       break;
     case 'voltage':
-      $limit = $current * (1 + (sgn($current) * 0.15));
+      if ($current < 0)
+      {
+        $limit = $current * (1 - (sgn($current) * 0.15));
+      }
+      else
+      {
+        $limit = $current * (1 + (sgn($current) * 0.15));
+      }
       break;
     case 'humidity':
       $limit = "70";
