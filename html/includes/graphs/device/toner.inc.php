@@ -10,39 +10,38 @@ $iter = "1";
 $rrd_options .= " COMMENT:'Toner level            Cur     Min      Max\\n'";
 foreach (dbFetchRows("SELECT * FROM toner where device_id = ?", array($id)) as $toner)
 {
-  # FIXME generic colour function
-  switch ($iter)
+  $colour = toner2colour($toner['toner_descr']);
+
+  if ($colour == NULL) 
   {
-    case "1":
-      $colour= "000000";
-      break;
-    case "2":
-      $colour= "008C00";
-      break;
-    case "3":
-      $colour= "4096EE";
-      break;
-    case "4":
-      $colour= "73880A";
-      break;
-    case "5":
-      $colour= "D01F3C";
-      break;
-    case "6":
-      $colour= "36393D";
-      break;
-    case "7":
-    default:
-      $colour= "FF0000";
-      unset($iter);
-      break;
+    # FIXME generic colour function
+    switch ($iter)
+    {
+      case "1":
+        $colour= "000000";
+        break;
+      case "2":
+        $colour= "008C00";
+        break;
+      case "3":
+        $colour= "4096EE";
+        break;
+      case "4":
+        $colour= "73880A";
+        break;
+      case "5":
+        $colour= "D01F3C";
+        break;
+      case "6":
+        $colour= "36393D";
+        break;
+      case "7":
+      default:
+        $colour= "FF0000";
+        unset($iter);
+        break;
+    }
   }
-
-  if (stripos($toner['toner_descr'],"cyan"   ) !== false || substr($toner['toner_descr'],-1) == 'C') { $colour = "55D6D3"; }
-  if (stripos($toner['toner_descr'],"magenta") !== false || substr($toner['toner_descr'],-1) == 'M') { $colour = "F24AC8"; }
-  if (stripos($toner['toner_descr'],"yellow" ) !== false || substr($toner['toner_descr'],-1) == 'Y' || stripos($toner['toner_descr'],"giallo"  ) !== false) { $colour = "FFF200"; }
-  if (stripos($toner['toner_descr'],"black"  ) !== false || substr($toner['toner_descr'],-1) == 'K' || stripos($toner['toner_descr'],"nero"    ) !== false) { $colour = "000000"; }
-
 
   $hostname = gethostbyid($toner['device_id']);
 
