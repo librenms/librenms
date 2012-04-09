@@ -13,7 +13,7 @@ foreach (explode("\n", $oids) as $data)
   $network = $addr->network . "/" . $addr->bitmask;
   $cidr = $addr->bitmask;
 
-  if (mysql_result(mysql_query("SELECT count(*) FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $oid != "0.0.0.0")
+  if (mysql_result(mysql_query("SELECT count(*) FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $oid != "0.0.0.0" && $oid != 'ipAdEntIfIndex')
   {
     $i_query = "SELECT interface_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
     $interface_id = mysql_result(mysql_query($i_query), 0);
