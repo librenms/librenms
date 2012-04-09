@@ -168,8 +168,6 @@ function poll_device($device, $options)
       ### If there any don't match, they're added/deleted from the database.
       ### Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
 
-      #print_r($graphs);
-
       foreach (dbFetch("SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?", array($device['device_id'])) as $graph)
       {
         if (!isset($graphs[$graph["graph"]]))
@@ -184,8 +182,10 @@ function poll_device($device, $options)
       {
         if (!isset($oldgraphs[$graph]))
         {
+          echo("+");
           dbInsert(array('device_id' => $device['device_id'], 'graph' => $graph), 'device_graphs');
         }
+        echo($graph." ");
       }
     }
 

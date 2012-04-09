@@ -54,7 +54,7 @@ foreach ($slas as $sla)
   if ($vars['view'] != 'all' && $vars['view'] != $sla['rtt_type'])
     continue;
 
-  $name = "SLA #". $sla['sla_nr'];
+  $name = "SLA #". $sla['sla_nr'] ." - ". $sla_types[$sla['rtt_type']];
   if ($sla['tag'])
     $name .= ": ".$sla['tag'];
   if ($sla['owner'])
