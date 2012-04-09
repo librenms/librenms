@@ -2,6 +2,8 @@ Options FollowSymlinks Multiviews
 
 RewriteEngine on
 RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !\.(js|ico|txt|gif|jpg|png|css|php)
 RewriteRule ^(.*)$ index.php/$1/
 
