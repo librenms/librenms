@@ -1,6 +1,6 @@
 <?php
 
-echo(" ENTITY-SENSOR ");
+echo(" ENTITY-SENSOR: ");
 
 echo("\nCaching OIDs:");
 
