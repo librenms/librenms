@@ -134,7 +134,7 @@ if (isset($config['branding']) && is_array($config['branding']))
   <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
   <meta http-equiv="content-language" content="en-us" />
 <?php
-if ($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$config['page_refresh']."'>"); }
+if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$config['page_refresh'].'" />' . "\n"); }
 ?>
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <link rel="shortcut icon" href="<?php echo($config['favicon']);  ?>" />
