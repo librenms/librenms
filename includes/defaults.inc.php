@@ -368,6 +368,29 @@ $config['auth_ldap_groups']['support']['level'] = 1;
 $config['astext'][65332] = "Cymru FullBogon Feed";
 $config['astext'][65333] = "Cymru Bogon Feed";
 
+### Nicer labels for the SLA types
+$config['sla_type_labels']['echo'] = 'ICMP ping';
+$config['sla_type_labels']['pathEcho'] = 'Path ICMP ping';
+$config['sla_type_labels']['fileIO'] = 'File I/O';
+$config['sla_type_labels']['script'] = 'Script';
+$config['sla_type_labels']['udpEcho'] = 'UDP ping';
+$config['sla_type_labels']['tcpConnect'] = 'TCP connect';
+$config['sla_type_labels']['http'] = 'HTTP';
+$config['sla_type_labels']['dns'] = 'DNS';
+$config['sla_type_labels']['jitter'] = 'Jitter';
+$config['sla_type_labels']['dlsw'] = 'DLSW';
+$config['sla_type_labels']['dhcp'] = 'DHCP';
+$config['sla_type_labels']['ftp'] = 'FTP';
+$config['sla_type_labels']['voip'] = 'VoIP';
+$config['sla_type_labels']['rtp'] = 'RTP';
+$config['sla_type_labels']['lspGroup'] = 'LSP group';
+$config['sla_type_labels']['icmpjitter'] = 'ICMP jitter';
+$config['sla_type_labels']['lspPing'] = 'LSP ping';
+$config['sla_type_labels']['lspTrace'] = 'LSP trace';
+$config['sla_type_labels']['ethernetPing'] = 'Ethernet ping';
+$config['sla_type_labels']['ethernetJitter'] = 'Ethernet jitter';
+$config['sla_type_labels']['lspPingPseudowire'] = 'LSP Pseudowire ping';
+
 ### Warnings on front page
 $config['warn']['ifdown'] = TRUE;    ## Show down interfaces
 
@@ -396,6 +419,7 @@ $config['poller_modules']['ospf']                         = 1;
 $config['poller_modules']['cisco-ipsec-flow-monitor']     = 1;
 $config['poller_modules']['cisco-remote-access-monitor']  = 1;
 $config['poller_modules']['cisco-cef']                    = 1;
+$config['poller_modules']['cisco-sla']                    = 1;
 $config['poller_modules']['cisco-mac-accounting']         = 1;
 $config['poller_modules']['cipsec-tunnels']               = 1;
 $config['poller_modules']['cisco-ace-loadbalancer']       = 1;
@@ -426,6 +450,7 @@ $config['discovery_modules']['cisco-mac-accounting']      = 1;
 $config['discovery_modules']['cisco-pw']                  = 1;
 $config['discovery_modules']['cisco-vrf']                 = 1;
 #$config['discovery_modules']['cisco-cef']                 = 1;
+$config['discovery_modules']['cisco-sla']                 = 1;
 $config['discovery_modules']['vmware-vminfo']             = 1;
 $config['discovery_modules']['libvirt-vminfo']            = 1;
 $config['discovery_modules']['toner']                     = 1;

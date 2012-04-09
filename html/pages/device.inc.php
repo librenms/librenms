@@ -100,6 +100,15 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
+    if (@dbFetchCell("SELECT COUNT(sla_id) FROM slas WHERE device_id = '" . $device['device_id'] . "'") > '0')
+    {
+      echo('<li class="' . $select['slas'] . $select['sla'] . '">
+    <a href="'.generate_device_url($device, array('tab' => 'slas')). '">
+      <img src="images/16/chart_line.png" align="absmiddle" border="0" /> SLAs
+    </a>
+  </li>');
+    }
+
     if (isset($config['smokeping']['dir']))
     {
       $smokeping_files = array();
