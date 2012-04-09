@@ -38,9 +38,6 @@ if ($device['os'] != "Snom")
     $rrdupdate .= ":$value";
   }
 
-  print_r($data);
-
-
   if (isset($data[0]['ipOutRequests']) && isset($data[0]['ipInReceives']))
   {
     if (!file_exists($rrd_file)) { rrdtool_create($rrd_file, $rrd_create); }
@@ -48,7 +45,6 @@ if ($device['os'] != "Snom")
     $graphs['netstat_ip'] = TRUE;
     $graphs['netstat_ip_frag'] = TRUE;
   }
-
 }
 
 unset($oids, $data, $data_array, $oid);

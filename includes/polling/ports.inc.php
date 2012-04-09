@@ -143,7 +143,8 @@ foreach ($port_stats as $ifIndex => $port)
       $ports[$ifIndex]['deleted'] = "0";
     }
   } else {
-    if($ports[$port['ifIndex']]['deleted'] != "1") {
+    if ($ports[$port['ifIndex']]['deleted'] != "1")
+    {
       dbUpdate(array('deleted' => '1'), 'ports', '`interface_id` = ?', array($ports[$ifIndex]['interface_id']));
       $ports[$ifIndex]['deleted'] = "1";
     }
