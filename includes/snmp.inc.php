@@ -14,6 +14,8 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
 {
   global $debug,$config,$runtime_stats,$mibs_loaded;
 
+  if(!$options) { $options = "-OQUs"; }
+
   if (is_numeric($device['timeout']) && $device['timeout'] > 0)
   {
      $timeout = $device['timeout'];
