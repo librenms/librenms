@@ -146,13 +146,10 @@ print_optionbar_end();
     <p>
       <a href="http://www.observium.org">Website</a> |
       <a href="http://www.observium.org/wiki/">Support Wiki</a> |
-      <a href="http://www.observium.org/forum/">Forum</a> |
-      <a href="http://www.observium.org/bugs/">Bugtracker</a> |
+      <a href="http://jira.observium.org/">Bugtracker</a> |
       <a href="http://www.observium.org/wiki/Mailing_Lists">Mailing List</a> |
-<?php /*
       <a href="http://twitter.com/Observium">Twitter</a> |
-*/ ?>
-      <a href="http://www.facebook.com/pages/Observer/128354461353">Facebook</a>
+      <a href="http://www.facebook.com/pages/Observium/128354461353">Facebook</a>
     </p>
 
     <h3>Observium is a Free, Open project. Please donate to support continued development.</h3>
