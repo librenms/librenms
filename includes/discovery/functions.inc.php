@@ -129,7 +129,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     // Fix high/low thresholds (i.e. on negative numbers)
     list($warn_limit, $low_warn_limit) = array($low_warn_limit, $warn_limit);
   }
-  
+
   if (dbFetchCell("SELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ?", array($poller_type, $class, $device['device_id'], $type, $index)) == '0')
   {
     if (!$high_limit) { $high_limit = sensor_limit($class, $current); }

@@ -60,5 +60,4 @@ if (is_numeric($cpu_usage))
 #$mem=snmp_get($device, "FORTINET-FORTIGATE-MIB::fgSysMemUsage.0", "-Ovq");
 #$memsize=snmp_get($device, "FORTINET-FORTIGATE-MIB::fgSysMemCapacity", "-Ovq");
 
-
 ?>

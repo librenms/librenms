@@ -446,7 +446,7 @@ foreach ($ports as $port)
   elseif ($port['disabled'] != "1")
   {
     echo("Port Deleted"); ### Port missing from SNMP cache.
-    if($port['deleted'] != "1")
+    if ($port['deleted'] != "1")
     {
       dbUpdate(array('deleted' => '1'), 'ports',  '`device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $port['ifIndex']));
     }

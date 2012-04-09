@@ -11,7 +11,7 @@ $sla_types = array('all' => 'All');
 foreach ($slas as $sla)
 {
   $sla_type = $sla['rtt_type'];
-  
+
   if (!in_array($sla_type, $sla_types))
     if (isset($config['sla_type_labels'][$sla_type]))
     {
@@ -21,7 +21,7 @@ foreach ($slas as $sla)
     {
       $text = ucfirst($sla_type);
     }
-    
+
     $sla_types[$sla_type] = $text;
 }
 asort($sla_types);
@@ -30,7 +30,7 @@ $sep = "";
 foreach ($sla_types as $sla_type => $text)
 {
   if (!$vars['view']) { $vars['view'] = $sla_type; }
-  
+
   echo($sep);
   if ($vars['view'] == $sla_type)
   {
@@ -59,7 +59,7 @@ foreach ($slas as $sla)
     $name .= ": ".$sla['tag'];
   if ($sla['owner'])
     $name .= " (Owner: ". $sla['owner'] .")";
-  
+
   $graph_array['type'] = "device_sla";
   $graph_array['id'] = $sla['sla_id'];
   echo('<tr><td>');
