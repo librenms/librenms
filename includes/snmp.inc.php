@@ -14,8 +14,6 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
 {
   global $debug,$config,$runtime_stats,$mibs_loaded;
 
-  if (!$options) { $options = "-OQUs"; }
-
   if (is_numeric($device['timeout']) && $device['timeout'] > 0)
   {
      $timeout = $device['timeout'];
@@ -133,7 +131,6 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
     $device['transport'] = "udp";
   }
 
-  // php has no bulkwalk functionality, so use binary for this.
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   {
     $snmpcommand = $config['snmpwalk'];

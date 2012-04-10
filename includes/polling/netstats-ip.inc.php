@@ -23,7 +23,7 @@ if ($device['os'] != "Snom")
     $snmpstring .= " IP-MIB::".$oid.".0";
   }
 
-  $data = snmp_get_multi($device, $snmpstring, NULL, "IP-MIB");
+  $data = snmp_get_multi($device, $snmpstring, "-OQUs", "IP-MIB");
 
   $rrdupdate = "N";
 
