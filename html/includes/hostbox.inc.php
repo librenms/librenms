@@ -36,7 +36,7 @@ $device['os_text'] = $config['os'][$device['os']]['text'];
 $port_count   = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ?", array($device['device_id']));
 $sensor_count = dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ?", array($device['device_id']));
 
-echo('  <tr class="'.$class.'" bgcolor="' . $bg . '" onmouseover="this.style.backgroundColor=\'#fdd\';" onmouseout="this.style.backgroundColor=\'' . $bg . '\';"
+echo('  <tr class="'.$class.'" onmouseover="this.style.backgroundColor=\'#fdd\';" onmouseout="this.style.backgroundColor=\'' . $bg . '\';"
           onclick="location.href=\'device/device='.$device['device_id'].'/\'" style="cursor: pointer;">
           <td width="1" style="background-color: '.$table_tab_colour.';"></td>
           <td width="40" class="paddedcell" align="center" valign="middle">' . $image . '</td>
