@@ -1,7 +1,5 @@
 <?php
 
-if (isset($bg) && $bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
-
 $hostname = gethostbyid($entry['host']);
 
 unset($icon);
@@ -9,7 +7,7 @@ unset($icon);
 $icon = geteventicon($entry['message']);
 if ($icon) { $icon = '<img src="images/16/' . $icon . '" />'; }
 
-echo('<tr style="background-color: ' . $bg . '">
+echo('<tr class="eventlog">
   <td width="0"></td>
   <td class="syslog" width="160">
     ' . $entry['datetime'] . '

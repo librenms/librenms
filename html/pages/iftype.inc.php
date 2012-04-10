@@ -26,12 +26,11 @@ $types_array = explode(',',$vars['type']);
 for ($i = 0; $i < count($types_array);$i++) $types_array[$i] = ucfirst($types_array[$i]);
 $types = implode(' + ',$types_array);
 
-echo("<tr bgcolor='$bg'>
-             <td><span class=list-large>Total Graph for ports of type : ".$types."</span></td></tr>");
+echo("<tr class='iftype'>
+             <td><span class=list-large>Total Graph for ports of type : ".$types."</span><br />");
 
 if ($if_list)
 {
-  echo("<tr bgcolor='$bg'><td>");
   $graph_type = "multiport_bits_separate";
   $port['interface_id'] = $if_list;
 
@@ -47,7 +46,7 @@ if ($if_list)
     $port['ifAlias'] = str_ireplace("[PNI]", "Private", $port['ifAlias']);
     $ifclass = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
     if ($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg = "#ffffff"; }
-    echo("<tr bgcolor='$bg'>
+    echo("<tr class='iftype'>
              <td><span class=list-large>" . generate_port_link($port,$port['port_descr_descr']) . "</span><br />
             <span class=interface-desc style='float: left;'>".generate_device_link($port)." ".generate_port_link($port)." </span>");
 
@@ -56,7 +55,7 @@ if ($if_list)
       echo("<span style='float: right;'><a href='device/".$port['device_id']."/port/".$port['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'> MAC Accounting</a></span>");
     }
 
-    echo("</td></tr><tr bgcolor='$bg'><td>");
+    echo('<br />');
 
     if (file_exists($config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . $port['ifIndex'] . ".rrd"))
     {
@@ -71,7 +70,7 @@ if ($if_list)
 }
 else
 {
-  echo("<tr><td>None found.</td></tr>");
+  echo("None found.</td></tr>");
 }
 
 ?>

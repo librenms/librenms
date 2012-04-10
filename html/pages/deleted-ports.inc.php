@@ -19,8 +19,6 @@ if ($vars['purge'] == "all")
   echo("<div class=infobox>Deleted ".generate_device_link($interface)." - ".generate_port_link($interface)."</div>");
 }
 
-$i_deleted = 1;
-
 echo("<table cellpadding=5 cellspacing=0 border=0 width=100%>");
 echo("<tr><td></td><td></td><td></td><td><a href='deleted-ports/purge=all/'><img src='images/16/cross.png' align=absmiddle></img> Purge All</a></td></tr>");
 
@@ -29,15 +27,11 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
   $interface = ifLabel($interface, $interface);
   if (port_permitted($interface['interface_id'], $interface['device_id']))
   {
-    if (is_integer($i_deleted/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-
-    echo("<tr bgcolor=$row_colour>");
+    echo("<tr class=list">);
     echo("<td width=250>".generate_device_link($interface)."</td>");
     echo("<td width=250>".generate_port_link($interface)."</td>");
     echo("<td></td>");
     echo("<td width=100><a href='deleted-ports/purge=".$interface['interface_id']."/'><img src='images/16/cross.png' align=absmiddle></img> Purge</a></td>");
-
-    $i_deleted++;
   }
 }
 

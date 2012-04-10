@@ -239,21 +239,6 @@ print_optionbar_end();
 
 $param = array();
 
-# FIXME block below is not totally used, at least the iftype stuff is bogus?
-#if ($vars['status'] == "down" || $_GET['type'] == "down" || $vars['state'] == "down")
-#{
-#  $where .= "AND I.ifAdminStatus = 'up' AND I.ifOperStatus = 'down' AND I.ignore = '0'";
-#}
-#if ($_GET['optb'] == "admindown" || $_GET['type'] == "admindown" || $vars['state'] == "admindown") {
-#  $where .= "AND I.ifAdminStatus = 'down'";
-#}
-#if ($_GET['optb'] == "errors" || $_GET['type'] == "errors" || $vars['state'] == "errors") {
-#  $where .= "AND (I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0')";
-#}
-#if ($vars['state'] == "up") {
-#  $where .= "AND I.ifOperStatus = 'up'";
-#}
-
 if(!isset($vars['ignore']))   { $vars['ignore'] = "0"; }
 if(!isset($vars['disabled'])) { $vars['disabled'] = "0"; }
 if(!isset($vars['deleted']))  { $vars['deleted'] = "0"; }

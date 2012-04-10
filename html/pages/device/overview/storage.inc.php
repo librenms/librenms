@@ -11,7 +11,6 @@ if (count($drives))
   echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=health/metric=storage/">');
   echo("<img align='absmiddle' src='images/icons/storage.png'> Storage</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
-  $drive_rows = '0';
 
   foreach ($drives as $drive)
   {
@@ -41,7 +40,6 @@ if (count($drives))
     }
 
     if ($skipdrive) { continue; }
-    if (is_integer($drive_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     $percent  = round($drive['storage_perc'], 0);
     $total = formatStorage($drive['storage_size']);
     $free = formatStorage($drive['storage_free']);
@@ -64,18 +62,16 @@ if (count($drives))
 
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - " . $drive['storage_descr']);
 
-    $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = $graph_colour;
-
+    $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = 'ffffff00'; # the 00 at the end makes the area transparent.
+    
     $minigraph =  generate_graph_tag($graph_array);
 
-    echo("<tr bgcolor=$row_colour>
+    echo("<tr class=device-overview>
            <td class=tablehead>".overlib_link($link, $drive['storage_descr'], $overlib_content)."</td>
            <td width=90>".overlib_link($link, $minigraph, $overlib_content)."</td>
            <td width=200>".overlib_link($link, print_percentage_bar (200, 20, $percent, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right']), $overlib_content)."
            </a></td>
          </tr>");
-
-    $drive_rows++;
   }
 
   echo("</table>");

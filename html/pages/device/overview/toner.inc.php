@@ -11,11 +11,9 @@ if (count($toners))
   echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=toner/">');
   echo("<img align='absmiddle' src='images/icons/toner.png'> Toner</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
-  $toner_rows = '0';
 
   foreach ($toners as $toner)
   {
-    if (is_integer($toner_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     $percent  = round($toner['toner_current'], 0);
     $total = formatStorage($toner['toner_size']);
     $free = formatStorage($toner['toner_free']);
@@ -46,18 +44,16 @@ if (count($toners))
 
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - " . $toner['toner_descr']);
 
-    $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = $graph_colour;
-
+    $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = 'ffffff00'; # the 00 at the end makes the area transparent.
+    
     $minigraph =  generate_graph_tag($graph_array);
 
-    echo("<tr bgcolor=$row_colour>
-           <td class=tablehead>".overlib_link($link, $toner['toner_descr'], $overlib_content)."</td>
+    echo("<tr class=device-overview>
+               <td class=tablehead>".overlib_link($link, $toner['toner_descr'], $overlib_content)."</td>
            <td width=90>".overlib_link($link, $minigraph, $overlib_content)."</td>
            <td width=200>".overlib_link($link, print_percentage_bar (200, 20, $percent, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right']), $overlib_content)."
            </a></td>
          </tr>");
-
-    $toner_rows++;
   }
 
   echo("</table>");

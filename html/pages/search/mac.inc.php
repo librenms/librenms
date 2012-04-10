@@ -56,14 +56,10 @@ if ($_POST['interface'])
 $query .= " ORDER BY P.ifPhysAddress";
 
 echo('<tr class="tablehead"><th>Device</a></th><th>Interface</th><th>MAC Address</th><th>Description</th></tr>');
-$row = 1;
 foreach (dbFetchRows($query, $param) as $entry)
 {
-
   if (!$ignore)
   {
-    if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-
     $speed = humanspeed($entry['ifSpeed']);
     $type = humanmedia($entry['ifType']);
 
@@ -76,14 +72,12 @@ foreach (dbFetchRows($query, $param) as $entry)
     {
       $interface = ifLabel ($interface, $interface);
 
-      echo('<tr bgcolor="' . $row_colour . '">
+      echo('<tr class="search">
           <td class="list-bold">' . generate_device_link($entry) . '</td>
           <td class="list-bold">' . generate_port_link($entry, makeshortif(fixifname($entry['ifDescr']))) . ' ' . $error_img . '</td>
           <td>' . formatMac($entry['ifPhysAddress']) . '</td>
           <td>' . $entry['ifAlias'] . "</td>
         </tr>\n");
-
-      $row++;
     }
   }
 

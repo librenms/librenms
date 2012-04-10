@@ -55,8 +55,6 @@ $query .= " ORDER BY A.ipv4_address";
 
 echo('<tr class="tablehead"><th>Device</a></th><th>Interface</th><th>Address</th><th>Description</th></tr>');
 
-$row = 1;
-
 foreach (dbFetchRows($query, $param) as $interface)
 {
   if ($_POST['address'])
@@ -68,8 +66,6 @@ foreach (dbFetchRows($query, $param) as $interface)
 
   if (!$ignore)
   {
-    if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-
     $speed = humanspeed($interface['ifSpeed']);
     $type = humanmedia($interface['ifType']);
 
@@ -84,14 +80,12 @@ foreach (dbFetchRows($query, $param) as $interface)
     {
       $interface = ifLabel ($interface, $interface);
 
-      echo('<tr bgcolor="' . $row_colour . '">
+      echo('<tr class="search">
           <td class="list-bold">' . generate_device_link($interface) . '</td>
           <td class="list-bold">' . generate_port_link($interface) . ' ' . $error_img . '</td>
           <td>' . $interface['ipv4_address'] . '/'.$length.'</td>
           <td>' . $interface['ifAlias'] . "</td>
         </tr>\n");
-
-      $row++;
     }
   }
 

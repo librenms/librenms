@@ -13,14 +13,10 @@ echo("<tr class=tablehead>
         <th width=50>Used</th>
       </tr>");
 
-$row = 1;
-
 foreach (dbFetchRows("SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY D.hostname, S.toner_descr") as $toner)
 {
   if (device_permitted($toner['device_id']))
   {
-    if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-
     $total = $toner['toner_capacity'];
     $perc = $toner['toner_current'];
 
@@ -38,7 +34,7 @@ foreach (dbFetchRows("SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_
 
     $background = get_percentage_colours(100 - $perc);
 
-    echo("<tr bgcolor='$row_colour'><td>" . generate_device_link($toner) . "</td><td class=tablehead>" . $toner['toner_descr'] . "</td>
+    echo("<tr class='health'><td>" . generate_device_link($toner) . "</td><td class=tablehead>" . $toner['toner_descr'] . "</td>
          <td>$mini_graph</td>
          <td>
           <a href='#' $store_popup>".print_percentage_bar (400, 20, $perc, "$perc%", "ffffff", $background['left'], $free, "ffffff", $background['right'])."</a>
@@ -46,8 +42,7 @@ foreach (dbFetchRows("SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_
 
     if ($vars['view'] == "graphs")
     {
-
-      echo("<tr bgcolor='$row_colour'><td colspan=5>");
+      echo("<tr></tr><tr class='health'><td colspan=5>");
 
       $graph_array['height'] = "100";
       $graph_array['width']  = "216";
@@ -58,10 +53,7 @@ foreach (dbFetchRows("SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_
       include("includes/print-quadgraphs.inc.php");
 
       echo("</td></tr>");
-
     } # endif graphs
-
-    $row++;
   }
 }
 
