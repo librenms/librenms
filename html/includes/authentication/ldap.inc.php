@@ -47,7 +47,7 @@ function authenticate($username,$password)
   return 0;
 }
 
-function passwordscanchange()
+function passwordscanchange($username = "")
 {
   return 0;
 }
@@ -62,7 +62,7 @@ function auth_usermanagement()
   return 0;
 }
 
-function adduser($username, $password, $level, $email = "", $realname = "")
+function adduser($username, $password, $level, $email = "", $realname = "", $can_modify_passwd = '1')
 {
   # Not supported
   return 0;

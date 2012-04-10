@@ -24,7 +24,7 @@ function authenticate($username,$password)
   return 0;
 }
 
-function passwordscanchange($username="")
+function passwordscanchange($username = "")
 {
   /*
    * By default allow the password to be modified, unless the existing
