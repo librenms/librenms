@@ -23,8 +23,14 @@ if ($vm['vmwVmGuestOS'] == "E: tools not installed")
 else if ($vm['vmwVmGuestOS'] == "")
 {
   echo('<td class="box-desc"><i>(Unknown)</i></td>');
-} else {
+}
+elseif (isset($config['vmware_guestid'][$vm['vmwVmGuestOS']]))
+{
   echo('<td class="list">' . $config['vmware_guestid'][$vm['vmwVmGuestOS']] . "</td>");
+}
+else
+{
+  echo('<td class="list">' . $vm['vmwVmGuestOS'] . "</td>");
 }
 
 if ($vm['vmwVmMemSize'] >= 1024)

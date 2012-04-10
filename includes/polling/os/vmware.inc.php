@@ -59,7 +59,16 @@ foreach ($db_info_list as $db_info)
   }
 
   /*
-   * Proceess all the VMware Virtual Machine properties.
+   * If VMware Tools is not running then don't overwrite the GuesOS with the error
+   * message, but just leave it as it currently is.
+   */
+  if (stristr($vm_info["vmwVmGuestOS"], 'tools not running') !== FALSE)
+  {
+    $vm_info["vmwVmGuestOS"] = $db_info["vmwVmGuestOS"];
+  }
+ 
+  /*
+   * Process all the VMware Virtual Machine properties.
    */
 
   foreach ($vm_info as $property => $value)
