@@ -415,6 +415,14 @@ a.list-device, a.list-device-ignored, a.list-device-down, a.list-device-ignored-
 tr.list-device, tr.list-device-ignored, tr.list-device-down, tr.list-device-ignored-up, tr.list-device-disabled {
 }
 
+tr.list-device:nth-child(even) {
+  background: #ffffff;
+}
+
+tr.list-device:nth-child(odd) {
+  background: #eeeeee;
+}
+
 tr.list-device-down {
   border: 2px solid #cc0000;
 }
