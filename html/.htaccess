@@ -1,3 +1,6 @@
+#  DO NOT CHANGE THIS FILE
+#  If you need to change this file, you are doing something wrong.
+
 Options FollowSymlinks Multiviews
 
 RewriteEngine on
