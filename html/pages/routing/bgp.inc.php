@@ -6,7 +6,6 @@ if ($_SESSION['userlevel'] < '5')
 }
 else
 {
-
   $link_array = array('page' => 'routing', 'protocol' => 'bgp');
 
   print_optionbar_start('', '');
@@ -129,8 +128,6 @@ else
   echo("<table border=0 cellspacing=0 cellpadding=5 width=100% class='sortable'>");
   echo('<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>State</th><th width=200>Uptime / Updates</th></tr>');
 
-  $i = "1";
-
   if ($vars['type'] == "external")
   {
    $where = "AND D.bgpLocalAs != B.bgpPeerRemoteAs";
@@ -156,8 +153,6 @@ else
   {
     unset ($alert, $bg_image);
 
-    if (!is_integer($i/2)) { $bg_colour = $list_colour_b; } else { $bg_colour = $list_colour_a; }
-
     if ($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $peer['alert']=1; }
     if ($peer['bgpPeerAdminStatus'] == "start" || $peer['bgpPeerAdminStatus'] == "running") { $admin_col = "green"; } else { $admin_col = "gray"; }
     if ($peer['bgpPeerAdminStatus'] == "stop") { $peer['alert']=0; $peer['disabled']=1; }
@@ -179,7 +174,7 @@ else
     $peer_daily_url   = "graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
     $peeraddresslink  = "<span class=list-large><a href='device/device=" . $peer['device_id'] . "/tab=routing/proto=bgp/' onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpPeerIdentifier'] . "</a></span>";
 
-    echo('<tr bgcolor="'.$bg_colour.'"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">");
+    echo('<tr class="bgp"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">");
 
     unset($sep);
     foreach (dbFetchRows("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?", array($peer['device_id'], $peer['bgpPeerIdentifier'])) as $afisafi)
@@ -203,8 +198,7 @@ else
             <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></strong></td>
             <td>" .formatUptime($peer['bgpPeerFsmEstablishedTime']). "<br />
                 Updates <img src='images/16/arrow_down.png' align=absmiddle /> " . format_si($peer['bgpPeerInUpdates']) . "
-                        <img src='images/16/arrow_up.png' align=absmiddle /> " . format_si($peer['bgpPeerOutUpdates']) . "</td></tr>
-         <tr height=5></tr>");
+                        <img src='images/16/arrow_up.png' align=absmiddle /> " . format_si($peer['bgpPeerOutUpdates']) . "</td></tr>");
 
     unset($invalid);
     switch ($vars['graph'])
@@ -242,14 +236,12 @@ else
         $graph_array['height'] = "100";
         $graph_array['width']  = "218";
         $graph_array['to']     = $now;
-        echo('<tr bgcolor="'.$bg_colour.'"' . ($bg_image ? ' background="'.$bg_image.'"' : '') . '"><td colspan="9">');
+        echo('<tr></tr><tr class="bgp"' . ($bg_image ? ' background="'.$bg_image.'"' : '') . '"><td colspan="9">');
 
         include("includes/print-quadgraphs.inc.php");
 
         echo("</td></tr>");
     }
-
-    $i++;
   }
 
   echo("</table>");

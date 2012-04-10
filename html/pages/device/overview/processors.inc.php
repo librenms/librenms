@@ -6,7 +6,6 @@ $processors = dbFetchRows("SELECT * FROM `processors` WHERE device_id = ?", arra
 
 if (count($processors))
 {
-  $processor_rows = 0;
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
   echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=health/metric=processor/">');
@@ -15,9 +14,6 @@ if (count($processors))
 
   foreach ($processors as $proc)
   {
-    if (is_integer($processor_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-    ## REPLACE THIS SHITTY CODE. IT IS ALSO ELSEWHERE.
-
     $text_descr = rewrite_entity_descr($proc['processor_descr']);
 
     # disable short hrDeviceDescr. need to make this prettier.
@@ -42,17 +38,16 @@ if (count($processors))
 
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - " . $text_descr);
 
-    $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = $graph_colour;
+    $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = 'ffffff00'; # the 00 at the end makes the area transparent.
 
     $minigraph =  generate_graph_tag($graph_array);
 
-    echo("<tr bgcolor=$row_colour>
+    echo("<tr class=device-overview>
            <td class=tablehead>".overlib_link($link, $text_descr, $overlib_content)."</td>
            <td width=90>".overlib_link($link, $minigraph, $overlib_content)."</td>
            <td width=200>".overlib_link($link, print_percentage_bar (200, 20, $percent, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right']), $overlib_content)."
            </a></td>
          </tr>");
-    $processor_rows++;
   }
 
   echo("</table>");

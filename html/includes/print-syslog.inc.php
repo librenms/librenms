@@ -2,10 +2,7 @@
 
 if (device_permitted($entry['device_id']))
 {
-  $syslog_iter++;
-  if (!is_integer($syslog_iter/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
-
-  echo("<tr style=\"background-color: $bg_colour\">
+  echo("<tr class=\"syslog\">
     <td width=0></td>");
 
   $entry['hostname'] = shorthost($entry['hostname'], 20);

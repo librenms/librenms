@@ -12,13 +12,10 @@ echo("<tr class=tablehead>
         <th width=280>Usage</th>
       </tr>");
 
-$i = '1';
 foreach (dbFetchRows("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.device_id = P.device_id ORDER BY D.hostname") as $proc)
 {
   if (device_permitted($proc['device_id']))
   {
-    if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-
     $device = $proc;
 
     # FIXME should that really be done here? :-)
@@ -30,7 +27,7 @@ foreach (dbFetchRows("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.de
 
     $proc_url   = "device/".$device['device_id']."/health/processor/";
 
-    $mini_url = "graph.php?id=".$proc['processor_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
+    $mini_url = "graph.php?id=".$proc['processor_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f400";
 
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
     $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['processor_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";
@@ -40,7 +37,7 @@ foreach (dbFetchRows("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.de
 
     $background = get_percentage_colours($perc);
 
-    echo("    <tr bgcolor=\"$row_colour\">
+    echo("    <tr class=\"health\">
                <td>".generate_device_link($proc)."</td>
                <td class=\"tablehead\"><a href='".$proc_url."' $proc_popup>" . $text_descr . "</a></td>
                <td width=\"90\"><a href=\"".$proc_url."\"  $proc_popup><img src=\"$mini_url\" /></a></td>
@@ -50,9 +47,9 @@ foreach (dbFetchRows("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.de
              </tr>');
 
     if ($vars['view'] == "graphs")
-    { ## If graphs are requested, do them, else not!
-      echo('    <tr bgcolor="'.$row_colour.'"><td colspan="5">');
-
+    {
+      echo('    <tr></tr><tr class="health"><td colspan="5">');
+      
       $daily_graph   = "graph.php?id=" . $proc['processor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=211&amp;height=100";
       $daily_url     = "graph.php?id=" . $proc['processor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=400&amp;height=150";
 
@@ -77,8 +74,6 @@ foreach (dbFetchRows("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.de
   </tr>");
 
     } #end graphs if
-
-    $i++;
   }
 }
 

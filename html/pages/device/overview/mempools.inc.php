@@ -11,11 +11,9 @@ if (count($mempools))
   echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=health/metric=mempool/">');
   echo("<img align='absmiddle' src='images/icons/memory.png'> Memory Pools</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
-  $mempool_rows = '0';
 
   foreach ($mempools as $mempool)
   {
-    if (is_integer($mempool_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     $percent= round($mempool['mempool_perc'],0);
     $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
     $total = formatStorage($mempool['mempool_total']);
@@ -39,18 +37,16 @@ if (count($mempools))
 
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - " . $text_descr);
 
-    $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = $graph_colour;
-
+    $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = 'ffffff00'; # the 00 at the end makes the area transparent.
+    
     $minigraph =  generate_graph_tag($graph_array);
 
-    echo("<tr bgcolor=$row_colour>
+    echo("<tr class=device-overview>
            <td class=tablehead>".overlib_link($link, $text_descr, $overlib_content)."</td>
            <td width=90>".overlib_link($link, $minigraph, $overlib_content)."</td>
            <td width=200>".overlib_link($link, print_percentage_bar (200, 20, $percent, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right']), $overlib_content)."
            </a></td>
          </tr>");
-
-    $mempool_rows++;
   }
 
   echo("</table>");

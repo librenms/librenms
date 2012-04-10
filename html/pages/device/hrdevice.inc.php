@@ -2,9 +2,11 @@
 
 echo('<table width="100%">');
 
+# FIXME missing heading
+
 foreach (dbFetchRows("SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `hrDeviceIndex`", array($device['device_id'])) as $hrdevice)
 {
-  echo("<tr><td>".$hrdevice['hrDeviceIndex']."</td>");
+  echo("<tr class='list'><td>".$hrdevice['hrDeviceIndex']."</td>");
 
   if ($hrdevice['hrDeviceType'] == "hrDeviceProcessor")
   {
@@ -56,8 +58,8 @@ foreach (dbFetchRows("SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
     echo("<td></td>");
   }
 
-  echo("<td>".$hrdevice['hrDeviceType']."</td><td>".$hrdevice['hrDeviceStatus']."</td>");
-  echo("<td>".$hrdevice['hrDeviceErrors']."</td><td>".$hrdevice['hrProcessorLoad']."</td>");
+  echo("<td>".$hrdevice['hrDeviceType'].'</td><td>'.$hrdevice['hrDeviceStatus']."</td>");
+  echo("<td>".$hrdevice['hrDeviceErrors'].'</td><td>'.$hrdevice['hrProcessorLoad']."</td>");
   echo("</tr>");
 }
 

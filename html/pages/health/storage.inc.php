@@ -13,8 +13,6 @@ echo("<tr class=tablehead>
         <th width=50>Used</th>
       </tr>");
 
-$row = 1;
-
 foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY D.hostname, S.storage_descr") as $drive)
 {
   if (device_permitted($drive['device_id']))
@@ -45,7 +43,6 @@ foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.devic
     }
 
     if ($skipdrive) { continue; }
-    if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
     $perc  = round($drive['storage_perc'], 0);
     $total = formatStorage($drive['storage_size']);
@@ -66,7 +63,7 @@ foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.devic
 
     $background = get_percentage_colours($perc);
 
-    echo("<tr bgcolor='$row_colour'><td>" . generate_device_link($drive) . "</td><td class=tablehead>" . $drive['storage_descr'] . "</td>
+    echo("<tr class='health'><td>" . generate_device_link($drive) . "</td><td class=tablehead>" . $drive['storage_descr'] . "</td>
          <td>$mini_graph</td>
          <td>
           <a href='#' $store_popup>".print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $background['left'], $free, "ffffff", $background['right'])."</a>
@@ -74,8 +71,7 @@ foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.devic
 
     if ($vars['view'] == "graphs")
     {
-
-      echo("<tr bgcolor='$row_colour'><td colspan=5>");
+      echo("<tr></tr><tr class='health'><td colspan=5>");
 
       $graph_array['height'] = "100";
       $graph_array['width']  = "216";
@@ -88,8 +84,6 @@ foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.devic
       echo("</td></tr>");
 
     } # endif graphs
-
-    $row++;
   }
 }
 

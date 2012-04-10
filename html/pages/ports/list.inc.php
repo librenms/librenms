@@ -25,8 +25,6 @@ foreach ($cols as $sort => $col)
 
 echo("      </tr>");
 
-$row = 1;
-
 $ports_disabled = 0; $ports_down = 0; $ports_up = 0; $ports_total = 0;
 
 foreach ($ports as $port)
@@ -39,8 +37,6 @@ foreach ($ports as $port)
 
   if (port_permitted($port['interface_id'], $port['device_id']))
   {
-    if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-
     $speed = humanspeed($port['ifSpeed']);
     $type = humanmedia($port['ifType']);
     $ifclass = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
@@ -54,7 +50,7 @@ foreach ($ports as $port)
     $port['out_rate'] = formatRates($port['ifOutOctets_rate'] * 8);
 
     $port = ifLabel($port, $device);
-    echo("<tr bgcolor=$row_colour>
+    echo("<tr class='ports'>
           <td width=5></td>
           <td width=200 class=list-bold><a href='" . generate_device_url($port) . "'>".$port['hostname']."</a></td>
           <td width=150 class=list-bold><a class='".$ifclass."'href='" . generate_port_url($port) . "'>".fixIfName($port['label'])." $error_img</td>
@@ -64,8 +60,6 @@ foreach ($ports as $port)
           <td width=150>$type</td>
           <td>" . $port['ifAlias'] . "</td>
         </tr>\n");
-
-    $row++;
   }
 }
 

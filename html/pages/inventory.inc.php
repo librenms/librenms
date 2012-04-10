@@ -92,9 +92,8 @@ echo("<tr><th>Hostname</th><th>Description</th><th>Name</th><th>Part No</th><th>
 
 foreach (dbFetchRows($sql, $param) as $entry)
 {
-  if ($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
-  echo("<tr style=\"background-color: $bg\"><td>" . generate_device_link($entry, shortHost($entry['hostname'])) . "</td><td>" . $entry['entPhysicalDescr']  .
-     "</td><td>" . $entry['entPhysicalName']  . "</td><td>" . $entry['entPhysicalModelName']  . "</td><td>" . $entry['entPhysicalSerialNum'] . "</td></tr>");
+  echo('<tr class="inventory"><td>' . generate_device_link($entry, shortHost($entry['hostname'])) . '</td><td>' . $entry['entPhysicalDescr']  .
+     '</td><td>' . $entry['entPhysicalName']  . '</td><td>' . $entry['entPhysicalModelName']  . '</td><td>' . $entry['entPhysicalSerialNum'] . '</td></tr>');
 }
 echo("</table>");
 

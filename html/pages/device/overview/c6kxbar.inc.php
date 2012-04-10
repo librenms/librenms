@@ -5,12 +5,9 @@ echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
 echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=health/metric=mempool/">');
 echo("<img align='absmiddle' src='images/16/arrow_switch.png'> Catalyst 6k Crossbar</a></p>");
 echo("<table width=100% cellspacing=0 cellpadding=5>");
-$c6kxbar_rows = '0';
 
 foreach ($entity_state['group']['c6kxbar'] as $index => $entry)
 {
-  if (is_integer($c6kxbar_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-
   // FIXME i'm not sure if this is the correct way to decide what entphysical index it is. slotnum+1? :>
   $entity = dbFetchRow("SELECT * FROM entPhysical WHERE device_id = ? AND entPhysicalIndex = ?", array($device['device_id'], $index+1));
 
@@ -73,11 +70,11 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry)
 
       $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - " . $text_descr);
 
-      $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = $graph_colour;
+      $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = 'ffffff00'; # the 00 at the end makes the area transparent.
 
       $minigraph =  generate_graph_tag($graph_array);
 
-      echo("<tr bgcolor=$row_colour>
+      echo("<tr class=device-overview>                     
           <td width=10></td>
           <td width=200><strong>Fabric ".$subindex."</strong></td>
           <td><span style='font-weight: bold;' class=".$fabric['mode_class'].">".
@@ -90,8 +87,6 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry)
           </tr>");
     }
   }
-
-  $c6kxbar_rows++;
 }
 
 echo("</table>");

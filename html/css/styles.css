@@ -408,6 +408,14 @@ A.purple:visited, a.purple, .purple { color: #740074; }
   font-weight: bold;
 }
 
+tr.device-overview:nth-child(odd) {
+  background: #ffffff;
+}
+
+tr.device-overview:nth-child(even) {
+  background: #eeeeee;
+}
+
 a.list-device, a.list-device-ignored, a.list-device-down, a.list-device-ignored-up, a.list-device-disabled {
   font-weight: bold;
 }
@@ -1363,6 +1371,75 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 .devicetable {
     border-collapse: collapse;
 }
+
+tr.iftype:nth-child(odd) {
+  background: #e5e5e5;
+}
+
+tr.iftype:nth-child(even) {
+  background: #ffffff;
+}
+
+tr.health:nth-child(odd) {
+  background: #ffffff;
+}
+
+tr.ports:nth-child(even) {
+  background: #ffffff;
+}
+
+tr.bgp:nth-child(even) {
+  background: #ffffff;
+}
+
+tr.locations:nth-child(even) {
+  background: #e5e5e5;
+}
+
+tr.locations:nth-child(odd) {
+  background: #ffffff;
+}
+
+tr.inventory:nth-child(even) {
+  background: #e5e5e5;
+}
+
+tr.inventory:nth-child(odd) {
+  background: #ffffff;
+}
+
+tr.list:nth-child(odd) {
+  background: #e5e5e5;
+}
+
+tr.list:nth-child(even) {
+  background: #ffffff;
+}
+
+tr.eventlog:nth-child(even) {
+  background: #e5e5e5;
+}
+
+tr.eventlog:nth-child(odd) {
+  background: #ffffff;
+}
+
+tr.syslog:nth-child(even) {
+  background: #e5e5e5;
+}
+
+tr.syslog:nth-child(odd) {
+  background: #ffffff;
+}
+
+tr.search:nth-child(even) {
+  background: #e5e5e5;
+}
+
+tr.search:nth-child(odd) {
+  background: #ffffff;
+}
+
 
 .paddedcell {
   padding: 7px;

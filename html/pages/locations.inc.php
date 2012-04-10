@@ -4,7 +4,7 @@ $pagetitle[] = "Locations";
 
 print_optionbar_start();
 
- echo('<span style="font-weight: bold;">Locations</span> &#187; ');
+echo('<span style="font-weight: bold;">Locations</span> &#187; ');
 
 $menu_options = array('basic' => 'Basic',
                       'traffic' => 'Traffic');
@@ -35,8 +35,6 @@ echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">')
 
 foreach (getlocations() as $location)
 {
-  if (!isset($bg) || $bg == "#ffffff") { $bg = "#eeeeee"; } else { $bg="#ffffff"; }
-
   if ($_SESSION['userlevel'] == '10')
   {
     $num = dbFetchCell("SELECT COUNT(device_id) FROM devices WHERE location = ?", array($location));
@@ -56,7 +54,7 @@ foreach (getlocations() as $location)
 
   if ($location != "")
   {
-    echo('      <tr bgcolor="' . $bg . '">
+    echo('      <tr class="locations">
              <td class="interface" width="300"><a class="list-bold" href="devices/location=' . urlencode($location) . '/">' . $location . '</a></td>
              <td width="100">' . $alert . '</td>
              <td width="100">' . $num . ' devices</td>
@@ -68,16 +66,16 @@ foreach (getlocations() as $location)
 
     if ($vars['view'] == "traffic")
     {
-      echo('<tr bgcolor="' . $bg . '"><td colspan=6>');
+      echo('<tr></tr><tr class="locations"><td colspan=6>');
 
-  $graph_array['type']   = "location_bits";
-  $graph_array['height'] = "100";
-  $graph_array['width']  = "220";
-  $graph_array['to']     = $config['time']['now'];
-  $graph_array['legend'] = "no";
-  $graph_array['id']     = $location;
+      $graph_array['type']   = "location_bits";
+      $graph_array['height'] = "100";
+      $graph_array['width']  = "220";
+      $graph_array['to']     = $config['time']['now'];
+      $graph_array['legend'] = "no";
+      $graph_array['id']     = $location;
 
-  include("includes/print-quadgraphs.inc.php");
+      include("includes/print-quadgraphs.inc.php");
 
       echo("</tr></td>");
     }
