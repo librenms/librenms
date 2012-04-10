@@ -7,21 +7,21 @@ function data_uri($file, $mime)
   return ('data:' . $mime . ';base64,' . $base64);
 }
 
-$width    = mres($_GET['width']);
-$height   = mres($_GET['height']);
-$title    = mres($_GET['title']);
-$vertical = mres($_GET['vertical']);
-$legend   = mres($_GET['legend']);
-$id       = mres($_GET['id']);
+$width    = $_GET['width'];
+$height   = $_GET['height'];
+$title    = $_GET['title'];
+$vertical = $_GET['vertical'];
+$legend   = $_GET['legend'];
+$id       = $_GET['id'];
 
-$from     = (isset($_GET['from']) ? mres($_GET['from']) : time() - 60*60*24);
-$to       = (isset($_GET['to']) ? mres($_GET['to']) : time());
+$from     = (isset($_GET['from']) ? $_GET['from'] : time() - 60*60*24);
+$to       = (isset($_GET['to']) ? $_GET['to'] : time());
 
 if ($from < 0) { $from = $to + $from; }
 
 $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 
-preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', mres($_GET['type']), $graphtype);
+preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $_GET['type'], $graphtype);
 
 $type = $graphtype['type'];
 $subtype = $graphtype['subtype'];

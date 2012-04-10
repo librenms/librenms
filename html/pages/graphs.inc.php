@@ -16,7 +16,7 @@ if($_SESSION['widescreen'])
 if (!is_numeric($vars['from'])) { $vars['from'] = $config['time']['day']; }
 if (!is_numeric($vars['to']))   { $vars['to']   = $config['time']['now']; }
 
-preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', mres($vars['type']), $graphtype);
+preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
 
 $type = $graphtype['type'];
 $subtype = $graphtype['subtype'];
