@@ -45,12 +45,12 @@ $param = array("%".str_replace(':','',mres($_POST['address']))."%");
 
 if (is_numeric($_POST['device_id']))
 {
-  $query  .= " AND I.device_id = ?";
+  $query  .= " AND P.device_id = ?";
   $param[] = $_POST['device_id'];
 }
 if ($_POST['interface'])
 {
-  $query .= " AND I.ifDescr LIKE ?";
+  $query .= " AND P.ifDescr LIKE ?";
   $param[] = $_POST['interface'];
 }
 $query .= " ORDER BY P.ifPhysAddress";
