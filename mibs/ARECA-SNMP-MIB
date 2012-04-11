@@ -1,0 +1,4223 @@
+ARECA-SNMP-MIB DEFINITIONS ::= BEGIN
+
+-- This was compiled from the following Areca files by Tom Laermans
+-- <tom.laermans@powersource.cx> for Observium <www.observium.org>
+-- The MIBs are an absolute MESS.
+
+IMPORTS
+                  enterprises
+                      FROM RFC1155-SMI;
+
+-- the path to the root
+
+--internet			OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+--directory			OBJECT IDENTIFIER ::= { internet 1 }
+--mgmt				OBJECT IDENTIFIER ::= { internet 2 }
+--experimental			OBJECT IDENTIFIER ::= { internet 3 }
+--private			OBJECT IDENTIFIER ::= { internet 4 }
+--enterprises			OBJECT IDENTIFIER ::= { private 1 }
+Areca			 	OBJECT IDENTIFIER ::= { enterprises 18928 }
+ArecaGroup1			OBJECT IDENTIFIER ::= { Areca 1 }
+SASRaidSubsystem 		OBJECT IDENTIFIER ::= { ArecaGroup1 2 }
+SystemInformation		OBJECT IDENTIFIER ::= { SASRaidSubsystem 1 }
+HW_Monitor			OBJECT IDENTIFIER ::= { SASRaidSubsystem 2 }
+HddInformation			OBJECT IDENTIFIER ::= { SASRaidSubsystem 3 }
+RaidsetInformation		OBJECT IDENTIFIER ::= { SASRaidSubsystem 4 }
+VolumesetInformation		OBJECT IDENTIFIER ::= { SASRaidSubsystem 5 }
+EventInformation		OBJECT IDENTIFIER ::= { SASRaidSubsystem 6 }
+
+-- definition of object types
+
+-- definition of object types of system information
+siVendor	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The vendor name of raid subsystem."
+	::= { SystemInformation 1 }
+
+siModel OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The model name of raid subsystem."
+	::= { SystemInformation 2 }
+
+siSerial OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The serial number of raid subsystem."
+	::= { SystemInformation 3 }	
+	
+siFirmVer OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The firmware version of raid subsystem."
+	::= { SystemInformation 4 }	
+	
+siBootVer OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The Boot version of raid subsystem."
+	::= { SystemInformation 5 }	
+	
+siMbrVer OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The master boot record version of raid subsystem."
+	::= { SystemInformation 6 }		
+	
+siProcessor OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The processor name of raid subsystem."
+	::= { SystemInformation 7 }	
+	
+siCpuSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The CPU speed (in MHZ, e.g. 400) of Raid subsystem."
+	::= { SystemInformation 8 }
+
+siICache	OBJECT-TYPE
+	SYNTAX	INTEGER {
+	 		 32K(32768)
+	 		 512K(524288)
+	 		}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The CPU internal Instruction cache size (in bytes, e.g. 32768) of Raid subsystem."
+	::= { SystemInformation 9 }
+
+siDCache	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 32K(32768)
+			 512K(524288)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The CPU interanl data cache size (in bytes, e.g. 32768) of Raid subsystem."
+	::= { SystemInformation 10 }
+
+siSCache	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 32K(32768)
+			 512K(524288)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The CPU secondary cache size (in bytes, e.g. 32768) of Raid subsystem."
+	::= { SystemInformation 11 }
+
+siMemory	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The memory size (in MB, e.g. 128) of Raid subsystem."
+	::= { SystemInformation 12 }
+
+siMemSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The memory speed (in MHz) of Raid subsystem."
+	::= { SystemInformation 13 }
+
+siEcc		OBJECT-TYPE
+	SYNTAX	INTEGER{
+			No(0),
+			Yes(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sdram ECC capability of Raid subsystem (0:no ECC, 1:ECC)."
+	::= { SystemInformation 14 }
+
+siHosts		OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of host channels, e.g. 2."
+	::= { SystemInformation 15 }
+
+siRaidSets	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of RAIDSET supported, e.g. 16."
+	::= { SystemInformation 16 }
+
+siVolumeSets	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of VOLUMESET supported, e.g. 16."
+	::= { SystemInformation 17 }
+	
+siEvents	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The number of events supported, e.g. 16."
+	::= { SystemInformation 18 }	
+	
+siRaid6		OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 No(0),			 
+			 Yes(1) 
+			}
+			
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"0:no RAID6, 1:RAID6."
+	::= { SystemInformation 19 }		
+	
+siDhcp		OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 Disabled(0),
+			 Enabled(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"0:disabled, 1:enabled."
+	::= { SystemInformation 20 }			
+
+siBeeper	OBJECT-TYPE
+	SYNTAX	INTEGER {
+	 		 Disabled(0),
+	 		 Enabled(1)
+	 		}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"0:disabled, 1:enabled."
+	::= { SystemInformation 21 }			
+
+siUsage		OBJECT-TYPE
+	SYNTAX	INTEGER {
+	   		 Normal(0),
+	   		 JBOD(1)
+	   		}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"0:normal, 1:JBOD."
+	::= { SystemInformation 22 }			
+
+siRebuildRate	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"5,20,50,80 in %."
+	::= { SystemInformation 23 }
+
+siBaudRate	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 1200bps(1200),
+			 2400bps(2400),
+			 4800bps(4800),
+			 9600bps(9600),
+			 19200bps(19200),
+			 38400bps(38400),
+			 57600bps(57600),
+			 115200bps(115200)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"1200,2400,4800,9600,19200,38400,57600,115200."
+	::= { SystemInformation 24 }
+
+
+-- definition of object types of H/W monitor
+
+ControllerBoard			OBJECT IDENTIFIER ::= { HW_Monitor 1 }
+HwEnclosure1			OBJECT IDENTIFIER ::= { HW_Monitor 2 }
+HwEnclosure2			OBJECT IDENTIFIER ::= { HW_Monitor 3 }
+HwEnclosure3			OBJECT IDENTIFIER ::= { HW_Monitor 4 }
+HwEnclosure4			OBJECT IDENTIFIER ::= { HW_Monitor 5 }
+HwEnclosure5			OBJECT IDENTIFIER ::= { HW_Monitor 6 }
+HwEnclosure6			OBJECT IDENTIFIER ::= { HW_Monitor 7 }
+HwEnclosure7			OBJECT IDENTIFIER ::= { HW_Monitor 8 }
+HwEnclosure8			OBJECT IDENTIFIER ::= { HW_Monitor 9 }
+
+-- Controller Board
+hwControllerBoardInstalled	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { ControllerBoard 1 }
+
+hwControllerBoardDescription	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { ControllerBoard 2 }
+	
+hwControllerBoardNumberOfPower	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { ControllerBoard 3 }	
+	
+hwControllerBoardNumberOfVol	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Voltage, e.g. 2."
+	::= { ControllerBoard 4 }
+
+hwControllerBoardNumberOfFan	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Fan, e.g. 2."
+	::= { ControllerBoard 5 }		
+
+hwControllerBoardNumberOfTemp	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Temperature, e.g. 2."
+	::= { ControllerBoard 6 }	
+
+hwControllerBoardPowerTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwPowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Power information."
+	::= { ControllerBoard 7 }
+
+hwControllerBoardPowerEntry 	OBJECT-TYPE
+	SYNTAX	HwControllerBoardPowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current power state."
+	INDEX	{ hwControllerBoardPowerIndex }
+	::= { hwControllerBoardPowerTable 1 }
+	
+HwControllerBoardPowerEntry ::= SEQUENCE { hwControllerBoardPowerIndex INTEGER,
+			    hwControllerBoardPowerDesc DisplayString,
+			    hwControllerBoardPowerState INTEGER }
+
+hwControllerBoardPowerIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power index, 1..#of powers."
+	::= { hwControllerBoardPowerEntry 1 }		    
+			    
+hwControllerBoardPowerDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power description."
+	::= { hwControllerBoardPowerEntry 2 }
+			    
+hwControllerBoardPowerState	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 Failed(0),
+			 Ok(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power state 0:failed, 1:ok."
+	::= { hwControllerBoardPowerEntry 3 }		
+	
+hwControllerBoardVolTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwControllerBoardVolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing voltage information."
+	::= { ControllerBoard 8 }
+
+hwControllerBoardVolEntry 	OBJECT-TYPE
+	SYNTAX	HwControllerBoardVolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current voltage state."
+	INDEX	{ hwControllerBoardVolIndex }
+	::= { hwControllerBoardVolTable 1 }
+	
+HwControllerBoardVolEntry ::= SEQUENCE { hwControllerBoardVolIndex INTEGER,
+			  hwControllerBoardVolDesc DisplayString,
+			  hwControllerBoardVolValue INTEGER }
+
+hwControllerBoardVolIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage index, 1..#of voltages."
+	::= { hwControllerBoardVolEntry 1 }		    
+
+hwControllerBoardVolDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage description."
+	::= { hwControllerBoardVolEntry 2 }
+			    
+hwControllerBoardVolValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage value."
+	::= { hwControllerBoardVolEntry 3 }
+
+hwControllerBoardFanTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwControllerBoardFanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Fan information."
+	::= { ControllerBoard 9 }
+
+hwControllerBoardFanEntry 	OBJECT-TYPE
+	SYNTAX	HwControllerBoardFanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current fan state."
+	INDEX	{ hwControllerBoardFanIndex }
+	::= { hwControllerBoardFanTable 1 }
+	
+HwControllerBoardFanEntry ::= SEQUENCE { hwControllerBoardFanIndex INTEGER,
+			  hwControllerBoardFanDesc DisplayString,
+			  hwControllerBoardFanSpeed INTEGER }
+
+hwControllerBoardFanIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan index, 1..#of fans."
+	::= { hwControllerBoardFanEntry 1 }		    
+
+hwControllerBoardFanDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan description."
+	::= { hwControllerBoardFanEntry 2 }
+			    
+hwControllerBoardFanSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan speed in RPM, e.g. 3200."
+	::= { hwControllerBoardFanEntry 3 }
+
+hwControllerBoardTempTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwControllerBoardTempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing temperature information."
+	::= { ControllerBoard 10 }
+
+hwControllerBoardTempEntry 	OBJECT-TYPE
+	SYNTAX	HwControllerBoardTempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current temperature state."
+	INDEX	{ hwControllerBoardTempIndex }
+	::= { hwControllerBoardTempTable 1 }
+	
+HwControllerBoardTempEntry ::= SEQUENCE { hwControllerBoardTempIndex INTEGER,
+			   hwControllerBoardTempDesc DisplayString,
+			   hwControllerBoardTempValue INTEGER
+			 }
+
+hwControllerBoardTempIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature index, 1..#of voltages."
+	::= { hwControllerBoardTempEntry 1 }		    
+
+hwControllerBoardTempDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature description."
+	::= { hwControllerBoardTempEntry 2 }
+			    
+hwControllerBoardTempValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature value."
+	::= { hwControllerBoardTempEntry 3 }
+
+
+-- Enclosure#01
+hwEnclosure01Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HwEnclosure1 1 }
+
+hwEnclosure01Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HwEnclosure1 2 }
+	
+hwEnclosure01NumberOfPower	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { HwEnclosure1 3 }	
+	
+hwEnclosure01NumberOfVol	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Voltage, e.g. 2."
+	::= { HwEnclosure1 4 }
+
+hwEnclosure01NumberOfFan	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Fan, e.g. 2."
+	::= { HwEnclosure1 5 }	
+
+hwEnclosure01NumberOfTemp	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Temperature, e.g. 2."
+	::= { HwEnclosure1 6 }	
+
+hwEnclosure01PowerTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwPowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Power information."
+	::= { HwEnclosure1 7 }
+
+hwEnclosure01PowerEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure01PowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current power state."
+	INDEX	{ hwEnclosure01PowerIndex }
+	::= { hwEnclosure01PowerTable 1 }
+	
+HwEnclosure01PowerEntry ::= SEQUENCE { hwEnclosure01PowerIndex INTEGER,
+			    hwEnclosure01PowerDesc DisplayString,
+			    hwEnclosure01PowerState INTEGER }
+
+hwEnclosure01PowerIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power index, 1..#of powers."
+	::= { hwEnclosure01PowerEntry 1 }		    
+			    
+hwEnclosure01PowerDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power description."
+	::= { hwEnclosure01PowerEntry 2 }
+			    
+hwEnclosure01PowerState	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 Failed(0),
+			 Ok(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power state 0:failed, 1:ok."
+	::= { hwEnclosure01PowerEntry 3 }		
+	
+
+hwEnclosure01VolTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure01VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing voltage information."
+	::= { HwEnclosure1 8 }
+
+hwEnclosure01VolEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure01VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current voltage state."
+	INDEX	{ hwEnclosure01VolIndex }
+	::= { hwEnclosure01VolTable 1 }
+	
+HwEnclosure01VolEntry ::= SEQUENCE { hwEnclosure01VolIndex INTEGER,
+			  hwEnclosure01VolDesc DisplayString,
+			  hwEnclosure01VolValue INTEGER }
+
+hwEnclosure01VolIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage index, 1..#of voltages."
+	::= { hwEnclosure01VolEntry 1 }		    
+
+hwEnclosure01VolDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage description."
+	::= { hwEnclosure01VolEntry 2 }
+			    
+hwEnclosure01VolValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage value."
+	::= { hwEnclosure01VolEntry 3 }
+
+
+hwEnclosure01FanTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure01FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Fan information."
+	::= { HwEnclosure1 9 }
+
+hwEnclosure01FanEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure01FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current fan state."
+	INDEX	{ hwEnclosure01FanIndex }
+	::= { hwEnclosure01FanTable 1 }
+	
+HwEnclosure01FanEntry ::= SEQUENCE { hwEnclosure01FanIndex INTEGER,
+			  hwEnclosure01FanDesc DisplayString,
+			  hwEnclosure01FanSpeed INTEGER }
+
+hwEnclosure01FanIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan index, 1..#of fans."
+	::= { hwEnclosure01FanEntry 1 }		    
+
+hwEnclosure01FanDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan description."
+	::= { hwEnclosure01FanEntry 2 }
+			    
+hwEnclosure01FanSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan speed in RPM, e.g. 3200."
+	::= { hwEnclosure01FanEntry 3 }
+
+hwEnclosure01TempTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure01TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing temperature information."
+	::= { HwEnclosure1 10 }
+
+hwEnclosure01TempEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure01TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current temperature state."
+	INDEX	{ hwEnclosure01TempIndex }
+	::= { hwEnclosure01TempTable 1 }
+	
+HwEnclosure01TempEntry ::= SEQUENCE { hwEnclosure01TempIndex INTEGER,
+			   hwEnclosure01TempDesc DisplayString,
+			   hwEnclosure01TempValue INTEGER
+			 }
+
+hwEnclosure01TempIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature index, 1..#of voltages."
+	::= { hwEnclosure01TempEntry 1 }		    
+
+hwEnclosure01TempDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature description."
+	::= { hwEnclosure01TempEntry 2 }
+			    
+hwEnclosure01TempValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature value."
+	::= { hwEnclosure01TempEntry 3 }
+	
+
+-- Enclosure#02
+hwEnclosure02Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HwEnclosure2 1 }
+
+hwEnclosure02Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HwEnclosure2 2 }
+	
+hwEnclosure02NumberOfPower	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { HwEnclosure2 3 }	
+	
+hwEnclosure02NumberOfVol	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Voltage, e.g. 2."
+	::= { HwEnclosure2 4 }
+
+hwEnclosure02NumberOfFan	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Fan, e.g. 2."
+	::= { HwEnclosure2 5 }		
+
+hwEnclosure02NumberOfTemp	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Temperature, e.g. 2."
+	::= { HwEnclosure2 6 }	
+
+hwEnclosure02PowerTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwPowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Power information."
+	::= { HwEnclosure2 7 }
+
+hwEnclosure02PowerEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure02PowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current power state."
+	INDEX	{ hwEnclosure02PowerIndex }
+	::= { hwEnclosure02PowerTable 1 }
+	
+HwEnclosure02PowerEntry ::= SEQUENCE { hwEnclosure02PowerIndex INTEGER,
+			    hwEnclosure02PowerDesc DisplayString,
+			    hwEnclosure02PowerState INTEGER }
+
+hwEnclosure02PowerIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power index, 1..#of powers."
+	::= { hwEnclosure02PowerEntry 1 }		    
+			    
+hwEnclosure02PowerDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power description."
+	::= { hwEnclosure02PowerEntry 2 }
+			    
+hwEnclosure02PowerState	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 Failed(0),
+			 Ok(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power state 0:failed, 1:ok."
+	::= { hwEnclosure02PowerEntry 3 }		
+	
+hwEnclosure02VolTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure02VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing voltage information."
+	::= { HwEnclosure2 8 }
+
+hwEnclosure02VolEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure02VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current voltage state."
+	INDEX	{ hwEnclosure02VolIndex }
+	::= { hwEnclosure02VolTable 1 }
+	
+HwEnclosure02VolEntry ::= SEQUENCE { hwEnclosure02VolIndex INTEGER,
+			  hwEnclosure02VolDesc DisplayString,
+			  hwEnclosure02VolValue INTEGER }
+
+hwEnclosure02VolIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage index, 1..#of voltages."
+	::= { hwEnclosure02VolEntry 1 }		    
+
+hwEnclosure02VolDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage description."
+	::= { hwEnclosure02VolEntry 2 }
+			    
+hwEnclosure02VolValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage value."
+	::= { hwEnclosure02VolEntry 3 }
+
+hwEnclosure02FanTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure02FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Fan information."
+	::= { HwEnclosure2 9 }
+
+hwEnclosure02FanEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure02FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current fan state."
+	INDEX	{ hwEnclosure02FanIndex }
+	::= { hwEnclosure02FanTable 1 }
+	
+HwEnclosure02FanEntry ::= SEQUENCE { hwEnclosure02FanIndex INTEGER,
+			  hwEnclosure02FanDesc DisplayString,
+			  hwEnclosure02FanSpeed INTEGER }
+
+hwEnclosure02FanIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan index, 1..#of fans."
+	::= { hwEnclosure02FanEntry 1 }		    
+
+hwEnclosure02FanDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan description."
+	::= { hwEnclosure02FanEntry 2 }
+			    
+hwEnclosure02FanSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan speed in RPM, e.g. 3200."
+	::= { hwEnclosure02FanEntry 3 }
+
+hwEnclosure02TempTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure02TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing temperature information."
+	::= { HwEnclosure2 10 }
+
+hwEnclosure02TempEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure02TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current temperature state."
+	INDEX	{ hwEnclosure02TempIndex }
+	::= { hwEnclosure02TempTable 1 }
+	
+HwEnclosure02TempEntry ::= SEQUENCE { hwEnclosure02TempIndex INTEGER,
+			   hwEnclosure02TempDesc DisplayString,
+			   hwEnclosure02TempValue INTEGER
+			 }
+
+hwEnclosure02TempIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature index, 1..#of voltages."
+	::= { hwEnclosure02TempEntry 1 }		    
+
+hwEnclosure02TempDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature description."
+	::= { hwEnclosure02TempEntry 2 }
+			    
+hwEnclosure02TempValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature value."
+	::= { hwEnclosure02TempEntry 3 }
+
+
+
+
+-- Enclosure#03
+hwEnclosure03Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HwEnclosure3 1 }
+
+hwEnclosure03Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HwEnclosure3 2 }
+	
+hwEnclosure03NumberOfPower	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { HwEnclosure3 3 }	
+	
+hwEnclosure03NumberOfVol	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Voltage, e.g. 2."
+	::= { HwEnclosure3 4 }
+
+hwEnclosure03NumberOfFan	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Fan, e.g. 2."
+	::= { HwEnclosure3 5 }		
+
+hwEnclosure03NumberOfTemp	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Temperature, e.g. 2."
+	::= { HwEnclosure3 6 }	
+
+hwEnclosure03PowerTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwPowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Power information."
+	::= { HwEnclosure3 7 }
+
+hwEnclosure03PowerEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure03PowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current power state."
+	INDEX	{ hwEnclosure03PowerIndex }
+	::= { hwEnclosure03PowerTable 1 }
+	
+HwEnclosure03PowerEntry ::= SEQUENCE { hwEnclosure03PowerIndex INTEGER,
+			    hwEnclosure03PowerDesc DisplayString,
+			    hwEnclosure03PowerState INTEGER }
+
+hwEnclosure03PowerIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power index, 1..#of powers."
+	::= { hwEnclosure03PowerEntry 1 }		    
+			    
+hwEnclosure03PowerDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power description."
+	::= { hwEnclosure03PowerEntry 2 }
+			    
+hwEnclosure03PowerState	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 Failed(0),
+			 Ok(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power state 0:failed, 1:ok."
+	::= { hwEnclosure03PowerEntry 3 }		
+	
+
+hwEnclosure03VolTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure03VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing voltage information."
+	::= { HwEnclosure3 8 }
+
+hwEnclosure03VolEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure03VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current voltage state."
+	INDEX	{ hwEnclosure03VolIndex }
+	::= { hwEnclosure03VolTable 1 }
+	
+HwEnclosure03VolEntry ::= SEQUENCE { hwEnclosure03VolIndex INTEGER,
+			  hwEnclosure03VolDesc DisplayString,
+			  hwEnclosure03VolValue INTEGER }
+
+hwEnclosure03VolIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage index, 1..#of voltages."
+	::= { hwEnclosure03VolEntry 1 }		    
+
+hwEnclosure03VolDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage description."
+	::= { hwEnclosure03VolEntry 2 }
+			    
+hwEnclosure03VolValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage value."
+	::= { hwEnclosure03VolEntry 3 }
+
+hwEnclosure03FanTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure03FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Fan information."
+	::= { HwEnclosure3 9 }
+
+hwEnclosure03FanEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure03FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current fan state."
+	INDEX	{ hwEnclosure03FanIndex }
+	::= { hwEnclosure03FanTable 1 }
+	
+HwEnclosure03FanEntry ::= SEQUENCE { hwEnclosure03FanIndex INTEGER,
+			  hwEnclosure03FanDesc DisplayString,
+			  hwEnclosure03FanSpeed INTEGER }
+
+hwEnclosure03FanIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan index, 1..#of fans."
+	::= { hwEnclosure03FanEntry 1 }		    
+
+hwEnclosure03FanDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan description."
+	::= { hwEnclosure03FanEntry 2 }
+			    
+hwEnclosure03FanSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan speed in RPM, e.g. 3200."
+	::= { hwEnclosure03FanEntry 3 }
+
+hwEnclosure03TempTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure03TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing temperature information."
+	::= { HwEnclosure3 10 }
+
+hwEnclosure03TempEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure03TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current temperature state."
+	INDEX	{ hwEnclosure03TempIndex }
+	::= { hwEnclosure03TempTable 1 }
+	
+HwEnclosure03TempEntry ::= SEQUENCE { hwEnclosure03TempIndex INTEGER,
+			   hwEnclosure03TempDesc DisplayString,
+			   hwEnclosure03TempValue INTEGER
+			 }
+
+hwEnclosure03TempIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature index, 1..#of voltages."
+	::= { hwEnclosure03TempEntry 1 }		    
+
+hwEnclosure03TempDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature description."
+	::= { hwEnclosure03TempEntry 2 }
+			    
+hwEnclosure03TempValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature value."
+	::= { hwEnclosure03TempEntry 3 }
+
+
+
+-- Enclosure#04
+hwEnclosure04Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HwEnclosure4 1 }
+
+hwEnclosure04Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HwEnclosure4 2 }
+	
+hwEnclosure04NumberOfPower	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { HwEnclosure4 3 }	
+	
+hwEnclosure04NumberOfVol	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Voltage, e.g. 2."
+	::= { HwEnclosure4 4 }
+
+hwEnclosure04NumberOfFan	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Fan, e.g. 2."
+	::= { HwEnclosure4 5 }		
+
+hwEnclosure04NumberOfTemp	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Temperature, e.g. 2."
+	::= { HwEnclosure4 6 }	
+
+hwEnclosure04PowerTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwPowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Power information."
+	::= { HwEnclosure4 7 }
+
+hwEnclosure04PowerEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure04PowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current power state."
+	INDEX	{ hwEnclosure04PowerIndex }
+	::= { hwEnclosure04PowerTable 1 }
+	
+HwEnclosure04PowerEntry ::= SEQUENCE { hwEnclosure04PowerIndex INTEGER,
+			    hwEnclosure04PowerDesc DisplayString,
+			    hwEnclosure04PowerState INTEGER }
+
+hwEnclosure04PowerIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power index, 1..#of powers."
+	::= { hwEnclosure04PowerEntry 1 }		    
+			    
+hwEnclosure04PowerDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power description."
+	::= { hwEnclosure04PowerEntry 2 }
+			    
+hwEnclosure04PowerState	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 Failed(0),
+			 Ok(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power state 0:failed, 1:ok."
+	::= { hwEnclosure04PowerEntry 3 }		
+	
+
+hwEnclosure04VolTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure04VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing voltage information."
+	::= { HwEnclosure4 8 }
+
+hwEnclosure04VolEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure04VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current voltage state."
+	INDEX	{ hwEnclosure04VolIndex }
+	::= { hwEnclosure04VolTable 1 }
+	
+HwEnclosure04VolEntry ::= SEQUENCE { hwEnclosure04VolIndex INTEGER,
+			  hwEnclosure04VolDesc DisplayString,
+			  hwEnclosure04VolValue INTEGER }
+
+hwEnclosure04VolIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage index, 1..#of voltages."
+	::= { hwEnclosure04VolEntry 1 }		    
+
+hwEnclosure04VolDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage description."
+	::= { hwEnclosure04VolEntry 2 }
+			    
+hwEnclosure04VolValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage value."
+	::= { hwEnclosure04VolEntry 3 }
+
+hwEnclosure04FanTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure04FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Fan information."
+	::= { HwEnclosure4 9 }
+
+hwEnclosure04FanEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure04FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current fan state."
+	INDEX	{ hwEnclosure04FanIndex }
+	::= { hwEnclosure04FanTable 1 }
+	
+HwEnclosure04FanEntry ::= SEQUENCE { hwEnclosure04FanIndex INTEGER,
+			  hwEnclosure04FanDesc DisplayString,
+			  hwEnclosure04FanSpeed INTEGER }
+
+hwEnclosure04FanIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan index, 1..#of fans."
+	::= { hwEnclosure04FanEntry 1 }		    
+
+hwEnclosure04FanDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan description."
+	::= { hwEnclosure04FanEntry 2 }
+			    
+hwEnclosure04FanSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan speed in RPM, e.g. 3200."
+	::= { hwEnclosure04FanEntry 3 }
+
+hwEnclosure04TempTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure04TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing temperature information."
+	::= { HwEnclosure4 10 }
+
+hwEnclosure04TempEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure04TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current temperature state."
+	INDEX	{ hwEnclosure04TempIndex }
+	::= { hwEnclosure04TempTable 1 }
+	
+HwEnclosure04TempEntry ::= SEQUENCE { hwEnclosure04TempIndex INTEGER,
+			   hwEnclosure04TempDesc DisplayString,
+			   hwEnclosure04TempValue INTEGER
+			 }
+
+hwEnclosure04TempIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature index, 1..#of voltages."
+	::= { hwEnclosure04TempEntry 1 }		    
+
+hwEnclosure04TempDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature description."
+	::= { hwEnclosure04TempEntry 2 }
+			    
+hwEnclosure04TempValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature value."
+	::= { hwEnclosure04TempEntry 3 }
+
+
+
+-- Enclosure#05
+hwEnclosure05Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HwEnclosure5 1 }
+
+hwEnclosure05Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HwEnclosure5 2 }
+	
+hwEnclosure05NumberOfPower	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { HwEnclosure5 3 }	
+	
+hwEnclosure05NumberOfVol	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Voltage, e.g. 2."
+	::= { HwEnclosure5 4 }
+
+hwEnclosure05NumberOfFan	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Fan, e.g. 2."
+	::= { HwEnclosure5 5 }		
+
+hwEnclosure05NumberOfTemp	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Temperature, e.g. 2."
+	::= { HwEnclosure5 6 }	
+
+hwEnclosure05PowerTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwPowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Power information."
+	::= { HwEnclosure5 7 }
+
+hwEnclosure05PowerEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure05PowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current power state."
+	INDEX	{ hwEnclosure05PowerIndex }
+	::= { hwEnclosure05PowerTable 1 }
+	
+HwEnclosure05PowerEntry ::= SEQUENCE { hwEnclosure05PowerIndex INTEGER,
+			    hwEnclosure05PowerDesc DisplayString,
+			    hwEnclosure05PowerState INTEGER }
+
+hwEnclosure05PowerIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power index, 1..#of powers."
+	::= { hwEnclosure05PowerEntry 1 }		    
+			    
+hwEnclosure05PowerDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power description."
+	::= { hwEnclosure05PowerEntry 2 }
+			    
+hwEnclosure05PowerState	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 Failed(0),
+			 Ok(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power state 0:failed, 1:ok."
+	::= { hwEnclosure05PowerEntry 3 }		
+	
+
+hwEnclosure05VolTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure05VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing voltage information."
+	::= { HwEnclosure5 8 }
+
+hwEnclosure05VolEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure05VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current voltage state."
+	INDEX	{ hwEnclosure05VolIndex }
+	::= { hwEnclosure05VolTable 1 }
+	
+HwEnclosure05VolEntry ::= SEQUENCE { hwEnclosure05VolIndex INTEGER,
+			  hwEnclosure05VolDesc DisplayString,
+			  hwEnclosure05VolValue INTEGER }
+
+hwEnclosure05VolIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage index, 1..#of voltages."
+	::= { hwEnclosure05VolEntry 1 }		    
+
+hwEnclosure05VolDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage description."
+	::= { hwEnclosure05VolEntry 2 }
+			    
+hwEnclosure05VolValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage value."
+	::= { hwEnclosure05VolEntry 3 }
+
+hwEnclosure05FanTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure05FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Fan information."
+	::= { HwEnclosure5 9 }
+
+hwEnclosure05FanEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure05FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current fan state."
+	INDEX	{ hwEnclosure05FanIndex }
+	::= { hwEnclosure05FanTable 1 }
+	
+HwEnclosure05FanEntry ::= SEQUENCE { hwEnclosure05FanIndex INTEGER,
+			  hwEnclosure05FanDesc DisplayString,
+			  hwEnclosure05FanSpeed INTEGER }
+
+hwEnclosure05FanIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan index, 1..#of fans."
+	::= { hwEnclosure05FanEntry 1 }		    
+
+hwEnclosure05FanDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan description."
+	::= { hwEnclosure05FanEntry 2 }
+			    
+hwEnclosure05FanSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan speed in RPM, e.g. 3200."
+	::= { hwEnclosure05FanEntry 3 }
+
+hwEnclosure05TempTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure05TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing temperature information."
+	::= { HwEnclosure5 10 }
+
+hwEnclosure05TempEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure05TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current temperature state."
+	INDEX	{ hwEnclosure05TempIndex }
+	::= { hwEnclosure05TempTable 1 }
+	
+HwEnclosure05TempEntry ::= SEQUENCE { hwEnclosure05TempIndex INTEGER,
+			   hwEnclosure05TempDesc DisplayString,
+			   hwEnclosure05TempValue INTEGER
+			 }
+
+hwEnclosure05TempIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature index, 1..#of voltages."
+	::= { hwEnclosure05TempEntry 1 }		    
+
+hwEnclosure05TempDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature description."
+	::= { hwEnclosure05TempEntry 2 }
+			    
+hwEnclosure05TempValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature value."
+	::= { hwEnclosure05TempEntry 3 }
+
+
+-- Enclosure#06
+hwEnclosure06Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HwEnclosure6 1 }
+
+hwEnclosure06Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HwEnclosure6 2 }
+	
+hwEnclosure06NumberOfPower	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { HwEnclosure6 3 }	
+	
+hwEnclosure06NumberOfVol	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Voltage, e.g. 2."
+	::= { HwEnclosure6 4 }
+
+hwEnclosure06NumberOfFan	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Fan, e.g. 2."
+	::= { HwEnclosure6 5 }		
+
+hwEnclosure06NumberOfTemp	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Temperature, e.g. 2."
+	::= { HwEnclosure6 6 }	
+
+hwEnclosure06PowerTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwPowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Power information."
+	::= { HwEnclosure6 7 }
+
+hwEnclosure06PowerEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure06PowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current power state."
+	INDEX	{ hwEnclosure06PowerIndex }
+	::= { hwEnclosure06PowerTable 1 }
+	
+HwEnclosure06PowerEntry ::= SEQUENCE { hwEnclosure06PowerIndex INTEGER,
+			    hwEnclosure06PowerDesc DisplayString,
+			    hwEnclosure06PowerState INTEGER }
+
+hwEnclosure06PowerIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power index, 1..#of powers."
+	::= { hwEnclosure06PowerEntry 1 }		    
+			    
+hwEnclosure06PowerDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power description."
+	::= { hwEnclosure06PowerEntry 2 }
+			    
+hwEnclosure06PowerState	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 Failed(0),
+			 Ok(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power state 0:failed, 1:ok."
+	::= { hwEnclosure06PowerEntry 3 }		
+	
+hwEnclosure06VolTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure06VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing voltage information."
+	::= { HwEnclosure6 8 }
+
+hwEnclosure06VolEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure06VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current voltage state."
+	INDEX	{ hwEnclosure06VolIndex }
+	::= { hwEnclosure06VolTable 1 }
+	
+HwEnclosure06VolEntry ::= SEQUENCE { hwEnclosure06VolIndex INTEGER,
+			  hwEnclosure06VolDesc DisplayString,
+			  hwEnclosure06VolValue INTEGER }
+
+hwEnclosure06VolIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage index, 1..#of voltages."
+	::= { hwEnclosure06VolEntry 1 }		    
+
+hwEnclosure06VolDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage description."
+	::= { hwEnclosure06VolEntry 2 }
+			    
+hwEnclosure06VolValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage value."
+	::= { hwEnclosure06VolEntry 3 }
+
+hwEnclosure06FanTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure06FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Fan information."
+	::= { HwEnclosure6 9 }
+
+hwEnclosure06FanEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure06FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current fan state."
+	INDEX	{ hwEnclosure06FanIndex }
+	::= { hwEnclosure06FanTable 1 }
+	
+HwEnclosure06FanEntry ::= SEQUENCE { hwEnclosure06FanIndex INTEGER,
+			  hwEnclosure06FanDesc DisplayString,
+			  hwEnclosure06FanSpeed INTEGER }
+
+hwEnclosure06FanIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan index, 1..#of fans."
+	::= { hwEnclosure06FanEntry 1 }		    
+
+hwEnclosure06FanDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan description."
+	::= { hwEnclosure06FanEntry 2 }
+			    
+hwEnclosure06FanSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan speed in RPM, e.g. 3200."
+	::= { hwEnclosure06FanEntry 3 }
+
+hwEnclosure06TempTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure06TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing temperature information."
+	::= { HwEnclosure6 10 }
+
+hwEnclosure06TempEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure06TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current temperature state."
+	INDEX	{ hwEnclosure06TempIndex }
+	::= { hwEnclosure06TempTable 1 }
+	
+HwEnclosure06TempEntry ::= SEQUENCE { hwEnclosure06TempIndex INTEGER,
+			   hwEnclosure06TempDesc DisplayString,
+			   hwEnclosure06TempValue INTEGER
+			 }
+
+hwEnclosure06TempIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature index, 1..#of voltages."
+	::= { hwEnclosure06TempEntry 1 }		    
+
+hwEnclosure06TempDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature description."
+	::= { hwEnclosure06TempEntry 2 }
+			    
+hwEnclosure06TempValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature value."
+	::= { hwEnclosure06TempEntry 3 }
+
+
+-- Enclosure#07
+hwEnclosure07Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HwEnclosure7 1 }
+
+hwEnclosure07Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HwEnclosure7 2 }
+	
+hwEnclosure07NumberOfPower	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { HwEnclosure7 3 }	
+	
+hwEnclosure07NumberOfVol	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Voltage, e.g. 2."
+	::= { HwEnclosure7 4 }
+
+hwEnclosure07NumberOfFan	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Fan, e.g. 2."
+	::= { HwEnclosure7 5 }		
+
+hwEnclosure07NumberOfTemp	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Temperature, e.g. 2."
+	::= { HwEnclosure7 6 }	
+
+hwEnclosure07PowerTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwPowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Power information."
+	::= { HwEnclosure7 7 }
+
+hwEnclosure07PowerEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure07PowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current power state."
+	INDEX	{ hwEnclosure07PowerIndex }
+	::= { hwEnclosure07PowerTable 1 }
+	
+HwEnclosure07PowerEntry ::= SEQUENCE { hwEnclosure07PowerIndex INTEGER,
+			    hwEnclosure07PowerDesc DisplayString,
+			    hwEnclosure07PowerState INTEGER }
+
+hwEnclosure07PowerIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power index, 1..#of powers."
+	::= { hwEnclosure07PowerEntry 1 }		    
+			    
+hwEnclosure07PowerDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power description."
+	::= { hwEnclosure07PowerEntry 2 }
+			    
+hwEnclosure07PowerState	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 Failed(0),
+			 Ok(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power state 0:failed, 1:ok."
+	::= { hwEnclosure07PowerEntry 3 }		
+	
+hwEnclosure07VolTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure07VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing voltage information."
+	::= { HwEnclosure7 8 }
+
+hwEnclosure07VolEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure07VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current voltage state."
+	INDEX	{ hwEnclosure07VolIndex }
+	::= { hwEnclosure07VolTable 1 }
+	
+HwEnclosure07VolEntry ::= SEQUENCE { hwEnclosure07VolIndex INTEGER,
+			  hwEnclosure07VolDesc DisplayString,
+			  hwEnclosure07VolValue INTEGER }
+
+hwEnclosure07VolIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage index, 1..#of voltages."
+	::= { hwEnclosure07VolEntry 1 }		    
+
+hwEnclosure07VolDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage description."
+	::= { hwEnclosure07VolEntry 2 }
+			    
+hwEnclosure07VolValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage value."
+	::= { hwEnclosure07VolEntry 3 }
+
+hwEnclosure07FanTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure07FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Fan information."
+	::= { HwEnclosure7 9 }
+
+hwEnclosure07FanEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure07FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current fan state."
+	INDEX	{ hwEnclosure07FanIndex }
+	::= { hwEnclosure07FanTable 1 }
+	
+HwEnclosure07FanEntry ::= SEQUENCE { hwEnclosure07FanIndex INTEGER,
+			  hwEnclosure07FanDesc DisplayString,
+			  hwEnclosure07FanSpeed INTEGER }
+
+hwEnclosure07FanIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan index, 1..#of fans."
+	::= { hwEnclosure07FanEntry 1 }		    
+
+hwEnclosure07FanDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan description."
+	::= { hwEnclosure07FanEntry 2 }
+			    
+hwEnclosure07FanSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan speed in RPM, e.g. 3200."
+	::= { hwEnclosure07FanEntry 3 }
+
+hwEnclosure07TempTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure07TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing temperature information."
+	::= { HwEnclosure7 10 }
+
+hwEnclosure07TempEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure07TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current temperature state."
+	INDEX	{ hwEnclosure07TempIndex }
+	::= { hwEnclosure07TempTable 1 }
+	
+HwEnclosure07TempEntry ::= SEQUENCE { hwEnclosure07TempIndex INTEGER,
+			   hwEnclosure07TempDesc DisplayString,
+			   hwEnclosure07TempValue INTEGER
+			 }
+
+hwEnclosure07TempIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature index, 1..#of voltages."
+	::= { hwEnclosure07TempEntry 1 }		    
+
+hwEnclosure07TempDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature description."
+	::= { hwEnclosure07TempEntry 2 }
+			    
+hwEnclosure07TempValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature value."
+	::= { hwEnclosure07TempEntry 3 }
+
+
+-- Enclosure#08
+hwEnclosure08Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HwEnclosure8 1 }
+
+hwEnclosure08Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HwEnclosure8 2 }
+	
+hwEnclosure08NumberOfPower	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { HwEnclosure8 3 }	
+	
+hwEnclosure08NumberOfVol	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Voltage, e.g. 2."
+	::= { HwEnclosure8 4 }
+
+hwEnclosure08NumberOfFan	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Fan, e.g. 2."
+	::= { HwEnclosure8 5 }		
+
+hwEnclosure08NumberOfTemp	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of Temperature, e.g. 2."
+	::= { HwEnclosure8 6 }	
+
+hwEnclosure08PowerTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwPowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Power information."
+	::= { HwEnclosure8 7 }
+
+hwEnclosure08PowerEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure08PowerEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current power state."
+	INDEX	{ hwEnclosure08PowerIndex }
+	::= { hwEnclosure08PowerTable 1 }
+	
+HwEnclosure08PowerEntry ::= SEQUENCE { hwEnclosure08PowerIndex INTEGER,
+			    hwEnclosure08PowerDesc DisplayString,
+			    hwEnclosure08PowerState INTEGER }
+
+hwEnclosure08PowerIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power index, 1..#of powers."
+	::= { hwEnclosure08PowerEntry 1 }		    
+			    
+hwEnclosure08PowerDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power description."
+	::= { hwEnclosure08PowerEntry 2 }
+			    
+hwEnclosure08PowerState	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 Failed(0),
+			 Ok(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power state 0:failed, 1:ok."
+	::= { hwEnclosure08PowerEntry 3 }		
+	
+hwEnclosure08VolTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure08VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing voltage information."
+	::= { HwEnclosure8 8 }
+
+hwEnclosure08VolEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure08VolEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current voltage state."
+	INDEX	{ hwEnclosure08VolIndex }
+	::= { hwEnclosure08VolTable 1 }
+	
+HwEnclosure08VolEntry ::= SEQUENCE { hwEnclosure08VolIndex INTEGER,
+			  hwEnclosure08VolDesc DisplayString,
+			  hwEnclosure08VolValue INTEGER }
+
+hwEnclosure08VolIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage index, 1..#of voltages."
+	::= { hwEnclosure08VolEntry 1 }		    
+
+hwEnclosure08VolDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage description."
+	::= { hwEnclosure08VolEntry 2 }
+			    
+hwEnclosure08VolValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Voltage value."
+	::= { hwEnclosure08VolEntry 3 }
+
+hwEnclosure08FanTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure08FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Fan information."
+	::= { HwEnclosure8 9 }
+
+hwEnclosure08FanEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure08FanEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current fan state."
+	INDEX	{ hwEnclosure08FanIndex }
+	::= { hwEnclosure08FanTable 1 }
+	
+HwEnclosure08FanEntry ::= SEQUENCE { hwEnclosure08FanIndex INTEGER,
+			  hwEnclosure08FanDesc DisplayString,
+			  hwEnclosure08FanSpeed INTEGER }
+
+hwEnclosure08FanIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan index, 1..#of fans."
+	::= { hwEnclosure08FanEntry 1 }		    
+
+hwEnclosure08FanDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan description."
+	::= { hwEnclosure08FanEntry 2 }
+			    
+hwEnclosure08FanSpeed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Fan speed in RPM, e.g. 3200."
+	::= { hwEnclosure08FanEntry 3 }
+
+hwEnclosure08TempTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HwEnclosure08TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing temperature information."
+	::= { HwEnclosure8 10 }
+
+hwEnclosure08TempEntry 	OBJECT-TYPE
+	SYNTAX	HwEnclosure08TempEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current temperature state."
+	INDEX	{ hwEnclosure08TempIndex }
+	::= { hwEnclosure08TempTable 1 }
+	
+HwEnclosure08TempEntry ::= SEQUENCE { hwEnclosure08TempIndex INTEGER,
+			   hwEnclosure08TempDesc DisplayString,
+			   hwEnclosure08TempValue INTEGER
+			 }
+
+hwEnclosure08TempIndex	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature index, 1..#of voltages."
+	::= { hwEnclosure08TempEntry 1 }		    
+
+hwEnclosure08TempDesc	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature description."
+	::= { hwEnclosure08TempEntry 2 }
+			    
+hwEnclosure08TempValue	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Temperature value."
+	::= { hwEnclosure08TempEntry 3 }
+
+
+
+-- definition of object types of HDD information
+
+HddEnclosure1			OBJECT IDENTIFIER ::= { HddInformation 1 }
+HddEnclosure2			OBJECT IDENTIFIER ::= { HddInformation 2 }
+HddEnclosure3			OBJECT IDENTIFIER ::= { HddInformation 3 }
+HddEnclosure4			OBJECT IDENTIFIER ::= { HddInformation 4 }
+HddEnclosure5			OBJECT IDENTIFIER ::= { HddInformation 5 }
+HddEnclosure6			OBJECT IDENTIFIER ::= { HddInformation 6 }
+HddEnclosure7			OBJECT IDENTIFIER ::= { HddInformation 7 }
+HddEnclosure8			OBJECT IDENTIFIER ::= { HddInformation 8 }
+
+
+-- Enclosure#01 hdd info
+
+
+hddEnclosure01Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HddEnclosure1 1 }
+
+hddEnclosure01Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HddEnclosure1 2 }
+	
+hddEnclosure01NumberOfSlot	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of slot"
+	::= { HddEnclosure1 3 }	
+
+hddEnclosure01InfoTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HddEnclosure01InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing HDD information."
+	::= { HddEnclosure1 4 }
+
+hddEnclosure01InfoEntry 	OBJECT-TYPE
+	SYNTAX	HddEnclosure01InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current HDD state."
+	INDEX	{ hddEnclosure01Slots }
+	::= { hddEnclosure01InfoTable 1 }
+	
+HddEnclosure01InfoEntry ::= SEQUENCE { hddEnclosure01Slots INTEGER,
+			    hddEnclosure01Desc DisplayString,
+			    hddEnclosure01Name DisplayString,
+			    hddEnclosure01Serial DisplayString,
+			    hddEnclosure01FirmVer DisplayString,
+			    hddEnclosure01Capacity INTEGER,
+			    hddEnclosure01Type INTEGER,
+			    hddEnclosure01State DisplayString }
+
+hddEnclosure01Slots	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD slot#, 1..#of HDD."
+	::= { hddEnclosure01InfoEntry 1 }
+
+hddEnclosure01Desc		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD description."
+	::= { hddEnclosure01InfoEntry 2 }
+
+hddEnclosure01Name		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure01InfoEntry 3 }
+
+hddEnclosure01Serial	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD serial number."
+	::= { hddEnclosure01InfoEntry 4 }
+
+hddEnclosure01FirmVer	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD firmware reversion."
+	::= { hddEnclosure01InfoEntry 5 }
+
+hddEnclosure01Capacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD total capacity in mega byte."
+	::= { hddEnclosure01InfoEntry 6 }
+
+hddEnclosure01Type		OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 SATA(1),
+			 SAS(2)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD Type."
+	::= { hddEnclosure01InfoEntry 7 }
+
+hddEnclosure01State	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD state."
+	::= { hddEnclosure01InfoEntry 8 }
+	
+	
+-- Enclosure#02 hdd info
+
+hddEnclosure02Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HddEnclosure2 1 }
+
+hddEnclosure02Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HddEnclosure2 2 }
+	
+hddEnclosure02NumberOfSlot	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of slot."
+	::= { HddEnclosure2 3 }	
+
+hddEnclosure02InfoTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HddEnclosure02InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing HDD information."
+	::= { HddEnclosure2 4 }
+
+hddEnclosure02InfoEntry 	OBJECT-TYPE
+	SYNTAX	HddEnclosure02InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current HDD state."
+	INDEX	{ hddEnclosure02Slots }
+	::= { hddEnclosure02InfoTable 1 }
+	
+HddEnclosure02InfoEntry ::= SEQUENCE { hddEnclosure02Slots INTEGER,
+			    hddEnclosure02Desc DisplayString,
+			    hddEnclosure02Name DisplayString,
+			    hddEnclosure02Serial DisplayString,
+			    hddEnclosure02FirmVer DisplayString,
+			    hddEnclosure02Capacity INTEGER,
+			    hddEnclosure02Type INTEGER,
+			    hddEnclosure02State DisplayString }
+
+hddEnclosure02Slots	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD slot#, 1..#of HDD."
+	::= { hddEnclosure02InfoEntry 1 }
+
+hddEnclosure02Desc		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure02InfoEntry 2 }
+
+hddEnclosure02Name		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure02InfoEntry 3 }
+
+hddEnclosure02Serial	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD serial number."
+	::= { hddEnclosure02InfoEntry 4 }
+
+hddEnclosure02FirmVer	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD firmware reversion."
+	::= { hddEnclosure02InfoEntry 5 }
+
+hddEnclosure02Capacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD total capacity in mega byte."
+	::= { hddEnclosure02InfoEntry 6 }
+
+hddEnclosure02Type		OBJECT-TYPE	
+	SYNTAX	INTEGER {
+			 SATA(1),
+			 SAS(2)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD Type."
+	::= { hddEnclosure02InfoEntry 7 }
+
+hddEnclosure02State	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD state."
+	::= { hddEnclosure02InfoEntry 8 }
+	
+	
+	
+-- Enclosure#03 hdd info
+hddEnclosure03Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HddEnclosure3 1 }
+
+hddEnclosure03Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HddEnclosure3 2 }
+	
+hddEnclosure03NumberOfSlot	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of slot."
+	::= { HddEnclosure3 3 }	
+
+hddEnclosure03InfoTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HddEnclosure03InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing HDD information."
+	::= { HddEnclosure3 4 }
+
+hddEnclosure03InfoEntry 	OBJECT-TYPE
+	SYNTAX	HddEnclosure03InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current HDD state."
+	INDEX	{ hddEnclosure03Slots }
+	::= { hddEnclosure03InfoTable 1 }
+	
+HddEnclosure03InfoEntry ::= SEQUENCE { hddEnclosure03Slots INTEGER,
+                            hddEnclosure03Desc DisplayString,
+			    hddEnclosure03Name DisplayString,
+			    hddEnclosure03Serial DisplayString,
+			    hddEnclosure03FirmVer DisplayString,
+			    hddEnclosure03Capacity INTEGER,
+			    hddEnclosure03Type INTEGER,
+			    hddEnclosure03State DisplayString }
+
+hddEnclosure03Slots	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD slot#, 1..#of HDD."
+	::= { hddEnclosure03InfoEntry 1 }
+
+hddEnclosure03Desc		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure03InfoEntry 2 }
+
+hddEnclosure03Name		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure03InfoEntry 3 }
+
+hddEnclosure03Serial	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD serial number."
+	::= { hddEnclosure03InfoEntry 4 }
+
+hddEnclosure03FirmVer	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD firmware reversion."
+	::= { hddEnclosure03InfoEntry 5 }
+
+hddEnclosure03Capacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD total capacity in mega byte."
+	::= { hddEnclosure03InfoEntry 6 }
+
+hddEnclosure03Type		OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 SATA(1),
+			 SAS(2)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD Type."
+	::= { hddEnclosure03InfoEntry 7 }
+
+hddEnclosure03State	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD state."
+	::= { hddEnclosure03InfoEntry 8 }
+	
+	
+-- Enclosure#04 hdd info
+hddEnclosure04Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HddEnclosure4 1 }
+
+hddEnclosure04Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HddEnclosure4 2 }
+	
+hddEnclosure04NumberOfSlot	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of slot."
+	::= { HddEnclosure4 3 }	
+
+hddEnclosure04InfoTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HddEnclosure04InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing HDD information."
+	::= { HddEnclosure4 4 }
+
+hddEnclosure04InfoEntry 	OBJECT-TYPE
+	SYNTAX	HddEnclosure04InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current HDD state."
+	INDEX	{ hddEnclosure04Slots }
+	::= { hddEnclosure04InfoTable 1 }
+	
+HddEnclosure04InfoEntry ::= SEQUENCE { hddEnclosure04Slots INTEGER,
+			    hddEnclosure04Desc DisplayString,
+			    hddEnclosure04Name DisplayString,
+			    hddEnclosure04Serial DisplayString,
+			    hddEnclosure04FirmVer DisplayString,
+			    hddEnclosure04Capacity INTEGER,
+			    hddEnclosure04Type INTEGER,
+			    hddEnclosure04State DisplayString }
+
+hddEnclosure04Slots	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD slot#, 1..#of HDD."
+	::= { hddEnclosure04InfoEntry 1 }
+
+hddEnclosure04Desc		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure04InfoEntry 2 }
+
+hddEnclosure04Name		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure04InfoEntry 3 }
+
+hddEnclosure04Serial	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD serial number."
+	::= { hddEnclosure04InfoEntry 4 }
+
+hddEnclosure04FirmVer	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD firmware reversion."
+	::= { hddEnclosure04InfoEntry 5 }
+
+hddEnclosure04Capacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD total capacity in mega byte."
+	::= { hddEnclosure04InfoEntry 6 }
+
+hddEnclosure04Type		OBJECT-TYPE	
+	SYNTAX	INTEGER {
+			 SATA(1),
+			 SAS(2)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD Type."
+	::= { hddEnclosure04InfoEntry 7 }
+
+hddEnclosure04State	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD state."
+	::= { hddEnclosure04InfoEntry 8 }
+	
+	
+-- Enclosure#05 hdd info
+hddEnclosure05Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HddEnclosure5 1 }
+
+hddEnclosure05Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HddEnclosure5 2 }
+	
+hddEnclosure05NumberOfSlot	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of slot."
+	::= { HddEnclosure5 3 }	
+
+
+hddEnclosure05InfoTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HddEnclosure05InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing HDD information."
+	::= { HddEnclosure5 4 }
+
+hddEnclosure05InfoEntry 	OBJECT-TYPE
+	SYNTAX	HddEnclosure05InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current HDD state."
+	INDEX	{ hddEnclosure05Slots }
+	::= { hddEnclosure05InfoTable 1 }
+	
+HddEnclosure05InfoEntry ::= SEQUENCE { hddEnclosure05Slots INTEGER,
+			    hddEnclosure05Desc DisplayString,
+			    hddEnclosure05Name DisplayString,
+			    hddEnclosure05Serial DisplayString,
+			    hddEnclosure05FirmVer DisplayString,
+			    hddEnclosure05Capacity INTEGER,
+			    hddEnclosure05Type INTEGER,
+			    hddEnclosure05State DisplayString }
+
+hddEnclosure05Slots	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD slot#, 1..#of HDD."
+	::= { hddEnclosure05InfoEntry 1 }
+
+hddEnclosure05Desc		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure05InfoEntry 2 }
+
+hddEnclosure05Name		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure05InfoEntry 3 }
+
+hddEnclosure05Serial	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD serial number."
+	::= { hddEnclosure05InfoEntry 4 }
+
+hddEnclosure05FirmVer	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD firmware reversion."
+	::= { hddEnclosure05InfoEntry 5 }
+
+hddEnclosure05Capacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD total capacity in mega byte."
+	::= { hddEnclosure05InfoEntry 6 }
+
+hddEnclosure05Type		OBJECT-TYPE	
+	SYNTAX	INTEGER {
+			 SATA(1),
+			 SAS(2)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD Type."
+	::= { hddEnclosure05InfoEntry 7 }
+
+hddEnclosure05State	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD state."
+	::= { hddEnclosure05InfoEntry 8 }
+	
+-- Enclosure#06 hdd info
+hddEnclosure06Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HddEnclosure6 1 }
+
+hddEnclosure06Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HddEnclosure6 2 }
+	
+hddEnclosure06NumberOfSlot	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { HddEnclosure6 3 }	
+
+
+hddEnclosure06InfoTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HddEnclosure06InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing HDD information."
+	::= { HddEnclosure6 4 }
+
+hddEnclosure06InfoEntry 	OBJECT-TYPE
+	SYNTAX	HddEnclosure06InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current HDD state."
+	INDEX	{ hddEnclosure06Slots }
+	::= { hddEnclosure06InfoTable 1 }
+	
+HddEnclosure06InfoEntry ::= SEQUENCE { hddEnclosure06Slots INTEGER,
+			    hddEnclosure06Desc DisplayString,
+			    hddEnclosure06Name DisplayString,
+			    hddEnclosure06Serial DisplayString,
+			    hddEnclosure06FirmVer DisplayString,
+			    hddEnclosure06Capacity INTEGER,
+			    hddEnclosure06Type INTEGER,
+			    hddEnclosure06State DisplayString }
+
+hddEnclosure06Slots	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD slot#, 1..#of HDD."
+	::= { hddEnclosure06InfoEntry 1 }
+
+hddEnclosure06Desc		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure06InfoEntry 2 }	
+
+hddEnclosure06Name		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure06InfoEntry 3 }
+
+hddEnclosure06Serial	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD serial number."
+	::= { hddEnclosure06InfoEntry 4 }
+
+hddEnclosure06FirmVer	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD firmware reversion."
+	::= { hddEnclosure06InfoEntry 5 }
+
+hddEnclosure06Capacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD total capacity in mega byte."
+	::= { hddEnclosure06InfoEntry 6 }
+
+hddEnclosure06Type		OBJECT-TYPE
+	SYNTAX	INTEGER {	
+			 SATA(1),
+			 SAS(2)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD Type."
+	::= { hddEnclosure06InfoEntry 7 }
+
+hddEnclosure06State	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD state."
+	::= { hddEnclosure06InfoEntry 8 }
+	
+
+-- Enclosure#07 hdd info
+hddEnclosure07Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HddEnclosure7 1 }
+
+hddEnclosure07Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HddEnclosure7 2 }
+	
+hddEnclosure07NumberOfSlot	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { HddEnclosure7 3 }	
+
+hddEnclosure07InfoTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HddEnclosure07InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing HDD information."
+	::= { HddEnclosure7 4 }
+
+hddEnclosure07InfoEntry 	OBJECT-TYPE
+	SYNTAX	HddEnclosure07InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current HDD state."
+	INDEX	{ hddEnclosure07Slots }
+	::= { hddEnclosure07InfoTable 1 }
+	
+HddEnclosure07InfoEntry ::= SEQUENCE { hddEnclosure07Slots INTEGER,
+			    hddEnclosure07Desc DisplayString,
+			    hddEnclosure07Name DisplayString,
+			    hddEnclosure07Serial DisplayString,
+			    hddEnclosure07FirmVer DisplayString,
+			    hddEnclosure07Capacity INTEGER,
+			    hddEnclosure07Type INTEGER,
+			    hddEnclosure07State DisplayString }
+
+hddEnclosure07Slots	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD slot#, 1..#of HDD."
+	::= { hddEnclosure07InfoEntry 1 }
+
+hddEnclosure07Desc		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure07InfoEntry 2 }
+
+hddEnclosure07Name		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure07InfoEntry 3 }
+
+hddEnclosure07Serial	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD serial number."
+	::= { hddEnclosure07InfoEntry 4 }
+
+hddEnclosure07FirmVer	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD firmware reversion."
+	::= { hddEnclosure07InfoEntry 5 }
+
+hddEnclosure07Capacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD total capacity in mega byte."
+	::= { hddEnclosure07InfoEntry 6 }
+
+hddEnclosure07Type		OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 SATA(1),
+			 SAS(2)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD Type."
+	::= { hddEnclosure07InfoEntry 7 }
+
+hddEnclosure07State	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD state."
+	::= { hddEnclosure07InfoEntry 8 }
+	
+
+-- Enclosure#08 hdd info
+hddEnclosure08Installed	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure Installed?"
+	::= { HddEnclosure8 1 }
+
+hddEnclosure08Description	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Enclosure description."
+	::= { HddEnclosure8 2 }
+	
+hddEnclosure08NumberOfSlot	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"# of power supply, e.g. 2."
+	::= { HddEnclosure8 3 }	
+
+hddEnclosure08InfoTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF HddEnclosure08InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing HDD information."
+	::= { HddEnclosure8 4 }
+
+hddEnclosure08InfoEntry 	OBJECT-TYPE
+	SYNTAX	HddEnclosure08InfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current HDD state."
+	INDEX	{ hddEnclosure08Slots }
+	::= { hddEnclosure08InfoTable 1 }
+	
+HddEnclosure08InfoEntry ::= SEQUENCE { hddEnclosure08Slots INTEGER,
+			    hddEnclosure08Desc DisplayString,
+			    hddEnclosure08Name DisplayString,
+			    hddEnclosure08Serial DisplayString,
+			    hddEnclosure08FirmVer DisplayString,
+			    hddEnclosure08Capacity INTEGER,
+			    hddEnclosure08Type INTEGER,
+			    hddEnclosure08State DisplayString }
+
+hddEnclosure08Slots	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD slot#, 1..#of HDD."
+	::= { hddEnclosure08InfoEntry 1 }
+
+hddEnclosure08Desc		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure08InfoEntry 2 }
+
+
+hddEnclosure08Name		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD name."
+	::= { hddEnclosure08InfoEntry 3 }
+
+hddEnclosure08Serial	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD serial number."
+	::= { hddEnclosure08InfoEntry 4 }
+
+hddEnclosure08FirmVer	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD firmware reversion."
+	::= { hddEnclosure08InfoEntry 5 }
+
+hddEnclosure08Capacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD total capacity in mega byte."
+	::= { hddEnclosure08InfoEntry 6 }
+
+hddEnclosure08Type		OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 SATA(1),
+			 SAS(2)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD Type."
+	::= { hddEnclosure08InfoEntry 7 }
+
+hddEnclosure08State	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"HDD state."
+	::= { hddEnclosure08InfoEntry 8 }							
+		
+
+-- definition of object types of RaidSet information
+
+raidInfoTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF RaidInfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing RaidSet information."
+	::= { RaidsetInformation 1 }
+
+raidInfoEntry 	OBJECT-TYPE
+	SYNTAX	RaidInfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current RaidSet state."
+	INDEX	{ raidNumber }
+	::= { raidInfoTable 1 }
+	
+RaidInfoEntry ::= SEQUENCE { raidNumber INTEGER,
+			     raidName DisplayString,
+			     raidDisks INTEGER,
+			     raidState DisplayString,
+			     raidTotalCapacity INTEGER,
+			     raidFreeCapacity INTEGER,
+			     raidMemberDiskCapacity INTEGER,			    
+			     raidMemberDiskChannels DisplayString }
+
+raidNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"RiadSet#, 0..#raidset-1."
+	::= { raidInfoEntry 1 }
+
+raidName		OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Raid set name."
+	::= { raidInfoEntry 2 }
+
+raidDisks	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Member disks."
+	::= { raidInfoEntry 3 }
+
+raidState	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Raid state."
+	::= { raidInfoEntry 4 }
+
+raidTotalCapacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"RaidSet total capacity in MB, totla capacity."
+	::= { raidInfoEntry 5 }
+
+raidFreeCapacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"RaidSet free capacity in MB, totla capacity."
+	::= { raidInfoEntry 6 }
+
+raidMemberDiskCapacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"RaidSet member disk capacity in MB, totla capacity."
+	::= { raidInfoEntry 7 }
+
+raidMemberDiskChannels	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Member disk channels."
+	::= { raidInfoEntry 8 }
+
+
+-- definition of object types of VolumeSet information
+
+volInfoTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF VolInfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing VolumeSet information."
+	::= { VolumesetInformation 1 }
+
+volInfoEntry 	OBJECT-TYPE
+	SYNTAX	VolInfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current VolumeSet state."
+	INDEX	{ volNumber }
+	::= { volInfoTable 1 }
+	
+VolInfoEntry ::= SEQUENCE { volNumber INTEGER,
+			    volName DisplayString,
+			    volRaidName DisplayString,
+			    volCapacity INTEGER,
+			    volState DisplayString,			
+			    volProgress INTEGER,
+			    volCluster INTEGER,
+			    volChannel INTEGER,
+			    volSCSIID INTEGER,
+			    volSCSILUN INTEGER,
+			    volRaidLevel DisplayString,
+			    volStripes INTEGER,
+			    volDisks INTEGER,
+			    volCache INTEGER,
+			    volTag INTEGER,			    			    
+			    volMaxSpeed DisplayString,
+			    volCurrentSpeed DisplayString }
+	
+volNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Volume number, 0..#of volume-1."
+	::= { volInfoEntry 1 }
+
+volName	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Volume name."
+	::= { volInfoEntry 2 }
+
+volRaidName	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Raid name."
+	::= { volInfoEntry 3 }
+
+volCapacity	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"In MB, Capacity."
+	::= { volInfoEntry 4 }
+
+volState	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"VolumeSet state."
+	::= { volInfoEntry 5 }
+
+volProgress	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"percentage."
+	::= { volInfoEntry 6 }
+
+volCluster	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Clustering, 0:no, 1:yes."
+	::= { volInfoEntry 7 }
+
+volChannel	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"SCSI Channel,0,1."
+	::= { volInfoEntry 8 }
+
+volSCSIID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"SCSI ID, 0..15."
+	::= { volInfoEntry 9 }
+
+volSCSILUN	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"SCSI LUN, 0..7."
+	::= { volInfoEntry 10 }
+
+volRaidLevel	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Raid Level, 0,1,3,5,6,30,50,60."
+	::= { volInfoEntry 11 }
+
+volStripes	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 4K(4096),
+			 8K(8192),
+			 16K(16384),
+			 32K(32768),
+			 64K(65536),
+			 128K(131072)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Stripe size, in bytes."
+	::= { volInfoEntry 12 }
+
+volDisks	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Disks."
+	::= { volInfoEntry 13 }
+
+volCache	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			 Write-through(0),
+			 Write-back(1)
+			}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Cache enabled, 0:no, 1:yes."
+	::= { volInfoEntry 14 }
+	
+volTag		OBJECT-TYPE
+	SYNTAX	INTEGER {
+	 		 Disabled(0),
+	 		 Enabled(1)
+	 		}
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Tag enabled, 0:no, 1:yes."
+	::= { volInfoEntry 15 }	
+
+volMaxSpeed	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Max speed."
+	::= { volInfoEntry 16 }	
+
+volCurrentSpeed	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Current speed."
+	::= { volInfoEntry 17 }	
+
+-- definition of object types of Event information
+
+eventInfoTable 	OBJECT-TYPE
+	SYNTAX 	SEQUENCE OF EventInfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing Event information."
+	::= { EventInformation 1 }
+
+eventInfoEntry 	OBJECT-TYPE
+	SYNTAX	EventInfoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a particular current event."
+	INDEX	{ eventNumber }
+	::= { eventInfoTable 1 }
+	
+EventInfoEntry ::= SEQUENCE { eventNumber INTEGER,
+			      eventString DisplayString }
+
+eventNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Event number, 0..#events-1."
+	::= { eventInfoEntry 1 }	
+
+eventString	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS 	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Event string."
+	::= { eventInfoEntry 2 }
+
+
+-- Areca Raid Subsystem Trap Group
+raidSubSysTraps		OBJECT IDENTIFIER ::= { SASRaidSubsystem }
+
+-- Traps definitions
+-- RaidSet Traps
+rsCreate	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 128
+
+rsDelete	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 129
+
+rsExpand	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 130
+	
+rsRebuild	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 131
+	
+rsDegraded	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 132
+	
+rsNoEvent	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 133
+
+
+-- VolumeSet Traps
+vsInitializing 	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 256
+
+vsRebuilding 	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 257
+
+vsMigrating 	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 258
+
+vsChecking	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 259
+	
+vsCompleteInit	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 260		
+
+vsCompleteRebuild	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 261	
+	
+vsCompleteMigrating	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 262	
+	
+vsCompleteChecking	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 263			
+
+vsCreate	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 264	
+	
+vsDelete	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 265		
+
+vsModify	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 266	
+	
+vsDegraded	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 267		
+
+vsFailed	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 268
+
+vsRevived	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 269
+
+vsTotals	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 270
+	
+	
+-- IDE Device Traps
+pdAdded	 	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 384
+
+pdRemoved	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 385
+
+pdReadError	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 386
+
+pdWriteError	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 387
+	
+pdAtaEccError	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 388
+	
+pdAtaChangeMode	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 389
+	
+pdTimeOut	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 390
+	
+pdMarkFailed	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 391
+	
+pdPciError	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 392
+	
+pdSmartFailed	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 393
+	
+pdCreatePass	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 394
+	
+pdModifyPass	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 395
+	
+pdDeletePass	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 396
+	
+pdTotals	 TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 397										
+
+-- SCSI Bus Traps
+scsiReset	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 512	
+	
+scsiParity	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 513	
+	
+scsiModeChange	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 514
+	
+scsiTotals	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 515
+	
+-- Hardware Monitor Traps	
+hwSdram1BitEcc		TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 640	
+
+hwSdramMultiBitEcc	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 641	
+	
+hwTempController	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 642	
+
+
+hwTempBackplane		TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 643
+
+hwVoltage15	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 644
+
+hwVoltage3	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 645
+
+hwVoltage5	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 646
+
+hwVoltage12	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 647
+	
+	
+hwVoltage1_3	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 648
+	
+hwVoltage2_5	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 649
+	
+hwVoltage1_25	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 650
+
+hwPower1Failed	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 651
+	
+hwFan1Failed	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 652
+	
+hwPower2Failed	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 653
+	
+hwFan2Failed	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 654
+	
+hwPower3Failed	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 655
+	
+hwFan3Failed	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 656
+
+hwPower4Failed	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 657
+	
+hwFan4Failed	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 658
+
+hwUpsPowerLoss	TRAP-TYPE	
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 659
+
+hwTempController_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 660
+
+
+hwTempBackplane_R		TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 661
+
+hwVoltage15_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 662
+
+hwVoltage3_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 663
+
+hwVoltage5_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 664
+
+hwVoltage12_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 665
+	
+	
+hwVoltage1_3_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 666
+	
+hwVoltage2_5_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 667
+	
+hwVoltage1_25_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 668
+
+hwPower1Failed_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 669
+	
+hwFan1Failed_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 670
+	
+hwPower2Failed_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 671
+	
+hwFan2Failed_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 672
+	
+hwPower3Failed_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 673
+	
+hwFan3Failed_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 674
+
+hwPower4Failed_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 675
+	
+hwFan4Failed_R	TRAP-TYPE
+	ENTERPRISE	raidSubSysTraps
+	VARIABLES	{ eventString }
+	DESCRIPTION
+		"%s."
+	::= 676
+	
+
+END
