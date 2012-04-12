@@ -88,8 +88,13 @@ function graph_error($string)
 }
 
 if ($error_msg) {
+  /// We have an error :(
+
   graph_error($graph_error);
+
 } elseif (!$auth) {
+  /// We are unauthenticated :(
+
   if ($width < 200)
   {
    graph_error("No Auth");
@@ -126,7 +131,26 @@ if ($error_msg) {
         if (!$debug)
         {
           header('Content-type: image/png');
-          $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
+          if($config['trim_tobias'])
+          {
+            list($w, $h, $type, $attr) = getimagesize($graphfile);
+            $src_im = imagecreatefrompng($graphfile);
+            $src_x = '0';   // begin x
+  	    $src_y = '0';   // begin y
+  	    $src_w = $w-12; // width
+	    $src_h = $h; // height
+	    $dst_x = '0';   // destination x
+	    $dst_y = '0';   // destination y
+	    $dst_im = imagecreatetruecolor($src_w, $src_h);
+	    $white = imagecolorallocate($dst_im, 255, 255, 255);
+	    imagefill($dst_im, 0, 0, $white);
+	    imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
+	    imagepng($dst_im);
+	    imagedestroy($dst_im);
+          } else {
+            $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
+          }
+
         } else {
           echo(`ls -l $graphfile`);
           echo('<img src="'.data_uri($graphfile,'image/png').'" alt="graph" />');
