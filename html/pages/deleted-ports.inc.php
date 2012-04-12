@@ -27,7 +27,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
   $interface = ifLabel($interface, $interface);
   if (port_permitted($interface['interface_id'], $interface['device_id']))
   {
-    echo("<tr class=list">);
+    echo("<tr class=list>");
     echo("<td width=250>".generate_device_link($interface)."</td>");
     echo("<td width=250>".generate_port_link($interface)."</td>");
     echo("<td></td>");
