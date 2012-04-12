@@ -132,6 +132,65 @@ $rewrite_junose_hardware = array(
   'juniSsx1440' => 'SSX-1440',
 );
 
+$rewrite_junos_hardware = array(
+  'jnxProductNameM40' => 'M40',
+  'jnxProductNameM20' => 'M20',
+  'jnxProductNameM160' => 'M160',
+  'jnxProductNameM10' => 'M10',
+  'jnxProductNameM5' => 'M5',
+  'jnxProductNameT640' => 'T640',
+  'jnxProductNameT320' => 'T320',
+  'jnxProductNameM40e' => 'M40e',
+  'jnxProductNameM320' => 'M320',
+  'jnxProductNameM7i' => 'M7i',
+  'jnxProductNameM10i' => 'M10i',
+  'jnxProductNameJ2300' => 'J2300',
+  'jnxProductNameJ4300' => 'J4300',
+  'jnxProductNameJ6300' => 'J6300',
+  'jnxProductNameIRM' => 'IRM',
+  'jnxProductNameTX' => 'TX',
+  'jnxProductNameM120' => 'M120',
+  'jnxProductNameJ4350' => 'J4350',
+  'jnxProductNameJ6350' => 'J6350',
+  'jnxProductNameMX960' => 'MX960',
+  'jnxProductNameJ4320' => 'J4320',
+  'jnxProductNameJ2320' => 'J2320',
+  'jnxProductNameJ2350' => 'J2350',
+  'jnxProductNameMX480' => 'MX480',
+  'jnxProductNameSRX5800' => 'SRX5800',
+  'jnxProductNameT1600' => 'T1600',
+  'jnxProductNameSRX5600' => 'SRX5600',
+  'jnxProductNameMX240' => 'MX240',
+  'jnxProductNameEX3200' => 'EX3200',
+  'jnxProductNameEX4200' => 'EX4200',
+  'jnxProductNameEX8208' => 'EX8208',
+  'jnxProductNameEX8216' => 'EX8216',
+  'jnxProductNameSRX3600' => 'SRX3600',
+  'jnxProductNameSRX3400' => 'SRX3400',
+  'jnxProductNameSRX210' => 'SRX210',
+  'jnxProductNameTXP' => 'TXP',
+  'jnxProductNameJCS' => 'JCS',
+  'jnxProductNameSRX240' => 'SRX240',
+  'jnxProductNameSRX650' => 'SRX650',
+  'jnxProductNameSRX100' => 'SRX100',
+  'jnxProductNameESR1000V' => 'ESR1000V',
+  'jnxProductNameEX2200' => 'EX2200',
+  'jnxProductNameEX4500' => 'EX4500',
+  'jnxProductNameFXSeries' => 'FX Series',
+  'jnxProductNameIBM4274M02J02M' => 'IBM4274M02J02M', # ?
+  'jnxProductNameIBM4274M06J06M' => 'IBM4274M06J06M', # ?
+  'jnxProductNameIBM4274M11J11M' => 'IBM4274M11J11M', # ?
+  'jnxProductNameSRX1400' => 'SRX1400',
+  'jnxProductNameIBM4274S58J58S' => 'IBM4274S58J58S', # ?
+  'jnxProductNameIBM4274S56J56S' => 'IBM4274S56J56S', # ?
+  'jnxProductNameIBM4274S36J36S' => 'IBM4274S36J36S', # ?
+  'jnxProductNameIBM4274S34J34S' => 'IBM4274S34J34S', # ?
+  'jnxProductNameIBM427348EJ48E' => 'IBM427348EJ48E', # ?
+  'jnxProductNameIBM4274E08J08E' => 'IBM4274E08J08E', # ?
+  'jnxProductNameIBM4274E16J16E' => 'IBM4274E16J16E', # ?
+  'jnxProductNameMX80' => 'MX80',
+);
+
 $rewrite_cisco_hardware = array(
 '.1.3.6.1.4.1.9.1.275' => 'C2948G-L3',
 );
@@ -900,6 +959,15 @@ function rewrite_junose_hardware ($hardware)
   global $rewrite_junose_hardware;
 
   $hardware = array_str_replace($rewrite_junose_hardware, $hardware);
+
+  return ($hardware);
+}
+
+function rewrite_junos_hardware ($hardware)
+{
+  global $rewrite_junos_hardware;
+
+  $hardware = array_str_replace($rewrite_junos_hardware, $hardware);
 
   return ($hardware);
 }
