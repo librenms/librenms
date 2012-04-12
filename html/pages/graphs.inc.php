@@ -179,7 +179,7 @@ if (!$auth)
     <form id='customrange' action=\"test\">
     <p>
   ");
-  echo("<input type=hidden id='selfaction' value='" . $_SERVER['PHP_SELF'] . "'>");
+  echo("<input type=hidden id='selfaction' value='" . $_SERVER['REQUEST_URI'] . "'>");
   echo("
     <strong>From:</strong> <input type='text' id='dtpickerfrom' maxlength=16 value='" . date('Y-m-d H:i', $graph_array['from']) . "'>
     <strong>To:</strong> <input type='text' id='dtpickerto' maxlength=16 value='" . date('Y-m-d H:i', $graph_array['to']) . "'>
