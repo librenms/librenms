@@ -13,5 +13,7 @@ include("includes/print-quadgraphs.inc.php");
 
 echo('</div>');
 
+$g_i++;
+
 ?>
 
