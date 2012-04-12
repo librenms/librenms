@@ -3,6 +3,7 @@
 if ($_GET['from'])    { $from   = mres($_GET['from']);   }
 if ($_GET['to'])      { $to     = mres($_GET['to']);     }
 if ($_GET['width'])   { $width  = mres($_GET['width']);  }
+if($config['trim_tobias']) { $width+=12; }
 if ($_GET['height'])  { $height = mres($_GET['height']); }
 if ($_GET['inverse']) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
 if ($_GET['legend'] == "no")  { $rrd_options = " -g"; }
