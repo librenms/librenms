@@ -28,8 +28,28 @@ if ($device['os'] == "junos")
       } ## End if checks
     } ## End Foreach
   } ## End if array
+  else
+  {
+    $srx_mempools_array = snmpwalk_cache_multi_oid($device, "jnxJsSPUMonitoringMemoryUsage", $srx_mempools_array, "JUNIPER-SRX5000-SPU-MONITORING-MIB" , '+'.$config['install_dir']."/mibs/junos");
+
+    if (is_array($srx_mempools_array))
+    {
+      foreach ($srx_mempools_array as $index => $entry)
+      {
+        if ($index)
+        {
+          $usage_oid = ".1.3.6.1.4.1.2636.3.39.1.12.1.1.1.5." . $index;
+          $descr = "Memory"; # No description in the table?
+          $usage = $entry['jnxJsSPUMonitoringMemoryUsage'];
+
+          discover_mempool($valid_mempool, $device, $index, "junos", $descr, "1", NULL, NULL);
+        }
+      }
+    }
+  }
 } ## End JUNOS mempools
 
 unset ($mempools_array);
+unset ($srx_mempools_array);
 
 ?>
