@@ -2,21 +2,15 @@
 
 ## We should walk, so we can discover here too.
 
-echo("Polling BGP peers\n");
-
 global $debug;
 
-if (!$config['enable_bgp'])
-{
-  echo("BGP Support Disabled\n");
-}
-else
+if ($config['enable_bgp'])
 {
   foreach (dbFetchRows("SELECT * FROM bgpPeers WHERE device_id = ?", array($device['device_id'])) as $peer)
   {
     ### Poll BGP Peer
 
-    echo("Checking ".$peer['bgpPeerIdentifier']." ");
+    echo("Checking BGP peer ".$peer['bgpPeerIdentifier']." ");
 
     if (!strstr($peer['bgpPeerIdentifier'],':'))
     {

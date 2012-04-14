@@ -19,14 +19,7 @@ if (count($toners))
     $free = formatStorage($toner['toner_free']);
     $used = formatStorage($toner['toner_used']);
 
-    $background['left'] = toner2colour($toner['toner_descr']);
-    unset($background['right']);
-    for ($i = 0;$i < strlen($background['left']); $i++)
-    {
-      $new = dechex(hexdec("0x" . $background['left'][$i])+1);
-      if (strlen($new) != 1) { $new = 'F'; }
-      $background['right'] .= $new;
-    }
+    $background = toner2colour($toner['toner_descr'], $percent);
     
     $graph_array           = array();
     $graph_array['height'] = "100";

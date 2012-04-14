@@ -1,9 +1,9 @@
 <?php
 
-echo("Wireless: ");
-
 if ($device['type'] == 'network' || $device['type'] == 'firewall')
 {
+  echo("Wireless: ");
+
   ##### GENERIC FRAMEWORK, FILLING VARIABLES
   if ($device['os'] == 'airport')
   {

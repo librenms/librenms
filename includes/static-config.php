@@ -739,6 +739,14 @@ $config['os'][$os]['icon']              = "ricoh";
 $config['os'][$os]['over'][0]['graph']  = "device_toner";
 $config['os'][$os]['over'][0]['text']   = "Toner";
 
+$os = "epson";
+$config['os'][$os]['group']             = "printer";
+$config['os'][$os]['text']              = "Epson Printer";
+$config['os'][$os]['type']              = "printer";
+$config['os'][$os]['icon']              = "epson";
+$config['os'][$os]['over'][0]['graph']  = "device_toner";
+$config['os'][$os]['over'][0]['text']   = "Toner";
+
 $os = "xerox";
 $config['os'][$os]['group']             = "printer";
 $config['os'][$os]['text']              = "Xerox Printer";
