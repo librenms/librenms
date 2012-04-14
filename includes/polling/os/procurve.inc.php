@@ -13,6 +13,12 @@ if ($altversion) { $version = $altversion; }
 $altversion = trim(snmp_get($device,".1.3.6.1.4.1.11.2.3.7.11.12.1.2.1.11.0", "-Oqv"),'"');
 if ($altversion) { $version = $altversion; }
 
+if (preg_match('/^PROCURVE (.*) - (.*)/', $poll_device['sysDescr'], $regexp_result))
+{
+  $hardware = "ProCurve " . $regexp_result[1];
+  $version = $regexp_result[2];
+}
+
 $serial = snmp_get($device, ".1.3.6.1.4.1.11.2.36.1.1.2.9.0", "-Oqv", "SEMI-MIB");
 $serial = trim(str_replace("\"", "", $serial));
 
