@@ -1,16 +1,16 @@
 <?php
 
-function toner2colour($descr)
+function toner2colour($descr, $percent)
 {
-  $colour = NULL;
+  $colour = get_percentage_colours(100-$percent);
 
-  if (substr($descr,-1) == 'C' || stripos($descr,"cyan"   ) !== false) { $colour = "55D6D3"; }
-  if (substr($descr,-1) == 'M' || stripos($descr,"magenta") !== false) { $colour = "F24AC8"; }
+  if (substr($descr,-1) == 'C' || stripos($descr,"cyan"   ) !== false) { $colour['left'] = "55D6D3"; $colour['right'] = "33B4B1"; }
+  if (substr($descr,-1) == 'M' || stripos($descr,"magenta") !== false) { $colour['left'] = "F24AC8"; $colour['right'] = "D028A6"; }
   if (substr($descr,-1) == 'Y' || stripos($descr,"yellow" ) !== false
                                || stripos($descr,"giallo" ) !== false
-                               || stripos($descr,"gul"    ) !== false) { $colour = "FFF200"; }
+                               || stripos($descr,"gul"    ) !== false) { $colour['left'] = "FFF200"; $colour['right'] = "DDD000"; }
   if (substr($descr,-1) == 'K' || stripos($descr,"black"  ) !== false
-                               || stripos($descr,"nero"   ) !== false) { $colour = "000000"; }
+                               || stripos($descr,"nero"   ) !== false) { $colour['left'] = "000000"; $colour['right'] = "222222"; }
 
   return $colour;       
 }
