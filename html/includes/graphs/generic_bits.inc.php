@@ -1,7 +1,7 @@
 <?php
 
 /// Draw generic bits graph
-/// args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse
+/// args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, previous
 
 include("includes/graphs/common.inc.php");
 
@@ -24,6 +24,39 @@ if ($multiplier)
   $rrd_options .= " DEF:".$in."octets=".$rrd_filename_in.":".$ds_in.":AVERAGE";
   $rrd_options .= " DEF:".$out."octets_max=".$rrd_filename_out.":".$ds_out.":MAX";
   $rrd_options .= " DEF:".$in."octets_max=".$rrd_filename_in.":".$ds_in.":MAX";
+}
+
+if($_GET['previous'] == "yes")
+{
+  if ($multiplier)
+  {
+    $rrd_options .= " DEF:p".$out."octetsX=".$rrd_filename_out.":".$ds_out.":AVERAGE:start=".$prev_from.":end=".$from;
+    $rrd_options .= " DEF:p".$in."octetsX=".$rrd_filename_in.":".$ds_in.":AVERAGE:start=".$prev_from.":end=".$from;
+    $rrd_options .= " SHIFT:p".$out."octetsX:$period";
+    $rrd_options .= " SHIFT:p".$in."octetsX:$period";
+    $rrd_options .= " CDEF:inoctetsX=pinoctetsX,$multiplier,*";
+    $rrd_options .= " CDEF:outoctetsX=poutoctetsX,$multiplier,*";
+  } else {
+    $rrd_options .= " DEF:".$out."octetsX=".$rrd_filename_out.":".$ds_out.":AVERAGE:start=".$prev_from.":end=".$from;
+    $rrd_options .= " DEF:".$in."octetsX=".$rrd_filename_in.":".$ds_in.":AVERAGE:start=".$prev_from.":end=".$from;
+    $rrd_options .= " SHIFT:".$out."octetsX:$period";
+    $rrd_options .= " SHIFT:".$in."octetsX:$period";
+  }
+
+  $rrd_options .= " CDEF:octetsX=inoctetsX,outoctetsX,+";
+  $rrd_options .= " CDEF:doutoctetsX=outoctetsX,-1,*";
+  $rrd_options .= " CDEF:outbitsX=outoctetsX,8,*";
+  #$rrd_options .= " CDEF:outbits_maxX=outoctets_maxX,8,*";
+  #$rrd_options .= " CDEF:doutoctets_maxX=outoctets_maxX,-1,*";
+  $rrd_options .= " CDEF:doutbitsX=doutoctetsX,8,*";
+  #$rrd_options .= " CDEF:doutbits_maxX=doutoctets_maxX,8,*";
+
+  $rrd_options .= " CDEF:inbitsX=inoctetsX,8,*";
+  #$rrd_options .= " CDEF:inbits_maxX=inoctets_maxX,8,*";
+  $rrd_options .= " VDEF:totinX=inoctetsX,TOTAL";
+  $rrd_options .= " VDEF:totoutX=outoctetsX,TOTAL";
+  $rrd_options .= " VDEF:totX=octetsX,TOTAL";
+
 }
 
 $rrd_options .= " CDEF:octets=inoctets,outoctets,+";
@@ -78,5 +111,11 @@ $rrd_options .= " GPRINT:totin:'(In %6.2lf%s'";
 $rrd_options .= " GPRINT:totout:'Out %6.2lf%s)\\\\l'";
 $rrd_options .= " LINE1:95thin#aa0000";
 $rrd_options .= " LINE1:d95thout#aa0000";
+
+if($_GET['previous'] == "yes")
+{
+  $rrd_options .= " LINE1.25:inbitsX#009900:'Prev In \\\\n'";
+  $rrd_options .= " LINE1.25:doutbitsX#000099:'Prev Out'";
+}
 
 ?>
