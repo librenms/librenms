@@ -165,7 +165,6 @@ $config['show_overview_tab'] = TRUE;
 $config['overview_show_sysDescr'] = TRUE;
 
 ### Enable version checker & stats
-
 $config['version_check']                = 1; # Enable checking of version in discovery
                                              # and submittal of basic stats used
                                              # to prioritise development effort :)
