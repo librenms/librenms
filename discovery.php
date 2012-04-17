@@ -112,7 +112,7 @@ if ($discovered_devices)
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $discovered_devices devices discovered in $proctime secs";
 if ($debug) echo("$string\n");
 
-if(!$options['h'] == "new" && $config['version_check']) {
+if($options['h'] != "new" && $config['version_check']) {
   include("includes/versioncheck.inc.php");
 }
 
