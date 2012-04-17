@@ -44,7 +44,7 @@ if (!$auth)
   {
     while (false !== ($file = readdir($handle)))
     {
-      if ($file != "." && $file != ".." && strstr($file, ".inc.php"))
+      if ($file != "." && $file != ".." && $file != "auth.inc.php" &&strstr($file, ".inc.php"))
       {
         $types[] = str_replace(".inc.php", "", $file);
       }
