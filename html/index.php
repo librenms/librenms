@@ -327,7 +327,16 @@ $('INPUT.auto-hint, TEXTAREA.auto-hint').focus(function() {
 <?php
 if (is_array($pagetitle))
 {
-  array_unshift($pagetitle,$config['page_title']);
+  # page_title is put in front, unless page_title_prefix is set
+  if (!$config['page_title_prefix']) { $config['page_title_prefix'] = $config['page_title']; }
+  
+  # if prefix is set, put it in front
+  if ($config['page_title_prefix']) { array_unshift($pagetitle,$config['page_title_prefix']); }
+  
+  # if suffix is set, put it in the back
+  if ($config['page_title_suffix']) { $pagetitle[] = $config['page_title_suffix']; }
+  
+  # create and set the title
   $title = join(" - ",$pagetitle);
   echo("<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>");
 }
