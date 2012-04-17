@@ -38,6 +38,20 @@ if (!$auth)
     $title .= " :: ".ucfirst($subtype);
   }
 
+  # Load our list of available graphtypes for this object
+  # Fixme not all of these are going to be valid
+  if ($handle = opendir($config['install_dir'] . "/html/includes/graphs/".$type."/"))
+  {
+    while (false !== ($file = readdir($handle)))
+    {
+      if ($file != "." && $file != ".." && strstr($file, ".inc.php"))
+      {
+        $types[] = str_replace(".inc.php", "", $file);
+      }
+    }
+    closedir($handle);
+  }
+
   $graph_array = $vars;
   $graph_array['height'] = "60";
   $graph_array['width']  = $thumb_width;
@@ -46,6 +60,25 @@ if (!$auth)
 
   print_optionbar_start();
   echo($title);
+
+  echo('<div style="float: right;">');
+  ?>
+  <form action="">
+  <select name='type' id='type'
+    onchange="window.open(this.options[this.selectedIndex].value,'_top')" >
+          <?php
+
+  foreach($types as $avail_type)
+  {
+    echo("<option value='".generate_url($vars, array('type' => $type."_".$avail_type, 'page' => "graphs"))."'");
+    if ($avail_type == $subtype) { echo(" selected"); }
+    echo(">".$avail_type."</option>");
+  }
+          ?>
+        </select>
+  <?php
+  echo('</div>');
+
   print_optionbar_end();
 
   // css and js for datetimepicker
