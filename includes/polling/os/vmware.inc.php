@@ -66,7 +66,7 @@ foreach ($db_info_list as $db_info)
   {
     $vm_info["vmwVmGuestOS"] = $db_info["vmwVmGuestOS"];
   }
- 
+
   /*
    * Process all the VMware Virtual Machine properties.
    */

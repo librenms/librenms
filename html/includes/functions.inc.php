@@ -12,7 +12,7 @@ function toner2colour($descr, $percent)
   if (substr($descr,-1) == 'K' || stripos($descr,"black"  ) !== false
                                || stripos($descr,"nero"   ) !== false) { $colour['left'] = "000000"; $colour['right'] = "222222"; }
 
-  return $colour;       
+  return $colour;
 }
 
 function generate_link($text, $vars, $new_vars = array())

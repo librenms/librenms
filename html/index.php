@@ -127,7 +127,7 @@ if (isset($config['branding']) && is_array($config['branding']))
 
 # page_title_prefix is displayed, unless page_title is set
 if ($config['page_title']) { $config['page_title_prefix'] = $config['page_title']; }
-    
+
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -333,10 +333,10 @@ if (is_array($pagetitle))
 {
   # if prefix is set, put it in front
   if ($config['page_title_prefix']) { array_unshift($pagetitle,$config['page_title_prefix']); }
-  
+
   # if suffix is set, put it in the back
   if ($config['page_title_suffix']) { $pagetitle[] = $config['page_title_suffix']; }
-  
+
   # create and set the title
   $title = join(" - ",$pagetitle);
   echo("<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>");
