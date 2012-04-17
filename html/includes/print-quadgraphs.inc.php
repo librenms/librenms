@@ -15,7 +15,6 @@ if($_SESSION['widescreen'])
 
 $graph_array['to']     = $config['time']['now'];
 
-#echo('<p class="badtobias"');
 foreach ($periods as $period)
 {
   $graph_array['from']        = $config['time'][$period];
@@ -30,6 +29,5 @@ foreach ($periods as $period)
 
   echo(overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL));
 }
-#echo('</p>');
 
 ?>
