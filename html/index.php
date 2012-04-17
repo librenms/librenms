@@ -124,11 +124,15 @@ if (isset($config['branding']) && is_array($config['branding']))
     }
   }
 }
+
+# page_title_prefix is displayed, unless page_title is set
+if ($config['page_title']) { $config['page_title_prefix'] = $config['page_title']; }
+    
 ?>
 <!DOCTYPE HTML>
 <html>
 <head>
-  <title><?php echo($config['page_title']); ?></title>
+  <title><?php echo($config['page_title_prefix']); ?></title>
   <base href="<?php echo($config['base_url']); ?>" />
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
@@ -327,9 +331,6 @@ $('INPUT.auto-hint, TEXTAREA.auto-hint').focus(function() {
 <?php
 if (is_array($pagetitle))
 {
-  # page_title is put in front, unless page_title_prefix is set
-  if (!$config['page_title_prefix']) { $config['page_title_prefix'] = $config['page_title']; }
-  
   # if prefix is set, put it in front
   if ($config['page_title_prefix']) { array_unshift($pagetitle,$config['page_title_prefix']); }
   
