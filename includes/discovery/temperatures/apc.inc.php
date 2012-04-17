@@ -17,7 +17,7 @@ if ($device['os'] == "apc")
   }
 
   # Environmental monitoring on UPSes etc
-  # FIXME emConfigProbesTable may also be used? But not filled out on my device... 
+  # FIXME emConfigProbesTable may also be used? But not filled out on my device...
   $apc_env_data = snmpwalk_cache_oid($device, "iemConfigProbesTable", array(), "PowerNet-MIB");
   $apc_env_data = snmpwalk_cache_oid($device, "iemStatusProbesTable", $apc_env_data, "PowerNet-MIB");
 
@@ -31,7 +31,7 @@ if ($device['os'] == "apc")
     $low_warn_limit  = ($apc_env_data[$index]['iemConfigProbeLowTempEnable']  != 'disabled' ? $apc_env_data[$index]['iemConfigProbeLowTempThreshold'] : NULL);
     $high_warn_limit = ($apc_env_data[$index]['iemConfigProbeHighTempEnable'] != 'disabled' ? $apc_env_data[$index]['iemConfigProbeHighTempThreshold'] : NULL);
     $high_limit      = ($apc_env_data[$index]['iemConfigProbeMaxTempEnable']  != 'disabled' ? $apc_env_data[$index]['iemConfigProbeMaxTempThreshold'] : NULL);
-    
+
     discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit , $current);
   }
 

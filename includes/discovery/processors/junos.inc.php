@@ -30,7 +30,7 @@ if ($device['os'] == "junos")
   } ## End if array
   else
   {
-    $srx_processors_array = snmpwalk_cache_multi_oid($device, "jnxJsSPUMonitoringCPUUsage", $srx_processors_array, "JUNIPER-SRX5000-SPU-MONITORING-MIB" , '+'.$config['install_dir']."/mibs/junos");  
+    $srx_processors_array = snmpwalk_cache_multi_oid($device, "jnxJsSPUMonitoringCPUUsage", $srx_processors_array, "JUNIPER-SRX5000-SPU-MONITORING-MIB" , '+'.$config['install_dir']."/mibs/junos");
 
     if (is_array($srx_processors_array))
     {
@@ -41,7 +41,7 @@ if ($device['os'] == "junos")
           $usage_oid = ".1.3.6.1.4.1.2636.3.39.1.12.1.1.1.4." . $index;
           $descr = "CPU"; # No description in the table?
           $usage = $entry['jnxJsSPUMonitoringCPUUsage'];
-         
+
           discover_processor($valid['processor'], $device, $usage_oid, $index, "junos", $descr, "1", $usage, NULL, NULL);
         }
       }

@@ -74,7 +74,7 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry)
 
       $minigraph =  generate_graph_tag($graph_array);
 
-      echo("<tr class=device-overview>                     
+      echo("<tr class=device-overview>
           <td width=10></td>
           <td width=200><strong>Fabric ".$subindex."</strong></td>
           <td><span style='font-weight: bold;' class=".$fabric['mode_class'].">".
