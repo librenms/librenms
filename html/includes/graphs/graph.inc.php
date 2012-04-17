@@ -19,6 +19,10 @@ $to       = (isset($_GET['to']) ? $_GET['to'] : time());
 
 if ($from < 0) { $from = $to + $from; }
 
+$period = $to - $from;
+
+$prev_from = $from - $period;
+
 $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $_GET['type'], $graphtype);
