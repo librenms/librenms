@@ -230,6 +230,18 @@ if (!$auth)
     echo(generate_link("Hide Legend",$vars, array('page' => "graphs", 'legend' => "no")));
   }
 
+  ### FIXME : do this properly
+  if($type == "port" && $subtype == "bits")
+  {
+    echo(' | ');
+    if ($vars['previous'] == "yes")
+    {
+      echo(generate_link("Hide Previous",$vars, array('page' => "graphs", 'previous' => NULL)));
+    } else {
+      echo(generate_link("Show Previous",$vars, array('page' => "graphs", 'previous' => "yes")));
+    }
+  }
+
   echo('<div style="float: right;">');
 
   if ($vars['showcommand'] == "yes")
