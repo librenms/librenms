@@ -1145,6 +1145,7 @@ if ($config['memcached']['enable'])
   else
   {
     echo("WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n");
+    echo("Try 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to do so.\n\n");
     $config['memcached']['enable'] = 0;
   }
 }
