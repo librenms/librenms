@@ -1,14 +1,19 @@
 <?php
 
-#Polls MySQL  statistics from script via SNMP
+### Fixme - this is lame
+if(!empty($agent_data['mysql']))
+{
+  $mysql = $agent_data['mysql'];
+} else {
+  #Polls MySQL  statistics from script via SNMP
+  $mysql_cmd  = $config['snmpget'] ." -m NET-SNMP-EXTEND-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  $mysql_cmd .= " nsExtendOutputFull.5.109.121.115.113.108";
+  $mysql  = shell_exec($mysql_cmd);
+}
 
 $mysql_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
-$mysql_cmd  = $config['snmpget'] ." -m NET-SNMP-EXTEND-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
-$mysql_cmd .= " nsExtendOutputFull.5.109.121.115.113.108";
 
-$mysql  = shell_exec($mysql_cmd);
-
-echo(" mysql...");
+echo(" mysql");
 
 $data = explode("\n", $mysql);
 
