@@ -146,8 +146,10 @@ if ($error_msg) {
             $dst_x = '0';   // destination x
             $dst_y = '0';   // destination y
             $dst_im = imagecreatetruecolor($src_w, $src_h);
+ 	    imagesavealpha($dst_im, true);
             $white = imagecolorallocate($dst_im, 255, 255, 255);
-            imagefill($dst_im, 0, 0, $white);
+	    $trans_colour = imagecolorallocatealpha($dst_im, 0, 0, 0, 127);
+	    imagefill($dst_im, 0, 0, $trans_colour);
             imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
             imagepng($dst_im);
             imagedestroy($dst_im);

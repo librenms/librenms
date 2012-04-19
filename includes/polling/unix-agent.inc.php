@@ -2,7 +2,7 @@
 
 if($device['os_group'] == "unix") {
 
-echo("Observium *nix Agent: ");
+echo("Observium UNIX Agent: ");
 
 $port='6556';
 
@@ -27,9 +27,12 @@ if(!empty($agent_raw))
     $agent_data[$section] = trim($data);
   }
 
+  ## FIXME - split these into separate modules which are "autoloaded" when the section exists.
+
+  ### RPM
   if (!empty($agent_data['rpm']))
   {
-    echo("RPM Packages ");
+    echo("\nRPM Packages: ");
     ## Build array of existing packages
     $manager = "rpm";
 
@@ -60,56 +63,59 @@ if(!empty($agent_raw))
         $text = $manager."-".$name."-".$arch."-".$version."-".$build;
         $pkgs_id[] = $pkgs[$manager][$name][$arch][$version][$build];
     }
-
-    foreach ($pkgs_id as $pkg) {
-      $name    = $pkg['name'];
-      $version = $pkg['version'];
-      $build   = $pkg['build'];
-      $arch    = $pkg['arch'];
-      $size    = $pkg['size'];
-
-      #echo(str_pad($name, 20)." ".str_pad($version, 10)." ".str_pad($build, 10)." ".$arch."\n");
-      #echo($name." ");
-
-      if (is_array($pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]))
-      {
-        ### FIXME - packages_history table
-        $id = $pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]['id'];
-        if ($pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]['status'] != '1')
-        {
-          $pkg_update['status']  = '1';
-        }
-        if ($pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]['size'] != $size)
-        {
-          $pkg_update['size']  = $size;
-        }
-        if (!empty($pkg_update))
-        {
-          dbUpdate($pkg_update, 'packages', '`pkg_id` = ?', array($id));
-          echo("u");
-        } else {
-          echo(".");
-        }
-        unset($pkgs_db_id[$id]);
-      } else {
-        if (count($pkgs[$manager][$name][$arch], 1) > "10" || count($pkgs_db[$manager][$name][$arch], 1) == '0') {
-          dbInsert(array('device_id' => $device['device_id'], 'name' => $name, 'manager' => $manager,
-                       'status' => 1, 'version' => $version, 'build' => $build, 'arch' => $arch, 'size' => $size), 'packages');
-          echo("+".$name."-".$version."-".$build."-".$arch);
-          log_event('Package installed: '.$name.' ('.$arch.') version '.$version.'-'.$build, $device, 'package');
-        } elseif(count($pkgs_db[$manager][$name][$arch], 1)) {
-          $pkg_c = dbFetchRow("SELECT * FROM `packages` WHERE `device_id` = ? AND `manager` = ? AND `name` = ? and `arch` = ? ORDER BY version DESC, build DESC", array($device['device_id'], $manager, $name, $arch));
-          echo("U(".$pkg_c['name']."-".$pkg_c['version']."-".$pkg_c['build']."|".$name."-".$version."-".$build.")");
-          $pkg_update = array('version' => $version, 'build' => $build, 'status' => '1', 'size' => $size);
-          dbUpdate($pkg_update, 'packages', '`pkg_id` = ?', array($pkg_c['pkg_id']));
-          log_event('Package updated: '.$name.' ('.$arch.') from '.$pkg_c['version'].'-'.$pkg_c['build'] .' to '.$version.'-'.$build, $device, 'package');
-          unset($pkgs_db_id[$pkg_c['pkg_id']]);
-        }
-      }
-      unset($pkg_update);
-    }
   }
 
+
+  ## This is run for all "packages" and is common to RPM/DEB/etc
+  foreach ($pkgs_id as $pkg) {
+    $name    = $pkg['name'];
+    $version = $pkg['version'];
+    $build   = $pkg['build'];
+    $arch    = $pkg['arch'];
+    $size    = $pkg['size'];
+
+    #echo(str_pad($name, 20)." ".str_pad($version, 10)." ".str_pad($build, 10)." ".$arch."\n");
+    #echo($name." ");
+
+    if (is_array($pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]))
+    {
+      ### FIXME - packages_history table
+      $id = $pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]['id'];
+      if ($pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]['status'] != '1')
+      {
+        $pkg_update['status']  = '1';
+      }
+      if ($pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]['size'] != $size)
+      {
+        $pkg_update['size']  = $size;
+      }
+      if (!empty($pkg_update))
+      {
+       dbUpdate($pkg_update, 'packages', '`pkg_id` = ?', array($id));
+        echo("u");
+      } else {
+        echo(".");
+      }
+      unset($pkgs_db_id[$id]);
+    } else {
+      if (count($pkgs[$manager][$name][$arch], 1) > "10" || count($pkgs_db[$manager][$name][$arch], 1) == '0') {
+        dbInsert(array('device_id' => $device['device_id'], 'name' => $name, 'manager' => $manager,
+                     'status' => 1, 'version' => $version, 'build' => $build, 'arch' => $arch, 'size' => $size), 'packages');
+        echo("+".$name."-".$version."-".$build."-".$arch);
+        log_event('Package installed: '.$name.' ('.$arch.') version '.$version.'-'.$build, $device, 'package');
+      } elseif(count($pkgs_db[$manager][$name][$arch], 1)) {
+        $pkg_c = dbFetchRow("SELECT * FROM `packages` WHERE `device_id` = ? AND `manager` = ? AND `name` = ? and `arch` = ? ORDER BY version DESC, build DESC", array($device['device_id'], $manager, $name, $arch));
+        echo("U(".$pkg_c['name']."-".$pkg_c['version']."-".$pkg_c['build']."|".$name."-".$version."-".$build.")");
+        $pkg_update = array('version' => $version, 'build' => $build, 'status' => '1', 'size' => $size);
+        dbUpdate($pkg_update, 'packages', '`pkg_id` = ?', array($pkg_c['pkg_id']));
+        log_event('Package updated: '.$name.' ('.$arch.') from '.$pkg_c['version'].'-'.$pkg_c['build'] .' to '.$version.'-'.$build, $device, 'package');
+        unset($pkgs_db_id[$pkg_c['pkg_id']]);
+      }
+    }
+    unset($pkg_update);
+  }
+
+  ## Packages
   foreach ($pkgs_db_id as $id => $pkg)
   {
     dbDelete('packages', "`pkg_id` =  ?", array($id));
@@ -117,6 +123,60 @@ if(!empty($agent_raw))
     log_event('Package removed: '.$pkg['name'].' '.$pkg['arch'].' '.$pkg['version'].'-'.$pkg['build'], $device, 'package');
   }
 
+  ### Processes
+  if (!empty($agent_data['ps']))
+  {
+    echo("\nProcesses: ");
+    foreach (explode("\n", $agent_data['ps']) as $process)
+    {
+        $process = preg_replace("/\((.*),([0-9]*),([0-9]*),([0-9\.]*)\)\ (.*)/", "\\1|\\2|\\3|\\4|\\5", $process);
+        list($user, $vsz, $rss, $pcpu, $command) = explode("|", $process, 5);
+	$processlist[] = array('user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'pcpu' => $pcpu, 'command' => $command);
+    }
+    #print_r($processlist);
+  }
+
+  ### Apache
+  if (!empty($agent_data['apache']))
+  {
+    $app_found['apache'] = TRUE;
+    if(dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?", array($device['device_id'], 'apache')) == "0")
+    {
+      echo("Found new application 'Apache'\n");
+      dbInsert(array('device_id' => $device['device_id'], 'app_type' => 'apache'), 'applications');
+    }
+  }
+
+  ### MySQL
+  if (!empty($agent_data['mysql']))
+  {
+    $app_found['mysql'] = TRUE;
+    if(dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?", array($device['device_id'], 'mysql')) == "0")
+    {
+      echo("Found new application 'MySQL'\n");
+      dbInsert(array('device_id' => $device['device_id'], 'app_type' => 'mysql'), 'applications');
+    }
+  }
+
+  ### DRBd
+  if (!empty($agent_data['drbd']))
+  {
+    $agent_data['drbd_raw'] = $agent_data['drbd'];
+    $agent_data['drbd'] = array();
+    foreach (explode("\n", $agent_data['drbd_raw']) as $drbd_entry)
+    {
+      list($drbd_dev, $drbd_data) = explode(":", $drbd_entry);
+      if(preg_match("/^drbd/", $drbd_dev))
+      {
+        $agent_data['drbd'][$drbd_dev] = $drbd_data;
+        if(dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?", array($device['device_id'], 'drbd', $drbd_dev)) == "0")
+        {
+          echo("Found new application 'DRBd' $drbd_dev\n");
+          dbInsert(array('device_id' => $device['device_id'], 'app_type' => 'drbd', 'app_instance' => $drbd_dev), 'applications');
+        }
+      }
+    }
+  }
 }
 
  unset($pkg);
