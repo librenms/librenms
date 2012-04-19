@@ -1,0 +1,302 @@
+CYCLADES-ACS-PM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	cyACSMgmt
+		FROM CYCLADES-ACS-MIB
+	OBJECT-TYPE, MODULE-IDENTITY, Integer32
+		FROM SNMPv2-SMI
+	InterfaceIndex, InterfaceIndexOrZero
+		FROM IF-MIB
+	DisplayString
+		FROM SNMPv2-TC;
+
+cyPM   MODULE-IDENTITY
+	LAST-UPDATED	"200508290000Z"
+	ORGANIZATION	"Cyclades Corporation"
+	CONTACT-INFO	"postal : Cyclades Corporation
+				  3541 Gateway Boulevard
+				  Fremont, CA 94538, USA
+			 e-mail : Technical Support
+				  support@cyclades.com"
+	DESCRIPTION	"This module defines objects of the Proxy for PM "
+	REVISION	"200508290000Z"
+	DESCRIPTION	"Changed the Contact-Info"
+	REVISION	"200310170000Z"
+	DESCRIPTION	"First Draft"
+::= { cyACSMgmt 5 }
+
+cyNumberOfPM		OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of PM's connected on the unit"
+::= { cyPM 1 }
+ 
+cyPMTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CyPMEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Allows to read information about each connected PM"
+::= { cyPM 2 }
+
+cyPMEntry	OBJECT-TYPE
+	SYNTAX		CyPMEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Information about the connected PM"
+	INDEX		{ cyPMSerialPortNumber }
+::= { cyPMTable 1 }
+
+CyPMEntry ::= SEQUENCE  {
+	cyPMSerialPortNumber	InterfaceIndex,     
+	cyPMNumberOutlets Integer32,
+	cyPMNumberUnits	Integer32,
+	cyPMCurrent	DisplayString,
+	cyPMVersion	DisplayString,
+	cyPMTemperature	DisplayString,
+	cyPMCommand	DisplayString
+}
+
+cyPMSerialPortNumber	OBJECT-TYPE
+	SYNTAX		InterfaceIndex	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of the serial port when the PM is connected."
+::= { cyPMEntry 1 }
+
+cyPMNumberOutlets	OBJECT-TYPE
+	SYNTAX		Integer32	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Number of outlets."
+::= { cyPMEntry 2 }
+
+cyPMNumberUnits		OBJECT-TYPE
+	SYNTAX		Integer32	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Total number of PM unists that are accessed by this 
+			serial port."
+::= { cyPMEntry 3 }
+
+cyPMCurrent	OBJECT-TYPE
+	SYNTAX		DisplayString	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Current reading for the PM."
+::= { cyPMEntry 4 }
+
+cyPMVersion	OBJECT-TYPE
+	SYNTAX		DisplayString	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The software version of the PM."
+::= { cyPMEntry 5 }
+
+cyPMTemperature	OBJECT-TYPE
+	SYNTAX		DisplayString	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The PM temperature."
+::= { cyPMEntry 6 }
+
+cyPMCommand		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (1..100))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"A character string for the user to send commands to
+			PM. He can use it to does the save command.
+			Or to list the outlets that need to be turned off, 
+			or turned on , or cycled or locked or unlocked as a 
+			group. The command is the first word and is followed 
+			by a space and the outlet list (otulets commands). 
+			Valid commands are 'on', 'off', 'cycle', 'lock',
+			'unlock', 'save'."
+::= { cyPMEntry 7 }
+
+cyPMUnitTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CyPMUnitEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Allow operations on specific PM unit connected"
+::= { cyPM 3 }
+
+cyPMUnitEntry	OBJECT-TYPE
+	SYNTAX		CyPMUnitEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Allow operations on outlet"
+	INDEX		{ cyPMSerialPortNumber, cyPMUnitNumber }
+::= { cyPMUnitTable 1 }
+
+CyPMUnitEntry ::= SEQUENCE  {
+	cyPMUnitNumber		InterfaceIndex,     
+	cyPMUnitVersion		DisplayString,
+	cyPMUnitOutlets		Integer32,
+	cyPMUnitFirstOutlet 	Integer32,
+	cyPMUnitCurrent		Integer32,
+	cyPMUnitMaxCurrent 	Integer32,
+	cyPMUnitTemperature 	Integer32,
+	cyPMUnitMaxTemperature 	Integer32
+}
+
+cyPMUnitNumber	OBJECT-TYPE
+	SYNTAX		InterfaceIndex	
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"The number of the PM unit in the daisy-chained mode."
+::= { cyPMUnitEntry 1 }
+
+cyPMUnitVersion	OBJECT-TYPE
+	SYNTAX		DisplayString	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The software version of this PM unit."
+::= { cyPMUnitEntry 2 }
+
+cyPMUnitOutlets	OBJECT-TYPE
+	SYNTAX		Integer32	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Number of outlets of this PM unit."
+::= { cyPMUnitEntry 3 }
+
+cyPMUnitFirstOutlet	OBJECT-TYPE
+	SYNTAX		Integer32	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Number of the first outlet of this PM unit."
+::= { cyPMUnitEntry 4 }
+
+cyPMUnitCurrent	OBJECT-TYPE
+	SYNTAX		Integer32	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Current of this PM unit in AMP.
+			The value of this object is the actual current in 
+                        AMP * 10. You need to translate the readed value
+                        (Ex. : value is 5, the current is 0.5 AMP.)" 
+::= { cyPMUnitEntry 5 }
+
+cyPMUnitMaxCurrent	OBJECT-TYPE
+	SYNTAX		Integer32	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Maximum current of this PM unit in AMP.
+			The value of this object is the maximum current in 
+                        AMP * 10. You need to translate the readed value
+                        (Ex. : value is 5, the maximum current is 0.5 AMP.)" 
+::= { cyPMUnitEntry 6 }
+
+cyPMUnitTemperature	OBJECT-TYPE
+	SYNTAX		Integer32	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Temperature of this PM unit in Celsius degrees.
+			The value of this object is the actual temperature in 
+                        degrees C * 10. You need to translate the readed value
+                        (Ex. : value is 240, the temperature is 24 Celsius.) 
+			If the temperature measurement is not installed this 
+			value will be 0.
+                        Valid values are 5 to 999 ( 0.5 to 99.9 Celsius)."
+::= { cyPMUnitEntry 7 }
+
+cyPMUnitMaxTemperature	OBJECT-TYPE
+	SYNTAX		Integer32	
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Maximum temperature value of this PM unit in Celsius 
+			degrees. The value of this object is the maximum 
+			temperature in degrees C * 10. You need to translate 
+			the readed value(Ex. : value is 240, the maximum
+			temperature is 24 Celsius). 
+			If the temperature measurement is not installed this 
+			value will be 0.
+                        Valid values are 5 to 999 ( 0.5 to 99.9 Celsius)."
+::= { cyPMUnitEntry 8 }
+
+cyOutletTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CyOutletEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Allow operations on outlet"
+::= { cyPM 4 }
+
+cyOutletEntry	OBJECT-TYPE
+	SYNTAX		CyOutletEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Allow operations on outlet"
+	INDEX		{ cyPMSerialPortNumber, cyOutletNumber }
+::= { cyOutletTable 1 }
+
+CyOutletEntry ::= SEQUENCE  {
+	cyOutletNumber	InterfaceIndexOrZero,     
+	cyOutletName	DisplayString,
+	cyOutletServer	DisplayString,
+	cyOutletPower	INTEGER,
+	cyOutletLock	INTEGER,
+	cyOutletPUInterval Integer32
+}
+
+cyOutletNumber	OBJECT-TYPE
+	SYNTAX		InterfaceIndexOrZero	
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"The outlet number on the PM. Zero is ALL outlets."
+::= { cyOutletEntry 1 }
+
+cyOutletName OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(1 .. 8))	
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The name given to a particular outlet Maximum size is 8 characters."
+::= { cyOutletEntry 2 }
+
+cyOutletServer OBJECT-TYPE
+	SYNTAX		DisplayString 	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Alias of the Server connected to this outlet ."
+::= { cyOutletEntry 3 }
+
+cyOutletPower	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			off	(0),
+			on	(1),
+			cycle	(2),
+			unknow  (3)
+		}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Getting this object will return the power state of
+			the outlet. Valid return states are UNKNOW, OFF and
+			ON. Setting this object will change the power state 
+			of the outlet."
+::= { cyOutletEntry 4 }
+
+cyOutletLock	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			unlock	(0),
+			lock	(1),
+			unknow 	(2)
+		}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Getting this object will return the lock state of
+			the outlet. Setting this object will change the 
+			lock state of the outlet."
+::= { cyOutletEntry 5 }
+
+cyOutletPUInterval	OBJECT-TYPE
+	SYNTAX		Integer32	
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The power unit interval of this outlet in seconds.
+			The value of this object is the actual interval in 
+                        seconds * 10. You need to translate the readed value
+                        (Ex. : value is 5, the interval is 0.5 seconds.)" 
+::= { cyOutletEntry 6 }
+
+END
+

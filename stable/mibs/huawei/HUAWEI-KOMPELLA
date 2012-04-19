@@ -1,0 +1,970 @@
+--  ==================================================================
+-- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI KOMPELLA Management MIB
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              V1.0 PanJun, 2006-05-09, publish
+-- ==================================================================
+
+    HUAWEI-KOMPELLA-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            HWL2VpnVcEncapsType, HWEnableValue, HWL2VpnStateChangeReason            
+                FROM HUAWEI-VPLS-EXT-MIB            
+            InterfaceIndex            
+                FROM IF-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DisplayString, RowStatus, TruthValue            
+                FROM SNMPv2-TC;
+    
+    
+        hwL2VpnKompella MODULE-IDENTITY 
+            LAST-UPDATED "200605090900Z"        -- May 09, 2006 at 09:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd."
+            CONTACT-INFO 
+                "R&D BeiJing, Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                Zip:100085 
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com"
+            DESCRIPTION 
+                "The HUAWEI-KOMPELLA-MIB contains objects to
+                manage KOMPELLA."
+            ::= { hwL2Vpn 2 }
+        
+    
+    
+--
+-- Node definitions
+--
+    
+        hwL2Vpn OBJECT IDENTIFIER ::= { hwDatacomm 119 }
+        
+        hwKompellaMIBObjects OBJECT IDENTIFIER ::= { hwL2VpnKompella 1 }
+        
+--         
+-- The KOMPELLA's Vpn Table
+-- 
+        hwKompellaVpnTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWKompellaVpnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the VPN's configuration table. Users can 
+                create or delete the VPN by it."
+            ::= { hwKompellaMIBObjects 1 }
+        
+        hwKompellaVpnEntry OBJECT-TYPE
+            SYNTAX HWKompellaVpnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a Vpn entry."
+            INDEX { hwKompellaVpnName }
+            ::= { hwKompellaVpnTable 1 }
+        
+        HWKompellaVpnEntry ::=
+            SEQUENCE { 
+                hwKompellaVpnName
+                    DisplayString,
+                hwKompellaVpnVcType
+                    HWL2VpnVcEncapsType,
+                hwKompellaVpnRouteDistinguisher
+                    DisplayString,
+                hwKompellaVpnCtrlWord
+                    HWEnableValue,
+                hwKompellaVpnMtu
+                    Unsigned32,
+                hwKompellaVpnRowStatus
+                    RowStatus
+             }
+
+        hwKompellaVpnName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The human-readable name of this VPN."
+            ::= { hwKompellaVpnEntry 1 }
+        
+        hwKompellaVpnVcType OBJECT-TYPE
+            SYNTAX HWL2VpnVcEncapsType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This value indicates the service to be carried."
+            ::= { hwKompellaVpnEntry 2 }
+        
+        hwKompellaVpnRouteDistinguisher OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (3..21))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The route distinguisher for this VPN.
+                This value must be exclusive on the whole.
+                If this node hasn't been configured, the entry of 
+                hwKompellaCeTable or hwKompellaVcTable can not be 
+                created."
+            ::= { hwKompellaVpnEntry 3 }
+        
+        hwKompellaVpnCtrlWord OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This value indicates the control word capability."
+            ::= { hwKompellaVpnEntry 4 }
+        
+        hwKompellaVpnMtu OBJECT-TYPE
+            SYNTAX Unsigned32 (0|46..16352)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object specifies max transport unit."
+            ::= { hwKompellaVpnEntry 5 }
+        
+        hwKompellaVpnRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table.
+                Restriction:
+                  Only hwKompellaVpnMtu can be modified. 
+                  If delete a VPN, the entries of hwKompellaCeTable
+                  and hwKompellaVcTable under this VPN will be 
+                  deleted too."
+            ::= { hwKompellaVpnEntry 51 }
+        
+--         
+-- The KOMPELLA's Vpn Target Table
+-- 
+        hwKompellaVpnTargetTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWKompellaVpnTargetEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the VPN Target's configuration table. Users
+                can create or delete the Vpn target of a VPN by it."
+            ::= { hwKompellaMIBObjects 2 }
+        
+        hwKompellaVpnTargetEntry OBJECT-TYPE
+            SYNTAX HWKompellaVpnTargetEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a Vpn target entry."
+            INDEX { hwKompellaVpnName, hwKompellaVpnTargetType,hwKompellaVpnTarget }
+            ::= { hwKompellaVpnTargetTable 1 }
+        
+        HWKompellaVpnTargetEntry ::=
+            SEQUENCE { 
+--                hwKompellaVpnTargetIndex
+--                    Unsigned32,
+                hwKompellaVpnTargetType
+                    INTEGER,
+                hwKompellaVpnTarget
+                    DisplayString,
+                hwKompellaVpnTargetRowStatus
+                    RowStatus
+             }
+
+--        hwKompellaVpnTargetIndex OBJECT-TYPE
+--            SYNTAX Unsigned32 (1..16)
+--            MAX-ACCESS not-accessible
+--            STATUS current
+--            DESCRIPTION
+--                "Auxiliary index for route-targets configured for a
+--                particular VPN."
+--            ::= { hwKompellaVpnTargetEntry 1 }
+        
+        hwKompellaVpnTargetType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                import(1),
+                export(2)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The route target export distribution type."
+            ::= { hwKompellaVpnTargetEntry 2 }
+        
+        hwKompellaVpnTarget OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (3..21))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The route target distribution policy."
+            ::= { hwKompellaVpnTargetEntry 3 }
+        
+        hwKompellaVpnTargetRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table.
+                Restriction:
+                  The VPN designated by hwKompellaVpnName must be
+                  created first.
+                  Not support modifying configuration."
+            ::= { hwKompellaVpnTargetEntry 51 }
+        
+--         
+-- The KOMPELLA's CE Table
+-- 
+        hwKompellaCeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWKompellaCeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the CE configuration table. Users
+                can create or delete the CE of a VPN by it."
+            ::= { hwKompellaMIBObjects 3 }
+        
+        hwKompellaCeEntry OBJECT-TYPE
+            SYNTAX HWKompellaCeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a CE entry."
+            INDEX { hwKompellaVpnName, hwKompellaCeID }
+            ::= { hwKompellaCeTable 1 }
+        
+        HWKompellaCeEntry ::=
+            SEQUENCE { 
+                hwKompellaCeID
+                    Unsigned32,
+                hwKompellaCeName
+                    DisplayString,
+                hwKompellaCeIDRange
+                    Unsigned32,
+                hwKompellaCeIDDefaultOffset
+                    Unsigned32,
+                hwKompellaCeRowStatus
+                    RowStatus
+             }
+
+        hwKompellaCeID OBJECT-TYPE
+            SYNTAX Unsigned32 (0..249)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The unique ID in a VPN identifies a local CE."
+            ::= { hwKompellaCeEntry 1 }
+        
+        hwKompellaCeName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..20))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The human-readable name of this CE."
+            ::= { hwKompellaCeEntry 2 }
+        
+        hwKompellaCeIDRange OBJECT-TYPE
+            SYNTAX Unsigned32 (1..250)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The CE ID range available."
+            ::= { hwKompellaCeEntry 3 }
+        
+        hwKompellaCeIDDefaultOffset OBJECT-TYPE
+            SYNTAX Unsigned32 (0..1)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Value of default original CE offset, default value is 0."
+            ::= { hwKompellaCeEntry 4 }
+        
+        hwKompellaCeRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table.
+                Restriction:
+                  The VPN designated by hwKompellaVpnName must be
+                  created first.
+                  Not support modifying configuration.
+                  If delete a CE, the entries of hwKompellaVcTable
+                  under this CE will be deleted too."
+            ::= { hwKompellaCeEntry 51 }
+        
+--         
+-- The KOMPELLA's VC Table
+-- 
+        hwKompellaVcTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWKompellaVcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the VC configuration table. Users
+                can create or delete the VC of a VPN by it."
+            ::= { hwKompellaMIBObjects 4 }
+        
+        hwKompellaVcEntry OBJECT-TYPE
+            SYNTAX HWKompellaVcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a VC entry."
+            INDEX { hwKompellaVpnName, hwKompellaCeID, hwKompellaVcIfIndex, hwKompellaVcRmtCeID }
+            ::= { hwKompellaVcTable 1 }
+        
+        HWKompellaVcEntry ::=
+            SEQUENCE { 
+                hwKompellaVcIfIndex
+                    InterfaceIndex,
+                hwKompellaVcRmtCeID
+                    Unsigned32,
+                hwKompellaVcInboundLabel
+                    Unsigned32,
+                hwKompellaVcOutboundLabel
+                    Unsigned32,
+                hwKompellaVcCtrlWord
+                    HWEnableValue,
+                hwKompellaVcTnlPolicyName
+                    OCTET STRING,
+                hwKompellaVcVlanTagMode
+                    INTEGER,
+                hwKompellaVcSecondary
+                    TruthValue,   
+                hwKompellaOAMSync
+                    TruthValue,
+                hwKompellaVCForBFDIndex
+                    Unsigned32,        
+                hwKompellaVcOperStatus
+                    INTEGER,   
+                hwKompellaVcRerouteDelayTime
+                    Unsigned32,
+                hwKompellaVcRerouteResumeTime
+                    Unsigned32,
+                hwKompellaVcReroutePolicy
+                    INTEGER,
+                hwKompellaVcRerouteReason
+                    HWL2VpnStateChangeReason,
+                hwKompellaVcLastRerouteTime
+                    Unsigned32,
+                hwKompellaVcManualSetFault
+                    TruthValue,
+                hwKompellaVcIsActive
+                    TruthValue,       
+                hwKompellaACStatus
+                    INTEGER,  
+                hwKompellaACOAMStatus
+                    INTEGER,
+                hwKompellaVcBFDDetectMultiplier
+                    Unsigned32, 
+                hwKompellaVcBFDMinReceiveInterval
+                    Unsigned32,
+                hwKompellaVcBFDMinTransmitInterval
+                    Unsigned32,
+                hwKompellaVcDynamicBFDDetect
+                    TruthValue,   
+                hwKompellaEthOamType
+                    INTEGER,        
+                hwKompellaCfmMaIndex
+                    Unsigned32,    
+                hwKompellaVcRowStatus
+                    RowStatus
+             }
+
+        hwKompellaVcIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "If the vc is represented in the ifTable as an ifIndex, this 
+                item holds the ifIndex of the vc in the ifTable, otherwise  
+                it MUST be set to zero."
+            ::= { hwKompellaVcEntry 1 }
+        
+        hwKompellaVcRmtCeID OBJECT-TYPE
+            SYNTAX Unsigned32 (0..249)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This item holds the remote ce id."
+            ::= { hwKompellaVcEntry 2 }
+        
+        hwKompellaVcInboundLabel OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the inbound label."
+            ::= { hwKompellaVcEntry 3 }
+        
+        hwKompellaVcOutboundLabel OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the outbound label."
+            ::= { hwKompellaVcEntry 4 }
+        
+        hwKompellaVcCtrlWord OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This value indicates the control word capability."
+            ::= { hwKompellaVcEntry 5 }
+        
+        hwKompellaVcTnlPolicyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..20))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the tunnel policy name used."
+            ::= { hwKompellaVcEntry 6 }
+        
+        hwKompellaVcVlanTagMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                raw(1),
+                tagged(2),
+                rawTagNotConfiged(255)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates VLAN tag is stripped(raw) , 
+                attached(tagged) or invalid(rawTagNotConfiged)."
+            ::= { hwKompellaVcEntry 7 }
+        
+        hwKompellaVcSecondary OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Denotes the VC is the repetition or not."
+            ::= { hwKompellaVcEntry 8 }   
+            
+        hwKompellaOAMSync   OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Denotes the AC and PSN are enable or not."
+            ::= { hwKompellaVcEntry 9 } 
+            
+        hwKompellaVCForBFDIndex OBJECT-TYPE
+            SYNTAX Unsigned32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of pw for BFD."
+            ::= { hwKompellaVcEntry 10 } 
+        
+        hwKompellaVcOperStatus OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+             up(1),
+             down(2)   
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes the vc is operational or not."
+            ::= { hwKompellaVcEntry 11 }  
+            
+        hwKompellaVcRerouteDelayTime OBJECT-TYPE
+            SYNTAX Unsigned32                 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The reroute delay time."
+            ::= { hwKompellaVcEntry 12 }    
+            
+        hwKompellaVcRerouteResumeTime OBJECT-TYPE
+            SYNTAX Unsigned32                 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "the reroute resume time."
+            ::= { hwKompellaVcEntry 13 }   
+            
+        hwKompellaVcReroutePolicy OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                delay(1),
+                immediately(2),
+                never(3),
+                none(4),
+                err(5),
+                invalid(6)
+                }                
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "reroute policy."
+            ::= { hwKompellaVcEntry 14 }
+            
+        hwKompellaVcRerouteReason OBJECT-TYPE
+            SYNTAX HWL2VpnStateChangeReason                 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the reroute reason."
+            ::= { hwKompellaVcEntry 15 }
+            
+        hwKompellaVcLastRerouteTime OBJECT-TYPE
+            SYNTAX Unsigned32                 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "last  reroute time."
+            ::= { hwKompellaVcEntry 16 } 
+            
+        hwKompellaVcManualSetFault OBJECT-TYPE
+            SYNTAX TruthValue                 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes the manual has been set or not."
+            ::= { hwKompellaVcEntry 17 } 
+            
+        hwKompellaVcIsActive OBJECT-TYPE
+            SYNTAX TruthValue                 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes the current vc is active or not."
+            ::= { hwKompellaVcEntry 18 }                                          
+                        
+        hwKompellaACStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2),
+                notify(4),
+                        notifyDown(5),
+                        downNotify(6)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes the AC's physical status is operational or not."
+            ::= { hwKompellaVcEntry 19 }  
+            
+        hwKompellaACOAMStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes the AC's protocol is operational or not."
+            ::= { hwKompellaVcEntry 20 }  
+              
+        hwKompellaVcBFDDetectMultiplier OBJECT-TYPE
+            SYNTAX Unsigned32 (0 | 3..50)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multiple of detection time."
+            ::= { hwKompellaVcEntry 21 }    
+            
+        hwKompellaVcBFDMinReceiveInterval OBJECT-TYPE
+            SYNTAX Unsigned32 (0 | 10..1000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The minimum interval of BFD messages to be received."
+            ::= { hwKompellaVcEntry 22 }  
+        
+        hwKompellaVcBFDMinTransmitInterval OBJECT-TYPE
+            SYNTAX Unsigned32 (0 | 10..1000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The minimum interval of BFD messages to be sent."
+            ::= { hwKompellaVcEntry 23 } 
+        
+        hwKompellaVcDynamicBFDDetect OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value indicates the capacitability to support dynamic BFD detect."
+            ::= { hwKompellaVcEntry 24 }       
+        
+        hwKompellaEthOamType OBJECT-TYPE
+            SYNTAX INTEGER 
+                {
+                ethOam1ag(1),
+                ethOam3ah(2),
+                noEthOamCfg(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value indicates the type of ETH OAM."
+            ::= { hwKompellaVcEntry 25 }   
+            
+        hwKompellaCfmMaIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4095)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value indicates the CFM MA Index."
+            ::= { hwKompellaVcEntry 26 } 
+        hwKompellaVcRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table.
+                Restriction:
+                  The VPN designated by hwKompellaVpnName must be
+                  created first.
+                  The CE designated by hwKompellaVpnName and
+                  hwKompellaCeID must be created first.
+                  Not support modifying configuration."
+            ::= { hwKompellaVcEntry 51 }
+            
+        
+--         
+-- The KOMPELLA's VC Tunnel Table
+-- 
+        hwKompellaVcTnlTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWKompellaVcTnlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to search the tunnel index of a VC."
+            ::= { hwKompellaMIBObjects 5 }
+        
+        hwKompellaVcTnlEntry OBJECT-TYPE
+            SYNTAX HWKompellaVcTnlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a VC tunnel entry."
+            INDEX { hwKompellaVpnName, hwKompellaCeID, hwKompellaVcIfIndex, hwKompellaVcRmtCeID,hwKompellaVcTnlIndex }
+            ::= { hwKompellaVcTnlTable 1 }
+        
+        HWKompellaVcTnlEntry ::=
+            SEQUENCE { 
+                hwKompellaVcTnlIndex
+                    Unsigned32,
+                hwKompellaVcTnlType
+                    INTEGER  ,
+                hwKompellaTnlForBfdIndex
+                    Unsigned32
+             }
+
+        hwKompellaVcTnlIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the tunnel index of a VC."
+            ::= { hwKompellaVcTnlEntry 1 }
+        
+        hwKompellaVcTnlType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                lsp(1),
+                gre(2),
+                l2tp(3),
+                ipsec(4),
+                crLsp(5)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of the VC tunnel."
+            ::= { hwKompellaVcTnlEntry 2 }   
+            
+        hwKompellaTnlForBfdIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the index of LSP for BFD."
+            ::= { hwKompellaVcTnlEntry 3 }
+            
+        
+--         
+-- The KOMPELLA's VC Statistics Table
+-- 
+        hwKompellaVcStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWKompellaVcStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the KOMPELLA's VC packets statistics."
+            ::= { hwKompellaMIBObjects 6 }
+        
+        hwKompellaVcStatisticsEntry OBJECT-TYPE
+            SYNTAX HWKompellaVcStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the KOMPELLA's VC packets
+                statistics."
+            INDEX { hwKompellaVpnName, hwKompellaCeID, hwKompellaVcIfIndex, hwKompellaVcRmtCeID }
+            ::= { hwKompellaVcStatisticsTable 1 }
+        
+        HWKompellaVcStatisticsEntry ::=
+            SEQUENCE { 
+                hwKompellaVcStatisticsRcvPkts
+                    Counter64,
+                hwKompellaVcStatisticsRcvBytes
+                    Counter64,
+                hwKompellaVcStatisticsSndPkts
+                    Counter64,
+                hwKompellaVcStatisticsSndBytes
+                    Counter64
+             }
+
+        hwKompellaVcStatisticsRcvPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets received on this VC."
+            ::= { hwKompellaVcStatisticsEntry 1 }
+        
+        hwKompellaVcStatisticsRcvBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes received on this VC."
+            ::= { hwKompellaVcStatisticsEntry 2 }
+        
+        hwKompellaVcStatisticsSndPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets sent on this VC."
+            ::= { hwKompellaVcStatisticsEntry 3 }
+        
+        hwKompellaVcStatisticsSndBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes sent on the VC."
+            ::= { hwKompellaVcStatisticsEntry 4 }
+        
+--         
+-- The Leaf Nodes of hwKompellaMIBObjects
+-- 
+        hwKompellaVcUpDownNotifEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of KOMPELLA
+                VC state change notification."
+            DEFVAL { disable }
+            ::= { hwKompellaMIBObjects 7 }
+        
+        hwKompellaVcDeletedNotifEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of KOMPELLA
+                VC deletion notification."
+            DEFVAL { disable }
+            ::= { hwKompellaMIBObjects 8 }  
+            
+        hwKompellaSwitchNotifEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If this object is set to enable(1),then it enbables
+                 this emission of hwKompellaSwitchWtoP and hwKompellaSwitchPtoW
+                 notifications;otherwise these notifications are not emitted."
+            DEFVAL { disable }
+            ::= { hwKompellaMIBObjects 9 }
+        
+            
+        hwKompellaVcStateChangeReason OBJECT-TYPE
+            SYNTAX HWL2VpnStateChangeReason
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the reason of KOMPELLA VC
+                state change."
+            ::= { hwKompellaMIBObjects 10 }   
+            
+        hwKompellaSwitchRmtCEID OBJECT-TYPE
+            SYNTAX Unsigned32 (0..249)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the remote CE ID of KOMPELLA VC
+                switch from working pw to protect pw ."
+            ::= { hwKompellaMIBObjects 11 }
+            
+        
+--         
+-- KOMPELLA MIB Trap Definitions
+-- 
+        hwKompellaMIBTraps OBJECT IDENTIFIER ::= { hwL2VpnKompella 2 }
+        
+        hwKompellaVcDown NOTIFICATION-TYPE
+            OBJECTS { hwKompellaVcSecondary, hwKompellaVcStateChangeReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VC's state changes to down."
+            ::= { hwKompellaMIBTraps 1 }
+        
+        hwKompellaVcUp NOTIFICATION-TYPE
+            OBJECTS { hwKompellaVcSecondary, hwKompellaVcStateChangeReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VC's state changes to up."
+            ::= { hwKompellaMIBTraps 2 } 
+            
+        hwKompellaSwitchWtoP NOTIFICATION-TYPE
+            OBJECTS { hwKompellaVcCtrlWord, hwKompellaSwitchRmtCEID,hwKompellaVcStateChangeReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when switch from working
+                pw to protect pw happens."
+            ::= { hwKompellaMIBTraps 3 }
+        
+        hwKompellaSwitchPtoW NOTIFICATION-TYPE
+            OBJECTS { hwKompellaVcCtrlWord, hwKompellaSwitchRmtCEID,hwKompellaVcStateChangeReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when switch from protect
+                pw to working pw happens."
+            ::= { hwKompellaMIBTraps 4 } 
+            
+        
+        
+        hwKompellaVcDeleted NOTIFICATION-TYPE
+            OBJECTS { hwKompellaVcSecondary }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VC is deleted."
+            ::= { hwKompellaMIBTraps 5 }
+        
+--  Conformance information
+-- 
+        hwKompellaMIBConformance OBJECT IDENTIFIER ::= { hwL2VpnKompella 3 }
+        
+        hwKompellaMIBCompliances OBJECT IDENTIFIER ::= { hwKompellaMIBConformance 1 }
+        
+--  this module
+        hwKompellaMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-KOMPELLA-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwKompellaVpnGroup, hwKompellaVpnTargetGroup, hwKompellaCeGroup, hwKompellaVcGroup, hwKompellaVcTnlGroup, 
+                    hwKompellaVcStatisticsGroup, hwKompellaNotificationControlGroup,hwKompellaVCSwitchControlGroup, hwKompellaVcStateChangeReasonGroup,
+                    hwKompellaSwitchRmtCEIDGroup, hwKompellaNotificationGroup }
+            ::= { hwKompellaMIBCompliances 1 }
+        
+        hwKompellaMIBGroups OBJECT IDENTIFIER ::= { hwKompellaMIBConformance 2 }
+        
+        hwKompellaVpnGroup OBJECT-GROUP
+            OBJECTS { hwKompellaVpnVcType, hwKompellaVpnRouteDistinguisher, hwKompellaVpnCtrlWord, hwKompellaVpnMtu, hwKompellaVpnRowStatus
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The KOMPELLA's Vpn group."
+            ::= { hwKompellaMIBGroups 1 }
+        
+        hwKompellaVpnTargetGroup OBJECT-GROUP
+            OBJECTS { hwKompellaVpnTargetRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The KOMPELLA's Vpn Target group."
+            ::= { hwKompellaMIBGroups 2 }
+        
+        hwKompellaCeGroup OBJECT-GROUP
+            OBJECTS { hwKompellaCeName, hwKompellaCeIDRange, hwKompellaCeIDDefaultOffset, hwKompellaCeRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The KOMPELLA's CE group."
+            ::= { hwKompellaMIBGroups 3 }
+        
+        hwKompellaVcGroup OBJECT-GROUP
+            OBJECTS { hwKompellaVcInboundLabel, hwKompellaVcOutboundLabel, hwKompellaVcCtrlWord, hwKompellaVcTnlPolicyName, hwKompellaVcVlanTagMode, 
+                        hwKompellaVcSecondary,hwKompellaOAMSync,hwKompellaVCForBFDIndex ,hwKompellaVcOperStatus,
+                        hwKompellaVcRerouteDelayTime,hwKompellaVcRerouteResumeTime,hwKompellaVcReroutePolicy,hwKompellaVcRerouteReason,
+                        hwKompellaVcLastRerouteTime,hwKompellaVcManualSetFault,hwKompellaVcIsActive,hwKompellaACStatus,
+                        hwKompellaACOAMStatus,hwKompellaVcBFDDetectMultiplier, hwKompellaVcBFDMinReceiveInterval,
+                        hwKompellaVcBFDMinTransmitInterval,hwKompellaVcDynamicBFDDetect,hwKompellaEthOamType,hwKompellaCfmMaIndex,hwKompellaVcRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The KOMPELLA's VC group."
+            ::= { hwKompellaMIBGroups 4 }
+        
+        hwKompellaVcTnlGroup OBJECT-GROUP
+            OBJECTS {hwKompellaVcTnlType,hwKompellaTnlForBfdIndex }
+            STATUS current
+            DESCRIPTION 
+                "The KOMPELLA's VC Tunnel group."
+            ::= { hwKompellaMIBGroups 5 }
+        
+        hwKompellaVcStatisticsGroup OBJECT-GROUP
+            OBJECTS { hwKompellaVcStatisticsRcvPkts, hwKompellaVcStatisticsRcvBytes, hwKompellaVcStatisticsSndPkts, hwKompellaVcStatisticsSndBytes }
+            STATUS current
+            DESCRIPTION 
+                "The KOMPELLA's VC Statistic group."
+            ::= { hwKompellaMIBGroups 6 }
+        
+        hwKompellaNotificationControlGroup OBJECT-GROUP
+            OBJECTS { hwKompellaVcUpDownNotifEnable, hwKompellaVcDeletedNotifEnable }
+            STATUS current
+            DESCRIPTION 
+                "The KOMPELLA's Notification Control group."
+            ::= { hwKompellaMIBGroups 7 }  
+            
+        hwKompellaVCSwitchControlGroup OBJECT-GROUP
+            OBJECTS { hwKompellaSwitchNotifEnable }
+            STATUS current
+            DESCRIPTION 
+                "The KOMPELLA's Switch Notification Control group."
+            ::= { hwKompellaMIBGroups 8 }              
+        
+        hwKompellaVcStateChangeReasonGroup OBJECT-GROUP
+            OBJECTS { hwKompellaVcStateChangeReason }
+            STATUS current
+            DESCRIPTION 
+                "The KOMPELLA's Vc State Change Reason group."
+            ::= { hwKompellaMIBGroups 9 }  
+            
+        hwKompellaSwitchRmtCEIDGroup OBJECT-GROUP
+            OBJECTS { hwKompellaSwitchRmtCEID }
+            STATUS current
+            DESCRIPTION 
+                "The KOMPELLA's Remote CE ID group."
+            ::= { hwKompellaMIBGroups 10 }        
+        
+        hwKompellaNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwKompellaVcDown, hwKompellaVcUp, hwKompellaSwitchWtoP,hwKompellaSwitchPtoW,hwKompellaVcDeleted }
+            STATUS current
+            DESCRIPTION 
+                "The KOMPELLA Notification group."
+            ::= { hwKompellaMIBGroups 11 }
+        
+    
+    END

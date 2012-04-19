@@ -1,0 +1,410 @@
+-- SECTION 1: Top Level Definitions
+
+S5-COMMON-STATS-MIB DEFINITIONS ::= BEGIN
+
+
+-- 5000 Common Statistics MIB Release 1.1.2
+-- Revision 04/18/94
+
+-- Copyright 1993-94 SynOptics Communications, Inc.
+-- All rights reserved.
+-- This SynOptics SNMP Management Information Base Specification
+-- (Specification) embodies SynOptics' confidential and
+-- proprietary intellectual property. SynOptics retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS," and SynOptics makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+
+-- Imports
+
+IMPORTS
+	OBJECT-TYPE
+		FROM RFC-1212
+	TimeTicks
+		FROM RFC1155-SMI
+	s5Com
+		FROM S5-ROOT-MIB
+	MacAddress
+		FROM SNMPv2-TC;
+
+
+-- Groups
+
+-- Statistics
+s5CmStat	OBJECT IDENTIFIER ::= { s5Com 1 }
+
+
+-- SECTION 2: MIB Objects
+
+
+-- Show Nodes Table
+
+s5CmSNodeTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S5CmSNodeEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A Table of MAC addresses of active nodes, which are
+		detected to be connected to the concentrator.
+		These nodes may be directly connected to the
+		concentrator or may be indirectly connected via
+		an interconnect port, bridge or switch.  The definition
+		of active node is provided by s5CmSNodeStatus.
+
+		The object s5CmSNodeIfIndex specifies the
+		source that is used to detect MAC addresses.  When the
+		source is not an interface, the agent uses best effort to
+		detect entries.  These entries may, but are not required
+		to be, MACs from media types other than the interfaces
+		for the agent.
+
+		This table is indexed by source of the detection,
+		board, port, and MAC address of the node.  This 
+		table is indexed differently from the FindNodes
+		table which uses only the source of the detection
+		and MAC address of the node.  Note: a MAC
+		address could appear multiple times in this
+		table (on different board and port)."
+	::= { s5CmStat 1 }
+
+s5CmSNodeEntry OBJECT-TYPE
+	SYNTAX	S5CmSNodeEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A row in the Show Node table.
+		Entries can not be created or deleted via
+		SNMP."
+	INDEX	{ s5CmSNodeIfIndx,
+		  s5CmSNodeBrdIndx,
+		  s5CmSNodePortIndx,
+		  s5CmSNodeMacAddr }
+	::= { s5CmSNodeTable 1 }
+
+S5CmSNodeEntry ::= SEQUENCE {
+	s5CmSNodeIfIndx INTEGER,
+	s5CmSNodeBrdIndx INTEGER,
+	s5CmSNodePortIndx INTEGER,
+	s5CmSNodeMacAddr MacAddress,
+	s5CmSNodeStatus INTEGER
+	}
+
+s5CmSNodeIfIndx OBJECT-TYPE
+	SYNTAX	INTEGER(0..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"An integer value representing the source
+		that detected the active node.  A value greater
+		than zero is the index of the agent's interface
+		in the NMM.  This is the same value as ifIndex 
+		for the interface.  A value of zero indicates
+		that the agent detected the node information via
+		best available efforts.  The nodes may be, but are
+		note required to be, from media types other than
+		the interfaces for the agent."
+	::= { s5CmSNodeEntry 1 }
+
+s5CmSNodeBrdIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The index of the board. This corresponds to
+		the index of the slot containing the board."
+	::= { s5CmSNodeEntry 2 }
+
+s5CmSNodePortIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The index of the port on the board. Its
+		value ranges between 1 and index of the last
+		manageable port on the board."
+	::= { s5CmSNodeEntry 3 }
+
+s5CmSNodeMacAddr OBJECT-TYPE
+	SYNTAX	MacAddress
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The MAC address of the station."
+	::= { s5CmSNodeEntry 4 }
+
+s5CmSNodeStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		active(2),
+		inactive(3)
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The status of the MAC address for a station.
+		The meaning varies depending on the media type
+		of the NMM reporting the status. The values are:
+		  other(1)......unknown or other
+		  active(2).....the station is actively sending
+		                  and receiving, or
+		                  participating
+		                  in the ring poll
+		  inactive(3)...the station is idle
+
+		For Ethernet, active(2) means that the station
+		has sent a frame in the last N seconds and
+		inactive(3) means the station has not sent a
+		frame in the last N seconds. N is specified by
+		the s5EnNodeInactInterval object, which is
+		defined in the 5000 Ethernet MIB.  The status of
+		other(3) is reported when the current status of
+		the station is unknown.
+
+		For Token Ring and FDDI, the status of a station
+		will always be reported as active(2) since it is
+		based on being in the ring poll.  When no longer
+		in the ring poll, a station is removed from the
+		table."
+	::= { s5CmSNodeEntry 5 }
+
+
+-- Find Nodes Table
+
+s5CmFNodeTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S5CmFNodeEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A Table of MAC addresses of active nodes, which are
+		detected to be connected to the concentrator.
+		These nodes may be directly connected to the
+		concentrator or may be indirectly connected via
+		an interconnect port, bridge or switch.  The definition
+		of active node is provided by s5CmSNodeStatus.
+
+		The object s5CmSNodeIfIndex specifies the
+		source that is used to detect MAC addresses.  When the
+		source is not an interface, the agent uses best effort to
+		detect entries.  These entries may, but are not required
+		to be, MACs from media types other than the interfaces
+		for the agent.
+
+		This table is indexed by source of the detection
+		and MAC address of the node.  This 
+		table is indexed differently from the ShowNodes
+		table which uses the source of the detection,
+		board, port, and MAC address of the node.
+
+		Note: The same MAC may be detected at several
+		locations.  The entry in this table is the last 
+		detected location.  In addition, more than one
+		MAC address could appear on the same board
+		and port."
+	::= { s5CmStat 2 }
+
+s5CmFNodeEntry OBJECT-TYPE
+	SYNTAX	S5CmFNodeEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A row in the Find Node table.
+		Entries can not be created or deleted via
+		SNMP."
+	INDEX	{ s5CmFNodeIfIndx,
+		  s5CmFNodeMacAddr }
+	::= { s5CmFNodeTable 1 }
+
+S5CmFNodeEntry ::= SEQUENCE {
+	s5CmFNodeIfIndx INTEGER,
+	s5CmFNodeMacAddr MacAddress,
+	s5CmFNodeBrdIndx INTEGER,
+	s5CmFNodePortIndx INTEGER
+	}
+
+s5CmFNodeIfIndx OBJECT-TYPE
+	SYNTAX	INTEGER(0..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"An integer value representing the source
+		that detected the active node.  A value greater
+		than zero is the index of the agent's interface
+		in the NMM.  This is the same value as ifIndex 
+		for the interface.  A value of zero indicates
+		that the agent detected the node information via
+		best available efforts.  The nodes may be, but are
+		note required to be, from media types other than
+		the interfaces for the agent."
+	::= { s5CmFNodeEntry 1 }
+
+s5CmFNodeMacAddr OBJECT-TYPE
+	SYNTAX	MacAddress
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"MAC address of the station."
+	::= { s5CmFNodeEntry 2 }
+
+s5CmFNodeBrdIndx OBJECT-TYPE
+	SYNTAX	INTEGER (0..255)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The index of the board.  This corresponds to
+		the index of the slot containing the board.  The
+		value of zero has the special meaning that the
+		true board index value is currently unknown.
+		Note that the syntax of this object is not
+		identical to s5CmSNodeBrdIndx."
+	::= { s5CmFNodeEntry 3 }
+
+s5CmFNodePortIndx OBJECT-TYPE
+	SYNTAX	INTEGER (0..255)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The index of the port on the board.  This
+		corresponds to the index of one of the
+		manageable ports on the board.  The value of
+		zero has the special meaning that the true port
+		index value is currently unknown.
+		Note that the syntax of this object is not
+		identical to s5CmSNodePortIndx."
+	::= { s5CmFNodeEntry 4 }
+
+
+-- Per-port Network to MAC Address Mapping Table
+
+s5CmNetAddrTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S5CmNetAddrEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table of network layer addresses associated
+		with MAC addresses of active nodes, which are
+		detected to be connected to the concentrator.
+
+		This table is indexed by the interface it was
+		detected, the board and port the node is connected,
+		the MAC address of the node and an integer index 
+		(enumerating multiple network addresses).
+
+		Note:
+		Only a small implementation determined number of 
+		network addresses are stored. The oldest one is 
+		discarded, so that the most recent one may be
+		retained.  When packet decoding is switched off
+		entries in the network address mapping table may
+		remain present for some time, but no new addresses
+		are added.  An network address could appear multiple
+		times in this table (on different board and port)
+		and can appear under different s5CmNetAddrNetIndx
+		over time."
+	::= { s5CmStat 3 }
+
+s5CmNetAddrEntry OBJECT-TYPE
+	SYNTAX	S5CmNetAddrEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A row in the network address mapping table.
+		Entries can not be created or deleted
+		via SNMP."
+	INDEX	{ s5CmNetAddrIfIndex, 
+		  s5CmNetAddrBrdIndx, 
+		  s5CmNetAddrPortIndx, 
+		  s5CmNetAddrMacAddr, 
+		  s5CmNetAddrNetIndx }
+	::= { s5CmNetAddrTable 1 }
+
+S5CmNetAddrEntry ::= SEQUENCE {
+	s5CmNetAddrIfIndex INTEGER,
+	s5CmNetAddrBrdIndx INTEGER,
+	s5CmNetAddrPortIndx INTEGER,
+	s5CmNetAddrMacAddr MacAddress,
+	s5CmNetAddrNetIndx INTEGER,
+	s5CmNetAddrType INTEGER,
+	s5CmNetAddrAddr OCTET STRING,
+	s5CmNetAddrLastSeen TimeTicks
+	}
+
+s5CmNetAddrIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER (1..65535)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The index of the interface on the NMM on 
+		which the address was detected. This is the 
+		same as the ifIndex."
+	::= { s5CmNetAddrEntry 1 }
+
+
+s5CmNetAddrBrdIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The index of the board. This corresponds to
+		the index of the slot containing the board."
+	::= { s5CmNetAddrEntry 2 }
+
+
+s5CmNetAddrPortIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The index of the port on the board."
+	::= { s5CmNetAddrEntry 3 }
+
+s5CmNetAddrMacAddr OBJECT-TYPE
+	SYNTAX	MacAddress
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The MAC address of the station."
+	::= { s5CmNetAddrEntry 4 }
+
+s5CmNetAddrNetIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sequence number of the network address."
+	::= { s5CmNetAddrEntry 5 }
+
+s5CmNetAddrType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		ip(1)
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The type of network layer address:
+		  ip(1).....an IP address as defined in RFC 791."
+	::= { s5CmNetAddrEntry 6 }
+
+s5CmNetAddrAddr OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The network layer address of the station represented
+		in network byte-order"
+	::= { s5CmNetAddrEntry 7 }
+
+s5CmNetAddrLastSeen OBJECT-TYPE
+	SYNTAX	TimeTicks
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The value of sysUpTime at the time this network
+		address was last seen on this interface/board/port/MAC."
+	::= { s5CmNetAddrEntry 8 }
+
+
+END

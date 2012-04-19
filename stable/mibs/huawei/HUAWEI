@@ -1,0 +1,488 @@
+-- ============================================================================
+-- Copyright (C) by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:
+-- Reference:
+-- Version: V3.03
+-- History:
+--
+-- ============================================================================
+
+HUAWEI-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        enterprises, MODULE-IDENTITY
+            FROM SNMPv2-SMI;
+
+    huawei MODULE-IDENTITY
+        LAST-UPDATED "200601250000Z"
+        ORGANIZATION
+            "Fix-Net Dept, Huawei Technologies Co.,Ltd."
+        CONTACT-INFO
+            "Floor 5, Block 4, R&D Building,
+            Huawei Longgang Production Base,
+            Shenzhen,  P.R.C.
+            http://www.huawei.com
+            Zip: 518129
+            "
+        DESCRIPTION
+            "huawei common oid   mib defintion. "
+        ::= { enterprises 2011 }
+
+    hwLocal                     OBJECT IDENTIFIER ::= { huawei 1 }
+        quidway                 OBJECT IDENTIFIER ::= { hwLocal 1 }
+        hwTrans                 OBJECT IDENTIFIER ::= { hwLocal 2 }
+        
+        hwInternetProtocol      OBJECT IDENTIFIER ::= { hwLocal 3 }
+            rmonExtend          OBJECT IDENTIFIER ::= { hwInternetProtocol 4 }
+                performance     OBJECT IDENTIFIER ::= { rmonExtend 4 }
+        
+        hwNovellProtocol        OBJECT IDENTIFIER ::= { hwLocal 4 }
+    hwProducts                  OBJECT IDENTIFIER ::= { huawei 2 }
+        atm                     OBJECT IDENTIFIER ::= { hwProducts 1 }
+            atmAccess           OBJECT IDENTIFIER ::= { atm 1 }
+            atmBone             OBJECT IDENTIFIER ::= { atm 2 }
+            r8750               OBJECT IDENTIFIER ::= { atmBone 1 }
+
+        router                  OBJECT IDENTIFIER ::= { hwProducts 2 }
+            routerGeneral       OBJECT IDENTIFIER ::= { router 1 }
+                ne08            OBJECT IDENTIFIER ::= { routerGeneral 7508 }
+                ne16            OBJECT IDENTIFIER ::= { routerGeneral 7516 }
+                attr            OBJECT IDENTIFIER ::= { routerGeneral 1 }
+
+            module              OBJECT IDENTIFIER ::= { router 2 }
+            flash               OBJECT IDENTIFIER ::= { router 3 }
+            mixinfo             OBJECT IDENTIFIER ::= { router 4 }
+            huaweiMemoryPool    OBJECT IDENTIFIER ::= { router 5 }
+            configFile          OBJECT IDENTIFIER ::= { router 6 }
+            netEngine           OBJECT IDENTIFIER ::= { router 8070 }
+
+        access-server           OBJECT IDENTIFIER ::= { hwProducts 3 }
+            as8010              OBJECT IDENTIFIER ::= { access-server 1 }
+
+        lan-switch              OBJECT IDENTIFIER ::= { hwProducts 4 }
+            switch2403          OBJECT IDENTIFIER ::= { lan-switch 1 }
+                switch2403F     OBJECT IDENTIFIER ::= { switch2403 0 }
+            switch3008          OBJECT IDENTIFIER ::= { lan-switch 2 }
+            switch3016          OBJECT IDENTIFIER ::= { lan-switch 3 }
+            switch2024-M        OBJECT IDENTIFIER ::= { lan-switch 4 }
+            switch3025-M        OBJECT IDENTIFIER ::= { lan-switch 5 }
+
+        xdsl                    OBJECT IDENTIFIER ::= { hwProducts 5 }
+            adsl                OBJECT IDENTIFIER ::= { xdsl 1 }
+
+        musa                    OBJECT IDENTIFIER ::= { hwProducts 6 }
+            hwMusaV100R001Mib   OBJECT IDENTIFIER ::= { musa 1 }
+            hwMA5200Mib         OBJECT IDENTIFIER ::= { musa 2 }
+            hwMusaV100R002Mib   OBJECT IDENTIFIER ::= { musa 3 }
+            hwMd5500Mib         OBJECT IDENTIFIER ::= { musa 4 }
+            hwMa5100Mib         OBJECT IDENTIFIER ::= { musa 5 }
+            hwMa5300Mib         OBJECT IDENTIFIER ::= { musa 6 }
+            ias                 OBJECT IDENTIFIER ::= { musa 7 }
+
+        mpeg-2                  OBJECT IDENTIFIER ::= { hwProducts 7 }
+        gprs                    OBJECT IDENTIFIER ::= { hwProducts 8 }
+        honet                   OBJECT IDENTIFIER ::= { hwProducts 9 }
+        cc08                    OBJECT IDENTIFIER ::= { hwProducts 10 }
+        sbs                     OBJECT IDENTIFIER ::= { hwProducts 11 }
+        ip-phone                OBJECT IDENTIFIER ::= { hwProducts 12 }
+        ups                     OBJECT IDENTIFIER ::= { hwProducts 13 }
+        viewpoint               OBJECT IDENTIFIER ::= { hwProducts 14 }
+        netManager              OBJECT IDENTIFIER ::= { hwProducts 15 }
+        iNet                    OBJECT IDENTIFIER ::= { hwProducts 16 }
+        ne80                    OBJECT IDENTIFIER ::= { hwProducts 17 }
+        
+        wireIn                  OBJECT IDENTIFIER ::= { hwProducts 18 }
+            wireInScp           OBJECT IDENTIFIER ::= { wireIn 1 }
+            wireInSdp           OBJECT IDENTIFIER ::= { wireIn 2 }
+            wireInSmp           OBJECT IDENTIFIER ::= { wireIn 3 }
+            wireInSsp           OBJECT IDENTIFIER ::= { wireIn 4 }
+            wireInIP            OBJECT IDENTIFIER ::= { wireIn 5 }
+
+        mobileIn                OBJECT IDENTIFIER ::= { hwProducts 19 }
+            mobileInScp         OBJECT IDENTIFIER ::= { mobileIn 1 }
+            mobileInSdp         OBJECT IDENTIFIER ::= { mobileIn 2 }
+            mobileInSmp         OBJECT IDENTIFIER ::= { mobileIn 3 }
+            mobileInSsp         OBJECT IDENTIFIER ::= { mobileIn 4 }
+            mobileInIP          OBJECT IDENTIFIER ::= { mobileIn 5 }
+
+        cdmaIn                  OBJECT IDENTIFIER ::= { hwProducts 20 }
+            cdmaInScp           OBJECT IDENTIFIER ::= { cdmaIn 1 }
+            cdmaInSdp           OBJECT IDENTIFIER ::= { cdmaIn 2 }
+            cdmaInSmp           OBJECT IDENTIFIER ::= { cdmaIn 3 }
+            cdmaInSsp           OBJECT IDENTIFIER ::= { cdmaIn 4 }
+            cdmaInIP            OBJECT IDENTIFIER ::= { cdmaIn 5 }
+            
+        acdIn                   OBJECT IDENTIFIER ::= { hwProducts 21 }
+        
+        esr                     OBJECT IDENTIFIER ::= { hwProducts 22 }
+            radium8750          OBJECT IDENTIFIER ::= { esr 2 }
+            isn8850             OBJECT IDENTIFIER ::= { esr 3 }
+            esr8825             OBJECT IDENTIFIER ::= { esr 5 }
+            esrV5R3             OBJECT IDENTIFIER ::= { esr 6 }
+            esrV5R58850         OBJECT IDENTIFIER ::= { esr 7 }
+            esrV5R58825         OBJECT IDENTIFIER ::= { esr 8 }
+            
+        lanSw                   OBJECT IDENTIFIER ::= { hwProducts 23 }
+            lswCommon           OBJECT IDENTIFIER ::= { lanSw 1 }
+            s8016               OBJECT IDENTIFIER ::= { lanSw 11 }
+            s8016Common         OBJECT IDENTIFIER ::= { s8016 1 }
+            s8016A              OBJECT IDENTIFIER ::= { s8016 2 }
+            s8016B              OBJECT IDENTIFIER ::= { s8016 3 }
+            s3526               OBJECT IDENTIFIER ::= { lanSw 12 }
+            s3026               OBJECT IDENTIFIER ::= { lanSw 13 }
+            s3026V              OBJECT IDENTIFIER ::= { lanSw 14 }
+            s2008               OBJECT IDENTIFIER ::= { lanSw 15 }
+            s2016               OBJECT IDENTIFIER ::= { lanSw 16 }
+            s3526F              OBJECT IDENTIFIER ::= { lanSw 17 }
+            s5516               OBJECT IDENTIFIER ::= { lanSw 18 }
+            s6506               OBJECT IDENTIFIER ::= { lanSw 19 }
+            s3026F              OBJECT IDENTIFIER ::= { lanSw 20 }
+            s3526E              OBJECT IDENTIFIER ::= { lanSw 21 }
+            s2026               OBJECT IDENTIFIER ::= { lanSw 22 }
+            s2403H              OBJECT IDENTIFIER ::= { lanSw 23 }
+            s3026E              OBJECT IDENTIFIER ::= { lanSw 24 }
+
+            s3050C              OBJECT IDENTIFIER ::= { lanSw 29 }
+            s6503               OBJECT IDENTIFIER ::= { lanSw 30 }
+            s8512               OBJECT IDENTIFIER ::= { lanSw 31 }
+            s8505               OBJECT IDENTIFIER ::= { lanSw 32 }
+            s6506R              OBJECT IDENTIFIER ::= { lanSw 33 }
+            s3026c              OBJECT IDENTIFIER ::= { lanSw 34 }
+            s3026g              OBJECT IDENTIFIER ::= { lanSw 35 }
+            s3026t              OBJECT IDENTIFIER ::= { lanSw 36 }
+            s3552G              OBJECT IDENTIFIER ::= { lanSw 37 }
+            s3552P              OBJECT IDENTIFIER ::= { lanSw 38 }
+            s3528G              OBJECT IDENTIFIER ::= { lanSw 39 }
+            s3528P              OBJECT IDENTIFIER ::= { lanSw 40 }
+            s3526c              OBJECT IDENTIFIER ::= { lanSw 41 }
+            s3026c-24-12fs      OBJECT IDENTIFIER ::= { lanSw 42 }
+            s3026c-24-12fm      OBJECT IDENTIFIER ::= { lanSw 43 }
+            s3526c-24-12fs      OBJECT IDENTIFIER ::= { lanSw 44 }
+            s3526c-24-12fm      OBJECT IDENTIFIER ::= { lanSw 45 }
+            s5012G              OBJECT IDENTIFIER ::= { lanSw 46 }
+            s5012G-DC           OBJECT IDENTIFIER ::= { lanSw 47 }
+            s5012T-12-10GBC     OBJECT IDENTIFIER ::= { lanSw 48 }
+            s5012T-12-10GBC-DC  OBJECT IDENTIFIER ::= { lanSw 49 }
+            s5024G-24-20TP      OBJECT IDENTIFIER ::= { lanSw 50 }
+            s5024G-24-20TP-DC   OBJECT IDENTIFIER ::= { lanSw 51 }
+            s2026Z              OBJECT IDENTIFIER ::= { lanSw 52 }
+            s2026C              OBJECT IDENTIFIER ::= { lanSw 53 }
+            s3026G-SI           OBJECT IDENTIFIER ::= { lanSw 54 }
+            s3026C-SI           OBJECT IDENTIFIER ::= { lanSw 55 }
+            s3026S-SI           OBJECT IDENTIFIER ::= { lanSw 56 }
+            s8505e              OBJECT IDENTIFIER ::= { lanSw 57 }
+            s3552F-SI           OBJECT IDENTIFIER ::= { lanSw 67 }
+            s3552F-EI           OBJECT IDENTIFIER ::= { lanSw 68 }
+            e026                OBJECT IDENTIFIER ::= { lanSw 69 }
+            e026-SI             OBJECT IDENTIFIER ::= { lanSw 70 }
+            e050                OBJECT IDENTIFIER ::= { lanSw 71 }
+            s2326P-SI           OBJECT IDENTIFIER ::= { lanSw 72 } 
+            s2326P-EI           OBJECT IDENTIFIER ::= { lanSw 73 } 
+            s2318P-SI           OBJECT IDENTIFIER ::= { lanSw 74 } 
+            s2318P-EI           OBJECT IDENTIFIER ::= { lanSw 75 } 
+            s2309P-SI           OBJECT IDENTIFIER ::= { lanSw 76 } 
+            s2309P-EI           OBJECT IDENTIFIER ::= { lanSw 77 } 
+            s3352P-SI           OBJECT IDENTIFIER ::= { lanSw 78 } 
+            s3352P-EI           OBJECT IDENTIFIER ::= { lanSw 79 } 
+            s3328TP-SI          OBJECT IDENTIFIER ::= { lanSw 80 } 
+            s3328TP-EI          OBJECT IDENTIFIER ::= { lanSw 81 }
+            s3328TP-EI-24S      OBJECT IDENTIFIER ::= { lanSw 82 }
+            s3328TP-SI-24S      OBJECT IDENTIFIER ::= { lanSw 83 }
+            s3352P-EI-24S       OBJECT IDENTIFIER ::= { lanSw 84 }
+            s3352P-EI-48S       OBJECT IDENTIFIER ::= { lanSw 85 }
+            s3352P-SI-48S       OBJECT IDENTIFIER ::= { lanSw 86 }
+            s2309TP-SI          OBJECT IDENTIFIER ::= { lanSw 87 }
+            s2309TP-EI          OBJECT IDENTIFIER ::= { lanSw 88 }
+            s2318TP-SI          OBJECT IDENTIFIER ::= { lanSw 89 }
+            s2318TP-EI          OBJECT IDENTIFIER ::= { lanSw 90 }
+            s2326TP-SI          OBJECT IDENTIFIER ::= { lanSw 91 }
+            s2326TP-EI          OBJECT IDENTIFIER ::= { lanSw 92 }
+            s2352P-SI           OBJECT IDENTIFIER ::= { lanSw 93 }
+            s2352P-EI           OBJECT IDENTIFIER ::= { lanSw 94 }
+            s5328C-EI           OBJECT IDENTIFIER ::= { lanSw 95 }
+            s5328C-EI-24S       OBJECT IDENTIFIER ::= { lanSw 96 }
+            s5352C-EI           OBJECT IDENTIFIER ::= { lanSw 97 }
+            
+            s5324TP-SI          OBJECT IDENTIFIER ::= { lanSw 98 }
+            s5348TP-SI          OBJECT IDENTIFIER ::= { lanSw 99 }
+            s5324TP-PWR-SI      OBJECT IDENTIFIER ::= { lanSw 100 }
+            s5348TP-PWR-SI      OBJECT IDENTIFIER ::= { lanSw 101 }
+            s5328C-SI           OBJECT IDENTIFIER ::= { lanSw 102 }
+            s5352C-SI           OBJECT IDENTIFIER ::= { lanSw 103 }
+            s5328C-PWR-SI       OBJECT IDENTIFIER ::= { lanSw 104 }
+            s5352C-PWR-SI       OBJECT IDENTIFIER ::= { lanSw 105 }
+            s5328C-PWR-EI       OBJECT IDENTIFIER ::= { lanSw 106 }
+            s5352C-PWR-EI       OBJECT IDENTIFIER ::= { lanSw 107 }
+            s2309TP-PWR-EI      OBJECT IDENTIFIER ::= { lanSw 108 }
+            s2326TP-PWR-EI      OBJECT IDENTIFIER ::= { lanSw 109 }
+            s3328TP-PWR-EI      OBJECT IDENTIFIER ::= { lanSw 110 }
+            s3352P-PWR-EI       OBJECT IDENTIFIER ::= { lanSw 111 }
+        apon                    OBJECT IDENTIFIER ::= { hwProducts 24 }
+            ma5101              OBJECT IDENTIFIER ::= { apon 1 }
+            ma5102              OBJECT IDENTIFIER ::= { apon 2 }
+
+        transmission            OBJECT IDENTIFIER ::= { hwProducts 25 }
+            optix155622H        OBJECT IDENTIFIER ::= { transmission 1 }
+            optix10Gv2          OBJECT IDENTIFIER ::= { transmission 2 }
+
+        hsr                     OBJECT IDENTIFIER ::= { hwProducts 26 }
+            ne16E               OBJECT IDENTIFIER ::= { hsr 1 }
+            ne08E               OBJECT IDENTIFIER ::= { hsr 2 }
+            ne05                OBJECT IDENTIFIER ::= { hsr 3 }
+
+        amg5000                 OBJECT IDENTIFIER ::= { hwProducts 27 }
+        umg8900                 OBJECT IDENTIFIER ::= { hwProducts 28 }
+        ne20                    OBJECT IDENTIFIER ::= { hwProducts 29 }
+        ne20s                   OBJECT IDENTIFIER ::= { hwProducts 30 }
+        ne40                    OBJECT IDENTIFIER ::= { hwProducts 31 }
+        
+        wcdma                   OBJECT IDENTIFIER ::= { hwProducts 32 }
+            sgsn                OBJECT IDENTIFIER ::= { wcdma 1 }
+
+        mlsr                    OBJECT IDENTIFIER ::= { hwProducts 33 }
+        
+        dslw                    OBJECT IDENTIFIER ::= { hwProducts 34 }
+            dlswNode            OBJECT IDENTIFIER ::= { dslw 1 }
+            dlswTConn           OBJECT IDENTIFIER ::= { dslw 2 } -- information about this DLSw
+            dlswInterface       OBJECT IDENTIFIER ::= { dslw 3 } -- about adjacent DLSw partners
+            dlswDirectory       OBJECT IDENTIFIER ::= { dslw 4 } -- about which interfaces DLSw is active on
+            dlswCircuit         OBJECT IDENTIFIER ::= { dslw 5 } -- about any directory of local/remote resources
+            dlswSdlc            OBJECT IDENTIFIER ::= { dslw 6 } -- about established circuits.
+            dlswLlc2            OBJECT IDENTIFIER ::= { dslw 7 } -- about SDLC data link switched devices
+
+        sm                      OBJECT IDENTIFIER ::= { hwProducts 35 }
+            mmsc                OBJECT IDENTIFIER ::= { sm 1 }
+
+        as                      OBJECT IDENTIFIER ::= { hwProducts 36 }
+        p3                      OBJECT IDENTIFIER ::= { hwProducts 37 }
+        
+        iad                     OBJECT IDENTIFIER ::= { hwProducts 38 }
+            iad132              OBJECT IDENTIFIER ::= { iad 1 }
+
+        wlanAp                  OBJECT IDENTIFIER ::= { hwProducts 39 }
+            wlanApCommon        OBJECT IDENTIFIER ::= { wlanAp 1 }
+            wlanApWA1003        OBJECT IDENTIFIER ::= { wlanAp 2 }
+            wlanApWA1003A       OBJECT IDENTIFIER ::= { wlanAp 3 }
+            wlanApWA1005        OBJECT IDENTIFIER ::= { wlanAp 4 }
+            wlanApWA1008        OBJECT IDENTIFIER ::= { wlanAp 5 }
+            wlanApWA1208        OBJECT IDENTIFIER ::= { wlanAp 6 }
+            wlanApWA1208H       OBJECT IDENTIFIER ::= { wlanAp 7 }
+            wlanApWA1006E       OBJECT IDENTIFIER ::= { wlanAp 8 }
+            wlanBridgeWB2010    OBJECT IDENTIFIER ::= { wlanAp 9 }
+            wlanBridgeWB2011    OBJECT IDENTIFIER ::= { wlanAp 10}
+            wa1208E             OBJECT IDENTIFIER ::= { wlanAp 11}
+
+        hwinfoX                 OBJECT IDENTIFIER ::= { hwProducts 40 }
+        wlanApWA1006            OBJECT IDENTIFIER ::= { hwProducts 43 }
+        ar46-20                 OBJECT IDENTIFIER ::= { hwProducts 44 }
+        ar46-40                 OBJECT IDENTIFIER ::= { hwProducts 45 }
+        ar46-80                 OBJECT IDENTIFIER ::= { hwProducts 46 }
+        ne20-2                  OBJECT IDENTIFIER ::= { hwProducts 47 }
+        ne20-4                  OBJECT IDENTIFIER ::= { hwProducts 48 }
+        ne20-8                  OBJECT IDENTIFIER ::= { hwProducts 49 }
+        eudemon200              OBJECT IDENTIFIER ::= { hwProducts 50 }
+        eudemon1000             OBJECT IDENTIFIER ::= { hwProducts 51 }
+        vdg10-40                OBJECT IDENTIFIER ::= { hwProducts 52 }
+        vdg10-41                OBJECT IDENTIFIER ::= { hwProducts 53 }
+        hwSps                   OBJECT IDENTIFIER ::= { hwProducts 54 }
+        ar18-18                 OBJECT IDENTIFIER ::= { hwProducts 55 }
+        ar18-20                 OBJECT IDENTIFIER ::= { hwProducts 56 }
+        ar18-30                 OBJECT IDENTIFIER ::= { hwProducts 57 }
+        ar18-31                 OBJECT IDENTIFIER ::= { hwProducts 58 }
+        ar18-32                 OBJECT IDENTIFIER ::= { hwProducts 59 }
+        ar18-33                 OBJECT IDENTIFIER ::= { hwProducts 60 }
+        ar18-34                 OBJECT IDENTIFIER ::= { hwProducts 61 }
+
+        ne5000                  OBJECT IDENTIFIER ::= { hwProducts 62 }
+            ne5000SysOid        OBJECT IDENTIFIER ::= { ne5000 2 }      
+            ne5000oem       OBJECT IDENTIFIER ::= { ne5000SysOid 1 }
+            ne80E           OBJECT IDENTIFIER ::= { ne5000SysOid 2 }
+            ne5000E         OBJECT IDENTIFIER ::= { ne5000SysOid 3 }
+            ne5000EMulti    OBJECT IDENTIFIER ::= { ne5000SysOid 4 }
+            ne40E           OBJECT IDENTIFIER ::= { ne5000SysOid 5 }
+            ne5000E-BTB     OBJECT IDENTIFIER ::= { ne5000SysOid 6 } 
+            ne40E-4         OBJECT IDENTIFIER ::= { ne5000SysOid 7 } 
+            ne40E-X3        OBJECT IDENTIFIER ::= { ne5000SysOid 8 } 
+            ne40E-X8        OBJECT IDENTIFIER ::= { ne5000SysOid 9 }
+            ne40E-X16        OBJECT IDENTIFIER ::= { ne5000SysOid 10 }
+
+        ggsn9811                OBJECT IDENTIFIER ::= { hwProducts 63 }
+        pdsn9660                OBJECT IDENTIFIER ::= { hwProducts 64 }
+        eudemon2100             OBJECT IDENTIFIER ::= { hwProducts 65 }
+        eudemon2200             OBJECT IDENTIFIER ::= { hwProducts 66 }
+        --s3552F-SI               OBJECT IDENTIFIER ::= { hwProducts 67 }
+        --s3552F-EI               OBJECT IDENTIFIER ::= { hwProducts 68 }
+        --e026                    OBJECT IDENTIFIER ::= { hwProducts 69 }
+        --e026-SI                 OBJECT IDENTIFIER ::= { hwProducts 70 }
+        --e050                    OBJECT IDENTIFIER ::= { hwProducts 71 }
+        ua5000ipm               OBJECT IDENTIFIER ::= { hwProducts 72 } 
+        rm9000                  OBJECT IDENTIFIER ::= { hwProducts 73 } 
+        hwIMAPNorthbound        OBJECT IDENTIFIER ::= { hwProducts 74 } 
+        hwBITS                  OBJECT IDENTIFIER ::= { hwProducts 75 }
+        hwPv8                   OBJECT IDENTIFIER ::= { hwProducts 76 }
+        eudemon500              OBJECT IDENTIFIER ::= { hwProducts 77 }
+        ua5000IpmB              OBJECT IDENTIFIER ::= { hwProducts 78 }
+        ua5000ApmB              OBJECT IDENTIFIER ::= { hwProducts 79 }
+        ma5600                  OBJECT IDENTIFIER ::= { hwProducts 80 }
+        softx3000UC             OBJECT IDENTIFIER ::= { hwProducts 81 }  
+        hwOSTA                  OBJECT IDENTIFIER ::= { hwProducts 82 }  
+        secpath1800F            OBJECT IDENTIFIER ::= { hwProducts 83 }
+        eudemon2300             OBJECT IDENTIFIER ::= { hwProducts 84 }
+        ma5100V600              OBJECT IDENTIFIER ::= { hwProducts 85 }
+        ma5605                  OBJECT IDENTIFIER ::= { hwProducts 86 }
+
+        msp              OBJECT IDENTIFIER ::= { hwProducts 87 }
+            cX200A              OBJECT IDENTIFIER ::= { msp 1 }
+            cX200B              OBJECT IDENTIFIER ::= { msp 2 }
+            cX300A              OBJECT IDENTIFIER ::= { msp 3 }
+            cX300B              OBJECT IDENTIFIER ::= { msp 4 }
+            cX500A              OBJECT IDENTIFIER ::= { msp 5 }
+            cX380               OBJECT IDENTIFIER ::= { msp 6 }
+            cX600-8             OBJECT IDENTIFIER ::= { msp 7 }
+            cX600-16            OBJECT IDENTIFIER ::= { msp 8 }
+            cX200C              OBJECT IDENTIFIER ::= { msp 9 }
+            cX200D              OBJECT IDENTIFIER ::= { msp 10 }
+            cX200D-EA           OBJECT IDENTIFIER ::= { msp 11 }
+            cX200D-MC           OBJECT IDENTIFIER ::= { msp 12 }                       
+            cX600-4             OBJECT IDENTIFIER ::= { msp 13 }
+            cX380-PBT           OBJECT IDENTIFIER ::= { msp 14 }
+            cX380-ME            OBJECT IDENTIFIER ::= { msp 15 }
+            cX200D-EA-MC        OBJECT IDENTIFIER ::= { msp 16 } 
+            cX600-X3            OBJECT IDENTIFIER ::= { msp 17 }
+        ne20E                   OBJECT IDENTIFIER ::= { hwProducts 88 }
+            ne20E-4             OBJECT IDENTIFIER ::= { ne20E 1 }
+            ne20E-8             OBJECT IDENTIFIER ::= { ne20E 2 }
+
+
+        me60             OBJECT IDENTIFIER ::= { hwProducts 89}       
+        
+        eudemon300       OBJECT IDENTIFIER ::= { hwProducts 113} 
+        eudemonVPN3900   OBJECT IDENTIFIER ::= { hwProducts 114} 
+        eudemonEVPN5900  OBJECT IDENTIFIER ::= { hwProducts 115} 
+        eudemon100E      OBJECT IDENTIFIER ::= { hwProducts 116} 
+        eudemon200E      OBJECT IDENTIFIER ::= { hwProducts 117} 
+        eudemon200S      OBJECT IDENTIFIER ::= { hwProducts 118} 
+
+        svn3000          OBJECT IDENTIFIER ::= { hwProducts 124} 
+        usg5000          OBJECT IDENTIFIER ::= { hwProducts 125} 
+        usg9000          OBJECT IDENTIFIER ::= { hwProducts 126} 
+        eudemon200s      OBJECT IDENTIFIER ::= { hwProducts 127} 
+        sig1000          OBJECT IDENTIFIER ::= { hwProducts 129} 
+        sig9280          OBJECT IDENTIFIER ::= { hwProducts 130} 
+        sig2000          OBJECT IDENTIFIER ::= { hwProducts 131} 
+        s9300            OBJECT IDENTIFIER ::= { hwProducts 170}
+        ptn              OBJECT IDENTIFIER ::= { hwProducts 182}
+           ptn2900          OBJECT IDENTIFIER ::= { ptn 1 }
+           ptn6900          OBJECT IDENTIFIER ::= { ptn 2 }
+        ssp              OBJECT IDENTIFIER ::= { hwProducts 187}
+           ssp1000          OBJECT IDENTIFIER ::= { ssp 1 }
+           ssp2000          OBJECT IDENTIFIER ::= { ssp 2 }
+           ssp3000          OBJECT IDENTIFIER ::= { ssp 3 }
+
+
+        
+    huaweiExperimental          OBJECT IDENTIFIER ::= { huawei 4 }
+    
+    huaweiMgmt                  OBJECT IDENTIFIER ::= { huawei 5 }
+        hwAcl                   OBJECT IDENTIFIER ::= { huaweiMgmt 1 }
+        hwAaa                   OBJECT IDENTIFIER ::= { huaweiMgmt 2 }
+        hwLam                   OBJECT IDENTIFIER ::= { huaweiMgmt 3 }
+        hwPortal                OBJECT IDENTIFIER ::= { huaweiMgmt 4 }
+        hwRadius                OBJECT IDENTIFIER ::= { huaweiMgmt 5 }
+        hwVlan                  OBJECT IDENTIFIER ::= { huaweiMgmt 6 }
+        
+        hwDhcp                  OBJECT IDENTIFIER ::= { huaweiMgmt 7 }
+            hwDHCPRelayMib          OBJECT IDENTIFIER ::= { hwDhcp 1 }
+            hwDHCPServerMib         OBJECT IDENTIFIER ::= { hwDhcp 2 }
+        
+        hwVprn                  OBJECT IDENTIFIER ::= { huaweiMgmt 8 }
+        hwFr                    OBJECT IDENTIFIER ::= { huaweiMgmt 9 }
+        hwAtmCmRm               OBJECT IDENTIFIER ::= { huaweiMgmt 10 }
+        hwCes                   OBJECT IDENTIFIER ::= { huaweiMgmt 11 }
+        
+        hwMpls                  OBJECT IDENTIFIER ::= { huaweiMgmt 12 }
+            hwMplsLsr           OBJECT IDENTIFIER ::= { hwMpls 1 }
+            hwMplsLdp           OBJECT IDENTIFIER ::= { hwMpls 2 }
+            hwMplsVpn           OBJECT IDENTIFIER ::= { hwMpls 3 }
+            hwMplsFtn           OBJECT IDENTIFIER ::= { hwMpls 4 }
+            hwMplsVpls          OBJECT IDENTIFIER ::= { hwMpls 5 }
+            hwMplsLsp           OBJECT IDENTIFIER ::= { hwMpls 6 }
+            hwMplsOam           OBJECT IDENTIFIER ::= { hwMpls 7 }
+            hwPw                OBJECT IDENTIFIER ::= { hwMpls 8 }
+            
+        hwRouteManagement       OBJECT IDENTIFIER ::= { huaweiMgmt 13 }
+            hwRouteManagementUrm OBJECT IDENTIFIER ::= { hwRouteManagement 1 }
+            hwRouteManagementMrm OBJECT IDENTIFIER ::= { hwRouteManagement 2 }
+            hwRouteManagementRpm OBJECT IDENTIFIER ::= { hwRouteManagement 3 }
+            
+        hwEthernetPort           OBJECT IDENTIFIER ::= { huaweiMgmt 14 }
+        hwVTP                    OBJECT IDENTIFIER ::= { huaweiMgmt 15 }
+        hwMam                    OBJECT IDENTIFIER ::= { huaweiMgmt 16 }
+        hwArpProxy               OBJECT IDENTIFIER ::= { huaweiMgmt 17 }
+        hwDhcpProxy              OBJECT IDENTIFIER ::= { huaweiMgmt 18 }
+        hwIgspSnooping           OBJECT IDENTIFIER ::= { huaweiMgmt 19 }
+        hwGarpExt                OBJECT IDENTIFIER ::= { huaweiMgmt 20 }
+        hwRstpExt                OBJECT IDENTIFIER ::= { huaweiMgmt 21 }
+        hwPae8021xExt            OBJECT IDENTIFIER ::= { huaweiMgmt 22 }
+        hwNat                    OBJECT IDENTIFIER ::= { huaweiMgmt 23 }
+        hwVlanProtocol           OBJECT IDENTIFIER ::= { huaweiMgmt 24 }
+        hwDatacomm               OBJECT IDENTIFIER ::= { huaweiMgmt 25 }
+            hwBRASMib            OBJECT IDENTIFIER ::= { hwDatacomm 40 }
+        hwImps                   OBJECT IDENTIFIER ::= { huaweiMgmt 26 }
+
+       
+    huaweiUtility                OBJECT IDENTIFIER ::= { huawei 6 }
+        hwEnvironment            OBJECT IDENTIFIER ::= { huaweiUtility 1 }
+        hwPower                  OBJECT IDENTIFIER ::= { huaweiUtility 2 }
+        hwDev                    OBJECT IDENTIFIER ::= { huaweiUtility 3 }
+        hwNtp                    OBJECT IDENTIFIER ::= { huaweiUtility 4 }
+        hwMem                    OBJECT IDENTIFIER ::= { huaweiUtility 5 }
+        hwLoadBackup             OBJECT IDENTIFIER ::= { huaweiUtility 6 }
+        hwHgmp                   OBJECT IDENTIFIER ::= { huaweiUtility 7 }
+        hwIppool                 OBJECT IDENTIFIER ::= { huaweiUtility 8 }
+        hwFlash                  OBJECT IDENTIFIER ::= { huaweiUtility 9 }
+        hwConfig                 OBJECT IDENTIFIER ::= { huaweiUtility 10 }
+        hwAtmOam                 OBJECT IDENTIFIER ::= { huaweiUtility 11 }
+        hwAtmPos                 OBJECT IDENTIFIER ::= { huaweiUtility 12 }
+        hwHSL                    OBJECT IDENTIFIER ::= { huaweiUtility 13 }
+        hwMTA                    OBJECT IDENTIFIER ::= { huaweiUtility 14 }
+        hwSPC                    OBJECT IDENTIFIER ::= { huaweiUtility 15 }
+        hwV5                     OBJECT IDENTIFIER ::= { huaweiUtility 16 }
+        hwIma                    OBJECT IDENTIFIER ::= { huaweiUtility 17 }
+        hwUcl                    OBJECT IDENTIFIER ::= { huaweiUtility 18 }
+        hwAtmSvc                 OBJECT IDENTIFIER ::= { huaweiUtility 19 }
+        hwVPRing                 OBJECT IDENTIFIER ::= { huaweiUtility 20 }
+        
+        hwTest                   OBJECT IDENTIFIER ::= { huaweiUtility 21 }
+            hwTestCommon         OBJECT IDENTIFIER ::= { hwTest 1 }
+            hwNTest              OBJECT IDENTIFIER ::= { hwTest 2 }
+            hwBtest              OBJECT IDENTIFIER ::= { hwTest 3 }
+        hwSwitchOver             OBJECT IDENTIFIER ::= { huaweiUtility 22 }
+        hwVfb                    OBJECT IDENTIFIER ::= { huaweiUtility 23 }
+        hwClk                    OBJECT IDENTIFIER ::= { huaweiUtility 25 }
+        hwCdi                    OBJECT IDENTIFIER ::= { huaweiUtility 26 }
+        hwAti                    OBJECT IDENTIFIER ::= { huaweiUtility 27 }
+        hwDslamNtv               OBJECT IDENTIFIER ::= { huaweiUtility 28 }
+        hwServerMon              OBJECT IDENTIFIER ::= { huaweiUtility 29 }
+        hwSyntrap                OBJECT IDENTIFIER ::= { huaweiUtility 30 } 
+        hwAdsl                   OBJECT IDENTIFIER ::= { huaweiUtility 31 }
+        hwVdsl                   OBJECT IDENTIFIER ::= { huaweiUtility 32 }
+        hwHdsl                   OBJECT IDENTIFIER ::= { huaweiUtility 33 } 
+        hwDeha                   OBJECT IDENTIFIER ::= { huaweiUtility 34 } 
+        hwSyslog                 OBJECT IDENTIFIER ::= { huaweiUtility 35 } 
+        hwVoip                   OBJECT IDENTIFIER ::= { huaweiUtility 36 } 
+        hwVrp                    OBJECT IDENTIFIER ::= { huaweiUtility 37 } 
+        hwMus                    OBJECT IDENTIFIER ::= { huaweiUtility 38 } 
+        hwDns                    OBJECT IDENTIFIER ::= { huaweiUtility 39 } 
+        hwNetTest                OBJECT IDENTIFIER ::= { huaweiUtility 40 } 
+        hwMs                     OBJECT IDENTIFIER ::= { huaweiUtility 41 } 
+        hwPITP                   OBJECT IDENTIFIER ::= { huaweiUtility 42 } 
+        hwDslamMacPool           OBJECT IDENTIFIER ::= { huaweiUtility 43 } 
+        hwDslamPPPoA             OBJECT IDENTIFIER ::= { huaweiUtility 44 } 
+        hwDslamPvcProtocol       OBJECT IDENTIFIER ::= { huaweiUtility 45 } 
+        hwDslamIpoa              OBJECT IDENTIFIER ::= { huaweiUtility 46 } 
+        hwLicense                OBJECT IDENTIFIER ::= { huaweiUtility 47 } 
+END
+
+

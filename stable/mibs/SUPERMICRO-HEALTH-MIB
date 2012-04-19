@@ -1,0 +1,246 @@
+-- *****************************************************************
+-- SUPERMICRO-SMI.mib:  Super Micro Enterprise Structure of Management Information
+--
+-- October 26 2001, Software LAB
+--
+-- Copyright (c) 1993-2001 by Super Micro Computer Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+SUPERMICRO-HEALTH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	Integer32,
+	Gauge32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION,
+	DisplayString,
+	TruthValue
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP
+		FROM SNMPv2-CONF
+	smHealth
+		FROM SUPERMICRO-SMI;
+
+smHealthMIB MODULE-IDENTITY
+	LAST-UPDATED "200110260000Z"
+	ORGANIZATION "Super Micro Computer Inc."
+	CONTACT-INFO
+		"	Software Lab
+
+		Postal: 980 Rock Avenue
+			San Jose, CA  95131
+			USA
+
+		   Tel: +1 408 503 8000
+
+		E-mail: SoftLab@supermicro.com"
+	DESCRIPTION
+		"MIB module for monitoring health information"
+	::= { smHealth 1 }
+
+SMHealthInfoTypes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Represents the different types of health information that
+		may be present in a managed device.  The following health
+		information types are currently predefined:
+			0:  fan speed
+			1:  voltage
+			2:  temperature
+		"
+	SYNTAX		Integer32 (0..64)
+
+smHealthObjects OBJECT IDENTIFIER ::= { smHealthMIB 1 }
+
+smHealthMonitorTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF SMHealthMonitorEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of health monitoring entries."
+	::= { smHealthObjects 1 }
+
+-- ================
+smHealthMonitorEntry OBJECT-TYPE
+	SYNTAX	    SMHealthMonitorEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the health monitoring table.
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { smHealthMonitorIndex }
+	::= { smHealthMonitorTable 1 }
+
+SMHealthMonitorEntry ::=
+	SEQUENCE {
+		smHealthMonitorIndex		Integer32,
+		smHealthMonitorName			DisplayString,
+		smHealthMonitorType			SMHealthInfoTypes,
+		smHealthMonitorReading		Integer32,
+		smHealthMonitorHighLimit	Integer32,
+		smHealthMonitorLowLimit		Integer32,
+		smHealthMonitorMaxReading	Integer32,
+		smHealthMonitorMinReading	Integer32,
+		smHealthMonitorDivisor		Integer32,
+		smHealthMonitorMonitor		TruthValue
+	}
+
+smHealthMonitorIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"The unique value which identifies this Monitor device."
+	::= { smHealthMonitorEntry 1 }
+
+smHealthMonitorName OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"A textual full name assigned to the Monitor device.
+		This object is suitable for output to a human operator."
+	::= { smHealthMonitorEntry 2 }
+
+smHealthMonitorType OBJECT-TYPE
+	SYNTAX	    SMHealthInfoTypes
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Identifies this Monitor device type."
+	::= { smHealthMonitorEntry 3 }
+
+smHealthMonitorReading OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the value from the Monitor device that are
+		currently in use on the managed device.
+		FAN reading is in unit of RPM,
+		Voltage reading is in unit of mV,
+		Temperture reading is in unit of degree C"
+	::= { smHealthMonitorEntry 4 }
+
+smHealthMonitorHighLimit OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the value for the High limitation 
+		for the Monitor device that are currently in use on the
+		managed device.
+		Apply to Temperature and Voltage deivces only.
+		Voltage limit is in unit of mV,
+		Temperture limit is in unit of degree C"
+	::= { smHealthMonitorEntry 5 }
+
+smHealthMonitorLowLimit OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the value for the Low limitation 
+		for the Monitor device that are currently in use on the
+		managed device.
+		FAN limit is in unit of RPM,
+		Voltage limit is in unit of mV,
+		Temperture limit is in unit of degree C"
+	::= { smHealthMonitorEntry 6 }
+
+smHealthMonitorMaxReading OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the value for the possible Maximum reading value 
+		for the Monitor device that are currently in use on the
+		managed device.
+		FAN reading is in unit of RPM,
+		Voltage reading is in unit of mV,
+		Temperture reading is in unit of degree C"
+	::= { smHealthMonitorEntry 7 }
+
+smHealthMonitorMinReading OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the value for the possible Minimum reading value 
+		for the Monitor device that are currently in use on the
+		managed device.
+		FAN reading is in unit of RPM,
+		Voltage reading is in unit of mV,
+		Temperture reading is in unit of degree C"
+	::= { smHealthMonitorEntry 8 }
+
+smHealthMonitorDivisor OBJECT-TYPE
+	SYNTAX	    Integer32
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the value for the Divisor for the Fan
+		device that are currently in use on the managed device.
+		Apply to Fan devices only."
+	::= { smHealthMonitorEntry 9 }
+
+smHealthMonitorMonitor OBJECT-TYPE
+	SYNTAX	    TruthValue
+	MAX-ACCESS  read-write
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the monitoring status for the Fan device 
+		that are currently in use on the managed device.
+		1 = monitor, 2=do not monitor"
+	::= { smHealthMonitorEntry 10 }
+                                      
+-- notifications
+
+smHealthNotifications OBJECT IDENTIFIER ::= { smHealthMIB 2 }
+
+-- (no notifications are currently defined)
+
+
+-- conformance information
+
+smHealthConformance OBJECT IDENTIFIER ::= { smHealthMIB 3 }
+smHealthCompliances OBJECT IDENTIFIER ::= { smHealthConformance 1 }
+smHealthGroups OBJECT IDENTIFIER ::= { smHealthConformance 2 }
+
+
+-- compliance statements
+
+smHealthCompliance MODULE-COMPLIANCE
+	STATUS	current
+	DESCRIPTION
+		"The compliance statement for entities which implement
+		the Supermicro Health Monitoring MIB"
+	MODULE	-- this module
+		MANDATORY-GROUPS { smHealthMonitorGroup}
+	::= { smHealthCompliances 1 }
+
+
+-- units of conformance
+
+smHealthMonitorGroup OBJECT-GROUP
+	OBJECTS {
+		smHealthMonitorType,
+		smHealthMonitorName,
+		smHealthMonitorReading,
+		smHealthMonitorHighLimit,
+		smHealthMonitorLowLimit,
+		smHealthMonitorMaxReading,
+		smHealthMonitorMinReading,
+		smHealthMonitorMonitor
+	}
+	STATUS	current
+	DESCRIPTION
+		"A collection of objects providing Monitor devices."
+	::= { smHealthGroups 1 }
+
+END

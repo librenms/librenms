@@ -1,0 +1,607 @@
+
+-- *****************************************************************************
+-- Juniper-MROUTER-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   IP multicast router MIB
+--
+-- Copyright (c) 2002-2006 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-MROUTER-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, Unsigned32, Counter64,NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString,TruthValue,RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP  
+        FROM SNMPv2-CONF
+    IANAipMRouteProtocol    
+        FROM IANA-RTPROTO-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniInterfaceLocationValue, JuniInterfaceLocationType
+        FROM Juniper-TC
+    ipMRouteEntry,ipMRouteInterfaceEntry
+        FROM IPMROUTE-STD-MIB;
+   
+
+juniMRouterMIB  MODULE-IDENTITY
+    LAST-UPDATED "200609180809Z"  -- 18-Sep-06 04:09 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The IP multicast router MIB for Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200609180809Z"  -- 18-Sep-06 04:09 AM EDT  - JUNOSe 8.2  
+    DESCRIPTION
+        "Extended the ipMRouteInterfaceEntry Table, introduced traps and platform
+         dependent juniMRoutePortTable."
+    REVISION    "200609021102Z"  -- 02-Sep-06 07:02 PM EDT  - JUNOSe 8.1
+    DESCRIPTION
+        "Scalar attribute juniMcastRpfDisable is supported in this MIB module."
+    REVISION    "200606151013Z"  -- 15-Jun-06 06:13 AM EDT  - JUNOSe 8.1  
+    DESCRIPTION
+        "Extended the ipMRouteEntry Table."
+    REVISION    "200210282006Z"  -- 28-Oct-02 03:06 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 65 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniMRouterMIBObject          OBJECT IDENTIFIER ::= { juniMRouterMIB 1 }
+juniMcastTraps                OBJECT IDENTIFIER ::= { juniMRouterMIBObject 1 }
+juniMcastObjects              OBJECT IDENTIFIER ::= { juniMRouterMIBObject 2 }
+juniMcastNotifyObject         OBJECT IDENTIFIER ::= { juniMRouterMIBObject 3 }
+juniMcastNotificationObjects  OBJECT IDENTIFIER ::= { juniMcastNotifyObject 1 }
+
+
+
+--
+--  The static IP route table for RPF check
+--
+juniMcastRpfRouteTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniMcastRpfRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing the static IP routes for the mcast RPF check."
+    ::= { juniMcastObjects 1 }
+
+juniMcastRpfRouteEntry  OBJECT-TYPE
+    SYNTAX      JuniMcastRpfRouteEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing the static IP route for the mcast RPF check."
+    INDEX     { juniMcastRouteStaticDest,
+                juniMcastRouteStaticMask }
+    ::= { juniMcastRpfRouteTable 1 }
+
+JuniMcastRpfRouteEntry ::= SEQUENCE {
+    juniMcastRouteStaticDest          IpAddress,
+    juniMcastRouteStaticMask          IpAddress,
+    juniMcastRouteStaticRtPreference  Integer32,
+    juniMcastRouteStaticRpfHop        IpAddress,
+    juniMcastRouteStaticTag           Unsigned32,
+    juniMcastRouteStaticRowStatus     RowStatus }
+
+juniMcastRouteStaticDest  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The static group's destination IpAddress."
+    ::= { juniMcastRpfRouteEntry 1 }
+
+juniMcastRouteStaticMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The static group's destination IpAddress Mask."
+    ::= { juniMcastRpfRouteEntry 2 }
+
+juniMcastRouteStaticRtPreference  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administrative distance metric."
+    ::= { juniMcastRpfRouteEntry 3 }
+
+juniMcastRouteStaticRpfHop  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The next hop IP address."
+    ::= { juniMcastRpfRouteEntry 4 }
+
+juniMcastRouteStaticTag  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tag value to be associated."
+    ::= { juniMcastRpfRouteEntry 5 }
+
+juniMcastRouteStaticRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniMcastRouteStaticRowStatus
+            juniMcastRouteStaticDest
+            juniMcastRouteStaticMask
+            juniMcastRouteStaticRtPreference
+            juniMcastRouteStaticRpfHop
+            juniMcastRouteStaticTag "
+    ::= { juniMcastRpfRouteEntry 6 }
+
+--
+-- Extension of IP Multicast Routing MIB-Group
+--
+juniMRouteTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniMRouteEntry
+    MAX-ACCESS not-accessible	
+    STATUS      current
+    DESCRIPTION
+        "The table containing the extended information of IP Multicast Route Entry"
+    ::= { juniMcastObjects 2 }
+
+juniMRouteEntry OBJECT-TYPE
+    SYNTAX      JuniMRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry representing the additional information of IP Multicast Route Entry"
+    AUGMENTS {ipMRouteEntry}
+    ::= { juniMRouteTable  1 }
+
+JuniMRouteEntry ::= SEQUENCE {
+    juniMRouteAdmBwAdaptive	    TruthValue,
+    juniMRouteAdmBw         	    Integer32,
+    juniMRouteQosBwAdaptive 	    TruthValue,
+    juniMRouteQosBw         	    Integer32,
+    juniMRouteIsEcmp		    TruthValue,     
+    juniMRouteRpfDisabled		    TruthValue,
+    juniMRouteOwnerProtoType	    IANAipMRouteProtocol,
+    juniMRoutePktFwd		    Counter64,
+    juniMRouteOifCnt		    Integer32 }
+
+juniMRouteAdmBwAdaptive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that bandwidth is measured. "
+    ::= { juniMRouteEntry 1 }
+
+juniMRouteAdmBw         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Multicast Admission Control bandwidth in bps."
+    ::= { juniMRouteEntry 2 }
+
+juniMRouteQosBwAdaptive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that qos bandwidth is measured.  "
+    ::= { juniMRouteEntry 3 }
+
+juniMRouteQosBw         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "QoS Adjustment bandwidth in bps. "
+    ::= { juniMRouteEntry 4 }
+
+juniMRouteIsEcmp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates RPF route is an ECMP route."
+    ::= { juniMRouteEntry 5 }
+
+juniMRouteRpfDisabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS read-only
+
+    STATUS      current
+    DESCRIPTION
+        "Indicates that RPF check is disabled for this entry."
+    ::= { juniMRouteEntry 6 }
+
+juniMRouteOwnerProtoType OBJECT-TYPE
+    SYNTAX      IANAipMRouteProtocol
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the multicast protocol type."
+    ::= { juniMRouteEntry 7 }
+    	
+juniMRoutePktFwd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Packets received that made it out on any egress."
+    ::= { juniMRouteEntry 8 }
+
+juniMRouteOifCnt		OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the OIF count."
+    ::= { juniMRouteEntry 9 }
+
+juniMcastRpfDisable OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32)) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Disable RPF check for the Group access list name. Null value for 
+          enabling RPF check for the access list. "  
+    ::= { juniMcastObjects 3 }
+
+--
+--  The Multicast Routing Interface Table
+--
+
+juniMRouteInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JuniMRouteInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table containing multicast routing
+            information specific to interfaces."
+    ::= { juniMcastObjects 4 }
+
+juniMRouteInterfaceEntry OBJECT-TYPE
+    SYNTAX     JuniMRouteInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) containing the multicast routing
+            information for a particular interface."
+    AUGMENTS   { ipMRouteInterfaceEntry }
+    ::= { juniMRouteInterfaceTable 1 }
+
+JuniMRouteInterfaceEntry ::= SEQUENCE { 
+    juniMRouteInterfaceActiveGroups          Integer32,
+    juniMRouteInterfaceBlockedGroups         Integer32
+    }
+
+juniMRouteInterfaceActiveGroups OBJECT-TYPE
+    SYNTAX     Integer32 (0..1024)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This indicates the total number of groups currently forwarded on the interface."
+    ::= { juniMRouteInterfaceEntry 1 }
+
+juniMRouteInterfaceBlockedGroups OBJECT-TYPE
+    SYNTAX     Integer32 (0..1024)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This indicates the total number of groups currently blocked on the interface."
+    ::= { juniMRouteInterfaceEntry 2 }
+
+
+--
+-- System wide platform dependent objects
+--
+
+juniMroutePortLocationType OBJECT-TYPE
+    SYNTAX      JuniInterfaceLocationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the interpretation of JuniInterfaceLocationValue object
+        values into platform-dependent interface location components, e.g.,
+        'slot.port' on an ERX."
+    ::= { juniMcastObjects 5 }
+
+
+juniMRoutePortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniMRoutePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The (conceptual) table containing multicast routing
+         information specific to the number of mroutes (across all VRs) ,
+         that have OIFs, on a port."
+    ::= { juniMcastObjects 6 }
+
+juniMRoutePortEntry  OBJECT-TYPE
+    SYNTAX      JuniMRoutePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) containing the multicast routing
+         information specific to the number of mroutes (across all VRs) ,
+         that have OIFs, on a port."
+    INDEX     { juniMRoutePortLocationIndex  }
+    ::= { juniMRoutePortTable 1 }
+
+JuniMRoutePortEntry ::= SEQUENCE {
+    juniMRoutePortLocationIndex              JuniInterfaceLocationValue,
+    juniMRoutePortMaxBw                      Integer32,
+    juniMRoutePortPriorityBw                 Integer32,
+    juniMRoutePortHysteresis                 Integer32,
+    juniMRoutePortAdmittedBw                 Integer32,
+    juniMRoutePortSGCount                    Integer32,
+    juniMRoutePortLimit                      Integer32}
+
+juniMRoutePortLocationIndex  OBJECT-TYPE
+    SYNTAX      JuniInterfaceLocationValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of a platform specific port location."        
+    ::= { juniMRoutePortEntry 1 }
+
+juniMRoutePortMaxBw  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum port admission-bandwidth-limit to be configured on the port."
+    ::= { juniMRoutePortEntry 2 }
+
+juniMRoutePortPriorityBw  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum port priority-bandwidth-limit to be configured on the port."
+    ::= { juniMRoutePortEntry 3 }
+
+juniMRoutePortHysteresis  OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Hysteresis to be configured on the port. Applies to juniMRoutePortMaxBw 
+        and juniMRoutePortPriorityBw."
+    ::= { juniMRoutePortEntry 4 }
+
+juniMRoutePortAdmittedBw  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Admitted Bandwidht on the port."
+    ::= { juniMRoutePortEntry 5 }
+
+juniMRoutePortSGCount  OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of mroutes on this port."
+    ::= { juniMRoutePortEntry 6 }
+
+juniMRoutePortLimit  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Limit on the number of mroutes, with the OIFs on the port, to be
+         configured on the port ."
+    ::= { juniMRoutePortEntry 7 }
+
+----------------
+-- mrouter Traps
+----------------
+
+juniMRoutePortBwExceded NOTIFICATION-TYPE
+    OBJECTS {
+         juniMRouteIfLocIndex
+    }
+    STATUS             current
+    DESCRIPTION
+            " A juniMRoutePortBwExceded trap signifies the port max
+              admission limit are exceded. This trap should be generated when the
+              OIFs are blocked due to exceded admission limit on the port."
+    ::= { juniMcastTraps 1 }
+
+
+juniMRoutePortBwReceded NOTIFICATION-TYPE
+    OBJECTS {
+         juniMRouteIfLocIndex
+    }
+    STATUS             current
+    DESCRIPTION
+            " A juniMRoutePortBwReceded trap signifies the port max
+              admission limit are receded. This trap should be generated when the
+              the port admission limits fall below the configured hysteresis 
+              value on the port."
+    ::= { juniMcastTraps 2 }
+
+juniMRoutePortPriorityBwExceded NOTIFICATION-TYPE
+    OBJECTS {
+         juniMRouteIfLocIndex
+    }
+    STATUS             current
+    DESCRIPTION
+            " A juniMRoutePortPriorityBwExceded trap signifies the port priority
+              admission limit are exceded. This trap should be generated when the
+              OIFs are blocked due to exceded admission limit on the port."
+    ::= { juniMcastTraps 3 }
+
+
+juniMRoutePortPriorityBwReceded NOTIFICATION-TYPE
+    OBJECTS {
+         juniMRouteIfLocIndex
+    }
+    STATUS             current
+    DESCRIPTION
+            " A juniMRoutePortPriorityReceded trap signifies the port priority
+              admission limit are receded. This trap should be generated when the
+              the port admission limits fall below the configured hysteresis 
+              value on the port."
+    ::= { juniMcastTraps 4 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notification control objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniMRouteIfLocIndex  OBJECT-TYPE
+    SYNTAX      JuniInterfaceLocationValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The interface location on which the mrouter trap is generated."
+    ::= { juniMcastNotificationObjects 1 }
+
+
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniMcastConformance OBJECT IDENTIFIER ::= { juniMRouterMIB 2 }
+juniMcastCompliances OBJECT IDENTIFIER ::= { juniMcastConformance 1 }
+juniMcastConfGroups  OBJECT IDENTIFIER ::= { juniMcastConformance 2 }
+
+
+--
+-- compliance statements
+--
+juniMcastCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        multicast MIB.  This statement became obsolete when juniMRouteTable
+        were added. "
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniMcastRpfRouteConfGroup }
+    ::= { juniMcastCompliances 1 }                                 -- JUNOSe 5.0
+
+juniMcastCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        multicast MIB. "
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniMcastRpfRouteConfGroup,
+            juniMRouteConfGroup }
+    ::= { juniMcastCompliances 2 }                                 -- JUNOSe 8.1
+
+juniMcastCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        multicast MIB.This statement became obsolete when juniMRouteInterfaceTable,
+        juniMRoutePortTable and mrouter traps were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniMcastRpfRouteConfGroup,
+            juniMRouteConfGroup,
+            juniMcastGlobalConfGroup }
+    ::= { juniMcastCompliances 3 }                                 -- JUNOSe 8.1
+
+juniMcastCompliance4  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        multicast MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniMcastRpfRouteConfGroup,
+            juniMRouteConfGroup,
+            juniMcastGlobalConfGroup,
+            juniMRoutePortConfGroup }
+    ::= { juniMcastCompliances 4 }                                 -- JUNOSe 8.2
+
+--
+-- units of conformance
+--
+juniMcastRpfRouteConfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniMcastRouteStaticRtPreference,
+        juniMcastRouteStaticRpfHop,
+        juniMcastRouteStaticTag,
+        juniMcastRouteStaticRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of multicast RPF static
+        routes of the product."
+    ::= { juniMcastConfGroups 1 }
+
+juniMRouteConfGroup       OBJECT-GROUP
+    OBJECTS {
+         juniMRouteAdmBwAdaptive,
+         juniMRouteAdmBw,
+         juniMRouteQosBwAdaptive,
+         juniMRouteQosBw,
+         juniMRouteIsEcmp,     
+         juniMRouteRpfDisabled,
+         juniMRouteOwnerProtoType,
+         juniMRoutePktFwd,
+         juniMRouteOifCnt }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing extended information of IP 
+        Multicast Route Entry."
+    ::= { juniMcastConfGroups 2 }
+
+juniMcastGlobalConfGroup   OBJECT-GROUP
+    OBJECTS {
+        juniMcastRpfDisable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of global scalar objects providing extended information 
+        of IP Multicast Route Entry."
+    ::= { juniMcastConfGroups 3 }
+
+
+juniMRoutePortConfGroup            OBJECT-GROUP
+    OBJECTS {
+         juniMRouteInterfaceActiveGroups,
+         juniMRouteInterfaceBlockedGroups,
+         juniMroutePortLocationType,
+         juniMRoutePortMaxBw,              
+         juniMRoutePortPriorityBw,
+         juniMRoutePortHysteresis,         
+         juniMRoutePortAdmittedBw,         
+         juniMRoutePortSGCount,            
+         juniMRoutePortLimit }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing extended information of IP 
+        Multicast Route Entry."
+    ::= { juniMcastConfGroups 4 }
+
+END

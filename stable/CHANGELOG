@@ -1,0 +1,245 @@
+For more granular updates check:
+
+http://www.observium.org/websvn/listing.php?repname=observer
+
+SVN
+
+* Smokeping integration
+* Fixed Cisco VLAN tracking
+* Much improved devices/ports browsing
+* Some improvements to map
+
+0.10.5.2248 ( 5th May 2011 )
+
+* Improve poller/discovery
+* Improve option bar option highlighting
+* Add support for OSPF discovery
+* Add support for CEF switching statistics from CISCO-CEF-MIB
+* Add support for UDP6 transport (and others) for SNMP.
+* Improved Microsoft Windows detection.
+* Juniper ScreenOS CPU/Memory.
+* Click to zoom for graphs.
+* Force10 support (hardware, os, version, temp).
+* Mikrotik RouterOS fixes.
+* Fixes to port type and customer detection.
+* Improved base URL detection. (*REMOVE* $config['base_url'] from your config.php).
+* Add graphing of VPN statistics on Cisco IOS/ASA.
+* Migrate entire graphing system to new graphing structure with per-graphtype authentication.
+* Add more UNIX statistics graphing from UCD-MIB.
+* Add support for XUPS-MIB for Eaton devices
+* Add support for JunOS BGP prefix counters
+* Add support for Ingrasys iPoMan 1200 series PDUs
+* Add support for Socomec Net Vision UPS systems
+* Add support for ServerTech Sentry3 power systems
+* Add support for VMWare ESX hosts, and listing their virtual machines
+* Add support for listing libvirt virtual machines
+* MySQL and nginx application pollers
+* Add support for IPMI polling on servers
+* Add a new discovery parameter to only discover new devices, this can be run every 5 minutes
+  to speed up discovery of added devices through the webinterface
+* Make a distinction between 'ignore' and 'disable' for ports, like for devices
+* Allow overriding sysLocation and sysContact
+
+Release 0.10.7.1 ( 19th July 2010 )
+
+* Minor bugfix release
+
+Release 0.10.7 ( 18th July 2010 )
+
+* Project name has changed to Observium
+* rrdcached support
+* Support of ADSL-LINE-MIB and new ports display mode designed
+  for service providers with DSLAMs and MSANs
+* Discovery of new device/os types :
+  Apple Airport, Axis Camera, Motorola Netopia, APC Switched PDU,
+  Extreme Extremeware, Redback, ZyXEL ZyWALL, DELL DRAC,
+  Dell PowerVault, Allied Telesis, Cisco NX-OS, MGE Evolution UPS
+  HP JetDirect printers, APC STS/ATS, Mikrotic RouterOS,
+  AKCP SensorProbe3
+* New structure for device graphing to aid 3rd party addons
+* Temperature detection from CISCO-ENTITY-SENSOR-MIB
+* Graphing of statistics from DISKIO-MIB
+* Ongoing unification of all sensors into one 'sensors' framework
+* Detection and polling of frequency, voltage and amperage stats
+  for many UPSes and power switching hardware
+* Detection of Extremeware / XOS versions and hardware
+* Detection of several Allied Telesis devices and their versions
+  and hardware
+* Added a lot of MIBs
+
+Release 0.10.6 ( 21st June 2010 )
+
+* Changed netstats (icmp, udp, tcp, snmp, ip) stats collection
+* Implemented new application monitoring system
+* Implemented new includes-based graphing system
+* Improvements to eventlogging code
+* Replaced interfaces polling code (2x speed improvement on average!)
+
+* Removed, cleaned up or replaced a lot of old and unused code.
+
+* Added support for IPv6 BGP sessions on JunOS
+* Added support for Dell Powerconnect and HP Procurve switches
+* Added support for Supermicro SuperoDoctor temperature support
+* Added support for LLDP discovery
+* Added support for Q-BRIDGE-MIB VLANs (basically for non-cisco HW)
+* Added support for LMSensors and Supermicro Temp/Fan/Voltages
+* Replaced old image-based percentage bar with new CSS bar
+* Added Foundry/Brocade support
+* Added Juniper JunOSe support
+
+* And more...
+
+Release 0.6.0 ( 28th August 2009 )
+
+* Changed IPv6 database structure and discovery *** DATABASE CHANGE ***
+* Added CollectD integration code
+* Added fixed mib loading to SNMP commands
+* Replaced IPv4 and IPv6 discovery code
+* Added support for CISCO-PROCESS-MIB for per-CPU graphing
+* Added support for CISCO-ENHANCED-MEMORY-POOL-MIB for per-pool graphing
+
+Release 0.5.1 ( 25 March 2009 )
+
+* Primarily bugfixes to 0.5.0
+* Removed GPL'd code and added downloader helper scripts instead
+* Added Pseudowire menu entry and configuration option
+* Fixed device adding scripts and added port option to web interface
+* Fixed interface packets/bits/errors links
+* Fixed some non-absolute links
+* Fixed device deletion script
+
+Release 0.5.0 ( 24 March 2009 )
+
+* Cleaned up a lot of hardcoded paths
+* Cleaned up BGP session polling
+* Added CDP-based device link map
+* Added sysName tracking for more accurate CDP linking
+* Added more search features for syslog, device list and inventory
+* Replaced old syslog system with new version, without pipes
+* Added more Pseudowire/X-Connect tracking information
+* Fixed a lot of URLs to be absolute URLs built from base_url
+* Fixed some mod_rewrite rules
+* Added basic MAC accounting polling
+* Added config display and syntax colouring for RANCID-collected IOS configs
+
+Release 0.4.1 ( 20th Nov 2008 )
+
+* Cleaned up some configuration settings
+* Added more connection type rewrites
+* Added ability to change device names
+* Cleaned up IPv6 and CDP discovery
+* Security fixes
+
+Release 0.4.0 ( 11th Nov 2008 )
+
+* Much prettier front page
+* Tidied up service checking layout
+* Added MPLS VRF tracking
+* Added Pseudowire/X-Connect tracking
+* Basic front page customisation
+* Fixed aggregate graphs
+* IPv6 address tracking
+* View for ports with errors
+* Added some JunOS support
+
+Release 0.3.2.1 ( 27th March 2008 )
+
+* Minor bugfix to interface discovery engine.
+
+Release 0.3.2 ( 26th March 2008 )
+
+* Added BGP peer detection and watching
+* Cleaned up the front page and made it more useful
+* Added better syslog support
+* Added some Juniper Netscreen support
+* Wrote a better OS detection system
+* Added some billing features
+* Rewrote and restructured a lot of the discovery
+* Rewrote some polling stuff
+
+... This release is greatly improved, and threatens
+ to actually work properly for people other than me!
+
+Release 0.3.1 ( 30th November 2007 )
+
+* Fixed a great many things and made it prettier!
+
+ This release took so long that I've largely forgotten
+ what's been changed. Again!
+
+Release 0.3.0-pre1 ( 24th June 2007 )
+
+* Added VLAN features for cisco devices
+* Added scripts to check for interface errors
+* Added extraction of current interface rates from rrd files
+* Added some syslog stuff
+* Added email notification for device reboots
+
+.. Lots of other updates, most of which i've forgotten about!
+
+Release 0.2.5
+
+* Added new CDP detection code and proper CDP link removal
+* Added service addition page
+* Added device overview
+* Added more interface pages
+* Added syslogging using syslog-ng
+* Added temperature monitoring and discovery
+* Added TCP/IP/UDP/ICMP statistics collection and graphing
+* Fixed some graphs
+* Tidied up some font sizes
+* Added stylesheet variable into config.php to allow custom files to be used
+
+Release 0.2.4
+
+* Fixed some misnamed files
+* Fixed some hardcoded binary locations
+* Removed some messy AJAX
+* Replaced the menu bar
+* Added some new menu items
+* Cleaned up presentation of some pages
+
+Release 0.2.3
+
+* Fixed some broken graphing code
+* Added host add/remove to web interface
+* Added host/interface/service status to web interface
+* Tidied up some code
+
+Release 0.2.2
+
+* Replaced old layout with new 'Project Observer' layout
+* Added recognition of SNOM SIP phones, data collection and some graphing
+* Modified standard layout to remove Vostron-specific elements
+* Added cpu graphing for ProCurve devices
+* Added tabs for device page and AJAX loading of contents
+* Detection of HP ProCurve devices
+* Detection of m0n0wall devices by new snmp-id
+* Can now disable the Transit, Peering and Customer sections
+* Added some tabbing to Interface
+* Added detection of Net/Open/DragonFlyBSD
+
+Release 0.2.1 - 19th January 2007
+
+* Modification of graphing disply style
+* Seperatation of device types
+* Implementation of storage graphing
+
+Release 0.2.0 - 20th December 2006
+
+* Cleanup of graphing code
+* Seperation of customer-accessible interface
+* Preliminary alerting system
+
+Release 0.1.2 - Late November 2006
+
+* Graphing of additional server-related data
+
+Release 0.1.1 - November 2006
+
+* Removal of large amounts of perl
+
+Release 0.1.0 - October 2006
+
+* Initial Release
+* Basic discovery in place. Graphing in place

@@ -1,0 +1,1992 @@
+
+-- *****************************************************************************
+-- Juniper-IP-POLICY-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Extensions for IP Policy management
+--
+-- Copyright (c) 1998 Redstone Communications, Inc.
+-- Copyright (c) 2000, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2003 Juniper Networks, Inc.
+-- Copyright (c) 2006 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+
+Juniper-IP-POLICY-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Counter32, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DisplayString, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniIpPolicyMIB  MODULE-IDENTITY
+    LAST-UPDATED "200701250824Z"  -- 25-Jan-07 03:24 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The IP Policy MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200701250834Z"  -- 25-Jan-07 03:34 AM EST  - JUNOSe 7.0
+    DESCRIPTION
+        "Changed the length of octet string for juniIpAspAccessExpression to
+         vary from 1 to 256."
+    REVISION    "200607250413Z"  -- 24-Jul-06 11:13 PM EST  - JUNOSe 6.0
+    DESCRIPTION
+        "Changed the length of octet string for juniIpCommunityListExpression to
+         vary from 1 to 256." 
+    REVISION    "200601101421Z"  -- 10-Jan-06 09:21 AM EST  - JUNOSe 7.1
+    DESCRIPTION
+        "Added two more protocols to JuniIpRedistributeProtocol."
+    REVISION    "200402051421Z"  -- 05-Feb-04 09:21 AM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added Policy-List under juniIpRouteMapClauseElemId."
+    REVISION    "200302051421Z"  -- 05-Feb-03 09:21 AM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added IP route maps config support."
+    REVISION    "200302042230Z"  -- 04-Feb-03 05:30 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Fixed the index for the juniIpDynRedistributeTable."
+    REVISION    "200201031506Z"  -- 03-Jan-02 11:06 AM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Expanded MIB to include following tables:
+                     JuniIpAspAccessListTable
+                     JuniIpPrefixListTable
+                     JuniIpPrefixTreeTable
+                     JuniIpCommunityListTable
+                     JuniIpExtCommunityListTable
+                     JuniIpRedistributeTable
+                     JuniIpRouteMapTable
+         Expanded MIB to include a new textual convention:
+                     JuniIpPolicyExtendedCommunity"
+    REVISION    "200007200000Z"  -- 20-Jul-00               - JUNOSe 2.0
+    DESCRIPTION
+        "Added Named Access List support."
+    REVISION    "9811190000Z"    -- 19-Nov-98               - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 13 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniIpPolicyName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION
+        "IP access list name.  Represents textual information taken from the NVT
+        ASCII character set."
+    REFERENCE
+        "RFC 854: NVT ASCII character set.  See SNMPv2-TC.DisplayString
+        DESCRIPTION for a summary."
+    SYNTAX      OCTET STRING (SIZE(0..32))
+
+JuniIpPolicyPolicy ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of IP policy actions."
+    SYNTAX      INTEGER {
+                    permit(0),
+                    deny(1) }
+
+JuniIpDynRedistributeProtocol ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of protocols choices used to configure to/from settings in an
+        IP Dynamic Route Redistribution element."
+    SYNTAX      INTEGER {
+                    ipRedistrProtocolIsis(1),
+                    ipRedistrProtocolRip(2),
+                    ipRedistrProtocolOspf(3),
+                    ipRedistrProtocolStatic(4),
+                    ipRedistrProtocolConnected(5),
+                    ipRedistrProtocolBgp(6),
+                    ipRedistrProtocolMBgp(7),
+                    ipRedistrProtocolStaticLow(8),
+                    ipRedistrProtocolOspfIntern(9),
+                    ipRedistrProtocolOspfExtern(10),
+                    ipRedistrProtocolDvmrp(11),
+                    ipRedistrProtocolDvmrpAggregate(12),
+                    ipRedistrProtocolHidden(13),
+                    ipRedistrProtocolOwnerAccess(14),
+                    ipRedistrProtocolOwnerAccessInternal(15),
+                    ipRedistrProtocolOwnerDialout(16),
+                    ipRedistrProtocolDefaultRoute(17) }
+
+JuniIpRedistributeProtocol ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of protocols choices used to configure to/from settings in an
+        IP Redistribution element."
+    SYNTAX      INTEGER {
+                    ipRedistrProtocolStatic(1),
+                    ipRedistrProtocolBgp(2),
+                    ipRedistrProtocolMBgp(3),
+                    ipRedistrProtocolOspf(4),
+                    ipRedistrProtocolIsis(5),
+                    ipRedistrProtocolRip(6),
+                    ipRedistrProtocolConnected(7),
+                    ipRedistrProtocolDefaultRoute(8),
+                    ipRedistrProtocolAccess(9),
+                    ipRedistrProtocolAccessInternal(10),
+                    ipRedistrProtocolDvmrp(11),
+                    ipRedistrProtocolDialout(12),
+  			  ipRedistrProtocolOspfM(13),
+                    ipRedistrProtocolStaticMcast(14),
+			  ipRedistrProtocolLdpUcast(15) }
+
+JuniIpPolicyAdminStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned management state for an IP route policy."
+    SYNTAX      INTEGER {
+                    ipPolicyAdminStateDisable(0),
+                    ipPolicyAdminStateEnable(1) }
+
+JuniIpPolicyExtendedCommunity ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "22a"
+    STATUS      current
+    DESCRIPTION
+        "The extended community specification.  Represents textual information
+        taken from the NVT ASCII character set.  The format of the text string
+        is defined by either one of these choices:
+
+         In:
+             ASN::nn          where ASN is a 16 bit decimal number and
+                              nn is a 32 bit decimal number
+
+         Or:
+             IP-address::nn   where IP-address is in dotted decimal format
+                              and nn is a 16 bit decimal number
+         "
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    SYNTAX      OCTET STRING (SIZE(0..22))
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpPolicyObjects    OBJECT IDENTIFIER ::= { juniIpPolicyMIB 1 }
+
+juniIpAccessList       OBJECT IDENTIFIER ::= { juniIpPolicyObjects 1 }
+juniIpNamedAccessList  OBJECT IDENTIFIER ::= { juniIpPolicyObjects 2 }
+juniIpAspAccessList    OBJECT IDENTIFIER ::= { juniIpPolicyObjects 3 }
+juniIpPrefixList       OBJECT IDENTIFIER ::= { juniIpPolicyObjects 4 }
+juniIpPrefixTree       OBJECT IDENTIFIER ::= { juniIpPolicyObjects 5 }
+juniIpCommunityList    OBJECT IDENTIFIER ::= { juniIpPolicyObjects 6 }
+juniIpRedistributeList OBJECT IDENTIFIER ::= { juniIpPolicyObjects 7 }
+juniIpRouteMapTree     OBJECT IDENTIFIER ::= { juniIpPolicyObjects 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Access Lists
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- The IP Access List Table
+--
+juniIpAccessListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpAccessListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of IP access lists.  Entries
+        belonging to the same access list are ordered, and comparisons to those
+        entries are performed in that order until a match is detected.  If no
+        match is found, the default action is to 'deny'."
+    ::= { juniIpAccessList 1 }
+
+juniIpAccessListEntry OBJECT-TYPE
+    SYNTAX      JuniIpAccessListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an IP access list element."
+    INDEX     { juniIpAccessListId,
+                juniIpAccessListElemId }
+    ::= { juniIpAccessListTable 1 }
+
+JuniIpAccessListEntry ::= SEQUENCE {
+    juniIpAccessListId        Integer32,
+    juniIpAccessListElemId    Integer32,
+    juniIpAccessListRowStatus RowStatus,
+    juniIpAccessListAction    JuniIpPolicyPolicy,
+    juniIpAccessListSrc       IpAddress,
+    juniIpAccessListSrcMask   IpAddress,
+    juniIpAccessListDst       IpAddress,
+    juniIpAccessListDstMask   IpAddress,
+    juniIpAccessListProtocol  Integer32 }
+
+juniIpAccessListId OBJECT-TYPE
+    SYNTAX      Integer32 (1..10000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of the access list to which this entry belongs."
+    ::= { juniIpAccessListEntry 1 }
+
+juniIpAccessListElemId OBJECT-TYPE
+    SYNTAX      Integer32 (0..10000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The relative position of this entry within its access list.  Access
+        list entries are searched in this sequence (low to high values) until a
+        match is found.
+
+        NOTE:  The value zero is reserved for use with SET operations to perform
+        special-purpose table entry creations/deletions; see the DESCRIPTION of
+        juniIpAccessListRowStatus for details.
+
+        Get/GetNext/GetBulk retrievals never return an entry for which this
+        object is zero-valued."
+    ::= { juniIpAccessListEntry 2 }
+
+juniIpAccessListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        Two configuration levels are defined, limited and full.  EARLY
+        IMPLEMENTATIONS MIGHT PROVIDE ONLY THE LIMITED LEVEL OF CONFIGURATION
+        CAPABILITY.
+
+        *** LIMITED ACCESS LIST CONFIGURATION LEVEL ***
+
+         1) RowStatus createAndGo/destroy operations directed to a target table
+            entry for which juniIpAccessListElemId is ZERO, have the following
+            special-purpose semantics:
+                createAndGo     Create an entry having the specified
+                                configuration and append it to the target list,
+                                i.e. assign it a value of juniIpAccessListElemId
+                                that is one greater than the current last
+                                element in the list.
+                destroy         Destroy the specified list and all of its
+                                constituent elements.
+
+         2) RowStatus createAndGo/destroy operations directed to a target table
+            entry for which juniIpAccessListElemId is NONZERO are disallowed.
+
+        *** FULL ACCESS LIST CONFIGURATION LEVEL ***
+
+        Permit conventional RowStatus-based management of table entries having a
+        nonzero value for juniIpAccessListElemId, IN ADDITION TO the special
+        RowStatus semantics applied to entries having a zero value for
+        juniIpAccessListElemId.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+                juniIpAccessListRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+
+                The value of juniIpAccessListElemId is nonzero.
+
+        Once created, element attributes cannot be modified except by a
+        RowStatus destroy operation to delete the list element."
+    ::= { juniIpAccessListEntry 3 }
+
+juniIpAccessListAction OBJECT-TYPE
+    SYNTAX      JuniIpPolicyPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the disposition of an item that matches the comparison
+        criteria described by this entry."
+    DEFVAL    { permit }
+    ::= { juniIpAccessListEntry 4 }
+
+juniIpAccessListSrc OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A source IP address.  A subject IP address is first masked with the
+        value of juniIpAccessListSrcMask, then the result is compared to this
+        value.  Setting both this object and its corresponding mask to 0.0.0.0
+        acts as a wildcard, matching any source IP address."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniIpAccessListEntry 5 }
+
+juniIpAccessListSrcMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address mask to be applied to a subject source IP address before
+        comparing it to juniIpAccessListSrc.  Ones in the mask identify which
+        bits in the subject IP address are significant for the comparison.
+
+        To be considered valid, a nonzero value for this object must contain a
+        single contiguous string of ones, beginning with the most significant
+        bit of the mask."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniIpAccessListEntry 6 }
+
+juniIpAccessListDst OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A destination IP address.  A subject IP address is first masked with
+        the value of juniIpAccessListDstMask, then the result is compared to
+        this value.  Setting both this object and its corresponding mask to
+        0.0.0.0 acts as a wildcard, matching any destination IP address."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniIpAccessListEntry 7 }
+
+juniIpAccessListDstMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address mask to be applied to a subject destination IP address
+        before comparing it to juniIpAccessListDst.  Ones in the mask identify
+        which bits in the IP address are significant for the comparison.
+
+        To be considered valid, a nonzero value for this object must contain a
+        single contiguous string of ones, beginning with the most significant
+        bit of the mask."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniIpAccessListEntry 8 }
+
+juniIpAccessListProtocol OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An IP Protocol value.  Nonzero values match a specific IP Protocol
+        value (e.g. 6 for TCP) carried in an IP packet; a value of zero acts as
+        a wildcard, matching any IP Protocol."
+    DEFVAL    { 0 }
+    ::= { juniIpAccessListEntry 9 }
+
+
+--
+-- The IP Named Access List Table
+--
+juniIpNamedAccessListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpNamedAccessListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of IP access lists.  Entries
+        belonging to the same access list are ordered, and comparisons to those
+        entries are performed in that order until a match is detected.  If no
+        match is found, the default action is to 'deny'."
+    ::= { juniIpNamedAccessList 1 }
+
+juniIpNamedAccessListEntry OBJECT-TYPE
+    SYNTAX      JuniIpNamedAccessListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an IP access list element."
+    INDEX     { juniIpNamedAccessListName,
+                juniIpNamedAccessListElemId }
+    ::= { juniIpNamedAccessListTable 1 }
+
+JuniIpNamedAccessListEntry ::= SEQUENCE {
+    juniIpNamedAccessListName         JuniIpPolicyName,
+    juniIpNamedAccessListElemId       Integer32,
+    juniIpNamedAccessListRowStatus    RowStatus,
+    juniIpNamedAccessListAction       JuniIpPolicyPolicy,
+    juniIpNamedAccessListSrc          IpAddress,
+    juniIpNamedAccessListSrcMask      IpAddress,
+    juniIpNamedAccessListDst          IpAddress,
+    juniIpNamedAccessListDstMask      IpAddress,
+    juniIpNamedAccessListProtocol     Integer32 }
+
+juniIpNamedAccessListName OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the access list to which this entry belongs."
+    ::= { juniIpNamedAccessListEntry 1 }
+
+juniIpNamedAccessListElemId OBJECT-TYPE
+    SYNTAX      Integer32 (0..10000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The relative position of this entry within its access list.  Access
+        list entries are searched in this sequence (low to high values) until a
+        match is found.
+
+        NOTE:  The value zero is reserved for use with SET operations to perform
+        special-purpose table entry creations/deletions; see the DESCRIPTION of
+        juniIpNamedAccessListRowStatus for details.
+
+        Get/GetNext/GetBulk retrievals never return an entry for which this
+        object is zero-valued."
+    ::= { juniIpNamedAccessListEntry 2 }
+
+juniIpNamedAccessListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        Two configuration levels are defined, limited and full.  EARLY
+        IMPLEMENTATIONS MIGHT PROVIDE ONLY THE LIMITED LEVEL OF CONFIGURATION
+        CAPABILITY.
+
+        *** LIMITED ACCESS LIST CONFIGURATION LEVEL ***
+
+         1) RowStatus createAndGo/destroy operations directed to a target table
+            entry for which juniIpNamedAccessListElemId is ZERO, have the
+            following special-purpose semantics:
+                createAndGo     Create an entry having the specified
+                                configuration and append it to the target list,
+                                i.e. assign it a value of
+                                juniIpNamedAccessListElemId that is one greater
+                                than the current last element in the list.
+                destroy         Destroy the specified list and all of its
+                                constituent elements.
+
+         2) RowStatus createAndGo/destroy operations directed to a target table
+            entry for which juniIpNamedAccessListElemId is NONZERO are
+            disallowed.
+
+        *** FULL ACCESS LIST CONFIGURATION LEVEL ***
+
+        Permit conventional RowStatus-based management of table entries having a
+        nonzero value for juniIpNamedAccessListElemId, IN ADDITION TO the
+        special RowStatus semantics applied to entries having a zero value for
+        juniIpNamedAccessListElemId.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+                juniIpNamedAccessListRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+
+                The value of juniIpNamedAccessListElemId is nonzero.
+
+        Once created, element attributes cannot be modified except by a
+        RowStatus destroy operation to delete the list element."
+    ::= { juniIpNamedAccessListEntry 3 }
+
+juniIpNamedAccessListAction OBJECT-TYPE
+    SYNTAX      JuniIpPolicyPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the disposition of an item that matches the comparison
+        criteria described by this entry."
+    DEFVAL    { permit }
+    ::= { juniIpNamedAccessListEntry 4 }
+
+juniIpNamedAccessListSrc OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A source IP address.  A subject IP address is first masked with the
+        value of juniIpNamedAccessListSrcMask, then the result is compared to
+        this value.  Setting both this object and its corresponding mask to
+        0.0.0.0 acts as a wildcard, matching any source IP address."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniIpNamedAccessListEntry 5 }
+
+juniIpNamedAccessListSrcMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address mask to be applied to a subject source IP address before
+        comparing it to juniIpNamedAccessListSrc.  Ones in the mask identify
+        which bits in the subject IP address are significant for the comparison.
+
+        To be considered valid, a nonzero value for this object must contain a
+        single contiguous string of ones, beginning with the most significant
+        bit of the mask."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniIpNamedAccessListEntry 6 }
+
+juniIpNamedAccessListDst OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A destination IP address.  A subject IP address is first masked with
+        the value of juniIpNamedAccessListDstMask, then the result is compared
+        to this value.  Setting both this object and its corresponding mask to
+        0.0.0.0 acts as a wildcard, matching any destination IP address."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniIpNamedAccessListEntry 7 }
+
+juniIpNamedAccessListDstMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address mask to be applied to a subject destination IP address
+        before comparing it to juniIpNamedAccessListDst.  Ones in the mask
+        identify which bits in the IP address are significant for the
+        comparison.
+
+        To be considered valid, a nonzero value for this object must contain a
+        single contiguous string of ones, beginning with the most significant
+        bit of the mask."
+    DEFVAL    { '00000000'H }    -- 0.0.0.0
+    ::= { juniIpNamedAccessListEntry 8 }
+
+juniIpNamedAccessListProtocol OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An IP Protocol value.  Nonzero values match a specific IP Protocol
+        value (e.g. 6 for TCP) carried in an IP packet; a value of zero acts as
+        a wildcard, matching any IP Protocol."
+    DEFVAL    { 0 }
+    ::= { juniIpNamedAccessListEntry 9 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP AS-Path Access List
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- The IP AS-Path Access Table
+--
+juniIpAspAccessTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpAspAccessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of IP AS-Path access entries."
+    ::= { juniIpAspAccessList 1 }
+
+juniIpAspAccessEntry OBJECT-TYPE
+    SYNTAX      JuniIpAspAccessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an IP AS-Path access
+        element."
+    INDEX     { juniIpAspAccessName,
+                juniIpAspAccessElemId }
+    ::= { juniIpAspAccessTable 1 }
+
+JuniIpAspAccessEntry ::= SEQUENCE {
+    juniIpAspAccessName               JuniIpPolicyName,
+    juniIpAspAccessElemId             Integer32,
+    juniIpAspAccessCreatedInternally  TruthValue,
+    juniIpAspAccessPolicy             JuniIpPolicyPolicy,
+    juniIpAspAccessExpression         OCTET STRING,
+    juniIpAspAccessRowStatus          RowStatus }
+
+juniIpAspAccessName OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the AS-Path Access List to which this entry belongs."
+    ::= { juniIpAspAccessEntry 1 }
+
+juniIpAspAccessElemId OBJECT-TYPE
+    SYNTAX      Integer32 (0..10000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The element ID portion of the IP AS-Path for this entry."
+    ::= { juniIpAspAccessEntry 2 }
+
+juniIpAspAccessCreatedInternally OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicated whether this entry was created internally by the system, or
+        dynamically via a management interface.  A true value for this object
+        indicates that this entry was created internally; false indicates
+        externally."
+    ::= { juniIpAspAccessEntry 3 }
+
+juniIpAspAccessPolicy OBJECT-TYPE
+    SYNTAX      JuniIpPolicyPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates the action to take for this AS-Path access list."
+    ::= { juniIpAspAccessEntry 4 }
+
+juniIpAspAccessExpression OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The AS-Path access list expression for this entry."
+    ::= { juniIpAspAccessEntry 5 }
+
+juniIpAspAccessRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpCommunityRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+
+            Once created, only certain attributes can be modified."
+    ::= { juniIpAspAccessEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Prefix Lists
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- The IP Prefix List Table
+--
+juniIpPrefixListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpPrefixListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of IP prefix lists.  Entries
+        belonging to the same prefix list are ordered, and comparisons to those
+        entries are performed in that order until a match is detected.  If no
+        match is found, the default action is to 'deny'."
+    ::= { juniIpPrefixList 1 }
+
+juniIpPrefixListEntry OBJECT-TYPE
+    SYNTAX      JuniIpPrefixListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an IP prefix list element."
+    INDEX     { juniIpPrefixListName,
+                juniIpPrefixListElemId,
+                juniIpPrefixListIpAddress,
+                juniIpPrefixListLength }
+    ::= { juniIpPrefixListTable 1 }
+
+JuniIpPrefixListEntry ::= SEQUENCE {
+    juniIpPrefixListName          JuniIpPolicyName,
+    juniIpPrefixListElemId        Integer32,
+    juniIpPrefixListIpAddress     IpAddress,
+    juniIpPrefixListLength        Integer32,
+    juniIpPrefixListPolicy        JuniIpPolicyPolicy,
+    juniIpPrefixListGeValue       Integer32,
+    juniIpPrefixListLeValue       Integer32,
+    juniIpPrefixListDescription   DisplayString,
+    juniIpPrefixListHitCount      Counter32,
+    juniIpPrefixListRowStatus     RowStatus }
+
+juniIpPrefixListName OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the prefix list to which this entry belongs."
+    ::= { juniIpPrefixListEntry 1 }
+
+juniIpPrefixListElemId OBJECT-TYPE
+    SYNTAX      Integer32 (0..10000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The relative position of this entry within its prefix list.  Access
+        list entries are searched in this sequence (low to high values) until a
+        match is found."
+    ::= { juniIpPrefixListEntry 2 }
+
+juniIpPrefixListIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address portion of the IP List value for this entry."
+    ::= { juniIpPrefixListEntry 3 }
+
+juniIpPrefixListLength OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The length portion of the IP List value for this entry."
+    ::= { juniIpPrefixListEntry 4 }
+
+juniIpPrefixListPolicy OBJECT-TYPE
+    SYNTAX      JuniIpPolicyPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP Prefix list action to perform for this entry."
+    ::= { juniIpPrefixListEntry 5 }
+
+juniIpPrefixListGeValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The minimum prefix length to apply to address."
+    ::= { juniIpPrefixListEntry 6 }
+
+juniIpPrefixListLeValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum prefix length to apply to address."
+    ::= { juniIpPrefixListEntry 7 }
+
+juniIpPrefixListDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned description for this entry."
+    ::= { juniIpPrefixListEntry 8 }
+
+juniIpPrefixListHitCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of hits for this entry."
+    ::= { juniIpPrefixListEntry 9 }
+
+juniIpPrefixListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+
+            juniIpPrefixListRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+
+            The value of juniIpPrefixListElemId is nonzero.
+
+        Once created, only certain attributes can be modified."
+    ::= { juniIpPrefixListEntry 10 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Prefix Tree
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- The IP Prefix Tree Table
+--
+juniIpPrefixTreeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpPrefixTreeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of IP prefix trees.  Entries
+        belonging to the same prefix tree are ordered, and comparisons to those
+        entries are performed in that order until a match is detected.  If no
+        match is found, the default action is to 'deny'."
+    ::= { juniIpPrefixTree 1 }
+
+juniIpPrefixTreeEntry OBJECT-TYPE
+    SYNTAX      JuniIpPrefixTreeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an IP prefix tree element."
+    INDEX     { juniIpPrefixTreeName,
+                juniIpPrefixTreeIpAddress,
+                juniIpPrefixTreeLength }
+    ::= { juniIpPrefixTreeTable 1 }
+
+JuniIpPrefixTreeEntry ::= SEQUENCE {
+    juniIpPrefixTreeName          JuniIpPolicyName,
+    juniIpPrefixTreeIpAddress     IpAddress,
+    juniIpPrefixTreeLength        Integer32,
+    juniIpPrefixTreePolicy        JuniIpPolicyPolicy,
+    juniIpPrefixTreeDescription   DisplayString,
+    juniIpPrefixTreeHitCount      Counter32,
+    juniIpPrefixTreeRowStatus     RowStatus }
+
+juniIpPrefixTreeName OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the prefix tree to which this entry belongs."
+    ::= { juniIpPrefixTreeEntry 1 }
+
+juniIpPrefixTreeIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address portion of the IP Prefix value for this entry."
+    ::= { juniIpPrefixTreeEntry 2 }
+
+juniIpPrefixTreeLength OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The length portion of the IP Prefix value for this entry."
+    ::= { juniIpPrefixTreeEntry 3 }
+
+juniIpPrefixTreePolicy OBJECT-TYPE
+    SYNTAX      JuniIpPolicyPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP Prefix tree policy perform for this entry."
+    ::= { juniIpPrefixTreeEntry 4 }
+
+juniIpPrefixTreeDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned description for this entry."
+    ::= { juniIpPrefixTreeEntry 5 }
+
+juniIpPrefixTreeHitCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of hits for this entry."
+    ::= { juniIpPrefixTreeEntry 6 }
+
+juniIpPrefixTreeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpPrefixTreeRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+
+            The value of juniIpPrefixTreeIpAddress and juniIpPrefixTreeLength
+            are nonzero.
+
+        Once created, only certain attributes can be modified."
+    ::= { juniIpPrefixTreeEntry 7 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Community List Tables
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+--
+-- The IP Community List Table
+--
+juniIpCommunityListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpCommunityListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of IP Community Lists.
+        Entries belonging to the same Community List are ordered.  The table
+        supports standard and extended community lists."
+    ::= { juniIpCommunityList 1 }
+
+juniIpCommunityListEntry OBJECT-TYPE
+    SYNTAX      JuniIpCommunityListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an IP Community List
+        element."
+    INDEX     { juniIpCommunityListName,
+                juniIpCommunityListElemId }
+    ::= { juniIpCommunityListTable 1 }
+
+JuniIpCommunityListEntry ::= SEQUENCE {
+    juniIpCommunityListName               JuniIpPolicyName,
+    juniIpCommunityListElemId             Integer32,
+    juniIpCommunityListCreatedInternally  TruthValue,
+    juniIpCommunityListExtended           TruthValue,
+    juniIpCommunityListPolicy             JuniIpPolicyPolicy,
+    juniIpCommunityListExpression         OCTET STRING,
+    juniIpCommunityListRowStatus          RowStatus }
+
+juniIpCommunityListName OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the Community List to which this entry belongs."
+    ::= { juniIpCommunityListEntry 1 }
+
+juniIpCommunityListElemId OBJECT-TYPE
+    SYNTAX      Integer32 (0..10000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address portion of the IP Prefix value for this entry."
+    ::= { juniIpCommunityListEntry 2 }
+
+juniIpCommunityListCreatedInternally OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicated whether this entry was created internally by the system, or
+        dynamically via a management interface.  A true value for this object
+        indicates that this entry was created internally; false indicates
+        externally."
+    ::= { juniIpCommunityListEntry 3 }
+
+juniIpCommunityListExtended OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this entry is a standard or extended Community List.
+        True indicates extended, false indicates standard"
+    ::= { juniIpCommunityListEntry 4 }
+
+juniIpCommunityListPolicy OBJECT-TYPE
+    SYNTAX      JuniIpPolicyPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates the policy action to perform for this list."
+    ::= { juniIpCommunityListEntry 5 }
+
+juniIpCommunityListExpression OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The community list expression for this entry."
+    ::= { juniIpCommunityListEntry 6 }
+
+juniIpCommunityListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpCommunityRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+
+            Once created, only certain attributes can be modified."
+    ::= { juniIpCommunityListEntry 7 }
+
+
+--
+-- The IP Extended Community List Table
+--
+juniIpExtCommunityListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpExtCommunityListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for Extended IP Community Lists.  Entries
+        belonging to the same Extended Community List are ordered."
+    ::= { juniIpCommunityList 2 }
+
+juniIpExtCommunityListEntry OBJECT-TYPE
+    SYNTAX      JuniIpExtCommunityListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an Extended IP Community
+        List element."
+    INDEX     { juniIpExtCommunityListName,
+                juniIpExtCommunityListElemId }
+    ::= { juniIpExtCommunityListTable 1 }
+
+JuniIpExtCommunityListEntry ::= SEQUENCE {
+    juniIpExtCommunityListName                JuniIpPolicyName,
+    juniIpExtCommunityListElemId              Integer32,
+    juniIpExtCommunityListCreatedInternally   TruthValue,
+    juniIpExtCommunityListPolicy              JuniIpPolicyPolicy,
+    juniIpExtCommunityListExpression          OCTET STRING,
+    juniIpExtCommunityListRowStatus           RowStatus }
+
+juniIpExtCommunityListName OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the Extended Community List to which this entry belongs."
+    ::= { juniIpExtCommunityListEntry 1 }
+
+juniIpExtCommunityListElemId OBJECT-TYPE
+    SYNTAX      Integer32 (0..10000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The element ID value for this entry."
+    ::= { juniIpExtCommunityListEntry 2 }
+
+juniIpExtCommunityListCreatedInternally OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicated whether this entry was created internally by the system, or
+        dynamically via a management interface.  A true value for this object
+        indicates that this entry was created internally; false indicates
+        externally."
+    ::= { juniIpExtCommunityListEntry 3 }
+
+juniIpExtCommunityListPolicy OBJECT-TYPE
+    SYNTAX      JuniIpPolicyPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates the policy action to perform for this list."
+    ::= { juniIpExtCommunityListEntry 4 }
+
+juniIpExtCommunityListExpression OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The extended community list expression for this entry."
+    ::= { juniIpExtCommunityListEntry 5 }
+
+juniIpExtCommunityListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpExtCommunityRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+
+            The value of juniIpExtCommunityListElemId is included in this table
+            as a key for future use.  It must be the value zero.
+
+        Once created, only certain attributes can be modified."
+    ::= { juniIpExtCommunityListEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Redistribute Tables
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- The IP Dynamic Route Redistribution Table
+--
+juniIpDynRedistributeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpDynRedistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of IP Dynamic Route
+        Redistribution elements."
+    ::= { juniIpRedistributeList 1 }
+
+juniIpDynRedistributeEntry OBJECT-TYPE
+    SYNTAX      JuniIpDynRedistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a dynamic IP Route
+        Redistribute element."
+    INDEX     { juniIpDynRedistributeToProtocol }
+    ::= { juniIpDynRedistributeTable 1 }
+
+JuniIpDynRedistributeEntry ::= SEQUENCE {
+    juniIpDynRedistributeToProtocol   JuniIpDynRedistributeProtocol,
+    juniIpDynRedistributeState        JuniIpPolicyAdminStatus,
+    juniIpDynRedistributeRowStatus    RowStatus }
+
+juniIpDynRedistributeToProtocol OBJECT-TYPE
+    SYNTAX      JuniIpDynRedistributeProtocol
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies the protocol associated with this Dynamic Route
+        Redistribution element that routes are redistributed to."
+    ::= { juniIpDynRedistributeEntry 1 }
+
+juniIpDynRedistributeState OBJECT-TYPE
+    SYNTAX      JuniIpPolicyAdminStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates the enable/disable state of this redistribution element."
+    DEFVAL    { ipPolicyAdminStateEnable }
+    ::= { juniIpDynRedistributeEntry 2 }
+
+juniIpDynRedistributeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpDynRedistributeRowStatus
+
+        Once created, only the juniIpDynRedistributeState object can be
+        modified."
+    ::= { juniIpDynRedistributeEntry 3 }
+
+
+--
+-- The IP Route Redistribution Table
+--
+juniIpRedistributeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpRedistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of IP Route Redistribution
+        elements."
+    ::= { juniIpRedistributeList 2 }
+
+juniIpRedistributeEntry OBJECT-TYPE
+    SYNTAX      JuniIpRedistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an IP Route Redistribution
+        element."
+    INDEX     { juniIpRedistributeToProtocol,
+                juniIpRedistributeFromProtocol }
+    ::= { juniIpRedistributeTable 1 }
+
+JuniIpRedistributeEntry ::= SEQUENCE {
+    juniIpRedistributeToProtocol      JuniIpRedistributeProtocol,
+    juniIpRedistributeFromProtocol    JuniIpRedistributeProtocol,
+    juniIpRedistributeState           JuniIpPolicyAdminStatus,
+    juniIpRedistributeRouteMapName    JuniIpPolicyName,
+    juniIpRedistributeRowStatus       RowStatus }
+
+juniIpRedistributeToProtocol OBJECT-TYPE
+    SYNTAX      JuniIpRedistributeProtocol
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies the protocol for this element that routes are redistributed
+        to."
+    ::= { juniIpRedistributeEntry 1 }
+
+juniIpRedistributeFromProtocol OBJECT-TYPE
+    SYNTAX      JuniIpRedistributeProtocol
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies the protocol for this element that routes are redistributed
+        from."
+    ::= { juniIpRedistributeEntry 2 }
+
+juniIpRedistributeState OBJECT-TYPE
+    SYNTAX      JuniIpPolicyAdminStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates the enable/disable state of this redistribution element."
+    DEFVAL    { ipPolicyAdminStateEnable }
+    ::= { juniIpRedistributeEntry 3 }
+
+juniIpRedistributeRouteMapName OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Identifies the IP route-map associated with this IP Route
+        Redistribution element."
+    ::= { juniIpRedistributeEntry 4 }
+
+juniIpRedistributeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpRedistributeRowStatus
+            juniIpRedistributeRouteMapName
+
+        Once created, only the juniIpRedistributeState object can be modified."
+    ::= { juniIpRedistributeEntry 5 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Route-Map Tables
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- The IP Route-Map Table
+--
+juniIpRouteMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpRouteMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for elements of IP Route Maps."
+    ::= { juniIpRouteMapTree 1 }
+
+juniIpRouteMapEntry OBJECT-TYPE
+    SYNTAX      JuniIpRouteMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an IP Route Map element."
+    INDEX     { juniIpRouteMapName,
+                juniIpRouteMapSequenceNum,
+                juniIpRouteMapElemId,
+                juniIpRouteMapSubElemId }
+    ::= { juniIpRouteMapTable 1 }
+
+JuniIpRouteMapEntry ::= SEQUENCE {
+    juniIpRouteMapName                JuniIpPolicyName,
+    juniIpRouteMapSequenceNum         Integer32,
+    juniIpRouteMapElemId              Integer32,
+    juniIpRouteMapSubElemId           Integer32,
+    juniIpRouteMapCreatedInternally   TruthValue,
+    juniIpRouteMapPolicy              JuniIpPolicyPolicy,
+    juniIpRouteMapDisplay             OCTET STRING }
+
+juniIpRouteMapName OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the route map to which this entry belongs."
+    ::= { juniIpRouteMapEntry 1 }
+
+juniIpRouteMapSequenceNum OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The element ID value for this entry."
+    ::= { juniIpRouteMapEntry 2 }
+
+juniIpRouteMapElemId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The element ID to which this entry belongs."
+    ::= { juniIpRouteMapEntry 3 }
+
+juniIpRouteMapSubElemId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The sub-element ID to which this entry belongs."
+    ::= { juniIpRouteMapEntry 4 }
+
+juniIpRouteMapCreatedInternally OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicated whether this entry was created internally by the system, or
+        dynamically via a management interface.  A true value for this object
+        indicates that this entry was created internally; false indicates
+        externally."
+    ::= { juniIpRouteMapEntry 5 }
+
+juniIpRouteMapPolicy OBJECT-TYPE
+    SYNTAX      JuniIpPolicyPolicy
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the policy action performed by this element."
+    ::= { juniIpRouteMapEntry 6 }
+
+juniIpRouteMapDisplay OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..2048))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Textual information taken from the NVT ASCII character set
+        (i.e. RFC1903 DisplayString), but with increased length.  The
+        information in this object is the series of set, match, and/or match &
+        set clauses for this route map.
+
+        It is assumed that the information conveyed in this object is used for
+        display purposes and in general, is not parsed.  The information in this
+        string is a concatentation of routemap clauses configured via the
+        systems non SNMP interface."
+    ::= { juniIpRouteMapEntry 7 }
+
+--
+-- The IP Route-Map version 2 Table
+--
+juniIpRouteMapV2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpRouteMapV2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for route maps instances."
+    ::= { juniIpRouteMapTree 2 }
+
+juniIpRouteMapV2Entry OBJECT-TYPE
+    SYNTAX      JuniIpRouteMapV2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry is a specific instance of the Route Map."
+    INDEX     { juniIpRouteMapV2Name,
+                juniIpRouteMapV2SequenceNum }
+    ::= { juniIpRouteMapV2Table 1 }
+
+JuniIpRouteMapV2Entry ::= SEQUENCE {
+    juniIpRouteMapV2Name             JuniIpPolicyName,
+    juniIpRouteMapV2SequenceNum      Integer32,
+    juniIpRouteMapV2Policy           JuniIpPolicyPolicy,
+    juniIpRouteMapV2RowStatus        RowStatus }
+
+juniIpRouteMapV2Name OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the route map to which this instance entry belongs."
+    ::= { juniIpRouteMapV2Entry 1 }
+
+juniIpRouteMapV2SequenceNum OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Multiple instances of the same route map can be created by assigning a
+        different sequence number to it.  Each instance is identified by the
+        route map name and the sequence number.  The value of the sequence
+        number associated with the particular route map instance determines the
+        order in which the routing protocol evaluates routes; the instance of
+        having lowest sequence number is evaluated first.  If the routes pass
+        all the match conditions specified in the lowest-numbered instance, and
+        if all set clause elements are successfully configured, then no other
+        instance of the route map is considered.  However, any routes that do
+        not pass all the match conditions are evaluated against the next
+        instance of the route map."
+    ::= { juniIpRouteMapV2Entry 2 }
+
+juniIpRouteMapV2Policy OBJECT-TYPE
+    SYNTAX      JuniIpPolicyPolicy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates the policy action performed by this route map instance."
+    DEFVAL    { permit }
+    ::= { juniIpRouteMapV2Entry 3 }
+
+juniIpRouteMapV2RowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpRouteMapV2RowStatus
+
+        To delete an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpRouteMapV2RowStatus
+
+        Once created, juniIpRouteMapV2Policy attribute can be modified.
+        To modify juniIpRouteMapV2Policy, set juniIpRouteMapV2RowStatus also.
+
+        Note: Match, match-set and set clause elements can be configured for a
+              specific instance of the route map.  First create the route map
+              instance to make use of the same to configure in the clause table.
+              Deletion of the route map instance will also delete all the clause
+              elements confgured for that instance as clause elements are
+              configured for that instance."
+    ::= { juniIpRouteMapV2Entry 4 }
+
+
+--
+-- The IP route-map clauses(set, match-set and match) table
+--
+juniIpRouteMapClauseTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpRouteMapClauseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for instances of the route map clause
+        elements."
+    ::= { juniIpRouteMapTree 3 }
+
+juniIpRouteMapClauseEntry OBJECT-TYPE
+    SYNTAX      JuniIpRouteMapClauseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of one route map clause
+        element instance."
+    INDEX     { juniIpRouteMapV2Name,
+                juniIpRouteMapV2SequenceNum,
+                juniIpRouteMapClauseElemId,
+                juniIpRouteMapClauseSubElemId }
+    ::= { juniIpRouteMapClauseTable 1 }
+
+JuniIpRouteMapClauseEntry ::= SEQUENCE {
+    juniIpRouteMapClauseElemId          INTEGER,
+    juniIpRouteMapClauseSubElemId       Integer32,
+    juniIpRouteMapClauseElemIdAddon     INTEGER,
+    juniIpRouteMapClauseElementValue    DisplayString,
+    juniIpRouteMapClauseRowStatus       RowStatus }
+
+juniIpRouteMapClauseElemId OBJECT-TYPE
+    SYNTAX      INTEGER {
+                 -- match clause element selection options
+                    matchNotKnown(0),
+                    matchAsPath(1),
+                    matchCommunity(2),
+                    matchExtendedCommunity(3),
+                    matchDistance(4),
+                    matchAccessList(5),
+                    matchNextHop(6),
+                    matchPrefixList(7),
+                    matchNextHopPreList(8),
+                    matchPrefixTree(9),
+                    matchNextHopPreTree(10),
+                    matchLevel(11),
+                    matchMetric(12),
+                    matchMetricType(13),
+                    matchTag(14),
+                    matchRouteType(15),
+                    matchSource(16),
+                    matchPolicyList(17),
+                 -- set clause element selection options
+                    setAsPath(100),
+                    setAsPathCreateList(101),
+                    setAutoTag(102),
+                    setCommList(103),
+                    setCommunityNone(104),
+                    setCommunityAdd(105),
+                    setCommunity(106),
+                    setCommunityCreateListAdd(107),
+                    setCommunityCreateList(108),
+                    setExtendedCommunityCreateAdd(109),
+                    setExtendedCommunityCreate(110),
+                    setNextHop(111),
+                    setNextHopPeerAddr(112),
+                    setLocalPref(113),
+                    setWeight(114),
+                    setLevel(115),
+                    setMetric(116),
+                    setMetricType(117),
+                    setTag(118),
+                    setOrigin(119),
+                    setRouteType(220),
+                    setDampingCreate(221),
+                    setDistance(222),
+                 -- match-set clause element selection option
+                    matchSetSummary(300) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The clause element selection option.  Select the appropriate element
+        option to configure each element instance of match, match-set and set
+        clauses.  For the complete configuration map table refer to the
+        juniIpRouteMapClauseRowStatus object's DESCRIPTION."
+    ::= { juniIpRouteMapClauseEntry 1 }
+
+juniIpRouteMapClauseSubElemId OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The clause element sub ID used to distinguish specific instance of the
+        element.  This value is determined by choosing the next available by
+        walking the table."
+    ::= { juniIpRouteMapClauseEntry 2 }
+
+juniIpRouteMapClauseElemIdAddon OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notApplicable(0),
+                    exact(1),
+                    delete(2),
+                    relativeNeg(3),
+                    relativePos(4),
+                    extCommRt(5),
+                    extCommSoo(6),
+                    interfaceValue(7),
+                    ipAddress(8) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This represents clause element instance add-on option selected along
+        with the main option (juniIpRouteMapClauseElemId) whenever it applies.
+        For more information on how to map this object value to each value,
+        refer to the mapping table in the juniIpRouteMapClauseRowStatus object's
+        DESCRIPTION."
+    DEFVAL    { notApplicable }
+    ::= { juniIpRouteMapClauseEntry 3 }
+
+juniIpRouteMapClauseElementValue OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..100))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This represents set, match-set and match clauses' different element
+        instance values in character string form.  Whatever may be the data type
+        of the attribute element instance value, it is always interpreted as a
+        set of characters for both configuration and display purposes.  It is up
+        to the user to know the element's data type mapping in order to input
+        the correct value while configuring.  Refer to the mapping table in the
+        juniIpRouteMapClauseRowStatus object descrption for detailed
+        information."
+    ::= { juniIpRouteMapClauseEntry 4 }
+
+juniIpRouteMapClauseRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create/delete an entry in this table, the following entry objects
+        MUST be explicitly configured:
+            juniIpRouteMapClauseElementValue
+            juniIpRouteMapClauseRowStatus
+
+        Additional object juniIpRouteMapClauseElemIdAddon may become OPTIONAL
+        for some elements creation/deletion along with the above.  Refer the
+        mapping table below to determine which elements are required.
+
+        The table entry elements may not be modified.  Only create and delete
+        are allowed.
+
+        Note#1: Make sure route map(s) are created before configuring their
+                corresponding clause elements.
+        Note#2: The mapping table below is the extensive guide for the options,
+                values and ranges of the table objects
+                juniIpRouteMapClauseElemId, juniIpRouteMapClauseElemIdAddon and
+                juniIpRouteMapClauseElementValue.
+
+                Clause element configuration selection mapping table
+                ====================================================
+        ClauseElemId               ClauseElemIdAddon ClauseElementValue
+        ============               ================= ==================
+
+        matchAsPath                notApplicable     DisplayString (SIZE(1..32))
+        matchCommunity             exact/            DisplayString (SIZE(1..32))
+                                   notApplicable
+        matchExtendedCommunity     exact/            DisplayString (SIZE(1..32))
+                                   notApplicable
+
+        Note#3: At a given time only one can be configured for access list and
+                prefix-list/trees'.
+        matchAccessList            notApplicable     DisplayString (SIZE(1..32))
+        matchPrefixList            notApplicable     DisplayString (SIZE(1..32))
+        matchPrefixTree            notApplicable     DisplayString (SIZE(1..32))
+        matchNextHop               notApplicable     DisplayString (SIZE(1..32))
+        matchNextHopPreList        notApplicable     DisplayString (SIZE(1..32))
+        matchNextHopPreTree        notApplicable     DisplayString (SIZE(1..32))
+
+        Note#4: For matchLevel, matchMetricType and matchRouteType element
+                selection choose the exact case-sensitive string to set the
+                option.
+                Example: For matchLevel, option levelOne, levelOneAndTwo, etc.
+                         can be set.
+        matchLevel                 notApplicable     { levelOne,
+                                                       levelOneAndTwo,
+                                                       levelTwo,
+                                                       backbone,
+                                                       stubArea }
+        matchMetricType            notApplicable     { internal or typeOne,
+                                                       external or typeTwo }
+        matchRouteType             notApplicable     { external,
+                                                       internal,
+                                                       internalInter,
+                                                       internalIntra }
+
+        matchDistance              notApplicable     Integer32 (0..255)
+        matchMetric                notApplicable     Unsigned32
+        matchTag                   notApplicable     Unsigned32
+        matchPolicyList            notApplicable     DisplayString (SIZE(1..32))
+
+        setAsPath                  notApplicable     DisplayString (SIZE(1..32))
+        setCommunityAdd            notApplicable     DisplayString (SIZE(1..32))
+        setCommList                delete/           DisplayString (SIZE(1..32))
+                                   notApplicable
+        setCommunity               notApplicable     DisplayString (SIZE(1..32))
+
+        Note#5: For below elements selection choose the exact case-sensitive
+                string to set the option.
+                Example: For setOrigin, egp or igp or incomplete will be the
+                         valid options to select.
+        setAutoTag                 notApplicable     { autoTag }
+        setCommunityNone           notApplicable     { communityNone }
+
+        Note#6: setCommunityCreateList and setCommunityCreateListAdd will have
+                only one instance and all will be set in one instance of the
+                element (either setCommunityCreateList or
+                setCommunityCreateListAdd), i.e., all options and values will
+                aggregate in one SubElementId.
+        setCommunityCreateList     notApplicable     Unsigned32
+        setCommunityCreateListAdd  notApplicable     Unsigned32
+        setCommunityCreateList     notApplicable     { none,
+                                                       localAs,
+                                                       noAdvertise,
+                                                       noExport }
+        setCommunityCreateListAdd  notApplicable     { none,
+                                                       localAs,
+                                                       noAdvertise,
+                                                       noExport }
+
+        setLevel                  notApplicable      { backbone,
+                                                       levelOne,
+                                                       levelOneAndTwo,
+                                                       levelTwo,
+                                                       stubArea }
+        setRouteType              notApplicable      { external,
+                                                       internal,
+                                                       internalInter,
+                                                       internalIntra }
+        setNextHopPeerAddr        notApplicable      { peerAddress }
+        setMetricType             notApplicable      { external,
+                                                       internal }
+        setOrigin                 notApplicable      { egp,
+                                                       igp,
+                                                       incomplete }
+
+        setAsPathCreateList       notApplicable      Interger32 (1..65535)
+        setTag                    notApplicable      Unsigned32
+        setWeight                 notApplicable      Unsigned32
+        setDistance               notApplicable      Interger32 (1..255)
+        setLocalPref              notApplicable      Unsigned32
+        setMetric                 relativeNeg/       Unsigned32
+                                  relativePos/
+                                  notApplicable
+
+        Note#7: setExtendedCommunityCreate and setExtendedCommunityCreateAdd
+                will have only one instance and all will be set in one instance
+                of the element (either setExtendedCommunityCreate or
+                setExtendedCommunityCreateAdd) i.e. all options and values will
+                aggregate in one SubElementId.
+        setExtendedCommunityCreate extCommRt/        IPADDRESS:Unsigned32 or
+                                   notApplicable     IPADDRESS-in-ASN:Unsigned32
+        setExtendedCommunityCreate extCommSoo/       IPADDRESS:Unsigned32 or
+                                   notApplicable     IPADDRESS-in-ASN:Unsigned32
+        setExtendedCommunityCreateAdd extCommRt/     IPADDRESS:Unsigned32 or
+                                      notApplicable  IPADDRESS-in-ASN:Unsigned32
+        setExtendedCommunityCreateAdd extCommSoo/    IPADDRESS:Unsigned32
+                                      notApplicable  IPADDRESS-in-ASN:Unsigned32
+
+        Note#8: Damping element has only one instance at any given time.  It can
+                be deleted by just refering to the instance (elementID and
+                subElementId) without refering the exact value; i.e., while
+                deleting, values doesn't matter.
+        setDampingCreate          notApplicable
+                                 1. HalfLifeiTime-Interger32 (1..45)
+                                 2. RtSuppressTime-Interger32 (1..20000)
+                                 3. SuppressedRtReuseTime-Interger32 (1..20000)
+                                 4. MaxRtSuppressTime-Interger32 (1..255)
+                                 5. UnreachableRtHalfLifeTime-Interger32 (1..45)
+        Note#9: 1, 2, 3 and 4 values are MUST values to be specified (in
+                minutes) for route flap damping and 5th one is optional.  Format
+                for specifying the values are very rigid and strict.  Always
+                specify four MUST values.  The first value shouldn't be preceded
+                with space characters and last the value always should be
+                followed with one space character.  From first value to till
+                last value, all the values will be separated from each other by
+                one space character.
+
+        setNextHop                interfaceValue/    Unsigned32
+                                  notApplicable
+        setNextHop                ipAddress/         IPADDRESS
+                                  notApplicable "
+    ::= { juniIpRouteMapClauseEntry 5 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniIpPolicyTrapEnables OBJECT IDENTIFIER ::= { juniIpPolicyMIB 2 }
+-- juniIpPolicyTraps       OBJECT IDENTIFIER ::= { juniIpPolicyMIB 3 }
+-- juniIpPolicyTrapPrefix  OBJECT IDENTIFIER ::= { juniIpPolicyTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpPolicyConformance     OBJECT IDENTIFIER ::= { juniIpPolicyMIB 4 }
+juniIpPolicyCompliances     OBJECT IDENTIFIER ::= { juniIpPolicyConformance 1 }
+juniIpPolicyGroups          OBJECT IDENTIFIER ::= { juniIpPolicyConformance 2 }
+
+--
+-- compliance statements
+--
+juniIpPolicyCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete compliance statement for entities that implement the
+        Juniper IP Policy MIB.  This statement became obsolete when support was
+        added for the IP Named Access List."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpAccessListGroup }
+    ::= { juniIpPolicyCompliances 1 }                              -- JUNOSe 1.0
+
+juniIpPolicyCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete compliance statement for entities that implement the
+        Juniper IP Policy MIB.  This statement became obsolete when support was
+        added for the IP ASP Access List, the IP Prefix List, the IP Prefix
+        Tree, the IP Community List, the IP Extended Community List, IP Dynamic
+        Route Redistribution, and the IP Route Map."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpAccessListGroup,
+            juniIpNamedAccessListGroup }
+    ::= { juniIpPolicyCompliances 2 }                              -- JUNOSe 2.0
+
+juniIpPolicyCompliance3  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "An obsolete compliance statement for entities that implement the
+        Juniper IP Policy MIB.  This statement became obsolete when support was
+        added for the IP Route Map configurations."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpAccessListGroup,
+            juniIpNamedAccessListGroup,
+            juniIpAspAccessListGroup,
+            juniIpPrefixListGroup,
+            juniIpPrefixTreeGroup,
+            juniIpCommunityListGroup,
+            juniIpExtCommunityListGroup,
+            juniIpRedistributeGroup,
+            juniIpRouteMapGroup }
+    ::= { juniIpPolicyCompliances 3 }                              -- JUNOSe 3.0
+
+juniIpPolicyCompliance4  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper IP
+        Policy MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpAccessListGroup,
+            juniIpNamedAccessListGroup,
+            juniIpAspAccessListGroup,
+            juniIpPrefixListGroup,
+            juniIpPrefixTreeGroup,
+            juniIpCommunityListGroup,
+            juniIpExtCommunityListGroup,
+            juniIpRedistributeGroup,
+            juniIpRouteMapGroup2 }
+    ::= { juniIpPolicyCompliances 4 }                              -- JUNOSe 5.1
+
+--
+-- units of conformance
+--
+juniIpAccessListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpAccessListRowStatus,
+        juniIpAccessListAction,
+        juniIpAccessListSrc,
+        juniIpAccessListSrcMask,
+        juniIpAccessListDst,
+        juniIpAccessListDstMask,
+        juniIpAccessListProtocol }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing IP access list capabilities in a
+        Juniper product."
+    ::= { juniIpPolicyGroups 1 }
+
+juniIpNamedAccessListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpNamedAccessListRowStatus,
+        juniIpNamedAccessListAction,
+        juniIpNamedAccessListSrc,
+        juniIpNamedAccessListSrcMask,
+        juniIpNamedAccessListDst,
+        juniIpNamedAccessListDstMask,
+        juniIpNamedAccessListProtocol }
+    STATUS      current
+    DESCRIPTION
+        "A named collection of objects for managing IP access list capabilities
+        in a Juniper product."
+    ::= { juniIpPolicyGroups 2 }
+
+juniIpAspAccessListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpAspAccessCreatedInternally,
+        juniIpAspAccessPolicy,
+        juniIpAspAccessExpression,
+        juniIpAspAccessRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A named collection of objects for managing AS-Path access list
+        capabilities in a Juniper product."
+    ::= { juniIpPolicyGroups 3 }
+
+juniIpPrefixListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpPrefixListPolicy,
+        juniIpPrefixListGeValue,
+        juniIpPrefixListLeValue,
+        juniIpPrefixListDescription,
+        juniIpPrefixListHitCount,
+        juniIpPrefixListRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A named collection of objects for managing Prefix list capabilities in
+        a Juniper product."
+    ::= { juniIpPolicyGroups 4 }
+
+juniIpPrefixTreeGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpPrefixTreePolicy,
+        juniIpPrefixTreeDescription,
+        juniIpPrefixTreeHitCount,
+        juniIpPrefixTreeRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A named collection of objects for managing Prefix Tree capabilities in
+        a Juniper product."
+    ::= { juniIpPolicyGroups 5 }
+
+juniIpCommunityListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpCommunityListCreatedInternally,
+        juniIpCommunityListExtended,
+        juniIpCommunityListPolicy,
+        juniIpCommunityListExpression,
+        juniIpCommunityListRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A named collection of objects for managing Community List capabilities
+        in a Juniper product."
+    ::= { juniIpPolicyGroups 6 }
+
+juniIpExtCommunityListGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpExtCommunityListCreatedInternally,
+        juniIpExtCommunityListPolicy,
+        juniIpExtCommunityListExpression,
+        juniIpExtCommunityListRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A named collection of objects for managing Extended Community List
+        capabilities in a Juniper product."
+    ::= { juniIpPolicyGroups 7 }
+
+juniIpRedistributeGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpDynRedistributeState,
+        juniIpDynRedistributeRowStatus,
+        juniIpRedistributeState,
+        juniIpRedistributeRouteMapName,
+        juniIpRedistributeRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing IP route redistribution list
+        capabilities in a Juniper product."
+    ::= { juniIpPolicyGroups 8 }
+
+juniIpRouteMapGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpRouteMapCreatedInternally,
+        juniIpRouteMapPolicy,
+        juniIpRouteMapDisplay }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects for managing IP route map list capabilities in
+        a Juniper product."
+    ::= { juniIpPolicyGroups 9 }
+
+juniIpRouteMapGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniIpRouteMapCreatedInternally,
+        juniIpRouteMapPolicy,
+        juniIpRouteMapDisplay,
+        juniIpRouteMapV2Policy,
+        juniIpRouteMapV2RowStatus,
+        juniIpRouteMapClauseElemIdAddon,
+        juniIpRouteMapClauseElementValue,
+        juniIpRouteMapClauseRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing IP route map list capabilities in
+        a Juniper product."
+    ::= { juniIpPolicyGroups 10 }
+
+END

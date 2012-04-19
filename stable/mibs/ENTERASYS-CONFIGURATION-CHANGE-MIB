@@ -1,0 +1,259 @@
+ENTERASYS-CONFIGURATION-CHANGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32
+              FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+              FROM SNMPv2-CONF
+    DateAndTime
+              FROM SNMPv2-TC
+    SnmpAdminString
+              FROM SNMP-FRAMEWORK-MIB
+    etsysModules
+              FROM ENTERASYS-MIB-NAMES;
+
+
+etsysConfigurationChangeMIB  MODULE-IDENTITY
+    LAST-UPDATED "200111261644Z"  -- Mon Nov 26 16:44 GMT 2001
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+    "Postal: Enterasys Networks
+             35 Industrial Way, P.O. Box 5005
+             Rochester, NH 03867-0505
+
+     Phone:  +1 603 332 9400
+     E-mail: support@enterasys.com
+     WWW:    http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise 
+         MIBs under the Enterasys enterprise OID pertaining to the 
+         monitoring of configuration changes for Enterasys products."
+
+    REVISION "200111261644Z"  -- Mon Nov 26 16:44 GMT 2001
+    DESCRIPTION
+        "Changed the descriptions for the objects that use the
+         DateAndTime textual convention.  They can now return
+         all zeros if the information is not available."
+
+    REVISION "200108080000Z"
+    DESCRIPTION
+        "The initial version of this MIB module."
+
+    ::= { etsysModules 12 }
+
+
+-- -------------------------------------------------------------
+-- mib groupings 
+-- -------------------------------------------------------------
+
+etsysConfigChangeNonVolatile     OBJECT IDENTIFIER 
+                 ::= { etsysConfigurationChangeMIB 1 }
+
+etsysConfigChangeVolatile        OBJECT IDENTIFIER 
+                 ::= { etsysConfigurationChangeMIB 2 }
+
+etsysConfigChangeFirmware        OBJECT IDENTIFIER 
+                 ::= { etsysConfigurationChangeMIB 3 }
+
+-- -------------------------------------------------------------
+-- etsysConfigChangeNonVolatile group           
+-- -------------------------------------------------------------
+
+etsysConfigChangeNonVolatileCount OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of successful non-volatile, or persistent,
+         configuration changes."
+    ::= { etsysConfigChangeNonVolatile 1 }
+
+etsysConfigChangeNonVolatileTime OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time of the last successful non-volatile,
+         or persistent, configuration change.  Return an object
+         of all zeros if this information is not available and
+         the group is otherwise supported."
+    ::= { etsysConfigChangeNonVolatile 2 }
+
+etsysConfigChangeNonVolatileMethod OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..64)) 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The method that was used to make the last non-volatile
+         change.  i.e.  SNMP, TELNET, LM, CLI.  If the individual
+         user login, or the source IP address, is available they
+         should be included in this string.
+
+         example format:  <TELNET: 192.168.0.1: JohnJones>
+
+         Return a null byte if no information is available and
+         the group is otherwise supported."
+    ::= { etsysConfigChangeNonVolatile 3 }
+
+-- -------------------------------------------------------------
+-- etsysConfigChangeVolatile group           
+-- -------------------------------------------------------------
+
+etsysConfigChangeVolatileCount OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of successful volatile, or non-persistent,
+         configuration changes."
+    ::= { etsysConfigChangeVolatile 1 }
+
+etsysConfigChangeVolatileTime OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time of the last successful volatile, or
+         non-persistent, configuration change.  Return an object
+         of all zeros if this information is not available and
+         the group is otherwise supported."
+    ::= { etsysConfigChangeVolatile 2 }
+
+etsysConfigChangeVolatileMethod OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..64)) 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The method that was used to make the last volatile
+         change.  i.e.  SNMP, TELNET, LM, CLI.  If the individual
+         user login, or the source IP address, is available they
+         should be included in this string.
+
+         example format:  <TELNET: 192.168.0.1: JohnJones>
+
+         Return a null byte if no information is available and
+         the group is otherwise supported."
+    ::= { etsysConfigChangeVolatile 3 }
+
+-- -------------------------------------------------------------
+-- etsysConfigChangeFirmware group           
+-- -------------------------------------------------------------
+
+etsysConfigChangeFirmwareCount OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of successful firmware image downloads."
+    ::= { etsysConfigChangeFirmware 1 }
+
+etsysConfigChangeFirmwareTime OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time of the last successful firmware image
+         download.  Return an object of all zeros if this
+         information is not available and the group is otherwise
+         supported."
+    ::= { etsysConfigChangeFirmware 2 }
+
+etsysConfigChangeFirmwareMethod OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..64)) 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The method that was used to cause the last firmware
+         change.  i.e.  SNMP, TELNET, LM, CLI.  If the individual
+         user login, or the source IP address, is available they
+         should be included in this string.
+
+         example format:  <TELNET: 192.168.0.1: JohnJones>
+
+         Return a null byte if no information is available and
+         the group is otherwise supported."
+    ::= { etsysConfigChangeFirmware 3 }
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysConfigChangeConformance OBJECT IDENTIFIER 
+                          ::= { etsysConfigurationChangeMIB 4 }
+
+etsysConfigChangeGroups OBJECT IDENTIFIER 
+                          ::= { etsysConfigChangeConformance 1 }
+
+etsysConfigChangeCompliances OBJECT IDENTIFIER 
+                          ::= { etsysConfigChangeConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+ 
+etsysConfigChangeNonVolatileGroup OBJECT-GROUP
+    OBJECTS {
+                etsysConfigChangeNonVolatileCount,
+                etsysConfigChangeNonVolatileTime,
+                etsysConfigChangeNonVolatileMethod
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing non-volatile
+         configuration change information."
+    ::= { etsysConfigChangeGroups 1 }
+
+etsysConfigChangeVolatileGroup OBJECT-GROUP
+    OBJECTS {
+                etsysConfigChangeVolatileCount,
+                etsysConfigChangeVolatileTime,
+                etsysConfigChangeVolatileMethod
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing volatile
+         configuration change information."
+    ::= { etsysConfigChangeGroups 2 }
+
+etsysConfigChangeFirmwareGroup OBJECT-GROUP
+    OBJECTS {
+                etsysConfigChangeFirmwareCount,
+                etsysConfigChangeFirmwareTime,
+                etsysConfigChangeFirmwareMethod
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing firmware
+         change information."
+    ::= { etsysConfigChangeGroups 3 }
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+    
+etsysConfigChangeCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices that are
+         configurable."
+    MODULE -- this module
+
+    GROUP etsysConfigChangeNonVolatileGroup
+    DESCRIPTION
+        "This object is mandatory only for agents which support
+         non-volatile configurations."
+
+    GROUP etsysConfigChangeVolatileGroup
+    DESCRIPTION
+        "This object is mandatory only for agents which support
+         volatile configurations."
+
+    GROUP etsysConfigChangeFirmwareGroup
+    DESCRIPTION
+        "This object is mandatory only for agents which support
+         downloadable firmware."
+
+    ::= { etsysConfigChangeCompliances 1 }
+
+END

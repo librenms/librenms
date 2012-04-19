@@ -1,0 +1,1343 @@
+ALCATEL-IND1-IPMS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Unsigned32
+FROM SNMPv2-SMI
+        MacAddress, RowStatus
+FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+FROM SNMPv2-CONF
+	InterfaceIndex
+FROM IF-MIB
+	softentIND1Ipms
+FROM ALCATEL-IND1-BASE;
+
+alcatelIND1IPMSMIB MODULE-IDENTITY
+    LAST-UPDATED "200704030000Z"
+    ORGANIZATION "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             Propietary IPMS MIB definitions
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special,
+	 or consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { softentIND1Ipms 1 }
+
+alcatelIND1IPMSMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIB 1 }
+
+
+-- ************************************************************************
+--  IPMS Global Configuration
+-- ************************************************************************
+
+alaIpmsConfig OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIBObjects 1 }
+
+alaIpmsStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+                    enable(1),
+                    disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Administratively enables/disables IPMS on this switch."
+    DEFVAL      { disable }
+    ::= { alaIpmsConfig 1 }
+
+alaIpmsLeaveTimeout OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+            "The IGMP Leave Timeout Interval in seconds."
+    DEFVAL      { 1 }
+    ::= { alaIpmsConfig 2 }
+
+alaIpmsQueryInterval OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+            "The IGMP Query interval in seconds."
+    DEFVAL      { 125 }
+    ::= { alaIpmsConfig 3 }
+
+alaIpmsNeighborTimer OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	    "The IPMS neighboring multicast router timeout interval in seconds."
+    DEFVAL      { 90 }
+    ::= { alaIpmsConfig 4 }
+
+alaIpmsQuerierTimer OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	    "The IPMS neighboring querier timeout interval in seconds."
+    DEFVAL      { 260 }
+    ::= { alaIpmsConfig 5 }
+
+alaIpmsMembershipTimer OBJECT-TYPE
+    SYNTAX 	Unsigned32
+    MAX-ACCESS	read-write
+    STATUS 	current
+    DESCRIPTION
+	    "The IGMP Group Membership timeout in seconds."
+    DEFVAL      { 260 }
+    ::= { alaIpmsConfig 6 }
+
+alaIpmsPriority OBJECT-TYPE
+    SYNTAX INTEGER {
+	        unsupported(4),
+                urgent(3),
+	        high(2),
+	        medium(1),
+		low(0)
+           }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+	    "The traffic priority applied to all IP multicast flows."
+    DEFVAL      { low }
+    ::= { alaIpmsConfig 7 }
+
+alaIpmsMaxBandwidth OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The maximum ingress IP multicast traffic forwarded for
+	     each Coronado of the switch.  This value should be specified
+	     in megabits.  Hardware platforms lacking support for this
+	     command will read 0."
+    DEFVAL      { 10 }
+    ::= { alaIpmsConfig 8 }
+
+alaIpmsHardwareRoute OBJECT-TYPE
+    SYNTAX     INTEGER {
+		    unsupported(0),
+                    enable(1),
+                    disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+	    "Enable or disable hardware based routing for IPMS"
+    DEFVAL      { disable }
+    ::= { alaIpmsConfig 9 }
+
+alaIpmsIGMPMembershipProxyVersion OBJECT-TYPE
+    SYNTAX     INTEGER {
+		    igmpv1(1),
+                    igmpv2(2),
+                    igmpv3(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+	    "Set the default IGMP version for membership reports
+            being proxied to external neighbors and queriers."
+    DEFVAL      { igmpv2 }
+    ::= { alaIpmsConfig 10 }
+
+alaIpmsOtherQuerierTimer OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+            "The IGMP Other Querier timeout in seconds."
+    DEFVAL      { 255 }
+    ::= { alaIpmsConfig 11 }
+
+-- ************************************************************************
+--  IPMS Group Table
+-- ************************************************************************
+
+alaIpmsGroup OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIBObjects 2 }
+
+alaIpmsGroupTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IPMSGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The Group table contains information about all ports that
+	    have requested membership in a multicast group."
+    ::= { alaIpmsGroup 1 }
+
+alaIpmsGroupEntry OBJECT-TYPE
+    SYNTAX     IPMSGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry corresponds to a membership request."
+    INDEX      {
+            alaIpmsGroupDestIpAddr,
+	    alaIpmsGroupClientIpAddr,
+	    alaIpmsGroupClientVlan,
+	    alaIpmsGroupClientIfIndex,
+	    alaIpmsGroupClientVci,
+	    alaIpmsGroupIGMPVersion,
+	    alaIpmsGroupIGMPv3SrcIP,
+	    alaIpmsGroupIGMPv3SrcType
+          }
+    ::= { alaIpmsGroupTable 1 }
+
+IPMSGroupEntry ::= SEQUENCE {
+            alaIpmsGroupDestIpAddr IpAddress,
+	    alaIpmsGroupClientIpAddr  IpAddress,
+            alaIpmsGroupClientMacAddr MacAddress,
+	    alaIpmsGroupClientVlan    INTEGER,
+	    alaIpmsGroupClientIfIndex InterfaceIndex,
+            alaIpmsGroupClientVci     Unsigned32,
+	    alaIpmsGroupIGMPVersion   INTEGER,
+            alaIpmsGroupIGMPv3SrcIP   IpAddress,
+            alaIpmsGroupIGMPv3SrcType    INTEGER,
+            alaIpmsGroupIGMPv3SrcTimeout Unsigned32,
+            alaIpmsGroupIGMPv3GroupType INTEGER,
+	    alaIpmsGroupTimeout    Unsigned32
+          }
+
+alaIpmsGroupDestIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The destination IP address of the membership request."
+    ::= { alaIpmsGroupEntry 1 }
+
+alaIpmsGroupClientIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the last client requesting membership."
+    ::= { alaIpmsGroupEntry 2 }
+
+alaIpmsGroupClientMacAddr OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The source MAC address of the membership request."
+    ::= { alaIpmsGroupEntry 3 }
+
+alaIpmsGroupClientVlan OBJECT-TYPE
+    SYNTAX     INTEGER (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	    "The source VLAN of the membership request."
+    ::= { alaIpmsGroupEntry 4 }
+
+alaIpmsGroupClientIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source ifIndex value of the membership request."
+    ::= { alaIpmsGroupEntry 5 }
+
+alaIpmsGroupClientVci OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source vci of the membership request."
+    ::= { alaIpmsGroupEntry 6 }
+
+alaIpmsGroupIGMPVersion OBJECT-TYPE
+    SYNTAX     INTEGER {
+            igmpv1(1),
+            igmpv2(2),
+            igmpv3(3)
+         }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IGMP version of the client."
+    ::= { alaIpmsGroupEntry 7 }
+
+alaIpmsGroupIGMPv3SrcIP OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the IGMPv3 requested source.
+            The value 0.0.0.0 will be used for IGMPv3 exclude
+            none, or IGMPv2 membership requests."
+    ::= { alaIpmsGroupEntry 8 }
+
+alaIpmsGroupIGMPv3SrcType OBJECT-TYPE
+    SYNTAX     INTEGER {
+	    na(0),
+            include(1),
+            exclude(2)
+         }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The type of the IGMPv3 required for this source."
+    ::= { alaIpmsGroupEntry 9 }
+
+alaIpmsGroupIGMPv3SrcTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The timeout of the requested IGMPv3 source.  This
+            value is only applicable to include type sources,
+            all others will be zero."
+    ::= { alaIpmsGroupEntry 10 }
+
+alaIpmsGroupIGMPv3GroupType OBJECT-TYPE
+    SYNTAX	INTEGER {
+	     na(0),
+             include(1),
+             exclude(2)
+         }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IGMPv3 group membership type."
+    ::= { alaIpmsGroupEntry 11 }
+
+alaIpmsGroupTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The timeout of the membership request.  This field
+            will always contain a valid timeout for IGMPv2 and
+            IGMPv3 exclude clients.  This value will be zero for
+            IGMPv3 include clients."
+    ::= { alaIpmsGroupEntry 12 }
+
+
+-- ************************************************************************
+--  IPMS Neighbor Table
+-- ************************************************************************
+
+alaIpmsNeighbor OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIBObjects 3 }
+
+alaIpmsNeighborTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IPMSNeighborEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	    "The Neighbor table contains information about all
+	    ports that link to multicast routers."
+    ::= { alaIpmsNeighbor 1 }
+
+alaIpmsNeighborEntry OBJECT-TYPE
+    SYNTAX     IPMSNeighborEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry corresponds to a multicast router."
+    INDEX      {
+            alaIpmsNeighborIpAddr
+          }
+    ::= { alaIpmsNeighborTable 1 }
+
+IPMSNeighborEntry ::= SEQUENCE {
+            alaIpmsNeighborIpAddr    IpAddress,
+            alaIpmsNeighborVlan      INTEGER,
+	    alaIpmsNeighborIfIndex   InterfaceIndex,
+            alaIpmsNeighborVci       Unsigned32,
+            alaIpmsNeighborType      INTEGER,
+            alaIpmsNeighborTimeout   Unsigned32
+          }
+
+alaIpmsNeighborIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the neighbor."
+    ::= { alaIpmsNeighborEntry 1 }
+
+alaIpmsNeighborVlan OBJECT-TYPE
+    SYNTAX     INTEGER (1..4094)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The VLAN of the neighbor."
+    ::= { alaIpmsNeighborEntry 2 }
+
+alaIpmsNeighborIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the neighbor."
+    ::= { alaIpmsNeighborEntry 3 }
+
+alaIpmsNeighborVci OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The vci of the neighbor."
+    ::= { alaIpmsNeighborEntry 4 }
+
+alaIpmsNeighborType OBJECT-TYPE
+    SYNTAX     INTEGER {
+            native(0),
+            ipip(1),
+            pim(2),
+            cmm(3)
+          }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The type of the neighbor."
+    ::= { alaIpmsNeighborEntry 5 }
+
+alaIpmsNeighborTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The timeout of the neighbor."
+    ::= { alaIpmsNeighborEntry 6 }
+
+
+-- ************************************************************************
+--  IPMS Static Neighbor Table
+-- ************************************************************************
+
+alaIpmsStaticNeighbor OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIBObjects 4 }
+
+alaIpmsStaticNeighborTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IPMSStaticNeighborEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	    "The Neighbor table contains information about all
+	    manually configured multicast neighbor ports."
+    ::= { alaIpmsStaticNeighbor 1 }
+
+alaIpmsStaticNeighborEntry OBJECT-TYPE
+    SYNTAX     IPMSStaticNeighborEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry corresponds to a manually configured multicast neighbor."
+    INDEX      {
+	        alaIpmsStaticNeighborVlan,
+		alaIpmsStaticNeighborIfIndex,
+	        alaIpmsStaticNeighborVci
+	       }
+    ::= { alaIpmsStaticNeighborTable 1 }
+
+IPMSStaticNeighborEntry ::= SEQUENCE {
+            alaIpmsStaticNeighborVlan      INTEGER,
+            alaIpmsStaticNeighborIfIndex   InterfaceIndex,
+            alaIpmsStaticNeighborVci       Unsigned32,
+	    alaIpmsStaticNeighborIGMPVersion INTEGER,
+	    alaIpmsStaticNeighborRowStatus RowStatus
+          }
+
+alaIpmsStaticNeighborVlan OBJECT-TYPE
+    SYNTAX     INTEGER (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The VLAN of the neighbor."
+    ::= { alaIpmsStaticNeighborEntry 1 }
+
+alaIpmsStaticNeighborIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the neighbor."
+    ::= { alaIpmsStaticNeighborEntry 2 }
+
+alaIpmsStaticNeighborVci OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The vci of the neighbor."
+    ::= { alaIpmsStaticNeighborEntry 3 }
+
+alaIpmsStaticNeighborIGMPVersion OBJECT-TYPE
+    SYNTAX     INTEGER {
+	      igmpv2(2),
+              igmpv3(3)
+       }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The version used for proxy IGMP membership reports
+            to this static neighbor."
+    ::= { alaIpmsStaticNeighborEntry 4 }
+
+alaIpmsStaticNeighborRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Used in accordance to installation and removal conventions for
+	     conceptual rows.  The RowStatus values that are supported are
+	     the following:
+                  active - The row is active and valid.
+                  createAndGo - The row will be created and activated.
+                  destroy - The row will be destroyed."
+    ::= { alaIpmsStaticNeighborEntry 5 }
+
+
+-- ************************************************************************
+--  IPMS Querier Table
+-- ************************************************************************
+
+alaIpmsQuerier OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIBObjects 5 }
+
+alaIpmsQuerierTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IPMSQuerierEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	    "The Querier table contains information about all
+	    ports that link to multicast queriers."
+    ::= { alaIpmsQuerier 1 }
+
+alaIpmsQuerierEntry OBJECT-TYPE
+    SYNTAX     IPMSQuerierEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry corresponds to a multicast querier."
+    INDEX      {
+            alaIpmsQuerierIpAddr
+          }
+    ::= { alaIpmsQuerierTable 1 }
+
+IPMSQuerierEntry ::= SEQUENCE {
+            alaIpmsQuerierIpAddr    IpAddress,
+            alaIpmsQuerierVlan      INTEGER,
+            alaIpmsQuerierIfIndex   InterfaceIndex,
+            alaIpmsQuerierVci       Unsigned32,
+            alaIpmsQuerierType      INTEGER,
+            alaIpmsQuerierTimeout   Unsigned32
+          }
+
+alaIpmsQuerierIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the querier."
+    ::= { alaIpmsQuerierEntry 1 }
+
+alaIpmsQuerierVlan OBJECT-TYPE
+    SYNTAX     INTEGER (1..4094)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The VLAN of the querier."
+    ::= { alaIpmsQuerierEntry 2 }
+
+alaIpmsQuerierIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the querier."
+    ::= { alaIpmsQuerierEntry 3 }
+
+alaIpmsQuerierVci OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The vci of the querier."
+    ::= { alaIpmsQuerierEntry 4 }
+
+alaIpmsQuerierType OBJECT-TYPE
+    SYNTAX     INTEGER {
+            native(0),
+            ipip(1),
+            pim(2),
+            cmm(3)
+          }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The type of the querier."
+    ::= { alaIpmsQuerierEntry 5 }
+
+alaIpmsQuerierTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The timeout of the querier."
+    ::= { alaIpmsQuerierEntry 6 }
+
+
+-- ************************************************************************
+--  IPMS Static Querier Table
+-- ************************************************************************
+
+alaIpmsStaticQuerier OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIBObjects 6 }
+
+alaIpmsStaticQuerierTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IPMSStaticQuerierEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	    "The Querier table contains information about all
+	    manually configured ports that link to multicast
+	    queriers."
+    ::= { alaIpmsStaticQuerier 1 }
+
+alaIpmsStaticQuerierEntry OBJECT-TYPE
+    SYNTAX     IPMSStaticQuerierEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry corresponds to a multicast querier."
+    INDEX      {
+	    alaIpmsStaticQuerierVlan,
+	    alaIpmsStaticQuerierIfIndex,
+	    alaIpmsStaticQuerierVci
+          }
+    ::= { alaIpmsStaticQuerierTable 1 }
+
+IPMSStaticQuerierEntry ::= SEQUENCE {
+            alaIpmsStaticQuerierVlan      INTEGER,
+            alaIpmsStaticQuerierIfIndex   InterfaceIndex,
+            alaIpmsStaticQuerierVci       Unsigned32,
+	    alaIpmsStaticQuerierIGMPVersion INTEGER,
+            alaIpmsStaticQuerierRowStatus RowStatus
+          }
+
+alaIpmsStaticQuerierVlan OBJECT-TYPE
+    SYNTAX     INTEGER (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The VLAN of the querier."
+    ::= { alaIpmsStaticQuerierEntry 1 }
+
+alaIpmsStaticQuerierIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the querier."
+    ::= { alaIpmsStaticQuerierEntry 2 }
+
+alaIpmsStaticQuerierVci OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The vci of the querier."
+    ::= { alaIpmsStaticQuerierEntry 3 }
+
+alaIpmsStaticQuerierIGMPVersion OBJECT-TYPE
+    SYNTAX     INTEGER {
+	         igmpv2(2),
+	         igmpv3(3)
+       }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The version used for proxy IGMP membership reports
+            sent to this querier."
+    ::= { alaIpmsStaticQuerierEntry 4 }
+
+alaIpmsStaticQuerierRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Used in accordance to installation and removal conventions for
+	     conceptual rows.  The RowStatus values that are supported are
+	     the following:
+                  active - The row is active and valid.
+                  createAndGo - The row will be created and activated.
+                  destroy - The row will be destroyed."
+    ::= { alaIpmsStaticQuerierEntry 5 }
+
+
+-- ************************************************************************
+--  IPMS Source Table
+-- ************************************************************************
+
+alaIpmsSource OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIBObjects 7 }
+
+alaIpmsSourceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IPMSSourceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The Source table contains information about all the
+	    multicast streams."
+    ::= { alaIpmsSource 1 }
+
+alaIpmsSourceEntry OBJECT-TYPE
+    SYNTAX     IPMSSourceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry corresponds to a multicast stream."
+    INDEX      {
+            alaIpmsSourceDestIpAddr,
+	    alaIpmsSourceSrcIpAddr,
+	    alaIpmsSourceSrcVlan,
+            alaIpmsSourceSrcIfIndex,
+            alaIpmsSourceUniIpAddr,
+	    alaIpmsSourceSrcVci,
+	    alaIpmsSourceSrcType
+          }
+    ::= { alaIpmsSourceTable 1 }
+
+IPMSSourceEntry ::= SEQUENCE {
+            alaIpmsSourceDestIpAddr IpAddress,
+	    alaIpmsSourceSrcIpAddr  IpAddress,
+            alaIpmsSourceSrcMacAddr MacAddress,
+	    alaIpmsSourceSrcVlan    INTEGER,
+	    alaIpmsSourceSrcIfIndex InterfaceIndex,
+            alaIpmsSourceUniIpAddr  IpAddress,
+            alaIpmsSourceSrcVci     Unsigned32,
+	    alaIpmsSourceSrcType    INTEGER,
+	    alaIpmsSourceTimeout    Unsigned32
+          }
+
+alaIpmsSourceDestIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The destination IP address of the multicast stream."
+    ::= { alaIpmsSourceEntry 1 }
+
+alaIpmsSourceSrcIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source IP address of the multicast stream."
+    ::= { alaIpmsSourceEntry 2 }
+
+alaIpmsSourceSrcMacAddr OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The source MAC address of the multicast stream."
+    ::= { alaIpmsSourceEntry 3 }
+
+alaIpmsSourceSrcVlan OBJECT-TYPE
+    SYNTAX     INTEGER (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	    "The source VLAN of the multicast stream."
+    ::= { alaIpmsSourceEntry 4 }
+
+alaIpmsSourceSrcIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source ifIndex value of the multicast stream."
+    ::= { alaIpmsSourceEntry 5 }
+
+alaIpmsSourceUniIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The tunneled source IP address of the multicast stream."
+    ::= { alaIpmsSourceEntry 6 }
+
+alaIpmsSourceSrcVci OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source vci of the multicast stream."
+    ::= { alaIpmsSourceEntry 7 }
+
+alaIpmsSourceSrcType OBJECT-TYPE
+    SYNTAX     INTEGER {
+            native(0),
+            ipip(1),
+            pim(2),
+            cmm(3)
+          }
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source type of the multicast stream."
+    ::= { alaIpmsSourceEntry 8 }
+
+alaIpmsSourceTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The timeout of the multicast stream."
+    ::= { alaIpmsSourceEntry 9 }
+
+
+-- ************************************************************************
+--  IPMS Forward Table
+-- ************************************************************************
+
+alaIpmsForward OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIBObjects 8 }
+
+alaIpmsForwardTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IPMSForwardEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The Forward table contains information for forwarding
+             multicast streams."
+    ::= { alaIpmsForward 1 }
+
+alaIpmsForwardEntry OBJECT-TYPE
+    SYNTAX     IPMSForwardEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry corresponds to a multicast stream."
+    INDEX      {
+            alaIpmsForwardDestIpAddr,
+	    alaIpmsForwardSrcIpAddr,
+	    alaIpmsForwardDestVlan,
+	    alaIpmsForwardSrcVlan,
+	    alaIpmsForwardSrcIfIndex,
+	    alaIpmsForwardUniIpAddr,
+	    alaIpmsForwardSrcVci,
+	    alaIpmsForwardDestType,
+	    alaIpmsForwardSrcType,
+            alaIpmsForwardDestIfIndex,
+	    alaIpmsForwardDestTunIpAddr
+          }
+    ::= { alaIpmsForwardTable 1 }
+
+IPMSForwardEntry ::= SEQUENCE {
+            alaIpmsForwardDestIpAddr    IpAddress,
+	    alaIpmsForwardSrcIpAddr	IpAddress,
+	    alaIpmsForwardDestVlan	INTEGER,
+	    alaIpmsForwardSrcVlan       INTEGER,
+	    alaIpmsForwardSrcIfIndex    InterfaceIndex,
+	    alaIpmsForwardUniIpAddr     IpAddress,
+	    alaIpmsForwardSrcVci        Unsigned32,
+	    alaIpmsForwardDestType      INTEGER,
+	    alaIpmsForwardSrcType       INTEGER,
+	    alaIpmsForwardDestTunIpAddr IpAddress,
+	    alaIpmsForwardSrcTunIpAddr  IpAddress,
+	    alaIpmsForwardRtrMacAddr    MacAddress,
+	    alaIpmsForwardRtrTtl        INTEGER,
+	    alaIpmsForwardDestIfIndex   InterfaceIndex
+          }
+
+alaIpmsForwardDestIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The destination IP address of the multicast stream."
+    ::= { alaIpmsForwardEntry 1 }
+
+alaIpmsForwardSrcIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source IP address of the multicast stream."
+    ::= { alaIpmsForwardEntry 2 }
+
+alaIpmsForwardDestVlan OBJECT-TYPE
+    SYNTAX     INTEGER (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	    "The destination VLAN of the multicast stream."
+    ::= { alaIpmsForwardEntry 3 }
+
+alaIpmsForwardSrcVlan OBJECT-TYPE
+    SYNTAX     INTEGER (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	    "The source VLAN of the multicast stream."
+    ::= { alaIpmsForwardEntry 4 }
+
+alaIpmsForwardSrcIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source ifIndex value of the multicast stream."
+    ::= { alaIpmsForwardEntry 5 }
+
+alaIpmsForwardUniIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The tunneled source IP address of the multicast stream."
+    ::= { alaIpmsForwardEntry 6 }
+
+alaIpmsForwardSrcVci OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source vci of the multicast stream."
+    ::= { alaIpmsForwardEntry 7 }
+
+alaIpmsForwardDestType OBJECT-TYPE
+    SYNTAX     INTEGER {
+            native(0),
+            ipip(1),
+            pim(2),
+            cmm(3)
+          }
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The destination type of the multicast stream."
+    ::= { alaIpmsForwardEntry 8 }
+
+alaIpmsForwardSrcType OBJECT-TYPE
+    SYNTAX     INTEGER {
+            native(0),
+            ipip(1),
+            pim(2),
+            cmm(3)
+          }
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source type of the multicast stream."
+    ::= { alaIpmsForwardEntry 9 }
+
+alaIpmsForwardDestTunIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The tunneled destination IP address of the multicast stream."
+    ::= { alaIpmsForwardEntry 10 }
+
+alaIpmsForwardSrcTunIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The tunneled source IP address of the multicast stream."
+    ::= { alaIpmsForwardEntry 11 }
+
+alaIpmsForwardRtrMacAddr OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The source MAC address of the router port."
+    ::= { alaIpmsForwardEntry 12 }
+
+alaIpmsForwardRtrTtl OBJECT-TYPE
+    SYNTAX     INTEGER (1..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time-to-live of the router port."
+    ::= { alaIpmsForwardEntry 13 }
+
+alaIpmsForwardDestIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The destination ifIndex value of the multicast stream."
+    ::= { alaIpmsForwardEntry 14 }
+
+
+-- ************************************************************************
+--  IPMS Policy Table
+-- ************************************************************************
+
+alaIpmsPolicy OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIBObjects 9 }
+
+alaIpmsPolicyTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IPMSPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The Policy table contains information about all policies
+	    concerning multicast streams."
+    ::= { alaIpmsPolicy 1 }
+
+alaIpmsPolicyEntry OBJECT-TYPE
+    SYNTAX     IPMSPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry corresponds to a membership request."
+    INDEX      {
+            alaIpmsPolicyDestIpAddr,
+	    alaIpmsPolicySrcIpAddr,
+	    alaIpmsPolicySrcVlan,
+	    alaIpmsPolicySrcIfIndex,
+	    alaIpmsPolicyUniIpAddr,
+	    alaIpmsPolicySrcVci,
+	    alaIpmsPolicySrcType,
+	    alaIpmsPolicyPolicy
+          }
+    ::= { alaIpmsPolicyTable 1 }
+
+IPMSPolicyEntry ::= SEQUENCE {
+            alaIpmsPolicyDestIpAddr  IpAddress,
+	    alaIpmsPolicySrcIpAddr   IpAddress,
+            alaIpmsPolicySrcMacAddr  MacAddress,
+	    alaIpmsPolicySrcVlan     INTEGER,
+	    alaIpmsPolicySrcIfIndex  InterfaceIndex,
+	    alaIpmsPolicyUniIpAddr   IpAddress,
+            alaIpmsPolicySrcVci      Unsigned32,
+	    alaIpmsPolicySrcType     INTEGER,
+	    alaIpmsPolicyPolicy      INTEGER,
+	    alaIpmsPolicyDisposition INTEGER,
+	    alaIpmsPolicyTimeout     Unsigned32
+          }
+
+alaIpmsPolicyDestIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The destination IP address of the policy stream."
+    ::= { alaIpmsPolicyEntry 1 }
+
+alaIpmsPolicySrcIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source IP address of the policy stream."
+    ::= { alaIpmsPolicyEntry 2 }
+
+alaIpmsPolicySrcMacAddr OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The source MAC address of the policy stream."
+    ::= { alaIpmsPolicyEntry 3 }
+
+alaIpmsPolicySrcVlan OBJECT-TYPE
+    SYNTAX     INTEGER (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	    "The source VLAN of the policy stream."
+    ::= { alaIpmsPolicyEntry 4 }
+
+alaIpmsPolicySrcIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source ifIndex value of the policy stream."
+    ::= { alaIpmsPolicyEntry 5 }
+
+alaIpmsPolicyUniIpAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The tunneled source IP address of the policy stream."
+    ::= { alaIpmsPolicyEntry 6 }
+
+alaIpmsPolicySrcVci OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source vci of the policy stream."
+    ::= { alaIpmsPolicyEntry 7 }
+
+alaIpmsPolicySrcType OBJECT-TYPE
+    SYNTAX     INTEGER {
+            native(0),
+            ipip(1),
+            pim(2),
+            cmm(3)
+          }
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The source type of the policy stream."
+    ::= { alaIpmsPolicyEntry 8 }
+
+alaIpmsPolicyPolicy OBJECT-TYPE
+    SYNTAX     INTEGER {
+            membership(1)
+          }
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The type of policy of the stream."
+    ::= { alaIpmsPolicyEntry 9 }
+
+alaIpmsPolicyDisposition OBJECT-TYPE
+    SYNTAX     INTEGER {
+            drop(0),
+            accept(1)
+          }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The applied disposition of the policy stream."
+    ::= { alaIpmsPolicyEntry 10 }
+
+alaIpmsPolicyTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The timeout of the policy stream."
+    ::= { alaIpmsPolicyEntry 11 }
+
+-- ************************************************************************
+--  IPMS Static Member Table
+-- ************************************************************************
+
+alaIpmsStaticMember OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIBObjects 10 }
+
+alaIpmsStaticMemberTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IPMSStaticMemberEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	    "The Member table contains information about all
+	     manually configured multicast Member ports."
+    ::= { alaIpmsStaticMember 1 }
+
+alaIpmsStaticMemberEntry OBJECT-TYPE
+    SYNTAX     IPMSStaticMemberEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry corresponds to a manually configured multicast Member."
+    INDEX      {
+	        alaIpmsStaticMemberGroupAddr,
+	        alaIpmsStaticMemberVlan,
+		alaIpmsStaticMemberIfIndex,
+	        alaIpmsStaticMemberVci
+	       }
+    ::= { alaIpmsStaticMemberTable 1 }
+
+IPMSStaticMemberEntry ::= SEQUENCE {
+	    alaIpmsStaticMemberGroupAddr IpAddress,
+	    alaIpmsStaticMemberIGMPVersion INTEGER,
+            alaIpmsStaticMemberVlan      INTEGER,
+            alaIpmsStaticMemberIfIndex   InterfaceIndex,
+            alaIpmsStaticMemberVci       Unsigned32,
+	    alaIpmsStaticMemberRowStatus RowStatus
+          }
+
+alaIpmsStaticMemberGroupAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+               "The Multicast Group IP address this
+	        static client subscribes to."
+    ::= { alaIpmsStaticMemberEntry 1 }
+
+alaIpmsStaticMemberIGMPVersion OBJECT-TYPE
+    SYNTAX     INTEGER {
+	      igmpv2(2),
+              igmpv3(3)
+       }
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The version used for proxy IGMP membership reports
+            to this static Member."
+    ::= { alaIpmsStaticMemberEntry 2 }
+
+alaIpmsStaticMemberVlan OBJECT-TYPE
+    SYNTAX     INTEGER (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The VLAN of the Member."
+    ::= { alaIpmsStaticMemberEntry 3 }
+
+alaIpmsStaticMemberIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the Member."
+    ::= { alaIpmsStaticMemberEntry 4 }
+
+alaIpmsStaticMemberVci OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The vci of the Member."
+    ::= { alaIpmsStaticMemberEntry 5 }
+
+alaIpmsStaticMemberRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Used in accordance to installation and removal conventions for
+	     conceptual rows.  The RowStatus values that are supported are
+	     the following:
+                  active - The row is active and valid.
+                  createAndGo - The row will be created and activated.
+                  destroy - The row will be destroyed."
+    ::= { alaIpmsStaticMemberEntry 6 }
+
+-- ************************************************************************
+--  IPMS Conformance Table
+-- ************************************************************************
+
+alcatelIND1IPMSMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1IPMSMIB 2 }
+
+alcatelIND1IPMSMIBCompliances OBJECT IDENTIFIER ::=
+                                        { alcatelIND1IPMSMIBConformance 1 }
+
+alcatelIND1IPMSMIBGroups OBJECT IDENTIFIER ::=
+                                        { alcatelIND1IPMSMIBConformance 2 }
+
+alaIpmsCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+            "The compliance statement for switches running IPMS and
+            implementing ALCATEL-IND1-IPMS-MIB."
+    MODULE
+    MANDATORY-GROUPS { alaIpmsConfig, alaIpmsGroup, alaIpmsNeighbor,
+		       alaIpmsStaticNeighbor, alaIpmsQuerier,
+                       alaIpmsStaticQuerier, alaIpmsSource, alaIpmsForward,
+                       alaIpmsPolicy }
+    ::= { alcatelIND1IPMSMIBCompliances 1 }
+
+alaIpmsConfigGroup OBJECT-GROUP
+    OBJECTS  { alaIpmsStatus, alaIpmsLeaveTimeout, alaIpmsQueryInterval,
+               alaIpmsNeighborTimer, alaIpmsQuerierTimer,
+               alaIpmsMembershipTimer, alaIpmsOtherQuerierTimer }
+    STATUS     current
+    DESCRIPTION
+            "A collection of objects to support management of configuration
+            parameters of IPMS switches."
+    ::= { alcatelIND1IPMSMIBGroups 1 }
+
+alaIpmsGroupGroup OBJECT-GROUP
+    OBJECTS  { alaIpmsGroupClientMacAddr, alaIpmsGroupTimeout,
+               alaIpmsGroupIGMPv3GroupType, alaIpmsGroupIGMPv3SrcTimeout }
+    STATUS     current
+    DESCRIPTION
+            "A collection of objects to support IPMS group tables."
+    ::= { alcatelIND1IPMSMIBGroups 2 }
+
+alaIpmsNeighborGroup OBJECT-GROUP
+    OBJECTS  { alaIpmsNeighborVlan, alaIpmsNeighborIfIndex,
+               alaIpmsNeighborVci, alaIpmsNeighborType,
+               alaIpmsNeighborTimeout }
+    STATUS     current
+    DESCRIPTION
+            "A collection of objects to support IPMS neighbor tables."
+    ::= { alcatelIND1IPMSMIBGroups 3 }
+
+alaIpmsStaticNeighborGroup OBJECT-GROUP
+    OBJECTS  { alaIpmsStaticNeighborRowStatus }
+    STATUS     current
+    DESCRIPTION
+            "A collection of objects to support IPMS static neighbor tables."
+    ::= { alcatelIND1IPMSMIBGroups 4 }
+
+alaIpmsQuerierGroup OBJECT-GROUP
+    OBJECTS  { alaIpmsQuerierVlan, alaIpmsQuerierIfIndex, alaIpmsQuerierVci,
+               alaIpmsQuerierType, alaIpmsQuerierTimeout }
+    STATUS     current
+    DESCRIPTION
+            "A collection of objects to support IPMS querier tables."
+    ::= { alcatelIND1IPMSMIBGroups 5 }
+
+alaIpmsStaticQuerierGroup OBJECT-GROUP
+    OBJECTS  { alaIpmsStaticQuerierRowStatus }
+    STATUS     current
+    DESCRIPTION
+            "A collection of objects to support IPMS static querier tables."
+    ::= { alcatelIND1IPMSMIBGroups 6 }
+
+alaIpmsSourceGroup OBJECT-GROUP
+    OBJECTS  { alaIpmsSourceSrcMacAddr, alaIpmsSourceTimeout }
+    STATUS     current
+    DESCRIPTION
+            "A collection of objects to support IPMS source tables."
+    ::= { alcatelIND1IPMSMIBGroups 7 }
+
+alaIpmsForwardGroup OBJECT-GROUP
+    OBJECTS  { alaIpmsForwardSrcTunIpAddr, alaIpmsForwardRtrMacAddr,
+               alaIpmsForwardRtrTtl }
+    STATUS     current
+    DESCRIPTION
+            "A collection of objects to support IPMS forward tables."
+    ::= { alcatelIND1IPMSMIBGroups 8 }
+
+alaIpmsPolicyGroup OBJECT-GROUP
+    OBJECTS  { alaIpmsPolicySrcMacAddr, alaIpmsPolicyDisposition,
+               alaIpmsPolicyTimeout }
+    STATUS     current
+    DESCRIPTION
+            "A collection of objects to support IPMS policy tables."
+    ::= { alcatelIND1IPMSMIBGroups 9 }
+
+END

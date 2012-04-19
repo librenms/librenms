@@ -1,0 +1,110 @@
+
+--
+-- Changes to RFC1215 (A Convention for Defining Traps for use with the SNMP):
+--      Make it into a proper ASN.1 definition module (RFC-1215).
+--      Add appropriate IMPORTS.
+--
+  RFC-1215 DEFINITIONS ::= BEGIN
+
+  IMPORTS
+      ObjectName
+          FROM RFC1155-SMI
+      snmp, ifIndex, egpNeighAddr
+          FROM RFC1213-MIB;
+
+--
+-- SMIv1 Trap macro definition.
+--
+  TRAP-TYPE MACRO ::=
+  BEGIN
+      TYPE NOTATION ::= "ENTERPRISE" value
+                            (enterprise OBJECT IDENTIFIER)
+                        VarPart
+                        DescrPart
+                        ReferPart
+      VALUE NOTATION ::= value (VALUE INTEGER)
+
+      VarPart ::=
+                 "VARIABLES" "{" VarTypes "}"
+                      | empty
+      VarTypes ::=
+                 VarType | VarTypes "," VarType
+      VarType ::=
+                 value (vartype ObjectName)
+
+      DescrPart ::=
+                 "DESCRIPTION" value (description DisplayString)
+                      | empty
+
+      ReferPart ::=
+                 "REFERENCE" value (reference DisplayString)
+                      | empty
+
+  END
+
+--
+-- SNMPv1 standard trap definitions.
+--
+  coldStart TRAP-TYPE
+      ENTERPRISE  snmp
+      DESCRIPTION
+                  "A coldStart trap signifies that the sending
+                  protocol entity is reinitializing itself such
+                  that the agent's configuration or the rotocol
+                  entity implementation may be altered."
+      ::= 0
+
+  warmStart TRAP-TYPE
+      ENTERPRISE  snmp
+      DESCRIPTION
+                  "A warmStart trap signifies that the sending
+                  protocol entity is reinitializing itself such
+                  that neither the agent configuration nor the
+                  protocol entity implementation is altered."
+      ::= 1
+
+  linkDown TRAP-TYPE
+      ENTERPRISE  snmp
+      VARIABLES   { ifIndex }
+      DESCRIPTION
+                  "A linkDown trap signifies that the sending
+                  protocol entity recognizes a failure in one of
+                  the communication links represented in the
+                  agent's configuration."
+      ::= 2
+
+  linkUp TRAP-TYPE
+      ENTERPRISE  snmp
+      VARIABLES   { ifIndex }
+      DESCRIPTION
+                  "A linkUp trap signifies that the sending
+                  protocol entity recognizes that one of the
+                  communication links represented in the agent's
+                  configuration has come up."
+      ::= 3
+
+  authenticationFailure TRAP-TYPE
+      ENTERPRISE  snmp
+      DESCRIPTION
+                  "An authenticationFailure trap signifies that
+                  the sending protocol entity is the addressee
+                  of a protocol message that is not properly
+                  authenticated.  While implementations of the
+                  SNMP must be capable of generating this trap,
+                  they must also be capable of suppressing the
+                  emission of such traps via an implementation-
+                  specific mechanism."
+      ::= 4
+
+
+  egpNeighborLoss TRAP-TYPE
+      ENTERPRISE  snmp
+      VARIABLES   { egpNeighAddr }
+      DESCRIPTION
+                  "An egpNeighborLoss trap signifies that an EGP
+                  neighbor for whom the sending protocol entity
+                  was an EGP peer has been marked down and the
+                  peer relationship no longer obtains."
+      ::= 5
+
+END

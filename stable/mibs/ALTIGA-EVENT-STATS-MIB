@@ -1,0 +1,177 @@
+-- *------------------------------------------------------------------
+-- * ALTIGA-EVENT-STATS-MIB.my:  Altiga Event Statistics MIB.
+-- *
+-- * Altiga Networks was acquired by Cisco Systems on March 29, 2000
+-- *
+-- * Copyright (c) 2002, 2003 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+
+ALTIGA-EVENT-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32
+         FROM SNMPv2-SMI
+      DisplayString
+         FROM SNMPv2-TC
+      OBJECT-GROUP, MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+      alStatsEvent, alEventGroup
+         FROM ALTIGA-MIB
+      alEventMibModule
+         FROM ALTIGA-GLOBAL-REG;
+
+   altigaEventStatsMibModule MODULE-IDENTITY
+      LAST-UPDATED   "200301130000Z"
+      ORGANIZATION   "Cisco Systems, Inc."
+      CONTACT-INFO
+         "Cisco Systems
+          170 W Tasman Drive
+          San Jose, CA  95134
+          USA
+
+          Tel: +1 800 553-NETS
+          E-mail: cs-cvpn3000@cisco.com"
+
+      DESCRIPTION
+         "The Altiga Event Statistics MIB models counters and objects that are
+          of management interest for events.
+         
+          Acronyms
+          The following acronyms are used in this document:
+
+            MIB:        Management Information Base
+
+         "
+
+
+        REVISION "200301130000Z"
+        DESCRIPTION
+                "Added alStatsEventNotificationId object"
+
+        REVISION "200207100000Z"
+        DESCRIPTION
+                "Updated with new header"
+
+      ::= { alEventMibModule 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+alStatsEventGlobal OBJECT IDENTIFIER ::= { alStatsEvent 1 }
+
+alStatsEventNotificationId        OBJECT-TYPE
+   SYNTAX                         DisplayString
+   MAX-ACCESS                     read-only
+   STATUS                         current
+   DESCRIPTION
+      "The event class and event ID string in class/id format.
+       The string applies as the product is configured to
+       send log events whenever SNMP generates notifications."
+   ::= { alStatsEventGlobal 1 }
+
+alEventStatsTable   OBJECT-TYPE
+  SYNTAX                  SEQUENCE OF AlEventStatsEntry
+  MAX-ACCESS              not-accessible
+  STATUS                  current
+  DESCRIPTION
+     "The Event Stats Per Class/Event Number."
+  ::= { alStatsEvent 2 }
+
+alEventStatsEntry   OBJECT-TYPE
+  SYNTAX                  AlEventStatsEntry
+  MAX-ACCESS              not-accessible
+  STATUS                  current
+  DESCRIPTION
+     "An entry in the alEventStatsTable."
+  INDEX     { alEventStatsClass, alEventStatsEventNumber }
+  ::= { alEventStatsTable 1 }
+
+AlEventStatsEntry ::= SEQUENCE {
+   alEventStatsClass       Integer32,
+   alEventStatsEventNumber Integer32,
+   alEventStatsCount       Counter32
+}
+
+alEventStatsClass   OBJECT-TYPE
+   SYNTAX                  Integer32 (0..65535)
+   MAX-ACCESS              read-only
+   STATUS                  current
+   DESCRIPTION
+      "The primary index of this row, the event class."
+   ::= { alEventStatsEntry 1 }
+
+alEventStatsEventNumber   OBJECT-TYPE
+   SYNTAX                  Integer32  (0..65535)
+   MAX-ACCESS              read-only
+   STATUS                  current
+   DESCRIPTION
+      "The secondary index of this row, the event number."
+   ::= { alEventStatsEntry 2 }
+
+alEventStatsCount   OBJECT-TYPE
+   SYNTAX                  Counter32
+   MAX-ACCESS              read-only
+   STATUS                  current
+   DESCRIPTION
+      "The number of times that the given event for the give class has
+       been generated."
+  ::= { alEventStatsEntry 3 }
+
+altigaEventStatsMibConformance OBJECT IDENTIFIER 
+::= { altigaEventStatsMibModule 1 }
+altigaEventStatsMibCompliances OBJECT IDENTIFIER 
+::= { altigaEventStatsMibConformance 1 }
+
+altigaEventStatsMibCompliance MODULE-COMPLIANCE
+   STATUS         deprecated
+   DESCRIPTION
+      "The compliance statement for agents which 
+       implement the Altiga Event Statistics MIB."
+   MODULE
+   MANDATORY-GROUPS { 
+      altigaEventStatsGroup
+   }
+   ::= { altigaEventStatsMibCompliances 1 }
+
+altigaEventStatsMibComplianceRev1 MODULE-COMPLIANCE
+    STATUS         current
+    DESCRIPTION
+       "The compliance statement for agents which 
+        implement the Altiga Event Statistics MIB."
+    MODULE
+    MANDATORY-GROUPS { 
+       altigaEventStatsGroupRev1
+    }
+    ::= { altigaEventStatsMibCompliances 2 }
+
+altigaEventStatsGroup OBJECT-GROUP
+   OBJECTS
+   {
+      alEventStatsClass,
+      alEventStatsEventNumber,
+      alEventStatsCount
+   }
+   STATUS  deprecated
+   DESCRIPTION
+      "The objects for Event Statistics."
+   ::= { alEventGroup 2 }
+
+altigaEventStatsGroupRev1 OBJECT-GROUP
+    OBJECTS
+    {
+       alEventStatsClass,
+       alEventStatsEventNumber,
+       alEventStatsCount,
+       alStatsEventNotificationId 
+    }
+    STATUS  current
+    DESCRIPTION
+       "The objects for Event Statistics."
+    ::= { alEventGroup 3 }
+
+END
+
+

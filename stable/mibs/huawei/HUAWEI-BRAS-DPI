@@ -1,0 +1,248 @@
+-- =================================================================
+-- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-DPI-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+    HUAWEI-BRAS-DPI-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+        hwBRASMib            
+            FROM HUAWEI-MIB
+        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI
+            RowStatus, TruthValue            
+                FROM SNMPv2-TC;
+    
+        hwBRASDpi MODULE-IDENTITY 
+            LAST-UPDATED "200604181334Z"        -- April 18, 2006 at 13:34 GMT
+            ORGANIZATION 
+                "       
+                NanJing Institute,Huawei Technologies Co.,Ltd.
+                HuiHong Mansion,No.91 BaiXia Rd.
+                NanJing, P.R. of China
+                Zipcode:210001
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com "
+            CONTACT-INFO 
+                "The MIB contains objects of module DPI."
+            DESCRIPTION 
+                "Description."
+            ::= { hwBRASMib 16}
+--
+-- Node definitions
+--
+ 
+            hwDpiPolicyObject OBJECT IDENTIFIER ::= { hwBRASDpi 1 }
+                
+        hwDpiPolicyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDpiPolicyEntry
+            ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " DPI Service Policy Configuration.
+                
+                "
+            ::= { hwDpiPolicyObject 1 }
+        
+        hwDpiPolicyEntry OBJECT-TYPE
+            SYNTAX HwDpiPolicyEntry
+            ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Dpi Policy Entry.
+                  The dpi policy table is uniquely identified by the policy name. The policy name is the key word entered when the policy table is created, and cannot be changed. 
+                                  The index is hwDpiPolicyName.
+                                  This table is used to configure the dpi policy.
+                                  The description of operation constraints is as follows:
+                  1.The DPI policy name must be entered when the policy table is created.
+                  2.The DPI policy cannot be changed if it is referenced by some user.
+                  3.The current DPI policy cannot be deleted if it is referenced by some domain.     
+                        "
+            INDEX { hwDpiPolicyName }
+            ::= { hwDpiPolicyTable 1 }
+        
+        HwDpiPolicyEntry ::=
+            SEQUENCE { 
+                hwDpiServiceType
+                    INTEGER,
+                hwDpiPolicyName
+                    OCTET STRING,
+                hwDpiUpBehaviorName
+                    OCTET STRING,
+                hwDpiDownBehaviorName
+                    OCTET STRING,
+                hwDpiPolicyRowStatus
+                    RowStatus            
+             }
+
+        hwDpiServiceType OBJECT-TYPE
+            SYNTAX INTEGER
+                        {
+                        p2p(0),
+                        other(1)
+                        }
+            ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " Service Type.
+                
+                P2P/OTHER.
+                "
+            DEFVAL { 0 }
+            ::= { hwDpiPolicyEntry 1 }
+        
+        hwDpiPolicyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " Dpi Policy Name.
+                  The policy name is the key word entered when the policy table is created, and cannot be changed later.
+                  The DPI policy name is assigned when DPI policy is created. 
+                "
+            ::= { hwDpiPolicyEntry 2 }
+        
+        hwDpiUpBehaviorName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " Up Behavior Name.
+                  Binding up DPI behavior policy is choosen to do, if up DPI behavior is binded, it need assingn behavior name.
+                "
+            ::= { hwDpiPolicyEntry 3 }
+        
+        hwDpiDownBehaviorName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " Down Behavior Name.
+                  Binding down DPI behavior policy is choosen to do, if down DPI behavior is binded, it need assingn behavior name.
+                "
+            ::= { hwDpiPolicyEntry 4 }
+        
+        hwDpiPolicyRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row admin status,either Add or Del.
+                 Supports add and delete.    
+                "
+            ::= { hwDpiPolicyEntry 5 }    
+
+                   
+       
+        hwDpiBehaviorTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDpiBehaviorEntry
+            ACCESS not-accessible
+            STATUS current
+            ::= { hwDpiPolicyObject 2 }
+        
+        hwDpiBehaviorEntry OBJECT-TYPE
+            SYNTAX HwDpiBehaviorEntry
+            ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Dpi Behavior Entry.
+                  The dpi behavior table is uniquely identified by the behavior name. The behavior name is the key word entered when the behavior table is created, and cannot be changed. 
+                                  The index is hwDpiBehaviorName.
+                                  This table is used to configure the dpi behavior.
+                                  The description of operation constraints is as follows:
+                  1.The DPI behavior name must be entered when the behavior table is created.
+                  2.The DPI behavior cannot be changed if it is referenced by some DPI policy.
+                  3.The current DPI behavior cannot be deleted if it is referenced by global application. 
+                    "
+            INDEX { hwDpiBehaviorName }
+            ::= { hwDpiBehaviorTable 1 }
+        
+        HwDpiBehaviorEntry ::=
+            SEQUENCE { 
+                hwDpiBehaviorName
+                    OCTET STRING,
+                hwDpiBehaviorCarCir
+                    Integer32,
+                hwDpiBehaviorRowStatus
+                    RowStatus            
+             }
+
+        hwDpiBehaviorName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " Dpi Behavior Name.
+                  The behavior name is the key word entered when the behavior table is created, and cannot be changed. 
+                  The DPI behavior name is assigned when DPI behavior is created.
+                "
+            ::= { hwDpiBehaviorEntry 1 }
+        
+        hwDpiBehaviorCarCir OBJECT-TYPE
+            SYNTAX Integer32 (100..3000000)
+            ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " Dpi Car Cir.
+                
+                Car Cir."
+            DEFVAL { 100000 }
+            ::= { hwDpiBehaviorEntry 2 }
+        
+        hwDpiBehaviorRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row admin status,either Add or Del.
+                 Supports add and delete.
+                "
+            ::= { hwDpiBehaviorEntry 3 }     
+            
+    --  ============== conformance information ==============
+        hwDpiConformance OBJECT IDENTIFIER ::= { hwBRASDpi 2 }
+        
+        
+        hwDpiCompliances OBJECT IDENTIFIER ::= { hwDpiConformance 1 }
+        hwDpiCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwDpiPolicyGroup, hwDpiBehaviorGroup }  
+                                               
+              ::= { hwDpiCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwDpiGroups OBJECT IDENTIFIER ::= { hwDpiConformance 2 } 
+        
+        hwDpiPolicyGroup OBJECT-GROUP
+            OBJECTS { hwDpiServiceType, hwDpiPolicyName, hwDpiUpBehaviorName, 
+                hwDpiDownBehaviorName, hwDpiPolicyRowStatus }       
+            STATUS current
+            DESCRIPTION 
+                "The Dpi policy group."
+            ::= { hwDpiGroups 1 }
+
+
+        hwDpiBehaviorGroup OBJECT-GROUP
+            OBJECTS { hwDpiBehaviorName, hwDpiBehaviorCarCir, hwDpiBehaviorRowStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The Dpi behavior group."
+            ::= { hwDpiGroups 2 }
+             
+                    
+        --  ============== conformance information define end ==============
+    END
+
+--
+-- HUAWEI-BRAS-DPI-MIB.mib
+--

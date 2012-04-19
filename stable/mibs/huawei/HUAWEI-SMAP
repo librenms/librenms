@@ -1,0 +1,164 @@
+-- =================================================================
+--  Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI-SMAP-MIB, this mib will maintain the SMAP
+--              mib oid for all datacomm product. 
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              yangyinzhu,2003-03-18, initial version.
+--              chenruining,2003-03-20, adjust to the SRS review.
+-- =================================================================
+
+HUAWEI-SMAP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        RowStatus            
+            FROM SNMPv2-TC
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwSMAP MODULE-IDENTITY 
+        LAST-UPDATED "200303201150Z"        -- March 20, 2003 at 11:50 GMT
+        ORGANIZATION 
+            "
+            HAUWEI MIB Standard community
+            "
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            V1.00
+            The SMAP mib is for all datacomm product.
+            "
+        ::= { hwDatacomm 14 }
+    
+    --
+    -- Node definitions
+    --
+    -- 1.3.6.1.4.1.2011.5.25.14.1
+    hwSmapMibObjects OBJECT IDENTIFIER ::= { hwSMAP 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.14.1.1
+    hwSmapTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwSmapEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The Port-Application Map table.
+            "
+        ::= { hwSmapMibObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.14.1.1.1
+    hwSmapEntry OBJECT-TYPE
+        SYNTAX HwSmapEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The Port-Application Map table struct.
+            "
+        INDEX { hwSmapUserPort, hwSmapAcl }
+        ::= { hwSmapTable 1 }
+    
+    HwSmapEntry ::=
+        SEQUENCE { 
+            hwSmapUserPort
+                Integer32,
+            hwSmapAcl
+                Integer32,
+            hwSmapAppSysPort
+                Integer32,
+            hwSmapStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.14.1.1.1.1
+    hwSmapUserPort OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The new port defined by user.
+            
+            This item is index."
+        ::= { hwSmapEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.14.1.1.1.2
+    hwSmapAcl OBJECT-TYPE
+        SYNTAX Integer32 (0|2000..2999)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The SMAP function is used for which data flow.
+            0 means thie item is used for all data flow.
+            
+            This item is index.
+            "
+        ::= { hwSmapEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.14.1.1.1.3
+    hwSmapAppSysPort OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The application port defined by rfc. 
+            
+            Now only support:
+            ftp    21
+            smtp   25
+            http   80
+            rtsp   554
+            h323   1720
+            "
+        ::= { hwSmapEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.14.1.1.1.4
+    hwSmapStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Only support CreateAndGo and Destroy.
+            "
+        ::= { hwSmapEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.14.2
+    hwSmapMibConformance OBJECT IDENTIFIER ::= { hwSMAP 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.14.2.1
+    hwSmapMibGroup OBJECT IDENTIFIER ::= { hwSmapMibConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.14.2.1.1
+    hwSmapGroup OBJECT-GROUP
+        OBJECTS { 
+            hwSmapUserPort, 
+            hwSmapAcl, 
+            hwSmapAppSysPort, 
+            hwSmapStatus }
+        STATUS current
+        DESCRIPTION 
+            "
+            The SMAP table member.
+            "
+        ::= { hwSmapMibGroup 1 }
+
+END

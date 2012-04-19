@@ -1,0 +1,560 @@
+-- Start - PAN-GLOBAL-REG Module
+
+-- The convention described in "Understanding SNMP MIBs"
+-- (David Perkins, Evan McGinnis), Chapter 8, has generally been followed.
+
+PAN-GLOBAL-REG DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		enterprises
+			FROM SNMPv2-SMI;
+
+	panGlobalRegModule MODULE-IDENTITY
+		LAST-UPDATED			"201001071040Z"
+		ORGANIZATION			"Palo Alto Networks"
+		CONTACT-INFO			"
+					Customer Support
+					Palo Alto Networks
+					232 E. Java Dr.
+					Sunnyvale, CA 94089
+
+					+1 866-898-9087
+					support at paloaltonetworks dot com"
+
+		DESCRIPTION				"
+			A MIB module containing top-level OID definitions
+			for various sub-trees for Palo Alto Networks' enterprise MIB modules."
+
+		REVISION				"201001071040Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module PAN-GLOBAL-REG."
+
+		::= { panModules 1 }
+
+	panRoot OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			The root of the OID sub-tree assigned to Palo Alto Networks assigned by
+			the Internet Assigned Numbers Authority (IANA)."
+		::= { enterprises 25461 }
+
+	panReg OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for registrations - identification of modules and logical and
+			physical components."
+		::= { panRoot 1 }
+
+	panModules OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for module registrations."
+		::= { panReg 1 }
+
+	panMibs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for all Palo Alto object and event definitions."
+		::= { panRoot 2 }
+
+	-- Sub-trees for Palo Alto managed objects
+
+	panCommonMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common Palo Alto object and event definitions.
+			These would be implemented by all Palo Alto products."
+		::= { panMibs 1 }
+
+	panSpecificMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for specific Palo Alto object and event definitions."
+		::= { panMibs 2 }
+
+	panProductsMibs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for all Palo Alto product specific definitions."
+		::= { panMibs 3 }
+
+END
+
+-- End - PAN-GLOBAL-REG Module
+
+-- ========================================================================
+-- Start - PAN-GLOBAL-TC Module
+
+-- Palo Alto Global Textual Conventions
+--
+-- The convention described in "Understanding SNMP MIBs"
+-- (David Perkins, Evan McGinnis), Chapter 8, has generally been followed.
+
+PAN-GLOBAL-TC DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY
+			FROM SNMPv2-SMI
+		TEXTUAL-CONVENTION
+			FROM SNMPv2-TC
+		panModules
+			FROM PAN-GLOBAL-REG;
+
+	panGlobalTcModule MODULE-IDENTITY
+		LAST-UPDATED			"201001071040Z"
+		ORGANIZATION			"Palo Alto Networks"
+		CONTACT-INFO			"
+					Customer Support
+					Palo Alto Networks
+					232 E. Java Dr.
+					Sunnyvale, CA 94089
+
+					+1 866-898-9087
+					support at paloaltonetworks dot com"
+
+		DESCRIPTION				"
+			A MIB module containing textual conventions
+			for Palo Alto Networks' enterprise MIB modules.
+			These textual conventions are used across all Palo Alto products."
+
+		REVISION				"201001071040Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module PAN-GLOBAL-TC."
+
+		::= { panModules 2 }
+
+	-- No Palo Alto textual conventions yet!
+
+	TcAppaname ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT			"64a"
+		STATUS					current
+		DESCRIPTION				"
+			Represents the name of an application.
+
+			This has all the restrictions of the DisplayString textual
+			convention with the following additional ones:
+
+			- Only the following characters/character ranges are allowed:
+				0-9
+				A-Z
+				a-z
+				:./#$&_-+()'
+				<space>
+
+			Any object defined using this syntax may not exceed 64
+			characters in length."
+		SYNTAX       OCTET STRING (SIZE (0..64))
+
+	TcChassisType ::= TEXTUAL-CONVENTION
+		STATUS					current
+		DESCRIPTION				"
+			Enumerates all possible chassis types for Palo Alto devices."
+		SYNTAX       OCTET STRING (SIZE (0..64))
+END
+
+-- End - PAN-GLOBAL-TC Module
+
+-- ========================================================================
+-- Start - PAN-COMMON-MIB Module
+
+-- MIB for the common MIB objects implemented by all
+-- Palo Alto devices.
+--
+-- The convention described in "Understanding SNMP MIBs"
+-- (David Perkins, Evan McGinnis), Chapter 8, has generally been followed.
+
+PAN-COMMON-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		OBJECT-TYPE, NOTIFICATION-TYPE,
+		Integer32
+			FROM SNMPv2-SMI
+--		MODULE-COMPLIANCE, OBJECT-GROUP
+--			FROM SNMPv2-CONF
+		DisplayString, TruthValue
+			FROM SNMPv2-TC
+		TcChassisType
+			FROM PAN-GLOBAL-TC
+		panModules, panCommonMib
+			FROM PAN-GLOBAL-REG;
+
+	panCommonMibModule MODULE-IDENTITY
+		LAST-UPDATED			"201001071040Z"
+		ORGANIZATION			"Palo Alto Networks"
+		CONTACT-INFO			"
+					Customer Support
+					Palo Alto Networks
+					232 E. Java Dr.
+					Sunnyvale, CA 94089
+
+					+1 866-898-9087
+					support at paloaltonetworks dot com"
+
+		DESCRIPTION				"
+			A MIB module containing definitions of managed objects
+			implemented by all Palo Alto Networks' products."
+
+		REVISION				"201001071040Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module PAN-COMMON-MIB."
+
+		::= { panModules 3 }
+
+	panCommonConfMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for MIB conformance statements."
+		::= { panCommonMib 1 }
+
+	panCommonObjs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common MIB objects."
+		::= { panCommonMib 2 }
+
+	panCommonEvents OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common MIB events."
+		::= { panCommonMib 3 }
+
+	-- Top level groups
+
+	panSys OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common system objects."
+		::= { panCommonObjs 1 }
+
+	panChassis OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common chassis information."
+		::= { panCommonObjs 2 }
+
+	panSession OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common session information."
+		::= { panCommonObjs 3 }
+
+	----------------------------------------------------------------------
+	-- System objects
+
+	panSysSwVersion OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Full software version. The first two components of the full
+			version are the major and minor versions. The third component
+			indicates the maintenance release number and the fourth,
+			the build number."
+		::= { panSys 1 }
+
+	panSysHwVersion OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..128))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Hardware version of the unit."
+		::= { panSys 2 }
+
+	panSysSerialNumber OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..128))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The serial number of the unit. If not available,
+			an empty string is returned."
+		::= { panSys 3 }
+
+	panSysTimeZoneOffset OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The offset in seconds from UTC of the system's time zone.
+			Values are negative for locations west of UTC and positive
+			for locations east of UTC."
+		::= { panSys 4 }
+
+	panSysDaylightSaving OBJECT-TYPE
+		SYNTAX      TruthValue
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Whether daylight savings are in currently in effect for the
+			system's time zone."
+		::= { panSys 5 }
+
+	panSysVpnClientVersion OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed VPN client package version.  If
+			package is not installed, 0.0.0 is returned."
+		::= { panSys 6 }
+
+	panSysAppVersion OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed application definition version.  If 
+			no application definition is found, 0 is returned."
+		::= { panSys 7 }
+
+	panSysAvVersion OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed antivirus version.  If no antivirus 
+			is found, 0 is returned."
+		::= { panSys 8 }
+
+	panSysThreatVersion OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed threat definition version.  If no
+			threat definition is found, 0 is returned."
+		::= { panSys 9 }
+
+	panSysUrlFilteringVersion OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed URL filtering version.  If no URL
+			filtering is installed, 0 is returned."
+		::= { panSys 10 }
+
+	panSysHAState OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Current high-availability state."
+		::= { panSys 11 }
+
+	panSysHAPeerState OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Current peer high-availability state."
+		::= { panSys 12 }
+
+	----------------------------------------------------------------------
+	-- Chassis
+
+	panChassisType OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..128))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Chassis type for this Palo Alto device."
+		::= { panChassis 1 }
+
+	----------------------------------------------------------------------
+	-- Session
+
+	panSessionUtilization OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Session table utilization percentage. Values should
+			be between 0 and 100."
+		::= { panSession 1 }
+
+	panSessionMax OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Total number of sessions supported."
+		::= { panSession 2 }
+
+	panSessionActive OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Total number of active sessions."
+		::= { panSession 3 }
+
+	panSessionActiveTcp OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Total number of active TCP sessions."
+		::= { panSession 4 }
+
+	panSessionActiveUdp OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Total number of active UDP sessions."
+		::= { panSession 5 }
+
+	panSessionActiveICMP OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Total number of active ICMP sessions."
+		::= { panSession 6 }
+
+	----------------------------------------------------------------------
+	-- Events
+
+	panCommonEventObjs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for objects meant only to be sent in event varbinds."
+		::= { panCommonEvents 1 }
+
+	panCommonEventEvents OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for the events themselves."
+		::= { panCommonEvents 2 }
+
+	panCommonEventEventsV2 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for SNMPv2 events. The OIDs for SNMPv2 events should
+			have a zero as the next-to-last sub-identifier (as specified
+			in RFC1902)."
+		::= { panCommonEventEvents 0 }
+
+	-- Objects sent only in events
+
+	panCommonEventDescr OBJECT-TYPE
+		SYNTAX					DisplayString
+		MAX-ACCESS				accessible-for-notify
+		STATUS					current
+		DESCRIPTION
+			"String that provides a textual description of the event."
+		::= { panCommonEventObjs 1 }
+
+	-- Event descriptions
+
+	panCommonEventLog NOTIFICATION-TYPE
+		OBJECTS { panCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A config/system/firewall/threat log"
+		::= { panCommonEventEventsV2 1 }
+END
+
+-- End - PAN-COMMON-MIB Module
+
+
+-- ========================================================================
+-- Start - PAN-PRODUCT-MIB Module
+
+-- MIB for the platform specific MIB objects implemented by
+-- Palo Alto devices.
+--
+-- The convention described in "Understanding SNMP MIBs"
+-- (David Perkins, Evan McGinnis), Chapter 8, has generally been followed.
+
+PAN-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		OBJECT-TYPE, NOTIFICATION-TYPE,
+		Integer32
+			FROM SNMPv2-SMI
+--		MODULE-COMPLIANCE, OBJECT-GROUP
+--			FROM SNMPv2-CONF
+		DisplayString, TruthValue
+			FROM SNMPv2-TC
+		TcChassisType
+			FROM PAN-GLOBAL-TC
+		panModules, panProductsMibs
+			FROM PAN-GLOBAL-REG;
+
+	panProductsMibsModule MODULE-IDENTITY
+		LAST-UPDATED			"201001071040Z"
+		ORGANIZATION			"Palo Alto Networks"
+		CONTACT-INFO			"
+					Customer Support
+					Palo Alto Networks
+					232 E. Java Dr.
+					Sunnyvale, CA 94089
+
+					+1 866-898-9087
+					support at paloaltonetworks dot com"
+
+		DESCRIPTION				"
+			A MIB module containing definitions of managed objects
+			implemented by specific Palo Alto Networks' products."
+
+		REVISION				"201001071040Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module PAN-PRODUCTS-MIB."
+
+		::= { panModules 4 }
+
+	panPA-4050 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-4050 specific objects."
+		::= { panProductsMibs 1 }
+
+	panPA-4020 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-4020 specific objects."
+		::= { panProductsMibs 2 }
+
+	panPA-2050 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-2050 specific objects."
+		::= { panProductsMibs 3 }
+
+	panPA-2020 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-2020 specific objects."
+		::= { panProductsMibs 4 }
+
+	panPA-4060 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-4060 specific objects."
+		::= { panProductsMibs 5 }
+
+	panPA-500 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for PA-500 specific objects."
+		::= { panProductsMibs 6 }
+
+	panPanorama OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for Panorama specific objects."
+		::= { panProductsMibs 7 }
+
+	
+END
+
+-- End - PAN-PRODUCTS-MIB Module
+

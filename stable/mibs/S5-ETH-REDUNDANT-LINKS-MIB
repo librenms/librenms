@@ -1,0 +1,464 @@
+
+S5-ETH-REDUNDANT-LINKS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32, TimeTicks
+            FROM SNMPv2-SMI
+	s5EnCfg
+		FROM S5-ETHERNET-MIB
+	TimeIntervalSec
+		FROM S5-TCS-MIB;
+
+s5EthRedundantLinksMib2 MODULE-IDENTITY
+       LAST-UPDATED    "200411030000Z"
+       ORGANIZATION    "Nortel Networks"
+       CONTACT-INFO    "Nortel Networks"
+       DESCRIPTION
+           "5000 Ethernet Redundant Links MIB
+
+            Copyright 1993-2004 Nortel Networks, Inc.
+            All rights reserved.
+            This Nortel Networks SNMP Management Information Base Specification
+            (Specification) embodies Nortel Networks' confidential and
+            proprietary intellectual property. Nortel Networks retains all
+            title and ownership in the Specification, including any
+            revisions.
+
+            This Specification is supplied 'AS IS,' and Nortel Networks makes
+            no warranty, either express or implied, as to the use,
+            operation, condition, or performance of the Specification."
+
+       REVISION "200411030000Z" -- 03 November 2004
+       DESCRIPTION "Version 104:  Use sane OID for s5EthRedundantLinksMib"
+
+       REVISION "200407200000Z" -- 20 July 2004
+       DESCRIPTION "Version 103:  Conversion to SMIv2"
+
+       ::= { s5EnCfg 99 }
+
+-- Groups
+
+s5EnRedun		OBJECT IDENTIFIER ::= { s5EnCfg 2 }
+
+
+
+-- SECTION 2: Redundant Port Information
+
+-- Redundant Port Table 
+
+s5EnRedPortTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S5EnRedPortEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A table with redundancy status and control for
+		each redundancy-capable port in the chassis.
+		The number of entries is determined by the number
+		of redundancy-capable ports in the chassis.
+
+		The ports appearing in this table can be divided into
+		two categories:
+		Those with remote fault signaling capability and
+		those without. The latter kind depends on the port
+		link status to provide the required redundancy.
+
+		Ports that are not capable of supporting redundancy do
+		not have an entry in this table." 
+	::= { s5EnRedun 1 }
+
+s5EnRedPortEntry OBJECT-TYPE
+	SYNTAX	S5EnRedPortEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A row in the table of redundancy status and
+		control for each redundancy-capable port in the
+		chassis. Entries in the table cannot be
+		created or deleted via SNMP."
+	INDEX	{ s5EnRedPortBrdIndx,
+		  s5EnRedPortPortIndx }
+	::= { s5EnRedPortTable 1 }
+
+S5EnRedPortEntry ::= SEQUENCE {
+	s5EnRedPortBrdIndx
+		INTEGER,
+	s5EnRedPortPortIndx
+		INTEGER,
+	s5EnRedPortCapability
+		INTEGER,
+	s5EnRedPortRedundMode
+		INTEGER,
+	s5EnRedPortOperStatus
+		INTEGER,
+	s5EnRedPortRemoteOperStatus
+		INTEGER,
+	s5EnRedPortRemFltSelectMode
+		INTEGER,
+	s5EnRedPortTxMode
+		INTEGER,
+	s5EnRedPortFaults
+		Counter32,
+	s5EnRedPortModeChanges
+		Counter32,
+	s5EnRedPortCompanionBrdNum
+		INTEGER,
+	s5EnRedPortCompanionPortNum
+		INTEGER,
+	s5EnRedPortSwitchoverStatus
+		INTEGER,
+	s5EnRedPortSwitchoverTime
+		TimeIntervalSec
+	}
+
+s5EnRedPortBrdIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The index of the slot containing the board on which
+		the port is located."
+	::= { s5EnRedPortEntry 1 }
+
+s5EnRedPortPortIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The index of the port on the board."
+	::= { s5EnRedPortEntry 2 }
+
+s5EnRedPortCapability OBJECT-TYPE
+	SYNTAX	INTEGER {
+		hwRedOnly(1),
+		swRedOnly(2),
+		hwAndSwRed(3)
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The redundancy capability of the port:
+		  hwRedOnly(1).....hardware redundancy only.
+		  swRedOnly(2).....software redundacy only.
+		  hwAndSwRed(3)....both hardware and software redundancy.
+
+		A value of hwRedOnly(1) or hwAndSwRed(3) means that
+		the port is capable of being configured into a
+		hardware-redundant pair.  In this case, the identity of the
+		potential redundant companion is given by the objects
+		s5EnRedPortCompanionBrdNum and s5EnRedPortCompanionPortNum.
+
+		A value of swRedOnly(2) or hwAndSwRed(3) means that
+		the port is capable of being configured into a
+		software-redundant pair."
+	::= { s5EnRedPortEntry 3 }
+
+s5EnRedPortRedundMode OBJECT-TYPE
+	SYNTAX	INTEGER {
+		standAlone(1),
+		hwActive(2),
+		hwStandby(3),
+		swActive(4),
+		swStandby(5)
+		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The redundancy mode of the port. 
+
+		The values when written change the redundancy
+		mode, and when read report the redundancy mode:
+		  standalone(1)..the port is not in any redundant pair.
+		  hwActive(2)....the port is the active companion in
+		                 a hardware-redundant pair.
+		  hwStandby(3)...the port is the standby companion
+		                 in a hardware-redundant pair.
+		  swActive(4)....the port is the active companion in
+		                 a software-redundant pair.
+		  swStandby(5)...the port is the standby companion
+		                 in a software-redundant pair.
+
+		The values that can be written, which change the
+ 		redundancy mode, are:
+		  standalone(1)...causes the redundant pair to be
+		                  broken up.
+		  hwActive(2).....if the previous value was hwStandby(3),
+		                  this value will cause the port to become
+		                  the active port in the hardware-redundant
+		                  pair, resulting in a switchover.
+		  hwStandby(3)....if the previous value was hwActive(2),
+		                  this value will cause the port to become
+		                  the standby port in the hardware-redundant
+		                  pair, resulting in a switchover.
+		  swActive(4).....if the previous value was swStandby(5),
+		                  this value will cause the port to become
+		                  the active port in the software-redundant
+		                  pair, resulting in a switchover.
+		  swStandby(5)....if the previous value was swActive(4),
+		                  this value will cause the port to become
+		                  the standby port in the software-redundant
+		                  pair, resulting in a switchover.
+
+		To create a hardware-redundant pair, change this object
+		to hwActive(2) or hwStandby(3).  To create a
+		software-redundant pair, change this object to
+		swActive(4) or swStandby(5).  The same SNMP SET PDU
+		must also write to objects s5EnRedPortCompanionBrdNum
+		and s5EnRedPortCompanionPortNum."
+	::= { s5EnRedPortEntry 4 }
+
+s5EnRedPortOperStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		ok(2),
+		localFault(3),
+		remoteFault(4)
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The redundancy status of the port. The values are:
+		  other(1).............none of the following.
+		  ok(2)...................no fault
+		  localFault(3)....the local port has sensed a fault condition.
+		  remoteFault(4)...the remote port has sensed a fault
+		                   condition and has signaled the local port
+		                   accordingly.
+
+		Either a localFault(3) or remoteFault(4) condition should
+		cause a healthy redundant port pair to switchover.
+		If the port does not belong to a redundant pair, a
+		value of other(1) is returned.
+
+		Note:  If the redundant link consists of ports without
+		       remote fault capability, the value remoteFault(4)
+		       will not be reported and the value localFault(3)
+		       implies that link is off."
+	::= { s5EnRedPortEntry 5 }
+
+s5EnRedPortRemoteOperStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		snpxFLRemFltCpblPortUp(1),
+		snpxFLFBRemFltCpblPortUp(2),
+		tenBaseTFLPortUp(3),
+		tenBaseFBPortUp(4),
+		snpxRemFltCpblPortFault(5),
+		tenBaseFBPortFault(6),
+		unknown(7)
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This object reflects the real time status of the
+		received data from the remote port. The values are:
+
+		  snpxFLRemFltCpblPortUp(1)....10BASE-FL signaling,
+		               plus capable of SynOptics proprietary
+		               remote fault signaling. A remote fault
+		               on such a port is indicated by
+		               snpxRemFltCpblPortFault(5).
+		  snpxFLFBRemFltCpblPortUp(2)..10BASE-FL signaling,
+		               plus capable of SynOptics proprietary
+		               remote fault signaling and 10BASE-FB
+		               signaling. A remote fault on such a port
+		               is indicated by snpxRemFltCpblPortFault(5).
+		  tenBaseTFLPortUp(3)...........regular idle 10BASE-T
+		               or 10BASE-FL signaling, and is incapable of
+		               remote fault signaling.
+		  tenBaseFBPortUp(4)...........10BASE-FB synchronous
+		               signaling. A remote fault on such a port is
+		               indicated by tenBaseFBPortFault(6).
+		  snpxRemFltCpblPortFault(5)...SynOptics proprietary
+		               remote fault signaling.
+		  tenBaseFBPortFault(6)........10BASE-FB remote fault
+		               signaling.
+		  unknown(7)...................none of the above.
+
+		A value of snpxFLRemFltCpblPortUp(1) indicates that
+		the remote port is using 10BASE-FL signaling, and is
+		capable of SynOptics proprietary idle and remote fault
+		signaling. A remote fault on such a port is indicated
+		by snpxRemFltCpblPortFault(5).
+
+		A value of snpxFLFBRemFltCpblPortUp(2) indicates that
+		the remote port is using 10BASE-FL signaling, and is
+		capable of SynOptics proprietary idle and remote fault
+		signaling, and is also capable of synchronous
+		signaling. A remote fault on such a port is indicated
+		by snpxRemFltCpblPortFault(5).
+
+		A value of tenBaseFLPortUp(3) indicates that the
+		remote port uses regular idle 10BASE-FL signaling, and
+		is incapable of remote fault signaling.
+
+		A value of tenBaseFBPortUp(4) indicates that the
+		remote port uses 10BASE-FB synchronous signaling. A
+		remote fault on such a port is indicated by
+		tenBaseFBPortFault(6)."
+	::= { s5EnRedPortEntry 6 }
+
+s5EnRedPortRemFltSelectMode OBJECT-TYPE
+	SYNTAX	INTEGER {
+		synoptics(1),
+		standard(2)
+		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"This mode specifies the set of local fault events
+		which will cause a switchover. The values are: 
+		  synoptics(1)..The SynOptics Tx Remote Fault events
+		                consist of auto-partition and NM (network 
+		                management) partition events in addition to
+		                the standard events.
+		  standard(2)...The standard events are link-off for 
+		                all ports, and low light, jabber, Rx invalid idle,
+		                Tx dark, and Tx remote fault  (for diagnostics)
+ 		                for ports with transmit remote fault
+ 		                capability."
+	::= { s5EnRedPortEntry 7 }
+
+s5EnRedPortTxMode OBJECT-TYPE
+	SYNTAX	INTEGER {
+		autoCfg(1),
+		fl(2),
+		fb(3),
+		other(4)
+		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The Transmit Fiber Mode, which determines the
+		port transmit idle. The values are:
+		  autoCfg(1)...The port will auto configure based
+		               upon the received idle.
+		  fl(2)........The port is configured in FL mode.
+		  fb(3)........The port is configured in FB mode.
+		  other(4).....None of the above. The port is not a fiber
+		               port.
+
+		The value other(4) is read-only."
+	::= { s5EnRedPortEntry 8 }
+
+s5EnRedPortFaults OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of local or remote faults on this port. This
+		counter increments on a transition between the fault
+		and no-fault states."
+	::= { s5EnRedPortEntry 9 }
+
+s5EnRedPortModeChanges OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of the number of times this port has transitioned
+		from standby mode to non-standby mode (includes active
+		mode and standalone mode), or vice versa."
+	::= { s5EnRedPortEntry 10 }
+
+s5EnRedPortCompanionBrdNum OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The index of the slot containing the board of the
+		other port in the redundant pair. 
+
+		If the port (whose slot-port identity is given by
+		the instance) is hardware-redundant capable, this
+		object has the value of the slot number of the
+		(potential) redundant companion, even if the port is
+		in standalone mode. This allows the network
+		manager to determine the identity of the potential
+		companion, which is fixed by the hardware of the
+		board.
+
+		Changing this object is permitted only when creating a
+		software-redundant pair."
+	::= { s5EnRedPortEntry 11 }
+
+s5EnRedPortCompanionPortNum OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The index of the other port in the redundant pair.
+
+		If the port (whose slot-port identity is given by
+		the instance) is hardware-redundant capable, this object
+		has the value of the port number of the (potential) 
+		redundant companion, even if the port is in standalone 
+		mode. This allows the network manager to determine 
+		the identity of the potential companion, which is fixed
+		by the hardware of the board. 
+
+		Changing this object is permitted only when creating a
+		software-redundant pair."
+	::= { s5EnRedPortEntry  12 }
+
+s5EnRedPortSwitchoverStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		timedSwitchover(2)
+		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The switchover status of the port (and its companion).
+		The following values can be written:
+		  timedSwitchover(2)...cause a timed switchover
+		                       (see value of 
+		                       s5EnRedPortSwitchoverTime)
+
+		The following values reflect the switchover
+		status of the redundant port pair:
+		  other(1)..............not undergoing switchover
+		  timedSwitchover(2)....port is undergoing timed switchover
+		                        (see value of
+		                        s5EnRedPortSwitchoverTime).
+
+		On GETs with switchover status of timedSwitchover(2),
+		if the time remaining before the completion of the
+		switchover and reversal is available, it will be reported
+		in object s5EnRedPortSwitchoverTime as a positive value
+		If not available, the value of s5EnRedSwitchoverTime will
+		be zero. When changing a port to timedSwitchover(2), the
+		SET request must also contain the value for object
+		s5EnRedSwitchoverTime."
+	::= { s5EnRedPortEntry 13 }
+
+s5EnRedPortSwitchoverTime OBJECT-TYPE
+	SYNTAX	TimeIntervalSec (0..65535)
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The length of time between switching over a redundant
+		port pair and switching back, when a timed switchover
+		is done to the port. This object can only be written
+		in the same request that sets
+		s5EnRedPortSwitchoverStatus to timedSwitchover(2).
+		Afterwards, it indicates the amount of time left
+		before the timed switchover is completed, at which
+		time another switchover occurs and
+		s5EnRedSwitchoverStatus is changed to other(1). This
+		object has the value of zero if the port is not
+		undergoing a timed switchover, or if the amount of
+		time is not available."
+	::= { s5EnRedPortEntry 14 }
+
+
+-- Last Change To Table Object
+
+s5EnRedLastChg OBJECT-TYPE
+	SYNTAX	TimeTicks
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The value of sysUpTime when the last change in the
+		redundant ports table was observed by the agent."
+	::= { s5EnRedun 2}
+
+END

@@ -1,0 +1,429 @@
+-- *****************************************************************
+-- OLD-CISCO-MEMORY-MIB.my:  Old Cisco Memory MIB file
+--
+-- May 1994, Jeffrey T. Johnson
+--
+-- Copyright (c) 1994,1996 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+               OLD-CISCO-MEMORY-MIB DEFINITIONS ::= BEGIN
+
+               IMPORTS
+			OBJECT-TYPE
+				FROM RFC-1212
+			local
+				FROM CISCO-SMI;
+          
+               lmem             OBJECT IDENTIFIER ::= { local 1 }
+
+-- lmem is same as lsystem
+-- name changed to support separate compilation under mibcomp
+
+               freeMem OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  obsolete
+                   DESCRIPTION
+                           "Return the amount of free memory in bytes.
+
+                           NOTE WELL:  this mib object is obsolete as
+			   of IOS release 11.1.  IOS release 11.1
+			   introduced the CISCO-MEMORY-POOL-MIB which
+			   better instruments all of the memory pools"
+                   ::= { lmem 8 }
+
+               bufferElFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free buffer
+                           elements."
+                   ::= { lmem 9 }
+
+               bufferElMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of buffer
+                           elements."
+                   ::= { lmem 10 }
+
+               bufferElHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of buffer element hits."
+                   ::= { lmem 11 }
+
+               bufferElMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of buffer element
+                           misses."
+                   ::= { lmem 12 }
+
+               bufferElCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of buffer element
+                           creates."
+                   ::= { lmem 13 }
+
+               bufferSmSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of small buffers."
+                   ::= { lmem 14 }
+
+               bufferSmTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of small buffers."
+                   ::= { lmem 15 }
+
+               bufferSmFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free small buffers."
+                   ::= { lmem 16 }
+
+               bufferSmMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of small
+                           buffers."
+                   ::= { lmem 17 }
+
+               bufferSmHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer hits."
+                   ::= { lmem 18 }
+
+               bufferSmMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer misses."
+                   ::= { lmem 19 }
+
+               bufferSmTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer trims."
+                   ::= { lmem 20 }
+
+               bufferSmCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer
+                           creates."
+                   ::= { lmem 21 }
+
+               bufferMdSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of medium buffers."
+                   ::= { lmem 22 }
+
+               bufferMdTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of medium
+                           buffers."
+                   ::= { lmem 23 }
+
+               bufferMdFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free medium buffers."
+                   ::= { lmem 24 }
+
+               bufferMdMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of medium
+                           buffers."
+                   ::= { lmem 25 }
+
+               bufferMdHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer hits."
+                   ::= { lmem 26 }
+
+               bufferMdMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer
+                           misses."
+                   ::= { lmem 27 }
+
+               bufferMdTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer trims."
+                   ::= { lmem 28 }
+
+               bufferMdCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer
+                           creates."
+                   ::= { lmem 29 }
+
+               bufferBgSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of big buffers."
+                   ::= { lmem 30 }
+
+               bufferBgTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of big buffers."
+                   ::= { lmem 31 }
+
+               bufferBgFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free big buffers."
+                   ::= { lmem 32 }
+
+               bufferBgMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of big buffers."
+                   ::= { lmem 33 }
+
+               bufferBgHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer hits."
+                   ::= { lmem 34 }
+
+               bufferBgMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer misses."
+                   ::= { lmem 35 }
+
+               bufferBgTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer trims."
+                   ::= { lmem 36 }
+
+               bufferBgCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer creates."
+                   ::= { lmem 37 }
+
+               bufferLgSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of large buffers."
+                   ::= { lmem 38 }
+
+               bufferLgTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of large buffers."
+                   ::= { lmem 39 }
+
+               bufferLgFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free large buffers."
+                   ::= { lmem 40 }
+
+               bufferLgMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of large
+                           buffers."
+                   ::= { lmem 41 }
+
+               bufferLgHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer hits."
+                   ::= { lmem 42 }
+
+               bufferLgMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer misses."
+                   ::= { lmem 43 }
+
+               bufferLgTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer trims."
+                   ::= { lmem 44 }
+
+               bufferLgCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer
+                           creates."
+                   ::= { lmem 45 }
+
+               bufferFail OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Count of the number of buffer allocation
+                           failures."
+                   ::= { lmem 46 }
+
+               bufferNoMem OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Count of the number of buffer create
+                           failures due to no free memory."
+                   ::= { lmem 47 }
+
+               bufferHgSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of huge buffers."
+                   ::= { lmem 62 }
+
+               bufferHgTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of huge buffers."
+                   ::= { lmem 63 }
+
+               bufferHgFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free huge buffers."
+                   ::= { lmem 64 }
+
+               bufferHgMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of huge
+                           buffers."
+                   ::= { lmem 65 }
+
+               bufferHgHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer hits."
+                   ::= { lmem 66 }
+
+               bufferHgMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer misses."
+                   ::= { lmem 67 }
+
+               bufferHgTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer trims."
+                   ::= { lmem 68 }
+
+               bufferHgCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer creates."
+                   ::= { lmem 69 }
+
+END

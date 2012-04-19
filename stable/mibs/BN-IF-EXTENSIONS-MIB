@@ -1,0 +1,229 @@
+-- SECTION 1: Top Level Definitions
+
+
+BN-IF-EXTENSIONS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, Integer32
+		FROM SNMPv2-SMI
+        s5IfExt 
+                FROM S5-ROOT-MIB;
+
+bnIfExtensionsMib MODULE-IDENTITY
+       LAST-UPDATED    "200407200000Z"  -- July 20, 2004
+       ORGANIZATION    "Nortel Networks"
+       CONTACT-INFO    "Nortel Networks"
+       DESCRIPTION
+           "Interface Extension MIB
+
+            Copyright 1997 - 2004 Nortel Networks, Inc.
+            All rights reserved.
+            This Bay Networks SNMP Management Information Base Specification
+            (Specification) embodies Bay Networks' confidential and
+            proprietary intellectual property. Bay Networks retains all
+            title and ownership in the Specification, including any
+            revisions.
+
+            This Specification is supplied 'AS IS,' and Bay Networks makes
+            no warranty, either express or implied, as to the use,
+            operation, condition, or performance of the Specification."
+
+       REVISION "200407200000Z"  -- July 20, 2004
+       DESCRIPTION "Version 105:  Added version info"
+
+       ::= { s5IfExt 2 }
+
+-- Groups
+
+bnIfExtensions	OBJECT IDENTIFIER ::= { s5IfExt 1 }
+-- PLACEHOLDER for MODULE-IDENTITY
+-- bnIfExtensionsMib OBJECT IDENTIFIER ::= { s5IfExt 2 }
+
+
+-- SECTION 2: Interface Extension Table
+
+bnIfExtnTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF BnIfExtnEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A list of interface entries. The number of entries is
+		given by the value of ifNumber."
+	::= { bnIfExtensions 1 }
+
+bnIfExtnEntry OBJECT-TYPE
+	SYNTAX	BnIfExtnEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"An interface entry containing objects at the subnetwork
+		layer and below for a particular interface."
+	INDEX	{ bnIfExtnIndex }
+	::= { bnIfExtnTable 1 }
+
+BnIfExtnEntry ::= SEQUENCE {
+	bnIfExtnIndex
+		Integer32,
+	bnIfExtnSlot
+		Integer32,
+	bnIfExtnPort
+		Integer32,
+	bnIfExtnIsPortShared
+		INTEGER,
+	bnIfExtnPortActiveComponent
+		INTEGER,
+        bnIfExtnPoweredDeviceDetectType
+                INTEGER,
+        bnIfExtnAutoNegotiationExtAdv
+                BITS,
+        bnIfExtnExtHwAdvCapability
+                BITS
+}
+
+bnIfExtnIndex OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+		"A unique value for each interface corresponding to the
+		ifIndex value for the same interface."
+	::= { bnIfExtnEntry 1 }
+
+bnIfExtnSlot OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+		"The unit number associated with this particular interface."
+	::= { bnIfExtnEntry 2 }
+
+bnIfExtnPort OBJECT-TYPE
+	SYNTAX	Integer32
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+		"The port number within a unit or slot."
+	::= { bnIfExtnEntry 3 }
+
+bnIfExtnIsPortShared OBJECT-TYPE
+	SYNTAX	INTEGER { portShared(1),
+                          portNotShared(2) }
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+		"Indicates whether the port is considered a 'shared' port
+                or not. Multiple physical ports that are logically 
+                represented as a single port are considered shared. Only
+                one of the physical ports is active at any given time."
+	::= { bnIfExtnEntry 4 }
+
+bnIfExtnPortActiveComponent OBJECT-TYPE
+	SYNTAX	INTEGER { fixedPort(1),
+                          gbicPort(2),
+                          mdaPort(3) }
+	MAX-ACCESS read-write
+	STATUS	current
+	DESCRIPTION
+		"Indicates which physical port component is currently active
+                for ports that are 'shared'. The ability to set this object
+                and thus specify the active physical component of a single
+                logical port is implmentation dependent. This object will be
+                read-only is this capability is not supported."
+	::= { bnIfExtnEntry 5 }
+
+bnIfExtnPoweredDeviceDetectType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                            compliantWith802dot3af(1),
+                            compliantWith802dot3afAndLegacySupport(2)
+                        }
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+                "This object is used to specify the mechanism used
+                 to detect powered ethernet devices attached to a
+                 powered ethernet port.  This object should only
+                 be instantiated for values of ifIndex that
+                 represent ports that support powered ethernet."
+    ::= {bnIfExtnEntry 6}
+
+bnIfExtnAutoNegotiationExtAdv OBJECT-TYPE
+        SYNTAX  BITS { 
+                         advertise10Half (0),
+                         advertise10Full (1),
+                         advertise100Half (2),
+                         advertise100Full (3),
+                         advertise1000Half (4),
+                         advertise1000Full (5),
+                         advertisePauseFrame (6),
+                         advertiseAsymmPauseFrame (7)
+                     }
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+                "This object is used to specify the port speed
+                and duplex abilities to be advertised during
+                link negotiation.
+
+                 bit 0 - 10 half duplex advertised
+                 bit 1 - 10 full duplex advertised
+                 bit 2 - 100 half duplex advertised
+                 bit 3 - 100 full duplex advertised
+                 bit 4 - 1000 half duplex advertised
+                 bit 5 - 1000 full duplex advertised
+                 bit 6 - PAUSE frame support advertised
+                 bit 7 - Asymmetric PAUSE frame support advertised
+
+                The abilities specified in this object are only used
+                when auto-negotiation is enabled on the port.  If all
+                bits in this object are disabled, and auto-negotiation
+                is enabled on the port, then the physical link process
+                on the port will be disabled.
+
+                Any change in the value of this bit map will force the
+                PHY to restart the auto-negotiation process.  This will
+                have the same effect as physically unplugging and
+                reattaching the cable plant attached to this port.
+
+                Only capabilities present in the hardware as indicated
+                by bnIfExtnExtHwAdvCapability can be advertised.
+
+                The default value for this object will be the value
+                of the associated instance of bnIfExtnExtHwAdvCapability."
+        ::= { bnIfExtnEntry 7 }
+
+bnIfExtnExtHwAdvCapability OBJECT-TYPE
+        SYNTAX  BITS { 
+                         advertise10Half (0),
+                         advertise10Full (1),
+                         advertise100Half (2),
+                         advertise100Full (3),
+                         advertise1000Half (4),
+                         advertise1000Full (5),
+                         advertisePauseFrame (6),
+                         advertiseAsymmPauseFrame (7)
+                     }
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "This object indicates the port speed and duplex
+                capabilities that hardware can actually support on a
+                port, and which may be advertised by the port
+                using auto-negotiation. Bit 7 tells if a port supports
+                pause frame capabilities (for full-duplex links) as a
+                part of the advertisement.
+
+                 bit 0 - 10 half duplex advertisements
+                 bit 1 - 10 full duplex advertisements
+                 bit 2 - 100 half duplex advertisements
+                 bit 3 - 100 full duplex advertisements
+                 bit 4 - 1000 half duplex advertisements
+                 bit 5 - 1000 full duplex advertisements
+                 bit 6 - PAUSE frame support advertisements
+                 bit 7 - Asymmetric PAUSE frame support advertisements
+
+                If auto negotiation is not supported by the port
+                hardware, then all bits will reflect a value of zero."
+        ::= { bnIfExtnEntry 8 }
+
+END
+

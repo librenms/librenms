@@ -1,0 +1,603 @@
+--  ==================================================================
+-- Copyright (C) 2009 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI ALARM MIB
+-- Reference:
+-- Version: V1.0
+-- History: 
+--  V1.0      2009-03-20   publish
+-- ==================================================================
+    HUAWEI-ALARM-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE            
+                FROM SNMPv2-CONF            
+            Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI            
+            RowStatus, DateAndTime            
+                FROM SNMPv2-TC;
+    
+    
+        hwAlarmMIB MODULE-IDENTITY 
+            LAST-UPDATED "200903201414Z"
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "VRP Team Huawei Technologies Co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100085
+                "
+            DESCRIPTION 
+                "The MIB module for creating and deleting bulk files of
+                SNMP data for file transfer."
+            REVISION "200903201414Z"
+            DESCRIPTION
+                "The initial revision of this MIB module ."
+            ::= { hwDatacomm 180 }
+    
+
+        hwAlarmObjects OBJECT IDENTIFIER ::= { hwAlarmMIB 1 }
+        
+        hwSnmpTargetAlarmReliability OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The MIB module for creating and deleting bulk files of
+                SNMP data for file transfer."
+            ::= { hwAlarmObjects 1 }
+        
+--    snmp extend table
+
+        hwSnmpTargetAddrExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSnmpTargetAddrExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define snmp target Address extend table."
+            ::= { hwAlarmObjects 2 }
+        
+        hwSnmpTargetAddrExtEntry OBJECT-TYPE
+            SYNTAX HwSnmpTargetAddrExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The MIB module for creating and deleting bulk files of
+                SNMP data for file transfer."
+            INDEX { hwSnmpTargetAddrExtIndex }
+            ::= { hwSnmpTargetAddrExtTable 1 }
+        
+        HwSnmpTargetAddrExtEntry ::=
+            SEQUENCE { 
+                hwSnmpTargetAddrExtIndex
+                    OCTET STRING,
+                hwSnmpTargetSlaveAddressList
+                    OCTET STRING,
+                hwSnmpTargetAddrExtRowStatus
+                    RowStatus
+             }
+
+        hwSnmpTargetAddrExtIndex OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The MIB module for creating and deleting bulk files of
+                SNMP data for file transfer."
+            ::= { hwSnmpTargetAddrExtEntry 2 }
+        
+        hwSnmpTargetSlaveAddressList OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Address of slave target host."
+            ::= { hwSnmpTargetAddrExtEntry 3 }
+        
+        hwSnmpTargetAddrExtRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The master and slave target list."
+            ::= { hwSnmpTargetAddrExtEntry 4 }
+        
+        hwAlarmDefineTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmDefineEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define alarm table."
+            ::= { hwAlarmObjects 3 }
+        
+        hwAlarmDefineEntry OBJECT-TYPE
+            SYNTAX HwAlarmDefineEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of hwAlarmDefineTable."
+            INDEX { hwAlarmId }
+            ::= { hwAlarmDefineTable 1 }
+        
+        HwAlarmDefineEntry ::=
+            SEQUENCE { 
+                hwAlarmId
+                    Integer32,
+                hwAlarmName
+                    OCTET STRING,
+                hwAlarmDescription
+                    OCTET STRING,
+                hwAlarmSuppressPeriod
+                    Integer32,
+                hwAlarmSeverity
+                    Integer32,
+                hwAlarmModuleName
+                    OCTET STRING,
+                hwAlarmNotificationId
+                    OBJECT IDENTIFIER
+             }
+
+        hwAlarmId OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Id of an alarm."
+            ::= { hwAlarmDefineEntry 1 }
+        
+        hwAlarmName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Name of an alarm."
+            ::= { hwAlarmDefineEntry 2 }
+        
+        hwAlarmDescription OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Description of an alarm."
+            ::= { hwAlarmDefineEntry 3 }
+        
+        hwAlarmSuppressPeriod OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Alarm suppression period."
+            DEFVAL { 3 }
+            ::= { hwAlarmDefineEntry 4 }
+        
+        hwAlarmSeverity OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Severity of an alarm."
+            ::= { hwAlarmDefineEntry 5 }
+        
+        hwAlarmModuleName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Module id of an alarm."
+            ::= { hwAlarmDefineEntry 6 }
+        
+        hwAlarmNotificationId OBJECT-TYPE
+            SYNTAX OBJECT IDENTIFIER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The NOTIFICATION-TYPE object identifier of this alarm state. "
+            ::= { hwAlarmDefineEntry 7 }
+        
+--    ararm script define     
+        hwAlarmScriptDefineTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmScriptDefineEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define alarm script table."
+            ::= { hwAlarmObjects 4 }
+        
+        hwAlarmScriptDefineEntry OBJECT-TYPE
+            SYNTAX HwAlarmScriptDefineEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of hwAlarmScriptDefineTable."
+            INDEX { hwAlarmScriptId }
+            ::= { hwAlarmScriptDefineTable 1 }
+        
+        HwAlarmScriptDefineEntry ::=
+            SEQUENCE { 
+                hwAlarmScriptId
+                    Integer32,
+                hwAlarmScriptName
+                    OCTET STRING,
+                hwAlarmScriptDescription
+                    OCTET STRING
+             }
+
+
+        hwAlarmScriptId OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Id of an alarm script."
+            ::= { hwAlarmScriptDefineEntry 1 }
+        
+        hwAlarmScriptName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Name of an alarm script."
+            ::= { hwAlarmScriptDefineEntry 2 }
+        
+        hwAlarmScriptDescription OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Description of an alarm script."
+            ::= { hwAlarmScriptDefineEntry 3 }
+        
+--    alarm linkage table   
+        hwAlarmLinkageTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmLinkageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define alarm Linkage table."
+            ::= { hwAlarmObjects 5 }
+        
+        hwAlarmLinkageEntry OBJECT-TYPE
+            SYNTAX HwAlarmLinkageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of hwAlarmLinkageTable."
+            INDEX { hwAlarmId }
+            ::= { hwAlarmLinkageTable 1 }
+        
+        HwAlarmLinkageEntry ::=
+            SEQUENCE { 
+                hwAlarmLinkageScriptName
+                    OCTET STRING,
+                hwAlarmLinkageRowStatus
+                    RowStatus
+             }
+
+        hwAlarmLinkageScriptName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Name of an alarm linkage script."
+            ::= { hwAlarmLinkageEntry 1 }
+        
+        hwAlarmLinkageRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Binding a linkage script to an alarm."
+            ::= { hwAlarmLinkageEntry 2 }
+        
+--    alarm suppress
+        hwAlarmSuppressEnable OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Enable flag of alarm suppress."
+            ::= { hwAlarmObjects 6 }
+        
+--    -alarm mask list  
+        hwAlarmMaskDefineTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmMaskDefineEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define alarm mask table."
+            ::= { hwAlarmObjects 7 }
+        
+        hwAlarmMaskDefineEntry OBJECT-TYPE
+            SYNTAX HwAlarmMaskDefineEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of hwAlarmMaskDefineTable."
+            INDEX { hwAlarmMaskListIndex }
+            ::= { hwAlarmMaskDefineTable 1 }
+        
+        HwAlarmMaskDefineEntry ::=
+            SEQUENCE { 
+                hwAlarmMaskListIndex
+                    Integer32,
+                hwAlarmMaskRowStatus
+                    RowStatus
+             }
+
+        hwAlarmMaskListIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Alarm mask list index."
+            ::= { hwAlarmMaskDefineEntry 1 }
+        
+        hwAlarmMaskRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Create an alarm mask list."
+            ::= { hwAlarmMaskDefineEntry 2 }
+        
+--    alarm rule list          
+        hwAlarmMaskRuleDefineTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmMaskRuleDefineEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define alarm mask Rule table."
+            ::= { hwAlarmObjects 8 }
+        
+        hwAlarmMaskRuleDefineEntry OBJECT-TYPE
+            SYNTAX HwAlarmMaskRuleDefineEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of hwAlarmMaskRuleDefineTable."
+            INDEX { hwAlarmMaskListIndex, hwMaskRuleIndex }
+            ::= { hwAlarmMaskRuleDefineTable 1 }
+        
+        HwAlarmMaskRuleDefineEntry ::=
+            SEQUENCE { 
+                hwMaskRuleIndex
+                    Integer32,
+                hwMaskRuleModuleName
+                    OCTET STRING,
+                hwMaskRuleAlarmName
+                    OCTET STRING,
+                hwMaskRuleSeverity
+                    Integer32,
+                hwMaskRuleVrId
+                    Integer32,
+                hwMaskRuleStartTime
+                    DateAndTime,
+                hwMaskRuleEndTime
+                    DateAndTime,
+                hwMaskRuleRowStatus
+                    RowStatus
+             }
+
+        hwMaskRuleIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Alarm mask rule index."
+            ::= { hwAlarmMaskRuleDefineEntry 1 }
+        
+        hwMaskRuleModuleName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Module id of an alarm."
+            ::= { hwAlarmMaskRuleDefineEntry 2 }
+        
+        hwMaskRuleAlarmName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Id of an alarm."
+            ::= { hwAlarmMaskRuleDefineEntry 3 }
+        
+        hwMaskRuleSeverity OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Alarm severity."
+            ::= { hwAlarmMaskRuleDefineEntry 4 }
+        
+        hwMaskRuleVrId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "VR id."
+            ::= { hwAlarmMaskRuleDefineEntry 5 }
+        
+        hwMaskRuleStartTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Mask start time."
+            ::= { hwAlarmMaskRuleDefineEntry 6 }
+        
+        hwMaskRuleEndTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Mask end time."
+            ::= { hwAlarmMaskRuleDefineEntry 7 }
+        
+        hwMaskRuleRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Binding rule to mask list."
+            ::= { hwAlarmMaskRuleDefineEntry 8 }
+        
+--    alarm mask list apply  
+
+        hwAlarmMaskApplyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmMaskApplyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Apply alarm mask table."
+            ::= { hwAlarmObjects 9 }
+        
+        hwAlarmMaskApplyEntry OBJECT-TYPE
+            SYNTAX HwAlarmMaskApplyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of hwAlarmMaskApplyTable."
+            INDEX { hwSnmpTargetAddrExtIndex }
+            ::= { hwAlarmMaskApplyTable 1 }
+        
+        HwAlarmMaskApplyEntry ::=
+            SEQUENCE { 
+                hwMaskApplyActiveFlag
+                    Integer32,
+                hwMaskApplyMasklistIndex
+                    Integer32,
+                hwMaskApplyRowStatus
+                    RowStatus
+             }
+
+        hwMaskApplyActiveFlag OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Active or NonActive an alarm mask list of scriber."
+            ::= { hwAlarmMaskApplyEntry 2 }
+        
+        hwMaskApplyMasklistIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Mask list index."
+            ::= { hwAlarmMaskApplyEntry 3 }
+        
+        hwMaskApplyRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Apply mask list to user."
+            ::= { hwAlarmMaskApplyEntry 4 }
+        
+--    alarm statistics table
+
+        hwAlarmStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Alarm statistics table."
+            ::= { hwAlarmObjects 10 }
+        
+        hwAlarmStatisticsEntry OBJECT-TYPE
+            SYNTAX HwAlarmStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of hwAlarmStatisticsTable."
+            INDEX { hwAlarmId }
+            ::= { hwAlarmStatisticsTable 1 }
+        
+        HwAlarmStatisticsEntry ::=
+            SEQUENCE { 
+                hwAlarmStatisticsValue
+                    Counter32
+             }
+
+        hwAlarmStatisticsValue OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Alarm statistics value."
+            ::= { hwAlarmStatisticsEntry 1 }
+        
+        hwAlarmConformance OBJECT IDENTIFIER ::= { hwAlarmMIB 2 }
+        
+        hwAlarmCompliances OBJECT IDENTIFIER ::= { hwAlarmConformance 1 }
+        
+-- this module
+
+        hwAlarmCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for entities which 
+                implement the Huawei Alarm mib."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwAlarmReliabilityGroup }
+            ::= { hwAlarmCompliances 1 }
+        
+        hwAlarmGroups OBJECT IDENTIFIER ::= { hwAlarmConformance 2 }
+        
+        hwAlarmReliabilityGroup OBJECT-GROUP
+            OBJECTS { hwSnmpTargetAlarmReliability, hwSnmpTargetSlaveAddressList, hwSnmpTargetAddrExtRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The objects for alarm reliability and snmp target address list."
+            ::= { hwAlarmGroups 1 }
+        
+        hwAlarmDefineGroup OBJECT-GROUP
+            OBJECTS { hwAlarmName, hwAlarmDescription, hwAlarmSuppressPeriod, hwAlarmSeverity, 
+                hwAlarmModuleName, hwAlarmNotificationId, hwAlarmLinkageScriptName, hwAlarmLinkageRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "All information of an alarm."
+            ::= { hwAlarmGroups 2 }
+        
+        hwAlarmScriptGroup OBJECT-GROUP
+            OBJECTS { hwAlarmScriptName, hwAlarmScriptDescription }
+            STATUS current
+            DESCRIPTION 
+                "All information of script."
+            ::= { hwAlarmGroups 3 }
+        
+        hwAlarmSuppressGroup OBJECT-GROUP
+            OBJECTS { hwAlarmSuppressEnable }
+            STATUS current
+            DESCRIPTION 
+                "Alarm suppress flag."
+            ::= { hwAlarmGroups 4 }
+        
+        hwAlarmMaskGroup OBJECT-GROUP
+            OBJECTS { hwAlarmMaskRowStatus, hwMaskRuleModuleName, hwMaskRuleAlarmName, 
+                hwMaskRuleSeverity, hwMaskRuleVrId, hwMaskRuleStartTime, hwMaskRuleEndTime, hwMaskRuleRowStatus, 
+                hwMaskApplyActiveFlag, hwMaskApplyMasklistIndex, hwMaskApplyRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Alarm mask list information."
+            ::= { hwAlarmGroups 5 }
+        
+        hwAlarmStatisticsGroup OBJECT-GROUP
+            OBJECTS { hwAlarmStatisticsValue }
+            STATUS current
+            DESCRIPTION 
+                "Alarm statistics value."
+            ::= { hwAlarmGroups 6 }
+        
+    
+END
+
+--
+-- HUAWEI-ALARM-MIB.mib
+--

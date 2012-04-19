@@ -1,0 +1,44 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+--
+-- Copyright (c) 2002-2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-EX-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+                jnxExMibRoot            FROM JUNIPER-SMI;
+
+
+
+--
+-- This MIB file added the nodes to create the Juniper Security
+-- tree structure under the object node: jnxExObjects.
+-- In general, the prefix jnxEx is used to name the object identifiers
+-- and to designate them.
+--
+-- The jnxEx node is designed to provide a branch for the Switching
+-- related MIB defintions specific to the EX products.
+--
+
+--
+-- Object identifier added as the basis for identifying other EX nodes.
+--
+jnxExSwitching                   OBJECT IDENTIFIER ::= { jnxExMibRoot 1 }
+
+
+--
+-- next level object identifiers under jnxExSwitching
+--
+jnxExAnalyzer                    OBJECT IDENTIFIER ::= { jnxExSwitching 1 }
+jnxExSecureAccessPort            OBJECT IDENTIFIER ::= { jnxExSwitching 2 }
+jnxExPaeExtension                OBJECT IDENTIFIER ::= { jnxExSwitching 3 }
+jnxExVirtualChassis              OBJECT IDENTIFIER ::= { jnxExSwitching 4 }
+jnxExVlan                        OBJECT IDENTIFIER ::= { jnxExSwitching 5 }
+jnxRPS                           OBJECT IDENTIFIER ::= { jnxExSwitching 6 }
+jnxMacNotificationRoot           OBJECT IDENTIFIER ::= { jnxExSwitching 7 }
+END
+

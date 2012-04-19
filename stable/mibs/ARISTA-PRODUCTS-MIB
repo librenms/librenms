@@ -1,0 +1,45 @@
+-- ARISTA-PRODUCTS-MIB: Arista Networks product object identifier assignments
+-- Copyright (c) 2008 Aristra Networks, Inc.  All rights reserved.
+
+ARISTA-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    aristaModules,
+    aristaProducts
+        FROM ARISTA-SMI-MIB;
+
+aristaProductsMIB MODULE-IDENTITY
+    LAST-UPDATED    "200809101415Z"
+    ORGANIZATION "Arista Networks, Inc."
+    CONTACT-INFO
+        "Arista Networks, Inc.
+
+         Postal: 275 Middlefield Road
+                 Suite 150
+                 Menlo Park, CA 94025
+
+         Tel: +1 650 462-5000
+
+         E-mail: snmp@aristanetworks.com"
+    DESCRIPTION
+        "This module defines the object identifiers returned as values for
+         sysObjectID or entPhysicalVendorType for Arista Networks hardware."
+        REVISION      "200809101415Z"
+        DESCRIPTION
+                "Revised to include DCS-7148S"
+        REVISION      "200803031230Z"
+        DESCRIPTION
+                "Initial version."
+
+    ::= { aristaModules 1 }
+
+-- DCS-7124S 1RU 24-port SFP+ 10Gb Ethernet Switch
+aristaDCS7124S OBJECT IDENTIFIER ::= { aristaProducts 3011 7124 3282 }
+-- DCS-7148SX 1RU 48-port SFP+ 10Gb Ethernet Switch
+aristaDCS7148SX OBJECT IDENTIFIER ::= { aristaProducts 3011 7148 3741 }
+-- DCS-7148S 1RU 48-port SFP+ 10Gb Ethernet Switch
+aristaDCS7148S OBJECT IDENTIFIER ::= { aristaProducts 3011 7148 3282 }
+
+END

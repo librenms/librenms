@@ -1,0 +1,193 @@
+-- ArubaOS 3.2.0.0_16376
+-- vim:set ts=4 sw=4:
+WLSX-MESH-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION,
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+       Unsigned32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+       DateAndTime,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+           
+       ArubaMeshRole,
+	   ArubaEncryptionMethods,
+	   ArubaPhyType
+	   		FROM ARUBA-TC
+	   wlanAPMacAddress
+           FROM WLSX-WLAN-MIB
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+		wlsxEnterpriseMibModules
+			FROM ARUBA-MIB;
+
+   wlsxMeshMIB MODULE-IDENTITY 
+       LAST-UPDATED "0707040044Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089	
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provides
+            information about Mesh portal and topology 
+		in the Aruba controller."
+       REVISION        "0707040044Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 13 }
+
+   wlsxMeshInfoGroup			OBJECT IDENTIFIER ::= { wlsxMeshMIB 1 }
+   
+   wlsxMeshNodeGroup           OBJECT IDENTIFIER ::= { wlsxMeshInfoGroup 1 }
+
+   wlsxMeshNodeTotal     OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Number of mesh nodes in the controller.
+            "
+        ::= { wlsxMeshNodeGroup 1 }
+
+   wlsxMeshNodeTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF MeshEntry
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists Mesh Node Info. 
+		"
+      ::= { wlsxMeshNodeGroup 2 } 
+      
+   wlsxMeshNodeEntry OBJECT-TYPE
+	  SYNTAX       MeshEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             ""
+	  INDEX {wlanAPMacAddress}
+      ::= { wlsxMeshNodeTable 1 } 
+      
+   MeshEntry ::=
+     SEQUENCE {
+		wlsxMeshRole           ArubaMeshRole,
+		wlsxMeshNodeParent    MacAddress,
+		wlsxMeshNodeChildrenCount  Unsigned32,
+		wlsxMeshNodeCluster      DisplayString,
+		wlsxMeshNodeRfBand    ArubaPhyType,
+		wlsxMeshNodePathCost  Integer32,
+		wlsxMeshNodeNodeCost  Integer32,
+		wlsxMeshNodeLinkCost  Integer32,
+		wlsxMeshNodeHopCount  Integer32
+    } 
+	wlsxMeshRole OBJECT-TYPE
+         SYNTAX       ArubaMeshRole
+         MAX-ACCESS   read-write
+         STATUS       current
+         DESCRIPTION
+            "
+			Mesh role
+            "
+        ::= { wlsxMeshNodeEntry 1 }
+        
+ 	wlsxMeshNodeParent OBJECT-TYPE
+         SYNTAX       MacAddress
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Mesh node parent
+            "
+        ::= { wlsxMeshNodeEntry 2 }
+
+	wlsxMeshNodeChildrenCount OBJECT-TYPE
+         SYNTAX       Unsigned32
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Mesh node children count
+            "
+        ::= { wlsxMeshNodeEntry 3 }
+
+    wlsxMeshNodeCluster OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Mesh cluster name. Value in float.
+            "
+        ::= { wlsxMeshNodeEntry 4 }
+
+	wlsxMeshNodeRfBand OBJECT-TYPE
+         SYNTAX       ArubaPhyType
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Mesh node rf band
+            "
+        ::= { wlsxMeshNodeEntry 5 }
+
+	wlsxMeshNodePathCost OBJECT-TYPE
+         SYNTAX       Integer32
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Mesh topology path cost
+            "
+        ::= { wlsxMeshNodeEntry 6 }
+ 
+	wlsxMeshNodeNodeCost OBJECT-TYPE
+         SYNTAX       Integer32
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Mesh topology node cost
+            "
+        ::= { wlsxMeshNodeEntry 7 }
+
+ 	wlsxMeshNodeLinkCost OBJECT-TYPE
+         SYNTAX       Integer32
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Mesh topology link cost
+            "
+        ::= { wlsxMeshNodeEntry 8 }
+
+  	wlsxMeshNodeHopCount OBJECT-TYPE
+         SYNTAX       Integer32
+  		 MAX-ACCESS   read-only		
+         STATUS       current
+         DESCRIPTION
+            "
+			Mesh topology hop cost
+            "
+        ::= { wlsxMeshNodeEntry 9 }
+
+END        

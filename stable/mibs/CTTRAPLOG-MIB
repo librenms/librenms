@@ -1,0 +1,473 @@
+CTTRAPLOG-MIB  DEFINITIONS ::= BEGIN
+
+--  cttraplog-mib.txt
+--  Revision: 01.00.02
+--  Part Number:
+--  Date: July 17, 1998
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific trap log mib.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright July 1998 Cabletron Systems
+
+--  PLEASE NOTE: All groups in this mib are optional
+
+        IMPORTS 
+                DisplayString
+                        FROM RFC1213-MIB
+                Counter, TimeTicks
+                        FROM RFC1155-SMI
+                OBJECT-TYPE
+                        FROM RFC-1212 
+                ctTrapLog
+                        FROM CTRON-MIB-NAMES;
+
+        totalNumberOfEntries  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Total number of logged entries for this chassis."
+            ::= { ctTrapLog 1 }
+
+        configTable  OBJECT-TYPE 
+            SYNTAX  SEQUENCE OF ConfigTableEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            ::= { ctTrapLog 2 }
+
+        configTableEntry  OBJECT-TYPE 
+            SYNTAX  ConfigTableEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Each entry allows a user to configure the alarm table
+                    for a specific slot. Objects such as Current Entry,
+                    MaxEntries Allowed, and an Enable/Disable switch are
+                    available."
+            INDEX   { slotInChassis }
+            ::= { configTable 1 }
+
+        ConfigTableEntry ::=
+            SEQUENCE { 
+                slotInChassis
+                    INTEGER,
+                numEntriesLoggeds
+                    Counter,
+                numEntriesRequested
+                    INTEGER,
+                numEntriesAllocated
+                    INTEGER,
+                lastLoggedEntryLogId
+                    INTEGER,
+                logCommand
+                    INTEGER,
+                wrap
+                    INTEGER
+            }
+
+        slotInChassis  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Each Slot can be separately configured. This is the
+                    slot number for the configuration entry. "
+            ::= { configTableEntry 1 }
+
+        numEntriesLoggeds  OBJECT-TYPE 
+            SYNTAX  Counter
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This is the total number of entries looged for this
+                    slot."
+            ::= { configTableEntry 2 }
+
+        numEntriesRequested  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Maximum number of entries to store before wrapping
+                    the log on this slot."
+            ::= { configTableEntry 3 }
+
+        numEntriesAllocated  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This is the number of entries allocated to log alarms
+                    on this slot. It will always be less than or equal
+                    to the requested number of entries."
+            ::= { configTableEntry 4 }
+
+        lastLoggedEntryLogId  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This is the log id of the last entry logged for this
+                    slot."
+            ::= { configTableEntry 5 }
+
+        logCommand  OBJECT-TYPE 
+            SYNTAX  INTEGER {
+                        clearLog (1)
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Allows the user to send the log the commands
+                    specified in the enumeration."
+            ::= { configTableEntry 6 }
+
+        wrap  OBJECT-TYPE 
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This is whether or not this configuration has
+                    wrapped or not."
+            ::= { configTableEntry 7 }
+
+        trapLogTable  OBJECT-TYPE 
+            SYNTAX  SEQUENCE OF TrapLogEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            ::= { ctTrapLog 3 }
+
+        trapLogEntry  OBJECT-TYPE 
+            SYNTAX  TrapLogEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Each alarm entry is generated from one of the
+                    following sources; (1) a module in one of the main
+                    chassis slots, (2) the EM, (3) or a power supply. "
+            INDEX   { slotChassis,
+                      logId }
+            ::= { trapLogTable 1 }
+
+        TrapLogEntry ::=
+            SEQUENCE { 
+                logId
+                    INTEGER,
+                nvmpId
+                    INTEGER,
+                trapLogAcknowledged
+                    INTEGER,
+                trapLogVarBind
+                    OCTET STRING,
+                trapLogDescription
+                    DisplayString,
+                timeLogged
+                    TimeTicks,
+                filterId
+                    INTEGER,
+               slotChassis
+                    INTEGER,
+               trapOID
+                    OBJECT IDENTIFIER,
+                z80Time
+                    TimeTicks
+            }
+
+        logId  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Each slot has a maximium number of log entries that it
+                    can support. Each entry is assigned a monotonically
+                    increasing sequence number. When the maximum number
+                    of entries for a slot is reached, the log wraps. Each
+                    new entry will replace the oldest entry for that slot."
+            ::= { trapLogEntry 1 }
+
+        nvmpId  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This contains the nvmp id of the trap that occurred."
+            ::= { trapLogEntry 2 }
+
+        trapLogAcknowledged  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This field is set to 2 if a trap as been acknowledged
+                    from the EM."
+            ::= { trapLogEntry 3 }
+
+        trapLogVarBind  OBJECT-TYPE 
+            SYNTAX  OCTET STRING (SIZE (0..1500))
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This is an ASN.1 encoded string representing the pairs
+                    of OID/value items supplied in the original SNMP or
+                    NVMP trap. "
+            ::= { trapLogEntry 4 }
+
+        trapLogDescription  OBJECT-TYPE 
+            SYNTAX  DisplayString (SIZE (0..80))
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This is an internally defined string used to describe
+                    an alarm. Its primary use is for display on the EMs
+                    LCD. A default value will be used for the old trap
+                    calls."
+            ::= { trapLogEntry 5 }
+
+        timeLogged  OBJECT-TYPE 
+            SYNTAX  TimeTicks
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "The time the entry was logged. This will be date and
+                    time if possible."
+            ::= { trapLogEntry 6 }
+
+        filterId  OBJECT-TYPE 
+            SYNTAX  INTEGER {
+                        informational (1),
+                        warning (2),
+                        severe (3),
+                        fatal (4),
+                        existing (5)
+                    }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This will be used to filter certain alarms. The
+                    criteria is TBD. An example of classification:
+                    informational - requires no intervention. warning -
+                    Does not require immediate intervention. e.g. static
+                    risk severe - Requires immediate intervention. e.g.
+                    power overload. fatal - Requires attention and
+                    module may take corrective action such as reboot. e.g.
+                    Unrecoverable software or hardware error. "
+            ::= { trapLogEntry 7 }
+
+        slotChassis  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Slot of this trap log."
+            ::= { trapLogEntry 8 }
+
+        trapOID  OBJECT-TYPE 
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This OID combines the General Trap code, Specific
+                    Trap code, and the sys object id into one OID."
+            ::= { trapLogEntry 9 }
+
+        z80Time  OBJECT-TYPE 
+            SYNTAX  TimeTicks
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This is the time that the Z80 has been up for the 
+                    board that sent this trap."
+            ::= { trapLogEntry 10 }
+
+        filterTable  OBJECT-TYPE 
+            SYNTAX  SEQUENCE OF FilterEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            ::= { ctTrapLog 4 }
+
+        filterEntry  OBJECT-TYPE 
+            SYNTAX  FilterEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Each filter entry is generated from one of the
+                    following sources; (1) a module in one of the main
+                    chassis slots, (2) the EM, (3) or a power supply. "
+            INDEX   { filterSlotInChassis,
+                      filterFilterId,
+                      filterLogId }
+            ::= { filterTable 1 }
+
+        FilterEntry ::=
+            SEQUENCE { 
+                filterLogId
+                    INTEGER,
+                filterNvmpId
+                    INTEGER,
+                filterTrapLogAcknowledged
+                    INTEGER,
+                filterTrapLogVarBind
+                    OCTET STRING,
+                filterTrapLogDescription
+                    DisplayString,
+                filterTimeLogged
+                    TimeTicks,
+                filterFilterId
+                    INTEGER,
+                filterSlotInChassis
+                    INTEGER,
+                filterTrapOID
+                    OBJECT IDENTIFIER,
+                filterZ80Time
+                    TimeTicks
+            }
+
+        filterLogId  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Each slot has a maximum number of log entries that it
+                    can support. Each entry is assigned a monotonically
+                    increasing sequence number. When the maximum number of
+                    entries for a slot is reached, the log wraps. Each new
+                    entry willreplace the oldest entry for that slot."
+            ::= { filterEntry 1 }
+
+        filterNvmpId  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This contains the nvmp id of the trap that was 
+                    generated."
+            ::= { filterEntry 2 }
+
+        filterTrapLogAcknowledged  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This field is non-zero if a trap has been acknowleged
+                    from the EM."
+            ::= { filterEntry 3 }
+
+        filterTrapLogVarBind  OBJECT-TYPE 
+            SYNTAX  OCTET STRING (SIZE (0..1500))
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This is an ASN.1 encoded string representing the pairs
+                    of OID/value items supplied in the original SNMP or
+                    NVMP trap."
+            ::= { filterEntry 4 }
+
+        filterTrapLogDescription  OBJECT-TYPE 
+            SYNTAX  DisplayString (SIZE (0..80))
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This is an internally defined string used to
+                    describe an alarm. It's primary use is for display
+                    on the EMs LCD. A default value will be used for 
+                    the old trap calls."
+            ::= { filterEntry 5 }
+
+        filterTimeLogged  OBJECT-TYPE 
+            SYNTAX  TimeTicks
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "The time the entry was logged. This will be date
+                    and time if possible."
+            ::= { filterEntry 6 }
+
+        filterFilterId  OBJECT-TYPE 
+            SYNTAX  INTEGER {
+                        informational (1),
+                        warning (2),
+                        severe (3),
+                        fatal (4),
+                        existing (5)
+                    }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This will be used tofilter certain alarms. The
+                    criteria is TBD. An example of classification:
+                    informational-requires no intervention. warning - 
+                    Does not require immediate intervention. e.g. 
+                    statis risk severe - Requires immediate 
+                    intervention. e.g. power overload. fatal - 
+                    Requires attention and module may take
+                    corrective action such as reboot. e.g. Unrecoverale
+                    software or hardware error."
+            ::= { filterEntry 7 }
+
+        filterSlotInChassis  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Slot of this filter entry."
+            ::= { filterEntry 8 }
+
+        filterTrapOID  OBJECT-TYPE 
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This OID combines the General Trap code, Specific
+                    Trap code, and the sys object id into one OID."
+            ::= { filterEntry 9 }
+
+        filterZ80Time  OBJECT-TYPE 
+            SYNTAX  TimeTicks
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "The number of time ticks that have passed since
+                    this boards Z80 processor has been up."
+            ::= { filterEntry 10 }
+
+
+       trapLoggerAgent  OBJECT-TYPE 
+            SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2),
+                standby(3),
+                elected(4)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Reflects the operational status of the traplogger agent"
+        ::= { ctTrapLog 5 }
+        
+END

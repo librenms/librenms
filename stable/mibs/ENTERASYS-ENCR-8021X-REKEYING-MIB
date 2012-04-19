@@ -1,0 +1,503 @@
+ENTERASYS-ENCR-8021X-REKEYING-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-encr-8021x-rekeying-mib.txt
+--
+--  Part Number: <TBD>
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' encrypted IEEE 802.1x rapid rekeying MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright March, 2002 Enterasys Networks, Inc.
+
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+--  TruthValue
+--      FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    dot1xPaePortNumber
+        FROM IEEE8021-PAE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysEncr8021xRekeyingMIB MODULE-IDENTITY
+    LAST-UPDATED "200203142049Z"  -- Thu Mar 14 20:49 GMT 2002
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal: Enterasys Networks
+                 35 Industrial Way, P.O. Box 5005
+                 Rochester, NH 03867-0505
+
+         Phone:  +1 603 332 9400
+         E-mail: support@enterasys.com
+         WWW:    http://www.enterasys.com"
+
+    -- This is the overall description of this MIB module
+    DESCRIPTION
+        "The Enterasys Networks MIB module for configuring rapid
+         rekeying on SNMPv1-only platforms.
+
+         This MIB includes encrypted variants of selected objects
+         from the Enterasys 802.1x Rapid Rekeying MIB.
+
+                                ------------------
+
+                                   N O T I C E
+
+              Use of this MIB in any product requires the approval
+              of the Office of the CTO, Enterasys Networks, Inc.  
+              Permission to use this MIB will not be granted for 
+              products in which SNMPv3 is now, or will soon be,
+              implemented.  Permission to use this MIB in products
+              that are never scheduled to implement SNMPv3 will be 
+              granted on a case-by-case basis, depending on what 
+              other suitable, secure means of configuration are
+              available in the product.
+
+                                ------------------
+
+         The following is a discussion of the encoding/decoding and
+         encryption/decryption methods that must be used to extract
+         data from an encrypted OCTET STRING.  (These methods are the
+         same as for the Enterasys Networks encrypted RADIUS Client
+         MIB.)
+          
+         The encryption/decryption methods make use of an agreed-upon
+         Secret and an Authenticator shared between the SNMP network
+         management system and the entity that implements the MIB.
+
+         The encryption/decryption algorithm, as presented herein, is
+         taken from the RADIUS protocol, and is the method specified
+         for encryption of Tunnel-Password Attributes in RFC 2868.
+
+         To permit plug-and-play remote installation, configuration,
+         and management of the device, the device will algorithmically
+         derive the initial shared secret and the initial authenticator.
+
+         For security reasons, the network manager should change the
+         authenticator portion of the management encryption key after
+         initial configuration.  The methods available for doing this
+         are implementation-specific and subject to change.  (On the
+         RoamAbout AccessPoint 2000, the encrypted RADIUS client MIB
+         contains an authenticator object used for both that MIB and
+         this one.)
+
+         All read-write and write-only access objects except the table
+         index are encoded into fields in an OCTET STRING.
+
+         Octet String
+
+         Before encryption, the 'native' objects must be encoded into
+         a formatted Octet String.  After decryption, the Octet String
+         must be decoded to obtain the 'native' objects.
+
+      0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |     Type      |    Length     |   Salt                        |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |   String ...
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+            
+             Type
+  
+                The data type of the non-encrypted 'native' data:
+
+                1 = Integer32
+                2 = OCTET STRING
+          
+             Length
+
+                The length in octets of the native object sub-field of
+                the Octet String, exclusive of any optional padding.
+                Note that the Integrity Check sub-fields (CRC, OID-tail,
+                Time Stamp, Source IP Address) are not included in this
+                length value, but since the IC sub-fields are always
+                present and are of fixed length, there is no impediment
+                to proper packet parsing.
+
+             Salt
+
+                The Salt field is two octets in length and is used to
+                ensure the uniqueness of the encryption key used to
+                encrypt each object.
+
+                The most significant bit (leftmost) of the Salt field
+                MUST be set (1).  The contents of each Salt field in a
+                given SNMP packet must be unique.
+          
+             String
+
+       0                   1                   2                   3
+       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |  CRC (4 bytes)                                                |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |  OID-tail (4 bytes)                                           |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |  Time Stamp (4 bytes)                                         |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |  Source IP Address (4 bytes)                                  |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |  Object/Padding ...
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+            
+                The plain-text String field consists of six logical
+                sub-fields: the CRC, OID-tail, Time Stamp, Source IP
+                address and native Object sub-fields (all of which are
+                required), and the optional Padding sub-field.  The
+                String field MUST be treated as a counted-string of
+                undistinguished octets, and not as a standard
+                C/UNIX-style null-terminated, printable ASCII string.
+          
+                CRC Sub-field
+
+                  The CRC sub-field contains a 32-bit CRC (CRC-32)
+                  calculated over the following concatentated sub-fields
+                  of the String: the OID-tail, Time Stamp, Source IP
+                  Address and unpadded native Object fields.  The CRC
+                  sub-field acts as an integrity check on the decrypted
+                  data.
+          
+                OID-tail Sub-field
+          
+                  The OID-tail sub-field contains the least significant
+                  four octets of the Object ID of the varbind.  This
+                  field is included as an integrity check on the OID of
+                  the varbind.
+          
+                Time Stamp Sub-field
+          
+                  The Time Stamp sub-field contains a 32-bit unsigned
+                  integer value representing the time the encrypted
+                  message was assembled.  This field acts as an
+                  integrity check by facilitating the disposal of stale
+                  or replayed messages. The time window of acceptance is
+                  implementation dependant, and may be the subject of
+                  local (i.e. managed entity) policy configuration.  The
+                  Time Stamp is relative time, in units of seconds,
+                  referenced to the sysUpTime object of the managed
+                  entity.
+          
+                Source IP Address Sub-field
+          
+                  The Source IP Address sub-field contains an unsigned
+                  32-bit representation of the IPv4 address of the
+                  source of the encrypted message.  This is an added
+                  check to allow verification of the source of the
+                  varbind.
+
+                The CRC, OID-tail, Time Stamp, and Source IP Address
+                sub-fields are collectively hereinafter refered to as
+                the Integrity Check (IC) sub-fields.
+          
+                Object/Padding Sub-field
+
+                  Object 
+                    The Object sub-field contains the actual or native
+                    object data followed by padding, if necessary.
+          
+                  Padding
+                    If the combined length (in octets) of the
+                    non-encrypted CRC, OID-tail, Time Stamp, Source IP
+                    Address, and native Object sub-fields is not an even
+                    multiple of 16, then the Padding sub-field MUST be
+                    present.  If it is present, the length of the
+                    Padding sub-field is variable, between 1 and 15
+                    octets.  The value of the pad octets SHOULD be zero.
+          
+             Encrypting/Decrypting the String Field
+
+                The entire String field MUST be encrypted as follows,
+                prior to transmission:
+          
+                Construct a plain-text version of the String field by
+                concatenating the CRC, OID-tail, Time Stamp, Source IP
+                address, and native Object sub-fields.  If necessary,
+                pad the resulting string until its length (in octets)
+                is an even multiple of 16.  It is recommended that zero
+                octets (0x00) be used for padding.  Call this plain-text
+                P.
+
+                   Shared Secret
+
+                      The shared secret is formed from the MAC
+                      (hardware) address of the primary management
+                      interface of the managed device (containing the
+                      RADIUS Client).  The MAC address is represented
+                      as up-cased, dashed-ASCII, e.g. 08-00-2B-11-22-33.
+          
+                  Authenticator
+          
+                      The 128-bit authenticator is a pre-defined
+                      constant.  The default value of the authenticator
+                      is an Enterasys Networks trade secret.  This value
+                      is settable and the user is advised to change it
+                      from the default value after initial configuration
+                      of the system.  Contact the MIB author for
+                      additional information on the default value.
+          
+                Call the shared secret S, the [pseudo-random] 128-bit 
+                Authenticator R, and the contents of the Salt field A.  
+                Break P into 16 octet chunks p(1), p(2)...p(i), 
+                where i = len(P)/16.  Call the cipher-text blocks 
+                c(1), c(2)...c(i) and the final cipher-text C.
+                Intermediate values b(1), b(2)...c(i) are required.
+                Encryption is performed in the following manner ('+'
+                indicates concatenation):
+          
+            b(1) = MD5(S + R + A)   c(1) = p(1) xor b(1)   C = c(1)
+            b(2) = MD5(S + c(1))    c(2) = p(2) xor b(2)   C = C + c(2)
+                         .                       .
+                         .                       .
+                         .                       .
+            b(i) = MD5(S + c(i-1))  c(i) = p(i) xor b(i)   C = C + c(i)
+          
+                The resulting encrypted String field will contain
+                c(1)+c(2)+...+c(i).
+
+                On receipt, the process is reversed to yield the
+                plain-text String."
+
+
+    REVISION "200203142049Z"  -- Thu Mar 14 20:49 GMT 2002
+    DESCRIPTION
+        "The initial version of this MIB module."
+
+    ::= { etsysModules 20 }
+
+
+etsysEncrDot1xRekeyingObjects
+        OBJECT IDENTIFIER ::= { etsysEncr8021xRekeyingMIB 1 }
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+-- ---------------------------------------------------------- --
+-- Branches of the Enterasys IEEE 802.1x Rapid Rekeying MIB
+-- ---------------------------------------------------------- --
+
+etsysEncrDot1xRekeyBaseBranch
+        OBJECT IDENTIFIER ::= { etsysEncrDot1xRekeyingObjects 1 }
+
+-- ---------------------------------------------------------- --
+-- The Rapid Rekeying Configuration Table
+-- ---------------------------------------------------------- --
+
+etsysEncrDot1xRekeyConfigTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysEncrDot1xRekeyConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table that contains encryption-key-related configuration
+         objects for ports on which Authenticator PAEs can run."
+    ::= { etsysEncrDot1xRekeyBaseBranch 1 }
+
+etsysEncrDot1xRekeyConfigEntry OBJECT-TYPE
+    SYNTAX        EtsysEncrDot1xRekeyConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each conceptual row holds encryption key configuration
+         information for the Authenticator PAEs associated with one
+         port."
+    INDEX { dot1xPaePortNumber }
+    ::= { etsysEncrDot1xRekeyConfigTable 1 }
+
+EtsysEncrDot1xRekeyConfigEntry ::=
+    SEQUENCE { 
+               etsysEncrDot1xRekeyEnabled           OCTET STRING,
+               etsysEncrDot1xRekeyPeriod            OCTET STRING,
+               etsysEncrDot1xRekeyLength            OCTET STRING,
+               etsysEncrDot1xRekeyAsymmetric        OCTET STRING
+     }
+
+etsysEncrDot1xRekeyEnabled OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..255)) -- encrypted TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "An encrypted version of etsysDot1xRekeyEnabled.
+
+                 Determines how an access point selects radio encryption
+                 keys.
+
+                 If the selected port does not support the EAPOL-Key
+                 feature (e.g., because radio keys are not applicable
+                 to Ethernet ports), this object will have a value of
+                 FALSE and attempts to write TRUE will fail.
+
+                 Normally, if radio keys are present, the manager enters
+                 them into the access point through some manual process.
+                 The manager or the users may also need to configure the
+                 keys into each laptop (access points can distribute the
+                 keys automatically to 802.1x EAP-TLS clients).  However
+                 laptops get keys, the keys remain static until somebody
+                 goes to the trouble of changing them.  If the keys stay
+                 unchanged for long periods, this can make it easier for
+                 a determined attacker to launch a cryptographic attack.
+
+                 When rapid rekeying is enabled, an access point ignores
+                 its manually-set keys.  It generates pseudo-random keys
+                 on a periodic basis, using IEEE 802.1x key distribution
+                 to deliver the keys to new and current clients.
+
+                 Do not enable rapid rekeying unless ALL of your clients
+                 support IEEE 802.1x and an authentication method (e.g.,
+                 EAP-TLS) that supports key distribution.
+
+                 Before enabling rapid rekeying, make sure that you have
+                 set 'dot1xAuthKeyTxEnabled' to TRUE.  Changing the keys
+                 without telling any of the clients about the changes is
+                 not a very useful mode of operation.
+
+             The data type is 1, Integer32."
+--  DEFVAL { encrypt(false) }
+    ::= { etsysEncrDot1xRekeyConfigEntry 1 }
+
+etsysEncrDot1xRekeyPeriod OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..255)) -- encrypted Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "An encrypted version of etsysDot1xRekeyPeriod.
+
+                    When rapid rekeying (periodic changing of radio
+                    keys) is enabled, the value of this object
+                    determines the period, in seconds, between key
+                    changes.
+
+             The data type is 1, Integer32."
+--  DEFVAL { encrypt(1800) }
+    ::= { etsysEncrDot1xRekeyConfigEntry 2 }
+
+etsysEncrDot1xRekeyLength OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..255)) -- encrypted enumeration
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "An encrypted version of etsysDot1xRekeyLength.
+
+                SYNTAX INTEGER {  keylen40 (1),   keylen128 (2) }
+
+                Determines the number of bits/bytes used in the
+                encryption keys.  Currently supports either 128-bit
+                (16-octet) encryption keys or 40-bit (5-octet)
+                encryption keys.
+
+             The data type is 1, Integer32."
+--  DEFVAL { encrypt(keylen128) }
+    ::= { etsysEncrDot1xRekeyConfigEntry 3 }
+
+etsysEncrDot1xRekeyAsymmetric OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..255)) -- encrypted TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "An encrypted version of etsysDot1xRekeyAsymmetric.
+
+                Determines the association between the supplicant and
+                authenticator transmit keys.
+
+                If true(1), the authenticator and supplicant will use
+                different encryption keys in order to transmit data.
+
+                If false(2), the authenticator and supplicant will use
+                a single key pattern to encrypt the transmitted data.
+
+             The data type is 1, Integer32."
+--  DEFVAL { encrypt(true) }
+    ::= { etsysEncrDot1xRekeyConfigEntry 4 }
+
+
+-- ---------------------------------------------------------- --
+-- Enterasys 802.1X Rekeying MIB - Conformance Information
+-- ---------------------------------------------------------- --
+
+etsysEncrDot1xRekeyingConformance
+    OBJECT IDENTIFIER ::= { etsysEncr8021xRekeyingMIB 2 }
+
+etsysEncrDot1xRekeyingGroups      
+    OBJECT IDENTIFIER ::= { etsysEncrDot1xRekeyingConformance 1 }
+
+etsysEncrDot1xRekeyingCompliances
+    OBJECT IDENTIFIER ::= { etsysEncrDot1xRekeyingConformance 2 }
+
+-- ---------------------------------------------------------- --
+-- Units of conformance
+-- ---------------------------------------------------------- --
+
+etsysEncrDot1xRekeyingBaseGroup OBJECT-GROUP
+    OBJECTS {
+           etsysEncrDot1xRekeyPeriod,
+           etsysEncrDot1xRekeyEnabled,
+           etsysEncrDot1xRekeyLength,
+           etsysEncrDot1xRekeyAsymmetric
+        }
+    STATUS current
+    DESCRIPTION
+            "A collection of objects providing rekeying configuration
+             information about a port on which Authenticator PAEs can
+             run."
+    ::= { etsysEncrDot1xRekeyingGroups 1 }
+
+
+-- ---------------------------------------------------------- --
+-- Compliance statements
+-- ---------------------------------------------------------- --
+
+etsysEncrDot1xRekeyingCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+            "The compliance statement for devices that support the
+             Enterasys IEEE 802.1x extensions MIB."
+
+MODULE
+
+    MANDATORY-GROUPS { etsysEncrDot1xRekeyingBaseGroup }
+
+    OBJECT         etsysEncrDot1xRekeyEnabled
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required."
+
+    OBJECT         etsysEncrDot1xRekeyPeriod
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required."
+
+    OBJECT         etsysEncrDot1xRekeyLength
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required.  Depending upon
+                   product capabilities (and export restrictions,
+                   if applicable), some systems may not implement
+                   all key lengths."
+
+    OBJECT         etsysEncrDot1xRekeyAsymmetric
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required."
+
+::= { etsysEncrDot1xRekeyingCompliances 1 }
+
+END

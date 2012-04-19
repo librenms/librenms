@@ -1,0 +1,326 @@
+-- *****************************************************************
+-- CISCO-SMI.my:  Cisco Enterprise Structure of Management Information
+--
+-- April 1994, Jeffrey T. Johnson
+--
+-- Copyright (c) 1994-1997 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+CISCO-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+cisco MODULE-IDENTITY
+	LAST-UPDATED "200001110000Z"
+	ORGANIZATION "Cisco Systems, Inc."
+	CONTACT-INFO
+		"	Cisco Systems
+			Customer Service
+
+		Postal: 170 West Tasman Drive
+			San Jose, CA  95134
+			USA
+
+		   Tel: +1 800 553-NETS
+
+		E-mail: cs-snmp@cisco.com"
+	DESCRIPTION
+		"The Structure of Management Information for the
+		Cisco enterprise."
+	REVISION      "200001110000Z"
+	DESCRIPTION
+		"Added ciscoPolicy, ciscoPolicyAuto, ciscoPIB, and
+                ciscoPibToMib."
+	REVISION      "9704090000Z"
+	DESCRIPTION
+		"Added ciscoPartnerProducts to generate sysObjectID
+		for partner platforms"
+	REVISION      "9505160000Z"
+	DESCRIPTION
+		"New oid assignments for Cisco REPEATER MIB and others."
+	REVISION      "9404262000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= { enterprises 9 }	-- assigned by IANA
+
+
+ciscoProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ciscoProducts is the root OBJECT IDENTIFIER from
+		which sysObjectID values are assigned.  Actual
+		values are defined in CISCO-PRODUCTS-MIB."
+	::= { cisco 1 }
+
+local OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which pre-10.2 MIBS were built."
+	::= { cisco 2 }
+
+temporary OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which pre-10.2 experiments were
+		placed."
+	::= { cisco 3 }
+
+pakmon OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"reserved for pakmon"
+	::= { cisco 4 }
+
+workgroup OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for use by the Workgroup Business Unit"
+	::= { cisco 5 }
+
+otherEnterprises OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"otherEnterprises provides a root object identifier
+		from which mibs produced by other companies may be
+		placed.  mibs produced by other enterprises are
+		typicially implemented with the object identifiers
+		as defined in the mib, but if the mib is deemed to
+		be uncontrolled, we may reroot the mib at this
+		subtree in order to have a controlled version."
+	::= { cisco 6 }
+
+ciscoAgentCapability OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ciscoAgentCapability provides a root object identifier
+		from which AGENT-CAPABILITIES values may be assigned."
+	::= { cisco 7 }
+
+ciscoConfig OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ciscoConfig is the main subtree for configuration mibs."
+	::= { cisco 8 }
+
+ciscoMgmt OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ciscoMgmt is the main subtree for new mib development."
+	::= { cisco 9 }
+
+ciscoExperiment OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ciscoExperiment provides a root object identifier
+		from which experimental mibs may be temporarily
+		based.  mibs are typicially based here if they
+		fall in one of two categories
+		1) are IETF work-in-process mibs which have not
+		been assigned a permanent object identifier by
+		the IANA.
+		2) are cisco work-in-process which has not been
+		assigned a permanent object identifier by the
+		cisco assigned number authority, typicially because
+		the mib is not ready for deployment.
+
+		NOTE WELL:  support for mibs in the ciscoExperiment
+		subtree will be deleted when a permanent object
+		identifier assignment is made."
+	::= { cisco 10 }
+
+ciscoAdmin OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ciscoAdmin is reserved for administratively assigned
+		OBJECT IDENTIFIERS, i.e. those not associated with MIB
+		objects"
+	::= { cisco 11 }
+
+ciscoModules OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ciscoModules provides a root object identifier
+		from which MODULE-IDENTITY values may be assigned."
+	::= { cisco 12 }
+
+lightstream OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for use by Lightstream"
+	::= { cisco 13 }
+
+ciscoworks OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ciscoworks provides a root object identifier beneath
+		which mibs applicable to the CiscoWorks family of network
+		management products are defined."
+	::= { cisco 14 }
+
+newport OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for use by the former Newport Systems
+		Solutions, now a portion of the Access Business Unit."
+	::= { cisco 15 }
+
+ciscoPartnerProducts OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+		"ciscoPartnerProducts is the root OBJECT IDENTIFIER from
+		which partner sysObjectID values may be assigned. Such 
+		sysObjectID values are composed of the ciscoPartnerProducts
+		prefix, followed by a single identifier that is unique for 
+		each partner, followed by the value of sysObjectID of the
+		Cisco product from which partner product is derived.  Note
+		that the chassisPartner MIB object defines the value of the
+		identifier assigned to each partner."
+        ::= { cisco 16 }
+
+ciscoPolicy OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION
+                "ciscoPolicy is the root of the Cisco-assigned OID
+                subtree for use with Policy Management."
+         ::= { cisco 17 }
+
+--  Note that 1.3.6.1.4.1.9.17.1 is currently unassigned
+
+ciscoPIB OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION
+                "ciscoPIB is the root of the Cisco-assigned OID
+                 subtree for assignment to PIB (Policy Information
+                 Base) modules."
+         ::= { ciscoPolicy 2 }
+
+ciscoPolicyAuto OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION
+                "ciscoPolicyAuto is the root of the Cisco-assigned
+                OID subtree for OIDs which are automatically assigned
+                for use in Policy Management."
+         ::= { cisco 18 }
+
+--  Note that 1.3.6.1.4.1.9.18.1 is currently unassigned
+
+ciscoPibToMib OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION
+                "ciscoPibToMib is the root of the Cisco-assigned
+                OID subtree for MIBs which are algorithmically
+                generated/translated from Cisco PIBs with OIDs
+                assigned under the ciscoPIB subtree.
+                These generated MIBs allow management
+                entities (other the current Policy Server) to
+                read the downloaded policy.  By convention, for PIB
+                'ciscoPIB.x', the generated MIB shall have the
+                name 'ciscoPibToMib.x'."
+         ::= { ciscoPolicyAuto 2 }
+
+-- ciscoAdmin assignments follow
+
+ciscoProxy OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ciscoProxy OBJECT IDENTIFIERS are used to uniquely name
+		party mib records created to proxy for SNMPv1."
+	::= { ciscoAdmin 1 }
+ciscoPartyProxy		OBJECT IDENTIFIER ::= { ciscoProxy 1 }
+ciscoContextProxy	OBJECT IDENTIFIER ::= { ciscoProxy 2 }
+
+--
+-- Administrative assignments for repeaters
+--
+
+ciscoRptrGroupObjectID OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ciscoRptrGroupObjectID OBJECT IDENTIFIERS are used to
+		uniquely identify groups of repeater ports for use by the
+		SNMP-REPEATER-MIB (RFC 1516) rptrGroupObjectID object."
+	::= { ciscoAdmin 2 }
+
+ciscoUnknownRptrGroup OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"The identity of an unknown repeater port group."
+	::= { ciscoRptrGroupObjectID 1 }
+
+cisco2505RptrGroup OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"The authoritative identity of the Cisco 2505 repeater
+		port group."
+	::= { ciscoRptrGroupObjectID 2 }
+
+cisco2507RptrGroup OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"The authoritative identity of the Cisco 2507 repeater
+		port group."
+	::= { ciscoRptrGroupObjectID 3 }
+
+cisco2516RptrGroup OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"The authoritative identity of the Cisco 2516 repeater
+		port group."
+	::= { ciscoRptrGroupObjectID 4 }
+
+ciscoWsx5020RptrGroup OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"The authoritative identity of the wsx5020 repeater
+		port group."
+	::= { ciscoRptrGroupObjectID 5 }
+
+--
+--  Administrative assignments for chip sets
+--
+
+ciscoChipSets OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Numerous media-specific MIBS have an object, defined as
+		an OBJECT IDENTIFIER, which is the identity of the chipset
+		realizing the interface.  Cisco-specific chipsets have their 
+		OBJECT IDENTIFIERS assigned under this subtree."
+	::= { ciscoAdmin 3 }
+
+ciscoChipSetSaint1 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"The identity of the Rev 1 SAINT ethernet chipset
+		manufactured for cisco by LSI Logic."
+	::= { ciscoChipSets 1 }
+
+ciscoChipSetSaint2 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"The identity of the Rev 2 SAINT ethernet chipset
+		manufactured for cisco by LSI Logic."
+	::= { ciscoChipSets 2 }
+
+ciscoChipSetSaint3 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"The identity of the Rev 3 SAINT ethernet chipset
+		manufactured for cisco by Plessey."
+	::= { ciscoChipSets 3 }
+
+ciscoChipSetSaint4 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"The identity of the Rev 4 SAINT ethernet chipset
+		manufactured for cisco by Mitsubishi."
+	::= { ciscoChipSets 4 }
+
+END

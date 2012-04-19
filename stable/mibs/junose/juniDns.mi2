@@ -1,0 +1,418 @@
+
+-- *****************************************************************************
+-- Juniper-DNS-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   DNS MIB
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+-- Copyright (c) 2006, Juniper Networks Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-DNS-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    JuniEnable
+        FROM Juniper-TC
+    InetAddress, InetAddressType
+        FROM INET-ADDRESS-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniDnsMIB  MODULE-IDENTITY
+    LAST-UPDATED "200609150832Z"  -- 15-Sep-06 03:32 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The DNS MIB for the Juniper Networks, Inc. enterprise."
+    -- Revision History
+    REVISION    "200609150832Z"  -- 15-Sep-06 03:32 AM EST  - JUNOSe 6.1
+    DESCRIPTION
+        "Changed the maximum size of octet string for the object 
+        juniDnsLocalDomainNameListName from 32 to 1025." 
+    REVISION    "200309111550Z"  -- 11-Sep-03 11:50 AM EDT  - JUNOSe 5.2
+    DESCRIPTION
+        "Added IPv6 address support."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200103221929Z"  -- 22-Mar-01 02:29 PM EST  - JUNOSe 3.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 47 }
+
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Type definitions
+--
+JuniNextServerListIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Coordinate index value allocation for entries in an associated table,
+        by first reading an index value from this object, then creating an
+        entry, having that index value, in the associated table.
+
+        The DESCRIPTION clause for an object of this type must identify the
+        associated table.
+
+        A GET of this object returns the next available index value to be used
+        to create an entry in the associated table; or zero, if no valid index
+        value is available.  This object also returns a value of zero when it is
+        the lexicographic successor of a varbind presented in an SNMP GETNEXT or
+        GETBULK request, for which circumstance it is assumed that index
+        allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously.
+
+        Unless specified otherwise by its MAX-ACCESS and DESCRIPTION clauses, an
+        object of this type is read-only, and a SET of such an object returns a
+        notWritable error."
+    SYNTAX      Integer32 (0..2147483647)
+
+ServerListIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "A unique value, greater than zero, for each DNS server in the managed
+        system."
+    SYNTAX       Integer32 (1..2147483647)
+
+JuniNextLocalDomainNameListIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Coordinate index value allocation for entries in an associated table,
+        by first reading an index value from this object, then creating an
+        entry, having that index value, in the associated table.
+
+        The DESCRIPTION clause for an object of this type must identify the
+        associated table.
+
+        A GET of this object returns the next available index value to be used
+        to create an entry in the associated table; or zero, if no valid index
+        value is available.  This object also returns a value of zero when it is
+        the lexicographic successor of a varbind presented in an SNMP GETNEXT or
+        GETBULK request, for which circumstance it is assumed that index
+        allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously.
+
+        Unless specified otherwise by its MAX-ACCESS and DESCRIPTION clauses, an
+        object of this type is read-only, and a SET of such an object returns a
+        notWritable error."
+    SYNTAX      Integer32 (0..2147483647)
+
+LocalDomainNameListIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "A unique value, greater than zero, for each recognized domain name in
+        the managed system."
+    SYNTAX       Integer32 (1..2147483647)
+
+LocalDomainName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1025a"
+    STATUS       current
+    DESCRIPTION
+        "Local domain name.  Represents textual information taken from the NVT
+        ASCII character set."
+    REFERENCE
+        "RFC 854: NVT ASCII character set.  See SNMPv2-TC.DisplayString
+        DESCRIPTION for a summary."
+    SYNTAX      OCTET STRING (SIZE (0..1025))
+
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDnsObjects              OBJECT IDENTIFIER ::= { juniDnsMIB 1 }
+juniDnsGeneral              OBJECT IDENTIFIER ::= { juniDnsObjects 1 }
+juniDnsServerList           OBJECT IDENTIFIER ::= { juniDnsObjects 2 }
+juniDnsLocalDomainNameList  OBJECT IDENTIFIER ::= { juniDnsObjects 3 }
+
+--
+-- General DNS Control Objects
+--
+juniDnsEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Exerts administrative control to enable/disable DNS capability."
+    ::= { juniDnsGeneral 1 }
+
+
+--
+-- The DNS Server List
+--
+juniDnsServerListNextIndex OBJECT-TYPE
+    SYNTAX      JuniNextServerListIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate juniDnsServerListIndex value allocation for entries in
+        juniDnsServerListTable.
+
+        A GET of this object returns the next available index value to be used
+        to create an entry in the associated table; or zero, if no valid index
+        value is available.  This object also returns a value of zero when it is
+        the lexicographic successor of a varbind presented in an SNMP GETNEXT or
+        GETBULK request, for which circumstance it is assumed that index
+        allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniDnsServerList 1 }
+
+juniDnsServerListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDnsServerListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains an entry for each DNS server."
+    ::= { juniDnsServerList 2 }
+
+juniDnsServerListEntry OBJECT-TYPE
+    SYNTAX      JuniDnsServerListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry corresponds to an associated DNS server."
+    INDEX     { juniDnsServerListIndex }
+    ::= { juniDnsServerListTable 1 }
+
+JuniDnsServerListEntry ::= SEQUENCE {
+    juniDnsServerListIndex      ServerListIndex,        
+    juniDnsServerListAddress    IpAddress,   -- obsoleted
+    juniDnsServerListRowStatus  RowStatus,
+    juniDnsV4V6ServerListAddressType InetAddressType,
+    juniDnsV4V6ServerListAddress     InetAddress }
+
+juniDnsServerListIndex OBJECT-TYPE
+    SYNTAX      ServerListIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the DNS server.  When creating entries in this table,
+        suitable values for this object are determined by reading
+        juniDnsServerListNextIndex."
+    ::= { juniDnsServerListEntry 1 }
+
+juniDnsServerListAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The IP address of the DNS server.  This object has been replaced by
+        juniDnsV4V6ServerListAddressType and juniDnsV4V6ServerListAddress."
+    ::= { juniDnsServerListEntry 2 }
+
+juniDnsServerListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy"
+    ::= { juniDnsServerListEntry 3 }
+
+juniDnsV4V6ServerListAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of IP address (IPv4 or IPv6) of the DNS server."
+    ::= { juniDnsServerListEntry 4 }
+
+juniDnsV4V6ServerListAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the DNS server.
+
+         Note: Since this object is used to configure the IPv4 or IPv6 address 
+               depending on juniDnsV4V6ServerListAddressType value, it is
+               mandatory to provide the IPv4 or IPv6 address by specifying each
+               octet's positional values explicitly.
+               Example:
+                     1. IPv4 -- 4  octets  --  0xFF 0xFF 0xFF 0xFF
+                     2. IPv6 -- 16 octets  --  0xFF 0xFF 0xFF 0xFF
+                                               0xFF 0xFF 0xFF 0xFF
+                                               0xFF 0xFF 0xFF 0xFF
+                                               0xFF 0xFF 0xFF 0xFF "
+    ::= { juniDnsServerListEntry 5 }
+
+--
+-- The DNS Local Domain Name List
+--
+juniDnsLocalDomainNameListNextIndex OBJECT-TYPE
+    SYNTAX      JuniNextLocalDomainNameListIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate juniDnsLocalDomainNameListIndex value allocation for entries
+        in juniDnsLocalDomainNameListTable.
+
+        A GET of this object returns the next available index value to be used
+        to create an entry in the associated table; or zero, if no valid index
+        value is available.  This object also returns a value of zero when it is
+        the lexicographic successor of a varbind presented in an SNMP GETNEXT or
+        GETBULK request, for which circumstance it is assumed that index
+        allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniDnsLocalDomainNameList 1 }
+
+juniDnsLocalDomainNameListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDnsLocalDomainNameListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains an entry for each recognized local domain name."
+    ::= { juniDnsLocalDomainNameList 2 }
+
+juniDnsLocalDomainNameListEntry OBJECT-TYPE
+    SYNTAX      JuniDnsLocalDomainNameListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry corresponds to a recognized local domain name."
+    INDEX     { juniDnsLocalDomainNameListIndex }
+    ::= { juniDnsLocalDomainNameListTable 1 }
+
+JuniDnsLocalDomainNameListEntry ::= SEQUENCE {
+    juniDnsLocalDomainNameListIndex         LocalDomainNameListIndex,        
+    juniDnsLocalDomainNameListName          LocalDomainName,
+    juniDnsLocalDomainNameListRowStatus     RowStatus }
+
+juniDnsLocalDomainNameListIndex OBJECT-TYPE
+    SYNTAX      LocalDomainNameListIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the domain name.  When creating entries in this table,
+        suitable values for this object are determined by reading
+        juniDnsLocalDomainNameListNextIndex."
+    ::= { juniDnsLocalDomainNameListEntry 1 }
+
+juniDnsLocalDomainNameListName OBJECT-TYPE
+    SYNTAX      LocalDomainName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A recognized local domain name."
+    ::= { juniDnsLocalDomainNameListEntry 2 }
+
+juniDnsLocalDomainNameListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy"
+    ::= { juniDnsLocalDomainNameListEntry 3 }
+
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDnsConformance     OBJECT IDENTIFIER ::= { juniDnsMIB 2 }
+juniDnsCompliances     OBJECT IDENTIFIER ::= { juniDnsConformance 1 }
+juniDnsGroups          OBJECT IDENTIFIER ::= { juniDnsConformance 2 }
+
+--
+-- compliance statements
+--
+juniDnsCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper DNS
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDnsEnableGroup,
+            juniDnsServerListGroup,
+            juniDnsV4V6ServerListGroup,
+            juniDnsLocalDomainNameListGroup }
+    ::= { juniDnsCompliances 1 }                                   -- JUNOSe 3.0
+
+--
+-- units of conformance
+--
+juniDnsEnableGroup OBJECT-GROUP
+    OBJECTS {
+        juniDnsEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for enabling/disabling DNS capabilities in a
+        Juniper product."
+    ::= { juniDnsGroups 1 }
+
+juniDnsServerListGroup OBJECT-GROUP
+    OBJECTS {
+        juniDnsServerListNextIndex,
+
+        juniDnsServerListAddress,
+        juniDnsServerListRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing DNS server list
+        capabilities in a Juniper product.  This group became obsolete when IPv2
+        address support was added."
+    ::= { juniDnsGroups 2 }
+
+juniDnsLocalDomainNameListGroup OBJECT-GROUP
+    OBJECTS {
+        juniDnsLocalDomainNameListNextIndex,
+        juniDnsLocalDomainNameListName,
+        juniDnsLocalDomainNameListRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing DNS local domain name list
+        capabilities in a Juniper product."
+    ::= { juniDnsGroups 3 }
+
+
+juniDnsV4V6ServerListGroup OBJECT-GROUP
+    OBJECTS {
+        juniDnsServerListNextIndex,
+        juniDnsServerListRowStatus,
+        juniDnsV4V6ServerListAddress,
+        juniDnsV4V6ServerListAddressType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing DNS server list capabilities in a
+        Juniper product."
+    ::= { juniDnsGroups 4 }
+
+END

@@ -1,0 +1,660 @@
+CTRON-SFPS-CALL-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-call-mib.txt
+--  Revision: 0.0.16
+--
+--  Part Number: 
+--  Date: August 9, 1994
+
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+ 
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--      enterprises,
+--      IpAddress, 
+--      Counter, Gauge, 
+      TimeTicks
+                FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.2
+        sfpsSap, sfpsSapAPI, sfpsCallByTuple, sfpsCallTableStats
+        
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+HexInteger ::= INTEGER
+--  display this integer in hex format
+
+--
+
+--  SFPS Switch Agent Redirector Group
+--  This group contains the objects that pertain to the SFPS Redirector.
+--  This object receives redirected packets from the switch engine and
+--  forwards them to the appropriate call processor stack. 
+
+
+
+sfpsSapTable            OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsSapTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the registered (active) call processors
+                indexed (indirectly) by address and address type supported."
+        ::= { sfpsSap 1 }
+
+sfpsSapTableEntry       OBJECT-TYPE
+        SYNTAX  SfpsSapTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains information pertaining to an active
+                call processor."
+        INDEX   { sfpsSapTableTag, sfpsSapTableHash, sfpsSapTableHashIndex }
+        ::= { sfpsSapTable 1 }
+
+SfpsSapTableEntry       ::=
+        SEQUENCE {
+                sfpsSapTableTag                 INTEGER,
+                sfpsSapTableHash                INTEGER,
+                sfpsSapTableHashIndex           INTEGER,
+                sfpsSapTableSourceCP            DisplayString,
+                sfpsSapTableDestCP              DisplayString,
+                        sfpsSapTableSAP                             DisplayString,
+                        sfpsSapTableOperStatus                  INTEGER,
+                        sfpsSapTableAdminStatus                 INTEGER,
+                        sfpsSapTableStateTime                   TimeTicks,
+                        sfpsSapTableDescription                 DisplayString,
+                        sfpsSapTableNumAccepted                 INTEGER,
+                        sfpsSapTableNumDropped                  INTEGER,
+                        sfpsSapTableUnicastSap                  INTEGER,
+                        sfpsSapTableNVStatus                    INTEGER
+        }
+
+sfpsSapTableTag         OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A type tag used to sort and index the table entries."
+        ::= { sfpsSapTableEntry 1 }
+
+sfpsSapTableHash        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A hash of the sfpsSapTableAddress used to identify the 
+                instance."
+        ::= { sfpsSapTableEntry 2 }
+
+sfpsSapTableHashIndex   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A count of the non-unique sfpsSapTableAddress hashes used to
+                identify the instance."
+        ::= { sfpsSapTableEntry 3 }
+
+sfpsSapTableSourceCP   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The name of the call processor initiating the the SAP attempts
+                for this particular SAP load."
+        ::= { sfpsSapTableEntry 4 }
+
+sfpsSapTableDestCP   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The destination call processor that is registered for with this
+                source call processor for the given SAP load."
+        ::= { sfpsSapTableEntry 5 }
+
+sfpsSapTableSAP   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The value of the SAP in 0x format."
+        ::= { sfpsSapTableEntry 6 }
+
+sfpsSapTableOperStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the Current OperStatus of the SAP entry."
+        ::= { sfpsSapTableEntry 7 }
+
+sfpsSapTableAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the Current AdminStatus of the SAP entry."
+        ::= { sfpsSapTableEntry 8 }
+
+sfpsSapTableStateTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Total number of SFPSElements stored in NVRAM for persistence."
+        ::= { sfpsSapTableEntry 9 }
+
+sfpsSapTableDescription   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Text description of the entry."
+        ::= { sfpsSapTableEntry 10 }
+
+sfpsSapTableNumAccepted   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number accepted by the SAP."
+        ::= { sfpsSapTableEntry 11 }
+
+sfpsSapTableNumDropped   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number dropped by the SAP."
+        ::= { sfpsSapTableEntry 12 }
+
+sfpsSapTableUnicastSap   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsSapTableEntry 13 }
+
+sfpsSapTableNVStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3),
+                unset(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Status in NVRAM  for persistence."
+        ::= { sfpsSapTableEntry 14 }
+
+
+-- SAP Table API                                                             
+
+sfpsSapAPIVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                getStatus(1),
+                next(2),
+                first(3),
+                disable(4),
+                disableInNvram(5),
+                enable(6),
+                enableInNvram(7),
+                clearFromNvram(8),
+                clearAllNvram(9),
+                resetStats(10),
+                resetAllStats(11)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "1 - getStatus -- The default verb. When the SourceCP, DestCP,
+                 and SAP info are entered, this action will get the current
+                 AdminStatus, OperStatus, and NvramStatus.
+                (Must perform a mo_get after setting the above info to actually
+                get the status info)
+                2 - next -- Move to the next Entry in the SAP Table and Get the
+                 status. If this operation is successful, the verb will stay
+                 next, else it defaults to getStatus.
+                3 - first -- Jump back to the First Entry in the SAP Table.
+                4 - disable -- Disable the Current SAP Entry.
+                This does not effect the Status of this Entry in Nvram.
+                5 - disableInNvram -- Set the Current SAP Entries status to
+                 Disabled in Nvram - This does not effect the Current Admin
+                 Status for this SAP Entry.
+                6 - enable -- Enable the Current SAP Entry.
+                This does not effect the Status of this Entry in Nvram.
+                7 - enableInNvram -- Set the Current SAP Entries status to
+                Enabled in Nvram - This does not effect the Current Admin 
+                Status for this SAP Entry.
+                8 - clearFromNvram -- Clear the Current SAP Entry from Nvram 
+                (if set).
+                9 - clearAllNvram -- Clear all SAP Entries from Nvram.
+                10 - resetStats -- Resets the Accepted/Dropped Stats for the
+                Current/Entered SAP Entry.
+                11 - resetAllStats -- Resets the Accepted/Dropped Stats for 
+                all SAP Entries."
+        ::= { sfpsSapAPI 1 }
+
+sfpsSapAPISourceCP   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The name of the call processor initiating the the SAP attempts
+                for this particular SAP load."
+        ::= { sfpsSapAPI 2 }
+
+sfpsSapAPIDestCP   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The destination call processor that is registered for with this
+                source call processor for the given SAP load."
+        ::= { sfpsSapAPI 3 }
+
+sfpsSapAPISAP   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enter in the SAP for the desired SAP Entry."
+        ::= { sfpsSapAPI 4 }
+
+sfpsSapAPINVStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3),
+                unset(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the Current Admin Status of this SAP Entry saved 
+                in Nvram."
+        ::= { sfpsSapAPI 5 }
+
+sfpsSapAPIAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the Current AdminStatus of the SAP Entry."
+        ::= { sfpsSapAPI 6 }
+
+sfpsSapAPIOperStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the Current OperStatus of the SAP Entry."
+        ::= { sfpsSapAPI 7 }
+
+sfpsSapAPINvSet   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Total number of entries stored in NVRAM for persistence."
+        ::= { sfpsSapAPI 8 }
+
+sfpsSapAPINVTotal   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Total number of entries allocated in NVRAM. The 
+                switch will always allocate enough space in NVRAM for
+                the number of elements. That is, NvTotal will always be
+                greater than or equal to NvSet."
+        ::= { sfpsSapAPI 9 }
+
+sfpsSapAPINumAccept   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsSapAPI 10 }
+
+sfpsSapAPINvDiscard   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsSapAPI 11 }
+
+sfpsSapAPIDefaultStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsSapAPI 12 }
+
+
+--
+
+
+
+--  SFPS Agent Call Processor Groups
+
+--  SFPS Call by Tuple  Group
+--  This group contains the objects that pertain to call tag. 
+--  This group should eventually replace the Call tag table
+
+sfpsCallByTupleTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsCallByTupleEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the call tags, and call states 
+                indexed (indirectly) by switch tuple (in port, src 
+                address, dst address)"
+        ::= { sfpsCallByTuple 1 }
+
+sfpsCallByTupleEntry    OBJECT-TYPE
+        SYNTAX  SfpsCallByTupleEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains information pertaining to a call tag
+                and its state."
+        INDEX   { sfpsCallByTupleInPort, sfpsCallByTupleSrcHash,
+                sfpsCallByTupleDstHash, sfpsCallByTupleHashIndex }
+        ::= { sfpsCallByTupleTable 1 }
+
+SfpsCallByTupleEntry    ::=
+        SEQUENCE {
+                sfpsCallByTupleInPort                   INTEGER,
+                sfpsCallByTupleSrcHash                  INTEGER,
+                sfpsCallByTupleDstHash                  INTEGER,
+                sfpsCallByTupleHashIndex                INTEGER,
+                sfpsCallByTupleBotSrcType               DisplayString,
+                sfpsCallByTupleBotSrcAddress            DisplayString,
+                sfpsCallByTupleBotDstType               DisplayString,
+                sfpsCallByTupleBotDstAddress            DisplayString,
+                sfpsCallByTupleTopSrcType               DisplayString,
+                sfpsCallByTupleTopSrcAddress            DisplayString,
+                sfpsCallByTupleTopDstType               DisplayString,
+                sfpsCallByTupleTopDstAddress            DisplayString,
+                sfpsCallByTupleCallProcName             DisplayString,
+                sfpsCallByTupleCallTag                  HexInteger,
+                sfpsCallByTupleCallState                DisplayString,
+                sfpsCallByTupleTimeRemaining            TimeTicks
+        }
+
+sfpsCallByTupleInPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port of the switch on which the packet associated with 
+                this call tag was seen."
+        ::= { sfpsCallByTupleEntry 1 }
+
+sfpsCallByTupleSrcHash  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A hash of sfpsCallByTupleBotSrcAddress used to identify the 
+                instance."
+        ::= { sfpsCallByTupleEntry 2 }
+
+sfpsCallByTupleDstHash  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A hash of sfpsCallByTupleTopDstAddress used to identify the 
+                instance."
+        ::= { sfpsCallByTupleEntry 3 }
+
+sfpsCallByTupleHashIndex        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A count of non-unique sfpsCallByTupleSrcHash and 
+                sfpsCallByTupleDstHash pairs used to identify the instance."
+        ::= { sfpsCallByTupleEntry 4 }
+
+sfpsCallByTupleBotSrcType OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The source address type of the lowest known protocol 
+                layer."
+        ::= { sfpsCallByTupleEntry 5 }
+
+sfpsCallByTupleBotSrcAddress    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The source address value of the lowest known protocol 
+                layer."
+        ::= { sfpsCallByTupleEntry 6 }
+
+sfpsCallByTupleBotDstType OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The destination address type of the lowest known 
+                protocol layer."
+        ::= { sfpsCallByTupleEntry 7 }
+
+sfpsCallByTupleBotDstAddress    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The destination address value of the lowest known 
+                protocol layer."
+        ::= { sfpsCallByTupleEntry 8 }
+
+sfpsCallByTupleTopSrcType OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The source address type of the highest learned protocol 
+                layer."
+        ::= { sfpsCallByTupleEntry 9 }
+
+sfpsCallByTupleTopSrcAddress    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The source address value of the highest learned protocol 
+                layer."
+        ::= { sfpsCallByTupleEntry 10 }
+
+sfpsCallByTupleTopDstType OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The destination address type of the highest learned 
+                protocol layer."
+        ::= { sfpsCallByTupleEntry 11 }
+
+sfpsCallByTupleTopDstAddress    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The destination address value of the highest learned 
+                protocol layer."
+        ::= { sfpsCallByTupleEntry 12 }
+
+sfpsCallByTupleCallProcName     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The name of the call processor responsible for all 
+                signaling for this packet/call tag."
+        ::= { sfpsCallByTupleEntry 13 }
+
+sfpsCallByTupleCallTag  OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number used to reference this packet and its 
+                associated calls."
+        ::= { sfpsCallByTupleEntry 14 }
+
+sfpsCallByTupleCallState        OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The current state of the packet in the call processor."
+        ::= { sfpsCallByTupleEntry 15 }
+
+sfpsCallByTupleTimeRemaining    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of time ticks remaining before this entry's
+                timer expires and it is removed from the table."
+        ::= { sfpsCallByTupleEntry 16 }
+
+
+sfpsCallTableStatsRam   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of bytes used by the Call Table."
+        ::= { sfpsCallTableStats 1 }
+
+sfpsCallTableStatsSize  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of entries in the Call Table."
+        ::= { sfpsCallTableStats 2 }
+
+sfpsCallTableStatsInUse OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The current number of calls in use. A call goes into this
+                table only if it is being blocked (waiting for resolve or
+                sent new user)."
+        ::= { sfpsCallTableStats 3 }
+
+sfpsCallTableStatsMax   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The maximum number of calls that the switch maintained."
+        ::= { sfpsCallTableStats 4 }
+
+sfpsCallTableStatsTotMisses     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "The number of times that there were no calls available
+                 in the Call Table. This would be the number of calls that
+                 had to be dropped."
+        ::= { sfpsCallTableStats 5 }
+
+sfpsCallTableStatsMissStart     OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Time when last miss occurred"
+        ::= { sfpsCallTableStats 7 }
+
+sfpsCallTableStatsMissStop      OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Time when missing stopped"
+        ::= { sfpsCallTableStats 8 }
+
+sfpsCallTableStatsLastMiss      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Number of calls dropped in last miss,  also write 0 to files"
+        ::= { sfpsCallTableStats 9 }
+
+END

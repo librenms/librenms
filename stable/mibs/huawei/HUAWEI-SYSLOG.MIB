@@ -1,0 +1,393 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:The HUAWEI-SYSLOG-MIB DEFINITIONS provides information about system log
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+
+    HUAWEI-SYSLOG-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            huaweiUtility            
+                FROM HUAWEI-MIB            
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI            
+            RowStatus, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+    
+    
+        syslogMIBObjects MODULE-IDENTITY
+            LAST-UPDATED "200404240900Z"
+            ORGANIZATION
+                "Fix-Net Dept, Huawei Technologies Co.,Ltd."
+            CONTACT-INFO
+                "Floor 5, Block 4, R&D Building,
+                Huawei Longgang Production Base,
+                Shenzhen,  P.R.C.
+                http://www.huawei.com
+                Zip: 518129
+                " 
+            DESCRIPTION 
+                "The MIB contains objects of system log."
+            ::= { huaweiUtility 35 }
+        
+--
+-- Node definitions
+--
+    
+--  ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ================================================================== 
+    
+
+    
+        syslogEnableAdminStatus OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The board supports the configuration of switch group of system log server.
+                The configuration mode can be bit-domain setting, board is numbered 1 to 18, correspondingly to the bit of BIT1 to BIT18, 1 means enable, 0 means disable.     
+                "
+            ::= { syslogMIBObjects 1 }
+        
+    --  ============== syslogServerTable  define beginning ==============
+        syslogServerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF SyslogServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The system log server table.
+                "
+            ::= { syslogMIBObjects 2 }
+        
+        syslogServerEntry OBJECT-TYPE
+            SYNTAX SyslogServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The entry of the system log server table.
+                "
+            INDEX {syslogServerIpAddress   }
+            ::= { syslogServerTable 1 }
+        
+        SyslogServerEntry ::=
+            SEQUENCE { 
+                syslogServerIpAddress
+                    Integer32,
+                syslogPolicyGroupNameSelect
+                    OCTET STRING,
+                syslogServerRowStatus
+                    RowStatus
+             }
+
+        syslogServerIpAddress OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The IP address of system log server
+                "
+            ::= { syslogServerEntry 1 }
+        
+        syslogPolicyGroupNameSelect OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The name of policy group selected by the system log server, one server can only use one policy server group.
+                "
+            ::= { syslogServerEntry 2 }
+        
+        syslogServerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The row status, used to add and delete.
+                "
+            ::= { syslogServerEntry 4 }
+
+    --  ============== syslogServerTable  define end ==============         
+                
+    --  ============== syslogPolicyGroupTable  define beginning ==============
+        
+        syslogPolicyGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF SyslogPolicyGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The policy group control table."
+            ::= { syslogMIBObjects 3 }
+        
+        syslogPolicyGroupEntry OBJECT-TYPE
+            SYNTAX SyslogPolicyGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of policy group control table."
+            INDEX { syslogPolicyGroupName }
+            ::= { syslogPolicyGroupTable 1 }
+        
+        SyslogPolicyGroupEntry ::=
+            SEQUENCE { 
+                syslogPolicyGroupName
+                    OCTET STRING,
+                syslogPolicyGroupRowStatus
+                    RowStatus
+             }
+
+        syslogPolicyGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (0..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The name of policy group.
+                "
+            ::= { syslogPolicyGroupEntry 1 }
+        
+        syslogPolicyGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The row status of policy group, used to add and delete."
+            ::= { syslogPolicyGroupEntry 2 }
+
+    --  ============== syslogPolicyGroupTable  define end ==============         
+                
+    --  ============== syslogPolicyConfigTable  define beginning ==============
+        
+        syslogPolicyConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF SyslogPolicyConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The system server policy config table.
+                "
+            ::= { syslogMIBObjects 4 }
+        
+        syslogPolicyConfigEntry OBJECT-TYPE
+            SYNTAX SyslogPolicyConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The entry of system server policy config table."
+            INDEX { syslogPolicyConfigIndex }
+            ::= { syslogPolicyConfigTable 1 }
+        
+        SyslogPolicyConfigEntry ::=
+            SEQUENCE { 
+                syslogPolicyConfigIndex
+                    Integer32,
+                syslogPolicyDescr
+                    OCTET STRING,
+                syslogUserType
+                    INTEGER,
+                syslogPolicyBoard
+                    BITS,
+                syslogPolicyIsp
+                    OCTET STRING,
+                syslogPolicyType
+                    INTEGER,
+                syslogGroupChoice
+                    OCTET STRING,
+                syslogPolicyRowStatus
+                    RowStatus
+             }
+
+        syslogPolicyConfigIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..1024)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The index of system log policy config.
+                "
+            ::= { syslogPolicyConfigEntry 1 }
+        
+        syslogPolicyDescr OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The description of policy.
+                "
+            ::= { syslogPolicyConfigEntry 2 }
+        
+        syslogUserType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                all(0),
+                portal(1),
+                ppp(2),
+                l2static(3),
+                l2dynamic(4),
+                l3(5),
+                l2tp(6),
+                telnet(7),
+                dot1x(101),
+                wlan(102),
+                others(200)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Filtrating the system log information of different user type.
+                "
+            ::= { syslogPolicyConfigEntry 3 }
+        
+        syslogPolicyBoard OBJECT-TYPE
+            SYNTAX BITS
+                {
+                first(1),
+                second(2),
+                third(3),
+                fouth(4),
+                fifth(5),
+                sixth(6),
+                seventh(7),
+                eighth(8),
+                ninth(9),
+                tenth(10),
+                eleventh(11),
+                twelfth(12),
+                thirteenth(13),
+                fourteenth(14),
+                fifteenth(15),
+                sixteenth(16),
+                seventennth(17),
+                eighteenth(18)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The board which policy taking effect.
+                "
+            ::= { syslogPolicyConfigEntry 4 }
+        
+        syslogPolicyIsp OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The selection of ISP, the null character means tracing operation log of all ISP.
+                More than one ISP can be separated by character ';', for example, if the policy can support 2 ISPs, it can express as ISP1; ISP2.
+                "
+            ::= { syslogPolicyConfigEntry 5 }
+        
+        syslogPolicyType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                all(1),
+                userOperSyslog(2),
+                callSyslog(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The selection of system log filter type.
+                "
+            DEFVAL { 7 }
+            ::= { syslogPolicyConfigEntry 6 }
+        
+        syslogGroupChoice OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The server group which the policy belongs to. 
+                When one policy belongs to more than one policy server group, name of policy server group can be separated by character ';'.
+                "
+            ::= { syslogPolicyConfigEntry 7 }
+        
+        syslogPolicyRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The row status, used to add and delete.
+                "
+            ::= { syslogPolicyConfigEntry 8 }
+
+    --  ============== syslogPolicyConfigTable  define end ==============         
+                
+    --  ============== conformance information ==============
+        hwSyslogConformance OBJECT IDENTIFIER ::= { syslogMIBObjects 100 }
+        
+        hwSyslogCompliances OBJECT IDENTIFIER ::= { hwSyslogConformance 1 }
+        hwSyslogCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwSyslogAdminStatusObjectGroup, hwSyslogServerObjectGroup,
+                                    hwSyslogPolicyGroupObjectGroup, hwSyslogPolicyConfigObjectGroup }  
+                                               
+              ::= { hwSyslogCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwSyslogObjectGroups OBJECT IDENTIFIER ::= { hwSyslogConformance 2 } 
+            
+        hwSyslogAdminStatusObjectGroup OBJECT-GROUP
+            OBJECTS { syslogEnableAdminStatus }
+            STATUS current
+            DESCRIPTION 
+                "The system log administrate status group."
+            ::= { hwSyslogObjectGroups 1 }
+
+        hwSyslogServerObjectGroup OBJECT-GROUP
+            OBJECTS { syslogServerIpAddress, syslogPolicyGroupNameSelect, syslogServerRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The system log server group."
+            ::= { hwSyslogObjectGroups 2 }
+        
+        hwSyslogPolicyGroupObjectGroup OBJECT-GROUP
+            OBJECTS { syslogPolicyGroupName, syslogPolicyGroupRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The system log policy group."
+            ::= { hwSyslogObjectGroups 3 }
+        
+        hwSyslogPolicyConfigObjectGroup OBJECT-GROUP
+            OBJECTS { syslogPolicyDescr, syslogUserType, syslogPolicyBoard,
+                      syslogPolicyIsp, syslogPolicyType,syslogGroupChoice,
+                      syslogPolicyRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The system log policy config group."
+            ::= { hwSyslogObjectGroups 4 }
+        
+            
+            
+        --  ============== conformance information define end ==============            
+    
+    END
+
+

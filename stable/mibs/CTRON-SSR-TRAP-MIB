@@ -1,0 +1,361 @@
+CTRON-SSR-TRAP-MIB DEFINITIONS ::= BEGIN
+
+--  This module provides authoritative definitions for Enterasys's
+--  enterprise-specific Smart Switch Router Traps.
+--
+--  This module will be extended, as required.
+--
+
+--  Enterasys Networks reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Enterasys products.
+
+--  Copyright July, 2002 Enterasys Networks, Inc.
+
+
+IMPORTS
+      MODULE-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF
+      ifIndex
+      FROM IF-MIB
+      ssrTraps, ssrMibs
+      FROM CTRON-SSR-SMI-MIB
+      capCPUCurrentUtilization
+      FROM CTRON-SSR-CAPACITY-MIB
+      polAclName, polAclItem
+      FROM CTRON-SSR-POLICY-MIB
+      sysHwPowerSupply, sysHwFan, sysHwTemperature, sysHwModuleSlotNumber
+      FROM CTRON-SSR-HARDWARE-MIB;
+
+ssrTrapsMIB MODULE-IDENTITY
+   LAST-UPDATED "200207231720Z"  -- Tue Jul 23 17:20 GMT 2002
+   ORGANIZATION "Enterasys Networks, Inc."
+   CONTACT-INFO
+    "Postal: Enterasys Networks, Inc.
+             35 Industrial Way, P.O. Box 5005
+             Rochester, NH 03867-0505
+     Phone:  +1 603 332 9400
+     E-mail: support@enterasys.com
+     WWW:    http://www.enterasys.com"
+ 
+   DESCRIPTION
+      "This module describes the traps specific to the Smart Switch Router."
+
+   REVISION     "200207231720Z"  -- Tue Jul 23 17:20 GMT 2002
+   DESCRIPTION  "Update contact information. Add notifications for access
+                 denial by access control list (ACL) entry."
+
+   REVISION     "200102160000Z"
+   DESCRIPTION  "Add notifications for backup control module failure, line
+                 card failure, and CPU threshold exceeded."
+   ::= { ssrMibs 300 }
+ 
+
+   trapControl  OBJECT IDENTIFIER       ::=     { ssrTraps 1 }
+
+   envTrapGroup OBJECT IDENTIFIER       ::=     { ssrTraps 2 }
+
+   polTrapGroup OBJECT IDENTIFIER       ::=     { ssrTraps 3 }
+
+
+    envPowerSupplyFailed NOTIFICATION-TYPE
+        OBJECTS { 
+                  sysHwPowerSupply
+                }
+        STATUS             current
+        DESCRIPTION
+           "A power supply on the sending device has failed. The 
+            sysHwPowerSupply object identifies the failed supply."
+        ::= { envTrapGroup 1 }
+
+    envPowerSupplyRecovered NOTIFICATION-TYPE
+        OBJECTS {
+                  sysHwPowerSupply
+                }
+        STATUS             current
+        DESCRIPTION
+           "A power supply on the sending device has recovered 
+            after failure. The sysHwPowerSupply object identifies 
+            the recovered supply."
+        ::= { envTrapGroup 2 }
+
+    envFanFailed NOTIFICATION-TYPE
+        OBJECTS {
+                  sysHwFan
+                }
+        STATUS             current
+        DESCRIPTION
+           "A Fan tray on the sending device has failed. The
+            sysHwFan object identifies the failed fan tray."
+        ::= { envTrapGroup 3 }
+ 
+    envFanRecovered NOTIFICATION-TYPE
+        OBJECTS {
+                  sysHwFan
+                }
+        STATUS             current
+        DESCRIPTION
+           "A Fan tray on the sending device has recovered
+            after failure. The sysHwFan object identifies
+            the recovered Fan tray."
+        ::= { envTrapGroup 4 }
+ 
+    envTempExceeded NOTIFICATION-TYPE
+        OBJECTS {
+                  sysHwTemperature
+                }
+        STATUS             current
+        DESCRIPTION
+           "A temperature inside the chassis on the sending device has exceeded
+            normal operating temperature. The sysHwTemperature object
+            identifies the current status."
+        ::= { envTrapGroup 5 }
+ 
+    envTempNormal NOTIFICATION-TYPE
+        OBJECTS {
+                  sysHwTemperature
+                }
+        STATUS             current
+        DESCRIPTION
+           "A temperature inside the chassis on the sending device has returned
+            to normal operating temperature. The sysHwTemperature
+            object identifies the current status."
+        ::= { envTrapGroup 6 }
+
+    envHotSwapIn NOTIFICATION-TYPE
+        OBJECTS {
+                  sysHwModuleSlotNumber
+                }
+        STATUS             current
+        DESCRIPTION
+           "A module has been inserted into the chassis.
+            sysHwModuleSlotNumber identifies the slot the module was inserted into."
+        ::= { envTrapGroup 7 }
+
+    envHotSwapOut NOTIFICATION-TYPE
+        OBJECTS {
+                  sysHwModuleSlotNumber
+                }
+        STATUS             current
+        DESCRIPTION
+           "A module has been turned off or removed from the chassis.
+            sysHwModuleSlotNumber identifies the slot the module was removed from."
+        ::= { envTrapGroup 8 }
+
+    envBackupControlModuleOnline NOTIFICATION-TYPE
+        OBJECTS {
+                  sysHwModuleSlotNumber
+                }
+        STATUS             current
+        DESCRIPTION
+           "A backup control module that was in standby mode has taken over 
+            for a failed primary control module. Poll sysHwControlModuleBackupState 
+            for current state of backup control module. sysHwModuleSlotNumber is the index
+            into the sysHwModuleTable for the now active control module."
+        ::= { envTrapGroup 9 }
+
+
+    envBackupControlModuleFailure NOTIFICATION-TYPE
+        OBJECTS {
+                  sysHwModuleSlotNumber
+                }
+        STATUS             current
+        DESCRIPTION
+           "A backup control module that was in standby mode has changed to 
+            inactive or notInstalled. Poll sysHwControlModuleBackupState 
+            for current state of backup control module."
+        ::= { envTrapGroup 10 }
+
+    envLineModuleFailure NOTIFICATION-TYPE
+        OBJECTS {
+                  sysHwModuleSlotNumber
+                }
+        STATUS             current
+        DESCRIPTION
+           "A line card module which was in the online state changed to the 
+            offline state indicating an error condition."
+        ::= { envTrapGroup 11 }
+
+    envCPUThresholdExceeded NOTIFICATION-TYPE
+        OBJECTS {
+                  sysHwModuleSlotNumber,
+                  capCPUCurrentUtilization
+                }
+        STATUS             current
+        DESCRIPTION
+           "The CPU utilization has exceeded the value of capCPUMaxThreshold
+            after having been below the value of capCPUMinThreshold. Once 
+            this trap has occurred it will not occurred again until the
+            utilization has dropped below capCPUMinThreshold. Poll
+            capCPUMinThreshold and capCPUMaxThreshold to determine the
+            configured threshold settings."
+        ::= { envTrapGroup 12 }
+
+
+   polNotifications    OBJECT IDENTIFIER   ::= { polTrapGroup 0 }
+
+   polAclDenied NOTIFICATION-TYPE
+     OBJECTS      { polAclName,
+                    polAclItem,
+                    ifIndex
+                  }
+     STATUS       current
+     DESCRIPTION
+         "The polAclDenied trap indicates that a message was
+          dropped because of a 'deny' ACL. The polAclName and polAclItem
+          identify the entry in the polAclTable. The ifIndex value identifies
+          the interface on which the deny ACL was applied."
+     ::= { polNotifications 1 }
+
+--
+-- Conformance Section
+--
+ssrTrapsConformance OBJECT IDENTIFIER ::= { ssrTrapsMIB 2 }
+ssrTrapsCompliances OBJECT IDENTIFIER ::= { ssrTrapsConformance 1 }
+ssrTrapsGroups OBJECT IDENTIFIER ::= { ssrTrapsConformance 2 }
+
+
+-- MODULE-COMPLIANCE 
+
+ 
+ssrTrapsComplianceV10 MODULE-COMPLIANCE
+    STATUS obsolete
+    DESCRIPTION
+            "The compliance statement for the CTRON-SSR-TRAPS-MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { ssrTrapsConfGroupV10 }
+    ::= { ssrTrapsConfGroupV10 1 }
+
+ssrTrapsComplianceV20 MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+            "The compliance statement for the CTRON-SSR-TRAPS-MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { ssrTrapsConfGroupV20 }
+    ::= { ssrTrapsConfGroupV20 1 }
+
+ssrTrapsComplianceV30 MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+            "The compliance statement for the CTRON-SSR-TRAPS-MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { ssrTrapsConfGroupV30 }
+    ::= { ssrTrapsConfGroupV30 1 }
+
+ssrTrapsComplianceV40 MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+            "The compliance statement for the CTRON-SSR-TRAPS-MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { ssrTrapsConfGroupV40 }
+    ::= { ssrTrapsConfGroupV40 1 }
+
+ssrTrapsComplianceV50 MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+            "The compliance statement for the CTRON-SSR-TRAPS-MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { ssrTrapsConfGroupV50 }
+    ::= { ssrTrapsConfGroupV50 1 }
+
+
+
+-- Notification Groups
+
+
+ssrTrapsConfGroupV10  NOTIFICATION-GROUP 
+   NOTIFICATIONS {
+      envPowerSupplyFailed,
+      envPowerSupplyRecovered
+}
+ STATUS obsolete
+ DESCRIPTION
+  "A set of managed objects that make up version 1.0 of the SSR Trap MIB."
+    ::= { ssrTrapsGroups 1 } 
+
+ssrTrapsConfGroupV20  NOTIFICATION-GROUP 
+   NOTIFICATIONS {
+      envPowerSupplyFailed,
+      envPowerSupplyRecovered,
+      envFanFailed,
+      envFanRecovered,
+      envTempExceeded,
+      envTempNormal
+}
+ STATUS deprecated
+ DESCRIPTION
+  "A set of managed objects that make up version 2.0 of the SSR Trap MIB."
+    ::= { ssrTrapsGroups 2 } 
+
+ssrTrapsConfGroupV30  NOTIFICATION-GROUP 
+   NOTIFICATIONS {
+      envPowerSupplyFailed,
+      envPowerSupplyRecovered,
+      envFanFailed,
+      envFanRecovered,
+      envTempExceeded,
+      envTempNormal,
+      envHotSwapIn,
+      envHotSwapOut
+}
+ STATUS deprecated
+ DESCRIPTION
+  "A set of managed objects that make up version 3.0 of the SSR Trap MIB."
+    ::= { ssrTrapsGroups 3 } 
+
+ssrTrapsConfGroupV40  NOTIFICATION-GROUP 
+   NOTIFICATIONS {
+      envPowerSupplyFailed,
+      envPowerSupplyRecovered,
+      envFanFailed,
+      envFanRecovered,
+      envTempExceeded,
+      envTempNormal,
+      envHotSwapIn,
+      envHotSwapOut,
+      envBackupControlModuleOnline,
+      envBackupControlModuleFailure,
+      envLineModuleFailure,
+      envCPUThresholdExceeded
+}
+ STATUS deprecated
+ DESCRIPTION
+  "A set of managed objects that make up version 4.0 of the SSR Trap MIB."
+    ::= { ssrTrapsGroups 4 } 
+
+ssrTrapsConfGroupV50  NOTIFICATION-GROUP 
+   NOTIFICATIONS {
+      envPowerSupplyFailed,
+      envPowerSupplyRecovered,
+      envFanFailed,
+      envFanRecovered,
+      envTempExceeded,
+      envTempNormal,
+      envHotSwapIn,
+      envHotSwapOut,
+      envBackupControlModuleOnline,
+      envBackupControlModuleFailure,
+      envLineModuleFailure,
+      envCPUThresholdExceeded,
+      polAclDenied
+}
+ STATUS current
+ DESCRIPTION
+  "A set of managed objects that make up version 5.0 of the SSR Trap MIB."
+    ::= { ssrTrapsGroups 5 } 
+
+END

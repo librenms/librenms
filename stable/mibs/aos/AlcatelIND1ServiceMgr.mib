@@ -1,0 +1,4316 @@
+
+ALCATEL-IND1-SERVICE-MGR-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Unsigned32, TimeTicks
+			FROM SNMPv2-SMI
+		OBJECT-GROUP, MODULE-COMPLIANCE	        
+			FROM SNMPv2-CONF
+		softentIND1serviceMgr    	
+			FROM ALCATEL-IND1-BASE
+		RowStatus, TEXTUAL-CONVENTION, DisplayString, TruthValue, MacAddress				
+			FROM SNMPv2-TC
+		InterfaceIndex 			
+			FROM IF-MIB
+		AlaEServiceUNIProfileProtocolTreatment	
+			FROM ALCATEL-IND1-E-SERVICE-MIB
+		svcId, SdpId
+			FROM TIMETRA-SERV-MIB
+		sapPortId, sapEncapValue 	
+			FROM TIMETRA-SAP-MIB
+		sdpBindId                       
+			FROM TIMETRA-SDP-MIB
+		TmnxPortID, TmnxEncapVal, TmnxServId, TmnxVcIdOrNone, SdpBindId	
+			FROM TIMETRA-TC-MIB
+		InetAddress, InetAddressType
+			FROM INET-ADDRESS-MIB
+		MplsLdpIdentifier
+			FROM MPLS-LDP-MIB
+		vRtrID
+			FROM TIMETRA-VRTR-MIB
+		;
+		
+
+        alcatelIND1ServiceMgrMIB MODULE-IDENTITY
+		LAST-UPDATED "200901290000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+                "Please consult with Customer Service to ensure the most appropriate
+                version of this document is used with the products in question:
+ 	
+				                   Alcatel-Lucent, Enterprise Solutions Division
+			                    (Formerly Alcatel Internetworking, Incorporated)
+				                         26801 West Agoura Road
+			 	                       Agoura Hills, CA  91301-5122
+			      		                United States Of America
+	
+                Telephone:	    North America	+1 800 995 2696
+				                        Latin America 	+1 877 919 9526
+                                Europe		+31 23 556 0100
+                                Asia		+65 394 7933
+                                All Other	+1 818 878 4507
+	
+                Electronic Mail:	support@ind.alcatel.com
+                World Wide Web:		http://alcatel-lucent.com/wps/portal/enterprise
+                File Transfer Protocol:	ftp://ftp.ind.alcatel.com/pub/products/mibs"
+                DESCRIPTION
+                "The parameters for configuration of the service manager feature.
+
+                The right to make changes in specification and other information
+                contained in this document without prior notice is reserved.
+
+                No liability shall be assumed for any incidental, indirect, special, or
+                consequential damages whatsoever arising from or related to this 
+                document or the information contained herein.
+
+                Vendors, end-users, and other interested parties are granted
+                non-exclusive license to use this specification in connection with 
+                management of the products for which it is intended to be used.
+
+                               Copyright (C) 1995-2006 Alcatel-Lucent
+	                                 ALL RIGHTS RESERVED WORLDWIDE"
+		::= { softentIND1serviceMgr 1}
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+--  Textual Conventions   (alphabetical)
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+AluLocation ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "The data type AluLocation represents the
+         type of the local 'interface':
+         - 'sap(1)': sap interface
+         - 'sdp(2)': mesh-sdp or spoke-sdp interface."
+    SYNTAX  INTEGER {
+                sap(1),
+                sdp(2)
+            }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alcatelIND1ServiceMgrMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Service Manager Managed Objects."
+     	::= { alcatelIND1ServiceMgrMIB 1 }
+
+alcatelIND1ServiceMgrMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Service Manager Conformance Information."
+    	::= { alcatelIND1ServiceMgrMIB 2 }
+
+alcatelIND1ServiceMgrMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Service Manager Units Of Conformance."
+     	::= { alcatelIND1ServiceMgrMIBConformance 1 }
+
+alcatelIND1ServiceMgrMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Service Manager Compliance Statements."
+    	 ::= { alcatelIND1ServiceMgrMIBConformance 2 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  The Service Manager Group 
+
+     alaServiceMgr OBJECT IDENTIFIER ::= { alcatelIND1ServiceMgrMIBObjects 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--   The Service Manager Port Profile Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaServiceMgrPortProfileTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaServiceMgrPortProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains service profiles containing performance and control attributes. 
+        An entry in this table is created when a new service profile is defined."
+        ::= { alaServiceMgr 1 }
+
+alaServiceMgrPortProfileEntry  OBJECT-TYPE
+        SYNTAX  AlaServiceMgrPortProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A Service Manager Port Profile entry."
+        INDEX   { alaServiceMgrPortProfileID }
+        ::= { alaServiceMgrPortProfileTable 1 }
+
+AlaServiceMgrPortProfileEntry ::= SEQUENCE 
+        {
+                alaServiceMgrPortProfileID		        DisplayString, 
+		alaServiceMgrPortProfileStpBpduTreatment	AlaEServiceUNIProfileProtocolTreatment,
+		alaServiceMgrPortProfile8021xTreatment		AlaEServiceUNIProfileProtocolTreatment,
+		alaServiceMgrPortProfile8021ABTreatment		AlaEServiceUNIProfileProtocolTreatment,
+		alaServiceMgrPortProfile8023adTreatment		AlaEServiceUNIProfileProtocolTreatment,
+		alaServiceMgrPortProfileGvrpTreatment		AlaEServiceUNIProfileProtocolTreatment,
+		alaServiceMgrPortProfileAmapTreatment		AlaEServiceUNIProfileProtocolTreatment,
+		alaServiceMgrPortProfileRowStatus               RowStatus,
+		alaServiceMgrPortProfileMvrpTreatment		AlaEServiceUNIProfileProtocolTreatment
+        }
+
+alaServiceMgrPortProfileID OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..31))
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A label given to uniquely identify this port profile. Must be at least one character long."
+        ::= { alaServiceMgrPortProfileEntry 1 }
+
+alaServiceMgrPortProfileStpBpduTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the spanning tree 
+        protocol BPDU received on the Access Port. Tunnel (1) enables the PDU to be tunneled across 
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
+        and not enter the provider network. Peer (3) means that on this port the bridge 
+        is to participate in the protocol.  Currnetly Peer is not supported for Spanning Tree"
+        DEFVAL { tunnel }
+        ::= { alaServiceMgrPortProfileEntry 2 }
+
+alaServiceMgrPortProfile8021xTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the IEEE 802.1x PDU 
+        frames received on the Access Port. Tunnel (1) enables the PDU to be tunneled across 
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
+        and not enter the provider network. Peer (3) means that on this port the bridge 
+        is to participate in the protocol.  Currnetly only drop is supported"
+        DEFVAL { drop }
+        ::= { alaServiceMgrPortProfileEntry 3 }
+
+alaServiceMgrPortProfile8021ABTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the IEEE 802.1AB PDU 
+        frames received on the Access Port. Tunnel (1) enables the PDU to be tunneled across 
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
+        and not enter the provider network. Peer (3) means that on this port the bridge 
+        is to participate in the protocol.  Currently drop and tunnel are supported"
+        DEFVAL { drop }
+        ::= { alaServiceMgrPortProfileEntry 4 }
+
+alaServiceMgrPortProfile8023adTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the IEEE 802.1ad PDU 
+        frames received on the Access Port. Tunnel (1) enables the PDU to be tunneled across 
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
+        and not enter the provider network. Peer (3) means that on this port the bridge 
+        is to participate in the protocol.  Currently peer and drop are supported"
+        DEFVAL { peer }
+        ::= { alaServiceMgrPortProfileEntry 5 }
+
+alaServiceMgrPortProfileGvrpTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the GVRP PDU 
+        frames received on the Access Port. Tunnel (1) enables the PDU to be tunneled across 
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
+        and not enter the provider network. Peer (3) means that on this port the bridge 
+        is to participate in the protocol.  Currently peer is not supported for GVRP"
+        DEFVAL { tunnel }
+        ::= { alaServiceMgrPortProfileEntry 6 }
+
+alaServiceMgrPortProfileAmapTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the Alcatel
+        propietary AMAP PDU frames received on the Access Port. Tunnel (1) enables the PDU to 
+        be tunneled across the provider network.  Discard (2) causes the PDU of the 
+        protocol to be discarded and not enter the provider network. Peer (3) means 
+        that on this port the bridge is to participate in the protocol.  Currently 
+        drop is only supported"
+        DEFVAL { drop }
+        ::= { alaServiceMgrPortProfileEntry 7 }
+
+alaServiceMgrPortProfileRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry."
+        ::= { alaServiceMgrPortProfileEntry 8 }	
+
+alaServiceMgrPortProfileMvrpTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the MVRP PDU 
+        frames received on the Access Port. Tunnel (1) enables the PDU to be tunneled across 
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
+        and not enter the provider network. Peer (3) means that on this port the bridge 
+        is to participate in the protocol.  Currently peer is not supported for MVRP"
+        DEFVAL { tunnel }
+        ::= { alaServiceMgrPortProfileEntry 9 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--   The Service Manager Port Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaServiceMgrPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaServiceMgrPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The port table has an entry for each port."
+        ::= { alaServiceMgr 2 }
+
+alaServiceMgrPortEntry  OBJECT-TYPE
+        SYNTAX  AlaServiceMgrPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A Service Manager Port entry."
+        INDEX   {  alaServiceMgrPortID }
+        ::= { alaServiceMgrPortTable 1 }
+
+AlaServiceMgrPortEntry ::= SEQUENCE 
+        {
+                alaServiceMgrPortID			InterfaceIndex,
+		alaServiceMgrPortMode			INTEGER,
+		alaServiceMgrPortEncapType              INTEGER,
+		alaServiceMgrPortPortProfileID		DisplayString,
+		alaServiceMgrPortRowStatus		RowStatus
+        }
+
+alaServiceMgrPortID OBJECT-TYPE
+        SYNTAX  InterfaceIndex 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+         "IfIndex uniquely identify this port table."
+        ::= { alaServiceMgrPortEntry 1 }
+
+alaServiceMgrPortMode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    undefined (0),
+                    access (1),
+                    network (2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The alaServiceMgrPortMode variable indicates if the interface on this port
+         is configured as a service access port or a network access
+         port.  
+
+         If port mode equals 'access', alaServiceMgrPortEncapType must also
+         be configured to 'qEncap' (For Ethernet MDAs) or to
+         'bcpNullEncap' for Sonet/SDH MDAs.  
+
+         Once the port's operation mode has been configured 
+         for 'access' mode, multiple services may be configured 
+         on the port.  
+
+         If the port mode equals 'network', alaServiceMgrPortEncapType must also
+         be configured to 'nullEncap' (Ethernet MDAs), or 'pppAutoEncap'
+         (Sonet/SDH MDAs) and tmnxPortEncapType is defaulted to those
+         values on the mode change."
+        DEFVAL { 2 }
+        ::= { alaServiceMgrPortEntry 2 }
+
+alaServiceMgrPortEncapType  OBJECT-TYPE
+	SYNTAX      INTEGER {
+		    unknown (0),
+		    nullEncap (1),
+		    qEncap (2)
+		    
+		}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The type of encapsulation protocol configured on this
+         port's network interface.  If alaServiceMgrPortEncapType has a value
+         of 'nullEncap', frames received will not carry any tags
+         or labels and as a result only one service can be
+         configured on this port.  Sometimes this is referred to
+         as raw Ethernet packets. 
+                 
+         If alaServiceMgrPortEncapType has a value of 'qEncap', ingress frames 
+         carry 802.1q tags where each different tag can signify a 
+         different service. This is not a valid value if
+         Port Class has a value of 'sonetPath'. 
+                 
+         If alaServiceMgrPortEncapType has a value of 'bcpNullEncap',
+         Bcp is used on the sonet path as the NCP control protocol.
+         The BCP IEEE 802 Tagged Frame Configuration Option (type 8)
+         is negotiated to 'enabled'.  VLAN tagged frames are
+         allowed into the sonet path.  Only a single SAP can
+         be associated with the sonet path.  'bcpNullEncap' is 
+         valid only if Port Class has a value of 'sonetPath'.
+                 
+         If alaServiceMgrPortEncapType has a value of 'bcpDot1qEncap',
+         BCP is used as the NCP control protocol.  The BCP IEEE 802
+         Tagged Frame Configuration Option (type 8) is negotiated to
+         'enabled'.  VLAN tagged frames are allowed on the sonet path.
+         This encapsulation type is required when multiple SAPs are
+         defined on the sonet path where each one is service
+         delimited by a provisioned Dot1q tag.  When 'bcpDot1qEncap'
+         is specified, BCP does not enter the 'open' state unless
+         the far end peer also supports 'bcpDot1qEncap'.  This allows
+         a LCP negotiation to transmit configuration request and
+         confirmation messages to enable this feature.  'bcpDot1qEncap'
+         is a valid value only if Port Classhas a value of 'sonetPath'.
+ 
+         If alaServiceMgrPortEncapType has a value of 'ipcpEncap',
+         BCP will not be used on this sonet path.  IPCP NCP is used
+         instead.  'ipcpEncap' is a valid only if Port Class has
+         a value of 'sonetPath'.
+         
+         If alaServiceMgrPortEncapType has a value of 'frEncap', Frame Relay is
+         the expected encapsulation.
+
+         If alaServiceMgrPortEncapType has a value of 'pppAutoEncap', IPCP is 
+         automatically enabled. This encap type is only valid on 
+         ports/paths in network mode.
+
+         If alaServiceMgrPortEncapType has a value of 'atmEncap', the encapsulation
+         on the port is ATM. The 'atmEncap' is also used when mirroring
+         ATM ports.
+
+         If alaServiceMgrPortEncapType has a value of 'wanMirrorEncap', the 
+         port is used for mirroring of frame-relay and POS ports. On such 
+         ports no link management protocol would run.
+
+         If alaServiceMgrPortEncapType has a value of 'ciscoHDLCEncap', the Cisco HDLC
+         encapsulation is applied. This encap type is only valid if 
+         Port Class has a value of 'tdm' or 'sonet'.
+         
+         If alaServiceMgrPortEncapType has a value of 'cemEncap', encapsulation of
+         frames will be circuit emulation.  This is used to support transparent
+         transmission of frames.  This encap type is only valid
+         if Port Class has a value of 'tdm' or 'sonet' in access mode.
+
+         alaServiceMgrPortEncapType is set to 'unknown' for physical SONET/SDH and
+         TDM ports.
+         "
+        DEFVAL { 1 }
+        ::= { alaServiceMgrPortEntry 3 }
+
+alaServiceMgrPortPortProfileID OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..31))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "This labels which Port Profile this port matched to."
+        ::= { alaServiceMgrPortEntry 4 }
+
+alaServiceMgrPortRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry."
+        ::= { alaServiceMgrPortEntry 5 }	
+
+-- ---------------------------------------------------------------------
+--  SAP Extra Information Table
+--
+--  This is an extension of the sapBaseInfoTable.
+--
+--  Deletion of a row in the sapBaseInfoTable results in the
+--  same fate for the row in the alaSapExtraInfoTable.
+-- ---------------------------------------------------------------------
+
+alaSapExtraInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ASapExtraInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains SAP information."
+    ::= { alaServiceMgr 3 }
+
+alaSapExtraInfoEntry OBJECT-TYPE
+    SYNTAX          ASapExtraInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about a specific SAP."
+    INDEX           { svcId, sapPortId, sapEncapValue }
+    ::= { alaSapExtraInfoTable 1 }
+
+ASapExtraInfoEntry ::=
+    SEQUENCE {
+        alaSapInfoTrusted      	             INTEGER,
+        alaSapInfoPriority                   INTEGER
+    }
+
+alaSapInfoTrusted  OBJECT-TYPE
+	SYNTAX      INTEGER {
+		    true (1),
+		    false (2)
+		}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+	 "Indicates whether the SAP is trusted.
+         "
+        DEFVAL { false }
+        ::= { alaSapExtraInfoEntry 1 }
+
+alaSapInfoPriority  OBJECT-TYPE
+	SYNTAX      INTEGER (0..7)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+	 "Priority for this SAP.
+         "
+        DEFVAL { 0 }
+        ::= { alaSapExtraInfoEntry 2 }
+
+--
+--  Service IGMP Configuration Table
+--
+
+alaServiceMgrIgmp OBJECT IDENTIFIER ::= { alcatelIND1ServiceMgrMIBObjects 2 }
+
+alaIgmpServiceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpServiceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Service table contains the information on which IPv4 multicast
+         switching and routing is configured."
+    ::= { alaServiceMgrIgmp 1 }
+
+alaIgmpServiceEntry OBJECT-TYPE
+    SYNTAX          IgmpServiceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponds to a service on which IPv4 multicast switching
+         and routing is configured."
+    INDEX         { 
+                    svcId
+                  }
+    ::= { alaIgmpServiceTable 1 }
+
+IgmpServiceEntry ::= SEQUENCE {
+    alaIgmpServiceStatus                     INTEGER,
+    alaIgmpServiceQuerying                   INTEGER,
+    alaIgmpServiceSpoofing                   INTEGER,
+    alaIgmpServiceZapping                    INTEGER,
+    alaIgmpServiceVersion                    Unsigned32,
+    alaIgmpServiceRobustness                 Unsigned32,
+    alaIgmpServiceQueryInterval              Unsigned32,
+    alaIgmpServiceQueryResponseInterval      Unsigned32,
+    alaIgmpServiceLastMemberQueryInterval    Unsigned32,
+    alaIgmpServiceRouterTimeout              Unsigned32,
+    alaIgmpServiceSourceTimeout              Unsigned32,
+    alaIgmpServiceProxying                   INTEGER,
+    alaIgmpServiceUnsolicitedReportInterval  Unsigned32,
+    alaIgmpServiceQuerierForwarding          INTEGER,
+    alaIgmpServiceMaxGroupLimit  		  Unsigned32,
+    alaIgmpServiceMaxGroupExceedAction       INTEGER
+}
+
+
+alaIgmpServiceStatus OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable IPv4 multicast switching and routing 
+         on the Service."
+    ::= { alaIgmpServiceEntry 1 }
+
+alaIgmpServiceQuerying OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable IGMP Querying on the Service."
+    ::= { alaIgmpServiceEntry 2 }
+
+alaIgmpServiceSpoofing OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable IGMP Spoofing on the Service."
+    ::= { alaIgmpServiceEntry 3 }
+
+alaIgmpServiceZapping OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable IGMP Zapping on the Service."
+    ::= { alaIgmpServiceEntry 4 }
+
+alaIgmpServiceVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the default IGMP protocol Version running on the Service."
+    ::= { alaIgmpServiceEntry 5 }
+
+alaIgmpServiceRobustness OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the IGMP Robustness variable used on the Service."
+    ::= { alaIgmpServiceEntry 6 }
+
+alaIgmpServiceQueryInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the IGMP Query Interval used on the Service."
+    ::= { alaIgmpServiceEntry 7 }
+
+alaIgmpServiceQueryResponseInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "tenths of seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the IGMP Query Response Interval on the Service."
+    ::= { alaIgmpServiceEntry 8 }
+
+alaIgmpServiceLastMemberQueryInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "tenths of seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the IGMP Last Member Query Interval on the Service."
+    ::= { alaIgmpServiceEntry 9 }
+
+alaIgmpServiceRouterTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the IGMP Router Timeout on the Service."
+    ::= { alaIgmpServiceEntry 10 }
+
+alaIgmpServiceSourceTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the IGMP Source Timeout on the Service."
+    ::= { alaIgmpServiceEntry 11 }
+
+alaIgmpServiceProxying OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable IGMP Proxying on the Service."
+    ::= { alaIgmpServiceEntry 12 }
+
+alaIgmpServiceUnsolicitedReportInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the IGMP Unsolicited Report Interval on the Service."
+    ::= { alaIgmpServiceEntry 13 }
+
+alaIgmpServiceQuerierForwarding OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable IGMP Querier Forwarding on the Service."
+    ::= { alaIgmpServiceEntry 14 }
+
+alaIgmpServiceMaxGroupLimit OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of IGMP Group memberships that can be learnt on the Service."
+    DEFVAL 		{0}
+    ::= { alaIgmpServiceEntry 15 }
+
+alaIgmpServiceMaxGroupExceedAction OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), drop(1), replace(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The action to be taken when the IGMP group membership limit is exceeded on the Service."
+    DEFVAL        { none }
+    ::= { alaIgmpServiceEntry 16 }
+
+
+--
+--  Service Group Membership Table
+--
+
+
+alaIgmpMemberServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpMemberServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the IGMP group membership information for SAPs."
+    ::= { alaServiceMgrIgmp 2 }
+
+alaIgmpMemberServiceSapEntry OBJECT-TYPE
+    SYNTAX          IgmpMemberServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IGMP group membership request."
+    INDEX         { 
+                    svcId,
+                    sapPortId,
+                    sapEncapValue,
+		    alaIgmpMemberServiceSapGroupAddressType,
+                    alaIgmpMemberServiceSapGroupAddress,
+                    alaIgmpMemberServiceSapSourceAddressType,
+		    alaIgmpMemberServiceSapSourceAddress
+                  }
+    ::= { alaIgmpMemberServiceSapTable 1 }
+
+IgmpMemberServiceSapEntry ::= SEQUENCE {
+    alaIgmpMemberServiceSapGroupAddressType         InetAddressType,
+    alaIgmpMemberServiceSapGroupAddress             InetAddress,
+    alaIgmpMemberServiceSapSourceAddressType        InetAddressType,
+    alaIgmpMemberServiceSapSourceAddress            InetAddress,
+    alaIgmpMemberServiceSapMode                     INTEGER,
+    alaIgmpMemberServiceSapCount                    Counter32,
+    alaIgmpMemberServiceSapTimeout                  TimeTicks
+   
+}
+
+alaIgmpMemberServiceSapGroupAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpMemberServiceSapEntry 1 }
+
+alaIgmpMemberServiceSapGroupAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IPv4 group address."
+    ::= { alaIgmpMemberServiceSapEntry 2 }
+
+alaIgmpMemberServiceSapSourceAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpMemberServiceSapEntry 3 }
+
+alaIgmpMemberServiceSapSourceAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IPv4 source address."
+    ::= { alaIgmpMemberServiceSapEntry 4 }
+
+alaIgmpMemberServiceSapMode OBJECT-TYPE
+    SYNTAX          INTEGER { include(1), exclude(2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IGMP source filter mode."
+    ::= { alaIgmpMemberServiceSapEntry 5 }
+
+alaIgmpMemberServiceSapCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's counter."
+    ::= { alaIgmpMemberServiceSapEntry 6 }
+
+alaIgmpMemberServiceSapTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's timeout."
+    ::= { alaIgmpMemberServiceSapEntry 7}
+
+
+alaIgmpMemberServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpMemberServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the IGMP group membership information for SDP bindings."
+    ::= { alaServiceMgrIgmp 3 }
+
+alaIgmpMemberServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          IgmpMemberServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IGMP group membership request."
+    INDEX         { 
+                    svcId,
+                    sdpBindId,
+		    alaIgmpMemberServiceSdpBindGroupAddressType,
+                    alaIgmpMemberServiceSdpBindGroupAddress,
+                    alaIgmpMemberServiceSdpBindSourceAddressType,
+		    alaIgmpMemberServiceSdpBindSourceAddress
+                  }
+    ::= { alaIgmpMemberServiceSdpBindTable 1 }
+
+IgmpMemberServiceSdpBindEntry ::= SEQUENCE {
+    alaIgmpMemberServiceSdpBindGroupAddressType         InetAddressType,
+    alaIgmpMemberServiceSdpBindGroupAddress             InetAddress,
+    alaIgmpMemberServiceSdpBindSourceAddressType        InetAddressType,
+    alaIgmpMemberServiceSdpBindSourceAddress            InetAddress,
+    alaIgmpMemberServiceSdpBindMode                     INTEGER,
+    alaIgmpMemberServiceSdpBindCount                    Counter32,
+    alaIgmpMemberServiceSdpBindTimeout                  TimeTicks
+}
+
+alaIgmpMemberServiceSdpBindGroupAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpMemberServiceSdpBindEntry 1 }
+
+alaIgmpMemberServiceSdpBindGroupAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IPv4 group address."
+    ::= { alaIgmpMemberServiceSdpBindEntry 2 }
+
+alaIgmpMemberServiceSdpBindSourceAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpMemberServiceSdpBindEntry 3 }
+
+alaIgmpMemberServiceSdpBindSourceAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IPv4 source address."
+    ::= { alaIgmpMemberServiceSdpBindEntry 4 }
+
+alaIgmpMemberServiceSdpBindMode OBJECT-TYPE
+    SYNTAX          INTEGER { include(1), exclude(2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IGMP source filter mode."
+    ::= { alaIgmpMemberServiceSdpBindEntry 5 }
+
+alaIgmpMemberServiceSdpBindCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's counter."
+    ::= { alaIgmpMemberServiceSdpBindEntry 6 }
+
+alaIgmpMemberServiceSdpBindTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's timeout."
+    ::= { alaIgmpMemberServiceSdpBindEntry 7 }
+
+--
+--  Static Group Membership Table
+--
+
+alaIgmpStaticMemberServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpStaticMemberServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sap static IGMP group membership information."
+    ::= { alaServiceMgrIgmp 4 }
+
+alaIgmpStaticMemberServiceSapEntry OBJECT-TYPE
+    SYNTAX          IgmpStaticMemberServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a ervice sap static IGMP group membership request."
+    INDEX         { 
+                    svcId,
+                    sapPortId,
+                    sapEncapValue,
+		    alaIgmpStaticMemberServiceSapGroupAddressType,
+                    alaIgmpStaticMemberServiceSapGroupAddress
+                  }
+    ::= { alaIgmpStaticMemberServiceSapTable 1 }
+
+IgmpStaticMemberServiceSapEntry ::= SEQUENCE {
+    alaIgmpStaticMemberServiceSapGroupAddressType   InetAddressType,
+    alaIgmpStaticMemberServiceSapGroupAddress       InetAddress,
+    alaIgmpStaticMemberServiceSapRowStatus          RowStatus
+}
+
+alaIgmpStaticMemberServiceSapGroupAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpStaticMemberServiceSapEntry 1 }
+
+alaIgmpStaticMemberServiceSapGroupAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The service sap static group membership request's IPv4 group address."
+    ::= { alaIgmpStaticMemberServiceSapEntry 2 }
+
+alaIgmpStaticMemberServiceSapRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaIgmpStaticMemberServiceSapEntry 3}
+
+
+alaIgmpStaticMemberServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpStaticMemberServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sdp binding static IGMP group membership information."
+    ::= { alaServiceMgrIgmp 5 }
+
+alaIgmpStaticMemberServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          IgmpStaticMemberServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a service sdp binding static IGMP group membership request."
+    INDEX         { 
+                    svcId,
+                    sdpBindId,
+		    alaIgmpStaticMemberServiceSdpBindGroupAddressType,
+                    alaIgmpStaticMemberServiceSdpBindGroupAddress
+                  }
+    ::= { alaIgmpStaticMemberServiceSdpBindTable 1 }
+
+IgmpStaticMemberServiceSdpBindEntry ::= SEQUENCE {
+    alaIgmpStaticMemberServiceSdpBindGroupAddressType   InetAddressType,
+    alaIgmpStaticMemberServiceSdpBindGroupAddress       InetAddress,
+    alaIgmpStaticMemberServiceSdpBindRowStatus          RowStatus
+}
+
+alaIgmpStaticMemberServiceSdpBindGroupAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpStaticMemberServiceSdpBindEntry 1 }
+
+alaIgmpStaticMemberServiceSdpBindGroupAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The service sdp binding static group membership request's IPv4 group address."
+    ::= { alaIgmpStaticMemberServiceSdpBindEntry 2 }
+
+alaIgmpStaticMemberServiceSdpBindRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaIgmpStaticMemberServiceSdpBindEntry 3}
+
+
+--
+--  Neighbor Table
+--
+
+alaIgmpNeighborServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpNeighborServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sap neighboring IP multicast routers."
+    ::= { alaServiceMgrIgmp 6 }
+
+alaIgmpNeighborServiceSapEntry OBJECT-TYPE
+    SYNTAX          IgmpNeighborServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast router."
+    INDEX         { 
+		    svcId,
+                    sapPortId,
+                    sapEncapValue,
+		    alaIgmpNeighborServiceSapHostAddressType,
+                    alaIgmpNeighborServiceSapHostAddress
+                  }
+    ::= { alaIgmpNeighborServiceSapTable 1 }
+
+IgmpNeighborServiceSapEntry ::= SEQUENCE {
+    alaIgmpNeighborServiceSapHostAddressType	    InetAddressType,
+    alaIgmpNeighborServiceSapHostAddress            InetAddress,
+    alaIgmpNeighborServiceSapCount                  Counter32,
+    alaIgmpNeighborServiceSapTimeout                TimeTicks
+}
+
+
+alaIgmpNeighborServiceSapHostAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpNeighborServiceSapEntry 1 }
+
+alaIgmpNeighborServiceSapHostAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's IPv4 host address."
+    ::= { alaIgmpNeighborServiceSapEntry 2 }
+
+alaIgmpNeighborServiceSapCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's counter."
+    ::= { alaIgmpNeighborServiceSapEntry 3 }
+
+alaIgmpNeighborServiceSapTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's timeout."
+    ::= { alaIgmpNeighborServiceSapEntry 4 }
+
+alaIgmpNeighborServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpNeighborServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service SdpBind neighboring IP multicast routers."
+    ::= { alaServiceMgrIgmp 7 }
+
+alaIgmpNeighborServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          IgmpNeighborServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast router."
+    INDEX         { 
+		    svcId,
+                    sdpBindId,
+		    alaIgmpNeighborServiceSdpBindHostAddressType,
+                    alaIgmpNeighborServiceSdpBindHostAddress
+                  }
+    ::= { alaIgmpNeighborServiceSdpBindTable 1 }
+
+IgmpNeighborServiceSdpBindEntry ::= SEQUENCE {
+    alaIgmpNeighborServiceSdpBindHostAddressType	InetAddressType,
+    alaIgmpNeighborServiceSdpBindHostAddress            InetAddress,
+    alaIgmpNeighborServiceSdpBindCount                  Counter32,
+    alaIgmpNeighborServiceSdpBindTimeout                TimeTicks
+}
+
+alaIgmpNeighborServiceSdpBindHostAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpNeighborServiceSdpBindEntry 1 }
+
+alaIgmpNeighborServiceSdpBindHostAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's IPv4 host address."
+    ::= { alaIgmpNeighborServiceSdpBindEntry 2 }
+
+alaIgmpNeighborServiceSdpBindCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's counter."
+    ::= { alaIgmpNeighborServiceSdpBindEntry 3 }
+
+alaIgmpNeighborServiceSdpBindTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's timeout."
+    ::= { alaIgmpNeighborServiceSdpBindEntry 4 }
+
+
+--
+--  Static Neighbor Table
+--
+
+
+alaIgmpStaticNeighborServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpStaticNeighborServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sap static IP multicast routers."
+    ::= { alaServiceMgrIgmp 8 }
+
+alaIgmpStaticNeighborServiceSapEntry OBJECT-TYPE
+    SYNTAX          IgmpStaticNeighborServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a service sap static IP multicast router."
+    INDEX         { 
+		    svcId,
+                    sapPortId,
+                    sapEncapValue
+
+                  }
+    ::= { alaIgmpStaticNeighborServiceSapTable 1 }
+
+IgmpStaticNeighborServiceSapEntry ::= SEQUENCE {
+    alaIgmpStaticNeighborServiceSapRowStatus        RowStatus
+}
+
+alaIgmpStaticNeighborServiceSapRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaIgmpStaticNeighborServiceSapEntry 1 }
+
+
+alaIgmpStaticNeighborServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpStaticNeighborServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service SdpBind static IP multicast routers."
+    ::= { alaServiceMgrIgmp 9 }
+
+alaIgmpStaticNeighborServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          IgmpStaticNeighborServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a service SdpBind static IP multicast router."
+    INDEX         { 
+		    svcId,
+                    sdpBindId
+                  }
+    ::= { alaIgmpStaticNeighborServiceSdpBindTable 1 }
+
+IgmpStaticNeighborServiceSdpBindEntry ::= SEQUENCE {
+    alaIgmpStaticNeighborServiceSdpBindRowStatus        RowStatus
+}
+
+alaIgmpStaticNeighborServiceSdpBindRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaIgmpStaticNeighborServiceSdpBindEntry 1 }
+
+
+--
+--  Querier Table
+--
+
+
+alaIgmpQuerierServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpQuerierServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sap neighboring IGMP queriers."
+    ::= { alaServiceMgrIgmp 10 }
+
+alaIgmpQuerierServiceSapEntry OBJECT-TYPE
+    SYNTAX          IgmpQuerierServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IGMP querier."
+    INDEX         { 
+                    svcId,
+                    sapPortId,
+                    sapEncapValue,
+		    alaIgmpQuerierServiceSapHostAddressType,
+                    alaIgmpQuerierServiceSapHostAddress
+                  }
+    ::= { alaIgmpQuerierServiceSapTable 1 }
+
+IgmpQuerierServiceSapEntry ::= SEQUENCE {
+    alaIgmpQuerierServiceSapHostAddressType	    InetAddressType,
+    alaIgmpQuerierServiceSapHostAddress             InetAddress,
+    alaIgmpQuerierServiceSapCount                   Counter32,
+    alaIgmpQuerierServiceSapTimeout                 TimeTicks
+}
+alaIgmpQuerierServiceSapHostAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpQuerierServiceSapEntry 1 }
+
+alaIgmpQuerierServiceSapHostAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IGMP querier's IPv4 host address."
+    ::= { alaIgmpQuerierServiceSapEntry 2 }
+
+alaIgmpQuerierServiceSapCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IGMP querier's counter."
+    ::= { alaIgmpQuerierServiceSapEntry 3 }
+
+alaIgmpQuerierServiceSapTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IGMP querier's timeout."
+    ::= { alaIgmpQuerierServiceSapEntry 4 }
+
+alaIgmpQuerierServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpQuerierServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service SdpBind neighboring IGMP queriers."
+    ::= { alaServiceMgrIgmp 11 }
+
+alaIgmpQuerierServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          IgmpQuerierServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IGMP querier."
+    INDEX         { 
+                   
+		    svcId,
+                    sdpBindId,
+		    alaIgmpQuerierServiceSdpBindHostAddressType,
+                    alaIgmpQuerierServiceSdpBindHostAddress
+                  }
+    ::= { alaIgmpQuerierServiceSdpBindTable 1 }
+
+IgmpQuerierServiceSdpBindEntry ::= SEQUENCE {
+    alaIgmpQuerierServiceSdpBindHostAddressType		InetAddressType,
+    alaIgmpQuerierServiceSdpBindHostAddress             InetAddress,
+    alaIgmpQuerierServiceSdpBindCount                   Counter32,
+    alaIgmpQuerierServiceSdpBindTimeout                 TimeTicks
+}
+
+alaIgmpQuerierServiceSdpBindHostAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpQuerierServiceSdpBindEntry 1 }
+
+alaIgmpQuerierServiceSdpBindHostAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IGMP querier's IPv4 host address."
+    ::= { alaIgmpQuerierServiceSdpBindEntry 2 }
+
+alaIgmpQuerierServiceSdpBindCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IGMP querier's counter."
+    ::= { alaIgmpQuerierServiceSdpBindEntry 3 }
+
+alaIgmpQuerierServiceSdpBindTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IGMP querier's timeout."
+    ::= { alaIgmpQuerierServiceSdpBindEntry 4 }
+
+
+--
+--  Static Querier Table
+--
+
+
+alaIgmpStaticQuerierServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpStaticQuerierServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sap static IGMP queriers."
+    ::= { alaServiceMgrIgmp 12 }
+
+alaIgmpStaticQuerierServiceSapEntry OBJECT-TYPE
+    SYNTAX          IgmpStaticQuerierServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a static IGMP querier."
+    INDEX         { 
+                    svcId,
+                    sapPortId,
+                    sapEncapValue
+                  }
+    ::= { alaIgmpStaticQuerierServiceSapTable 1 }
+
+IgmpStaticQuerierServiceSapEntry ::= SEQUENCE {
+    alaIgmpStaticQuerierServiceSapRowStatus         RowStatus
+}
+
+
+alaIgmpStaticQuerierServiceSapRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaIgmpStaticQuerierServiceSapEntry 1 }
+
+
+alaIgmpStaticQuerierServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpStaticQuerierServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service SdpBind static IGMP queriers."
+    ::= { alaServiceMgrIgmp 13 }
+
+alaIgmpStaticQuerierServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          IgmpStaticQuerierServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a static IGMP querier."
+    INDEX         { 
+                    
+		    svcId,
+                    sdpBindId
+                  }
+    ::= { alaIgmpStaticQuerierServiceSdpBindTable 1 }
+
+IgmpStaticQuerierServiceSdpBindEntry ::= SEQUENCE {
+    alaIgmpStaticQuerierServiceSdpBindRowStatus         RowStatus
+}
+
+
+alaIgmpStaticQuerierServiceSdpBindRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaIgmpStaticQuerierServiceSdpBindEntry 1 }
+
+
+
+--
+--  Source Table
+--
+
+
+alaIgmpServiceSourceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpServiceSourceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the Service IP multicast source information."
+    ::= { alaServiceMgrIgmp 14 }
+
+alaIgmpServiceSourceEntry OBJECT-TYPE
+    SYNTAX          IgmpServiceSourceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast source flow."
+    INDEX         { 
+                    svcId,
+		    alaIgmpServiceSourceGroupAddressType,
+                    alaIgmpServiceSourceGroupAddress,
+                    alaIgmpServiceSourceHostAddressType,
+		    alaIgmpServiceSourceHostAddress,
+                    alaIgmpServiceSourceDestAddressType,
+		    alaIgmpServiceSourceDestAddress,
+                    alaIgmpServiceSourceOrigAddressType,
+		    alaIgmpServiceSourceOrigAddress
+                  }
+    ::= { alaIgmpServiceSourceTable 1 }
+
+IgmpServiceSourceEntry ::= SEQUENCE {
+    alaIgmpServiceSourceGroupAddressType	 InetAddressType,
+    alaIgmpServiceSourceGroupAddress             InetAddress,
+    alaIgmpServiceSourceHostAddressType		 InetAddressType,
+    alaIgmpServiceSourceHostAddress              InetAddress,
+    alaIgmpServiceSourceDestAddressType		 InetAddressType,
+    alaIgmpServiceSourceDestAddress              InetAddress,
+    alaIgmpServiceSourceOrigAddressType		 InetAddressType,
+    alaIgmpServiceSourceOrigAddress              InetAddress,
+    alaIgmpServiceSourceLocale			  AluLocation,
+    alaIgmpServiceSourcePortId                   TmnxPortID,
+    alaIgmpServiceSourceEncapValue               TmnxEncapVal,
+    alaIgmpServiceSourceSdpId                    SdpId,
+    alaIgmpServiceSourceVcId                     TmnxVcIdOrNone,
+    alaIgmpServiceSourceType                     INTEGER
+}
+
+alaIgmpServiceSourceGroupAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpServiceSourceEntry 1 }
+
+alaIgmpServiceSourceGroupAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv4 group address."
+    ::= { alaIgmpServiceSourceEntry 2 }
+
+alaIgmpServiceSourceHostAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpServiceSourceEntry 3 }
+
+alaIgmpServiceSourceHostAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv4 host address."
+    ::= { alaIgmpServiceSourceEntry 4 }
+
+alaIgmpServiceSourceDestAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpServiceSourceEntry 5 }
+
+alaIgmpServiceSourceDestAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv4 tunnel destination address."
+    ::= { alaIgmpServiceSourceEntry 6 }
+
+alaIgmpServiceSourceOrigAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv4."
+        ::= { alaIgmpServiceSourceEntry 7 }
+
+alaIgmpServiceSourceOrigAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv4 tunnel source address."
+    ::= { alaIgmpServiceSourceEntry 8 }
+
+alaIgmpServiceSourceLocale OBJECT-TYPE
+    SYNTAX      AluLocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSourceLocale indicates
+         where this multicast router was detected.
+
+         A multicast router found on a local SAP has the value 'sap(1)'.
+         A multicast router detected on an SDP has the value 'sdp(2)'."
+    ::= { alaIgmpServiceSourceEntry 9 }
+
+alaIgmpServiceSourcePortId OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSourcePortId indicates,
+         together with the object alaIgmpServiceSourceEncapValue, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         tlsIgmpSnpgMRouterLocale is 'sap(1)'."
+    ::= { alaIgmpServiceSourceEntry 10 }
+
+alaIgmpServiceSourceEncapValue OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSourceEncapValue indicates,
+         together with the objectalaIgmpServiceSourcePortId, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaIgmpServiceSourceLocale is 'sap(1)'."
+    ::= { alaIgmpServiceSourceEntry 11 }
+
+alaIgmpServiceSourceSdpId OBJECT-TYPE
+    SYNTAX      SdpId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSourceSdpId indicates,
+         together with the object alaIgmpServiceSourceVcId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaIgmpServiceSourceLocale is 'sdp(2)'."
+    ::= { alaIgmpServiceSourceEntry 12 }
+
+alaIgmpServiceSourceVcId OBJECT-TYPE
+    SYNTAX      TmnxVcIdOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSourceVcId indicates,
+         together with the object alaIgmpServiceSourceSdpId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaIgmpServiceSourceLocale is 'sdp(2)'."
+    ::= { alaIgmpServiceSourceEntry 13 }
+
+alaIgmpServiceSourceType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's encapsulation type."
+    ::= { alaIgmpServiceSourceEntry 14 }
+
+--
+--  Forward Table
+--
+
+alaIgmpServiceSapForwardTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpServiceSapForwardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the IP multicast forward information."
+    ::= { alaServiceMgrIgmp 15 }
+
+alaIgmpServiceSapForwardEntry OBJECT-TYPE
+    SYNTAX          IgmpServiceSapForwardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast forwarded flow."
+    INDEX         { 
+                    svcId,
+                    alaIgmpServiceSapForwardGroupAddress,
+                    alaIgmpServiceSapForwardHostAddress,
+                    alaIgmpServiceSapForwardDestAddress,
+                    alaIgmpServiceSapForwardOrigAddress,
+                    alaIgmpServiceSapForwardNextSapPortId,
+		    alaIgmpServiceSapForwardNextSapEncapValue
+
+                  }
+    ::= { alaIgmpServiceSapForwardTable 1 }
+
+IgmpServiceSapForwardEntry ::= SEQUENCE {
+
+    alaIgmpServiceSapForwardLocale		    AluLocation,
+    alaIgmpServiceSapForwardPortId                  TmnxPortID,
+    alaIgmpServiceSapForwardEncapValue              TmnxEncapVal,
+    alaIgmpServiceSapForwardSdpId                   SdpId,
+    alaIgmpServiceSapForwardVcId                    TmnxVcIdOrNone,
+    alaIgmpServiceSapForwardGroupAddress            MacAddress,
+    alaIgmpServiceSapForwardHostAddress             MacAddress,
+    alaIgmpServiceSapForwardDestAddress             MacAddress,
+    alaIgmpServiceSapForwardOrigAddress             MacAddress,
+    alaIgmpServiceSapForwardType                    INTEGER,
+    alaIgmpServiceSapForwardNextSapPortId           TmnxPortID,
+    alaIgmpServiceSapForwardNextSapEncapValue       TmnxEncapVal,
+    alaIgmpServiceSapForwardNextType                    INTEGER
+
+  
+}
+
+alaIgmpServiceSapForwardLocale OBJECT-TYPE
+    SYNTAX      AluLocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSapForwardLocale indicates
+         where this multicast router was detected.
+
+         A multicast router found on a local SAP has the value 'sap(1)'.
+         A multicast router detected on an SDP has the value 'sdp(2)'."
+    ::= { alaIgmpServiceSapForwardEntry 1 }
+
+alaIgmpServiceSapForwardPortId OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSapForwardPortId indicates,
+         together with the object alaIgmpServiceSapForwardEncapValue, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         tlsIgmpSnpgMRouterLocale is 'sap(1)'."
+    ::= { alaIgmpServiceSapForwardEntry 2 }
+
+alaIgmpServiceSapForwardEncapValue OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSapForwardEncapValue indicates,
+         together with the objectalaIgmpServiceSapForwardPortId, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaIgmpServiceSapForwardLocale is 'sap(1)'."
+    ::= { alaIgmpServiceSapForwardEntry 3 }
+
+alaIgmpServiceSapForwardSdpId OBJECT-TYPE
+    SYNTAX      SdpId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSapForwardSdpId indicates,
+         together with the object alaIgmpServiceSapForwardVcId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaIgmpServiceSapForwardLocale is 'sdp(2)'."
+    ::= { alaIgmpServiceSapForwardEntry 4 }
+
+alaIgmpServiceSapForwardVcId OBJECT-TYPE
+    SYNTAX      TmnxVcIdOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSapForwardVcId indicates,
+         together with the object alaIgmpServiceSapForwardSdpId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaIgmpServiceSapForwardLocale is 'sdp(2)'."
+    ::= { alaIgmpServiceSapForwardEntry 5 }
+
+
+alaIgmpServiceSapForwardGroupAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv4 group address."
+    ::= { alaIgmpServiceSapForwardEntry 6 }
+
+alaIgmpServiceSapForwardHostAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv4 host address."
+    ::= { alaIgmpServiceSapForwardEntry 7 }
+
+alaIgmpServiceSapForwardDestAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv4 tunnel destination address."
+    ::= { alaIgmpServiceSapForwardEntry 8 }
+
+alaIgmpServiceSapForwardOrigAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv4 tunnel source address."
+    ::= { alaIgmpServiceSapForwardEntry 9 }
+
+alaIgmpServiceSapForwardType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's encapsulation type."
+    ::= { alaIgmpServiceSapForwardEntry 10 }
+
+
+alaIgmpServiceSapForwardNextSapPortId OBJECT-TYPE
+    SYNTAX          TmnxPortID
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The IP multicast forwarded flow's next SAP. The ID of the access port where this SAP
+                     is defined."
+    ::= { alaIgmpServiceSapForwardEntry 11 }
+
+alaIgmpServiceSapForwardNextSapEncapValue OBJECT-TYPE
+    SYNTAX          TmnxEncapVal
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The IP multicast forwarded flow's next SAP. The value of the label used to identify this
+                     SAP on the access port specified by sapPortId."
+    ::= { alaIgmpServiceSapForwardEntry 12 }
+
+alaIgmpServiceSapForwardNextType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's next encapsulation type."
+    ::= { alaIgmpServiceSapForwardEntry 13 }
+
+alaIgmpServiceSdpBindForwardTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF IgmpServiceSdpBindForwardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the IP multicast forward information."
+    ::= { alaServiceMgrIgmp 16 }
+
+alaIgmpServiceSdpBindForwardEntry OBJECT-TYPE
+    SYNTAX          IgmpServiceSdpBindForwardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast forwarded flow."
+    INDEX         { 
+                    svcId,
+                    alaIgmpServiceSdpBindForwardGroupAddress,
+                    alaIgmpServiceSdpBindForwardHostAddress,
+                    alaIgmpServiceSdpBindForwardDestAddress,
+                    alaIgmpServiceSdpBindForwardOrigAddress,
+                    alaIgmpServiceSdpBindForwardNextSdpBindId
+
+                  }
+    ::= { alaIgmpServiceSdpBindForwardTable 1 }
+
+IgmpServiceSdpBindForwardEntry ::= SEQUENCE {
+
+    alaIgmpServiceSdpBindForwardLocale		    AluLocation,
+    alaIgmpServiceSdpBindForwardPortId                  TmnxPortID,
+    alaIgmpServiceSdpBindForwardEncapValue              TmnxEncapVal,
+    alaIgmpServiceSdpBindForwardSdpId                   SdpId,
+    alaIgmpServiceSdpBindForwardVcId                    TmnxVcIdOrNone,
+    alaIgmpServiceSdpBindForwardGroupAddress            MacAddress,
+    alaIgmpServiceSdpBindForwardHostAddress             MacAddress,
+    alaIgmpServiceSdpBindForwardDestAddress             MacAddress,
+    alaIgmpServiceSdpBindForwardOrigAddress             MacAddress,
+    alaIgmpServiceSdpBindForwardType                    INTEGER,
+    alaIgmpServiceSdpBindForwardNextSdpBindId          SdpBindId,
+    alaIgmpServiceSdpBindForwardNextType                    INTEGER
+
+  
+}
+
+alaIgmpServiceSdpBindForwardLocale OBJECT-TYPE
+    SYNTAX      AluLocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSdpBindForwardLocale indicates
+         where this multicast router was detected.
+
+         A multicast router found on a local SAP has the value 'sap(1)'.
+         A multicast router detected on an SDP has the value 'sdp(2)'."
+    ::= { alaIgmpServiceSdpBindForwardEntry 1 }
+
+alaIgmpServiceSdpBindForwardPortId OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSdpBindForwardPortId indicates,
+         together with the object alaIgmpServiceSdpBindForwardEncapValue, the SdpBind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         tlsIgmpSnpgMRouterLocale is 'sap(1)'."
+    ::= { alaIgmpServiceSdpBindForwardEntry 2 }
+
+alaIgmpServiceSdpBindForwardEncapValue OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSdpBindForwardEncapValue indicates,
+         together with the object alaIgmpServiceSdpBindForwardPortId, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaIgmpServiceSdpBindForwardLocale is 'sap(1)'."
+    ::= { alaIgmpServiceSdpBindForwardEntry 3 }
+
+alaIgmpServiceSdpBindForwardSdpId OBJECT-TYPE
+    SYNTAX      SdpId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSdpBindForwardSdpId indicates,
+         together with the object alaIgmpServiceSdpBindForwardVcId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaIgmpServiceSdpBindForwardLocale is 'sdp(2)'."
+    ::= { alaIgmpServiceSdpBindForwardEntry 4 }
+
+alaIgmpServiceSdpBindForwardVcId OBJECT-TYPE
+    SYNTAX      TmnxVcIdOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaIgmpServiceSdpBindForwardVcId indicates,
+         together with the object alaIgmpServiceSdpBindForwardSdpId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaIgmpServiceSdpBindForwardLocale is 'sdp(2)'."
+    ::= { alaIgmpServiceSdpBindForwardEntry 5 }
+
+
+alaIgmpServiceSdpBindForwardGroupAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv4 group address."
+    ::= { alaIgmpServiceSdpBindForwardEntry 6 }
+
+alaIgmpServiceSdpBindForwardHostAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv4 host address."
+    ::= { alaIgmpServiceSdpBindForwardEntry 7 }
+
+alaIgmpServiceSdpBindForwardDestAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv4 tunnel destination address."
+    ::= { alaIgmpServiceSdpBindForwardEntry 8 }
+
+alaIgmpServiceSdpBindForwardOrigAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv4 tunnel source address."
+    ::= { alaIgmpServiceSdpBindForwardEntry 9 }
+
+alaIgmpServiceSdpBindForwardType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's encapsulation type."
+    ::= { alaIgmpServiceSdpBindForwardEntry 10 }
+
+
+
+alaIgmpServiceSdpBindForwardNextSdpBindId OBJECT-TYPE
+    SYNTAX          SdpBindId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The IP multicast forwarded flow's next sdpBind."
+    ::= { alaIgmpServiceSdpBindForwardEntry 11 }
+
+
+
+alaIgmpServiceSdpBindForwardNextType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's next encapsulation type."
+    ::= { alaIgmpServiceSdpBindForwardEntry 12 }
+
+
+--
+--  SAP/SDPBIND Table for IP Multicast objects managed per  SAP/SDPBIND 
+--
+		
+alaIgmpServiceSapTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF AlaIgmpServiceSapEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION 
+       "The table listing the IP multicast port information."   
+     ::= { alaServiceMgrIgmp 17 }
+   
+alaIgmpServiceSapEntry OBJECT-TYPE
+     SYNTAX     AlaIgmpServiceSapEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION 
+       "An entry corresponding to IP multicast Service SAP information."
+     INDEX        { 
+		    svcId,
+                    sapPortId,
+                    sapEncapValue
+                  }
+    ::= { alaIgmpServiceSapTable 1 }
+   
+AlaIgmpServiceSapEntry ::=
+     SEQUENCE {
+       alaIgmpServiceSapMaxGroupLimit   		Unsigned32,
+       alaIgmpServiceSapMaxGroupExceedAction    	INTEGER,
+       alaIgmpServiceSapCurrentGroupCount     		Unsigned32
+     }
+ 
+
+alaIgmpServiceSapMaxGroupLimit OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of IGMP Group memberships that can be learnt 
+	on the sap."
+    DEFVAL 		{0}
+    ::= { alaIgmpServiceSapEntry 1 }
+
+alaIgmpServiceSapMaxGroupExceedAction OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), drop(1), replace(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The action to be taken when IGMP group membership limit is 
+	exceeded for the sap."
+    DEFVAL        { none }
+    ::= { alaIgmpServiceSapEntry 2 }
+
+
+alaIgmpServiceSapCurrentGroupCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current IP multicast group memberships on a sap. 
+	instance."
+    ::= { alaIgmpServiceSapEntry 3 }
+
+alaIgmpServiceSdpBindTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF AlaIgmpServiceSdpBindEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION 
+       "The table listing the IP multicast port information."   
+     ::= { alaServiceMgrIgmp 18 }
+   
+alaIgmpServiceSdpBindEntry OBJECT-TYPE
+     SYNTAX     AlaIgmpServiceSdpBindEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION 
+       "An entry corresponding to IP multicast Service SdpBind information."
+     INDEX        { 
+		    svcId,
+                    sdpBindId
+                  }
+    ::= { alaIgmpServiceSdpBindTable 1 }
+   
+AlaIgmpServiceSdpBindEntry ::=
+     SEQUENCE {
+       alaIgmpServiceSdpBindMaxGroupLimit   		Unsigned32,
+       alaIgmpServiceSdpBindMaxGroupExceedAction    	INTEGER,
+       alaIgmpServiceSdpBindCurrentGroupCount     		Unsigned32
+     }
+ 
+
+alaIgmpServiceSdpBindMaxGroupLimit OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of IGMP Group memberships that can be learnt 
+	on the SdpBind."
+    DEFVAL 		{0}
+    ::= { alaIgmpServiceSdpBindEntry 1 }
+
+alaIgmpServiceSdpBindMaxGroupExceedAction OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), drop(1), replace(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The action to be taken when IGMP group membership limit is 
+	exceeded for the SdpBind."
+    DEFVAL        { none }
+    ::= { alaIgmpServiceSdpBindEntry 2 }
+
+alaIgmpServiceSdpBindCurrentGroupCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current IP multicast group memberships on a SdpBind. 
+	instance."
+    ::= { alaIgmpServiceSdpBindEntry 3 }
+
+--
+--  Service MLD Configuration Table
+--
+
+alaServiceMgrMld OBJECT IDENTIFIER ::= { alcatelIND1ServiceMgrMIBObjects 3 }
+
+alaMldServiceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldServiceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Service table contains the information on which IPv6 multicast
+         switching and routing is configured."
+    ::= { alaServiceMgrMld 1 }
+
+alaMldServiceEntry OBJECT-TYPE
+    SYNTAX          MldServiceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponds to a service on which IPv6 multicast switching
+         and routing is configured."
+    INDEX         { 
+                    svcId
+                  }
+    ::= { alaMldServiceTable 1 }
+
+MldServiceEntry ::= SEQUENCE {
+    alaMldServiceStatus                     INTEGER,
+    alaMldServiceQuerying                   INTEGER,
+    alaMldServiceSpoofing                   INTEGER,
+    alaMldServiceZapping                    INTEGER,
+    alaMldServiceVersion                    Unsigned32,
+    alaMldServiceRobustness                 Unsigned32,
+    alaMldServiceQueryInterval              Unsigned32,
+    alaMldServiceQueryResponseInterval      Unsigned32,
+    alaMldServiceLastMemberQueryInterval    Unsigned32,
+    alaMldServiceRouterTimeout              Unsigned32,
+    alaMldServiceSourceTimeout              Unsigned32,
+    alaMldServiceProxying                   INTEGER,
+    alaMldServiceUnsolicitedReportInterval  Unsigned32,
+    alaMldServiceQuerierForwarding          INTEGER,
+    alaMldServiceMaxGroupLimit  		  Unsigned32,
+    alaMldServiceMaxGroupExceedAction       INTEGER
+}
+
+
+alaMldServiceStatus OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable IPv6 multicast switching and routing 
+         on the Service."
+    ::= { alaMldServiceEntry 1 }
+
+alaMldServiceQuerying OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Querying on the Service."
+    ::= { alaMldServiceEntry 2 }
+
+alaMldServiceSpoofing OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Spoofing on the Service."
+    ::= { alaMldServiceEntry 3 }
+
+alaMldServiceZapping OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Zapping on the Service."
+    ::= { alaMldServiceEntry 4 }
+
+alaMldServiceVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the default MLD protocol Version running on the Service."
+    ::= { alaMldServiceEntry 5 }
+
+alaMldServiceRobustness OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Robustness variable used on the Service."
+    ::= { alaMldServiceEntry 6 }
+
+alaMldServiceQueryInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Query Interval used on the Service."
+    ::= { alaMldServiceEntry 7 }
+
+alaMldServiceQueryResponseInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "tenths of seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Query Response Interval on the Service."
+    ::= { alaMldServiceEntry 8 }
+
+alaMldServiceLastMemberQueryInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "tenths of seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Last Member Query Interval on the Service."
+    ::= { alaMldServiceEntry 9 }
+
+alaMldServiceRouterTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Router Timeout on the Service."
+    ::= { alaMldServiceEntry 10 }
+
+alaMldServiceSourceTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Source Timeout on the Service."
+    ::= { alaMldServiceEntry 11 }
+
+alaMldServiceProxying OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Proxying on the Service."
+    ::= { alaMldServiceEntry 12 }
+
+alaMldServiceUnsolicitedReportInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Unsolicited Report Interval on the Service."
+    ::= { alaMldServiceEntry 13 }
+
+alaMldServiceQuerierForwarding OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Querier Forwarding on the Service."
+    ::= { alaMldServiceEntry 14 }
+
+alaMldServiceMaxGroupLimit OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of MLD Group memberships that can be learnt on the Service."
+    DEFVAL 		{0}
+    ::= { alaMldServiceEntry 15 }
+
+alaMldServiceMaxGroupExceedAction OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), drop(1), replace(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The action to be taken when the MLD group membership limit is exceeded on the Service."
+    DEFVAL        { none }
+    ::= { alaMldServiceEntry 16 }
+
+
+--
+--  Service Group Membership Table
+--
+
+
+alaMldMemberServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldMemberServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the MLD group membership information for SAPs."
+    ::= { alaServiceMgrMld 2 }
+
+alaMldMemberServiceSapEntry OBJECT-TYPE
+    SYNTAX          MldMemberServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an MLD group membership request."
+    INDEX         { 
+                    svcId,
+                    sapPortId,
+                    sapEncapValue,
+		    alaMldMemberServiceSapGroupAddressType,
+                    alaMldMemberServiceSapGroupAddress,
+                    alaMldMemberServiceSapSourceAddressType,
+		    alaMldMemberServiceSapSourceAddress
+                  }
+    ::= { alaMldMemberServiceSapTable 1 }
+
+MldMemberServiceSapEntry ::= SEQUENCE {
+    alaMldMemberServiceSapGroupAddressType         InetAddressType,
+    alaMldMemberServiceSapGroupAddress             InetAddress,
+    alaMldMemberServiceSapSourceAddressType        InetAddressType,
+    alaMldMemberServiceSapSourceAddress            InetAddress,
+    alaMldMemberServiceSapMode                     INTEGER,
+    alaMldMemberServiceSapCount                    Counter32,
+    alaMldMemberServiceSapTimeout                  TimeTicks
+}
+
+alaMldMemberServiceSapGroupAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldMemberServiceSapEntry 1 }
+
+alaMldMemberServiceSapGroupAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IPv6 group address."
+    ::= { alaMldMemberServiceSapEntry 2 }
+
+alaMldMemberServiceSapSourceAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldMemberServiceSapEntry 3 }
+
+alaMldMemberServiceSapSourceAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IPv6 source address."
+    ::= { alaMldMemberServiceSapEntry 4 }
+
+alaMldMemberServiceSapMode OBJECT-TYPE
+    SYNTAX          INTEGER { include(1), exclude(2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's MLD source filter mode."
+    ::= { alaMldMemberServiceSapEntry 5 }
+
+alaMldMemberServiceSapCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's counter."
+    ::= { alaMldMemberServiceSapEntry 6 }
+
+alaMldMemberServiceSapTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's timeout."
+    ::= { alaMldMemberServiceSapEntry 7 }
+
+
+alaMldMemberServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldMemberServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the MLD group membership information for SDP bindings."
+    ::= { alaServiceMgrMld 3 }
+
+alaMldMemberServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          MldMemberServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an MLD group membership request."
+    INDEX         { 
+                    svcId,
+                    sdpBindId,
+		    alaMldMemberServiceSdpBindGroupAddressType,
+                    alaMldMemberServiceSdpBindGroupAddress,
+                    alaMldMemberServiceSdpBindSourceAddressType,
+		    alaMldMemberServiceSdpBindSourceAddress
+                  }
+    ::= { alaMldMemberServiceSdpBindTable 1 }
+
+MldMemberServiceSdpBindEntry ::= SEQUENCE {
+    alaMldMemberServiceSdpBindGroupAddressType         InetAddressType,
+    alaMldMemberServiceSdpBindGroupAddress             InetAddress,
+    alaMldMemberServiceSdpBindSourceAddressType        InetAddressType,
+    alaMldMemberServiceSdpBindSourceAddress            InetAddress,
+    alaMldMemberServiceSdpBindMode                     INTEGER,
+    alaMldMemberServiceSdpBindCount                    Counter32,
+    alaMldMemberServiceSdpBindTimeout                  TimeTicks
+}
+
+alaMldMemberServiceSdpBindGroupAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldMemberServiceSdpBindEntry 1 }
+
+alaMldMemberServiceSdpBindGroupAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IPv6 group address."
+    ::= { alaMldMemberServiceSdpBindEntry 2 }
+
+alaMldMemberServiceSdpBindSourceAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldMemberServiceSdpBindEntry 3 }
+
+alaMldMemberServiceSdpBindSourceAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IPv6 source address."
+    ::= { alaMldMemberServiceSdpBindEntry 4 }
+
+alaMldMemberServiceSdpBindMode OBJECT-TYPE
+    SYNTAX          INTEGER { include(1), exclude(2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's MLD source filter mode."
+    ::= { alaMldMemberServiceSdpBindEntry 5 }
+
+alaMldMemberServiceSdpBindCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's counter."
+    ::= { alaMldMemberServiceSdpBindEntry 6 }
+
+alaMldMemberServiceSdpBindTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's timeout."
+    ::= { alaMldMemberServiceSdpBindEntry 7 }
+
+--
+--  Static Group Membership Table
+--
+
+alaMldStaticMemberServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldStaticMemberServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sap static MLD group membership information."
+    ::= { alaServiceMgrMld 4 }
+
+alaMldStaticMemberServiceSapEntry OBJECT-TYPE
+    SYNTAX          MldStaticMemberServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a ervice sap static MLD group membership request."
+    INDEX         { 
+                    svcId,
+                    sapPortId,
+                    sapEncapValue,
+		    alaMldStaticMemberServiceSapGroupAddressType,
+                    alaMldStaticMemberServiceSapGroupAddress
+                  }
+    ::= { alaMldStaticMemberServiceSapTable 1 }
+
+MldStaticMemberServiceSapEntry ::= SEQUENCE {
+    alaMldStaticMemberServiceSapGroupAddressType   InetAddressType,
+    alaMldStaticMemberServiceSapGroupAddress       InetAddress,
+    alaMldStaticMemberServiceSapRowStatus          RowStatus
+}
+
+alaMldStaticMemberServiceSapGroupAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldStaticMemberServiceSapEntry 1 }
+
+alaMldStaticMemberServiceSapGroupAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The service sap static group membership request's IPv6 group address."
+    ::= { alaMldStaticMemberServiceSapEntry 2 }
+
+alaMldStaticMemberServiceSapRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaMldStaticMemberServiceSapEntry 3}
+
+
+alaMldStaticMemberServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldStaticMemberServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sdp binding static MLD group membership information."
+    ::= { alaServiceMgrMld 5 }
+
+alaMldStaticMemberServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          MldStaticMemberServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a service sdp binding static MLD group membership request."
+    INDEX         { 
+                    svcId,
+                    sdpBindId,
+		    alaMldStaticMemberServiceSapGroupAddressType,
+                    alaMldStaticMemberServiceSapGroupAddress
+                  }
+    ::= { alaMldStaticMemberServiceSdpBindTable 1 }
+
+MldStaticMemberServiceSdpBindEntry ::= SEQUENCE {
+    alaMldStaticMemberServiceSdpBindGroupAddressType   InetAddressType,
+    alaMldStaticMemberServiceSdpBindGroupAddress       InetAddress,
+    alaMldStaticMemberServiceSdpBindRowStatus          RowStatus
+}
+
+alaMldStaticMemberServiceSdpBindGroupAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldStaticMemberServiceSdpBindEntry 1 }
+
+alaMldStaticMemberServiceSdpBindGroupAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The service sdp binding static group membership request's IPv6 group address."
+    ::= { alaMldStaticMemberServiceSdpBindEntry 2 }
+
+alaMldStaticMemberServiceSdpBindRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaMldStaticMemberServiceSdpBindEntry 3}
+
+
+--
+--  Neighbor Table
+--
+
+alaMldNeighborServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldNeighborServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sap neighboring IP multicast routers."
+    ::= { alaServiceMgrMld 6 }
+
+alaMldNeighborServiceSapEntry OBJECT-TYPE
+    SYNTAX          MldNeighborServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast router."
+    INDEX         { 
+		    svcId,
+                    sapPortId,
+                    sapEncapValue,
+		    alaMldNeighborServiceSapHostAddressType,
+                    alaMldNeighborServiceSapHostAddress
+                  }
+    ::= { alaMldNeighborServiceSapTable 1 }
+
+MldNeighborServiceSapEntry ::= SEQUENCE {
+    alaMldNeighborServiceSapHostAddressType        InetAddressType,
+    alaMldNeighborServiceSapHostAddress            InetAddress,
+    alaMldNeighborServiceSapCount                  Counter32,
+    alaMldNeighborServiceSapTimeout                TimeTicks
+}
+
+alaMldNeighborServiceSapHostAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldNeighborServiceSapEntry 1 }
+
+alaMldNeighborServiceSapHostAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's IPv6 host address."
+    ::= { alaMldNeighborServiceSapEntry 2 }
+
+alaMldNeighborServiceSapCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's counter."
+    ::= { alaMldNeighborServiceSapEntry 3 }
+
+alaMldNeighborServiceSapTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's timeout."
+    ::= { alaMldNeighborServiceSapEntry 4 }
+
+alaMldNeighborServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldNeighborServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service SdpBind neighboring IP multicast routers."
+    ::= { alaServiceMgrMld 7 }
+
+alaMldNeighborServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          MldNeighborServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast router."
+    INDEX         { 
+		    svcId,
+                    sdpBindId,
+		    alaMldNeighborServiceSdpBindHostAddressType,
+                    alaMldNeighborServiceSdpBindHostAddress
+                  }
+    ::= { alaMldNeighborServiceSdpBindTable 1 }
+
+MldNeighborServiceSdpBindEntry ::= SEQUENCE {
+    alaMldNeighborServiceSdpBindHostAddressType        InetAddressType,
+    alaMldNeighborServiceSdpBindHostAddress            InetAddress,
+    alaMldNeighborServiceSdpBindCount                  Counter32,
+    alaMldNeighborServiceSdpBindTimeout                TimeTicks
+}
+
+
+alaMldNeighborServiceSdpBindHostAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldNeighborServiceSdpBindEntry 1 }
+
+alaMldNeighborServiceSdpBindHostAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's IPv6 host address."
+    ::= { alaMldNeighborServiceSdpBindEntry 2 }
+
+alaMldNeighborServiceSdpBindCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's counter."
+    ::= { alaMldNeighborServiceSdpBindEntry 3 }
+
+alaMldNeighborServiceSdpBindTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's timeout."
+    ::= { alaMldNeighborServiceSdpBindEntry 4 }
+
+
+--
+--  Static Neighbor Table
+--
+
+
+alaMldStaticNeighborServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldStaticNeighborServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sap static IP multicast routers."
+    ::= { alaServiceMgrMld 8 }
+
+alaMldStaticNeighborServiceSapEntry OBJECT-TYPE
+    SYNTAX          MldStaticNeighborServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a service sap static IP multicast router."
+    INDEX         { 
+		    svcId,
+                    sapPortId,
+                    sapEncapValue
+
+                  }
+    ::= { alaMldStaticNeighborServiceSapTable 1 }
+
+MldStaticNeighborServiceSapEntry ::= SEQUENCE {
+    alaMldStaticNeighborServiceSapRowStatus        RowStatus
+}
+
+alaMldStaticNeighborServiceSapRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaMldStaticNeighborServiceSapEntry 1 }
+
+
+alaMldStaticNeighborServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldStaticNeighborServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service SdpBind static IP multicast routers."
+    ::= { alaServiceMgrMld 9 }
+
+alaMldStaticNeighborServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          MldStaticNeighborServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a service SdpBind static IP multicast router."
+    INDEX         { 
+		    svcId,
+                    sdpBindId
+                  }
+    ::= { alaMldStaticNeighborServiceSdpBindTable 1 }
+
+MldStaticNeighborServiceSdpBindEntry ::= SEQUENCE {
+    alaMldStaticNeighborServiceSdpBindRowStatus        RowStatus
+}
+
+alaMldStaticNeighborServiceSdpBindRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaMldStaticNeighborServiceSdpBindEntry 1 }
+
+
+--
+--  Querier Table
+--
+
+
+alaMldQuerierServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldQuerierServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sap neighboring MLD queriers."
+    ::= { alaServiceMgrMld 10 }
+
+alaMldQuerierServiceSapEntry OBJECT-TYPE
+    SYNTAX          MldQuerierServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an MLD querier."
+    INDEX         { 
+                    svcId,
+                    sapPortId,
+                    sapEncapValue,
+		    alaMldQuerierServiceSapHostAddressType,
+                    alaMldQuerierServiceSapHostAddress
+                  }
+    ::= { alaMldQuerierServiceSapTable 1 }
+
+MldQuerierServiceSapEntry ::= SEQUENCE {
+    alaMldQuerierServiceSapHostAddressType         InetAddressType,
+    alaMldQuerierServiceSapHostAddress             InetAddress,
+    alaMldQuerierServiceSapCount                   Counter32,
+    alaMldQuerierServiceSapTimeout                 TimeTicks
+}
+
+alaMldQuerierServiceSapHostAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldQuerierServiceSapEntry 1 }
+
+alaMldQuerierServiceSapHostAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MLD querier's IPv6 host address."
+    ::= { alaMldQuerierServiceSapEntry 2 }
+
+alaMldQuerierServiceSapCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The MLD querier's counter."
+    ::= { alaMldQuerierServiceSapEntry 3 }
+
+alaMldQuerierServiceSapTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The MLD querier's timeout."
+    ::= { alaMldQuerierServiceSapEntry 4 }
+
+alaMldQuerierServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldQuerierServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service SdpBind neighboring MLD queriers."
+    ::= { alaServiceMgrMld 11 }
+
+alaMldQuerierServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          MldQuerierServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an MLD querier."
+    INDEX         { 
+                   
+		    svcId,
+                    sdpBindId,
+		    alaMldQuerierServiceSdpBindHostAddressType,
+                    alaMldQuerierServiceSdpBindHostAddress
+                  }
+    ::= { alaMldQuerierServiceSdpBindTable 1 }
+
+MldQuerierServiceSdpBindEntry ::= SEQUENCE {
+    alaMldQuerierServiceSdpBindHostAddressType         InetAddressType,
+    alaMldQuerierServiceSdpBindHostAddress             InetAddress,
+    alaMldQuerierServiceSdpBindCount                   Counter32,
+    alaMldQuerierServiceSdpBindTimeout                 TimeTicks
+}
+
+alaMldQuerierServiceSdpBindHostAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldQuerierServiceSdpBindEntry 1 }
+
+alaMldQuerierServiceSdpBindHostAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MLD querier's IPv6 host address."
+    ::= { alaMldQuerierServiceSdpBindEntry 2 }
+
+alaMldQuerierServiceSdpBindCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The MLD querier's counter."
+    ::= { alaMldQuerierServiceSdpBindEntry 3 }
+
+alaMldQuerierServiceSdpBindTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The MLD querier's timeout."
+    ::= { alaMldQuerierServiceSdpBindEntry 4 }
+
+
+--
+--  Static Querier Table
+--
+
+
+alaMldStaticQuerierServiceSapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldStaticQuerierServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service sap static MLD queriers."
+    ::= { alaServiceMgrMld 12 }
+
+alaMldStaticQuerierServiceSapEntry OBJECT-TYPE
+    SYNTAX          MldStaticQuerierServiceSapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a static MLD querier."
+    INDEX         { 
+                    svcId,
+                    sapPortId,
+                    sapEncapValue
+                  }
+    ::= { alaMldStaticQuerierServiceSapTable 1 }
+
+MldStaticQuerierServiceSapEntry ::= SEQUENCE {
+    alaMldStaticQuerierServiceSapRowStatus         RowStatus
+}
+
+
+alaMldStaticQuerierServiceSapRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaMldStaticQuerierServiceSapEntry 1 }
+
+
+alaMldStaticQuerierServiceSdpBindTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldStaticQuerierServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the service SdpBind static MLD queriers."
+    ::= { alaServiceMgrMld 13 }
+
+alaMldStaticQuerierServiceSdpBindEntry OBJECT-TYPE
+    SYNTAX          MldStaticQuerierServiceSdpBindEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a static MLD querier."
+    INDEX         { 
+                    
+		    svcId,
+                    sdpBindId
+                  }
+    ::= { alaMldStaticQuerierServiceSdpBindTable 1 }
+
+MldStaticQuerierServiceSdpBindEntry ::= SEQUENCE {
+    alaMldStaticQuerierServiceSdpBindRowStatus         RowStatus
+}
+
+
+alaMldStaticQuerierServiceSdpBindRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaMldStaticQuerierServiceSdpBindEntry 1 }
+
+
+
+--
+--  Source Table
+--
+
+
+alaMldServiceSourceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldServiceSourceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the Service IP multicast source information."
+    ::= { alaServiceMgrMld 14 }
+
+alaMldServiceSourceEntry OBJECT-TYPE
+    SYNTAX          MldServiceSourceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast source flow."
+    INDEX         { 
+                    svcId,
+		    alaMldServiceSourceGroupAddressType,
+                    alaMldServiceSourceGroupAddress,
+		    alaMldServiceSourceHostAddressType,
+                    alaMldServiceSourceHostAddress,
+		    alaMldServiceSourceDestAddressType,
+                    alaMldServiceSourceDestAddress,
+		    alaMldServiceSourceOrigAddressType,
+                    alaMldServiceSourceOrigAddress
+                  }
+    ::= { alaMldServiceSourceTable 1 }
+
+MldServiceSourceEntry ::= SEQUENCE {
+    alaMldServiceSourceGroupAddressType         InetAddressType,
+    alaMldServiceSourceGroupAddress             InetAddress,
+    alaMldServiceSourceHostAddressType          InetAddressType,
+    alaMldServiceSourceHostAddress              InetAddress,
+    alaMldServiceSourceDestAddressType          InetAddressType,
+    alaMldServiceSourceDestAddress              InetAddress,
+    alaMldServiceSourceOrigAddressType          InetAddressType,
+    alaMldServiceSourceOrigAddress              InetAddress,
+    alaMldServiceSourceLocale			  AluLocation,
+    alaMldServiceSourcePortId                   TmnxPortID,
+    alaMldServiceSourceEncapValue               TmnxEncapVal,
+    alaMldServiceSourceSdpId                    SdpId,
+    alaMldServiceSourceVcId                     TmnxVcIdOrNone,
+    alaMldServiceSourceType                     INTEGER
+}
+
+
+alaMldServiceSourceGroupAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldServiceSourceEntry 1 }
+
+alaMldServiceSourceGroupAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv6 group address."
+    ::= { alaMldServiceSourceEntry 2 }
+
+alaMldServiceSourceHostAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldServiceSourceEntry 3 }
+
+alaMldServiceSourceHostAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv6 host address."
+    ::= { alaMldServiceSourceEntry 4 }
+
+alaMldServiceSourceDestAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldServiceSourceEntry 5 }
+
+alaMldServiceSourceDestAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv6 tunnel destination address."
+    ::= { alaMldServiceSourceEntry 6 }
+
+alaMldServiceSourceOrigAddressType OBJECT-TYPE
+        SYNTAX InetAddressType (2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The IP address type. This release only supports IPv6."
+        ::= { alaMldServiceSourceEntry 7 }
+
+alaMldServiceSourceOrigAddress OBJECT-TYPE
+    SYNTAX       InetAddress(SIZE(4|16))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv6 tunnel source address."
+    ::= { alaMldServiceSourceEntry 8 }
+
+alaMldServiceSourceLocale OBJECT-TYPE
+    SYNTAX      AluLocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSourceLocale indicates
+         where this multicast router was detected.
+
+         A multicast router found on a local SAP has the value 'sap(1)'.
+         A multicast router detected on an SDP has the value 'sdp(2)'."
+    ::= { alaMldServiceSourceEntry 9 }
+
+alaMldServiceSourcePortId OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSourcePortId indicates,
+         together with the object alaMldServiceSourceEncapValue, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         tlsMldSnpgMRouterLocale is 'sap(1)'."
+    ::= { alaMldServiceSourceEntry 10 }
+
+alaMldServiceSourceEncapValue OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSourceEncapValue indicates,
+         together with the objectalaMldServiceSourcePortId, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaMldServiceSourceLocale is 'sap(1)'."
+    ::= { alaMldServiceSourceEntry 11 }
+
+alaMldServiceSourceSdpId OBJECT-TYPE
+    SYNTAX      SdpId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSourceSdpId indicates,
+         together with the object alaMldServiceSourceVcId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaMldServiceSourceLocale is 'sdp(2)'."
+    ::= { alaMldServiceSourceEntry 12 }
+
+alaMldServiceSourceVcId OBJECT-TYPE
+    SYNTAX      TmnxVcIdOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSourceVcId indicates,
+         together with the object alaMldServiceSourceSdpId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaMldServiceSourceLocale is 'sdp(2)'."
+    ::= { alaMldServiceSourceEntry 13 }
+
+alaMldServiceSourceType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's encapsulation type."
+    ::= { alaMldServiceSourceEntry 14 }
+
+--
+--  Forward Table
+--
+
+alaMldServiceSapForwardTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldServiceSapForwardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the IP multicast forward information."
+    ::= { alaServiceMgrMld 15 }
+
+alaMldServiceSapForwardEntry OBJECT-TYPE
+    SYNTAX          MldServiceSapForwardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast forwarded flow."
+    INDEX         { 
+                    svcId,
+                    alaMldServiceSapForwardGroupAddress,
+                    alaMldServiceSapForwardHostAddress,
+                    alaMldServiceSapForwardDestAddress,
+                    alaMldServiceSapForwardOrigAddress,
+                    alaMldServiceSapForwardNextSapPortId,
+		    alaMldServiceSapForwardNextSapEncapValue
+
+                  }
+    ::= { alaMldServiceSapForwardTable 1 }
+
+MldServiceSapForwardEntry ::= SEQUENCE {
+
+    alaMldServiceSapForwardLocale		    AluLocation,
+    alaMldServiceSapForwardPortId                  TmnxPortID,
+    alaMldServiceSapForwardEncapValue              TmnxEncapVal,
+    alaMldServiceSapForwardSdpId                   SdpId,
+    alaMldServiceSapForwardVcId                    TmnxVcIdOrNone,
+    alaMldServiceSapForwardGroupAddress            MacAddress,
+    alaMldServiceSapForwardHostAddress             MacAddress,
+    alaMldServiceSapForwardDestAddress             MacAddress,
+    alaMldServiceSapForwardOrigAddress             MacAddress,
+    alaMldServiceSapForwardType                    INTEGER,
+    alaMldServiceSapForwardNextSapPortId           TmnxPortID,
+    alaMldServiceSapForwardNextSapEncapValue       TmnxEncapVal,
+    alaMldServiceSapForwardNextType                    INTEGER
+
+  
+}
+
+alaMldServiceSapForwardLocale OBJECT-TYPE
+    SYNTAX      AluLocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSapForwardLocale indicates
+         where this multicast router was detected.
+
+         A multicast router found on a local SAP has the value 'sap(1)'.
+         A multicast router detected on an SDP has the value 'sdp(2)'."
+    ::= { alaMldServiceSapForwardEntry 1 }
+
+alaMldServiceSapForwardPortId OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSapForwardPortId indicates,
+         together with the object alaMldServiceSapForwardEncapValue, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         tlsMldSnpgMRouterLocale is 'sap(1)'."
+    ::= { alaMldServiceSapForwardEntry 2 }
+
+alaMldServiceSapForwardEncapValue OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSapForwardEncapValue indicates,
+         together with the objectalaMldServiceSapForwardPortId, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaMldServiceSapForwardLocale is 'sap(1)'."
+    ::= { alaMldServiceSapForwardEntry 3 }
+
+alaMldServiceSapForwardSdpId OBJECT-TYPE
+    SYNTAX      SdpId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSapForwardSdpId indicates,
+         together with the object alaMldServiceSapForwardVcId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaMldServiceSapForwardLocale is 'sdp(2)'."
+    ::= { alaMldServiceSapForwardEntry 4 }
+
+alaMldServiceSapForwardVcId OBJECT-TYPE
+    SYNTAX      TmnxVcIdOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSapForwardVcId indicates,
+         together with the object alaMldServiceSapForwardSdpId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaMldServiceSapForwardLocale is 'sdp(2)'."
+    ::= { alaMldServiceSapForwardEntry 5 }
+
+
+alaMldServiceSapForwardGroupAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 group address."
+    ::= { alaMldServiceSapForwardEntry 6 }
+
+alaMldServiceSapForwardHostAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 host address."
+    ::= { alaMldServiceSapForwardEntry 7 }
+
+alaMldServiceSapForwardDestAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 tunnel destination address."
+    ::= { alaMldServiceSapForwardEntry 8 }
+
+alaMldServiceSapForwardOrigAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 tunnel source address."
+    ::= { alaMldServiceSapForwardEntry 9 }
+
+alaMldServiceSapForwardType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's encapsulation type."
+    ::= { alaMldServiceSapForwardEntry 10 }
+
+
+alaMldServiceSapForwardNextSapPortId OBJECT-TYPE
+    SYNTAX          TmnxPortID
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The IP multicast forwarded flow's next SAP. The ID of the access port where this SAP
+                     is defined."
+    ::= { alaMldServiceSapForwardEntry 11 }
+
+alaMldServiceSapForwardNextSapEncapValue OBJECT-TYPE
+    SYNTAX          TmnxEncapVal
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The IP multicast forwarded flow's next SAP. The value of the label used to identify this
+                     SAP on the access port specified by sapPortId."
+    ::= { alaMldServiceSapForwardEntry 12 }
+
+alaMldServiceSapForwardNextType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's next encapsulation type."
+    ::= { alaMldServiceSapForwardEntry 13 }
+
+alaMldServiceSdpBindForwardTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldServiceSdpBindForwardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the IP multicast forward information."
+    ::= { alaServiceMgrMld 16 }
+
+alaMldServiceSdpBindForwardEntry OBJECT-TYPE
+    SYNTAX          MldServiceSdpBindForwardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast forwarded flow."
+    INDEX         { 
+                    svcId,
+                    alaMldServiceSdpBindForwardGroupAddress,
+                    alaMldServiceSdpBindForwardHostAddress,
+                    alaMldServiceSdpBindForwardDestAddress,
+                    alaMldServiceSdpBindForwardOrigAddress,
+                    alaMldServiceSdpBindForwardNextSdpBindId
+
+                  }
+    ::= { alaMldServiceSdpBindForwardTable 1 }
+
+MldServiceSdpBindForwardEntry ::= SEQUENCE {
+
+    alaMldServiceSdpBindForwardLocale		    AluLocation,
+    alaMldServiceSdpBindForwardPortId                  TmnxPortID,
+    alaMldServiceSdpBindForwardEncapValue              TmnxEncapVal,
+    alaMldServiceSdpBindForwardSdpId                   SdpId,
+    alaMldServiceSdpBindForwardVcId                    TmnxVcIdOrNone,
+    alaMldServiceSdpBindForwardGroupAddress            MacAddress,
+    alaMldServiceSdpBindForwardHostAddress             MacAddress,
+    alaMldServiceSdpBindForwardDestAddress             MacAddress,
+    alaMldServiceSdpBindForwardOrigAddress             MacAddress,
+    alaMldServiceSdpBindForwardType                    INTEGER,
+    alaMldServiceSdpBindForwardNextSdpBindId          SdpBindId,
+    alaMldServiceSdpBindForwardNextType                    INTEGER
+
+  
+}
+
+alaMldServiceSdpBindForwardLocale OBJECT-TYPE
+    SYNTAX      AluLocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSdpBindForwardLocale indicates
+         where this multicast router was detected.
+
+         A multicast router found on a local SAP has the value 'sap(1)'.
+         A multicast router detected on an SDP has the value 'sdp(2)'."
+    ::= { alaMldServiceSdpBindForwardEntry 1 }
+
+alaMldServiceSdpBindForwardPortId OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSdpBindForwardPortId indicates,
+         together with the object alaMldServiceSdpBindForwardEncapValue, the SdpBind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         tlsMldSnpgMRouterLocale is 'sap(1)'."
+    ::= { alaMldServiceSdpBindForwardEntry 2 }
+
+alaMldServiceSdpBindForwardEncapValue OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSdpBindForwardEncapValue indicates,
+         together with the object alaMldServiceSdpBindForwardPortId, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaMldServiceSdpBindForwardLocale is 'sap(1)'."
+    ::= { alaMldServiceSdpBindForwardEntry 3 }
+
+alaMldServiceSdpBindForwardSdpId OBJECT-TYPE
+    SYNTAX      SdpId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSdpBindForwardSdpId indicates,
+         together with the object alaMldServiceSdpBindForwardVcId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaMldServiceSdpBindForwardLocale is 'sdp(2)'."
+    ::= { alaMldServiceSdpBindForwardEntry 4 }
+
+alaMldServiceSdpBindForwardVcId OBJECT-TYPE
+    SYNTAX      TmnxVcIdOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object alaMldServiceSdpBindForwardVcId indicates,
+         together with the object alaMldServiceSdpBindForwardSdpId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         alaMldServiceSdpBindForwardLocale is 'sdp(2)'."
+    ::= { alaMldServiceSdpBindForwardEntry 5 }
+
+
+alaMldServiceSdpBindForwardGroupAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 group address."
+    ::= { alaMldServiceSdpBindForwardEntry 6 }
+
+alaMldServiceSdpBindForwardHostAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 host address."
+    ::= { alaMldServiceSdpBindForwardEntry 7 }
+
+alaMldServiceSdpBindForwardDestAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 tunnel destination address."
+    ::= { alaMldServiceSdpBindForwardEntry 8 }
+
+alaMldServiceSdpBindForwardOrigAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 tunnel source address."
+    ::= { alaMldServiceSdpBindForwardEntry 9 }
+
+alaMldServiceSdpBindForwardType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's encapsulation type."
+    ::= { alaMldServiceSdpBindForwardEntry 10 }
+
+
+
+alaMldServiceSdpBindForwardNextSdpBindId OBJECT-TYPE
+    SYNTAX          SdpBindId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The IP multicast forwarded flow's next sdpBind."
+    ::= { alaMldServiceSdpBindForwardEntry 11 }
+
+
+
+alaMldServiceSdpBindForwardNextType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's next encapsulation type."
+    ::= { alaMldServiceSdpBindForwardEntry 12 }
+
+
+--
+--  SAP/SDPBIND Table for IP Multicast objects managed per  SAP/SDPBIND 
+--
+		
+alaMldServiceSapTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF AlaMldServiceSapEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION 
+       "The table listing the IP multicast port information."   
+     ::= { alaServiceMgrMld 17 }
+   
+alaMldServiceSapEntry OBJECT-TYPE
+     SYNTAX     AlaMldServiceSapEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION 
+       "An entry corresponding to IP multicast Service SAP information."
+     INDEX        { 
+		    svcId,
+                    sapPortId,
+                    sapEncapValue
+                  }
+    ::= { alaMldServiceSapTable 1 }
+   
+AlaMldServiceSapEntry ::=
+     SEQUENCE {
+       alaMldServiceSapMaxGroupLimit   		Unsigned32,
+       alaMldServiceSapMaxGroupExceedAction    	INTEGER,
+       alaMldServiceSapCurrentGroupCount     		Unsigned32
+     }
+ 
+
+alaMldServiceSapMaxGroupLimit OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of MLD Group memberships that can be learnt 
+	on the sap."
+    DEFVAL 		{0}
+    ::= { alaMldServiceSapEntry 1 }
+
+alaMldServiceSapMaxGroupExceedAction OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), drop(1), replace(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The action to be taken when MLD group membership limit is 
+	exceeded for the sap."
+    DEFVAL        { none }
+    ::= { alaMldServiceSapEntry 2 }
+
+
+alaMldServiceSapCurrentGroupCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current IP multicast group memberships on a sap. 
+	instance."
+    ::= { alaMldServiceSapEntry 3 }
+
+alaMldServiceSdpBindTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF AlaMldServiceSdpBindEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION 
+       "The table listing the IP multicast port information."   
+     ::= { alaServiceMgrMld 18 }
+   
+alaMldServiceSdpBindEntry OBJECT-TYPE
+     SYNTAX     AlaMldServiceSdpBindEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION 
+       "An entry corresponding to IP multicast Service SdpBind information."
+     INDEX        { 
+		    svcId,
+                    sdpBindId
+                  }
+    ::= { alaMldServiceSdpBindTable 1 }
+   
+AlaMldServiceSdpBindEntry ::=
+     SEQUENCE {
+       alaMldServiceSdpBindMaxGroupLimit   		Unsigned32,
+       alaMldServiceSdpBindMaxGroupExceedAction    	INTEGER,
+       alaMldServiceSdpBindCurrentGroupCount     		Unsigned32
+     }
+ 
+
+alaMldServiceSdpBindMaxGroupLimit OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of MLD Group memberships that can be learnt 
+	on the SdpBind."
+    DEFVAL 		{0}
+    ::= { alaMldServiceSdpBindEntry 1 }
+
+alaMldServiceSdpBindMaxGroupExceedAction OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), drop(1), replace(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The action to be taken when MLD group membership limit is 
+	exceeded for the SdpBind."
+    DEFVAL        { none }
+    ::= { alaMldServiceSdpBindEntry 2 }
+
+alaMldServiceSdpBindCurrentGroupCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current IP multicast group memberships on a SdpBind. 
+	instance."
+    ::= { alaMldServiceSdpBindEntry 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- AOS LDP related MIB
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaExtraLdp OBJECT IDENTIFIER ::= { alcatelIND1ServiceMgrMIBObjects 4 }
+
+
+
+ alaVRtrExtendedLdpGeneralTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaVRtrExtendedLdpGeneralEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " alaVRtrExtendedLdpGeneralTable  is an extension to vRtrLdpGeneralTable 	   
+	and it has an entry for each virtual router 
+         in the system capable of supporting an instance of the
+         Label Distribution Protocol (LDP)."
+    ::= { alaExtraLdp 1 }
+
+alaVRtrExtendedLdpGeneralEntry   OBJECT-TYPE
+    SYNTAX      AlaVRtrExtendedLdpGeneralEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an instance of the Label Distribution
+         Protocol (LDP) for a virtual router in the system.
+
+         An entry in this table is created by the agent when vRtrLdpStatus
+         in the vRtrConfTable is set to 'create'.
+         The entry is destroyed when vRtrLdpStatus is set to 'delete' but
+         only if vRtrLdpGenAdminState has a value of 'outOfService'."
+    INDEX { vRtrID }
+::= { alaVRtrExtendedLdpGeneralTable  1 }
+
+AlaVRtrExtendedLdpGeneralEntry ::= SEQUENCE {
+    alaVRtrLdpGenGracefulRestartSupport   TruthValue,
+    alaVRtrLdpGenGRReconnectTime           Unsigned32,
+    alaVRtrLdpGenGRFwdStateHoldTime        Unsigned32
+}
+
+  alaVRtrLdpGenGracefulRestartSupport  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of alaVRtrLdpGenGracefulRestartSupport specifies whether
+	 restarting the LSR gracefully during a control plane restart is 	     	   
+	 allowed. When this object has a value of 'true',
+         graceful restart procedures are  enabled.  When its value is 'false', 	   
+	 graceful restart procedures are disabled."
+    DEFVAL { false }
+    ::= { alaVRtrExtendedLdpGeneralEntry 1 }
+
+alaVRtrLdpGenGRReconnectTime  OBJECT-TYPE
+    SYNTAX       Unsigned32 (5..300)
+    UNITS        "seconds"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+	"The value of alaVRtrLdpGenGRReconnectTime  
+	specifies the value of FT Reconnect timer. 
+	The FT Reconnect timeout is the time that the sender of the TLV would like the receiver 
+	of that TLV to wait after the receiver detects the failure of LDP communication with the sender. 
+	This object has meaning only when alaVRtrLdpGenGracefulRestartSupport is ‘true’." 
+    DEFVAL { 120 }
+    ::= { alaVRtrExtendedLdpGeneralEntry 2 }
+
+alaVRtrLdpGenGRFwdStateHoldTime   OBJECT-TYPE
+    SYNTAX       Unsigned32 (15..1800)
+    UNITS        "seconds"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+	  "The value of vRtrLdpGenGRFwdStateHoldTime specifies the MPLS 	   	      	  
+	  ‘forwarding state hold’timer. If the forwarding state has been 	   	   
+	  preserved during a control plane restart, then the LSR starts this 		   
+	  timer and marks all forwarding entries as stale. At the expiration of 	   
+	  the timer all the entries that are still marked as stale are deleted.     	   
+	  The value of Recovery Time advertised to the neighbors in the FT 	   	   
+	  session TLV is set to the current value of the timer at the point in 	   
+	  which the Initialization message carrying the FT session TLV is sent"
+    DEFVAL { 120 }
+    ::= { alaVRtrExtendedLdpGeneralEntry 3}
+
+
+  alaVRtrLdpExtendedSessionTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaVRtrLdpExtendedSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "alaVRtrLdpExtendedSessionTable is an extension to vRtrLdpSessionTable.
+	 This isa read-only table which parallels the
+          mplsLdpSessionTable in the MPLS-LDP-MIB. The purpose of this
+          table is to keep information about a single session between
+          an LDP entity and an LDP Peer"
+    ::= { alaExtraLdp 2 }
+
+alaVRtrLdpExtendedSessionEntry OBJECT-TYPE
+    SYNTAX      AlaVRtrLdpExtendedSessionEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in this table represents information about a single
+         session between an LDP entity and an LDP Peer."
+    INDEX  { vRtrID,
+             alaVRtrLdpPeerLdpId }
+    ::= { alaVRtrLdpExtendedSessionTable    1 }
+
+AlaVRtrLdpExtendedSessionEntry ::= SEQUENCE {
+    alaVRtrLdpPeerLdpId                    MplsLdpIdentifier,
+    alaVRtrLdpSessRestartInProgress		TruthValue,
+    alaVRtrLdpSessFtReconTimeAdvertised         Unsigned32,
+    alaVRtrLdpSessFtRecoveryTimeAdvertised      Unsigned32
+}
+
+
+alaVRtrLdpPeerLdpId    OBJECT-TYPE
+    SYNTAX      MplsLdpIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of alaVRtrLdpSessLocalLdpId specifies the local LDP
+         identifier for this LDP session." 
+    ::= { alaVRtrLdpExtendedSessionEntry 1 }
+
+alaVRtrLdpSessRestartInProgress OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of alaVRtrLdpSessRestartInProgress  indicates whether 
+	   graceful restart is in progress for this session"
+    ::= { alaVRtrLdpExtendedSessionEntry 2 }
+
+alaVRtrLdpSessFtReconTimeAdvertised OBJECT-TYPE
+	SYNTAX      Unsigned32
+	UNITS        "seconds"
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"The value of alaVRtrLdpSessFtReconTimeAdvertised  indicates the session's
+	Fault Tolerant(FT) Reconnect Timeout advertised to the peer"
+	::= { alaVRtrLdpExtendedSessionEntry 3 }
+
+alaVRtrLdpSessFtRecoveryTimeAdvertised       OBJECT-TYPE
+	SYNTAX      Unsigned32
+	UNITS        "seconds"
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	"The value of alaVRtrLdpSessFtRecoveryTimeAdvertised  indicates the session's
+	Fault Tolerant(FT) recovery timeout that was advertised to the peer."
+	::= { alaVRtrLdpExtendedSessionEntry 4 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alcatelIND1ServiceMgrMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+        "Compliance statement for service manager."
+        MODULE  MANDATORY-GROUPS
+                {
+                alaServiceMgrPortProfileGroup ,
+		alaServiceMgrPortGroup,
+		alaSapExtraInfoGroup,
+		alaIgmpServiceGroup,
+		alaIgmpMemberServiceSapGroup,
+		alaIgmpMemberServiceSdpBindGroup,
+		alaIgmpStaticMemberServiceSapGroup,
+		alaIgmpStaticMemberServiceSdpBindGroup,
+		alaIgmpNeighborServiceSapGroup,
+		alaIgmpNeighborServiceSdpBindGroup,
+		alaIgmpStaticNeighborServiceSapGroup,
+		alaIgmpStaticNeighborServiceSdpBindGroup,
+		alaIgmpQuerierServiceSapGroup,
+		alaIgmpQuerierServiceSdpBindGroup,
+		alaIgmpStaticQuerierServiceSapGroup,
+		alaIgmpStaticQuerierServiceSdpBindGroup,
+		alaIgmpServiceSourceGroup,
+		alaIgmpServiceSapForwardGroup,
+		alaIgmpServiceSdpBindForwardGroup,
+		alaIgmpServiceSapGroup,
+		alaIgmpServiceSdpBindGroup,
+		alaMldServiceGroup,
+		alaMldMemberServiceSapGroup,
+		alaMldMemberServiceSdpBindGroup,
+		alaMldStaticMemberServiceSapGroup,
+		alaMldStaticMemberServiceSdpBindGroup,
+		alaMldNeighborServiceSapGroup,
+		alaMldNeighborServiceSdpBindGroup,
+		alaMldStaticNeighborServiceSapGroup,
+		alaMldStaticNeighborServiceSdpBindGroup,
+		alaMldQuerierServiceSapGroup,
+		alaMldQuerierServiceSdpBindGroup,
+		alaMldStaticQuerierServiceSapGroup,
+		alaMldStaticQuerierServiceSdpBindGroup,
+		alaMldServiceSourceGroup,
+		alaMldServiceSapForwardGroup,
+		alaMldServiceSdpBindForwardGroup,
+		alaMldServiceSapGroup,
+		alaMldServiceSdpBindGroup
+                }
+        ::= { alcatelIND1ServiceMgrMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+
+alaServiceMgrPortProfileGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaServiceMgrPortProfileStpBpduTreatment,
+		alaServiceMgrPortProfile8021xTreatment,
+		alaServiceMgrPortProfile8021ABTreatment,
+		alaServiceMgrPortProfile8023adTreatment,
+		alaServiceMgrPortProfileGvrpTreatment,
+		alaServiceMgrPortProfileAmapTreatment,
+		alaServiceMgrPortProfileRowStatus,
+		alaServiceMgrPortProfileMvrpTreatment
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of Service Manager Port Profiles."
+        ::= { alcatelIND1ServiceMgrMIBGroups 1 }
+
+alaServiceMgrPortGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaServiceMgrPortMode,
+		alaServiceMgrPortEncapType,
+		alaServiceMgrPortPortProfileID,
+		alaServiceMgrPortRowStatus		
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of Service Manager Port."
+	::= { alcatelIND1ServiceMgrMIBGroups 2 }
+
+alaSapExtraInfoGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaSapInfoTrusted,
+		alaSapInfoPriority	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of Sap extra info."
+	::= { alcatelIND1ServiceMgrMIBGroups 3 }
+
+alaIgmpServiceGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpServiceStatus,
+		alaIgmpServiceQuerying,
+		alaIgmpServiceSpoofing,
+		alaIgmpServiceZapping,
+		alaIgmpServiceVersion,
+		alaIgmpServiceRobustness,
+		alaIgmpServiceQueryInterval,
+		alaIgmpServiceQueryResponseInterval,
+		alaIgmpServiceLastMemberQueryInterval,
+		alaIgmpServiceRouterTimeout,
+		alaIgmpServiceSourceTimeout,
+		alaIgmpServiceProxying,
+		alaIgmpServiceUnsolicitedReportInterval,
+		alaIgmpServiceQuerierForwarding,
+		alaIgmpServiceMaxGroupLimit,
+		alaIgmpServiceMaxGroupExceedAction
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service igmp object."
+	::= { alcatelIND1ServiceMgrMIBGroups 4 }
+
+alaIgmpMemberServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpMemberServiceSapMode,
+		alaIgmpMemberServiceSapCount,
+		alaIgmpMemberServiceSapTimeout
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service igmp member sap object."
+	::= { alcatelIND1ServiceMgrMIBGroups 5 }
+
+alaIgmpMemberServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpMemberServiceSdpBindMode,
+		alaIgmpMemberServiceSdpBindCount,
+		alaIgmpMemberServiceSdpBindTimeout	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service igmp member sdp binding object."
+	::= { alcatelIND1ServiceMgrMIBGroups 6 }
+
+alaIgmpStaticMemberServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpStaticMemberServiceSapRowStatus	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service igmp static member sap object."
+	::= { alcatelIND1ServiceMgrMIBGroups 7 }
+
+alaIgmpStaticMemberServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpStaticMemberServiceSdpBindRowStatus	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service igmp static member sdp binding object."
+	::= { alcatelIND1ServiceMgrMIBGroups 8 }
+
+alaIgmpNeighborServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpNeighborServiceSapCount,
+		alaIgmpNeighborServiceSapTimeout	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service igmp sap neighbor object."
+	::= { alcatelIND1ServiceMgrMIBGroups 9 }
+
+alaIgmpNeighborServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpNeighborServiceSdpBindCount,
+		alaIgmpNeighborServiceSdpBindTimeout	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service igmp SdpBind neighbor object."
+	::= { alcatelIND1ServiceMgrMIBGroups 10 }
+
+alaIgmpStaticNeighborServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpStaticNeighborServiceSapRowStatus	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service igmp sap static neighbor object."
+	::= { alcatelIND1ServiceMgrMIBGroups 11 }
+
+alaIgmpStaticNeighborServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpStaticNeighborServiceSdpBindRowStatus	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service igmp SdpBind static neighbor object."
+	::= { alcatelIND1ServiceMgrMIBGroups 12 }
+
+alaIgmpQuerierServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpQuerierServiceSapCount,
+		alaIgmpQuerierServiceSapTimeout	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service sap igmp querier object."
+	::= { alcatelIND1ServiceMgrMIBGroups 13 }
+
+alaIgmpQuerierServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpQuerierServiceSdpBindCount,
+		alaIgmpQuerierServiceSdpBindTimeout	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service SdpBind igmp querier object."
+	::= { alcatelIND1ServiceMgrMIBGroups 14 }
+
+alaIgmpStaticQuerierServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpStaticQuerierServiceSapRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service sap igmp static querier object."
+	::= { alcatelIND1ServiceMgrMIBGroups 15 }
+
+alaIgmpStaticQuerierServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpStaticQuerierServiceSdpBindRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service SdpBind igmp static querier object."
+	::= { alcatelIND1ServiceMgrMIBGroups 16 }
+
+alaIgmpServiceSourceGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpServiceSourceLocale,
+		alaIgmpServiceSourcePortId,
+		alaIgmpServiceSourceEncapValue,
+		alaIgmpServiceSourceSdpId,
+		alaIgmpServiceSourceVcId,
+		alaIgmpServiceSourceType
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of igmp service source object."
+	::= { alcatelIND1ServiceMgrMIBGroups 17 }
+
+alaIgmpServiceSapForwardGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpServiceSapForwardLocale,
+		alaIgmpServiceSapForwardPortId,
+		alaIgmpServiceSapForwardEncapValue,
+		alaIgmpServiceSapForwardSdpId,
+		alaIgmpServiceSapForwardVcId,
+		alaIgmpServiceSapForwardType,
+		alaIgmpServiceSapForwardNextType
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of igmp service sap forward object."
+	::= { alcatelIND1ServiceMgrMIBGroups 18 }
+
+alaIgmpServiceSdpBindForwardGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpServiceSdpBindForwardLocale,
+		alaIgmpServiceSdpBindForwardPortId,
+		alaIgmpServiceSdpBindForwardEncapValue,
+		alaIgmpServiceSdpBindForwardSdpId,
+		alaIgmpServiceSdpBindForwardVcId,
+		alaIgmpServiceSdpBindForwardType,
+		alaIgmpServiceSdpBindForwardNextType
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of igmp service SdpBind forward object."
+	::= { alcatelIND1ServiceMgrMIBGroups 19 }
+
+
+alaIgmpServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpServiceSapMaxGroupLimit,
+		alaIgmpServiceSapMaxGroupExceedAction,
+		alaIgmpServiceSapCurrentGroupCount
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of igmp service sap object."
+	::= { alcatelIND1ServiceMgrMIBGroups 20 }
+
+alaIgmpServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaIgmpServiceSdpBindMaxGroupLimit,
+		alaIgmpServiceSdpBindMaxGroupExceedAction,
+		alaIgmpServiceSdpBindCurrentGroupCount
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of igmp service SdpBind object."
+	::= { alcatelIND1ServiceMgrMIBGroups 21 }
+alaMldServiceGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldServiceStatus,
+		alaMldServiceQuerying,
+		alaMldServiceSpoofing,
+		alaMldServiceZapping,
+		alaMldServiceVersion,
+		alaMldServiceRobustness,
+		alaMldServiceQueryInterval,
+		alaMldServiceQueryResponseInterval,
+		alaMldServiceLastMemberQueryInterval,
+		alaMldServiceRouterTimeout,
+		alaMldServiceSourceTimeout,
+		alaMldServiceProxying,
+		alaMldServiceUnsolicitedReportInterval,
+		alaMldServiceQuerierForwarding,
+		alaMldServiceMaxGroupLimit,
+		alaMldServiceMaxGroupExceedAction
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service MLD object."
+	::= { alcatelIND1ServiceMgrMIBGroups 22 }
+
+alaMldMemberServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldMemberServiceSapMode,
+		alaMldMemberServiceSapCount,
+		alaMldMemberServiceSapTimeout
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service MLD member sap object."
+	::= { alcatelIND1ServiceMgrMIBGroups 23 }
+
+alaMldMemberServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldMemberServiceSdpBindMode,
+		alaMldMemberServiceSdpBindCount,
+		alaMldMemberServiceSdpBindTimeout	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service MLD member sdp binding object."
+	::= { alcatelIND1ServiceMgrMIBGroups 24 }
+
+alaMldStaticMemberServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldStaticMemberServiceSapRowStatus	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service MLD static member sap object."
+	::= { alcatelIND1ServiceMgrMIBGroups 25 }
+
+alaMldStaticMemberServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldStaticMemberServiceSdpBindRowStatus	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service MLD static member sdp binding object."
+	::= { alcatelIND1ServiceMgrMIBGroups 26 }
+
+alaMldNeighborServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldNeighborServiceSapCount,
+		alaMldNeighborServiceSapTimeout	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service MLD sap neighbor object."
+	::= { alcatelIND1ServiceMgrMIBGroups 27 }
+
+alaMldNeighborServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldNeighborServiceSdpBindCount,
+		alaMldNeighborServiceSdpBindTimeout	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service MLD SdpBind neighbor object."
+	::= { alcatelIND1ServiceMgrMIBGroups 28 }
+
+alaMldStaticNeighborServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldStaticNeighborServiceSapRowStatus	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service MLD sap static neighbor object."
+	::= { alcatelIND1ServiceMgrMIBGroups 29 }
+
+alaMldStaticNeighborServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldStaticNeighborServiceSdpBindRowStatus	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service MLD SdpBind static neighbor object."
+	::= { alcatelIND1ServiceMgrMIBGroups 30 }
+
+alaMldQuerierServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldQuerierServiceSapCount,
+		alaMldQuerierServiceSapTimeout	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service sap MLD querier object."
+	::= { alcatelIND1ServiceMgrMIBGroups 31 }
+
+alaMldQuerierServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldQuerierServiceSdpBindCount,
+		alaMldQuerierServiceSdpBindTimeout	
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service SdpBind MLD querier object."
+	::= { alcatelIND1ServiceMgrMIBGroups 32 }
+
+alaMldStaticQuerierServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldStaticQuerierServiceSapRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service sap MLD static querier object."
+	::= { alcatelIND1ServiceMgrMIBGroups 33 }
+
+alaMldStaticQuerierServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldStaticQuerierServiceSdpBindRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of service SdpBind MLD static querier object."
+	::= { alcatelIND1ServiceMgrMIBGroups 34 }
+
+alaMldServiceSourceGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldServiceSourceLocale,
+		alaMldServiceSourcePortId,
+		alaMldServiceSourceEncapValue,
+		alaMldServiceSourceSdpId,
+		alaMldServiceSourceVcId,
+		alaMldServiceSourceType
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of MLD service source object."
+	::= { alcatelIND1ServiceMgrMIBGroups 35 }
+
+alaMldServiceSapForwardGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldServiceSapForwardLocale,
+		alaMldServiceSapForwardPortId,
+		alaMldServiceSapForwardEncapValue,
+		alaMldServiceSapForwardSdpId,
+		alaMldServiceSapForwardVcId,
+		alaMldServiceSapForwardType,
+		alaMldServiceSapForwardNextType
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of MLD service sap forward object."
+	::= { alcatelIND1ServiceMgrMIBGroups 36 }
+
+alaMldServiceSdpBindForwardGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldServiceSdpBindForwardLocale,
+		alaMldServiceSdpBindForwardPortId,
+		alaMldServiceSdpBindForwardEncapValue,
+		alaMldServiceSdpBindForwardSdpId,
+		alaMldServiceSdpBindForwardVcId,
+		alaMldServiceSdpBindForwardType,
+		alaMldServiceSdpBindForwardNextType
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of MLD service SdpBind forward object."
+	::= { alcatelIND1ServiceMgrMIBGroups 37 }
+
+
+alaMldServiceSapGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldServiceSapMaxGroupLimit,
+		alaMldServiceSapMaxGroupExceedAction,
+		alaMldServiceSapCurrentGroupCount
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of MLD service sap object."
+	::= { alcatelIND1ServiceMgrMIBGroups 38 }
+
+alaMldServiceSdpBindGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaMldServiceSdpBindMaxGroupLimit,
+		alaMldServiceSdpBindMaxGroupExceedAction,
+		alaMldServiceSdpBindCurrentGroupCount
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of MLD service SdpBind object."
+	::= { alcatelIND1ServiceMgrMIBGroups 39 }
+
+alaVRtrExtendedLdpGeneralGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaVRtrLdpGenGracefulRestartSupport,
+		alaVRtrLdpGenGRReconnectTime,
+		alaVRtrLdpGenGRFwdStateHoldTime
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of MLD service SdpBind object."
+	::= { alcatelIND1ServiceMgrMIBGroups 40 }
+
+alaVRtrLdpExtendedSessionGroup OBJECT-GROUP
+        OBJECTS
+        { 
+		alaVRtrLdpSessRestartInProgress,
+		alaVRtrLdpSessFtReconTimeAdvertised,
+		alaVRtrLdpSessFtRecoveryTimeAdvertised
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of objects for management of MLD service SdpBind object."
+	::= { alcatelIND1ServiceMgrMIBGroups 41 }
+
+END
+

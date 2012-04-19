@@ -1,0 +1,1027 @@
+--
+-- $Id: zyxel-zywall.mib version 1.00 2005/01/25
+--
+
+--	Copyright (C) 1994 - 2001 Zyxel Communications, Inc.
+--	All Rights Reserved.
+--
+-- Stagecoach Confidential; Need to Know only.
+-- Protected as an unpublished work.
+--
+-- The computer program listings, specifications and documentation
+-- herein are the property of Stagecoach Communications, Inc. and
+-- shall not be reproduced, copied, disclosed, or used in whole or
+-- in part for any reason without the prior express written permission of
+-- Stagecoach Communications, Inc.
+
+-- ZyXEL Communications Corporation
+-- Private Enterprise MIB definition
+
+ZYXEL-ZYWALL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	enterprises, IpAddress		
+		FROM RFC1155-SMI
+	OBJECT-TYPE 
+		FROM RFC-1212	
+	DisplayString , PhysAddress
+	  	FROM RFC1213-MIB	  	
+	TRAP-TYPE
+		FROM RFC-1215
+	zywallCommon
+		FROM ZYXEL-MIB;
+
+
+	-- ZyWALL common managed objects
+	zywallSystem			OBJECT IDENTIFIER ::= { zywallCommon 1 }
+	zywallFirewall			OBJECT IDENTIFIER ::= { zywallCommon 2 }
+	zywallVPN			OBJECT IDENTIFIER ::= { zywallCommon 3 }
+	zywallIDP			OBJECT IDENTIFIER ::= { zywallCommon 4 }
+	zywallAV			OBJECT IDENTIFIER ::= { zywallCommon 5 }
+	zywallTraps			OBJECT IDENTIFIER ::= { zywallCommon 99 }
+	
+	
+
+	-- The system group
+	
+	sysCPUUsage OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Show device CPU load in %, it's the snapshot of CPU load when 
+			getting the values."
+		::= { zywallSystem 1 }
+
+	sysFlashUsage OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Show device flash load in %, it's the snapshot of the flash load 
+			when getting the value."
+		::= { zywallSystem 2 }
+
+	sysRAMUsage OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Show device RAM load in %, it's the snapshot of RAM load when 
+			getting the values."
+		::= { zywallSystem 3 }
+		
+	sysSessionUsage OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Show device session load in %, it's the snapshot of session load 
+			when getting the values."
+		::= { zywallSystem 4 }
+	
+	sysDeviceName OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The device name."
+		::= { zywallSystem 5 }
+
+	sysDeviceType OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The device type."
+		::= { zywallSystem 6 }
+
+	sysDeviceMACAddress OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The device MAC address."
+		::= { zywallSystem 7 }
+
+	sysFirmwareVersion OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The device firmware version."
+		::= { zywallSystem 8 }
+
+	sysLastEdit OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The system last edit time."
+		::= { zywallSystem 9 }
+
+	-- the device interface group
+	-- the device interface table
+	sysDeviceInterfaceTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF SysDeviceInterfaceEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of device interface entries. The number depends on 
+			product definition."
+		::= { zywallSystem 10 }
+
+	sysDeviceInterfaceEntry OBJECT-TYPE
+		SYNTAX  SysDeviceInterfaceEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        		"A device interface entry containing comment object for a 
+        		particular interface."
+		INDEX   { sysDeviceInterfaceIndex }
+		::= { sysDeviceInterfaceTable 1 }
+
+	SysDeviceInterfaceEntry ::=
+		SEQUENCE {
+			sysDeviceInterfaceIndex
+				INTEGER,
+			sysDeviceInterfaceName
+				DisplayString,
+			sysDeviceInterfaceIPAddress
+				IpAddress,
+			sysDeviceInterfaceIPSubnetMask
+				IpAddress,
+			sysDeviceInterfaceTx
+			    INTEGER,
+			sysDeviceInterfaceRx
+				INTEGER
+		}
+
+	sysDeviceInterfaceIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of device interface, base on 1."
+		::= { sysDeviceInterfaceEntry 1 }
+
+	sysDeviceInterfaceName OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The name of device interface."
+		::= { sysDeviceInterfaceEntry 2 }
+
+	sysDeviceInterfaceIPAddress OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The IP address of device interface."
+		::= { sysDeviceInterfaceEntry 3 }            
+
+	sysDeviceInterfaceIPSubnetMask OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The IP subnet mask of device interface."
+		::= { sysDeviceInterfaceEntry 4 }            
+                                              
+	sysDeviceInterfaceTx OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"the current outgoing rate in pbs of each interface."
+		::= { sysDeviceInterfaceEntry 5 }
+
+	sysDeviceInterfaceRx OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"the current incoming rate in kbps of each interface."
+		::= { sysDeviceInterfaceEntry 6 }
+		
+	sysMaxSessionPerHost OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Get and Set the Max concurrent session per host."
+		::= { zywallSystem 11 }
+
+	sysHTTPPort OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Get the HTTP/HTTPS port numbers of management service."
+		::= { zywallSystem 12 }
+		
+	-- the device ARP group
+	-- the device ARP table
+	sysDeviceARPTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF SysDeviceARPEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of device ARP entries. The number depends on 
+			product definition."
+		::= { zywallSystem 13 }
+
+	sysDeviceARPEntry OBJECT-TYPE
+		SYNTAX  SysDeviceARPEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        		"A device ARP entry containing comment object for a 
+        		particular ARP."
+		INDEX   { sysDeviceARPIndex }
+		::= { sysDeviceARPTable 1 }
+
+	SysDeviceARPEntry ::=
+		SEQUENCE {
+			sysDeviceARPIndex
+				INTEGER,
+			sysDeviceARPIPAddress
+				IpAddress,
+			sysDeviceARPMACAddress
+				DisplayString,
+			sysDeviceARPInterface
+				DisplayString,
+			sysDeviceARPTTL
+				INTEGER
+		}
+
+	sysDeviceARPIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of device ARP entry, base on 1."
+		::= { sysDeviceARPEntry 1 }
+
+	sysDeviceARPIPAddress OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The IP address of device ARP entry."
+		::= { sysDeviceARPEntry 2 }
+
+	sysDeviceARPMACAddress OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The MAC address of device ARP entry."
+		::= { sysDeviceARPEntry 3 }            
+
+	sysDeviceARPInterface OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The input interface of device ARP entry."
+		::= { sysDeviceARPEntry 4 }            
+
+	sysDeviceARPTTL OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The TTL of device ARP entry."
+		::= { sysDeviceARPEntry 5 }
+
+	-- the LAN DHCP group
+	-- the LAN DHCP table
+	sysLANDHCPTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF SysLANDHCPEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of LAN DHCP entries. The number depends on LAN 
+			DHCP pool size"
+		::= { zywallSystem 14 }
+
+	sysLANDHCPEntry OBJECT-TYPE
+		SYNTAX  SysLANDHCPEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        		"A LAN DHCP entry containing comment object for a 
+        		particular DHCP."
+		INDEX   { sysLANDHCPIndex }
+		::= { sysLANDHCPTable 1 }
+
+	SysLANDHCPEntry ::=
+		SEQUENCE {
+			sysLANDHCPIndex
+				INTEGER,
+			sysLANDHCPIPAddress
+				IpAddress,
+			sysLANDHCPMACAddress
+				DisplayString,
+			sysLANDHCPHostname
+				DisplayString
+		}
+
+	sysLANDHCPIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of LAN DHCP entry, base on 1."
+		::= { sysLANDHCPEntry 1 }
+
+	sysLANDHCPIPAddress OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The IP Address of LAN DHCP entry."
+		::= { sysLANDHCPEntry 2 }
+
+	sysLANDHCPMACAddress OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The MAC address of LAN DHCP entry."
+		::= { sysLANDHCPEntry 3 }            
+
+	sysLANDHCPHostname OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The hostname of LAN DHCP entry."
+		::= { sysLANDHCPEntry 4 }            
+
+	-- the DMZ DHCP group
+	-- the DMZ DHCP table
+	sysDMZDHCPTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF SysDMZDHCPEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of DMZ DHCP entries. The number depends on DMZ 
+			DHCP pool size"
+		::= { zywallSystem 15 }
+
+	sysDMZDHCPEntry OBJECT-TYPE
+		SYNTAX  SysDMZDHCPEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        		"A DMZ DHCP entry containing comment object for a 
+        		particular DHCP."
+		INDEX   { sysDMZDHCPIndex }
+		::= { sysDMZDHCPTable 1 }
+
+	SysDMZDHCPEntry ::=
+		SEQUENCE {
+			sysDMZDHCPIndex
+				INTEGER,
+			sysDMZDHCPIPAddress
+				IpAddress,
+			sysDMZDHCPMACAddress
+				DisplayString,
+			sysDMZDHCPHostname
+				DisplayString
+		}
+
+	sysDMZDHCPIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of DMZ DHCP entry, base on 1."
+		::= { sysDMZDHCPEntry 1 }
+
+	sysDMZDHCPIPAddress OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The IP Address of DMZ DHCP entry."
+		::= { sysDMZDHCPEntry 2 }
+
+	sysDMZDHCPMACAddress OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The MAC address of DMZ DHCP entry."
+		::= { sysDMZDHCPEntry 3 }            
+
+	sysDMZDHCPHostname OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The hostname of DMZ DHCP entry."
+		::= { sysDMZDHCPEntry 4 }            
+
+	-- the WLAN DHCP group
+	-- the WLAN DHCP table
+	sysWLANDHCPTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF SysWLANDHCPEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of WLAN DHCP entries. The number depends on WLAN 
+			DHCP pool size"
+		::= { zywallSystem 16 }
+
+	sysWLANDHCPEntry OBJECT-TYPE
+		SYNTAX  SysWLANDHCPEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        		"A WLAN DHCP entry containing comment object for a 
+        		particular DHCP."
+		INDEX   { sysWLANDHCPIndex }
+		::= { sysWLANDHCPTable 1 }
+
+	SysWLANDHCPEntry ::=
+		SEQUENCE {
+			sysWLANDHCPIndex
+				INTEGER,
+			sysWLANDHCPIPAddress
+				IpAddress,
+			sysWLANDHCPMACAddress
+				DisplayString,
+			sysWLANDHCPHostname
+				DisplayString
+		}
+
+	sysWLANDHCPIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of WLAN DHCP entry, base on 1."
+		::= { sysWLANDHCPEntry 1 }
+
+	sysWLANDHCPIPAddress OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The IP Address of WLAN DHCP entry."
+		::= { sysWLANDHCPEntry 2 }
+
+	sysWLANDHCPMACAddress OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The MAC address of WLAN DHCP entry."
+		::= { sysWLANDHCPEntry 3 }            
+
+	sysWLANDHCPHostname OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The hostname of WLAN DHCP entry."
+		::= { sysWLANDHCPEntry 4 }            
+	
+	sysDeviceMode OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The device mode."
+		::= { zywallSystem 17 }
+
+
+	-- The Firewall group
+	
+	-- the Firewall direction group
+	-- the Firewall direction table
+	firewallDirTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF FirewallDirEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of Firewall direction entries. The number depends on 
+			product definition."
+		::= { zywallFirewall 1 }
+
+	firewallDirEntry OBJECT-TYPE
+		SYNTAX  FirewallDirEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        	"A Firewall direction entry containing comment object for a 
+        	particular Firewall direction."
+		INDEX   { firewallDirIndex }
+		::= { firewallDirTable 1 }
+
+	FirewallDirEntry ::=
+		SEQUENCE {
+			firewallDirIndex
+				INTEGER,
+			firewallDirForwardPktCnt
+				Counter64,
+			firewallDirForwardPktSize
+				Counter64,
+			firewallDirBlockPktCnt
+				Counter64,
+			firewallDirBlockPktSize
+				Counter64
+		}
+
+	firewallDirIndex OBJECT-TYPE
+		SYNTAX  INTEGER {
+			LANTOWAN(1),
+			WANTOLAN(2),
+			DMZTOLAN(3),
+			DMZTOWAN(4),
+			WANTODMZ(5),
+			LANTODMZ(6),
+			LANTOLAN(7),
+			WANTOWAN(8),
+			DMZTODMZ(9),
+			LANTOROUTER(10),
+			WANTOROUTER(11),
+			DMZTOROUTER(12)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of Firewall direction."
+		::= { firewallDirEntry 1 }
+
+	firewallDirForwardPktCnt OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of the forwarded packets for each direction from 
+			device booting till now."
+		::= { firewallDirEntry 2 }
+
+	firewallDirForwardPktSize OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total size of the forwarded packets for each direction from 
+			device booting till now."
+		::= { firewallDirEntry 3 }
+
+	firewallDirBlockPktCnt OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of the blocked packets for each direction from device 
+			booting till now."
+		::= { firewallDirEntry 4 }
+
+	firewallDirBlockPktSize OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of the blocked packets for each direction from device 
+			booting till now."
+		::= { firewallDirEntry 5 }
+
+	firewallTotalRules OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Counter of total Firewall rules from device booting until now."
+		::= { zywallFirewall 2 }
+
+	firewallNewRules OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Counter of new installation policies between 2 queries."
+		::= { zywallFirewall 3 }
+
+	firewallDelRules OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Counter of the deleted policies between 2 queries."
+		::= { zywallFirewall 4 }
+
+	firewallActRules OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Counter of the activated rules between 2 queries."
+		::= { zywallFirewall 5 }
+
+	firewallDeActRules OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Counter of the deactivated rules between 2 queries."
+		::= { zywallFirewall 6 }
+
+
+	-- The VPN group
+	
+	-- the VPN tunnel group
+	-- the VPN tunnel table
+	vpnTunnelTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF VPNTunnelEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of VPN tunnel entries. The number depends on product 
+			definition."
+		::= { zywallVPN 1 }
+
+	vpnTunnelEntry OBJECT-TYPE
+		SYNTAX  VPNTunnelEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        	"A VPN tunnel entry containing comment object for a particular VPN 
+        	tunnel."
+		INDEX   { vpnTunnelIndex }
+		::= { vpnTunnelTable 1 }
+
+	VPNTunnelEntry ::=
+		SEQUENCE {
+			vpnTunnelIndex
+				INTEGER,
+			vpnTunnelName
+				DisplayString,
+			vpnTunnelTxPktCnt
+				Counter64,
+			vpnTunnelTxPktSize
+				Counter64,
+			vpnTunnelRxPktCnt
+				Counter64,
+			vpnTunnelRxPktSize
+				Counter64,
+			vpnTunnelDisPktCnt
+				Counter64,
+			vpnTunnelDisPktSize
+				Counter64,
+			vpnTunnelUpTime
+				DisplayString,
+			vpnTunnelLaunchNum
+				INTEGER,
+			vpnTunnelCloseNum
+				INTEGER,
+			vpnTunnelFailReason
+				DisplayString,
+			vpnTunnelFailTime
+				DisplayString,
+			vpnTunnelRuleIndex
+				INTEGER,
+			vpnTunnelRuleName
+				DisplayString,
+			vpnTunnelActivity
+				INTEGER,
+			vpnTunnelLocalNetwork
+				DisplayString,
+			vpnTunnelRemoteNetwork
+				DisplayString,
+			vpnTunnelEncapsulation
+				DisplayString,
+			vpnTunnelAlgorithm
+				DisplayString,
+			vpnTunnelRemoteGateway
+				DisplayString
+		}
+
+	vpnTunnelIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of VPN tunnel, base on 1."
+		::= { vpnTunnelEntry 1 }
+
+	vpnTunnelName OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The name of VPN tunnel."
+		::= { vpnTunnelEntry 2 }
+
+	vpnTunnelTxPktCnt OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of transmitted packets from tunnel was up for each 
+			tunnel."
+		::= { vpnTunnelEntry 3 }
+
+	vpnTunnelTxPktSize OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total size of transmitted packets from tunnel was up for 
+			each tunnel."
+		::= { vpnTunnelEntry 4 }
+
+	vpnTunnelRxPktCnt OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of received packets from tunnel was up for each 
+			tunnel."
+		::= { vpnTunnelEntry 5 }
+
+	vpnTunnelRxPktSize OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total size of received packets from tunnel was up for each 
+			tunnel."
+		::= { vpnTunnelEntry 6 }
+
+	vpnTunnelDisPktCnt OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of discarded packets from tunnel was up for each 
+			tunnel."
+		::= { vpnTunnelEntry 7 }
+		
+	vpnTunnelDisPktSize OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total size of discarded packets from tunnel was up for each 
+			tunnel."
+		::= { vpnTunnelEntry 8 }
+
+	vpnTunnelUpTime OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Tunnel up time until now for each tunnel."
+		::= { vpnTunnelEntry 9 }
+
+	vpnTunnelLaunchNum OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Number of times a tunnel has been launched from device booting 
+			until now."
+		::= { vpnTunnelEntry 10 }
+
+	vpnTunnelCloseNum OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Number of times a tunnel has been closed from device booting 
+			until now."
+		::= { vpnTunnelEntry 11 }
+
+	vpnTunnelFailReason OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The latest failed reason of each tunnel."
+		::= { vpnTunnelEntry 12 }
+
+	vpnTunnelFailTime OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The latest failed time of each tunnel. DisplayString = mm/dd/yyyy 
+			hh:mm:ss, ex: 01/07/2005 12:35:20."
+		::= { vpnTunnelEntry 13 }
+
+	vpnTunnelRuleIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The rule index of VPN tunnel, base on 1."
+		::= { vpnTunnelEntry 14 }
+
+	vpnTunnelRuleName OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The rule name of VPN tunnel."
+		::= { vpnTunnelEntry 15 }
+
+	vpnTunnelActivity OBJECT-TYPE
+		SYNTAX  INTEGER {
+				Off (0),
+				On (1)
+				}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The activity of VPN tunnel."
+		::= { vpnTunnelEntry 16 }
+		
+	vpnTunnelLocalNetwork OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The local network of VPN tunnel."
+		::= { vpnTunnelEntry 17 }
+		
+	vpnTunnelRemoteNetwork OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The remote network of VPN tunnel."
+		::= { vpnTunnelEntry 18 }
+		
+	vpnTunnelEncapsulation OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The encapsulation mode of VPN tunnel."
+		::= { vpnTunnelEntry 19 }
+		
+	vpnTunnelAlgorithm OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The used algorithms of VPN tunnel."
+		::= { vpnTunnelEntry 20 }
+		
+	vpnTunnelRemoteGateway OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The remote gateway of VPN tunnel."
+		::= { vpnTunnelEntry 21 }
+		
+	vpnUpTunnel OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Number of total up tunnels when querying."
+		::= { zywallVPN 2 }
+
+	vpnPhase1ErrbyLocal OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Counter of phase 1 tunnels errors caused by local site between 2 
+			queries."
+		::= { zywallVPN 3 }
+
+	vpnPhase1ErrbyRemote OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Counter of phase 1 tunnels errors caused by remote site between 2 
+			queries."
+		::= { zywallVPN 4 }
+
+	vpnPhase2ErrbyLocal OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Counter of phase 2 tunnels errors caused by local site between 2 
+			queries."
+		::= { zywallVPN 5 }
+
+	vpnPhase2ErrbyRemote OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Counter of phase 2 tunnels errors caused by remote site between 2 
+			queries."
+		::= { zywallVPN 6 }
+
+	-- the VPN local user group
+	-- the VPN local user table
+	vpnLocalUserTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF VPNLocalUserEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of VPN local user entries from system local user database. 
+			The number depends on product definition."
+		::= { zywallVPN 7 }
+
+	vpnLocalUserEntry OBJECT-TYPE
+		SYNTAX  VPNLocalUserEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        	"A VPN local user entry containing comment object for a particular 
+        	local user."
+		INDEX   { vpnLocalUserIndex }
+		::= { vpnLocalUserTable 1 }
+
+	VPNLocalUserEntry ::=
+		SEQUENCE {
+			vpnLocalUserIndex
+				INTEGER,
+			vpnLocalUserName
+				DisplayString,
+			vpnLocalUserFailCnt
+				Counter64
+		}
+
+	vpnLocalUserIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of VPN local user, base on 1."
+		::= { vpnLocalUserEntry 1 }
+
+	vpnLocalUserName OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The name of VPN local user."
+		::= { vpnLocalUserEntry 2 }
+
+	vpnLocalUserFailCnt OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Counter of failure for each user name of local user database from 
+			device booting until now."
+		::= { vpnLocalUserEntry 3 }            
+		
+
+
+	-- The IDP group
+	
+	idpSigVersion OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The IDP signature version."
+		::= { zywallIDP 1 }            
+		
+	idpSigDate OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The IDP signature date."
+		::= { zywallIDP 2 }            
+
+		
+	-- The AV group
+	
+	avSigVersion OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The AV signature version."
+		::= { zywallAV 1 }            
+		
+	avSigDate OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The AV signature date."
+		::= { zywallAV 2 }            
+		
+
+END 	

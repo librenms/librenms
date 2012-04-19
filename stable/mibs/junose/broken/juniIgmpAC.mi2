@@ -1,0 +1,208 @@
+
+-- *****************************************************************************
+-- Juniper-IGMP-CONF
+--
+-- SNMP Agent Capabilities definitions for the IGMP MIBs.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2006 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-IGMP-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniIgmpAgent  MODULE-IDENTITY
+    LAST-UPDATED "200608250540Z"  -- 25-Aug-06 12:40 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the Internet Group Management
+        Protocol (IGMP) component of the SNMP agent in the Juniper E-series
+        family of products."
+    -- Revision History
+
+    REVISION    "200608250540Z"  -- 25-Aug-06 12:40 AM EST  - JUNOSe 7.0
+    DESCRIPTION
+        "Added rsIgmpIfLocationType for support on REX platform and deprecated
+         rsIgmpGroupsTable."
+    REVISION    "200309291822Z"  -- 29-Sep-03 02:22 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Juniper-IGMP-MIB:
+         Added IGMP admin state support."
+    REVISION    "200210281506Z"  -- 28-Oct-02 10:06 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-IGMP-MIB:
+         Replaced Unisphere names with Juniper names.
+         Added support for interface addresses and multicast group limits."
+    REVISION    "200208292048Z"  -- 29-Aug-02 04:48 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "IGMP-STD-MIB:
+         Added support for the IETF IGMP MIB (RFC 2933)."
+    REVISION    "200103281720Z"  -- 28-Mar-01 12:20 PM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 19 }
+
+
+-- *****************************************************************************
+-- IGMP SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniIgmpAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the IGMP component of the JUNOSe SNMP agent.  This version
+        of the IGMP component was supported in JUNOSe 3.0 thru 4.0 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the IGMP application in JUNOSe.
+        These capabilities became obsolete when support was added for the
+        IGMP-STD-MIB (RFC 2933)."
+    SUPPORTS    Juniper-IGMP-MIB
+        INCLUDES {
+            juniIgmpProxyInterfaceGroup,
+            juniIgmpProxyCacheGroup }
+    ::= { juniIgmpAgent 1 }
+
+juniIgmpAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the IGMP component of the JUNOSe SNMP agent.  This version
+        of the IGMP component was supported in JUNOSe 4.1 and subsequent 4.x
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the IGMP application in
+        JUNOSe.  These capabilities became obsolete when support was added to
+        Juniper-IGMP-MIB for interface addresses and multicast group limits."
+    SUPPORTS    IGMP-STD-MIB
+        INCLUDES {
+            igmpBaseMIBGroup,
+            igmpRouterMIBGroup,
+            igmpV2HostMIBGroup,
+            igmpHostOptMIBGroup,
+            igmpV2RouterMIBGroup,
+            igmpV2ProxyMIBGroup }
+        VARIATION   igmpCacheSelf
+            ACCESS      read-only
+            DESCRIPTION
+                "This attribute is not supported on the JUNOSe system.  It will
+                always get created with a value of false and can be read only.
+                JUNOSe currently has no applications which join multicast
+                groups."
+    SUPPORTS    Juniper-IGMP-MIB
+        INCLUDES {
+            juniIgmpProxyInterfaceGroup,
+            juniIgmpProxyCacheGroup }
+    ::= { juniIgmpAgent 2 }
+
+juniIgmpAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the IGMP component of the JUNOSe SNMP agent.  This version
+        of the IGMP component was supported in JUNOSe 5.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the IGMP application in
+        JUNOSe.  These capabilities became obsolete when support was added to
+        Juniper-IGMP-MIB for the administrative state object."
+    SUPPORTS    IGMP-STD-MIB
+        INCLUDES {
+            igmpBaseMIBGroup,
+            igmpRouterMIBGroup,
+            igmpV2HostMIBGroup,
+            igmpHostOptMIBGroup,
+            igmpV2RouterMIBGroup,
+            igmpV2ProxyMIBGroup }
+        VARIATION   igmpCacheSelf
+            ACCESS      read-only
+            DESCRIPTION
+                "This attribute is not supported on the JUNOSe system.  It will
+                always get created with a value of false and can be read only.
+                JUNOSe currently has no applications which join multicast
+                groups."
+    SUPPORTS    Juniper-IGMP-MIB
+        INCLUDES {
+            juniIgmpProxyInterfaceGroup,
+            juniIgmpProxyCacheGroup,
+            juniIgmpInterfaceGroup,
+            juniIgmpGroupsGroup }
+    ::= { juniIgmpAgent 3 }
+
+juniIgmpAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the IGMP component of the JUNOSe SNMP agent.  This version
+        of the IGMP component is supported in JUNOSe 5.1 and subsequent system
+        releases."
+    STATUS      deprecated
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the IGMP application in
+        JUNOSe."
+    SUPPORTS    IGMP-STD-MIB
+        INCLUDES {
+            igmpBaseMIBGroup,
+            igmpRouterMIBGroup,
+            igmpV2HostMIBGroup,
+            igmpHostOptMIBGroup,
+            igmpV2RouterMIBGroup,
+            igmpV2ProxyMIBGroup }
+        VARIATION   igmpCacheSelf
+            ACCESS      read-only
+            DESCRIPTION
+                "This attribute is not supported on the JUNOSe system.  It will
+                always get created with a value of false and can be read only.
+                JUNOSe currently has no applications which join multicast
+                groups."
+    SUPPORTS    Juniper-IGMP-MIB
+        INCLUDES {
+            juniIgmpProxyInterfaceGroup,
+            juniIgmpProxyCacheGroup,
+            juniIgmpInterfaceGroup2,
+            juniIgmpGroupsGroup }
+    ::= { juniIgmpAgent 4 }
+
+
+juniIgmpAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the IGMP component of the JUNOSe SNMP agent.  This version
+        of the IGMP component is supported in JUNOSe 7.0 and subsequent system
+        releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the IGMP application in
+        JUNOSe."
+    SUPPORTS    IGMP-STD-MIB
+        INCLUDES {
+            igmpBaseMIBGroup,
+            igmpRouterMIBGroup,
+            igmpV2HostMIBGroup,
+            igmpHostOptMIBGroup,
+            igmpV2RouterMIBGroup,
+            igmpV2ProxyMIBGroup }
+        VARIATION   igmpCacheSelf
+            ACCESS      read-only
+            DESCRIPTION
+                "This attribute is not supported on the JUNOSe system.  It will
+                always get created with a value of false and can be read only.
+                JUNOSe currently has no applications which join multicast
+                groups."
+    SUPPORTS    Juniper-IGMP-MIB
+        INCLUDES {
+            juniIgmpProxyInterfaceGroup,
+            juniIgmpProxyCacheGroup,
+            juniIgmpInterfaceGroup2,
+            juniIgmpGroupsGroup2 }
+    ::= { juniIgmpAgent 5 }
+
+END

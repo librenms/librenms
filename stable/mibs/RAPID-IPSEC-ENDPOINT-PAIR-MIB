@@ -1,0 +1,455 @@
+RAPID-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,  Unsigned32, Gauge32,
+        OBJECT-IDENTITY, enterprises,
+        IpAddress                       FROM SNMPv2-SMI
+        rapidstream                     FROM RAPID-MIB;
+
+    rsIpsecEndpointPairModule MODULE-IDENTITY
+        LAST-UPDATED "9909081200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "   Ella Yu
+                      WatchGuard Technologies, Inc.
+                      1841 Zanker Road
+                      San Jose, CA 95112
+                      USA
+
+                      408-519-4888
+                      ella.yu@watchguard.com "
+
+        DESCRIPTION
+            "The MIB module describes generic Ipsec Endpoint Pair information
+            of RapidStream system.  Mainly, the information 
+            obtained from this MIB is used to constructed topological
+            view of IPSec security gateways that are connected by
+            IPSec tunnels. 
+               
+            An IPSec Endpoint Pair is a pair of security gateways that
+            are connected with 0 or more IPSec SA's in tunnel mode.  
+            It contains information of aggregated information 
+            of tunnel mode SA's between two security gateways.
+
+            An IPSec Endpoint Pair is identified by a pair of IP addresses.
+            Therefore, if an IPSec security gateway X has 2 external
+            IP addresses while IPsec secruity gateway Y has 3 external
+            IP addresses, there are potentially 6 IPsec Endpoint Pairs
+            between X and Y."
+
+
+        REVISION      "200003211200Z"
+        DESCRIPTION
+            "Initial revision."
+        REVISION      "200211011200Z"
+        DESCRIPTION
+            "Changed CONTACT-INFO."
+        ::= { rapidstream 5 }
+
+
+    rsIpsecEndpointPairMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all IPSec tunnel
+             branches."
+        ::= { rsIpsecEndpointPairModule 1 }
+
+    rsIpsecEndpointPair OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all IPSec
+            tunnel information."
+        ::= { rsIpsecEndpointPairMIB 1 }
+
+    rsIpsecEndpointPairStatistics OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all objects which
+            are global counters for IPSec tunnels."
+        ::= { rsIpsecEndpointPairMIB 2 }
+
+
+    rsIpsecEndpointPairNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of entries in the rsIpsecEndpointPairTable. "
+        ::= { rsIpsecEndpointPair 1 }
+
+    rsIpsecEndpointPairTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSIpsecEndpointPairEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the connection table describing all current
+            IPSec tunnels exist on this entity."
+        ::= { rsIpsecEndpointPair 2 }
+
+
+    rsIpsecEndpointPairEntry OBJECT-TYPE
+        SYNTAX      RSIpsecEndpointPairEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            IPSec tunnel between two IPSec security gateways."
+        INDEX{ rsIpsecEndpointPairIndex }
+        ::= { rsIpsecEndpointPairTable 1 }
+
+    RSIpsecEndpointPairEntry ::= SEQUENCE {
+
+        rsIpsecEndpointPairIndex                 Integer32,
+
+        rsIpsecEndpointPairLocalAddr             IpAddress,
+        rsIpsecEndpointPairPeerAddr              IpAddress,
+
+
+        rsIpsecEndpointPairInSAs                 Unsigned32,
+        rsIpsecEndpointPairOutSAs                Unsigned32,
+        rsIpsecEndpointPairInAccKbytes           Counter32,
+        rsIpsecEndpointPairOutAccKbytes          Counter32,
+        rsIpsecEndpointPairInPackets             Counter32,
+        rsIpsecEndpointPairOutPackets            Counter32,
+        rsIpsecEndpointPairDecryptErrors         Counter32,
+        rsIpsecEndpointPairAuthErrors            Counter32,
+        rsIpsecEndpointPairReplayErrors          Counter32,
+        rsIpsecEndpointPairPolicyErrors          Counter32,
+        rsIpsecEndpointPairPadErrors             Counter32,
+        rsIpsecEndpointPairOtherReceiveErrors    Counter32,
+        rsIpsecEndpointPairSendErrors            Counter32
+
+    }
+
+    rsIpsecEndpointPairIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "The running index of this IPSec endpoint pair."
+        ::= { rsIpsecEndpointPairEntry 1 }
+
+    rsIpsecEndpointPairLocalAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The local IP address of the current IPSec ednpoint pair."
+        ::= { rsIpsecEndpointPairEntry 2 }
+
+    rsIpsecEndpointPairPeerAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The remote IP address of the current IPSec endpoint pair."
+        ::= { rsIpsecEndpointPairEntry 3 }
+
+
+    rsIpsecEndpointPairInSAs OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of inbound IPSEC SA's within this
+             IPSec endpoint pair."
+        ::= { rsIpsecEndpointPairEntry 4 }
+
+    rsIpsecEndpointPairOutSAs OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outbound IPSEC SA's within this
+             IPSec endpoint pair."
+        ::= { rsIpsecEndpointPairEntry 5 }
+
+    rsIpsecEndpointPairInAccKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total inbound traffic in Kbytes since the establish of
+             this connection."
+        ::= { rsIpsecEndpointPairEntry 6 }
+
+    rsIpsecEndpointPairOutAccKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total outound traffic in Kbytes since the establish of
+            this connection."
+        ::= { rsIpsecEndpointPairEntry 7 }
+
+    rsIpsecEndpointPairInPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of inbound packets since the establish of
+            this connection."
+        ::= { rsIpsecEndpointPairEntry 8 }
+
+    rsIpsecEndpointPairOutPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of outound packets since the establish of
+            this connection."
+        ::= { rsIpsecEndpointPairEntry 9 }
+
+    rsIpsecEndpointPairDecryptErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to decryption
+            error since the establish of this connection."
+        ::= { rsIpsecEndpointPairEntry 10 }
+
+    rsIpsecEndpointPairAuthErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to authentication
+            error since the establish of this connection."
+        ::= { rsIpsecEndpointPairEntry 11 }
+
+    rsIpsecEndpointPairReplayErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to replay
+            error since the establish of this connection."
+        ::= { rsIpsecEndpointPairEntry 12}
+
+    rsIpsecEndpointPairPolicyErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to policy
+            error since the establish of this connection."
+        ::= { rsIpsecEndpointPairEntry 13 }
+
+    rsIpsecEndpointPairPadErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to pad value
+            error since the establish of this connection."
+        ::= { rsIpsecEndpointPairEntry 14 }
+
+    rsIpsecEndpointPairOtherReceiveErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded  due to errors
+            other than decryption, authentication or replay errors. This
+            may include packets dropped due to a lack of receive
+            buffers, and may include packets dropped due to congestion
+            at the decryption element."
+        ::= { rsIpsecEndpointPairEntry 15 }
+
+    rsIpsecEndpointPairSendErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded due to any error.
+            This may include errors due to a lack of transmit buffers."
+        ::= { rsIpsecEndpointPairEntry 16 }
+
+
+   -- global statistics
+
+   rsIpsecEndpointPairTotalInSAs  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of active inbound SA's in the entity."
+        ::= { rsIpsecEndpointPairStatistics 1 }
+
+   rsIpsecEndpointPairTotalOutSAs  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of active outbound SA's in the entity."
+        ::= { rsIpsecEndpointPairStatistics 2 }
+
+   rsIpsecEndpointPairTotalInAccKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total inbound IPsec traffic of this entity."
+        ::= { rsIpsecEndpointPairStatistics 3 }
+
+   rsIpsecEndpointPairTotalOutAccKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total outbound IPsec traffic of this entity."
+        ::= { rsIpsecEndpointPairStatistics 4 }
+
+   rsIpsecEndpointPairTotalInPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total inbound IPsec packets of this entity."
+        ::= { rsIpsecEndpointPairStatistics 5 }
+
+   rsIpsecEndpointPairTotalOutPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total outbound IPsec packets of this entity."
+        ::= { rsIpsecEndpointPairStatistics 6 }
+
+
+    rsIpsecEndpointPairTotalDecryptErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Total number of packets on this entity discarded due to encryption
+           error."
+        ::= { rsIpsecEndpointPairStatistics 7 }
+
+    rsIpsecEndpointPairTotalAuthErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Total number of packets on this entity discarded 
+           due to authentication errors."
+        ::= { rsIpsecEndpointPairStatistics 8 }
+
+
+    rsIpsecEndpointPairTotalReplayErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Total number of packets discarded due to replay
+           errors on this entity."
+        ::= { rsIpsecEndpointPairStatistics 9 }
+
+    rsIpsecEndpointPairTotalPolicyErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Total number of packets discarded due to policy
+           errors on this entity."
+        ::= { rsIpsecEndpointPairStatistics 10 }
+
+
+    rsIpsecEndpointPairTotalPadErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Total number of packets on this entity  discarded due to pad value
+           error."
+        ::= { rsIpsecEndpointPairStatistics 11 }
+
+    rsIpsecEndpointPairTotalOtherReceiveErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets on this entity discarded  due to errors
+            other than decryption, authentication or replay errors. This
+            may include packets dropped due to a lack of receive
+            buffers, and may include packets dropped due to congestion
+            at the decryption element."
+        ::= { rsIpsecEndpointPairStatistics 12 }
+
+
+    rsIpsecEndpointPairTotalSendErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets discarded due to any error on
+            this entity."
+
+        ::= { rsIpsecEndpointPairStatistics 13 }
+
+
+    rsIpsecEndpointPairPeerIPToTunnel OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all tunnels
+             information of the policies."
+        ::= {rsIpsecEndpointPairMIB 3}
+
+    rsIpsecEndpointPairPeerIPToTunnelNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of tunnels in the peeriptotunnel table. "
+        ::= { rsIpsecEndpointPairPeerIPToTunnel 1 }
+
+    rsIpsecEndpointPairPeerIPToTunnelTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSIpsecEndpointPairPeerIPToTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The peeriptotunnel table in the endpointpair mib."
+        ::= { rsIpsecEndpointPairPeerIPToTunnel 2 }
+
+    rsIpsecEndpointPairPeerIPToTunnelEntry OBJECT-TYPE
+        SYNTAX      RSIpsecEndpointPairPeerIPToTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the peer ip and tunnel
+            information."
+        INDEX {
+            rsIpsecEndpointPairPeerIPToTunnelPeerIP,
+            rsIpsecEndpointPairPeerIPToTunnelTunnelID
+        }
+        ::= { rsIpsecEndpointPairPeerIPToTunnelTable 1 }
+
+    RSIpsecEndpointPairPeerIPToTunnelEntry ::= SEQUENCE {
+
+        rsIpsecEndpointPairPeerIPToTunnelPeerIP      IpAddress,
+        rsIpsecEndpointPairPeerIPToTunnelTunnelID    Integer32
+    }
+    
+    rsIpsecEndpointPairPeerIPToTunnelPeerIP  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peer ip of the peeriptotunnel table."
+        ::= {rsIpsecEndpointPairPeerIPToTunnelEntry 1}
+            
+    rsIpsecEndpointPairPeerIPToTunnelTunnelID  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tunnel id of the peeriptotunnel table."
+        ::= {rsIpsecEndpointPairPeerIPToTunnelEntry 2}
+        
+END
+

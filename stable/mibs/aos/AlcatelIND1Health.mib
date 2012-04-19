@@ -1,0 +1,1765 @@
+ALCATEL-IND1-HEALTH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE,
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	NOTIFICATION-TYPE              FROM SNMPv2-SMI
+	DisplayString                  FROM SNMPv2-TC
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP             FROM SNMPv2-CONF
+	healthMonTraps,
+        softentIND1Health              FROM ALCATEL-IND1-BASE
+        ifIndex                        FROM IF-MIB;
+ 
+
+ 
+	alcatelIND1HealthMonitorMIB MODULE-IDENTITY
+		LAST-UPDATED "200704030000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+         
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+        
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+        
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+		DESCRIPTION
+			"This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+         
+                 For the Birds Of Prey Product Line
+		 Health Monitoring for dissemination of resource consumption information.
+         
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+         
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+         
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+         
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION      "200704030000Z"
+        DESCRIPTION
+            "Addressing discrepancies with Alcatel Standard."
+     	        ::= { softentIND1Health 1}
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	alcatelIND1HealthMonitorMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Health Montor Subsystem Managed Objects."
+            ::= { alcatelIND1HealthMonitorMIB 1 }
+
+
+    alcatelIND1HealthMonitorMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Health Montor Subsystem Managed Objects."
+            ::= { alcatelIND1HealthMonitorMIB 2 }
+
+
+    alcatelIND1HealthMonitorMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Health Montor Subsystem Managed Objects."
+            ::= { alcatelIND1HealthMonitorMIBConformance 1}
+
+
+    alcatelIND1HealthMonitorMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Health Montor Subsystem Managed Objects."
+            ::= { alcatelIND1HealthMonitorMIBConformance 2}
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	healthDeviceInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+	--  healthDeviceInfo contains device-level
+	--  health monitoring information.  
+
+	healthDeviceRxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level input utilization over the
+		 latest sample period (percent)."
+	    ::= { healthDeviceInfo 1 }
+
+	healthDeviceRx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level input utilization over the
+		 last minute (percent)."
+	    ::= { healthDeviceInfo 2 }
+
+	healthDeviceRx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level input utilization over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 3 }
+
+	healthDeviceRx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute device-level input utilization over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 4 }
+
+	healthDeviceRxTxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level i/o utilization over the
+		 latest sample period (percent)."
+	    ::= { healthDeviceInfo 5 }
+
+	healthDeviceRxTx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level i/o utilization over the
+		 last minute (percent)."
+	    ::= { healthDeviceInfo 6 }
+
+	healthDeviceRxTx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level i/o utilization over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 7 }
+
+	healthDeviceRxTx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute device-level i/o utilization over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 8 }
+
+	healthDeviceMemoryLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level memory utilization over the
+		 latest sample period (percent)."
+	    ::= { healthDeviceInfo 9 }
+
+	healthDeviceMemory1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level memory utilization over the
+		 last minute (percent)."
+	    ::= { healthDeviceInfo 10 }
+
+	healthDeviceMemory1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level memory utilization over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 11 }
+
+	healthDeviceMemory1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute device-level memory utilization over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 12 }
+
+	healthDeviceCpuLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level CPU utilization over the
+		 latest sample period (percent)."
+	    ::= { healthDeviceInfo 13 }
+
+	healthDeviceCpu1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level CPU utilization over the
+		 last minute (percent)."
+	    ::= { healthDeviceInfo 14 }
+
+	healthDeviceCpu1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average device-level CPU utilization over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 15 }
+
+	healthDeviceCpu1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute device-level CPU utilization over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 16 }
+
+	healthDeviceTemperatureChasLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average chassis temperature over the
+		 latest sample period (percent)."
+	    ::= { healthDeviceInfo 17 }
+
+	healthDeviceTemperatureChas1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average chassis temperature over the
+		 last minute (percent)."
+	    ::= { healthDeviceInfo 18 }
+
+	healthDeviceTemperatureChas1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average chassis temperature over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 19 }
+
+	healthDeviceTemperatureChas1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute chassis temperature over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 20 }
+
+	healthDeviceTemperatureCmmCpuLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  obsolete
+	    DESCRIPTION
+		"Average CMM CPU temperature over the
+		 latest sample period (percent)."
+	    ::= { healthDeviceInfo 21 }
+
+	healthDeviceTemperatureCmmCpu1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  obsolete
+	    DESCRIPTION
+		"Average CMM CPU temperature over the
+		 last minute (percent)."
+	    ::= { healthDeviceInfo 22 }
+
+	healthDeviceTemperatureCmmCpu1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  obsolete
+	    DESCRIPTION
+		"Average CMM CPU temperature over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 23 }
+
+	healthDeviceTemperatureCmmCpu1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  obsolete
+	    DESCRIPTION
+		"Maximum one-minute CMM CPU temperature over the
+		 last hour (percent)."
+	    ::= { healthDeviceInfo 24 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	healthModuleInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	--  healthModuleInfo contains slot-level health monitoring information.
+
+
+	healthModuleTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF HealthModuleEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"A list of installed modules in this chassis."
+	    ::= { healthModuleInfo 1 }
+
+	healthModuleEntry  OBJECT-TYPE
+	    SYNTAX  HealthModuleEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"A module entry containing objects for a module in a specific 'slot'."
+	    INDEX { healthModuleSlot }
+	    ::= { healthModuleTable 1 }
+
+	HealthModuleEntry ::= SEQUENCE {
+	    healthModuleSlot
+			INTEGER,
+	    healthModuleRxLatest
+			INTEGER,
+	    healthModuleRx1MinAvg
+			INTEGER,
+	    healthModuleRx1HrAvg
+			INTEGER,
+	    healthModuleRx1HrMax
+			INTEGER,
+	    healthModuleRxTxLatest
+			INTEGER,
+	    healthModuleRxTx1MinAvg
+			INTEGER,
+	    healthModuleRxTx1HrAvg
+			INTEGER,
+	    healthModuleRxTx1HrMax
+			INTEGER,
+	    healthModuleMemoryLatest
+			INTEGER,
+	    healthModuleMemory1MinAvg
+			INTEGER,
+	    healthModuleMemory1HrAvg
+			INTEGER,
+	    healthModuleMemory1HrMax
+			INTEGER,
+	    healthModuleCpuLatest
+			INTEGER,
+	    healthModuleCpu1MinAvg
+			INTEGER,
+	    healthModuleCpu1HrAvg
+			INTEGER,
+	    healthModuleCpu1HrMax
+			INTEGER
+	    }
+
+	healthModuleSlot  OBJECT-TYPE
+	    SYNTAX  INTEGER  (1..64)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The (one-based) front slot number within the chassis."
+	    ::= { healthModuleEntry 1 }
+
+	healthModuleRxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level input utilization over the 
+		 latest sample period (percent)."
+	    ::= { healthModuleEntry 2 }
+
+	healthModuleRx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level input utilization over the 
+		 last minute (percent)."
+	    ::= { healthModuleEntry 3 }
+
+	healthModuleRx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level input utilization over the 
+		 last hour (percent)."
+	    ::= { healthModuleEntry 4 }
+
+	healthModuleRx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute module-level input utilization over the 
+		 last hour (percent)."
+	    ::= { healthModuleEntry 5 }
+
+	healthModuleRxTxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level i/o utilization over the 
+		 latest sample period (percent)."
+	    ::= { healthModuleEntry 6 }
+
+	healthModuleRxTx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level i/o utilization over the 
+		 last minute (percent)."
+	    ::= { healthModuleEntry 7 }
+
+	healthModuleRxTx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level i/o utilization over the 
+		 last hour (percent)."
+	    ::= { healthModuleEntry 8 }
+
+	healthModuleRxTx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute module-level i/o utilization over the 
+		 last hour (percent)."
+	    ::= { healthModuleEntry 9 }
+
+	healthModuleMemoryLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level memory utilization over the
+		 latest sample period (percent)."
+	    ::= { healthModuleEntry 10 }
+
+	healthModuleMemory1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level memory utilization over the
+		 last minute (percent)."
+	    ::= { healthModuleEntry 11 }
+
+	healthModuleMemory1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level memory utilization over the
+		 last hour (percent)."
+	    ::= { healthModuleEntry 12 }
+
+	healthModuleMemory1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute module-level memory utilization over the
+		 last hour (percent)."
+	    ::= { healthModuleEntry 13 }
+
+	healthModuleCpuLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level CPU utilization over the
+		 latest sample period (percent)."
+	    ::= { healthModuleEntry 14 }
+
+	healthModuleCpu1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level CPU utilization over the
+		 last minute (percent)."
+	    ::= { healthModuleEntry 15 }
+
+	healthModuleCpu1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average module-level CPU utilization over the
+		 last hour (percent)."
+	    ::= { healthModuleEntry 16 }
+
+	healthModuleCpu1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute module-level CPU utilization over the
+		 last hour (percent)."
+	    ::= { healthModuleEntry 17 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	healthPortInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	--  healthPortInfo contains port-level health monitoring information.
+
+	HealthPortUpDownStatus ::= INTEGER {
+	    healthPortDn(1),
+	    healthPortUp(2)
+	}
+
+	healthPortTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF HealthPortEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"A list of Physical Port health instances."
+	    ::= { healthPortInfo 1 }
+
+	healthPortEntry  OBJECT-TYPE
+	    SYNTAX  HealthPortEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"A Physical Port health entry."
+	    INDEX { healthPortSlot, healthPortIF }
+	    ::= { healthPortTable 1 }
+
+	HealthPortEntry ::= SEQUENCE {
+	    healthPortSlot
+			INTEGER,
+	    healthPortIF
+			INTEGER,
+	    healthPortUpDn
+			HealthPortUpDownStatus,
+	    healthPortRxLatest
+			INTEGER,
+	    healthPortRx1MinAvg
+			INTEGER,
+	    healthPortRx1HrAvg
+			INTEGER,
+	    healthPortRx1HrMax
+			INTEGER,
+	    healthPortRxTxLatest
+			INTEGER,
+	    healthPortRxTx1MinAvg
+			INTEGER,
+	    healthPortRxTx1HrAvg
+			INTEGER,
+	    healthPortRxTx1HrMax
+			INTEGER
+	    }
+
+	healthPortSlot  OBJECT-TYPE
+	    SYNTAX  INTEGER (1..64)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The physical slot number for this port."
+	    ::= { healthPortEntry 1 }
+
+	healthPortIF  OBJECT-TYPE
+	    SYNTAX  INTEGER  (1..64)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The on-board interface number."
+	    ::= { healthPortEntry 2 }
+
+	healthPortUpDn  OBJECT-TYPE
+	    SYNTAX  HealthPortUpDownStatus 
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The status of this port."
+	    ::= { healthPortEntry 3 }
+
+	healthPortRxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average port-level input utilization over the 
+		 latest sample period (percent)."
+	    ::= { healthPortEntry 4 }
+
+	healthPortRx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average port-level input utilization over the 
+		 last minute (percent)."
+	    ::= { healthPortEntry 5 }
+
+	healthPortRx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average port-level input utilization over the 
+		 last hour (percent)."
+	    ::= { healthPortEntry 6 }
+
+	healthPortRx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute port-level input utilization over the 
+		 last hour (percent)."
+	    ::= { healthPortEntry 7 }
+
+	healthPortRxTxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average port-level i/o utilization over the 
+		 latest sample period (percent)."
+	    ::= { healthPortEntry 8 }
+
+	healthPortRxTx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average port-level i/o utilization over the 
+		 last minute (percent)."
+	    ::= { healthPortEntry 9 }
+
+	healthPortRxTx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average port-level i/o utilization over the 
+		 last hour (percent)."
+	    ::= { healthPortEntry 10 }
+
+	healthPortRxTx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute port-level i/o utilization over the 
+		 last hour (percent)."
+	    ::= { healthPortEntry 11 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	healthControlInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	--  healthControl contains the variables
+	--  which control operation of resource utilization sampling. 
+	--
+        healthSamplingInterval OBJECT-TYPE
+	      SYNTAX  INTEGER  (1..30)
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                 "Time interval between consecutive samples of resources.
+		  Units are seconds.  Legal values are:               1,2,3,4,5,6,10,12,15,20,30."
+              DEFVAL  { 5 }
+              ::= { healthControlInfo 1 }
+
+        healthSamplingReset OBJECT-TYPE
+              SYNTAX  INTEGER   (0..2147483647)
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                 "Any set of this variable causes all health counters to reset
+		  to zero and a restart of sampling."
+              DEFVAL  { 1 }
+              ::= { healthControlInfo 2 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	healthThreshInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 5 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	--  healthThreshInfo contains the threshold data.
+	--
+
+	healthThreshDeviceRxLimit  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+  		"Device input threshold value.  Units are percent."
+            DEFVAL  { 80 }
+	    ::= { healthThreshInfo 1 }
+
+	healthThreshDeviceRxTxLimit  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+  		"Device input/output threshold value.  Units are percent."
+            DEFVAL  { 80 }
+	    ::= { healthThreshInfo 2 }
+
+	healthThreshDeviceMemoryLimit  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+  		"Device memory threshold value.  Units are percent."
+            DEFVAL  { 80 }
+	    ::= { healthThreshInfo 3 }
+	    
+	healthThreshDeviceCpuLimit  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+  		"Device Cpu threshold value.  Units are percent."
+            DEFVAL  { 80 }
+	    ::= { healthThreshInfo 4 }
+
+
+	healthThreshDeviceRxSecondaryLimit  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+  		"Device input secondary threshold value.  Units are percent."
+            DEFVAL  { 60 }
+	    ::= { healthThreshInfo 5 }
+
+	healthThreshDeviceRxTxSecondaryLimit  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+  		"Device input/output secondary threshold value.  Units are percent."
+            DEFVAL  { 60 }
+	    ::= { healthThreshInfo 6 }
+
+	healthThreshDeviceMemorySecondaryLimit  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+  		"Device memory secondary threshold value.  Units are percent."
+            DEFVAL  { 60 }
+	    ::= { healthThreshInfo 7 }
+	    
+	healthThreshDeviceCpuSecondaryLimit  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+  		"Device CPU secondary threshold value.  Units are percent."
+            DEFVAL  { 60 }
+	    ::= { healthThreshInfo 8 }
+
+	healthThreshDeviceTempLimit  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+  		"Device Temperature threshold value.  Units are degrees Celsius."
+            DEFVAL  { 50 }
+	    ::= { healthThreshInfo 9 }
+
+	healthThreshDeviceTempSecondaryLimit  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+  		"Device Temperature secondary threshold value.  Units are degrees Celsius."
+            DEFVAL  { 40 }
+	    ::= { healthThreshInfo 10 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	healthSliceInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 7 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	--  healthSliceInfo contains the slice data.
+	--
+
+	healthSliceTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF HealthSliceEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"A list of Physical Slice health instances."
+	    ::= { healthSliceInfo 1 }
+
+	healthSliceEntry  OBJECT-TYPE
+	    SYNTAX  HealthSliceEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"A Physical Slice health entry."
+	    INDEX { healthSliceSlot, healthSliceSlice }
+	    ::= { healthSliceTable 1 }
+
+	HealthSliceEntry ::= SEQUENCE {
+	    healthSliceSlot
+			INTEGER,
+	    healthSliceSlice
+			INTEGER,
+	    healthSliceMemoryLatest
+			INTEGER,
+	    healthSliceCpuLatest
+			INTEGER
+	    }
+
+	healthSliceSlot  OBJECT-TYPE
+	    SYNTAX  INTEGER (1..64)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The physical slot number for this slice."
+	    ::= { healthSliceEntry 1 }
+
+	healthSliceSlice  OBJECT-TYPE
+	    SYNTAX  INTEGER  (1..64)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The on-board slice number."
+	    ::= { healthSliceEntry 2 }
+
+	healthSliceMemoryLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Slice-level memory utilization over the
+		 latest sample period (percent)."
+	    ::= { healthSliceEntry 3 }
+
+
+	healthSliceCpuLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Slice-level Cpu utilization over the
+		 latest sample period (percent)."
+	    ::= { healthSliceEntry 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	healthFabricInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 8 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	--  healthFabricInfo contains the fabric data.
+	--
+
+	healthFabricTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF HealthFabricEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"A list of installed modules in this chassis."
+	    ::= { healthFabricInfo 1 }
+
+	healthFabricEntry  OBJECT-TYPE
+	    SYNTAX  HealthFabricEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"A fabric entry containing objects for a module in a specific 'slot'."
+	    INDEX { healthFabricSlot }
+	    ::= { healthFabricTable 1 }
+
+	HealthFabricEntry ::= SEQUENCE {
+	    healthFabricSlot
+			INTEGER,
+	    healthFabricPrimaryRxLatest
+			INTEGER,
+	    healthFabricPrimaryRx1MinAvg
+			INTEGER,
+	    healthFabricPrimaryRx1HrAvg
+			INTEGER,
+	    healthFabricPrimaryRx1HrMax
+			INTEGER,
+	    healthFabricPrimaryRxTxLatest
+			INTEGER,
+	    healthFabricPrimaryRxTx1MinAvg
+			INTEGER,
+	    healthFabricPrimaryRxTx1HrAvg
+			INTEGER,
+	    healthFabricPrimaryRxTx1HrMax
+			INTEGER,
+	    healthFabricSecondaryRxLatest
+			INTEGER,
+	    healthFabricSecondaryRx1MinAvg
+			INTEGER,
+	    healthFabricSecondaryRx1HrAvg
+			INTEGER,
+	    healthFabricSecondaryRx1HrMax
+			INTEGER,
+	    healthFabricSecondaryRxTxLatest
+			INTEGER,
+	    healthFabricSecondaryRxTx1MinAvg
+			INTEGER,
+	    healthFabricSecondaryRxTx1HrAvg
+			INTEGER,
+	    healthFabricSecondaryRxTx1HrMax
+			INTEGER,
+	    healthFabricPrimaryLink1RxLatest 
+			INTEGER,
+    	healthFabricPrimaryLink1Rx1MinAvg
+			INTEGER,
+    	healthFabricPrimaryLink1Rx1HrAvg 
+			INTEGER,
+    	healthFabricPrimaryLink1Rx1HrMax 
+			INTEGER,
+    	healthFabricPrimaryLink1RxTxLatest  
+			INTEGER,
+    	healthFabricPrimaryLink1RxTx1MinAvg 
+			INTEGER,
+    	healthFabricPrimaryLink1RxTx1HrAvg  
+			INTEGER,
+    	healthFabricPrimaryLink1RxTx1HrMax  
+			INTEGER,
+    	healthFabricSecondaryLink1RxLatest  
+			INTEGER,
+    	healthFabricSecondaryLink1Rx1MinAvg 
+			INTEGER,
+    	healthFabricSecondaryLink1Rx1HrAvg  
+			INTEGER,
+    	healthFabricSecondaryLink1Rx1HrMax  
+			INTEGER,
+    	healthFabricSecondaryLink1RxTxLatest  
+			INTEGER,
+    	healthFabricSecondaryLink1RxTx1MinAvg 
+			INTEGER,
+    	healthFabricSecondaryLink1RxTx1HrAvg  
+			INTEGER,
+    	healthFabricSecondaryLink1RxTx1HrMax  
+			INTEGER
+	    }
+
+	healthFabricSlot  OBJECT-TYPE
+	    SYNTAX  INTEGER  (1..64)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The (one-based) front slot number within the chassis."
+	    ::= { healthFabricEntry 1 }
+
+
+	healthFabricPrimaryRxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric input utilization over the
+		 latest sample period (percent). If the switch has multiple 
+		 fabric links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 2 }
+
+	healthFabricPrimaryRx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric input utilization over the
+		 last minute (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 3 }
+
+	healthFabricPrimaryRx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric input utilization over the
+		 last hour (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 4 }
+
+	healthFabricPrimaryRx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute primary fabric input utilization over the
+		 last hour (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 5 }
+
+
+	healthFabricPrimaryRxTxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric i/o utilization over the
+		 latest sample period (percent). If the switch has multiple
+		 fabric links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 6 }
+
+	healthFabricPrimaryRxTx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric i/o utilization over the
+		 last minute (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 7 }
+
+	healthFabricPrimaryRxTx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric i/o utilization over the
+		 last hour (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 8 }
+
+	healthFabricPrimaryRxTx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute primary fabric i/o utilization over the
+		 last hour (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 9 }
+
+
+	healthFabricSecondaryRxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric input utilization over the
+		 latest sample period (percent). If the switch has multiple
+		 fabric links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 10 }
+
+	healthFabricSecondaryRx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric input utilization over the
+		 last minute (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 11 }
+
+	healthFabricSecondaryRx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric input utilization over the
+		 last hour (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 12 }
+
+	healthFabricSecondaryRx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute secondary fabric input utilization over the
+		 last hour (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 13 }
+
+	healthFabricSecondaryRxTxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric i/o utilization over the
+		 latest sample period (percent). If the switch has multiple
+		 fabric links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 14 }
+
+	healthFabricSecondaryRxTx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric i/o utilization over the
+		 last minute (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 15 }
+
+	healthFabricSecondaryRxTx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric i/o utilization over the
+		 last hour (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 16 }
+
+	healthFabricSecondaryRxTx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute secondary fabric i/o utilization over the
+		 last hour (percent). If the switch has multiple fabric
+		 links it represents the value for Link0 of the fabric."
+	    ::= { healthFabricEntry 17 }
+
+  healthFabricPrimaryLink1RxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric link1 input utilization over the
+		 latest sample period (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 18 }
+
+	healthFabricPrimaryLink1Rx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric link1 input utilization over the
+		 last minute (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 19 }
+
+	healthFabricPrimaryLink1Rx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric link1 input utilization over the
+		 last hour (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 20 }
+
+	healthFabricPrimaryLink1Rx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute primary fabric link1 input utilization over the
+		 last hour (percent). Only used for a switch with multiple fabric 
+		 links."
+	    ::= { healthFabricEntry 21 }
+
+
+	healthFabricPrimaryLink1RxTxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric link1 i/o utilization over the
+		 latest sample period (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 22 }
+
+	healthFabricPrimaryLink1RxTx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric link1 i/o utilization over the
+		 last minute (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 23 }
+
+	healthFabricPrimaryLink1RxTx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average primary fabric link1 i/o utilization over the
+		 last hour (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 24 }
+
+	healthFabricPrimaryLink1RxTx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute primary fabric link1 i/o utilization over the
+		 last hour (percent). Only used for a switch with multiple fabric 
+		 links."
+	    ::= { healthFabricEntry 25 }
+
+
+	healthFabricSecondaryLink1RxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric link1 input utilization over the
+		 latest sample period (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 26 }
+
+	healthFabricSecondaryLink1Rx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric link1 input utilization over the
+		 last minute (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 27 }
+
+	healthFabricSecondaryLink1Rx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric link1 input utilization over the
+		 last hour (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 28 }
+
+	healthFabricSecondaryLink1Rx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute secondary fabric link1 input utilization over the
+		 last hour (percent). Only used for a switch with multiple fabric 
+		 links."
+	    ::= { healthFabricEntry 29 }
+
+	healthFabricSecondaryLink1RxTxLatest  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric link1 i/o utilization over the
+		 latest sample period (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 30 }
+
+	healthFabricSecondaryLink1RxTx1MinAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric link1 i/o utilization over the
+		 last minute (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 31 }
+
+	healthFabricSecondaryLink1RxTx1HrAvg  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Average secondary fabric link1 i/o utilization over the
+		 last hour (percent). Only used for a switch
+		 with multiple fabric links."
+	    ::= { healthFabricEntry 32 }
+
+	healthFabricSecondaryLink1RxTx1HrMax  OBJECT-TYPE
+	    SYNTAX  INTEGER  (0..100)
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Maximum one-minute secondary fabric link1 i/o utilization over the
+		 last hour (percent). Only used for a switch with multiple fabric 
+		 links."
+	    ::= { healthFabricEntry 33 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	healthTrapInfo  OBJECT IDENTIFIER ::= { alcatelIND1HealthMonitorMIBObjects 6 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	--  healthTrapInfo contains objects exclusively used in traps.
+	--
+
+	healthMonRxStatus  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  {
+		     crossedBelowThreshold (1),
+		     noChange              (2),
+		     crossedAboveThreshold (3)
+                             }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+  		"Rx threshold status."
+	    ::= { healthTrapInfo 1 }
+
+	healthMonRxTxStatus  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  {
+		     crossedBelowThreshold (1),
+		     noChange              (2),
+		     crossedAboveThreshold (3)
+                             }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+  		"RxTx threshold status."
+	    ::= { healthTrapInfo 2 }
+
+	healthMonMemoryStatus  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  {
+		     crossedBelowThreshold (1),
+		     noChange              (2),
+		     crossedAboveThreshold (3)
+                             }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+  		"Memory threshold status."
+	    ::= { healthTrapInfo 3 }
+
+	healthMonCpuStatus  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  {
+		     crossedBelowThreshold (1),
+		     noChange              (2),
+		     crossedAboveThreshold (3)
+                             }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+  		"CPU threshold status."
+	    ::= { healthTrapInfo 4 }
+
+	healthMonCmmTempStatus  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  {
+		     crossedBelowThreshold (1),
+		     noChange              (2),
+		     crossedAboveThreshold (3)
+                             }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+  		"CMM temperature threshold status."
+	    ::= { healthTrapInfo 5 }
+
+	healthMonCmmCpuTempStatus  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  {
+		     crossedBelowThreshold (1),
+		     noChange              (2),
+		     crossedAboveThreshold (3)
+                             }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+  		"CMM CPU temperature threshold status."
+	    ::= { healthTrapInfo 6 }
+
+	healthMonPrimaryFabricRxStatus  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  {
+		     crossedBelowThreshold (1),
+		     noChange              (2),
+		     crossedAboveThreshold (3)
+                             }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+  		"Primary Fabric Rx threshold status."
+	    ::= { healthTrapInfo 7 }
+
+	healthMonPrimaryFabricRxTxStatus  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  {
+		     crossedBelowThreshold (1),
+		     noChange              (2),
+		     crossedAboveThreshold (3)
+                             }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+  		"Primary Fabric RxTx threshold status."
+	    ::= { healthTrapInfo 8 }
+
+	healthMonSecondaryFabricRxStatus  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  {
+		     crossedBelowThreshold (1),
+		     noChange              (2),
+		     crossedAboveThreshold (3)
+                             }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+  		"Secondary Fabric Rx threshold status."
+	    ::= { healthTrapInfo 9 }
+
+	healthMonSecondaryFabricRxTxStatus  OBJECT-TYPE
+ 	    SYNTAX  INTEGER  {
+		     crossedBelowThreshold (1),
+		     noChange              (2),
+		     crossedAboveThreshold (3)
+                             }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+  		"Secondary Fabric RxTx threshold status."
+	    ::= { healthTrapInfo 10 }
+
+
+	healthMonIpcPoolStatus  OBJECT-TYPE
+            SYNTAX     DisplayString (SIZE (0..255) )
+	    MAX-ACCESS  read-only
+            STATUS   current
+            DESCRIPTION
+                "Ipc Pools Usage status."
+            ::= { healthTrapInfo 11 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+--  NOTIFICATIONS
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+	healthMonDeviceTrap  NOTIFICATION-TYPE
+	   OBJECTS { 
+	       healthMonRxStatus, 
+	       healthMonRxTxStatus, 
+	       healthMonMemoryStatus, 
+	       healthMonCpuStatus, 
+	       healthMonCmmTempStatus, 
+	       healthMonCmmCpuTempStatus
+		   }
+	   STATUS   current
+	   DESCRIPTION 
+	       "Device-level rising/falling threshold crossing trap."
+	    ::= { healthMonTraps 0 1 }
+
+	healthMonModuleTrap  NOTIFICATION-TYPE
+	   OBJECTS { 
+	       healthModuleSlot,
+	       healthMonRxStatus, 
+	       healthMonRxTxStatus,
+	       healthMonMemoryStatus, 
+	       healthMonCpuStatus,
+	       healthMonPrimaryFabricRxStatus,
+	       healthMonPrimaryFabricRxTxStatus,
+	       healthMonSecondaryFabricRxStatus,
+	       healthMonSecondaryFabricRxTxStatus
+		   }
+	   STATUS   current
+	   DESCRIPTION 
+	       "Module-level rising/falling threshold crossing trap."
+	    ::= { healthMonTraps 0 2 }
+
+	healthMonPortTrap  NOTIFICATION-TYPE
+	   OBJECTS { 
+	       healthPortSlot,
+	       healthPortIF,
+	       healthMonRxStatus, 
+	       healthMonRxTxStatus 
+		   }
+	   STATUS   current
+	   DESCRIPTION 
+	       "Port-level rising/falling threshold crossing trap."
+	    ::= { healthMonTraps 0 3 }
+
+	 healthMonIpcTrap  NOTIFICATION-TYPE
+             OBJECTS {
+                healthMonIpcPoolStatus
+                     }
+             STATUS   current
+             DESCRIPTION
+               "IPC pools exceed usage/ causing trap."
+            ::= { healthMonTraps 0 4 }
+
+        healthMonCpuShutPortTrap  NOTIFICATION-TYPE
+                  OBJECTS { 
+                      healthModuleSlot,
+                      ifIndex,
+                      healthModuleCpuLatest
+                          }
+                  STATUS   current
+                  DESCRIPTION 
+                      "Port Shutdown notification for CPU spike."
+              ::= { healthMonTraps 0 5 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alcatelIND1HealthMonitorMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for Health Monitoring."
+        MODULE
+            MANDATORY-GROUPS
+            {
+                healthDeviceGroup,
+                healthModuleGroup,
+                healthPortGroup,
+                healthControlGroup,
+                healthThreshGroup,
+                healthSliceGroup
+            }
+
+        ::= { alcatelIND1HealthMonitorMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    healthDeviceGroup OBJECT-GROUP
+        OBJECTS
+        {
+	                healthDeviceRxLatest,
+	                healthDeviceRx1MinAvg,
+	                healthDeviceRx1HrAvg,
+	                healthDeviceRx1HrMax,
+	                healthDeviceRxTxLatest,
+	                healthDeviceRxTx1MinAvg,
+	                healthDeviceRxTx1MinAvg,
+	                healthDeviceRxTx1HrAvg,
+	                healthDeviceRxTx1HrMax,
+	                healthDeviceMemoryLatest,
+	                healthDeviceMemory1MinAvg,
+	                healthDeviceMemory1HrAvg,
+	                healthDeviceMemory1HrMax,
+	                healthDeviceCpuLatest,
+	                healthDeviceCpu1MinAvg,
+	                healthDeviceCpu1HrAvg,
+	                healthDeviceCpu1HrMax,
+	                healthDeviceTemperatureChas1HrMax,
+	                healthDeviceTemperatureChasLatest,
+	                healthDeviceTemperatureChas1MinAvg,
+	                healthDeviceTemperatureChas1HrAvg,
+	                healthDeviceTemperatureChas1HrMax,
+	                healthDeviceTemperatureCmmCpuLatest,
+	                healthDeviceTemperatureCmmCpu1MinAvg,
+	                healthDeviceTemperatureCmmCpu1HrAvg,
+	                healthDeviceTemperatureCmmCpu1HrMax
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of device-level health monitoring objects."
+        ::= { alcatelIND1HealthMonitorMIBGroups 1 }
+
+
+    healthModuleGroup OBJECT-GROUP
+        OBJECTS
+        {
+	                healthModuleSlot,      
+	                healthModuleRxLatest,
+	                healthModuleRx1MinAvg,
+	                healthModuleRx1HrAvg,
+	                healthModuleRx1HrMax,
+	                healthModuleRxTxLatest,
+	                healthModuleRxTx1MinAvg,
+	                healthModuleRxTx1MinAvg,
+	                healthModuleRxTx1HrAvg,
+	                healthModuleRxTx1HrMax,
+	                healthModuleMemoryLatest,
+	                healthModuleMemory1MinAvg,
+	                healthModuleMemory1HrAvg,
+	                healthModuleMemory1HrMax,
+	                healthModuleCpuLatest,
+	                healthModuleCpu1MinAvg,
+	                healthModuleCpu1HrAvg,
+	                healthModuleCpu1HrMax
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of slot-level health monitoring objects."
+        ::= { alcatelIND1HealthMonitorMIBGroups 2 }
+
+
+    healthPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+	                healthPortSlot,      
+	                healthPortIF,      
+	                healthPortRxLatest,
+	                healthPortRx1MinAvg,
+	                healthPortRx1HrAvg,
+	                healthPortRx1HrMax,
+	                healthPortRxTxLatest,
+	                healthPortRxTx1MinAvg,
+	                healthPortRxTx1MinAvg,
+	                healthPortRxTx1HrAvg,
+	                healthPortRxTx1HrMax
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of port-level health monitoring objects."
+        ::= { alcatelIND1HealthMonitorMIBGroups 3 }
+
+
+    healthControlGroup OBJECT-GROUP
+        OBJECTS
+        {
+                        healthSamplingInterval,
+                        healthSamplingReset
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects which control operation of resource utilization sampling."
+        ::= { alcatelIND1HealthMonitorMIBGroups 4 }
+
+
+    healthThreshGroup OBJECT-GROUP
+        OBJECTS
+        {
+	                healthThreshDeviceRxLimit,
+	                healthThreshDeviceRxTxLimit,
+	                healthThreshDeviceMemoryLimit,
+	                healthThreshDeviceCpuLimit,
+	                healthThreshDeviceRxSecondaryLimit,
+	                healthThreshDeviceRxTxSecondaryLimit,
+	                healthThreshDeviceMemorySecondaryLimit,
+	                healthThreshDeviceCpuSecondaryLimit,
+	                healthThreshDeviceTempLimit,
+	                healthThreshDeviceTempSecondaryLimit
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of threshold objects."
+        ::= { alcatelIND1HealthMonitorMIBGroups 5 }
+
+
+    healthTrapObjectsGroup OBJECT-GROUP
+        OBJECTS
+        {
+	                healthMonRxStatus,
+	                healthMonRxTxStatus,
+	                healthMonMemoryStatus,
+	                healthMonCpuStatus,
+	                healthMonCmmTempStatus,
+	                healthMonCmmCpuTempStatus,
+	                healthMonPrimaryFabricRxStatus,
+	                healthMonPrimaryFabricRxTxStatus,
+	                healthMonSecondaryFabricRxStatus,
+	                healthMonSecondaryFabricRxTxStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects which appear only in traps."
+        ::= { alcatelIND1HealthMonitorMIBGroups 6 }
+
+
+    healthTrapsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+	                healthMonDeviceTrap,
+	                healthMonModuleTrap,
+	                healthMonPortTrap,
+			healthMonIpcTrap
+	}
+        STATUS  current
+        DESCRIPTION
+            "Collection of Traps for health monitoring."
+        ::= { alcatelIND1HealthMonitorMIBGroups 7 }
+
+
+    healthSliceGroup OBJECT-GROUP
+        OBJECTS
+        {
+	                healthSliceSlot,      
+	                healthSliceSlice,      
+	                healthSliceMemoryLatest,      
+	                healthSliceCpuLatest
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of slice-level health monitoring objects."
+        ::= { alcatelIND1HealthMonitorMIBGroups 8 }
+
+
+    healthFabricGroup OBJECT-GROUP
+        OBJECTS
+        {
+	                healthFabricPrimaryRxLatest,
+	                healthFabricPrimaryRx1MinAvg,
+	                healthFabricPrimaryRx1HrAvg,
+	                healthFabricPrimaryRx1HrMax,
+	                healthFabricPrimaryRxTxLatest,
+	                healthFabricPrimaryRxTx1MinAvg,
+	                healthFabricPrimaryRxTx1HrAvg,
+	                healthFabricPrimaryRxTx1HrMax,
+	                healthFabricSecondaryRxLatest,
+	                healthFabricSecondaryRx1MinAvg,
+	                healthFabricSecondaryRx1HrAvg,
+	                healthFabricSecondaryRx1HrMax,
+	                healthFabricSecondaryRxTxLatest,
+	                healthFabricSecondaryRxTx1MinAvg,
+	                healthFabricSecondaryRxTx1HrAvg,
+	                healthFabricSecondaryRxTx1HrMax,
+	                healthFabricPrimaryLink1RxLatest, 
+                	healthFabricPrimaryLink1Rx1MinAvg,
+                	healthFabricPrimaryLink1Rx1HrAvg, 
+                	healthFabricPrimaryLink1Rx1HrMax, 
+                	healthFabricPrimaryLink1RxTxLatest,  
+                	healthFabricPrimaryLink1RxTx1MinAvg, 
+                	healthFabricPrimaryLink1RxTx1HrAvg,  
+                	healthFabricPrimaryLink1RxTx1HrMax,  
+                	healthFabricSecondaryLink1RxLatest,  
+                	healthFabricSecondaryLink1Rx1MinAvg, 
+                	healthFabricSecondaryLink1Rx1HrAvg,  
+                	healthFabricSecondaryLink1Rx1HrMax,  
+                	healthFabricSecondaryLink1RxTxLatest,  
+                	healthFabricSecondaryLink1RxTx1MinAvg, 
+                	healthFabricSecondaryLink1RxTx1HrAvg,  
+                	healthFabricSecondaryLink1RxTx1HrMax
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of fabric health monitoring objects."
+        ::= { alcatelIND1HealthMonitorMIBGroups 9 }
+
+
+	END

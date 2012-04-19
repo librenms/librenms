@@ -1,0 +1,163 @@
+RBTWS-EXTERNAL-SERVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    rbtwsMibs
+        FROM RBTWS-ROOT-MIB;
+
+
+rbtwsExternalServerMib MODULE-IDENTITY
+    LAST-UPDATED "200609271237Z"
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "www.enterasys.com"
+    DESCRIPTION
+        "External Server configuration MIB.
+
+        Copyright 2006 Enterasys Networks, Inc.
+        All rights reserved.
+        This SNMP Management Information Base
+        Specification (Specification) embodies
+        confidential and proprietary intellectual property.
+
+        This Specification is supplied 'AS IS' and Enterasys Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200607310004Z"
+    DESCRIPTION "v1.0.4: Initial version, for 6.0 release"
+
+    ::= { rbtwsMibs 7 }
+
+
+-- Textual conventions
+
+RbtwsIpPort ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "An UDP or TCP port number."
+    SYNTAX Unsigned32 (1..65535)
+
+RbtwsSyslogServerEnable ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Syslog Server mode (administratively enabled or disabled)."
+    SYNTAX      INTEGER {
+                    enabled  (1),
+                    disabled (2)
+                }
+
+
+--
+-- The External Server Configuration MIB Tree
+--
+
+rbtwsExternalServerObjects      OBJECT IDENTIFIER ::= { rbtwsExternalServerMib 1 }
+rbtwsExternalServerDataObjects  OBJECT IDENTIFIER ::= { rbtwsExternalServerObjects 1 }
+
+--
+-- Object definitions
+--
+
+-- Syslog Server table
+
+rbtwsExtServerSyslogTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF RbtwsExtServerSyslogEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Configured Syslog server table."
+   ::= { rbtwsExternalServerDataObjects 1 }
+
+rbtwsExtServerSyslogEntry OBJECT-TYPE
+   SYNTAX      RbtwsExtServerSyslogEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Entry for Syslog server table."
+   INDEX { rbtwsExtServerSyslogIndex }
+   ::= { rbtwsExtServerSyslogTable 1 }
+
+RbtwsExtServerSyslogEntry ::= SEQUENCE {
+    rbtwsExtServerSyslogIndex    Unsigned32,
+    rbtwsExtServerSyslogAddress  IpAddress,
+    rbtwsExtServerSyslogPort     RbtwsIpPort,
+    rbtwsExtServerSyslogEnable   RbtwsSyslogServerEnable
+    }
+
+rbtwsExtServerSyslogIndex  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Index of the Syslog sever"
+   ::= { rbtwsExtServerSyslogEntry 1 }
+
+rbtwsExtServerSyslogAddress OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "IP Address of the Syslog server."
+   ::= { rbtwsExtServerSyslogEntry 2 }
+
+rbtwsExtServerSyslogPort OBJECT-TYPE
+   SYNTAX      RbtwsIpPort
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The Syslog server Port number."
+   ::= { rbtwsExtServerSyslogEntry 3 }
+
+rbtwsExtServerSyslogEnable OBJECT-TYPE
+   SYNTAX      RbtwsSyslogServerEnable
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The administrative status of the Syslog server (enabled/disabled)"
+   ::= { rbtwsExtServerSyslogEntry 4 }
+
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+rbtwsExternalServerConformance  OBJECT IDENTIFIER ::= { rbtwsExternalServerObjects 2 }
+rbtwsExternalServerCompliances  OBJECT IDENTIFIER ::= { rbtwsExternalServerConformance 1 }
+rbtwsExternalServerGroups       OBJECT IDENTIFIER ::= { rbtwsExternalServerConformance 2 }
+
+-- Compliance
+
+rbtwsExternalServerCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        the External Server MIB."
+    MODULE  -- rbtwsExternalServerMib
+
+    MANDATORY-GROUPS { rbtwsExternalServerConfigGroup }
+
+    ::= { rbtwsExternalServerCompliances 1 }
+
+-- Units of Conformance
+
+rbtwsExternalServerConfigGroup OBJECT-GROUP
+        OBJECTS {
+                 rbtwsExtServerSyslogAddress,
+                 rbtwsExtServerSyslogPort,
+                 rbtwsExtServerSyslogEnable
+                }
+        STATUS      current
+        DESCRIPTION
+            "Mandatory group of objects implemented to provide
+             External Server configuration info."
+        ::= { rbtwsExternalServerGroups 1 }
+
+END

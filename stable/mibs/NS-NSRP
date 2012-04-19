@@ -1,0 +1,1182 @@
+-- This module defines enterprise MIBs for nsrp
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-NSRP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenNsrp
+        FROM NETSCREEN-SMI
+    Counter32, Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString,PhysAddress
+        FROM SNMPv2-TC
+    ;
+
+netscreenNsrpMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are200 used for netscreen
+         redundancy protocol"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311140000Z" -- November 14, 2003
+    DESCRIPTION
+        "no comment"
+    REVISION      "200306040000Z" -- June 04, 2003
+    DESCRIPTION
+        "no comment"
+    REVISION      "200101080000Z" -- January 08, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenNsrp 0 }
+
+NsRpRtoCounterEntry ::= SEQUENCE
+{
+    nsrpRtoCounterIdx     Integer32,
+    nsrpRtoCounterName    DisplayString,
+    nsrpRtoCounterSend    Counter32,
+    nsrpRtoCounterReceive Counter32,
+    nsrpRtoCounterDrop    Counter32
+}
+
+NsRpRtoGroupEntry ::= SEQUENCE
+{
+    nsrpRtoGroupId   Integer32,
+    nsrpRtoNumOfUnit Integer32
+}
+
+NsRpRtoUnitEntry ::= SEQUENCE
+{
+    nsrpRtoUnitGroupId       Integer32,
+    nsrpRtoUnitId            Integer32,
+    nsrpRtoUnitStatus        INTEGER,
+    nsrpRtoUnitDirection     INTEGER,
+    nsrpRtoUnitLostHeartbeat Counter32,
+    nsrpRtoUnitToActive      Counter32,
+    nsrpRtoUnitToSet         Counter32,
+    nsrpRtoUnitLostPeer      Counter32,
+    nsrpRtoUnitGroupDetach   Counter32
+}
+
+NsRpTrackEntry ::= SEQUENCE
+{
+    nsrpTrackIpIndex            Integer32,
+    nsrpTrackIpAddr             IpAddress,
+    nsrpTrackIpStatus           INTEGER,
+    nsrpTrackIpTimestamp        Integer32,
+    nsrpTrackIpInterval         Integer32,
+    nsrpTrackIpThreshhold       Integer32,
+    nsrpTrackIpMethod           INTEGER,
+    nsrpTrackIpWeight           Integer32,
+    nsrpTrackIpIfName           DisplayString,
+    nsrpTrackIpTotalCheck       Integer32,
+    nsrpTrackIpTotalFailedCheck Integer32
+}
+
+NsRpVsdInterfaceEntry ::= SEQUENCE
+{
+    nsrpVsdIfIndex         Integer32,
+    nsrpVsdIfStatus        INTEGER,
+    nsrpVsdIfGroupId       Integer32,
+    nsrpVsdIfIp            IpAddress,
+    nsrpVsdIfNetmask       IpAddress,
+    nsrpVsdIfGateway       IpAddress,
+    nsrpVsdIfName          DisplayString,
+    nsrpVsdIfVLAN          Integer32,
+    nsrpVsdIfMAC           PhysAddress,
+    nsrpVsdIfVSys          DisplayString,
+    nsrpVsdIfMngTelnet     INTEGER,
+    nsrpVsdIfMngSCS        INTEGER,
+    nsrpVsdIfMngWEB        INTEGER,
+    nsrpVsdIfMngSSL        INTEGER,
+    nsrpVsdIfMngSNMP       INTEGER,
+    nsrpVsdIfMngGlobal     INTEGER,
+    nsrpVsdIfMngGlobalPro  INTEGER,
+    nsrpVsdIfMngPing       INTEGER,
+    nsrpVsdIfMngIdentReset INTEGER
+}
+
+NsrpClusterEntry ::= SEQUENCE
+{
+    nsrpClusterTblIndex    Integer32,
+    nsrpClusterUnitId      Integer32,
+    nsrpClusterUnitCtrlMac PhysAddress,
+    nsrpClusterUnitDataMac PhysAddress
+}
+
+NsrpLinkInfoEntry ::= SEQUENCE
+{
+    nsrpLinkInfoIndex    Integer32,
+    nsrpLinkInfoLinkType INTEGER,
+    nsrpLinkInfoChannel  DisplayString,
+    nsrpLinkInfoMac      PhysAddress,
+    nsrpLinkInfoState    INTEGER
+}
+
+NsrpVsdGroupEntry ::= SEQUENCE
+{
+    nsrpVsdGroupID                Integer32,
+    nsrpVsdGroupPriority          Integer32,
+    nsrpVsdGroupPreempt           Integer32,
+    nsrpVsdGroupHoldDownTime      Integer32,
+    nsrpVsdGroupNumberOfUnit      Integer32,
+    nsrpVsdGroupCntStateChange    Integer32,
+    nsrpVsdGroupCntToInit         Integer32,
+    nsrpVsdGroupCntToMaster       Integer32,
+    nsrpVsdGroupCntToPBackup      Integer32,
+    nsrpVsdGroupCntToBackup       Integer32,
+    nsrpVsdGroupCntToIneligible   Integer32,
+    nsrpVsdGroupCntToInoperable   Integer32,
+    nsrpVsdGroupCntMasterConflict Integer32,
+    nsrpVsdGroupCntPbConfilict    Integer32,
+    nsrpVsdGroupCntHeartbeatTx    Integer32,
+    nsrpVsdGroupCntHeartbeatRx    Integer32
+}
+
+NsrpVsdMemberEntry ::= SEQUENCE
+{
+    nsrpVsdMemberGroupId  Integer32,
+    nsrpVsdMemberUnitId   Integer32,
+    nsrpVsdMemberStatus   INTEGER,
+    nsrpVsdMemberPriority Integer32,
+    nsrpVsdMemberPreempt  Integer32
+}
+
+netscreenNsrpGeneral OBJECT IDENTIFIER ::= { netscreenNsrp 1 }
+
+nsrpGeneralClusterId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The cluster ID"
+    ::= { netscreenNsrpGeneral 1 }
+
+nsrpGeneralLocalUnitId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "local device's unit ID"
+    ::= { netscreenNsrpGeneral 2 }
+
+nsrpGeneralEncrypEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disabled(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "NSRP encryption enabled"
+    ::= { netscreenNsrpGeneral 3 }
+
+nsrpGeneralAuthEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disabled(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "NSRP authentication enabled"
+    ::= { netscreenNsrpGeneral 4 }
+
+nsrpGeneralIfMonitor OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..64))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "interface being monitored"
+    ::= { netscreenNsrpGeneral 5 }
+
+nsrpGeneralGratArps OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "number of gratuitious arps"
+    ::= { netscreenNsrpGeneral 6 }
+
+netscreenNsrpVSD OBJECT IDENTIFIER ::= { netscreenNsrp 2 }
+
+nsrpVsdGroupTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsrpVsdGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of VSD groups on the device."
+    ::= { netscreenNsrpVSD 1 }
+
+nsrpVsdGroupEntry OBJECT-TYPE
+    SYNTAX        NsrpVsdGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing attributes for a track ip"
+    INDEX
+        { nsrpVsdGroupID }
+    ::= { nsrpVsdGroupTable 1 }
+
+nsrpVsdGroupID OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "one group ID the device belongs to."
+    ::= { nsrpVsdGroupEntry 1 }
+
+nsrpVsdGroupPriority OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "local unit in current group's priority."
+    ::= { nsrpVsdGroupEntry 2 }
+
+nsrpVsdGroupPreempt OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "local unit in current group's preempt."
+    ::= { nsrpVsdGroupEntry 3 }
+
+nsrpVsdGroupHoldDownTime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "TBD"
+    ::= { nsrpVsdGroupEntry 4 }
+
+nsrpVsdGroupNumberOfUnit OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "unit quantity in this group."
+    ::= { nsrpVsdGroupEntry 5 }
+
+nsrpVsdGroupCntStateChange OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "total number of state transition events"
+    ::= { nsrpVsdGroupEntry 6 }
+
+nsrpVsdGroupCntToInit OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "number of state transition into init state, which is as out of
+         ineligible state`"
+    ::= { nsrpVsdGroupEntry 7 }
+
+nsrpVsdGroupCntToMaster OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "number of state transition into master state"
+    ::= { nsrpVsdGroupEntry 8 }
+
+nsrpVsdGroupCntToPBackup OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "number of state transition into primary backup state"
+    ::= { nsrpVsdGroupEntry 9 }
+
+nsrpVsdGroupCntToBackup OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "number of state transition into backup state."
+    ::= { nsrpVsdGroupEntry 10 }
+
+nsrpVsdGroupCntToIneligible OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "number of state transition into ineligible  state."
+    ::= { nsrpVsdGroupEntry 11 }
+
+nsrpVsdGroupCntToInoperable OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "number of state transition into inoperable  state."
+    ::= { nsrpVsdGroupEntry 12 }
+
+nsrpVsdGroupCntMasterConflict OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "number of times multiple masters exist while the local unit is
+         in master state."
+    ::= { nsrpVsdGroupEntry 13 }
+
+nsrpVsdGroupCntPbConfilict OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "number of times multiple primary backups exist while the local
+         unit is in primary backup state."
+    ::= { nsrpVsdGroupEntry 14 }
+
+nsrpVsdGroupCntHeartbeatTx OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "number of heart beat transfered by a group."
+    ::= { nsrpVsdGroupEntry 15 }
+
+nsrpVsdGroupCntHeartbeatRx OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "number of heart beat received by a group."
+    ::= { nsrpVsdGroupEntry 16 }
+
+nsrpVsdMemberTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsrpVsdMemberEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of devices within the VSD group."
+    ::= { netscreenNsrpVSD 2 }
+
+nsrpVsdMemberEntry OBJECT-TYPE
+    SYNTAX        NsrpVsdMemberEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A entry containing attributes of one device in a group"
+    INDEX
+        { nsrpVsdMemberGroupId, nsrpVsdMemberUnitId }
+    ::= { nsrpVsdMemberTable 1 }
+
+nsrpVsdMemberGroupId OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "indicate the Group it belong to"
+    ::= { nsrpVsdMemberEntry 1 }
+
+nsrpVsdMemberUnitId OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "VSD group member's unit id"
+    ::= { nsrpVsdMemberEntry 2 }
+
+nsrpVsdMemberStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+        undefined(0),
+        init(1),
+        master(2),
+        primary-backup(3),
+        backup(4),
+        ineligible(5),
+        inoperable(6)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 Undefined
+         1 init
+         2 Master
+         3 Primary Backup
+         4 Backup
+         5 ineligible
+         6 inoperable"
+    ::= { nsrpVsdMemberEntry 3 }
+
+nsrpVsdMemberPriority OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Priority of unit in this group"
+    ::= { nsrpVsdMemberEntry 4 }
+
+nsrpVsdMemberPreempt OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "unit in current group's preempt"
+    ::= { nsrpVsdMemberEntry 5 }
+
+nsrpVsdInterfaceTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsRpVsdInterfaceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of VSD interfaces on the device."
+    ::= { netscreenNsrpVSD 3 }
+
+nsrpVsdInterfaceEntry OBJECT-TYPE
+    SYNTAX        NsRpVsdInterfaceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A track entry containing attributes for a track ip"
+    INDEX
+        { nsrpVsdIfIndex }
+    ::= { nsrpVsdInterfaceTable 1 }
+
+nsrpVsdIfIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A index."
+    ::= { nsrpVsdInterfaceEntry 1 }
+
+nsrpVsdIfStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+        down(0),
+        inactive(1),
+        active(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "indicate the status of this vsi interface"
+    ::= { nsrpVsdInterfaceEntry 2 }
+
+nsrpVsdIfGroupId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "indicate the group it belong to"
+    ::= { nsrpVsdInterfaceEntry 3 }
+
+nsrpVsdIfIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ip ADDRESS"
+    ::= { nsrpVsdInterfaceEntry 4 }
+
+nsrpVsdIfNetmask OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "subnet mask"
+    ::= { nsrpVsdInterfaceEntry 5 }
+
+nsrpVsdIfGateway OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "gateway"
+    ::= { nsrpVsdInterfaceEntry 6 }
+
+nsrpVsdIfName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "trust/untrust/DMZ"
+    ::= { nsrpVsdInterfaceEntry 7 }
+
+nsrpVsdIfVLAN OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vlan -1 means no vlan"
+    ::= { nsrpVsdInterfaceEntry 8 }
+
+nsrpVsdIfMAC OBJECT-TYPE
+    SYNTAX        PhysAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "mac address"
+    ::= { nsrpVsdInterfaceEntry 9 }
+
+nsrpVsdIfVSys OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "virtual system"
+    ::= { nsrpVsdInterfaceEntry 10 }
+
+nsrpVsdIfMngTelnet OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enable(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 Disable
+         1 Enable"
+    ::= { nsrpVsdInterfaceEntry 11 }
+
+nsrpVsdIfMngSCS OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enable(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 Disable
+         1 Enable"
+    ::= { nsrpVsdInterfaceEntry 12 }
+
+nsrpVsdIfMngWEB OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enable(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 Disable
+         1 Enable"
+    ::= { nsrpVsdInterfaceEntry 13 }
+
+nsrpVsdIfMngSSL OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enable(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 Disable
+         1 Enable"
+    ::= { nsrpVsdInterfaceEntry 14 }
+
+nsrpVsdIfMngSNMP OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enable(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 Disable
+         1 Enable"
+    ::= { nsrpVsdInterfaceEntry 15 }
+
+nsrpVsdIfMngGlobal OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enable(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 Disable
+         1 Enable"
+    ::= { nsrpVsdInterfaceEntry 16 }
+
+nsrpVsdIfMngGlobalPro OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enable(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 Disable
+         1 Enable"
+    ::= { nsrpVsdInterfaceEntry 17 }
+
+nsrpVsdIfMngPing OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enable(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 Disable
+         1 Enable"
+    ::= { nsrpVsdInterfaceEntry 18 }
+
+nsrpVsdIfMngIdentReset OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enable(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 Disable
+         1 Enable"
+    ::= { nsrpVsdInterfaceEntry 19 }
+
+nsrpVsdGeneral OBJECT IDENTIFIER ::= { netscreenNsrpVSD 4 }
+
+nsrpVsdGeneralInitHoldTime OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "VSD group init hold time (in second)"
+    ::= { nsrpVsdGeneral 1 }
+
+nsrpVsdGeneralHbInterval OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "VSD heart beat interval.(in milisecond)"
+    ::= { nsrpVsdGeneral 2 }
+
+nsrpVsdGeneralHbLostThres OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vsd heartbeat lost threshold"
+    ::= { nsrpVsdGeneral 3 }
+
+netscreenNsrpRTO OBJECT IDENTIFIER ::= { netscreenNsrp 3 }
+
+nsrpRtoGroupTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsRpRtoGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of RTO groups on the device."
+    ::= { netscreenNsrpRTO 1 }
+
+nsrpRtoGroupEntry OBJECT-TYPE
+    SYNTAX        NsRpRtoGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing attributes for RTO group"
+    INDEX
+        { nsrpRtoGroupId }
+    ::= { nsrpRtoGroupTable 1 }
+
+nsrpRtoGroupId OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A RTO group ID.also used as table index"
+    ::= { nsrpRtoGroupEntry 1 }
+
+nsrpRtoNumOfUnit OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "how many units in this RTO group"
+    ::= { nsrpRtoGroupEntry 2 }
+
+nsrpRtoUnitTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsRpRtoUnitEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of device status within a RTO group."
+    ::= { netscreenNsrpRTO 2 }
+
+nsrpRtoUnitEntry OBJECT-TYPE
+    SYNTAX        NsRpRtoUnitEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A track entry containing attributes for a track ip"
+    INDEX
+        { nsrpRtoUnitGroupId, nsrpRtoUnitId }
+    ::= { nsrpRtoUnitTable 1 }
+
+nsrpRtoUnitGroupId OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The RTO group id, a unit belongs to"
+    ::= { nsrpRtoUnitEntry 1 }
+
+nsrpRtoUnitId OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "device's unit id."
+    ::= { nsrpRtoUnitEntry 2 }
+
+nsrpRtoUnitStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+        undefined(0),
+        set(1),
+        active(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The RTO group id, a unit belongs to"
+    ::= { nsrpRtoUnitEntry 3 }
+
+nsrpRtoUnitDirection OBJECT-TYPE
+    SYNTAX        INTEGER {
+        out(1),
+        in(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The RTO uint's dirction in the group"
+    ::= { nsrpRtoUnitEntry 4 }
+
+nsrpRtoUnitLostHeartbeat OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "counter of heartbeat"
+    ::= { nsrpRtoUnitEntry 5 }
+
+nsrpRtoUnitToActive OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "counter of active"
+    ::= { nsrpRtoUnitEntry 6 }
+
+nsrpRtoUnitToSet OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "counter of set"
+    ::= { nsrpRtoUnitEntry 7 }
+
+nsrpRtoUnitLostPeer OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "counter of lost peer"
+    ::= { nsrpRtoUnitEntry 8 }
+
+nsrpRtoUnitGroupDetach OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "counter of rto group detach"
+    ::= { nsrpRtoUnitEntry 9 }
+
+nsrpRtoCounter OBJECT IDENTIFIER ::= { netscreenNsrpRTO 3 }
+
+nsrpRtoCounterPakForwarded OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "packets forwarded by rto."
+    ::= { nsrpRtoCounter 1 }
+
+nsrpRtoCounterPakReceived OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "packets received by rto."
+    ::= { nsrpRtoCounter 2 }
+
+nsrpRtoCounterTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsRpRtoCounterEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of rto counter object entry."
+    ::= { nsrpRtoCounter 3 }
+
+nsrpRtoCounterEntry OBJECT-TYPE
+    SYNTAX        NsRpRtoCounterEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A rto counter entry containing attributes for a rto counter
+         obj."
+    INDEX
+        { nsrpRtoCounterIdx }
+    ::= { nsrpRtoCounterTable 1 }
+
+nsrpRtoCounterIdx OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "counter index."
+    ::= { nsrpRtoCounterEntry 1 }
+
+nsrpRtoCounterName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Name of a rto counter object."
+    ::= { nsrpRtoCounterEntry 2 }
+
+nsrpRtoCounterSend OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Total number of message sent."
+    ::= { nsrpRtoCounterEntry 3 }
+
+nsrpRtoCounterReceive OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Total number of message received."
+    ::= { nsrpRtoCounterEntry 4 }
+
+nsrpRtoCounterDrop OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Total number of message dropped."
+    ::= { nsrpRtoCounterEntry 5 }
+
+nsrpRtoGeneral OBJECT IDENTIFIER ::= { netscreenNsrpRTO 4 }
+
+nsrpRtoGeneralHbInterval OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "rto heart beat interval."
+    ::= { nsrpRtoGeneral 1 }
+
+nsrpRtoGeneralHbLostThres OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "rto heartbeat lost threshold"
+    ::= { nsrpRtoGeneral 2 }
+
+nsrpRtoGeneralSessSyncEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disabled(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "session sync enabled."
+    ::= { nsrpRtoGeneral 3 }
+
+netscreenNsrpTrack OBJECT IDENTIFIER ::= { netscreenNsrp 4 }
+
+nsrpTrackEnable OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 means disable, 1 meams enable"
+    ::= { netscreenNsrpTrack 1 }
+
+nsrpTrackThreshold OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Failover Threshold"
+    ::= { netscreenNsrpTrack 2 }
+
+nsrpTrackFailoverEnalble OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Failover enable switch"
+    ::= { netscreenNsrpTrack 3 }
+
+nsrpTrackTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsRpTrackEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of track ip entries."
+    ::= { netscreenNsrpTrack 4 }
+
+nsrpTrackEntry OBJECT-TYPE
+    SYNTAX        NsRpTrackEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A track entry containing attributes for a track ip"
+    INDEX
+        { nsrpTrackIpIndex }
+    ::= { nsrpTrackTable 1 }
+
+nsrpTrackIpIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for each track ip.  Its value ranges between 1
+         and 65535 and may not be contigous.  It has no other meaning
+         but a pure index."
+    ::= { nsrpTrackEntry 1 }
+
+nsrpTrackIpAddr OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The IP address of the monitored device."
+    ::= { nsrpTrackEntry 2 }
+
+nsrpTrackIpStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+        success(0),
+        fail(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Status"
+    ::= { nsrpTrackEntry 3 }
+
+nsrpTrackIpTimestamp OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Timestamp of status change. Reference 1970/1/1 0:0"
+    ::= { nsrpTrackEntry 4 }
+
+nsrpTrackIpInterval OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A frequecy how the track ip is checked. It is in unit of
+         seconds."
+    ::= { nsrpTrackEntry 5 }
+
+nsrpTrackIpThreshhold OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A number of consective failures to regard the device has
+         failed."
+    ::= { nsrpTrackEntry 6 }
+
+nsrpTrackIpMethod OBJECT-TYPE
+    SYNTAX        INTEGER {
+        ping(0),
+        arp(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The method to track the device."
+    ::= { nsrpTrackEntry 7 }
+
+nsrpTrackIpWeight OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The weight of this failure contributing to the failover."
+    ::= { nsrpTrackEntry 8 }
+
+nsrpTrackIpIfName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The interface the track messages are sent to. Auto means the
+         actual interface is determined by the routing table."
+    ::= { nsrpTrackEntry 9 }
+
+nsrpTrackIpTotalCheck OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of ping/arp attempts."
+    ::= { nsrpTrackEntry 10 }
+
+nsrpTrackIpTotalFailedCheck OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of total failed attempts."
+    ::= { nsrpTrackEntry 11 }
+
+netscreenNsrpCluster OBJECT IDENTIFIER ::= { netscreenNsrp 5 }
+
+nsrpClusterTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsrpClusterEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of cluster on the device."
+    ::= { netscreenNsrpCluster 1 }
+
+nsrpClusterEntry OBJECT-TYPE
+    SYNTAX        NsrpClusterEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing attributes for nsrp cluster"
+    INDEX
+        { nsrpClusterTblIndex }
+    ::= { nsrpClusterTable 1 }
+
+nsrpClusterTblIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "table index"
+    ::= { nsrpClusterEntry 1 }
+
+nsrpClusterUnitId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Unit id in this cluster"
+    ::= { nsrpClusterEntry 2 }
+
+nsrpClusterUnitCtrlMac OBJECT-TYPE
+    SYNTAX        PhysAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Unit id's control path mac address"
+    ::= { nsrpClusterEntry 3 }
+
+nsrpClusterUnitDataMac OBJECT-TYPE
+    SYNTAX        PhysAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Unit id's data path mac address"
+    ::= { nsrpClusterEntry 4 }
+
+netscreenNsrpLinkInfo OBJECT IDENTIFIER ::= { netscreenNsrp 6 }
+
+nsrpLinkInfoTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsrpLinkInfoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of NSRP link info"
+    ::= { netscreenNsrpLinkInfo 1 }
+
+nsrpLinkInfoEntry OBJECT-TYPE
+    SYNTAX        NsrpLinkInfoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing attributes for nsrp link info"
+    INDEX
+        { nsrpLinkInfoIndex }
+    ::= { nsrpLinkInfoTable 1 }
+
+nsrpLinkInfoIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "table index"
+    ::= { nsrpLinkInfoEntry 1 }
+
+nsrpLinkInfoLinkType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        control(0),
+        data(1),
+        unused(2),
+        hapath2(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "link type"
+    ::= { nsrpLinkInfoEntry 2 }
+
+nsrpLinkInfoChannel OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "link channel's name"
+    ::= { nsrpLinkInfoEntry 3 }
+
+nsrpLinkInfoMac OBJECT-TYPE
+    SYNTAX        PhysAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "link channel's mac address"
+    ::= { nsrpLinkInfoEntry 4 }
+
+nsrpLinkInfoState OBJECT-TYPE
+    SYNTAX        INTEGER {
+        down(0),
+        up(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "link channel's state"
+    ::= { nsrpLinkInfoEntry 5 }
+
+END
+
+

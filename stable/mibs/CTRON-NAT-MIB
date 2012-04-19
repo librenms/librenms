@@ -1,0 +1,730 @@
+CTRON-NAT-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-nat-mib.txt  Cabletron Network Address Translator MIB.
+        --  Revision: 01.00.00
+        --  Part Number: 
+        --  Date:  December 16, 1998
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03866-5005
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for part
+        --  of the naming tree below:
+        --
+        --              cabletron { enterprises 52 }
+        --
+        --  This module will be extended, as additional sub-sections
+        --  of this naming tree are defined.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+        --
+        --  Copyright August 1997 Cabletron Systems
+
+    --  Abstract
+    --
+    --  This memo defines management objects which are required to support
+    --  Cabletron's implementation of RFC 1631, The IP Network Address 
+    --  Translator (NAT).
+ 
+    --  Structure of MIB
+    --
+    --  Objects, in this MIB, are arranged into groups.  Each group is organized
+    --  as a set of related objects and is described below.
+ 
+    --  The ctNatConfigGroup Group
+    --
+    --  This group contains the objects that are specific to the configuration,
+    --  control and status of network address translation functionality. All of 
+    --  the read-write objects are persistent. "Private" refers to a network 
+    --  which uses IP addresses which must be translated.  Devices on that 
+    --  network are termed "Local".  Their IP addresses are not official, and 
+    --  they cannot be accessed from external networks without NAT.  "Public"  
+    --  refers to the networks outside the private area which use registered 
+    --  IP addresses. It is also called the "Internet".  Devices on the internet 
+    --  can be also termed "Foreign".
+
+    --  The ctNatServerGroup Group
+    --
+    --  This group contains the objects that are specific to the server
+    --  list.  The list contains information describing the assignment
+    --  of devices on the private network to perform some server functions.
+    --  The assignment will make the device accessible to the public network.
+    --  Access is obtained by addressing the Internet IP and a predefined port.
+          
+    --  The ctNatConnStatsGroup Group
+    --
+    --  This group contains the objects that are specific to the client list.
+    --  The list contains information describing some statistics
+    --  which are collected for ACTIVE connections.  The data are deleted
+    --  when the connection goes inactive.
+
+IMPORTS
+      OBJECT-TYPE
+        FROM RFC-1212
+      nwRtrProtoSuites
+        FROM ROUTER-OIDS
+      nwIpRouter, nwIpMibs, nwIpComponents, nwIpClientServices
+        FROM CTRON-IP-ROUTER-MIB
+      IpAddress, Counter
+        FROM RFC1155-SMI;
+
+
+--====================================================================
+
+    ctNat                  OBJECT IDENTIFIER ::= { nwIpClientServices 1 }
+
+    --========       group definitions           =============
+ 
+    ctNatConfigGroup       OBJECT IDENTIFIER ::= { ctNat 1 }
+
+    ctNatServerGroup       OBJECT IDENTIFIER ::= { ctNat 2 }
+
+    ctNatConnStatsGroup    OBJECT IDENTIFIER ::= { ctNat 3 }
+
+--====================================================================
+
+    --
+ --========        ctNatConfigGroup group       =============--
+    --
+
+        ctNatPublicIfIndex       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                "This is the value of the MIB II ifindex which identifies 
+                        the router port connected to the public network."
+                ::= { ctNatConfigGroup 1}
+
+        ctNatPublicIP   OBJECT-TYPE
+                SYNTAX  IpAddress 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the IP address of the interface which
+                        is selected by ctNatPublicIfIndex."
+                ::= { ctNatConfigGroup 2 }
+
+        ctNatPublicMask OBJECT-TYPE
+                SYNTAX  IpAddress 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the subnet mask of the interface which
+                        is selected by ctNatPublicIfIndex."
+                ::= { ctNatConfigGroup 3 }
+
+        ctNatMaxConn       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the value of the maximum number of simultaneous
+                        connections allowed, using the Network Address 
+                        Translator application.  The default value is 200.  
+                        Acceptable values are from 40 to 1000."
+                ::= { ctNatConfigGroup 4}
+
+        ctNatTcpTimeout       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the value in seconds after which an idle
+                        TCP connection will be deleted.  The default value
+                        is 300.  Acceptable values are from 60 to 3600."
+                ::= { ctNatConfigGroup 5}
+
+        ctNatUdpTimeout       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the value in seconds after which an idle
+                        UDP connection will be deleted.  The default value
+                        is 120.  Acceptable values are from 60 to 3600."
+                ::= { ctNatConfigGroup 6}
+
+        ctNatPktsL2I       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of packets which have been forwarded 
+                        from the private network to the public network since the
+                        last reset."
+                ::= { ctNatConfigGroup 7}
+
+        ctNatPktsI2L       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of packets which have been forwarded 
+                        from the public network to the private network since the
+                        last reset."
+                ::= { ctNatConfigGroup 8}
+
+        ctNatBytesL2I       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of bytes which have been forwarded 
+                        from the private network to the public network since the
+                        last reset."
+                ::= { ctNatConfigGroup 9}
+
+        ctNatBytesI2L       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of bytes which have been forwarded
+                        from the public network to the private network since the
+                        last reset."
+                ::= { ctNatConfigGroup 10}
+
+        ctNatTcpConn       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of active TCP connections using
+                        the Network Address Translator application."
+                ::= { ctNatConfigGroup 11}
+
+        ctNatUdpConn       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of active UDP connections using
+                        the Network Address Translator application."
+                ::= { ctNatConfigGroup 12}
+
+        ctNatIcmpConn       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of active ICMP connections using
+                        the Network Address Translator application."
+                ::= { ctNatConfigGroup 13}
+
+        ctNatRetries       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of detected TCP retries in both
+                        directions since the last reset."
+                ::= { ctNatConfigGroup 14}
+
+        ctNatBadSums       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of detected checksum errors in both
+                        directions since the last reset."
+                ::= { ctNatConfigGroup 15}
+
+        ctNatTotalPkts       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the total number of packets by the application
+                        since the last reset."
+                ::= { ctNatConfigGroup 16}
+
+        ctNatBadPkts       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the total number of packets detected with an 
+                        invalid format since the last reset."
+                ::= { ctNatConfigGroup 17}
+
+        ctNatResPkts       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the total number of packets detected with a
+                        reserved address since the last reset."
+                ::= { ctNatConfigGroup 18}
+
+        ctNatTotTcpConn       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of TCP connections made
+                        using the Network Address Translator application
+                        since the last reset."
+                ::= { ctNatConfigGroup 19}
+
+        ctNatTotUdpConn       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of UDP connections made
+                        using the Network Address Translator application
+                        since the last reset."
+                ::= { ctNatConfigGroup 20}
+
+        ctNatTotIcmpConn       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of ICMP connections made
+                        using the Network Address Translator application
+                        since the last reset."
+                ::= { ctNatConfigGroup 21}
+
+-- This table configures each instance of the Network Address Translator class.
+
+        ctNatConfigTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF CtNatConfigEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "Information describing the configuration parameters
+                        for each instance of NAT."
+                ::= { ctNatConfigGroup 22 }
+        
+        ctNatConfigEntry OBJECT-TYPE
+                SYNTAX      CtNatConfigEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a single server entry."
+                INDEX       { ctNatConfigId }
+                ::= { ctNatConfigTable 1 }
+        
+        CtNatConfigEntry ::=
+                SEQUENCE {
+                        ctNatConfigId
+                        INTEGER,
+                        ctNatAdminStatus
+                        INTEGER,
+                        ctNatOperStatus
+                        INTEGER,
+                        ctNatLocalIfIndex
+                        INTEGER,
+                        ctNatLocalIP
+                        IpAddress,
+                        ctNatLocalMask
+                        IpAddress
+                        }
+        
+        ctNatConfigId    OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence of
+                        groups which belong to the NAT configuration table."
+                ::= { ctNatConfigEntry 1 }
+        
+        ctNatAdminStatus        OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable the Network Address 
+                        Translator method for this instance.  This object must 
+                        be set to enabled for the translation to occur on 
+                        ctNatLocalIfIndex."
+                ::= { ctNatConfigEntry 2 }
+
+        ctNatOperStatus OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2),
+                        invalid-config(3)
+                        }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Indicates the current operating status of the Network 
+                        Address Translator feature."
+                ::= { ctNatConfigEntry 3 }
+
+        ctNatLocalIfIndex       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the value of the MIB II ifindex which identifies 
+                        the router port connected to the private network."
+                ::= { ctNatConfigEntry 4 }
+
+        ctNatLocalIP    OBJECT-TYPE
+                SYNTAX  IpAddress 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the IP address of the interface which
+                        serves as the gateway for the private network.
+                        With ctNatLocalMask, it serves to define the subnet 
+                        of the hosts on the network.  The preferred address 
+                        is 192.168.254.254, part of the class C net reserved 
+                        by RFC1597."
+                ::= { ctNatConfigEntry 5 }
+
+        ctNatLocalMask  OBJECT-TYPE
+                SYNTAX  IpAddress 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the subnet mask of the interface which
+                        serves as the gateway for the private network.
+                        With ctNatLocalIP, it serves to define the subnet 
+                        of the hosts on the network.  The preferred mask is
+                        255.255.255.0, part of the class C net reserved 
+                        by RFC1597."
+                ::= { ctNatConfigEntry 6 }
+
+    --
+ --========        ctNatServerGroup group       =============--
+    --
+
+-- This group comprises the Network Address Translator Server List Table
+
+        ctNatTotServerEntries   OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "This is the total number of server assignments."
+                ::= { ctNatServerGroup 1 }
+
+        ctNatServerListTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF CtNatServerListEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "Information describing the configured parameters
+                        which designate a local device as a server."
+                ::= { ctNatServerGroup 2 }
+        
+        ctNatServerListEntry OBJECT-TYPE
+                SYNTAX      CtNatServerListEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a single server entry."
+                INDEX       { ctNatServerId }
+                ::= { ctNatServerListTable 1 }
+        
+        CtNatServerListEntry ::=
+                SEQUENCE {
+                        ctNatServerId
+                        INTEGER,
+                        ctNatProxyServer
+                        OCTET STRING
+                        }
+        
+        ctNatServerId    OBJECT-TYPE
+                SYNTAX      INTEGER 
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence of
+                        groups which belong to the NAT Server List.  This value
+                        ranges from 1 to 16."
+                ::= { ctNatServerListEntry 1 }
+        
+        ctNatProxyServer   OBJECT-TYPE
+                SYNTAX      OCTET STRING
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a proxy server assignment.  The format
+                        is private IP address of the server, followed by the 
+                        public port number, followed by the private port number, 
+                        followed by the protocol to be handled by the server.  
+                        The fields are delimited by commas.  Each record must be 
+                        31 chars or less.  Protocol choices are TCP and UDP." 
+                ::= { ctNatServerListEntry 2 }
+
+    --
+ --========        ctNatConnStatsGroup group       =============--
+    --
+
+-- This table contains the Network Address Translator Connection Statistics.
+
+        ctNatTotActiveConn   OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "This is the total number of active connections."
+                ::= { ctNatConnStatsGroup 1 }
+
+        ctNatConnStatsTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF CtNatConnStatsEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "Information describing the configured parameters
+                        which designate a local device as a server."
+                ::= { ctNatConnStatsGroup 2 }
+        
+        ctNatConnStatsEntry OBJECT-TYPE
+                SYNTAX      CtNatConnStatsEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a single server entry."
+                INDEX       { ctNatConnStatsID }
+                ::= { ctNatConnStatsTable 1 }
+        
+        CtNatConnStatsEntry ::=
+                SEQUENCE {
+                        ctNatConnStatsID
+                        INTEGER,
+                        ctNatConnStatsForeignIP
+                        IpAddress,
+                        ctNatConnStatsLocalIP
+                        IpAddress,
+                        ctNatConnStatsPublicPort
+                        INTEGER,
+                        ctNatConnStatsLocalPort
+                        INTEGER,
+                        ctNatConnStatsForeignPort
+                        INTEGER,
+                        ctNatConnStatsOutgoingPkts
+                        Counter,
+                        ctNatConnStatsOutgoingBytes
+                        Counter,
+                        ctNatConnStatsIncomingPkts
+                        Counter,
+                        ctNatConnStatsIncomingBytes
+                        Counter,
+                        ctNatConnStatsTimeSinceUse
+                        INTEGER,
+                        ctNatConnStatsProtocol
+                        INTEGER,
+                        ctNatConnStatsTCPSeq
+                        INTEGER,
+                        ctNatConnStatsTCPAck
+                        INTEGER,
+                        ctNatConnStatsTCPState
+                        INTEGER,
+                        ctNatConnStatsLocalRetrys
+                        Counter,
+                        ctNatConnStatsForeignRetrys
+                        Counter,
+                        ctNatConnStatsLocalChecksum
+                        Counter,
+                        ctNatConnStatsForeignChecksum
+                        Counter
+                        }
+        
+        ctNatConnStatsID    OBJECT-TYPE
+                SYNTAX      INTEGER 
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence of
+                        active connections which belong to the NAT Connection
+                        Statistics Group."  
+                ::= { ctNatConnStatsEntry 1 }
+        
+        ctNatConnStatsForeignIP OBJECT-TYPE
+                SYNTAX  IpAddress 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the IP address of the foreign host during
+                        this active connection."
+                ::= { ctNatConnStatsEntry 2 }
+
+        ctNatConnStatsLocalIP   OBJECT-TYPE
+                SYNTAX  IpAddress 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the IP address of the local host during
+                        this active connection."
+                ::= { ctNatConnStatsEntry 3 }
+
+        ctNatConnStatsPublicPort       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the port number addressed by an external 
+                        device.  It is also substituted for the local port 
+                        by NAT on outbound packets."
+                ::= { ctNatConnStatsEntry 4 }
+
+        ctNatConnStatsLocalPort       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the local host's port for TCP or UDP
+                        for this active connection."
+                ::= { ctNatConnStatsEntry 5 }
+
+        ctNatConnStatsForeignPort       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the source port number used by the
+                        foreign host for this active connection."
+                ::= { ctNatConnStatsEntry 6 }
+
+        ctNatConnStatsOutgoingPkts       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of packets that have been sent 
+                        from the local net to the public net by this 
+                        active connection."
+                ::= { ctNatConnStatsEntry 7 }
+
+        ctNatConnStatsOutgoingBytes       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of bytes that have been sent 
+                        from the local net to the public net by this 
+                        active connection."
+                ::= { ctNatConnStatsEntry 8 }
+
+        ctNatConnStatsIncomingPkts       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of packets that have been sent from
+                        the public net to the local net by this active connection."
+                ::= { ctNatConnStatsEntry 9 }
+
+        ctNatConnStatsIncomingBytes       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of bytes that have been sent from
+                        the public net to the local net by this active connection."
+                ::= { ctNatConnStatsEntry 10 }
+
+        ctNatConnStatsTimeSinceUse       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the time in seconds since the last packet 
+                        was sent or received on this active connection."
+                ::= { ctNatConnStatsEntry 11 }
+
+        ctNatConnStatsProtocol       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the type of IP protocol used by this 
+                        active connection.  Options are 1 = ICMP, 6 = TCP 
+                        and 17 = UDP."
+                ::= { ctNatConnStatsEntry 12 }
+
+--      The folowing objects apply to TCP connections only.
+
+        ctNatConnStatsTCPSeq       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the last TCP sequence number of local host 
+                        sent on this active connection."
+                ::= { ctNatConnStatsEntry 13 }
+
+        ctNatConnStatsTCPAck       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the last TCP acknowledgement number of 
+                        local host sent on this active connection."
+                ::= { ctNatConnStatsEntry 14 }
+
+        ctNatConnStatsTCPState       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the TCP connection state value on this 
+                        active connection."
+                ::= { ctNatConnStatsEntry 15 }
+
+        ctNatConnStatsLocalRetrys       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of TCP retries by the local host 
+                        on this active connection."
+                ::= { ctNatConnStatsEntry 16 }
+
+        ctNatConnStatsForeignRetrys       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of TCP retries by the foreign host 
+                        on this active connection."
+                ::= { ctNatConnStatsEntry 17 }
+
+        ctNatConnStatsLocalChecksum       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of times checksum failed in a 
+                        packet from the local host on this active connection."
+                ::= { ctNatConnStatsEntry 18 }
+
+        ctNatConnStatsForeignChecksum       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the number of times checksum failed in a 
+                        packet from the foreign host on this active connection."
+                ::= { ctNatConnStatsEntry 19 }
+
+END

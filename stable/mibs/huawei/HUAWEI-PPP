@@ -1,0 +1,276 @@
+-- ==================================================================
+-- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Private PPP Protocol MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--      V1.0 
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types be imported
+-- 
+-- ==================================================================
+
+    HUAWEI-PPP-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS          
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            InterfaceIndex            
+                FROM IF-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE            
+                FROM SNMPv2-CONF            
+            IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI            
+            RowStatus, TruthValue            
+                FROM SNMPv2-TC;
+    
+    
+--  October 17, 2007 at 22:30 GMT
+-- October 17, 2007 at 22:30 GMT
+        hwPppMIB MODULE-IDENTITY 
+            LAST-UPDATED "200710172230Z"        -- October 17, 2007 at 22:30 GMT
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                "VRP Team Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100085
+                "
+            DESCRIPTION 
+                "This MIB is mainly used to configure  PPP , PPP MRU negotiation, MP binding with Mp-Group, and PAP/Chap authentication ."
+            ::= { hwDatacomm 169 }
+        
+    
+    
+--
+-- Node definitions
+--
+    
+--  Node definitions
+-- 
+        hwPppObjects OBJECT IDENTIFIER ::= { hwPppMIB 1 }
+        
+   
+                
+--      hwPppConfigTable table
+-- 
+        hwPppConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPppConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure PPP , PPP MRU negotiation, and MP binding with MP-Group."
+            ::= { hwPppObjects 1 }
+        
+        hwPppConfigEntry OBJECT-TYPE
+            SYNTAX HwPppConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure PPP , PPP MRU negotiation, and MP binding with MP-Group."
+            INDEX { hwPppIfIndex }
+            ::= { hwPppConfigTable 1 }
+        
+        HwPppConfigEntry ::=
+            SEQUENCE { 
+                hwPppIfIndex
+                    InterfaceIndex,
+                hwPppMruNegType
+                    INTEGER,
+                hwPppMpIfIndex
+                    Integer32
+             }
+
+        hwPppIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This object indicates the interface index."
+            ::= { hwPppConfigEntry 1 }
+        
+        hwPppMruNegType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ipv4(1),
+                ipv6(2)
+
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+               "This object indicates the mode of MRU negotiation."
+            ::= { hwPppConfigEntry 11 }
+        
+        hwPppMpIfIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the MP-Group  index."
+            ::= { hwPppConfigEntry 12 }
+        
+
+
+
+--      hwPppAuthenticateTable table
+-- 
+        hwPppAuthenticateTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPppAuthenticateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure PAP/CHAP authentication ."
+            ::= { hwPppObjects 2 }
+        
+        hwPppAuthenticateEntry OBJECT-TYPE
+            SYNTAX HwPppAuthenticateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure PAP/CHAP authentication ."
+            INDEX { hwPppIfIndex }
+            ::= { hwPppAuthenticateTable 1 }
+        
+        HwPppAuthenticateEntry ::=
+            SEQUENCE { 
+                
+                hwPppAuthenticateMode
+                    INTEGER,
+                hwPppAuthenticateChapUserName
+                    OCTET STRING (SIZE(1..64)),
+                hwPppAuthenticateChapPwType
+                     INTEGER,
+                hwPppAuthenticateChapPw 
+                     OCTET  STRING (SIZE(1..16|24)),
+                hwPppAuthenticatePapUserName
+                    OCTET STRING (SIZE(1..64)),
+                hwPppAuthenticatePapPwType
+                     INTEGER,
+                hwPppAuthenticatePapPw 
+                     OCTET  STRING (SIZE(1..16|24))
+             }
+
+        
+        
+        hwPppAuthenticateMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    chap(1),
+                    pap(2),
+                    chappap(3)
+                 }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+               "This object indicates the mode of the authentication."
+            ::= { hwPppAuthenticateEntry 11 }
+        
+        hwPppAuthenticateChapUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..64))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the username of CHAP authentication."
+            ::= { hwPppAuthenticateEntry 12 }
+            
+            
+        hwPppAuthenticateChapPwType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                  cipher(1),
+                  simple(2)
+             }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the encryption type of CHAP."
+            ::= { hwPppAuthenticateEntry 13 }
+
+         hwPppAuthenticateChapPw OBJECT-TYPE
+            SYNTAX OCTET  STRING (SIZE(1..16|24))
+           
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the password of CHAP authentication."
+            ::= { hwPppAuthenticateEntry 14 }
+
+         hwPppAuthenticatePapUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..64))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the username of PAP authentication.."
+            ::= { hwPppAuthenticateEntry 15 }
+            
+            
+        hwPppAuthenticatePapPwType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                  cipher(1),
+                  simple(2)
+             }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the encryption type of PAP."
+            ::= { hwPppAuthenticateEntry 16 }
+
+         hwPppAuthenticatePapPw OBJECT-TYPE
+            SYNTAX OCTET  STRING (SIZE(1..16|24))
+           
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the password of PAP authentication."
+            ::= { hwPppAuthenticateEntry 17 }
+  
+  
+       
+       
+        
+        hwPppConformance OBJECT IDENTIFIER ::= { hwPppMIB 11 }
+        
+        hwPppCompliances OBJECT IDENTIFIER ::= { hwPppConformance 1 }
+        
+
+        hwPppCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-PPP-MIB."
+            MODULE 
+                MANDATORY-GROUPS { hwPppConfigObjectGroup, hwPppAuthenticateObjectGroup}
+            ::= { hwPppCompliances 1 }
+        
+        hwPppGroups OBJECT IDENTIFIER ::= { hwPppConformance 2 }
+        
+        hwPppConfigObjectGroup OBJECT-GROUP
+            OBJECTS {  hwPppMruNegType, hwPppMpIfIndex }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the PPP attribute group."
+            ::= { hwPppGroups 1 }
+        
+        hwPppAuthenticateObjectGroup OBJECT-GROUP
+            OBJECTS {  hwPppAuthenticateMode ,hwPppAuthenticateChapUserName ,hwPppAuthenticateChapPwType, hwPppAuthenticateChapPw,hwPppAuthenticatePapUserName ,hwPppAuthenticatePapPwType, hwPppAuthenticatePapPw }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the PPP authentcation group."
+            ::= { hwPppGroups 2 }
+        
+        
+        
+    
+    END
+
+--
+-- HUAWEI-PPP-MIB.mib
+--

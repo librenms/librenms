@@ -1,0 +1,555 @@
+Wellfleet-MODULE-MIB DEFINITIONS ::= BEGIN
+
+-- Created by mdl2asn version 3.1
+-- Creation date: Wed Aug 30 16:45:27 EDT 1995
+
+
+    IMPORTS
+
+       OBJECT-TYPE
+        FROM RFC-1212
+       DisplayString
+        FROM RFC1213-MIB
+      wfHwModuleGroup
+        FROM Wellfleet-COMMON-MIB;
+
+
+    wfHwModuleTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfHwModuleEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Hardware Module Table
+                Filled in by the Module Driver. Read by SNMP to
+                build the driver load records "
+        ::= { wfHwModuleGroup 1 }
+
+    wfHwModuleEntry OBJECT-TYPE
+        SYNTAX	WfHwModuleEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Hardware specific information about a slot."
+        INDEX	{ wfHwModuleSlot,
+    		  wfHwModuleModule }
+        ::= { wfHwModuleTable 1 }
+
+    WfHwModuleEntry ::= SEQUENCE {
+    	    wfHwModuleSlot
+    		INTEGER,
+    	    wfHwModuleModule
+    		INTEGER,
+    	    wfHwModuleModIdOpt
+    		INTEGER,
+    	    wfHwModuleModRev
+    		OCTET STRING,
+    	    wfHwModuleModSerialNumber
+    		OCTET STRING,
+    	    wfHwModuleArtworkRev
+    		DisplayString,
+            wfHwModuleMemorySize1
+                INTEGER,
+            wfHwModuleMemorySize2
+                INTEGER,
+            wfHwModuleDaughterBdIdOpt
+                INTEGER,
+            wfHwModuleLEDStatus1
+                INTEGER,
+            wfHwModuleLEDState1
+                INTEGER,
+            wfHwModuleLEDStatus2
+                INTEGER,
+            wfHwModuleLEDState2
+                INTEGER,
+            wfHwModuleLEDStatus3
+                INTEGER,
+            wfHwModuleLEDState3
+                INTEGER
+        }
+
+    wfHwModuleSlot OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "A unique value for each slot.
+                Its value ranges between 1 and 4."
+        ::= { wfHwModuleEntry 1 }
+
+    wfHwModuleModule OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "This value ranges between 1 and 4"
+        ::= { wfHwModuleEntry 2 }
+
+    wfHwModuleModIdOpt OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    spex(512),
+    		    spexhss(768),
+    		    spexhsd(769),
+    		    denm(1280),
+    		    denmhwf(1281),
+		    iqe(1408),
+    		    dsnmnn(1536),
+    		    dsnmn1(1537),
+    		    dsnmn2(1538),
+    		    dsnm1n(1540),
+    		    dsnm11(1541),
+    		    dsnm12(1542),
+    		    dsnm2n(1544),
+    		    dsnm21(1545),
+    		    dsnm22(1546),
+    		    dsnmnnisdn(1584),
+    		    dsnmn1isdn(1585),
+    		    dsnmn2isdn(1586),
+    		    dsnm1nisdn(1588),
+    		    dsnm11isdn(1589),
+    		    dsnm12isdn(1590),
+    		    dsnm2nisdn(1592),
+    		    dsnm21isdn(1593),
+    		    dsnm22isdn(1594),
+		    qsyncnm(1664),
+    		    mmfsdsas(1792),
+    		    mmfsddas(1793),
+    		    smfsdsas(1800),
+    		    smfsddas(1801),
+    		    mmscsas(1808),
+    		    mmscdas(1809),
+    		    smammbdas(1825),
+    		    mmasmbdas(1833),
+    		    mmfsdsashwf(1856),
+    		    mmfsddashwf(1857),
+    		    smfsdsashwf(1864),
+    		    smfsddashwf(1865),
+    		    mmscsashwf(1872),
+    		    mmscdashwf(1873),
+    		    smammbdashwf(1889),
+    		    mmasmbdashwf(1897),
+    		    dtnm(2048),
+    		    cam(2049),
+		    iqtok(2176),
+    		    se100nm(2304),
+    		    asnqbri(2560),
+		    mce1nm(2816),
+                    dmct1nm(2944),
+                    hwcompnm32(3072),
+                    hwcompnm128(3073),
+                    ahwcompnm32(3328),
+                    ahwcompnm128(3329),
+                    ahwcompnm256(3330),
+                    shssinm(3584),
+                    fbrmbdfen(8000),
+                    ds1e1atm(8160),
+                    ds3e3atm(8161),
+                    pmcdsync(8320),
+                    pmcqsync(8321),
+		    fvoippmcc(8500),
+	            fvoipt1e1pmc(8501),
+		    arnmbstr(8704),
+		    arnmbsen(8720),
+                    arnmbsfetx(8728),
+                    arnmbsfefx(8729),
+                    litembsfetx(8744),
+		    arnssync(8736),
+		    arnv34(8752),
+		    arndcsu(8768),
+                    arnft1(8776),
+                    arnfe1(8780),
+		    arnisdns(8784),
+		    arnisdnu(8800),
+		    arnisdb(8808),
+		    arnstkrg(8816),
+		    arnsenet(8832),
+		    arntsync(8848),
+		    arnentsync(8864),
+                    arne7sync(8872),
+                    arn7sync(8873),
+                    arnvoice(8890),
+                    arnvoicedsync(8891),
+                    arnpbe7sx10(8972),
+		    arntrtsync(8880),
+                    arnmbenx10(8896),
+                    arnmbtrx10(8912),
+                    arnpbenx10(8928),
+                    arnpbtrx10(8944),
+                    arnpbtenx10(8960),
+                    arnpbttrx10(8976),
+                    snm10t16(16384),
+                    snm100t2(16640),
+                    snmatmoc31mm(16896),
+                    snmatmoc31dmm(16897),
+                    snmatmoc31sm(16898),
+                    snmatmoc31dsm(16899),
+                    snmfddismm(17152),
+                    snmfddisms(17153),
+                    snmfddissm(17154),
+                    snmfddisss(17155),
+                    snm10f8(17408),
+                    snm100f2(17664),
+                    snm10t16p4(17920),
+                    snm100t2p4(18176),
+                    snm10t14100t1(18432),
+                    snm100t16(18688),
+                    snm10t14100f1(18944),
+		    atm5000ah(524288),
+		    atm5000bh(524544)
+    		}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Module IDs for the net modules modules"
+        ::= { wfHwModuleEntry 3 }
+
+    wfHwModuleModRev OBJECT-TYPE
+        SYNTAX	OCTET STRING
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The revision level of the module. High byte is in upper 2 bytes."
+        ::= { wfHwModuleEntry 4 }
+
+    wfHwModuleModSerialNumber OBJECT-TYPE
+        SYNTAX	OCTET STRING
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The serial number of the module."
+        ::= { wfHwModuleEntry 5 }
+
+    wfHwModuleArtworkRev OBJECT-TYPE
+        SYNTAX	DisplayString
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The Artwork Revision number of the module"
+        ::= { wfHwModuleEntry 6 }
+
+    wfHwModuleMemorySize1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Size (in bytes) of memory #1."
+        ::= { wfHwModuleEntry 7 }
+
+    wfHwModuleMemorySize2 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Size (in bytes) of memory #2."
+        ::= { wfHwModuleEntry 8 }
+
+    wfHwModuleDaughterBdIdOpt OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Daughterboard IDs that may be attached to net modules"
+        ::= { wfHwModuleEntry 9 }
+
+    wfHwModuleLEDStatus1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Bit mask representing the status of the LEDs on the module.
+                 Each LED is represented by 2 bits.  LED #1 status is
+                 indicated by the 2 least significant bits.  LED #16 status
+                 is indicated by the 2 most significant bits.  How this bit
+                 mask is interpreted depends on the module ID.  For example,
+                 some modules use this value to report what color the LED
+                 is currently set to ('00' off, '01' yellow, '10' green).
+
+                 This value can be used by a NMS that needs to know this
+                 information for whatever reason.  Some modules may not
+                 support this value in which case it should be set to zero."
+        ::= { wfHwModuleEntry 10 }
+
+    wfHwModuleLEDState1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Bit mask representing the state of the LEDs on the module.
+                 Each LED is represented by 2 bits.  LED #1 state is
+                 indicated by the 2 least significant bits.  LED #16 state
+                 is indicated by the 2 most significant bits.  How this bit
+                 mask is interpreted depends on the module ID.  For example,
+                 some modules use this value to indicate a LED is flashing
+                 (value of '01') or a solid color (value of '00').
+
+                 This value can be used by a NMS that needs to know this
+                 information for whatever reason.  Some modules may not
+                 support this value in which case it should be set to zero."
+        ::= { wfHwModuleEntry 11 }
+
+    wfHwModuleLEDStatus2 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Bit mask representing the status of the LEDs on the module.
+                 Each LED is represented by 2 bits.  LED #17 status is
+                 indicated by the 2 least significant bits.  LED #32 status
+                 is indicated by the 2 most significant bits.  How this bit
+                 mask is interpreted depends on the module ID.  For example,
+                 some modules use this value to report what color the LED
+                 is currently set to ('00' off, '01' yellow, '10' green).
+
+                 This value can be used by a NMS that needs to know this
+                 information for whatever reason.  Some modules may not
+                 support this value in which case it should be set to zero."
+        ::= { wfHwModuleEntry 12 }
+
+    wfHwModuleLEDState2 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Bit mask representing the state of the LEDs on the module.
+                 Each LED is represented by 2 bits.  LED #17 state is
+                 indicated by the 2 least significant bits.  LED #32 state
+                 is indicated by the 2 most significant bits.  How this bit
+                 mask is interpreted depends on the module ID.  For example,
+                 some modules use this value to indicate a LED is flashing
+                 (value of '01') or a solid color (value of '00').
+
+                 This value can be used by a NMS that needs to know this
+                 information for whatever reason.  Some modules may not
+                 support this value in which case it should be set to zero."
+        ::= { wfHwModuleEntry 13 }
+
+    wfHwModuleLEDStatus3 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Bit mask representing the status of the LEDs on the module.
+                 Each LED is represented by 2 bits.  LED #33 status is
+                 indicated by the 2 least significant bits.  LED #48 status
+                 is indicated by the 2 most significant bits.  How this bit
+                 mask is interpreted depends on the module ID.  For example,
+                 some modules use this value to report what color the LED
+                 is currently set to ('00' off, '01' yellow, '10' green).
+
+                 This value can be used by a NMS that needs to know this
+                 information for whatever reason.  Some modules may not
+                 support this value in which case it should be set to zero."
+        ::= { wfHwModuleEntry 14 }
+
+    wfHwModuleLEDState3 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Bit mask representing the state of the LEDs on the module.
+                 Each LED is represented by 2 bits.  LED #33 state is
+                 indicated by the 2 least significant bits.  LED #48 state
+                 is indicated by the 2 most significant bits.  How this bit
+                 mask is interpreted depends on the module ID.  For example,
+                 some modules use this value to indicate a LED is flashing
+                 (value of '01') or a solid color (value of '00').
+
+                 This value can be used by a NMS that needs to know this
+                 information for whatever reason.  Some modules may not
+                 support this value in which case it should be set to zero."
+        ::= { wfHwModuleEntry 15 }
+
+
+    wfModuleTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WfModuleEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "This table is used by the module driver for Barracuda"
+        ::= { wfHwModuleGroup 2 }
+
+    wfModuleEntry OBJECT-TYPE
+        SYNTAX	WfModuleEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Hardware specific information about a slot."
+        INDEX	{ wfModuleSlot }
+        ::= { wfModuleTable 1 }
+
+    WfModuleEntry ::= SEQUENCE {
+    	    wfModuleDelete
+    		INTEGER,
+    	    wfModuleSlot
+    		INTEGER,
+    	    wfModuleTimerFrequency
+    		INTEGER,
+    	    wfModuleBufferBalance
+    		INTEGER,
+    	    wfModuleFddiWeight
+    		INTEGER,
+    	    wfModuleTokenRingWeight
+    		INTEGER,
+    	    wfModuleCsmacdWeight
+    		INTEGER,
+    	    wfModuleSyncWeight
+    		INTEGER,
+    	    wfModuleFreeBufferCredits
+    		INTEGER,
+    	    wfModuleTotalBufferCredits
+    		INTEGER,
+    	    wfModuleRestart
+    		INTEGER,
+    	    wfModuleCsmacd100Weight
+    		INTEGER,
+	    wfModuleBisyncWeight
+    		INTEGER ,
+	    wfModuleHssiWeight
+    		INTEGER
+        }
+
+    wfModuleDelete OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    created(1),
+    		    deleted(2)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "create/delete parameter"
+        DEFVAL	{ created }
+        ::= { wfModuleEntry 1 }
+
+    wfModuleSlot OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "A unique value for each slot.
+                Its value ranges between 1 and 14.
+                There are products in this family that contain 1, 5, and 14 slots."
+        ::= { wfModuleEntry 2 }
+
+    wfModuleTimerFrequency OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    timerdefault(1)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "This value determines the frequency for the buffer balance
+                algorithm to run"
+        DEFVAL	{ timerdefault }
+        ::= { wfModuleEntry 3 }
+
+    wfModuleBufferBalance OBJECT-TYPE
+        SYNTAX	INTEGER {
+    		    txrx(1),
+    		    none(2),
+    		    rx(3),
+    		    tx(4)
+    		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Enable/Disable buffer balancing algorithm selectively"
+        DEFVAL	{ txrx }
+        ::= { wfModuleEntry 4 }
+
+    wfModuleFddiWeight OBJECT-TYPE
+        SYNTAX	INTEGER(1..10)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "This value determines the weight of the fddi line
+                for the buffer balancing algorithm"
+        DEFVAL	{ 6 }
+        ::= { wfModuleEntry 5 }
+
+    wfModuleTokenRingWeight OBJECT-TYPE
+        SYNTAX	INTEGER(1..10)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "This value determines the weight of the token-ring
+                for the buffer balancing algorithm"
+        DEFVAL	{ 4 }
+        ::= { wfModuleEntry 6 }
+
+    wfModuleCsmacdWeight OBJECT-TYPE
+        SYNTAX	INTEGER(1..10)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "This value determines the weight of the csmacd line
+                for the buffer balancing algorithm"
+        DEFVAL	{ 3 }
+        ::= { wfModuleEntry 7 }
+
+    wfModuleSyncWeight OBJECT-TYPE
+        SYNTAX	INTEGER(1..10)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "This value determines the weight of the sync line
+                for the buffer balancing algorithm"
+        DEFVAL	{ 2 }
+        ::= { wfModuleEntry 8 }
+
+    wfModuleFreeBufferCredits OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "This attribute indicates the number of buffers
+                available to line drivers but not used by them"
+        ::= { wfModuleEntry 9 }
+
+    wfModuleTotalBufferCredits OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "This attribute indicates the total number of buffers
+                available to line drivers"
+        ::= { wfModuleEntry 10 }
+
+    wfModuleRestart OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "This attribute should be touched after the queue
+                lengths are configured in the line-records"
+        ::= { wfModuleEntry 11 }
+
+    wfModuleCsmacd100Weight OBJECT-TYPE
+        SYNTAX	INTEGER(1..10)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "This value determines the weight of the csmacd 100MB line
+                for the buffer balancing algorithm"
+        DEFVAL	{ 6 }
+        ::= { wfModuleEntry 12 }
+
+    wfModuleBisyncWeight OBJECT-TYPE
+        SYNTAX	INTEGER(1..10)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "This value determines the weight of the bisync line
+                for the buffer balancing algorithm"
+        DEFVAL	{ 2 }
+        ::= { wfModuleEntry 13 }
+
+    wfModuleHssiWeight OBJECT-TYPE
+        SYNTAX        INTEGER(1..10)
+        ACCESS        read-write
+        STATUS        mandatory
+        DESCRIPTION
+                "This value determines the weight of the hssi line
+                for the buffer balancing algorithm"
+        DEFVAL        { 2 }
+        ::= { wfModuleEntry 14 }
+
+    END  -- Wellfleet-MODULE-MIB

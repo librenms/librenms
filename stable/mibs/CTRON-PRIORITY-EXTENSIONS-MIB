@@ -1,0 +1,573 @@
+CTRON-PRIORITY-EXTENSIONS-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-priority-extensions-mib.txt
+--  Revision: 01.01.02
+--  Part Number: 
+--  Date: February 17, 1997
+
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific priority extensions MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in 
+--  specification and other information contained in this document 
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental, 
+--  indirect, special, or consequential damages whatsoever (including 
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the 
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright December 1997 Cabletron Systems
+        
+IMPORTS
+        OBJECT-TYPE
+                FROM RFC-1212
+        PhysAddress
+                FROM RFC1213-MIB
+        ctPriorityExt
+                FROM CTRON-MIB-NAMES;
+        
+-- PhysAddress     ::= OCTET STRING
+
+-- The ctPriorityExt MIB is used to control priority packet forwarding.
+-- Priority packet forwarding provides the ability to designate certain 
+-- packets to be of higher importance than others.  This control allows
+-- for the forwarding of higher priority packets before those of lower priority.
+-- This functionality is essential for time critical applications on 
+-- shared networks. 
+
+
+
+ctPriorityExtTxQueue  OBJECT IDENTIFIER
+   ::= { ctPriorityExt 1 }
+
+-- The ctPriorityExtTxQueue group specifies the number of 
+-- transmit queues supported for each physical interface on the device.
+-- Which transmit queue a packet is placed on will be determined by
+-- associating each priority level (0-7) with a particular transmit
+-- queue. Specifically the priority mappings will be as follows:
+--
+--               +=====================================+
+--               |Priority | Number of Transmit Queues |
+--               | Level   ========================+===|
+--               |         | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+--               |=========+===+===+===+===+===+===+===|
+--               |    0    | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+--               +=========+===+===+===+===+===+===+===| O T
+--               |    1    | 1 | 1 | 1 | 1 | 1 | 1 | 1 | u X
+--               +=========+===+===+===+===+===+===+===| t
+--               |    2    | 1 | 1 | 1 | 1 | 1 | 1 | 2 | b Q
+--               +=========+===+===+===+===+===+===+===| o u
+--               |    3    | 1 | 1 | 1 | 2 | 2 | 2 | 3 | u e
+--               +=========+===+===+===+===+===+===+===| n u
+--               |    4    | 1 | 1 | 2 | 2 | 3 | 3 | 4 | d e
+--               +=========+===+===+===+===+===+===+===|
+--               |    5    | 1 | 1 | 2 | 3 | 4 | 4 | 5 |
+--               +=========+===+===+===+===+===+===+===|
+--               |    6    | 1 | 1 | 2 | 3 | 4 | 5 | 6 |
+--               +=========+===+===+===+===+===+===+===|
+--               |    7    | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+--               +=========+===+===+===+===+===+===+===|
+--
+--
+-- The implementation of this group is MANDANTORY.
+
+
+ctPriorityExtTXQueueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtPriorityExtTXQueueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table provides information pertaining to the number
+        of physical transmit queues per interface."
+    ::= { ctPriorityExtTxQueue 1 }
+
+
+ctPriorityExtTXQueueEntry OBJECT-TYPE
+    SYNTAX CtPriorityExtTXQueueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies the number of transmit queues for this interface."
+    INDEX { ctPriorityExtSlotNum, ctPriorityExtInterfaceNum }
+    ::= { ctPriorityExtTXQueueTable 1 }
+
+
+CtPriorityExtTXQueueEntry ::= SEQUENCE {
+        ctPriorityExtSlotNum
+                INTEGER,
+        ctPriorityExtInterfaceNum
+                INTEGER,
+        ctPriorityExtNumTXQueues
+                INTEGER
+        }
+
+ctPriorityExtSlotNum OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The slot num of the device that the interface is located on."
+    ::= { ctPriorityExtTXQueueEntry 1 }
+
+ctPriorityExtInterfaceNum OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The interface number for which the information is requested.
+         This is equal to the MIB-II ifIndex."
+    ::= { ctPriorityExtTXQueueEntry 2 }
+
+ctPriorityExtNumTXQueues OBJECT-TYPE
+    SYNTAX INTEGER (1..8) 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of physical transmit queues for the requested interface."
+    ::= { ctPriorityExtTXQueueEntry 3 }
+
+
+ctPriorityExtMACConfig  OBJECT IDENTIFIER ::= { ctPriorityExt 2 }
+
+-- The control is defined by creating a row in the ctPriorityExtMacTable
+-- specifying the MAC address, address type, packet type, and VLAN ID
+-- with ctPriorityExtMACPriority set to a value in the range of 1 to 8.
+-- When an entry is made in the aforementioned table all packets
+-- matching those criteria will be forwarded with the specifed priority.
+-- Additionally any ports that support IEEE 802.1p and 802.1q frame tagging
+-- will encode the priority in the frame tag of the packet.
+-- The implementation of this group is optional.
+
+
+ctPriorityExtMACStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Defines the status of the priority packet forwarding based
+        on MAC address.  Setting ctIfPriorityExtMACStatus to a value of 
+        disable(2), disables the forwarding of packets based on priority table 
+        information.  All information remains in existence but is not 
+        considered in the forwarding decision."
+    DEFVAL { enable }
+    ::= { ctPriorityExtMACConfig 1 }
+
+ctPriorityExtNumMACEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of active entries in the ctPriorityExtMACTable."
+    ::= { ctPriorityExtMACConfig 2 }
+
+ctPriorityExtMaxNumMACEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of entries allowed in the ctPriorityExtMACTable."
+    ::= { ctPriorityExtMACConfig 3 }
+
+ctPriorityExtMaxNumPktTypesPerMACEntry OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of packet types that can be asssociated
+        with any one MAC address in the ctPriorityExtMACTable"
+    ::= { ctPriorityExtMACConfig 4 }
+
+
+
+ctPriorityExtMACTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtPriorityExtMACEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table provides the ability to specify priority based
+        on the MAC addresses encoded in a packet.  There are several
+        possible permutations achieveable via this table. Priorities
+        in this table may be based on the following criteria:
+             
+           Destination address and specific packet type and VLAN ID
+           Destination address and specific packet type
+           Destination address
+           Source address and specific packet type and VLAN ID
+           Source address and specific packet type
+           Source address
+           Destination or source address and specific packet type and VLAN ID 
+           Destination or source address and specific packet type
+           Destination or source address
+        Depending on the values set in the table which of these criteria
+        will be used for any given packet.
+
+        If any given relationship can not be created the set will fail with a 
+        BAD-VALUE error."
+    ::= { ctPriorityExtMACConfig 5 }
+
+
+ctPriorityExtMACEntry OBJECT-TYPE
+    SYNTAX CtPriorityExtMACEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Describes a particular MAC address priority entry."
+    INDEX { ctPriorityExtMACAddr, ctPriorityExtAddrType,
+        ctPriorityExtMACPktType, ctPriorityExtMACVlanId }
+    ::= { ctPriorityExtMACTable 1 }
+
+CtPriorityExtMACEntry ::= SEQUENCE {
+        ctPriorityExtMACAddr
+                PhysAddress,
+        ctPriorityExtAddrType
+                INTEGER,
+        ctPriorityExtMACPktType
+                INTEGER,
+        ctPriorityExtMACVlanId
+                INTEGER,
+        ctPriorityExtMACPriority
+                INTEGER}
+
+ctPriorityExtMACAddr OBJECT-TYPE
+    SYNTAX PhysAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The MAC address which will have a priority associated with it
+        as specified by ctPriorityExtMACPriority." 
+    ::= { ctPriorityExtMACEntry 1 }
+
+ctPriorityExtAddrType OBJECT-TYPE
+    SYNTAX INTEGER {
+        destAddr(1),
+        srcAddr(2),
+        destOrSource(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The type of MAC address which will have priority associated
+        with it as specified by ctPriorityExtMACPriority."
+    ::= { ctPriorityExtMACEntry 2 }
+
+ctPriorityExtMACPktType OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The packet type associated with a particular MAC address,
+        specified by ctPriorityExtMACAddr, which will have priority
+        associated with it as specified by ctPriorityExtMACPriority.
+        A value of 1 indicates that this entry pertains to all 
+        packet types.  A single value in the range of 0x0600..0xFFFF
+        indicates that this entry only pertains to that particular packet
+        type."
+    ::= { ctPriorityExtMACEntry 3 }
+
+ctPriorityExtMACVlanId OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "A set of 65335 (0xFFFF) causes the priority value specified in 
+         ctPriorityExtMACPriority to apply to all packets
+         matching the criteria specified by ctPriorityExtMACAddr, 
+         ctPriorityExtAddrType, and ctPriorityExtMACPktType. Any 
+         value between 1 and 4095 is a valid VLAN ID (IEEE 802.1q)
+         and causes ctPriorityExtMACPriority to only apply
+         to packets that are of matching the above criteria and that are 
+         members of the IEEE 802.1q VLAN specified by the value set."
+--    DEFVAL { 65535 }
+   ::= { ctPriorityExtMACEntry 4 }
+
+ctPriorityExtMACPriority OBJECT-TYPE
+    SYNTAX INTEGER {
+         priority0(1), -- Lowest Priority
+         priority1(2),   
+         priority2(3),   
+         priority3(4),
+         priority4(5),
+         priority5(6),
+         priority6(7),
+         priority7(8), -- Highest Priority
+         delete(100)       
+         }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "A set of delete(100) will delete this row from the 
+        ctPriorityExtMACTable.  A set of priority(1-8) will either
+        create a row in the ctPriorityExtMACTable with the specified
+        priority or modify an existing entry with the newly specified 
+        priority."
+    ::= { ctPriorityExtMACEntry 5 }
+
+
+ctPriorityExtPktTypeConfig      OBJECT IDENTIFIER ::= { ctPriorityExt 3 }
+-- Control of priorities is based exclusively on packet
+-- type and optionally VLAN ID.  This control is defined by creating a 
+-- row in the ctPriorityExtPktTypeTable specifying the packet type with 
+-- ctPriorityExtPktTypePriority set to a value in the range of 1-8.
+-- When an entry is made in the aforementioned table all packets
+-- matching those criteria will be forwarded with the specifed priority.
+-- Additionally any ports that support IEEE 802.1p and 802.1q frame tagging 
+-- will encode the priority in the frame tag of the packet.
+-- The implementation of this group is optional.
+
+ctPriorityExtPktTypeStatus      OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Defines the status of the priority packet forwarding based 
+        exclusively on packet type.  Setting ctIfPriorityPktTypeExtStatus 
+        to a value of disable(2) disables the forwarding of packets 
+        based on priority table information.  All information remains 
+        in existence but is not considered in the forwarding decision."
+    DEFVAL { enable }
+    ::= { ctPriorityExtPktTypeConfig 1 }
+
+
+ctPriorityExtNumPktTypeEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of active entries in the ctPriorityExtPktTypeTable."
+    ::= { ctPriorityExtPktTypeConfig 2 }
+
+ctPriorityExtMaxNumPktTypeEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of entries allowed in the 
+        ctPriorityExtPktTypeTable."
+    ::= { ctPriorityExtPktTypeConfig 3 }
+
+ctPriorityExtPktTypeTable     OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtPriorityExtPktTypeEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table provides the ability to specify priority based
+        on the packet type encoded in a packet. Priorities  
+        in this table may be based on the following criteria:
+             
+           Packet type and VLAN ID
+           Packet type
+
+        If any given relationship can not be created the set will fail with a 
+        BAD-VALUE error."
+    ::= { ctPriorityExtPktTypeConfig 4 }
+
+
+ctPriorityExtPktTypeEntry       OBJECT-TYPE
+    SYNTAX CtPriorityExtPktTypeEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Describes a particular packet type priority entry."
+    INDEX { ctPriorityExtPktType, ctPriorityExtPktTypeVlanId }
+    ::= { ctPriorityExtPktTypeTable 1 }
+
+
+CtPriorityExtPktTypeEntry ::= SEQUENCE {
+        ctPriorityExtPktType
+                INTEGER,
+        ctPriorityExtPktTypeVlanId
+                INTEGER,
+        ctPriorityExtPktTypePriority
+                INTEGER}
+
+ctPriorityExtPktType OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The packet type which will have priority associated with 
+        it as specified by ctPriorityExtPktTypePriority.
+        A value of 1 indicates that this entry pertains to all 
+        packet types.  A single value in the range of 0x0600..0xFFFF
+        indicates that this entry only pertains to that particular packet
+        type."
+    ::= { ctPriorityExtPktTypeEntry 1 }
+
+ctPriorityExtPktTypeVlanId OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "A set of 65535 (0xFFFF) causes the priority value specified in 
+         ctPriorityExtPktTypePriority to apply to all packets
+         of the type specified by ctPriorityExtPktType.  Any
+         value between 1 and 4095 is a valid VLAN ID (IEEE 802.1q)
+         and causes ctPriorityExtPktTypePriority to only apply
+         to packets that are of ctPriorityExtPktType type and are 
+         members of the IEEE 802.1q VLAN specified by the value set."
+--    DEFVAL { 65535 }
+    ::= { ctPriorityExtPktTypeEntry 2 }
+
+ctPriorityExtPktTypePriority OBJECT-TYPE
+    SYNTAX INTEGER {
+         priority0(1), -- Lowest Priority
+         priority1(2),   
+         priority2(3),   
+         priority3(4),
+         priority4(5),
+         priority5(6),
+         priority6(7),
+         priority7(8), -- Highest Priority
+         delete(100)      
+         }
+    ACCESS read-write
+    STATUS mandatory 
+    DESCRIPTION
+        "A set of delete(100) will delete this row from the 
+        ctPriorityExtPriorityTypeTable.  A set of priority(1-8) will either
+        create a row in the ctPriorityExtPriorityTypeTable with the specified
+        priority or modify an existing entry with the newly specified 
+        priority."
+    ::= { ctPriorityExtPktTypeEntry 3 }
+
+
+
+ctPriorityExtPortConfig OBJECT IDENTIFIER ::= { ctPriorityExt 4 }
+
+-- Control of priorities is based exclusively on port.
+-- Each port will have a priority associated with it.
+-- When a packet is recieved on that port it will 
+-- be given the priority of the port it is received on.
+-- If the incoming packet already has a priority associated 
+-- with it, the incoming priority will remain intact, or be replaced
+-- with the port priority, based on the value of 
+-- ctPriorityExtPortFwdInboundPriority.
+-- The implementation of this group is optional.
+
+ctPriorityExtPortStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Defines the status of the priority packet forwarding based
+        on receive port.  Setting ctIfPriorityExtPortStatus to a value of 
+        disable(2), disables the forwarding of packets based on priority table 
+        information.  All information remains in existence but is not 
+        considered in the forwarding decision."
+    DEFVAL { enable }
+    ::= { ctPriorityExtPortConfig 1 }
+
+ctPriorityExtPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtPriorityExtPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table provides information pertaining to the priority associated 
+         with a receive port."
+    ::= { ctPriorityExtPortConfig 2 }
+
+
+ctPriorityExtPortEntry OBJECT-TYPE
+    SYNTAX CtPriorityExtPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies the priority associated with a specific physical 
+        interface."
+    INDEX { ctPriorityExtPortSlotNum, ctPriorityExtPortInterfaceNum }
+    ::= { ctPriorityExtPortTable 1 }
+
+
+CtPriorityExtPortEntry ::= SEQUENCE {
+        ctPriorityExtPortSlotNum
+                INTEGER,
+        ctPriorityExtPortInterfaceNum
+                INTEGER,
+        ctPriorityExtPortPriority
+                INTEGER,
+        ctPriorityExtFwdInboundPriority
+                INTEGER
+        }
+
+ctPriorityExtPortSlotNum OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The slot num of the device that the interface is located on."
+    ::= { ctPriorityExtPortEntry 1 }
+
+
+ctPriorityExtPortInterfaceNum OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The interface number for which the information is requested."
+    ::= { ctPriorityExtPortEntry 2 }
+
+ctPriorityExtPortPriority OBJECT-TYPE
+    SYNTAX INTEGER {
+         priority0(1), -- Lowest Priority
+         priority1(2),   
+         priority2(3),   
+         priority3(4),
+         priority4(5),
+         priority5(6),
+         priority6(7),
+         priority7(8) -- Highest Priority
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "A set of priority(1-8) will modify an existing entry 
+        with the newly specified priority.  Entries cannot be 
+        deleted from this table."
+    DEFVAL { priority0 }
+    ::= { ctPriorityExtPortEntry 3 }
+
+ctPriorityExtFwdInboundPriority OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This controls whether a packet that is received with a priority tag
+        is forwarded with the priority encoded in the tag or the default
+        priority of the port.  A value of enable(1) means the packet will 
+        be forwarded with the priority encoded in the tag.  A value of
+        disable(2) means the packet will be given the default priority
+        of the port it was received on." 
+    DEFVAL { enable }
+    ::= { ctPriorityExtPortEntry 4 }
+
+END

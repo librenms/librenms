@@ -1,0 +1,347 @@
+ALCATEL-IND1-WEBMGT-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+		OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE, Counter32, IpAddress
+			FROM SNMPv2-SMI
+		RowStatus, DisplayString
+			FROM SNMPv2-TC
+        	OBJECT-GROUP
+            	FROM SNMPv2-CONF
+		InetAddress, InetAddressType
+			FROM INET-ADDRESS-MIB
+		softentIND1WebMgt
+			FROM ALCATEL-IND1-BASE
+	        switchMgtTraps       FROM ALCATEL-IND1-BASE;
+
+        alcatelIND1WebMgtMIB MODULE-IDENTITY
+		LAST-UPDATED    "200704030000Z"
+    ORGANIZATION    "Alcatel-Lucent"
+		CONTACT-INFO
+			"Please consult with Customer Service to ensure the most appropriate
+			version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            	Telephone:               North America  +1 800 995 2696
+                  	                   Latin America  +1 877 919 9526
+                        	             Europe         +31 23 556 0100
+                              	       Asia           +65 394 7933
+                                    	 All Other      +1 818 878 4507
+
+       	     Electronic Mail:         support@ind.alcatel.com
+			World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            	File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+        DESCRIPTION
+            "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 WebView - web based embedded device manager.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+
+        ::= { softentIND1WebMgt 1 }
+
+
+       alcatelIND1WebMgtMIBObjects OBJECT-IDENTITY
+		STATUS current
+        	DESCRIPTION
+            	"Branch For WebView Subsystem Managed Objects."
+		::= { alcatelIND1WebMgtMIB  1 }
+
+	alcatelIND1WebMgtMIBConformance OBJECT-IDENTITY
+      	STATUS current
+        	DESCRIPTION
+            	"Branch For WebView Subsystem Conformance Information."
+        	::= { alcatelIND1WebMgtMIB  2 }
+
+
+    	alcatelIND1WebMgtMIBGroups OBJECT-IDENTITY
+        	STATUS current
+        	DESCRIPTION
+            	"Branch For WebView Subsystem Groups of managed objects."
+        	::= { alcatelIND1WebMgtMIBConformance 1 }
+
+
+    	alcatelIND1WebMgtMIBCompliances OBJECT-IDENTITY
+        	STATUS current
+        	DESCRIPTION
+            	"Branch For WebView Subsystem Compliance Statements."
+        	::= { alcatelIND1WebMgtMIBConformance 2 }
+
+-- WebView Global Configuration parameters
+
+       alaIND1WebMgtAdminStatus OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+		            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+            "Enable/Disable WebView Application."
+                DEFVAL { enable }
+         ::= { alcatelIND1WebMgtMIBObjects 1 }
+
+
+        alaIND1WebMgtSSL OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+	                      }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+            "Enable/Disable SSL for WebView."
+                DEFVAL { enable }
+         ::= { alcatelIND1WebMgtMIBObjects 2}
+
+
+--
+-- WebView Remote File Server (RFS) configuration table
+--
+
+        alaIND1WebMgtRFSConfigTable OBJECT-TYPE
+            SYNTAX    SEQUENCE OF AlaIND1WebMgtRFSConfigEntry
+            MAX-ACCESS    not-accessible
+            STATUS    current
+            DESCRIPTION
+                  "WebView Remote File Server Configuration table."
+         ::= { alcatelIND1WebMgtMIBObjects 3 }
+
+        alaIND1WebMgtRFSConfigEntry OBJECT-TYPE
+        	SYNTAX    AlaIND1WebMgtRFSConfigEntry
+        	MAX-ACCESS    not-accessible
+       	STATUS    current
+            DESCRIPTION
+            	"WebView RFS Configuration entry.Maximum of 4 RFS is currently supported."
+       	INDEX    {
+				alaIND1WebMgtRFSAddrType,
+				alaIND1WebMgtRFSIPAddr
+                     }
+            ::= { alaIND1WebMgtRFSConfigTable 1}
+
+        AlaIND1WebMgtRFSConfigEntry ::=
+                        SEQUENCE	{
+					  	alaIND1WebMgtRFSAddrType        InetAddressType,
+                                	alaIND1WebMgtRFSIPAddr          InetAddress,
+                                	alaIND1WebMgtRFSIPServerName    DisplayString,
+                                	alaIND1WebMgtRFSServerLogin     DisplayString,
+                                	alaIND1WebMgtRFSServerPassword  DisplayString,
+					  	alaIND1WebMgtRFSPrefServer	  INTEGER,
+					  	alaIND1WebMgtRFSPath		  DisplayString,
+					  	alaIND1WebMgtRFSRowStatus	  RowStatus
+						}
+
+
+		alaIND1WebMgtRFSAddrType OBJECT-TYPE
+			SYNTAX  InetAddressType
+                  MAX-ACCESS  read-write
+                  STATUS  current
+                  DESCRIPTION
+                  	"RFS address type. InetAddressIPv4 (1) is the only type currently supported. "
+                  ::= { alaIND1WebMgtRFSConfigEntry 1}
+
+
+
+		alaIND1WebMgtRFSIPAddr OBJECT-TYPE
+                	SYNTAX  InetAddress
+                 	MAX-ACCESS  read-write
+                 	STATUS  current
+                 	DESCRIPTION
+                 	       "RFS IP address."
+	            ::= { alaIND1WebMgtRFSConfigEntry 2}
+
+		alaIND1WebMgtRFSIPServerName OBJECT-TYPE
+    	           	SYNTAX  DisplayString
+     	           	MAX-ACCESS  read-write
+      	     	STATUS  current
+       	     	DESCRIPTION
+                 	     "RFS DNS Name."
+                  ::= { alaIND1WebMgtRFSConfigEntry 3 }
+
+		alaIND1WebMgtRFSServerLogin OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  MAX-ACCESS  read-write
+                  STATUS  current
+                  DESCRIPTION
+                       "Login name for RFS."
+                  ::= { alaIND1WebMgtRFSConfigEntry 4 }
+
+		alaIND1WebMgtRFSServerPassword OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                      "Password for RFS."
+                   ::= { alaIND1WebMgtRFSConfigEntry 5 }
+
+		alaIND1WebMgtRFSPrefServer OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        		preferred(1)
+                        		}
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                        "The value 1 indicates that this server is a preferred one.
+				Any other number will be an indication that the server should
+				ony be used if the preferred one is unreachable."
+			DEFVAL { 1 }
+                  ::= { alaIND1WebMgtRFSConfigEntry 6 }
+
+           alaIND1WebMgtRFSPath OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                        "Directory path for the Remote File Server "
+			 ::= { alaIND1WebMgtRFSConfigEntry 7 }
+
+           alaIND1WebMgtRFSRowStatus OBJECT-TYPE
+                    SYNTAX  RowStatus
+                    MAX-ACCESS  read-write
+                    STATUS  current
+                    DESCRIPTION
+                        "The status column used for creating, modifying,
+				and deleting instances of the columnar objects in
+				the evaluation table. Set to 4 to create a new entry in the table,
+				6 to delete an entry in the table."
+                    ::= { alaIND1WebMgtRFSConfigEntry 8 }
+
+
+       	alaIND1WebMgtDigestAuth OBJECT-TYPE
+            	SYNTAX  INTEGER {
+                        		enable(1),
+                        		disable(2)
+		                 		}
+            	MAX-ACCESS  read-write
+            	STATUS  current
+            	DESCRIPTION
+            		"Enable/Diable Digest Authentication. Currently the object is not supported."
+                	DEFVAL { enable }
+         ::= { alcatelIND1WebMgtMIBObjects 4 }
+
+        alaIND1WebMgtHttpPort OBJECT-TYPE
+            SYNTAX  INTEGER (0..65535)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "The user configurable TCP port for switch's
+	         http access. Default is 80."
+            DEFVAL { 80 }
+         ::= { alcatelIND1WebMgtMIBObjects 5 }
+
+        alaIND1WebMgtHttpsPort OBJECT-TYPE
+            SYNTAX  INTEGER (0..65535)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "The user configurable TCP port for switch's https
+                 access. Default is 443."
+            DEFVAL { 443 }
+         ::= { alcatelIND1WebMgtMIBObjects 6 }
+
+
+--
+-- Trap definition
+--
+
+webMgtTrapsDesc  OBJECT IDENTIFIER ::= { switchMgtTraps 3 }
+webMgtTrapsObj  OBJECT IDENTIFIER ::= { switchMgtTraps 4 }
+
+    httpServerDoSAttackTrap  NOTIFICATION-TYPE
+        OBJECTS {
+	    httpConnectionStats,
+	    httpsConnectionStats,
+	    httpServerDoSAttackSrcIp
+	}
+	STATUS  current
+        DESCRIPTION
+	    "This trap is sent to management station(s) when the
+	     HTTP server is under Denial of Service attack. The HTTP
+	     and HTTPS connections are sampled at a 15 second
+	     interval. This trap is sent every 1 minute while the HTTP
+	     server detects it is under attack."
+	::= { webMgtTrapsDesc 0 1 }
+
+	httpConnectionStats  OBJECT-TYPE
+	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of HTTP connection attempts over the past 15
+		 seconds."
+	    ::= { webMgtTrapsObj 1 }
+
+
+	httpsConnectionStats  OBJECT-TYPE
+	    SYNTAX  Counter32
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Number of HTTPS connection attempts over the past 15
+		 seconds."
+	    ::= { webMgtTrapsObj 2 }
+
+	httpServerDoSAttackSrcIp OBJECT-TYPE
+	    SYNTAX  IpAddress
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"Source IP of recent connection requesting an invalid URL."
+	    ::= { webMgtTrapsObj 3 }
+
+
+--
+-- Units Of Conformance
+--
+alaIND1WebMgtConfigMIBGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaIND1WebMgtAdminStatus ,
+            alaIND1WebMgtSSL,
+            alaIND1WebMgtHttpPort,
+            alaIND1WebMgtHttpsPort
+	}
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for global configuration parameters defining
+		the behavior of the embedded web server."
+        ::= { alcatelIND1WebMgtMIBGroups 1 }
+
+alaIND1WebMgtRFSMIBGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaIND1WebMgtRFSAddrType,
+		alaIND1WebMgtRFSIPAddr ,
+		alaIND1WebMgtRFSIPServerName,
+		alaIND1WebMgtRFSServerLogin,
+		alaIND1WebMgtRFSServerPassword,
+		alaIND1WebMgtRFSPrefServer,
+		alaIND1WebMgtRFSPath,
+		alaIND1WebMgtRFSRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of Remote File Server."
+        ::= { alcatelIND1WebMgtMIBGroups 2 }
+
+END

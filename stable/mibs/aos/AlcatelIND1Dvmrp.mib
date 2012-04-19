@@ -1,0 +1,607 @@
+ALCATEL-IND1-DVMRP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Unsigned32
+            FROM SNMPv2-SMI
+        TruthValue
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        dvmrpInterfaceEntry
+            FROM DVMRP-STD-MIB
+        routingIND1Dvmrp
+            FROM ALCATEL-IND1-BASE;
+
+alcatelIND1DVMRPMIB MODULE-IDENTITY
+    LAST-UPDATED  "200704030000Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This MIB contains management information for Coronado Layer
+             3 Hardware Routing Engine (HRE) management.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { routingIND1Dvmrp 1 }
+
+alcatelIND1DVMRPMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1DVMRPMIB 1 }
+
+alaDvmrpGlobalConfig    OBJECT IDENTIFIER ::= { alcatelIND1DVMRPMIBObjects 1 }
+alaDvmrpDebugConfig OBJECT IDENTIFIER ::= { alcatelIND1DVMRPMIBObjects 2 }
+alaDvmrpTunnelXIfTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AlaDvmrpTunnelXIfEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of attributes that are associated with the internal
+        assigned tunnel index when a DVMRP tunnel is created.  This table
+        contains additional objects that are not present in the tunnelMIB
+        tunnelIfTable."
+        ::= { alcatelIND1DVMRPMIBObjects 3 }
+
+
+-- ***************************************************************************
+-- Global DVMRP Configuration
+-- ***************************************************************************
+
+alaDvmrpAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                 enable(1),
+                 disable(2),
+                 unrestrictedEnable(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Administratively enables/disables the
+                 DVMRP protocol on this router."
+    DEFVAL      { disable }
+    ::= { alaDvmrpGlobalConfig 1}
+
+alaDvmrpRouteReportInterval OBJECT-TYPE
+    SYNTAX      Integer32 (10..2000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The Route Report Interval determines how often
+                 a router will send its complete routing tables to
+                 neighboring routers running DVMRP."
+    DEFVAL      { 60 }
+    ::= { alaDvmrpGlobalConfig 2}
+
+alaDvmrpFlashUpdateInterval OBJECT-TYPE
+    SYNTAX      Integer32 (5..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The minimum Flash Update Interval defines how often
+                 routing table change messages are sent to
+                 neighboring DVMRP routers.  Since these messages
+                 are sent between the transmission of complete
+                 routing tables, the flash update interval value
+                 must be shorter than that of the route report
+                 interval."
+    DEFVAL      { 5 }
+    ::= { alaDvmrpGlobalConfig 3}
+
+alaDvmrpNeighborTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (5..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The Neighbor Timeout value specifies how long, without
+                 any activity from a neighboring DVMRP router, the
+                 router will wait before assuming that the inactive
+                 router is down."
+    DEFVAL      { 35 }
+    ::= { alaDvmrpGlobalConfig 4}
+
+alaDvmrpRouteExpirationTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (20..4000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The Route Expiration Timeout value specifies how
+                 long the router will wait before aging out a route.
+                 When this value expires, the route is advertised as
+                 inactive until either it's activity resumes or it is
+                 deleted."
+    DEFVAL      { 140 }
+    ::= { alaDvmrpGlobalConfig 5}
+
+alaDvmrpRouteHoldDown OBJECT-TYPE
+    SYNTAX      Integer32 (1..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Specifies the time during which DVMRP routes are kept
+                 in a hold-down state.  A hold-down state refers to
+                 the time that a route to an inactive network continues
+                 to be advertised."
+    DEFVAL      { 120 }
+    ::= { alaDvmrpGlobalConfig 6}
+
+alaDvmrpNeighborProbeInterval OBJECT-TYPE
+    SYNTAX      Integer32 (5..30)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The Neighbor Probe Interval value specifies how often
+                 probes will be transmitted to those interfaces
+                 with attached DVMRP neighbors."
+    DEFVAL      { 10 }
+    ::= { alaDvmrpGlobalConfig 7}
+
+alaDvmrpPruneLifetime OBJECT-TYPE
+    SYNTAX      Integer32 (180..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The Prune Lifetime value defines the value
+                 whereby a source-rooted multicast tree will be
+                 pruned."
+    DEFVAL      { 7200 }
+    ::= { alaDvmrpGlobalConfig 8}
+
+alaDvmrpPruneRetransmission OBJECT-TYPE
+    SYNTAX      Integer32 (30..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The Prune Packet Retransmission value is the duration
+                 of time that the router will wait, if it continues
+                 to receive unwanted multicast traffic, before
+                 retransmitting a prune message."
+    DEFVAL      { 30 }
+    ::= { alaDvmrpGlobalConfig 9}
+
+alaDvmrpGraftRetransmission OBJECT-TYPE
+    SYNTAX      Integer32 (5..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The Graft message Retransmission value defines
+                 the duration of time that the router will wait
+                 before retransmitting a graft message, if it has
+                 not already received an acknowledgement from its
+                 neighbor."
+    DEFVAL      { 5 }
+    ::= { alaDvmrpGlobalConfig 10}
+
+alaDvmrpInitNbrAsSubord OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The value true(1) indicates neighbors, on initial discovery,
+                are considered subordinate.  This means traffic may be resumed
+                slightly quicker on network disruptions.  But, if the neighbor
+                has trouble handling huge initial blasts of traffic, it may be
+                wise to wait until route reports have been exchanged and the
+                neighbor has requested dependency, before forwarding traffic."
+    DEFVAL      { true }
+    ::= { alaDvmrpGlobalConfig 11}
+
+ alaDvmrpBfdStatus    OBJECT-TYPE
+	SYNTAX	INTEGER
+			{
+			enable(1),
+			disable(2)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	"Enables/Disables Bfd for DVMRP Protocol."
+	DEFVAL      {disable}
+	::= { alaDvmrpGlobalConfig 12}
+
+ alaDvmrpBfdAllInterfaceStatus   OBJECT-TYPE
+	SYNTAX	INTEGER
+			{
+			enable(1),
+			disable(2)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	"Enables/Disables Bfd for all DVMRP interfaces."
+	DEFVAL      {disable}
+	::= { alaDvmrpGlobalConfig 13}
+
+-- ************************************************************************
+--  DVMRP Debug Configuration
+-- ************************************************************************
+
+alaDvmrpDebugLevel     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { 0 }
+    ::= {alaDvmrpDebugConfig 1}
+
+alaDvmrpDebugError     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugError
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 2}
+
+alaDvmrpDebugNbr     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugNbr
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 3}
+
+alaDvmrpDebugRoutes     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugRoutes
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 4}
+
+alaDvmrpDebugProbes     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugProbes
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 5}
+
+alaDvmrpDebugPrunes     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugPrunes
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 6}
+
+alaDvmrpDebugGrafts     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugGrafts
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 7}
+
+alaDvmrpDebugTime     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugTime
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 8}
+
+alaDvmrpDebugIgmp     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugIgmp
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 9}
+
+alaDvmrpDebugFlash     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugFlash
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 10}
+
+alaDvmrpDebugMip     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugMip
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 11}
+
+alaDvmrpDebugInit     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugInit
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 12}
+
+alaDvmrpDebugTm     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugTm
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 13}
+
+alaDvmrpDebugIpmrm     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugIpmrm
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 14}
+
+alaDvmrpDebugMisc     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugMisc
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 15}
+
+alaDvmrpDebugAll     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favour of alaDrcTmDvmrpDebugAll
+                MIB Object of alaDrcTmDvmrpDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaDvmrpDebugConfig 16}
+
+-- ************************************************************************
+--  DVMRP Tunnel Config Extension Table
+-- ************************************************************************
+alaDvmrpTunnelXIfEntry  OBJECT-TYPE
+    SYNTAX      AlaDvmrpTunnelXIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing additional attributes associated with a DVMRP
+        tunnel."
+    INDEX { alaDvmrpTunnelIndex }
+    ::= { alaDvmrpTunnelXIfTable 1 }
+
+AlaDvmrpTunnelXIfEntry ::=
+    SEQUENCE {
+        alaDvmrpTunnelIndex     Unsigned32,
+        alaDvmrpLocalIfIndex    Unsigned32
+    }
+
+alaDvmrpTunnelIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tunnel index of the DVMRP tunnel."
+    ::= { alaDvmrpTunnelXIfEntry 1 }
+
+alaDvmrpLocalIfIndex        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface index of the local end-point of the DVMRP tunnel."
+
+    ::= { alaDvmrpTunnelXIfEntry 2 }
+
+ alaDvmrpIfAugTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF AlaDvmrpIfAugEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Expansion for Dvmrp Intf table."
+		::= { alcatelIND1DVMRPMIBObjects 4 }
+
+ alaDvmrpIfAugEntry OBJECT-TYPE
+	SYNTAX       AlaDvmrpIfAugEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry of alaDvmrpIfAugEntry."
+    	AUGMENTS { dvmrpInterfaceEntry } 
+		::= { alaDvmrpIfAugTable 1 }
+
+ AlaDvmrpIfAugEntry ::=
+	SEQUENCE {
+			alaDvmrpIfBfdStatus		INTEGER 
+            	 }
+
+ alaDvmrpIfBfdStatus		OBJECT-TYPE
+	SYNTAX		INTEGER
+			{
+			enable(1),
+			disable(2)
+			}
+	MAX-ACCESS	read-create
+	STATUS   current
+	DESCRIPTION
+		"This object enables/disables BFD for this DVMRP interface."
+		::= { alaDvmrpIfAugEntry 1 }
+
+-- conformance information
+
+alcatelIND1DVMRPMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1DVMRPMIB 2 }
+alcatelIND1DVMRPMIBCompliances OBJECT IDENTIFIER ::=
+                                          { alcatelIND1DVMRPMIBConformance 1 }
+alcatelIND1DVMRPMIBGroups      OBJECT IDENTIFIER ::=
+                                          { alcatelIND1DVMRPMIBConformance 2 }
+
+-- compliance statements
+
+alaDvmrpCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers running DVMRP
+            and implementing the ALCATEL-IND1-DVMRP MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaDvmrpConfigMIBGroup, alaDvmrpDebugMIBGroup,
+                           alaDvmrpTunnelXIfMIBGroup,alaDvmrpIfConfigGroup }
+
+    ::= { alcatelIND1DVMRPMIBCompliances 1 }
+
+-- units of conformance
+
+alaDvmrpConfigMIBGroup OBJECT-GROUP
+    OBJECTS { alaDvmrpAdminStatus, alaDvmrpRouteReportInterval,
+              alaDvmrpFlashUpdateInterval, alaDvmrpNeighborTimeout,
+              alaDvmrpRouteExpirationTimeout, alaDvmrpRouteHoldDown,
+              alaDvmrpNeighborProbeInterval, alaDvmrpPruneLifetime,
+              alaDvmrpPruneRetransmission, alaDvmrpGraftRetransmission,
+              alaDvmrpInitNbrAsSubord,alaDvmrpBfdStatus,alaDvmrpBfdAllInterfaceStatus 
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support the management of global
+            configuration parameters on DVMRP routers."
+    ::= { alcatelIND1DVMRPMIBGroups 1 }
+
+alaDvmrpDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaDvmrpDebugLevel, alaDvmrpDebugError, alaDvmrpDebugNbr,
+              alaDvmrpDebugRoutes, alaDvmrpDebugProbes, alaDvmrpDebugPrunes,
+              alaDvmrpDebugGrafts, alaDvmrpDebugTime, alaDvmrpDebugIgmp,
+              alaDvmrpDebugFlash, alaDvmrpDebugMip, alaDvmrpDebugInit,
+              alaDvmrpDebugTm, alaDvmrpDebugIpmrm, alaDvmrpDebugMisc,
+              alaDvmrpDebugAll
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support on DVMRP routers."
+    ::= { alcatelIND1DVMRPMIBGroups 2 }
+
+alaDvmrpTunnelXIfMIBGroup OBJECT-GROUP
+    OBJECTS { alaDvmrpLocalIfIndex }
+    STATUS  current
+    DESCRIPTION
+            "These objects are required to provide additional information 
+            about configured DVMRP tunnels not found in the standard tunnel
+            MIB."
+    ::= { alcatelIND1DVMRPMIBGroups 3 }
+alaDvmrpIfConfigGroup    OBJECT-GROUP
+   OBJECTS { alaDvmrpIfBfdStatus }
+    STATUS  current
+    DESCRIPTION
+            "These objects are required to provide additional information
+            about configured DVMRP interfaces not found in the standard tunnel
+            MIB."
+    ::= { alcatelIND1DVMRPMIBGroups 4 }
+
+
+END
+

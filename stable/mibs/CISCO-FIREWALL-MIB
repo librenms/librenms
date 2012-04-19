@@ -1,0 +1,1336 @@
+-- *****************************************************************
+-- CISCO-FIREWALL-MIB
+--
+-- April, 1999 Jim Fitzgerald
+--
+-- Copyright (c) 1999-2005 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+	
+CISCO-FIREWALL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP,
+    MODULE-COMPLIANCE        FROM SNMPv2-CONF
+
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Counter32,
+    Gauge32,
+    Unsigned32,
+    IpAddress                FROM SNMPv2-SMI
+
+    DateAndTime,
+    TEXTUAL-CONVENTION,
+    RowPointer               FROM SNMPv2-TC
+
+    SnmpAdminString          FROM SNMP-FRAMEWORK-MIB
+    InterfaceIndexOrZero     FROM IF-MIB
+    ciscoMgmt                FROM CISCO-SMI;
+
+
+ciscoFirewallMIB MODULE-IDENTITY
+    LAST-UPDATED        "200512060000Z"
+    ORGANIZATION        "Cisco Systems, Inc."
+    CONTACT-INFO
+            "       Cisco Systems
+                    Customer Service
+
+            Postal: 170 W Tasman Drive
+                    San Jose, CA  95134
+                    USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-pix@cisco.com
+                    cs-iosfw@cisco.com"
+    DESCRIPTION "MIB module for monitoring Cisco Firewalls."
+    REVISION    "200512060000Z"
+    DESCRIPTION
+            "Added the copyright statement and updated the imports 
+            such that Unsigned32 is imported from SNMPv2-SMI instead 
+            of CISCO-TC. Added a new NOTIFICATION-GROUP 
+            ciscoFirewallMIBNotificationGroupRev1 to include all the 
+            notifications defined in the MIB. Obsoleted the 
+            OBJECT-GROUP ciscoFirewallMIBNotificationGroup. Deprecated
+            the MODULE-COMPLIANCE ciscoFirewallMIBCompliance and added 
+            a new MODULE-COMPLIANCE ciscoFirewallMIBComplianceRev1."
+    REVISION    "9904291200Z"
+    DESCRIPTION
+            "Initial version of this MIB module."
+    ::= { ciscoMgmt 147 }
+
+ciscoFirewallMIBObjects OBJECT IDENTIFIER ::=  { ciscoFirewallMIB 1 }
+
+cfwEvents            OBJECT IDENTIFIER ::=  { ciscoFirewallMIBObjects 1 }
+    cfwBasicEvents   OBJECT IDENTIFIER ::=  { cfwEvents 1 }
+    cfwNetEvents     OBJECT IDENTIFIER ::=  { cfwEvents 2 }
+ 
+
+cfwSystem            OBJECT IDENTIFIER ::=  { ciscoFirewallMIBObjects 2 }
+    cfwStatus        OBJECT IDENTIFIER ::=  { cfwSystem 1 }
+    cfwStatistics    OBJECT IDENTIFIER ::=  { cfwSystem 2 }
+
+-- Textual Conventions
+
+ResourceStatistics ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This textual convention is used to identify various statistics
+        that are related to the resources on a firewall.
+
+        highUse     : The highest load the resource has had for a
+                      time period. The time period will be
+                      implementation dependent.
+        highLoad    : The highest load the resource has had since
+                      startup.
+        maximum     : The maximum amount of the resource that is
+                      available.
+        minimum     : The minimum amount of the resource that is
+                      available.
+        low         : The lowest amount of the resource that has been
+                      available since startup.
+        high        : The highest amount of the resource that has been
+                      available since startup.
+        average     : The average amount of the resource that has been
+                      available since startup.
+        free        : The amount of the resource that is currently
+                      available since startup.
+        inUse       : The amount of the resource that is currently
+                      in use,  eg. CPU usage, memory usage."
+    SYNTAX INTEGER {
+        highUse(1),
+        highLoad(2),
+        maximum(3),
+        minimum(4),
+        low(5),
+        high(6),
+        average(7),
+        free(8),
+        inUse(9)
+    }
+
+Hardware ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "This textual convention is used to describe various hardware
+        resouces that can be monitored by the firewall.
+
+        memory         - identifies memory.
+        disk           - identifies disk.
+        power          - identifies power.
+        netInterface   - identifies a network interface.
+        tape           - identifies a tape drive.
+        controller     - identifies hardware controller.
+        cpu            - identifies CPU.
+        primaryUnit    - identifies the primary unit of the two
+                         identical firewalls configured redundancy.
+        secondaryUnit  - identifies the secondary unit of the two
+                         identical firewalls configured redundancy.
+        other          - identifies other hardware."
+    SYNTAX INTEGER {
+        memory(1),
+        disk(2),
+        power(3),
+        netInterface(4),
+        cpu(5),
+        primaryUnit(6),
+        secondaryUnit(7),
+        other(8)
+    }
+
+Services ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+
+       "This textual convention is used to describe various services
+        that are monitored by the firewall.
+
+        otherFWService  - a service that does not fit into any
+                          other category.
+        fileXferFtp     - identifies FTP, File Transfer Protocol.
+        fileXferTftp    - identifies TFTP, Trivial File
+                          Transfer Protocol
+        fileXferFtps    - identifies FTP, File Transfer
+                            Protocol running over Secure Sockets Layer.
+        loginTelnet    - identifies telnet
+        loginRlogin    - identifies rlogin.
+        loginTelnets   - identifies telnet over 
+                         Secure Sockets Layer(SSL).
+        remoteExecSunRPC  - identifies Sun Remote 
+                            Procedure Call Protocol.
+        remoteExecMSRPC   - identifies Microsoft Remote 
+                            Procedure Call Protocol.
+        remoteExecRsh     - identifies the remote shell.
+        remoteExecXserver - identifies the Xwindows server.
+        webHttp           - identifies Hyper Text Transfer Protocol.
+        webHttps          - identifies the secure HTTP protocol.
+        mailSmtp  - identifies SMTP, Simple Mail Transfer Protocol.
+        mailSmtps - identifies SMTP, Simple Mail Transfer Protocol 
+                    running over Secure Sockets Layer (SSL).
+        multimediaStreamworks - identifies streamworks.
+        multimediaH323        - identifies H323.
+        multimediaNetShow     - identifies NetShow.
+        multimediaVDOLive     - identifies vDOLive.
+        multimediaRealAV      - identifies RealAV.
+        multimediaRTSP        - identifies Real Time Streaming Protocol
+        dbOracle    - identifies Oracle's SQL*Net.
+        dbMSsql     - identifies MicroSoft SQL.
+        contInspProgLang     - identifies a payload as a programming
+                               language such as Java or ActiveX.
+        contInspUrl          - identifies a payload as a URL.
+        directoryNis         - identifies NIS, Network Information Service.
+        directoryDns         - identifies DNS, Domain Name Service.
+        directoryNetbiosns   - identifies NetBIOSNS - NetBIOS Name Service.
+        directoryNetbiosdgm  - identifies NetBIOSNS - NetBIOS 
+                               datagram Service.
+        directoryNetbiosssn  - identifies NetBIOSNS - NetBIOS 
+                               Session Service.
+        directoryWins      - identifies Windows Internet Naming
+                             Service (WINS).
+        qryWhois   - identifies WhoIs service.
+        qryFinger  - identifies finger.
+        qryIdent   - identifies Ident.
+        fsNfsStatus  - identifies Network File System (NFS) Status.
+        fsNfs        -  identifies Network File System (NFS).
+        fsCifs       - identifies CIFS, Common Internet 
+                       File Service.
+        protoIcmp   - identifies ICMP, Internet Control Message Protocol.
+        protoTcp    - identifies TCP, Transmission Control Protocol.
+        protoUdp    - identifies UDP, User Datagram Protocol.
+        protoIp     - identifies IP, Internet Protocol.
+        protoSnmp   - identifies SNMP, Simple Network Management Protocol."
+
+    SYNTAX INTEGER {
+        otherFWService(1),
+        fileXferFtp(2),
+        fileXferTftp(3),
+        fileXferFtps(4),
+        loginTelnet(5),
+        loginRlogin(6),
+        loginTelnets(7),
+        remoteExecSunRPC(8),
+        remoteExecMSRPC(9),
+        remoteExecRsh(10),
+        remoteExecXserver(11),
+        webHttp(12),
+        webHttps(13),
+        mailSmtp(14),
+        multimediaStreamworks(15),
+        multimediaH323(16),
+        multimediaNetShow(17),
+        multimediaVDOLive(18),
+        multimediaRealAV(19),
+        multimediaRTSP(20),
+        dbOracle(21),
+        dbMSsql(22),
+        contInspProgLang(23),
+        contInspUrl(24),
+        directoryNis(25),
+        directoryDns(26),
+        directoryNetbiosns(27),
+        directoryNetbiosdgm(28),
+        directoryNetbiosssn(29),
+        directoryWins(30),
+        qryWhois(31),
+        qryFinger(32),
+        qryIdent(33),
+        fsNfsStatus(34),
+        fsNfs(35),
+        fsCifs(36),
+        protoIcmp(37),
+        protoTcp(38),
+        protoUdp(39),
+        protoIp(40),
+        protoSnmp(41)
+    }
+
+HardwareStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This textual convention is used to describe various events
+        that are related to the resources on a firewall.
+        other      : Generic resource event.
+        up         : The resource is in service.
+        down       : The resource is not in service.
+        error      : There has been an error for this resource.
+        overTemp   : The resource is overheating.
+        busy       : The resource is busy.
+        noMedia    : A device doesn't have its needed media.
+        backup     : Processing has switched to the backup.
+        active     : This is the active unit.
+        standby    : This is the standby unit."
+
+    SYNTAX INTEGER {
+        other(1),
+        up(2),
+        down(3),
+        error(4),
+        overTemp(5),
+        busy(6),
+        noMedia(7),
+        backup(8),
+        active(9),
+        standby(10)
+    }
+
+SecurityEvent ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This textual convention is used to describe various 
+        security-related events and statistics on a firewall.
+
+        other      : Generic attack event.
+        none       : No attack is occurring, an informational
+                     event.
+        dos        : A denial of service attack has been detected.
+        recon      : A pattern of reconnaissance activity has been
+                     detected.
+        pakFwd     : A packet forwarding attack has been detected.
+        addrSpoof  : A spoofed address has been detected.
+        svcSpoof   : A spoofed service (eg., DNS) has been detected.
+        thirdParty : This site is being used as a third-party for
+                     an attack on another network. For example, the
+                     'smurf' attack or email spamming.
+        complete   : An attack has terminated
+        invlPak    : An invalid packet with attack characteristics
+                     has been detected.
+        illegCmd   : An illegal command has been found.
+        policy     : An attempt has reen made to violate a security
+                     policy."
+
+    SYNTAX INTEGER {
+        other(1),
+        none(2),
+        dos(3),
+        recon(4),
+        pakFwd(5),
+        addrSpoof(6),
+        svcSpoof(7),
+        thirdParty(8),
+        complete(9),
+        invalPak(10),
+        illegCom(11),
+        policy(12)
+    }
+
+ContentInspectionEvent ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Content inspection events, these events report that
+        something was found in the application payload. The 
+        details entry in the event can report on what was
+        found (eg., virus, company private info., etc), what it
+        was found in (eg., html, win32 executable, e-mail), and
+        what was done with it (eg., the quarantine location).
+
+        other  : A content inspection event. Used to indicate
+                 that some content inspection has occurred that
+                 is not covered by the other content inspection
+                 enumerations.
+        okay   : The check of the content was okay, nothing 'bad'
+                 was found.
+        error  : There was an error while checking the content.
+        found  : Something was found that the content inspection
+                 engine has determined merits attention.
+        clean  : The content inspection engine has found something
+                 that violates the security policy and has 
+                 neutralized the content in the data flow.
+        reject : The content inspection engine has found something
+                 that violates the security policy and has discarded 
+                 the content.
+        saved  : The content inspection engine has found something
+                 that violates the security policy and has stored 
+                 it in a quarentine storage area."
+    SYNTAX INTEGER {
+        other(1),
+        okay(2),
+        error(3),
+        found(4),
+        clean(5),
+        reject(6),
+        saved(7)
+    }
+
+ConnectionEvent ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This textual convention is used to describe various events
+        and statistics that are related to the connections that
+        occur on a firewall.
+
+        other    : A generic connection event.
+        accept   : A connection has been acccepted.
+        error    : An error has occurred for a connection.
+        drop     : The connection has been dropped.
+        close    : A connection has been closed.
+        timeout  : A connection has been timed out.
+        refused  : A connection has been refused.
+        reset    : A connection has been reset.
+        noResp   : A connection has received no response."
+    SYNTAX INTEGER {
+        other(1),
+        accept(2),
+        error(3),
+        drop(4),
+        close(5),
+        timeout(6),
+        refused(7),
+        reset(8),
+        noResp(9)
+    }
+
+ConnectionStat ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This textual convention is used to describe various 
+        connections statistics.
+
+        other            : A generic connection event.
+        totalOpen        : Total open connections since reboot.
+        currentOpen      : The number of connections currently open.
+        currentClosing   : The number of connections currently closing.
+        currentHalfOpen  : The number of connections currently half-open.
+        currentInUse     : The number of connections currently in use.
+        high             : The highest number of connections in use at
+                           any one time since system startup."
+    SYNTAX INTEGER {
+        other(1),
+        totalOpen(2),
+        currentOpen(3),
+        currentClosing(4),
+        currentHalfOpen(5),
+        currentInUse(6),
+        high(7)
+    }
+
+AccessEvent ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This textual convention is used to describe various events
+        and statistics that are related to the access control on a
+        firewall.
+
+        other    : Miscellaneous access event.
+        grant    : A service has allowed access based on all
+                   of its access checks.
+        deny     : a client was denied use of a service.
+        denyMult : A client was denied use of a service
+                   multiple times.
+        error    : An error has ocurred during the access
+                   control process."
+    SYNTAX INTEGER {
+        other(1),
+        grant(2),
+        deny(3),
+        denyMult(4),
+        error(5)
+    }
+
+AuthenticationEvent ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This textual convention is used to describe various events
+        and statistics that are related to authorization.
+
+        other    : Miscellaneous authentication event.
+        succ     : A client successfuly authenticated.
+        error    : Error while authenticating.
+        fail     : A client failed an authenticating.
+        succPriv : A client accessed a service with special
+                   privileges.
+        failPriv : A client failed to access a service with
+                   special privileges.
+        failMult : Multiple failed authentication attempts by
+                   a client."
+    SYNTAX INTEGER {
+        other(1),
+        succ(2),
+        error(3),
+        fail(4),
+        succPriv(5),
+        failPriv(6),
+        failMult(7)
+    }
+
+GenericEvent ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Generic Events - events for which there is no more specific
+        enumeration
+        abnormal : An abnormal event has occurred that is neither
+                   'okay' nor an 'error'.
+        okay     : A normal event occurred or the system has changed
+                   from an abnormal state to a normal state
+        error    : An error event occurred"
+    SYNTAX INTEGER {
+        abnormal(1),
+        okay(2),
+        error(3)
+    }
+
+--
+-- The cfwBasicEventsGroup
+--
+-- This group defines the table containing information that is
+-- for every logged event on the firewall.  The table is
+-- defined along with one variable to obtain the index value of 
+-- the last row in the table. The table is indexed by the
+-- integer-valued cfwBasicEventIndex which is assigned to events 
+-- in ascending chronological order, such that the oldest event 
+-- stored in the table has the numerically smallest value of 
+-- cfwBasicEventIndex."
+--
+-- The index of the last row also indicates the total number 
+-- modulo 2**32 of events logged in the table since reboot. 
+-- Events are not retained across reboots.
+--
+ 
+cfwBasicEventsTableLastRow OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The index value of the most recently created row 
+            in the cfwBasicEventsTable. This number starts at 
+            1 and increase by one with each new log entry.  When 
+            this number wraps, all events are deleted."
+    ::= { cfwBasicEvents 1 }
+
+cfwBasicEventsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CfwBasicEventsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Table of basic data for firewall events.  The agent 
+            may choose to delete the instances of cfwBasicEventsEntry
+            as required because of lack of memory.  The oldest Events 
+            will be selected first for deletion."
+    ::= { cfwBasicEvents 2 }
+
+cfwBasicEventsEntry OBJECT-TYPE
+        SYNTAX     CfwBasicEventsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry in the table, containing general information
+             about an event. This table will always be sparse, i.e., 
+             each row will instanciate only a subet of the columnar
+             objects."
+        INDEX { cfwBasicEventIndex }
+    ::= { cfwBasicEventsTable 1 }
+
+CfwBasicEventsEntry ::= SEQUENCE {
+        cfwBasicEventIndex                 Unsigned32,
+        cfwBasicEventTime                  DateAndTime,
+        cfwBasicSecurityEventType          SecurityEvent,
+        cfwBasicContentInspEventType       ContentInspectionEvent,
+        cfwBasicConnectionEventType        ConnectionEvent,
+        cfwBasicAccessEventType            AccessEvent,
+        cfwBasicAuthenticationEventType    AuthenticationEvent,
+        cfwBasicGenericEventType           GenericEvent,
+        cfwBasicEventDescription           SnmpAdminString,
+        cfwBasicEventDetailsTableRow       RowPointer
+    }
+ 
+cfwBasicEventIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An index that uniquely identifies an entry in the 
+            log table.  These indices are assigned beginning 
+            with 1 and increase by one with each new event logged."
+    ::= { cfwBasicEventsEntry 1 }
+ 
+cfwBasicEventTime OBJECT-TYPE
+        SYNTAX     DateAndTime
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The time that the event occurred."
+    ::= { cfwBasicEventsEntry 2 }
+ 
+cfwBasicSecurityEventType OBJECT-TYPE
+        SYNTAX     SecurityEvent
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The type of security-related event that this row contains.
+            If the event is not security-related this object will not 
+            be instantiated."
+    ::= { cfwBasicEventsEntry 3 }
+
+cfwBasicContentInspEventType OBJECT-TYPE
+        SYNTAX     ContentInspectionEvent
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The type of content inspection-related event that this row
+            contains. If the event is not content inspection-related 
+            this object will not be instantiated."
+    ::= { cfwBasicEventsEntry 4 }
+
+cfwBasicConnectionEventType OBJECT-TYPE
+        SYNTAX     ConnectionEvent
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The type of connection-related event that this row contains.
+            If the event is not connection-related this object will not 
+            be instantiated."
+    ::= { cfwBasicEventsEntry 5 }
+
+cfwBasicAccessEventType OBJECT-TYPE
+        SYNTAX     AccessEvent
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The type of access-related event that this row contains. 
+            If the event is not access-related this object will not be
+            instantiated."
+    ::= { cfwBasicEventsEntry 6 }
+
+cfwBasicAuthenticationEventType OBJECT-TYPE
+        SYNTAX     AuthenticationEvent
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The type of authentication-related event that this row 
+            contains. If the event is not authentication-related this 
+            object will not be instantiated."
+    ::= { cfwBasicEventsEntry 7 }
+
+cfwBasicGenericEventType OBJECT-TYPE
+        SYNTAX     GenericEvent
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The type of generic event that this row contains. If the 
+            event does not fall into one of the other categories this
+            object will be populated. Otherwise, this object will not 
+            be instantiated."
+    ::= { cfwBasicEventsEntry 8 }
+
+cfwBasicEventDescription OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "A description of the event. The value of the object may
+            be a zero-length string."
+        ::= { cfwBasicEventsEntry 9 }
+ 
+cfwBasicEventDetailsTableRow OBJECT-TYPE
+        SYNTAX     RowPointer
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "A pointer to a row in the table containing details
+            about this event.  Generally, the table will be the 
+            cfwNetEventsTable but a Cisco-defined table may also 
+            appear here. If there there is no more detailed 
+            information for this event the value of this object 
+            will have the value {0 0}."
+    ::= { cfwBasicEventsEntry 10 }
+ 
+--
+-- Network Events 
+--
+-- A details table with information related to network events
+-- or events involving "users" of the firewall resources and services
+-- (eg., traffic flows through the firewall or a user authenticating
+-- to use a firewall service).
+ 
+cfwNetEventsTableLastRow OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The index value of the last row in the
+            cfwNetEventsTable. This number starts at 1 and 
+            increase by one with each new log entry.  When this
+            number wraps, all events are deleted."
+    ::= { cfwNetEvents 1 }
+ 
+cfwNetEventsTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF CfwNetEventsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Table of detailed data for network events. The
+            agent may choose to delete the instances of 
+            cfwBasicEventsEntry as required because of lack of
+            memory.  It is an implementation-specific matter as
+            to when this deletion may occur. It is recommended 
+            that the oldest log instances are deleted first."
+    ::= { cfwNetEvents 2}
+ 
+cfwNetEventsEntry OBJECT-TYPE
+        SYNTAX     CfwNetEventsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry in the table, containing detailed information
+            about an event. Note that this table may be sparse.
+            If Network Address Translation is not enabled
+            cfwNetEventInsideSrcIpAddress and 
+            cfwNetEventInsideDstIpAddress will not be instantiated
+            in the row. If Port Address Translation is not enabled 
+            cfwNetEventInsideSrcIpPort and 
+            cfwNetEventInsideDstIpPort will not be instantiated
+            in the row. Entries are added to this table at the
+            same time that events are added to the cfwBasicEventsTable.
+            These two tables may be configured to be different
+            sizes so there may not be a one-to-one correspondence
+            between rows in the two tables."
+        INDEX { cfwNetEventIndex }
+    ::= { cfwNetEventsTable 1 }
+ 
+ 
+CfwNetEventsEntry ::= SEQUENCE {
+        cfwNetEventIndex              Unsigned32,
+        cfwNetEventInterface          InterfaceIndexOrZero,
+        cfwNetEventSrcIpAddress       IpAddress,
+        cfwNetEventInsideSrcIpAddress IpAddress,
+        cfwNetEventDstIpAddress       IpAddress,
+        cfwNetEventInsideDstIpAddress IpAddress,
+        cfwNetEventSrcIpPort          INTEGER,
+        cfwNetEventInsideSrcIpPort    INTEGER,
+        cfwNetEventDstIpPort          INTEGER,
+        cfwNetEventInsideDstIpPort    INTEGER,
+        cfwNetEventService            Services,
+        cfwNetEventServiceInformation SnmpAdminString,
+        cfwNetEventIdentity           SnmpAdminString,
+        cfwNetEventDescription        SnmpAdminString
+    }
+ 
+cfwNetEventIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An index that uniquely identifies an entry in the
+            log table.  These indices are assigned beginning with
+            one and increase by one with each new log entry. When
+            this number wraps, all events are deleted in order to
+            allow the NMS to differentiate between old and new
+            events."
+    ::= { cfwNetEventsEntry 1 }
+ 
+cfwNetEventInterface OBJECT-TYPE
+        SYNTAX     InterfaceIndexOrZero
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The interface most closely associated with this event.
+            For example, for an event that relates to the receipt of 
+            a packet, this object identifies the interface on which 
+            the packet was received.  If there are multiple interfaces
+            associated with an event, the interface most closely 
+            associated with the cause of the event will be used.
+            For example, for an event for the setup of a TCP 
+            connection, the interface on the initiator's side
+            of the connection would be preferred.  If there is no 
+            associated interface, then this object has the value zero."
+    ::= { cfwNetEventsEntry 2 }
+ 
+cfwNetEventSrcIpAddress OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Source IP address in the IP packet that caused the
+            event. If there is no packet associated with the 
+            event this object has the value of zero. If the event is
+            the result of multiple packets with different source 
+            addresses, this value may be zero or an address taken 
+            from an arbitrarily chosen packet in the sequence of 
+            packets causing the event."
+    ::= { cfwNetEventsEntry 3 }
+ 
+cfwNetEventInsideSrcIpAddress OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Source IP address after Network Address Translation
+            has been applied. If NAT has not been applied to the
+            source address in this packet this object will not
+            be instantiated, resulting in a sparse table. If the
+            event is the result of multiple packets with different
+            source addresses, this value may be zero or an address
+            taken from an arbitrarily chosen packet in the sequence
+            of packets causing the event."
+    ::= { cfwNetEventsEntry 4 }
+ 
+cfwNetEventDstIpAddress OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Destination IP address in the IP packet that caused
+            the event. If there is no packet associated with
+            the event this object has the value of zero. If the event
+            is the result of multiple packets with different destination
+            addresses, this value may be zero or an address taken
+            from an arbitrarily chosen packet in the sequence of
+            packets causing the event."
+    ::= { cfwNetEventsEntry 5 }
+ 
+cfwNetEventInsideDstIpAddress OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Destination IP address after Network Address Translation
+            has been applied. If NAT has not been applied to the
+            destination address in this packet this object will not
+            be instantiated, resulting in a sparse table. If the event
+            is the result of multiple packets with different destination
+            addresses, this value may be zero or an address taken 
+            from an arbitrarily chosen packet in the sequence of 
+            packets causing the event."
+    ::= { cfwNetEventsEntry 6 }
+ 
+cfwNetEventSrcIpPort OBJECT-TYPE
+        SYNTAX     INTEGER (0..65535)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Source UDP/TCP port in the IP packet that caused
+            the event. If there is no packet associated with the 
+            event this object has the value of zero. If the event
+            is the result of multiple packets with different source
+            ports, this value may be zero or a port taken from an 
+            arbitrarily chosen packet in the sequence of packets
+            causing the event."
+    ::= { cfwNetEventsEntry 7 }
+ 
+ 
+cfwNetEventInsideSrcIpPort OBJECT-TYPE
+        SYNTAX     INTEGER (0..65535)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Source UDP/TCP port after Port Address Translation
+            has been applied. If PAT has not been applied to the
+            source port in this packet this object will not be 
+            instantiated, resulting in a sparse table. If the 
+            event is the result of multiple packets with different
+            source ports, this value may be zero or a port taken 
+            from an arbitrarily chosen packet in the sequence of 
+            packets causing the event."
+    ::= { cfwNetEventsEntry 8 }
+ 
+cfwNetEventDstIpPort OBJECT-TYPE
+        SYNTAX     INTEGER (0..65535)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Destination UDP/TCP port in the IP packet that caused
+             the event. If there is no packet associated with the
+             event this object has the value of zero. If the event is 
+             the result of multiple packets with different destination 
+             ports, this value may be zero or a port taken from an 
+             arbitrarily chosen packet in the sequence of packets 
+             causing the event."
+    ::= { cfwNetEventsEntry 9 }
+ 
+cfwNetEventInsideDstIpPort OBJECT-TYPE
+        SYNTAX     INTEGER (0..65535)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Destination UDP/TCP port after Port Address Translation
+            has been applied. If PAT has not been applied to the
+            Destination port in this packet this object will not be 
+            instantiated, resulting in a sparse table. If the event
+            is the result of multiple packets with different
+            destination ports, this value may be zero or a port
+            taken from an arbitrarily chosen packet in the sequence
+            of packets causing the event."
+    ::= { cfwNetEventsEntry 10 }
+ 
+cfwNetEventService OBJECT-TYPE
+        SYNTAX     Services
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The identification of the type of service involved 
+            with this event."
+    ::= { cfwNetEventsEntry 11 }
+ 
+cfwNetEventServiceInformation OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Specific service information.  This can be used to
+            describe the particular service indentified by
+            cfwNetEventService and can reflect whether the service 
+            is a local service or a gateway service.  For example,
+            if the value for cfwNetEventService is loginTelnet
+            then the string provided might be 'local telnet'."
+    ::= { cfwNetEventsEntry 12 }
+ 
+cfwNetEventIdentity OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object will contain a description of the entity that 
+            caused the event. The entity could be a userid, username,
+            processid or other identifier for the entity using the service.
+            If there is no such information then this object will contain
+            a zero-length string."
+    ::= { cfwNetEventsEntry 13 }
+     
+cfwNetEventDescription OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "A detailed description of the event."
+    ::= { cfwNetEventsEntry 14 }
+ 
+-- The cfwHardwareStatus
+--
+-- The resource information related queries, this table is for
+-- providing the status of the resources on the firewall.  Resources
+-- can include hardware or software modules on the firewall.
+ 
+cfwHardwareStatusTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF CfwHardwareStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Table of firewall cfwHardwareStatusEntry entries."
+    ::= { cfwStatus 1 }
+ 
+cfwHardwareStatusEntry OBJECT-TYPE
+        SYNTAX     CfwHardwareStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry in the table, containing status information
+            about a resource."
+        INDEX { cfwHardwareType }
+    ::= { cfwHardwareStatusTable 1 }
+ 
+CfwHardwareStatusEntry ::= SEQUENCE {
+        cfwHardwareType            Hardware,
+        cfwHardwareInformation     SnmpAdminString,
+        cfwHardwareStatusValue     HardwareStatus,
+        cfwHardwareStatusDetail    SnmpAdminString
+    }
+       
+cfwHardwareType OBJECT-TYPE
+        SYNTAX     Hardware
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The hardware type for which this row provides 
+            status information."
+    ::= { cfwHardwareStatusEntry 1 }
+ 
+cfwHardwareInformation OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "A detailed textual description of the resource
+            identified by cfwHardwareType."
+    ::= { cfwHardwareStatusEntry 2 }
+ 
+cfwHardwareStatusValue  OBJECT-TYPE
+        SYNTAX     HardwareStatus
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object contains the current status of the resource."
+    ::= { cfwHardwareStatusEntry 3 }
+ 
+cfwHardwareStatusDetail OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "A detailed textual description of the current status of
+            the resource which may provide a more specific description 
+            than cfwHardwareStatusValue."
+    ::= { cfwHardwareStatusEntry 4 }
+
+-- The cfwBufferStatistics
+--
+-- This table is for providing the statistics for the buffers 
+-- on the firewall.
+ 
+cfwBufferStatsTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF CfwBufferStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A table conatining status information about a firewall's
+            buffers."
+    ::= { cfwStatistics 1 }
+ 
+cfwBufferStatsEntry OBJECT-TYPE
+        SYNTAX     CfwBufferStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry in the table, containing status information
+            about a particular statistic for the set of buffers
+            of a particular size."
+        INDEX { cfwBufferStatSize, cfwBufferStatType }
+    ::= { cfwBufferStatsTable 1 }
+ 
+CfwBufferStatsEntry ::= SEQUENCE {
+        cfwBufferStatSize           Unsigned32,
+        cfwBufferStatType           ResourceStatistics,
+        cfwBufferStatInformation    SnmpAdminString,
+        cfwBufferStatValue          Gauge32
+    }
+       
+cfwBufferStatSize OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This object contains the size of the set of buffers 
+            for which this row contains the statistics given by 
+            cfwBufferStatType."
+    ::= { cfwBufferStatsEntry 1 }
+       
+cfwBufferStatType OBJECT-TYPE
+        SYNTAX     ResourceStatistics
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This object identifies the type of statistic given by 
+            this row for the particular set of buffers identified by 
+            cfwBufferStatSize."
+    ::= { cfwBufferStatsEntry 2 }
+ 
+cfwBufferStatInformation OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "A detailed textual description of the statistic 
+            identified by cfwBufferStatType."
+    ::= { cfwBufferStatsEntry 3 }
+ 
+cfwBufferStatValue OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The value of the buffer statistic."
+    ::= { cfwBufferStatsEntry 4 }
+ 
+--
+-- The Firewall Connection Statistics Table
+--
+-- This table can be used to provide the statistics for firewall
+-- connection events or services.  These "connections" can be
+-- connections in a loose sense of the word - a UDP transaction 
+-- would qualify as a connection if the firewall maintains
+-- state information to monitor the packets traversing the firewall
+-- for this "connection".  A uni-directional UDP "connection" could be 
+-- described as being "half-open" by a value of 'halfOpen' in 
+-- cfwConnectionStatType.
+--
+-- This table contains multiple rows for each service to which the 
+-- statistic applies.
+--
+
+cfwConnectionStatTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF CfwConnectionStatEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Table of firewall statistic instances."
+    ::= { cfwStatistics 2 }
+     
+cfwConnectionStatEntry OBJECT-TYPE
+        SYNTAX     CfwConnectionStatEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry in the table, containing information about a
+            firewall statistic."
+        INDEX { cfwConnectionStatService, cfwConnectionStatType }
+    ::= { cfwConnectionStatTable 1 }
+ 
+CfwConnectionStatEntry ::= SEQUENCE {
+        cfwConnectionStatService         Services,
+        cfwConnectionStatType            ConnectionStat,
+        cfwConnectionStatDescription     SnmpAdminString,
+        cfwConnectionStatCount           Counter32,
+        cfwConnectionStatValue           Gauge32
+    }
+ 
+cfwConnectionStatService OBJECT-TYPE
+        SYNTAX     Services
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The identification of the type of connection providing
+            statistics."
+    ::= { cfwConnectionStatEntry 1 }
+ 
+cfwConnectionStatType OBJECT-TYPE
+        SYNTAX     ConnectionStat
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The state of the connections that this row contains
+            statistics for."
+    ::= { cfwConnectionStatEntry 2 }
+
+cfwConnectionStatDescription OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "A detailed textual description of this statistic."
+    ::= { cfwConnectionStatEntry 3 }
+     
+cfwConnectionStatCount OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is an integer that contains the value of the
+            resource statistic. If a type of 'gauge' is more
+            appropriate this object will be omitted resulting 
+            in a sparse table."
+    ::= { cfwConnectionStatEntry 4 }
+
+cfwConnectionStatValue OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This is an integer that contains the value of the
+            resource statistic. If a type of 'counter' is more
+            appropriate this object will be omitted resulting 
+            in a sparse table."
+    ::= { cfwConnectionStatEntry 5 }
+
+
+-- Notifications
+
+ciscoFirewallMIBNotificationPrefix OBJECT IDENTIFIER ::=
+    { ciscoFirewallMIB 2 }
+ciscoFirewallMIBNotifications OBJECT IDENTIFIER ::=
+    { ciscoFirewallMIBNotificationPrefix 0 }
+
+cfwSecurityNotification NOTIFICATION-TYPE
+        OBJECTS {
+            cfwBasicEventTime,
+            cfwBasicSecurityEventType,
+            cfwBasicEventDescription,
+            cfwBasicEventDetailsTableRow
+        }
+        STATUS current
+        DESCRIPTION
+            "This notification is used for events involving security
+            events. The included objects provide more detailed 
+            information about the event."
+    ::= { ciscoFirewallMIBNotifications 2 }
+
+cfwContentInspectNotification NOTIFICATION-TYPE
+        OBJECTS {
+            cfwBasicEventTime,
+            cfwBasicContentInspEventType,
+            cfwBasicEventDescription,
+            cfwBasicEventDetailsTableRow
+        }
+        STATUS current
+        DESCRIPTION
+            "This notification is used to notify the NMS of content
+            inspection events. The included objects provide more
+            detailed information about the event."
+    ::= { ciscoFirewallMIBNotifications 3 }
+
+cfwConnNotification NOTIFICATION-TYPE
+        OBJECTS {
+            cfwBasicEventTime,
+            cfwBasicConnectionEventType,
+            cfwBasicEventDescription,
+            cfwBasicEventDetailsTableRow
+        }
+        STATUS current
+        DESCRIPTION
+            "This notification is used to notify the NMS of 
+            connection-oriented events. The included objects provide 
+            more detailed information about the event."
+    ::= { ciscoFirewallMIBNotifications 4 }
+
+cfwAccessNotification NOTIFICATION-TYPE
+        OBJECTS {
+            cfwBasicEventTime,
+            cfwBasicAccessEventType,
+            cfwBasicEventDescription,
+            cfwBasicEventDetailsTableRow
+        }
+        STATUS current
+        DESCRIPTION
+            "This notification is used to notify the NMS of access 
+            events. The included objects provide more detailed 
+            information about the event."
+    ::= { ciscoFirewallMIBNotifications 5 }
+
+cfwAuthNotification NOTIFICATION-TYPE
+        OBJECTS {
+            cfwBasicEventTime,
+            cfwBasicAuthenticationEventType,
+            cfwBasicEventDescription,
+            cfwBasicEventDetailsTableRow
+        }
+        STATUS current
+        DESCRIPTION
+            "This notification is used to notify the NMS of 
+            authentication events. The included objects provide 
+            more detailed information about the event."
+    ::= { ciscoFirewallMIBNotifications 6 }
+
+cfwGenericNotification NOTIFICATION-TYPE
+        OBJECTS {
+            cfwBasicEventTime,
+            cfwBasicGenericEventType,
+            cfwBasicEventDescription,
+            cfwBasicEventDetailsTableRow
+        }
+        STATUS current
+        DESCRIPTION
+            "This notification is used to notify the NMS of events
+            that do not fall into the other categories. The included 
+            objects provide more detailed information about the event."
+    ::= { ciscoFirewallMIBNotifications 7 }
+
+
+-- Conformance
+
+ciscoFirewallMIBConformance OBJECT IDENTIFIER ::= { ciscoFirewallMIB 3 }
+ciscoFirewallMIBCompliances OBJECT IDENTIFIER ::=
+    { ciscoFirewallMIBConformance 1 }
+ciscoFirewallMIBGroups      OBJECT IDENTIFIER ::=
+    { ciscoFirewallMIBConformance 2 }
+
+-- Conformance
+
+ciscoFirewallMIBCompliance MODULE-COMPLIANCE
+        STATUS deprecated
+        DESCRIPTION
+            "The compliance statement for entities which implement
+            the Cisco FirewallMIB."
+        MODULE        -- this module
+        MANDATORY-GROUPS { ciscoFirewallMIBStatisticsGroup }
+    ::= { ciscoFirewallMIBCompliances 1 }
+
+ciscoFirewallMIBComplianceRev1 MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for entities which implement
+            the Cisco FirewallMIB."
+        MODULE        -- this module
+        MANDATORY-GROUPS { ciscoFirewallMIBStatisticsGroup }
+
+        GROUP ciscoFirewallMIBEventsGroup
+        DESCRIPTION
+             "Implementation of these objects is not required."
+        GROUP ciscoFirewallMIBNotificationGroupRev1
+        DESCRIPTION
+             "Implementation of these notifications is not required."
+
+    ::= { ciscoFirewallMIBCompliances 2 }
+
+-- Units of Conformance
+
+ciscoFirewallMIBEventsGroup OBJECT-GROUP
+        OBJECTS {
+            cfwBasicEventsTableLastRow,
+            cfwBasicEventTime,
+            cfwBasicSecurityEventType,
+            cfwBasicContentInspEventType,
+            cfwBasicConnectionEventType,
+            cfwBasicAccessEventType,
+            cfwBasicAuthenticationEventType,
+            cfwBasicGenericEventType,
+            cfwBasicEventDescription,
+            cfwBasicEventDetailsTableRow,
+            cfwNetEventsTableLastRow,
+            cfwNetEventInterface,
+            cfwNetEventSrcIpAddress,
+            cfwNetEventInsideSrcIpAddress,
+            cfwNetEventDstIpAddress,
+            cfwNetEventInsideDstIpAddress,
+            cfwNetEventSrcIpPort,
+            cfwNetEventInsideSrcIpPort,
+            cfwNetEventDstIpPort,
+            cfwNetEventInsideDstIpPort,
+            cfwNetEventService,
+            cfwNetEventServiceInformation,
+            cfwNetEventIdentity,
+            cfwNetEventDescription
+        }
+        STATUS current
+        DESCRIPTION
+            "Firewall events"
+    ::= { ciscoFirewallMIBGroups 1 }
+
+ciscoFirewallMIBStatisticsGroup OBJECT-GROUP
+        OBJECTS {
+            cfwHardwareInformation,
+            cfwHardwareStatusValue,
+            cfwHardwareStatusDetail,
+            cfwBufferStatInformation,
+            cfwBufferStatValue,
+            cfwConnectionStatDescription,
+            cfwConnectionStatCount,
+            cfwConnectionStatValue
+        }
+        STATUS current
+        DESCRIPTION
+            "Firewall statistics"
+    ::= { ciscoFirewallMIBGroups 2 }
+
+ciscoFirewallMIBNotificationGroup OBJECT-GROUP
+        OBJECTS {
+            cfwBasicEventTime,
+            cfwBasicSecurityEventType,
+            cfwBasicContentInspEventType,
+            cfwBasicConnectionEventType,
+            cfwBasicAccessEventType,
+            cfwBasicAuthenticationEventType,
+            cfwBasicGenericEventType,
+            cfwBasicEventDescription,
+            cfwBasicEventDetailsTableRow
+        }
+        STATUS obsolete
+        DESCRIPTION
+            "Firewall Notifications"
+    ::= { ciscoFirewallMIBGroups 3 }
+
+ciscoFirewallMIBNotificationGroupRev1 NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            cfwSecurityNotification,
+            cfwContentInspectNotification,
+            cfwConnNotification,
+            cfwAccessNotification,
+            cfwAuthNotification,
+            cfwGenericNotification
+        }
+        STATUS current
+        DESCRIPTION
+            "Firewall Notifications"
+    ::= { ciscoFirewallMIBGroups 4 }
+
+END
+

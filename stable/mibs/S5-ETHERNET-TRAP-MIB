@@ -1,0 +1,170 @@
+
+S5-ETHERNET-TRAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+	s5EnPortPartStatus, s5EnPortJabberStatus,
+	s5EnPortLinkStatus
+            FROM S5-ETHERNET-COMMON-MIB
+	s5EnRedPortCompanionBrdNum, s5EnRedPortCompanionPortNum,
+	s5EnRedPortRemoteOperStatus, s5EnRedPortRedundMode,
+	s5EnRedPortOperStatus
+            FROM S5-ETH-REDUNDANT-LINKS-MIB
+	s5EthTrap
+            FROM S5-ROOT-MIB
+	s5SbsViolationStatusBrdIndx,
+	s5SbsViolationStatusPortIndx,
+	s5SbsViolationStatusMACAddress,
+	s5SbsMgmViolationType,
+	s5SbsMgmViolationIpAddress
+            FROM S5-SWITCH-BAYSECURE-MIB;
+
+s5EthernetTrapMib MODULE-IDENTITY
+       LAST-UPDATED    "200407200000Z"
+       ORGANIZATION    "Nortel Networks"
+       CONTACT-INFO    "Nortel Networks"
+       DESCRIPTION
+           "5000 Ethernet Trap MIB
+
+            Copyright 1993-2004 Nortel Networks, Inc.
+            All rights reserved.
+            This Nortel Networks SNMP Management Information Base Specification
+            (Specification) embodies Nortel Networks' confidential and
+            proprietary intellectual property. Nortel Networks retains all
+            title and ownership in the Specification, including any
+            revisions.
+
+            This Specification is supplied 'AS IS,' and Nortel Networks makes
+            no warranty, either express or implied, as to the use,
+            operation, condition, or performance of the Specification."
+
+       REVISION "200407200000Z" -- 20 July 2004
+       DESCRIPTION "Version 118:  Conversion to SMIv2"
+
+       ::= { s5EthTrap 0 }
+
+-- SECTION 2: SynOptics 5000 Ethernet Trap Definitions
+
+s5EtrPortAutoPart NOTIFICATION-TYPE
+	OBJECTS	{ s5EnPortPartStatus,
+		  s5EnPortJabberStatus }
+	STATUS		current
+	DESCRIPTION
+		"A port was auto partitioned (wrapped). This
+		trap is sent only once when the condition is
+		first detected. The following values are
+		returned:
+		  s5EnPortPartStatus.....the partition status
+		    of the port, with the instance identifying
+		    the board and the port.
+		  s5EnPortJabberStatus...the jabber status of
+		    the DTE(s) connected to the port, with the
+		    instance identifying the board and the port."
+	::= { s5EthTrap 1 }
+
+s5EtrPortDteJabbering NOTIFICATION-TYPE
+	OBJECTS		{ s5EnPortJabberStatus }
+	STATUS		current
+	DESCRIPTION
+		"An ethernet DTE started jabbering.  This trap
+		is sent only once when the condition is first
+		detected. The following values are returned:
+		  s5EnPortJabberStatus...the jabber status of
+		    the DTE(s) connected to the port, with the
+		    instance identifying the board and the port."
+	::= { s5EthTrap 2 }
+
+s5EtrRedPortFailure NOTIFICATION-TYPE
+	OBJECTS		{ s5EnRedPortOperStatus,
+			  s5EnRedPortCompanionBrdNum,
+			  s5EnRedPortCompanionPortNum,
+			  s5EnPortPartStatus,
+			  s5EnPortLinkStatus,
+			  s5EnPortJabberStatus }
+	STATUS		current
+	DESCRIPTION
+		"A port that is in a redundant pair developed a fault.
+		This trap is sent once when the condition is
+		first detected. For all objects returned in the trap,
+		the instance identifies the board and the port index.
+		The following values are returned:
+		  s5EnRedPortOperStatus.........The status of the port.
+		              The value will distinguish between a
+		              local fault, a remote fault, and a
+		              missing board.
+		  s5EnRedPortCompanionBrdNum....The index of the slot
+		              containing the board of the other port
+		              in the redundant pair.
+		  s5EnRedPortCompanionPortNum...The index of the other
+		              port in the redundant pair.
+		  s5EnPortPartStatus, s5EnPortLinkStatus and
+		  s5EnPortJabberStatus..........These values may help
+		              determine the cause of the local fault."  
+	::= { s5EthTrap 3 }
+
+s5EtrRedBadRemCfgDetected NOTIFICATION-TYPE
+	OBJECTS		{ s5EnRedPortRemoteOperStatus,
+			  s5EnRedPortRedundMode}
+	STATUS		current
+	DESCRIPTION
+		"This trap is sent periodically when the NMM detects a
+		remoteOperStatus of invalid on a port set for
+		redundancy. The instance identifies the board and port
+		index. The following values are returned:
+		  s5EnRedPortRemoteOperStatus.....The value of the
+		              received signal from the remote port.
+		  s5EnRedPortRedundMode...the redundancy mode of the port."
+	::= { s5EthTrap 4 }
+
+s5EtrSbsMacAccessViolation NOTIFICATION-TYPE
+	OBJECTS		{ s5SbsViolationStatusBrdIndx,
+			  s5SbsViolationStatusPortIndx,
+			  s5SbsViolationStatusMACAddress}
+	STATUS		current
+	DESCRIPTION
+		"This trap is sent when the switch device detects a
+		Mac_address based security violation on a port set by
+		s5SbsSecurityAction defined in s5sbs100.mib. This trap
+		is sent only once when the condition is first detected. 
+		The following values are returned:
+		s5SbsViolationStatusBrdIndx...the Board number on which
+                                         a security violation was seen.
+		s5SbsViolationStatusPortIndx...the Port number on which
+                                         a security violation was seen.
+		s5SbsViolationStatusMACIndx...the mac address triggers
+                                                    this violation"
+	::= { s5EthTrap 5 }
+
+s5EtrMgmAccessViolation NOTIFICATION-TYPE
+	OBJECTS		{ s5SbsMgmViolationType,
+			  s5SbsMgmViolationIpAddress}
+	STATUS		current
+	DESCRIPTION
+		"This trap is sent when the switch device detects a
+		management access violation on the switch. This trap
+		is sent only once when the condition is first detected. 
+		The following values are returned:
+		s5SbsMgmViolationType.....WEB access violation or telnet 
+					access violation or SNMP access violation.
+		s5SbsMgmViolationIpAddress...the invalid IP address."
+	::= { s5EthTrap 6 }
+
+s5EtrPortManualPart NOTIFICATION-TYPE
+	OBJECTS		{ s5EnPortPartStatus,
+			  s5EnPortJabberStatus }
+	STATUS		current
+	DESCRIPTION
+		"A port was manually partitioned (wrapped). This
+		trap is sent once when the port is initially 
+		partitioned. The following values are
+		returned:
+		  s5EnPortPartStatus.....the partition status
+		    of the port, with the instance identifying
+		    the board and the port.
+		  s5EnPortJabberStatus...the jabber status of
+		    the DTE(s) connected to the port, with the
+		    instance identifying the board and the port."
+	::= { s5EthTrap 7 }
+
+END

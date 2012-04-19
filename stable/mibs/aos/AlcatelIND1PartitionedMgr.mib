@@ -1,0 +1,477 @@
+ALCATEL-IND1-PARTITIONED-MGR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE,
+	OBJECT-IDENTITY,
+	MODULE-IDENTITY		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION 	FROM SNMPv2-TC	
+	OBJECT-GROUP,
+	MODULE-COMPLIANCE 	FROM SNMPv2-CONF
+	VlanId	                FROM Q-BRIDGE-MIB
+        SnmpAdminString	        FROM SNMP-FRAMEWORK-MIB
+	RowStatus               FROM SNMPv2-TC
+	softentIND1Partmgr      FROM ALCATEL-IND1-BASE;
+
+alcatelIND1PartitionedMgrMIB MODULE-IDENTITY
+	LAST-UPDATED "200704030000Z"
+	ORGANIZATION "Alcatel-Lucent"
+	CONTACT-INFO
+	    "Please consult with Customer Service to ensure the most appropriate
+	     version of this document is used with the products in question:
+ 
+			Alcatel-Lucent, Enterprise Solutions Division
+		       (Formerly Alcatel Internetworking, Incorporated)
+			       26801 West Agoura Road
+			    Agoura Hills, CA  91301-5122
+			      United States Of America
+	
+	    Telephone:               North America  +1 800 995 2696
+				     Latin America  +1 877 919 9526
+				     Europe         +31 23 556 0100
+				     Asia           +65 394 7933
+				     All Other      +1 818 878 4507
+	
+	    Electronic Mail:         support@ind.alcatel.com
+	    World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+	    File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+	DESCRIPTION
+	    "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+         
+                 For the Birds Of Prey Product Line
+                 User Partitioned Manager Subsystem.
+         
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+         
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+         
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+         
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+	::= { softentIND1Partmgr 1}
+
+    alcatelIND1PartitionedMgrMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Partitioned Manager Subsystem Managed Objects."
+        ::= { alcatelIND1PartitionedMgrMIB 1 }
+
+
+    alcatelIND1PartitionedMgrMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Partitioned Manager Subsystem Conformance Information."
+        ::= { alcatelIND1PartitionedMgrMIB 2 }
+
+
+    alcatelIND1PartitionedMgrMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Partitioned Manager Subsystem Units Of Conformance."
+        ::= { alcatelIND1PartitionedMgrMIBConformance 1 }
+
+
+    alcatelIND1PartitionedMgrMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Partitioned Manager Subsystem Compliance Statements."
+        ::= { alcatelIND1PartitionedMgrMIBConformance 2 }
+
+-- End User Partitioned Management
+
+    endUserProfileMgrMIB  OBJECT IDENTIFIER ::= { alcatelIND1PartitionedMgrMIBObjects 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+	EndUserPortList ::= TEXTUAL-CONVENTION
+  	   STATUS      current
+ 	   DESCRIPTION
+ 	      "The port number 1 to 64 for one slot"
+ 	   SYNTAX BITS {
+  	           port1(0),
+  	           port2(1),
+  	           port3(2),
+  	           port4(3),
+  	           port5(4),
+  	           port6(5),
+  	           port7(6),
+  	           port8(7),
+  	           port9(8),
+  	           port10(9),
+  	           port11(10),
+  	           port12(11),
+  	           port13(12),
+  	           port14(13),
+  	           port15(14),
+  	           port16(15),
+  	           port17(16),
+  	           port18(17),
+  	           port19(18),
+  	           port20(19),
+  	           port21(20),
+  	           port22(21),
+  	           port23(22),
+  	           port24(23),
+  	           port25(24),
+  	           port26(25),
+  	           port27(26),
+  	           port28(27),
+  	           port29(28),
+  	           port30(29), 
+  	           port31(30),
+  	           port32(31),
+  	           port33(32),
+  	           port34(33),
+  	           port35(34),
+  	           port36(35),
+  	           port37(36),
+  	           port38(37),
+  	           port39(38),
+  	           port40(39), 
+  	           port41(40),
+  	           port42(41),
+  	           port43(42),
+  	           port44(43),
+  	           port45(44),
+  	           port46(45),
+  	           port47(46),
+  	           port48(47),
+  	           port49(48),
+  	           port50(49),
+ 	           port51(50),
+  	           port52(51),
+  	           port53(52),
+  	           port54(53),
+  	           port55(54),
+  	           port56(55),
+  	           port57(56),
+  	           port58(57),
+  	           port59(58),
+  	           port60(59),  
+ 	           port61(60),
+  	           port62(61),
+  	           port63(62),
+  	           port64(63)
+         }
+
+	EndUserProfileArea ::= TEXTUAL-CONVENTION
+    	    STATUS current
+     	   DESCRIPTION
+      	     "The accessible rights for an area."
+      	  SYNTAX INTEGER {
+      	          disable (1),
+      	          readOnly (2),
+      	          readWrite (3)
+       	 } 
+ 
+-- -------------------------------------------------------------
+--  End User Profile configuration table
+-- -------------------------------------------------------------
+
+	endUserProfileTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF EndUserProfileEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The configuration parameters of a end user profile."
+	    ::= { endUserProfileMgrMIB 1 }
+
+	endUserProfileEntry  OBJECT-TYPE
+	    SYNTAX  EndUserProfileEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"An entry of the end user profile table."
+	    INDEX { IMPLIED endUserProfileName }
+	    ::= { endUserProfileTable 1 }
+
+	EndUserProfileEntry ::= SEQUENCE {
+   	    endUserProfileName		        SnmpAdminString,	
+   	    endUserProfileAreaPhysical          EndUserProfileArea,     
+            endUserProfileAreaVlanTable         EndUserProfileArea,        
+            endUserProfileAreaBasicIpRouting    EndUserProfileArea,
+            endUserProfileAreaIpRoutesTable     EndUserProfileArea,
+            endUserProfileAreaMacFilteringTable EndUserProfileArea,
+            endUserProfileAreaSpantree          EndUserProfileArea,
+	    endUserProfileRowStatus		RowStatus
+	    }
+
+	endUserProfileName  OBJECT-TYPE	
+	    SYNTAX   SnmpAdminString (SIZE(1..32))  
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"The End User profile name."
+	    ::= { endUserProfileEntry 1 }
+
+   	endUserProfileAreaPhysical  OBJECT-TYPE
+            SYNTAX      EndUserProfileArea
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "The accessible rights for the port area."
+            DEFVAL  { disable }
+            ::= { endUserProfileEntry 2 }
+
+        endUserProfileAreaVlanTable  OBJECT-TYPE
+            SYNTAX      EndUserProfileArea
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "The accessible rights for the vlan area."
+            DEFVAL  { disable }
+            ::= { endUserProfileEntry 3 }
+
+        endUserProfileAreaBasicIpRouting  OBJECT-TYPE
+            SYNTAX      EndUserProfileArea      
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "The accessible rights for the basic-routing area."
+            DEFVAL  { disable }
+            ::= { endUserProfileEntry 4 }
+
+        endUserProfileAreaIpRoutesTable  OBJECT-TYPE
+            SYNTAX      EndUserProfileArea
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "The accessible rights for the ip-routes area."
+            DEFVAL  { disable }
+            ::= { endUserProfileEntry 5 }
+
+        endUserProfileAreaMacFilteringTable  OBJECT-TYPE
+            SYNTAX      EndUserProfileArea
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "The accessible rights for the mac-address-table area."
+            DEFVAL  { disable }
+            ::= { endUserProfileEntry 6 }
+
+        endUserProfileAreaSpantree  OBJECT-TYPE
+            SYNTAX      EndUserProfileArea
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "The accessible rights for the spanning-tree area."
+            DEFVAL  { disable }
+            ::= { endUserProfileEntry 7 }
+ 
+	endUserProfileRowStatus  OBJECT-TYPE
+	    SYNTAX   RowStatus   
+	    MAX-ACCESS  read-write            
+	    STATUS  current
+	    DESCRIPTION
+		"The status of this table entry.
+		 Reading or writing values :
+		 - active (1) : end User Profile created and OK
+		 - notInService (2) : not used for end User Profile
+		 Only reading values :
+		 - notReady (3) : missing parameters for the end User profile
+		 Only writing values :
+		 - createAndGo (4) : to create an end User Profile
+		 - createAndWait (5) : not used for end User Profile
+		 - destroy (6) : to remove a end User Profile."
+	    ::= { endUserProfileEntry 8 }               
+
+-- -------------------------------------------------------------
+-- End User Profile Slot Port table
+-- -------------------------------------------------------------
+  				
+	endUserProfileSlotPortTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF EndUserProfileSlotPortEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The list of slot/port of a end user."
+	    ::= { endUserProfileMgrMIB 2 }
+
+	endUserProfileSlotPortEntry  OBJECT-TYPE
+	    SYNTAX  EndUserProfileSlotPortEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"An entry of the end user profile slot/port table."
+	    INDEX {endUserProfileSlotNumber, IMPLIED endUserProfileName}
+	    ::= { endUserProfileSlotPortTable 1 }
+
+	EndUserProfileSlotPortEntry ::= SEQUENCE {
+	    endUserProfileSlotNumber			INTEGER,       
+	    endUserProfilePortList			EndUserPortList,
+	    endUserProfileSlotPortRowStatus		RowStatus
+	    }
+
+	endUserProfileSlotNumber  OBJECT-TYPE
+	    SYNTAX   INTEGER (1..16)
+	    MAX-ACCESS  read-only          
+	    STATUS  current
+	    DESCRIPTION
+		"The number of the physical slot contained
+		in the profile."
+	    ::= { endUserProfileSlotPortEntry 1 }
+
+	endUserProfilePortList  OBJECT-TYPE
+	    SYNTAX      EndUserPortList
+	    MAX-ACCESS  read-write           
+	    STATUS  current
+	    DESCRIPTION
+ 		"A string of 64 bits, 
+		 corresponding to the port number 1 to 64.
+                 The first bit corresponds to port 1, 
+		 the second bit to port 2 until
+                 the 64 bit corresponding to the port 64."
+	    ::= { endUserProfileSlotPortEntry 2 }
+
+	endUserProfileSlotPortRowStatus  OBJECT-TYPE
+	    SYNTAX   RowStatus   
+	    MAX-ACCESS  read-write            
+	    STATUS  current
+	    DESCRIPTION
+		"The status of this table entry.
+		 Reading or writing values :
+		 - active (1) : end User Profile Slot/Port created and OK
+		 - notInService (2) : not used for end User Profile Slot/Port 
+		 Only reading values :
+		 - notReady (3) : missing parameters for the end User profile Slot/Port 
+		 Only writing values :
+		 - createAndGo (4) : to create an end User Profile Slot/Port 
+		 - createAndWait (5) : not used for end User Profile Slot/Port 
+		 - destroy (6) : to remove a end User Profile Slot/Port."
+	    ::= { endUserProfileSlotPortEntry 3 }
+
+-- -------------------------------------------------------------
+-- End User Profile Vlan Id table
+-- -------------------------------------------------------------
+
+	endUserProfileVlanIdTable  OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF EndUserProfileVlanIdEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"The list of vlan ids of a end user."
+	    ::= { endUserProfileMgrMIB 3 }
+
+	endUserProfileVlanIdEntry  OBJECT-TYPE
+	    SYNTAX  EndUserProfileVlanIdEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		"An entry of the end user profile Vlan Ids table."
+	    INDEX {endUserProfileVlanIdStart, IMPLIED endUserProfileName}
+	    ::= { endUserProfileVlanIdTable 1 }
+
+	EndUserProfileVlanIdEntry ::= SEQUENCE {     
+	    endUserProfileVlanIdStart		VlanId,
+	    endUserProfileVlanIdEnd  		VlanId,
+	    endUserProfileVlanIdRowStatus	RowStatus
+	    }
+
+	endUserProfileVlanIdStart  OBJECT-TYPE
+	    SYNTAX   VlanId  
+	    MAX-ACCESS  read-only            
+	    STATUS  current
+	    DESCRIPTION
+		"The End User Profile Vlan Id Start in a range."
+	    ::= { endUserProfileVlanIdEntry 1 }
+
+	endUserProfileVlanIdEnd  OBJECT-TYPE
+	    SYNTAX   VlanId    
+	    MAX-ACCESS  read-write           
+	    STATUS  current
+	    DESCRIPTION
+		"The End User Profile Vlan Id End in a range."
+	    ::= { endUserProfileVlanIdEntry 2 }
+
+	endUserProfileVlanIdRowStatus  OBJECT-TYPE
+	    SYNTAX   RowStatus   
+	    MAX-ACCESS  read-write            
+	    STATUS  current
+	    DESCRIPTION
+		"The status of this table entry.
+		 Reading or writing values :
+		 - active (1) : end User Profile Vlan Ids created and OK
+		 - notInService (2) : not used for end User Profile Vlan Ids 
+		 Only reading values :
+		 - notReady (3) : missing parameters for the end User profile Vlan Ids  
+		 Only writing values :
+		 - createAndGo (4) : to create an end User Profile Vlan Ids
+		 - createAndWait (5) : not used for end User Profile Vlan Ids 
+		 - destroy (6) : to remove a end User Profile Vlan Ids."
+	    ::= { endUserProfileVlanIdEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- Compliance Statements 
+-- -------------------------------------------------------------
+
+    alcatelIND1PartitionedMgrMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for Partitioned Manager Subsystem."
+        MODULE  -- this module
+            MANDATORY-GROUPS
+            {
+                endUserProfileGroup,
+                endUserProfileSlotPortGroup,
+                endUserProfileVlanIdGroup
+            }
+        ::= { alcatelIND1PartitionedMgrMIBCompliances 1 }
+
+
+-- -------------------------------------------------------------
+-- Units Of Conformance 
+-- -------------------------------------------------------------
+
+    endUserProfileGroup OBJECT-GROUP
+        OBJECTS
+        {
+	    endUserProfileName,    -- End User Profile configuration table  	
+            endUserProfileAreaPhysical,                     
+            endUserProfileAreaVlanTable,                
+            endUserProfileAreaBasicIpRouting,     
+            endUserProfileAreaIpRoutesTable, 
+            endUserProfileAreaMacFilteringTable,  
+            endUserProfileAreaSpantree, 
+	    endUserProfileRowStatus	
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of end UserProfile for management of Partitioned Manager."
+        ::= { alcatelIND1PartitionedMgrMIBGroups 1 }
+
+  				
+    	endUserProfileSlotPortGroup OBJECT-GROUP
+        OBJECTS
+        {          
+	    endUserProfileSlotNumber,  -- End User Profile Slot Port table  
+	    endUserProfilePortList,					
+	    endUserProfileSlotPortRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of end UserProfile slot/port for management of Partitioned Manager."
+        ::= { alcatelIND1PartitionedMgrMIBGroups 2 }
+
+
+    	endUserProfileVlanIdGroup OBJECT-GROUP
+        OBJECTS
+        {          
+	    endUserProfileVlanIdStart,	-- End User Profile Vlan Id table
+	    endUserProfileVlanIdEnd,  	
+	    endUserProfileVlanIdRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of end UserProfile Vlan ids for management of Partitioned Manager."
+        ::= { alcatelIND1PartitionedMgrMIBGroups 3 }
+
+END

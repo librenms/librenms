@@ -1,0 +1,3586 @@
+-- ****************************************************************************
+--
+--                         Rack Information MIB
+--         Management Information Base for SNMP Network Management
+--
+--
+--      Copyright 2002,2003 Hewlett-Packard Development Company, L.P.
+--
+--      Hewlett-Packard Company shall not be liable for technical or
+--      editorial errors or omissions contained herein. The information in
+--      this document is provided "as is" without warranty of any kind and
+--      is subject to change without notice. The warranties for HP products
+--      are set forth in the express limited warranty statements
+--      accompanying such products. Nothing herein should be construed as
+--      constituting an additional warranty.
+--
+--      Confidential computer software. Valid license from HP required for
+--      possession, use or copying. Consistent with FAR 12.211 and 12.212,
+--      Commercial Computer Software, Computer Software Documentation, and
+--      Technical Data for Commercial Items are licensed to the U.S.
+--      Government under vendor's standard commercial license.
+--
+--      Refer to the READMIB.RDM file for more information about the
+--      organization of the information in the Compaq Enterprise.
+--
+--      The Compaq Enterprise number is 232.
+--      The ASN.1 prefix to, and including the Compaq Enterprise is:
+--           1.3.6.1.4.1.232
+--
+-- ****************************************************************************
+
+CPQRACK-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        compaq                         FROM CPQHOST-MIB
+        DisplayString                  FROM RFC1213-MIB
+        OBJECT-TYPE                    FROM RFC-1212
+        sysName                        FROM RFC1213-MIB
+        cpqHoTrapFlags                 FROM CPQHOST-MIB
+        TRAP-TYPE                      FROM RFC-1215;
+
+--  compaq                             OBJECT IDENTIFIER ::= { enterprises 232 }
+    cpqRackInfo                        OBJECT IDENTIFIER ::= { compaq 22 }
+    cpqRackMibRev                      OBJECT IDENTIFIER ::= { cpqRackInfo 1 }
+    cpqRackComponent                   OBJECT IDENTIFIER ::= { cpqRackInfo 2 }
+    cpqRackSysObjID                    OBJECT IDENTIFIER ::= { cpqRackInfo 3 }
+
+    cpqRackInterface                   OBJECT IDENTIFIER ::= { cpqRackComponent 1 }
+    cpqRackAsset                       OBJECT IDENTIFIER ::= { cpqRackComponent 2 }
+    cpqRackEnclosure                   OBJECT IDENTIFIER ::= { cpqRackComponent 3 }
+    cpqRackServer                      OBJECT IDENTIFIER ::= { cpqRackComponent 4 }
+    cpqRackPower                       OBJECT IDENTIFIER ::= { cpqRackComponent 5 }
+    cpqRackNetwork                     OBJECT IDENTIFIER ::= { cpqRackComponent 6 }
+
+    cpqRackOsCommon                    OBJECT IDENTIFIER ::= { cpqRackInterface 4 }
+
+    cpqRackCommonEnclosure             OBJECT IDENTIFIER ::= { cpqRackEnclosure 1 }
+    cpqRackServerEnclosure             OBJECT IDENTIFIER ::= { cpqRackEnclosure 2 }
+    cpqRackPowerEnclosure              OBJECT IDENTIFIER ::= { cpqRackEnclosure 3 }
+
+    cpqRackServerBlade                 OBJECT IDENTIFIER ::= { cpqRackServer 1 }
+
+    cpqRackPowerSupply                 OBJECT IDENTIFIER ::= { cpqRackPower 1 }
+
+    cpqRackNetConnector                OBJECT IDENTIFIER ::= { cpqRackNetwork 1 }
+
+-- ****************************************************************************
+--   Rack Information MIB Revision
+--   =============================
+--
+-- The compaq enterprise               (1.3.6.1.4.1.232)
+--      cpqRackInfo Group              (1.3.6.1.4.1.232.22)
+--       cpqRackMibRev Group           (1.3.6.1.4.1.232.22.1)
+--
+--    Implementation of the MibRev group is mandatory for all Agents
+--    supporting the Rack Information MIB.
+--
+--     An Agent conforming to this document will return a
+--     cpqRackMibRevMajor of one (1) and a cpqRackMibRevMinor of three (3).
+--
+--
+-- ****************************************************************************
+
+    cpqRackMibRevMajor OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The major revision level of the MIB.
+
+            A change in the major revision level represents a major change
+            in the architecture of the MIB.  A change in the major revision
+            level may indicate a significant change in the information
+            supported and/or the meaning of the supported information,
+            correct interpretation of data may require a MIB document with
+            the same major revision level."
+        ::= { cpqRackMibRev 1 }
+
+    cpqRackMibRevMinor OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The minor revision level of the MIB.
+
+            A change in the minor revision level may represent some minor
+            additional support, no changes to any pre-existing information
+            has occurred."
+        ::= { cpqRackMibRev 2 }
+
+    cpqRackMibCondition OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            ok(2),              -- default
+            degraded(3),
+            failed(4)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The overall condition.
+
+            This object represents the overall status of the
+            rack information represented by this MIB."
+        ::= { cpqRackMibRev 3 }
+
+-- ****************************************************************************
+--   Rack Information Common
+--   =======================
+--
+-- The compaq enterprise               (1.3.6.1.4.1.232)
+--      cpqRackInfo Group              (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group        (1.3.6.1.4.1.232.22.2)
+--        cpqRackInterface Group       (1.3.6.1.4.1.232.22.2.1)
+--         cpqRackOsCommon Group       (1.3.6.1.4.1.232.22.2.1.4)
+--
+--
+--  Implementation of the cpqRackOsCommon group is mandatory for all
+--  Agents that support the Rack Information MIB.
+--
+-- ****************************************************************************
+
+    cpqRackOsCommonPollFreq OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The Management Agent's polling frequency.
+
+            The frequency, in seconds, at which the Agent requests
+            information from the device driver.  A frequency of zero (0)
+            indicates that the Insight Agent retrieves the information upon
+            request of a management station, it does not poll the device
+            driver at a specific interval.
+
+            If the poll frequency is zero (0) all attempts to write to this
+            object will fail.  If the poll frequency is non-zero,
+            setting this value will change the polling frequency of the
+            Insight Agent.  Setting the poll frequency to zero (0) will
+            always fail, an agent may also choose to fail any request to
+            change the poll frequency to a value that would severely impact
+            system performance."
+        ::= { cpqRackOsCommon 1 }
+
+
+-- ****************************************************************************
+--   Rack Asset Group
+--   ================
+--
+-- The compaq enterprise               (1.3.6.1.4.1.232)
+--      cpqRackInfo Group              (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group        (1.3.6.1.4.1.232.22.2)
+--        cpqRackAsset Group           (1.3.6.1.4.1.232.22.2.2)
+--
+--  The cpqRackAsset group contains the serial numbers, names, etc. of any
+--  Rack hardware that supports asset management.
+--
+--  Implementation of the cpqRackAsset group is mandatory for all
+--  Agents that support the Rack Information MIB.
+--
+-- ****************************************************************************
+
+-- ****************************************************************************
+--   Rack Asset Table
+--   ================
+--
+-- The compaq enterprise               (1.3.6.1.4.1.232)
+--      cpqRackInfo Group              (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group        (1.3.6.1.4.1.232.22.2)
+--        cpqRackAsset Group           (1.3.6.1.4.1.232.22.2.2)
+--         cpqRackAssetTable           (1.3.6.1.4.1.232.22.2.2.1)
+--
+-- ****************************************************************************
+
+    cpqRackAssetTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CpqRackAssetEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table of rack asset information."
+        ::= { cpqRackAsset 1 }
+
+    cpqRackAssetEntry OBJECT-TYPE
+        SYNTAX  CpqRackAssetEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A rack asset description."
+        INDEX   { cpqRackAssetIndex }
+        ::= { cpqRackAssetTable 1 }
+
+    CpqRackAssetEntry ::= SEQUENCE {
+        cpqRackAssetIndex           INTEGER,
+        cpqRackName                 DisplayString,
+        cpqRackUid                  DisplayString,
+        cpqRackSerialNum            DisplayString,
+        cpqRackTrapSequenceNum      INTEGER,
+        cpqRackHeight               INTEGER,
+        cpqRackWidth                INTEGER,
+        cpqRackDepth                INTEGER
+    }
+
+    cpqRackAssetIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this rack table entry."
+        ::= { cpqRackAssetEntry 1 }
+
+    cpqRackName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The customer changeable identifier used to identify the entire
+            rack.
+
+            The string will be empty if the system does not report this
+            function."
+        ::= { cpqRackAssetEntry 2 }
+
+    cpqRackUid OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The rack unique identifier.
+
+            The string will be empty if the rack does not report the
+            UID or if it could not be determined."
+        ::= { cpqRackAssetEntry 3 }
+
+    cpqRackSerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The rack serial number.
+
+            The string will be empty if the rack does not report the
+            serial number."
+        ::= { cpqRackAssetEntry 4 }
+
+    cpqRackTrapSequenceNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The trap sequence number for rack traps.
+
+            This is used by the management application trap processing.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackAssetEntry 5 }
+
+    cpqRackHeight OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The internal height dimension of the useable rack space expressed
+            in millimeters.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackAssetEntry 6 }
+
+    cpqRackWidth OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The internal width dimension of the useable rack space expressed
+            in millimeters.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackAssetEntry 7 }
+
+    cpqRackDepth OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The internal depth dimension of the useable rack space expressed
+            in millimeters.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackAssetEntry 8 }
+
+
+-- ****************************************************************************
+--   Rack Enclosure Chassis Group
+--   ============================
+--
+-- The compaq enterprise               (1.3.6.1.4.1.232)
+--      cpqRackInfo Group              (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group        (1.3.6.1.4.1.232.22.2)
+--        cpqRackEnclosure Group       (1.3.6.1.4.1.232.22.2.3)
+--
+--  The cpqRackEnclosure group contains the information about rack
+--  enclosures.
+--
+-- ****************************************************************************
+
+-- ****************************************************************************
+--   Rack Common Enclosure Table
+--   ===========================
+--
+-- The compaq enterprise                 (1.3.6.1.4.1.232)
+--      cpqRackInfo Group                (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group          (1.3.6.1.4.1.232.22.2)
+--        cpqRackEnclosure Group         (1.3.6.1.4.1.232.22.2.3)
+--         cpqRackCommonEnclosure Group  (1.3.6.1.4.1.232.22.2.3.1)
+--          cpqRackCommonEnclosureTable  (1.3.6.1.4.1.232.22.2.3.1.1)
+--
+-- ****************************************************************************
+
+    cpqRackCommonEnclosureTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CpqRackCommonEnclosureEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table of rack enclosure information."
+        ::= { cpqRackCommonEnclosure 1 }
+
+    cpqRackCommonEnclosureEntry OBJECT-TYPE
+        SYNTAX  CpqRackCommonEnclosureEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A rack enclosure description."
+        INDEX   { cpqRackCommonEnclosureRack,
+                  cpqRackCommonEnclosureIndex }
+        ::= { cpqRackCommonEnclosureTable 1 }
+
+    CpqRackCommonEnclosureEntry ::= SEQUENCE {
+        cpqRackCommonEnclosureRack                 INTEGER,
+        cpqRackCommonEnclosureIndex                INTEGER,
+        cpqRackCommonEnclosureModel                DisplayString,
+        cpqRackCommonEnclosureAssetTag             DisplayString,
+        cpqRackCommonEnclosurePartNumber           DisplayString,
+        cpqRackCommonEnclosureSparePartNumber      DisplayString,
+        cpqRackCommonEnclosureSerialNum            DisplayString,
+        cpqRackCommonEnclosureFWRev                DisplayString,
+        cpqRackCommonEnclosureName                 DisplayString,
+        cpqRackCommonEnclosureNeighborNamePrev     DisplayString,
+        cpqRackCommonEnclosureNeighborNameNext     DisplayString,
+        cpqRackCommonEnclosureHeight               INTEGER,
+        cpqRackCommonEnclosureWidth                INTEGER,
+        cpqRackCommonEnclosureDepth                INTEGER,
+        cpqRackCommonEnclosureTrapSequenceNum      INTEGER,
+        cpqRackCommonEnclosureCondition            INTEGER,
+        cpqRackCommonEnclosureHasServerBlades      INTEGER,
+        cpqRackCommonEnclosureHasPowerSupplies     INTEGER,
+        cpqRackCommonEnclosureHasNetConnectors     INTEGER,
+        cpqRackCommonEnclosureHasTempSensors       INTEGER,
+        cpqRackCommonEnclosureHasFans              INTEGER,
+        cpqRackCommonEnclosureHasFuses             INTEGER,
+        cpqRackCommonEnclosureMgmtUID              INTEGER,
+        cpqRackCommonEnclosureSerialNumPrev        DisplayString,
+        cpqRackCommonEnclosureSerialNumNext        DisplayString,
+        cpqRackCommonEnclosureAddress              INTEGER,
+        cpqRackCommonEnclosureProductId            DisplayString,
+        cpqRackCommonEnclosureProductIdPrev        DisplayString,
+        cpqRackCommonEnclosureProductIdNext        DisplayString,
+        cpqRackCommonEnclosureUUID                 DisplayString,
+        cpqRackCommonEnclosureUUIDPrev             DisplayString,
+        cpqRackCommonEnclosureUUIDNext             DisplayString
+    }
+
+    cpqRackCommonEnclosureRack OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this rack."
+        ::= { cpqRackCommonEnclosureEntry 1 }
+
+    cpqRackCommonEnclosureIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this enclosure in the rack."
+        ::= { cpqRackCommonEnclosureEntry 2 }
+
+    cpqRackCommonEnclosureModel OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The model name of the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            model information."
+        ::= { cpqRackCommonEnclosureEntry 3 }
+
+    cpqRackCommonEnclosureAssetTag OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The customer changeable asset identifier of the enclosure.
+
+            The string will be empty if the system does not report this
+            function or if the asset tag has not been set."
+        ::= { cpqRackCommonEnclosureEntry 4 }
+
+    cpqRackCommonEnclosurePartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The part number of the enclosure.
+
+            The string will be empty if the enclosure does not report this
+            function."
+        ::= { cpqRackCommonEnclosureEntry 5 }
+
+    cpqRackCommonEnclosureSparePartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The spare part number of the enclosure.
+
+            The string will be empty if the enclosure does not report this
+            function."
+        ::= { cpqRackCommonEnclosureEntry 6 }
+
+    cpqRackCommonEnclosureSerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            serial number."
+        ::= { cpqRackCommonEnclosureEntry 7 }
+
+    cpqRackCommonEnclosureFWRev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The firmware revision of the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            firmware revision or does not contain firmware."
+        ::= { cpqRackCommonEnclosureEntry 8 }
+
+    cpqRackCommonEnclosureName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            name or it could not be determined."
+        ::= { cpqRackCommonEnclosureEntry 9 }
+
+    cpqRackCommonEnclosureNeighborNamePrev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the enclosure immediately preceding or above this
+            enclosure.
+
+            The string will be empty if the neighbor enclosure name could not be
+            determined or there is no enclosure preceding this one."
+        ::= { cpqRackCommonEnclosureEntry 10 }
+
+    cpqRackCommonEnclosureNeighborNameNext OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the enclosure immediately following or below this
+            enclosure.
+
+            The string will be empty if the neighbor enclosure name could not be
+            determined or there is no enclosure following this one."
+        ::= { cpqRackCommonEnclosureEntry 11 }
+
+    cpqRackCommonEnclosureHeight OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The height dimension of the rack space taken by the
+            enclosure expressed in millimeters.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackCommonEnclosureEntry 12 }
+
+    cpqRackCommonEnclosureWidth OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The width dimension of the rack space taken by the
+            enclosure expressed in millimeters.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackCommonEnclosureEntry 13 }
+
+    cpqRackCommonEnclosureDepth OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The depth dimension of the rack space taken by the
+            enclosure expressed in millimeters.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackCommonEnclosureEntry 14 }
+
+    cpqRackCommonEnclosureTrapSequenceNum OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The trap sequence number for the enclosure.
+
+            This is used by the management application trap processing.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackCommonEnclosureEntry 15 }
+
+    cpqRackCommonEnclosureCondition OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            ok(2),
+            degraded(3),
+            failed(4)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The overall condition of the enclosure.
+
+            This is the aggregate of the temperature sensors, fans, and
+            fuses within the enclosure.
+
+            This value will be one of the following:
+
+            other(1)
+              No temperature sensors, fans, or fuses in the enclosure or the
+              state could no be determined.
+
+            ok(2)
+              All temperature sensors, fans, and fuses are within the normal
+              operating range.
+
+            degraded(3)
+              One or more temperature sensors, fans, or fuses are outside of
+              the normal operating range.  None are failed.
+
+            failed(4)
+              The temperature sensor exceeded the critical threshold value,
+              a required fan has failed, or a fuse has been tripped.
+
+            The system will automatically shutdown if the failed(4) condition
+            results, so it is unlikely that this value will ever be returned
+            by the agent."
+        ::= { cpqRackCommonEnclosureEntry 16 }
+
+    cpqRackCommonEnclosureHasServerBlades OBJECT-TYPE
+        SYNTAX  INTEGER {
+            false(1),
+            true(2)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The enclosure can contain server blades.
+
+            This will be true(2) is the enclosure can house server blades.  The
+            cpqRackServerEnclosureTable will contain server enclosure specific
+            information.
+
+            Match the cpqRackCommonEnclosureSerialNum in this table to the
+            serial number in the cpqRackServerEnclosureTable to get complete
+            information on the server enclosure."
+        ::= { cpqRackCommonEnclosureEntry 17 }
+
+    cpqRackCommonEnclosureHasPowerSupplies OBJECT-TYPE
+        SYNTAX  INTEGER {
+            false(1),
+            true(2)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The enclosure can contain power supplies.
+
+            This will be true(2) is the enclosure can house power supplies.  The
+            cpqRackEnclosurePowerTable will contain power enclosure specific
+            information.
+
+            Match the cpqRackCommonEnclosureSerialNum in this table to the
+            serial number in the cpqRackEnclosurePowerTable to get complete
+            information on the power enclosure."
+        ::= { cpqRackCommonEnclosureEntry 18 }
+
+    cpqRackCommonEnclosureHasNetConnectors OBJECT-TYPE
+        SYNTAX  INTEGER {
+            false(1),
+            true(2)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The enclosure contains network connectivity.
+
+            This will be true(2) is the enclosure contains network connectivity.
+            The cpqRackCommonEnclosureNetConnectorTable will contain network
+            connectivity specific information.
+
+            Match the cpqRackCommonEnclosureSerialNum in this table to the
+            serial number in the cpqRackCommonEnclosureNetConnectorTable to get complete
+            information on the network connector enclosure."
+        ::= { cpqRackCommonEnclosureEntry 19 }
+
+    cpqRackCommonEnclosureHasTempSensors OBJECT-TYPE
+        SYNTAX  INTEGER {
+            false(1),
+            true(2)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The enclosure contains temperature sensors.
+
+            This will be true(2) is the enclosure contains
+            temperature sensors. The cpqRackCommonEnclosureTempTable will
+            contain temperature sensor specific information.
+
+            Match the cpqRackCommonEnclosureSerialNum in this table to the
+            serial number in the cpqRackCommonEnclosureTempTable to get complete
+            information on the enclosure."
+        ::= { cpqRackCommonEnclosureEntry 20 }
+
+    cpqRackCommonEnclosureHasFans OBJECT-TYPE
+        SYNTAX  INTEGER {
+            false(1),
+            true(2)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The enclosure contains fans.
+
+            This will be true(2) is the enclosure contains fans.
+            The cpqRackCommonEnclosureFanTable will contain the fan
+            specific information.
+
+            Match the cpqRackCommonEnclosureSerialNum in this table to the
+            serial number in the cpqRackCommonEnclosureFanTable to get complete
+            information on the enclosure."
+        ::= { cpqRackCommonEnclosureEntry 21 }
+
+    cpqRackCommonEnclosureHasFuses OBJECT-TYPE
+        SYNTAX  INTEGER {
+            false(1),
+            true(2)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The enclosure contains fuses.
+
+            This will be true(2) is the enclosure contains fuses.
+            The cpqRackCommonEnclosureFuseTable will contain the fuse
+            specific information.
+
+            Match the cpqRackCommonEnclosureSerialNum in this table to the
+            serial number in the cpqRackCommonEnclosureFuseTable to get complete
+            information on the enclosure."
+        ::= { cpqRackCommonEnclosureEntry 22 }
+
+    cpqRackCommonEnclosureMgmtUID OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),            -- Unknown device or could not be determined
+            none(2),             -- No Unit Identifier LED present
+            ledOn(3),            -- Unit Identifier LED is On
+            ledOff(4)            -- Unit Identifier LED is Off
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The Unit Identifier LED.
+
+            This value will be one of the following:
+
+            other(1)
+              The state of the LED could not be determined.  Setting the
+              LED state is not allowed.
+
+            none(2)
+              The LED is not present.  Setting LED state is not allowed.
+
+            ledOn(3)
+              The LED is present and ON.  The LED can be turned off
+              by setting the cpqRackCommonEnclosureMgmtUID to ledOff(4).
+
+            ledOff(4)
+              The LED is present and OFF.  The LED can be turned on
+              by setting the cpqRackCommonEnclosureMgmtUID to ledOn(3)."
+        ::= { cpqRackCommonEnclosureEntry 23 }
+
+    cpqRackCommonEnclosureSerialNumPrev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the enclosure immediately preceding or
+            above this enclosure.
+
+            The string will be empty if the neighbor enclosure serial number
+            could not be determined or there is no enclosure preceding this one."
+        ::= { cpqRackCommonEnclosureEntry 24 }
+
+    cpqRackCommonEnclosureSerialNumNext OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the enclosure immediately following or
+            below this enclosure.
+
+            The string will be empty if the neighbor enclosure serial number
+            could not be determined or there is no enclosure following this one."
+        ::= { cpqRackCommonEnclosureEntry 25 }
+
+    cpqRackCommonEnclosureAddress OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The unique address of the enclosure within the rack.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackCommonEnclosureEntry 26 }
+
+    cpqRackCommonEnclosureProductId OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The product id string of the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            product id string."
+        ::= { cpqRackCommonEnclosureEntry 27 }
+
+    cpqRackCommonEnclosureProductIdPrev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The product id string of the enclosure immediately preceding or
+            above this enclosure.
+
+            The string will be empty if the enclosure does not report the
+            product id string."
+        ::= { cpqRackCommonEnclosureEntry 28 }
+
+    cpqRackCommonEnclosureProductIdNext OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The product id string of the enclosure immediately following or
+            below this enclosure.
+
+            The string will be empty if the enclosure does not report the
+            product id string."
+        ::= { cpqRackCommonEnclosureEntry 29 }
+
+    cpqRackCommonEnclosureUUID OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The universal unique identifier string of the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            UUID string."
+        ::= { cpqRackCommonEnclosureEntry 30 }
+
+    cpqRackCommonEnclosureUUIDPrev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The universal unique identifier string of the enclosure
+            immediately preceding or above this enclosure.
+
+            The string will be empty if the enclosure does not report the
+            UUID string or if there is no preceding enclosure."
+        ::= { cpqRackCommonEnclosureEntry 31 }
+
+    cpqRackCommonEnclosureUUIDNext OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The universal unique identifier string of the enclosure
+            immediately following or below this enclosure.
+
+            The string will be empty if the enclosure does not report the
+            UUID string or if there is no following enclosure."
+        ::= { cpqRackCommonEnclosureEntry 32 }
+
+
+-- ****************************************************************************
+--   Rack Enclosure Common Temperature Sensor Table
+--   ==============================================
+--
+-- The compaq enterprise                     (1.3.6.1.4.1.232)
+--      cpqRackInfo Group                    (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group              (1.3.6.1.4.1.232.22.2)
+--        cpqRackEnclosure Group             (1.3.6.1.4.1.232.22.2.3)
+--         cpqRackCommonEnclosure Group      (1.3.6.1.4.1.232.22.2.3.1)
+--          cpqRackCommonEnclosureTempTable  (1.3.6.1.4.1.232.22.2.3.1.2)
+--
+-- ****************************************************************************
+
+    cpqRackCommonEnclosureTempTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CpqRackCommonEnclosureTempEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table of rack enclosure temperature sensor information."
+        ::= { cpqRackCommonEnclosure 2 }
+
+    cpqRackCommonEnclosureTempEntry OBJECT-TYPE
+        SYNTAX  CpqRackCommonEnclosureTempEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A rack enclosure temperature sensor description."
+        INDEX   { cpqRackCommonEnclosureTempRack,
+                  cpqRackCommonEnclosureTempChassis,
+                  cpqRackCommonEnclosureTempSensorIndex }
+        ::= { cpqRackCommonEnclosureTempTable 1 }
+
+    CpqRackCommonEnclosureTempEntry ::= SEQUENCE {
+        cpqRackCommonEnclosureTempRack                      INTEGER,
+        cpqRackCommonEnclosureTempChassis                   INTEGER,
+        cpqRackCommonEnclosureTempSensorIndex               INTEGER,
+        cpqRackCommonEnclosureTempSensorEnclosureName       DisplayString,
+        cpqRackCommonEnclosureTempLocation                  DisplayString,
+        cpqRackCommonEnclosureTempCurrent                   INTEGER,
+        cpqRackCommonEnclosureTempThreshold                 INTEGER,
+        cpqRackCommonEnclosureTempCondition                 INTEGER,
+        cpqRackCommonEnclosureTempType                      INTEGER,
+        cpqRackCommonEnclosureTempSensorEnclosureSerialNum  DisplayString
+    }
+
+    cpqRackCommonEnclosureTempRack OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this rack."
+        ::= { cpqRackCommonEnclosureTempEntry 1 }
+
+    cpqRackCommonEnclosureTempChassis OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this enclosure in the rack."
+        ::= { cpqRackCommonEnclosureTempEntry 2 }
+
+    cpqRackCommonEnclosureTempSensorIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this temperature sensor within
+            this enclosure in the rack."
+        ::= { cpqRackCommonEnclosureTempEntry 3 }
+
+    cpqRackCommonEnclosureTempSensorEnclosureName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            name or it could not be determined."
+        ::= { cpqRackCommonEnclosureTempEntry 4 }
+
+    cpqRackCommonEnclosureTempLocation OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The location description of the temperature sensor within the
+            enclosure.
+
+            The string will be empty if the location could not be
+            determined."
+        ::= { cpqRackCommonEnclosureTempEntry 5 }
+
+    cpqRackCommonEnclosureTempCurrent OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This is the current temperature sensor reading in degrees
+            celsius.
+
+            If this value cannot be determined by software, then a value
+            of -1 will be returned."
+        ::= { cpqRackCommonEnclosureTempEntry 6 }
+
+    cpqRackCommonEnclosureTempThreshold OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This is the threshold temperature sensor setting
+            in degrees celsius.  This is the temperature in which the
+            sensor will be considered to be in a tripped state this
+            causing some action to occur depending on the type of
+            the sensor.  The action of temperature sensor threshold
+            will be indicated by the cpqRackCommonEnclosureTempType
+            item.  If the type is blowout(5), then the temperature sensor
+            will cause the fans to speed up.  If the type is caution(9),
+            then the temperature sensor is in a degraded state.  If the
+            type is critical(15), then the enclosure will be considered
+            as in a failed state.
+
+            If this value cannot be determined by software, then a value
+            of -1 will be returned."
+        ::= { cpqRackCommonEnclosureTempEntry 7 }
+
+    cpqRackCommonEnclosureTempCondition OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            ok(2),
+            degraded(3),
+            failed(4)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The Temperature sensor condition.
+
+            This value will be one of the following:
+
+            other(1)
+              Temperature could not be determined.
+
+            ok(2)
+              The temperature sensor is within the normal operating range.
+
+            degraded(3)
+              The temperature sensor is outside of the normal operating range.
+
+            failed(4)
+              The temperature sensor detects a condition that could
+              possibly damage the system.
+
+            The system will automatically shutdown if the failed(4) condition
+            results, so it is unlikely that this value will ever be returned
+            by the agent."
+        ::= { cpqRackCommonEnclosureTempEntry 8 }
+
+    cpqRackCommonEnclosureTempType OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            blowout(5),
+            caution(9),
+            critical(15)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This specifies the type of this instance of temperature
+            sensor.
+
+            This value will be one of the following:
+
+            other(1)
+              Temperature threshold type could not be determined.
+
+            blowout(5)
+              If a blowout(5) temperature sensor reaches its threshold,
+              the fan or fans in the area of the temperature sensor will
+              increase in speed in an attempt to reduce the temperature
+              before a caution or critical threshold is reached.
+
+            caution(9)
+              If a caution(9) temperature sensor reaches its threshold, the
+              cpqRackCommonEnclosureTempCondition will be set to degraded(3)
+              and the system will either continue or shutdown depending
+              on the user preferences.
+
+            critical(15)
+              If a critical(15) temperature sensor reaches its threshold,
+              the cpqHeTemperatureCondition will be set to failed(4)
+              and the system will shutdown."
+        ::= { cpqRackCommonEnclosureTempEntry 9 }
+
+    cpqRackCommonEnclosureTempSensorEnclosureSerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the enclosure containing this temperature
+            sensor.
+
+            The string will be empty if the enclosure does not report the
+            serial number or it could not be determined."
+        ::= { cpqRackCommonEnclosureTempEntry 10 }
+
+
+-- ****************************************************************************
+--   Rack Enclosure Common Fan Table
+--   ===============================
+--
+-- The compaq enterprise                     (1.3.6.1.4.1.232)
+--      cpqRackInfo Group                    (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group              (1.3.6.1.4.1.232.22.2)
+--        cpqRackEnclosure Group             (1.3.6.1.4.1.232.22.2.3)
+--         cpqRackCommonEnclosure Group      (1.3.6.1.4.1.232.22.2.3.1)
+--          cpqRackCommonEnclosureFanTable   (1.3.6.1.4.1.232.22.2.3.1.3)
+--
+-- ****************************************************************************
+
+    cpqRackCommonEnclosureFanTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CpqRackCommonEnclosureFanEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table of rack enclosure fan information."
+        ::= { cpqRackCommonEnclosure 3 }
+
+    cpqRackCommonEnclosureFanEntry OBJECT-TYPE
+        SYNTAX  CpqRackCommonEnclosureFanEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A rack enclosure fan description."
+        INDEX   { cpqRackCommonEnclosureFanRack,
+                  cpqRackCommonEnclosureFanChassis,
+                  cpqRackCommonEnclosureFanIndex }
+        ::= { cpqRackCommonEnclosureFanTable 1 }
+
+    CpqRackCommonEnclosureFanEntry ::= SEQUENCE {
+        cpqRackCommonEnclosureFanRack                   INTEGER,
+        cpqRackCommonEnclosureFanChassis                INTEGER,
+        cpqRackCommonEnclosureFanIndex                  INTEGER,
+        cpqRackCommonEnclosureFanEnclosureName          DisplayString,
+        cpqRackCommonEnclosureFanLocation               DisplayString,
+        cpqRackCommonEnclosureFanPartNumber             DisplayString,
+        cpqRackCommonEnclosureFanSparePartNumber        DisplayString,
+        cpqRackCommonEnclosureFanPresent                INTEGER,
+        cpqRackCommonEnclosureFanRedundant              INTEGER,
+        cpqRackCommonEnclosureFanRedundantGroupId       INTEGER,
+        cpqRackCommonEnclosureFanCondition              INTEGER,
+        cpqRackCommonEnclosureFanEnclosureSerialNum     DisplayString
+    }
+
+    cpqRackCommonEnclosureFanRack OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this rack."
+        ::= { cpqRackCommonEnclosureFanEntry 1 }
+
+    cpqRackCommonEnclosureFanChassis OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this enclosure in the rack."
+        ::= { cpqRackCommonEnclosureFanEntry 2 }
+
+    cpqRackCommonEnclosureFanIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this fan within this
+            enclosure in the rack."
+        ::= { cpqRackCommonEnclosureFanEntry 3 }
+
+    cpqRackCommonEnclosureFanEnclosureName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            name or it could not be determined."
+        ::= { cpqRackCommonEnclosureFanEntry 4 }
+
+    cpqRackCommonEnclosureFanLocation OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The location description of the fan within the enclosure.
+
+            The string will be empty if the location could not be
+            determined."
+        ::= { cpqRackCommonEnclosureFanEntry 5 }
+
+    cpqRackCommonEnclosureFanPartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The part number of the enclosure fan.
+
+            The string will be empty if the part number could not be
+            determined."
+        ::= { cpqRackCommonEnclosureFanEntry 6 }
+
+    cpqRackCommonEnclosureFanSparePartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The spare part number of the enclosure fan.
+
+            The string will be empty if the part number could not be
+            determined."
+        ::= { cpqRackCommonEnclosureFanEntry 7 }
+
+    cpqRackCommonEnclosureFanPresent OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            absent(2),
+            present(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This specifies if the fan described is present in the system."
+        ::= { cpqRackCommonEnclosureFanEntry 8 }
+
+    cpqRackCommonEnclosureFanRedundant OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            notRedundant(2),
+            redundant(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This specifies if the fan is in a redundant configuration."
+        ::= { cpqRackCommonEnclosureFanEntry 9 }
+
+    cpqRackCommonEnclosureFanRedundantGroupId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This specifies the group number for redundant fans within this
+            enclosure."
+        ::= { cpqRackCommonEnclosureFanEntry 10 }
+
+    cpqRackCommonEnclosureFanCondition OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            ok(2),
+            degraded(3),
+            failed(4)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The condition of the fan.
+
+            This value will be one of the following:
+
+            other(1)
+              Fan status detection is not supported.
+
+            ok(2)
+              The fan is operating properly.
+
+            degraded(2)
+              A redundant fan is not operating properly.
+
+            failed(4)
+              A non-redundant fan is not operating properly."
+        ::= { cpqRackCommonEnclosureFanEntry 11 }
+
+    cpqRackCommonEnclosureFanEnclosureSerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the enclosure containing the fan.
+
+            The string will be empty if the enclosure does not report the
+            serial number or it could not be determined."
+        ::= { cpqRackCommonEnclosureFanEntry 12 }
+
+
+-- ****************************************************************************
+--   Rack Enclosure Common Fuse Table
+--   ================================
+--
+-- The compaq enterprise                     (1.3.6.1.4.1.232)
+--      cpqRackInfo Group                    (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group              (1.3.6.1.4.1.232.22.2)
+--        cpqRackEnclosure Group             (1.3.6.1.4.1.232.22.2.3)
+--         cpqRackCommonEnclosure Group      (1.3.6.1.4.1.232.22.2.3.1)
+--          cpqRackCommonEnclosureFuseTable  (1.3.6.1.4.1.232.22.2.3.1.4)
+--
+-- ****************************************************************************
+
+    cpqRackCommonEnclosureFuseTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CpqRackCommonEnclosureFuseEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table of rack enclosure fuse information."
+        ::= { cpqRackCommonEnclosure 4 }
+
+    cpqRackCommonEnclosureFuseEntry OBJECT-TYPE
+        SYNTAX  CpqRackCommonEnclosureFuseEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A rack enclosure fuse description."
+        INDEX   { cpqRackCommonEnclosureFuseRack,
+                  cpqRackCommonEnclosureFuseChassis,
+                  cpqRackCommonEnclosureFuseIndex }
+        ::= { cpqRackCommonEnclosureFuseTable 1 }
+
+    CpqRackCommonEnclosureFuseEntry ::= SEQUENCE {
+        cpqRackCommonEnclosureFuseRack             INTEGER,
+        cpqRackCommonEnclosureFuseChassis          INTEGER,
+        cpqRackCommonEnclosureFuseIndex            INTEGER,
+        cpqRackCommonEnclosureFuseEnclosureName    DisplayString,
+        cpqRackCommonEnclosureFuseLocation         DisplayString,
+        cpqRackCommonEnclosureFusePresent          INTEGER,
+        cpqRackCommonEnclosureFuseCondition        INTEGER
+    }
+
+    cpqRackCommonEnclosureFuseRack OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this rack."
+        ::= { cpqRackCommonEnclosureFuseEntry 1 }
+
+    cpqRackCommonEnclosureFuseChassis OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this enclosure in the rack."
+        ::= { cpqRackCommonEnclosureFuseEntry 2 }
+
+    cpqRackCommonEnclosureFuseIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies the fuse within this enclosure."
+        ::= { cpqRackCommonEnclosureFuseEntry 3 }
+
+    cpqRackCommonEnclosureFuseEnclosureName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            name or it could not be determined."
+        ::= { cpqRackCommonEnclosureFuseEntry 4 }
+
+    cpqRackCommonEnclosureFuseLocation OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The location description of the fuse within the enclosure.
+
+            The string will be empty if the location could not be
+            determined."
+        ::= { cpqRackCommonEnclosureFuseEntry 5 }
+
+    cpqRackCommonEnclosureFusePresent OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            absent(2),
+            present(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This specifies if the fuse described is present in the system."
+        ::= { cpqRackCommonEnclosureFuseEntry 6 }
+
+    cpqRackCommonEnclosureFuseCondition OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            ok(2),
+            failed(4)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The condition of the fuse.
+
+            This value will be one of the following:
+
+            other(1)
+              Fuse status detection is not supported.
+
+            ok(2)
+              The fuse is operating properly.
+
+            failed(4)
+              A fuse has been tripped or is not operating properly."
+        ::= { cpqRackCommonEnclosureFuseEntry 7 }
+
+-- ****************************************************************************
+--   Rack Enclosure Common FRU Table
+--   ===============================
+--
+-- The compaq enterprise                     (1.3.6.1.4.1.232)
+--      cpqRackInfo Group                    (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group              (1.3.6.1.4.1.232.22.2)
+--        cpqRackEnclosure Group             (1.3.6.1.4.1.232.22.2.3)
+--         cpqRackCommonEnclosure Group      (1.3.6.1.4.1.232.22.2.3.1)
+--          cpqRackCommonEnclosureFruTable   (1.3.6.1.4.1.232.22.2.3.1.5)
+--
+-- ****************************************************************************
+
+    cpqRackCommonEnclosureFruTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CpqRackCommonEnclosureFruEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table of rack enclosure field replaceable units information."
+        ::= { cpqRackCommonEnclosure 5 }
+
+    cpqRackCommonEnclosureFruEntry OBJECT-TYPE
+        SYNTAX  CpqRackCommonEnclosureFruEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A rack enclosure field replaceable unit description."
+        INDEX   { cpqRackCommonEnclosureFruRack,
+                  cpqRackCommonEnclosureFruChassis,
+                  cpqRackCommonEnclosureFruIndex }
+        ::= { cpqRackCommonEnclosureFruTable 1 }
+
+    CpqRackCommonEnclosureFruEntry ::= SEQUENCE {
+        cpqRackCommonEnclosureFruRack                 INTEGER,
+        cpqRackCommonEnclosureFruChassis              INTEGER,
+        cpqRackCommonEnclosureFruIndex                INTEGER,
+        cpqRackCommonEnclosureFruEnclosureName        DisplayString,
+        cpqRackCommonEnclosureFruDescription          DisplayString,
+        cpqRackCommonEnclosureFruLocation             DisplayString,
+        cpqRackCommonEnclosureFruAssemblyPartNumber   DisplayString,
+        cpqRackCommonEnclosureFruSparePartNumber      DisplayString,
+        cpqRackCommonEnclosureFruAutoRev              DisplayString,
+        cpqRackCommonEnclosureFruSerialNum            DisplayString
+    }
+
+    cpqRackCommonEnclosureFruRack OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this rack."
+        ::= { cpqRackCommonEnclosureFruEntry 1 }
+
+    cpqRackCommonEnclosureFruChassis OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this enclosure in the rack."
+        ::= { cpqRackCommonEnclosureFruEntry 2 }
+
+    cpqRackCommonEnclosureFruIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies the FRU within this enclosure."
+        ::= { cpqRackCommonEnclosureFruEntry 3 }
+
+    cpqRackCommonEnclosureFruEnclosureName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            name or it could not be determined."
+        ::= { cpqRackCommonEnclosureFruEntry 4 }
+
+    cpqRackCommonEnclosureFruDescription OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A description of the FRU component.
+
+            The string will be empty if the enclosure does not report the
+            description information."
+        ::= { cpqRackCommonEnclosureFruEntry 5 }
+
+    cpqRackCommonEnclosureFruLocation OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The location description of the FRU within the enclosure.
+
+            The string will be empty if the location could not be
+            determined."
+        ::= { cpqRackCommonEnclosureFruEntry 6 }
+
+    cpqRackCommonEnclosureFruAssemblyPartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The assembly part number of the FRU within the enclosure.
+
+            The string will be empty if the enclosure does not report this
+            information."
+        ::= { cpqRackCommonEnclosureFruEntry 7 }
+
+    cpqRackCommonEnclosureFruSparePartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The spare part number of the FRU within the enclosure.
+
+            The string will be empty if the enclosure does not report this
+            information."
+        ::= { cpqRackCommonEnclosureFruEntry 8 }
+
+    cpqRackCommonEnclosureFruAutoRev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The auto revision number of the FRU within the enclosure.
+
+            The string will be empty if the enclosure does not report this
+            information."
+        ::= { cpqRackCommonEnclosureFruEntry 9 }
+
+    cpqRackCommonEnclosureFruSerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the FRU within the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            serial number."
+        ::= { cpqRackCommonEnclosureFruEntry 10 }
+
+-- ****************************************************************************
+--   Rack Enclosure for Servers Table
+--   ================================
+--
+-- The compaq enterprise                 (1.3.6.1.4.1.232)
+--      cpqRackInfo Group                (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group          (1.3.6.1.4.1.232.22.2)
+--        cpqRackEnclosure Group         (1.3.6.1.4.1.232.22.2.3)
+--         cpqRackServerEnclosure Group  (1.3.6.1.4.1.232.22.2.3.2)
+--          cpqRackServerEnclosureTable  (1.3.6.1.4.1.232.22.2.3.2.1)
+--
+-- ****************************************************************************
+
+    cpqRackServerEnclosureTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CpqRackServerEnclosureEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table of rack enclosure information for servers."
+        ::= { cpqRackServerEnclosure 1 }
+
+    cpqRackServerEnclosureEntry OBJECT-TYPE
+        SYNTAX  CpqRackServerEnclosureEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A server enclosure description."
+        INDEX   { cpqRackServerEnclosureRack,
+                  cpqRackServerEnclosureIndex }
+        ::= { cpqRackServerEnclosureTable 1 }
+
+    CpqRackServerEnclosureEntry ::= SEQUENCE {
+        cpqRackServerEnclosureRack                 INTEGER,
+        cpqRackServerEnclosureIndex                INTEGER,
+        cpqRackServerEnclosureName                 DisplayString,
+        cpqRackServerEnclosureMaxNumBlades         INTEGER,
+        cpqRackServerEnclosureMaxNumBladesX        INTEGER,
+        cpqRackServerEnclosureMaxNumBladesY        INTEGER
+    }
+
+    cpqRackServerEnclosureRack OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this rack."
+        ::= { cpqRackServerEnclosureEntry 1 }
+
+    cpqRackServerEnclosureIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this server enclosure in the rack."
+        ::= { cpqRackServerEnclosureEntry 2 }
+
+    cpqRackServerEnclosureName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the server enclosure.
+
+            The string will be empty if the enclosure does not report the
+            name or it could not be determined."
+        ::= { cpqRackServerEnclosureEntry 3 }
+
+    cpqRackServerEnclosureMaxNumBlades OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The maximum number of server blades the enclosure can contain.
+
+            The string will be empty if the enclosure does not report the
+            name or it could not be determined."
+        ::= { cpqRackServerEnclosureEntry 4 }
+
+    cpqRackServerEnclosureMaxNumBladesX OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The maximum number of server blades in x-direction (from left to right)
+            the enclosure can contain."
+
+        ::= { cpqRackServerEnclosureEntry 5 }
+
+    cpqRackServerEnclosureMaxNumBladesY OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The maximum number of server blades in y-direction (from top to bottom)
+            the enclosure can contain."
+
+        ::= { cpqRackServerEnclosureEntry 6 }
+
+
+-- ****************************************************************************
+--   Rack Enclosure for Power Supplies Table
+--   =======================================
+--
+-- The compaq enterprise                 (1.3.6.1.4.1.232)
+--      cpqRackInfo Group                (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group          (1.3.6.1.4.1.232.22.2)
+--        cpqRackEnclosure Group         (1.3.6.1.4.1.232.22.2.3)
+--         cpqRackPowerEnclosure Group   (1.3.6.1.4.1.232.22.2.3.3)
+--          cpqRackPowerEnclosureTable   (1.3.6.1.4.1.232.22.2.3.3.1)
+--
+-- ****************************************************************************
+
+    cpqRackPowerEnclosureTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CpqRackPowerEnclosureEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table of rack power enclosure information."
+        ::= { cpqRackPowerEnclosure 1 }
+
+    cpqRackPowerEnclosureEntry OBJECT-TYPE
+        SYNTAX  CpqRackPowerEnclosureEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A rack power enclosure description."
+        INDEX   { cpqRackPowerEnclosureRack,
+                  cpqRackPowerEnclosureIndex }
+        ::= { cpqRackPowerEnclosureTable 1 }
+
+    CpqRackPowerEnclosureEntry ::= SEQUENCE {
+        cpqRackPowerEnclosureRack                  INTEGER,
+        cpqRackPowerEnclosureIndex                 INTEGER,
+        cpqRackPowerEnclosureName                  DisplayString,
+        cpqRackPowerEnclosureMgmtBoardSerialNum    DisplayString,
+        cpqRackPowerEnclosureRedundant             INTEGER,
+        cpqRackPowerEnclosureLoadBalanced          INTEGER,
+        cpqRackPowerEnclosureInputPwrType          INTEGER,
+        cpqRackPowerEnclosurePwrFeedMax            INTEGER,
+        cpqRackPowerEnclosureCondition             INTEGER
+    }
+
+    cpqRackPowerEnclosureRack OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this rack."
+        ::= { cpqRackPowerEnclosureEntry 1 }
+
+    cpqRackPowerEnclosureIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this power enclosure in the rack."
+        ::= { cpqRackPowerEnclosureEntry 2 }
+
+    cpqRackPowerEnclosureName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the power enclosure.
+
+            The string will be empty if the enclosure does not report the
+            name or it could not be determined."
+        ::= { cpqRackPowerEnclosureEntry 3 }
+
+    cpqRackPowerEnclosureMgmtBoardSerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the enclosure.
+
+            The string will be empty if the enclosure does not report the
+            serial number."
+        ::= { cpqRackPowerEnclosureEntry 4 }
+
+    cpqRackPowerEnclosureRedundant OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            notRedundant(2),
+            redundant(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This indicates if the power supply enclosure is in a redundant
+            state."
+        ::= { cpqRackPowerEnclosureEntry 5 }
+
+    cpqRackPowerEnclosureLoadBalanced OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            notLoadBalanced(2),
+            loadBalanced(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This indicates if the power supply enclosure is in a load
+            balanced state."
+        ::= { cpqRackPowerEnclosureEntry 6 }
+
+    cpqRackPowerEnclosureInputPwrType OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            singlePhase(2),
+            threePhase(3),
+            directCurrent(4)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This indicates type of input facility power."
+        ::= { cpqRackPowerEnclosureEntry 7 }
+
+    cpqRackPowerEnclosurePwrFeedMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This is the maximum facility power in watts.
+
+            The maximum facility power being fed to this power enclosure.
+
+            The value will be -1 if the power enclosure does not report the
+            value or if the value is not known."
+        ::= { cpqRackPowerEnclosureEntry 8 }
+
+    cpqRackPowerEnclosureCondition OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            ok(2),
+            degraded(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This indicates current condition of the power enclosure.
+
+            other(1)
+              The power enclosure condition could not be determined.
+
+            ok(2)
+              The power enclosure is operating normally.
+
+            degraded(3)
+              The power enclosure is in a degraded state.  The power subsystem
+              may not be load balanced or may have lost redundancy."
+        ::= { cpqRackPowerEnclosureEntry 9 }
+
+
+-- ****************************************************************************
+--   Rack Server Blade Table
+--   =======================
+--
+-- The compaq enterprise                 (1.3.6.1.4.1.232)
+--      cpqRackInfo Group                (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group          (1.3.6.1.4.1.232.22.2)
+--        cpqRackServer Group            (1.3.6.1.4.1.232.22.2.4)
+--         cpqRackServerBlade Group      (1.3.6.1.4.1.232.22.2.4.1)
+--          cpqRackServerBladeTable      (1.3.6.1.4.1.232.22.2.4.1.1)
+--
+-- ****************************************************************************
+
+    cpqRackServerBladeTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CpqRackServerBladeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table of rack server blade information."
+        ::= { cpqRackServerBlade 1 }
+
+    cpqRackServerBladeEntry OBJECT-TYPE
+        SYNTAX  CpqRackServerBladeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A rack server blade description."
+        INDEX   { cpqRackServerBladeRack,
+                  cpqRackServerBladeChassis,
+                  cpqRackServerBladeIndex }
+        ::= { cpqRackServerBladeTable 1 }
+
+    CpqRackServerBladeEntry ::= SEQUENCE {
+        cpqRackServerBladeRack               INTEGER,
+        cpqRackServerBladeChassis            INTEGER,
+        cpqRackServerBladeIndex              INTEGER,
+        cpqRackServerBladeName               DisplayString,
+        cpqRackServerBladeEnclosureName      DisplayString,
+        cpqRackServerBladePartNumber         DisplayString,
+        cpqRackServerBladeSparePartNumber    DisplayString,
+        cpqRackServerBladePosition           INTEGER,
+        cpqRackServerBladeHeight             INTEGER,
+        cpqRackServerBladeWidth              INTEGER,
+        cpqRackServerBladeDepth              INTEGER,
+        cpqRackServerBladePresent            INTEGER,
+        cpqRackServerBladeHasFuses           INTEGER,
+        cpqRackServerBladeEnclosureSerialNum DisplayString,
+        cpqRackServerBladeSlotsUsed          INTEGER,
+        cpqRackServerBladeSerialNum          DisplayString,
+        cpqRackServerBladeProductId          DisplayString,
+        cpqRackServerBladeUid                DisplayString,
+        cpqRackServerBladeSlotsUsedX         INTEGER,
+        cpqRackServerBladeSlotsUsedY         INTEGER
+    }
+
+    cpqRackServerBladeRack OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this rack."
+        ::= { cpqRackServerBladeEntry 1 }
+
+    cpqRackServerBladeChassis OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this enclosure in the rack."
+        ::= { cpqRackServerBladeEntry 2 }
+
+    cpqRackServerBladeIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this server blade within the enclosure."
+        ::= { cpqRackServerBladeEntry 3 }
+
+    cpqRackServerBladeName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the server blade.
+
+            The string will be empty if it could not be determined."
+        ::= { cpqRackServerBladeEntry 4 }
+
+    cpqRackServerBladeEnclosureName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the enclosure which contains the blade.
+
+            The string will be empty if the enclosure does not report the
+            name or it could not be determined."
+        ::= { cpqRackServerBladeEntry 5 }
+
+    cpqRackServerBladePartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The part number of the server blade.
+
+            The string will be empty if the part number could not be
+            determined."
+        ::= { cpqRackServerBladeEntry 6 }
+
+    cpqRackServerBladeSparePartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The spare part number of the server blade.
+
+            The string will be empty if the part number could not be
+            determined."
+        ::= { cpqRackServerBladeEntry 7 }
+
+    cpqRackServerBladePosition OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The position or slot number of the server blade within the
+            server enclosure.
+
+            This will be -1 if the server enclosure does not report the
+            information or it could not be determined."
+        ::= { cpqRackServerBladeEntry 8 }
+
+    cpqRackServerBladeHeight OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The height dimension of the rack space taken by the server
+            blade expressed in millimeters.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackServerBladeEntry 9 }
+
+    cpqRackServerBladeWidth OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The width dimension of the rack space taken by the server
+            blade expressed in millimeters.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackServerBladeEntry 10 }
+
+    cpqRackServerBladeDepth OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The depth dimension of the rack space taken by the server
+            blade expressed in millimeters.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackServerBladeEntry 11 }
+
+    cpqRackServerBladePresent OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            absent(2),
+            present(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This specifies if the server blade described is present in the
+            enclosure."
+        ::= { cpqRackServerBladeEntry 12 }
+
+    cpqRackServerBladeHasFuses OBJECT-TYPE
+        SYNTAX  INTEGER {
+            false(1),
+            true(2)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The server blade contains fuses.
+
+            This will be true(2) is the server blade contains fuses.
+            The cpqRackCommonEnclosureFuseTable will contain the fuse
+            specific information.
+
+            Match the cpqRackServerBladeEnclosureSerialNum in this table to the
+            serial number in the cpqRackCommonEnclosureFanTable to get complete
+            information on the fuses."
+        ::= { cpqRackServerBladeEntry 13 }
+
+    cpqRackServerBladeEnclosureSerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the enclosure which contains the blade.
+
+            The string will be empty if the enclosure does not report the
+            serial number or it could not be determined."
+        ::= { cpqRackServerBladeEntry 14 }
+
+    cpqRackServerBladeSlotsUsed OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of slot positions occupied by this server blade.  This
+            is used to indicate a server blade which may obscure an adjacent
+            blade slot.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackServerBladeEntry 15 }
+
+    cpqRackServerBladeSerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the server blade.
+
+            The string will be empty if the system does not report the
+            serial number function."
+        ::= { cpqRackServerBladeEntry 16 }
+
+    cpqRackServerBladeProductId OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The product id string of the server blade.
+
+            The string will be empty if the system does not report the
+            product id function."
+        ::= { cpqRackServerBladeEntry 17 }
+
+    cpqRackServerBladeUid OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The server blade unique identifier.
+
+            The string will be empty if the blade does not report the
+            UID or if it could not be determined."
+        ::= { cpqRackServerBladeEntry 18 }
+
+    cpqRackServerBladeSlotsUsedX OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of slot positions in x-direction (from left to right)
+            occupied by this server blade.  This is used to indicate a server blade
+            which may obscure an adjacent blade slot.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackServerBladeEntry 19 }
+
+    cpqRackServerBladeSlotsUsedY OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of slot positions in y-direction (from top to bottom)
+            occupied by this server blade.  This is used to indicate a server blade
+            which may obscure an adjacent blade slot.
+
+            This will be -1 if the rack does not report the information or
+            it could not be determined."
+        ::= { cpqRackServerBladeEntry 20 }
+
+
+-- ****************************************************************************
+--   Rack Power Supply Table
+--   =======================
+--
+-- The compaq enterprise                 (1.3.6.1.4.1.232)
+--      cpqRackInfo Group                (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group          (1.3.6.1.4.1.232.22.2)
+--        cpqRackPower Group             (1.3.6.1.4.1.232.22.2.5)
+--         cpqRackPowerSupply Group      (1.3.6.1.4.1.232.22.2.5.1)
+--          cpqRackPowerSupplyTable      (1.3.6.1.4.1.232.22.2.5.1.1)
+--
+-- ****************************************************************************
+
+    cpqRackPowerSupplyTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CpqRackPowerSupplyEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table of rack power supply information."
+        ::= { cpqRackPowerSupply 1 }
+
+    cpqRackPowerSupplyEntry OBJECT-TYPE
+        SYNTAX  CpqRackPowerSupplyEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A rack power supply description."
+        INDEX   { cpqRackPowerSupplyRack,
+                  cpqRackPowerSupplyChassis,
+                  cpqRackPowerSupplyIndex }
+        ::= { cpqRackPowerSupplyTable 1 }
+
+    CpqRackPowerSupplyEntry ::= SEQUENCE {
+        cpqRackPowerSupplyRack                  INTEGER,
+        cpqRackPowerSupplyChassis               INTEGER,
+        cpqRackPowerSupplyIndex                 INTEGER,
+        cpqRackPowerSupplyEnclosureName         DisplayString,
+        cpqRackPowerSupplySerialNum             DisplayString,
+        cpqRackPowerSupplyPartNumber            DisplayString,
+        cpqRackPowerSupplySparePartNumber       DisplayString,
+        cpqRackPowerSupplyFWRev                 DisplayString,
+        cpqRackPowerSupplyMaxPwrOutput          INTEGER,
+        cpqRackPowerSupplyCurPwrOutput          INTEGER,
+        cpqRackPowerSupplyPosition              INTEGER,
+        cpqRackPowerSupplyIntakeTemp            INTEGER,
+        cpqRackPowerSupplyExhaustTemp           INTEGER,
+        cpqRackPowerSupplyStatus                INTEGER,
+        cpqRackPowerSupplyInputLineStatus       INTEGER,
+        cpqRackPowerSupplyPresent               INTEGER,
+        cpqRackPowerSupplyCondition             INTEGER,
+        cpqRackPowerSupplyEnclosureSerialNum    DisplayString
+    }
+
+    cpqRackPowerSupplyRack OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this rack."
+        ::= { cpqRackPowerSupplyEntry 1 }
+
+    cpqRackPowerSupplyChassis OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this power enclosure in the rack."
+        ::= { cpqRackPowerSupplyEntry 2 }
+
+    cpqRackPowerSupplyIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this power supply in the enclosure."
+        ::= { cpqRackPowerSupplyEntry 3 }
+
+    cpqRackPowerSupplyEnclosureName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the power supply enclosure in which this power supply
+            resides.
+
+            The string will be empty if the enclosure does not report the
+            name or it could not be determined."
+        ::= { cpqRackPowerSupplyEntry 4 }
+
+    cpqRackPowerSupplySerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the power supply.
+
+            The string will be empty if the power supply does not report the
+            serial number."
+        ::= { cpqRackPowerSupplyEntry 5 }
+
+    cpqRackPowerSupplyPartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The part number of the power supply.
+
+            The string will be empty if the power supply does not report this
+            function."
+        ::= { cpqRackPowerSupplyEntry 6 }
+
+    cpqRackPowerSupplySparePartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The spare part number of the power supply.
+
+            The string will be empty if the power supply does not report this
+            function."
+        ::= { cpqRackPowerSupplyEntry 7 }
+
+    cpqRackPowerSupplyFWRev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The firmware revision of the power supply.
+
+            The string will be empty if the power supply does not report the
+            firmware revision."
+        ::= { cpqRackPowerSupplyEntry 8 }
+
+    cpqRackPowerSupplyMaxPwrOutput OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The maximum power output of the power supply in watts.
+
+            The value will be -1 if the power supply does not report the
+            value."
+        ::= { cpqRackPowerSupplyEntry 9 }
+
+    cpqRackPowerSupplyCurPwrOutput OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The current power output of the power supply in watts.
+
+            The value will be -1 if the power supply does not report the
+            value."
+        ::= { cpqRackPowerSupplyEntry 10 }
+
+    cpqRackPowerSupplyPosition OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The position of the power supply within the power enclosure.
+
+            This will be -1 if the power enclosure does not report the
+            power supply information or it could not be determined."
+        ::= { cpqRackPowerSupplyEntry 11 }
+
+    cpqRackPowerSupplyIntakeTemp OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The current air temperature at the intake of the power supply
+            in degrees celsius.
+
+            The value will be -1 if the power supply does not report the
+            value."
+        ::= { cpqRackPowerSupplyEntry 12 }
+
+    cpqRackPowerSupplyExhaustTemp OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The current air temperature at the exhaust of the power supply
+            in degrees celsius.
+
+            The value will be -1 if the power supply does not report the
+            value."
+        ::= { cpqRackPowerSupplyEntry 13 }
+
+    cpqRackPowerSupplyStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noError(1),
+            generalFailure(2),
+            bistFailure(3),
+            fanFailure(4),
+            tempFailure(5),
+            interlockOpen(6),
+            epromFailed(7),
+            vrefFailed(8),
+            dacFailed(9),
+            ramTestFailed(10),
+            voltageChannelFailed(11),
+            orringdiodeFailed(12),
+            brownOut(13),
+            giveupOnStartup(14),
+            nvramInvalid(15),
+            calibrationTableInvalid(16)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The status of the power supply."
+        ::= { cpqRackPowerSupplyEntry 14 }
+
+    cpqRackPowerSupplyInputLineStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noError(1),
+            lineOverVoltage(2),
+            lineUnderVoltage(3),
+            lineHit(4),
+            brownOut(5),
+            linePowerLoss(6)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The status of line input power."
+        ::= { cpqRackPowerSupplyEntry 15 }
+
+    cpqRackPowerSupplyPresent OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            absent(2),
+            present(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This specifies if the power supply described is present in the
+            enclosure."
+        ::= { cpqRackPowerSupplyEntry 16 }
+
+    cpqRackPowerSupplyCondition OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            ok(2),
+            degraded(3),
+            failed(4)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The condition of the power supply.
+
+            This value will be one of the following:
+
+            other(1)
+              The status could not be determined or not present.
+
+            ok(2)
+              The power supply is operating normally.
+
+            degraded(3)
+              A temperature sensor, fan or other power supply component is
+              outside of normal operating range.
+
+            failed(4)
+              A power supply component detects a condition that could
+              possibly damage the system."
+        ::= { cpqRackPowerSupplyEntry 17 }
+
+    cpqRackPowerSupplyEnclosureSerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the power supply enclosure in which this
+            power supply resides.
+
+            The string will be empty if the enclosure does not report the
+            serial number or it could not be determined."
+        ::= { cpqRackPowerSupplyEntry 18 }
+
+
+-- ****************************************************************************
+--   Rack Network Connector Table
+--   ============================
+--
+-- The compaq enterprise                 (1.3.6.1.4.1.232)
+--      cpqRackInfo Group                (1.3.6.1.4.1.232.22)
+--       cpqRackComponent Group          (1.3.6.1.4.1.232.22.2)
+--        cpqRackNetwork Group           (1.3.6.1.4.1.232.22.2.6)
+--         cpqRackNetConnector Group     (1.3.6.1.4.1.232.22.2.6.1)
+--          cpqRackNetConnectorTable     (1.3.6.1.4.1.232.22.2.6.1.1)
+--
+-- ****************************************************************************
+
+    cpqRackNetConnectorTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CpqRackNetConnectorEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table of rack network connector information."
+        ::= { cpqRackNetConnector 1 }
+
+    cpqRackNetConnectorEntry OBJECT-TYPE
+        SYNTAX  CpqRackNetConnectorEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A rack network connector description."
+        INDEX   { cpqRackNetConnectorRack,
+                  cpqRackNetConnectorChassis,
+                  cpqRackNetConnectorIndex }
+        ::= { cpqRackNetConnectorTable 1 }
+
+    CpqRackNetConnectorEntry ::= SEQUENCE {
+        cpqRackNetConnectorRack                 INTEGER,
+        cpqRackNetConnectorChassis              INTEGER,
+        cpqRackNetConnectorIndex                INTEGER,
+        cpqRackNetConnectorEnclosureName        DisplayString,
+        cpqRackNetConnectorName                 DisplayString,
+        cpqRackNetConnectorModel                DisplayString,
+        cpqRackNetConnectorSerialNum            DisplayString,
+        cpqRackNetConnectorPartNumber           DisplayString,
+        cpqRackNetConnectorSparePartNumber      DisplayString,
+        cpqRackNetConnectorFWRev                DisplayString,
+        cpqRackNetConnectorType                 INTEGER,
+        cpqRackNetConnectorLocation             DisplayString,
+        cpqRackNetConnectorPresent              INTEGER,
+        cpqRackNetConnectorHasFuses             INTEGER,
+        cpqRackNetConnectorEnclosureSerialNum   DisplayString
+    }
+
+    cpqRackNetConnectorRack OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this rack."
+        ::= { cpqRackNetConnectorEntry 1 }
+
+    cpqRackNetConnectorChassis OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this server enclosure in the rack."
+        ::= { cpqRackNetConnectorEntry 2 }
+
+    cpqRackNetConnectorIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "A number that uniquely specifies this network connector in the rack."
+        ::= { cpqRackNetConnectorEntry 3 }
+
+    cpqRackNetConnectorEnclosureName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the network connector enclosure.
+
+            The string will be empty if the enclosure does not report the
+            name or it could not be determined."
+        ::= { cpqRackNetConnectorEntry 4 }
+
+    cpqRackNetConnectorName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The name of the network connector.
+
+            The string will be empty if the network connector does not report the
+            name or it could not be determined."
+        ::= { cpqRackNetConnectorEntry 5 }
+
+    cpqRackNetConnectorModel OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The model name of the network connector.
+
+            The string will be empty if the network connector does not report the
+            model information."
+        ::= { cpqRackNetConnectorEntry 6 }
+
+    cpqRackNetConnectorSerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the network connector.
+
+            The string will be empty if the network connector does not report the
+            serial number."
+        ::= { cpqRackNetConnectorEntry 7 }
+
+    cpqRackNetConnectorPartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The part number of the network connector.
+
+            The string will be empty if the enclosure does not report this
+            function."
+        ::= { cpqRackNetConnectorEntry 8 }
+
+    cpqRackNetConnectorSparePartNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The spare part number of the network connector.
+
+            The string will be empty if the enclosure does not report this
+            function."
+        ::= { cpqRackNetConnectorEntry 9 }
+
+    cpqRackNetConnectorFWRev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The firmware revision of the network connector.
+
+            The string will be empty if the network connector does not report the
+            firmware revision."
+        ::= { cpqRackNetConnectorEntry 10 }
+
+    cpqRackNetConnectorType OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            passive(2),
+            active(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The type of network connector within the enclosure."
+        ::= { cpqRackNetConnectorEntry 11 }
+
+    cpqRackNetConnectorLocation OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The location of the network connector within the enclosure."
+        ::= { cpqRackNetConnectorEntry 12 }
+
+    cpqRackNetConnectorPresent OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            absent(2),
+            present(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This specifies if the network connector described is present in the
+            enclosure."
+        ::= { cpqRackNetConnectorEntry 13 }
+
+    cpqRackNetConnectorHasFuses OBJECT-TYPE
+        SYNTAX  INTEGER {
+            false(1),
+            true(2)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The network connector contains fuses.
+
+            This will be true(2) is the network connector contains fuses.
+            The cpqRackCommonEnclosureFuseTable will contain the fuse
+            specific information.
+
+            Match the cpqRackNetworkEnclosureSerialNum in this table to the
+            serial number in the cpqRackCommonEnclosureFusTable to get complete
+            information on the fuses."
+        ::= { cpqRackNetConnectorEntry 14 }
+
+    cpqRackNetConnectorEnclosureSerialNum OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The serial number of the enclosure containing the network connector.
+
+            The string will be empty if the enclosure does not report the
+            serial number or it could not be determined."
+        ::= { cpqRackNetConnectorEntry 15 }
+
+
+-- ****************************************************************************
+--   Rack System Object Identification
+--   =================================
+--
+-- The compaq enterprise                 (1.3.6.1.4.1.232)
+--      cpqRackInfo Group                (1.3.6.1.4.1.232.22)
+--       cpqRackSysObjID Group           (1.3.6.1.4.1.232.22.3)
+--
+-- ****************************************************************************
+
+    cpqRackSystemObjectIdentification OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The hardware identification string.
+
+            The string will reported by the rack firmware."
+        ::= { cpqRackSysObjID 1 }
+
+
+-- ****************************************************************************
+--  Rack Information Trap Definitions
+--  =================================
+--
+--  The SNMP trap messages must not be bigger than 484 octets (bytes).
+--
+--  Trap support in an SNMP agent implementation is optional.  An SNMP
+--  agent implementation may support all, some, or none of the traps.
+--  If traps are supported, The user should be provided with the option of
+--  disabling traps.
+-- **************************************************************************
+
+    cpqRackNameChanged TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackSerialNum,
+                     cpqRackTrapSequenceNum }
+        DESCRIPTION
+           "Rack name has changed.
+
+            This trap signifies that an agent or utility has changed the name
+            of the rack.  Each of the server blades in each of the enclosure
+            within the rack will be updated to reflect the new rack name.
+
+            It may take several minutes for the rack name change to be
+            propagated throughout the entire rack.
+
+            User Action: None."
+
+        --#TYPE "Rack name changed (22001)"
+        --#SUMMARY "The rack name has changed to %s."
+        --#ARGUMENTS {2}
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 99
+        --#STATE OPERATIONAL
+
+        ::= 22001
+
+    cpqRackEnclosureNameChanged TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureModel,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The enclosure name has changed.
+
+            This trap signifies that an agent or utility has changed the name
+            of an enclosure within the rack.  Each of the components
+            within the rack will be updated to reflect the new enclosure name.
+
+            It may take several minutes for the enclosure name change to be
+            propagated throughout the entire enclosure.
+
+            User Action: None."
+
+        --#TYPE "Enclosure name changed (22002)"
+        --#SUMMARY "The enclosure name has changed to %s in rack %s."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 99
+        --#STATE OPERATIONAL
+
+        ::= 22002
+
+    cpqRackEnclosureRemoved TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureModel,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The enclosure has been removed.
+
+            This trap signifies that an enclosure has been removed from
+            the rack.
+
+            User Action: None."
+
+        --#TYPE "Enclosure removed (22003)"
+        --#SUMMARY "The enclosure %s has been removed from rack %s."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 99
+        --#STATE OPERATIONAL
+
+        ::= 22003
+
+    cpqRackEnclosureInserted TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureModel,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The enclosure has been inserted.
+
+            This trap signifies that an enclosure has been inserted into
+            the rack.
+
+            User Action: None."
+
+        --#TYPE "Enclosure inserted (22004)"
+        --#SUMMARY "The enclosure %s has been inserted into rack %s."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 99
+        --#STATE OPERATIONAL
+
+        ::= 22004
+
+    cpqRackEnclosureTempFailed TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTempLocation,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The enclosure temperature status has been set to failed.
+
+            This trap signifies that a enclosure temperature sensor has
+            been tripped indicating an overheat condition.
+
+            User Action: Shutdown the enclosure and possibly the rack
+            as soon as possible.  Insure all fans are working properly and
+            that air flow in the rack has not been blocked."
+
+        --#TYPE "Enclosure temperature failed (22005)"
+        --#SUMMARY "The enclosure %s temperature sensor in rack %s has been set to failed."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 99
+        --#STATE NONOPERATIONAL
+
+        ::= 22005
+
+    cpqRackEnclosureTempDegraded TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTempLocation,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The enclosure temperature status has been set to degraded.
+
+            This trap signifies that an enclosure temperature sensor has
+            been tripped indicating a possible overheat condition.
+
+            User Action: Shutdown the enclosure and possibly the rack
+            as soon as possible.  Insure all fans are working properly and
+            that air flow in the rack has not been blocked."
+
+        --#TYPE "Enclosure temperature degraded (22006)"
+        --#SUMMARY "The enclosure %s temperature sensor in rack %s has been set to degraded."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22006
+
+    cpqRackEnclosureTempOk TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTempLocation,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The enclosure temperature status has been set to ok.
+
+            This trap signifies that an enclosure temperature sensor has
+            returned to normal.
+
+            User Action: None."
+
+        --#TYPE "Enclosure temperature ok (22007)"
+        --#SUMMARY "The enclosure %s temperature sensor in rack %s has been set to ok."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 99
+        --#STATE OPERATIONAL
+
+        ::= 22007
+
+    cpqRackEnclosureFanFailed TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureFanLocation,
+                     cpqRackCommonEnclosureFanSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The enclosure fan status has been set to failed.
+
+            This trap signifies that an enclosure fan has failed and
+            no other fans in the redundant fan group are operating.
+            This may result in overheating of the enclosure.
+
+            User Action: Replace the fan as soon as possible."
+
+        --#TYPE "Enclosure fan failed (22008)"
+        --#SUMMARY "The enclosure %s fan in rack %s has been set to failed."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 99
+        --#STATE NONOPERATIONAL
+
+        ::= 22008
+
+    cpqRackEnclosureFanDegraded TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureFanLocation,
+                     cpqRackCommonEnclosureFanSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The enclosure fan status has been set to degraded.
+
+            This trap signifies that an enclosure fan has failed but
+            other fans in the redundant fan group are still operating.
+            This may result in overheating of the enclosure.
+
+            User Action: Replace the fan as soon as possible."
+
+        --#TYPE "Enclosure fan degraded (22009)"
+        --#SUMMARY "The enclosure %s fan in rack %s has been set to degraded."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22009
+
+    cpqRackEnclosureFanOk TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureFanLocation,
+                     cpqRackCommonEnclosureFanSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The enclosure fan status has been set to ok.
+
+            This trap signifies that an enclosure fan has returned
+            to normal operation.
+
+            User Action: None."
+
+        --#TYPE "Enclosure fan ok (22010)"
+        --#SUMMARY "The enclosure %s fan in rack %s has been set to ok."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 99
+        --#STATE OPERATIONAL
+
+        ::= 22010
+
+
+    cpqRackEnclosureFanRemoved TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureFanLocation,
+                     cpqRackCommonEnclosureFanSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The enclosure fan has been removed.
+
+            User Action: None."
+
+        --#TYPE "Enclosure fan removed (22011)"
+        --#SUMMARY "The enclosure %s fan in rack %s has been removed."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY MINOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22011
+
+    cpqRackEnclosureFanInserted TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureFanLocation,
+                     cpqRackCommonEnclosureFanSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The enclosure fan has been inserted.
+
+            User Action: None."
+
+        --#TYPE "Enclosure fan inserted (22012)"
+        --#SUMMARY "The enclosure %s fan in rack %s has been inserted."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 99
+        --#STATE OPERATIONAL
+
+        ::= 22012
+
+    cpqRackPowerSupplyFailed TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackPowerSupplyEnclosureName,
+                     cpqRackPowerSupplySerialNum,
+                     cpqRackPowerSupplyPosition,
+                     cpqRackPowerSupplyFWRev,
+                     cpqRackPowerSupplySparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The power supply status has been set to failed.
+
+            This trap signifies that a power supply has failed.
+
+            User Action: Replace the power supply as soon as possible."
+
+        --#TYPE "Rack power supply failed (22013)"
+        --#SUMMARY "The power supply %s in enclosure %s in rack %s has been set to failed."
+        --#ARGUMENTS {6, 4, 2}
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 99
+        --#STATE NONOPERATIONAL
+
+        ::= 22013
+
+    cpqRackPowerSupplyDegraded TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackPowerSupplyEnclosureName,
+                     cpqRackPowerSupplySerialNum,
+                     cpqRackPowerSupplyPosition,
+                     cpqRackPowerSupplyFWRev,
+                     cpqRackPowerSupplySparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The power supply status has been set to degraded.
+
+            This trap signifies that a power supply has degraded.
+
+            User Action: Replace the power supply as soon as possible."
+
+        --#TYPE "Rack power supply degraded (22014)"
+        --#SUMMARY "The power supply %s in enclosure %s in rack %s has been set to degraded."
+        --#ARGUMENTS {6, 4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22014
+
+    cpqRackPowerSupplyOk TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackPowerSupplyEnclosureName,
+                     cpqRackPowerSupplySerialNum,
+                     cpqRackPowerSupplyPosition,
+                     cpqRackPowerSupplyFWRev,
+                     cpqRackPowerSupplySparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The power supply status has been set to ok.
+
+            This trap signifies that a power supply has returned to normal
+            operation.
+
+            User Action: None."
+
+        --#TYPE "Rack power supply ok (22015)"
+        --#SUMMARY "The power supply %s in enclosure %s in rack %s has been set to ok."
+        --#ARGUMENTS {6, 4, 2}
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 99
+        --#STATE OPERATIONAL
+
+        ::= 22015
+
+    cpqRackPowerSupplyRemoved TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackPowerSupplyEnclosureName,
+                     cpqRackPowerSupplySerialNum,
+                     cpqRackPowerSupplyPosition,
+                     cpqRackPowerSupplyFWRev,
+                     cpqRackPowerSupplySparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The power supply has been removed.
+
+            User Action: None."
+
+        --#TYPE "Rack power supply removed (22016)"
+        --#SUMMARY "The power supply %s in enclosure %s in rack %s has been removed."
+        --#ARGUMENTS {6, 4, 2}
+        --#SEVERITY MINOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22016
+
+    cpqRackPowerSupplyInserted TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackPowerSupplyEnclosureName,
+                     cpqRackPowerSupplySerialNum,
+                     cpqRackPowerSupplyPosition,
+                     cpqRackPowerSupplyFWRev,
+                     cpqRackPowerSupplySparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The power supply has been inserted.
+
+            User Action: None."
+
+        --#TYPE "Rack power supply inserted (22017)"
+        --#SUMMARY "The power supply %s in enclosure %s in rack %s has been inserted."
+        --#ARGUMENTS {6, 4, 2}
+        --#SEVERITY INFORMATIONAL
+        --#TIMEINDEX 99
+        --#STATE OPERATIONAL
+
+        ::= 22017
+
+    cpqRackPowerSubsystemNotRedundant TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackPowerEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The rack power subsystem is no longer in a redundant state.
+
+            User Action: Replace any failed power supplies as soon as possible
+            to return the system to a redundant state."
+
+        --#TYPE "Rack power subsystem not redundant (22018)"
+        --#SUMMARY "The power subsystem in enclosure %s in rack %s is no longer redundant."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22018
+
+    cpqRackPowerSubsystemLineVoltageProblem TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackPowerSupplyEnclosureName,
+                     cpqRackPowerSupplyPosition,
+                     cpqRackPowerSupplyFWRev,
+                     cpqRackPowerSupplyInputLineStatus,
+                     cpqRackPowerSupplySparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The rack power supply detected an input line voltage problem.
+
+            User Action: Check the power input for the power supply or replace
+            any failed power supplies as soon as possible."
+
+        --#TYPE "Rack power supply input voltage problem (22019)"
+        --#SUMMARY "The rack power supply detected an input line voltage problem in power supply %s, enclosure %s, rack %s."
+        --#ARGUMENTS {5, 4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22019
+
+    cpqRackPowerSubsystemOverloadCondition TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackPowerEnclosureName,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "The rack power subsystem overload condition.
+
+            User Action: Replace any failed power supplies as soon as possible
+            to return the system to a redundant state."
+
+        --#TYPE "Rack power subsystem overload condition (22020)"
+        --#SUMMARY "The power subsystem in enclosure %s in rack %s is in an overload condition."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22020
+
+    cpqRackPowerShedAutoShutdown TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackServerBladeEnclosureName,
+                     cpqRackServerBladePosition,
+                     cpqRackServerBladeSparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Server shutdown due to power shedding.
+
+            The server blade was shutdown due to a lack of power.
+
+            User Action: Check power connections or add power supplies."
+
+        --#TYPE "Server shutdown due to power shedding (22021)"
+        --#SUMMARY "The server shutdown due to lack of power blade %s, in enclosure %s, in rack %s."
+        --#ARGUMENTS {5, 4, 2}
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 99
+        --#STATE NONOPERATIONAL
+
+        ::= 22021
+
+    cpqRackServerPowerOnFailedNotRedundant TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackServerBladeEnclosureName,
+                     cpqRackServerBladePosition,
+                     cpqRackServerBladeSparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Server power on prevented to preserve redundancy.
+
+            There is not enough power to power on the server blade and
+            maintain redundancy for the other blades in the enclosure.
+
+            User Action: Check power connections or add power supplies."
+
+        --#TYPE "Server power on prevented to preserve redundancy (22022)"
+        --#SUMMARY "Server power on prevented to preserve redundancy in blade %s, in enclosure %s, in rack %s."
+        --#ARGUMENTS {5, 4, 2}
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 99
+        --#STATE NONOPERATIONAL
+
+        ::= 22022
+
+    cpqRackServerPowerOnFailedNotEnoughPower TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackServerBladeEnclosureName,
+                     cpqRackServerBladePosition,
+                     cpqRackServerBladeSparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Inadequate power to power on.
+
+            There is not enough power to power on the server blade.
+
+            User Action: Check power connections or add power supplies."
+
+        --#TYPE "Inadequate power to power on (22023)"
+        --#SUMMARY "Inadequate power to power on blade %s, in enclosure %s, in rack %s."
+        --#ARGUMENTS {5, 4, 2}
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 99
+        --#STATE NONOPERATIONAL
+
+        ::= 22023
+
+    cpqRackServerPowerOnFailedEnclosureNotFound TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackServerBladeEnclosureName,
+                     cpqRackServerBladePosition,
+                     cpqRackServerBladeSparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Inadequate power to power on.
+
+            There is not enough power to power on the server blade.  The
+            server enclosure micro-controller was not found.
+
+            User Action: Check server enclosure connections or add power supplies."
+
+        --#TYPE "Inadequate power to power on (22024)"
+        --#SUMMARY "Inadequate power to power on blade %s, in enclosure %s, in rack %s."
+        --#ARGUMENTS {5, 4, 2}
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 99
+        --#STATE NONOPERATIONAL
+
+        ::= 22024
+
+    cpqRackServerPowerOnFailedPowerChassisNotFound TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackServerBladeEnclosureName,
+                     cpqRackServerBladePosition,
+                     cpqRackServerBladeSparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Inadequate power to power on.
+
+            There is not enough power to power on the server blade.  The
+            power enclosure micro-controller was not found.
+
+            User Action: Check power enclosure connections or add power supplies."
+
+        --#TYPE "Inadequate power to power on (22025)"
+        --#SUMMARY "Inadequate power to power on blade %s, in enclosure %s, in rack %s."
+        --#ARGUMENTS {5, 4, 2}
+        --#SEVERITY CRITICAL
+        --#TIMEINDEX 99
+        --#STATE NONOPERATIONAL
+
+        ::= 22025
+
+    cpqRackServerPowerOnManualOverride TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackServerBladeEnclosureName,
+                     cpqRackServerBladePosition,
+                     cpqRackServerBladeSparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Server power on via manual override.
+
+            The server blade was powered on by a manual override.
+
+            User Action: None."
+
+        --#TYPE "Server power on via manual override (22026)"
+        --#SUMMARY "Server power on via manual override on blade %s, in enclosure %s, in rack %s."
+        --#ARGUMENTS {5, 4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22026
+
+    cpqRackFuseOpen TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureFuseLocation,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Fuse open.
+
+            The fuse has been tripped.
+
+            User Action: Check enclosure and / or blade power connections and
+            reset the fuse."
+
+        --#TYPE "Fuse open (22027)"
+        --#SUMMARY "Fuse open fuse %s, in enclosure %s, in rack %s."
+        --#ARGUMENTS {5, 4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22027
+
+
+    cpqRackServerBladeRemoved TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackServerBladeEnclosureName,
+                     cpqRackServerBladeName,
+                     cpqRackServerBladePosition,
+                     cpqRackServerBladeSparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Server blade removed.
+
+            The server blade has been removed from the enclosure.
+
+            User Action: None."
+
+        --#TYPE "Server blade removed (22028)"
+        --#SUMMARY "Server blade %s removed from position %s, in enclosure %s, in rack %s."
+        --#ARGUMENTS {5, 6, 4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22028
+
+    cpqRackServerBladeInserted TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackServerBladeEnclosureName,
+                     cpqRackServerBladeName,
+                     cpqRackServerBladePosition,
+                     cpqRackServerBladeSparePartNumber,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Server blade inserted.
+
+            The server blade has been inserted into the enclosure.
+
+            User Action: None."
+
+        --#TYPE "Server blade inserted (22029)"
+        --#SUMMARY "Server blade %s inserted into position %s, in enclosure %s, in rack %s."
+        --#ARGUMENTS {5, 6, 4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22029
+
+    cpqRackPowerChassisNotLoadBalanced TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Power subsystem not load balanced.
+
+            The power subsystem is out of balance for this power enclosure.
+
+            User Action: Check the power enclosure and power supplies.  Replace
+            any failed or degraded power supplies.  Add additional power supplies
+            if needed."
+
+        --#TYPE "Power subsystem not load balanced (22030)"
+        --#SUMMARY "Power subsystem not load balanced in enclosure %s, in rack %s."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22030
+
+    cpqRackPowerChassisDcPowerProblem TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Power subsystem DC power problem.
+
+            There is a power subsystem DC power problem for this power enclosure.
+
+            User Action: Check the power enclosure and power supplies.  Replace
+            any failed or degraded power supplies."
+
+        --#TYPE "Power subsystem DC power problem (22031)"
+        --#SUMMARY "Power subsystem DC power problem in enclosure %s, in rack %s."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22031
+
+    cpqRackPowerChassisAcFacilityPowerExceeded TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Power subsystem AC facility input power exceeded.
+
+            There is a power subsystem Power subsystem AC facility input power
+            exceeded for this power enclosure.
+
+            User Action: Check the power enclosure and power supplies.  Replace
+            any failed or degraded power supplies."
+
+        --#TYPE "Power subsystem AC facility input power exceeded (22032)"
+        --#SUMMARY "Power subsystem AC facility input power exceeded in enclosure %s, in rack %s."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22032
+
+
+
+    cpqRackPowerUnknownPowerConsumption TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Unknown power consumption.
+
+            There is an unknown power consumer drawing power.
+
+            User Action: Check the power enclosure and power supplies.  Replace
+            any failed or degraded power supplies."
+
+        --#TYPE "Unknown power consumption (22033)"
+        --#SUMMARY "Unknown power consumption in rack %s."
+        --#ARGUMENTS {2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22033
+
+    cpqRackPowerChassisLoadBalancingWireMissing TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Power subsystem load balancing wire missing.
+
+            The power subsystem load balancing wire missing.
+
+            User Action: Connect the load balancing wire."
+
+        --#TYPE "Power subsystem load balancing wire missing (22034)"
+        --#SUMMARY "Power subsystem load balancing wire missing for enclosure %s, in rack %s."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22034
+
+    cpqRackPowerChassisTooManyPowerChassis TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Power subsystem has too may power enclosures.
+
+            The maximum number of power enclosures has been exceeded.
+
+            User Action: Remove the extra power enclosure."
+
+        --#TYPE "Power subsystem has too may power enclosures (22035)"
+        --#SUMMARY "Power subsystem has too may power enclosures %s, in rack %s."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22035
+
+    cpqRackPowerChassisConfigError TRAP-TYPE
+        ENTERPRISE compaq
+        VARIABLES  { sysName,
+                     cpqHoTrapFlags,
+                     cpqRackName,
+                     cpqRackUid,
+                     cpqRackCommonEnclosureName,
+                     cpqRackCommonEnclosureSerialNum,
+                     cpqRackCommonEnclosureSparePartNumber,
+                     cpqRackCommonEnclosureTrapSequenceNum }
+        DESCRIPTION
+           "Power subsystem improperly configured.
+
+            The power subsystem has been improperly configured.
+
+            User Action: Check the cabling of the power enclosure."
+
+        --#TYPE "Power subsystem improperly configured (22036)"
+        --#SUMMARY "Power subsystem has been improperly configured in enclosure %s, in rack %s."
+        --#ARGUMENTS {4, 2}
+        --#SEVERITY MAJOR
+        --#TIMEINDEX 99
+        --#STATE DEGRADED
+
+        ::= 22036
+
+END
+

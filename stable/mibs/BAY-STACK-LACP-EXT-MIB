@@ -1,0 +1,122 @@
+
+BAY-STACK-LACP-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB;
+
+bayStackLacpExtMib MODULE-IDENTITY
+    LAST-UPDATED    "200511140000Z"
+    ORGANIZATION    "Nortel Networks"
+    CONTACT-INFO    "Nortel Networks"
+    DESCRIPTION
+        "BayStack LACP Extension MIB
+
+         Copyright 2004 Nortel Networks, Inc.
+         All rights reserved.
+         This Nortel Networks SNMP Management Information Base
+         Specification embodies Nortel Networks' confidential and
+         proprietary intellectual property. Nortel Networks retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         This Specification is supplied 'AS IS,' and Nortel Networks
+         makes no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+    REVISION "200511140000Z" -- 14 November 2005
+    DESCRIPTION "v2:  Added bsleDot3adCompatibilityMode."
+
+    REVISION "200406040000Z" -- 04 June 2004
+    DESCRIPTION "v1:  Initial version."
+
+    ::= { bayStackMibs 7 }
+
+bsleNotifications OBJECT IDENTIFIER ::= { bayStackLacpExtMib 0 }
+bsleObjects OBJECT IDENTIFIER ::= { bayStackLacpExtMib 1 }
+
+--
+-- Scalar objects
+--
+
+bsleScalars OBJECT IDENTIFIER ::= { bsleObjects 1 }
+
+bsleDot3adCompatibilityMode OBJECT-TYPE
+    SYNTAX INTEGER {
+                       default(1),
+                       advanced(2)
+                   }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The compatibility mode.  This determines behaviour when
+         an LACP-enabled port is connected to a non-LACP partner,
+         or when an LACP active trunk port is removed from the
+         trunk configuration."
+    ::= { bsleScalars 1 }
+
+--
+-- 802.3ad Agg Port Extension Table
+--
+
+bsleDot3adAggPortExtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsleDot3adAggPortExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table extends the dot3adAggPortTable."
+    ::= { bayStackLacpExtMib 2 }
+
+bsleDot3adAggPortExtEntry OBJECT-TYPE
+    SYNTAX BsleDot3adAggPortExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry that extends dot3adAggPortEntry."
+    INDEX { bsleDot3adAggPortExtIndex }
+    ::= { bsleDot3adAggPortExtTable 1 }
+
+BsleDot3adAggPortExtEntry ::=
+    SEQUENCE {
+        bsleDot3adAggPortExtIndex          InterfaceIndex,
+        bsleDot3adAggPortExtAdminEnabled   TruthValue,
+        bsleDot3adAggPortExtOperEnabled    TruthValue
+    }
+
+bsleDot3adAggPortExtIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object is equal to the value of dot3adAggPortIndex of the
+         entry in the dot3adAggPortTable extended by this entry."
+    ::= { bsleDot3adAggPortExtEntry 1 }
+
+bsleDot3adAggPortExtAdminEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The current administrative setting for the port.  A value of
+         true(1) means the port is set to participate in LACP.  A value
+         of false(2) means the port is set to not participate in LACP."
+    ::= { bsleDot3adAggPortExtEntry 2 }
+
+bsleDot3adAggPortExtOperEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational state for the port.  A value of true(1)
+         means the port is participating in LACP.  A value of false(2)
+         means the port is not participating in LACP."
+    ::= { bsleDot3adAggPortExtEntry 3 }
+
+END
+

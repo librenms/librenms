@@ -1,0 +1,954 @@
+ALCATEL-IND1-VRRP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32
+		FROM SNMPv2-SMI
+	RowStatus, TruthValue, TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+		FROM SNMPv2-CONF
+	softentIND1Vrrp
+		FROM ALCATEL-IND1-BASE
+	ifIndex, InterfaceIndexOrZero
+		FROM IF-MIB
+        InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+	vrrpOperVrId, vrrpOperEntry
+		FROM VRRP-MIB
+	alaVrrp3OperVrId, alaVrrp3OperIpVersion, alaVrrp3OperEntry
+		FROM ALCATEL-IND1-VRRP3-MIB;
+
+
+alcatelIND1VRRPMIB MODULE-IDENTITY
+    LAST-UPDATED "200704030000Z"
+    ORGANIZATION "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             Propietary VRRP MIB definitions
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special,
+	 or consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { softentIND1Vrrp 1 }
+
+
+alcatelIND1VRRPMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1VRRPMIB 1 }
+
+-- *******************************************************************
+--  Textual Conventions
+-- *******************************************************************
+
+ AlaVrTrackId ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION
+	"A number that serves to uniquely identify a tracking policy."
+     SYNTAX      Integer32 (1..255)
+
+AlaVrGroupId ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION
+	"A number that serves to uniquely identify a virtual router group."
+     SYNTAX      Integer32 (1..255)
+
+--
+-- Alcatel VRRP Configuration
+--
+
+alaVRRPConfig OBJECT IDENTIFIER ::= { alcatelIND1VRRPMIBObjects 1 }
+alaVrrpTracking OBJECT IDENTIFIER ::= { alcatelIND1VRRPMIBObjects 2 }
+alaVrrpOperations OBJECT IDENTIFIER ::= { alcatelIND1VRRPMIBObjects 3 }
+alaVRRPv2Config OBJECT IDENTIFIER ::= { alcatelIND1VRRPMIBObjects 4 }
+alaVrrpGroup OBJECT IDENTIFIER ::= { alcatelIND1VRRPMIBObjects 5 }
+
+alaVRRPStartDelay OBJECT-TYPE
+    SYNTAX	Integer32 (0..180)
+    UNITS       "seconds"
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Once VRRP's initial configuration is complete at startup, this
+	object specifies the number of seconds VRRP will delay before
+	leaving the initialize state.  This delay is to allow external
+	protocols (spanning tree, OSPF, etc.) time to converge so that
+	when a VRRP virtual router becomes master it will be able to
+	forward traffic."
+    DEFVAL	{ 30 }
+    ::= { alaVRRPConfig 1 }
+
+ alaVrrpBfdStatus  OBJECT-TYPE
+	SYNTAX		INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"Enable or disable the BFD for VRRP."
+	::= { alaVRRPConfig 2}
+
+
+alaVRRPDefaultInterval OBJECT-TYPE
+     SYNTAX       Integer32 (1..255)
+     UNITS        "seconds"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "The VRRP Router default time interval, in seconds, between 
+         sending advertisement messages."
+     DEFVAL       { 1 }
+     ::= { alaVRRPv2Config 1 }
+
+alaVRRPDefaultPriority OBJECT-TYPE
+     SYNTAX       Integer32 (1..254)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object specifies the VRRP Router default priority to be used for the
+         virtual router master election process. Higher values imply
+         higher priority."
+     DEFVAL       { 100 }
+     ::= { alaVRRPv2Config 2 }
+
+alaVRRPDefaultPreemptMode OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "The VRRP Router default preempt mode. Controls whether a higher 
+          priority virtual router will preempt a lower priority master."
+     DEFVAL       { true }
+     ::= { alaVRRPv2Config 3 }
+
+alaVRRPAdminState OBJECT-TYPE
+     SYNTAX       INTEGER {
+         allEnable(1),
+         enable(2),
+         disable(3)
+     }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object is used to force a change in to the vrrpOperAdminState
+         of virtual routers in the vrrpOperTable.  Setting a value of allEnable will
+         cause the vrrpOperAdminState of each entry in the table to be set to up.
+         Setting a value of enable will set the vrrpOperAdminState to up but
+         only for the set of virtual routers whose vrrpOperAdminState was down 
+         by default (as occurs when the virtual router instance is created) or due 
+         to a previous set command of the alaVRRPAdminState to disable.
+         Setting a value of disable will cause the vrrpOperAdminState of each 
+         entry in the table to be set to down.
+
+         This object is of little value when read but will return the last value
+         to which it was set."
+     ::= { alaVRRPv2Config 4 }
+
+alaVRRPSetParam OBJECT-TYPE
+     SYNTAX       INTEGER {
+         none(1),
+         all(2),
+         interval(3),
+         priority(4),
+         preempt(5)
+     }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object is used to force the virtual routers in the vrrpOperTable
+         to revert to the default parameter values specified in 
+         alaVRRPDefaultInterval,  alaVRRPDefaultPriority, and 
+         alaVRRPDefaultPreemptMode.  Unless alaVRRPOverride is set to true only
+         virtual routers previously configured with default parameter values 
+         are modified.  Parameters can be modified individually with the 
+         interval, priority, and preempt values, or collectively with the all 
+         value.  
+
+         This object is of little value when read but will return the last value
+         to which it was set."
+     ::= { alaVRRPv2Config 5 }
+
+alaVRRPOverride OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object is used in combination with the alaVRRPSetParam object 
+         to force all virtual routers in the vrrpOperTable to revert to the default 
+         values specified in alaVRRPDefaultInterval,  alaVRRPDefaultPriority,
+         and alaVRRPDefaultPreemptMode.
+
+         This object is of little value when read but will return the last value
+         to which it was set."
+     ::= { alaVRRPv2Config 6 }
+
+-- *******************************************************************
+--  Start of  VRRP Tracking MIB objects
+-- *******************************************************************
+
+-- *******************************************************************
+--  VRRP Tracking Policy Table
+-- *******************************************************************
+
+ alaVrrpTrackTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF AlaVrrpTrackEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	"VRRP Tracking Policy table, which consists of a sequence
+	(i.e., one or more conceptual rows) of 'vrrpTrackEntry' items."
+     ::= { alaVrrpTracking 1 }
+
+ alaVrrpTrackEntry OBJECT-TYPE
+     SYNTAX       AlaVrrpTrackEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "An entry in the vrrpTrackTable containing the operational
+          characteristics of a VRRP tracking policy.
+
+          Rows in the table cannot be modified unless the value
+          of `vrrpTrackAdminState' is `disabled'."
+
+     INDEX    { alaVrrpTrackId }
+     ::= { alaVrrpTrackTable 1 }
+
+ AlaVrrpTrackEntry ::=
+     SEQUENCE {
+         alaVrrpTrackId
+             AlaVrTrackId,
+         alaVrrpTrackState
+             INTEGER,
+         alaVrrpTrackAdminState
+             INTEGER,
+         alaVrrpTrackEntityType
+             INTEGER,
+         alaVrrpTrackEntityVlan
+             INTEGER,
+         alaVrrpTrackEntityPort
+             InterfaceIndexOrZero,
+         alaVrrpTrackEntityIpAddress
+             IpAddress,
+         alaVrrpTrackPriority
+             Integer32,
+         alaVrrpTrackRowStatus
+             RowStatus,
+         alaVrrpTrackEntityInterface
+             InterfaceIndexOrZero,
+         alaVrrpTrackEntityIpv6Interface
+             InterfaceIndexOrZero,
+         alaVrrpTrackEntityIpAddrType
+             InetAddressType,
+         alaVrrpTrackEntityIpAddr
+             InetAddress,
+		 alaVrrpTrackBfdStatus
+			 INTEGER			 
+ }
+
+ alaVrrpTrackId OBJECT-TYPE
+     SYNTAX       AlaVrTrackId
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This object contains the Tracking Policy Identifier (TRACKID)."
+     ::= { alaVrrpTrackEntry 1 }
+
+alaVrrpTrackState OBJECT-TYPE
+     SYNTAX       INTEGER {
+         up(1),
+         down(2)
+     }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "The conditional state of the tracking policy entity."
+     ::= { alaVrrpTrackEntry 2 }
+
+ alaVrrpTrackAdminState OBJECT-TYPE
+     SYNTAX       INTEGER {
+         enable(1),
+         disable(2)
+     }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object will enable/disable the tracking policy function."
+     DEFVAL    { enable }
+     ::= { alaVrrpTrackEntry 3 }
+
+alaVrrpTrackEntityType OBJECT-TYPE
+     SYNTAX       INTEGER {
+         vlan(1),
+         port(2),
+         ipaddress(3),
+         interface(4),
+         ipv6Interface(5)
+     }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object specifies the tracking policy entity type 
+          currently in use."
+     ::= { alaVrrpTrackEntry 4 }
+
+alaVrrpTrackEntityVlan OBJECT-TYPE
+     SYNTAX       INTEGER (0..4094)
+     MAX-ACCESS   read-write
+     STATUS       deprecated
+     DESCRIPTION
+         "This object contains the Tracking Policy Entity. A vlan id. 
+
+         The alaVrrpTrackEntityVlan, alaVrrpTrackEntityPort,
+         alaVrrpTrackEntityIpAddress, alaVrrpTrackEntityInterface, 
+         alaVrrpTrackEntityIpv6Interface, and alaVrrpTrackEntityIpAddr
+         are mutually exclusive of one another. The last one set is the 
+         valid one and identifies the entity type."
+     ::= { alaVrrpTrackEntry 5 }
+
+alaVrrpTrackEntityPort OBJECT-TYPE
+     SYNTAX       InterfaceIndexOrZero
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object contains the Tracking Policy Entity. A port 
+         ifIndex or 0 if not significant.  
+
+         The alaVrrpTrackEntityVlan, alaVrrpTrackEntityPort,
+         alaVrrpTrackEntityIpAddress, alaVrrpTrackEntityInterface, 
+         alaVrrpTrackEntityIpv6Interface, and alaVrrpTrackEntityIpAddr
+         are mutually exclusive of one another. The last one set is the 
+         valid one and identifies the entity type."
+     ::= { alaVrrpTrackEntry 6 }
+
+alaVrrpTrackEntityIpAddress OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-write
+     STATUS       deprecated
+     DESCRIPTION
+         "This object contains the Tracking Policy Entity. IP Address.
+
+         The alaVrrpTrackEntityVlan, alaVrrpTrackEntityPort,
+         alaVrrpTrackEntityIpAddress, alaVrrpTrackEntityInterface, 
+         alaVrrpTrackEntityIpv6Interface, and alaVrrpTrackEntityIpAddr
+         are mutually exclusive of one another. The last one set is the 
+         valid one and identifies the entity type."
+     ::= { alaVrrpTrackEntry 7 }
+
+alaVrrpTrackPriority OBJECT-TYPE
+     SYNTAX       Integer32 (1..255)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	"This object specifies the value by which the priority of virtual
+	routers associated with the tracking policy will be decremented
+	when the tracked entity's operational state transitions from up to
+	down, or will be incremented when the tracked entity's operational
+	state transitions from down to up."
+     DEFVAL       { 25 }
+     ::= { alaVrrpTrackEntry 8 }
+
+alaVrrpTrackRowStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+	 "The row status variable, used in accordance to installation
+         and removal conventions for conceptual rows.
+
+         To create a row in this table, a manager sets this object
+         to either createAndGo(4) or createAndWait(5). Until instances
+         of all corresponding columns are appropriately configured,
+         the value of the corresponding instance of the
+         `vrrpTrackRowStatus' column will be read as notReady(3).
+
+         In particular, a newly created row cannot be made active(1)
+         until (minimally) the corresponding instances of `vrrpTrackId',
+         and either one of : alaVrrpTrackEntityVlan, 
+         alaVrrpTrackEntityPort, alaVrrpTrackEntityIpAddress, or 
+         alaVrrpTrackEntityInterface have been set."
+     ::= { alaVrrpTrackEntry 9 }
+
+alaVrrpTrackEntityInterface OBJECT-TYPE
+     SYNTAX       InterfaceIndexOrZero
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object contains the Tracking Policy Entity. An interface. 
+
+         The alaVrrpTrackEntityVlan, alaVrrpTrackEntityPort,
+         alaVrrpTrackEntityIpAddress, alaVrrpTrackEntityInterface, 
+         alaVrrpTrackEntityIpv6Interface, and alaVrrpTrackEntityIpAddr
+         are mutually exclusive of one another. The last one set is the 
+         valid one and identifies the entity type."
+     ::= { alaVrrpTrackEntry 10 }
+
+
+alaVrrpTrackEntityIpv6Interface OBJECT-TYPE
+     SYNTAX       InterfaceIndexOrZero
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object contains the Tracking Policy Entity. An Ipv6 
+         interface. 
+
+         The alaVrrpTrackEntityVlan, alaVrrpTrackEntityPort,
+         alaVrrpTrackEntityIpAddress, alaVrrpTrackEntityInterface, 
+         alaVrrpTrackEntityIpv6Interface, and alaVrrpTrackEntityIpAddr
+         are mutually exclusive of one another. The last one set is the 
+         valid one and identifies the entity type."
+     ::= { alaVrrpTrackEntry 11 }
+
+
+alaVrrpTrackEntityIpAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object contains the Tracking Policy Entity IP Address
+         type."
+     ::= { alaVrrpTrackEntry 12 }
+
+alaVrrpTrackEntityIpAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object contains the Tracking Policy Entity. An 
+         IPv4 for or IPv6 Address based on alaVrrpTrackEntityIpAddrType.
+
+         The alaVrrpTrackEntityVlan, alaVrrpTrackEntityPort,
+         alaVrrpTrackEntityIpAddress, alaVrrpTrackEntityInterface, 
+         alaVrrpTrackEntityIpv6Interface, and alaVrrpTrackEntityIpAddr
+         are mutually exclusive of one another. The last one set is the 
+         valid one and identifies the entity type."
+     ::= { alaVrrpTrackEntry 13 }
+
+ alaVrrpTrackBfdStatus 	OBJECT-TYPE	
+	SYNTAX		INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Enables BFD for a VRRP track."
+	::= { alaVrrpTrackEntry 14}
+
+-- *******************************************************************
+--  VRRP Associated Tracking Policy Table
+-- *******************************************************************
+
+ alaVrrpAssoTrackTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF AlaVrrpAssoTrackEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	"The table of tracking policies associated with this virtual router."
+     ::= { alaVrrpTracking 2 }
+
+ alaVrrpAssoTrackEntry OBJECT-TYPE
+     SYNTAX       AlaVrrpAssoTrackEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	"An entry in the table contains a tracking policy id that is
+	associated with a virtual router. The number of rows for
+	a given ifIndex and VrId will equal the number of tracking
+	policies associated with the virtual router (equivalent to alaVrrpTrackCount').
+	Rows in the table cannot be modified unless the value of
+	`vrrpOperAdminState' is `disabled' and the 'vrrpOperState' has transitioned to `initialize'."
+     INDEX    { ifIndex, vrrpOperVrId, alaVrrpAssoTrackId }
+     ::= { alaVrrpAssoTrackTable 1 }
+
+ AlaVrrpAssoTrackEntry ::=
+     SEQUENCE {
+         alaVrrpAssoTrackId
+             AlaVrTrackId,
+         alaVrrpAssoTrackRowStatus
+             RowStatus
+ }
+
+ alaVrrpAssoTrackId OBJECT-TYPE
+     SYNTAX       AlaVrTrackId
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "The identifier of the tracking policy the virtual router is
+         responsible for monitoring."
+     ::= { alaVrrpAssoTrackEntry 1 }
+
+ alaVrrpAssoTrackRowStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "The row status variable, used according to installation
+         and removal conventions for conceptual rows. Setting this
+         object to active(1) or createAndGo(4) results in the
+         addition of an associated tracking policy for a virtual router.
+         Destroying the entry or setting it to notInService(2)
+         removes the associated tracking policy from the virtual router.
+         The use of other values is implementation-dependent."
+     ::= { alaVrrpAssoTrackEntry 2 }
+
+-- *******************************************************************
+--  VRRP Group Table
+-- *******************************************************************
+
+ alaVrrpGroupTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF AlaVrrpGroupEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	"VRRP Group table, which consists of a sequence (i.e., one 
+            or more conceptual rows) of 'vrrpGroupEntry' items."
+     ::= { alaVrrpGroup 1 }
+
+ alaVrrpGroupEntry OBJECT-TYPE
+     SYNTAX       AlaVrrpGroupEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "An entry in the vrrpGroupTable containing the 
+          characteristics of a VRRP group."
+     INDEX    { alaVrrpGroupId }
+     ::= { alaVrrpGroupTable 1 }
+
+ AlaVrrpGroupEntry ::=
+     SEQUENCE {
+         alaVrrpGroupId
+             AlaVrGroupId,
+         alaVrrpGroupInterval
+             Integer32,
+         alaVrrpGroupPriority
+             Integer32,
+         alaVrrpGroupPreemptMode
+             TruthValue,
+         alaVrrpGroupAdminState
+             INTEGER,
+         alaVrrpGroupSetParam
+             INTEGER,
+         alaVrrpGroupOverride
+             TruthValue,
+         alaVrrpGroupRowStatus
+             RowStatus
+}
+
+ alaVrrpGroupId OBJECT-TYPE
+     SYNTAX       AlaVrGroupId
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This object contains the Tracking Policy Identifier (GROUPID)."
+     ::= { alaVrrpGroupEntry 1 }
+
+alaVrrpGroupInterval OBJECT-TYPE
+     SYNTAX       Integer32 (1..255)
+     UNITS        "seconds"
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "The VRRP Group time interval, in seconds, between 
+         sending advertisement messages."
+     DEFVAL       { 1 }
+     ::= { alaVrrpGroupEntry 2 }
+
+alaVrrpGroupPriority OBJECT-TYPE
+     SYNTAX       Integer32 (1..254)
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "This object specifies the VRRP Group priority to be used for the
+         virtual router master election process. Higher values imply
+         higher priority."
+     DEFVAL       { 100 }
+     ::= { alaVrrpGroupEntry 3 }
+
+alaVrrpGroupPreemptMode OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "The VRRP Group preempt mode. Controls whether a higher 
+          priority virtual router will preempt a lower priority master."
+     DEFVAL       { true }
+     ::= { alaVrrpGroupEntry 4 }
+
+alaVrrpGroupAdminState OBJECT-TYPE
+     SYNTAX       INTEGER {
+         allEnable(1),
+         enable(2),
+         disable(3)
+     }
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "This object is used to force a change in to the vrrpOperAdminState
+         of virtual routers in the corresponding alaVRRPAssoGroupTable
+         entry.  Setting a value of allEnable will cause the vrrpOperAdminState
+         of each vrrpOperEntry to be set to up.  Setting a value of enable will
+         set the vrrpOperAdminState to up but only for the set of virtual routers
+         in the group whose vrrpOperAdminState was down by default (as 
+         occurs when the virtual router instance is created) or due to a previous
+         set command of the alaVrrpGroupAdminState or alaVRRPAdminState
+         to disable.  Setting a value of disable will cause the vrrpOperAdminState
+        of each entry in the table to be set to down.
+
+         This object is of little value when read but will return the last value
+         to which it was set."
+     ::= { alaVrrpGroupEntry 5 }
+
+alaVrrpGroupSetParam OBJECT-TYPE
+     SYNTAX       INTEGER {
+         none(1),
+         all(2),
+         interval(3),
+         priority(4),
+         preempt(5)
+     }
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "This object is used to force the virtual routers in the corresponding
+         alaVRRPAssoGroupTable to revert to the group parameter values 
+         specified in alaVrrpGroupInterval,  alaVrrpGroupPriority,
+         and alaVrrpGroupPreemptMode.  Unless alaVrrpGroupOverride is set to
+         true only virtual routers previously configured with default 
+         or group parameter values are modified.  Parameters can be modified 
+         individually with the interval, priority, and preempt values, or 
+         collectively with the all value.  
+
+         This object is of little value when read but will return the last value
+         to which it was set."
+     ::= { alaVrrpGroupEntry 6 }
+
+alaVrrpGroupOverride OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "This object is used in combination with the alaVrrpGroupSetParam object 
+         to force all virtual routers in the corresponding alaVrrpAssoGroupTable
+         to revert to the group parameter values specified in alaVrrpGroupInterval,
+         alaVrrpGroupPriority, and alaVrrpGroupPreemptMode.
+
+         This object is of little value when read but will return the last value
+         to which it was set."
+     ::= { alaVrrpGroupEntry 7 }
+
+alaVrrpGroupRowStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+        "The row status variable, used in accordance to installation
+         and removal conventions for conceptual rows.
+
+         To create a row in this table, a manager sets this object
+         to either createAndGo(4) or createAndWait(5). Until instances
+         of all corresponding columns are appropriately configured,
+         the value of the corresponding instance of the
+         `alaVrrpGroupRowStatus' column will be read as notReady(3).
+
+         In particular, a newly created row cannot be made active(1)
+         until (minimally) the corresponding instance of `alaVrrpGroupId'
+         has been set."
+     ::= { alaVrrpGroupEntry 8 }
+
+-- *******************************************************************
+--  VRRP Associated Group Table
+-- *******************************************************************
+
+ alaVrrpAssoGroupTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF AlaVrrpAssoGroupEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	"The table of virtual routers associated with this group."
+     ::= { alaVrrpGroup 2 }
+
+ alaVrrpAssoGroupEntry OBJECT-TYPE
+     SYNTAX       AlaVrrpAssoGroupEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	"An entry in the table contains a virtual router id that is
+	associated with a virtual router group."
+     INDEX    { alaVrrpGroupId, ifIndex, vrrpOperVrId }
+     ::= { alaVrrpAssoGroupTable 1 }
+
+ AlaVrrpAssoGroupEntry ::=
+     SEQUENCE {
+         alaVrrpAssoGroupRowStatus
+             RowStatus
+ }
+
+ alaVrrpAssoGroupRowStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "The row status variable, used according to installation
+         and removal conventions for conceptual rows. Setting this
+         object to active(1) or createAndGo(4) results in the
+         addition of an associated virtual router for a group.
+         Destroying the entry or setting it to notInService(2)
+         removes the associated virtual router from the group.
+         The use of other values is implementation-dependent."
+     ::= { alaVrrpAssoGroupEntry 1 }
+
+-- ****************************************************************
+-- Extention of the Vrrp Oper Table from the standard mib
+-- ****************************************************************
+ alaVrrpOperTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF AlaVrrpOperEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Table of virtual router configuration info."
+     ::= { alaVrrpOperations 1 }
+
+ alaVrrpOperEntry OBJECT-TYPE
+     SYNTAX       AlaVrrpOperEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "An entry in the table, config information
+         about a given virtual router."
+     AUGMENTS    { vrrpOperEntry }
+     ::= { alaVrrpOperTable 1 }
+
+ AlaVrrpOperEntry ::=
+     SEQUENCE {
+         alaVrrpCurrentPriority
+             Integer32,
+         alaVrrpTrackCount
+             Integer32,
+         alaVrrpGroupIdent
+             Integer32
+         }
+
+ alaVrrpCurrentPriority OBJECT-TYPE
+     SYNTAX       Integer32 (0..255)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object specifies the priority currently used for the
+         virtual router master election process. Higher values imply
+         higher priority.
+
+         A priority of '0', although not settable, is sent by
+         the master router to indicate that this router has ceased
+         to participate in VRRP and a backup virtual router should
+         transition  to become a new master.
+
+         A priority of 255 is used for the router that owns the
+         associated IP address(es)."
+     ::= { alaVrrpOperEntry 1 }
+
+ alaVrrpTrackCount OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "The number of tracking policies associated with a virtual router."
+     ::= { alaVrrpOperEntry 2 }
+
+ alaVrrpGroupIdent OBJECT-TYPE
+     SYNTAX       Integer32 (0..255)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "The VRRP group to which this virtual router belongs.  A value of
+          zero indicates that the virtual router is not affiliated with any group."
+     ::= { alaVrrpOperEntry 3 }
+
+-- *******************************************************************
+--  VRRP3 Associated Tracking Policy Table
+-- *******************************************************************
+
+ alaVrrp3AssoTrackTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF AlaVrrp3AssoTrackEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	"The table of tracking policies associated with this virtual router."
+     ::= { alaVrrpTracking 3 }
+
+ alaVrrp3AssoTrackEntry OBJECT-TYPE
+     SYNTAX       AlaVrrp3AssoTrackEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	"An entry in the table contains a tracking policy id that is
+	associated with a virtual router. The number of rows for
+	a given IP Version, VrId, and ifIndex will equal the number of tracking
+	policies associated with the virtual router (equivalent to alaVrrp3TrackCount').
+	Rows in the table cannot be modified unless the value of
+	`alaVrrp3OperAdminState' is `disabled' and the 'alaVrrp3OperState' has transitioned to `initialize'."
+     INDEX    { alaVrrp3OperIpVersion, alaVrrp3OperVrId, ifIndex, alaVrrp3AssoTrackId }
+     ::= { alaVrrp3AssoTrackTable 1 }
+
+ AlaVrrp3AssoTrackEntry ::=
+     SEQUENCE {
+         alaVrrp3AssoTrackId
+             AlaVrTrackId,
+         alaVrrp3AssoTrackRowStatus
+             RowStatus
+ }
+
+ alaVrrp3AssoTrackId OBJECT-TYPE
+     SYNTAX       AlaVrTrackId
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "The identifier of the tracking policy the virtual router is
+         responsible for monitoring."
+     ::= { alaVrrp3AssoTrackEntry 1 }
+
+ alaVrrp3AssoTrackRowStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "The row status variable, used according to installation
+         and removal conventions for conceptual rows. Setting this
+         object to active(1) or createAndGo(4) results in the
+         addition of an associated tracking policy for a virtual router.
+         Destroying the entry or setting it to notInService(2)
+         removes the associated tracking policy from the virtual router.
+         The use of other values is implementation-dependent."
+     ::= { alaVrrp3AssoTrackEntry 2 }
+
+-- ****************************************************************
+-- Extention of the alaVrrp3OperTable from the Alcatel VRRP3 mib
+-- ****************************************************************
+ alaVrrp3OperExTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF AlaVrrp3OperExEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Table of virtual router configuration info."
+     ::= { alaVrrpOperations 2 }
+
+ alaVrrp3OperExEntry OBJECT-TYPE
+     SYNTAX       AlaVrrp3OperExEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "An entry in the table, config information
+         about a given virtual router."
+     AUGMENTS    { alaVrrp3OperEntry }
+     ::= { alaVrrp3OperExTable 1 }
+
+ AlaVrrp3OperExEntry ::=
+     SEQUENCE {
+         alaVrrp3CurrentPriority
+             Integer32,
+         alaVrrp3TrackCount
+             Integer32,
+         alaVrrp3GroupIdent
+             Integer32
+         }
+
+ alaVrrp3CurrentPriority OBJECT-TYPE
+     SYNTAX       Integer32 (0..255)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object specifies the priority currently used for the
+         virtual router master election process. Higher values imply
+         higher priority.
+
+         A priority of '0', although not settable, is sent by
+         the master router to indicate that this router has ceased
+         to participate in VRRP and a backup virtual router should
+         transition  to become a new master.
+
+         A priority of 255 is used for the router that owns the
+         associated IP address(es)."
+     ::= { alaVrrp3OperExEntry 1 }
+
+ alaVrrp3TrackCount OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "The number of tracking policies associated with a virtual router."
+     ::= { alaVrrp3OperExEntry 2 }
+
+ alaVrrp3GroupIdent OBJECT-TYPE
+     SYNTAX       Integer32 (0..255)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "The VRRP group to which this virtual router belongs.  A value of
+          zero indicates that the virtual router is not affiliated with any group."
+     ::= { alaVrrp3OperExEntry 3 }
+
+--
+-- conformance information
+--
+
+alcatelIND1VRRPMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1VRRPMIB 2 }
+alcatelIND1VRRPMIBCompliances OBJECT IDENTIFIER ::= { alcatelIND1VRRPMIBConformance 1 }
+alcatelIND1VRRPMIBGroups OBJECT IDENTIFIER ::= { alcatelIND1VRRPMIBConformance 2 }
+
+alaVRRPCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+	"The compliance statement for switches with Alcatel VRRP and
+	implementing ALCATEL-IND1-VRRP-MIB."
+    MODULE
+    MANDATORY-GROUPS { alaVRRPConfigGroup }
+    ::= { alcatelIND1VRRPMIBCompliances 1 }
+
+
+--
+-- units of conformance
+--
+
+alaVRRPConfigGroup OBJECT-GROUP
+    OBJECTS  	{
+                  alaVRRPStartDelay,
+ 		  alaVrrpBfdStatus 
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of Alcatel VRRP."
+    ::= { alcatelIND1VRRPMIBGroups 1 }
+
+END

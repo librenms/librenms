@@ -1,0 +1,171 @@
+
+-- *****************************************************************************
+-- Juniper-HTTP-Profile-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   HTTP Profile MIB
+--
+-- Copyright (c) 2005 Juniper Networks, Inc.  All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-HTTP-Profile-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    juniMibs
+        FROM Juniper-MIBs
+    JuniSetMap
+        FROM Juniper-TC;
+
+juniHttpProfileMIB  MODULE-IDENTITY
+    LAST-UPDATED "200508191421Z"  -- 19-Aug-05 02:21 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The HTTP rofile MIB for the Juniper Networks, Inc. enterprise."
+    -- Revision History
+    REVISION    "200508191421Z"  -- 19-Aug-05 02:21 PM EDT  = JUNOSe 8.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 79 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniHttpProfileObjects  OBJECT IDENTIFIER ::= { juniHttpProfileMIB 1 }
+juniHttpProfile         OBJECT IDENTIFIER ::= { juniHttpProfileObjects 1 }
+
+--
+-- This MIB defines configuration profile structure for ATM interfaces.
+-- The creation/deletion of profiles and mapping of profile names to profile
+-- indices is coordinated in the Juniper-PROFILE-MIB.
+--
+--
+-- The ATM 1483 Profile Table
+--
+juniHttpProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniHttpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains profiles for configuring bulk ATM circuits.
+
+        Entries in this table are created/deleted as a side-effect of
+        corresponding operations to the juniProfileNameTable in the
+        Juniper-PROFILE-MIB."
+    ::= { juniHttpProfile 1 }
+
+juniHttpProfileEntry OBJECT-TYPE
+    SYNTAX      JuniHttpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A profile describing VCC configuration of an ATM subinterface."
+    INDEX     { juniHttpProfileId }
+    ::= { juniHttpProfileTable 1 }
+
+JuniHttpProfileEntry ::= SEQUENCE {
+    juniHttpProfileId                      Unsigned32,
+    juniHttpProfileSetMap                  JuniSetMap,
+    juniHttpProfileRedirectUrl             DisplayString }
+
+juniHttpProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The integer identifier associated with this profile.  A value for this
+        identifier is determined by locating or creating a profile name in the
+        juniProfileNameTable."
+    ::= { juniHttpProfileEntry 1 }
+
+juniHttpProfileSetMap OBJECT-TYPE
+    SYNTAX      JuniSetMap
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A bitmap representing which objects in this entry have been explicitly
+        configured.  See the definition of the JuniSetMap TEXTUAL-CONVENTION for
+        details of use.
+
+        The INDEX object(s) and this object are excluded from representation
+        (i.e. their bits are never set).
+
+        When a SET request does not explicitly configure JuniSetMap, bits in
+        JuniSetMap are set as a side-effect of configuring other profile
+        attributes in the same entry.
+
+        If, however, a SET request explicitly configures JuniSetMap, the
+        explicitly configured value overrides 1) any previous bit settings, and
+        2) any simultaneous 'side-effect' settings that would otherwise occur.
+
+        Once set, bits can only be cleared by explicitly configuring
+        JuniSetMap."
+    ::= { juniHttpProfileEntry 2 }
+
+juniHttpProfileRedirectUrl OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is a 64 byte string that will be used as the redirect
+         URL when requests arrive at the HTTP server over the Ip Interface
+         configured."
+    ::= { juniHttpProfileEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniHttpProfileConformance  OBJECT IDENTIFIER
+    ::= { juniHttpProfileMIB 4 }
+juniHttpProfileCompliances  OBJECT IDENTIFIER
+    ::= { juniHttpProfileConformance 1 }
+juniHttpProfileGroups       OBJECT IDENTIFIER
+    ::= { juniHttpProfileConformance 2 }
+
+--
+-- compliance statements
+--
+juniHttpProfileCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Compliance statement for entities which implement the Juniper
+        HTTP Profile MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniHttpProfileGroup }
+    ::= { juniHttpProfileCompliances 1 }                        -- JUNOSe 8.0
+
+--
+-- units of conformance
+--
+juniHttpProfileGroup  OBJECT-GROUP
+    OBJECTS {
+        juniHttpProfileSetMap,
+        juniHttpProfileRedirectUrl }
+    STATUS      current
+    DESCRIPTION
+        "Current collection of objects providing management of profile
+        functionality for per Interface HTTP objects in a Juniper product."
+    ::= { juniHttpProfileGroups 1 }
+
+END

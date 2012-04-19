@@ -1,0 +1,399 @@
+-- ArubaOS 3.2.0.0_16376
+-- vim: set ts=4 sw=4:
+WLSX-SNR-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION,
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+	  monPhyAddress, 
+	  monRadioNumber, 
+	  monitoredStaPhyAddress,
+	  monitoredApBSSID
+			FROM WLSX-MON-MIB
+		wlsxEnterpriseMibModules
+			FROM ARUBA-MIB;
+
+   wlsxSNRMIB MODULE-IDENTITY 
+       LAST-UPDATED "0601221834Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089	
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "
+		   This MIB module defines MIB objects which provide
+           information about the Wireless Management System (WMS) in the 
+		   Aruba controller.
+		   "
+       REVISION        "0601221834Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 7 }
+
+   wlsxSNRGroup     		OBJECT IDENTIFIER ::= { wlsxSNRMIB 1 }
+
+ -- AP SNR Table
+
+   wlsxAPSnrTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxAPSnrEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists SNR information about monitored APs. 
+		"
+      ::= { wlsxSNRGroup 1 } 
+
+   wlsxAPSnrEntry OBJECT-TYPE 
+	  SYNTAX       WlsxAPSnrEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Station Management Entry"
+	  INDEX {monPhyAddress, monRadioNumber, monitoredApBSSID}
+      ::= { wlsxAPSnrTable 1 } 
+
+   WlsxAPSnrEntry ::=
+     SEQUENCE {
+		 apSnrAverageSignalStrength		Integer32,
+		 apSnrSignalPkts					Integer32,
+		 apSnrHighestRxSignalStrength		Integer32,
+		 apSnrLowestRxSignalStrength		Integer32,
+		 apSnrSampleTime					Integer32
+   }
+
+   apSnrAverageSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Total Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxAPSnrEntry 1 }
+
+   apSnrSignalPkts OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Number of Signal Packets observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxAPSnrEntry 2 }
+
+   apSnrHighestRxSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Highest Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxAPSnrEntry 3 }
+
+   apSnrLowestRxSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Lowest Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxAPSnrEntry 4 }
+
+
+   apSnrSampleTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Sample Time in which this data is collected.
+            "
+        ::= { wlsxAPSnrEntry 5 }
+
+ -- Station SNR Table
+
+   wlsxStaSnrTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxStaSnrEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists SNR information about monitored stations. 
+		"
+      ::= { wlsxSNRGroup 2 } 
+
+   wlsxStaSnrEntry OBJECT-TYPE 
+	  SYNTAX       WlsxStaSnrEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Station Management Entry"
+	  INDEX {monPhyAddress, monRadioNumber, monitoredStaPhyAddress}
+      ::= { wlsxStaSnrTable 1 } 
+
+   WlsxStaSnrEntry ::=
+     SEQUENCE {
+		 staSnrAverageSignalStrength		Integer32,
+		 staSnrSignalPkts					Integer32,
+		 staSnrHighestRxSignalStrength		Integer32,
+		 staSnrLowestRxSignalStrength		Integer32,
+		 staSnrSampleTime					Integer32
+   }
+
+   staSnrAverageSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Total Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxStaSnrEntry 1 }
+
+   staSnrSignalPkts OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Number of Signal Packets observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxStaSnrEntry 2 }
+
+   staSnrHighestRxSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Highest Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxStaSnrEntry 3 }
+
+   staSnrLowestRxSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Lowest Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxStaSnrEntry 4 }
+
+
+   staSnrSampleTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Sample Time in which this data is collected.
+            "
+        ::= { wlsxStaSnrEntry 5 }
+
+
+ -- AP SNR Table Ordered by the BSSID
+
+   wlsxAPSnrBSSIDTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxAPSnrBSSIDEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table SNR information about monitored APs. 
+		"
+      ::= { wlsxSNRGroup 3 } 
+
+   wlsxAPSnrBSSIDEntry OBJECT-TYPE 
+	  SYNTAX       WlsxAPSnrBSSIDEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Station Management Entry"
+	  INDEX {monitoredApBSSID, monPhyAddress, monRadioNumber}
+      ::= { wlsxAPSnrBSSIDTable 1 } 
+
+   WlsxAPSnrBSSIDEntry ::=
+     SEQUENCE {
+		 apSnrBSSIDAverageSignalStrength		Integer32,
+		 apSnrBSSIDSignalPkts					Integer32,
+		 apSnrBSSIDHighestRxSignalStrength		Integer32,
+		 apSnrBSSIDLowestRxSignalStrength		Integer32,
+		 apSnrBSSIDSampleTime					Integer32
+   }
+
+   apSnrBSSIDAverageSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Total Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxAPSnrBSSIDEntry 1 }
+
+   apSnrBSSIDSignalPkts OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Number of Signal Packets observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxAPSnrBSSIDEntry 2 }
+
+   apSnrBSSIDHighestRxSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Highest Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxAPSnrBSSIDEntry 3 }
+
+   apSnrBSSIDLowestRxSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Lowest Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxAPSnrBSSIDEntry 4 }
+
+
+   apSnrBSSIDSampleTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Sample Time in which this data is collected.
+            "
+        ::= { wlsxAPSnrBSSIDEntry 5 }
+
+ -- Station SNR Station Phy Table
+
+   wlsxStaSnrPhyTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxStaSnrPhyEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists SNR information about monitored stations. 
+		"
+      ::= { wlsxSNRGroup 4 } 
+
+   wlsxStaSnrPhyEntry OBJECT-TYPE 
+	  SYNTAX       WlsxStaSnrPhyEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Station Management Entry"
+	  INDEX {monitoredStaPhyAddress, monPhyAddress, monRadioNumber}
+      ::= { wlsxStaSnrPhyTable 1 } 
+
+   WlsxStaSnrPhyEntry ::=
+     SEQUENCE {
+		 staSnrPhyAverageSignalStrength		Integer32,
+		 staSnrPhySignalPkts					Integer32,
+		 staSnrPhyHighestRxSignalStrength		Integer32,
+		 staSnrPhyLowestRxSignalStrength		Integer32,
+		 staSnrPhySampleTime					Integer32
+   }
+
+   staSnrPhyAverageSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Total Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxStaSnrPhyEntry 1 }
+
+   staSnrPhySignalPkts OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Number of Signal Packets observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxStaSnrPhyEntry 2 }
+
+   staSnrPhyHighestRxSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Highest Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxStaSnrPhyEntry 3 }
+
+   staSnrPhyLowestRxSignalStrength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Lowest Signal Strength observed by the Monitoring station 
+			during this sample time.
+            "
+        ::= { wlsxStaSnrPhyEntry 4 }
+
+
+   staSnrPhySampleTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Sample Time in which this data is collected.
+            "
+        ::= { wlsxStaSnrPhyEntry 5 }
+END

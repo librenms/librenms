@@ -1,0 +1,461 @@
+
+NAS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      enterprises, Counter, TimeTicks
+         FROM RFC1155-SMI
+      OBJECT-TYPE
+         FROM RFC-1212
+      TRAP-TYPE
+         FROM RFC-1215;
+
+      -- From RFC-1213 (MIB-II)
+      DisplayString ::=
+         OCTET STRING
+
+    storage     OBJECT IDENTIFIER ::= { enterprises 24681 }
+    storageSystem        OBJECT IDENTIFIER ::= { storage 1 }
+
+ -- Frame Relay Multiplexer MIB groups
+ -- system Event
+   SystemEventMsg        OBJECT IDENTIFIER ::= { storageSystem 1 }
+
+ -- system event
+   EventInformMsg OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "Information event of NAS system."
+     ::= { SystemEventMsg 101 }
+
+   EventWarningMsg OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "Warning event of NAS system."
+      ::= { SystemEventMsg 102 }
+
+   EventErrorMsg OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "Error event of NAS system."
+      ::= { SystemEventMsg 103 }
+
+	SystemTraps OBJECT IDENTIFIER ::= { storageSystem  10 }
+	
+	EventInform TRAP-TYPE
+		ENTERPRISE SystemTraps    
+		VARIABLES { EventInformMsg }
+		DESCRIPTION
+			"Info: %s"
+		::=  1
+
+	EventWarning TRAP-TYPE
+		ENTERPRISE SystemTraps    
+		VARIABLES { EventWarningMsg }
+		DESCRIPTION 
+			"Warn: %s"
+		::=  2
+
+	EventError TRAP-TYPE
+		ENTERPRISE SystemTraps
+		VARIABLES { EventErrorMsg }
+		DESCRIPTION 
+			"Error: %s"
+		::=  4
+
+ -- system inform
+	SystemInfo        OBJECT IDENTIFIER ::= { storageSystem 2 }
+
+	SystemCPU-Usage OBJECT-TYPE
+		SYNTAX DisplayString
+    	MAX-ACCESS read-only
+	    STATUS     current
+    	DESCRIPTION
+			"System CPU usage"
+		::= { SystemInfo 1 }
+	SystemTotalMem OBJECT-TYPE
+		SYNTAX DisplayString
+    	MAX-ACCESS read-only
+	    STATUS     current
+    	DESCRIPTION
+			"System total memory"
+		::= { SystemInfo 2 }
+	SystemFreeMem OBJECT-TYPE
+		SYNTAX DisplayString
+    	MAX-ACCESS read-only
+	    STATUS     current
+    	DESCRIPTION
+			"System free memory"
+		::= { SystemInfo 3 }
+	SystemUptime OBJECT-TYPE
+    	SYNTAX     TimeTicks
+    	MAX-ACCESS read-only
+	    STATUS     current
+    	DESCRIPTION
+        	"The amount of time since this host was last
+	        initialized.  Note that this is different from
+    	    sysUpTime in the SNMPv2-MIB [RFC1907] because
+        	sysUpTime is the uptime of the network management
+	        portion of the system."
+    	::= { SystemInfo 4 }
+	CPU-Temperature OBJECT-TYPE
+		SYNTAX DisplayString
+    	MAX-ACCESS read-only
+	    STATUS     current
+    	DESCRIPTION
+			"CPU temperature"
+		::= { SystemInfo 5 }
+	SystemTemperature OBJECT-TYPE
+		SYNTAX DisplayString
+    	MAX-ACCESS read-only
+	    STATUS     current
+    	DESCRIPTION
+			"System temperature"
+		::= { SystemInfo 6 }
+
+IfNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The number of network interfaces (regardless of
+            their current state) present on this system."
+    ::= { SystemInfo 8 }
+SystemIfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IfEntryDef
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A list of interface entries.  The number of
+            entries is given by the value of IfNumber."
+    ::= { SystemInfo 9 }
+IfEntry OBJECT-TYPE
+    SYNTAX  IfEntryDef
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "An interface entry containing objects at the
+            subnetwork layer and below for a particular
+            interface."
+    INDEX   { IfIndex }
+    ::= { SystemIfTable 1 }
+IfEntryDef ::=
+    SEQUENCE {
+        IfIndex
+            INTEGER,
+        IfDescr
+            DisplayString,
+		IfPacketsReceived
+            Counter,
+		IfPacketsSent
+            Counter,
+		IfErrorPackets
+            Counter
+	}
+IfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A unique value for each interface.  Its value
+            ranges between 1 and the value of IfNumber.  The
+            value for each interface must remain constant at
+            least from one re-initialization of the entity's
+            network management system to the next re-
+            initialization."
+    ::= { IfEntry 1 }
+IfDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A textual string containing information about the
+            interface.  This string should include the name of
+            the manufacturer, the product name and the version
+            of the hardware interface."
+    ::= { IfEntry 2 }
+IfPacketsReceived OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "System packets received."
+    ::= { IfEntry 3 }
+IfPacketsSent OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "System packets sent."
+    ::= { IfEntry 4 }
+IfErrorPackets OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "System error packets."
+    ::= { IfEntry 5 }
+
+HdNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The number of hard disk (regardless of
+            their current state) present on this system."
+    ::= { SystemInfo 10 }
+SystemHdTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF HdEntryDef
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A list of interface entries.  The number of
+            entries is given by the value of IfNumber."
+    ::= { SystemInfo 11 }
+HdEntry OBJECT-TYPE
+    SYNTAX  HdEntryDef
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "An interface entry containing objects at the
+            subnetwork layer and below for a particular
+            interface."
+    INDEX   { HdIndex }
+    ::= { SystemHdTable 1 }
+HdEntryDef ::=
+    SEQUENCE {
+        HdIndex
+            INTEGER,
+        HdDescr
+            DisplayString,
+        HdTemperature
+            DisplayString,
+        HdStatus
+            INTEGER,
+	HdModel DisplayString,
+	HdCapacity DisplayString,
+	HdSmartInfo DisplayString
+	}
+HdIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A unique value for each hard disk.  Its value
+            ranges between 1 and the value of IfNumber.  The
+            value for each interface must remain constant at
+            least from one re-initialization of the entity's
+            network management system to the next re-
+            initialization."
+    ::= { HdEntry 1 }
+HdDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A textual string containing information about the
+            interface.  This string should include the name of
+            the manufacturer, the product name and the version
+            of the hardware interface."
+    ::= { HdEntry 2 }
+HdTemperature OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Hard disk temperature."
+    ::= { HdEntry 3 }
+HdStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+	ready(0),
+	noDisk(-5),
+	invalid(-6),
+	rwError(-9),
+	unknown(-4)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "HDD status. 0:not availible, 1:availible."
+    ::= { HdEntry 4 }
+HdModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Hard disk model."
+    ::= { HdEntry 5 }
+HdCapacity OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Hard disk capacity."
+    ::= { HdEntry 6 }
+HdSmartInfo OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Hard disk SMART information."
+    ::= { HdEntry 7 }
+
+	ModelName OBJECT-TYPE
+		SYNTAX DisplayString
+    	MAX-ACCESS read-only
+	    STATUS     current
+    	DESCRIPTION
+			"Model name"
+		::= { SystemInfo 12 }
+	HostName OBJECT-TYPE
+		SYNTAX DisplayString
+    	MAX-ACCESS read-only
+	    STATUS     current
+    	DESCRIPTION
+			"Model name"
+		::= { SystemInfo 13 }
+
+SysFanNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The number of system fan (regardless of
+            their current state) present on this system."
+    ::= { SystemInfo 14 }
+SystemFanTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SysFanEntryDef
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A list of interface entries.  The number of
+            entries is given by the value of SysFanNumber."
+    ::= { SystemInfo 15 }
+SysFanEntry OBJECT-TYPE
+    SYNTAX  SysFanEntryDef
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "An system fan entry containing objects at the
+            subnetwork layer and below for a particular
+            interface."
+    INDEX   { SysFanIndex }
+    ::= { SystemFanTable 1 }
+SysFanEntryDef ::=
+    SEQUENCE {
+        SysFanIndex
+            INTEGER,
+        SysFanDescr
+            DisplayString,
+		SysFanSpeed
+            DisplayString
+	}
+SysFanIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A unique value for each system fan. Its value
+            ranges between 1 and the value of SysFanNumber.  The
+            value for each interface must remain constant at
+            least from one re-initialization of the entity's
+            network management system to the next re-
+            initialization."
+    ::= { SysFanEntry 1 }
+SysFanDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A textual string containing information about the
+            interface.  This string should include the name of
+            the manufacturer, the product name and the version
+            of the hardware interface."
+    ::= { SysFanEntry 2 }
+SysFanSpeed OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "System fan speed."
+    ::= { SysFanEntry 3 }
+
+SysVolumeNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The number of system volumes (regardless of
+            their current state) present on this system."
+    ::= { SystemInfo 16 }
+SystemVolumeTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SysVolumeEntryDef
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A list of volume entries.  The number of
+            entries is given by the value of SysVolumeNumber."
+    ::= { SystemInfo 17 }
+SysVolumeEntry OBJECT-TYPE
+    SYNTAX  SysVolumeEntryDef
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "An system volume entry"
+    INDEX   { SysVolumeIndex }
+    ::= { SystemVolumeTable 1 }
+SysVolumeEntryDef ::=
+    SEQUENCE {
+        SysVolumeIndex	INTEGER,
+        SysVolumeDescr	DisplayString,
+	SysVolumeFS	DisplayString,
+	SysVolumeTotalSize	DisplayString,
+	SysVolumeFreeSize	DisplayString,
+	SysVolumeStatus	DisplayString
+	}
+SysVolumeIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A unique value for each system volume. Its value
+            ranges between 1 and the value of SysVolumeNumber.  The
+            value for each volume must remain constant at
+            least from one re-initialization of the entity's
+            volume system to the next re-initialization."
+    ::= { SysVolumeEntry 1 }
+SysVolumeDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION	"A textual string containing information about the volume."
+    ::= { SysVolumeEntry 2 }
+SysVolumeFS OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION	"System Volume file system."
+    ::= { SysVolumeEntry 3 }
+SysVolumeTotalSize OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION	"System Volume total size."
+    ::= { SysVolumeEntry 4 }
+SysVolumeFreeSize OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION	"System Volume free size."
+    ::= { SysVolumeEntry 5 }
+SysVolumeStatus OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION	"System Volume status."
+    ::= { SysVolumeEntry 6 }
+
+END
+

@@ -1,0 +1,4549 @@
+
+-- *****************************************************************************
+-- Juniper-PPP-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   PPP MIB
+--
+-- Copyright (c) 1998, 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2007 Juniper Networks, Inc.
+-- Copyright (c) 2008 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-PPP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, IpAddress, TimeTicks
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex, InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    Ipv6AddressIfIdentifier
+        FROM IPV6-TC
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable, JuniNextIfIndex, JuniName, JuniNibbleConfig
+        FROM Juniper-TC;
+
+juniPppMIB  MODULE-IDENTITY
+    LAST-UPDATED "200909180724Z"  -- 18-Sep-09 03:24 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    
+    DESCRIPTION
+        "The Point-to-Point Protocol (PPP) MIB for the Juniper enterprise."
+    -- Revision History  
+    REVISION    "200909180724Z"  -- 18-Sep-09 03:24 AM EDT  - JUNOSe 11.1
+    DESCRIPTION
+		"Added new multiclass multilink objects. Added new traffic class 
+		mapping for multiclasses."
+    REVISION    "200908101423Z"  -- 10-Aug-09 07:53 PM EST  - JUNOSe 11.0
+    DESCRIPTION
+        "Added new variables for prompting IPCP DNS options and IPCP 
+         lockout options."
+
+    REVISION    "200808271120Z"  -- 08-Sep-08 04:50 PM EST  - JUNOSe 10.1
+    DESCRIPTION
+        "Added new variables for configuring Maximum negotiation attempts
+         allowed for any client in LCP , IPCP and IPv6CP config. Also
+         added statistics for lcp, ip and ipv6 for renegotiation attempts
+         terminated due to exceeding the configured attempts. RLI 4138."
+    REVISION    "200707121215Z"  -- 12-Jul-07 08:15 AM EDT  - JUNOSe 7.3
+    DESCRIPTION
+        "Added new ignore magic number mismatch element.
+         Added new authentication elements to use JuniNibbleConfig."
+    REVISION    "200510191626Z"  -- 19-Oct-05 12:26 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+	"Added new object to the multi-link group." 
+    REVISION    "200410052217Z"  -- 05-Oct-04 06:17 PM EDT -  JUNOSe 6.2
+    DESCRIPTION
+        "Added support for short keepalives in juniPppLinkConfigKeepalive."
+    REVISION    "200410012141Z"  -- 01-Oct-04 05:41 PM EDT -  JUNOSe 6.0
+    DESCRIPTION
+        "Updated the juniPppSummary table"
+    REVISION    "200408251212Z"  -- 25-Aug-04 08:12 AM EDT -  JUNOSe 5.3
+    DESCRIPTION
+        "Added new objects to the multi-link group."
+    REVISION    "200408251212Z"  -- 25-Aug-04 08:12 AM EDT -  JUNOSe 5.2 
+    DESCRIPTION
+        "Increased max keepalive timer."
+    REVISION    "200408251212Z"  -- 25-Aug-04 08:12 AM EDT -  JUNOSe 5.1
+    DESCRIPTION
+        "Added IPv6 support."
+    REVISION    "200408251212Z"  -- 25-Aug-04 08:12 AM EDT -  JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added new objects to the multi-link group.
+         Reduced min keepalive timer."
+    REVISION    "200208302036Z"  -- 30-Aug-02 04:36 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added new objects to the link and multi-link groups."
+    REVISION    "200205092031Z"  -- 09-May-02 04:31 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Added new objects to the IP, LCP and multi-link groups."
+    REVISION    "200112122147Z"  -- 12-Dec-01 04:47 PM EST  - JUNOSe 3.3
+    DESCRIPTION
+        "Revised the conformance statements."
+    REVISION    "200010091610Z"  --  9-Oct-00 12:10 PM EDT  - JUNOSe 2.4
+    DESCRIPTION
+        "Added juniPppLinkConfigStandardIfIndex object for cross referencing
+        with standard PPP MIBs."
+    REVISION    "200002151200Z"  -- 15-Feb-00               - JUNOSe 2.0
+    DESCRIPTION
+        "Added juniPppLinkStatusTunnelIfIndex, Multi-Link PPP support, and PPP
+        Interface Summary counts.
+        Modified Terminate reasons to include tunnel-related events."
+    REVISION    "9907010000Z"    --  1-Jul-99               - JUNOSe 1.1
+    DESCRIPTION
+        "Additional objects added to support remote access capabilities,
+        including termination reason, authentication protocol, option
+        negotiation status."
+    REVISION    "9811130000Z"    -- 13-Nov-98               - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 11 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniPppAuthentication ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+        "Specifies the type(s) of PPP authentication used, if any:
+          none      No authentication is negotiated.
+          pap       PAP negotiation only.
+          chap      CHAP negotiation only.
+          papChap   PAP negotiation is attempted first; if fails, attempt CHAP.
+          chapPap   CHAP negotiation is attempted first; if fails, attempt PAP."
+    SYNTAX      INTEGER {
+                    none(0),
+                    pap(1),
+                    chap(2),
+                    papChap(3),
+                    chapPap(4) }
+
+JuniPppAuthentication2 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type(s) of PPP authentication used, if any:
+          none      No authentication is negotiated.
+          pap       PAP negotiation.
+          chap      CHAP negotiation.
+          eap       EAP negotiation." 
+
+    SYNTAX      INTEGER {
+                    none(0),
+                    pap(1),
+                    chap(2),
+                    eap(3) }
+
+JuniPppMlPppBundleName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "MLPPP Bundle name.  The bundle name is a characteristic of a MLPPP
+        network interface."
+    SYNTAX OCTET STRING (SIZE(0..32))
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPppObjects     OBJECT IDENTIFIER ::= { juniPppMIB 1 }
+
+--
+-- This MIB contains managed objects for PPP interfaces.
+-- Management objects are provided to query for an available
+-- interface index, and to create/delete interfaces of this type.
+-- Creating/deleting this interface type using this MIB has
+-- the side effect of creating/deleting corresponding entries
+-- in the Interface MIB ifTable/ifXTable, and in the Juniper
+-- Enterprise Interface MIB juniIfTable.
+--
+-- This MIB acts as a supplement to IETF MIBs RFC1471 PPP-LCP-MIB
+-- and RFC1473 PPP-IP-NCP-MIB.
+--
+
+--
+-- MIB object definitions are organized into the following
+-- functional sections:
+--
+juniPppLcp        OBJECT IDENTIFIER   ::= { juniPppObjects 1 }
+juniPppSec        OBJECT IDENTIFIER   ::= { juniPppObjects 2 }     -- reserved
+juniPppIp         OBJECT IDENTIFIER   ::= { juniPppObjects 3 }
+juniPppOsi        OBJECT IDENTIFIER   ::= { juniPppObjects 4 }
+juniPppSession    OBJECT IDENTIFIER   ::= { juniPppObjects 5 }
+juniPppMlPpp      OBJECT IDENTIFIER   ::= { juniPppObjects 6 }
+juniPppSummary    OBJECT IDENTIFIER   ::= { juniPppObjects 7 }
+juniPppIpv6       OBJECT IDENTIFIER   ::= { juniPppObjects 8 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPP LCP
+--
+-- This section defines objects used to manage the PPP Link / LCP
+-- layer of PPP.
+--
+-- The juniPppLinkStatusTable complements RFC1471 pppLinkStatusTable,
+-- providing status indications regarding the operation
+-- of network protocols over each link. The addition/removal of a
+-- network protocol service is accomplished outside this MIB.
+--
+-- The juniPppLinkConfigTable complements RFC1471 pppLinkConfigTable,
+-- providing the ability to create/delete instances of PPP links
+-- and providing for configuration of option parameter values (if any)
+-- not found in the standard MIB, to be used during LCP negotiation.
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- The PPP Link Status Table
+--
+juniPppLinkStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppLinkStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for PPP interfaces present in the system."
+    ::= { juniPppLcp 1 }
+
+juniPppLinkStatusEntry OBJECT-TYPE
+    SYNTAX      JuniPppLinkStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a PPP interface."
+    INDEX     { ifIndex }
+    ::= { juniPppLinkStatusTable 1 }
+
+JuniPppLinkStatusEntry ::= SEQUENCE {
+    juniPppLinkStatusTerminateReason         INTEGER,
+    juniPppLinkStatusTerminateNegFailOption  INTEGER,
+    juniPppLinkStatusInKeepaliveRequests     Counter32,
+    juniPppLinkStatusOutKeepaliveRequests    Counter32,
+    juniPppLinkStatusInKeepaliveReplies      Counter32,
+    juniPppLinkStatusOutKeepaliveReplies     Counter32,
+    juniPppLinkStatusKeepaliveFailures       Counter32,
+    juniPppLinkStatusLocalMagicNumber        Integer32,
+    juniPppLinkStatusRemoteMagicNumber       Integer32,
+    juniPppLinkStatusLocalAuthentication     JuniPppAuthentication2,
+    juniPppLinkStatusTunnelIfIndex           InterfaceIndexOrZero,
+    juniPppLinkStatuslcpRenegoTerminates     Counter32}
+
+juniPppLinkStatusTerminateReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    adminDisable(2),
+                    lowerLayerDown(3),
+                    noUpperInterface(4),
+                    authenticationFailure(5),
+                    peerTerminated(6),
+                    peerRenegotiated(7),
+                    maxRetriesExceeded(8),
+                    negotiationFailure(9),
+                    keepaliveFailure(10),
+                    sessionTimeout(11),
+                    inactivityTimeout(12),
+                    addressLeaseExpired(13),
+                    adminLogout(14),
+                    tunnelFailed(15),
+                    tunnelDisconnected(16),
+                    loopback(17) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason the PPP link was terminated:
+            none                    None.
+            other                   Not specified.
+            adminDisable            Interface administratively disabled.
+            lowerLayerDown          Underlying interface is down.
+            noUpperInterface        No interface above PPP.
+            authenticationFailure   Authentication failed.
+            peerTerminated          Peer initiated termination.
+            peerRenegotiated        Peer initiated renegotiation.
+            maxRetriesExceeded      Maximum number of config retries exceeded.
+            negotiationFailure      Failed to negotiate LCP option.  See
+                                    juniPppLinkStatusTerminateNegFailOption.
+            keepaliveFailure        Keepalive failed.
+            sessionTimeout          Maximum session period expired.
+            inactivityTimeout       Maximum inactivity period expired.
+            addressLeaseExpired     Lease for network address expired.
+            adminLogout             Session administratively terminated.
+            tunnelFailed            Associated tunnel failed.
+            tunnelDisconnected      Associated tunnel disconnected.
+            loopback                Loopback detected."
+    ::= { juniPppLinkStatusEntry 1 }
+
+juniPppLinkStatusTerminateNegFailOption OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    localMru(2),
+                    remoteMru(3),
+                    localMagicNumber(4),
+                    remoteMagicNumber(5),
+                    localAuthentication(6),
+                    localToRemoteProtocolCompression(7),
+                    localToRemoteACCompression(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the PPP LCP option for which negotiation failed, when
+        juniPppLinkStatusTerminateReason has the value 'negotiationFailure'."
+    ::= { juniPppLinkStatusEntry 2 }
+
+juniPppLinkStatusInKeepaliveRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of keepalive requests received."
+    ::= { juniPppLinkStatusEntry 3 }
+
+juniPppLinkStatusOutKeepaliveRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of keepalive requests transmitted."
+    ::= { juniPppLinkStatusEntry 4 }
+
+juniPppLinkStatusInKeepaliveReplies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of keepalive replies received."
+    ::= { juniPppLinkStatusEntry 5 }
+
+juniPppLinkStatusOutKeepaliveReplies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of keepalive replies transmitted."
+    ::= { juniPppLinkStatusEntry 6 }
+
+juniPppLinkStatusKeepaliveFailures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of keepalive failures detected."
+    ::= { juniPppLinkStatusEntry 7 }
+
+juniPppLinkStatusLocalMagicNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Magic number negotiated for the local side."
+    ::= { juniPppLinkStatusEntry 8 }
+
+juniPppLinkStatusRemoteMagicNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Magic number negotiated for the remote side."
+    ::= { juniPppLinkStatusEntry 9 }
+
+juniPppLinkStatusLocalAuthentication OBJECT-TYPE
+    SYNTAX      JuniPppAuthentication2
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Authentication protocol negotiated for the local side."
+    ::= { juniPppLinkStatusEntry 10 }
+
+juniPppLinkStatusTunnelIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an associated interface pertaining to a tunneling
+        protocol, or zero if no such interface exists.
+
+        The type of tunneling interface can be identified from information in
+        the entries in ifTable and juniIfTable for this tunnel interface."
+    ::= { juniPppLinkStatusEntry 11 }
+
+juniPppLinkStatuslcpRenegoTerminates OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times lcp terminated due to peer exceeding max renegotiation
+        attempts."
+    ::= { juniPppLinkStatusEntry 12 }
+
+--
+-- The PPP Link Configuration Table
+--
+juniPppLinkConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppLinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for PPP interfaces present in the system."
+    ::= { juniPppLcp 2 }
+
+juniPppLinkConfigEntry OBJECT-TYPE
+    SYNTAX      JuniPppLinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a PPP interface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniPppLinkConfigIfIndex }
+    ::= { juniPppLinkConfigTable 1 }
+
+JuniPppLinkConfigEntry ::= SEQUENCE {
+    juniPppLinkConfigIfIndex                    InterfaceIndex,
+    juniPppLinkConfigRowStatus                  RowStatus,
+    juniPppLinkConfigLowerIfIndex               InterfaceIndexOrZero,
+    juniPppLinkConfigKeepalive                  Integer32,
+    juniPppLinkConfigAuthentication             JuniPppAuthentication,
+    juniPppLinkConfigMaxAuthenRetries           Integer32,
+    juniPppLinkConfigStandardIfIndex            InterfaceIndex,
+    juniPppLinkConfigChapMinChallengeLength     Integer32,
+    juniPppLinkConfigChapMaxChallengeLength     Integer32,
+    juniPppLinkConfigPassiveMode                JuniEnable,
+    juniPppLinkConfigAuthenticatorVirtualRouter JuniName,
+    juniPppLinkConfigAaaProfile                 JuniName,
+    juniPppLinkConfigAuthentication2            JuniNibbleConfig,
+    juniPppLinkConfigIgnoreMagicNumberMismatch  JuniEnable,
+    juniPppLinkConfigMaxLcpRenegotiation        Integer32}
+
+juniPppLinkConfigIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the PPP interface.  When creating entries in this table,
+        suitable values for this object are determined by reading
+        juniPppNextIfIndex."
+    ::= { juniPppLinkConfigEntry 1 }
+
+juniPppLinkConfigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniPppLinkConfigRowStatus
+            juniPppLinkConfigLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniPppLinkConfigIndex must have been determined
+            previously, by reading juniPppNextIfIndex.
+
+            The interface identified by juniPppLinkConfigLowerIfIndex must
+            exist.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniPppLinkConfigEntry 2 }
+
+juniPppLinkConfigLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an interface over which this PPP interface is to be
+        layered.  A value of zero indicates no layering.  An implementation may
+        choose to require that a non-zero value be configured at entry
+        creation."
+    ::= { juniPppLinkConfigEntry 3 }
+
+juniPppLinkConfigKeepalive OBJECT-TYPE
+    SYNTAX      Integer32 (0..64800)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Keepalive interval in seconds.  A value of zero disables keepalive.
+        Keepalive is performed using LCP Echo."
+    DEFVAL    { 30 }
+    ::= { juniPppLinkConfigEntry 4 }
+
+juniPppLinkConfigAuthentication OBJECT-TYPE
+    SYNTAX      JuniPppAuthentication
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Specifies the type(s) of authentication, if any, to be negotiated with
+        the peer:
+          none      No authentication is negotiated.
+          pap       PAP negotiation only.
+          chap      CHAP negotiation only.
+          papChap   PAP negotiation is attempted first; if fails, attempt CHAP.
+          chapPap   CHAP negotiation is attempted first; if fails, attempt PAP.
+
+        If authentication negotiation is not supported for this PPP interface,
+        then any attempt to explicitely set this object will result in a
+        notWritable error and it will be implicitily set to the DEFVAL on row
+        creation.
+
+        Setting this object to none(0) will set
+        juniPppLinkConfigAuthenticatorVirtualRouter object to an empty string.
+
+        This object returns a null(0) value on the get operation. New object
+        juniPppLinkConfigAuthentication2 will reflect the configured values.
+
+        Setting this object along with the juniPppLinkConfigAuthentication2 object
+        will return an inconsistentValue error."
+    DEFVAL    { none }
+    ::= { juniPppLinkConfigEntry 5 }
+
+juniPppLinkConfigMaxAuthenRetries OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of authentication retries permitted, in addition to a failed
+        initial attempt.  If all retries fail, the link is reset.
+
+        If authentication negotiation is not supported for this PPP interface,
+        then any attempt to explicitely set this object will result in a
+        notWritable error and it will be implicitily set to the DEFVAL on row
+        creation."
+    DEFVAL    { 0 }
+    ::= { juniPppLinkConfigEntry 6 }
+
+juniPppLinkConfigStandardIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value for this interface in the standard PPP MIBs.  The
+        ifIndex value for PPP interfaces is not the same for both proprietary
+        and standard MIB tables pertaining to PPP interface.  Therefore this
+        value is provide to simply cross referencing standard PPP and
+        proprietary PPP MIB information."
+    ::= { juniPppLinkConfigEntry 7 }
+
+juniPppLinkConfigChapMinChallengeLength OBJECT-TYPE
+    SYNTAX      Integer32 (8..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Minimum value of the CHAP authenticator challenge length value.  This
+        value is never allowed to be set to a value greater than
+        juniPppLinkConfigChapMaxChallengeLength."
+    DEFVAL    { 16 }
+    ::= { juniPppLinkConfigEntry 8 }
+
+juniPppLinkConfigChapMaxChallengeLength OBJECT-TYPE
+    SYNTAX      Integer32 (8..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maximum value of the CHAP authenticator challenge length value. This
+        value is never allowed to be set to a value less than
+        juniPppLinkConfigChapMinChallengeLength."
+    DEFVAL    { 32 }
+    ::= { juniPppLinkConfigEntry 9 }
+
+juniPppLinkConfigPassiveMode OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When enabled, LCP state machine is forced into passive mode on lower
+        layer UP message.  It adds compatibility with slow and buggy clients."
+    DEFVAL    { disable }
+    ::= { juniPppLinkConfigEntry 10 }
+
+juniPppLinkConfigAuthenticatorVirtualRouter OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the virtual router (Juniper-ROUTER-MIB.juniRouterName) to
+        be used for authentication on the PPP interface.  Setting this object
+        statically binds the authenticating virtual router with the PPP
+        interface.  If this object is not explicitly set or it is set to null
+        string, then this object is ignored and the virtual router used for
+        authentication is determined by other means.  On a Set operation, if the
+        value of this object is not null and does not correspond to an existing
+        virtual router, then an inconsistentValue error is returned.
+
+        Setting this object to a non-null string returns inconsistentValue error
+        if juniPppLinkConfigAuthentication object is none(0) or not configured."
+    ::= { juniPppLinkConfigEntry 11 }
+
+juniPppLinkConfigAaaProfile OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the AAA profile to be used for authentication on the PPP
+        interface.  Setting this object statically binds the AAA profile with
+        the PPP interface.  If this object is not explicitly set or it is set to
+        null string, then this object is ignored.  On a Set operation, if the
+        value of this object is not null and does not correspond to an existing
+        AAA profile, then an inconsistentValue error is returned."
+    ::= { juniPppLinkConfigEntry 12 }
+
+juniPppLinkConfigAuthentication2 OBJECT-TYPE
+    SYNTAX      JuniNibbleConfig
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A configuration variable comprised of nibbles i.e. 4 bits, such that 
+         a client can supply a list of 0 to 8 selections.  The least 
+         significant nibble is the first value of the list, and the most 
+         significant nibble is the last value.  The value in each field 
+         ranges from 0 to 15, however the first nibble with value 0 indicates
+         the end of the list.  Repetition of values is not allowed. 
+         Segregation of values is not allowed.
+
+         Valid Values are:
+         none - 0
+         pap  - 1
+         chap - 2
+         eap  - 3
+
+         Example valid encoding:
+         0x00000321
+         0x00000012
+
+         Not a valid encoding:
+         0x00000121
+         0x01002001
+
+         If authentication negotiation is not supported for this PPP interface,
+         then any attempt to explicitly set this object will result in a
+         notWritable error and it will be implicitly set to the DEFVAL on row
+         creation.
+
+         Setting this object to null will set
+         juniPppLinkConfigAuthenticatorVirtualRouter object to an empty string.
+
+         Setting this object along with the juniPppLinkConfigAuthentication object
+         will return an inconsistentValue error."
+    DEFVAL    { 0 }
+    ::= { juniPppLinkConfigEntry 13 }
+    
+juniPppLinkConfigIgnoreMagicNumberMismatch OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ignore magic number mismatch option of the PPP interface 
+        determines the action to be taken, when the peer has not negotiated 
+        any value yet sent null or invalid magic number in the LCP echo 
+        packets. The two actions that can be configured are:
+            1)	Ignore the mismatch and retain connection
+            2)	Disallow the mismatch and terminate connection"
+    DEFVAL    { disable }
+    ::= { juniPppLinkConfigEntry 14 }
+
+juniPppLinkConfigMaxLcpRenegotiation OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of allowed lcp renegotiation attempts from peer."
+    DEFVAL    { 30 }
+    ::= { juniPppLinkConfigEntry 15 }
+
+
+--
+-- IfIndex selection for creating new PPP interfaces in juniPppLinkConfigTable.
+--
+-- NOTE: This object is placed after juniPppLinkConfigTable so
+-- that juniPppLinkStatusTable and juniPppLinkConfigTable have the
+-- same relative MIB node positions below the juniPppLcp node
+-- (juniPppLcp.1 and juniPppLcp.2, respectively) as their counterpart
+-- Status and Config tables in RFC1471.
+--
+juniPppNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in the
+        juniPppLinkConfigTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniPppLcp 3 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPP Security
+--
+-- This section defines objects used to manage the PPP Security
+-- functionality of PPP.
+--
+-- /////////////////////////////////////////////////////////////////////////////
+
+-- No objects are currently defined.
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPP IP NCP
+--
+-- This section defines objects used to manage the PPP Network
+-- Control Protocol for IP protocol operation (IPCP).
+--
+-- /////////////////////////////////////////////////////////////////////////////
+
+--
+-- The PPP IP Table
+--
+juniPppIpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing the IP parameters for the local PPP entity."
+    ::= { juniPppIp 1 }
+
+juniPppIpEntry OBJECT-TYPE
+    SYNTAX      JuniPppIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPCP status information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { juniPppIpTable 1 }
+
+JuniPppIpEntry ::= SEQUENCE {
+    juniPppIpServiceStatus                      JuniEnable,
+    juniPppIpTerminateReason                    INTEGER,
+    juniPppIpTerminateNegFailOption             INTEGER,
+    juniPppIpLocalIpAddress                     IpAddress,
+    juniPppIpRemoteIpAddress                    IpAddress,
+    juniPppIpRemotePrimaryDnsAddress            IpAddress,
+    juniPppIpRemoteSecondaryDnsAddress          IpAddress,
+    juniPppIpRemotePrimaryWinsAddress           IpAddress,
+    juniPppIpRemoteSecondaryWinsAddress         IpAddress,
+    juniPppIpNetworkStatusIpcpRenegoTerminates  Counter32}
+
+juniPppIpServiceStatus OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether IP protocol service is operating over this PPP link.
+        Service is established on this link through means outside this MIB."
+    ::= { juniPppIpEntry 1 }
+
+juniPppIpTerminateReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    noService(2),
+                    admin(3),
+                    linkDown(4),
+                    peerTerminated(5),
+                    peerRenegotiated(6),
+                    maxRetriesExceeded(7),
+                    negotiationFailure(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason the IPCP link was terminated:
+            none                    None.
+            other                   Not specified.
+            noService               No IP service configured on this PPP link.
+            admin                   Administratively disabled.
+            linkDown                Underlying link is down.
+            peerTerminated          Peer initiated termination.
+            peerRenegotiated        Peer initiated renegotiation.
+            maxRetriesExceeded      Maximum number of config retries exceeded.
+            negotiationFailure      Failed to negotiate IPCP option.  See
+                                    juniPppIpTerminateNegFailOption."
+    ::= { juniPppIpEntry 2 }
+
+juniPppIpTerminateNegFailOption OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    localIpAddress(2),
+                    remoteIpAddress(3),
+                    remotePrimaryDnsAddress(4),
+                    remoteSecondaryDnsAddress(5),
+                    remotePrimaryWinsAddress(6),
+                    remoteSecondaryWinsAddress(7),
+                    localIpAddressMask(8),
+                    remoteIpAddressMask(9) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the PPP IPCP option for which negotiation failed, when
+        juniPppIpTerminateReason has the value 'negotiationFailure'."
+    ::= { juniPppIpEntry 3 }
+
+juniPppIpLocalIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP Address used by the local side."
+    ::= { juniPppIpEntry 4 }
+
+juniPppIpRemoteIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP Address used by the remote side."
+    ::= { juniPppIpEntry 5 }
+
+juniPppIpRemotePrimaryDnsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Primary DNS server used by the remote side."
+    ::= { juniPppIpEntry 6 }
+
+juniPppIpRemoteSecondaryDnsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Secondary DNS server used by the remote side."
+    ::= { juniPppIpEntry 7 }
+
+juniPppIpRemotePrimaryWinsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Primary WINS server used by the remote side."
+    ::= { juniPppIpEntry 8 }
+
+juniPppIpRemoteSecondaryWinsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Secondary WINS server used by the remote side."
+    ::= { juniPppIpEntry 9 }
+
+juniPppIpNetworkStatusIpcpRenegoTerminates OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times ipcp terminated due to peer exceeding max
+        renegotiation attempts."
+    ::= { juniPppIpEntry 10 }
+
+--
+-- The PPP IP Config Table
+--
+juniPppIpConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppIpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing the IP parameters for the local PPP entity."
+    ::= { juniPppIp 2 }
+
+juniPppIpConfigEntry OBJECT-TYPE
+    SYNTAX      JuniPppIpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPCP configuration information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { juniPppIpConfigTable 1 }
+
+JuniPppIpConfigEntry ::= SEQUENCE {
+    juniPppIpConfigPeerDnsPriority      JuniEnable,
+    juniPppIpConfigPeerWinsPriority     JuniEnable,
+    juniPppIpConfigIpcpNetmask          JuniEnable,
+    juniPppIpConfigInitiateIp           JuniEnable,
+    juniPppIpConfigMaxIpcpRenegotiation Integer32,
+    juniPppIpConfigPromptIpcpDnsOption  JuniEnable,
+    juniPppIpConfigIpcpLockout          JuniEnable}
+
+juniPppIpConfigPeerDnsPriority OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, allows peer's DNS address to prevail in the event of a
+        negotiation conflict; when disabled, the local PPP interface's DNS
+        address prevails."
+    ::= { juniPppIpConfigEntry 1 }
+
+juniPppIpConfigPeerWinsPriority OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, allows peer's WINS address to prevail in the event of a
+        negotiation conflict; when disabled, the local PPP interface's WINS
+        address prevails."
+    ::= { juniPppIpConfigEntry 2 }
+
+juniPppIpConfigIpcpNetmask OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables the negotiation of the IPCP option netmask (0x90) during IPCP
+        negotiation."
+    DEFVAL    { disable }
+    ::= { juniPppIpConfigEntry 3 }
+
+juniPppIpConfigInitiateIp OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables the initiation of negotiation of the IPCP."
+    DEFVAL    { disable }
+    ::= { juniPppIpConfigEntry 4 }
+
+juniPppIpConfigMaxIpcpRenegotiation OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of allowed ipcp renegotiation attempts from peer."
+    DEFVAL    { 30 }
+    ::= { juniPppIpConfigEntry 5 }
+
+juniPppIpConfigPromptIpcpDnsOption OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control prompting of IPCP DNS option to remote peer."
+    DEFVAL    { disable }
+    ::= { juniPppIpConfigEntry 6 }
+
+juniPppIpConfigIpcpLockout OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables IPCP lockout. It determines whether this NCP can be negotiated
+         when the interface is already running a different NCP. On enabling this
+         option, the IPCP negotiation will be blocked after a different NCP
+         service is up and waited for 10 seconds for IPCP initiation from peer."
+    DEFVAL    { disable }
+    ::= { juniPppIpConfigEntry 7 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPP OSI NCP
+--
+-- This section defines objects used to manage the PPP Network
+-- Control Protocol for OSI protocol operation (OSICP).
+--
+-- The IETF does not define a standard MIB for managing an OSI NCP.
+-- For consistency, this MIB follows the model of RFC1473 for IP NCP:
+-- A status table reports the condition of the NCP state machine, and
+-- the outcome of option parameter negotiation (if any) when the
+-- OperStatus object has the value 'opened(1)'; a configuration table
+-- provides administrative control over the NCP state machine, and
+-- permits configuration of proposed option parameter values (if any)
+-- to be used during NCP negotiation.
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPP OSI Status Table
+--
+juniPppOsiTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppOsiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing the OSI parameters for the local PPP entity."
+    ::= { juniPppOsi 1 }
+
+juniPppOsiEntry OBJECT-TYPE
+    SYNTAX      JuniPppOsiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "OSICP status information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { juniPppOsiTable 1 }
+
+JuniPppOsiEntry ::= SEQUENCE {
+    juniPppOsiServiceStatus          JuniEnable,
+    juniPppOsiOperStatus             INTEGER,
+    juniPppOsiTerminateReason        INTEGER,
+    juniPppOsiTerminateNegFailOption INTEGER,
+    juniPppOsiLocalAlignNpdu         INTEGER,
+    juniPppOsiRemoteAlignNpdu        INTEGER }
+
+juniPppOsiServiceStatus OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether OSI protocol service is operating over this PPP link.
+        Service is established on this link through means outside this MIB."
+    ::= { juniPppOsiEntry 1 }
+
+juniPppOsiOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    opened(1),
+                    notOpened(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational status of the OSI network protocol.  If the value of
+        this object is up then the finite state machine for the OSI network
+        protocol has reached the Opened state."
+    ::= { juniPppOsiEntry 2 }
+
+juniPppOsiTerminateReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    noService(2),
+                    admin(3),
+                    linkDown(4),
+                    peerTerminated(5),
+                    peerRenegotiated(6),
+                    maxRetriesExceeded(7),
+                    negotiationFailure(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason the OSICP link was terminated:
+            none                    None.
+            other                   Not specified.
+            noService               No OSI service configured on this PPP link.
+            admin                   Administratively disabled.
+            linkDown                Underlying link is down.
+            peerTerminated          Peer initiated termination.
+            peerRenegotiated        Peer initiated renegotiation.
+            maxRetriesExceeded      Maximum number of config retries exceeded.
+            negotiationFailure      Failed to negotiate IPCP option.  See
+                                    juniPppOsiTerminateNegFailOption."
+    ::= { juniPppOsiEntry 3 }
+
+juniPppOsiTerminateNegFailOption OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    localAlignNpdu(2),
+                    remoteAlignNpdu(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the PPP OSICP option for which negotiation failed, when
+        juniPppOsiTerminateReason has the value 'negotiationFailure'."
+    ::= { juniPppOsiEntry 4 }
+
+juniPppOsiLocalAlignNpdu OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    oneModulo4(1),
+                    twoModulo4(2),
+                    threeModulo4(3),
+                    fourModulo4(4),
+                    even(254),
+                    odd(255) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Local alignment of network PDU:
+            none            No alignment specified.
+            oneModulo4      Alignment on first octet (out of four).
+            twoModulo4      Alignment on second octet (out of four).
+            threeModulo4    Alignment on third octet (out of four).
+            fourModulo4     Alignment on fourth octet (out of four).
+            even            Alignment on even-octet boundary.
+            odd             Alignment on odd-octet boundary."
+    ::= { juniPppOsiEntry 5 }
+
+juniPppOsiRemoteAlignNpdu OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    oneModulo4(1),
+                    twoModulo4(2),
+                    threeModulo4(3),
+                    fourModulo4(4),
+                    even(254),
+                    odd(255) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote alignment of network PDU.
+            none            No alignment specified.
+            oneModulo4      Alignment on first octet (out of four).
+            twoModulo4      Alignment on second octet (out of four).
+            threeModulo4    Alignment on third octet (out of four).
+            fourModulo4     Alignment on fourth octet (out of four).
+            even            Alignment on even-octet boundary.
+            odd             Alignment on odd-octet boundary."
+    ::= { juniPppOsiEntry 6 }
+
+
+--
+-- The PPP OSI Configuration Table
+--
+juniPppOsiConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppOsiConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing configuration variables for the OSICP for the local
+        PPP entity."
+    ::= { juniPppOsi 2 }
+
+juniPppOsiConfigEntry   OBJECT-TYPE
+    SYNTAX      JuniPppOsiConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "OSICP information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { juniPppOsiConfigTable 1 }
+
+JuniPppOsiConfigEntry ::= SEQUENCE {
+    juniPppOsiConfigAdminStatus  INTEGER }
+
+juniPppOsiConfigAdminStatus   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    open(1),
+                    close(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The immediate desired status of the OSI network protocol.  Setting this
+        object to open will inject an administrative open event into the OSI
+        network protocol's finite state machine.  Setting this object to close
+        will inject an administrative close event into the OSI network
+        protocol's finite state machine."
+    ::= { juniPppOsiConfigEntry 1 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPP Session
+--
+-- This section defines objects used to manage the PPP sessions.
+--
+-- The juniPppSessionTable provides status of each PPP session.
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- The PPP Session Table
+--
+juniPppSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for PPP interfaces present in the system."
+    ::= { juniPppSession 1 }
+
+juniPppSessionEntry OBJECT-TYPE
+    SYNTAX      JuniPppSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a PPP interface."
+    INDEX     { ifIndex }
+    ::= { juniPppSessionTable 1 }
+
+JuniPppSessionEntry ::= SEQUENCE {
+    juniPppSessionGrant                         TruthValue,
+    juniPppSessionTerminateReason               INTEGER,
+    juniPppSessionStartTime                     TimeTicks,
+    juniPppSessionInOctets                      Counter32,
+    juniPppSessionOutOctets                     Counter32,
+    juniPppSessionInPackets                     Counter32,
+    juniPppSessionOutPackets                    Counter32,
+    juniPppSessionSessionTimeout                Integer32,
+    juniPppSessionInactivityTimeout             Integer32,
+    juniPppSessionAccountingInterval            Integer32,
+    juniPppSessionRemoteIpAddress               IpAddress,
+    juniPppSessionRemotePrimaryDnsAddress       IpAddress,
+    juniPppSessionRemoteSecondaryDnsAddress     IpAddress,
+    juniPppSessionRemotePrimaryWinsAddress      IpAddress,
+    juniPppSessionRemoteSecondaryWinsAddress    IpAddress,
+    juniPppSessionRemoteIpv6AddressIfIdentifier Ipv6AddressIfIdentifier,
+    juniPppSessionInhibitIp                     TruthValue,
+    juniPppSessionInhibitIpv6                   TruthValue }
+
+juniPppSessionGrant OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a session has been granted via the authentication
+        mechanism."
+    ::= { juniPppSessionEntry 1 }
+
+juniPppSessionTerminateReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    unknown(1),
+                    userRequest(2),
+                    keepaliveFailure(3),
+                    sessionTimeout(4),
+                    inactivityTimeout(5),
+                    adminDisable(6),
+                    lowerLayerDown(7),
+                    noUpperInterface(8),
+                    deny(9),
+                    noHardware(10),
+                    noResources(11),
+                    noInterface(12),
+                    challengeTimeout(13),
+                    requestTimeout(14),
+                    authenticatorTimeout(15),
+                    addressLeaseExpired(16),
+                    adminLogout(17),
+                    tunnelFailed(18) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The reason the session was terminated."
+    ::= { juniPppSessionEntry 2 }
+
+juniPppSessionStartTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when this session last became active."
+    ::= { juniPppSessionEntry 3 }
+
+juniPppSessionInOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received since this session last became active, as
+        denoted by juniPppSessionStartTime."
+    ::= { juniPppSessionEntry 4 }
+
+juniPppSessionOutOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets sent since this session last became active, as denoted
+        by juniPppSessionStartTime."
+    ::= { juniPppSessionEntry 5 }
+
+juniPppSessionInPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received since this session last became active, as
+        denoted by juniPppSessionStartTime."
+    ::= { juniPppSessionEntry 6 }
+
+juniPppSessionOutPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets sent since this session last became active, as
+        denoted by juniPppSessionStartTime."
+    ::= { juniPppSessionEntry 7 }
+
+juniPppSessionSessionTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum duration for the session, after which the session terminates
+        automatically."
+    ::= { juniPppSessionEntry 8 }
+
+juniPppSessionInactivityTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum inactivity duration for the session, after which the session
+        terminates automatically."
+    ::= { juniPppSessionEntry 9 }
+
+juniPppSessionAccountingInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interval that must elapse between generation of accounting records for
+        this session."
+    ::= { juniPppSessionEntry 10 }
+
+juniPppSessionRemoteIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote IP address, obtained from the authentication service, to be used
+        during IPCP negotiation with the remote side."
+    ::= { juniPppSessionEntry 11 }
+
+juniPppSessionRemotePrimaryDnsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote primary DNS IP address, obtained from the authentication
+        service, to be used during IPCP negotiation with the remote side."
+    ::= { juniPppSessionEntry 12 }
+
+juniPppSessionRemoteSecondaryDnsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote secondary DNS IP address, obtained from the authentication
+        service, to be used during IPCP negotiation with the remote side."
+    ::= { juniPppSessionEntry 13 }
+
+juniPppSessionRemotePrimaryWinsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote primary WINS IP address, obtained from the authentication
+        service, to be used during IPCP negotiation with the remote side."
+    ::= { juniPppSessionEntry 14 }
+
+juniPppSessionRemoteSecondaryWinsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote secondary WINS IP address, obtained from the authentication
+        service, to be used during IPCP negotiation with the remote side."
+    ::= { juniPppSessionEntry 15 }
+
+juniPppSessionRemoteIpv6AddressIfIdentifier OBJECT-TYPE
+    SYNTAX      Ipv6AddressIfIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPV6 Address Interface Identifier obtained from the authentication
+        service, to be used during IPCP negotiation with the remote side."
+    ::= { juniPppSessionEntry 16 }
+
+juniPppSessionInhibitIp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a session has had its IP service inhibited by the
+        authentication mechanism."
+    ::= { juniPppSessionEntry 17 }
+
+juniPppSessionInhibitIpv6 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a session has had its IPv6 service inhibited by the
+        authentication mechanism."
+    ::= { juniPppSessionEntry 18 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- Multi-Link PPP  (MLPPP)
+--
+-- This section defines objects used to manage the MLPPP.
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- The MLPPP BundleTable
+--
+juniPppMlPppBundleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppMlPppBundleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP bundles present in the system."
+    ::= { juniPppMlPpp 1 }
+
+juniPppMlPppBundleEntry OBJECT-TYPE
+    SYNTAX      JuniPppMlPppBundleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a MLPPP bundle."
+    INDEX     { juniPppMlPppBundleName }
+    ::= { juniPppMlPppBundleTable 1 }
+
+JuniPppMlPppBundleEntry ::= SEQUENCE {
+    juniPppMlPppBundleName           JuniPppMlPppBundleName,
+    juniPppMlPppBundleRowStatus      RowStatus,
+    juniPppMlPppBundleNetworkIfIndex InterfaceIndex }
+
+juniPppMlPppBundleName OBJECT-TYPE
+    SYNTAX      JuniPppMlPppBundleName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The administrative name of the MLPPP bundle associated with this MLPPP
+        network interface."
+    ::= { juniPppMlPppBundleEntry 1 }
+
+juniPppMlPppBundleRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The rowStatus for this entry.  The following sets are supported:
+             createAndGo(4),
+             destroy(6)
+
+         The following values can be read from this object:
+             active(1) "
+    ::= { juniPppMlPppBundleEntry 2 }
+
+juniPppMlPppBundleNetworkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of this MLPPP network interface.  It is a valid ifIndex
+        even if there is no corresponding network interface instance in the
+        juniPppMlPppLinkConfigTable."
+    ::= { juniPppMlPppBundleEntry 3 }
+
+--
+-- IfIndex selection for creating new MLPPP Link interfaces
+-- in juniPppLinkConfigTable.
+--
+-- NOTE: This object is placed after juniPppLinkConfigTable so
+-- that juniPppLinkStatusTable and juniPppLinkConfigTable have the
+-- same relative MIB node positions below the juniPppLcp node
+-- (juniPppLcp.1 and juniPppLcp.2, respectively) as their counterpart
+-- Status and Config tables in RFC1471.
+--
+juniPppMlPppNextLinkIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in
+        juniPppMlPppLinkConfigTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniPppMlPpp 2 }
+
+--
+-- The MLPPP Link Configuration Table
+--
+juniPppMlPppLinkConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppMlPppLinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP interfaces present in the
+        system."
+    ::= { juniPppMlPpp 3 }
+
+juniPppMlPppLinkConfigEntry OBJECT-TYPE
+    SYNTAX      JuniPppMlPppLinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of MLPPP interface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniPppMlPppLinkConfigIfIndex }
+    ::= { juniPppMlPppLinkConfigTable 1 }
+
+JuniPppMlPppLinkConfigEntry ::= SEQUENCE {
+    juniPppMlPppLinkConfigIfIndex                      InterfaceIndex,
+    juniPppMlPppLinkConfigLowerIfIndex                 InterfaceIndexOrZero,
+    juniPppMlPppLinkConfigKeepalive                    Integer32,
+    juniPppMlPppLinkConfigAuthentication               JuniPppAuthentication,
+    juniPppMlPppLinkConfigMaxAuthenRetries             Integer32,
+    juniPppMlPppLinkConfigRowStatus                    RowStatus,
+    juniPppMlPppLinkConfigAaaProfile                   JuniName,
+    juniPppMlPppLinkConfigChapMinChallengeLength       Integer32,
+    juniPppMlPppLinkConfigChapMaxChallengeLength       Integer32,
+    juniPppMlPppLinkConfigPassiveMode                  JuniEnable,
+    juniPppMlPppLinkConfigAuthenticatorVirtualRouter   JuniName,
+    juniPppMlPppLinkConfigFragmentation                JuniEnable,
+    juniPppMlPppLinkConfigReassembly                   JuniEnable,
+    juniPppMlPppLinkConfigMaxReceiveReconstructedUnit  Integer32,
+    juniPppMlPppLinkConfigFragmentSize                 Integer32,
+    juniPppMlPppLinkConfigHashLinkSelection            JuniEnable,
+    juniPppMlPppLinkConfigAuthentication2              JuniNibbleConfig,
+    juniPppMlPppLinkConfigIgnoreMagicNumberMismatch    JuniEnable,
+    juniPppMlPppLinkConfigMultilinkMulticlass          JuniEnable,
+    juniPppMlPppLinkConfigMultilinkMaxMultiClasses     INTEGER}
+
+juniPppMlPppLinkConfigIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the MLPPP interface.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniPppMlPppNextLinkIfIndex."
+    ::= { juniPppMlPppLinkConfigEntry 1 }
+
+juniPppMlPppLinkConfigLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an interface over which this PPP interface is to be
+        layered.  A value of zero indicates no layering.  An implementation may
+        choose to require that a non-zero value be configured at entry
+        creation."
+    ::= { juniPppMlPppLinkConfigEntry 2 }
+
+juniPppMlPppLinkConfigKeepalive OBJECT-TYPE
+    SYNTAX      Integer32 (0|10..64800)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Keepalive interval in seconds.  A value of zero disables keepalive.
+        Keepalive is performed using LCP Echo."
+    DEFVAL    { 30 }
+    ::= { juniPppMlPppLinkConfigEntry 4 }
+
+juniPppMlPppLinkConfigAuthentication OBJECT-TYPE
+    SYNTAX      JuniPppAuthentication
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Specifies the type(s) of authentication, if any, to be negotiated with
+        the peer:
+          none      No authentication is negotiated.
+          pap       PAP negotiation only.
+          chap      CHAP negotiation only.
+          papChap   PAP negotiation is attempted first; if fails, attempt CHAP.
+          chapPap   CHAP negotiation is attempted first; if fails, attempt PAP.
+
+        If authentication negotiation is not supported for this MLPPP interface,
+        then any attempt to explicitely set this object will result in a
+        notWritable error and it will be implicitily set to the DEFVAL on row
+        creation.
+
+        Setting this object to none(0) will set
+        juniPppMlPppLinkConfigAuthenticatorVirtualRouter object to an empty 
+        string.
+
+        This object returns a none (0) value on the get operation. New object
+        juniPppMlPppLinkConfigAuthentication2 will reflect the configured values.
+
+        Setting this object along with the juniPppMlPppLinkConfigAuthentication2 
+        object will return an inconsistentValue error."
+    DEFVAL    { none }
+    ::= { juniPppMlPppLinkConfigEntry 5 }
+
+juniPppMlPppLinkConfigMaxAuthenRetries OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of authentication retries permitted, in addition to a failed
+        initial attempt.  If all retries fail, the link is reset."
+    DEFVAL    { 0 }
+    ::= { juniPppMlPppLinkConfigEntry 6 }
+
+juniPppMlPppLinkConfigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniPppMlPppLinkConfigRowStatus
+            juniPppMlPppLinkConfigLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniPppMlPppLinkConfigIndex must have been determined
+            previously, by reading juniPppMlPppNextIfIndex.
+
+            The interface identified by juniPppMlPppLinkConfigLowerIfIndex
+            must exist.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniPppMlPppLinkConfigEntry 7 }
+
+juniPppMlPppLinkConfigAaaProfile OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the AAA profile to be used for authentication on the PPP
+        interface.  Setting this object statically binds the AAA profile with
+        the PPP interface.  If this object is not explicitly set or it is set to
+        null string, then this object is ignored.  On a Set operation, if the
+        value of this object is not null and does not correspond to an existing
+        AAA profile, then an inconsistentValue error is returned."
+    ::= { juniPppMlPppLinkConfigEntry 8 }
+
+juniPppMlPppLinkConfigChapMinChallengeLength OBJECT-TYPE
+    SYNTAX      Integer32 (8..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Minimum value of the CHAP authenticator challenge length value.  This
+        value is never allowed to be set to a value greater than
+        juniPppMlPppLinkConfigChapMaxChallengeLength."
+    DEFVAL    { 16 }
+    ::= { juniPppMlPppLinkConfigEntry 9 }
+
+juniPppMlPppLinkConfigChapMaxChallengeLength OBJECT-TYPE
+    SYNTAX      Integer32 (8..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maximum value of the CHAP authenticator challenge length value."
+    DEFVAL    { 32 }
+    ::= { juniPppMlPppLinkConfigEntry 10 }
+
+juniPppMlPppLinkConfigPassiveMode OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When enabled, LCP state machine is forced into passive mode on lower
+        layer UP message.  It adds compatibility with slow and buggy clients."
+    DEFVAL    { disable }
+    ::= { juniPppMlPppLinkConfigEntry 11 }
+
+juniPppMlPppLinkConfigAuthenticatorVirtualRouter OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the virtual router (Juniper-ROUTER-MIB.juniRouterName) to
+        be used for authentication on the PPP interface.  Setting this object
+        statically binds the authenticating virtual router with the link
+        interface.  If this object is not explicitly set or it is set to null
+        string, then this object is ignored and the virtual router used for
+        authentication is determined by other means.  On a Set operation, if the
+        value of this object is not null and does not correspond to an existing
+        virtual router, then an inconsistentValue error is returned."
+    ::= { juniPppMlPppLinkConfigEntry 12 }
+
+juniPppMlPppLinkConfigFragmentation OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables MLPPP fragmentation.  Changing this object has an effect when
+        the link is next restarted."
+    DEFVAL    { disable }
+    ::= { juniPppMlPppLinkConfigEntry 13 }
+
+juniPppMlPppLinkConfigReassembly OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables MLPPP reassembly.  Changing this object has an effect when the
+        link is next restarted."
+    DEFVAL    { disable }
+    ::= { juniPppMlPppLinkConfigEntry 14 }
+
+juniPppMlPppLinkConfigMaxReceiveReconstructedUnit OBJECT-TYPE
+    SYNTAX      Integer32 (1|64..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Maximum Receive Reconstructed Unit (MRRU) that the local PPP entity
+        will advertise to the remote entity.  If the value of this variable is
+        1, then the MRRU is set to the local MRU value.  Changing this object
+        has an effect when the link is next restarted."
+    DEFVAL    { 1 }
+    ::= { juniPppMlPppLinkConfigEntry 15 }
+
+juniPppMlPppLinkConfigFragmentSize OBJECT-TYPE
+    SYNTAX      Integer32 (1|128..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The size of fragments transmitted by the local PPP entity.  If the
+        value of this variable is 1, then the fragment size is set to the link's
+        MTU value.  Changing this object has an effect when the link is next
+        restarted."
+    DEFVAL    { 1 }
+    ::= { juniPppMlPppLinkConfigEntry 16 }
+
+juniPppMlPppLinkConfigHashLinkSelection OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables MLPPP hash-based link selection for non-best-effort traffic.
+	Changing this object has an effect when the link is next restarted."
+    DEFVAL    { disable }
+    ::= { juniPppMlPppLinkConfigEntry 17 }
+
+juniPppMlPppLinkConfigAuthentication2 OBJECT-TYPE
+    SYNTAX      JuniNibbleConfig
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A configuration variable comprised of nibbles i.e. 4 bits, such that 
+         a client can supply a list of 0 to 8 selections.  The least 
+         significant nibble is the first value of the list, and the most 
+         significant nibble is the last value.  The value in each field 
+         ranges from 0 to 15, however the first nibble with value 0 indicates
+         the end of the list.  Repetition of values is not allowed. 
+         Segregation of values is not allowed.
+
+         Valid Values are:
+         none - 0
+         pap  - 1
+         chap - 2
+         eap  - 3
+
+         Example valid encoding:
+         0x00000321
+         0x00000012
+
+         Not a valid encoding:
+         0x00000121
+         0x01002001
+
+         If authentication negotiation is not supported for this PPP interface,
+         then any attempt to explicitly set this object will result in a
+         notWritable error and it will be implicitly set to the DEFVAL on row
+         creation.
+
+         Setting this object to null will set
+         juniPppMlPppLinkConfigAuthenticatorVirtualRouter object to an empty 
+         string.
+
+         Setting this object along with the juniPppMlPppLinkConfigAuthentication
+         object will return an inconsistentValue error."
+    DEFVAL    { 0 }
+    ::= { juniPppMlPppLinkConfigEntry 18 }
+    
+juniPppMlPppLinkConfigIgnoreMagicNumberMismatch OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ignore magic number mismatch option of the PPP interface 
+        determines the action to be taken, when the peer has not negotiated
+        any value yet sent null or invalid magic number in the LCP echo 
+        packets. The two actions that can be configured are:
+            1)	Ignore the mismatch and retain connection
+            2)	Disallow the mismatch and terminate connection"
+    DEFVAL    { disable }
+    ::= { juniPppMlPppLinkConfigEntry 19 }
+
+juniPppMlPppLinkConfigMultilinkMulticlass OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables Multiclass Multilink PPP (MCML). Changing this object has an 
+		effect when the link is next restarted."
+    DEFVAL    {disable}
+    ::= { juniPppMlPppLinkConfigEntry 20 }
+
+juniPppMlPppLinkConfigMultilinkMaxMultiClasses OBJECT-TYPE
+    SYNTAX      INTEGER (0..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of MCML classes to be negotiated. Changing this object
+		 has an effect when the link is next restarted."
+    DEFVAL    {0}
+    ::= { juniPppMlPppLinkConfigEntry 21 }
+
+juniPppMlPppNextNetworkIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in
+        juniPppMlPppNetworkConfigTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniPppMlPpp 4 }
+
+
+--
+-- The MLPPP Network Configuration Table
+--
+juniPppMlPppNetworkConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppMlPppNetworkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP network interfaces present in the
+        system."
+    ::= { juniPppMlPpp 5 }
+
+juniPppMlPppNetworkConfigEntry OBJECT-TYPE
+    SYNTAX      JuniPppMlPppNetworkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of MLPPP interface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniPppMlPppNetworkConfigIfIndex }
+    ::= { juniPppMlPppNetworkConfigTable 1 }
+
+JuniPppMlPppNetworkConfigEntry ::= SEQUENCE {
+    juniPppMlPppNetworkConfigIfIndex         InterfaceIndex,
+    juniPppMlPppNetworkConfigLowerIfIndex    InterfaceIndex,
+    juniPppMlPppNetworkBundleName            JuniPppMlPppBundleName,
+    juniPppMlPppNetworkRowStatus             RowStatus }
+
+juniPppMlPppNetworkConfigIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the MLPPP network interface.  When creating entries in
+        this table, suitable values for this object are determined by reading
+        juniPppMlPppNextNetworkIfIndex."
+    ::= { juniPppMlPppNetworkConfigEntry 1 }
+
+juniPppMlPppNetworkConfigLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a PPP link interface over which this PPP network
+        interface is to be layered.  On sets, the value of this object must
+        equal on of the previously created PPP link interfaces created in the
+        juniPppMlPppLinkConfigTable.  On gets, the value of this object is the
+        lexicographically least PPP link interface in a potential bundle of PPP
+        link interfaces."
+    ::= { juniPppMlPppNetworkConfigEntry 2 }
+
+juniPppMlPppNetworkBundleName OBJECT-TYPE
+    SYNTAX     JuniPppMlPppBundleName
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The MLPPP bundle name administratively assigned."
+    ::= { juniPppMlPppNetworkConfigEntry 3 }
+
+juniPppMlPppNetworkRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniPppMlPppNetworkConfigLowerIfIndex
+            juniPppMlPppNetworkBundleName
+            juniPppMlPppNetworkConfigRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniPppMlPppNetworkConfigIndex must have been determined
+            previously, by reading juniPppMlPppNextNetworkIfIndex.
+
+            The interface identified by juniPppMlPppNetworkConfigLowerIfIndex
+            must exist by a creation request to the juniPppMlPppLinkConfigTable.
+
+            The bundleName specified in juniPppMlPppNetworkBundleName must have
+            been created first in the juniPppMlPppBundleTable.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table.  "
+    ::= { juniPppMlPppNetworkConfigEntry 4 }
+
+
+--
+-- The MLPPP Link Bind Table
+--
+juniPppMlPppLinkBindTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppMlPppLinkBindEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP Link interface to MLPPP network
+        interfaces bindings."
+    ::= { juniPppMlPpp 6 }
+
+juniPppMlPppLinkBindEntry OBJECT-TYPE
+    SYNTAX      JuniPppMlPppLinkBindEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the MLPPP link interface to MLPPP network
+        interface bindings."
+    INDEX     { juniPppMlPppBindNetworkIfIndex,
+                juniPppMlPppBindLinkIfIndex }
+    ::= { juniPppMlPppLinkBindTable 1 }
+
+JuniPppMlPppLinkBindEntry ::= SEQUENCE {
+    juniPppMlPppBindNetworkIfIndex   InterfaceIndex,
+    juniPppMlPppBindLinkIfIndex      InterfaceIndex,
+    juniPppMlPppBindRowStatus        RowStatus }
+
+juniPppMlPppBindNetworkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the MLPPP network interface."
+    ::= { juniPppMlPppLinkBindEntry 1 }
+
+juniPppMlPppBindLinkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a MLPPP link interface bound by the MLPPP network
+        interface defined by juniPppMlPppBindNetworkIfIndex."
+    ::= { juniPppMlPppLinkBindEntry 2 }
+
+juniPppMlPppBindRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniPppMlPppBindRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+
+            The interfaces identified by juniPppMlPppBindNetworkIfIndex and
+            juniPppMlPppBindLinkIfIndex must be created in the
+            juniPppMlPppNetworkConfigTable and juniPppMlPppLinkConfigTable
+            respectively.
+
+            A MLPPP bundle must be associated with the
+            juniPppMlPppNetworkIfIndex and exist in the
+            juniPppMibPppBundleTable.
+
+        A corresponding entry in ifStackTable is created/destroyed as a result
+        of creating/destroying an entry in this table."
+    ::= { juniPppMlPppLinkBindEntry 3 }
+
+
+--
+-- The MLPPP Multiclass Traffic class Configuration Table
+--
+
+JuniPppMlPppMulticlassTcName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Name of the Traffic class.  The bundle name is a characteristic of a MLPPP
+        Multiclass."
+    SYNTAX OCTET STRING (SIZE(0..64))
+    
+juniPppMlPppMulticlassTraffiClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppMlPppMulticlassTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP Multiclass to traffic class
+         mapping of interfaces present in the system."
+    ::= { juniPppMlPpp 7 }
+ 
+juniPppMlPppMulticlassTrafficClassEntry OBJECT-TYPE
+    SYNTAX      JuniPppMlPppMulticlassTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the MLPPP multiclass to traffic class mapping of
+         interfaces.Other characteristics like fragmentation and reassembly
+         for a particular traffic class can be configured."
+    INDEX     { juniPppMlPppMulticlassIfIndex,
+                juniPppMlPppMulticlassIndex }
+    ::= { juniPppMlPppMulticlassTraffiClassTable  1 }
+
+JuniPppMlPppMulticlassTrafficClassEntry ::= SEQUENCE {
+	juniPppMlPppMulticlassIfIndex						InterfaceIndex,
+    juniPppMlPppMulticlassIndex                       INTEGER,
+    juniPppMlPppMulticlassTcName            			JuniPppMlPppMulticlassTcName,
+    juniPppMlPppMulticlassFragmentation               JuniEnable,
+    juniPppMlPppMulticlassReassembly                  JuniEnable }
+
+juniPppMlPppMulticlassIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the MLPPP interface.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniPppMlPppMulticlassIfIndex."
+    ::= { juniPppMlPppMulticlassTrafficClassEntry 1 }
+
+juniPppMlPppMulticlassIndex OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The multiclass index of a particular traffic class type. This can be
+		 configured only when MCMP is enabled on the link interface."
+	DEFVAL	{ 15 }
+	::= { juniPppMlPppMulticlassTrafficClassEntry 2 }
+	
+juniPppMlPppMulticlassTcName OBJECT-TYPE
+	SYNTAX		JuniPppMlPppMulticlassTcName
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The traffic class index mapped to the MCMP multiclass index. This can be
+		 configured only when MCMP is enabled on the link interface."
+	::= { juniPppMlPppMulticlassTrafficClassEntry 3 }
+	
+juniPppMlPppMulticlassFragmentation  OBJECT-TYPE
+	SYNTAX		JuniEnable
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enable or disable fragmentation for a particular multiclass. This can be
+		 configured only when MCMP is enaled on the link interface."
+	DEFVAL  { disable }
+	::= { juniPppMlPppMulticlassTrafficClassEntry 4 }
+
+juniPppMlPppMulticlassReassembly  OBJECT-TYPE
+	SYNTAX		JuniEnable
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enable or disable rassembly for a particular multiclass. This can be
+		 configured only when MCMP is enaled on the link interface."
+	DEFVAL  { disable }
+	::= { juniPppMlPppMulticlassTrafficClassEntry 5 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPP Interface Summary Counts
+--
+-- /////////////////////////////////////////////////////////////////////////////
+
+juniPppSummaryPppInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces configured in the system."
+    ::= { juniPppSummary 1 }
+
+juniPppSummaryPppIpNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number IP NCPs configured in the system."
+    ::= { juniPppSummary 2 }
+
+juniPppSummaryPppOsiNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs configured in the system."
+    ::= { juniPppSummary 3 }
+
+juniPppSummaryPppIfAdminUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system that are
+        administratively configured to up(1)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { juniPppSummary 4 }
+
+juniPppSummaryPppIfAdminDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system that are
+        administrateively configued to down(2)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { juniPppSummary 5 }
+
+juniPppSummaryPppIfOperUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system with an operational
+        state of up(1)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 7 }
+
+juniPppSummaryPppIfOperDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system with an operational
+        state of down(2)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 8 }
+
+juniPppSummaryPppIfOperDormant OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system with an operational
+        state of dormant(5)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 9 }
+
+juniPppSummaryPppIfNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system with an operational
+        state of notPresent(6)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 10 }
+
+juniPppSummaryPppIfLowerLayerDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system with an operational
+        state of lowerLayerDown(7)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 11 }
+
+juniPppSummaryPppIpNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an operational state
+        of opened(1)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 12 }
+
+juniPppSummaryPppIpNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an operational
+        state of not-opened(2)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 13 }
+
+juniPppSummaryPppOsiNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an operational
+        state of opened."
+    ::= { juniPppSummary 14 }
+
+juniPppSummaryPppOsiNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an operational
+        state of closed."
+    ::= { juniPppSummary 15 }
+
+juniPppSummaryPppIfLastChangeTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the sysUpTime at the time of the last PPP interface
+        creation or deletion in the system.  If the number of PPP interfaces has
+        been unchanged since the last re-initialization of the system, then this
+        object contains a zero value. "
+    ::= { juniPppSummary 16 }
+
+juniPppSummaryPppLinkInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces configured in the system."
+    ::= { juniPppSummary 17 }
+
+juniPppSummaryPppLinkIfAdminUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system that are
+        administratively configured to up(1)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { juniPppSummary 18 }
+
+juniPppSummaryPppLinkIfAdminDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system that are
+        administrateively configued to down(2)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { juniPppSummary 19 }
+
+juniPppSummaryPppLinkIfOperUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system with an
+        operational state of up(1)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 20 }
+
+juniPppSummaryPppLinkIfOperDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system with an
+        operational state of down(2)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 21 }
+
+juniPppSummaryPppLinkIfOperDormant OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system with an
+        operational state of dormant(5)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 22 }
+
+juniPppSummaryPppLinkIfNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP link interfaces in the system with an
+        operational state of notPresent(6)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 23 }
+
+juniPppSummaryPppLinkIfLowerLayerDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system with an
+        operational state of lowerLayerDown(7)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 24 }
+
+juniPppSummaryPppLinkIfLastChangeTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the sysUpTime at the time of the last PPP Link interface
+        creation or deletion in the system.  If the number of PPP interfaces has
+        been unchanged since the last re-initialization of the system, then this
+        object contains a zero value. "
+    ::= { juniPppSummary 25 }
+
+juniPppSummaryPppNetworkInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces configured in the system."
+    ::= { juniPppSummary 26 }
+
+juniPppSummaryPppNetworkIpNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number IP NCPs in the system configured on PPP network
+        interfaces."
+    ::= { juniPppSummary 27 }
+
+juniPppSummaryPppNetworkOsiNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system configured on PPP network
+        interfaces."
+    ::= { juniPppSummary 28 }
+
+juniPppSummaryPppNetworkIfAdminUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system that are
+        administratively configured to up(1)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { juniPppSummary 29 }
+
+juniPppSummaryPppNetworkIfAdminDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system that are
+        administrateively configued to down(2)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { juniPppSummary 30 }
+
+juniPppSummaryPppNetworkIfOperUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system with an
+        operational state of up(1)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 31 }
+
+juniPppSummaryPppNetworkIfOperDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system with an
+        operational state of down(2)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 32 }
+
+juniPppSummaryPppNetworkIfOperDormant OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system with an
+        operational state of dormant(5)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 33 }
+
+juniPppSummaryPppNetworkIfNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system with an
+        operational state of notPresent(6)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 34 }
+
+juniPppSummaryPppNetworkIfLowerLayerDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system with an
+        operational state of lowerLayerDown(7)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { juniPppSummary 35 }
+
+juniPppSummaryPppNetworkIpNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an operational state
+        of opened(1)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 36 }
+
+juniPppSummaryPppNetworkIpNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an operational state
+        of not-opened(2)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 37 }
+
+juniPppSummaryPppNetworkOsiNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an operational
+        state of opened."
+    ::= { juniPppSummary 38 }
+
+juniPppSummaryPppNetworkOsiNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an operational
+        state of closed."
+    ::= { juniPppSummary 39 }
+
+juniPppSummaryPppNetworkIfLastChangeTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the sysUpTime at the time of the last PPP network
+        interface creation or deletion in the system.  If the number of PPP
+        network interfaces has been unchanged since the last re-initialization
+        of the system, then this object contains a zero value. "
+    ::= { juniPppSummary 40 }
+
+juniPppSummaryPppIpv6NCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number IPv6 NCPs configured in the system."
+    ::= { juniPppSummary 41 }
+
+juniPppSummaryPppIpv6NcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPv6 NCPs in the system with an operational
+        state of opened(1)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 42 }
+
+juniPppSummaryPppIpv6NcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPv6 NCPs in the system with an operational
+        state of not-opened(2)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 43 }
+
+juniPppSummaryPppNetworkIpv6NCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number IPv6 NCPs configured in the system."
+    ::= { juniPppSummary 44 }
+
+juniPppSummaryPppNetworkIpv6NcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPv6 NCPs in the system with an operational
+        state of opened(1)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 45 }
+
+juniPppSummaryPppNetworkIpv6NcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPv6 NCPs in the system with an operational
+        state of not-opened(2)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 46 }
+
+juniPppSummaryPppStaticInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of static PPP interfaces configured in the system."
+    ::= { juniPppSummary 47 }
+
+juniPppSummaryPppMplsNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number MPLS NCPs configured in the system."
+    ::= { juniPppSummary 48 }
+
+juniPppSummaryPppIpAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system that are
+        administratively configured to open(1)."
+    ::= { juniPppSummary 49 }
+
+juniPppSummaryPppIpAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system that are
+        administratively configured to close(2)."
+    ::= { juniPppSummary 50 }
+
+juniPppSummaryPppIpv6AdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system that are
+        administratively configured to open(1)."
+    ::= { juniPppSummary 51 }
+
+juniPppSummaryPppIpv6AdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system that are
+        administratively configured to close(2)."
+    ::= { juniPppSummary 52 }
+
+juniPppSummaryPppOsiAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system that are
+        administratively configured to open(1)."
+    ::= { juniPppSummary 53 }
+
+juniPppSummaryPppOsiAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system that are
+        administratively configured to close(2)."
+    ::= { juniPppSummary 54 }
+
+juniPppSummaryPppMplsAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system that are
+        administratively configured to open(1)."
+    ::= { juniPppSummary 55 }
+
+juniPppSummaryPppMplsAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system that are
+        administratively configured to close(2)."
+    ::= { juniPppSummary 56 }
+
+juniPppSummaryPppIpNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an operational state
+        of notPresent(3)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 57}
+
+juniPppSummaryPppIpNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an operational
+        state of noResources(4)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 58 }
+
+juniPppSummaryPppIpv6NcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPV6 NCPs in the system with an operational state
+        of notPresent(3)."
+    ::= { juniPppSummary 59 }
+
+juniPppSummaryPppIpv6NcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPV6 NCPs in the system with an operational
+        state of noResources(4)."
+    ::= { juniPppSummary 60 }
+
+juniPppSummaryPppOsiNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an operational state
+        of notPresent(3)."
+    ::= { juniPppSummary 61 }
+
+juniPppSummaryPppOsiNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an operational
+        state of noResources(4)."
+    ::= { juniPppSummary 62 }
+
+juniPppSummaryPppMplsNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP MPLS NCPs in the system with an operational state
+        of opened(1)."
+    ::= { juniPppSummary 63 }
+
+juniPppSummaryPppMplsNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP MPLS NCPs in the system with an operational
+        state of not-opened(2)."
+    ::= { juniPppSummary 64 }
+
+juniPppSummaryPppMplsNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP MPLS NCPs in the system with an operational state
+        of notPresent(3)."
+    ::= { juniPppSummary 65 }
+
+juniPppSummaryPppMplsNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP MPLS NCPs in the system with an operational
+        state of noResources(4)."
+    ::= { juniPppSummary 66 }
+
+juniPppSummaryPppLinkStaticInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of static PPP Link interfaces configured in the system."
+    ::= { juniPppSummary 67 }
+
+juniPppSummaryPppNetworkStaticInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of static PPP network interfaces configured in the system."
+    ::= { juniPppSummary 68 }
+
+juniPppSummaryPppNetworkMplsNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+        interfaces."
+    ::= { juniPppSummary 69 }
+
+juniPppSummaryPppNetworkIpAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system configured on PPP network
+         interfaces that are administratively configured to open(1)."
+    ::= { juniPppSummary 70 }
+
+juniPppSummaryPppNetworkIpAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system configured on PPP network
+         interfaces that are administratively configured to close(2)."
+    ::= { juniPppSummary 71 }
+
+juniPppSummaryPppNetworkIpv6AdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system configured on PPP network
+         interfaces that are administratively configured to open(1)."
+    ::= { juniPppSummary 72 }
+
+juniPppSummaryPppNetworkIpv6AdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system configured on PPP network
+         interfaces that are administratively configured to close(2)."
+    ::= { juniPppSummary 73 }
+
+juniPppSummaryPppNetworkOsiAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system configured on PPP network
+         interfaces that are administratively configured to open(1)."
+    ::= { juniPppSummary 74 }
+
+juniPppSummaryPppNetworkOsiAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system configured on PPP network
+         interfaces that are administratively configured to close(2)."
+    ::= { juniPppSummary 75 }
+
+juniPppSummaryPppNetworkMplsAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+         interfaces that are administratively configured to open(1)."
+    ::= { juniPppSummary 76 }
+
+juniPppSummaryPppNetworkMplsAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+         interfaces that are administratively configured to close(2)."
+    ::= { juniPppSummary 77 }
+
+juniPppSummaryPppNetworkIpNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system configured on PPP network
+        interfaces with an operational state of notPresent(3)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 78 }
+
+juniPppSummaryPppNetworkIpNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system configured on PPP network
+        interfaces with an operational state of noResources(4)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { juniPppSummary 79 }
+
+juniPppSummaryPppNetworkIpv6NcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system configured on PPP network
+        interfaces with an operational state of notPresent(3)."
+    ::= { juniPppSummary 80 }
+
+juniPppSummaryPppNetworkIpv6NcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system configured on PPP network
+        interfaces with an operational state of noResources(4)."
+    ::= { juniPppSummary 81 }
+
+juniPppSummaryPppNetworkOsiNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system configured on PPP network
+        interfaces with an operational state of notPresent(3)."
+    ::= { juniPppSummary 82 }
+
+juniPppSummaryPppNetworkOsiNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system configured on PPP network
+        interfaces with an operational state of noResources(4)."
+    ::= { juniPppSummary 83 }
+
+juniPppSummaryPppNetworkMplsNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+        interfaces with an operational state of opened(1)."
+    ::= { juniPppSummary 84 }
+
+juniPppSummaryPppNetworkMplsNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+        interfaces with an operational state of not-opened(2)."
+    ::= { juniPppSummary 85 }
+
+juniPppSummaryPppNetworkMplsNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+        interfaces with an operational state of notPresent(3)."
+    ::= { juniPppSummary 86 }
+
+juniPppSummaryPppNetworkMplsNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+        interfaces with an operational state of noResources(4)."
+    ::= { juniPppSummary 87 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPP IPv6 NCP
+--
+-- This section defines objects used to manage the PPP Network
+-- Control Protocol for IPv6 protocol operation (IPV6CP).
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- The PPP IPv6 Table
+--
+juniPppIpv6Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing the IPv6 parameters for the local PPP entity."
+    ::= { juniPppIpv6 1 }
+
+juniPppIpv6Entry OBJECT-TYPE
+    SYNTAX      JuniPppIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPV6CP status information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { juniPppIpv6Table 1 }
+
+JuniPppIpv6Entry ::= SEQUENCE {
+    juniPppIpv6ServiceStatus                       JuniEnable,
+    juniPppIpv6OperStatus                          INTEGER,
+    juniPppIpv6TerminateReason                     INTEGER,
+    juniPppIpv6TerminateNegFailOption              INTEGER,
+    juniPppIpv6LocalIpv6AddressIfIdentifier        Ipv6AddressIfIdentifier,
+    juniPppIpv6RemoteIpv6AddressIfIdentifier       Ipv6AddressIfIdentifier,
+    juniPppIpv6NetworkStatusIpv6cpRenegoTerminates Counter32}
+
+juniPppIpv6ServiceStatus OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether IPv6 protocol service is operating over this PPP
+        link.  Service is established on this link through means outside this
+        MIB."
+    ::= { juniPppIpv6Entry 1 }
+
+juniPppIpv6OperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    opened(1),
+                    notOpened(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational status of the IPv6 network protocol.  If the value of
+        this object is up then the finite state machine for the IPv6 network
+        protocol has reached the Opened state."
+    ::= { juniPppIpv6Entry 2 }
+
+juniPppIpv6TerminateReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    noService(2),
+                    admin(3),
+                    linkDown(4),
+                    peerTerminated(5),
+                    peerRenegotiated(6),
+                    maxRetriesExceeded(7),
+                    negotiationFailure(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason the IPV6CP link was terminated:
+            none                    None.
+            other                   Not specified.
+            noService               No IPv6 service configured on this PPP link.
+            admin                   Administratively disabled.
+            linkDown                Underlying link is down.
+            peerTerminated          Peer initiated termination.
+            peerRenegotiated        Peer initiated renegotiation.
+            maxRetriesExceeded      Maximum number of config retries exceeded.
+            negotiationFailure      Failed to negotiate IPV6CP option.  See
+                                    juniPppIpv6TerminateNegFailOption."
+    ::= { juniPppIpv6Entry 3 }
+
+juniPppIpv6TerminateNegFailOption OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    localIpv6AddressIfIdentifier(2),
+                    remoteIpv6AddressIfIdentifier(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the PPP IPV6CP option for which negotiation failed, when
+        juniPppIpv6TerminateReason has the value 'negotiationFailure'."
+    ::= { juniPppIpv6Entry 4 }
+
+juniPppIpv6LocalIpv6AddressIfIdentifier OBJECT-TYPE
+    SYNTAX      Ipv6AddressIfIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 Address Interface Identifier used by the local side."
+    ::= { juniPppIpv6Entry 5 }
+
+juniPppIpv6RemoteIpv6AddressIfIdentifier OBJECT-TYPE
+    SYNTAX      Ipv6AddressIfIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 Address Interface Identifier used by the remote side."
+    ::= { juniPppIpv6Entry 6 }
+
+juniPppIpv6NetworkStatusIpv6cpRenegoTerminates OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times ipv6cp terminated due to peer exceeding max
+        renegotiation attempts."
+    ::= { juniPppIpv6Entry 7 }
+
+--
+-- The PPP IPv6 Config Table
+--
+juniPppIpv6ConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppIpv6ConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing the IPv6 parameters for the local PPP entity."
+    ::= { juniPppIpv6 2 }
+
+juniPppIpv6ConfigEntry OBJECT-TYPE
+    SYNTAX      JuniPppIpv6ConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPV6CP configuration information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { juniPppIpv6ConfigTable 1 }
+
+JuniPppIpv6ConfigEntry ::= SEQUENCE {
+    juniPppIpv6ConfigAdminStatus            INTEGER,
+    juniPppIpv6ConfigInitiateIpv6           JuniEnable,
+    juniPppIpv6ConfigMaxIpv6cpRenegotiation Integer32 }
+
+juniPppIpv6ConfigAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    open(1),
+                    close(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The immediate desired status of the IPv6 network protocol.  Setting
+        this object to open will inject an administrative open event into the
+        IPv6 network protocol's finite state machine.  Setting this object to
+        close will inject an administrative close event into the IPv6 network
+        protocol's finite state machine."
+    ::= { juniPppIpv6ConfigEntry 1 }
+
+juniPppIpv6ConfigInitiateIpv6 OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables the initiation of negotiation of the IPv6CP."
+    DEFVAL { disable }
+    ::= { juniPppIpv6ConfigEntry 2 }
+
+juniPppIpv6ConfigMaxIpv6cpRenegotiation OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of allowed ipv6cp renegotiation attempts from peer."
+    DEFVAL { 30 }
+    ::= { juniPppIpv6ConfigEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniPppTrapControl      OBJECT IDENTIFIER ::= { juniPppMIB 2 }
+-- juniPppTraps            OBJECT IDENTIFIER ::= { juniPppMIB 3 }
+-- juniPppTrapPrefix       OBJECT IDENTIFIER ::= { juniPppTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPppConformance OBJECT IDENTIFIER ::= { juniPppMIB 4 }
+juniPppCompliances OBJECT IDENTIFIER ::= { juniPppConformance 1 }
+juniPppGroups      OBJECT IDENTIFIER ::= { juniPppConformance 2 }
+
+--
+-- compliance statements
+--
+juniPppCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when additional objects were
+        added to the MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup,
+            juniPppIpGroup,
+            juniPppOsiGroup }
+    ::= { juniPppCompliances 1 }                                   -- JUNOSe 1.0
+
+juniPppCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when the juniPppMlPppGroup and
+        juniPppSummaryGroup objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup2,
+            juniPppIpGroup2,
+            juniPppOsiGroup2,
+            juniPppSessionGroup }
+    ::= { juniPppCompliances 2 }                                   -- JUNOSe 1.1
+
+juniPppCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when the
+        juniPppLinkConfigStandardIfIndex object was added to the MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup2,
+            juniPppIpGroup2,
+            juniPppOsiGroup2,
+            juniPppSessionGroup,
+            juniPppMlPppGroup,
+            juniPppSummaryGroup }
+    ::= { juniPppCompliances 3 }                                   -- JUNOSe 2.0
+
+juniPppCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when the juniPppMlPppGroup,
+        juniPppSummaryLinkGroup and juniPppSummaryNetworkGroup were moved from
+        the list of mandatory groups."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup3,
+            juniPppIpGroup2,
+            juniPppOsiGroup2,
+            juniPppSessionGroup,
+            juniPppMlPppGroup,
+            juniPppSummaryGroup }
+    ::= { juniPppCompliances 4 }                                   -- JUNOSe 2.4
+
+juniPppCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when new IP, LCP and multi-link
+        objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup3,
+            juniPppIpGroup2,
+            juniPppOsiGroup2,
+            juniPppSessionGroup,
+            juniPppSummaryBasicGroup }
+        GROUP       juniPppMlPppGroup
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 5 }                                   -- JUNOSe 3.3
+
+juniPppCompliance6  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when new juniPppLcpGroup and
+        juniPppMlPppGroup objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup4,
+            juniPppIpGroup3,
+            juniPppOsiGroup2,
+            juniPppSessionGroup,
+            juniPppSummaryBasicGroup }
+        GROUP       juniPppMlPppGroup2
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 6 }                                   -- JUNOSe 4.0
+
+juniPppCompliance7  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when more new multi-link
+        objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup5,
+            juniPppIpGroup3,
+            juniPppOsiGroup2,
+            juniPppSessionGroup,
+            juniPppSummaryBasicGroup }
+        GROUP       juniPppMlPppGroup3
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 7 }                                   -- JUNOSe 4.1
+
+juniPppCompliance8  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when IPv6 support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup5,
+            juniPppIpGroup3,
+            juniPppOsiGroup2,
+            juniPppSessionGroup,
+            juniPppSummaryBasicGroup }
+        GROUP       juniPppMlPppGroup4
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup
+             DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 8 }                                   -- JUNOSe 5.0
+
+juniPppCompliance9  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when more new multi-link
+        objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup5,
+            juniPppIpGroup4,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup2,
+            juniPppIpv6Group }
+        GROUP       juniPppMlPppGroup4
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup2
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 9 }                                  -- JUNOSe 5.1
+
+juniPppCompliance10  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when more new juniPppSummary
+        objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup5,
+            juniPppIpGroup4,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup2,
+            juniPppIpv6Group }
+        GROUP       juniPppMlPppGroup5
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup2
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 10 }                                  -- JUNOSe 5.3
+
+juniPppCompliance11  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+	"Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when a new multi-link
+        object was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup5,
+            juniPppIpGroup4,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group }
+        GROUP       juniPppMlPppGroup5
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup2
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup3
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 11 }                                  -- JUNOSe 6.0
+
+juniPppCompliance12  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP MIB.  This statement became obsolete when more new juniPppLcpGroup
+        and juniPppMlPppGroup objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup5,
+            juniPppIpGroup4,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group }
+        GROUP       juniPppMlPppGroup6
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup2
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup3
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 12 }                                  -- JUNOSe 7.2
+
+juniPppCompliance13  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP
+        MIB. This statement became obsolete when more new juniPppLcpGroup,
+        juniPppIpGroup and juniPppIpv6Group objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup7,
+            juniPppIpGroup4,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group }
+        GROUP       juniPppMlPppGroup8
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup2
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup3
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 13 }                                  -- JUNOSe 7.3
+
+juniPppCompliance14  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup8,
+            juniPppIpGroup5,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group2 }
+        GROUP       juniPppMlPppGroup8
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup2
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup3
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 14 }                                  -- JUNOSe 10.1
+
+juniPppCompliance15  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup8,
+            juniPppIpGroup6,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group2 }
+        GROUP       juniPppMlPppGroup8
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup2
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup3
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 15 }                                  -- JUNOSe 11.0
+
+juniPppCompliance16  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP
+        MIB. This statement was obsoleted when MCMP traffic class mapping was
+		added. New group juniPppMlPppMulticlassTcGroup1 was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup8,
+            juniPppIpGroup5,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group2 }
+        GROUP       juniPppMlPppGroup9
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup2
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup3
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP		juniPppMlPppMulticlassTcGroup1
+        	DESCRIPTION
+        		"The Multilink multiclass traffic class group is mandatory only 
+				for PPP entities that support multi-link functionality."
+    ::= { juniPppCompliances 16 }                                  -- JUNOSe 11.1
+    
+--
+-- units of conformance
+--
+juniPppLcpGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPppLinkConfigRowStatus,
+        juniPppLinkConfigLowerIfIndex,
+        juniPppNextIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of link-layer
+        functionality (LCP) of PPP interfaces in a Juniper product.  This group
+        became obsolete when additional objects were added."
+    ::= { juniPppGroups 1 }                                        -- JUNOSe 1.0
+
+juniPppIpGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPppIpServiceStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of IP network
+        control protocol functionality (IPCP) of PPP interfaces in a Juniper
+        product.  This group became obsolete when additional objects were
+        added."
+    ::= { juniPppGroups 2 }                                        -- JUNOSe 1.0
+
+juniPppOsiGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPppOsiServiceStatus,
+        juniPppOsiOperStatus,
+
+        juniPppOsiConfigAdminStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of OSI network
+        control protocol functionality (OSICP) of PPP interfaces in a Juniper
+        product.  This group became obsolete when additional objects were
+        added."
+    ::= { juniPppGroups 3 }                                        -- JUNOSe 1.0
+
+juniPppLcpGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPppLinkStatusTerminateReason,
+        juniPppLinkStatusTerminateNegFailOption,
+        juniPppLinkStatusInKeepaliveRequests,
+        juniPppLinkStatusOutKeepaliveRequests,
+        juniPppLinkStatusInKeepaliveReplies,
+        juniPppLinkStatusOutKeepaliveReplies,
+        juniPppLinkStatusKeepaliveFailures,
+        juniPppLinkStatusLocalMagicNumber,
+        juniPppLinkStatusRemoteMagicNumber,
+        juniPppLinkStatusLocalAuthentication,
+        juniPppLinkStatusTunnelIfIndex,
+        juniPppLinkConfigRowStatus,
+        juniPppLinkConfigLowerIfIndex,
+        juniPppLinkConfigKeepalive,
+        juniPppLinkConfigAuthentication,
+        juniPppLinkConfigMaxAuthenRetries,
+        juniPppNextIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of link-layer
+        functionality (LCP) of PPP interfaces in a Juniper product.  This group
+        became obsolete when the juniPppLinkConfigStandardIfIndex object was
+        added."
+    ::= { juniPppGroups 4 }                                        -- JUNOSe 1.1
+
+juniPppIpGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPppIpServiceStatus,
+        juniPppIpTerminateReason,
+        juniPppIpTerminateNegFailOption,
+        juniPppIpLocalIpAddress,
+        juniPppIpRemoteIpAddress,
+        juniPppIpRemotePrimaryDnsAddress,
+        juniPppIpRemoteSecondaryDnsAddress,
+        juniPppIpRemotePrimaryWinsAddress,
+        juniPppIpRemoteSecondaryWinsAddress,
+        juniPppIpConfigPeerDnsPriority,
+        juniPppIpConfigPeerWinsPriority }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of IP network
+        control protocol functionality (IPCP) of PPP interfaces in a Juniper
+        product.  This group became obsolete when additional objects were
+        added."
+    ::= { juniPppGroups 5 }                                        -- JUNOSe 1.1
+
+juniPppOsiGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPppOsiServiceStatus,
+        juniPppOsiOperStatus,
+        juniPppOsiTerminateReason,
+        juniPppOsiTerminateNegFailOption,
+        juniPppOsiLocalAlignNpdu,
+        juniPppOsiRemoteAlignNpdu,
+        juniPppOsiConfigAdminStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of OSI network control
+        protocol functionality (OSICP) of PPP interfaces in a Juniper product."
+    ::= { juniPppGroups 6 }                                        -- JUNOSe 1.1
+
+juniPppSessionGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPppSessionGrant,
+        juniPppSessionTerminateReason,
+        juniPppSessionStartTime,
+        juniPppSessionInOctets,
+        juniPppSessionOutOctets,
+        juniPppSessionInPackets,
+        juniPppSessionOutPackets,
+        juniPppSessionSessionTimeout,
+        juniPppSessionInactivityTimeout,
+        juniPppSessionAccountingInterval,
+        juniPppSessionRemoteIpAddress,
+        juniPppSessionRemotePrimaryDnsAddress,
+        juniPppSessionRemoteSecondaryDnsAddress,
+        juniPppSessionRemotePrimaryWinsAddress,
+        juniPppSessionRemoteSecondaryWinsAddress }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of PPP session
+        functionality of PPP interfaces in a Juniper product.  This group became
+        obsolete when IPv6 support was added."
+    ::= { juniPppGroups 7 }                                        -- JUNOSe 1.1
+
+juniPppMlPppGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPppMlPppBundleRowStatus,
+        juniPppMlPppNextLinkIfIndex,
+        juniPppMlPppLinkConfigLowerIfIndex,
+        juniPppMlPppLinkConfigKeepalive,
+        juniPppMlPppLinkConfigAuthentication,
+        juniPppMlPppLinkConfigMaxAuthenRetries,
+        juniPppMlPppLinkConfigRowStatus,
+        juniPppMlPppNextNetworkIfIndex,
+        juniPppMlPppNetworkConfigLowerIfIndex,
+        juniPppMlPppNetworkBundleName,
+        juniPppMlPppNetworkRowStatus,
+        juniPppMlPppBindRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing multi link PPP management
+        support in a Juniper product.  This group became obsolete when
+        additional objects were added."
+    ::= { juniPppGroups 8 }                                        -- JUNOSe 2.0
+
+juniPppSummaryGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPppSummaryPppInterfaceCount,
+        juniPppSummaryPppIpNCPs,
+        juniPppSummaryPppOsiNCPs,
+        juniPppSummaryPppIfAdminUp,
+        juniPppSummaryPppIfAdminDown,
+        juniPppSummaryPppIfOperUp,
+        juniPppSummaryPppIfOperDown,
+        juniPppSummaryPppIfOperDormant,
+        juniPppSummaryPppIfNotPresent,
+        juniPppSummaryPppIfLowerLayerDown,
+        juniPppSummaryPppIfLastChangeTime,
+        juniPppSummaryPppLinkInterfaceCount,
+        juniPppSummaryPppLinkIfAdminUp,
+        juniPppSummaryPppLinkIfAdminDown,
+        juniPppSummaryPppLinkIfOperUp,
+        juniPppSummaryPppLinkIfOperDown,
+        juniPppSummaryPppLinkIfOperDormant,
+        juniPppSummaryPppLinkIfNotPresent,
+        juniPppSummaryPppLinkIfLowerLayerDown,
+        juniPppSummaryPppLinkIfLastChangeTime,
+        juniPppSummaryPppNetworkInterfaceCount,
+        juniPppSummaryPppNetworkIpNCPs,
+        juniPppSummaryPppNetworkOsiNCPs,
+        juniPppSummaryPppNetworkIfAdminUp,
+        juniPppSummaryPppNetworkIfAdminDown,
+        juniPppSummaryPppNetworkIfOperUp,
+        juniPppSummaryPppNetworkIfOperDown,
+        juniPppSummaryPppNetworkIfOperDormant,
+        juniPppSummaryPppNetworkIfNotPresent,
+        juniPppSummaryPppNetworkIfLowerLayerDown,
+        juniPppSummaryPppNetworkIfLastChangeTime,
+        juniPppSummaryPppIpNcpOpened,
+        juniPppSummaryPppIpNcpClosed,
+        juniPppSummaryPppOsiNcpOpened,
+        juniPppSummaryPppOsiNcpClosed,
+        juniPppSummaryPppNetworkIpNcpOpened,
+        juniPppSummaryPppNetworkIpNcpClosed,
+        juniPppSummaryPppNetworkOsiNcpOpened,
+        juniPppSummaryPppNetworkOsiNcpClosed }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing PPP interface summary
+        information in a Juniper product.  This group became obsolete when it
+        was divided into three groups so that the link and network object would
+        not be manditory."
+    ::= { juniPppGroups 9 }                                        -- JUNOSe 2.0
+
+juniPppLcpGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniPppLinkStatusTerminateReason,
+        juniPppLinkStatusTerminateNegFailOption,
+        juniPppLinkStatusInKeepaliveRequests,
+        juniPppLinkStatusOutKeepaliveRequests,
+        juniPppLinkStatusInKeepaliveReplies,
+        juniPppLinkStatusOutKeepaliveReplies,
+        juniPppLinkStatusKeepaliveFailures,
+        juniPppLinkStatusLocalMagicNumber,
+        juniPppLinkStatusRemoteMagicNumber,
+        juniPppLinkStatusLocalAuthentication,
+        juniPppLinkStatusTunnelIfIndex,
+        juniPppLinkConfigRowStatus,
+        juniPppLinkConfigLowerIfIndex,
+        juniPppLinkConfigKeepalive,
+        juniPppLinkConfigAuthentication,
+        juniPppLinkConfigMaxAuthenRetries,
+        juniPppLinkConfigStandardIfIndex,
+        juniPppNextIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of link-layer
+        functionality (LCP) of PPP interfaces in a Juniper product.  This group
+        became obsolete when additional objects were added."
+    ::= { juniPppGroups 10 }                                       -- JUNOSe 2.4
+
+juniPppSummaryBasicGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPppSummaryPppInterfaceCount,
+        juniPppSummaryPppIpNCPs,
+        juniPppSummaryPppOsiNCPs,
+        juniPppSummaryPppIfAdminUp,
+        juniPppSummaryPppIfAdminDown,
+        juniPppSummaryPppIfOperUp,
+        juniPppSummaryPppIfOperDown,
+        juniPppSummaryPppIfOperDormant,
+        juniPppSummaryPppIfNotPresent,
+        juniPppSummaryPppIfLowerLayerDown,
+        juniPppSummaryPppIfLastChangeTime,
+        juniPppSummaryPppIpNcpOpened,
+        juniPppSummaryPppIpNcpClosed,
+        juniPppSummaryPppOsiNcpOpened,
+        juniPppSummaryPppOsiNcpClosed }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing PPP interface basic summary
+        information in a Juniper product.  This group became obsolete when IPv6
+        support was added."
+    ::= { juniPppGroups 11 }                                       -- JUNOSe 3.3
+
+juniPppSummaryLinkGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPppSummaryPppLinkInterfaceCount,
+        juniPppSummaryPppLinkIfAdminUp,
+        juniPppSummaryPppLinkIfAdminDown,
+        juniPppSummaryPppLinkIfOperUp,
+        juniPppSummaryPppLinkIfOperDown,
+        juniPppSummaryPppLinkIfOperDormant,
+        juniPppSummaryPppLinkIfNotPresent,
+        juniPppSummaryPppLinkIfLowerLayerDown,
+        juniPppSummaryPppLinkIfLastChangeTime }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing PPP interface basic summary
+        information in a Juniper product.  This group became obsolete when 
+        new objects were added."
+    ::= { juniPppGroups 12 }                                       -- JUNOSe 3.3
+
+juniPppSummaryNetworkGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPppSummaryPppNetworkInterfaceCount,
+        juniPppSummaryPppNetworkIpNCPs,
+        juniPppSummaryPppNetworkOsiNCPs,
+        juniPppSummaryPppNetworkIfAdminUp,
+        juniPppSummaryPppNetworkIfAdminDown,
+        juniPppSummaryPppNetworkIfOperUp,
+        juniPppSummaryPppNetworkIfOperDown,
+        juniPppSummaryPppNetworkIfOperDormant,
+        juniPppSummaryPppNetworkIfNotPresent,
+        juniPppSummaryPppNetworkIfLowerLayerDown,
+        juniPppSummaryPppNetworkIfLastChangeTime,
+        juniPppSummaryPppNetworkIpNcpOpened,
+        juniPppSummaryPppNetworkIpNcpClosed,
+        juniPppSummaryPppNetworkOsiNcpOpened,
+        juniPppSummaryPppNetworkOsiNcpClosed }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing PPP interface network summary
+        information in a Juniper product.  This group became obsolete when IPv6
+        support was added."
+    ::= { juniPppGroups 13 }                                       -- JUNOSe 3.3
+
+juniPppLcpGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniPppLinkStatusTerminateReason,
+        juniPppLinkStatusTerminateNegFailOption,
+        juniPppLinkStatusInKeepaliveRequests,
+        juniPppLinkStatusOutKeepaliveRequests,
+        juniPppLinkStatusInKeepaliveReplies,
+        juniPppLinkStatusOutKeepaliveReplies,
+        juniPppLinkStatusKeepaliveFailures,
+        juniPppLinkStatusLocalMagicNumber,
+        juniPppLinkStatusRemoteMagicNumber,
+        juniPppLinkStatusLocalAuthentication,
+        juniPppLinkStatusTunnelIfIndex,
+        juniPppLinkConfigRowStatus,
+        juniPppLinkConfigLowerIfIndex,
+        juniPppLinkConfigKeepalive,
+        juniPppLinkConfigAuthentication,
+        juniPppLinkConfigMaxAuthenRetries,
+        juniPppLinkConfigStandardIfIndex,
+        juniPppLinkConfigChapMinChallengeLength,
+        juniPppLinkConfigChapMaxChallengeLength,
+        juniPppLinkConfigPassiveMode,
+        juniPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppNextIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of link-layer
+        functionality (LCP) of PPP interfaces in a Juniper product.  This group
+        became obsolete when additional objects were added."
+    ::= { juniPppGroups 14 }                                       -- JUNOSe 4.0
+
+juniPppIpGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniPppIpServiceStatus,
+        juniPppIpTerminateReason,
+        juniPppIpTerminateNegFailOption,
+        juniPppIpLocalIpAddress,
+        juniPppIpRemoteIpAddress,
+        juniPppIpRemotePrimaryDnsAddress,
+        juniPppIpRemoteSecondaryDnsAddress,
+        juniPppIpRemotePrimaryWinsAddress,
+        juniPppIpRemoteSecondaryWinsAddress,
+        juniPppIpConfigPeerDnsPriority,
+        juniPppIpConfigPeerWinsPriority,
+        juniPppIpConfigIpcpNetmask }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of IP network
+        control protocol functionality (IPCP) of PPP interfaces in a Juniper
+        product.  This group became obsolete when IPv6 support was added."
+    ::= { juniPppGroups 15 }                                       -- JUNOSe 4.0
+
+juniPppMlPppGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPppMlPppBundleRowStatus,
+        juniPppMlPppBundleNetworkIfIndex,
+        juniPppMlPppNextLinkIfIndex,
+        juniPppMlPppLinkConfigLowerIfIndex,
+        juniPppMlPppLinkConfigKeepalive,
+        juniPppMlPppLinkConfigAuthentication,
+        juniPppMlPppLinkConfigMaxAuthenRetries,
+        juniPppMlPppLinkConfigRowStatus,
+        juniPppMlPppNetworkConfigLowerIfIndex,
+        juniPppMlPppNetworkBundleName,
+        juniPppMlPppNetworkRowStatus,
+        juniPppMlPppBindRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing multi link PPP management
+        support in a Juniper product.  This group became obsolete when
+        additional objects were added."
+    ::= { juniPppGroups 16 }                                       -- JUNOSe 4.0
+
+juniPppMlPppGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniPppMlPppBundleRowStatus,
+        juniPppMlPppBundleNetworkIfIndex,
+        juniPppMlPppNextLinkIfIndex,
+        juniPppMlPppLinkConfigLowerIfIndex,
+        juniPppMlPppLinkConfigKeepalive,
+        juniPppMlPppLinkConfigAuthentication,
+        juniPppMlPppLinkConfigMaxAuthenRetries,
+        juniPppMlPppLinkConfigRowStatus,
+        juniPppMlPppLinkConfigAaaProfile,
+        juniPppMlPppNetworkConfigLowerIfIndex,
+        juniPppMlPppNetworkBundleName,
+        juniPppMlPppNetworkRowStatus,
+        juniPppMlPppBindRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing multi link PPP management
+        support in a Juniper product.  This group became obsolete when
+        additional objects were added."
+    ::= { juniPppGroups 17 }                                       -- JUNOSe 4.1
+
+juniPppLcpGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniPppLinkStatusTerminateReason,
+        juniPppLinkStatusTerminateNegFailOption,
+        juniPppLinkStatusInKeepaliveRequests,
+        juniPppLinkStatusOutKeepaliveRequests,
+        juniPppLinkStatusInKeepaliveReplies,
+        juniPppLinkStatusOutKeepaliveReplies,
+        juniPppLinkStatusKeepaliveFailures,
+        juniPppLinkStatusLocalMagicNumber,
+        juniPppLinkStatusRemoteMagicNumber,
+        juniPppLinkStatusLocalAuthentication,
+        juniPppLinkStatusTunnelIfIndex,
+        juniPppLinkConfigRowStatus,
+        juniPppLinkConfigLowerIfIndex,
+        juniPppLinkConfigKeepalive,
+        juniPppLinkConfigAuthentication,
+        juniPppLinkConfigMaxAuthenRetries,
+        juniPppLinkConfigStandardIfIndex,
+        juniPppLinkConfigChapMinChallengeLength,
+        juniPppLinkConfigChapMaxChallengeLength,
+        juniPppLinkConfigPassiveMode,
+        juniPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppLinkConfigAaaProfile,
+        juniPppNextIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of link-layer
+        functionality (LCP) of PPP interfaces in a Juniper product.  This group
+        became obsolete when additional objects were added."
+    ::= { juniPppGroups 18 }                                       -- JUNOSe 4.1
+
+juniPppMlPppGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniPppMlPppBundleRowStatus,
+        juniPppMlPppBundleNetworkIfIndex,
+        juniPppMlPppNextLinkIfIndex,
+        juniPppMlPppLinkConfigLowerIfIndex,
+        juniPppMlPppLinkConfigKeepalive,
+        juniPppMlPppLinkConfigAuthentication,
+        juniPppMlPppLinkConfigMaxAuthenRetries,
+        juniPppMlPppLinkConfigRowStatus,
+        juniPppMlPppLinkConfigChapMinChallengeLength,
+        juniPppMlPppLinkConfigChapMaxChallengeLength,
+        juniPppMlPppLinkConfigPassiveMode,
+        juniPppMlPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppMlPppLinkConfigAaaProfile,
+        juniPppMlPppNextNetworkIfIndex,
+        juniPppMlPppNetworkConfigLowerIfIndex,
+        juniPppMlPppNetworkBundleName,
+        juniPppMlPppNetworkRowStatus,
+        juniPppMlPppBindRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing multi link PPP management
+        support in a Juniper product.  This group became obsolete when
+        additional objects were added."
+    ::= { juniPppGroups 19 }                                       -- JUNOSe 5.0
+
+juniPppSummaryBasicGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPppSummaryPppInterfaceCount,
+        juniPppSummaryPppIpNCPs,
+        juniPppSummaryPppOsiNCPs,
+        juniPppSummaryPppIfAdminUp,
+        juniPppSummaryPppIfAdminDown,
+        juniPppSummaryPppIfOperUp,
+        juniPppSummaryPppIfOperDown,
+        juniPppSummaryPppIfOperDormant,
+        juniPppSummaryPppIfNotPresent,
+        juniPppSummaryPppIfLowerLayerDown,
+        juniPppSummaryPppIfLastChangeTime,
+        juniPppSummaryPppIpNcpOpened,
+        juniPppSummaryPppIpNcpClosed,
+        juniPppSummaryPppOsiNcpOpened,
+        juniPppSummaryPppOsiNcpClosed,
+        juniPppSummaryPppIpv6NCPs,
+        juniPppSummaryPppIpv6NcpOpened,
+        juniPppSummaryPppIpv6NcpClosed }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing PPP interface basic summary
+        information in a Juniper product.  This group became obsolete when 
+        new objects were added."
+    ::= { juniPppGroups 20 }                                       -- JUNOSe 5.1
+
+juniPppSummaryNetworkGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPppSummaryPppNetworkInterfaceCount,
+        juniPppSummaryPppNetworkIpNCPs,
+        juniPppSummaryPppNetworkOsiNCPs,
+        juniPppSummaryPppNetworkIfAdminUp,
+        juniPppSummaryPppNetworkIfAdminDown,
+        juniPppSummaryPppNetworkIfOperUp,
+        juniPppSummaryPppNetworkIfOperDown,
+        juniPppSummaryPppNetworkIfOperDormant,
+        juniPppSummaryPppNetworkIfNotPresent,
+        juniPppSummaryPppNetworkIfLowerLayerDown,
+        juniPppSummaryPppNetworkIfLastChangeTime,
+        juniPppSummaryPppNetworkIpNcpOpened,
+        juniPppSummaryPppNetworkIpNcpClosed,
+        juniPppSummaryPppNetworkOsiNcpOpened,
+        juniPppSummaryPppNetworkOsiNcpClosed,
+        juniPppSummaryPppNetworkIpv6NCPs,
+        juniPppSummaryPppNetworkIpv6NcpOpened,
+        juniPppSummaryPppNetworkIpv6NcpClosed }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing PPP interface basic summary
+        information in a Juniper product.  This group became obsolete when 
+        new objects were added."
+    ::= { juniPppGroups 21 }                                       -- JUNOSe 5.1
+
+juniPppIpGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniPppIpServiceStatus,
+        juniPppIpTerminateReason,
+        juniPppIpTerminateNegFailOption,
+        juniPppIpLocalIpAddress,
+        juniPppIpRemoteIpAddress,
+        juniPppIpRemotePrimaryDnsAddress,
+        juniPppIpRemoteSecondaryDnsAddress,
+        juniPppIpRemotePrimaryWinsAddress,
+        juniPppIpRemoteSecondaryWinsAddress,
+        juniPppIpConfigPeerDnsPriority,
+        juniPppIpConfigPeerWinsPriority,
+        juniPppIpConfigIpcpNetmask,
+        juniPppIpConfigInitiateIp }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing management of IP network control
+        protocol functionality (IPCP) of PPP interfaces in a Juniper product.
+        This group became obsolete when additional objects were added"
+    ::= { juniPppGroups 22 }                                       -- JUNOSe 5.1
+
+juniPppIpv6Group  OBJECT-GROUP
+    OBJECTS {
+        juniPppIpv6ServiceStatus,
+        juniPppIpv6OperStatus,
+        juniPppIpv6TerminateReason,
+        juniPppIpv6TerminateNegFailOption,
+        juniPppIpv6LocalIpv6AddressIfIdentifier,
+        juniPppIpv6RemoteIpv6AddressIfIdentifier,
+        juniPppIpv6ConfigAdminStatus,
+        juniPppIpv6ConfigInitiateIpv6 }
+    STATUS      obsolete 
+    DESCRIPTION
+        "A collection of objects providing management of IPV6 network control
+        protocol functionality (IPV6CP) of PPP interfaces in a Juniper product.
+        This group became obsolete when additional objects were added."
+    ::= { juniPppGroups 23 }                                       -- JUNOSe 5.1
+
+juniPppSessionGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPppSessionGrant,
+        juniPppSessionTerminateReason,
+        juniPppSessionStartTime,
+        juniPppSessionInOctets,
+        juniPppSessionOutOctets,
+        juniPppSessionInPackets,
+        juniPppSessionOutPackets,
+        juniPppSessionSessionTimeout,
+        juniPppSessionInactivityTimeout,
+        juniPppSessionAccountingInterval,
+        juniPppSessionRemoteIpAddress,
+        juniPppSessionRemotePrimaryDnsAddress,
+        juniPppSessionRemoteSecondaryDnsAddress,
+        juniPppSessionRemotePrimaryWinsAddress,
+        juniPppSessionRemoteSecondaryWinsAddress,
+        juniPppSessionRemoteIpv6AddressIfIdentifier,
+        juniPppSessionInhibitIp,
+        juniPppSessionInhibitIpv6 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of PPP session
+        functionality of PPP interfaces in a Juniper product."
+    ::= { juniPppGroups 24 }                                       -- JUNOSe 5.1
+
+juniPppMlPppGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniPppMlPppBundleRowStatus,
+        juniPppMlPppBundleNetworkIfIndex,
+        juniPppMlPppNextLinkIfIndex,
+        juniPppMlPppLinkConfigLowerIfIndex,
+        juniPppMlPppLinkConfigKeepalive,
+        juniPppMlPppLinkConfigAuthentication,
+        juniPppMlPppLinkConfigMaxAuthenRetries,
+        juniPppMlPppLinkConfigRowStatus,
+        juniPppMlPppLinkConfigChapMinChallengeLength,
+        juniPppMlPppLinkConfigChapMaxChallengeLength,
+        juniPppMlPppLinkConfigPassiveMode,
+        juniPppMlPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppMlPppLinkConfigAaaProfile,
+        juniPppMlPppLinkConfigFragmentation,
+        juniPppMlPppLinkConfigReassembly,
+        juniPppMlPppLinkConfigMaxReceiveReconstructedUnit,
+        juniPppMlPppLinkConfigFragmentSize,
+        juniPppMlPppNextNetworkIfIndex,
+        juniPppMlPppNetworkConfigLowerIfIndex,
+        juniPppMlPppNetworkBundleName,
+        juniPppMlPppNetworkRowStatus,
+        juniPppMlPppBindRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+	"Obsolete collection of objects providing multi link PPP management
+        support in a Juniper product.  This group became obsolete when
+        additional objects were added."
+    ::= { juniPppGroups 25 }                                       -- JUNOSe 5.3
+
+juniPppSummaryBasicGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniPppSummaryPppInterfaceCount,
+        juniPppSummaryPppStaticInterfaceCount,
+        juniPppSummaryPppIpNCPs,
+        juniPppSummaryPppIpv6NCPs,
+        juniPppSummaryPppOsiNCPs,
+        juniPppSummaryPppMplsNCPs,
+        juniPppSummaryPppIfAdminUp,
+        juniPppSummaryPppIfAdminDown,
+        juniPppSummaryPppIpAdminOpen,
+        juniPppSummaryPppIpAdminClose,
+        juniPppSummaryPppIpv6AdminOpen,
+        juniPppSummaryPppIpv6AdminClose,
+        juniPppSummaryPppOsiAdminOpen,
+        juniPppSummaryPppOsiAdminClose,
+        juniPppSummaryPppMplsAdminOpen,
+        juniPppSummaryPppMplsAdminClose,
+        juniPppSummaryPppIfOperUp,
+        juniPppSummaryPppIfOperDown,
+        juniPppSummaryPppIfOperDormant,
+        juniPppSummaryPppIfNotPresent,
+        juniPppSummaryPppIfLowerLayerDown,
+        juniPppSummaryPppIpNcpOpened,
+        juniPppSummaryPppIpNcpClosed,
+        juniPppSummaryPppIpNcpNotPresent,
+        juniPppSummaryPppIpNcpNoResources,
+        juniPppSummaryPppIpv6NcpOpened,
+        juniPppSummaryPppIpv6NcpClosed,
+        juniPppSummaryPppIpv6NcpNotPresent,
+        juniPppSummaryPppIpv6NcpNoResources,
+        juniPppSummaryPppOsiNcpOpened,
+        juniPppSummaryPppOsiNcpClosed,
+        juniPppSummaryPppOsiNcpNotPresent,
+        juniPppSummaryPppOsiNcpNoResources,
+        juniPppSummaryPppMplsNcpOpened,
+        juniPppSummaryPppMplsNcpClosed,
+        juniPppSummaryPppMplsNcpNotPresent,
+        juniPppSummaryPppMplsNcpNoResources,
+        juniPppSummaryPppIfLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing PPP interface basic summary
+        information in a Juniper product."
+    ::= { juniPppGroups 26 }                                       -- JUNOSe 6.0
+
+juniPppSummaryLinkGroup2 OBJECT-GROUP
+    OBJECTS {
+        juniPppSummaryPppLinkInterfaceCount,
+        juniPppSummaryPppLinkStaticInterfaceCount,
+        juniPppSummaryPppLinkIfAdminUp,
+        juniPppSummaryPppLinkIfAdminDown,
+        juniPppSummaryPppLinkIfOperUp,
+        juniPppSummaryPppLinkIfOperDown,
+        juniPppSummaryPppLinkIfOperDormant,
+        juniPppSummaryPppLinkIfNotPresent,
+        juniPppSummaryPppLinkIfLowerLayerDown,
+        juniPppSummaryPppLinkIfLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing PPP interface link summary
+        information in a Juniper product."
+    ::= { juniPppGroups 27 }                                       -- JUNOSe 6.0
+
+juniPppSummaryNetworkGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniPppSummaryPppNetworkInterfaceCount,
+        juniPppSummaryPppNetworkStaticInterfaceCount,
+        juniPppSummaryPppNetworkIpNCPs,
+        juniPppSummaryPppNetworkIpv6NCPs,
+        juniPppSummaryPppNetworkOsiNCPs,
+        juniPppSummaryPppNetworkMplsNCPs,
+        juniPppSummaryPppNetworkIfAdminUp,
+        juniPppSummaryPppNetworkIfAdminDown,
+        juniPppSummaryPppNetworkIpAdminOpen,
+        juniPppSummaryPppNetworkIpAdminClose,
+        juniPppSummaryPppNetworkIpv6AdminOpen,
+        juniPppSummaryPppNetworkIpv6AdminClose,
+        juniPppSummaryPppNetworkOsiAdminOpen,
+        juniPppSummaryPppNetworkOsiAdminClose,
+        juniPppSummaryPppNetworkMplsAdminOpen,
+        juniPppSummaryPppNetworkMplsAdminClose,
+        juniPppSummaryPppNetworkIfOperUp,
+        juniPppSummaryPppNetworkIfOperDown,
+        juniPppSummaryPppNetworkIfOperDormant,
+        juniPppSummaryPppNetworkIfNotPresent,
+        juniPppSummaryPppNetworkIfLowerLayerDown,
+        juniPppSummaryPppNetworkIpNcpOpened,
+        juniPppSummaryPppNetworkIpNcpClosed,
+        juniPppSummaryPppNetworkIpNcpNotPresent,
+        juniPppSummaryPppNetworkIpNcpNoResources,
+        juniPppSummaryPppNetworkIpv6NcpOpened,
+        juniPppSummaryPppNetworkIpv6NcpClosed,
+        juniPppSummaryPppNetworkIpv6NcpNotPresent,
+        juniPppSummaryPppNetworkIpv6NcpNoResources,
+        juniPppSummaryPppNetworkOsiNcpOpened,
+        juniPppSummaryPppNetworkOsiNcpClosed,
+        juniPppSummaryPppNetworkOsiNcpNotPresent,
+        juniPppSummaryPppNetworkOsiNcpNoResources,
+        juniPppSummaryPppNetworkMplsNcpOpened,
+        juniPppSummaryPppNetworkMplsNcpClosed,
+        juniPppSummaryPppNetworkMplsNcpNotPresent,
+        juniPppSummaryPppNetworkMplsNcpNoResources,
+        juniPppSummaryPppNetworkIfLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing PPP interface network summary
+        information in a Juniper product."
+    ::= { juniPppGroups 28 }                                       -- JUNOSe 6.0
+
+juniPppMlPppGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniPppMlPppBundleRowStatus,
+        juniPppMlPppBundleNetworkIfIndex,
+        juniPppMlPppNextLinkIfIndex,
+        juniPppMlPppLinkConfigLowerIfIndex,
+        juniPppMlPppLinkConfigKeepalive,
+        juniPppMlPppLinkConfigAuthentication,
+        juniPppMlPppLinkConfigMaxAuthenRetries,
+        juniPppMlPppLinkConfigRowStatus,
+        juniPppMlPppLinkConfigChapMinChallengeLength,
+        juniPppMlPppLinkConfigChapMaxChallengeLength,
+        juniPppMlPppLinkConfigPassiveMode,
+        juniPppMlPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppMlPppLinkConfigAaaProfile,
+        juniPppMlPppLinkConfigFragmentation,
+        juniPppMlPppLinkConfigReassembly,
+        juniPppMlPppLinkConfigMaxReceiveReconstructedUnit,
+        juniPppMlPppLinkConfigFragmentSize,
+	juniPppMlPppLinkConfigHashLinkSelection,
+        juniPppMlPppNextNetworkIfIndex,
+        juniPppMlPppNetworkConfigLowerIfIndex,
+        juniPppMlPppNetworkBundleName,
+        juniPppMlPppNetworkRowStatus,
+        juniPppMlPppBindRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+	"Obsolete collection of objects providing multi link PPP management
+        support in a Juniper product.  This group became obsolete when
+        additional objects were added."
+    ::= { juniPppGroups 29 }                                       -- JUNOSe 7.2
+
+juniPppLcpGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniPppLinkStatusTerminateReason,
+        juniPppLinkStatusTerminateNegFailOption,
+        juniPppLinkStatusInKeepaliveRequests,
+        juniPppLinkStatusOutKeepaliveRequests,
+        juniPppLinkStatusInKeepaliveReplies,
+        juniPppLinkStatusOutKeepaliveReplies,
+        juniPppLinkStatusKeepaliveFailures,
+        juniPppLinkStatusLocalMagicNumber,
+        juniPppLinkStatusRemoteMagicNumber,
+        juniPppLinkStatusLocalAuthentication,
+        juniPppLinkStatusTunnelIfIndex,
+        juniPppLinkConfigRowStatus,
+        juniPppLinkConfigLowerIfIndex,
+        juniPppLinkConfigKeepalive,
+        juniPppLinkConfigAuthentication,
+        juniPppLinkConfigMaxAuthenRetries,
+        juniPppLinkConfigStandardIfIndex,
+        juniPppLinkConfigChapMinChallengeLength,
+        juniPppLinkConfigChapMaxChallengeLength,
+        juniPppLinkConfigPassiveMode,
+        juniPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppLinkConfigAaaProfile,
+        juniPppLinkConfigAuthentication2,
+        juniPppNextIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of link-layer
+        functionality (LCP) of PPP interfaces in a Juniper product. This group
+        became obsolete when additional objects were added."
+    ::= { juniPppGroups 30 }                                       -- JUNOSe 7.3
+
+juniPppMlPppGroup7  OBJECT-GROUP
+    OBJECTS {
+        juniPppMlPppBundleRowStatus,
+        juniPppMlPppBundleNetworkIfIndex,
+        juniPppMlPppNextLinkIfIndex,
+        juniPppMlPppLinkConfigLowerIfIndex,
+        juniPppMlPppLinkConfigKeepalive,
+        juniPppMlPppLinkConfigAuthentication,
+        juniPppMlPppLinkConfigMaxAuthenRetries,
+        juniPppMlPppLinkConfigRowStatus,
+        juniPppMlPppLinkConfigChapMinChallengeLength,
+        juniPppMlPppLinkConfigChapMaxChallengeLength,
+        juniPppMlPppLinkConfigPassiveMode,
+        juniPppMlPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppMlPppLinkConfigAaaProfile,
+        juniPppMlPppLinkConfigFragmentation,
+        juniPppMlPppLinkConfigReassembly,
+        juniPppMlPppLinkConfigMaxReceiveReconstructedUnit,
+        juniPppMlPppLinkConfigFragmentSize,
+        juniPppMlPppLinkConfigHashLinkSelection,
+        juniPppMlPppLinkConfigAuthentication2,
+        juniPppMlPppNextNetworkIfIndex,
+        juniPppMlPppNetworkConfigLowerIfIndex,
+        juniPppMlPppNetworkBundleName,
+        juniPppMlPppNetworkRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing multi link PPP management support in
+        a Juniper product. This group became obsolete when additional objects were added"
+    ::= { juniPppGroups 31 }                                       -- JUNOSe 7.3
+    
+juniPppLcpGroup7  OBJECT-GROUP
+    OBJECTS {
+        juniPppLinkStatusTerminateReason,
+        juniPppLinkStatusTerminateNegFailOption,
+        juniPppLinkStatusInKeepaliveRequests,
+        juniPppLinkStatusOutKeepaliveRequests,
+        juniPppLinkStatusInKeepaliveReplies,
+        juniPppLinkStatusOutKeepaliveReplies,
+        juniPppLinkStatusKeepaliveFailures,
+        juniPppLinkStatusLocalMagicNumber,
+        juniPppLinkStatusRemoteMagicNumber,
+        juniPppLinkStatusLocalAuthentication,
+        juniPppLinkStatusTunnelIfIndex,
+        juniPppLinkConfigRowStatus,
+        juniPppLinkConfigLowerIfIndex,
+        juniPppLinkConfigKeepalive,
+        juniPppLinkConfigAuthentication,
+        juniPppLinkConfigMaxAuthenRetries,
+        juniPppLinkConfigStandardIfIndex,
+        juniPppLinkConfigChapMinChallengeLength,
+        juniPppLinkConfigChapMaxChallengeLength,
+        juniPppLinkConfigPassiveMode,
+        juniPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppLinkConfigAaaProfile,
+        juniPppLinkConfigAuthentication2,
+        juniPppLinkConfigIgnoreMagicNumberMismatch,
+        juniPppNextIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing management of link-layer
+        functionality (LCP) of PPP interfaces in a Juniper product. This group
+        became obsolete when additional objects were added."
+    ::= { juniPppGroups 32 }                                       -- JUNOSe 7.3
+
+juniPppMlPppGroup8  OBJECT-GROUP
+    OBJECTS {
+        juniPppMlPppBundleRowStatus,
+        juniPppMlPppBundleNetworkIfIndex,
+        juniPppMlPppNextLinkIfIndex,
+        juniPppMlPppLinkConfigLowerIfIndex,
+        juniPppMlPppLinkConfigKeepalive,
+        juniPppMlPppLinkConfigAuthentication,
+        juniPppMlPppLinkConfigMaxAuthenRetries,
+        juniPppMlPppLinkConfigRowStatus,
+        juniPppMlPppLinkConfigChapMinChallengeLength,
+        juniPppMlPppLinkConfigChapMaxChallengeLength,
+        juniPppMlPppLinkConfigPassiveMode,
+        juniPppMlPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppMlPppLinkConfigAaaProfile,
+        juniPppMlPppLinkConfigFragmentation,
+        juniPppMlPppLinkConfigReassembly,
+        juniPppMlPppLinkConfigMaxReceiveReconstructedUnit,
+        juniPppMlPppLinkConfigFragmentSize,
+        juniPppMlPppLinkConfigHashLinkSelection,
+        juniPppMlPppLinkConfigAuthentication2,
+        juniPppMlPppLinkConfigIgnoreMagicNumberMismatch,
+        juniPppMlPppNextNetworkIfIndex,
+        juniPppMlPppNetworkConfigLowerIfIndex,
+        juniPppMlPppNetworkBundleName,
+        juniPppMlPppNetworkRowStatus,
+        juniPppMlPppBindRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing multi link PPP management support in
+        a Juniper product. This was obsoleted when multiclass multilink support
+		was added."
+    ::= { juniPppGroups 33 }                                       -- JUNOSe 7.3
+
+juniPppLcpGroup8  OBJECT-GROUP
+    OBJECTS {
+        juniPppLinkStatusTerminateReason,
+        juniPppLinkStatusTerminateNegFailOption,
+        juniPppLinkStatusInKeepaliveRequests,
+        juniPppLinkStatusOutKeepaliveRequests,
+        juniPppLinkStatusInKeepaliveReplies,
+        juniPppLinkStatusOutKeepaliveReplies,
+        juniPppLinkStatusKeepaliveFailures,
+        juniPppLinkStatusLocalMagicNumber,
+        juniPppLinkStatusRemoteMagicNumber,
+        juniPppLinkStatusLocalAuthentication,
+        juniPppLinkStatusTunnelIfIndex,
+        juniPppLinkStatuslcpRenegoTerminates,
+        juniPppLinkConfigRowStatus,
+        juniPppLinkConfigLowerIfIndex,
+        juniPppLinkConfigKeepalive,
+        juniPppLinkConfigAuthentication,
+        juniPppLinkConfigMaxAuthenRetries,
+        juniPppLinkConfigStandardIfIndex,
+        juniPppLinkConfigChapMinChallengeLength,
+        juniPppLinkConfigChapMaxChallengeLength,
+        juniPppLinkConfigPassiveMode,
+        juniPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppLinkConfigAaaProfile,
+        juniPppLinkConfigAuthentication2,
+        juniPppLinkConfigIgnoreMagicNumberMismatch,
+        juniPppLinkConfigMaxLcpRenegotiation,
+        juniPppNextIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of link-layer
+		functionality (LCP) of PPP interfaces in a Juniper product."
+    ::= { juniPppGroups 34 }                                       -- JUNOSe 10.1
+
+juniPppIpGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniPppIpServiceStatus,
+        juniPppIpTerminateReason,
+        juniPppIpTerminateNegFailOption,
+        juniPppIpLocalIpAddress,
+        juniPppIpRemoteIpAddress,
+        juniPppIpRemotePrimaryDnsAddress,
+        juniPppIpRemoteSecondaryDnsAddress,
+        juniPppIpRemotePrimaryWinsAddress,
+        juniPppIpRemoteSecondaryWinsAddress,
+        juniPppIpNetworkStatusIpcpRenegoTerminates,
+        juniPppIpConfigPeerDnsPriority,
+        juniPppIpConfigPeerWinsPriority,
+        juniPppIpConfigIpcpNetmask,
+        juniPppIpConfigInitiateIp,
+        juniPppIpConfigMaxIpcpRenegotiation }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing management of IP network 
+         control protocol functionality (IPCP) of PPP interfaces in a Juniper 
+         product.This group became obsolete when additional objects were added."
+    ::= { juniPppGroups 35 }                                       -- JUNOSe 10.1
+
+juniPppIpv6Group2  OBJECT-GROUP
+    OBJECTS {
+        juniPppIpv6ServiceStatus,
+        juniPppIpv6OperStatus,
+        juniPppIpv6TerminateReason,
+        juniPppIpv6TerminateNegFailOption,
+        juniPppIpv6LocalIpv6AddressIfIdentifier,
+        juniPppIpv6RemoteIpv6AddressIfIdentifier,
+        juniPppIpv6NetworkStatusIpv6cpRenegoTerminates,
+        juniPppIpv6ConfigAdminStatus,
+        juniPppIpv6ConfigInitiateIpv6,
+        juniPppIpv6ConfigMaxIpv6cpRenegotiation }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of IPV6 network control
+        protocol functionality (IPV6CP) of PPP interfaces in a Juniper product."
+    ::= { juniPppGroups 36 }                                       -- JUNOSe 10.1
+
+juniPppIpGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniPppIpServiceStatus,
+        juniPppIpTerminateReason,
+        juniPppIpTerminateNegFailOption,
+        juniPppIpLocalIpAddress,
+        juniPppIpRemoteIpAddress,
+        juniPppIpRemotePrimaryDnsAddress,
+        juniPppIpRemoteSecondaryDnsAddress,
+        juniPppIpRemotePrimaryWinsAddress,
+        juniPppIpRemoteSecondaryWinsAddress,
+        juniPppIpNetworkStatusIpcpRenegoTerminates,
+        juniPppIpConfigPeerDnsPriority,
+        juniPppIpConfigPeerWinsPriority,
+        juniPppIpConfigIpcpNetmask,
+        juniPppIpConfigInitiateIp,
+        juniPppIpConfigMaxIpcpRenegotiation,
+        juniPppIpConfigPromptIpcpDnsOption,
+        juniPppIpConfigIpcpLockout }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of IP network control
+        protocol functionality (IPCP) of PPP interfaces in a Juniper product."
+    ::= { juniPppGroups 37 }                                        --JUNOSe 11.0
+
+juniPppMlPppGroup9  OBJECT-GROUP
+    OBJECTS {
+        juniPppMlPppBundleRowStatus,
+        juniPppMlPppBundleNetworkIfIndex,
+        juniPppMlPppNextLinkIfIndex,
+        juniPppMlPppLinkConfigLowerIfIndex,
+        juniPppMlPppLinkConfigKeepalive,
+        juniPppMlPppLinkConfigAuthentication,
+        juniPppMlPppLinkConfigMaxAuthenRetries,
+        juniPppMlPppLinkConfigRowStatus,
+        juniPppMlPppLinkConfigChapMinChallengeLength,
+        juniPppMlPppLinkConfigChapMaxChallengeLength,
+        juniPppMlPppLinkConfigPassiveMode,
+        juniPppMlPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppMlPppLinkConfigAaaProfile,
+        juniPppMlPppLinkConfigFragmentation,
+        juniPppMlPppLinkConfigReassembly,
+        juniPppMlPppLinkConfigMaxReceiveReconstructedUnit,
+        juniPppMlPppLinkConfigFragmentSize,
+        juniPppMlPppLinkConfigHashLinkSelection,
+        juniPppMlPppLinkConfigAuthentication2,
+        juniPppMlPppLinkConfigIgnoreMagicNumberMismatch,
+        juniPppMlPppNextNetworkIfIndex,
+        juniPppMlPppNetworkConfigLowerIfIndex,
+        juniPppMlPppNetworkBundleName,
+        juniPppMlPppNetworkRowStatus,
+        juniPppMlPppBindRowStatus,
+		juniPppMlPppLinkConfigMultilinkMulticlass,
+    	juniPppMlPppLinkConfigMultilinkMaxMultiClasses }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing multi link PPP management support in
+        a Juniper product."
+    ::= { juniPppGroups 38 }                                       -- JUNOSe 11.1
+    
+juniPppMlPppMulticlassTcGroup1  OBJECT-GROUP
+	OBJECTS {
+	  	juniPppMlPppMulticlassTcName,
+    	juniPppMlPppMulticlassFragmentation,
+    	juniPppMlPppMulticlassReassembly  }
+    STATUS		current
+    DESCRIPTION
+    	" A collection of object providing management of MCMP traffic class
+		mapping functionality of PPP link interfaces in a Juniper product."
+	::= { juniPppGroups 39 }										-- JUNOSe 11.1
+
+END
+

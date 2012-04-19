@@ -1,0 +1,1060 @@
+CTRON-SFPS-SOFTLINK-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-softlink-mib.txt
+--  Revision: 0.0.03
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+--
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services API MIB.
+--
+--  This module will be extended, as required.
+--
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--  tcl    enterprises
+--      Counter,
+      TimeTicks
+--      Gauge
+                FROM RFC1155-SMI
+ 
+
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.8
+        sfpsCentersFacility, sfpsVNSFacility, sfpsVLANFacility,
+        sfpsDiagFacility, sfpsRAFacility, sfpsBetaFacility,
+        sfpsCallTapFacility, sfpsFabricFacility, sfpsLiteFacility, 
+        sfpsFpcFacility, sfpsMcastFacility, sfpsUpLinkFacility
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+--SfpsSwitchInstance ::= OCTET STRING (SIZE(4))
+--  this will map to chassis.module index value
+ 
+-- SfpsSwitchPort ::= INTEGER
+--  this will map to chassis.module.portgroup.portsubgroup.port index value
+ 
+--SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+  
+     HexInteger ::= INTEGER
+--  display this integer in hex format
+
+
+
+sfpsCentersFacilityTable        OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsCentersFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCentersFacility 1 }
+
+sfpsCentersFacilityEntry         OBJECT-TYPE
+        SYNTAX  SfpsCentersFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsCentersFacilityAddress }
+        ::= { sfpsCentersFacilityTable 1 }
+
+SfpsCentersFacilityEntry ::=
+        SEQUENCE {
+                sfpsCentersFacilityAddress      HexInteger,
+                sfpsCentersFacilityMetric       INTEGER,
+                sfpsCentersFacilityElementName  DisplayString,
+                sfpsCentersFacilityOperStatus   INTEGER,
+                sfpsCentersFacilityAdminStatus  INTEGER,
+                sfpsCentersFacilityStatusTime   TimeTicks,
+                sfpsCentersFacilityRequests     INTEGER,
+                sfpsCentersFacilityResponses    INTEGER
+
+                }
+
+sfpsCentersFacilityAddress      OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCentersFacilityEntry 1 }
+
+sfpsCentersFacilityMetric       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCentersFacilityEntry 2 }
+
+sfpsCentersFacilityElementName  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCentersFacilityEntry 3 }
+
+sfpsCentersFacilityOperStatus   OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kStatusRunning(1),
+                        kStatusHalted(2),
+                        kStatusPending(3),
+                        kStatusFaulted(4),
+                        kStatusNotStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCentersFacilityEntry 4 }
+
+sfpsCentersFacilityAdminStatus  OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kControlOther(1),
+                        kControlDisable(2),
+                        kControlEnable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCentersFacilityEntry 5 }
+
+sfpsCentersFacilityStatusTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCentersFacilityEntry 6 }
+
+sfpsCentersFacilityRequests     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCentersFacilityEntry 7 }
+
+sfpsCentersFacilityResponses    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCentersFacilityEntry 8 }
+
+-- Beta Facility
+
+sfpsBetaFacilityTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsBetaFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsBetaFacility 1 }
+
+sfpsBetaFacilityEntry    OBJECT-TYPE
+        SYNTAX  SfpsBetaFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsBetaFacilityHashIndex }
+        ::= { sfpsBetaFacilityTable 1 }
+
+SfpsBetaFacilityEntry ::=
+        SEQUENCE {
+                sfpsBetaFacilityHashIndex       INTEGER,
+                sfpsBetaFacilityElementName     DisplayString,
+                sfpsBetaFacilityAdminStatus     INTEGER,
+                sfpsBetaFacilityOperStatus      INTEGER,
+                sfpsBetaFacilityStatusTime      TimeTicks
+                }
+
+sfpsBetaFacilityHashIndex       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsBetaFacilityEntry 1 }
+
+sfpsBetaFacilityElementName     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsBetaFacilityEntry 2 }
+
+sfpsBetaFacilityAdminStatus     OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kControlOther(1),
+                        kControlDisable(2),
+                        kControlEnable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsBetaFacilityEntry 3 }
+
+sfpsBetaFacilityOperStatus      OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kStatusRunning(1),
+                        kStatusHalted(2),
+                        kStatusPending(3),
+                        kStatusFaulted(4),
+                        kStatusNotStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsBetaFacilityEntry 4 }
+
+sfpsBetaFacilityStatusTime      OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsBetaFacilityEntry 5 }
+ 
+
+--  Call Tap Facility
+
+sfpsCallTapFacilityTable        OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsCallTapFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCallTapFacility 1 }
+
+sfpsCallTapFacilityEntry         OBJECT-TYPE
+        SYNTAX  SfpsCallTapFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsCallTapFacilityHashIndex }
+        ::= { sfpsCallTapFacilityTable 1 }
+
+SfpsCallTapFacilityEntry ::=
+        SEQUENCE {
+                sfpsCallTapFacilityHashIndex    INTEGER,
+                sfpsCallTapFacilityElementName  DisplayString,
+                sfpsCallTapFacilityAdminStatus  INTEGER,
+                sfpsCallTapFacilityOperStatus   INTEGER,
+                sfpsCallTapFacilityStatusTime   TimeTicks
+                }
+
+sfpsCallTapFacilityHashIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCallTapFacilityEntry 1 }
+
+sfpsCallTapFacilityElementName  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCallTapFacilityEntry 2 }
+
+sfpsCallTapFacilityAdminStatus  OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kControlOther(1),
+                        kControlDisable(2),
+                        kControlEnable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCallTapFacilityEntry 3 }
+
+sfpsCallTapFacilityOperStatus   OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kStatusRunning(1),
+                        kStatusHalted(2),
+                        kStatusPending(3),
+                        kStatusFaulted(4),
+                        kStatusNotStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCallTapFacilityEntry 4 }
+
+sfpsCallTapFacilityStatusTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsCallTapFacilityEntry 5 }
+ 
+
+sfpsDiagFacilityTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsDiagFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDiagFacility 1 }
+
+sfpsDiagFacilityEntry    OBJECT-TYPE
+        SYNTAX  SfpsDiagFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsDiagFacilityHashIndex }
+        ::= { sfpsDiagFacilityTable 1 }
+
+SfpsDiagFacilityEntry ::=
+        SEQUENCE {
+                sfpsDiagFacilityHashIndex       INTEGER,
+                sfpsDiagFacilityElementName     DisplayString,
+                sfpsDiagFacilityAdminStatus     INTEGER,
+                sfpsDiagFacilityOperStatus      INTEGER,
+                sfpsDiagFacilityStatusTime      TimeTicks
+                }
+
+sfpsDiagFacilityHashIndex       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDiagFacilityEntry 1 }
+
+sfpsDiagFacilityElementName     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDiagFacilityEntry 2 }
+
+sfpsDiagFacilityAdminStatus     OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kControlOther(1),
+                        kControlDisable(2),
+                        kControlEnable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDiagFacilityEntry 3 }
+
+sfpsDiagFacilityOperStatus      OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kStatusRunning(1),
+                        kStatusHalted(2),
+                        kStatusPending(3),
+                        kStatusFaulted(4),
+                        kStatusNotStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDiagFacilityEntry 4 }
+
+sfpsDiagFacilityStatusTime      OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsDiagFacilityEntry 5 }
+
+
+--  Fabric Facility
+
+sfpsFabricFacilityTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsFabricFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsFabricFacility 1 }
+
+sfpsFabricFacilityEntry  OBJECT-TYPE
+        SYNTAX  SfpsFabricFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsFabricFacilityHashIndex }
+        ::= { sfpsFabricFacilityTable 1 }
+
+SfpsFabricFacilityEntry ::=
+        SEQUENCE {
+                sfpsFabricFacilityHashIndex     INTEGER,
+                sfpsFabricFacilityElementName   DisplayString,
+                sfpsFabricFacilityAdminStatus   INTEGER,
+                sfpsFabricFacilityOperStatus    INTEGER,
+                sfpsFabricFacilityStatusTime    TimeTicks
+                }
+
+sfpsFabricFacilityHashIndex     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsFabricFacilityEntry 1 }
+
+sfpsFabricFacilityElementName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsFabricFacilityEntry 2 }
+
+sfpsFabricFacilityAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kControlOther(1),
+                        kControlDisable(2),
+                        kControlEnable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsFabricFacilityEntry 3 }
+
+sfpsFabricFacilityOperStatus    OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kStatusRunning(1),
+                        kStatusHalted(2),
+                        kStatusPending(3),
+                        kStatusFaulted(4),
+                        kStatusNotStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsFabricFacilityEntry 4 }
+
+sfpsFabricFacilityStatusTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsFabricFacilityEntry 5 }
+
+--  Facility
+
+sfpsLiteFacilityTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsLiteFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsLiteFacility 1 }
+
+sfpsLiteFacilityEntry    OBJECT-TYPE
+        SYNTAX  SfpsLiteFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsLiteFacilityHashIndex }
+        ::= { sfpsLiteFacilityTable 1 }
+
+SfpsLiteFacilityEntry ::=
+        SEQUENCE {
+                sfpsLiteFacilityHashIndex       INTEGER,
+                sfpsLiteFacilityElementName     DisplayString,
+                sfpsLiteFacilityAdminStatus     INTEGER,
+                sfpsLiteFacilityOperStatus      INTEGER,
+                sfpsLiteFacilityStatusTime      TimeTicks
+                }
+
+sfpsLiteFacilityHashIndex       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsLiteFacilityEntry 1 }
+
+sfpsLiteFacilityElementName     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsLiteFacilityEntry 2 }
+
+sfpsLiteFacilityAdminStatus     OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kControlOther(1),
+                        kControlDisable(2),
+                        kControlEnable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsLiteFacilityEntry 3 }
+
+sfpsLiteFacilityOperStatus      OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kStatusRunning(1),
+                        kStatusHalted(2),
+                        kStatusPending(3),
+                        kStatusFaulted(4),
+                        kStatusNotStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsLiteFacilityEntry 4 }
+
+sfpsLiteFacilityStatusTime      OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsLiteFacilityEntry 5 }
+ 
+--  Facility
+
+sfpsFpcFacilityTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsFpcFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsFpcFacility 1 }
+
+sfpsFpcFacilityEntry     OBJECT-TYPE
+        SYNTAX  SfpsFpcFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsFpcFacilityHashIndex }
+        ::= { sfpsFpcFacilityTable 1 }
+
+SfpsFpcFacilityEntry ::=
+        SEQUENCE {
+                sfpsFpcFacilityHashIndex        INTEGER,
+                sfpsFpcFacilityElementName      DisplayString,
+                sfpsFpcFacilityAdminStatus      INTEGER,
+                sfpsFpcFacilityOperStatus       INTEGER,
+                sfpsFpcFacilityStatusTime       TimeTicks
+                }
+
+sfpsFpcFacilityHashIndex        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsFpcFacilityEntry 1 }
+
+sfpsFpcFacilityElementName      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsFpcFacilityEntry 2 }
+
+sfpsFpcFacilityAdminStatus      OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kControlOther(1),
+                        kControlDisable(2),
+                        kControlEnable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsFpcFacilityEntry 3 }
+
+sfpsFpcFacilityOperStatus       OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kStatusRunning(1),
+                        kStatusHalted(2),
+                        kStatusPending(3),
+                        kStatusFaulted(4),
+                        kStatusNotStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsFpcFacilityEntry 4 }
+
+sfpsFpcFacilityStatusTime       OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsFpcFacilityEntry 5 }
+ 
+
+--  Multicast Facility
+
+sfpsMcastFacilityTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsMcastFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsMcastFacility 1 }
+
+sfpsMcastFacilityEntry   OBJECT-TYPE
+        SYNTAX  SfpsMcastFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsMcastFacilityHashIndex }
+        ::= { sfpsMcastFacilityTable 1 }
+
+SfpsMcastFacilityEntry ::=
+        SEQUENCE {
+                sfpsMcastFacilityHashIndex      INTEGER,
+                sfpsMcastFacilityElementName    DisplayString,
+                sfpsMcastFacilityAdminStatus    INTEGER,
+                sfpsMcastFacilityOperStatus     INTEGER,
+                sfpsMcastFacilityStatusTime     TimeTicks
+                }
+
+sfpsMcastFacilityHashIndex      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMcastFacilityEntry 1 }
+
+sfpsMcastFacilityElementName    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMcastFacilityEntry 2 }
+
+sfpsMcastFacilityAdminStatus    OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kControlOther(1),
+                        kControlDisable(2),
+                        kControlEnable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMcastFacilityEntry 3 }
+
+sfpsMcastFacilityOperStatus     OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kStatusRunning(1),
+                        kStatusHalted(2),
+                        kStatusPending(3),
+                        kStatusFaulted(4),
+                        kStatusNotStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMcastFacilityEntry 4 }
+
+sfpsMcastFacilityStatusTime     OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsMcastFacilityEntry 5 }
+
+sfpsVLANFacilityTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsVLANFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsVLANFacility 1 }
+
+sfpsVLANFacilityEntry    OBJECT-TYPE
+        SYNTAX  SfpsVLANFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsVLANFacilityHashIndex }
+        ::= { sfpsVLANFacilityTable 1 }
+
+SfpsVLANFacilityEntry ::=
+        SEQUENCE {
+                sfpsVLANFacilityHashIndex       INTEGER,
+                sfpsVLANFacilityElementName     DisplayString,
+                sfpsVLANFacilityAdminStatus     INTEGER,
+                sfpsVLANFacilityOperStatus      INTEGER,
+                sfpsVLANFacilityStatusTime      TimeTicks
+                }
+
+sfpsVLANFacilityHashIndex       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsVLANFacilityEntry 1 }
+
+sfpsVLANFacilityElementName     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsVLANFacilityEntry 2 }
+
+sfpsVLANFacilityAdminStatus     OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kControlOther(1),
+                        kControlDisable(2),
+                        kControlEnable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsVLANFacilityEntry 3 }
+
+sfpsVLANFacilityOperStatus      OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kStatusRunning(1),
+                        kStatusHalted(2),
+                        kStatusPending(3),
+                        kStatusFaulted(4),
+                        kStatusNotStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsVLANFacilityEntry 4 }
+
+sfpsVLANFacilityStatusTime      OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsVLANFacilityEntry 5 }
+
+ 
+
+sfpsVNSFacilityTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsVNSFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsVNSFacility 1 }
+
+sfpsVNSFacilityEntry     OBJECT-TYPE
+        SYNTAX  SfpsVNSFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsVNSFacilityHashIndex }
+        ::= { sfpsVNSFacilityTable 1 }
+
+SfpsVNSFacilityEntry ::=
+        SEQUENCE {
+                sfpsVNSFacilityHashIndex        INTEGER,
+                sfpsVNSFacilityElementName      DisplayString,
+                sfpsVNSFacilityAdminStatus      INTEGER,
+                sfpsVNSFacilityOperStatus       INTEGER,
+                sfpsVNSFacilityStatusTime       TimeTicks
+                }
+
+sfpsVNSFacilityHashIndex        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsVNSFacilityEntry 1 }
+
+sfpsVNSFacilityElementName      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsVNSFacilityEntry 2 }
+
+sfpsVNSFacilityAdminStatus      OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kControlOther(1),
+                        kControlDisable(2),
+                        kControlEnable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsVNSFacilityEntry 3 }
+
+sfpsVNSFacilityOperStatus       OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        kStatusRunning(1),
+                        kStatusHalted(2),
+                        kStatusPending(3),
+                        kStatusFaulted(4),
+                        kStatusNotStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsVNSFacilityEntry 4 }
+
+sfpsVNSFacilityStatusTime       OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsVNSFacilityEntry 5 }
+
+ 
+
+
+-- Redundant Access Facility - RAFacility
+
+sfpsRAFacilityTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsRAFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRAFacility 1 }
+
+sfpsRAFacilityEntry      OBJECT-TYPE
+        SYNTAX  SfpsRAFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsRAFacilityHashIndex }
+        ::= { sfpsRAFacilityTable 1 }
+
+SfpsRAFacilityEntry ::=
+        SEQUENCE {
+                sfpsRAFacilityHashIndex         INTEGER,
+                sfpsRAFacilityName              DisplayString,
+                sfpsRAFacilityAdminStatus       INTEGER,
+                sfpsRAFacilityOperStatus        INTEGER,
+                sfpsRAFacilityStatusTime        TimeTicks
+                }
+
+sfpsRAFacilityHashIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsRAFacilityEntry 1 }
+
+sfpsRAFacilityName      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsRAFacilityEntry 2 }
+
+sfpsRAFacilityAdminStatus       OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsRAFacilityEntry 3 }
+
+sfpsRAFacilityOperStatus        OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        running(1),
+                        halted(2),
+                        pending(3),
+                        faulted(4),
+                        notStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsRAFacilityEntry 4 }
+
+sfpsRAFacilityStatusTime        OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsRAFacilityEntry 5 }
+
+-- Uplink Facility
+
+sfpsUplinkFacilityTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsUplinkFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsUpLinkFacility 1 }
+
+sfpsUplinkFacilityEntry  OBJECT-TYPE
+        SYNTAX  SfpsUplinkFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsUplinkFacilityHashIndex }
+        ::= { sfpsUplinkFacilityTable 1 }
+
+SfpsUplinkFacilityEntry ::=
+        SEQUENCE {
+                sfpsUplinkFacilityHashIndex             INTEGER,
+                sfpsUplinkFacilityName          DisplayString,
+                sfpsUplinkFacilityAdminStatus   INTEGER,
+                sfpsUplinkFacilityOperStatus    INTEGER,
+                sfpsUplinkFacilityStatusTime    TimeTicks
+                }
+
+sfpsUplinkFacilityHashIndex     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsUplinkFacilityEntry 1 }
+
+sfpsUplinkFacilityName  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsUplinkFacilityEntry 2 }
+
+sfpsUplinkFacilityAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsUplinkFacilityEntry 3 }
+
+sfpsUplinkFacilityOperStatus    OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        running(1),
+                        halted(2),
+                        pending(3),
+                        faulted(4),
+                        notStarted(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsUplinkFacilityEntry 4 }
+
+sfpsUplinkFacilityStatusTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+        ::= { sfpsUplinkFacilityEntry 5 }
+
+END

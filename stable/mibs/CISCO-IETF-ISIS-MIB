@@ -1,0 +1,3816 @@
+-- *****************************************************************
+-- CISCO-IETF-ISIS-MIB.my: Cisco Experimental MIB for IS-IS
+--
+-- August 2005, Sundar Ramachandran
+--
+-- Copyright (c) 2005 by cisco Systems, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+-- This MIB module is based on the Internet Draft
+-- <draft-ietf-isis-wg-mib-16.txt>. In terms of object syntax and
+-- semantics, the content of this Cisco MIB is the same as the
+-- corresponding Internet Draft revision. This Cisco MIB was created
+-- due to the "subject to change" nature of Internet Drafts. This
+-- Cisco MIB may later be deprecated, and the stable RFC, which may
+-- replace the Internet Draft, may be implemented in its place.
+--
+-- Caution.  This MIB is temporary and experimental. In the future it
+-- will be removed from products, perhaps with short notice, in favor
+-- of more standard or generic MIBs.  Application developers should
+-- not depend on long-term access to this MIB.
+
+CISCO-IETF-ISIS-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+        TEXTUAL-CONVENTION, RowStatus, TruthValue
+                FROM SNMPv2-TC
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32,
+            Counter32, TimeTicks, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        ciscoExperiment
+                FROM CISCO-SMI
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+        IndexIntegerNextFree
+                FROM DIFFSERV-MIB
+        InterfaceIndex
+                FROM IF-MIB
+        InetAddressType, InetAddress, InetAddressPrefixLength
+                FROM INET-ADDRESS-MIB;
+
+     ciscoIetfIsisMIB MODULE-IDENTITY
+        LAST-UPDATED "200508161200Z" -- August 16, 2005 12:00:00 GMT
+        ORGANIZATION "Cisco Systems, Inc."
+        CONTACT-INFO
+               "  Cisco Systems
+                  Customer Service
+
+                  Postal: 170 W. Tasman Drive
+                          San Jose, CA  95134
+                          USA
+
+                  Tel: +1 800 553-NETS
+
+                  E-mail: cs-clns@cisco.com"
+
+        DESCRIPTION
+            "This document describes a management information base for
+             the IS-IS Routing protocol, as described in ISO 10589,
+             when it is used to construct routing tables for IP networks,
+             as described in RFC 1195. This MIB is entirely based upon
+             the IETF draft draft-ietf-isis-wg-mib-16."
+
+        -- Revision History
+        REVISION "200508161200Z" -- August 16, 2005 12:00:00 GMT
+        DESCRIPTION
+                 "Corrected DESCRIPTION clause for ciiAreaAddrTable,
+                  ciiAreaAddrEntry, ciiAreaAddr and for 
+                  ciiSysLevelOverloadState based on similar
+                  definitions in draft-ietf-isis-wg-mib-18.txt."
+        REVISION "200502081200Z" -- 08 February 2005 12:00:00 GMT
+        DESCRIPTION
+                 "Initial version."
+
+    ::= { ciscoExperiment 118 }
+
+-- Top-level structure of the MIB
+
+ciscoIetfIsisMIBNotifs      OBJECT IDENTIFIER ::= { ciscoIetfIsisMIB 0 }
+ciscoIetfIsisMIBObjects     OBJECT IDENTIFIER ::= { ciscoIetfIsisMIB 1 }
+ciscoIetfIsisMIBConform     OBJECT IDENTIFIER ::= { ciscoIetfIsisMIB 2 }
+
+-- OBJECT IDENTIFIER definitions
+
+-- System wide attributes.
+ciiSystem OBJECT IDENTIFIER ::= { ciscoIetfIsisMIBObjects 1 }
+
+-- Attributes associated with the domain or with the area.
+ciiSysLevel OBJECT IDENTIFIER ::= { ciscoIetfIsisMIBObjects 2 }
+
+-- Attributes associated with one Circuit
+ciiCirc OBJECT IDENTIFIER ::= { ciscoIetfIsisMIBObjects 3 }
+
+-- Attributes associated with area or domain relevant within a Circuit.
+ciiCircLevelValues OBJECT IDENTIFIER ::= { ciscoIetfIsisMIBObjects 4 }
+
+-- System and circuit counters.
+ciiCounters OBJECT IDENTIFIER ::= { ciscoIetfIsisMIBObjects 5 }
+
+-- Attributes associated with an adjacent Protocol Peer.
+ciiISAdj OBJECT IDENTIFIER ::= { ciscoIetfIsisMIBObjects 6 }
+
+-- Attributes associated with a configured address.
+ciiReachAddr OBJECT IDENTIFIER ::= { ciscoIetfIsisMIBObjects 7 }
+
+-- Attributes associated with IP routes learned by
+-- configuration or through another protocol.
+ciiIPReachAddr OBJECT IDENTIFIER ::= { ciscoIetfIsisMIBObjects 8 }
+
+-- The collection of Link State PDUs known to the Intermediate System
+ciiLSPDataBase OBJECT IDENTIFIER ::= { ciscoIetfIsisMIBObjects 9 }
+
+-- Objects included in Notifications.
+ciiNotification OBJECT IDENTIFIER ::= { ciscoIetfIsisMIBObjects 10 }
+
+-- Type definitions
+
+    CiiOSINSAddress ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "OSI Network Service Address, e.g. NSAP, SNPA, or Network
+             Entity Title"
+        SYNTAX OCTET STRING (SIZE(0..20))
+
+    CiiSystemID ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "A system ID."
+        SYNTAX OCTET STRING (SIZE(6))
+
+    CiiLinkStatePDUID ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "A Link State PDU Identifier."
+        SYNTAX OCTET STRING (SIZE(0|8))
+
+    CiiAdminState ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Type used in enabling and disabling a row.
+             Values match those in RFC 2863."
+        SYNTAX INTEGER
+            {
+                on(1),
+                off(2)
+            }
+
+    CiiLSPBuffSize ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Integer sub range for LSP size."
+        SYNTAX Integer32 (512..16000)
+
+    CiiLevelState ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "States of the IS-IS protocol."
+        SYNTAX INTEGER
+            {
+                off (1),
+                on (2),
+                waiting (3),
+                overloaded(4)
+            }
+
+    CiiSupportedProtocol ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Types of network protocol supported by Integrated IS-IS.
+             The values for ISO8473 and IP are those registered for
+             these protocols in ISO TR9577."
+        SYNTAX INTEGER
+            {
+                iso8473(129),
+                ipV6(142),
+                ip(204)
+            }
+
+    CiiDefaultMetric ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Integer sub-range for default metric for single hop.
+             ISO 10589 provides for 4 types of metric.  Only the
+             'default' metric is used in practice."
+        SYNTAX Integer32 (0..63)
+
+    CiiWideMetric ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Wide Metric for IS Neighbors.  ISO 10589 provides a
+             6 bit metric.  Traffic Engineering extensions provide
+             24 bit metrics."
+        SYNTAX Unsigned32 (0..16777215)
+
+    CiiFullMetric ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Full Metric for IP Routes.  Traffic Engineering extensions
+             provide 32 bit metrics."
+        SYNTAX Unsigned32
+
+    CiiMetricType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Is this an Internal or External Metric?"
+        SYNTAX INTEGER
+            {
+                internal(1),
+                external(2)
+            }
+
+    CiiMetricStyle ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Do we use 1195 style Metrics or wide metrics."
+        SYNTAX INTEGER
+            {
+                narrow(1),
+                wide(2),
+                both(3)
+            }
+
+    CiiISLevel ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Identifies a level."
+        SYNTAX INTEGER
+            {
+                none(0),
+                area(1),        -- L1
+                domain(2)       -- L2
+            }
+
+    CiiPDUHeader ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "A block to contain the header from a PDU."
+        SYNTAX OCTET STRING (SIZE(0..64))
+
+    CiiCircuitID ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "ID for a circuit."
+        SYNTAX OCTET STRING (SIZE(0|7))
+
+    CiiISPriority ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Integer sub-range for IS-IS priority."
+        SYNTAX Integer32 (0..127)
+
+    CiiUnsigned16TC ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "An Unsigned32 further restricted to 16 Bits. Note that
+             the ASN.1 BER encoding may still require 24 Bits for
+             some values."
+        SYNTAX       Unsigned32 (0..65535)
+
+    CiiUnsigned8TC ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "An Unsigned32 further restricted to 8 Bits. Note that
+             the ASN.1 BER encoding may still require 16 Bits for
+             some values."
+        SYNTAX       Unsigned32 (0..255)
+
+-- Behavior Definitions
+
+-- ResettingTimer behavior definition
+-- "This object specifies the interval between certain events in
+-- the operation of the protocol state machine. If the value of
+-- this object is set to a new value while the protocol state
+-- machine is in operation, the implementation shall take the
+-- necessary steps to ensure that for any time interval which
+-- was in progress when the value of the corresponding object
+-- was changed, the next expiration of that interval takes place
+-- the specified time after the original start of that interval,
+-- or immediately, whichever is later. The precision with which
+-- this time shall be implemented shall be the same as that
+-- associated with the basic operation of the timer object."
+
+-- ReplaceOnlyWhileDisabled behavior definition
+-- "This object may not be modified while the corresponding
+-- table row's variable of type CiiAdminState is in state on."
+
+-- ManualOrAutomatic behavior definition
+-- "The access of this object is read-write if the row to which
+-- it belongs is manual (i.e. is being or was created manually)
+-- otherwise (i.e. was created automatically) it is read-only."
+
+    ciiSysObject  OBJECT IDENTIFIER ::= { ciiSystem 1 }
+
+    ciiSysVersion OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                unknown(0),
+                one(1)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The version number of the IS-IS protocol that
+             is implemented."
+        REFERENCE "{ISIS.aoi version (1)}"
+        DEFVAL { one }
+    ::= { ciiSysObject 1 }
+
+    ciiSysType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                level1IS (1),
+                level2IS (2),
+                level1L2IS (3)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "At which levels is the Intermediate System
+             running? This object follows the
+             replaceOnlyWhileDisabled behavior."
+        REFERENCE "{ISIS.aoi iSType (2)}"
+        DEFVAL { level1L2IS }
+    ::= { ciiSysObject 2 }
+
+    ciiSysID OBJECT-TYPE
+        SYNTAX CiiSystemID
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The ID for this Intermediate System.
+             This value is appended to each of the
+             area addresses to form the Network Entity Titles.
+             The derivation of a value for this object is
+             implementation-specific.  Some implementations may
+             automatically assign values and not permit an
+             SNMP write, while others may require the value
+             to be set manually."
+        REFERENCE "{ISIS.aoi systemId (119)}"
+    ::= { ciiSysObject 3 }
+
+    ciiSysMaxPathSplits OBJECT-TYPE
+        SYNTAX Integer32 (1..32)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Maximum number of paths with equal routing metric value
+             which it is permitted to split between. This object
+             follows the replaceOnlyWhileDisabled behavior."
+        REFERENCE "{ISIS.aoi maximumPathSplits (3)}"
+        DEFVAL { 2 }
+    ::= { ciiSysObject 4 }
+
+    ciiSysMaxLSPGenInt OBJECT-TYPE
+        SYNTAX Integer32 (1..65235)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Maximum interval, in seconds, between generated LSPs
+             by this Intermediate System. This object follows
+             the resettingTimer behavior.  The value must be
+             greater than any value configured for
+             ciiSysLevelMinLSPGenInt, and should be at least 300
+             seconds less than ciiSysMaxAge."
+        REFERENCE "{ISIS.aoi maximumLSPGenerationInterval (6)}"
+        DEFVAL { 900 }
+    ::= { ciiSysObject 5 }
+
+    ciiSysPollESHelloRate OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC (1..65535)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The value, in seconds, to be used for the suggested ES
+             configuration timer in ISH PDUs when soliciting the ES
+             configuration."
+        REFERENCE "{ISIS.aoi pollESHelloRate (13)}"
+        DEFVAL { 50 }
+    ::= { ciiSysObject 6 }
+
+    ciiSysWaitTime OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC (1..65535)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Number of seconds to delay in 'waiting' state before
+             entering 'on' state. This object follows the resettingTimer
+             behavior."
+        REFERENCE "{ISIS.aoi waitingTime (15)}"
+        DEFVAL { 60 }
+    ::= { ciiSysObject 7 }
+
+    ciiSysAdminState OBJECT-TYPE
+        SYNTAX CiiAdminState
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The administrative state of this Intermediate
+             System.  Setting this object to the value 'on'
+             when its current value is 'off' enables
+             the Intermediate System."
+        DEFVAL { off }
+    ::= { ciiSysObject 8 }
+
+    ciiSysL2toL1Leaking OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "If true, allow the router to leak L2 routes into L1."
+        DEFVAL { false }
+    ::= { ciiSysObject 9 }
+
+    ciiSysMaxAge OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC (350..65535)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Value to place in RemainingLifeTime field of
+             the LSPs we generate.
+             This should be at least 300 seconds greater than
+             ciiSysMaxLSPGenInt."
+        DEFVAL { 1200 }
+    ::= { ciiSysObject 10 }
+
+    ciiSysReceiveLSPBufferSize OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC (1492..16000)
+        UNITS "bytes"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Size of the largest Buffer we are designed or
+             configured to store.  This should be at least
+             as big as the maximum ciiSysLevelOrigLSPBuffSize
+             supported by the system.
+
+             If resources allow, we will store and flood LSPs
+             larger than ciiSysReceiveLSPBufferSize, as this
+             can help avoid problems in networks with different
+             values for ciiSysLevelOrigLSPBuffSize."
+        DEFVAL { 1492 }
+    ::= { ciiSysObject 11 }
+
+-- The Level 1 Manual Area Address Table
+-- contains the set of area addresses manually configured
+-- for this Intermediate System.
+-- At least one row in which the value of ciiManAreaAddrExistState
+-- is active must be present. The maximum number of rows
+-- in this table for for which the object
+-- ciiManAreaAddrExistState has the value active is 3.
+--     An attempt to create more 3 rows of ciiManAreaAddrEntry
+-- with state 'active' in one instance of the IS-IS protocol
+-- should return inconsistentValue.
+
+    ciiManAreaAddrTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiManAreaAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The set of manual area addresses configured on this
+             Intermediate System."
+        REFERENCE "{ISIS.aoi manualAreaAddresses (10)}"
+    ::= { ciiSystem 2 }
+
+    ciiManAreaAddrEntry OBJECT-TYPE
+        SYNTAX CiiManAreaAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains one area address manually configured
+             on this system"
+        INDEX { ciiManAreaAddr }
+    ::= { ciiManAreaAddrTable 1 }
+
+    CiiManAreaAddrEntry ::=
+        SEQUENCE {
+            ciiManAreaAddr
+                CiiOSINSAddress,
+            ciiManAreaAddrExistState
+                RowStatus
+            }
+
+    ciiManAreaAddr OBJECT-TYPE
+        SYNTAX CiiOSINSAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A manually configured area address for this system. This
+             object follows the index behavior.
+
+             Note: an index for the entry {1, {49.0001} active} in
+             this table would be the ordered pair
+             (1, (0x03 0x49 0x00 0x01)), as the length of an Octet
+             string is part of the OID."
+
+    ::= { ciiManAreaAddrEntry 1 }
+
+    ciiManAreaAddrExistState OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The state of the ciiManAreaAddrEntry. This object
+             follows the Row Status behavior. If the ciiSysAdminState
+             for this Intermediate System is 'on', and an
+             attempt is made to set this object to the value 'destroy'
+             or 'notInService' when this is the only
+             ciiManAreaAddrEntry in state 'active' for this
+             Intermediate System should return inconsistentValue."
+    ::= { ciiManAreaAddrEntry 2 }
+
+-- The Level 1 Area Address Table
+
+-- The Level 1 Area Address Table contains the
+-- union of the sets of relevant area addresses configured or
+-- learned from Level 1 LSPs received by this Intermediate System.
+
+    ciiAreaAddrTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiAreaAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The union of the sets of area addresses reported in all
+             Level 1 LSPs with fragment number zero generated by this
+             Intermediate System, or received from other Intermediate
+             Systems which are reachable via Level 1 routing."
+        REFERENCE "{ISIS.aoi areaAddresses (18)}"
+    ::= { ciiSystem 3 }
+
+    ciiAreaAddrEntry OBJECT-TYPE
+        SYNTAX CiiAreaAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains one area address reported in a
+             Level 1 LSP generated or received by this Intermediate
+             System."
+        INDEX { ciiAreaAddr }
+    ::= { ciiAreaAddrTable 1 }
+
+    CiiAreaAddrEntry ::=
+        SEQUENCE {
+            ciiAreaAddr
+                CiiOSINSAddress
+            }
+
+    ciiAreaAddr OBJECT-TYPE
+        SYNTAX CiiOSINSAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An area address reported in a Level 1 LSP." 
+    ::= { ciiAreaAddrEntry 1 }
+
+-- The System Protocol Supported Table
+
+-- The System Protocol Supported Table contains the manually
+-- configured set of protocols supported by this
+-- Intermediate System.
+
+    ciiSysProtSuppTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiSysProtSuppEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains the manually configured set of
+             protocols supported by this Intermediate System."
+    ::= { ciiSystem 4 }
+
+    ciiSysProtSuppEntry OBJECT-TYPE
+        SYNTAX CiiSysProtSuppEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains one protocol supported by
+             this Intermediate System."
+
+        INDEX {  ciiSysProtSuppProtocol }
+
+    ::= { ciiSysProtSuppTable 1 }
+
+    CiiSysProtSuppEntry ::=
+        SEQUENCE {
+            ciiSysProtSuppProtocol
+                CiiSupportedProtocol,
+            ciiSysProtSuppExistState
+                RowStatus
+            }
+
+    ciiSysProtSuppProtocol OBJECT-TYPE
+        SYNTAX CiiSupportedProtocol
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "One supported protocol. This object follows the index
+             behavior."
+    ::= { ciiSysProtSuppEntry 1 }
+
+    ciiSysProtSuppExistState OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The state of the ciiSysProtSuppEntry. This object
+             follows the RowStatus behavior."
+    ::= { ciiSysProtSuppEntry 2 }
+
+-- The Summary Address Table
+
+-- The Summary Address Table contains the set of summary
+-- addresses manually configured for the Intermediate System.
+--
+-- This is used to control leaking L1 routes into L2.
+
+    ciiSummAddrTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiSummAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The set of IP summary addresses to use in forming
+             summary TLVs originated by this Intermediate System.
+
+             An administrator may use a summary address to combine
+             and modify IP Reachability announcements.  If the
+             Intermediate system can reach any subset of the summary
+             address, the summary address will be announced instead,
+             at the configured metric."
+    ::= { ciiSystem 5 }
+
+    ciiSummAddrEntry OBJECT-TYPE
+        SYNTAX CiiSummAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains one IP summary address."
+        INDEX { ciiSummAddressType,
+                ciiSummAddress,
+                ciiSummAddrPrefixLen }
+    ::= { ciiSummAddrTable 1 }
+
+    CiiSummAddrEntry ::=
+        SEQUENCE {
+            ciiSummAddressType
+                InetAddressType,
+            ciiSummAddress
+                InetAddress,
+            ciiSummAddrPrefixLen
+                InetAddressPrefixLength,
+            ciiSummAddrExistState
+                RowStatus,
+            ciiSummAddrMetric
+                CiiDefaultMetric,
+            ciiSummAddrFullMetric
+                CiiFullMetric
+        }
+
+    ciiSummAddressType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The Type of IP address for this summary address.
+             This object follows the index behavior."
+    ::= { ciiSummAddrEntry 1 }
+
+    ciiSummAddress OBJECT-TYPE
+        SYNTAX InetAddress (SIZE(4|16))
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IP Address value for this summary address.
+             This object follows the index behavior."
+    ::= { ciiSummAddrEntry 2 }
+
+    ciiSummAddrPrefixLen OBJECT-TYPE
+        SYNTAX InetAddressPrefixLength (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The Length of the IP NetMask for this summary address."
+    ::= { ciiSummAddrEntry 3 }
+
+    ciiSummAddrExistState OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The existence state of this summary address. This object
+             follows the row status behavior."
+    ::= { ciiSummAddrEntry 4 }
+
+    ciiSummAddrMetric OBJECT-TYPE
+        SYNTAX CiiDefaultMetric
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The metric value to announce this summary
+             address with in LSPs generated by this system."
+        DEFVAL { 20 }
+    ::= { ciiSummAddrEntry 5 }
+
+    ciiSummAddrFullMetric OBJECT-TYPE
+        SYNTAX CiiFullMetric
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The wide metric value to announce this summary
+             address with in LSPs generated by this system."
+        DEFVAL { 20 }
+    ::= { ciiSummAddrEntry 6 }
+
+-- The Redistribution table defines addresses that should be
+-- leaked from L2 to L1 if ciiSysL2toL1Leaking is enabled.
+
+    ciiRedistributeAddrTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiRedistributeAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table provides criteria to decide if a route should
+             be leaked from L2 to L1 when Domain Wide Prefix leaking is
+             enabled.
+
+             Addresses that match the summary mask in the table will
+             be announced at L1 by routers when ciiSysL2toL1Leaking
+             is enabled.  Routes that fall into the ranges specified
+             are announced as is, without being summarized.  Routes
+             that do not match a summary mask are not announced."
+    ::= { ciiSystem 6 }
+
+    ciiRedistributeAddrEntry OBJECT-TYPE
+        SYNTAX CiiRedistributeAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains one IP summary address to
+             manage leaking L2 addresses into L1."
+        INDEX { ciiRedistributeAddrType,
+                ciiRedistributeAddrAddress,
+                ciiRedistributeAddrPrefixLen }
+    ::= { ciiRedistributeAddrTable 1 }
+
+    CiiRedistributeAddrEntry ::=
+        SEQUENCE {
+            ciiRedistributeAddrType
+                InetAddressType,
+            ciiRedistributeAddrAddress
+                InetAddress,
+            ciiRedistributeAddrPrefixLen
+                InetAddressPrefixLength,
+            ciiRedistributeAddrExistState
+                RowStatus
+        }
+
+    ciiRedistributeAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The Type of IP address for this summary address.
+             This object follows the index behavior."
+    ::= { ciiRedistributeAddrEntry 1 }
+
+    ciiRedistributeAddrAddress OBJECT-TYPE
+        SYNTAX InetAddress (SIZE(4|16))
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IP Address value for this summary address.
+             This object follows the index behavior."
+    ::= { ciiRedistributeAddrEntry 2 }
+
+    ciiRedistributeAddrPrefixLen OBJECT-TYPE
+        SYNTAX InetAddressPrefixLength (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The Length of the IP NetMask for this summary address."
+    ::= { ciiRedistributeAddrEntry 3 }
+
+    ciiRedistributeAddrExistState OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The existence state of this summary address. This object
+             follows the row status behavior."
+    ::= { ciiRedistributeAddrEntry 4 }
+
+-- The Router Table keeps track of hostnames and router IDs
+-- associated with peers in the area and domain.
+
+    ciiRouterTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiRouterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The set of hostnames and router ID."
+    ::= { ciiSystem 7 }
+
+    ciiRouterEntry OBJECT-TYPE
+        SYNTAX CiiRouterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry tracks information about one peer at
+             one level."
+        INDEX { ciiRouterSysID,
+                ciiRouterLevel }
+    ::= { ciiRouterTable 1 }
+
+    CiiRouterEntry ::=
+        SEQUENCE {
+            ciiRouterSysID
+                CiiSystemID,
+            ciiRouterLevel
+                CiiISLevel,
+            ciiRouterHostName
+                SnmpAdminString,
+            ciiRouterID
+                Unsigned32
+        }
+
+    ciiRouterSysID OBJECT-TYPE
+        SYNTAX CiiSystemID
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The System ID of the Router Peer."
+    ::= { ciiRouterEntry 1 }
+
+    ciiRouterLevel OBJECT-TYPE
+        SYNTAX CiiISLevel
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The level of this Intermediate System."
+    ::= { ciiRouterEntry 2 }
+
+    ciiRouterHostName OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The hostname listed in LSP, or zero-length string if none."
+    ::= { ciiRouterEntry 3 }
+
+    ciiRouterID OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Router ID of the Peer found in LSP, or zero if none."
+    ::= { ciiRouterEntry 4 }
+
+-- The System Level Table
+-- This table captures level-specific information about the System
+
+    ciiSysLevelTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiSysLevelEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Level specific information about the System."
+    ::= { ciiSysLevel 1 }
+
+    ciiSysLevelEntry OBJECT-TYPE
+        SYNTAX CiiSysLevelEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Describe variables defined for Area or Domain."
+        INDEX { ciiSysLevelIndex }
+    ::= { ciiSysLevelTable 1 }
+
+    CiiSysLevelEntry ::=
+        SEQUENCE {
+            ciiSysLevelIndex
+                INTEGER,
+            ciiSysLevelOrigLSPBuffSize
+                CiiLSPBuffSize,
+            ciiSysLevelMinLSPGenInt
+                CiiUnsigned16TC,
+            ciiSysLevelOverloadState
+                CiiLevelState,
+            ciiSysLevelSetOverload
+                TruthValue,
+            ciiSysLevelSetOverloadUntil
+                TimeTicks,
+            ciiSysLevelMetricStyle
+                CiiMetricStyle,
+            ciiSysLevelSPFConsiders
+                CiiMetricStyle,
+            ciiSysLevelTEEnabled
+                TruthValue
+        }
+
+    ciiSysLevelIndex OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                level1IS (1),
+                level2IS (2)
+            }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The level that this entry describes."
+    ::= { ciiSysLevelEntry 1 }
+
+    ciiSysLevelOrigLSPBuffSize OBJECT-TYPE
+        SYNTAX CiiLSPBuffSize
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum size of LSPs and SNPs originated by
+             this Intermediate System at this level.
+             This object follows the replaceOnlyWhileDisabled
+             behavior."
+        REFERENCE "{ISIS.aoi originatingL1LSPBufferSize (9)}"
+        DEFVAL { 1492 }
+    ::= { ciiSysLevelEntry 2 }
+
+    ciiSysLevelMinLSPGenInt OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC (1..65535)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Minimum interval, in seconds, between successive
+             generation of LSPs with the same LSPID at this level
+             by this Intermediate System.  This object
+             follows the resettingTimer behavior."
+        REFERENCE "{ISIS.aoi minimumLSPGenerationInterval (11)}"
+        DEFVAL { 30 }
+    ::= { ciiSysLevelEntry 3 }
+
+    ciiSysLevelOverloadState OBJECT-TYPE
+        SYNTAX CiiLevelState
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The state of the database at this level.
+             The value 'off' indicates that IS-IS is not active at
+             this level.
+             The value 'on' indicates that IS-IS is active at this
+             level, and not overloaded.
+             The value 'waiting' indicates a database that is low on
+             an essential resource, such as memory.
+             The administrator may force the state to 'overloaded'
+             by setting the object ciiSysLevelSetOverload.
+             If the state is 'waiting' or 'overloaded', we originate
+             LSPs with the Overload bit set."
+        REFERENCE "{ISIS.aoi l1State (17)}"
+    ::= { ciiSysLevelEntry 4 }
+
+    ciiSysLevelSetOverload OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Administratively set the overload bit for the level.
+             The overload bit will continue to be set if the
+             implementation runs out of memory, independent of
+             this variable"
+        DEFVAL { false }
+    ::= { ciiSysLevelEntry 5 }
+
+    ciiSysLevelSetOverloadUntil OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "If set, the overload bit should be set, and cleared
+             after sysUpTime exceeds this value."
+        DEFVAL { 0 }
+    ::= { ciiSysLevelEntry 6 }
+
+    ciiSysLevelMetricStyle OBJECT-TYPE
+        SYNTAX CiiMetricStyle
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Which style of Metric do we generate in our LSPs
+             at this level? This object follows the
+             replaceOnlyWhileDisabled behavior."
+        DEFVAL { narrow }
+    ::= { ciiSysLevelEntry 7 }
+
+    ciiSysLevelSPFConsiders OBJECT-TYPE
+        SYNTAX CiiMetricStyle
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Which style of Metric do we consider in our
+             SPF computation at this level?"
+        DEFVAL { narrow }
+    ::= { ciiSysLevelEntry 8 }
+
+    ciiSysLevelTEEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Do we do Traffic Engineering at this level?"
+        DEFVAL { false }
+    ::= { ciiSysLevelEntry 9 }
+
+-- Static to provide next CircIndex
+
+    ciiNextCircIndex OBJECT-TYPE
+        SYNTAX IndexIntegerNextFree
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object is used to assign values to
+             ciiCircIndex as described in 'Textual
+             Conventions for SNMPv2'.  The network manager
+             reads this object, and then writes the value
+             back as the ciiCircIndex in a SET that creates
+             a new instance of ciiCircEntry.  If the SET
+             fails with the code 'inconsistentValue', then
+             the process must be repeated; If the SET succeeds,
+             then the object is incremented, and the new
+             ciiCircEntry is created according to the manager's
+             directions."
+    ::= { ciiCirc  1 }
+
+-- The Circuit Table
+-- Each broadcast or point-to-point interface on the system
+-- corresponds to one entry in the Circuit table.  However, there
+-- may be multiple X.25 DA circuit entries in the Circuit table
+-- for a given X.25 interface.
+
+    ciiCircTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiCircEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table of circuits used by this
+             Intermediate System."
+    ::= { ciiCirc 2 }
+
+    ciiCircEntry OBJECT-TYPE
+        SYNTAX CiiCircEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An ciiCircEntry exists for each circuit used by
+             Integrated IS-IS on this system."
+        INDEX { ciiCircIndex }
+    ::= { ciiCircTable 1 }
+
+    CiiCircEntry ::=
+        SEQUENCE {
+            ciiCircIndex
+                Integer32,
+            ciiCircIfIndex
+                InterfaceIndex,
+            ciiCircIfSubIndex
+                Integer32,
+            ciiCircAdminState
+                CiiAdminState,
+            ciiCircExistState
+                RowStatus,
+            ciiCircType
+                INTEGER,
+            ciiCircExtDomain
+                TruthValue,
+            ciiCircLevel
+                INTEGER,
+            ciiCircPassiveCircuit
+                TruthValue,
+            ciiCircMeshGroupEnabled
+                INTEGER,
+            ciiCircMeshGroup
+                Unsigned32,
+            ciiCircSmallHellos
+                TruthValue,
+            ciiCircLastUpTime
+                TimeTicks,
+            ciiCirc3WayEnabled
+                TruthValue,
+            ciiCircExtendedCircID
+                Unsigned32
+        }
+
+    ciiCircIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The identifier of this circuit, unique within the
+             Intermediate System.  This object follows
+             the index behavior.  This is for SNMP Indexing
+             purposes only and need not have any relation to
+             any protocol value."
+    ::= { ciiCircEntry 1 }
+
+    ciiCircIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The value of ifIndex for the interface to which this
+             circuit corresponds.   This object cannot be modified
+             after creation"
+    ::= { ciiCircEntry 2 }
+
+    ciiCircIfSubIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "A specifier for the part of the interface ifIndex to which
+             this circuit corresponds, such as a DLCI or VPI/VCI.
+             This object cannot be modified after creation"
+    ::= { ciiCircEntry 3 }
+
+    ciiCircAdminState OBJECT-TYPE
+        SYNTAX CiiAdminState
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The administrative state of the circuit. This
+             object follows the CiiAdminState behavior."
+        DEFVAL { off }
+    ::= { ciiCircEntry 4 }
+
+    ciiCircExistState OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The existence state of this circuit. This object follows
+             the RowStatus behavior.  Setting the state to
+             'notInService' halts the generation and processing of
+             IS-IS protocol PDUs on this circuit.  Setting the state
+             to 'destroy' will also erase any configuration associated
+             with the circuit."
+    ::= { ciiCircEntry 5 }
+
+    ciiCircType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                broadcast(1),
+                ptToPt(2),
+                staticIn(3),
+                staticOut(4),
+                dA(5)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The type of the circuit. This object follows the
+             replaceOnlyWhileDisabled behavior. The type specified
+             must be compatible with the type of the interface defined
+             by the value of ciiCircIfIndex."
+        REFERENCE "{ISIS.aoi type (33)}"
+    ::= { ciiCircEntry 6 }
+
+    ciiCircExtDomain OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "If true, suppress normal transmission of and
+             interpretation of Intra-domain IS-IS PDUs on this
+             circuit."
+        REFERENCE "{ISIS.aoi externalDomain (46)}"
+        DEFVAL { false }
+    ::= { ciiCircEntry 7 }
+
+    ciiCircLevel OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                level1(1),
+                level2(2),
+                level1L2(3)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates which type of packets will be sent and
+             accepted on this circuit. The values used will be
+             modified by the settings of ciiSysType. This
+             object follows the replaceOnlyWhileDisabled behavior."
+        DEFVAL { level1L2 }
+    ::= { ciiCircEntry 8 }
+
+    ciiCircPassiveCircuit OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Should we include this interface in LSPs, even if
+             it is not running the IS-IS Protocol?"
+        DEFVAL { false }
+    ::= { ciiCircEntry 9 }
+
+    ciiCircMeshGroupEnabled OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                inactive(1),
+                blocked(2),
+                set(3)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Is this port a member of a mesh group, or blocked?
+             Circuits in the same mesh group act as a virtual
+             multiaccess network.  LSPs seen on one circuit in
+             a mesh group will not be flooded to another circuit
+             in the same mesh group."
+        REFERENCE "{ RFC 2973 }"
+        DEFVAL { inactive }
+    ::= { ciiCircEntry 10 }
+
+    ciiCircMeshGroup OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Circuits in the same mesh group act as a virtual
+             multiaccess network.  LSPs seen on one circuit in
+             a mesh group will not be flooded to another circuit
+             in the same mesh group.  If ciiCircMeshGroupEnabled
+             is inactive or blocked, this value is ignored."
+        REFERENCE "{ RFC 2973 }"
+    ::= { ciiCircEntry 11 }
+
+    ciiCircSmallHellos OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Can we send unpadded hellos on LAN circuits?  'false'
+             means LAN Hellos must be padded.
+             Implementations should allow the administrator to read
+             this value.  An implementation need not be able to
+             support unpadded hellos to be conformant."
+         DEFVAL { false }
+    ::= { ciiCircEntry 12 }
+
+    ciiCircLastUpTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "If the circuit is enabled, the value of sysUpTime
+             when ciiCircAdminState most recently entered
+             the state 'on'.  If the circuit is not 'on',
+             the value of sysUpTime when the circuit last
+             entered state 'on', 0 if the circuit has never
+             been 'on'."
+    ::= { ciiCircEntry 13 }
+
+    ciiCirc3WayEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Is this circuit enabled to run 3Way handshake?"
+        DEFVAL { true }
+    ::= { ciiCircEntry 14 }
+
+    ciiCircExtendedCircID OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The value to be used as the extended circuit ID in
+             3Way handshake.  This value is only used if
+             ciiCirc3WayEnabled is true, and must be unique across
+             all circuits on this IS."
+    ::= { ciiCircEntry 15 }
+
+-- The Circuit Level Table
+-- This table captures level-specific information about a circuit
+
+    ciiCircLevelTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiCircLevelEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Level specific information about circuits used by IS-IS"
+    ::= { ciiCircLevelValues 1 }
+
+    ciiCircLevelEntry OBJECT-TYPE
+        SYNTAX CiiCircLevelEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An ciiCircLevelEntry exists for each level on
+             each circuit used by Integrated IS-IS on this system."
+        INDEX { ciiCircIndex,
+                ciiCircLevelIndex }
+    ::= { ciiCircLevelTable 1 }
+
+    CiiCircLevelEntry ::=
+        SEQUENCE {
+            ciiCircLevelIndex
+                INTEGER,
+            ciiCircLevelMetric
+                CiiDefaultMetric,
+            ciiCircLevelWideMetric
+                CiiWideMetric,
+            ciiCircLevelISPriority
+                CiiISPriority,
+            ciiCircLevelIDOctet
+                Integer32,
+            ciiCircLevelID
+                CiiCircuitID,
+            ciiCircLevelDesIS
+                CiiCircuitID,
+            ciiCircLevelHelloMultiplier
+                Integer32,
+            ciiCircLevelHelloTimer
+                Integer32,
+            ciiCircLevelDRHelloTimer
+                Integer32,
+            ciiCircLevelLSPThrottle
+                CiiUnsigned16TC,
+            ciiCircLevelMinLSPRetransInt
+                Integer32,
+            ciiCircLevelCSNPInterval
+                Integer32,
+            ciiCircLevelPartSNPInterval
+                Integer32
+        }
+
+    ciiCircLevelIndex OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                level1IS (1),
+                level2IS (2)
+            }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The level that this entry describes."
+    ::= { ciiCircLevelEntry 1 }
+
+    ciiCircLevelMetric OBJECT-TYPE
+        SYNTAX CiiDefaultMetric
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The metric value of this circuit for this level."
+        REFERENCE "{ISIS.aoi l1DefaultMetric (35)}"
+        DEFVAL { 10 }
+    ::= { ciiCircLevelEntry 2 }
+
+    ciiCircLevelWideMetric OBJECT-TYPE
+        SYNTAX CiiWideMetric
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The wide metric value of this circuit for this level."
+        DEFVAL { 10 }
+    ::= { ciiCircLevelEntry 3 }
+
+    ciiCircLevelISPriority OBJECT-TYPE
+        SYNTAX CiiISPriority
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The priority for becoming LAN Designated
+             Intermediate System at this level."
+        REFERENCE "{ISIS.aoi l2IntermediateSystemPriority (73)}"
+        DEFVAL { 64 }
+    ::= { ciiCircLevelEntry 4 }
+
+    ciiCircLevelIDOctet OBJECT-TYPE
+        SYNTAX Integer32(0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A one byte identifier that can be used in protocol packets
+             to identify a circuit.  Values of ciiCircLevelIDOctet
+             do not need to be unique.  They are only required to
+             differ on LANs where the Intermediate System is the
+             Designated Intermediate System."
+    ::= { ciiCircLevelEntry 5 }
+
+    ciiCircLevelID OBJECT-TYPE
+        SYNTAX CiiCircuitID
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "On a point to point circuit with a fully initialized
+             adjacency to a peer IS, the value of this object is
+             the circuit ID negotiated during adjacency initialization.
+             On a point to point circuit without such an adjacency,
+             the value is the concatenation of the local system ID
+             and the one byte ciiCircLevelIDOctet for this circuit
+             i.e. the value that would be proposed for the circuit ID.
+
+             On other circuit types, the value returned is the zero
+             length OCTET STRING."
+        REFERENCE "{ISIS.aoi ptPtCircuitID (51)}"
+    ::= { ciiCircLevelEntry 6 }
+
+    ciiCircLevelDesIS OBJECT-TYPE
+        SYNTAX CiiCircuitID
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ID of the LAN Designated Intermediate System
+             on this circuit at this level. If, for any reason,
+             this system is not partaking in the relevant
+             Designated Intermediate System election process,
+             then the value returned is the zero length OCTET STRING."
+        REFERENCE "{ISIS.aoi l2DesignatedIntermediateSystem (75)}"
+    ::= { ciiCircLevelEntry 7 }
+
+    ciiCircLevelHelloMultiplier OBJECT-TYPE
+        SYNTAX Integer32 (2..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value is multiplied by the corresponding HelloTimer
+             and the result in seconds (rounded up) is used as the
+             holding time in transmitted hellos, to be used by
+             receivers of hello packets from this IS"
+        REFERENCE "{ISIS.aoi iSISHelloTimer (45)}"
+        DEFVAL { 10 }
+    ::= { ciiCircLevelEntry 8 }
+
+    ciiCircLevelHelloTimer OBJECT-TYPE
+        SYNTAX Integer32 (10..600000)
+        UNITS "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Maximum period, in milliseconds, between IIH PDUs
+             on multiaccess networks at this level for LANs.
+             The value at L1 is used as the period between
+             Hellos on L1L2 point to point circuits.  Setting
+             this value at level 2 on an L1L2 point to point
+             circuit will result in an error of InconsistentValue.
+
+             This object follows the resettingTimer behavior."
+        REFERENCE "{ISIS.aoi iSISHelloTimer (45)}"
+        DEFVAL { 3000 }
+    ::= { ciiCircLevelEntry 9 }
+
+    ciiCircLevelDRHelloTimer OBJECT-TYPE
+        SYNTAX Integer32 (10..120000)
+        UNITS "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Period, in milliseconds, between Hello PDUs on
+             multiaccess networks when this IS is the Designated
+             Intermediate System.  This object follows the
+             resettingTimer behavior."
+        REFERENCE "{ISIS.aoi iSISHelloTimer (45)}"
+        DEFVAL { 1000 }
+    ::= { ciiCircLevelEntry 10 }
+
+    ciiCircLevelLSPThrottle OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC (1..65535)
+        UNITS "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Minimal interval of time, in milliseconds, between
+             transmissions of LSPs on an interface at this level."
+        REFERENCE
+            "{ISIS.aoi minimumBroadcastLSPTransmissionInterval (5)}"
+        DEFVAL { 30 }
+    ::= { ciiCircLevelEntry 11 }
+
+    ciiCircLevelMinLSPRetransInt OBJECT-TYPE
+        SYNTAX Integer32 (1..300)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Minimum interval, in seconds, between re-transmission of
+             an LSP at this level. This object follows the
+             resettingTimer behavior.
+
+             Note that ciiCircLevelLSPThrottle controls
+             how fast we send back to back LSPs.  This variable
+             controls how fast we re-send the same LSP."
+        REFERENCE "{ISIS.aoi minimumLSPTransmissionInterval (5)}"
+        DEFVAL { 5 }
+    ::= { ciiCircLevelEntry 12 }
+
+    ciiCircLevelCSNPInterval OBJECT-TYPE
+        SYNTAX Integer32 (1..600)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Interval of time, in seconds, between periodic
+             transmission of a complete set of CSNPs on
+             multiaccess networks if this router is the
+             designated router at this level.
+
+             This object follows the resettingTimer behavior."
+        REFERENCE "{ISIS.aoi completeSNPInterval (8)}"
+        DEFVAL { 10 }
+    ::= { ciiCircLevelEntry 13 }
+
+    ciiCircLevelPartSNPInterval OBJECT-TYPE
+        SYNTAX Integer32 (1..120)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Minimum interval in seconds between sending Partial
+             Sequence Number PDUs at this level. This object
+             follows the resettingTimer behavior."
+        REFERENCE "{ISIS.aoi partialSNPInterval (14)}"
+        DEFVAL { 2 }
+    ::= { ciiCircLevelEntry 14 }
+
+-- ciiSystemCounterTable keeps track of system-wide events.
+
+    ciiSystemCounterTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiSystemCounterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "System wide counters for this Intermediate System."
+    ::= { ciiCounters 1 }
+
+    ciiSystemCounterEntry OBJECT-TYPE
+        SYNTAX CiiSystemCounterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "System-wide IS-IS counters."
+        INDEX { ciiSysStatLevel }
+    ::= { ciiSystemCounterTable 1 }
+
+    CiiSystemCounterEntry ::=
+        SEQUENCE {
+            ciiSysStatLevel
+                INTEGER,
+            ciiSysStatCorrLSPs
+                Counter32,
+            ciiSysStatAuthTypeFails
+                Counter32,
+            ciiSysStatAuthFails
+                Counter32,
+            ciiSysStatLSPDbaseOloads
+                Counter32,
+            ciiSysStatManAddrDropFromAreas
+                Counter32,
+            ciiSysStatAttmptToExMaxSeqNums
+                Counter32,
+            ciiSysStatSeqNumSkips
+                Counter32,
+            ciiSysStatOwnLSPPurges
+                Counter32,
+            ciiSysStatIDFieldLenMismatches
+                Counter32,
+            ciiSysStatPartChanges
+                Counter32,
+            ciiSysStatSPFRuns
+                Counter32,
+            ciiSysStatLSPErrors
+                Counter32
+        }
+
+    ciiSysStatLevel OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                level1IS (1),
+                level2IS (2)
+            }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The level that this entry describes."
+    ::= { ciiSystemCounterEntry 1 }
+
+    ciiSysStatCorrLSPs OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of corrupted in-memory LSP frames detected.
+
+             LSPs received from the wire with a bad checksum
+             are silently dropped and not counted.
+
+             LSPs received from the wire with parse errors
+             are counted by ciiSysStatLSPErrors."
+        REFERENCE "{ISIS.aoi corruptedLSPsDetected (19)}"
+    ::= { ciiSystemCounterEntry 2 }
+
+    ciiSysStatAuthTypeFails OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of frames with authentication type mismatches
+             recognized by this Intermediate System."
+    ::= { ciiSystemCounterEntry 3 }
+
+    ciiSysStatAuthFails OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of frames with authentication failures
+             recognized by this Intermediate System."
+    ::= { ciiSystemCounterEntry 4 }
+
+    ciiSysStatLSPDbaseOloads OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of times the LSP database has become
+             overloaded."
+        REFERENCE "{ISIS.aoi lSPL1DatabaseOverloads (20)}"
+    ::= { ciiSystemCounterEntry 5 }
+
+    ciiSysStatManAddrDropFromAreas OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of times a manual address has been dropped from
+             the area."
+        REFERENCE "{ISIS.aoi manualAddressesDroppedFromArea (21)}"
+    ::= { ciiSystemCounterEntry 6 }
+
+    ciiSysStatAttmptToExMaxSeqNums OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of times the IS has attempted to exceed the
+             maximum sequence number."
+        REFERENCE
+            "{ISIS.aoi attemptsToExceedmaximumSequenceNumber (22)}"
+    ::= { ciiSystemCounterEntry 7 }
+
+    ciiSysStatSeqNumSkips OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of times a sequence number skip has occurred."
+        REFERENCE "{ISIS.aoi sequenceNumberSkips (23)}"
+    ::= { ciiSystemCounterEntry 8 }
+
+    ciiSysStatOwnLSPPurges OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of times a zero-aged copy of the system's own LSP
+             is received from some other node."
+        REFERENCE "{ISIS.aoi ownLSPPurges (24)}"
+    ::= { ciiSystemCounterEntry 9 }
+
+    ciiSysStatIDFieldLenMismatches OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of times a PDU is received with a different value
+             for ID field length to that of the receiving system."
+        REFERENCE "{ISIS.aoi iDFieldLengthMismatches (25)}"
+    ::= { ciiSystemCounterEntry 10 }
+
+    ciiSysStatPartChanges OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Partition changes"
+    ::= { ciiSystemCounterEntry 11 }
+
+    ciiSysStatSPFRuns OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of times we ran SPF at this level."
+    ::= { ciiSystemCounterEntry 12 }
+
+    ciiSysStatLSPErrors OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of LSP frames with errors we have received."
+    ::= { ciiSystemCounterEntry 13 }
+
+-- ciiCircuitCounterTable keeps track of events
+-- specific to a circuit and a level
+
+    ciiCircuitCounterTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiCircuitCounterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Circuit specific counters for this
+             Intermediate System."
+    ::= { ciiCounters 2 }
+
+    ciiCircuitCounterEntry OBJECT-TYPE
+        SYNTAX CiiCircuitCounterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An ciiCircuitCounterEntry exists for each circuit
+             used by Integrated IS-IS on this system."
+        INDEX { ciiCircIndex,
+                ciiCircuitType }
+    ::= { ciiCircuitCounterTable 1 }
+
+    CiiCircuitCounterEntry ::= SEQUENCE {
+          ciiCircuitType
+              INTEGER,
+          ciiCircAdjChanges
+              Counter32,
+          ciiCircNumAdj
+              Unsigned32,
+          ciiCircInitFails
+              Counter32,
+          ciiCircRejAdjs
+              Counter32,
+          ciiCircIDFieldLenMismatches
+              Counter32,
+          ciiCircMaxAreaAddrMismatches
+              Counter32,
+          ciiCircAuthTypeFails
+              Counter32,
+          ciiCircAuthFails
+              Counter32,
+          ciiCircLANDesISChanges
+              Counter32
+       }
+
+    ciiCircuitType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                lanlevel1(1),
+                lanlevel2(2),
+                p2pcircuit(3)
+            }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "What type of circuit saw these counts?
+
+             The point to point Hello PDU includes
+             both L1 and L2, and ISs form a single
+             adjacency on point to point links.
+             Thus we combine counts on
+             point to point links into one group."
+    ::= { ciiCircuitCounterEntry 1 }
+
+    ciiCircAdjChanges OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times an adjacency state change has
+             occurred on this circuit."
+        REFERENCE "{ISIS.aoi changesInAdjacencyState (40)}"
+    ::= { ciiCircuitCounterEntry 2 }
+
+    ciiCircNumAdj OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of adjacencies on this circuit."
+        REFERENCE "{ISIS.aoi changesInAdjacencyState (40)}"
+    ::= { ciiCircuitCounterEntry 3 }
+
+    ciiCircInitFails OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times initialization of this circuit has
+             failed.  This counts events such as PPP NCP failures.
+             Failures to form an adjacency are counted by
+             ciiCircRejAdjs."
+    ::= { ciiCircuitCounterEntry 4 }
+
+    ciiCircRejAdjs OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times an adjacency has been rejected on
+             this circuit."
+        REFERENCE "{ISIS.aoi rejectedAdjacencies (42)}"
+    ::= { ciiCircuitCounterEntry 5 }
+
+    ciiCircIDFieldLenMismatches OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times an IS-IS control PDU with an ID
+             field length different to that for this system has been
+             received."
+        REFERENCE "{ISIS.aoi iDFieldLengthMismatches (25)}"
+    ::= { ciiCircuitCounterEntry 6 }
+
+    ciiCircMaxAreaAddrMismatches OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times an IS-IS control PDU with a
+             max area address field different to that for this
+             system has been received."
+        REFERENCE "{ISIS.aoi iDFieldLengthMismatches (25)}"
+    ::= { ciiCircuitCounterEntry 7 }
+
+    ciiCircAuthTypeFails OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times an IS-IS control PDU with
+             an auth type field different to that for this
+             system has been received."
+    ::= { ciiCircuitCounterEntry 8 }
+
+    ciiCircAuthFails OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times an IS-IS control PDU with
+             the correct auth type has failed to pass authentication
+             validation."
+    ::= { ciiCircuitCounterEntry 9 }
+
+    ciiCircLANDesISChanges OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times the Designated IS has changed
+             on this circuit at this level.  If the circuit is
+             point to point, this count is zero."
+    ::= { ciiCircuitCounterEntry 10 }
+
+-- ciiPacketCounterTable keeps track of the number of IS-IS
+-- control packets sent and received at each level
+
+    ciiPacketCounterTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiPacketCounterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Information about IS-IS protocol traffic at one level
+             on one circuit in one direction"
+    ::= { ciiCounters 3 }
+
+    ciiPacketCounterEntry OBJECT-TYPE
+        SYNTAX CiiPacketCounterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Information about IS-IS protocol traffic at one level
+             on one circuit in one direction"
+        INDEX { ciiCircIndex,
+                ciiPacketCountLevel,
+                ciiPacketCountDirection }
+    ::= { ciiPacketCounterTable 1 }
+
+    CiiPacketCounterEntry ::=
+        SEQUENCE {
+            ciiPacketCountLevel
+                INTEGER,
+            ciiPacketCountDirection
+                INTEGER,
+            ciiPacketCountIIHellos
+                Counter32,
+            ciiPacketCountISHellos
+                Counter32,
+            ciiPacketCountESHellos
+                Counter32,
+            ciiPacketCountLSPs
+                Counter32,
+            ciiPacketCountCSNPs
+                Counter32,
+            ciiPacketCountPSNPs
+                Counter32,
+            ciiPacketCountUnknowns
+                Counter32
+    }
+
+    ciiPacketCountLevel OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                level1(1),
+                level2(2)
+            }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The level at which these PDU counts have been collected."
+    ::= { ciiPacketCounterEntry 1 }
+
+    ciiPacketCountDirection OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                sending(1),
+                receiving(2)
+            }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Were we sending or receiving these PDUs?"
+    ::= { ciiPacketCounterEntry 2 }
+
+    ciiPacketCountIIHellos OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of IS-IS Hello PDU frames seen in this
+             direction at this level.
+
+             Point-to-Point IIH PDUs are counted at
+             the lowest enabled level: at L1 on L1 or L1L2 circuits,
+             and at L2 otherwise."
+        REFERENCE "{ISIS.aoi iSISControlPDUsSent (43)}"
+    ::= { ciiPacketCounterEntry 3 }
+
+    ciiPacketCountISHellos OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of ES-IS Hello PDU frames seen in this
+             direction.  ISH PDUs are counted at the
+             lowest enabled level: at L1 on L1 or L1L2
+             circuits, and at L2 otherwise."
+    ::= { ciiPacketCounterEntry 4 }
+
+    ciiPacketCountESHellos OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of ES Hello PDU frames seen in this
+             direction.  ESH PDUs are counted at the
+             lowest enabled level: at L1 on L1 or L1L2
+             circuits, and at L2 otherwise."
+    ::= { ciiPacketCounterEntry 5 }
+
+    ciiPacketCountLSPs OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of IS-IS LSP frames seen in this
+             direction at this level."
+        REFERENCE "{ISIS.aoi iSISControlPDUsSent (43)}"
+    ::= { ciiPacketCounterEntry 6 }
+
+    ciiPacketCountCSNPs OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of IS-IS CSNP frames seen in this
+             direction at this level."
+        REFERENCE "{ISIS.aoi iSISControlPDUsSent (43)}"
+    ::= { ciiPacketCounterEntry 7 }
+
+    ciiPacketCountPSNPs OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of IS-IS PSNP frames seen in this
+             direction at this level."
+        REFERENCE "{ISIS.aoi iSISControlPDUsSent (43)}"
+    ::= { ciiPacketCounterEntry 8 }
+
+    ciiPacketCountUnknowns OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "frames"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of unknown IS-IS PDU frames seen
+             at this level."
+        REFERENCE "{ISIS.aoi iSISControlPDUsSent (43)}"
+    ::= { ciiPacketCounterEntry 9 }
+
+-- The IS Adjacency Table
+--
+-- Each adjacency to an IS corresponds to one entry in this
+-- table.
+
+    ciiISAdjTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiISAdjEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table of adjacencies to Intermediate Systems."
+    ::= { ciiISAdj 1 }
+
+    ciiISAdjEntry OBJECT-TYPE
+        SYNTAX CiiISAdjEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry corresponds to one adjacency to an
+             Intermediate System on this system."
+        INDEX { ciiCircIndex,
+                ciiISAdjIndex }
+    ::= { ciiISAdjTable 1 }
+
+    CiiISAdjEntry ::=
+        SEQUENCE {
+            ciiISAdjIndex
+                Integer32,
+            ciiISAdjState
+                INTEGER,
+            ciiISAdj3WayState
+                INTEGER,
+            ciiISAdjNeighSNPAAddress
+                CiiOSINSAddress,
+            ciiISAdjNeighSysType
+                INTEGER,
+            ciiISAdjNeighSysID
+                CiiSystemID,
+            ciiISAdjNbrExtendedCircID
+                Unsigned32,
+            ciiISAdjUsage
+                INTEGER,
+            ciiISAdjHoldTimer
+                CiiUnsigned16TC,
+            ciiISAdjNeighPriority
+                CiiISPriority,
+            ciiISAdjLastUpTime
+                TimeTicks
+      }
+
+    ciiISAdjIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2000000000)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A unique value identifying the IS adjacency from all
+             other such adjacencies on this circuit. This value is
+             automatically assigned by the system when the adjacency
+             is created."
+    ::= { ciiISAdjEntry 1 }
+
+    ciiISAdjState OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                 down (1),
+                 initializing (2),
+                 up (3),
+                 failed(4)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The state of the adjacency"
+        REFERENCE "{ISIS.aoi adjacencyState (78)}"
+    ::= { ciiISAdjEntry 2 }
+
+    ciiISAdj3WayState OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                 up (0),
+                 initializing (1),
+                 down (2),
+                 failed (3)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The 3Way state of the adjacency.  These are picked
+             to match the historical on-the-wire representation
+             of the 3Way state, and are not intended to match
+             ciiISAdjState."
+        REFERENCE "{ RFC 3373 }"
+    ::= { ciiISAdjEntry 3 }
+
+    ciiISAdjNeighSNPAAddress OBJECT-TYPE
+        SYNTAX CiiOSINSAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The SNPA address of the neighboring system."
+        REFERENCE "{ISIS.aoi neighbourSNPAAddress (79)}"
+    ::= { ciiISAdjEntry 4 }
+
+    ciiISAdjNeighSysType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                l1IntermediateSystem(1),
+                l2IntermediateSystem(2),
+                l1L2IntermediateSystem(3),
+                unknown(4)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the neighboring system."
+        REFERENCE "{ISIS.aoi neighbourSystemType (80)}"
+    ::= { ciiISAdjEntry 5 }
+
+    ciiISAdjNeighSysID OBJECT-TYPE
+        SYNTAX CiiSystemID
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The system ID of the neighboring Intermediate
+             System."
+        REFERENCE "{ISIS.aoi neighbourSystemIds (83)}"
+    ::= { ciiISAdjEntry 6 }
+
+    ciiISAdjNbrExtendedCircID OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The 4 byte Extended Circuit ID learned from the
+             Neighbor during 3-way handshake, or 0."
+    ::= { ciiISAdjEntry 7 }
+
+    ciiISAdjUsage OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                level1(1),
+                level2(2),
+                level1and2(3)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "How is the adjacency used?  On a point-to-point link,
+             this might be level1and2, but on a LAN, the usage will
+             be level1 on the adjacency between peers at L1,
+             and level2 for the adjacency between peers at L2."
+        REFERENCE "{ISIS.aoi adjacencyUsage (82)}"
+    ::= { ciiISAdjEntry 8 }
+
+    ciiISAdjHoldTimer OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC (1..65535)
+        UNITS "seconds"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The holding time in seconds for this adjacency.
+             This value is based on received IIH PDUs and
+             the elapsed time since receipt."
+        REFERENCE "{ISIS.aoi holdingTimer (85)}"
+    ::= { ciiISAdjEntry 9 }
+
+    ciiISAdjNeighPriority OBJECT-TYPE
+        SYNTAX CiiISPriority
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Priority of the neighboring Intermediate System for
+             becoming the Designated Intermediate System."
+        REFERENCE "{ISIS.aoi lANPriority (86)}"
+    ::= { ciiISAdjEntry 10 }
+
+    ciiISAdjLastUpTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        UNITS "hundredths of a second"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "If the ciiISAdjState is in state 'up', the value
+             of sysUpTime when the adjacency most recently
+             entered the state 'up',  or 0 if it has never
+             been in state 'up'."
+    ::= { ciiISAdjEntry 11 }
+
+-- The IS Adjacency Area Address Table
+
+-- The IS Adjacency Area Address Table contains the set of
+-- Area Addresses of neighboring
+-- Intermediate Systems as reported in IIH PDUs.
+
+    ciiISAdjAreaAddrTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiISAdjAreaAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains the set of Area Addresses of
+             neighboring Intermediate Systems as reported in received
+             IIH PDUs."
+        REFERENCE "{ISIS.aoi areaAddressesOfNeighbour (84)}"
+    ::= { ciiISAdj 2 }
+
+    ciiISAdjAreaAddrEntry OBJECT-TYPE
+        SYNTAX CiiISAdjAreaAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains one Area Address reported by a
+             neighboring Intermediate System in its IIH PDUs."
+        INDEX { ciiCircIndex,
+                ciiISAdjIndex,
+                ciiISAdjAreaAddrIndex }
+    ::= { ciiISAdjAreaAddrTable 1 }
+
+    CiiISAdjAreaAddrEntry ::=
+        SEQUENCE {
+            ciiISAdjAreaAddrIndex
+                Integer32,
+            ciiISAdjAreaAddress
+                CiiOSINSAddress
+            }
+
+    ciiISAdjAreaAddrIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2000000000)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An index for the areas associated with one neighbor.
+             This provides a simple way to walk the table."
+    ::= { ciiISAdjAreaAddrEntry 1 }
+
+    ciiISAdjAreaAddress OBJECT-TYPE
+        SYNTAX CiiOSINSAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "One Area Address as reported in IIH PDUs received from
+             the neighbor."
+    ::= { ciiISAdjAreaAddrEntry 2 }
+
+-- The IS Adjacency IP Address Table
+
+-- The IS Adjacency IP Address Table contains the
+-- set of IP Addresses of neighboring Intermediate Systems
+-- as reported in received IIH PDUs.
+
+    ciiISAdjIPAddrTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiISAdjIPAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains the set of IP Addresses of
+             neighboring Intermediate Systems as reported in received
+             IIH PDUs."
+    ::= { ciiISAdj 3 }
+
+    ciiISAdjIPAddrEntry OBJECT-TYPE
+        SYNTAX CiiISAdjIPAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains one IP Address reported by a
+             neighboring Intermediate System in its IIH PDUs."
+        INDEX { ciiCircIndex,
+                ciiISAdjIndex,
+                ciiISAdjIPAddrIndex
+                }
+    ::= { ciiISAdjIPAddrTable 1 }
+
+    CiiISAdjIPAddrEntry ::=
+        SEQUENCE {
+            ciiISAdjIPAddrIndex
+                Integer32,
+            ciiISAdjIPAddrType
+                 InetAddressType,
+            ciiISAdjIPAddrAddress
+                InetAddress
+        }
+
+    ciiISAdjIPAddrIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2000000000)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An index to this table which identifies the IP addresses
+             to which this entry belongs."
+    ::= { ciiISAdjIPAddrEntry 1 }
+
+    ciiISAdjIPAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of one IP Address as reported in IIH PDUs
+             received from the neighbor."
+    ::= { ciiISAdjIPAddrEntry 2 }
+
+    ciiISAdjIPAddrAddress OBJECT-TYPE
+        SYNTAX InetAddress (SIZE(4|16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "One IP Address as reported in IIH PDUs received from the
+             neighbor."
+    ::= { ciiISAdjIPAddrEntry 3 }
+
+-- The IS Adjacency Protocol Supported Table
+--
+-- The IS Adjacency Protocol Supported Table contains the set of
+-- protocols supported by neighboring
+-- Intermediate Systems as reported in received IIH PDUs.
+
+    ciiISAdjProtSuppTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiISAdjProtSuppEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains the set of protocols supported by
+             neighboring Intermediate Systems as reported in received
+             IIH PDUs."
+    ::= { ciiISAdj 4 }
+
+    ciiISAdjProtSuppEntry OBJECT-TYPE
+        SYNTAX CiiISAdjProtSuppEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry contains one protocol supported by a
+             neighboring Intermediate System as reported in its IIH
+             PDUs."
+        INDEX {  ciiCircIndex,
+                 ciiISAdjIndex,
+                 ciiISAdjProtSuppProtocol }
+    ::= { ciiISAdjProtSuppTable 1 }
+
+    CiiISAdjProtSuppEntry ::=
+        SEQUENCE {
+            ciiISAdjProtSuppProtocol
+                CiiSupportedProtocol
+        }
+
+    ciiISAdjProtSuppProtocol OBJECT-TYPE
+        SYNTAX CiiSupportedProtocol
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "One supported protocol as reported in IIH PDUs received
+             from the neighbor."
+    ::= { ciiISAdjProtSuppEntry 1 }
+
+-- The Reachable Address Group
+--
+-- The Reachable Address Group is optional.
+-- The Reachable Address Table
+-- Each entry records information about a reachable address
+-- (NSAP or address prefix) manually configured on the system
+-- or learned through another protocol.
+
+    ciiRATable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiRAEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table of Reachable Addresses to NSAPs or Address
+             Prefixes."
+    ::= { ciiReachAddr 1 }
+
+    ciiRAEntry OBJECT-TYPE
+        SYNTAX CiiRAEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry defines a Reachable Address to a NSAP or
+             Address Prefix."
+        INDEX { ciiCircIndex,
+                ciiRAIndex }
+    ::= { ciiRATable 1 }
+
+    CiiRAEntry ::=
+        SEQUENCE {
+            ciiRAIndex
+                Integer32,
+            ciiRAExistState
+                RowStatus,
+            ciiRAAdminState
+                CiiAdminState,
+            ciiRAAddrPrefix
+                CiiOSINSAddress,
+            ciiRAMapType
+                INTEGER,
+            ciiRAMetric
+                CiiDefaultMetric,
+            ciiRAMetricType
+                CiiMetricType,
+            ciiRASNPAAddress
+                CiiOSINSAddress,
+            ciiRASNPAMask
+                CiiOSINSAddress,
+            ciiRASNPAPrefix
+                CiiOSINSAddress,
+            ciiRAType
+                INTEGER
+        }
+
+    ciiRAIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2000000000)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The identifier for this ciiRAEntry. This value must be
+             unique amongst all Reachable Addresses on the same parent
+             Circuit. This object follows the index and ManualOrAutomatic
+             behaviors."
+    ::= { ciiRAEntry 1 }
+
+    ciiRAExistState OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The existence state of this Reachable Address. This
+             object follows the ManualOrAutomatic behaviors."
+    ::= { ciiRAEntry 2 }
+
+    ciiRAAdminState OBJECT-TYPE
+        SYNTAX CiiAdminState
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The administrative state of the Reachable Address. This
+             object follows the CiiAdminState and ManualOrAutomatic
+             behaviors."
+        DEFVAL { off }
+    ::= { ciiRAEntry 3 }
+
+    ciiRAAddrPrefix OBJECT-TYPE
+        SYNTAX CiiOSINSAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The destination of this Reachable Address. This is an
+             Address Prefix. This object follows the
+             replaceOnlyWhileDisabled and ManualOrAutomatic
+             behaviors."
+        REFERENCE "{ISIS.aoi addressPrefix (98)}"
+    ::= { ciiRAEntry 4 }
+
+    ciiRAMapType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                none (1),
+                explicit (2),
+                extractIDI (3),
+                extractDSP (4)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The type of mapping to be employed to ascertain the SNPA
+             Address which should be used in forwarding PDUs for this
+             Reachable Address prefix. This object follows the
+             ManualOrAutomatic behavior. The following values of
+             mapping type are defined:
+
+                 none: The mapping is null because the neighbor SNPA is
+                       implicit by nature of the subnetwork (e.g. a
+                       point-to-point linkage).
+
+                 explicit: The subnetwork addresses in the object
+                       ciiRASNPAAddress is to be used.
+
+                 extractIDI: The SNPA is embedded in the IDI of
+                       the destination NSAP Address. The mapping
+                       algorithm extracts the SNPA to be used
+                       according to the format and encoding rules of
+                       ISO8473/Add2. This SNPA extraction algorithm can
+                       be used in conjunction with Reachable Address
+                       prefixes from the X.121, F.69, E.163 and E.164
+                       addressing subdomains.
+
+                 extractDSP: All, or a suffix, of the SNPA is embedded
+                       in the DSP of the destination address. This SNPA
+                       extraction algorithm extracts the embedded
+                       subnetwork addressing information by performing a
+                       logical AND of the ciiRASNPAMask object value
+                       with the destination address. The part of the
+                       SNPA extracted from the destination NSAP is
+                       appended to the ciiRASNPAPrefix object value to
+                       form the next hop subnetwork addressing
+                       information."
+
+        REFERENCE "{ISO10589-ISIS.aoi mappingType (107)}"
+    ::= { ciiRAEntry 5 }
+
+    ciiRAMetric OBJECT-TYPE
+        SYNTAX CiiDefaultMetric
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The metric value for reaching the specified
+             prefix over this circuit. This object follows the
+             ManualOrAutomatic behavior."
+        REFERENCE "{ISIS.aoi DefaultMetric (99)}"
+        DEFVAL { 20 }
+    ::= { ciiRAEntry 6 }
+
+    ciiRAMetricType OBJECT-TYPE
+        SYNTAX CiiMetricType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates whether the metric is internal or
+             external. This object follows the ManualOrAutomatic
+             behavior."
+        REFERENCE "{ISIS.aoi DefaultMetricType (103)}"
+        DEFVAL { internal }
+    ::= { ciiRAEntry 7 }
+
+    ciiRASNPAAddress OBJECT-TYPE
+        SYNTAX CiiOSINSAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The SNPA Address to which a PDU may be forwarded in
+             order to reach a destination which matches the address
+             prefix of the Reachable Address. This object follows the
+             ManualOrAutomatic behavior."
+        REFERENCE "{ISIS.aoi sNPAAddresses (109)}"
+-- note only one address may be specified per Reachable Address
+-- in the MIB
+        DEFVAL { ''H }
+    ::= { ciiRAEntry 8 }
+
+    ciiRASNPAMask OBJECT-TYPE
+        SYNTAX CiiOSINSAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "A bit mask with 1 bits indicating the positions in the
+             effective destination address from which embedded SNPA
+             information is to be extracted. For the extraction the
+             first octet of the ciiRASNPAMask object value is aligned
+             with the first octet (AFI) of the NSAP Address. If the
+             ciiRASNPAMask object value and NSAP Address are of
+             different lengths, the shorter of the two is logically
+             padded with zeros before performing the extraction. This
+             object follows the ManualOrAutomatic behavior."
+        REFERENCE "{ISIS.aoi sNPAMask (122)}"
+        DEFVAL { '00'H }
+    ::= { ciiRAEntry 9 }
+
+    ciiRASNPAPrefix OBJECT-TYPE
+        SYNTAX CiiOSINSAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "A fixed SNPA prefix for use when the ciiRAMapType is
+             extractDSP. The SNPA Address to use is formed by
+             concatenating the fixed SNPA prefix with a variable SNPA
+             part that is extracted from the effective destination
+             address. For Reachable Address prefixes in which the
+             entire SNPA is embedded in the DSP the SNPA Prefix shall
+             be null. This object follows the ManualOrAutomatic
+             behavior."
+        REFERENCE "{ISIS.aoi sNPAPrefix (123)}"
+        DEFVAL { '00'H }
+    ::= { ciiRAEntry 10 }
+
+    ciiRAType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                manual (1),
+                automatic (2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The type of Reachable address. Those of type
+             manual are created by the network manager. Those
+             of type automatic are created through propagation
+             of routing information from another routing
+             protocol (eg. IDRP). "
+        DEFVAL {manual}
+    ::= {ciiRAEntry 11 }
+
+-- The IP Reachable Address Table
+
+-- Each entry records information about one IP reachable
+-- address manually configured on this system or learned from
+-- another protocol.
+
+    ciiIPRATable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiIPRAEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table of IP Reachable Addresses to networks,
+             subnetworks or hosts either manually configured or
+             learned from another protocol."
+    ::= { ciiIPReachAddr 1 }
+
+    ciiIPRAEntry OBJECT-TYPE
+        SYNTAX CiiIPRAEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry defines an IP Reachable Address to a network,
+             subnetwork or host.
+
+             Each IP Reachable Address may have multiple entries in the
+             table, one for each equal cost path to the reachable address."
+        INDEX {  ciiIPRADestType,
+                 ciiIPRADest,
+                 ciiIPRADestPrefixLen,
+                 ciiIPRANextHopIndex }
+    ::= { ciiIPRATable 1 }
+
+    CiiIPRAEntry ::=
+        SEQUENCE {
+            ciiIPRADestType
+                InetAddressType,
+            ciiIPRADest
+                InetAddress,
+            ciiIPRADestPrefixLen
+                InetAddressPrefixLength,
+            ciiIPRANextHopIndex
+                Integer32,
+            ciiIPRANextHopType
+                InetAddressType,
+            ciiIPRANextHop
+                InetAddress,
+            ciiIPRAType
+                INTEGER,
+            ciiIPRAExistState
+                RowStatus,
+            ciiIPRAAdminState
+                CiiAdminState,
+            ciiIPRAMetric
+                CiiDefaultMetric,
+            ciiIPRAMetricType
+                CiiMetricType,
+            ciiIPRAFullMetric
+                CiiFullMetric,
+            ciiIPRASNPAAddress
+                CiiOSINSAddress,
+            ciiIPRASourceType
+                INTEGER
+        }
+
+    ciiIPRADestType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The type of this IP Reachable Address.  This object
+             follows the ManualOrAutomatic behavior."
+    ::= { ciiIPRAEntry 1 }
+
+    ciiIPRADest OBJECT-TYPE
+        SYNTAX InetAddress (SIZE(4|16))
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The destination of this IP Reachable Address. This is
+             either a network address, subnetwork address or host
+             address. This object follows the ManualOrAutomatic
+             behavior."
+    ::= { ciiIPRAEntry 2 }
+
+    ciiIPRADestPrefixLen OBJECT-TYPE
+        SYNTAX InetAddressPrefixLength (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The length of the IP Netmask for Reachability Address.
+             This object follows the ManualOrAutomatic behavior."
+    ::= { ciiIPRAEntry 3 }
+
+    ciiIPRANextHopIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Index of next hop.  Used when there are multiple Equal
+             Cost Multipath alternatives for the same destination."
+    ::= { ciiIPRAEntry 4 }
+
+    ciiIPRANextHopType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The type of the IP next hop address."
+    ::= { ciiIPRAEntry 5 }
+
+    ciiIPRANextHop OBJECT-TYPE
+        SYNTAX InetAddress (SIZE(4|16))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The IP next hop to this destination."
+    ::= { ciiIPRAEntry 6 }
+
+    ciiIPRAType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                manual (1),
+                automatic (2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The type of this IP Reachable Address. Those of type
+             manual are created by the network manager. Those of type
+             automatic are created through propagation of routing
+             information from another routing protocol.  This object
+             follows the ManualOrAutomatic behavior."
+    ::= { ciiIPRAEntry 7 }
+
+    ciiIPRAExistState OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The state of this IP Reachable Address. This object
+             follows the ExistenceState and ManualOrAutomatic
+             behaviors."
+    ::= { ciiIPRAEntry 8 }
+
+    ciiIPRAAdminState OBJECT-TYPE
+        SYNTAX CiiAdminState
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The administrative state of the IP Reachable Address. This
+             object follows the CiiAdminState and ManualOrAutomatic
+             behaviors."
+        DEFVAL { off }
+    ::= { ciiIPRAEntry 9 }
+
+    ciiIPRAMetric OBJECT-TYPE
+        SYNTAX CiiDefaultMetric
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The metric value for reaching the specified
+             destination over this circuit. This object follows the
+             ManualOrAutomatic behavior."
+        DEFVAL { 10 }
+    ::= { ciiIPRAEntry 10 }
+
+    ciiIPRAMetricType OBJECT-TYPE
+        SYNTAX CiiMetricType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates whether the metric is internal or
+             external. This object follows the ManualOrAutomatic
+             behavior."
+        DEFVAL { internal }
+    ::= { ciiIPRAEntry 11 }
+
+    ciiIPRAFullMetric OBJECT-TYPE
+        SYNTAX CiiFullMetric
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The wide metric value for reaching the specified
+             destination over this circuit. This object follows the
+             ManualOrAutomatic behavior."
+        DEFVAL { 10 }
+    ::= { ciiIPRAEntry 12 }
+
+    ciiIPRASNPAAddress OBJECT-TYPE
+        SYNTAX CiiOSINSAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The SNPA Address to which a PDU may be forwarded in
+             order to reach a destination which matches this IP
+             Reachable Address. This object follows the
+             ManualOrAutomatic behavior."
+        DEFVAL { ''H }
+    ::= { ciiIPRAEntry 13 }
+
+    ciiIPRASourceType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                static (1),
+                direct (2),
+                ospfv2 (3),
+                ospfv3 (4),
+                isis   (5),
+                rip    (6),
+                igrp   (7),
+                eigrp  (8),
+                bgp    (9),
+                other (10)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The origin of this route."
+    ::= { ciiIPRAEntry 14 }
+
+-- The LSP Database Table
+--
+-- The first table provides Summary Information about LSPs
+-- The next table provides a complete record
+
+    ciiLSPSummaryTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiLSPSummaryEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table of LSP Headers."
+    ::= { ciiLSPDataBase 1 }
+
+    ciiLSPSummaryEntry OBJECT-TYPE
+        SYNTAX CiiLSPSummaryEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry provides a summary describing an
+             LSP currently stored in the system."
+        INDEX {  ciiLSPLevel,
+                 ciiLSPID }
+    ::= { ciiLSPSummaryTable 1 }
+
+    CiiLSPSummaryEntry ::=
+        SEQUENCE {
+            ciiLSPLevel
+                CiiISLevel,
+            ciiLSPID
+                CiiLinkStatePDUID,
+            ciiLSPSeq
+                Unsigned32,
+            ciiLSPZeroLife
+                TruthValue,
+            ciiLSPChecksum
+                CiiUnsigned16TC,
+            ciiLSPLifetimeRemain
+                CiiUnsigned16TC,
+            ciiLSPPDULength
+                CiiUnsigned16TC,
+            ciiLSPAttributes
+                CiiUnsigned8TC
+        }
+
+    ciiLSPLevel OBJECT-TYPE
+        SYNTAX CiiISLevel
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "At which level does this LSP appear?"
+    ::= { ciiLSPSummaryEntry 1 }
+
+    ciiLSPID OBJECT-TYPE
+        SYNTAX CiiLinkStatePDUID
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The 8 byte LSP ID, consisting of the SystemID,
+             Circuit ID, and Fragment Number."
+    ::= { ciiLSPSummaryEntry 2 }
+
+    ciiLSPSeq OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sequence number for this LSP."
+    ::= { ciiLSPSummaryEntry 3 }
+
+    ciiLSPZeroLife OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Is this LSP being purged by this System?"
+    ::= { ciiLSPSummaryEntry 4 }
+
+    ciiLSPChecksum OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The 16 bit Fletcher Checksum."
+    ::= { ciiLSPSummaryEntry 5 }
+
+    ciiLSPLifetimeRemain OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC
+        UNITS "seconds"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The remaining lifetime in seconds for this LSP."
+    ::= { ciiLSPSummaryEntry 6 }
+
+    ciiLSPPDULength OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The length of this LSP."
+    ::= { ciiLSPSummaryEntry 7 }
+
+    ciiLSPAttributes OBJECT-TYPE
+        SYNTAX CiiUnsigned8TC
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Flags carried by the LSP."
+    ::= { ciiLSPSummaryEntry 8 }
+
+-- LSP Table
+--
+-- The full LSP as a sequence of {Type, Len, Value} tuples
+-- Since the underlying LSP may have changed while downloading
+-- TLVs, we provide the Sequence number and Checksum for each
+-- LSP TLV, so the network manager may verify that they are
+-- still working on the same version of the LSP.
+
+    ciiLSPTLVTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CiiLSPTLVEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The contents of each LSP."
+    ::= { ciiLSPDataBase 2 }
+
+    ciiLSPTLVEntry OBJECT-TYPE
+        SYNTAX CiiLSPTLVEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry describes an LSP current stored in the
+             system."
+        INDEX {  ciiLSPLevel,
+                 ciiLSPID,
+                 ciiLSPTLVIndex }
+    ::= { ciiLSPTLVTable 1 }
+
+    CiiLSPTLVEntry ::=
+        SEQUENCE {
+            ciiLSPTLVIndex
+                Unsigned32,
+            ciiLSPTLVSeq
+                Unsigned32,
+            ciiLSPTLVChecksum
+                CiiUnsigned16TC,
+            ciiLSPTLVType
+                CiiUnsigned8TC,
+            ciiLSPTLVLen
+                CiiUnsigned8TC,
+            ciiLSPTLVValue
+                OCTET STRING
+        }
+
+    ciiLSPTLVIndex OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index of this TLV in the LSP.  The first TLV has index 1
+             and the Nth TLV has an index of N."
+    ::= { ciiLSPTLVEntry 1 }
+
+    ciiLSPTLVSeq OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sequence number for this LSP."
+    ::= { ciiLSPTLVEntry 2 }
+
+    ciiLSPTLVChecksum OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The 16 bit Fletcher Checksum."
+    ::= { ciiLSPTLVEntry 3 }
+
+    ciiLSPTLVType OBJECT-TYPE
+        SYNTAX CiiUnsigned8TC
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of this TLV."
+    ::= { ciiLSPTLVEntry 4 }
+
+    ciiLSPTLVLen OBJECT-TYPE
+        SYNTAX CiiUnsigned8TC
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The length of this TLV."
+    ::= { ciiLSPTLVEntry 5 }
+
+    ciiLSPTLVValue OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of this TLV."
+    ::= { ciiLSPTLVEntry 6 }
+
+-- The IS-IS Notification Table
+
+-- The IS-IS Notification Table records fields that are
+-- required for notifications
+
+    ciiNotificationEntry OBJECT IDENTIFIER
+        ::= { ciiNotification 1 }
+
+    ciiPduLspId OBJECT-TYPE
+        SYNTAX CiiLinkStatePDUID
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "An Octet String that uniquely identifies
+             a Link State PDU."
+    ::= { ciiNotificationEntry 1 }
+
+    ciiPduFragment OBJECT-TYPE
+        SYNTAX CiiPDUHeader
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Holds up to 64 initial bytes of a PDU that
+             triggered the notification."
+    ::= { ciiNotificationEntry 2 }
+
+    ciiPduFieldLen OBJECT-TYPE
+        SYNTAX CiiUnsigned8TC
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Holds the System ID length reported in PDU we received."
+    ::= { ciiNotificationEntry 3 }
+
+    ciiPduMaxAreaAddress OBJECT-TYPE
+        SYNTAX CiiUnsigned8TC
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Holds the Max Area Addresses reported in a PDU
+             we received."
+    ::= { ciiNotificationEntry 4 }
+
+    ciiPduProtocolVersion OBJECT-TYPE
+        SYNTAX CiiUnsigned8TC
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Holds the Protocol version reported in PDU we received."
+    ::= { ciiNotificationEntry 5 }
+
+    ciiPduLspSize OBJECT-TYPE
+        SYNTAX Integer32 (0..2147483647)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Holds the size of LSP we received that is too
+             big to forward."
+    ::= { ciiNotificationEntry 6 }
+
+    ciiPduOriginatingBufferSize OBJECT-TYPE
+        SYNTAX CiiUnsigned16TC (0..16000)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Holds the size of ciiSysLevelOrigLSPBuffSize advertised by
+             the peer in the originatingLSPBufferSize TLV."
+    ::= { ciiNotificationEntry 7 }
+
+    ciiPduProtocolsSupported OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..255))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The list of protocols supported by an
+             adjacent system.  This may be empty."
+    ::= { ciiNotificationEntry 8 }
+
+    ciiAdjState OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                 down (1),
+                 initializing (2),
+                 up (3),
+                 failed(4)
+            }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The current state of an adjacency."
+    ::= { ciiNotificationEntry 9 }
+
+    ciiErrorOffset OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "An offset to a problem in a PDU.  If the problem
+             is a malformed TLV, this points to the beginning
+             of the TLV.  If the problem is in the header, this
+             points to the byte that is suspicious."
+    ::= { ciiNotificationEntry 10 }
+
+    ciiErrorTLVType OBJECT-TYPE
+        SYNTAX Unsigned32 (0..255)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+             "The type for a malformed TLV."
+    ::= { ciiNotificationEntry 11 }
+
+    ciiNotifManualAddress OBJECT-TYPE
+        SYNTAX CiiOSINSAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+             "Manually configured area address used in
+              this notification."
+    ::= { ciiNotificationEntry 12 }
+
+    ciiNotifIsLevelIndex OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                level1IS (1),
+                level2IS (2)
+            }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+             "The index value used in this notification
+              to indicate the system level."
+    ::= { ciiNotificationEntry 13 }
+
+-- Type definitions
+
+    ciiDatabaseOverload NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiSysLevelOverloadState
+        }
+        STATUS current
+        DESCRIPTION
+            "This notification is generated when the system
+             enters or leaves the Overload state.  The number
+             of times this has be generated and cleared is kept
+             track of by ciiSysStatLSPDbaseOloads."
+    ::= { ciscoIetfIsisMIBNotifs 1 }
+
+    ciiManualAddressDrops NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifManualAddress
+        }
+        STATUS current
+        DESCRIPTION
+            "This notification is generated when one of the
+             manual areaAddresses assigned to this system is
+             ignored when computing routes.  The object
+             ciiNotifManualAddress describes the area that
+             has been dropped.
+
+             The number of times this event has been generated
+             is counted by ciiSysStatManAddrDropFromAreas.
+
+             This notification is edge triggered, and should not
+             be regenerated until an address that was used in
+             the previous computation has been dropped."
+
+    ::= { ciscoIetfIsisMIBNotifs 2 }
+
+    ciiCorruptedLSPDetected NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiPduLspId
+        }
+        STATUS current
+        DESCRIPTION
+            "This notification is generated when we find that
+             an LSP that was stored in memory has become
+             corrupted.  The number of times this has been
+             generated is counted by ciiSysStatCorrLSPs.
+
+             We forward an LSP ID.  We may have independent
+             knowledge of the ID, but in some implementations
+             there is a chance that the ID itself will be
+             corrupted."
+
+    ::= { ciscoIetfIsisMIBNotifs 3 }
+
+    ciiAttemptToExceedMaxSequence NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiPduLspId
+        }
+        STATUS current
+        DESCRIPTION
+            "When the sequence number on an LSP we generate
+             wraps the 32 bit sequence counter, we purge and
+             wait to re-announce this information.  This
+             notification describes that event.  Since these
+             should not be generated rapidly, we generate
+             an event each time this happens.
+
+             While the first 6 bytes of the LSPID are ours,
+             the other two contain useful information."
+
+    ::= { ciscoIetfIsisMIBNotifs 4 }
+
+    ciiIDLenMismatch  NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiPduFieldLen,
+            ciiCircIfIndex,
+            ciiPduFragment
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when we receive a PDU
+             with a different value of the System ID Length.
+             This notification includes an index to identify
+             the circuit where we saw the PDU and the header of
+             the PDU which may help a network manager identify
+             the source of the confusion.
+
+             This should be an edge-triggered notification.
+             We should not send a second notification about
+             PDUs received on the same circuit."
+
+    ::= { ciscoIetfIsisMIBNotifs 5 }
+
+    ciiMaxAreaAddressesMismatch NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiPduMaxAreaAddress,
+            ciiCircIfIndex,
+            ciiPduFragment
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when we receive a PDU
+             with a different value of the Maximum Area
+             Addresses.  This notification includes the
+             header of the packet, which may help a
+             network manager identify the source of the
+             confusion.
+
+             This should be an edge-triggered notification.
+             We should not send a second notification about
+             PDUs received from the same circuit."
+
+    ::= { ciscoIetfIsisMIBNotifs 6 }
+
+    ciiOwnLSPPurge NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiCircIfIndex,
+            ciiPduLspId
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when we receive a PDU
+             with our systemID and zero age.  This
+             notification includes the circuit Index
+             and router ID from the LSP, if available,
+             which may help a network manager
+             identify the source of the confusion."
+
+    ::= { ciscoIetfIsisMIBNotifs 7 }
+
+    ciiSequenceNumberSkip NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiCircIfIndex,
+            ciiPduLspId
+        }
+        STATUS current
+        DESCRIPTION
+            "When we receive an LSP with our System ID
+             and different contents, we may need to reissue
+             the LSP with a higher sequence number.
+
+             We send this notification if we need to increase
+             the sequence number by more than one.  If two
+             Intermediate Systems are configured with the same
+             System ID, this notification will fire."
+
+    ::= { ciscoIetfIsisMIBNotifs 8 }
+
+    ciiAuthenticationTypeFailure NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiCircIfIndex,
+            ciiPduFragment
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when we receive a PDU
+             with the wrong authentication type field.
+             This notification includes the header of the
+             packet, which may help a network manager
+             identify the source of the confusion.
+
+             This should be an edge-triggered notification.
+             We should not send a second notification about
+             PDUs received from the same circuit."
+
+    ::= { ciscoIetfIsisMIBNotifs 9 }
+
+    ciiAuthenticationFailure NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiCircIfIndex,
+            ciiPduFragment
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when we receive a PDU
+             with incorrect authentication information
+             field.  This notification includes the header
+             of the packet, which may help a network manager
+             identify the source of the confusion.
+             This should be an edge-triggered notification.
+             We should not send a second notification about
+             PDUs received from the same circuit."
+
+    ::= { ciscoIetfIsisMIBNotifs 10 }
+
+    ciiVersionSkew NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiCircIfIndex,
+            ciiPduProtocolVersion,
+            ciiPduFragment
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when we receive a Hello
+             PDU from an IS running a different version
+             of the protocol. This notification includes
+             the header of the packet, which may help a
+             network manager identify the source of the
+             confusion.
+
+             This should be an edge-triggered notification.
+             We should not send a second notification about
+             PDUs received from the same circuit."
+
+    ::= { ciscoIetfIsisMIBNotifs 11 }
+
+    ciiAreaMismatch NOTIFICATION-TYPE
+        OBJECTS {
+            ciiCircIfIndex,
+            ciiPduFragment
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when we receive a Hello
+             PDU from an IS which does not share any
+             area address. This notification includes
+             the header of the packet, which may help a
+             network manager identify the source of the
+             confusion.
+
+             This should be an edge-triggered notification.
+             We should not send a second notification about
+             PDUs received from the same circuit."
+
+    ::= { ciscoIetfIsisMIBNotifs 12 }
+
+    ciiRejectedAdjacency NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiCircIfIndex,
+            ciiPduFragment
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when we receive a Hello
+             PDU from an IS, but do not establish an
+             adjacency for some reason.
+
+             This should be an edge-triggered notification.
+             We should not send a second notification about
+             PDUs received from the circuit."
+
+    ::= { ciscoIetfIsisMIBNotifs 13 }
+
+    ciiLSPTooLargeToPropagate NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiCircIfIndex,
+            ciiPduLspSize,
+            ciiPduLspId
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when we attempt to propagate
+             an LSP which is larger than the dataLinkBlockSize
+             for the circuit.
+             This should be an edge-triggered notification.
+             We should not send a second notification about
+             PDUs received from the same circuit."
+
+    ::= { ciscoIetfIsisMIBNotifs 14 }
+
+    ciiOrigLSPBuffSizeMismatch NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiCircIfIndex,
+            ciiPduLspId,
+            ciiPduOriginatingBufferSize
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when a Level 1 LSP or Level
+             2 LSP is received which is larger than the local
+             value for ciiSysLevelOrigLSPBuffSize, or when an
+             LSP is received containing the originatingLSPBufferSize
+             option and the value in the PDU option field does
+             not match the local value for ciiSysLevelOrigLSPBuffSize.
+             We pass up the size from the option field or the
+             size of the LSP that exceeds our configuration.
+
+             This should be an edge-triggered notification.
+             We should not send a second notification about
+             PDUs received from the same circuit."
+
+    ::= { ciscoIetfIsisMIBNotifs 15 }
+
+    ciiProtocolsSupportedMismatch NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiCircIfIndex,
+            ciiPduProtocolsSupported,
+            ciiPduLspId,
+            ciiPduFragment
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when a non-pseudonode
+             segment 0 LSP is received that has no matching
+             protocols supported.
+             This may be because the system does not generate
+             the field, or because there are no common elements.
+             The list of protocols supported should be included
+             in the notification: it may be empty if the TLV
+             is not supported, or if the TLV is empty.
+
+             This should be an edge-triggered notification.
+             We should not send a second notification about
+             PDUs received from the same circuit."
+
+    ::= { ciscoIetfIsisMIBNotifs 16 }
+
+    ciiAdjacencyChange NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiCircIfIndex,
+            ciiPduLspId,
+            ciiAdjState
+        }
+        STATUS current
+        DESCRIPTION
+            "A notification sent when an adjacency changes
+             state, entering or leaving state up.
+             The first 6 bytes of the ciiPduLspId are the
+             SystemID of the adjacent IS.
+             The ciiAdjState is the new state of the adjacency."
+
+    ::= { ciscoIetfIsisMIBNotifs 17 }
+
+    ciiLSPErrorDetected NOTIFICATION-TYPE
+        OBJECTS {
+            ciiNotifIsLevelIndex,
+            ciiPduLspId,
+            ciiCircIfIndex,
+            ciiPduFragment,
+            ciiErrorOffset,
+            ciiErrorTLVType
+        }
+        STATUS current
+        DESCRIPTION
+            "This notification is generated when we receive
+             an LSP with a parse error.  The ciiCircIfIndex
+             holds in index of the circuit on which the PDU
+             arrived.  The ciiPduFragment holds start of the LSP,
+             and the ciiErrorOffset points to the problem.
+
+             If the problem is a mal-formed TLV, ciiErrorOffset
+             points to start of the TLV and ciiErrorTLVType
+             holds the value of the type.
+
+             If the problem is with the LSP header, ciiErrorOffset
+             points to the suspicious byte.
+
+             The number of such LSPs is accumulated in
+             ciiSysStatLSPErrors."
+
+    ::= { ciscoIetfIsisMIBNotifs 18 }
+
+-- Agent Conformance Definitions
+-- We define the objects a conformant agent must define
+
+ciscoIetfIsisMIBGroups      OBJECT IDENTIFIER ::=
+    { ciscoIetfIsisMIBConform 1 }
+ciscoIetfIsisMIBCompliances OBJECT IDENTIFIER ::=
+    { ciscoIetfIsisMIBConform 2 }
+
+-- compliance statements
+
+    ciscoIetfIsisMIBCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for agents that support
+             the IS-IS MIB"
+        MODULE -- this module
+            MANDATORY-GROUPS {
+                    ciscoIetfIsisSystemGroup,
+                    ciscoIetfIsisCircuitGroup,
+                    ciscoIetfIsisISAdjGroup,
+                    ciscoIetfIsisNotifObjectGroup,
+                    ciscoIetfIsisNotificationGroup
+        }
+    ::= { ciscoIetfIsisMIBCompliances 1 }
+
+    -- List of all groups, mandatory and optional
+    ciscoIetfIsisMIBAdvCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for agents that support
+             the IS-IS MIB"
+        MODULE -- this module
+            MANDATORY-GROUPS {
+                    ciscoIetfIsisSystemGroup,
+                    ciscoIetfIsisCircuitGroup,
+                    ciscoIetfIsisISAdjGroup,
+                    ciscoIetfIsisNotifObjectGroup,
+                    ciscoIetfIsisNotificationGroup,
+                    ciscoIetfIsisISPDUCounterGroup,
+                    ciscoIetfIsisRATableGroup,
+                    ciscoIetfIsisISIPRADestGroup,
+                    ciscoIetfIsisLSPGroup
+        }
+    ::= { ciscoIetfIsisMIBCompliances 2 }
+
+-- MIB Grouping
+
+    ciscoIetfIsisSystemGroup OBJECT-GROUP
+        OBJECTS {
+            ciiSysVersion,
+            ciiSysType,
+            ciiSysID,
+            ciiSysMaxPathSplits,
+            ciiSysMaxLSPGenInt,
+            ciiSysPollESHelloRate,
+            ciiSysWaitTime,
+            ciiSysAdminState,
+            ciiSysL2toL1Leaking,
+            ciiSysMaxAge,
+            ciiSysLevelOrigLSPBuffSize,
+            ciiSysLevelMinLSPGenInt,
+            ciiSysLevelOverloadState,
+            ciiSysLevelSetOverload,
+            ciiSysLevelSetOverloadUntil,
+            ciiSysLevelMetricStyle,
+            ciiSysLevelSPFConsiders,
+            ciiSysLevelTEEnabled,
+            ciiSysReceiveLSPBufferSize,
+            ciiManAreaAddrExistState,
+            ciiAreaAddr,
+            ciiSysProtSuppExistState,
+            ciiSummAddrExistState,
+            ciiSummAddrMetric,
+            ciiSummAddrFullMetric,
+            ciiRedistributeAddrExistState,
+            ciiRouterHostName,
+            ciiRouterID,
+            ciiSysStatCorrLSPs,
+            ciiSysStatLSPDbaseOloads,
+            ciiSysStatManAddrDropFromAreas,
+            ciiSysStatAttmptToExMaxSeqNums,
+            ciiSysStatSeqNumSkips,
+            ciiSysStatOwnLSPPurges,
+            ciiSysStatIDFieldLenMismatches,
+            ciiSysStatPartChanges,
+            ciiSysStatSPFRuns,
+            ciiSysStatAuthTypeFails,
+            ciiSysStatAuthFails,
+            ciiSysStatLSPErrors
+        }
+        STATUS current
+        DESCRIPTION
+            "The collections of objects used to manage an
+             IS-IS router."
+    ::= { ciscoIetfIsisMIBGroups 1 }
+
+    ciscoIetfIsisCircuitGroup OBJECT-GROUP
+        OBJECTS {
+            ciiNextCircIndex,
+            ciiCircIfSubIndex,
+            ciiCircAdminState,
+            ciiCircExistState,
+            ciiCircType,
+            ciiCircExtDomain,
+            ciiCircAdjChanges,
+            ciiCircNumAdj,
+            ciiCircInitFails,
+            ciiCircRejAdjs,
+            ciiCircIDFieldLenMismatches,
+            ciiCircMaxAreaAddrMismatches,
+            ciiCircAuthTypeFails,
+            ciiCircAuthFails,
+            ciiCircLANDesISChanges,
+            ciiCircLevel,
+            ciiCircPassiveCircuit,
+            ciiCircMeshGroupEnabled,
+            ciiCircMeshGroup,
+            ciiCircSmallHellos,
+            ciiCircLastUpTime,
+            ciiCirc3WayEnabled,
+            ciiCircExtendedCircID,
+            ciiCircIfIndex,
+            ciiCircLevelMetric,
+            ciiCircLevelWideMetric,
+            ciiCircLevelISPriority,
+            ciiCircLevelIDOctet,
+            ciiCircLevelID,
+            ciiCircLevelDesIS,
+            ciiCircLevelHelloMultiplier,
+            ciiCircLevelHelloTimer,
+            ciiCircLevelDRHelloTimer,
+            ciiCircLevelLSPThrottle,
+            ciiCircLevelMinLSPRetransInt,
+            ciiCircLevelCSNPInterval,
+            ciiCircLevelPartSNPInterval
+        }
+        STATUS current
+        DESCRIPTION
+            "The collection of objects used to describe in
+             IS-IS Circuit."
+    ::= { ciscoIetfIsisMIBGroups 2 }
+
+    ciscoIetfIsisISAdjGroup OBJECT-GROUP
+        OBJECTS {
+            ciiISAdjState,
+            ciiISAdj3WayState,
+            ciiISAdjNeighSNPAAddress,
+            ciiISAdjNeighSysType,
+            ciiISAdjNeighSysID,
+            ciiISAdjNbrExtendedCircID,
+            ciiISAdjUsage,
+            ciiISAdjHoldTimer,
+            ciiISAdjNeighPriority,
+            ciiISAdjLastUpTime,
+            ciiISAdjAreaAddress,
+            ciiISAdjIPAddrType,
+            ciiISAdjIPAddrAddress,
+            ciiISAdjProtSuppProtocol
+        }
+        STATUS current
+        DESCRIPTION
+            "The collections of objects used to manage an
+             IS-IS Adjacency."
+    ::= { ciscoIetfIsisMIBGroups 3 }
+
+    ciscoIetfIsisNotifObjectGroup OBJECT-GROUP
+        OBJECTS {
+            ciiPduLspId,
+            ciiPduFragment,
+            ciiPduFieldLen,
+            ciiPduMaxAreaAddress,
+            ciiPduProtocolVersion,
+            ciiPduLspSize,
+            ciiPduOriginatingBufferSize,
+            ciiPduProtocolsSupported,
+            ciiAdjState,
+            ciiErrorOffset,
+            ciiErrorTLVType,
+            ciiNotifManualAddress,
+            ciiNotifIsLevelIndex
+        }
+        STATUS current
+        DESCRIPTION
+            "The objects used to record notification parameters."
+    ::= { ciscoIetfIsisMIBGroups 4 }
+
+    ciscoIetfIsisNotificationGroup        NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            ciiDatabaseOverload,
+            ciiManualAddressDrops,
+            ciiCorruptedLSPDetected,
+            ciiAttemptToExceedMaxSequence,
+            ciiIDLenMismatch,
+            ciiMaxAreaAddressesMismatch,
+            ciiOwnLSPPurge,
+            ciiSequenceNumberSkip,
+            ciiAuthenticationTypeFailure,
+            ciiAuthenticationFailure,
+            ciiVersionSkew,
+            ciiAreaMismatch,
+            ciiRejectedAdjacency,
+            ciiLSPTooLargeToPropagate,
+            ciiOrigLSPBuffSizeMismatch,
+            ciiProtocolsSupportedMismatch,
+            ciiAdjacencyChange,
+            ciiLSPErrorDetected
+        }
+        STATUS current
+        DESCRIPTION
+            "The collections of notifications sent by an IS."
+    ::= { ciscoIetfIsisMIBGroups 5 }
+
+    ciscoIetfIsisISPDUCounterGroup OBJECT-GROUP
+        OBJECTS {
+            ciiPacketCountIIHellos,
+            ciiPacketCountISHellos,
+            ciiPacketCountESHellos,
+            ciiPacketCountLSPs,
+            ciiPacketCountCSNPs,
+            ciiPacketCountPSNPs,
+            ciiPacketCountUnknowns
+        }
+        STATUS current
+        DESCRIPTION
+            "The collections of objects used to count protocol PDUs."
+    ::= { ciscoIetfIsisMIBGroups 6 }
+
+    ciscoIetfIsisRATableGroup OBJECT-GROUP
+        OBJECTS {
+            ciiRAExistState,
+            ciiRAAdminState,
+            ciiRAAddrPrefix,
+            ciiRAMapType,
+            ciiRAMetric,
+            ciiRAMetricType,
+            ciiRASNPAAddress,
+            ciiRASNPAMask,
+            ciiRASNPAPrefix,
+            ciiRAType
+        }
+        STATUS current
+        DESCRIPTION
+            "The collections of objects used to manage the
+             reachable NSAP prefixes."
+    ::= { ciscoIetfIsisMIBGroups 7 }
+
+    ciscoIetfIsisISIPRADestGroup OBJECT-GROUP
+        OBJECTS {
+            ciiIPRANextHopType,
+            ciiIPRANextHop,
+            ciiIPRAType,
+            ciiIPRAExistState,
+            ciiIPRAAdminState,
+            ciiIPRAMetric,
+            ciiIPRAFullMetric,
+            ciiIPRAMetricType,
+            ciiIPRASNPAAddress,
+            ciiIPRASourceType
+        }
+        STATUS current
+        DESCRIPTION
+            "The collections of objects used to manage configured
+             IP addresses."
+    ::= { ciscoIetfIsisMIBGroups 8 }
+
+    ciscoIetfIsisLSPGroup OBJECT-GROUP
+        OBJECTS {
+            ciiLSPSeq,
+            ciiLSPZeroLife,
+            ciiLSPChecksum,
+            ciiLSPLifetimeRemain,
+            ciiLSPPDULength,
+            ciiLSPAttributes,
+            ciiLSPTLVSeq,
+            ciiLSPTLVChecksum,
+            ciiLSPTLVType,
+            ciiLSPTLVLen,
+            ciiLSPTLVValue
+        }
+        STATUS current
+        DESCRIPTION
+            "The collections of objects used to observe the LSP
+             Data Base."
+    ::= { ciscoIetfIsisMIBGroups 9 }
+
+END

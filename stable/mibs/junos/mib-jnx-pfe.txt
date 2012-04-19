@@ -1,0 +1,408 @@
+--
+-- Juniper Enterprise Specific MIB: PFE MIB
+-- 
+-- Copyright (c) 2006, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-PFE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    jnxPfeMibRoot
+        FROM JUNIPER-SMI;
+
+jnxPfeMib MODULE-IDENTITY
+    LAST-UPDATED "201002070000Z" -- Sun Feb 07 00:00:00 2010 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "The MIB provides PFE specific data."
+
+    REVISION      "201002070000Z"
+    DESCRIPTION
+               "Added new notification types."
+    --REVISION      "201001070000Z"
+    --DESCRIPTION
+    --         "Added new notification types."
+    --REVISION      "200607240000Z"
+    --DESCRIPTION
+    --           "Initial revision."
+    ::= { jnxPfeMibRoot 1 }
+
+    --
+    -- This branch contains all PFE Notification statistics data.
+    --
+    jnxPfeNotification   OBJECT IDENTIFIER ::= { jnxPfeMib 1 }
+
+
+    --
+    -- This table provide global PFE notification stats for each PFE slot,
+    -- exposing the data provided by the 'show pfe statistics notification'
+    -- cli command.
+    --
+    jnxPfeNotifyGlTable OBJECT-TYPE
+	SYNTAX          SEQUENCE OF JnxPfeNotifyGlEntry
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION
+		"This table provides global PFE notification statistics."
+	::= { jnxPfeNotification 1 }
+
+    jnxPfeNotifyGlEntry OBJECT-TYPE
+	SYNTAX          JnxPfeNotifyGlEntry
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION
+		""
+        INDEX { jnxPfeNotifyGlSlot }
+	::= { jnxPfeNotifyGlTable 1 }
+
+    JnxPfeNotifyGlEntry ::=
+	SEQUENCE {
+	    jnxPfeNotifyGlSlot          Integer32,
+            jnxPfeNotifyGlParsed        Counter32,
+            jnxPfeNotifyGlAged          Counter32,
+            jnxPfeNotifyGlCorrupt       Counter32,
+            jnxPfeNotifyGlIllegal       Counter32,
+            jnxPfeNotifyGlSample        Counter32,
+            jnxPfeNotifyGlGiants        Counter32,
+            jnxPfeNotifyGlTtlExceeded   Counter32,
+            jnxPfeNotifyGlTtlExcErrors  Counter32,
+            jnxPfeNotifyGlSvcOptAsp     Counter32,
+            jnxPfeNotifyGlSvcOptRe      Counter32,
+            jnxPfeNotifyGlPostSvcOptOut Counter32,
+            jnxPfeNotifyGlOptTtlExp     Counter32,
+            jnxPfeNotifyGlDiscSample    Counter32,
+            jnxPfeNotifyGlRateLimited   Counter32,
+            jnxPfeNotifyGlPktGetFails   Counter32,
+            jnxPfeNotifyGlDmaFails      Counter32,
+            jnxPfeNotifyGlDmaTotals     Counter32,
+            jnxPfeNotifyGlUnknowns      Counter32
+	}
+
+    jnxPfeNotifyGlSlot OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The PFE slot number for this set of global PFE notification
+                statistics."
+        ::= { jnxPfeNotifyGlEntry 1 }
+
+    jnxPfeNotifyGlParsed OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications reported by the routing chip."
+        ::= { jnxPfeNotifyGlEntry 2 }
+
+    jnxPfeNotifyGlAged OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications that are dropped due to the fact 
+                that the they have been in the system for too long and 
+                hence not valid anymore."
+        ::= { jnxPfeNotifyGlEntry 3 }
+
+    jnxPfeNotifyGlCorrupt OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications dropped due to the fact that they 
+                have an invalid notification result format. This counter
+                is valid for Internet Processor-I and Internet Processor-II 
+                only."
+        ::= { jnxPfeNotifyGlEntry 4 }
+
+    jnxPfeNotifyGlIllegal OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications dropped due to the fact that they 
+                have an illegal notification type."
+        ::= { jnxPfeNotifyGlEntry 5 }
+
+    jnxPfeNotifyGlSample OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of sample notifications reported by the routing chip."
+        ::= { jnxPfeNotifyGlEntry 6 }
+
+    jnxPfeNotifyGlGiants OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications dropped that are larger than the 
+                supported DMA size."
+        ::= { jnxPfeNotifyGlEntry 7 }
+
+    jnxPfeNotifyGlTtlExceeded OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of options/TTL-expired notifications that need to be 
+                sent to service interfaces as transit packets. This counter 
+                is valid for Internet Processor-I and Internet Processor-II
+                only."
+        ::= { jnxPfeNotifyGlEntry 8 }
+
+    jnxPfeNotifyGlTtlExcErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of options/TTL-expired packet notifications that could 
+                not be sent as transit packets because the output interface 
+                could not be determined.  This counter is valid for Internet 
+                Processor-I and Internet Processor-II only."
+        ::= { jnxPfeNotifyGlEntry 9 }
+
+    jnxPfeNotifyGlSvcOptAsp OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of IP options packets that are sent out to a Services 
+                PIC."
+        ::= { jnxPfeNotifyGlEntry 10 }
+
+    jnxPfeNotifyGlSvcOptRe OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of IP options packets that are sent out to the Routing
+                Engine."
+        ::= { jnxPfeNotifyGlEntry 11 }
+
+    jnxPfeNotifyGlPostSvcOptOut OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications that were re-injected by the services 
+                PIC after it had processed the associated packets.  These 
+                notifications now need to be forwarded out to their actual 
+                destination.  This counter is valid for Internet Processor-I 
+                and Internet Processor-II only."
+        ::= { jnxPfeNotifyGlEntry 12 }
+
+    jnxPfeNotifyGlOptTtlExp OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of TTL-expired transit packets."
+        ::= { jnxPfeNotifyGlEntry 13 }
+
+    jnxPfeNotifyGlDiscSample OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of sample notifications that are dropped as they refer 
+                to discarded packets in PFE."
+        ::= { jnxPfeNotifyGlEntry 14 }
+
+    jnxPfeNotifyGlRateLimited OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications ignored because of PFE software 
+                throttling."
+        ::= { jnxPfeNotifyGlEntry 15 }
+
+    jnxPfeNotifyGlPktGetFails OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications where we could not allocate memory 
+                for DMA."
+        ::= { jnxPfeNotifyGlEntry 16 }
+
+    jnxPfeNotifyGlDmaFails OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications where the DMA of associated packets 
+                failed for miscellaneous reasons.  Valid for T-series Internet 
+                Processor only."
+        ::= { jnxPfeNotifyGlEntry 17 }
+
+    jnxPfeNotifyGlDmaTotals OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications for which the packet DMA completed.  
+                Valid for T-series Internet Processor only."
+        ::= { jnxPfeNotifyGlEntry 18 }
+
+    jnxPfeNotifyGlUnknowns OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications that could not be resolved to a known 
+                next hop destination. Valid for T-series Internet Processor 
+                only."
+        ::= { jnxPfeNotifyGlEntry 19 }
+
+    --
+    -- This table provides Type specific PFE notification stats for each PFE 
+    -- slot, exposing the data provided by the 'show pfe statistics 
+    -- notification' cli command.
+    --
+    jnxPfeNotifyTypeTable OBJECT-TYPE
+	SYNTAX          SEQUENCE OF JnxPfeNotifyTypeEntry
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION
+		"This provides type-specific PFE notification stats"
+	::= { jnxPfeNotification 2 }
+
+    jnxPfeNotifyTypeEntry OBJECT-TYPE
+	SYNTAX          JnxPfeNotifyTypeEntry
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION
+		""
+        INDEX { jnxPfeNotifyGlSlot, jnxPfeNotifyTypeId }
+	::= { jnxPfeNotifyTypeTable 1 }
+
+    JnxPfeNotifyTypeEntry ::=
+	SEQUENCE {
+	    jnxPfeNotifyTypeId       INTEGER,
+            jnxPfeNotifyTypeDescr    DisplayString,
+            jnxPfeNotifyTypeParsed   Counter32, 
+            jnxPfeNotifyTypeInput    Counter32, 
+            jnxPfeNotifyTypeFailed   Counter32, 
+            jnxPfeNotifyTypeIgnored  Counter32
+	}
+
+    jnxPfeNotifyTypeId  OBJECT-TYPE
+        SYNTAX INTEGER {
+                   illegal       (1),
+                   unclassified  (2),
+                   option        (3),
+                   nextHop       (4),
+                   discard       (5),
+                   sample        (6),
+                   redirect      (7),
+                   dontFragment  (8),
+                   cfdf          (9),
+                   poison        (10),
+                   unknown       (11),
+                   specialMemPkt (12), 
+                   autoConfig    (13),
+                   reject        (14)
+               }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This identifies the PFE notification type for this row's stats.
+            Below is a description of each notification type:
+                1.  illegal       Packets with invalid notification type.
+
+                2.  unclassified  Packets that did not have a key lookup 
+                                  performed on them.
+
+                3.  option        Packets which have L3 options present.  
+
+                4.  nextHop       Packets that are destined to the host.
+
+                5.  discard       Used when a discarded packet is sent to the 
+                                  route processor.
+
+                6.  sample        Unused.
+
+                7.  redirect      This is used when a packet is being sent out 
+                                  on the interface it came in on.
+
+                8.  dontFragment  This is used that a packet needs to be 
+                                   fragmented but the DF (don't fragment) bit
+                                   is set.
+
+                9.  cfdf           When an MTU exceeded indication is 
+                                   triggered by the CF chip and the packet has 
+                                   DF (don't fragment) set.
+
+                10. poison         Packets that resolved to a poisoned next 
+                                   hop index.
+
+                11. unknown       Packets of unknown notification type.
+  
+                12. specialMemPkt Packets with special memory pkt type notification used in diagnostics.  
+
+                13. autoconfig    Packets with autoconfig PFE notification type used for dynamic VLANs.  
+
+                14. reject        Packets of reject PFE notification type."  
+    ::= { jnxPfeNotifyTypeEntry 1 }
+
+    jnxPfeNotifyTypeDescr OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The description of the Pfe Notification type for this entry."
+        ::= { jnxPfeNotifyTypeEntry 2 }
+
+    jnxPfeNotifyTypeParsed OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of successful parsing of notifications."
+        ::= { jnxPfeNotifyTypeEntry 3 }
+
+    jnxPfeNotifyTypeInput OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications whose associated packets were DMA'ed 
+                into route processor memory."
+        ::= { jnxPfeNotifyTypeEntry 4 }
+
+    jnxPfeNotifyTypeFailed OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of failures in parsing the notifications."
+        ::= { jnxPfeNotifyTypeEntry 5 }
+
+    jnxPfeNotifyTypeIgnored OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Count of notifications where the notification type in the 
+                message does not match any of the valid types."
+        ::= { jnxPfeNotifyTypeEntry 6 }
+
+END

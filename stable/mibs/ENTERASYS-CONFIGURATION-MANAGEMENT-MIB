@@ -1,0 +1,730 @@
+ENTERASYS-CONFIGURATION-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-configuration-management-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' Configuration Management MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright December, (2001-2003) Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32,
+        Gauge32, Counter32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DateAndTime, DisplayString, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysConfigurationManagementMIB MODULE-IDENTITY
+    LAST-UPDATED "200303241610Z"  -- Mon Mar 24 16:10 GMT 2003
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+         "Postal: Enterasys Networks
+                  35 Industrial Way, P.O. Box 5005
+                  Rochester, NH 03867-0505
+                  USA
+          Phone:  +1 603 332 9400
+          E-mail: support@enterasys.com
+          WWW:    http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         Enterasys Networks' enterprise OID pertaining to
+         configuration management."
+
+    REVISION "200210032021Z"  -- Thu Oct  3 20:21 GMT 2002
+    DESCRIPTION
+        "Updated the Security Considerations section."
+
+    REVISION "200209301702Z"  -- Mon Sep 30 17:02 GMT 2002
+    DESCRIPTION
+        "Added a bootPromDownload bit to the ConfigMgmtOperations
+         textual convention."
+
+    REVISION "200112031949Z"  -- Mon Dec  3 19:49 GMT 2001
+    DESCRIPTION
+        "The initial version of this MIB module."
+
+    ::= { etsysModules 16 }
+
+
+-- -------------------------------------------------------------
+-- The groups defined within this MIB module:
+-- -------------------------------------------------------------
+
+
+etsysConfigMgmtStatus           OBJECT IDENTIFIER
+                         ::= { etsysConfigurationManagementMIB 1 }
+
+etsysConfigMgmtChange           OBJECT IDENTIFIER
+                         ::= { etsysConfigurationManagementMIB 2 }
+
+etsysConfigMgmtConformance      OBJECT IDENTIFIER
+                         ::= { etsysConfigurationManagementMIB 3 }
+
+
+-- -------------------------------------------------------------
+-- Textual conventions
+-- -------------------------------------------------------------
+
+ConfigMgmtOperations ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Operations that can be used to effect the configuration
+         of the managed entity.
+
+         -------------------------------------------------------
+         --  Any or all of these operations MAY be supported on
+         --  all devices.
+         -------------------------------------------------------
+
+             resetHardware
+                - Initiate a hardware reset.  If this operation is
+                  requested in conjunction with other operations
+                  than this operation should be performed only
+                  after all of the other requested operations
+                  have completed successfully.
+
+             resetSoftware
+                - Initiate a software reset.  If this operation is
+                  requested in conjunction with other operations
+                  than this operation should be performed only
+                  after all of the other requested operations
+                  have completed successfully.
+
+             imageDownload
+                - The managed entity will initiate an image
+                  download using the least disruptive method
+                  available to it given the specified protocol.
+                  The downloaded image WILL be stored in
+                  persistent storage.  This operation MAY initiate
+                  a reset.
+
+             bootPromDownload
+                - The managed entity will initiate a boot PROM
+                  download using the least disruptive method
+                  available to it given the specified protocol.
+                  The downloaded boot PROM WILL be stored in
+                  persistent storage.  This operation MAY initiate
+                  a reset.
+
+             imageDownloadNonPersistent
+                - The managed entity will initiate an image
+                  download using the least disruptive method
+                  available to it given the specified protocol.
+                  This operation WILL cause the managed entity
+                  to reset.  The managed entity will not execute
+                  the new image on subsequent resets.
+
+             configurationReset
+                - Reset the configuration to the factory default
+                  state.  This operation MAY initiate a reset.
+
+             configurationUpload
+                - The managed entity will transfer the currently
+                  active configuration to the specified destination.
+                  The destination may be a local file on entities
+                  that support a user file system.
+
+             configurationDownload
+                - The managed entity will initiate a configuration
+                  file download using the least disruptive method
+                  available to it given the specified protocol.
+                  The downloaded configuration WILL be stored in
+                  persistent storage.  This operation MAY cause
+                  the managed entity to reset.
+
+             validationMD5sum,
+                - The system will calculate the MD5 message digest,
+                  as specified in RFC1321, for the file specified in
+                  etsysConfigMgmtChangeURL and compare that with the
+                  value of the etsysConfigMgmtChangeValidationString
+                  object.
+                  If this operation is requested in conjunction with
+                  other operations then this operation MUST be
+                  initiated as soon as practical and all operations
+                  MUST be terminated/aborted as soon as practical if
+                  the calculated value does not match the specified
+                  value.
+                  If the etsysConfigMgmtChangeValidationString is
+                  empty the calculate the MD5 message digest will
+                  be returned in that object.
+
+         -------------------------------------------------------
+         --  Any or all of these operations MAY be supported on
+         --  devices that have user file systems.
+         -------------------------------------------------------
+
+             imageSetSelected
+                - The file specified in etsysConfigMgmtChangeURL
+                  is selected as the boot image.  Although a reset
+                  MAY be required to execute the selected boot
+                  image this operation WILL NOT initiate a reset.
+                  This operation will fail if the specified file
+                  is not a valid boot image.
+
+             imageGetSelected
+                - The file selected as the boot image is returned
+                  in etsysConfigMgmtChangeURL.  This operation
+                  MUST NOT be used in conjunction with any other
+                  operations.
+
+             configurationActivate
+                - The configuration file specified in the
+                  etsysConfigMgmtChangeURL is applied to the
+                  factory default configuration and the result
+                  becomes the active configuration.
+                  If the entity does not support the
+                  configurationPersist operation the result
+                  also becomes the start-up configuration.
+                  This operation MAY initiate a reset operation.
+
+             configurationAppend
+                - The configuration file specified in the
+                  etsysConfigMgmtChangeURL is applied to the
+                  active configuration and the result becomes
+                  the active configuration.
+                  If the entity does not support the
+                  configurationPersist operation the result
+                  also becomes the start-up configuration.
+                  This operation SHOULD NOT initiate a reset
+                  operation.
+
+             configurationPersist
+                - The active configuration will be save to
+                  persistent storage and become the start-up
+                  configuration.  This operation WILL NOT
+                  initiate a reset operation.
+
+             configurationParse
+                - The configuration file specified in the
+                  etsysConfigMgmtChangeURL is parsed for
+                  errors.  This operation WILL NOT effect
+                  active configuration.  This operation
+                  WILL NOT initiate a reset operation."
+
+    SYNTAX  BITS {
+      resetHardware(0),
+      resetSoftware(1),
+      imageDownload(2),
+      imageDownloadNonPersistent(3),
+      configurationReset(4),
+      configurationUpload(5),
+      configurationDownload(6),
+      imageSetSelected(7),
+      imageGetSelected(8),
+      configurationActivate(9),
+      configurationAppend(10),
+      configurationPersist(11),
+      configurationParse(12),
+      validationMD5sum(13),
+      bootPromDownload(14)
+    }
+
+
+-- -------------------------------------------------------------
+-- Configuration Management Status Group
+-- -------------------------------------------------------------
+
+etsysConfigMgmtCurrentImageURL  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The URL of the last image to be successfully loaded into
+       memory.  Return an empty string if this feature is not
+       supported or the information is unavailable."
+    DEFVAL { ''H }
+    ::= { etsysConfigMgmtStatus 1 }
+
+etsysConfigMgmtCurrentConfigURL  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The URL of the last configuration file to be successfully
+       loaded into memory.  Return an empty string if this
+       feature is not supported or the information is unavailable."
+    DEFVAL { ''H }
+    ::= { etsysConfigMgmtStatus 2 }
+
+etsysConfigMgmtPersistentStorageStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "A descriptive status of any current failures of any of
+      the persistent storage facilities on this entity.  When
+      this information is unavailable return a null string. 
+      'operational' should be returned if there are no problems.
+      Transitional information MAY be reported as well."
+    DEFVAL { ''H }
+    ::= { etsysConfigMgmtStatus 3 }
+
+etsysConfigMgmtPersistentStorageCkSum OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The MD5 message digest, as specified in RFC1321, for the
+       persistent configuration information.  This object MAY
+       be used by management applications to detect changes to
+       the configuration of the managed entity.  If it is not
+       possible to compute this value return an empty string."
+    DEFVAL { ''H }
+    ::= { etsysConfigMgmtStatus 4 }
+
+-- -------------------------------------------------------------
+-- Configuration Management Change Group
+-- -------------------------------------------------------------
+
+etsysConfigMgmtChangeLimit OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of configuration change requests
+         this entity can hold in the etsysConfigMgmtChangeTable.
+         A value of 0 indicates no configured limit."
+    ::= { etsysConfigMgmtChange 1 }
+
+etsysConfigMgmtChangeCurrent OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of configuration change requests currently
+         in the etsysConfigMgmtChangeTable."
+    ::= { etsysConfigMgmtChange 2 }
+
+etsysConfigMgmtChangeCompleted OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of configuration change requests that have
+         completed successfully or otherwise.  This object
+         should be stored in persistent memory."
+    ::= { etsysConfigMgmtChange 3 }
+
+etsysConfigMgmtChangeSupportedURLs OBJECT-TYPE
+    SYNTAX      BITS {
+       etsysConfigMgmtFtp(0),
+       etsysConfigMgmtRcp(1),
+       etsysConfigMgmtHttp(2),
+       etsysConfigMgmtTftp(3),
+       etsysConfigMgmtFile(4),
+       etsysConfigMgmtBootP(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The URLs that this entity supports for transferring files.
+         These define the transfer protocols and remote file names.
+
+         etsysConfigMgmtFtp -  As per rfc1738
+
+            ftp://<user>:<password>@<host>:<port>/<url-path>
+
+            url-path: <cwd1>/<cwd2>/.../<cwdN>/<name>;type=<typecode>
+
+            user defaults to anonymous, password to snmp@<domain-name>,
+            port to 21, and type to ASCII.  binary and image are both
+            valid types which have the same meaning.  domain-name would
+            be the IP address or domain name of the managed entity.
+
+         etsysConfigMgmtRcp -
+
+            rcp://<user>@<host>:<port>/<cwd1>/<cwd2>/.../<cwdN>/<name>
+
+            port defaults to 514.
+
+         etsysConfigMgmtHttp - As per rfc1738
+
+            http://<host>:<port>/<path>?<searchpart>
+
+            port defaults to 80.
+
+         etsysConfigMgmtTftp -
+
+            tftp://<host>:<port>/<cwd1>/<cwd2>/.../<cwdN>/<name>
+
+            port defaults to 69.
+
+         etsysConfigMgmtFile - As per rfc1738
+
+            file://<host>/<path>
+
+            host can only be specified as localhost or the empty
+            string.  This will only be used to specify a file on
+            the managed entity.  This indicates that the managed
+            entity supports some form of a user file system.
+
+         etsysConfigMgmtBootP -
+
+            bootp://<host>
+
+            host specifies the default gateway, or bootp server
+            that the bootp request should be directed to."
+
+    REFERENCE
+        "RFC 1738 - Uniform Resource Locators (URL),
+         RFC 2396 - Uniform Resource Identifiers (URI): Generic Syntax"
+
+    ::= { etsysConfigMgmtChange 4 }
+
+etsysConfigMgmtChangeSupportedOperations OBJECT-TYPE
+    SYNTAX  ConfigMgmtOperations
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Configuration change operations that are supported on
+         this managed entity.  A managed entity should provide
+         support only for the options that make sense given the
+         capabilities of the entity and the desired level of
+         manageability."
+    ::= { etsysConfigMgmtChange 5 }
+
+etsysConfigMgmtChangeNextAvailableIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the numerically lowest available 
+         index within this entity, which may be used for the
+         value of etsysConfigMgmtChangeIndex in the creation
+         of a new entry in the etsysConfigMgmtChangeTable.
+
+         An index is considered available if the index value
+         falls within the range of 1 to etsysConfigMgmtChangeLimit
+         and is not being used to index an existing entry in the
+         etsysConfigMgmtChangeTable contained within this entity.
+
+         A value of zero indicates that all of the entries in the
+         etsysConfigMgmtChangeTable are currently in use.
+
+         This value should only be considered a guideline for 
+         management creation of etsysConfigMgmtChangeTable
+         entries, there is no requirement on management to
+         create entries based upon this index value."
+    ::= { etsysConfigMgmtChange 6 }
+
+
+-- -------------------------------------------------------------
+-- Configuration Management Change Table
+-- -------------------------------------------------------------
+
+
+etsysConfigMgmtChangeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysConfigMgmtChangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that describes a single configuration change
+         request."
+    ::= { etsysConfigMgmtChange 7 }
+
+etsysConfigMgmtChangeEntry OBJECT-TYPE
+    SYNTAX      EtsysConfigMgmtChangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describing the configuration change request."
+    INDEX { etsysConfigMgmtChangeIndex }
+    ::= { etsysConfigMgmtChangeTable 1 }
+
+EtsysConfigMgmtChangeEntry ::=
+    SEQUENCE {
+        etsysConfigMgmtChangeIndex
+            Unsigned32,
+        etsysConfigMgmtChangeURL
+            DisplayString,
+        etsysConfigMgmtChangeOperation
+            ConfigMgmtOperations,
+        etsysConfigMgmtChangeOperStatus
+            INTEGER,
+        etsysConfigMgmtChangeDelayTime
+            Unsigned32,
+        etsysConfigMgmtChangeEnqueuedTime
+            DateAndTime,
+        etsysConfigMgmtChangeCompletionTime
+            DateAndTime,
+        etsysConfigMgmtChangeBytesTransferred
+            Integer32,
+        etsysConfigMgmtChangeValidationString
+            DisplayString,
+        etsysConfigMgmtChangeErrorDescription
+            SnmpAdminString,
+        etsysConfigMgmtChangeRowStatus
+            RowStatus
+    }
+
+etsysConfigMgmtChangeIndex       OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index for this configuration change request."
+    ::= { etsysConfigMgmtChangeEntry 1 }
+
+etsysConfigMgmtChangeURL  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The URL of the image, configuration file, or server to use
+         for the requested operation.  Any password information
+         MUST NOT be returned on a read.  Any errors with the type
+         or format of this object SHOULD be reported in the
+         etsysConfigMgmtChangeErrorDescription object when the
+         row is activated."
+    DEFVAL { ''H }
+    ::= { etsysConfigMgmtChangeEntry 2 }
+
+etsysConfigMgmtChangeOperation  OBJECT-TYPE
+    SYNTAX      ConfigMgmtOperations
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The operation or operations requested.  The specification
+         of any unsupported operations SHOULD cause the entire
+         operation to fail immediately and an appropriate error
+         description to be generated."
+    ::= { etsysConfigMgmtChangeEntry 3 }
+
+etsysConfigMgmtChangeOperStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+      inactive(1),
+      pending(2),
+      running(3),
+      success(4),
+      failure(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state of the configuration request.
+
+         inactive - Indicates that the RowStatus of this conceptual
+                    row is not in the `active` state.
+
+         pending  - Indicates that the configuration change described
+                    by this row is ready to run and waiting in a queue.
+
+         running  - Indicates that the configuration change described
+                    by this row is running.
+
+         success  - Indicates that the configuration change described
+                    by this row has successfully run to completion.
+
+         failure  - Indicates that the configuration change described
+                    by this row has failed to run to completion."
+    ::= { etsysConfigMgmtChangeEntry 4 }
+
+etsysConfigMgmtChangeDelayTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds that should elapse between the time
+         that the RowStatus of this conceptual row is set to active
+         and the request is queued for execution.  On a read this
+         object should return the time remaining before the request
+         is queued."
+    DEFVAL { 0 }
+    ::= { etsysConfigMgmtChangeEntry 5 }
+
+etsysConfigMgmtChangeEnqueuedTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time, in device local time, when this change
+         request was last enqueued for execution.
+         The value '0000000000000000'H is returned if this table
+         entry has not yet been queued."
+    DEFVAL { '0000000000000000'H }
+    ::= { etsysConfigMgmtChangeEntry 6 }
+
+etsysConfigMgmtChangeCompletionTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time, in device local time, when this change
+         request was last completed.  It should be reset to the
+         default value when the RowStatus of this conceptual row
+         is set to active.  The value '0000000000000000'H is returned
+         if this table entry has not yet run to completion."
+    DEFVAL { '0000000000000000'H }
+    ::= { etsysConfigMgmtChangeEntry 7 }
+
+etsysConfigMgmtChangeBytesTransferred  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes currently transferred.  A value of -1
+         indicates that this feature is not supported for the
+         protocol currently selected.  This value is reset to its
+         initial state when the etsysConfigMgmtRowStatus object
+         is set to the active state."
+    DEFVAL { 0 }
+    ::= { etsysConfigMgmtChangeEntry 8 }
+
+etsysConfigMgmtChangeValidationString OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A checksum, fingerprint, message-digest, or some other
+         means to validate the integrity of the file."
+    DEFVAL { ''H }
+    ::= { etsysConfigMgmtChangeEntry 9 }
+
+etsysConfigMgmtChangeErrorDescription OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains a descriptive error message if the
+         requested transfer failed.  Implementations must reset
+         the error message to a zero-length string when the
+         etsysConfigMgmtChangeRowStatus leaf is set to the
+         active state."
+    DEFVAL { ''H }
+    ::= { etsysConfigMgmtChangeEntry 10 }
+
+etsysConfigMgmtChangeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A control that will allow one entry to be added,
+         activated, deactivated, and removed from this table.
+
+         When the value of this object is 'active' none of the
+         other objects in this conceptual row can be modified.
+
+         Setting this object to the 'active' state from the
+         'notInService' state will cause the requested
+         configuration operation to be initiated.
+
+         Once the requested configuration operation has completed,
+         successfully or otherwise, this leaf will be set to
+         the 'notInService' state by the managed entity.
+
+         Setting this object to any other valid state from the
+         'active' state SHOULD cause the managed entity to cancel
+         the requested operation at its earliest most rational
+         opportunity.
+
+         Setting this object to the 'active' state from the
+         'active' state SHOULD NOT have any affect.
+
+         Conceptual rows that have been in the 'notInService'
+         state for more than a device specific time period
+         MAY be destroyed by the managed entity."
+    ::= { etsysConfigMgmtChangeEntry 11 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysConfigMgmtGroups           OBJECT IDENTIFIER ::=
+                  { etsysConfigMgmtConformance 1 }
+
+etsysConfigMgmtCompliances      OBJECT IDENTIFIER ::=
+                  { etsysConfigMgmtConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+etsysConfigMgmtStatusGroup  OBJECT-GROUP
+    OBJECTS {
+        etsysConfigMgmtCurrentImageURL,
+        etsysConfigMgmtCurrentConfigURL,
+        etsysConfigMgmtPersistentStorageStatus,
+        etsysConfigMgmtPersistentStorageCkSum
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects that provide some status information about the
+         entity's current configuration."
+    ::= { etsysConfigMgmtGroups 1 }
+
+etsysConfigMgmtChangeGroup  OBJECT-GROUP
+    OBJECTS {
+        etsysConfigMgmtChangeLimit,
+        etsysConfigMgmtChangeCurrent,
+        etsysConfigMgmtChangeCompleted,
+        etsysConfigMgmtChangeSupportedURLs,
+        etsysConfigMgmtChangeSupportedOperations,
+        etsysConfigMgmtChangeNextAvailableIndex,
+        etsysConfigMgmtChangeURL,
+        etsysConfigMgmtChangeOperation,
+        etsysConfigMgmtChangeOperStatus,
+        etsysConfigMgmtChangeDelayTime,
+        etsysConfigMgmtChangeEnqueuedTime,
+        etsysConfigMgmtChangeCompletionTime,
+        etsysConfigMgmtChangeBytesTransferred,
+        etsysConfigMgmtChangeValidationString,
+        etsysConfigMgmtChangeErrorDescription,
+        etsysConfigMgmtChangeRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects that provide a means to change the entity's
+         configuration."
+    ::= { etsysConfigMgmtGroups 2 }
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+etsysConfigMgmtCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Enterasys Configuration Management MIB.
+        Implementation of this MIB is based on individual product
+        needs."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+            etsysConfigMgmtStatusGroup,
+            etsysConfigMgmtChangeGroup
+    }
+    ::= { etsysConfigMgmtCompliances 1 }
+
+END

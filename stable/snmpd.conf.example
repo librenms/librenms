@@ -1,0 +1,12 @@
+com2sec readonly  default         0bs3rv1um
+
+group MyROGroup v2c        readonly
+view all    included  .1                               80
+access MyROGroup ""      any       noauth    exact  all    none   none
+
+syslocation Rack, Room, Building, City, Country [GPSX,Y]
+syscontact Your Name <your@email.address>
+
+#Distro Detection
+extend .1.3.6.1.4.1.2021.7890.1 distro /usr/bin/distro
+

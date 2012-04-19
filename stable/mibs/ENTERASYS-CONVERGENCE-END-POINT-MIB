@@ -1,0 +1,1104 @@
+ENTERASYS-CONVERGENCE-END-POINT-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-convergence-end-point-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' Convergence End Point (CEP) MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright November, (2003-2005) Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32  
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, MacAddress, DateAndTime, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex, InterfaceIndex
+        FROM IF-MIB
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysConvergenceEndPointMIB MODULE-IDENTITY
+    LAST-UPDATED "200511181325Z"  -- Fri Nov 18 13:25 UTC 2005
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+         "Postal: Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+          Phone:  +1 978 684 1000
+          E-mail: support@enterasys.com
+          WWW:    http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         Enterasys Networks enterprise OID pertaining to
+         Convergence End Point management."
+
+    REVISION "200511181325Z"  -- Fri Nov 18 13:25 UTC 2005
+    DESCRIPTION
+        "Added new ConvEndPointType of lldpMed(6)."
+
+    REVISION "200510191549Z"  -- Wed Oct 19 15:49 UTC 2005
+    DESCRIPTION
+        "Added the etsysCEPCiscoCDPVoicePortVlan to configure the remote
+         configuration of Cisco VOIP phones using Cisco CDP."
+
+    REVISION "200508161233Z"  -- Tue Aug 16 12:33 UTC 2005
+    DESCRIPTION
+        "Added new etsysConvEndPointDetectionEndPointType enumeration
+         of sip(2)."
+
+    REVISION "200506161427Z"  -- Thu Jun 16 14:27 UTC 2005
+    DESCRIPTION
+        "Added new ConvEndPointType of sip(5).  Added new default
+         behavior to etsysConvEndPointDetectionTable for SIP."
+
+    REVISION "200503311610Z"  -- Thu Mar 31 16:10 GMT 2005
+    DESCRIPTION
+        "Deprecated the etsysConvEndPointConnMacTable in favor of
+         the more flexible etsysCEPConnMacTable.  The 
+         etsysCEPPortClearUsers object has been added to allow easier 
+         clearing of detected Convergence End Points on a per port
+         basis."
+
+    REVISION "200311051942Z"  -- Wed Nov  5 19:42 GMT 2003
+    DESCRIPTION
+        "The initial version of this MIB module."
+    ::= { etsysModules 40 }
+
+
+-- -------------------------------------------------------------
+-- Textual conventions
+-- -------------------------------------------------------------
+
+ConvEndPointTypes ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Supported Convergence End Point products."
+    SYNTAX BITS {
+      ciscoIPphone(0),
+      siemensIPphone(1),
+      avayaCLan(2),
+      avayaMedPro(3),
+      genericH323(4),
+      sip(5),
+      lldpMed(6)
+    }
+
+
+-- -------------------------------------------------------------
+-- MIB Objects
+-- -------------------------------------------------------------
+
+etsysConvEndPointObjects   OBJECT IDENTIFIER
+         ::= { etsysConvergenceEndPointMIB 1 }
+
+etsysConvEndPointConfig    OBJECT IDENTIFIER
+         ::= { etsysConvEndPointObjects 1 }
+
+etsysConvEndPointStatus    OBJECT IDENTIFIER
+         ::= { etsysConvEndPointObjects 2 }
+
+etsysConvEndPointDetection OBJECT IDENTIFIER
+         ::= { etsysConvEndPointObjects 3 }
+
+
+-- -------------------------------------------------------------
+-- Convergence End Point Configuration Group
+-- -------------------------------------------------------------
+
+etsysConvEndPointGlobalConfigEnable OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When set to enabled(1) this object activates the current
+         Convergence End Point configuration.
+
+         When set to disabled(2) this MIB SHALL be configurable,
+         but MUST NOT be applied, all entries will be removed
+         from the etsysConvEndPointConnMacTable and the
+         etsysConvEndPointConnPortTable, and any policies that
+         have been changed as a result of End Point detection
+         will revert to their default states.
+
+         Maintaining the value of this object across agent
+         reboots is REQUIRED."
+    DEFVAL { disabled }
+    ::= { etsysConvEndPointConfig 1 }
+
+
+-- -------------------------------------------------------------
+-- Convergence End Point Global Configuration Table
+-- -------------------------------------------------------------
+
+etsysConvEndPointGlobalConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysConvEndPointGlobalConfigEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represents all Convergence End Point types
+         supported by this entity, and provides a default policy
+         profile for each Convergence End Point type."
+    ::= { etsysConvEndPointConfig 2 }
+
+etsysConvEndPointGlobalConfigEntry OBJECT-TYPE
+    SYNTAX      EtsysConvEndPointGlobalConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the default policy to be applied when this type of
+         Convergence End Point is detected or discovered."
+    INDEX { etsysConvEndPointGlobalEndPointType }
+    ::= { etsysConvEndPointGlobalConfigTable 1 }
+
+EtsysConvEndPointGlobalConfigEntry ::=
+    SEQUENCE {
+       etsysConvEndPointGlobalEndPointType        ConvEndPointTypes,
+       etsysConvEndPointGlobalDefaultPolicyIndex  Integer32
+    }
+
+etsysConvEndPointGlobalEndPointType OBJECT-TYPE
+    SYNTAX      ConvEndPointTypes
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Convergence End Point type. The value of this object is
+         limited to a single enumerated bit in the ConvEndPointTypes
+         textual convention."
+    ::= { etsysConvEndPointGlobalConfigEntry 1 }
+
+etsysConvEndPointGlobalDefaultPolicyIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The policy that should be applied for this type of Convergence
+         End Point.  This value is an etsysPolicyProfileIndex as defined
+         in the ENTERASYS-POLICY-PROFILE-MIB.  If no such policy index 
+         exists, then no policy will be applied when this type of
+         Convergence End Point is detected or discovered.  The value
+         zero is not a valid etsysPolicyProfileIndex, so zero indicates
+         that no policy should be applied.
+
+         Maintaining the value of this object across system reboots
+         is REQUIRED."
+    DEFVAL { 0 }
+    ::= { etsysConvEndPointGlobalConfigEntry 2 }
+
+
+-- -------------------------------------------------------------
+-- Convergence End Point Protocol Configuration Table
+-- -------------------------------------------------------------
+
+etsysConvEndPointProtocolConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysConvEndPointProtocolConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides control of Convergence End Point detection
+         and discovery on a per interface and per Convergence End Point
+         type basis.
+
+         Maintaining the values of this table across system reboots
+         is REQUIRED."
+    ::= { etsysConvEndPointConfig 3 }
+
+etsysConvEndPointProtocolConfigEntry OBJECT-TYPE
+    SYNTAX      EtsysConvEndPointProtocolConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The current Convergence End Point detection and discovery
+         status for an interface."
+    INDEX { ifIndex, etsysConvEndPointProtocolEndPointType }
+    ::= { etsysConvEndPointProtocolConfigTable 1 }
+
+EtsysConvEndPointProtocolConfigEntry ::=
+    SEQUENCE {
+       etsysConvEndPointProtocolEndPointType   ConvEndPointTypes,
+       etsysConvEndPointProtocolEnable         EnabledStatus
+     }
+
+etsysConvEndPointProtocolEndPointType OBJECT-TYPE
+    SYNTAX      ConvEndPointTypes
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Convergence End Point type."
+    ::= { etsysConvEndPointProtocolConfigEntry 1 }
+
+etsysConvEndPointProtocolEnable OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When set to enabled(1), Convergence End Point detection
+         and discovery will be enabled on this interface for the
+         Convergence End Point type specified.
+         When set to disabled(2), the Convergence End Points that
+         have been discovered or detected on this interface of the
+         type specified will be removed from the
+         etsysConvEndPointConnMacTable and the
+         etsysConvEndPointConnPortTable.
+         After all of the End Points have been removed from an
+         interface the policy on that interface will revert to
+         its default state."
+    DEFVAL { disabled }
+    ::= { etsysConvEndPointProtocolConfigEntry 2 }
+
+
+-- -------------------------------------------------------------
+-- Convergence End Point Connection MAC Table
+-- -------------------------------------------------------------
+
+etsysConvEndPointConnMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysConvEndPointConnMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "This table provides information on each of the Convergence
+         End Points that has been discovered or detected by this
+         entity.
+
+         Maintaining the value of this object across system reboots
+         is NOT REQUIRED."
+    ::= { etsysConvEndPointStatus 1 }
+
+etsysConvEndPointConnMacEntry OBJECT-TYPE
+    SYNTAX      EtsysConvEndPointConnMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Information about an individual Convergence End Point."
+    INDEX { etsysConvEndPointConnMacMacAddress }    
+    ::= { etsysConvEndPointConnMacTable 1 }
+
+EtsysConvEndPointConnMacEntry ::=
+    SEQUENCE {
+       etsysConvEndPointConnMacMacAddress       MacAddress,
+       etsysConvEndPointConnMacPortNumber       InterfaceIndex,
+       etsysConvEndPointConnMacEndPointType     ConvEndPointTypes,
+       etsysConvEndPointConnMacPolicyIndex      Integer32,
+       etsysConvEndPointConnMacDiscoveryTime    DateAndTime,
+       etsysConvEndPointConnMacFirmwareVersion  SnmpAdminString,
+       etsysConvEndPointConnMacInetAddressType  InetAddressType,
+       etsysConvEndPointConnMacInetAddress      InetAddress
+    }
+
+etsysConvEndPointConnMacMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The MAC address of this Convergence End Point."
+    ::= { etsysConvEndPointConnMacEntry 1 }
+
+etsysConvEndPointConnMacPortNumber OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The interface on which this Convergence End Point was
+         detected or discovered."
+    ::= { etsysConvEndPointConnMacEntry 2 }   
+
+etsysConvEndPointConnMacEndPointType OBJECT-TYPE
+    SYNTAX      ConvEndPointTypes
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The type of Convergence End Point described by this row."
+    ::= { etsysConvEndPointConnMacEntry 3 }
+
+etsysConvEndPointConnMacPolicyIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The policy applied for this Convergence End Point.  This
+         value is an etsysPolicyProfileIndex as defined in the
+         ENTERASYS-POLICY-PROFILE-MIB.  If the desired policy does
+         not currently exist, or never did exist, then a zero MUST
+         be returned."
+    ::= { etsysConvEndPointConnMacEntry 4 }
+
+etsysConvEndPointConnMacDiscoveryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The time and date that this Convergence End Point was
+         detected or discovered."
+    ::= { etsysConvEndPointConnMacEntry 5 }
+
+etsysConvEndPointConnMacFirmwareVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "This is the firmware version of the discovered Convergence
+         End Point.  If this information is not available via the
+         detection protocol then a zero length string MUST be returned."
+    DEFVAL { "" }
+    ::= { etsysConvEndPointConnMacEntry 6 }
+
+etsysConvEndPointConnMacInetAddressType OBJECT-TYPE  
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The address type of the discovered or detected Convergence
+         End Point.  If the address is unknown, then this object
+         MUST return 'unknown'."
+    DEFVAL { unknown }
+    ::= { etsysConvEndPointConnMacEntry 7 }   
+
+etsysConvEndPointConnMacInetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The address of the discovered or detected Convergence End
+         Point.  If the address is unknown, then this object MUST
+         return a zero length string."
+    DEFVAL { "" }
+    ::= { etsysConvEndPointConnMacEntry 8 }   
+
+
+-- -------------------------------------------------------------
+-- Convergence End Point Connection Port Table
+-- -------------------------------------------------------------
+
+etsysConvEndPointConnPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysConvEndPointConnPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides a mapping from the entities interfaces
+         to discovered Convergence End Points.
+
+         Maintaining the value of this object across system reboots
+         is NOT REQUIRED."
+    ::= { etsysConvEndPointStatus 2 }
+
+etsysConvEndPointConnPortEntry OBJECT-TYPE
+    SYNTAX      EtsysConvEndPointConnPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about an individual Convergence End Point."
+    INDEX { ifIndex, etsysConvEndPointConnPortMacAddress }    
+    ::= { etsysConvEndPointConnPortTable 1 }
+
+EtsysConvEndPointConnPortEntry ::=
+    SEQUENCE {
+       etsysConvEndPointConnPortMacAddress       MacAddress
+    }
+
+etsysConvEndPointConnPortMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the discovered or detected Convergence
+         End Point."
+ ::= { etsysConvEndPointConnPortEntry 1 }
+
+
+-- -------------------------------------------------------------
+-- New Convergence End Point (CEP) Connection MAC Table
+-- -------------------------------------------------------------
+
+etsysCEPConnMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCEPConnMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides information on each of the Convergence
+         End Points that has been discovered or detected by this
+         entity.
+
+         Maintaining the value of this object across system reboots
+         is NOT REQUIRED."
+    ::= { etsysConvEndPointStatus 3 }
+
+etsysCEPConnMacEntry OBJECT-TYPE
+    SYNTAX      EtsysCEPConnMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about an individual Convergence End Point (CEP)."
+    INDEX { etsysConvEndPointConnPortMacAddress, ifIndex }    
+    ::= { etsysCEPConnMacTable 1 }
+
+EtsysCEPConnMacEntry ::=
+    SEQUENCE {
+       etsysCEPConnMacEndPointType     ConvEndPointTypes,
+       etsysCEPConnMacPolicyIndex      Integer32,
+       etsysCEPConnMacDiscoveryTime    DateAndTime,
+       etsysCEPConnMacFirmwareVersion  SnmpAdminString,
+       etsysCEPConnMacInetAddressType  InetAddressType,
+       etsysCEPConnMacInetAddress      InetAddress
+    }
+
+etsysCEPConnMacEndPointType OBJECT-TYPE
+    SYNTAX      ConvEndPointTypes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of Convergence End Point described by this row."
+    ::= { etsysCEPConnMacEntry 1 }
+
+etsysCEPConnMacPolicyIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The policy applied for this Convergence End Point.  This
+         value is an etsysPolicyProfileIndex as defined in the
+         ENTERASYS-POLICY-PROFILE-MIB.  If the desired policy does
+         not currently exist, or never did exist, then a zero MUST
+         be returned."
+    ::= { etsysCEPConnMacEntry 2 }
+
+etsysCEPConnMacDiscoveryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time and date that this Convergence End Point was
+         detected or discovered."
+    ::= { etsysCEPConnMacEntry 3 }
+
+etsysCEPConnMacFirmwareVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the firmware version of the discovered Convergence
+         End Point.  If this information is not available via the
+         detection protocol then a zero length string MUST be returned."
+    DEFVAL { "" }
+    ::= { etsysCEPConnMacEntry 4 }
+
+etsysCEPConnMacInetAddressType OBJECT-TYPE  
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address type of the discovered or detected Convergence
+         End Point.  If the address is unknown, then this object
+         MUST return 'unknown'."
+    DEFVAL { unknown }
+    ::= { etsysCEPConnMacEntry 5 }   
+
+etsysCEPConnMacInetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address of the discovered or detected Convergence End
+         Point.  If the address is unknown, then this object MUST
+         return a zero length string."
+    DEFVAL { "" }
+    ::= { etsysCEPConnMacEntry 6 }   
+
+
+-- -------------------------------------------------------------
+-- Convergence End Point Detection Table
+-- -------------------------------------------------------------
+
+etsysConvEndPointDetectionMaxEntries OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This value represents the maximum number of entries
+         allowed in the etsysConvEndPointDetectionTable."
+    ::= { etsysConvEndPointDetection 1 }
+
+etsysConvEndPointDetectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysConvEndPointDetectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that describes the IP address and IP port based
+         Convergence End Point detection parameters.
+
+         Packets on interfaces that are configured to detect End
+         Points, via the etsysConvEndPointProtocolConfigTable,
+         that are defined in this table are inspected to determine
+         if a Convergence End Point exists on that interface.
+
+         Rules applying to Convergence End Point types that are
+         configured for detection are evaluated according to the
+         following:
+
+         1.  If etsysConvEndPointDetectionProtocol does not have
+             any bits set, this indicates that the port based detection
+             should not be performed, proceed to step 2.  Otherwise
+             the value in etsysConvEndPointDetectionProtocol is
+             evaluated against the protocol field in the IP header,
+             if it is of a, or the, type specified then the destination
+             port must be between the values of
+             etsysConvEndPointDetectionPortLow and
+             etsysConvEndPointDetectionPortHigh, inclusive.
+
+         2.  If the etsysConvEndPointDetectionAddr is null, this 
+             indicates that no detection address check should be 
+             performed, consider the End Point detected.  Otherwise
+             the value the of etsysConvEndPointDetectionAddr will be
+             masked with the value of etsysConvEndPointDetectionAddrMask,
+             via a bitwise AND operation, and this value will be compared
+             with the destination IP address that has also been masked
+             with the value of etsysConvEndPointDetectionAddrMask,
+             via a bitwise AND operation, if they are equal then
+             consider the End Point detected.
+
+         If there are no rows in this table that are in the active
+         state then the following pseudo entries describe the
+         behavior of the IP based Convergence End Point detection.
+
+            EndPointType siemens
+            Protocol     { { udp, tcp } }
+            PortLow      4060
+            PortHigh     4060
+            AddrType     unknown
+            Addr         ''
+            AddrMaskType unknown
+            AddrMask     ''
+
+            EndPointType h323
+            Protocol     { { udp, tcp } }
+            PortLow      1718
+            PortHigh     1720
+            AddrType     ipv4
+            Addr         '224.0.1.41'
+            AddrMaskType ipv4
+            AddrMask     '255.255.255.255'
+
+            EndPointType sip
+            Protocol     { { udp, tcp } }
+            PortLow      5060
+            PortHigh     5060
+            AddrType     ipv4
+            Addr         '224.0.1.75'
+            AddrMaskType ipv4
+            AddrMask     '255.255.255.255'
+
+         If one or more entries in this table are active the active
+         entries will define the IP based detection behavior in its
+         entirety.
+
+         Maintaining entries in this table across system reboots is 
+         REQUIRED for entries with an etsysConvEndPointDetectionRowStatus
+         value of active(1)."
+    REFERENCE
+        "Internet Assigned Numbers Authority (INTERNET MULTICAST 
+              ADDRESSES).
+         RFC3261 (SIP: Session Initiation Protocol)."
+    ::= { etsysConvEndPointDetection 2 }
+
+etsysConvEndPointDetectionEntry OBJECT-TYPE
+    SYNTAX      EtsysConvEndPointDetectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents a describes parameters for
+         detecting a Convergence End Point."
+    INDEX { etsysConvEndPointDetectionRuleIndex }    
+    ::= { etsysConvEndPointDetectionTable 1 }
+
+EtsysConvEndPointDetectionEntry ::=
+    SEQUENCE {
+       etsysConvEndPointDetectionRuleIndex             Integer32,
+       etsysConvEndPointDetectionEndPointType          INTEGER,
+       etsysConvEndPointDetectionProtocol              BITS,
+       etsysConvEndPointDetectionPortLow               Integer32,
+       etsysConvEndPointDetectionPortHigh              Integer32,
+       etsysConvEndPointDetectionAddrType              InetAddressType,
+       etsysConvEndPointDetectionAddr                  InetAddress,
+       etsysConvEndPointDetectionAddrMaskType          InetAddressType,
+       etsysConvEndPointDetectionAddrMask              InetAddress,
+       etsysConvEndPointDetectionRowStatus             RowStatus
+    }
+
+etsysConvEndPointDetectionRuleIndex OBJECT-TYPE
+    SYNTAX      Integer32  (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The index of this conceptual row.  This row represents a
+         single rule for determining if an incoming IP packet
+         indicates the presence of a Convergence End Point device.
+         The lower the numerical value of the index the greater the
+         precedence of the rule.  It is recommended that the lowest
+         index be configured to most predominate protocol in the
+         network for greater efficiency."
+    ::={ etsysConvEndPointDetectionEntry 1 }
+
+etsysConvEndPointDetectionEndPointType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  h323(0),
+                  siemens(1),
+                  sip(2)                  
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Convergence End Point device type that a 'hit' on
+         this rule will indicate the presence of."
+    DEFVAL { siemens }
+    ::={ etsysConvEndPointDetectionEntry 2 }
+
+etsysConvEndPointDetectionProtocol OBJECT-TYPE
+    SYNTAX      BITS {
+                  udp(0),
+                  tcp(1)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP protocol type that the following port range
+         applies to.  If no bits are set then the destination
+         port will not be evaluated as part of the detection
+         process."
+    DEFVAL { { udp, tcp } }
+    ::={ etsysConvEndPointDetectionEntry 3 }
+
+etsysConvEndPointDetectionPortLow OBJECT-TYPE
+    SYNTAX      Integer32  (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The low end of the range of the IP destination port that
+         will be used for Convergence End Point detection. This
+         value represents the low value in a range of port numbers
+         that will be used to indicate this type of Convergence End
+         Point. This value must be less than or equal to
+         etsysConvEndPointDetectionPortHigh."
+    DEFVAL { 4060 }
+    ::={ etsysConvEndPointDetectionEntry 4 }
+
+etsysConvEndPointDetectionPortHigh OBJECT-TYPE
+    SYNTAX      Integer32  (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The high end of the range of the IP destination port that
+         will be used for Convergence End Point detection. This
+         value represents the high value in a range of port numbers
+         that will be used to indicate this type of Convergence End
+         Point. This value must be greater than or equal to
+         etsysConvEndPointDetectionPortLow."
+    DEFVAL { 4060 }
+    ::={ etsysConvEndPointDetectionEntry 5 }
+
+etsysConvEndPointDetectionAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination address type that will be used for Convergence
+         End Point detection. If the address type is 'unknown', then
+         this value will not be evaluated as part of the detection
+         process."
+    DEFVAL { unknown }
+    ::={ etsysConvEndPointDetectionEntry 6 }
+
+etsysConvEndPointDetectionAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination IP address that will be used for Convergence
+         End Point detection. If this address is null, then this value
+         will not be evaluated as part of the detection process."
+    DEFVAL { "" }
+    ::={ etsysConvEndPointDetectionEntry 7 }
+
+etsysConvEndPointDetectionAddrMaskType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The address type of the mask that will be applied to the 
+         destination IP address as part of the Convergence End Point
+         detection process. If the address type is 'unknown', then
+         this value will not be evaluated as part of the detection
+         process."
+    DEFVAL { unknown }
+    ::={ etsysConvEndPointDetectionEntry 8 }
+
+etsysConvEndPointDetectionAddrMask OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination address mask that will be used for Convergence
+         End Point detection. If the mask is null, then this value will
+         not be evaluated as part of the detection process."
+    DEFVAL { "" }
+    ::={ etsysConvEndPointDetectionEntry 9 }
+
+etsysConvEndPointDetectionRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this row as defined by the RowStatus textual
+         convention.
+
+         Rows in this table can only transition to 'notInService',
+         or to 'active' if the etsysConvEndPointDetectionAddrType
+         object and the etsysConvEndPointDetectionAddrMaskType
+         object have the same value, and either their values are
+         not 'unknown' or there is at least one bit set in the
+         etsysConvEndPointDetectionProtocol object."
+    REFERENCE
+        "RFC2579 (Textual Conventions for SMIv2)"
+    ::={ etsysConvEndPointDetectionEntry 10 }
+
+
+-- -------------------------------------------------------------
+-- Convergence End Point Detection Port Configuration Table
+-- -------------------------------------------------------------
+
+etsysCEPDetectionPortConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCEPDetectionPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of per port configuration for Convergence End Point
+         detection.
+
+         Maintaining the value of this object across system reboots
+         is NOT REQUIRED."
+    ::= { etsysConvEndPointDetection 3 }
+
+etsysCEPDetectionPortConfigEntry OBJECT-TYPE
+    SYNTAX      EtsysCEPDetectionPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing per port Convergence End Point data.
+         Only interfaces that are able to detect Convergence End Points
+         are represented in this table."
+    INDEX { ifIndex }    
+    ::= { etsysCEPDetectionPortConfigTable 1 }
+
+EtsysCEPDetectionPortConfigEntry ::=
+    SEQUENCE {
+       etsysCEPPortClearUsers        TruthValue
+    }
+
+etsysCEPPortClearUsers OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Setting this object to a value of true(1) will cause
+         all detected or discovered Convergence End Points to be 
+         removed from the following status tables:
+      
+                etsysConvEndPointConnMacTable
+                etsysConvEndPointConnPortTable
+                etsysCEPConnMacTable
+
+         Setting this object to a value of false(2) has no effect.  This
+         object will always return a value of false(2)."
+    DEFVAL { false }
+    ::={ etsysCEPDetectionPortConfigEntry 1 }
+
+-- -------------------------------------------------------------
+-- Convergence End Point CDP Port Configuration Table
+-- -------------------------------------------------------------
+
+etsysCEPCdpPortConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCEPCdpPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of per port configuration for Convergence End Point
+         detection related to the Cisco CDP protocol.  Only ports
+         that are capable of participating in Cisco CDP protocol are 
+         represented in this table."
+    ::= { etsysConvEndPointDetection 4 }
+
+etsysCEPCdpPortConfigEntry OBJECT-TYPE
+    SYNTAX      EtsysCEPCdpPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing per port Convergence End Point data.
+         Only interfaces that are able to detect Convergence End Points
+         are represented in this table."
+    INDEX { ifIndex }
+    ::= { etsysCEPCdpPortConfigTable 1 }
+
+EtsysCEPCdpPortConfigEntry ::=
+    SEQUENCE {
+       etsysCEPCiscoCDPVoicePortVlan Integer32
+    }
+
+etsysCEPCiscoCDPVoicePortVlan OBJECT-TYPE
+    SYNTAX       Integer32 (-1|0|1..4094|4095)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object controls the behavior of the remote configuration
+         of Cisco VOIP phones via Cisco CDP.  Setting this object to 
+         a value of -1 will cause the device to not attempt to
+         remotely configure a Cisco phone using CDP.  Setting this
+         object to a value of 0 will cause the device to configure
+         the phone to send 802.1p priority tagged frames.  A value of
+         4095 will cause the device to configure the phone to send
+         untagged frames.  A value in the range 1..4094 will cause
+         the device to configure the phone to send 802.1Q tagged frames
+         using that value as the VLAN ID encoded in the tag.  This object
+         SHOULD be maintained across device reboots."
+    DEFVAL { -1 }
+    ::={ etsysCEPCdpPortConfigEntry 1 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysConvEndPointConformance   OBJECT IDENTIFIER
+         ::= { etsysConvergenceEndPointMIB 2 }
+
+etsysConvEndPointGroups        OBJECT IDENTIFIER
+         ::= { etsysConvEndPointConformance 1 }
+
+etsysConvEndPointCompliances   OBJECT IDENTIFIER
+         ::= { etsysConvEndPointConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysConvEndPointGlobalConfigGroup OBJECT-GROUP
+    OBJECTS {
+        etsysConvEndPointGlobalConfigEnable,
+        etsysConvEndPointGlobalDefaultPolicyIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects which provide global control of the Convergence
+         End Point features."
+    ::= { etsysConvEndPointGroups 1 }
+
+etsysConvEndPointConfigGroup OBJECT-GROUP
+    OBJECTS {
+        etsysConvEndPointProtocolEnable
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects which provide overrides to the global Convergence
+         End Point controls."
+    ::= { etsysConvEndPointGroups 2 }
+
+etsysConvEndPointDetectionGroup OBJECT-GROUP
+    OBJECTS {
+       etsysConvEndPointDetectionEndPointType,
+       etsysConvEndPointDetectionProtocol,
+       etsysConvEndPointDetectionPortLow,
+       etsysConvEndPointDetectionPortHigh,
+       etsysConvEndPointDetectionAddrType,
+       etsysConvEndPointDetectionAddr,
+       etsysConvEndPointDetectionAddrMaskType,
+       etsysConvEndPointDetectionAddrMask,
+       etsysConvEndPointDetectionRowStatus
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "Objects that provide configuration information specific to
+         IP, port, and address based Convergence End Point detection."
+    ::= { etsysConvEndPointGroups 3 }
+
+etsysConvEndPointStatusGroup OBJECT-GROUP
+    OBJECTS {
+       etsysConvEndPointConnMacPortNumber,
+       etsysConvEndPointConnMacEndPointType,
+       etsysConvEndPointConnMacPolicyIndex,
+       etsysConvEndPointConnMacDiscoveryTime,
+       etsysConvEndPointConnMacFirmwareVersion,
+       etsysConvEndPointConnMacInetAddressType,
+       etsysConvEndPointConnMacInetAddress,
+       etsysConvEndPointConnPortMacAddress
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "Objects that provide status information for discovered
+         and detected Convergence End Points."
+    ::= { etsysConvEndPointGroups 4 }
+
+etsysConvEndPointStatusGroup2 OBJECT-GROUP
+    OBJECTS {
+       etsysConvEndPointConnPortMacAddress,
+       etsysCEPConnMacEndPointType,
+       etsysCEPConnMacPolicyIndex,
+       etsysCEPConnMacDiscoveryTime,
+       etsysCEPConnMacFirmwareVersion,
+       etsysCEPConnMacInetAddressType,
+       etsysCEPConnMacInetAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects that provide status information for discovered
+         and detected Convergence End Points."
+    ::= { etsysConvEndPointGroups 5 }
+
+etsysConvEndPointDetectionGroup2 OBJECT-GROUP
+    OBJECTS {
+       etsysConvEndPointDetectionEndPointType,
+       etsysConvEndPointDetectionProtocol,
+       etsysConvEndPointDetectionPortLow,
+       etsysConvEndPointDetectionPortHigh,
+       etsysConvEndPointDetectionAddrType,
+       etsysConvEndPointDetectionAddr,
+       etsysConvEndPointDetectionAddrMaskType,
+       etsysConvEndPointDetectionAddrMask,
+       etsysConvEndPointDetectionRowStatus,
+       etsysConvEndPointDetectionMaxEntries
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects that provide configuration information specific to
+         IP, port, and address based Convergence End Point detection."
+    ::= { etsysConvEndPointGroups 6 }
+
+etsysConvEndPointPortConfigGroup OBJECT-GROUP
+    OBJECTS {
+       etsysCEPPortClearUsers
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects that provide per port control for discovered
+         and detected Convergence End Points."
+    ::= { etsysConvEndPointGroups 7 }
+
+etsysConvEndPointCiscoVoiceVLANGroup OBJECT-GROUP
+    OBJECTS {
+       etsysCEPCiscoCDPVoicePortVlan
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects that provide per port control for configuring Cisco
+         VOIP phones via Cisco CDP."
+    ::= { etsysConvEndPointGroups 8 }
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysConvEndPointCompliance MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "This compliance statement has been deprecated in favor of
+         the etsysConvEndPointCompliance2 group."
+    MODULE   
+    MANDATORY-GROUPS {
+            etsysConvEndPointGlobalConfigGroup,
+            etsysConvEndPointStatusGroup
+    }
+
+    GROUP  etsysConvEndPointConfigGroup  
+    DESCRIPTION
+        "This group is mandatory for devices which support overrides
+         to device wide Policy Profiles."
+
+    GROUP  etsysConvEndPointDetectionGroup
+    DESCRIPTION
+        "This group is mandatory for devices which support IP port
+         and address based Convergence End Point detection."
+
+    ::= { etsysConvEndPointCompliances 1 }
+
+etsysConvEndPointCompliance2 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+         the Enterasys Convergence End Point Management MIB."
+    MODULE  
+        MANDATORY-GROUPS {
+                etsysConvEndPointGlobalConfigGroup,
+                etsysConvEndPointStatusGroup2
+        }
+
+        GROUP  etsysConvEndPointConfigGroup
+        DESCRIPTION
+            "This group is mandatory for devices which support overrides
+             to device wide policy profiles."
+
+        GROUP  etsysConvEndPointDetectionGroup2
+        DESCRIPTION
+            "This group is mandatory for devices which support IP, port,
+             and address based Convergence End Point detection."
+
+    ::= { etsysConvEndPointCompliances 2 }
+
+etsysConvEndPointPortConfigCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support per port
+         configuration of Convergence End Point detection and
+         discovery."
+    MODULE
+        GROUP   etsysConvEndPointPortConfigGroup
+        DESCRIPTION
+           "This group is mandatory for all devices that support per
+            port configuration of Convergence End Point detection and
+            discovery."
+
+    ::= { etsysConvEndPointCompliances 3 }
+
+etsysConvEndPointCiscoVoiceVLANCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support detection
+         and configuration of Cisco VOIP phones via Cisco CDP."
+    MODULE
+        GROUP   etsysConvEndPointCiscoVoiceVLANGroup
+        DESCRIPTION
+           "This group is mandatory for all devices that support 
+            detection and configuration of Cisco VOIP phones via Cisco
+            CDP."
+
+    ::= { etsysConvEndPointCompliances 4 }
+
+END

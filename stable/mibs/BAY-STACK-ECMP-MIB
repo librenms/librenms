@@ -1,0 +1,100 @@
+
+BAY-STACK-ECMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32
+        FROM SNMPv2-SMI
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB;
+
+bayStackEcmpMib MODULE-IDENTITY
+    LAST-UPDATED    "200509090000Z"
+    ORGANIZATION    "Nortel Networks"
+    CONTACT-INFO    "Nortel Networks"
+    DESCRIPTION
+        "Nortel Networks ECMP MIB
+
+         Copyright 2005 Nortel Networks, Inc.
+         All rights reserved.
+         This Nortel Networks SNMP Management Information Base
+         Specification embodies Nortel Networks' confidential and
+         proprietary intellectual property. Nortel Networks retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         This Specification is supplied 'AS IS,' and Nortel Networks
+         makes no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+    REVISION "200509090000Z" -- 09 September 2005
+    DESCRIPTION "v1:  Initial version."
+
+    ::= { bayStackMibs 15 }
+
+bsEcmpNotifications OBJECT IDENTIFIER ::= { bayStackEcmpMib 0 }
+bsEcmpObjects       OBJECT IDENTIFIER ::= { bayStackEcmpMib 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Scalar Objects
+-- -------------------------------------------------------------
+
+bsEcmpScalars OBJECT IDENTIFIER ::= { bsEcmpObjects 1 }
+
+-- -------------------------------------------------------------
+-- ECMP Configuration Table
+-- -------------------------------------------------------------
+
+bsEcmpConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsEcmpConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Extensions to the ospfIfTable from RFC 2787."
+    ::= { bsEcmpObjects 2 }
+
+bsEcmpConfigEntry OBJECT-TYPE
+    SYNTAX BsEcmpConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A set of objects that augments the ospfIfTable.  There
+         will be an entry in this table for each entry in the
+         ospfIfTable."
+    INDEX { bsEcmpConfigRoutingProtocol }
+    ::= { bsEcmpConfigTable 1 }
+
+BsEcmpConfigEntry ::=
+    SEQUENCE {
+        bsEcmpConfigRoutingProtocol  INTEGER,
+        bsEcmpConfigMaxPath          Integer32
+    }
+
+bsEcmpConfigRoutingProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            static(1),
+                            rip(2),
+                            ospf(3)
+                        }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bsEcmpConfigEntry 1 }
+ 
+bsEcmpConfigMaxPath OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION ""
+    DEFVAL { 1 }
+    ::= { bsEcmpConfigEntry 2 }
+
+-- -------------------------------------------------------------
+-- Notifications
+-- -------------------------------------------------------------
+
+END
+
