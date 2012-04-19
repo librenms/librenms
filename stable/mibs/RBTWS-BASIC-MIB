@@ -1,0 +1,230 @@
+RBTWS-BASIC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress
+	FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+	FROM SNMPv2-TC
+    rbtwsMibs
+	FROM RBTWS-ROOT-MIB;
+
+rbtwsBasic MODULE-IDENTITY
+    LAST-UPDATED "200607102335Z"
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "www.enterasys.com"
+    DESCRIPTION
+	"Basic objects for Enterasys Networks wireless switches.
+
+        Copyright 2006 Enterasys Networks, Inc.
+        All rights reserved.
+        This SNMP Management Information Base
+        Specification (Specification) embodies
+        confidential and proprietary intellectual property.
+
+        This Specification is supplied 'AS IS' and Enterasys Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200607100008Z"
+    DESCRIPTION "v2.0.6: Fixed MAX-ACCESS of rbtwsMobilityMemberEntryAddr,
+                         an index that was also the only column"
+
+    REVISION "200604140007Z"
+    DESCRIPTION "v2.0.5: Revised for 4.1 release"
+
+    REVISION "200501010000Z"
+    DESCRIPTION "v1: initial version, as for 4.0 and older releases"
+
+    ::= { rbtwsMibs 2 }
+
+
+-- Textual Conventions
+RbtwsLicenseFeature ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+	"Enumeration of the licensable features.
+	Currently only 1 feature is licensed, the
+	number AP/DAPs concurrently supported.  This
+	feature has 'three' levels: none, 1, and 2.
+	Level 1 implies support for 80 concurrent AP/DAPs,
+	level 2 implies support for 120 concurrent AP/DAPs.
+	The value in object rbtwsLicenseInfoEntryValue
+	should therefore reflect the number of AP/DAPs
+	supported."
+    SYNTAX      INTEGER {
+			none(1),
+			maxSupportedAPsOrDAPs(2)
+			}
+
+
+-- Object definitions
+
+-- Basic System Information Group
+rbtwsBasicSystemInfo OBJECT IDENTIFIER ::= { rbtwsBasic 1 }
+
+rbtwsSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The serial number of the switch."
+    ::= { rbtwsBasicSystemInfo 1 }
+
+rbtwsSwMajorVersionNumber OBJECT-TYPE
+    SYNTAX      INTEGER (0..99)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The major release version of the running software."
+    ::= { rbtwsBasicSystemInfo 2 }
+
+rbtwsSwMinorVersionNumber OBJECT-TYPE
+    SYNTAX      INTEGER (0..99)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The minor release version of the running software."
+    ::= { rbtwsBasicSystemInfo 3 }
+
+rbtwsVersionString OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The version string of the running software, including
+	 the major, minor, patch and build numbers, such as
+	 3.0.0.185"
+    ::= { rbtwsBasicSystemInfo 4 }
+
+-- Mobility Domain Group
+rbtwsMobilityDomainInfo OBJECT IDENTIFIER ::= { rbtwsBasic 2 }
+
+rbtwsMobilityDomainName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The mobility domain containing the switch, or a
+	zero-length string when the mobility domain is
+	unknown."
+    ::= { rbtwsMobilityDomainInfo 1 }
+
+
+rbtwsMobilitySeedIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The IPv4 address of the seed switch for this switch's
+	mobility domain, or the IPv4 address 0.0.0.0 if unknown."
+    ::= { rbtwsMobilityDomainInfo 2 }
+
+rbtwsMobilityMemberTableSize OBJECT-TYPE
+    SYNTAX      INTEGER (0..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The number of entries in the mobility member table,
+	rbtwsMobilityMemberTable."
+    ::= { rbtwsMobilityDomainInfo 3 }
+
+rbtwsMobilityMemberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsMobilityMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Table of members of the mobility domain, indexed
+	 by the member IPv4 address."
+    ::= {rbtwsMobilityDomainInfo 4 }
+
+rbtwsMobilityMemberEntry OBJECT-TYPE
+    SYNTAX      RbtwsMobilityMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"An entry in the rbtwsMobilityMemberTable table."
+    INDEX   { rbtwsMobilityMemberEntryAddr }
+    ::= { rbtwsMobilityMemberTable 1 }
+
+RbtwsMobilityMemberEntry ::= SEQUENCE {
+    rbtwsMobilityMemberEntryAddr     IpAddress
+    }
+
+-- a row can't have _all_ columns with MAX-ACCESS of not-accessible
+-- (would mean there is nothing to retrieve)
+
+rbtwsMobilityMemberEntryAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"IPv4 address of a member of the mobility domain."
+    ::= { rbtwsMobilityMemberEntry 1 }
+
+-- License Information Group
+rbtwsLicenseInfoGroup OBJECT IDENTIFIER ::= { rbtwsBasic 3 }
+
+rbtwsLicenseInfoTableSize OBJECT-TYPE
+    SYNTAX      INTEGER (0..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The number of entries in the license table,
+	rbtwsLicenseInfoTable."
+    ::= { rbtwsLicenseInfoGroup 1 }
+
+rbtwsLicenseInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsLicenseInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Table of installed licenses on the switch. The
+	licences provide additional capabilities over
+	the default capabilities of the switch."
+	::= { rbtwsLicenseInfoGroup 2 }
+
+rbtwsLicenseInfoEntry OBJECT-TYPE
+    SYNTAX  RbtwsLicenseInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"A license table entry."
+    INDEX { rbtwsLicenseInfoEntryFeature }
+    ::= { rbtwsLicenseInfoTable 1 }
+
+RbtwsLicenseInfoEntry ::= SEQUENCE {
+    rbtwsLicenseInfoEntryFeature     RbtwsLicenseFeature,
+    rbtwsLicenseInfoEntryValue       INTEGER,
+    rbtwsLicenseInfoEntryDescr       DisplayString
+    }
+
+rbtwsLicenseInfoEntryFeature OBJECT-TYPE
+    SYNTAX RbtwsLicenseFeature
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"The feature being reported on"
+    ::= { rbtwsLicenseInfoEntry 1 }
+
+rbtwsLicenseInfoEntryValue OBJECT-TYPE
+    SYNTAX      INTEGER (0..4096)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The value of the feature enabled, for example
+	a feature may have multiple levels of licensing,
+	so the value will very with the license level."
+    ::= { rbtwsLicenseInfoEntry 2 }
+
+rbtwsLicenseInfoEntryDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"A human interpretable description of this license,
+	for example, '120 APs or DAPs.'"
+    ::= { rbtwsLicenseInfoEntry 3 }
+
+
+END

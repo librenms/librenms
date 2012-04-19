@@ -1,0 +1,162 @@
+--  =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI MACBIND MIB, this mib will maintain the 
+--              MAC-IP address bind mib oid for all datacomm product.
+-- Reference:
+-- Version:     V1.20
+-- History:
+--  
+--  V1.20 2005-05-30 Wei Rixi(22510) added mplsVpnVrfName as table index,
+--  V1.00 2003-03-18 Yang Yinzhu(28193)  initial version
+-- =================================================================
+
+HUAWEI-MACBIND-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        IpAddress, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        TruthValue, MacAddress, RowStatus            
+            FROM SNMPv2-TC
+        mplsVpnVrfName            
+            FROM MPLS-VPN-MIB
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwMACBIND MODULE-IDENTITY 
+        LAST-UPDATED "200304110900Z"        -- April 11, 2003 at 09:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            V1.00
+            The MAC-IP address bind mib is for all datacomm product.
+            
+            "
+        ::= { hwDatacomm 9 }
+
+    --
+    -- Node definitions
+    --
+    -- 1.3.6.1.4.1.2011.5.25.9.1
+    hwMacBindMibObjects OBJECT IDENTIFIER ::= { hwMACBIND 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.9.1.1
+    hwMacBindEnableFlag OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The MAC-IP address bind function switch.
+            1: true(on)
+            2: false(off)
+            "
+        DEFVAL { false }
+        ::= { hwMacBindMibObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.9.1.2
+    hwMacBindTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwMacBindEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The MAC-IP address bind table.
+            "
+        ::= { hwMacBindMibObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.9.1.2.1
+    hwMacBindEntry OBJECT-TYPE
+        SYNTAX HwMacBindEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The MAC-IP address bind table struct.
+            "
+        INDEX { mplsVpnVrfName, hwMacBindIPAddress }
+        ::= { hwMacBindTable 1 }
+    
+    HwMacBindEntry ::=
+        SEQUENCE { 
+            hwMacBindIPAddress
+                IpAddress,
+            hwMacBindMacAddress
+                MacAddress,
+            hwMacBindRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.9.1.2.1.1
+    hwMacBindIPAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            IP address.
+            
+            This item is index."
+        ::= { hwMacBindEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.9.1.2.1.2
+    hwMacBindMacAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            MAC address.
+            "
+        ::= { hwMacBindEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.9.1.2.1.3
+    hwMacBindRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Only support CreateAndGo and Destroy.
+            "
+        ::= { hwMacBindEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.9.2
+    hwMacBindMibConformance OBJECT IDENTIFIER ::= { hwMACBIND 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.9.2.1
+    hwMacBindMibGroup OBJECT IDENTIFIER ::= { hwMacBindMibConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.9.2.1.1
+    hwMacBindTableGroup OBJECT-GROUP
+        OBJECTS { 
+            hwMacBindIPAddress, 
+            hwMacBindMacAddress, 
+            hwMacBindRowStatus }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwMacBindMibGroup 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.9.2.1.2
+    hwMacBindEnableGroup OBJECT-GROUP
+        OBJECTS { hwMacBindEnableFlag }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwMacBindMibGroup 2 }
+
+END

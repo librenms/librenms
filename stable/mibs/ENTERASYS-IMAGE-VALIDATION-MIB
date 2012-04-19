@@ -1,0 +1,235 @@
+ENTERASYS-IMAGE-VALIDATION-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-image-validation-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' Image Validation MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright December, (2004) Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysImageValidationMIB MODULE-IDENTITY
+    LAST-UPDATED "200404022134Z"  -- Fri Apr  2 21:34 GMT 2004
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+         "Postal: Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+          Phone:  +1 978 684 1000
+          E-mail: support@enterasys.com
+          WWW:    http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         Enterasys Networks' enterprise OID pertaining to new
+         image validation and recovery."
+
+    REVISION "200404022134Z"  -- Fri Apr  2 21:34 GMT 2004
+    DESCRIPTION
+        "The initial version of this MIB module."
+    ::= { etsysModules 47 }
+
+
+-- -------------------------------------------------------------
+-- The groups defined within this MIB module:
+-- -------------------------------------------------------------
+
+etsysImageValidationObjects     OBJECT IDENTIFIER
+                             ::= { etsysImageValidationMIB 1 }
+
+etsysImageValidationConfig      OBJECT IDENTIFIER
+                             ::= { etsysImageValidationObjects 1 }
+
+
+-- -------------------------------------------------------------
+-- Image Validation Configuration
+-- -------------------------------------------------------------
+
+etsysImageValidationEnable  OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enabled/disabled status of the New Image Validation
+         feature."
+    DEFVAL { disabled }
+    ::= { etsysImageValidationConfig 1 }
+
+etsysImageValidationPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of seconds to monitor the new image 
+         after it has booted.  If any of the selected validation
+         operations are not successfully completed within this
+         interval, a reset will be issued to load the prior
+         operational image."
+    DEFVAL { 600 }
+    ::= { etsysImageValidationConfig 2 }
+
+etsysImageValidationOperations OBJECT-TYPE
+    SYNTAX      BITS {
+       etsysImageValidationConfig(0),
+       etsysImageValidationIcmp(1),
+       etsysImageValidationSnmp(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The operations that will be used to validate the new
+         image during the etsysImageValidationPeriod.
+
+         etsysImageValidationConfig -
+
+            The successful loading of the start-up configuration. 
+
+         etsysImageValidationIcmp - 
+
+            The successful reception of an ICMP echo reply from the
+            host specified in etsysImageValidationIcmpAddress.
+
+         etsysImageValidationSnmp - 
+
+            The successful reception of an SNMP request from the
+            host specified in etsysImageValidationSnmpAddress.
+            If a host is not specified, an SNMP request from any
+            host will be considered a success.
+
+         If all of the selected validation operations are not
+         successfully completed within the etsysImageValidationPeriod,
+         a reset will be issued to load the prior operational image."
+    ::= { etsysImageValidationConfig 3 }
+
+etsysImageValidationIcmpAddressType OBJECT-TYPE
+     SYNTAX  InetAddressType
+     MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+       "The address type of the etsysImageValidationIcmpAddress
+        object.  These objects are used when the ICMP echo reply
+        validation operation has been selected."
+    DEFVAL { ipv4 }
+     ::= { etsysImageValidationConfig 4 }
+
+etsysImageValidationIcmpAddress OBJECT-TYPE
+    SYNTAX  InetAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The address of the host that should respond to the ICMP echo
+        request.  If an ICMP echo reply has NOT been received from
+        this host by the end of the etsysImageValidationPeriod, a reset
+        will be initiated to load the prior operational image."
+    DEFVAL { '00000000'H }
+    ::= { etsysImageValidationConfig 5 }
+
+etsysImageValidationSnmpAddressType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The address type of the etsysImageValidationSnmpAddress
+        object.  These objects are used when the SNMP request
+        validation operation has been selected."
+    DEFVAL { ipv4 }
+    ::= { etsysImageValidationConfig 6 }
+
+etsysImageValidationSnmpAddress OBJECT-TYPE
+    SYNTAX  InetAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The address of the host that we should receive an SNMP
+        request from.  If this object contains its default value
+        then an SNMP request from any station will be considered
+        a success.  If an SNMP request has NOT been received from
+        this host by the end of the etsysImageValidationPeriod, a
+        reset will be initiated to load the prior operational image."
+    DEFVAL { '00000000'H }
+    ::= { etsysImageValidationConfig 7 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysImageValidationConformance  OBJECT IDENTIFIER
+                         ::= { etsysImageValidationMIB 2 }
+
+etsysImageValidationGroups       OBJECT IDENTIFIER
+                         ::= { etsysImageValidationConformance 1 }
+
+etsysImageValidationCompliances  OBJECT IDENTIFIER
+                         ::= { etsysImageValidationConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+etsysImageValidationConfigGroup  OBJECT-GROUP
+    OBJECTS {
+        etsysImageValidationEnable,
+        etsysImageValidationPeriod,
+        etsysImageValidationOperations,
+        etsysImageValidationIcmpAddressType,
+        etsysImageValidationIcmpAddress,
+        etsysImageValidationSnmpAddressType,
+        etsysImageValidationSnmpAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects that provide a means to validate a new image."
+    ::= { etsysImageValidationGroups 1 }
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+etsysImageValidationCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+         the Enterasys Image Validation MIB."
+    MODULE
+        MANDATORY-GROUPS { etsysImageValidationConfigGroup }
+
+    ::= { etsysImageValidationCompliances 1 }
+ 
+END

@@ -1,0 +1,104 @@
+
+-- *****************************************************************************
+-- Juniper-LICENSE-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   License Manager MIB
+--
+-- Copyright (c) 2004 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-LICENSE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniLicenseMIB  MODULE-IDENTITY
+    LAST-UPDATED "200409141924Z"  -- 14-Sep-04 03:24 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The License Manager MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200409141924Z"  -- 14-Sep-04 03:24 PM EDT  - JUNOSe 6.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 76 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for Assignment functions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniLicenseObjects          OBJECT IDENTIFIER ::= { juniLicenseMIB 1 }
+
+juniLicenseLineModuleIfLimitKey OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The license string that determines the maximum number of interfaces
+        that can be configured on an ATM line module.  A zero-length string
+        (no license) restores the original interface limit."
+    ::= { juniLicenseObjects 1 }
+
+juniLicenseLineModuleIfLimitValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of interfaces allowed on the ATM line module 
+        on the currently configured license string."
+    ::= { juniLicenseObjects 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniLicenseMIBConformance
+             OBJECT IDENTIFIER ::= { juniLicenseMIB 2 }
+juniLicenseMIBCompliances
+             OBJECT IDENTIFIER ::= { juniLicenseMIBConformance 1 }
+juniLicenseMIBGroups
+             OBJECT IDENTIFIER ::= { juniLicenseMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniLicenseCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting licensing
+        of features."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniLicenseGroup }
+    ::= { juniLicenseMIBCompliances 1 }
+
+--
+-- units of conformance
+--
+juniLicenseGroup OBJECT-GROUP
+    OBJECTS {
+        juniLicenseLineModuleIfLimitKey,
+        juniLicenseLineModuleIfLimitValue }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of
+        feature licenses in a Juniper product."
+    ::= { juniLicenseMIBGroups 1 }
+
+END

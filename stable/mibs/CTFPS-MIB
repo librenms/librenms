@@ -1,0 +1,621 @@
+CTFPS-MIB DEFINITIONS ::= BEGIN 
+
+        --  ctfps-mib.txt
+        --  Revision:   01.00.00
+        --  Date: October 14, 1996
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --
+        --  This module will be extended, as needed.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in
+        --  specification and other information contained in this document
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental,
+        --  indirect, special, or consequential damages whatsoever (including
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 96 Cabletron Systems
+ 
+IMPORTS 
+        Gauge, Counter, TimeTicks    FROM RFC1155-SMI 
+        OBJECT-TYPE                  FROM RFC-1212
+        ctFPS                        FROM CTRON-MIB-NAMES ;
+
+
+-- The system group 
+--
+
+   fpsSystem             OBJECT IDENTIFIER ::= { ctFPS 1 }
+
+   fpsSystemSlotNum OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The chassis slot of this FPS system."
+       ::= { fpsSystem 1 }
+
+   fpsSystemMode  OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           bridge(1),
+           switch(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The current operation mode of the FPS."
+       ::= { fpsSystem 2 }
+
+   fpsMaxPktRam OBJECT-TYPE
+       SYNTAX  INTEGER 
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The maximum number of packet buffers supported by the system."
+       ::= { fpsSystem 3 }
+
+   fpsFreePktRam OBJECT-TYPE
+       SYNTAX  Gauge
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The number of packet buffers currently free in the system."
+       ::= { fpsSystem 4 }
+
+   fpsOperTime OBJECT-TYPE
+       SYNTAX  TimeTicks
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Indicates the amount of time the FPS has been operational."
+       ::= { fpsSystem 5 }
+
+   fpsInPkts OBJECT-TYPE
+       SYNTAX  Counter 
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The number of packets received by the FPS since the last time
+            the FPS became operational."
+       ::= { fpsSystem 6 }
+
+   fpsOutPkts OBJECT-TYPE
+       SYNTAX  Counter
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The number of packets forwarded by the FPS."
+       ::= { fpsSystem 7 }
+
+   fpsInOctets OBJECT-TYPE
+       SYNTAX  Counter 
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The number of octets received by the FPS."
+       ::= { fpsSystem 8 }
+
+   fpsOutOctets OBJECT-TYPE
+       SYNTAX  Counter
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The number of octets forwarded by the FPS."
+       ::= { fpsSystem 9 }
+
+--
+--
+--
+--
+-- FPS PORT table
+--
+--
+--
+--
+
+fpsPort               OBJECT IDENTIFIER ::= { ctFPS 2 }
+
+   fpsActivePorts OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The number of active FPS ports."
+       ::= { fpsPort 1 }
+
+   fpsMaxPortNum OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The maximum number of ports that this FPS system can support."
+       ::= { fpsPort 2 }
+
+-- The fpsPortTable contains all of the per fps port information
+-- including per port status, port to interface  mapping,
+-- pointers to associated clusters
+-- (port to cluster is many to one relationship)
+--
+
+   fpsPortTable OBJECT-TYPE 
+       SYNTAX  SEQUENCE OF FpsPortEntry
+       ACCESS  not-accessible 
+       STATUS  mandatory 
+       DESCRIPTION 
+          "A list of status and configuration information on active
+           FPS ports in the system"
+       ::= { fpsPort 3 } 
+
+   fpsPortEntry OBJECT-TYPE 
+       SYNTAX  FpsPortEntry
+       ACCESS  not-accessible 
+       STATUS  mandatory 
+       DESCRIPTION 
+           "A collection of fps port status and configurations." 
+       INDEX { fpsPortNum }
+       ::= { fpsPortTable 1 } 
+
+
+   FpsPortEntry ::= 
+       SEQUENCE { 
+           fpsPortNum
+               INTEGER,
+           fpsPortIfNum
+               INTEGER,
+           fpsPortType
+               INTEGER,
+           fpsPortClusterNum
+               INTEGER,
+           fpsPortTotalAvailQueDepth
+               INTEGER,
+           fpsPortMaxQueDepth
+               INTEGER,
+           fpsPortCurrentQueDepth
+               INTEGER,
+           fpsPortBandwidthRequested
+               INTEGER,
+           fpsPortBandwidthAllocated
+               INTEGER,
+           fpsPortXmitStatus
+               INTEGER,
+           fpsPortFwdStatus
+               INTEGER,
+           fpsPortLearningStatus
+               INTEGER,
+           fpsPortUnknownStatus
+               INTEGER,
+           fpsPortBroadcastStatus
+               INTEGER,
+           fpsPortViolationStatus
+               INTEGER,
+           fpsPortCopyStatus
+               INTEGER,
+           fpsPortStatsStatus
+               INTEGER,
+           fpsPortSpecialPortsSMT
+               INTEGER,
+           fpsPortSpecialPortsHost
+               INTEGER,
+           fpsPortSpecialPortsError
+               INTEGER
+       }
+
+   fpsPortNum  OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           " FPS port number.  A unique value in the range between 1 and
+           fpsActivePorts."
+       ::= { fpsPortEntry 1 }
+
+   fpsPortIfNum OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           " This object uniquely identifies the interface associated
+           with the FPS port.  This interface number is the same as
+           the MIBII interface number, ifIndex, defined in RFC1213."
+       ::= { fpsPortEntry 2 }
+ 
+   fpsPortType OBJECT-TYPE
+       SYNTAX  INTEGER {
+           ether(1),
+           tokenRing(2),
+           inb(3),
+           fddi(4),
+           host(5),
+           atm(6),
+           wan(7),
+           other(8)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Media type of this FPS port."
+       ::= { fpsPortEntry 3 }
+
+   fpsPortClusterNum OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "FPS cluster associated with this FPS port.  Cluster numbers
+           are used to allocate FPS bandwidth for this port."
+       ::= { fpsPortEntry 4 }
+
+   fpsPortTotalAvailQueDepth OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Que depth assigned to this FPS port's queue.  This number
+           represents the hardware limit for the queue and can be no
+           greater than fpsPortMaxQueDepth for this FPS port."
+       ::= { fpsPortEntry 5 }
+ 
+   fpsPortMaxQueDepth OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Maximum depth this queue can be set to for this FPS port.
+           This number may be equal or less than the hardware limit."
+       ::= { fpsPortEntry 6 }
+
+   fpsPortCurrentQueDepth OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The actual queue depth on this FPS port.  This value is from
+           (fpsPortTotalAvailQueDepth - the number of queue entries on the
+           queue at any one time)."
+       ::= { fpsPortEntry 7 }
+ 
+   fpsPortBandwidthRequested  OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Amount of bandwidth (in Mb/s) that this port is
+           requesting from the FPS"
+       ::= { fpsPortEntry 8 }
+
+   fpsPortBandwidthAllocated  OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Estimate of the actual bandwidth this port is receiving
+           (in Mb/s) from the FPS. This value may be lower or higher
+           than the required bandwidth."
+       ::= { fpsPortEntry 9 }
+
+   fpsPortXmitStatus  OBJECT-TYPE
+        SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Current state of this port's transmit enable bit in
+           the Transmit Enable Register (LUFW)."
+       ::= { fpsPortEntry 10 }
+
+   fpsPortFwdStatus  OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Current state of this port's forward enable bit
+           in the Forward Enable Register (LUFW).  If enabled,
+           the FPS will allow packets received on this port to
+           be forwarded through the system"
+       ::= { fpsPortEntry 11 }
+
+   fpsPortLearningStatus  OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Current state of this port's bit in the Learn Enable
+           Mask (LUFW).  If enabled the FPS will allow dynamic
+           learning on frames received on this port."
+       ::= { fpsPortEntry 12 }
+
+   fpsPortUnknownStatus  OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Current state of this port's bit in the Unkown Mask
+           (LUFW). If enabled the FPS will forward packets that
+           are unknown to this port."  
+       ::= { fpsPortEntry 13 }
+
+   fpsPortBroadcastStatus  OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Current state of this port's bit in the Broadcast
+           Mask (LUFW).  If enabled the FPS will forward broadcast
+           packets to this port."  
+       ::= { fpsPortEntry 14 }
+
+   fpsPortViolationStatus  OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Current state of this port's bit in the Violation
+           Mask (LUFW).  If enabled the FPS will forward packets
+           that are in violation to this port.  Note:  This value
+           is only valid in connection mode."
+       ::= { fpsPortEntry 15 }
+
+   fpsPortCopyStatus  OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Current state of this port's bit in the Copy
+           Mask (LUFW).  If enabled the FPS will copy packets
+           to this port whose BAF entry has the 'copyl' bit set."  
+       ::= { fpsPortEntry 16 }
+
+   fpsPortStatsStatus  OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Current state of this port's bit in the Statistics
+           Mask (LUFW).  If enabled the FPS will collect statistics
+           on this port.  These stats are found in the system table."
+       ::= { fpsPortEntry 17 }
+
+   fpsPortSpecialPortsSMT  OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "This object represents whether or not this port has been
+           selected to receive SMT multicast and broadcast frames"
+       ::= { fpsPortEntry 18 }
+
+   fpsPortSpecialPortsHost  OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "This object represents whether or not this port has been
+           selected to receive to-host frames"
+       ::= { fpsPortEntry 19 }
+
+   fpsPortSpecialPortsError OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "This object represents whether or not this port has been
+           selected to receive errored frames"
+       ::= { fpsPortEntry 20 }
+
+
+
+fpsCluster            OBJECT IDENTIFIER ::= { ctFPS 3 }
+
+   fpsActiveClusters OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Number of valid FPS clusters in the system."
+       ::= { fpsCluster 1 }
+
+-- The fpsClusterTable contains all of the cluster information
+-- including valid cluster numbers, cluster type, Round Robin
+-- enable status, and ports per cluster.
+
+   fpsClusterTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF FpsClusterEntry
+       ACCESS  not-accessible 
+       STATUS  mandatory 
+       DESCRIPTION 
+           "A list of fps cluster entries"
+       ::= { fpsCluster 2 } 
+
+   fpsClusterEntry OBJECT-TYPE 
+       SYNTAX  FpsClusterEntry
+       ACCESS  not-accessible 
+       STATUS  mandatory 
+       DESCRIPTION 
+           "A collection of fps cluster entries."
+       INDEX { fpsClusterNumber }
+       ::= { fpsClusterTable 1 } 
+
+
+   FpsClusterEntry ::= 
+       SEQUENCE { 
+           fpsClusterNumber
+               INTEGER,
+           fpsClusterType
+               INTEGER,
+           fpsClusterRoundRobin
+               INTEGER,
+           fpsPortsPerCluster
+               INTEGER
+       } 
+
+   fpsClusterNumber OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The value of this object uniquely identifies the cluster
+           table entry.  Cluster numbers are mapped to FPS ports for
+           bandwidth allocation."
+       ::= { fpsClusterEntry 1 }
+
+   fpsClusterType OBJECT-TYPE
+       SYNTAX  INTEGER {
+           ethernet(1),
+           token-ring(2),
+           inb(3),
+           fnb(4),
+           host(5),
+           atm(6),
+           wan(7)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Media type of the FPS port that is attached to this cluster
+           number."
+       ::= { fpsClusterEntry 2 }
+
+   fpsClusterRoundRobin OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+           enabled(1),
+           disabled(2)
+       }
+       ACCESS  read-write
+       STATUS  mandatory
+       DESCRIPTION
+           "Whether a cluster is signed up for RoundRobin arbitration or
+           not.  Round Robin clusters will be given unused time slices."
+       ::= { fpsClusterEntry 3 }
+
+   fpsPortsPerCluster OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Number of FPS ports that share this cluster number for FPS
+           bandwidth."
+       ::= { fpsClusterEntry 4 }
+
+
+fpsDMAF               OBJECT IDENTIFIER ::= { ctFPS 4 }
+
+
+
+-- DMAF
+--
+-- DMAF utilization objects
+--
+--
+ 
+   dmafBandWidth3SecUtil  OBJECT-TYPE
+       SYNTAX  Gauge
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Estimate of total FPS bandwidth utilized over
+           the last three seconds as a function of DMAFTimeSlices.
+           The counter represents hundreths of percent utilization.
+           For example a count of 25 would represent .25 percent
+           utilization."
+       ::= { fpsDMAF 1 }
+ 
+ 
+ 
+-- BAF
+--
+-- BAF objects
+--
+--
+fpsBAF                OBJECT IDENTIFIER ::= { ctFPS 5 }
+ 
+   bafEntryCount OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The number of entries currently used in this BAF.
+           This number shall include static as well as dynamic entries"
+       ::= { fpsBAF 1 }
+
+   bafMaxEntry OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The maximum number of entries this BAF can hold per hardware.
+           This includes static as well as dynamic entries"
+       ::= { fpsBAF 2 }
+
+   baf3SecUtil OBJECT-TYPE
+       SYNTAX  Gauge
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "Percentage of time that the BAF was utilized
+           over the last three seconds. The Counter represents
+           hundreths of percent. For example a value of 20 would
+           represent .20 percent."
+       ::= { fpsBAF 3 }
+
+END

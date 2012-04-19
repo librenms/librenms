@@ -1,0 +1,430 @@
+ALCATEL-IND1-DOT1Q-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		RowStatus, DisplayString                    				FROM SNMPv2-TC
+		MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE
+			 	 							FROM SNMPv2-SMI
+		MODULE-COMPLIANCE, OBJECT-GROUP          				FROM SNMPv2-CONF
+		softentIND1Dot1Q                 				    FROM ALCATEL-IND1-BASE;
+
+	alcatelIND1Dot1QMIB MODULE-IDENTITY
+		LAST-UPDATED "200704030000Z"
+		ORGANIZATION "Alcatel-Lucent"
+		CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+		DESCRIPTION
+			"This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 802.1q for vlan assignment to slot/port and aggregates
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION      "200704030000Z"
+        DESCRIPTION
+            "Addressing discrepancies with Alcatel Standard."
+		::= { softentIND1Dot1Q 1}
+
+
+
+	alcatelIND1Dot1QMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For 802.1Q
+            Subsystem Managed Objects."
+        ::= { alcatelIND1Dot1QMIB 1 }
+
+
+    alcatelIND1Dot1QMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For 802.1Q
+            Subsystem Conformance Information."
+        ::= { alcatelIND1Dot1QMIB 2 }
+
+
+    alcatelIND1Dot1QMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For 802.1Q
+            Subsystem Units Of Conformance."
+        ::= { alcatelIND1Dot1QMIBConformance 1 }
+
+
+    alcatelIND1Dot1QMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For 802.1Q
+            Subsystem Compliance Statements."
+        ::= { alcatelIND1Dot1QMIBConformance 2 }
+
+    v8021Q  OBJECT IDENTIFIER ::= { alcatelIND1Dot1QMIBObjects 1 }
+
+-- the 8021Q port/vlan table
+
+qPortVlanTable     OBJECT-TYPE
+       SYNTAX  SEQUENCE OF QPortVlanEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+       "This table lists the 802.1q vlans on a port."
+       ::=     { v8021Q 1 }
+
+qPortVlanEntry OBJECT-TYPE
+       SYNTAX  QPortVlanEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+       "An entry in 802.1q port vlan table."
+       INDEX { qPortVlanSlot, qPortVlanPort, qPortVlanTagValue }
+       ::= { qPortVlanTable 1 }
+
+QPortVlanEntry ::= SEQUENCE {
+                qPortVlanSlot
+                        INTEGER,
+                qPortVlanPort
+                        INTEGER,
+                qPortVlanTagValue
+                        INTEGER,
+                qPortVlanStatus
+                        RowStatus,
+                qPortVlanDescription
+                        DisplayString,
+                qPortVlanForceTagInternal
+                        INTEGER
+                }
+
+qPortVlanSlot    OBJECT-TYPE
+                 SYNTAX  INTEGER (1..16)
+                 MAX-ACCESS  read-write
+                 STATUS  current
+                 DESCRIPTION
+                "The slot id of the required port."
+                ::= { qPortVlanEntry 1 }
+
+qPortVlanPort   OBJECT-TYPE
+                SYNTAX  INTEGER (1..64)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The physical port number."
+                ::= { qPortVlanEntry 2 }
+
+qPortVlanTagValue   OBJECT-TYPE
+                   SYNTAX  INTEGER (1..4094)
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                  "Tag for a particular port"
+                  ::= { qPortVlanEntry 3 }
+
+qPortVlanStatus     OBJECT-TYPE
+                    SYNTAX  RowStatus
+                    MAX-ACCESS  read-write
+                    STATUS  current
+                    DESCRIPTION
+                "Row Status for creating/deleting rules"
+                ::= { qPortVlanEntry 4 }
+
+
+qPortVlanDescription OBJECT-TYPE
+                     SYNTAX DisplayString ( SIZE (0..31) )
+                     MAX-ACCESS read-write
+                     STATUS  current
+                     DESCRIPTION
+                     "Textual description of vlan added to a port."
+                     ::= { qPortVlanEntry 5 }
+
+qPortVlanForceTagInternal    OBJECT-TYPE
+                    SYNTAX  INTEGER {
+                                na(2),
+                                on(1),
+                                off(0)
+                                }
+                    MAX-ACCESS  read-write
+                    STATUS  current
+                    DESCRIPTION
+                    "0-ON, 1-OFF and 2-NA"
+                    DEFVAL { na }
+                ::= { qPortVlanEntry 6 }
+
+-- End 8021Q group for slot/port
+
+
+-- the 8021Q Aggregate Vlan table
+
+qAggregateVlanTable     OBJECT-TYPE
+       SYNTAX  SEQUENCE OF QAggregateVlanEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+       "This table lists the 802.1q vlans on a aggregate."
+       ::=     { v8021Q 2 }
+
+qAggregateVlanEntry OBJECT-TYPE
+       SYNTAX  QAggregateVlanEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+       "An entry in 802.1q aggregate vlan table."
+       INDEX { qAggregateVlanAggregateId, qAggregateVlanTagValue }
+       ::= { qAggregateVlanTable 1 }
+
+QAggregateVlanEntry ::= SEQUENCE {
+                qAggregateVlanAggregateId
+                        INTEGER,
+                qAggregateVlanTagValue
+                        INTEGER,
+                qAggregateVlanStatus
+                        RowStatus,
+                qAggregateVlanDescription
+                        DisplayString
+                }
+
+qAggregateVlanAggregateId    OBJECT-TYPE
+                             SYNTAX  INTEGER (0..31)
+                             MAX-ACCESS  read-write
+                             STATUS  current
+                             DESCRIPTION
+                            "The aggreagte id of the aggregate."
+                            ::= { qAggregateVlanEntry 1 }
+
+qAggregateVlanTagValue  OBJECT-TYPE
+                        SYNTAX  INTEGER (1..4094)
+                        MAX-ACCESS  read-write
+                        STATUS  current
+                        DESCRIPTION
+                        "Tag Value on the particular aggregate."
+                        ::= { qAggregateVlanEntry 2 }
+
+qAggregateVlanStatus     OBJECT-TYPE
+                    SYNTAX  RowStatus
+                    MAX-ACCESS  read-write
+                    STATUS  current
+                    DESCRIPTION
+                "Row status for creating/deleting rules."
+                ::= { qAggregateVlanEntry 3 }
+
+
+qAggregateVlanDescription OBJECT-TYPE
+                          SYNTAX DisplayString ( SIZE (0..31) )
+                          MAX-ACCESS read-write
+                          STATUS  current
+                          DESCRIPTION
+                         "Textual description of vlan added to a aggregate."
+                         ::= { qAggregateVlanEntry 4 }
+
+-- End 8021Q group for Aggregate
+
+-- 8021Q ATM IfIndex/VPI/VCI Vlan Table
+
+qAtmIfIndexVpiVciTable  OBJECT-TYPE
+       SYNTAX  SEQUENCE OF QAtmIfIndexVpiVciEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+          "This table lists the 802.1q vlans on an ATM port."
+       ::=     { v8021Q 3 }
+
+qAtmIfIndexVpiVciEntry OBJECT-TYPE
+       SYNTAX  QAtmIfIndexVpiVciEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+          "An entry in 802.1q IfIndex/VPI/VCI vlan table."
+       INDEX { qAtmIfIndex, qAtmVpiValue, qAtmVciValue,
+                 qAtmIfIndexVpiVciVlanTagValue }
+       ::= { qAtmIfIndexVpiVciTable 1 }
+
+QAtmIfIndexVpiVciEntry ::= SEQUENCE {
+
+                qAtmIfIndex
+                        INTEGER,
+                qAtmVpiValue
+			INTEGER,
+		qAtmVciValue
+                        INTEGER,
+		qAtmIfIndexVpiVciVlanTagValue
+                        INTEGER,
+                qAtmIfIndexVpiVciVlanAction
+                        RowStatus,
+                qAtmIfIndexVpiVciVlanDescription
+                        DisplayString,
+		qAtmIfIndexVpiVciAcceptableFrameTypes
+                        INTEGER,
+		qAtmIfIndexVpiVciForceTagInternal
+                        INTEGER
+                }
+
+
+	qAtmIfIndex  	OBJECT-TYPE
+            SYNTAX  INTEGER (4259841..2147483647)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+               "The ATM Interface Index."
+            ::= { qAtmIfIndexVpiVciEntry 1 }
+
+	qAtmVpiValue	OBJECT-TYPE
+		SYNTAX	  INTEGER (0..4095)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+		   ".The Vpi value of the ATM VC.."
+		::= {qAtmIfIndexVpiVciEntry 2 }
+
+	qAtmVciValue	OBJECT-TYPE
+		SYNTAX	  INTEGER (0..65535)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+		   ".The Vci value of the ATM VC.."
+		::= {qAtmIfIndexVpiVciEntry 3 }
+
+
+	qAtmIfIndexVpiVciVlanTagValue   OBJECT-TYPE
+            SYNTAX  INTEGER (1..4094)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+               "Tag for a particular ATM Interface Index"
+            ::= { qAtmIfIndexVpiVciEntry 4 }
+
+qAtmIfIndexVpiVciVlanAction     OBJECT-TYPE
+             SYNTAX  RowStatus
+             MAX-ACCESS  read-write
+             STATUS  current
+             DESCRIPTION
+                "Row Status for creating/deleting services."
+             ::= { qAtmIfIndexVpiVciEntry 5 }
+
+
+qAtmIfIndexVpiVciVlanDescription OBJECT-TYPE
+             SYNTAX DisplayString ( SIZE (0..31) )
+             MAX-ACCESS read-write
+             STATUS  current
+             DESCRIPTION
+                "Textual description of vlan added to an Interface Index."
+             ::= { qAtmIfIndexVpiVciEntry 6 }
+
+qAtmIfIndexVpiVciAcceptableFrameTypes   OBJECT-TYPE
+    		SYNTAX      INTEGER {
+                    admitAll(1),
+                    admitOnlyVlanTagged(2)
+                }
+    		MAX-ACCESS  read-write
+    		STATUS      current
+    		DESCRIPTION
+	        "When this is admitOnlyVlanTagged(2) the device will
+	        discard untagged frames or Priority-Tagged frames
+	        received on this port.  When admitAll(1), untagged
+	        frames or Priority-Tagged frames received on this port
+	        will be accepted and assigned to the PVID for this port.
+
+	        This control does not affect VLAN independent BPDU
+	        frames, such as GVRP and STP.  It does affect VLAN
+	        dependent BPDU frames, such as GMRP."
+   		DEFVAL      { admitAll }
+    		::= { qAtmIfIndexVpiVciEntry 7 }
+
+
+qAtmIfIndexVpiVciForceTagInternal	OBJECT-TYPE
+                    SYNTAX  INTEGER {
+                                na(2),
+                                on(1),
+                                off(0)
+                                }
+                    MAX-ACCESS  read-write
+                    STATUS  current
+                    DESCRIPTION
+                    "0-ON, 1-OFF and 2-NA"
+                    DEFVAL { na }
+                ::= { qAtmIfIndexVpiVciEntry 8 }
+
+-- End 8021Q group for ATM IfIndex/VPI/VCI Vlan Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alcatelIND1Dot1QMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for
+             802.1q."
+        MODULE
+            MANDATORY-GROUPS
+            {
+                dot1qPortGroup,
+                dot1qAggregateGroup
+            }
+
+        ::= { alcatelIND1Dot1QMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    dot1qPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+                qPortVlanSlot,
+                qPortVlanPort,
+                qPortVlanTagValue ,
+                qPortVlanStatus ,
+                qPortVlanDescription ,
+                qPortVlanForceTagInternal
+
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of 802.1q on the ports."
+        ::= { alcatelIND1Dot1QMIBGroups 1 }
+
+
+    dot1qAggregateGroup OBJECT-GROUP
+        OBJECTS
+        {
+                qAggregateVlanAggregateId ,
+                qAggregateVlanTagValue ,
+                qAggregateVlanStatus ,
+                qAggregateVlanDescription
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of 802.1q on the aggregate."
+        ::= { alcatelIND1Dot1QMIBGroups 2 }
+
+END

@@ -1,0 +1,1809 @@
+-- COPYRIGHT NOTICE
+-- Copyright (c) Alteon WebSystems, Inc. 2001
+-- All rights reserved
+-- 
+-- HISTORY
+-- $Log: tigonSwitch.mib,v $
+-- Revision 1.1.1.1  2004/11/01 16:55:42  maxbaker
+-- initial import
+--
+-- Revision ts10_rrekha/2 2002/04/05 02:42:44 rrekha
+-- 	Fixed 217841: Changed descprition for agImageVer1 and agImageVer2 to
+-- 	include new version digit.
+-- 
+-- Revision ge_rrekha/4 2001/10/31 00:06:12 rrekha
+-- 	Fixed 13656: Remove syslog group for PM and AOL DPS.
+-- 
+-- Revision ge_rrekha/2 2001/10/26 01:12:31 rrekha
+-- 	Update the description with information on the placement of the
+-- 	sensors.
+-- 
+-- Revision genie_rekha/23 2001/07/07 02:26:22 rekha
+-- 	For SNMP added ability to enable/disable syslog for SYN attack
+-- 	detection and TCP rate limiting.
+-- 
+-- Revision genie_rekha/21 2001/06/20 19:52:34 rekha
+-- 	Moved SYN attack detection under serverloadbalance to be consistent
+-- 	with CLI.
+-- 
+-- Revision genie_rekha/19 2001/06/19 21:54:58 rekha
+-- 	Added MIB objects to support SYN attack detection.
+-- 
+-- Revision genie_rekha/17 2001/05/25 00:11:10 rekha
+-- 	Removed 'other' from enumerations.
+-- 
+-- Revision genie_rekha/15 2001/05/18 00:12:23 rekha
+-- 	CR11597: Changed the enum for agClrSyslogMsgs to start with a 1
+-- 	instead of 0 as enumerations should not have a number with vlaue 0
+-- 	per RFC1155.
+-- 
+-- Revision test_smiao/5 2001/05/07 21:46:36 smiao
+-- 	Added syslog/trap features in webUI and SNMP.
+-- 
+-- Revision genie_rekha/12 2001/04/25 22:24:10 rekha
+-- 	Fixed CR11327: Added MIB object for RURL key.
+-- 
+-- Revision jbLatest_jbuswell/4 2001/04/23 19:21:25 jbuswell
+-- 	CR#11147: Added to the description of agSoftwareVersion to include new
+-- 	version digit.
+-- 
+-- Revision astro2_mmac/3 2001/04/11 17:36:53 mmac
+-- 	add object adSlotNumber; this object is holds the chassis slot number 
+-- 	of the 780 WSM4 blade.
+-- 
+-- Revision work_rmundhra/8 2001/03/27 00:43:21 rmundhra
+-- 	Fixed 11047:Aceview(EMS)need individual software keys to 
+-- 	be instrumented.
+-- 	Added entries agEnabledGslbKey and agEnabledBwmKey.
+-- 
+-- Revision test_smiao/3 2001/03/21 23:24:43 smiao
+-- 	Removed duplicate registration, private-mibs and switch definitions.
+-- 	Added IMPORTS switch FROM ALTEON-ROOT-MIB.
+-- 
+-- Revision jbLatest_jbuswell/2 2001/03/15 22:10:06 jbuswell
+-- 	Defect 10731: Added agClrSyslogMsgs, changed OID of agSavePending due
+-- 	to conflict.
+-- 
+-- Revision work_rmundhra/4 2001/03/06 23:11:49 rmundhra
+-- 	Added SNMP support for NTP.
+-- 
+-- Revision genie_rekha/10 2001/02/28 21:58:54 rekha
+-- 	Added SNMP support for management network and mask.
+-- 
+-- Revision work_rmundhra/2 2001/02/27 22:53:59 rmundhra
+-- 	Fixed 10217: (Agent) Aceview does not show console enabled/disabled
+-- 	console output syslog messages but in CLI under syslog menu it shows
+-- 	this feature.
+-- 	Added entries agCurCfgConsole & agNewCfgConsole to mib.
+-- 
+-- Revision genie_rekha/7 2001/02/16 00:11:24 rekha
+-- 	Fixed 10218: Added MIB objects for radius telnet.
+-- 
+-- Revision genie_rekha/4 2001/02/09 01:18:17 rekha
+-- 	Added MIB object agSavePending. This fixes CR# 5096
+-- 
+-- Revision genie_rekha/2 2001/02/08 18:18:03 rekha
+-- 	As part of the code cleanup split the Tigon MIB into smaller
+-- 	modules. Instead of altswitch.mib these 5 new modules should be
+-- 	used.
+-- 
+-- $EndLog$
+-- 
+-- Version 10.0.x
+--
+
+ALTEON-TIGON-SWITCH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, mgmt, NetworkAddress, IpAddress, Counter, Gauge 
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+	FROM RFC-1212
+    PhysAddress, DisplayString
+	FROM RFC1213-MIB
+    switch
+	FROM ALTEON-ROOT-MIB;
+
+-- groups in private-mibs
+
+hardware          OBJECT IDENTIFIER ::= { switch 1 }
+agent             OBJECT IDENTIFIER ::= { switch 2 }
+stats		  OBJECT IDENTIFIER ::= { switch 8 }
+information	  OBJECT IDENTIFIER ::= { switch 9 }
+altswitchTraps    OBJECT IDENTIFIER ::= { switch 13 }
+operCmds          OBJECT IDENTIFIER ::= { switch 14 }
+radius            OBJECT IDENTIFIER ::= { switch 16 }
+
+agGeneral         OBJECT IDENTIFIER ::= { agent 1 }
+agGeneralConfig   OBJECT IDENTIFIER ::= { agent 2 }
+
+memStats	  OBJECT IDENTIFIER ::= { stats  12 }
+pktStats	  OBJECT IDENTIFIER ::= { stats  13 }
+mpCpuStats	  OBJECT IDENTIFIER ::= { stats  16 }
+
+-- There are two configuration blocks for Alteon switches.
+-- The "current_config" reflects the configuration parameters that the
+-- switch is operating on and it is read-only.  The objects with "CurCfg"
+-- in the name are reflect to this configuration block.
+--
+-- The "new_config" accepts user configurations on set.  The objects with
+-- "NewCfg" in the name are reflect to this configuration block.
+--
+-- The newly set configurations will not take effect until a "apply"
+-- command has been issued (See agApplyConfiguration object defined in
+-- ALTEON-PRIVATE-MIBS).
+--
+-- The newly set configurations will not be saved through next restarting
+-- of the switch unless a "save" command has been issued (See
+-- agSaveConfiguration object defined in ALTEON-PRIVATE-MIBS).
+
+-- Hardware Information
+
+hwPartNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The hardware part number of the Alteon Switch." 
+    ::= { hardware 1 }
+
+hwRevision OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..16))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The hardware revision.  If the revision is not
+	 available, a zero length string should be returned."
+    ::= { hardware 2 }
+
+hwPowerSupplyStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok(1),
+        bad(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The status of the internal power supply."
+    ::= { hardware 3 }
+
+hwRedundantPSPresent OBJECT-TYPE 
+    SYNTAX  INTEGER { 
+        notPresent(3),  
+        present(4) 
+        } 
+    ACCESS  read-only
+    STATUS  mandatory 
+    DESCRIPTION 
+        "Existence of redundant power supply." 
+    ::= { hardware 4 } 
+
+hwRedundantPSStatus OBJECT-TYPE 
+    SYNTAX  INTEGER { 
+        ok(1), 
+        bad(2),
+        notPresent(3)  
+        } 
+    ACCESS  read-only
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The status of the redundant power supply." 
+    ::= { hardware 5 }
+
+hwSensor1Temp OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The temperature of the rear left sensor in degrees Celsius."
+    ::= { hardware 6 }
+
+hwSensor2Temp OBJECT-TYPE 
+    SYNTAX  INTEGER 
+    ACCESS  read-only 
+    STATUS  mandatory
+    DESCRIPTION
+        "The temperature of the rear middle sensor in degrees Celsius."
+    ::= { hardware 7 } 
+
+hwSensor3Temp OBJECT-TYPE 
+    SYNTAX  INTEGER 
+    ACCESS  read-only 
+    STATUS  mandatory
+    DESCRIPTION
+        "The temperature of the front middle sensor in degrees Celsius."
+    ::= { hardware 8 } 
+
+hwSensor4Temp OBJECT-TYPE 
+    SYNTAX  INTEGER 
+    ACCESS  read-only 
+    STATUS  mandatory
+    DESCRIPTION
+        "The temperature of the front right sensor in degrees Celsius."
+    ::= { hardware 9 } 
+
+-- Agent General Group
+-- This group of objects take effect on the 'SET' request.
+-- There is no need to 'apply' or 'save'.
+ 
+agSaveConfiguration OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok(1),
+        saveActive(2),
+        notSaveActive(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is an action object to write current configuration to 
+         nonvolatile storage.
+
+         When issued with the saveActive, the active configuration
+         in flash is saved to backup in flash and then the new
+         configuration is saved to the active configuration in flash.
+
+         When issued with notSaveActive, the active configuration
+         is NOT saved to the flash and the active configuration is
+         overwritten with the new configuration.
+
+         ok(1) is returned always when read."
+    ::= { agGeneral 1 }
+
+agApplyConfiguration OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        apply(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is an action object to apply the changes made to configuration 
+         of the switch. By setting the value to apply(2), all the changes 
+         made since the last apply are written to the new_config block.
+
+         other(1) is returned when this object ie read. "
+    ::= { agGeneral 2 }
+
+agApplyPending OBJECT-TYPE
+    SYNTAX  INTEGER {
+        applyNeeded(2),
+        noApplyNeeded(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object, when read, gives the user information
+         whether an apply action is needed and that the configuration
+         has been chaged by the user actions. The user then can
+         apply the changes by setting proper value to the object
+         agApplyConfiguration described above."
+    ::= { agGeneral 3 }
+
+agReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        coldReset(2),
+        warmReset(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is an action object to reboot the agent.
+         other(1) is returned always when read.
+
+         The following values are writable:
+             coldReset(2)...
+             warmReset(3)..."
+    ::= { agGeneral 4 }
+
+agConfigForNxtReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        active(2),
+        backup(3),
+        default(4)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The configuration information to be loaded from at next reset.
+
+          The following values are writable:
+              active(2)...active configuration block
+              backup(3)...backup configuration block
+              default(4)..default configuration block"
+    ::= { agGeneral 5 }
+
+agImageForNxtReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        image1(2),
+        image2(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The software image to be booted from at next reset.
+
+         The following values are writable:
+             image1(2)...image 1
+             image2(3)...image 2"
+    ::= { agGeneral 6 }
+
+agSoftwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The version of the software image that is currently running on the 
+         system in the form of 'major.minor.maintenance.bugfix'.  A zero 
+         length string is returned if version is not available."
+    ::= { agGeneral 7 }
+
+agBootVer OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The version of the boot code in the form of 'major.minor.bugfix'.
+         A zero length string is returned if version is not available."
+    ::= { agGeneral 8 }
+
+agImage1Ver OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The version of the software image stored in image 1 storage in the 
+         form of 'major.minor.maintenance.bugfix'.  A zero length string is 
+         returned if version is not available or there is no valid 
+         software image."
+    ::= { agGeneral 9 }
+
+agImage2Ver OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The version of the software image stored in image 2 storage in the 
+         form of 'major.minor.maintenance.bugfix'.  A zero length string is
+         returned if version is not available or there is no valid software
+         image."
+    ::= { agGeneral 10 }
+
+agRtcDate OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The date on the real time clock in the form of 'mm/dd/yy'.  
+         A zero length string is returned if date is not available."
+    ::= { agGeneral 11 }
+
+agRtcTime OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The time on the real time clock in the form of 'hh:mm:ss'.  
+         A zero length string is returned if time is not available."
+    ::= { agGeneral 12 }
+
+agTftpServerIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The TFTP server IP address."
+    ::= { agGeneral 13 }
+
+agTftpImageFileName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The image file name to be downloaded."
+    ::= { agGeneral 14 }
+
+agTftpImage OBJECT-TYPE
+    SYNTAX  INTEGER {
+        image1(2),
+        image2(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Whether the image file should be loaded in image1 or image2 in flash."
+    ::= { agGeneral 15 }
+
+agTftpDownload OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        download(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is an action object to cause to download software image 
+         according to the setup of agTftpServerIpAddr, agTftpImageFileName, 
+         agTftpImage when download(2) is issued.
+         other(1) is returned always when read."
+    ::= { agGeneral 16 }
+
+agLastSetErrorReason   OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..256))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The error reason of the last SET failure."
+    ::= { agGeneral 17 }
+
+agTftpServer OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..64))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The TFTP server IP address or domain name."
+    ::= { agGeneral 18 }
+
+agTftpCfgFileName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The configuration file name."
+    ::= { agGeneral 19 }
+
+agTftpDumpFileName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The file name for core dump."
+    ::= { agGeneral 20 }
+
+agTftpAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        img-get(2),
+        cfg-get(3),
+        cfg-put(4),
+        dump-put(5)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is an action object to perform various TFTP Get or Put functions.
+         The TFTP sever is specified in agTftpServer object.
+	 img-get(2) - Download switch image from a specified image
+                      file (agTftpImageFileName) on the TFTP server to
+	              the destinated storage (agTftpImage).
+	 cfg-get(3) - Download switch configuration from a specified
+                      file (agTftpCfgFileName) on the TFTP server.
+	 cfg-put(4) - Upload switch configuration to a specified
+                      file (agTftpCfgFileName) on the TFTP server.
+	 dump-put(5)- Download switch core dump to a specified
+                      file (agTftpDumpFileName) on the TFTP server.
+
+         other(1) is returned always when read."
+    ::= { agGeneral 21 }
+
+agTftpLastActionStatus OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The recorded status of the previous TFTP activity."
+    ::= { agGeneral 22 }
+
+agRevert OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        revert(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is an action object to revert the unapplied changes 
+         made to the switch. By setting the value to revert(2), 
+         all the unapplied changes will be reverted. This action 
+         will copy the current_config to the new_config block.
+
+         other(1) is returned when this object is read. "
+    ::= { agGeneral 23 }
+
+agRevertApply OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        revertApply(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is an action object to revert the unsaved changes 
+         made to the switch. By setting the value to revertApply(2), 
+         all the unsaved as well as unapplied changes will be 
+         reverted.
+
+         other(1) is returned when this object is read. "
+    ::= { agGeneral 24 }
+
+agEnabledSwFeatures OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The software features that are enabled on the switch."
+    ::= { agGeneral 25 }
+
+agClrSyslogMsgs OBJECT-TYPE
+    SYNTAX  INTEGER {
+            other(1),
+            reset(2)
+            }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Clears all current Syslog messages."
+    ::= { agGeneral 26 }
+
+agSavePending OBJECT-TYPE
+    SYNTAX  INTEGER {
+        saveNeeded(1),
+        noSaveNeeded(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object, when read, gives the user information
+         whether an save action is needed and that the configuration
+         has been applied but not saved to the flash."
+    ::= { agGeneral 27 }
+
+agEnabledGslbKey OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Query if software key Global slb enabled on switch."
+    ::= { agGeneral 28 }
+
+agEnabledBwmKey OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Query if software key Bandwidth Mgmt. enabled on switch."
+    ::= { agGeneral 29 }
+
+agSlotNumber OBJECT-TYPE
+    SYNTAX INTEGER (1..10)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Identifies the slot in which this switch is installed. If the 
+         agent implementing this MIB is not a blade in a chassis this 
+         value has no meaning."
+    ::= { agGeneral 30 }
+
+agEnabledRurlKey OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The status of the RURL software key."
+    ::= { agGeneral 31 }
+
+-- Agent General Configuration Group
+
+agNewCfgSyslogHost OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The syslog host IP address, in the new_configuration block."
+    ::= { agGeneralConfig 1 }
+
+agCurCfgSyslogHost OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The syslog host IP address, as currently configured in
+         the current_configuration block."
+    ::= { agGeneralConfig 2 }
+
+agNewCfgBootp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable the use of BootP, in the new_configuration block."
+    ::= { agGeneralConfig 3 }
+
+agCurCfgBootp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable the use of BootP, as currently configured in the 
+         current_configuration block."
+    ::= { agGeneralConfig 4 }
+
+agNewCfgSpanningTree OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Turn On or Off Spanning Tree Protocol for the switch, in the 
+         new_configuration block."
+    ::= { agGeneralConfig 5 }
+
+agCurCfgSpanningTree OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The state of Spanning Tree Protocol for the switch, as
+         currently configured in the current_configuration block."
+    ::= { agGeneralConfig 6 }
+
+-- Trap host table
+
+agTrapHostTableMaxEnt OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum number of rows in the trap host table."
+    ::= { agGeneralConfig 7 }
+
+agCurCfgTrapHostTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgCurCfgTrapHostEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of trap hosts which to send SNMP traps in the 
+         current_configuration block."
+    ::= { agGeneralConfig 8 }
+
+agCurCfgTrapHostEntry OBJECT-TYPE
+    SYNTAX  AgCurCfgTrapHostEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the trap host table in the current_configuration block."
+    INDEX   { agCurCfgTrapHostIndx }
+    ::= { agCurCfgTrapHostTable 1 }
+
+AgCurCfgTrapHostEntry ::= SEQUENCE {
+    agCurCfgTrapHostIndx            INTEGER,
+    agCurCfgTrapHostIpAddr          IpAddress,
+    agCurCfgTrapHostCommString      DisplayString
+    }
+
+agCurCfgTrapHostIndx OBJECT-TYPE
+    SYNTAX  INTEGER  (1..255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of the row in trap host table."
+    ::= { agCurCfgTrapHostEntry 1 }
+
+agCurCfgTrapHostIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of a trap host."
+    ::= { agCurCfgTrapHostEntry 2 }
+
+agCurCfgTrapHostCommString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The SNMP community string to use with the trap host"
+    ::= { agCurCfgTrapHostEntry 3 }
+
+agNewCfgTrapHostTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgNewCfgTrapHostEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of trap hosts which to send SNMP traps in the
+          new_configuration block."
+    ::= { agGeneralConfig 9 }
+
+agNewCfgTrapHostEntry OBJECT-TYPE
+    SYNTAX  AgNewCfgTrapHostEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the trap host table in the new_configuration block."
+    INDEX   { agNewCfgTrapHostIndx }
+    ::= { agNewCfgTrapHostTable 1 }
+
+AgNewCfgTrapHostEntry ::= SEQUENCE {
+    agNewCfgTrapHostIndx            INTEGER,
+    agNewCfgTrapHostIpAddr          IpAddress,
+    agNewCfgTrapHostCommString      DisplayString
+    }
+
+agNewCfgTrapHostIndx OBJECT-TYPE
+    SYNTAX  INTEGER  (1..255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of the row in trap host table."
+    ::= { agNewCfgTrapHostEntry 1 }
+
+agNewCfgTrapHostIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of a trap host."
+    ::= { agNewCfgTrapHostEntry 2 }
+
+agNewCfgTrapHostCommString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The SNMP community string to use with the trap host"
+    ::= { agNewCfgTrapHostEntry 3 }
+
+agCurCfgHttpServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The TCP port number that the HTTP server is listening to 
+         in the current_configuration block."
+    ::= { agGeneralConfig 10 }
+
+agNewCfgHttpServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The TCP port number that the HTTP server is listening to 
+         in the new_configuration block."
+    ::= { agGeneralConfig 11 }
+
+agCurCfgLoginBanner OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..79))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The user defined login banner."
+    ::= { agGeneralConfig 12 }
+
+agNewCfgLoginBanner OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..79))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The user defined login banner."
+    ::= { agGeneralConfig 13 }
+
+agNewCfgSyslog2Host OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The second syslog host IP address, in the new_configuration block."
+    ::= { agGeneralConfig 14 }
+
+agCurCfgSyslog2Host OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The second syslog host IP address, as currently configured in
+         the current_configuration block."
+    ::= { agGeneralConfig 15 }
+
+agCurCfgSyslogFac   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	local0(1),
+	local1(2),
+	local2(3),
+	local3(4),
+	local4(5),
+	local5(6),
+	local6(7),
+	local7(8)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The facility of syslog host in the current_configuration block."
+    ::= { agGeneralConfig 16 }
+
+agNewCfgSyslogFac   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	local0(1), 
+	local1(2),
+	local2(3),
+	local3(4),
+	local4(5),
+	local5(6),
+        local6(7),
+	local7(8)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The facility of syslog host in the new_configuration block."
+    ::= { agGeneralConfig 17 }
+
+agCurCfgSyslog2Fac   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	local0(1),
+	local1(2),
+	local2(3),
+	local3(4),
+	local4(5),
+	local5(6),
+	local6(7),
+	local7(8)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The facility of syslog2 host in the current_configuration block."
+    ::= { agGeneralConfig 18 }
+
+agNewCfgSyslog2Fac   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	local0(1), 
+	local1(2),
+	local2(3),
+	local3(4),
+        local4(5),
+	local5(6),
+        local6(7),
+	local7(8)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The facility of syslogs host in the new_configuration block."
+    ::= { agGeneralConfig 19 }
+
+agCurCfgSmtpHost OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..127))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The user defined SMTP host."
+    ::= { agGeneralConfig 20}
+
+agNewCfgSmtpHost OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..127))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The user defined SMTP host."
+    ::= { agGeneralConfig 21 }
+
+agCurCfgConsole OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable console output of syslog messages."
+    ::= { agGeneralConfig 22 }
+
+agNewCfgConsole OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable console output of syslog messages."
+    ::= { agGeneralConfig 23 }
+
+agCurCfgMgmtNetwork OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The management network - corresponding to the mnet command of 
+         the slb configuration menu." 
+    ::= { agGeneralConfig 24 }
+
+agNewCfgMgmtNetwork OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The management network - corresponding to the mnet command of 
+         the system menu." 
+    ::= { agGeneralConfig 25 }
+
+agCurCfgMgmtMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The management subnet mask - corresponding to the mmask command 
+         of the system configuration menu." 
+    ::= { agGeneralConfig 26 }
+
+agNewCfgMgmtMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The management subnet mask - corresponding to the mmask command 
+         of the system configuration menu." 
+    ::= { agGeneralConfig 27 }
+
+agNTP	OBJECT IDENTIFIER ::= { agGeneralConfig 28 }
+
+agCurCfgNTPServer OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The NTP Server Address."
+    ::= { agNTP 1 }
+
+agNewCfgNTPServer OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The NTP Server Address."
+    ::= { agNTP 2 }
+
+agCurCfgNTPResyncInterval OBJECT-TYPE
+    SYNTAX  INTEGER (1..2880)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The NTP Server resync interval in minutes."
+    ::= { agNTP 3 }
+
+agNewCfgNTPResyncInterval OBJECT-TYPE
+    SYNTAX  INTEGER (1..2880)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The NTP Server resync interval in minutes."
+    ::= { agNTP 4 }
+
+
+agCurCfgNTPTzone OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..3))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The NTP Server timezone offset from GMT in hours."
+    ::= { agNTP 5 }
+
+agNewCfgNTPTzone OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..3))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The NTP Server timezone offset from GMT in hours."
+    ::= { agNTP 6 }
+
+agCurCfgNTPDlight OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable/disable daylight savings time."
+    ::= { agNTP 7 }
+
+agNewCfgNTPDlight OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable/disable daylight savings time."
+    ::= { agNTP 8 }
+
+agCurCfgNTPService OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable/disable NTP Service."
+    ::= { agNTP 9 }
+
+agNewCfgNTPService OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable/disable NTP Service."
+    ::= { agNTP 10 }
+
+agLog OBJECT IDENTIFIER ::= { agGeneralConfig 29 }
+
+agNewCfgSyslogTrapConsole OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable console syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 1 }
+
+agCurCfgSyslogTrapConsole OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable console syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 2 }
+
+agNewCfgSyslogTrapSystem OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable system level syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 3 }
+
+agCurCfgSyslogTrapSystem OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable system level syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 4 }
+
+agNewCfgSyslogTrapMgmt OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable management(flash, config, login) syslog and SNMP 
+         trap, in the new_configuration block."
+    ::= { agLog 5 }
+
+agCurCfgSyslogTrapMgmt OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable management(flash, config, login) syslog and SNMP 
+         trap, as currently configured in the current_configuration block."
+    ::= { agLog 6 }
+
+agNewCfgSyslogTrapCli OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable CLI generated error syslog and SNMP trap, in the 
+	 new_configuration block."
+    ::= { agLog 7 }
+
+agCurCfgSyslogTrapCli OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable CLI generated error syslog and SNMP trap, as 
+         currently configured in the current_configuration block." 
+    ::= { agLog 8 }
+
+agNewCfgSyslogTrapStp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable spanning tree syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 9 }
+
+agCurCfgSyslogTrapStp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable spanning tree syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 10 }
+
+agNewCfgSyslogTrapVlan OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable VLAN syslog and SNMP trap, in the new_configuration
+         block."
+    ::= { agLog 11 }
+
+agCurCfgSyslogTrapVlan OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable VLAN syslog and SNMP trap, as currently configured 
+         in the current_configuration block."
+    ::= { agLog 12 }
+
+agNewCfgSyslogTrapSlb OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable SLB syslog and SNMP trap, in the new_configuration 
+         block."
+    ::= { agLog 13 }
+
+agCurCfgSyslogTrapSlb OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable SLB syslog and SNMP trap, as currently configured 
+         in the current_configuration block."
+    ::= { agLog 14 }
+
+agNewCfgSyslogTrapGslb OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable GSLB syslog and SNMP trap, in the new_configuration
+         block."
+    ::= { agLog 15 }
+
+agCurCfgSyslogTrapGslb OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable GSLB syslog and SNMP trap, as currently configured 
+         in the current_configuration block."
+    ::= { agLog 16 }
+
+agNewCfgSyslogTrapFilter OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable filter syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 17 }
+
+agCurCfgSyslogTrapFilter OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable filter syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 18 }
+
+agNewCfgSyslogTrapSsh OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable SSH, RADIUS syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 19 }
+
+agCurCfgSyslogTrapSsh OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable SSH, RADIUS syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 20 }
+
+agNewCfgSyslogTrapVrrp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable VRRP syslog and SNMP trap, in the new_configuration
+         block."
+    ::= { agLog 21 }
+
+agCurCfgSyslogTrapVrrp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable VRRP syslog and SNMP trap, as currently configured 
+         in the current_configuration block."
+    ::= { agLog 22 }
+
+agNewCfgSyslogTrapBgp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable BGP syslog and SNMP trap, in the new_configuration 
+         block."
+    ::= { agLog 23 }
+
+agCurCfgSyslogTrapBgp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable BGP syslog and SNMP trap, as currently configured 
+         in the current_configuration block."
+    ::= { agLog 24 }
+
+agNewCfgSyslogTrapNtp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable NTP syslog and SNMP trap, in the new_configuration 
+         block."
+    ::= { agLog 25 }
+
+agCurCfgSyslogTrapNtp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable NTP syslog and SNMP trap, as currently configured 
+         in the current_configuration block."
+    ::= { agLog 26 }
+
+agNewCfgSyslogTrapIsd OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable ISD syslog and SNMP trap, in the new_configuration 
+         block."
+    ::= { agLog 27 }
+
+agCurCfgSyslogTrapIsd OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable ISD syslog and SNMP trap, as currently configured 
+         in the current_configuration block."
+    ::= { agLog 28 }
+
+agNewCfgSyslogTrapIp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable IP related syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 31 }
+
+agCurCfgSyslogTrapIp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable IP related syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 32 }
+
+agNewCfgSyslogTrapWeb OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable WEBUI related syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 35 }
+
+agCurCfgSyslogTrapWeb OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable WEBUI related syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 36 }
+
+agNewCfgSyslogTrapSynAtk OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable SYN attack detection related syslog and SNMP trap,
+         in the new_configuration block."
+    ::= { agLog 37 }
+
+agCurCfgSyslogTrapSynAtk OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable SYN attack detection related syslog and SNMP trap,
+         as currently configured in the current_configuration block."
+    ::= { agLog 38 }
+
+agNewCfgSyslogTrapTcpLim OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable TCP rate limiting related syslog and SNMP trap, 
+         in the new_configuration block."
+    ::= { agLog 39 }
+
+agCurCfgSyslogTrapTcpLim OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable TCP rate limiting related syslog and SNMP trap,
+         as currently configured in the current_configuration block."
+    ::= { agLog 40 }
+
+-- RADIUS Configuration 
+ 
+radCurCfgPrimaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of the Primary RADIUS server."
+    ::= { radius 1 }
+
+radNewCfgPrimaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of the Primary RADIUS server."
+    ::= { radius 2 }
+
+radCurCfgSecondaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of the Secondary RADIUS server."
+    ::= { radius 3 }
+
+radNewCfgSecondaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of the Secondary RADIUS server."
+    ::= { radius 4 }
+
+radCurCfgPort OBJECT-TYPE
+    SYNTAX  INTEGER  (1500..3000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Specify the RADIUS port number."
+    ::= { radius 5 }
+
+radNewCfgPort OBJECT-TYPE
+    SYNTAX  INTEGER  (1500..3000)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Speicfy the RADIUS port number."
+    ::= { radius 6 }
+
+radCurCfgTimeout OBJECT-TYPE
+    SYNTAX  INTEGER  (1..10)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum number of seconds before resending authentication
+         to RADIUS server."
+    ::= { radius 7 }
+
+radNewCfgTimeout OBJECT-TYPE
+    SYNTAX  INTEGER  (1..10)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum number of seconds before resending authentication
+         to RADIUS server."
+    ::= { radius 8 }
+
+radCurCfgRetries OBJECT-TYPE
+    SYNTAX  INTEGER  (1..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of retries to the RADIUS server."
+    ::= { radius 9 }
+
+radNewCfgRetries OBJECT-TYPE
+    SYNTAX  INTEGER  (1..3)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of retries to the RADIUS server."
+    ::= { radius 10 }
+
+radCurCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disbale RADIUS authentication."
+    ::= { radius 11 }
+
+radNewCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable RADIUS authentication."
+    ::= { radius 12 }
+
+radCurCfgAuthenString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The RADIUS authentication string."
+    ::= { radius 13 }
+
+radNewCfgAuthenString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The RADIUS authentication string."
+    ::= { radius 14 }
+
+radCurCfgTelnet OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disbale RADIUS backdoor for telnet."
+    ::= { radius 15 }
+
+radNewCfgTelnet OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable RADIUS backdoor for telnet."
+    ::= { radius 16 }
+
+-- Statistics Group
+
+-- Memory Statistics Group
+-- This group represents Memory Statistics information
+
+memStatsAllocs OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of memory allocations."
+    ::= { memStats 1 }
+
+memStatsFrees OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of memory frees."
+    ::= { memStats 2 }
+ 
+memStatsAllocFails OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of memory allocations failed."
+    ::= { memStats 3 }
+ 
+memStatsBytesCurr OBJECT-TYPE
+    SYNTAX Gauge 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The outstanding memory in bytes have been allocated."
+    ::= { memStats 4 }
+ 
+memStatsBytesHiwat OBJECT-TYPE
+    SYNTAX  Gauge 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Bytes allocated witch high water mark."
+    ::= { memStats 5 }
+ 
+memStatsPoolBytes OBJECT-TYPE
+    SYNTAX  Gauge 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total bytes in the memory pool."
+    ::= { memStats 6 }
+ 
+memStatsLargest OBJECT-TYPE
+    SYNTAX  Gauge 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The largest block has been allocated."
+    ::= { memStats 7 }
+ 
+-- Packet Statistics Group
+-- This group represents Packet Statistics information
+ 
+pktStatsAllocs OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total packets have been allocated."
+    ::= { pktStats 1 }
+ 
+pktStatsFrees OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total packets have been freed."
+    ::= { pktStats 2 }
+ 
+pktStatsAllocFails OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total packet allocations failed."
+    ::= { pktStats 3}
+ 
+pktStatsMediums OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of medium size packets have been allocated."
+    ::= { pktStats 4}
+ 
+pktStatsJumbos OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of jumbo size packets have been allocated."
+    ::= { pktStats 5}
+ 
+pktStatsSmalls OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of small size packets have been allocated."
+    ::= { pktStats 6}
+
+-- MP CPU Statisitics Group
+ 
+mpCpuAStatsUtil1Second OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of MP CPU A over 1 second. It shows the percentage."
+    ::= { mpCpuStats 1}
+ 
+mpCpuBStatsUtil1Second OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of MP CPU B over 4 seconds. 
+	 It shows the percentage."
+    ::= { mpCpuStats 2}
+
+mpCpuAStatsUtil4Seconds OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of MP CPU A over 4 seconds. 
+	 It shows the percentage."
+    ::= { mpCpuStats 3}
+ 
+mpCpuBStatsUtil4Seconds OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of MP CPU B over 4 seconds. 
+	 It shows the percentage."
+    ::= { mpCpuStats 4}
+
+mpCpuAStatsUtil64Seconds OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of MP CPU A over 64 seconds. 
+	 It shows the percentage."
+    ::= { mpCpuStats 5}
+ 
+mpCpuBStatsUtil64Seconds OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The utilization of MP CPU B over 64 second.
+	 It shows the percentage."
+    ::= { mpCpuStats 6}
+
+END

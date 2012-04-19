@@ -1,0 +1,868 @@
+
+BAY-STACK-EAPOL-EXTENSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32, TimeTicks
+        FROM SNMPv2-SMI
+    TruthValue, MacAddress, RowStatus
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+bayStackEapExtMib MODULE-IDENTITY
+    LAST-UPDATED    "200611010000Z"
+    ORGANIZATION    "Nortel Networks"
+    CONTACT-INFO    "Nortel Networks"
+    DESCRIPTION
+        "BayStack EAPOL Extension MIB
+
+         Copyright 2003-2004 Nortel Networks, Inc.
+         All rights reserved.
+         This Bay Networks SNMP Management Information Base Specification
+         (Specification) embodies Bay Networks' confidential and
+         proprietary intellectual property. Bay Networks retains all
+         title and ownership in the Specification, including any
+         revisions.
+
+         This Specification is supplied 'AS IS,' and Bay Networks makes
+         no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+    REVISION "200611010000Z" -- 01 Nov 2006
+    DESCRIPTION "v010  Added support for various additional EAP features:
+                           - allowing IP phones based on DHCP
+                           - allowing use of radius assigned VLAN in
+                             multihost-eap mode
+                           - use of unicast packets for Eap-ReqId packets
+                           - fail or not-fail EAP users on radius timeout
+                             (default is to fail)"
+
+    REVISION "200605240000Z" -- 24 May 2006
+    DESCRIPTION "v009:  Added non-eap ubp support, filter-on-mac ubp support,
+                        configurable non-eap radius password attribute format
+                        support, re-auth of individual MAC addrs support."
+
+    REVISION "200506270000Z" -- 27 June 2005
+    DESCRIPTION "v008:  Added MHSA support.  Added new non-eap auth reasons."
+
+    REVISION "200503100000Z" -- 10 March 2005
+    DESCRIPTION "v007:  Cleaned up some DESCRIPTION clauses.
+                        Added bseeMultiHostNonEapStatusTable."
+
+    REVISION "200502170000Z" -- 17 February 2005
+    DESCRIPTION "v006:  Added objects:
+                            bseeMultiHostAllowNonEapClient 
+                            bseeMultiHostRadiusAuthNonEapClient
+                            bseePortConfigMultiHostRadiusAuthNonEapClient
+                        deprecated bseePortConfigMultiHostNonEapMacSource."
+
+    REVISION "200411110000Z" -- 11 November 2004
+    DESCRIPTION "v005:  Added bseeMultiHostNonEapMacTable."
+
+    REVISION "200408310000Z" -- 20 July 2004
+    DESCRIPTION "v004:  Changes to have separate enable/disable flag for
+                        guest vlan and remediation vlan.  Added objects:
+                            bseeGuestVlanEnabled
+                            bseeRemediationVlanEnabled
+                            bseePortConfigGuestVlanEnabled"
+
+    REVISION "200407200000Z" -- 20 July 2004
+    DESCRIPTION "v003:  Added enhancements for guest vlan, remediation vlan,
+                        and multihost support."
+
+    REVISION "200309180000Z" -- 18 Sept 2003
+    DESCRIPTION "v001:  Initial version."
+
+    ::= { bayStackMibs 3 }
+
+bseeObjects OBJECT IDENTIFIER ::= { bayStackEapExtMib 1 }
+bseeNotifications OBJECT IDENTIFIER ::= { bayStackEapExtMib 2 }
+bseeNotifications0 OBJECT IDENTIFIER ::= { bseeNotifications 0 }
+
+
+bseeUserBasedPoliciesEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether EAPOL User-based policies
+        are enabled or disabled."
+    ::= { bseeObjects 1 }
+
+bseeGuestVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the ID of the global default guest VLAN.  This
+        VLAN is used for ports which do not have a configured guest VLAN.
+        Access to the guest VLAN is allowed for MAC addresses before EAP
+        authentication has been performed.  However, if the value of
+        bseeGuestVlanEnabled is false(2), then access to the guest VLAN
+        is not allowed for ports that do not have a configured guest VLAN."
+    ::= { bseeObjects 2 }
+
+bseeRemediationVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the ID of the remediation VLAN.  If EAP
+        authentication fails for a port, MAC addresses on that port are
+        restricted to access only the remediation VLAN.  However, if the
+        value of bseeRemediationVlanEnabled is false(2), then access is
+        not allowed at all for a port when EAP authentication fails."
+    ::= { bseeObjects 3 }
+
+bseeMaximumEapClientMacs OBJECT-TYPE
+    SYNTAX      Integer32 (1..800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the global maximum number of EAP authenticated
+        MAC addresses allowed."
+    ::= { bseeObjects 4 }
+
+bseeMaximumNonEapClientMacs OBJECT-TYPE
+    SYNTAX      Integer32 (1..800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the global maximum number of non-EAP
+        authenticated MAC addresses allowed."
+    ::= { bseeObjects 5 }
+
+bseeGuestVlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies whether access to the global default guest
+        VLAN is allowed."
+    ::= { bseeObjects 6 }
+
+bseeRemediationVlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies whether access to the remediation VLAN
+        is allowed."
+    ::= { bseeObjects 7 }
+
+bseeMultiHostAllowNonEapClient OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object controls whether non-EAP clients (MAC addresses) are
+        allowed.  This is the system-wide setting.  The associated per-port
+        setting (bseePortConfigMultiHostAllowNonEapClient) must also be true
+        for non-EAP clients to be allowed on a particular port."
+    DEFVAL      { false }
+    ::= { bseeObjects 8 }
+
+bseeMultiHostRadiusAuthNonEapClient OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object controls whether non-EAP clients (MAC addresses) may
+        be authenticated using RADIUS.  This is the system-wide setting.  The
+        associated per-port setting (bseePortConfigMultiHostRadiusAuthNonEapClient)
+        must also be true for non-EAP clients to be authenticated using
+        RADIUS on a particular port."
+    DEFVAL      { false }
+    ::= { bseeObjects 9 }
+
+bseeMultiHostSingleAuthEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object controls whether non-EAP clients (MAC addresses) may
+        be automatically authenticated on a port after an EAP client has
+        been authenticated (known as MHSA).  This is the system-wide setting.
+        The associated per-port setting must also be true for non-EAP clients
+        to be authenticated in this way."
+    DEFVAL      { false }
+    ::= { bseeObjects 10 }
+
+bseeUserBasedPoliciesFilterOnMac OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the EAPOL User-based policy filters
+         that are installed on ports will be dynamically modified to include
+         the MAC address for which the filters are installed."
+    ::= { bseeObjects 11 }
+
+bseeMultiHostNonEapUserBasedPoliciesEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether non-EAPOL User-based policies
+        are enabled or disabled."
+    ::= { bseeObjects 12 }
+
+bseeMultiHostNonEapUserBasedPoliciesFilterOnMac OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the non-EAPOL User-based policy filters
+         that are installed on ports will be dynamically modified to include
+         the MAC address for which the filters are installed."
+    ::= { bseeObjects 13 }
+
+bseeMultihostNonEapRadiusPasswordAttributeFormat OBJECT-TYPE
+    SYNTAX      BITS {
+                    ipAddr(0),
+                    macAddr(1),
+                    portNumber(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object controls the format of the RADIUS password attribute
+         that is included in requests to the RADIUS server for authenticating
+         non-EAP clients (MAC addresses).
+
+         If the ipAddr(0) bit is set, the password attribute will contain
+         the switch's IP address encoded as a string of four 3-digit 0-padded
+         integers.  For example, the encoding for the IP address 47.80.225.1
+         would be '047080225001'.
+
+         If the macAddr(1) bit is set, the password attribute will contain
+         the MAC address to be authenticated as a string of six 2-digit hex
+         numbers.  For example, the MAC address 00:08:01:0a:33:34 would be
+         encoded as '0008010a3334'.
+
+         If the portNumber(2) bit is set, the password attribute will contain
+         the port number on which the MAC address was seen, encoded as a string
+         of two 2-digit 0-padded integers.  The first integer is the unit/slot
+         number, and the second number is the port number on that unit/slot.
+         For a standalone stackable unit, the unit/slot number will be 0.  For
+         example, the encoding for unit/port 1/23 would be '0123', and the
+         encoding for port 7 on a standalone stackable unit would be '0007'.
+
+         The fields in the password attribute will appear in the order of the
+         bits defined in this object, i.e., IP addr, followed by MAC addr,
+         followed by port number.  Fields are separated by a '.' character.
+         The separators are present regardless of whether a field is present.
+         So, for example, if all three fields are present, the password
+         attribute might contain:
+             047080225001.0008010a3334.0123
+         If none of the three fields are present, the password attribute will
+         be '..'."
+    ::= { bseeObjects 14 }
+
+bseeMultiHostAllowNonEapPhones OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether IP phones will be allowed access
+         based on DHCP."
+    DEFVAL      { false }
+    ::= { bseeObjects 15 }
+
+bseeMultiHostAllowRadiusAssignedVlan OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether to allow the use of RADIUS-assigned
+         VLANs in multihost-eap mode."
+    DEFVAL      { false }
+    ::= { bseeObjects 16 }
+
+bseeMultiHostEapPacketMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    multicast(1),
+                    unicast(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether to use unicast or multicast packets
+         for Eap-ReqId packets.  Normally, multicast packets are used."
+    DEFVAL      { multicast }
+    ::= { bseeObjects 17 }
+
+bseeMultiHostEapRadiusTimeoutMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    fail(1),
+                    doNotFail(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether or not to fail authentication of EAP
+         users on a RADIUS timeout."
+    DEFVAL      { fail }
+    ::= { bseeObjects 18 }
+
+--
+-- EAP Multi-Host Configuration Table
+--
+
+bseePortConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BseePortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to control the EAP multihost configuration
+        for each port in the system."
+    ::= { bayStackEapExtMib 3 }
+
+bseePortConfigEntry OBJECT-TYPE
+    SYNTAX BseePortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The EAP multihost configuration for a port."
+    INDEX { bseePortConfigPortNumber }
+    ::= { bseePortConfigTable 1 }
+
+BseePortConfigEntry ::=
+    SEQUENCE {
+        bseePortConfigPortNumber InterfaceIndex,
+        bseePortConfigGuestVlanId                       Integer32,
+        bseePortConfigMultiHostEnabled                  TruthValue,
+        bseePortConfigMultiHostEapMaxNumMacs            Integer32,
+        bseePortConfigMultiHostAllowNonEapClient        TruthValue,
+        bseePortConfigMultiHostNonEapMacSource          INTEGER,
+        bseePortConfigMultiHostNonEapMaxNumMacs         Integer32,
+        bseePortConfigGuestVlanEnabled                  TruthValue,
+        bseePortConfigMultiHostRadiusAuthNonEapClient   TruthValue,
+        bseePortConfigMultiHostSingleAuthEnabled        TruthValue,
+        bseePortConfigMultiHostAllowNonEapPhones        TruthValue,
+        bseePortConfigMultiHostAllowRadiusAssignedVlan  TruthValue,
+        bseePortConfigMultiHostEapPacketMode            INTEGER,
+        bseePortConfigMultiHostEapRadiusTimeoutMode     INTEGER
+    }
+
+bseePortConfigPortNumber OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Port number associated with this Port."
+    ::= { bseePortConfigEntry 1 }
+
+bseePortConfigGuestVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the ID of the guest VLAN for this port.
+        Access to the guest VLAN is allowed for MAC addresses before EAP
+        authentication has been performed.
+
+        If the value of this object is 0, then the global guest VLAN ID
+        is used for this port, as specified in bseeGuestVlanId.
+
+        However, if the value of the associated instance of
+        bseePortConfigGuestVlanEnabled is false(2), then access to the
+        guest VLAN is not allowed for the port, regardless of the value
+        of bseePortConfigGuestVlanId."
+    DEFVAL      { 0 }
+    ::= { bseePortConfigEntry 2 }
+
+bseePortConfigMultiHostEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object controls whether EAP multihost is enabled for a port."
+    DEFVAL      { false }
+    ::= { bseePortConfigEntry 3 }
+
+bseePortConfigMultiHostEapMaxNumMacs OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the maximum number of EAP-authentication
+        MAC addresses allowed on this port.  A value of 0 indicates that
+        there is no port-specific limit."
+    DEFVAL      { 1 }
+    ::= { bseePortConfigEntry 4 }
+
+bseePortConfigMultiHostAllowNonEapClient OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object controls whether non-EAP clients (MAC addresses) are
+        allowed on the port."
+    DEFVAL      { false }
+    ::= { bseePortConfigEntry 5 }
+
+bseePortConfigMultiHostNonEapMacSource OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    autoLearn(1),
+                    userConfig(2),
+                    radius(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "This object controls the source for finding allowed non-EAP MAC
+        addresses."
+    DEFVAL      { userConfig }
+    ::= { bseePortConfigEntry 6 }
+
+bseePortConfigMultiHostNonEapMaxNumMacs OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the maximum number of non-EAP authenticated
+        MAC addresses allowed on this port."
+    DEFVAL      { 1 }
+    ::= { bseePortConfigEntry 7 }
+
+bseePortConfigGuestVlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object controls whether access to the guest VLAN is allowed
+        for a port."
+    DEFVAL      { false }
+    ::= { bseePortConfigEntry 8 }
+
+bseePortConfigMultiHostRadiusAuthNonEapClient OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object controls whether non-EAP clients (MAC addresses) may
+        authenticated using RADIUS on the port."
+    DEFVAL      { false }
+    ::= { bseePortConfigEntry 9 }
+
+bseePortConfigMultiHostSingleAuthEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object controls whether non-EAP clients (MAC addresses) may
+        be automatically authenticated on the port after an EAP client has
+        been authenticated (known as MHSA)."
+    DEFVAL      { false }
+    ::= { bseePortConfigEntry 10 }
+
+bseePortConfigMultiHostAllowNonEapPhones OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether IP phones will be allowed access
+         based on DHCP."
+    DEFVAL      { false }
+    ::= { bseePortConfigEntry 11 }
+
+bseePortConfigMultiHostAllowRadiusAssignedVlan OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether to allow the use of RADIUS-assigned
+         VLANs in multihost-eap mode."
+    DEFVAL      { false }
+    ::= { bseePortConfigEntry 12 }
+
+bseePortConfigMultiHostEapPacketMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    multicast(1),
+                    unicast(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether to use unicast or multicast packets
+         for Eap-ReqId packets.  Normally, multicast packets are used."
+    DEFVAL      { multicast }
+    ::= { bseePortConfigEntry 13 }
+
+bseePortConfigMultiHostEapRadiusTimeoutMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    fail(1),
+                    doNotFail(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether or not to fail authentication of EAP
+         users on a RADIUS timeout."
+    DEFVAL      { fail }
+    ::= { bseePortConfigEntry 14 }
+
+--
+-- EAP Multi-Host Status Table
+--
+
+bseeMultiHostStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BseeMultiHostStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table provides the EAP authentication status per-MAC address
+         per-port."
+    ::= { bayStackEapExtMib 4 }
+
+bseeMultiHostStatusEntry OBJECT-TYPE
+    SYNTAX BseeMultiHostStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The status of EAP authentication of clients for a port."
+    INDEX { bseeMultiHostStatusPortNumber, bseeMultiHostStatusClientMACAddr }
+    ::= { bseeMultiHostStatusTable 1 }
+
+BseeMultiHostStatusEntry ::=
+    SEQUENCE {
+        bseeMultiHostStatusPortNumber InterfaceIndex,
+        bseeMultiHostStatusClientMACAddr MacAddress,
+        bseeMultiHostStatusPaeState INTEGER,
+        bseeMultiHostStatusBackendAuthState INTEGER,
+        bseeMultiHostStatusReauthenticate INTEGER
+    }
+
+bseeMultiHostStatusPortNumber OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Port number associated with this client."
+    ::= { bseeMultiHostStatusEntry 1 }
+
+bseeMultiHostStatusClientMACAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the client."
+    ::= { bseeMultiHostStatusEntry 2 }
+
+bseeMultiHostStatusPaeState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    initialize(1),
+                    disconnected(2),
+                    connecting(3),
+                    authenticating(4),
+                    authenticated(5),
+                    aborting(6),
+                    held(7),
+                    forceAuth(8),
+                    forceUnauth(9)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the Authenticator PAE state machine."
+    ::= { bseeMultiHostStatusEntry 3 }
+
+bseeMultiHostStatusBackendAuthState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    request(1),
+                    response(2),
+                    success(3),
+                    fail(4),
+                    timeout(5),
+                    idle(6),
+                    initialize(7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the Backend Authentication state machine."
+    ::= { bseeMultiHostStatusEntry 4 }
+
+bseeMultiHostStatusReauthenticate OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    reauthenticate(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to reauthenticate(2) will force the client to
+         be reauthenticated.  When retrieved, the value of this object is
+         always other(1)."
+    ::= { bseeMultiHostStatusEntry 5 }
+
+
+--
+-- EAP Multi-Host Session Statistics Table
+--
+
+bseeMultiHostSessionStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BseeMultiHostSessionStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains the session statistics objects for the
+        Authenticator PAE associated with each EAP client on each Port.
+        An entry appears in this table for each client MAC address on each
+        port that may authenticate access to itself."
+    ::= { bayStackEapExtMib 5 }
+
+bseeMultiHostSessionStatsEntry OBJECT-TYPE
+    SYNTAX BseeMultiHostSessionStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The session statistics information for an Authenticator
+        PAE. This shows the current values being collected for
+        each session that is still in progress, or the final
+        values for the last valid session for each client where
+        there is no session currently active.  This is similar to
+        the dot1xAuthSessionStatsTable, except that it provides
+        information per-port-per-MAC, rather than just per-port."
+    INDEX { bseeMultiHostSessionStatsPortNumber,
+            bseeMultiHostSessionStatsClientMACAddr }
+    ::= { bseeMultiHostSessionStatsTable 1 }
+
+BseeMultiHostSessionStatsEntry ::=
+    SEQUENCE {
+        bseeMultiHostSessionStatsPortNumber InterfaceIndex,
+        bseeMultiHostSessionStatsClientMACAddr MacAddress,
+        bseeMultiHostSessionId SnmpAdminString,
+        bseeMultiHostSessionAuthenticMethod INTEGER,
+        bseeMultiHostSessionTime TimeTicks,
+        bseeMultiHostSessionTerminateCause INTEGER,
+        bseeMultiHostSessionUserName SnmpAdminString
+    }
+
+bseeMultiHostSessionStatsPortNumber OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Port number associated with this client."
+    ::= { bseeMultiHostSessionStatsEntry 1 }
+
+bseeMultiHostSessionStatsClientMACAddr OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The MAC address of this client."
+    ::= { bseeMultiHostSessionStatsEntry 2 }
+
+bseeMultiHostSessionId OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A unique identifier for the session, in the
+        form of a printable ASCII string of at least
+        three characters."
+    ::= { bseeMultiHostSessionStatsEntry 3 }
+
+bseeMultiHostSessionAuthenticMethod OBJECT-TYPE
+    SYNTAX INTEGER {
+               remoteAuthServer(1),
+               localAuthServer(2)
+           }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The authentication method used to establish the session."
+    ::= { bseeMultiHostSessionStatsEntry 4 }
+
+bseeMultiHostSessionTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The duration of the session in seconds."
+    ::= { bseeMultiHostSessionStatsEntry 5 }
+
+bseeMultiHostSessionTerminateCause OBJECT-TYPE
+    SYNTAX INTEGER {
+               supplicantLogoff(1),
+               portFailure(2),
+               supplicantRestart(3),
+               reauthFailed(4),
+               authControlForceUnauth(5),
+               portReInit(6),
+               portAdminDisabled(7),
+               notTerminatedYet(999)
+           }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The reason for the session termination."
+    ::= { bseeMultiHostSessionStatsEntry 6 }
+
+bseeMultiHostSessionUserName OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The User-Name representing the identity of the Supplicant PAE."
+    ::= { bseeMultiHostSessionStatsEntry 7 }
+
+
+--
+-- EAP Multi-Host Allowed Non-EAP MAC Address Table
+--
+
+bseeMultiHostNonEapMacTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BseeMultiHostNonEapMacEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains the non-EAP MAC addresses that are
+         allowed access to EAP-enabled interfaces."
+    ::= { bayStackEapExtMib 6 }
+
+bseeMultiHostNonEapMacEntry OBJECT-TYPE
+    SYNTAX BseeMultiHostNonEapMacEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An allowed non-EAP MAC address."
+    INDEX { bseeMultiHostNonEapMacPortNumber,
+            bseeMultiHostNonEapMacClientMACAddr }
+    ::= { bseeMultiHostNonEapMacTable 1 }
+
+BseeMultiHostNonEapMacEntry ::=
+    SEQUENCE {
+        bseeMultiHostNonEapMacPortNumber    InterfaceIndex,
+        bseeMultiHostNonEapMacClientMACAddr MacAddress,
+        bseeMultiHostNonEapMacRowStatus     RowStatus
+    }
+
+bseeMultiHostNonEapMacPortNumber OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Port number on which the MAC address is allowed."
+    ::= { bseeMultiHostNonEapMacEntry 1 }
+
+bseeMultiHostNonEapMacClientMACAddr OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The MAC address allowed on the port."
+    ::= { bseeMultiHostNonEapMacEntry 2 }
+
+bseeMultiHostNonEapMacRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This is used to control creation/deletion of entries
+         in this table."
+    ::= { bseeMultiHostNonEapMacEntry 3 }
+
+
+--
+-- EAP Multi-Host Non-EAP Status Table
+--
+
+bseeMultiHostNonEapStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BseeMultiHostNonEapStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table provides the authentication status of non-EAP
+         clients per-MAC address per-port."
+    ::= { bayStackEapExtMib 7 }
+
+bseeMultiHostNonEapStatusEntry OBJECT-TYPE
+    SYNTAX BseeMultiHostNonEapStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The status of authentication of a non-EAP client for a port."
+    INDEX { bseeMultiHostNonEapStatusPortNumber,
+            bseeMultiHostNonEapStatusClientMACAddr }
+    ::= { bseeMultiHostNonEapStatusTable 1 }
+
+BseeMultiHostNonEapStatusEntry ::=
+    SEQUENCE {
+        bseeMultiHostNonEapStatusPortNumber InterfaceIndex,
+        bseeMultiHostNonEapStatusClientMACAddr MacAddress,
+        bseeMultiHostNonEapStatusState INTEGER,
+        bseeMultiHostNonEapStatusReauthenticate INTEGER
+    }
+
+bseeMultiHostNonEapStatusPortNumber OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Port number associated with this client."
+    ::= { bseeMultiHostNonEapStatusEntry 1 }
+
+bseeMultiHostNonEapStatusClientMACAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the client."
+    ::= { bseeMultiHostNonEapStatusEntry 2 }
+
+bseeMultiHostNonEapStatusState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    rejected(1),
+                    locallyAuthenticated(2),
+                    radiusPending(3),
+                    radiusAuthenticated(4),
+                    adacAuthenticated(5),
+                    mhsaAuthenticated(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The authentication status.  Values are:
+
+           rejected(1) - the MAC address could not be authenticated
+                         on this port
+
+           locallyAuthenticated(2) - the MAC address was authenticated
+                         using the local table of allowed clients
+
+           radiusPending(3) -  the MAC address is awaiting
+                         authentication by a RADIUS server
+
+           radiusAuthenticated(4) - the MAC address was authenticated
+                         by a RADIUS server
+
+           adacAuthenticated(5) - the MAC address was authenticated using
+                         ADAC configuration tables
+
+           mhsaAuthenticated(6) - the MAC address was auto-authenticated
+                         on a port following a successful authentication
+                         of an EAP client"
+    ::= { bseeMultiHostNonEapStatusEntry 3 }
+
+bseeMultiHostNonEapStatusReauthenticate OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    reauthenticate(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to reauthenticate(2) will force the MAC address
+         to be reauthenticated.  When retrieved, the value of this object is
+         always other(1)."
+    ::= { bseeMultiHostNonEapStatusEntry 4 }
+
+END

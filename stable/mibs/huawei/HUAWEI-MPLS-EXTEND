@@ -1,0 +1,1603 @@
+-- ==================================================================
+-- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Private Extended MPLS MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--      V1.0 
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Varibles and types be imported
+-- 
+-- ==================================================================
+
+    HUAWEI-MPLS-EXTEND-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            ifIndex            
+                FROM IF-MIB            
+            MplsIndexType            
+                FROM MPLS-LSR-STD-MIB            
+            MplsTunnelIndex, MplsTunnelInstanceIndex, MplsExtendedTunnelId            
+                FROM MPLS-TC-STD-MIB            
+            SnmpAdminString            
+                FROM SNMP-FRAMEWORK-MIB            
+            OBJECT-GROUP, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, Counter32, BITS, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI;
+    
+    
+--   June 10, 2006 at 15:59 GMT
+-- June 30, 2006 at 15:54 GMT
+        -- 1.3.6.1.4.1.2011.5.25.121
+        hwMplsExtendMib MODULE-IDENTITY 
+            LAST-UPDATED "200606101559Z"        -- June 10, 2006 at 15:59 GMT
+            ORGANIZATION 
+                "Multiprotocol Label Switching (MPLS) Working Group"
+            CONTACT-INFO 
+                "MPLS Team Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100085
+                "
+            DESCRIPTION 
+                "This MIB contains private managed object and notification trap 
+                definitions for the Multiprotocol Label Switching (MPLS)."
+            REVISION "200606301554Z"        -- June 30, 2006 at 15:54 GMT
+            DESCRIPTION
+                "Initial version 2006/06/10,MPLS LSPM MIB GROUP."
+            ::= { hwDatacomm 121 }
+
+        
+    
+    
+--
+-- Node definitions
+--
+    
+-- 1.3.6.1.4.1.2011.5.25.121.1
+        hwMplsExtendMibTunnel OBJECT IDENTIFIER ::= { hwMplsExtendMib 1 }
+
+--   1.3.6.1.4.1.2011.5.25.121.1.1
+        hwMplsTunnelTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsTunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The mplsTunnelTable allows new MPLS tunnels to be
+                created between an LSR and a remote endpoint, and
+                existing tunnels to be reconfigured or removed.
+                Note that only point-to-point tunnel segments are
+                supported, although multipoint-to-point and point-
+                to-multipoint connections are supported by an LSR
+                acting as a cross-connect.  Each MPLS tunnel can
+                thus have one out-segment originating at this LSR
+                and/or one in-segment terminating at this LSR."
+            ::= { hwMplsExtendMibTunnel 1 }
+
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1
+        hwMplsTunnelEntry OBJECT-TYPE
+            SYNTAX HwMplsTunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table represents an MPLS tunnel.
+                An entry can be created by a network administrator
+                or by an SNMP agent as instructed by an MPLS
+                signalling protocol. Whenever a new entry is
+                created with mplsTunnelIsIf set to true(1), then a
+                corresponding entry is created in ifTable as well
+                (see RFC 2863). The ifType of this entry is
+                mplsTunnel(150).
+                
+                A tunnel entry needs to be uniquely identified across
+                a MPLS network. Indices mplsTunnelIndex and
+                mplsTunnelInstance uniquely identify a tunnel on
+                the LSR originating the tunnel.  To uniquely
+                identify a tunnel across an MPLS network requires
+                index mplsTunnelIngressLSRId.  The last index
+                mplsTunnelEgressLSRId is useful in identifying all
+                instances of a tunnel that terminate on the same
+                egress LSR."
+            REFERENCE
+                "1. RFC 2863 - The Interfaces Group MIB, McCloghrie,
+                K., and F. Kastenholtz, June 2000 "
+            INDEX { hwMplsTunnelIndex, hwMplsTunnelInstance, hwMplsTunnelIngressLSRId, hwMplsTunnelEgressLSRId }
+            ::= { hwMplsTunnelTable 1 }
+
+        
+        HwMplsTunnelEntry ::=
+            SEQUENCE { 
+                hwMplsTunnelIndex
+                    MplsTunnelIndex,
+                hwMplsTunnelInstance
+                    MplsTunnelInstanceIndex,
+                hwMplsTunnelIngressLSRId
+                    MplsExtendedTunnelId,
+                hwMplsTunnelEgressLSRId
+                    MplsExtendedTunnelId,
+                hwMplsTunnelClassType
+                    INTEGER,
+                hwMplsTunnelBandwidth
+                    Integer32,
+                hwMplsTunnelAdminStatus
+                    INTEGER,
+                hwMplsTunnelOperStatus
+                    INTEGER,
+                hwMplsTunnelSessionAttr
+                    BITS,
+                hwMplsTunnelFrrSetupPrio
+                    Unsigned32,
+                hwMplsTunnelFrrHoldingPrio
+                    Unsigned32,
+                hwMplsTunnelFrrBandwidth
+                    Unsigned32,
+                hwMplsTunnelFrrSwitchover
+                    Counter32,
+                hwMplsTunnelFrrBypassTableIndex
+                    Unsigned32,
+                hwMplsTunnelFrrARHopTableIndex
+                    Unsigned32,
+                hwMplsTunnelName
+                    SnmpAdminString,
+                hwMplsTunnelIfIndex
+                    Unsigned32,
+                hwMplsTunnelPreBandwidth
+                    Unsigned32,
+                hwMplsTunnelNextBandwidth
+                    Unsigned32,
+                hwMplsTunnelCt0Bandwidth
+                    Unsigned32,
+                hwMplsTunnelCt1Bandwidth
+                    Unsigned32,
+                hwMplsTunnelCt2Bandwidth
+                    Unsigned32,
+                hwMplsTunnelCt3Bandwidth
+                    Unsigned32,
+                hwMplsTunnelCt4Bandwidth
+                    Unsigned32,
+                hwMplsTunnelCt5Bandwidth
+                    Unsigned32,
+                hwMplsTunnelCt6Bandwidth
+                    Unsigned32,
+                hwMplsTunnelCt7Bandwidth
+                    Unsigned32
+             }
+
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.1
+        hwMplsTunnelIndex OBJECT-TYPE
+            SYNTAX MplsTunnelIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Uniquely identifies a set of tunnel instances 
+                between a pair of ingress and egress LSRs. 
+                When the MPLS signalling protocol is rsvp(2), this value 
+                equals to the value signaled in the Tunnel ID 
+                of the SESSION object. When the MPLS signalling protocol 
+                is crldp(3), this value equals to the value 
+                signaled in the LSP ID. Reference to MPLS-TE-STD-MIB."
+            ::= { hwMplsTunnelEntry 1 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.2
+        hwMplsTunnelInstance OBJECT-TYPE
+            SYNTAX MplsTunnelInstanceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Uniquely identifies a particular instance of a 
+                tunnel between a pair of ingress and egress LSRs. 
+                It is used to identify multiple instances of 
+                tunnels for backup and parallel tunnels. 
+                When the MPLS signaling protocol is 
+                rsvp(2), this value equals to the LSP ID 
+                of the Sender Template object. When the signaling 
+                protocol is crldp(3) there is no equivalent 
+                signaling object. Reference to MPLS-TE-STD-MIB."
+            ::= { hwMplsTunnelEntry 2 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.3
+        hwMplsTunnelIngressLSRId OBJECT-TYPE
+            SYNTAX MplsExtendedTunnelId
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the ingress LSR ID of this tunnel. 
+                When the MPLS signalling protocol 
+                is rsvp(2), this value equals to the Tunnel 
+                Sender Address in the Sender Template object and may 
+                equal to the Extended Tunnel ID in the 
+                SESSION object. When the MPLS signalling protocol is 
+                crldp(3), this value equals to the Ingress 
+                LSR Router ID in the LSPID TLV object. 
+                Reference to MPLS-TE-STD-MIB."
+            ::= { hwMplsTunnelEntry 3 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.4
+        hwMplsTunnelEgressLSRId OBJECT-TYPE
+            SYNTAX MplsExtendedTunnelId
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the egress LSR ID of this 
+                tunnel. Reference to MPLS-TE-STD-MIB."
+            ::= { hwMplsTunnelEntry 4 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.5
+        hwMplsTunnelClassType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                bc0(1),
+                bc1(2),
+                invalidValue(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the bandwidth type used by this tunnel. 1 
+                indicates bc0, 2 indicates bc1 and 3 indicates invalid 
+                value."
+            ::= { hwMplsTunnelEntry 5 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.6
+        hwMplsTunnelBandwidth OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the bandwidth used by this tunnel."
+            ::= { hwMplsTunnelEntry 6 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.7
+        hwMplsTunnelAdminStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2),
+                testing(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the management status of this 
+                tunnel. Reference to MPLS-TE-STD-MIB."
+            ::= { hwMplsTunnelEntry 7 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.8
+        hwMplsTunnelOperStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2),
+                testing(3),
+                unknown(4),
+                dormant(5),
+                notPresent(6),
+                lowerLayerDown(7)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the actual operational status of this 
+                tunnel, which is but not limited to the status of 
+                this tunnel of a certain period. 
+                Reference to MPLS-TE-STD-MIB."
+            ::= { hwMplsTunnelEntry 8 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.9
+        hwMplsTunnelSessionAttr OBJECT-TYPE
+            SYNTAX BITS
+                {
+                localProtectionDesired(0),
+                nodeProtectionDesired(1),
+                bandwidthProtectionDesired(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates protection types desired by the primary 
+                tunnel, such as node protection, link protection or 
+                bandwidth protection."
+            ::= { hwMplsTunnelEntry 9 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.10
+        hwMplsTunnelFrrSetupPrio OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the setup PRI of auto-bypass tunnel. 
+                The value ranges from 0 to 7."
+            ::= { hwMplsTunnelEntry 10 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.11
+        hwMplsTunnelFrrHoldingPrio OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the holding PRI of auto-bypass tunnel. 
+                The value ranges from 0 to 7."
+            ::= { hwMplsTunnelEntry 11 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.12
+        hwMplsTunnelFrrBandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the protecting bandwidth of auto-bypass tunnel. 
+                Its value is defined by the configuration on the primary 
+                tunnel."
+            ::= { hwMplsTunnelEntry 12 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.13
+        hwMplsTunnelFrrSwitchover OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates FRR switching times"
+            ::= { hwMplsTunnelEntry 13 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.14
+        hwMplsTunnelFrrBypassTableIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the index of the bypass tunnel table, that is, 
+                the LSP ID of the bypass tunnel. The bypass table shows 
+                interfaces protected by specified bypass tunnel."
+            ::= { hwMplsTunnelEntry 14 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.1.1.15
+        hwMplsTunnelFrrARHopTableIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the table index of the protection type adopted 
+                by each hop of the primary tunnel."
+            ::= { hwMplsTunnelEntry 15 }
+        
+        hwMplsTunnelName OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the tunnel name. The name can refer to the tunnel 
+                on the console port of the LSR. If mplsTunnelIsIf is set to 
+                True, the IfName of the interface corresponding to this tunnel 
+                should have a value equal to hwMplsTunnelName. 
+                Reference to the description of IfName in RFC 2863."
+            ::= { hwMplsTunnelEntry 16 }
+        
+        hwMplsTunnelIfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface index of the tunnel. It uniquely 
+                identifies the tunnel name."
+            ::= { hwMplsTunnelEntry 17 }
+
+        
+        hwMplsTunnelPreBandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the original bandwidth of the tunnel 
+                when the tunnel is in the Modify state."
+            ::= { hwMplsTunnelEntry 18 }
+
+        
+        hwMplsTunnelNextBandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the bandwidth of the tunnel that is to be changed 
+                when the tunnel is in the Modify state."
+            ::= { hwMplsTunnelEntry 19 }
+
+        
+        hwMplsTunnelCt0Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 0 (CT0) in this tunnel, in Kbit/sec.
+                
+                If all CT bandwidths are 0s, it means that this tunnel's Class-Type
+                is CT0, and bandwidth is 0 Kbit/sec."
+            ::= { hwMplsTunnelEntry 20 }
+
+        
+        hwMplsTunnelCt1Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 1 (CT1) in this tunnel, in Kbit/sec."
+            ::= { hwMplsTunnelEntry 21 }
+
+        
+        hwMplsTunnelCt2Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 2 (CT2) in this tunnel, in Kbit/sec."
+            ::= { hwMplsTunnelEntry 22 }
+
+        
+        hwMplsTunnelCt3Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 3 (CT3) in this tunnel, in Kbit/sec."
+            ::= { hwMplsTunnelEntry 23 }
+
+        
+        hwMplsTunnelCt4Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 4 (CT4) in this tunnel, in Kbit/sec."
+            ::= { hwMplsTunnelEntry 24 }
+
+        
+        hwMplsTunnelCt5Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 5 (CT5) in this tunnel, in Kbit/sec."
+            ::= { hwMplsTunnelEntry 25 }
+
+        
+        hwMplsTunnelCt6Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 6 (CT6) in this tunnel, in Kbit/sec."
+            ::= { hwMplsTunnelEntry 26 }
+
+        
+        hwMplsTunnelCt7Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 7 (CT7) in this tunnel, in Kbit/sec."
+            ::= { hwMplsTunnelEntry 27 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.2
+        hwTunnelFrrBypassTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwTunnelFrrBypassEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the bypass tunnel."
+            ::= { hwMplsExtendMibTunnel 2 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.2.1
+        hwTunnelFrrBypassEntry OBJECT-TYPE
+            SYNTAX HwTunnelFrrBypassEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the bypass tunnel."
+            INDEX { hwTunnelFrrBypassListIndex, hwTunnelFrrBypassIndex }
+            ::= { hwTunnelFrrBypassTable 1 }
+
+        
+        HwTunnelFrrBypassEntry ::=
+            SEQUENCE { 
+                hwTunnelFrrBypassListIndex
+                    Unsigned32,
+                hwTunnelFrrBypassIndex
+                    Unsigned32,
+                hwTunnelFrrBypassProtIfIndex
+                    Unsigned32
+             }
+
+--    1.3.6.1.4.1.2011.5.25.121.1.2.1.1
+        hwTunnelFrrBypassListIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the index of the bypass tunnel table, that is, the LSP ID of the bypass tunnel."
+            ::= { hwTunnelFrrBypassEntry 1 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.2.1.2
+        hwTunnelFrrBypassIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the index of the bypass tunnel interface."
+            ::= { hwTunnelFrrBypassEntry 2 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.2.1.3
+        hwTunnelFrrBypassProtIfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the index of the interface protected by the bypass tunnel."
+            ::= { hwTunnelFrrBypassEntry 3 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.3
+        hwTunnelFrrARHopTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwTunnelFrrARHopEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the FrrARHopTable, which will show the every hop's frr 
+                protect information of the tunnel."
+            ::= { hwMplsExtendMibTunnel 3 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.3.1
+        hwTunnelFrrARHopEntry OBJECT-TYPE
+            SYNTAX HwTunnelFrrARHopEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the FrrARHopTable, which will show the every hop's frr 
+                protect information of the tunnel."
+            INDEX { hwTunnelFrrARHopListIndex, hwTunnelFrrARHopIndex }
+            ::= { hwTunnelFrrARHopTable 1 }
+
+        
+        HwTunnelFrrARHopEntry ::=
+            SEQUENCE { 
+                hwTunnelFrrARHopListIndex
+                    Unsigned32,
+                hwTunnelFrrARHopIndex
+                    Unsigned32,
+                hwTunnelFrrARHopProtDesired
+                    BITS,
+                hwTunnelFrrARHopProtActual
+                    BITS
+             }
+
+--    1.3.6.1.4.1.2011.5.25.121.1.3.1.1
+        hwTunnelFrrARHopListIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the table index of each hop along the primary tunnel."
+            ::= { hwTunnelFrrARHopEntry 1 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.3.1.2
+        hwTunnelFrrARHopIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the index of each hop along the primary tunnel."
+            ::= { hwTunnelFrrARHopEntry 2 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.3.1.3
+        hwTunnelFrrARHopProtDesired OBJECT-TYPE
+            SYNTAX BITS
+                {
+                localProtection(0),
+                nodeProtection(1),
+                bandwidthProtection(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the FRR protection types desired by the primary tunnel interface, including:
+                0: link protection,
+                1: node protection,
+                2: bandwidth protection
+                "
+            ::= { hwTunnelFrrARHopEntry 3 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.3.1.4
+        hwTunnelFrrARHopProtActual OBJECT-TYPE
+            SYNTAX BITS
+                {
+                localProtection(0),
+                nodeProtection(1),
+                bandwidthProtection(2),
+                protectionInuse(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the actual FRR protection types of the primary tunnel interface, including:
+                0: link protection,
+                1: node protection,
+                2: bandwidth protection,
+                3: primary tunnel protection in use
+                "
+            ::= { hwTunnelFrrARHopEntry 4 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.4
+        hwTunnelFrrRouteDBTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwTunnelFrrRouteDBEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the primary tunnel is protected by which bypass tunnel."
+            ::= { hwMplsExtendMibTunnel 4 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.4.1
+        hwTunnelFrrRouteDBEntry OBJECT-TYPE
+            SYNTAX HwTunnelFrrRouteDBEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the primary tunnel is protected by which bypass tunnel."
+            INDEX { hwTunnelFrrRouteDBTunnelIndex, hwTunnelFrrRouteDBTunnelInstance, hwTunnelFrrRouteDBTunnelIngressLSRId, hwTunnelFrrRouteDBTunnelEngressLSRId }
+            ::= { hwTunnelFrrRouteDBTable 1 }
+
+        
+        HwTunnelFrrRouteDBEntry ::=
+            SEQUENCE { 
+                hwTunnelFrrRouteDBTunnelIndex
+                    Unsigned32,
+                hwTunnelFrrRouteDBTunnelInstance
+                    Unsigned32,
+                hwTunnelFrrRouteDBTunnelIngressLSRId
+                    Unsigned32,
+                hwTunnelFrrRouteDBTunnelEngressLSRId
+                    Unsigned32,
+                hwTunnelFrrRouteDBBypassIfIndex
+                    Unsigned32,
+                hwTunnelFrrRouteDBInnerLabel
+                    Unsigned32
+             }
+
+--    1.3.6.1.4.1.2011.5.25.121.1.4.1.1
+        hwTunnelFrrRouteDBTunnelIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Identifies the index of the primary. Manager obtains new index 
+                values for row creation in this table by reading mplsTunnelIndexNext. 
+                When the MPLS signaling protocol is rsvp(2), this value equals to 
+                the value signaled in the Tunnel ID of the SESSION object. When 
+                the MPLS signaling protocol is crldp(3), this value equals to the 
+                value signaled in the LSP ID. Reference to MPLS-TE-STD-MIB."
+            ::= { hwTunnelFrrRouteDBEntry 1 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.4.1.2
+        hwTunnelFrrRouteDBTunnelInstance OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Uniquely identifies a particular instance of a
+                tunnel between a pair of ingress and egress LSRs. 
+                It is the object identifies multiple instances of 
+                tunnels for the purposes of backup and parallel 
+                tunnels. When the MPLS signaling protocol is 
+                rsvp(2), this value equals to the LSP ID
+                of the Sender Template object. When the signaling
+                protocol is crldp(3), there is no equivalent
+                signaling object. Reference to MPLS-TE-STD-MIB."
+            ::= { hwTunnelFrrRouteDBEntry 2 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.4.1.3
+        hwTunnelFrrRouteDBTunnelIngressLSRId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Identifies the ingress LSR ID of the primary tunnel. 
+                When the MPLS signalling protocol is rsvp(2),LSR ID 
+                equals to the Tunnel Sender Address in the Sender 
+                Template object or the Extended Tunnel Id in the 
+                SESSION object. When the MPLS signalling protocol is 
+                crldp(3),  LSR ID equals to the Ingress 
+                LSR Router ID in the LSPID TLV object."
+            ::= { hwTunnelFrrRouteDBEntry 3 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.4.1.4
+        hwTunnelFrrRouteDBTunnelEngressLSRId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Identifies the egress LSR ID of the primary tunnel. 
+                Reference to MPLS-TE-STD-MIB."
+            ::= { hwTunnelFrrRouteDBEntry 4 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.4.1.5
+        hwTunnelFrrRouteDBBypassIfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface index of the bypass tunnel."
+            ::= { hwTunnelFrrRouteDBEntry 5 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.4.1.6
+        hwTunnelFrrRouteDBInnerLabel OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the inner label of the primary tunnel and bypass tunnel."
+            ::= { hwTunnelFrrRouteDBEntry 6 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.1.5
+        hwStaticLspTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwStaticLspEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The hwStaticLspTable allows new MPLS static lsp to be
+                created between an LSR and a remote endpoint, and
+                existing static lsp to be reconfigured or removed.
+                Note that only point-to-point static lsp segments are
+                supported.  Each MPLS static lsp can thus have one 
+                out-segment originating at this LSR and/or one 
+                in-segment terminating at this LSR.
+                     "
+            ::= { hwMplsExtendMibTunnel 5 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.5.1
+        hwStaticLspEntry OBJECT-TYPE
+            SYNTAX HwStaticLspEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table represents a static LSP.
+                An entry is created by a network administrator for
+                signaled LSP set up by MPLS Static.
+                "
+            INDEX { hwStaticLspIndex, hwStaticLspInSegmentIndex, hwStaticLspOutSegmentIndex }
+            ::= { hwStaticLspTable 1 }
+
+        
+        HwStaticLspEntry ::=
+            SEQUENCE { 
+                hwStaticLspIndex
+                    MplsIndexType,
+                hwStaticLspInSegmentIndex
+                    MplsIndexType,
+                hwStaticLspOutSegmentIndex
+                    MplsIndexType,
+                hwStaticLspOwner
+                    INTEGER,
+                hwStaticLspName
+                    SnmpAdminString,
+                hwStaticLspStatus
+                    INTEGER,
+                hwStaticLspClassType
+                    INTEGER,
+                hwStaticLspBandwidth
+                    Unsigned32
+             }
+
+--    1.3.6.1.4.1.2011.5.25.121.1.5.1.1
+        hwStaticLspIndex OBJECT-TYPE
+            SYNTAX MplsIndexType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the index of the static LSP. If the string is 0x00, 
+                it means that the index is invalid."
+            ::= { hwStaticLspEntry 1 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.5.1.2
+        hwStaticLspInSegmentIndex OBJECT-TYPE
+            SYNTAX MplsIndexType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the incoming label index of the static LSP/CR-LSP. 
+                If the string is 0x00, it means that the index is invalid. 
+                In this case, no corresponding mplsInSegmentEntry exists. 
+                Reference to MPLS-LSR-STD-MIB."
+            ::= { hwStaticLspEntry 2 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.5.1.3
+        hwStaticLspOutSegmentIndex OBJECT-TYPE
+            SYNTAX MplsIndexType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the outgoing index of the static LSP/CR-LSP. 
+                If the entry is used to identify the incoming node or 
+                intermediate node of the LSP, this object cannot be set 
+                to the string 0x00. Because corresponding mplsOutSegmentEntry 
+                exists. If the entry is used to identify the outgoing node 
+                of the LSP, this object must be set to the string 0x00. Becuase  
+                no corresponding mplsOutSegmentEntry exists. 
+                Reference to MPLS-LSR-STD-MIB."
+            ::= { hwStaticLspEntry 3 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.5.1.4
+        hwStaticLspOwner OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                static(1),
+                crstatic(2),
+                other(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes the entity that creates and manages the static LSP. 
+                This column is automatically filled when the agent is creating 
+                rows. The value can be:
+                1: static LSP 
+                2: static CR-LSP 
+                3: others
+                Reference to MPLS-LSR-STD-MIB."
+            ::= { hwStaticLspEntry 4 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.5.1.5
+        hwStaticLspName OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the name of the static LSP or CR-LSP. 
+                The name is appointed when the static LSP or CR-LSP 
+                is created."
+            REFERENCE
+                "RFC 2863 - The Interfaces Group MIB, McCloghrie, K.,
+                and F. Kastenholtz, June 2000"
+            ::= { hwStaticLspEntry 5 }
+
+        
+--    1.3.6.1.4.1.2011.5.25.121.1.5.1.6
+        hwStaticLspStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2),
+                testing(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the actual operation status of the static LSP/CR-LSP. 
+                When the static LSP/CR-LSP is in Up state, the value is 1; 
+                in Down state, the value is 2; in Testing state, the value is reserved."
+            ::= { hwStaticLspEntry 6 }
+
+        
+        hwStaticLspClassType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ct0(1),
+                ct1(2),
+                ct2(3),
+                ct3(4),
+                ct4(5),
+                ct5(6),
+                ct6(7),
+                ct7(8)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Class-Type of this static lsp."
+            ::= { hwStaticLspEntry 7 }
+
+        
+        hwStaticLspBandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of this static lsp, in Kbit/sec."
+            ::= { hwStaticLspEntry 8 }
+
+        
+        hwMplsTeClassTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsTeClassEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This per LSR table provides the mapping between the TE-Class 
+                supported on the LSR and <Class-Type, Priority> pair.
+                "
+            ::= { hwMplsExtendMibTunnel 6 }
+
+        
+        hwMplsTeClassEntry OBJECT-TYPE
+            SYNTAX HwMplsTeClassEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table represents TE-Class mapping. TE-Class mapping is 
+                sets of TE-Class, it includes at most 8 TE-Class items.
+                TE-Class is <Class-Type, Priority> pair, such as TE-Class[1] = <CT0, 5>.
+                
+                A (setup/holding) priority associated with a LSP, is considered to be valid
+                only if it appears as a pair with the Class-Type. Class-Types and priorities 
+                can be randomly paired up. You can define 8 <Class-Type, Priority> pairs at most.
+                
+                The LSR is considered to support a particular Class-Type only if it appears in
+                the definition of the 8 possible TE-Classes. It is suggested that all the LSRs in
+                the domain use the same TE-Class mapping.                                  
+                "
+            INDEX { hwMplsTeClassId }
+            ::= { hwMplsTeClassTable 1 }
+
+        
+        HwMplsTeClassEntry ::=
+            SEQUENCE { 
+                hwMplsTeClassId
+                    Unsigned32,
+                hwMplsTeClassClassType
+                    INTEGER,
+                hwMplsTeClassPriority
+                    Unsigned32,
+                hwMplsTeClassDescription
+                    OCTET STRING
+             }
+
+        hwMplsTeClassId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This value represents the index of the TE-Class configured
+                on this LSR."
+            ::= { hwMplsTeClassEntry 1 }
+
+        
+        hwMplsTeClassClassType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ct0(1),
+                ct1(2),
+                ct2(3),
+                ct3(4),
+                ct4(5),
+                ct5(6),
+                ct6(7),
+                ct7(8)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value represents a Class-Type supported on the LSR."
+            ::= { hwMplsTeClassEntry 2 }
+
+        
+        hwMplsTeClassPriority OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value represents the preemption priority (setup or holding) 
+                supported for a particular class-type, on the LSR. "
+            ::= { hwMplsTeClassEntry 3 }
+
+        
+        hwMplsTeClassDescription OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Textual description of the TE-Class defined by this row."
+            ::= { hwMplsTeClassEntry 4 }
+
+        
+        hwMplsIfBcTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsIfBcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table specifies bandwidth constraints associated with mpls te 
+                enabled interfaces.
+                "
+            ::= { hwMplsExtendMibTunnel 7 }
+
+        
+        hwMplsIfBcEntry OBJECT-TYPE
+            SYNTAX HwMplsIfBcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " "
+            INDEX { ifIndex }
+            ::= { hwMplsIfBcTable 1 }
+
+        
+        HwMplsIfBcEntry ::=
+            SEQUENCE { 
+                hwMplsIfMaxResvBandwidth
+                    Unsigned32,
+                hwMplsIfBc0Bandwidth
+                    Unsigned32,
+                hwMplsIfBc1Bandwidth
+                    Unsigned32,
+                hwMplsIfBc2Bandwidth
+                    Unsigned32,
+                hwMplsIfBc3Bandwidth
+                    Unsigned32,
+                hwMplsIfBc4Bandwidth
+                    Unsigned32,
+                hwMplsIfBc5Bandwidth
+                    Unsigned32,
+                hwMplsIfBc6Bandwidth
+                    Unsigned32,
+                hwMplsIfBc7Bandwidth
+                    Unsigned32
+             }
+
+        hwMplsIfMaxResvBandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum reservable bandwidth on this interface, in Kbit/sec."
+            ::= { hwMplsIfBcEntry 1 }
+
+        
+        hwMplsIfBc0Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 0 (CT0) in this tunnel, in Kbit/sec."
+            ::= { hwMplsIfBcEntry 2 }
+
+        
+        
+        hwMplsIfBc1Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 1 (CT1) in this tunnel, in Kbit/sec."
+            ::= { hwMplsIfBcEntry 3 }
+
+        
+        hwMplsIfBc2Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 2 (CT2) in this tunnel, in Kbit/sec."
+            ::= { hwMplsIfBcEntry 4 }
+
+        
+        hwMplsIfBc3Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 3 (CT3) in this tunnel, in Kbit/sec."
+            ::= { hwMplsIfBcEntry 5 }
+
+        
+        hwMplsIfBc4Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 4 (CT4) in this tunnel, in Kbit/sec."
+            ::= { hwMplsIfBcEntry 6 }
+
+        
+        hwMplsIfBc5Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 5 (CT5) in this tunnel, in Kbit/sec."
+            ::= { hwMplsIfBcEntry 7 }
+
+        
+        hwMplsIfBc6Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 6 (CT6) in this tunnel, in Kbit/sec."
+            ::= { hwMplsIfBcEntry 8 }
+                
+        
+        hwMplsIfBc7Bandwidth OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "kilobits per second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of Class-Type 7 (CT7) in this tunnel, in Kbit/sec."
+            ::= { hwMplsIfBcEntry 9 }
+        
+        hwStaticLspTnlTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwStaticLspTnlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "hwStaticLspTnlTable is used to display Static Lsp Token of specified Static Lsp accordding to its name."
+            ::= { hwMplsExtendMibTunnel 8 }
+        
+        hwStaticLspTnlEntry OBJECT-TYPE
+            SYNTAX HwStaticLspTnlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "hwStaticLspTnlEntry is used to display Static Lsp Token of specified Static Lsp accordding to its name."
+            INDEX { hwStaticLspTnlName }
+            ::= { hwStaticLspTnlTable 1 }
+        
+        HwStaticLspTnlEntry ::=
+            SEQUENCE { 
+                hwStaticLspTnlName
+                    SnmpAdminString,
+                hwStaticLspTnlToken
+                    Unsigned32
+             }
+
+        hwStaticLspTnlName OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the name of the Static Lsp."
+            ::= { hwStaticLspTnlEntry 1 }
+        
+        hwStaticLspTnlToken OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the token of the Static Lsp."
+            ::= { hwStaticLspTnlEntry 2 }
+        
+--   1.3.6.1.4.1.2011.5.25.121.2
+        hwMplsExtendTrap OBJECT IDENTIFIER ::= { hwMplsExtendMib 2 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1
+        hwLspTrap OBJECT IDENTIFIER ::= { hwMplsExtendTrap 1 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.1
+        hwMplsStaticLspUp NOTIFICATION-TYPE
+            OBJECTS { hwStaticLspName, hwStaticLspStatus }
+            STATUS current
+            DESCRIPTION 
+                " 
+                Trap information is output when the status of static LSP changes to Up.
+                "
+            ::= { hwLspTrap 1 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.2
+        hwMplsStaticLspDown NOTIFICATION-TYPE
+            OBJECTS { hwStaticLspName, hwStaticLspStatus }
+            STATUS current
+            DESCRIPTION 
+                "
+                Trap information is output when the status of static LSP changes to Down.
+                "
+            ::= { hwLspTrap 2 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.3
+        hwMplsStaticCRLspUp NOTIFICATION-TYPE
+            OBJECTS { hwStaticLspName, hwStaticLspStatus }
+            STATUS current
+            DESCRIPTION 
+                "
+                Trap information is output when the status of static CR-LSP changes to Up.
+                "
+            ::= { hwLspTrap 3 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.4
+        hwMplsStaticCRLspDown NOTIFICATION-TYPE
+            OBJECTS { hwStaticLspName, hwStaticLspStatus }
+            STATUS current
+            DESCRIPTION 
+                "
+                Trap informaiton is output when the status of static CR-LSP changes to Down.
+                "
+            ::= { hwLspTrap 4 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.5
+        hwMplsTeFrrProtAval NOTIFICATION-TYPE
+            OBJECTS { hwTunnelFrrRouteDBBypassIfIndex, hwTunnelFrrRouteDBInnerLabel }
+            STATUS current
+            DESCRIPTION 
+                "For TE FRR notification. Trap information is output when the primary tunnel is bound to bypass tunnel."
+            ::= { hwLspTrap 5 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.6
+        hwMplsTeFrrProtNotAval NOTIFICATION-TYPE
+            OBJECTS { hwTunnelFrrRouteDBBypassIfIndex }
+            STATUS current
+            DESCRIPTION 
+                "For TE FRR notification. Trap information is output when the primary tunnel is unbound to bypass tunnel."
+            ::= { hwLspTrap 6 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.7
+        hwMplsTeFrrSwitch NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus }
+            STATUS current
+            DESCRIPTION 
+                "
+                For TE FRR notification. Trap information is output when the primary tunnel switches to the bypass tunnel.
+                "
+            ::= { hwLspTrap 7 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.8
+        hwMplsTeFrrResume NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus }
+            STATUS current
+            DESCRIPTION 
+                "
+                For TE FRR notification. Trap information is output when the bypass tunnel is switched back from  the primary tunnel.
+                "
+            ::= { hwLspTrap 8 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.9
+        hwMplsTunnelHSBSwitch NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus }
+            STATUS current
+            DESCRIPTION 
+                "
+                For Hot Standby notification. The data is switched from the primary CR-LSP to the backup CR-LSP.
+                "
+            ::= { hwLspTrap 9 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.10
+        hwMplsTunnelHSBResume NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus }
+            STATUS current
+            DESCRIPTION 
+                "
+                For Hot Standby notification. The data is switched from the backup CR-LSP to the primary CR-LSP.
+                "
+            ::= { hwLspTrap 10 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.11
+        hwMplsTunnelOBSwitch NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus }
+            STATUS current
+            DESCRIPTION 
+                "
+                For Ordinary Standby notification. The primary CR-LSP is down and the backup CR-LSP is up.
+                "
+            ::= { hwLspTrap 11 }
+
+        
+--   1.3.6.1.4.1.2011.5.25.121.2.1.12
+        hwMplsTunnelOBResume NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus }
+            STATUS current
+            DESCRIPTION 
+                "
+                For Ordinary Standby notification. The data is switched from the backup CR-LSP to the primary CR-LSP.
+                "
+            ::= { hwLspTrap 12 }
+
+        
+        hwMplsTunnelUp NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelName, hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus }
+            STATUS current
+            DESCRIPTION 
+                "Trap information about the Up state, tunnel name, tunnel management, and operation staus is 
+                output when the staus of the tunnel changes into Up."
+            ::= { hwLspTrap 13 }
+
+        hwMplsTunnelDown NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelName, hwMplsTunnelAdminStatus, hwMplsTunnelOperStatus }
+            STATUS current
+            DESCRIPTION 
+                "Trap information about the Down state, tunnel name, tunnel management, and operation staus is 
+                output when the staus of the tunnel changes into Down."
+            ::= { hwLspTrap 14 }
+
+        hwMplsTunnelChangeBw NOTIFICATION-TYPE
+            OBJECTS { hwMplsTunnelName, hwMplsTunnelIfIndex, hwMplsTunnelPreBandwidth, hwMplsTunnelNextBandwidth }
+            STATUS current
+            DESCRIPTION 
+                "Trap information is output when the bandwidth of the tunnel is changed."
+            ::= { hwLspTrap 15 }
+
+-- 1.3.6.1.4.1.2011.5.25.121.2.2
+        hwMplsTrapObjects OBJECT IDENTIFIER ::= { hwMplsExtendTrap 2 }
+        
+         hwMplsTunnelIfName OBJECT-TYPE
+         SYNTAX           SnmpAdminString
+         MAX-ACCESS     accessible-for-notify
+         STATUS           obsolete
+         DESCRIPTION
+             "The Tunnel Interface name."
+         ::= { hwMplsTrapObjects 1 }  
+             
+            
+        hwMplsTunnelFrrConfigOper OBJECT-TYPE
+        SYNTAX  INTEGER
+             {
+             unconfig(0),
+             config(1),
+             unknow(2)
+             }
+        MAX-ACCESS     accessible-for-notify
+        STATUS           obsolete
+        DESCRIPTION
+            "The FRR Config operation."
+        ::= { hwMplsTrapObjects 2 } 
+        
+
+        hwMplsTunnelFrrConfigChange NOTIFICATION-TYPE
+        OBJECTS { hwMplsTunnelIfName, hwMplsTunnelFrrConfigOper }
+        STATUS obsolete
+        DESCRIPTION
+            "Indicate the change of FRR configuration."
+        ::= { hwMplsExtendTrap 3 }
+        
+        hwMplsGlobalObject OBJECT IDENTIFIER ::= { hwMplsExtendMib 3 }
+
+        hwMplsGlobalWorkMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                standard(1),
+                nonstandard(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The work mode of DS-TE system, default mode is nonstandard.
+                1. standard
+                2. nonstandard"
+            DEFVAL { nonstandard }
+            ::= { hwMplsGlobalObject 1 }
+
+        hwMplsGlobalBcModel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                rdm(1),
+                mam(2),
+                extendMam(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Bandwidth Constraint Model currently used by this LSR.
+                1. rdm
+                2. mam
+                3. extend-mam"
+            ::= { hwMplsGlobalObject 2 }
+        
+        hwMplsLspStatistics OBJECT IDENTIFIER ::= { hwMplsExtendMib 4 }
+        
+        hwMplsLspStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsLspStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "hwMplsLspStatisticsTable is used to display the number of ingress LSPs, transit LSPs or egress LSPs of specified types."
+            ::= { hwMplsLspStatistics 1 }
+        
+        hwMplsLspStatisticsEntry OBJECT-TYPE
+            SYNTAX HwMplsLspStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "hwMplsLspStatisticsEntry is used to display the statistics entry of a specified LSP."
+            INDEX { hwMplsLspStatisticsLspType }
+            ::= { hwMplsLspStatisticsTable 1 }
+        
+        HwMplsLspStatisticsEntry ::=
+            SEQUENCE { 
+                hwMplsLspStatisticsLspType
+                    INTEGER,
+                hwMplsLspStatisticsIngressLspCount
+                    Unsigned32,
+                hwMplsLspStatisticsTransitLspCount
+                    Unsigned32,
+                hwMplsLspStatisticsEgressLspCount
+                    Unsigned32,
+                hwMplsLspStatisticsTotalLspCount
+                    Unsigned32
+             }
+
+        hwMplsLspStatisticsLspType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                staticLsp(1),
+                staticCrLsp(2),
+                ldpLsp(3),
+                rsvpCrLsp(4),
+                bgpLsp(5),
+                asbrLsp(6),
+                bgpIpv6Lsp(7),
+                l3vpnIpv6Lsp(8)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the LSP type."
+            ::= { hwMplsLspStatisticsEntry 1 }
+        
+        hwMplsLspStatisticsIngressLspCount OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of ingress LSPs of a specified type."
+            ::= { hwMplsLspStatisticsEntry 2 }
+        
+        hwMplsLspStatisticsTransitLspCount OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of transit LSPs of a specified type."
+            ::= { hwMplsLspStatisticsEntry 3 }
+        
+        hwMplsLspStatisticsEgressLspCount OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of egress LSPs of a specified type."
+            ::= { hwMplsLspStatisticsEntry 4 }
+        
+        hwMplsLspStatisticsTotalLspCount OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the total number of the ingress LSPs, transit LSPs and egress LSP of specified types."
+            ::= { hwMplsLspStatisticsEntry 5 }
+        
+        hwMplsExtendConformance OBJECT IDENTIFIER ::= { hwMplsExtendMib 6 }
+        
+        hwMplsExtendGroups OBJECT IDENTIFIER ::= { hwMplsExtendConformance 1 }
+        
+        hwMplsTunnelGroup OBJECT-GROUP
+            OBJECTS { hwTunnelFrrRouteDBInnerLabel, hwTunnelFrrRouteDBBypassIfIndex, hwTunnelFrrARHopProtActual, hwTunnelFrrARHopProtDesired, hwTunnelFrrBypassProtIfIndex, 
+                hwStaticLspOwner, hwMplsTunnelClassType, hwMplsTunnelSessionAttr, hwMplsTunnelFrrARHopTableIndex, hwMplsTunnelName, 
+                hwMplsTunnelIfIndex, hwMplsTunnelPreBandwidth, hwMplsTunnelNextBandwidth, hwMplsTunnelFrrSwitchover, hwMplsTunnelFrrBandwidth, 
+                hwMplsTunnelOperStatus, hwMplsTunnelAdminStatus, hwMplsTunnelBandwidth, hwMplsTunnelFrrHoldingPrio, hwMplsTunnelFrrSetupPrio, 
+                hwMplsTunnelFrrBypassTableIndex }
+            STATUS current
+            DESCRIPTION 
+                "Indicate the atrributes of the tunnel."
+            ::= { hwMplsExtendGroups 1 }
+        
+        hwStaticLspGroup OBJECT-GROUP
+            OBJECTS { hwStaticLspName, hwStaticLspStatus, hwStaticLspTnlToken }
+            STATUS current
+            DESCRIPTION 
+                "Indicate the atrributes of the static lsp."
+            ::= { hwMplsExtendGroups 2 }
+        
+        hwMplsDsTeGroup OBJECT-GROUP
+            OBJECTS { hwMplsTunnelCt0Bandwidth, hwMplsTunnelCt1Bandwidth, hwMplsTunnelCt2Bandwidth, hwMplsTunnelCt3Bandwidth, hwMplsTunnelCt4Bandwidth, 
+                hwMplsTunnelCt5Bandwidth, hwMplsTunnelCt6Bandwidth, hwMplsTunnelCt7Bandwidth, hwStaticLspClassType, hwStaticLspBandwidth, 
+                hwMplsTeClassClassType, hwMplsTeClassPriority, hwMplsTeClassDescription, hwMplsGlobalBcModel, hwMplsGlobalWorkMode, 
+                hwMplsIfBc7Bandwidth, hwMplsIfBc6Bandwidth, hwMplsIfBc5Bandwidth, hwMplsIfBc4Bandwidth, hwMplsIfBc3Bandwidth, 
+                hwMplsIfBc2Bandwidth, hwMplsIfBc1Bandwidth, hwMplsIfBc0Bandwidth, hwMplsIfMaxResvBandwidth }
+            STATUS current
+            DESCRIPTION 
+                "Indicate the atrributes about DS-TE."
+            ::= { hwMplsExtendGroups 3 }
+        
+        hwMplsLspStatisticsGroup OBJECT-GROUP
+            OBJECTS { hwMplsLspStatisticsIngressLspCount, hwMplsLspStatisticsTransitLspCount, hwMplsLspStatisticsEgressLspCount, hwMplsLspStatisticsTotalLspCount }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwMplsExtendGroups 4 }
+
+        hwMplsObsoleteGroup OBJECT-GROUP
+        OBJECTS { hwMplsTunnelIfName, hwMplsTunnelFrrConfigOper }
+        STATUS obsolete
+        DESCRIPTION 
+           "Indicate the OBSOLETE objects of MPLS."
+        ::= { hwMplsExtendGroups 5 }
+        
+        hwMplsExtendCompliances OBJECT IDENTIFIER ::= { hwMplsExtendConformance 2 }
+
+        
+        hwExtendTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsTeFrrProtAval, hwMplsTeFrrProtNotAval, hwMplsStaticLspUp, hwMplsStaticLspDown, hwMplsStaticCRLspUp, 
+                hwMplsStaticCRLspDown, hwMplsTeFrrSwitch, hwMplsTeFrrResume, hwMplsTunnelHSBSwitch, hwMplsTunnelHSBResume, 
+                hwMplsTunnelOBSwitch, hwMplsTunnelOBResume, hwMplsTunnelUp, hwMplsTunnelDown, hwMplsTunnelChangeBw
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Indicate the traps."
+            ::= { hwMplsExtendCompliances 1 }
+
+        hwObsoleteTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hwMplsTunnelFrrConfigChange }
+        STATUS obsolete
+        DESCRIPTION 
+             "Indicate the Obsolete traps."
+        ::= { hwMplsExtendCompliances 2 }
+    
+    END
+
+--
+-- HUAWEI-MPLS-EXTEND-MIB.mib
+--

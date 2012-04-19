@@ -1,0 +1,210 @@
+CTRON-IF-REMAP-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-if-remap-mib.txt
+--  Revision: 1.03.00
+--  Part Number: 
+--  Date: May 6, 1997
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific repeater MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in 
+--  specification and other information contained in this document 
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental, 
+--  indirect, special, or consequential damages whatsoever (including 
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the 
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright August 95 Cabletron Systems
+
+        IMPORTS
+        OBJECT-TYPE
+                FROM RFC-1212
+        ctIFRemap
+                FROM CTRON-MIB-NAMES;
+
+        ctIfRemapConfig OBJECT IDENTIFIER ::= { ctIFRemap 1 }
+
+-- The ctIfRemapConfig group is used to control interface remapping.
+-- Interface remapping provides the ability to map one or more
+-- interfaces directly to another interface.  This control is defined
+-- by creating a row in the ctIFRemapTable specifing source interface,
+-- and destination interface with ctIfRemapStatus set to a value of
+-- enable(1).
+--
+-- When a source interface is remapped to a destination interface, the
+-- destination interface will transmit out all packets received or 
+-- transmitted on the source interface. Counters on the destination 
+-- interface will increment for all packets transmitted be it by normal 
+-- bridging or due to ifremap.
+
+
+ctIFRemapTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtIFRemapEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table provides the ability to remap all frames from one
+        interface onto another interface.  As described by the remote
+        analysizer function.
+
+        A given source interface can be mapped to one or more destination
+        interfaces.  Each row that exists in this table defines such a
+        relationship.  By disabling a row in this table remapping
+        relationship no longer exists.
+
+        If a given relationship can not be created the set will fail
+        with a BAD-VALUE error."
+::= { ctIfRemapConfig 1 }
+
+ctIFRemapEntry  OBJECT-TYPE
+    SYNTAX      CtIFRemapEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "Describes a particular interface remap entry."
+INDEX { ctIfRemapSourceIf, ctIfRemapDestIf }
+::= { ctIFRemapTable 1 }
+
+CtIFRemapEntry ::= SEQUENCE {
+        ctIfRemapSourceIf
+                INTEGER,
+        ctIfRemapDestIf
+                INTEGER,
+        ctIfRemapStatus
+                INTEGER
+        }
+
+ctIfRemapSourceIf OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The source interface which will have all packets redirected to
+        the destination interface as defined by ctIfRemapDestIf."
+    ::= { ctIFRemapEntry 1 }
+
+ctIfRemapDestIf OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Defines the interface that will see all packets redirected from
+        ctIfRemapSourceIf."
+    ::= { ctIFRemapEntry 2 }
+
+ctIfRemapStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable(1),
+        disable(2)
+        }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Defines the status of the interface remap entry.  Setting
+        ctIfRemapStatus to a value of disable(2) disables the entry and
+        deletes the row from the table.
+
+        Therefore this table only contains entries that are active."
+    DEFVAL { enable }
+    ::= { ctIFRemapEntry 3 }
+
+ctIfRemapTableNumberEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of active entries in the ctIfRemap Table."
+    ::= { ctIFRemap 2 }
+
+ctIfRemapTableMaxNumberEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of entries allowed in the ctIfRemap Table."
+    ::= { ctIFRemap 3 }
+
+ctIfRemapPhysicalErrorsEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2),
+        unsupported(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Enable or disable remapping of physical errors, or indicate that
+         the device is incapable of remapping physical errors.  If the
+         feature is supported, the value can only be set to 1 or 2.  If
+         the feature is unsupported, a get will return 3 and the value 
+         cannot be changed."
+    ::= { ctIFRemap 4 }
+
+ctIfRemapTableEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2),
+      unsupported(3)
+      }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "This object places the device into the correct mode to allow for 
+      interface remapping.
+
+      Setting this object to enable(1) configures the device to allow
+      ifremapping.
+
+      Setting this object to disable(2) configures the device to
+      disallow ifremapping.
+
+      A value of unsupported(3) indicates that this device does not 
+      require any special configuration to allow for interface remapping."
+    DEFVAL { enable }
+    ::= { ctIFRemap 5 }
+
+ctIfRemapTableStart OBJECT-TYPE
+    SYNTAX INTEGER {
+      start(1),
+      stop(2),
+      unsupported(3)
+      }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "This object allows operational control (start/stop) of all active 
+      entries in  the ctIFRemapTable.  This object becomes meaningless
+      if the ctIfRemapTableEnable object is set to disable(2).
+
+      Setting this object to start(1) allows all active entries to 
+      perform interface remapping.
+
+      Setting this object to stop(2) stops all interface remapping
+      Existing entries are not deleted from the table.
+
+      A value of unsupported(3) indicates that this device does not
+      support the starting and stopping of active entries in the
+      ctIFRemapTable."
+    DEFVAL { start }
+    ::= { ctIFRemap 6 }
+
+END

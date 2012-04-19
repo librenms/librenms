@@ -1,0 +1,1304 @@
+CTRON-SFPS-L4SS-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-l4ss.mib
+--  Revision: 0.0.06
+--  Date: June 25, 1999
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for the
+--  Layer 4 Smart Switch (L4SS).
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+ 
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString, PhysAddress
+                FROM RFC1213-MIB
+      IpAddress, Counter, TimeTicks
+                FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt
+      switchSFPS       
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+
+-- New SFPS Switch Group.
+sfpsL4SS        OBJECT IDENTIFIER ::= { switchSFPS 6 }
+
+-- The SFPS Layer 4 SmartSwitch Groups.
+sfpsL4CP        OBJECT IDENTIFIER ::= { sfpsL4SS 1 }
+sfpsL4CDR       OBJECT IDENTIFIER ::= { sfpsL4SS 2 }
+
+l4cpStats       OBJECT IDENTIFIER ::= { sfpsL4CP 1 }
+l4cpConfig      OBJECT IDENTIFIER ::= { sfpsL4CP 2 }
+l4cpActions     OBJECT IDENTIFIER ::= { sfpsL4CP 3 }
+
+l4cdrStats      OBJECT IDENTIFIER ::= { sfpsL4CDR 1 }
+l4cdrConfig     OBJECT IDENTIFIER ::= { sfpsL4CDR 2 }
+l4cdrActions    OBJECT IDENTIFIER ::= { sfpsL4CDR 3 }
+
+--  Textual Conventions
+
+HexInteger ::= INTEGER
+--  display this integer in hex format
+
+SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+
+
+
+-- SFPS L4CP Scalars
+
+sfpsL4CPDisableTCPAckCheck  OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This variable indicates whether or not TCP
+                 segments whose ACK bit is off are allowed to use an
+                 existing flow table entry.  When set to 2, a TCP
+                 segment whose ACK bit is off is always treated as an
+                 exception packet.  This variable takes effect immediately,
+                 and its value is peristent."
+        ::= { l4cpConfig 1 }
+
+
+
+-- SFPS FLOW TABLE
+
+sfpsL4CPFlowTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsL4CPFlowEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table describes each conversation between a pair
+                 or Layer 3 or Layer 4 endpoints."
+        ::= { sfpsL4CP 4 }
+
+sfpsL4CPFlowEntry    OBJECT-TYPE
+        SYNTAX  SfpsL4CPFlowEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains statistics and information for
+                 a pair of Layer 3 or Layer 4 endpoints."
+        INDEX   { sfpsL4CPFlowCnxIndex,
+                  sfpsL4CPFlowSecL3Address,
+                  sfpsL4CPFlowPrimL3Address,
+                  sfpsL4CPFlowSubprotocol,
+                  sfpsL4CPFlowSecMatchAnyDyn,
+                  sfpsL4CPFlowPrimMatchAnyDyn,
+                  sfpsL4CPFlowSecProtPort,
+                  sfpsL4CPFlowPrimProtPort } 
+        ::= { sfpsL4CPFlowTable 1 }
+
+SfpsL4CPFlowEntry ::=
+        SEQUENCE {
+                sfpsL4CPFlowCnxIndex         INTEGER,  
+                sfpsL4CPFlowSecL3Address     DisplayString,
+                sfpsL4CPFlowPrimL3Address    DisplayString,
+                sfpsL4CPFlowSubprotocol      HexInteger,
+                sfpsL4CPFlowSecMatchAnyDyn   INTEGER,
+                sfpsL4CPFlowPrimMatchAnyDyn  INTEGER,
+                sfpsL4CPFlowSecProtPort      INTEGER,
+                sfpsL4CPFlowPrimProtPort     INTEGER,
+                sfpsL4CPFlowSecSubstApplies  INTEGER,
+                sfpsL4CPFlowPrimSubstApplies INTEGER,
+                sfpsL4CPFlowSecInPkts        Counter,
+                sfpsL4CPFlowSecInOctets      Counter,
+                sfpsL4CPFlowPrimInPkts       Counter,
+                sfpsL4CPFlowPrimInOctets     Counter,
+                sfpsL4CPFlowFlowAge          TimeTicks,
+                sfpsL4CPFlowFlowLastUse      TimeTicks,
+                sfpsL4CPFlowID               INTEGER
+         }  
+
+sfpsL4CPFlowCnxIndex   OBJECT-TYPE
+        SYNTAX  INTEGER(0..'7FFFFFFF'h)  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Index (1-based) of the SFPSGAPI connection table entry 
+                 to which this flow belongs."
+        ::= { sfpsL4CPFlowEntry 1 }
+
+sfpsL4CPFlowSecL3Address   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Layer 3 address of the secondary endpoint for this flow.
+                 The secondary endpoint is the one having the higher MAC address."
+        ::= { sfpsL4CPFlowEntry 2 }
+
+sfpsL4CPFlowPrimL3Address   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Layer 3 address of the primary endpoint for this flow.
+                 The primary endpoint is the one having the lower MAC address."
+        ::= { sfpsL4CPFlowEntry 3 }
+
+sfpsL4CPFlowSubprotocol   OBJECT-TYPE
+        SYNTAX  HexInteger(0..'7FFFFFFF'h)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This value identifies the Layer 4 protocol.  It 
+                 corresponds to the IP 'Protocol' field as described 
+                 in the 'Assigned Numbers' RFC."
+        ::= { sfpsL4CPFlowEntry 4 }
+
+sfpsL4CPFlowSecMatchAnyDyn   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this is a TCP or UDP entry, this value specifies whether
+                 or not the protocol port of the secondary endpoint should
+                 be treated as a wildcard, able to match any port number above
+                 1023."
+        ::= { sfpsL4CPFlowEntry 5 }
+
+sfpsL4CPFlowPrimMatchAnyDyn   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this is a TCP or UDP entry, this value specifies whether
+                 or not the protocol port of the primary endpoint should
+                 be treated as a wildcard, able to match any port number above
+                 1023."
+        ::= { sfpsL4CPFlowEntry 6 }
+
+sfpsL4CPFlowSecProtPort   OBJECT-TYPE
+        SYNTAX  INTEGER(0..'FFFF'h)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this is a TCP or UDP entry, this value indicates the
+                 protocol port number of the secondary endpoint.
+                 Otherwise, this field is zero."
+        ::= { sfpsL4CPFlowEntry 7 }
+
+sfpsL4CPFlowPrimProtPort   OBJECT-TYPE
+        SYNTAX  INTEGER(0..'FFFF'h)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this is a TCP or UDP entry, this value indicates the
+                 protocol port number of the primary endpoint.
+                 Otherwise, this field is zero."
+        ::= { sfpsL4CPFlowEntry 8 }
+
+sfpsL4CPFlowSecSubstApplies   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indication of whether or not MAC address substitution
+                 applies to the secondary endpoint for this flow."
+        ::= { sfpsL4CPFlowEntry 9 }
+
+sfpsL4CPFlowPrimSubstApplies   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indication of whether or not MAC address substitution
+                 applies to the primary endpoint for this flow."
+        ::= { sfpsL4CPFlowEntry 10 }
+
+sfpsL4CPFlowSecInPkts   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Count of packets transmitted from primary to secondary."
+        ::= { sfpsL4CPFlowEntry 11 }
+
+sfpsL4CPFlowSecInOctets   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Count of octets transmitted from primary to secondary."
+        ::= { sfpsL4CPFlowEntry 12 }
+
+sfpsL4CPFlowPrimInPkts   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Count of packets transmitted from secondary to primary."
+        ::= { sfpsL4CPFlowEntry 13 }
+
+sfpsL4CPFlowPrimInOctets   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Count of octets transmitted from secondary to primary."
+        ::= { sfpsL4CPFlowEntry 14 }
+
+sfpsL4CPFlowFlowAge   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time elapsed since this entry was created."
+        ::= { sfpsL4CPFlowEntry 15 }
+
+sfpsL4CPFlowFlowLastUse   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time elapsed since this entry was last used to send data."
+        ::= { sfpsL4CPFlowEntry 16 }
+
+sfpsL4CPFlowID   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Call Detail Recording flow ID for this flow, or zero
+                 if CDR is not active for the flow."
+        ::= { sfpsL4CPFlowEntry 17 }
+
+
+-- SFPS MAC ADDRESS SUBSTITUTION TABLE
+
+sfpsL4CPMACAddrSubTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsL4CPMACAddrSubEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table provides the ability to override the default
+                 gateway for specific routes."
+        ::= { sfpsL4CP 5 }
+
+sfpsL4CPMACAddrSubEntry    OBJECT-TYPE
+        SYNTAX  SfpsL4CPMACAddrSubEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains the MAC address substitution information
+                 associated with a specific destination IP address."
+        INDEX   { sfpsL4CPMACAddrSubDestIP } 
+        ::= { sfpsL4CPMACAddrSubTable 1 }
+
+SfpsL4CPMACAddrSubEntry ::=
+        SEQUENCE {
+                sfpsL4CPMACAddrSubDestIP     IpAddress,  
+                sfpsL4CPMACAddrSubNextHopMAC PhysAddress,  
+                sfpsL4CPMACAddrSubRefCount   INTEGER
+         }  
+
+sfpsL4CPMACAddrSubDestIP   OBJECT-TYPE
+        SYNTAX  IpAddress  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Destination IP address for this route"
+        ::= { sfpsL4CPMACAddrSubEntry 1 }
+
+sfpsL4CPMACAddrSubNextHopMAC   OBJECT-TYPE
+        SYNTAX  PhysAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The next-hop MAC address to use for this route."
+        ::= { sfpsL4CPMACAddrSubEntry 2 }
+
+sfpsL4CPMACAddrSubRefCount   OBJECT-TYPE
+        SYNTAX  INTEGER(0..'7FFFFFFF'h)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of flow table entries that reference this entry."
+        ::= { sfpsL4CPMACAddrSubEntry 3 }
+
+
+-- SFPS NETWORK ADDRESS SUBSTITUTION TABLE
+
+sfpsL4CPNetAddrUserTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsL4CPNetAddrUserEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table associates user information with network 
+                 addresses."
+        ::= { sfpsL4CP 7 }
+
+sfpsL4CPNetAddrUserEntry    OBJECT-TYPE
+        SYNTAX  SfpsL4CPNetAddrUserEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains the user information
+                 associated with a specific network address."
+        INDEX   { sfpsL4CPNetAddrUserProtocol,
+                  sfpsL4CPNetAddrUserNetAddr } 
+        ::= { sfpsL4CPNetAddrUserTable 1 }
+
+SfpsL4CPNetAddrUserEntry ::=
+        SEQUENCE {
+                sfpsL4CPNetAddrUserProtocol   INTEGER,  
+                sfpsL4CPNetAddrUserNetAddr    DisplayString,  
+                sfpsL4CPNetAddrUserLoginID    INTEGER,
+                sfpsL4CPNetAddrUserUserID     INTEGER,
+                sfpsL4CPNetAddrUserUserName   DisplayString
+         }  
+
+sfpsL4CPNetAddrUserProtocol   OBJECT-TYPE
+        SYNTAX  INTEGER(0..'7FFFFFFF'h)  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The network-layer protocol associated with this entry.  Values
+                 correspond to the 'aoAddressTag' enumeration 
+                 (see aoproperties.h)."
+        ::= { sfpsL4CPNetAddrUserEntry 1 }
+
+sfpsL4CPNetAddrUserNetAddr   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The network-layer address associated with this entry."
+        ::= { sfpsL4CPNetAddrUserEntry 2 }
+
+sfpsL4CPNetAddrUserLoginID   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The login ID from CSM's LoginOID.  Set to zero
+                 if no user is logged into the address."
+        ::= { sfpsL4CPNetAddrUserEntry 3 }
+
+sfpsL4CPNetAddrUserUserID   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The object ID from CSM's UserOID."
+        ::= { sfpsL4CPNetAddrUserEntry 4 }
+
+sfpsL4CPNetAddrUserUserName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The user name associated with this entry."
+        ::= { sfpsL4CPNetAddrUserEntry 5 }
+
+
+
+-- SFPS IP ROUTE TABLE
+
+sfpsL4CPIPRouteTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsL4CPIPRouteEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table associates IP routes (subnets) with devices."
+        ::= { sfpsL4CP 8 }
+
+sfpsL4CPIPRouteEntry    OBJECT-TYPE
+        SYNTAX  SfpsL4CPIPRouteEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains the IP route information
+                 associated with a specific device."
+        INDEX   { sfpsL4CPIPRouteSubnetMask,
+                  sfpsL4CPIPRouteSubnet } 
+        ::= { sfpsL4CPIPRouteTable 1 }
+
+SfpsL4CPIPRouteEntry ::=
+        SEQUENCE {
+                sfpsL4CPIPRouteSubnetMask     IpAddress,  
+                sfpsL4CPIPRouteSubnet         IpAddress,  
+                sfpsL4CPIPRouteRouteID        INTEGER,
+                sfpsL4CPIPRouteRouteSubsystem INTEGER,
+                sfpsL4CPIPRouteDeviceID       INTEGER,
+                sfpsL4CPIPRouteDeviceName     DisplayString,
+                sfpsL4CPIPRouteMACAddress     SfpsAddress,
+                sfpsL4CPIPRouteMetric         INTEGER,
+                sfpsL4CPIPRouteCallable       INTEGER
+         }  
+
+sfpsL4CPIPRouteSubnetMask   OBJECT-TYPE
+        SYNTAX  IpAddress  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The subnet mask associated with this route." 
+        ::= { sfpsL4CPIPRouteEntry 1 }
+
+sfpsL4CPIPRouteSubnet   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The destination subnet of this route."
+        ::= { sfpsL4CPIPRouteEntry 2 }
+
+sfpsL4CPIPRouteRouteID   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The object ID from CSM's RouteOID."
+        ::= { sfpsL4CPIPRouteEntry 3 }
+
+sfpsL4CPIPRouteRouteSubsystem   OBJECT-TYPE
+        SYNTAX  INTEGER { local(1),
+                          remote(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates type of device route."
+        ::= { sfpsL4CPIPRouteEntry 4 }
+
+sfpsL4CPIPRouteDeviceID   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The object ID from CSM's DeviceOID."
+        ::= { sfpsL4CPIPRouteEntry 5 }
+
+sfpsL4CPIPRouteDeviceName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The device name for this route."
+        ::= { sfpsL4CPIPRouteEntry 6 }
+
+sfpsL4CPIPRouteMACAddress   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MAC address of the device for this route."
+        ::= { sfpsL4CPIPRouteEntry 7 }
+
+sfpsL4CPIPRouteMetric   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The metric associated with this route."
+        ::= { sfpsL4CPIPRouteEntry 8 }
+
+sfpsL4CPIPRouteCallable   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether or not the device associated
+                 with this route is callable for IP."
+        ::= { sfpsL4CPIPRouteEntry 9 }
+
+
+
+-- SFPS PORT TABLE
+
+sfpsL4CPPortTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsL4CPPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table lists the attributes of an access servers ports."
+        ::= { sfpsL4CP 9 }
+
+sfpsL4CPPortEntry    OBJECT-TYPE
+        SYNTAX  SfpsL4CPPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains information about
+                 one of this access server's ports."
+        INDEX   { sfpsL4CPPortNum } 
+        ::= { sfpsL4CPPortTable 1 }
+
+SfpsL4CPPortEntry ::=
+        SEQUENCE {
+                sfpsL4CPPortNum              INTEGER,  
+                sfpsL4CPPortID               INTEGER,  
+                sfpsL4CPPortApplyPolicyIn    INTEGER,
+                sfpsL4CPPortApplyPolicyOut   INTEGER,
+                sfpsL4CPPortDefaultUserID    INTEGER,
+                sfpsL4CPPortDefaultUserName  DisplayString
+         }  
+
+sfpsL4CPPortNum   OBJECT-TYPE
+        SYNTAX  INTEGER(0..'7FFFFFFF'h)  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The logical port number of this port." 
+        ::= { sfpsL4CPPortEntry 1 }
+
+sfpsL4CPPortID   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The last four octets of CSM's PortOID for this port."
+        ::= { sfpsL4CPPortEntry 2 }
+
+sfpsL4CPPortApplyPolicyIn   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether or not access policies
+                 are to be applied to packets arriving at this port."
+        ::= { sfpsL4CPPortEntry 3 }
+
+sfpsL4CPPortApplyPolicyOut   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether or not access policies
+                 are to be applied to packets sent out this port."
+        ::= { sfpsL4CPPortEntry 4 }
+
+sfpsL4CPPortDefaultUserID   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The last four octets of CSM's UserOID for the
+                 default userid for this port."
+        ::= { sfpsL4CPPortEntry 5 }
+
+sfpsL4CPPortDefaultUserName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The user name assigned to MAC addresses
+                 discovered on this port."
+        ::= { sfpsL4CPPortEntry 6 }
+
+
+
+
+-- SFPS Callable Device Table
+
+sfpsL4CPCallableDeviceTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsL4CPCallableDeviceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table lists the attributes of a callable device."
+        ::= { sfpsL4CP 11 }
+
+sfpsL4CPCallableDeviceEntry    OBJECT-TYPE
+        SYNTAX  SfpsL4CPCallableDeviceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains information about
+                 one of this access server's ports."
+        INDEX   { sfpsL4CPCallableDeviceDeviceID } 
+        ::= { sfpsL4CPCallableDeviceTable 1 }
+
+SfpsL4CPCallableDeviceEntry ::=
+        SEQUENCE {
+                sfpsL4CPCallableDeviceDeviceID         INTEGER,  
+                sfpsL4CPCallableDeviceDeviceName       DisplayString,  
+                sfpsL4CPCallableDeviceDefaultUserName  DisplayString
+         }  
+
+sfpsL4CPCallableDeviceDeviceID   OBJECT-TYPE
+        SYNTAX  INTEGER(0..'7FFFFFFF'h)  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The last four octets of CSM's DeviceOID for this
+                 callable device."
+        ::= { sfpsL4CPCallableDeviceEntry 1 }
+
+sfpsL4CPCallableDeviceDeviceName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The default device name for this callable device."
+        ::= { sfpsL4CPCallableDeviceEntry 2 }
+
+sfpsL4CPCallableDeviceDefaultUserName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The default user name for this callable device."
+        ::= { sfpsL4CPCallableDeviceEntry 3 }
+
+
+
+
+-- SFPS Layer 4 Call Detail Recording Active Flow Table
+
+sfpsL4CDRActiveFlowTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsL4CDRActiveFlowEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table lists the currently active flows that have
+                 Call Detail Recording enabled."
+        ::= { sfpsL4CDR 4 }
+
+sfpsL4CDRActiveFlowEntry    OBJECT-TYPE
+        SYNTAX  SfpsL4CDRActiveFlowEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains information about
+                 one flow that has CDR enabled."
+        INDEX   { sfpsL4CDRActiveFlowFlowID } 
+        ::= { sfpsL4CDRActiveFlowTable 1 }
+
+SfpsL4CDRActiveFlowEntry ::=
+        SEQUENCE {
+                sfpsL4CDRActiveFlowFlowID               INTEGER,  
+                sfpsL4CDRActiveFlowSubProtocol          INTEGER,  
+                sfpsL4CDRActiveFlowEtherType            INTEGER,
+                sfpsL4CDRActiveFlowSourceUser           DisplayString,
+                sfpsL4CDRActiveFlowSourceMACAddr        DisplayString,
+                sfpsL4CDRActiveFlowSourceNetAddr        DisplayString,
+                sfpsL4CDRActiveFlowSourceProtocolPort   INTEGER,
+                sfpsL4CDRActiveFlowSourcePPRangeEnabled INTEGER,
+                sfpsL4CDRActiveFlowSourceConnNumber     INTEGER,
+                sfpsL4CDRActiveFlowDestUser             DisplayString,
+                sfpsL4CDRActiveFlowDestMACAddr          DisplayString,
+                sfpsL4CDRActiveFlowDestNetAddr          DisplayString,
+                sfpsL4CDRActiveFlowDestProtocolPort     INTEGER,
+                sfpsL4CDRActiveFlowDestPPRangeEnabled   INTEGER,
+                sfpsL4CDRActiveFlowDestConnNumber       INTEGER,
+                sfpsL4CDRActiveFlowStartTime            TimeTicks,
+                sfpsL4CDRActiveFlowLastPktTime          TimeTicks,
+                sfpsL4CDRActiveFlowEndTime              TimeTicks,
+                sfpsL4CDRActiveFlowInOctets             Counter,
+                sfpsL4CDRActiveFlowOutOctets            Counter,
+                sfpsL4CDRActiveFlowInPkts               Counter,
+                sfpsL4CDRActiveFlowOutPkts              Counter,
+                sfpsL4CDRActiveFlowDemandAccessConnMade INTEGER,
+                sfpsL4CDRActiveFlowFlowRecordState      INTEGER
+         }  
+
+sfpsL4CDRActiveFlowFlowID   OBJECT-TYPE
+        SYNTAX  INTEGER(0..'7FFFFFFF'h)  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Flow ID for this flow."
+        ::= { sfpsL4CDRActiveFlowEntry 1 }
+
+sfpsL4CDRActiveFlowSubProtocol   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this is a Layer 4 flow, this value identifies the Layer
+                 4 protocol (for IP, this value corresponds to the 'Protocol'
+                 field as described in the 'Assigned Numbers' RFC).  If this
+                 is a Layer 3 flow, this value is zero."
+        ::= { sfpsL4CDRActiveFlowEntry 2 }
+
+sfpsL4CDRActiveFlowEtherType   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Layer 3 protocol represented by this entry.  Values
+                 correspond to the 'Ether Type' field as described in the
+                 Assigned Numbers RFC."
+        ::= { sfpsL4CDRActiveFlowEntry 3 }
+
+sfpsL4CDRActiveFlowSourceUser   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The user name associated with the source of the flow."
+        ::= { sfpsL4CDRActiveFlowEntry 4 }
+
+sfpsL4CDRActiveFlowSourceMACAddr   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MAC address associated with the source of the flow."
+        ::= { sfpsL4CDRActiveFlowEntry 5 }
+
+sfpsL4CDRActiveFlowSourceNetAddr   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Layer 3 address associated with the source of the flow."
+        ::= { sfpsL4CDRActiveFlowEntry 6 }
+
+sfpsL4CDRActiveFlowSourceProtocolPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this is a Layer 4 flow, this value indicates the
+                 protocol port number of the source of the flow.
+                 Otherwise, this field is zero."
+        ::= { sfpsL4CDRActiveFlowEntry 7 }
+
+sfpsL4CDRActiveFlowSourcePPRangeEnabled   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether or not any source protocol port
+                 number greater than 1023 is considered to match the source
+                 protocol port with which this flow was created."
+        ::= { sfpsL4CDRActiveFlowEntry 8 }
+
+sfpsL4CDRActiveFlowSourceConnNumber   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The source connection number."
+        ::= { sfpsL4CDRActiveFlowEntry 9 }
+
+sfpsL4CDRActiveFlowDestUser   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The user name associated with the destination of the flow."
+        ::= { sfpsL4CDRActiveFlowEntry 10 }
+
+sfpsL4CDRActiveFlowDestMACAddr   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MAC address associated with the destination of the flow."
+        ::= { sfpsL4CDRActiveFlowEntry 11 }
+
+sfpsL4CDRActiveFlowDestNetAddr   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Layer 3 address associated with the destination of the flow."
+        ::= { sfpsL4CDRActiveFlowEntry 12 }
+
+sfpsL4CDRActiveFlowDestProtocolPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this is a Layer 4 flow, this value indicates the
+                 protocol port number of the destination of the flow.
+                 Otherwise, this field is zero."
+        ::= { sfpsL4CDRActiveFlowEntry 13 }
+
+sfpsL4CDRActiveFlowDestPPRangeEnabled   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether or not any destination protocol port
+                 number greater than 1023 is considered to match the destination
+                 protocol port with which this flow was created."
+        ::= { sfpsL4CDRActiveFlowEntry 14 }
+
+sfpsL4CDRActiveFlowDestConnNumber   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The destination connection number."
+        ::= { sfpsL4CDRActiveFlowEntry 15 }
+
+sfpsL4CDRActiveFlowStartTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The time elapsed since this flow was created."
+        ::= { sfpsL4CDRActiveFlowEntry 16 }
+
+sfpsL4CDRActiveFlowLastPktTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The time elapsed since the most recent packet was sent on
+                 this flow."
+        ::= { sfpsL4CDRActiveFlowEntry 17 }
+
+sfpsL4CDRActiveFlowEndTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The time elapsed since this flow was terminated.  This
+                 field is not meaningful for active flows."
+        ::= { sfpsL4CDRActiveFlowEntry 18 }
+
+sfpsL4CDRActiveFlowInOctets   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of octets that have been sent from the
+                 destination to the source."
+        ::= { sfpsL4CDRActiveFlowEntry 19 }
+
+sfpsL4CDRActiveFlowOutOctets   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of octets that have been sent from the
+                 source to the destination."
+        ::= { sfpsL4CDRActiveFlowEntry 20 }
+
+sfpsL4CDRActiveFlowInPkts   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets that have been sent from the
+                 destination to the source."
+        ::= { sfpsL4CDRActiveFlowEntry 21 }
+
+sfpsL4CDRActiveFlowOutPkts   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets that have been sent from the
+                 source to the destination."
+        ::= { sfpsL4CDRActiveFlowEntry 22 }
+
+sfpsL4CDRActiveFlowDemandAccessConnMade   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether or not a demand access
+                 connection had to be made for this flow."
+        ::= { sfpsL4CDRActiveFlowEntry 23 }
+
+sfpsL4CDRActiveFlowFlowRecordState   OBJECT-TYPE
+        SYNTAX  INTEGER { initialized(1),
+                          active(2),
+                          terminated(3),
+                          invalid(4) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the current state of the flow record."
+        ::= { sfpsL4CDRActiveFlowEntry 24 }
+
+
+
+-- SFPS Layer 4 Call Detail Recording Terminated Flow Table
+
+sfpsL4CDRTermedFlowTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsL4CDRTermedFlowEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table lists the terminated flows that had
+                 Call Detail Recording enabled."
+        ::= { sfpsL4CDR 5 }
+
+sfpsL4CDRTermedFlowEntry    OBJECT-TYPE
+        SYNTAX  SfpsL4CDRTermedFlowEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains information about
+                 one flow that had CDR enabled."
+        INDEX   { sfpsL4CDRTermedFlowFlowID } 
+        ::= { sfpsL4CDRTermedFlowTable 1 }
+
+SfpsL4CDRTermedFlowEntry ::=
+        SEQUENCE {
+                sfpsL4CDRTermedFlowFlowID               INTEGER,  
+                sfpsL4CDRTermedFlowSubProtocol          INTEGER,  
+                sfpsL4CDRTermedFlowEtherType            INTEGER,
+                sfpsL4CDRTermedFlowSourceUser           DisplayString,
+                sfpsL4CDRTermedFlowSourceMACAddr        DisplayString,
+                sfpsL4CDRTermedFlowSourceNetAddr        DisplayString,
+                sfpsL4CDRTermedFlowSourceProtocolPort   INTEGER,
+                sfpsL4CDRTermedFlowSourcePPRangeEnabled INTEGER,
+                sfpsL4CDRTermedFlowSourceConnNumber     INTEGER,
+                sfpsL4CDRTermedFlowDestUser             DisplayString,
+                sfpsL4CDRTermedFlowDestMACAddr          DisplayString,
+                sfpsL4CDRTermedFlowDestNetAddr          DisplayString,
+                sfpsL4CDRTermedFlowDestProtocolPort     INTEGER,
+                sfpsL4CDRTermedFlowDestPPRangeEnabled   INTEGER,
+                sfpsL4CDRTermedFlowDestConnNumber       INTEGER,
+                sfpsL4CDRTermedFlowStartTime            TimeTicks,
+                sfpsL4CDRTermedFlowLastPktTime          TimeTicks,
+                sfpsL4CDRTermedFlowEndTime              TimeTicks,
+                sfpsL4CDRTermedFlowInOctets             Counter,
+                sfpsL4CDRTermedFlowOutOctets            Counter,
+                sfpsL4CDRTermedFlowInPkts               Counter,
+                sfpsL4CDRTermedFlowOutPkts              Counter,
+                sfpsL4CDRTermedFlowDemandAccessConnMade INTEGER,
+                sfpsL4CDRTermedFlowFlowRecordState      INTEGER
+         }  
+
+sfpsL4CDRTermedFlowFlowID   OBJECT-TYPE
+        SYNTAX  INTEGER(0..'7FFFFFFF'h)  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Flow ID for this flow."
+        ::= { sfpsL4CDRTermedFlowEntry 1 }
+
+sfpsL4CDRTermedFlowSubProtocol   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this is a Layer 4 flow, this value identifies the Layer
+                 4 protocol (for IP, this value corresponds to the 'Protocol'
+                 field as described in the 'Assigned Numbers' RFC).  If this
+                 is a Layer 3 flow, this value is zero."
+        ::= { sfpsL4CDRTermedFlowEntry 2 }
+
+sfpsL4CDRTermedFlowEtherType   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Layer 3 protocol represented by this entry.  Values
+                 correspond to the 'Ether Type' field as described in the
+                 Assigned Numbers RFC."
+        ::= { sfpsL4CDRTermedFlowEntry 3 }
+
+sfpsL4CDRTermedFlowSourceUser   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The user name associated with the source of the flow."
+        ::= { sfpsL4CDRTermedFlowEntry 4 }
+
+sfpsL4CDRTermedFlowSourceMACAddr   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MAC address associated with the source of the flow."
+        ::= { sfpsL4CDRTermedFlowEntry 5 }
+
+sfpsL4CDRTermedFlowSourceNetAddr   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Layer 3 address associated with the source of the flow."
+        ::= { sfpsL4CDRTermedFlowEntry 6 }
+
+sfpsL4CDRTermedFlowSourceProtocolPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this is a Layer 4 flow, this value indicates the
+                 protocol port number of the source of the flow.
+                 Otherwise, this field is zero."
+        ::= { sfpsL4CDRTermedFlowEntry 7 }
+
+sfpsL4CDRTermedFlowSourcePPRangeEnabled   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether or not any source protocol port
+                 number greater than 1023 is considered to match the source
+                 protocol port with which this flow was created."
+        ::= { sfpsL4CDRTermedFlowEntry 8 }
+
+sfpsL4CDRTermedFlowSourceConnNumber   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The source connection number."
+        ::= { sfpsL4CDRTermedFlowEntry 9 }
+
+sfpsL4CDRTermedFlowDestUser   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The user name associated with the destination of the flow."
+        ::= { sfpsL4CDRTermedFlowEntry 10 }
+
+sfpsL4CDRTermedFlowDestMACAddr   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MAC address associated with the destination of the flow."
+        ::= { sfpsL4CDRTermedFlowEntry 11 }
+
+sfpsL4CDRTermedFlowDestNetAddr   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Layer 3 address associated with the destination of the flow."
+        ::= { sfpsL4CDRTermedFlowEntry 12 }
+
+sfpsL4CDRTermedFlowDestProtocolPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this is a Layer 4 flow, this value indicates the
+                 protocol port number of the destination of the flow.
+                 Otherwise, this field is zero."
+        ::= { sfpsL4CDRTermedFlowEntry 13 }
+
+sfpsL4CDRTermedFlowDestPPRangeEnabled   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether or not any destination protocol port
+                 number greater than 1023 is considered to match the destination
+                 protocol port with which this flow was created."
+        ::= { sfpsL4CDRTermedFlowEntry 14 }
+
+sfpsL4CDRTermedFlowDestConnNumber   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The destination connection number."
+        ::= { sfpsL4CDRTermedFlowEntry 15 }
+
+sfpsL4CDRTermedFlowStartTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The time elapsed since this flow was created."
+        ::= { sfpsL4CDRTermedFlowEntry 16 }
+
+sfpsL4CDRTermedFlowLastPktTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The time elapsed since the most recent packet was sent on
+                 this flow."
+        ::= { sfpsL4CDRTermedFlowEntry 17 }
+
+sfpsL4CDRTermedFlowEndTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The time elapsed since this flow was terminated."
+        ::= { sfpsL4CDRTermedFlowEntry 18 }
+
+sfpsL4CDRTermedFlowInOctets   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of octets that have been sent from the
+                 destination to the source."
+        ::= { sfpsL4CDRTermedFlowEntry 19 }
+
+sfpsL4CDRTermedFlowOutOctets   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of octets that have been sent from the
+                 source to the destination."
+        ::= { sfpsL4CDRTermedFlowEntry 20 }
+
+sfpsL4CDRTermedFlowInPkts   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets that have been sent from the
+                 destination to the source."
+        ::= { sfpsL4CDRTermedFlowEntry 21 }
+
+sfpsL4CDRTermedFlowOutPkts   OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets that have been sent from the
+                 source to the destination."
+        ::= { sfpsL4CDRTermedFlowEntry 22 }
+
+sfpsL4CDRTermedFlowDemandAccessConnMade   OBJECT-TYPE
+        SYNTAX  INTEGER { yes(1),
+                          no(2) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates whether or not a demand access
+                 connection had to be made for this flow."
+        ::= { sfpsL4CDRTermedFlowEntry 23 }
+
+sfpsL4CDRTermedFlowFlowRecordState   OBJECT-TYPE
+        SYNTAX  INTEGER { initialized(1),
+                          active(2),
+                          terminated(3),
+                          invalid(4) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the current state of the flow record."
+        ::= { sfpsL4CDRTermedFlowEntry 24 }
+
+
+
+-- SFPS Layer 4 Call Detail Recording Flow Index Table
+
+sfpsL4CDRFlowIndexTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsL4CDRFlowIndexEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table lists the current flows that have
+                 Call Detail Recording enabled."
+        ::= { sfpsL4CDR 6 }
+
+sfpsL4CDRFlowIndexEntry    OBJECT-TYPE
+        SYNTAX  SfpsL4CDRFlowIndexEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains information about
+                 one flow that has CDR enabled."
+        INDEX   { sfpsL4CDRFlowIndexFlowID } 
+        ::= { sfpsL4CDRFlowIndexTable 1 }
+
+SfpsL4CDRFlowIndexEntry ::=
+        SEQUENCE {
+                sfpsL4CDRFlowIndexFlowID               INTEGER,  
+                sfpsL4CDRFlowIndexSFPSFlowTblIndex     INTEGER,  
+                sfpsL4CDRFlowIndexSFlowStatsPtr        INTEGER,
+                sfpsL4CDRFlowIndexStaticFlowInfoPtr    INTEGER,
+                sfpsL4CDRFlowIndexFlowTblEntryPtr      INTEGER,
+                sfpsL4CDRFlowIndexFlowState            INTEGER
+         }  
+
+sfpsL4CDRFlowIndexFlowID   OBJECT-TYPE
+        SYNTAX  INTEGER(0..'7FFFFFFF'h)  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Flow ID for this flow."
+        ::= { sfpsL4CDRFlowIndexEntry 1 }
+
+sfpsL4CDRFlowIndexSFPSFlowTblIndex   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Index of the SFPS Flow Table entry (1-based) that
+                 corresponds to this flow."
+        ::= { sfpsL4CDRFlowIndexEntry 2 }
+
+sfpsL4CDRFlowIndexSFlowStatsPtr   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Pointer to the SFlowStats object for this flow."
+        ::= { sfpsL4CDRFlowIndexEntry 3 }
+
+sfpsL4CDRFlowIndexStaticFlowInfoPtr   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Pointer to the L4CDRStaticFlowInfo object for this flow."
+        ::= { sfpsL4CDRFlowIndexEntry 4 }
+
+sfpsL4CDRFlowIndexFlowTblEntryPtr   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The flow table entry pointer for this flow."
+        ::= { sfpsL4CDRFlowIndexEntry 5 }
+
+sfpsL4CDRFlowIndexFlowState   OBJECT-TYPE
+        SYNTAX  INTEGER { initialized(1),
+                          active(2),
+                          terminated(3),
+                          invalid(4) }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the current state of the flow index record."
+        ::= { sfpsL4CDRFlowIndexEntry 6 }
+
+END

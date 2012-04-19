@@ -1,0 +1,751 @@
+ALCATEL-IND1-PIM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	IpAddress, Integer32, TimeTicks
+		FROM SNMPv2-SMI
+	RowStatus
+		FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+    	FROM SNMPv2-CONF
+	routingIND1Pim
+		FROM ALCATEL-IND1-BASE;
+
+alcatelIND1PIMMIB MODULE-IDENTITY
+
+    LAST-UPDATED  "200704030000Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This proprietary MIB contains management information for 
+             the configuration of PIM-SM and PIM-DM global configuration 
+             parameters.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { routingIND1Pim 1 }
+
+alcatelIND1PIMMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1PIMMIB 1 }
+
+alaPimsmGlobalConfig OBJECT IDENTIFIER ::= { alcatelIND1PIMMIBObjects 1 }
+alaPimsmDebugConfig  OBJECT IDENTIFIER ::= { alcatelIND1PIMMIBObjects 2 }
+alaPimdmGlobalConfig OBJECT IDENTIFIER ::= { alcatelIND1PIMMIBObjects 3 }
+
+-- ************************************************************************
+--  PIM-SM Global Configuration
+-- ************************************************************************
+
+alaPimsmAdminStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the
+                PIM-SM protocol on this router."
+    DEFVAL     { disable }
+    ::= {alaPimsmGlobalConfig 1}
+
+
+alaPimsmAdminBSRAddress    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+               "The IP address used to source the bootstrap message when
+                the router is configured to be a candidate bootstrap
+                router (C-BSR).  This IP address should belong to a
+                PIM-enabled VLAN."
+    ::= {alaPimsmGlobalConfig 2 }
+
+alaPimsmAdminBSRHashmasklen   OBJECT-TYPE
+    SYNTAX     Integer32 (1..32)
+    MAX-ACCESS read-write
+    STATUS     obsolete
+    DESCRIPTION
+               "The length (in bits) of the mask to use in the hash 
+                function when computing the rendezvous point (RP) for a
+                multicast group.  This value may be changed to facilitate
+                vendor inter-operability.  For IPV4 we recommend a value 
+                of 30."
+    DEFVAL     { 30 }
+    ::= {alaPimsmGlobalConfig 3 }
+
+alaPimsmAdminBSRPriority   OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-only
+    STATUS     obsolete
+    DESCRIPTION
+               "The candidate bootstrap router's (C-BSR) priority.  The
+                C-BSR with the biggest priority value will be elected
+                as the BSR for this domain."
+    DEFVAL     { 0 }
+    ::= {alaPimsmGlobalConfig 4 }
+
+alaPimsmCRPExpiryTime   OBJECT-TYPE
+    SYNTAX     Integer32 (1..300)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     obsolete
+    DESCRIPTION
+               "The maximum time a PIM-SM router considers the current 
+		        candidate rendezvous point (C-RP) active."
+    DEFVAL     { 300 }
+    ::= {alaPimsmGlobalConfig 5 }
+
+alaPimsmCRPInterval    OBJECT-TYPE
+    SYNTAX     Integer32 (1..300)
+    MAX-ACCESS read-write
+    STATUS     obsolete
+    DESCRIPTION
+               "This is the interval at which the candidate rendezvous
+                point router's advertisements (C-RP-Adv) are sent
+                to the bootstrap router."
+    DEFVAL     { 60 }
+    ::= { alaPimsmGlobalConfig 6 }
+
+alaPimsmAdminCRPAddress   OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     obsolete
+    DESCRIPTION
+               "The IP Address of the C-RP when this router is configured
+                to be a Candidate RP.  This IP address should belong to
+                a PIM-enabled vlan.  The value of 0 indicates that
+                this router is not configured to be a C-RP."
+    DEFVAL     { 0 }
+    ::= {alaPimsmGlobalConfig 7 }
+
+alaPimsmAdminCRPPriority   OBJECT-TYPE
+    SYNTAX     Integer32 (0..128)
+    MAX-ACCESS read-write
+    STATUS     obsolete
+    DESCRIPTION
+               "The candidate rendezvous point (C-RP) router's
+                priority.  A lower numeric value denotes a higher
+                priority."
+    DEFVAL     { 0 }
+    ::= {alaPimsmGlobalConfig 8 }
+
+alaPimsmDataTimeout    OBJECT-TYPE
+    SYNTAX     Integer32 (1..300)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     obsolete
+    DESCRIPTION
+               "This is the time after which (S,G) state for a
+                silent source will be deleted."
+    DEFVAL     { 210 }
+    ::= { alaPimsmGlobalConfig 9 }
+
+alaPimsmMaxRPs    OBJECT-TYPE
+    SYNTAX     Integer32 (1..100)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "The maximum number of C-RPs allowed in the PIM-SM
+                domain."
+    DEFVAL     { 32 }
+    ::= { alaPimsmGlobalConfig 10 }
+
+alaPimsmProbeTime OBJECT-TYPE
+    SYNTAX     Integer32 (1..300)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "When NULL Registers are used, this is the time
+                between sending a NULL Register and the Register-
+                Suppression-Timer expiring unless it is restarted
+                by receiving a Register-Stop."
+    DEFVAL     { 5 }
+    ::= { alaPimsmGlobalConfig 11}
+
+alaPimsmOldRegisterMessageSupport    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    header(1),
+                    full(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+               "Specifies the application of the checksum function on
+                received Register messages in the PIM-SM domain.  When
+                set to full(2), the checksum for a register message
+                is computed for the entire packet (i.e. includes data).
+                When set to header(1), the checksum is done only on the
+                first 8 bytes of the packet.  This variable is provided
+                for interoperability reasons and may be required for
+                Compatibility with older implementations of PIM-SM v2.
+                This parameter must be set the same throughout the
+                PIM-SM domain."
+    DEFVAL     { header }
+    ::= { alaPimsmGlobalConfig 12 }
+
+alaPimsmRegisterSuppressionTimeout OBJECT-TYPE
+    SYNTAX     Integer32 (1..300)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     obsolete
+    DESCRIPTION
+               "This is the amount of time a Designated Router (DR) will
+                stop sending Registers on behalf of sources to the RP
+                once a Register-Stop has been received."
+    DEFVAL     { 60 }
+    ::= { alaPimsmGlobalConfig 13}
+
+alaPimsmAdminStaticRPConfig     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     obsolete
+    DESCRIPTION
+               "Administratively enables/disables Static RP
+                Configuration on this router."
+    DEFVAL     { disable }
+    ::= {alaPimsmGlobalConfig 14 }
+
+-- The PIM Static-RP Table
+
+alaPimsmStaticRPTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AlaPimsmStaticRPEntry
+    MAX-ACCESS not-accessible
+    STATUS     obsolete
+    DESCRIPTION
+            "The (conceptual) table listing the IP multicast groups 
+            to be used in the group-to-RP mapping when
+            the value of alaPimsmAdminStaticRPConfig is enabled."
+    ::= { alaPimsmGlobalConfig 15 }
+
+alaPimsmStaticRPEntry OBJECT-TYPE
+    SYNTAX     AlaPimsmStaticRPEntry
+    MAX-ACCESS not-accessible
+    STATUS     obsolete
+    DESCRIPTION
+            "An entry (conceptual row) in the alaPimsmStaticRPTable."
+    INDEX      { alaPimsmStaticRPGroupAddress,
+                 alaPimsmStaticRPGroupMask, alaPimsmStaticRPAddress }
+    ::= { alaPimsmStaticRPTable 1 }
+
+AlaPimsmStaticRPEntry ::= SEQUENCE {
+    alaPimsmStaticRPGroupAddress    IpAddress,
+    alaPimsmStaticRPGroupMask       IpAddress,
+    alaPimsmStaticRPAddress         IpAddress,
+    alaPimsmStaticRPRowStatus       RowStatus
+}
+
+alaPimsmStaticRPGroupAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     obsolete
+    DESCRIPTION
+            "The IP multicast group address which, when combined with
+            alaPimsmStaticRPGroupMask, identifies a group prefix to be
+            used in the group-to-rp mapping algorithm."
+    ::= { alaPimsmStaticRPEntry 1 }
+
+alaPimsmStaticRPGroupMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     obsolete
+    DESCRIPTION
+            "The multicast group address mask which, when combined with
+            alaPimsmStaticRPGroupMask, identifies a group prefix to be
+            used in the group-to-rp mapping algorithm."
+    ::= { alaPimsmStaticRPEntry 2 }
+
+alaPimsmStaticRPAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     obsolete
+    DESCRIPTION
+            "The (unicast) address of the interface which will be
+            an RP."
+    ::= { alaPimsmStaticRPEntry 3 }
+
+alaPimsmStaticRPRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     obsolete
+    DESCRIPTION
+            "The status of this row, by which new entries may be
+            created, or old entries deleted from this table."
+    ::= { alaPimsmStaticRPEntry 4 }
+
+
+alaPimsmAdminSPTConfig     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables SPT Switchover
+                upon receiving the first data packet."
+    DEFVAL     { enable }
+    ::= {alaPimsmGlobalConfig 16 }
+
+alaPimsmRPThreshold     OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Sets the RP threshold value (in bps) to be used
+                in determining when to switch to native
+                forwarding at the RP.  The value of 0
+                disables the RP Threshold functionality."
+    DEFVAL     { 1 }
+    ::= {alaPimsmGlobalConfig 17 }
+
+alaPimsmV6AdminStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the
+                PIM-SM IPv6 protocol on this router."
+    DEFVAL     { disable }
+    ::= {alaPimsmGlobalConfig 18 }
+
+alaPimsmV6SPTConfig     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables PIM IPv6 SPT Switchover
+                upon receiving the first data packet."
+    DEFVAL     { enable }
+    ::= {alaPimsmGlobalConfig 19 }
+
+alaPimsmV6RPSwitchover     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables whether PIM IPv6
+                will attempt to switch to native forwarding at the RP
+                upon receiving the first register-encapsulated packet."
+    DEFVAL     { enable }
+    ::= {alaPimsmGlobalConfig 20 }
+
+
+-- ************************************************************************
+--  PIM-SM Debug Configuration
+-- ************************************************************************
+
+alaPimsmDebugLevel     OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebug 
+                Configuration"
+    DEFVAL     { 0 }
+    ::= {alaPimsmDebugConfig 1}
+
+alaPimsmDebugError     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugError
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 2}
+
+alaPimsmDebugHello     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugHello
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 3}
+
+alaPimsmDebugNbr     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugNbr
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 4}
+
+alaPimsmDebugBootstrap     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of 
+                alaDrcTmPimsmDebugBootstrap MIB Object of alaDrcTmPimsmDebug 
+                Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 5}
+
+alaPimsmDebugCRP     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugCRP
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 6}
+
+alaPimsmDebugRoute     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugRoute
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 7}
+
+alaPimsmDebugJoinPrune     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of 
+                alaDrcTmPimsmDebugJoinPrune MIB Object of alaDrcTmPimsmDebug 
+                Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 8}
+
+alaPimsmDebugAssert     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugAssert
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 9}
+
+alaPimsmDebugTime     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugTime
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 10}
+
+alaPimsmDebugIgmp     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugIgmp
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 11}
+
+alaPimsmDebugSpt     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugSpt
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 12}
+
+alaPimsmDebugMip     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugMip
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 13}
+
+alaPimsmDebugInit     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugInit
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 14}
+
+alaPimsmDebugTm     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugTm
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 15}
+
+alaPimsmDebugIpmrm     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugIpmrm
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 16}
+
+alaPimsmDebugMisc     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugMisc
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 17}
+
+alaPimsmDebugAll     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     deprecated
+    DESCRIPTION
+               "This Object is deprecated in favor of alaDrcTmPimsmDebugAll
+                MIB Object of alaDrcTmPimsmDebug Configuration"
+    DEFVAL     { disable }
+    ::= {alaPimsmDebugConfig 18}
+
+-- ************************************************************************
+--  PIM-DM Global Configuration
+-- ************************************************************************
+
+alaPimdmAdminStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the
+                PIM-DM protocol on this router."
+    DEFVAL     { disable }
+    ::= {alaPimdmGlobalConfig 1}
+
+alaPimdmStateRefreshTimeToLive OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The TTL to be used by this router's originated State
+                 Refresh messages if the data packet's TTL is not
+                 recorded."
+    DEFVAL { 16 }
+    ::= {alaPimdmGlobalConfig 2}
+
+alaPimdmStateRefreshLimitInterval OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "This router will not forward successive State Refresh
+                 messages received at less than this interval."
+    DEFVAL { 0 }
+    ::= {alaPimdmGlobalConfig 3}
+
+alaPimdmV6AdminStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the
+                PIM-DM IPv6 protocol on this router."
+    DEFVAL     { disable }
+    ::= {alaPimdmGlobalConfig 4}
+
+
+-- conformance information
+
+alcatelIND1PIMMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1PIMMIB 2 }
+alcatelIND1PIMMIBCompliances OBJECT IDENTIFIER ::= 
+                                          { alcatelIND1PIMMIBConformance 1 }
+alcatelIND1PIMMIBGroups      OBJECT IDENTIFIER ::= 
+                                          { alcatelIND1PIMMIBConformance 2 }
+
+
+-- compliance statements
+
+alaPimsmCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers running PIM Sparse
+            Mode and implementing the ALCATEL-IND1-PIM MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaPimsmConfigMIBGroup, alaPimsmDebugMIBGroup }
+
+    ::= { alcatelIND1PIMMIBCompliances 1 }
+
+alaPimdmCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers running PIM Dense
+            Mode and implementing the ALCATEL-IND1-PIM MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaPimdmConfigMIBGroup }
+
+    ::= { alcatelIND1PIMMIBCompliances 2 }
+
+-- units of conformance
+
+alaPimsmConfigMIBGroup OBJECT-GROUP
+    OBJECTS { alaPimsmAdminStatus, alaPimsmAdminBSRAddress,
+              alaPimsmAdminBSRHashmasklen, alaPimsmAdminBSRPriority,
+              alaPimsmCRPExpiryTime, alaPimsmCRPInterval,
+              alaPimsmAdminCRPAddress, alaPimsmAdminCRPPriority,
+              alaPimsmDataTimeout, alaPimsmMaxRPs,
+              alaPimsmProbeTime, alaPimsmOldRegisterMessageSupport,
+              alaPimsmRegisterSuppressionTimeout,
+              alaPimsmAdminStaticRPConfig, alaPimsmStaticRPRowStatus, 
+			  alaPimsmAdminSPTConfig, alaPimsmRPThreshold,
+              alaPimsmV6AdminStatus, alaPimsmV6SPTConfig,
+              alaPimsmV6RPSwitchover
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of global
+            configuration parameters of PIM Sparse Mode routers."
+    ::= { alcatelIND1PIMMIBGroups 1 }
+
+alaPimsmDebugMIBGroup OBJECT-GROUP
+    OBJECTS { alaPimsmDebugLevel, alaPimsmDebugError,
+              alaPimsmDebugHello, alaPimsmDebugNbr,
+              alaPimsmDebugBootstrap, alaPimsmDebugCRP,
+              alaPimsmDebugRoute, alaPimsmDebugJoinPrune,
+              alaPimsmDebugAssert, alaPimsmDebugTime,
+              alaPimsmDebugIgmp, alaPimsmDebugSpt,
+              alaPimsmDebugMip, alaPimsmDebugInit,
+              alaPimsmDebugTm, alaPimsmDebugIpmrm,
+              alaPimsmDebugMisc, alaPimsmDebugAll
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects to provide debugging
+             support of PIM Sparse Mode routers."
+    ::= { alcatelIND1PIMMIBGroups 2 }
+
+alaPimdmConfigMIBGroup OBJECT-GROUP
+    OBJECTS { alaPimdmAdminStatus, alaPimdmStateRefreshTimeToLive,
+              alaPimdmStateRefreshLimitInterval,
+              alaPimdmV6AdminStatus
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of global
+            configuration parameters of PIM Dense Mode routers."
+    ::= { alcatelIND1PIMMIBGroups 3 }
+
+END

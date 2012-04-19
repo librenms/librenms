@@ -1,0 +1,1055 @@
+--  =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI-SECSTAT-MIB
+-- Reference:
+-- Version:     V1.0
+-- History:
+--  V1.20 2005-05-30 Wei Rixi(22510) added hwSecStatIcmpSessNumMax etc. fields.
+--  V1.00 2003-03-18 Yang Yinzhu(28193)  initial version
+-- =================================================================
+
+HUAWEI-SECSTAT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        TruthValue            
+            FROM SNMPv2-TC
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwSECSTATCommon MODULE-IDENTITY 
+        LAST-UPDATED "200304100900Z"        -- April 10, 2003 at 09:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            V1.00
+            The HUAWEI-SECSTAT-MIB contains objects to manage the security
+            statistics for router and firewall product.
+            "
+        ::= { hwSECSTAT 1 }
+    
+
+    --
+    -- Node definitions
+    --
+    -- 1.3.6.1.4.1.2011.5.25.11
+    hwSECSTAT OBJECT IDENTIFIER ::= { hwDatacomm 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1
+    hwSecStatCfgObjects OBJECT IDENTIFIER ::= { hwSECSTATCommon 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.1
+    hwSecStatGlobalStatEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The status indicate whether enable the global statistics."
+        DEFVAL { true }
+        ::= { hwSecStatCfgObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.2
+    hwSecStatGlobalPktScale OBJECT IDENTIFIER ::= { hwSecStatCfgObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.2.1
+    hwSecStatTcpPktScale OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The percent of TCP packets.
+            
+            The hwSecStatTcpPktScale + hwSecStatUdpPktScale + hwSecStatIcmpPktScale
+            must less than 100
+            "
+        ::= { hwSecStatGlobalPktScale 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.2.2
+    hwSecStatUdpPktScale OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The percent of UDP packets.
+            
+            The hwSecStatTcpPktScale + hwSecStatUdpPktScale + hwSecStatIcmpPktScale
+            must less than 100
+            "
+        ::= { hwSecStatGlobalPktScale 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.2.3
+    hwSecStatIcmpPktScale OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The percent of ICMP packets.
+            
+            The hwSecStatTcpPktScale + hwSecStatUdpPktScale + hwSecStatIcmpPktScale
+            must less than 100
+            "
+        ::= { hwSecStatGlobalPktScale 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.2.4
+    hwSecStatAlteration OBJECT-TYPE
+        SYNTAX Integer32 (0..25)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The proportion of change in the packets scale."
+        ::= { hwSecStatGlobalPktScale 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.2.5
+    hwSecStatCalcTime OBJECT-TYPE
+        SYNTAX Integer32 (0..14400)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The period of packet scale statistics, the unit is minute."
+        ::= { hwSecStatGlobalPktScale 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.2.6
+    hwSecStatPktScaleSetDefault OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This OID is used for setting the packet scale configuration to default.
+            When you want to set the value to default, set this OID to 1.
+            "
+        ::= { hwSecStatGlobalPktScale 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.3
+    hwSecStatGlobalSessNum OBJECT IDENTIFIER ::= { hwSecStatCfgObjects 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.3.1
+    hwSecStatTcpSessNumMax OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximun number of TCP session allowed."
+        DEFVAL { 500000 }
+        ::= { hwSecStatGlobalSessNum 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.3.2
+    hwSecStatTcpSessNumMin OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The minimum of TCP session.
+            when the number of TCP session in one system arrive the maximum allowed,
+            system would decrease the TCP session by some method, 
+            once the number of tcp session in one system arrive the minumim,
+            system would stop decreasing the TCP session.
+            "
+        DEFVAL { 500000 }
+        ::= { hwSecStatGlobalSessNum 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.3.3
+    hwSecStatUdpSessNumMax OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximun number of UDP session allowed."
+        DEFVAL { 500000 }
+        ::= { hwSecStatGlobalSessNum 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.3.4
+    hwSecStatUdpSessNumMin OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The minimum of UDP session.
+            when the number of UDP session in one system arrive the maximum allowed,
+            system would decrease the UDP session by some method, 
+            once the number of tcp session in one system arrive the minumim,
+            system would stop decreasing the UDP session.
+            "
+        DEFVAL { 500000 }
+        ::= { hwSecStatGlobalSessNum 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.3.5
+    hwSecStatGlobalSessSetDefault OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This OID is used for setting the global session number configuration to default.
+            When you want to set the value to default, set this OID to 1.
+            "
+        ::= { hwSecStatGlobalSessNum 5 }
+    
+        -- 1.3.6.1.4.1.2011.5.25.11.1.1.3.6
+    hwSecStatIcmpSessNumMax OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The maximun number of ICMP session allowed."
+        DEFVAL { 500000 }
+        ::= { hwSecStatGlobalSessNum 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.3.7
+    hwSecStatIcmpSessNumMin OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "
+        The minimum of ICMP session.
+        when the number of ICMP session in one system arrive the maximum allowed,
+        system would decrease the ICMP session by some method, 
+        once the number of ICMP session in one system arrive the minumim,
+        system would stop decreasing the ICMP session.
+        "
+        DEFVAL { 500000 }
+        ::= { hwSecStatGlobalSessNum 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.3.8
+    hwSecStatTcpProxySessNumMax OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The maximun number of TcpProxy session allowed."
+        DEFVAL { 500000 }
+        ::= { hwSecStatGlobalSessNum 8 }
+
+    -- 1.3.6.1.4.1.2011.5.25.11.1.1.3.9
+    hwSecStatTcpProxySessNumMin OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "
+        The minimum of TcpProxy session.
+        when the number of TcpProxy session in one system arrive the maximum allowed,
+        system would decrease the TcpProxy session by some method, 
+        once the number of TcpProxy session in one system arrive the minumim,
+        system would stop decreasing the TcpProxy session.
+        "
+        DEFVAL { 500000 }
+        ::= { hwSecStatGlobalSessNum 9 }
+
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2
+    hwSecStatMonitorObjects OBJECT IDENTIFIER ::= { hwSECSTATCommon 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1
+    hwSecStatMonitorGlobalSessFlow OBJECT IDENTIFIER ::= { hwSecStatMonitorObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.1
+    hwSecStatMonTotalBootConnNum OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The total number of connection since device startup.
+            This number is increased only.
+            "
+        ::= { hwSecStatMonitorGlobalSessFlow 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.2
+    hwSecStatMonPeakSessSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximun speed of session establishing since device startup."
+        ::= { hwSecStatMonitorGlobalSessFlow 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.3
+    hwSecStatMonCurSessSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current speed of session establishing."
+        ::= { hwSecStatMonitorGlobalSessFlow 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.4
+    hwSecStatMonTotalSess OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total session in the system currently."
+        ::= { hwSecStatMonitorGlobalSessFlow 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.5
+    hwSecStatMonHalfConn OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of incomplete session in system currently."
+        ::= { hwSecStatMonitorGlobalSessFlow 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.6
+    hwSecStatMonTcpSess OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current number of TCP sessions."
+        ::= { hwSecStatMonitorGlobalSessFlow 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.7
+    hwSecStatMonUdpSess OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current number of UDP sessions."
+        ::= { hwSecStatMonitorGlobalSessFlow 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.8
+    hwSecStatMonIcmpSess OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current number of ICMP sessions."
+        ::= { hwSecStatMonitorGlobalSessFlow 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.9
+    hwSecStatMonSvrMapTblNum OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of server map."
+        ::= { hwSecStatMonitorGlobalSessFlow 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.10
+    hwSecStatFragTblNum OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of entry in fragment table."
+        ::= { hwSecStatMonitorGlobalSessFlow 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.11
+    hwSecStatMonRcvIcmpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of ICMP packets received by system."
+        ::= { hwSecStatMonitorGlobalSessFlow 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.12
+    hwSecStatMonRcvIcmpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of ICMP packets received by system."
+        ::= { hwSecStatMonitorGlobalSessFlow 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.13
+    hwSecStatMonRcvTcpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of TCP packets received by system."
+        ::= { hwSecStatMonitorGlobalSessFlow 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.14
+    hwSecStatMonRcvTcpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of TCP packets received by system."
+        ::= { hwSecStatMonitorGlobalSessFlow 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.15
+    hwSecStatMonRcvUdpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of UDP packets received by system."
+        ::= { hwSecStatMonitorGlobalSessFlow 15 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.16
+    hwSecStatMonRcvUdpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of UDP packets received by system."
+        ::= { hwSecStatMonitorGlobalSessFlow 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.17
+    hwSecStatMonRcvEtcPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of other type packets received by system."
+        ::= { hwSecStatMonitorGlobalSessFlow 17 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.18
+    hwSecStatMonRcvEtcOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of other type packets received by system."
+        ::= { hwSecStatMonitorGlobalSessFlow 18 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.19
+    hwSecStatMonPassIcmpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of ICMP packets pass the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 19 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.20
+    hwSecStatMonPassIcmpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of ICMP packets pass the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 20 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.21
+    hwSecStatMonPassTcpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of TCP packets pass the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 21 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.22
+    hwSecStatMonPassTcpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of TCP packets pass the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 22 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.23
+    hwSecStatMonPassUdpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of UDP packets pass the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 23 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.24
+    hwSecStatMonPassUdpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of UDP packets pass the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 24 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.25
+    hwSecStatMonPassEtcPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of other type packets pass the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 25 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.26
+    hwSecStatMonPassEtcOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of other type packets pass the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 26 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.27
+    hwSecStatMonSynPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of SYN packets arriving the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 27 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.28
+    hwSecStatMonFinPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of FIN packets arriving the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 28 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.29
+    hwSecStatMonSynAckPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of SYN-ACK packets arriving the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 29 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.30
+    hwSecStatMonRstPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of RESET packets arriving the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 30 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.31
+    hwSecStatMonRcvFragPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of fragment packets arriving the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 31 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.32
+    hwSecStatMonRcvFragOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of fragment packets arriving the system."
+        ::= { hwSecStatMonitorGlobalSessFlow 32 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.33
+    hwSecStatMonAllPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of received packets by the device."
+        ::= { hwSecStatMonitorGlobalSessFlow 33 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.34
+    hwSecStatMonAllOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of received bytes by the device."
+        ::= { hwSecStatMonitorGlobalSessFlow 34 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.1.35
+    hwSecStatClearGlobalSessFlowInfo OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Use this OID to clear the global session flow statistics information.
+            When you want to clear the information, set this OID to 1.
+            "
+        ::= { hwSecStatMonitorGlobalSessFlow 35 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2
+    hwSecStatMonitorGlobalAppInfo OBJECT IDENTIFIER ::= { hwSecStatMonitorObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.1
+    hwSecStatMonFtpSessions OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of FTP sessions in the system currently."
+        ::= { hwSecStatMonitorGlobalAppInfo 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.2
+    hwSecStatMonRcvFtpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of FTP packets received by system."
+        ::= { hwSecStatMonitorGlobalAppInfo 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.3
+    hwSecStatMonRcvFtpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of FTP packets received by system."
+        ::= { hwSecStatMonitorGlobalAppInfo 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.4
+    hwSecStatMonSmtpSessions OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of SMTP sessions in the system currently."
+        ::= { hwSecStatMonitorGlobalAppInfo 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.5
+    hwSecStatMonRcvSmtpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of SMTP packets received by system."
+        ::= { hwSecStatMonitorGlobalAppInfo 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.6
+    hwSecStatMonRcvSmtpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of SMTP packets received by system."
+        ::= { hwSecStatMonitorGlobalAppInfo 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.7
+    hwSecStatMonHttpSessions OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of HTTP sessions in the system currently."
+        ::= { hwSecStatMonitorGlobalAppInfo 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.8
+    hwSecStatMonRcvHttpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of HTTP packets received by system."
+        ::= { hwSecStatMonitorGlobalAppInfo 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.9
+    hwSecStatMonRcvHttpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of HTTP packets received by system."
+        ::= { hwSecStatMonitorGlobalAppInfo 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.10
+    hwSecStatMonH323Sessions OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of H323 sessions in the system currently."
+        ::= { hwSecStatMonitorGlobalAppInfo 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.11
+    hwSecStatMonRcvH323Pkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of H323 packets received by system."
+        ::= { hwSecStatMonitorGlobalAppInfo 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.12
+    hwSecStatMonRcvH323Octs OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of H323 packets received by system."
+        ::= { hwSecStatMonitorGlobalAppInfo 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.13
+    hwSecStatMonRtspSessions OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of RTSP sessions in the system currently."
+        ::= { hwSecStatMonitorGlobalAppInfo 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.14
+    hwSecStatMonRcvRtspPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of RTSP packets received by system."
+        ::= { hwSecStatMonitorGlobalAppInfo 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.15
+    hwSecStatMonRcvRtspOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of RTSP packets received by system."
+        ::= { hwSecStatMonitorGlobalAppInfo 15 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.16
+    hwSecStatMonJavaAtckNum OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of JAVA attack detected by system."
+        ::= { hwSecStatMonitorGlobalAppInfo 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.2.17
+    hwSecStatClearGlobalAppInfo OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Use this OID to clear the global application statistics information.
+            When you want to clear the information, set this OID to 1.
+            "
+        ::= { hwSecStatMonitorGlobalAppInfo 17 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3
+    hwSecStatMonitorGlobalDrop OBJECT IDENTIFIER ::= { hwSecStatMonitorObjects 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.1
+    hwSecStatNoSessTblPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped for no session."
+        ::= { hwSecStatMonitorGlobalDrop 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.2
+    hwSecStatNoSessTblOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of packets dropped for no session."
+        ::= { hwSecStatMonitorGlobalDrop 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.3
+    hwSecStatSeqErrPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped for sequence number error."
+        ::= { hwSecStatMonitorGlobalDrop 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.4
+    hwSecStatSeqErrOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of packets dropped for sequence number error."
+        ::= { hwSecStatMonitorGlobalDrop 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.5
+    hwSecStatAclDenyNonIcmpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of non ICMP packets denied for acl rule."
+        ::= { hwSecStatMonitorGlobalDrop 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.6
+    hwSecStatAclDenyNonIcmpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of non ICMP packets denied for acl rule."
+        ::= { hwSecStatMonitorGlobalDrop 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.7
+    hwSecStatAclDenyIcmpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of ICMP packets denied by acl rule."
+        ::= { hwSecStatMonitorGlobalDrop 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.8
+    hwSecStatAclDenyIcmpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of ICMP packets denied by acl rule."
+        ::= { hwSecStatMonitorGlobalDrop 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.9
+    hwSecStatBlsDenyPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets denied by blacklist."
+        ::= { hwSecStatMonitorGlobalDrop 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.10
+    hwSecStatBlsDenyOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of packets denied by blacklist."
+        ::= { hwSecStatMonitorGlobalDrop 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.11
+    hwSecStatIcmpFloodDropPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to ICMP Flood attack."
+        ::= { hwSecStatMonitorGlobalDrop 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.12
+    hwSecStatIcmpFloodDropOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of packets dropped due to ICMP Flood attack."
+        ::= { hwSecStatMonitorGlobalDrop 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.13
+    hwSecStatUdpFloodDropPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to UDP Flood attack."
+        ::= { hwSecStatMonitorGlobalDrop 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.14
+    hwSecStatUdpFloodDropOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of packets dropped due to UDP Flood attack."
+        ::= { hwSecStatMonitorGlobalDrop 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.15
+    hwSecStatAlgDropPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped by application layer gateway."
+        ::= { hwSecStatMonitorGlobalDrop 15 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.16
+    hwSecStatAlgDropOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of packets dropped by application layer gateway."
+        ::= { hwSecStatMonitorGlobalDrop 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.17
+    hwSecStatIPVerErrDropPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped for IP version error."
+        ::= { hwSecStatMonitorGlobalDrop 17 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.18
+    hwSecStatIpCrcDropPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped for CRC error."
+        ::= { hwSecStatMonitorGlobalDrop 18 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.19
+    hwSecStatIpTTLDropPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped for TTL error."
+        ::= { hwSecStatMonitorGlobalDrop 19 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.20
+    hwSecStatProtoErrDropPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped for protocol error."
+        ::= { hwSecStatMonitorGlobalDrop 20 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.2.3.21
+    hwSecStatClearGlobalDropInfo OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Use this OID to clear the global dropped packets statistics information.
+            When you want to clear the information, set this OID to 1.
+            "
+        ::= { hwSecStatMonitorGlobalDrop 21 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.3
+    hwSecStatConformance OBJECT IDENTIFIER ::= { hwSECSTATCommon 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.3.1
+    hwSecStatCompliance OBJECT IDENTIFIER ::= { hwSecStatConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.3.2
+    hwSecStatMibGroups OBJECT IDENTIFIER ::= { hwSecStatConformance 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.3.2.1
+    hwSecStatGlobalCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            hwSecStatTcpPktScale, 
+            hwSecStatUdpPktScale, 
+            hwSecStatIcmpPktScale, 
+            hwSecStatAlteration, 
+            hwSecStatCalcTime, 
+            hwSecStatTcpSessNumMax, 
+            hwSecStatTcpSessNumMin, 
+            hwSecStatUdpSessNumMax, 
+            hwSecStatGlobalSessSetDefault,
+            hwSecStatIcmpSessNumMax,
+            hwSecStatIcmpSessNumMin,
+            hwSecStatTcpProxySessNumMax,
+            hwSecStatTcpProxySessNumMin,             
+            hwSecStatPktScaleSetDefault, 
+            hwSecStatUdpSessNumMin, 
+            hwSecStatGlobalStatEnable }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwSecStatMibGroups 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.1.3.2.2
+    hwSecStatGlobalMonitorGroup OBJECT-GROUP
+        OBJECTS { 
+            hwSecStatMonTotalSess, 
+            hwSecStatMonHalfConn, 
+            hwSecStatMonRcvIcmpPkts, 
+            hwSecStatMonRcvIcmpOcts, 
+            hwSecStatMonRcvTcpPkts, 
+            hwSecStatMonRcvTcpOcts, 
+            hwSecStatMonRcvUdpPkts, 
+            hwSecStatMonRcvUdpOcts, 
+            hwSecStatMonRcvEtcPkts, 
+            hwSecStatMonRcvEtcOcts, 
+            hwSecStatMonPassIcmpPkts, 
+            hwSecStatMonPassIcmpOcts, 
+            hwSecStatMonPassTcpPkts, 
+            hwSecStatMonPassTcpOcts, 
+            hwSecStatMonPassUdpPkts, 
+            hwSecStatMonPassUdpOcts, 
+            hwSecStatMonPassEtcPkts, 
+            hwSecStatMonPassEtcOcts, 
+            hwSecStatMonSynPkts, 
+            hwSecStatMonFinPkts, 
+            hwSecStatMonSynAckPkts, 
+            hwSecStatMonRstPkts, 
+            hwSecStatMonRcvFragPkts, 
+            hwSecStatMonRcvFragOcts, 
+            hwSecStatMonFtpSessions, 
+            hwSecStatMonRcvFtpPkts, 
+            hwSecStatMonRcvFtpOcts, 
+            hwSecStatMonSmtpSessions, 
+            hwSecStatMonRcvSmtpPkts, 
+            hwSecStatMonRcvSmtpOcts, 
+            hwSecStatMonHttpSessions, 
+            hwSecStatMonRcvHttpPkts, 
+            hwSecStatMonRcvHttpOcts, 
+            hwSecStatMonH323Sessions, 
+            hwSecStatMonRcvH323Pkts, 
+            hwSecStatMonRcvH323Octs, 
+            hwSecStatMonRtspSessions, 
+            hwSecStatMonRcvRtspPkts, 
+            hwSecStatMonRcvRtspOcts, 
+            hwSecStatMonJavaAtckNum, 
+            hwSecStatNoSessTblPkts, 
+            hwSecStatNoSessTblOcts, 
+            hwSecStatSeqErrPkts, 
+            hwSecStatSeqErrOcts, 
+            hwSecStatIcmpFloodDropPkts, 
+            hwSecStatIcmpFloodDropOcts, 
+            hwSecStatUdpFloodDropPkts, 
+            hwSecStatUdpFloodDropOcts, 
+            hwSecStatAlgDropPkts, 
+            hwSecStatAlgDropOcts, 
+            hwSecStatIPVerErrDropPkts, 
+            hwSecStatIpCrcDropPkts, 
+            hwSecStatIpTTLDropPkts, 
+            hwSecStatMonCurSessSpeed, 
+            hwSecStatMonPeakSessSpeed, 
+            hwSecStatMonTotalBootConnNum, 
+            hwSecStatProtoErrDropPkts, 
+            hwSecStatAclDenyNonIcmpPkts, 
+            hwSecStatAclDenyNonIcmpOcts, 
+            hwSecStatAclDenyIcmpPkts, 
+            hwSecStatAclDenyIcmpOcts, 
+            hwSecStatBlsDenyPkts, 
+            hwSecStatClearGlobalDropInfo, 
+            hwSecStatClearGlobalAppInfo, 
+            hwSecStatClearGlobalSessFlowInfo, 
+            hwSecStatBlsDenyOcts, 
+            hwSecStatMonTcpSess, 
+            hwSecStatMonUdpSess, 
+            hwSecStatMonIcmpSess, 
+            hwSecStatMonSvrMapTblNum, 
+            hwSecStatFragTblNum, 
+            hwSecStatMonAllPkts, 
+            hwSecStatMonAllOcts }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwSecStatMibGroups 2 }
+
+END

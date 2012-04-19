@@ -1,0 +1,269 @@
+ENTERASYS-MAU-MIB-EXT-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-mau-mib-ext-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' MAU MIB Extensions functionality.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright (2005-2006) Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifMauIfIndex
+        FROM MAU-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysMauMibExtMIB MODULE-IDENTITY
+    LAST-UPDATED "200605091130Z"  -- Tue May  9 11:30 GMT 2006
+    ORGANIZATION "Enterasys Networks, Inc."
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         the Enterasys Networks enterprise OID that provide
+         extensions to the industry standard MAU-MIB."
+
+    REVISION "200605091130Z"  -- Tue May  9 11:30 GMT 2006
+    DESCRIPTION
+        "Deprecated etsysIfMauExtMasterSlaveTable,
+         etsysMauMibExtMasterSlaveGroup, and
+         etsysMauMibExtMasterSlaveCompliance."
+
+    REVISION "200602161918Z"  -- Thu Feb 16 19:18 GMT 2006
+    DESCRIPTION
+        "Added etsysIfMauExtMasterSlaveTable to allow the manual 
+         configuration of the master/slave of the MAU."
+
+    REVISION "200502071505Z"  -- Mon Feb  7 15:05 GMT 2005
+    DESCRIPTION
+        "The initial version of this MIB module."
+    ::= { etsysModules 59 } 
+
+
+-- -------------------------------------------------------------
+-- MIB Objects
+-- -------------------------------------------------------------
+
+etsysMauMibExtObjects           OBJECT IDENTIFIER 
+                                   ::= { etsysMauMibExtMIB 1 }
+
+etsysMauMibExtBasic             OBJECT IDENTIFIER 
+                                   ::= { etsysMauMibExtObjects 1 }
+
+
+-- -------------------------------------------------------------
+-- The MAU MIB Extension Basic Group
+-- -------------------------------------------------------------
+
+-- The MAU MIB Extension MDIX Table
+
+etsysIfMauExtMDIXTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysIfMauExtMDIXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of management information used to control the MDI
+         crossover and extend the base ifMauTable defined in
+         RFC3636."
+    ::= { etsysMauMibExtBasic 1 }
+
+etsysIfMauExtMDIXEntry OBJECT-TYPE
+    SYNTAX      EtsysIfMauExtMDIXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the table containing MDI crossover management
+         information per MAU interface."
+    REFERENCE
+        "RFC 3636, 'Definitions of Managed Objects for IEEE 802.3
+         Medium Attachment Units (MAUs)'"
+    INDEX { ifMauIfIndex }
+    ::= { etsysIfMauExtMDIXTable 1 }
+
+EtsysIfMauExtMDIXEntry ::=
+    SEQUENCE { 
+        etsysIfMauExtMDIXStatus        
+            INTEGER
+    }
+
+etsysIfMauExtMDIXStatus OBJECT-TYPE
+    SYNTAX       INTEGER { 
+                   auto     (1), 
+                   mdix     (2),
+                   mdi      (3)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value of this object determines the MDI crossover state
+         of the port.  A value of auto(1) enables the port to
+         automatically detect and activate the appropriate rx/tx
+         crossover configuration.  A value of mdix(2) will force
+         the port to operate as a MDIX port, which is the standard
+         wiring configuration for a switch port.  A value of mdi(3)
+         will force the port to operate as a MDI port, with no
+         internal rx/tx crossover.  This object is independent of
+         and not affected by auto-negotiation setting."
+    DEFVAL      { auto }
+
+    ::= { etsysIfMauExtMDIXEntry 1 }
+
+-- The MAU MIB Extension Master/Slave Table
+
+etsysIfMauExtMasterSlaveTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysIfMauExtMasterSlaveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "********* THIS TABLE IS DEPRECATED **********
+
+         A table of management information used to control the
+         master/slave configuration and extend the base ifMauTable
+         defined in RFC3636."
+    ::= { etsysMauMibExtBasic 2 }
+
+etsysIfMauExtMasterSlaveEntry OBJECT-TYPE
+    SYNTAX      EtsysIfMauExtMasterSlaveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "An entry in the table containing master/slave management
+         information per MAU interface."
+    REFERENCE
+        "RFC 3636, 'Definitions of Managed Objects for IEEE 802.3
+         Medium Attachment Units (MAUs)'"
+    INDEX { ifMauIfIndex }
+    ::= { etsysIfMauExtMasterSlaveTable 1 }
+
+EtsysIfMauExtMasterSlaveEntry ::=
+    SEQUENCE {
+        etsysIfMauExtMasterSlaveStatus
+            INTEGER
+    }
+
+etsysIfMauExtMasterSlaveStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+                   master   (1),
+                   slave    (2)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       deprecated
+    DESCRIPTION
+        "If auto-negotiation is not enabled, the value of this object
+         determines the master/slave state for this MAU.  A value of
+         master(1) will force the port to operate as a master.
+         A value of slave(2) will force the port to operate as a slave."
+
+    DEFVAL      { slave }
+
+    ::= { etsysIfMauExtMasterSlaveEntry 1 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysMauMibExtConformance
+    OBJECT IDENTIFIER ::= { etsysMauMibExtMIB 2 }
+
+etsysMauMibExtGroups
+    OBJECT IDENTIFIER ::= { etsysMauMibExtConformance 1 }
+
+etsysMauMibExtCompliances
+    OBJECT IDENTIFIER ::= { etsysMauMibExtConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysMauMibExtMDIXGroup OBJECT-GROUP
+    OBJECTS {
+        etsysIfMauExtMDIXStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group that controls the MDI transmit and receive pairs
+         crossover for a given MAU interface."
+    ::= { etsysMauMibExtGroups 1 }
+
+etsysMauMibExtMasterSlaveGroup OBJECT-GROUP
+    OBJECTS {
+        etsysIfMauExtMasterSlaveStatus
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "******** THIS CONFORMANCE IS DEPRECATED ********
+
+         The group that controls the master/slave configuration
+         for a given MAU interface."
+    ::= { etsysMauMibExtGroups 2 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysMauMibExtMDIXCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         MDI crossover functionality for MAU interfaces."
+
+    MODULE
+        GROUP       etsysMauMibExtMDIXGroup
+        DESCRIPTION
+            "This group is mandatory for all devices that support
+             MDI crossover controls for a given MAU interface."
+    ::= { etsysMauMibExtCompliances 1 }
+
+etsysMauMibExtMasterSlaveCompliance MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "******** THIS COMPLIANCE IS DEPRECATED ********
+
+         The compliance statement for devices that support the
+         master/slave configuration functionality for MAU interfaces."
+
+    MODULE
+        GROUP       etsysMauMibExtMasterSlaveGroup
+        DESCRIPTION
+            "This group is mandatory for all devices that support
+             master/slave controls for a given MAU interface."
+    ::= { etsysMauMibExtCompliances 2 }
+
+END

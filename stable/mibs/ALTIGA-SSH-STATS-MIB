@@ -1,0 +1,287 @@
+-- *------------------------------------------------------------------
+-- * ALTIGA-SSH-STATS-MIB.my:  Altiga SSH Statistics MIB.
+-- *
+-- * Altiga Networks was acquired by Cisco Systems on March 29, 2000
+-- *
+-- * Copyright (c) 2002 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+
+ALTIGA-SSH-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Unsigned32, IpAddress,
+          Integer32, TimeTicks
+         FROM SNMPv2-SMI
+      DisplayString
+         FROM SNMPv2-TC
+      EncryptionAlgorithm
+              FROM ALTIGA-SESSION-STATS-MIB
+      OBJECT-GROUP, MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+      alStatsSsh, alSshGroup
+         FROM ALTIGA-MIB
+      alSshMibModule
+         FROM ALTIGA-GLOBAL-REG;
+
+   altigaSshStatsMibModule MODULE-IDENTITY
+      LAST-UPDATED   "200209051300Z"
+      ORGANIZATION   "Cisco Systems, Inc."
+      CONTACT-INFO
+         "Cisco Systems
+          170 W Tasman Drive
+          San Jose, CA  95134
+          USA
+
+          Tel: +1 800 553-NETS
+          E-mail: cs-cvpn3000@cisco.com"
+
+      DESCRIPTION
+         "The Altiga SSH Statistics MIB models counters and objects that are
+          of management interest for SSH.
+         
+          Acronyms
+          The following acronyms are used in this document:
+
+            MIB:        Management Information Base
+
+            SSH:        Secure Shell
+
+         "
+
+        REVISION "200209051300Z"
+        DESCRIPTION
+                "Added module compliance."
+
+        REVISION "200207100000Z"
+        DESCRIPTION
+                "Updated with new header"
+
+      ::= { alSshMibModule 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+alStatsSshGlobal  OBJECT IDENTIFIER ::= { alStatsSsh 1 }
+
+alSshStatsOctetsSent    OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The number of octets sent."
+   ::= { alStatsSshGlobal 1 }
+
+alSshStatsOctetsRcvd    OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The number of octets received."
+   ::= { alStatsSshGlobal 2 }
+
+alSshStatsPacketsSent      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The number of packets."
+   ::= { alStatsSshGlobal 3 }
+
+alSshStatsPacketsRcvd      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The number of packets received."
+   ::= { alStatsSshGlobal 4 }
+
+alSshStatsTotalSessions    OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The total number of SSH sessions established."
+   ::= { alStatsSshGlobal 5 }
+
+alSshStatsActiveSessions   OBJECT-TYPE
+   SYNTAX         Gauge32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The number of active sessions."
+   ::= { alStatsSshGlobal 6 }
+
+alSshStatsMaxSessions      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The maximum number of active sessions that existed at one any time."
+   ::= { alStatsSshGlobal 7 }
+
+
+alSshStatsSessionTable     OBJECT-TYPE
+   SYNTAX         SEQUENCE OF AlSshStatsSessionEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+          "List of active HTTP sessions."
+   ::= { alStatsSsh 2 }
+
+alSshStatsSessionEntry        OBJECT-TYPE
+   SYNTAX         AlSshStatsSessionEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+          "An entry in the alSshStatsSessionTable."
+   INDEX       { alSshStatsSessionIndex }
+   ::= { alSshStatsSessionTable 1 }
+
+AlSshStatsSessionEntry ::= SEQUENCE {
+   alSshStatsSessionIndex           Integer32,
+   alSshStatsSessionName            DisplayString,
+   alSshStatsSessionIpAddr          IpAddress,
+   alSshStatsSessionPort            Unsigned32,
+   alSshStatsSessionStartTime       TimeTicks,
+   alSshStatsSessionLoginTime       Unsigned32,
+   alSshStatsSessionEncr            EncryptionAlgorithm,
+   alSshStatsSessionOctetsSent      Counter32,
+   alSshStatsSessionOctetsRcvd      Counter32,
+   alSshStatsSessionPacketsSent     Counter32,
+   alSshStatsSessionPacketsRcvd     Counter32
+}
+
+alSshStatsSessionIndex     OBJECT-TYPE
+   SYNTAX         Integer32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "Index of this session."
+   ::= { alSshStatsSessionEntry 1 }
+   
+alSshStatsSessionName      OBJECT-TYPE
+   SYNTAX         DisplayString
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "Name of the administrator using this session."
+   ::= { alSshStatsSessionEntry 2 }
+   
+alSshStatsSessionIpAddr OBJECT-TYPE
+   SYNTAX         IpAddress
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "Remote IP address of this session.."
+   ::= { alSshStatsSessionEntry 3 }
+   
+alSshStatsSessionPort      OBJECT-TYPE
+   SYNTAX         Unsigned32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "Remote IP port address of this session.."
+   ::= { alSshStatsSessionEntry 4 }
+   
+alSshStatsSessionStartTime OBJECT-TYPE
+   SYNTAX         TimeTicks
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "Login time of this session."
+   ::= { alSshStatsSessionEntry 5 }
+   
+alSshStatsSessionLoginTime OBJECT-TYPE
+   SYNTAX         Unsigned32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "time_t value of the concentrator at the start of this session."
+   ::= { alSshStatsSessionEntry 6 }
+   
+alSshStatsSessionEncr      OBJECT-TYPE
+   SYNTAX         EncryptionAlgorithm
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The type of encryption algorithm used for this session."
+   ::= { alSshStatsSessionEntry 7 }
+   
+alSshStatsSessionOctetsSent   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "Number of octets sent during this session."
+   ::= { alSshStatsSessionEntry 8 }
+   
+alSshStatsSessionOctetsRcvd   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "Number of octets received during this session."
+   ::= { alSshStatsSessionEntry 9 }
+   
+alSshStatsSessionPacketsSent  OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "Number of packets sent during this session."
+   ::= { alSshStatsSessionEntry 10 }
+   
+alSshStatsSessionPacketsRcvd  OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "Number of packets received during this session."
+   ::= { alSshStatsSessionEntry 11 }
+   
+altigaSshStatsMibConformance OBJECT IDENTIFIER ::= { altigaSshStatsMibModule 1 }
+altigaSshStatsMibCompliances OBJECT IDENTIFIER ::= { altigaSshStatsMibConformance 1 }
+
+altigaSshStatsMibCompliance MODULE-COMPLIANCE
+   STATUS         current
+   DESCRIPTION
+      "The compliance statement for agents which 
+       implement the Altiga SSH Statistics MIB."
+   MODULE
+   MANDATORY-GROUPS { 
+      altigaSshStatsGroup
+   }
+   ::= { altigaSshStatsMibCompliances 1 }
+
+altigaSshStatsGroup OBJECT-GROUP
+   OBJECTS
+   {
+      alSshStatsOctetsSent,
+      alSshStatsOctetsRcvd,
+      alSshStatsPacketsSent,
+      alSshStatsPacketsRcvd,
+      alSshStatsTotalSessions,
+      alSshStatsActiveSessions,
+      alSshStatsMaxSessions,
+      alSshStatsSessionIndex,
+      alSshStatsSessionName,
+      alSshStatsSessionIpAddr,
+      alSshStatsSessionPort,
+      alSshStatsSessionStartTime,
+      alSshStatsSessionLoginTime,
+      alSshStatsSessionEncr,
+      alSshStatsSessionOctetsSent,
+      alSshStatsSessionOctetsRcvd,
+      alSshStatsSessionPacketsSent,
+      alSshStatsSessionPacketsRcvd
+   }
+   STATUS   current
+   DESCRIPTION
+          "The objects for SSH statistics."
+   ::= { alSshGroup 2 }
+
+END
+

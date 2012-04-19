@@ -1,0 +1,202 @@
+--
+-- Juniper Enterprise specific MIB: IDP MIB
+--
+-- Copyright (c) 2006-2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+
+    JUNIPER-JS-IDP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Unsigned32, Integer32,
+        NOTIFICATION-TYPE, TimeTicks, Counter32
+        FROM SNMPv2-SMI
+        DisplayString
+        FROM SNMPv2-TC
+        jnxJsIdpRoot
+        FROM JUNIPER-JS-SMI;
+
+    jnxJsIdpMIB MODULE-IDENTITY
+        LAST-UPDATED "200706132153Z" -- Wed Jun 13 21:53:50 2007UTC
+        ORGANIZATION "Juniper Networks, Inc."
+        CONTACT-INFO
+               " Juniper Technical Assistance Center
+                 Juniper Networks, Inc.
+                 1194 N. Mathilda Avenue
+                 Sunnyvale, CA 94089
+                 E-mail: support@juniper.net"
+
+        DESCRIPTION
+                "This is Juniper Networks' implementation of enterprise
+                 specific MIB for IDP."
+    
+        ::= {jnxJsIdpRoot 1}
+
+    jnxJsIdpObjects OBJECT IDENTIFIER ::= { jnxJsIdpMIB 1 }
+
+    jnxJsIdpDataPlaneMemoryUsage OBJECT-TYPE
+        SYNTAX  Unsigned32
+        UNITS   "percent"
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Memory used by IDP in the data plane in percentage"
+    
+    ::= { jnxJsIdpObjects 1}
+
+    jnxJsIdpSessionsUsage OBJECT-TYPE
+        SYNTAX  Unsigned32
+        UNITS   "percent"
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Currently allocated sessions by IDP in percentage"
+    
+    ::= { jnxJsIdpObjects 2}
+
+    jnxJsIdpSessionsMaximum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Maximum number of sessions supported by IDP"
+    ::= { jnxJsIdpObjects 3 }
+
+    jnxJsIdpPoliciesSupported OBJECT-TYPE
+        SYNTAX      Gauge32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of policies that can be simultaneously loaded on the IDP device"
+    ::= { jnxJsIdpObjects 4}
+
+    jnxJsIdpPoliciesLoaded OBJECT-TYPE
+        SYNTAX      Gauge32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of policies that are currently loaded on the IDP device"
+    ::= { jnxJsIdpObjects 5}
+
+    jnxJsIdpActivePolicyName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the policy currently active on the device"
+    ::= { jnxJsIdpObjects 6 }
+
+    jnxJsIdpAttackTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxJsIdpAttackEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The attack table giving details of the attack and
+	         the number of hits"
+    ::= { jnxJsIdpObjects 7 }
+
+    jnxJsIdpAttackEntry OBJECT-TYPE
+        SYNTAX      JnxJsIdpAttackEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Attributes of an attack"
+        INDEX { jnxJsIdpAttackIndex }
+    ::= { jnxJsIdpAttackTable 1 }
+
+    JnxJsIdpAttackEntry ::= SEQUENCE {
+        jnxJsIdpAttackIndex Unsigned32,
+        jnxJsIdpAttackName  DisplayString,
+        jnxJsIdpAttackHits  Counter32
+    }
+
+    jnxJsIdpAttackIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index for the attack table"
+    ::= { jnxJsIdpAttackEntry 1 }
+
+    jnxJsIdpAttackName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The name of an attack identified by IDP"
+    ::= { jnxJsIdpAttackEntry 2 }
+
+    jnxJsIdpAttackHits OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "Number of times an attack has been hit"
+    ::= { jnxJsIdpAttackEntry 3 }
+
+    jnxJsIdpNotifications OBJECT IDENTIFIER ::= { jnxJsIdpMIB 2 }
+
+    jnxJsIdpNotificationPrefix OBJECT IDENTIFIER ::= { jnxJsIdpNotifications 0 }
+
+    jnxJsIdpRunningDetectorVersion OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The version of the detector currently loaded"
+    ::= { jnxJsIdpObjects 8 }
+
+    jnxJsIdpSecurityPackageVersion OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The version of the security package currently loaded"
+    ::= { jnxJsIdpObjects 9 }
+
+    jnxJsIdpLastSignatureUpdateTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The value of sysUpTime when the signature was last updated
+             successfully. Zero if unknown."
+    ::= { jnxJsIdpObjects 10 }
+
+    jnxJsIdpSignatureUpdateStatus OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The status of the signature update i.e. success or failure"
+    ::= { jnxJsIdpObjects 11 }
+
+    jnxJsIdpSignatureUpdate NOTIFICATION-TYPE
+        OBJECTS {jnxJsIdpRunningDetectorVersion,
+                 jnxJsIdpSecurityPackageVersion,
+                 jnxJsIdpLastSignatureUpdateTime,
+                 jnxJsIdpSignatureUpdateStatus}
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that a signature update has occurred."
+    ::= { jnxJsIdpNotificationPrefix 1 }
+
+    jnxJsIdpAttackLog NOTIFICATION-TYPE
+        OBJECTS {jnxJsIdpAttackName,
+                 jnxJsIdpAttackHits}
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that attacks have been detected.
+            
+            jnxJsIdpAttackName is the name of the attacks that have been
+            detected so far and
+            jnxJsIdpAttackHits is the number of times each attack has
+            been detected."
+    ::= { jnxJsIdpNotificationPrefix 2 }
+
+END
+

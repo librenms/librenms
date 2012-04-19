@@ -1,0 +1,184 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2002-2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-L2ALD-MIB DEFINITIONS ::=BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, 
+      NOTIFICATION-TYPE, Unsigned32                                 
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      ifIndex, ifDescr
+        FROM IF-MIB 
+      jnxl2aldMibRoot
+        FROM JUNIPER-SMI
+    ;
+    
+    jnxl2aldMib MODULE-IDENTITY
+       LAST-UPDATED "200702151000Z" -- Thursday February 15 10:00:00 2007 UTC
+       ORGANIZATION "Juniper Networks, Inc."
+       CONTACT-INFO
+              "        Juniper Technical Assistance Center
+                       Juniper Networks, Inc.
+                       1194 N. Mathilda Avenue
+                       Sunnyvale, CA 94089
+                       E-mail: support@juniper.net"
+       DESCRIPTION
+              "The MIB modules for L2ALD traps"
+    ::= { jnxl2aldMibRoot 1 }
+
+    jnxl2aldNotification OBJECT IDENTIFIER ::= { jnxl2aldMib 0 }
+
+    jnxl2aldObjects OBJECT IDENTIFIER ::= { jnxl2aldMib 1 }
+    
+    jnxl2aldInterfaceTable  OBJECT-TYPE
+        SYNTAX             SEQUENCE OF Jnxl2aldEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION 
+              "L2ALD objects for interface MAC limit."  
+    ::= { jnxl2aldObjects 1 }
+    
+    jnxl2aldEntry    OBJECT-TYPE
+        SYNTAX       Jnxl2aldEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  
+              "An entry in l2aldInterfaceTable."
+    INDEX { ifIndex }          
+    ::= { jnxl2aldInterfaceTable 1 }          
+
+    Jnxl2aldEntry ::= 
+       SEQUENCE {
+          jnxl2aldIntfLogicalRouter  DisplayString,
+          jnxl2aldIntfRoutingInst    DisplayString,
+          jnxl2aldIntfBridgeDomain   DisplayString,
+          jnxl2aldIntfMacLimit       Unsigned32
+    }   
+ 
+-- Entry definitions for the table above
+ 
+    jnxl2aldIntfLogicalRouter OBJECT-TYPE
+        SYNTAX                DisplayString
+        MAX-ACCESS            accessible-for-notify
+        STATUS                current
+        DESCRIPTION
+              "The logical router string for interface table."
+    ::= { jnxl2aldEntry 1 }
+
+    jnxl2aldIntfRoutingInst OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          accessible-for-notify
+        STATUS              current
+        DESCRIPTION  
+             "The routing instance string for interface table."
+    ::= { jnxl2aldEntry 2 }
+    
+    jnxl2aldIntfBridgeDomain OBJECT-TYPE
+        SYNTAX               DisplayString
+        MAX-ACCESS           accessible-for-notify
+        STATUS               current
+        DESCRIPTION
+              "The bridge domain string for interface table."
+    ::= { jnxl2aldEntry 3 } 
+
+    jnxl2aldIntfMacLimit OBJECT-TYPE
+        SYNTAX           Unsigned32
+        MAX-ACCESS       accessible-for-notify
+        STATUS           current
+        DESCRIPTION
+             "The MAC limit count for the interface table."
+    ::= { jnxl2aldEntry 4 }
+
+
+-- Objects defined below are scalar and for a different trap 
+-- they are different then the table definitions above
+
+    jnxl2aldRoutingInst OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     
+              "The Routing instance string for routing mac limit trap." 
+    ::= { jnxl2aldObjects 2 }
+
+    jnxl2aldBridgeDomain OBJECT-TYPE
+        SYNTAX           DisplayString
+        MAX-ACCESS       accessible-for-notify
+        STATUS           current
+        DESCRIPTION      
+              "The bridge domain string for routing mac limit trap."
+    ::= { jnxl2aldObjects 3 }
+
+    jnxl2aldLogicalRouter OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        accessible-for-notify
+        STATUS            current
+        DESCRIPTION 
+             "The logical router string for routing mac limit trap."
+    ::= { jnxl2aldObjects 4 }
+
+    jnxl2aldMacLimit     OBJECT-TYPE
+       SYNTAX            Unsigned32
+       MAX-ACCESS        accessible-for-notify
+       STATUS            current
+       DESCRIPTION
+              "The mac limit count for routing instance."
+    ::= { jnxl2aldObjects 5 }          
+
+    jnxl2aldGbMacLimit OBJECT-TYPE
+       SYNTAX              Unsigned32
+       MAX-ACCESS          accessible-for-notify
+       STATUS              current
+       DESCRIPTION
+              "The mac limit count for the system."
+    ::= { jnxl2aldObjects 6 }
+
+-- Trap definitions
+
+    jnxl2aldRoutingInstMacLimit NOTIFICATION-TYPE
+        OBJECTS    { jnxl2aldLogicalRouter,
+                     jnxl2aldRoutingInst,
+                     jnxl2aldBridgeDomain,
+                     jnxl2aldMacLimit
+        }
+        STATUS     current
+        DESCRIPTION
+                 "This notification is generated when the MAC limit for
+                  given routing instance (jnxl2aldRoutingInst) is reached. 
+                  This trap is send only once we exceed the limit value."
+    ::= { jnxl2aldNotification 1 }          
+                  
+    jnxl2aldInterfaceMacLimit NOTIFICATION-TYPE
+        OBJECTS    { jnxl2aldIntfLogicalRouter, 
+                     jnxl2aldIntfRoutingInst,
+                     jnxl2aldIntfBridgeDomain,
+                     ifDescr,
+                     jnxl2aldIntfMacLimit
+        }
+        STATUS     current
+        DESCRIPTION
+                 "This notification is generated when the MAC limit for 
+                  the given physical interface (jnxl2aldInterfaceMacLimit) is reached.
+                  This trap is send only once we exceed the limit value."
+    ::= { jnxl2aldNotification 2 }
+
+    jnxl2aldGlobalMacLimit NOTIFICATION-TYPE
+         OBJECTS   {  jnxl2aldGbMacLimit 
+         }
+         STATUS   current
+         DESCRIPTION
+                 "This notification is generated when the MAC limit for
+                  the entire system is reached.
+                  This trap is send only once we exceed the limit value."
+     ::= { jnxl2aldNotification 3 }
+
+END
+

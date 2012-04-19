@@ -1,0 +1,147 @@
+TRAP-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-trap-mib.txt
+        --  Revision: 1.01.03
+        --  Part Number:  2170572
+        --  Date: October 29, 1997
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific Trap Table MIB.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright November 95 Cabletron Systems
+
+
+        IMPORTS 
+                IpAddress
+                        FROM RFC1155-SMI
+                ctTrapTable
+                        FROM CTRON-MIB-NAMES
+                OBJECT-TYPE
+                        FROM RFC-1212; 
+
+        trap                  OBJECT IDENTIFIER ::= { ctTrapTable 1 }
+
+
+        trapTable  OBJECT-TYPE 
+            SYNTAX  SEQUENCE OF TrapEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This table houses information for transmitting traps.
+                    This table is not associated with trivial
+                    authentication."
+            ::= { trap 1 }
+
+        trapEntry  OBJECT-TYPE 
+            SYNTAX  TrapEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Each entry contains a community name for the SNMP trap
+                    PDU, network addresses of who receives traps from this
+                    device and a trap status of Enable or Disable."
+            INDEX   { trapIndex }
+            ::= { trapTable 1 }
+
+        TrapEntry ::=
+            SEQUENCE { 
+                trapIndex
+                    INTEGER,
+                trapCommunityName
+                    OCTET STRING,
+                trapStatus
+                    INTEGER,
+                trapIPAddr
+                    IpAddress,
+                trapSrcParty
+                    OBJECT IDENTIFIER,
+                trapDstParty
+                    OBJECT IDENTIFIER
+            }
+
+        trapIndex  OBJECT-TYPE 
+            SYNTAX  INTEGER (0..32)
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "A unique value for each trap entry that indexes the
+                    table."
+            ::= { trapEntry 1 }
+
+        trapCommunityName  OBJECT-TYPE 
+            SYNTAX  OCTET STRING (SIZE (0..32))
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION  
+                    "The community name that will be used within the SNMP
+                    trap PDU."
+            ::= { trapEntry 2 }
+
+        trapStatus  OBJECT-TYPE 
+            SYNTAX  INTEGER {
+                        trapsDisabled (1),
+                        trapsEnabled (2)
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This object is checked to determine if traps should be
+                    sent to the corresponding network address associated
+                    with it."
+            ::= { trapEntry 3 }
+
+        trapIPAddr  OBJECT-TYPE 
+            SYNTAX  IpAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION  
+                    "The network address of the device that will receive
+                    traps from this agent."
+            ::= { trapEntry 4 }
+
+        trapSrcParty  OBJECT-TYPE 
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This object administratively defines operations of the
+                    source SNMP protocol entity.  When processing a
+                    SNMP message, the entity acts as a SNMP party."
+            ::= { trapEntry 5 }
+
+        trapDstParty  OBJECT-TYPE 
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This object administratively defines operations of the
+                    destination SNMP protocol entity.  When processing a
+                    SNMP message, the entity acts as a SNMP party."
+            ::= { trapEntry 6 }
+
+END 

@@ -1,0 +1,133 @@
+
+RAPID-CITY-BAY-STACK DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE,
+        OBJECT-TYPE,
+        IpAddress             FROM SNMPv2-SMI
+        rcBayStack            FROM RAPID-CITY
+        rcMltId               FROM RC-MLT-MIB; 
+
+rcBayStackMIB MODULE-IDENTITY
+       LAST-UPDATED         "200409290000Z"
+       ORGANIZATION         "Nortel Networks"
+       CONTACT-INFO         "
+                                         
+                         Postal:       Nortel Networks 
+                                       4401 Great America Parkway 
+                                       Santa Clara, CA 95052-8185 
+
+                            Tel: 
+                            Fax:  
+                         E-mail:         
+                        "
+       DESCRIPTION         "BayStack specific portion of RAPID-CITY-MIB."
+
+       REVISION "200409290000Z" -- 29 September 2004
+       DESCRIPTION "Version 6: Fixed IMPORTS, RAPID-CITY-MIB to RAPID-CITY"
+
+       REVISION "200407200000Z" -- 20 July 2004
+       DESCRIPTION "Version 5: Added version info"
+
+       ::= { rcBayStack 1 }
+
+rcBayStackObjects   OBJECT IDENTIFIER ::= { rcBayStackMIB 1 }
+rcBayStackTraps     OBJECT IDENTIFIER ::= { rcBayStackMIB 21 }
+rcBayStackTraps0    OBJECT IDENTIFIER ::= { rcBayStackTraps 0 }
+
+--
+-- Extensions to the rcTftp group
+--
+
+rcBayStackTftpExt   OBJECT IDENTIFIER ::= { rcBayStackObjects 1 }
+
+rcBayStackTftpAction OBJECT-TYPE
+       SYNTAX      INTEGER {
+                       none(1),
+                       downloadSshPublicKeys(2),
+                       deleteSshDsaAuthKey(3)
+                   }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "This object may be set to initiate a TFTP download of
+                    SSH public keys.  When retrieved, the value will always
+                    be none(1)."
+       ::= { rcBayStackTftpExt 1 }
+
+--
+-- SSH Session Table
+--
+ 
+rcBayStackSshSessionTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF RcBayStackSshSessionEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Table describing the SSH sessions"
+        ::= { rcBayStackObjects 2 }
+ 
+rcBayStackSshSessionEntry OBJECT-TYPE
+        SYNTAX        RcBayStackSshSessionEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "An entry describing an SSH session."
+        INDEX         { rcBayStackSshSessionId }
+        ::= { rcBayStackSshSessionTable 1 }
+ 
+RcBayStackSshSessionEntry ::=
+        SEQUENCE {
+                rcBayStackSshSessionId INTEGER,
+                rcBayStackSshSessionIp IpAddress
+        }
+ 
+rcBayStackSshSessionId OBJECT-TYPE
+        SYNTAX        INTEGER (1..8)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Session ID"
+        ::= { rcBayStackSshSessionEntry 1 }
+ 
+rcBayStackSshSessionIp OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "IP address of SSH client that opened the session."
+        ::= { rcBayStackSshSessionEntry 2 }
+
+--
+-- Extensions to the rcSsh group
+--
+
+rcBayStackSshExt   OBJECT IDENTIFIER ::= { rcBayStackObjects 3 }
+
+rcBayStackSshDsaHostKeyStatus OBJECT-TYPE
+       SYNTAX      INTEGER {
+                       notGenerated(1),
+                       generated(2),
+                       generating(3)
+                   }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "This object indicates the current status of the SSH
+                    DSA host key.  If the DSA host key has not yet been
+                    generated, the value will be notGenerated(1).  If it
+                    has already been generated, the value will be
+                    generated(2).  If it is currently being generated,
+                    the value will be generating(3)."
+       ::= { rcBayStackSshExt 1 }
+
+--
+-- NOTIFICATIONS
+--
+
+rcMltConfigError NOTIFICATION-TYPE
+        OBJECTS       { rcMltId }
+        STATUS        current
+        DESCRIPTION   "An rcMltConfigError trap indicates that one of the
+                       ports in a multi-link trunk was connected to a remote
+                       port that was not also configured as a trunk.  The
+                       trap indicates that the specified trunk has also been
+                       automatically disabled." 
+        ::= { rcBayStackTraps0 1 }
+
+END

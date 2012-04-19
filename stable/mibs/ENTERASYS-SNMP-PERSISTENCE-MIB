@@ -1,0 +1,265 @@
+ENTERASYS-SNMP-PERSISTENCE-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-snmp-persistence-mib.txt
+--
+--  Part Number: <TBD>
+--
+--
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' SNMP persistence MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  This MIB is based upon the Storage Type MIB, an IETF Internet
+--  Draft, dated June 21, 2001 with Juergen Schoenwaelder listed as
+--  the author.
+
+--  Copyright (C) The Internet Society (2001).  All Rights Reserved.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysSnmpPersistenceMIB MODULE-IDENTITY
+    LAST-UPDATED "200209092022Z"  -- Mon Sep  9 20:22 GMT 2002
+    ORGANIZATION "Enterasys Networks Inc"
+    CONTACT-INFO
+    "Postal: Enterasys Networks
+             35 Industrial Way, P.O. Box 5005
+             Rochester, NH 03867-0505
+
+     Phone:  +1 603 332 9400
+     E-mail: support@enterasys.com
+     WWW:    http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB modules provides objects that allow management
+         applications to commit persistent SNMP configuration
+         information to persistent storage."
+
+    REVISION  "200209092022Z"  -- Mon Sep  9 20:22 GMT 2002
+    DESCRIPTION
+        "The initial version of this MIB module."
+    ::= { etsysModules 24 }
+
+
+etsysSnmpPersistenceObjects
+        OBJECT IDENTIFIER ::= { etsysSnmpPersistenceMIB 1 }
+
+
+etsysSnmpPersistenceMode OBJECT-TYPE
+    SYNTAX        INTEGER { snmpNormalSave(1),
+                            pushButtonSave(2),
+                            timeDelayedSave(3)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Setting this object to snmpNormalSave(1) will cause this
+         device to exhibit what could be considered normal SNMP
+         behavior, that is each SNMP set of a persistent object
+         will be saved to persistent storage as part of the set
+         operation.
+
+         Setting this object to pushButtonSave(2) will cause SNMP
+         sets of persistent objects to be buffered in volatile memory
+         until the configuration is explicitly saved to persistent
+         memory, either through the CLI or by setting the
+         etsysSnmpPersistenceWrite object to save(2).
+
+         Setting this object to timeDelayedSave(3) will cause SNMP
+         sets of persistent objects to be buffered in volatile memory
+         until certain implementation dependent time conditions are
+         met.  Once these conditions are met the configuration is
+         saved to persistent memory.
+
+         Setting this object to a mode that is not supported on that
+         particular implementation leads to an inconsistent value error.
+
+         On an SNMP get operation this object will return the current
+         persistent storage mode of operation."
+    ::= { etsysSnmpPersistenceObjects 1 }
+
+etsysSnmpPersistenceSave OBJECT-TYPE
+    SYNTAX        INTEGER { nop(1), save(2) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Setting this object to save(2) will cause the current
+         configuration that is stored in volatile memory to be
+         written to persistent memory and become the start-up
+         configuration.
+
+         This will also cause any configuration information
+         that is part of another management interface's active
+         configuration to become part of the start-up
+         configuration.
+
+         Any configuration changes made through SNMP will become
+         part of the start-up configuration if and when another
+         management interface saves the current configuration to
+         persistent storage.
+
+         Setting this object to save(2) while the value of the
+         etsysSnmpPersistenceMode object is NOT pushButtonSave(2)
+         MAY lead to an inconsistent value error.
+
+         Setting this object to save(2) while the value of the
+         etsysSnmpPersistenceStatus object is savingChanges(3)
+         leads to an inconsistent value error.
+
+         Setting this object to nop(1) always succeeds and has no
+         effect.
+
+         On an SNMP get operation this object will return nop(1).
+
+         Management applications are advised to make use of the
+         snmpSetSerialNo object defined in the SNMPv2-MIB to
+         coordinate their use of this object."
+    ::= { etsysSnmpPersistenceObjects 2 }
+
+etsysSnmpPersistenceStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      other(1),
+                      unsavedChanges(2),
+                      savingChanges(3),
+                      saveSucceeded(4),
+                      saveFailed(5)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object reports the current status of the persistent
+         storage system when the etsysSnmpPersistenceMode object is
+         NOT set to snmpNormalSave(1).
+
+         other          - The value returned after initialization and
+                          before any configuration changes are made
+                          when the etsysSnmpPersistenceMode object is
+                          NOT set to snmpNormalSave(1).
+                          The value returned in all cases when the
+                          etsysSnmpPersistenceMode object is set to
+                          snmpNormalSave(1).
+
+         unsavedChanges - The value returned when there are existing
+                          configuration changes that have not been
+                          saved to persistent storage.
+
+         savingChanges  - The value returned during the process of
+                          writing the current configuration to 
+                          persistent storage.
+               
+         saveSucceeded  - The value returned after the process of
+                          writing the current configuration to
+                          persistent storage has succeeded.
+
+         saveFailed     - The value returned after the process of
+                          writing the current configuration to
+                          persistent storage has failed.
+
+         This status will reflect operations initiated through SNMP as
+         well as all other supported management interfaces."
+    ::= { etsysSnmpPersistenceObjects 3 }
+
+etsysSnmpPersistenceStatusTime OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The value of sysUpTime when etsysSnmpPersistenceStatus was
+         last updated. If etsysSnmpPersistenceStatus has not been
+         updated since initialization the value zero is returned."
+    ::= { etsysSnmpPersistenceObjects 4 }
+
+etsysSnmpPersistenceError OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "This object contains a descriptive error message if the
+        last attempt to write to persistent storage has failed."
+    ::= { etsysSnmpPersistenceObjects 5 }
+
+etsysSnmpPersistenceErrorTime OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "The data and time when the etsysSnmpPersistenceError was
+        last updated.  If etsysSnmpPersistenceError has not been
+        updated since initialization the value '0000000000000000'H
+        is returned."
+    ::= { etsysSnmpPersistenceObjects 6 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysSnmpPersistenceConformance
+    OBJECT IDENTIFIER ::= { etsysSnmpPersistenceMIB 2 }
+
+etsysSnmpPersistenceGroups
+    OBJECT IDENTIFIER ::= { etsysSnmpPersistenceConformance 1 }
+
+etsysSnmpPersistenceCompliances
+    OBJECT IDENTIFIER ::= { etsysSnmpPersistenceConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+etsysSnmpPersistenceGroup OBJECT-GROUP
+    OBJECTS { etsysSnmpPersistenceMode,
+              etsysSnmpPersistenceSave,
+              etsysSnmpPersistenceStatus,
+              etsysSnmpPersistenceStatusTime,
+              etsysSnmpPersistenceError,
+              etsysSnmpPersistenceErrorTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing support for
+         delayed persistence of otherwise persistent SNMP
+         objects."
+    ::= { etsysSnmpPersistenceGroups 1 }
+
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+etsysSnmpPersistenceCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support
+         delayed persistence of otherwise persistent SNMP
+         objects."
+    MODULE
+    MANDATORY-GROUPS { etsysSnmpPersistenceGroup }
+    ::= { etsysSnmpPersistenceCompliances 1 }
+
+END

@@ -1,0 +1,3622 @@
+
+-- *****************************************************************************
+-- Juniper-System-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   E-series System MIB
+--
+-- Copyright (c) 2002-2008 Juniper Networks, Inc.  All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-System-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Unsigned32,
+    Gauge32, TimeTicks
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, TruthValue, DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    PhysicalIndex, entPhysicalDescr
+        FROM ENTITY-MIB
+    KBytes
+        FROM HOST-RESOURCES-MIB
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable, JuniTimeFilter
+        FROM Juniper-TC;
+
+juniSystemMIB  MODULE-IDENTITY
+    LAST-UPDATED "200806111101Z"  -- 11-Jun-08 07:01 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The MIB objects for managing a Juniper E-series (JUNOSe) system.  This
+        MIB complements the ENTITY-MIB.entPhysicalTable by providing the
+        system's physical information in a format that is more user friendly and
+        provides additional elements not found in the Entity MIB, including
+        state information, parameters for configuring the system and additional
+        notifications.
+
+        There are two families of E-series hardware systems supported by this
+        MIB:
+            ERX   - first generation E-series systems
+            ES2    - second generation E-series systems "
+    -- Revision History
+    REVISION    "200806111101Z"  -- 11-Jun-08 07:01 AM EDT  - JUNOSe 10.0
+    DESCRIPTION
+        "Added es2Lm10s support."
+    REVISION    "200805051241Z"  -- 05-May-08 08:41 AM EDT  - JUNOSe 9.2
+    DESCRIPTION
+        "Add ISSU Support for ERX-1440."
+    REVISION    "200705071012Z"  -- 07-May-07 06:12 AM EDT  - JUNOSe 9.0
+    DESCRIPTION
+        "Add ISSU support."
+    REVISION    "200612182125Z"  -- 18-Dec-06 04:25 PM EST  - JUNOSe 8.3
+    DESCRIPTION
+        "Add LM10 Access Support."
+    REVISION    "200611240913Z"  -- 24-Nov-06 04:13 AM EST  - JUNOSe 8.2
+    DESCRIPTION
+        "Add suppot for ES2 primary modules SRP-120 and SFM-120 for E120."
+    REVISION    "200605180831Z"  -- 18-May-06 02:01 PM EST  - JUNOSe 8.0
+    DESCRIPTION
+        "Add last 5 seconds, 1 minute and 5 minutes avergae CPU utilzation
+        support."
+    REVISION    "200601061817Z"  -- 06-Jan-06 01:17 PM EST  - JUNOSe main
+    DESCRIPTION
+        "Add LM10 Access Support."
+    REVISION    "200512160721Z"  -- 16-Dec-05 12:51 PM EST  - JUNOSe main
+    DESCRIPTION
+        "Changed maximum value of juniSystemHighMemUtilThreshold from 100 to 99
+         and maximum value of juniSystemAbatedMemUtilThreshold from 99 to 98."
+    REVISION    "200511182230Z"  -- 18-Nov-05 05:30 PM EST  - JUNOSe 7.3
+    DESCRIPTION
+        "Add CPU utilization statitics table support."
+    REVISION    "200509151414Z"  -- 15-Sep-05 10:14 AM EDT  - JUNOSe 7.2
+    DESCRIPTION
+        "Add LM10 Uplink Support."
+    REVISION    "200508191748Z"  -- 29-Jul-05 01:48 PM EDT  - JUNOSe main
+    DESCRIPTION
+        "Add Ge8 support."
+    REVISION    "200507291748Z"  -- 29-Jul-05 01:48 PM EDT  - JUNOSe 7.0.1
+    DESCRIPTION
+        "conform to REX Naming Document, renamed various ES2 module types
+         and deleted ones that didn't belong."
+    REVISION    "200505181810Z"  -- 18-May-05 02:10 PM EDT  - JUNOSe 7.0.0
+    DESCRIPTION
+        "Updated JuniSystemModuleType TC and created JuniSystemSlotLevel TC."
+    REVISION    "200505041810Z"  -- 04-May-05 02:10 PM EDT  - JUNOSe 7.0.0
+    DESCRIPTION
+        "Added GE-HDE support."
+    REVISION    "200501311813Z"  -- 31-Jan-05 02:13 PM EDT  - JUNOSe 5.1.5
+    DESCRIPTION
+        "Added KByte memory capacity object to notification."
+    REVISION    "200412311013Z"  -- 31-Dec-04 05:13 AM EST  - JUNOSe main
+    DESCRIPTION
+        "Updated for second generation E-series router."
+
+    REVISION    "200412291010Z"  -- 29-Dec-04 05:10 AM EST  - JUNOSe 6.1
+    DESCRIPTION
+        "Updated SystemTimingSelector TC and related timing objects."
+    REVISION    "200405251813Z"  -- 25-May-04 02:13 PM EDT  - JUNOSe 6.1
+    DESCRIPTION
+        "Added support for the Fe8 FX IOA."
+    REVISION    "200401072246Z"  -- 07-Jan-04 05:46 PM EST  - JUNOSe 6.0
+    DESCRIPTION
+        "Added support for the second generation E-series hardware
+        architecture."
+    REVISION    "200311242059Z"  -- 24-Nov-03 03:59 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added Hybrid Primary Module and Hybrid IOA modules.
+         Added GE2 Primary Module and GE2 IOA module."
+    REVISION    "200311241939Z"  -- 24-Nov-03 02:39 PM EST  - JUNOSe 5.2
+    DESCRIPTION
+        "Added resource utilization notification enable/disable.
+         Added KByte memory capacilty object."
+    REVISION    "200307221410Z"  -- 22-Jul-03 10:10 AM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added ERX-310 support."
+    REVISION    "200301272122Z"  -- 27-Jan-03 04:22 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added resource utilization notification support."
+    REVISION    "200210172101Z"  -- 17-Oct-02 05:01 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniSystemModuleType  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The 'personality' type of a module found in an E-series system.  Some
+        primary modules (e.g., line cards) have only one personality; that is
+        they only accept one personality of other level modules (e.g. I/O
+        adapters) in the same slot and are always configured in the same way.
+        Other modules are multi-personality and will behave differently
+        depending on the other level modules they are operating with, and
+        therefore cannot be configured without knowing the other level module
+        type(s).  Type values in this table include both.  Types that are
+        multi-personality are noted by [MP] and types that are personality-only
+        are noted by [PO].  Use the ENTITY-MIB to deretmine the actual hardware
+        type of a module with personality-only type.
+
+            unknown         Unknown module type
+        ERX primary modules:
+            erxSrp          ERX Switch/Route Processor
+            erxCt3          ERX 3 port Channelized T3
+            erxOc3          ERX 2 port OC3 SONET/SDH
+            erxUt3Atm       ERX 3 port Unchannelized T3 ATM
+            erxUt3Frame     ERX 3 port Unchannelized T3 Frame
+            erxUe3Atm       ERX 3 port Unchannelized E3 ATM
+            erxUe3Frame     ERX 3 port Uncahnnelized E3 Frame
+            erxCe1          ERX 20 port Channelized E1
+            erxCt1          ERX 24 port Channelized T1
+            erxDpfe         ERX 2 port Fast Ethernet
+            erxOc12Pos      ERX 1 port OC12 POS
+            erxOc12Atm      ERX 1 port OC12 ATM
+            erxOc3Pos       ERX 4 port OC3 POS
+            erxOc3Atm       ERX 4 port OC3 ATM
+            erxGe           ERX 1 port Gigabit Ethernet [PO]
+            erxFe8          ERX 8 port Fast Ethernet [PO]
+            erxOc3oc12Pos   ERX OC3/OC12 POS [MP]
+            erxOc3oc12Atm   ERX OC3/OC12 ATM [MP]
+            erxCoc3oc12     ERX Channelized OC3/OC12 [MP]
+            erxCoc3         ERX 4 port Channelized OC3 [PO]
+            erxCoc12        ERX 1 port Channelized OC12 [PO]
+            erxOc12Server   ERX 1 port OC12 Tunnel Server
+            erxHssi         ERX 3 port High Speed Serial Interface
+            erxGeFe         ERX Gigabit Ethernet / Fast Ethernet [MP]
+            erxCt3P12       ERX 12 port Channelized T3
+            erxV35          ERX 16 port X.21/V.35
+            erxUt3f12       ERX 12 port Unchannelized T3 Frame [PO]
+            erxUe3f12       ERX 12 port Unchannelized E3 Frame [PO]
+            erxCoc12F3      ERX 1 port OC12 channelized to T3/E3 [PO]
+            erxCoc3F3       ERX 4 port OC3 channelized to T3/E3 [PO]
+            erxCocxF3       ERX OC3/OC12 channelized to T3/E3 [MP]
+            erxVts          ERX Virtual Tunnel Server
+            erxOc48         ERX 1 port OC48 SONET/SDH
+            erxUt3Atm4      ERX 4 port Unchannelized T3/E3 ATM [PO]
+            erxHybrid       ERX ATM / POS / Gigabit Ethernet Hybrid [MP]
+            erxOc3AtmGe     ERX 2 port OC3 ATM 1 port Gigabit Ethernet [PO]
+            erxOc3AtmPos    ERX 2 port OC3 ATM 2 port OC3 POS [PO]
+            erxGe2          ERX 2 port Gigabit Ethernet
+            erxGeHde        ERX 2/8 port Gigabit Ethernet
+        ERX I/O adapter (IOA) modules:
+            erxSrpIoa                 ERX Switch/Route Processor IOA
+            erxCt1Ioa                 ERX 24 port channelized T1/J1 IOA
+            erxCe1Ioa                 ERX 20 port channelized E1 IOA
+            erxCe1TIoa                ERX 20 port channelized E1 Telco IOA
+            erxCt3Ioa                 ERX 3 port channelized T3/E3 IOA
+            erxE3Ioa                  ERX 3 port E3 IOA
+            erxOc3Mm2Ioa              ERX 2 port OC3 multi-mode IOA
+            erxOc3Sm2Ioa              ERX 2 port OC3 single-mode IOA
+            erxOc3Mm4Ioa              ERX 4 port OC3 multi-mode IOA
+            erxOc3SmIr4Ioa            ERX 4 port OC3 single-mode
+                                        intermediate-reach IOA
+            erxOc3SmLr4Ioa            ERX 4 port OC3 single-mode long-reach IOA
+            erxCOc3Mm4Ioa             ERX 4 port channelized OC3 multi-mode IOA
+            erxCOc3SmIr4Ioa           ERX 4 port channelized OC3 single-mode
+                                        intermediate-reach IOA
+            erxCOc3SmLr4Ioa           ERX 4 port channelized OC3 single-mode
+                                        long-reach IOA
+            erxOc12Mm1Ioa             ERX 1 port OC12 multi-mode IOA
+            erxOc12SmIr1Ioa           ERX 1 port OC12 single-mode
+                                        intermediate-reach IOA
+            erxOc12SmLr1Ioa           ERX 1 port OC12 single-mode long-reach IOA
+            erxCOc12Mm1Ioa            ERX 1 port channelized OC12 multi-mode IOA
+            erxCOc12SmIr1Ioa          ERX 1 port channelized OC12 single-mode
+                                        intermediate-reach IOA
+            erxCOc12SmLr1Ioa          ERX 1 port channelized OC12 single-mode
+                                        long-reach IOA
+            erxFe2Ioa                 ERX 2 port 10/100 Fast Ethernet IOA
+            erxFe8Ioa                 ERX 8 port 10/100 Fast Ethernet IOA
+            erxGeMm1Ioa               ERX 1 port Gigabit Ethernet multi-mode IOA
+            erxGeSm1Ioa               ERX 1 port Gigabit Ethernet single-mode
+                                        IOA
+            erxHssiIoa                ERX 3 port High Speed Serial Interface IOA
+            erxCt3P12Ioa              ERX 12 port channelized and unchannelized
+                                        T3 IOA
+            erxV35Ioa                 ERX 16 port X2.1/V3.5 IOA
+            erxGeSfpIoa               ERX 1 port Gigabit Ethernet SFP IOA
+            erxUe3P12Ioa              ERX 12 port unchannelized E3 IOA
+            erxT3Atm4Ioa              ERX 4 port T3 ATM IOA
+            erxCOc12Mm1ApsIoa         ERX 1 port channelized OC12 multi-mode APS
+                                        (1+1) IOA
+            erxCOc12SmIr1ApsIoa       ERX 1 port channelized OC12 single-mode
+                                        intermediate-reach APS (1+1) IOA
+            erxCOc12SmLr1ApsIoa       ERX 1 port channelized OC12 single-mode
+                                        long-reach APS (1+1) IOA
+            erxOc12Mm1ApsIoa          ERX 1 port OC12 multi-mode APS (1+1) IOA
+            erxOc12SmIr1ApsIoa        ERX 1 port OC12 single-mode
+                                        intermediate-reach APS (1+1) IOA
+            erxOc12SmLr1ApsIoa        ERX 1 port OC12 single-mode long-reach APS
+                                        (1+1) IOA
+            erxCOc12AtmPosMm1Ioa      ERX 1 port channelized OC12 multi-mode
+                                        ATM/POS IOA
+            erxCOc12AtmPosSmIr1Ioa    ERX 1 port channelized OC12 single-mode
+                                        intermediate-reach ATM/POS IOA
+            erxCOc12AtmPosSmLr1Ioa    ERX 1 port channelized OC12 single-mode
+                                        long-reach ATM/POS IOA
+            erxCOc12AtmPosMm1ApsIoa   ERX 1 port channelized OC12 multi-mode
+                                        ATM/POS APS (1+1) IOA
+            erxCOc12AtmPosSmIr1ApsIoa ERX 1 port channelized OC12 single-mode
+                                        intermediate-reach ATM/POS APS (1+1) IOA
+            erxCOc12AtmPosSmLr1ApsIoa ERX 1 port channelized OC12 single-mode
+                                        long-reach ATM/POS APS (1+1) IOA
+            erxT1E1RedundantIoa       ERX T1/E1 redundant midplane spare IOA
+            erxT3E3RedundantIoa       ERX T3/E3 redundant midplane spare IOA
+            erxCt3RedundantIoa        ERX channelized T3 redundant midplane
+                                        spare IOA
+            erxOcxRedundantIoa        ERX OC3/OC12 redundant midplane spare IOA
+            erxCOcxRedundantIoa       ERX channelized OC3/OC12 redundant
+                                        midplane spare IOA
+            erxOc3Mm4ApsIoa           ERX 4 port OC3 multi-mode APS (1+1) IOA
+            erxOc3SmIr4ApsIoa         ERX 4 port OC3 single-mode
+                                        intermediate-reach APS (1+1) IOA
+            erxOc3SmLr4ApsIoa         ERX 4 port OC3 single-mode long-reach APS
+                                        (1+1) IOA
+            erxOc48Ioa                ERX 1 port OC48/STM16 IOA
+            erxOc3Atm2Ge1Ioa          ERX 2 port OC3 ATM 1 port GE IOA
+            erxOc3Atm2Pos2Ioa         ERX 2 port OC3 ATM 2 port OC3 POS IOA
+            erxGe2Ioa                 ERX 2 port Gigabit Ethernet IOA
+            erxFe8FxIoa               ERX 8 port 100 Fast Ethernet SFP IOA
+            erxGe8Ioa                 ERX 8 port Gigabit Ethernet IOA
+        ES2 primary modules:
+            e320Srp100                 ES2 100Gb System Route Processor with integrated
+                                        fabric slice
+            e320Sfm100                 ES2 100Gb Switch Fabric Slice
+            es2Lm4                     ES2 4Gb (series 1) Line Module(LM).  
+            es2Lm10Uplink              ES2 10Gb (series 2) Uplink Line Module(LM).  
+            es2Lm10                    ES2 10Gb (series 3) Line Module(LM).  
+            e320Srp320                 ES2 320Gb System Route Processor with integrated
+                                        fabric slice
+            e320Sfm320                 ES2 320Gb Switch Fabric Slice
+            es2Lm10s                   ES2 10Gb (series 4) Line Module(LM).  
+        ES2 I/O adapter (IOA) modules:
+            e320SrpIoa                 ES2 system resource processor IOA
+            es2Ge4S1Ioa                ES2 4 port Gigabit Ethernet S1 IOA
+            es2Oc48Stm16PosS1Ioa       ES2 OC48/STM16 POS S1 IOA
+            es2ServiceS1Ioa            ES2 Service S1 IOA
+            es2Oc3Stm1x8AtmS1Ioa       ES2 OC3/STM1-8 ATM S1 IOA
+            es2RedundancyS1Ioa         ES2 Redundancy S1 IOA
+            es2Oc12Stm4x2PosS1Ioa      ES2 OC12/STM4-2 POS S1 IOA
+            es2Oc12Stm4x2AtmS1Ioa      ES2 OC12/STM4-2 ATM S1 IOA
+            es2dash10GeS1Ioa           ES2 10GE-1 SR S1 IOA
+            es2Ge8S1Ioa                ES2 8 port Gigabit Ethernet S1 IOA
+            es2dash10GePrS2Ioa         ES2 10GE-1 Port Redundancy S2 IOA
+            es2Ge20S2Ioa               ES2 20 port Gigabit Ethernet S2 IOA
+        ES2 primary modules for E120:
+            e120Srp120                 ES2 120Gb System Route Processor with integrated
+                                        fabric slice
+            e120Sfm120                 ES2 120Gb Switch Fabric Slice"
+
+
+    SYNTAX      INTEGER {
+                    unknown(0),
+                -- ERX primary module types
+                    erxSrp(1),
+                    erxCt3(2),
+                    erxOc3(3),
+                    erxUt3Atm(4),
+                    erxUt3Frame(5),
+                    erxUe3Atm(6),
+                    erxUe3Frame(7),
+                    erxCe1(8),
+                    erxCt1(9),
+                    erxDpfe(10),
+                    erxOc12Pos(11),
+                    erxOc12Atm(12),
+                    erxOc3Pos(13),
+                    erxOc3Atm(14),
+                    erxGe(15),
+                    erxFe8(16),
+                    erxOc3oc12Pos(17),
+                    erxOc3oc12Atm(18),
+                    erxCoc3oc12(19),
+                    erxCoc3(20),
+                    erxCoc12(21),
+                    erxOc12Server(22),
+                    erxHssi(23),
+                    erxGeFe(24),
+                    erxCt3P12(25),
+                    erxV35(26),
+                    erxUt3f12(27),
+                    erxUe3f12(28),
+                    erxCoc12F3(29),
+                    erxCoc3F3(30),
+                    erxCocxF3(31),
+                    erxVts(32),
+                    erxOc48(33),
+                    erxUt3Atm4(34),
+                    erxHybrid(35),
+                    erxOc3AtmGe(36),
+                    erxOc3AtmPos(37),
+                    erxGe2(38),
+                    erxGeHde(39),
+                -- ERX I/O adapter (IOA) module types
+                    erxSrpIoa(1024),
+                    erxCt1Ioa(1025),
+                    erxCe1Ioa(1026),
+                    erxCe1TIoa(1027),
+                    erxCt3Ioa(1028),
+                    erxE3Ioa(1029),
+                    erxOc3Mm2Ioa(1030),
+                    erxOc3Sm2Ioa(1031),
+                    erxOc3Mm4Ioa(1032),
+                    erxOc3SmIr4Ioa(1033),
+                    erxOc3SmLr4Ioa(1034),
+                    erxCOc3Mm4Ioa(1035),
+                    erxCOc3SmIr4Ioa(1036),
+                    erxCOc3SmLr4Ioa(1037),
+                    erxOc12Mm1Ioa(1038),
+                    erxOc12SmIr1Ioa(1039),
+                    erxOc12SmLr1Ioa(1040),
+                    erxCOc12Mm1Ioa(1041),
+                    erxCOc12SmIr1Ioa(1042),
+                    erxCOc12SmLr1Ioa(1043),
+                    erxFe2Ioa(1044),
+                    erxFe8Ioa(1045),
+                    erxGeMm1Ioa(1046),
+                    erxGeSm1Ioa(1047),
+                    erxHssiIoa(1048),
+                    erxCt3P12Ioa(1049),
+                    erxV35Ioa(1050),
+                    erxGeSfpIoa(1051),
+                    erxUe3P12Ioa(1052),
+                    erxT3Atm4Ioa(1053),
+                    erxCOc12Mm1ApsIoa(1054),
+                    erxCOc12SmIr1ApsIoa(1055),
+                    erxCOc12SmLr1ApsIoa(1056),
+                    erxOc12Mm1ApsIoa(1057),
+                    erxOc12SmIr1ApsIoa(1058),
+                    erxOc12SmLr1ApsIoa(1059),
+                    erxCOc12AtmPosMm1Ioa(1060),
+                    erxCOc12AtmPosSmIr1Ioa(1061),
+                    erxCOc12AtmPosSmLr1Ioa(1062),
+                    erxCOc12AtmPosMm1ApsIoa(1063),
+                    erxCOc12AtmPosSmIr1ApsIoa(1064),
+                    erxCOc12AtmPosSmLr1ApsIoa(1065),
+                    erxT1E1RedundantIoa(1066),
+                    erxT3E3RedundantIoa(1067),
+                    erxCt3RedundantIoa(1068),
+                    erxOcxRedundantIoa(1069),
+                    erxCOcxRedundantIoa(1070),
+                    erxOc3Mm4ApsIoa(1071),
+                    erxOc3SmIr4ApsIoa(1072),
+                    erxOc3SmLr4ApsIoa(1073),
+                    erxOc48Ioa(1074),
+                    erxOc3Atm2Ge1Ioa(1075),
+                    erxOc3Atm2Pos2Ioa(1076),
+                    erxGe2Ioa(1077),
+                    erxFe8FxIoa(1078),
+                    erxGe8Ioa(1079),
+                -- ES2 primary module types
+                    e320Srp100(2048),
+                    e320Sfm100(2049),
+                    es2Lm4(2050),
+                    es2Lm10Uplink(2051),
+                    es2Lm10(2052),
+                    e320Srp320(2053),
+                    e320Sfm320(2054),
+                    es2Lm10s(2055),
+                -- ES2 I/O adapter (IOA) module types
+                    e320SrpIoa(3072),
+                    es2Ge4S1Ioa(3073),
+                    es2Oc48Stm16PosS1Ioa(3074),
+                    es2ServiceS1Ioa(3075),
+                    es2Oc3Stm1x8AtmS1Ioa(3076),
+                    es2RedundancyS1Ioa(3077),
+                    es2Oc12Stm4x2PosS1Ioa(3078),
+                    es2Oc12Stm4x2AtmS1Ioa(3079),
+                    es2dash10GeS1Ioa(3080),
+                    es2Ge8S1Ioa(3081),
+                    es2dash10GePrS2Ioa(3082),
+                    es2Ge20S2Ioa(3083) ,
+                -- ES2 primary module types for E120
+                    e120Srp120(4096),
+                    e120Sfm120(4097) }
+
+JuniSystemSlotLevel  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The relative position of a module or sub-module 'container' within a
+        slot.  The upper limit of valid values is juniSystemMaxModulesPerSlot.
+        A module or sub-module in the lowest numbered level for a particular
+        slot is considered to be the 'primary' module for that slot.
+
+        For the first generation E-series (ERX) platform family:
+            level 1 - SRP or line card module
+            level 2 - I/O adapter module
+
+        For the second generation E-series platform family:
+            level 1 - Forwarding module or SRP sub-module
+            level 2 - Switch fabric slice (SFS) sub-module or module
+            level 3 - Bay 0 I/O adapter
+            level 4 - Bay 1 I/O adapter "
+
+    SYNTAX      Integer32 (1..4)
+ 
+JuniSystemSlotType  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of 'container' for holding a module or sub-module found in an
+        E-series chassis.
+
+        The slot type may be for a 'sub-module' where there are multiple logical
+        functions on a single hardware module.  For example, the second
+        generation SRP hardware module (slot 6 or 7 on an E320) contains both a
+        System Resource Processor (SRP) sub-module (level 1 position) and a
+        Switch Fabric Slice (SFS) sub-module (level 2 position).
+
+            noSlot          The slot does not exist
+        ERX system slot types:
+            erxSrpSlot      ERX switch/route processor module slot
+            erxLcmSlot      ERX line card module slot
+            erxSrpIoaSlot   ERX switch/route processor I/O adapter slot
+            erxLcIoaSlot    ERX line card I/O adapter slot
+        Second generation E-series (ES2) system slot types:
+            es2SrpSlot       ES2 system resource processor sub-module slot
+            es2SfsSlot       ES2 switch fabric module or sub-module slot
+            es2FmSlot        ES2 forwarding module slot
+            es2SrpIoaSlot    ES2 system resource processor I/O adapter slot
+            es2FIoaSlot      ES2 forwarding I/O adapter slot "
+    SYNTAX      INTEGER {
+                    noSlot(0),
+                -- ERX system slot types
+                    erxSrpSlot(1),
+                    erxLcmSlot(2),
+                    erxSrpIoaSlot(3),
+                    erxLcIoaSlot(4),
+                -- ES2 system slot types
+                    es2SrpSlot(16),
+                    es2SfsSlot(17),
+                    es2FmSlot(18),
+                    es2SrpIoaSlot(19),
+                    es2FIoaSlot(20) }
+
+JuniSystemTimingSelector  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The system timing selector.
+            primary   - the primary timing selector
+            secondary - the secondary timing selector
+            tertiary  - the tertiary timing selector
+            error     - the error in timing selector"
+    SYNTAX      INTEGER  {
+                    primary(1),
+                    secondary(2),
+                    tertiary(3),
+                    error(4)}
+
+JuniSystemLocationType  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The location information class that is used to understand the encoding
+        of the associated location instance information.  An object with this
+        syntax is always paired with an object that uses the JuniSystemLocation
+        syntax.
+            system    - all resources on the system
+            slot      - all resources associated with a particular slot "
+    SYNTAX      INTEGER {
+                    system(1),
+                    slot(2) }
+
+JuniSystemLocation  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The location instance information that is encoded according to the
+        rules for the associated location information class.  An object with
+        this syntax is always paired with an object that uses the
+        JuniSystemLocationType syntax.
+            system    - a zero length string: { ''H }
+            slot      - a single octet (see juniSystemSlotNumber) "
+    SYNTAX      OCTET STRING (SIZE(0..16))
+
+JuniSystemTaskName  ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "100a"
+    STATUS      current
+    DESCRIPTION
+        "Name of the task. Represents textual information taken from the
+        NVT ASCII character set. The character repertoire of the string is
+        restricted to printable, non-whitespace characters (codes 33 through
+        126)."
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    SYNTAX      OCTET STRING (SIZE(1..100))
+    
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Structure
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemTrap          OBJECT IDENTIFIER ::= { juniSystemMIB 0 }
+juniSystemObjects       OBJECT IDENTIFIER ::= { juniSystemMIB 1 }
+juniSystemConformance   OBJECT IDENTIFIER ::= { juniSystemMIB 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemGeneral        OBJECT IDENTIFIER ::= { juniSystemObjects 1 }
+juniSystemSubsystem      OBJECT IDENTIFIER ::= { juniSystemObjects 2 }
+juniSystemModule         OBJECT IDENTIFIER ::= { juniSystemObjects 3 }
+juniSystemPort           OBJECT IDENTIFIER ::= { juniSystemObjects 4 }
+juniSystemTiming         OBJECT IDENTIFIER ::= { juniSystemObjects 5 }
+juniSystemFabric         OBJECT IDENTIFIER ::= { juniSystemObjects 6 }
+juniSystemNvs            OBJECT IDENTIFIER ::= { juniSystemObjects 7 }
+juniSystemPower          OBJECT IDENTIFIER ::= { juniSystemObjects 8 }
+juniSystemTemperature    OBJECT IDENTIFIER ::= { juniSystemObjects 9 }
+juniSystemUtilization    OBJECT IDENTIFIER ::= { juniSystemObjects 10 }
+juniSystemIssu           OBJECT IDENTIFIER ::= { juniSystemObjects 11 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- General operational software system objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemSwVersion  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Version identification of currently executing system-wide operational
+        software."
+    ::= { juniSystemGeneral 1 }
+
+juniSystemSwBuildDate  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Build date of currently executing system-wide operational software
+        version."
+    ::= { juniSystemGeneral 2 }
+
+juniSystemMemUtilPct  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of memory utilization on the primary system processor.  A
+        value of -1 indicates the utilization is unknown."
+    ::= { juniSystemGeneral 3 }
+
+juniSystemMemCapacity  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total memory capacity in bytes of the primary system processor.  If
+        the memory capacity is greater than 2147483647, a -1 value is returned,
+        and the actual memory capacity (in number of bytes divided by 1024) is
+        returned in juniSystemMemKBytesCapacity."
+    ::= { juniSystemGeneral 4 }
+
+juniSystemMemKBytesCapacity  OBJECT-TYPE
+    SYNTAX      KBytes
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total memory capacity in kilo-bytes (1024 bytes) of the primary
+        system processor."
+    ::= { juniSystemGeneral 23 }
+
+juniSystemHighMemUtilThreshold  OBJECT-TYPE
+    SYNTAX      Integer32 (1..99)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of memory utilization in the primary system processor, where,
+        if reached for the first time after a high memory threshold reset, a
+        high memory utilization event notification will be sent to the
+        management entity on this system.  A high memory threshold reset occurs
+        when the system is initialized (booted) or the memory utilization falls
+        below the value in juniSystemAbatedMemUtilThreshold.
+
+        The value of this object must always be greater than the value of
+        juniSystemAbatedMemUtilThreshold."
+    DEFVAL    { 85 }
+    ::= { juniSystemGeneral 5 }
+
+juniSystemAbatedMemUtilThreshold  OBJECT-TYPE
+    SYNTAX      Integer32 (0..98)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of memory utilization in the primary system processor that is
+        used to determine when to send an abated memory utilization event
+        notification to the management entity on this system.  The abated memory
+        utilization event occurs if a high memory threshold reset has not
+        occurred since the last high memory threshold event, and then the memory
+        utilization falls to or below the value of this object.  The abated
+        memory utilization event then triggers a high memory threshold reset.
+
+        The value of this object must always be less than the value of
+        juniSystemHighMemUtilThreshold."
+    DEFVAL    { 75 }
+    ::= { juniSystemGeneral 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- General software system reload configuration objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemBootConfigControl  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    file(0),
+                    fileOnce(1),
+                    factoryDefaults(2),
+                    runningConfiguration(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "System boot configuration control:
+            file                  - On a system reboot use the configuration
+                                    settings specified by the
+                                    juniSystemBootConfigFile.  The
+                                    juniSystemBootConfigControl and
+                                    juniSystemBootConfigFile must be specified
+                                    together in the same set request PDU.
+            fileOnce              - On the next system reboot use the
+                                    configuration settings specified by the
+                                    juniSystemBootConfigFile.  Do not continue
+                                    to use this file after using it once; on
+                                    subsequent reboots use the running
+                                    configuration.  The
+                                    juniSystemBootConfigControl and
+                                    juniSystemBootConfigFile must be specified
+                                    together in the same set request PDU.
+            factoryDefaults       - On the next system reboot use the factory
+                                    default settings.  On subsequent reboots use
+                                    the running configuration.
+            runningConfiguration  - On a system reboot use the current
+                                    configuration settings."
+    ::= { juniSystemGeneral 7 }
+
+juniSystemBootBackupConfigControl  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    file(0),
+                    factoryDefaults(1),
+                    none(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "System boot backup configuration control is used to determine the
+        configuration to be used when the boot logic chooses backup mode:
+            file              - On a system reboot in backup mode use the
+                                configuration settings specified by the
+                                juniSystemBootBackupConfigFile.  If this option
+                                is specified, juniSystemBootBackupConfigFile,
+                                juniSystemBootBackupReleaseFile and this object
+                                must be specified together in the same set
+                                request PDU.
+            factoryDefaults   - On a system reboot in backup mode use the
+                                factory default configuration settings.  If this
+                                option is specified,
+                                juniSystemBootBackupReleaseFile and this object
+                                must be specified together in the same set
+                                request PDU.
+            none              - Disallow the boot logic from using the backup
+                                release file and configuration (i.e., disable
+                                backup mode)."
+    ::= { juniSystemGeneral 8 }
+
+juniSystemBootForceBackupControl  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off(0),
+                    on(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "System boot force backup control:
+            off   - On the next system reboot do not force the boot logic to
+                    choose backup mode.
+            on    - On the next system reboot force the boot logic to choose
+                    backup mode.
+
+        Attempting to set this object to on(1) while the
+        juniSystemBootBackupConfigControl is set to none(2) will result in an
+        error."
+    ::= { juniSystemGeneral 9 }
+
+juniSystemBootAutoRevertControl  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    default(0),
+                    never(1),
+                    set(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system boot auto-revert control is used to determine when the boot
+        logic should choose backup mode based of the reboot history:
+            default   - Use the default auto-revert tolerances: 3 reboots in 30
+                        minutes.
+            never     - Never auto-revert to backup mode.
+            set       - Use the auto-revert tolerances specified by
+                        juniSystemBootAutoRevertCountTolerance and
+                        juniSystemBootAutoRevertTimeTolerance, which must be
+                        specified in the same PDU as this object when this value
+                        is specified."
+    ::= { juniSystemGeneral 10 }
+
+juniSystemBootAutoRevertCountTolerance  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967294)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The auto-revert reboot count tolerance, used in conjunction with the
+        value of juniSystemBootAutoRevertTimeTolerance when
+        juniSystemBootAutoRevertControl is set to set(2) in the same PDU.  For
+        example, if this object is set to 4 and
+        juniSystemBootAutoRevertTimeTolerance is set to 1200, then the boot
+        logic will choose backup mode if 4 system reboots occur within 20
+        minutes.  This object cannot be set to zero, but may contain a zero
+        value when juniSystemBootAutoRevertControl is set to never(1)."
+    ::= { juniSystemGeneral 11 }
+
+juniSystemBootAutoRevertTimeTolerance  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967294)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The auto-revert reboot time tolerance, used in conjunction with the
+        value of juniSystemBootAutoRevertCountTolerance when
+        juniSystemBootAutoRevertControl is set to set(2) in the same PDU.  This
+        object cannot be set to zero, but will contain a zero value when
+        juniSystemBootAutoRevertControl is set to never(1)."
+    ::= { juniSystemGeneral 12 }
+
+juniSystemBootReleaseFile  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system-wide boot release file name, with extension '.rel'.  On a
+        set operation, if there is no file found with the name specified, then
+        an error is returned."
+    ::= { juniSystemGeneral 13 }
+
+juniSystemBootConfigFile  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system-wide boot configuration file name.  This object and the
+        juniSystemBootConfigControl object set to file(0) or fileOnce(1) must be
+        specified together in the same set request PDU.  If
+        juniSystemBootConfigControl is file(0), only file names with extension
+        '.cnf' are allowed.  If juniSystemBootConfigControl is fileOnce(1), only
+        file names with extensions '.cnf' or '.scr' are allowed.  On a set
+        operation, if the extension is not appropriate or there is no file found
+        with the name specified, then an error is returned.  If
+        juniSystemBootConfigControl is not set to file(0) or fileOnce(1) then a
+        get operation for this object will return a zero-length string."
+    DEFVAL    { "" }
+    ::= { juniSystemGeneral 14 }
+
+juniSystemBootBackupReleaseFile  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system-wide backup boot release file name, with extension '.rel'.
+        A zero-length string indicates that there is no backup release file so
+        the primary release file (juniSystemBootReleaseFile) will be used.  On a
+        set operation if there is no file found with the name specified, then an
+        error is returned.  The juniSystemBootBackupConfigControl object with a
+        valid value other than none(2) must be specified together with this
+        object in the same set request PDU, and if the
+        juniSystemBootBackupConfigControl is set to file(0) then a valid
+        juniSystemBootBackupConfigFile must also be included in the set request
+        PDU."
+    DEFVAL    { "" }
+    ::= { juniSystemGeneral 15 }
+
+juniSystemBootBackupConfigFile  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system-wide backup boot configuration file name, with extension
+        '.cnf'.  The juniSystemBootBackupReleaseFile object, the
+        juniSystemBootBackupConfigControl object set to file(0), and this object
+        must be specified together in the same set request PDU.  On a set
+        operation, if there is no file found with the name specified, then an
+        error is returned.  If juniSystemBootBackupConfigControl is not set to
+        file(0) then a get operation for this object will return a zero-length
+        string."
+    DEFVAL    { "" }
+    ::= { juniSystemGeneral 16 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- System-wide module redundancy control objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemRedundancyRevertControl  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off(0),
+                    immediate(1),
+                    timeOfDay(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global control for reverting primary modules back from their active
+        redundant spare modules:
+            off       - Disable global reverts of redundant modules.
+            immediate - All redundant module pairs are to revert as soon as the
+                        primary module is ready to enter the online state.
+            timeOfDay - All redundant module pairs are to revert at the time
+                        specified by juniSystemRevertTimeOfDay, relative to
+                        midnight based on the system clock time.  This object
+                        must be set concurrently with juniSystemRevertTimeOfDay
+                        when this value is specified.
+
+        Note that this only applies to modules that have
+        juniSystemModuleRedundancySupport set to true(1)."
+    ::= { juniSystemGeneral 17 }
+
+juniSystemRedundancyRevertTimeOfDay  OBJECT-TYPE
+    SYNTAX      Integer32 (0..86399)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds past midnight local time on any given day at
+        which time redundant slot reverts are allowed to occur.  This object
+        must be set concurrently with juniSystemRevertControl { timeOfDay }."
+    ::= { juniSystemGeneral 18 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Subsystem objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemSubsystemTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of subsystems.  A subsystem supports a 'family' of module types;
+        that is, each module type is supported by a particular software
+        subsystem.  For example, the ERX channelized T1 line card (CT1-FULL) is
+        supported by the 'ct1' subsystem."
+    ::= { juniSystemSubsystem 1 }
+
+juniSystemSubsystemEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry containing information pertaining to a subsystem.
+        Subsystem information takes precedence over system-wide information, but
+        not over individual module information."
+    INDEX     { juniSystemSubsystemIndex }
+    ::= { juniSystemSubsystemTable 1 }
+
+JuniSystemSubsystemEntry  ::= SEQUENCE {
+    juniSystemSubsystemIndex                 Integer32,
+    juniSystemSubsystemName                  DisplayString,
+    juniSystemSubsystemBootReleaseFile       DisplayString,
+    juniSystemSubsystemBootBackupReleaseFile DisplayString }
+
+juniSystemSubsystemIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Arbitrary subsystem identification number."
+    ::= { juniSystemSubsystemEntry 1 }
+
+juniSystemSubsystemName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the subsystem."
+    ::= { juniSystemSubsystemEntry 2 }
+
+juniSystemSubsystemBootReleaseFile  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The boot release file name for this subsystem, with extension '.rel'.
+        If a file name is specified (a non-zero-length string), then this
+        release file takes precedence over the system-wide boot release file
+        (juniSystemBootReleaseFile) just for modules of the type specified by
+        the subsystem name.  On a set operation, if there is no file that
+        matches the name specified, then an inconsistentValue error will be
+        returned.  Setting this object to a zero-length string deconfigures the
+        subsystem-specific backup release file."
+    DEFVAL    { "" }
+    ::= { juniSystemSubsystemEntry 3 }
+
+juniSystemSubsystemBootBackupReleaseFile  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The backup boot release file name for this subsystem, with extension
+        '.rel'.  If a file name is specified (a non-zero-length string), then
+        this release file takes precedence over the system-wide boot backup
+        release file (juniSystemBootBackupReleaseFile) just for modules of the
+        type specified by the subsystem name.  This object cannot be set unless
+        the system has a backup file, which means that
+        juniSystemBootBackupReleaseFile must contain a file name (a
+        non-zero-length string).  On a set operation, if there is no file that
+        matches the name specified, then an inconsistentValue error will be
+        returned.  Setting this object to a zero-length string deconfigures the
+        subsystem-specific backup release file."
+    DEFVAL    { "" }
+    ::= { juniSystemSubsystemEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Module Slot objects
+-- A slot represents a position in a chassis that contains one or more phisical
+-- modules (printed circuit boards) and/or sub-modules that operate together as
+-- a functional unit.
+-- A sub-module is a functionally independent portion of a physical module.
+-- One physical module may contain more than one sub-module.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemMaxSlotNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The highest number assigned to a slot in the system.  In a particular
+        hardware model, module slots have fixed numbers assigned to them, even
+        though in some instances there may be no actual slots associated with a
+        particular number.  In all cases there is a maximum slot number that
+        will never be exceeded:
+             2 for ERX-3xx models
+             6 for ERX-7xx models
+            13 for ERX-14xx models
+            16 for E320 models
+
+        Note that slot numbers are zero-based."
+    ::= { juniSystemModule 1 }
+
+juniSystemMaxModulesPerSlot  OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of modules and sub-modules (different levels) that
+        can be associated with a slot number in the system.  This value is
+        constant for a particular hardware platform family.  The number of
+        levels is 2 for a first generation E-series (ERX) platform and is 4 for
+        a second generation E-series platform.
+
+        For the first generation E-series (ERX) platform family:
+            level 1 - SRP or line card module
+            level 2 - I/O adapter module
+
+        For the second generation E-series platform family:
+            level 1 - Forwarding module or SRP sub-module
+            level 2 - Switch fabric slice (SFS) sub-module or module
+            level 3 - Bay 0 I/O adapter
+            level 4 - Bay 1 I/O adapter "
+    ::= { juniSystemModule 2 }
+
+juniSystemSlotTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of system module slot physical container configuration
+        information."
+    ::= { juniSystemModule 3 }
+
+juniSystemSlotEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry describing the physical status of a system module slot
+        container, which is designated by its slot and level positions.  There
+        is an entry in this table for all index pairs from { 0, 1 } to the
+        maximum for each index, { juniSystemMaxSlotNumber,
+        juniSystemMaxModulesPerSlot }, even if there is no corresponding module
+        slot container in the system.  A request for an index value outside this
+        range will result in a 'no such' response."
+    INDEX     { juniSystemSlotNumber,
+                juniSystemSlotLevel }
+    ::= { juniSystemSlotTable 1 }
+
+JuniSystemSlotEntry  ::= SEQUENCE {
+    juniSystemSlotNumber    Integer32,
+    juniSystemSlotLevel     JuniSystemSlotLevel,
+    juniSystemSlotStatus    INTEGER,
+    juniSystemSlotType      JuniSystemSlotType }
+
+juniSystemSlotNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The slot number.  The actual upper limit of valid values is
+        juniSystemMaxSlotNumber.  Note that slot numbers are zero-based."
+    ::= { juniSystemSlotEntry 1 }
+
+juniSystemSlotLevel  OBJECT-TYPE
+    SYNTAX      JuniSystemSlotLevel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The relative position of a module or sub-module 'container' within a
+        slot."
+    ::= { juniSystemSlotEntry 2 }
+
+juniSystemSlotStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    noSlotContainer(1),
+                    empty(2),
+                    moduleNotPresent(3),
+                    modulePresent(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the module slot container.
+            unknown           - The existence of a container cannot be
+                                determined
+            noSlotContainer   - The physical container does not exist
+            empty             - No module is present and no configuration
+                                information is available for this container
+            moduleNotPresent  - A module is configured but it is not currently
+                                in its container
+            modulePresent     - A module is inserted in the container "
+    ::= { juniSystemSlotEntry 3 }
+
+juniSystemSlotType  OBJECT-TYPE
+    SYNTAX      JuniSystemSlotType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The category of modules that can be configured for the container."
+    ::= { juniSystemSlotEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Module Status objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemModuleTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of system module and sub-module information.  In this table, a
+        module refers to a physical module (board) or a sub-module.
+
+        A physical board may contain a single module or multiple sub-modules.
+        For example, an ERX line card is a single module and appears as single
+        entry in this table.  An I/O adapter is a module that doesn't provide
+        any operaitonal state information and it also appears as a single entry
+        in this table.  A second generation E-series SRP/SFS hardware module
+        contains two sub-modules, each with its own operational state
+        information: a System Resource Processor (SRP) sub-module and a Switch
+        Fabric Slice (SFS) sub-module, which appear as two separate entries in
+        this table, one for each sub-module."
+    ::= { juniSystemModule 4 }
+
+juniSystemModuleEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry that provides information about a specific system module
+        or sub-module in a particular module location.  There are only entries
+        in this table for module locations that report a juniSystemSlotStatus of
+        moduleNotPresent(3) or modulePresent(4)."
+    INDEX     { juniSystemSlotNumber,
+                juniSystemSlotLevel }
+    ::= { juniSystemModuleTable 1 }
+
+JuniSystemModuleEntry  ::= SEQUENCE {
+    juniSystemModuleOperStatus           INTEGER,
+    juniSystemModuleDisableReason        INTEGER,
+    juniSystemModuleLastChange           TimeTicks,
+    juniSystemModuleCurrentType          JuniSystemModuleType,
+    juniSystemModuleExpectedType         JuniSystemModuleType,
+    juniSystemModuleDescr                DisplayString,
+    juniSystemModuleSlotSpan             Integer32,
+    juniSystemModulePortCount            Integer32,
+    juniSystemModuleSerialNumber         DisplayString,
+    juniSystemModuleAssemblyPartNumber   DisplayString,
+    juniSystemModuleAssemblyRev          DisplayString,
+    juniSystemModulePhysicalIndex        PhysicalIndex,
+    juniSystemModuleSoftwareSupport      TruthValue,
+    juniSystemModuleRedundancySupport    TruthValue,
+    juniSystemModuleLevelSpan            Integer32 }
+
+juniSystemModuleOperStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    notPresent(1),
+                    disabled(2),
+                    hardwareError(3),
+                    booting(4),
+                    initializing(5),
+                    online(6),
+                    standby(7),
+                    inactive(8),
+                    notResponding(9) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational status of the module (or sub-module):
+            unknown       - The status of the module cannot be determined
+            notPresent    - No hardware is currently present but there was a
+                            module previously configured in this position (see
+                            juniSystemModuleExpectedType);
+                            juniSystemModuleCurrentType is unknown(0)
+            disabled      - Disable for the reason specified in
+                            juniSystemModuleDisableReason
+            hardwareError - Not operational due to a hardware failure
+            booting       - In the process of booting
+            initializing  - In the process of initialing
+            online        - Fully operational
+            standby       - In redundant standby mode
+            inactive      - In redundant inactive mode
+            notResponding - Unable to communicate with the rest of the system "
+    ::= { juniSystemModuleEntry 1 }
+
+juniSystemModuleDisableReason  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    unknown(1),
+                    assessing(2),
+                    admin(3),
+                    typeMismatch(4),
+                    fabricLimit(5),
+                    imageError(6) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the condition causing the module (or sub-module) to be
+        disabled:
+            none          - Value when the module is not disabled
+            unknown       - Unknown reason for disablement
+            assessing     - The module content is being assessed (transient
+                            initialization state)
+            admin         - The module is administratively disabled
+            typeMismatch  - The current module personality conflicts with
+                            configuration associated with a different (expected)
+                            module personality that previously occupied the slot
+            fabricLimit   - Module resource requirements exceed available fabric
+                            capacity
+            imageError    - Software image for the module is missing or invalid"
+    ::= { juniSystemModuleEntry 2 }
+
+juniSystemModuleLastChange  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when the value of juniSystemModuleOperStatus
+        last changed."
+    ::= { juniSystemModuleEntry 3 }
+
+juniSystemModuleCurrentType  OBJECT-TYPE
+    SYNTAX      JuniSystemModuleType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The personality of this module based on the combination of modules that
+        are currently inserted in the slot.  This could be different from the
+        personality reported in juniSystemModuleExpectedType, in which case it
+        may be necessary to set juniSystemModuleControl for the module in the
+        primary level to 'flush' before the set of modules in this slot can be
+        made operational."
+    ::= { juniSystemModuleEntry 4 }
+
+juniSystemModuleExpectedType  OBJECT-TYPE
+    SYNTAX      JuniSystemModuleType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The personality for this module position based on the combination of
+        modules that were inserted in this slot when it was last configured.
+        The value of this object will be different than the value of
+        juniSystemModuleCurrentType when the value of juniSystemModuleOperStatus
+        is disabled(2) and the value of juniSystemModuleDisableReason is
+        typeMismatch(4).  After one or more modules is removed from a slot,
+        configuration information associated with the slot (its 'personality')
+        may persist, inhibiting the operation of a different combination of
+        modules in the slot (when new modules are inserted) until
+        juniSystemModuleControl for the slot's primary module is set to
+        flush(1)."
+    ::= { juniSystemModuleEntry 5 }
+
+juniSystemModuleDescr  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Textual description of the expected module in this slot."
+    ::= { juniSystemModuleEntry 6 }
+
+juniSystemModuleSlotSpan  OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of slot positions that the expected module spans.  Most
+        modules are only one slot wide, but some require extra space or
+        backplane resources.  These modules are identified as being in the lower
+        numbered slot and spanning across the higher numbered slot(s)."
+    ::= { juniSystemModuleEntry 7 }
+
+juniSystemModulePortCount  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of physical ports supported by the expected module type in
+        this slot."
+    ::= { juniSystemModuleEntry 8 }
+
+juniSystemModuleSerialNumber  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The serial number of the expected module in this slot.  The serial
+        number of the current module may be found in this module's
+        entPhysicalSerialNum.  A serial number is for a hardware board, so if
+        there is more than one sub-module on a board, their serial numbers will
+        all be the same."
+    DEFVAL    { "" }
+    ::= { juniSystemModuleEntry 9 }
+
+juniSystemModuleAssemblyPartNumber  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The part number of the expected module in this slot.  The part number
+        of the current module may be found in this module's
+        entPhysicalModelName.  A part number is for a hardware board, so if
+        there is more than one sub-module on a board, their part numbers will
+        all be the same."
+    DEFVAL    { "" }
+    ::= { juniSystemModuleEntry 10 }
+
+juniSystemModuleAssemblyRev  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..3))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The revision level of the expected module in this slot.  The revision
+        level of the current module may be found in this module's
+        entPhysicalHardwareRev.  A revision level is for a hardware board, so if
+        there is more than one sub-module on a board, their revision levels will
+        all be the same."
+    DEFVAL    { "" }
+    ::= { juniSystemModuleEntry 11 }
+
+juniSystemModulePhysicalIndex  OBJECT-TYPE
+    SYNTAX      PhysicalIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entPhysicalIndex value assigned to the module.  The
+        ENTITY-MIB.entPhysicalTable contains additional information about this
+        module that can be retrieved using this index.  An entPhysicalIndex is
+        for a hardware board, so if there is more than one sub-module on a
+        board, their entPhysicalIndex values will all be the same."
+    ::= { juniSystemModuleEntry 12 }
+
+juniSystemModuleSoftwareSupport  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An indicator as to whether this module or sub-module has operational
+        state information that can be managed.  If the value of this object is
+        true(1), then there is an entry for this module or sub-module in the
+        juniSystemModuleSoftwareTable."
+    ::= { juniSystemModuleEntry 13 }
+
+juniSystemModuleRedundancySupport  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An indicator as to whether this module or sub-module is part of a
+        redundancy group.  If the value of this object is true(1), then there is
+        an entry for this module or sub-module in the
+        juniSystemModuleRedundancyTable."
+    ::= { juniSystemModuleEntry 14 }
+
+juniSystemModuleLevelSpan  OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of level positions that the expected module spans.  Most
+        modules are only one level 'high', but some require extra space or
+        backplane resources.  These modules are identified as being in the lower
+        numbered level and spanning across the higher numbered level(s)."
+    ::= { juniSystemModuleEntry 15 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Module Software objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemModuleSoftwareTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemModuleSoftwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of system module software information.  This includes the
+        version of the software running on the particular module, the running
+        software's use of the modules resources and the modules operational
+        state.
+
+        Some module types don't contain loadable software (they execute
+        'firmware') but include support for some of the objects in this table.
+        For example, the E320 SFS (es2Sfs) modules only support
+        juniSystemModuleAdminStatus and juniSystemModuleControl.  Appropriate
+        'default' values are returned for the other objects.
+
+        Some module types don't contain any software related information (e.g.,
+        ERX I/O adapters do not) in which case their value of
+        juniSystemModuleSoftwareSupport will be false and there will not be a
+        corresponding entry in this table."
+    ::= { juniSystemModule 5 }
+
+juniSystemModuleSoftwareEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemModuleSoftwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry that provides software information about a specific
+        system module in a particular slot location."
+    INDEX     { juniSystemSlotNumber,
+                juniSystemSlotLevel }
+    ::= { juniSystemModuleSoftwareTable 1 }
+
+JuniSystemModuleSoftwareEntry  ::= SEQUENCE {
+    juniSystemModuleSoftwareVersion          DisplayString,
+    juniSystemModuleCpuUtilPct               Integer32,
+    juniSystemModuleMemUtilPct               Integer32,
+    juniSystemModuleAdminStatus              JuniEnable,
+    juniSystemModuleControl                  INTEGER,
+    juniSystemModuleBootReleaseFile          DisplayString,
+    juniSystemModuleBootBackupReleaseFile    DisplayString,
+    juniSystemModuleCpuFiveSecUtilPct        Integer32,
+    juniSystemModuleCpuOneMinAvgPct          Integer32,
+    juniSystemModuleCpuFiveMinAvgPct         Integer32 }
+
+juniSystemModuleSoftwareVersion  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Version identification of the currently executing operational software
+        on this module.  If the module is in a state where the software version
+        is not known (e.g., module type mismatch), then the value of this object
+        will be a zero-length string."
+    ::= { juniSystemModuleSoftwareEntry 2 }
+
+juniSystemModuleCpuUtilPct  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last available module CPU utilization percentage.  A value of -1
+        indicates the utilization is unknown. This value is calculated over
+        a 5 second period."
+    ::= { juniSystemModuleSoftwareEntry 3 }
+
+juniSystemModuleMemUtilPct  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of module memory utilization.  A value of -1 indicates the
+        utilization is unknown."
+    ::= { juniSystemModuleSoftwareEntry 4 }
+
+juniSystemModuleAdminStatus  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Provides administrative control to enable/disable the module.  This
+        object is read-only for certain types of modules."
+    ::= { juniSystemModuleSoftwareEntry 5 }
+
+juniSystemModuleControl  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noOperation(0),
+                    flush(1),
+                    reset(2),
+                    resetBackup(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Administrative control of this slot:
+            noOperation   - Setting this value has no effect.
+            flush         - Flushes the configuration associated with a module
+                            type that previously occupied this slot.  Used to
+                            explicitly confirm that the slot is now empty, or
+                            contains a different card type.  The module must be
+                            disabled when this value is asserted.  See the
+                            description for juniSystemModuleDisableReason.
+            reset         - Resets the module.
+            resetBackup   - Resets the module using the backup release file.
+
+        Get operations on this variable always return noOperation.  Module types
+        that do not support these operations simply ignore them."
+    ::= { juniSystemModuleSoftwareEntry 6 }
+
+juniSystemModuleBootReleaseFile  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The boot release file name for this slot, with extension '.rel'.  If a
+        file name is specified (not a zero-length string), then this release
+        file takes precedence over the subsystem boot release file
+        (juniSystemSubsystemBootReleaseFile) and the system-wide boot release
+        file (juniSystemBootReleaseFile) for just the module in this slot.
+
+        Some module types (e.g., ERX SRP modules) don't allow this object to be
+        set.  On a set operation, if there is no file that matches the name
+        specified, then an inconsistentValue error will be returned.  Setting
+        this object to a zero-length string deconfigures the slot-specific
+        primary release file."
+    DEFVAL    { "" }
+    ::= { juniSystemModuleSoftwareEntry 7 }
+
+juniSystemModuleBootBackupReleaseFile  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The backup boot release file name for this slot, with extension '.rel'.
+        If a file name is specified (a non-zero-length string), then this
+        release file takes precedence over the subsystem boot backup release
+        file (juniSystemSubsystemBootBackupReleaseFile) and the system-wide boot
+        backup release file (juniSystemBootBackupReleaseFile) for just the
+        module in this slot.
+
+        This object cannot be set unless the system has a backup file, which
+        mean that juniSystemBootBackupReleaseFile must contain a file name (a
+        non-zero-length string).  Some module types (e.g., ERX SRP modules)
+        don't allow this object to be set.  On a set operation, if there is no
+        file that matches the name specified, then an inconsistentValue error
+        will be returned.  Setting this object to a zero-length string
+        deconfigures the slot-specific backup release file."
+    DEFVAL    { "" }
+    ::= { juniSystemModuleSoftwareEntry 8 }
+
+juniSystemModuleCpuFiveSecUtilPct  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of average CPU utilization for the last five sec for this
+         module. A value of -1 indicates the utilization is unknown."
+    ::= { juniSystemModuleSoftwareEntry 9 }
+
+juniSystemModuleCpuOneMinAvgPct  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of average CPU utilization for the last one minute for this
+         module. A value of -1 indicates the utilization is unknown."
+    ::= { juniSystemModuleSoftwareEntry 10 }
+
+juniSystemModuleCpuFiveMinAvgPct  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of average CPU utilization for the last five minutes for 
+         this module. A value of -1 indicates the utilization is unknown."
+    ::= { juniSystemModuleSoftwareEntry 11 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Module Redundancy objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemModuleRedundancyTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemModuleRedundancyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of system module redundancy information.  Note that modules
+        that do not support redundancy information will not appear in this
+        table."
+    ::= { juniSystemModule 6 }
+
+juniSystemModuleRedundancyEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemModuleRedundancyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry that provides information about a specific system module
+        in a particular slot location."
+    INDEX     { juniSystemSlotNumber,
+                juniSystemSlotLevel }
+    ::= { juniSystemModuleRedundancyTable 1 }
+
+JuniSystemModuleRedundancyEntry  ::= SEQUENCE {
+    juniSystemModuleRedundancyGroupId        Unsigned32,
+    juniSystemModuleRedundancySpare          TruthValue,
+    juniSystemModuleRedundancyAssociatedSlot Integer32,
+    juniSystemModuleRedundancyLockout        JuniEnable,
+    juniSystemModuleRedundancyRevertControl  INTEGER,
+    juniSystemModuleRedundancyRevertTime     DateAndTime }
+
+juniSystemModuleRedundancyGroupId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the redundancy group as derived from hardware settings."
+    ::= { juniSystemModuleRedundancyEntry 1 }
+
+juniSystemModuleRedundancySpare  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "True only if this module is a spare redundant module."
+    ::= { juniSystemModuleRedundancyEntry 2 }
+
+juniSystemModuleRedundancyAssociatedSlot  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If this module is a primary redundant module, then the module at the
+        same slot level with the slot number identified by this variable is the
+        spare module that serves as this module's backup.
+
+        If this module is an active spare redundant module, then the module in
+        the slot identified by this variable is the primary module for which
+        this module is the spare.
+
+        If this module is an inactive spare redundant module, then the value of
+        this object is the slot number of the spare itself (the same value as
+        the first index)."
+    ::= { juniSystemModuleRedundancyEntry 3 }
+
+juniSystemModuleRedundancyLockout  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Provides administrative control to enable/disable redundancy protection
+        for the module in this slot."
+    ::= { juniSystemModuleRedundancyEntry 4 }
+
+juniSystemModuleRedundancyRevertControl  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off(0),
+                    immediate(1),
+                    timeAndDate(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Per-module control for reverting a primary module back from its active
+        redundant spare module:
+            off           - Disable reverting to the primary module.
+            immediate     - Revert as soon as this primary module is ready to
+                            enter the online state.
+            timeAndDate   - Revert to this primary module at time specified by
+                            juniSystemModuleRedundancyRevertTime, provided it is
+                            in the inactive state.
+
+        This control only applies to primary modules; spare modules can only be
+        set to off(0)."
+    ::= { juniSystemModuleRedundancyEntry 5 }
+
+juniSystemModuleRedundancyRevertTime  OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE(8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time associated with the timeAndDate (delayed) revert
+        operation.  Only the local format for DateAndTime is supported.  On a
+        set operation, if the time specified is prior to the current time, then
+        an inconsistent value error is returned.This object must be set concurrently 
+		with juniSystemModuleRedundancyRevertControl { timeAndDate(2) }."
+    ::= { juniSystemModuleRedundancyEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- I/O Port objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemPortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of system physical I/O ports.  The information in this table
+        reflects the ports for the expected module type in each slot; in event
+        of a module mismatch, this table permits navigation of the existing
+        configuration of the expected module type."
+    ::= { juniSystemPort 1 }
+
+juniSystemPortEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry describing a physical port of the system."
+    INDEX     { juniSystemSlotNumber,
+                juniSystemSlotLevel,
+                juniSystemPortNumber }
+    ::= { juniSystemPortTable 1 }
+
+JuniSystemPortEntry  ::= SEQUENCE {
+    juniSystemPortNumber         Integer32,
+    juniSystemPortIfIndex        InterfaceIndexOrZero,
+    juniSystemPortPhysicalIndex  PhysicalIndex }
+
+juniSystemPortNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port number of this physical port, relative to the slot in which it
+        resides.  Each physical port is uniquely distinguished by its slot
+        number, slot level and port number.  Port numbers are zero-based."
+    ::= { juniSystemPortEntry 1 }
+
+juniSystemPortIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the Interfaces MIB ifTable entry corresponding to this
+        physical port; if zero, the ifIndex is unknown or does not exist."
+    ::= { juniSystemPortEntry 2 }
+
+juniSystemPortPhysicalIndex  OBJECT-TYPE
+    SYNTAX      PhysicalIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entPhysicalIndex value assigned to this port.  This index may be
+        use to retrieve other information about the port, such as description
+        and type, from the ENTITY-MIB.entPhysicalTable."
+    ::= { juniSystemPortEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Timing objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemAdminTimingSource  OBJECT-TYPE
+    SYNTAX      JuniSystemTimingSelector
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative timing source for the system.  This variable is used
+        to select the desired timing source to be either primary, secondary or
+        tertiary.  Setting this variable will cause the system to change to the
+        specified timing source, provided it is currently available.  Setting
+        this value to error(4) is not allowed.
+
+        The system periodically monitors the status of the three timing sources.
+        If the systems current timing source fails, the system will
+        automatically downgrade to the next timing source.  If the system is
+        configured to automatically upgrade (juniSystemTimingAutoUpgrade is set
+        to enable(1)) the system will switch back to the timing source indicated
+        by this variable when it becomes available.
+
+        A timing source failure can be detected by comparing the operational and
+        administrative timing sources.  If they are not equal, the system has
+        swapped timing sources because the administratively set timing source is
+        in the error state."
+    ::= { juniSystemTiming 1 }
+
+juniSystemOperTimingSource  OBJECT-TYPE
+    SYNTAX      JuniSystemTimingSelector
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational timing source for the system.  The system periodically
+        monitors the status of three timing sources, primary, secondary and
+        tertiary.  If the systems current timing source fails, the system will
+        automatically downgrade to the next timing source.  If the system is
+        configured to automatically upgrade (juniSystemTimingAutoUpgrade is set
+        to enable(1)) the system will switch back to the higher timing source
+        when it becomes available."
+    ::= { juniSystemTiming 2 }
+
+juniSystemTimingAutoUpgrade  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object controls the automatic timing selector upgrade.  Setting
+        this object to disable(0) will prevent automatic upgrade to the next
+        highest timing selector.  Setting this object to enable(1) will enable
+        the automatic upgrade of timing selectors."
+    DEFVAL    { enable }
+    ::= { juniSystemTiming 3 }
+
+juniSystemTimingSelectorTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemTimingSelectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of system timing selectors.  This table only contains entries for
+        the primary, secondary and tertiary selecors."
+    ::= { juniSystemTiming 4 }
+
+juniSystemTimingSelectorEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemTimingSelectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry describing a system timing selector."
+    INDEX     { juniSystemTimingSelectorIndex }
+    ::= { juniSystemTimingSelectorTable 1 }
+
+JuniSystemTimingSelectorEntry  ::= SEQUENCE {
+    juniSystemTimingSelectorIndex    JuniSystemTimingSelector,
+    juniSystemTimingSourceType       INTEGER,
+    juniSystemTimingSourceIfIndex    InterfaceIndexOrZero,
+    juniSystemTimingSourceLine       INTEGER,
+    juniSystemTimingWorkingStatus    INTEGER,
+    juniSystemTimingProtectedStatus  INTEGER }
+
+juniSystemTimingSelectorIndex  OBJECT-TYPE
+    SYNTAX      JuniSystemTimingSelector
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The system timing selector index associated with this entry.  There are
+        valid indexes for selector types primary(1), secondary(2), tertiary(3)."
+    ::= { juniSystemTimingSelectorEntry 1 }
+
+juniSystemTimingSourceType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    timingInterfaceIfIndex(1),
+                    timingInternal(2),
+                    timingLine(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system timing source type for this entry.  This object must be set
+        to timingInterfaceIfIndex(1) when setting the
+        juniSystemTimingSourceIfIndex object or timingLine(3) when setting the
+        juniSystemTimingSourceLine object.  Also, if the value of this object is
+        set to timingInternal(2), no other objects should be set, otherwise the
+        agent will return an error."
+    ::= { juniSystemTimingSelectorEntry 2 }
+
+juniSystemTimingSourceIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface selected as the system timing source.  If
+        the juniSystemTimingSourceType object is not timingInterfaceIfIndex(1),
+        then reading this object will return a zero value.  The agent will not
+        accept a set to this object unless the juniSystemTimingSourceType object
+        is set to timingInterfaceIfIndex(1)."
+    DEFVAL    { 0 }
+    ::= { juniSystemTimingSelectorEntry 3 }
+
+juniSystemTimingSourceLine  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    timingSourceLineUndefined(0),
+                    timingSourceLineE1PortA(1),
+                    timingSourceLineE1PortB(2),
+                    timingSourceLineT1PortA(3),
+                    timingSourceLineT1PortB(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The line type timing source for this entry.  If the
+        juniSystemTimingSourceType object is not timingLine(3), then reading
+        this object will return timingSourceLineUndefined(0).  The agent will
+        not accept a set to this object unless the juniSystemTimingSourceType
+        object is set to timingLine(3).  Attempting to set this object to
+        timingSourceLineUndefined(0) will always return an inconsistantValue
+        error.  Attempting to set this object to a value that is not supported
+        on the type of system running the agent will result in an
+        inconsistantValue error."
+    DEFVAL    { timingSourceLineUndefined }
+    ::= { juniSystemTimingSelectorEntry 4 }
+
+juniSystemTimingWorkingStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    timingStatusOk(1),
+                    timingStatusError(2),
+                    timingStatusUnknown(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status associated with the working (normal) source of this system
+        timing working selector."
+    ::= { juniSystemTimingSelectorEntry 5 }
+
+juniSystemTimingProtectedStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    timingStatusOk(1),
+                    timingStatusError(2),
+                    timingStatusUnknown(3),
+                    sourceNotProtected(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status associated with the protected (backup) source of this system
+        timing selector.  If the system doesn't support protected timing
+        sources, then sourceNotProtected(4) will be returned."
+    ::= { juniSystemTimingSelectorEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Fabric objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemFabricSpeed  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "gigabits per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The speed of switching fabric, in gigabits per second."
+    ::= { juniSystemFabric 1 }
+
+juniSystemFabricRev  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The fabric revision number.  If unknown, a zero-length string is
+        reported."
+    ::= { juniSystemFabric 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Non-Volatile Storage status objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemNvsCount  OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of non-volatile storage (NVS) 'flash' cards in the system."
+    ::= { juniSystemNvs 1 }
+
+juniSystemNvsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemNvsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of NVS status information."
+    ::= { juniSystemNvs 2 }
+
+juniSystemNvsEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemNvsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry that provides the status information for a NVS flash
+        card."
+    INDEX     { juniSystemNvsIndex }
+    ::= { juniSystemNvsTable 1 }
+
+JuniSystemNvsEntry  ::= SEQUENCE {
+    juniSystemNvsIndex           Integer32,
+    juniSystemNvsStatus          INTEGER,
+    juniSystemNvsCapacity        Unsigned32,
+    juniSystemNvsUtilPct         Integer32,
+    juniSystemNvsPhysicalIndex   PhysicalIndex }
+
+juniSystemNvsIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index number of the NVS flash card.  There is an entry in this
+        table for all values of this index in the range of 1 to the value of
+        juniSystemNvsCount."
+    ::= { juniSystemNvsEntry 1 }
+
+juniSystemNvsStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notPresent(0),
+                    writeProtected(1),
+                    volumeError(2),
+                    nearCapacity(3),
+                    ok(4),
+                    noConfigSpace(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of non-volatile storage (NVS):
+            notPresent        - The SRP or the flash card is not accessible.
+            writeProtected    - NVS is write-protected.
+            volumeError       - Status poll of NVS failed.
+            nearCapacity      - Utilization exceeds 85% of NVS capacity.
+            ok                - NVS is fully operational with ample capacity.
+            noConfigSpace     - Utilization exceeds the ability to save the
+                                running configuration."
+    ::= { juniSystemNvsEntry 2 }
+
+juniSystemNvsCapacity  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "megabytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The capacity of NVS storage in megabytes."
+    ::= { juniSystemNvsEntry 3 }
+
+juniSystemNvsUtilPct  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The percentage of NVS storage used.  A value of -1 indicates NVS
+        utilization is unknown."
+    ::= { juniSystemNvsEntry 4 }
+
+juniSystemNvsPhysicalIndex  OBJECT-TYPE
+    SYNTAX      PhysicalIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entPhysicalIndex value assigned to this NVS flash card.  This index
+        may be use to retrieve other information about the NVS flash card, such
+        as description and type, from the ENTITY-MIB.entPhysicalTable."
+    ::= { juniSystemNvsEntry 5 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Power element objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemPowerCount  OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of power elements in the system."
+    ::= { juniSystemPower 1 }
+
+juniSystemPowerTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of status variables for the system power elements."
+    ::= { juniSystemPower 2 }
+
+juniSystemPowerEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry describing status of a system power element."
+    INDEX     { juniSystemPowerIndex }
+    ::= { juniSystemPowerTable 1 }
+
+JuniSystemPowerEntry  ::= SEQUENCE {
+    juniSystemPowerIndex         Integer32,
+    juniSystemPowerStatus        INTEGER,
+    juniSystemPowerPhysicalIndex PhysicalIndex }
+
+juniSystemPowerIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index number of the power element.  There is an entry in this table
+        for all values of this index in the range of 1 to the value of
+        juniSystemPowerCount."
+    ::= { juniSystemPowerEntry 1 }
+
+juniSystemPowerStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notPresent(0),
+                    inactive(1),
+                    good(2),
+                    failed(3),
+                    sensorFailed(4),
+                    unknown(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the power element:
+            notPresent    - The power element is removed from the chassis.
+            inactive      - No power is available from this element.
+            good          - Power is available from this element.
+            failed        - The power element is not working.
+            sensorFailed  - The power element sensor has failed.
+            unknown       - The status of the power element is not availiable."
+    ::= { juniSystemPowerEntry 2 }
+
+juniSystemPowerPhysicalIndex  OBJECT-TYPE
+    SYNTAX      PhysicalIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entPhysicalIndex value assigned to this power element.  This index
+        may be use to retrieve other information about the power element, such
+        as description and type, from the ENTITY-MIB.entPhysicalTable."
+    ::= { juniSystemPowerEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Temperature control (fan subsystem) objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemFanCount  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of fan subsystems that may be present in the system.
+        This is a fixed number for each product type."
+    ::= { juniSystemTemperature 1 }
+
+juniSystemFanTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of status of the system's fan subsystems."
+    ::= { juniSystemTemperature 2 }
+
+juniSystemFanEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry describing status of a fan subsystem."
+    INDEX     { juniSystemFanIndex }
+    ::= { juniSystemFanTable 1 }
+
+JuniSystemFanEntry  ::= SEQUENCE {
+    juniSystemFanIndex           Integer32,
+    juniSystemFanStatus          INTEGER,
+    juniSystemFanPhysicalIndex   PhysicalIndex }
+
+juniSystemFanIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index number of the fan subsystem.  This is a number in the range
+        of 1 to the value of juniSystemFanCount."
+    ::= { juniSystemFanEntry 1 }
+
+juniSystemFanStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    failed(0),
+                    ok(1),
+                    warning(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of fan subsystem.
+            failed    - The fan subsystem has a critical failure, or has been
+                        removed, and is now non-operational.
+            ok        - All components are operational.
+            warning   - The fan subsystem has a non-critical failure."
+    ::= { juniSystemFanEntry 2 }
+
+juniSystemFanPhysicalIndex  OBJECT-TYPE
+    SYNTAX      PhysicalIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entPhysicalIndex value assigned to this fan subsystem.  This index
+        may be use to retrieve other information about the fan subsystem, such
+        as description and type, from the ENTITY-MIB.entPhysicalTable."
+    ::= { juniSystemFanEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Temperature sensor objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemTempCount  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of possible temperature sensors in the system."
+    ::= { juniSystemTemperature 3 }
+
+juniSystemTempTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemTempEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of status of the system's temperature sensors."
+    ::= { juniSystemTemperature 4 }
+
+juniSystemTempEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemTempEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry describing status of a temperature sensor.  Sensors are
+        located throughout the system.  The ENTITY_MIB.entPhysicalTable provides
+        detailed information about the location of each sensor.  The index for a
+        table entry is fixed based on a product-specific algorithm that uses the
+        maximum number of sensors that may be on any module type associated with
+        each of the available slots.  This means that entries for sensors
+        associated with empty slots and the 'extra' sensors on modules that have
+        less than the maximum number of sensors for the slot type will have a
+        notPresent status."
+    INDEX     { juniSystemTempIndex }
+    ::= { juniSystemTempTable 1 }
+
+JuniSystemTempEntry  ::= SEQUENCE {
+    juniSystemTempIndex          Integer32,
+    juniSystemTempStatus         INTEGER,
+    juniSystemTempValue          Integer32,
+    juniSystemTempPhysicalIndex  Integer32 }
+
+juniSystemTempIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary number to uniquely identify the temperature sensor."
+    ::= { juniSystemTempEntry 1 }
+
+juniSystemTempStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    failed(1),
+                    tooLow(2),
+                    nominal(3),
+                    tooHigh(4),
+                    tooLowWarning(5),
+                    tooHighWarning(6) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of a temperature sensor:
+            unknown           - sensor is not present or is not accessible
+            failed            - sensor is broken
+            tooLow            - temperature is below nominal range
+            nominal           - temperature is within nominal range
+            tooHigh           - temperature is above nominal range
+            tooLowWarning     - temperature is near the nominal lower limit
+            tooHighWarning    - temperature is near the nominal upper limit "
+    ::= { juniSystemTempEntry 2 }
+
+juniSystemTempValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The temperature measured by this sensor in degrees Celsius.  This
+        measurement is valid only if the value of the corresponding
+        juniSystemTempStatus is tooLow, nominal or tooHigh."
+    ::= { juniSystemTempEntry 3 }
+
+juniSystemTempPhysicalIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entPhysicalIndex value assigned to this temperature sensor.  If the
+        temperature sensor is not present this object will return a value of 0.
+        For non-zero values this index may be used to retrieve other information
+        about the temperature sensor from the ENTITY-MIB.entPhysicalTable, such
+        as description and location."
+    ::= { juniSystemTempEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Thermal protection objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemTempProtectionStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off(0),
+                    monitoring(1),
+                    inHoldOff(2),
+                    activatedHoldOffExpired(3),
+                    activatedTempTooHigh(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Thermal Protection status:
+            off                       - No thermal protection.
+            monitoring                - Monitoring.
+            inHoldOff                 - Hold off time has begun.
+            activatedHoldOffExpired   - Hold off time has expired; the system
+                                        is in thermal protection mode.
+            activatedTempTooHigh      - The temperature is too high, the system
+                                        is in thermal protection mode."
+    ::= { juniSystemTemperature 5 }
+
+juniSystemTempProtectionHoldOffTime  OBJECT-TYPE
+    SYNTAX      Integer32 (0..1200)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time, in seconds, before the system enters Thermal Protection mode
+        after a critical thermal failure is detected."
+    DEFVAL    { 150 }
+    ::= { juniSystemTemperature 6 }
+
+juniSystemTempProtectionHoldOffTimeRemaining  OBJECT-TYPE
+    SYNTAX      Integer32 (0..1200)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time remaining, in seconds, before the system enters Thermal
+        Protection mode while the ThermalProtectionStatus is set to inHoldOff.
+        The value decrements every second until it reaches zero, and the status
+        changes to activatedHoldOffExpired.  When ThermalProtectionStatus is not
+        inHoldOff or activatedHoldOffExpired, the value is set to the hold off
+        time."
+    DEFVAL    { 150 }
+    ::= { juniSystemTemperature 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Resource utilization objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Resource utilization status table
+--
+juniSystemUtilizationTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of status of the utilization of system resources.  It is an
+        implementation option as to which resources (if any) are supported in
+        this table.  It is also an implementation option as to whether the
+        threshold objects are supported for a particular instance."
+    ::= { juniSystemUtilization 1 }
+
+juniSystemUtilizationEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry describing the status of the utilization of a system
+        resource."
+    INDEX     { juniSystemUtilizationResourceType,
+                juniSystemUtilizationResourceSubType,
+                juniSystemUtilizationLocationType,
+                juniSystemUtilizationLocation }
+    ::= { juniSystemUtilizationTable 1 }
+
+JuniSystemUtilizationEntry  ::= SEQUENCE {
+    juniSystemUtilizationResourceType       INTEGER,
+    juniSystemUtilizationResourceSubType    Integer32,
+    juniSystemUtilizationLocationType       JuniSystemLocationType,
+    juniSystemUtilizationLocation           JuniSystemLocation,
+    juniSystemUtilizationMaxCapacity        Gauge32,
+    juniSystemUtilizationCurrentValue       Gauge32,
+    juniSystemUtilizationThresholdRising    Gauge32,
+    juniSystemUtilizationThresholdFalling   Gauge32,
+    juniSystemUtilizationHoldDownTime       Gauge32 }
+
+juniSystemUtilizationResourceType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    interface(1),
+                    memory(2) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index identifies a type of enumerated value that is used for the
+        juniSystemUtilizationResourceSubType.  See the DESCRIPTION for
+        juniSystemUtilizationResourceSubType for the mapping of Type to SubType
+        enumeration and the corresponding units of measure used for each type of
+        resource."
+    ::= { juniSystemUtilizationEntry 1 }
+
+juniSystemUtilizationResourceSubType  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index uses an enumerated value that is different for each value of
+        juniSystemUtilizationResourceType.  The following table shows the
+        mapping of Type to SubType enumeration and the corresponding units of
+        measure used for each type of resource.
+
+        Type        SubType                         Units
+        -----------+-------------------------------+----------------------------
+        interface   Juniper-UNI-IF-MIB.juniIfType   number of interfaces
+        memory      SNMPv2-TC.StorageType           HOST-RESOURCES-MIB.KBytes "
+    ::= { juniSystemUtilizationEntry 2 }
+
+juniSystemUtilizationLocationType  OBJECT-TYPE
+    SYNTAX      JuniSystemLocationType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index element identifies the format of the location information so
+        that the juniSystemUtilizationLocation index element can be properly
+        interpreted."
+    ::= { juniSystemUtilizationEntry 3 }
+
+juniSystemUtilizationLocation  OBJECT-TYPE
+    SYNTAX      JuniSystemLocation
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index is used to specify the resource instance based on its
+        location.  Its value is interpreted based on the location type
+        identified by the juniSystemUtilizationLocationType index element."
+    ::= { juniSystemUtilizationEntry 4 }
+
+juniSystemUtilizationMaxCapacity  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of units of the resource the system can support.
+
+        See the DESCRIPTION of juniSystemUtilizationResourceSubType for what
+        constitutes a unit of value for this object.
+
+        Note that for some resources this value may not always be achievable due
+        to other resource constraints."
+    ::= { juniSystemUtilizationEntry 5 }
+
+juniSystemUtilizationCurrentValue  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of units of the resource in the system.
+
+        See the DESCRIPTION for juniSystemUtilizationResourceSubType for what
+        constitutes a unit of value for this object.
+
+        Note that some resource types may have instances that do not consume any
+        limited resources and therefore are not included in this count (e.g. IP
+        loopback interfaces do not consume routing resources and therefore don't
+        have a capacity limit, whereas 'external' IP interfaces do)."
+    ::= { juniSystemUtilizationEntry 6 }
+
+juniSystemUtilizationThresholdRising  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold value (risingVal), which, in conjunction with
+        juniSystemUtilizationHoldDownTime (holdTime) and
+        juniSystemUtilizationThresholdFalling (fallingVal), is used to decide
+        when to trigger an event indicating that the resource utilization,
+        juniSystemUtilizationCurrentValue (currentVal), is approaching or has
+        reached its maximum capacity, juniSystemUtilizationMaxCapacity (maxVal).
+
+        See the DESCRIPTION for juniSystemUtilizationResourceSubType for what
+        constitutes a unit of value for this object.
+
+        The value of fallingVal must be less than the value of this object.
+
+        This object provides one element in the formula used to determine when
+        to send a utilization notification.  If the currentVal rises to equal
+        the risingVal and no other utilization event (either rising or falling)
+        has been triggered within the holdTime, or if the holdTime for a falling
+        threshold notification expires and the currentVal is at or above the
+        risingVal, then and only then is a rising threshold utilization
+        notification sent.
+
+        The following pseudo-code states the algorithm more precisely.
+
+        When the resource is created or initialized ( currentVal == 0 ):
+            lastTrapType = none;
+            lastTrapTime = 0;
+
+        When currentVal increments (increases):
+            if ( currentVal == risingVal &&
+                 lastTrapTime + holdTime <= currentTime ) {
+                triggerUtilizationTrapRising();
+                lastTrapType = rising;
+                lastTrapTime = currentTime; }
+
+        When currentVal decrements (decreases):
+            if ( currentVal == fallingVal &&
+                 lastTrapTime + holdTime <= currentTime ) {
+                triggerUtilizationTrapFalling();
+                lastTrapType = falling;
+                lastTrapTime = currentTime; }
+
+        When the rising threshold value is modified:
+            if ( currentVal < oldRisingVal &&
+                 currentVal >= newRisingVal &&
+                 lastTrapTime + holdTime <= currentTime )
+                triggerUtilizationTrapRising();
+                lastTrapType = rising;
+                lastTrapTime = currentTime; }
+
+        When the falling threshold value is modified:
+            if ( currentVal > oldFallingVal &&
+                 currentVal <= newFallingVal &&
+                 lastTrapTime + holdTime <= currentTime )
+                triggerUtilizationTrapFalling();
+                lastTrapType = falling;
+                lastTrapTime = currentTime; }
+
+        When a hold-down time expires (lastTrapTime + holdTime == currentTime):
+            switch ( lastTrapType ) {
+                case rising:
+                    if ( currentVal <= fallingVal ) {
+                        triggerUtilizationTrapFalling();
+                        lastTrapType = falling;
+                        lastTrapTime = currentTime; }
+                    else {
+                        lastTrapType = none; }
+                    break;
+                case falling:
+                    if ( currentVal >= risingVal ) {
+                        triggerUtilizationTrapRising();
+                        lastTrapType = rising;
+                        lastTrapTime = currentTime; }
+                    else {
+                        lastTrapType = none; }
+                    break; } "
+    ::= { juniSystemUtilizationEntry 7 }
+
+juniSystemUtilizationThresholdFalling  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold value (fallingVal), which, in conjunction with
+        juniSystemUtilizationHoldDownTime (holdTime) and
+        juniSystemUtilizationThresholdRising (risingVal), is used to decide when
+        to trigger an event indicating that the resource utilization,
+        juniSystemUtilizationCurrentValue (currentVal), has fallen to or below
+        this level after having exceeded this value.
+
+        See the DESCRIPTION for juniSystemUtilizationResourceSubType for what
+        constitutes a unit of value for this object.
+
+        The value of this object  must be less than the value of risingVal.
+
+        This object provides one element in the formula used to determine when
+        to send a utilization notification.  If the currentVal falls to equal
+        the fallingVal and no other utilization event (either rising or falling)
+        has been triggered within the holdTime, or if the holdTime for a rising
+        threshold notification expires and the currentVal is at or below the
+        fallingVal, then and only then is a falling threshold utilization
+        notification sent.
+
+        The pseudo-code in the juniSystemUtilizationThresholdRising DESCRIPTION
+        states the algorithm more precisely."
+    ::= { juniSystemUtilizationEntry 8 }
+
+juniSystemUtilizationHoldDownTime  OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The hold-down time (holdTime) used in conjunction with
+        juniSystemUtilizationThresholdRising (risingVal) and
+        juniSystemUtilizationThresholdFalling (fallingVal) to decide when to
+        trigger an event indicating that the resource utilization,
+        juniSystemUtilizationCurrentValue (currentVal), has reached or surpassed
+        one of the thresholds.
+
+        This object provides one element in the formula used to determine when
+        to send a utilization notification.  If the resource utilization
+        increases to the rising threshold value but a prior rising or falling
+        utilization event has been triggered within this hold-down time then no
+        rising threshold utilization notification may be sent at that time.  If
+        the resource utilization decreases to the falling threshold value but a
+        prior rising or falling utilization event has been triggered within this
+        hold-down time then no falling threshold utilization notification may be
+        sent at that time.  However, if the end of a hold-down period for a
+        rising threshold utilization notification is reached and the current
+        value is at or below the falling threshold value, then a falling
+        threshold notification is sent and the hold-down timer is restarted.
+        Likewise, if the end of a hold-down period for a falling threshold
+        utilization notification is reached and the current value is at or above
+        the rising threshold value, then a rising threshold notification is sent
+        and the hold-down timer is restarted.
+
+        The pseudo-code in the juniSystemUtilizationThresholdRising DESCRIPTION
+        states the algorithm more precisely."
+    ::= { juniSystemUtilizationEntry 9 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Task profiling (process cpu utilization) objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemCpuUtilizationTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSystemCpuUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of status of the cpu utilization by various tasks."
+    ::= { juniSystemUtilization 2 }
+
+juniSystemCpuUtilizationEntry  OBJECT-TYPE
+    SYNTAX      JuniSystemCpuUtilizationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry describing cpu utilization of a particular task."
+    INDEX { juniSystemCpuUtilizationTimeMark,
+            juniSystemCpuUtilizationTaskName }
+    ::= { juniSystemCpuUtilizationTable 1 }
+
+JuniSystemCpuUtilizationEntry ::= SEQUENCE {
+    juniSystemCpuUtilizationTimeMark                  JuniTimeFilter,
+    juniSystemCpuUtilizationTaskName                  JuniSystemTaskName,
+    juniSystemCpuUtilizationInvoked                   Integer32,
+    juniSystemCpuUtilizationInvokationPerSec          Integer32,
+    juniSystemCpuUtilizationTotalRunningTime          Integer32,
+    juniSystemCpuUtilizationPercentageRunningTime     Integer32,    
+    juniSystemCpuUtilizationAverageTimePerInvokation  Integer32,
+    juniSystemCpuUtilizationFiveSecondUtilization     Integer32,    
+    juniSystemCpuUtilizationOneMinuteUtilization      Integer32,
+    juniSystemCpuUtilizationFiveMinuteUtilization     Integer32,
+    juniSystemCpuUtilizationNumberOfInstances         Integer32 }
+
+juniSystemCpuUtilizationTimeMark  OBJECT-TYPE
+    SYNTAX      JuniTimeFilter
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A TimeFilter for this task profile entry.  Allows GetNext and GetBulk
+        to find task profile rows which have changed since a specified
+        value of sysUptime."
+    REFERENCE
+        "Refer to RFC 2021 for the definition of the TimeFilter, its usage and 
+        implementation notes."
+    ::= { juniSystemCpuUtilizationEntry 1 }
+
+juniSystemCpuUtilizationTaskName  OBJECT-TYPE
+    SYNTAX      JuniSystemTaskName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Task name associated with this task profile entry."
+    ::= { juniSystemCpuUtilizationEntry 2 }
+
+juniSystemCpuUtilizationInvoked  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times task associated with this task profile 
+        entry being invoked."
+    ::= { juniSystemCpuUtilizationEntry 3 }
+
+juniSystemCpuUtilizationInvokationPerSec  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of invokation for the task associated with this task 
+        profile entry."
+    ::= { juniSystemCpuUtilizationEntry 4 }
+
+juniSystemCpuUtilizationTotalRunningTime  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "milli Seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total running time for the task associated with this task 
+        profile entry."
+    ::= { juniSystemCpuUtilizationEntry 5 }
+
+juniSystemCpuUtilizationPercentageRunningTime  OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage running time for the task associated with this task 
+        profile entry."
+    ::= { juniSystemCpuUtilizationEntry 6 }
+
+juniSystemCpuUtilizationAverageTimePerInvokation  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "micro Seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average running time per invokation for the task associated  
+        with this task profile entry."
+    ::= { juniSystemCpuUtilizationEntry 7 }
+
+juniSystemCpuUtilizationFiveSecondUtilization  OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Utilization in terms of percentage during the five seconds measurement 
+        interval for the task associated with this task profile entry."
+    ::= { juniSystemCpuUtilizationEntry 8 }
+
+juniSystemCpuUtilizationOneMinuteUtilization  OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Utilization in terms of percentage during the one minute measurement 
+        interval for the task associated with this task profile entry."
+    ::= { juniSystemCpuUtilizationEntry 9 }
+
+juniSystemCpuUtilizationFiveMinuteUtilization  OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Utilization in terms of percentage during the five minutes measurement 
+        interval for the task associated with this task profile entry."
+    ::= { juniSystemCpuUtilizationEntry 10 }
+
+juniSystemCpuUtilizationNumberOfInstances  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of instances consolidated for CPU utilization calculation in this 
+        task profile entry."
+    ::= { juniSystemCpuUtilizationEntry 11 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- ISSU objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemIssuState   OBJECT-TYPE 
+    SYNTAX      INTEGER {
+                    idle(1),
+                    initializing(2),
+                    initialized(3),
+                    upgrading(4),
+                    stopping(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the system with respect to ISSU upgrade:
+            idle         - ISSU is currently idle
+            initializing - ISSU initialization is in-progress 
+            initialized  - ISSU has successfully initialized
+            upgrading    - ISSU is currently upgrading to the new armed release
+            stopping     - ISSU is currently in the process of stopping
+
+        This object is supported on the second generation E-series
+        platform family (E320 & E120) in JUNOSe 9.0 and subsequent system
+        releases. This object is also supported on ERX-1440 in JUNOSe 9.2
+        and subsequent system releases."
+    ::= { juniSystemIssu  1 }
+
+juniSystemIssuRunningReleaseFile  OBJECT-TYPE 
+    SYNTAX          DisplayString (SIZE(0..128)) 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The currently running release file name, with extension '.rel'.
+        The system was booted last time with this release file.
+
+        This object is supported on the second generation E-series
+        platform family (E320 & E120) in JUNOSe 9.0 and subsequent system
+        releases. This object is also supported on ERX-1440 in JUNOSe 9.2
+        and subsequent system releases."
+    ::= { juniSystemIssu  2 }
+
+juniSystemIssuArmedReleaseFile    OBJECT-TYPE 
+    SYNTAX          DisplayString (SIZE(0..128)) 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The currently armed release file name, with extension '.rel'.
+        The system will be booted with this release file, after ISSU (if
+        it is not aborted).
+
+        This object is supported on the second generation E-series
+        platform family (E320 & E120) in JUNOSe 9.0 and subsequent system
+        releases. This object is also supported on ERX-1440 in JUNOSe 9.2
+        and subsequent system releases."
+    ::= { juniSystemIssu 3 }
+
+juniSystemIssuStatus  OBJECT-TYPE 
+    SYNTAX      INTEGER {
+                    ok(1),
+                    warning(2),
+                    error(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the system with respect to ISSU upgrade.
+            ok           - no error or warning found
+            warning      - at least one upgrade warning found, upgrade is possible
+            error        - at least one upgrade error found, upgrade is not possible
+
+        This object is supported on the second generation E-series
+        platform family (E320 & E120) in JUNOSe 9.0 and subsequent system
+        releases. This object is also supported on ERX-1440 in JUNOSe 9.2
+        and subsequent system releases."
+    ::= { juniSystemIssu  4 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- ISSU upgrade Criteria
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemIssuCriteriaTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF JuniSystemIssuCriteriaEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A Table of criteria for an ISSU initialization.
+        
+        This table will be empty for unsupported platforms. These objects
+        are supported on the second generation E-series platform
+        family (E320 & E120) in JUNOSe 9.0 and subsequent system releases.
+        This object is also supported on ERX-1440 in JUNOSe 9.2 and
+        subsequent system releases."
+    ::= { juniSystemIssu 5 }
+
+juniSystemIssuCriteriaEntry  OBJECT-TYPE
+    SYNTAX          JuniSystemIssuCriteriaEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table entry describing the criteria for an ISSU initialization."
+    INDEX           { juniSystemIssuCriteriaIndex }
+    ::= { juniSystemIssuCriteriaTable 1 }
+
+    JuniSystemIssuCriteriaEntry ::= SEQUENCE {
+        juniSystemIssuCriteriaIndex                   Integer32,
+        juniSystemIssuCriteriaDescription             DisplayString,
+        juniSystemIssuCriteriaStatus                  INTEGER }
+
+juniSystemIssuCriteriaIndex   OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index associated with an entry of the system ISSU Criteria Table."
+    ::= { juniSystemIssuCriteriaEntry 1 }
+
+juniSystemIssuCriteriaDescription   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "To initialize ISSU, few criteria need to be met. If these criteria
+        were not met, ISSU cannot be initialized. This object provides the
+        criteria details."
+    ::= { juniSystemIssuCriteriaEntry 2 }
+
+juniSystemIssuCriteriaStatus    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    yes(1),
+                    no(2),
+                    conditional(3)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "To initialize ISSU, few criteria need to be met. If these criteria
+        were not met, ISSU cannot be initialized. This object indicates
+        whether a criteria has met. It will be conditional when that the
+        user can choose to accept the consequences of proceeding with ISSU
+        with non-ideal operating conditions."
+    ::= { juniSystemIssuCriteriaEntry 3 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notification control objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemMemUtilTrapEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the sending of primary system processor memory utilization
+        events.  Setting the value of this object to true(1) will cause system
+        memory utilization event notifications, if they occur, to be sent to the
+        management entity on this system.  Setting the value of this object to
+        false(2) will disable memory utilization event notifications."
+    DEFVAL    { false }
+    ::= { juniSystemGeneral 19 }
+
+juniSystemReloadSlotNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "In a juniSystemReloadCommand notification, this object indicates the
+        number of the slot that is being reloaded.  Note that slot numbers are
+        zero-based."
+    ::= { juniSystemGeneral 20 }
+
+juniSystemUtilizationThresholdDirection  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    rising(1),
+                    falling(2) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The type of resource utilization notification being sent.  See the
+        DESCRIPTIONs for the juniSystemUtilizationTable elements for details on
+        what conditions trigger a resource utilization notification."
+    ::= { juniSystemGeneral 21 }
+
+juniSystemUtilizationTrapEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the sending of system resource utilization threshold
+        notifications.  Setting the value of this object to true(1) will allow
+        resource utilization threshold event notifications, if they occur, to be
+        sent to the management entity on this system.  Setting the value of this
+        object to false(2) will disable resource utilization threshold
+        utilization event notifications."
+    DEFVAL    { true }
+    ::= { juniSystemGeneral 22 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+--
+-- The juniSystemTrap OBJECT IDENTIFIER is used to define SNMPv2 notifications
+-- that may be translated into SNMPv1 traps.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemHighMemUtil  NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemMemCapacity,
+        juniSystemMemUtilPct,
+        juniSystemAbatedMemUtilThreshold,
+        juniSystemHighMemUtilThreshold,
+        juniSystemMemKBytesCapacity }
+    STATUS      current
+    DESCRIPTION
+        "Report system memory utilization has met the conditions of
+        juniSystemHighMemUtilThreshold.  If the memory capacity is greater than
+        2147483647, a -1 value is returned in juniSystemMemCapacity, and the
+        actual memory capacity in units of 1024 bytes is returned in
+        juniSystemMemKBytesCapacity."
+    ::= { juniSystemTrap 1 }
+
+juniSystemAbatedMemUtil  NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemMemCapacity,
+        juniSystemMemUtilPct,
+        juniSystemAbatedMemUtilThreshold,
+        juniSystemHighMemUtilThreshold,
+        juniSystemMemKBytesCapacity }
+    STATUS      current
+    DESCRIPTION
+        "Reports system memory utilization has met the conditions of
+        juniSystemAbatedMemUtilThreshold.  If the memory capacity is greater
+        than 2147483647, a -1 value is returned in juniSystemMemCapacity, and
+        the actual memory capacity in units of 1024 bytes is returned in
+        juniSystemMemKBytesCapacity."
+    ::= { juniSystemTrap 2 }
+
+juniSystemModuleOperStatusChange  NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemModuleCurrentType,
+        juniSystemModuleAdminStatus,
+        juniSystemModuleOperStatus,
+        juniSystemModuleDisableReason,
+        juniSystemModuleDescr }
+    STATUS      current
+    DESCRIPTION
+        "Reports a status change for a module.  This trap is generated on a
+        transition into a stable state (online or disabled) or on a transition
+        out of online.  If redundancy is supported for the module
+        (juniSystemModuleRedundancySupported is true(1)), then the
+        juniSystemModuleSpareServer and juniSystemModuleAssociatedSlot objects
+        are also included in the notification."
+    ::= { juniSystemTrap 3 }
+
+juniSystemPowerStatusChange  NOTIFICATION-TYPE
+    OBJECTS {
+        entPhysicalDescr,
+        juniSystemPowerStatus }
+    STATUS      current
+    DESCRIPTION
+        "Reports a change in the status of a power element."
+    ::= { juniSystemTrap 4 }
+
+juniSystemFanStatusChange  NOTIFICATION-TYPE
+    OBJECTS {
+        entPhysicalDescr,
+        juniSystemFanStatus }
+    STATUS      current
+    DESCRIPTION
+        "Reports a transition between the three states of the fan subsystem.
+        When the fan subsystem transitions to the failed state the Thermal
+        Protection hold off time begins."
+    ::= { juniSystemTrap 5 }
+
+juniSystemTempStatusChange  NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemTempStatus }
+    STATUS      current
+    DESCRIPTION
+        "Reports a change in the temperature status.  When the status
+        transitions to the tooHigh state the system enters Thermal Protection
+        mode."
+    ::= { juniSystemTrap 6 }
+
+juniSystemTempProtectionStatusChange  NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemTempProtectionStatus,
+        juniSystemTempProtectionHoldOffTimeRemaining }
+    STATUS      current
+    DESCRIPTION
+        "Notification about changes in the state of Thermal Protection.  This
+        notification is sent when the tempProtectionStatus changes.  It is also
+        sent when the holdOffTimeRemaining is 50% of the holdOffTime."
+    ::= { juniSystemTrap 7 }
+
+juniSystemReloadCommand  NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "Notification indicating that a slot or the entire system is about to
+        restart due to a system console reload command.  If the reload is only
+        on an individual slot then the following object is included in the
+        notification:
+            juniSystemReloadSlotNumber "
+    ::= { juniSystemTrap 8 }
+
+juniSystemUtilizationThreshold  NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemUtilizationThresholdDirection,
+        juniSystemUtilizationMaxCapacity,
+        juniSystemUtilizationCurrentValue,
+        juniSystemUtilizationThresholdRising,
+        juniSystemUtilizationThresholdFalling,
+        juniSystemUtilizationHoldDownTime }
+    STATUS      current
+    DESCRIPTION
+        "Notification indicating that a system resource's utilization has met
+        the conditions of juniSystemUtilizationThresholdDirection.  See the
+        DESCRIPTIONs for the juniSystemUtilizationTable elements for details on
+        what conditions trigger a resource utilization notification."
+    ::= { juniSystemTrap 9 }
+
+juniSystemIssuStateChange    NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemIssuState }
+    STATUS      current
+    DESCRIPTION
+        "Notification about changes in the status, in case of ISSU upgrade.
+        This notification is sent when the juniSystemIssuState changes. The
+        trap parameter will indicate the current value of the
+        juniSystemIssuState.
+
+        This notification is supported on the second generation E-series
+        platform family (E320 & E120) from 9.0 release onwards. This
+        object is also supported on ERX-1440 in JUNOSe 9.2 and
+        subsequent system releases."
+    ::= { juniSystemTrap 10 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSystemCompliances OBJECT IDENTIFIER ::= { juniSystemConformance 1 }
+juniSystemGroups      OBJECT IDENTIFIER ::= { juniSystemConformance 2 }
+
+--
+-- compliance statements
+--
+juniSystemCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        E-series System MIB.  This statement became obsolete when system
+        resource utilization support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSystemGeneralGroup,
+            juniSystemSubsystemGroup,
+            juniSystemModuleGroup,
+            juniSystemPortGroup,
+            juniSystemTimingGroup,
+            juniSystemFabricGroup,
+            juniSystemNvsGroup,
+            juniSystemPowerGroup,
+            juniSystemTemperatureGroup,
+            juniSystemNotificationObjectsGroup,
+            juniSystemNotificationGroup }
+    ::= { juniSystemCompliances 1 }                                -- JUNOSe 4.1
+
+juniSystemCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        E-series System MIB.  This statement became obsolete when the system
+        resource utilization trap enabled and the KByte memory capacilty objects
+        were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSystemGeneralGroup,
+            juniSystemSubsystemGroup,
+            juniSystemModuleGroup,
+            juniSystemPortGroup,
+            juniSystemTimingGroup,
+            juniSystemFabricGroup,
+            juniSystemNvsGroup,
+            juniSystemPowerGroup,
+            juniSystemTemperatureGroup,
+            juniSystemUtilizationGroup,
+            juniSystemNotificationObjectsGroup,
+            juniSystemNotificationGroup2 }
+            OBJECT      juniSystemUtilizationMaxCapacity
+                MIN-ACCESS  accessible-for-notify
+                DESCRIPTION
+                    "This object is only required to be included in the
+                    juniSystemUtilizationThreshold notifications."
+            OBJECT      juniSystemUtilizationCurrentValue
+                MIN-ACCESS  accessible-for-notify
+                DESCRIPTION
+                    "This object is only required to be included in the
+                    juniSystemUtilizationThreshold notifications."
+            OBJECT      juniSystemUtilizationThresholdRising
+                MIN-ACCESS  accessible-for-notify
+                DESCRIPTION
+                    "This object may have a fixed value in a particular
+                    implementation and is therefore only required to be included
+                    in the juniSystemUtilizationThreshold notifications."
+            OBJECT      juniSystemUtilizationThresholdFalling
+                MIN-ACCESS  accessible-for-notify
+                DESCRIPTION
+                    "This object may have a fixed value in a particular
+                    implementation and is therefore only required to be included
+                    in the juniSystemUtilizationThreshold notifications."
+            OBJECT      juniSystemUtilizationHoldDownTime
+                MIN-ACCESS  accessible-for-notify
+                DESCRIPTION
+                    "This object may have a fixed value in a particular
+                    implementation and is therefore only required to be included
+                    in the juniSystemUtilizationThreshold notifications."
+    ::= { juniSystemCompliances 2 }                                -- JUNOSe 5.0
+
+juniSystemCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        E-series System MIB.  This statement became obsolete when the module
+        level span object was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSystemGeneralGroup2,
+            juniSystemSubsystemGroup,
+            juniSystemModuleGroup,
+            juniSystemPortGroup,
+            juniSystemTimingGroup,
+            juniSystemFabricGroup,
+            juniSystemNvsGroup,
+            juniSystemPowerGroup,
+            juniSystemTemperatureGroup,
+            juniSystemUtilizationGroup,
+            juniSystemNotificationObjectsGroup,
+            juniSystemNotificationGroup2 }
+    ::= { juniSystemCompliances 3 }                                -- JUNOSe 5.2
+
+juniSystemCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        E-series System MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSystemGeneralGroup2,
+            juniSystemSubsystemGroup,
+            juniSystemModuleGroup2,
+            juniSystemPortGroup,
+            juniSystemTimingGroup,
+            juniSystemFabricGroup,
+            juniSystemNvsGroup,
+            juniSystemPowerGroup,
+            juniSystemTemperatureGroup,
+            juniSystemUtilizationGroup,
+            juniSystemNotificationObjectsGroup,
+            juniSystemNotificationGroup2 }
+    ::= { juniSystemCompliances 4 }                                -- JUNOSe 6.0
+
+juniSystemCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        E-series System MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSystemGeneralGroup2,
+            juniSystemSubsystemGroup,
+            juniSystemModuleGroup2,
+            juniSystemPortGroup,
+            juniSystemTimingGroup,
+            juniSystemFabricGroup,
+            juniSystemNvsGroup,
+            juniSystemPowerGroup,
+            juniSystemTemperatureGroup,
+            juniSystemUtilizationGroup2,
+            juniSystemNotificationObjectsGroup,
+            juniSystemNotificationGroup2 }
+    ::= { juniSystemCompliances 5 }                                -- JUNOSe 7.3
+
+juniSystemCompliance6  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper
+        E-series System MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSystemGeneralGroup2,
+            juniSystemSubsystemGroup,
+            juniSystemModuleGroup3,
+            juniSystemPortGroup,
+            juniSystemTimingGroup,
+            juniSystemFabricGroup,
+            juniSystemNvsGroup,
+            juniSystemPowerGroup,
+            juniSystemTemperatureGroup,
+            juniSystemUtilizationGroup2,
+            juniSystemNotificationObjectsGroup,
+            juniSystemNotificationGroup2 }
+    ::= { juniSystemCompliances 6 }                                -- JUNOSe 8.0
+
+juniSystemCompliance7  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper
+        E-series System MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSystemGeneralGroup2,
+            juniSystemSubsystemGroup,
+            juniSystemModuleGroup3,
+            juniSystemPortGroup,
+            juniSystemTimingGroup,
+            juniSystemFabricGroup,
+            juniSystemNvsGroup,
+            juniSystemPowerGroup,
+            juniSystemTemperatureGroup,
+            juniSystemUtilizationGroup2,
+            juniSystemNotificationObjectsGroup,
+            juniSystemIssuGroup,
+            juniSystemNotificationGroup3 }
+    ::= { juniSystemCompliances 7 }                                -- JUNOSe 9.0
+--
+-- units of conformance
+--
+juniSystemGeneralGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSystemSwVersion,
+        juniSystemSwBuildDate,
+        juniSystemMemUtilPct,
+        juniSystemMemCapacity,
+        juniSystemHighMemUtilThreshold,
+        juniSystemAbatedMemUtilThreshold,
+        juniSystemMemUtilTrapEnable,
+
+        juniSystemBootConfigControl,
+        juniSystemBootBackupConfigControl,
+        juniSystemBootForceBackupControl,
+        juniSystemBootAutoRevertControl,
+        juniSystemBootAutoRevertCountTolerance,
+        juniSystemBootAutoRevertTimeTolerance,
+        juniSystemBootReleaseFile,
+        juniSystemBootConfigFile,
+        juniSystemBootBackupReleaseFile,
+        juniSystemBootBackupConfigFile,
+
+        juniSystemRedundancyRevertControl,
+        juniSystemRedundancyRevertTimeOfDay }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of management objects providing system-wide
+        software status and control information in a Juniper E-series product.
+        This group became obsolete when the system resource utilization
+        threshold trap enable/disable and the KByte memory capacilty objects
+        were added."
+    ::= { juniSystemGroups 1 }                                     -- JUNOSe 4.1
+
+juniSystemSubsystemGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSystemSubsystemName,
+        juniSystemSubsystemBootReleaseFile,
+        juniSystemSubsystemBootBackupReleaseFile }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects providing subsystem software control
+        information in a Juniper E-series product."
+    ::= { juniSystemGroups 2 }                                     -- JUNOSe 4.1
+
+juniSystemModuleGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSystemMaxSlotNumber,
+        juniSystemMaxModulesPerSlot,
+
+        juniSystemSlotStatus,
+        juniSystemSlotType,
+
+        juniSystemModuleOperStatus,
+        juniSystemModuleDisableReason,
+        juniSystemModuleLastChange,
+        juniSystemModuleCurrentType,
+        juniSystemModuleExpectedType,
+        juniSystemModuleDescr,
+        juniSystemModuleSlotSpan,
+        juniSystemModulePortCount,
+        juniSystemModuleSerialNumber,
+        juniSystemModuleAssemblyPartNumber,
+        juniSystemModuleAssemblyRev,
+        juniSystemModulePhysicalIndex,
+        juniSystemModuleSoftwareSupport,
+        juniSystemModuleRedundancySupport,
+
+        juniSystemModuleSoftwareVersion,
+        juniSystemModuleCpuUtilPct,
+        juniSystemModuleMemUtilPct,
+        juniSystemModuleAdminStatus,
+        juniSystemModuleControl,
+        juniSystemModuleBootReleaseFile,
+        juniSystemModuleBootBackupReleaseFile,
+
+        juniSystemModuleRedundancyGroupId,
+        juniSystemModuleRedundancySpare,
+        juniSystemModuleRedundancyAssociatedSlot,
+        juniSystemModuleRedundancyLockout,
+        juniSystemModuleRedundancyRevertControl,
+        juniSystemModuleRedundancyRevertTime }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of management objects that provide system module
+        information in a Juniper E-series product.  This group became obsolete
+        when the module level span object was added."
+    ::= { juniSystemGroups 3 }                                     -- JUNOSe 4.1
+
+juniSystemPortGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSystemPortPhysicalIndex,
+        juniSystemPortIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects providing physical I/O port
+        information in a Juniper E-series product."
+    ::= { juniSystemGroups 4 }                                     -- JUNOSe 4.1
+
+juniSystemTimingGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSystemAdminTimingSource,
+        juniSystemOperTimingSource,
+        juniSystemTimingAutoUpgrade,
+
+        juniSystemTimingSourceType,
+        juniSystemTimingSourceIfIndex,
+        juniSystemTimingSourceLine,
+        juniSystemTimingWorkingStatus,
+        juniSystemTimingProtectedStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects providing system timing source
+        information in a Juniper E-series product."
+    ::= { juniSystemGroups 5 }                                     -- JUNOSe 4.1
+
+juniSystemFabricGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSystemFabricSpeed,
+        juniSystemFabricRev }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects providing system fabric information
+        in a Juniper E-series product."
+    ::= { juniSystemGroups 6 }                                     -- JUNOSe 4.1
+
+juniSystemNvsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSystemNvsCount,
+
+        juniSystemNvsPhysicalIndex,
+        juniSystemNvsStatus,
+        juniSystemNvsCapacity,
+        juniSystemNvsUtilPct }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects providing system non-volatile
+        storage (NVS) information in a Juniper E-series product."
+    ::= { juniSystemGroups 7 }                                     -- JUNOSe 4.1
+
+juniSystemPowerGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSystemPowerCount,
+
+        juniSystemPowerPhysicalIndex,
+        juniSystemPowerStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects providing system power element
+        information in a Juniper E-series product."
+    ::= { juniSystemGroups 8 }                                     -- JUNOSe 4.1
+
+juniSystemTemperatureGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSystemFanCount,
+
+        juniSystemFanPhysicalIndex,
+        juniSystemFanStatus,
+
+        juniSystemTempCount,
+
+        juniSystemTempStatus,
+        juniSystemTempValue,
+        juniSystemTempPhysicalIndex,
+
+        juniSystemTempProtectionStatus,
+        juniSystemTempProtectionHoldOffTime,
+        juniSystemTempProtectionHoldOffTimeRemaining }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects providing system temperature control
+        information in a Juniper E-series product."
+    ::= { juniSystemGroups 9 }                                     -- JUNOSe 4.1
+
+juniSystemNotificationObjectsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSystemReloadSlotNumber }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects providing system information for
+        notification in a Juniper E-series product."
+    ::= { juniSystemGroups 10 }                                    -- JUNOSe 4.1
+
+juniSystemNotificationGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniSystemHighMemUtil,
+        juniSystemAbatedMemUtil,
+        juniSystemModuleOperStatusChange,
+        juniSystemPowerStatusChange,
+        juniSystemFanStatusChange,
+        juniSystemTempStatusChange,
+        juniSystemTempProtectionStatusChange,
+        juniSystemReloadCommand }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of notifications for system events in a Juniper
+        E-series product.  This group became obsolete when the system resource
+        utilization notification was added."
+    ::= { juniSystemGroups 11 }                                    -- JUNOSe 4.1
+
+juniSystemUtilizationGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSystemUtilizationMaxCapacity,
+        juniSystemUtilizationCurrentValue,
+        juniSystemUtilizationThresholdRising,
+        juniSystemUtilizationThresholdFalling,
+        juniSystemUtilizationHoldDownTime,
+        juniSystemUtilizationThresholdDirection }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of management objects providing system resource
+        utilization information and notification control for a Juniper E-series
+        product."
+    ::= { juniSystemGroups 12 }                                    -- JUNOSe 5.0
+
+juniSystemNotificationGroup2  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniSystemHighMemUtil,
+        juniSystemAbatedMemUtil,
+        juniSystemModuleOperStatusChange,
+        juniSystemPowerStatusChange,
+        juniSystemFanStatusChange,
+        juniSystemTempStatusChange,
+        juniSystemTempProtectionStatusChange,
+        juniSystemReloadCommand,
+        juniSystemUtilizationThreshold }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of notifications for system events in a Juniper E-series
+        product."
+    ::= { juniSystemGroups 13 }                                    -- JUNOSe 5.0
+
+juniSystemGeneralGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniSystemSwVersion,
+        juniSystemSwBuildDate,
+        juniSystemMemUtilPct,
+        juniSystemMemCapacity,
+        juniSystemMemKBytesCapacity,
+        juniSystemHighMemUtilThreshold,
+        juniSystemAbatedMemUtilThreshold,
+        juniSystemMemUtilTrapEnable,
+        juniSystemUtilizationTrapEnable,
+
+        juniSystemBootConfigControl,
+        juniSystemBootBackupConfigControl,
+        juniSystemBootForceBackupControl,
+        juniSystemBootAutoRevertControl,
+        juniSystemBootAutoRevertCountTolerance,
+        juniSystemBootAutoRevertTimeTolerance,
+        juniSystemBootReleaseFile,
+        juniSystemBootConfigFile,
+        juniSystemBootBackupReleaseFile,
+        juniSystemBootBackupConfigFile,
+
+        juniSystemRedundancyRevertControl,
+        juniSystemRedundancyRevertTimeOfDay }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects providing system-wide software
+        status and control information in a Juniper E-series product."
+    ::= { juniSystemGroups 14 }                                    -- JUNOSe 5.2
+
+juniSystemModuleGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniSystemMaxSlotNumber,
+        juniSystemMaxModulesPerSlot,
+
+        juniSystemSlotStatus,
+        juniSystemSlotType,
+
+        juniSystemModuleOperStatus,
+        juniSystemModuleDisableReason,
+        juniSystemModuleLastChange,
+        juniSystemModuleCurrentType,
+        juniSystemModuleExpectedType,
+        juniSystemModuleDescr,
+        juniSystemModuleSlotSpan,
+        juniSystemModulePortCount,
+        juniSystemModuleSerialNumber,
+        juniSystemModuleAssemblyPartNumber,
+        juniSystemModuleAssemblyRev,
+        juniSystemModulePhysicalIndex,
+        juniSystemModuleSoftwareSupport,
+        juniSystemModuleRedundancySupport,
+        juniSystemModuleLevelSpan,
+
+        juniSystemModuleSoftwareVersion,
+        juniSystemModuleCpuUtilPct,
+        juniSystemModuleMemUtilPct,
+        juniSystemModuleAdminStatus,
+        juniSystemModuleControl,
+        juniSystemModuleBootReleaseFile,
+        juniSystemModuleBootBackupReleaseFile,
+
+        juniSystemModuleRedundancyGroupId,
+        juniSystemModuleRedundancySpare,
+        juniSystemModuleRedundancyAssociatedSlot,
+        juniSystemModuleRedundancyLockout,
+        juniSystemModuleRedundancyRevertControl,
+        juniSystemModuleRedundancyRevertTime }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of management objects that provide system module
+        information in a Juniper E-series product."
+    ::= { juniSystemGroups 15 }                                    -- JUNOSe 6.0
+
+juniSystemUtilizationGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniSystemUtilizationMaxCapacity,
+        juniSystemUtilizationCurrentValue,
+        juniSystemUtilizationThresholdRising,
+        juniSystemUtilizationThresholdFalling,
+        juniSystemUtilizationHoldDownTime,
+        juniSystemUtilizationThresholdDirection,        
+        juniSystemCpuUtilizationTaskName,
+        juniSystemCpuUtilizationInvoked,
+        juniSystemCpuUtilizationInvokationPerSec,
+        juniSystemCpuUtilizationTotalRunningTime,
+        juniSystemCpuUtilizationPercentageRunningTime,    
+        juniSystemCpuUtilizationAverageTimePerInvokation,
+        juniSystemCpuUtilizationFiveSecondUtilization,    
+        juniSystemCpuUtilizationOneMinuteUtilization,
+        juniSystemCpuUtilizationFiveMinuteUtilization,
+        juniSystemCpuUtilizationNumberOfInstances }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects providing system resource
+        utilization information and notification control for a Juniper E-series
+        product."
+    ::= { juniSystemGroups 16 }                                    -- JUNOSe 7.3  
+
+juniSystemModuleGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniSystemMaxSlotNumber,
+        juniSystemMaxModulesPerSlot,
+
+        juniSystemSlotStatus,
+        juniSystemSlotType,
+
+        juniSystemModuleOperStatus,
+        juniSystemModuleDisableReason,
+        juniSystemModuleLastChange,
+        juniSystemModuleCurrentType,
+        juniSystemModuleExpectedType,
+        juniSystemModuleDescr,
+        juniSystemModuleSlotSpan,
+        juniSystemModulePortCount,
+        juniSystemModuleSerialNumber,
+        juniSystemModuleAssemblyPartNumber,
+        juniSystemModuleAssemblyRev,
+        juniSystemModulePhysicalIndex,
+        juniSystemModuleSoftwareSupport,
+        juniSystemModuleRedundancySupport,
+        juniSystemModuleLevelSpan,
+
+        juniSystemModuleSoftwareVersion,
+        juniSystemModuleCpuUtilPct,
+        juniSystemModuleMemUtilPct,
+        juniSystemModuleAdminStatus,
+        juniSystemModuleControl,
+        juniSystemModuleBootReleaseFile,
+        juniSystemModuleBootBackupReleaseFile,
+        juniSystemModuleCpuFiveSecUtilPct,
+        juniSystemModuleCpuOneMinAvgPct,
+        juniSystemModuleCpuFiveMinAvgPct,
+
+        juniSystemModuleRedundancyGroupId,
+        juniSystemModuleRedundancySpare,
+        juniSystemModuleRedundancyAssociatedSlot,
+        juniSystemModuleRedundancyLockout,
+        juniSystemModuleRedundancyRevertControl,
+        juniSystemModuleRedundancyRevertTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects that provide system module
+        information in a Juniper E-series product."
+    ::= { juniSystemGroups 17 }                                    -- JUNOSe 8.0
+
+juniSystemIssuGroup	OBJECT-GROUP
+	OBJECTS	{
+        juniSystemIssuState,
+        juniSystemIssuArmedReleaseFile,
+        juniSystemIssuRunningReleaseFile,
+        juniSystemIssuStatus,
+
+        juniSystemIssuCriteriaDescription,
+        juniSystemIssuCriteriaStatus }
+	STATUS		current
+	DESCRIPTION
+        "A collection of management objects that provide ISSU related
+        information in a Juniper E-series product."
+	::= { juniSystemGroups 18 }                                   -- JUNOSe 9.0
+
+juniSystemNotificationGroup3	NOTIFICATION-GROUP
+	NOTIFICATIONS	{
+        juniSystemHighMemUtil,
+        juniSystemAbatedMemUtil,
+        juniSystemModuleOperStatusChange,
+        juniSystemPowerStatusChange,
+        juniSystemFanStatusChange,
+        juniSystemTempStatusChange,
+        juniSystemTempProtectionStatusChange,
+        juniSystemReloadCommand,
+        juniSystemUtilizationThreshold,
+        juniSystemIssuStateChange }
+	STATUS		current
+	DESCRIPTION		
+        "A collection of notifications for system events in a Juniper E-series
+        product."
+	::= { juniSystemGroups 19 }                                   -- JUNOSe 9.0
+
+END

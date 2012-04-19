@@ -1,0 +1,2515 @@
+-- =====================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: Huawei Configuration management MIB
+-- Reference:   HUAWEI Enterprise MIB
+-- Version:     V1.10
+-- History:
+--  
+--  2005-04-21  V1.10   Zhang Xianping  Added traps for disk fault.
+--  2003-05-28  V1.00   Yu Bo           Initial version for first baseline.
+-- =====================================================================
+HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		PhysicalIndex			
+			FROM ENTITY-MIB			
+			EnabledStatus			
+				FROM P-BRIDGE-MIB			
+		OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP			
+			FROM SNMPv2-CONF			
+		Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE			
+			FROM SNMPv2-SMI			
+		RowPointer, DateAndTime, DisplayString, RowStatus			
+			FROM SNMPv2-TC
+		hwDatacomm			
+			FROM HUAWEI-MIB;
+
+	huaweiSystemManMIB MODULE-IDENTITY 
+		LAST-UPDATED "200212200000Z"		-- December 20, 2002  GMT
+		ORGANIZATION 
+			"Huawei Technologies Co., Ltd."
+		CONTACT-INFO 
+			"VRP Team Huawei Technologies co.,Ltd.				
+			Huawei Bld.,NO.3 Xinxi Rd., 
+			Shang-Di Information Industry Base,
+			Hai-Dian District Beijing P.R. China
+			http://www.huawei.com
+			Zip:100085"
+		DESCRIPTION 
+			"The HUAWEI-SYS-MAN-MIB contains objects to manage the system.
+			The module defines the information about system, such as system
+			time, the current configuration file and system image file, system
+			reload actions, and notifications. By querying the system time,
+			configuration files and system image files, NMS can reboot the device
+			in the specified time and the specified configuration and system image."
+		::= { hwDatacomm 19 }
+
+    --
+    -- Node definitions
+    --
+		HWPatchErrorType ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"           
+				description.
+				"
+			SYNTAX INTEGER
+				{
+				initNoMemory(1),
+				initMemProtectFail(2),
+				fetchInputIsNull(5),
+				fetchFlagNotSame(6),
+				fetchProgVerInvalid(7),
+				fetchProgCrcInvalid(8),
+				fetchPatNoInvalid(9),
+				fetchTotalNumInvalid(10),
+				fetchUnitCrcInvalid(11),
+				fetchFuncNumTooMany(12),
+				fetchTypeInvalid(13),
+				fetchCommonAfterTemp(14),
+				fetchLengthNotSuited(15),
+				fetchCodeAddrNotSuited(16),
+				fetchDataAddrNotSuited(17),
+				fetchBaseAddrNotSuited(18),
+				fetchCodeLenOverflow(19),
+				fetchDataLenOverflow(20),
+				fetchOldAfterIndependent(103),
+				fetchUpdateDependency(104),
+				chgproChangeModeFailed(30),
+				activeNumInvalid(40),
+				activeHasBeenActived(41),
+				activeNotExist(42),
+				activeStateInvalid(43),
+				activeCodeAddrNotSuited(44),
+				activeDataAddrNotSuited(45),
+				activeBaseAddrNotSuited(46),
+				activeFormatUnknown(47),
+				runNumInvalid(55),
+				runHasInRunning(56),
+				runNotActive(57),
+				runIdleState(58),
+				runBadState(59),
+				deactNumInvalid(70),
+				deactRunOrActive(71),
+				deactRunningState(72),
+				deactBadState(73),
+				removeNumInvalid(80),
+				removeHasInIdle(81),
+				removeBadStatus(82),
+				caclcrcFileCrcInvalid(90),
+				caclcrcUnitCrcInvalid(91),
+				caclcrcOutputIsNull(92),
+				caclcrcNumInvalid(93),
+				caclcrcBadUnitCrc(95),
+				showNumInvalid(100),
+				showCodeLenIsZero(101),
+				showDataLenIsZero(102),
+				addlistBadParam(105),
+				addlistMemAllocFail(106),
+				depToListBadParamDep(107),
+				depToListBadParamList(108),
+				depToListMemFreeFail(109),
+				depToListAddItemFail(110),
+				listToDepBadParamDep(111),
+				listToDepBadParamList(112),
+				listToDepBadParamDepCount(113),
+				updateDepBadParam(114),
+				updateDepMemAllocFail(115),
+				updateDepDepToListFail(116),
+				updateDepToInterFail(117),
+				updateDepFromInterFail(118),
+				updateDepListToDepFail(119),
+				depToInterBadParam(120),
+				depToInterInvalidNo(121),
+				depToInterAddFail(122),
+				interToDepBadParam(123),
+				interToDepAppendFail(124),
+				appendListBadParam(125),
+				appendListAddFail(126),
+				indActiveBadParam(127),
+				indActiveAlreadyActive(128),
+				indActiveListFail(129),
+				indActiveListGenFail(130),
+				indActiveListAppendFail(131),
+				indActiveMemFreeFail(132),
+				indActiveDepIdle(133),
+				indActiveDepInvalid(134),
+				indActiveCodeAddrNotSuited(135),
+				indActiveDataAddrNotSuited(136),
+				indActiveBaseAddrNotSuited(137),
+				indActiveNotLoaded(138),
+				indActiveFuncFail(139),
+				indPatchFileNoInd(140),
+				indRunFail(141),
+				indDeactiveFail(142),
+				indRemoveFail(143),
+				indGetDepOfPara(144),
+				indGetDepOnPara(145),
+				indGetDepOnFail(146),
+				fetchBufferPara(147),
+				fetchBufferFail(148),
+				getStatePara(149),
+				indActiveAlreadyRunning(150),
+				indFreeListInputNull(151),
+				indFreeListMemFreeErr(152),
+				indBitTblToArrayInputNull(153),
+				indBitTblToArrayFreeFail(154),
+				indBitTblToArrayAllocFail(155),
+				indBitTblToArrayBitsetMore(156),
+				indBitTblToArrayBitsetLess(157),
+				listToDepBadParamAllocFail(158),
+				listToDepBadParamFreeFail(159),
+				indDeactiveFreeNull(160),
+				indRemoveFreeFail(161),
+				getInfoBufNull(162),
+				getInfoOutputNull(163),
+				getInfoFlagNotSame(164),
+				getInfoProgCrcInvalid(165),
+				getInfoFileCrcInvalid(166),
+				getInfoUnitCrcInvalid(167),
+				indPatchOpNotconfig(169),
+				normalOpNotconfig(170),
+				indDeactiveDeative(173),
+				indDeactiveRunning(174),
+				indDeactiveInvalid(176),
+				indRunDeactive(177),
+				indRunRunning(178),
+				indRunIdle(179),
+				indRunInvalid(180),
+				indActiveIdle(171),
+				indActiveInvalid(172),
+				indFetchActive(183),
+				indFetchRunning(185),
+				indFetchDeactive(184),
+				indFetchInvalid(186),
+				indRemoveIdle(181),
+				indRemoveInvalid(182),
+				unknown(65535)
+				}
+
+	huaweiSystemManMIBObjects OBJECT IDENTIFIER ::= { huaweiSystemManMIB 1 }
+
+	hwSysClock OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 1 }
+
+	hwSysLocalClock OBJECT-TYPE
+		SYNTAX DateAndTime
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This node gives the current local time of the system.
+			The unit of it is DateAndTime."
+		::= { hwSysClock 1 }
+
+	hwSysCurrent OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 2 }
+
+	hwSysCurTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwSysCurEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The current status of system. A configuration file and an image 
+			file are used to describe the current status."
+		::= { hwSysCurrent 1 }
+
+	hwSysCurEntry OBJECT-TYPE
+		SYNTAX HwSysCurEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry of hwSysCurTable. It is indexed by hwSysCurEntPhysicalIndex."
+		INDEX { hwSysCurEntPhysicalIndex }
+		::= { hwSysCurTable 1 }
+
+	HwSysCurEntry ::=
+		SEQUENCE { 
+			hwSysCurEntPhysicalIndex
+				Integer32,
+			hwSysCurCFGFileIndex
+				Integer32,
+			hwSysCurImageIndex
+					Integer32,
+				hwSysCurPafFileIndex
+					Integer32,
+				hwSysCurLicenseIndex
+					Integer32,
+				hwSysCurPatchFileIndex
+				Integer32
+		 }
+
+	hwSysCurEntPhysicalIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..2147483647)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Specifies the entity."
+		::= { hwSysCurEntry 1 }
+
+	hwSysCurCFGFileIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The startup configuration file currently used by the specified entity.
+			If the value of it is zero, none of the configuration file is used."
+		::= { hwSysCurEntry 2 }
+
+	hwSysCurImageIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The image file currently used by the specified entity.
+			If the value of it is zero, the system image is loaded from network."
+		::= { hwSysCurEntry 3 }
+
+		
+		hwSysCurPafFileIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The paf file currently used by the specified entity.
+				If the value of it is zero,none of the paf file is used.
+				"
+			::= { hwSysCurEntry 4 }
+
+		
+		hwSysCurLicenseIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The license file currently used by the specified entity.
+				If the value of it is zero,none of the License file is used.
+				"
+			::= { hwSysCurEntry 5 }
+
+		
+		hwSysCurPatchFileIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The patch file currently used by the specified hwPatchFileTable entity.
+				If the value of it is zero,none of the patch file is used.
+				"
+			::= { hwSysCurEntry 6 }
+
+		
+		hwSysReload OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 3 }
+
+	hwSysReloadSchedule OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The value of the object is a pointer to hwSysReloadSceduleTable.   
+			When a reload action had been finished, the value of it
+			would be zero. 
+			"
+		::= { hwSysReload 1 }
+
+	hwSysReloadAction OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			reloadUnavailable(1),
+			reloadOnSchedule(2),
+			reloadAtOnce(3),
+			reloadCancel(4)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Writing reloadOnSchedule(2) to this object perform the reload operation on      
+			schedule .Writing reloadAtOnce(3)to this object perform the reload operation at  
+			once, regardless of the hwSysReloadScheduleTime. When reloadcancel(4)is set , all the scheduled 
+			reload action will be canceled .If hwSysReloadSchedule is invalid, or the row of , 
+			hwSysReloadScheduleEntry hwSysReloadSchedule pointing to is not active,
+			all the reload action will be ignored , and an inconsistent value may be returned.    
+			
+			When a reload action had been finished, or there is no reload action , the value of it
+			would be reloadUnavailable(1)."
+		::= { hwSysReload 2 }
+	
+	hwSysReloadScheduleTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwSysReloadScheduleEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A reload parameters table."
+		::= { hwSysReload 3 }
+
+	hwSysReloadScheduleEntry OBJECT-TYPE
+		SYNTAX HwSysReloadScheduleEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Entry of hwSysReloadScheduleTable."
+		INDEX { hwSysReloadScheduleIndex }
+		::= { hwSysReloadScheduleTable 1 }
+
+	HwSysReloadScheduleEntry ::=
+		SEQUENCE { 
+			hwSysReloadScheduleIndex
+				Integer32,
+			hwSysReloadEntity
+				PhysicalIndex,
+			hwSysReloadCfgFile
+				Integer32,
+			hwSysReloadImage
+				Integer32,
+			hwSysReloadReason
+				DisplayString,
+			hwSysReloadScheduleTime
+				DateAndTime,
+			hwSysReloadRowStatus
+					RowStatus,
+				hwSysReloadPafFile
+					Integer32,
+				hwSysReloadLicenseFile
+					Integer32,
+				hwSysReloadPatchFile
+					Integer32,
+				hwSysReloadPatchState
+					INTEGER,
+				hwSysReloadOperateDestType
+					INTEGER,
+				hwSysReloadOperateDestIndex
+					DisplayString
+		 }
+
+	hwSysReloadScheduleIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..2147483647)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The index of hwSysReloadScheduleTable."
+		::= { hwSysReloadScheduleEntry 1 }
+
+	hwSysReloadEntity OBJECT-TYPE
+		SYNTAX PhysicalIndex
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The value of hwSysReloadEntity indicates an entry in entPhysicalTable , which
+			is the physical entity to be reloaded."
+		::= { hwSysReloadScheduleEntry 2 }
+
+	hwSysReloadCfgFile OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The value  indicates an entry in hwSysCFGFileTable. It
+			can decide which configuration file for reload action. 
+			The zero value means no configuration file available."
+		::= { hwSysReloadScheduleEntry 3 }
+
+	hwSysReloadImage OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The value indicates an entry in hwSysImageTable. It
+			can decide which image file for reload action. 
+			When the value is zero,it indicates that the image file is loaded from the network."
+		::= { hwSysReloadScheduleEntry 4 }
+
+	hwSysReloadReason OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (1..255))
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The reason of system's reload.  After the system is reloaded,
+			this object value will be empty octet string."
+		::= { hwSysReloadScheduleEntry 5 }
+
+	hwSysReloadScheduleTime OBJECT-TYPE
+		SYNTAX DateAndTime (SIZE(8))
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Specify the time at which the reload action 
+			will be occurred.
+			we will only take octet strings   
+			with length 8 for this object which indicates the   
+			local time of the switch. The maximum scheduled     
+			time is 24 days from the current system clock time. 
+			
+				field  octets  contents                  range
+				-----  ------  --------                  -----
+				  1      1-2   year                      0..65536
+				  2       3    month                     1..12
+				  3       4    day                       1..31
+				  4       5    hour                      0..23
+				  5       6    minutes                   0..59
+				  6       7    seconds                   0..60
+				  	      (use 60 for leap-second)
+				  7       8    deci-seconds              0..9
+
+			
+			If the value set is to be before the value of hwSysLocalClock
+			or beyond the maximum scheduled time limit, a bad value error
+			occurred.                                                 
+			The value of all-zero octet strings indicates system reload 
+			at once if the reload action is reloadOnSchedule(2).				      
+			"
+		::= { hwSysReloadScheduleEntry 6 }
+
+	hwSysReloadRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"If one of value of hwSysReloadEntity,hwSysReloadCfgFile and hwSysReloadImage
+			is invalid, the value of hwSysReloadRowStatus can not be set to 'active'.
+			
+			A valid entry means the specified element is available in current system.
+			e.g.
+			Reload an entity indexed by hwSysReloadEntity with the startup configuration
+			file and the image may be not allowed. Herein the entry is invalid.
+			"
+		::= { hwSysReloadScheduleEntry 7 }
+
+		hwSysReloadPafFile OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The value  indicates an entry in hwSysPafFileTable. It
+				can decide which paf file for reload action. 
+				The zero value means no paf file available or configure ,default is 0."
+			::= { hwSysReloadScheduleEntry 8 }
+
+		
+		hwSysReloadLicenseFile OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The value indicates an entry in hwSysLicenseFileTable. It
+				can decide which license file for reload action. 
+				The zero value means no license file available or configure ,default is 0."
+			::= { hwSysReloadScheduleEntry 9 }
+		hwSysReloadPatchFile OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The value  indicates an entry in hwPatchFileTable. It
+				can decide which patch file for reload action. 
+				The zero value means no patch file available or configure ,default is 0."
+			::= { hwSysReloadScheduleEntry 10 }
+
+		
+		hwSysReloadPatchState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				run(1),
+				unused(255)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The running status of the patch when it starts up next time.
+				Specify whether the loaded patch runs to the run state when the patch starts up next time.
+				run(1): indicates that the loaded patch runs to the run state when the patch starts up next time.
+				unused(255): indicates that the loaded patch runs to the original status when the patch starts up next time.
+				"
+			::= { hwSysReloadScheduleEntry 11 }
+			
+		hwSysReloadOperateDestType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			all(1),
+			slave(2),
+			chassis(3),
+			unused(4)
+			}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Reload operate object type,it combine with the hwSysReloadOperateDestIndex 
+				to note the operate object."
+			::= { hwSysReloadScheduleEntry 12 }
+			
+		hwSysReloadOperateDestIndex OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Reload operate object index,it combine with chassis,the value of hwSysReloadOperateDestType, 
+				to note the operate object.hwSysReloadOperateDestIndex is value such as ccc1,clc2 etc."
+			::= { hwSysReloadScheduleEntry 13 }
+	
+		hwSysReboot OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unused(1),
+				rebootWholeRoute(2),
+				rebootSlave(3),
+				slaveSwitch(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The master/slave board starts up.
+				unused(1): unused.
+				rebootWholeRoute(2): The device restarts.
+				rebootSlave(3): The standby main board restarts.
+				slaveSwitch(4): Indicates active/standby switchover. If hwSysSlaveSwitchEnable is disabled, the active/standby cannot succeed.
+				"
+			::= { hwSysReload 4 }
+
+		
+		hwSysSlaveSwitchEnable OBJECT-TYPE
+			SYNTAX EnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The active/standby switchover. If the active/standby switchover is not enabled, the active/standby switchover fails.
+				1: enable: The active/standby switchover is enabled.
+				2: disable: The active/standby switchover is not enabled."
+			::= { hwSysReload 5 }
+
+		
+		hwSysLatestRebootErrorInfo OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Error information of the latest restart."
+			::= { hwSysReload 6 }
+			
+		hwSysSlaveSwitchTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSysSlaveSwitchEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A slave switchover enable parameters table."
+			::= { hwSysReload 7 }
+			
+		hwSysSlaveSwitchEntry OBJECT-TYPE
+			SYNTAX HwSysSlaveSwitchEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Entry of hwSysSlaveSwitchTable."
+			INDEX { hwSysSlaveSwitchIndex }
+			::= { hwSysSlaveSwitchTable 1 }
+			
+		HwSysSlaveSwitchEntry ::=
+			SEQUENCE {
+				hwSysSlaveSwitchIndex
+					Integer32,
+				hwSysSlaveSwitchChassisNum
+					DisplayString,
+				hwSysSlaveSwitchOperType
+					INTEGER,
+				hwSysSlaveSwitchEnableStatus
+					EnabledStatus
+			 }
+			
+		hwSysSlaveSwitchIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..80)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Index of the slaveswitch table,the value is filled by logic chassis number."
+			::= { hwSysSlaveSwitchEntry 1 }
+			
+		hwSysSlaveSwitchChassisNum OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Physical chassis number for the slaveswitch table."
+			::= { hwSysSlaveSwitchEntry 2 }
+		
+		hwSysSlaveSwitchOperType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			unused(1),
+			slaveSwitch(2),
+			slaveSwitchLock(3)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"SlaveSwitch operate status.
+				unused(1):default value.
+				slaveSwitch(2):slave switchover execute.
+				slaveSwitchLock(3):slave switchover enabled or disbled,it's worked with the node
+				hwSysSlaveSwitchEnableStatus."
+			::= { hwSysSlaveSwitchEntry 3 }
+				
+		hwSysSlaveSwitchEnableStatus OBJECT-TYPE
+			SYNTAX EnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"SlaveSwitch enable status for the slaveswitch table.Include set slaveswitch
+				status and check the slaveswitch status.
+				enable(1):slave switchover enabled.
+				disable(2):slave switchover disabled."
+			::= { hwSysSlaveSwitchEntry 4 }
+		
+  	hwSysDelayReboot OBJECT-TYPE
+			SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			  "Restart the device at a delayed time. The delayed time can be set up to 34560 minutes.
+			  The node is used to set the delayed time, cancel the setting, or check the status of 
+			  the delayed restart. If a value within the range of 0 to 34560 is entered, the delayed 
+			  time is set. If the value 65535 is entered, the setting is cancelled. 
+			  Other values are invalid. "
+			::= { hwSysReload 8 }
+
+
+	hwSysImage OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 4 }
+
+	hwSysImageNum OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of system images.It indicates the
+			total entries of hwSysImageTable."
+		::= { hwSysImage 1 }
+
+	hwSysImageTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwSysImageEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The system image management table."
+		::= { hwSysImage 2 }
+
+	hwSysImageEntry OBJECT-TYPE
+		SYNTAX HwSysImageEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A system image entry. Each entry consists of information of
+			a system image.
+			hwSysImageIndex exclusively decides an image file."
+		INDEX { hwSysImageIndex }
+		::= { hwSysImageTable 1 }
+
+	HwSysImageEntry ::=
+		SEQUENCE { 
+			hwSysImageIndex
+				Integer32,
+			hwSysImageName
+				DisplayString,
+			hwSysImageSize
+				Integer32,
+			hwSysImageLocation
+					DisplayString,
+				hwSysImageVersion
+				DisplayString
+		 }
+
+	hwSysImageIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..2147483647)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A monotonically increasing integer for the sole purpose of
+			indexing events.  When it reaches the maximum value, an    
+			extremely unlikely event, the agent wraps the value back   
+			to 1 and may flush existing entries."
+		::= { hwSysImageEntry 1 }
+
+	hwSysImageName OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"The file name of the image. It must not contain the path of the file."
+		::= { hwSysImageEntry 2 }
+
+	hwSysImageSize OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The file size of the image."
+		::= { hwSysImageEntry 3 }
+
+	hwSysImageLocation OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The location of the image. It may be of the form   
+			entPhysicalIndex:device/path
+			e.g.
+			<6:flash:/image> means that the position is image folder in flash 
+			of entity indexed by 6.                 
+			"
+		::= { hwSysImageEntry 4 }
+	
+		hwSysImageVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Version information of the image that the file corresponds to."
+			::= { hwSysImageEntry 5 }
+	hwSysCFGFile OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 5 }
+
+	hwSysCFGFileNum OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of the configuration files in the system.It indicates the
+			total entries of hwSysCFGFileTable."
+		::= { hwSysCFGFile 1 }
+
+	hwSysCFGFileTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwSysCFGFileEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of configuration files in this system."
+		::= { hwSysCFGFile 2 }
+
+	hwSysCFGFileEntry OBJECT-TYPE
+		SYNTAX HwSysCFGFileEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A configuration file entry. Each entry consists of information of
+			a configuration file.
+			 hwSysCFGFileIndex exclusively decides a configuration file."
+		INDEX { hwSysCFGFileIndex }
+		::= { hwSysCFGFileTable 1 }
+
+	HwSysCFGFileEntry ::=
+		SEQUENCE { 
+			hwSysCFGFileIndex
+				Integer32,
+			hwSysCFGFileName
+				DisplayString,
+			hwSysCFGFileSize
+				Integer32,
+			hwSysCFGFileLocation
+				DisplayString
+		 }
+
+	hwSysCFGFileIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..2147483647)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A monotonically increasing integer for the sole purpose of
+			indexing events.  When it reaches the maximum value, an
+			extremely unlikely event, the agent wraps the value back
+			to 1 and may flush existing entries."
+		::= { hwSysCFGFileEntry 1 }
+
+	hwSysCFGFileName OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Configuration file name. The name should not include the colon (:)
+			character as it is a special separator character used
+			to delineate the device name, partition name, and the
+			file name."
+		::= { hwSysCFGFileEntry 2 }
+
+	hwSysCFGFileSize OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Size of the file in bytes. Note that this size does 
+			not include the size of the file system file header.
+			File size will always be non-zero."
+		::= { hwSysCFGFileEntry 3 }
+
+		
+		hwSysCFGFileLocation OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The location of file. It may be of the form 
+				entPhysicalIndex:device/path
+				e.g.
+				<6:flash:/config> means that the position is the configuration folder in flash 
+				of entity indexed by 6."
+			::= { hwSysCFGFileEntry 4 }
+
+		
+		hwSysPafFile OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 6 }
+
+		
+		hwSysPafFileNum OBJECT-TYPE
+			SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of the paf files in the system.It indicates the
+				total entries of hwSysPafFileTable."
+			::= { hwSysPafFile 1 }
+
+		
+		hwSysPafFileTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSysPafFileEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A table of paf files in this system."
+			::= { hwSysPafFile 2 }
+
+		
+		hwSysPafFileEntry OBJECT-TYPE
+			SYNTAX HwSysPafFileEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A paf file entry. Each entry consists of information of
+				a paf file.
+				 hwSysPafFileIndex  exclusively decides a configuration file."
+			INDEX { hwSysPafFileIndex }
+			::= { hwSysPafFileTable 1 }
+
+		
+		HwSysPafFileEntry ::=
+			SEQUENCE { 
+				hwSysPafFileIndex
+					Integer32,
+				hwSysPafFileName
+					DisplayString,
+				hwSysPafFileSize
+					Integer32,
+				hwSysPafFileLocation
+					DisplayString,
+				hwSysPafFileVersion
+					DisplayString
+			 }
+
+		hwSysPafFileIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of the paf file."
+			::= { hwSysPafFileEntry 1 }
+
+		
+		hwSysPafFileName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The name of the paf file."
+			::= { hwSysPafFileEntry 2 }
+
+		
+		hwSysPafFileSize OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The size of the paf file."
+			::= { hwSysPafFileEntry 3 }
+
+		
+		hwSysPafFileLocation OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The location of the paf file."
+			::= { hwSysPafFileEntry 4 }
+
+		
+		hwSysPafFileVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Version information of the paf file."
+			::= { hwSysPafFileEntry 5 }
+
+		
+		hwSysLicenseFile OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 7 }
+
+		
+		hwSysLicenseFileNum OBJECT-TYPE
+			SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of system license.It indicates the
+				total entries of hwSysLicenseFileTable."
+			::= { hwSysLicenseFile 1 }
+
+		
+		hwSysLicenseFileTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSysLicenseFileEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A table of license files in this system."
+			::= { hwSysLicenseFile 2 }
+
+		
+		hwSysLicenseFileEntry OBJECT-TYPE
+			SYNTAX HwSysLicenseFileEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A license file entry. Each entry consists of information of
+				a license  file.
+				 hwSysLicenseFileIndex exclusively decides a configuration file."
+			INDEX { hwSysLicenseFileIndex }
+			::= { hwSysLicenseFileTable 1 }
+
+		
+		HwSysLicenseFileEntry ::=
+			SEQUENCE { 
+				hwSysLicenseFileIndex
+					Integer32,
+				hwSysLicenseFileName
+					DisplayString,
+				hwSysLicenseFileSize
+					Integer32,
+				hwSysLicenseFileLocation
+					DisplayString
+			 }
+
+		hwSysLicenseFileIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of the license file."
+			::= { hwSysLicenseFileEntry 1 }
+
+		
+		hwSysLicenseFileName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The name of the license file."
+			::= { hwSysLicenseFileEntry 2 }
+
+		
+		hwSysLicenseFileSize OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The size of the license file."
+			::= { hwSysLicenseFileEntry 3 }
+
+		
+		hwSysLicenseFileLocation OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The location of the license file."
+			::= { hwSysLicenseFileEntry 4 }
+
+		
+		hwPatch OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 8 }
+
+		
+		hwPatchBase OBJECT IDENTIFIER ::= { hwPatch 1 }
+
+		
+		hwPatchFileNum OBJECT-TYPE
+			SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of system patch.It indicates the
+				total entries of hwPatchFileTable."
+			::= { hwPatchBase 1 }
+
+		
+		hwPatchRecordReset OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unused(1),
+				resetPatchHistory(2),
+				resetPatchError(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Clear the patch records.
+				unused(1): unused.
+				resetPatchHistory(2): clears the hwPatchHistoryTable record.
+				resetPatchError(3): clears the hwPatchErrorTable record."
+			::= { hwPatchBase 2 }
+
+		
+		hwPatchHistoryTableMax OBJECT-TYPE
+			SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set the size of hwPatchHistoryTable."
+			::= { hwPatchBase 3 }
+
+		
+		hwPatchTrapEnble OBJECT-TYPE
+			SYNTAX EnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The value of this object determines whether to generate the trap of HUAWEI-SYS-MAN-MIB.
+				enable(1): Trap is enabled.
+				disable(2): Trap is not enabled."
+			::= { hwPatchBase 4 }
+
+		
+		hwPatchErrorTableMax OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set the size of hwPatchErrorTable."
+			::= { hwPatchBase 5 }
+
+		
+		hwPatchId OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Patch ID."
+			::= { hwPatchBase 6 }
+
+		
+		hwPatchLatestId OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The latest patch ID."
+			::= { hwPatchBase 7 }
+
+		
+		hwPatchFileTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwPatchFileEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Patch file query table."
+			::= { hwPatch 2 }
+
+		
+		hwPatchFileEntry OBJECT-TYPE
+			SYNTAX HwPatchFileEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Defines an entry in the hwPatchFileTable."
+			INDEX { hwPatchFileIndex }
+			::= { hwPatchFileTable 1 }
+
+		
+		HwPatchFileEntry ::=
+			SEQUENCE { 
+				hwPatchFileIndex
+					Unsigned32,
+				hwPatchFileName
+					DisplayString,
+				hwPatchFileSize
+					Integer32,
+				hwPatchFileLocation
+					DisplayString,
+				hwPatchFileVersion
+					DisplayString
+			 }
+
+		hwPatchFileIndex OBJECT-TYPE
+			SYNTAX Unsigned32 (1..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of the patch file."
+			::= { hwPatchFileEntry 1 }
+
+		
+		hwPatchFileName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The name of the patch name."
+			::= { hwPatchFileEntry 2 }
+
+		
+		hwPatchFileSize OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The size of the patch file."
+			::= { hwPatchFileEntry 3 }
+
+		
+		hwPatchFileLocation OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The location of the patch file."
+			::= { hwPatchFileEntry 4 }
+
+		
+		hwPatchFileVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Version information of the patch file."
+			::= { hwPatchFileEntry 5 }
+
+		
+		hwLoadPatchTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwLoadPatchEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The load table of the patch file.
+				Load the patch file to the memory:
+				hwSlotIndex:The slot ID of the destination device to be loaded by the patch file,
+				hwPatchFileIndex:The index of the patch file,
+				
+				If hwSlotIndex is 128, it indicates all slots of the device."
+			::= { hwPatch 4 }
+
+		
+		hwLoadPatchEntry OBJECT-TYPE
+			SYNTAX HwLoadPatchEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Defines an entry in the hwLoadPatchTable."
+			INDEX { hwPatchSlotIndex, hwPatchFileIndex }
+			::= { hwLoadPatchTable 1 }
+
+		
+		HwLoadPatchEntry ::=
+			SEQUENCE { 
+				hwPatchLoadDestType
+					INTEGER,
+				hwPatchLoadDestIndex
+					DisplayString,
+				hwLoadPatchRowState
+					RowStatus
+			 }
+			 		
+		hwPatchLoadDestType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				all(1),
+				slave(2),
+				slot(3),
+				chassis(4),
+				unused(5)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Patch load object type,it combine with the hwPatchLoadDestIndex 
+				to note the load object."
+			::= { hwLoadPatchEntry 1 }
+			
+		hwPatchLoadDestIndex OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Patch load object index,it combine with chassis,the value of the hwPatchLoadDestType 
+				to note the load object.hwPatchLoadDestIndex is value such as ccc1,clc2 etc."
+			::= { hwLoadPatchEntry 2 }
+			
+		hwLoadPatchRowState OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Row status."
+			::= { hwLoadPatchEntry 51 }
+
+		
+		hwPatchInfo OBJECT IDENTIFIER ::= { hwPatch 5 }
+
+		
+		hwPatchTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwPatchEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Running status transfer and query of the patch.
+				If hwSlotIndex is 128, it indicates all slots of the device.
+				If hwPatchNum is 65535, it indicates all patches of the specified slot.
+				If hwPatchNum is 0, it indicates the NP patch of the specified slot. 
+				If hwPatchNum is in range from 1 to 200, it indicates the C patch of the specified slot.
+				"
+			::= { hwPatchInfo 1 }
+
+		
+		hwPatchEntry OBJECT-TYPE
+			SYNTAX HwPatchEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Defines an entry in the hwPatchTable."
+			INDEX { hwPatchSlotIndex, hwPatchIndex }
+			::= { hwPatchTable 1 }
+
+		
+		HwPatchEntry ::=
+			SEQUENCE { 
+				hwPatchSlotIndex
+					Integer32,
+				hwPatchIndex
+					Unsigned32,
+				hwPatchUsedFileName
+					DisplayString,
+				hwPatchVersion
+					DisplayString,
+				hwPatchDescription
+					DisplayString,
+				hwPatchProgramVersion
+					DisplayString,
+				hwPatchFuncNum
+					Integer32,
+				hwPatchTextLen
+					Integer32,
+				hwPatchDataLen
+					Integer32,
+				hwPatchType
+					INTEGER,
+				hwPatchBuildTime
+					DateAndTime,
+				hwPatchActiveTime
+					DateAndTime,
+				hwPatchAdminStatus
+					INTEGER,
+				hwPatchOperateState
+					INTEGER,
+				hwPatchOperateDestType
+					INTEGER,
+				hwPatchOperateDestIndex
+					DisplayString
+			 }
+
+		hwPatchSlotIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..128)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Slot index that identifies the physical position of a slot."
+			::= { hwPatchEntry 1 }
+
+		
+		hwPatchIndex OBJECT-TYPE
+			SYNTAX Unsigned32 (0..65535)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The number of the patch."
+			::= { hwPatchEntry 2 }
+
+		
+		hwPatchUsedFileName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The name of the patch file."
+			::= { hwPatchEntry 3 }
+
+		
+		hwPatchVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The version number of the patch."
+			::= { hwPatchEntry 4 }
+
+		
+		hwPatchDescription OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Patch description."
+			::= { hwPatchEntry 5 }
+
+		
+		hwPatchProgramVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Version number of the image used by the current device."
+			::= { hwPatchEntry 6 }
+
+		
+		hwPatchFuncNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of functions contained in the patch area."
+			::= { hwPatchEntry 7 }
+
+		
+		hwPatchTextLen OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The length of the code in the patch area."
+			::= { hwPatchEntry 8 }
+
+		
+		hwPatchDataLen OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The length of the data in the patch area."
+			::= { hwPatchEntry 9 }
+
+		
+		hwPatchType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				hotCommon(1),
+				hotTemporary(2),
+				coolCommon(3),
+				coolTemporary(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Patch type:
+				hotCommon(1):Hot common patch;
+				hotTemporary(2):Hot temporary patch;
+				coolCommon(3):Cool common patch;
+				coolTemporary(4):Cool temporary patch."
+			::= { hwPatchEntry 10 }
+
+		
+		hwPatchBuildTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The build time of the patch."
+			::= { hwPatchEntry 11 }
+
+		
+		hwPatchActiveTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The active time of the patch."
+			::= { hwPatchEntry 12 }
+
+		
+		hwPatchAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				run(1),
+				active(2),
+				deactive(3),
+				delete(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The operating status of the patch."
+			::= { hwPatchEntry 13 }
+
+		
+		hwPatchOperateState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				patchRunning(1),
+				patchActive(2),
+				patchDeactive(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The running status of the patch."
+			::= { hwPatchEntry 14 }
+			
+		hwPatchOperateDestType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				all(1),
+				slave(2),
+				slot(3),
+				chassis(4),
+				unused(5)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Patch operate object type,it combine with the hwPatchOperateDestIndex 
+				to note the operate object."
+			::= { hwPatchEntry 15 }
+			
+		hwPatchOperateDestIndex OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Patch operate object index,it combine with chassis,the value of the hwPatchOperateDestType 
+				to note the operate object.hwPatchOperateDestIndex is value such as ccc1,clc2 etc."
+			::= { hwPatchEntry 16 }
+
+		
+		hwPatchStateTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwPatchStateEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The statistics information of the patch area on each slot."
+			::= { hwPatchInfo 2 }
+
+		
+		hwPatchStateEntry OBJECT-TYPE
+			SYNTAX HwPatchStateEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Defines an entry in the hwPatchStateTable."
+			INDEX { hwPatchSlotIndex }
+			::= { hwPatchStateTable 1 }
+
+		
+		HwPatchStateEntry ::=
+			SEQUENCE { 
+				hwPatchNumMax
+					Unsigned32,
+				hwPatchIdleNum
+					Integer32,
+				hwPatchTextMax
+					Integer32,
+				hwPatchDataMax
+					Integer32,
+				hwPatchStateTextUsed
+					Integer32,
+				hwPatchStateDataUsed
+					Integer32,
+				hwPatchStateTotalPatchNum
+					Integer32,
+				hwPatchStateTempPatchNum
+					Integer32,
+				hwPatchStateCommonPatchNum
+					Integer32,
+				hwPatchStateRuningPatchNum
+					Integer32,
+				hwPatchStateActivePatchNum
+					Integer32,
+				hwPatchStateDeactivePatchNum
+					Integer32
+			 }
+
+		hwPatchNumMax OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The maximum number of patches."
+			::= { hwPatchStateEntry 1 }
+
+		
+		hwPatchIdleNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of idle patches."
+			::= { hwPatchStateEntry 2 }
+
+		
+		hwPatchTextMax OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The code capacity of the patch area."
+			::= { hwPatchStateEntry 3 }
+
+		
+		hwPatchDataMax OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The data capacity of the patch area."
+			::= { hwPatchStateEntry 4 }
+
+		
+		hwPatchStateTextUsed OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The used code capacity of the patch area."
+			::= { hwPatchStateEntry 5 }
+
+		
+		hwPatchStateDataUsed OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The used data capacity of the patch area."
+			::= { hwPatchStateEntry 6 }
+
+		
+		hwPatchStateTotalPatchNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of the used patches."
+			::= { hwPatchStateEntry 7 }
+
+		
+		hwPatchStateTempPatchNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of temporary patches."
+			::= { hwPatchStateEntry 8 }
+
+		
+		hwPatchStateCommonPatchNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of common patches."
+			::= { hwPatchStateEntry 9 }
+
+		
+		hwPatchStateRuningPatchNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of running patches."
+			::= { hwPatchStateEntry 10 }
+
+		
+		hwPatchStateActivePatchNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of active patches."
+			::= { hwPatchStateEntry 11 }
+
+		
+		hwPatchStateDeactivePatchNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of deactive patches."
+			::= { hwPatchStateEntry 12 }
+
+		
+		hwPatchHistoryTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwPatchHistoryEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Patch history table."
+			::= { hwPatchInfo 3 }
+
+		
+		hwPatchHistoryEntry OBJECT-TYPE
+			SYNTAX HwPatchHistoryEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Defines an entry in the hwPatchHistoryTable."
+			INDEX { hwPatchHistoryIndex }
+			::= { hwPatchHistoryTable 1 }
+
+		
+		HwPatchHistoryEntry ::=
+			SEQUENCE { 
+				hwPatchHistoryIndex
+					Unsigned32,
+				hwPatchHistoryProgrameVersion
+					DisplayString,
+				hwPatchHistoryVersion
+					DisplayString,
+				hwSlotId
+					Integer32,
+				hwPacthBeginIndex
+					Integer32,
+				hwPatchEndIndex
+					Integer32,
+				hwPatchHistoryAction
+					INTEGER,
+				hwPatchHistoryBeginTime
+					DateAndTime,
+				hwPatchHistoryEndTime
+					DateAndTime
+			 }
+
+		hwPatchHistoryIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"History sequence number of patch operation."
+			::= { hwPatchHistoryEntry 1 }
+
+		
+		hwPatchHistoryProgrameVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The version number of the image."
+			::= { hwPatchHistoryEntry 2 }
+
+		
+		hwPatchHistoryVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The version information of the patch."
+			::= { hwPatchHistoryEntry 3 }
+
+		
+		hwSlotId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Slot ID involved in the patch history information."
+			::= { hwPatchHistoryEntry 4 }
+
+		
+		hwPacthBeginIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The beginning index of patch operation."
+			::= { hwPatchHistoryEntry 5 }
+
+		
+		hwPatchEndIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The end index of patch operation."
+			::= { hwPatchHistoryEntry 6 }
+
+		
+		hwPatchHistoryAction OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				running(1),
+				active(2),
+				deactive(3),
+				delete(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The type of patch operation."
+			::= { hwPatchHistoryEntry 7 }
+
+		
+		hwPatchHistoryBeginTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The beginning time of patch status."
+			::= { hwPatchHistoryEntry 8 }
+
+		
+		hwPatchHistoryEndTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The end time of patch status."
+			::= { hwPatchHistoryEntry 9 }
+
+		
+		hwPatchErrorTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwPatchErrorEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The error record table of patch operation."
+			::= { hwPatchInfo 4 }
+
+		
+		hwPatchErrorEntry OBJECT-TYPE
+			SYNTAX HwPatchErrorEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Defines an entry in the hwPatchErrorTable."
+			INDEX { hwPatchErrorIndex }
+			::= { hwPatchErrorTable 1 }
+
+		
+		HwPatchErrorEntry ::=
+			SEQUENCE { 
+				hwPatchErrorIndex
+					Unsigned32,
+				hwPatchErrorSlot
+					Unsigned32,
+				hwPatchErrorPatchFileName
+					DisplayString,
+				hwPatchErrorPatchIndex
+					Unsigned32,
+				hwPatchErrorCode
+					HWPatchErrorType
+			 }
+
+		hwPatchErrorIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of the hwPatchErrorEntry."
+			::= { hwPatchErrorEntry 1 }
+
+		
+		hwPatchErrorSlot OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The slot ID involved when the patch operation error occurs."
+			::= { hwPatchErrorEntry 2 }
+
+		
+		hwPatchErrorPatchFileName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The patch file name involved when the patch operation error occurs."
+			::= { hwPatchErrorEntry 3 }
+
+		
+		hwPatchErrorPatchIndex OBJECT-TYPE
+			SYNTAX Unsigned32 (0..65535)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The patch index involved when the patch operation error occurs."
+			::= { hwPatchErrorEntry 4 }
+
+		
+		hwPatchErrorCode OBJECT-TYPE
+			SYNTAX HWPatchErrorType
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The identifier involved when the patch operation error occurs."
+			::= { hwPatchErrorEntry 5 }
+
+		
+		hwBootRom OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 11 }
+
+		
+		hwBootRomTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwBootRomEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Boot ROM startup parameter query table."
+			::= { hwBootRom 1 }
+
+		
+		hwBootRomEntry OBJECT-TYPE
+			SYNTAX HwBootRomEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Defines an entry in the hwBootRomTable."
+			INDEX { hwBootRomIndex }
+			::= { hwBootRomTable 1 }
+
+		
+		HwBootRomEntry ::=
+			SEQUENCE { 
+				hwBootRomIndex
+					INTEGER,
+				hwBootRomBootDevice
+					DisplayString,
+				hwBootRomProcessorNo
+					Integer32,
+				hwBootRomHostName
+					DisplayString,
+				hwBootRomFileName
+					DisplayString,
+				hwBootRomIpOnEthernet
+					IpAddress,
+				hwBootRomIpOnBackPlane
+					IpAddress,
+				hwBootRomHostIp
+					IpAddress,
+				hwBootRomGatewayIp
+					IpAddress,
+				hwBootRomUserName
+					DisplayString,
+				hwBootRomPassword
+					DisplayString,
+				hwBootRomTargetName
+					DisplayString,
+				hwBootRomStartupScript
+					DisplayString,
+				hwBootRomXModemBaudRate
+		            Integer32,
+	  	        hwBootRomVersion
+		            Integer32
+             }
+
+		hwBootRomIndex OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				master(1),
+				slave(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of the hwBootRomIndex:
+				master(1):Master board;
+				slave(2):Slave board.
+				"
+			::= { hwBootRomEntry 1 }
+
+		
+		hwBootRomBootDevice OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM boot device."
+			::= { hwBootRomEntry 2 }
+
+		
+		hwBootRomProcessorNo OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM processor number."
+			::= { hwBootRomEntry 3 }
+
+		
+		hwBootRomHostName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM host name."
+			::= { hwBootRomEntry 4 }
+
+		
+		hwBootRomFileName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM file name."
+			::= { hwBootRomEntry 5 }
+
+		
+		hwBootRomIpOnEthernet OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM IP address on ethernet."
+			::= { hwBootRomEntry 6 }
+
+		
+		hwBootRomIpOnBackPlane OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM IP address on backplane."
+			::= { hwBootRomEntry 7 }
+
+		
+		hwBootRomHostIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM host IP address."
+			::= { hwBootRomEntry 8 }
+
+		
+		hwBootRomGatewayIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM gateway IP address."
+			::= { hwBootRomEntry 9 }
+
+		
+		hwBootRomUserName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM user name."
+			::= { hwBootRomEntry 10 }
+
+		
+		hwBootRomPassword OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM password."
+			::= { hwBootRomEntry 11 }
+
+		
+		hwBootRomTargetName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM target name."
+			::= { hwBootRomEntry 12 }
+
+		
+		hwBootRomStartupScript OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Boot ROM startup script."
+			::= { hwBootRomEntry 13 }
+
+		
+        hwBootRomXModemBaudRate OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Boot ROM x-modem baudrate."
+            ::= { hwBootRomEntry 14 }
+
+					
+	   hwBootRomVersion OBJECT-TYPE
+	        SYNTAX Integer32
+	        MAX-ACCESS read-only
+	        STATUS current
+	        DESCRIPTION
+	        "Boot ROM version."
+	        ::= { hwBootRomEntry 15 }
+
+	hwSysUpgrade OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 12 }
+	 
+	hwIssuMode OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			issuInterrupt(1)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Set system issu upgrade mode."
+		::= { hwSysUpgrade 1 }
+	 
+		 
+	hwIssuState OBJECT-TYPE
+	    SYNTAX INTEGER
+		{
+			noIssuUpgrading(1),
+			issuUpgrading(2),
+			issuExceptional(3)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"System issu upgrade state."
+		::= { hwSysUpgrade 2 }
+		
+	hwIssuConditionCheck OBJECT-TYPE
+	    SYNTAX INTEGER
+		{
+			normal(1),
+			notRealtimeBackup(2),
+			slotAbnormal(3),
+			configurationChange(4),
+			otherAbnormal(5)		
+		}
+
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"System issu upgrade condition check.
+			 The default check result is normal."
+		::= { hwSysUpgrade 3 } 			
+
+		hwSysSourceIndex OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 13 }
+
+		
+		hwSysSourceIndexTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSysSourceIndexEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"System file Index query table."
+			::= { hwSysSourceIndex 1 }
+
+		
+		hwSysSourceIndexEntry OBJECT-TYPE
+			SYNTAX HwSysSourceIndexEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Defines an entry in the hwBootRomTable."
+			INDEX { hwSysFileType,hwSysFileName}
+			::= { hwSysSourceIndexTable 1 }
+			
+			
+		HwSysSourceIndexEntry ::=
+		SEQUENCE { 
+			hwSysFileType
+			      INTEGER,
+			hwSysFileName
+			      OCTET STRING,
+			 hwSysFileIndex
+			       Integer32
+		 }               
+		
+		hwSysFileType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				image(1),
+				config(2),
+				paf(3),
+				license(4),
+				patch(5)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object is an index that specifies the file type."
+			::= { hwSysSourceIndexEntry 1 }	  
+			
+	     hwSysFileName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..110))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object is an index that specifies the name of a file on the main board."
+			::= { hwSysSourceIndexEntry 2 }	
+			
+	   hwSysFileIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the index of the specified file in the table of the specified type. The value 0 indicates that the file does not exist in the table of specified type."
+			::= { hwSysSourceIndexEntry 3 }	 
+		
+	hwSysRebootInfo OBJECT IDENTIFIER 	::= { huaweiSystemManMIBObjects 14 }
+	hwSysRebootTimes OBJECT-TYPE
+	SYNTAX Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The value of the device reboot times.
+		"
+	::= { hwSysRebootInfo 1 }
+	
+	hwSysRebootRecordTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwSysRebootRecordEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A reboot information record table."
+	::= { hwSysRebootInfo 2 }
+
+hwSysRebootRecordEntry OBJECT-TYPE
+	SYNTAX HwSysRebootRecordEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry of hwSysReloadScheduleTable."
+	INDEX { hwSysRebootRecordIndex }
+	::= { hwSysRebootRecordTable 1 }
+	
+	HwSysRebootRecordEntry ::=
+		SEQUENCE { 
+			hwSysRebootRecordIndex
+				Integer32,
+			hwSysRebootReason
+				INTEGER,
+			hwSysRebootTime
+				DateAndTime
+		 }
+
+hwSysRebootRecordIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The index of hwSysRebootRecordTable."
+	::= { hwSysRebootRecordEntry 1 }
+
+hwSysRebootReason OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		manual(1),
+		powerOff(2),
+		unknown(3),
+		schedule(4)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The reason of system's reboot."
+	::= { hwSysRebootRecordEntry 2 }
+
+hwSysRebootTime OBJECT-TYPE
+	SYNTAX DateAndTime (SIZE (8))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The time at which the reboot action occurred.
+		we will only take octet strings   
+		with length 8 for this object which indicates the   
+		local time of the switch. The maximum scheduled     
+		time is 24 days from the current system clock time. 
+		
+			field  octets  contents                  range
+			-----  ------  --------                  -----
+			  1      1-2   year                      0..65536
+			  2       3    month                     1..12
+			  3       4    day                       1..31
+			  4       5    hour                      0..23
+			  5       6    minutes                   0..59
+			  6       7    seconds                   0..60
+			  	      (use 60 for leap-second)
+			  7       8    deci-seconds              0..9
+		
+		
+		"
+	::= { hwSysRebootRecordEntry 3 }
+		
+		huaweiSystemManMIBNotifications OBJECT IDENTIFIER ::= { huaweiSystemManMIB 2 }
+
+	hwSysClockChangedNotification NOTIFICATION-TYPE
+		OBJECTS { hwSysLocalClock }
+		STATUS current
+		DESCRIPTION 
+			"A clock changed notification is generated when the current
+			local date and time for the system has been manually changed.
+			The value of csyClockDateAndTime reflects new date and time."
+		::= { huaweiSystemManMIBNotifications 1 }
+
+	hwSysReloadNotification NOTIFICATION-TYPE
+			OBJECTS { hwSysReloadImage, hwSysReloadCfgFile, hwSysReloadReason, hwSysReloadScheduleTime, hwSysReloadAction, 
+				hwSysReloadPafFile, hwSysReloadLicenseFile, hwSysReloadPatchFile }
+		STATUS current
+		DESCRIPTION 
+			"A reload action will happen when the value of hwSysReloadAction 
+			is modified.If hwSysReloadAction is reloadAtOnce, This notification
+			MUST be send at once before system's reload."
+		::= { huaweiSystemManMIBNotifications 2 }
+
+	hwSysMasterHDError NOTIFICATION-TYPE
+		STATUS current
+		DESCRIPTION 
+			"When the hard disk on master board can't be read and written because
+			of some error, the hard disk on master board will be unregistered and 
+			the notification is sent.
+			"
+		::= { huaweiSystemManMIBNotifications 3 }
+		
+	hwSysSlaveHDError NOTIFICATION-TYPE
+		STATUS current
+		DESCRIPTION 
+			"When the hard disk on slave board can't be read and written because
+			of some error, the hard disk on slave board will be unregistered and 
+			the notification is sent.
+			"
+		::= { huaweiSystemManMIBNotifications 4 }
+
+		
+		hwPatchTrap OBJECT IDENTIFIER ::= { huaweiSystemManMIBNotifications 5 }
+
+		
+		hwPatchErrorTrap NOTIFICATION-TYPE
+			OBJECTS { hwPatchErrorSlot, hwPatchErrorPatchIndex, hwPatchErrorCode, hwPatchErrorPatchFileName }
+			STATUS current
+			DESCRIPTION 
+				"The trap is generated when the patch operation error occurs."
+			::= { hwPatchTrap 1 }
+
+		
+		hwPatchActiveOverTimeTrap NOTIFICATION-TYPE
+			OBJECTS { hwPatchOperateState }
+			STATUS current
+			DESCRIPTION 
+				"After the patch is active for 24 hour,the trap is generated because the patch is not up to the run state."
+			::= { hwPatchTrap 2 }
+
+		
+		hwPatchMalfunctionComebackTrap NOTIFICATION-TYPE
+			OBJECTS { hwPatchOperateState }
+			STATUS current
+			DESCRIPTION 
+				"The trap is generated when the patch fault is removed."
+			::= { hwPatchTrap 3 }
+	hwSysMasterCfcardError NOTIFICATION-TYPE
+		STATUS current
+		DESCRIPTION 
+			"When the cfcard on master board can't be read and written because
+			of some error, the Cfcard on master board will be unregistered and 
+			the notification is sent.
+			"
+		::= { huaweiSystemManMIBNotifications 6 }
+		
+	hwSysSlaveCfcardError NOTIFICATION-TYPE
+		STATUS current
+		DESCRIPTION 
+			"When the cfcard on slave board can't be read and written because
+			of some error, the Cfcard on slave board will be unregistered and 
+			the notification is sent.
+			"
+		::= { huaweiSystemManMIBNotifications 7 }
+
+			
+		hwSysSlaveSwitchSuccessNotification NOTIFICATION-TYPE
+			OBJECTS { hwSysSlaveSwitchChassisNum }
+			STATUS current
+			DESCRIPTION 
+				"When slaveswitch action happened, This notification must be send 
+				after slaveswitch action complete to notify success to net manager."
+			::= { huaweiSystemManMIBNotifications 8 }
+			
+		hwSysSlaveSwitchFailNotification NOTIFICATION-TYPE
+			OBJECTS { hwSysSlaveSwitchChassisNum }
+			STATUS current
+			DESCRIPTION 
+				"When slaveswitch action happened, This notification must be send 
+				after slaveswitch action complete to notify fail to net manager."
+			::= { huaweiSystemManMIBNotifications 9 }
+
+		
+		huaweiSystemManMIBConformance OBJECT IDENTIFIER ::= { huaweiSystemManMIB 3 }
+
+	huaweiSystemManMIBCompliances OBJECT IDENTIFIER ::= { huaweiSystemManMIBConformance 1 }
+
+	huaweiSystemManMIBCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION 
+			"The compliance statement for entities which implement
+			the Huawei system management MIB."
+		MODULE -- this module
+			MANDATORY-GROUPS { huaweiSysClockGroup, huaweiSysReloadGroup, huaweiSysImageGroup, huaweiSysCFGFileGroup, huaweiSystemManNotificationGroup
+				 }
+		::= { huaweiSystemManMIBCompliances 1 }
+
+	huaweiSystemManMIBGroups OBJECT IDENTIFIER ::= { huaweiSystemManMIBConformance 2 }
+
+	huaweiSysClockGroup OBJECT-GROUP
+		OBJECTS { hwSysLocalClock }
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing mandatory system reload."
+		::= { huaweiSystemManMIBGroups 1 }
+
+		huaweiSysReloadGroup OBJECT-GROUP
+			OBJECTS { hwSysReloadSchedule, hwSysReloadAction, hwSysReloadImage, hwSysReloadCfgFile, hwSysReloadReason, 
+				hwSysReloadPatchFile, hwSysReloadLicenseFile, hwSysReloadPafFile, hwSysReloadPatchState, hwSysLatestRebootErrorInfo, 
+				hwSysReloadScheduleTime, hwSysReloadEntity, hwSysReloadRowStatus, hwSysReloadOperateDestType, hwSysReloadOperateDestIndex,
+				hwSysSlaveSwitchChassisNum, hwSysSlaveSwitchOperType, hwSysSlaveSwitchEnableStatus,hwSysDelayReboot}
+			STATUS current
+			DESCRIPTION 
+				" A collection of objects providing mandatory system clock
+				information."
+			::= { huaweiSystemManMIBGroups 2 }
+
+		
+		huaweiSysImageGroup OBJECT-GROUP
+			OBJECTS { hwSysImageNum, hwSysImageName, hwSysImageSize, hwSysImageLocation, hwSysImageVersion
+				 }
+			STATUS current
+			DESCRIPTION 
+				"A collection of objects providing mandatory system image
+				information."
+			::= { huaweiSystemManMIBGroups 3 }
+
+	huaweiSysCFGFileGroup OBJECT-GROUP
+		OBJECTS { hwSysCFGFileNum, hwSysCFGFileName, hwSysCFGFileSize, hwSysCFGFileLocation }
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing mandatory system configureation
+			file information."
+		::= { huaweiSystemManMIBGroups 4 }
+
+		
+		hwSysCurGroup OBJECT-GROUP
+			OBJECTS { hwSysCurCFGFileIndex, hwSysCurImageIndex, hwSysCurPafFileIndex, hwSysCurLicenseIndex, hwSysCurPatchFileIndex
+				 }
+			STATUS current
+			DESCRIPTION 
+				"A collection of system current status."
+			::= { huaweiSystemManMIBGroups 5 }
+
+	huaweiSystemManNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwSysClockChangedNotification, hwSysReloadNotification, hwSysSlaveSwitchSuccessNotification,
+			hwSysSlaveSwitchFailNotification }
+		STATUS current
+		DESCRIPTION 
+			"A collection of notification."
+		::= { huaweiSystemManMIBGroups 6 }
+
+	huaweiSystemHDNotificationGroup NOTIFICATION-GROUP
+		NOTIFICATIONS { hwSysMasterHDError, hwSysSlaveHDError }
+		STATUS current
+		DESCRIPTION 
+			"A collection of notification about system hard disk."
+		::= { huaweiSystemManMIBGroups 7 }
+
+		
+		hwPatchLoadGroup OBJECT-GROUP
+			OBJECTS { hwPatchLoadDestType, hwPatchLoadDestIndex, hwLoadPatchRowState }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { huaweiSystemManMIBGroups 8 }
+
+		
+		hwPatchTrapsGrop NOTIFICATION-GROUP
+			NOTIFICATIONS { hwPatchErrorTrap, hwPatchActiveOverTimeTrap, hwPatchMalfunctionComebackTrap }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { huaweiSystemManMIBGroups 9 }
+
+		
+		hwPatchInfoGroup OBJECT-GROUP
+			OBJECTS { hwPatchDescription, hwPatchFuncNum, hwPatchTextLen, hwPatchDataLen, hwPatchType, 
+				hwPatchAdminStatus, hwPatchStateTempPatchNum, hwPatchStateCommonPatchNum, hwPatchStateRuningPatchNum, hwPatchStateActivePatchNum, 
+				hwPatchStateDeactivePatchNum, hwPatchHistoryVersion, hwPatchStateTotalPatchNum, hwPatchStateDataUsed, hwPatchStateTextUsed, 
+				hwPatchDataMax, hwPatchTextMax, hwPatchIdleNum, hwPatchNumMax, hwPatchActiveTime, 
+				hwPatchBuildTime, hwPatchVersion, hwPatchHistoryProgrameVersion, hwPatchFileName, hwPatchUsedFileName, 
+				hwPatchErrorTableMax, hwPatchHistoryTableMax, hwPatchRecordReset, hwPatchProgramVersion, hwPatchOperateState, 
+				hwPatchErrorSlot, hwPatchErrorPatchIndex, hwPatchErrorCode, hwPatchHistoryBeginTime, hwPatchHistoryEndTime, 
+				hwPatchHistoryAction, hwPatchEndIndex, hwPatchTrapEnble, hwPacthBeginIndex, hwPatchId, 
+				hwPatchLatestId, hwSlotId, hwPatchErrorPatchFileName }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { huaweiSystemManMIBGroups 10 }
+
+		
+		hwPatchFileGroup OBJECT-GROUP
+			OBJECTS { hwPatchFileName, hwPatchFileSize, hwPatchFileLocation, hwPatchFileVersion, hwPatchFileNum
+				 }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { huaweiSystemManMIBGroups 11 }
+
+		
+		hwSysPafFileGroup OBJECT-GROUP
+			OBJECTS { hwSysPafFileName, hwSysPafFileSize, hwSysPafFileLocation, hwSysPafFileVersion, hwSysPafFileNum
+				 }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { huaweiSystemManMIBGroups 13 }
+
+		
+		hwSysPafLicenseGroup OBJECT-GROUP
+			OBJECTS { hwSysLicenseFileNum, hwSysLicenseFileName, hwSysLicenseFileSize, hwSysLicenseFileLocation }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { huaweiSystemManMIBGroups 14 }
+
+		
+		hwSysRebootAndSwitchGrop OBJECT-GROUP
+			OBJECTS { hwSysReboot, hwSysSlaveSwitchEnable }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { huaweiSystemManMIBGroups 15 }
+
+		
+        hwBootRomGroup OBJECT-GROUP
+            OBJECTS { hwBootRomBootDevice, hwBootRomHostName, hwBootRomFileName, hwBootRomIpOnEthernet, hwBootRomIpOnBackPlane, 
+                hwBootRomHostIp, hwBootRomGatewayIp, hwBootRomUserName, hwBootRomPassword, hwBootRomTargetName, 
+				hwBootRomStartupScript, hwBootRomXModemBaudRate, hwBootRomVersion, hwBootRomProcessorNo }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { huaweiSystemManMIBGroups 16 }
+			
+	hwSystemCfcardNotificationGroup NOTIFICATION-GROUP
+		NOTIFICATIONS { hwSysMasterCfcardError, hwSysSlaveCfcardError }
+		STATUS current                     
+		DESCRIPTION                        
+			"A collection of notification about system cfcard."
+		::= { huaweiSystemManMIBGroups 17 } 
+		
+	hwSysUpgradeGroup OBJECT-GROUP
+		OBJECTS {hwIssuMode, hwIssuState, hwIssuConditionCheck}
+		STATUS current
+		DESCRIPTION 
+			"A collection of system upgrade."
+		::= { huaweiSystemManMIBGroups 18 }
+	
+  hwSysRebootInfoGroup OBJECT-GROUP
+	OBJECTS { hwSysRebootTimes, hwSysRebootReason, hwSysRebootTime }
+	STATUS current
+	DESCRIPTION 
+		"A collection of system upgrade."
+	::= { huaweiSystemManMIBGroups 19 }	
+	
+	
+	END
+
+--
+-- HUAWEI-SYS-MAN-MIB.mib
+--

@@ -1,0 +1,430 @@
+ENTERASYS-ACTIVATION-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-activation-mib.txt
+--
+--  Part Number: <TBD>
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' Product Activation MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright March, 2002 Enterasys Networks, Inc.
+
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString 
+        FROM SNMP-FRAMEWORK-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysActivationMIB MODULE-IDENTITY
+    LAST-UPDATED "200204181454Z"  -- Thu Apr 18 14:54 GMT 2002
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal: Enterasys Networks, Inc.
+                 500 Spaulding Turnpike
+                 P.O. Box 3060
+                 Portsmouth, NH 03801
+
+         Phone:  +1 603 501 5500
+         E-mail: support@enterasys.com
+         WWW:    http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to 
+         configuration of product activation keys."
+
+    REVISION    "200204181454Z"  -- Thu Apr 18 14:54 GMT 2002
+    DESCRIPTION "The initial version of this MIB module."
+    ::= { etsysModules 99999 }
+
+
+etsysActivationObjects
+        OBJECT IDENTIFIER ::= { etsysActivationMIB 1 }
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+EnterasysKeyType ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+            "A value of this type indicates whether an activation key
+             is a product key, or whether it is a special kind of key
+             such as a demonstration key.
+
+                 noKey(1)
+                     Indicates that no key is configured.
+
+                 unknownKeyType(2)
+                     Indicates that a key is configured, but that the
+                     agent has no idea what type of key it is.
+
+                 productKey(3)
+                     Indicates that a product key is configured.
+
+                 demoKey(4)
+                     Indicates that a demonstration key is configured.
+                     Demonstration keys intended for customer use will
+                     typically have expirations or other restrictions."
+
+    SYNTAX        INTEGER {
+                      noKey(1),
+                      unknownKeyType(2),
+                      productKey(3),
+                      demoKey(4)
+                  }
+
+EnterasysFeature ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+            "A value of this type identifies an optional feature for
+             which an activation key may be bought or obtained.
+
+             This enumeration type will be extended as necessary."
+
+    SYNTAX        INTEGER {
+                      dot1xAuthentication(1),
+                      pointToMultipoint(2)
+                  }
+
+-- ---------------------------------------------------------- --
+-- Branches of the Enterasys Product Activation MIB
+-- ---------------------------------------------------------- --
+
+etsysActivationBaseBranch
+        OBJECT IDENTIFIER ::= { etsysActivationObjects 1 }
+
+-- ---------------------------------------------------------- --
+-- MIB Objects in the Activation Base Branch
+-- ---------------------------------------------------------- --
+
+etsysMaxActivationKeyRow OBJECT-TYPE
+    SYNTAX        Integer32( 1..2147483647 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The largest value that the agent supports for the index
+             object etsysActivationKeyRow."
+    ::= { etsysActivationBaseBranch 1 }
+
+
+-- ---------------------------------------------------------- --
+-- The Activation Key Table
+-- ---------------------------------------------------------- --
+
+etsysActivationKeyTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysActivationKeyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table contains activation keys for optional features."
+    ::= { etsysActivationBaseBranch 2 }
+
+etsysActivationKeyEntry OBJECT-TYPE
+    SYNTAX        EtsysActivationKeyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each valid conceptual row contains basic information about
+         one product activation key.  Only those rows for which the
+         etsysActivationKeyStatus is active(1) may enable features.
+
+         Note that it is possible for an active(1) row to contain a
+         well-formatted, internally-consistent key that has expired.
+         A managed system is under no obligation to enable features
+         in response to the presence of expired keys."
+    INDEX { etsysActivationKeyRow }
+    ::= { etsysActivationKeyTable 1 }
+
+EtsysActivationKeyEntry ::=
+    SEQUENCE { 
+    etsysActivationKeyRow                     Integer32,
+    etsysActivationLicenseString              SnmpAdminString,
+    etsysActivationKeyValue                   SnmpAdminString,
+    etsysActivationKeyType                    EnterasysKeyType,
+    etsysActivationKeyStatus                  RowStatus
+    }
+
+etsysActivationKeyRow OBJECT-TYPE
+    SYNTAX        Integer32( 1..2147483647 )
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+            "An index that uniquely identifies a row in the product
+             key table.
+
+             Agents are not required to accept arbitrary indices --
+             they may limit indices to numbers in the range (1 - N),
+             where N is defined as the maximum number of activation
+             keys that can usefully be supported on a product."
+    ::= { etsysActivationKeyEntry 1 }
+
+etsysActivationLicenseString OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+            "A place for human-readable administrative information
+             associated with this activation key, such as a product
+             serial number or a demo key's registration date.
+
+             Some key formats may require entry of 'License String'
+             values provided by the vendor.  Agents may enforce the
+             following rule with respect to such paired-key rows:
+             -------------------------------------------------------
+             This object MUST be set before etsysActivationKeyStatus
+             can become active(1), and MAY NOT be modified while
+             etsysActivationKeyStatus is active(1).
+             -------------------------------------------------------"
+    ::= { etsysActivationKeyEntry 2 }
+
+etsysActivationKeyValue OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+            "An activation key.  The activation key must be coded as
+             a string of printable characters.
+
+             Spaces and hyphens are reserved punctuation characters.
+             They may be used freely on input and output, and do not
+             form part of the key value.  (The agent is not required
+             to preserve these or other non-essential aspects of the
+             key formatting.)
+
+             The key must conform to one of the meta-formats defined
+             in this DESCRIPTION.  These meta-formats are subject to
+             change.
+
+             Agents should validate activation keys at Set time.  An
+             agent may reject even a valid key if it is inapplicable
+             to the managed device.
+
+             This object MUST be set before etsysActivationKeyStatus
+             can become active(1), and MAY NOT be modified while
+             etsysActivationKeyStatus is active(1).
+
+             =======================================================
+
+             Standard activation keys have the following format:
+
+                 <FormatCode> <OpaqueKey>
+
+             The <FormatCode> is encoded as four hexadecimal digits,
+             and identifies the format of the <OpaqueKey>.
+
+             The <OpaqueKey> may be encoded in any fashion the agent
+             likes, within the constraints mentioned earlier in this
+             DESCRIPTION.
+
+             =======================================================
+
+             A platform may accept keys of the format
+
+                  <Keyword> [Qualifiers]
+
+             provided that there is no possibility of confusion with
+             standard activation keys.
+
+             This format is best suited to non-secret demo keys that
+             are intended for a wide audience ('everyone reading the
+             user manual').
+
+             =======================================================
+
+             Backwards compatibility example
+
+             Task : Configure an existing RoamAbout AccessPoint 2000
+                    P-MP activation key, using this MIB.
+
+             <OpaqueKey>  :  XXXX-XXXX-XXXX-XXXX      (existing key)
+
+             <FormatCode> :  0001
+
+             You enter    :  0001-XXXX-XXXX-XXXX-XXXX
+
+             ======================================================="
+    ::= { etsysActivationKeyEntry 3 }
+
+etsysActivationKeyType OBJECT-TYPE
+    SYNTAX        EnterasysKeyType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "Derived from the activation key.  Identifies the type of
+             key (product key vs. demonstration key).  Identification
+             of existing demonstration keys may not be 100% accurate."
+    ::= { etsysActivationKeyEntry 4 }
+
+etsysActivationKeyStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+            "Supports creation, deletion, and activation of rows in
+             the etsysActivationKeyTable.
+
+             An instance of this variable may become active(1) only
+             when there is a corresponding etsysActivationKeyValue.
+             For some key formats, the etsysActivationLicenseString
+             may need to be set to a matching vendor-supplied value.
+
+             Note that a row with an active(1) status may contain a
+             demo key that has expired, and that no longer provides
+             access to any features."
+    ::= { etsysActivationKeyEntry 5 }
+
+
+-- ---------------------------------------------------------- --
+-- The Activation Key Feature Table
+-- ---------------------------------------------------------- --
+
+etsysActivationKeyFeatureTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysActivationKeyFeatureEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table indicates which optional feature or features each
+         activation key enables.
+
+         Rows only appear in this table for 'etsysActivationKeyValue'
+         instances that contain recognizable key values."
+    ::= { etsysActivationBaseBranch 3 }
+
+etsysActivationKeyFeatureEntry OBJECT-TYPE
+    SYNTAX        EtsysActivationKeyFeatureEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each valid conceptual row indicates the existence of a known
+         mapping between an activation key and an optional feature."
+    INDEX { etsysActivationKeyRow, etsysActivationKeyFeature }
+    ::= { etsysActivationKeyFeatureTable 1 }
+
+EtsysActivationKeyFeatureEntry ::=
+    SEQUENCE { 
+    etsysActivationKeyFeature                 EnterasysFeature,
+    etsysActivationKeyRestrictions            SnmpAdminString
+    }
+
+etsysActivationKeyFeature OBJECT-TYPE
+    SYNTAX        EnterasysFeature
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+            "Identifies one of the optional product features enabled
+             by an activation key in the etsysActivationKeyTable."
+    ::= { etsysActivationKeyFeatureEntry 1 }
+
+etsysActivationKeyRestrictions OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "If the activation key associated with this row is a demo
+             key, this MIB object may contain a human-readable string
+             describing the key's restrictions, expiration conditions,
+             and/or status.
+
+             A demo key that enables several features could, at least
+             theoretically, have different conditions for each.
+
+             Platforms may automatically enforce expirations, but are
+             not guaranteed to do so.  It is ultimately the system
+             manager's responsibility to clean up expired keys.
+
+             For a key that has no restrictions, this object's value
+             may consist of the empty string, or of whitespace."
+    ::= { etsysActivationKeyFeatureEntry 2 }
+
+
+
+-- ---------------------------------------------------------- --
+-- Enterasys Product Activation MIB - Conformance Information
+-- ---------------------------------------------------------- --
+
+etsysActivationConformance
+    OBJECT IDENTIFIER ::= { etsysActivationMIB 2 }
+
+etsysActivationGroups
+    OBJECT IDENTIFIER ::= { etsysActivationConformance 1 }
+
+etsysActivationCompliances
+    OBJECT IDENTIFIER ::= { etsysActivationConformance 2 }
+
+-- ---------------------------------------------------------- --
+-- Units of conformance
+-- ---------------------------------------------------------- --
+
+etsysActivationBaseGroup OBJECT-GROUP
+    OBJECTS {
+          etsysMaxActivationKeyRow,
+          etsysActivationLicenseString,
+          etsysActivationKeyValue,
+          etsysActivationKeyType,
+          etsysActivationKeyStatus,
+          etsysActivationKeyRestrictions
+        }
+    STATUS current
+    DESCRIPTION
+            "A collection of objects for configuring activation keys
+             for optional platform features."
+    ::= { etsysActivationGroups 1 }
+
+
+-- ---------------------------------------------------------- --
+-- Compliance statements
+-- ---------------------------------------------------------- --
+
+etsysActivationCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+            "The compliance statement for devices that support the
+             Enterasys Product Activation MIB."
+
+MODULE
+
+    MANDATORY-GROUPS { etsysActivationBaseGroup }
+
+    OBJECT         etsysActivationLicenseString
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required."
+
+    OBJECT         etsysActivationKeyValue
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required."
+
+    OBJECT         etsysActivationKeyStatus
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required."
+
+::= { etsysActivationCompliances 1 }
+
+END

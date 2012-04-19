@@ -1,0 +1,99 @@
+-- =================================================================
+-- Copyright (C) 2008 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: File Transfer Protocol(FTP) mib
+-- Reference:   huawei enterprise mib
+-- Version:     V1.0           
+-- History:     V1.0  zhouyao, 2008-09-28, publish 
+-- =================================================================
+
+HUAWEI-FTP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            RowStatus, DisplayString            
+                FROM SNMPv2-TC;
+    
+
+    hwFtp MODULE-IDENTITY 
+        LAST-UPDATED "200809280900Z"        -- September 28, 2008 at 09:00 GMT
+        ORGANIZATION 
+            "HUAWEI MIB Standard community
+            "
+        CONTACT-INFO 
+            "R&D BeiJing, Huawei Technologies co.,Ltd.
+             Huawei Bld.,NO.3 Xinxi Rd.,
+             Shang-Di Information Industry Base,
+             Hai-Dian District Beijing P.R. China
+             Zip:100085
+             Http://www.huawei.com
+             E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "V1.00
+             The HUAWEI-FTP-MIB which contains objects manages the FTP server and FTP client configuration. .
+            "
+        ::= { hwDatacomm 166 }
+
+--
+-- Node definitions
+--
+    hwFtpObjects OBJECT IDENTIFIER ::= { hwFtp 1 }                                                                  
+    
+    hwFtpServer OBJECT IDENTIFIER ::= { hwFtpObjects 1 }  
+
+    hwFtpServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "The object specifies whether the FTP server is enable."
+            DEFVAL    { 2 }
+            ::= { hwFtpServer 1 }                
+
+-- Conformance information            
+
+        hwFtpNotification OBJECT IDENTIFIER ::= { hwFtp 2 }
+                                      
+-- Conformance information       
+     
+        hwFtpMIBConformance OBJECT IDENTIFIER ::= { hwFtp 3 }
+        
+        
+        hwFtpMIBCompliances OBJECT IDENTIFIER ::= { hwFtpMIBConformance 1 }
+
+        
+        hwFtpMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-FTP-MIB."
+            MODULE HUAWEI-FTP-MIB
+                MANDATORY-GROUPS { hwFtpServerGroup }
+            ::= { hwFtpMIBCompliances 1 }
+
+        
+        hwFtpMIBGroups OBJECT IDENTIFIER ::= { hwFtpMIBConformance 2 }        
+        
+        hwFtpServerGroup OBJECT-GROUP
+            OBJECTS { hwFtpServerEnable }
+            STATUS current
+            DESCRIPTION 
+                "The FTP server attribute group."
+            ::= { hwFtpMIBGroups 1 }            
+  
+END
+
+--
+-- HUAWEI-FTP-MIB.mib
+--
+

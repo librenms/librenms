@@ -1,0 +1,184 @@
+-- *******************************************************************
+-- Juniper enterprise VPN Certificat objects MIB.
+--
+-- Copyright (c) 2001-2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+        JUNIPER-JS-CERT-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+
+        MODULE-IDENTITY, OBJECT-TYPE        FROM SNMPv2-SMI
+        DateAndTime, DisplayString          FROM SNMPv2-TC 
+        jnxJsCertificates                   FROM JUNIPER-JS-SMI;
+
+
+        jnxJsCertificateMIB MODULE-IDENTITY
+        LAST-UPDATED  "200704200000Z" -- April 20, 2007
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+                "Juniper Technical Assistance Center
+                 Juniper Networks, Inc.
+                 1194 N. Mathilda Avenue
+                 Sunnyvale, CA 94089
+                 E-mail: support@juniper.net
+                 HTTP://www.juniper.net"
+        DESCRIPTION
+               "This module defines the object that are used to monitor
+                reference and attributes to the certificates."
+
+        REVISION        "200704200000Z" -- April 20, 2007
+        DESCRIPTION     "The MIB has been revised to make the index
+                         in the tables jnxJsLoadedLocalCertTable and
+                         jnxJsLoadedCaCertTable as IMPLIED"
+
+    ::= { jnxJsCertificates 1 }   
+
+
+
+    jnxJsCertificateObjects OBJECT IDENTIFIER ::= { jnxJsCertificateMIB 1 }
+
+
+
+    -- ***************************************************************
+    --  Loaded CA Certification Table
+    -- ***************************************************************
+
+    jnxJsLoadedCaCertTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsLoadedCaCertEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table exposes the loaded Certification Authority (CA) 
+             issued certificates. Certificates are used when establishing
+             a secure connection in the device."
+    	::= { jnxJsCertificateObjects 1 }
+
+    jnxJsLoadedCaCertEntry OBJECT-TYPE
+        SYNTAX        JnxJsLoadedCaCertEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The loaded CA certificate entry.  It is indexed by the 
+             CA certification name."
+        INDEX   { IMPLIED jnxJsLoadedCaCertName }
+        ::= { jnxJsLoadedCaCertTable 1 }
+
+    JnxJsLoadedCaCertEntry ::= SEQUENCE
+    {
+        jnxJsLoadedCaCertName                           DisplayString,
+        jnxJsLoadedCaCertSubject                        DisplayString,
+        jnxJsLoadedCaCertExpire                         DateAndTime,
+        jnxJsLoadedCaCertIssuer                         DisplayString	
+    }
+
+    jnxJsLoadedCaCertName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(1..255))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The loaded CA certificate name.  This is unique within the 
+             the loaded CA certifcates."
+        ::= { jnxJsLoadedCaCertEntry 1 }
+
+    jnxJsLoadedCaCertSubject OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The CA certificate subject."
+        ::= { jnxJsLoadedCaCertEntry 2 }
+
+    jnxJsLoadedCaCertExpire OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The expiration time and date of the CA certificate."
+        ::= { jnxJsLoadedCaCertEntry 3 }
+
+
+    jnxJsLoadedCaCertIssuer OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The issuer of the CA certificate."
+        ::= { jnxJsLoadedCaCertEntry 4 }
+
+
+    -- ***************************************************************
+	-- Local loaded Certificate table 
+    -- ***************************************************************
+
+    jnxJsLoadedLocalCertTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsLoadedLocalCertEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table exposes the loaded certificates. 
+             Certificates are used when establishing a secure 
+             connection in the device."
+        ::= { jnxJsCertificateObjects 2 }
+
+    jnxJsLoadedLocalCertEntry OBJECT-TYPE
+        SYNTAX        JnxJsLoadedLocalCertEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Default certificate entry.  It is indexed by the 
+             certification name."
+        INDEX   {IMPLIED jnxJsLoadedLocalCertName }
+        ::= { jnxJsLoadedLocalCertTable 1 }
+
+    JnxJsLoadedLocalCertEntry ::= SEQUENCE
+    {
+        jnxJsLoadedLocalCertName               DisplayString,
+        jnxJsLoadedLocalCertSubject            DisplayString,
+        jnxJsLoadedLocalCertExpire             DateAndTime,
+        jnxJsLoadedLocalCertIssuer             DisplayString
+    }
+
+    jnxJsLoadedLocalCertName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(1..255))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of the local certificate. 
+             The certificate name is unique within the loaded local 
+             certificates. "
+        ::= { jnxJsLoadedLocalCertEntry 1 }
+
+    jnxJsLoadedLocalCertSubject OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The certificate subject."
+        ::= { jnxJsLoadedLocalCertEntry 2 }
+
+    jnxJsLoadedLocalCertExpire OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The expiration time and date of the local certificate."
+        ::= { jnxJsLoadedLocalCertEntry 3 }
+
+    jnxJsLoadedLocalCertIssuer OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The issuer of the local certificate."
+        ::= { jnxJsLoadedLocalCertEntry 4 }
+
+
+    -- ***************************************************************
+    --  END of File 
+    -- ***************************************************************
+
+END 

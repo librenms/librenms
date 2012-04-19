@@ -1,0 +1,543 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-MA5200-DEVICE-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+    HUAWEI-MA5200-DEVICE-MIB DEFINITIONS ::= BEGIN
+ 
+      IMPORTS
+              hwMA5200Mib            
+            FROM HUAWEI-MIB            
+            Unsigned32, IpAddress,OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI            
+            TruthValue, RowStatus,DateAndTime,MacAddress            
+                FROM SNMPv2-TC
+            HWFrameType, HWPCBType, HWSubPCBType, HWPortType        
+                FROM HUAWEI-TC-MIB
+               VlanIdOrNone, VlanId 
+                    FROM Q-BRIDGE-MIB
+            hwFrameIndex, hwSlotIndex
+                FROM HUAWEI-DEVICE-MIB;
+    
+        hwMA5200Device MODULE-IDENTITY 
+            LAST-UPDATED "200408300900Z"
+            ORGANIZATION 
+                "       
+                NanJing Institute,Huawei Technologies Co.,Ltd.
+                HuiHong Mansion,No.91 BaiXia Rd.
+                NanJing, P.R. of China
+                Zipcode:210001
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com "
+            CONTACT-INFO 
+                "The MIB contains objects of module MA5200 device."
+            DESCRIPTION 
+                "Huawei ma5200 device mib."
+            ::= { hwMA5200Mib 201 }
+
+        hw52DevSlot OBJECT IDENTIFIER ::= { hwMA5200Device 1 }
+
+--
+-- Node definitions
+--
+    
+--  ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ================================================================== 
+        
+        hw52DevSlotNum OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "                
+                The slot number. 
+                "
+            ::= { hw52DevSlot 1 }
+        
+        hw52DevSubSlotNum OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "                
+                THe sub Slot number. 
+                "
+            ::= { hw52DevSlot 2 }
+                
+        hw52DevPortNum OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "                
+                The port number. 
+                "
+            ::= { hw52DevSlot 3 }
+            
+        hw52DevPortOperateStatus OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "                
+                The port Operate Status. 
+                "
+            ::= { hw52DevSlot 4 }    
+                    
+    --  ============== hw52DevSlotTrap  define beginning ==============
+        hw52DevSlotTrap OBJECT IDENTIFIER ::= { hwMA5200Device 2 }
+        
+        hw52DevSlotReset NOTIFICATION-TYPE
+            OBJECTS {hw52DevSlotNum}
+            STATUS current
+            DESCRIPTION 
+                "
+                The trap report of slot reset.
+                "
+            ::= { hw52DevSlotTrap 1006 }
+            
+        hw52DevSlotRegOK NOTIFICATION-TYPE
+            OBJECTS {hw52DevSlotNum}
+            STATUS current
+            DESCRIPTION 
+                "
+                The trap report of slot register OK.
+                "
+            ::= { hw52DevSlotTrap 1007 }
+        
+        hw52DevSlotPlugOut NOTIFICATION-TYPE
+            OBJECTS {hw52DevSlotNum}
+            STATUS current
+            DESCRIPTION 
+                "
+                The trap report of slot plug out.
+                "
+            ::= { hw52DevSlotTrap 1008 }    
+
+    --  ============== hw52DevSlotTrap  define end ==============        
+
+    --  ============== hwHdDevTable  define beginning ==============
+
+        hwHdDev OBJECT IDENTIFIER ::= { hwMA5200Device 5 }
+        
+        hwHdDevTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwHdDevEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                This table contains harddisk information.  
+                "
+            ::= { hwHdDev 1 }
+        
+        hwHdDevEntry OBJECT-TYPE
+            SYNTAX HwHdDevEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The table entry of harddisk information.
+                "
+            INDEX { hwFrameIndex, hwSlotIndex, hwHdDevIndex }
+            ::= { hwHdDevTable 1 }
+        
+        HwHdDevEntry ::=
+            SEQUENCE { 
+                hwHdDevIndex
+                    Integer32,
+                hwHdDevSize
+                    Integer32,
+                hwHdDevFree
+                    Integer32
+             }
+
+        hwHdDevIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The index of harddisk information table.
+                "
+            ::= { hwHdDevEntry 1 }
+        
+        hwHdDevSize OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Total Size in Octets of harddisk memory.
+                "
+            ::= { hwHdDevEntry 2 }
+        
+        hwHdDevFree OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Unused Size in Octets of harddisk memory.
+                "
+            ::= { hwHdDevEntry 3 }                
+
+    --  ============== hwHdDevTable  define end ==============        
+
+        hw52DevPortTrap OBJECT IDENTIFIER ::= { hwMA5200Device 6 }
+        
+        hw52DevPortUp NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum, hw52DevSubSlotNum, hw52DevPortNum, hw52DevPortOperateStatus }
+            STATUS current
+            DESCRIPTION 
+                "
+                Port up.
+                "
+            ::= { hw52DevPortTrap 1 }
+            
+        hw52DevPortDown NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum, hw52DevSubSlotNum, hw52DevPortNum, hw52DevPortOperateStatus }
+            STATUS current
+            DESCRIPTION 
+                "
+                Port down.
+                "
+            ::= { hw52DevPortTrap 2 }                    
+            
+        hw52DevUserAttackInfo OBJECT IDENTIFIER ::= { hwMA5200Device 7 }
+        
+        hw52DevUserIPAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "                
+                The user's IP address. 
+                "
+            ::= { hw52DevUserAttackInfo 1 }
+        
+        hw52DevUserMac OBJECT-TYPE
+            SYNTAX MacAddress 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "                
+                The user's MAC address. 
+                "
+            ::= { hw52DevUserAttackInfo 2 }
+                
+        hw52DevUserIndex OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The index of user, could be vlan id, Session id or VCD according with the type of user.                
+                "
+            ::= { hw52DevUserAttackInfo 3 }
+
+        hw52DevUserOuterVlan OBJECT-TYPE
+            SYNTAX VlanIdOrNone 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The outer vlan.                
+                "
+            ::= { hw52DevUserAttackInfo 4 }
+                        
+        hw52DevUserAttack OBJECT IDENTIFIER ::= { hwMA5200Device 8 }
+        
+        hw52DevUserAttackTrap NOTIFICATION-TYPE
+            OBJECTS { hw52DevUserIPAddr,hw52DevUserMac,hw52DevSlotNum, hw52DevSubSlotNum, hw52DevPortNum, hw52DevUserIndex, hw52DevUserOuterVlan}
+            STATUS current
+            DESCRIPTION 
+                "
+                The trap report of user attack.
+                "
+            ::= { hw52DevUserAttack 1 }
+
+        hw52TrapSwitch OBJECT IDENTIFIER ::= { hwMA5200Device 9 }
+        
+        hw52HwdeviceOrBasetrap OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                disable(1),
+                hwdevice(2),
+                basetrap(3)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Trap switches between basetrap and hwdevice.
+                "
+            ::= { hw52TrapSwitch 1 }            
+            
+        hw52DevMemUsage OBJECT IDENTIFIER ::= { hwMA5200Device 10 }
+        
+        hw52DevMemUsageThreshold OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Memory usage threshold.
+                "
+            ::= { hw52DevMemUsage 1 }   
+                 
+    hw52DevMemUsageTrap OBJECT IDENTIFIER ::= { hwMA5200Device 11 }
+        
+        hw52DevMemUsageAlarm NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum, hw52DevMemUsageThreshold }
+            STATUS current
+            DESCRIPTION 
+                "
+                Memory usage alarm.
+                "
+            ::= { hw52DevMemUsageTrap 1 }
+                
+        hw52DevMemUsageResume NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum, hw52DevMemUsageThreshold }
+            STATUS current
+            DESCRIPTION 
+                "
+                Memory usage alarm resum.
+                "
+            ::= { hw52DevMemUsageTrap 2 }        
+            
+    hw52DevStartupFileFail OBJECT IDENTIFIER ::= { hwMA5200Device 12 }
+        
+        hw52DevDefaultStartupFileName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Default startup file name.
+                "
+            ::= { hw52DevStartupFileFail 1 }        
+        
+        hw52DevCurrentStartupFileName  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " 
+                Current startup file name.
+                "
+            ::= { hw52DevStartupFileFail 2 } 
+
+    hw52DevStartupFileFailTrap OBJECT IDENTIFIER ::= { hwMA5200Device 13 }
+                
+        hw52DevStartupFileReloadAlarm NOTIFICATION-TYPE
+            OBJECTS { hw52DevDefaultStartupFileName, hw52DevCurrentStartupFileName, hw52DevSlotNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                Startup file load fail alarm.
+                "
+            ::= { hw52DevStartupFileFailTrap 1 }        
+
+    hw52DevDiskSelfTestFail OBJECT IDENTIFIER ::= { hwMA5200Device 14 }
+    
+    hw52DevDiskSelfTestDiskType  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Disk type: cfcard or harddisk.
+                "
+            ::= { hw52DevDiskSelfTestFail 1 } 
+            
+    hw52DevDiskSelfTestFailStep  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "    
+                Disk self-test fail step.            
+                "
+            ::= { hw52DevDiskSelfTestFail 2 }         
+    
+    hw52DevDiskSelfTestFailTrap OBJECT IDENTIFIER ::= { hwMA5200Device 15 }
+            
+        hw52DevDiskSelfTestFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hw52DevDiskSelfTestDiskType,hw52DevDiskSelfTestFailStep,hw52DevSlotNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                Disk selftest error alarm.
+                "
+            ::= { hw52DevDiskSelfTestFailTrap 1 }    
+
+    hw52DevCfUnregisterTrap OBJECT IDENTIFIER ::= { hwMA5200Device 16 }
+    
+    hw52DevCfUnregisteredAlarm NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                Cf card unregistered.
+                "
+            ::= { hw52DevCfUnregisterTrap 1 }    
+    
+    hw52DevHpt372ErrorTrap OBJECT IDENTIFIER ::= { hwMA5200Device 17 }
+            
+        hw52DevHpt372ErrorAlarm NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                Hpt372 occur error.
+                "
+            ::= { hw52DevHpt372ErrorTrap 1 }        
+    
+    hw52DevHarddiskUsageTrap OBJECT IDENTIFIER ::= { hwMA5200Device 18 }
+            
+    hw52DevHarddiskUsageAlarm NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                Harddisk usage alarm.
+                "
+            ::= { hw52DevHarddiskUsageTrap 1 }
+            
+        hw52DevHarddiskUsageResume NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                Harddisk usage alarm resume.
+                "
+            ::= { hw52DevHarddiskUsageTrap 2 }
+
+        hw52PacketError OBJECT IDENTIFIER ::= { hwMA5200Device 19 }
+        
+        hw52InPacketErrorTrap NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum, hw52DevSubSlotNum, hw52DevPortNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                In packet error.
+                "
+            ::= { hw52PacketError 1 }
+
+        hw52OutPacketErrorTrap NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum, hw52DevSubSlotNum, hw52DevPortNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                Out packet error.
+                "
+            ::= { hw52PacketError 2 }
+
+    hw52DevCfcardUsageTrap OBJECT IDENTIFIER ::= { hwMA5200Device 20 }
+            
+    hw52DevCfcardUsageAlarm NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                Cfcard usage alarm.
+                "
+            ::= { hw52DevCfcardUsageTrap 1 }
+            
+        hw52DevCfcardUsageResume NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                Cfcard usage alarm resume.
+                "
+            ::= { hw52DevCfcardUsageTrap 2 }
+            
+    hw52DevFlashUsageTrap OBJECT IDENTIFIER ::= { hwMA5200Device 21 }
+            
+    hw52DevFlashUsageAlarm NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                Flash usage alarm.
+                "
+            ::= { hw52DevFlashUsageTrap 1 }
+            
+    hw52DevFlashUsageResume NOTIFICATION-TYPE
+            OBJECTS { hw52DevSlotNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                Flash usage alarm resume.
+                "
+            ::= { hw52DevFlashUsageTrap 2 }                    
+                
+    --  ============== conformance information ==============
+        hw52DevConformance OBJECT IDENTIFIER ::= { hwMA5200Device 200 }
+        
+        hw52DevCompliances OBJECT IDENTIFIER ::= { hw52DevConformance 1 }
+        hw52DevCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hw52DevSlotGroup, hw52DevHdTableGroup, hw52DevTrapsGroup,
+                                    hw52DevTrapObjectsGroup }  
+                                               
+              ::= { hw52DevCompliances 1 }
+              
+    --  ============== groups ==============  
+        hw52DevObjectGroups OBJECT IDENTIFIER ::= { hw52DevConformance 2 } 
+        
+        hw52DevSlotGroup OBJECT-GROUP
+            OBJECTS { hw52DevSlotNum, hw52DevSubSlotNum, hw52DevPortNum,
+                      hw52DevPortOperateStatus}
+            STATUS current
+            DESCRIPTION 
+                "The MA5200 device slot group objects."
+            ::= { hw52DevObjectGroups 1 }
+
+        hw52DevHdTableGroup OBJECT-GROUP
+            OBJECTS { hwHdDevSize, hwHdDevFree }
+            STATUS current
+            DESCRIPTION 
+                "The MA5200 device harddisk information table group."
+            ::= { hw52DevObjectGroups 2 } 
+
+        hw52DevTrapsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hw52DevSlotReset, hw52DevSlotRegOK, hw52DevSlotPlugOut,
+                            hw52DevPortUp, hw52DevPortDown, hw52DevUserAttackTrap,
+                            hw52DevMemUsageAlarm, hw52DevMemUsageResume, hw52DevStartupFileReloadAlarm,
+                            hw52DevDiskSelfTestFailAlarm, hw52DevCfUnregisteredAlarm, hw52DevHpt372ErrorAlarm,
+                            hw52DevHarddiskUsageAlarm, hw52DevHarddiskUsageResume, hw52InPacketErrorTrap,
+                            hw52OutPacketErrorTrap, hw52DevCfcardUsageAlarm, hw52DevCfcardUsageResume,
+                            hw52DevFlashUsageAlarm, hw52DevFlashUsageResume }
+            STATUS current
+            DESCRIPTION 
+                "The MA5200 device traps group."
+            ::= { hw52DevObjectGroups 3 }
+             
+        hw52DevTrapObjectsGroup OBJECT-GROUP
+            OBJECTS { hw52DevUserIPAddr, hw52DevUserMac, hw52DevUserIndex,
+                      hw52DevUserOuterVlan, hw52HwdeviceOrBasetrap, hw52DevMemUsageThreshold,
+                      hw52DevDefaultStartupFileName, hw52DevCurrentStartupFileName, hw52DevDiskSelfTestDiskType,
+                      hw52DevDiskSelfTestFailStep }
+            STATUS current
+            DESCRIPTION 
+                "The objects of MA5200 device traps group."
+            ::= { hw52DevObjectGroups 4 } 
+        
+    --  ============== conformance information define end ==============          
+                        
+        END
+        

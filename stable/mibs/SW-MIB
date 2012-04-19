@@ -1,0 +1,3561 @@
+--
+-- Title: Fibre Channel Switch MIB.
+--
+-- This is specified based on SMIv2, mainly to ensure that the specification
+-- can be parsed easily by off-the-shelf network management product in
+-- the market.
+--
+-- The goal of this mib is to access the any Fibre Channel switch of
+-- Brocade's family by using single SW-MIB file.
+-- This mib file includes the traps for Silkworm Switch.
+-- NOTE: Load BRCD.mib file before loading this mib file.
+--
+
+SW-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+	DisplayString, TEXTUAL-CONVENTION
+      FROM SNMPv2-TC
+    Counter32, Integer32, IpAddress,
+    OBJECT-TYPE, OBJECT-IDENTITY,
+	MODULE-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+    FcWwn, SwDomainIndex, SwNbIndex, SwSensorIndex,
+    SwPortIndex, SwTrunkMaster
+      FROM Brocade-TC
+    fcSwitch, bcsiModules
+      FROM Brocade-REG-MIB
+	connUnitPortStatEntry
+	  FROM FCMGMT-MIB;
+
+  swMibModule MODULE-IDENTITY
+    LAST-UPDATED "200408061830Z" -- Aug 06, 2004 6:30pm
+    ORGANIZATION "Brocade Communications Systems, Inc.,"
+    CONTACT-INFO "Customer Support Group
+		  Brocade Communications Systems,
+		  1745 Technology Drive,
+		  San Jose, CA 95110 U.S.A
+		  Tel: +1-408-392-6061
+		  Fax: +1-408-392-6656
+		  Email: support@Brocade.COM
+		  WEB: www.brocade.com"
+		
+
+    DESCRIPTION	"The MIB module	is for Brocade's Fibre Channel Switch.
+                 Copyright (c) 1996-2003 Brocade Communications Systems, Inc.
+  				 All rights reserved."
+    REVISION	"200301131430Z" -- Jan 13, 2003 2:30pm
+    DESCRIPTION	"The initial version of this module."
+    REVISION	"200307201430Z" -- July 20, 2003 2:30pm
+    DESCRIPTION	"Added swIDIDMode to the swFabric group."
+    REVISION	"200404151030Z" -- April 15, 2004 10:30am
+    DESCRIPTION	"Added object for Trap Severity Level, swFwLastSeverityLevel.
+                 Added the enumeration swFwResourceFlash for SwFwClassesAreas.
+                 Deprecated the mib object swEventTrapLevel.
+                 Updated the description of swGroupId and corrected the spell
+                 mistakes.
+                 Obsoleted the swFault Trap.
+                 Added enumerations four-GB for swFCPortSpeed and unknown,
+				 other for swFCPortType."
+    REVISION	"200408061830Z" -- Aug 06, 2004 6:30pm
+    DESCRIPTION	"Added swFCPortSpecifier object to swFCPortTable."
+    REVISION	"200504292016Z" -- Apr 29, 2005 8:16pm
+    DESCRIPTION	"Modified the #SUMMARY and #ARGUMENTS for swFabricWatchTrap"
+    REVISION	"200601090900Z" -- Jan 09, 2006 9:00am
+    DESCRIPTION	"1. Modified the description for swPortTrunked
+    		 2. Updated the SW Traps summary and description to
+		 remove the obsolete varbindings"
+    REVISION	"200605170900Z" -- May 17, 2006 9:00am
+    DESCRIPTION "Added swFCPortFlag object to swFCPortTable"
+    REVISION	"200701230900Z" -- Jan 23, 2007 9:00am
+    DESCRIPTION "Added enumerations eight-GB and  ten-GB for swFCPortSpeed"
+	REVISION	"200706081200Z" -- Jun 8, 2007 12:00pm
+	DESCRIPTION "Included swFCPortFlag as an additiional variable binding for
+				trap SWFCPortScn"
+	REVISION	"200706271030Z" -- Jun 27, 2007 10:30am
+	DESCRIPTION "Added enumerations octuple and decuple for swNbBaudRate"
+	REVISION	"200708011220Z" -- Aug 01, 2007 12:20pm 
+	DESCRIPTION "Added the enumerations swFwEPortUtil and swFwEPortPktl for swFwClassAreaIndex"
+	REVISION	"200708290442Z" -- Aug 29, 2007 4:42pm
+	DESCRIPTION "Added swFCPortBrcdType object to swFCPortTable"
+	REVISION    "200801290759Z" -- Jan 29, 2008 7:59pm
+	DESCRIPTION "Added Toptalker support and swVfId to the swFabric group."
+	REVISION    "200807170345Z" -- July 17, 2008 3:45pm
+	DESCRIPTION "Added swIPv6ChangeTrap, swIPv6Address and swIPv6Status ."
+	REVISION    "200807240232Z" -- July 24, 2008 2:32pm
+	DESCRIPTION "Added swModel to distiguish between 7500 and 7500E switch ."
+	REVISION    "200807250232Z" -- July 25, 2008 2:32pm
+	DESCRIPTION "Added the enumerations swFwPortLr, swFwEPortLr, swFwEPortUtil, swFwEPortPktl,
+				swFwFCUPortLr, swFwFOPPortLr for swFwClassAreaIndex."
+	REVISION    "200809090900Z" -- Sept 09, 2008 9:00pm
+	DESCRIPTION "Added swPmgrEventTrap information."
+	REVISION    "200909280900Z" -- Jan 28, 2009 9:00pm
+	DESCRIPTION "Added additional fabric watch threshold in SwFwActs."
+	REVISION    "200902210900Z" -- Feb 21, 2008 9:00pm
+	DESCRIPTION "Added port phy states."
+    REVISION    "200903300900Z" -- Mar 30, 2009 9:00am
+    DESCRIPTION "Added swEventVfId in swEventTable."	
+    REVISION    "200906251200Z" -- Jun 25, 2009 12:00pm
+    DESCRIPTION "Removed the version information from Brocade's proprietary MIB file name."
+    REVISION    "200906290100Z" -- Jun 29, 2009 01:00pm
+    DESCRIPTION "Modified swVfid position at the last of swFabric table"
+    REVISION    "200906301306Z" -- June 30, 2009 1:06pm
+    DESCRIPTION "Added swFwCPUMemUsage enumeration under swFwClassAreaIndex."
+    REVISION    "200906300600Z" -- Jun 30, 2009 06:00pm
+    DESCRIPTION "Updated the description of swCpuAction/swMemAction and access of 
+		 swcpuormemoryusage objects and changed the type of swEndDeviceInvalidWord, 
+		 swEndDeviceLinkFailure,swEndDeviceSyncLoss, swEndDeviceSigLoss, 
+		 swEndDeviceProtoErr,swEndDeviceInvalidCRC from integer32 to counter32."
+    REVISION    "200910300500Z" -- Oct 30, 2009 05:00pm
+    DESCRIPTION "Added swFabricReconfigTrap and swFabricSegmentTrap."        
+    REVISION    "200911031306Z" -- Nov 03, 2009 1:06pm
+    DESCRIPTION "Removed enum switchReboot from swAdmStatus."
+    REVISION    "200911051200Z" -- Nov 05, 2009 12:00pm
+    DESCRIPTION "Changed swFwCustUnit access to read-only"
+	REVISION    "200911050500Z" -- Nov 05, 2009 05:00pm
+	DESCRIPTION "Added enums swFwEPortTrunkUtil,swFwFCUPortTrunkUtil and
+	             swFwFOPPortTrunkUtil in SwFwClassesAreas"
+	REVISION    "200911061130Z" -- Nov 06, 2009 11:30am
+	DESCRIPTION "Added swConnUnitExtensionTable and entries for 64 bit
+				portstats."
+	REVISION    "0911301030Z" -- Nov 30, 2009 10:30am
+	DESCRIPTION "Added swMemUsageLimit1 and swMemUsageLimit3 under 
+				swCpuOrMemoryUsage"
+	REVISION    "0912031730Z" -- Dec 03, 2009 05:30pm
+	DESCRIPTION "Added swExttrap as internal trap."
+	REVISION    "1001301730Z" -- Jan 30, 2010 05:30pm
+	DESCRIPTION "Changed the descriptions for swConnUnitExtensionTable as per latest FS."
+
+	::=	{ bcsiModules 3 }
+	
+    sw		    OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for Brocade's Silkworm Series of
+                    Fibre Channel Switches."
+     ::= { fcSwitch 1 }
+
+    sw28k		OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID for Brocade's Silkworm 2800 model Fibre Channel
+                    Switch."
+     ::= { fcSwitch 2 }
+
+    sw21kN24k	OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID for Brocade's Silkworm 2100 and 2400 series
+                    model Fibre Channel Switch."
+     ::= { fcSwitch 3 }
+
+    sw20x0	    OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID for Brocade's Silkworm 20x0 series
+                    model Fibre Channel Switch."
+     ::= { fcSwitch 4 }
+
+  SwSevType		::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION   "The event trap level in conjunction with the an event's
+                    severity level."
+     SYNTAX  INTEGER {
+               none            (0),
+               critical        (1),
+               error           (2),
+               warning         (3),
+               informational   (4),
+               debug           (5)
+            }
+            
+  FcPortFlag		::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION   "Represents the port status for a FC Flag. Currently this will indicate
+                    if the port is virtual or physical."
+     SYNTAX  BITS {
+	       physical           (0),
+               virtual            (1)
+            }
+
+  -- various groups
+  swSystem	OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swSystem group."
+     ::= { sw 1 }
+
+  swFabric	OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swFabric group."
+     ::= { sw 2 }
+
+  swModule	OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swModule group."
+     ::= { sw 3 }
+
+  swAgtCfg	OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swAgtCfg group."
+     ::= { sw 4 }
+
+  -- { sw 5 } is reserved
+  swFCport	OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swFCport group."
+     ::= { sw 6 }
+
+  swNs		OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swNs group."
+     ::= { sw 7 }
+
+  swEvent	OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swEvent group."
+     ::= { sw 8 }
+
+  swFwSystem	OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swFwSystem group."
+     ::= { sw 10 }
+
+  swEndDevice	OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swEndDevice group."
+     ::= { sw 21 }
+
+  swGroup       OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swGroup group."
+     ::= { sw 22 }
+
+  swBlmPerfMnt    OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swBlmPerfMnt (Bloom Performance
+                    Monitor) group."
+    ::= { sw 23 }
+
+  swTrunk      OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swTrunk group."
+     ::= { sw 24 }   
+
+  swTopTalker   OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for TopTalker group."
+	 ::= { sw 25 }
+
+  swCpuOrMemoryUsage   OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for cpu or memory usage group."
+	 ::= { sw 26 }
+
+  swConnUnitPortStatExtentionTable  OBJECT-TYPE
+     SYNTAX     SEQUENCE OF SwConnUnitPortStatEntry
+     MAX-ACCESS  not-accessible
+     STATUS    current
+     DESCRIPTION    "This represents the Conn unit Port Stats"
+     ::= { sw 27 }
+
+  --
+  -- the System Group (sw)
+  --
+
+  swCurrentDate		OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current date information in displayable textual
+		format."
+  ::= { swSystem 1 }
+
+  swBootDate		OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The date and time when the system last booted, in
+		displayable textual format."
+  ::= { swSystem 2 }
+
+  swFWLastUpdated	OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The information indicates the date when the firmware
+		was last updated, in displayable textual format."
+  ::= { swSystem 3 }
+
+  swFlashLastUpdated	OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The information indicates the date when the FLASH
+		was last updated, in displayable textual format."
+  ::= { swSystem 4 }
+
+  swBootPromLastUpdated	OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The information indicates the date when the boot PROM
+		was last updated, in displayable textual format."
+  ::= { swSystem 5 }
+
+  swFirmwareVersion	OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..24))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current version of the firwmare."
+  ::= { swSystem 6 }
+
+  swOperStatus		OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  online	(1),
+			  offline	(2),
+			  testing	(3),
+			  faulty	(4)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current operational status of the switch.
+		The states are as follow:
+		o online(1) means the switch is accessible by an external
+		  Fibre Channel port;
+		o offline(2) means the switch is not accessible;
+		o testing(3) means the switch is in a built-in test mode
+		  and is not accessible by an external Fibre Channel port;
+		o faulty(4) means the switch is not operational."
+  ::= { swSystem 7 }
+
+  swAdmStatus		OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  online	(1),
+			  offline	(2),
+			  testing	(3),
+			  faulty	(4),
+			  reboot	(5),
+			  fastboot	(6)
+			}
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The desired administrative status of the switch.
+		A management station may place the switch in a desired
+		state by setting this object accordingly. The states
+		are as follow:
+		o online(1) means set the switch to be accessible by an
+		  external Fibre Channel port;
+		o offline(2) means set the switch to be inaccessible;
+		o testing(3) means set the switch to run the built-in test;
+		o faulty(4) means set the switch to a 'soft' faulty
+		  condition;
+		o reboot(5) means set the switch to reboot in 1 second.
+		o fastboot(6) means set the switch to fastboot in 1 second.
+		Fastboot would cause the switch to boot but skip over the
+		POST.
+
+                When the switch is in faulty state, only two states
+                can be set: faulty and reboot/fastboot."
+
+  ::= { swSystem 8 }
+
+  swTelnetShellAdmStatus	OBJECT-TYPE
+	SYNTAX			INTEGER {
+				  unknown	(0),
+				  terminated	(1)
+				}
+	MAX-ACCESS			read-write
+	STATUS			current
+	DESCRIPTION	"The desired administrative status of the Telnet
+		shell. By setting it to terminated(1), the current
+		Telnet shell task is deleted. When this variable instance
+		is read, it reports the value last set through SNMP."
+  ::= { swSystem 9 }
+
+  swSsn			OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE (0..128))
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "The soft serial number of the switch."
+  ::= { swSystem 10 }
+
+  -- FLASH administration
+  -- the next 5 objects are related to firmware or config file management.
+  --
+  -- The underlying method in the transfer of the firmware or config file
+  -- is based on either FTP or remote shell.
+  -- If a password is provided, then FTP is used.
+  -- If NO password is provided, then remote shell is used.
+  --
+  -- 2 steps to manage firmware or switch config file in the switch FLASH,
+  -- (A1) set swFlashDLHost.0, swFlashDLUser.0 and swFlashDLFile.0 to
+  --      appropriate
+  --        host IP address in user dot notation (e.g. 192.168.1.7),
+  --        user name (e.g. "administrator"), and
+  --        file name of the firmware or config file (e.g. "/home/fcswh/v2.2")
+  --      respectively;
+  -- (A2) set swFlashDLPassword.0 to an appropriate value (e.g. "secret")
+  --      if FTP is the desired method of transfer;
+  -- (B) set swFlashDLAdmStatus.0 to swFwUpgrade(2), swCfUpload(3),
+  --	   or swCfDownload(4) accordingly.
+  --
+
+  swFlashDLOperStatus	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  unknown		(0),
+			  swCurrent		(1),
+			  swFwUpgraded		(2),
+			  swCfUploaded		(3),
+			  swCfDownloaded	(4),
+			  swFwCorrupted 	(5)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The operational status of the FLASH.
+		The operational states are as follow:
+		o swCurrent(1) indicates that the FLASH contains the
+		  current firmware image or config file;
+		o swFwUpgraded(2) state indicates that it contains the image
+		  upgraded from the swFlashDLHost.0.;
+		o swCfUploaded(3) state indicates that the switch configuration
+		  file has been uploaded to the host; and
+		o swCfDownloaded(4) state indicates that the switch
+		  configuration file has been downloaded from the host.
+		o swFwCorrupted (5) state indicates that the firmware in the
+		  FLASH of the switch is corrupted."
+  ::= { swSystem 11 }
+
+  swFlashDLAdmStatus	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  swCurrent		(1),
+			  swFwUpgrade		(2),
+			  swCfUpload		(3),
+			  swCfDownload		(4),
+			  swFwCorrupted 	(5)
+			}
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The desired state of the FLASH.
+		A management station may place the FLASH in a desired
+		state by setting this object accordingly:
+		o swCurrent(1) indicates that the FLASH contains the
+		  current firmware image or config file;
+		o swFwUpgrade(2) means that the firmware in the	FLASH is to be
+		  upgraded from the host specified;
+		o swCfUpload(3) means that the switch config file is to be
+		  uploaded to the host specified; or
+		o swCfDownload(4) means that the switch config file is to be
+		  downloaded from the host specified.
+		o swFwCorrupted(5) state indicates that the firmware in the
+		  FLASH is corrupted. This value is for informational purpose
+		  only. However, set of swFlashDLAdmStatus to this value is
+		  not allowed.
+
+		The host is specified in swFlashDLHost.0. In addition,
+		user name is specified in swFlashDLUser.0, and
+		the file name specified in swFlashDLFile.0.
+
+		Reference the user manual on the following commands,
+		o firmwareDownload,
+		o configUpload, and
+		o configDownload."
+  ::= { swSystem 12 }
+
+  swFlashDLHost		OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The name or IP address (in dot notation) of the host
+			 to download or upload a relevant file to the FLASH."
+  ::= { swSystem 13 }
+
+  swFlashDLUser		OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The user name on the host to download or upload
+			 a relevant file to or from the FLASH."
+  ::= { swSystem 14 }
+
+  swFlashDLFile		OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The name of the file to be downloaded or uploaded."
+  ::= { swSystem 15 }
+
+  swFlashDLPassword	OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..100))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The password to be used in for FTP transfer of
+			 files in the download or upload operation."
+  ::= { swSystem 16 }
+
+  -- 17..19 are reserved
+
+  swBeaconOperStatus	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				on	(1),
+				off	(2)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current operational status of the switch beacon.
+			 When the beacon is on, the LEDs on the front panel
+			 of the switch run alternately from left to right
+			 and right to left. The color is yellow.
+			 When the beacon is off, each LED will be in their
+			 its regular status indicating color and state."
+  ::= { swSystem 18 }
+
+  swBeaconAdmStatus	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				on	(1),
+				off	(2)
+			}
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The desired status of the switch beacon.
+			 When the beacon is set to on, the LEDs on the front
+			 panel of the switch run alternately from left to right
+			 and right to left. The color is yellow.
+			 When the beacon is set to off, each LED will be in
+			 its regular status indicating color and state."
+  ::= { swSystem 19 }
+
+  swDiagResult	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				sw-ok			(1),
+				sw-faulty	    (2),
+				sw-embedded-port-fault	(3)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The result of the power-on startup (POST)
+			 diagnostics."
+  ::= { swSystem 20 }
+
+  -- operating environment sensors (temperature, fan, power supply...)
+  swNumSensors		OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The number of sensors inside the switch."
+  ::= { swSystem 21 }
+
+  swSensorTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SwSensorEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"The table of sensor entries."
+  ::= { swSystem 22 }
+
+  swSensorEntry		OBJECT-TYPE
+	SYNTAX		SwSensorEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry of the sensor information."
+	INDEX		{ swSensorIndex }
+  ::= { swSensorTable 1 }
+
+  SwSensorEntry	::= SEQUENCE {
+	swSensorIndex	SwSensorIndex,
+	swSensorType	INTEGER,
+	swSensorStatus	INTEGER,
+	swSensorValue	Integer32,
+	swSensorInfo	DisplayString
+  }
+
+  swSensorIndex		OBJECT-TYPE
+	SYNTAX		SwSensorIndex
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object identifies the sensor."
+  ::= { swSensorEntry 1 }
+
+  swSensorType		OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  temperature	(1),
+			  fan		(2),
+			  power-supply	(3)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object identifies the sensor type."
+  ::= { swSensorEntry 2 }
+
+  swSensorStatus	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  unknown	(1),
+			  faulty	(2),
+			  below-min	(3),
+			  nominal	(4),
+			  above-max	(5),
+			  absent	(6)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current status of the sensor."
+  ::= { swSensorEntry 3 }
+
+  swSensorValue		OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current value (reading) of the sensor.
+		The value, -2147483648, represents an unknown quantity.
+		It also means that the sensor does not have the capability to
+		measure the actual value. In V2.0, the temperature sensor
+		value will be in Celsius; the fan value will be in RPM
+		(revolution per minute); and the power supply sensor reading
+		will be unknown."
+  ::= { swSensorEntry 4 }
+
+  swSensorInfo		OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE(0..255))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Additional displayable information on the sensor.
+		In V2.x, it contains the sensor type and number
+		in textual format. For example, 'Temp 3', 'Fan 6'."
+  ::= { swSensorEntry 5 }
+
+  -- track changes string scalar
+  swTrackChangesInfo	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Track changes string. For trap only"
+  ::= { swSystem 23 }
+
+  swID     OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The number of the logical switch (0/1)"
+   ::= { swSystem 24 }
+
+  swEtherIPAddress     OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The IP Address of the Ethernet interface of this logical
+        switch."
+    ::= { swSystem 25 }
+
+  swEtherIPMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The IP Mask of the Ethernet interface of this logical switch."
+    ::= { swSystem 26}
+
+  swFCIPAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The IP Address of the FC interface of this logical switch."
+    ::= { swSystem 27 }
+
+  swFCIPMask    OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The IP Mask of the FC interface of this logical switch."
+    ::= { swSystem 28 }
+
+  swIPv6Address OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS not-accessible 
+        STATUS  current
+        DESCRIPTION
+        "IPV6 address."
+    ::= { swSystem 29 }
+
+  swIPv6Status  OBJECT-TYPE
+    SYNTAX      INTEGER {
+              tentative (1),
+              preferred (2),
+              ipdeprecated (3),
+              inactive  (4)
+            }
+    MAX-ACCESS     not-accessible 
+    STATUS      current
+    DESCRIPTION "The current status of ipv6 address."
+  ::= { swSystem 30 }
+
+  swModel  OBJECT-TYPE
+    SYNTAX      INTEGER {
+              switch7500 (1),
+              switch7500E (2),
+              other (3)
+            }
+    MAX-ACCESS    read-only 
+    STATUS      current
+    DESCRIPTION "Indicates whether the switch is 7500 or 7500E ."
+  ::= { swSystem 31 }
+
+ swTestString  OBJECT-TYPE
+	SYNTAX	    DisplayString(SIZE(1..255))
+	MAX-ACCESS  not-accessible
+	STATUS	   current
+	DESCRIPTION	"presence of this string represents test trap."
+	::= { swSystem 32 }
+
+
+  --
+  -- End of System Group
+  --
+
+  --
+  -- Fabric Group
+  --
+  swDomainID	OBJECT-TYPE
+	SYNTAX		SwDomainIndex
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The current Fibre Channel domain ID of the switch.
+		To set a new value, the switch (swAdmStatus) must be in
+		offline or testing state."
+  ::= { swFabric 1 }
+
+  swPrincipalSwitch	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				yes	(1),
+				no	(2)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object indicates whether the switch is
+		the Principal switch as per FC-SW."
+  ::= { swFabric 2 }
+
+  -- swFabric 3..7 are reserved
+
+  -- (immediate) Neighborhood ISL family
+  --
+  swNumNbs		OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The number of Inter-Switch Links in the (immediate)
+		neighborhood."
+  ::= { swFabric 8 }
+
+  swNbTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SwNbEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"This table contains the ISLs in the immediate
+		neighborhood of the switch."
+  ::= { swFabric 9 }
+
+  swNbEntry		OBJECT-TYPE
+	SYNTAX		SwNbEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry containing each neighbor ISL parameters."
+	INDEX		{ swNbIndex }
+  ::= { swNbTable 1 }
+
+  SwNbEntry		::= SEQUENCE {
+	swNbIndex	SwNbIndex,
+	swNbMyPort	SwPortIndex,
+	swNbRemDomain	SwDomainIndex,
+	swNbRemPort	SwPortIndex,
+	swNbBaudRate	INTEGER,
+	swNbIslState	INTEGER,
+	swNbIslCost	Integer32,
+        swNbRemPortName	OCTET STRING
+  }
+
+  swNbIndex		OBJECT-TYPE
+	SYNTAX		SwNbIndex
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object identifies the neighbor ISL entry."
+  ::= { swNbEntry 1 }
+
+  swNbMyPort		OBJECT-TYPE
+	SYNTAX		SwPortIndex
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This is the port that has an ISL to another switch."
+  ::= { swNbEntry 2 }
+
+  swNbRemDomain		OBJECT-TYPE
+	SYNTAX		SwDomainIndex
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This is the Fibre Channel domain on the other end
+		of the ISL."
+  ::= { swNbEntry 3 }
+
+  swNbRemPort		OBJECT-TYPE
+	SYNTAX		SwPortIndex
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This is the port index on the other end of the ISL."
+  ::= { swNbEntry 4 }
+
+  swNbBaudRate		OBJECT-TYPE
+	SYNTAX		INTEGER {
+				other           (1),    -- none of below
+				oneEighth       (2),    -- 155 Mbaud
+				quarter         (4),    -- 266 Mbaud
+				half            (8),    -- 532 Mbaud
+				full            (16),   --   1 Gbaud
+				double          (32),   --   2 Gbaud
+				quadruple       (64),   --   4 Gbaud
+				octuple         (128),  --   8 Gbaud
+				decuple         (256)   --  10 Gbaud
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The baud rate of the ISL."
+  ::= { swNbEntry 5 }
+
+  swNbIslState		OBJECT-TYPE
+	SYNTAX		INTEGER {
+				sw-down		(0),
+				sw-init		(1),
+				sw-internal2	(2),
+				sw-internal3	(3),
+				sw-internal4	(4),
+				sw-active	(5)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current state of the ISL.
+			 The swNbIslState will be 0 when ISL 
+			 is in incompatible state or port is a slave port."
+  ::= { swNbEntry 6 }
+
+  swNbIslCost		OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The current link cost of the ISL."
+  ::= { swNbEntry 7 }
+
+  swNbRemPortName	OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE (8))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The World_wide_Name of the remote port."
+  ::= { swNbEntry 8 }
+
+ -- Fabric member information
+ --
+  swFabricMemTable      OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SwFabricMemEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION     "This table contains information on the member 
+                         switches of a fabric. This may not be available on
+                         all versions of Fabric OS."
+  ::= { swFabric 10 }
+
+  swFabricMemEntry              OBJECT-TYPE
+        SYNTAX          SwFabricMemEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry containing each switch in the fabric."
+        INDEX           { swFabricMemWwn }
+  ::= { swFabricMemTable 1 }
+
+  SwFabricMemEntry      ::= SEQUENCE {
+        swFabricMemWwn          FcWwn,
+        swFabricMemDid          SwDomainIndex,
+        swFabricMemName         DisplayString,
+        swFabricMemEIP          IpAddress,
+        swFabricMemFCIP         IpAddress,
+        swFabricMemGWIP         IpAddress,
+        swFabricMemType         Integer32,
+        swFabricMemShortVersion OCTET STRING
+  }
+  swFabricMemWwn        OBJECT-TYPE
+        SYNTAX          FcWwn
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the World wide name of the
+                         member switch."
+  ::= { swFabricMemEntry 1 }
+
+  swFabricMemDid  OBJECT-TYPE
+        SYNTAX          SwDomainIndex
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the domain id of the member
+                         switch."
+  ::= { swFabricMemEntry 2 }
+
+  swFabricMemName       OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the name of the member switch."
+  ::= { swFabricMemEntry 3 }
+
+  swFabricMemEIP        OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the ethernet IP address
+                         of the member switch."
+  ::= { swFabricMemEntry 4 }
+  swFabricMemFCIP       OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the Fibre Channel IP address
+                         of the member switch."
+  ::= { swFabricMemEntry 5 }
+
+  swFabricMemGWIP       OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the Gateway IP address
+                         of the member switch."
+  ::= { swFabricMemEntry 6 }
+
+ swFabricMemType        OBJECT-TYPE
+        SYNTAX          Integer32 (0..2147483647)
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the member switch type."
+  ::= { swFabricMemEntry 7 }
+
+  swFabricMemShortVersion       OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..24))
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies Fabric OS version of
+                         the member switch."
+  ::= { swFabricMemEntry 8 }
+
+  swIDIDMode	OBJECT-TYPE
+	SYNTAX		INTEGER { enabled(1), disabled(2) }
+	MAX-ACCESS		read-only
+	STATUS		current
+    DESCRIPTION "Status of Insistent Domain ID (IDID) mode. Status
+                   indicating IDID mode is enabled or not."
+  ::= { swFabric 11 }
+
+  swPmgrEventType OBJECT-TYPE
+	SYNTAX      INTEGER {
+              create (0),
+              delete (1),
+              moveport (2),
+              fidchange (3),
+			  basechange (4),
+			  vfstatechange(6)	
+            }
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "Indicates Partition manager event type."
+  ::= { swFabric 12 }
+
+  swPmgrEventTime OBJECT-TYPE 
+	SYNTAX          DisplayString(SIZE (0..64))
+	MAX-ACCESS     not-accessible 
+	STATUS          current
+	DESCRIPTION     "This object identifies the date and time when this pmgr
+			 event occurred, in textual format."
+  ::= { swFabric 13 }
+
+  swPmgrEventDescr OBJECT-TYPE 
+	SYNTAX          DisplayString(SIZE (0..64))
+	MAX-ACCESS      not-accessible    
+	STATUS          current
+	DESCRIPTION     "This object identifies the textual description of
+                the pmgr event."
+  ::= { swFabric 14 }
+
+  swVfId        OBJECT-TYPE
+        SYNTAX          Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Virtual fabric id."
+  ::= { swFabric 15 }
+
+  --
+  -- SNMP Agent Configuration
+  --
+
+  -- swAgtCfg 1..10 are reserved
+
+  swAgtCmtyTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SwAgtCmtyEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"A table that contains, one entry for each Community,
+		the access control and parameters of the Community."
+  ::= { swAgtCfg 11 }
+
+  swAgtCmtyEntry	OBJECT-TYPE
+	SYNTAX		SwAgtCmtyEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry containing the Community parameters."
+	INDEX	{ swAgtCmtyIdx }
+  ::= { swAgtCmtyTable 1 }
+
+  SwAgtCmtyEntry	::= SEQUENCE {
+	swAgtCmtyIdx		Integer32,
+	swAgtCmtyStr		DisplayString,
+	swAgtTrapRcp		IpAddress,
+	swAgtTrapSeverityLevel		SwSevType
+  }
+
+  swAgtCmtyIdx		OBJECT-TYPE
+	SYNTAX		Integer32 (1..6)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object identifies the SNMPv1 Community entry."
+  ::= { swAgtCmtyEntry 1 }
+
+  swAgtCmtyStr		OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (2..16))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"This is a Community string supported by the agent.
+		If a new value is set successfully, it takes effect
+		immediately."
+  ::= { swAgtCmtyEntry 2 }
+
+  swAgtTrapRcp		OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"This is the trap recipient associated with the
+		Community. If a new value is set successfully, it takes
+		effect immediately."
+  ::= { swAgtCmtyEntry 3 }
+
+  swAgtTrapSeverityLevel		OBJECT-TYPE
+	SYNTAX			SwSevType
+	MAX-ACCESS		read-write
+	STATUS		    current
+	DESCRIPTION	"This is the trap severity level associated with the
+		swAgtTrapRcp. The trap severity level in conjunction with
+        the an event's severity level. When an event occurs and if its
+        severity level is at or below the set value, the SNMP trap is
+        sent to configured trap recipients. The severity level is
+        limited to particular events. If a new value is set successfully,
+        it takes effect immediately."
+  ::= { swAgtCmtyEntry 4 }
+
+  --
+  -- End of SNMP Agent Configuration Group
+  --
+
+  --
+  -- Fibre Channel Port Group
+  -- This group contains information about the physical state,
+  -- operational status, performance and error statistics of each
+  -- Fibre Channel port on the switch. A Fibre Channel port is one which
+  -- supports the Fibre Channel protocol. E.g. F_Port, E_Port, FL_Port.
+  --
+
+  swFCPortCapacity	OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The maximum number of Fibre Channel ports on this
+		switch. It includes G_Port, F_Port, FL_Port and any other
+		types of Fibre Channel port."
+  ::= { swFCport 1 }
+
+  swFCPortTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SwFCPortEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"A table that contains, one entry for each switch port,
+		configuration and service parameters of the port."
+  ::= { swFCport 2 }
+
+  swFCPortEntry		OBJECT-TYPE
+	SYNTAX		SwFCPortEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry containing the configuration and service
+		parameters of the switch port."
+	INDEX	{ swFCPortIndex }
+	::= { swFCPortTable 1 }
+
+  SwFCPortEntry		::= SEQUENCE {
+	swFCPortIndex		SwPortIndex,
+	swFCPortType		INTEGER,
+	swFCPortPhyState	INTEGER,
+	swFCPortOpStatus	INTEGER,
+	swFCPortAdmStatus	INTEGER,
+
+	swFCPortLinkState	INTEGER,
+	swFCPortTxType		INTEGER,
+	
+	-- the rest is mapped to gstat_t
+	swFCPortTxWords		Counter32,
+	swFCPortRxWords		Counter32,
+	swFCPortTxFrames	Counter32,
+	swFCPortRxFrames	Counter32,
+	swFCPortRxC2Frames	Counter32,
+	swFCPortRxC3Frames	Counter32,
+	swFCPortRxLCs		Counter32,
+	swFCPortRxMcasts	Counter32,
+	swFCPortTooManyRdys	Counter32,
+	swFCPortNoTxCredits	Counter32,
+	swFCPortRxEncInFrs	Counter32,
+	swFCPortRxCrcs		Counter32,
+	swFCPortRxTruncs	Counter32,
+	swFCPortRxTooLongs	Counter32,
+	swFCPortRxBadEofs	Counter32,
+	swFCPortRxEncOutFrs	Counter32,
+	swFCPortRxBadOs		Counter32,
+	swFCPortC3Discards	Counter32,
+	swFCPortMcastTimedOuts	Counter32,
+	swFCPortTxMcasts	Counter32,
+
+	-- LIP statistics
+	swFCPortLipIns		Counter32,
+	swFCPortLipOuts		Counter32,
+	swFCPortLipLastAlpa	OCTET STRING,
+
+	-- new for V2.1
+	swFCPortWwn		OCTET STRING,
+
+	-- new for V3.0
+	swFCPortSpeed       INTEGER,
+
+	-- new for Port Name Feature.
+	swFCPortName       DisplayString,
+
+	-- new for PortSpecifier Feature.
+	swFCPortSpecifier    DisplayString,
+	
+	-- new for portFlag Feature.
+	swFCPortFlag	FcPortFlag,
+
+	-- Brocade port type.
+	swFCPortBrcdType	INTEGER
+  }
+
+  swFCPortIndex		OBJECT-TYPE
+	SYNTAX		SwPortIndex
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object identifies the switch port index.
+		Note that the value of a port index is 1 higher than the
+		port number labeled on the front panel.
+		E.g. port index 1 correspond to port number 0."
+  ::= { swFCPortEntry 1 }
+
+  swFCPortType		OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  stitch	(1),
+			  flannel	(2),
+			  loom		(3),
+			  bloom		(4),
+			  rdbloom	(5),
+			  wormhole	(6),
+			  other	    (7),
+			  unknown	(8)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object identifies the type of switch port.
+			 It may be of type stitch(1), flannel(2), loom(3) , bloom(4),rdbloom(5) or wormhole(6)."
+  ::= { swFCPortEntry 2 }
+
+  swFCPortPhyState	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  noCard	(1),
+			  noTransceiver	(2),
+			  laserFault	(3),
+			  noLight	(4),
+			  noSync	(5),
+			  inSync	(6),
+			  portFault	(7),
+			  diagFault	(8),
+			  lockRef	(9),
+			  validating    (10),
+			  invalidModule (11),
+			  unknown   (255)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object identifies the physical state of
+		the port:
+			noCard(1)	no card present in this switch slot;
+			noTransceiver(2)	no Transceiver module in this port.
+								noGbic(2) was used previously. Transceiver
+								is the generic name for GBIC, SFP etc.;
+			laserFault(3)	the module is signaling a laser fault
+					(defective Transceiver);
+			noLight(4)	the module is not receiving light;
+			noSync(5)	the module is receiving light but is
+					out of sync;
+			inSync(6)	the module is receiving light and is
+					in sync;
+			portFault(7)	the port is marked faulty (defective
+					Transceiver, cable or device);
+			diagFault(8)	the port failed diagnostics (defective
+					G_Port or FL_Port card or motherboard);
+			lockRef(9)	the port is locking to the reference
+					signal.
+			validating(10)  Validation is in progress
+			invalidModule(11) Invalid SFP
+			unknown(255)    unknown.
+		"
+  ::= { swFCPortEntry 3 }
+
+  swFCPortOpStatus	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  unknown	(0),
+			  online	(1),
+			  offline	(2),
+			  testing	(3),
+			  faulty	(4)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object identifies the operational status of
+		the port. The online(1) state indicates that user frames
+		can be passed. The unknown(0) state indicates that likely
+		the port module is physically absent (see swFCPortPhyState)."
+  ::= { swFCPortEntry 4 }
+
+  swFCPortAdmStatus	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  online	(1),
+			  offline	(2),
+			  testing	(3),
+			  faulty	(4)
+			}
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"The desired state of the port. A management station
+                may place the port in a desired state by setting this
+                object accordingly.  The testing(3) state indicates that
+                no user frames can be passed. As the result of
+                either explicit management action or per configuration
+                information accessible by the switch, swFCPortAdmStatus is
+		then changed to either the online(1) or testing(3)
+		states,	or remains in the offline(2) state."
+  ::= { swFCPortEntry 5 }
+
+  swFCPortLinkState	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  enabled	(1),
+			  disabled	(2),
+			  loopback	(3)
+			}
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"This object indicates the link state of the port.
+		The value may be:
+		  enabled(1) - port is allowed to participate in the FC-PH
+			protocol with its attached port (or ports if it is
+			in a FC-AL loop);
+		  disabled(2) - the port is not allowed to participate in
+			the FC-PH protocol with its attached port(s);
+		  loopback(3) - the port may transmit frames through an
+			internal path to verify the health of the transmitter
+			and receiver path.
+
+		Note that when the port's link state changes, its
+		operational status (swFCPortOpStatus) will be affected."
+  ::= { swFCPortEntry 6 }
+
+  swFCPortTxType	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  unknown	(1),
+			  lw		(2),
+			  sw		(3),
+			  ld		(4),
+			  cu		(5)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object indicates the media transmitter type of
+		the port. The value may be:
+		  unknown(1)		cannot determined to the port driver
+		  lw(2)			long wave laser
+		  sw(3)			short wave laser
+		  ld(4)			long wave LED
+		  cu(5)			copper (electrical)."
+  ::= { swFCPortEntry 7 }
+
+  -- counters
+  swFCPortTxWords	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of Fibre Channel
+		words that the port has transmitted."
+  ::= { swFCPortEntry 11 }
+
+  swFCPortRxWords	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of Fibre Channel
+		words that the port has received."
+  ::= { swFCPortEntry 12 }
+
+  swFCPortTxFrames	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of (Fibre Channel)
+		frames that the port has transmitted."
+  ::= { swFCPortEntry 13 }
+
+  swFCPortRxFrames	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of (Fibre Channel)
+		frames that the port has received."
+  ::= { swFCPortEntry 14 }
+
+  swFCPortRxC2Frames	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of Class 2
+		frames that the port has received."
+  ::= { swFCPortEntry 15 }
+
+  swFCPortRxC3Frames	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of Class 3
+		frames that the port has received."
+  ::= { swFCPortEntry 16 }
+
+  swFCPortRxLCs		OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of Link Control
+		frames that the port has received."
+  ::= { swFCPortEntry 17 }
+
+  swFCPortRxMcasts	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of Multicast
+		frames that the port has received."
+  ::= { swFCPortEntry 18 }
+
+  swFCPortTooManyRdys	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of times when RDYs
+		 exceeds the frames received."
+  ::= { swFCPortEntry 19 }
+
+  swFCPortNoTxCredits	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of times when the
+		 transmit credit has reached zero."
+  ::= { swFCPortEntry 20 }
+
+  swFCPortRxEncInFrs	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of encoding error or
+		disparity error inside frames received."
+  ::= { swFCPortEntry 21 }
+
+  swFCPortRxCrcs	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of CRC errors
+		detected for frames received."
+  ::= { swFCPortEntry 22 }
+
+  swFCPortRxTruncs	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of truncated
+		frames that the port has received."
+  ::= { swFCPortEntry 23 }
+
+  swFCPortRxTooLongs	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of received frames that
+		are too long."
+  ::= { swFCPortEntry 24 }
+
+  swFCPortRxBadEofs	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of received frames that
+		have bad EOF delimiter."
+  ::= { swFCPortEntry 25 }
+
+  swFCPortRxEncOutFrs	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of encoding error or
+		disparity error outside frames received."
+  ::= { swFCPortEntry 26 }
+
+  swFCPortRxBadOs		OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of invalid Ordered
+		Sets received."
+  ::= { swFCPortEntry 27 }
+
+  swFCPortC3Discards	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of Class 3
+		frames that the port has discarded."
+  ::= { swFCPortEntry 28 }
+
+  swFCPortMcastTimedOuts	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of Multicast
+		frames that has been timed out."
+  ::= { swFCPortEntry 29 }
+
+  swFCPortTxMcasts	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of Multicast
+		frames that has been transmitted."
+  ::= { swFCPortEntry 30 }
+
+  -- LIP statistics
+  swFCPortLipIns	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of Loop Initializations
+		that has been initiated by loop devices attached."
+  ::= { swFCPortEntry 31 }
+
+  swFCPortLipOuts	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object counts the number of Loop Initializations
+		that has been initiated by the port."
+  ::= { swFCPortEntry 32 }
+
+  swFCPortLipLastAlpa	OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(4))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object indicates the Physical Address (AL_PA)
+		of the loop device that initiated the last
+		Loop Initialization."
+  ::= { swFCPortEntry 33 }
+
+  swFCPortWwn		OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(8))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The World_wide_Name of the Fibre Channel port.
+		The contents of an instance are in the IEEE extended format
+		as specified in FC-PH; the 12-bit port identifier represents
+		the port number within the switch."
+  ::= { swFCPortEntry 34 }
+
+ swFCPortSpeed     OBJECT-TYPE
+    SYNTAX      INTEGER
+				{
+					one-GB   (1),
+					two-GB   (2),
+					auto-Negotiate (3),
+					four-GB (4),
+					eight-GB (5),
+					ten-GB (6),
+					unknown (7)
+				}
+	MAX-ACCESS      read-write
+	STATUS      current
+	DESCRIPTION "The desired baud rate for the port. It can have the
+		values of 1GB (1), 2GB (2), Auto-Negotiate (3), 4GB (4), 8GB (5),
+		or 10GB (6). Some of the above values may not be supported
+		by all type of switches."
+  ::= { swFCPortEntry 35 }
+
+ swFCPortName     OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..32))
+	MAX-ACCESS      read-only
+	STATUS      current
+	DESCRIPTION "A string indicates the name of the addressed port.
+                 The names should be persistent across switch reboots.
+                 Port names do not have to be unique within a switch or
+                 within a fabric."
+  ::= { swFCPortEntry 36 }
+
+ swFCPortSpecifier     OBJECT-TYPE
+    SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "This string indicates the physical port number of the addressed port.
+				The format of the string is: <slot>/port, where 'slot' being
+				present only for bladed systems. 
+				"
+  ::= { swFCPortEntry 37 }
+  
+  -- FC port status flag
+
+  swFCPortFlag		OBJECT-TYPE
+      SYNTAX	  FcPortFlag
+      MAX-ACCESS  read-only
+      STATUS	  current
+      DESCRIPTION
+	 "A bit  map  of  port  status  flags which includes the information of port type.
+	  Currently this will indicate if the port is virtual or physical."
+  ::= {	swFCPortEntry 38	}
+
+  swFCPortBrcdType		OBJECT-TYPE
+		SYNTAX INTEGER {
+				unknown			(1),
+				other			(2),
+				fl-port			(3),  -- public loop
+				f-port			(4),  -- fabric port
+				e-port			(5),  -- fabric expansion port
+				g-port			(6), -- generic fabric port
+				ex-port			(7)
+			}
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+		"The Brocade port type."
+  ::= { swFCPortEntry 39    }
+	
+
+  --
+  -- End of Fibre Channel Port group
+  --
+
+
+
+  --
+  -- The Name Server Database group
+  --
+
+  swNsLocalNumEntry	OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The number of local Name Server entries."
+  ::= { swNs 1 }
+
+  swNsLocalTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SwNsEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"The table of local Name Server entries."
+  ::= { swNs 2 }
+
+  swNsLocalEntry	OBJECT-TYPE
+	SYNTAX		SwNsEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry of the local Name Server database."
+	INDEX		{ swNsEntryIndex }
+  ::= { swNsLocalTable 1 }
+
+  SwNsEntry ::= SEQUENCE {
+	swNsEntryIndex	Integer32,
+	swNsPortID	OCTET STRING,
+	swNsPortType	INTEGER,
+	swNsPortName	FcWwn,
+	swNsPortSymb	OCTET STRING,
+	swNsNodeName	FcWwn,
+	swNsNodeSymb	OCTET STRING,
+	swNsIPA		OCTET STRING,
+	swNsIpAddress	OCTET STRING,
+	swNsCos		INTEGER,
+	swNsFc4		OCTET STRING,
+	swNsIpNxPort    OCTET STRING,
+    swNsWwn         OCTET STRING,
+    swNsHardAddr    OCTET STRING
+  }
+
+  swNsEntryIndex	OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the Name Server database entry."
+  ::= { swNsLocalEntry 1 }
+
+  swNsPortID		OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(4))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the Fibre Channel port address
+		ID of the entry."
+  ::= { swNsLocalEntry 2 }
+
+  swNsPortType		OBJECT-TYPE
+	SYNTAX		INTEGER {
+			--  unknown	(0),
+			  nPort		(1),
+			  nlPort	(2)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the type of port: N_Port,
+		NL_Port, etc., for this entry. The type is defined in FC-GS-2."
+  ::= { swNsLocalEntry 3 }
+
+  swNsPortName		OBJECT-TYPE
+	SYNTAX		FcWwn
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the Fibre Channel World_wide
+		Name of the port entry."
+  ::= { swNsLocalEntry 4 }
+
+  swNsPortSymb		OBJECT-TYPE
+	SYNTAX		OCTET STRING(SIZE(0..255))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the contents of a Symbolic Name
+		of the port entry. In FC-GS-2, a Symbolic Name consists of
+		a byte array of 1 through 255 bytes, and the first byte of the
+		array specifies the length of its 'contents'.
+		This object variable corresponds to the 'contents' of the
+		Symbolic Name, without the first byte."
+  ::= { swNsLocalEntry 5 }
+
+  swNsNodeName		OBJECT-TYPE
+	SYNTAX		FcWwn
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the Fibre Channel World_wide
+		Name of the associated node as defined in FC-GS-2."
+  ::= { swNsLocalEntry 6 }
+
+  swNsNodeSymb		OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..255))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the contents of a Symbolic Name
+		of the the node associated with the entry. In FC-GS-2,
+		a Symbolic Name consists of a byte array of 1 through 255
+		bytes, and the first byte of the array specifies the length
+		of its 'contents'.
+		This object variable corresponds to the 'contents' of the
+		Symbolic Name, without the first byte (specifying the length)."
+  ::= { swNsLocalEntry 7 }
+
+  swNsIPA		OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(8))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the Initial Process Associator
+		of the node for the entry as defined in FC-GS-2."
+  ::= { swNsLocalEntry 8 }
+
+  swNsIpAddress		OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(16))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the IP address of the node
+		for the entry as defined in FC-GS-2. The format of the address
+		is in IPv6."
+  ::= { swNsLocalEntry 9 }
+
+  swNsCos		OBJECT-TYPE
+	SYNTAX		INTEGER {
+		--	  class-unknown	(0),
+			  class-F	(1),
+			  class-1	(2),
+			  class-F-1	(3),
+			  class-2	(4),
+			  class-F-2	(5),
+			  class-1-2	(6),
+			  class-F-1-2	(7),
+			  class-3	(8),
+			  class-F-3	(9),
+			  class-1-3	(10),
+			  class-F-1-3	(11),
+			  class-2-3	(12),
+			  class-F-2-3	(13),
+			  class-1-2-3	(14),
+			  class-F-1-2-3	(15)
+			-- more to enumerate in future.
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the class of services supported
+		by the port. The value is a bit-map defined as follows:
+		o bit 0 is class F,
+		o bit 1 is class 1,
+		o bit 2 is class 2,
+		o bit 3 is class 3,
+		o bit 4 is class 4, etc."
+  ::= { swNsLocalEntry 10 }
+
+  swNsFc4		OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE (32))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the FC-4s supported
+		by the port as defined in FC-GS-2."
+  ::= { swNsLocalEntry 11 }
+
+  swNsIpNxPort            OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE(16))
+	MAX-ACCESS      read-only
+	STATUS      current
+	DESCRIPTION     "The object identifies IpAddress of the Nx_port for the entry."
+  ::= { swNsLocalEntry 12 }
+
+  swNsWwn       OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE(8))
+	MAX-ACCESS      read-only
+	STATUS      current
+	DESCRIPTION     "The object identifies the World Wide Name (WWN) of the Fx_port
+					 for the entry."
+  ::= { swNsLocalEntry 13 }
+
+  swNsHardAddr            OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE(3))
+	MAX-ACCESS      read-only
+	STATUS      current
+	DESCRIPTION     "The object identifies the 24-bit hard address of the node
+				     for the entry."
+ ::= { swNsLocalEntry 14 }
+
+  --
+  -- End of Fibre Channel Name Server group
+  --
+
+  -- #######################################################################
+  --
+  -- Event Group - to map the errLog
+  --
+  -- NOTE
+  -- Logically, swEventTable is separate from the error log since it is
+  -- essentially a view of the error log within a particular time window.
+  -- The value of swEventIndex shall indicate the event number that has  
+  -- occurred since the switch booted. The value will range from 1 through
+  -- 2147383647 (2^31 - 1).
+  --
+  -- #######################################################################
+ 
+  swEventTrapLevel      OBJECT-TYPE
+        SYNTAX          INTEGER {
+			  none		(0),
+                          critical      (1),
+                          error         (2),
+                          warning       (3),
+                          informational (4),
+                          debug         (5)
+                        }
+        MAX-ACCESS          read-write
+        STATUS          deprecated
+        DESCRIPTION     "swAgtTrapSeverityLevel, in absence of
+		swEventTrapLevel, specifies the Trap Severity Level of each
+		defined trap recipient host.
+		This object specifies the swEventTrap level in
+		conjunction with an event's severity level. When an event
+		occurs and if its severity level is at or below the value
+		specified by this object instance, the agent will send
+		the associated swEventTrap to configured recipients."
+  ::= { swEvent 1 }
+ 
+  -- { swEvent 2..3 are reserved }
+ 
+  swEventNumEntries     OBJECT-TYPE
+        SYNTAX          Integer32 (0..2147483647)
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "The number of entries in the Event Table."
+  ::= { swEvent 4 }
+ 
+  swEventTable          OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SwEventEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION     "The table of event entries."
+  ::= { swEvent 5 }
+ 
+  swEventEntry          OBJECT-TYPE
+        SYNTAX          SwEventEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry of the event table."
+        INDEX           { swEventIndex }
+ 
+  ::= { swEventTable 1 }
+ 
+  SwEventEntry          ::= SEQUENCE {
+        swEventIndex		Integer32,
+        swEventTimeInfo		DisplayString,
+        swEventLevel		INTEGER,
+	swEventRepeatCount	Integer32,
+        swEventDescr		DisplayString,
+        swEventVfId         Integer32
+  }
+
+  swEventIndex          OBJECT-TYPE
+        SYNTAX          Integer32 (0..2147483647)
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the event entry."
+  ::= { swEventEntry 1 }
+ 
+  swEventTimeInfo       OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE (0..64))
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the date and time when this
+                event occurred, in textual format."
+  ::= { swEventEntry 2 }
+ 
+  swEventLevel          OBJECT-TYPE
+        SYNTAX          INTEGER {
+                          critical      (1),
+                          error         (2),
+                          warning       (3),
+			  informational	(4),
+                          debug         (5)
+                        }
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the severity level of this
+		event entry."
+  ::= { swEventEntry 3 }
+ 
+  swEventRepeatCount	OBJECT-TYPE
+        SYNTAX          Integer32 (0..2147483647)
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies how many times this particular
+		event has occurred."
+  ::= { swEventEntry 4 }
+ 
+  swEventDescr          OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS          read-only
+        STATUS          current
+         DESCRIPTION     "This object identifies the textual description of
+                the event."
+  ::= { swEventEntry 5 }
+
+  swEventVfId           OBJECT-TYPE
+        SYNTAX          Integer32 (0..255)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the Virtual fabric id."
+  ::= { swEventEntry 6 }
+ 
+  --
+  -- End of Fibre Channel Event Group
+  --
+
+  --
+  -- swFwSystem
+  -- Fabric Watch subsystem
+  -- ###########################################################################
+  -- Fabric Watch subsystem consists of two tables
+  -- SwFwClassAreaEntry contains control information for a particular class/area's
+  -- thresholds. These thresholds are contained in SwFwThresholdEntry.
+  -- ###########################################################################
+
+  -- valid action matrix
+  -- ###########################################################################
+  -- The valid action matrix is arrived out of the combination of the configured 
+  -- alarm matrix such as Errlog-1(El), SnmpTrap-2(St), PortLogLock-4(Pl), 
+  -- RapiTrap-8(Rn), EmailAlert-16, PortFencing-32(Pf)   
+  -- ###########################################################################
+  SwFwActs ::= INTEGER {
+				swFwNoAction(0),
+				swFwErrlog(1),
+				swFwSnmptrap(2),
+				swFwErrlogSnmptrap(3),
+				swFwPortloglock(4),
+				swFwErrlogPortloglock(5),
+				swFwSnmptrapPortloglock(6),
+				swFwErrlogSnmptrapPortloglock(7),
+				swFwRn(8),
+				swFwElRn(9),
+				swFwStRn(10),
+				swFwElStRn(11),
+				swFwPlRn(12),
+				swFwElPlRn(13),
+				swFwStPlRn(14),
+				swFwElStPlRn(15),
+				swFwMailAlert(16),
+				swFwMailAlertErrlog(17),
+				swFwMailAlertSnmptrap(18),
+				swFwMailAlertErrlogSnmptrap(19),
+				swFwMailAlertPortloglock(20),
+				swFwMailAlertErrlogPortloglock(21),
+				swFwMailAlertSnmptrapPortloglock(22),
+				swFwMailAlertErrlogSnmptrapPortloglock(23),
+				swFwMailAlertRn(24),
+				swFwElMailAlertRn(25),
+				swFwMailAlertStRn(26),
+				swFwMailAlertElStRn(27),
+				swFwMailAlertPlRn(28),
+				swFwMailAlertElPlRn(29),
+				swFwMailAlertStPlRn(30),
+				swFwMailAlertElStPlRn(31),
+				swFwPf(32),
+				swFwElPf(33),
+				swFwStPf(34),
+				swFwElStPf(35),
+				swFwPlPf(36),
+				swFwElPlPf(37),
+				swFwStPlPf(38),
+				swFwElStPlPf(39),
+				swFwRnPf(40),
+				swFwElRnPf(41),
+				swFwStRnPf(42),
+				swFwElStRnPf(43),
+				swFwPlRnPf(44),
+				swFwElPlRnPf(45),
+				swFwStPlRnPf(46),
+				swFwElStPlRnPf(47),
+				swFwMailAlertPf(48),
+				swFwMailAlertElPf(49),
+				swFwMailAlertStPf(50),
+				swFwMailAlertElStPf(51),
+				swFwMailAlertPlPf(52),
+				swFwMailAlertElPlPf(53),
+				swFwMailAlertStPlPf(54),
+				swFwMailAlertElStPlPf(55),
+				swFwMailAlertRnPf(56),
+				swFwMailAlertElRnPf(57),
+				swFwMailAlertStRnPf(58),
+				swFwMailAlertElStRnPf(59),
+				swFwMailAlertPlRnPf(60),
+				swFwMailAlertElPlRnPf(61),
+				swFwMailAlertStPlRnPf(62),
+				swFwMailAlertElStPlRnPf(63)
+				}
+
+  -- variable for threshold values or action matrix level
+  SwFwLevels ::= INTEGER {
+				swFwReserved(1),
+				swFwDefault(2),
+				swFwCustom(3)
+				}
+
+  -- classes and areas index
+  SwFwClassesAreas ::=	INTEGER {
+				swFwEnvTemp(1),
+				swFwEnvFan(2),
+				swFwEnvPs(3),
+				swFwTransceiverTemp(4),
+				swFwTransceiverRxp(5),
+				swFwTransceiverTxp(6),
+				swFwTransceiverCurrent(7),
+				swFwPortLink(8),
+				swFwPortSync(9),
+				swFwPortSignal(10),
+				swFwPortPe(11),
+				swFwPortWords(12),
+				swFwPortCrcs(13),
+				swFwPortRXPerf(14),
+				swFwPortTXPerf(15),
+				swFwPortState(16),
+				swFwFabricEd(17),
+				swFwFabricFr(18),
+				swFwFabricDi(19),
+				swFwFabricSc(20),
+				swFwFabricZc(21),
+				swFwFabricFq(22),
+				swFwFabricFl(23),
+				swFwFabricGs(24),
+				swFwEPortLink(25),
+				swFwEPortSync(26),
+				swFwEPortSignal(27),
+				swFwEPortPe(28),
+				swFwEPortWords(29),
+				swFwEPortCrcs(30),
+				swFwEPortRXPerf(31),
+				swFwEPortTXPerf(32),
+				swFwEPortState(33),
+				swFwFCUPortLink(34),
+				swFwFCUPortSync(35),
+				swFwFCUPortSignal(36),
+				swFwFCUPortPe(37),
+				swFwFCUPortWords(38),
+				swFwFCUPortCrcs(39),
+				swFwFCUPortRXPerf(40),
+				swFwFCUPortTXPerf(41),
+				swFwFCUPortState(42),
+				swFwFOPPortLink(43),
+				swFwFOPPortSync(44),
+				swFwFOPPortSignal(45),
+				swFwFOPPortPe(46),
+				swFwFOPPortWords(47),
+				swFwFOPPortCrcs(48),
+				swFwFOPPortRXPerf(49),
+				swFwFOPPortTXPerf(50),
+				swFwFOPPortState(51),
+				swFwPerfALPACRC(52),
+			    swFwPerfEToECRC(53),
+			    swFwPerfEToERxCnt(54),
+			    swFwPerfEToETxCnt(55),
+			    swFwPerffltCusDef(56),
+			    swFwTransceiverVoltage(57),
+			    swFwSecTelnetViolations(58),
+			    swFwSecHTTPViolations(59),
+			    swFwSecAPIViolations(60),
+			    swFwSecRSNMPViolations(61),
+			    swFwSecWSNMPViolations(62),
+			    swFwSecSESViolations(63),
+			    swFwSecMSViolations(64),
+			    swFwSecSerialViolations(65),
+			    swFwSecFPViolations(66),
+			    swFwSecSCCViolations(67),
+			    swFwSecDCCViolations(68),
+			    swFwSecLoginViolations(69),
+			    swFwSecInvalidTS(70),
+			    swFwSecInvalidSign(71),
+			    swFwSecInvalidCert(72),
+			    swFwSecSlapFail(73),
+			    swFwSecSlapBadPkt(74),
+			    swFwSecTSOutSync(75),
+			    swFwSecNoFcs(76),
+			    swFwSecIncompDB(77),
+			    swFwSecIllegalCmd(78),
+				swFwSAMTotalDownTime(79),
+				swFwSAMTotalUpTime(80),
+				swFwSAMDurationOfOccur(81),
+				swFwSAMFreqOfOccur(82),
+				swFwResourceFlash(83),
+				swFwEPortUtil(84),
+				swFwEPortPktl(85),
+				swFwPortLr(86),
+				swFwEPortLr(87),
+				swFwFCUPortLr(88),
+				swFwFOPPortLr(89),
+                swFwPortC3Discard(90),
+                swFwEPortC3Discard(91),
+                swFwFCUPortC3Discard(92),
+                swFwFOPPortC3Discard(93),
+				swFwVEPortStateChange(94),
+				swFwVEPortUtil(95),
+				swFwVEPortPktLoss(96),
+				swFwEPortTrunkUtil(97),
+				swFwFCUPortTrunkUtil(98),
+				swFwFOPPortTrunkUtil(99),
+				swFwCPUMemUsage(100)
+
+				}
+
+  -- write only variable for applying or canceling
+  -- values or action matrix changes
+  SwFwWriteVals	::= INTEGER {
+				swFwCancelWrite(1),
+				swFwApplyWrite(2)
+				}
+
+  -- timebase for thresholds
+  SwFwTimebase ::= INTEGER {
+				swFwTbNone(1),
+				swFwTbSec(2),
+				swFwTbMin(3),
+				swFwTbHour(4),
+				swFwTbDay(5)
+				}
+
+  -- status for thresholds
+  SwFwStatus ::= INTEGER {
+				disabled(1),
+				enabled(2)
+				}
+
+  -- possible events available
+  SwFwEvent ::= INTEGER {
+				started(1),
+				changed(2),
+				exceeded(3),
+				below(4),
+				above(5),
+				inBetween(6)
+				}
+ 
+  -- behavior type for thresholds
+  SwFwBehavior ::= INTEGER {
+				triggered(1),
+				continuous(2)
+				}
+
+  -- state type for last events
+  SwFwState ::= INTEGER {
+				swFwInformative(1),
+				swFwNormal(2),
+				swFwFaulty(3)
+				}
+
+  -- license state
+  SwFwLicense ::= INTEGER {
+				swFwLicensed(1),
+				swFwNotLicensed(2)
+				}
+
+  -- This is the first of the elements declared for Fabric Watch :
+  -- one scalar & two tables
+  -- A scalar, swFwFabricWatchLicense is used to tell is if the switch has
+  -- proper license for Fabric Watch. Please refer to Fabric Watch 
+  -- documentation for further information.
+  -- One table contains classArea information such as threshold unit string,
+  -- time base, low thresholds, etc. The other table contains individual
+  -- threshold information such as name, label, last event, etc.
+  -- Please refer to Fabric Watch documentation for further information.
+
+  -- license scalar
+  swFwFabricWatchLicense	OBJECT-TYPE
+	SYNTAX		SwFwLicense
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"tells if licensed or not."
+  ::= { swFwSystem 1 }
+
+  -- classArea table
+  swFwClassAreaTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF	SwFwClassAreaEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"The table of classes and areas."
+  ::= { swFwSystem 2 }
+
+  swFwClassAreaEntry	OBJECT-TYPE
+	SYNTAX		SwFwClassAreaEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry of the classes and areas."
+	INDEX		{ swFwClassAreaIndex }
+  ::= { swFwClassAreaTable 1 }
+
+  SwFwClassAreaEntry ::= SEQUENCE {
+	swFwClassAreaIndex		SwFwClassesAreas,
+	swFwWriteThVals			SwFwWriteVals,
+	swFwDefaultUnit			DisplayString,
+	swFwDefaultTimebase		SwFwTimebase,
+	swFwDefaultLow			Integer32,
+	swFwDefaultHigh			Integer32,
+	swFwDefaultBufSize		Integer32,
+	swFwCustUnit			DisplayString,
+	swFwCustTimebase		SwFwTimebase,
+	swFwCustLow				Integer32,
+	swFwCustHigh			Integer32,
+	swFwCustBufSize			Integer32,
+	swFwThLevel				SwFwLevels,
+	swFwWriteActVals		SwFwWriteVals,
+	swFwDefaultChangedActs	SwFwActs,
+	swFwDefaultExceededActs	SwFwActs,
+	swFwDefaultBelowActs	SwFwActs,
+	swFwDefaultAboveActs	SwFwActs,
+	swFwDefaultInBetweenActs        SwFwActs,
+	swFwCustChangedActs		SwFwActs,
+	swFwCustExceededActs	SwFwActs,
+	swFwCustBelowActs		SwFwActs,
+	swFwCustAboveActs		SwFwActs,
+	swFwCustInBetweenActs           SwFwActs,
+	swFwValidActs			SwFwActs,
+	swFwActLevel			SwFwLevels
+	}
+
+  swFwClassAreaIndex	OBJECT-TYPE
+	SYNTAX		SwFwClassesAreas
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object identifies the class type."
+  ::= { swFwClassAreaEntry 1 }
+
+  -- this variable is used to apply or cancel
+  -- changes made to swFwCustUnit, swFwCustTimebase, swFwCustLow,
+  -- swFwCustHigh, swFwCustBufSize.
+  -- read of this variable will always return cancel.
+  swFwWriteThVals	OBJECT-TYPE
+	SYNTAX		SwFwWriteVals
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"This object is set to apply the value changes."
+  ::= { swFwClassAreaEntry 2 }
+
+  -- {swFwDefaultUnit, swFwDefaultTimebase, swFwDefaultMin, and swFwDefaultMax}
+  -- {swFwCustUnit, swFwCustTimebase, swFwCustMin, and swFwCustMax}
+  -- are grouped together to be applied to give threshold areas as in 
+  --- Default and Cust. Which of default, or custom groups applies depends
+  --- on swFwThLevel.
+  swFwDefaultUnit		OBJECT-TYPE	
+	SYNTAX		DisplayString
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"A Default unit string name for a threshold area."
+  ::= { swFwClassAreaEntry 3 }
+
+  swFwDefaultTimebase	OBJECT-TYPE
+	SYNTAX		SwFwTimebase
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"A Default timebase for the current threshold counter."
+  ::= { swFwClassAreaEntry 4 }
+
+  swFwDefaultLow		OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"A Default low threshold value."
+  ::= { swFwClassAreaEntry 5 }
+
+  swFwDefaultHigh		OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"A Default high threshold value."
+  ::= { swFwClassAreaEntry 6 }
+
+  swFwDefaultBufSize		OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"A Default buffer size value."
+  ::= { swFwClassAreaEntry 7 }
+
+  swFwCustUnit	OBJECT-TYPE	
+	SYNTAX		DisplayString
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"A custom unit string name for a threshold area."
+  ::= { swFwClassAreaEntry 8 }
+
+  swFwCustTimebase	OBJECT-TYPE
+	SYNTAX		SwFwTimebase
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"A custom timebase for the current threshold counter."
+  ::= { swFwClassAreaEntry 9 }
+
+  swFwCustLow		OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"A custom low threshold value."
+  ::= { swFwClassAreaEntry 10 }
+
+  swFwCustHigh		OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"A custom high threshold value."
+  ::= { swFwClassAreaEntry 11 }
+
+  swFwCustBufSize		OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"A custom buffer size value."
+  ::= { swFwClassAreaEntry 12 }
+
+  -- swFwThLevel is used to point to current level for classArea
+  -- values. It is either default or custom.
+  swFwThLevel		OBJECT-TYPE
+	SYNTAX		SwFwLevels
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"A level where all the threshold values are set at."
+  ::= { swFwClassAreaEntry 13 }
+
+  -- this variable is used to apply or cancel
+  -- changes made to swFwCustUnit, swFwCustTimebase, swFwCustLow,
+  -- swFwCustHigh, swFwCustBufSize.
+  -- read of this variable will always return cancel.
+  swFwWriteActVals	OBJECT-TYPE
+	SYNTAX		SwFwWriteVals
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"This object is set to apply act value changes."
+  ::= { swFwClassAreaEntry 14 }
+
+  -- {swFwDefaultChangedActs, swFwDefaultExceededActs, swFwDefaultBelowActs, 
+  -- and swFwDefaultAboveActs} and {swFwCustChangedActs, swFwCustExceededActs, 
+  -- swFwCustBelowActs, and swFwCustAboveActs} are grouped together to be 
+  -- applied to give threshold areas as in default and cust. Which of 
+  -- default, or custom groups applies depends on swFwThLevel.
+  swFwDefaultChangedActs	OBJECT-TYPE
+	SYNTAX		SwFwActs
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Default action matrix for changed event."
+  ::= { swFwClassAreaEntry 15 }
+	
+  swFwDefaultExceededActs	OBJECT-TYPE
+	SYNTAX		SwFwActs
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Default action matrix for exceeded event."
+  ::= { swFwClassAreaEntry 16 }
+	
+  swFwDefaultBelowActs	OBJECT-TYPE
+	SYNTAX		SwFwActs
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Default action matrix for below event."
+  ::= { swFwClassAreaEntry 17 }
+	
+  swFwDefaultAboveActs	OBJECT-TYPE
+	SYNTAX		SwFwActs
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Default action matrix for above event."
+  ::= { swFwClassAreaEntry 18 }
+
+  swFwDefaultInBetweenActs	OBJECT-TYPE
+	SYNTAX		SwFwActs
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Default action matrix for in-between event."
+  ::= { swFwClassAreaEntry 19 }
+
+  swFwCustChangedActs	OBJECT-TYPE
+	SYNTAX		SwFwActs
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"custom action matrix for changed event."
+  ::= { swFwClassAreaEntry 20 }
+	
+  swFwCustExceededActs	OBJECT-TYPE
+	SYNTAX		SwFwActs
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"custom action matrix for exceeded event."
+  ::= { swFwClassAreaEntry 21 }
+	
+  swFwCustBelowActs	OBJECT-TYPE
+	SYNTAX		SwFwActs
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"custom action matrix for below event."
+  ::= { swFwClassAreaEntry 22 }
+	
+  swFwCustAboveActs	OBJECT-TYPE
+	SYNTAX		SwFwActs
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"custom action matrix for above event."
+  ::= { swFwClassAreaEntry 23 }
+
+  swFwCustInBetweenActs	OBJECT-TYPE
+	SYNTAX		SwFwActs
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"custom action matrix for in-between event."
+  ::= { swFwClassAreaEntry 24 }
+
+  swFwValidActs	OBJECT-TYPE
+	SYNTAX		SwFwActs
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"matrix of valid acts for an class/area."
+  ::= { swFwClassAreaEntry 25 }
+
+  -- swFwActLevel is used to point to current level for classArea
+  -- action matrix. It is either default or custom.
+  swFwActLevel	OBJECT-TYPE
+	SYNTAX		SwFwLevels
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"A level where all the actions are set at."
+  ::= { swFwClassAreaEntry 26 }
+
+  -- table for individual threshold
+  swFwThresholdTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF	SwFwThresholdEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"The table of individual thresholds."
+  ::= { swFwSystem 3 }
+
+  swFwThresholdEntry	OBJECT-TYPE
+	SYNTAX		SwFwThresholdEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry of an individual threshold."
+	INDEX		{ swFwClassAreaIndex, swFwThresholdIndex }
+  ::= { swFwThresholdTable 1 }
+
+  SwFwThresholdEntry ::= SEQUENCE {
+	swFwThresholdIndex		Integer32,
+	swFwStatus				SwFwStatus,
+	swFwName				DisplayString,
+	swFwLabel				DisplayString,
+	swFwCurVal				Integer32,
+	swFwLastEvent			SwFwEvent,
+	swFwLastEventVal		Integer32,
+	swFwLastEventTime		DisplayString,
+	swFwLastState			SwFwState,
+	swFwBehaviorType		SwFwBehavior,
+	swFwBehaviorInt			Integer32,
+	swFwLastSeverityLevel	SwSevType
+	}	
+
+  swFwThresholdIndex	OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only	
+	STATUS		current
+	DESCRIPTION	"This object identifies the element index of
+				an threshold."
+  ::= { swFwThresholdEntry 1 }
+
+  swFwStatus		OBJECT-TYPE
+	SYNTAX		SwFwStatus
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"This object identifies if an threshold is
+				enabled or disabled."
+  ::= { swFwThresholdEntry 2 }
+
+  swFwName		OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE(0..32))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object is a name of the threshold."
+  ::= { swFwThresholdEntry 3 }
+
+  swFwLabel		OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE(0..70))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object is a label of the threshold."
+  ::= { swFwThresholdEntry 4 }
+
+  swFwCurVal		OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object is a current counter of the threshold."
+  ::= { swFwThresholdEntry 5 }
+
+  swFwLastEvent	OBJECT-TYPE
+	SYNTAX		SwFwEvent
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object is a last event type of the threshold."
+  ::= { swFwThresholdEntry 6 }
+
+  swFwLastEventVal	OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object is a last event value of the threshold."
+  ::= { swFwThresholdEntry 7 }
+
+  swFwLastEventTime	OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE(0..32))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object is a last event time of the threshold."
+  ::= { swFwThresholdEntry 8 }
+
+  swFwLastState	OBJECT-TYPE
+	SYNTAX		SwFwState
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object is a last event state of the threshold."
+  ::= { swFwThresholdEntry 9 }
+
+  swFwBehaviorType	OBJECT-TYPE
+	SYNTAX		SwFwBehavior
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"A behavior of which the thresholds generate event."
+  ::= { swFwThresholdEntry 10 }
+
+  swFwBehaviorInt	OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"A integer of which the thresholds generate continuous event."
+  ::= { swFwThresholdEntry 11 }
+
+  swFwLastSeverityLevel	OBJECT-TYPE
+	SYNTAX		SwSevType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"This object is a last event severity level of the threshold."
+  ::= { swFwThresholdEntry 12 }
+
+  -- swEndDevice Group
+  -- ###########################################################################
+  -- table for RLS of end devices.
+  -- swEndDevice consists of only one table.
+  -- swEndDeviceRlsTable contains entries of individual end devices' rls.
+  -- ###########################################################################
+
+  swEndDeviceRlsTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF	SwEndDeviceRlsEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"The table of individual end devices' rls."
+  ::= { swEndDevice 1 }
+
+  swEndDeviceRlsEntry	OBJECT-TYPE
+	SYNTAX		SwEndDeviceRlsEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry of an individual end devices' rls."
+	INDEX		{ swEndDevicePort, swEndDeviceAlpa }
+  ::= { swEndDeviceRlsTable 1 }
+
+  SwEndDeviceRlsEntry ::= SEQUENCE {
+	swEndDevicePort				Integer32,
+	swEndDeviceAlpa				Integer32,
+	swEndDevicePortID               OCTET STRING,
+	swEndDeviceLinkFailure		Counter32,
+	swEndDeviceSyncLoss			Counter32,
+	swEndDeviceSigLoss			Counter32,
+	swEndDeviceProtoErr			Counter32,
+	swEndDeviceInvalidWord		Counter32,
+	swEndDeviceInvalidCRC		Counter32
+	}	
+
+  -- Since Silkworm family switches start with port # 0
+  -- snmp port # should be physical port # + 1.
+  -- i.e. snmp port # 3 translates to port # 2
+  swEndDevicePort	OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"This object identifies the port of the end device."
+  ::= { swEndDeviceRlsEntry 1 }
+
+  -- snmp alpa # should be logical alpa # + 1.
+  -- i.e. snmp alpa # 0xf0 translates to 0xef
+  swEndDeviceAlpa	OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"This object identifies the alpa of the end device."
+  ::= { swEndDeviceRlsEntry 2 }
+
+  swEndDevicePortID		OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(4))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The object identifies the Fibre Channel port address
+		ID of the entry."
+  ::= { swEndDeviceRlsEntry 3 }
+
+  swEndDeviceLinkFailure	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Link failure count for the end device."
+  ::= { swEndDeviceRlsEntry 4 }
+
+  swEndDeviceSyncLoss	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Sync loss count for the end device."
+  ::= { swEndDeviceRlsEntry 5 }
+
+  swEndDeviceSigLoss	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Sig loss count for the end device."
+  ::= { swEndDeviceRlsEntry 6 }
+
+  swEndDeviceProtoErr	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Protocol err count for the end device."
+  ::= { swEndDeviceRlsEntry 7 }
+
+  swEndDeviceInvalidWord	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Invalid word count for the end device."
+  ::= { swEndDeviceRlsEntry 8 }
+
+  swEndDeviceInvalidCRC	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Invalid CRC count for the end device."
+  ::= { swEndDeviceRlsEntry 9 }
+
+-- table for displaying all the Groups
+  swGroupTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF     SwGroupEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION     "The table of groups. This may not be available
+                         on all versions of Fabric OS."
+  ::= { swGroup 1 }
+
+  swGroupEntry  OBJECT-TYPE
+        SYNTAX          SwGroupEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry of table of groups."
+        INDEX           { swGroupIndex }
+  ::= { swGroupTable 1 }
+
+  SwGroupEntry ::= SEQUENCE {
+        swGroupIndex    Integer32,
+        swGroupName     OCTET STRING,
+        swGroupType     OCTET STRING
+        }
+swGroupIndex    OBJECT-TYPE
+        SYNTAX          Integer32 (0..2147483647)
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object is the group index starting from 1."
+  ::= { swGroupEntry 1 }
+
+ swGroupName    OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..32))
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the name of the group."
+  ::= { swGroupEntry 2 }
+
+  swGroupType   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..15))
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the type of the group."
+  ::= { swGroupEntry 3 }
+
+-- table for displaying group members for all the groups
+
+  swGroupMemTable       OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SwGroupMemEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION     "The table of members of all groups. This may not
+                         be available on all versions of Fabric OS."
+  ::= { swGroup 2 }
+
+  swGroupMemEntry       OBJECT-TYPE
+        SYNTAX          SwGroupMemEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry for a member of a group."
+        INDEX           { swGroupId, swGroupMemWwn }
+  ::= { swGroupMemTable 1 }
+
+  SwGroupMemEntry ::= SEQUENCE {
+        swGroupId       Integer32,
+        swGroupMemWwn   FcWwn,
+        swGroupMemPos   Integer32
+        }
+
+  swGroupId OBJECT-TYPE
+        SYNTAX          Integer32 (0..2147483647)
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the Group Id  of the
+                         member switch."
+  ::= { swGroupMemEntry 1 }
+
+  swGroupMemWwn OBJECT-TYPE
+        SYNTAX          FcWwn
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the WWN of the member switch."
+  ::= { swGroupMemEntry 2 }
+
+  swGroupMemPos OBJECT-TYPE
+        SYNTAX          Integer32 (0..2147483647)
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies position of the member
+                         switch in the group. This is based on the order
+                         that the switches were added in the group."
+  ::= { swGroupMemEntry 3 }
+
+-- ************************************************************************************
+--      Bloom Performance counter tables.                                           *
+--                                                                                  *
+-- ************************************************************************************
+
+ swBlmPerfALPAMntTable      OBJECT-TYPE
+   SYNTAX          SEQUENCE OF SwBlmPerfALPAMntEntry
+   MAX-ACCESS          not-accessible
+   STATUS          current
+   DESCRIPTION  "ALPA monitoring counter Table. "
+ ::= { swBlmPerfMnt 1}
+
+ swBlmPerfALPAMntEntry      OBJECT-TYPE
+   SYNTAX          SwBlmPerfALPAMntEntry
+   MAX-ACCESS          not-accessible
+   STATUS          current
+   DESCRIPTION     " ALPA monitoring counter for given ALPA."
+   INDEX           { swBlmPerfAlpaPort,swBlmPerfAlpaIndx }
+ ::= { swBlmPerfALPAMntTable 1}
+
+ SwBlmPerfALPAMntEntry ::= SEQUENCE {
+ swBlmPerfAlpaPort           SwPortIndex,
+ swBlmPerfAlpaIndx           Integer32,
+ swBlmPerfAlpa               Integer32,
+ swBlmPerfAlpaCRCCnt         OCTET STRING
+ }
+
+ swBlmPerfAlpaPort       OBJECT-TYPE
+   SYNTAX          SwPortIndex
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION     " This Object identifies the port index of the switch."
+ ::= { swBlmPerfALPAMntEntry 1}
+
+ swBlmPerfAlpaIndx           OBJECT-TYPE
+ SYNTAX          Integer32 (1..126)
+ MAX-ACCESS          read-only
+ STATUS          current
+ DESCRIPTION   " This Object identifies the ALPA index. There can be 126 ALPA values"
+ ::= { swBlmPerfALPAMntEntry 2}
+
+ swBlmPerfAlpa           OBJECT-TYPE
+   SYNTAX          Integer32 (0..2147483647) 
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION  " This Object identifies the ALPA values. These values
+                  range between x'01' and x'EF'(1 to 239). ALPA value x'00'
+                  is reserved for FL_Port
+				  If Alpa device is invalid, then it will have -1 value.  "
+ ::= { swBlmPerfALPAMntEntry 3}
+
+ swBlmPerfAlpaCRCCnt     OBJECT-TYPE
+   SYNTAX          OCTET STRING (SIZE(8))
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION   "Get CRC count for given ALPA and port. This monitoring
+				  provides information on the number of CRC errors
+				  occurred on the frames destined to each possible ALPA
+				  attached to a specific port."
+
+ ::= { swBlmPerfALPAMntEntry 4}
+
+ swBlmPerfEEMntTable        OBJECT-TYPE
+   SYNTAX          SEQUENCE OF SwBlmPerfEEMntEntry
+   MAX-ACCESS          not-accessible
+   STATUS          current
+   DESCRIPTION     " End-to-End  monitoring counter Table"
+ ::= { swBlmPerfMnt 2}
+
+ swBlmPerfEEMntEntry        OBJECT-TYPE
+   SYNTAX          SwBlmPerfEEMntEntry
+   MAX-ACCESS          not-accessible
+   STATUS          current
+   DESCRIPTION     "End-to-End monitoring counter for given port."
+   INDEX               { swBlmPerfEEPort, swBlmPerfEERefKey}
+ ::= { swBlmPerfEEMntTable 1}
+
+ SwBlmPerfEEMntEntry ::= SEQUENCE{
+ swBlmPerfEEPort         SwPortIndex,
+ swBlmPerfEERefKey       Integer32,
+ swBlmPerfEECRC          OCTET STRING,
+ swBlmPerfEEFCWRx        OCTET STRING,
+ swBlmPerfEEFCWTx        OCTET STRING,
+ swBlmPerfEESid          Integer32,
+ swBlmPerfEEDid          Integer32
+}
+
+ swBlmPerfEEPort     OBJECT-TYPE
+   SYNTAX          SwPortIndex
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION    " This object identifies the port number of the switch."
+ ::= { swBlmPerfEEMntEntry 1}
+
+ swBlmPerfEERefKey      OBJECT-TYPE
+   SYNTAX          Integer32 (1..8)
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION     "This object identifies the reference number
+					of the counter. This reference is  number assigned
+                    when a filter is created. In SNMP Index start one
+                    instead of 0, add one to actual ref key"
+ ::= { swBlmPerfEEMntEntry 2}
+
+ swBlmPerfEECRC      OBJECT-TYPE
+   SYNTAX          OCTET STRING (SIZE(8))
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION    " Get End to End CRC error for the frames that matched
+					the SID-DID pair."
+::= { swBlmPerfEEMntEntry 3}
+
+
+ swBlmPerfEEFCWRx        OBJECT-TYPE
+   SYNTAX          OCTET STRING (SIZE(8))
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION     "Get End to End count of Fibre Channel words (FCW),
+   					received by the port, that matched
+				    the SID-DID pair. "
+ ::= { swBlmPerfEEMntEntry 4 }
+
+ swBlmPerfEEFCWTx        OBJECT-TYPE
+   SYNTAX          OCTET STRING (SIZE(8))
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION     "Get End to End count of Fibre Channel words (FCW),
+					transmitted by the port, that matched the SID-DID pair. "
+ ::= { swBlmPerfEEMntEntry 5}
+
+ swBlmPerfEESid      OBJECT-TYPE
+   SYNTAX          Integer32 (0..2147483647)
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION     " Gets SID info by reference number. SID (Source Identifier)
+          			is a 3-byte field in the frame header used to indicate the
+					address identifier of the N-Port from which the frame was sent."
+ ::= { swBlmPerfEEMntEntry 6 }
+
+ swBlmPerfEEDid      OBJECT-TYPE
+   SYNTAX          Integer32 (0..2147483647)
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION     "Gets DID info by reference number.
+                    DID (Destination Identifier) is a 3-byte field in the
+                    frame header used to indicate the address identifier of 
+                    the N-Port to which the frame was sent."
+ ::= { swBlmPerfEEMntEntry 7 }
+
+ swBlmPerfFltMntTable       OBJECT-TYPE
+   SYNTAX          SEQUENCE OF SwBlmPerfFltMntEntry
+   MAX-ACCESS          not-accessible
+   STATUS          current
+   DESCRIPTION     "Filter based monitoring counter."
+ ::= { swBlmPerfMnt 3}
+
+ swBlmPerfFltMntEntry       OBJECT-TYPE
+   SYNTAX          SwBlmPerfFltMntEntry
+   MAX-ACCESS          not-accessible
+   STATUS          current
+   DESCRIPTION     " Filter base monitoring counter for given port."
+   INDEX           { swBlmPerfFltPort,swBlmPerfFltRefkey}
+ ::= { swBlmPerfFltMntTable 1}
+
+ SwBlmPerfFltMntEntry ::= SEQUENCE{
+ swBlmPerfFltPort        SwPortIndex,
+ swBlmPerfFltRefkey      Integer32,
+ swBlmPerfFltCnt         OCTET STRING,
+ swBlmPerfFltAlias       DisplayString
+ }
+
+ swBlmPerfFltPort        OBJECT-TYPE
+   SYNTAX          SwPortIndex
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION     "This object identifies the port number of the switch."
+ ::= { swBlmPerfFltMntEntry 1}
+
+ swBlmPerfFltRefkey      OBJECT-TYPE
+   SYNTAX          Integer32 (1..8)
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION    " This object identifies the reference number of the filter.
+					This reference number is assigned when a filter is created.
+					In SNMP Index start one instead of 0, add one to actual ref key"
+ ::= { swBlmPerfFltMntEntry 2}
+
+ swBlmPerfFltCnt     OBJECT-TYPE
+   SYNTAX          OCTET STRING (SIZE(8))
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION     "Get statistics of filter based monitor.
+ 					Filter based monitoring provides information
+    				about a filter hit count such as
+						1.  Read command
+						2.  SCSI or IP traffic
+						3.  SCSI Read/Write"
+ ::= { swBlmPerfFltMntEntry 3 }
+
+ swBlmPerfFltAlias       OBJECT-TYPE
+   SYNTAX          DisplayString(SIZE(0..20))
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION    " Alias name for the filter."
+ ::= { swBlmPerfFltMntEntry 4}
+
+swSwitchTrunkable		OBJECT-TYPE
+  SYNTAX			INTEGER { yes ( 8 ) , no ( 0 ) }
+  MAX-ACCESS			read-only
+  STATUS			current
+  DESCRIPTION	"The trunking status of the switch - whether the switch supports the trunking feature or not. The values are
+		yes(8) - the trunking feature is supported
+		no(0). - the trunking feature is not supported. "
+
+ ::= { swTrunk 1}
+
+swTrunkTable			OBJECT-TYPE
+  SYNTAX			SEQUENCE OF SwTrunkEntry
+  MAX-ACCESS			not-accessible
+  STATUS			current
+  DESCRIPTION	" Table to display trunking information for the switch. "
+ ::= { swTrunk 2}
+
+swTrunkEntry		OBJECT-TYPE
+  SYNTAX			SwTrunkEntry
+  MAX-ACCESS			not-accessible
+  STATUS			current
+  DESCRIPTION	"Entry for the trunking table."
+  INDEX	{ swTrunkPortIndex }
+ ::= { swTrunkTable 1}
+
+SwTrunkEntry ::= SEQUENCE{
+  swTrunkPortIndex	SwPortIndex,
+  swTrunkGroupNumber Integer32,
+  swTrunkMaster		SwTrunkMaster,
+  swPortTrunked		INTEGER
+ }
+
+swTrunkPortIndex		OBJECT-TYPE
+  SYNTAX			SwPortIndex
+  MAX-ACCESS			read-only
+  STATUS			current
+  DESCRIPTION	        "This object identifies the switch port index.
+			Note that the value of a port index is 1 higher than the
+                        port number labeled on the front panel.
+			e.g. port index 1 correspond to port number 0. "
+ ::= { swTrunkEntry 1 }
+
+swTrunkGroupNumber		OBJECT-TYPE
+	SYNTAX			Integer32 (0..2147483647) 
+	MAX-ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"This object is a logical entity which specifies 
+					the Group Number to which the port belongs to.
+					If this value is Zero it means the port is not Trunked."
+	::= { swTrunkEntry 2}
+
+swTrunkMaster			OBJECT-TYPE
+  SYNTAX			SwTrunkMaster
+  MAX-ACCESS			read-only
+  STATUS			current
+  DESCRIPTION		"Port number that is the trunk master of the group. 
+			The trunk master implicitly defines the group. 
+			All ports with the same master are considered to be part of the same group."
+ ::= { swTrunkEntry 3 }
+
+  swPortTrunked     OBJECT-TYPE
+  SYNTAX			INTEGER {disabled(0), enabled(1)}
+  MAX-ACCESS			read-only
+  STATUS			current
+  DESCRIPTION   	"The active trunk status for a member port.
+			      	Values are enabled(1) or disabled(0)."
+ ::= { swTrunkEntry 4 }
+
+
+  swTrunkGrpTable   OBJECT-TYPE
+  SYNTAX          SEQUENCE OF SwTrunkGrpEntry
+  MAX-ACCESS          not-accessible
+  STATUS          current
+  DESCRIPTION  	  "Table to display trunking Performance
+   					information for the switch."
+   ::= { swTrunk 3}
+
+   swTrunkGrpEntry     OBJECT-TYPE
+   SYNTAX          SwTrunkGrpEntry
+   MAX-ACCESS          not-accessible
+   STATUS          current
+   DESCRIPTION 	   "Entry for the trunking Group table."
+   INDEX   { swTrunkGrpNumber}
+   ::= { swTrunkGrpTable 1}
+
+	SwTrunkGrpEntry ::= SEQUENCE{
+	swTrunkGrpNumber        Integer32,
+	swTrunkGrpMaster        SwTrunkMaster,
+	swTrunkGrpTx            OCTET STRING,
+	swTrunkGrpRx            OCTET STRING
+	}
+
+	swTrunkGrpNumber        OBJECT-TYPE
+	SYNTAX          Integer32 (0..2147483647)
+	MAX-ACCESS          read-only
+	STATUS          current
+	DESCRIPTION     "This object is a logical entity which
+					specifies the Group Number to which port 
+					belongs to."
+    ::= { swTrunkGrpEntry  1 }
+
+   swTrunkGrpMaster        OBJECT-TYPE
+   SYNTAX          SwTrunkMaster
+   MAX-ACCESS          read-only
+   STATUS          current
+   DESCRIPTION     "This object gives the master port id
+					for the TrunkGroup."
+	::= { swTrunkGrpEntry  2 }
+
+	swTrunkGrpTx            OBJECT-TYPE
+  	  SYNTAX          OCTET STRING (SIZE (8))
+	  MAX-ACCESS          read-only
+	  STATUS          current
+	  DESCRIPTION     "Gives the aggregate value of the    
+					   transmitted words from this TrunkGroup."
+	::= { swTrunkGrpEntry  3}
+
+	 swTrunkGrpRx            OBJECT-TYPE
+	   SYNTAX            OCTET STRING (SIZE (8))
+	   MAX-ACCESS          read-only
+	   STATUS          current
+	   DESCRIPTION     "Gives the aggregate value of the  
+	   					received words by this TrunkGroup."
+	::= { swTrunkGrpEntry  4 }
+
+swTopTalkerMntMode       OBJECT-TYPE
+  SYNTAX                INTEGER {
+                       fabricmode  (1),
+                       fportmode   (2)
+                       } 
+  MAX-ACCESS               read-only
+  STATUS                 current
+  DESCRIPTION          "Gives the mode in which toptalker
+						is installed"
+    ::= { swTopTalker 1}
+
+swTopTalkerMntNumEntries   OBJECT-TYPE
+  SYNTAX                 Integer32 (1..32) 
+  MAX-ACCESS               read-only
+  STATUS                  current
+  DESCRIPTION           "Gives the number of toptalking
+						flows"
+    ::= { swTopTalker 2}
+
+swTopTalkerMntTable       OBJECT-TYPE
+  SYNTAX            SEQUENCE OF SwTopTalkerMntEntry
+  MAX-ACCESS             not-accessible 
+  STATUS                 current 
+  DESCRIPTION           "Table to display toptalkingflows"
+    ::= { swTopTalker 3}
+
+ swTopTalkerMntEntry      OBJECT-TYPE
+  SYNTAX               SwTopTalkerMntEntry
+  MAX-ACCESS              not-accessible
+  STATUS                  current
+  DESCRIPTION            "Entry for the toptalker table"
+  INDEX{ swTopTalkerMntIndex}
+    ::= { swTopTalkerMntTable 1} 
+
+ SwTopTalkerMntEntry ::= SEQUENCE{
+  swTopTalkerMntIndex   Integer32,
+  swTopTalkerMntPort    Integer32,
+  swTopTalkerMntSpid    Integer32,
+  swTopTalkerMntDpid    Integer32,  
+  swTopTalkerMntflow    Integer32,
+  swTopTalkerMntSwwn    FcWwn,
+  swTopTalkerMntDwwn    FcWwn
+}
+
+   swTopTalkerMntIndex     OBJECT-TYPE
+    SYNTAX                Integer32 (1..32)
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION           "This object identifies the list/object
+							entry"
+      ::= { swTopTalkerMntEntry 1}
+
+
+   swTopTalkerMntPort      OBJECT-TYPE
+    SYNTAX                 Integer32 (1..32) 
+    MAX-ACCESS             read-only
+    STATUS                  current
+    DESCRIPTION            "This object identifies the switch port
+                            number on which the f-port mode toptalker
+                            is added."
+      ::= { swTopTalkerMntEntry 2}
+ 
+   swTopTalkerMntSpid      OBJECT-TYPE
+    SYNTAX               Integer32 (1..32) 
+    MAX-ACCESS             read-only
+    STATUS                  current
+    DESCRIPTION            "This object identifies the SID of the host"
+      ::= { swTopTalkerMntEntry 3}
+
+   swTopTalkerMntDpid       OBJECT-TYPE
+    SYNTAX                Integer32 (1..32) 
+    MAX-ACCESS             read-only
+    STATUS                  current
+    DESCRIPTION              "This object identifies the DID of the SID-DID pair"
+      ::= { swTopTalkerMntEntry 4}
+
+   swTopTalkerMntflow       OBJECT-TYPE
+     SYNTAX                  Integer32 (1..32)
+     MAX-ACCESS              read-only
+     STATUS                 current
+     DESCRIPTION          "This object identifies the traffic flow in MB/sec"
+	   ::= { swTopTalkerMntEntry 5}
+
+  swTopTalkerMntSwwn      OBJECT-TYPE
+    SYNTAX               FcWwn
+    MAX-ACCESS             read-only
+    STATUS                  current
+    DESCRIPTION            "This object identifies the SID in WWN format of the host"
+      ::= { swTopTalkerMntEntry 6}
+
+   swTopTalkerMntDwwn       OBJECT-TYPE
+    SYNTAX                FcWwn
+    MAX-ACCESS             read-only
+    STATUS                  current
+    DESCRIPTION              "This object identifies the DID in WWN format of the SID-DID pair"
+      ::= { swTopTalkerMntEntry 7}
+	
+
+	swCpuUsage   OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "System's cpu usage."
+     ::= { swCpuOrMemoryUsage 1 }
+
+    swCpuNoOfRetries         OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of times system should take cpu utilization sample before sending the CPU utilization trap."
+     ::= { swCpuOrMemoryUsage 2 }
+
+    swCpuUsageLimit         OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "CPU usage limit"
+     ::= { swCpuOrMemoryUsage 3 }
+
+    swCpuPollingInterval  OBJECT-TYPE
+    SYNTAX      Integer32 (10..3600)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Time interval between two memory samples."
+     ::= { swCpuOrMemoryUsage 4 }
+
+    swCpuAction  OBJECT-TYPE
+    SYNTAX        Integer32 (0..3)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Specifies  the  actions to be taken if system
+	             resources  exceed  the  specified  threshold."
+     ::= { swCpuOrMemoryUsage 5 }
+
+    swMemUsage   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "System's memory usage."
+     ::= { swCpuOrMemoryUsage 6 }
+
+    swMemNoOfRetries         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of times system should take memory usage sample before sending the memory usage trap."
+     ::= { swCpuOrMemoryUsage 7 }
+
+    swMemUsageLimit         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Memory usage limit"
+     ::= { swCpuOrMemoryUsage 8 }
+
+    swMemPollingInterval  OBJECT-TYPE
+    SYNTAX      Integer32 (10..3600)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Time interval between two memory samples."
+     ::= { swCpuOrMemoryUsage 9 }
+
+    swMemAction  OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Specifies  the  actions to be taken if system
+	             resources  exceed  the  specified  threshold."
+     ::= { swCpuOrMemoryUsage 10 }
+
+
+    swMemUsageLimit1         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Low memory usage limit"
+     ::= { swCpuOrMemoryUsage 11 }
+
+
+    swMemUsageLimit3         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "High memory usage limit"
+     ::= { swCpuOrMemoryUsage 12 }
+
+
+    swConnUnitPortStatEntry OBJECT-TYPE
+    SYNTAX SwConnUnitPortStatEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "This represents the Conn unit Port Stats"
+    AUGMENTS {connUnitPortStatEntry}
+    ::= { swConnUnitPortStatExtentionTable 1 }
+
+    SwConnUnitPortStatEntry ::= SEQUENCE {
+        swConnUnitCRCWithBadEOF OCTET STRING,
+        swConnUnitZeroTenancy  OCTET STRING,
+        swConnUnitFLNumOfTenancy OCTET STRING,
+        swConnUnitNLNumOfTenancy OCTET STRING,
+        swConnUnitStopTenancyStarVation OCTET STRING,
+        swConnUnitOpend                 OCTET STRING,
+        swConnUnitTransferConnection  OCTET STRING,
+        swConnUnitOpen                OCTET STRING,
+        swConnUnitInvalidARB OCTET STRING,
+        swConnUnitFTB1Miss  OCTET STRING,
+        swConnUnitFTB2Miss  OCTET STRING,
+        swConnUnitFTB6Miss  OCTET STRING,
+        swConnUnitZoneMiss  OCTET STRING,
+        swConnUnitLunZoneMiss  OCTET STRING,
+        swConnUnitBadEOF  OCTET STRING,
+        swConnUnitLCRX  OCTET STRING,
+        swConnUnitRDYPriority  OCTET STRING,
+		swConnUnitLli OCTET STRING
+    }
+  swConnUnitCRCWithBadEOF OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of frames with CRC error with Bad EOF."
+            ::= { swConnUnitPortStatEntry 1 }
+
+  swConnUnitZeroTenancy OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This counter is incremented when the FL_port acquires the loop but does not transmit a frame."
+           ::= { swConnUnitPortStatEntry 2 }
+  swConnUnitFLNumOfTenancy OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This counter is incremented when the FL_port acquires the loop."
+            ::= { swConnUnitPortStatEntry 3 }
+
+  swConnUnitNLNumOfTenancy OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This counter is incremented when the NL_port acquires the loop."
+            ::= { swConnUnitPortStatEntry 4 }
+
+  swConnUnitStopTenancyStarVation OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This counter is incremented when the FL_port can not transmit a frame because of lack of credit."
+            ::= { swConnUnitPortStatEntry 5 }
+
+  swConnUnitOpend OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of times FC port entered OPENED state."
+            ::= { swConnUnitPortStatEntry 6 }
+
+  swConnUnitTransferConnection OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of times FC port entered TRANSFER state."
+            ::= { swConnUnitPortStatEntry 7 }
+
+  swConnUnitOpen OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of times FC port entered OPEN state."
+            ::= { swConnUnitPortStatEntry 8 }
+
+  swConnUnitInvalidARB OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of times FC port received invalid ARB."
+            ::= { swConnUnitPortStatEntry  9 }
+
+  swConnUnitFTB1Miss OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This counter is incremented when the port receives a frame with a DID that can not be routed by FCR.. Applicable to 8G platforms only."
+            ::= { swConnUnitPortStatEntry 10 }
+
+  swConnUnitFTB2Miss OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This counter is incremented when the port receives a frame with an SID/DID combination that can not be routed by the VF module.Applicable to 8G platforms only."
+            ::= { swConnUnitPortStatEntry 11 }
+
+  swConnUnitFTB6Miss OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This counter is incremented when port receives a frame with an SID that can not be routed by FCR. Applicable to 8G platforms."
+            ::= { swConnUnitPortStatEntry 12 }
+
+  swConnUnitZoneMiss OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This counter is incremented when the port receives a frame with an SID and DID that are not zoned together."
+            ::= { swConnUnitPortStatEntry 13 }
+
+  swConnUnitLunZoneMiss OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This counter is incremented when the port receives a frame with an SID, DID and LUN that are not zoned together( This is not currently used )."
+            ::= { swConnUnitPortStatEntry 14 }
+
+  swConnUnitBadEOF OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of frames with bad end-of-frame."
+            ::= { swConnUnitPortStatEntry 15 }
+
+  swConnUnitLCRX OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of link control frames received."
+            ::= { swConnUnitPortStatEntry 16 }
+
+  swConnUnitRDYPriority OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of times  that  sending  R_RDY  or VC_RDY primitive signals was a higher priority than sending frames, due  to  diminishing credit  reserves in  the  transmitter at the other end of the  fibre."
+            ::= { swConnUnitPortStatEntry 17 }
+
+  swConnUnitLli OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number low level interrupts generated by the physical and link layer."
+            ::= { swConnUnitPortStatEntry 18 }	
+--
+-- Enterprise Specific Traps for Fibre Channel Switch (sw).
+--
+
+  swTrapsV2 OBJECT-IDENTITY
+    STATUS     current
+	DESCRIPTION	"The Traps for Brocade's Fibre Channel Switch."
+	::= { sw 0 }
+
+  swFault		NOTIFICATION-TYPE
+	OBJECTS	{ swDiagResult, swSsn , swGroupName, swGroupType, swGroupMemPos
+			}
+	STATUS	obsolete
+	DESCRIPTION	"Obsoleted this trap as firmware doesn't support this trap.
+		A swFault(1) is generated whenever the diagnostics
+		detects a fault with the switch."
+	--#TYPE		"Switch is faulty."
+	--#SUMMARY	"Faulty reason: %d and SSN is #%s,GroupName %s,GroupType %s,GroupMemPosition %d""
+	--#ARGUMENTS	{ 0, 1, 2, 3, 4}
+	--#SEVERITY	CRITICAL
+	--#TIMEINDEX	1
+	--#STATE	NONOPERATIONAL
+	::= { swTrapsV2 1 }
+
+  swSensorScn	NOTIFICATION-TYPE
+	OBJECTS	{ swSensorStatus, swSensorIndex, swSensorType,
+					swSensorValue, swSensorInfo, swSsn,
+					swGroupName, swGroupType, swGroupMemPos
+					}
+	STATUS	current
+	DESCRIPTION	"A swSensorScn(2) is generated whenever an
+		environment sensor changes its operational state. For instance,
+		a fan stop working. The VarBind in the Trap Data Unit shall
+		contain the corresponding instance of the sensor
+		status, sensor index, sensor type, sensor value (reading)
+		and sensor information.	Note that the sensor information contains the type of sensor
+	    and its number in textual format."
+	--#TYPE		"A sensor (temperature, fan, etc.) changed its operational state."
+	--#SUMMARY	"%s: is currently in state %d and SSN is #%s"
+	--#ARGUMENTS	{ 4, 0, 5 }
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	1
+	--#STATE	OPERATIONAL
+	::= { swTrapsV2 2 }
+
+   swFCPortScn		NOTIFICATION-TYPE
+	OBJECTS	{ swFCPortOpStatus, swFCPortIndex, swFCPortName,
+					swSsn, swFCPortFlag, swGroupName, swGroupType,
+					swGroupMemPos, swVfId }
+	STATUS	current
+	DESCRIPTION	"A swFCPortScn(3) is generated whenever an FC_Port
+		changes its operational state. For instance, the FC_Port
+		goes from on-line to offline. The VarBind in the Trap Data
+		Unit shall contain the corresponding instance of the
+		FC_Port's operational status, index, swFCPortName,swSsn and
+		swFCPortFlag. swSsn is optional varbind sent when swExtTrap
+		is also enabled.swVfId is optional if VF is enabled.
+		The three arguments swGroupName, swGroupType,
+		swGroupMemPos belong to swGroup table which is obsolete
+		and not implemented."
+	--#TYPE		"A Fibre Channel Port changed its operational state."
+	--#SUMMARY	"Port Index %d changed state to %d  Port Name: %s and SSN is #%s"
+	--#ARGUMENTS	{ 1, 0, 2, 3 }
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	1
+	--#STATE	OPERATIONAL
+	::= { swTrapsV2 3 }
+
+   swEventTrap           NOTIFICATION-TYPE
+        OBJECTS       { swEventIndex, swEventTimeInfo, swEventLevel,
+                          swEventRepeatCount, swEventDescr, swSsn,
+						  swGroupName,swGroupType,swGroupMemPos,swVfId }
+        STATUS      current
+        DESCRIPTION     "This trap is generated when an event whose
+                level at or below swEventTrapLevel occurs."
+	--#TYPE		"A firmware event has been logged"
+	--#SUMMARY	"Event %d: %s (severity level %d) - %s SSN is #%s"
+	--#ARGUMENTS	{ 0, 1, 2, 4, 5 }
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	1
+	--#STATE	OPERATIONAL
+	::= { swTrapsV2 4 }
+
+  -- traps for Fabric Watch subsystem
+
+  swFabricWatchTrap	NOTIFICATION-TYPE
+	OBJECTS	{	swFwClassAreaIndex,
+					swFwThresholdIndex,
+					swFwName,
+					swFwLabel,
+					swFwLastEventVal,
+					swFwLastEventTime,
+					swFwLastEvent,
+					swFwLastState,
+					swFwLastSeverityLevel,
+					swSsn,
+				    swGroupName,
+					swGroupType,
+					swGroupMemPos,
+					swVfId	
+					}
+	STATUS	current
+	DESCRIPTION	"trap to be sent by Fabric Watch to notify of an event"
+	--#TYPE		"Fabric Watch has generated an event"
+	--#SUMMARY	"Threshold %s in Class/Area %d at index %d has generated event %d with %d on %s. This event is %d. This event label is %d, event severity level is %d and SSN is #%s"
+	--#ARGUMENTS	{ 2, 0, 1, 6, 4, 5, 7, 3, 8, 9 }
+	--#SEVERITY	WARNING
+	--#TIMEINDEX	1
+	--#STATE	OPERATIONAL
+	::= { swTrapsV2 5 }
+
+  -- traps for track changes subsystem
+
+  swTrackChangesTrap	NOTIFICATION-TYPE
+	OBJECTS	{	swTrackChangesInfo, swSsn,
+					swGroupName, swGroupType, swGroupMemPos,
+					swVfId
+					}
+	STATUS	current
+	DESCRIPTION	"trap to be sent for tracking login/logout/config changes"
+	--#TYPE		"Track changes has generated a trap"
+	--#SUMMARY	"%s and SSN is #%s"
+	--#ARGUMENTS	{ 0, 1 }
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	1
+	--#STATE	OPERATIONAL
+	::= { swTrapsV2 6 }
+	
+	swIPv6ChangeTrap           NOTIFICATION-TYPE
+     OBJECTS       { swIPv6Address, swIPv6Status }
+     STATUS      current
+     DESCRIPTION     "This trap is generated when an ipv6 address
+                status change event occurs."
+	--#TYPE		"IPv6 address status change has generated a trap"
+	--#SUMMARY	
+	--#ARGUMENTS	
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	1
+	--#STATE	OPERATIONAL
+    ::= { swTrapsV2 7 }
+
+	swPmgrEventTrap           NOTIFICATION-TYPE
+     OBJECTS       { swPmgrEventType, swPmgrEventTime, swPmgrEventDescr, swSsn, swVfId }
+     STATUS      current
+     DESCRIPTION     "This trap is generated when any partition manager
+                change happens."
+	--#TYPE		"Partition manager status change has generated a trap"
+	--#SUMMARY  "pmgr event of type %d occured on %d swVfId and SSN is #%s. Time is %s and the description is %s"  	
+	--#ARGUMENTS { 0, 4, 3, 1, 2 }	
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	1
+	--#STATE	OPERATIONAL
+    ::= { swTrapsV2 8 }
+
+  swFabricReconfigTrap	NOTIFICATION-TYPE
+	OBJECTS	{ swDomainID }
+	STATUS current
+	DESCRIPTION	"trap to be sent for tracking fabric reconfiguration"
+	--#TYPE		"Fabric reconfiguration has generated a trap"
+	--#SUMMARY	
+	--#ARGUMENTS	
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	1
+	--#STATE	OPERATIONAL
+    ::= { swTrapsV2 9 }
+
+  swFabricSegmentTrap	NOTIFICATION-TYPE
+	OBJECTS	{ swFCPortIndex, swFCPortName, swSsn, 
+                  swFCPortFlag, swVfId }
+	STATUS current
+	DESCRIPTION	"trap to be sent for tracking segmentation"
+	--#TYPE		"Fabric segmentation has generated a trap"
+	--#SUMMARY	
+	--#ARGUMENTS	
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	1
+	--#STATE	OPERATIONAL
+    ::= { swTrapsV2 10 }
+
+  swExtTrap NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION "THIS IS INTERNAL TRAP"
+	::= { swTrapsV2 11 }
+
+   -- end of Enterprise Specific Traps for Fibre Channel Switch (sw)
+END

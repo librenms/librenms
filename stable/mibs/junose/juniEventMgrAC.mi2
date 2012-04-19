@@ -1,0 +1,406 @@
+
+-- *****************************************************************************
+-- Juniper-Event-Manager-CONF
+--
+-- SNMP Agent Capabilities definitions for the Event Manager MIBs.
+--
+-- Copyright (c) 2003 Juniper Networks, Inc.  All rights reserved.
+-- *****************************************************************************
+
+Juniper-Event-Manager-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniEventManagerAgent  MODULE-IDENTITY
+    LAST-UPDATED "200310301443Z"  -- 30-Oct-03 09:43 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the Event Manager component of
+        the SNMP agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200310301443Z"  -- 30-Oct-03 09:43 AM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "DISMAN-EVENT-MIB:
+         Added support for existence and boolean triggers.
+         Added support for multiple agent wildcarding.
+         Added support for event Set capabilities.
+         Juniper-DISMAN-EVENT-MIB:
+         Initial release for the proprietary Event Manager MIB."
+    REVISION    "200305121422Z"  -- 12-May-03 10:22 AM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "The initial release of this management information module.
+         DISMAN-EVENT-MIB:
+         Added partial support for the draft-ietf-disman-event-mib-v2-01
+         version (enhancements to RFC 2981):
+            Supports threshold triggers for absolute and delta sampling.
+            Does not support existence or boolean triggers.
+            Does not support wildcarding.
+            Does not support event Set capabilities."
+    ::= { juniAgents 62 }
+
+
+-- *****************************************************************************
+-- Event Manager SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniEventManagerAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the Event Manager component of the JUNOSe SNMP agent.
+        This version of the Event Manager component was supported in JUNOSe 5.1
+        and 5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Event Manager application
+        in JUNOSe.  These capabilities became obsolete when support was added
+        for existence and boolean triggers, multiple agent wildcarding, and
+        event Set capabilities."
+    SUPPORTS    DISMAN-EVENT-MIB
+        INCLUDES  {
+            dismanEventResourceGroup,
+            dismanEventTriggerGroup,
+            dismanEventEventGroup,
+            dismanEventNotificationObjectGroup,
+            dismanEventNotificationGroup }
+        VARIATION   mteTriggerComment
+            ACCESS      read-only
+            DESCRIPTION
+                "Comment cannot be modified in this agent.  Comment is set to
+                zero length."
+        VARIATION   mteTriggerTest
+            ACCESS      read-only
+            DESCRIPTION
+                "Trigger test cannot be modified in this agent.  Trigger test is
+                set to threshold(2)."
+        VARIATION   mteTriggerValueIDWildcard
+            ACCESS      read-only
+            DESCRIPTION
+                "Trigger value ID wildcard cannot be modified in this agent.
+                Trigger value ID wildcard is set to false(2)."
+        VARIATION   mteTriggerTargetTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Target tag can not be modified in this agent.  Target tag is
+                set to blank."
+        VARIATION   mteTriggerContextName
+            DESCRIPTION
+                "Default value is the current router context name.  The router
+                must exist before attempting to change this object value."
+        VARIATION   mteTriggerContextNameWildcard
+            ACCESS      read-only
+            DESCRIPTION
+                "Trigger context name wildcard cannot be modified in this agent.
+                Trigger context name wildcard is set to false(2)."
+        VARIATION   mteTriggerObjectsOwner
+            ACCESS      read-only
+            DESCRIPTION
+                "Objects owner cannot be modified in this agent.  Objects owner
+                is set to zero length."
+        VARIATION   mteTriggerObjects
+            ACCESS      read-only
+            DESCRIPTION
+                "Objects cannot be modified in this agent.  Objects is set to
+                zero length."
+        VARIATION   mteTriggerEntryStorageType
+            DESCRIPTION
+                "Storage type can only be set to nonVolatile in this agent."
+        VARIATION   mteTriggerDeltaDiscontinuityIDWildcard
+            ACCESS      read-only
+            DESCRIPTION
+                "Trigger delta discontinuity ID wildcard cannot be modified in
+                this agent.  Trigger delta discontinuity ID wildcard is set to
+                false(2)."
+        VARIATION   mteTriggerExistenceTest
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger existance table is not supported in then agent."
+        VARIATION   mteTriggerExistenceStartup
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger existance table is not supported in then agent."
+        VARIATION   mteTriggerExistenceObjectsOwner
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger existance table is not supported in then agent."
+        VARIATION   mteTriggerExistenceObjects
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger existance table is not supported in then agent."
+        VARIATION   mteTriggerExistenceEventOwner
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger existance table is not supported in then agent."
+        VARIATION   mteTriggerExistenceEvent
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger existance table is not supported in then agent."
+        VARIATION   mteTriggerBooleanComparison
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger boolean table is not supported in then agent."
+        VARIATION   mteTriggerBooleanValue
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger boolean table is not supported in then agent."
+        VARIATION   mteTriggerBooleanStartup
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger boolean table is not supported in then agent."
+        VARIATION   mteTriggerBooleanObjectsOwner
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger boolean table is not supported in then agent."
+        VARIATION   mteTriggerBooleanObjects
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger boolean table is not supported in then agent."
+        VARIATION   mteTriggerBooleanEventOwner
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger boolean table is not supported in then agent."
+        VARIATION   mteTriggerBooleanEvent
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The trigger boolean table is not supported in then agent."
+        VARIATION   mteTriggerThresholdRising
+            DESCRIPTION
+                "The value of this object can not be set to a value less than
+                mteTriggerThresholdFalling value."
+        VARIATION   mteTriggerThresholdFalling
+            DESCRIPTION
+                "The value of this object can not be set to a value greater than
+                mteTriggerThresholdRising value."
+        VARIATION   mteTriggerThresholdDeltaRising
+            DESCRIPTION
+                "The value of this object can not be set to a value less than
+                mteTriggerThresholdDeltaFalling value."
+        VARIATION   mteTriggerThresholdDeltaFalling
+            DESCRIPTION
+                "The value of this object can not be set to a value greater than
+                mteTriggerThresholdDeltaRising value."
+        VARIATION   mteTriggerThresholdObjectsOwner
+            ACCESS      read-only
+            DESCRIPTION
+                "Threshold objects owner cannot be modified in this agent.
+                Threshold objects owner is set to zero length."
+        VARIATION   mteTriggerThresholdObjects
+            ACCESS      read-only
+            DESCRIPTION
+                "Threshold objects cannot be modified in this agent.  Threshold
+                objects is set to zero length."
+        VARIATION   mteEventComment
+            ACCESS      read-only
+            DESCRIPTION
+                "Comment cannot be modified in this agent.  Comment is set to
+                zero length."
+        VARIATION   mteEventActions
+            ACCESS      read-only
+            DESCRIPTION
+                "Actions cannot be modified in this agent.  Actions is set to
+                notification(0)."
+        VARIATION   mteEventEntryStorageType
+            DESCRIPTION
+                "Storage type can only be set to nonVolatile in this agent."
+        VARIATION   mteEventNotification
+            DESCRIPTION
+                "Event notification can only be set to the following OIDs in
+                this agent:
+                    mteTriggerRising
+                    mteTriggerFalling
+                    mteTriggerFailure "
+        VARIATION   mteEventNotificationObjectsOwner
+            ACCESS      read-only
+            DESCRIPTION
+                "Notification objects owner cannot be modified in this agent.
+                Notification objects owner is set to zero length."
+        VARIATION   mteEventNotificationObjects
+            ACCESS      read-only
+            DESCRIPTION
+                "Notification objects cannot be modified in this agent.
+                Notification objects is set to zero length."
+        VARIATION   mteEventSetObject
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The event set table is not supported in then agent."
+        VARIATION   mteEventSetObjectWildcard
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The event set table is not supported in then agent."
+        VARIATION   mteEventSetValue
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The event set table is not supported in then agent."
+        VARIATION   mteEventSetTargetTag
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The event set table is not supported in then agent."
+        VARIATION   mteEventSetContextName
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The event set table is not supported in then agent."
+        VARIATION   mteEventSetContextNameWildcard
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The event set table is not supported in then agent."
+    ::= { juniEventManagerAgent 1 }
+
+juniEventManagerAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the Event Manager component of the JUNOSe SNMP agent.
+        This version of the Event Manager component is supported in JUNOSe 5.3
+        and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Event Manager application
+        in JUNOSe."
+    SUPPORTS    DISMAN-EVENT-MIB
+        INCLUDES  {
+            dismanEventResourceGroup,
+            dismanEventTriggerGroup,
+            dismanEventEventGroup,
+            dismanEventNotificationObjectGroup,
+            dismanEventNotificationGroup }
+        VARIATION   mteTriggerComment
+            ACCESS      read-only
+            DESCRIPTION
+                "Comment cannot be modified in this agent.  Comment is set to
+                zero length."
+        VARIATION   mteTriggerTest
+            DESCRIPTION
+                "Trigger test can only be set to one of the following trigger 
+                types in this agent:
+                    existence(0) 
+                    boolean(1)
+                    threshold(2) "
+        VARIATION   mteTriggerValueIDWildcard
+            ACCESS      read-only
+            DESCRIPTION
+                "Trigger value ID wildcard cannot be modified in this agent.
+                Trigger value ID wildcard is set to false(2)."
+        VARIATION   mteTriggerTargetTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Target tag can not be modified in this agent.  Target tag is
+                set to blank."
+        VARIATION   mteTriggerContextName
+            DESCRIPTION
+                "Default value is the current router context name."
+        VARIATION   mteTriggerObjectsOwner
+            ACCESS      read-only
+            DESCRIPTION
+                "Objects owner cannot be modified in this agent.  Objects owner
+                is set to zero length."
+        VARIATION   mteTriggerObjects
+            ACCESS      read-only
+            DESCRIPTION
+                "Objects cannot be modified in this agent.  Objects is set to
+                zero length."
+        VARIATION   mteTriggerEntryStorageType
+            DESCRIPTION
+                "Storage type can only be set to nonVolatile in this agent."
+        VARIATION   mteTriggerDeltaDiscontinuityIDWildcard
+            ACCESS      read-only
+            DESCRIPTION
+                "Trigger delta discontinuity ID wildcard cannot be modified in
+                this agent.  Trigger delta discontinuity ID wildcard is set to
+                false(2)."
+        VARIATION   mteTriggerExistenceObjectsOwner
+            ACCESS      read-only
+            DESCRIPTION
+                "Objects owner cannot be modified in this agent.  Objects owner
+                is set to zero length."
+        VARIATION   mteTriggerExistenceObjects
+            ACCESS      read-only
+            DESCRIPTION
+                "Objects cannot be modified in this agent.  Objects is set to
+                zero length."
+        VARIATION   mteTriggerBooleanObjectsOwner
+            ACCESS      read-only
+            DESCRIPTION
+                "Objects owner cannot be modified in this agent.  Objects owner
+                is set to zero length."
+        VARIATION   mteTriggerBooleanObjects
+            ACCESS      read-only
+            DESCRIPTION
+                "Objects cannot be modified in this agent.  Objects is set to
+                zero length."
+        VARIATION   mteTriggerThresholdRising
+            DESCRIPTION
+                "The value of this object can not be set to a value less than
+                mteTriggerThresholdFalling value."
+        VARIATION   mteTriggerThresholdFalling
+            DESCRIPTION
+                "The value of this object can not be set to a value greater than
+                mteTriggerThresholdRising value."
+        VARIATION   mteTriggerThresholdDeltaRising
+            DESCRIPTION
+                "The value of this object can not be set to a value less than
+                mteTriggerThresholdDeltaFalling value."
+        VARIATION   mteTriggerThresholdDeltaFalling
+            DESCRIPTION
+                "The value of this object can not be set to a value greater than
+                mteTriggerThresholdDeltaRising value."
+        VARIATION   mteTriggerThresholdObjectsOwner
+            ACCESS      read-only
+            DESCRIPTION
+                "Threshold objects owner cannot be modified in this agent.
+                Threshold objects owner is set to zero length."
+        VARIATION   mteTriggerThresholdObjects
+            ACCESS      read-only
+            DESCRIPTION
+                "Threshold objects cannot be modified in this agent.  Threshold
+                objects is set to zero length."
+        VARIATION   mteEventComment
+            ACCESS      read-only
+            DESCRIPTION
+                "Comment cannot be modified in this agent.  Comment is set to
+                zero length."
+        VARIATION   mteEventEntryStorageType
+            DESCRIPTION
+                "Storage type can only be set to nonVolatile in this agent."
+        VARIATION   mteEventNotification
+            DESCRIPTION
+                "Event notification can only be set to the following OIDs in
+                this agent:
+                    mteTriggerFired
+                    mteTriggerRising
+                    mteTriggerFalling
+                    mteTriggerFailure
+                    mteEventSetFailure "
+        VARIATION   mteEventNotificationObjectsOwner
+            ACCESS      read-only
+            DESCRIPTION
+                "Notification objects owner cannot be modified in this agent.
+                Notification objects owner is set to zero length."
+        VARIATION   mteEventNotificationObjects
+            ACCESS      read-only
+            DESCRIPTION
+                "Notification objects cannot be modified in this agent.
+                Notification objects is set to zero length."
+        VARIATION   mteEventSetObjectWildcard
+            ACCESS      read-only
+            DESCRIPTION
+                "Set object wildcard cannot be modified in this agent.  Set
+                object ID wildcard is set to false(2)."
+        VARIATION   mteEventSetTargetTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Target tag can not be modified in this agent.  Target tag is
+                set to blank."
+    SUPPORTS    Juniper-DISMAN-EVENT-MIB
+        INCLUDES  {
+            juniMteTriggerTableGroup }
+    ::= { juniEventManagerAgent 2 }
+
+END

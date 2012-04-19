@@ -1,0 +1,631 @@
+-- ArubaOS 3.2.0.0_16376
+-- vim:set ts=4 sw=4:
+ARUBA-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ObjectSyntax, TimeTicks
+        FROM SNMPv2-SMI;
+
+
+-- definition of textual conventions
+
+ArubaEnableValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents a Flag which is either Enabled or Disabled."
+    SYNTAX       INTEGER { enabled(1), disabled(2) }
+
+
+ArubaFrameType ::= TEXTUAL-CONVENTION
+   	STATUS       current
+   	DESCRIPTION
+           "Represents the Frame type."
+    SYNTAX       INTEGER {
+						associateRequest(0),
+						associateResponse(1),
+						reassociateRequest(2),
+						reassociateResponse(3),
+						probeRequest(4),
+						probeResponse(5),
+						beacon(8),
+						atim(9),
+						disassociate(10),
+						auth(11),
+						deauth(12)
+				 }
+ArubaPhyType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the PHY-type of the access point.  Wired clients will
+		  show 'wired' in user MIB entries.
+		"
+	SYNTAX       INTEGER {
+		 				dot11a(1),
+						dot11b(2),
+						dot11g(3),
+						dot11ag(4),
+						wired(5)
+					  }
+        
+ArubaSwitchRole ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the role of the controller"
+	SYNTAX       INTEGER {
+		 				master(1),
+						local(2),
+						backupmaster(3)
+					  }
+          
+ArubaSupportStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents if a feature is supported or unsupported."
+	SYNTAX       INTEGER {
+		 				unsupported(1),
+						supported(2)
+					  }
+         
+ArubaActiveState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents if a feature is active or inactive."
+	SYNTAX       INTEGER {
+		 				active(1),
+						inactive(2)
+					  }
+          
+ArubaACLDomain ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents both the source and destination to which an ACL rule will
+		  be applied.
+		"
+	SYNTAX       INTEGER {
+		 				alias(1),
+						any(2),
+						user(3),
+						host(4),
+						network(5)
+					  }
+           
+ArubaACLNetworkServiceType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the network service in an ACL Rule."
+	SYNTAX       INTEGER {
+		 				alias(1),
+						any(2),
+						tcp(3),
+						udp(4),
+						protocol(5)
+					  }
+            
+ArubaACLAction ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the Actions in an ACL rule."
+	SYNTAX       INTEGER {
+		 				deny(1),
+						permit(2),
+						srcNAT(3),
+						dstNAT(4),
+						redirect(5)
+					  }
+             
+ArubaDaysOfWeek ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the Actions in an ACL rule."
+	SYNTAX       INTEGER {
+		 				sun(1),
+						mon(2),
+						tue(3),
+						wed(4),
+						thu(5),
+						fri(6),
+						sat(7)
+					  }
+              
+ArubaAuthenticationMethods ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Authentication Method."
+	SYNTAX       INTEGER {
+		 				none(0),
+		 				web(1),
+						mac(2),
+						vpn(3),
+						dot1x(4),
+						kerberos(5),
+						secureId(7),
+						pubcookie(15),
+						xSec(16),
+						xSecMachine(17),
+						other(255)
+					  }
+     
+ArubaSubAuthenticationMethods ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Sub Authentication Method (e.g. EAP type)."
+	SYNTAX       INTEGER {
+		 				authPAP(1),
+						authCHAP(2),
+						authMSCHAP(3),
+						authMSCHAPv2(4),
+						eapTLS(5),
+						eapTTLS(6),
+						eapLEAP(7),
+						eapMD5(8)
+					  }
+     
+ArubaRogueApType ::= TEXTUAL-CONVENTION
+   STATUS	  current
+   DESCRIPTION
+   		"Represents the Rogue AP Type. "
+   SYNTAX      INTEGER {
+						valid(1),
+						interfering(2),
+						unsecure(3),
+		 				dos(4),
+						unknown(5),
+						knownInterfering(6),
+						suspectedUnsecure(7)
+					 }
+          
+ArubaAPMatchType ::= TEXTUAL-CONVENTION
+   STATUS	  current
+   DESCRIPTION
+   		"Represents the match type of a suspected rogue AP. "
+   SYNTAX      INTEGER {
+						unknown(0),
+						configuredWiredMac(1),
+						ethernetWiredMac(2),
+						apWiredMac(3),
+		 				externalWiredMac(4),
+						manual(5),
+						baseBSSIDOverride(6),
+						mms(7),
+						ethernetGatewayWiredMac(8)
+					 }
+
+ArubaAPMatchMethod ::= TEXTUAL-CONVENTION
+   STATUS	  current
+   DESCRIPTION
+   		"Represents the match method of a suspected rogue AP. "
+   SYNTAX      INTEGER {
+						notApplicable(0),
+						exactMatch(1),
+						plusOneMatch(2),
+						minusOneMatch(3)
+					 }
+
+ArubaStationType ::= TEXTUAL-CONVENTION
+   STATUS	  current
+   DESCRIPTION
+   		"Represents the station type. "
+   SYNTAX      INTEGER {
+						valid(1),
+						interfering(2),
+		 				dos(3)
+					 }
+          
+ArubaEncryptionMethods ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the Actions in an ACL rule."
+    SYNTAX      BITS{
+						disabled(0),
+						static-wep(1),
+						dynamic-wep(2),
+						static-wpa(3),
+						dynamic-wpa(4),
+						wpa2-psk-aes(5),
+						wpa2-8021x-aes(6),
+						wpa2PreAuth(7),
+						xsec(8),
+						wpa-psk-aes(9),
+						wpa-aes(10),
+						wpa2-psk-tkip(11),
+						wpa2-8021x-tkip(12)
+						}
+
+ ArubaHashAlgorithms ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the Actions in an ACL rule."
+	SYNTAX       INTEGER {
+		 				md5(1),
+						sha(2)
+					  }
+  
+ArubaVlanValidRange	::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Represents the Valid Vlan Id Range."
+	SYNTAX		INTEGER(1..4095)
+  
+ArubaPortMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Represents the controller port mode."
+	SYNTAX		INTEGER {
+					access(1),
+					dot1q(2)
+				}
+  
+ArubaDot1dState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Represents the controller port spanning tree state."
+	SYNTAX		INTEGER {
+					disabled(1),
+					blocked(2),
+					listening(3),
+					learning(4),
+					forwarding(5)
+				}
+  
+ArubaPoeState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Represents the POE mode."
+	SYNTAX		INTEGER {
+					disabled(1),
+					enabled(2),
+					enabledCisco(3)
+				}
+ 
+ArubaCardType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Type of the hardware module.
+		"
+	SYNTAX		INTEGER {
+					lc1(1),
+					lc2(2),
+					sc1(3),
+					sc2(4),
+					sw2400(5),
+					sw800(6),
+					sw200(7),
+					m3mk1(8),
+					sw3200(9),
+					sw3400(10),
+					sw3600(11)
+				}
+ 
+ArubaESIServerMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The mode of the ESI server.
+		"
+	SYNTAX		INTEGER {
+					bridged(1),
+					routed(2),
+					nat(3)
+				}
+ 
+ArubaESIServerStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The status of the ESI server.
+		"
+	SYNTAX		INTEGER {
+					up(1),
+					down(2)
+				}
+
+ArubaIfType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The type of interface referred to by the value of ifIndex.
+		"
+	SYNTAX		INTEGER {
+					port(1),
+					vlan(2),
+					tunnel(3),
+					loopback(4)
+				}
+
+ArubaVoipProtocolType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The type of VoIP protocols supported.
+		"
+	SYNTAX       INTEGER{
+		 				sccp(1),
+						svp(2),
+						vocera(3),
+						sip(4),
+						unknown(10)
+		 		 }
+
+ArubaAccessPointMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The mode of the access point.
+		"
+	SYNTAX       INTEGER{
+		 				airMonitor(1),
+						accessPoint(2),
+						accessPointAndMonitor(3),
+						meshPortal(4),
+						meshPoint(5)
+		 		 }
+
+ArubaAuthServerType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The type of the auth server.
+		"
+         SYNTAX       INTEGER{
+		 				internaldb(1),
+						radius(2),
+						ldap(3),
+						kerberos(4),
+						tacacs(5)
+					  }
+
+ArubaAddressType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Address Type. 
+		"
+	SYNTAX       INTEGER{
+		 				srcAddress(1),
+						dstAddress(2),
+						bssid(3)
+		 		 }
+
+ArubaBlackListReason ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Black List Reason. 
+		"
+	SYNTAX       INTEGER {
+		 				userDefined(1),
+						mitmAttack(2),
+						authFailure(3),
+						pingFlood(4),
+						sessionFlood(5),
+						synFlood(6),
+						sessionBlacklist(7),
+						ipSpoofing(8),
+						esiBlacklist(9),
+						other(100)
+		 			  }
+
+ArubaDBType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		DataBase Type. 
+		"
+	SYNTAX       INTEGER {
+		 				mssql(1),
+						mysql(2)
+		 			  }
+
+
+ArubaVrrpState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		DataBase Type. 
+		"
+	SYNTAX       INTEGER {
+						initialize(1),
+						backup(2),
+		 				master(3)
+		 			  }
+
+
+ArubaOperStateValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents Operational state of an interface."
+    SYNTAX       INTEGER { up(1), down(2), testing(3) }
+
+
+
+ArubaAntennaSetting ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents the status of the external antenna."
+    SYNTAX       INTEGER { notPresent(1), enabled(2), disabled(3) }
+
+ArubaAPStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The status of the access point.
+		"
+	SYNTAX		INTEGER { up(1), down(2) }
+
+ArubaPortSpeed ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Port Speed.
+		"
+	SYNTAX		INTEGER { speed10Mbps(1), 
+						  speed100Mbps(2), 
+						  speed1000Mbps(3), 
+						  speedAuto(4),
+						  speed10Gbps(5)
+						}
+
+ArubaPortDuplex ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Port Duplexity.
+		"
+	SYNTAX		INTEGER { half(1), 
+						  full(2), 
+						  auto(3)
+						}
+
+ArubaPortType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Port Type.
+		"
+	SYNTAX		INTEGER { fastethernet(1), 
+						  gigabitethernet(2),
+						  xgigabitethernet(3) 
+						}
+
+ArubaEnet1Mode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the Mode of the Ethernet port on the Access Point"
+	SYNTAX       INTEGER {
+		 				activeStandby(1),
+						tunnel(2),
+						bridge(3),
+						notApplicable(4)
+					  }
+ 
+ArubaUnprovisionedStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents whether the AP is provisioned or not."
+	SYNTAX       INTEGER {
+		 				yes(1),
+						no(2)
+					  }
+ 
+ArubaMonitorMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents whether the AP has any radios dedicated to monitoring."
+	SYNTAX       INTEGER {
+		 				unknown(0),
+		 				all(1),
+						none(2),
+						mixed(3)
+					  }
+ 
+ArubaConfigurationState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION	
+		"Configuration Transfer Types."
+	SYNTAX		INTEGER {
+					success(1),
+					error(2)
+				}
+ 
+ArubaConfigurationChangeType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION	
+		"Configuration Change Types."
+	SYNTAX		INTEGER {
+					create(1),
+					delete(2),
+					modify(3)
+				}
+
+ArubaCallStates ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The Call state.
+		"
+	SYNTAX		INTEGER {
+				idle(0),
+				initiated(1),
+				connecting(2),
+				delivered(3),
+				connected(4),
+				offered(5),
+				alerting(6),
+				releasing(7),
+				cancelling(8),
+				transient(9),
+				dummy503(10),
+				succ(11),
+				fail(12),
+				aborted(13),
+				blocked(14)
+			}
+   
+ArubaVoipProtocol ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  VoIP protocol used
+		"
+	SYNTAX		INTEGER {
+			sccp(1), 
+			svp(2), 
+			vocera(3), 
+			sip(9), ua(11) 
+	}
+
+ArubaVoipRegState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  VoIP registered state
+		"
+	SYNTAX		INTEGER {
+			unkown(0), 
+			registering(1), 
+			unregistering(2), 
+			challenge(3), 
+			registered(4), 
+			unregistered(5)
+	}
+
+ArubaVoiceCdrDirection ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  VoIP CDR direction
+		"
+	SYNTAX		INTEGER {
+			og(0), 
+			ic(1)
+	}
+
+ArubaVoiceCacBit ::= TEXTUAL-CONVENTION
+	STATUS    current
+	DESCRIPTION
+		"
+			Voice CAC bit flags
+		"
+	SYNTAX 	BITS {
+			cacActiveLoadBalancing(0),
+			cacHighCapThresholdReached(1),
+			cacHandRsrvThresholdReached(2),
+			cacPeakCapacityReached(3)
+	}
+	
+ArubaMeshRole ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  Mesh role
+		"
+	SYNTAX		INTEGER {
+			nonmesh(0),
+			point(1), 
+			portal(2)
+	}
+
+
+
+END

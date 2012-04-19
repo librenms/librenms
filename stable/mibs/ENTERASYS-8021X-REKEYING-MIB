@@ -1,0 +1,308 @@
+ENTERASYS-8021X-REKEYING-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-8021x-rekeying-mib.txt
+--
+--  Part Number: <TBD>
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' IEEE 802.1x rapid rekeying MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright February, 2002 Enterasys Networks, Inc.
+
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    dot1xPaePortNumber
+        FROM IEEE8021-PAE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsys8021xRekeyingMIB MODULE-IDENTITY
+    LAST-UPDATED "200407141507Z"  -- Wed Jul 14 15:07 GMT 2004
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to 
+         IEEE 802.1x authentication.
+
+         This MIB is designed to supplement and be used in connection
+         with the standard IEEE 802.1x MIB.
+
+         It provides configuration controls for Enterasys Networks'
+         rapid rekeying feature -- a feature that enhances wireless
+         LAN security by changing the network's radio keys on a
+         regular basis."
+
+    REVISION "200407141507Z"  -- Wed Jul 14 15:07 GMT 2004
+    DESCRIPTION
+        "Added the etsysDot1xRekeyPairwise leaf."
+
+    REVISION "200203072006Z"  -- Thu Mar  7 20:06 GMT 2002
+    DESCRIPTION
+        "The initial version of this MIB module."
+
+    ::= { etsysModules 17 }
+
+
+etsysDot1xRekeyingObjects
+        OBJECT IDENTIFIER ::= { etsys8021xRekeyingMIB 1 }
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+-- ---------------------------------------------------------- --
+-- Branches of the Enterasys IEEE 802.1x Rapid Rekeying MIB
+-- ---------------------------------------------------------- --
+
+etsysDot1xRekeyBaseBranch
+        OBJECT IDENTIFIER ::= { etsysDot1xRekeyingObjects 1 }
+
+-- ---------------------------------------------------------- --
+-- The Rapid Rekeying Configuration Table
+-- ---------------------------------------------------------- --
+
+etsysDot1xRekeyConfigTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysDot1xRekeyConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table that contains encryption-key-related configuration
+         objects for ports on which Authenticator PAEs can run."
+    ::= { etsysDot1xRekeyBaseBranch 1 }
+
+etsysDot1xRekeyConfigEntry OBJECT-TYPE
+    SYNTAX        EtsysDot1xRekeyConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each conceptual row holds encryption key configuration
+         information for the Authenticator PAEs associated with one
+         port."
+    INDEX { dot1xPaePortNumber }
+    ::= { etsysDot1xRekeyConfigTable 1 }
+
+EtsysDot1xRekeyConfigEntry ::=
+    SEQUENCE { 
+               etsysDot1xRekeyEnabled           TruthValue,
+               etsysDot1xRekeyPeriod            Unsigned32,
+               etsysDot1xRekeyLength            INTEGER,
+               etsysDot1xRekeyAsymmetric        TruthValue,
+               etsysDot1xRekeyPairwise          TruthValue
+     }
+
+etsysDot1xRekeyEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "Determines how an access point selects radio encryption
+             keys.
+
+             If the selected port/Authenticator PAE does not support
+             the EAPOL-Key feature (e.g., because radio keys are not
+             applicable to Ethernet ports), this object's value will
+             be FALSE and attempts to write TRUE will fail.
+
+             Normally, if radio keys are present, the manager enters
+             them into the access point through some manual process.
+             The manager or the users may also need to configure the
+             keys into each laptop (access points can distribute the
+             keys automatically to 802.1x EAP-TLS clients).  However
+             laptops get keys, the keys remain static until somebody
+             goes to the trouble of changing them.  If the keys stay
+             unchanged for long periods, this can make it easier for
+             a determined attacker to launch a cryptographic attack.
+
+             When rapid rekeying is enabled, an access point ignores
+             its manually-set keys.  It generates pseudo-random keys
+             on a periodic basis, using IEEE 802.1x key distribution
+             to deliver the keys to new and current clients.
+
+             Do not enable rapid rekeying unless ALL of your clients
+             support IEEE 802.1x and an authentication method (e.g.,
+             EAP-TLS) that supports key distribution.
+
+             Before enabling rapid rekeying, make sure that you have
+             set 'dot1xAuthKeyTxEnabled' to TRUE.  Changing the keys
+             without telling any of the clients about the changes is
+             not a very useful mode of operation."
+    DEFVAL { false }
+    ::= { etsysDot1xRekeyConfigEntry 1 }
+
+etsysDot1xRekeyPeriod OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+               "When rapid rekeying (periodic changing of radio keys) is
+                enabled, the value of this object determines the period,
+                in seconds, between key changes."
+    DEFVAL { 1800 }
+    ::= { etsysDot1xRekeyConfigEntry 2 }
+
+etsysDot1xRekeyLength OBJECT-TYPE
+    SYNTAX INTEGER {  keylen40 (1),   keylen128 (2) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+                "Determines the number of bits/bytes used in the
+                 encryption keys.  Currently supports either 128-bit
+                 (16-octet) encryption keys or 40-bit (5-octet)
+                 encryption keys."
+    DEFVAL { keylen128 }
+    ::= { etsysDot1xRekeyConfigEntry 3 }
+
+etsysDot1xRekeyAsymmetric OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+                "Determines the association between the supplicant and
+                 authenticator transmit keys.
+
+                 If true(1), the authenticator and supplicant will use
+                 different encryption keys in order to transmit data.
+
+                 If false(2), the authenticator and supplicant will use
+                 a single key pattern to encrypt the transmitted data."
+    DEFVAL { true }
+    ::= { etsysDot1xRekeyConfigEntry 4 }
+
+etsysDot1xRekeyPairwise OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+                "Determines whether Rapid Rekeying tumbles Pairwise keys
+                 (when it is enabled, and the radio card supports them).
+
+                 If true(1), it indicates that the access point should
+                 tumble both Pairwise and Group keys.
+
+                 If false(2), it indicates that the access point should
+                 tumble only Group keys."
+    DEFVAL { true }
+    ::= { etsysDot1xRekeyConfigEntry 5 }
+
+
+-- ---------------------------------------------------------- --
+-- Enterasys 802.1X Rekeying MIB - Conformance Information
+-- ---------------------------------------------------------- --
+
+etsysDot1xRekeyingConformance
+    OBJECT IDENTIFIER ::= { etsys8021xRekeyingMIB 2 }
+
+etsysDot1xRekeyingGroups      
+    OBJECT IDENTIFIER ::= { etsysDot1xRekeyingConformance 1 }
+
+etsysDot1xRekeyingCompliances
+    OBJECT IDENTIFIER ::= { etsysDot1xRekeyingConformance 2 }
+
+
+-- ---------------------------------------------------------- --
+-- Units of conformance
+-- ---------------------------------------------------------- --
+
+etsysDot1xRekeyingBaseGroup OBJECT-GROUP
+    OBJECTS {
+           etsysDot1xRekeyPeriod,
+           etsysDot1xRekeyEnabled,
+           etsysDot1xRekeyLength,
+           etsysDot1xRekeyAsymmetric
+        }
+    STATUS current
+    DESCRIPTION
+            "A collection of objects providing rekeying configuration
+             information about a port on which Authenticator PAEs can
+             run."
+    ::= { etsysDot1xRekeyingGroups 1 }
+
+etsysDot1xRekeyingPairwiseGroup OBJECT-GROUP
+    OBJECTS {
+           etsysDot1xRekeyPairwise
+        }
+    STATUS current
+    DESCRIPTION
+            "A collection of objects providing rekeying configuration
+             information related to Pairwise keys."
+    ::= { etsysDot1xRekeyingGroups 2 }
+
+
+-- ---------------------------------------------------------- --
+-- Compliance statements
+-- ---------------------------------------------------------- --
+
+etsysDot1xRekeyingCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+            "The compliance statement for devices that support the
+             Enterasys IEEE 802.1x extensions MIB."
+
+MODULE
+
+    MANDATORY-GROUPS { etsysDot1xRekeyingBaseGroup }
+
+    GROUP          etsysDot1xRekeyingPairwiseGroup
+    DESCRIPTION    "For devices that support pairwise rekeying."
+
+    OBJECT         etsysDot1xRekeyEnabled
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required."
+
+    OBJECT         etsysDot1xRekeyPeriod
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required."
+
+    OBJECT         etsysDot1xRekeyLength
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required.  Depending upon
+                   product capabilities (and export restrictions,
+                   if applicable), some systems may not implement
+                   all key lengths."
+
+    OBJECT         etsysDot1xRekeyAsymmetric
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required."
+
+    OBJECT         etsysDot1xRekeyPairwise
+    MIN-ACCESS     read-only
+    DESCRIPTION    "Write access is not required."
+
+::= { etsysDot1xRekeyingCompliances 1 }
+
+END

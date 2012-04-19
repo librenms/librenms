@@ -1,0 +1,156 @@
+ALCATEL-IND1-VIRTUALROUTER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   	MODULE-IDENTITY, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    routingIND1Vrf
+        FROM ALCATEL-IND1-BASE ;
+
+alcatelIND1VirtualRouterMIB MODULE-IDENTITY
+
+    LAST-UPDATED  "200704030000Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This proprietary MIB contains management information for
+             the configuration of IP Route Maps global configuration
+             parameters.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2006 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200803170000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { routingIND1Vrf 1 }                
+
+alcatelIND1VirtualRouterMIBObjects  OBJECT IDENTIFIER ::= { alcatelIND1VirtualRouterMIB 1 }
+
+alaVirtualRouterConfig  OBJECT IDENTIFIER ::= { alcatelIND1VirtualRouterMIBObjects 1 }
+
+
+-- virtual router name table
+
+alaVirtualRouterNameTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaVirtualRouterNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing Virtual Router Name to Virtual Router Index bindings."
+    ::= { alaVirtualRouterConfig 1 }
+
+alaVirtualRouterNameEntry OBJECT-TYPE
+    SYNTAX      AlaVirtualRouterNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry binds a Virtual Router Name to a Virtual Router index."
+    INDEX {
+        alaVirtualRouterName
+       }                 
+    ::= { alaVirtualRouterNameTable 1 }
+
+AlaVirtualRouterNameEntry ::= SEQUENCE {
+    alaVirtualRouterName            DisplayString,
+    alaVirtualRouterNameIndex       Unsigned32,
+    alaVirtualRouterNameRowStatus   RowStatus
+   }
+
+
+alaVirtualRouterName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..20))
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The name of a Virtual Router."
+    ::= { alaVirtualRouterNameEntry 1 }
+
+alaVirtualRouterNameIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The index associated with the Virtual Router name."
+    ::= { alaVirtualRouterNameEntry 2 }
+
+alaVirtualRouterNameRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Controls creation and deletion of Row Status entries."
+    ::= { alaVirtualRouterNameEntry 3 }
+
+
+
+-- conformance information
+
+alcatelIND1VirtualRouterMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1VirtualRouterMIB 2 }
+alcatelIND1VirtualRouterMIBCompliances OBJECT IDENTIFIER ::=
+                                          { alcatelIND1VirtualRouterMIBConformance 1 }
+alcatelIND1VirtualRouterMIBGroups      OBJECT IDENTIFIER ::=
+                                          { alcatelIND1VirtualRouterMIBConformance 2 }
+
+-- compliance statements
+
+alaVirtualRouterCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for routers running Route Maps
+            and implementing the ALCATEL-IND1-VIRTUALROUTER MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaVirtualRouterConfigMIBGroup }
+
+    ::= { alcatelIND1VirtualRouterMIBCompliances 1 }
+
+-- units of conformance
+
+alaVirtualRouterConfigMIBGroup OBJECT-GROUP
+    OBJECTS { alaVirtualRouterNameIndex, alaVirtualRouterNameRowStatus }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of global
+            configuration parameters of the Virtual Router Module."
+    ::= { alcatelIND1VirtualRouterMIBGroups 1 }
+
+
+END

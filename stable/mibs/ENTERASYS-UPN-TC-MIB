@@ -1,0 +1,181 @@
+ENTERASYS-UPN-TC-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-upn-tc-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' UPN textual conventions.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright February 2004 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysUpnTcMIB MODULE-IDENTITY
+    LAST-UPDATED "200402032200Z"  -- Tue Feb  3 22:00 GMT 2004
+    ORGANIZATION "Enterasys Networks, Inc."
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+   
+    DESCRIPTION
+        "This MIB module defines textual conventions related to 
+         the management of User Personalized Networks.  The 
+         conventions defined below are applicable for use in all
+         Enterasys Networks' MIB definitions."
+
+    REVISION    "200402032200Z"  -- Tue Feb  3 22:00 GMT 2004
+    DESCRIPTION 
+        "Changed naming from StationIdentifier to StationAddress to
+         align naming with ongoing work in the IETF."
+
+    REVISION    "200402031533Z"  -- Tue Feb  3 15:33 GMT 2004
+    DESCRIPTION 
+        "The initial version of this MIB module."
+    ::= { etsysModules 44 } 
+
+
+StationAddressType ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value representing a network address that can be used
+         to identify a station on the network.
+ 
+         unknown(0)  An unknown address type. This value MUST
+                     be used if the value of the corresponding
+                     StationAddress object is a zero-length string.
+                     It may also be used to indicate an station address
+                     which is not in one of the formats defined
+                     below.
+ 
+         ipv4(1)     An IPv4 address as defined by the
+                     InetAddressIPv4 textual convention as defined
+                     in RFC3291.
+ 
+         ipv6(2)     An IPv6 address as defined by the
+                     StationAddressIPv6 textual convention below.
+  
+         mac(3)      An 802.3 MAC layer address, i.e. an
+                     Ethernet address, defined by the
+                     MacAddress textual convention as defined
+                     in RFC2579.
+  
+         dns(16)     A DNS domain name as defined by the
+                     InetAddressDNS textual convention as defined
+                     in RFC3291.
+  
+         Each definition of a concrete StationAddressType value must 
+         be accompanied by a definition of a textual convention for use
+         with that StationAddressType.
+ 
+         The StationAddressType textual convention SHOULD NOT be 
+         subtyped in object type definitions to support future extensions.
+         It MAY be subtyped in compliance statements in order to require
+         only a subset of these address types for a compliant
+         implementation."
+    REFERENCE   
+        "STD0058 (RFC2579), Textual Conventions for SMIv2.
+         RFC3291, Textual Conventions for Internet Network Addresses."
+    SYNTAX       INTEGER {
+                     unknown(0),
+                     ipv4(1),
+                     ipv6(2),
+                     mac(3),
+                     dns(16)
+                 }
+
+StationAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Denotes a generic Internet address.
+
+         An StationAddress value is always interpreted within the 
+         context of an StationAddressType value. Every usage of the
+         StationAddress textual convention is required to specify 
+         the StationAddressType object which provides the context.  
+         It is suggested that the StationAddressType object is 
+         logically registered before the object(s) which use the 
+         StationAddress textual convention if they appear in the 
+         same logical row.
+
+         The value of an StationAddress object must always be
+         consistent with the value of the associated StationAddressType
+         object. Attempts to set an StationAddress object to a value
+         which is inconsistent with the associated StationAddressType
+         must fail with an inconsistentValue error.
+
+         When this textual convention is used as the syntax of an
+         index object, there may be issues with the limit of 128
+         sub-identifiers specified in SMIv2, STD 58. In this case,
+         the object definition MUST include a 'SIZE' clause to
+         limit the number of potential instance sub-identifiers."
+    SYNTAX      OCTET STRING (SIZE (0..255))
+
+   StationAddressIPv6 ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x%4d"
+     STATUS       current
+     DESCRIPTION
+         "Represents an IPv6 network address:
+
+            octets   contents         encoding
+             1-16    IPv6 address     network-byte order
+            17-20    scope identifier network-byte order
+
+          The corresponding InetAddressType value is ipv6(2).
+
+          The scope identifier (bytes 17-20) MUST NOT be present
+          for global IPv6 addresses. For non-global IPv6 addresses
+          (e.g. link-local or site-local addresses), the scope
+          identifier MUST always be present. It contains a link
+          identifier for link-local and a site identifier for
+          site-local IPv6 addresses.
+
+          The scope identifier MUST disambiguate identical address
+          values. For link-local addresses, the scope identifier will
+          typically be the interface index (ifIndex as defined in the
+          IF-MIB, RFC 2233) of the interface on which the address is
+          configured.
+
+          The scope identifier may contain the special value 0
+          which refers to the default scope. The default scope
+          may be used in cases where the valid scope identifier
+          is not known (e.g., a management application needs to
+          write a site-local StationIdIPv6 address without
+          knowing the site identifier value). The default scope
+          SHOULD NOT be used as an easy way out in cases where
+          the scope identifier for a non-global IPv6 is known."
+     SYNTAX       OCTET STRING (SIZE (16|20))
+
+END

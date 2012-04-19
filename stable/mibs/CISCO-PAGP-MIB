@@ -1,0 +1,1005 @@
+
+CISCO-PAGP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32
+            FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    MacAddress,
+    TimeStamp,
+    DisplayString
+            FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+            FROM SNMPv2-CONF
+    ciscoMgmt
+            FROM CISCO-SMI
+    InterfaceIndexOrZero
+            FROM CISCO-TC
+    ifIndex
+            FROM IF-MIB
+    ;
+
+ciscoPagpMIB MODULE-IDENTITY
+        LAST-UPDATED "200212130000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+        CONTACT-INFO
+            "       Cisco Systems
+                    Customer Service
+
+            Postal: 170 W Tasman Drive
+                    San Jose, CA  95134
+                    USA
+
+               Tel: +1 800 553-NETS
+
+            E-mail: cs-etherchan@cisco.com
+                    cs-lan-switch-snmp@cisco.com"
+
+        DESCRIPTION
+            "The MIB module for configuration of Fast Etherchannel
+            and the operation of the Port Aggregation Protocol (PAgP).
+            These features allow two or more physical interfaces to
+            be aggregated together to form a single agport.  This
+            agport behaves like a single interface with improved
+            bandwidth and/or availability over each of its component
+            physical interfaces.
+
+            You can monitor interfaces, agports, and related statistics
+            through the ifStackTable and ifTable entries."
+        
+        REVISION    "200212130000Z"
+        DESCRIPTION "Added a new value vlanIpPort(4) to 
+                     pagpDistributionProtocol."
+
+        REVISION    "200201020000Z"
+        DESCRIPTION "Added port(3) to pagpDistributionProtocol."
+
+        REVISION    "9903040000Z"
+        DESCRIPTION "Added two PagpDistribution objects."
+
+        REVISION    "9804090000Z"
+        DESCRIPTION "Initial version of this MIB module."
+
+        ::= { ciscoMgmt 98 }
+
+ciscoPagpMIBObjects
+        OBJECT IDENTIFIER ::= { ciscoPagpMIB 1 }
+
+pagpGroupCapabilityConfiguration
+        OBJECT IDENTIFIER ::= { ciscoPagpMIBObjects  1 }
+pagpProtocol
+        OBJECT IDENTIFIER ::= { ciscoPagpMIBObjects  2 }
+
+-- Textual Conventions
+
+PagpGroupCapability ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The group-capability value of an interface.  Indicates the
+        ability of the interface to aggregate together with other
+        interfaces to form aggregate links, or agports.
+
+        The value of PagpGroupCapability has no meaning except by
+        comparison (equal or not equal) to other PagpGroupCapability
+        values for different interfaces (ifIndex values) having the
+        same device (pagpDeviceId).  If two different interfaces on the
+        same device have the same PagpGroupCapability, then they are
+        capable of being aggregated into the same agport.  If they
+        have different PagpGroupCapability values, then they cannot
+        be aggregated together.
+
+        The assignment of PagpGroupCapability values to the variables
+        which use them can be made either by the network administrator
+        or by the managed system, depending on the variable.  One
+        easily-used and understood means of assigning
+        PagpGroupCapability values is to use, for each interface's
+        PagpGroupCapability, the lowest ifIndex (in numerical value)
+        of all of the intefaces with which this interface can
+        aggregate.  The use of this technique is not required.
+        Therefore, when examining a variable using the
+        PagpGroupCapability, the user must not assume that the values
+        have any meaning, other than by comparison for equality with
+        other interfaces' values on the same device.
+
+        Note also that a single managed system may utilize multiple
+        pagpDeviceId values.  PagpGroupCapability values may be
+        compared only among those interfaces with the same
+        pagpDeviceId values."
+    SYNTAX     Integer32
+
+PagpEthcOperationMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The group-capability configuration operation mode of Fast
+        Etherchannel on this interface:
+
+            off(1)       No aggregation of interfaces is allowed.
+
+            manual(2)    Aggregation is under control of the
+                         pagpGroupCapabilityConfiguration
+                         section; no PAgP protocol packets are sent,
+                         and any received are ignored.
+
+            pagpOn(3)    Aggregation is under control of the PAgP
+                         protocol.  PAgP packets are sent on the
+                         interface and those received are acted upon.
+
+        It is anticipated that further values of this textual convention
+        may be defined as additional aggregation protocols are defined."
+    SYNTAX     INTEGER { off(1), manual(2), pagpOn(3) }
+
+PagpPortPriority ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The priority of this interface for use as the active port of
+        an aggregation operating in hot-standby mode.  The highest
+        numerical value indicates the most-desirable interface."
+    SYNTAX     INTEGER (0..255)
+
+PagpOperationMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The group-capability configuration operation mode of the PAgP
+        protocol on this interface:
+
+            desirable(1) aggregation is under control of the PAgP
+                         protocol.  PAgP packets are sent on the
+                         interface and those received are acted upon.
+                         If no data packets are received on the
+                         interface, then the interface is never attached
+                         to an agport and cannot be used for data.
+
+            desirableSilent(2)
+                         aggregation is under control of the PAgP
+                         protocol.  PAgP packets are sent on the
+                         interface and those received are acted upon.
+                         If no data packets are received on the
+                         interface, then after some timeout period, the
+                         interface is attached, by itself, to an agport
+                         and can thus be used for data transmission.
+
+            automatic(3) aggregation is under control of the PAgP
+                         protocol.  PAgP packets are not sent on the
+                         interface until at least one PAgP packet is
+                         received which indicates that the sender is
+                         operating in desirable or desirableSilent mode.
+                         If no data packets are received on the
+                         interface, then the interface is never attached
+                         to an agport and cannot be used for data.
+
+            automaticSilent(4)
+                         aggregation is under control of the PAgP
+                         protocol.  PAgP packets are not sent on the
+                         interface until at least one PAgP packet is
+                         received which indicates that the sender is
+                         operating in desirable or desirableSilent mode.
+                         If no data packets are received on the
+                         interface, then after some timeout period, the
+                         interface is attached, by itself, to an agport
+                         and can thus be used for data transmission.
+
+            The value of PagpOperationMode takes effect only when the
+            value of pagpEthcOperationMode is pagpOn(3).  If
+            pagpEthcOperationMode has any other value, the operation of
+            the PAgP protocol is disabled."
+    SYNTAX     INTEGER { desirable(1), desirableSilent(2),
+                         automatic(3), automaticSilent(4) }
+
+PagpLearnMethod  ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Indicates the ability of this device to determine the input
+        interface of an incoming data packet received on an aggregated
+        interface.  This serves as a request to the sending device for
+the
+        use or avoidance of different means of assigning packets to
+        the member interfaces of an aggregation.  Three values are
+defined:
+
+            physPort(1)  This device claims to be unable to ignore the
+                         physical interface on which the packet is
+                         received.
+
+            agPort(2)    This device claims to be able to ignore the
+                         physical interface on which the packet is
+                         received.
+
+            undefined(3) The learn method is unknown.  This value is
+                         not allowed in some variables."
+    SYNTAX INTEGER { physPort(1), agPort(2), undefined(3) }
+
+-- MIB Objects
+
+-- Port Aggregation Protocol and Fast Etherchannel operation variables
+
+-- Per-Interface EtherChannel Variables
+
+pagpEtherChannelTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF PagpEtherChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The pagpEtherChannelTable specifies, per physical interface,
+        the Fast Etherchannel operational mode (off, manual, or
+        protocol-controlled) and the capability of the interface to form
+        aggregations.  Interfaces that do not support Fast Etherchannel
+        or PAgP do not have an entry in this table, nor do the
+        agports, themselves."
+    ::= { pagpGroupCapabilityConfiguration 1 }
+
+pagpEtherChannelEntry OBJECT-TYPE
+    SYNTAX     PagpEtherChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The entry describes the permitted interface aggregation.
+        Entries are created by the managed system for each interface
+        which supports Fast Etherchannel."
+    INDEX      { ifIndex }
+    ::= { pagpEtherChannelTable 1 }
+
+PagpEtherChannelEntry ::= SEQUENCE {
+    pagpEthcOperationMode       PagpEthcOperationMode,
+    pagpDeviceId                MacAddress,
+    pagpPhysGroupCapability     PagpGroupCapability,
+    pagpOperGroupCapability     PagpGroupCapability,
+    pagpAdminGroupCapability    PagpGroupCapability,
+    pagpPortPriority            PagpPortPriority,
+    pagpLearnMethod             PagpLearnMethod,
+    pagpGroupIfIndex            InterfaceIndexOrZero,
+    pagpDistributionProtocol    INTEGER,
+    pagpDistributionAddress     INTEGER 
+}
+
+pagpEthcOperationMode OBJECT-TYPE
+    SYNTAX     PagpEthcOperationMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The managed device will refuse a request to set
+        pagpEthcOperationMode to the pagpOn(3) state if the device does
+        not implement the PAgP protocol.  The managed device will refuse
+        to set pagpEthcOperationMode to manual(2) or pagpOn(3) if the
+        values in the interface's pagpAdminGroupCapability variable is
+        inconsistent with other interfaces' pagpAdminGroupCapability
+        values."
+    ::= { pagpEtherChannelEntry 1 }
+
+pagpDeviceId OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Uniquely identifies a device which implements Fast
+Etherchannel.
+        The combination of pagpDeviceId and ifIndex must be unique over
+        all interfaces in a network.  pagpDeviceId typically identifies
+        a device such as a bridge, router, or file server, but may be
+        used to identify a smaller unit such as a single multi-interface
+        circuit card."
+    ::= { pagpEtherChannelEntry 2 }
+
+pagpPhysGroupCapability OBJECT-TYPE
+    SYNTAX     PagpGroupCapability
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The values in pagpPhysGroupCapability indicate the aggregation
+        capability of the underlying hardware.
+
+        The speed, configuration, and status condition of the interface,
+        e.g. ISL protocol on/off, ifOperStatus On/Off,
+full-/half-duplex,
+        etc., does not affect the state of pagpPhysGroupCapability.
+
+        Any number of interfaces with the same value of
+        pagpPhysGroupCapability can be aggregated together manually."
+    ::= { pagpEtherChannelEntry 3 }
+
+pagpOperGroupCapability OBJECT-TYPE
+    SYNTAX     PagpGroupCapability
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This variable informs the system administrator examining the
+Fast
+        Etherchannel MIB of the capabilities of the current state of the
+        interface's hardware to form agports.
+
+        The pagpOperGroupCapability values are adjusted automatically by
+        the managed system to reflect configuration changes, such as
+port
+        speed or duplex mode, which can affect the ability of an
+interface
+        to join agports.
+
+        pagpOperGroupCapability reflects the ability to form
+        aggregations; it does not specify whether the interface is
+        or is not currently a member of such an aggregation.
+
+        pagpOperGroupCapability values are chosen so that no two
+interfaces
+        may be aggregated unless both pagpPhysGroupCapability and
+        pagpAdminGroupCapability permit the aggregation, as well as the
+        current configuration of the interfaces. 
+pagpOperGroupCapability
+        may change dynamically, as a result of the operation of
+automatic
+        configuration protocols such as PAgP, in order to prevent
+illegal
+        aggregations.
+
+        When the PAgP protocol is enabled, then pagpOperGroupCapability
+        is the value of the group capability being transmitted on this
+        interface in PAgP packets."
+    ::= { pagpEtherChannelEntry 4 }
+
+pagpAdminGroupCapability OBJECT-TYPE
+    SYNTAX     PagpGroupCapability
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "pagpAdminGroupCapability is used by the network administrator
+to
+        control the aggregation of interfaces into agports.  The default
+        value of pagpAdminGroupCapability is equal to the value of
+        pagpPhysGroupCapability on that same interface.
+
+        A pagpAdminGroupCapability may be set to restrict which
+interfaces
+        may be aggregated.  Any attempt to set an
+        pagpAdminGroupCapability value that permits two interfaces to
+        be aggregated together that are prohibited from being aggregated
+        by the pagpPhysGroupCapability values will be refused.
+
+        A given device may place consistency requirements on
+        pagpAdminGroupCapability values that span multiple interfaces.
+        For example, one may be changing interfaces 1-4 from group
+        capabilities 1, 1, 1, 1 to group capabilities 1, 1, 3, 3.  The
+        capability vector 1, 1, 3, 1 may be illegal.  The managed device
+        will refuse a request to set a value in an interface's
+        pagpAdminGroupCapability variable if: 1) that new value would
+        result in an illegal combination of values; and 2) the interface
+        being set does not have its pagpEthcOperationMode variable set
+to
+        off(1).
+
+        The pagpEthcOperationMode variable may be used to avoid illegal
+        combinations of pagpAdminGroupCapability values.  As long as a
+        given interface's pagpEthcOperationMode is in the off state, any
+        value may be set in that interface's pagpAdminGroupCapability
+        variable.  In the above example, the third interface could be
+        disabled, the 3 could be written to the third and fourth
+        interfaces, and the third interfaces re-enabled.
+
+        The operating manuals of the managed device must be consulted to
+        determine the legality of a given combination of
+        pagpAdminGroupCapability values."
+    ::= { pagpEtherChannelEntry 5 }
+
+pagpPortPriority OBJECT-TYPE
+    SYNTAX     PagpPortPriority
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The priority of this interface relative to other interfaces
+        when determining which interface is to be used in Hot
+        Standby mode.
+
+        Among all interfaces aggregated together with a single agport,
+        the one with the highest numerical value of pagpPortPriority is
+        selected for use.  Default value is 128."
+    ::= { pagpEtherChannelEntry 6 }
+
+pagpLearnMethod OBJECT-TYPE
+    SYNTAX     PagpLearnMethod
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This interface's learning method value.  Specifies whether this
+        device is able to learn the location of a source MAC address
+based
+        on the agport on which it was received, agPort(2), or on the
+        interface on which it was received, physPort(1).  This value is
+        relevant primarily to IEEE 802.1D transparent bridges.  If a
+device
+        does not associate recieved source MAC addresses with the
+interface
+        on which it arrived, it should use the value agPort(2).
+
+        The managed device will refuse an attempt to set the value of
+        pagpLearnMethod to undefined(3).
+
+        A particular device may support either physPort, agPort, or
+both."
+    ::= { pagpEtherChannelEntry 7 }
+
+pagpGroupIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "If pagpGroupIfIndex is 0, then the inteface is not aggregated
+        to an agport, and is unavailable for normal data reception and
+        transmission.
+
+        If pagpGroupIfIndex equals the interface's own ifIndex, the
+        interface is aggregated to itself, and behaves as a single
+        interface (as if there were no Fast Etherchannel or PAgP).
+
+        If pagpGroupIfIndex has any other value, then it must contain
+the
+        ifIndex of an agport, and the interface is aggregated to that
+        agport.
+
+        The ifType of an agport is propVirtual(53)."
+    ::= { pagpEtherChannelEntry 8 }
+
+pagpDistributionProtocol OBJECT-TYPE
+    SYNTAX      INTEGER { 
+                          ip(1),     -- ip address
+                          mac(2),    -- mac address 
+                          port(3),   -- port number 
+                          vlanIpPort(4)  -- vlan number, ip address
+                                         -- and port number 
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "pagpDistributionProtocol controls the load balancing
+           algorithms used on this interface's agport to distribute
+           outgoing data frames among its component interfaces, such 
+           as IP address. Configuring pagpDistributionProtocol on this 
+           interface may result in having the same change on the 
+           other interfaces due to hardware architecture." 
+    ::= { pagpEtherChannelEntry 9 }
+
+pagpDistributionAddress  OBJECT-TYPE
+    SYNTAX      INTEGER { 
+                          source(1),       -- source address
+                          destination(2),  -- destination address
+                          both(3)          -- source and destination address
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "pagpDistributionAddress controls the type of distribution 
+              on the configured pagpDistributionProtocol used on this
+              interface's agport to distribute outgoing data frames among its
+              component interfaces. For example if the pagpDistributionProtocol
+              is configured as 'ip(1)' and the pagpDistributionAddress is 
+              configured as 'both(3)', then every frame with a given source and               destination IP value pairs will be sent on the same interface. 
+              Configuring pagpDistributionAddress on this interface may 
+              result in having the same change on the other interfaces due to 
+              hardware architecture."
+    ::= { pagpEtherChannelEntry 10 }
+
+-- Per-interface PAgP Protocol Control Variables
+
+pagpProtocolConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF PagpProtocolConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table of per-interface Port Aggregation Protocol variables.
+        Physical interfaces that support Fast Etherchannel and PAgP
+        protocol have an entry in this table.  If the value of
+        pagpEthcOperationMode for the corresponding interface is off(1)
+or
+        manual(2), then the the interface does not have any entries in
+        this table."
+    ::= { pagpProtocol 1 }
+
+pagpProtocolConfigEntry OBJECT-TYPE
+    SYNTAX     PagpProtocolConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The entry describes the operational state of the PAgP protocol
+on
+        a particular physical interface.  Entries in this table are for
+        interfaces that support both Fast Etherchannel and PAgP
+protocol.
+        The agport itself is not represented in this table."
+    INDEX      { ifIndex }
+    ::= { pagpProtocolConfigTable 1 }
+
+PagpProtocolConfigEntry ::= SEQUENCE {
+    pagpOperationMode           PagpOperationMode,
+    pagpPortState               INTEGER,
+    pagpLastStateChange         TimeStamp,
+    pagpHelloFrequency          INTEGER,
+    pagpDistributionAlgorithm   DisplayString,
+    pagpPartnerCount            INTEGER,
+    pagpPartnerDeviceId         MacAddress,
+    pagpPartnerLearnMethod      PagpLearnMethod,
+    pagpPartnerPortPriority     PagpPortPriority,
+    pagpPartnerIfIndex          InterfaceIndexOrZero,
+    pagpPartnerGroupCapability  PagpGroupCapability,
+    pagpPartnerGroupIfIndex     InterfaceIndexOrZero,
+    pagpPartnerDeviceName       DisplayString,
+    pagpPartnerPortName         DisplayString,
+    pagpPartnerAgportMACAddress MacAddress
+}
+
+pagpOperationMode OBJECT-TYPE
+    SYNTAX     PagpOperationMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Controls the operational mode of the PAgP protocol on this
+        interface."
+    ::= { pagpProtocolConfigEntry 1 }
+
+pagpPortState OBJECT-TYPE
+    SYNTAX     INTEGER {
+          portDown(1),
+          portUp(2),
+          dataReceived(3),
+          upData(4),
+          pagpReceived(5),
+          biDirectional(6),
+          upPagp(7),
+          upMult(8)
+        }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The state of the PAgP state machine on this interface.  Values:
+
+        portDown(1)      - interface's ifOperStatus is not Up;
+
+        portUp(2)        - interface's ifOperStatus is Up, no packets
+                           yet received;
+
+        dataReceived(3)  - data packets, but no PAgP packets, have been
+                           received;
+
+        upData(4)        - interface is aggregated, but no PAgP packets
+                           have been received;
+
+        pagpReceived(5)  - one or more PAgP packets have been received;
+
+        biDirectional(6) - interface has passed PAgP packets in both
+                           directions;
+
+        upPagp(7)        - interface is aggregated by means of PAgP;
+
+        upMult(8)        - interface is aggregated to an agport, but
+                           connects to more than one external device."
+    ::= { pagpProtocolConfigEntry 2 }
+
+pagpLastStateChange OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Value of sysUpTime the last time that pagpPortState changed."
+    ::= { pagpProtocolConfigEntry 3 }
+
+pagpHelloFrequency OBJECT-TYPE
+    SYNTAX     INTEGER {  fast(1), slow(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "If pagpHelloFrequency is slow(2), this device uses a 105 second
+        timer on this interface to time out receipt of PAgP packet. If
+        fast(1), this device uses a 3.5 second timer.  PAgP uses fast(1)
+        by default.  This value is set to slow(2) by action of the PAgP
+        protocol."
+    ::= { pagpProtocolConfigEntry 4 }
+
+pagpDistributionAlgorithm OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "pagpDistributionAlgorithm describes, in human terms, the method
+        used on this interface's agport to distribute outgoing data
+frames
+        among its component interfaces.  'Source MAC address', 'Source
+and
+        Destination MAC addresses', or 'IP flow: Source, Destination,
+        protocol type' might be typical values for
+        pagpDistributionAlgorithm.  If the interface is not aggregated
+        with an agport (pagpGroupIfIndex contains either 0 or the
+        interface's own ifIndex), pagpDistributionAlgorithm may contain
+a
+        DisplayString of length 0.
+
+        See the managed device's operation manual to determine the exact
+        meaning of the information supplied in this variable.  A device
+        may implement more than one algorithm; selecting among those
+        algorithms is not possible within this MIB.
+
+        The maximum length of this DisplayString is 255 octets."
+    ::= { pagpProtocolConfigEntry 5 }
+
+pagpPartnerCount OBJECT-TYPE
+    SYNTAX     INTEGER { none(1), one(2), many(3) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of other devices known to be transmitting PAgP
+packets
+        to this device on this physical interface.
+
+        If pagpPartnerCount contains none(1), then the values of
+        the remainder of the variables in this section are as defined
+        by each variable for this case.
+
+        If pagpPartnerCount contains one(2), then the values of the
+        remainder of the variables in this section are valid.
+
+        If pagpPartnerCount contains many(3), then the values of
+        the remainder of the variables in this section reflect the
+        last PAgP packet received.  The values in this section are,
+        in this case, unreliable, as they may change with the receipt
+        of each new PAgP packet on this interface."
+    ::= { pagpProtocolConfigEntry 6 }
+
+pagpPartnerDeviceId OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "MAC Address of the partner, obtained from
+        the PAgP packet last received on this interface.  Contains
+        all 0 if pagpPartnerCount contains none(1)."
+    ::= { pagpProtocolConfigEntry 7 }
+
+pagpPartnerLearnMethod OBJECT-TYPE
+    SYNTAX     PagpLearnMethod
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of the partner's pagpLearnMethod value, obtained from
+        the PAgP packet last received on this interface.
+        undefined(3) if pagpPartnerCount contains none(1)."
+    ::= { pagpProtocolConfigEntry 8 }
+
+pagpPartnerPortPriority OBJECT-TYPE
+    SYNTAX     PagpPortPriority
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of the partner's pagpPortPriority, obtained from the
+        PAgP packet last received on this interface.  0 if
+        pagpPartnerCount contains none(1)."
+    ::= { pagpProtocolConfigEntry 9 }
+
+pagpPartnerIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of the partner's ifIndex value, obtained from the
+        PAgP packet last received on this interface.  0 if
+        pagpPartnerCount contains none(1).
+
+        Use CISCO-CDP-MIB cdpCacheTable to resolve the partner's IP
+        Address and get ifTable information for this ifIndex."
+    ::= { pagpProtocolConfigEntry 10 }
+
+pagpPartnerGroupCapability OBJECT-TYPE
+    SYNTAX     PagpGroupCapability
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of the partner's pagpOperGroupCapability obtained
+from
+        the PAgP packet last received on this interface.  0 if
+        pagpPartnerCount contains none(1)"
+    ::= { pagpProtocolConfigEntry 11 }
+
+pagpPartnerGroupIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of the partner's pagpGroupIfIndex obtained from the
+        PAgP packet last received on this interface.  0 if
+        pagpPartnerCount contains none(1)."
+    ::= { pagpProtocolConfigEntry 12 }
+
+pagpPartnerDeviceName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The DisplayString obtained from the PAgP packet last received
+on
+        this interface.  0-length string if pagpPartnerCount contains
+        none(1), or if no device name has been received.
+
+        The value transmitted in a PAgP information packet should be the
+        sysName value of the device sending the packet.
+
+        The maximum size of this DisplayString is 255 octets."
+    ::= { pagpProtocolConfigEntry 13 }
+
+pagpPartnerPortName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The DisplayString obtained from the PAgP packet last received
+on
+        this interface.  0-length string if pagpPartnerCount contains
+        none(1), or if no port name has been received.
+
+        The value transmitted in a PAgP packet should be the ifName
+        value of the interface on the device sending the packet.
+
+        The maximum size of this DisplayString is 255 octets."
+    ::= { pagpProtocolConfigEntry 14 }
+
+pagpPartnerAgportMACAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The MacAddress obtained from the PAgP packet last received on
+        this interface.  All 0 if pagpPartnerCount contains none(1) or
+if
+        no agport MacAddress has been received in a PAgP packet.
+
+        If this value is not all 0, then the device sending the TLV is
+        promising to use this MAC address, and only this MAC address, in
+        all frames it sends on the agport."
+    ::= { pagpProtocolConfigEntry 15 }
+
+
+
+-- per-interface Port Aggregation Protocol operation statistics
+
+pagpProtocolStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF PagpProtocolStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table of per-interface Port Aggregation Protocol
+        statistics.  The entries in this table are
+        present only on an interface that is capable both of
+implementing
+        Fast Etherchannel, and can be controlled by the PAgP protocol.
+        The agport itself is not represented in this table."
+    ::= { pagpProtocol 2 }
+
+pagpProtocolStatsEntry OBJECT-TYPE
+    SYNTAX     PagpProtocolStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The entry describes the accumulated statistics of the PAgP
+        protocol operation on the aggregated interface."
+    INDEX      { ifIndex }
+    ::= { pagpProtocolStatsTable 1 }
+
+PagpProtocolStatsEntry ::= SEQUENCE {
+    pagpInPackets        Counter32,
+    pagpOutPackets       Counter32,
+    pagpInFlushes        Counter32,
+    pagpReturnedFlushes  Counter32,
+    pagpOutFlushes       Counter32,
+    pagpInErrors         Counter32
+}
+
+pagpInPackets OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS   "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of PAgP information packets received on this interface."
+    ::= { pagpProtocolStatsEntry 3 }
+
+pagpOutPackets OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS   "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of PAgP information packets transmitted on this
+interface."
+    ::= { pagpProtocolStatsEntry 4 }
+
+pagpInFlushes OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS   "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of PAgP flush packets received and echoed on this
+        interface not matching any pagpDeviceId belonging to the managed
+        device.  This counts PAgP flush packets originated by another
+        device, and indicates that the other device 1) implements the
+PAgP
+        flush feature, and 2) uses that feature to prevent mis-ordering
+        data frames within an ordered stream."
+    ::= { pagpProtocolStatsEntry 5 }
+
+pagpReturnedFlushes OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS   "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of PAgP flush packets received on this interface
+        matching some pagpDeviceId belonging to this device.  This
+counts
+        PAgP flush packets which were originated by the managed device
+and
+        returned to it by another device, and indicates that 1) the
+        managed device implements the PAgP flush protocol; and 2) the
+        other device correctly returns PAgP flush protocol packets."
+    ::= { pagpProtocolStatsEntry 6 }
+
+pagpOutFlushes OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS   "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of PAgP flush packets generated on this interface.  Does
+        not count flush packets counted in pagpInFlushes and returned to
+        the sender.  If pagpOutFlushes is counting and
+pagpReturnedFlushes
+        is not, the other device may not be returning PAgP flush
+packets."
+    ::= { pagpProtocolStatsEntry 7 }
+
+pagpInErrors OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS   "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Number of packet received on this interface which were
+identified
+        by the encapsulation as being PAgP packets (of any type, e.g.
+        information or flush), but which were not valid packets because
+        of length, version, number of TLVs, or an illegal value in an
+        enumerated field."
+    ::= { pagpProtocolStatsEntry 8 }
+
+-- Notifications
+--     (none)
+
+-- Conformance information
+
+ciscoPagpMIBConformance
+        OBJECT IDENTIFIER ::= { ciscoPagpMIB 3 }
+
+ciscoPagpMIBCompliances
+        OBJECT IDENTIFIER ::= { ciscoPagpMIBConformance 1 }
+
+ciscoPagpMIBGroups
+        OBJECT IDENTIFIER ::= { ciscoPagpMIBConformance 2 }
+
+-- Conformance
+
+ciscoPagpMIBComplianceV1R1 MODULE-COMPLIANCE
+
+        STATUS  obsolete
+        DESCRIPTION
+            "Conformance statement for the Fast Ethernet and Port
+            Aggregation Protocol MIB."
+
+        MODULE  -- this module
+        MANDATORY-GROUPS { ciscoPagpEthcGroupV1R1}
+
+        GROUP ciscoPagpPagpGroupV1R1
+        DESCRIPTION
+            "This group is mandatory for all interfaces which
+            implement the Port Aggregation Protocol (PAgP), and which
+            the value pagpOn(3) in the pagpEthcOperationMode variable."
+
+        OBJECT pagpEthcOperationMode
+        SYNTAX INTEGER { off(1), manual(2) }
+        DESCRIPTION
+            "Interfaces which do not implement the Port Aggregation
+            Protocol (PAgP) do not require the value pagpOn(3)."
+        ::= { ciscoPagpMIBCompliances 1 }
+
+ciscoPagpMIBComplianceV2R2 MODULE-COMPLIANCE
+
+        STATUS  current
+        DESCRIPTION
+            "Conformance statement for the Fast Ethernet and Port
+            Aggregation Protocol MIB."
+
+        MODULE  -- this module
+        MANDATORY-GROUPS { ciscoPagpEthcGroupV2R2}
+
+        GROUP ciscoPagpPagpGroupV1R1
+        DESCRIPTION
+            "This group is mandatory for all interfaces which
+            implement the Port Aggregation Protocol (PAgP), and which
+            the value pagpOn(3) in the pagpEthcOperationMode variable."
+
+        OBJECT pagpEthcOperationMode
+        SYNTAX INTEGER { off(1), manual(2) }
+        DESCRIPTION
+            "Interfaces which do not implement the Port Aggregation
+            Protocol (PAgP) do not require the value pagpOn(3)."
+        ::= { ciscoPagpMIBCompliances 2 }
+
+-- Units of conformance
+
+ciscoPagpEthcGroupV1R1 OBJECT-GROUP
+        OBJECTS {
+            pagpEthcOperationMode,
+            pagpDeviceId,
+            pagpPhysGroupCapability,
+            pagpOperGroupCapability,
+            pagpAdminGroupCapability,
+            pagpPortPriority,
+            pagpLearnMethod,
+            pagpGroupIfIndex
+       }
+        STATUS  obsolete
+        DESCRIPTION
+            "The collection of objects which are used
+            to configure and monitor the Fast Etherchannel
+            operation and interface group-capability."
+        ::= { ciscoPagpMIBGroups 1 }
+
+ciscoPagpPagpGroupV1R1 OBJECT-GROUP
+        OBJECTS {
+            pagpOperationMode,
+            pagpPortState,
+            pagpLastStateChange,
+            pagpHelloFrequency,
+            pagpDistributionAlgorithm,
+            pagpPartnerCount,
+            pagpPartnerDeviceId,
+            pagpPartnerLearnMethod,
+            pagpPartnerPortPriority,
+            pagpPartnerIfIndex,
+            pagpPartnerGroupCapability,
+            pagpPartnerGroupIfIndex,
+            pagpPartnerDeviceName,
+            pagpPartnerPortName,
+            pagpPartnerAgportMACAddress,
+            pagpInPackets,
+            pagpOutPackets,
+            pagpInFlushes,
+            pagpReturnedFlushes,
+            pagpOutFlushes,
+            pagpInErrors
+        }
+        STATUS  current
+        DESCRIPTION
+            "The collection of objects which are used
+            to configure and monitor the Port Aggregation Protocol
+            (PAgP) for the automatic negotiation and configuration of
+            Fast Etherchannel."
+        ::= { ciscoPagpMIBGroups 2 }
+
+ciscoPagpEthcGroupV2R2 OBJECT-GROUP
+        OBJECTS {
+            pagpEthcOperationMode,
+            pagpDeviceId,
+            pagpPhysGroupCapability,
+            pagpOperGroupCapability,
+            pagpAdminGroupCapability,
+            pagpPortPriority,
+            pagpLearnMethod,
+            pagpGroupIfIndex,
+            pagpDistributionProtocol,
+            pagpDistributionAddress
+       }
+        STATUS  current
+        DESCRIPTION
+            "The collection of objects which are used
+            to configure and monitor the Fast Etherchannel
+            operation and interface group-capability."
+        ::= { ciscoPagpMIBGroups 3 }
+END
+
+

@@ -1,0 +1,741 @@
+ENTERASYS-SYSLOG-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+              Unsigned32, Counter32, Gauge32
+              FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TimeStamp
+              FROM SNMPv2-TC
+    InetAddressType, InetAddress
+              FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+              FROM SNMPv2-CONF
+    SnmpAdminString
+              FROM SNMP-FRAMEWORK-MIB
+    etsysModules
+              FROM ENTERASYS-MIB-NAMES;
+
+etsysSyslogClientMIB  MODULE-IDENTITY
+    LAST-UPDATED "200311061515Z"  -- Thu Nov  6 15:15 GMT 2003
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise 
+         MIBs under the Enterasys enterprise OID pertaining to the 
+         configuration of the generation of Syslog compatible
+         diagnostic messages for Enterasys products."
+
+    REVISION    "200311061515Z"  -- Thu Nov  6 15:15 GMT 2003
+    DESCRIPTION
+        "Corrected the postal code in the CONTACT-INFO clause."
+
+    REVISION "200307311419Z"  -- Thu Jul 31 14:19 GMT 2003
+    DESCRIPTION
+        "Augmented etsysSyslogClientControl to support the option 
+         of logging to non-volatile memory, added a DEFVAL clause
+         to etsysSyslogClientControl, and added an object,
+         etsysSyslogApplicationAllowedServers, to control which
+         syslog servers will be sent messages on a per application
+         basis."
+
+    REVISION "200112031955Z"  -- Mon Dec  3 19:55 GMT 2001
+    DESCRIPTION
+        "Removed the import of BITS from SNMPv2-SMI."
+
+    REVISION "200108080000Z"
+    DESCRIPTION
+        "The initial version of this MIB module."
+
+    ::= { etsysModules 14 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+SyslogUdpPort  ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The UDP port number the client is using to send requests
+         to this server.  514 is the IANA assigned port number for
+         syslog."
+    SYNTAX      Unsigned32
+
+SyslogFacility  ::=  TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention maps out to the facilities
+         available for syslog messages."
+    SYNTAX  INTEGER {
+                      local0(16),
+                      local1(17),
+                      local2(18),
+                      local3(19),
+                      local4(20),
+                      local5(21),
+                      local6(22),
+                      local7(23)
+                    }
+
+SyslogSeverity  ::=  TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention maps out to the severity levels
+         of syslog messages.  The syslog protocol uses the values
+         0 (emergency), to 7 (debug)."
+    SYNTAX  INTEGER {
+                      emergency(1),
+                      alert(2),
+                      critical(3),
+                      error(4),
+                      warning(5),
+                      notice(6),
+                      info(7),
+                      debug(8)
+                    }
+
+
+-- -------------------------------------------------------------
+-- etsysSyslogClientMIB  groupings
+-- -------------------------------------------------------------
+
+etsysSyslogClient          OBJECT IDENTIFIER 
+                      ::= { etsysSyslogClientMIB 1 }
+
+etsysSyslogServer          OBJECT IDENTIFIER 
+                      ::= { etsysSyslogClientMIB 2 }
+
+etsysSyslogApplication     OBJECT IDENTIFIER 
+                      ::= { etsysSyslogClientMIB 3 }
+
+-- -------------------------------------------------------------
+-- etsysSyslogClient group           
+-- -------------------------------------------------------------
+
+etsysSyslogClientMessages OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of messages successfully delivered to
+         the upstream side of the syslog client software
+         for processing."
+    ::= { etsysSyslogClient 1 }
+
+etsysSyslogClientMessagesDropped OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of messages unable to be queued to
+         the downstream side of the syslog client software
+         for transmitting."
+    ::= { etsysSyslogClient 2 }
+
+etsysSyslogClientLastMessageTime OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime of the last attempt, successful or
+         otherwise, to queue a message to the downstream
+         side of the syslog client software."
+    ::= { etsysSyslogClient 3 }
+
+etsysSyslogClientControl OBJECT-TYPE
+    SYNTAX      BITS  {
+        etsysSyslogClientControlConsoleLogging(0),
+                                -- Log messages to the console.
+        etsysSyslogClientControlPersistentLogging(1)
+                                -- Log messages to non-volatile store.
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A list of attributes to control the operation of the
+         syslog client."
+    DEFVAL { { etsysSyslogClientControlConsoleLogging } }
+    ::= { etsysSyslogClient 4 }
+
+-- -------------------------------------------------------------
+-- etsysSyslogServer table group
+-- -------------------------------------------------------------
+
+etsysSyslogServerMaxEntries OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries allowed in the
+         etsysSyslogServerTable."
+    ::= { etsysSyslogServer 1 }
+
+etsysSyslogServerNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of entries currently in the
+         etsysSyslogServerTable."
+    ::= { etsysSyslogServer 2 }
+
+etsysSyslogServerTableNextAvailableIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the numerically lowest available 
+         index within this entity, which may be used for the
+         value of etsysSyslogServerIndex in the creation of a
+         new entry in the etsysSyslogServerTable.
+
+         An index is considered available if the index value
+         falls within the range of 1 to 8 and is not being used
+         to index an existing entry in the etsysSyslogServerTable
+         contained within this entity.
+
+         A value of zero indicates that all of the entries in the
+         etsysSyslogServerTable are currently in use.
+
+         This value should only be considered a guideline for 
+         management creation of etsysSyslogServerEntries, there
+         is no requirement on management to create entries based
+         upon this index value."
+    ::= { etsysSyslogServer 3 }
+
+-- -------------------------------------------------------------
+-- etsysSyslogServer Table
+-- -------------------------------------------------------------
+
+etsysSyslogServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysSyslogServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing Syslog server information."
+    ::= { etsysSyslogServer 4 }
+
+etsysSyslogServerEntry OBJECT-TYPE
+    SYNTAX      EtsysSyslogServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the information to generate syslog messages to
+         an aggregating agent or server.
+
+         Entries within this table with an access level of read-
+         create MUST be considered non-volatile and MUST be
+         maintained across entity resets."
+    INDEX  { etsysSyslogServerIndex }
+    ::= { etsysSyslogServerTable 1 }
+
+EtsysSyslogServerEntry ::=
+    SEQUENCE {
+        etsysSyslogServerIndex   
+             Unsigned32,
+        etsysSyslogServerDescription   
+             SnmpAdminString,
+        etsysSyslogServerAddressType   
+             InetAddressType,
+        etsysSyslogServerAddress   
+             InetAddress,
+        etsysSyslogServerUdpPort
+             SyslogUdpPort,
+        etsysSyslogServerFacility
+             SyslogFacility,
+        etsysSyslogServerSeverity
+             SyslogSeverity,
+        etsysSyslogServerMessagesIgnored
+             Counter32,
+        etsysSyslogServerRowStatus      
+             RowStatus
+    }
+
+etsysSyslogServerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique arbitrary identifier for this syslog server."
+    ::= { etsysSyslogServerEntry 1 }
+
+etsysSyslogServerDescription OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Administratively assigned textual description of this 
+         syslog server."
+    ::= { etsysSyslogServerEntry 2 }
+
+etsysSyslogServerAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of Internet address by which the Syslog
+         server is specified in etsysSyslogServerAddress.
+
+         Not all address types may be supported."
+    ::= { etsysSyslogServerEntry 3 }
+
+etsysSyslogServerAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Internet address for the Syslog message server.
+
+         The use of DNS domain names is discouraged, and agent
+         support for them is optional.  Deciding when, and how
+         often, to resolve them is an issue.  Not resolving them
+         often enough means you might lose synchronization with
+         the associated entry in the DNS server, and resolving
+         them too often might leave you without access to the
+         Syslog server during critical network events."
+    ::= { etsysSyslogServerEntry 4 }
+
+etsysSyslogServerUdpPort OBJECT-TYPE
+    SYNTAX      SyslogUdpPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The UDP port number the client is using to send requests
+         to this server.
+
+         If an entity only supports sending messages using a
+         single UDP port to all servers then this may optionally
+         be implemented read-only, in which case the current
+         value of etsysSyslogServerDefaultUdpPort will be used."
+    ::= { etsysSyslogServerEntry 5 }
+
+etsysSyslogServerFacility OBJECT-TYPE
+    SYNTAX      SyslogFacility
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The syslog facility (local0-local7) that will be encoded
+         in messages sent to this server.
+
+         If an entity only supports encoding a single facility in
+         all messages to all servers then this may optionally be
+         implemented read-only, in which case the current value of
+         etsysSyslogServerDefaultFacility will be used."
+    ::= { etsysSyslogServerEntry 6 }
+
+etsysSyslogServerSeverity OBJECT-TYPE
+    SYNTAX      SyslogSeverity
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum severity level of the messages that should
+         be forwarded to the syslog server.  The higher the level,
+         the lower the severity.
+
+         If an entity only supports filtering based on a single
+         severity level for all servers then this may optionally
+         be implemented read-only, in which case the current value
+         of etsysSyslogServerDefaultSeverity will be used."
+    ::= { etsysSyslogServerEntry 7 }
+
+etsysSyslogServerMessagesIgnored OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of messages not sent to this server
+         because the severity level of the message was above
+         etsysSyslogServerSeverity, the higher the level,
+         the lower the severity."
+    ::= { etsysSyslogServerEntry 8 }
+
+etsysSyslogServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows for the dynamic creation and deletion
+         of entries within the etsysSyslogServerTable as well as
+         the activation and deactivation of these entries.
+
+         When this object's value is set to notInService(2) this
+         server will not be sent any messages, nor will any of its
+         counters be incremented.
+
+         The agent should not delete a row, except in the case of
+         the loss of persistent storage.
+
+         Refer to the RowStatus convention for further details on 
+         the behavior of this object."
+    REFERENCE
+        "RFC2579 (Textual Conventions for SMIv2)"
+    ::= { etsysSyslogServerEntry 9 }
+
+-- -------------------------------------------------------------
+-- The Syslog Server Defaults
+-- -------------------------------------------------------------
+
+etsysSyslogServerDefaultUdpPort OBJECT-TYPE
+    SYNTAX      SyslogUdpPort
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default UDP port number that the managed entity is
+         using to send syslog messages.
+
+         This value will be used as the default value for
+         etsysSyslogServerUdpPort when creating rows in the
+         etsysSyslogServerTable and either:
+
+         1.)  no value is specified for etsysSyslogServerUdpPort, or
+
+         2.)  etsysSyslogServerUdpPort is implemented read-only. 
+
+         If etsysSyslogServerUdpPort is implemented read-only,
+         and this value is changed, it should affect the UDP
+         port that is used to send syslog messages to all
+         servers as soon as it is practical.
+
+         This parameter value is maintained across system reboots."
+    DEFVAL  { 514 }
+    ::= { etsysSyslogServer 5 }
+
+etsysSyslogServerDefaultFacility OBJECT-TYPE
+    SYNTAX      SyslogFacility
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default syslog facility (local0-local7) that will be
+         encoded in syslog messages.
+
+         This value will be used as the default value for
+         etsysSyslogServerFacility when creating rows in the
+         etsysSyslogServerTable and either:
+
+         1.)  no value is specified for etsysSyslogServerFacility, or
+
+         2.)  etsysSyslogServerFacility is implemented read-only. 
+
+         If etsysSyslogServerFacility is implemented read-only,
+         and this value is changed, it should affect the syslog
+         facility that is encoded in all syslog messages as soon
+         as it is practical.
+
+         This parameter value is maintained across system reboots."
+    DEFVAL  { local7 }
+    ::= { etsysSyslogServer 6 }
+
+etsysSyslogServerDefaultSeverity OBJECT-TYPE
+    SYNTAX      SyslogSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default syslog message severity level that will be used
+         to filter all syslog messages.
+
+         This value will be used as the default value for
+         etsysSyslogServerSeverity when creating rows in the
+         etsysSyslogServerTable and either:
+
+         1.)  no value is specified for etsysSyslogServerSeverity, or
+
+         2.)  etsysSyslogServerSeverity is implemented read-only. 
+
+         The higher the severity level, the less critical it is.
+
+         If etsysSyslogServerSeverity is implemented read-only,
+         and this value is changed, it should affect the syslog
+         message severity level that will be used to filter all
+         syslog messages as soon as it is practical.
+
+         This parameter value is maintained across system reboots."
+    DEFVAL  { error }
+    ::= { etsysSyslogServer 7 }
+
+-- -------------------------------------------------------------
+-- etsysSyslogApplication group            
+-- -------------------------------------------------------------
+
+etsysSyslogApplicationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysSyslogApplicationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "This is a table of applications on the managed entity
+          that provide individual control over the severity level
+          of the messages that they will generate."
+    ::= { etsysSyslogApplication 1 }
+
+etsysSyslogApplicationEntry OBJECT-TYPE
+    SYNTAX      EtsysSyslogApplicationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An individual application that provides that ability
+         to control the messages that it generates based on a
+         severity level.
+
+         MUST be considered non-volatile and MUST be maintained
+         across entity resets."
+    INDEX    { etsysSyslogApplicationIndex }
+    ::= { etsysSyslogApplicationTable 1 }
+
+EtsysSyslogApplicationEntry ::=
+    SEQUENCE {
+        etsysSyslogApplicationIndex
+             Unsigned32,
+        etsysSyslogApplicationDescription   
+             SnmpAdminString,
+        etsysSyslogApplicationMnemonic   
+             SnmpAdminString,
+        etsysSyslogApplicationSeverity   
+             SyslogSeverity,
+        etsysSyslogApplicationAllowedServers 
+             BITS
+    }
+
+etsysSyslogApplicationIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique arbitrary identifier for this application."
+    ::= { etsysSyslogApplicationEntry 1 }
+
+etsysSyslogApplicationDescription OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Textual description of this application, assigned by
+         the managed entity."
+    ::= { etsysSyslogApplicationEntry 2 }
+
+etsysSyslogApplicationMnemonic OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An abbreviation of the textual description for this
+         application, assigned by the managed entity.
+
+         i.e. 'STP' for 'Spanning Tree Protocol', etc.
+
+         This provides a mapping between the textual descriptions
+         and the mnemonics used in the syslog messages."
+    ::= { etsysSyslogApplicationEntry 3 }
+
+etsysSyslogApplicationSeverity OBJECT-TYPE
+    SYNTAX      SyslogSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum severity level of the messages from this
+         application that should be forwarded to the syslog
+         client software for processing.
+
+         The higher the severity level, the more verbose the
+         messages."
+    DEFVAL  { error }
+    ::= { etsysSyslogApplicationEntry 4 }
+
+etsysSyslogApplicationAllowedServers OBJECT-TYPE
+    SYNTAX      BITS  {
+        etsysSyslogServerIndex1(0),
+        etsysSyslogServerIndex2(1),
+        etsysSyslogServerIndex3(2),
+        etsysSyslogServerIndex4(3),
+        etsysSyslogServerIndex5(4),
+        etsysSyslogServerIndex6(5),
+        etsysSyslogServerIndex7(6),
+        etsysSyslogServerIndex8(7)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A list of syslog servers that will be forwarded messages logged
+         by this application.  Bits in this list correspond to rows in
+         the etsysSyslogServerTable. Bit positions that are set, but for
+         which the corresponding etsysSyslogServerRowStatus object is
+         not active, will be ignored."
+    DEFVAL  { { etsysSyslogServerIndex1, etsysSyslogServerIndex2,
+                etsysSyslogServerIndex3, etsysSyslogServerIndex4,
+                etsysSyslogServerIndex5, etsysSyslogServerIndex6,
+                etsysSyslogServerIndex7, etsysSyslogServerIndex8 } }
+    ::= { etsysSyslogApplicationEntry 5 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysSyslogClientConformance OBJECT IDENTIFIER 
+                          ::= { etsysSyslogClientMIB 4 }
+
+etsysSyslogClientGroups OBJECT IDENTIFIER 
+                          ::= { etsysSyslogClientConformance 1 }
+
+etsysSyslogClientCompliances OBJECT IDENTIFIER 
+                          ::= { etsysSyslogClientConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+etsysSyslogClientGroup OBJECT-GROUP
+    OBJECTS {
+                etsysSyslogClientMessages,
+                etsysSyslogClientMessagesDropped,
+                etsysSyslogClientLastMessageTime,
+                etsysSyslogClientControl
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing syslog message
+         statistics."
+    ::= { etsysSyslogClientGroups 1 }
+
+etsysSyslogServerGroup OBJECT-GROUP
+    OBJECTS {
+                etsysSyslogServerMaxEntries,
+                etsysSyslogServerNumEntries,
+                etsysSyslogServerTableNextAvailableIndex,
+                etsysSyslogServerDescription,
+                etsysSyslogServerAddressType,
+                etsysSyslogServerAddress,
+                etsysSyslogServerUdpPort,
+                etsysSyslogServerFacility,
+                etsysSyslogServerSeverity,
+                etsysSyslogServerMessagesIgnored,
+                etsysSyslogServerRowStatus
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing descriptions of
+         syslog servers for sending system messages to."
+    ::= { etsysSyslogClientGroups 2 }
+
+etsysSyslogApplicationGroup OBJECT-GROUP
+    OBJECTS {
+                etsysSyslogApplicationDescription,
+                etsysSyslogApplicationMnemonic,
+                etsysSyslogApplicationSeverity,
+                etsysSyslogApplicationAllowedServers
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing a mechanism to
+         control the severity level of the messages individual
+         application may generate."
+    ::= { etsysSyslogClientGroups 3 }
+
+etsysSyslogServerDefaultsGroup OBJECT-GROUP
+    OBJECTS {
+                etsysSyslogServerDefaultUdpPort,
+                etsysSyslogServerDefaultFacility,
+                etsysSyslogServerDefaultSeverity
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing default values for
+         the syslog servers that can optionally be overridden
+         on a per server basis with etsysSyslogServerFacility,
+         etsysSyslogServerSeverity, or etsysSyslogServerUdpPort."
+    ::= { etsysSyslogClientGroups 4 }
+
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+etsysSyslogClientCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices that support sending
+         system messages to a syslog server."
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        etsysSyslogClientGroup,
+        etsysSyslogServerGroup,
+        etsysSyslogServerDefaultsGroup
+    }
+
+    GROUP       etsysSyslogApplicationGroup
+    DESCRIPTION
+        "The etsysSyslogApplication group is mandatory only for
+         agents which support configuring the severity level of
+         the messages that individual applications may generate."
+
+    OBJECT      etsysSyslogClientControl
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required for implementations that
+         do not support configuring BOTH console AND persistent
+         logging.  Implementations may choose to support only
+         a subset of the client controls.  Sets which attempt
+         to modify unsupported controls should fail."
+
+    OBJECT      etsysSyslogServerUdpPort
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required for implementations that
+         do not support configuring the UDP port number on a
+         per server basis."
+
+    OBJECT      etsysSyslogServerFacility
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required for implementations that
+         do not support configuring the syslog facility on a
+         per server basis."
+
+    OBJECT      etsysSyslogServerSeverity
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required for implementations that
+         do not support configuring the message severity level
+         on a per server basis."
+
+    OBJECT      etsysSyslogServerDefaultUdpPort
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required for implementations that
+         do not support configuring the UDP port number at all,
+         or do not want to support a configurable default.
+         Hopefully, it is only the later."
+
+    OBJECT      etsysSyslogServerDefaultFacility
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required for implementations that
+         do not support configuring the syslog facility at all,
+         or do not want to support a configurable default.
+         Hopefully, it is only the later."
+
+    OBJECT      etsysSyslogServerDefaultSeverity
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required for implementations that
+         do not support configuring the syslog facility at all,
+         or do not want to support a configurable default.
+         Hopefully, it is only the later."
+
+    OBJECT      etsysSyslogApplicationAllowedServers
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required for implementations that
+         do not support configuring the syslog facility at all,
+         or do not support specification of allowable servers
+         per application."                    
+
+    ::= { etsysSyslogClientCompliances 1 }
+
+END

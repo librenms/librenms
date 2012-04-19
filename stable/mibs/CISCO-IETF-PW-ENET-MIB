@@ -1,0 +1,510 @@
+-- *****************************************************************
+-- CISCO-IETF-PW-ENET-MIB.my
+--
+-- February 2003, Tim Swanson
+--
+-- Copyright (c) 2003, 2006 by cisco Systems, Inc.
+-- All rights reserved.
+--
+-- Made Cisco Proprietary based on IETF draft:
+-- draft-ietf-pwe3-enet-mib-00.txt
+-- *****************************************************************
+--
+
+CISCO-IETF-PW-ENET-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS 
+      OBJECT-TYPE, MODULE-IDENTITY, experimental,  
+      Counter64 
+          FROM SNMPv2-SMI 
+
+      MODULE-COMPLIANCE, OBJECT-GROUP 
+          FROM SNMPv2-CONF 
+
+      StorageType, RowStatus 
+          FROM SNMPv2-TC 
+
+      InterfaceIndexOrZero 
+          FROM IF-MIB 
+
+      cpwVcIndex 
+          FROM CISCO-IETF-PW-MIB 
+
+      CpwVcVlanCfg 
+          FROM CISCO-IETF-PW-TC-MIB
+
+      ciscoExperiment
+          FROM CISCO-SMI
+      ; 
+
+  cpwVcEnetMIB MODULE-IDENTITY 
+      LAST-UPDATED "200209221200Z" -- 22 September 2002 12:00:00 GMT 
+      ORGANIZATION "IETF PWE3 Working group"  
+      CONTACT-INFO 
+           "David Zelig 
+            Postal: Corrigent Systems 
+            126, Yigal Alon St. 
+            Tel-Aviv, ISRAEL 
+            Tel: +972-3-6945273 
+            E-mail: davidz@corrigent.com 
+
+           Thomas D. Nadeau 
+           Postal: Cisco Systems, Inc. 
+           250 Apollo Drive 
+           Chelmsford, MA 01824 
+           Tel:    +1-978-497-3051 
+           Email:  tnadeau@cisco.com 
+          " 
+      DESCRIPTION  
+          "This MIB describes a model for managing Ethernet  
+          point-to-point pseudo wire services over a Packet  
+          Switched Network (PSN)." 
+
+     -- Revision history. 
+
+     REVISION  
+        "200209221200Z" -- 22 September 2002 12:00:00 GMT 
+     DESCRIPTION 
+       " Submited as draft-pwe3-enet-mib-00. 
+          Changes from previous version: 
+          1) Alignment with draft-pwe3-ethernet-encap-00.txt: 
+             removing 'rangeVLAN' mode and the associated objects. 
+          2) Relaxing requirement on value of pwVcEnetPortVlan in 
+             port mode. 
+        " 
+
+     REVISION 
+         "200208201200Z" -- 20 August 2002 12:00:00 GMT 
+     DESCRIPTION 
+         "Changes from previous version: 
+          1) Add pwVcEnetVcIfIndex - Option for VC as ifIndex. 
+          2) Change counters to 64 bits. 
+          3) Add mode for adding/removing VLAN fields between PW and 
+             CE bound interface. 
+          4) Referencing draft-martini instead of draft-so. 
+          5) Editorial changes for some description clauses. 
+          6) MPLS PRI mapping table to be independent (not augmented). 
+          7) Adapt descriptions and rules of use to  
+             dratf-ietf-pwe3-Ethernet-encap-00. 
+          "  
+     REVISION 
+         "200202031200Z"  -- 03 February 2002 12:00:00 GMT 
+     DESCRIPTION 
+         "initial revision as -00 draft"  
+
+      ::= { ciscoExperiment 108 } 
+
+  cpwVcEnetNotifications  OBJECT IDENTIFIER ::= { cpwVcEnetMIB 0 } 
+  cpwVcEnetObjects        OBJECT IDENTIFIER ::= { cpwVcEnetMIB 1 } 
+  cpwVcEnetConformance    OBJECT IDENTIFIER ::= { cpwVcEnetMIB 2 } 
+
+  -- 
+  -- VC Ethernet table 
+  -- 
+
+  cpwVcEnetTable  OBJECT-TYPE 
+      SYNTAX SEQUENCE OF CpwVcEnetEntry 
+      MAX-ACCESS  not-accessible 
+      STATUS     current 
+      DESCRIPTION  
+          "This table contains the index to the Ethernet tables  
+          associated with this ETH VC, the VLAN configuration and  
+          VLAN mode." 
+      ::= { cpwVcEnetObjects 1 } 
+
+  cpwVcEnetEntry  OBJECT-TYPE 
+      SYNTAX     CpwVcEnetEntry 
+      MAX-ACCESS  not-accessible 
+      STATUS     current 
+      DESCRIPTION  
+          "This table is indexed by the same index that was created  
+          for the associated entry in the PW VC Table in the 
+          CISCO-IETF-PW-MIB.  The CpwVcIndex and the cpwVcEnetPwVlan 
+          are used as indexes to allow multiple VLANs to exist on 
+          the same PW. 
+
+          An entry is created in this table by the agent for every  
+          entry in the cpwVc table with a VcType of 'ethernetVLAN', 
+          'ethernet' or 'ethernetVPLS'. Additional rows may be  
+          created by the operator or the agent if multiple entries 
+          are required for the same VC. 
+
+          This table provides Ethernet port mapping and VLAN  
+          configuration for each Ethernet VC." 
+
+      INDEX { cpwVcIndex, cpwVcEnetPwVlan } 
+      ::= { cpwVcEnetTable 1 } 
+
+  CpwVcEnetEntry ::= SEQUENCE { 
+         cpwVcEnetPwVlan        CpwVcVlanCfg, 
+         cpwVcEnetVlanMode      INTEGER, 
+         cpwVcEnetPortVlan      CpwVcVlanCfg, 
+
+         cpwVcEnetPortIfIndex   InterfaceIndexOrZero, 
+         cpwVcEnetVcIfIndex     InterfaceIndexOrZero, 
+
+         cpwVcEnetRowStatus     RowStatus, 
+         cpwVcEnetStorageType   StorageType 
+                    } 
+
+  cpwVcEnetPwVlan  OBJECT-TYPE 
+      SYNTAX      CpwVcVlanCfg 
+      MAX-ACCESS  not-accessible 
+      STATUS      current 
+      DESCRIPTION  
+          "This Object defines the VLAN on the VC. The value of 4097 
+          is used if the object is not applicable, for example when 
+          mapping all packets from an Ethernet port to this VC. 
+          The value of 4096 is used to indicate untagged frames (at  
+          least from the PW point of view), for example if  
+          cpwVcEnetVlanMode is equal 'removeVLAN' or when  
+          cpwVcEnetVlanMode equal 'noChange' and cpwVcEnetPortVlan 
+          is equal 4096." 
+      ::= { cpwVcEnetEntry 1 } 
+
+  cpwVcEnetVlanMode  OBJECT-TYPE 
+      SYNTAX     INTEGER { 
+              other(0), 
+              portBased(1), 
+              noChange(2), 
+              changeVlan(3), 
+              addVlan(4), 
+              removeVlan(5) 
+      } 
+      MAX-ACCESS  read-create 
+      STATUS     current 
+      DESCRIPTION  
+          "Indicate the mode of VLAN handling between the port  
+          associated to the VC and the VC encapsulation itself. 
+
+          - 'other' indicate operation that is not defined by 
+            this MIB. 
+
+          - 'portBased' indicates that the forwarder will forward 
+            packets between the port and the PW independent of their 
+            structure. 
+
+          - 'noChange' indicates that the VC contains the original 
+             user VLAN, as specified in cpwVcEnetPortVlan. 
+
+          - 'changeVlan' indicates that the VLAN field on the VC  
+            may be different than the VLAN field on the user's  
+            port. 
+
+          - 'removeVlan' indicates that the encapsulation on the  
+            VC does not include the original VLAN field. Note  
+            that PRI bits transparency is lost in this case. 
+
+          - 'addVlan' indicate that a VLAN field will be added 
+            on the PSN bound direction. cpwVcEnetPwVlan indicate 
+            the value that will be added.  
+
+          - 'removeVlan', 'addVlan' and 'changeVlan' implementation 
+            is not required. 
+          " 
+      DEFVAL { noChange } 
+      ::= { cpwVcEnetEntry 2 } 
+
+  cpwVcEnetPortVlan  OBJECT-TYPE 
+      SYNTAX     CpwVcVlanCfg 
+      MAX-ACCESS  read-create 
+      STATUS     current 
+      DESCRIPTION  
+          "This object define the VLAN value on the physical port (or  
+          VPLS virtual port) if a change is required to the VLAN value 
+          between the VC and the physical/virtual port. 
+
+          The value of this object can be ignored if the whole traffic  
+          from the port is forwarded to one VC independent of the  
+          tagging on the port, but it is RECOMENDED that the value in 
+          this case will be '4097' indicating not relevant. 
+
+          It MUST be equal to cpwVcEnetPwVlan if 'noChange' mode 
+          is used. 
+
+          The value 4096 indicate that no VLAN (i.e. untagged  
+          frames) on the port are associated to this VC. This  
+          allows the same behaviors as assigning 'Default VLAN'  
+          to un-tagged frames. 
+          " 
+      DEFVAL  { 4097 } 
+      ::= { cpwVcEnetEntry 3 } 
+
+  cpwVcEnetVcIfIndex  OBJECT-TYPE 
+      SYNTAX     InterfaceIndexOrZero 
+      MAX-ACCESS  read-create 
+      STATUS     current 
+      DESCRIPTION  
+          "It is sometimes convenient to model the VC PW as a  
+           virtual interface in the ifTable. In these cases this  
+           object hold the value of the ifIndex in the ifTable  
+           representing this VC PW. A value of zero indicate no such  
+           association or association is not yet known." 
+
+      ::= { cpwVcEnetEntry 4 } 
+
+  cpwVcEnetPortIfIndex  OBJECT-TYPE 
+      SYNTAX     InterfaceIndexOrZero 
+      MAX-ACCESS  read-create 
+      STATUS     current 
+      DESCRIPTION  
+      "This object is used to specify the ifIndex of the ETHERNET 
+       port associated with this VC for point-to-point Ethernet  
+       service, or the ifIndex of the virtual interface of the VPLS  
+       instance associated with the PW if the service is VPLS. Two  
+       rows in this table can point to the same ifIndex only if: 
+
+       1) It is required to support multiple COS on a MPLS PSN  
+          for the same service (i.e.: a combination of ports and  
+          VLANs) by the use of multiple VC, each with a different 
+          COS. 
+
+       2) There is no overlap of VLAN values specified in  
+          cpwVcEnetPortVlan that are associated with this port. 
+
+       A value of zero indicate that association to an ifIndex is 
+       not yet known." 
+
+  ::= { cpwVcEnetEntry 5 } 
+
+  cpwVcEnetRowStatus  OBJECT-TYPE 
+      SYNTAX     RowStatus 
+      MAX-ACCESS  read-create 
+      STATUS     current 
+      DESCRIPTION  
+          "Enable creating, deleting and modifying this row." 
+  -- TBD: Need to specify exact interaction with other tables, and  
+  -- when rows can/cannot be created/deleted/modified. 
+      ::= { cpwVcEnetEntry 6 } 
+
+  cpwVcEnetStorageType  OBJECT-TYPE 
+      SYNTAX     StorageType 
+      MAX-ACCESS  read-create 
+      STATUS     current 
+      DESCRIPTION  
+          "Indicates the storage type of this row." 
+      ::= { cpwVcEnetEntry 7 } 
+
+  -- 
+  -- Ethernet Primary Mapping Table 
+  -- 
+
+  cpwVcEnetMplsPriMappingTable  OBJECT-TYPE 
+      SYNTAX SEQUENCE OF CpwVcEnetMplsPriMappingTableEntry 
+      MAX-ACCESS  not-accessible 
+      STATUS     current 
+      DESCRIPTION  
+          "This table may be used for MPLS PSNs if there is a need  
+          to hold multiple VC, each with different COS, for the same 
+          user service (port + PW VLAN). Such a need may arise if the 
+          MPLS network is capable of L-LSP or E-LSP without multiple 
+          COS capabilities.  Each row is indexed by the cpwVcIndex  
+          and indicate the PRI bits on the packet recieved from the  
+          user port (or VPLS virtual port) that are 
+          classified to this VC. Note that the EXP bit value of the VC 
+          is configured in the CISCO-IETF-PW-MPLS-MIB." 
+      ::= { cpwVcEnetObjects 2 } 
+
+  cpwVcEnetMplsPriMappingTableEntry  OBJECT-TYPE 
+      SYNTAX     CpwVcEnetMplsPriMappingTableEntry 
+      MAX-ACCESS  not-accessible 
+      STATUS     current 
+      DESCRIPTION  
+          "Each entry is created if special classification based on  
+           the PRI bits is required for this VC." 
+
+      INDEX { cpwVcIndex } 
+
+      ::= { cpwVcEnetMplsPriMappingTable 1 } 
+
+  CpwVcEnetMplsPriMappingTableEntry ::= SEQUENCE { 
+      cpwVcEnetMplsPriMapping             BITS, 
+      cpwVcEnetMplsPriMappingRowStatus    RowStatus, 
+      cpwVcEnetMplsPriMappingStorageType  StorageType 
+  } 
+
+  cpwVcEnetMplsPriMapping  OBJECT-TYPE 
+      SYNTAX     BITS { 
+          pri000 (0), 
+          pri001 (1), 
+          pri010 (2), 
+          pri011 (3), 
+          pri100 (4), 
+          pri101 (5), 
+          pri110 (6), 
+          pri111 (7), 
+          untagged (8) 
+      } 
+      MAX-ACCESS  read-create 
+      STATUS     current 
+      DESCRIPTION  
+          "This object defines the groups of user PRI mapped into 
+          this VC. Each bit set indicates that this user priority  
+          is assigned to this VC. 
+
+          The value 'untagged' is used to indicate that untagged  
+          frames are also associated to this VC. 
+
+          This object allow the use of different PSN COS based on  
+          user marking of PRI bits in MPLS PSN with L-LSP or  
+          E-LSP without multiple COS support. In all other cases,  
+          the default value MUST be used. 
+
+          It is REQUIRED that there is no overlap on this object  
+          between rows serving the same service (port+ PW VLAN). 
+
+          In case of missing BIT configuration between rows to  
+          the same service, incoming packets with PRI marking not  
+          configured should be handled by the VC with the lowest  
+          COS. 
+          " 
+      REFERENCE  
+          "See appendix A of <draft-ietf-pwe3i-ethernet-encap> 
+           for mapping rules of the PRI bits to PSN COS." 
+
+      ::= { cpwVcEnetMplsPriMappingTableEntry 1 } 
+
+  cpwVcEnetMplsPriMappingRowStatus  OBJECT-TYPE 
+      SYNTAX     RowStatus 
+      MAX-ACCESS  read-create 
+      STATUS     current 
+      DESCRIPTION  
+          "Enable creating, deleting and modifying this row." 
+  -- TBD: Need to specify exact interaction with other tables, and  
+  -- when rows can/cannot be created/deleted/modified. 
+      ::= { cpwVcEnetMplsPriMappingTableEntry 2 } 
+
+  cpwVcEnetMplsPriMappingStorageType  OBJECT-TYPE 
+      SYNTAX     StorageType 
+      MAX-ACCESS  read-create 
+      STATUS     current 
+      DESCRIPTION  
+          "Indicates the storage type of this row." 
+      ::= { cpwVcEnetMplsPriMappingTableEntry 3 } 
+
+  -- 
+  -- VC Ethernet Statistics Table 
+  -- 
+
+  cpwVcEnetStatsTable  OBJECT-TYPE 
+      SYNTAX SEQUENCE OF CpwVcEnetStatsEntry 
+      MAX-ACCESS  not-accessible 
+      STATUS     current 
+      DESCRIPTION  
+          "This table contains statistical counters specific for  
+           Ethernet PW." 
+      ::= { cpwVcEnetObjects 3 } 
+
+  cpwVcEnetStatsEntry  OBJECT-TYPE 
+      SYNTAX     CpwVcEnetStatsEntry 
+      MAX-ACCESS  not-accessible 
+      STATUS     current 
+      DESCRIPTION  
+          "Each entry represents the statistics gathered for the  
+           VC carrying the Ethernet packets since this VC was  
+           first created in the cpwVcEnetTable." 
+      INDEX { cpwVcIndex } 
+      ::= { cpwVcEnetStatsTable 1 } 
+
+  CpwVcEnetStatsEntry ::= SEQUENCE { 
+      cpwVcEnetStatsIllegalVlan        Counter64, 
+      cpwVcEnetStatsIllegalLength      Counter64 
+  } 
+
+  cpwVcEnetStatsIllegalVlan  OBJECT-TYPE 
+      SYNTAX     Counter64 
+      MAX-ACCESS  read-only 
+      STATUS     current 
+      DESCRIPTION  
+      "The number of packets received (from the PSN) on this VC with  
+      an illegal VLAN field, missing VLAN field that was expected, or  
+      A VLAN field when it was not expected. This counter is not  
+      relevant if the VC type is 'ethernet' (i.e. raw mode), and  
+      should be set to 0 by the agent to indicate this." 
+      ::= { cpwVcEnetStatsEntry 1 } 
+
+  cpwVcEnetStatsIllegalLength  OBJECT-TYPE 
+      SYNTAX     Counter64 
+      MAX-ACCESS  read-only 
+      STATUS     current 
+      DESCRIPTION  
+      "The number of packets that were received with an illegal  
+      Ethernet packet length on this VC. An illegal length is defined 
+      as being greater than the value in the advertised maximum MTU  
+      supported, or shorter than the allowed Ethernet packet size." 
+      ::= { cpwVcEnetStatsEntry 2 } 
+
+  --- 
+  --- Conformance description 
+  --- In this version of the draft, only objects level conformance is 
+  --- defined. More detailed conformance specifications is FFS. 
+  --- 
+
+  cpwVcEnetGroups      OBJECT IDENTIFIER ::= { cpwVcEnetConformance 1 } 
+  cpwVcEnetCompliances OBJECT IDENTIFIER ::= { cpwVcEnetConformance 2 } 
+
+  cpwVcEnetModuleCompliance MODULE-COMPLIANCE 
+      STATUS  current 
+      DESCRIPTION 
+              "The compliance statement for agent that support  
+               Ethernet PW." 
+
+      MODULE  -- this module 
+          MANDATORY-GROUPS { cpwVcEnetGroup, 
+                             cpwVcStatsGroup 
+                           } 
+
+        GROUP cpwVcEnetMplsPriGroup 
+        DESCRIPTION 
+            "Collection of objects defining classification to 
+            different PW based on the user's PRI bits mapping. 
+            This group is optional, and should be implemented 
+            only for MPLS PSN where only L-LSP or single OA  
+            E-LSP, exists, and different PSN COS is required 
+            based on the PRI mapping." 
+
+      ::= { cpwVcEnetCompliances 1 } 
+
+  -- Units of conformance. 
+
+  cpwVcEnetGroup OBJECT-GROUP  
+     OBJECTS { 
+              cpwVcEnetVlanMode, 
+              cpwVcEnetPortVlan, 
+              cpwVcEnetPortIfIndex, 
+              cpwVcEnetVcIfIndex, 
+              cpwVcEnetRowStatus, 
+              cpwVcEnetStorageType 
+     } 
+     STATUS  current 
+     DESCRIPTION 
+            "Collection of objects for basic Ethernet PW config." 
+     ::= { cpwVcEnetGroups 1 } 
+
+  cpwVcStatsGroup OBJECT-GROUP  
+     OBJECTS { 
+              cpwVcEnetStatsIllegalVlan, 
+              cpwVcEnetStatsIllegalLength 
+     }           
+     STATUS  current 
+     DESCRIPTION 
+            "Collection of objects counting various PW level errors." 
+     ::= { cpwVcEnetGroups 2 } 
+
+  cpwVcEnetMplsPriGroup OBJECT-GROUP  
+     OBJECTS { 
+              cpwVcEnetMplsPriMapping, 
+              cpwVcEnetMplsPriMappingRowStatus, 
+              cpwVcEnetMplsPriMappingStorageType 
+     }           
+     STATUS  current 
+     DESCRIPTION 
+            "Collection of objects defining classification to 
+            different PW based on the user's PRI bits mapping. 
+            This group is optional, and should be implemented 
+            only for MPLS PSN where only L-LSP or single OA  
+            E-LSP exists, and different PSN COS is required 
+            based on the PRI mapping." 
+     ::= { cpwVcEnetGroups 3 } 
+
+END

@@ -1,0 +1,379 @@
+
+-- *****************************************************************************
+-- Juniper-DHCPv6-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   DHCPv6 MIB
+--
+-- Copyright (c) 2003 Juniper Networks, Inc.   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-DHCPv6-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, TimeInterval
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Ipv6AddressPrefix
+        FROM IPV6-TC
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniDhcpv6MIB  MODULE-IDENTITY
+    LAST-UPDATED "200305081715Z"  -- 08-May-03 01:15 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The DHCPv6 MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200305081715Z"  -- 08-May-03 01:15 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 69 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniDhcpv6LocalServerModeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of DHCPv6 Local Server operational Mode types."
+    SYNTAX      INTEGER {
+                    localServerModeTypeEqualAccess(1),
+                    localServerModeTypeStandalone(2) }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpv6Objects              OBJECT IDENTIFIER ::= { juniDhcpv6MIB 1 }
+juniDhcpv6LocalServerObjects   OBJECT IDENTIFIER ::= { juniDhcpv6Objects 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for DHCPv6 Local Server
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpv6LocalServerStatistics OBJECT IDENTIFIER
+    ::= { juniDhcpv6LocalServerObjects 1 }
+juniDhcpv6LocalServerAttributes OBJECT IDENTIFIER
+    ::= { juniDhcpv6LocalServerObjects 2 }
+juniDhcpv6LocalServerBindings   OBJECT IDENTIFIER
+    ::= { juniDhcpv6LocalServerObjects 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCPv6 Local Server Statistics
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpv6LocalServerMemUsage OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount (in bytes) of memory currently allocated to this local
+        server."
+    ::= { juniDhcpv6LocalServerStatistics 1 }
+
+juniDhcpv6LocalServerNumBindings OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of address bindings maintained by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 2 }
+
+juniDhcpv6LocalServerRxSolicits OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of solicit messages received by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 3 }
+
+juniDhcpv6LocalServerRxAccepts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of accept messages received by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 4 }
+
+juniDhcpv6LocalServerRxRenews OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of renew messages received by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 5 }
+
+juniDhcpv6LocalServerRxDeclines OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of decline messages received by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 6 }
+
+juniDhcpv6LocalServerRxReleases OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of release messages received by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 7 }
+
+juniDhcpv6LocalServerRxInforms OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inform messages received by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 8 }
+
+juniDhcpv6LocalServerRxConfirms OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of confirm messages received by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 9 }
+
+juniDhcpv6LocalServerRxRebinds OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of rebind messages received by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 10 }
+
+juniDhcpv6LocalServerTxReconfigures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of reconfigure messages sent by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 11 }
+
+juniDhcpv6LocalServerTxAdvertises OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of advertise messages sent by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 12 }
+
+juniDhcpv6LocalServerTxSuccessfulReplies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of success reply messages sent by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 13 }
+
+juniDhcpv6LocalServerTxFailedReplies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of failed reply messages sent by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 14 }
+
+juniDhcpv6LocalServerUnknownMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of unknown messages processed by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 15 }
+
+juniDhcpv6LocalServerBadMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bad messages processed by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 16 }
+
+juniDhcpv6LocalServerPacketsIn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of input packets processed by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 17 }
+
+juniDhcpv6LocalServerPacketsOut OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of output packets processed by this local server."
+    ::= { juniDhcpv6LocalServerStatistics 18 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCPv6 Local Server Bindings Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpv6LocalServerBindingsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDhcpv6LocalServerBindingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of address bindings maintained by this DHCPv6 Local Server."
+    ::= { juniDhcpv6LocalServerBindings 1 }
+
+juniDhcpv6LocalServerBindingsEntry OBJECT-TYPE
+    SYNTAX      JuniDhcpv6LocalServerBindingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an address binding maintained by
+        this DHCPv6 Local Server."
+    INDEX     { juniDhcpv6LocalServerBindingsPrefix,
+                juniDhcpv6LocalServerBindingsLength }
+    ::= { juniDhcpv6LocalServerBindingsTable 1 }
+
+JuniDhcpv6LocalServerBindingsEntry ::= SEQUENCE {
+    juniDhcpv6LocalServerBindingsPrefix        Ipv6AddressPrefix,
+    juniDhcpv6LocalServerBindingsLength        Integer32,
+    juniDhcpv6LocalServerBindingsClientDuid    OCTET STRING,
+    juniDhcpv6LocalServerBindingsInfinite      TruthValue,
+    juniDhcpv6LocalServerBindingsExpireTime    TimeInterval,
+    juniDhcpv6LocalServerBindingsIf            OCTET STRING}
+
+juniDhcpv6LocalServerBindingsPrefix OBJECT-TYPE
+    SYNTAX      Ipv6AddressPrefix
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address associated with this entry in the bindings table."
+    ::= { juniDhcpv6LocalServerBindingsEntry 1 }
+
+juniDhcpv6LocalServerBindingsLength OBJECT-TYPE
+    SYNTAX      Integer32 (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address associated with this entry in the bindings table."
+    ::= { juniDhcpv6LocalServerBindingsEntry 2 }
+
+juniDhcpv6LocalServerBindingsClientDuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..130))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The client OUID associated with this entry in the bindings table and
+        corresponding to the IP Address denoted by the table index."
+    ::= { juniDhcpv6LocalServerBindingsEntry 3 }
+
+juniDhcpv6LocalServerBindingsInfinite OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, then this binding will be maintained indefinitely.  If false,
+        then this binding will expire in accordance with the value of
+        juniDhcpv6LocalServerBindingsExpireTime."
+    ::= { juniDhcpv6LocalServerBindingsEntry 4 }
+
+juniDhcpv6LocalServerBindingsExpireTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If juniDhcpv6LocalServerBindingsInfinite is false, then this is the
+        time remaining prior to expiration of the address binding associated
+        with this entry."
+    ::= { juniDhcpv6LocalServerBindingsEntry 5 }
+
+juniDhcpv6LocalServerBindingsIf OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface associated with this entry in the bindings table and
+        corresponding to the IP Address denoted by the table index."
+    ::= { juniDhcpv6LocalServerBindingsEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCPv6 Local Server Attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpv6LocalServerAttributesMode OBJECT-TYPE
+    SYNTAX      JuniDhcpv6LocalServerModeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An object representing the mode in which the DHCPv6 Local Server is
+        operating."
+    ::= { juniDhcpv6LocalServerAttributes 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpv6MIBConformance
+             OBJECT IDENTIFIER ::= { juniDhcpv6MIB 2 }
+juniDhcpv6MIBCompliances
+             OBJECT IDENTIFIER ::= { juniDhcpv6MIBConformance 1 }
+juniDhcpv6MIBGroups
+             OBJECT IDENTIFIER ::= { juniDhcpv6MIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniDhcpv6Compliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting DHCPv6."
+    MODULE  -- this module
+        GROUP juniDhcpv6LocalServerGroup
+            DESCRIPTION
+                "The DHCPv6 Local Server group is mandatory for systems
+                supporting DHCPv6 Local Servers."
+    ::= { juniDhcpv6MIBCompliances 1 }                             -- JUNOSe 5.1
+
+
+--
+-- units of conformance
+--
+juniDhcpv6LocalServerGroup  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpv6LocalServerMemUsage,
+        juniDhcpv6LocalServerNumBindings,
+        juniDhcpv6LocalServerRxSolicits,
+        juniDhcpv6LocalServerRxAccepts,
+        juniDhcpv6LocalServerRxRenews,
+        juniDhcpv6LocalServerRxDeclines,
+        juniDhcpv6LocalServerRxReleases,
+        juniDhcpv6LocalServerRxInforms,
+        juniDhcpv6LocalServerRxConfirms,
+        juniDhcpv6LocalServerRxRebinds,
+        juniDhcpv6LocalServerTxReconfigures,
+        juniDhcpv6LocalServerTxAdvertises,
+        juniDhcpv6LocalServerTxSuccessfulReplies,
+        juniDhcpv6LocalServerTxFailedReplies,
+        juniDhcpv6LocalServerUnknownMessages,
+        juniDhcpv6LocalServerBadMessages,
+        juniDhcpv6LocalServerPacketsIn,
+        juniDhcpv6LocalServerPacketsOut,
+        juniDhcpv6LocalServerBindingsClientDuid,
+        juniDhcpv6LocalServerBindingsInfinite,
+        juniDhcpv6LocalServerBindingsExpireTime,
+        juniDhcpv6LocalServerBindingsIf,
+        juniDhcpv6LocalServerAttributesMode }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of DHCPv6 Local
+        Server functionality."
+    ::= { juniDhcpv6MIBGroups 1 }                                  -- JUNOSe 5.1
+
+END

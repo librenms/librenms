@@ -1,0 +1,168 @@
+ENTERASYS-IETF-P-BRIDGE-MIB-EXT-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-ietf-p-bridge-mib-ext-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' IETF P-BRIDGE-MIB extension MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright December, 2002 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    dot1dBasePortEntry
+        FROM BRIDGE-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysIetfpBridgeMibExtMIB MODULE-IDENTITY
+    LAST-UPDATED "200212202216Z"  -- Fri Dec 20 22:16 GMT 2002
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+    "Postal: Enterasys Networks
+             35 Industrial Way, P.O. Box 5005
+             Rochester, NH 03867-0505
+
+     Phone:  +1 603 332 9400
+     E-mail: support@enterasys.com
+     WWW:    http://www.enterasys.com"
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         Enterasys Networks' enterprise OID pertaining to proprietary
+         extensions to the IETF P-BRIDGE-MIB as specified in RFC2674."
+
+    REVISION "200212202216Z"  -- Fri Dec 20 22:16 GMT 2002
+    DESCRIPTION
+        "The initial version of this MIB module"
+
+    ::= { etsysModules 33 } 
+
+etsysIetfpBridgeMibExt
+    OBJECT IDENTIFIER ::= { etsysIetfpBridgeMibExtMIB 1 }
+
+
+-- ---------------------------------------------------------- --
+-- branches in the ENTERASYS-IETF-P-BRIDGE-MIB-EXT-MIB
+-- ---------------------------------------------------------- --
+
+etsysDot1dPriority
+    OBJECT IDENTIFIER ::= { etsysIetfpBridgeMibExt 1 }
+
+
+-- ---------------------------------------------------------- --
+-- Extensions to the Port Priority Table
+-- ---------------------------------------------------------- --
+
+etsysDot1dPortPriorityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysDot1dPortPriorityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Extensions to the table that contains information about
+         every port that is associated with this transparent bridge."
+    ::= { etsysDot1dPriority 1 }
+
+etsysDot1dPortPriorityEntry OBJECT-TYPE
+    SYNTAX      EtsysDot1dPortPriorityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of extensions that support the management of
+         proprietary features for each port of a transparent
+         bridge.  This is indexed by dot1dBasePort."
+    AUGMENTS { dot1dBasePortEntry }
+    ::= { etsysDot1dPortPriorityTable 1 }
+
+EtsysDot1dPortPriorityEntry ::=
+    SEQUENCE { 
+        etsysDot1dPortPriorityRewrite    INTEGER
+    }
+
+etsysDot1dPortPriorityRewrite   OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enabled/disabled status of the rewriting of the 802.1P
+         priority in tagged frames on the port."
+    DEFVAL { disabled }
+    ::= { etsysDot1dPortPriorityEntry 1 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysIetfpBridgeConformance
+    OBJECT IDENTIFIER ::= { etsysIetfpBridgeMibExtMIB 2 }
+
+etsysIetfpBridgeGroups
+    OBJECT IDENTIFIER ::= { etsysIetfpBridgeConformance 1 }
+
+etsysIetfpBridgeCompliances
+    OBJECT IDENTIFIER ::= { etsysIetfpBridgeConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysDot1dPriorityRewriteGroup OBJECT-GROUP
+    OBJECTS {
+        etsysDot1dPortPriorityRewrite
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects relating to the User Priority
+        applicable to each port."
+    ::= { etsysIetfpBridgeGroups 1 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysIetfpBridgeCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         IETF P-BRIDGE-MIB Extension MIB."
+
+    MODULE
+
+        GROUP       etsysDot1dPriorityRewriteGroup
+        DESCRIPTION
+            "Support for this group is optional and only applies
+             to products that wish to allow the rewriting of the
+             802.1P priority in tagged frames."
+
+    ::= { etsysIetfpBridgeCompliances 1 }
+
+END

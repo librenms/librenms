@@ -1,0 +1,453 @@
+--
+-- Juniper Enterprise Specific MIB: Passive Monitoring MIB
+-- 
+-- Copyright (c) 2002-2003, 2006, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-PMon-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64, Counter32, Gauge32, TimeTicks,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DateAndTime, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ifIndex, ifDescr
+        FROM IF-MIB
+    jnxMibs, jnxPMonNotifications
+        FROM JUNIPER-SMI;
+
+jnxPMon  MODULE-IDENTITY
+    LAST-UPDATED "200307182153Z" -- Fri Jul 18 21:53:57 2003 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise
+	     specific MIB for Passive Monitoring PIC"
+
+    -- revision history
+    REVISION "200206050000Z"    -- 5 June, 2002
+    DESCRIPTION
+            "Added Passive Monitoring PIC stats."
+
+    REVISION "200208270000Z"    -- 27 August, 2002
+    DESCRIPTION
+            "jnxPMonCurrentActiveFlows, jnxPMonTenSecondAvyyerageFlowPackets,
+             jnxPMonTenSecondAverageFlowBytes, jnxPMonAllocPerSecond, 
+             jnxPMonFreePerSecond, jnxPMonTotalMemoryUsed, 
+             jnxPMonTotalMemoryFree: change type Counter32 to Gauge32"
+
+    REVISION "200209090000Z"    -- 9 Sept, 2002
+    DESCRIPTION
+            "Added overload notifications and objects to jnxPMonErrorTable."
+
+    ::= { jnxMibs 19 }
+
+JnxPMonOverloadId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Identifies specific overload conditions that may exist on an
+             interface."
+    SYNTAX   BITS {
+                 pmonMemOverload(0),    -- Memory overload
+                 pmonPpsOverload(1),    -- Packets per second overload
+                 pmonBpsOverload(2),    -- Bits per second overload
+                 pmonMemWarning(3)      -- Memory warning
+             }
+
+-- Passive Monitoring Flow Table
+
+-- Passive Monitoring Flow Table contains flow information on the entity's
+-- management PIC.
+
+    jnxPMonFlowTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxPMonFlowEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                  "a list of flow entry for Passive Monitoring PIC"
+        ::= { jnxPMon 1 }
+
+    jnxPMonFlowEntry OBJECT-TYPE
+        SYNTAX     JnxPMonFlowEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "An entry containing management information applicable to a
+            particular monitor interfaces."
+        INDEX   { ifIndex }
+        ::= { jnxPMonFlowTable 1 }
+
+    JnxPMonFlowEntry ::=
+        SEQUENCE {
+            jnxPMonCurrentActiveFlows           Gauge32,
+            jnxPMonTotalFlows                   Counter32,
+            jnxPMonTotalFlowsPackets            Counter64,
+            jnxPMonTenSecondAverageFlowPackets  Gauge32,
+            jnxPMonTotalFlowsBytes              Counter64,
+            jnxPMonTenSecondAverageFlowBytes    Gauge32,
+            jnxPMonTotalFlowsExpired            Counter32,
+            jnxPMonTotalFlowsAged               Counter32,
+            jnxPMonTotalFlowsExported           Counter32,
+            jnxPMonTotalFlowsPacketsExported    Counter32
+        }
+
+    jnxPMonCurrentActiveFlows OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of flows currently active."
+        ::= { jnxPMonFlowEntry 1 }
+
+    jnxPMonTotalFlows OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The cumulative number of total flows."
+        ::= { jnxPMonFlowEntry 2 }
+
+    jnxPMonTotalFlowsPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of total flows packets."
+        ::= { jnxPMonFlowEntry 3 }
+
+    jnxPMonTenSecondAverageFlowPackets OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of flow packets per second in 10 second average."
+        ::= { jnxPMonFlowEntry 4 }
+
+    jnxPMonTotalFlowsBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of total flows bytes."
+        ::= { jnxPMonFlowEntry 5 }
+
+    jnxPMonTenSecondAverageFlowBytes OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of flow bytes per second in 10 second average."
+        ::= { jnxPMonFlowEntry 6 }
+
+    jnxPMonTotalFlowsExpired OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The cumulative number of total flows expired."
+        ::= { jnxPMonFlowEntry 7 }
+
+    jnxPMonTotalFlowsAged OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The cumulative number of total flows aged."
+        ::= { jnxPMonFlowEntry 8 }
+
+    jnxPMonTotalFlowsExported OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The cumulative number of total flows exported."
+        ::= { jnxPMonFlowEntry 9 }
+
+    jnxPMonTotalFlowsPacketsExported OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The cumulative number of total flows packets exported."
+        ::= { jnxPMonFlowEntry 10 }
+
+-- Passive Monitoring Error Table
+
+-- Passive Monitoring Error Table contains error information on the entity's
+-- management PIC.
+
+    jnxPMonErrorTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxPMonErrorEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                  "a list of error entry for Passive Monitoring PIC"
+        ::= { jnxPMon 2 }
+
+    jnxPMonErrorEntry OBJECT-TYPE
+        SYNTAX     JnxPMonErrorEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "An entry containing management information applicable to a
+            particular monitor interfaces."
+        INDEX   { ifIndex }
+        ::= { jnxPMonErrorTable 1 }
+
+    JnxPMonErrorEntry ::=
+        SEQUENCE {
+-- memory error stats
+            jnxPMonFlowAllocFailures           Counter32,
+            jnxPMonFlowFreeFailures            Counter32,
+            jnxPMonFreeListFailures            Counter32,
+-- packet drop error stats
+            jnxPMonNoMemDrops                  Counter64,
+            jnxPMonNotIPDrops                  Counter64,
+            jnxPMonNotIPv4Drops                Counter64,
+            jnxPMonTooSmallDrops               Counter64,
+-- overload data
+            jnxPMonCurrentOverload             JnxPMonOverloadId,
+            jnxPMonLastOverload                JnxPMonOverloadId,
+            jnxPMonLastOverloadTime            TimeTicks,
+            jnxPMonLastOverloadDate            DateAndTime,
+            jnxPMonLastOverloadEvent           INTEGER
+        }
+
+    jnxPMonFlowAllocFailures OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of flow allocation failures."
+        ::= { jnxPMonErrorEntry 1 }
+
+    jnxPMonFlowFreeFailures OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of flow free failures."
+        ::= { jnxPMonErrorEntry 2 }
+
+    jnxPMonFreeListFailures OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of free list failures."
+        ::= { jnxPMonErrorEntry 3 }
+
+    jnxPMonNoMemDrops OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of packet drops due to low/no memory."
+        ::= { jnxPMonErrorEntry 4 }
+
+    jnxPMonNotIPDrops OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of packet drops due to not IP."
+        ::= { jnxPMonErrorEntry 5 }
+
+    jnxPMonNotIPv4Drops OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of packet drops due to not IPv4."
+        ::= { jnxPMonErrorEntry 6 }
+
+    jnxPMonTooSmallDrops OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of packet drops due to too small on header."
+        ::= { jnxPMonErrorEntry 7 }
+
+    jnxPMonCurrentOverload OBJECT-TYPE
+        SYNTAX      JnxPMonOverloadId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Identifies current overload conditions that exist on this
+                 interface."
+        ::= { jnxPMonErrorEntry 8 }
+
+    jnxPMonLastOverload OBJECT-TYPE
+        SYNTAX      JnxPMonOverloadId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Identifies the last overload condition to change on this
+                 interface."
+        ::= { jnxPMonErrorEntry 9 }
+
+    jnxPMonLastOverloadTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of sysUpTime when the management subsystem last
+                 learned of a change to the overload condition on this
+                 interface."
+        ::= { jnxPMonErrorEntry 10 }
+
+    jnxPMonLastOverloadDate OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The system date and time when the management subsystem last 
+                 learned of a change to the overload condition on this
+                 interface."
+        ::= { jnxPMonErrorEntry 11 }
+
+    jnxPMonLastOverloadEvent OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        none    (1),
+                        set     (2),
+                        cleared (3) 
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "This indicates whether the last overload event set a new
+                 overload condition or cleared an existing condition."
+        ::= { jnxPMonErrorEntry 12 }
+
+
+-- Passive Monitoring Memory Table
+
+-- Passive Monitoring Memory Table contains memory information on the entity's
+-- management PIC.
+
+    jnxPMonMemoryTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxPMonMemoryEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                  "a list of memory entry for Passive Monitoring PIC"
+        ::= { jnxPMon 3 }
+
+
+    jnxPMonMemoryEntry OBJECT-TYPE
+        SYNTAX     JnxPMonMemoryEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "An entry containing management information applicable to a
+            particular monitor interfaces."
+        INDEX   { ifIndex }
+        ::= { jnxPMonMemoryTable 1 }
+
+    JnxPMonMemoryEntry ::=
+        SEQUENCE {
+            jnxPMonFlowTotalAlloc              Counter64,
+            jnxPMonFlowTotalFree               Counter64,
+            jnxPMonFlowMaxAlloc                Counter64,
+            jnxPMonAllocPerSecond              Gauge32,
+            jnxPMonFreePerSecond               Gauge32,
+            jnxPMonTotalMemoryUsed             Gauge32,
+            jnxPMonTotalMemoryFree             Gauge32
+        }
+
+    jnxPMonFlowTotalAlloc OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of flow records allocated."
+        ::= { jnxPMonMemoryEntry 1 }
+
+    jnxPMonFlowTotalFree  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of flow records freed."
+        ::= { jnxPMonMemoryEntry 2 }
+
+    jnxPMonFlowMaxAlloc  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of maximum flow records allocated."
+        ::= { jnxPMonMemoryEntry 3 }
+
+    jnxPMonAllocPerSecond  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of flow records allocated per second."
+        ::= { jnxPMonMemoryEntry 4 }
+
+    jnxPMonFreePerSecond  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of flow records freed per second."
+        ::= { jnxPMonMemoryEntry 5 }
+
+    jnxPMonTotalMemoryUsed  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The total amount of memory currently used in KBbytes."
+        ::= { jnxPMonMemoryEntry 6 }
+
+    jnxPMonTotalMemoryFree  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The total amount of memory currently freed in KBbytes."
+        ::= { jnxPMonMemoryEntry 7 }
+
+--
+-- Passive Monitoring Notifications
+--
+
+jnxPMonNotificationPrefix   OBJECT IDENTIFIER ::= { jnxPMonNotifications 0 }
+
+jnxPMonOverloadSet NOTIFICATION-TYPE
+       OBJECTS { ifDescr,
+                 jnxPMonLastOverload, 
+                 jnxPMonCurrentOverload,
+		 jnxPMonLastOverloadDate }
+       STATUS  current
+       DESCRIPTION
+                "Notification of a new overload condition on a Passive 
+                 Monitoring interface."
+       ::= { jnxPMonNotificationPrefix 1 }
+
+jnxPMonOverloadCleared NOTIFICATION-TYPE
+       OBJECTS { ifDescr,
+                 jnxPMonLastOverload, 
+                 jnxPMonCurrentOverload,
+		 jnxPMonLastOverloadDate }
+       STATUS  current
+       DESCRIPTION
+                "Notification of a cleared overload condition on a Passive 
+                 Monitoring interface."
+       ::= { jnxPMonNotificationPrefix 2 }
+
+END

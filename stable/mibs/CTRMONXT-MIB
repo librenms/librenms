@@ -1,0 +1,477 @@
+CTRMONXT-MIB DEFINITIONS ::= BEGIN        
+
+        --  ctrmon-ext (Net Monitoring (Discovery) Group)
+        --  Revision: 1.01.00
+        --  Part Number:  2170560
+        --  Date:     August 14, 1995
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for part
+        --  of the naming tree below:
+        --
+        --              cabletron { enterprises 52 }
+        --
+        --  This module will be extended, as additional sub-sections
+        --  of this naming tree are defined.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+
+
+
+
+--                  Cabletron Systems Inc.
+
+
+
+
+-- 1.  Status of this Memo
+
+-- This draft document is an internal Cabletron document
+-- for experimental use.  Please send comments to the Bill 
+-- Fardy (fardy@ctron.com) or Jason Nyberg (nyberg@ctron.com).
+
+
+-- 2.  Abstract
+
+-- This memo defines a entrprise specific, Cabletron extensions
+-- to the RMON MIB (RFC 1271) use with network management
+-- protocols in TCP/IP-based internets.  In particular, it
+-- defines objects for managing remote network monitoring
+-- devices tha tare not already identified in RFC1271.
+
+
+-- 3  Format of Definitions
+
+-- Section 7 contains the specification of all object types
+-- contained in this MIB module.  The object types are defined
+-- using the conventions defined in the SMI, as amended by the
+-- extensions specified in [9,10].
+
+-- 4.  Overview
+
+-- RFC 1271 described a set of objects that would provide information
+-- that would help a manager identify the performance and behavior
+-- of a network segment.  This document extends that by specifying
+-- more specific objects that allow even greater detail into the
+-- performance and behavior of a network segment.  Unless specified, 
+-- these extensions do not require the objects in the RMON MIB
+-- to be present.
+-- 
+-- 
+-- 5.  Structure of MIB
+
+-- The objects are arranged into the following groups:
+
+--         - Discovery
+
+--   These groups are the basic unit of conformance.  If a remote
+-- monitoring device implements a group, then it must implement
+-- all objects in that group.
+
+-- All groups in this MIB are optional.  Implementations of this
+-- MIB must also implement the system and interfaces group of
+-- MIB-II [6].  MIB-II may also mandate the implementation of
+-- additional groups.
+
+-- These groups are defined to provide a means of assigning
+-- object identifiers, and to provide a method for managed agents
+-- to know which objects they must implement.
+
+-- 5.1.  The Discovery Group
+
+-- The Discovery Group contains information statistics measured by
+-- the probe for each monitored interface on this device.  This group
+-- currently consists of the ctDiscoveryTable that is intended for
+-- discovery purposes.  In the future it may be expanded.
+-- 
+-- 7.  Definitions
+
+  
+ -- This module defines extensions to the RMON MIB (RFC1271)
+ -- These cabletron xtensions are proprietary
+      IMPORTS
+          TimeTicks                     FROM RFC1155-SMI
+          ctronRmon                     FROM CTRON-MIB-NAMES
+          OBJECT-TYPE                 FROM RFC-1212 
+          OwnerString,EntryStatus    FROM RMON-MIB;
+ -- This MIB module uses the extended OBJECT-TYPE macro as defined 
+ -- in RFC 1212
+
+ ctDiscovery    OBJECT IDENTIFIER ::= { ctronRmon 20 }
+
+ -- The RMON Discovery Group
+ -- This group is used to implement discovery in the agent.
+ -- It does this by mapping mac address to Network address
+ -- and vice versa per interface.
+ -- It is best thought of as one physical table with 
+ -- four???? logical representations.
+ -- Implemetation of this group is optional
+ -- Place holder for various protocol suites    
+
+ -- First pass we identify IP, Netware (IPX) and DecNet (Phase IV) 
+ctDiscoveryProtocol  OBJECT IDENTIFIER    ::= { ctDiscovery 1 }
+ctProtIP             OBJECT IDENTIFIER    ::= { ctDiscoveryProtocol 1 }
+ctProtNetware        OBJECT IDENTIFIER    ::= { ctDiscoveryProtocol 2 }
+ctProtDecNet         OBJECT IDENTIFIER    ::= { ctDiscoveryProtocol 3 }
+
+ctDiscoveryControlTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CtDiscoveryControlEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+            "A list of Discovery Control Entries."
+    ::= { ctDiscovery 2 }
+
+ctDiscoveryControlEntry OBJECT-TYPE
+    SYNTAX     CtDiscoveryControlEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+        "A list of parameters that set up the discovery 
+        of devices by mac address, network address, protocol
+        mapping and the interface they appear on."
+    INDEX { ctDiscoveryControlIndex }
+    ::= { ctDiscoveryControlTable 1 }
+
+CtDiscoveryControlEntry ::= SEQUENCE  {
+    ctDiscoveryControlIndex          INTEGER (1..65535),
+    ctDiscoveryControlDataSource     OBJECT IDENTIFIER,
+    ctDiscoveryControlProtocol        OBJECT IDENTIFIER,
+    ctDiscoveryControlTableSize      INTEGER,
+    ctDiscoveryControlAgeInterval     INTEGER,
+    ctDiscoveryControlLastDeleteTime TimeTicks,
+    ctDiscoveryControlOwner          OwnerString,
+    ctDiscoveryControlStatus         EntryStatus
+    }
+
+ctDiscoveryControlIndex         OBJECT-TYPE
+    SYNTAX     INTEGER (1..65535)
+    ACCESS     read-only                STATUS     mandatory
+    DESCRIPTION
+        "An index that uniquely identifies an entry in
+        the ctDiscoveryControl table.  Each entry identifies a 
+        function that will discover relationships between
+        MAC and Network layer addresses on a particular
+        interface and of a particular protocol. Information
+        about these relationships will be placed in the
+        ctDiscoveryMediaToNetTable and the ctDiscoveryNetToMedia
+        table."
+    ::= { ctDiscoveryControlEntry 1 }
+
+ctDiscoveryControlDataSource    OBJECT-TYPE
+    SYNTAX     OBJECT IDENTIFIER
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+        "This object identifies the source of
+        the data from which this entry creates address relationships.
+        This source can be any interface on this device.  In
+        order to identify a particular interface, this object
+        shall identify the instance of the ifIndex object,
+        defined in [4,6], for the desired interface.  For
+        example, if an entry were to receive data from
+        interface #1, this object would be set to ifIndex.1.
+
+        The statistics in this group reflect all packets
+        on the local network segment attached to the
+        identified interface.
+
+        This object may not be modified if the associated
+        ctDiscoveryControlStatus object is equal to valid(1)."
+    ::= { ctDiscoveryControlEntry 2  }
+
+ctDiscoveryControlProtocol    OBJECT-TYPE
+    SYNTAX     OBJECT IDENTIFIER
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+        "This object identifies the protocol suite, and 
+        hence the type of network addresses in the tables, for 
+        the table associated with this control index..  NOTE:
+        In this table, this value applies only to the network
+        layer of the packet."
+    ::= { ctDiscoveryControlEntry 3  }
+
+ctDiscoveryControlTableSize    OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The number of ctDiscoveryMediaToNetEntries in
+        the ctDiscoveryMediaToNetTable
+        associated with this ctDiscoveryControlTable.
+        This must also be the number of entries in the
+        ctDiscoveryNetToMediaTable for this
+        ctDiscoveryControlTable."
+    ::= { ctDiscoveryControlEntry 4 }
+
+ctDiscoveryControlLastDeleteTime        OBJECT-TYPE
+    SYNTAX     TimeTicks
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The value of sysUpTime when the last entry
+        was deleted from the ctDiscoveryMediaToNetTable
+        associated with this ctDiscoveryControlEntry."
+    ::= { ctDiscoveryControlEntry 5 }
+
+ctDiscoveryControlAgeInterval    OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-write
+    STATUS     mandatory    
+    DESCRIPTION
+        "The minimum amount of idle time that will be allowed
+        for an entry before it may be deleted from the table
+        by the agent.
+        The aging routine is not required to run every second."
+    ::= { ctDiscoveryControlEntry 6 }
+
+ctDiscoveryControlOwner        OBJECT-TYPE
+    SYNTAX     OwnerString
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+        "The entity that configured this entry and is 
+        therefore using the resources assigned to it."
+    ::= { ctDiscoveryControlEntry 7  }
+
+ctDiscoveryControlStatus        OBJECT-TYPE
+    SYNTAX     EntryStatus
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+        "The status of this ctDiscoveryControl Entry."
+    ::= { ctDiscoveryControlEntry 8  }
+
+
+
+ctDiscoveryMNTable        OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CtDiscoveryMNEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+        "A list of ctDiscoveryMNEntries."
+    ::= { ctDiscovery  3 }
+
+ctDiscoveryMNEntry            OBJECT-TYPE
+    SYNTAX     CtDiscoveryMNEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+        "A MAC/Network address assocaition."
+    INDEX { ctDiscoveryMNIndex, ctDiscoveryMNMACAddress,
+            ctDiscoveryMNNetworkAddress }  
+    ::= { ctDiscoveryMNTable 1 }
+
+CtDiscoveryMNEntry ::= SEQUENCE  {
+    ctDiscoveryMNMACAddress        OCTET STRING,
+    ctDiscoveryMNNetworkAddress    OCTET STRING,
+    ctDiscoveryMNIndex            INTEGER (1..65535), 
+    ctDiscoveryMNCreationTime        TimeTicks,
+    ctDiscoveryMNLastTransmitTime    TimeTicks,
+    ctDiscoveryMNBoard            INTEGER,
+    ctDiscoveryMNPort                INTEGER
+    } 
+
+ctDiscoveryMNMACAddress    OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The MAC layer address of this MAC/Network
+        association"
+    ::= { ctDiscoveryMNEntry 1 }
+
+ctDiscoveryMNNetworkAddress     OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The network layer address of this MAC/Network
+        association."
+    ::= { ctDiscoveryMNEntry 2 }
+
+ctDiscoveryMNIndex    OBJECT-TYPE
+    SYNTAX     INTEGER (1..65535)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "An index that defines the set of collected 
+        ctDiscoveryMNEntries of which this entry is part.
+        The set of MAC/Network associations identified by a
+        particular value of this index is associated with
+        the ctDiscoveryControlEntry with the same index."
+    ::= { ctDiscoveryMNEntry 3 }
+
+ctDiscoveryMNCreationTime    OBJECT-TYPE
+    SYNTAX        TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "The value of SysUpTime when an error free frame
+        with this source MAC/Network address association
+        was detected, and an entry with a corresponding
+        association was not present in the ctDiscoveryMNTable."
+    ::= { ctDiscoveryMNEntry 4 }            
+
+ctDiscoveryMNLastTransmitTime        OBJECT-TYPE
+    SYNTAX        TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "The value of SysUpTime when this entry was last
+        updated.  This time correponds to the last time that
+        a frame with the source MAC/Network association of
+        this dicovery entry was detected.
+        This object is useful in that the management station 
+        can    compute idle time by the difference between this 
+        value and current sysUpTime."
+    ::= { ctDiscoveryMNEntry 5 }    
+
+ctDiscoveryMNBoard        OBJECT-TYPE
+    SYNTAX        INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "The index of the board that this MAC/Network
+        association was last seen on.  A value of zero
+        indicates that this information was not available."
+    ::= { ctDiscoveryMNEntry 6 }    
+
+ctDiscoveryMNPort        OBJECT-TYPE
+    SYNTAX        INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "The index of the port that this MAC/Network
+        association was last seen on.  A value of zero
+        indicates that this information was not available."
+    ::= { ctDiscoveryMNEntry 7 }    
+
+ctDiscoveryNMTable            OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CtDiscoveryNMEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "A list of ctDiscoveryNMEntries."
+    ::= { ctDiscovery  4 }
+
+ctDiscoveryNMEntry            OBJECT-TYPE
+    SYNTAX     CtDiscoveryNMEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+        "A MAC/Network address assocaition."
+    INDEX { ctDiscoveryNMIndex, ctDiscoveryNMNetworkAddress,
+            ctDiscoveryNMMACAddress } 
+    ::= { ctDiscoveryNMTable 1 }
+
+CtDiscoveryNMEntry ::= SEQUENCE  {
+    ctDiscoveryNMNetworkAddress            OCTET STRING,
+    ctDiscoveryNMMACAddress            OCTET STRING,
+    ctDiscoveryNMIndex                INTEGER (1..65535), 
+    ctDiscoveryNMCreationTime        TimeTicks,
+    ctDiscoveryNMLastTransmitTime    TimeTicks,
+    ctDiscoveryNMBoard                INTEGER,
+    ctDiscoveryNMPort                INTEGER
+    } 
+
+ctDiscoveryNMNetworkAddress    OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The Network layer address of this MAC/Network
+        association"
+    ::= { ctDiscoveryNMEntry 1 }
+
+ctDiscoveryNMMACAddress     OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The MAC layer address of this MAC/Network
+        association"
+    ::= { ctDiscoveryNMEntry 2 }
+
+ctDiscoveryNMIndex    OBJECT-TYPE
+    SYNTAX     INTEGER (1..65535)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "An index that defines the set of collected 
+        ctDiscoveryNMEntries of which this entry is part.
+        The set of MAC/Network associations identified by a
+        particular value of this index is associated with
+        the ctDiscoveryControlEntry with the same index."
+    ::= { ctDiscoveryNMEntry 3 }
+
+ ctDiscoveryNMCreationTime  OBJECT-TYPE
+     SYNTAX      TimeTicks
+     ACCESS      read-only
+     STATUS      mandatory
+     DESCRIPTION
+         "The value of SysUpTime when an error free frame
+         with this source MAC/Network address association
+         was detected, and an entry with a corresponding
+         association was not present in the ctDiscoveryNMTable."
+     ::= { ctDiscoveryNMEntry 4 }
+
+ ctDiscoveryNMLastTransmitTime      OBJECT-TYPE
+     SYNTAX      TimeTicks
+     ACCESS      read-only
+     STATUS      mandatory
+     DESCRIPTION
+         "The value of SysUpTime when this entry was last
+         updated.  This time correponds to the last time that
+         a frame with the source MAC/Network association of
+         this dicovery entry was detected.
+         This object is useful in that the management station 
+         can    compute idle time by the difference between this 
+         value and current sysUpTime."
+    ::= { ctDiscoveryNMEntry 5 }
+
+ctDiscoveryNMBoard        OBJECT-TYPE
+    SYNTAX        INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "The index of the board that this MAC/Network
+        association was last seen on.  A value of zero
+        indicates that this information was not available."
+    ::= { ctDiscoveryNMEntry 6 }    
+
+ctDiscoveryNMPort        OBJECT-TYPE
+    SYNTAX        INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "The index of the port that this MAC/Network
+        association was last seen on.  A value of zero
+        indicates that this information was not available."
+    ::= { ctDiscoveryNMEntry 7 }    
+
+END

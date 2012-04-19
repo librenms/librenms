@@ -1,0 +1,397 @@
+-- ArubaOS 3.2.0.0_16376
+-- vim:set ts=4 sw=4:
+WLSX-AUTH-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION,
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+		wlsxEnterpriseMibModules
+			FROM ARUBA-MIB
+
+	   ArubaEnableValue,
+	   ArubaAuthenticationMethods,
+	   ArubaEncryptionMethods,
+	   ArubaHashAlgorithms,
+	   ArubaAuthServerType
+	   		FROM ARUBA-TC;
+
+   wlsxAuthMIB MODULE-IDENTITY 
+       LAST-UPDATED "0601221834Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089	
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide
+            information about the authentication servers known to an 
+			Aruba controller."
+       REVISION        "0601221834Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 8 }
+
+   wlsxAuthenticationServerGroup     	OBJECT IDENTIFIER ::= { wlsxAuthMIB 1 }
+   wlsxAuthenticationInfoGroup     	OBJECT IDENTIFIER ::= { wlsxAuthMIB 2 }
+   wlsxAuthenticationGroup     	OBJECT IDENTIFIER ::= { wlsxAuthMIB 3 }
+
+-- wlsxAuthenticationServerGroup contains information about the authentication
+-- servers in the controller.
+
+   wlsxAuthenticationServerTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxAuthenticationServerEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists all the authentication servers currently
+			configured in the controller. Servers are identified by name.
+		"
+	
+      ::= { wlsxAuthenticationServerGroup 1 } 
+
+   wlsxAuthenticationServerEntry OBJECT-TYPE 
+	  SYNTAX       WlsxAuthenticationServerEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Server entry"
+	  INDEX { authServerName }
+      ::= { wlsxAuthenticationServerTable 1 } 
+
+   WlsxAuthenticationServerEntry ::=
+     SEQUENCE {
+
+		authServerName 					DisplayString,
+		authServerType					ArubaAuthServerType,
+		authServerAddress				IpAddress,
+		authServerPort					Integer32,
+		authServerRetryCount			Integer32,
+		authServerTimeOutValue			Integer32,
+		authServerState					ArubaEnableValue,
+		authServerInservice				TruthValue,
+		authServerUsageCount			Counter32,
+		authServerSuccessfullAuths		Counter32,
+		authServerFailedAuths			Counter32,
+		authServerTimeouts				Counter32,
+		authServerAvgResponseTime		Integer32,
+		authServerOutStandingRequests	Integer32,
+		authServerUptime				Integer32
+
+     }
+
+    authServerName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			The name of the authentication server.
+            "
+        ::= { wlsxAuthenticationServerEntry 1 }
+
+    authServerType OBJECT-TYPE
+         SYNTAX       ArubaAuthServerType
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The type of the authentication server.
+            "
+        ::= { wlsxAuthenticationServerEntry 2 }
+
+    authServerAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-create
+         STATUS       current
+         DESCRIPTION
+            "
+			The IP address of the authentication server.
+            "
+        ::= { wlsxAuthenticationServerEntry 3 }
+
+    authServerPort OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-create
+         STATUS       current
+         DESCRIPTION
+            "
+			The transport layer port of the authentication server.
+            "
+        ::= { wlsxAuthenticationServerEntry 4 }
+
+    authServerRetryCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-create
+         STATUS       current
+         DESCRIPTION
+            "
+			The configured retry count.
+            "
+        ::= { wlsxAuthenticationServerEntry 5 }
+
+    authServerTimeOutValue OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-create
+         STATUS       current
+         DESCRIPTION
+            "
+			The configured timeout value.
+            "
+        ::= { wlsxAuthenticationServerEntry 6 }
+
+    authServerState OBJECT-TYPE
+         SYNTAX       ArubaEnableValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The state of the authentication server.
+            "
+        ::= { wlsxAuthenticationServerEntry 7 }
+
+    authServerInservice OBJECT-TYPE
+         SYNTAX       TruthValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			An indication of whether or not the authentication server is
+			 in service.
+            "
+        ::= { wlsxAuthenticationServerEntry 8 }
+
+    authServerUsageCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of times this server was queried.
+            "
+        ::= { wlsxAuthenticationServerEntry 9 }
+
+    authServerSuccessfullAuths OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of times this server responded with success.
+            "
+        ::= { wlsxAuthenticationServerEntry 10 }
+
+    authServerFailedAuths OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of times this server responded with failure.
+            "
+        ::= { wlsxAuthenticationServerEntry 11 }
+
+    authServerTimeouts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of times this communication with this server timed out.
+            "
+        ::= { wlsxAuthenticationServerEntry 12 }
+
+    authServerAvgResponseTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The average response time of the server in milliseconds.
+            "
+        ::= { wlsxAuthenticationServerEntry 13 }
+
+    authServerOutStandingRequests OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of requests currently outstanding to this server.
+            "
+        ::= { wlsxAuthenticationServerEntry 14 }
+
+    authServerUptime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The time since the server went into service with the controller.
+            "
+        ::= { wlsxAuthenticationServerEntry 15 }
+
+   wlsxPortalServerTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxPortalServerEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists configured captive portal servers.
+		"
+	
+      ::= { wlsxAuthenticationServerGroup 2 } 
+
+   wlsxPortalServerEntry OBJECT-TYPE 
+	  SYNTAX       WlsxPortalServerEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Portal Server Entry"
+	  INDEX { portalServerIndex }
+      ::= { wlsxPortalServerTable 1 } 
+
+   WlsxPortalServerEntry ::=
+     SEQUENCE {
+		portalServerIndex 				DisplayString,
+		portalServerHost 				DisplayString,
+		portalServerPort 				Integer32,
+		portalServerPage 				DisplayString,
+		portalServerProtocol			DisplayString
+     }
+
+    portalServerIndex OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..256))
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+            "
+        ::= { wlsxPortalServerEntry 1 }
+
+    portalServerHost OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..256))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The IP address of the portal server.
+            "
+        ::= { wlsxPortalServerEntry 2 }
+
+    portalServerPort OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The transport layer port of the portal server.
+            "
+        ::= { wlsxPortalServerEntry 3 }
+
+    portalServerPage OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..256))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The portal server URL
+            "
+        ::= { wlsxPortalServerEntry 4 }
+
+    portalServerProtocol OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The portal server protocol (e.g. HTTP or HTTPS)
+            "
+        ::= { wlsxPortalServerEntry 5 }
+
+   -- LDAP Server Specific State
+
+   wlsxLdapServerStateTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxLdapServerStateEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+		"
+      ::= { wlsxAuthenticationServerGroup 5 } 
+
+   wlsxLdapServerStateEntry OBJECT-TYPE 
+	  SYNTAX       WlsxLdapServerStateEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "LDAP Server Entry"
+	  INDEX { authServerName }
+      ::= { wlsxLdapServerStateTable 1 } 
+
+   WlsxLdapServerStateEntry ::=
+     SEQUENCE {
+	 	ldapInitDone				TruthValue,
+		ldapAdminBound				INTEGER,
+		ldapReBindCount				Counter32
+
+     }
+
+    ldapInitDone OBJECT-TYPE
+         SYNTAX       TruthValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates whether the controller is initialized with the server.
+            "
+        ::= { wlsxLdapServerStateEntry 1 }
+
+    ldapAdminBound OBJECT-TYPE
+         SYNTAX       INTEGER{
+		 				no(1),
+						yes(2),
+						inProgress(3)
+		 			  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates whether the controller is bound to the server.
+            "
+        ::= { wlsxLdapServerStateEntry 2 }
+
+    ldapReBindCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of times that the controller re-bound with the server.
+            "
+        ::= { wlsxLdapServerStateEntry 3 }
+
+END

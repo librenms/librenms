@@ -1,0 +1,926 @@
+
+-- *****************************************************************************
+-- Juniper-IKE-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Extensions for Internet Key Exchange management
+--
+-- Copyright (c) 2004 Juniper Networks, Inc.  All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-IKE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress,  Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniIkeMIB  MODULE-IDENTITY
+    LAST-UPDATED "200404062226Z"  -- 06-Apr-04 06:26 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Internet Key Exchange (IKE) MIB for the Juniper Networks
+        enterprise."
+    -- Revision History
+    REVISION    "200511221615Z"  -- 22-Nov-05 11:15 AM EST  - JUNOSe 7.3
+    DESCRIPTION
+        "Replaced the juniIkePolicyRuleTable with the juniIkePolicyRuleV2Table.
+        Added ip address and router index.  Added more options to the 
+        agressive mode."
+    REVISION    "200401231512Z"  -- 23-Jan-04 10:12 AM EST  - JUNOSe 6.0
+    DESCRIPTION
+        "Replaced the juniIkeSaTable with the juniIkeSa2Table.
+         Added local and remote IKE cookies to the IKE SA2 table.
+         Added local port, remote port, and ikeSaNegotiationDone flag to the IKE
+         SA2 table."
+    REVISION    "200404062226Z"  -- 06-Apr-04 06:26 PM EDT  - JUNOSe 5.3
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 71 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniIkeAuthenticationMethod  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The authentication method for the IKE policy rule."
+    SYNTAX      INTEGER {
+                    rsaSignature(0),
+                    preSharedKeys(3) }
+
+JuniIkeEncryptionMethod  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The encryption method for the IKE policy rule."
+    SYNTAX      INTEGER {
+                    des(0),
+                    tripleDes(1) }
+
+JuniIkeGroup  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The PFS group for the IKE policy rule."
+    SYNTAX      INTEGER {
+                    group1(0),
+                    group2(1),
+                    group5(4) }
+
+JuniIkeHashMethod  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The hash method for the IKE policy rule."
+    SYNTAX      INTEGER {
+                    md5(0),
+                    sha(1) }
+
+JuniIkeNegotiationMode  ::= TEXTUAL-CONVENTION
+    STATUS      obsolete
+    DESCRIPTION
+        "The mode that IKE uses to negotiate its SA."
+    SYNTAX      INTEGER {
+                    aggressive(0),
+                    main(1) }
+                    
+JuniIkeNegotiationV2Mode  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The aggressive mode that IKE uses to negotiate its SA."
+    SYNTAX      INTEGER {
+                    aggressiveAccepted(0),
+                    aggressiveRequested(1),
+                    aggressiveRequired(2),
+                    aggressiveNotAllowed(3) }
+
+JuniIpsecPhase1SaState  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The state for the IKE security association."
+    SYNTAX      INTEGER {
+                    reserved(0),
+                    startSaNegotiationI(1),
+                    startSaNegotiationR(2),
+                    mmSaI(3),
+                    mmSaR(4),
+                    mmKeI(5),
+                    mmKeR(6),
+                    mmFinalI(7),
+                    mmFinalR(8),
+                    mmDoneI(9),
+                    amSaI(10),
+                    amSaR(11),
+                    amFinalI(12),
+                    amDoneR(13),
+                    startQmI(14),
+                    startQmR(15),
+                    qmHashSaI(16),
+                    qmHashSaR(17),
+                    qmHashI(18),
+                    qmDoneR(19),
+                    startNgmI(20),
+                    startNgmR(21),
+                    ngmHashSaI(22),
+                    ngmHashSaR(23),
+                    ngmDoneI(24),
+                    done(25),
+                    deleted(26) }
+
+JuniIpsecPhase1SaDirection  ::= TEXTUAL-CONVENTION
+    STATUS      obsolete
+    DESCRIPTION
+        "The direction for the IPsec phase 1 security association."
+    SYNTAX      INTEGER {
+                    initiator(0),
+                    responder(1) }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIkeObjects  OBJECT IDENTIFIER  ::= { juniIkeMIB 1 }
+
+--
+-- Major subtrees
+--
+juniIke         OBJECT IDENTIFIER  ::= { juniIkeObjects 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IPSEC IKE group
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+--
+--  Obsolete IKE policy rule table
+--
+juniIkePolicyRuleTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIkePolicyRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete IKE policy rule table that stores the IKE policy rule.
+        This table has been replaced by the juniIkePolicyRuleV2Table"
+    ::= { juniIke 1 }
+
+juniIkePolicyRuleEntry  OBJECT-TYPE
+    SYNTAX      JuniIkePolicyRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Describes the IKE policy rule."
+    INDEX     { juniIkePolicyRulePriority }
+    ::= { juniIkePolicyRuleTable 1 }
+
+JuniIkePolicyRuleEntry ::= SEQUENCE {
+    juniIkePolicyRulePriority           Integer32,
+    juniIkePolicyRuleAuthMethod         JuniIkeAuthenticationMethod,
+    juniIkePolicyRuleEncryptMethod      JuniIkeEncryptionMethod,
+    juniIkePolicyRulePfsGroup           JuniIkeGroup,
+    juniIkePolicyRuleHashMethod         JuniIkeHashMethod,
+    juniIkePolicyRuleLifetime           Integer32,
+    juniIkePolicyRuleNegotiationMode    JuniIkeNegotiationMode,
+    juniIkePolicyRuleRowStatus          RowStatus }
+
+juniIkePolicyRulePriority  OBJECT-TYPE
+    SYNTAX      Integer32 (1..10000)
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The priority of the IKE policy rule."
+    ::= { juniIkePolicyRuleEntry 1 }
+
+juniIkePolicyRuleAuthMethod  OBJECT-TYPE
+    SYNTAX      JuniIkeAuthenticationMethod
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The authentication method for the IKE policy rule."
+    DEFVAL    { preSharedKeys }
+    ::= { juniIkePolicyRuleEntry 2 }
+
+juniIkePolicyRuleEncryptMethod  OBJECT-TYPE
+    SYNTAX      JuniIkeEncryptionMethod
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The encryption method for the IKE policy rule."
+    DEFVAL    { tripleDes }
+    ::= { juniIkePolicyRuleEntry 3 }
+
+juniIkePolicyRulePfsGroup  OBJECT-TYPE
+    SYNTAX      JuniIkeGroup
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The PFS group for the IKE policy rule."
+    DEFVAL    { group2 }
+    ::= { juniIkePolicyRuleEntry 4 }
+
+juniIkePolicyRuleHashMethod  OBJECT-TYPE
+    SYNTAX      JuniIkeHashMethod
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The hash method for the IKE policy rule."
+    DEFVAL    { sha }
+    ::= { juniIkePolicyRuleEntry 5 }
+
+juniIkePolicyRuleLifetime  OBJECT-TYPE
+    SYNTAX      Integer32 (60..86400)
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The lifetime in seconds for the IKE policy rule."
+    DEFVAL    { 28800 }
+    ::= { juniIkePolicyRuleEntry 6 }
+
+juniIkePolicyRuleNegotiationMode  OBJECT-TYPE
+    SYNTAX      JuniIkeNegotiationMode
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The negotiation mode for the IKE policy rule."
+    DEFVAL    { aggressive }
+    ::= { juniIkePolicyRuleEntry 7 }
+
+juniIkePolicyRuleRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIkePolicyRulePriority "
+    ::= { juniIkePolicyRuleEntry 8 }
+
+
+--
+--  IKE policy rule table
+--
+juniIkePolicyRuleV2Table  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIkePolicyRuleV2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IKE policy rule table that stores the IKE policy rule."
+    ::= { juniIke 6 }
+
+juniIkePolicyRuleV2Entry  OBJECT-TYPE
+    SYNTAX      JuniIkePolicyRuleV2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the IKE policy rule."
+    INDEX     { juniIkePolicyRuleV2Priority }
+    ::= { juniIkePolicyRuleV2Table 1 }
+
+JuniIkePolicyRuleV2Entry ::= SEQUENCE {
+    juniIkePolicyRuleV2Priority           Integer32,
+    juniIkePolicyRuleV2AuthMethod         JuniIkeAuthenticationMethod,
+    juniIkePolicyRuleV2EncryptMethod      JuniIkeEncryptionMethod,
+    juniIkePolicyRuleV2PfsGroup           JuniIkeGroup,
+    juniIkePolicyRuleV2HashMethod         JuniIkeHashMethod,
+    juniIkePolicyRuleV2Lifetime           Integer32,
+    juniIkePolicyRuleV2NegotiationMode    JuniIkeNegotiationV2Mode,
+    juniIkePolicyRuleV2IpAddress          IpAddress,
+    juniIkePolicyRuleV2RouterIndex        Unsigned32,
+    juniIkePolicyRuleV2RowStatus          RowStatus }
+
+juniIkePolicyRuleV2Priority  OBJECT-TYPE
+    SYNTAX      Integer32 (1..10000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The priority of the IKE policy rule."
+    ::= { juniIkePolicyRuleV2Entry 1 }
+
+juniIkePolicyRuleV2AuthMethod  OBJECT-TYPE
+    SYNTAX      JuniIkeAuthenticationMethod
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The authentication method for the IKE policy rule."
+    DEFVAL    { preSharedKeys }
+    ::= { juniIkePolicyRuleV2Entry 2 }
+
+juniIkePolicyRuleV2EncryptMethod  OBJECT-TYPE
+    SYNTAX      JuniIkeEncryptionMethod
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The encryption method for the IKE policy rule."
+    DEFVAL    { tripleDes }
+    ::= { juniIkePolicyRuleV2Entry 3 }
+
+juniIkePolicyRuleV2PfsGroup  OBJECT-TYPE
+    SYNTAX      JuniIkeGroup
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The PFS group for the IKE policy rule."
+    DEFVAL    { group2 }
+    ::= { juniIkePolicyRuleV2Entry 4 }
+
+juniIkePolicyRuleV2HashMethod  OBJECT-TYPE
+    SYNTAX      JuniIkeHashMethod
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The hash method for the IKE policy rule."
+    DEFVAL    { sha }
+    ::= { juniIkePolicyRuleV2Entry 5 }
+
+juniIkePolicyRuleV2Lifetime  OBJECT-TYPE
+    SYNTAX      Integer32 (60..86400)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The lifetime in seconds for the IKE policy rule."
+    DEFVAL    { 28800 }
+    ::= { juniIkePolicyRuleV2Entry 6 }
+
+juniIkePolicyRuleV2NegotiationMode  OBJECT-TYPE
+    SYNTAX      JuniIkeNegotiationV2Mode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The negotiation mode for the IKE policy rule."
+    DEFVAL    { aggressiveNotAllowed }
+    ::= { juniIkePolicyRuleV2Entry 7 }
+
+juniIkePolicyRuleV2IpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ip address for the IKE policy rule."
+    ::= { juniIkePolicyRuleV2Entry 8 }
+
+juniIkePolicyRuleV2RouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The virtual router for the IKE policy rule."
+    ::= { juniIkePolicyRuleV2Entry 9 }
+
+
+juniIkePolicyRuleV2RowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIkePolicyRuleV2Priority "
+    ::= { juniIkePolicyRuleV2Entry 10 }
+
+
+--
+--  IKE IPv4 based preshared key table
+--
+juniIkeIpv4PresharedKeyTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIkeIpv4PresharedKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IKE preshared key table that stores the IKE pre-share keys indexed
+        by the IP address."
+    ::= { juniIke 2 }
+
+juniIkeIpv4PresharedKeyEntry  OBJECT-TYPE
+    SYNTAX      JuniIkeIpv4PresharedKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the IKE preshared key."
+    INDEX     { juniIkeIpv4PresharedRemoteIpAddr,
+                juniIkeIpv4PresharedRouterIdx }
+    ::= { juniIkeIpv4PresharedKeyTable 1 }
+
+JuniIkeIpv4PresharedKeyEntry ::= SEQUENCE {
+    juniIkeIpv4PresharedRemoteIpAddr    IpAddress,
+    juniIkeIpv4PresharedRouterIdx       Unsigned32,
+    juniIkeIpv4PresharedKeyStr          DisplayString,
+    juniIkeIpv4PresharedMaskedKeyStr    OCTET STRING,
+    juniIkeIpv4PresharedKeyRowStatus    RowStatus }
+
+juniIkeIpv4PresharedRemoteIpAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the remote endpoint for the preshared key."
+    ::= { juniIkeIpv4PresharedKeyEntry 1 }
+
+juniIkeIpv4PresharedRouterIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    REFERENCE
+        "Juniper-ROUTER-MIB"
+    ::= { juniIkeIpv4PresharedKeyEntry 2 }
+
+juniIkeIpv4PresharedKeyStr  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..200))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IKE preshared key string."
+    ::= { juniIkeIpv4PresharedKeyEntry 3 }
+
+juniIkeIpv4PresharedMaskedKeyStr  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..300))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IKE masked preshared key string."
+    ::= { juniIkeIpv4PresharedKeyEntry 4 }
+
+juniIkeIpv4PresharedKeyRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIkeIpv4PresharedKeyRowStatus
+            juniIkeIpv4PresharedRemoteIpAddr
+            juniIkeIpv4PresharedKeyStr
+
+        Once created, the following objects may not be modified:
+            juniIkeIpv4PresharedRemoteIpAddr
+            juniIkeIpv4PresharedMaskedKeyStr "
+    ::= { juniIkeIpv4PresharedKeyEntry 5 }
+
+
+--
+--  IKE FQDN based preshared key table
+--
+juniIkeFqdnPresharedKeyTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIkeFqdnPresharedKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IPSEC preshared key table that stores the IKE pre-share keys
+        indexed by FQDN or userFQDN string."
+    ::= { juniIke 3 }
+
+juniIkeFqdnPresharedKeyEntry  OBJECT-TYPE
+    SYNTAX      JuniIkeFqdnPresharedKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the IKE phase preshared key."
+    INDEX     { juniIkeFqdnPresharedRemote,
+                juniIkeFqdnPresharedRouterIndex }
+    ::= { juniIkeFqdnPresharedKeyTable 1 }
+
+JuniIkeFqdnPresharedKeyEntry ::= SEQUENCE {
+    juniIkeFqdnPresharedRemote          DisplayString,
+    juniIkeFqdnPresharedRouterIndex     Unsigned32,
+    juniIkeFqdnPresharedKeyStr          DisplayString,
+    juniIkeFqdnPresharedMaskedKeyStr    OCTET STRING,
+    juniIkeFqdnPresharedKeyRowStatus    RowStatus }
+
+juniIkeFqdnPresharedRemote  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..80))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The remote FQDN endpoint of the IKE preshared key."
+    ::= { juniIkeFqdnPresharedKeyEntry 1 }
+
+juniIkeFqdnPresharedRouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    ::= { juniIkeFqdnPresharedKeyEntry 2 }
+
+juniIkeFqdnPresharedKeyStr  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..200))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IKE preshared key string."
+    ::= { juniIkeFqdnPresharedKeyEntry 3 }
+
+juniIkeFqdnPresharedMaskedKeyStr  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..300))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IKE masked preshared key string."
+    ::= { juniIkeFqdnPresharedKeyEntry 4 }
+
+juniIkeFqdnPresharedKeyRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpsecIkePresharedKeyRowStatus
+            juniIkeFqdnPresharedRemote
+            juniIkeFqdnPresharedVirtualRouter
+            juniIkeFqdnPresharedKeyStr
+
+        Once created, the following objects may not be modified:
+            juniIkeFqdnPresharedRemote
+            juniIkeFqdnPresharedVirtualRouter
+            juniIkeFqdnPresharedMaskedKeyStr "
+    ::= { juniIkeFqdnPresharedKeyEntry 5 }
+
+
+--
+-- Obsolete IKE SA table.
+--
+juniIkeSaTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIkeSaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete IKE security assoication table.  This table has been replaced
+        by the version 2 IKE SA table (juniIkeSa2Table)."
+    ::= { juniIke 4 }
+
+juniIkeSaEntry  OBJECT-TYPE
+    SYNTAX      JuniIkeSaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Describes the IPsec IKE SA."
+    INDEX     { juniIkeSaRemoteIpAddr,
+                juniIkeSaLocalIpAddr,
+                juniIkeSaRouterIndex,
+                juniIkeSaDirection }
+    ::= { juniIkeSaTable 1 }
+
+JuniIkeSaEntry ::= SEQUENCE {
+    juniIkeSaRemoteIpAddr   IpAddress,
+    juniIkeSaLocalIpAddr    IpAddress,
+    juniIkeSaRouterIndex    Unsigned32,
+    juniIkeSaDirection      JuniIpsecPhase1SaDirection,
+    juniIkeSaState          JuniIpsecPhase1SaState,
+    juniIkeSaRemaining      Unsigned32 }
+
+juniIkeSaRemoteIpAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The remote IP address of the IKE security association."
+    ::= { juniIkeSaEntry  1 }
+
+juniIkeSaLocalIpAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The local IP address of the IKE security association."
+    ::= { juniIkeSaEntry 2 }
+
+juniIkeSaRouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    ::= { juniIkeSaEntry 3 }
+
+juniIkeSaDirection  OBJECT-TYPE
+    SYNTAX      JuniIpsecPhase1SaDirection
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The value represents if the IKE SA is for initiator or responder.
+        Initiator donates the value of 0, and responder denotes the value of 1."
+    ::= { juniIkeSaEntry 4 }
+
+juniIkeSaState  OBJECT-TYPE
+    SYNTAX      JuniIpsecPhase1SaState
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The state of the IKE secruity association."
+    ::= { juniIkeSaEntry 5 }
+
+juniIkeSaRemaining  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The remaining time of the IKE security association."
+    ::= { juniIkeSaEntry 6 }
+
+
+--
+-- The IKE SA (vesion 2) table.  Replaces the obsolete juniIkeSaTable.
+--
+juniIkeSa2Table  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIkeSa2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IKE security assoication table."
+    ::= { juniIke 5 }
+
+juniIkeSa2Entry  OBJECT-TYPE
+    SYNTAX      JuniIkeSa2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the IPsec IKE SA."
+    INDEX     { juniIkeSa2RemoteIpAddr,
+                juniIkeSaRemotePort,
+                juniIkeSa2LocalIpAddr,
+                juniIkeSaLocalPort,
+                juniIkeSa2RouterIndex,
+                juniIkeSa2Direction,
+                juniIkeSaNegotiationDone }
+    ::= { juniIkeSa2Table 1 }
+
+JuniIkeSa2Entry ::= SEQUENCE {
+    juniIkeSa2RemoteIpAddr         IpAddress,
+    juniIkeSaRemotePort            Unsigned32,
+    juniIkeSa2LocalIpAddr          IpAddress,
+    juniIkeSaLocalPort             Unsigned32,
+    juniIkeSa2RouterIndex          Unsigned32,
+    juniIkeSa2Direction            INTEGER,
+    juniIkeSaNegotiationDone       INTEGER,
+    juniIkeSa2State                JuniIpsecPhase1SaState,
+    juniIkeSa2Remaining            Unsigned32,
+    juniLocalCookie                OCTET STRING,
+    juniRemoteCookie               OCTET STRING }
+
+juniIkeSa2RemoteIpAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The remote IP address of the IKE security association."
+    ::= { juniIkeSa2Entry  1 }
+
+juniIkeSaRemotePort  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The remote UDP port the IKE security association."
+    ::= { juniIkeSa2Entry  2 }
+
+juniIkeSa2LocalIpAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The local IP address of the IKE security association."
+    ::= { juniIkeSa2Entry 3 }
+
+juniIkeSaLocalPort  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The local UDP port the IKE security association."
+    ::= { juniIkeSa2Entry  4 }
+
+juniIkeSa2RouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of the virtual router.  The value of this object can
+        be used to retrieve additional information in the router MIB."
+    ::= { juniIkeSa2Entry 5 }
+
+juniIkeSa2Direction  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    responder(0),
+                    initiator(1) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This IKE SA is for an initiator or a responder."
+    ::= { juniIkeSa2Entry 6 }
+
+juniIkeSaNegotiationDone  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    negotiationNotDone(0),
+                    negotiationDone(1) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The phase 1 negotiation is done or not."
+    ::= { juniIkeSa2Entry 7 }
+
+juniIkeSa2State  OBJECT-TYPE
+    SYNTAX      JuniIpsecPhase1SaState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the IKE secruity association."
+    ::= { juniIkeSa2Entry 8 }
+
+juniIkeSa2Remaining  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remaining time of the IKE security association."
+    ::= { juniIkeSa2Entry 9 }
+
+juniRemoteCookie  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remote IKE cookie."
+    ::= { juniIkeSa2Entry 10 }
+
+juniLocalCookie  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local IKE cookie."
+    ::= { juniIkeSa2Entry 11 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIkeMIBConformance   OBJECT IDENTIFIER  ::= { juniIkeMIB 2 }
+juniIkeMIBCompliances   OBJECT IDENTIFIER  ::= { juniIkeMIBConformance 1 }
+juniIkeMIBGroups        OBJECT IDENTIFIER  ::= { juniIkeMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniIkeCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        IKE MIB.  This statement became obsolete when the juniIkeSaTable was
+        replaced with the juniIkeSa2Table."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIkePolicyRuleGroup,
+            juniIkeIpv4PreSharedKeyGroup,
+            juniIkeFqdnPreSharedKeyGroup,
+            juniIkeSaGroup }
+    ::= { juniIkeMIBCompliances 1 }                                -- JUNOSe 5.3
+
+juniIkeCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement
+        the IKE MIB.  This statement became obsolete when the 
+        juniIkePolicyRuleGroup was replaced with the juniIkePolicyRuleV2Group"
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIkePolicyRuleGroup,
+            juniIkeIpv4PreSharedKeyGroup,
+            juniIkeFqdnPreSharedKeyGroup,
+            juniIkeSa2Group }
+    ::= { juniIkeMIBCompliances 2 }                                -- JUNOSe 5.3
+
+juniIkeCompliance3  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for SNMPv2 entities which implement the IKE
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIkePolicyRuleV2Group,
+            juniIkeIpv4PreSharedKeyGroup,
+            juniIkeFqdnPreSharedKeyGroup,
+            juniIkeSa2Group }
+    ::= { juniIkeMIBCompliances 3 }                                -- JUNOSe 7.3
+
+--
+-- units of conformance
+--
+juniIkePolicyRuleGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIkePolicyRuleAuthMethod,
+        juniIkePolicyRuleEncryptMethod,
+        juniIkePolicyRulePfsGroup,
+        juniIkePolicyRuleHashMethod,
+        juniIkePolicyRuleLifetime,
+        juniIkePolicyRuleNegotiationMode,
+        juniIkePolicyRuleRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information
+        of the IKE policy rule.  This group became obsolete when the 
+        juniIkePolicyRuleGroup was replaced with the juniIkePolicyRuleV2Group"
+    ::= { juniIkeMIBGroups 1 }                                     -- JUNOSe 5.3
+
+juniIkeIpv4PreSharedKeyGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIkeIpv4PresharedKeyStr,
+        juniIkeIpv4PresharedMaskedKeyStr,
+        juniIkeIpv4PresharedKeyRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing configuration information of the IKE
+        preshared key in IPv4 format."
+    ::= { juniIkeMIBGroups 2 }                                     -- JUNOSe 5.3
+
+juniIkeFqdnPreSharedKeyGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIkeFqdnPresharedKeyStr,
+        juniIkeFqdnPresharedMaskedKeyStr,
+        juniIkeFqdnPresharedKeyRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing configuration information of the IKE
+        preshared key in FQDN format."
+    ::= { juniIkeMIBGroups 3 }                                     -- JUNOSe 5.3
+
+juniIkeSaGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIkeSaState,
+        juniIkeSaRemaining }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing IKE SA state information.
+        This group became obsolete when the juniIkeSaTable was replaced with the
+        juniIkeSa2Table."
+    ::= { juniIkeMIBGroups 4 }                                     -- JUNOSe 5.3
+
+juniIkeSa2Group  OBJECT-GROUP
+    OBJECTS {
+        juniIkeSa2State,
+        juniIkeSa2Remaining,
+        juniRemoteCookie,
+        juniLocalCookie }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing IKE SA state information."
+    ::= { juniIkeMIBGroups 5 }                                     -- JUNOSe 6.0
+    
+juniIkePolicyRuleV2Group  OBJECT-GROUP
+    OBJECTS {
+        juniIkePolicyRuleV2AuthMethod,
+        juniIkePolicyRuleV2EncryptMethod,
+        juniIkePolicyRuleV2PfsGroup,
+        juniIkePolicyRuleV2HashMethod,
+        juniIkePolicyRuleV2Lifetime,
+        juniIkePolicyRuleV2NegotiationMode,
+        juniIkePolicyRuleV2IpAddress,
+        juniIkePolicyRuleV2RouterIndex,
+        juniIkePolicyRuleV2RowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing configuration information of the IKE
+        policy rule."
+    ::= { juniIkeMIBGroups 6 }                                     -- JUNOSe 7.3
+
+
+END

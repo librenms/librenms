@@ -1,0 +1,147 @@
+-- ArubaOS 3.2.0.0_16376
+-- vim:set ts=4 sw=4:
+WLSX-CTS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION,
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+       Unsigned32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+		wlsxEnterpriseMibModules
+			FROM ARUBA-MIB;
+
+   wlsxCtsMIB MODULE-IDENTITY 
+       LAST-UPDATED "0704101823Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089	
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide
+            information about the Controller Transport Service (Cts) in the 
+			Aruba controller."
+       REVISION        "0704101823Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 11 }
+
+   wlsxCtsOpGroup     	OBJECT IDENTIFIER ::= { wlsxCtsMIB 1 }
+
+   wlsxCtsRequestTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF WlsxCtsRequestEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"
+		"
+	::= { wlsxCtsOpGroup 1 }
+
+	wlsxCtsRequestEntry OBJECT-TYPE
+		SYNTAX WlsxCtsRequestEntry
+		MAX-ACCESS not-accessible
+		STATUS	current
+		DESCRIPTION
+			""
+		INDEX { wlsxCtsIndex }
+		::= { wlsxCtsRequestTable 1 }
+
+	WlsxCtsRequestEntry ::=
+		SEQUENCE {
+			wlsxCtsIndex	Integer32,
+			wlsxCtsOpcode	DisplayString,
+			wlsxCtsCookie	DisplayString,
+			wlsxCtsURL		DisplayString,
+			wlsxCtsFlags	BITS,
+			wlsxCtsStatus	RowStatus
+		}
+
+	wlsxCtsIndex OBJECT-TYPE
+		SYNTAX 	Integer32
+		MAX-ACCESS not-accessible
+		STATUS	current
+		DESCRIPTION
+			"
+				CTS transport index 
+				0 - Config Sync
+				1 - Counters Sync
+				2 - RF Plan Sync
+			"
+		::= { wlsxCtsRequestEntry 1 }
+
+	wlsxCtsOpcode OBJECT-TYPE
+		SYNTAX 	DisplayString
+		MAX-ACCESS read-write
+		STATUS	current
+		DESCRIPTION
+			"
+				CTS operation opcode
+			"
+		::= { wlsxCtsRequestEntry 2 }
+
+	wlsxCtsCookie OBJECT-TYPE
+		SYNTAX 	DisplayString
+		MAX-ACCESS read-write
+		STATUS	current
+		DESCRIPTION
+			"
+				Cookie for the config sync operation
+			"
+		::= { wlsxCtsRequestEntry 3 }
+
+	wlsxCtsURL OBJECT-TYPE
+		SYNTAX 	DisplayString
+		MAX-ACCESS read-write
+		STATUS	current
+		DESCRIPTION
+			"
+				URL for the config sync operation
+			"
+		::= { wlsxCtsRequestEntry 4 }
+
+	wlsxCtsFlags OBJECT-TYPE
+		SYNTAX 	BITS {
+			wlsxCtsFlagForce(0),
+			wlsxCtsFlagUseCert(1)
+	    }
+		MAX-ACCESS read-write
+		STATUS	current
+		DESCRIPTION
+			"
+				Operational flags to be sent via CTS
+			"
+		::= { wlsxCtsRequestEntry 5 }
+
+	wlsxCtsStatus OBJECT-TYPE
+		SYNTAX 	RowStatus
+		MAX-ACCESS read-write
+		STATUS	current
+		DESCRIPTION
+			"
+				CTS row status
+			"
+		::= { wlsxCtsRequestEntry 6 }
+
+END

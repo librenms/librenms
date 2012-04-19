@@ -1,0 +1,642 @@
+ENTERASYS-THREAT-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-threat-notification-mib.txt
+--
+--  Part Number: <TBD>
+--
+--
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' Threat Notification MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright September, (2004-2005) Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DateAndTime, DisplayString, MacAddress
+        FROM SNMPv2-TC
+    InetAddress, InetAddressType
+        FROM INET-ADDRESS-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysThreatNotificationMIB MODULE-IDENTITY
+    LAST-UPDATED "200509141314Z"  -- Wed Sep 14 13:14 GMT 2005
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines the portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to
+         the Threat Notification feature."
+
+    REVISION "200509141314Z"  -- Wed Sep 14 13:14 GMT 2005
+    DESCRIPTION
+        "Added the etsysThreatResponseNotificationMessage notification."
+
+    REVISION "200502111514Z"  -- Fri Feb 11 15:14 GMT 2005
+    DESCRIPTION
+        "Added the etsysThreatNotificationIncidentID object and the
+         etsysThreatUndoNotificationMessage notification."
+
+    REVISION "200407191758Z"  -- Mon Jul 19 17:58 GMT 2004
+    DESCRIPTION
+        "Added the etsysThreatNotificationInitiatorMacAddress object
+         and the etsysThreatNotificationInformationMessage4
+         notification."
+
+    REVISION "200403101547Z"  -- Wed Mar 10 15:47 GMT 2004
+    DESCRIPTION
+        "The initial version of this MIB module."
+    ::= { etsysModules 45 }
+
+-- -------------------------------------------------------------
+-- Branches of the Enterasys Threat Notification MIB
+-- -------------------------------------------------------------
+
+etsysThreatNotificationObjects
+        OBJECT IDENTIFIER ::= { etsysThreatNotificationMIB 1 }
+
+etsysThreatNotificationNotificationBranch
+        OBJECT IDENTIFIER ::= { etsysThreatNotificationObjects 0 }
+
+etsysThreatNotificationSystemBranch
+        OBJECT IDENTIFIER ::= { etsysThreatNotificationObjects 1 }
+
+-- -------------------------------------------------------------
+-- Threat Notification System Branch
+-- -------------------------------------------------------------
+
+etsysThreatNotificationSenderID  OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "A name that identifies a sender or group
+                   of senders. ie. 'Dragon IDS', ACME IDS',
+                   'VIRUS SCAN', 'DRAGON1', 'DRAGON2'"
+    ::= { etsysThreatNotificationSystemBranch 1 }
+
+etsysThreatNotificationSenderName  OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The name of the sensor that discovered the threat."
+    ::= { etsysThreatNotificationSystemBranch 2 }
+
+etsysThreatNotificationThreatCategory  OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "A name that identifies a group of threat types."
+    ::= { etsysThreatNotificationSystemBranch 3 }
+
+etsysThreatNotificationThreatName  OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The name of the signature that detected the threat."
+    ::= { etsysThreatNotificationSystemBranch 4 }
+
+etsysThreatNotificationDeviceAddressType  OBJECT-TYPE
+    SYNTAX        InetAddressType
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The address type of the device where the initiator
+                   of the threat was detected."
+    ::= { etsysThreatNotificationSystemBranch 5 }
+
+etsysThreatNotificationDeviceAddress  OBJECT-TYPE
+    SYNTAX        InetAddress
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The address of the device where the initiator
+                   of the threat was detected."
+    ::= { etsysThreatNotificationSystemBranch 6 }
+
+etsysThreatNotificationDeviceIfIndex  OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The interface where the initiator was detected."
+    ::= { etsysThreatNotificationSystemBranch 7 }
+
+etsysThreatNotificationInitiatorAddressType  OBJECT-TYPE
+    SYNTAX        InetAddressType
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The address type of the endstation that initiated
+                   the threat."
+    ::= { etsysThreatNotificationSystemBranch 8 }
+
+etsysThreatNotificationInitiatorAddress  OBJECT-TYPE
+    SYNTAX        InetAddress
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The address of the endstation that initiated the
+                   threat."
+    ::= { etsysThreatNotificationSystemBranch 9 }
+
+etsysThreatNotificationTargetAddressType  OBJECT-TYPE
+    SYNTAX        InetAddressType
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The address type of the endstation that is threatened."
+    ::= { etsysThreatNotificationSystemBranch 10 }
+
+etsysThreatNotificationTargetAddress  OBJECT-TYPE
+    SYNTAX        InetAddress
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The address of the endstation that is threatened."
+    ::= { etsysThreatNotificationSystemBranch 11 }
+
+etsysThreatNotificationConsolidatedData  OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..1024))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The purpose of this object is to support devices that can
+                  only send single varbind notification messages and should
+                  only be used in conjunction with
+                  etsysThreatNotificationInformationMessage3. The data should
+                  be encoded in the following format:
+                      object1='data' object2='data' object3='data' ...
+                  Here is an example:
+                      etsysThreatNotificationSenderID='dragon' 
+                      etsysThreatNotificationSenderName='dragon' 
+                      etsysThreatNotificationThreatCategory='ATTACKS'
+                      etsysThreatNotificationThreatName='HOST:APACHE:ETC-PASSWD' 
+                      etsysThreatNotificationInitiatorAddress='1.1.1.1'
+                      etsysThreatNotificationTargetAddress='2.2.2.2'
+                  "
+    ::= { etsysThreatNotificationSystemBranch 12 }
+
+etsysThreatNotificationInitiatorMacAddress  OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The MAC address of the endstation that is threatened."
+    ::= { etsysThreatNotificationSystemBranch 13 }
+
+etsysThreatNotificationIncidentID  OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The incident ID of an event.  Used by
+                  etsysThreatUndoNotificationMessage to undo an action."
+    ::= { etsysThreatNotificationSystemBranch 14 }
+
+etsysThreatNotificationStatus  OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..64))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The status of an event.  Used by
+                  etsysThreatResponseNotificationMessage."
+    ::= { etsysThreatNotificationSystemBranch 15 }
+
+etsysThreatNotificationDetails  OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The details of an event.  Used by
+                  etsysThreatResponseNotificationMessage."
+    ::= { etsysThreatNotificationSystemBranch 16 }
+
+etsysThreatNotificationAction  OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..64))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The action taken in response to an incident.  Used by
+                  etsysThreatResponseNotificationMessage."
+    ::= { etsysThreatNotificationSystemBranch 17 }
+
+etsysThreatNotificationRuleName  OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..64))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The name of the rule that was applied to this incident.
+                  Used by etsysThreatResponseNotificationMessage."
+    ::= { etsysThreatNotificationSystemBranch 18 }
+
+etsysThreatNotificationDateTime  OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The date and time the incident was received.  Used by
+                  etsysThreatResponseNotificationMessage."
+    ::= { etsysThreatNotificationSystemBranch 19 }
+
+etsysThreatNotificationLastUpdated  OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION   "The date and time the event was last updated.  Used by
+                  etsysThreatResponseNotificationMessage."
+    ::= { etsysThreatNotificationSystemBranch 20 }
+
+-- -------------------------------------------------------------
+--  Threat Notification Notification Branch
+-- -------------------------------------------------------------
+
+etsysThreatNotificationInformationMessage1 NOTIFICATION-TYPE
+    OBJECTS { 
+              etsysThreatNotificationSenderID,
+              etsysThreatNotificationSenderName,
+              etsysThreatNotificationThreatCategory,
+              etsysThreatNotificationThreatName,
+              etsysThreatNotificationInitiatorAddressType,
+              etsysThreatNotificationInitiatorAddress,
+              etsysThreatNotificationTargetAddressType,
+              etsysThreatNotificationTargetAddress
+            }
+    STATUS  current
+    DESCRIPTION
+        "An etsysThreatNotificationInformationMessage1 indicates that a
+        potential threat has been identified.  This trap should be
+        generated when the IP address of the source of the threat is
+        known, but not the device and interface.
+        (etsysThreatNotificationSenderName and
+        etsysThreatNotificationTargetAddress are optional objects)"
+    ::= { etsysThreatNotificationNotificationBranch 1 }
+
+etsysThreatNotificationInformationMessage2 NOTIFICATION-TYPE
+    OBJECTS { 
+              etsysThreatNotificationSenderID,
+              etsysThreatNotificationSenderName,
+              etsysThreatNotificationThreatCategory,
+              etsysThreatNotificationThreatName,
+              etsysThreatNotificationDeviceAddressType,
+              etsysThreatNotificationDeviceAddress,
+              etsysThreatNotificationDeviceIfIndex,
+              etsysThreatNotificationInitiatorAddressType,
+              etsysThreatNotificationInitiatorAddress,
+              etsysThreatNotificationTargetAddressType,
+              etsysThreatNotificationTargetAddress
+            }
+    STATUS  current
+    DESCRIPTION
+        "An etsysThreatNotificationInformationMessage2 indicates that a
+        potential threat has been identified.  This trap should be
+        generated when the device and interface of the threat is known,
+        but the IP address of the source may or may not be known.
+        (etsysThreatNotificationSenderName,
+        etsysThreatNotificationInitiatorAddress
+        and etsysThreatNotificationTargetAddress are optional objects)"
+    ::= { etsysThreatNotificationNotificationBranch 2 }
+
+etsysThreatNotificationInformationMessage3 NOTIFICATION-TYPE
+    OBJECTS {
+              etsysThreatNotificationConsolidatedData
+            }
+    STATUS  current
+    DESCRIPTION
+        "The purpose of etsysThreatNotificationInformationMessage3 is to
+        support devices that can only send single varbind notifications.
+        See etsysThreatNotificationConsolidatedData for more details."
+    ::= { etsysThreatNotificationNotificationBranch 3 }
+
+etsysThreatNotificationInformationMessage4 NOTIFICATION-TYPE
+    OBJECTS { 
+              etsysThreatNotificationSenderID,
+              etsysThreatNotificationSenderName,
+              etsysThreatNotificationThreatCategory,
+              etsysThreatNotificationThreatName,
+              etsysThreatNotificationDeviceAddressType,
+              etsysThreatNotificationDeviceAddress,
+              etsysThreatNotificationDeviceIfIndex,
+              etsysThreatNotificationInitiatorAddressType,
+              etsysThreatNotificationInitiatorAddress,
+              etsysThreatNotificationInitiatorMacAddress,
+              etsysThreatNotificationTargetAddressType,
+              etsysThreatNotificationTargetAddress
+            }
+    STATUS  current
+    DESCRIPTION
+        "An etsysThreatNotificationInformationMessage4 indicates that a
+        potential threat has been identified.  This trap should be
+        generated when the device and interface of the threat is known,
+        but the IP address of the source may or may not be known.
+        (etsysThreatNotificationSenderName,
+        etsysThreatNotificationInitiatorAddress
+        and etsysThreatNotificationTargetAddress are optional objects)"
+    ::= { etsysThreatNotificationNotificationBranch 4 }
+
+etsysThreatUndoNotificationMessage NOTIFICATION-TYPE
+    OBJECTS { 
+              etsysThreatNotificationIncidentID,
+              etsysThreatNotificationDeviceAddressType,
+              etsysThreatNotificationDeviceAddress,
+              etsysThreatNotificationDeviceIfIndex,
+              etsysThreatNotificationInitiatorAddressType,
+              etsysThreatNotificationInitiatorAddress,
+              etsysThreatNotificationInitiatorMacAddress
+            }
+    STATUS  current
+    DESCRIPTION
+        "An etsysThreatUndoNotificationMessage indicates that a
+        potential threat that had been identified has been resolved.
+        When this message is received, if a user was quarantined,
+        the action should be undone."
+    ::= { etsysThreatNotificationNotificationBranch 5 }
+
+etsysThreatResponseNotificationMessage NOTIFICATION-TYPE
+    OBJECTS { 
+              etsysThreatNotificationIncidentID,
+              etsysThreatNotificationStatus,
+              etsysThreatNotificationDateTime,
+              etsysThreatNotificationSenderID,
+              etsysThreatNotificationSenderName,
+              etsysThreatNotificationThreatCategory,
+              etsysThreatNotificationThreatName,
+              etsysThreatNotificationInitiatorAddressType,
+              etsysThreatNotificationInitiatorAddress,
+              etsysThreatNotificationInitiatorMacAddress,
+              etsysThreatNotificationDeviceAddressType,
+              etsysThreatNotificationDeviceAddress,
+              etsysThreatNotificationDeviceIfIndex,
+              etsysThreatNotificationRuleName,
+              etsysThreatNotificationAction,
+              etsysThreatNotificationDetails,
+              etsysThreatNotificationLastUpdated
+            }
+    STATUS  current
+    DESCRIPTION
+        "An etsysThreatResponseNotificationMessage indicates that a
+        potential threat that had been identified has been acted upon.
+        When this message is received, a user was either quarantined,
+        or the action was undone."
+    ::= { etsysThreatNotificationNotificationBranch 6 }
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysThreatNotificationConformance
+        OBJECT IDENTIFIER ::= { etsysThreatNotificationMIB 2 }
+
+etsysThreatNotificationGroups
+        OBJECT IDENTIFIER ::= { etsysThreatNotificationConformance 1 }
+
+etsysThreatNotificationCompliances
+        OBJECT IDENTIFIER ::= { etsysThreatNotificationConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of Conformance
+-- -------------------------------------------------------------
+
+etsysThreatNotificationMessage1SystemGroup OBJECT-GROUP
+    OBJECTS {
+        etsysThreatNotificationSenderID,
+        etsysThreatNotificationSenderName,
+        etsysThreatNotificationThreatCategory,
+        etsysThreatNotificationThreatName,
+        etsysThreatNotificationInitiatorAddressType,
+        etsysThreatNotificationInitiatorAddress,
+        etsysThreatNotificationTargetAddressType,
+        etsysThreatNotificationTargetAddress
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects required for etsysThreatNotificationMessage1
+         providing information about possible threats on a network."
+    ::= { etsysThreatNotificationGroups 1 }
+
+etsysThreatNotificationMessage2SystemGroup OBJECT-GROUP
+    OBJECTS {
+        etsysThreatNotificationDeviceAddressType,
+        etsysThreatNotificationDeviceAddress,
+        etsysThreatNotificationDeviceIfIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects required for etsysThreatNotificationMessage2
+         providing information about possible threats on a network."
+    ::= { etsysThreatNotificationGroups 2 }
+
+etsysThreatNotificationMessage3SystemGroup OBJECT-GROUP
+    OBJECTS {
+        etsysThreatNotificationConsolidatedData
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects required for etsysThreatNotificationMessage3
+         providing information about possible threats on a network."
+    ::= { etsysThreatNotificationGroups 3 }
+
+etsysThreatNotificationMessage1Group NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysThreatNotificationInformationMessage1
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of notifications used to alert a management
+         application of possible threats on a network."
+    ::= { etsysThreatNotificationGroups 4 }
+
+etsysThreatNotificationMessage2Group NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysThreatNotificationInformationMessage2
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of notifications used to alert a management
+         application of possible threats on a network."
+    ::= { etsysThreatNotificationGroups 5 }
+
+etsysThreatNotificationMessage3Group NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysThreatNotificationInformationMessage3
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of notifications used to alert a management
+         application of possible threats on a network."
+    ::= { etsysThreatNotificationGroups 6 }
+
+etsysThreatNotificationMessage4SystemGroup OBJECT-GROUP
+    OBJECTS {
+        etsysThreatNotificationDeviceAddressType,
+        etsysThreatNotificationDeviceAddress,
+        etsysThreatNotificationDeviceIfIndex,
+        etsysThreatNotificationInitiatorMacAddress
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects required for etsysThreatNotificationMessage4
+         providing information about possible threats on a network."
+    ::= { etsysThreatNotificationGroups 7 }
+
+etsysThreatNotificationMessage4Group NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysThreatNotificationInformationMessage4
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of notifications used to alert a management
+         application of possible threats on a network."
+    ::= { etsysThreatNotificationGroups 8 }
+
+etsysThreatUndoNotificationMessageSystemGroup OBJECT-GROUP
+    OBJECTS {
+        etsysThreatNotificationIncidentID,
+        etsysThreatNotificationDeviceAddressType,
+        etsysThreatNotificationDeviceAddress,
+        etsysThreatNotificationDeviceIfIndex,
+        etsysThreatNotificationInitiatorAddressType,
+        etsysThreatNotificationInitiatorAddress,
+        etsysThreatNotificationInitiatorMacAddress
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects required for etsysThreatUndoNotificationMessage
+         providing information about possible threats on a network."
+    ::= { etsysThreatNotificationGroups 9 }
+
+etsysThreatUndoNotificationMessageGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysThreatUndoNotificationMessage
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of notifications used to alert a management
+         application of possible threats on a network."
+    ::= { etsysThreatNotificationGroups 10 }
+
+etsysThreatResponseNotificationMessageSystemGroup OBJECT-GROUP
+    OBJECTS {
+        etsysThreatNotificationIncidentID,
+        etsysThreatNotificationStatus,
+        etsysThreatNotificationDateTime,
+        etsysThreatNotificationSenderID,
+        etsysThreatNotificationSenderName,
+        etsysThreatNotificationThreatCategory,
+        etsysThreatNotificationThreatName,
+        etsysThreatNotificationInitiatorAddressType,
+        etsysThreatNotificationInitiatorAddress,
+        etsysThreatNotificationInitiatorMacAddress,
+        etsysThreatNotificationDeviceAddressType,
+        etsysThreatNotificationDeviceAddress,
+        etsysThreatNotificationDeviceIfIndex,
+        etsysThreatNotificationRuleName,
+        etsysThreatNotificationAction,
+        etsysThreatNotificationDetails,
+        etsysThreatNotificationLastUpdated
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects required for
+         etsysThreatResponseNotificationMessage providing information about
+         possible threats on a network."
+    ::= { etsysThreatNotificationGroups 11 }
+
+etsysThreatResponseNotificationMessageGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysThreatResponseNotificationMessage
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of notifications used to alert a management
+         application of possible threats on a network."
+    ::= { etsysThreatNotificationGroups 12 }
+
+
+
+-- -------------------------------------------------------------
+-- Compliance Statements
+-- -------------------------------------------------------------
+
+etsysThreatNotificationCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices that support
+         threat notifications."
+    MODULE
+        GROUP       etsysThreatNotificationMessage1SystemGroup
+        DESCRIPTION
+            "This group is OPTIONAL for devices supporting 
+             etsysThreatNotificationMessage1."
+
+        GROUP       etsysThreatNotificationMessage2SystemGroup
+        DESCRIPTION
+            "This group is OPTIONAL for devices supporting 
+             etsysThreatNotificationMessage2."
+
+        GROUP       etsysThreatNotificationMessage3SystemGroup
+        DESCRIPTION
+            "This group is OPTIONAL for devices supporting 
+             etsysThreatNotificationMessage3."
+
+        GROUP       etsysThreatNotificationMessage4SystemGroup
+        DESCRIPTION
+            "This group is OPTIONAL for devices supporting 
+             etsysThreatNotificationMessage4."
+
+        GROUP       etsysThreatNotificationMessage1Group
+        DESCRIPTION
+            "This group is OPTIONAL for devices supporting 
+             etsysThreatNotificationMessage1."
+
+        GROUP       etsysThreatNotificationMessage2Group
+        DESCRIPTION
+            "This group is OPTIONAL for devices supporting 
+             etsysThreatNotificationMessage2."
+
+        GROUP       etsysThreatNotificationMessage3Group
+        DESCRIPTION
+            "This group is OPTIONAL for devices supporting 
+             etsysThreatNotificationMessage3."
+
+        GROUP       etsysThreatNotificationMessage4Group
+        DESCRIPTION
+            "This group is OPTIONAL for devices supporting 
+             etsysThreatNotificationMessage4."
+
+        GROUP       etsysThreatUndoNotificationMessageSystemGroup
+        DESCRIPTION
+            "This group is OPTIONAL for devices supporting 
+             etsysThreatUndoNotificationMessage."
+
+        GROUP       etsysThreatUndoNotificationMessageGroup
+        DESCRIPTION
+            "This group is OPTIONAL for devices supporting 
+             etsysThreatUndoNotificationMessage."
+
+        GROUP       etsysThreatResponseNotificationMessageGroup
+        DESCRIPTION
+            "This group is OPTIONAL for devices supporting 
+             etsysThreatResponseNotificationMessage."
+
+    ::= { etsysThreatNotificationCompliances 1 }
+
+END

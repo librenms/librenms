@@ -1,0 +1,351 @@
+BROADCOM-POWER-ETHERNET-MIB DEFINITIONS ::= BEGIN
+
+-- Copyright Broadcom Corporation (2003-2007)  All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Broadcom Corporation's confidential and proprietary
+-- intellectual property.  Broadcom Corporation retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Broadcom Corporation
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+    
+    IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Gauge32                  FROM SNMPv2-SMI
+      TruthValue                                             FROM SNMPv2-TC
+      fastPath                                               FROM BROADCOM-REF-MIB
+      pethPsePortEntry, pethMainPseEntry                     FROM POWER-ETHERNET-MIB;
+    
+
+    fastPathpowerEthernetMIB MODULE-IDENTITY
+    LAST-UPDATED "200708191200Z" -- 17 Aug 2007 12:00:00 GMT
+    ORGANIZATION "Broadcom Corporation"
+    CONTACT-INFO
+    "                      Customer Support
+    Postal:                Broadcom Corporation
+                           100 Perimeter Park Dr., Suite H
+                           Morrisville, NC 27560
+    Tel:                   +1 919 865 2700"
+
+    DESCRIPTION
+        "This MIB Augments the POWER-ETHERNET-MIB created by the IETF Ethernet 
+         Interfaces and Hub MIB Working Group for managing Power Source 
+         Equipment (PSE).  The objects in this MIB are intended to provide 
+         additional objects for reporting information available to the hardware 
+         on this platform which are not represented in the draft MIB."
+         
+      -- Revision history.
+   REVISION
+        "200708191200Z" -- 17 Aug 2007 12:00:00 GMT
+   DESCRIPTION
+        "PoE support for BCM59101 added."
+   REVISION
+        "200705230000Z" -- 23 May 2007 12:00:00 GMT
+   DESCRIPTION
+        "Broadcom branding related changes."
+   REVISION
+        "200311101200Z" -- 10 Nov 2003 12:00:00 GMT
+   DESCRIPTION
+        "Initial revision."
+    ::= {  fastPath 15 }
+
+    agentPethObjects       OBJECT IDENTIFIER ::= { fastPathpowerEthernetMIB 1 }
+
+    agentPethPsePortTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF AgentPethPsePortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A table of per-port information and configuration objects relating 
+              to the power status of each port."
+          ::= { agentPethObjects 1 }
+
+    agentPethPsePortEntry OBJECT-TYPE
+          SYNTAX      AgentPethPsePortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A collection of objects providing additional power information 
+              and control parameters for the specified port."
+          AUGMENTS    { pethPsePortEntry }
+          ::= { agentPethPsePortTable 1 }
+
+    AgentPethPsePortEntry ::= SEQUENCE {
+          agentPethPowerLimit
+             Gauge32,
+          agentPethOutputPower
+             Gauge32,
+          agentPethOutputCurrent
+             Gauge32,
+          agentPethOutputVolts
+             Gauge32,
+          agentPethTemperature
+             Gauge32,
+          agentPethPowerLimitType
+             INTEGER,
+          agentPethHighPowerEnable
+             TruthValue,
+          agentPethPowerDetectionType
+             INTEGER,
+          agentPethFaultStatus
+             INTEGER,  
+          agentPethPortReset
+             INTEGER
+          }
+             
+    agentPethPowerLimit OBJECT-TYPE
+          SYNTAX      Gauge32
+          UNITS       "Milliwatts"
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+             "The configured maximum power this port can provide to an 
+             attached device measured in Milliwatts."
+          ::= { agentPethPsePortEntry 1 }
+    
+    agentPethOutputPower OBJECT-TYPE
+          SYNTAX      Gauge32
+          UNITS       "Milliwatts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+             "The power this port is supplying to an attached device measured 
+             in Milliwatts."
+          ::= { agentPethPsePortEntry 2 }
+    
+    agentPethOutputCurrent OBJECT-TYPE
+          SYNTAX      Gauge32
+          UNITS       "Milliamps"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+             "The current this port is supplying to an attached device measured 
+             in Milliamps."
+          ::= { agentPethPsePortEntry 3 }
+    
+    agentPethOutputVolts OBJECT-TYPE
+          SYNTAX      Gauge32
+          UNITS       "Volts"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+             "The voltage this port is supplying to an attached device measured 
+             in Volts."
+          ::= { agentPethPsePortEntry 4 }
+
+    agentPethTemperature OBJECT-TYPE
+          SYNTAX      Gauge32
+          UNITS       "DEGREES"
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+             "The temperature measured at this port of the PoE Controller. It is
+              measured in degree celcius."
+          ::= { agentPethPsePortEntry 5 }
+
+    agentPethPowerLimitType OBJECT-TYPE
+    SYNTAX INTEGER   {
+               dot3af(1),
+               user(2)
+     }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Describes or controls the maximum power that a port can deliver
+         A value of dot3af(1) means that the port power limit is as per
+         the dot3af class of the PD attached.
+         A value of user(2) means that the port power limit is equal to the value 
+         specified by agentPethPowerLimit"
+    REFERENCE
+      "Broadcom 5910X programmers guide, IEEE Std 802.3af Section 30.9.1.1.6"
+
+    ::= { agentPethPsePortEntry 6 }
+
+    agentPethHighPowerEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "true (1) The PSE port can deliver power up to 32Watts.
+         false(2) The PSE port can deliver power up to 18Watts"
+    REFERENCE
+      "Broadcom 5910X programmers guide"
+
+    ::= { agentPethPsePortEntry 7 }
+
+    agentPethPowerDetectionType OBJECT-TYPE
+    SYNTAX INTEGER   {
+               none(0),
+               legacy(1),
+               fourPtdot3afonly(2),
+               fourPtdot3afandlegacy(3),
+               twoPtdot3afonly(4),
+               twoPtdot3afandlegacy(5)
+     }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Describes PD detection mechanism performed by the PSE port.
+         A value of none(0) means no detection is done.
+         A value of legacy(1) means only legacy capacitive detection scheme is
+         used.
+         A value of 4ptdot3afonly(2) means that IEEE 802.3af 4point detection scheme
+         is used.
+         A value of 4ptdot3afandlegacy(3)means that IEEE 802.3af 4point detection scheme
+         is used and when that fails to detect a connected PD, legacity capacitive detection
+         is used.          
+         A value of 2ptdot3afonly(4) means that IEEE 802.3af 2point detection scheme
+         is used.
+         A value of 2ptdot3afandlegacy(5)means that IEEE 802.3af 2point detection scheme
+         is used and when that fails to detect a connected PD, legacity capacitive detection
+         is used.          
+         The value 'none' can not be forcibly set by the administrator."
+    REFERENCE
+      "Broadcom 5910X programmers guide, IEEE Std 802.3af Section 30.9.1.1.6"
+
+    ::= { agentPethPsePortEntry 8 }
+
+    agentPethFaultStatus OBJECT-TYPE
+    SYNTAX INTEGER   {
+               none(0),
+               mpsAbsent(1),
+               short(2),
+               overload(3),
+               powerDenied(4)
+     }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Describes the error description when the pse port is in fault status.
+         A value of none(0) specifies that the pse port is not in any error state.
+         A value of mpsAbsent(1) specifies that the pse port has detected and absence
+         of main power supply.
+         A value of short(2) specifies that the pse port has detected a short circuit
+         condition.
+         A value of overload(3) specifies that the pd connected to the pse port had tried
+         to draw more power than permissible by the hardware. 
+         A value of powerDenied(4) specifies that the pse port has been denied power
+         because of shortage of power or due to administrative action."
+    REFERENCE
+      "Broadcom 5910X programmers guide, IEEE Std 802.3af"
+
+    ::= { agentPethPsePortEntry 9 }
+
+   agentPethPortReset OBJECT-TYPE
+    SYNTAX INTEGER   {
+               none(0),
+               reset(1)
+     }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "A value of reset(1) is used to move the pse port dot3af state to idle. A
+         read on this object will always return the value none(0). The value none(0)
+         can not be forcibly set by the administrtor."
+    REFERENCE
+      "Broadcom 5910X programmers guide, IEEE Std 802.3af"
+
+    ::= { agentPethPsePortEntry 10 }
+ 
+
+-- Main objects
+    agentPethMainPseObjects       OBJECT IDENTIFIER ::= { agentPethObjects 2 }
+
+    agentPethMainPseTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF AgentPethMainPseEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A table of objects that display and control attributes
+               of the main power source in a PSE  device. Ethernet
+               switches are one example of boxes that would support
+               these objects.
+               Values of all read-write objects in this table are
+               persistent at restart/reboot."
+          ::= { agentPethMainPseObjects 1 }
+
+        agentPethMainPseEntry OBJECT-TYPE
+            SYNTAX      AgentPethMainPseEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+               "A set of objects that display and control the Main
+                power of a PSE. "
+            AUGMENTS    { pethMainPseEntry }
+            ::= { agentPethMainPseTable 1 }      
+
+        AgentPethMainPseEntry ::= SEQUENCE {
+            agentPethMainPseLegacy
+                TruthValue
+        }
+             
+        agentPethMainPseLegacy OBJECT-TYPE
+          SYNTAX      TruthValue
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                  "Enable/Disable Legacy device detection. The
+                value true(1) means legacy devices are detected; the
+                value false(2) means legacy devices are not detected."
+          ::= { agentPethMainPseEntry 1 }
+          
+    agentPethPseTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF AgentPethPseEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A table of per-unit information and configuration objects relating 
+              to the power configurtion for the entire pse unit."
+          ::= { agentPethObjects 3 }
+
+    agentPethPseEntry OBJECT-TYPE
+          SYNTAX      AgentPethPseEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A collection of objects providing additional power information 
+              and control parameters for the specified pse unit."
+          AUGMENTS    { pethMainPseEntry }
+          ::= { agentPethPseTable 1 }
+
+    AgentPethPseEntry ::= SEQUENCE {
+          agentPethPsePowerManagementMode
+            INTEGER,
+          agentPethPseAutoResetEnable
+            TruthValue
+          }
+
+    agentPethPsePowerManagementMode OBJECT-TYPE
+    SYNTAX INTEGER   {
+               none(0),
+               dynamic(1),
+               static(2)
+     }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Describes or controls the power management algorithm used by the pse 
+         to deliver power to the requesting PDsthat a pds.
+         A value of dot3af(1) means that the port power limit is as per
+         the dot3af class of the PD attached.
+         A value of user(2) means that the port power limit is equal to the value 
+         specified by agentPethPowerLimit"
+    REFERENCE
+      "Broadcom 5910X programmers guide"
+
+    ::= { agentPethPseEntry 1 }
+
+    agentPethPseAutoResetEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "true (1) The PSE port is reset with out administrator intervention whenver a 
+         fault condition occurs.
+         false(2) Administrator has to reset the pse port whenver a fault condition
+         is detected."
+
+    ::= { agentPethPseEntry 2 }         
+END

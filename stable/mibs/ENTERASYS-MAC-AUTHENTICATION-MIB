@@ -1,0 +1,587 @@
+ENTERASYS-MAC-AUTHENTICATION-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-mac-authentication-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' MAC-Authentication.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright May, 2002 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MacAddress, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysMACAuthenticationMIB MODULE-IDENTITY
+    LAST-UPDATED "200207181812Z"  -- Thu Jul 18 18:12 GMT 2002
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+    "Postal: Enterasys Networks
+             35 Industrial Way
+             P.O. Box 5005
+             Rochester, NH 03867-5005
+
+     Phone:  +1 603 603 332 9400
+     E-mail: support@enterasys.com
+     WWW:    http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to
+         MAC-Authentication.
+
+         This MIB was designed to be used for authentication using
+         source MAC addresses received in traffic on ports under
+         control of MAC-authentication.
+
+         The security afforded by this approach is neither the primary
+         concern nor intent of this MIB.  Rather, this MIB provides
+         a convenient method of associating policy with MAC
+         addresses and applying that policy when the MAC address
+         appears on a pre-approved port in the network.
+
+         The term MAC-Authentication is used because an authentication
+         backend mechanism is used to allow the MAC onto the network,
+         as well as provide authorization information to the switch."
+
+    REVISION    "200207181812Z"  -- Thu Jul 18 18:12 GMT 2002
+    DESCRIPTION "The initial version of this MIB module"
+
+    ::= { etsysModules 25 }
+
+etsysMACAuthenticationObjects
+        OBJECT IDENTIFIER ::= { etsysMACAuthenticationMIB 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Branches of the Enterasys MAC Authentication MIB
+-- -------------------------------------------------------------
+
+etsysMACAuthenticationSystem
+        OBJECT IDENTIFIER ::= { etsysMACAuthenticationObjects 1 }
+
+etsysMACAuthenticationPortConfig
+        OBJECT IDENTIFIER ::= { etsysMACAuthenticationObjects 2 }
+
+etsysMACAuthenticationMACConfig
+        OBJECT IDENTIFIER ::= { etsysMACAuthenticationObjects 3 }
+
+etsysMACAuthenticationMACSession
+        OBJECT IDENTIFIER ::= { etsysMACAuthenticationObjects 4 }
+
+-- -------------------------------------------------------------
+-- etsysMACAuthenticationSystemGroup
+-- -------------------------------------------------------------
+
+etsysMACAuthenticationSystemEnable OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled(1), all objects in this MIB are fully active.
+         When disabled(2), this object overrides all other object
+         settings in this MIB without affecting their values."
+    DEFVAL { disabled }
+    ::= { etsysMACAuthenticationSystem 1 }
+
+etsysMACAuthenticationMACUserPassword OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the string to be used as a password credential
+         when authenticating a MAC address."
+    DEFVAL { "NOPASSWORD" }
+    ::= { etsysMACAuthenticationSystem 2 }
+
+etsysMACAuthenticationPortUserNameSignificantBits OBJECT-TYPE
+    SYNTAX      INTEGER (1..48)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the number of significant bits in the
+         MAC addresses to be used starting with the left-most bit of
+         the vendor portion of the MAC address. The significant portion
+         of the MAC address is sent as a user-name credential when the
+         primary attempt to authenticate the full MAC address fails.
+         Any other failure to authenticate the full address, (i.e.
+         authentication server timeout) causes the the next attempt to
+         start once again with a full MAC authentication."
+    DEFVAL { 48 }
+    ::= { etsysMACAuthenticationSystem 3 }
+
+
+-- -------------------------------------------------------------
+-- etsysMACAuthenticationPortConfigGroup
+-- -------------------------------------------------------------
+
+etsysMACAuthenticationPortConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysMACAuthenticationPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing configuration objects for each MAC
+         authentication port. The configuration for
+         each port in this table must be non-volatile."
+    ::= { etsysMACAuthenticationPortConfig 1 }
+
+etsysMACAuthenticationPortConfigEntry OBJECT-TYPE
+    SYNTAX      EtsysMACAuthenticationPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row provides control over all of the
+         initial values used by each authenticated MAC on
+         this port. Subsequent changes to rows in this table,
+         except where noted, have no effect on existing MACs
+         authenticated on this port."
+    INDEX { etsysMACAuthenticationPort }
+    ::= { etsysMACAuthenticationPortConfigTable 1 }
+
+EtsysMACAuthenticationPortConfigEntry ::=
+    SEQUENCE {
+        etsysMACAuthenticationPort                      InterfaceIndex,
+        etsysMACAuthenticationPortInitialize            TruthValue,
+        etsysMACAuthenticationPortReauthenticate        TruthValue,
+        etsysMACAuthenticationPortEnable                EnabledStatus,
+        etsysMACAuthenticationPortQuietPeriod           Unsigned32,
+        etsysMACAuthenticationPortReauthPeriod          Unsigned32,
+        etsysMACAuthenticationPortReauthEnabled         EnabledStatus,
+        etsysMACAuthenticationAuthenticationsAllowed    Unsigned32,
+        etsysMACAuthenticationAuthenticationsAllocated  Unsigned32,
+        etsysMACAuthenticationLastFailedAuthCause       SnmpAdminString
+    }
+
+etsysMACAuthenticationPort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the InterfaceIndex associated with this row."
+    ::= { etsysMACAuthenticationPortConfigEntry 1 }
+
+etsysMACAuthenticationPortInitialize OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When set to true(1), the MAC authentication logic on this
+         port is initialized, forcibly ending all MAC authentication
+         sessions currently in existence on this port.  A set with
+         the value false(2) has no affect and a read always returns
+         false."
+    ::= { etsysMACAuthenticationPortConfigEntry 2 }
+
+etsysMACAuthenticationPortReauthenticate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When set to true(1), the MAC authentication entity on
+         this port is required to immediately verify all currently
+         authenticated MACs on this port. This requires that each
+         MAC address be authenticated with the authentication server
+         through the local authentication client or some other
+         authentication mechanism. Each supplicant remains
+         authenticated pending the outcome."
+    ::= { etsysMACAuthenticationPortConfigEntry 3 }
+
+etsysMACAuthenticationPortEnable OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When set to enabled(1), a platform dependent triggering
+         mechanism initiates an authentication exchange using a
+         MAC address for authentication credentials.
+         When disabled(2), authentication attempts are disabled
+         and all currently authenticated MAC sessions or those in
+         the process of authentication on this port are terminated."
+    DEFVAL { disabled }
+    ::= { etsysMACAuthenticationPortConfigEntry 4 }
+
+etsysMACAuthenticationPortQuietPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, following a failed authentication
+         before another may be attempted on this port. This object
+         allows network management to provide hysteresis for failed
+         authentication requests from the same port."
+    DEFVAL { 30 }
+    ::= { etsysMACAuthenticationPortConfigEntry 5 }
+
+etsysMACAuthenticationPortReauthPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, between attempts to re-authenticate
+         any current MAC authenticated on this port."
+    DEFVAL { 3600 }
+    ::= { etsysMACAuthenticationPortConfigEntry 6 }
+
+etsysMACAuthenticationPortReauthEnabled OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled(1), then every etsysMACAuthenticationReauthPeriod
+         the switch attempts to validate all currently authenticated
+         MACs on this port. When set to disabled(2) all current
+         re-authentications in progress are allowed to complete and
+         the requisite actions are taken. When set to disabled(2), no
+         further re-authentications are attempted."
+    DEFVAL { disabled }
+    ::= { etsysMACAuthenticationPortConfigEntry 7 }
+
+etsysMACAuthenticationAuthenticationsAllowed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of concurrent authentications supported
+         on this port on this module. The default value of this
+         object is platform and resource dependent."
+    ::= { etsysMACAuthenticationPortConfigEntry 8 }
+
+etsysMACAuthenticationAuthenticationsAllocated OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of MAC authentications permitted on this
+         port on this module. This value must be non-zero and be less
+         than or equal to the value of
+         etsysMACAuthenticationAuthenticationsAllowed.  Setting this
+         object to a value less than the current number of authenticated
+         MACs on this port prevents further authentications, but has no
+         affect on the current sessions."
+    ::= { etsysMACAuthenticationPortConfigEntry 9 }
+
+etsysMACAuthenticationLastFailedAuthCause OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The string will be formatted with
+       'XX-XX-XX-XX-XX-XX: TIME&DATE: Textual failure reason';
+        where XX-XX-XX-XX-XX-XX is the MAC address and TIME&DATE
+        is the time (hh/mm/ss) and date (mm/dd/yyyy) of the failure.
+        It is also only best effort; as there could be multiple
+        failures per port and the agent may query this at any random
+        time."
+    ::= { etsysMACAuthenticationPortConfigEntry 10 }
+
+
+-- -------------------------------------------------------------
+-- etsysMACAuthenticationMACConfigGroup
+-- -------------------------------------------------------------
+
+etsysMACAuthenticationMACConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysMACAuthenticationMACConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing configuration objects for each MAC
+         authenticated on a port. Each row in this table
+         is created dynamically when a MAC authenticates
+         on a port."
+    ::= { etsysMACAuthenticationMACConfig 1 }
+
+etsysMACAuthenticationMACConfigEntry OBJECT-TYPE
+    SYNTAX      EtsysMACAuthenticationMACConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row inherits it's initial information
+         from the row in the etsysMACAuthenticationPortConfigTable
+         corresponding to the correct port. Each row represents an
+         authenticated MAC."
+    INDEX { etsysMACAuthenticationMACAddress }
+    ::= { etsysMACAuthenticationMACConfigTable 1 }
+
+EtsysMACAuthenticationMACConfigEntry::=
+    SEQUENCE {
+        etsysMACAuthenticationMACAddress                MacAddress,
+        etsysMACAuthenticationSupplicantPort            InterfaceIndex,
+        etsysMACAuthenticationMACInitialize             TruthValue,
+        etsysMACAuthenticationMACReauthenticate         TruthValue,
+        etsysMACAuthenticationMACReauthPeriod           Unsigned32,
+        etsysMACAuthenticationMACReauthEnabled          EnabledStatus
+    }
+
+etsysMACAuthenticationMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the MAC address that was authenticated on this port."
+    ::= { etsysMACAuthenticationMACConfigEntry 1 }
+
+etsysMACAuthenticationSupplicantPort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the InterfaceIndex associated with this rows
+         authenticated MAC."
+    ::= { etsysMACAuthenticationMACConfigEntry 2 }
+
+etsysMACAuthenticationMACInitialize OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When set to true(1), this MAC session terminates causing the
+        corresponding row in this table and in the
+        etsysMACAuthenticationSessionTable to be removed.
+
+        Setting this object to false(2) has no effect on the system.
+        Reads of this object always return false(2)."
+    ::= { etsysMACAuthenticationMACConfigEntry 3 }
+
+etsysMACAuthenticationMACReauthenticate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When set to true(1), this MAC authentication session on this
+         port is required to immediately verify it's credentials.
+         This requires that each MAC address be authenticated with the
+         authentication server through the local authentication client
+         or some other authentication mechanism.
+
+         Setting this object to false(2) has no effect on the system.
+         Reads of this object always return false(2)."
+    ::= { etsysMACAuthenticationMACConfigEntry 4 }
+
+etsysMACAuthenticationMACReauthPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, between attempts to re-authenticate
+         the MAC associated with this row."
+    ::= { etsysMACAuthenticationMACConfigEntry 5 }
+
+etsysMACAuthenticationMACReauthEnabled OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If enabled(1), then every etsysMACAuthenticationReauthPeriod
+         the switch attempts to validate all currently authenticated
+         MACs on this port. If disabled(2), reauthentication is
+         not attempted."
+    ::= { etsysMACAuthenticationMACConfigEntry 6 }
+
+
+-- -------------------------------------------------------------
+-- etsysMACAuthenticationSessionGroup
+-- -------------------------------------------------------------
+
+etsysMACAuthenticationSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysMACAuthenticationSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing configuration objects for each MAC
+         authentication on a port. The successful completion of
+         an authentication causes the creation of a new row in
+         this table. When a MAC becomes unauthenticated because
+         of a link-down, a management change, or system
+         re-initialization, then the corresponding row is removed
+         from this table."
+    ::= { etsysMACAuthenticationMACSession 1 }
+
+etsysMACAuthenticationSessionEntry OBJECT-TYPE
+    SYNTAX      EtsysMACAuthenticationSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row inherits it's initial information
+         from the row in the etsysMACAuthenticationPortConfigTable
+         corresponding to the correct port. Each row represents an
+         authenticated MAC."
+    INDEX { etsysMACAuthenticationMACAddress }
+    ::= { etsysMACAuthenticationSessionTable 1 }
+
+EtsysMACAuthenticationSessionEntry::=
+    SEQUENCE {
+        etsysMACAuthenticationSessionPort               InterfaceIndex,
+        etsysMACAuthenticationDuration                  Unsigned32
+    }
+
+etsysMACAuthenticationSessionPort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the InterfaceIndex associated with the authenticated
+         MACs session."
+    ::= { etsysMACAuthenticationSessionEntry 1 }
+
+etsysMACAuthenticationDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, which have elapsed since the start
+         of this session."
+    ::= { etsysMACAuthenticationSessionEntry 2 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysMACAuthenticationConformance
+        OBJECT IDENTIFIER ::= { etsysMACAuthenticationMIB 2 }
+
+etsysMACAuthenticationGroups
+        OBJECT IDENTIFIER ::= { etsysMACAuthenticationConformance 1 }
+
+etsysMACAuthenticationCompliances
+        OBJECT IDENTIFIER ::= { etsysMACAuthenticationConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysMACAuthenticationSystemGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMACAuthenticationSystemEnable,
+        etsysMACAuthenticationMACUserPassword,
+        etsysMACAuthenticationPortUserNameSignificantBits
+    }
+    STATUS      current
+    DESCRIPTION
+        "Global object controlling this feature.
+         Global objects that affect how the credentials are
+         presented to the authentication server."
+    ::= { etsysMACAuthenticationGroups 1 }
+
+etsysMACAuthenticationPortConfigGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMACAuthenticationPortInitialize,
+        etsysMACAuthenticationPortReauthenticate,
+        etsysMACAuthenticationPortEnable,
+        etsysMACAuthenticationPortQuietPeriod,
+        etsysMACAuthenticationPortReauthPeriod,
+        etsysMACAuthenticationPortReauthEnabled,
+        etsysMACAuthenticationAuthenticationsAllowed,
+        etsysMACAuthenticationAuthenticationsAllocated,
+        etsysMACAuthenticationLastFailedAuthCause
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects describing the MAC Authentication
+         configuration for each port."
+    ::= { etsysMACAuthenticationGroups 2 }
+
+etsysMACAuthenticationMACConfigGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMACAuthenticationSupplicantPort,
+        etsysMACAuthenticationMACInitialize,
+        etsysMACAuthenticationMACReauthenticate,
+        etsysMACAuthenticationMACReauthPeriod,
+        etsysMACAuthenticationMACReauthEnabled
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects associated with an individual MACs
+         authentication configuration."
+    ::= { etsysMACAuthenticationGroups 3 }
+
+etsysMACAuthenticationMACSessionGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMACAuthenticationSessionPort,
+        etsysMACAuthenticationDuration
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects associated with a MAC Session"
+    ::= { etsysMACAuthenticationGroups 4 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysMACAuthenticationCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support MAC-Authentication."
+
+    MODULE
+        MANDATORY-GROUPS {
+            etsysMACAuthenticationSystemGroup,
+            etsysMACAuthenticationPortConfigGroup,
+            etsysMACAuthenticationMACConfigGroup
+            }
+
+        GROUP etsysMACAuthenticationMACSessionGroup
+        DESCRIPTION
+            "Implementation of the etsysMACAuthenticationMACSessionGroup
+             is optional for all agents.  If the agent impelments session
+             functionality, then this table should be supported."
+
+       OBJECT      etsysMACAuthenticationSystemEnable
+       SYNTAX      EnabledStatus
+       MIN-ACCESS  read-only
+       DESCRIPTION
+           "Write access is not required. If read-only is selected,
+            then the default value must be enabled(1)."
+
+       OBJECT      etsysMACAuthenticationPortUserNameSignificantBits
+       SYNTAX      INTEGER(1..48)
+       MIN-ACCESS  read-only
+       DESCRIPTION
+           "Write access is not required. If read-only is selected,
+            then the default value must be 48. If this object is read-write,
+            then the agent performs a two stage authentication where the
+            it attempts to authenticate the masked MAC address if the
+            full MAC address fails to authenticate."
+    ::= { etsysMACAuthenticationCompliances 1 }
+
+END

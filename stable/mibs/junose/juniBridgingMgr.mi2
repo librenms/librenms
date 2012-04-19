@@ -1,0 +1,484 @@
+
+-- *****************************************************************************
+-- Juniper-Bridging-Manager-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Bridging Manager MIB
+--
+-- Copyright (c) 2002 Juniper Networks Inc.   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-Bridging-Manager-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniBridgingMgrMIB  MODULE-IDENTITY
+    LAST-UPDATED "200210112025Z"  -- 11-Oct-02 04:25 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "Initial version of this MIB module to support Bridging."
+    -- Revision History
+    REVISION    "200210112025Z"  -- 11-Oct-02 04:25 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 64 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniBridgingMgrBridgeRouteMask ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This integer is interpreted as a bit mask, in which each bit
+        corresponds to a routed protocol.
+
+        Bit definitions are as follows:
+        Bit     Category
+        -----   -----------------------------------------------
+         0      ip
+         1      pppoe 
+         2      mpls"
+    SYNTAX      Integer32
+
+JuniBridgingMgrNextIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Coordinates BridgeGroupIndex value allocation for entries in an
+        associated bridge group table.  Clients must first read the
+        BridgeGroupIndex value from this object, then create an entry having the
+        BridgeGroupIndex value in the associated bridge group table.
+
+        A GET of this object returns the next available BridgeGroupIndex value
+        to be used to create an entry in the associated bridge group table; or
+        zero, if no valid BridgeGroupIndex value is available.  This object also
+        returns a value of zero when it is the lexicographic successor of a
+        varbind presented in an SNMP GETNEXT or GETBULK request, for which
+        circumstance it is assumed that routerIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously.
+
+        Unless specified otherwise by its MAX-ACCESS and DESCRIPTION clauses, an
+        object of this type is read-only, and a SET of such an object returns a
+        notWritable error."
+    SYNTAX      Unsigned32
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniBridgingMgrBridgeGroup  OBJECT IDENTIFIER
+    ::= { juniBridgingMgrMIB 1 }
+juniBridgingMgrBridgeSubscriberPolicy  OBJECT IDENTIFIER
+    ::= { juniBridgingMgrMIB 2 }
+juniBridgingMgrBridge  OBJECT IDENTIFIER
+    ::= { juniBridgingMgrMIB 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The Bridge Group
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniBridgingMgrNextIndex  OBJECT-TYPE
+    SYNTAX      JuniBridgingMgrNextIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniBridgingMgrBridgeGroupTable.  This object returns a value of zero
+        when it is the lexicographic successor of a varbind presented in an SNMP
+        GETNEXT or GETBULK request, for which circumstance it is assumed that
+        index allocation is unintended."
+    ::= { juniBridgingMgrBridgeGroup 1 }
+
+
+--
+-- The Bridge Group Table
+--
+juniBridgingMgrBridgeGroupTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniBridgingMgrBridgeGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of configuration entries for a bridge group."
+    ::= { juniBridgingMgrBridgeGroup 3 }
+
+juniBridgingMgrBridgeGroupEntry  OBJECT-TYPE
+    SYNTAX      JuniBridgingMgrBridgeGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration parameters for a bridge group."
+    INDEX     { juniBridgingMgrBridgeGroupIndex }
+    ::= { juniBridgingMgrBridgeGroupTable 1 }
+
+JuniBridgingMgrBridgeGroupEntry ::= SEQUENCE {
+    juniBridgingMgrBridgeGroupIndex           Unsigned32,
+    juniBridgingMgrBridgeRowStatus            RowStatus,
+    juniBridgingMgrBridgeGroupLearning        INTEGER,
+    juniBridgingMgrBridgeGroupName            DisplayString,
+    juniBridgingMgrBridgeGroupSPolicyIndex    Integer32,
+    juniBridgingMgrBridgeGroupRouteProtocol   JuniBridgingMgrBridgeRouteMask,
+    juniBridgingMgrBridgeGroupLearnCount      INTEGER }
+
+juniBridgingMgrBridgeGroupIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of the bridge group table entry which is defined by this
+        row."
+    ::= { juniBridgingMgrBridgeGroupEntry 1 }
+
+juniBridgingMgrBridgeRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy "
+    ::= { juniBridgingMgrBridgeGroupEntry 2 }
+
+juniBridgingMgrBridgeGroupLearning  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if MAC address learning is enabled or disabled
+        for the bridge group."
+    DEFVAL    { enabled }
+    ::= { juniBridgingMgrBridgeGroupEntry 3 }
+
+juniBridgingMgrBridgeGroupName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the bridge group."
+    ::= { juniBridgingMgrBridgeGroupEntry 4 }
+
+juniBridgingMgrBridgeGroupSPolicyIndex  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The index of the associated subscriber policy."
+    ::= { juniBridgingMgrBridgeGroupEntry 5 }
+
+juniBridgingMgrBridgeGroupRouteProtocol  OBJECT-TYPE
+    SYNTAX      JuniBridgingMgrBridgeRouteMask
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The protocol masks for which protocols to route."
+    ::= { juniBridgingMgrBridgeGroupEntry 6 }
+
+juniBridgingMgrBridgeGroupLearnCount  OBJECT-TYPE
+    SYNTAX      INTEGER (0..64000) 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the maximum number of mac entries that can be
+        learned from any one bridge interface belonging to this bridge group.
+        The default value of 0 indicates that the maximum number of entries is
+        not restricted."
+    DEFVAL    { 0 }
+    ::= { juniBridgingMgrBridgeGroupEntry 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The Bridge Subscriber Policy
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniBridgingMgrSubscriberNextIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar object returns the index of the next available row in the
+        juniBridgingMgrBridgeSubscriberPolicyTable.  This object returns a value
+        of zero when it is the lexicographic successor of a varbind presented in
+        an SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that index allocation is unintended."
+    ::= { juniBridgingMgrBridgeSubscriberPolicy 1 }
+
+--
+-- The Bridge Subscriber Policy Table
+--
+juniBridgingMgrBridgeSubscriberPolicyTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniBridgingMgrBridgeSubscriberPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of subscriber policy entries."
+    ::= { juniBridgingMgrBridgeSubscriberPolicy 2 }
+
+juniBridgingMgrBridgeSubscriberPolicyEntry  OBJECT-TYPE
+    SYNTAX      JuniBridgingMgrBridgeSubscriberPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration parameters for a subscriber policy."
+    INDEX     { juniBridgingMgrBridgeSubscriberPolicyIndex }
+    ::= { juniBridgingMgrBridgeSubscriberPolicyTable 1 }
+
+JuniBridgingMgrBridgeSubscriberPolicyEntry ::= SEQUENCE {
+    juniBridgingMgrBridgeSubscriberPolicyIndex              Integer32,
+    juniBridgingMgrBridgeSubscriberPolicyRowStatus          RowStatus,
+    juniBridgingMgrBridgeSubscriberPolicyArp                INTEGER,
+    juniBridgingMgrBridgeSubscriberPolicyBroadcast          INTEGER,
+    juniBridgingMgrBridgeSubscriberPolicyMulticast          INTEGER,
+    juniBridgingMgrBridgeSubscriberPolicyUnknownUnicast     INTEGER,
+    juniBridgingMgrBridgeSubscriberPolicyIp                 INTEGER,
+    juniBridgingMgrBridgeSubscriberPolicyUnknownProtocol    INTEGER,
+    juniBridgingMgrBridgeSubscriberPolicyUnicast            INTEGER,
+    juniBridgingMgrBridgeSubscriberPolicyPPPoE              INTEGER,
+    juniBridgingMgrBridgeSubscriberPolicyRelearn            INTEGER,
+    juniBridgingMgrBridgeSubscriberPolicyMpls               INTEGER,
+    juniBridgingMgrBridgeSubscriberPolicyName               DisplayString }
+
+juniBridgingMgrBridgeSubscriberPolicyIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of the subscriber policy table entry which is defined by
+        this row."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 1 }
+
+juniBridgingMgrBridgeSubscriberPolicyRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy "
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 2 }
+
+juniBridgingMgrBridgeSubscriberPolicyArp  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    permit(1),
+                    deny(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if ARP is permitted or denied."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 3 }
+
+juniBridgingMgrBridgeSubscriberPolicyBroadcast  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    permit(1),
+                    deny(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if Broadcast packets are permitted or denied."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 4 }
+
+juniBridgingMgrBridgeSubscriberPolicyMulticast  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    permit(1),
+                    deny(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if Multicast packets are permitted or denied."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 5 }
+
+juniBridgingMgrBridgeSubscriberPolicyUnknownUnicast  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    permit(1),
+                    deny(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if Unknown DA unicast packets are permitted or
+        denied."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 6 }
+
+juniBridgingMgrBridgeSubscriberPolicyIp  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    permit(1),
+                    deny(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if IP is permitted or denied."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 7 }
+
+juniBridgingMgrBridgeSubscriberPolicyUnknownProtocol  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    permit(1),
+                    deny(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if packets with unknown protocols are permitted
+        or denied.  Unknown is defined as not IP or PPPoE."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 8 }
+
+juniBridgingMgrBridgeSubscriberPolicyUnicast  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    permit(1),
+                    deny(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if Unicast packets are permitted or denied."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 9 }
+
+juniBridgingMgrBridgeSubscriberPolicyPPPoE  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    permit(1),
+                    deny(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if PPPoE packets are permitted or denied."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 10 }
+
+juniBridgingMgrBridgeSubscriberPolicyRelearn  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    permit(1),
+                    deny(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if packets that cause MAC addressing relearning
+        are permitted or denied."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 11 }
+
+juniBridgingMgrBridgeSubscriberPolicyMpls  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    permit(1),
+                    deny(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if Mpls packets are permitted or denied."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 12 }
+
+juniBridgingMgrBridgeSubscriberPolicyName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the subscriber policy."
+    ::= { juniBridgingMgrBridgeSubscriberPolicyEntry 13 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The Bridge 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniBridgingMgrBridgeMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    default(0),
+                    crb(1),
+                    irb(2),
+                    other(3) } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar object represents the mode of the bridge.  The legal values
+        are the following: default, CRB, IRB, and other.  If the legal value is
+        not supported by a particular implementation an error will occur."
+    ::= { juniBridgingMgrBridge 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniBridgingMgrTrapControl  OBJECT IDENTIFIER
+--     ::= { juniBridgingMgrMIB 3 }
+-- juniBridgingMgrBridgeTraps  OBJECT IDENTIFIER
+--     ::= { juniBridgingMgrBridgeMIB 4 }
+-- juniBridgingMgrBridgePrefix  OBJECT IDENTIFIER
+--     ::= { juniBridgingMgrBridgeTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniBridgingMgrConformance  OBJECT IDENTIFIER
+    ::= { juniBridgingMgrMIB 4 }
+juniBridgingMgrCompliances  OBJECT IDENTIFIER
+    ::= { juniBridgingMgrConformance 1 }
+juniBridgingMgrGroups  OBJECT IDENTIFIER
+    ::= { juniBridgingMgrConformance 2 }
+
+--
+-- compliance statements
+--
+juniBridgingMgrCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        Bridging Manager MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniBridgingMgrConfGroup }
+    ::= { juniBridgingMgrCompliances 1 }                           -- JUNOSe 5.0
+
+
+--
+-- units of conformance
+--
+juniBridgingMgrConfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniBridgingMgrNextIndex,
+        juniBridgingMgrBridgeRowStatus,
+        juniBridgingMgrBridgeGroupLearning,
+        juniBridgingMgrBridgeGroupName,
+        juniBridgingMgrBridgeGroupSPolicyIndex,
+        juniBridgingMgrBridgeGroupRouteProtocol,
+        juniBridgingMgrBridgeGroupLearnCount,
+
+        juniBridgingMgrSubscriberNextIndex,
+
+        juniBridgingMgrBridgeSubscriberPolicyRowStatus,
+        juniBridgingMgrBridgeSubscriberPolicyArp,
+        juniBridgingMgrBridgeSubscriberPolicyBroadcast,
+        juniBridgingMgrBridgeSubscriberPolicyMulticast,
+        juniBridgingMgrBridgeSubscriberPolicyUnknownUnicast,
+        juniBridgingMgrBridgeSubscriberPolicyIp,
+        juniBridgingMgrBridgeSubscriberPolicyUnknownProtocol,
+        juniBridgingMgrBridgeSubscriberPolicyUnicast,
+        juniBridgingMgrBridgeSubscriberPolicyPPPoE,
+        juniBridgingMgrBridgeSubscriberPolicyRelearn,
+        juniBridgingMgrBridgeSubscriberPolicyMpls,
+        juniBridgingMgrBridgeSubscriberPolicyName,
+
+        juniBridgingMgrBridgeMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing basic management of the Bridging
+        Manager in a Juniper product."
+    ::= { juniBridgingMgrGroups 1 }
+
+END
+
+

@@ -1,0 +1,358 @@
+-- =======================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: Huawei ASPF MIB, this MIB will for firewall only
+-- Reference:
+-- Version:     V1.10
+-- History:
+--  
+--  V1.20 2005-05-30 Wei Rixi(22510) added mplsVpnVrfName as table index,
+--              changed the region of ApplyZoneID(hwNatEudmZoneApplyZoneID1
+--              and hwNatEudmZoneApplyZoneID2) from 1~16 to 0~128.
+--              Added fields to HwAspfEudmAppEnableEntry and hwAspfEudmAppEnableGroup.
+--  V1.10 2004-06-30 Xin Jianfeng(37631) altered the region of 
+--                  hwAspfEudmEnableJavaAcl & hwAspfEudmEnableActiveXAcl to 
+--                  0|2000~2999
+--  V1.00 2003-03-18 Yang Yinzhu(28193)  initial version
+-- =======================================================================
+
+HUAWEI-ASPF-EUDM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        TruthValue            
+            FROM SNMPv2-TC
+        mplsVpnVrfName            
+            FROM MPLS-VPN-MIB
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwASPFEudm MODULE-IDENTITY 
+        LAST-UPDATED "200304110900Z"        -- April 11, 2003 at 09:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            The HUAWEI-ASPF_EUDM-MIB contains objects to
+            manage the ASPF(Application Specific Packet Filter)
+            configuration for firewall.
+            "
+        ::= { hwASPF 2 }
+
+    --
+    -- Node definitions
+    --
+    -- 1.3.6.1.4.1.2011.5.25.6
+    hwASPF OBJECT IDENTIFIER ::= { hwDatacomm 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1
+    hwAspfMibEudmObjects OBJECT IDENTIFIER ::= { hwASPFEudm 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1
+    hwAspfEudmAppEnableTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAspfEudmAppEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            This table contains some switches,
+            these switches denotes which application protocol to be inspected.
+            This table is used for the device with security zone.
+            "
+        ::= { hwAspfMibEudmObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1
+    hwAspfEudmAppEnableEntry OBJECT-TYPE
+        SYNTAX HwAspfEudmAppEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            Each table entry define the configuration in one inter zone.
+            "
+        INDEX { mplsVpnVrfName, hwAspfEudmAppEnableZoneID1, hwAspfEudmAppEnableZoneID2 }
+        ::= { hwAspfEudmAppEnableTable 1 }
+    
+    HwAspfEudmAppEnableEntry ::=
+        SEQUENCE { 
+            hwAspfEudmAppEnableZoneID1
+                Integer32,
+            hwAspfEudmAppEnableZoneID2
+                Integer32,
+            hwAspfEudmEnableFtp
+                TruthValue,
+            hwAspfEudmEnableSmtp
+                TruthValue,
+            hwAspfEudmEnableRstp
+                TruthValue,
+            hwAspfEudmEnableH323
+                TruthValue,
+            hwAspfEudmEnableHttp
+                TruthValue,
+            hwAspfEudmEnableJava
+                TruthValue,
+            hwAspfEudmEnableJavaAcl
+                Integer32,
+            hwAspfEudmEnableActiveX
+                TruthValue,
+            hwAspfEudmEnableActiveXAcl
+                Integer32,
+            hwAspfEudmEnablePptp
+                TruthValue,
+            hwAspfEudmEnableNetBios
+                TruthValue,
+            hwAspfEudmEnableMsn
+                TruthValue,
+            hwAspfEudmEnableQq
+                TruthValue,
+            hwAspfEudmEnableSip
+                TruthValue,
+            hwAspfEudmEnableUserDefAcl
+                Integer32,
+            hwAspfEudmEnableUserDefAge
+                Integer32,
+            hwAspfEudmEnableIdo
+                TruthValue,
+            hwAspfEudmEnableIls
+                TruthValue
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.1
+    hwAspfEudmAppEnableZoneID1 OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The internal ID of first security zone,
+            This is index.
+            0: Any zone.
+            "
+        ::= { hwAspfEudmAppEnableEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.2
+    hwAspfEudmAppEnableZoneID2 OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The internal ID of second security zone, this is index.
+            ID2 must not less than ID1.
+            0: Any zone.
+            "
+        ::= { hwAspfEudmAppEnableEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.3
+    hwAspfEudmEnableFtp OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for FTP protocol."
+        ::= { hwAspfEudmAppEnableEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.4
+    hwAspfEudmEnableSmtp OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for SMTP protocol."
+        ::= { hwAspfEudmAppEnableEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.5
+    hwAspfEudmEnableRstp OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for RSTP protocol."
+        ::= { hwAspfEudmAppEnableEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.6
+    hwAspfEudmEnableH323 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for H323 protocol."
+        ::= { hwAspfEudmAppEnableEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.7
+    hwAspfEudmEnableHttp OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for HTTP protocol."
+        ::= { hwAspfEudmAppEnableEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.8
+    hwAspfEudmEnableJava OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for JAVA."
+        ::= { hwAspfEudmAppEnableEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.9
+    hwAspfEudmEnableJavaAcl OBJECT-TYPE
+        SYNTAX Integer32 (0 | 2000..2999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The acl number to specify the hosts from which the packet to be inspected."
+        ::= { hwAspfEudmAppEnableEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.10
+    hwAspfEudmEnableActiveX OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for ActiveX."
+        ::= { hwAspfEudmAppEnableEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.11
+    hwAspfEudmEnableActiveXAcl OBJECT-TYPE
+        SYNTAX Integer32 (0 | 2000..2999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The acl number to specify the hosts from which the packet to be inspected."
+        ::= { hwAspfEudmAppEnableEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.12
+    hwAspfEudmEnablePptp OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for PPTP."
+        ::= { hwAspfEudmAppEnableEntry 12 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.13
+    hwAspfEudmEnableNetBios OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for NetBios."
+        ::= { hwAspfEudmAppEnableEntry 13 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.14
+    hwAspfEudmEnableMsn OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for MSN."
+        ::= { hwAspfEudmAppEnableEntry 14 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.15
+    hwAspfEudmEnableQq OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for QQ."
+        ::= { hwAspfEudmAppEnableEntry 15 }
+                                    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.16
+    hwAspfEudmEnableSip OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for SIP."
+        ::= { hwAspfEudmAppEnableEntry 16 }
+
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.17
+    hwAspfEudmEnableUserDefAcl OBJECT-TYPE
+        SYNTAX Integer32 (0 | 2000..2999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The user define acl number to specify the hosts from which the packet to be inspected."
+        ::= { hwAspfEudmAppEnableEntry 17 }
+
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.18
+    hwAspfEudmEnableUserDefAge OBJECT-TYPE
+        SYNTAX Integer32 (0 | 1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The aging time of the user define."
+        ::= { hwAspfEudmAppEnableEntry 18 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.19
+    hwAspfEudmEnableIdo OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for IDO."
+        ::= { hwAspfEudmAppEnableEntry 19 }
+
+    -- 1.3.6.1.4.1.2011.5.25.6.2.1.1.1.20
+    hwAspfEudmEnableIls OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The inspecting switch for ILS."
+        ::= { hwAspfEudmAppEnableEntry 20 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.6.2.2
+    hwAspfEudmConformance OBJECT IDENTIFIER ::= { hwASPFEudm 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.2.1
+    hwAspfEudmCompliance OBJECT IDENTIFIER ::= { hwAspfEudmConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.2.2
+    hwAspfEudmMibGroups OBJECT IDENTIFIER ::= { hwAspfEudmConformance 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.6.2.2.2.1
+    hwAspfEudmAppEnableGroup OBJECT-GROUP
+        OBJECTS { 
+            hwAspfEudmEnableFtp, 
+            hwAspfEudmEnableRstp, 
+            hwAspfEudmEnableH323, 
+            hwAspfEudmEnableHttp, 
+            hwAspfEudmEnableJava, 
+            hwAspfEudmEnableJavaAcl, 
+            hwAspfEudmEnableActiveX, 
+            hwAspfEudmEnableActiveXAcl, 
+            hwAspfEudmEnableSmtp,
+            hwAspfEudmEnablePptp,
+            hwAspfEudmEnableNetBios,
+            hwAspfEudmEnableMsn,
+            hwAspfEudmEnableQq,
+            hwAspfEudmEnableSip,
+            hwAspfEudmEnableUserDefAcl,
+            hwAspfEudmEnableUserDefAge,
+            hwAspfEudmEnableIdo,
+            hwAspfEudmEnableIls
+        }
+        STATUS current
+        DESCRIPTION 
+            "The object group contains the ASPF application inspecting switches mib objects "
+        ::= { hwAspfEudmMibGroups 1 }
+    
+
+END

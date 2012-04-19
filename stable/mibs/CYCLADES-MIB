@@ -1,0 +1,11 @@
+CYCLADES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises
+      FROM SNMPv2-SMI ;
+
+-- Cyclades Corporation Identifier
+
+cyclades	OBJECT IDENTIFIER ::= { enterprises 2925 }
+
+END

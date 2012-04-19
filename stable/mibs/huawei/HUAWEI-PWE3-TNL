@@ -1,0 +1,327 @@
+-- =================================================================
+-- Copyright (C) 2006 by HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: This MIB defines all the objects that containing PWE3 tunnel information.
+-- Reference: rfc4001
+-- Version: V1.00
+-- History:
+--         V1.0 Rengaofeng, 2008-12-11, publish
+-- =================================================================
+
+
+    HUAWEI-PWE3-TNL-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            HWL2VpnVcEncapsType, HWEnableValue, HWL2VpnStateChangeReason            
+                FROM HUAWEI-VPLS-EXT-MIB            
+            InterfaceIndexOrZero            
+                FROM IF-MIB            
+            InetAddressType            
+                FROM INET-ADDRESS-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            sysUpTime            
+                FROM SNMPv2-MIB            
+            IpAddress, Integer32, Unsigned32, Counter64, BITS, 
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DisplayString, TruthValue, RowStatus            
+                FROM SNMPv2-TC;
+    
+    
+        hwL2VpnPwe3TnlExt MODULE-IDENTITY 
+            LAST-UPDATED "200812151935Z"  --Dec 15, 2008 at 19:35 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd."
+            CONTACT-INFO 
+                "R&D BeiJing, Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                Zip:100085 
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com"
+            DESCRIPTION 
+                "Initial version 2008/12/11,L2VPN QOS OBJECT GROUP."
+            ::= { hwL2Vpn 5 }
+  
+--
+-- Node definitions
+--
+        hwL2Vpn OBJECT IDENTIFIER ::= { hwDatacomm 119 }
+
+--          
+-- The PWE3Tunnel Attribute Group
+-- 
+       hwPwe3TunnelMIBObjects OBJECT IDENTIFIER ::= { hwL2VpnPwe3TnlExt 1 }         
+
+-- Textual Conventions.
+
+      
+   --  ============== hwPWE3TunnelTable  define beginning ==============  
+   
+   -- hwPwe3TunnelTable 
+   hwPwe3TunnelTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPwe3TunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a tunnel table."
+            ::= { hwPwe3TunnelMIBObjects 1 }
+   
+   hwPwe3TunnelEntry OBJECT-TYPE
+            SYNTAX HwPwe3TunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a VC entry."
+            INDEX { hwPwVcId,hwPwVcType,hwPwe3PeerTnlId,hwPwe3PwInlabel}
+            ::= { hwPwe3TunnelTable 1 }
+   
+-- HWPwe3TunnelEntry  
+   HwPwe3TunnelEntry ::=              
+    SEQUENCE { 
+     hwPwVcId
+      Unsigned32,
+     hwPwVcType
+      HWL2VpnVcEncapsType,   
+    hwPwe3PwInlabel
+      Unsigned32,                 
+     hwPwe3PeerTnlId
+      Unsigned32,
+     hwPwe3TnlName
+      OCTET STRING, -- GRE/TE tunnel name
+     hwPwe3TnlType
+      Integer32, --(or OCTET STRING type)
+     hwPwe3TnlSrcAddress
+      IpAddress,
+     hwPwe3TnlDestAddress
+      IpAddress,
+     hwPwe3LspIndex 
+       Integer32, 
+     hwPwe3LspOutIf
+      OCTET STRING,
+     hwPwe3LspOutLabel
+      Integer32,
+     hwPwe3LspNextHop
+       IpAddress,
+     hwPwe3LspFec
+      IpAddress, 
+     hwPwe3LspFecPfxLen
+      Integer32,
+     hwPwe3LspIsBackup
+      TruthValue,
+     hwPwe3PwOutLabel
+      Integer32,
+     hwPwe3IsBalance
+      TruthValue,
+     hwPwe3TnlRowStatus
+      RowStatus   
+    }    
+
+
+    hwPwVcId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index for the conceptual row identifying a PW within  
+                this PW Emulation table.Used in the outgoing PW ID field within the 'Virtual 
+                Circuit FEC Element'."
+            ::= { hwPwe3TunnelEntry 1 }
+
+
+    hwPwVcType OBJECT-TYPE
+            SYNTAX HWL2VpnVcEncapsType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The type of the Virtual Circuit.This value indicate the service carried over 
+                this PW."
+            ::= { hwPwe3TunnelEntry 2 }
+
+
+    hwPwe3PwInlabel OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The inlabel of SVC PW."
+            ::= { hwPwe3TunnelEntry 3 }
+                                    
+
+    hwPwe3PeerTnlId OBJECT-TYPE
+           SYNTAX Unsigned32
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+            "The Tunnel ID."
+           ::= { hwPwe3TunnelEntry 4 }  
+
+
+    hwPwe3TnlName OBJECT-TYPE
+         SYNTAX OCTET STRING
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+          "The name of this Tunnel."
+           ::= { hwPwe3TunnelEntry 5 }
+              
+
+    hwPwe3TnlType OBJECT-TYPE
+         SYNTAX Integer32 (0..255)
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+          "The type of this Tunnel. e.g. LSP/GRE/CR-LSP..."
+           ::= { hwPwe3TunnelEntry 6}
+          
+
+    hwPwe3TnlSrcAddress OBJECT-TYPE
+           SYNTAX IpAddress 
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "The source ip address of this tunnel."   
+           ::= { hwPwe3TunnelEntry 7 }
+
+
+    hwPwe3TnlDestAddress OBJECT-TYPE
+           SYNTAX IpAddress 
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "The destination ip address of this tunnel."   
+           ::= { hwPwe3TunnelEntry 8 } 
+       
+
+    hwPwe3LspIndex OBJECT-TYPE
+           SYNTAX Integer32
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "The index of lsp."
+           ::= { hwPwe3TunnelEntry 9 } 
+           
+                   
+    hwPwe3LspOutIf OBJECT-TYPE
+           SYNTAX OCTET STRING
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "The out-interface of lsp."
+           ::= { hwPwe3TunnelEntry 10 }
+           
+    
+    hwPwe3LspOutLabel OBJECT-TYPE
+           SYNTAX Integer32 (0..2147483647)
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "The out-label of lsp."
+           ::= { hwPwe3TunnelEntry 11 }
+           
+
+    hwPwe3LspNextHop OBJECT-TYPE
+           SYNTAX IpAddress
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "The next-hop of lsp."
+           ::= { hwPwe3TunnelEntry 12 }                       
+           
+         
+    hwPwe3LspFec OBJECT-TYPE
+           SYNTAX IpAddress 
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "The FEC of lsp."   
+           ::= { hwPwe3TunnelEntry 13 } 
+           
+
+    hwPwe3LspFecPfxLen OBJECT-TYPE
+           SYNTAX Integer32
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "The length of mask for hwVplsLspFec."   
+           ::= { hwPwe3TunnelEntry 14 } 
+
+
+    hwPwe3LspIsBackup OBJECT-TYPE
+           SYNTAX TruthValue
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "Indicate whether the lsp is main."   
+           ::= { hwPwe3TunnelEntry 15 } 
+
+
+    hwPwe3PwOutLabel OBJECT-TYPE
+           SYNTAX Integer32
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "the outlabel of pw£¬specified for SVC."   
+           ::= { hwPwe3TunnelEntry 16 }
+
+
+    hwPwe3IsBalance OBJECT-TYPE
+           SYNTAX TruthValue
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "Property of Balance. Rerurn True if Tunnel-Policy is configed."   
+           ::= { hwPwe3TunnelEntry 17 } 
+
+
+    hwPwe3TnlRowStatus OBJECT-TYPE
+           SYNTAX RowStatus
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+            "The operating state of the row."
+           ::= { hwPwe3TunnelEntry 50}
+              
+   --  ============== hwTnlInfoTable  define end ==============    
+
+--           
+--  MIB Trap Definitions
+-- 
+        hwPwe3TunnelMIBTraps OBJECT IDENTIFIER ::= { hwL2VpnPwe3TnlExt 2 }
+           
+--    Conformance information
+-- 
+        hwPwe3TunnelMIBConformance OBJECT IDENTIFIER ::= { hwL2VpnPwe3TnlExt 3 }
+
+        
+        hwPwe3TunnelMIBCompliances OBJECT IDENTIFIER ::= { hwPwe3TunnelMIBConformance 1 }
+
+        
+--  MIB Compliance Definitions
+        hwPwe3TunnelMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-PWE3-TNL-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwPwe3TunnelGroup }
+            ::= { hwPwe3TunnelMIBCompliances 1 }
+
+--  MIB Group Definitions        
+        hwPwe3TunnelMIBGroups OBJECT IDENTIFIER ::= { hwPwe3TunnelMIBConformance 2 }
+
+        
+        hwPwe3TunnelGroup OBJECT-GROUP
+            OBJECTS { hwPwe3TnlName, hwPwe3TnlType, hwPwe3TnlSrcAddress, hwPwe3TnlDestAddress, hwPwe3LspIndex, hwPwe3LspOutIf,
+            hwPwe3LspOutLabel, hwPwe3LspNextHop, hwPwe3LspFec, hwPwe3LspFecPfxLen, hwPwe3LspIsBackup, hwPwe3PwOutLabel, hwPwe3IsBalance, hwPwe3TnlRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The PWE3 tunnel group."
+            ::= { hwPwe3TunnelMIBGroups 1 }
+
+   
+    END 

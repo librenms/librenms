@@ -1,0 +1,397 @@
+-- ============================================================================
+-- AT-SETUP.MIB, Allied Telesis enterprise MIB:
+-- Device Setup for the AlliedWare Plus(tm) operating system
+-- 
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+	AT-SETUP-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			modules			
+				FROM AT-SMI-MIB			
+			Integer32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			DisplayString, TruthValue			
+				FROM SNMPv2-TC;
+	
+	
+		-- 1.3.6.1.4.1.207.8.4.4.4.500
+		setup MODULE-IDENTITY 
+			LAST-UPDATED "200810020000Z"		-- October 2, 2008 at 00:00 GMT
+			ORGANIZATION 
+				"Allied Telesis, Inc."
+			CONTACT-INFO 
+				"http://www.alliedtelesis.com"
+			DESCRIPTION 
+				"The AT Setup MIB for moving and copying files to and from the device
+				and managing the software installation and configuration files."
+
+			REVISION "200810020000Z"		-- October 2, 2008 at 00:00 GMT
+			DESCRIPTION 
+				"Added support for obtaining GUI applet version information."
+
+			REVISION "200809300000Z"		-- September 30, 2008 at 00:00 GMT
+			DESCRIPTION 
+				"Add branch serviceConfig "
+
+			REVISION "200809240000Z"		-- September 24, 2008 at 00:00 GMT
+			DESCRIPTION 
+				"Moved file copy branch to the new AT-FILEv2 MIB.
+				
+				Allowed clearing of currentFirmware, nextBootFirmware and nextBootConfig 
+				by setting the path objects with an empty string."
+			REVISION "200805210000Z"		-- May 21, 2008 at 00:00 GMT
+			DESCRIPTION 
+				"Initial revision."
+			::= { modules 500 }
+
+		
+	
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.1
+		restartDevice OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object will force the device to restart immediately when set with 
+				the value of 1. Reads will return 0."
+			::= { setup 1 }
+
+		
+-- ---------------------------------------------------------- --
+-- The firmware objects
+-- ---------------------------------------------------------- --
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.2
+		firmware OBJECT IDENTIFIER::= { setup 2 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.2.1
+		currentFirmware OBJECT IDENTIFIER::= { firmware 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.2.1.1
+		currSoftVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The major.minor.interim version of the firmware that the device is 
+				currently running. Will return 0 if the version cannot be determined."
+			::= { currentFirmware 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.2.1.2
+		currSoftName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The name of the firmware that the device is currently running."
+			::= { currentFirmware 2 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.2.1.3
+		currSoftSaveAs OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set with a filename to save the currently running software to the root 
+				of the flash. Only one save operation can be executed at a time across 
+				all SNMP users.
+				
+				Immediately upon executing the set action the device will indicate that 
+				the SNMP set was a success. The actual firmware save operation itself 
+				will be started and continue on the device until it has completed.
+				
+				Subsequent reads of the object will return one of several results:
+				saving x            A saving operation is currently in progress. You 
+				                    cannot start another save while the object is 
+				                    returning this value.
+				
+				x success           The last save operation was successfully completed.
+				
+				x failure: [error]  The last save operation failed, with the 
+				                    descriptive message attached. The most common 
+				                    failure is lack of remaining space on the flash.
+				
+				idle                There is no save operation in progress and a new 
+				                    one may be started.
+				
+				
+				Upon reading a success or failure message, the message will be cleared 
+				and the next read will result in an 'idle' message. A new save operation 
+				can now be executed."
+			::= { currentFirmware 3 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.2.2
+		nextBootFirmware OBJECT IDENTIFIER::= { firmware 2 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.2.2.1
+		nextBootVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The major.minor.interim version of the firmware that the device is 
+				currently set to boot from. Will return 0 if the version cannot be 
+				determined."
+			::= { nextBootFirmware 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.2.2.2
+		nextBootPath OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The full path of the release to use the next time the device is rebooted. 
+				There is no guarantee that the file referenced exists in the flash 
+				(ie, may have been subsequently deleted).
+				
+				This object can be set with an empty string in order to clear the current
+				boot firmware. Otherwise, the path should be in the form:
+				flash:/release.rel.
+				
+				There are several requirements that must be met in order to set this 
+				object:
+				- File must exist
+				- File must be in the root of the flash
+				- File must not be the same one that is set as the backup release
+				- File must have a .rel suffix
+				- File must pass several internal checks to ensure it really is a 
+				  release file"
+			::= { nextBootFirmware 2 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.2.3
+		backupFirmware OBJECT IDENTIFIER::= { firmware 3 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.2.3.1
+		backupVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The major.minor.interim version of the firmware that the device will 
+				boot from as a backup. This will return 0 if the version cannot be 
+				determined."
+			::= { backupFirmware 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.2.3.2
+		backupPath OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The full path of the release to use a backup. There is no guarantee that 
+				the file referenced exists in the flash (ie, may have been subsequently 
+				deleted).
+				
+				This object can be set with an empty string in order to clear the current
+				backup firmware. Otherwise, the path should be in the form:
+				flash:/release.rel.
+				
+				There are several requirements that must be met in order to set this 
+				object:
+				- File must exist
+				- File must be in the root of the flash
+				- File must not be the same one that is set as the next boot release
+				- File must have a .rel suffix
+				- File must pass several internal checks to ensure it really is a 
+				  release file"
+			::= { backupFirmware 2 }
+
+		
+-- ---------------------------------------------------------- --
+-- The configuration file objects
+-- ---------------------------------------------------------- --
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.3
+		deviceConfiguration OBJECT IDENTIFIER::= { setup 3 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.3.1
+		runningConfig OBJECT IDENTIFIER::= { deviceConfiguration 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.3.1.1
+		runCnfgSaveAs OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set with a filename to save the running configuration to root of the 
+				flash using that filename.
+				eg myconfig.cfg"
+			::= { runningConfig 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.3.2
+		nextBootConfig OBJECT IDENTIFIER::= { deviceConfiguration 2 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.3.2.1
+		bootCnfgPath OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The full path of the configuration file to use the next time the device 
+				is rebooted. There is no guarantee that the file referenced exists in the 
+				flash (ie, may have been subsequently deleted).
+				
+				This object can be set with an empty string in order to clear the current
+				boot configuration. Otherwise, the path should be in the form:
+				flash:/myconfig.cfg
+				
+				There are several requirements that must be met in order to set this 
+				object:
+				- File must exist
+				- File must be in the root of the flash
+				- File must have a .cfg suffix
+				"
+			::= { nextBootConfig 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.3.2.2
+		bootCnfgExists OBJECT-TYPE
+			SYNTAX TruthValue (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object will return TRUE if the currently defined boot configuration 
+				file exists, or FALSE otherwise."
+			::= { nextBootConfig 2 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.3.3
+		defaultConfig OBJECT IDENTIFIER::= { deviceConfiguration 3 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.3.3.1
+		dfltCnfgPath OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The full path of the configuration file to use as backup when the device 
+				is rebooted. There is no guarantee that the file referenced exists in the 
+				flash (ie, may have been subsequently deleted).
+				
+				This object is not settable - the default configuration file is always 
+				flash:/default.cfg"
+			::= { defaultConfig 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.3.3.2
+		dfltCnfgExists OBJECT-TYPE
+			SYNTAX TruthValue (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object will return TRUE if the currently defined default 
+				configuration file exists, or FALSE otherwise."
+			::= { defaultConfig 2 }
+
+		
+
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.5
+		serviceConfig OBJECT IDENTIFIER::= { setup 5 }
+
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.5.1
+		srvcTelnetEnable	OBJECT-TYPE
+			SYNTAX 		TruthValue
+			MAX-ACCESS 	read-write
+			STATUS 		current
+			DESCRIPTION
+				"This object represents the state of the telnet server of a device.
+
+				A management application can find out the telnet server is either
+				enabled	or disabled by reading this object.
+
+				To either enable or disable the telnet server, a management
+				application can SET this object with value 'enable(1)' or
+				'disable(2)' respectively."
+			::= { serviceConfig 1 }
+
+
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.5.2
+		srvcSshEnable	OBJECT-TYPE
+			SYNTAX 		TruthValue
+			MAX-ACCESS 	read-write
+			STATUS 		current
+			DESCRIPTION
+				"This object represents the state of the ssh server of a device.
+
+				A management application can find out the ssh server is either 
+				enabled	or disabled by reading this object.
+
+				To either enable or disable the ssh server, a management 
+				application can SET this object with value 'enable(1)' or
+				'disable(2)' respectively."
+
+			::= { serviceConfig 2 }
+
+-- ---------------------------------------------------------- --
+-- GUI applet configuration file objects
+-- ---------------------------------------------------------- --
+
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.6
+		guiConfig OBJECT IDENTIFIER::= { setup 6 }
+
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.6.1
+		guiAppletConfig OBJECT IDENTIFIER::= { guiConfig 1 }
+
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.6.1.1
+		guiAppletSysSwVer	OBJECT-TYPE
+			SYNTAX 		DisplayString
+			MAX-ACCESS 	read-only
+			STATUS 		current
+			DESCRIPTION
+				"This object represents the system software release that the
+				 currently selected GUI applet was designed to run on.
+
+				 The system will automatically search for GUI applet files
+				 residing in the root directory of flash, and will select the
+				 latest available one that is applicable to the currently
+				 running system software. This will be the applet that is
+				 uploaded to a user's web browser when they initiate use of the
+				 GUI."
+
+			::= { guiAppletConfig 1 }
+
+		-- 1.3.6.1.4.1.207.8.4.4.4.500.6.1.2
+		guiAppletSwVer	OBJECT-TYPE
+			SYNTAX 		DisplayString
+			MAX-ACCESS 	read-only
+			STATUS 		current
+			DESCRIPTION
+				"This object represents the software version of the currently
+				 selected GUI applet.
+
+				 The system will automatically search for GUI applet files
+				 residing in the root directory of flash, and will select the
+				 latest available one that is applicable to the currently
+				 running system software. This will be the applet that is
+				 uploaded to a user's web browser when they initiate use of the
+				 GUI."
+
+			::= { guiAppletConfig 2 }
+
+END
+
+--
+-- at-setup.mib
+--

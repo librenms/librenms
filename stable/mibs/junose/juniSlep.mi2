@@ -1,0 +1,342 @@
+
+-- *****************************************************************************
+-- Juniper-SLEP-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Serial Line Encapsulation Protocol MIB
+--
+-- Copyright (c) 2000, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-SLEP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniNextIfIndex, JuniEnable
+        FROM Juniper-TC;
+
+juniSlepMIBS  MODULE-IDENTITY
+    LAST-UPDATED "200209162144Z"  -- 16-Sep-02 05:44 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The Serial Line Encapulation Protocol (SLEP) MIB for the Juniper
+        Networks enterprise."
+    -- Revision History
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200104031910Z"  -- 03-Apr-01 03:10 PM EDT  - JUNOSe 3.1
+    DESCRIPTION
+        "Add juniSledDownWhenLooped attribute."
+    REVISION    "200001030000Z"  --  3-Jan-00               - JUNOSe 1.3
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 15 }
+
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSlepObjects     OBJECT IDENTIFIER ::= { juniSlepMIBS 1 }
+
+--
+-- This MIB contains managed objects for the Serial Line Encapulation
+-- Protocol sublayer interface.
+--
+-- Management objects are provided to query for an available
+-- interface index, and to create/delete interfaces of that type.
+-- Creating/deleting these interface types using this MIB has the
+-- side effect of creating/deleting corresponding entries in the
+-- Interface MIB ifTable/ifXTable, and in the Juniper Enterprise
+-- Interface MIB juniIfTable.
+--
+juniSlepIfLayer    OBJECT IDENTIFIER ::= { juniSlepObjects 1 }
+
+-- //////////////////////////////////////////////////////////////////////
+--
+-- Serial Line Encapulation Interface Layer
+--
+-- This layer is managed with the following elements:
+--
+--  o NextIfIndex (generator for SLEP Ifndex selection)
+--  o Interface Table (creation/configuration/deletion of SLEP interfaces)
+--
+-- //////////////////////////////////////////////////////////////////////
+--
+-- IfIndex selection for creating new SLEP interfaces
+--
+juniSlepNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniSlepIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniSlepIfLayer 1 }
+
+
+--
+-- The Slep Interface Table
+--
+juniSlepIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSlepIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The parameters for the SLEP service on this interface."
+    ::= { juniSlepIfLayer 2 }
+
+juniSlepIfEntry OBJECT-TYPE
+    SYNTAX      JuniSlepIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Parameters for a particular SLEP interface.
+
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniSlepIfIndex }
+    ::= { juniSlepIfTable 1 }
+
+JuniSlepIfEntry ::= SEQUENCE {
+    juniSlepIfIndex         InterfaceIndex,
+    juniSlepKeepAliveTimer  INTEGER,
+    juniSlepIfLowerIfIndex  InterfaceIndexOrZero,
+    juniSlepIfRowStatus     RowStatus,
+    juniSlepDownWhenLooped  JuniEnable }
+
+juniSlepIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the corresponding ifEntry."
+    ::= { juniSlepIfEntry 1 }
+
+juniSlepKeepAliveTimer OBJECT-TYPE
+    SYNTAX      INTEGER (0..6553)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The interface keep alive timer for this entry.  The time in seconds
+        that this entity will wait for sending a keep-alive-message to the
+        remote SLEP entity, and the time in seconds that this entity will wait
+        for the reception of a keep-alive-message from the remote SLEP entity."
+    DEFVAL    { 10 }
+    ::= { juniSlepIfEntry 2 }
+
+juniSlepIfLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an interface over which this SLEP interface is to be
+        layered.  A value of zero indicates no layering.  An implementation may
+        choose to require that a nonzero value be configured at entry creation."
+    ::= { juniSlepIfEntry 3 }
+
+juniSlepIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniSlepIfRowStatus
+            juniSlepIfLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniSlepIfIndex must have been determined previously, by
+            reading juniSlepNextIfIndex.
+
+            The interface identified by juniSlepIfLowerIfIndex must exist, and
+            must be an interface type that permits layering of SLEP Interface
+            above it.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniSlepIfEntry 4 }
+
+juniSlepDownWhenLooped OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The down-when-looped control for this entry.  This attribute determines
+        if loop detection is enabled for the interface.  If set to disable, loop
+        detection is disabled for the interface."
+    DEFVAL    { disable }
+    ::= { juniSlepIfEntry 5 }
+
+
+--
+-- The Slep Interface Statistics Table
+--
+juniSlepIfStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSlepIfStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The statistics for the SLEP service on this interface."
+    ::= { juniSlepIfLayer 3 }
+
+juniSlepIfStatisticsEntry OBJECT-TYPE
+    SYNTAX      JuniSlepIfStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The statistics for a particular SLEP interface."
+    INDEX     { juniSlepIfStatsIndex }
+    ::= { juniSlepIfStatisticsTable 1 }
+
+JuniSlepIfStatisticsEntry ::= SEQUENCE {
+    juniSlepIfStatsIndex             InterfaceIndex,
+    juniSlepKeepAliveFailures        Counter32,
+    juniSlepLinkStatusTooLongPackets Counter32,
+    juniSlepLinkStatusBadFCSs        Counter32 }
+
+juniSlepIfStatsIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of that identifies this entry."
+    ::= { juniSlepIfStatisticsEntry 1 }
+
+juniSlepKeepAliveFailures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of link drops due to keep-alive failures."
+    ::= { juniSlepIfStatisticsEntry 2 }
+
+juniSlepLinkStatusTooLongPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that were too long for this SLEP entity."
+    ::= { juniSlepIfStatisticsEntry 3 }
+
+juniSlepLinkStatusBadFCSs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of FCS's errors for this SLEP entity."
+    ::= { juniSlepIfStatisticsEntry 4 }
+
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniSlepTrapControl  OBJECT IDENTIFIER ::= { juniSlepMIBS 2 }
+-- juniSlepTraps        OBJECT IDENTIFIER ::= { juniSlepMIBS 3 }
+-- juniSlepPrefix       OBJECT IDENTIFIER ::= { juniSlepTraps 0 }
+
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSlepConformance OBJECT IDENTIFIER ::= { juniSlepMIBS 4 }
+juniSlepCompliances OBJECT IDENTIFIER ::= { juniSlepConformance 1 }
+juniSlepGroups      OBJECT IDENTIFIER ::= { juniSlepConformance 2 }
+
+--
+-- compliance statements
+--
+juniSlepCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        SLEP MIB.  This compliance statement became obsolete when the
+        juniSlepDownWhenLooped object was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSlepGroup }
+    ::= { juniSlepCompliances 1 }                                  -- JUNOSe 1.3
+
+juniSlepCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        SLEP MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSlepGroup2 }
+    ::= { juniSlepCompliances 2 }                                  -- JUNOSe 3.1
+
+--
+-- units of conformance
+--
+juniSlepGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSlepNextIfIndex,
+        juniSlepKeepAliveTimer,
+        juniSlepIfLowerIfIndex,
+        juniSlepIfRowStatus,
+        juniSlepKeepAliveFailures,
+        juniSlepLinkStatusTooLongPackets,
+        juniSlepLinkStatusBadFCSs }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of SLEP interfaces
+        in a Juniper product.  This group became obsolete when the
+        juniSlepDownWhenLooped object was added."
+    ::= { juniSlepGroups 1 }
+
+juniSlepGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniSlepNextIfIndex,
+        juniSlepKeepAliveTimer,
+        juniSlepIfLowerIfIndex,
+        juniSlepIfRowStatus,
+        juniSlepDownWhenLooped,
+        juniSlepKeepAliveFailures,
+        juniSlepLinkStatusTooLongPackets,
+        juniSlepLinkStatusBadFCSs }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of SLEP interfaces in a
+        Juniper product."
+    ::= { juniSlepGroups 2 }
+
+END

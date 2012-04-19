@@ -1,0 +1,1692 @@
+ALCATEL-IND1-SAA-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY,
+            Integer32, Unsigned32, Counter32
+                                                      FROM SNMPv2-SMI
+            SnmpAdminString
+                                                      FROM SNMP-FRAMEWORK-MIB
+
+            OBJECT-GROUP,MODULE-COMPLIANCE
+                                                      FROM SNMPv2-CONF
+
+            DateAndTime, DisplayString, TruthValue,
+            RowStatus, MacAddress                     FROM SNMPv2-TC
+
+            InetAddressType, InetAddress              FROM INET-ADDRESS-MIB
+
+	    softentIND1Saa			      FROM ALCATEL-IND1-BASE                
+            
+            Dot1agCfmMaintDomainName,
+            Dot1agCfmMaintAssocName                   FROM IEEE8021-CFM-MIB; 
+        
+         alcatelIND1SaaMIB MODULE-IDENTITY
+	    LAST-UPDATED "200907210000Z"     -- 07/21/2009 00:00GMT
+            ORGANIZATION "Alcatel - Architects Of An Internet World"
+            CONTACT-INFO
+                "Please consult with Customer Service to insure the most appropriate
+                 version of this document is used with the products in question:
+
+                        Alcatel Internetworking, Incorporated
+                       (Division 1, Formerly XYLAN Corporation)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+                Telephone:           North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+                Electronic Mail:         support@ind.alcatel.com
+                World Wide Web:          http://www.ind.alcatel.com
+                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+            DESCRIPTION
+                "This module describes an authoritative enterprise-
+                specific Simple Network Management Protocol (SNMP) Management
+                Information Base (MIB):
+
+                For the Birds Of Prey Product Line
+                Service Assurance agent.
+
+
+                The right to make changes in specification and other information
+                contained in this document without prior notice is reserved.
+
+                No liability shall be assumed for any incidental, indirect,
+                special, or consequential damages whatsoever arising from or
+                related to this document or the information contained herein.
+
+                Vendors, end-users, and other interested parties are granted
+                non-exclusive license to use this specification in connection with
+                management of the products for which it is intended to be used.
+
+                Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+            REVISION      "200907210000Z"
+
+            DESCRIPTION
+                "The mib for SAA module"
+                ::= { softentIND1Saa 1}
+
+-- --------------------------------------------------------------
+--
+-- Sections of the  Saa MIB
+-- --------------------------------------------------------------
+      alcatelIND1SaaNotifications OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch for Saa Notifications."
+        ::= { alcatelIND1SaaMIB 0 }
+
+      alcatelIND1SaaMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "Branch For Saa Objects."
+        ::= { alcatelIND1SaaMIB 1 }
+
+      alcatelIND1SaaMIBConformance OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch for Saa Module MIB Subsystem Conformance Information."
+        ::= { alcatelIND1SaaMIB 2 }
+
+      alcatelIND1SaaMIBGroups OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch for Saa Module MIB Subsystem Units of Conformance."
+        ::= { alcatelIND1SaaMIBConformance 1 }
+
+      alcatelIND1SaaMIBCompliances OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch for Saa Module MIB Subsystem Compliance Statements."
+        ::= { alcatelIND1SaaMIBConformance 2 }
+
+
+-- --------------------------------------------------------------
+--      DESCRIPTION:
+--         "control table data for the Saa Module.
+--         "
+--  --------------------------------------------------------------
+
+      alaSaaCtrlConfig  OBJECT IDENTIFIER ::= { alcatelIND1SaaMIBObjects 1 }
+
+      alaSaaCtrlTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaSaaCtrlEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Defines the SAA control table for providing, via SNMP, the 
+           capability of performing SAA test operations.
+          "
+        ::= { alaSaaCtrlConfig  1 }
+
+      alaSaaCtrlEntry OBJECT-TYPE
+        SYNTAX     AlaSaaCtrlEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+          "An entry in the alaSaaCtrlTable  table, containing information on
+	  the Saa function for a single instance of the Saa.
+          "
+        INDEX { 
+                alaSaaCtrlOwnerIndex,
+                alaSaaCtrlTestIndex
+              }
+        ::= { alaSaaCtrlTable 1 }
+
+      AlaSaaCtrlEntry ::=
+        SEQUENCE {
+          alaSaaCtrlOwnerIndex		   SnmpAdminString,
+          alaSaaCtrlTestIndex		         SnmpAdminString,
+          alaSaaCtrlRowStatus		         RowStatus,
+          alaSaaCtrlDescr		         DisplayString,
+          alaSaaCtrlAdminStatus		   INTEGER,
+          alaSaaCtrlTestMode		         INTEGER,
+          alaSaaCtrlRuns		         Counter32,
+          alaSaaCtrlFailures		         Counter32,
+          alaSaaCtrlLastRunResult		   INTEGER,
+          alaSaaCtrlLastRunTime		   DateAndTime,
+          alaSaaCtrlInterval		         Integer32,
+          alaSaaCtrlStartAt		         DateAndTime,
+          alaSaaCtrlStopAt		         DateAndTime,
+          alaSaaCtrlMaxHistoryRows  	   Integer32
+        }
+
+     alaSaaCtrlOwnerIndex OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..32))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Owner name to identify entries in the table.
+           This is currently not supported and its value
+           will always be the string 'USER'.
+          "
+        DEFVAL { "USER" }
+        ::= { alaSaaCtrlEntry 1 }
+
+     alaSaaCtrlTestIndex OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..32))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Unique name to identify the entries in the table. 
+           The name is unique across various SNMP users.
+          "
+        ::= { alaSaaCtrlEntry 2 }
+
+     alaSaaCtrlRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "This object allows entries to be created and deleted in the table.
+          "
+        ::= { alaSaaCtrlEntry 3 }
+
+     alaSaaCtrlDescr OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "User provided description string for the SAA.
+          "
+	DEFVAL { "DEFAULT" }
+        ::= { alaSaaCtrlEntry 4 }
+
+     alaSaaCtrlAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER  {
+			start(0),
+			stop(1)
+			}
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Indicates wether to start or stop the SAA test.
+          "
+        ::= { alaSaaCtrlEntry 5 }
+
+     alaSaaCtrlTestMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        undefined(0),
+                        ipSaa(1),
+                        ethSaa(2)
+                        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The type of SAA test to be performed. The undefined value corresponds to the case
+          when an entry is created in the alaSaaCtrlTable table without specifying a value for 
+	  this object. This value shall be updated when the user creates an entry for the
+	  corresponding saa in the alaSaaIpCtrlTable table or alaSaaEthoamCtrlTable table.
+          "
+	DEFVAL { undefined }
+        ::= { alaSaaCtrlEntry 6 }
+
+     alaSaaCtrlRuns OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Indicates number of times SAA test has been executed.
+          "
+        ::= { alaSaaCtrlEntry 7 }
+
+     alaSaaCtrlFailures OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Indicates the number of times this SAA test has failed.
+          "
+        ::= { alaSaaCtrlEntry 8 }
+
+    alaSaaCtrlLastRunResult OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                        undetermined(0),
+                        success(1),
+			failed(2),
+                        aborted(3)
+                        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The result of the latest SAA test iteration.
+          "
+        ::= { alaSaaCtrlEntry 9 }
+
+     alaSaaCtrlLastRunTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The time at which the last iteration of the SAA was run.
+          "
+        ::= { alaSaaCtrlEntry 10 }
+
+     alaSaaCtrlInterval OBJECT-TYPE
+        SYNTAX      Integer32 (10..1500)
+	UNITS       "minutes"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Interval, in minutes, between two iterations of the SAA test.
+          "
+	  DEFVAL { 150 }
+        ::= { alaSaaCtrlEntry 11 }
+
+     alaSaaCtrlStartAt OBJECT-TYPE
+        SYNTAX      DateAndTime (SIZE(8))
+	MAX-ACCESS  read-create	
+        STATUS      current
+        DESCRIPTION
+          "Specifies the time at which the SAA test 
+           is to be started. The deci-seconds specified in DateAndTime
+           has no significance in scheduling SAA. The year in DateAndTime
+	   must be in the range from 1970 to 2037.
+          "
+        ::= { alaSaaCtrlEntry 12 }
+
+     alaSaaCtrlStopAt OBJECT-TYPE
+        SYNTAX      DateAndTime (SIZE(8))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Specifies the time at which the SAA test 
+           is to be stopped.Special value for DataAndTime which is
+	   9999-12-31,23:59:59.0 is used to reset the existing configured 
+           value of this object, indicating that the SAA test should never stop.
+	   The deci-seconds in the DateAndTime has no significance in scheduling
+	   SAA.The year in DateAndTime must be in the range from 1970 to 2037.
+          "
+        ::= { alaSaaCtrlEntry 13 }
+
+     alaSaaCtrlMaxHistoryRows OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the maximum number of iterations for which
+           history data is maintained.
+          "
+        DEFVAL { 5 }
+        ::= { alaSaaCtrlEntry 14 }
+
+
+-- ***************************************************************
+--      DESCRIPTION:
+--                      "control table data for the Ip-Saa.
+--                     " 
+-- ***************************************************************
+
+      alaSaaIpCtrlConfig  OBJECT IDENTIFIER ::= { alcatelIND1SaaMIBObjects 2 }
+
+      alaSaaIpCtrlTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaSaaIpCtrlEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "It defines the ping Control Table for providing the ping capability
+          via SNMP. The results of these tests are stored in the alaSaaIpResultsTable
+          and alaSaaIpHistoryTable.
+          "
+        ::= { alaSaaIpCtrlConfig  1 }
+
+      alaSaaIpCtrlEntry OBJECT-TYPE
+        SYNTAX      AlaSaaIpCtrlEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Entry for the alaSaaIpCtrl table.
+          "
+        INDEX {
+                alaSaaIpCtrlOwnerIndex,
+                alaSaaIpCtrlTestIndex
+              }
+        ::= { alaSaaIpCtrlTable 1 }
+
+      AlaSaaIpCtrlEntry ::=
+        SEQUENCE {
+                  alaSaaIpCtrlOwnerIndex   	SnmpAdminString,
+                  alaSaaIpCtrlTestIndex	   	SnmpAdminString,
+                  alaSaaIpCtrlRowStatus      	RowStatus,
+                  alaSaaIpCtrlTestMode          INTEGER,
+                  alaSaaIpCtrlTgtAddrType       InetAddressType,
+                  alaSaaIpCtrlTgtAddress        InetAddress,
+                  alaSaaIpCtrlSrcAddrType       InetAddressType,
+                  alaSaaIpCtrlSrcAddress        InetAddress,
+                  alaSaaIpCtrlPayloadSize       Integer32,
+                  alaSaaIpCtrlNumPkts           Integer32,	
+                  alaSaaIpCtrlInterPktDelay     Integer32,	
+                  alaSaaIpCtrlTypeOfService     Integer32,
+                  alaSaaIpCtrlVRFId             Integer32,
+                  alaSaaIpCtrlTotalPktsSent     Counter32,
+                  alaSaaIpCtrlTotalPktsRcvd     Counter32,
+                  alaSaaIpCtrlMinRTT            Integer32,
+                  alaSaaIpCtrlAvgRTT            Integer32,
+                  alaSaaIpCtrlMaxRTT            Integer32,
+                  alaSaaIpCtrlMinJitter         Integer32,
+                  alaSaaIpCtrlAvgJitter         Integer32,
+                  alaSaaIpCtrlMaxJitter         Integer32,
+                  alaSaaIpCtrlTSMinRTT          DateAndTime,
+                  alaSaaIpCtrlTSMaxRTT          DateAndTime,
+                  alaSaaIpCtrlTSMinJitter       DateAndTime,
+                  alaSaaIpCtrlTSMaxJitter       DateAndTime                             
+                 }
+
+     alaSaaIpCtrlOwnerIndex OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..32))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Owner name to identify entries in the table.
+           This is currently not supported and its value
+           will always be the string 'USER'.
+          "
+        DEFVAL { "USER" }
+        ::= { alaSaaIpCtrlEntry 1 }
+
+      alaSaaIpCtrlTestIndex OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..32))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Unique name to identify the entries in the table. 
+           This name is unique across various SNMP users.
+          "
+        ::= { alaSaaIpCtrlEntry 2 }
+
+      alaSaaIpCtrlRowStatus      OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Allows entries to be created and deleted in the table. 
+	  createAndWait value is not supported for this object.
+          "
+        ::= { alaSaaIpCtrlEntry 3 }
+
+      alaSaaIpCtrlTestMode          OBJECT-TYPE
+        SYNTAX      INTEGER {
+				icmpEcho(1)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Specifies the type of ping test defined by this entry.
+	    "
+        ::= { alaSaaIpCtrlEntry 4 }
+
+      alaSaaIpCtrlTgtAddrType       OBJECT-TYPE
+        SYNTAX      InetAddressType(1)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Specifies the InetAddress type of host address to be used as the destination 
+          for performing a ping operation. InetAddressIPv4(1) is the only type currently
+          supported.
+          "
+	DEFVAL { 1 }
+        ::= { alaSaaIpCtrlEntry 5 }
+
+      alaSaaIpCtrlTgtAddress        OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Specifies the IP host address to be used as the destination for 
+           performing a ping operation.
+          "
+        ::= { alaSaaIpCtrlEntry 6 }
+
+      alaSaaIpCtrlSrcAddrType       OBJECT-TYPE
+        SYNTAX      InetAddressType(1)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Specifies the InetAddress type of host address to be used as the source for 
+          performing a ping operation. InetAddressIPv4(1) is the only type currently
+          supported.
+          "
+	DEFVAL { 1 }
+        ::= { alaSaaIpCtrlEntry 7 }
+
+      alaSaaIpCtrlSrcAddress        OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Specifies the IP host address to be used as the source for performing
+          a ping operation. The default value of this object is 0.0.0.0 if 
+          alaSaaIpCtrlSrcAddrType is set to ipv4.
+          "
+        ::= { alaSaaIpCtrlEntry 8 }
+
+      alaSaaIpCtrlPayloadSize        OBJECT-TYPE
+        SYNTAX      Integer32 (24..1472)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Specifies the size of the ICMP payload to be used for the ping operation.
+          "
+	DEFVAL { 24 }
+        ::= { alaSaaIpCtrlEntry 9 }
+
+       alaSaaIpCtrlNumPkts        OBJECT-TYPE
+        SYNTAX      Integer32 (1..10)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Specifies the number of packets to be sent in one ping iteration.
+          "
+	DEFVAL { 5 }
+        ::= { alaSaaIpCtrlEntry 10 }
+
+      alaSaaIpCtrlInterPktDelay     OBJECT-TYPE
+        SYNTAX      Integer32 (100..1000)
+	UNITS       "milli-seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Specifies the delay between two consecutive packets transmitted 
+           during a ping iteration.The value specified should be a multiple
+           of 100.
+          "
+	DEFVAL { 1000 }
+        ::= { alaSaaIpCtrlEntry 11 }
+
+      alaSaaIpCtrlTypeOfService     OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Specifies the type of service
+          "
+	DEFVAL { 0 }
+        ::= { alaSaaIpCtrlEntry 12 }
+
+      alaSaaIpCtrlVRFId     OBJECT-TYPE
+        SYNTAX      Integer32 (0..4096)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Specifies the VRF ID. Only the value '0' is
+           currently supported.
+          "
+        ::= { alaSaaIpCtrlEntry 13 }
+
+      alaSaaIpCtrlTotalPktsSent  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the total number of packets sent during all the ping iterations.
+          "
+        ::= { alaSaaIpCtrlEntry 14 }
+
+      alaSaaIpCtrlTotalPktsRcvd   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the total number of packets received during all the ping iterations.
+          "
+        ::= { alaSaaIpCtrlEntry 15 }
+
+      alaSaaIpCtrlMinRTT    OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the minimum round trip time among all the iterations of the SAA.
+          "
+        ::= { alaSaaIpCtrlEntry 16 }
+
+      alaSaaIpCtrlAvgRTT   OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the average round trip time of all the iterations of the SAA.
+          "
+        ::= { alaSaaIpCtrlEntry 17 }
+
+      alaSaaIpCtrlMaxRTT    OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the maximum round trip time among all the iterations of the SAA.
+          "
+        ::= { alaSaaIpCtrlEntry 18 }
+
+      alaSaaIpCtrlMinJitter   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the minimum jitter among all the iterations of the SAA.
+          "
+        ::= { alaSaaIpCtrlEntry 19 }
+
+      alaSaaIpCtrlAvgJitter   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the average jitter of all the iterations of the SAA.
+          "
+        ::= { alaSaaIpCtrlEntry 20 }
+
+      alaSaaIpCtrlMaxJitter   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the maximum jitter among all the iterations of the SAA.
+          "
+        ::= { alaSaaIpCtrlEntry 21 }
+
+     alaSaaIpCtrlTSMinRTT    OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the timestamp of the iteration that gave the minimum 
+           packet delay.
+          "
+        ::= { alaSaaIpCtrlEntry 22 }
+
+     alaSaaIpCtrlTSMaxRTT    OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the timestamp of the iteration that gave the maximum 
+           packet delay.
+          "
+        ::= { alaSaaIpCtrlEntry 23 }
+
+     alaSaaIpCtrlTSMinJitter   OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the timestamp of the iteration that gave the minimum 
+           packet jitter.
+          "
+        ::= { alaSaaIpCtrlEntry 24 }
+
+     alaSaaIpCtrlTSMaxJitter   OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the timestamp of the iteration that gave the maximum 
+           packet jitter.
+          "
+        ::= { alaSaaIpCtrlEntry 25 }
+
+
+-- ***************************************************************
+--      DESCRIPTION:
+--                      "Results table data for the Ip-Saa.
+--                     " 
+-- ***************************************************************
+
+      alaSaaIpResults  OBJECT IDENTIFIER ::= { alcatelIND1SaaMIBObjects 3 }
+
+      alaSaaIpResultsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaSaaIpResultsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Defines the IP Results Table for providing
+           the capability of performing IP Ping operations. The 
+           results of these operations are stored in the 
+           alaSaaIpResultsTable and the alaSaaIpHistoryTable.
+ 
+           An entry is removed from the alaSaaIpResultsTable when
+           its corresponding alaSaaCtrlEntry is deleted.
+          "
+        ::= { alaSaaIpResults  1 }
+
+      alaSaaIpResultsEntry OBJECT-TYPE
+        SYNTAX      AlaSaaIpResultsEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Entry for the alaSaaResults table.
+
+           An entry in this table summarizes results from multiple
+           invocations of the test configured by the corresponding
+           entry in alaSaaIpCtrlTable.
+          "
+        INDEX {
+                alaSaaIpCtrlOwnerIndex,
+                alaSaaIpCtrlTestIndex,
+                alaSaaIpResultsTestRunIndex
+              }
+        ::= { alaSaaIpResultsTable 1 }
+
+      AlaSaaIpResultsEntry ::=
+        SEQUENCE {
+                  alaSaaIpResultsTestRunIndex 	   Unsigned32,
+                  alaSaaIpResultsPktsSent          Counter32,
+                  alaSaaIpResultsPktsRcvd          Counter32,
+                  alaSaaIpResultsInterPktDelay     Integer32,
+                  alaSaaIpResultsRunResult 	   INTEGER,
+		  alaSaaIpResultsRunResultReason   OCTET STRING,
+	   	  alaSaaIpResultsRunTime  	   DateAndTime,
+                  alaSaaIpResultsMinRTT            Integer32,
+                  alaSaaIpResultsAvgRTT            Integer32,
+                  alaSaaIpResultsMaxRTT            Integer32,
+                  alaSaaIpResultsMinJitter         Integer32,
+                  alaSaaIpResultsAvgJitter         Integer32,
+                  alaSaaIpResultsMaxJitter         Integer32
+                 }
+
+      alaSaaIpResultsTestRunIndex   OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The value of alaSaaIpResultsTestRunIndex identifies the
+           row entry that reports results for a single OAM test run.
+
+           The value of this object starts from 1 and can go upto a 
+           maximum of alaSaaCtrlMaxHistoryRows.
+          "
+        ::= { alaSaaIpResultsEntry 1 }
+
+      alaSaaIpResultsPktsSent   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the number of packets sent during a single ping iteration.
+          "
+        ::= { alaSaaIpResultsEntry 2 }
+
+      alaSaaIpResultsPktsRcvd     OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the number of packets received during a single ping iteration.
+          "
+        ::= { alaSaaIpResultsEntry 3 }
+
+      alaSaaIpResultsInterPktDelay   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Specifies the inter-packet-delay with which the packets were sent 
+           in the iteration.
+          "
+        ::= { alaSaaIpResultsEntry 4 }
+
+       alaSaaIpResultsRunResult OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        undetermined(0),
+                        success(1),
+			      failed(2),
+                        aborted(3)
+                        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The result of the iteration.
+          "
+        ::= { alaSaaIpResultsEntry 5 }
+
+       alaSaaIpResultsRunResultReason  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "If the iteration fails, this field indicates the reason
+           for failure. If the reason for failure cannot be determined
+           the value of this field is the string Unknown.
+           For successful iterations, the value of this field is the
+           string 'Iteration successful'.
+          "
+        ::= { alaSaaIpResultsEntry 6 }
+
+       alaSaaIpResultsRunTime  OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The date and time at which the iteraton was run.
+          "
+        ::= { alaSaaIpResultsEntry 7 }	
+
+      alaSaaIpResultsMinRTT   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The minimum round trip time.
+          "
+        ::= { alaSaaIpResultsEntry 8 }
+
+       alaSaaIpResultsAvgRTT  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The average round trip time.
+          "
+        ::= { alaSaaIpResultsEntry 9 }
+
+       alaSaaIpResultsMaxRTT   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum round trip time.
+          "
+        ::= { alaSaaIpResultsEntry 10 }	
+
+       alaSaaIpResultsMinJitter  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Minumum jitter value.
+          "
+        ::= { alaSaaIpResultsEntry 11 }
+
+      alaSaaIpResultsAvgJitter  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Average jitter value.
+          "
+        ::= { alaSaaIpResultsEntry 12 }
+
+       alaSaaIpResultsMaxJitter  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Maximum jitter value
+          "
+        ::= { alaSaaIpResultsEntry 13 }	
+
+
+-- ***************************************************************
+--      DESCRIPTION:
+--                      "Data for the stats history"
+-- ***************************************************************
+
+      alaSaaIpHistory OBJECT IDENTIFIER ::= { alcatelIND1SaaMIBObjects 4 }
+
+      alaSaaIpHistoryTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaSaaIpHistoryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "It is the table for storing the results of a ping operation. An entry
+          in this table is created when a ping operation is performed. Entries 
+          are removed from this table when its corresponding alaSaaCtrlEntry is
+     	  deleted.
+          "
+        ::= { alaSaaIpHistory 1 }
+
+      alaSaaIpHistoryEntry OBJECT-TYPE
+        SYNTAX      AlaSaaIpHistoryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Entry of the alaSaaIpHistory table.
+          "
+      INDEX       {
+                    alaSaaIpCtrlOwnerIndex,
+                    alaSaaIpCtrlTestIndex,
+                    alaSaaIpResultsTestRunIndex,
+                    alaSaaIpHistoryIndex
+                  }
+      ::= { alaSaaIpHistoryTable 1 }
+
+      AlaSaaIpHistoryEntry ::=
+        SEQUENCE {
+		  alaSaaIpHistoryIndex     	Unsigned32,
+		  alaSaaIpHistoryPktRTT		Integer32,
+		  alaSaaIpHistoryPktJitter	Integer32
+                 }
+
+      alaSaaIpHistoryIndex        OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "An entry in this table is created when the result of
+           a ping iteration is determined.  The initial 2 instance
+           identifier index values identify the alaSaaIpPingCtrlEntry
+           that a ping iteration result (alaSaaIpHistoryEntry) belongs
+           to.  The alaSaaIpHistoryIndex element selects a single ping 
+           iteration result.
+      
+           The value of this object starts from 1 and can go up to a
+           maximum of alaSaaIpCtrlNumPkts.
+          "
+        ::= { alaSaaIpHistoryEntry 1 }
+
+       alaSaaIpHistoryPktRTT  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The round trip time taken by a single packet in an iteration.
+          "
+        ::= { alaSaaIpHistoryEntry 2 }	
+
+       alaSaaIpHistoryPktJitter  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The jitter value for a single packet in an iteration.
+          "
+        ::= { alaSaaIpHistoryEntry 3 }
+
+
+-- ***************************************************************
+--      DESCRIPTION:
+--                      "control table data for the Eth-Saa.
+--                     " 
+-- ***************************************************************
+
+alaSaaEthoamCtrlConfig OBJECT IDENTIFIER ::= { alcatelIND1SaaMIBObjects 5 }
+
+alaSaaEthoamCtrlTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaSaaEthoamCtrlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Defines the table for providing, via SNMP, the capability of 
+         performing Ethernet Loopback and DMM test operations. The results
+         of these tests are stored in the alaSaaEthoamResultsTable and
+         the alaSaaEthoamHistoryTable."
+   ::= { alaSaaEthoamCtrlConfig 1 }
+
+alaSaaEthoamCtrlEntry OBJECT-TYPE
+    SYNTAX      AlaSaaEthoamCtrlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the alaSaaEthoamCtrlTable.
+        "
+    INDEX {
+             alaSaaEthoamCtrlOwnerIndex,
+             alaSaaEthoamCtrlTestIndex
+          }
+    ::= { alaSaaEthoamCtrlTable 1 }
+
+AlaSaaEthoamCtrlEntry ::=
+    SEQUENCE {
+        alaSaaEthoamCtrlOwnerIndex             SnmpAdminString,
+        alaSaaEthoamCtrlTestIndex              SnmpAdminString,
+        alaSaaEthoamCtrlRowStatus              RowStatus,
+        alaSaaEthoamCtrlTestMode               INTEGER,
+        alaSaaEthoamCtrlTgtMepId               Integer32,
+        alaSaaEthoamCtrlTgtMAC                 MacAddress,
+        alaSaaEthoamCtrlSrcMepId               Integer32,
+        alaSaaEthoamCtrlDomainName             Dot1agCfmMaintDomainName,
+        alaSaaEthoamCtrlAssociationName        Dot1agCfmMaintAssocName,
+        alaSaaEthoamCtrlPktTimeOut             Integer32,
+        alaSaaEthoamCtrlNumPkts                Integer32,
+        alaSaaEthoamCtrlInterPktDelay          Integer32,
+        alaSaaEthoamCtrlPktData                OCTET STRING,
+        alaSaaEthoamCtrlVlanPriority           Integer32,
+        alaSaaEthoamCtrlDropEligible           TruthValue,
+        alaSaaEthoamCtrlTotalPktsRcvd          Unsigned32,
+        alaSaaEthoamCtrlTotalPktsSent          Unsigned32,
+        alaSaaEthoamCtrlMinRTT                 Integer32,
+        alaSaaEthoamCtrlAvgRTT                 Integer32,
+        alaSaaEthoamCtrlMaxRTT                 Integer32,
+        alaSaaEthoamCtrlMinJitter              Integer32,
+        alaSaaEthoamCtrlAvgJitter              Integer32,
+        alaSaaEthoamCtrlMaxJitter              Integer32,
+        alaSaaEthoamCtrlTSMinRTT               DateAndTime,
+        alaSaaEthoamCtrlTSMaxRTT               DateAndTime,
+        alaSaaEthoamCtrlTSMinJitter            DateAndTime,
+        alaSaaEthoamCtrlTSMaxJitter            DateAndTime
+    }
+
+alaSaaEthoamCtrlOwnerIndex OBJECT-TYPE
+    SYNTAX      SnmpAdminString 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "Owner name to identify entries in the table.
+           This is currently not supported and its value
+           will always be the string 'USER'.
+          "
+        DEFVAL { "USER" }
+    ::= { alaSaaEthoamCtrlEntry 1 }
+ 
+alaSaaEthoamCtrlTestIndex OBJECT-TYPE
+    SYNTAX      SnmpAdminString 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique name to identify the entries in the table. 
+         This name is unique across various SNMP users.
+        "
+    ::= { alaSaaEthoamCtrlEntry 2 }
+
+alaSaaEthoamCtrlRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+         in the alaSaaEthoamCtrlTable.  Deletion of an entry in this
+         table results in all corresponding (same
+         alaSaaEthoamCtrlOwnerIndex and alaSaaEthoamCtrlTestIndex index 
+         values) alaSaaEthoamResultsTable and alaSaaEthoamHistoryTable 
+         entries being deleted."
+    ::= { alaSaaEthoamCtrlEntry 3 }
+
+alaSaaEthoamCtrlTestMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ethernetLoopback (1),
+                    ethernetDmm (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of Ethernet OAM test defined by this entry.
+           
+         ethernetLoopback -  tests connectivity and round trip time by 
+                             sending loopback requests.
+         
+         ethernetDmm -  tests connectivity and round trip time by sending
+                        timestamped packets.
+         "
+    ::= { alaSaaEthoamCtrlEntry 4 }
+
+alaSaaEthoamCtrlTgtMepId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Mep-Id of the destination to which the Ethernet Loopback or
+        DMM message is to be sent. Either alaSaaEthoamCtrlTgtMepId or
+        alaSaaEthoamCtrlTgtMAC should be specified while configuring
+        an alaSaaEthoamCtrlEntry.
+       "
+    ::= { alaSaaEthoamCtrlEntry 5 }
+
+alaSaaEthoamCtrlTgtMAC OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Target MAC Address of the destination to which the Ethernet
+        Loopback or DMM message is to be sent: A unicast
+        destination MAC address. Either alaSaaEthoamCtrlTgtMepId or
+        alaSaaEthoamCtrlTgtMAC should be specified while configuring
+        an alaSaaEthoamCtrlEntry.
+       "
+    ::= { alaSaaEthoamCtrlEntry 6 }
+
+alaSaaEthoamCtrlSrcMepId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The Mep-Id of the source node initiating the Ethernet Loopback or
+        DMM message."
+    ::= { alaSaaEthoamCtrlEntry 7 }
+
+alaSaaEthoamCtrlDomainName OBJECT-TYPE
+    SYNTAX      Dot1agCfmMaintDomainName 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The name of the domain to which the source Mep belongs.
+       "
+    ::= { alaSaaEthoamCtrlEntry 8 }
+
+alaSaaEthoamCtrlAssociationName OBJECT-TYPE
+    SYNTAX     Dot1agCfmMaintAssocName 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The name of the association in the domain (specified by 
+        alaSaaEthoamCtrlDomainName) to which the source Mep belongs.
+       "
+    ::= { alaSaaEthoamCtrlEntry 9 }
+
+alaSaaEthoamCtrlPktTimeOut OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "milli-seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The maximum time to wait for the reply of the transmitted packet.
+       "
+    ::= { alaSaaEthoamCtrlEntry 10 }
+
+alaSaaEthoamCtrlNumPkts OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The number of packets to be sent in one iteration of Eth-LB/DMM test.
+       "
+    ::= { alaSaaEthoamCtrlEntry 11 }
+
+alaSaaEthoamCtrlInterPktDelay OBJECT-TYPE
+    SYNTAX      Integer32 (100..1000)
+    UNITS       "milli-seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Specifies the delay between two consecutive packets transmitted
+        during an iteration. The value specified should be a 
+        multiple of 100.
+       "
+    ::= { alaSaaEthoamCtrlEntry 12 }
+
+alaSaaEthoamCtrlPktData OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..255)) 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "An arbitrary amount of data to be included in the Data TLV,
+        if the Data TLV is selected to be sent."
+    ::= { alaSaaEthoamCtrlEntry 13 }
+
+alaSaaEthoamCtrlVlanPriority OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Priority. 3 bit value to be used in the VLAN tag, if present
+        in the transmitted frame.
+       "
+    ::= { alaSaaEthoamCtrlEntry 14 }
+
+alaSaaEthoamCtrlDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Drop Enable bit value to be used in the VLAN tag, if present
+        in the transmitted frame."
+    DEFVAL { false }
+    ::= { alaSaaEthoamCtrlEntry 15 }
+
+alaSaaEthoamCtrlTotalPktsRcvd   OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "Specifies the total number of packets received during all the Eth-LB/DMM
+        iterations."
+    ::= { alaSaaEthoamCtrlEntry 16 }
+
+alaSaaEthoamCtrlTotalPktsSent  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+        "Specifies the total number of packets sent during all the Eth-LB/DMM 
+         iterations."
+    ::= { alaSaaEthoamCtrlEntry 17 }
+
+alaSaaEthoamCtrlMinRTT  OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       "Specifies the minimum round trip time among all the iterations of the SAA.
+       "
+    ::= { alaSaaEthoamCtrlEntry 18 }
+
+alaSaaEthoamCtrlAvgRTT  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "Specifies the average round trip time of all the iterations of the SAA.
+       "
+    ::= { alaSaaEthoamCtrlEntry 19 }
+
+alaSaaEthoamCtrlMaxRTT  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "Specifies the maximum round trip time among all the iterations of the SAA.
+       "
+    ::= { alaSaaEthoamCtrlEntry 20 }
+
+alaSaaEthoamCtrlMinJitter  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "Specifies the minimum jitter among all the iterations of the SAA.
+       "
+    ::= { alaSaaEthoamCtrlEntry 21 }
+
+alaSaaEthoamCtrlAvgJitter  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "Specifies the average jitter of all the iterations of the SAA.
+       "
+    ::= { alaSaaEthoamCtrlEntry 22 }
+
+alaSaaEthoamCtrlMaxJitter  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Specifies the maximum jitter among all the iterations of the SAA.
+       "
+    ::= { alaSaaEthoamCtrlEntry 23 }
+
+alaSaaEthoamCtrlTSMinRTT  OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "The timestamp of the iteration that gave the minimum 
+        packet delay."
+    ::= { alaSaaEthoamCtrlEntry 24 }
+
+alaSaaEthoamCtrlTSMaxRTT  OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "The timestamp of the iteration that gave the maximum 
+        packet delay."
+    ::= { alaSaaEthoamCtrlEntry 25 }
+
+alaSaaEthoamCtrlTSMinJitter  OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "The timestamp of the iteration that gave the minimum 
+        packet jitter."
+    ::= { alaSaaEthoamCtrlEntry 26 }
+
+alaSaaEthoamCtrlTSMaxJitter  OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "The timestamp of the iteration that gave the maximum 
+        packet jitter."
+    ::= { alaSaaEthoamCtrlEntry 27 }
+
+
+-- ***************************************************************
+--      DESCRIPTION:
+--                      "Results table data for the Eth-Saa.
+--                     " 
+-- ***************************************************************
+
+alaSaaEthoamResults OBJECT IDENTIFIER ::= { alcatelIND1SaaMIBObjects 6 }
+
+alaSaaEthoamResultsTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaSaaEthoamResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Defines the Ethoam Results Table for providing
+         the capability of performing Eth-LB/DMM operations.  The 
+         results of these operations are stored in the 
+         alaSaaEthoamResultsTable and the alaSaaEthoamHistoryTable.
+
+         An entry is removed from the alaSaaEthoamResultsTable when
+         its corresponding alaSaaCtrlEntry is deleted."
+   ::= { alaSaaEthoamResults 1 }
+
+alaSaaEthoamResultsEntry OBJECT-TYPE
+    SYNTAX      AlaSaaEthoamResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the alaSaaEthoamResultsTable.  The
+         alaSaaEthoamResultsTable has the same indexing as the
+         alaSaaEthoamCtrlTable in order for a alaSaaEthoamResultsEntry to
+         correspond to the alaSaaEthoamCtrlEntry that caused it to
+         be created.
+        
+         An entry in this table summarizes results from multiple
+         invocations of the test configured by the corresponding
+         entry in alaSaaEthoamCtrlTable."
+    INDEX {
+             alaSaaEthoamCtrlOwnerIndex,
+             alaSaaEthoamCtrlTestIndex,
+             alaSaaEthoamResultsTestRunIndex
+          }
+    ::= { alaSaaEthoamResultsTable 1 }
+
+AlaSaaEthoamResultsEntry ::=
+    SEQUENCE {
+        alaSaaEthoamResultsTestRunIndex       Unsigned32,
+        alaSaaEthoamResultsPktsSent           Unsigned32,
+        alaSaaEthoamResultsPktsRcvd           Unsigned32,
+        alaSaaEthoamResultsInterPktDelay      Integer32,
+        alaSaaEthoamResultsRunResult          INTEGER,
+        alaSaaEthoamResultsRunResultReason    OCTET STRING,
+        alaSaaEthoamResultsRunTime            DateAndTime,
+        alaSaaEthoamResultsMinRTT             Integer32,
+        alaSaaEthoamResultsAvgRTT             Integer32,
+        alaSaaEthoamResultsMaxRTT             Integer32,
+        alaSaaEthoamResultsMinJitter          Integer32,
+        alaSaaEthoamResultsAvgJitter          Integer32,
+        alaSaaEthoamResultsMaxJitter          Integer32
+    }
+
+alaSaaEthoamResultsTestRunIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The value of alaSaaEthoamResultsTestRunIndex identifies the
+        row entry that reports results for a single Eth-LB/DMM test run.
+
+        The value of this object starts from 1 and can go upto a 
+        maximum of alaSaaCtrlMaxHistoryRows."
+    ::= { alaSaaEthoamResultsEntry 1 }
+ 
+alaSaaEthoamResultsPktsSent  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+        "Specifies the number of packets sent during a single Eth-LB/DMM 
+         iteration."
+    ::= { alaSaaEthoamResultsEntry 2 }
+
+alaSaaEthoamResultsPktsRcvd  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "Specifies the number of packets received during a single Eth-LB/DMM
+        iteration"
+    ::= { alaSaaEthoamResultsEntry 3 }
+
+alaSaaEthoamResultsInterPktDelay  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Specifies the inter-packet-delay with which the packets were sent 
+       in the iteration.
+      "
+    ::= { alaSaaEthoamResultsEntry 4 }
+
+alaSaaEthoamResultsRunResult  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    undetermined(0),
+                    success(1),
+		        failed(2),
+                    aborted(3)
+                        }
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       "The result of the Eth-LB/DMM iteration."
+    ::= { alaSaaEthoamResultsEntry 5 }
+
+alaSaaEthoamResultsRunResultReason  OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "If the iteration fails, this field indicates the reason
+        for failure. If the reason for failure cannot be determined
+        the value of this field is the string Unknown.
+        For successful iterations, the value of this field is the
+        string 'Iteration successful'.
+       "
+     ::= { alaSaaEthoamResultsEntry 6 }
+
+alaSaaEthoamResultsRunTime  OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "The date and time at which the iteraton was run.
+       "
+    ::= { alaSaaEthoamResultsEntry 7 }
+
+alaSaaEthoamResultsMinRTT  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "The minimum round trip time."
+    ::= { alaSaaEthoamResultsEntry 8 }
+
+alaSaaEthoamResultsAvgRTT  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+       "The average round trip time.
+       "
+    ::= { alaSaaEthoamResultsEntry 9 }
+
+alaSaaEthoamResultsMaxRTT  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       "The maximum round trip time.
+       "
+    ::= { alaSaaEthoamResultsEntry 10 }
+
+alaSaaEthoamResultsMinJitter  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       "The minimum jitter value.
+       "
+    ::= { alaSaaEthoamResultsEntry 11 }
+
+alaSaaEthoamResultsAvgJitter  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       "The average jitter value.
+       "
+    ::= { alaSaaEthoamResultsEntry 12 }
+
+alaSaaEthoamResultsMaxJitter  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       "The maximum jitter value.
+       "
+    ::= { alaSaaEthoamResultsEntry 13 }
+
+
+-- ***************************************************************
+--      DESCRIPTION:
+--                      "History table data for the Eth-Saa.
+--                     " 
+-- ***************************************************************
+
+alaSaaEthoamHistory OBJECT IDENTIFIER ::= { alcatelIND1SaaMIBObjects 7 }
+
+alaSaaEthoamHistoryTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaSaaEthoamHistoryEntry
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION 
+        "Defines a table for storing the results of an Eth-LB/DMM
+         iteration.  
+         
+         The number of entries in this table for
+         a configured test are limited by the value of the 
+         corresponding alaSaaEthoamCtrlMaxRows object.
+
+         An entry in this table is created when the result of an Eth-LB/DMM 
+         test is determined.  An entry is removed from this table when 
+         its corresponding alaSaaEthoamCtrlEntry is deleted.
+
+         The agent removes the oldest entry for a test in the 
+         alaSaaEthoamHistoryTable to allow the addition of a new 
+         entry for that test once the number of rows in the 
+         alaSaaEthoamHistoryTable reaches the value specified by 
+         alaSaaEthoamCtrlMaxRows."
+   ::= { alaSaaEthoamHistory 1 }
+
+alaSaaEthoamHistoryEntry OBJECT-TYPE
+    SYNTAX      AlaSaaEthoamHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX {
+             alaSaaEthoamCtrlOwnerIndex,
+             alaSaaEthoamCtrlTestIndex,
+             alaSaaEthoamResultsTestRunIndex,
+             alaSaaEthoamHistoryIndex
+          }
+    ::= { alaSaaEthoamHistoryTable 1 }
+
+AlaSaaEthoamHistoryEntry ::=
+    SEQUENCE {
+        alaSaaEthoamHistoryIndex        Unsigned32,
+	alaSaaEthoamHistoryPktRTT       Integer32,
+	alaSaaEthoamHistoryPktJitter	Integer32
+    }
+
+alaSaaEthoamHistoryIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "An entry in this table is created when the result of
+           an Eth-LB/DMM iteration is determined.  The initial 2 instance
+           identifier index values identify the alaSaaEthoamCtrlEntry
+           that an Eth-LB/DMM iteration result (alaSaaEthoamHistoryEntry) belongs
+           to.  The alaSaaEthoamHistoryIndex element selects a single ping 
+           iteration result.
+      
+           The value of this object starts from 1 and can go up to a
+           maximum of alaSaaEthoamCtrlNumPkts."
+    ::= { alaSaaEthoamHistoryEntry 1 }
+ 
+alaSaaEthoamHistoryPktRTT  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "The round trip time taken by a single packet in an iteration.
+          "
+    ::= { alaSaaEthoamHistoryEntry 2 }	
+
+alaSaaEthoamHistoryPktJitter  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "The jitter value for a single packet in an iteration.
+          "
+    ::= { alaSaaEthoamHistoryEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- COMPLIANCE
+-- -------------------------------------------------------------
+alcatelIND1SaaMIBCompliance MODULE-COMPLIANCE
+   STATUS    current
+   DESCRIPTION
+        "Compliance statement for Saa."
+   MODULE
+        MANDATORY-GROUPS
+        {
+          alaSaaCtrlConfigGroup,
+          alaSaaIpCtrlConfigGroup,
+          alaSaaIpResultsGroup,
+	    alaSaaIpHistoryGroup,
+          alaSaaEthoamCtrlConfigGroup,
+          alaSaaEthoamResultsGroup,
+          alaSaaEthoamHistoryGroup
+        }
+   ::= { alcatelIND1SaaMIBCompliances 1 }
+
+
+-- -------------------------------------------------------------
+-- UNITS OF CONFORMANCE
+-- -------------------------------------------------------------
+
+alaSaaCtrlConfigGroup OBJECT-GROUP
+   OBJECTS
+   {
+    alaSaaCtrlRowStatus,
+    alaSaaCtrlDescr,
+    alaSaaCtrlAdminStatus,
+    alaSaaCtrlTestMode,
+    alaSaaCtrlRuns,
+    alaSaaCtrlFailures,
+    alaSaaCtrlLastRunResult,
+    alaSaaCtrlLastRunTime,
+    alaSaaCtrlInterval,
+    alaSaaCtrlStartAt,
+    alaSaaCtrlStopAt,
+    alaSaaCtrlMaxHistoryRows
+  }
+  STATUS  current
+  DESCRIPTION
+  "Collection of objects for management of Saa control Group."
+  ::= { alcatelIND1SaaMIBGroups 1 }
+
+alaSaaIpCtrlConfigGroup OBJECT-GROUP
+   OBJECTS
+   {
+    alaSaaIpCtrlRowStatus,
+    alaSaaIpCtrlTestMode,
+    alaSaaIpCtrlTgtAddrType,
+    alaSaaIpCtrlTgtAddress,
+    alaSaaIpCtrlSrcAddrType,
+    alaSaaIpCtrlSrcAddress,
+    alaSaaIpCtrlPayloadSize,
+    alaSaaIpCtrlNumPkts,
+    alaSaaIpCtrlInterPktDelay,
+    alaSaaIpCtrlTypeOfService,
+    alaSaaIpCtrlVRFId,
+    alaSaaIpCtrlTotalPktsSent,
+    alaSaaIpCtrlTotalPktsRcvd,
+    alaSaaIpCtrlMinRTT,
+    alaSaaIpCtrlAvgRTT,
+    alaSaaIpCtrlMaxRTT,
+    alaSaaIpCtrlMinJitter,
+    alaSaaIpCtrlAvgJitter,
+    alaSaaIpCtrlMaxJitter,
+    alaSaaIpCtrlTSMinRTT,
+    alaSaaIpCtrlTSMaxRTT,
+    alaSaaIpCtrlTSMinJitter,
+    alaSaaIpCtrlTSMaxJitter
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of Saa Ip Configuration Table."
+   ::= { alcatelIND1SaaMIBGroups 2 }
+
+alaSaaIpResultsGroup OBJECT-GROUP
+   OBJECTS
+   {
+    alaSaaIpResultsPktsSent,
+    alaSaaIpResultsPktsRcvd,
+    alaSaaIpResultsInterPktDelay,
+    alaSaaIpResultsRunResult,
+    alaSaaIpResultsRunResultReason,
+    alaSaaIpResultsRunTime,
+    alaSaaIpResultsMinRTT,
+    alaSaaIpResultsAvgRTT,
+    alaSaaIpResultsMaxRTT,
+    alaSaaIpResultsMinJitter,
+    alaSaaIpResultsAvgJitter,
+    alaSaaIpResultsMaxJitter
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of Saa Ip Results Table."
+   ::= { alcatelIND1SaaMIBGroups 3 }
+
+alaSaaIpHistoryGroup OBJECT-GROUP
+   OBJECTS
+   {
+    alaSaaIpHistoryPktRTT,
+    alaSaaIpHistoryPktJitter
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of Saa Ip history table."
+   ::= { alcatelIND1SaaMIBGroups 4 }
+
+alaSaaEthoamCtrlConfigGroup OBJECT-GROUP
+   OBJECTS
+   {
+    alaSaaEthoamCtrlRowStatus,
+    alaSaaEthoamCtrlTestMode,
+    alaSaaEthoamCtrlTgtMepId,
+    alaSaaEthoamCtrlTgtMAC,
+    alaSaaEthoamCtrlSrcMepId,
+    alaSaaEthoamCtrlDomainName,
+    alaSaaEthoamCtrlAssociationName,
+    alaSaaEthoamCtrlPktTimeOut,
+    alaSaaEthoamCtrlNumPkts,
+    alaSaaEthoamCtrlInterPktDelay,
+    alaSaaEthoamCtrlPktData,
+    alaSaaEthoamCtrlVlanPriority,
+    alaSaaEthoamCtrlDropEligible,
+    alaSaaEthoamCtrlTotalPktsRcvd,
+    alaSaaEthoamCtrlTotalPktsSent,
+    alaSaaEthoamCtrlMinRTT,
+    alaSaaEthoamCtrlAvgRTT,
+    alaSaaEthoamCtrlMaxRTT,
+    alaSaaEthoamCtrlMinJitter,
+    alaSaaEthoamCtrlAvgJitter,
+    alaSaaEthoamCtrlMaxJitter,
+    alaSaaEthoamCtrlTSMinRTT,
+    alaSaaEthoamCtrlTSMaxRTT,
+    alaSaaEthoamCtrlTSMinJitter,
+    alaSaaEthoamCtrlTSMaxJitter
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of Saa Ethoam Configuration Table."
+   ::= { alcatelIND1SaaMIBGroups 5 }
+
+alaSaaEthoamResultsGroup OBJECT-GROUP
+   OBJECTS
+   {
+    alaSaaEthoamResultsPktsSent,
+    alaSaaEthoamResultsPktsRcvd,
+    alaSaaEthoamResultsInterPktDelay,
+    alaSaaEthoamResultsRunResult,
+    alaSaaEthoamResultsRunResultReason,
+    alaSaaEthoamResultsRunTime,
+    alaSaaEthoamResultsMinRTT,
+    alaSaaEthoamResultsAvgRTT,
+    alaSaaEthoamResultsMaxRTT,
+    alaSaaEthoamResultsMinJitter,
+    alaSaaEthoamResultsAvgJitter,
+    alaSaaEthoamResultsMaxJitter
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of Saa Ethoam Results Table."
+   ::= { alcatelIND1SaaMIBGroups 6 }
+
+alaSaaEthoamHistoryGroup OBJECT-GROUP
+   OBJECTS
+   {
+    alaSaaEthoamHistoryPktRTT,
+    alaSaaEthoamHistoryPktJitter
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of Saa Ethoam history table."
+   ::= { alcatelIND1SaaMIBGroups 7 }
+
+END

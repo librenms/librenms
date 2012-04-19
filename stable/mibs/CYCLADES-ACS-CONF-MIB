@@ -1,0 +1,876 @@
+CYCLADES-ACS-CONF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	cyACSMgmt
+			FROM CYCLADES-ACS-MIB
+	InterfaceIndexOrZero
+			FROM IF-MIB
+	MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,
+	IpAddress, Integer32
+			FROM SNMPv2-SMI
+	DisplayString
+			FROM SNMPv2-TC;
+
+cyACSConf    MODULE-IDENTITY
+	LAST-UPDATED	"200508290000Z"
+	ORGANIZATION	"Cyclades Corporation"
+	CONTACT-INFO	"postal : Cyclades Corporation
+				3541 Gateway Boulevard
+				Fremont, CA 94538, USA
+				e-mail : Technical Support
+					  support@cyclades.com"
+	DESCRIPTION	"This module defines objects for the ACS/TS configuration"
+	REVISION	"200508290000Z"
+	DESCRIPTION	"Changed the Contact-Info"
+	REVISION	"200306300000Z"
+	DESCRIPTION	"Changed cySPortSniffMsess SYNTAX"
+	REVISION	"200301170000Z"
+	DESCRIPTION	"Included new parameters in cySerialPortConf"
+	REVISION	"200210200000Z"
+	DESCRIPTION	"Included new parameters in cySerialPortConf"
+	REVISION	"200209200000Z"
+	DESCRIPTION	"First Draft"
+::= { cyACSMgmt 2 }
+
+-- Current Cyclades ACS Configuration core mib table entries :
+--	cyHostName		OBJECT-TYPE	::= { cyACSConf 1 }
+--	cyConsoleBanner		OBJECT-TYPE	::= { cyACSConf 2 }
+--	cyMotd			OBJECT-TYPE	::= { cyACSConf 3 }
+--	cyEthItf		OBJECT-IDENTITY	::= { cyACSConf 4 }
+--	cyNameService		OBJECT-IDENTITY	::= { cyACSConf 5 }  
+--	cySerialPortConf	OBJECT-IDENTITY	::= { cyACSConf 6 }
+
+cyHostName	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (1..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The Host Name "
+::= { cyACSConf 1 }                              
+
+cyConsoleBanner	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (1..255))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The console banner "
+::= { cyACSConf 2 }                              
+
+cyMotd	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The motd message "
+::= { cyACSConf 3 }                              
+
+cyEthItf	OBJECT-IDENTITY
+	STATUS     	current
+	DESCRIPTION "The configuration of the Ethernet Interface"   
+::= { cyACSConf 4 }
+
+cyEthDhcpc	OBJECT-TYPE
+	SYNTAX	INTEGER	{
+			inactive(0),	-- DHCP is inactive
+			active(1),	-- DHCP is active
+			restore(2)	-- DHCP is active and ACS saves the last parameters 
+					-- assigned by the server
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The ACS can request all of its ethernet parameters 
+				 to a DHCP server"
+::= { cyEthItf 1 }
+
+cyEthIPaddr	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This is the IP address of the Ethernet Interface"
+::= { cyEthItf 2 }
+
+cyEthIPmask		OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The mask fot the Ethernet network"
+::= { cyEthItf 3 }
+
+cyEthMTU		OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The Maximum Transmission Unit size, wich determines 
+			 whether or not packets should be broken up"
+::= { cyEthItf 4 }
+
+cyEthIPaddr2	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The Ethernet secondary IP address"
+::= { cyEthItf 5 }
+
+cyEthIPmask2	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The Ethernet secondary IP mask"
+::= { cyEthItf 6 }
+
+cyNameService	OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"The Name Service configuration"
+::= { cyACSConf 5 }  
+
+cyResolverOrder	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..15))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"It specifies how host lookups are to be performed.
+			 Valid values : empty, 'hosts', 'bind', 'hosts, bind', 
+			 'bind, hosts' "
+::= { cyNameService 1 }
+                   
+cyMultipleIP	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..3))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Valid values are ON or OFF. If set to ON, the resolve 
+			 library will return all valid addresses for a host 
+			 that appears in the /etc/hosts file, instead of only 
+			 the first.  "
+::= { cyNameService 2 }
+
+cyDNSserv		OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"The DNS server configuration"
+::= { cyNameService 3 }
+
+cyDNSpriserv	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Internet Address (in dot notation) of primary name 
+			 server that the resolver should query."
+::= { cyDNSserv 1 }
+ 
+cyDNSsecserv	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Internet Address (in dot notation) of secondary name 
+			 server that the resolver should query."
+::= { cyDNSserv 2 }
+
+cyDNSdomain		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (1..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Local domain name ."
+::= { cyDNSserv 3 }
+
+cySerialPortConf	OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"The PortSlave configuration - pslave.conf file. 
+			 It configures the all serial ports."
+::= { cyACSConf 6 }  
+
+cySerialGlobal		OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"These parameters have the prefix conf. in 
+			 the pslave.conf file"
+::= { cySerialPortConf 1 }
+
+cySerialInclude	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"File used in centralized management."
+::= { cySerialGlobal 1 }
+
+cySerialNFS		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..50))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Remote Network File System where data buffering will be 
+			 written instead of the default directory '/var/run/DB'."
+::= { cySerialGlobal 2 }
+
+cySerialLockDir		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..50))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The lock directory for the ACS."
+::= { cySerialGlobal 3 }
+
+cySerialRlogin		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..50))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Location of the rlogin binary that accepts the -i flag."
+::= { cySerialGlobal 4 }
+
+cySerialPppd	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..50))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Location of the pppd binary."
+::= { cySerialGlobal 5 }
+
+cySerialTelnet	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..50))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION "Location of the telnet application"
+::= { cySerialGlobal 6 }
+
+cySerialSsh		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..50))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Location of the ssh application"
+::= { cySerialGlobal 7 }
+
+cySerialLocalLogins	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				off(0),           
+				on(1)   -- possible to login to the ACS directly by placing a !
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION 	"This parameter is only necessary when authentication is 
+			 being performed for a port.
+			 This is useful if the Radius authentication server is down."
+::= { cySerialGlobal 8 }
+
+cySerialFacility	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This value (0-7) is the Local facility sent to the syslog daemon."
+::= { cySerialGlobal 9 }
+
+cySerialDBFacility	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This value (0-7) is the Local facility sent to the syslog 
+			 daemon with the data when ."
+::= { cySerialGlobal 10 }
+
+cySerialGroupTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CyGroupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"This associates group name and its users"
+::= { cySerialGlobal 11 }
+
+cygroupEntry	OBJECT-TYPE
+	SYNTAX		CyGroupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"One particular association between group name and its users"
+	INDEX		{ cyGroupIndex }
+::= { cySerialGroupTable 1 }
+
+CyGroupEntry ::= SEQUENCE  {
+	cyGroupIndex	Integer32,
+	cyGroupName	DisplayString,
+	cyGroupUsers	DisplayString
+}
+
+cyGroupIndex	OBJECT-TYPE
+	SYNTAX		InterfaceIndexOrZero	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"number to identifier the group"
+::= { cygroupEntry  1 }                              
+
+cyGroupName	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..20))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The Group Name "
+::= { cygroupEntry  2 }                              
+
+cyGroupUsers	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..80))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The users names "
+::= { cygroupEntry  3 }                              
+
+cySerialSpec	OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"These parameters have the prefix all. or sxx. in the pslave.conf file"
+::= { cySerialPortConf 2 }
+
+cySerialPortTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CySPortEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 	"This is the specific configuration to serial port"
+::= { cySerialSpec 1 }
+
+cysportEntry	OBJECT-TYPE
+	SYNTAX		CySPortEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"One particular serial port configuration"
+	INDEX		{ cySPortNumber }
+::= { cySerialPortTable 1 }
+
+CySPortEntry ::= SEQUENCE  {
+	cySPortNumber		InterfaceIndexOrZero,	-- 0 == all.  X == ttyX sX.
+	cySPortTty		DisplayString,		-- associate device
+	cySPortName		DisplayString,		-- alias name
+	cySPortSpeed		INTEGER,		-- physical port configuration
+	cySPortDataSize		Integer32,
+	cySPortStopBits		Integer32,
+	cySPortParity		DisplayString,
+	cySPortFlowCtrl		DisplayString,
+	cySPortDTRdelay		Integer32,
+	cySPortDCDCtrl		INTEGER,
+	cySPortLogUtmp		INTEGER,		-- log into UTMP
+	cySPortLogWtmp		INTEGER,		-- log into WTMP
+	cySPortLogform		DisplayString,
+	cySPortAuthtype		DisplayString,		-- authentication type
+	cySPortAuthSrv1		IpAddress,	-- IP address of the primary authentication server
+	cySPortAccSrv1		IpAddress,	-- IP address of the primarty accounting server
+	cySPortAuthTmo		Integer32,	-- time out per authentication query
+	cySPortAuthRetr		Integer32,	-- authentication number of retries
+	cySPortAuthSrv2		IpAddress,	-- IP address of the secondary authentication server
+	cySPortAccSrv2		IpAddress,	-- IP address of the secondary accounting server
+	cySPortAuthSecret	DisplayString,	-- secret used in authentication
+	cySPortAuthRadP		INTEGER,	-- accept RADIUS' user without password
+	cySPortAuthAcc		DisplayString,	-- access restrition on Users
+	cySPortProtocol		DisplayString,	-- Profile
+	cySPortRemoteIP		DisplayString,	-- remote IP address
+	cySPortSocketPort	DisplayString,	-- number of socket port
+	cySPortRemHost		IpAddress,	-- IP address of the remote Host
+	cySPortBanner		DisplayString,	-- Banner
+	cySPortPrompt		DisplayString,	-- Login prompt
+	cySPortTermType		DisplayString,	-- terminal type
+	cySPortAutomUsr		DisplayString,	-- automatic user
+	cySPortNetMask		IpAddress,	-- net mask
+	cySPortPppMtu		Integer32,
+	cySPortPppMru		Integer32,
+	cySPortPppOptions	DisplayString,
+	cySPortPppFoption	DisplayString,
+	cySPortModemChat	DisplayString,	-- initchat send to modem
+	cySPortSttyCmd		DisplayString,
+	cySPortSockTx		Integer32,	-- socket transmission interval
+	cySPortSockPoll		Integer32,	-- socket polling interval
+	cySPortSockIdle		Integer32,	-- socket idle timeout
+	cySPortDBsize		Integer32,	-- maximum size of the data buffering file
+	cySPortDBtime		INTEGER,	-- data buffering with/without timestamp
+	cySPortDBmode		DisplayString,	-- data bufferinf mode circ or line
+	cySPortDBsyslog		Integer32,	-- size of the data send to syslog
+	cySPortDBmenu		INTEGER,	-- menu of the data buffering
+	cySPortDBalarm		INTEGER,	-- use alarm generating feature
+	cySPortSSHbreak		DisplayString,	-- break sequence (SSH)
+	cySPortSniffSess	DisplayString,	-- sniff session type
+	cySPortSniffAdm		DisplayString,	-- admin users to sniff
+	cySPortSniffEsc		DisplayString,	-- escape char to sniff session
+	cySPortSniffMsess	DisplayString,	-- multiple session
+	cySPortTelnetMode	INTEGER,	-- telnet client mode
+	cySPortSysBufSess	INTEGER,	-- syslog buffering at all times
+	cySPortLFSuppress	INTEGER,	-- LF suppression in socket_server session
+	cySPortAutoInput	DisplayString,  -- Input string to auto answer 
+	cySPortAutoOutput	DisplayString,  -- Output string to auto answer
+	cySPortPmType 		DisplayString,  -- Power Management IPDU type
+	cySPortPmUsers	 	DisplayString,  -- Power Management IPDU users
+	cySPortPmOutlet 	DisplayString,  -- Power Management Outlets
+	cySPortPmKey 		DisplayString,  -- Power Management Hotkey
+	cySPortPmNOutlets 	Integer32, 	-- Power Management IPDU number of outlets 
+	cySPortBreakInterval 	Integer32 	-- Break interval (in ms) 
+}
+
+cySPortNumber	OBJECT-TYPE
+	SYNTAX		InterfaceIndexOrZero	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"number to identifier the serial port. Value 0 is ALL."
+::= { cysportEntry 1 }
+
+cySPortTty		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..25))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The device name for the serial port."
+::= { cysportEntry 2 }
+
+cySPortName		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Alias name given to the server connected to the serial port."
+::= { cysportEntry 3 }
+
+cySPortSpeed	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				s50bps(50), s75bps(75), s110bps(110), s134bps(134), 
+				s150bps(150), s200bps(200), s300bps(300), s600bps(600), 
+				s1200bps(1200), s1800bps(1800),
+				s2400bps(2400), s4800bps(4800), 
+				s9600bps(9600), s14400bps(14400), 
+				s19200bps(19200), s28800bps(28800), 
+				s38400bps(38400), s57600bps(57600), 
+				s115200bps(115200), s230400bps(230400), 
+				s460800bps(460800)
+			}	
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The speed for serial port."
+::= { cysportEntry 4 }
+
+cySPortDataSize	OBJECT-TYPE
+	SYNTAX		Integer32 (4..8)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The data size for serial port."
+::= { cysportEntry 5 }
+
+cySPortStopBits	OBJECT-TYPE
+	SYNTAX		Integer32 (1..2)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The number of stop bits for serial port."
+::= { cysportEntry 6 }
+
+cySPortParity	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..5))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The parity for serial port."
+::= { cysportEntry 7 }
+
+cySPortFlowCtrl	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..5))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The flow control for serial port."
+::= { cysportEntry 8 }
+
+cySPortDTRdelay	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This specifies how long (in miliseconds) a DTR signal
+				 will be turned off before it is turned on again."
+::= { cysportEntry 9 }
+
+cySPortDCDCtrl	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				notctrl(0),  
+				control(1)	   
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"DCD signal controls the connection request." 
+::= { cysportEntry 10 }
+
+cySPortLogUtmp	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				inactive(0),  
+				active(1)	   
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"ACS update the login records in /var/run/utmp file." 
+::= { cysportEntry 11 }
+
+cySPortLogWtmp	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				inactive(0),  
+				active(1)	   
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"ACS update the login records in /var/run/wtmp file." 
+::= { cysportEntry 12 }
+
+cySPortLogform	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This is the format to write login record." 
+::= { cysportEntry 13 }
+
+cySPortAuthtype		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..25))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Authentication type : ." 
+::= { cysportEntry 14 }
+
+cySPortAuthSrv1	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"IP address of the primary authentication server." 
+::= { cysportEntry 15 }
+
+cySPortAccSrv1	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"IP address of the primary accounting server." 
+::= { cysportEntry 16 }
+
+cySPortAuthTmo	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This is the timeout (in seconds) for authentication 
+			query to be answered." 
+::= { cysportEntry 17 }
+
+cySPortAuthRetr	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This defines the number of times each server is tried 
+			before another is contacted." 
+::= { cysportEntry 18 }
+
+cySPortAuthSrv2	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"IP address of the secondary authentication server." 
+::= { cysportEntry 19 }
+
+cySPortAccSrv2	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"IP address of the secondary accounting server." 
+::= { cysportEntry 20 }
+
+cySPortAuthSecret	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This is the shared secret with authentciation servers." 
+::= { cysportEntry 21 }
+
+cySPortAuthRadP	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				inactive(0),  
+				active(1)	   
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"To accept Radius' user without password." 
+::= { cysportEntry 22 }
+
+cySPortAuthAcc	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"access restrition on Users." 
+::= { cysportEntry 23 }
+
+cySPortProtocol	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Defines the port serial's protocol." 
+::= { cysportEntry 24 }
+
+cySPortRemoteIP	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..20))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This is the default IP address of the serial port." 
+::= { cysportEntry 25 }
+
+cySPortSocketPort	OBJECT-TYPE	
+	SYNTAX		DisplayString (SIZE (0..10))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This defines an alternative labeling system for the serial port." 
+::= { cysportEntry 26 }
+
+cySPortRemHost	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The IP address of the host to which the serial port will connect." 
+::= { cysportEntry 27 }
+
+cySPortBanner	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..250))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This defines the banner." 
+::= { cysportEntry 28 }
+
+cySPortPrompt	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..250))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This defines the login prompt to the serial port." 
+::= { cysportEntry 29 }
+
+cySPortTermType	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..20))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This defines the terminal type." 
+::= { cysportEntry 30 }
+
+cySPortAutomUsr	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This defines the automatic user." 
+::= { cysportEntry 31 }
+
+cySPortNetMask	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The network mask used in dial in connection." 
+::= { cysportEntry 32 }
+
+cySPortPppMtu	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The PPP MTU - dial in connection." 
+::= { cysportEntry 33 }
+
+cySPortPppMru	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The PPP MRU - dial in connection." 
+::= { cysportEntry 34 }
+
+cySPortPppOptions	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The PPP options when ACS autodetects the PPP session ." 
+::= { cysportEntry 35 }
+
+cySPortPppFoption	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The PPP forced options when the user has already been authenticated." 
+::= { cysportEntry 36 }
+
+cySPortModemChat	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The initchat send to modem connected." 
+::= { cysportEntry 37 }
+
+cySPortSttyCmd	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..180))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"the tty settings after socket connection is established." 
+::= { cysportEntry 38 }
+
+cySPortSockTx	OBJECT-TYPE	
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Defines the delay (in miliseconds) before transmission to
+			 the Ethernet of data received through a serial port ." 
+::= { cysportEntry 39 }
+
+cySPortSockPoll	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Keep-alive timer (miliseconds) to the TCP connection ." 
+::= { cysportEntry 40 }
+
+cySPortSockIdle	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The idle timeout in seconds ." 
+::= { cysportEntry 41 }
+
+cySPortDBsize	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Maximum size of the data buffering file." 
+::= { cysportEntry 42 }
+
+cySPortDBtime	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				inactive(0),
+				active(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Timestamp in data buffering." 
+::= { cysportEntry 43 }
+
+cySPortDBmode	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..5))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Data buffering mode : circ or line"
+::= { cysportEntry 44 }
+
+cySPortDBsyslog	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"size of the data buffering send to syslog." 
+::= { cysportEntry 45 }
+
+cySPortDBmenu	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				displayMenu(0),
+				inactive(1),
+				displayDB(2),
+				displayParc(3)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Menu of the data buffering." 
+::= { cysportEntry 46 }
+
+cySPortDBalarm	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				inactive(0),
+				active(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Generating Alarms." 
+::= { cysportEntry 47 }
+
+cySPortSSHbreak	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..16))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Break sequence - ssh session"
+::= { cysportEntry 48 }
+
+cySPortSniffSess	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..5))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Sniff session type"
+::= { cysportEntry 49 }
+
+cySPortSniffAdm	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"List of admin users to sniff session"
+::= { cysportEntry 50 }
+
+cySPortSniffEsc	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..6))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Escape sequence used in sniff session"
+::= { cysportEntry 51 }
+
+cySPortSniffMsess	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..20))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Multiple sniff sessions"
+::= { cysportEntry 52 }
+
+cySPortTelnetMode	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				text(0),
+				binary(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Mode negotiated by client telnet with the server"
+::= { cysportEntry 53 }
+
+cySPortSysBufSess	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				yes(0),
+				no(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Syslog Buffering at all times"
+::= { cysportEntry 54 }
+
+cySPortLFSuppress	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				inactive(0),
+				active(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"LF suppression in socket_server session"
+::= { cysportEntry 55 }
+
+cySPortAutoInput	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This string is used to auto answer. It's the input string"
+::= { cysportEntry 56 }
+
+cySPortAutoOutput	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"This string is used to auto answer. It's the output string"
+::= { cysportEntry 57 }
+
+cySPortPmType		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..20))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"IPDU type, when the port protocol is configured as IPDU"
+::= { cysportEntry 58 }
+
+cySPortPmUsers		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"List of users which can access the IPDU and their respective outlets"
+::= { cysportEntry 59 }
+
+cySPortPmOutlet		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..40))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"List of <IPDU port>.<outlet> pairs, where the server is connected"
+::= { cysportEntry 60 }
+
+cySPortPmKey		OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..8))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Hotkey to grant access to the Power Management from a Telnet/SSH session"
+::= { cysportEntry 61 }
+
+cySPortPmNOutlets	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Number of outlets of the IPDU"
+::= { cysportEntry 62 }
+
+cySPortBreakInterval	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"The break interval in miliseconds." 
+::= { cysportEntry 63 }
+
+END
+
+

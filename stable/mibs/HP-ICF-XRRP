@@ -1,0 +1,910 @@
+HP-ICF-XRRP DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        IpAddress, Integer32, Counter32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        VlanId
+            FROM Q-BRIDGE-MIB
+        LastCreateTime
+                FROM RMON2-MIB
+        TEXTUAL-CONVENTION, RowStatus, TimeStamp, MacAddress
+            FROM SNMPv2-TC
+        hpSwitch
+            FROM HP-ICF-OID
+        ;
+
+    hpicfXrrpMIB MODULE-IDENTITY 
+        LAST-UPDATED "200508050000Z" -- Aug 5, 2005 
+        ORGANIZATION "Hewlett-Packard Company
+                      ProCurve Networking Business"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains the definitions of Managed
+                      Objects for the XRRP router - the device running HP 
+                      proprietory version of the Virtual Router Redundancy
+                      Protocol (VRRP)."
+        REVISION     "200508050000Z" -- Aug 5, 2005
+        DESCRIPTION  "Added import objects."
+
+        REVISION      "200410200000Z"  -- October 20, 2004
+        DESCRIPTION   "Revision to add objects to support controlled 
+                       failback feature for XRRP."
+                       
+        REVISION      "200208190000Z"  -- August 19, 2002
+        DESCRIPTION   "Initial revision."
+        
+	
+        ::= { hpSwitch 18 }
+
+-- *******************************************************************
+--  Textual Conventions
+-- *******************************************************************
+
+    XrrpRouterId ::= TEXTUAL-CONVENTION
+        STATUS       current 
+        DESCRIPTION  "A number which serves to uniquely identify a XRRP router 
+                      within a domain."
+        SYNTAX       Integer32 (1..255)
+
+-- **********************************************************************
+--  XRRP MIB Groups
+-- **********************************************************************
+
+    hpicfXrrpOperations      OBJECT IDENTIFIER ::= { hpicfXrrpMIB 2 }
+    hpicfXrrpStatistics      OBJECT IDENTIFIER ::= { hpicfXrrpMIB 3 }
+    hpicfXrrpConformance     OBJECT IDENTIFIER ::= { hpicfXrrpMIB 4 }
+
+-- **********************************************************************
+--  Start of MIB objects
+-- **********************************************************************
+
+    hpicfXrrpVersion OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value identifies the particular version of the XRRP
+                      supported by this device."
+     ::= { hpicfXrrpOperations 1 }
+
+    hpicfXrrpAdminState OBJECT-TYPE
+        SYNTAX       INTEGER {
+                         enable(1),
+                         disable(2)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "The administrative state of the XRRP protocol
+                      on the box."
+        DEFVAL { 2 }
+        ::= { hpicfXrrpOperations 2 }
+
+    hpicfXrrpDomain OBJECT-TYPE
+        SYNTAX      Integer32 (1..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Domain that this router is in. The router can only be in 
+                     one domain. Routers in the same domain can fail-over for 
+                     each other. Up to 2 routers that have common VLANs can use
+                     the same XRRP Domain."
+        DEFVAL { 1 }
+        ::= { hpicfXrrpOperations 3 }
+
+    hpicfXrrpRouterId OBJECT-TYPE
+        SYNTAX      XrrpRouterId
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Unique number for this router within a given domain.
+                     The router number (in combination with a VLAN ID) is 
+                     used as an identifier for an XRRP instance within a
+                     domain. Along with 'hpicfXrrpDomain' it is used to 
+                     create the XRRP MAC address for the XRRP instance this 
+                     router owns. No two routers in the same domain can have
+                     the same router number in the same level 2 switching 
+                     fabric."
+        DEFVAL { 1 }
+        ::= { hpicfXrrpOperations 4 }
+
+    hpicfXrrpFailback OBJECT-TYPE
+        SYNTAX      Integer32 (10..999)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Delay a router must wait before it can reclaim control 
+   	             for the virtual router it owns after its VLANs have come
+                     back up. This prevents any crashing for intermittent 
+                     failures."
+        DEFVAL { 10 }
+        ::= { hpicfXrrpOperations 5 }
+
+    hpicfXrrpTrapCntl OBJECT-TYPE
+        SYNTAX       BITS {
+                         stateChange(0),
+                         masterState(1),
+                         authFailure(2)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "Indicates whether the XRRP-enabled router will generate
+                      SNMP traps for events defined in this MIB. The set bit
+                      means 'enabled'.
+
+                      - stateChange(0)
+                        This bit controls whether the notification trap is
+                        allowed to be send when virtual router changes the state.
+
+                      - masterState(1)
+                        This bit controls whether the notification trap is
+                        allowed to be send when virtual router transitions 
+                        to the Master state.
+
+                      - authFailure(2)
+                        This bit controls whether the notification trap is
+                        allowed to be send when virtual router detects an 
+                        authentication error."
+        ::= { hpicfXrrpOperations 6 }
+
+-- **********************************************************************
+--  XRRP Virtual Router (XRRP Instance) Operations Table
+-- **********************************************************************
+
+    hpicfXrrpInstancesTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfXrrpInstanceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table that contains operational characteristics of the
+                     virtual routers (XRRP instances) configured on this routing
+                     device. Currently on a given router for a given VLAN up to 
+                     2 instances can be supported (i.e. router can be the owner 
+                     of one XRRP instance and backup up to one other). The 
+                     theoretical maximum of XRRP instances on the router can 
+                     be MAX_VLAN*2, currently it is limited to 512."
+        ::= { hpicfXrrpOperations 7 }
+
+    hpicfXrrpInstanceEntry OBJECT-TYPE
+        SYNTAX      HpicfXrrpInstanceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry (row) in the 'hpicfXrrpInstancesTable' containing
+                     the operational characteristics of the specific virtual 
+                     router (XRRP instance) configured on this device."
+        INDEX       { hpicfXrrpInstanceRouterId, hpicfXrrpInstanceVlanId }
+        ::= { hpicfXrrpInstancesTable 1 }
+
+    HpicfXrrpInstanceEntry ::=
+        SEQUENCE {
+            hpicfXrrpInstanceRouterId              XrrpRouterId,
+            hpicfXrrpInstanceVlanId                VlanId,
+            hpicfXrrpInstanceOperState             INTEGER,
+            hpicfXrrpInstanceAuthType              INTEGER,
+            hpicfXrrpInstanceAuthKey               OCTET STRING,
+            hpicfXrrpInstanceAdvertiseInterval     Integer32,
+            hpicfXrrpInstanceUpTime                TimeStamp,
+            hpicfXrrpInstanceRowStatus             RowStatus
+        }
+
+    hpicfXrrpInstanceRouterId OBJECT-TYPE
+        SYNTAX      XrrpRouterId
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The router number which owns the virtual router interface
+                     (XRRP instance). In combination with 
+                     'hpicfXrrpInstanceVlanId' used as an index value to 
+                      uniquely identify a row in the 
+                     'hpicfXrrpInstancesTable' table."
+        ::= { hpicfXrrpInstanceEntry 1 }
+
+    hpicfXrrpInstanceVlanId OBJECT-TYPE
+        SYNTAX      VlanId
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The VLAN ID where the virtual router (XRRP instance) is 
+                     running on. In combination with 'hpicfXrrpInstanceRouterId'
+                     is used as an index value to uniquely identify a row in the 
+                     'hpicfXrrpInstancesTable' table."
+        ::= { hpicfXrrpInstanceEntry 2 }
+
+    hpicfXrrpInstanceOperState OBJECT-TYPE 
+        SYNTAX       INTEGER {
+                         initialize(1),
+                         backup(2),
+                         master(3),
+                         vlandown(4)
+                     }
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "The current state of the virtual router (XRRP instance)
+                      configured on this device. This object has the following 
+                      defined values:
+ 
+                      - `initialize', which indicates that the virtual router
+                        (XRRP instance) is waiting for a startup event.
+
+                      - `backup', which indicates that virtual router (XRRP 
+                        instance) is monitoring the availability of the Master.
+
+                      - `master', which indicates that the given virtual router
+                        (XRRP instance) is forwarding packets for the IP 
+                        addresses associated with it, i.e. is in the Master 
+                        state.
+
+                      - 'vlandown', which indicates that the VLAN associated 
+                        with this virtual router (XRRP instance) is in down 
+                        state."
+
+        ::= { hpicfXrrpInstanceEntry 3 }
+
+    hpicfXrrpInstanceAuthType OBJECT-TYPE 
+        SYNTAX            INTEGER {
+                              noAuthentication(1),
+                              simpleTextPassword(2)
+                     }
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  "Authentication type used for VRRP protocol exchanges
+                      between virtual routers.
+                      - 'noAuthentication' means that VRRP protocol exchanges 
+                        are notauthenticated.
+
+                      - 'simpleTextPassword' means that exchanges are 
+                        authenticated by a clear text password." 
+
+        DEFVAL       { noAuthentication }
+        ::= { hpicfXrrpInstanceEntry 4 }
+
+    hpicfXrrpInstanceAuthKey OBJECT-TYPE 
+        SYNTAX       OCTET STRING (SIZE (0..8))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  "This is an authentication string that is used to 
+                      authenticate encapsulated VRRP packets received from
+                      other routers the XRRP instance is composed. This value 
+                      must be consistently defined across the routers that 
+                      form this XRRP instance. When read, it always returns an 
+                      Octet String of length zero."
+        DEFVAL { NULL }
+        ::= { hpicfXrrpInstanceEntry 5 }
+
+    hpicfXrrpInstanceAdvertiseInterval OBJECT-TYPE
+        SYNTAX      Integer32 (1..60)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This parameter defines the advertisement interval in 
+                     seconds for XRRP packets sent out by the Master of the 
+                     XRRP instance."
+        DEFVAL { 5 }
+        ::= { hpicfXrrpInstanceEntry 6 }
+
+    hpicfXrrpInstanceUpTime OBJECT-TYPE 
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This is the value of the `sysUpTime' object when
+                     the XRRP instance transitioned out of `initialized'
+                     state."
+        ::= { hpicfXrrpInstanceEntry 7 }
+
+    hpicfXrrpInstanceRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Status of the row in the 'hpicfXrrpInstancesTable'."
+        ::= { hpicfXrrpInstanceEntry 8 }
+
+-- **********************************************************************
+--  XRRP Virtual Routers (XRRP Instances) Associated IP addresses Table
+-- **********************************************************************
+
+    hpicfXrrpInstanceAssoIpAddrTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF HpicfXrrpInstanceAssoIpAddrEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "This table contains IP addresses associated with 
+                      virtual routers (XRRP instances) configured on
+                      this device."
+    ::= { hpicfXrrpOperations 8 }
+
+    hpicfXrrpInstanceAssoIpAddrEntry OBJECT-TYPE 
+        SYNTAX       HpicfXrrpInstanceAssoIpAddrEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "An entry in the 'hpicfXrrpInstanceAssoIpAddrTable'.
+                      The number of rows will be equal the number of IP 
+                      addresses backed up by the all XRRP instances on this
+                      device."
+        INDEX    { hpicfXrrpInstanceRouterId, 
+                   hpicfXrrpInstanceVlanId, 
+                   hpicfXrrpAssoIpAddr }
+        ::= { hpicfXrrpInstanceAssoIpAddrTable 1 }
+
+    HpicfXrrpInstanceAssoIpAddrEntry ::=
+        SEQUENCE {
+            hpicfXrrpAssoIpAddr         IpAddress,
+            hpicfXrrpAssoIpMask         IpAddress,
+            hpicfXrrpAssoRowStatus      RowStatus
+        }
+
+    hpicfXrrpAssoIpAddr OBJECT-TYPE 
+        SYNTAX       IpAddress
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "The backed up IP address configured on the VLAN 
+                     'hpicfXrrpInstanceVlanId' of the router
+                     'hpicfXrrpInstanceRouterId'."
+     ::= { hpicfXrrpInstanceAssoIpAddrEntry 1 }
+
+    hpicfXrrpAssoIpMask OBJECT-TYPE 
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  "The subnet mask for the IP address."
+     ::= { hpicfXrrpInstanceAssoIpAddrEntry 2 }
+
+    hpicfXrrpAssoRowStatus OBJECT-TYPE 
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  "The status of the row in 
+                      'hpicfXrrpInstanceAssoIpAddrTable'."
+        ::= { hpicfXrrpInstanceAssoIpAddrEntry 3 }
+
+-- **********************************************************************
+--  XRRP Transfer Control Object
+-- **********************************************************************    
+
+    hpicfXrrpTransferControl OBJECT-TYPE
+        SYNTAX       INTEGER {
+                        transferCtrl (1),
+                        notransferCtrl (2)
+                        }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "When this object is set to transferCtrl (1), it acts
+                     as a trigger to intimate XRRP of the transfer of control
+                     from one router to another.
+                     When read, this object always returns 
+                     notransferCtrl (2)."
+                     
+        ::= { hpicfXrrpOperations 9 }
+
+ -- **********************************************************************
+--  XRRP Infinite Failback object
+-- **********************************************************************    
+
+    hpicfXrrpInfiniteFailback OBJECT-TYPE
+        SYNTAX       INTEGER {
+                        enable (1),
+                        disable (2)
+                        }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "When this object is set to enable (1), it sets the
+                      XRRP router on infinite failback. On initialization, 
+                      the default value is disable (2)."
+        
+        ::= { hpicfXrrpOperations 10 }
+
+-- **********************************************************************
+--  XRRP Global Statistics (Read only objects)
+-- **********************************************************************
+
+    hpicfXrrpStatsXrrpMacAddress OBJECT-TYPE 
+        SYNTAX       MacAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "MAC Address used for XRRP instances for which this 
+                      router is the owner. Value is determined by XRRP 
+                      domain and unique router number."
+        ::= { hpicfXrrpStatistics 1 }
+
+    hpicfXrrpStatsMacAndMask OBJECT-TYPE 
+        SYNTAX       MacAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the current AND mask used by XRRP to 
+                      determine which MAC addresses can be received for
+                      routing."
+        ::= { hpicfXrrpStatistics 2 }
+
+    hpicfXrrpStatsPktsRcvd OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of XRRP packets received 
+                      by the router."
+        ::= { hpicfXrrpStatistics 3 }
+
+    hpicfXrrpStatsNotDomainPktsReject OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of XRRP packets 
+                      received from the other domains."
+        ::= { hpicfXrrpStatistics 4 }
+
+    hpicfXrrpStatsCheckSumPktsReject OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of XRRP packets rejected
+                      due to checksum errors."
+        ::= { hpicfXrrpStatistics 5 }
+
+    hpicfXrrpStatsBadValuePktsReject OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of received XRRP packets 
+                      with bad values."
+        ::= { hpicfXrrpStatistics 6 }
+
+    hpicfXrrpStatsCorruptedPktsReject OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of received XRRP packets 
+                      that are too short."
+        ::= { hpicfXrrpStatistics 7 }
+
+    hpicfXrrpStatsVersionErrorPktsReject OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of received XRRP packets 
+                      with wrong version number."
+        ::= { hpicfXrrpStatistics 8 }
+
+    hpicfXrrpStatsBcastArpsXmtd OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of broacast arps sent."
+        ::= { hpicfXrrpStatistics 9 }
+
+    hpicfXrrpStatsUpTime OBJECT-TYPE 
+        SYNTAX       TimeStamp
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This is the value of the `sysUpTime' object when
+                      the XRRP protocol has been last enabled. Used to count
+                      elapsed time since last XRRP enable action."
+        ::= { hpicfXrrpStatistics 10 }
+
+    hpicfXrrpStatsProtocolCreateTime OBJECT-TYPE
+        SYNTAX       LastCreateTime
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "The value of sysUpTime when XRRP protocol was last
+                      activated (initialized). This can be used for polling 
+                      applications to detect discontinuity in the above
+                      statistics counters if protocol has been reinitialized
+                      between polls."
+        ::= { hpicfXrrpStatistics 11 }
+
+-- **********************************************************************
+--  XRRP Virtual Routers Statistics (Read only objects)
+-- **********************************************************************
+
+    hpicfXrrpStatsInstancesTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF HpicfXrrpStatsInstanceEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "A table that contains statistics information for 
+                      the XRRP instances on the router."
+        ::= { hpicfXrrpStatistics 12 }
+
+    hpicfXrrpStatsInstanceEntry OBJECT-TYPE
+        SYNTAX       HpicfXrrpStatsInstanceEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "Information about a specific XRRP instance."
+        INDEX       { hpicfXrrpInstanceRouterId, 
+                      hpicfXrrpInstanceVlanId }
+        ::= { hpicfXrrpStatsInstancesTable 1 }
+
+    HpicfXrrpStatsInstanceEntry ::=
+        SEQUENCE {
+            hpicfXrrpInstanceRouterId                  XrrpRouterId,
+            hpicfXrrpInstanceVlanId                    VlanId,
+            hpicfXrrpStatsInstancePktsRcvd             Counter32,
+            hpicfXrrpStatsInstancePktsXmtd             Counter32,
+            hpicfXrrpStatsInstanceVersionErrPkts       Counter32,
+            hpicfXrrpStatsInstancePriorityZeroPktsRcvd Counter32,
+            hpicfXrrpStatsInstancePriorityZeroPktsXmtd Counter32,
+            hpicfXrrpStatsInstanceMismatchedIpPkts     Counter32,
+            hpicfXrrpStatsInstanceAuthFailPktsReject   Counter32,
+            hpicfXrrpStatsInstanceIntervalMismatchPkts Counter32,
+            hpicfXrrpStatsInstanceCreateTime           LastCreateTime
+        } 
+
+    hpicfXrrpStatsInstancePktsRcvd OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This value contains the number of XRRP packets received 
+                     by the virtual router (XRRP instance)."
+        ::= { hpicfXrrpStatsInstanceEntry 1 }
+
+    hpicfXrrpStatsInstancePktsXmtd OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This value contains the number of XRRP packets transmitted
+                     by the virtual router (XRRP instance)."
+        ::= { hpicfXrrpStatsInstanceEntry 2 }
+
+    hpicfXrrpStatsInstanceVersionErrPkts OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This value contains the number of XRRP packets received
+                     by the virtual router (XRRP instance) with incompatible 
+                     version value in either the XRRP or VRRP portion of the 
+                     header."
+        ::= { hpicfXrrpStatsInstanceEntry 3 }
+
+    hpicfXrrpStatsInstancePriorityZeroPktsRcvd OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of XRRP packets received 
+                      with the priority set to 0 on the virtual router (i.e. 
+                      the current master is giving up control)."
+        ::= { hpicfXrrpStatsInstanceEntry 4 }
+
+    hpicfXrrpStatsInstancePriorityZeroPktsXmtd OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of XRRP packets 
+                      transmitted by the virtual router with the priority set 
+                      to 0 (i.e. the virtual router is giving up control)."
+        ::= { hpicfXrrpStatsInstanceEntry 5 }
+
+    hpicfXrrpStatsInstanceMismatchedIpPkts OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of XRRP packets received 
+                      by the virtual router with an unknown mismatched IP 
+                      addresses. The Backup router will automatically accept 
+                      the addresses from a router with a priority of 255 (i.e. 
+                      the virtual router owner)."
+        ::= { hpicfXrrpStatsInstanceEntry 6 }
+
+    hpicfXrrpStatsInstanceAuthFailPktsReject OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of rejected by this virtual
+                      router XRRP packets due to authentication failure (i.e. 
+                      mismatched passwords)."
+        ::= { hpicfXrrpStatsInstanceEntry 7 }
+
+    hpicfXrrpStatsInstanceIntervalMismatchPkts OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of XRRP packets with 
+                      the advertisement interval is a mismatch. The receiving
+                      router will change to that of the transmitter but logs 
+                      a warning."
+        ::= { hpicfXrrpStatsInstanceEntry 8 }
+
+    hpicfXrrpStatsInstanceCreateTime OBJECT-TYPE
+        SYNTAX       LastCreateTime
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "The value of sysUpTime when this virtual router
+                      entry was last activated. This object allows to a 
+                      management station to detect deletion and recreation 
+                      cycles between polls and thus detect discontinuity 
+                      in the above statistics counters."
+        ::= { hpicfXrrpStatsInstanceEntry 9 }
+
+-- **********************************************************************
+--  XRRP Virtual Router Coordinator Statistics (Read only objects)
+-- **********************************************************************
+
+    hpicfXrrpStatsRcTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF HpicfXrrpStatsRcEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "A table that contains statistics information for 
+                      virtual router coordinators in the domain."
+        ::= { hpicfXrrpStatistics 13 }
+
+    hpicfXrrpStatsRcEntry OBJECT-TYPE
+        SYNTAX       HpicfXrrpStatsRcEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "Information about a specific router coordinator."
+        INDEX       { hpicfXrrpStatsRcRouterId }
+        ::= { hpicfXrrpStatsRcTable 1 }
+
+    HpicfXrrpStatsRcEntry ::=
+        SEQUENCE {
+            hpicfXrrpStatsRcRouterId             XrrpRouterId,
+            hpicfXrrpStatsRcOperState            INTEGER,
+            hpicfXrrpStatsRcType1PktsRcvd        Counter32,
+            hpicfXrrpStatsRcType1PktsXmtd        Counter32,
+            hpicfXrrpStatsRcType2PktsRcvd        Counter32,
+            hpicfXrrpStatsRcType2PktsXmtd        Counter32,
+            hpicfXrrpStatsRcBecomeMaster         Counter32,
+            hpicfXrrpStatsRcMasterTime           TimeStamp,
+            hpicfXrrpStatsRcUnknownVlanId        Counter32,
+            hpicfXrrpStatsRcCreateTime           LastCreateTime
+        } 
+
+    hpicfXrrpStatsRcRouterId OBJECT-TYPE
+        SYNTAX     XrrpRouterId
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "The router coordinator number."
+        ::= { hpicfXrrpStatsRcEntry 1 }
+
+    hpicfXrrpStatsRcOperState OBJECT-TYPE 
+        SYNTAX       INTEGER {
+                         initialize(1),
+                         backup(2),
+                         master(3),
+                         failback(4)
+                     }
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "The current operational state of the router coordinator."
+
+        ::= { hpicfXrrpStatsRcEntry 2 }
+
+    hpicfXrrpStatsRcType1PktsRcvd OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of type 1 XRRP packets 
+                      received by the router."
+        ::= { hpicfXrrpStatsRcEntry 3 }
+
+    hpicfXrrpStatsRcType1PktsXmtd OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of type 1 XRRP packets 
+                      transmitted by the router."
+        ::= { hpicfXrrpStatsRcEntry 4 }
+
+    hpicfXrrpStatsRcType2PktsRcvd OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of type 2 XRRP packets 
+                      received by the router."
+        ::= { hpicfXrrpStatsRcEntry 5 }
+
+    hpicfXrrpStatsRcType2PktsXmtd OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This value contains the number of type 2 XRRP packets 
+                      transmitted by the router."
+        ::= { hpicfXrrpStatsRcEntry 6 }
+
+    hpicfXrrpStatsRcBecomeMaster OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of times that this router has become
+                     a master."
+        ::= { hpicfXrrpStatsRcEntry 7 }
+
+    hpicfXrrpStatsRcMasterTime OBJECT-TYPE
+        SYNTAX      TimeStamp 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Duration as master (in seconds)."
+        ::= { hpicfXrrpStatsRcEntry 8 }
+
+    hpicfXrrpStatsRcUnknownVlanId OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { hpicfXrrpStatsRcEntry 9 }
+
+    hpicfXrrpStatsRcCreateTime OBJECT-TYPE
+        SYNTAX       LastCreateTime
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "The value of sysUpTime when this router coordinator
+                      entry was last activated. This object allows to a 
+                      management station to detect deletion and recreation 
+                      cycles between polls and thus detect discontinuity 
+                      in the above statistics counters."
+        ::= { hpicfXrrpStatsRcEntry 10 }
+
+-- **********************************************************************
+--   XRRP Notifications Trap Definitions
+-- **********************************************************************
+
+    hpicfXrrpNotifications   OBJECT IDENTIFIER ::= { hpicfXrrpMIB 1 }
+
+    hpicfXrrpNotificationsPrefix
+                   OBJECT IDENTIFIER ::= { hpicfXrrpNotifications 0 }
+
+    hpicfXrrpNotificationsObjects
+                   OBJECT IDENTIFIER ::= { hpicfXrrpNotifications 1 }
+
+    hpicfXrrpTrapAuthErrorType OBJECT-TYPE 
+        SYNTAX       INTEGER {
+                         invalidAuthType (1),
+                         authTypeMismatch (2),
+                         authFailure (3)
+                     }
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION  "Potential types of configuration conflicts.
+                      Used by hpicfXrrpTrapAuthFailure trap."
+        ::= { hpicfXrrpNotificationsObjects 1 }
+
+    hpicfXrrpTrapStateChange NOTIFICATION-TYPE
+        OBJECTS { 
+            hpicfXrrpDomain, 
+            hpicfXrrpStatsRcRouterId,
+            hpicfXrrpStatsRcOperState
+        }
+        STATUS       current
+        DESCRIPTION  "This trap indicates that a XRRP router has changed
+                      state. The trap contains the domain number, the router 
+                      coordinator number and state value for the change.
+                      This trap is being controled by the state of 
+                      'hpicfXrrpTrapCntl' object."
+        ::= { hpicfXrrpNotificationsPrefix 1 }
+
+    hpicfXrrpTrapAuthFailure NOTIFICATION-TYPE
+        OBJECTS { 
+            hpicfXrrpDomain, 
+            hpicfXrrpRouterId,          -- The originator of the trap
+            hpicfXrrpInstanceRouterId, 
+            hpicfXrrpInstanceVlanId,
+            hpicfXrrpTrapAuthErrorType
+        }
+        STATUS       current
+        DESCRIPTION  "This trap indicates that the authentication error occured
+                      on a XRRP VLAN. The trap contains the domain number, this
+                      router number, instance id (owner router number and 
+                      VLAN ID) that detected the error and type of the 
+                      authentication error. This trap is being controled by the 
+                      state of 'hpicfXrrpTrapCntl' object." 
+        ::= { hpicfXrrpNotificationsPrefix 2 }
+
+-- **********************************************************************
+--  Conformance Information
+-- **********************************************************************
+
+    hpicfXrrpMIBCompliances  OBJECT IDENTIFIER ::= { hpicfXrrpConformance 1 }
+    hpicfXrrpMIBGroups       OBJECT IDENTIFIER ::= { hpicfXrrpConformance 2 }
+
+-- ...................................................................
+-- Compliance Statements
+-- ...................................................................
+
+    hpicfXrrpMIBCompliance MODULE-COMPLIANCE 
+        STATUS      deprecated
+        DESCRIPTION "********* THIS COMPLIANCE IS DEPRECATED *********"
+        MODULE -- this module 
+            MANDATORY-GROUPS  { hpicfXrrpOperGroup,
+                                hpicfXrrpStatsGroup }
+        ::= { hpicfXrrpMIBCompliances 1 }
+
+    hpicfXrrpMIBCompliance1 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The core compliance statement for XRRP implementation."
+        MODULE -- this module
+            MANDATORY-GROUPS  { hpicfXrrpOperGroup1,
+                                hpicfXrrpStatsGroup }
+        ::= { hpicfXrrpMIBCompliances 2 }
+
+    hpicfXrrpOperGroup OBJECT-GROUP
+        OBJECTS     {
+                      hpicfXrrpVersion,
+                      hpicfXrrpAdminState,
+                      hpicfXrrpDomain,
+                      hpicfXrrpRouterId,
+                      hpicfXrrpTrapCntl,
+
+                      hpicfXrrpInstanceOperState,
+                      hpicfXrrpInstanceAuthType,
+                      hpicfXrrpInstanceAuthKey,
+                      hpicfXrrpInstanceAdvertiseInterval,
+                      hpicfXrrpInstanceUpTime,
+                      hpicfXrrpInstanceRowStatus,
+
+                      hpicfXrrpAssoIpMask,
+                      hpicfXrrpAssoRowStatus
+                    }
+        STATUS      deprecated
+        DESCRIPTION "********* THIS GROUP IS DEPRECATED *********"
+        ::= { hpicfXrrpMIBGroups 1 }
+
+    hpicfXrrpStatsGroup OBJECT-GROUP
+        OBJECTS     { 
+                        hpicfXrrpStatsXrrpMacAddress,
+                        hpicfXrrpStatsMacAndMask,
+                        hpicfXrrpStatsPktsRcvd,
+                        hpicfXrrpStatsNotDomainPktsReject,
+                        hpicfXrrpStatsCheckSumPktsReject,
+                        hpicfXrrpStatsBadValuePktsReject,
+                        hpicfXrrpStatsCorruptedPktsReject,
+                        hpicfXrrpStatsVersionErrorPktsReject,
+                        hpicfXrrpStatsBcastArpsXmtd,
+                        hpicfXrrpStatsUpTime,
+                        hpicfXrrpStatsProtocolCreateTime,
+
+                        hpicfXrrpStatsInstancePktsRcvd,
+                        hpicfXrrpStatsInstancePktsXmtd,
+                        hpicfXrrpStatsInstanceVersionErrPkts,
+                        hpicfXrrpStatsInstancePriorityZeroPktsRcvd,
+                        hpicfXrrpStatsInstancePriorityZeroPktsXmtd,
+                        hpicfXrrpStatsInstanceMismatchedIpPkts,
+                        hpicfXrrpStatsInstanceAuthFailPktsReject,
+                        hpicfXrrpStatsInstanceIntervalMismatchPkts,
+                        hpicfXrrpStatsInstanceCreateTime,
+
+                        hpicfXrrpStatsRcOperState,
+                        hpicfXrrpStatsRcType1PktsRcvd,
+                        hpicfXrrpStatsRcType1PktsXmtd,
+                        hpicfXrrpStatsRcType2PktsRcvd,
+                        hpicfXrrpStatsRcType2PktsXmtd,
+                        hpicfXrrpStatsRcBecomeMaster,
+                        hpicfXrrpStatsRcMasterTime,
+                        hpicfXrrpStatsRcUnknownVlanId,
+                        hpicfXrrpStatsRcCreateTime
+                    }
+        STATUS      current
+        DESCRIPTION "Conformance group for XRRP statistics."
+        ::= { hpicfXrrpMIBGroups 2 }
+
+    hpicfXrrpTrapGroup OBJECT-GROUP 
+        OBJECTS     {
+                        hpicfXrrpTrapAuthErrorType
+                    }
+        STATUS      current
+        DESCRIPTION "Conformance group for objects contained in XRRP 
+                     notifications."
+        ::= { hpicfXrrpMIBGroups 3 }
+
+    hpicfXrrpNotificationGroup NOTIFICATION-GROUP 
+        NOTIFICATIONS {
+                        hpicfXrrpTrapStateChange,
+                        hpicfXrrpTrapAuthFailure
+                      }
+        STATUS      current
+        DESCRIPTION "The XRRP MIB Notification Group."
+        ::= { hpicfXrrpMIBGroups 4 }
+
+     hpicfXrrpOperGroup1 OBJECT-GROUP
+        OBJECTS     {
+                      hpicfXrrpVersion,
+                      hpicfXrrpAdminState,
+                      hpicfXrrpDomain,
+                      hpicfXrrpRouterId,
+                      hpicfXrrpTrapCntl,
+
+                      hpicfXrrpInstanceOperState,
+                      hpicfXrrpInstanceAuthType,
+                      hpicfXrrpInstanceAuthKey,
+                      hpicfXrrpInstanceAdvertiseInterval,
+                      hpicfXrrpInstanceUpTime,
+                      hpicfXrrpInstanceRowStatus,
+
+                      hpicfXrrpAssoIpMask,
+                      hpicfXrrpAssoRowStatus,
+
+                      hpicfXrrpTransferControl,
+                      hpicfXrrpInfiniteFailback
+                    }
+        STATUS      current
+        DESCRIPTION "Conformance group for XRRP operations."
+        ::= { hpicfXrrpMIBGroups 5 }
+END

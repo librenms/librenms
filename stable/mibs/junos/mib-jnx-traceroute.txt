@@ -1,0 +1,145 @@
+--
+-- Juniper Enterprise Specific MIB: TraceRoute MIB
+-- 
+-- Copyright (c) 2001-2003, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-TRACEROUTE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI              -- RFC2578
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB      -- RFC2571
+    DisplayString
+        FROM SNMPv2-TC
+    jnxMibs
+        FROM JUNIPER-SMI;
+
+jnxTraceRouteMIB MODULE-IDENTITY
+    LAST-UPDATED "200307182154Z" -- Fri Jul 18 21:54:03 2003 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise specific
+             portions of traceRouteMib.  Any data stored in this MIB has
+             directly related entries in mib-2, traceRouteMIB."
+    ::= { jnxMibs 8 }
+
+
+jnxTraceRouteObjects      OBJECT IDENTIFIER ::= { jnxTraceRouteMIB 1 }
+
+jnxTraceRouteCtlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxTraceRouteCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the jnxTraceRoute Control Table for providing enterprise
+         specific options to the corresponding traceRouteCtlTable entry."
+   ::= { jnxTraceRouteObjects 2 }
+
+jnxTraceRouteCtlEntry OBJECT-TYPE
+    SYNTAX      JnxTraceRouteCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the jnxTraceRouteCtlTable.  The first index
+         element, jnxTraceRouteCtlOwnerIndex, is of type SnmpAdminString, a
+         textual convention that allows for use of the SNMPv3 View-Based Access
+         Control Model (RFC 2575 [11], VACM) and allows an management
+         application to identify its entries.  The second index,
+         jnxTraceRouteCtlTestName (also an SnmpAdminString), enables the same
+         management application to have multiple outstanding requests.
+         Entries are created in the traceRouteCtlTable and mirrored here."
+    INDEX {
+             jnxTRCtlOwnerIndex,
+             jnxTRCtlTestName
+          }
+    ::= { jnxTraceRouteCtlTable 1 }
+
+JnxTraceRouteCtlEntry ::=
+    SEQUENCE {
+        jnxTRCtlOwnerIndex             SnmpAdminString,
+        jnxTRCtlTestName               SnmpAdminString,
+        jnxTRCtlIfName                 DisplayString,
+        jnxTRCtlRoutingInstanceName    DisplayString
+    }
+
+jnxTRCtlOwnerIndex OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "To facilitate the provisioning of access control by a
+       security administrator using the View-Based Access
+       Control Model (RFC 2575, VACM) for tables in which
+       multiple users may need to independently create or
+       modify entries, the initial index is used as an 'owner
+       index'.  Such an initial index has a syntax of
+       SnmpAdminString, and can thus be trivially mapped to a
+       securityName or groupName as defined in VACM, in
+       accordance with a security policy.
+
+       When used in conjunction with such a security policy all
+       entries in the table belonging to a particular user (or
+       group) will have the same value for this initial index.
+       For a given user's entries in a particular table, the
+       object identifiers for the information in these entries
+       will have the same subidentifiers (except for the 'column'
+       subidentifier) up to the end of the encoded owner index.
+       To configure VACM to permit access to this portion of the
+       table, one would create vacmViewTreeFamilyTable entries
+       with the value of vacmViewTreeFamilySubtree including
+       the owner index portion, and vacmViewTreeFamilyMask
+       'wildcarding' the column subidentifier.  More elaborate
+       configurations are possible."
+    ::= { jnxTraceRouteCtlEntry 1 }
+
+jnxTRCtlTestName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the traceRoute test.  This is locally unique, within
+        the scope of an traceRouteCtlOwnerIndex."
+    ::= { jnxTraceRouteCtlEntry 2 }
+
+jnxTRCtlIfName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..24))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to an interface name prior to starting a remote
+        traceRoute operation directs the traceRoute probes to be transmitted
+        over the specified interface.  To specify the interface index instead,
+        see traceRouteCtlIfIndex.  The interface name must be specified under
+        interfaces statement of the JUNOS configuration.  A zero length string
+        value for this object means that this option is not enabled.  The 
+        following values may be set simultaneously, however, only one value is
+        used.  The precedence order is a follows:
+            traceRouteCtlIfIndex (see traceRouteCtlTable in traceRouteMIB)
+            jnxTRCtlIfName
+            jnxTRCtlRoutingInstanceName"
+    DEFVAL { ''H }
+    ::= { jnxTraceRouteCtlEntry 3 }
+
+jnxTRCtlRoutingInstanceName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Use this option to specify the name of the routing instance used when
+        directing outgoing traceRoute packets.  The instance name specified
+        must be configured under routing-instances of the JUNOS configuration."
+    DEFVAL { ''H }
+    ::= { jnxTraceRouteCtlEntry 4 }
+END
