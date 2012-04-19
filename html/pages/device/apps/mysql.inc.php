@@ -1,9 +1,50 @@
 <?php
 global $config;
 
-$graphs = array('mysql_command_counters' => 'Command Counters',
+print_optionbar_start();
+
+echo("<span style='font-weight: bold;'>".$app['app_type']."</span> &#187; ");
+
+$app_sections = array('system' => "System",
+                      'queries' => "Quieries",
+                      'innodb' => "InnoDB");
+
+unset($sep);
+foreach ($app_sections as $app_section => $app_section_text)
+{
+  echo($sep);
+
+  if (!$vars['app_section']) { $vars['app_section'] = $app_section; }
+
+  if ($vars['app_section'] == $app_section)
+  {
+    echo("<span class='pagemenu-selected'>");
+  }
+  echo(generate_link(ucfirst($app_section),$vars,array('app_section'=>$app_section)));
+  if ($vars['app_section'] == $app_section) { echo("</span>"); }
+  $sep = " | ";
+}
+print_optionbar_end();
+
+$graphs['system'] = array(
                 'mysql_connections' => 'Connections',
                 'mysql_files_tables' => 'Files and Tables',
+                'mysql_myisam_indexes' => 'MyISAM Indexes',
+                'mysql_network_traffic' => 'Network Traffic',
+                'mysql_table_locks' => 'Table Locks',
+                'mysql_temporary_objects' => 'Temporary Objects'
+                );
+
+$graphs['queries'] = array(
+                'mysql_command_counters' => 'Command Counters',
+		'mysql_query_cache' => 'Query Cache',
+                'mysql_query_cache_memory' => 'Query Cache Memory',
+                'mysql_select_types' => 'Select Types',
+                'mysql_slow_queries' => 'Slow Queries',
+                'mysql_sorts' => 'Sorts',
+		);
+
+$graphs['innodb'] = array(
                 'mysql_innodb_buffer_pool' => 'InnoDB Buffer Pool',
                 'mysql_innodb_buffer_pool_activity' => 'InnoDB Buffer Pool Activity',
                 'mysql_innodb_insert_buffer' => 'InnoDB Insert Buffer',
@@ -13,17 +54,9 @@ $graphs = array('mysql_command_counters' => 'Command Counters',
                 'mysql_innodb_row_operations' => 'InnoDB Row Operations',
                 'mysql_innodb_semaphores' => 'InnoDB semaphores',
                 'mysql_innodb_transactions' => 'InnoDB Transactions',
-                'mysql_myisam_indexes' => 'MyISAM Indexes',
-                'mysql_network_traffic' => 'Network Traffic',
-                'mysql_query_cache' => 'Query Cache',
-                'mysql_query_cache_memory' => 'Query Cache Memory',
-                'mysql_select_types' => 'Select Types',
-                'mysql_slow_queries' => 'Slow Queries',
-                'mysql_sorts' => 'Sorts',
-                'mysql_table_locks' => 'Table Locks',
-                'mysql_temporary_objects' => 'Temporary Objects');
+		);
 
-foreach ($graphs as $key => $text)
+foreach ($graphs[$vars['app_section']] as $key => $text)
 {
   $graph_type = $key;
   $graph_array['height'] = "100";
