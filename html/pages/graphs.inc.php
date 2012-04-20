@@ -231,8 +231,8 @@ if (!$auth)
   }
 
   ### FIXME : do this properly
-  if($type == "port" && $subtype == "bits")
-  {
+#  if($type == "port" && $subtype == "bits")
+#  {
     echo(' | ');
     if ($vars['previous'] == "yes")
     {
@@ -240,7 +240,7 @@ if (!$auth)
     } else {
       echo(generate_link("Show Previous",$vars, array('page' => "graphs", 'previous' => "yes")));
     }
-  }
+#  }
 
   echo('<div style="float: right;">');
 
