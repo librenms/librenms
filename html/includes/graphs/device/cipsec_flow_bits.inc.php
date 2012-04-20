@@ -5,6 +5,6 @@ $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cipsec_flow.r
 $ds_in = "InOctets";
 $ds_out = "OutOctets";
 
-include("includes/graphs/generic_bits.inc.php");
+include("includes/graphs/generic_data.inc.php");
 
 ?>

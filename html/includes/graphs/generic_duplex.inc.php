@@ -20,30 +20,61 @@ $rrd_options .= " DEF:".$out."=".$rrd_filename.":".$ds_out.":AVERAGE";
 $rrd_options .= " DEF:".$in."=".$rrd_filename.":".$ds_in.":AVERAGE";
 $rrd_options .= " DEF:".$out."_max=".$rrd_filename.":".$ds_out.":MAX";
 $rrd_options .= " DEF:".$in."_max=".$rrd_filename.":".$ds_in.":MAX";
-
 $rrd_options .= " CDEF:dout_max=out_max,-1,*";
 $rrd_options .= " CDEF:dout=out,-1,*";
 $rrd_options .= " CDEF:both=in,out,+";
-
 if ($print_total)
 {
   $rrd_options .= " VDEF:totin=in,TOTAL";
   $rrd_options .= " VDEF:totout=out,TOTAL";
   $rrd_options .= " VDEF:tot=both,TOTAL";
 }
-
 if ($percentile)
 {
   $rrd_options .= " VDEF:percentile_in=in,".$percentile.",PERCENT";
   $rrd_options .= " VDEF:percentile_out=out,".$percentile.",PERCENT";
   $rrd_options .= " VDEF:dpercentile_out=dout,".$percentile.",PERCENT";
 }
-
 if ($graph_max)
 {
   $rrd_options .= " AREA:in_max#".$colour_area_in_max.":";
   $rrd_options .= " AREA:dout_max#".$colour_area_out_max.":";
 }
+
+if($_GET['previous'] == "yes")
+{
+  $rrd_options .= " DEF:".$out."X=".$rrd_filename.":".$ds_out.":AVERAGE:start=".$prev_from.":end=".$from;
+  $rrd_options .= " DEF:".$in."X=".$rrd_filename.":".$ds_in.":AVERAGE:start=".$prev_from.":end=".$from;
+  $rrd_options .= " DEF:".$out."_maxX=".$rrd_filename.":".$ds_out.":MAX:start=".$prev_from.":end=".$from;
+  $rrd_options .= " DEF:".$in."_maxX=".$rrd_filename.":".$ds_in.":MAX:start=".$prev_from.":end=".$from;
+  $rrd_options .= " SHIFT:".$out."X:$period";
+  $rrd_options .= " SHIFT:".$in."X:$period";
+  $rrd_options .= " SHIFT:".$out."_maxX:$period";
+  $rrd_options .= " SHIFT:".$in."_maxX:$period";
+  $rrd_options .= " CDEF:dout_maxX=out_maxX,-1,*";
+  $rrd_options .= " CDEF:doutX=outX,-1,*";
+  $rrd_options .= " CDEF:bothX=inX,outX,+";
+  if ($print_total)
+  {
+    $rrd_options .= " VDEF:totinX=inX,TOTAL";
+    $rrd_options .= " VDEF:totoutX=outX,TOTAL";
+    $rrd_options .= " VDEF:totX=bothX,TOTAL";
+  }
+  if ($percentile)
+  {
+    $rrd_options .= " VDEF:percentile_inX=inX,".$percentile.",PERCENT";
+    $rrd_options .= " VDEF:percentile_outX=outX,".$percentile.",PERCENT";
+    $rrd_options .= " VDEF:dpercentile_outX=doutX,".$percentile.",PERCENT";
+  }
+  if ($graph_max)
+  {
+    $rrd_options .= " AREA:in_max#".$colour_area_in_max.":";
+    $rrd_options .= " AREA:dout_max#".$colour_area_out_max.":";
+  }
+}
+
+
+
 $rrd_options .= " AREA:in#".$colour_area_in.":";
 $rrd_options .= " COMMENT:'".$unit_text."      Now       Ave      Max";
 
@@ -89,5 +120,13 @@ if ($percentile)
   $rrd_options .= " LINE1:percentile_in#aa0000";
   $rrd_options .= " LINE1:dpercentile_out#aa0000";
 }
+
+if($_GET['previous'] == "yes")
+{
+  $rrd_options .= " LINE1.25:in".$format."X#666666:'Prev In \\\\n'";
+  $rrd_options .= " LINE1.25:dout".$format."X#666666:'Prev Out'";
+}
+
+
 
 ?>

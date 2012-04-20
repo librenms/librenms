@@ -15,7 +15,8 @@ $ds_in = "dr";
 $ds_out = "dw";
 
 $multiplier = "8";
+$format = "bytes";
 
-include("includes/graphs/generic_bits.inc.php");
+include("includes/graphs/generic_data.inc.php");
 
 ?>

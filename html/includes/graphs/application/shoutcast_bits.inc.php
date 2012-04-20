@@ -22,6 +22,6 @@ $rrddir          = $config['rrd_dir']."/".$device['hostname'];
 $hostname        = (isset($_GET['hostname']) ? $_GET['hostname'] : "unkown");
 $rrd_filename    = $rrddir."/app-shoutcast-".$app['app_id']."-".$hostname.".rrd";
 
-include("includes/graphs/generic_bits.inc.php");
+include("includes/graphs/generic_data.inc.php");
 
 ?>
