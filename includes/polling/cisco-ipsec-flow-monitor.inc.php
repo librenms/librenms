@@ -65,19 +65,7 @@ if ($device['os_group'] == "cisco")
   $rrd_create .= " DS:ProtocolUseFails:COUNTER:600:0:100000000000";
   $rrd_create .= " DS:NoSaFails:COUNTER:600:0:100000000000";
   $rrd_create .= " DS:SysCapFails:COUNTER:600:0:100000000000";
-  $rrd_create .= " RRA:AVERAGE:0.5:1:1200";
-  $rrd_create .= " RRA:AVERAGE:0.5:1:2000";
-  $rrd_create .= " RRA:AVERAGE:0.5:6:2000";
-  $rrd_create .= " RRA:AVERAGE:0.5:24:2000";
-  $rrd_create .= " RRA:AVERAGE:0.5:288:2000";
-  $rrd_create .= " RRA:MAX:0.5:1:1200";
-  $rrd_create .= " RRA:MAX:0.5:6:2000";
-  $rrd_create .= " RRA:MAX:0.5:24:2000";
-  $rrd_create .= " RRA:MAX:0.5:288:2000";
-  $rrd_create .= " RRA:MIN:0.5:1:1200";
-  $rrd_create .= " RRA:MIN:0.5:6:2000";
-  $rrd_create .= " RRA:MIN:0.5:24:2000";
-  $rrd_create .= " RRA:MIN:0.5:288:2000";
+  $rrd_create .= $config['rrd_rra'];
 
   if (is_file($rrd_filename) || $data['cipSecGlobalActiveTunnels'])
   {

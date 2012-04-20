@@ -199,19 +199,7 @@ if (!is_file($mysql_rrd))
         DS:CRSt:DERIVE:600:0:125000000000 \
         DS:CSt:DERIVE:600:0:125000000000 \
         DS:CUe:DERIVE:600:0:125000000000 \
-        DS:CUMi:DERIVE:600:0:125000000000 \
-        RRA:AVERAGE:0.5:1:600 \
-        RRA:AVERAGE:0.5:6:700 \
-        RRA:AVERAGE:0.5:24:775 \
-        RRA:AVERAGE:0.5:288:797 \
-        RRA:MIN:0.5:1:600 \
-        RRA:MIN:0.5:6:700 \
-        RRA:MIN:0.5:24:775 \
-        RRA:MIN:0.5:3:600 \
-        RRA:MAX:0.5:1:600 \
-        RRA:MAX:0.5:6:700 \
-        RRA:MAX:0.5:24:775 \
-        RRA:MAX:0.5:288:797");
+        DS:CUMi:DERIVE:600:0:125000000000 ".$config['rrd_rra']);
 }
 
 rrdtool_update($mysql_rrd, "N:$string");

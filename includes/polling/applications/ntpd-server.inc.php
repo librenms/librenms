@@ -28,19 +28,7 @@ if (!is_file($rrd_filename))
         DS:packets_drop:DERIVE:600:0:125000000000 \
         DS:packets_ignore:DERIVE:600:0:125000000000 \
         DS:packets_recv:DERIVE:600:0:125000000000 \
-        DS:packets_sent:DERIVE:600:0:125000000000 \
-        RRA:AVERAGE:0.5:1:600 \
-        RRA:AVERAGE:0.5:6:700 \
-        RRA:AVERAGE:0.5:24:775 \
-        RRA:AVERAGE:0.5:288:797 \
-        RRA:MIN:0.5:1:600 \
-        RRA:MIN:0.5:6:700 \
-        RRA:MIN:0.5:24:775 \
-        RRA:MIN:0.5:288:797 \
-        RRA:MAX:0.5:1:600 \
-        RRA:MAX:0.5:6:700 \
-        RRA:MAX:0.5:24:775 \
-        RRA:MAX:0.5:288:797");
+        DS:packets_sent:DERIVE:600:0:125000000000 ".$config['rrd_rra']);
 }
 
 rrdtool_update($rrd_filename,  "N:$stratum:$offset:$frequency:$jitter:$noise:$stability:$uptime:$buffer_recv:$buffer_free:$buffer_used:$packets_drop:$packets_ignore:$packets_recv:$packets_sent");

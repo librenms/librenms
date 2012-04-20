@@ -113,6 +113,13 @@ $config['ports_page_default']      = "details"; ## eg "details" or "basic"
 $config['snmp']['community'][0] = "public"; # Communities to try during adding hosts and discovery
 $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
 
+### RRD Settings
+
+$config['rrd_rra']  = " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ";
+$config['rrd_rra'] .= " RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797 ";
+$config['rrd_rra'] .= " RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797 ";
+$config['rrd_rra'] .= " RRA:LAST:0.5:1:1440 ";
+
 ### Autodiscovery Settings
 
 $config['autodiscovery']['xdp']            = TRUE; ## Autodiscover hosts via discovery protocols

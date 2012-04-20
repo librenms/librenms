@@ -63,11 +63,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall')
     if (!is_file($wificlientsrrd))
     {
       rrdtool_create($wificlientsrrd,"--step 300 \
-     DS:wificlients:GAUGE:600:-273:1000 \
-     RRA:AVERAGE:0.5:1:1200 \
-     RRA:MIN:0.5:12:2400 \
-     RRA:MAX:0.5:12:2400 \
-     RRA:AVERAGE:0.5:12:2400");
+     DS:wificlients:GAUGE:600:-273:1000 ".$config['rrd_rra']);
     }
 
     rrdtool_update($wificlientsrrd,"N:".$wificlients1);
@@ -82,11 +78,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall')
     if (!is_file($wificlientsrrd))
     {
       rrdtool_create($wificlientsrrd,"--step 300 \
-     DS:wificlients:GAUGE:600:-273:1000 \
-     RRA:AVERAGE:0.5:1:1200 \
-     RRA:MIN:0.5:12:2400 \
-     RRA:MAX:0.5:12:2400 \
-     RRA:AVERAGE:0.5:12:2400");
+     DS:wificlients:GAUGE:600:-273:1000 ".$config['rrd_rra']);
     }
 
     rrdtool_update($wificlientsrrd,"N:".$wificlients2);

@@ -19,19 +19,7 @@ if ($device['os_group'] == "cisco")
     $rrd_create  = " DS:tunnels:GAUGE:600:0:U";
     $rrd_create .= " DS:sessions:GAUGE:600:0:U";
     $rrd_create .= " DS:denied:COUNTER:600:0:100000";
-    $rrd_create .= " RRA:AVERAGE:0.5:1:1200";
-    $rrd_create .= " RRA:AVERAGE:0.5:1:2000";
-    $rrd_create .= " RRA:AVERAGE:0.5:6:2000";
-    $rrd_create .= " RRA:AVERAGE:0.5:24:2000";
-    $rrd_create .= " RRA:AVERAGE:0.5:288:2000";
-    $rrd_create .= " RRA:MAX:0.5:1:1200";
-    $rrd_create .= " RRA:MAX:0.5:6:2000";
-    $rrd_create .= " RRA:MAX:0.5:24:2000";
-    $rrd_create .= " RRA:MAX:0.5:288:2000";
-    $rrd_create .= " RRA:MIN:0.5:1:1200";
-    $rrd_create .= " RRA:MIN:0.5:6:2000";
-    $rrd_create .= " RRA:MIN:0.5:24:2000";
-    $rrd_create .= " RRA:MIN:0.5:288:2000";
+    $rrd_create .= $config['rrd_rra'];
 
     if (is_file($rrd_filename) || $vpdn['cvpdnSystemTunnelTotal'] || $vpdn['cvpdnSystemSessionTotal'])
     {

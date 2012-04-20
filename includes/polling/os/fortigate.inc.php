@@ -23,9 +23,7 @@ if (is_numeric($sessions))
 {
   if (!is_file($sessrrd))
   {
-    rrdtool_create($sessrrd," --step 300 DS:sessions:GAUGE:600:0:3000000 \
-     RRA:AVERAGE:0.5:1:800 RRA:AVERAGE:0.5:6:800 RRA:AVERAGE:0.5:24:800 RRA:AVERAGE:0.5:288:800 \
-     RRA:MAX:0.5:1:800 RRA:MAX:0.5:6:800 RRA:MAX:0.5:24:800 RRA:MAX:0.5:288:800");
+    rrdtool_create($sessrrd," --step 300 DS:sessions:GAUGE:600:0:3000000 ".$config['rrd_rra']);
   }
   print "Sessions: $sessions\n";
   rrdtool_update($sessrrd,"N:".$sessions);
@@ -39,18 +37,7 @@ if (is_numeric($cpu_usage))
 {
   if (!is_file($cpurrd))
   {
-    rrdtool_create($cpurrd," --step 300 DS:LOAD:GAUGE:600:-1:100 RRA:AVERAGE:0.5:1:1200                  RRA:AVERAGE:0.5:1:2000 \
-                    RRA:AVERAGE:0.5:6:2000 \
-                    RRA:AVERAGE:0.5:24:2000 \
-                    RRA:AVERAGE:0.5:288:2000 \
-                    RRA:MAX:0.5:1:2000 \
-                    RRA:MAX:0.5:6:2000 \
-                    RRA:MAX:0.5:24:2000 \
-                    RRA:MAX:0.5:288:2000 \
-                    RRA:MIN:0.5:1:2000 \
-                    RRA:MIN:0.5:6:2000 \
-                    RRA:MIN:0.5:24:2000 \
-                    RRA:MIN:0.5:288:2000");
+    rrdtool_create($cpurrd," --step 300 DS:LOAD:GAUGE:600:-1:100 ".$config['rrd_rra']);
   }
   echo("CPU: $cpu_usage%\n");
   rrdtool_update($cpurrd, " N:$cpu_usage");

@@ -39,19 +39,7 @@ foreach ($servers as $item=>$server)
                 DS:status:GAUGE:600:0:125000000000 \
                 DS:peak:GAUGE:600:0:125000000000 \
                 DS:max:GAUGE:600:0:125000000000 \
-                DS:unique:GAUGE:600:0:125000000000 \
-                RRA:AVERAGE:0.5:1:600 \
-                RRA:AVERAGE:0.5:6:700 \
-                RRA:AVERAGE:0.5:24:775 \
-                RRA:AVERAGE:0.5:288:797 \
-                RRA:MIN:0.5:1:600 \
-                RRA:MIN:0.5:6:700 \
-                RRA:MIN:0.5:24:775 \
-                RRA:MIN:0.5:288:797 \
-                RRA:MAX:0.5:1:600 \
-                RRA:MAX:0.5:6:700 \
-                RRA:MAX:0.5:24:775 \
-                RRA:MAX:0.5:288:797");
+                DS:unique:GAUGE:600:0:125000000000 ".$config['rrd_rra']);
     }
 
     rrdtool_update($rrdfile,  "N:$bitrate:$traf_in:$traf_out:$current:$status:$peak:$max:$unique");

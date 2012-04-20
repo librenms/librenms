@@ -40,15 +40,7 @@ $cpu_rrd_create = " --step 300 \
    DS:user:COUNTER:600:0:U \
    DS:system:COUNTER:600:0:U \
    DS:nice:COUNTER:600:0:U \
-   DS:idle:COUNTER:600:0:U \
-   RRA:AVERAGE:0.5:1:800 \
-   RRA:AVERAGE:0.5:6:800 \
-   RRA:AVERAGE:0.5:24:800 \
-   RRA:AVERAGE:0.5:288:800 \
-   RRA:MAX:0.5:1:800 \
-   RRA:MAX:0.5:6:800 \
-   RRA:MAX:0.5:24:800 \
-   RRA:MAX:0.5:288:800";
+   DS:idle:COUNTER:600:0:U ".$config['rrd_rra'];
 
 ### This is how we currently collect. We should collect one RRD per stat, for ease of handling differen formats,
 ### and because it is per-host and no big performance hit. See new format below
@@ -76,7 +68,7 @@ foreach ($collect_oids as $oid)
     $filename = $host_rrd . "/ucd_".$oid.".rrd";
     if (!is_file($filename))
     {
-      rrdtool_create($filename, " --step 300 DS:value:COUNTER:600:0:U RRA:AVERAGE:0.5:1:800 RRA:AVERAGE:0.5:6:800 RRA:AVERAGE:0.5:24:800 RRA:AVERAGE:0.5:288:800 RRA:MAX:0.5:1:800 RRA:MAX:0.5:6:800 RRA:MAX:0.5:24:800 RRA:MAX:0.5:288:800");
+      rrdtool_create($filename, " --step 300 DS:value:COUNTER:600:0:U ".$config['rrd_rra']);
     }
     rrdtool_update($filename, "N:".$value);
     $graphs['ucd_cpu'] = TRUE;
@@ -114,15 +106,7 @@ $mem_rrd_create = " --step 300 \
      DS:totalfree:GAUGE:600:0:10000000000 \
      DS:shared:GAUGE:600:0:10000000000 \
      DS:buffered:GAUGE:600:0:10000000000 \
-     DS:cached:GAUGE:600:0:10000000000 \
-     RRA:AVERAGE:0.5:1:800 \
-     RRA:AVERAGE:0.5:6:800 \
-     RRA:AVERAGE:0.5:24:800 \
-     RRA:AVERAGE:0.5:288:800 \
-     RRA:MAX:0.5:1:800 \
-     RRA:MAX:0.5:6:800 \
-     RRA:MAX:0.5:24:800 \
-     RRA:MAX:0.5:288:800";
+     DS:cached:GAUGE:600:0:10000000000 ".$config['rrd_rra'];
 
 $snmpdata = snmp_get_multi($device, "memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0", "-OQUs", "UCD-SNMP-MIB");
 if (is_array($snmpdata[0]))
@@ -150,18 +134,7 @@ if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTot
 #UCD-SNMP-MIB::laLoadInt.2 = INTEGER: 429
 #UCD-SNMP-MIB::laLoadInt.3 = INTEGER: 479
 
-$la_load_create = " --step 300 \
-DS:1min:GAUGE:600:0:5000 \
-DS:5min:GAUGE:600:0:5000 \
-DS:15min:GAUGE:600:0:5000 \
-RRA:AVERAGE:0.5:1:800 \
-RRA:AVERAGE:0.5:6:800 \
-RRA:AVERAGE:0.5:24:800 \
-RRA:AVERAGE:0.5:288:800 \
-RRA:MAX:0.5:1:800 \
-RRA:MAX:0.5:6:800 \
-RRA:MAX:0.5:24:800 \
-RRA:MAX:0.5:288:800";
+$la_load_create = " --step 300 DS:1min:GAUGE:600:0:5000 DS:5min:GAUGE:600:0:5000 DS:15min:GAUGE:600:0:5000 ".$config['rrd_rra'];
 
 $load_get = "laLoadInt.1 laLoadInt.2 laLoadInt.3";
 $load_raw = snmp_get_multi($device, $load_get, "-OQUs", "UCD-SNMP-MIB");

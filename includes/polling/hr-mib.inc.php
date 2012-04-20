@@ -14,15 +14,7 @@ if (is_numeric($hrSystem[0]['hrSystemProcesses']))
   if (!is_file($rrd_file))
   {
     rrdtool_create($rrd_file,"--step 300 \
-    DS:procs:GAUGE:600:0:U \
-    RRA:AVERAGE:0.5:1:800 \
-    RRA:AVERAGE:0.5:6:800 \
-    RRA:AVERAGE:0.5:24:800 \
-    RRA:AVERAGE:0.5:288:800 \
-    RRA:MAX:0.5:1:800 \
-    RRA:MAX:0.5:6:800 \
-    RRA:MAX:0.5:24:800 \
-    RRA:MAX:0.5:288:800");
+    DS:procs:GAUGE:600:0:U ".$config['rrd_rra']);
   }
 
   rrdtool_update($rrd_file,  "N:".$hrSystem[0]['hrSystemProcesses']);
@@ -36,15 +28,7 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers']))
   if (!is_file($rrd_file))
   {
     rrdtool_create($rrd_file, "--step 300 \
-    DS:users:GAUGE:600:0:U \
-    RRA:AVERAGE:0.5:1:800 \
-    RRA:AVERAGE:0.5:6:800 \
-    RRA:AVERAGE:0.5:24:800 \
-    RRA:AVERAGE:0.5:288:800 \
-    RRA:MAX:0.5:1:800 \
-    RRA:MAX:0.5:6:800 \
-    RRA:MAX:0.5:24:800 \
-    RRA:MAX:0.5:288:800");
+    DS:users:GAUGE:600:0:U ".$config['rrd_rra']);
   }
 
   rrdtool_update($rrd_file,  "N:".$hrSystem[0]['hrSystemNumUsers']);

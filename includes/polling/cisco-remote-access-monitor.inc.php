@@ -39,27 +39,13 @@ if ($device['os_group'] == "cisco")
 
   $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cras_sessions.rrd");
 
-  $rrd_create  = " RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797";
-  $rrd_create .= " RRA:MAX:0.5:1:600 RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797";
   $rrd_create .= " DS:email:GAUGE:600:0:U";
   $rrd_create .= " DS:ipsec:GAUGE:600:0:U";
   $rrd_create .= " DS:l2l:GAUGE:600:0:U";
   $rrd_create .= " DS:lb:GAUGE:600:0:U";
   $rrd_create .= " DS:svc:GAUGE:600:0:U";
   $rrd_create .= " DS:webvpn:GAUGE:600:0:U";
-  $rrd_create .= " RRA:AVERAGE:0.5:1:1200";
-  $rrd_create .= " RRA:AVERAGE:0.5:1:2000";
-  $rrd_create .= " RRA:AVERAGE:0.5:6:2000";
-  $rrd_create .= " RRA:AVERAGE:0.5:24:2000";
-  $rrd_create .= " RRA:AVERAGE:0.5:288:2000";
-  $rrd_create .= " RRA:MAX:0.5:1:2000";
-  $rrd_create .= " RRA:MAX:0.5:6:2000";
-  $rrd_create .= " RRA:MAX:0.5:24:2000";
-  $rrd_create .= " RRA:MAX:0.5:288:2000";
-  $rrd_create .= " RRA:MIN:0.5:1:2000";
-  $rrd_create .= " RRA:MIN:0.5:6:2000";
-  $rrd_create .= " RRA:MIN:0.5:24:2000";
-  $rrd_create .= " RRA:MIN:0.5:288:2000";
+  $rrd_create .= $config['rrd_rra'];
 
   if (is_file($rrd_filename) || $data['crasEmailNumSessions'] || $data['crasIPSecNumSessions'] || $data['crasL2LNumSessions'] || $data['crasLBNumSessions'] || $data['crasSVCNumSessions'] || $data['crasWebvpnSessions'])
   {

@@ -23,14 +23,34 @@ $percentage  = round($storage['storage_perc'], 0);
 
 $background = get_percentage_colours($percentage);
 
-$rrd_options .= " DEF:$storage[storage_id]used=$rrd_filename:used:AVERAGE";
-$rrd_options .= " DEF:$storage[storage_id]free=$rrd_filename:free:AVERAGE";
-$rrd_options .= " CDEF:$storage[storage_id]size=$storage[storage_id]used,$storage[storage_id]free,+";
-$rrd_options .= " CDEF:$storage[storage_id]perc=$storage[storage_id]used,$storage[storage_id]size,/,100,*";
-$rrd_options .= " AREA:$storage[storage_id]perc#" . $background['right'] . ":";
-$rrd_options .= " LINE1.25:$storage[storage_id]perc#" . $background['left'] . ":'$descr'";
-$rrd_options .= " GPRINT:$storage[storage_id]size:LAST:%6.2lf%sB";
-$rrd_options .= " GPRINT:$storage[storage_id]free:LAST:%6.2lf%sB";
-$rrd_options .= " GPRINT:$storage[storage_id]perc:LAST:%5.2lf%%\\\\n";
+$rrd_options .= " DEF:used=$rrd_filename:used:AVERAGE";
+$rrd_options .= " DEF:free=$rrd_filename:free:AVERAGE";
+$rrd_options .= " CDEF:size=used,free,+";
+$rrd_options .= " CDEF:perc=used,size,/,100,*";
+$rrd_options .= " AREA:perc#" . $background['right'] . ":";
+$rrd_options .= " LINE1.25:perc#" . $background['left'] . ":'$descr'";
+$rrd_options .= " GPRINT:size:LAST:%6.2lf%sB";
+$rrd_options .= " GPRINT:free:LAST:%6.2lf%sB";
+$rrd_options .= " GPRINT:perc:LAST:%5.2lf%%\\\\n";
 
+if($_GET['previous']) 
+{
+  $descr = substr(str_pad("Prev ".$storage[storage_descr], 12),0,12);
+  $descr = str_replace(":","\:",$descr);
+
+  $colour="99999999";
+  $colour_area="66666666";
+
+  $rrd_options .= " DEF:usedX=$rrd_filename:used:AVERAGE:start=".$prev_from.":end=".$from;
+  $rrd_options .= " DEF:freeX=$rrd_filename:free:AVERAGE:start=".$prev_from.":end=".$from;
+  $rrd_options .= " SHIFT:usedX:$period";
+  $rrd_options .= " SHIFT:freeX:$period";
+  $rrd_options .= " CDEF:sizeX=usedX,freeX,+";
+  $rrd_options .= " CDEF:percX=usedX,sizeX,/,100,*";
+  $rrd_options .= " AREA:percX#" . $colour_area . ":";
+  $rrd_options .= " LINE1.25:percX#" . $colour . ":'$descr'";
+  $rrd_options .= " GPRINT:sizeX:LAST:%6.2lf%sB";
+  $rrd_options .= " GPRINT:freeX:LAST:%6.2lf%sB";
+  $rrd_options .= " GPRINT:percX:LAST:%5.2lf%%\\\\n";
+}
 ?>

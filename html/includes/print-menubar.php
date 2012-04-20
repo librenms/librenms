@@ -402,11 +402,11 @@ if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0")
           <ul>
 <?php
 
-  $rows = dbFetchRows("SELECT `app_type` FROM `applications` GROUP BY `app_type` ORDER BY `app_type`");
-  foreach ($rows as $row)
+  $app_list = dbFetchRows("SELECT `app_type` FROM `applications` GROUP BY `app_type` ORDER BY `app_type`");
+  foreach ($app_list as $app)
   {
 echo('
-        <li><a href="applications/app='.$row['app_type'].'/"><img src="images/icons/'.$row['app_type'].'.png" border="0" align="absmiddle" /> '.$row['app_type'].' </a></li>');
+        <li><a href="applications/app='.$app['app_type'].'/"><img src="images/icons/'.$app['app_type'].'.png" border="0" align="absmiddle" /> '.$app['app_type'].' </a></li>');
   }
 
 ?>

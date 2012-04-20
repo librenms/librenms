@@ -29,9 +29,6 @@ foreach ($rserver_array as $index => $serverfarm)
   }
 
   $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/rserver-".$serverfarms[$clean_index]['rserver_id'].".rrd";
-#echo $rrd_file."-\n";
-  $rrd_create = "RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 RRA:MAX:0.5:1:600 \
-                    RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797";
 
   foreach ($oids as $oid)
   {
@@ -51,6 +48,8 @@ foreach ($rserver_array as $index => $serverfarm)
     }
     $rrdupdate .= ":$value";
   }
+
+  $rrd_create .= " ".$config['rrd_rra'];
 
   if (isset($serverfarms[$clean_index]))
   {

@@ -60,11 +60,7 @@ if ($device['os_group'] == "cisco")
             rrdtool_create($filename, "--step 300 \
             DS:drop:DERIVE:600:0:1000000 \
             DS:punt:DERIVE:600:0:1000000 \
-            DS:hostpunt:DERIVE:600:0:1000000 \
-            RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 \
-            RRA:MIN:0.5:1:600     RRA:MIN:0.5:6:700     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797 \
-            RRA:MAX:0.5:1:600     RRA:MAX:0.5:6:700     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797 \
-            RRA:LAST:0.5:1:600    RRA:LAST:0.5:6:700    RRA:LAST:0.5:24:775    RRA:LAST:0.5:288:797");
+            DS:hostpunt:DERIVE:600:0:1000000 ".$config['rrd_rra']);
           }
 
           ### Copy HC to non-HC if they exist
