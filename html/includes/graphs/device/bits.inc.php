@@ -2,6 +2,9 @@
 
 ## Generate a list of ports and then call the multi_bits grapher to generate from the list
 
+$ds_in  = "INOCTETS";
+$ds_out = "OUTOCTETS";
+
 $device = device_by_id_cache($id);
 
 foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $port)
@@ -64,7 +67,8 @@ $colour_line_out = "000099";
 $colour_area_in = "91B13C";
 $colour_area_out = "8080BD";
 
+include("includes/graphs/generic_multi_seperated.inc.php");
 #include("includes/graphs/generic_multi_bits_separated.inc.php");
-include("includes/graphs/generic_multi_data.inc.php");
+#include("includes/graphs/generic_multi_data.inc.php");
 
 ?>

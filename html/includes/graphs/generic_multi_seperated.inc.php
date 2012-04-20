@@ -4,6 +4,15 @@ include("includes/graphs/common.inc.php");
 
 $units_descr = substr(str_pad($units_descr, 18),0,18);
 
+if($format == "octets" || $format == "bytes")
+{
+  $units = "Bps";
+  $format = "octets";
+} else {
+  $units = "bps";
+  $format = "bits";
+}
+
 $i = 0;
 $rrd_options .= " COMMENT:'$units_descr Current  Average  Maximum\\n'";
 if (!$nototal) { $rrd_options .= " COMMENT:' Tot'"; }
@@ -25,6 +34,20 @@ foreach ($rrd_list as $rrd)
   $rrd_options .= " CDEF:outB".$i."=out".$i.",$multiplier,*";
   $rrd_options .= " CDEF:outB".$i."_neg=outB".$i.",-1,*";
   $rrd_options .= " CDEF:octets".$i."=inB".$i.",outB".$i.",+";
+
+  if($_GET['previous'])
+  {
+    $rrd_options .= " DEF:".$in."octets" . $i . "X=".$rrd['filename'].":".$ds_in.":AVERAGE:start=".$prev_from.":end=".$from;
+    $rrd_options .= " DEF:".$out."octets" . $i . "X=".$rrd['filename'].":".$ds_out.":AVERAGE:start=".$prev_from.":end=".$from;
+    $rrd_options .= " SHIFT:".$in."octets" . $i . "X:$period";
+    $rrd_options .= " SHIFT:".$out."octets" . $i . "X:$period";
+    $in_thingX .= $seperatorX . "inoctets" . $i . "X,UN,0," . "inoctets" . $i . "X,IF";
+    $out_thingX .= $seperatorX . "outoctets" . $i . "X,UN,0," . "outoctets" . $i . "X,IF";
+    $plusesX .= $plusX;
+    $seperatorX = ",";
+    $plusX = ",+";
+  }
+
   if (!$args['nototal'])
   {
     $rrd_options .= " VDEF:totin".$i."=inB".$i.",TOTAL";
@@ -53,6 +76,28 @@ foreach ($rrd_list as $rrd)
   $rrd_options .= " COMMENT:'\\n'";
   $i++; $iter++;
 }
+
+  if($_GET['previous'] == "yes")
+  {
+    $rrd_options .= " CDEF:".$in."octetsX=" . $in_thingX . $plusesX;
+    $rrd_options .= " CDEF:".$out."octetsX=" . $out_thingX . $plusesX;
+    $rrd_options .= " CDEF:doutoctetsX=outoctetsX,-1,*";
+    $rrd_options .= " CDEF:inbitsX=inoctetsX,8,*";
+    $rrd_options .= " CDEF:outbitsX=outoctetsX,8,*";
+    $rrd_options .= " CDEF:doutbitsX=doutoctetsX,8,*";
+    $rrd_options .= " VDEF:95thinX=inbitsX,95,PERCENT";
+    $rrd_options .= " VDEF:95thoutX=outbitsX,95,PERCENT";
+    $rrd_options .= " VDEF:d95thoutX=doutbitsX,5,PERCENT";
+  }
+
+  if($_GET['previous'] == "yes")
+  {
+    $rrd_options .= " AREA:in".$format."X#99999999:";
+    $rrd_options .= " AREA:dout".$format."X#99999999:";
+    $rrd_options .= " LINE1.25:in".$format."X#666666:";
+    $rrd_options .= " LINE1.25:dout".$format."X#666666:";
+  }
+
 
 $rrd_options .= $rrd_optionsb;
 $rrd_options .= " HRULE:0#999999";

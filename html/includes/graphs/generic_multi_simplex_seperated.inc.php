@@ -52,6 +52,16 @@ foreach ($rrd_list as $i => $rrd)
     $rrd_options .= " DEF:".$rrd['ds'].$i."max=".$rrd['filename'].":".$rrd['ds'].":MAX ";
   }
 
+  if($_GET['previous'])
+  {
+    $rrd_options .= " DEF:".$i . "X=".$rrd['filename'].":".$rrd['ds'].":AVERAGE:start=".$prev_from.":end=".$from;
+    $rrd_options .= " SHIFT:".$i . "X:$period";
+    $thingX .= $seperatorX . $i . "X,UN,0," . $i . "X,IF";
+    $plusesX .= $plusX;
+    $seperatorX = ",";
+    $plusX = ",+";
+  }
+
   ## Suppress totalling?
   if (!$nototal)
   {
@@ -60,7 +70,6 @@ foreach ($rrd_list as $i => $rrd)
 
   ## This this not the first entry?
   if ($i) { $stack="STACK"; }
-
   # if we've been passed a multiplier we must make a CDEF based on it!
   $g_defname = $rrd['ds'];
   if (is_numeric($multiplier))
@@ -79,6 +88,8 @@ foreach ($rrd_list as $i => $rrd)
     $rrd_options .= " CDEF:" . $g_defname . $i . "max=" . $rrd['ds'] . $i . "max," . $divider . ",/";
   }
 
+
+
   ## Are our text values related to te multiplier/divisor or not?
   if (isset($text_orig) && $text_orig)
   {
@@ -96,5 +107,26 @@ foreach ($rrd_list as $i => $rrd)
 
   $rrd_options .= " COMMENT:'\\n'";
 }
+
+  if($_GET['previous'] == "yes")
+  {
+    if (is_numeric($multiplier))
+    {
+      $rrd_options .= " CDEF:X=" . $thingX . $plusesX.",".$multiplier. ",*";
+    } elseif (is_numeric($divider))
+    {
+      $rrd_options .= " CDEF:X=" . $thingX . $plusesX.",".$divider. ",/";
+    } else 
+    {
+      $rrd_options .= " CDEF:X=" . $thingX . $plusesX;
+    }
+
+    $rrd_options .= " AREA:X#99999999:";
+    $rrd_options .= " LINE1.25:X#666666:";
+
+
+  }
+
+
 
 ?>
