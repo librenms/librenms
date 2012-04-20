@@ -1,5 +1,7 @@
 <?php
 
+## FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
+
 $service_alerts = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '0'");
 $if_alerts      = dbFetchCell("SELECT COUNT(interface_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
 
@@ -387,6 +389,34 @@ foreach (array_keys($menu_sensors) as $item)
 
 <?php
 
+$app_count = dbFetchCell("SELECT COUNT(`app_id`) FROM `applications`");
+
+
+
+if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0")
+{
+?>
+
+    <li><a href="apps/" class="drop"><img src="images/icons/apps.png" border="0" align="absmiddle" /> Apps</a><!-- Begin Home Item -->
+        <div class="dropdown_1column"><!-- Begin 1 column container -->
+          <ul>
+<?php
+
+  $rows = dbFetchRows("SELECT `app_type` FROM `applications` GROUP BY `app_type` ORDER BY `app_type`");
+  foreach ($rows as $row)
+  {
+echo('
+        <li><a href="applications/app='.$row['app_type'].'/"><img src="images/icons/'.$row['app_type'].'.png" border="0" align="absmiddle" /> '.$row['app_type'].' </a></li>');
+  }
+
+?>
+          </ul>
+      </div>
+    </li>
+
+<?php
+}
+
 $routing_count['bgp']  = dbFetchCell("SELECT COUNT(bgpPeer_id) from `bgpPeers`");
 $routing_count['ospf'] = dbFetchCell("SELECT COUNT(ospf_instance_id) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'");
 $routing_count['cef']  = dbFetchCell("SELECT COUNT(cef_switching_id) from `cef_switching`");
@@ -398,10 +428,9 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 ?>
 
     <li><a href="routing/" class="drop"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a><!-- Begin Home Item -->
-
         <div class="dropdown_1column"><!-- Begin 1 column container -->
-
           <ul>
+
 
 <?php
   $separator = 0;
