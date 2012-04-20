@@ -6,7 +6,6 @@
 include("includes/graphs/common.inc.php");
 
 if ($rrd_filename) { $rrd_filename_out = $rrd_filename; $rrd_filename_in = $rrd_filename; }
-
 if ($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
 
 if ($multiplier)
@@ -83,22 +82,32 @@ $rrd_options .= " VDEF:95thin=inbits,95,PERCENT";
 $rrd_options .= " VDEF:95thout=outbits,95,PERCENT";
 $rrd_options .= " VDEF:d95thout=doutbits,5,PERCENT";
 
+if($format == "octets" || $format == "bytes")
+{
+  $units = "Bps";
+  $format = "octets";
+} else {
+  $units = "bps";
+  $format = "bits";
+}
+
+
 $rrd_options .= " COMMENT:'bps      Now       Ave      Max      95th %\\n'";
 
-$rrd_options .= " AREA:inbits_max#aDEB7B:";
-$rrd_options .= " AREA:inbits#91B13C:'In '";
-#$rrd_options .= " LINE1.25:inbits#006600:'In '";
-$rrd_options .= " GPRINT:inbits:LAST:%6.2lf%s";
-$rrd_options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";
-$rrd_options .= " GPRINT:inbits_max:MAX:%6.2lf%s";
+$rrd_options .= " AREA:in".$format."_max#aDEB7B:";
+$rrd_options .= " AREA:in".$format."#91B13C:'In '";
+#$rrd_options .= " LINE1.25:in".$format."#006600:'In '";
+$rrd_options .= " GPRINT:in".$format.":LAST:%6.2lf%s";
+$rrd_options .= " GPRINT:in".$format.":AVERAGE:%6.2lf%s";
+$rrd_options .= " GPRINT:in".$format."_max:MAX:%6.2lf%s";
 $rrd_options .= " GPRINT:95thin:%6.2lf%s\\\\n";
 
-$rrd_options .= " AREA:doutbits_max#a3b9FF:";
-$rrd_options .= " AREA:doutbits#8080BD:'Out'";
-#$rrd_options .= " LINE1.25:doutbits#000099:Out";
-$rrd_options .= " GPRINT:outbits:LAST:%6.2lf%s";
-$rrd_options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
-$rrd_options .= " GPRINT:outbits_max:MAX:%6.2lf%s";
+$rrd_options .= " AREA:dout".$format."_max#a3b9FF:";
+$rrd_options .= " AREA:dout".$format."#8080BD:'Out'";
+#$rrd_options .= " LINE1.25:dout".$format."#000099:Out";
+$rrd_options .= " GPRINT:out".$format.":LAST:%6.2lf%s";
+$rrd_options .= " GPRINT:out".$format.":AVERAGE:%6.2lf%s";
+$rrd_options .= " GPRINT:out".$format."_max:MAX:%6.2lf%s";
 $rrd_options .= " GPRINT:95thout:%6.2lf%s\\\\n";
 
 if ($config['rrdgraph_real_95th']) {
@@ -114,8 +123,8 @@ $rrd_options .= " LINE1:d95thout#aa0000";
 
 if($_GET['previous'] == "yes")
 {
-  $rrd_options .= " LINE1.25:inbitsX#009900:'Prev In \\\\n'";
-  $rrd_options .= " LINE1.25:doutbitsX#000099:'Prev Out'";
+  $rrd_options .= " LINE1.25:in".$format."X#009900:'Prev In \\\\n'";
+  $rrd_options .= " LINE1.25:dout".$format."X#000099:'Prev Out'";
 }
 
 ?>

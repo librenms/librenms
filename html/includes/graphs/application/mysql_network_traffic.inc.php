@@ -14,6 +14,6 @@ $multiplier = 8;
 $ds_in = "BRd";
 $ds_out = "BSt";
 
-include("includes/graphs/generic_bits.inc.php");
+include("includes/graphs/generic_data.inc.php");
 
 ?>
