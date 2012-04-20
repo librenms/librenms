@@ -41,11 +41,7 @@ foreach (dbFetchRows("SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` =
   if (!is_file($slarrd))
   {
     rrdtool_create($slarrd, "--step 300 \
-     DS:rtt:GAUGE:600:0:300000 \
-     RRA:AVERAGE:0.5:1:1200 \
-     RRA:MIN:0.5:12:2400 \
-     RRA:MAX:0.5:12:2400 \
-     RRA:AVERAGE:0.5:12:2400");
+     DS:rtt:GAUGE:600:0:300000 ".$config['rrd_rra']);
   }
 
   if (isset($sla_table[$sla['sla_nr']]))

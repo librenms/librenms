@@ -328,12 +328,8 @@ if (!is_file($filename))
           DS:instances:GAUGE:600:0:1000000 \
           DS:areas:GAUGE:600:0:1000000 \
           DS:ports:GAUGE:600:0:1000000 \
-          DS:neighbours:GAUGE:600:0:1000000 \
-          RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 \
-          RRA:MIN:0.5:1:600     RRA:MIN:0.5:6:700     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797 \
-          RRA:MAX:0.5:1:600     RRA:MAX:0.5:6:700     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797 \
-          RRA:LAST:0.5:1:600    RRA:LAST:0.5:6:700    RRA:LAST:0.5:24:775    RRA:LAST:0.5:288:797");
-}
+          DS:neighbours:GAUGE:600:0:1000000 ".$config['rrd_rra']);
+ }
 
 $rrd_update  = "N:".$ospf_instance_count.":".$ospf_area_count.":".$ospf_port_count.":".$ospf_neighbour_count;
 $ret = rrdtool_update("$filename", $rrd_update);

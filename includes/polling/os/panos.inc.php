@@ -13,10 +13,7 @@ if (is_numeric($sessions))
 {
   if (!is_file($sessrrd))
   {
-    rrdtool_create($sessrrd," --step 300 DS:sessions:GAUGE:600:0:3000000 \
-     RRA:AVERAGE:0.5:1:800 RRA:AVERAGE:0.5:6:800 RRA:AVERAGE:0.5:24:800 RRA:AVERAGE:0.5:288:800 \
-     RRA:MAX:0.5:1:800 RRA:MAX:0.5:6:800 RRA:MAX:0.5:24:800 RRA:MAX:0.5:288:800");
-  }
+    rrdtool_create($sessrrd," --step 300 DS:sessions:GAUGE:600:0:3000000 ".$config['rrd_rra']);  }
   rrdtool_update($sessrrd,"N:$sessions");
   $graphs['panos_sessions'] = TRUE;
 }

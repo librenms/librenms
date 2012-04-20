@@ -1,11 +1,32 @@
 <?php
-$scale_min = "0";
-$scale_max = "100";
 
 include("includes/graphs/common.inc.php");
 
-$iter = "1";
+$scale_min = "0";
 
+$ds = "usage";
+
+$descr = substr(str_pad(short_hrDeviceDescr($proc['processor_descr']), 28),0,28);
+$descr = str_replace(":", "\:", $descr);
+
+$colour_line = "cc0000";
+$colour_minmax = "c5c5c5";
+
+$graph_max = 1;
+$unit_text = "Usage";
+
+include("includes/graphs/generic_simplex.inc.php");
+
+
+
+
+if($poop)
+{
+
+$scale_min = "0";
+$scale_max = "100";
+include("includes/graphs/common.inc.php");
+$iter = "1";
 $rrd_options .= " COMMENT:'                                 Cur   Max\\n'";
 
 if ($iter=="1") { $colour="CC0000"; } elseif ($iter=="2") { $colour="008C00"; } elseif ($iter=="3") { $colour="4096EE"; }
@@ -26,5 +47,5 @@ $rrd_options .= " LINE1:proc" . $proc['hrDeviceIndex'] . "#" . $colour . ":'" . 
 $rrd_options .= " GPRINT:proc" . $proc['hrDeviceIndex'] . ":LAST:%3.0lf%%";
 $rrd_options .= " GPRINT:proc" . $proc['hrDeviceIndex'] . ":MAX:%3.0lf%%\\\l ";
 $iter++;
-
+}
 ?>

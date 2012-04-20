@@ -34,15 +34,7 @@ if (!is_file($rrdfile))
    DS:INPKTS:COUNTER:600:U:10000000000 \
    DS:OUTPKTS:COUNTER:600:U:10000000000 \
    DS:CALLS:COUNTER:600:U:10000000000 \
-   DS:REGISTRATIONS:COUNTER:600:U:10000000000 \
-   RRA:AVERAGE:0.5:1:600 \
-   RRA:AVERAGE:0.5:6:700 \
-   RRA:AVERAGE:0.5:24:775 \
-   RRA:AVERAGE:0.5:288:797 \
-   RRA:MAX:0.5:1:600 \
-   RRA:MAX:0.5:6:700 \
-   RRA:MAX:0.5:24:775 \
-   RRA:MAX:0.5:288:797");
+   DS:REGISTRATIONS:COUNTER:600:U:10000000000 ".$config['rrd_rra']);
 }
 
 $rrdupdate = "N:$rxbytes:$txbytes:$rxpkts:$rxbytes:$calls:$registrations";

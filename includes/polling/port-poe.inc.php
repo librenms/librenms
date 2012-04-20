@@ -22,8 +22,7 @@ if ($port_stats[$port['ifIndex']] && $port['ifType'] == "ethernetCsmacd"
 
     if (!file_exists($rrdfile))
     {
-      $rrd_create .= "RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 RRA:MAX:0.5:1:600 \
-                      RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797";
+      $rrd_create .= $config['rrd_rra'];
 
       # FIXME CISCOSPECIFIC
       $rrd_create .= " DS:PortPwrAllocated:GAUGE:600:0:U";

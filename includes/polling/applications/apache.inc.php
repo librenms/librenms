@@ -41,19 +41,7 @@ if (!is_file($rrd_filename))
         DS:sb_logging:GAUGE:600:0:125000000000 \
         DS:sb_graceful:GAUGE:600:0:125000000000 \
         DS:sb_idle:GAUGE:600:0:125000000000 \
-        DS:sb_open:GAUGE:600:0:125000000000 \
-        RRA:AVERAGE:0.5:1:600 \
-        RRA:AVERAGE:0.5:6:700 \
-        RRA:AVERAGE:0.5:24:775 \
-        RRA:AVERAGE:0.5:288:797 \
-        RRA:MIN:0.5:1:600 \
-        RRA:MIN:0.5:6:700 \
-        RRA:MIN:0.5:24:775 \
-        RRA:MIN:0.5:288:797 \
-        RRA:MAX:0.5:1:600 \
-        RRA:MAX:0.5:6:700 \
-        RRA:MAX:0.5:24:775 \
-        RRA:MAX:0.5:288:797");
+        DS:sb_open:GAUGE:600:0:125000000000 ".$config['rrd_rra']);
 }
 
 rrdtool_update($rrd_filename,  "N:$total_access:$total_kbyte:$cpuload:$uptime:$reqpersec:$bytespersec:$bytesperreq:$busyworkers:$idleworkers:$score_wait:$score_start:$score_reading:$score_writing:$score_keepalive:$score_dns:$score_closing:$score_logging:$score_graceful:$score_idle:$score_open");

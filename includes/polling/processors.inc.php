@@ -17,11 +17,7 @@ foreach (dbFetchRows("SELECT * FROM processors WHERE device_id = ?", array($devi
   if (!is_file($procrrd))
   {
     rrdtool_create($procrrd, "--step 300 \
-     DS:usage:GAUGE:600:-273:1000 \
-     RRA:AVERAGE:0.5:1:1200 \
-     RRA:MIN:0.5:12:2400 \
-     RRA:MAX:0.5:12:2400 \
-     RRA:AVERAGE:0.5:12:2400");
+     DS:usage:GAUGE:600:-273:1000 ".$config['rrd_rra']);
   }
 
   $proc = trim(str_replace("\"", "", $proc));

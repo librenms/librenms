@@ -11,11 +11,10 @@ if ($device['os'] == "asa" || $device['os'] == "pix")
 
   $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("altiga-ssl.rrd");
 
-  $rrd_create  = " RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 RRA:MAX:0.5:1:600";
-  $rrd_create .= " RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797";
   $rrd_create .= " DS:TotalSessions:COUNTER:600:U:100000 DS:ActiveSessions:GAUGE:600:0:U DS:MaxSessions:GAUGE:600:0:U";
   $rrd_create .= " DS:PreDecryptOctets:COUNTER:600:U:100000000000 DS:PostDecryptOctets:COUNTER:600:U:100000000000 DS:PreEncryptOctets:COUNTER:600:U:100000000000";
   $rrd_create .= " DS:PostEncryptOctets:COUNTER:600:U:100000000000";
+  $rrd_create .= $config['rrd_rra'];
 
   if (!file_exists($rrdfile))
   {

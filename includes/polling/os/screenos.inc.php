@@ -14,19 +14,7 @@ if (!is_file($sessrrd))
    rrdtool_create($sessrrd, " --step 300 \
      DS:allocate:GAUGE:600:0:3000000 \
      DS:max:GAUGE:600:0:3000000 \
-     DS:failed:GAUGE:600:0:1000 \
-     RRA:AVERAGE:0.5:1:800 \
-     RRA:AVERAGE:0.5:6:800 \
-     RRA:AVERAGE:0.5:24:800 \
-     RRA:AVERAGE:0.5:288:800 \
-     RRA:MIN:0.5:1:800 \
-     RRA:MIN:0.5:6:800 \
-     RRA:MIN:0.5:24:800 \
-     RRA:MIN:0.5:288:800 \
-     RRA:MAX:0.5:1:800 \
-     RRA:MAX:0.5:6:800 \
-     RRA:MAX:0.5:24:800 \
-     RRA:MAX:0.5:288:800");
+     DS:failed:GAUGE:600:0:1000 ".$config['rrd_rra']); 
 }
 
 rrdtool_update("$sessrrd", "N:$sessalloc:$sessmax:$sessfailed");

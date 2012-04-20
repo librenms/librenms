@@ -67,7 +67,7 @@
 
     if (!is_file($uptime_rrd))
     {
-      rrdtool_create ($uptime_rrd, "DS:uptime:GAUGE:600:0:U RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797");
+      rrdtool_create ($uptime_rrd, "DS:uptime:GAUGE:600:0:U ".$config['rrd_rra']);
     }
     rrdtool_update($uptime_rrd, "N:".$uptime);
 

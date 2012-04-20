@@ -12,11 +12,14 @@ if ($multiplier)
 {
   $rrd_options .= " DEF:".$ds."_o=".$rrd_filename.":".$ds.":AVERAGE";
   $rrd_options .= " DEF:".$ds."_max_o=".$rrd_filename.":".$ds.":MAX";
+  $rrd_options .= " DEF:".$ds."_min_o=".$rrd_filename.":".$ds.":MIN";
   $rrd_options .= " CDEF:".$ds."=".$ds."_o,$multiplier,*";
   $rrd_options .= " CDEF:".$ds."_max=".$ds."_max_o,$multiplier,*";
+  $rrd_options .= " CDEF:".$ds."_min=".$ds."_min_o,$multiplier,*";
 } else {
   $rrd_options .= " DEF:".$ds."=".$rrd_filename.":".$ds.":AVERAGE";
   $rrd_options .= " DEF:".$ds."_max=".$rrd_filename.":".$ds.":MAX";
+  $rrd_options .= " DEF:".$ds."_min=".$rrd_filename.":".$ds.":MIN";
 }
 if ($print_total)
 {
@@ -26,10 +29,6 @@ if ($print_total)
 if ($percentile)
 {
   $rrd_options .= " VDEF:".$ds."_percentile=".$ds.",".$percentile.",PERCENT";
-}
-if ($graph_max)
-{
-  $rrd_options .= " AREA:".$ds."_max#".$colour_area_max.":";
 }
 
 if($_GET['previous'] == "yes")
@@ -62,8 +61,19 @@ if($_GET['previous'] == "yes")
 #  }
 }
 
+if($colour_minmax)
+{
+  $rrd_options .= " AREA:".$ds."_max#c5c5c5";
+  $rrd_options .= " AREA:".$ds."_min#ffffffff";
+} else {
+  $rrd_options .= " AREA:".$ds."#".$colour_area.":";
+  if ($graph_max)
+  {
+    $rrd_options .= " AREA:".$ds."_max#".$colour_area_max.":";
+  }
+}
 
-$rrd_options .= " AREA:".$ds."#".$colour_area.":";
+
 $rrd_options .= " COMMENT:'".$unit_text."Now       Ave      Max";
 
 if ($percentile)

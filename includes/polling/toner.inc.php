@@ -23,11 +23,7 @@ if ($config['enable_printers'])
     if (!is_file($tonerrrd))
     {
       rrdtool_create($tonerrrd,"--step 300 \
-      DS:toner:GAUGE:600:0:20000 \
-      RRA:AVERAGE:0.5:1:1200 \
-      RRA:MIN:0.5:12:2400 \
-      RRA:MAX:0.5:12:2400 \
-      RRA:AVERAGE:0.5:12:2400");
+      DS:toner:GAUGE:600:0:20000 ".$config['rrd_rra']);
     }
 
     echo($tonerperc . " %\n");

@@ -72,15 +72,7 @@ if ($device['os_group'] == "cisco")
         rrdtool_create($rrdfile,"DS:IN:COUNTER:600:0:12500000000 \
           DS:OUT:COUNTER:600:0:12500000000 \
           DS:PIN:COUNTER:600:0:12500000000 \
-          DS:POUT:COUNTER:600:0:12500000000 \
-          RRA:AVERAGE:0.5:1:600 \
-          RRA:AVERAGE:0.5:6:700 \
-          RRA:AVERAGE:0.5:24:775 \
-          RRA:AVERAGE:0.5:288:797 \
-          RRA:MAX:0.5:1:600 \
-          RRA:MAX:0.5:6:700 \
-          RRA:MAX:0.5:24:775 \
-          RRA:MAX:0.5:288:797");
+          DS:POUT:COUNTER:600:0:12500000000 " . $config['rrd_rra']);
       }
       $woo = "N:".($b_in+0).":".($b_out+0).":".($p_in+0).":".($p_out+0);
       $ret = rrdtool_update("$rrdfile", $woo);

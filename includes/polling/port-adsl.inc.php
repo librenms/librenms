@@ -71,9 +71,7 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding']))
   $rrd_create .= " DS:AtucChanUncorrectBl:COUNTER:600:U:100000000000";
   $rrd_create .= " DS:AturChanCorrectedBl:COUNTER:600:U:100000000000";
   $rrd_create .= " DS:AturChanUncorrectBl:COUNTER:600:U:100000000000";
-  $rrd_create .= " RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797";
-  $rrd_create .= " RRA:MIN:0.5:1:600 RRA:MIN:0.5:6:700 RRA:MIN:0.5:24:775 RRA:MIN:0.5:288:797 ";
-  $rrd_create .= " RRA:MAX:0.5:1:600 RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797 ";
+  $rrd_create .= $config['rrd_rra'];
 
   $adsl_oids = array('AtucCurrSnrMgn','AtucCurrAtn','AtucCurrOutputPwr','AtucCurrAttainableRate','AtucChanCurrTxRate','AturCurrSnrMgn','AturCurrAtn','AturCurrOutputPwr','AturCurrAttainableRate','AturChanCurrTxRate','AtucPerfLofs','AtucPerfLoss','AtucPerfLprs','AtucPerfESs','AtucPerfInits','AturPerfLofs','AturPerfLoss','AturPerfLprs','AturPerfESs','AtucChanCorrectedBlks','AtucChanUncorrectBlks','AturChanCorrectedBlks','AturChanUncorrectBlks');
 
