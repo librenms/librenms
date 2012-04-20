@@ -61,9 +61,10 @@ $graph_title .= "::bits";
 
 $colour_line_in = "006600";
 $colour_line_out = "000099";
-$colour_area_in = "CDEB8B";
-$colour_area_out = "C3D9FF";
+$colour_area_in = "91B13C";
+$colour_area_out = "8080BD";
 
-include("includes/graphs/generic_multi_bits_separated.inc.php");
+#include("includes/graphs/generic_multi_bits_separated.inc.php");
+include("includes/graphs/generic_multi_data.inc.php");
 
 ?>

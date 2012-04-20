@@ -18,7 +18,6 @@ if ($multiplier)
   $rrd_options .= " DEF:".$ds."=".$rrd_filename.":".$ds.":AVERAGE";
   $rrd_options .= " DEF:".$ds."_max=".$rrd_filename.":".$ds.":MAX";
 }
-
 if ($print_total)
 {
   $rrd_options .= " VDEF:".$ds."_total=ds,TOTAL";
@@ -28,11 +27,42 @@ if ($percentile)
 {
   $rrd_options .= " VDEF:".$ds."_percentile=".$ds.",".$percentile.",PERCENT";
 }
-
 if ($graph_max)
 {
   $rrd_options .= " AREA:".$ds."_max#".$colour_area_max.":";
 }
+
+if($_GET['previous'] == "yes")
+{
+  if ($multiplier)
+  {
+    $rrd_options .= " DEF:".$ds."_oX=".$rrd_filename.":".$ds.":AVERAGE:start=".$prev_from.":end=".$from;
+    $rrd_options .= " DEF:".$ds."_max_oX=".$rrd_filename.":".$ds.":MAX:start=".$prev_from.":end=".$from;
+    $rrd_options .= " SHIFT:".$ds."_oX:$period";
+    $rrd_options .= " SHIFT:".$ds."_max_oX:$period";
+    $rrd_options .= " CDEF:".$ds."X=".$ds."_oX,$multiplier,*";
+    $rrd_options .= " CDEF:".$ds."_maxX=".$ds."_max_oX,$multiplier,*";
+  } else {
+    $rrd_options .= " DEF:".$ds."X=".$rrd_filename.":".$ds.":AVERAGE:start=".$prev_from.":end=".$from;
+    $rrd_options .= " DEF:".$ds."_maxX=".$rrd_filename.":".$ds.":MAX:start=".$prev_from.":end=".$from;
+    $rrd_options .= " SHIFT:".$ds."X:$period";
+    $rrd_options .= " SHIFT:".$ds."_maxX:$period";
+  }
+  if ($print_total)
+  {
+    $rrd_options .= " VDEF:".$ds."_totalX=ds,TOTAL";
+  }
+  if ($percentile)
+  {
+    $rrd_options .= " VDEF:".$ds."_percentileX=".$ds.",".$percentile.",PERCENT";
+  }
+#  if ($graph_max)
+#  {
+#    $rrd_options .= " AREA:".$ds."_max#".$colour_area_max.":";
+#  }
+}
+
+
 $rrd_options .= " AREA:".$ds."#".$colour_area.":";
 $rrd_options .= " COMMENT:'".$unit_text."Now       Ave      Max";
 
@@ -63,6 +93,11 @@ if ($print_total)
 if ($percentile)
 {
   $rrd_options .= " LINE1:".$ds."_percentile#aa0000";
+}
+
+if($_GET['previous'] == "yes")
+{
+  $rrd_options .= " LINE1.25:".$ds."X#666666:'Prev \\\\n'";
 }
 
 ?>
