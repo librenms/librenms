@@ -406,7 +406,7 @@ if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0")
   foreach ($app_list as $app)
   {
 echo('
-        <li><a href="applications/app='.$app['app_type'].'/"><img src="images/icons/'.$app['app_type'].'.png" border="0" align="absmiddle" /> '.$app['app_type'].' </a></li>');
+        <li><a href="apps/app='.$app['app_type'].'/"><img src="images/icons/'.$app['app_type'].'.png" border="0" align="absmiddle" /> '.$app['app_type'].' </a></li>');
   }
 
 ?>
