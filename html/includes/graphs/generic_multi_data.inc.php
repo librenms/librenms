@@ -5,6 +5,15 @@
 
 include("includes/graphs/common.inc.php");
 
+if($format == "octets" || $format == "bytes")
+{
+  $units = "Bps";
+  $format = "octets";
+} else {
+  $units = "bps";
+  $format = "bits";
+}
+
 $i=0;
 
 foreach ($rrd_filenames as $key => $rrd_filename)
@@ -62,23 +71,23 @@ if ($i)
 
   if ($legend == 'no' || $legend == '1')
   {
-    $rrd_options .= " AREA:inbits#".$colour_area_in.":";
-    $rrd_options .= " LINE1.25:inbits#".$colour_line_in.":";
-    $rrd_options .= " AREA:doutbits#".$colour_area_out.":";
-    $rrd_options .= " LINE1.25:doutbits#".$colour_line_out.":";
+    $rrd_options .= " AREA:in".$format."#".$colour_area_in.":";
+#    $rrd_options .= " LINE1.25:in".$format."#".$colour_line_in.":";
+    $rrd_options .= " AREA:dout".$format."#".$colour_area_out.":";
+#    $rrd_options .= " LINE1.25:dout".$format."#".$colour_line_out.":";
   } else {
-    $rrd_options .= " AREA:inbits#".$colour_area_in.":";
+    $rrd_options .= " AREA:in".$format."#".$colour_area_in.":";
     $rrd_options .= " COMMENT:'bps      Now       Ave      Max      95th %\\n'";
-    $rrd_options .= " LINE1.25:inbits#".$colour_line_in.":In\ ";
-    $rrd_options .= " GPRINT:inbits:LAST:%6.2lf%s";
-    $rrd_options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";
-    $rrd_options .= " GPRINT:inbits:MAX:%6.2lf%s";
+#    $rrd_options .= " LINE1.25:in".$format."#".$colour_line_in.":In\ ";
+    $rrd_options .= " GPRINT:in".$format.":LAST:%6.2lf%s";
+    $rrd_options .= " GPRINT:in".$format.":AVERAGE:%6.2lf%s";
+    $rrd_options .= " GPRINT:in".$format.":MAX:%6.2lf%s";
     $rrd_options .= " GPRINT:95thin:%6.2lf%s\\\\n";
-    $rrd_options .= " AREA:doutbits#".$colour_area_out.":";
-    $rrd_options .= " LINE1.25:doutbits#".$colour_line_out.":Out";
-    $rrd_options .= " GPRINT:outbits:LAST:%6.2lf%s";
-    $rrd_options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
-    $rrd_options .= " GPRINT:outbits:MAX:%6.2lf%s";
+    $rrd_options .= " AREA:dout".$format."#".$colour_area_out.":";
+#    $rrd_options .= " LINE1.25:dout".$format."#".$colour_line_out.":Out";
+    $rrd_options .= " GPRINT:out".$format.":LAST:%6.2lf%s";
+    $rrd_options .= " GPRINT:out".$format.":AVERAGE:%6.2lf%s";
+    $rrd_options .= " GPRINT:out".$format.":MAX:%6.2lf%s";
     $rrd_options .= " GPRINT:95thout:%6.2lf%s\\\\n";
   }
 
@@ -87,8 +96,10 @@ if ($i)
 
   if($_GET['previous'] == "yes")
   {
-    $rrd_options .= " AREA:inbitsX#9999966:";
-    $rrd_options .= " AREA:doutbitsX#99999966:";
+    $rrd_options .= " AREA:in".$format."X#99999999:";
+    $rrd_options .= " AREA:dout".$format."X#99999999:";
+    $rrd_options .= " LINE1.25:in".$format."X#666666:";
+    $rrd_options .= " LINE1.25:dout".$format."X#666666:";
   }
 
 }
