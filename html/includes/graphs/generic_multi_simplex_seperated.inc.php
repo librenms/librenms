@@ -52,7 +52,7 @@ foreach ($rrd_list as $i => $rrd)
     $rrd_options .= " DEF:".$rrd['ds'].$i."max=".$rrd['filename'].":".$rrd['ds'].":MAX ";
   }
 
-  if($_GET['previous'])
+  if ($_GET['previous'])
   {
     $rrd_options .= " DEF:".$i . "X=".$rrd['filename'].":".$rrd['ds'].":AVERAGE:start=".$prev_from.":end=".$from;
     $rrd_options .= " SHIFT:".$i . "X:$period";
@@ -88,8 +88,6 @@ foreach ($rrd_list as $i => $rrd)
     $rrd_options .= " CDEF:" . $g_defname . $i . "max=" . $rrd['ds'] . $i . "max," . $divider . ",/";
   }
 
-
-
   ## Are our text values related to te multiplier/divisor or not?
   if (isset($text_orig) && $text_orig)
   {
@@ -108,7 +106,7 @@ foreach ($rrd_list as $i => $rrd)
   $rrd_options .= " COMMENT:'\\n'";
 }
 
-  if($_GET['previous'] == "yes")
+  if ($_GET['previous'] == "yes")
   {
     if (is_numeric($multiplier))
     {
@@ -116,7 +114,7 @@ foreach ($rrd_list as $i => $rrd)
     } elseif (is_numeric($divider))
     {
       $rrd_options .= " CDEF:X=" . $thingX . $plusesX.",".$divider. ",/";
-    } else 
+    } else
     {
       $rrd_options .= " CDEF:X=" . $thingX . $plusesX;
     }
@@ -124,9 +122,6 @@ foreach ($rrd_list as $i => $rrd)
     $rrd_options .= " AREA:X#99999999:";
     $rrd_options .= " LINE1.25:X#666666:";
 
-
   }
-
-
 
 ?>

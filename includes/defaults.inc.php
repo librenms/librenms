@@ -454,7 +454,6 @@ $config['poller_modules']['entity-physical']              = 1;
 $config['poller_modules']['unix-agent']                   = 0;
 $config['poller_modules']['applications']                 = 1;
 
-
 ## List of discovery modules. Need to be in this array to be
 ## considered for execution.
 

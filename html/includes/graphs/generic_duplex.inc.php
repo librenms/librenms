@@ -73,8 +73,6 @@ if($_GET['previous'] == "yes")
   }
 }
 
-
-
 $rrd_options .= " AREA:in#".$colour_area_in.":";
 $rrd_options .= " COMMENT:'".$unit_text."      Now       Ave      Max";
 
@@ -126,7 +124,5 @@ if($_GET['previous'] == "yes")
   $rrd_options .= " LINE1.25:in".$format."X#666666:'Prev In \\\\n'";
   $rrd_options .= " LINE1.25:dout".$format."X#666666:'Prev Out'";
 }
-
-
 
 ?>

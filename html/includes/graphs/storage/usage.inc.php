@@ -33,7 +33,7 @@ $rrd_options .= " GPRINT:size:LAST:%6.2lf%sB";
 $rrd_options .= " GPRINT:free:LAST:%6.2lf%sB";
 $rrd_options .= " GPRINT:perc:LAST:%5.2lf%%\\\\n";
 
-if($_GET['previous']) 
+if ($_GET['previous'])
 {
   $descr = substr(str_pad("Prev ".$storage[storage_descr], 12),0,12);
   $descr = str_replace(":","\:",$descr);
@@ -53,4 +53,5 @@ if($_GET['previous'])
   $rrd_options .= " GPRINT:freeX:LAST:%6.2lf%sB";
   $rrd_options .= " GPRINT:percX:LAST:%5.2lf%%\\\\n";
 }
+
 ?>

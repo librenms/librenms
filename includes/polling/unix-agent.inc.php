@@ -4,12 +4,12 @@ if($device['os_group'] == "unix")
 {
 
   echo("Observium UNIX Agent: ");
-  
+
   $port='6556';
-  
+
   $agent = fsockopen($device['hostname'], $port, $errno, $errstr, 10);
-  
-  if(!$agent)
+
+  if (!$agent)
   {
     echo "Connection to UNIX agent failed on port ".$port.".";
   } else {
@@ -18,25 +18,25 @@ if($device['os_group'] == "unix")
       $agent_raw .= fgets($agent, 128);
     }
   }
-  
-  if(!empty($agent_raw))
+
+  if (!empty($agent_raw))
   {
     foreach (explode("<<<", $agent_raw) as $section)
     {
-  
+
       list($section, $data) = explode(">>>", $section);
       $agent_data[$section] = trim($data);
     }
-  
+
     ## FIXME - split these into separate modules which are "autoloaded" when the section exists.
-  
+
     ### RPM
     if (!empty($agent_data['rpm']))
     {
       echo("\nRPM Packages: ");
       ## Build array of existing packages
       $manager = "rpm";
-  
+
       $pkgs_db_db = dbFetchRows("SELECT * FROM `packages` WHERE `device_id` = ?", array($device['device_id']));
       foreach ($pkgs_db_db as $pkg_db)
       {
@@ -50,7 +50,7 @@ if($device['os_group'] == "unix")
         $pkgs_db_id[$pkg_db['pkg_id']]['version'] = $pkg_db['version'];
         $pkgs_db_id[$pkg_db['pkg_id']]['build']   = $pkg_db['build'];
       }
-  
+
       foreach (explode("\n", $agent_data['rpm']) as $package)
       {
         list($name, $version, $build, $arch, $size) = explode(" ", $package);
@@ -65,14 +65,14 @@ if($device['os_group'] == "unix")
         $pkgs_id[] = $pkgs[$manager][$name][$arch][$version][$build];
       }
     }
-  
+
     ### DPKG
     if (!empty($agent_data['dpkg']))
     {
       echo("\nDEB Packages: ");
       ## Build array of existing packages
       $manager = "deb";
-  
+
       $pkgs_db_db = dbFetchRows("SELECT * FROM `packages` WHERE `device_id` = ?", array($device['device_id']));
       foreach ($pkgs_db_db as $pkg_db)
       {
@@ -86,7 +86,7 @@ if($device['os_group'] == "unix")
         $pkgs_db_id[$pkg_db['pkg_id']]['version'] = $pkg_db['version'];
         $pkgs_db_id[$pkg_db['pkg_id']]['build']   = $pkg_db['build'];
       }
-  
+
       foreach (explode("\n", $agent_data['dpkg']) as $package)
       {
         list($name, $version, $arch, $size) = explode(" ", $package);
@@ -102,7 +102,7 @@ if($device['os_group'] == "unix")
         $pkgs_id[] = $pkgs[$manager][$name][$arch][$version][$build];
       }
     }
-  
+
     ## This is run for all "packages" and is common to RPM/DEB/etc
     foreach ($pkgs_id as $pkg)
     {
@@ -111,10 +111,10 @@ if($device['os_group'] == "unix")
       $build   = $pkg['build'];
       $arch    = $pkg['arch'];
       $size    = $pkg['size'];
-  
+
       #echo(str_pad($name, 20)." ".str_pad($version, 10)." ".str_pad($build, 10)." ".$arch."\n");
       #echo($name." ");
-  
+
       if (is_array($pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]))
       {
         ### FIXME - packages_history table
@@ -155,7 +155,7 @@ if($device['os_group'] == "unix")
       }
       unset($pkg_update);
     }
-  
+
     ## Packages
     foreach ($pkgs_db_id as $id => $pkg)
     {
@@ -163,7 +163,7 @@ if($device['os_group'] == "unix")
       echo("-".$pkg['text']);
       log_event('Package removed: '.$pkg['name'].' '.$pkg['arch'].' '.$pkg['version'].'-'.$pkg['build'], $device, 'package');
     }
-  
+
     ### Processes
     if (!empty($agent_data['ps']))
     {
@@ -172,33 +172,33 @@ if($device['os_group'] == "unix")
       {
         $process = preg_replace("/\((.*),([0-9]*),([0-9]*),([0-9\.]*)\)\ (.*)/", "\\1|\\2|\\3|\\4|\\5", $process);
         list($user, $vsz, $rss, $pcpu, $command) = explode("|", $process, 5);
-  	$processlist[] = array('user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'pcpu' => $pcpu, 'command' => $command);
+          $processlist[] = array('user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'pcpu' => $pcpu, 'command' => $command);
       }
       #print_r($processlist);
     }
-  
+
     ### Apache
     if (!empty($agent_data['apache']))
     {
       $app_found['apache'] = TRUE;
-      if(dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?", array($device['device_id'], 'apache')) == "0")
+      if (dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?", array($device['device_id'], 'apache')) == "0")
       {
         echo("Found new application 'Apache'\n");
         dbInsert(array('device_id' => $device['device_id'], 'app_type' => 'apache'), 'applications');
       }
     }
-  
+
     ### MySQL
     if (!empty($agent_data['mysql']))
     {
       $app_found['mysql'] = TRUE;
-      if(dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?", array($device['device_id'], 'mysql')) == "0")
+      if (dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?", array($device['device_id'], 'mysql')) == "0")
       {
         echo("Found new application 'MySQL'\n");
         dbInsert(array('device_id' => $device['device_id'], 'app_type' => 'mysql'), 'applications');
       }
     }
-  
+
     ### DRBD
     if (!empty($agent_data['drbd']))
     {
@@ -207,10 +207,10 @@ if($device['os_group'] == "unix")
       foreach (explode("\n", $agent_data['drbd_raw']) as $drbd_entry)
       {
         list($drbd_dev, $drbd_data) = explode(":", $drbd_entry);
-        if(preg_match("/^drbd/", $drbd_dev))
+        if (preg_match("/^drbd/", $drbd_dev))
         {
           $agent_data['drbd'][$drbd_dev] = $drbd_data;
-          if(dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?", array($device['device_id'], 'drbd', $drbd_dev)) == "0")
+          if (dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?", array($device['device_id'], 'drbd', $drbd_dev)) == "0")
           {
             echo("Found new application 'DRBd' $drbd_dev\n");
             dbInsert(array('device_id' => $device['device_id'], 'app_type' => 'drbd', 'app_instance' => $drbd_dev), 'applications');
@@ -219,14 +219,14 @@ if($device['os_group'] == "unix")
       }
     }
   }
-  
+
   unset($pkg);
   unset($pkgs_db_id);
   unset($pkg_c);
   unset($pkgs);
   unset($pkgs_db);
   unset($pkgs_db_db);
-  
+
   echo("\n");
 }
 

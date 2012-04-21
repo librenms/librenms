@@ -1,6 +1,6 @@
 <?php
 
-### Fixme - this is lame
+### FIXME - this is lame
 if(!empty($agent_data['mysql']))
 {
   $mysql = $agent_data['mysql'];

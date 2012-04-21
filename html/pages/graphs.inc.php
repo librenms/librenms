@@ -39,7 +39,7 @@ if (!$auth)
   }
 
   # Load our list of available graphtypes for this object
-  # Fixme not all of these are going to be valid
+  # FIXME not all of these are going to be valid
   if ($handle = opendir($config['install_dir'] . "/html/includes/graphs/".$type."/"))
   {
     while (false !== ($file = readdir($handle)))
@@ -231,7 +231,7 @@ if (!$auth)
   }
 
   ### FIXME : do this properly
-#  if($type == "port" && $subtype == "bits")
+#  if ($type == "port" && $subtype == "bits")
 #  {
     echo(' | ');
     if ($vars['previous'] == "yes")

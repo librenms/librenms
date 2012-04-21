@@ -5,11 +5,10 @@ $drbd_data = $agent_data['drbd'][$drbd_dev];
 
 $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-drbd-".$drbd_dev.".rrd";
 
-
-  foreach(explode("|", $drbd_data) as $part)
+  foreach (explode("|", $drbd_data) as $part)
   {
     list($stat, $val) = explode("=", $part);
-    if(!empty($stat))
+    if (!empty($stat))
     {
       $drbd[$stat] = $val;
     }
@@ -31,6 +30,5 @@ $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-drbd-".$
   }
 
   rrdtool_update($rrd_filename, "N:".$drbd['ns'].":".$drbd['nr'].":".$drbd['dw'].":".$drbd['dr'].":".$drbd['al'].":".$drbd['bm'].":".$drbd['lo'].":".$drbd['pe'].":".$drbd['ua'].":".$drbd['ap'].":".$drbd['oop']);
-
 
 ?>

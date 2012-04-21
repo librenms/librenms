@@ -333,7 +333,7 @@ foreach ($ports as $port)
     echo('bytes('.formatStorage($port['stats']['ifInOctets_diff']).'/'.formatStorage($port['stats']['ifOutOctets_diff']).')');
     echo('pkts('.format_si($port['stats']['ifInUcastPkts_rate']).'pps/'.format_si($port['stats']['ifOutUcastPkts_rate']).'pps)');
 
-    ### Port utilisation % threshold alerting. ## Fixme allow setting threshold per-port. probably 90% of ports we don't care about.
+    ### Port utilisation % threshold alerting. ## FIXME allow setting threshold per-port. probably 90% of ports we don't care about.
     if ($config['alerts']['port_util_alert'])
     {
       // Check for port saturation of $config['alerts']['port_util_perc'] or higher.  Alert if we see this.
