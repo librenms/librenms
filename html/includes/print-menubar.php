@@ -66,8 +66,12 @@ foreach ($config['device_types'] as $devtype)
 
 if ($_SESSION['userlevel'] >= '10')
 {
+  if (count($cache['device_types']))
+  {
+    echo ('
+        <li><hr width="140" /></li>');
+  }
   echo('
-        <li><hr width="140" /></li>
         <li><a href="addhost/"><img src="images/16/server_add.png" border="0" align="absmiddle" /> Add Device</a></li>
         <li><a href="delhost/"><img src="images/16/server_delete.png" border="0" align="absmiddle" /> Delete Device</a></li>');
 }
@@ -489,7 +493,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 <?php
 }
 
-$packages  = dbFetchCell("SELECT COUNT(package_id) from `packages`");
+$packages = dbFetchCell("SELECT COUNT(pkg_id) from `packages`");
 
 if ($packages)
 {
