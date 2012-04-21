@@ -75,11 +75,11 @@ if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
   if (strpos($_SERVER["SERVER_NAME"] , ":"))
   {
     # Literal IPv6
-    $config['base_url']  = "http://[" . $_SERVER["SERVER_NAME"] ."]:".$_SERVER["SERVER_PORT"]."/";
+    $config['base_url']  = "http://[" . $_SERVER["SERVER_NAME"] ."]" . ($_SERVER["SERVER_PORT"] != 80 ? ":".$_SERVER["SERVER_PORT"] : '') ."/";
   }
   else
   {
-  $config['base_url']  = "http://" . $_SERVER["SERVER_NAME"] .":".$_SERVER["SERVER_PORT"]."/";
+    $config['base_url']  = "http://" . $_SERVER["SERVER_NAME"] . ($_SERVER["SERVER_PORT"] != 80 ? ":".$_SERVER["SERVER_PORT"] : '') ."/";
   }
 }
 
