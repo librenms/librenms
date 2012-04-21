@@ -39,6 +39,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
           <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv4'))); ?>"><img src="images/icons/ipv4.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
           <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv6'))); ?>"><img src="images/icons/ipv6.png" border="0" align="absmiddle" /> IPv6 Search</a></li>
           <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'mac'))); ?>"><img src="images/16/email_link.png" border="0" align="absmiddle" /> MAC Search</a></li>
+          <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'arp'))); ?>"><img src="images/16/email_link.png" border="0" align="absmiddle" /> ARP Tables</a></li>
         </ul>
             </div>
 
