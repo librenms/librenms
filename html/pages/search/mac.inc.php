@@ -41,7 +41,7 @@ echo('<table width="100%" cellspacing="0" cellpadding="5">');
 
 $query = "SELECT * FROM `ports` AS P, `devices` AS D WHERE P.device_id = D.device_id ";
 $query .= "AND `ifPhysAddress` LIKE ?";
-$param = array("%".str_replace(':','',mres($_POST['address']))."%");
+$param = array("%".str_replace(array(':', ' ', '-', '.', '0x'),'',mres($_POST['address']))."%");
 
 if (is_numeric($_POST['device_id']))
 {
