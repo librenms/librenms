@@ -2,7 +2,7 @@
 
 $pagetitle[] = "Search";
 
-$sections = array('ipv4' => 'IPv4 Address', 'ipv6' => 'IPv6 Address', 'mac' => 'MAC Address');
+$sections = array('ipv4' => 'IPv4 Address', 'ipv6' => 'IPv6 Address', 'mac' => 'MAC Address', 'arp' => 'ARP Table');
 
 if (!isset($vars['search'])) { $vars['search'] = "ipv4"; }
 
@@ -35,6 +35,7 @@ switch ($vars['search'])
   case 'ipv4':
   case 'ipv6':
   case 'mac':
+  case 'arp':
     include('pages/search/'.$vars['search'].'.inc.php');
     break;
   default:
