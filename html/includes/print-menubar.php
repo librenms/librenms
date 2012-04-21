@@ -68,7 +68,7 @@ if ($_SESSION['userlevel'] >= '10')
 {
   if (count($cache['device_types']))
   {
-    echo ('
+    echo('
         <li><hr width="140" /></li>');
   }
   echo('
@@ -395,8 +395,6 @@ foreach (array_keys($menu_sensors) as $item)
 
 $app_count = dbFetchCell("SELECT COUNT(`app_id`) FROM `applications`");
 
-
-
 if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0")
 {
 ?>
@@ -434,7 +432,6 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
     <li><a href="routing/" class="drop"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a><!-- Begin Home Item -->
         <div class="dropdown_1column"><!-- Begin 1 column container -->
           <ul>
-
 
 <?php
   $separator = 0;

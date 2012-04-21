@@ -19,7 +19,7 @@ foreach ($rrd_filenames as $key => $rrd_filename)
   $seperator = ",";
   $plus = ",+";
 
-  if($_GET['previous'])
+  if ($_GET['previous'])
   {
     $rrd_options .= " DEF:".$in."octets" . $i . "X=".$rrd_filename.":".$ds_in.":AVERAGE:start=".$prev_from.":end=".$from;
     $rrd_options .= " DEF:".$out."octets" . $i . "X=".$rrd_filename.":".$ds_out.":AVERAGE:start=".$prev_from.":end=".$from;
@@ -47,7 +47,7 @@ if ($i)
   $rrd_options .= " VDEF:95thout=outbits,95,PERCENT";
   $rrd_options .= " VDEF:d95thout=doutbits,5,PERCENT";
 
-  if($_GET['previous'] == "yes")
+  if ($_GET['previous'] == "yes")
   {
     $rrd_options .= " CDEF:".$in."octetsX=" . $in_thingX . $pluses;
     $rrd_options .= " CDEF:".$out."octetsX=" . $out_thingX . $pluses;
@@ -85,7 +85,7 @@ if ($i)
   $rrd_options .= " LINE1:95thin#aa0000";
   $rrd_options .= " LINE1:d95thout#aa0000";
 
-  if($_GET['previous'] == "yes")
+  if ($_GET['previous'] == "yes")
   {
     $rrd_options .= " AREA:inbitsX#9999966:";
     $rrd_options .= " AREA:doutbitsX#99999966:";

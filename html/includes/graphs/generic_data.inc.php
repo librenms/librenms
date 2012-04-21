@@ -91,7 +91,6 @@ if($format == "octets" || $format == "bytes")
   $format = "bits";
 }
 
-
 $rrd_options .= " COMMENT:'bps      Now       Ave      Max      95th %\\n'";
 
 $rrd_options .= " AREA:in".$format."_max#aDEB7B:";

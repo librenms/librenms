@@ -73,7 +73,6 @@ if($colour_minmax)
   }
 }
 
-
 $rrd_options .= " COMMENT:'".$unit_text."Now       Ave      Max";
 
 if ($percentile)

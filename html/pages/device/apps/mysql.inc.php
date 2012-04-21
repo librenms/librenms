@@ -37,12 +37,12 @@ $graphs['system'] = array(
 
 $graphs['queries'] = array(
                 'mysql_command_counters' => 'Command Counters',
-		'mysql_query_cache' => 'Query Cache',
+                'mysql_query_cache' => 'Query Cache',
                 'mysql_query_cache_memory' => 'Query Cache Memory',
                 'mysql_select_types' => 'Select Types',
                 'mysql_slow_queries' => 'Slow Queries',
                 'mysql_sorts' => 'Sorts',
-		);
+                );
 
 $graphs['innodb'] = array(
                 'mysql_innodb_buffer_pool' => 'InnoDB Buffer Pool',
@@ -54,7 +54,7 @@ $graphs['innodb'] = array(
                 'mysql_innodb_row_operations' => 'InnoDB Row Operations',
                 'mysql_innodb_semaphores' => 'InnoDB semaphores',
                 'mysql_innodb_transactions' => 'InnoDB Transactions',
-		);
+                );
 
 foreach ($graphs[$vars['app_section']] as $key => $text)
 {

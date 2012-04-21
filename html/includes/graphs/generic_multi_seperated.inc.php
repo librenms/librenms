@@ -35,7 +35,7 @@ foreach ($rrd_list as $rrd)
   $rrd_options .= " CDEF:outB".$i."_neg=outB".$i.",-1,*";
   $rrd_options .= " CDEF:octets".$i."=inB".$i.",outB".$i.",+";
 
-  if($_GET['previous'])
+  if ($_GET['previous'])
   {
     $rrd_options .= " DEF:".$in."octets" . $i . "X=".$rrd['filename'].":".$ds_in.":AVERAGE:start=".$prev_from.":end=".$from;
     $rrd_options .= " DEF:".$out."octets" . $i . "X=".$rrd['filename'].":".$ds_out.":AVERAGE:start=".$prev_from.":end=".$from;
@@ -77,7 +77,7 @@ foreach ($rrd_list as $rrd)
   $i++; $iter++;
 }
 
-  if($_GET['previous'] == "yes")
+  if ($_GET['previous'] == "yes")
   {
     $rrd_options .= " CDEF:".$in."octetsX=" . $in_thingX . $plusesX;
     $rrd_options .= " CDEF:".$out."octetsX=" . $out_thingX . $plusesX;
@@ -90,14 +90,13 @@ foreach ($rrd_list as $rrd)
     $rrd_options .= " VDEF:d95thoutX=doutbitsX,5,PERCENT";
   }
 
-  if($_GET['previous'] == "yes")
+  if ($_GET['previous'] == "yes")
   {
     $rrd_options .= " AREA:in".$format."X#99999999:";
     $rrd_options .= " AREA:dout".$format."X#99999999:";
     $rrd_options .= " LINE1.25:in".$format."X#666666:";
     $rrd_options .= " LINE1.25:dout".$format."X#666666:";
   }
-
 
 $rrd_options .= $rrd_optionsb;
 $rrd_options .= " HRULE:0#999999";

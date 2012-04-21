@@ -2,7 +2,7 @@
 
 ## Polls Apache statistics from script via SNMP
 
-if(!empty($agent_data['apache'])) 
+if (!empty($agent_data['apache']))
 {
   $apache = $agent_data['apache'];
 } else {
@@ -12,12 +12,11 @@ if(!empty($agent_data['apache']))
 }
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-apache-".$app['app_id'].".rrd";
 
-
 echo(" apache");
 
-  list ($total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec, $bytesperreq, $busyworkers, $idleworkers,
-        $score_wait, $score_start, $score_reading, $score_writing, $score_keepalive, $score_dns, $score_closing, $score_logging, 
-        $score_graceful, $score_idle, $score_open) = explode("\n", $apache);
+list ($total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec, $bytesperreq, $busyworkers, $idleworkers,
+      $score_wait, $score_start, $score_reading, $score_writing, $score_keepalive, $score_dns, $score_closing, $score_logging,
+      $score_graceful, $score_idle, $score_open) = explode("\n", $apache);
 
 if (!is_file($rrd_filename))
 {

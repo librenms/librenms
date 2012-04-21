@@ -13,14 +13,12 @@ $graph_array_zoom['height'] = "150";
 $graph_array_zoom['width']  = "400";
 $graph_array['legend']      = "no";
 
-
-
-foreach($app_list as $app)
+foreach ($app_list as $app)
 {
   echo('<div style="clear: both;">');
   echo('<h2>'.generate_link(ucfirst($app['app_type']),array('page'=>'apps','app'=>$app['app_type'])).'</h2>');
   $app_devices = dbFetchRows("SELECT * FROM `devices` AS D, `applications` AS A WHERE D.device_id = A.device_id AND A.app_type = ?", array($app['app_type']));
-  foreach($app_devices as $app_device)
+  foreach ($app_devices as $app_device)
   {
 
     $graph_type = $graphs[$app['app_type']][0];
@@ -42,7 +40,7 @@ foreach($app_list as $app)
     $overlib_link   .= generate_graph_tag($graph_array);
     $overlib_content = generate_overlib_content($graph_array, $port['hostname'] . " - " . $port['label']);
 
-    echo("<div style='display: block; padding: 1px; margin: 2px; min-width: ".$width_div."px; max-width:".$width_div."px; min-height:180px; max-height:180px; 
+    echo("<div style='display: block; padding: 1px; margin: 2px; min-width: ".$width_div."px; max-width:".$width_div."px; min-height:180px; max-height:180px;
                       text-align: center; float: left; background-color: #f5f5f5;'>");
     echo(overlib_link($link, $overlib_link, $overlib_content));
     echo("</div>");
