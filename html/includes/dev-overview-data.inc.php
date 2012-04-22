@@ -1,8 +1,12 @@
 <?php
 
+echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
+
 if ($config['overview_show_sysDescr'])
 {
-  echo('<div style="font-family: courier, serif; margin: 10px"><strong>' . $device['sysDescr'] . "</strong></div>");
+  echo("<p style='padding: 0px;' class=sectionhead>");
+  echo('<div style="font-family: courier, serif; margin: 3px"><strong>' . $device['sysDescr'] . "</strong></div>");
+  echo("</p>");
 }
 
 $uptime = $device['uptime'];
@@ -11,7 +15,8 @@ if ($device['os'] == "ios") { formatCiscoHardware($device); }
 if ($device['features']) { $device['features'] = "(".$device['features'].")"; }
 $device['os_text'] = $config['os'][$device['os']]['text'];
 
-echo('<table width="100%">');
+echo("<table width=100% cellspacing=0 cellpadding=5>");
+echo('<tr class="device-overview"><td width="100%"><table width="100%">');
 
 if ($device['hardware'])
 {
@@ -74,7 +79,7 @@ if ($uptime)
       </tr>');
 }
 
-echo('
-    </table>');
+  echo("</table></tr></td></table>");
+  echo("</div>");
 
 ?>

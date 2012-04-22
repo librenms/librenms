@@ -17,14 +17,9 @@ if ($ports['down']) { $ports_colour = $warn_colour_a; } else { $ports_colour = $
 
 echo("<table width=100% cellspacing=0 cellpadding=0><tr><td style='width: 50%; vertical-align: top;>");
 
-#if (file_exists("includes/dev-data-" . strtolower($device[os]) . ".inc.php")) {
-  echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-#  echo("<p class=sectionhead>Device Data</p><div style='height: 5px;'></div>");
-#  include("includes/dev-data-" . strtolower($device[os]) . ".inc.php");
-  include("includes/dev-overview-data.inc.php");
-
-  echo("</div>");
-#}
+echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
+include("includes/dev-overview-data.inc.php");
+echo("</div>");
 
 include("overview/ports.inc.php");
 
@@ -52,7 +47,7 @@ if ($services['total'])
     if ($data['service_status'] == "1" && $data['service_ignore'] == "1") { $status = "green"; }
     if ($data['service_status'] == "0" && $data['service_ignore'] == "0") { $status = "red"; }
     if ($data['service_status'] == "1" && $data['service_ignore'] == "0") { $status = "blue"; }
-    echo("$break<a class=$status>" . strtolower($data[service_type]) . "</a>");
+    echo("$break<a class=$status>" . strtolower($data['service_type']) . "</a>");
     $break = ", ";
   }
 
