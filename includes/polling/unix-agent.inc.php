@@ -96,7 +96,7 @@ if($device['os_group'] == "unix")
         $pkgs[$manager][$name][$arch][$version][$build]['arch']    = $arch;
         $pkgs[$manager][$name][$arch][$version][$build]['version'] = $version;
         $pkgs[$manager][$name][$arch][$version][$build]['build']   = $build;
-        $pkgs[$manager][$name][$arch][$version][$build]['size']    = $size;
+        $pkgs[$manager][$name][$arch][$version][$build]['size']    = $size * 1024;
         $pkgs[$manager][$name][$arch][$version][$build]['status']  = '1';
         $text = $manager."-".$name."-".$arch."-".$version."-".$build;
         $pkgs_id[] = $pkgs[$manager][$name][$arch][$version][$build];
