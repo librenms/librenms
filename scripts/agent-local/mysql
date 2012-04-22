@@ -72,6 +72,9 @@ $version = "1.1.7";
 # ============================================================================
 if (file_exists(__FILE__ . '.cnf' ) ) {
    require(__FILE__ . '.cnf');
+} else {
+  echo("No ".__FILE__ . '.cnf found!');
+  exit();
 }
 
 # Make this a happy little script even when there are errors.
