@@ -227,7 +227,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-    if ($config['poller_modules']['unix-agent'] && @dbFetchCell("SELECT COUNT(*) FROM `packages` WHERE device_id = '".$device['device_id']."'") > '0')
+    if (@dbFetchCell("SELECT COUNT(*) FROM `packages` WHERE device_id = '".$device['device_id']."'") > '0')
     {
       echo('<li class="' . $select['packages'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'packages')).'">
