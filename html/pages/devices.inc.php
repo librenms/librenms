@@ -270,8 +270,8 @@ if($format == "graph")
     <th></th>
     <th class="paddedcell">Device</th>
     <th></th>
-    <th class="paddedcell">Operating System</th>
     <th class="paddedcell">Platform</th>
+    <th class="paddedcell">Operating System</th>
     <th class="paddedcell">Uptime/Location</th>
   </tr>');
   }
