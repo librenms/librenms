@@ -36,7 +36,7 @@ foreach ($app_list as $app)
     unset($link_array['height'], $link_array['width']);
     $link = generate_url($link_array);
 
-    $overlib_link    = generate_device_link($device, shorthost($app_device['hostname']), array('tab'=>'apps','app'=>$app['app_type']))."<br/>";
+    $overlib_link    = generate_device_link($app_device, shorthost($app_device['hostname']), array('tab'=>'apps','app'=>$app['app_type']))."<br/>";
     $overlib_link   .= generate_graph_tag($graph_array);
     $overlib_content = generate_overlib_content($graph_array, $port['hostname'] . " - " . $port['label']);
 

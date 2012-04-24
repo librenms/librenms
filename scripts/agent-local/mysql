@@ -48,9 +48,10 @@ $mysql_host = 'localhost';
 $mysql_port = 3306;
 $mysql_ssl  = FALSE;   # Whether to use SSL to connect to MySQL.
 
-$heartbeat  = '';      # db.tbl in case you use mk-heartbeat from Maatkit.
-$cache_dir  = '/tmp';  # If set, this uses caching to avoid multiple calls.
-$poll_time  = 300;     # Adjust to match your polling interval.
+$heartbeat   = '';      # db.tbl in case you use mk-heartbeat from Maatkit.
+$cache_dir   = '/tmp';  # If set, this uses caching to avoid multiple calls.
+$cache_time  = 30;      # How long to cache data.
+
 $chk_options = array (
    'innodb' => true,    # Do you want to check InnoDB statistics?
    'master' => true,    # Do you want to check binary logging?
@@ -252,7 +253,7 @@ function parse_cmdline( $args ) {
 # ============================================================================
 function ss_get_mysql_stats( $options ) {
    # Process connection options and connect to MySQL.
-   global $debug, $mysql_user, $mysql_pass, $heartbeat, $cache_dir, $poll_time,
+   global $debug, $mysql_user, $mysql_pass, $heartbeat, $cache_dir, $cache_time,
           $chk_options, $mysql_host, $mysql_port, $mysql_ssl;
 
    # Connect to MySQL.
@@ -282,8 +283,7 @@ function ss_get_mysql_stats( $options ) {
    }
 
    $sanitized_host = str_replace(array(":", "/"), array("", "_"), $host);
-   $cache_file = "$cache_dir/$sanitized_host-mysql_cacti_stats.txt"
-               . $port != 3306 ? ":$port" : '';
+   $cache_file = "$cache_dir/mysql_stats.txt";
    debug("Cache file is $cache_file");
 
    # First, check the cache.
@@ -293,7 +293,7 @@ function ss_get_mysql_stats( $options ) {
          $locked = flock($fp, 1); # LOCK_SH
          if ($locked ) {
             if (filesize($cache_file) > 0
-               && filectime($cache_file) + ($poll_time/2) > time()
+               && filectime($cache_file) + ($cache_time) > time()
                && ($arr = file($cache_file))
             ) {# The cache file is good to use.
                debug("Using the cache file");
@@ -308,7 +308,7 @@ function ss_get_mysql_stats( $options ) {
                   # another process ran and updated it.  Let's see if we can just
                   # return the data now:
                   if (filesize($cache_file) > 0
-                     && filectime($cache_file) + ($poll_time/2) > time()
+                     && filectime($cache_file) + ($cache_time) > time()
                      && ($arr = file($cache_file))
                   ) {# The cache file is good to use.
                      debug("Using the cache file");
