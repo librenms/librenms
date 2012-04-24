@@ -48,7 +48,7 @@ $config['os'][$os]['over'][2]['graph']  = "device_storage";
 $config['os'][$os]['over'][2]['text']   = "Storage Usage";
 
 $os = "qnap";
-$config['os'][$os]['type']              = "server";
+$config['os'][$os]['type']              = "storage";
 $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['text']              = "QNAP TurboNAS";
 $config['os'][$os]['ifXmcbc']           = 1;
@@ -870,6 +870,12 @@ $config['os'][$os]['text']              = "ArubaOS";
 $config['os'][$os]['type']              = "wireless";
 $config['os'][$os]['icon']              = "arubaos";
 
+$os = "dsm";
+$config['os'][$os]['text']              = "Synology DSM";
+$config['os'][$os]['group']             = "unix";
+$config['os'][$os]['type']              = "storage";
+$config['os'][$os]['icon']              = "synology";
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
@@ -1070,6 +1076,11 @@ $i++;
 $config['device_types'][$i]['text'] = 'Load Balancers';
 $config['device_types'][$i]['type'] = 'loadbalancer';
 $config['device_types'][$i]['icon'] = 'loadbalancer.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Storage';
+$config['device_types'][$i]['type'] = 'storage';
+$config['device_types'][$i]['icon'] = 'storage.png';
 
 if (isset($config['enable_printers']) && $config['enable_printers'])
 {
