@@ -27,9 +27,8 @@ if ($device['disabled'] == '1')
 }
 
 $type = strtolower($device['os']);
-unset($image);
 
-$image = getImage($device['device_id']);
+$image = getImage($device);
 if ($device['os'] == "ios") { formatCiscoHardware($device, true); }
 $device['os_text'] = $config['os'][$device['os']]['text'];
 
