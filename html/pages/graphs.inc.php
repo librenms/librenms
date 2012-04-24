@@ -75,7 +75,8 @@ if (!$auth)
     echo(">".$avail_type."</option>");
   }
           ?>
-        </select>
+    </select>
+  </form>
   <?php
   echo('</div>');
 
