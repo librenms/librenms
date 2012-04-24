@@ -15,9 +15,8 @@ if ($device['disabled'] == '1')
 }
 
 $type = strtolower($device['os']);
-unset($image);
 
-$image = getImage($device['device_id']);
+$image = getImage($device);
 
 echo('
             <tr bgcolor="'.$device_colour.'" class="'.$class.'">

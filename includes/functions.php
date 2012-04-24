@@ -101,28 +101,32 @@ function interface_errors($rrd_file, $period = '-1d') // Returns the last in/out
   return $errors;
 }
 
-function getImage($host)
+function getImage($device)
 {
-  ## FIXME why not pass $device? (my shitty ancient code here!)
   global $config;
 
-  $data = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($host));
-  $type = strtolower($data['os']);
-  if ($config['os'][$type]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$type]['icon']  . ".png"))
+  $device['os'] = strtolower($device['os']);
+
+  if ($device['icon'] && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png"))
   {
-    $image = '<img src="'.$config['base_url'].'/images/os/'.$config['os'][$type]['icon'].'.png" />';
-  } elseif ($config['os'][$type]['icon'] && file_exists($config['html_dir'] . "/images/os/". $config['os'][$type]['icon'] . ".gif"))
+    $image = '<img src="' . $config['base_url'] . '/images/os/' . $device['icon'] . '.png" />';
+  }
+  elseif ($config['os'][$device['os']]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png"))
   {
-    $image = '<img src="'.$config['base_url'].'/images/os/'.$config['os'][$type]['icon'].'.gif" />';
+    $image = '<img src="' . $config['base_url'] . '/images/os/' . $config['os'][$device['os']]['icon'] . '.png" />';
   } else {
-    if (file_exists($config['html_dir'] . "/images/os/$type" . ".png")) { $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.png" />';
-    } elseif (file_exists($config['html_dir'] . "/images/os/$type" . ".gif")) { $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.gif" />'; }
-    if ($type == "linux")
+    if (file_exists($config['html_dir'] . '/images/os/' . $device['os'] . '.png'))
     {
-      $features = strtolower(trim($data['features']));
+      $image = '<img src="' . $config['base_url'] . '/images/os/' . $device['os'] . '.png" />';
+    }
+    if ($device['os'] == "linux")
+    {
+      $features = strtolower(trim($device['features']));
       list($distro) = explode(" ", $features);
-      if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")) { $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.png" />';
-      } elseif (file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")) { $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.gif" />'; }
+      if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png"))
+      {
+        $image = '<img src="' . $config['base_url'] . '/images/os/' . $distro . '.png" />';
+      }
     }
   }
 
