@@ -98,8 +98,8 @@ if ($i)
   {
     $rrd_options .= " AREA:in".$format."X#99999999:";
     $rrd_options .= " AREA:dout".$format."X#99999999:";
-    $rrd_options .= " LINE1.25:in".$format."X#666666:";
-    $rrd_options .= " LINE1.25:dout".$format."X#666666:";
+    $rrd_options .= " LINE1:in".$format."X#666666:";
+    $rrd_options .= " LINE1:dout".$format."X#666666:";
   }
 
 }

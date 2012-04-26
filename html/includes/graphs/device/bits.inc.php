@@ -55,7 +55,7 @@ $colours_in ='greens';
 $multiplier = "8";
 $colours_out = 'blues';
 
-$nototal = 1;
+#$nototal = 1;
 
 $ds_in  = "INOCTETS";
 $ds_out = "OUTOCTETS";
@@ -68,8 +68,7 @@ $colour_area_in = "91B13C";
 $colour_area_out = "8080BD";
 
 include("includes/graphs/generic_multi_seperated.inc.php");
-
 #include("includes/graphs/generic_multi_bits_separated.inc.php");
-#include("includes/graphs/generic_multi_data.inc.php");
+#include("includes/graphs/generic_multi_data_separated.inc.php");
 
 ?>

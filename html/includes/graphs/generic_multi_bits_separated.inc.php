@@ -39,7 +39,6 @@ foreach ($rrd_list as $rrd)
     $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr'], $descr_len),0,$descr_len)) . "  In";
   }
   $descr_out = str_replace(":", "\:", substr(str_pad($rrd['descr_out'], $descr_len),0,$descr_len)). " Out";
-
   $descr     = str_replace("'", "", $descr);
   $descr_out = str_replace("'", "", $descr_out);
 

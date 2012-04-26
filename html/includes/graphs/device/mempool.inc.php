@@ -18,7 +18,7 @@ foreach (dbFetchRows("SELECT * FROM `mempools` where `device_id` = ?", array($id
 
   $descr = substr(str_pad(short_hrDeviceDescr($mempool['mempool_descr']), 22),0,22);
   $descr = str_replace(":", "\:", $descr);
-  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("mempoolX-".$mempool['mempool_type']."-".$mempool['mempool_index'].".rrd");
+  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("mempool-".$mempool['mempool_type']."-".$mempool['mempool_index'].".rrd");
 
   if (is_file($rrd_filename))
   {
