@@ -19,7 +19,7 @@ foreach (dbFetchRows("SELECT * FROM storage where device_id = ?", array($id)) as
 
   $descr = substr(str_pad($storage[storage_descr], 12),0,12);
   $descr = str_replace(":","\:",$descr);
-  $rrd = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("storageX-".$storage['storage_mib']."-".$storage['storage_descr'].".rrd");
+  $rrd = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("storage-".$storage['storage_mib']."-".$storage['storage_descr'].".rrd");
   $rrd_options .= " DEF:$storage[storage_id]used=$rrd:used:AVERAGE";
   $rrd_options .= " DEF:$storage[storage_id]free=$rrd:free:AVERAGE";
   $rrd_options .= " CDEF:$storage[storage_id]size=$storage[storage_id]used,$storage[storage_id]free,+";

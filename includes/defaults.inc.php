@@ -113,7 +113,10 @@ $config['ports_page_default']      = "details"; ## eg "details" or "basic"
 $config['snmp']['community'][0] = "public"; # Communities to try during adding hosts and discovery
 $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
 
-### RRD Settings
+### RRD Format Settings
+### These should not normally be changed
+### Though one could conceivably increase or decrease the size of each RRA if one had performance problems
+### Or if one had a very fast I/O subsystem with no performance worries.
 
 $config['rrd_rra']  = " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ";
 $config['rrd_rra'] .= " RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797 ";
