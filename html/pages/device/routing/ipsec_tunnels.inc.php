@@ -65,7 +65,7 @@ $graph_array['to']     = $config['time']['now'];
 $graph_array['id']     = $tunnel['tunnel_id'];
 $graph_array['type']   = $graph_type;
 
-include("includes/print-quadgraphs.inc.php");
+include("includes/print-graphrow.inc.php");
 
    echo("
    </td>

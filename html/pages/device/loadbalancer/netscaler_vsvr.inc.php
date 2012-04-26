@@ -46,7 +46,7 @@ foreach (dbFetchRows("SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? A
 
     echo('<h3>'.$graph_text.'</h3>');
 
-    include("includes/print-quadgraphs.inc.php");
+    include("includes/print-graphrow.inc.php");
 
     echo("
     </td>
@@ -121,7 +121,7 @@ foreach (dbFetchRows("SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? O
     $graph_array['id']     = $vsvr['vsvr_id'];
     $graph_array['type']   = $graph_type;
 
-    include("includes/print-quadgraphs.inc.php");
+    include("includes/print-graphrow.inc.php");
 
     echo("
     </td>

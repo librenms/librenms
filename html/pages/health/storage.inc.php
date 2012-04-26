@@ -79,7 +79,7 @@ foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.devic
       $graph_array['id']     = $drive['storage_id'];
       $graph_array['type']   = $graph_type;
 
-      include("includes/print-quadgraphs.inc.php");
+      include("includes/print-graphrow.inc.php");
 
       echo("</td></tr>");
 

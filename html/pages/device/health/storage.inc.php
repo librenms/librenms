@@ -42,7 +42,7 @@ foreach (dbFetchRows("SELECT * FROM `storage` WHERE device_id = ? ORDER BY stora
 
   echo("<tr bgcolor='$row_colour'><td colspan=6>");
 
-  include("includes/print-quadgraphs.inc.php");
+  include("includes/print-graphrow.inc.php");
 
   echo("</td></tr>");
 

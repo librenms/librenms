@@ -42,7 +42,7 @@ if (dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE device_id = ?", 
 
          echo('<tr style="background-color: '.$bg.'; padding: 7px;"><td colspan=4>');
 
-         include("includes/print-quadgraphs.inc.php");
+         include("includes/print-graphrow.inc.php");
 
          echo("</td></tr>");
        }

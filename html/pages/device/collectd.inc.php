@@ -99,7 +99,7 @@ print_optionbar_end();
        $graph_array['c_type']                 = $type;
        $graph_array['c_type_instance']   = $tinst;
 
-       include("includes/print-quadgraphs.inc.php");
+       include("includes/print-graphrow.inc.php");
 
        echo("</div>");
 

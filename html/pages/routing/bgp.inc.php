@@ -238,7 +238,7 @@ else
         $graph_array['to']     = $now;
         echo('<tr></tr><tr class="bgp"' . ($bg_image ? ' background="'.$bg_image.'"' : '') . '"><td colspan="9">');
 
-        include("includes/print-quadgraphs.inc.php");
+        include("includes/print-graphrow.inc.php");
 
         echo("</td></tr>");
     }

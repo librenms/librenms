@@ -50,7 +50,7 @@ foreach (dbFetchRows("SELECT * FROM `toner` AS S, `devices` AS D WHERE S.device_
       $graph_array['id']     = $toner['toner_id'];
       $graph_array['type']   = $graph_type;
 
-      include("includes/print-quadgraphs.inc.php");
+      include("includes/print-graphrow.inc.php");
 
       echo("</td></tr>");
     } # endif graphs

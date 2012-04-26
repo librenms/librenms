@@ -65,7 +65,7 @@ foreach ($slas as $sla)
   echo('<tr><td>');
   echo('<h3>'.htmlentities($name).'</h3>');
 
-  include("includes/print-quadgraphs.inc.php");
+  include("includes/print-graphrow.inc.php");
 
   echo('</td></tr>');
 }

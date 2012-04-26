@@ -186,7 +186,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
     $graph_array['to']     = $now;
     echo('<tr bgcolor="'.$bg_colour.'"' . ($bg_image ? ' background="'.$bg_image.'"' : '') . '"><td colspan="7">');
 
-    include("includes/print-quadgraphs.inc.php");
+    include("includes/print-graphrow.inc.php");
 
     echo("</td></tr>");
   }
