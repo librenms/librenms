@@ -3,6 +3,8 @@
 
 chdir(dirname($argv[0]));
 
+$debug=1;
+
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
@@ -58,16 +60,15 @@ foreach (dbFetchRows("SELECT * FROM `devices` AS D, `services` AS S WHERE S.devi
 
   if (!is_file($rrd))
   {
-    rrdtool_create($rrd,"--step 300 \
-      DS:status:GAUGE:600:0:1 \
-      RRA:AVERAGE:0.5:1:1200 \
-      RRA:AVERAGE:0.5:12:2400");
+    rrdtool_create ($rrd, "DS:status:GAUGE:600:0:1 ".$config['rrd_rra']);
   }
-
   if ($status == "1" || $status == "0")
   {
     rrdtool_update($rrd,"N:".$status);
+  } else {
+    rrdtool_update($rrd,"N:U");
   }
+
 } # while
 
 ?>

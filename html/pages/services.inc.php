@@ -4,26 +4,21 @@ $pagetitle[] = "Services";
 
 print_optionbar_start();
 
- echo('<span style="font-weight: bold;">Services</span> &#187; ');
+echo("<span style='font-weight: bold;'>Services</span> &#187; ");
 
 $menu_options = array('basic' => 'Basic',
                       'details' => 'Details');
 
-if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
+if (!$vars['view']) { $vars['view'] = "basic"; }
 
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
+  if(empty($vars['view'])) { $vars['view'] = $option; }
   echo($sep);
-  if ($_GET['opta'] == $option)
-  {
-    echo("<span class='pagemenu-selected'>");
-  }
-  echo('<a href="services/' . $option . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $text . '</a>');
-  if ($_GET['opta'] == $option)
-  {
-    echo("</span>");
-  }
+  if ($vars['view'] == $option) { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link($text, $vars, array('view'=>$option)));
+  if ($vars['view'] == $option) { echo("</span>"); }
   $sep = " | ";
 }
 
@@ -44,16 +39,16 @@ if ($_SESSION['userlevel'] >= '5')
   $host_sql = "SELECT * FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = ? GROUP BY D.hostname ORDER BY D.hostname";
   $host_par = array($_SESSION['user_id']);
 }
-  foreach (dbFetchRows($host_sql, $host_par) as $host_data)
+  foreach (dbFetchRows($host_sql, $host_par) as $device)
   {
-    $device_id = $host_data['device_id'];
-    $device_hostname = $host_data['hostname'];
-    foreach (dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?", array($host_data['device_id'])) as $service)
+    $device_id = $device['device_id'];
+    $device_hostname = $device['hostname'];
+    foreach (dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?", array($device['device_id'])) as $service)
     {
        include("includes/print-service.inc.php");
 
 #       $samehost = 1;
-       if ($_GET['opta'] == "details")
+       if ($vars['view'] == "details")
        {
          $graph_array['height'] = "100";
          $graph_array['width']  = "215";
