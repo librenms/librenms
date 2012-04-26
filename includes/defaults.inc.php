@@ -55,6 +55,7 @@ $config['dot']            = "/usr/bin/dot";
 $config['unflatten']      = "/usr/bin/unflatten";
 $config['neato']          = "/usr/bin/neato";
 $config['sfdp']           = "/usr/bin/sfdp";
+$config['svn']		  = "/usr/bin/svn";
 
 ### Memcached - Keep immediate statistics
 
