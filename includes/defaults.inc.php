@@ -423,6 +423,7 @@ $config['warn']['ifdown'] = TRUE;    ## Show down interfaces
 ## List of poller modules. Need to be in the array to be
 ## considered for execution.
 
+$config['poller_modules']['unix-agent']                   = 0;
 $config['poller_modules']['system']                       = 1;
 $config['poller_modules']['os']                           = 1;
 $config['poller_modules']['ipmi']                         = 1;
@@ -451,7 +452,6 @@ $config['poller_modules']['cisco-ace-loadbalancer']       = 1;
 $config['poller_modules']['cisco-ace-serverfarms']        = 1;
 $config['poller_modules']['netscaler-vsvr']               = 1;
 $config['poller_modules']['entity-physical']              = 1;
-$config['poller_modules']['unix-agent']                   = 0;
 $config['poller_modules']['applications']                 = 1;
 
 ## List of discovery modules. Need to be in this array to be

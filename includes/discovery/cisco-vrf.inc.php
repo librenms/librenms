@@ -1,5 +1,7 @@
 <?php
 
+// FIXME : dbFacile !
+
 if ($config['enable_vrfs'])
 {
   if ($device['os_group'] == "cisco" || $device['os_group'] == "junos" || $device['os'] == "ironware")

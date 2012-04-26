@@ -1,0 +1,14 @@
+# Lokale Einzelchecks
+if cd munin-scripts
+then
+  for skript in $(ls)
+  do
+    if [ -x "$skript" ] ; then
+        echo "<<<munin-$skript>>>"
+        ./$skript
+	./$skript config
+    fi
+  done
+  cd ..
+fi
+
