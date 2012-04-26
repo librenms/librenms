@@ -53,8 +53,7 @@ while ($sensor = mysql_fetch_assoc($sensor_data))
 
   if ($sensor['sensor_limit_low'] != "" && $sensor['sensor_current'] < $sensor['sensor_limit'] && $sensor_value >= $sensor['sensor_limit'])
   {
-    $msg  = "Temp Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $sensor_value . " (Limit " . $sensor['sensor_limit'];
-    $msg .= ") at " . date($config['timestamp_format']);
+    $msg  = "Temp Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $sensor_value . " (Limit " . $sensor['sensor_limit'] . ")";
     notify($device, "Temp Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
     log_event('Temperature ' . $sensor['sensor_descr'] . " over threshold: " . $sensor_value . " " . html_entity_decode('&deg;') . "$unit (>= " . $sensor['sensor_limit'] . " " . html_entity_decode('&deg;') . "$unit)", $device, $class, $sensor['sensor_id']);
