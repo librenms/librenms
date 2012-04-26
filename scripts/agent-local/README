@@ -1,0 +1,5 @@
+These are local plugin scripts for the Observium Unix Agent.
+
+*DO NOT* put all of these files into your local folder, only use the scripts you want.
+
+Make sure that you configure any scripts that require configuration. (MySQL!)
