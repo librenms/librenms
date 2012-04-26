@@ -37,7 +37,7 @@ foreach (dbFetchRows("SELECT * FROM `processors` WHERE device_id = ?", array($de
   $graph_array['id'] = $proc['processor_id'];
   $graph_array['type'] = $graph_type;
 
-  include("includes/print-quadgraphs.inc.php");
+  include("includes/print-graphrow.inc.php");
 }
 
 echo("</table>");

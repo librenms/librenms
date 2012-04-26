@@ -71,7 +71,7 @@ $graph_array['to']     = $config['time']['now'];
 $graph_array['id']     = $rserver['rserver_id'];
 $graph_array['type']   = $graph_type;
 
-include("includes/print-quadgraphs.inc.php");
+include("includes/print-graphrow.inc.php");
 
 #include("includes/print-interface-graphs.inc.php");
 

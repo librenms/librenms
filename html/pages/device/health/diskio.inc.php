@@ -38,7 +38,7 @@ foreach (dbFetchRows("SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY di
     $graph_array['id']     = $drive['diskio_id'];
     $graph_array['type']   = $graph_type;
 
-    include("includes/print-quadgraphs.inc.php");
+    include("includes/print-graphrow.inc.php");
 
     echo("</td></tr>");
   }

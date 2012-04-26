@@ -39,7 +39,7 @@ if (isset($total) && $total == true)
     echo('<h3>'.$text.'</h3>');
     echo("<tr bgcolor='$row_colour'><td colspan=5>");
 
-    include("includes/print-quadgraphs.inc.php");
+    include("includes/print-graphrow.inc.php");
 
     echo("</td></tr>");
   }
@@ -67,7 +67,7 @@ foreach ($files as $id => $file)
     echo('<h3>'.$text.'</h3>');
     echo("<tr bgcolor='$row_colour'><td colspan=5>");
 
-    include("includes/print-quadgraphs.inc.php");
+    include("includes/print-graphrow.inc.php");
 
     echo("</td></tr>");
   }

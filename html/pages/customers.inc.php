@@ -65,7 +65,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GRO
   $graph_array['to']     = $config['time']['now'];
   $graph_array['id']     = $customer['port_descr_descr'];
 
-  include("includes/print-quadgraphs.inc.php");
+  include("includes/print-graphrow.inc.php");
 
   echo("</tr>");
 }

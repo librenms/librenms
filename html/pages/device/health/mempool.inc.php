@@ -43,7 +43,7 @@ foreach (dbFetchRows("SELECT * FROM `mempools` WHERE device_id = ?", array($devi
   $graph_array['id'] = $mempool['mempool_id'];
   $graph_array['type'] = $graph_type;
 
-  include("includes/print-quadgraphs.inc.php");
+  include("includes/print-graphrow.inc.php");
 
   echo("</td></tr>");
 

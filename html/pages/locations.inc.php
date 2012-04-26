@@ -75,7 +75,7 @@ foreach (getlocations() as $location)
       $graph_array['legend'] = "no";
       $graph_array['id']     = $location;
 
-      include("includes/print-quadgraphs.inc.php");
+      include("includes/print-graphrow.inc.php");
 
       echo("</tr></td>");
     }
