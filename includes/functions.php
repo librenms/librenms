@@ -17,6 +17,11 @@ include_once($config['install_dir'] . "/includes/snmp.inc.php");
 include_once($config['install_dir'] . "/includes/services.inc.php");
 include_once($config['install_dir'] . "/includes/dbFacile.php");
 include_once($config['install_dir'] . "/includes/console_colour.php");
+if ($config['alerts']['email']['enable'])
+{
+  include_once($config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
+  include_once($config['install_dir'] . "/includes/phpmailer/class.smtp.php");
+}
 
 function nicecase($item)
 {
@@ -478,6 +483,30 @@ function log_event($text, $device = NULL, $type = NULL, $reference = NULL)
   dbInsert($insert, 'eventlog');
 }
 
+// Parse string with emails. Return array with email (as key) and name (as value)
+function parse_email($emails)
+{
+  $result = array();
+  $regex = '/^[\"\']?([^\"\']+)[\"\']?\s{0,}<([^@]+@[^>]+)>$/';
+  if (is_string($emails))
+  {
+    $emails = preg_split('/[,;]\s{0,}/', $emails);
+    foreach ($emails as $email)
+    {
+      if (preg_match($regex, $email, $out, PREG_OFFSET_CAPTURE))
+      {
+        $result[$out[2][0]] = $out[1][0];
+      } else {
+        if (strpos($email, "@")) { $result[$email] = NULL; }
+      }
+    }
+  } else {
+    // Return FALSE if input not string
+    return FALSE;
+  }
+  return $result;
+}
+
 function notify($device,$title,$message)
 {
   global $config;
@@ -501,9 +530,66 @@ function notify($device,$title,$message)
           $email = $config['alerts']['email']['default'];
         }
       }
-      if ($email)
+      $emails = parse_email($email);
+      if ($emails)
       {
-        mail($email, $title, $message, $config['email_headers']);
+        $message_header = $config['page_title_prefix'];
+        $message_footer .= "E-mail sent to: ";
+        $i = 0;
+        $count = count($emails);
+        foreach ($emails as $email => $email_name)
+        {
+          $i++;
+          $message_footer .= $email;
+          if ($i < $count)
+          {
+            $message_footer .= ", ";
+          } else {
+            $message_footer .= "\n";
+          }
+        }
+        $message_footer .= "E-mail sent at: " . date($config['timestamp_format']) . "\n";
+        $mail = new PHPMailer();
+        $mail->Hostname = php_uname('n');
+        if (empty($config['email_from']))
+        {
+          $config['email_from'] = '"Observium" <observium@'.php_uname('n').'>'; // Default "From:"
+        }
+        foreach (parse_email($config['email_from']) as $from => $from_name)
+        {
+          $mail->SetFrom($from, $from_name); // From:
+        }
+        foreach ($emails as $email => $email_name) { $mail->AddAddress($email, $email_name); } // To:
+        $mail->Subject = $title; // Subject:
+        $mail->XMailer = 'Observium ' . $config['version']; // X-Mailer:
+        $mail->CharSet = 'utf-8';
+        $mail->WordWrap = 76;
+        $mail->Body = $message_header . $message . $message_footer;
+        switch (strtolower(trim($config['email_backend']))) {
+          case 'sendmail':
+            $mail->Mailer = 'sendmail';
+            $mail->Sendmail = $config['email_sendmail_path'];
+            break;
+          case 'smtp':
+            $mail->IsSMTP();
+            $mail->Host       = $config['email_smtp_host'];
+            $mail->Timeout    = $config['email_smtp_timeout'];
+            $mail->SMTPAuth   = $config['email_smtp_auth'];
+            $mail->SMTPSecure = $config['email_smtp_secure'];
+            if ($config['email_smtp_secure'] == "ssl" && $config['email_smtp_port'] == 25) {
+              $mail->Port     = 465; // Default port for SSL
+            }
+            $mail->Port       = $config['email_smtp_port'];
+            $mail->Username   = $config['email_smtp_username'];
+            $mail->Password   = $config['email_smtp_password'];
+            $mail->SMTPDebug  = false;
+            break;
+          default:
+            $mail->Mailer = 'mail';
+            break;
+        }
+        // Sending email
+        if(!$mail->Send()) { echo "Mailer Error: " . $mail->ErrorInfo . "\n"; }
       }
     }
   }

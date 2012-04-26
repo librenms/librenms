@@ -34,17 +34,15 @@ foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
 
   if ($sensor['sensor_limit_low'] != "" && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value <= $sensor['sensor_limit_low'])
   {
-    $msg  = $class_text . " Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $sensor_value . "$unit (Limit " . $sensor['sensor_limit'];
-    $msg .= "$unit) at " . date($config['timestamp_format']);
-    notify($device, $class_text" Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
+    $msg  = $class_text . " Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $sensor_value . "$unit (Limit " . $sensor['sensor_limit'] . "$unit)";
+    notify($device, $class_text . " Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
     log_event($class_text.' '.$sensor['sensor_descr'] . " under threshold: " . $sensor_value . " $unit (< " . $sensor['sensor_limit_low'] . " $unit)", $device, $class, $sensor['sensor_id']);
   }
   else if ($sensor['sensor_limit'] != "" && $sensor['sensor_current'] < $sensor['sensor_limit'] && $sensor_value >= $sensor['sensor_limit'])
   {
-    $msg  = $class_text." Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $sensor_value . "$unit (Limit " . $sensor['sensor_limit'];
-    $msg .= "$unit) at " . date($config['timestamp_format']);
-    notify($device, $class_text." Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
+    $msg  = $class_text." Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $sensor_value . "$unit (Limit " . $sensor['sensor_limit'] .= "$unit)";
+    notify($device, $class_text . " Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
     log_event($class_text." ". $sensor['sensor_descr'] . " above threshold: " . $sensor_value . " $unit (> " . $sensor['sensor_limit'] . " $unit)", $device, $class, $sensor['sensor_id']);
   }

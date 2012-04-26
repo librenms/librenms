@@ -44,14 +44,14 @@ while ($device = mysql_fetch_assoc($device_query))
       mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is up\n')");
       if ($config['alerts']['email']['enable'])
       {
-        notify($device, "Device Up: " . $device['hostname'], "Device Up: " . $device['hostname'] . " at " . date($config['timestamp_format']));
+        notify($device, "Device Up: " . $device['hostname'], "Device Up: " . $device['hostname']);
       }
     } else {
       $stat = "Down";
       mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('9', '" . $device['device_id'] . "', 'Device is down\n')");
       if ($config['alerts']['email']['enable'])
       {
-        notify($device, "Device Down: " . $device['hostname'], "Device Down: " . $device['hostname'] . " at " . date($config['timestamp_format']));
+        notify($device, "Device Down: " . $device['hostname'], "Device Down: " . $device['hostname']);
       }
     }
 

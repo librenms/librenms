@@ -129,6 +129,19 @@ $config['autodiscovery']['snmpscan']       = TRUE; ## autodiscover hosts via SNM
 
 $config['discover_services']               = FALSE; ## Autodiscover services via SNMP on devices of type "server"
 
+### Mailer backend Settings
+
+$config['email_backend']              = 'mail';               ## Mail backend. Allowed: "mail" (PHP's built-in), "sendmail", "smtp".
+$config['email_from']                 = NULL;                 ## Mail from. Default: "OBSERVIUM Network Monitor" <observium@`hostname`>
+$config['email_sendmail_path']        = '/usr/sbin/sendmail'; ## The location of the sendmail program.
+$config['email_smtp_host']            = 'localhost';          ## Outgoing SMTP server name.
+$config['email_smtp_port']            = 25;                   ## The port to connect.
+$config['email_smtp_timeout']         = 10;                   ## SMTP connection timeout in seconds.
+$config['email_smtp_secure']          = NULL;                 ## Enable encryption. Use 'tls' or 'ssl'
+$config['email_smtp_auth']            = FALSE;                ## Whether or not to use SMTP authentication.
+$config['email_smtp_username']        = NULL;                 ## SMTP username. 
+$config['email_smtp_password']        = NULL;                 ## Password for SMTP authentication.
+
 ### Alerting Settings
 
 $config['alerts']['email']['default']      = NULL;    ## Default alert recipient

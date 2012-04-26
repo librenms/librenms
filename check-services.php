@@ -37,13 +37,11 @@ foreach (dbFetchRows("SELECT * FROM `devices` AS D, `services` AS S WHERE S.devi
       if ($status == "1")
       {
         $msg  = "Service Up: " . $service['service_type'] . " on " . $service['hostname'];
-        $msg .= " at " . date($config['timestamp_format']);
         notify($device, "Service Up: " . $service['service_type'] . " on " . $service['hostname'], $msg);
       }
       elseif ($status == "0")
       {
         $msg  = "Service Down: " . $service['service_type'] . " on " . $service['hostname'];
-        $msg .= " at " . date($config['timestamp_format']);
         notify($device, "Service Down: " . $service['service_type'] . " on " . $service['hostname'], $msg);
       }
     } else { unset($updated); }
