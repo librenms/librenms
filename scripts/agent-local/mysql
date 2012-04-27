@@ -650,6 +650,7 @@ function ss_get_mysql_stats( $options ) {
        'binary_log_space'           => 'cz',
        'innodb_locked_tables'       => 'd0',
        'innodb_lock_structs'        => 'd1',
+
        'State_closing_tables'       => 'd2',
        'State_copying_to_tmp_table' => 'd3',
        'State_end'                  => 'd4',
@@ -666,6 +667,7 @@ function ss_get_mysql_stats( $options ) {
        'State_writing_to_net'       => 'df',
        'State_none'                 => 'dg',
        'State_other'                => 'dh',
+
        'Handler_commit'             => 'di',
        'Handler_delete'             => 'dj',
        'Handler_discover'           => 'dk',
@@ -681,6 +683,7 @@ function ss_get_mysql_stats( $options ) {
        'Handler_savepoint_rollback' => 'du',
        'Handler_update'             => 'dv',
        'Handler_write'              => 'dw',
+
        # Some InnoDB stats added later...
        'innodb_tables_in_use'    => 'dx',
        'innodb_lock_wait_secs'   => 'dy',

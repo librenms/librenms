@@ -1,7 +1,7 @@
 <?php
 
 $drbd_dev = $app['app_instance'];
-$drbd_data = $agent_data['drbd'][$drbd_dev];
+$drbd_data = $agent_data['app']['drbd'][$drbd_dev];
 
 $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-drbd-".$drbd_dev.".rrd";
 

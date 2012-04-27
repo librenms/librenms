@@ -23,14 +23,30 @@ foreach (dbFetchRows("SELECT * FROM `applications` WHERE `device_id` = ?", array
   } else {
     #echo('<img src="images/icons/greyscale/'.$app['app_type'].'.png" class="optionicon" />');
   }
-  echo(generate_link(ucfirst($app['app_type']),$link_array,array('app'=>$app['app_type'])));
+  $link_add = array('app'=>$app['app_type']);
+  $text = ucfirst($app['app_type']);
+  if(!empty($app['app_instance']))
+  {
+    $text .= "(".$app['app_instance'].")";
+    $link_add['instance'] = $app['app_id'];
+  }
+  echo(generate_link($text,$link_array,$link_add));
   if ($vars['app'] == $app['app_type']) { echo("</span>"); }
   $sep = " | ";
 }
 
 print_optionbar_end();
 
-$app = dbFetchRow("SELECT * FROM `applications` WHERE `device_id` = ? AND `app_type` = ?", array($device['device_id'], $vars['app']));
+$where_array = array($device['device_id'], $vars['app']);
+if($vars['instance'])
+{
+  $where = " AND `app_id` = ?";
+  $where_array[] = $vars['instance'];
+}
+
+$app = dbFetchRow("SELECT * FROM `applications` WHERE `device_id` = ? AND `app_type` = ?".$where, $where_array);
+
+#print_r($app);
 
 if (is_file("pages/device/apps/".mres($vars['app']).".inc.php"))
 {

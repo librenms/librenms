@@ -5,9 +5,12 @@ if($device['os_group'] == "unix")
 
   echo("Observium UNIX Agent: ");
 
-  $port='6556';
+  ### FIXME - this should be in config and overridable in database
 
-  $agent = fsockopen($device['hostname'], $port, $errno, $errstr, 10);
+  $agent_port='6556';
+
+  $agent_start = utime();
+  $agent = fsockopen($device['hostname'], $agent_port, $errno, $errstr, 10);
 
   if (!$agent)
   {
@@ -18,14 +21,29 @@ if($device['os_group'] == "unix")
       $agent_raw .= fgets($agent, 128);
     }
   }
+  $agent_end = utime(); $agent_time = round(($agent_end - $agent_start) * 1000);
 
   if (!empty($agent_raw))
   {
+    echo("execution time: ".$agent_time."ms");
+    $agent_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/agent.rrd";
+    if (!is_file($agent_rrd))
+    {
+      rrdtool_create ($agent_rrd, "DS:time:GAUGE:600:0:U ".$config['rrd_rra']);
+    }
+    rrdtool_update($agent_rrd, "N:".$agent_time);
+    $graphs['agent'] = TRUE;
+
     foreach (explode("<<<", $agent_raw) as $section)
     {
 
       list($section, $data) = explode(">>>", $section);
       list($sa, $sb) = explode("-", $section, 2);
+
+      if($section == "apache") { $sa = "app"; $sb = "apache"; }
+      if($section == "mysql")  { $sa = "app"; $sb = "mysql"; }
+      if($section == "drbd")   { $sa = "app"; $sb = "drbd"; }
+
       if(!empty($sa) && !empty($sb)) 
       {
         $agent_data[$sa][$sb] = trim($data);
@@ -34,7 +52,7 @@ if($device['os_group'] == "unix")
       }
     }
 
-    #print_r($agent_data);
+#    print_r($agent_data);
 
     include("unix-agent/packages.inc.php");
     include("unix-agent/munin-plugins.inc.php");
@@ -53,7 +71,7 @@ if($device['os_group'] == "unix")
     }
 
     ### Apache
-    if (!empty($agent_data['apache']))
+    if (!empty($agent_data['app']['apache']))
     {
       $app_found['apache'] = TRUE;
       if (dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?", array($device['device_id'], 'apache')) == "0")
@@ -63,8 +81,22 @@ if($device['os_group'] == "unix")
       }
     }
 
+    ### memcached
+    if (!empty($agent_data['app']['memcached']))
+    {
+      $agent_data['app']['memcached'] = unserialize($agent_data['app']['memcached']);
+      foreach ($agent_data['app']['memcached'] as $memcached_host => $memcached_data)
+      {
+        if (dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?", array($device['device_id'], 'memcached', $memcached_host)) == "0")
+        {
+          echo("Found new application 'Memcached' $memcached_host\n");
+          dbInsert(array('device_id' => $device['device_id'], 'app_type' => 'memcached', 'app_instance' => $memcached_host), 'applications');
+        }
+      }
+    }
+
     ### MySQL
-    if (!empty($agent_data['mysql']))
+    if (!empty($agent_data['app']['mysql']))
     {
       $app_found['mysql'] = TRUE;
       if (dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?", array($device['device_id'], 'mysql')) == "0")
@@ -75,7 +107,7 @@ if($device['os_group'] == "unix")
     }
 
     ### DRBD
-    if (!empty($agent_data['drbd']))
+    if (!empty($agent_data['app']['drbd']))
     {
       $agent_data['drbd_raw'] = $agent_data['drbd'];
       $agent_data['drbd'] = array();
