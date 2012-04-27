@@ -2,9 +2,9 @@
 
 ## Polls Apache statistics from script via SNMP
 
-if (!empty($agent_data['apache']))
+if (!empty($agent_data['app']['apache']))
 {
-  $apache = $agent_data['apache'];
+  $apache = $agent_data['app']['apache'];
 } else {
   $options      = "-O qv";
   $oid          = "nsExtendOutputFull.6.97.112.97.99.104.101";

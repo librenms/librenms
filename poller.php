@@ -65,7 +65,7 @@ if (!$where)
   echo("                                             Instances start at 0. 0-3 for -n 4\n\n");
   echo("Debugging and testing options:\n");
   echo("-d                                           Enable debugging output\n");
-  echo("-m                                           Specify single module to be run\n");
+  echo("-m                                           Specify module(s) to be run\n");
   echo("\n");
   echo("No polling type specified!\n");
   exit;

@@ -533,8 +533,8 @@ function notify($device,$title,$message)
       $emails = parse_email($email);
       if ($emails)
       {
-        $message_header = $config['page_title_prefix']."\n";
-        $message_footer = "E-mail sent to: ";
+        $message_header = $config['page_title_prefix']."\n\n";
+        $message_footer = "\n\nE-mail sent to: ";
         $i = 0;
         $count = count($emails);
         foreach ($emails as $email => $email_name)

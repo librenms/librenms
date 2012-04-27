@@ -24,7 +24,7 @@ if($_SESSION['widescreen'] === 1)
 
 if ($_SESSION['authenticated'])
 {
-  echo("Logged in as <b>".$_SESSION['username']."</b> (<a href='?logout=yes'>Logout</a>)");
+  echo("Logged in as <b>".$_SESSION['username']."</b> (<a href='/logout/'>Logout</a>)");
 } else {
   echo("Not logged in!");
 }

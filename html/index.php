@@ -29,8 +29,6 @@ if (strpos($_SERVER['PATH_INFO'], "debug"))
   ini_set('error_reporting', 0);
 }
 
-include("includes/authenticate.inc.php");
-
 foreach ($_GET as $key=>$get_var)
 {
   if (strstr($key, "opt"))
@@ -96,6 +94,8 @@ foreach ($_POST as $name => $value)
 {
   $vars[$name] = $value;
 }
+
+include("includes/authenticate.inc.php");
 
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) { $_SESSION['widescreen'] = 1; }
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=no'))  { unset($_SESSION['widescreen']); }

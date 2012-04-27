@@ -1,9 +1,9 @@
 <?php
 
 ### FIXME - this is lame
-if(!empty($agent_data['mysql']))
+if(!empty($agent_data['app']['mysql']))
 {
-  $mysql = $agent_data['mysql'];
+  $mysql = $agent_data['app']['mysql'];
 } else {
   #Polls MySQL  statistics from script via SNMP
   $mysql_cmd  = $config['snmpget'] ." -m NET-SNMP-EXTEND-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
@@ -24,6 +24,8 @@ foreach ($data as $str)
   $map[$key] = (float)trim($value);
   #$nstring .= (float)trim($elements[1]).":";
 }
+
+### General Stats
 
 $mapping = array(
         'IDBLBSe' => 'cr',
@@ -115,9 +117,6 @@ foreach ($mapping as $key)
 }
 $string = implode(':', $values);
 
-#$data = explode("\n", $mysql);
-#$nstring = trim(implode(':',$data),':');
-
 if (!is_file($mysql_rrd))
 {
   rrdtool_create ($mysql_rrd, "--step 300 \
@@ -203,6 +202,44 @@ if (!is_file($mysql_rrd))
 }
 
 rrdtool_update($mysql_rrd, "N:$string");
-echo("done ");
+
+/// Process state statistics
+
+$mysql_status_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id']."-status.rrd";
+
+$mapping_status = array(
+       'State_closing_tables'       => 'd2',
+       'State_copying_to_tmp_table' => 'd3',
+       'State_end'                  => 'd4',
+       'State_freeing_items'        => 'd5',
+       'State_init'                 => 'd6',
+       'State_locked'               => 'd7',
+       'State_login'                => 'd8',
+       'State_preparing'            => 'd9',
+       'State_reading_from_net'     => 'da',
+       'State_sending_data'         => 'db',
+       'State_sorting_result'       => 'dc',
+       'State_statistics'           => 'dd',
+       'State_updating'             => 'de',
+       'State_writing_to_net'       => 'df',
+       'State_none'                 => 'dg',
+       'State_other'                => 'dh'
+);
+
+$values = array(); $rrd_create = "";
+foreach ($mapping_status as $desc => $id)
+{
+  $values[] = isset($map[$id]) ? $map[$id] : -1;
+  $rrd_create .= " DS:".$id.":GAUGE:600:0:125000000000";
+}
+$string = implode(':', $values);
+
+if (!is_file($mysql_status_rrd))
+{
+  rrdtool_create ($mysql_status_rrd, "--step 300 ".$rrd_create." ".$config['rrd_rra']);
+}
+
+rrdtool_update($mysql_status_rrd, "N:$string");
+
 
 ?>

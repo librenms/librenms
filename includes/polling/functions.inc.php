@@ -134,9 +134,12 @@ function poll_device($device, $options)
 
     if ($options['m'])
     {
-      if (is_file("includes/polling/".$options['m'].".inc.php"))
+      foreach(explode(",", $options['m']) as $module)
       {
-        include("includes/polling/".$options['m'].".inc.php");
+        if (is_file("includes/polling/".$module.".inc.php"))
+        {
+          include("includes/polling/".$module.".inc.php");
+        }
       }
     } else {
       foreach ($config['poller_modules'] as $module => $module_status)

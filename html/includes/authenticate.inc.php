@@ -20,7 +20,7 @@ if (!is_writable($config['temp_dir']))
   echo("<div class='errorbox'>Temp Directory is not writable ({$config['tmp_dir']}).  Graphing may fail.</div>");
 }
 
-if (isset($_GET['logout']) && $_SESSION['authenticated'])
+if ($vars['page'] == "logout" && $_SESSION['authenticated'])
 {
   dbInsert(array('user' => $_SESSION['username'], 'address' => $_SERVER["REMOTE_ADDR"], 'result' => 'Logged Out'), 'authlog');
   unset($_SESSION);
@@ -78,7 +78,6 @@ if (isset($_SESSION['username']))
       setcookie("password", $_SESSION['password'], time()+60*60*24*100, "/");
     }
     $permissions = permissions_cache($_SESSION['user_id']);
-
   }
   elseif (isset($_SESSION['username']))
   {
