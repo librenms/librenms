@@ -8,7 +8,7 @@ echo("memcached(".$app['app_instance'].") ");
 
   if (!is_file($rrd_filename)) {
     rrdtool_create ($rrd_filename, "--step 300 \
-        DS:uptime:DERIVE:600:0:125000000000 \
+        DS:uptime:GAUGE:600:0:125000000000 \
         DS:threads:GAUGE:600:0:125000000000 \
         DS:rusage_user_ms:DERIVE:600:0:125000000000 \
         DS:rusage_system_ms:DERIVE:600:0:125000000000 \
