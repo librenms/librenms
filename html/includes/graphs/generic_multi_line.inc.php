@@ -53,11 +53,10 @@ foreach ($rrd_list as $rrd)
   {
     $rrd_options .= " CDEF:".$id."i=".$id.",-1,*";
     $rrd_optionsb .= " LINE1.25:".$id."i#".$colour.":'$descr'";
-#    $rrd_options .= " AREA:".$id."i#" . $colour . "10";
+    if(!empty($rrd['areacolour'])) { $rrd_optionsb .= " AREA:".$id."i#" . $rrd['areacolour']; }
   } else {
     $rrd_optionsb .= " LINE1.25:".$id."#".$colour.":'$descr'";
-#    $rrd_options .= " AREA:".$id."#" . $colour . "10";
-
+    if(!empty($rrd['areacolour'])) { $rrd_optionsb .= " AREA:".$id."#" . $rrd['areacolour']; }
   }
 
   $rrd_optionsb .= " GPRINT:".$id.":LAST:%5.2lf%s GPRINT:".$id."min:MIN:%5.2lf%s";
@@ -68,7 +67,6 @@ foreach ($rrd_list as $rrd)
 }
 
 $rrd_options .= $rrd_optionsb;
-
 $rrd_options .= " HRULE:0#555555";
 
 ?>
