@@ -1,11 +1,8 @@
 <?php
 
-$drbd_dev = $app['app_instance'];
-$drbd_data = $agent_data['app']['drbd'][$drbd_dev];
+$rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-drbd-".$app['app_instance'].".rrd";
 
-$rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-drbd-".$drbd_dev.".rrd";
-
-  foreach (explode("|", $drbd_data) as $part)
+  foreach (explode("|", $agent_data['app']['drbd'][$app['app_instance']]) as $part)
   {
     list($stat, $val) = explode("=", $part);
     if (!empty($stat))
@@ -29,6 +26,14 @@ $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-drbd-".$
         DS:oos:GAUGE:600:0:125000000000 ".$config['rrd_rra']);
   }
 
+  $ds_list = array('ns','nr','dw','dr','al','bm','lo','pe','ua','ap','oos');
+  foreach($ds_list as $ds)
+  {
+    if(empty($drbd[$ds])) { $drbd[$ds] = "U"; }
+  }
+
   rrdtool_update($rrd_filename, "N:".$drbd['ns'].":".$drbd['nr'].":".$drbd['dw'].":".$drbd['dr'].":".$drbd['al'].":".$drbd['bm'].":".$drbd['lo'].":".$drbd['pe'].":".$drbd['ua'].":".$drbd['ap'].":".$drbd['oop']);
+
+  unset($drbd)
 
 ?>

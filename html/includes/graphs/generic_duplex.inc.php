@@ -125,4 +125,6 @@ if($_GET['previous'] == "yes")
   $rrd_options .= " LINE1.25:dout".$format."X#666666:'Prev Out'";
 }
 
+$rrd_options .= " HRULE:0#999999";
+
 ?>

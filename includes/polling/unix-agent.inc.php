@@ -42,7 +42,7 @@ if($device['os_group'] == "unix")
 
       if($section == "apache") { $sa = "app"; $sb = "apache"; }
       if($section == "mysql")  { $sa = "app"; $sb = "mysql"; }
-      if($section == "drbd")   { $sa = "app"; $sb = "drbd"; }
+#      if($section == "drbd")   { $sa = "app"; $sb = "drbd"; }
 
       if(!empty($sa) && !empty($sb)) 
       {
@@ -107,16 +107,15 @@ if($device['os_group'] == "unix")
     }
 
     ### DRBD
-    if (!empty($agent_data['app']['drbd']))
+    if (!empty($agent_data['drbd']))
     {
-      $agent_data['drbd_raw'] = $agent_data['drbd'];
-      $agent_data['drbd'] = array();
-      foreach (explode("\n", $agent_data['drbd_raw']) as $drbd_entry)
+      $agent_data['app']['drbd'] = array();
+      foreach (explode("\n", $agent_data['drbd']) as $drbd_entry)
       {
         list($drbd_dev, $drbd_data) = explode(":", $drbd_entry);
         if (preg_match("/^drbd/", $drbd_dev))
         {
-          $agent_data['drbd'][$drbd_dev] = $drbd_data;
+          $agent_data['app']['drbd'][$drbd_dev] = $drbd_data;
           if (dbFetchCell("SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?", array($device['device_id'], 'drbd', $drbd_dev)) == "0")
           {
             echo("Found new application 'DRBd' $drbd_dev\n");

@@ -3,32 +3,23 @@
 include("memcached.inc.php");
 include("includes/graphs/common.inc.php");
 
-$array = array(
-                'cmd_set' => 'Set',
-                'cmd_get' => 'Get',
-);
+$nototal             = 1;
 
-$i = 0;
-if (is_file($rrd_filename))
-{
-  foreach ($array as $ds => $vars)
-  {
-    $rrd_list[$i]['filename'] = $rrd_filename;
-    if (is_array($vars))
-    {
-      $rrd_list[$i]['descr'] = $vars['descr'];
-    } else {
-      $rrd_list[$i]['descr'] = $vars;
-    }
-    $rrd_list[$i]['ds'] = $ds;
-    $i++;
-  }
-} else { echo("file missing: $file");  }
+$ds_in               = "cmd_set";
+$ds_out              = "cmd_get";
 
-$colours   = "mixed";
-$nototal   = 0;
-$unit_text = "";
+$in_text = "Set";
+$out_text = "Get";
 
-include("includes/graphs/generic_multi_simplex_seperated.inc.php");
+$graph_title        .= ":: Commands";
+$unit_text           = "Commands";
+$colour_line_in      = "008800FF";
+$colour_line_out     = "000088FF";
+$colour_area_in      = "bEFFbEAA";
+$colour_area_out     = "bEbEFFAA";
+$colour_area_in_max  = "CC88CC";
+$colour_area_out_max = "FFEFAA";
+
+include("includes/graphs/generic_duplex.inc.php");
 
 ?>
