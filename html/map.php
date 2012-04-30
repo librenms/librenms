@@ -1,8 +1,5 @@
 <?php
 
-### FIXME : remove link when port/host is not in the database (things /seen/ but not *discovered*)
-###         No, that should be there... I like to see that stuff :> (adama)
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('log_errors', 1);
@@ -64,7 +61,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
           if (!isset($locations[$device['location']])) { $locations[$device['location']] = $loc_count; $loc_count++; }
           $loc_id = $locations[$device['location']];
 
-          $map .= "\"".$device['hostname']."\" [fontsize=20, fillcolor=\"lightblue\", group=".$loc_id." URL=\"{$config['base_url']}device/device=".$device['device_id']."/tab=map/\" shape=box3d]\n";
+          $map .= "\"".$device['hostname']."\" [fontsize=20, fillcolor=\"lightblue\", group=".$loc_id." URL=\"{$config['base_url']}/device/device=".$device['device_id']."/tab=map/\" shape=box3d]\n";
         }
 
         foreach  ($links as $link)
@@ -115,10 +112,13 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
             if ($where == "")
             {
-              $map .= "\"$src\" -> \"" . $dst . "\" [weight=500000, arrowsize=0, len=0];\n";
+              if (!$ifdone[$dst][$dif['interface_id']])
+              {
+                $map .= "\"$src\" -> \"" . $dst . "\" [weight=500000, arrowsize=0, len=0];\n";
+              }
               $ifdone[$src][$sif['interface_id']] = 1;
             } else {
-              $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"{$config['base_url']}device/device=".$device['device_id']."/tab=port/port=$local_interface_id/\"]\n";
+              $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"{$config['base_url']}/device/device=".$device['device_id']."/tab=port/port=$local_interface_id/\"]\n";
               if (!$ifdone[$src][$sif['interface_id']])
               {
                 $map .= "\"$src\" -> \"" . $sif['interface_id'] . "\" [weight=500000, arrowsize=0, len=0];\n";
@@ -127,19 +127,19 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
               if ($dst_host)
               {
-                $map .= "\"$dst\" [URL=\"{$config['base_url']}device/device=$dst_host/tab=map/\", fontsize=20, shape=box3d]\n";
+                $map .= "\"$dst\" [URL=\"{$config['base_url']}/device/device=$dst_host/tab=map/\", fontsize=20, shape=box3d]\n";
               } else {
                 $map .= "\"$dst\" [ fontsize=20 shape=box3d]\n";
               }
 
               if ($dst_host == $device['device_id'] || $where == '')
               {
-                $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"{$config['base_url']}device/device=$dst_host/tab=port/port=$remote_interface_id/\"]\n";
+                $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"{$config['base_url']}/device/device=$dst_host/tab=port/port=$remote_interface_id/\"]\n";
               } else {
                 $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . " \", fontsize=12, fillcolor=lightgray";
                 if ($dst_host)
                 {
-                  $map .= ", URL=\"{$config['base_url']}device/device=$dst_host/tab=port/port=$remote_interface_id/\"";
+                  $map .= ", URL=\"{$config['base_url']}/device/device=$dst_host/tab=port/port=$remote_interface_id/\"";
                 }
                 $map .= "]\n";
               }
@@ -162,6 +162,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
   if ($_GET['debug'] == 1)
   {
+ echo '<pre>'; print_r($ifdone);
     echo("<pre>$map</pre>");exit();
   }
 
