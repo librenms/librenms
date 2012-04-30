@@ -11,12 +11,14 @@ $stats['bgp']          = dbFetchCell("SELECT count(*) FROM bgpPeers");
 
 foreach (dbFetch("SELECT COUNT(*) AS count,os from devices group by `os`") as $dt_data)
 {
-  $stats['devicetypes2'][$dt_data['os']] = $dt_data['count'];
+  $stats['devicetypes'][$dt_data['os']] = $dt_data['count'];
 }
 
-$stats = serialize($stats[$dt_data['os']]);
+$stat_serial = base64_encode(serialize($stats));
 
-$dataHandle = fopen("http://www.observium.org/latest.php?i=".$stats['ports']."&d=".$stats['devices']."&stats=".$stats."&v=".$config['version'], r);
+$url = "http://www.observium.org/latest.php?i=".$stats['ports']."&d=".$stats['devices']."&stats=".$stat_serial."&v=".$config['version'];
+$dataHandle = fopen($url, r);
+
 
 if ($dataHandle)
 {
