@@ -8,7 +8,7 @@ if ($device['os_group'] == "cisco")
   $vtpversion_cmd .= $device['hostname'].":".$device['port'] . " .1.3.6.1.4.1.9.9.46.1.1.1.0";
   $vtpversion = trim(`$vtpversion_cmd 2>/dev/null`);
 
-  if ($vtpversion == '1' || $vtpversion == '2' || $vtpversion == 'two' || $vtpversion == 'three')
+  if ($vtpversion == '1' || $vtpversion == '2' || $vtpversion == '3' || $vtpversion == 'one' || $vtpversion == 'two' || $vtpversion == 'three')
   {
     $vtp_domain_cmd  = $config['snmpget'] . " -M " . $config['mibdir'] . " -m CISCO-VTP-MIB -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
     $vtp_domain_cmd .= " .1.3.6.1.4.1.9.9.46.1.2.1.1.2.1";
