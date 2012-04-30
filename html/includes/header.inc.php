@@ -24,15 +24,21 @@ if($_SESSION['widescreen'] === 1)
 
 if ($_SESSION['authenticated'])
 {
-  echo("Logged in as <b>".$_SESSION['username']."</b> (<a href='/logout/'>Logout</a>)");
+  echo("Logged in as <b>".$_SESSION['username']."</b>");
 } else {
   echo("Not logged in!");
 }
 
-if (Net_IPv6::checkIPv6($_SERVER['REMOTE_ADDR'])) {
+if (Net_IPv6::checkIPv6($_SERVER['REMOTE_ADDR']))
+{
   echo(' via <b>IPv6</b>');
 } else {
   echo(' via <b>IPv4</b>');
+}
+
+if ($_SESSION['authenticated'])
+{
+  echo(" (<a href='logout/'>Logout</a>)");
 }
 ?>
 

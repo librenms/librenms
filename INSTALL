@@ -1,24 +1,3 @@
 Please see http://www.observium.org for up to date installation instructions.
 
 Please also contact us through the mailing list or on IRC if you run into any issues.
-
--------
-
-Some notes about how to set up your systems, which have not found their way
-onto the wiki just yet:
-
-Customer port parsing
-=====================
-
-Set your port description to:
-
-Cust: CustomerName {CircuitDesc} (OptionalNotes) [Speed]
-
-Transit/peering/core port parsing
-=================================
-
-Set your port description to:
-
-Transit: whateveryoulike
-Peering: whateveryoulike
-Core: whateveryoulike
