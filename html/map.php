@@ -162,7 +162,6 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
   if ($_GET['debug'] == 1)
   {
- echo '<pre>'; print_r($ifdone);
     echo("<pre>$map</pre>");exit();
   }
 
