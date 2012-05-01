@@ -16,11 +16,9 @@ foreach ($vars as $var => $value)
 
 echo('<table cellspacing="0" cellpadding="5" width="100%">');
 
-$i=0;
 foreach (dbFetchRows("SELECT * FROM `packages` WHERE 1 $where GROUP BY `name`", $param) as $entry)
 {
-  if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-  echo("<tr bgcolor=$row_colour>");
+  echo('<tr class="list">');
   echo('<td width=200><a href="'. generate_url($vars, array('name' => $entry['name'])).'">'.$entry['name'].'</a></td>');
 
   echo("<td>");
@@ -36,7 +34,8 @@ foreach (dbFetchRows("SELECT * FROM `packages` WHERE 1 $where GROUP BY `name`", 
 
     foreach ($bleu as $build => $bloo)
     {
-      $content .= '<div style="background-color: #eeeeee; margin: 5px;"><span style="font-weight: bold; ">'.$version.'-'.$build.'</span>';
+      if ($build) { $dbuild = '-' . $build; } else { $dbuild = ''; }
+      $content .= '<div style="background-color: #eeeeee; margin: 5px;"><span style="font-weight: bold; ">'.$version.$dbuild.'</span>';
       foreach ($bloo as $device_id => $no)
       {
         $this_device = device_by_id_cache($device_id);
@@ -51,11 +50,7 @@ foreach (dbFetchRows("SELECT * FROM `packages` WHERE 1 $where GROUP BY `name`", 
   }
 
   echo("<td>");
-
   echo("</tr>");
-
-  $i++;
-
 }
 
 echo("</table>");
