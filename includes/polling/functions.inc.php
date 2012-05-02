@@ -2,7 +2,7 @@
 
 function poll_sensor($device, $class, $unit)
 {
-  global $config;
+  global $config; global $memcache;
 
   foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `poller_type` = 'snmp'", array($class, $device['device_id'])) as $sensor)
   {
@@ -72,7 +72,12 @@ function poll_sensor($device, $class, $unit)
       log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . " above threshold: " . $sensor_value . " $unit (> " . $sensor['sensor_limit'] . " $unit)", $device, $class, $sensor['sensor_id']);
     }
 
-    dbUpdate(array('sensor_current' => $sensor_value), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
+    if ($config['memcached']['enable'])
+    {
+      $memcache->set('sensor-'.$sensor['sensor_id'].'-value', $sensor_value);
+    } else {
+      dbUpdate(array('sensor_current' => $sensor_value), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
+    }
   }
 }
 

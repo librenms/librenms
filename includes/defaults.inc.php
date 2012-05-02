@@ -341,6 +341,20 @@ $config['allow_unauth_graphs']      = 0;       # Allow graphs to be viewed by an
 $config['allow_unauth_graphs_cidr'] = array(); # Allow graphs to be viewed without authorisation from certain IP ranges
 $config['auth_mechanism']           = "mysql"; # Available mechanisms: mysql (default), ldap, http-auth
 
+### LDAP Authentication
+
+$config['auth_ldap_version'] = 3; # v2 or v3
+$config['auth_ldap_server'] = "ldap.yourserver.com";
+$config['auth_ldap_port']   = 389;
+$config['auth_ldap_prefix'] = "uid=";
+$config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
+$config['auth_ldap_group']  = "cn=observium,ou=groups,dc=example,dc=com";
+
+$config['auth_ldap_groupbase'] = "ou=group,dc=example,dc=com";
+$config['auth_ldap_groups']['admin']['level'] = 10;
+$config['auth_ldap_groups']['pfy']['level'] = 7;
+$config['auth_ldap_groups']['support']['level'] = 1;
+
 ### Sensors
 
 $config['allow_entity_sensor']['amperes'] = 1;
@@ -392,20 +406,6 @@ $config['syslog_filter'][] = "diskio.c";  ## Ignore some crappy stuff from SNMP 
 
 $config['enable_libvirt'] = 0; # Enable Libvirt VM support
 $config['libvirt_protocols']    = array("qemu+ssh","xen+ssh"); # Mechanisms used, add or remove if not using this on any of your machines.
-
-### LDAP Authentication
-
-$config['auth_ldap_version'] = 3; # v2 or v3
-$config['auth_ldap_server'] = "ldap.yourserver.com";
-$config['auth_ldap_port']   = 389;
-$config['auth_ldap_prefix'] = "uid=";
-$config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
-$config['auth_ldap_group']  = "cn=observium,ou=groups,dc=example,dc=com";
-
-$config['auth_ldap_groupbase'] = "ou=group,dc=example,dc=com";
-$config['auth_ldap_groups']['admin']['level'] = 10;
-$config['auth_ldap_groups']['pfy']['level'] = 7;
-$config['auth_ldap_groups']['support']['level'] = 1;
 
 ### Hardcoded ASN descriptions
 $config['astext'][65332] = "Cymru FullBogon Feed";

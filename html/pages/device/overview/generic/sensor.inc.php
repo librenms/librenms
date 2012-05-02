@@ -9,8 +9,17 @@ if (count($sensors))
   echo('<table width="100%" valign="top">');
   foreach ($sensors as $sensor)
   {
-    ### FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
+    if ($config['memcached']['enable'])
+    {
+      $sensor['sensor_current'] = $memcache->get('sensor-'.$sensor['sensor_id'].'-value');
+    }
 
+    if(empty($sensor['sensor_current']))
+    {
+      $sensor['sensor_current'] = "NaN";
+    }
+
+    ### FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
     ### FIXME - So now we need to clean this up and move it into a function. Isn't it just "print-graphrow"?
 
     $graph_colour = str_replace("#", "", $row_colour);

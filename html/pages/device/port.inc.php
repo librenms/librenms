@@ -4,6 +4,17 @@ if (!isset($vars['view']) ) { $vars['view'] = "graphs"; }
 
 $port = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($vars['port']));
 
+if ($config['memcached']['enable'])
+{
+  $oids = array('ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors');
+  foreach($oids as $oid)
+  {
+    $port[$oid.'_rate'] = $memcache->get('port-'.$port['interface_id'].'-'.$oid.'_rate');
+    if($debug) { echo("MC[".$oid."->".$port[$oid.'_rate']."]"); }
+  }
+}
+
+
 $port_details = 1;
 
 $hostname = $device['hostname'];

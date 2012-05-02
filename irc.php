@@ -11,13 +11,12 @@ include_once("includes/defaults.inc.php");
 include_once("config.php");
 include_once("includes/functions.php");
 include_once("includes/discovery/functions.inc.php");
-
 include_once('Net/SmartIRC.php');
 
 mysql_close();
 
 # Redirect to /dev/null or logfile if you aren't using screen to keep tabs
-echo "Observer Bot Starting ...\n";
+echo "Observium Bot Starting ...\n";
 echo "\n";
 echo "Timestamp         Command\n";
 echo "----------------- ------- \n";
