@@ -2,7 +2,7 @@
 
 function poll_sensor($device, $class, $unit)
 {
-  global $config; global $memcache;
+  global $config, $memcache;
 
   foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `poller_type` = 'snmp'", array($class, $device['device_id'])) as $sensor)
   {
@@ -16,7 +16,7 @@ function poll_sensor($device, $class, $unit)
         $sensor_value = snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
         $sensor_value = trim(str_replace("\"", "", $sensor_value));
 
-        if ($sensor_value != 9999) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
+        if ($sensor_value < 9000) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
         sleep(1); # Give the TME some time to reset
       }
     } else {
@@ -29,22 +29,6 @@ function poll_sensor($device, $class, $unit)
     if ($sensor['sensor_multiplier']) { $sensor_value = $sensor_value * $sensor['sensor_multiplier']; }
 
     $rrd_file = get_sensor_rrd($device, $sensor);
-
-    #$rrd_file = $config['rrd_dir']."/".$device['hostname']."/".safename("sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_index'] . ".rrd");
-
-    ## FIXME - sensor name format change 2011/04/26 - remove this in $amount_of_time.
-    ## We don't want to reduce performance forever because douchebags don't svn up!
-    $old_rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("$class-" . $sensor['sensor_descr'] . ".rrd");
-    $old_rrd_file_b = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("$class-" . $sensor['sensor_index'] . ".rrd");
-    if (is_file($old_rrd_file) && is_file($old_rrd_file_b))
-    {
-      rename($old_rrd_file, $rrd_file);
-      unlink($old_rrd_file_b);
-    } elseif (is_file($old_rrd_file)) {
-      rename($old_rrd_file, $rrd_file);
-    } elseif (is_file($old_rrd_file_b)) {
-      rename($old_rrd_file_b, $rrd_file);
-    }
 
     if (!is_file($rrd_file))
     {
