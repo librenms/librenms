@@ -107,8 +107,19 @@ if ($vars['view'] == 'minigraphs')
 
   foreach ($ports as $port)
   {
-    include("includes/print-interface.inc.php");
 
+    if ($config['memcached']['enable'])
+{
+  $oids = array('ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors');
+  foreach($oids as $oid)
+  {
+    $port[$oid.'_rate'] = $memcache->get('port-'.$port['interface_id'].'-'.$oid.'_rate');
+    if($debug) { echo("MC[".$oid."->".$port[$oid.'_rate']."]"); }
+  }
+}
+
+
+    include("includes/print-interface.inc.php");
     $i++;
   }
   echo("</table></div>");

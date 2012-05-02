@@ -36,8 +36,16 @@ foreach (dbFetchRows("SELECT * FROM storage WHERE device_id = ?", array($device[
 
   rrdtool_update($storage_rrd,"N:".$storage['used'].":".$storage['free']);
 
-  $update = dbUpdate(array('storage_used' => $storage['used'], 'storage_free' => $storage['free'], 'storage_size' => $storage['size'], 'storage_units' => $storage['units'], 'storage_perc' => $percent),
-                     'storage', '`storage_id` = ?', array($storage['storage_id']));
+  if ($config['memcached']['enable'])
+  {
+    $memcache->set('storage-'.$storage['storage_id'].'-used', $storage['used']);
+    $memcache->set('storage-'.$storage['storage_id'].'-free', $storage['free']);
+    $memcache->set('storage-'.$storage['storage_id'].'-size', $storage['size']);
+    $memcache->set('storage-'.$storage['storage_id'].'-units', $storage['units']);
+    $memcache->set('storage-'.$storage['storage_id'].'-used', $percent);
+  } else {
+    $update = dbUpdate(array('storage_used' => $storage['used'], 'storage_free' => $storage['free'], 'storage_size' => $storage['size'], 'storage_units' => $storage['units'], 'storage_perc' => $percent), 'storage', '`storage_id` = ?', array($storage['storage_id']));
+  }
 
   echo("\n");
 }

@@ -25,11 +25,22 @@ echo('<tr class=tablehead>
 
 foreach (dbFetchRows($sql, $param) as $sensor)
 {
+
+  if ($config['memcached']['enable'])
+  {
+    $sensor['sensor_current'] = $memcache->get('sensor-'.$sensor['sensor_id'].'-value');
+  }
+
+  if(empty($sensor['sensor_current'])) 
+  { 
+    $sensor['sensor_current'] = "NaN"; 
+  } else {
+    if ($sensor['sensor_current'] >= $sensor['sensor_limit']) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }
+  }
+
   $weekly_sensor = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
   $sensor_popup = "<a href=\"graphs/id=" . $sensor['sensor_id'] . "/type=".$graph_type."/\" onmouseover=\"return overlib('<img src=\'$weekly_sensor\'>', LEFT);\" onmouseout=\"return nd();\">
         " . $sensor['sensor_descr'] . "</a>";
-
-  if ($sensor['sensor_current'] >= $sensor['sensor_limit']) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }
 
   $sensor_day    = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=300&amp;height=100";
   $sensor_week   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=300&amp;height=100";
