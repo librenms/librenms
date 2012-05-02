@@ -12,8 +12,8 @@ foreach($vlans_db_raw as $vlan_db)
 /// Create an empty array to record what VLANs we discover this session.
 $device['vlans'] = array();
 
-include("includes/discovery/q-bridge-mib.inc.php");
-include("includes/discovery/cisco-vlans.inc.php");
+include("includes/discovery/vlans/q-bridge-mib.inc.php");
+include("includes/discovery/vlans/cisco-vtp.inc.php");
 
 /// Fetch switchport <> VLAN relationships. This is DIRTY.
 foreach ($device['vlans'] as $domain_id => $vlans)
