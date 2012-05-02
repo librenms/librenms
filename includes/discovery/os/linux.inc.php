@@ -21,6 +21,16 @@ if (!$os)
       $hrSystemInitialLoadParameters = trim(snmp_get($device, "hrSystemInitialLoadParameters.0", "-Osqnv"));
 
       if (strpos($hrSystemInitialLoadParameters, "syno_hw_version") !== FALSE) { $os = "dsm"; }
+      else
+      {
+        ## Check for Carel PCOweb
+        $roomTemp = trim(snmp_get($device,"roomTemp.0", "-OqvU", "CAREL-ug40cdz-MIB"));
+        
+        if (is_numeric($roomTemp))
+        {
+          $os = "pcoweb";
+        }
+      }
     }
   }
 }

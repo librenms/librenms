@@ -663,6 +663,15 @@ $config['os'][$os]['over'][0]['text']   = "Temperature";
 $config['os'][$os]['over'][1]['graph']  = "device_humidity";
 $config['os'][$os]['over'][1]['text']   = "Humidity";
 
+$os = "pcoweb";
+$config['os'][$os]['text']              = "Carel pCOWeb";
+$config['os'][$os]['type']              = "environment";
+$config['os'][$os]['over'][0]['graph']  = "device_temperature";
+$config['os'][$os]['over'][0]['text']   = "Temperature";
+$config['os'][$os]['over'][1]['graph']  = "device_humidity";
+$config['os'][$os]['over'][1]['text']   = "Humidity";
+$config['os'][$os]['icon']              = "carel";
+
 $os = "netvision";
 $config['os'][$os]['text']              = "Socomec Net Vision";
 $config['os'][$os]['type']              = "power";
