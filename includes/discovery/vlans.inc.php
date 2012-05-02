@@ -2,88 +2,91 @@
 
 echo("VLANs:\n");
 
-$this_vlans = array();
+/// Pre-cache the existing state of VLANs for this device from the database
+$vlans_db_raw = dbFetchRows("SELECT * FROM `vlans` WHERE `device_id` = ?", array($device['device_id']));
+foreach($vlans_db_raw as $vlan_db)
+{
+  $vlans_db[$vlan_db['vlan_domain']][$vlan_db['vlan_vlan']] = $vlan_db;
+}
+
+/// Create an empty array to record what VLANs we discover this session.
+$device['vlans'] = array();
 
 include("includes/discovery/q-bridge-mib.inc.php");
 include("includes/discovery/cisco-vlans.inc.php");
 
-foreach ($this_vlans as $vlan)
+/// Fetch switchport <> VLAN relationships. This is DIRTY.
+foreach ($device['vlans'] as $domain_id => $vlans)
 {
+  foreach ($vlans as $vlan_id => $vlan)
+  {
   /// Pull Tables for this VLAN
 
-  #/usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/observium/mibs/ udp:sw2.ahf:161 dot1dStpPortEntry
-  #/usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/observium/mibs/ udp:sw2.ahf:161 dot1dBasePortEntry
+    #/usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/observium/mibs/ udp:sw2.ahf:161 dot1dStpPortEntry
+    #/usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/observium/mibs/ udp:sw2.ahf:161 dot1dBasePortEntry
 
-  if (is_numeric($vlan) && ($vlan <1002 || $vlan > 1105)) /// Ignore reserved VLAN IDs
-  {
-
-    if ($device['os_group'] == "cisco" || $device['os'] == "ios")  /// This shit only seems to work on IOS
+    ### FIXME - do this only when vlan type == ethernet?
+    if (is_numeric($vlan_id) && ($vlan_id <1002 || $vlan_id > 1105)) /// Ignore reserved VLAN IDs
     {
-      $vlan_device = array_merge($device, array('community' => $device['community']."@".$vlan));
-      $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dStpPortEntry", array(), "BRIDGE-MIB:Q-BRIDGE-MIB");
-      $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dBasePortEntry", $vlan_data, "BRIDGE-MIB:Q-BRIDGE-MIB");
-    }
-
-    echo("VLAN $vlan \n");
-
-    if ($vlan_data)
-    {
-      echo(str_pad("dot1d id", 10).str_pad("ifIndex", 10).str_pad("Port Name", 25).
-           str_pad("Priority", 10).str_pad("State", 15).str_pad("Cost", 10)."\n");
-    }
-
-    foreach ($vlan_data as $vlan_port_id => $vlan_port)
-    {
-      $port = get_port_by_index_cache($device, $vlan_port['dot1dBasePortIfIndex']);
-      echo(str_pad($vlan_port_id, 10).str_pad($vlan_port['dot1dBasePortIfIndex'], 10).
-      str_pad($port['ifDescr'],25).str_pad($vlan_port['dot1dStpPortPriority'], 10).
-      str_pad($vlan_port['dot1dStpPortState'], 15).str_pad($vlan_port['dot1dStpPortPathCost'], 10));
-
-      $db_w = array('device_id' => $device['device_id'],
-                  'interface_id' => $port['interface_id'],
-                  'vlan' => $vlan);
-
-      $db_a = array('baseport' => $vlan_port_id,
-                  'priority' => $vlan_port['dot1dStpPortPriority'],
-                  'state' => $vlan_port['dot1dStpPortState'],
-                  'cost' => $vlan_port['dot1dStpPortPathCost']);
-
-      $from_db = dbFetchRow("SELECT * FROM `ports_vlans` WHERE device_id = ? AND interface_id = ? AND `vlan` = ?", array($device['device_id'], $port['interface_id'], $vlan));
-
-      if ($from_db['port_vlan_id'])
+      if ($device['os_group'] == "cisco" || $device['os'] == "ios")  /// This shit only seems to work on IOS
       {
-        dbUpdate($db_a, 'ports_vlans', "`port_vlan_id` = ?", $from_db['port_vlan_id']);
-        echo("Updated");
-      } else {
-        dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
-        echo("Inserted");
+        $vlan_device = array_merge($device, array('community' => $device['community']."@".$vlan_id));
+        $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dStpPortEntry", array(), "BRIDGE-MIB:Q-BRIDGE-MIB");
+        $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dBasePortEntry", $vlan_data, "BRIDGE-MIB:Q-BRIDGE-MIB");
       }
 
-      echo("\n");
+      echo("VLAN $vlan_id \n");
 
+      if ($vlan_data)
+      {
+        echo(str_pad("dot1d id", 10).str_pad("ifIndex", 10).str_pad("Port Name", 25).
+             str_pad("Priority", 10).str_pad("State", 15).str_pad("Cost", 10)."\n");
+      }
+
+      foreach ($vlan_data as $vlan_port_id => $vlan_port)
+      {
+        $port = get_port_by_index_cache($device, $vlan_port['dot1dBasePortIfIndex']);
+        echo(str_pad($vlan_port_id, 10).str_pad($vlan_port['dot1dBasePortIfIndex'], 10).
+        str_pad($port['ifDescr'],25).str_pad($vlan_port['dot1dStpPortPriority'], 10).
+        str_pad($vlan_port['dot1dStpPortState'], 15).str_pad($vlan_port['dot1dStpPortPathCost'], 10));
+
+        $db_w = array('device_id' => $device['device_id'],
+                    'interface_id' => $port['interface_id'],
+                    'vlan' => $vlan_id);
+
+        $db_a = array('baseport' => $vlan_port_id,
+                    'priority' => $vlan_port['dot1dStpPortPriority'],
+                    'state' => $vlan_port['dot1dStpPortState'],
+                    'cost' => $vlan_port['dot1dStpPortPathCost']);
+
+        $from_db = dbFetchRow("SELECT * FROM `ports_vlans` WHERE device_id = ? AND interface_id = ? AND `vlan` = ?", array($device['device_id'], $port['interface_id'], $vlan_id));
+
+        if ($from_db['port_vlan_id'])
+        {
+          dbUpdate($db_a, 'ports_vlans', "`port_vlan_id` = ?", $from_db['port_vlan_id']);
+          echo("Updated");
+        } else {
+          dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
+          echo("Inserted");
+        }
+        echo("\n");
+      }
     }
   }
-
-  unset($vlan_data);
-
 }
 
-$device_vlans = mysql_query("SELECT * FROM `vlans` WHERE `device_id` = '" . $device['device_id'] . "'");
-while ($dev_vlan = mysql_fetch_assoc($device_vlans))
+
+foreach($vlans_db as $domain_id => $vlans)
 {
-  unset($vlan_exists);
-  foreach ($this_vlans as $test_vlan)
+  foreach($vlans as $vlan_id => $vlan)
   {
-    if ($test_vlan == $dev_vlan['vlan_vlan']) { $vlan_exists = 1; }
-  }
-  if (!$vlan_exists)
-  {
-    mysql_query("DELETE FROM `vlans` WHERE `vlan_id` = '" . $dev_vlan['vlan_id'] . "'");
-    echo("-");
-    if ($debug) { echo("Deleted VLAN ". $dev_vlan['vlan_vlan'] ."\n"); }
+    if(empty($device['vlans'][$domain_id][$vlan_id]))
+    {
+      dbDelete('vlans', "`device_id` = ? AND vlan_domain = ? AND vlan_vlan = ?", array($device['device_id'], $domain_id, $vlan_id));
+    }
   }
 }
 
-unset($this_vlans);
+unset($device['vlans']);
 
 ?>
