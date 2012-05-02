@@ -305,7 +305,7 @@ function sensor_limit($class, $current)
       $limit = $current * 1.50;
       break;
     case 'fanspeed':
-      $limit = $current * 1.30;
+      $limit = $current * 1.80;
       break;
     case 'power':
       $limit = $current * 1.50;
