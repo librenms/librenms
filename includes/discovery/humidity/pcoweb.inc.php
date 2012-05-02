@@ -34,7 +34,7 @@ lhAlarmThrsh.0 = INTEGER: 30 rH%
 smDehumSetp.0 = INTEGER: 75 rH%
 smHumidSetp.0 = INTEGER: 35 rH%
 */
-  
+
 }
 
 ?>

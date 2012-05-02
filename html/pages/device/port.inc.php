@@ -7,13 +7,12 @@ $port = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($vars
 if ($config['memcached']['enable'])
 {
   $oids = array('ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors');
-  foreach($oids as $oid)
+  foreach ($oids as $oid)
   {
     $port[$oid.'_rate'] = $memcache->get('port-'.$port['interface_id'].'-'.$oid.'_rate');
-    if($debug) { echo("MC[".$oid."->".$port[$oid.'_rate']."]"); }
+    if ($debug) { echo("MC[".$oid."->".$port[$oid.'_rate']."]"); }
   }
 }
-
 
 $port_details = 1;
 

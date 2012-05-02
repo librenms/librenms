@@ -14,7 +14,7 @@ if (count($sensors))
       $sensor['sensor_current'] = $memcache->get('sensor-'.$sensor['sensor_id'].'-value');
     }
 
-    if(empty($sensor['sensor_current']))
+    if (empty($sensor['sensor_current']))
     {
       $sensor['sensor_current'] = "NaN";
     }

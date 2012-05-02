@@ -55,7 +55,7 @@ $config['dot']            = "/usr/bin/dot";
 $config['unflatten']      = "/usr/bin/unflatten";
 $config['neato']          = "/usr/bin/neato";
 $config['sfdp']           = "/usr/bin/sfdp";
-$config['svn']		  = "/usr/bin/svn";
+$config['svn']                  = "/usr/bin/svn";
 
 ### Memcached - Keep immediate statistics
 
@@ -143,7 +143,7 @@ $config['email_smtp_port']            = 25;                   ## The port to con
 $config['email_smtp_timeout']         = 10;                   ## SMTP connection timeout in seconds.
 $config['email_smtp_secure']          = NULL;                 ## Enable encryption. Use 'tls' or 'ssl'
 $config['email_smtp_auth']            = FALSE;                ## Whether or not to use SMTP authentication.
-$config['email_smtp_username']        = NULL;                 ## SMTP username. 
+$config['email_smtp_username']        = NULL;                 ## SMTP username.
 $config['email_smtp_password']        = NULL;                 ## Password for SMTP authentication.
 
 ### Alerting Settings

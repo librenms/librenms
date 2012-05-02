@@ -54,7 +54,7 @@ radcoolSpDX.0 = INTEGER: 280 degrees C
 delTempLimit.0 = INTEGER: 14 degrees C x10
 dtAutChgMLT.0 = INTEGER: 20 degrees C
 */
-  
+
 }
 
 ?>

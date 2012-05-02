@@ -23,7 +23,6 @@ if($width > "500")
   $rrd_options .= " COMMENT:'".substr(str_pad($mplug['mplug_vlabel'], $descr_len),0,$descr_len)."   Current   Average  Maximum\l'";
 }
 
-
 $c_i = 0;
 $dbq = dbFetchRows("SELECT * FROM `munin_plugins_ds` WHERE `mplug_id` = ?", array($mplug['mplug_id']));
 foreach ($dbq as $ds)
@@ -33,15 +32,15 @@ foreach ($dbq as $ds)
 
   $cmd_def .= " DEF:".$ds['ds_name']."=".$ds_filename.":val:AVERAGE";
 
-  if(!empty($ds['ds_cdef']))
+  if (!empty($ds['ds_cdef']))
   {
     $cmd_cdef .= "";
     $ds_name = $ds['ds_name']."_cdef";
   }
 
-  if($ds['ds_graph'] == "yes")
+  if ($ds['ds_graph'] == "yes")
   {
-    if(empty($ds['colour']))
+    if (empty($ds['colour']))
     {
       if (!$config['graph_colours']['mixed'][$c_i]) { $c_i = 0; }
       $colour=$config['graph_colours']['mixed'][$c_i]; $c_i++;

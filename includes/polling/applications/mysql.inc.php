@@ -241,5 +241,4 @@ if (!is_file($mysql_status_rrd))
 
 rrdtool_update($mysql_status_rrd, "N:$string");
 
-
 ?>

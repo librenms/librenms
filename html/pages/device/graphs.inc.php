@@ -19,7 +19,7 @@ $sep = "";
 
 foreach (dbFetchRows("SELECT * FROM munin_plugins WHERE device_id = ? ORDER BY mplug_category, mplug_type", array($device['device_id'])) as $mplug)
 {
-#  if(strlen($mplug['mplug_category']) == 0) { $mplug['mplug_category'] = "general"; } else {  }
+#  if (strlen($mplug['mplug_category']) == 0) { $mplug['mplug_category'] = "general"; } else {  }
   $graph_enable[$mplug['mplug_category']][$mplug['mplug_type']]['id'] = $mplug['mplug_id'];
   $graph_enable[$mplug['mplug_category']][$mplug['mplug_type']]['title'] = $mplug['mplug_title'];
 }
@@ -31,7 +31,7 @@ foreach (dbFetchRows("SELECT * FROM device_graphs WHERE device_id = ? ORDER BY g
 }
 
 #foreach ($config['graph_sections'] as $section)
-foreach($graph_enable as $section => $nothing)
+foreach ($graph_enable as $section => $nothing)
 {
   if (isset($graph_enable) && is_array($graph_enable[$section]))
   {
@@ -57,11 +57,11 @@ print_optionbar_end();
 $graph_enable = $graph_enable[$vars['group']];
 
 #foreach ($config['graph_types']['device'] as $graph => $entry)
-foreach($graph_enable as $graph => $entry)
+foreach ($graph_enable as $graph => $entry)
 {
   if ($graph_enable[$graph])
   {
-    if(is_numeric($entry['id']))
+    if (is_numeric($entry['id']))
     {
       $graph_title = $entry['title'];
       $graph_array['type'] = "munin_graph";
@@ -70,6 +70,7 @@ foreach($graph_enable as $graph => $entry)
       $graph_title = $config['graph_types']['device'][$graph]['descr'];
       $graph_array['type'] = "device_" . $graph;
     }
+
     include("includes/print-device-graph.php");
   }
 }

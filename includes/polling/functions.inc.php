@@ -139,7 +139,7 @@ function poll_device($device, $options)
 
     if ($options['m'])
     {
-      foreach(explode(",", $options['m']) as $module)
+      foreach (explode(",", $options['m']) as $module)
       {
         if (is_file("includes/polling/".$module.".inc.php"))
         {

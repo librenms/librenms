@@ -17,6 +17,7 @@ include_once($config['install_dir'] . "/includes/snmp.inc.php");
 include_once($config['install_dir'] . "/includes/services.inc.php");
 include_once($config['install_dir'] . "/includes/dbFacile.php");
 include_once($config['install_dir'] . "/includes/console_colour.php");
+
 if ($config['alerts']['email']['enable'])
 {
   include_once($config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
@@ -589,7 +590,7 @@ function notify($device,$title,$message)
             break;
         }
         // Sending email
-        if(!$mail->Send()) { echo "Mailer Error: " . $mail->ErrorInfo . "\n"; }
+        if (!$mail->Send()) { echo "Mailer Error: " . $mail->ErrorInfo . "\n"; }
       }
     }
   }

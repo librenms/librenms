@@ -18,7 +18,7 @@ foreach (dbFetchRows("SELECT D.device_id AS device_id, `hostname` FROM `ipv4_mac
 ?>
       </select>
     </td>
-    <td width="200" style="padding: 1px;">Search by 
+    <td width="200" style="padding: 1px;">Search by
       <select name="searchby" id="searchby">
       <option value="mac" <?php if ($_POST['searchby'] != "ip") { echo("selected"); } ?> >MAC Address</option>
       <option value="ip" <?php if ($_POST['searchby'] == "ip") { echo("selected"); } ?> >IP Address</option>
@@ -70,22 +70,21 @@ foreach (dbFetchRows($query, $param) as $entry)
     {
       $error_img = generate_port_link($entry,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
     } else { $error_img = ""; }
-	
-	$arp_host = dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id AND D.device_id = I.device_id", array($entry['ipv4_address']));
+
+    $arp_host = dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id AND D.device_id = I.device_id", array($entry['ipv4_address']));
     if ($arp_host) { $arp_name = generate_device_link($arp_host); } else { unset($arp_name); }
     if ($arp_host) { $arp_if = generate_port_link($arp_host); } else { unset($arp_if); }
     if ($arp_host['device_id'] == $entry['device_id']) { $arp_name = "Localhost"; }
     if ($arp_host['interface_id'] == $entry['interface_id']) { $arp_if = "Local port"; }
 
-
     echo('<tr class="search">
         <td width="160">' . formatMac($entry['mac_address']) . '</td>
         <td width="140">' . $entry['ipv4_address'] . '</td>
-	    <td width="200" class="list-bold">' . generate_device_link($entry) . '</td>
+            <td width="200" class="list-bold">' . generate_device_link($entry) . '</td>
         <td class="list-bold">' . generate_port_link($entry, makeshortif(fixifname($entry['ifDescr']))) . ' ' . $error_img . '</td>
-	    <td width="200">'.$arp_name.'</td>
+            <td width="200">'.$arp_name.'</td>
         <td class="list-bold">'.$arp_if.'</td>
-	    </tr>');
+            </tr>');
   }
 
   unset($ignore);

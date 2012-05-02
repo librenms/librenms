@@ -70,8 +70,7 @@ if ($vars['view'] == 'minigraphs')
   echo("<div style='display: block; clear: both; margin: auto; min-height: 500px;'>");
   unset ($seperator);
 
-  ## FIX THIS. UGLY.
-
+  ## FIXME - FIX THIS. UGLY.
   foreach (dbFetchRows("select * from ports WHERE device_id = ? ORDER BY ifIndex", array($device['device_id'])) as $port)
   {
     echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
@@ -107,19 +106,18 @@ if ($vars['view'] == 'minigraphs')
 
   foreach ($ports as $port)
   {
-
     if ($config['memcached']['enable'])
-{
-  $oids = array('ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors');
-  foreach($oids as $oid)
-  {
-    $port[$oid.'_rate'] = $memcache->get('port-'.$port['interface_id'].'-'.$oid.'_rate');
-    if($debug) { echo("MC[".$oid."->".$port[$oid.'_rate']."]"); }
-  }
-}
-
+    {
+      $oids = array('ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors');
+      foreach ($oids as $oid)
+      {
+        $port[$oid.'_rate'] = $memcache->get('port-'.$port['interface_id'].'-'.$oid.'_rate');
+        if ($debug) { echo("MC[".$oid."->".$port[$oid.'_rate']."]"); }
+      }
+    }
 
     include("includes/print-interface.inc.php");
+
     $i++;
   }
   echo("</table></div>");

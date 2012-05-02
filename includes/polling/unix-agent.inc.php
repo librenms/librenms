@@ -40,11 +40,11 @@ if($device['os_group'] == "unix")
       list($section, $data) = explode(">>>", $section);
       list($sa, $sb) = explode("-", $section, 2);
 
-      if($section == "apache") { $sa = "app"; $sb = "apache"; }
-      if($section == "mysql")  { $sa = "app"; $sb = "mysql"; }
-#      if($section == "drbd")   { $sa = "app"; $sb = "drbd"; }
+      if ($section == "apache") { $sa = "app"; $sb = "apache"; }
+      if ($section == "mysql")  { $sa = "app"; $sb = "mysql"; }
+#      if ($section == "drbd")   { $sa = "app"; $sb = "drbd"; }
 
-      if(!empty($sa) && !empty($sb)) 
+      if (!empty($sa) && !empty($sb))
       {
         $agent_data[$sa][$sb] = trim($data);
       } else {

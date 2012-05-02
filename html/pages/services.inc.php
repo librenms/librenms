@@ -14,7 +14,7 @@ if (!$vars['view']) { $vars['view'] = "basic"; }
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
-  if(empty($vars['view'])) { $vars['view'] = $option; }
+  if (empty($vars['view'])) { $vars['view'] = $option; }
   echo($sep);
   if ($vars['view'] == $option) { echo("<span class='pagemenu-selected'>"); }
   echo(generate_link($text, $vars, array('view'=>$option)));

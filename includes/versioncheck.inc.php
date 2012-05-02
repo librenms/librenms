@@ -19,7 +19,6 @@ $stat_serial = base64_encode(serialize($stats));
 $url = "http://www.observium.org/latest.php?i=".$stats['ports']."&d=".$stats['devices']."&stats=".$stat_serial."&v=".$config['version'];
 $dataHandle = fopen($url, r);
 
-
 if ($dataHandle)
 {
   while (!feof($dataHandle))
@@ -44,7 +43,7 @@ if ($dataHandle)
       {
         echo("Current Revision : $cur_revision\n");
 
-	if ($omnipotence > $cur_revision)
+        if ($omnipotence > $cur_revision)
         {
           echo("New Revision   : $omnipotence\n");
         }

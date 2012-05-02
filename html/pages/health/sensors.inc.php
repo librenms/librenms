@@ -31,9 +31,9 @@ foreach (dbFetchRows($sql, $param) as $sensor)
     $sensor['sensor_current'] = $memcache->get('sensor-'.$sensor['sensor_id'].'-value');
   }
 
-  if(empty($sensor['sensor_current'])) 
-  { 
-    $sensor['sensor_current'] = "NaN"; 
+  if (empty($sensor['sensor_current']))
+  {
+    $sensor['sensor_current'] = "NaN";
   } else {
     if ($sensor['sensor_current'] >= $sensor['sensor_limit']) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }
   }
