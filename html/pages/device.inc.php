@@ -217,6 +217,17 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
+    $device_pw_count = @dbFetchCell("SELECT COUNT(*) FROM `pseudowires` WHERE `device_id` = ?", array($device['device_id']));
+    if ($device_routing_count)
+    {
+      echo('<li class="' . $select['pseudowires'] . '">
+    <a href="'.generate_device_url($device, array('tab' => 'pseudowires')).'">
+      <img src="images/16/arrow_switch.png" align="absmiddle" border="0" /> Pseudowires
+    </a>
+  </li>');
+    }
+
+
     if ($_SESSION['userlevel'] >= "5" && dbFetchCell("SELECT COUNT(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"))
     {
       $discovery_links = TRUE;

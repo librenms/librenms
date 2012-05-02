@@ -32,11 +32,6 @@
 
     if (isset($entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier'])) { $ifIndex = $entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier']; }
 
-#    $ent_data  = $config['snmpget'] . " -M ".$config['mibdir']." -m ENTITY-MIB:IF-MIB -Ovqs -";
-#    $ent_data  .= $device['snmpver'] . " -M ".$config['mibdir']." -c " . $device['community'] . " " . $device['hostname'] .":".$device['port'];
-#    $ent_data .= " entAliasMappingIdentifier." . $entPhysicalIndex. ".0";
-#    $ifIndex = shell_exec($ent_data);
-
     if (!strpos($ifIndex, "fIndex") || $ifIndex == "") { unset($ifIndex);  }
     list(,$ifIndex) = explode(".", $ifIndex);
 
@@ -44,6 +39,8 @@
     {
       $entPhysicalModelName = $entPhysicalVendorTypes[$entPhysicalVendorType];
     }
+
+    ## FIXME - dbFacile
 
     if ($entPhysicalDescr || $entPhysicalName)
     {
