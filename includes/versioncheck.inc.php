@@ -42,18 +42,23 @@ if ($dataHandle)
     } else {
       if ($cur != $data)
       {
-        echo("Current Version : $cur_omnipotence.$cur_year.$cur_month.$cur_revision \n");
+        echo("Current Revision : $cur_revision\n");
 
-        if ($omnipotence > $cur_omnipotence)
+	if ($omnipotence > $cur_revision)
         {
-          echo("New version     : $omnipotence.$year.$month.$revision\n");
-        } elseif ($year > $cur_year) {
-          echo("New version     : $omnipotence.$year.$month.$revision\n");
-        } elseif ($month > $cur_month) {
-          echo("New version     : $omnipotence.$year.$month.$revision\n");
-        } elseif ($revision > $cur_revision) {
-          echo("New release     : $omnipotence.$year.$month.$revision\n");
+          echo("New Revision   : $omnipotence\n");
         }
+
+#        if ($omnipotence > $cur_omnipotence)
+#        {
+#          echo("New version     : $omnipotence.$year.$month.$revision\n");
+#        } elseif ($year > $cur_year) {
+#          echo("New version     : $omnipotence.$year.$month.$revision\n");
+#        } elseif ($month > $cur_month) {
+#          echo("New version     : $omnipotence.$year.$month.$revision\n");
+#        } elseif ($revision > $cur_revision) {
+#          echo("New release     : $omnipotence.$year.$month.$revision\n");
+#        }
       }
     }
   }
