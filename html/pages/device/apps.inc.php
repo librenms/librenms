@@ -25,7 +25,7 @@ foreach (dbFetchRows("SELECT * FROM `applications` WHERE `device_id` = ?", array
   }
   $link_add = array('app'=>$app['app_type']);
   $text = ucfirst($app['app_type']);
-  if(!empty($app['app_instance']))
+  if (!empty($app['app_instance']))
   {
     $text .= "(".$app['app_instance'].")";
     $link_add['instance'] = $app['app_id'];

@@ -13,7 +13,7 @@ if ($device['os_group'] == "cisco")
     $vtpdomains = snmpwalk_cache_oid($device, "vlanManagementDomains", array(), "CISCO-VTP-MIB");
     $vlans = snmpwalk_cache_twopart_oid($device, "vtpVlanEntry", array(), "CISCO-VTP-MIB");
 
-    foreach($vtpdomains as $vtpdomain_id => $vtpdomain)
+    foreach ($vtpdomains as $vtpdomain_id => $vtpdomain)
     {
       echo("VTP Domain  ".$vtpdomain_id." ".$vtpdomain['managementDomainName']." ");
       foreach ($vlans[$vtpdomain_id] as $vlan_id => $vlan)

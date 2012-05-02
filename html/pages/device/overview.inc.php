@@ -18,7 +18,9 @@ if ($ports['down']) { $ports_colour = $warn_colour_a; } else { $ports_colour = $
 echo("<table width=100% cellspacing=0 cellpadding=0><tr><td style='width: 50%; vertical-align: top;>");
 
 echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
+
 include("includes/dev-overview-data.inc.php");
+
 echo("</div>");
 
 include("overview/ports.inc.php");

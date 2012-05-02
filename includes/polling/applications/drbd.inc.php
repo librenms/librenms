@@ -27,9 +27,9 @@ $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-drbd-".$
   }
 
   $ds_list = array('ns','nr','dw','dr','al','bm','lo','pe','ua','ap','oos');
-  foreach($ds_list as $ds)
+  foreach ($ds_list as $ds)
   {
-    if(empty($drbd[$ds])) { $drbd[$ds] = "U"; }
+    if (empty($drbd[$ds])) { $drbd[$ds] = "U"; }
   }
 
   rrdtool_update($rrd_filename, "N:".$drbd['ns'].":".$drbd['nr'].":".$drbd['dw'].":".$drbd['dr'].":".$drbd['al'].":".$drbd['bm'].":".$drbd['lo'].":".$drbd['pe'].":".$drbd['ua'].":".$drbd['ap'].":".$drbd['oop']);

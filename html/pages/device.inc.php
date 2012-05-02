@@ -227,7 +227,6 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-
     if ($_SESSION['userlevel'] >= "5" && dbFetchCell("SELECT COUNT(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"))
     {
       $discovery_links = TRUE;

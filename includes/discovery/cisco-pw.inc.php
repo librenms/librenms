@@ -9,7 +9,7 @@ if ($config['enable_pseudowires'] && $device['os_group'] == "cisco")
 
   /// Pre-cache the existing state of pseudowires for this device from the database
   $pws_db_raw = dbFetchRows("SELECT * FROM `pseudowires` WHERE `device_id` = ?", array($device['device_id']));
-  foreach($pws_db_raw as $pw_db)
+  foreach ($pws_db_raw as $pw_db)
   {
     $device['pws_db'][$pw_db['cpwVcID']] = $pw_db['pseudowire_id'];
   }
@@ -24,8 +24,7 @@ if ($config['enable_pseudowires'] && $device['os_group'] == "cisco")
   /// For MPLS pseudowires
   $pws = snmpwalk_cache_oid($device, "cpwVcMplsPeerLdpID", $pws, "CISCO-IETF-PW-MPLS-MIB");
 
-
-  foreach($pws as $pw_id => $pw)
+  foreach ($pws as $pw_id => $pw)
   {
         list($cpw_remote_id) = explode(":", $pw['cpwVcMplsPeerLdpID']);
         $cpw_remote_device = @mysql_result(mysql_query("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '".$cpw_remote_id."' AND A.interface_id = I.interface_id"),0);
@@ -46,9 +45,9 @@ if ($config['enable_pseudowires'] && $device['os_group'] == "cisco")
   }
 
   /// Cycle the list of pseudowires we cached earlier and make sure we saw them again.
-  foreach($device['pws_db'] as $pw_id => $pseudowire_id)
+  foreach ($device['pws_db'] as $pw_id => $pseudowire_id)
   {
-    if(empty($device['pws'][$pw_id]))
+    if (empty($device['pws'][$pw_id]))
     {
       dbDelete('vlans', "`pseudowire_id` = ?", array($pseudowire_id));
     }

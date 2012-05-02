@@ -33,12 +33,11 @@ echo("memcached(".$app['app_instance'].") ");
               'connection_structures','bytes','cmd_get','cmd_set','get_hits','get_misses','evictions','bytes_read','bytes_written');
 
   $values = array();
-  foreach ($dslist as $ds) 
+  foreach ($dslist as $ds)
   {
     $values[] = isset($data[$ds]) ? $data[$ds] : -1;
   }
 
   rrdtool_update($rrd_filename, "N:".implode(":", $values));
-
 
 ?>

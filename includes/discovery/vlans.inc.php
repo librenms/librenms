@@ -4,7 +4,7 @@ echo("VLANs:\n");
 
 /// Pre-cache the existing state of VLANs for this device from the database
 $vlans_db_raw = dbFetchRows("SELECT * FROM `vlans` WHERE `device_id` = ?", array($device['device_id']));
-foreach($vlans_db_raw as $vlan_db)
+foreach ($vlans_db_raw as $vlan_db)
 {
   $vlans_db[$vlan_db['vlan_domain']][$vlan_db['vlan_vlan']] = $vlan_db;
 }
@@ -75,12 +75,11 @@ foreach ($device['vlans'] as $domain_id => $vlans)
   }
 }
 
-
-foreach($vlans_db as $domain_id => $vlans)
+foreach ($vlans_db as $domain_id => $vlans)
 {
-  foreach($vlans as $vlan_id => $vlan)
+  foreach ($vlans as $vlan_id => $vlan)
   {
-    if(empty($device['vlans'][$domain_id][$vlan_id]))
+    if (empty($device['vlans'][$domain_id][$vlan_id]))
     {
       dbDelete('vlans', "`device_id` = ? AND vlan_domain = ? AND vlan_vlan = ?", array($device['device_id'], $domain_id, $vlan_id));
     }

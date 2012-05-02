@@ -8,7 +8,7 @@ if (is_numeric($id))
   {
     $device = device_by_id_cache($mplug['device_id']);
     $title  = generate_device_link($device);
-#    if(!empty($mplug['mplug_instance']))
+#    if (!empty($mplug['mplug_instance']))
 #    {
 #      $plugfile = $config['rrd_dir']."/".$device['hostname']."/munin/".$mplug['mplug_type']."_".$mplug['mplug_instance'];
 #      $title .= " :: Plugin :: " . $mplug['mplug_type'] . " :: " . $mplug['mplug_title'];
