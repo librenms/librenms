@@ -117,14 +117,6 @@ $Observium_version = $config['version'];
 #  unset($svn);
 #}
 
-$apache_version = str_replace("Apache/", "", $_SERVER['SERVER_SOFTWARE']);
-
-$php_version = phpversion();
-
-$mysql_version = dbFetchCell("SELECT version()");
-
-$netsnmp_version = shell_exec($config['snmpget'] . " --version");
-
 print_optionbar_start(NULL);
 
 echo("
@@ -134,6 +126,7 @@ echo("
       <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
       <tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
       <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
+      <tr valign=top><td><b>RRDtool</b></td><td>$rrdtool_version</td></tr>
     </table>
 ");
 
