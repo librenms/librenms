@@ -131,7 +131,7 @@
     {
       dbDelete('packages', "`pkg_id` =  ?", array($id));
       echo("-".$pkg['text']);
-      log_event('Package removed: '.$pkg['name'].' '.$pkg['arch'].' '.$pkg['version'].'-'.$pkg['build'], $device, 'package');
+      log_event('Package removed: '.$pkg['name'].' '.$pkg['arch'].' '.$pkg['version']. ($pkg['build'] != '' ? "-".$pkg['build'] : ''), $device, 'package');
     }
 
     unset($pkg);
