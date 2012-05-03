@@ -1120,12 +1120,18 @@ if (file_exists($config['install_dir'] . '/.svn/entries'))
   } else {
     // SVN version >= 1.7
     $xml = simplexml_load_string(shell_exec($config['svn'] . ' info --xml'));
-    $svn_rev = $xml->entry->commit->attributes()->revision;
-    $svn_date = $xml->entry->commit->date;
+    if ($xml != false) {
+      $svn_rev = $xml->entry->commit->attributes()->revision;
+      $svn_date = $xml->entry->commit->date;
+    }
   }
   list($svn_year, $svn_month, $svn_day) = explode("-", $svn_date);
+}
+if (!empty($svn_rev))
+{
   $config['version'] = "0." . ($svn_year-2000) . "." . ($svn_month+0) . "." . $svn_rev;
 } else {
+  # FIXME - $config['release'] not needed
   $config['version'] = $config['version'] . "." . $config['release'];
 }
 
