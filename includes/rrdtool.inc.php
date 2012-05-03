@@ -162,7 +162,12 @@ function rrdtool($command, $filename, $options)
     $cmd .= " --daemon " . $config['rrdcached'];
   }
 
-  fwrite($rrd_pipes[0], $cmd."\n");
+  if($config['norrd'])
+  {
+    print Console_Color::convert("%g RRD Disabled %n", false);
+  } else {
+    fwrite($rrd_pipes[0], $cmd."\n");
+  }
 
   if ($debug)
   {
@@ -189,7 +194,12 @@ function rrdtool_create($filename, $options)
 {
   global $config, $debug;
 
-  $command = $config['rrdtool'] . " create $filename $options";
+  if($config['norrd'])
+  {
+    print Console_Color::convert("%g RRD Disabled %n", false);
+  } else {
+    $command = $config['rrdtool'] . " create $filename $options";
+  }
   if ($debug) { echo($command."\n"); }
 
   return shell_exec($command);

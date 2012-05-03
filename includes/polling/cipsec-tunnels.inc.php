@@ -1,5 +1,7 @@
 <?php
 
+## FIXME - seems to be broken. IPs appear with leading zeroes.
+
 $ipsec_array = snmpwalk_cache_oid($device, "cipSecTunnelEntry", array(), "CISCO-IPSEC-FLOW-MONITOR-MIB");
 $ike_array   = snmpwalk_cache_oid($device, "cikeTunnelEntry", array(), "CISCO-IPSEC-FLOW-MONITOR-MIB");
 
