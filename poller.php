@@ -22,7 +22,7 @@ include("includes/polling/functions.inc.php");
 $poller_start = utime();
 echo("Observium Poller v".$config['version']."\n\n");
 
-$options = getopt("h:m:i:n:d::a::");
+$options = getopt("h:m:i:n:d:r::a::");
 
 if ($options['h'] == "odd")      { $options['n'] = "1"; $options['i'] = "2"; }
 elseif ($options['h'] == "even") { $options['n'] = "0"; $options['i'] = "2"; }
@@ -64,6 +64,7 @@ if (!$where)
   echo("-i <instances> -n <number>                   Poll as instance <number> of <instances>\n");
   echo("                                             Instances start at 0. 0-3 for -n 4\n\n");
   echo("Debugging and testing options:\n");
+  echo("-r                                           Do not create or update RRDs\n");
   echo("-d                                           Enable debugging output\n");
   echo("-m                                           Specify module(s) to be run\n");
   echo("\n");
@@ -85,6 +86,11 @@ if (isset($options['d']))
   ini_set('display_startup_errors', 0);
   ini_set('log_errors', 0);
 #  ini_set('error_reporting', 0);
+}
+
+if (isset($options['r']))
+{
+  $config['norrd'] = TRUE;
 }
 
 rrdtool_pipe_open($rrd_process, $rrd_pipes);

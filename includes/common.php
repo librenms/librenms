@@ -287,7 +287,7 @@ function truncate($substring, $max = 50, $rep = '...')
 }
 
 function mres($string)
-{ // short function wrapper because the real one is stupidly long and ugly. aestetics.
+{ // short function wrapper because the real one is stupidly long and ugly. aesthetics.
   return mysql_real_escape_string($string);
 }
 
