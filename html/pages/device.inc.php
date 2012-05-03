@@ -218,7 +218,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     }
 
     $device_pw_count = @dbFetchCell("SELECT COUNT(*) FROM `pseudowires` WHERE `device_id` = ?", array($device['device_id']));
-    if ($device_routing_count)
+    if ($device_pw_count)
     {
       echo('<li class="' . $select['pseudowires'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'pseudowires')).'">
