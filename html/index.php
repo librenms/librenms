@@ -143,10 +143,9 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <link rel="shortcut icon" href="<?php echo($config['favicon']);  ?>" />
   <link rel="stylesheet" href="css/mktree.css" type="text/css" />
-
-  <?php
-    if ($_SESSION['widescreen']) { echo('<link rel="stylesheet" href="css/styles-wide.css" type="text/css" />'); }
-  ?>
+<?php
+if ($_SESSION['widescreen']) { echo('<link rel="stylesheet" href="css/styles-wide.css" type="text/css" />'); }
+?>
 </head>
 <body>
   <script type="text/javascript" src="js/mktree.js"></script>
@@ -154,10 +153,8 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <script type="text/javascript" src="js/jquery.min.js"></script>
   <script type="text/javascript" src="js/jquery-checkbox.js"></script>
   <script type="text/javascript" src="js/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>
-  <?php /* html5.js below from http://html5shim.googlecode.com/svn/trunk/html5.js */ ?>
-  <!--[if IE]>
-  <script src="js/html5.js"></script>
-  <![endif]-->
+<?php /* html5.js below from http://html5shim.googlecode.com/svn/trunk/html5.js */ ?>
+  <!--[if IE]><script src="js/html5.js"></script><![endif]-->
   <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="js/jqplot/excanvas.js"></script><![endif]-->
   <script language="javascript" type="text/javascript" src="js/jqplot/jquery.jqplot.min.js"></script>
   <link rel="stylesheet" type="text/css" href="js/jqplot/jquery.jqplot.min.css" />

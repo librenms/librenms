@@ -134,7 +134,7 @@ foreach (dbFetch('SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDE
       <a href="<?php echo(generate_url($vars)); ?>" title="Update the browser URL to reflect the search criteria." >Update URL</a> |
       <a href="<?php echo(generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>" title="Reset critera to default." >Reset</a>
       <br />
-      <input class="submit" type="submit" class="submit" value="Search">
+      <input type="submit" class="submit" value="Search">
       </td>
     </tr>
   </table>

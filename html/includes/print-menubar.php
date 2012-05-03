@@ -82,7 +82,7 @@ if ($_SESSION['userlevel'] >= '10')
 
        </div>
 
-       <div id="devices_chart" class="col_3" style="height: 300px";>
+       <div id="devices_chart" class="col_3" style="height: 300px">
        </div>
 
 <script class="code" type="text/javascript">
@@ -149,7 +149,7 @@ if ($_SESSION['userlevel'] >= '10')
         </ul>
         </div>
 
-       <div id="services_chart" class="col_3" style="height: 300px";>
+       <div id="services_chart" class="col_3" style="height: 300px">
        </div>
 
 <script class="code" type="text/javascript">
@@ -282,7 +282,7 @@ if ($deleted_ports) { echo('<li><a href="deleted-ports/"><img src="images/16/cro
 </ul>
           </div>
 
-          <div id="ports_chart" class="col_3" style="height: 300px";>
+          <div id="ports_chart" class="col_3" style="height: 300px">
           </div>
 
 <script class="code" type="text/javascript">
@@ -572,18 +572,17 @@ $apache_version = str_replace("Apache/", "", $_SERVER['SERVER_SOFTWARE']);
 $php_version = phpversion();
 $mysql_version = dbFetchCell("SELECT version()");
 $netsnmp_version = shell_exec($config['snmpget'] . " --version");
+$rrdtool_version = implode(" ",array_slice(explode(" ",shell_exec($config['rrdtool'] . " --version |head -n1")),1,1));
 ?>
 
             <div class="col_2">
                 <h2>Versions</h2>
-                <p>
-<?php echo("                     <table width=100% cellpadding=3 cellspacing=0 border=0>
-      <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
-      <tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
-      <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
-    </table>");
-?>
-                </p>
+                  <table width=100% cellpadding=3 cellspacing=0 border=0>
+                    <tr valign=top><td><b>Apache</b></td><td><?php echo($apache_version); ?></td></tr>
+                    <tr valign=top><td><b>PHP</b></td><td><?php echo($php_version); ?></td></tr>
+                    <tr valign=top><td><b>MySQL</b></td><td><?php echo($mysql_version); ?></td></tr>
+                    <tr valign=top><td><b>RRDtool</b></td><td><?php echo($rrdtool_version); ?></td></tr>
+                  </table>
                 <ul>
                   <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About Observium</a></li>
                 </ul>
@@ -593,7 +592,8 @@ $netsnmp_version = shell_exec($config['snmpget'] . " --version");
                 <h2>Users</h2>
 <ul>
 
-    <?php if ($_SESSION['userlevel'] >= '10') {
+    <?php if ($_SESSION['userlevel'] >= '10')
+    {
       if (auth_usermanagement())
       {
       echo('
