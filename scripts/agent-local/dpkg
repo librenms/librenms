@@ -7,12 +7,12 @@ if [ -x /usr/bin/dpkg-query ]; then
   FILE=/tmp/observium-agent-dpkg
   
   if [ ! -e $FILE ]; then
-    dpkg-query -W --showformat='${Status} ${Package} ${Version} ${Architecture} ${Installed-Size}\n'|grep "^install"|cut -d\  -f4- > $FILE
+    dpkg-query -W --showformat='${Status} ${Package} ${Version} ${Architecture} ${Installed-Size}\n'|grep " installed "|cut -d\  -f4- > $FILE
   fi
   FILEMTIME=$(stat -c %Y $FILE)
   FILEAGE=$(($DATE-$FILEMTIME))
   if [ $FILEAGE -gt 1800 ]; then
-    dpkg-query -W --showformat='${Status} ${Package} ${Version} ${Architecture} ${Installed-Size}\n'|grep "^install"|cut -d\  -f4- > $FILE
+    dpkg-query -W --showformat='${Status} ${Package} ${Version} ${Architecture} ${Installed-Size}\n'|grep " installed "|cut -d\  -f4- > $FILE
   fi
   echo "<<<dpkg>>>"
   cat $FILE
