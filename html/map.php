@@ -14,6 +14,8 @@ include_once("../includes/dbFacile.php");
 include_once("includes/functions.inc.php");
 include_once("includes/authenticate.inc.php");
 
+if (strpos($_SERVER['REQUEST_URI'], "anon")) { $anon = 1; }
+
 if (is_array($config['branding']))
 {
   if ($config['branding'][$_SERVER['SERVER_NAME']])
@@ -58,6 +60,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
         $links = dbFetch("SELECT * from ports AS I, links AS L WHERE I.device_id = ? AND L.local_interface_id = I.interface_id ORDER BY L.remote_hostname", array($device['device_id']));
         if (count($links))
         {
+	  if($anon) { $device['hostname'] = md5($device['hostname']); }
           if (!isset($locations[$device['location']])) { $locations[$device['location']] = $loc_count; $loc_count++; }
           $loc_id = $locations[$device['location']];
 
@@ -92,14 +95,17 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
             }
 
             $src = $device['hostname'];
+	    if($anon) { $src = md5($src); }
             if ($remote_interface_id)
             {
-              $dst = dbFetchCell("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.interface_id = ? AND D.device_id = I.device_id", array($remote_interface_id));
+              $dst = dbFetchCell("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.interface_id = ? AND D.device_id = I.device_id", array($remote_interface_id));      
               $dst_host = dbFetchCell("SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.interface_id = ?  AND D.device_id = I.device_id", array($remote_interface_id));
             } else {
               unset($dst_host);
               $dst = $link['remote_hostname'];
             }
+
+            if($anon) { $dst = md5($dst); $src = md5($src);}
 
             $sif = ifNameDescr(dbFetchRow("SELECT * FROM ports WHERE `interface_id` = ?", array($link['local_interface_id'])),$device);
             if ($remote_interface_id)
