@@ -24,7 +24,7 @@ foreach (dbFetchRows("SELECT * FROM `applications` WHERE `device_id` = ?", array
     #echo('<img src="images/icons/greyscale/'.$app['app_type'].'.png" class="optionicon" />');
   }
   $link_add = array('app'=>$app['app_type']);
-  $text = ucfirst($app['app_type']);
+  $text = nicecase($app['app_type']);
   if (!empty($app['app_instance']))
   {
     $text .= "(".$app['app_instance'].")";
@@ -45,8 +45,6 @@ if($vars['instance'])
 }
 
 $app = dbFetchRow("SELECT * FROM `applications` WHERE `device_id` = ? AND `app_type` = ?".$where, $where_array);
-
-#print_r($app);
 
 if (is_file("pages/device/apps/".mres($vars['app']).".inc.php"))
 {
