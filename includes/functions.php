@@ -26,8 +26,19 @@ if ($config['alerts']['email']['enable'])
 
 function nicecase($item)
 {
-  if ($item == "dbm") { return "dBm"; }
-  else return ucfirst($item);
+  switch ($item)
+  {
+    case "dbm":
+      return "dBm";
+    case "mysql":
+      return" MySQL";
+    case "powerdns":
+      return "PowerDNS";
+    case "bind":
+      return "BIND";
+    default:
+      return ucfirst($item);
+  }
 }
 
 function mac_clean_to_readable($mac)

@@ -411,7 +411,7 @@ if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0")
     $image = $config['html_dir']."/images/icons/".$row['app_type'].".png";
     $icon = (file_exists($image) ? $row['app_type'] : "apps");
 echo('
-        <li><a href="apps/app='.$app['app_type'].'/"><img src="images/icons/'.$icon.'.png" border="0" align="absmiddle" /> '.$app['app_type'].' </a></li>');
+        <li><a href="apps/app='.$app['app_type'].'/"><img src="images/icons/'.$icon.'.png" border="0" align="absmiddle" /> '.nicecase($app['app_type']).' </a></li>');
   }
 
 ?>
