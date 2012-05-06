@@ -24,7 +24,7 @@ if ($config['discover_services'])
           $tcp_port = $split_oid[count($split_oid)-6];
           if ($known_services[$tcp_port])
           {
-            add_service($device,$known_services[$tcp_port]);
+            discover_service($device,$known_services[$tcp_port]);
           }
         }
       }
