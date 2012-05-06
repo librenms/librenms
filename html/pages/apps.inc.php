@@ -28,7 +28,7 @@ foreach ($app_list as $app)
   } else {
     #echo('<img src="images/icons/greyscale/'.$app['app_type'].'.png" class="optionicon" />');
   }
-  echo(generate_link(ucfirst($app['app_type']),array('page'=>'apps','app'=>$app['app_type'])));
+  echo(generate_link(nicecase($app['app_type']),array('page'=>'apps','app'=>$app['app_type'])));
   if ($vars['app'] == $app['app_type']) { echo("</span>"); }
   $sep = " | ";
 }

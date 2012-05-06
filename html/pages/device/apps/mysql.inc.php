@@ -3,10 +3,10 @@ global $config;
 
 print_optionbar_start();
 
-echo("<span style='font-weight: bold;'>".$app['app_type']."</span> &#187; ");
+echo("<span style='font-weight: bold;'>".nicecase($app['app_type'])."</span> &#187; ");
 
 $app_sections = array('system' => "System",
-                      'queries' => "Quieries",
+                      'queries' => "Queries",
                       'innodb' => "InnoDB");
 
 unset($sep);
@@ -20,7 +20,7 @@ foreach ($app_sections as $app_section => $app_section_text)
   {
     echo("<span class='pagemenu-selected'>");
   }
-  echo(generate_link(ucfirst($app_section),$vars,array('app_section'=>$app_section)));
+  echo(generate_link(nicecase($app_section),$vars,array('app_section'=>$app_section)));
   if ($vars['app_section'] == $app_section) { echo("</span>"); }
   $sep = " | ";
 }
