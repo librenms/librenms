@@ -1107,7 +1107,7 @@ if (isset($config['enable_printers']) && $config['enable_printers'])
 # No changes below this line #
 ##############################
 
-$config['version']  = "0.11.5.2245";
+$config['version']  = "0.SVN.ERROR";
 
 if (file_exists($config['install_dir'] . '/.svn/entries'))
 {
@@ -1120,7 +1120,8 @@ if (file_exists($config['install_dir'] . '/.svn/entries'))
   } else {
     // SVN version >= 1.7
     $xml = simplexml_load_string(shell_exec($config['svn'] . ' info --xml'));
-    if ($xml != false) {
+    if ($xml != false)
+    {
       $svn_rev = $xml->entry->commit->attributes()->revision;
       $svn_date = $xml->entry->commit->date;
     }
@@ -1131,8 +1132,7 @@ if (!empty($svn_rev))
 {
   $config['version'] = "0." . ($svn_year-2000) . "." . ($svn_month+0) . "." . $svn_rev;
 } else {
-  # FIXME - $config['release'] not needed
-  $config['version'] = $config['version'] . "." . $config['release'];
+  $config['version'] = $config['version'];
 }
 
 if (isset($config['rrdgraph_def_text']))
@@ -1143,7 +1143,7 @@ if (isset($config['rrdgraph_def_text']))
 
 if (!isset($config['log_file']))
 {
-  $config['log_file']     = $config['install_dir'] . "/observium.log";
+  $config['log_file'] = $config['install_dir'] . "/observium.log";
 }
 
 if (isset($config['cdp_autocreate']))
@@ -1184,7 +1184,7 @@ if ($config['memcached']['enable'])
   else
   {
     echo("WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n");
-    echo("Try 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to do so.\n\n");
+    echo("Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n");
     $config['memcached']['enable'] = 0;
   }
 }
