@@ -38,9 +38,6 @@ $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 $config['nets'][] = "172.22.0.0/16";
 $config['nets'][] = "192.168.0.0/24";
 
-### Use the new Unix Agent (ALPHA)
-$config['poller_modules']['unix-agent']                   = 0;
-
 include("includes/static-config.php");
 
 ?>

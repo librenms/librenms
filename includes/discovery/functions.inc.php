@@ -465,13 +465,13 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
   }
 }
 
-function discover_toner(&$valid, $device, $oid, $capacity_oid, $index, $type, $descr, $capacity = NULL, $current = NULL)
+function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity_oid = NULL, $capacity = NULL, $current = NULL)
 {
   global $config, $debug;
 
-  if ($debug) { echo("$oid, $index, $type, $descr, $capacity\n"); }
+  if ($debug) { echo("$oid, $index, $type, $descr, $capacity, $capacity_oid\n"); }
 
-  if (mysql_result(mysql_query("SELECT count(toner_id) FROM `toner` WHERE device_id = '".$device['device_id']."' AND toner_type = '$type' AND `toner_index` = '$index'"),0) == '0')
+  if (mysql_result(mysql_query("SELECT count(toner_id) FROM `toner` WHERE device_id = '".$device['device_id']."' AND toner_type = '$type' AND `toner_index` = '$index' AND `toner_capacity_oid` = '$capacity_oid'"),0) == '0')
   {
     $query = "INSERT INTO toner (`device_id`, `toner_oid`, `toner_capacity_oid`, `toner_index`, `toner_type`, `toner_descr`, `toner_capacity`, `toner_current`) ";
     $query .= " VALUES ('".$device['device_id']."', '$oid', '$capacity_oid', '$index', '$type', '$descr', '$capacity', '$current')";
@@ -482,7 +482,7 @@ function discover_toner(&$valid, $device, $oid, $capacity_oid, $index, $type, $d
   else
   {
     $toner_entry = mysql_fetch_assoc(mysql_query("SELECT * FROM `toner` WHERE device_id = '".$device['device_id']."' AND toner_type = '$type' AND `toner_index` = '$index'"));
-    if ($oid == $toner_entry['toner_oid'] && $descr == $toner_entry['toner_descr'] && $capacity == $toner_entry['toner_capacity'])
+    if ($oid == $toner_entry['toner_oid'] && $descr == $toner_entry['toner_descr'] && $capacity == $toner_entry['toner_capacity'] && $capacity_oid == $toner_entry['toner_capacity_oid'])
     {
       echo(".");
     }
