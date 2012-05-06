@@ -151,9 +151,9 @@ if ($vars['subview'] == "top10")
       ".$addy['ipv4_address']." - ".$asn."
           <a href='#' onmouseover=\"return overlib('\
      <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #555555;\'>".$name." - ".$addy['ipv4_address']." - ".$asn."</div>\
-     <img src=\'graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=-2day&amp;to=$now&amp;width=450&amp;height=150\'>\
+     <img src=\'graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=-2day&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150\'>\
      ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\" >
-          <img src='graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=-2day&amp;to=$now&amp;width=213&amp;height=45'></a>
+          <img src='graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=-2day&amp;to=".$config['time']['now']."&amp;width=213&amp;height=45'></a>
 
           <span style='font-size: 10px;'>".$name."</span>
          </div>");
@@ -181,7 +181,7 @@ if ($vars['subview'] == "top10")
      $graph_array['id']     = $acc['ma_id'];
      $graph_array['height'] = "100";
      $graph_array['width']  = "216";
-     $graph_array['to']     = $now;
+     $graph_array['to']     = $config['time']['now'];
      echo('<tr bgcolor="'.$bg_colour.'"' . ($bg_image ? ' background="'.$bg_image.'"' : '') . '"><td colspan="7">');
 
      include("includes/print-graphrow.inc.php");

@@ -27,10 +27,10 @@ foreach ($ports as $port)
     $graph_array           = array();
     $graph_array['height'] = 100;
     $graph_array['width']  = 210;
-    $graph_array['to']     = $now;
+    $graph_array['to']     = $config['time']['now'];
     $graph_array['id']     = $port['interface_id'];
     $graph_array['type']   = $graph_type;
-    $graph_array['from']   = $day;
+    $graph_array['from']   = $config['time']['day'];
     $graph_array['legend'] = "no";
 
     $link_array = $graph_array;

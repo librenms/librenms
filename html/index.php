@@ -100,14 +100,6 @@ include("includes/authenticate.inc.php");
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) { $_SESSION['widescreen'] = 1; }
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=no'))  { unset($_SESSION['widescreen']); }
 
-$now = time();
-$fourhour = time() - (4 * 60 * 60);
-$day = time() - (24 * 60 * 60);
-$twoday = time() - (2 * 24 * 60 * 60);
-$week = time() - (7 * 24 * 60 * 60);
-$month = time() - (31 * 24 * 60 * 60);
-$year = time() - (365 * 24 * 60 * 60);
-
 # Load the settings for Multi-Tenancy.
 if (isset($config['branding']) && is_array($config['branding']))
 {

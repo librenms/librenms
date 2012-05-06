@@ -141,52 +141,56 @@ if ($_SESSION['userlevel'] >= '5')
 
   echo("<div style=' margin-bottom: 5px;'>");
 
-  if ($ports['peering'] && $ports['transit']) {
+  if ($ports['peering'] && $ports['transit'])
+  {
     echo("<div style='width: 235px; '>
     <a href='internet/' onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multiport_bits_duo&amp;id=".$ports['peering']."&amp;idb=".$ports['transit']."&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150\'>\
-    <img src=\'graph.php?type=multiport_bits_duo&amp;id=".$ports['peering']."&amp;idb=".$ports['transit']."&amp;from=".$week."&amp;to=".$now."&amp;width=400&amp;height=150\'>\
+    <img src=\'graph.php?type=multiport_bits_duo&amp;id=".$ports['peering']."&amp;idb=".$ports['transit']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=150\'>\
+    <img src=\'graph.php?type=multiport_bits_duo&amp;id=".$ports['peering']."&amp;idb=".$ports['transit']."&amp;from=".$config['time']['week']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Aggregate Internet Traffic</div>".
     "<img src='graph.php?type=multiport_bits_duo&amp;id=".$ports['peering']."&amp;idb=".$ports['transit'].
-    "&amp;from=".$day."&amp;to=".$now."&amp;width=385&amp;height=100&amp;legend=no'></a></div>");
+    "&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=385&amp;height=100&amp;legend=no'></a></div>");
   }
 
   echo("</div>");
 
   echo("<div style=' margin-bottom: 5px;'>");
 
-  if ($ports['transit']) {
+  if ($ports['transit'])
+  {
     echo("<div style='width: 235px; float: left;'>
     <a href='iftype/transit/' onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['transit']."&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150\'>\
-    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['transit']."&amp;from=".$week."&amp;to=".$now."&amp;width=400&amp;height=150\'>\
+    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['transit']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=150\'>\
+    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['transit']."&amp;from=".$config['time']['week']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Internet Transit</div>".
     "<img src='graph.php?type=multiport_bits&amp;id=".$ports['transit'].
-    "&amp;from=".$day."&amp;to=".$now."&amp;width=155&amp;height=100&amp;legend=no'></a></div>");
+    "&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=155&amp;height=100&amp;legend=no'></a></div>");
   }
 
-  if ($ports['peering']) {
+  if ($ports['peering'])
+  {
     echo("<div style='width: 235px; float: right;'>
     <a href='iftype/peering/' onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['peering']."&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150\'>\
-    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['peering']."&amp;from=".$week."&amp;to=".$now."&amp;width=400&amp;height=150\'>\
+    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['peering']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=150\'>\
+    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['peering']."&amp;from=".$config['time']['week']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Internet Peering</div>".
     "<img src='graph.php?type=multiport_bits&amp;id=".$ports['peering'].
-    "&amp;from=".$day."&amp;to=".$now."&amp;width=155&amp;height=100&amp;legend=no'></a></div>");
+    "&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=155&amp;height=100&amp;legend=no'></a></div>");
   }
 
-  if ($ports['core']) {
+  if ($ports['core'])
+  {
     echo("<div style='width: 235px;'>
     <a href='iftype/core/' onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['core']."&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150\'>\
-    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['core']."&amp;from=".$week."&amp;to=".$now."&amp;width=400&amp;height=150\'>\
+    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['core']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=150\'>\
+    <img src=\'graph.php?type=multiport_bits&amp;id=".$ports['core']."&amp;from=".$config['time']['week']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Core Traffic</div>".
     "<img src='graph.php?type=multiport_bits&amp;id=".$ports['core'].
-    "&amp;from=".$day."&amp;to=".$now."&amp;width=385&amp;height=100&amp;legend=no'></a></div>");
+    "&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=385&amp;height=100&amp;legend=no'></a></div>");
   }
 
   echo("</div>");

@@ -2,7 +2,7 @@
 
 $graph_array['height'] = "100";
 $graph_array['width']  = "218";
-$graph_array['to']     = $now;
+$graph_array['to']     = $config['time']['now'];
 $graph_array['from']        = $config['time']['day'];
 $graph_array_zoom           = $graph_array;
 $graph_array_zoom['height'] = "150";

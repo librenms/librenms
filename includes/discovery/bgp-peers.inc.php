@@ -1,5 +1,7 @@
 <?php
 
+global $debug;
+
 if ($config['enable_bgp'])
 {
   ### Discover BGP peers
@@ -113,21 +115,24 @@ if ($config['enable_bgp'])
           $safis[1] = "unicast";
           $safis[2] = "multicast";
 
-          if (!isset($peerIndexes))
+          if (!isset($j_peerIndexes))
           {
             $j_bgp = snmpwalk_cache_multi_oid($device, "jnxBgpM2PeerTable", $jbgp, "BGP4-V2-MIB-JUNIPER", $config['install_dir']."/mibs/junos");
+
             foreach ($j_bgp as $index => $entry)
             {
               switch ($entry['jnxBgpM2PeerRemoteAddrType'])
               {
                 case 'ipv4':
                   $ip = long2ip(hexdec($entry['jnxBgpM2PeerRemoteAddr']));
+                  if ($debug) { echo("peerindex for ipv4 $ip is " . $entry['jnxBgpM2PeerIndex'] . "\n"); }
                   $j_peerIndexes[$ip] = $entry['jnxBgpM2PeerIndex'];
                   break;
                 case 'ipv6':
                   $ip6 = trim(str_replace(' ','',$entry['jnxBgpM2PeerRemoteAddr']),'"');
                   $ip6 = substr($ip6,0,4) . ':' . substr($ip6,4,4) . ':' . substr($ip6,8,4) . ':' . substr($ip6,12,4) . ':' . substr($ip6,16,4) . ':' . substr($ip6,20,4) . ':' . substr($ip6,24,4) . ':' . substr($ip6,28,4);
                   $ip6 = Net_IPv6::compress($ip6);
+                  if ($debug) { echo("peerindex for ipv6 $ip6 is " . $entry['jnxBgpM2PeerIndex'] . "\n"); }
                   $j_peerIndexes[$ip6] = $entry['jnxBgpM2PeerIndex'];
                   break;
                 default:
@@ -146,7 +151,7 @@ if ($config['enable_bgp'])
               $j_afisafi[$index][] = $afisafi;
             }
           }
-
+          
           foreach ($j_afisafi[$j_peerIndexes[$peer['ip']]] as $afisafi)
           {
             list ($afi,$safi) = explode('.',$afisafi); $safi = $safis[$safi];
