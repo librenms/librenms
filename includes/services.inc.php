@@ -1,16 +1,15 @@
 <?php
 
-## FIXME who wrote this? so ugly :)
-# Not me! -TL
-
-function add_service($device, $service)
+function discover_service($device, $service)
 {
+  if (! dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?", array($service, $device['device_id'])))
+  {
+    add_service($device, $service, "(Auto discovered) $service");
+    log_event("Autodiscovered service: type " . mres($service), $device, 'service');
+    echo("+");
+  }
+
   echo("$service ");
-
-  $insert = array('device_id' => $device['device_id'], 'service_ip' => $device['hostname'], 'service_type' => $service,
-                  'service_desc' => "auto discovered: $service", 'service_param' => "", 'service_ignore' => "0");
-
-  return dbInsert($insert, 'services');
 }
 
 ?>

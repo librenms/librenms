@@ -525,4 +525,12 @@ function is_valid_hostname($hostname)
   return ctype_alnum(str_replace('_','',str_replace('-','',str_replace('.','',$hostname))));
 }
 
+function add_service($device, $service, $descr)
+{
+  $insert = array('device_id' => $device['device_id'], 'service_ip' => $device['hostname'], 'service_type' => $service,
+                  'service_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $descr, 'service_param' => "", 'service_ignore' => "0");
+
+  echo dbInsert($insert, 'services');
+}
+
 ?>
