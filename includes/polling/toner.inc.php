@@ -8,9 +8,8 @@ if ($config['enable_printers'])
   {
     echo("Checking toner " . $toner['toner_descr'] . "... ");
 
+    $toner['toner_capacity'] = snmp_get($device, $toner['toner_capacity_oid'], "-OUqnv");
     $tonerperc = round(snmp_get($device, $toner['toner_oid'], "-OUqnv") / $toner['toner_capacity'] * 100);
-    # FIXME also repoll capacity, or tonerperc can be incorrect; then line below can go too
-    if ($tonerperc > 100) { $tonerperc = 100; } # ^
 
     $old_tonerrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_descr'] . ".rrd");
     $tonerrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_index'] . ".rrd");
