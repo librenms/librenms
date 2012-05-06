@@ -118,7 +118,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
             if ($where == "")
             {
-              if (!$ifdone[$dst][$dif['interface_id']])
+              if (!$ifdone[$dst][$dif['interface_id']] && !$ifdone[$src][$sif['interface_id']])
               {
                 $map .= "\"$src\" -> \"" . $dst . "\" [weight=500000, arrowsize=0, len=0];\n";
               }
