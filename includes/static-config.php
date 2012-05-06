@@ -1131,8 +1131,6 @@ if (file_exists($config['install_dir'] . '/.svn/entries'))
 if (!empty($svn_rev))
 {
   $config['version'] = "0." . ($svn_year-2000) . "." . ($svn_month+0) . "." . $svn_rev;
-} else {
-  $config['version'] = $config['version'];
 }
 
 if (isset($config['rrdgraph_def_text']))
