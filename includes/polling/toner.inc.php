@@ -8,7 +8,10 @@ if ($config['enable_printers'])
   {
     echo("Checking toner " . $toner['toner_descr'] . "... ");
 
-    $toner['toner_capacity'] = snmp_get($device, $toner['toner_capacity_oid'], "-OUqnv");
+    if ($toner['toner_capacity_oid']) # FIXME this if can go on 1-Sep-2012
+    {
+      $toner['toner_capacity'] = snmp_get($device, $toner['toner_capacity_oid'], "-OUqnv");
+    }
     $tonerperc = round(snmp_get($device, $toner['toner_oid'], "-OUqnv") / $toner['toner_capacity'] * 100);
 
     $old_tonerrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_descr'] . ".rrd");
