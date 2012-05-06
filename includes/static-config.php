@@ -1191,15 +1191,6 @@ if ($config['memcached']['enable'])
 
 # Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 
-## Please remove these where found replacing with $config['time']
-
-$now = time();
-$day = time() - (24 * 60 * 60);
-$twoday = time() - (2 * 24 * 60 * 60);
-$week = time() - (7 * 24 * 60 * 60);
-$month = time() - (31 * 24 * 60 * 60);
-$year = time() - (365 * 24 * 60 * 60);
-
 $config['time']['now']        = time();
 $config['time']['fourhour']   = time() - (4 * 60 * 60);
 $config['time']['sixhour']    = time() - (6 * 60 * 60);

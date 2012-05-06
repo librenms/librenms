@@ -100,8 +100,8 @@ if($_GET['optb'] == "all" ) {
           case 'errors':
             $port['width'] = "130";
             $port['height'] = "30";
-            $port['from'] = $day;
-            $port['to'] = $now;
+            $port['from'] = $config['time']['day'];
+            $port['to'] = $config['time']['now'];
             $port['bg'] = "#".$bg;
             $port['graph_type'] = "port_".$_GET['optc'];
             echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;

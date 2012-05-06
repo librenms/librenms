@@ -56,7 +56,7 @@ if (!$auth)
   $graph_array['height'] = "60";
   $graph_array['width']  = $thumb_width;
   $graph_array['legend'] = "no";
-  $graph_array['to']     = $now;
+  $graph_array['to']     = $config['time']['now'];
 
   print_optionbar_start();
   echo($title);

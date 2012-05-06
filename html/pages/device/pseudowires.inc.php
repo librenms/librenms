@@ -58,8 +58,8 @@ foreach (dbFetchRows("SELECT * FROM pseudowires AS P, ports AS I WHERE P.interfa
       {
         $pw_a['width'] = "150";
         $pw_a['height'] = "30";
-        $pw_a['from'] = $day;
-        $pw_a['to'] = $now;
+        $pw_a['from'] = $config['time']['day'];
+        $pw_a['to'] = $config['time']['now'];
         $pw_a['bg'] = $bg;
         $types = array('bits','upkts','errors');
         foreach ($types as $graph_type)
@@ -74,8 +74,8 @@ foreach (dbFetchRows("SELECT * FROM pseudowires AS P, ports AS I WHERE P.interfa
       {
         $pw_b['width'] = "150";
         $pw_b['height'] = "30";
-        $pw_b['from'] = $day;
-        $pw_b['to'] = $now;
+        $pw_b['from'] = $config['time']['day'];
+        $pw_b['to'] = $config['time']['now'];
         $pw_b['bg'] = $bg;
         $types = array('bits','upkts','errors');
         foreach ($types as $graph_type)

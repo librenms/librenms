@@ -78,9 +78,9 @@ if ($vars['view'] == 'minigraphs')
     <a href=\"" . generate_port_url($port) . "\" onmouseover=\"return overlib('\
     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
     ".$port['ifAlias']." \
-    <img src=\'graph.php?type=".$graph_type."&amp;id=".$port['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=450&amp;height=150\'>\
+    <img src=\'graph.php?type=".$graph_type."&amp;id=".$port['interface_id']."&amp;from=".$from."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
-    "<img src='graph.php?type=".$graph_type."&amp;id=".$port['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=180&amp;height=45&amp;legend=no'>
+    "<img src='graph.php?type=".$graph_type."&amp;id=".$port['interface_id']."&amp;from=".$from."&amp;to=".$config['time']['now']."&amp;width=180&amp;height=45&amp;legend=no'>
     </a>
     <div style='font-size: 9px;'>".truncate(short_port_descr($port['ifAlias']), 32, '')."</div>
     </div>");

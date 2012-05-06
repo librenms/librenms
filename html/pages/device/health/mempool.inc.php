@@ -7,6 +7,8 @@ echo("<table width=100% cellpadding=6 cellspacing=0>");
 
 $i = '1';
 
+#FIXME css alternating colours
+
 foreach (dbFetchRows("SELECT * FROM `mempools` WHERE device_id = ?", array($device['device_id'])) as $mempool)
 {
   if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
@@ -14,10 +16,10 @@ foreach (dbFetchRows("SELECT * FROM `mempools` WHERE device_id = ?", array($devi
   $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
   $mempool_url   = "device/".$device['device_id']."/health/mempool/";
-  $mini_url = "graph.php?id=".$mempool['mempool_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
+  $mini_url = "graph.php?id=".$mempool['mempool_id']."&amp;type=".$graph_type."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 
   $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
-  $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['mempool_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";
+  $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['mempool_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['month']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=125\'>";
   $mempool_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
   $total = formatStorage($mempool['mempool_total']);

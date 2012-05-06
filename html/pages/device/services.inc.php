@@ -34,7 +34,7 @@ if (dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE device_id = ?", 
        {
          $graph_array['height'] = "100";
          $graph_array['width']  = "210";
-         $graph_array['to']     = $now;
+         $graph_array['to']     = $config['time']['now'];
          $graph_array['id']     = $service['service_id'];
          $graph_array['type']   = "service_availability";
 

@@ -53,12 +53,12 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry)
       $graph_array           = array();
       $graph_array['height'] = "100";
       $graph_array['width']  = "210";
-      $graph_array['to']     = $now;
+      $graph_array['to']     = $config['time']['now'];
       $graph_array['id']     = $device['device_id'];
       $graph_array['mod']    = $index;
       $graph_array['chan']   = $subindex;
       $graph_array['type']   = "c6kxbar_util";
-      $graph_array['from']   = $day;
+      $graph_array['from']   = $config['time']['day'];
       $graph_array['legend'] = "no";
 
       $link_array = $graph_array;

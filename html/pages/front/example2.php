@@ -143,28 +143,28 @@ if ($_SESSION['userlevel'] >= '5')
   if ($ports['transit'])
   {
     echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&amp;ports=".$ports['transit'].
-    "&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
+    "&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>Internet Transit</div>".
     "<img src='graph.php?type=multi_bits&amp;ports=".$ports['transit'].
-    "&amp;from=".$day."&amp;to=".$now."&amp;width=200&amp;height=100'></a>");
+    "&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=200&amp;height=100'></a>");
   }
 
   if ($ports['l2tp'])
   {
     echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&amp;ports=".$ports['l2tp'].
-    "&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
+    "&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>L2TP ADSL</div>".
     "<img src='graph.php?type=multi_bits&amp;ports=".$ports['l2tp'].
-    "&amp;from=".$day."&amp;to=".$now."&amp;width=200&amp;height=100'></a>");
+    "&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=200&amp;height=100'></a>");
   }
 
   if ($ports['voip'])
   {
     echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&amp;ports=".$ports['voip'].
-    "&amp;from=".$day."&amp;to=".$now."&amp;width=400&amp;height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
+    "&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>VoIP to PSTN</div>".
     "<img src='graph.php?type=multi_bits&amp;ports=".$ports['voip'].
-    "&amp;from=".$day."&amp;to=".$now."&amp;width=200&amp;height=100'></a>");
+    "&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=200&amp;height=100'></a>");
   }
 
 }
