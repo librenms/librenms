@@ -36,7 +36,7 @@ if ($config['enable_printers'])
             $current       = $current / $capacity * 100;
             $type          = "jetdirect";
             if (isHexString($descr)) { $descr = snmp_hexstring($descr); }
-            discover_toner($valid_toner,$device, $toner_oid, $index, $type, $descr, $capacity, $current);
+            discover_toner($valid_toner,$device, $toner_oid, $capacity_oid, $index, $type, $descr, $capacity, $current);
           }
         }
       }
