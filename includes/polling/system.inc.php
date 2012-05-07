@@ -20,7 +20,7 @@
   $poll_device['sysObjectID'] = snmp_get($device, "sysObjectID.0", "-Oqvn", "SNMPv2-MIB");
   $poll_device['sysName'] = strtolower($poll_device['sysName']);
 
-  if(!empty($agent_data['uptime'])) { list($uptime) = explode(" ", $agent_data['uptime']); $uptime = round($uptime); echo("Using UNIX Agent Uptime ($uptime)\n");}
+  if (!empty($agent_data['uptime'])) { list($uptime) = explode(" ", $agent_data['uptime']); $uptime = round($uptime); echo("Using UNIX Agent Uptime ($uptime)\n");}
 
   if (empty($uptime))
   {

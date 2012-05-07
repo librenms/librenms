@@ -151,7 +151,7 @@ if ($config['enable_bgp'])
               $j_afisafi[$index][] = $afisafi;
             }
           }
-          
+
           foreach ($j_afisafi[$j_peerIndexes[$peer['ip']]] as $afisafi)
           {
             list ($afi,$safi) = explode('.',$afisafi); $safi = $safis[$safi];
