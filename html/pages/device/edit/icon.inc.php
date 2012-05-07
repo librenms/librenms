@@ -60,7 +60,6 @@ for ($i = 0;$i < count($config['os'][$device['os']]['icons']);$i++)
   echo('<input name="icon" type="radio" value="' . $icon . '"' . ($device['icon'] == $icon ? ' checked="1"' : '') . ' /></td>' . "\n");
 }
 
-
 if ($numicons %10 == 0)
 {
   echo("          </tr>\n");

@@ -28,7 +28,7 @@ if ($_SESSION['userlevel'] < '7')
   }
 
   $panes['ipmi']     = 'IPMI';
-  
+
   print_optionbar_start();
 
   unset($sep);

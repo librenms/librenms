@@ -32,7 +32,7 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
   if ($oids != "")
   {
     $oids = explode("\n", $oids);
-  
+
     foreach ($oids as $oid)
     {
       /*
@@ -51,27 +51,27 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
        *  VMWARE-VMINFO-MIB::vmwVmCpus.224 = INTEGER: 2
        *  VMWARE-VMINFO-MIB::vmwVmCpus.416 = INTEGER: 2
        */
-  
+
       $vmwVmDisplayName = snmp_get($device, "VMWARE-VMINFO-MIB::vmwVmDisplayName." . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
       $vmwVmGuestOS   = snmp_get($device, "VMWARE-VMINFO-MIB::vmwVmGuestOS."   . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
       $vmwVmMemSize   = snmp_get($device, "VMWARE-VMINFO-MIB::vmwVmMemSize."   . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
       $vmwVmState     = snmp_get($device, "VMWARE-VMINFO-MIB::vmwVmState."     . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
       $vmwVmCpus    = snmp_get($device, "VMWARE-VMINFO-MIB::vmwVmCpus."    . $oid, "-Osqnv", "+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB", "+" . $config["install_dir"] . "/mibs/vmware:" . $config["install_dir"] . "/mibs");
-  
+
       /*
        * VMware does not return an INTEGER but a STRING of the vmwVmMemSize. This bug
        * might be resolved by VMware in the future making this code obsolete.
        */
-  
+
       if (preg_match("/^([0-9]+) .*$/", $vmwVmMemSize, $matches))
       {
         $vmwVmMemSize = $matches[1];
       }
-  
+
       /*
        * Check whether the Virtual Machine is already known for this host.
        */
-  
+
       if (mysql_result(mysql_query("SELECT COUNT(id) FROM vminfo WHERE device_id = '" . $device["device_id"] . "' AND vmwVmVMID = '" . $oid . "' AND vm_type='vmware'"), 0) == 0)
       {
         mysql_query("INSERT INTO vminfo (device_id, vm_type, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState) VALUES (" . $device["device_id"] . ",'vmware', " . $oid . ", '" . mres($vmwVmDisplayName) . "', '" . mres($vmwVmGuestOS) . "', " . $vmwVmMemSize . ", " . $vmwVmCpus . ", '" . mres($vmwVmState) . "')");
@@ -81,15 +81,15 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
         echo(".");
       }
       # FIXME update code!
-  
+
       /*
        * Save the discovered Virtual Machine.
        */
-  
+
       $vmw_vmlist[] = $oid;
     }
   }
-  
+
   /*
    * Get a list of all the known Virtual Machines for this host.
    */
@@ -113,8 +113,8 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
   /*
    * Finished discovering VMware information.
    */
-  
+
   echo("\n");
 }
-  
+
 ?>
