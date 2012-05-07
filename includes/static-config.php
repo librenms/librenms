@@ -671,6 +671,7 @@ $config['os'][$os]['over'][0]['text']   = "Temperature";
 $config['os'][$os]['over'][1]['graph']  = "device_humidity";
 $config['os'][$os]['over'][1]['text']   = "Humidity";
 $config['os'][$os]['icon']              = "carel";
+$config['os'][$os]['icons'][]           = "uniflair";
 
 $os = "netvision";
 $config['os'][$os]['text']              = "Socomec Net Vision";

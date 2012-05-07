@@ -1,5 +1,7 @@
 <?php
 
+global $debug;
+
 if ($config['enable_printers'])
 {
   $valid_toner = array();

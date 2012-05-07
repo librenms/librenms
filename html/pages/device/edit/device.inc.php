@@ -6,11 +6,6 @@ if ($_POST['editing'])
   {
     $updated = 0;
 
-    $descr = mres($_POST['descr']);
-    $ignore = mres($_POST['ignore']);
-    $type = mres($_POST['type']);
-    $disabled = mres($_POST['disabled']);
-
     $override_sysLocation_bool = mres($_POST['override_sysLocation']);
     if (isset($_POST['sysLocation'])) { $override_sysLocation_string = mres($_POST['sysLocation']); }
 

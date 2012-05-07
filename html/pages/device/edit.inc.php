@@ -12,6 +12,12 @@ if ($_SESSION['userlevel'] < '7')
   $panes['device']   = 'Device Settings';
   $panes['snmp']     = 'SNMP';
   $panes['ports']    = 'Port Settings';
+
+  if (count($config['os'][$device['os']]['icons']))
+  {
+    $panes['icon']  = 'Icon';
+  }
+
   $panes['apps']     = 'Applications';
   $panes['alerts']   = 'Alerts';
   $panes['modules']  = 'Modules';
@@ -22,7 +28,7 @@ if ($_SESSION['userlevel'] < '7')
   }
 
   $panes['ipmi']     = 'IPMI';
-
+  
   print_optionbar_start();
 
   unset($sep);
