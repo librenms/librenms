@@ -42,6 +42,7 @@ if($device['os_group'] == "unix")
 
       if ($section == "apache") { $sa = "app"; $sb = "apache"; }
       if ($section == "mysql")  { $sa = "app"; $sb = "mysql"; }
+      if ($section == "nginx")  { $sa = "app"; $sb = "nginx"; }
 #      if ($section == "drbd")   { $sa = "app"; $sb = "drbd"; }
 
       if (!empty($sa) && !empty($sb))
