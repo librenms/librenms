@@ -5,10 +5,7 @@ if (!empty($agent_data['app']['nginx']))
   $nginx = $agent_data['app']['nginx'];
 } else {
   # Polls nginx statistics from script via SNMP
-  $nginx_cmd  = $config['snmpget'] ." -m NET-SNMP-EXTEND-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
-  $nginx_cmd .= " nsExtendOutputFull.5.110.103.105.110.120";
-
-  $nginx  = shell_exec($nginx_cmd);
+  $nginx = snmp_get($device, "nsExtendOutputFull.5.110.103.105.110.120", "-Ovq", "NET-SNMP-EXTEND-MIB");
 }
 
 $nginx_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-nginx-".$app['app_id'].".rrd";
@@ -28,5 +25,14 @@ if (!is_file($nginx_rrd))
 
 print "active: $active reading: $reading writing: $writing waiting: $waiting Requests: $req";
 rrdtool_update($nginx_rrd, "N:$req:$active:$reading:$writing:$waiting");
+
+/// Unset the variables we set here
+
+unset($nginx); 
+unset($nginx_rrd); 
+unset($active); 
+unset($reading); 
+unset($writing); 
+unset($req);
 
 ?>
