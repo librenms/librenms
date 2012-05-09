@@ -44,7 +44,7 @@ function generate_overlib_content($graph_array, $text)
 {
     global $config;
 
-    $overlib_content = '<div style="width: 580px;"><span style="font-weight: bold; font-size: 16px;">'.$text."</span><br />";
+    $overlib_content = '<div style="width: 590px;"><span style="font-weight: bold; font-size: 16px;">'.$text."</span><br />";
     foreach (array('day','week','month','year') as $period)
     {
       $graph_array['from']        = $config['time'][$period];

@@ -1,8 +1,8 @@
 <?php
 
-$graph_array['height'] = "100";
-$graph_array['width']  = "218";
-$graph_array['to']     = $config['time']['now'];
+$graph_array['height']      = "100";
+$graph_array['width']  	    = "218";
+$graph_array['to']          = $config['time']['now'];
 $graph_array['from']        = $config['time']['day'];
 $graph_array_zoom           = $graph_array;
 $graph_array_zoom['height'] = "150";
@@ -30,15 +30,21 @@ foreach ($app_list as $app)
     $link_array['tab'] = "apps";
     $link_array['app']  = $app['app_type'];
     unset($link_array['height'], $link_array['width']);
-    $link = generate_url($link_array);
+    $overlib_url = generate_url($link_array);
 
-    $overlib_link    = generate_device_link($app_device, shorthost($app_device['hostname']), array('tab'=>'apps','app'=>$app['app_type']))."<br/>";
+    $overlib_link    = '<span style="float:left; margin-left: 10px; font-weight: bold;">'.shorthost($app_device['hostname'])."</span>";
+    if(!empty($app_device['app_instance']))
+    {
+      $overlib_link  .= '<span style="float:right; margin-right: 10px; font-weight: bold;">'.$app_device['app_instance']."</span>";
+      $app_device['content_add']   = '('.$app_device['app_instance'].')';
+    }
+    $overlib_link   .= "<br/>";
     $overlib_link   .= generate_graph_tag($graph_array);
-    $overlib_content = generate_overlib_content($graph_array, $port['hostname'] . " - " . $port['label']);
+    $overlib_content = generate_overlib_content($graph_array, $app_device['hostname'] . " - ". $app_device['app_type'] . $app_device['content_add']);
 
-    echo("<div style='display: block; padding: 1px; margin: 2px; min-width: ".$width_div."px; max-width:".$width_div."px; min-height:180px; max-height:180px;
+    echo("<div style='display: block; padding: 1px; padding-top: 3px; margin: 2px; min-width: ".$width_div."px; max-width:".$width_div."px; min-height:165px; max-height:165px;
                       text-align: center; float: left; background-color: #f5f5f5;'>");
-    echo(overlib_link($link, $overlib_link, $overlib_content));
+    echo(overlib_link($overlib_url, $overlib_link, $overlib_content));
     echo("</div>");
   }
   echo('</div>');
