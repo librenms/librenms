@@ -19,7 +19,7 @@ foreach (dbFetchRows("SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
 
     $graph_array['height'] = "20";
     $graph_array['width']  = "100";
-    $graph_array['to']     = ".$config['time']['now'].";
+    $graph_array['to']     = $config['time']['now'];
     $graph_array['id']     = $proc_id;
     $graph_array['type']   = 'processor_usage';
     $graph_array['from']     = $config['time']['day'];
