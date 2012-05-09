@@ -13,8 +13,8 @@ if (is_file($agent_rrd))
 
 $ds = "time";
 
-$colour_area = "CDEB8B";
-$colour_line = "006600";
+$colour_area = "EEEEEE";
+$colour_line = "36393D";
 
 $colour_area_max = "FFEE99";
 
