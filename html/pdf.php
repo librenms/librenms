@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage billing
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 if (strpos($_SERVER['REQUEST_URI'], "debug"))
 {
     $debug = "1";
@@ -22,6 +34,7 @@ $report   = (isset($_GET['report']) ? $_GET['report'] : "");
 
 include("../includes/defaults.inc.php");
 include("../config.php");
+include_once("../includes/definitions.inc.php");
 include("../includes/functions.php");
 include("includes/functions.inc.php");
 include("includes/authenticate.inc.php");

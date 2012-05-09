@@ -15,11 +15,4 @@ $graph_max = 1;
 
 $unit_text = "Prefixes";
 
-if($config['old_graphs'])
-{
-  include("includes/graphs/old_generic_simplex.inc.php");
-} else {
-  include("includes/graphs/generic_simplex.inc.php");
-}
-
 ?>

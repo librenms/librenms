@@ -9,6 +9,7 @@ $descr = substr(str_pad(short_hrDeviceDescr($proc['processor_descr']), 28),0,28)
 $descr = str_replace(":", "\:", $descr);
 
 $colour_line = "cc0000";
+$colour_area = "FFBBBB";
 $colour_minmax = "c5c5c5";
 
 $graph_max = 1;

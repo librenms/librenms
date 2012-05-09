@@ -6,7 +6,7 @@ $rrd_filename   = $config['rrd_dir'] . "/" . $device['hostname'] . "/ucd_ssRawIn
 
 $ds = "value";
 
-$colour_area = "CC9999";
+$colour_area = "EEBBBB";
 $colour_line = "CC0000";
 
 $colour_area_max = "cc9999";

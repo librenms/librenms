@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage webinterface
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
 
@@ -13,6 +25,7 @@ if ($_GET[debug])
 
 include("../includes/defaults.inc.php");
 include("../config.php");
+include_once("../includes/definitions.inc.php");
 include("includes/functions.inc.php");
 include("../includes/functions.php");
 include("includes/authenticate.inc.php");

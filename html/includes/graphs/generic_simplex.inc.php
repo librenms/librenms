@@ -1,5 +1,13 @@
 <?php
 
+
+if($config['old_graphs'])
+{
+  include("includes/graphs/old_generic_simplex.inc.php");
+} else {
+
+
+
 /// Draw generic bits graph
 /// args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, percentile
 
@@ -11,8 +19,10 @@ $line_text = str_pad(truncate($line_text,12,''),12);
 if ($multiplier)
 {
   $rrd_options .= " DEF:".$ds."_o=".$rrd_filename.":".$ds.":AVERAGE";
+  if($config['oldrrd']) {}
   $rrd_options .= " DEF:".$ds."_max_o=".$rrd_filename.":".$ds.":MAX";
   $rrd_options .= " DEF:".$ds."_min_o=".$rrd_filename.":".$ds.":MIN";
+
   $rrd_options .= " CDEF:".$ds."=".$ds."_o,$multiplier,*";
   $rrd_options .= " CDEF:".$ds."_max=".$ds."_max_o,$multiplier,*";
   $rrd_options .= " CDEF:".$ds."_min=".$ds."_min_o,$multiplier,*";
@@ -107,6 +117,10 @@ if ($percentile)
 if($_GET['previous'] == "yes")
 {
   $rrd_options .= " LINE1.25:".$ds."X#666666:'Prev \\\\n'";
+  $rrd_options .= " AREA:".$ds."X#99999966:";
+
+}
+
 }
 
 ?>

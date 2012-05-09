@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage map
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('log_errors', 1);
@@ -9,6 +21,7 @@ $links = 1;
 
 include_once("../includes/defaults.inc.php");
 include_once("../config.php");
+include_once("../includes/definitions.inc.php");
 include_once("../includes/functions.php");
 include_once("../includes/dbFacile.php");
 include_once("includes/functions.inc.php");

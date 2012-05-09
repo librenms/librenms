@@ -1,10 +1,23 @@
 #!/usr/bin/env php
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage services
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 chdir(dirname($argv[0]));
 
 include("includes/defaults.inc.php");
 include("config.php");
+include("includes/definitions.inc.php");
 include("includes/functions.php");
 
 foreach (dbFetchRows("SELECT * FROM `devices` AS D, `services` AS S WHERE S.device_id = D.device_id ORDER by D.device_id DESC") as $service)

@@ -1,15 +1,22 @@
 <?php
-/*
-	Originally part of m0n0wall (http://m0n0.ch/wall)
 
-	Copyright (C) 2004-2006 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>
-	and Jonathan Watt <jwatt@jwatt.org>.
-	All rights reserved.
-
-*/
+/**
+ * Observium
+ *
+ *   This file is included with Observium. It was originally part of m0n0wall <http://www.m0n0.ch/wall/>
+ *
+ * @package    observium
+ * @subpackage graphing
+ * @author     T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
+ * @copyright  2004-2006 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
+ * @license    BSD
+ *
+ */
 
 include_once("../includes/defaults.inc.php");
 include_once("../config.php");
+include_once("../includes/definitions.inc.php");
+
 include_once("../includes/common.php");
 include_once("../includes/dbFacile.php");
 include_once("../includes/rewrites.php");
