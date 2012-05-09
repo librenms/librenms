@@ -1,6 +1,17 @@
 #!/usr/bin/env php
-
 <?php
+
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage ircbot
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
 
 chdir(dirname($argv[0]));
 
@@ -9,6 +20,7 @@ error_reporting(0);
 
 include_once("includes/defaults.inc.php");
 include_once("config.php");
+include("includes/definitions.inc.php");
 include_once("includes/functions.php");
 include_once("includes/discovery/functions.inc.php");
 include_once('Net/SmartIRC.php');

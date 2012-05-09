@@ -1,6 +1,18 @@
 #!/usr/bin/env php
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage snmptraps
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('log_errors', 1);
@@ -8,6 +20,7 @@ ini_set('error_reporting', E_ALL);
 
 include("includes/defaults.inc.php");
 include("config.php");
+include("includes/definitions.inc.php");
 include("includes/functions.php");
 
 $entry = explode(",", $argv[1]);

@@ -9,13 +9,13 @@
  * @package    observium
  * @subpackage syslog
  * @author     Adam Armstrong <adama@memetic.org>
- * @copyright  (C) 2006 - 2011 Adam Armstrong
- * @license    http://gnu.org/copyleft/gpl.html GNU GPL
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
  *
  */
 
 include("includes/defaults.inc.php");
 include("config.php");
+include("includes/definitions.inc.php");
 include("includes/syslog.php");
 include("includes/dbFacile.php");
 include("includes/common.php");

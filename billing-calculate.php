@@ -1,12 +1,23 @@
 #!/usr/bin/env php
 <?php
 
-#$debug=1;
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage billing
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
 
 chdir(dirname($argv[0]));
 
 include("includes/defaults.inc.php");
 include("config.php");
+include("includes/definitions.inc.php");
 include("includes/functions.php");
 
 $options = getopt("r");

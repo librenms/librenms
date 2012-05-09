@@ -1,8 +1,21 @@
 #!/usr/bin/env php
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage discovery
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 include("includes/defaults.inc.php");
 include("config.php");
+include("includes/definitions.inc.php");
 include("includes/functions.php");
 
 $handle = fopen("ips.txt", "w");

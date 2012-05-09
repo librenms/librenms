@@ -1,7 +1,20 @@
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage webinterface
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 include("../includes/defaults.inc.php");
 include("../config.php");
+include_once("../includes/definitions.inc.php");
 include("../includes/functions.php");
 include("includes/functions.inc.php");
 

@@ -1,9 +1,22 @@
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage webinterface
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 ## FIXME - fewer includes!
 
 include_once("../includes/defaults.inc.php");
 include_once("../config.php");
+include_once("../includes/definitions.inc.php");
 include_once("../includes/common.php");
 include_once("../includes/dbFacile.php");
 include_once("../includes/rewrites.php");

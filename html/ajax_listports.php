@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage ajax
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 if ($_GET['debug'])
 {
   ini_set('display_errors', 1);
@@ -11,6 +23,7 @@ if ($_GET['debug'])
 
 include_once("../includes/defaults.inc.php");
 include_once("../config.php");
+include_once("../includes/definitions.inc.php");
 include_once("includes/functions.inc.php");
 include_once("../includes/dbFacile.php");
 include_once("../includes/common.php");
