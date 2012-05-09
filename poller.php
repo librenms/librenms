@@ -24,7 +24,7 @@ include("includes/polling/functions.inc.php");
 $poller_start = utime();
 echo("Observium Poller v".$config['version']."\n\n");
 
-$options = getopt("h:m:i:n:d:r::a::");
+$options = getopt("h:m:i:n:r:d::a::");
 
 if ($options['h'] == "odd")      { $options['n'] = "1"; $options['i'] = "2"; }
 elseif ($options['h'] == "even") { $options['n'] = "0"; $options['i'] = "2"; }
@@ -73,6 +73,8 @@ if (!$where)
   echo("No polling type specified!\n");
   exit;
 }
+
+print_r($options);
 
 if (isset($options['d']))
 {

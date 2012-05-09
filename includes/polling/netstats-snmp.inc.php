@@ -24,8 +24,7 @@ if ($device['os'] != "Snom")
 
   $data_array = snmpwalk_cache_oid($device, "snmp", array(), "SNMPv2-MIB");
 
-  $rrdupdate = "N";
-
+  $rrdupdate = array();
   foreach ($oids as $oid)
   {
     if (is_numeric($data_array[0][$oid]))
@@ -34,7 +33,7 @@ if ($device['os'] != "Snom")
     } else {
       $value = "U";
     }
-    $rrdupdate .= ":$value";
+    $rrdupdate[] = $value;
   }
 
   if (isset($data_array[0]['snmpInPkts']) && isset($data_array[0]['snmpOutPkts']))

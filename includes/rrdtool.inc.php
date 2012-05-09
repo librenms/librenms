@@ -32,8 +32,6 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
 
   $command = $config['rrdtool'] . " -";
 
-#  $command = "/usr/bin/php /home/observium/dev/testpipe.php";
-
   $descriptorspec = array(
      0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
      1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
@@ -168,7 +166,6 @@ function rrdtool($command, $filename, $options)
   } else {
     fwrite($rrd_pipes[0], $cmd."\n");
   }
-
   if ($debug)
   {
     echo stream_get_contents($rrd_pipes[1]);
@@ -209,6 +206,18 @@ function rrdtool_create($filename, $options)
 
 function rrdtool_update($filename, $options)
 {
+  /// Do some sanitisation on the data if passed as an array.
+  if(is_array($options))
+  {
+    $values[] = "N";
+    foreach($options as $value)
+    {
+      if(!is_numeric($value)) { $value = U; }
+      $values[] = $value;
+    }
+    $options = implode(':', $values);
+  }
+
   return rrdtool("update", $filename, $options);
 }
 
