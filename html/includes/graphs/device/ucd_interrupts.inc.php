@@ -1,7 +1,5 @@
 <?php
 
-include("includes/graphs/common.inc.php");
-
 $rrd_filename   = $config['rrd_dir'] . "/" . $device['hostname'] . "/ucd_ssRawInterrupts.rrd";
 
 $ds = "value";
@@ -11,8 +9,8 @@ $colour_line = "CC0000";
 
 $colour_area_max = "cc9999";
 
-$graph_max = 1;
-$graph_min = 0;
+#$graph_max = 1;
+$scale_min = 0;
 
 $unit_text = "Interrupts/s";
 
