@@ -1,30 +1,21 @@
 <?php
 
-$device = device_by_id_cache($id);
-
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/netstats-snmp.rrd";
 
-$stats = array('snmpInPkts',
-               'snmpOutPkts');
+$ds_in = "snmpInPkts";
+$ds_out = "snmpOutPkts";
 
-$i=0;
-foreach ($stats as $stat)
-{
-  $i++;
-  $rrd_list[$i]['filename'] = $rrd_filename;
-  $rrd_list[$i]['descr'] = str_replace("snmp", "", $stat);
-  $rrd_list[$i]['ds'] = $stat;
-  if (strpos($stat, "Out") !== FALSE)
-  {
-    $rrd_list[$i]['invert'] = TRUE;
-  }
-}
+$colour_area_in = "AA66AA";
+$colour_line_in = "330033";
+$colour_area_out = "FFDD88";
+$colour_line_out = "FF6600";
 
-$colours='mixed';
+$colour_area_in_max = "cc88cc";
+$colour_area_out_max = "FFefaa";
 
-$nototal = 1;
-$simple_rrd = TRUE;
+$graph_max = 1;
+$unit_text = "Packets";
 
-include("includes/graphs/generic_multi_line.inc.php");
+include("includes/graphs/generic_duplex.inc.php");
 
 ?>
