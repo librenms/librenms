@@ -1,5 +1,8 @@
 <?php
 
+// If anybody has again the idea to implement the PHP internal library calls,
+// be aware that it was tried and banned by lead dev Adam
+
 function string_to_oid($string)
 {
   $oid = strlen($string);
@@ -33,7 +36,9 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
     $device['transport'] = "udp";
   }
 
-  $cmd = $config['snmpget'] . " -" . $device['snmpver'] . " -c " . $device['community'] . " ";
+  $cmd  = $config['snmpget']; 
+  $cmd .= snmp_gen_auth ($device);
+
   if ($options) { $cmd .= " " . $options; }
   if ($mib) { $cmd .= " -m " . $mib; }
   if ($mibdir) { $cmd .= " -M " . $mibdir; } else { $cmd .= " -M ".$config['mibdir']; }
@@ -41,20 +46,16 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
 
-  $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oids;
+  $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port'];
+  $cmd .= " ".$oids;
   if (!$debug) { $cmd .= " 2>/dev/null"; }
   $data = trim(external_exec($cmd));
   $runtime_stats['snmpget']++;
   foreach (explode("\n", $data) as $entry)
   {
-    list($oid,$value) = explode("=", $entry);
-    $oid = trim($oid); $value = trim($value);
-    list($oid, $index) = explode(".", $oid);
-    if (!strstr($value, "at this OID") && isset($oid) && isset($index))
-    {
-      $array[$index][$oid] = $value;
-    }
+    $array[$index][$oid] = $value;
   }
+
   return $array;
 }
 
@@ -87,20 +88,24 @@ function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
     echo("Please report this to the Observium team.");
   }
 
-  $cmd = $config['snmpget'] . " -" . $device['snmpver'] . " -c " . $device['community'] . " ";
+  $cmd  = $config['snmpget']; 
+  $cmd .= snmp_gen_auth ($device);
 
   if ($options) { $cmd .= " " . $options; }
   if ($mib) { $cmd .= " -m " . $mib; }
-  if ($mibdir) { $cmd .= " -M " . $mibdir; } else { $cmd .= " -M ".$config['mibdir']; }
+  if ($mibdir) { $cmd .= " -M " . $mibdir; } 
+    else { $cmd .= " -M ".$config['mibdir']; }
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
-
-  $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oid;
+  $cmd .= " " . $device['transport'].":".$device['hostname'].":".$device['port'];
+  $cmd .= " " . $oid;
+     
   if (!$debug) { $cmd .= " 2>/dev/null"; }
   $data = trim(external_exec($cmd));
 
   $runtime_stats['snmpget']++;
-  if (is_string($data) && (preg_match("/No Such Instance/i", $data) || preg_match("/No Such Object/i", $data) || preg_match("/No more variables left/i", $data)))
+
+  if (is_string($data) && (preg_match("/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i", $data)))
   {
     return false;
   }
@@ -139,8 +144,11 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   {
     $snmpcommand = $config['snmpbulkwalk'];
   }
+  
+  $cmd = $snmpcommand;
 
-  $cmd = $snmpcommand . " -" . $device['snmpver'] . " -c " . $device['community'] . " ";
+  $cmd .= snmp_gen_auth ($device);
+
   if ($options) { $cmd .= " $options "; }
   if ($mib) { $cmd .= " -m $mib"; }
   if ($mibdir) { $cmd .= " -M " . $mibdir; } else { $cmd .= " -M ".$config['mibdir']; }
@@ -200,7 +208,10 @@ function snmpwalk_cache_cip($device, $oid, $array, $mib = 0)
     $snmpcommand = $config['snmpbulkwalk'];
   }
 
-  $cmd = $snmpcommand . " -O snQ -" . $device['snmpver'] . " -c " . $device['community'] . " ";
+  $cmd = $snmpcommand;
+  $cmd .= snmp_gen_auth ($device);
+
+  $cmd .= " -O snQ"; 
   if ($mib) { $cmd .= " -m $mib"; }
   $cmd .= " -M ".$config['install_dir']."/mibs";
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
@@ -266,8 +277,11 @@ function snmp_cache_ifIndex($device)
     $snmpcommand = $config['snmpbulkwalk'];
   }
 
-  $cmd = $snmpcommand . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " ";
-  $cmd .= " -M ".$config['install_dir']."/mibs";
+  $cmd = $snmpcommand;
+  $cmd .= snmp_gen_auth ($device);
+
+  $cmd .= " -O Qs"; 
+  $cmd .= " -M " . $config['install_dir']."/mibs";
   $cmd .= " -m IF-MIB ifIndex";
 
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
@@ -408,7 +422,11 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
   {
     $snmpcommand = $config['snmpbulkwalk'];
   }
-  $cmd = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " ";
+
+  $cmd = $snmpcommand;
+  $cmd .= snmp_gen_auth ($device);
+
+  $cmd .= " -O QUs";
   $cmd .= " -M ".$config['install_dir']."/mibs";
   if ($mib) { $cmd .= " -m $mib"; }
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
@@ -465,7 +483,10 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
     $snmpcommand = $config['snmpbulkwalk'];
   }
 
-  $cmd = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " ";
+  $cmd = $snmpcommand;
+  $cmd .= snmp_gen_auth ($device);
+
+  $cmd .= " -O QUs";
   $cmd .= " -M ".$config['install_dir']."/mibs";
   if ($mib) { $cmd .= " -m $mib"; }
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
@@ -522,7 +543,10 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0)
     $snmpcommand = $config['snmpbulkwalk'];
   }
 
-  $cmd = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " ";
+  $cmd = $snmpcommand;
+  $cmd .= snmp_gen_auth ($device);
+
+  $cmd .= " -O QUs"; 
   if ($mib) { $cmd .= " -m $mib"; }
   $cmd .= " -M ".$config['install_dir']."/mibs";
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
@@ -581,7 +605,10 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0)
     $string .= " $oid.$port";
   }
 
-  $cmd = $config['snmpget'] . " -O vq -" . $device['snmpver'] . " -c " . $device['community'] . " ";
+  $cmd = $config['snmpget'];
+  $cmd .= snmp_gen_auth ($device);
+
+  $cmd .= " -O vq"; 
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
   $cmd .= " -M ".$config['install_dir']."/mibs";
@@ -627,7 +654,10 @@ function snmp_cache_portIfIndex($device, $array)
     $device['transport'] = "udp";
   }
 
-  $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " ";
+  $cmd = $config['snmpwalk'];
+  $cmd .= snmp_gen_auth ($device);
+
+  $cmd .= " -CI -m CISCO-STACK-MIB -O q"; 
   $cmd .= " -M ".$config['install_dir']."/mibs";
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
@@ -671,7 +701,10 @@ function snmp_cache_portName($device, $array)
     $device['transport'] = "udp";
   }
 
-  $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " ";
+  $cmd = $config['snmpwalk'];
+  $cmd .= snmp_gen_auth ($device);
+
+  $cmd .= " -CI -m CISCO-STACK-MIB -O Qs"; 
   $cmd .= " -M ".$config['install_dir']."/mibs";
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
@@ -694,6 +727,55 @@ function snmp_cache_portName($device, $array)
   }
 
   return $array;
+}
+
+function snmp_gen_auth (&$device)
+{
+  global $debug;
+
+  $cmd = "";
+
+  if ($device['snmpver'] === "v3")
+  {
+    $cmd = " -v3 -n \"\" -l " . $device['authlevel'];
+
+    if ($device['authlevel'] === "noAuthNoPriv")
+    {
+      // We have to provide a username anyway (see Net-SNMP doc)
+      $cmd .= " -u observium";
+    }
+    elseif ($device['authlevel'] === "authNoPriv")
+    {
+      $cmd .= " -a " . $device['authalgo'];
+      $cmd .= " -A \"" . $device['authpass'] . "\"";
+      $cmd .= " -u " . $device['authname'];
+    }
+    elseif ($device['authlevel'] === "authPriv")
+    {
+      $cmd .= " -a " . $device['authalgo'];
+      $cmd .= " -A \"" . $device['authpass'] . "\"";
+      $cmd .= " -u " . $device['authname'];
+      $cmd .= " -x " . $device['cryptoalgo'];
+      $cmd .= " -X \"" . $device['cryptopass'] . "\"";
+    }
+    else
+    {
+      if ($debug) { print "DEBUG: " . $device['snmpver'] ." : Unsupported SNMPv3 AuthLevel (wtf have you done ?)\n"; }
+    }
+  }
+  elseif ($device['snmpver'] === "v2c" or $device['snmpver'] === "v1")
+  {
+    $cmd  = " -" . $device['snmpver'];
+    $cmd .= " -c " . $device['community'];
+  }
+  else
+  {
+    if ($debug) { print "DEBUG: " . $device['snmpver'] ." : Unsupported SNMP Version (wtf have you done ?)\n"; }
+  }
+
+  if ($debug) { print "DEBUG: SNMP Auth options = $cmd\n"; }
+
+  return $cmd;
 }
 
 ?>

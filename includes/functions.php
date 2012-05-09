@@ -191,7 +191,7 @@ function delete_device($id)
   return $ret;
 }
 
-function addHost($host, $snmpver = 'v2c', $port = '161', $transport = 'udp')
+function addHost($host, $snmpver, $port = '161', $transport = 'udp')
 {
   global $config;
 
@@ -206,25 +206,76 @@ function addHost($host, $snmpver = 'v2c', $port = '161', $transport = 'udp')
       if (isPingable($host))
       {
         $added = 0;
-        /// try each community from config
-        foreach ($config['snmp']['community'] as $community)
+
+        if (empty($snmpver))
         {
-          $device = deviceArray($host, $community, $snmpver, $port, $transport);
-          if (isSNMPable($device))
+          // Try SNMPv2c
+          $snmpver = 'v2c';
+          if (!addHost($host, $snmpver))
           {
-            print_message("Trying community $community");
-            $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-            if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host)))
+            //Try SNMPv3
+            $snmpver = 'v3';
+            if (!addHost($host, $snmpver))
             {
-              $device_id = createHost ($host, $community, $snmpver, $port, $transport);
-              return $device_id;
-            } else {
-              print_error("Given hostname does not match SNMP-read hostname ($snmphost)!");
+              // Try SNMPv1
+              $snmpver = 'v1';
+              if (!addHost($host, $snmpver))
+              {
+                return 0;
+              }
             }
-          } else {
-            print_error("No reply on community $community using $snmpver");
           }
         }
+
+        if ($snmpver === "v3")
+        {
+          // Try each set of parameters from config
+          foreach ($config['snmp']['v3'] as $v3)
+          {
+            $device = deviceArray($host, NULL, $snmpver, $port, $transport, $v3);
+            print_message("Trying v3 parameters " . $v3['authname'] . "/" .  $v3['authlevel'] . " ... ");
+            if (isSNMPable($device))
+            {
+              $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+              if (empty($snmphost) or ($snmphost == $host || $hostshort = $host))
+              {
+                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3);
+                return $device_id;
+              } else {
+                print_error("Given hostname does not match SNMP-read hostname ($snmphost)!");
+              }
+            } else {
+              print_error("No reply on credentials " . $v3['authname'] . "/" .  $v3['authlevel'] . " using $snmpver");
+            }
+          }
+        }
+        elseif ($snmpver === "v2c" or $snmpver === "v1")
+        {
+          /// try each community from config
+          foreach ($config['snmp']['community'] as $community)
+          {
+            $device = deviceArray($host, $community, $snmpver, $port, $transport, NULL);
+            print_message("Trying community $community ...");
+            if (isSNMPable($device))
+            {
+              $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+              if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host)))
+              {
+                $device_id = createHost ($host, $community, $snmpver, $port, $transport);
+                return $device_id;
+              } else {
+                print_error("Given hostname does not match SNMP-read hostname ($snmphost)!");
+              }
+            } else {
+              print_error("No reply on community $community using $snmpver");
+            }
+          }
+        }
+        else
+        {
+          print_error("Unsupported SNMP Version \"$snmpver\".");
+        }
+
         if (!$device_id)
         {
           /// Failed SNMP
@@ -238,7 +289,9 @@ function addHost($host, $snmpver = 'v2c', $port = '161', $transport = 'udp')
       print_error("Could not resolve $host"); }
   } else {
     /// found in database
-    print_error("Already got host $host"); }
+    print_error("Already got host $host"); 
+  }
+  return 0;
 }
 
 function scanUDP($host, $port, $timeout)
@@ -257,14 +310,27 @@ function scanUDP($host, $port, $timeout)
   } else { fclose($handle); return 0; }
 }
 
-function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp')
+function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3)
 {
   $device = array();
   $device['hostname'] = $host;
   $device['port'] = $port;
-  $device['community'] = $community;
-  $device['snmpver'] = $snmpver;
   $device['transport'] = $transport;
+
+  $device['snmpver'] = $snmpver;
+  if ($snmpver === "v2c" or $snmpver === "v1")
+  {
+    $device['community'] = $community;
+  }
+  elseif ($snmpver === "v3")
+  {
+    $device['authlevel']  = $v3['authlevel'];
+    $device['authname']   = $v3['authname'];
+    $device['authpass']   = $v3['authpass'];
+    $device['authalgo']   = $v3['authalgo'];
+    $device['cryptopass'] = $v3['cryptopass'];
+    $device['cryptoalgo'] = $v3['cryptoalgo'];
+  }
 
   return $device;
 }
@@ -358,7 +424,7 @@ function utime()
   return $sec + $usec;
 }
 
-function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
+function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array())
 {
   $host = trim(strtolower($host));
 
@@ -368,7 +434,10 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
                   'port' => $port,
                   'transport' => $transport,
                   'status' => '1',
-                  'snmpver' => $snmpver);
+                  'snmpver' => $snmpver
+            );
+
+  $device = array_merge($device, $v3);
 
   $device['os'] = getHostOS($device);
 

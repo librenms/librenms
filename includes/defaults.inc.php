@@ -111,8 +111,21 @@ $config['ports_page_default']      = "details"; ## eg "details" or "basic"
 ### SNMP Settings - Timeouts/Retries disabled as default
 #$config['snmp']['timeout'] = 1;            # timeout in seconds
 #$config['snmp']['retries'] = 5;            # how many times to retry the query
-$config['snmp']['community'][0] = "public"; # Communities to try during adding hosts and discovery
 $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
+
+$config['snmp']['version'] = "v2c";         # Default version to use
+
+# SNMPv1/2c default settings
+$config['snmp']['community'][0] = "public"; # Communities to try during adding hosts and discovery
+
+# SNMPv3 default settings
+# The array can be expanded to give another set of parameters
+$config['snmp']['v3'][0]['authlevel'] = "noAuthNoPriv";  # noAuthNoPriv | authNoPriv | authPriv
+$config['snmp']['v3'][0]['authname'] = "observium";      # User Name (required even for noAuthNoPriv)
+$config['snmp']['v3'][0]['authpass'] = "";               # Auth Passphrase
+$config['snmp']['v3'][0]['authalgo'] = "MD5";            # MD5 | SHA1
+$config['snmp']['v3'][0]['cryptopass'] = "";             # Privacy (Encryption) Passphrase
+$config['snmp']['v3'][0]['cryptoalgo'] = "AES";          # AES | DES
 
 ### RRD Format Settings
 ### These should not normally be changed
