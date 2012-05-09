@@ -6,7 +6,7 @@ if ($_GET['width'])   { $width  = mres($_GET['width']);  }
 if($config['trim_tobias']) { $width+=12; }
 if ($_GET['height'])  { $height = mres($_GET['height']); }
 if ($_GET['inverse']) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
-if ($_GET['legend'] == "no")  { $rrd_options = " -g"; }
+if ($_GET['legend'] == "no")  { $rrd_options .= " -g"; }
 
 if ($_GET['title'] == "yes")  { $rrd_options .= " --title='".$graph_title."' "; }
 if (isset($_GET['graph_title']))  { $rrd_options .= " --title='".$_GET['graph_title']."' "; }
