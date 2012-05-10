@@ -310,6 +310,15 @@ $config['os'][$os]['text']              = "ZTE ZXR10";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "zte";
 
+## Supermicro Switch
+
+$os = "supermicro-switch";
+$config['os'][$os]['group']             = "supermicro";
+$config['os'][$os]['text']              = "Supermicro Switch";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "supermicro";
+$config['os'][$os]['ifname']            = 1;
+
 # Juniper
 
 $os = "junos";
