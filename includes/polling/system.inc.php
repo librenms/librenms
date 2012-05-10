@@ -14,7 +14,6 @@
   unset($poll_device);
 
   $snmpdata = snmp_get_multi($device, "sysUpTime.0 sysLocation.0 sysContact.0 sysName.0", "-OQUs", "SNMPv2-MIB");
-  print_r($snmpdata);
   $poll_device = $snmpdata[0];
 
   $poll_device['sysDescr'] = snmp_get($device, "sysDescr.0", "-Oqv", "SNMPv2-MIB");
