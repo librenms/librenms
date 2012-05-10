@@ -15,7 +15,9 @@ if (!isset($debug))
 {
   # Not called from within discovery, let's load up the necessary stuff.
 
+  include("includes/defaults.inc.php");
   include("config.php");
+  include("includes/definitions.inc.php");
   include("includes/functions.php");
 
   $options = getopt("d");
