@@ -1,7 +1,5 @@
 <?php
 
-include("includes/graphs/common.inc.php");
-
 $scale_min = "0";
 
 $ds = "AcceptedPrefixes";
