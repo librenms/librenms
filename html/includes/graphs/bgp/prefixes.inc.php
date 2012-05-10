@@ -15,4 +15,6 @@ $graph_max = 1;
 
 $unit_text = "Prefixes";
 
+include("includes/graphs/generic_simplex.inc.php");
+
 ?>
