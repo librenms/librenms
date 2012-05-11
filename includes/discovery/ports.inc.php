@@ -4,65 +4,63 @@
 
 echo("Ports : ");
 
+/// Loop database and build a little cache to reduce db hits.
+foreach(dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($device['device_id'])) as $port)
+{
+  $ports_db[$port['ifIndex']] = $port;
+  $ports_l[$port['ifIndex']] = $port['interface_id'];
+}
+
+#print_r($ports_db);
+
 $ports = array();
 $ports = snmpwalk_cache_oid($device, "ifDescr", $ports, "IF-MIB");
-#$ports = snmpwalk_cache_oid($device, "ifName", $ports, "IF-MIB");
-#$ports = snmpwalk_cache_oid($device, "ifType", $ports, "IF-MIB");
+$ports = snmpwalk_cache_oid($device, "ifName", $ports, "IF-MIB");
+$ports = snmpwalk_cache_oid($device, "ifType", $ports, "IF-MIB");
 
-$interface_ignored = 0;
-$interface_added   = 0;
-
+### New interface detection
 foreach ($ports as $ifIndex => $port)
 {
+  /// Check the port against our filters.
   if (is_port_valid($port, $device))
   {
-    if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $port['ifDescr'], $matches)) { $port['ifDescr'] = $matches[1]; }
-    $port['ifDescr'] = fixifName($port['ifDescr']);
-    if ($debug) echo("\n $if ");
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0')
+    if (!is_array($ports_db[$ifIndex]))
     {
-      mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','".mres($port['ifDescr'])."')");
-      # Add Interface
-      echo("+");
+      $interface_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
+      echo("Adding: ".$port['ifName']."(".$ifIndex.")(".$ports_db[$port['ifIndex']]['interface_id'].")");
+    } elseif ($ports_db[$ifIndex]['deleted'] == "1") {
+      dbUpdate(array('deleted' => '0'), 'ports', '`interface_id` = ?', array($ports_db[$ifIndex]['interface_id']));
+      $ports_db[$ifIndex]['deleted'] = "0";
+      echo("U");
     } else {
-      mysql_query("UPDATE `ports` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
-      echo(".");
+      echo (".");
     }
-    $int_exists[] = "$ifIndex";
+    /// We've seen it. Remove it from the cache.
+    unset($ports_l[$ifIndex]);
   } else {
-    # Ignored Interface
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0')
-    {
-      mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
-      # Delete Interface
-      echo("-"); ## Deleted Interface
-    } else {
-      echo("X"); ## Ignored Interface
+    if (is_array($ports_db[$port['ifIndex']])) {
+      if ($ports_db[$port['ifIndex']]['deleted'] != "1")
+      {
+        dbUpdate(array('deleted' => '1'), 'ports', '`interface_id` = ?', array($ports_db[$ifIndex]['interface_id']));
+        $ports_db[$ifIndex]['deleted'] = "1";
+      }
     }
+    echo("X");
   }
 }
+### End New interface detection
 
-$sql = "SELECT * FROM `ports` WHERE `device_id`  = '".$device['device_id']."' AND `deleted` = '0'";
-$query = mysql_query($sql);
+### If it's in our $ports_l list, that means it's not been seen. Mark it deleted.
 
-while ($test_if = mysql_fetch_assoc($query))
+foreach($ports_l as $ifIndex => $port_id)
 {
-  unset($exists);
-  $i = 0;
-  while ($i < count($int_exists) && !isset($exists))
+  if($ports_db[$ifIndex]['deleted'] == "0")
   {
-    $this_if = $test_if['ifIndex'];
-    if ($int_exists[$i] == $this_if) { $exists = 1; }
-    $i++;
-  }
-  if (!$exists)
-  {
-    echo("-");
-    mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE interface_id = '" . $test_if['interface_id'] . "'");
+    dbUpdate(array('deleted' => '1'), 'ports', '`interface_id` = ?', array($port_id));
+    echo("-".$ifIndex);
   }
 }
 
-unset($temp_exists);
 echo("\n");
 
 ?>

@@ -132,6 +132,7 @@ foreach ($port_stats as $ifIndex => $port)
 {
   if (is_port_valid($port, $device))
   {
+    echo("valid");
     if (!is_array($ports[$port['ifIndex']]))
     {
       $interface_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
