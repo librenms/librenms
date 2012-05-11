@@ -4,7 +4,7 @@
 
 include("../includes/billing.php");
 
-if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || bill_permitted($_GET['id'])))
+if (is_numeric($_GET['id']) && ($auth || bill_permitted($_GET['id'])))
 {
   $bill     = dbFetchRow("SELECT * FROM `bills` WHERE bill_id = ?", array($_GET['id']));
 

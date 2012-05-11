@@ -1,6 +1,6 @@
 <?php
 
-if ($config['allow_unauth_graphs'] || device_permitted($device['device_id']))
+if ($auth || device_permitted($device['device_id']))
 {
   $title = generate_device_link($device);
   $graph_title = $device['hostname'];

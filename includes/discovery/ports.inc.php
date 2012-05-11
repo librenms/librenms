@@ -14,7 +14,6 @@ $interface_added   = 0;
 
 foreach ($ports as $ifIndex => $port)
 {
-
   if (is_port_valid($port, $device))
   {
     if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $port['ifDescr'], $matches)) { $port['ifDescr'] = $matches[1]; }

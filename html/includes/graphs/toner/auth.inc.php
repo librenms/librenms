@@ -4,7 +4,7 @@ if (is_numeric($vars['id']))
 {
   $toner = dbFetchRow("SELECT * FROM `toner` WHERE `toner_id` = ?", array($vars['id']));
 
-  if (is_numeric($toner['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($toner['device_id'])))
+  if (is_numeric($toner['device_id']) && ($auth || device_permitted($toner['device_id'])))
   {
     $device = device_by_id_cache($toner['device_id']);
     $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_index'] . ".rrd");

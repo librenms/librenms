@@ -4,7 +4,7 @@ $auth = TRUE;
 
 foreach (explode(",", $vars['id']) as $ifid)
 {
-  if (!$config['allow_unauth_graphs'] && !port_permitted($ifid))
+  if (!$auth && !port_permitted($ifid))
   $auth = FALSE;
 }
 

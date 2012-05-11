@@ -1,12 +1,5 @@
 <?php
 
-function data_uri($file, $mime)
-{
-  $contents = filevars_contents($file);
-  $base64   = base64_encode($contents);
-  return ('data:' . $mime . ';base64,' . $base64);
-}
-
 // Push $_GET into $vars to be compatible with web interface naming
 
 foreach ($_GET as $name => $value)
@@ -47,13 +40,20 @@ $subtype = $graphtype['subtype'];
 
 if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php"))
 {
+
+  if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs']) 
+  {
+    $auth = "1"; ## hardcode auth for all with config function
+  }
+
   if (isset($config['allow_unauth_graphs_cidr']) && count($config['allow_unauth_graphs_cidr']) > 0)
   {
     foreach ($config['allow_unauth_graphs_cidr'] as $range)
     {
       if (Net_IPv4::ipInNetwork($_SERVER['REMOTE_ADDR'], $range))
       {
-        $auth = "1";
+        $auth = "1"; 
+        if($debug) { echo("matched $range"); }
         break;
       }
     }
