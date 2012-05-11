@@ -1,6 +1,5 @@
 <?php
 
-$device = device_by_id_cache($id);
 
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/netstats-udp.rrd";
 

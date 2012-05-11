@@ -1,8 +1,8 @@
 <?php
 
-if (is_numeric($id))
+if (is_numeric($vars['id']))
 {
-  $service = dbFetchRow("SELECT * FROM services WHERE service_id = ?", array($id));
+  $service = dbFetchRow("SELECT * FROM services WHERE service_id = ?", array($vars['id']));
 
   if (is_numeric($service['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($service['device_id'])))
   {

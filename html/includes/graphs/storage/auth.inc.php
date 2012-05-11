@@ -1,8 +1,8 @@
 <?php
 
-if (is_numeric($id))
+if (is_numeric($vars['id']))
 {
-  $storage = dbFetchRow("SELECT * FROM `storage` WHERE `storage_id` = ?", array($id));
+  $storage = dbFetchRow("SELECT * FROM `storage` WHERE `storage_id` = ?", array($vars['id']));
 
   if (is_numeric($storage['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($storage['device_id'])))
   {

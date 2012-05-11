@@ -2,8 +2,6 @@
 
 include("includes/graphs/common.inc.php");
 
-$device = device_by_id_cache($id);
-
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/ipSystemStats-ipv4.rrd";
 
 $rrd_options .= " DEF:ipInDelivers=$rrd_filename:InDelivers:AVERAGE";

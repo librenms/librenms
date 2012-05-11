@@ -4,7 +4,6 @@ $scale_min = "0";
 
 include("includes/graphs/common.inc.php");
 
-$device = device_by_id_cache($id);
 
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";
 

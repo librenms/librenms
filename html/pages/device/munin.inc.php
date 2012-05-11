@@ -5,7 +5,7 @@
 
 $link_array = array('page'    => 'device',
                     'device'  => $device['device_id'],
-                    'tab' => 'graphs');
+                    'tab' => 'munin');
 
 $bg="#ffffff";
 
@@ -13,17 +13,18 @@ echo('<div style="clear: both;">');
 
 print_optionbar_start();
 
-echo("<span style='font-weight: bold;'>Graphs</span> &#187; ");
+echo("<span style='font-weight: bold;'>Munin</span> &#187; ");
 
 $sep = "";
 
-foreach (dbFetchRows("SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph", array($device['device_id'])) as $graph)
+foreach (dbFetchRows("SELECT * FROM munin_plugins WHERE device_id = ? ORDER BY mplug_category, mplug_type", array($device['device_id'])) as $mplug)
 {
-  $section = $config['graph_types']['device'][$graph['graph']]['section'];
-  $graph_enable[$section][$graph['graph']] = $graph['graph'];
+#  if (strlen($mplug['mplug_category']) == 0) { $mplug['mplug_category'] = "general"; } else {  }
+  $graph_enable[$mplug['mplug_category']][$mplug['mplug_type']]['id'] = $mplug['mplug_id'];
+  $graph_enable[$mplug['mplug_category']][$mplug['mplug_type']]['title'] = $mplug['mplug_title'];
+  $graph_enable[$mplug['mplug_category']][$mplug['mplug_type']]['plugin'] = $mplug['mplug_type'];
 }
 
-#foreach ($config['graph_sections'] as $section)
 foreach ($graph_enable as $section => $nothing)
 {
   if (isset($graph_enable) && is_array($graph_enable[$section]))
@@ -55,8 +56,17 @@ foreach ($graph_enable as $graph => $entry)
   $graph_array = array();
   if ($graph_enable[$graph])
   {
-    $graph_title = $config['graph_types']['device'][$graph]['descr'];
-    $graph_array['type'] = "device_" . $graph;
+    if (!empty($entry['plugin']))
+    {
+      $graph_title = $entry['title'];
+      $graph_array['type'] = "munin_graph";
+      $graph_array['device'] = $device['device_id'];
+      $graph_array['plugin'] = $entry['plugin'];
+    } else {
+      $graph_title = $config['graph_types']['device'][$graph]['descr'];
+      $graph_array['type'] = "device_" . $graph;
+    }
+
     include("includes/print-device-graph.php");
   }
 }

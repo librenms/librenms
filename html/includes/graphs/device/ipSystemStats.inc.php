@@ -2,8 +2,6 @@
 
 include("includes/graphs/common.inc.php");
 
-$device = device_by_id_cache($id);
-
 $rrd_filename_4 = $config['rrd_dir'] . "/" . $device['hostname'] . "/ipSystemStats-ipv4.rrd";
 $rrd_filename_6 = $config['rrd_dir'] . "/" . $device['hostname'] . "/ipSystemStats-ipv6.rrd";
 

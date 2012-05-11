@@ -2,8 +2,6 @@
 
 include("includes/graphs/common.inc.php");
 
-$device = device_by_id_cache($id);
-
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/ucd_mem.rrd";
 
 $rrd_options .= " '-b 1024'";
@@ -37,7 +35,6 @@ $rrd_options .= " 'CDEF:real_percf=100,real_perc,-'";
 $rrd_options .= " 'CDEF:shared_perc=shared,totalreal,/,100,*'";
 $rrd_options .= " 'CDEF:buffered_perc=buffered,totalreal,/,100,*'";
 $rrd_options .= " 'CDEF:cached_perc=cached,totalreal,/,100,*'";
-
 
 $rrd_options .= " 'CDEF:cusedswap=usedswap,-1,*'";
 $rrd_options .= " 'CDEF:cdeftot=availreal,shared,buffered,usedreal,cached,usedswap,+,+,+,+,+'";

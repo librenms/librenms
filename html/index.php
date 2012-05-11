@@ -61,33 +61,6 @@ foreach ($segments as $pos => $segment)
   {
     $vars['page'] = $segment;
   } else {
-    if (TRUE)  // do this to keep everything working whilst we fiddle --AS
-    { // also, who wrote this? Please check php.net/switch ;) --TL
-      if ($pos == "1")
-      {
-        $_GET['opta'] = $segment;
-      }
-      if ($pos == "2")
-      {
-        $_GET['optb'] = $segment;
-      }
-      if ($pos == "3")
-      {
-        $_GET['optc'] = $segment;
-      }
-      if ($pos == "4")
-      {
-        $_GET['optd'] = $segment;
-      }
-      if ($pos == "5")
-      {
-        $_GET['opte'] = $segment;
-      }
-      if ($pos == "6")
-      {
-        $_GET['optf'] = $segment;
-      }
-    }
     list($name, $value) = explode("=", $segment);
     if ($value == "" || !isset($value))
     {

@@ -2,13 +2,12 @@
 
 include("includes/graphs/common.inc.php");
 
-$device = device_by_id_cache($id);
 
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
 $rrd_options .= " COMMENT:'Toner level            Cur     Min      Max\\n'";
-foreach (dbFetchRows("SELECT * FROM toner where device_id = ?", array($id)) as $toner)
+foreach (dbFetchRows("SELECT * FROM toner where device_id = ?", array($device['device_id'])) as $toner)
 {
   $colour = toner2colour($toner['toner_descr']);
 

@@ -1,8 +1,8 @@
 <?php
 
-if (is_numeric($id))
+if (is_numeric($vars['id']))
 {
-  $toner = dbFetchRow("SELECT * FROM `toner` WHERE `toner_id` = ?", array($id));
+  $toner = dbFetchRow("SELECT * FROM `toner` WHERE `toner_id` = ?", array($vars['id']));
 
   if (is_numeric($toner['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($toner['device_id'])))
   {

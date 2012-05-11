@@ -2,14 +2,14 @@
 
 $auth = TRUE;
 
-foreach (explode(",", $id) as $ifid)
+foreach (explode(",", $vars['id']) as $ifid)
 {
   if (!$config['allow_unauth_graphs'] && !port_permitted($ifid))
   $auth = FALSE;
 }
 
-#if (is_numeric($id)) {
-#  $port = get_port_by_id($id);
+#if (is_numeric($vars['id'])) {
+#  $port = get_port_by_id($vars['id']);
 #  $device = device_by_id_cache($port['device_id']);
 #}
 

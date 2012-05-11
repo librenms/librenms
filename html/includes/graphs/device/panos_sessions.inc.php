@@ -2,8 +2,6 @@
 
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("panos-sessions.rrd");
 
-include("includes/graphs/common.inc.php");
-
 $ds = "sessions";
 
 $colour_area = "9999cc";

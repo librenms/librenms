@@ -2,7 +2,7 @@
 
 $i = 1;
 
-foreach (dbFetchRows("SELECT * FROM `ucd_diskio` AS U, `devices` AS D WHERE D.device_id = ? AND U.device_id = D.device_id", array($id)) as $disk)
+foreach (dbFetchRows("SELECT * FROM `ucd_diskio` AS U, `devices` AS D WHERE D.device_id = ? AND U.device_id = D.device_id", array($device['device_id'])) as $disk)
 {
   $rrd_filename = $config['rrd_dir'] . "/" . $disk['hostname'] . "/ucd_diskio-" . safename($disk['diskio_descr'] . ".rrd");
   if (is_file($rrd_filename))

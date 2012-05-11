@@ -257,6 +257,7 @@ function ifclass($ifOperStatus, $ifAdminStatus)
 
 function device_by_name($name, $refresh = 0)
 {
+  ## FIXME - cache name > id too.
   return device_by_id_cache(getidbyname($name), $refresh);
 }
 

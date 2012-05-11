@@ -1,9 +1,9 @@
 <?php
 
-if (is_numeric($id))
+if (is_numeric($vars['id']))
 {
 
-  $vsvr = dbFetchRow("SELECT * FROM `netscaler_vservers` AS I, `devices` AS D WHERE I.vsvr_id = ? AND I.device_id = D.device_id", array($id));
+  $vsvr = dbFetchRow("SELECT * FROM `netscaler_vservers` AS I, `devices` AS D WHERE I.vsvr_id = ? AND I.device_id = D.device_id", array($vars['id']));
 
   if (is_numeric($vsvr['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($vsvr['device_id'])))
   {

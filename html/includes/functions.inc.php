@@ -117,8 +117,8 @@ function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end
     $graphhead = $entry['text'];
     $contents .= '<div style="width: 708px">';
     $contents .= '<span style="margin-left: 5px; font-size: 12px; font-weight: bold;">'.$graphhead.'</span><br />';
-    $contents .= "<img src=\"graph.php?id=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
-    $contents .= "<img src=\"graph.php?id=" . $device['device_id'] . "&amp;from=".$config['time']['week']."&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
+    $contents .= "<img src=\"graph.php?device=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
+    $contents .= "<img src=\"graph.php?device=" . $device['device_id'] . "&amp;from=".$config['time']['week']."&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
     $contents .= '</div>';
   }
 
@@ -169,7 +169,9 @@ function generate_graph_popup($graph_array)
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
 
-  $graph_array['link'] = "graphs/type=" . $graph_array['type'] . "/id=" . $graph_array['id'];
+  $graph_array['link'] = generate_url($graph_array, array('page' => 'graphs', 'height' => NULL, 'width' => NULL, 'bg' => NULL));
+
+#  $graph_array['link'] = "graphs/type=" . $graph_array['type'] . "/id=" . $graph_array['id'];
 
   return overlib_link($graph_array['link'], $graph, $content, NULL);
 }

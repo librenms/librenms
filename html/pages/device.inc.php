@@ -91,6 +91,16 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
+    if (@dbFetchCell("SELECT COUNT(mplug_id) FROM munin_plugins WHERE device_id = '" . $device['device_id'] . "'") > '0')
+    {
+      echo('<li class="' . $select['munin'] . '">
+    <a href="'.generate_device_url($device, array('tab' => 'munin')). '">
+      <img src="images/16/chart_line.png" align="absmiddle" border="0" /> Munin
+    </a>
+  </li>');
+    }
+
+
     if (@dbFetchCell("SELECT COUNT(interface_id) FROM ports WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['ports'] . $select['port'] . '">

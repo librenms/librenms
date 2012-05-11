@@ -1,6 +1,6 @@
 <?php
 
-$proc = dbFetchRow("SELECT * FROM `processors` where `processor_id` = ?", array($id));
+$proc = dbFetchRow("SELECT * FROM `processors` where `processor_id` = ?", array($vars['id']));
 
 if (is_numeric($proc['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($proc['device_id'])))
 {

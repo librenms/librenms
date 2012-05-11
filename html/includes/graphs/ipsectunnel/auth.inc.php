@@ -1,9 +1,8 @@
 <?php
 
-if (is_numeric($id))
+if (is_numeric($vars['id']))
 {
-
-  $tunnel = dbFetchRow("SELECT * FROM `ipsec_tunnels` AS I, `devices` AS D WHERE I.tunnel_id = ? AND I.device_id = D.device_id", array($id));
+  $tunnel = dbFetchRow("SELECT * FROM `ipsec_tunnels` AS I, `devices` AS D WHERE I.tunnel_id = ? AND I.device_id = D.device_id", array($vars['id']));
 
   if (is_numeric($tunnel['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($tunnel['device_id'])))
   {

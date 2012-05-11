@@ -5,9 +5,7 @@
 $ds_in  = "INOCTETS";
 $ds_out = "OUTOCTETS";
 
-$device = device_by_id_cache($id);
-
-foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $port)
+foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($device['device_id'])) as $port)
 {
   $ignore = 0;
   if (is_array($config['device_traffic_iftype']))

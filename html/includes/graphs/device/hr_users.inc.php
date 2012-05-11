@@ -2,8 +2,6 @@
 
 $scale_min = "0";
 
-include("includes/graphs/common.inc.php");
-
 $rrd_filename   = $config['rrd_dir'] . "/" . $device['hostname'] . "/hr_users.rrd";
 
 $ds = "users";
