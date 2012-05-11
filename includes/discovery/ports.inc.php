@@ -13,13 +13,13 @@ foreach(dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($device
 
 #print_r($ports_db);
 
-$ports = array();
-$ports = snmpwalk_cache_oid($device, "ifDescr", $ports, "IF-MIB");
-$ports = snmpwalk_cache_oid($device, "ifName", $ports, "IF-MIB");
-$ports = snmpwalk_cache_oid($device, "ifType", $ports, "IF-MIB");
+$port_stats = array();
+$port_stats = snmpwalk_cache_oid($device, "ifDescr", $port_stats, "IF-MIB");
+$port_stats = snmpwalk_cache_oid($device, "ifName", $port_stats, "IF-MIB");
+$port_stats = snmpwalk_cache_oid($device, "ifType", $port_stats, "IF-MIB");
 
-### New interface detection
-foreach ($ports as $ifIndex => $port)
+/// New interface detection
+foreach ($port_stats as $ifIndex => $port)
 {
   /// Check the port against our filters.
   if (is_port_valid($port, $device))
@@ -43,15 +43,16 @@ foreach ($ports as $ifIndex => $port)
       {
         dbUpdate(array('deleted' => '1'), 'ports', '`interface_id` = ?', array($ports_db[$ifIndex]['interface_id']));
         $ports_db[$ifIndex]['deleted'] = "1";
+        echo("-");
       }
     }
     echo("X");
   }
 }
-### End New interface detection
+/// End New interface detection
 
-### If it's in our $ports_l list, that means it's not been seen. Mark it deleted.
-
+/// Interface Deletion
+/// If it's in our $ports_l list, that means it's not been seen. Mark it deleted.
 foreach($ports_l as $ifIndex => $port_id)
 {
   if($ports_db[$ifIndex]['deleted'] == "0")
@@ -60,6 +61,7 @@ foreach($ports_l as $ifIndex => $port_id)
     echo("-".$ifIndex);
   }
 }
+/// End interface deletion
 
 echo("\n");
 
