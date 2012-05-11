@@ -51,17 +51,6 @@ include_once("includes/functions.inc.php");
 include_once("../includes/rrdtool.inc.php");
 include_once("includes/authenticate.inc.php");
 
-if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs'])
-{
-  $auth = "1"; ## hardcode auth for all with config function
-} else {
-  if (!$_SESSION['authenticated'])
-  {
-    graph_error("Session not authenticated");
-    exit;
-  }
-}
-
 include("includes/graphs/graph.inc.php");
 
 $end = utime(); $run = $end - $start;;

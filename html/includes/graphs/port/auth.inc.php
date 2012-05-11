@@ -1,6 +1,6 @@
 <?php
 
-if (is_numeric($vars['id']) && ($config['allow_unauth_graphs'] || port_permitted($vars['id'])))
+if (is_numeric($vars['id']) && ($auth || port_permitted($vars['id'])))
 {
   $port   = get_port_by_id($vars['id']);
   $device = device_by_id_cache($port['device_id']);

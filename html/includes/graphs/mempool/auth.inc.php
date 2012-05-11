@@ -4,7 +4,7 @@ if (is_numeric($vars['id']))
 {
   $mempool = dbFetchRow("SELECT * FROM `mempools` AS C, `devices` AS D where C.`mempool_id` = ? AND C.device_id = D.device_id", array($vars['id']));
 
-  if (is_numeric($mempool['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($mempool['device_id'])))
+  if (is_numeric($mempool['device_id']) && ($auth || device_permitted($mempool['device_id'])))
   {
     $device = device_by_id_cache($mempool['device_id']);
     $rrd_filename = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("mempool-".$mempool['mempool_type']."-".$mempool['mempool_index'].".rrd");

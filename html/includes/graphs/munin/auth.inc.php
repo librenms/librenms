@@ -7,7 +7,7 @@
     $mplug = dbFetchRow("SELECT * FROM `munin_plugins` AS M, `devices` AS D WHERE M.`device_id` = ? AND `mplug_type` = ?  AND D.device_id = M.device_id", array($device['device_id'], $vars['plugin']));
   }
 
-  if (is_numeric($mplug['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($mplug['device_id'])))
+  if (is_numeric($mplug['device_id']) && ($auth || device_permitted($mplug['device_id'])))
   {
     $device = &$mplug;
     $title  = generate_device_link($device);

@@ -1,5 +1,12 @@
 <?php
 
+function data_uri($file, $mime)
+{
+  $contents = file_get_contents($file);
+  $base64   = base64_encode($contents);
+  return ('data:' . $mime . ';base64,' . $base64);
+}
+
 function toner2colour($descr, $percent)
 {
   $colour = get_percentage_colours(100-$percent);

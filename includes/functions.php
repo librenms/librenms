@@ -768,8 +768,10 @@ function is_port_valid($port, $device)
 
   global $config;
 
-  if (!strstr($port['ifDescr'], "irtual"))
+  if (strstr($port['ifDescr'], "irtual"))
   {
+    $valid = 0;
+  } else {
     $valid = 1;
     $if = strtolower($port['ifDescr']);
     foreach ($config['bad_if'] as $bi)
@@ -804,8 +806,6 @@ function is_port_valid($port, $device)
     }
     if (empty($port['ifDescr'])) { $valid = 0; }
     if ($device['os'] == "catos" && strstr($if, "vlan")) { $valid = 0; }
-  } else {
-    $valid = 0;
   }
 
   return $valid;

@@ -1,6 +1,6 @@
 <?php
 
-if (is_numeric($vars['id']) && ($config['allow_unauth_graphs'] || device_permitted($vars['id'])))
+if (is_numeric($vars['id']) && ($auth || device_permitted($vars['id'])))
 {
   $device = device_by_id_cache($vars['id']);
   $title = generate_device_link($device);
