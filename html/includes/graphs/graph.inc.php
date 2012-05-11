@@ -2,20 +2,37 @@
 
 function data_uri($file, $mime)
 {
-  $contents = file_get_contents($file);
+  $contents = filevars_contents($file);
   $base64   = base64_encode($contents);
   return ('data:' . $mime . ';base64,' . $base64);
 }
 
-$width    = $_GET['width'];
-$height   = $_GET['height'];
-$title    = $_GET['title'];
-$vertical = $_GET['vertical'];
-$legend   = $_GET['legend'];
-$id       = $_GET['id'];
+// Push $_GET into $vars to be compatible with web interface naming
 
-$from     = (isset($_GET['from']) ? $_GET['from'] : time() - 60*60*24);
-$to       = (isset($_GET['to']) ? $_GET['to'] : time());
+foreach ($_GET as $name => $value)
+{
+  $vars[$name] = $value;
+}
+
+preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
+
+if(is_numeric($vars['device']))
+{
+  $device = device_by_id_cache($vars['device']);
+} elseif(!empty($vars['device'])) {
+  $device = device_by_name($vars['device']);
+}
+
+## FIXME -- remove these
+
+$width    = $vars['width'];
+$height   = $vars['height'];
+$title    = $vars['title'];
+$vertical = $vars['vertical'];
+$legend   = $vars['legend'];
+
+$from     = (isset($vars['from']) ? $vars['from'] : time() - 60*60*24);
+$to       = (isset($vars['to']) ? $vars['to'] : time());
 
 if ($from < 0) { $from = $to + $from; }
 
@@ -24,8 +41,6 @@ $period = $to - $from;
 $prev_from = $from - $period;
 
 $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
-
-preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $_GET['type'], $graphtype);
 
 $type = $graphtype['type'];
 $subtype = $graphtype['subtype'];
@@ -58,9 +73,9 @@ else
 
 function graph_error($string)
 {
-  global $_GET, $config, $debug, $graphfile;
+  global $vars, $config, $debug, $graphfile;
 
-  $_GET['bg'] = "FFBBBB";
+  $vars['bg'] = "FFBBBB";
 
   include("includes/graphs/common.inc.php");
 

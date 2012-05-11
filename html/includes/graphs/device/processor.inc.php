@@ -1,7 +1,6 @@
 <?php
 
-$device = device_by_id_cache($id);
-$procs = dbFetchRows("SELECT * FROM `processors` where `device_id` = ?", array($id));
+$procs = dbFetchRows("SELECT * FROM `processors` where `device_id` = ?", array($device['device_id']));
 
 if($config['os'][$device['os']]['processor_stacked'] == 1)
 {

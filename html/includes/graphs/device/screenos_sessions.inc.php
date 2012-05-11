@@ -1,8 +1,5 @@
 <?php
 
-#$device = device_by_id_cache($id);
-
-include("includes/graphs/common.inc.php");
 
 $file = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("screenos_sessions.rrd");
 

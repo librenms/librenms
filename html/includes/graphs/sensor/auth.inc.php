@@ -1,8 +1,8 @@
 <?php
 
-if (is_numeric($id))
+if (is_numeric($vars['id']))
 {
-  $sensor = dbFetchRow("SELECT * FROM sensors WHERE sensor_id = ?", array($id));
+  $sensor = dbFetchRow("SELECT * FROM sensors WHERE sensor_id = ?", array($vars['id']));
 
   if (is_numeric($sensor['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($sensor['device_id'])))
   {

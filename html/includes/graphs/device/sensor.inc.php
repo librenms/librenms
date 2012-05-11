@@ -2,7 +2,6 @@
 
 include("includes/graphs/common.inc.php");
 
-$device = device_by_id_cache($id);
 
 if ($_GET['width'] > "300") { $descr_len = "40"; } else { $descr_len = "22"; }
 
@@ -10,7 +9,7 @@ $rrd_options .= " -l 0 -E ";
 $iter = "1";
 $rrd_options .= " COMMENT:'".str_pad($unit_long,$descr_len)."    Cur     Min    Max\\n'";
 
-foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_index`", array($class, $id)) as $sensor)
+foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_index`", array($class, $device['device_id'])) as $sensor)
 {
   # FIXME generic colour function
   switch ($iter)

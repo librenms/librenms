@@ -2,7 +2,7 @@
 
 $i = 1;
 
-foreach (explode(",", $id) as $ifid)
+foreach (explode(",", $vars['id']) as $ifid)
 {
   if (strstr($ifid, "!"))
   {

@@ -2,7 +2,9 @@
 
 include("includes/graphs/common.inc.php");
 
-$sla = dbFetchRow("SELECT * FROM `slas` WHERE `sla_id` = ?", array($id));
+### FIXME - THIS IS BROKEN
+
+$sla = dbFetchRow("SELECT * FROM `slas` WHERE `sla_id` = ?", array($vars['id']));
 $device = device_by_id_cache($sla['device_id']);
 
 #if ($_GET['width'] >= "450") { $descr_len = "48"; } else { $descr_len = "21"; }

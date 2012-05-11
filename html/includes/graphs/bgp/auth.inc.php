@@ -1,9 +1,9 @@
 <?php
 
-if (is_numeric($id))
+if (is_numeric($vars['id']))
 {
 
-  $data = dbFetchRow("SELECT * FROM bgpPeers WHERE bgpPeer_id = ?", array($id));
+  $data = dbFetchRow("SELECT * FROM bgpPeers WHERE bgpPeer_id = ?", array($vars['id']));
 
   if (is_numeric($data['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($data['device_id'])))
   {

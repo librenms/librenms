@@ -1,5 +1,7 @@
 <?php
 
+$device = device_by_id_cache($vars['id']);
+
 $units           = "b";
 $total_units     = "B";
 $colours_in      = "greens";

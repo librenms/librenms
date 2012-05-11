@@ -1,4 +1,5 @@
 <?php
+
 $dsdescr = "Byts/s ";
 $dsprefix = "traffic_";
 

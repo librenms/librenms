@@ -5,7 +5,7 @@ $scale_min = "0";
 include("memcached.inc.php");
 include("includes/graphs/common.inc.php");
 
-$device = device_by_id_cache($id);
+$device = device_by_id_cache($vars['id']);
 
 $rrd_options .= " DEF:uptime=".$rrd_filename.":uptime:AVERAGE";
 $rrd_options .= " CDEF:cuptime=uptime,86400,/";

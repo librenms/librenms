@@ -38,25 +38,24 @@ echo('
     $graphs = $config['os']['default']['over'];
   }
 
+  $graph_array = array();
   $graph_array['height'] = "100";
   $graph_array['width']  = "310";
   $graph_array['to']     = $config['time']['now'];
-  $graph_array['id']     = $device['device_id'];
+  $graph_array['device'] = $device['device_id'];
   $graph_array['type']   = "device_bits";
   $graph_array['from']   = $config['time']['day'];
   $graph_array['legend'] = "no";
   $graph_array['popup_title'] = $descr;
-#  $graph_array['link']   = generate_device_link($device_id);
-#  print_graph_popup($graph_array);
 
   $graph_array['height'] = "45";
   $graph_array['width']  = "150";
   $graph_array['bg']     = "FFFFFF00";
 
+
   foreach ($graphs as $entry)
   {
     $graph_array['type']   = $entry['graph'];
-    $graphhead = $entry['text'];
 
     echo("<div style='float: right; text-align: center; padding: 1px 5px; margin: 0 1px; background: #f5f5f5;' class='rounded-5px'>");
     print_graph_popup($graph_array);

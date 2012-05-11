@@ -1,9 +1,9 @@
 <?php
 
-if (is_numeric($id))
+if (is_numeric($vars['id']))
 {
 #  $auth= TRUE;
-  $vserver = dbFetchRow("SELECT * FROM `loadbalancer_vservers` AS I, `devices` AS D WHERE I.classmap_id = ? AND I.device_id = D.device_id", array($id));
+  $vserver = dbFetchRow("SELECT * FROM `loadbalancer_vservers` AS I, `devices` AS D WHERE I.classmap_id = ? AND I.device_id = D.device_id", array($vars['id']));
 
   if (is_numeric($vserver['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($vserver['device_id'])))
   {

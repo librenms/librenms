@@ -5,12 +5,10 @@ $scale_max = "100";
 
 include("includes/graphs/common.inc.php");
 
-$device = device_by_id_cache($id);
-
 $iter = "1";
 $rrd_options .= " COMMENT:'                    Size      Used    %age\\l'";
 
-foreach (dbFetchRows("SELECT * FROM storage where device_id = ?", array($id)) as $storage)
+foreach (dbFetchRows("SELECT * FROM storage where device_id = ?", array($device['device_id'])) as $storage)
 {
   # FIXME generic colour function
   if ($iter=="1") { $colour="CC0000"; } elseif ($iter=="2") { $colour="008C00"; } elseif ($iter=="3") { $colour="4096EE"; }

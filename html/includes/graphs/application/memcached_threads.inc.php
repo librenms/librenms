@@ -1,9 +1,8 @@
 <?php
 
-
 include("memcached.inc.php");
 include("includes/graphs/common.inc.php");
-$device = device_by_id_cache($id);
+$device = device_by_id_cache($vars['id']);
 
 include("includes/graphs/common.inc.php");
 
