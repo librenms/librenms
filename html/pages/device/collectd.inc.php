@@ -92,7 +92,7 @@ print_optionbar_end();
        echo("</div>");
 
        $graph_array['type']                    = "device_collectd";
-       $graph_array['id']                      = $device['device_id'];
+       $graph_array['device']                      = $device['device_id'];
 
        $graph_array['c_plugin']           = $vars['plugin'];
        $graph_array['c_plugin_instance'] = $instance;
