@@ -40,7 +40,7 @@ if($vars['view'] == "incoming")
     {
 
        $graph_array['type']                    = "device_smokeping_in_all_avg";
-       $graph_array['id']                      = $device['device_id'];
+       $graph_array['device']                      = $device['device_id'];
        echo('<tr><td>');
        echo('<h3>Average</h3>');
 
@@ -69,7 +69,7 @@ if($vars['view'] == "incoming")
            echo('<tr><td>');
            echo('<h3>'.generate_device_link($host).'</h3>');
            $graph_array['type']                    = "smokeping_in";
-           $graph_array['id']                      = $device['device_id'];
+           $graph_array['device']                      = $device['device_id'];
            $graph_array['src']                     = $host['device_id'];
 
            include("includes/print-graphrow.inc.php");
@@ -86,7 +86,7 @@ if($vars['view'] == "incoming")
     {
 
        $graph_array['type']                    = "device_smokeping_out_all_avg";
-       $graph_array['id']                      = $device['device_id'];
+       $graph_array['device']                      = $device['device_id'];
        echo('<tr><td>');
        echo('<h3>Aggregate</h3>');
 
@@ -116,7 +116,7 @@ if($vars['view'] == "incoming")
            echo('<tr><td>');
            echo('<h3>'.generate_device_link($host).'</h3>');
            $graph_array['type']                    = "smokeping_out";
-           $graph_array['id']                      = $device['device_id'];
+           $graph_array['device']                      = $device['device_id'];
            $graph_array['dest']                         = $host['device_id'];
 
            include("includes/print-graphrow.inc.php");
