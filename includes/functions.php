@@ -766,7 +766,7 @@ function include_dir($dir, $regex = "")
 function is_port_valid($port, $device)
 {
 
-  global $config; $debug;
+  global $config, $debug;
 
   if (strstr($port['ifDescr'], "irtual"))
   {
