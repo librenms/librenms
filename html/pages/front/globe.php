@@ -45,6 +45,7 @@ echo(implode(",\n", $locations));
         keepAspectRatio: 0,
         width: 1150,
         height: 500,
+        magnifyingGlass: {enable: true, zoomFactor: 8},
         colorAxis: {minValue: 0, maxValue: 100, colors: ['red', 'green']}
       };
 
