@@ -1,5 +1,21 @@
 <?php
 
+
+function rewrite_location($location){
+
+  // FIXME -- also check the database for rewrites?
+
+  global $config;
+  global $debug;
+
+  if(isset($config['location_map'][$location]))
+  {
+    $location = $config['location_map'][$location];
+  }
+  return $location;
+
+}
+
 function formatMac($mac)
 {
   $mac = preg_replace("/(..)(..)(..)(..)(..)(..)/", "\\1:\\2:\\3:\\4:\\5:\\6", $mac);
