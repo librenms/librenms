@@ -4,23 +4,36 @@
      google.setOnLoadCallback(drawRegionsMap);
 
     function drawRegionsMap() {
-      var data = google.visualization.arrayToDataTable([
-['Site', 'Status'],
-
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Site');
+      data.addColumn('number', 'Status');
+      data.addColumn({type: 'string', role: 'tooltip'});
+      data.addRows([
 <?php
 
 foreach(getlocations() as $location)
 {
 
-  $down = dbFetchCell("SELECT COUNT(device_id) FROM devices WHERE location = ? AND status = '0'", array($location));
-  
-  if($down == 0) { $state = 1; } else { $state = 0; }
+  $devices = array();
+  $devices_down = array();
+  $count = 0;
+  $down  = 0;
+  foreach(dbFetchRows("SELECT * FROM devices WHERE location = ?", array($location)) as $device)
+  {
+    $devices[] = $device['hostname'];
+    $count++;
+    if($device['status'] == "0") { $down++; $devices_down[] = $device['hostname']; }
+  }
 
-  $locations[] = "['".$location."','".$state."']";
+  if(empty($devices_down)) { $devices_down[] = "No Problems"; }
+
+  if($down > 0) { $state = 0; } else { $state = 100; }
+
+  $locations[] = "['".$location."',".$state.", '".implode(", ", $devices_down)."']";
 
 }
 
-echo(implode(",", $locations));
+echo(implode(",\n", $locations));
 
 ?>
 
@@ -32,7 +45,7 @@ echo(implode(",", $locations));
         keepAspectRatio: 0,
         width: 1150,
         height: 500,
-        colorAxis: {minValue: 0, maxValue: 1, colors: ['red', 'green']}
+        colorAxis: {minValue: 0, maxValue: 100, colors: ['red', 'green']}
       };
 
       var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
