@@ -82,6 +82,13 @@
   }
 
   $poll_device['sysLocation'] = str_replace("\"","", $poll_device['sysLocation']);
+
+  /// Rewrite sysLocation if there is a mapping array (database too?)
+  if(!empty($poll_device['sysLocation']) && is_array($config['location_map']))
+  {
+    $poll_device['sysLocation'] = rewrite_location($poll_device['sysLocation']);
+  }
+
   $poll_device['sysContact']  = str_replace("\"","", $poll_device['sysContact']);
 
   if ($poll_device['sysLocation'] == "not set")
