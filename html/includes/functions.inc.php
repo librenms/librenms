@@ -160,6 +160,8 @@ function generate_graph_popup($graph_array)
 
   ## Take $graph_array and print day,week,month,year graps in overlib, hovered over graph
 
+  $original_from = $graph_array['from'];
+
   $graph = generate_graph_tag($graph_array);
   $content = "<div class=list-large>".$graph_array['popup_title']."</div>";
   $content .= "<div style=\'width: 850px\'>";
@@ -175,6 +177,8 @@ function generate_graph_popup($graph_array)
   $graph_array['from']     = $config['time']['year'];
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
+  
+  $graph_array['from'] = $original_from;
 
   $graph_array['link'] = generate_url($graph_array, array('page' => 'graphs', 'height' => NULL, 'width' => NULL, 'bg' => NULL));
 
