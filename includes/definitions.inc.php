@@ -1220,19 +1220,19 @@ if ($config['memcached']['enable'])
 # Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 
 $config['time']['now']        = time();
-$config['time']['fourhour']   = time() - (4 * 60 * 60);
-$config['time']['sixhour']    = time() - (6 * 60 * 60);
-$config['time']['twelvehour'] = time() - (12 * 60 * 60);
-$config['time']['day']        = time() - (24 * 60 * 60);
-$config['time']['twoday']     = time() - (2 * 24 * 60 * 60);
-$config['time']['week']       = time() - (7 * 24 * 60 * 60);
-$config['time']['twoweek']    = time() - (2 * 7 * 24 * 60 * 60);
-$config['time']['month']      = time() - (31 * 24 * 60 * 60);
-$config['time']['twomonth']   = time() - (2 * 31 * 24 * 60 * 60);
-$config['time']['threemonth'] = time() - (3 * 31 * 24 * 60 * 60);
-$config['time']['sixmonth']   = time() - (6 * 31 * 24 * 60 * 60);
-$config['time']['year']       = time() - (365 * 24 * 60 * 60);
-$config['time']['twoyear']    = time() - (2 * 365 * 24 * 60 * 60);
+$config['time']['fourhour']   = $config['time']['now'] - 14400;    //time() - (4 * 60 * 60);
+$config['time']['sixhour']    = $config['time']['now'] - 21600;    //time() - (6 * 60 * 60);
+$config['time']['twelvehour'] = $config['time']['now'] - 43200;    //time() - (12 * 60 * 60);
+$config['time']['day']        = $config['time']['now'] - 86400;    //time() - (24 * 60 * 60);
+$config['time']['twoday']     = $config['time']['now'] - 172800;   //time() - (2 * 24 * 60 * 60);
+$config['time']['week']       = $config['time']['now'] - 604800;   //time() - (7 * 24 * 60 * 60);
+$config['time']['twoweek']    = $config['time']['now'] - 1209600;  //time() - (2 * 7 * 24 * 60 * 60);
+$config['time']['month']      = $config['time']['now'] - 2678400;  //time() - (31 * 24 * 60 * 60);
+$config['time']['twomonth']   = $config['time']['now'] - 5356800;  //time() - (2 * 31 * 24 * 60 * 60);
+$config['time']['threemonth'] = $config['time']['now'] - 8035200;  //time() - (3 * 31 * 24 * 60 * 60);
+$config['time']['sixmonth']   = $config['time']['now'] - 16070400; //time() - (6 * 31 * 24 * 60 * 60);
+$config['time']['year']       = $config['time']['now'] - 31536000; //time() - (365 * 24 * 60 * 60);
+$config['time']['twoyear']    = $config['time']['now'] - 63072000; //time() - (2 * 365 * 24 * 60 * 60);
 
 # IPMI sensor type mappings
 $config['ipmi_unit']['Volts']     = 'voltage';
