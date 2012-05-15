@@ -52,7 +52,7 @@ if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_num
   {
     rrdtool_create($cpu_rrd, $cpu_rrd_create);
   }
-  rrdtool_update($cpu_rrd,  "N:".$ss['ssCpuRawUser'].":".$ss['ssCpuRawSystem'].":".$ss['ssCpuRawNice'].":".$ss['ssCpuRawIdle']);
+  rrdtool_update($cpu_rrd,  array($ss['ssCpuRawUser'],$ss['ssCpuRawSystem'],$ss['ssCpuRawNice'],$ss['ssCpuRawIdle']));
   $graphs['ucd_cpu'] = TRUE;
 }
 
@@ -115,6 +115,8 @@ if (is_array($snmpdata[0]))
    foreach (array_keys($snmpdata[0]) as $key) { $$key = $snmpdata[0][$key]; }
 }
 
+$snmpdata = $snmpdata[0];
+
 ## Check to see that the OIDs are actually populated before we make the rrd
 if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTotalFree))
 {
@@ -123,7 +125,7 @@ if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTot
     ## Create the rrd file if it doesn't exist
     rrdtool_create($mem_rrd, $mem_rrd_create);
   }
-  rrdtool_update($mem_rrd,  "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:".($memShared+0).":".($memBuffer+0).":".($memCached+0));
+  rrdtool_update($mem_rrd,  array($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached));
   $graphs['ucd_memory'] = TRUE;
 }
 
@@ -134,26 +136,20 @@ if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTot
 #UCD-SNMP-MIB::laLoadInt.2 = INTEGER: 429
 #UCD-SNMP-MIB::laLoadInt.3 = INTEGER: 479
 
-$la_load_create = " --step 300 DS:1min:GAUGE:600:0:5000 DS:5min:GAUGE:600:0:5000 DS:15min:GAUGE:600:0:5000 ".$config['rrd_rra'];
+$load_raw = snmp_get_multi($device, "laLoadInt.1 laLoadInt.2 laLoadInt.3", "-OQUs", "UCD-SNMP-MIB");
 
-$load_get = "laLoadInt.1 laLoadInt.2 laLoadInt.3";
-$load_raw = snmp_get_multi($device, $load_get, "-OQUs", "UCD-SNMP-MIB");
-$load1 = $load_raw[1]['laLoadInt'];
-$load5 = $load_raw[2]['laLoadInt'];
-$load10 = $load_raw[3]['laLoadInt'];
-
-## Check to see that the OIDs are actually populated before we make the rrd
-if (is_numeric($load1) && is_numeric($load5) && is_numeric($load10))
+## Check to see that the 5-min OID is actually populated before we make the rrd
+if (is_numeric($load_raw[2]['laLoadInt']))
 {
   if (!is_file($load_rrd))
   {
-    rrdtool_create($load_rrd, $la_load_create);
+    rrdtool_create($load_rrd, " --step 300 DS:1min:GAUGE:600:0:5000 DS:5min:GAUGE:600:0:5000 DS:15min:GAUGE:600:0:5000 ".$config['rrd_rra']);
   }
-  rrdtool_update($load_rrd, "N:$load1:$load5:$load10");
+  rrdtool_update($load_rrd, array($load_raw[1]['laLoadInt'], $load_raw[2]['laLoadInt'], $load_raw[3]['laLoadInt']));
   $graphs['ucd_load'] = "TRUE";
 }
 
-unset($ss, $load1, $load5, $load10, $load_rrd, $la_load_create, $load_raw, $load_get, $snmpdata);
+unset($ss, $load_rrd, $load_raw, $snmpdata);
 unset($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached);
 unset($key, $mem_rrd, $mem_rrd_create, $collect_oids, $value, $filename, $cpu_rrd, $cpu_rrd_create, $oid);
 

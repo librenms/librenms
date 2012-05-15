@@ -74,8 +74,10 @@ if ($device['os_group'] == "cisco")
           DS:PIN:COUNTER:600:0:12500000000 \
           DS:POUT:COUNTER:600:0:12500000000 " . $config['rrd_rra']);
       }
-      $woo = "N:".($b_in+0).":".($b_out+0).":".($p_in+0).":".($p_out+0);
-      $ret = rrdtool_update("$rrdfile", $woo);
+
+      // FIXME - use memcached to make sure these values don't go backwards?
+      $rrdupdate = array($b_in, $b_out, $p_in, $p_out);
+      $ret = rrdtool_update("$rrdfile", $rrdupdate);
 
       if ($acc['update'])
       { /// Do Updates
