@@ -2,7 +2,6 @@
 
 include("includes/graphs/common.inc.php");
 
-
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";

@@ -2,7 +2,6 @@
 
 include("includes/graphs/common.inc.php");
 
-
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/vpdn-l2tp.rrd";
 
 $stats = array('tunnels');

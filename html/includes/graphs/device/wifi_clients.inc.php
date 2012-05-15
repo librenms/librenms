@@ -2,7 +2,6 @@
 
 include("includes/graphs/common.inc.php");
 
-
 $rrd_options .= " -l 0 -E ";
 
 $radio1  = $config['rrd_dir'] . "/".$device['hostname']."/wificlients-radio1.rrd";

@@ -207,12 +207,12 @@ function rrdtool_create($filename, $options)
 function rrdtool_update($filename, $options)
 {
   /// Do some sanitisation on the data if passed as an array.
-  if(is_array($options))
+  if (is_array($options))
   {
     $values[] = "N";
-    foreach($options as $value)
+    foreach ($options as $value)
     {
-      if(!is_numeric($value)) { $value = U; }
+      if (!is_numeric($value)) { $value = U; }
       $values[] = $value;
     }
     $options = implode(':', $values);

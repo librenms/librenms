@@ -1,7 +1,7 @@
 <?php
 
 $graph_array['height']      = "100";
-$graph_array['width']  	    = "218";
+$graph_array['width']       = "218";
 $graph_array['to']          = $config['time']['now'];
 $graph_array['from']        = $config['time']['day'];
 $graph_array_zoom           = $graph_array;
@@ -14,9 +14,9 @@ foreach ($app_list as $app)
   echo('<div style="clear: both;">');
   echo('<h2>'.generate_link(nicecase($app['app_type']),array('page'=>'apps','app'=>$app['app_type'])).'</h2>');
   $app_devices = dbFetchRows("SELECT * FROM `devices` AS D, `applications` AS A WHERE D.device_id = A.device_id AND A.app_type = ?", array($app['app_type']));
+
   foreach ($app_devices as $app_device)
   {
-
     $graph_type = $graphs[$app['app_type']][0];
 
     $graph_array['type']   = "application_".$app['app_type']."_".$graph_type;
@@ -33,7 +33,7 @@ foreach ($app_list as $app)
     $overlib_url = generate_url($link_array);
 
     $overlib_link    = '<span style="float:left; margin-left: 10px; font-weight: bold;">'.shorthost($app_device['hostname'])."</span>";
-    if(!empty($app_device['app_instance']))
+    if (!empty($app_device['app_instance']))
     {
       $overlib_link  .= '<span style="float:right; margin-right: 10px; font-weight: bold;">'.$app_device['app_instance']."</span>";
       $app_device['content_add']   = '('.$app_device['app_instance'].')';

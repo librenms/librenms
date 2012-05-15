@@ -2,7 +2,6 @@
 
 include("includes/graphs/common.inc.php");
 
-
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/netstats-ip.rrd";
 
 $rrd_options .= " DEF:ipInDelivers=$rrd_filename:ipInDelivers:AVERAGE";

@@ -124,7 +124,7 @@ if ($debug) { print_r($port_stats); }
 ##       -- i can make it a function, so that you don't know what it's doing.
 ##       -- $ports_db = adamasMagicFunction($ports_db); ?
 
-foreach(dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($device['device_id'])) as $port)
+foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($device['device_id'])) as $port)
 {
   $ports_db[$port['ifIndex']] = $port;
   $ports_db_l[$port['ifIndex']] = $port['interface_id'];
@@ -146,7 +146,7 @@ foreach ($port_stats as $ifIndex => $port)
       $ports_db[$ifIndex]['deleted'] = "0";
       echo("U");
     } else {
-      echo (".");
+      echo(".");
     }
     /// We've seen it. Remove it from the cache.
     unset($ports_l[$ifIndex]);
@@ -166,9 +166,9 @@ foreach ($port_stats as $ifIndex => $port)
 
 /// Interface Deletion
 /// If it's in our $ports_l list, that means it's not been seen. Mark it deleted.
-foreach($ports_l as $ifIndex => $port_id)
+foreach ($ports_l as $ifIndex => $port_id)
 {
-  if($ports_db[$ifIndex]['deleted'] == "0")
+  if ($ports_db[$ifIndex]['deleted'] == "0")
   {
     dbUpdate(array('deleted' => '1'), 'ports', '`interface_id` = ?', array($port_id));
     echo("-".$ifIndex);

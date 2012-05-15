@@ -1,6 +1,5 @@
 <?php
 
-
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/netstats-icmp.rrd";
 
 $stats = array('icmpInMsgs'      => '00cc00',

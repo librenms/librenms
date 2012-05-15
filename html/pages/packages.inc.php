@@ -45,7 +45,7 @@ foreach (dbFetchRows("SELECT * FROM `packages` WHERE 1 $where GROUP BY `name`", 
       $content .= "</div>";
     }
     $content .= "</div>";
-    if(empty($vars['name']))
+    if (empty($vars['name']))
     {
       echo("<span style='margin:5px;'>".overlib_link("", $version, $content,  NULL)."</span>");
     } else {

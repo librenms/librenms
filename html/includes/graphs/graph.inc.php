@@ -41,7 +41,7 @@ $subtype = $graphtype['subtype'];
 if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php"))
 {
 
-  if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs']) 
+  if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs'])
   {
     $auth = "1"; ## hardcode auth for all with config function
   }
@@ -52,8 +52,8 @@ if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.p
     {
       if (Net_IPv4::ipInNetwork($_SERVER['REMOTE_ADDR'], $range))
       {
-        $auth = "1"; 
-        if($debug) { echo("matched $range"); }
+        $auth = "1";
+        if ($debug) { echo("matched $range"); }
         break;
       }
     }

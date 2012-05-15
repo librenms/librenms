@@ -18,6 +18,4 @@ $unit_text = "Processes";
 
 include("includes/graphs/generic_simplex.inc.php");
 
-
-
 ?>

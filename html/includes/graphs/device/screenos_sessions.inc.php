@@ -1,6 +1,5 @@
 <?php
 
-
 $file = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("screenos_sessions.rrd");
 
 $rrd_list[0]['filename'] = $file;

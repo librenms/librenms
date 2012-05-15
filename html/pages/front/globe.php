@@ -11,23 +11,23 @@
       data.addRows([
 <?php
 
-foreach(getlocations() as $location)
+foreach (getlocations() as $location)
 {
 
   $devices = array();
   $devices_down = array();
   $count = 0;
   $down  = 0;
-  foreach(dbFetchRows("SELECT * FROM devices WHERE location = ?", array($location)) as $device)
+  foreach (dbFetchRows("SELECT * FROM devices WHERE location = ?", array($location)) as $device)
   {
     $devices[] = $device['hostname'];
     $count++;
-    if($device['status'] == "0") { $down++; $devices_down[] = $device['hostname']; }
+    if ($device['status'] == "0") { $down++; $devices_down[] = $device['hostname']; }
   }
 
-  if(empty($devices_down)) { $devices_down[] = "No Problems"; }
+  if (empty($devices_down)) { $devices_down[] = "No Problems"; }
 
-  if($down > 0) { $state = 0; } else { $state = 100; }
+  if ($down > 0) { $state = 0; } else { $state = 100; }
 
   $locations[] = "['".$location."',".$state.", '".implode(", ", $devices_down)."']";
 
@@ -55,10 +55,7 @@ echo(implode(",\n", $locations));
 
   </script>
 
-
     <div style="margin:0 auto;" id='chart_div'></div>
-
-
 
 <?php
 
