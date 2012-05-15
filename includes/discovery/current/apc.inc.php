@@ -1,6 +1,6 @@
 <?php
 
-## APC
+## APC PDUs
 if ($device['os'] == "apc")
 {
   # PDU - Phase
