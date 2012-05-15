@@ -178,7 +178,7 @@ function delete_device($id)
   dbDelete('devices', "`device_id` =  ?", array($id));
 
   $device_tables = array('entPhysical', 'devices_attribs', 'devices_perms', 'bgpPeers', 'vlans', 'vrfs', 'storage', 'alerts', 'eventlog',
-                         'syslog', 'ports', 'services', 'alerts', 'toner', 'frequency', 'current', 'sensors');
+                         'syslog', 'ports', 'services', 'toner', 'frequency', 'current', 'sensors');
 
   foreach ($device_tables as $table)
   {
