@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == "apc")
+if ($device['os'] == "apc" || $device['os'] == "apcups")
 {
   # Environmental monitoring on UPSes etc
   # FIXME emConfigProbesTable may also be used? But not filled out on my device...
