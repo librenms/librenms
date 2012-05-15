@@ -663,18 +663,6 @@ $config['os'][$os]['text']              = "APC Management Module";
 $config['os'][$os]['type']              = "power";
 $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
-$config['os'][$os]['over'][1]['graph']  = "device_voltage";
-$config['os'][$os]['over'][1]['text']   = "Voltage";
-
-$os = "apcups";
-$config['os'][$os]['text']              = "APC UPS";
-$config['os'][$os]['type']              = "power";
-$config['os'][$os]['group']             = "ups";
-$config['os'][$os]['icon']              = "apc";
-$config['os'][$os]['over'][0]['graph']  = "device_voltage";
-$config['os'][$os]['over'][0]['text']   = "Voltage";
-$config['os'][$os]['over'][1]['graph']  = "device_frequency";
-$config['os'][$os]['over'][1]['text']   = "Frequencies";
 
 $os = "netbotz";
 $config['os'][$os]['text']              = "Netbotz Environment sensor";

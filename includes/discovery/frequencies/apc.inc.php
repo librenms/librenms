@@ -1,7 +1,7 @@
 <?php
 
 ## APC
-if ($device['os'] == "apc" || $device['os'] == "apcups")
+if ($device['os'] == "apc")
 {
   $oids = snmp_walk($device, "1.3.6.1.4.1.318.1.1.8.5.3.2.1.4", "-OsqnU", "");
   if ($debug) { echo($oids."\n"); }

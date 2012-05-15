@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == "apc" || $device['os'] == "apcups")
+if ($device['os'] == "apc")
 {
   $oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.1.2.2.2.0", "-OsqnU", "");
   if ($debug) { echo($oids."\n"); }
