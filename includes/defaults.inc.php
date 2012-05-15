@@ -123,7 +123,7 @@ $config['snmp']['community'][0] = "public"; # Communities to try during adding h
 $config['snmp']['v3'][0]['authlevel'] = "noAuthNoPriv";  # noAuthNoPriv | authNoPriv | authPriv
 $config['snmp']['v3'][0]['authname'] = "observium";      # User Name (required even for noAuthNoPriv)
 $config['snmp']['v3'][0]['authpass'] = "";               # Auth Passphrase
-$config['snmp']['v3'][0]['authalgo'] = "MD5";            # MD5 | SHA1
+$config['snmp']['v3'][0]['authalgo'] = "MD5";            # MD5 | SHA
 $config['snmp']['v3'][0]['cryptopass'] = "";             # Privacy (Encryption) Passphrase
 $config['snmp']['v3'][0]['cryptoalgo'] = "AES";          # AES | DES
 

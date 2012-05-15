@@ -92,7 +92,7 @@ if (!empty($argv[1]))
         {
           $transport = $arg;
         }
-        elseif (preg_match ('/^(sha1|md5)$/i', $arg))
+        elseif (preg_match ('/^(sha|md5)$/i', $arg))
         {
           $v3['authalgo'] = $arg;
         }
@@ -121,7 +121,7 @@ if (!empty($argv[1]))
         {
           $transport = $arg;
         }
-        elseif (preg_match ('/^(sha1|md5)$/i', $arg))
+        elseif (preg_match ('/^(sha|md5)$/i', $arg))
         {
           $v3['authalgo'] = $arg;
         }
@@ -198,8 +198,8 @@ Observium v".$config['version']." Add Host Tool
 Usage (SNMPv1/2c): ./addhost.php <%Whostname%n> [community] [v1|v2c] [port] [" . implode("|",$config['snmp']['transports']) . "]
 Usage (SNMPv3)   :  Config Defaults : ./addhost.php <%Whostname%n> any v3 [user] [port] [" . implode("|",$config['snmp']['transports']) . "]
                    No Auth, No Priv : ./addhost.php <%Whostname%n> nanp v3 [user] [port] [" . implode("|",$config['snmp']['transports']) . "]
-                      Auth, No Priv : ./addhost.php <%Whostname%n> anp v3 <user> <password> [md5|sha1] [port] [" . implode("|",$config['snmp']['transports']) . "]
-                      Auth,    Priv : ./addhost.php <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha1] [aes|dsa] [port] [" . implode("|",$config['snmp']['transports']) . "]
+                      Auth, No Priv : ./addhost.php <%Whostname%n> anp v3 <user> <password> [md5|sha] [port] [" . implode("|",$config['snmp']['transports']) . "]
+                      Auth,    Priv : ./addhost.php <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha] [aes|dsa] [port] [" . implode("|",$config['snmp']['transports']) . "]
 %rRemember to run discovery for the host afterwards.%n
 
 ");

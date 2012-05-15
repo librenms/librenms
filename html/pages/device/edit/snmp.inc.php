@@ -112,7 +112,7 @@ echo("<br /><table cellpadding=0 cellspacing=0><tr><td>
       <td>
         <select name='authalgo'>
           <option value='MD5'>MD5</option>
-          <option value='SHA1' " . ($device['authalgo'] === "SHA1" ? 'selected' : '') . ">SHA1</option>
+          <option value='SHA' " . ($device['authalgo'] === "SHA" ? 'selected' : '') . ">SHA</option>
         </select>
       </td>
     </tr>
