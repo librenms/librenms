@@ -1,6 +1,6 @@
 <?php
 
-  if(is_numeric($vars['plugin']))
+  if (is_numeric($vars['plugin']))
   {
     $mplug = dbFetchRow("SELECT * FROM `munin_plugins` AS M, `devices` AS D WHERE `mplug_id` = ? AND D.device_id = M.device_id ", array($vars['plugin']));
   } else {

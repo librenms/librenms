@@ -52,7 +52,6 @@ echo('
   $graph_array['width']  = "150";
   $graph_array['bg']     = "FFFFFF00";
 
-
   foreach ($graphs as $entry)
   {
     $graph_array['type']   = $entry['graph'];

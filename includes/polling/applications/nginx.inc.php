@@ -28,11 +28,11 @@ rrdtool_update($nginx_rrd, "N:$req:$active:$reading:$writing:$waiting");
 
 /// Unset the variables we set here
 
-unset($nginx); 
-unset($nginx_rrd); 
-unset($active); 
-unset($reading); 
-unset($writing); 
+unset($nginx);
+unset($nginx_rrd);
+unset($active);
+unset($reading);
+unset($writing);
 unset($req);
 
 ?>

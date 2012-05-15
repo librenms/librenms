@@ -47,7 +47,7 @@ if (!empty($argv[1]))
     {
       $v3['authlevel'] = "noAuthNoPriv";
       $v3args = array_slice($argv, 4);
-      
+
       while ($arg = array_shift($v3args))
       {
         // parse all remaining args
@@ -71,7 +71,7 @@ if (!empty($argv[1]))
         { array_push($config['snmp']['v3'], $v3); }
 
       $device_id = addHost($host, $snmpver, $port, $transport);
-      
+
     }
     elseif ($seclevel === "anp" or $seclevel === "authNoPriv")
     {
@@ -97,10 +97,10 @@ if (!empty($argv[1]))
           $v3['authalgo'] = $arg;
         }
       }
-  
+
       array_push($config['snmp']['v3'], $v3);
       $device_id = addHost($host, $snmpver, $port, $transport);
-      
+
     }
     elseif ($seclevel === "ap" or $seclevel === "authPriv")
     {
@@ -130,10 +130,10 @@ if (!empty($argv[1]))
           $v3['cryptoalgo'] = $arg;
         }
       }
-  
+
       array_push($config['snmp']['v3'], $v3);
       $device_id = addHost($host, $snmpver, $port, $transport);
-      
+
     }
     else
     {
@@ -165,7 +165,7 @@ if (!empty($argv[1]))
     {
       $config['snmp']['community'] = array($community);
     }
-    
+
     $device_id = addHost($host, $snmpver, $port, $transport);
   }
 
@@ -199,7 +199,7 @@ Usage (SNMPv1/2c): ./addhost.php <%Whostname%n> [community] [v1|v2c] [port] [" .
 Usage (SNMPv3)   :  Config Defaults : ./addhost.php <%Whostname%n> any v3 [user] [port] [" . implode("|",$config['snmp']['transports']) . "]
                    No Auth, No Priv : ./addhost.php <%Whostname%n> nanp v3 [user] [port] [" . implode("|",$config['snmp']['transports']) . "]
                       Auth, No Priv : ./addhost.php <%Whostname%n> anp v3 <user> <password> [md5|sha1] [port] [" . implode("|",$config['snmp']['transports']) . "]
-                      Auth,    Priv : ./addhost.php <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha1] [aes|dsa] [port] [" . implode("|",$config['snmp']['transports']) . "] 
+                      Auth,    Priv : ./addhost.php <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha1] [aes|dsa] [port] [" . implode("|",$config['snmp']['transports']) . "]
 %rRemember to run discovery for the host afterwards.%n
 
 ");

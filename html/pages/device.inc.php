@@ -100,7 +100,6 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-
     if (@dbFetchCell("SELECT COUNT(interface_id) FROM ports WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['ports'] . $select['port'] . '">

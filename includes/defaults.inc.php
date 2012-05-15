@@ -273,7 +273,6 @@ $config['nfsen_enable'] = 0;
 ### Use this feature to map ugly locations to pretty locations
 #config['location_map']['Under the Sink'] = "Under The Sink, The Office, London, UK";
 
-
 ### Ignores & Allows
 # Has to be lowercase
 

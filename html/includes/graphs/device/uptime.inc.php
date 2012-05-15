@@ -4,7 +4,6 @@ $scale_min = "0";
 
 include("includes/graphs/common.inc.php");
 
-
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";
 
 $rrd_options .= " DEF:uptime=".$rrd_filename.":uptime:AVERAGE";

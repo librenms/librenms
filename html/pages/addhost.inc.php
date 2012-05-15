@@ -38,7 +38,7 @@ if ($_POST['hostname'])
       );
 
       array_push($config['snmp']['v3'], $v3);
-      
+
       $snmpver = "v3";
 
       if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = "161"; }

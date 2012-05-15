@@ -177,7 +177,7 @@ function generate_graph_popup($graph_array)
   $graph_array['from']     = $config['time']['year'];
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
-  
+
   $graph_array['from'] = $original_from;
 
   $graph_array['link'] = generate_url($graph_array, array('page' => 'graphs', 'height' => NULL, 'width' => NULL, 'bg' => NULL));

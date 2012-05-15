@@ -21,7 +21,7 @@ if (is_file($rrd_filename))
     $rrd_list[$i]['descr']    = $vars['descr'];
     $rrd_list[$i]['ds']       = $ds;
     $rrd_list[$i]['colour']   = $vars['colour'];
-    if(!empty($vars['areacolour'])) { $rrd_list[$i]['areacolour']   = $vars['areacolour']; }
+    if (!empty($vars['areacolour'])) { $rrd_list[$i]['areacolour']   = $vars['areacolour']; }
     $i++;
   }
 } else {

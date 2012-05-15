@@ -57,6 +57,7 @@ foreach ($graph_enable as $graph => $entry)
   {
     $graph_title = $config['graph_types']['device'][$graph]['descr'];
     $graph_array['type'] = "device_" . $graph;
+
     include("includes/print-device-graph.php");
   }
 }

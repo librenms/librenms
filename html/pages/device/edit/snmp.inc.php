@@ -20,16 +20,16 @@ if ($_POST['editing'])
 
     #FIXME needs better feedback
     $update = array(
-      'community' => $community, 
-      'snmpver' => $snmpver, 
+      'community' => $community,
+      'snmpver' => $snmpver,
       'port' => $port
     );
 
-    if ($_POST['timeout']) { $update['timeout'] = $timeout; } 
+    if ($_POST['timeout']) { $update['timeout'] = $timeout; }
       else { $update['timeout'] = array('NULL'); }
-    if ($_POST['retries']) { $update['retries'] = $retries; } 
+    if ($_POST['retries']) { $update['retries'] = $retries; }
       else { $update['retries'] = array('NULL'); }
-    
+
     $update = array_merge($update, $v3);
 
     $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?',array($device['device_id']));

@@ -96,7 +96,7 @@ if(!$nototal)
   $rrd_options .= " CDEF:inbits=inoctets,8,*";
   $rrd_options .= " CDEF:outbits=outoctets,8,*";
   $rrd_options .= " CDEF:doutbits=doutoctets,8,*";
-  
+
   $rrd_options .= " VDEF:95thin=inbits,95,PERCENT";
   $rrd_options .= " VDEF:95thout=outbits,95,PERCENT";
   $rrd_options .= " VDEF:d95thout=doutbits,5,PERCENT";
@@ -110,9 +110,7 @@ if(!$nototal)
 #  $rrd_options .= " GPRINT:totin:AVERAGE:%6.2lf%s$units";
 #  $rrd_options .= " GPRINT:totin:MAX:%6.2lf%s$units\l";
 
-
 }
-
 
 $rrd_options .= $rrd_optionsb;
 $rrd_options .= " HRULE:0#999999";

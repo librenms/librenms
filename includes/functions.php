@@ -289,7 +289,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp')
       print_error("Could not resolve $host"); }
   } else {
     /// found in database
-    print_error("Already got host $host"); 
+    print_error("Already got host $host");
   }
   return 0;
 }

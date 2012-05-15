@@ -1,6 +1,5 @@
 <?php
 
-
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/netstats-ip.rrd";
 
 $stats = array('ipForwDatagrams' => array(),
