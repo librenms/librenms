@@ -3,7 +3,7 @@
 $oid = $mempool['mempool_index'];
 
 # FIXME snmp_get
-$pool_cmd  = $config['snmpget'] . " -M ".$config['mibdir']. " -m CISCO-ENHANCED-MEMPOOL-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+$pool_cmd  = $config['snmpget'] . " -M ".$config['mibdir']. " -m CISCO-ENHANCED-MEMPOOL-MIB -O Uqnv " . snmp_gen_auth($device) . " " . $device['hostname'].":".$device['port'];
 $pool_cmd .= " cempMemPoolUsed.$oid cempMemPoolFree.$oid cempMemPoolLargestFree.$oid";
 $pool_cmd .= " | cut -f 1 -d ' '";
 

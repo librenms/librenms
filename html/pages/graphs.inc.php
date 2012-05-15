@@ -79,7 +79,7 @@ if (!$auth)
   {
     echo("<option value='".generate_url($vars, array('type' => $type."_".$avail_type, 'page' => "graphs"))."'");
     if ($avail_type == $subtype) { echo(" selected"); }
-    echo(">".$avail_type."</option>");
+    echo(">".nicecase($avail_type)."</option>");
   }
           ?>
     </select>

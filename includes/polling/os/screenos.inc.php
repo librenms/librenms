@@ -4,7 +4,7 @@ $version = preg_replace("/(.+)\ version\ (.+)\ \(SN:\ (.+)\,\ (.+)\)/", "\\1||\\
 list($hardware,$version,$serial,$features) = explode("||", $version);
 
 $sessrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/screenos_sessions.rrd";
-$sess_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
+$sess_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -O qv " . snmp_gen_auth($device) . " " . $device['hostname'];
 $sess_cmd .= " .1.3.6.1.4.1.3224.16.3.2.0 .1.3.6.1.4.1.3224.16.3.3.0 .1.3.6.1.4.1.3224.16.3.4.0";
 $sess_data = shell_exec($sess_cmd);
 list ($sessalloc, $sessmax, $sessfailed) = explode("\n", $sess_data);
