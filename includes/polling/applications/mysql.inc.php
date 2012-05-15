@@ -6,7 +6,7 @@ if(!empty($agent_data['app']['mysql']))
   $mysql = $agent_data['app']['mysql'];
 } else {
   #Polls MySQL  statistics from script via SNMP
-  $mysql_cmd  = $config['snmpget'] ." -m NET-SNMP-EXTEND-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  $mysql_cmd  = $config['snmpget'] ." -m NET-SNMP-EXTEND-MIB -O qv " . snmp_gen_auth($device) . " " . $device['hostname'].":".$device['port'];
   $mysql_cmd .= " nsExtendOutputFull.5.109.121.115.113.108";
   $mysql  = shell_exec($mysql_cmd);
 }

@@ -16,7 +16,7 @@ if ($config['enable_bgp'])
     {
       # v4 BGP4 MIB
       ## FIXME - needs moved to function
-      $peer_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m BGP4-MIB -OUvq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+      $peer_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m BGP4-MIB -OUvq " . snmp_gen_auth($device) . " " . $device['hostname'].":".$device['port'] . " ";
       $peer_cmd .= "bgpPeerState." . $peer['bgpPeerIdentifier'] . " bgpPeerAdminStatus." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerOutUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerInTotalMessages." . $peer['bgpPeerIdentifier'] . " ";
       $peer_cmd .= "bgpPeerOutTotalMessages." . $peer['bgpPeerIdentifier'] . " bgpPeerFsmEstablishedTime." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdateElapsedTime." . $peer['bgpPeerIdentifier'] . " ";
       $peer_cmd .= "bgpPeerLocalAddr." . $peer['bgpPeerIdentifier'] . "";
@@ -33,7 +33,7 @@ if ($config['enable_bgp'])
       {
         echo("\nCaching Oids...");
         ## FIXME - needs moved to function
-        $peer_cmd  = $config['snmpwalk'] . " -M ".$config['mibdir'] . "/junos -m BGP4-V2-MIB-JUNIPER -OUnq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
+        $peer_cmd  = $config['snmpwalk'] . " -M ".$config['mibdir'] . "/junos -m BGP4-V2-MIB-JUNIPER -OUnq -" . $device['snmpver'] . " " . snmp_gen_auth($device) . " " . $device['hostname'].":".$device['port'];
         $peer_cmd .= " jnxBgpM2PeerStatus.0.ipv6";
         foreach (explode("\n",trim(`$peer_cmd`)) as $oid)
         {
@@ -44,7 +44,7 @@ if ($config['enable_bgp'])
       }
 
       ## FIXME - move to function (and clean up, wtf?)
-      $peer_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . "/junos -m BGP4-V2-MIB-JUNIPER -OUvq -" . $device['snmpver'] . " -c" . $device['community'];
+      $peer_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . "/junos -m BGP4-V2-MIB-JUNIPER -OUvq " . snmp_get_auth($device);
       $peer_cmd .= ' -M"' . $config['install_dir'] . '/mibs/junos"';
       $peer_cmd .= " " . $device['hostname'].":".$device['port'];
       $peer_cmd .= " jnxBgpM2PeerState.0.ipv6." . $junos_v6[$peer_ip];
@@ -137,7 +137,7 @@ if ($config['enable_bgp'])
         if ($device['os_group'] == "cisco")
         {
           ## FIXME - move to function
-          $cbgp_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m CISCO-BGP4-MIB -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
+          $cbgp_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m CISCO-BGP4-MIB -Ovq " . snmp_gen_auth($device) . " " . $device['hostname'].":".$device['port'];
           $cbgp_cmd .= " cbgpPeerAcceptedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
           $cbgp_cmd .= " cbgpPeerDeniedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
           $cbgp_cmd .= " cbgpPeerPrefixAdminLimit." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";

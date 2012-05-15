@@ -4,7 +4,7 @@ if ($device['os_group'] == "cisco")
 {
   echo("Cisco MAC Accounting : ");
 
-  $datas = shell_exec($config['snmpbulkwalk'] . " -M ".$config['mibdir']." -m CISCO-IP-STAT-MIB -Oqn -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." cipMacSwitchedBytes");
+  $datas = shell_exec($config['snmpbulkwalk'] . " -M ".$config['mibdir']." -m CISCO-IP-STAT-MIB -Oqn " . snmp_gen_auth($device) . " " . $device['hostname']." cipMacSwitchedBytes");
   #echo("$datas\n");
   #echo("done\n");
   foreach (explode("\n", $datas) as $data) {

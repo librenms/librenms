@@ -30,6 +30,7 @@ foreach ($device['vlans'] as $domain_id => $vlans)
     {
       if ($device['os_group'] == "cisco" || $device['os'] == "ios")  /// This shit only seems to work on IOS
       {
+        # Probably does not work with snmpv3. I have no real idea about what this code is really doing
         $vlan_device = array_merge($device, array('community' => $device['community']."@".$vlan_id));
         $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dStpPortEntry", array(), "BRIDGE-MIB:Q-BRIDGE-MIB");
         $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dBasePortEntry", $vlan_data, "BRIDGE-MIB:Q-BRIDGE-MIB");
