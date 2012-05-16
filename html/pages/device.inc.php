@@ -151,7 +151,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     {
       echo('<li class="' . $select['latency'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'latency')).'">
-      <img src="images/16/arrow_undo.png" align="absmiddle" border="0" /> Latency
+      <img src="images/16/arrow_undo.png" align="absmiddle" border="0" /> Ping
     </a>
   </li>');
     }
@@ -250,7 +250,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     {
       echo('<li class="' . $select['packages'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'packages')).'">
-      <img src="images/16/box.png" align="absmiddle" border="0" /> Packages
+      <img src="images/16/package.png" align="absmiddle" border="0" /> Pkgs
     </a>
   </li>');
     }
@@ -299,6 +299,16 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     </li>');
     }
 
+    if (device_permitted($device['device_id']))
+    {
+      echo('<li class="' . $select['alerts'] . '">
+      <a href="'.generate_device_url($device, array('tab' => 'alerts')).'">
+        <img src="images/16/bell.png" align="absmiddle" border="0" /> Alerts
+      </a>
+    </li>');
+    }
+
+
     if ($_SESSION['userlevel'] >= "7")
     {
       if (!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }
@@ -345,7 +355,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     {
       echo('<li class="' . $select['edit'] . '" style="float: right;">
     <a href="'.generate_device_url($device, array('tab' => 'edit')).'">
-      <img src="images/16/server_edit.png" align="absmiddle" border="0" /> Settings
+      <img src="images/16/wrench.png" align="absmiddle" border="0" />
     </a>
   </li>');
     }
