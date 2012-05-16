@@ -341,29 +341,54 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
   return $output;
 }
 
-function generate_port_link($args, $text = NULL, $type = NULL)
+function generate_entity_link($type, $entity, $text = NULL, $graph_type=NULL)
+{
+  global $config;
+  global $entity_cache;
+
+  if(is_numeric($entity))
+  {
+    $entity = get_entity_by_id_cache($type, $entity);
+  }
+
+  switch($type)
+  {
+    case "port":
+      $link = generate_port_link($entity, $text, $graph_type);
+      break;
+    case "storage":
+      $url = generate_url(array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage'));
+    default:
+      $link = $entity[$type.'_id'];
+  }
+
+  return($link);
+
+}
+
+function generate_port_link($port, $text = NULL, $type = NULL)
 {
   global $config;
 
-  $args = ifNameDescr($args);
-  if (!$text) { $text = fixIfName($args['label']); }
-  if ($type) { $args['graph_type'] = $type; }
-  if (!isset($args['graph_type'])) { $args['graph_type'] = 'port_bits'; }
+  $port = ifNameDescr($port);
+  if (!$text) { $text = fixIfName($port['label']); }
+  if ($type) { $port['graph_type'] = $type; }
+  if (!isset($port['graph_type'])) { $port['graph_type'] = 'port_bits'; }
 
-  $class = ifclass($args['ifOperStatus'], $args['ifAdminStatus']);
+  $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
 
-  if (!isset($args['hostname'])) { $args = array_merge($args, device_by_id_cache($args['device_id'])); }
+  if (!isset($port['hostname'])) { $port = array_merge($port, device_by_id_cache($port['device_id'])); }
 
-  $content = "<div class=list-large>".$args['hostname']." - " . fixifName($args['label']) . "</div>";
-  if ($args['ifAlias']) { $content .= $args['ifAlias']."<br />"; }
+  $content = "<div class=list-large>".$port['hostname']." - " . fixifName($port['label']) . "</div>";
+  if ($port['ifAlias']) { $content .= $port['ifAlias']."<br />"; }
   $content .= "<div style=\'width: 850px\'>";
-  $graph_array['type']     = $args['graph_type'];
+  $graph_array['type']     = $port['graph_type'];
   $graph_array['legend']   = "yes";
   $graph_array['height']   = "100";
   $graph_array['width']    = "340";
   $graph_array['to']           = $config['time']['now'];
   $graph_array['from']     = $config['time']['day'];
-  $graph_array['id']       = $args['port_id'];
+  $graph_array['id']       = $port['port_id'];
   $content .= generate_graph_tag($graph_array);
   $graph_array['from']     = $config['time']['week'];
   $content .= generate_graph_tag($graph_array);
@@ -373,9 +398,9 @@ function generate_port_link($args, $text = NULL, $type = NULL)
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
 
-  $url = generate_port_url($args);
+  $url = generate_port_url($port);
 
-  if (port_permitted($args['port_id'], $args['device_id'])) {
+  if (port_permitted($port['port_id'], $port['device_id'])) {
     return overlib_link($url, $text, $content, $class);
   } else {
     return fixifName($text);

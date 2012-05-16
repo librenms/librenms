@@ -188,7 +188,7 @@ function get_entity_by_id_cache($type, $id)
   {
     $entity = $entity_cache[$type][$id];
   } else {
-    $entity = dbFetchRow("SELECT * FROM `".$table."` WHERE `".$type."_id` = ?", array($port_id));
+    $entity = dbFetchRow("SELECT * FROM `".$table."` WHERE `".$type."_id` = ?", array($id));
     $entity_cache[$type][$id] = $entity;
   }
   return $entity;
