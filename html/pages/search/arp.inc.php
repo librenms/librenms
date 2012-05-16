@@ -9,7 +9,7 @@
 <?php
 
 // Select the devices only with ARP tables
-foreach (dbFetchRows("SELECT D.device_id AS device_id, `hostname` FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D WHERE M.interface_id = P.interface_id AND P.device_id = D.device_id GROUP BY `device_id` ORDER BY `hostname`;") as $data)
+foreach (dbFetchRows("SELECT D.device_id AS device_id, `hostname` FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D WHERE M.port_id = P.port_id AND P.device_id = D.device_id GROUP BY `device_id` ORDER BY `hostname`;") as $data)
 {
   echo('<option value="'.$data['device_id'].'"');
   if ($data['device_id'] == $_POST['device_id']) { echo("selected"); }
@@ -40,7 +40,7 @@ print_optionbar_end();
 
 echo('<table width="100%" cellspacing="0" cellpadding="5">');
 
-$query = "SELECT * FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D WHERE M.interface_id = P.interface_id AND P.device_id = D.device_id ";
+$query = "SELECT * FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D WHERE M.port_id = P.port_id AND P.device_id = D.device_id ";
 if (isset($_POST['searchby']) && $_POST['searchby'] == "ip")
 {
   $query .= " AND `ipv4_address` LIKE ?";
@@ -71,11 +71,11 @@ foreach (dbFetchRows($query, $param) as $entry)
       $error_img = generate_port_link($entry,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
     } else { $error_img = ""; }
 
-    $arp_host = dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id AND D.device_id = I.device_id", array($entry['ipv4_address']));
+    $arp_host = dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id", array($entry['ipv4_address']));
     if ($arp_host) { $arp_name = generate_device_link($arp_host); } else { unset($arp_name); }
     if ($arp_host) { $arp_if = generate_port_link($arp_host); } else { unset($arp_if); }
     if ($arp_host['device_id'] == $entry['device_id']) { $arp_name = "Localhost"; }
-    if ($arp_host['interface_id'] == $entry['interface_id']) { $arp_if = "Local port"; }
+    if ($arp_host['port_id'] == $entry['port_id']) { $arp_if = "Local port"; }
 
     echo('<tr class="search">
         <td width="160">' . formatMac($entry['mac_address']) . '</td>

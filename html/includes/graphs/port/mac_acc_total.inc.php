@@ -36,8 +36,8 @@ if ($stat == "pkts")
 
 $accs = dbFetchRows("SELECT *, (M.cipMacHCSwitchedBytes_input_rate + M.cipMacHCSwitchedBytes_output_rate) AS bps,
         (M.cipMacHCSwitchedPkts_input_rate + M.cipMacHCSwitchedPkts_output_rate) AS pps
-        FROM `mac_accounting` AS M, `ports` AS I, `devices` AS D WHERE M.interface_id = ?
-        AND I.interface_id = M.interface_id AND D.device_id = I.device_id ORDER BY $sort DESC LIMIT 0," . $topn, array($port));
+        FROM `mac_accounting` AS M, `ports` AS I, `devices` AS D WHERE M.port_id = ?
+        AND I.port_id = M.port_id AND D.device_id = I.device_id ORDER BY $sort DESC LIMIT 0," . $topn, array($port));
 
 $pluses = ""; $iter = '0';
 $rrd_options .= " COMMENT:'                                     In\: Current     Maximum      Total      Out\: Current     Maximum     Total\\\\n'";
@@ -49,13 +49,13 @@ foreach ($accs as $acc)
   {
     $mac = formatmac($acc['mac']);
     $name = $mac;
-    $addy = dbFetchRow("SELECT * FROM ipv4_mac where mac_address = ? AND interface_id = ?", array($acc['mac'], $acc['interface_id']));
+    $addy = dbFetchRow("SELECT * FROM ipv4_mac where mac_address = ? AND port_id = ?", array($acc['mac'], $acc['port_id']));
 
     if ($addy)
     {
       $name = $addy['ipv4_address'] . " (".$mac.")";
       $peer = dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D
-              WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id AND D.device_id = I.device_id", array($addy['ipv4_address']));
+              WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id", array($addy['ipv4_address']));
       if ($peer)
       {
         $name = $peer['hostname'] . " " . makeshortif($peer['ifDescr']) . " (".$mac.")";

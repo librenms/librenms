@@ -11,10 +11,10 @@ foreach ($_POST as $key => $val)
   {
     # Interface identifier passed as part of the field name
 
-    $interface_id = intval(substr($key,7));
+    $port_id = intval(substr($key,7));
 
     $oldign = intval($val) ? 1 : 0;
-    $newign = $_POST['ignore_'.$interface_id] ? 1 : 0;
+    $newign = $_POST['ignore_'.$port_id] ? 1 : 0;
 
     # As checkboxes are not posted when unset - we effectively need to do a diff to work
     # out a set->unset case.
@@ -24,7 +24,7 @@ foreach ($_POST as $key => $val)
       continue;
     }
 
-    $n = dbUpdate(array('ignore' => $newign), 'ports', '`device_id` = ? AND `interface_id` = ?', array($device_id, $interface_id));
+    $n = dbUpdate(array('ignore' => $newign), 'ports', '`device_id` = ? AND `port_id` = ?', array($device_id, $port_id));
 
     if ($n <0)
     {
@@ -38,10 +38,10 @@ foreach ($_POST as $key => $val)
   {
     # Interface identifier passed as part of the field name
 
-    $interface_id = intval(substr($key,7));
+    $port_id = intval(substr($key,7));
 
     $olddis = intval($val) ? 1 : 0;
-    $newdis = $_POST['disabled_'.$interface_id] ? 1 : 0;
+    $newdis = $_POST['disabled_'.$port_id] ? 1 : 0;
 
     # As checkboxes are not posted when unset - we effectively need to do a diff to work
     # out a set->unset case.
@@ -51,7 +51,7 @@ foreach ($_POST as $key => $val)
       continue;
     }
 
-    $n = dbUpdate(array('disabled' => $newdis), 'ports', '`device_id` = ? AND `interface_id` = ?', array($device_id, $interface_id));
+    $n = dbUpdate(array('disabled' => $newdis), 'ports', '`device_id` = ? AND `port_id` = ?', array($device_id, $port_id));
 
     if ($n <0)
     {

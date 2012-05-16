@@ -52,7 +52,7 @@ if (is_array($ospf_instances_db))
       if ($ospf_instance_db[$oid] != $ospf_instance_poll[$oid])
       { // If data has changed, build a query
         $ospf_instance_update[$oid] = $ospf_instance_poll[$oid];
-        #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['interface_id']); ## FIXME
+        #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['port_id']); ## FIXME
       }
     }
     if ($ospf_instance_update)
@@ -120,7 +120,7 @@ if (is_array($ospf_areas_db))
         if ($ospf_area_db[$oid] != $ospf_area_poll[$oid])
         { ## If data has changed, build a query
           $ospf_area_update[$oid] = $ospf_area_poll[$oid];
-          #log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['interface_id']); ## FIXME
+          #log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['port_id']); ## FIXME
         }
       }
       if ($ospf_area_update)
@@ -148,7 +148,7 @@ unset($ospf_areas_poll);
 
 echo(" Ports: ");
 
-$ospf_port_oids = array('ospfIfIpAddress','interface_id','ospfAddressLessIf','ospfIfAreaId','ospfIfType','ospfIfAdminStat','ospfIfRtrPriority','ospfIfTransitDelay','ospfIfRetransInterval','ospfIfHelloInterval','ospfIfRtrDeadInterval','ospfIfPollInterval','ospfIfState','ospfIfDesignatedRouter','ospfIfBackupDesignatedRouter','ospfIfEvents','ospfIfAuthKey','ospfIfStatus','ospfIfMulticastForwarding','ospfIfDemand','ospfIfAuthType');
+$ospf_port_oids = array('ospfIfIpAddress','port_id','ospfAddressLessIf','ospfIfAreaId','ospfIfType','ospfIfAdminStat','ospfIfRtrPriority','ospfIfTransitDelay','ospfIfRetransInterval','ospfIfHelloInterval','ospfIfRtrDeadInterval','ospfIfPollInterval','ospfIfState','ospfIfDesignatedRouter','ospfIfBackupDesignatedRouter','ospfIfEvents','ospfIfAuthKey','ospfIfStatus','ospfIfMulticastForwarding','ospfIfDemand','ospfIfAuthType');
 
 ### Build array of existing entries
 foreach (dbFetchRows("SELECT * FROM `ospf_ports` WHERE `device_id` = ?", array($device['device_id'])) as $entry)
@@ -190,9 +190,9 @@ if (is_array($ospf_ports_db))
 
       if ($ospf_port_poll['ospfAddressLessIf'])
       {
-        $ospf_port_poll['interface_id'] = @dbFetchCell("SELECT `interface_id` FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device['device_id'], $ospf_port_poll['ospfAddressLessIf']));
+        $ospf_port_poll['port_id'] = @dbFetchCell("SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device['device_id'], $ospf_port_poll['ospfAddressLessIf']));
       } else {
-        $ospf_port_poll['interface_id'] = @dbFetchCell("SELECT A.`interface_id` FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id AND I.device_id = ?", array($ospf_port_poll['ospfIfIpAddress'], $device['device_id']));
+        $ospf_port_poll['port_id'] = @dbFetchCell("SELECT A.`port_id` FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND I.device_id = ?", array($ospf_port_poll['ospfIfIpAddress'], $device['device_id']));
       }
 
       foreach ($ospf_port_oids as $oid)
@@ -200,7 +200,7 @@ if (is_array($ospf_ports_db))
         if ($ospf_port_db[$oid] != $ospf_port_poll[$oid])
         { // If data has changed, build a query
           $ospf_port_update[$oid] = $ospf_port_poll[$oid];
-          #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['interface_id']); ## FIXME
+          #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['port_id']); ## FIXME
         }
       }
       if ($ospf_port_update)
@@ -279,14 +279,14 @@ if (is_array($ospf_nbrs_db))
     {
       $ospf_nbr_poll = $ospf_nbrs_poll[$ospf_nbr_db['ospf_nbr_id']];
 
-      $ospf_nbr_poll['interface_id'] = @dbFetchCell("SELECT A.`interface_id` FROM ipv4_addresses AS A, nbrs AS I WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id AND I.device_id = ?", array($ospf_nbr_poll['ospfNbrIpAddr'], $device['device_id']));
+      $ospf_nbr_poll['port_id'] = @dbFetchCell("SELECT A.`port_id` FROM ipv4_addresses AS A, nbrs AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND I.device_id = ?", array($ospf_nbr_poll['ospfNbrIpAddr'], $device['device_id']));
 
-      if ($ospf_nbr_db['interface_id'] != $ospf_nbr_poll['interface_id'])
+      if ($ospf_nbr_db['port_id'] != $ospf_nbr_poll['port_id'])
       {
-        if ($ospf_nbr_poll['interface_id']) {
-          $ospf_nbr_update = array('interface_id' => $ospf_nbr_poll['interface_id']);
+        if ($ospf_nbr_poll['port_id']) {
+          $ospf_nbr_update = array('port_id' => $ospf_nbr_poll['port_id']);
         } else {
-          $ospf_nbr_update = array('interface_id' => array('NULL'));
+          $ospf_nbr_update = array('port_id' => array('NULL'));
         }
       }
 
@@ -296,7 +296,7 @@ if (is_array($ospf_nbrs_db))
         if ($ospf_nbr_db[$oid] != $ospf_nbr_poll[$oid])
         { // If data has changed, build a query
           $ospf_nbr_update[$oid] = $ospf_nbr_poll[$oid];
-          #log_event("$oid -> ".$this_nbr[$oid], $device, 'ospf', $nbr['interface_id']); ## FIXME
+          #log_event("$oid -> ".$this_nbr[$oid], $device, 'ospf', $nbr['port_id']); ## FIXME
         }
       }
       if ($ospf_nbr_update)

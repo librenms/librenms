@@ -28,15 +28,15 @@ if ($device['os_group'] == "cisco")
     if ($ip && $interface) {
       $new_mac = str_replace(":", "", $mac);
       #echo($interface['ifDescr'] . " ($if) -> $mac ($oid) -> $ip");
-      if (mysql_result(mysql_query("SELECT COUNT(*) from mac_accounting WHERE interface_id = '".$interface['interface_id']."' AND mac = '$clean_mac'"),0)) {
-        #$sql = "UPDATE `mac_accounting` SET `mac` = '$clean_mac' WHERE interface_id = '".$interface['interface_id']."' AND `mac` = '$clean_mac'";
+      if (mysql_result(mysql_query("SELECT COUNT(*) from mac_accounting WHERE port_id = '".$interface['port_id']."' AND mac = '$clean_mac'"),0)) {
+        #$sql = "UPDATE `mac_accounting` SET `mac` = '$clean_mac' WHERE port_id = '".$interface['port_id']."' AND `mac` = '$clean_mac'";
         #mysql_query($sql);
         #if (mysql_affected_rows()) { echo("      UPDATED!"); }
         #echo($sql);
         echo(".");
       } else {
         #echo("      Not Exists!");
-        mysql_query("INSERT INTO `mac_accounting` (interface_id,  mac) VALUES ('".$interface['interface_id']."','$clean_mac')");
+        mysql_query("INSERT INTO `mac_accounting` (port_id,  mac) VALUES ('".$interface['port_id']."','$clean_mac')");
         echo("+");
       }
       #echo("\n");

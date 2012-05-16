@@ -170,7 +170,7 @@ function delete_device($id)
   foreach (dbFetch("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int_data)
   {
     $int_if = $int_data['ifDescr'];
-    $int_id = $int_data['interface_id'];
+    $int_id = $int_data['port_id'];
     delete_port($int_id);
     $ret .= "Removed interface $int_id ($int_if)\n";
   }

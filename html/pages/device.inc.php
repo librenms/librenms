@@ -2,7 +2,7 @@
 
 if ($vars['tab'] == "port" && is_numeric($vars['device']) && port_permitted($vars['port']))
 {
-  $check_device = get_device_id_by_interface_id($vars['port']);
+  $check_device = get_device_id_by_port_id($vars['port']);
   $permit_ports = 1;
 }
 
@@ -100,7 +100,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-    if (@dbFetchCell("SELECT COUNT(interface_id) FROM ports WHERE device_id = '" . $device['device_id'] . "'") > '0')
+    if (@dbFetchCell("SELECT COUNT(port_id) FROM ports WHERE device_id = '" . $device['device_id'] . "'") > '0')
     {
       echo('<li class="' . $select['ports'] . $select['port'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'ports')). '">
@@ -236,7 +236,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-    if ($_SESSION['userlevel'] >= "5" && dbFetchCell("SELECT COUNT(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"))
+    if ($_SESSION['userlevel'] >= "5" && dbFetchCell("SELECT COUNT(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.port_id = L.local_port_id"))
     {
       $discovery_links = TRUE;
       echo('<li class="' . $select['map'] . '">

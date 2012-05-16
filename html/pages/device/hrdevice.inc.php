@@ -40,7 +40,7 @@ foreach (dbFetchRows("SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
       $graph_array['height'] = "20";
       $graph_array['width']  = "100";
       $graph_array['to']     = $config['time']['now'];
-      $graph_array['id']     = $interface['interface_id'];
+      $graph_array['id']     = $interface['port_id'];
       $graph_array['type']   = 'port_bits';
       $graph_array['from']   = $config['time']['day'];
       $graph_array_zoom      = $graph_array; $graph_array_zoom['height'] = "150"; $graph_array_zoom['width'] = "400";

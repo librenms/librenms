@@ -58,14 +58,14 @@ if (!$oids)
   } // foreach
 } // if $oids
 
-$sql   = "SELECT * FROM ipv6_addresses AS A, ports AS I WHERE I.device_id = '".$device['device_id']."' AND  A.interface_id = I.interface_id";
+$sql   = "SELECT * FROM ipv6_addresses AS A, ports AS I WHERE I.device_id = '".$device['device_id']."' AND  A.port_id = I.port_id";
 $data = mysql_query($sql);
 
 while ($row = mysql_fetch_assoc($data))
 {
   $full_address = $row['ipv6_address'] . "/" . $row['ipv6_prefixlen'];
-  $interface_id = $row['interface_id'];
-  $valid_address = $full_address  . "-" . $interface_id;
+  $port_id = $row['port_id'];
+  $valid_address = $full_address  . "-" . $port_id;
   if (!$valid['ipv6'][$valid_address])
   {
     echo("-");

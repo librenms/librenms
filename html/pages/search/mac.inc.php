@@ -68,7 +68,7 @@ foreach (dbFetchRows($query, $param) as $entry)
       $error_img = generate_port_link($entry,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
     } else { $error_img = ""; }
 
-    if (port_permitted($entry['interface_id']))
+    if (port_permitted($entry['port_id']))
     {
       $interface = ifLabel ($interface, $interface);
 

@@ -9,7 +9,7 @@ echo("<td width=200 class=box-desc>" . $vlan['vlan_name'] . "</td>");
 echo("<td class=list-bold>");
 
   $vlan_ports = array();
-  $otherports = dbFetchRows("SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.interface_id = V.interface_id", array($device['device_id'], $vlan['vlan_vlan']));
+  $otherports = dbFetchRows("SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.port_id = V.port_id", array($device['device_id'], $vlan['vlan_vlan']));
   foreach ($otherports as $otherport)
   {
    $vlan_ports[$otherport[ifIndex]] = $otherport;
@@ -28,12 +28,12 @@ foreach ($vlan_ports as $port)
   {
     echo("<div style='display: block; padding: 2px; margin: 2px; min-width: 139px; max-width:139px; min-height:85px; max-height:85px; text-align: center; float: left; background-color: ".$list_colour_b_b.";'>
     <div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>
-    <a href='device/device=".$device['device_id']."/tab=port/port=".$port['interface_id']."/' onmouseover=\"return overlib('\
+    <a href='device/device=".$device['device_id']."/tab=port/port=".$port['port_id']."/' onmouseover=\"return overlib('\
     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
     ".$port['ifAlias']." \
-    <img src=\'graph.php?type=$graph_type&amp;id=".$port['interface_id']."&amp;from=" .$config['time']['twoday']."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150\'>\
+    <img src=\'graph.php?type=$graph_type&amp;id=".$port['port_id']."&amp;from=" .$config['time']['twoday']."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
-    "<img src='graph.php?type=$graph_type&amp;id=".$port['interface_id']."&amp;from=".$config['time']['twoday']."&amp;to=".$config['time']['now']."&amp;width=132&amp;height=40&amp;legend=no'>
+    "<img src='graph.php?type=$graph_type&amp;id=".$port['port_id']."&amp;from=".$config['time']['twoday']."&amp;to=".$config['time']['now']."&amp;width=132&amp;height=40&amp;legend=no'>
     </a>
     <div style='font-size: 9px;'>".truncate(short_port_descr($port['ifAlias']), 22, '')."</div>
    </div>");

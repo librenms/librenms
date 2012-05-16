@@ -4,7 +4,7 @@
 
 # $device_id_host = @dbFetchCell("SELECT device_id FROM devices WHERE `hostname` = '".mres($entry['host'])."' OR `sysName` = '".mres($entry['host'])."'");
 
-# $device_id_ip = @dbFetchCell("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id");
+# $device_id_ip = @dbFetchCell("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '" . $entry['host']."' AND I.port_id = A.port_id");
 
 function get_cache($host, $value)
 {
@@ -20,7 +20,7 @@ function get_cache($host, $value)
         // If failed, try by IP
         if (!is_numeric($dev_cache[$host]['device_id']))
         {
-          $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM `ipv4_addresses` AS A, `ports` AS I WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id', array($host));
+          $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM `ipv4_addresses` AS A, `ports` AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id', array($host));
         }
         break;
       case 'os':

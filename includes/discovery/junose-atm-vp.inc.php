@@ -17,11 +17,11 @@ if ($device['os'] == "junose" && $config['enable_ports_junoseatmvp'])
     {
       list($ifIndex,$vp_id)= explode('.', $index);
 
-      $interface_id = mysql_result(mysql_query("SELECT `interface_id` FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$ifIndex."'"),0);
+      $port_id = mysql_result(mysql_query("SELECT `port_id` FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$ifIndex."'"),0);
 
-      if (is_numeric($interface_id) && is_numeric($vp_id))
+      if (is_numeric($port_id) && is_numeric($vp_id))
       {
-        discover_juniAtmvp($valid_vp, $interface_id, $vp_id, NULL);
+        discover_juniAtmvp($valid_vp, $port_id, $vp_id, NULL);
       }
     } ## End Foreach
   } ## End if array
@@ -30,23 +30,23 @@ if ($device['os'] == "junose" && $config['enable_ports_junoseatmvp'])
 
   ## Remove ATM vps which weren't redetected here
 
-  $sql = "SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id`  = '".$device['device_id']."' AND J.interface_id = P.interface_id";
+  $sql = "SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id`  = '".$device['device_id']."' AND J.port_id = P.port_id";
   $query = mysql_query($sql);
 
   if ($debug) { print_r ($valid_vp); }
 
   while ($test = mysql_fetch_assoc($query))
   {
-    $interface_id = $test['interface_id'];
+    $port_id = $test['port_id'];
     $vp_id = $test['vp_id'];
-    if ($debug) { echo($interface_id . " -> " . $vp_id . "\n"); }
-    if (!$valid_vp[$interface_id][$vp_id])
+    if ($debug) { echo($port_id . " -> " . $vp_id . "\n"); }
+    if (!$valid_vp[$port_id][$vp_id])
     {
       echo("-");
       mysql_query("DELETE FROM `juniAtmvp` WHERE `juniAtmVp` = '" . $test['juniAtmvp'] . "'");
     }
 
-    unset($interface_id); unset($vp_id);
+    unset($port_id); unset($vp_id);
   }
 
   unset($valid_vp);

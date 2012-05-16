@@ -68,6 +68,8 @@ if ($device['os_group'] == "cisco")
           if (is_numeric($cef_stat['cefSwitchingHCPunt'])) { $cef_stat['cefSwitchingPunt'] = $cef_stat['cefSwitchingHCPunt']; }
           if (is_numeric($cef_stat['cefSwitchingHCPunt2Host'])) { $cef_stat['cefSwitchingPunt2Host'] = $cef_stat['cefSwitchingHCPunt2Host']; }
 
+          ## FIXME -- memcached
+
           $cef_stat['update']['drop'] = $cef_stat['cefSwitchingDrop'];
           $cef_stat['update']['punt'] = $cef_stat['cefSwitchingPunt'];
           $cef_stat['update']['punt2host'] = $cef_stat['cefSwitchingPunt2Host'];
@@ -79,10 +81,7 @@ if ($device['os_group'] == "cisco")
 
           dbUpdate($cef_stat['update'], 'cef_switching', '`device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?', array($device['device_id'], $entity, $afi, $path));
 
-          $rrd_update  = "N:".$cef_stat['cefSwitchingDrop'].":".$cef_stat['cefSwitchingPunt'].":".$cef_stat['cefSwitchingPunt2Host'];
-          $ret = rrdtool_update("$filename", $rrd_update);
-
-          if ($debug) { echo(" Values: ".$cef_stat['cefSwitchingDrop'].":".$cef_stat['cefSwitchingPunt'].":".$cef_stat['cefSwitchingPunt2Host']); }
+          $ret = rrdtool_update("$filename", array($cef_stat['cefSwitchingDrop'], $cef_stat['cefSwitchingPunt'], $cef_stat['cefSwitchingPunt2Host']));
 
           echo("\n");
 

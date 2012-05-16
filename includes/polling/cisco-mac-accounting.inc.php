@@ -18,7 +18,7 @@ if ($device['os_group'] == "cisco")
 
   $mac_entries = 0;
 
-  $acc_rows = dbFetchRows("SELECT *, A.poll_time AS poll_time FROM `mac_accounting` as A, `ports` AS I where A.interface_id = I.interface_id AND I.device_id = ?", array($device['device_id']));
+  $acc_rows = dbFetchRows("SELECT *, A.poll_time AS poll_time FROM `mac_accounting` as A, `ports` AS I where A.port_id = I.port_id AND I.device_id = ?", array($device['device_id']));
 
   foreach ($acc_rows as $acc)
   {

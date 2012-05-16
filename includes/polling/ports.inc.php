@@ -135,18 +135,18 @@ foreach ($port_stats as $ifIndex => $port)
     echo("valid");
     if (!is_array($ports[$port['ifIndex']]))
     {
-      $interface_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
-      $ports[$port['ifIndex']] = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($interface_id));
-      echo("Adding: ".$port['ifName']."(".$ifIndex.")(".$ports[$port['ifIndex']]['interface_id'].")");
+      $port_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
+      $ports[$port['ifIndex']] = dbFetchRow("SELECT * FROM `ports` WHERE `port_id` = ?", array($port_id));
+      echo("Adding: ".$port['ifName']."(".$ifIndex.")(".$ports[$port['ifIndex']]['port_id'].")");
       #print_r($ports);
     } elseif ($ports[$ifIndex]['deleted'] == "1") {
-      dbUpdate(array('deleted' => '0'), 'ports', '`interface_id` = ?', array($ports[$ifIndex]['interface_id']));
+      dbUpdate(array('deleted' => '0'), 'ports', '`port_id` = ?', array($ports[$ifIndex]['port_id']));
       $ports[$ifIndex]['deleted'] = "0";
     }
   } else {
     if ($ports[$port['ifIndex']]['deleted'] != "1")
     {
-      dbUpdate(array('deleted' => '1'), 'ports', '`interface_id` = ?', array($ports[$ifIndex]['interface_id']));
+      dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($ports[$ifIndex]['port_id']));
       $ports[$ifIndex]['deleted'] = "1";
     }
   }
@@ -166,7 +166,7 @@ foreach ($ports as $port)
 
     if ($config['memcached']['enable'])
     {
-      $port['poll_time'] = $memcache->get('port-'.$port['interface_id'].'-poll_time');
+      $port['poll_time'] = $memcache->get('port-'.$port['port_id'].'-poll_time');
 #      echo("time".$port['poll_time']);
     }
 
@@ -182,9 +182,9 @@ foreach ($ports as $port)
 
     if ($config['memcached']['enable'])
     {
-      $memcache->set('port-'.$port['interface_id'].'-poll_time', $polled);
-      $memcache->set('port-'.$port['interface_id'].'-poll_prev', $port['poll_time']);
-      $memcache->set('port-'.$port['interface_id'].'-poll_period', $polled_period);
+      $memcache->set('port-'.$port['port_id'].'-poll_time', $polled);
+      $memcache->set('port-'.$port['port_id'].'-poll_prev', $port['poll_time']);
+      $memcache->set('port-'.$port['port_id'].'-poll_period', $polled_period);
     }
 
     ### Copy ifHC[In|Out]Octets values to non-HC if they exist
@@ -252,11 +252,11 @@ foreach ($ports as $port)
       if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]))
       {
         $port['update'][$oid] = NULL;
-        log_event($oid . ": ".$port[$oid]." -> NULL", $device, 'interface', $port['interface_id']);
+        log_event($oid . ": ".$port[$oid]." -> NULL", $device, 'interface', $port['port_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> NULL "); } else { echo($oid . " "); }
       } elseif ($port[$oid] != $this_port[$oid]) {
         $port['update'][$oid] = $this_port[$oid];
-        log_event($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device, 'interface', $port['interface_id']);
+        log_event($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device, 'interface', $port['port_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> " . $this_port[$oid]." "); } else { echo($oid . " "); }
       }
     }
@@ -274,7 +274,7 @@ foreach ($ports as $port)
         if ($port_ifAlias[$attrib] != $port[$attrib_key])
         {
           $port['update'][$attrib_key] = $port_ifAlias[$attrib];
-          log_event($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device, 'interface', $port['interface_id']);
+          log_event($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device, 'interface', $port['port_id']);
         }
       }
     }
@@ -283,7 +283,6 @@ foreach ($ports as $port)
     ### Update IF-MIB metrics
     foreach ($stat_oids_db as $oid)
     {
-#      echo("\n".$oid.":");
 
       if ($config['slow_statistics'] == TRUE) {
         $port['update'][$oid] = $this_port[$oid];
@@ -292,22 +291,16 @@ foreach ($ports as $port)
 
       if ($config['memcached']['enable'])
       {
-        $port[$oid] = $memcache->get('port-'.$port['interface_id'].'-'.$oid);
-        $memcache->set('port-'.$port['interface_id'].'-'.$oid, $this_port[$oid]);
-        $memcache->set('port-'.$port['interface_id'].'-'.$oid.'_prev', $port[$oid]);
-#        echo("MEMCACHE!");
+        $port[$oid] = $memcache->get('port-'.$port['port_id'].'-'.$oid);
+        $memcache->set('port-'.$port['port_id'].'-'.$oid, $this_port[$oid]);
+        $memcache->set('port-'.$port['port_id'].'-'.$oid.'_prev', $port[$oid]);
       }
-
-#      echo(" old[".$port[$oid]."]");
-#      echo(" new[".$this_port[$oid]."]");
 
       $oid_prev = $oid . "_prev";
       if (isset($port[$oid]))
       {
         $oid_diff = $this_port[$oid] - $port[$oid];
-#        echo(" diff[".$oid_diff."]");
         $oid_rate  = $oid_diff / $polled_period;
-#        echo(" rate[".$oid_rate."]");
         if ($oid_rate < 0) { $oid_rate = "0"; echo("negative $oid"); }
         $port['stats'][$oid.'_rate'] = $oid_rate;
         $port['stats'][$oid.'_diff'] = $oid_diff;
@@ -319,17 +312,24 @@ foreach ($ports as $port)
 
         if ($config['memcached']['enable'])
             {
-          $memcache->set('port-'.$port['interface_id'].'-'.$oid.'_rate', $oid_rate);
-          $memcache->set('port-'.$port['interface_id'].'-'.$oid.'_delta', $oid_diff);
-#          echo($oid."[".$oid_rate."]");
+          $memcache->set('port-'.$port['port_id'].'-'.$oid.'_rate', $oid_rate);
+          $memcache->set('port-'.$port['port_id'].'-'.$oid.'_delta', $oid_diff);
            }
 
         if ($debug) { echo("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n"); }
       }
     }
 
-    $port['stats']['ifInBits_rate'] = $port['stats']['ifInOctets_rate'] * 8;
-    $port['stats']['ifOutBits_rate'] = $port['stats']['ifOutOctets_rate'] * 8;
+    $port['stats']['ifInBits_rate'] = round($port['stats']['ifInOctets_rate'] * 8);
+    $port['stats']['ifOutBits_rate'] = round($port['stats']['ifOutOctets_rate'] * 8);
+
+    // If we have a valid ifSpeed we should populate the stats for checking.
+    if(is_numeric($this_port['ifSpeed']))
+    {
+      $port['stats']['ifInBits_perc'] = round($port['stats']['ifInBits_rate'] / $this_port['ifSpeed'] * 100);
+      $port['stats']['ifOutBits_perc'] = round($port['stats']['ifOutBits_rate'] / $this_port['ifSpeed'] * 100);
+    }
+
     echo('bps('.formatRates($port['stats']['ifInBits_rate']).'/'.formatRates($port['stats']['ifOutBits_rate']).')');
     echo('bytes('.formatStorage($port['stats']['ifInOctets_diff']).'/'.formatStorage($port['stats']['ifOutOctets_diff']).')');
     echo('pkts('.format_si($port['stats']['ifInUcastPkts_rate']).'pps/'.format_si($port['stats']['ifOutUcastPkts_rate']).'pps)');
@@ -343,10 +343,13 @@ foreach ($ports as $port)
       echo("IN: " . $port['stats']['ifInBits_rate'] . " OUT: " . $port['stats']['ifOutBits_rate'] . " THRESH: " . $saturation_threshold);
       if (($port['stats']['ifInBits_rate'] >= $saturation_threshold ||  $port['stats']['ifOutBits_rate'] >= $saturation_threshold) && $saturation_threshold > 0)
       {
-          log_event('Port reached saturation threshold: ' . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ' - ifspeed: ' . formatRates( $this_port['stats']['ifSpeed'])  , $device, 'interface', $port['interface_id']);
+          log_event('Port reached saturation threshold: ' . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ' - ifspeed: ' . formatRates( $this_port['stats']['ifSpeed'])  , $device, 'interface', $port['port_id']);
           notify($device, 'Port saturation threshold reached on ' . $device['hostname'] , 'Port saturation threshold alarm: ' . $device['hostname'] . ' on ' . $port['ifDescr'] . "\nRates:" . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ' - ifspeed: ' . formatRates( $this_port['ifSpeed']));
       }
     }
+
+    print_r($port['stats']);
+
 
     ### Update RRDs
     $rrdfile = $host_rrd . "/port-" . safename($port['ifIndex'] . ".rrd");
@@ -370,15 +373,11 @@ foreach ($ports as $port)
       DS:OUTMULTICASTPKTS:DERIVE:600:0:12500000000 ".$config['rrd_rra']);
     }
 
-    foreach ($stat_oids as $oid)
-    {  ### Copy values from array to global variables and force numeric.
-      $$oid = $this_port[$oid];
-      if (!is_numeric($$oid)) { $$oid = "U"; }
-    }
+    $this_port['rrd_update']  = array($this_port['ifInOctets'], $this_port['ifOutOctets'], $this_port['ifInErrors'], $this_port['ifOutErrors'], $this_port['ifInUcastPkts'], $this_port['ifOutUcastPkts'],
+                            $this_port['ifInNUcastPkts'], $this_port['ifOutNUcastPkts'], $this_port['ifInDiscards'], $this_port['ifOutDiscards'], $this_port['ifInUnknownProtos'],
+                            $this_port['ifInBroadcastPkts'], $this_port['ifOutBroadcastPkts'], $this_port['ifInMulticastPkts'], $this_port['ifOutMulticastPkts']);
 
-    $if_rrd_update  = "$polled:$ifInOctets:$ifOutOctets:$ifInErrors:$ifOutErrors:$ifInUcastPkts:$ifOutUcastPkts:$ifInNUcastPkts:$ifOutNUcastPkts:$ifInDiscards:$ifOutDiscards:$ifInUnknownProtos";
-    $if_rrd_update .= ":$ifInBroadcastPkts:$ifOutBroadcastPkts:$ifInMulticastPkts:$ifOutMulticastPkts";
-    $ret = rrdtool_update("$rrdfile", $if_rrd_update);
+    rrdtool_update("$rrdfile", $this_port['rrd_update']);
     ### End Update IF-MIB
 
     ### Update PAgP
@@ -390,7 +389,7 @@ foreach ($ports as $port)
         { ### If data has changed, build a query
           $port['update'][$oid] = $this_port[$oid];
           echo("PAgP ");
-          log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['interface_id']);
+          log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['port_id']);
         }
       }
     }
@@ -411,7 +410,7 @@ foreach ($ports as $port)
     ### Update Database
     if (count($port['update']))
     {
-      $updated = dbUpdate($port['update'], 'ports', '`interface_id` = ?', array($port['interface_id']));
+      $updated = dbUpdate($port['update'], 'ports', '`port_id` = ?', array($port['port_id']));
       if ($debug) { echo("$updated updated"); }
     }
     ### End Update Database

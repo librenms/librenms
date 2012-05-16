@@ -6,7 +6,7 @@ var ajax = new Array();
 function getInterfaceList(sel)
 {
         var deviceId = sel.options[sel.selectedIndex].value;
-        document.getElementById('interface_id').options.length = 0;     // Empty city select box
+        document.getElementById('port_id').options.length = 0;     // Empty city select box
         if (deviceId.length>0) {
                 var index = ajax.length;
                 ajax[index] = new sack();
@@ -19,7 +19,7 @@ function getInterfaceList(sel)
 
 function createInterfaces(index)
 {
-        var obj = document.getElementById('interface_id');
+        var obj = document.getElementById('port_id');
         eval(ajax[index].response);     // Executing the response from Ajax as Javascript code
 }
 

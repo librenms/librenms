@@ -19,7 +19,7 @@ foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `ospfAdminStat` = 'en
   $neighbour_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = '".$device['device_id']."'");
 
   $ip_query = "SELECT * FROM ipv4_addresses AS A, ports AS I WHERE ";
-  $ip_query .= "(A.ipv4_address = ? AND I.interface_id = A.interface_id)";
+  $ip_query .= "(A.ipv4_address = ? AND I.port_id = A.port_id)";
   $ip_query .= " AND I.device_id = ?";
 
   $ipv4_host = dbFetchRow($ip_query, array($peer['bgpPeerIdentifier'], $device['device_id']));

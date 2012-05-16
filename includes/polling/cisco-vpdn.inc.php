@@ -16,24 +16,15 @@ if ($device['os_group'] == "cisco")
   {
 
     $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("vpdn-".$type.".rrd");
-    $rrd_create  = " DS:tunnels:GAUGE:600:0:U";
-    $rrd_create .= " DS:sessions:GAUGE:600:0:U";
-    $rrd_create .= " DS:denied:COUNTER:600:0:100000";
-    $rrd_create .= $config['rrd_rra'];
 
     if (is_file($rrd_filename) || $vpdn['cvpdnSystemTunnelTotal'] || $vpdn['cvpdnSystemSessionTotal'])
     {
       if (!file_exists($rrd_filename))
       {
-        rrdtool_create($rrd_filename, $rrd_create);
+        rrdtool_create($rrd_filename, " DS:tunnels:GAUGE:600:0:U DS:sessions:GAUGE:600:0:U DS:denied:COUNTER:600:0:100000" . $config['rrd_rra']);
       }
 
-      $rrd_update  = "N";
-      $rrd_update .= ":".$vpdn['cvpdnSystemTunnelTotal'];
-      $rrd_update .= ":".$vpdn['cvpdnSystemSessionTotal'];
-      $rrd_update .= ":".$vpdn['cvpdnSystemDeniedUsersTotal'];
-
-      rrdtool_update($rrd_filename, $rrd_update);
+      rrdtool_update($rrd_filename, array($vpdn['cvpdnSystemTunnelTotal'], $vpdn['cvpdnSystemSessionTotal'], $vpdn['cvpdnSystemDeniedUsersTotal']));
 
       $graphs['vpdn_sessions_'.$type]   = TRUE;
       $graphs['vpdn_tunnels_'.$type]   = TRUE;
@@ -41,7 +32,7 @@ if ($device['os_group'] == "cisco")
       echo(" Cisco VPDN ($type) ");
     }
   }
-  unset($data, $vpdn, $type, $rrd_filename, $rrd_create, $rrd_update);
+  unset($data, $vpdn, $type, $rrd_filename);
 }
 
 ?>

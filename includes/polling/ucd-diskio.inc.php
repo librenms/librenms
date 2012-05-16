@@ -19,9 +19,6 @@ if (count($diskio_data))
 
     if ($debug) { print_r($entry); }
 
-    $rrd_update = $entry['diskIONReadX'].":".$entry['diskIONWrittenX'];
-    $rrd_update .= ":".$entry['diskIOReads'].":".$entry['diskIOWrites'];
-
     $rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("ucd_diskio-" . $diskio['diskio_descr'] .".rrd");
 
     if ($debug) { echo("$rrd "); }
@@ -35,8 +32,7 @@ if (count($diskio_data))
       DS:writes:DERIVE:600:0:125000000000 ".$config['rrd_rra']);
     }
 
-    rrdtool_update($rrd,"N:$rrd_update");
-    unset($rrd_update);
+    rrdtool_update($rrd, array($entry['diskIONReadX'], $entry['diskIONWrittenX'], $entry['diskIOReads'], $entry['diskIOWrites']));
   }
 
   echo("\n");

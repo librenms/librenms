@@ -1,5 +1,7 @@
 <?php
 
+include("../includes/alerts.inc.php");
+
 function data_uri($file, $mime)
 {
   $contents = file_get_contents($file);
@@ -201,7 +203,7 @@ function permissions_cache($user_id)
   }
   foreach (dbFetchRows("SELECT * FROM ports_perms WHERE user_id = '".$user_id."'") as $port)
   {
-    $permissions['port'][$port['interface_id']] = 1;
+    $permissions['port'][$port['port_id']] = 1;
   }
   foreach (dbFetchRows("SELECT * FROM bill_perms WHERE user_id = '".$user_id."'") as $bill)
   {
@@ -226,18 +228,18 @@ function bill_permitted($bill_id)
   return $allowed;
 }
 
-function port_permitted($interface_id, $device_id = NULL)
+function port_permitted($port_id, $device_id = NULL)
 {
   global $permissions;
 
-  if (!is_numeric($device_id)) { $device_id = get_device_id_by_interface_id($interface_id); }
+  if (!is_numeric($device_id)) { $device_id = get_device_id_by_port_id($port_id); }
 
   if ($_SESSION['userlevel'] >= "5")
   {
     $allowed = TRUE;
   } elseif (device_permitted($device_id)) {
     $allowed = TRUE;
-  } elseif ($permissions['port'][$interface_id]) {
+  } elseif ($permissions['port'][$port_id]) {
     $allowed = TRUE;
   } else {
     $allowed = FALSE;
@@ -361,7 +363,7 @@ function generate_port_link($args, $text = NULL, $type = NULL)
   $graph_array['width']    = "340";
   $graph_array['to']           = $config['time']['now'];
   $graph_array['from']     = $config['time']['day'];
-  $graph_array['id']       = $args['interface_id'];
+  $graph_array['id']       = $args['port_id'];
   $content .= generate_graph_tag($graph_array);
   $graph_array['from']     = $config['time']['week'];
   $content .= generate_graph_tag($graph_array);
@@ -373,7 +375,7 @@ function generate_port_link($args, $text = NULL, $type = NULL)
 
   $url = generate_port_url($args);
 
-  if (port_permitted($args['interface_id'], $args['device_id'])) {
+  if (port_permitted($args['port_id'], $args['device_id'])) {
     return overlib_link($url, $text, $content, $class);
   } else {
     return fixifName($text);
@@ -382,13 +384,13 @@ function generate_port_link($args, $text = NULL, $type = NULL)
 
 function generate_port_url($port, $vars=array())
 {
-  return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['interface_id']), $vars);
+  return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']), $vars);
 }
 
 function generate_port_thumbnail($args)
 {
   if (!$args['bg']) { $args['bg'] = "FFFFFF"; }
-  $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&amp;id=".$args['interface_id']."&amp;from=".$args['from']."&amp;to=".$args['to']."&amp;width=".$args['width']."&amp;height=".$args['height']."&amp;bg=".$args['bg']."'>";
+  $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&amp;id=".$args['port_id']."&amp;from=".$args['from']."&amp;to=".$args['to']."&amp;width=".$args['width']."&amp;height=".$args['height']."&amp;bg=".$args['bg']."'>";
   echo(generate_port_link($args, $args['content']));
 }
 

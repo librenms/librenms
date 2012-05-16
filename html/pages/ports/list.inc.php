@@ -35,7 +35,7 @@ foreach ($ports as $port)
   } elseif ($port['ifAdminStatus'] == "up" && $port['ifOperStatus']== "up") { $ports_up++; }
   $ports_total++;
 
-  if (port_permitted($port['interface_id'], $port['device_id']))
+  if (port_permitted($port['port_id'], $port['device_id']))
   {
     $speed = humanspeed($port['ifSpeed']);
     $type = humanmedia($port['ifType']);

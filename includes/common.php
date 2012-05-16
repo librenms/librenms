@@ -77,17 +77,17 @@ function delete_port($int_id)
 {
   global $config;
 
-  $interface = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.interface_id = ? AND D.device_id = P.device_id", array($int_id));
+  $interface = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.port_id = ? AND D.device_id = P.device_id", array($int_id));
 
   $interface_tables = array('adjacencies', 'ipaddr', 'ip6adjacencies', 'ip6addr', 'mac_accounting', 'bill_ports', 'pseudowires', 'ports');
 
   foreach ($interface_tables as $table)
   {
-    dbDelete($table, "`interface_id` =  ?", array($int_id));
+    dbDelete($table, "`port_id` =  ?", array($int_id));
   }
 
-  dbDelete('links', "`local_interface_id` =  ?", array($int_id));
-  dbDelete('links', "`remote_interface_id` =  ?", array($int_id));
+  dbDelete('links', "`local_port_id` =  ?", array($int_id));
+  dbDelete('links', "`remote_port_id` =  ?", array($int_id));
   dbDelete('bill_ports', "`port_id` =  ?", array($int_id));
 
   unlink(trim($config['rrd_dir'])."/".trim($interface['hostname'])."/port-".$interface['ifIndex'].".rrd");
@@ -164,23 +164,41 @@ function get_all_devices($device, $type = "")
 
 function port_by_id_cache($port_id)
 {
-  global $port_cache;
+  return get_port_by_id_cache('port', $port_id);
+}
 
-  if (isset($port_cache[$port_id]) && is_array($port_cache[$device_id]))
+function table_from_entity_type($type)
+{
+  /// Fuck you, english pluralisation.
+  if($type == "storage")
   {
-    $port = $port_cache[$port_id];
+    return $type;
   } else {
-    $port = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($port_id));
-    $port_cache[$port_id] = $port;
+    return $type."s";
   }
-  return $port;
+}
+
+function get_entity_by_id_cache($type, $id)
+{
+  global $entity_cache;
+
+  $table = table_from_entity_type($type);
+
+  if (is_array($entity_cache[$type][$id]))
+  {
+    $entity = $entity_cache[$type][$id];
+  } else {
+    $entity = dbFetchRow("SELECT * FROM `".$table."` WHERE `".$type."_id` = ?", array($port_id));
+    $entity_cache[$type][$id] = $entity;
+  }
+  return $entity;
 }
 
 function get_port_by_id($port_id)
 {
   if (is_numeric($port_id))
   {
-    $port = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($port_id));
+    $port = dbFetchRow("SELECT * FROM `ports` WHERE `port_id` = ?", array($port_id));
   }
   if (is_array($port))
   {
@@ -218,11 +236,11 @@ function get_sensor_by_id($sensor_id)
   }
 }
 
-function get_device_id_by_interface_id($interface_id)
+function get_device_id_by_port_id($port_id)
 {
-  if (is_numeric($interface_id))
+  if (is_numeric($port_id))
   {
-    $device_id = dbFetchCell("SELECT `device_id` FROM `ports` WHERE `interface_id` = ?", array($interface_id));
+    $device_id = dbFetchCell("SELECT `device_id` FROM `ports` WHERE `port_id` = ?", array($port_id));
   }
   if (is_numeric($device_id))
   {
@@ -294,7 +312,7 @@ function mres($string)
 
 function getifhost($id)
 {
-  return dbFetchCell("SELECT `device_id` from `ports` WHERE `interface_id` = ?", array($id));
+  return dbFetchCell("SELECT `device_id` from `ports` WHERE `port_id` = ?", array($id));
 }
 
 function gethostbyid($id)
@@ -337,17 +355,17 @@ function getpeerhost($id)
 
 function getifindexbyid($id)
 {
-  return dbFetchCell("SELECT `ifIndex` FROM `ports` WHERE `interface_id` = ?", array($id));
+  return dbFetchCell("SELECT `ifIndex` FROM `ports` WHERE `port_id` = ?", array($id));
 }
 
 function getifbyid($id)
 {
-  return dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($id));
+  return dbFetchRow("SELECT * FROM `ports` WHERE `port_id` = ?", array($id));
 }
 
 function getifdescrbyid($id)
 {
-  return dbFetchCell("SELECT `ifDescr` FROM `ports` WHERE `interface_id` = ?", array($id));
+  return dbFetchCell("SELECT `ifDescr` FROM `ports` WHERE `port_id` = ?", array($id));
 }
 
 function getidbyname($hostname)

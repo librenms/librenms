@@ -17,7 +17,7 @@ $ports = dbFetchRows("SELECT * FROM `ports` as I, `devices` AS D WHERE $type_whe
 
 foreach ($ports as $port)
 {
-  $if_list .= $seperator . $port['interface_id'];
+  $if_list .= $seperator . $port['port_id'];
   $seperator = ",";
 }
 unset($seperator);
@@ -32,7 +32,7 @@ echo("<tr class='iftype'>
 if ($if_list)
 {
   $graph_type = "multiport_bits_separate";
-  $port['interface_id'] = $if_list;
+  $port['port_id'] = $if_list;
 
   include("includes/print-interface-graphs.inc.php");
 
@@ -50,9 +50,9 @@ if ($if_list)
              <td><span class=list-large>" . generate_port_link($port,$port['port_descr_descr']) . "</span><br />
             <span class=interface-desc style='float: left;'>".generate_device_link($port)." ".generate_port_link($port)." </span>");
 
-    if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE interface_id = ?", array($port['interface_id'])))
+    if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = ?", array($port['port_id'])))
     {
-      echo("<span style='float: right;'><a href='device/".$port['device_id']."/port/".$port['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'> MAC Accounting</a></span>");
+      echo("<span style='float: right;'><a href='device/".$port['device_id']."/port/".$port['port_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'> MAC Accounting</a></span>");
     }
 
     echo('<br />');

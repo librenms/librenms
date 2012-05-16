@@ -15,8 +15,8 @@ foreach (explode("\n", $oids) as $data)
 
   if (mysql_result(mysql_query("SELECT count(*) FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $oid != "0.0.0.0" && $oid != 'ipAdEntIfIndex')
   {
-    $i_query = "SELECT interface_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
-    $interface_id = mysql_result(mysql_query($i_query), 0);
+    $i_query = "SELECT port_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
+    $port_id = mysql_result(mysql_query($i_query), 0);
 
     if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_networks` WHERE `ipv4_network` = '$network'"), 0) < '1')
     {
@@ -27,10 +27,10 @@ foreach (explode("\n", $oids) as $data)
 
     $ipv4_network_id = @mysql_result(mysql_query("SELECT `ipv4_network_id` from `ipv4_networks` WHERE `ipv4_network` = '$network'"), 0);
 
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_addresses` WHERE `ipv4_address` = '$oid' AND `ipv4_prefixlen` = '$cidr' AND `interface_id` = '$interface_id'"), 0) == '0')
+    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_addresses` WHERE `ipv4_address` = '$oid' AND `ipv4_prefixlen` = '$cidr' AND `port_id` = '$port_id'"), 0) == '0')
     {
-      mysql_query("INSERT INTO `ipv4_addresses` (`ipv4_address`, `ipv4_prefixlen`, `ipv4_network_id`, `interface_id`) VALUES ('$oid', '$cidr', '$ipv4_network_id', '$interface_id')");
-      #echo("Added $oid/$cidr to $interface_id ( $hostname $ifIndex )\n $i_query\n");
+      mysql_query("INSERT INTO `ipv4_addresses` (`ipv4_address`, `ipv4_prefixlen`, `ipv4_network_id`, `port_id`) VALUES ('$oid', '$cidr', '$ipv4_network_id', '$port_id')");
+      #echo("Added $oid/$cidr to $port_id ( $hostname $ifIndex )\n $i_query\n");
       echo("+");
     } else { echo("."); }
 
@@ -39,7 +39,7 @@ foreach (explode("\n", $oids) as $data)
   } else { echo("!"); }
 }
 
-$sql   = "SELECT * FROM ipv4_addresses AS A, ports AS I WHERE I.device_id = '".$device['device_id']."' AND  A.interface_id = I.interface_id";
+$sql   = "SELECT * FROM ipv4_addresses AS A, ports AS I WHERE I.device_id = '".$device['device_id']."' AND  A.port_id = I.port_id";
 $data = mysql_query($sql);
 
 while ($row = mysql_fetch_assoc($data))

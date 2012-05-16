@@ -74,9 +74,9 @@ $(document).ready(function() {
             var text = $(this).text();
             if (name && text == 'down') {
                 // get the interface number from the object name
-                var interface_id = name.split('_')[1];
+                var port_id = name.split('_')[1];
                 // find its corresponding checkbox and toggle it
-                $('[name="ignore_' + interface_id + '"]').check();
+                $('[name="ignore_' + port_id + '"]').check();
             }
         });
     });
@@ -87,9 +87,9 @@ $(document).ready(function() {
             var name = $(this).attr('name');
             if (name) {
                 // get the interface number from the object name
-                var interface_id = name.split('_')[1];
+                var port_id = name.split('_')[1];
                 // find its corresponding checkbox and toggle it
-                $('[name="ignore_' + interface_id + '"]').check('toggle');
+                $('[name="ignore_' + port_id + '"]').check('toggle');
             }
         });
     });
@@ -122,16 +122,16 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY `ifIn
   $dowecare  = ($port['ignore'] == 0 && $port['disabled'] == 0) ? $isportbad : !$isportbad;
   $outofsync = $dowecare ? " class='red'" : "";
 
-  echo("<td align=right><span name='operstatus_".$port['interface_id']."'".$outofsync.">". $port['ifOperStatus']."</span></td>");
+  echo("<td align=right><span name='operstatus_".$port['port_id']."'".$outofsync.">". $port['ifOperStatus']."</span></td>");
 
   echo("<td align=center>");
-  echo("<input type=checkbox name='disabled_".$port['interface_id']."'".($port['disabled'] ? 'checked' : '').">");
-  echo("<input type=hidden name='olddis_".$port['interface_id']."' value=".($port['disabled'] ? 1 : 0).">");
+  echo("<input type=checkbox name='disabled_".$port['port_id']."'".($port['disabled'] ? 'checked' : '').">");
+  echo("<input type=hidden name='olddis_".$port['port_id']."' value=".($port['disabled'] ? 1 : 0).">");
   echo("</td>");
 
   echo("<td align=center>");
-  echo("<input type=checkbox name='ignore_".$port['interface_id']."'".($port['ignore'] ? 'checked' : '').">");
-  echo("<input type=hidden name='oldign_".$port['interface_id']."' value=".($port['ignore'] ? 1 : 0).">");
+  echo("<input type=checkbox name='ignore_".$port['port_id']."'".($port['ignore'] ? 'checked' : '').">");
+  echo("<input type=hidden name='oldign_".$port['port_id']."' value=".($port['ignore'] ? 1 : 0).">");
   echo("</td>");
   echo("<td align=left>".$port['ifAlias'] . "</td>");
 

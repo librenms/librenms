@@ -2,14 +2,14 @@
 
 if (!isset($vars['view']) ) { $vars['view'] = "graphs"; }
 
-$port = dbFetchRow("SELECT * FROM `ports` WHERE `interface_id` = ?", array($vars['port']));
+$port = dbFetchRow("SELECT * FROM `ports` WHERE `port_id` = ?", array($vars['port']));
 
 if ($config['memcached']['enable'])
 {
   $oids = array('ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors');
   foreach ($oids as $oid)
   {
-    $port[$oid.'_rate'] = $memcache->get('port-'.$port['interface_id'].'-'.$oid.'_rate');
+    $port[$oid.'_rate'] = $memcache->get('port-'.$port['port_id'].'-'.$oid.'_rate');
     if ($debug) { echo("MC[".$oid."->".$port[$oid.'_rate']."]"); }
   }
 }
@@ -17,7 +17,7 @@ if ($config['memcached']['enable'])
 $port_details = 1;
 
 $hostname = $device['hostname'];
-$hostid   = $device['interface_id'];
+$hostid   = $device['port_id'];
 $ifname   = $port['ifDescr'];
 $ifIndex   = $port['ifIndex'];
 $speed = humanspeed($port['ifSpeed']);
@@ -64,20 +64,20 @@ print_optionbar_start();
 $link_array = array('page'    => 'device',
                     'device'  => $device['device_id'],
                     'tab' => 'port',
-                    'port'    => $port['interface_id']);
+                    'port'    => $port['port_id']);
 
 $menu_options['graphs']   = 'Graphs';
 $menu_options['realtime'] = 'Real time';   ### FIXME CONDITIONAL
 $menu_options['arp']      = 'ARP Table';
 $menu_options['events']      = 'Eventlog';
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$port['interface_id']."'") )
+if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = '".$port['port_id']."'") )
 {  $menu_options['adsl'] = 'ADSL'; }
 
 if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '".$port['ifIndex']."' and `device_id` = '".$device['device_id']."'") )
 {  $menu_options['pagp'] = 'PAgP'; }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `interface_id` = '".$port['interface_id']."' and `device_id` = '".$device['device_id']."'") )
+if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = '".$port['port_id']."' and `device_id` = '".$device['device_id']."'") )
 {  $menu_options['vlans'] = 'VLANs'; }
 
 $sep = "";
@@ -91,7 +91,7 @@ foreach ($menu_options as $option => $text)
 }
 unset($sep);
 
-if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$port['interface_id']."'") > "0" )
+if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = '".$port['port_id']."'") > "0" )
 {
 
   echo(generate_link($descr,$link_array,array('view'=>'macaccounting','graph'=>$type)));
@@ -126,7 +126,7 @@ if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$po
   echo(")");
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE interface_id = '".$port['interface_id']."'") > "0" )
+if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '".$port['port_id']."'") > "0" )
 {
 
   ### FIXME ATM VPs
@@ -134,25 +134,25 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE interface_id = '".$port['i
 
   echo(" | ATM VPs : ");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='/device/device=" . $device['device_id'] . "/tab=port/port=".$port['interface_id']."/junose-atm-vp/bits/'>Bits</a>");
+  echo("<a href='/device/device=" . $device['device_id'] . "/tab=port/port=".$port['port_id']."/junose-atm-vp/bits/'>Bits</a>");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
   echo(" | ");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "packets") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='device/device=" . $device['device_id'] . "/tab=port/port=".$port['interface_id']."/junose-atm-vp/packets/'>Packets</a>");
+  echo("<a href='device/device=" . $device['device_id'] . "/tab=port/port=".$port['port_id']."/junose-atm-vp/packets/'>Packets</a>");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
   echo(" | ");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "cells") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='device/device=" . $device['device_id'] . "/tab=port/port=".$port['interface_id']."/junose-atm-vp/cells/'>Cells</a>");
+  echo("<a href='device/device=" . $device['device_id'] . "/tab=port/port=".$port['port_id']."/junose-atm-vp/cells/'>Cells</a>");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
   echo(" | ");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "errors") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='device/device=" . $device['device_id'] . "/tab=port/port=".$port['interface_id']."/junose-atm-vp/errors/'>Errors</a>");
+  echo("<a href='device/device=" . $device['device_id'] . "/tab=port/port=".$port['port_id']."/junose-atm-vp/errors/'>Errors</a>");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("</span>"); }
 }
 
 if ($_SESSION['userlevel'] == '10')
 {
-  echo("<span style='float: right;'><a href='bills/add/port=".$port['interface_id']."/'><img src='images/16/money.png' border='0' align='absmiddle'> Create Bill</a></span>");
+  echo("<span style='float: right;'><a href='bills/add/port=".$port['port_id']."/'><img src='images/16/money.png' border='0' align='absmiddle'> Create Bill</a></span>");
 }
 
 print_optionbar_end();

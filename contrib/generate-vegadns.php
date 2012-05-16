@@ -12,7 +12,7 @@ $link = mysql_connect($config['db_host'], $config['db_user'], $config['db_pass']
 $db = mysql_select_db($config['db_name'], $link);
 
 
-$query = "SELECT * FROM ipaddr AS A, ports as I, devices as D WHERE A.interface_id = I.interface_id AND I.device_id = D.device_id AND D.hostname LIKE '%.vostron.net' AND D.hostname NOT LIKE '%.cust.%' AND D.os = 'ios'";
+$query = "SELECT * FROM ipaddr AS A, ports as I, devices as D WHERE A.port_id = I.port_id AND I.device_id = D.device_id AND D.hostname LIKE '%.vostron.net' AND D.hostname NOT LIKE '%.cust.%' AND D.os = 'ios'";
 $data = mysql_query($query, $link);
 while($ip = mysql_fetch_array($data)) {
   unset($sub);

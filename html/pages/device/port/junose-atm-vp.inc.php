@@ -7,7 +7,7 @@ if (!$graph_type) { $graph_type = "atmvp_bits"; }
 
 echo('<table cellspacing="0" cellpadding="5" border="0">');
 
-foreach (dbFetchRows("SELECT * FROM juniAtmVp WHERE interface_id = ?", array($interface['interface_id'])) as $vp)
+foreach (dbFetchRows("SELECT * FROM juniAtmVp WHERE port_id = ?", array($interface['port_id'])) as $vp)
 {
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
   echo('<tr bgcolor="'.$row_colour.'">');
