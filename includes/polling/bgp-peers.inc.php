@@ -44,7 +44,7 @@ if ($config['enable_bgp'])
       }
 
       ## FIXME - move to function (and clean up, wtf?)
-      $peer_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . "/junos -m BGP4-V2-MIB-JUNIPER -OUvq " . snmp_get_auth($device);
+      $peer_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . "/junos -m BGP4-V2-MIB-JUNIPER -OUvq " . snmp_gen_auth($device);
       $peer_cmd .= ' -M"' . $config['install_dir'] . '/mibs/junos"';
       $peer_cmd .= " " . $device['hostname'].":".$device['port'];
       $peer_cmd .= " jnxBgpM2PeerState.0.ipv6." . $junos_v6[$peer_ip];
