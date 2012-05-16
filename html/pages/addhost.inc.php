@@ -115,7 +115,7 @@ $pagetitle[] = "Add host";
         <td>
           <select name="authalgo">
             <option value="MD5" selected>MD5</option>
-            <option value="SHA1">SHA1</option>
+            <option value="SHA">SHA</option>
           </select>
         </td>
       </tr>
