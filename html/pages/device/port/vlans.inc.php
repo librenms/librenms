@@ -1,6 +1,6 @@
 <?php
 
-$vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`interface_id` = '".$port['interface_id']."' and PV.`device_id` = '".$device['device_id']."' AND V.`vlan_vlan` = PV.vlan AND V.device_id = PV.device_id");
+$vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`port_id` = '".$port['port_id']."' and PV.`device_id` = '".$device['device_id']."' AND V.`vlan_vlan` = PV.vlan AND V.device_id = PV.device_id");
 
 echo('<table border="0" cellspacing="0" cellpadding="5" width="100%">');
 
@@ -21,7 +21,7 @@ foreach ($vlans as $vlan)
   echo("<td>".$vlan['cost']."</td><td>".$vlan['priority']."</td><td class=$class>".$vlan['state']."</td>");
 
   $vlan_ports = array();
-  $otherports = dbFetchRows("SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.interface_id = V.interface_id", array($device['device_id'], $vlan['vlan']));
+  $otherports = dbFetchRows("SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.port_id = V.port_id", array($device['device_id'], $vlan['vlan']));
   foreach ($otherports as $otherport)
   {
    $vlan_ports[$otherport[ifIndex]] = $otherport;

@@ -16,7 +16,7 @@ foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `device_id` = ?", arr
   $nbr_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = ?", array($device['device_id']));
 
   $query = "SELECT * FROM ipv4_addresses AS A, ports AS I WHERE ";
-  $query .= "(A.ipv4_address = ? AND I.interface_id = A.interface_id)";
+  $query .= "(A.ipv4_address = ? AND I.port_id = A.port_id)";
   $query .= " AND I.device_id = ?";
   $ipv4_host = dbFetchRow($query, array($peer['bgpPeerIdentifier'], $device['device_id']));
 
@@ -63,7 +63,7 @@ foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `device_id` = ?", arr
 
     ##### Loop Ports
     $i_p = $i_a + 1;
-    $p_sql   = "SELECT * FROM `ospf_ports` AS O, `ports` AS P WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = ? AND O.`ospfIfAreaId` = ? AND P.interface_id = O.interface_id";
+    $p_sql   = "SELECT * FROM `ospf_ports` AS O, `ports` AS P WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = ? AND O.`ospfIfAreaId` = ? AND P.port_id = O.port_id";
     foreach (dbFetchRows($p_sql, array($device['device_id'], $area['ospfAreaId'])) as $ospfport)
     {
       if (!is_integer($i_a/2))
@@ -107,7 +107,7 @@ foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `device_id` = ?", arr
     if (!is_integer($i_n/2)) { $nbr_bg = $list_colour_b_a; } else { $nbr_bg = $list_colour_b_b; }
 
     $host = @dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ?
-                                            AND I.interface_id = A.interface_id AND D.device_id = I.device_id", array($nbr['ospfNbrRtrId']));
+                                            AND I.port_id = A.port_id AND D.device_id = I.device_id", array($nbr['ospfNbrRtrId']));
 
     if (is_array($host)) { $rtr_id = generate_device_link($host); } else { $rtr_id = "unknown"; }
 

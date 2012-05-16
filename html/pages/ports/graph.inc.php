@@ -15,7 +15,7 @@ foreach ($ports as $port)
     $error_img = generate_port_link($port,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
   } else { $error_img = ""; }
 
-  if (port_permitted($port['interface_id'], $port['device_id']))
+  if (port_permitted($port['port_id'], $port['device_id']))
   {
     $port = ifLabel($port, $device);
 
@@ -28,7 +28,7 @@ foreach ($ports as $port)
     $graph_array['height'] = 100;
     $graph_array['width']  = 210;
     $graph_array['to']     = $config['time']['now'];
-    $graph_array['id']     = $port['interface_id'];
+    $graph_array['id']     = $port['port_id'];
     $graph_array['type']   = $graph_type;
     $graph_array['from']   = $config['time']['day'];
     $graph_array['legend'] = "no";
@@ -49,9 +49,9 @@ foreach ($ports as $port)
 #    echo("<div style='display: block; padding: 1px; margin: 2px; min-width: 393px; max-width:393px; min-height:180px; max-height:180px; text-align: center; float: left; background-color: #f5f5f5;'>
 #    <a href='".generate_port_url($port)."/' onmouseover=\"return overlib('\
 #    <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
-#    <img src=\'graph.php?type=$graph_type&amp;id=".$port['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150&amp;title=yes\'>\
+#    <img src=\'graph.php?type=$graph_type&amp;id=".$port['port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150&amp;title=yes\'>\
 #    ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
-#    "<img src='graph.php?type=$graph_type&amp;id=".$port['interface_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=315&amp;height=110&amp;legend=no&amp;title=yes'>
+#    "<img src='graph.php?type=$graph_type&amp;id=".$port['port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=315&amp;height=110&amp;legend=no&amp;title=yes'>
 #    </a>
 #    </div>");
   }

@@ -336,51 +336,51 @@ function check_valid_sensors($device, $class, $valid)
   }
 }
 
-function discover_juniAtmVp(&$valid, $interface_id, $vp_id, $vp_descr)
+function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
 {
   global $config, $debug;
 
-  if (dbFetchCell("SELECT COUNT(*) FROM `juniAtmVp` WHERE `interface_id` = ? AND `vp_id` = ?", array($interface_id, $vp_id)) == "0")
+  if (dbFetchCell("SELECT COUNT(*) FROM `juniAtmVp` WHERE `port_id` = ? AND `vp_id` = ?", array($port_id, $vp_id)) == "0")
   {
-     $inserted = dbInsert(array('interface_id' => $interface_id,'vp_id' => $vp_id,'vp_descr' => $vp_descr), 'juniAtmVp');
+     $inserted = dbInsert(array('port_id' => $port_id,'vp_id' => $vp_id,'vp_descr' => $vp_descr), 'juniAtmVp');
      if ($debug) { echo("( $inserted inserted )\n"); }
      #FIXME vv no $device!
-     log_event("Juniper ATM VP Added: port ".mres($interface_id)." vp ".mres($vp_id)." descr". mres($vp_descr), 'juniAtmVp', mysql_insert_id());
+     log_event("Juniper ATM VP Added: port ".mres($port_id)." vp ".mres($vp_id)." descr". mres($vp_descr), 'juniAtmVp', mysql_insert_id());
   }
   else
   {
     echo(".");
   }
-  $valid[$interface_id][$vp_id] = 1;
+  $valid[$port_id][$vp_id] = 1;
 }
 
-function discover_link($local_interface_id, $protocol, $remote_interface_id, $remote_hostname, $remote_port, $remote_platform, $remote_version)
+function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version)
 {
   global $config, $debug, $link_exists;
 
-  if (dbFetchCell("SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = ? AND `local_interface_id` = ? AND `protocol` = ? AND `remote_port` = ?",
-                  array($remote_hostname, $local_interface_id, $protocol, $remote_port)) == "0")
+  if (dbFetchCell("SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?",
+                  array($remote_hostname, $local_port_id, $protocol, $remote_port)) == "0")
   {
 
-    $inserted = dbInsert(array('local_interface_id' => $local_interface_id,'protocol' => $protocol,'remote_interface_id' => $remote_interface_id,'remote_hostname' => $remote_hostname,
+    $inserted = dbInsert(array('local_port_id' => $local_port_id,'protocol' => $protocol,'remote_port_id' => $remote_port_id,'remote_hostname' => $remote_hostname,
              'remote_port' => $remote_port,'remote_platform' => $remote_platform,'remote_version' => $remote_version), 'links');
 
     echo("+"); if ($debug) { echo("( $inserted inserted )"); }
   }
   else
   {
-    $data = dbFetchRow("SELECT * FROM `links` WHERE `remote_hostname` = ? AND `local_interface_id` = ? AND `protocol` = ? AND `remote_port` = ?", array($remote_hostname, $local_interface_id, $protocol, $remote_port));
-    if ($data['remote_interface_id'] == $remote_interface_id && $data['remote_platform'] == $remote_platform && $remote_version == $remote_version)
+    $data = dbFetchRow("SELECT * FROM `links` WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?", array($remote_hostname, $local_port_id, $protocol, $remote_port));
+    if ($data['remote_port_id'] == $remote_port_id && $data['remote_platform'] == $remote_platform && $remote_version == $remote_version)
     {
       echo(".");
     }
     else
     {
-      $updated = dbUpdate(array('remote_interface_id' => $remote_interface_id, 'remote_platform' => $remote_platform, 'remote_version' => $remote_version), 'links', '`id` = ?', array($data['id']));
+      $updated = dbUpdate(array('remote_port_id' => $remote_port_id, 'remote_platform' => $remote_platform, 'remote_version' => $remote_version), 'links', '`id` = ?', array($data['id']));
       echo("U"); if ($debug) { echo("( $updated updated )"); }
     }
   }
-  $link_exists[$local_interface_id][$remote_hostname][$remote_port] = 1;
+  $link_exists[$local_port_id][$remote_hostname][$remote_port] = 1;
 }
 
 function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, $units, $used = NULL)
@@ -511,8 +511,8 @@ function discover_process_ipv6(&$valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$
   if (mysql_result(mysql_query("SELECT count(*) FROM `ports`
         WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1')
   {
-    $i_query = "SELECT interface_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
-    $interface_id = mysql_result(mysql_query($i_query), 0);
+    $i_query = "SELECT port_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
+    $port_id = mysql_result(mysql_query($i_query), 0);
     if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0) < '1')
     {
       mysql_query("INSERT INTO `ipv6_networks` (`ipv6_network`) VALUES ('$ipv6_network')");
@@ -527,10 +527,10 @@ function discover_process_ipv6(&$valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$
 
     $ipv6_network_id = @mysql_result(mysql_query("SELECT `ipv6_network_id` from `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0);
 
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = '$ipv6_address' AND `ipv6_prefixlen` = '$ipv6_prefixlen' AND `interface_id` = '$interface_id'"), 0) == '0')
+    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = '$ipv6_address' AND `ipv6_prefixlen` = '$ipv6_prefixlen' AND `port_id` = '$port_id'"), 0) == '0')
     {
-     mysql_query("INSERT INTO `ipv6_addresses` (`ipv6_address`, `ipv6_compressed`, `ipv6_prefixlen`, `ipv6_origin`, `ipv6_network_id`, `interface_id`)
-                                   VALUES ('$ipv6_address', '$ipv6_compressed', '$ipv6_prefixlen', '$ipv6_origin', '$ipv6_network_id', '$interface_id')");
+     mysql_query("INSERT INTO `ipv6_addresses` (`ipv6_address`, `ipv6_compressed`, `ipv6_prefixlen`, `ipv6_origin`, `ipv6_network_id`, `port_id`)
+                                   VALUES ('$ipv6_address', '$ipv6_compressed', '$ipv6_prefixlen', '$ipv6_origin', '$ipv6_network_id', '$port_id')");
      echo("+");
     }
     else
@@ -538,7 +538,7 @@ function discover_process_ipv6(&$valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$
       echo(".");
     }
     $full_address = "$ipv6_address/$ipv6_prefixlen";
-    $valid_address = $full_address  . "-" . $interface_id;
+    $valid_address = $full_address  . "-" . $port_id;
     $valid['ipv6'][$valid_address] = 1;
   }
 }

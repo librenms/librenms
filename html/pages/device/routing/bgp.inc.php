@@ -76,12 +76,12 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
   if ($peer['bgpPeerRemoteAs'] == $device['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; }
 
   $query = "SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE ";
-  $query .= "(A.ipv4_address = ? AND I.interface_id = A.interface_id)";
+  $query .= "(A.ipv4_address = ? AND I.port_id = A.port_id)";
   $query .= " AND D.device_id = I.device_id";
   $ipv4_host = dbFetchRow($query,array($peer['bgpPeerIdentifier']));
 
   $query = "SELECT * FROM ipv6_addresses AS A, ports AS I, devices AS D WHERE ";
-  $query .= "(A.ipv6_address = ? AND I.interface_id = A.interface_id)";
+  $query .= "(A.ipv6_address = ? AND I.port_id = A.port_id)";
   $query .= " AND D.device_id = I.device_id";
   $ipv6_host = dbFetchRow($query,array($peer['bgpPeerIdentifier']));
 
@@ -167,7 +167,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
   {
     case 'macaccounting_bits':
     case 'macaccounting_pkts':
-      $acc = dbFetchRow("SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = ? AND M.mac = I.mac_address AND P.interface_id = M.interface_id AND D.device_id = P.device_id", array($peer['bgpPeerIdentifier']));
+      $acc = dbFetchRow("SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = ? AND M.mac = I.mac_address AND P.port_id = M.port_id AND D.device_id = P.device_id", array($peer['bgpPeerIdentifier']));
       $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
       if (is_array($acc) && is_file($database))
       {

@@ -17,7 +17,7 @@ $menu_options['basic']   = 'Basic';
 $menu_options['details'] = 'Details';
 $menu_options['arp']     = 'ARP Table';
 
-if(dbFetchCell("SELECT * FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"))
+if(dbFetchCell("SELECT * FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.port_id = L.local_port_id"))
 {
   $menu_options['neighbours'] = 'Neighbours';
 }
@@ -78,9 +78,9 @@ if ($vars['view'] == 'minigraphs')
     <a href=\"" . generate_port_url($port) . "\" onmouseover=\"return overlib('\
     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
     ".$port['ifAlias']." \
-    <img src=\'graph.php?type=".$graph_type."&amp;id=".$port['interface_id']."&amp;from=".$from."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150\'>\
+    <img src=\'graph.php?type=".$graph_type."&amp;id=".$port['port_id']."&amp;from=".$from."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
-    "<img src='graph.php?type=".$graph_type."&amp;id=".$port['interface_id']."&amp;from=".$from."&amp;to=".$config['time']['now']."&amp;width=180&amp;height=45&amp;legend=no'>
+    "<img src='graph.php?type=".$graph_type."&amp;id=".$port['port_id']."&amp;from=".$from."&amp;to=".$config['time']['now']."&amp;width=180&amp;height=45&amp;legend=no'>
     </a>
     <div style='font-size: 9px;'>".truncate(short_port_descr($port['ifAlias']), 32, '')."</div>
     </div>");
@@ -100,7 +100,7 @@ if ($vars['view'] == 'minigraphs')
   ### FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
   foreach ($ports as $port)
   {
-    $port_cache[$port['interface_id']] = $port;
+    $port_cache[$port['port_id']] = $port;
     $port_index_cache[$port['device_id']][$port['ifIndex']] = $port;
   }
 
@@ -111,7 +111,7 @@ if ($vars['view'] == 'minigraphs')
       $oids = array('ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors');
       foreach ($oids as $oid)
       {
-        $port[$oid.'_rate'] = $memcache->get('port-'.$port['interface_id'].'-'.$oid.'_rate');
+        $port[$oid.'_rate'] = $memcache->get('port-'.$port['port_id'].'-'.$oid.'_rate');
         if ($debug) { echo("MC[".$oid."->".$port[$oid.'_rate']."]"); }
       }
     }

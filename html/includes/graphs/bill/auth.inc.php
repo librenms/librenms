@@ -13,7 +13,7 @@ if (is_numeric($_GET['id']) && ($auth || bill_permitted($_GET['id'])))
 
   $rates = getRates($_GET['id'], $datefrom,  $dateto);
 
-  $ports = dbFetchRows("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D WHERE B.bill_id = ? AND P.interface_id = B.port_id AND D.device_id = P.device_id", array($_GET['id']));
+  $ports = dbFetchRows("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D WHERE B.bill_id = ? AND P.port_id = B.port_id AND D.device_id = P.device_id", array($_GET['id']));
 
   $auth = TRUE;
 }

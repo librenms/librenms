@@ -23,7 +23,7 @@ include("html/includes/functions.inc.php");
 
 ## Check all of our interface RRD files for errors
 
-if ($argv[1]) { $where = "AND `interface_id` = ?"; $params = array($argv[1]); }
+if ($argv[1]) { $where = "AND `port_id` = ?"; $params = array($argv[1]); }
 
 $i = 0;
 $errored = 0;

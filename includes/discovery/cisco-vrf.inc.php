@@ -112,8 +112,8 @@ if ($config['enable_vrfs'])
         {
           $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE ifIndex = '$if_id' AND device_id = '" . $device['device_id'] . "'"));
           echo(makeshortif($interface['ifDescr']) . " ");
-          mysql_query("UPDATE ports SET ifVrf = '$vrf_id' WHERE interface_id = '".$interface['interface_id']."'");
-          $if = $interface['interface_id'];
+          mysql_query("UPDATE ports SET ifVrf = '$vrf_id' WHERE port_id = '".$interface['port_id']."'");
+          $if = $interface['port_id'];
           $valid_vrf_if[$vrf_id][$if] = 1;
         }
       }
@@ -125,14 +125,14 @@ if ($config['enable_vrfs'])
     $data = mysql_query($sql);
     while ($row = mysql_fetch_assoc($data))
     {
-      $if = $row['interface_id'];
+      $if = $row['port_id'];
       $vrf_id = $row['ifVrf'];
       if ($row['ifVrf'])
       {
         if (!$valid_vrf_if[$vrf_id][$if])
         {
           echo("-");
-          $query = @mysql_query("UPDATE ports SET `ifVrf` = NULL WHERE interface_id = '$if'");
+          $query = @mysql_query("UPDATE ports SET `ifVrf` = NULL WHERE port_id = '$if'");
         }
         else
         {

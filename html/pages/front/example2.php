@@ -116,7 +116,7 @@ if ($_SESSION['userlevel'] >= '5')
   unset ($seperator);
   while ($interface = mysql_fetch_assoc($query))
   {
-    $ports['l2tp'] .= $seperator . $interface['interface_id'];
+    $ports['l2tp'] .= $seperator . $interface['port_id'];
     $seperator = ",";
   }
 
@@ -126,7 +126,7 @@ if ($_SESSION['userlevel'] >= '5')
   unset ($seperator);
   while ($interface = mysql_fetch_assoc($query))
   {
-    $ports['transit'] .= $seperator . $interface['interface_id'];
+    $ports['transit'] .= $seperator . $interface['port_id'];
     $seperator = ",";
   }
 
@@ -136,7 +136,7 @@ if ($_SESSION['userlevel'] >= '5')
   unset ($seperator);
   while ($interface = mysql_fetch_assoc($query))
   {
-    $ports['voip'] .= $seperator . $interface['interface_id'];
+    $ports['voip'] .= $seperator . $interface['port_id'];
     $seperator = ",";
   }
 

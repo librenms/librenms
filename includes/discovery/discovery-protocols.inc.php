@@ -28,17 +28,17 @@ if ($device['os'] == "ironware")
           if ($remote_device_id)
           {
             $int = ifNameDescr($interface);
-            log_event("Device autodiscovered through FDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['interface_id']);
+            log_event("Device autodiscovered through FDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['port_id']);
           }
         }
 
         if ($remote_device_id)
         {
           $if = $fdp['snFdpCacheDevicePort'];
-          $remote_interface_id = @mysql_result(mysql_query("SELECT interface_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if') AND `device_id` = '".$remote_device_id."'"),0);
-        } else { $remote_interface_id = "0"; }
+          $remote_port_id = @mysql_result(mysql_query("SELECT port_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if') AND `device_id` = '".$remote_device_id."'"),0);
+        } else { $remote_port_id = "0"; }
 
-        discover_link($interface['interface_id'], $fdp['snFdpCacheVendorId'], $remote_interface_id, $fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDevicePort'], $fdp['snFdpCachePlatform'], $fdp['snFdpCacheVersion']);
+        discover_link($interface['port_id'], $fdp['snFdpCacheVendorId'], $remote_port_id, $fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDevicePort'], $fdp['snFdpCachePlatform'], $fdp['snFdpCacheVersion']);
       }
     }
   }
@@ -67,19 +67,19 @@ if ($cdp_array)
           if ($remote_device_id)
           {
             $int = ifNameDescr($interface);
-            log_event("Device autodiscovered through CDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['interface_id']);
+            log_event("Device autodiscovered through CDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['port_id']);
           }
         }
 
         if ($remote_device_id)
         {
           $if = $cdp['cdpCacheDevicePort'];
-          $remote_interface_id = dbFetchCell("SELECT interface_id FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?", array($if, $if, $remote_device_id));
-        } else { $remote_interface_id = "0"; }
+          $remote_port_id = dbFetchCell("SELECT port_id FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?", array($if, $if, $remote_device_id));
+        } else { $remote_port_id = "0"; }
 
-        if ($interface['interface_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort'])
+        if ($interface['port_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort'])
         {
-          discover_link($interface['interface_id'], 'cdp', $remote_interface_id, $cdp['cdpCacheDeviceId'], $cdp['cdpCacheDevicePort'], $cdp['cdpCachePlatform'], $cdp['cdpCacheVersion']);
+          discover_link($interface['port_id'], 'cdp', $remote_port_id, $cdp['cdpCacheDeviceId'], $cdp['cdpCacheDevicePort'], $cdp['cdpCachePlatform'], $cdp['cdpCacheVersion']);
         }
       }
       else
@@ -123,21 +123,21 @@ if ($lldp_array)
           if ($remote_device_id)
           {
             $int = ifNameDescr($interface);
-            log_event("Device autodiscovered through LLDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['interface_id']);
+            log_event("Device autodiscovered through LLDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['port_id']);
           }
         }
 
         if ($remote_device_id)
         {
           $if = $lldp['lldpRemPortDesc']; $id = $lldp['lldpRemPortId'];
-          $remote_interface_id = @mysql_result(mysql_query("SELECT interface_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if' OR `ifDescr`= '$id' OR `ifName`='$id') AND `device_id` = '".$remote_device_id."'"),0);
+          $remote_port_id = @mysql_result(mysql_query("SELECT port_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if' OR `ifDescr`= '$id' OR `ifName`='$id') AND `device_id` = '".$remote_device_id."'"),0);
         } else {
-          $remote_interface_id = "0";
+          $remote_port_id = "0";
         }
 
-        if (is_numeric($interface['interface_id']) && isset($lldp['lldpRemSysName']) && isset($lldp['lldpRemPortId']))
+        if (is_numeric($interface['port_id']) && isset($lldp['lldpRemSysName']) && isset($lldp['lldpRemPortId']))
         {
-          discover_link($interface['interface_id'], 'lldp', $remote_interface_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortId'], NULL, $lldp['lldpRemSysDesc']);
+          discover_link($interface['port_id'], 'lldp', $remote_port_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortId'], NULL, $lldp['lldpRemSysDesc']);
         }
       }
     }
@@ -146,16 +146,16 @@ if ($lldp_array)
 
 if ($debug) { print_r($link_exists); }
 
-$sql = "SELECT * FROM `links` AS L, `ports` AS I WHERE L.local_interface_id = I.interface_id AND I.device_id = '".$device['device_id']."'";
+$sql = "SELECT * FROM `links` AS L, `ports` AS I WHERE L.local_port_id = I.port_id AND I.device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
 {
   while ($test = mysql_fetch_assoc($query))
   {
-    $local_interface_id = $test['local_interface_id'];
+    $local_port_id = $test['local_port_id'];
     $remote_hostname = $test['remote_hostname'];
     $remote_port = $test['remote_port'];
-    if ($debug) { echo("$local_interface_id -> $remote_hostname -> $remote_port \n"); }
-    if (!$link_exists[$local_interface_id][$remote_hostname][$remote_port])
+    if ($debug) { echo("$local_port_id -> $remote_hostname -> $remote_port \n"); }
+    if (!$link_exists[$local_port_id][$remote_hostname][$remote_port])
     {
       echo("-");
       mysql_query("DELETE FROM `links` WHERE id = '" . $test['id'] . "'");

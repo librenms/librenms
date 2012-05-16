@@ -54,7 +54,7 @@ elseif ($_GET['opta'] == "add")
 {
   if (is_numeric($vars['port']))
   {
-    $port = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE `interface_id` = ? AND D.device_id = P.device_id", array($vars['port']));
+    $port = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id", array($vars['port']));
   }
 
 ?>
@@ -99,7 +99,7 @@ if(is_array($port))
   $portbtn = str_replace("overlib('", "overlib('<div style=\'border: 5px solid #e5e5e5; background: #fff; padding: 10px;\'>", $portbtn);
   $portbtn = str_replace("<div>',;", "</div></div>',", $portbtn);
   echo("  <fieldset>\n");
-  echo("    <input type=\"hidden\" name=\"port\" value=\"".$port['interface_id']."\">\n");
+  echo("    <input type=\"hidden\" name=\"port\" value=\"".$port['port_id']."\">\n");
   echo("    <legend>Ports</legend>\n");
   echo("    <div class=\"control-group\">\n");
   echo("      <div class=\"btn-toolbar\">\n");

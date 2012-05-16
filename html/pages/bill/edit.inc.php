@@ -118,7 +118,7 @@ for ($x=1;$x<32;$x++) {
 <?php
 
 $ports = dbFetchRows("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-                      WHERE B.bill_id = ? AND P.interface_id = B.port_id
+                      WHERE B.bill_id = ? AND P.port_id = B.port_id
                       AND D.device_id = P.device_id ORDER BY D.device_id", array($bill_data['bill_id']));
 
 if (is_array($ports))
@@ -138,18 +138,18 @@ if (is_array($ports))
     $portalias = (empty($port['ifAlias']) ? "" : " - ".$port['ifAlias']."");
     $devicebtn = str_replace("\">".$port['hostname'], "\" style=\"color: #000;\"><i class=\"icon-asterisk\"></i> ".$port['hostname'], $devicebtn);
     $portbtn = str_replace("\">".strtolower($port['ifName']), "\" style=\"color: #000;\"><i class=\"icon-random\"></i> ".$port['ifName']."".$portalias, $portbtn);
-    echo("      <form action=\"\" method=\"post\" name=\"delete".$port['interface_id']."\" style=\"display: none;\">\n");
+    echo("      <form action=\"\" method=\"post\" name=\"delete".$port['port_id']."\" style=\"display: none;\">\n");
     echo("        <input type=\"hidden\" name=\"action\" value=\"delete_bill_port\" />\n");
-    echo("        <input type=\"hidden\" name=\"interface_id\" value=\"".$port['interface_id']."\" />\n");
+    echo("        <input type=\"hidden\" name=\"port_id\" value=\"".$port['port_id']."\" />\n");
     echo("      </form>\n");
     echo("      <div class=\"btn-toolbar\">\n");
     echo("        <div class=\"btn-group\" style=\"width: 600px;\">\n");
-    //echo("          <a class=\"btn btn-danger\" href=\"javascript:;\" onclick=\"document.delete".$port['interface_id'].".submit();\" style=\"color: #fff;\"><i class=\"icon-trash icon-white\"></i></a>\n");
+    //echo("          <a class=\"btn btn-danger\" href=\"javascript:;\" onclick=\"document.delete".$port['port_id'].".submit();\" style=\"color: #fff;\"><i class=\"icon-trash icon-white\"></i></a>\n");
     echo("          ".$devicebtn."\n");
     echo("          ".$portbtn."\n");
     echo("        </div>\n");
     echo("        <div class=\"btn-group\">\n");
-    echo("          <a class=\"btn btn-danger btn-mini\" href=\"javascript:;\" onclick=\"document.delete".$port['interface_id'].".submit();\" style=\"color: #fff;\"><i class=\"icon-minus-sign icon-white\"></i> <strong>Remove Interface</strong></a>\n");
+    echo("          <a class=\"btn btn-danger btn-mini\" href=\"javascript:;\" onclick=\"document.delete".$port['port_id'].".submit();\" style=\"color: #fff;\"><i class=\"icon-minus-sign icon-white\"></i> <strong>Remove Interface</strong></a>\n");
     echo("        </div>\n");
     echo("      </div>\n");
   }
@@ -189,9 +189,9 @@ foreach ($devices as $device)
       </div>
     </div>
     <div class="control-group">
-      <label class="control-label" for="interface_id"><strong>Interface</strong></label>
+      <label class="control-label" for="port_id"><strong>Interface</strong></label>
       <div class="controls">
-        <select style="width: 300px;" id="interface_id" name="interface_id"></select>
+        <select style="width: 300px;" id="port_id" name="port_id"></select>
       </div>
     </div>
   </fieldset>

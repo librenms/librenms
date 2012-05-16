@@ -120,7 +120,7 @@
     //$res      .= "    <th>Description</th>";
     //$res      .= "    <th>Notes</th>";
     $res      .= "  </tr>";
-    foreach (dbFetchRows("SELECT * FROM `bill_ports` as b, `ports` as p, `devices` as d WHERE b.bill_id = ? AND p.interface_id = b.port_id AND d.device_id = p.device_id", array($bill_id)) as $row) {
+    foreach (dbFetchRows("SELECT * FROM `bill_ports` as b, `ports` as p, `devices` as d WHERE b.bill_id = ? AND p.port_id = b.port_id AND d.device_id = p.device_id", array($bill_id)) as $row) {
       if (bill_permitted($bill_id)) {
         $device['name']   = $row['sysName'];
         //$device['port']   = $row['ifName']." (".$row['ifDescr'].")";

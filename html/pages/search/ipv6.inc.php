@@ -39,7 +39,7 @@ print_optionbar_end();
 
 echo('<table width="100%" cellspacing="0" cellpadding="5">');
 
-$query = "SELECT * FROM `ipv6_addresses` AS A, `ports` AS I, `devices` AS D, `ipv6_networks` AS N WHERE I.interface_id = A.interface_id AND I.device_id = D.device_id AND N.ipv6_network_id = A.ipv6_network_id ";
+$query = "SELECT * FROM `ipv6_addresses` AS A, `ports` AS I, `devices` AS D, `ipv6_networks` AS N WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv6_network_id = A.ipv6_network_id ";
 
 if (is_numeric($_POST['device_id']))
 {
@@ -76,7 +76,7 @@ foreach (dbFetchRows($query, $param) as $interface)
       $error_img = generate_port_link($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
     } else { $error_img = ""; }
 
-    if (port_permitted($interface['interface_id']))
+    if (port_permitted($interface['port_id']))
     {
       $interface = ifLabel ($interface, $interface);
 

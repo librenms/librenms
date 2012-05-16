@@ -89,36 +89,36 @@ while ($interface = mysql_fetch_assoc($interface_query)) {
    if ($interface['ifDescr'] != $ifDescr && $ifDescr != "" ) {
      $update .= $seperator . "`ifDescr` = '$ifDescr'";
      $seperator = ", ";
-     eventlog("ifDescr -> $ifDescr", $interface['device_id'], $interface['interface_id']);
+     eventlog("ifDescr -> $ifDescr", $interface['device_id'], $interface['port_id']);
    }
 
    if ($interface['ifName'] != $ifName && $ifName != "" ) {
      $update .= $seperator . "`ifName` = '$ifName'";
      $seperator = ", ";
-     eventlog("ifName -> $ifName", $interface['device_id'], $interface['interface_id']);
+     eventlog("ifName -> $ifName", $interface['device_id'], $interface['port_id']);
    }
 
    if ($interface['ifAlias'] != $ifAlias && $ifAlias != "" ) {
      $update .= $seperator . "`ifAlias` = '".mres($ifAlias)."'";
      $seperator = ", ";
-     eventlog("ifAlias -> $ifAlias", $interface['device_id'], $interface['interface_id']);
+     eventlog("ifAlias -> $ifAlias", $interface['device_id'], $interface['port_id']);
    }
    if ($interface['ifOperStatus'] != $ifOperStatus && $ifOperStatus != "" ) {
      $update .= $seperator . "`ifOperStatus` = '$ifOperStatus'";
      $seperator = ", ";
-     eventlog("Interface went $ifOperStatus", $interface['device_id'], $interface['interface_id']);
+     eventlog("Interface went $ifOperStatus", $interface['device_id'], $interface['port_id']);
    }
    if ($interface['ifAdminStatus'] != $ifAdminStatus && $ifAdminStatus != "" ) {
      $update .= $seperator . "`ifAdminStatus` = '$ifAdminStatus'";
      $seperator = ", ";
      if ($ifAdminStatus == "up") { $admin = "enabled"; } else { $admin = "disabled"; }
-     eventlog("Interface $admin", $interface['device_id'], $interface['interface_id']);
+     eventlog("Interface $admin", $interface['device_id'], $interface['port_id']);
    }
 
    if ($update) {
      $update_query  = "UPDATE `ports` SET ";
      $update_query .= $update;
-     $update_query .= " WHERE `interface_id` = '" . $interface['interface_id'] . "'";
+     $update_query .= " WHERE `port_id` = '" . $interface['port_id'] . "'";
      #echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
      $update_result = mysql_query($update_query);
    } else {
@@ -153,7 +153,7 @@ while ($interface = mysql_fetch_assoc($interface_query)) {
  }
 
   $rates = interface_rates ($rrdfile);
-  mysql_query("UPDATE `ports` SET in_rate = '" . $rates['in'] . "', out_rate = '" . $rates['out'] . "' WHERE interface_id= '" . $interface['interface_id'] . "'");
+  mysql_query("UPDATE `ports` SET in_rate = '" . $rates['in'] . "', out_rate = '" . $rates['out'] . "' WHERE port_id= '" . $interface['port_id'] . "'");
 
 }
 

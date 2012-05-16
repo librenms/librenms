@@ -41,11 +41,11 @@ if ($_POST['action'] == "reset_bill" && ($_POST['confirm'] == "rrd" || $_POST['c
 
 if ($_POST['action'] == "add_bill_port")
 {
-  dbInsert(array('bill_id' => $_POST['bill_id'], 'port_id' => $_POST['interface_id']), 'bill_ports');
+  dbInsert(array('bill_id' => $_POST['bill_id'], 'port_id' => $_POST['port_id']), 'bill_ports');
 }
 if ($_POST['action'] == "delete_bill_port")
 {
-  dbDelete('bill_ports', "`bill_id` =  ? AND `port_id` = ?", array($bill_id, $_POST['interface_id']));
+  dbDelete('bill_ports', "`bill_id` =  ? AND `port_id` = ?", array($bill_id, $_POST['port_id']));
 }
 if ($_POST['action'] == "update_bill")
 {

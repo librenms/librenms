@@ -60,7 +60,7 @@ if (bill_permitted($bill_id))
   # Speeds up loading for other included pages by setting it before progessing of mysql data!
 
   $ports = dbFetchRows("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-                        WHERE B.bill_id = ? AND P.interface_id = B.port_id
+                        WHERE B.bill_id = ? AND P.port_id = B.port_id
                         AND D.device_id = P.device_id", array($bill_id));
 
   echo("<font face=\"Verdana, Arial, Sans-Serif\"><h2>

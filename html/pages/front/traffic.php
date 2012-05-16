@@ -42,7 +42,7 @@ if ($config['warn']['ifdown']) {
 
 foreach (dbFetchRows("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'") as $interface)
 {
-   if (port_permitted($interface['interface_id'])) {
+   if (port_permitted($interface['port_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffddaa;'>
        <strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
        <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
@@ -119,7 +119,7 @@ if ($_SESSION['userlevel'] >= '5')
   $query = mysql_query($sql);
   unset ($seperator);
   while ($interface = mysql_fetch_assoc($query)) {
-    $ports['transit'] .= $seperator . $interface['interface_id'];
+    $ports['transit'] .= $seperator . $interface['port_id'];
     $seperator = ",";
   }
 
@@ -127,7 +127,7 @@ if ($_SESSION['userlevel'] >= '5')
   $query = mysql_query($sql);
   unset ($seperator);
   while ($interface = mysql_fetch_assoc($query)) {
-    $ports['peering'] .= $seperator . $interface['interface_id'];
+    $ports['peering'] .= $seperator . $interface['port_id'];
     $seperator = ",";
   }
 
@@ -135,7 +135,7 @@ if ($_SESSION['userlevel'] >= '5')
   $query = mysql_query($sql);
   unset ($seperator);
   while ($interface = mysql_fetch_assoc($query)) {
-    $ports['core'] .= $seperator . $interface['interface_id'];
+    $ports['core'] .= $seperator . $interface['port_id'];
     $seperator = ",";
   }
 

@@ -1,6 +1,6 @@
 <?php
 
-$vp_rows = dbFetchRows("SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id` = ? AND J.interface_id = P.interface_id", array($device['device_id']));
+$vp_rows = dbFetchRows("SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id` = ? AND J.port_id = P.port_id", array($device['device_id']));
 
 if (count($vp_rows))
 {

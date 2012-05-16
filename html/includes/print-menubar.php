@@ -3,7 +3,7 @@
 ## FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
 $service_alerts = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '0'");
-$if_alerts      = dbFetchCell("SELECT COUNT(interface_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
+$if_alerts      = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
 
 if (isset($config['enable_bgp']) && $config['enable_bgp'])
 {
@@ -265,7 +265,7 @@ if (isset($interface_alerts))
 $deleted_ports = 0;
 foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id") as $interface)
 {
-  if (port_permitted($interface['interface_id'], $interface['device_id']))
+  if (port_permitted($interface['port_id'], $interface['device_id']))
   {
     $deleted_ports++;
   }

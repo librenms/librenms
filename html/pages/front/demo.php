@@ -96,7 +96,7 @@ if ($config['warn']['ifdown'])
   $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
   while ($interface = mysql_fetch_array($sql))
   {
-     if (port_permitted($interface['interface_id']))
+     if (port_permitted($interface['port_id']))
      {
        echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffddaa;'>
        <strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />

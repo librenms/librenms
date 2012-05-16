@@ -7,16 +7,16 @@ if (!$interface) { exit; }
 $ifOperStatus = "down";
 #$ifAdminStatus = "down";
 
-log_event("SNMP Trap: linkDown " . $interface['ifDescr'], $device, "interface", $interface['interface_id']);
+log_event("SNMP Trap: linkDown " . $interface['ifDescr'], $device, "interface", $interface['port_id']);
 
 #if ($ifAdminStatus != $interface['ifAdminStatus'])
 #{
-#  log_event("Interface Disabled : " . $interface['ifDescr'] . " (TRAP)", $device, "interface", $interface['interface_id']);
+#  log_event("Interface Disabled : " . $interface['ifDescr'] . " (TRAP)", $device, "interface", $interface['port_id']);
 #}
 if ($ifOperStatus != $interface['ifOperStatus'])
 {
-  log_event("Interface went Down : " . $interface['ifDescr'] . " (TRAP)", $device, "interface", $interface['interface_id']);
-  mysql_query("UPDATE `ports` SET ifOperStatus = 'down' WHERE `interface_id` = '".$interface['interface_id']."'");
+  log_event("Interface went Down : " . $interface['ifDescr'] . " (TRAP)", $device, "interface", $interface['port_id']);
+  mysql_query("UPDATE `ports` SET ifOperStatus = 'down' WHERE `port_id` = '".$interface['port_id']."'");
 }
 
 ?>

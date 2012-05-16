@@ -52,7 +52,7 @@ foreach ($device['vlans'] as $domain_id => $vlans)
         str_pad($vlan_port['dot1dStpPortState'], 15).str_pad($vlan_port['dot1dStpPortPathCost'], 10));
 
         $db_w = array('device_id' => $device['device_id'],
-                    'interface_id' => $port['interface_id'],
+                    'port_id' => $port['port_id'],
                     'vlan' => $vlan_id);
 
         $db_a = array('baseport' => $vlan_port_id,
@@ -60,7 +60,7 @@ foreach ($device['vlans'] as $domain_id => $vlans)
                     'state' => $vlan_port['dot1dStpPortState'],
                     'cost' => $vlan_port['dot1dStpPortPathCost']);
 
-        $from_db = dbFetchRow("SELECT * FROM `ports_vlans` WHERE device_id = ? AND interface_id = ? AND `vlan` = ?", array($device['device_id'], $port['interface_id'], $vlan_id));
+        $from_db = dbFetchRow("SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?", array($device['device_id'], $port['port_id'], $vlan_id));
 
         if ($from_db['port_vlan_id'])
         {

@@ -74,28 +74,28 @@ if ($device['os_group'] == "cisco")
       rrdtool_create($rrd_filename, $rrd_create);
     }
 
-    $rrd_update  = "N";
-    $rrd_update .= ":".$data['cipSecGlobalActiveTunnels'];
-    $rrd_update .= ":".$data['cipSecGlobalInOctets'];
-    $rrd_update .= ":".$data['cipSecGlobalOutOctets'];
-    $rrd_update .= ":".$data['cipSecGlobalInDecompOctets'];
-    $rrd_update .= ":".$data['cipSecGlobalOutUncompOctets'];
-    $rrd_update .= ":".$data['cipSecGlobalInPkts'];
-    $rrd_update .= ":".$data['cipSecGlobalOutPkts'];
-    $rrd_update .= ":".$data['cipSecGlobalInDrops'];
-    $rrd_update .= ":".$data['cipSecGlobalInReplayDrops'];
-    $rrd_update .= ":".$data['cipSecGlobalOutDrops'];
-    $rrd_update .= ":".$data['cipSecGlobalInAuths'];
-    $rrd_update .= ":".$data['cipSecGlobalOutAuths'];
-    $rrd_update .= ":".$data['cipSecGlobalInAuthFails'];
-    $rrd_update .= ":".$data['cipSecGlobalOutAuthFails'];
-    $rrd_update .= ":".$data['cipSecGlobalInDecrypts'];
-    $rrd_update .= ":".$data['cipSecGlobalOutEncrypts'];
-    $rrd_update .= ":".$data['cipSecGlobalInDecryptFails'];
-    $rrd_update .= ":".$data['cipSecGlobalOutEncryptFails'];
-    $rrd_update .= ":".$data['cipSecGlobalProtocolUseFails'];
-    $rrd_update .= ":".$data['cipSecGlobalNoSaFails'];
-    $rrd_update .= ":".$data['cipSecGlobalSysCapFails'];
+    $rrd_update   = array();
+    $rrd_update[] = $data['cipSecGlobalActiveTunnels'];
+    $rrd_update[] = $data['cipSecGlobalInOctets'];
+    $rrd_update[] = $data['cipSecGlobalOutOctets'];
+    $rrd_update[] = $data['cipSecGlobalInDecompOctets'];
+    $rrd_update[] = $data['cipSecGlobalOutUncompOctets'];
+    $rrd_update[] = $data['cipSecGlobalInPkts'];
+    $rrd_update[] = $data['cipSecGlobalOutPkts'];
+    $rrd_update[] = $data['cipSecGlobalInDrops'];
+    $rrd_update[] = $data['cipSecGlobalInReplayDrops'];
+    $rrd_update[] = $data['cipSecGlobalOutDrops'];
+    $rrd_update[] = $data['cipSecGlobalInAuths'];
+    $rrd_update[] = $data['cipSecGlobalOutAuths'];
+    $rrd_update[] = $data['cipSecGlobalInAuthFails'];
+    $rrd_update[] = $data['cipSecGlobalOutAuthFails'];
+    $rrd_update[] = $data['cipSecGlobalInDecrypts'];
+    $rrd_update[] = $data['cipSecGlobalOutEncrypts'];
+    $rrd_update[] = $data['cipSecGlobalInDecryptFails'];
+    $rrd_update[] = $data['cipSecGlobalOutEncryptFails'];
+    $rrd_update[] = $data['cipSecGlobalProtocolUseFails'];
+    $rrd_update[] = $data['cipSecGlobalNoSaFails'];
+    $rrd_update[] = $data['cipSecGlobalSysCapFails'];
 
     rrdtool_update($rrd_filename, $rrd_update);
 

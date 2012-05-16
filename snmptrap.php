@@ -33,7 +33,7 @@ $device = @dbFetchRow("SELECT * FROM devices WHERE `hostname` = ?", array($entry
 
 if (!$device['device_id'])
 {
-  $device = @dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = ? AND I.interface_id = A.interface_id", array($entry['0']));
+  $device = @dbFetchRow("SELECT * FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id", array($entry['0']));
 }
 
 if (!$device['device_id']) { exit; } else { }

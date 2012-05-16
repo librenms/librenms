@@ -30,16 +30,16 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
     }
     if ($vars['action'] == "delifperm")
     {
-      if (dbFetchCell("SELECT COUNT(*) FROM ports_perms WHERE `interface_id` = ? AND `user_id` = ?", array($vars['interface_id'], $vars['user_id'])))
+      if (dbFetchCell("SELECT COUNT(*) FROM ports_perms WHERE `port_id` = ? AND `user_id` = ?", array($vars['port_id'], $vars['user_id'])))
       {
-        dbDelete('ports_perms', "`interface_id` =  ? AND `user_id` = ?", array($vars['interface_id'], $vars['user_id']));
+        dbDelete('ports_perms', "`port_id` =  ? AND `user_id` = ?", array($vars['port_id'], $vars['user_id']));
       }
     }
     if ($vars['action'] == "addifperm")
     {
-      if (!dbFetchCell("SELECT COUNT(*) FROM ports_perms WHERE `interface_id` = ? AND `user_id` = ?", array($vars['interface_id'], $vars['user_id'])))
+      if (!dbFetchCell("SELECT COUNT(*) FROM ports_perms WHERE `port_id` = ? AND `user_id` = ?", array($vars['port_id'], $vars['user_id'])))
       {
-        dbInsert(array('interface_id' => $vars['interface_id'], 'user_id' => $vars['user_id']), 'ports_perms');
+        dbInsert(array('port_id' => $vars['port_id'], 'user_id' => $vars['user_id']), 'ports_perms');
       }
     }
     if ($vars['action'] == "delbillperm")
@@ -96,13 +96,13 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
     echo("</td><td valign=top width=33%>");
     echo("<h3>Interface Access</h3>");
 
-    $interface_perms = dbFetchRows("SELECT * from ports_perms as P, ports as I, devices as D WHERE `user_id` = ? AND I.interface_id = P.interface_id AND D.device_id = I.device_id", array($vars['user_id']));
+    $interface_perms = dbFetchRows("SELECT * from ports_perms as P, ports as I, devices as D WHERE `user_id` = ? AND I.port_id = P.port_id AND D.device_id = I.device_id", array($vars['user_id']));
 
     foreach ($interface_perms as $interface_perm)
     {
       echo("<table><tr><td><strong>".$interface_perm['hostname']." - ".$interface_perm['ifDescr']."</strong><br />".
                   "" . $interface_perm['ifAlias'] . "</td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delifperm/user_id=" . $vars['user_id'] .
-       "/interface_id=" . $interface_perm['interface_id'] . "'><img src='images/16/cross.png' align=absmiddle border=0></a></td></tr></table>");
+       "/port_id=" . $interface_perm['port_id'] . "'><img src='images/16/cross.png' align=absmiddle border=0></a></td></tr></table>");
       $ipermdone = "yes";
     }
 
@@ -127,7 +127,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
     }
 
     echo("</select></td></tr><tr>
-       <td>Interface: </td><td><select class=selector id='interface_id' name='interface_id'>
+       <td>Interface: </td><td><select class=selector id='port_id' name='port_id'>
        </select></td>
        </tr><tr></table><input type='submit' name='Submit' value='Add'></form>");
 

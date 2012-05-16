@@ -86,9 +86,9 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding']))
     $this_port[$oid] = $this_port[$oid] / 10;
   }
 
-  if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = ?", array($port['interface_id'])) == "0")
+  if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = ?", array($port['port_id'])) == "0")
   {
-    dbInsert(array('interface_id' => $port['interface_id']), 'ports_adsl');
+    dbInsert(array('port_id' => $port['port_id']), 'ports_adsl');
   }
 
   $port['adsl_update'] = array('port_adsl_updated' => array('NOW()'));
@@ -97,7 +97,7 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding']))
     $data = str_replace("\"", "", $this_port[$oid]);  ## FIXME - do we need this?
     $port['adsl_update'][$oid] = $data;
   }
-  dbUpdate($port['adsl_update'], 'ports_adsl', '`interface_id` = ?', array($port['interface_id']));
+  dbUpdate($port['adsl_update'], 'ports_adsl', '`port_id` = ?', array($port['port_id']));
 
   if ($this_port['adslAtucCurrSnrMgn'] > "1280") { $this_port['adslAtucCurrSnrMgn'] = "U"; }
   if ($this_port['adslAturCurrSnrMgn'] > "1280") { $this_port['adslAturCurrSnrMgn'] = "U"; }

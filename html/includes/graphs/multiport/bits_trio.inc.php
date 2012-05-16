@@ -10,7 +10,7 @@ $i = 1;
 
 foreach (explode(",", $_GET['id']) as $ifid)
 {
-  $int = dbFetchRow("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = ? AND I.device_id = D.device_id", array($ifid));
+  $int = dbFetchRow("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id", array($ifid));
   if (is_file($config['rrd_dir'] . "/" . $int['hostname'] . "/port-" . $int['ifIndex'] . ".rrd"))
   {
     if (strstr($inverse, "a")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
@@ -29,7 +29,7 @@ unset($seperator); unset($plus);
 
 foreach (explode(",", $_GET['idb']) as $ifid)
 {
-  $int = dbFetchRow("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = ? AND I.device_id = D.device_id", array($ifid));
+  $int = dbFetchRow("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id", array($ifid));
   if (is_file($config['rrd_dir'] . "/" . $int['hostname'] . "/port-" . $int['ifIndex'] . ".rrd"))
   {
     if (strstr($inverse, "b")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
@@ -48,7 +48,7 @@ unset($seperator); unset($plus);
 
 foreach (explode(",", $_GET['idc']) as $ifid)
 {
-  $int = dbFetchRow("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = ? AND I.device_id = D.device_id", array($ifid));
+  $int = dbFetchRow("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id", array($ifid));
   if (is_file($config['rrd_dir'] . "/" . $int['hostname'] . "/port-" . $int['ifIndex'] . ".rrd"))
   {
     if (strstr($inverse, "c")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }

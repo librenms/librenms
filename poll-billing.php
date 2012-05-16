@@ -45,7 +45,7 @@ foreach (dbFetchRows("SELECT * FROM `bills`") as $bill_data)
 
 function CollectData($bill_id)
 {
-  foreach (dbFetchRows("SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.interface_id = P.port_id AND D.device_id = I.device_id", array($bill_id)) as $port_data)
+  foreach (dbFetchRows("SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id", array($bill_id)) as $port_data)
   {
     $port_id = $port_data['port_id'];
     $host    = $port_data['hostname'];
