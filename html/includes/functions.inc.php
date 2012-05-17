@@ -357,7 +357,9 @@ function generate_entity_link($type, $entity, $text = NULL, $graph_type=NULL)
       $link = generate_port_link($entity, $text, $graph_type);
       break;
     case "storage":
-      $url = generate_url(array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage'));
+      if(empty($text)) { $text = $entity['storage_descr']; }
+      $link = generate_link($text, array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage'));
+      break;
     default:
       $link = $entity[$type.'_id'];
   }

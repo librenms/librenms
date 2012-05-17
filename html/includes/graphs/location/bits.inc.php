@@ -37,7 +37,7 @@ foreach ($devices as $device)
     $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($int['ifIndex'] . ".rrd");
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $port['label'];
-    $rrd_list[$i]['descr_in'] = $port['label'];
+    $rrd_list[$i]['descr_in'] = $device['hostname'];
     $rrd_list[$i]['descr_out'] = $port['ifAlias'];
     $rrd_list[$i]['ds_in'] = $ds_in;
     $rrd_list[$i]['ds_out'] = $ds_out;

@@ -23,8 +23,9 @@ echo('<table cellspacing="0" cellpadding=5 class="sortable" width="100%">
 function get_entity_list($type, $subtype = "*", $device_id = "*", $entry)
 {
   if($type == "storage") { $table = $type; } else { $table = $type.'s'; }
+  if($type == "port")    { $deleted = "deleted"; } else { $deleted = $type.'_deleted'; }
 
-  $query = 'SELECT '.$type.'_id AS id FROM '.$table.' WHERE 1';
+  $query = 'SELECT '.$type.'_id AS id, '.$deleted.' FROM '.$table.' WHERE 1';
   $args  = array();
 
   if(is_numeric($device_id))
@@ -43,7 +44,9 @@ function get_entity_list($type, $subtype = "*", $device_id = "*", $entry)
 
   foreach($entities_db as $entity_db)
   {
-    $entities[] = $entity_db['id'];
+    /// Is this entity marked as deleted?
+    if($entity_db['deleted'] != "1")
+      $entities[] = $entity_db['id'];
   }
   return $entities;
 }
@@ -68,12 +71,12 @@ foreach($glo_conditions as $type => $subtypes)
 
         if(!empty($entities))
         {
-          echo('<tr class=list><td></td><td colspan=9><strong>Entities: </strong>');
+          echo('<tr class=list><td></td><td colspan=9><strong>');
 	  foreach($entities as $entity)
           {
-           echo(generate_entity_link($type, $entity)." ");
+           echo('<span style="padding:3px 5px; margin: 0px 3px; background-color: #e5e5e5;">'.generate_entity_link($type, $entity)."</span>");
           }
-          echo('</td></tr>');
+          echo('</strong></td></tr>');
         }
       }
     }
