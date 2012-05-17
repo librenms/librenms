@@ -370,7 +370,6 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
   else
   {
     $data = dbFetchRow("SELECT * FROM `links` WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?", array($remote_hostname, $local_port_id, $protocol, $remote_port));
-    print_r($data);
     if ($data['remote_port_id'] == $remote_port_id && $data['remote_platform'] == $remote_platform && $remote_version == $remote_version)
     {
       echo(".");
