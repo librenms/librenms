@@ -27,13 +27,14 @@ foreach (getlocations() as $location)
 
   if (empty($devices_down)) { $devices_down[] = "No Problems"; }
 
-  if ($down > 0) { $state = 0; } else { $state = 100; }
-
-  $locations[] = "['".$location."',".$state.", '".implode(", ", $devices_down)."']";
-
+  if ($down > 0) {
+    $locations_down[]   = "['".$location."', 100, '".implode(", ", $devices_down)."']";
+  } else {
+    $locations_up[] = "['".$location."', 0, '".implode(", ", $devices_down)."']";
+  }
 }
 
-echo(implode(",\n", $locations));
+echo(implode(",\n", array_merge($locations_up, $locations_down)));
 
 ?>
 
@@ -46,7 +47,9 @@ echo(implode(",\n", $locations));
         width: 1150,
         height: 500,
         magnifyingGlass: {enable: true, zoomFactor: 8},
-        colorAxis: {minValue: 0, maxValue: 100, colors: ['red', 'green']}
+        colorAxis: {minValue: 0, maxValue: 100, colors: ['green', 'red']},
+        markerOpacity: 0.90,
+        sizeAxis: {minValue: 10,  maxValue: 10}
       };
 
       var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
