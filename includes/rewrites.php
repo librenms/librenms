@@ -176,6 +176,7 @@ $rewrite_junos_hardware = array(
   'jnxProductNameSRX5600' => 'SRX5600',
   'jnxProductNameMX240' => 'MX240',
   'jnxProductNameEX3200' => 'EX3200',
+  'jnxProductNameEX3300' => 'EX3300',
   'jnxProductNameEX4200' => 'EX4200',
   'jnxProductNameEX8208' => 'EX8208',
   'jnxProductNameEX8216' => 'EX8216',
