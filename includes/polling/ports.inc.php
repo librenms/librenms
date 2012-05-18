@@ -407,8 +407,6 @@ foreach ($ports as $port)
     ### Do Alcatel Detailed Stats
     if ($device['os'] == "aos") { include("port-alcatel.inc.php"); }
 
-print_r($port);
-
     ### Update Database
     if (count($port['update']))
     {
