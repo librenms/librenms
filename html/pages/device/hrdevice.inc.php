@@ -11,7 +11,7 @@ foreach (dbFetchRows("SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
   if ($hrdevice['hrDeviceType'] == "hrDeviceProcessor")
   {
     $proc_id = dbFetchCell("SELECT processor_id FROM processors WHERE device_id = '".$device['device_id']."' AND hrDeviceIndex = '".$hrdevice['hrDeviceIndex']."'");
-    $proc_url   = "device/".$device['device_id']."/health/processor/";
+    $proc_url   = "device/device=".$device['device_id']."/tab=health/metric=processor/";
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$hrdevice['hrDeviceDescr'];
     $proc_popup .= "</div><img src=\'graph.php?id=" . $proc_id . "&amp;type=processor_usage&amp;from=".$config['time']['month']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=125\'>";
     $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
