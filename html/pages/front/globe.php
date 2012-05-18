@@ -16,16 +16,18 @@ foreach (getlocations() as $location)
 
   $devices = array();
   $devices_down = array();
+  $devices_up = array();
   $count = 0;
   $down  = 0;
   foreach (dbFetchRows("SELECT * FROM devices WHERE location = ?", array($location)) as $device)
   {
     $devices[] = $device['hostname'];
+    $devices_up[] = $device;
     $count++;
-    if ($device['status'] == "0") { $down++; $devices_down[] = $device['hostname']; }
+    if ($device['status'] == "0" && $device['disabled'] == "0" && $device['ignore'] == "0") { $down++; $devices_down[] = $device['hostname']." DOWN"; }
   }
 
-  if (empty($devices_down)) { $devices_down[] = "No Problems"; }
+  $devices_down = array_merge(array(count($devices_up). " Devices OK"), $devices_down);
 
   if ($down > 0) {
     $locations_down[]   = "['".$location."', 100, '".implode(", ", $devices_down)."']";
