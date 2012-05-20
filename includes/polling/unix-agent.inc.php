@@ -1,12 +1,12 @@
 <?php
 
-if($device['os_group'] == "unix")
-{
+global $debug;
 
+if ($device['os_group'] == "unix")
+{
   echo("Observium UNIX Agent: ");
 
   ### FIXME - this should be in config and overridable in database
-
   $agent_port='6556';
 
   $agent_start = utime();
@@ -36,7 +36,6 @@ if($device['os_group'] == "unix")
 
     foreach (explode("<<<", $agent_raw) as $section)
     {
-
       list($section, $data) = explode(">>>", $section);
       list($sa, $sb) = explode("-", $section, 2);
 
@@ -53,15 +52,33 @@ if($device['os_group'] == "unix")
       }
     }
 
-#    print_r($agent_data);
+    if ($debug) { print_r($agent_data); }
 
     include("unix-agent/packages.inc.php");
     include("unix-agent/munin-plugins.inc.php");
+    
+    foreach (array_keys($agent_data) as $key)
+    {
+      if (file_exists("includes/polling/unix-agent/$key.inc.php"))
+      {
+        if ($debug) { echo("Including: unix-agent/$key.inc.php"); }
+        include("unix-agent/$key.inc.php");
+      }
+    }
+
+    foreach (array_keys($agent_data['app']) as $key)
+    {
+      if (file_exists("includes/polling/applications/$key.inc.php"))
+      {
+        if ($debug) { echo("Including: applications/$key.inc.php"); }
+        include("applications/$key.inc.php");
+      }
+    }
 
     ### Processes
     if (!empty($agent_data['ps']))
     {
-      echo("\nProcesses: ");
+      echo("Processes: ");
       foreach (explode("\n", $agent_data['ps']) as $process)
       {
         $process = preg_replace("/\((.*),([0-9]*),([0-9]*),([0-9\.]*)\)\ (.*)/", "\\1|\\2|\\3|\\4|\\5", $process);
@@ -69,6 +86,7 @@ if($device['os_group'] == "unix")
           $processlist[] = array('user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'pcpu' => $pcpu, 'command' => $command);
       }
       #print_r($processlist);
+      echo("\n");
     }
 
     ### Apache
@@ -125,6 +143,13 @@ if($device['os_group'] == "unix")
         }
       }
     }
+  }
+  
+  if (!empty($agent_sensors))
+  {
+    echo("Sensors: ");
+    check_valid_sensors($device, 'temperature', $valid['sensor'], 'agent');
+    echo("\n");
   }
 
   echo("\n");

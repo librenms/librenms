@@ -1,6 +1,6 @@
 <?php
 
-## IPMI
+## IPMI - We can discover this on poll!
 if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
 {
   echo("IPMI : ");
