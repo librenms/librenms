@@ -56,12 +56,13 @@ if ($device['os_group'] == "unix")
 
     include("unix-agent/packages.inc.php");
     include("unix-agent/munin-plugins.inc.php");
-    
+
     foreach (array_keys($agent_data) as $key)
     {
       if (file_exists("includes/polling/unix-agent/$key.inc.php"))
       {
         if ($debug) { echo("Including: unix-agent/$key.inc.php"); }
+
         include("unix-agent/$key.inc.php");
       }
     }
@@ -71,6 +72,7 @@ if ($device['os_group'] == "unix")
       if (file_exists("includes/polling/applications/$key.inc.php"))
       {
         if ($debug) { echo("Including: applications/$key.inc.php"); }
+
         include("applications/$key.inc.php");
       }
     }
@@ -144,7 +146,7 @@ if ($device['os_group'] == "unix")
       }
     }
   }
-  
+
   if (!empty($agent_sensors))
   {
     echo("Sensors: ");

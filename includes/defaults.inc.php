@@ -97,7 +97,7 @@ $config['page_gen']         = 1;
 $config['web_header']       = "header.inc.php";  # in html/includes
 $config['login_message']    = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
 
-$config['old_graphs'] 	    = 1;   ## RRDfiles from before the great rra reform. This is default for a while.
+$config['old_graphs']             = 1;   ## RRDfiles from before the great rra reform. This is default for a while.
 
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
 $config['int_transit']             = 1;  # Enable Transit Types

@@ -74,7 +74,7 @@ foreach ($glo_conditions as $type => $subtypes)
         if (!empty($entities))
         {
           echo('<tr class=list><td></td><td colspan=9><strong>');
-	  foreach ($entities as $entity)
+          foreach ($entities as $entity)
           {
            echo('<span style="padding:3px 5px; margin: 0px 3px; background-color: #e5e5e5;">'.generate_entity_link($type, $entity)."</span>");
           }
@@ -84,7 +84,6 @@ foreach ($glo_conditions as $type => $subtypes)
     }
   }
 }
-
 
 echo('</table>');
 

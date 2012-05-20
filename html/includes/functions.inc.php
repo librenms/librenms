@@ -343,10 +343,9 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
 
 function generate_entity_link($type, $entity, $text = NULL, $graph_type=NULL)
 {
-  global $config;
-  global $entity_cache;
+  global $config, $entity_cache;
 
-  if(is_numeric($entity))
+  if (is_numeric($entity))
   {
     $entity = get_entity_by_id_cache($type, $entity);
   }
@@ -357,7 +356,7 @@ function generate_entity_link($type, $entity, $text = NULL, $graph_type=NULL)
       $link = generate_port_link($entity, $text, $graph_type);
       break;
     case "storage":
-      if(empty($text)) { $text = $entity['storage_descr']; }
+      if (empty($text)) { $text = $entity['storage_descr']; }
       $link = generate_link($text, array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage'));
       break;
     default:
