@@ -1,6 +1,6 @@
 <?php
 
-$sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND device_id = ? ORDER BY `sensor_index`", array($sensor_class, $device['device_id']));
+$sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND device_id = ? ORDER BY `poller_type`, `sensor_index`", array($sensor_class, $device['device_id']));
 
 if (count($sensors))
 {

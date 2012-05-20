@@ -2,24 +2,43 @@
 
 function poll_sensor($device, $class, $unit)
 {
-  global $config, $memcache;
+  global $config, $memcache, $agent_sensors;
 
-  foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `poller_type` = 'snmp'", array($class, $device['device_id'])) as $sensor)
+  foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ?", array($class, $device['device_id'])) as $sensor)
   {
-    echo("Checking $class " . $sensor['sensor_descr'] . "... ");
+    echo("Checking (" . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . "... ");
 
-    if ($class == "temperature")
+    if ($sensor['poller_type'] == "snmp")
     {
-      for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
+      if ($class == "temperature")
       {
-        if ($debug) echo("Attempt $i ");
-        $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB")));
+        for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
+        {
+          if ($debug) echo("Attempt $i ");
+          $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB")));
 
-        if ($sensor_value < 9000) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
-        sleep(1); # Give the TME some time to reset
+          if ($sensor_value < 9000) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
+          sleep(1); # Give the TME some time to reset
+        }
+      } else {
+        $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB")));
       }
-    } else {
-      $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB")));
+    } else if ($sensor['poller_type'] == "agent")
+    {
+      if (isset($agent_sensors))
+      {
+        $sensor_value = $agent_sensors[$class][$sensor['sensor_type']][$sensor['sensor_index']]['current'];
+      }
+      else
+      {
+        echo "no agent data!\n";
+        break;
+      }
+    }
+    else
+    {
+      echo "unknown poller type!\n";
+      break;
     }
 
     if ($sensor_value == -32768) { echo("Invalid (-32768) "); $sensor_value = 0; }

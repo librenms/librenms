@@ -116,7 +116,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 {
   global $config, $debug;
 
-  if ($debug) { echo("Discover sensor: $oid, $index, $type, $descr, $precision, $entPhysicalIndex\n"); }
+  if ($debug) { echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $precision, $entPhysicalIndex\n"); }
 
   if (is_null($low_warn_limit) || !is_null($warn_limit))
   {
@@ -314,9 +314,9 @@ function sensor_limit($class, $current)
   return $limit;
 }
 
-function check_valid_sensors($device, $class, $valid)
+function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
 {
-  $entries = dbFetchRows("SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ?", array($class, $device['device_id']));
+  $entries = dbFetchRows("SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ?", array($class, $device['device_id'], $poller_type));
 
   if (count($entries))
   {
