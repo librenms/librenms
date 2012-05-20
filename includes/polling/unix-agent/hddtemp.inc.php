@@ -4,7 +4,7 @@ global $agent_sensors;
 
 include_once("includes/discovery/functions.inc.php");
 
-$disks = explode('||',trim($agent_data['app']['hddtemp'],'|'));
+$disks = explode('||',trim($agent_data['hddtemp'],'|'));
 
 if (count($disks))
 {
