@@ -5,6 +5,6 @@
 # requires netcat to be installed and in the path
 # (c) 2012, Tom Laermans for Observium
 
-echo '<<<app-hddtemp>>>'
+echo '<<<hddtemp>>>'
 nc localhost 7634
 echo
