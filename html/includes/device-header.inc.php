@@ -26,33 +26,35 @@ echo('
              <td>');
 
   if (isset($config['os'][$device['os']]['over']))
-  {
-    $graphs = $config['os'][$device['os']]['over'];
-  }
-  elseif (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over']))
-  {
-    $graphs = $config['os'][$device['os_group']]['over'];
-  }
-  else
-  {
-    $graphs = $config['os']['default']['over'];
-  }
+{
+  $graphs = $config['os'][$device['os']]['over'];
+}
+elseif (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over']))
+{
+  $graphs = $config['os'][$device['os_group']]['over'];
+}
+else
+{
+  $graphs = $config['os']['default']['over'];
+}
 
-  $graph_array = array();
-  $graph_array['height'] = "100";
-  $graph_array['width']  = "310";
-  $graph_array['to']     = $config['time']['now'];
-  $graph_array['device'] = $device['device_id'];
-  $graph_array['type']   = "device_bits";
-  $graph_array['from']   = $config['time']['day'];
-  $graph_array['legend'] = "no";
-  $graph_array['popup_title'] = $descr;
+$graph_array = array();
+$graph_array['height'] = "100";
+$graph_array['width']  = "310";
+$graph_array['to']     = $config['time']['now'];
+$graph_array['device'] = $device['device_id'];
+$graph_array['type']   = "device_bits";
+$graph_array['from']   = $config['time']['day'];
+$graph_array['legend'] = "no";
+$graph_array['popup_title'] = $descr;
 
-  $graph_array['height'] = "45";
-  $graph_array['width']  = "150";
-  $graph_array['bg']     = "FFFFFF00";
+$graph_array['height'] = "45";
+$graph_array['width']  = "150";
+$graph_array['bg']     = "FFFFFF00";
 
-  foreach ($graphs as $entry)
+foreach ($graphs as $entry)
+{
+  if ($entry['graph'])
   {
     $graph_array['type']   = $entry['graph'];
 
@@ -61,10 +63,11 @@ echo('
     echo("<div style='font-weight: bold; font-size: 7pt; margin: -3px;'>".$entry['text']."</div>");
     echo("</div>");
   }
+}
 
-  unset($graph_array);
+unset($graph_array);
 
 echo('</td>
-     </tr>');
+   </tr>');
 
 ?>
