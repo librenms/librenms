@@ -348,9 +348,6 @@ foreach ($ports as $port)
       }
     }
 
-    print_r($port['stats']);
-
-
     ### Update RRDs
     $rrdfile = $host_rrd . "/port-" . safename($port['ifIndex'] . ".rrd");
     if (!is_file($rrdfile))
