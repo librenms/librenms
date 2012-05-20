@@ -308,7 +308,6 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
     </li>');
     }
 
-
     if ($_SESSION['userlevel'] >= "7")
     {
       if (!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }

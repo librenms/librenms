@@ -170,7 +170,7 @@ function port_by_id_cache($port_id)
 function table_from_entity_type($type)
 {
   /// Fuck you, english pluralisation.
-  if($type == "storage")
+  if ($type == "storage")
   {
     return $type;
   } else {
