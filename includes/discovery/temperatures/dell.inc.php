@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage discovery
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 # MIB-Dell-10892::temperatureProbechassisIndex.1.1 = INTEGER: 1
 # MIB-Dell-10892::temperatureProbeIndex.1.1 = INTEGER: 1
 # MIB-Dell-10892::temperatureProbeStateCapabilities.1.1 = INTEGER: 0

@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage functions
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 ## Include from PEAR
 
 include_once("Net/IPv4.php");
