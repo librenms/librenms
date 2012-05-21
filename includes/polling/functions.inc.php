@@ -32,13 +32,17 @@ function poll_sensor($device, $class, $unit)
       else
       {
         echo "no agent data!\n";
-        break;
+        continue;
       }
+    } else if ($sensor['poller_type'] == "ipmi")
+    {
+      echo " already polled.\n"; # ipmi should probably move here from the ipmi poller file (FIXME)
+      continue;
     }
     else
     {
       echo "unknown poller type!\n";
-      break;
+      continue;
     }
 
     if ($sensor_value == -32768) { echo("Invalid (-32768) "); $sensor_value = 0; }
