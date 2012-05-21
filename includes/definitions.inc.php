@@ -896,6 +896,10 @@ $os = "arubaos";
 $config['os'][$os]['text']              = "ArubaOS";
 $config['os'][$os]['type']              = "wireless";
 $config['os'][$os]['icon']              = "arubaos";
+$config['os'][$os]['over'][0]['graph']  = "device_arubacontroller_numaps";
+$config['os'][$os]['over'][0]['text']   = "Number of APs";
+$config['os'][$os]['over'][1]['graph']  = "device_arubacontroller_numclients";
+$config['os'][$os]['over'][1]['text']   = "Number of Clients";
 
 $os = "dsm";
 $config['os'][$os]['text']              = "Synology DSM";

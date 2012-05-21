@@ -65,10 +65,11 @@ if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.p
   {
     include($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php");
   }
+
 }
 else
 {
-  graph_error("Graph Template Missing");
+  graph_error("$type*$subtype ");//Graph Template Missing");
 }
 
 function graph_error($string)
@@ -106,6 +107,7 @@ function graph_error($string)
   }
 }
 
+
 if ($error_msg) {
   /// We have an error :(
 
@@ -141,6 +143,7 @@ if ($error_msg) {
     unlink($graphfile);
     echo("</div>");
   } else {
+
     if ($rrd_options)
     {
       rrdtool_graph($graphfile, $rrd_options);

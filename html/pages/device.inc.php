@@ -6,6 +6,7 @@ if ($vars['tab'] == "port" && is_numeric($vars['device']) && port_permitted($var
   $permit_ports = 1;
 }
 
+
 if (device_permitted($vars['device']) || $check_device == $vars['device'])
 {
   $selected['iface'] = "selected";
@@ -114,6 +115,15 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
       echo('<li class="' . $select['slas'] . $select['sla'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'slas')). '">
       <img src="images/16/chart_line.png" align="absmiddle" border="0" /> SLAs
+    </a>
+  </li>');
+    }
+
+    if (@dbFetchCell("SELECT COUNT(accesspoint_id) FROM accesspoint WHERE device_id = '" . $device['device_id'] . "'") > '0')
+    {
+      echo('<li class="' . $select['accesspoints'] . '">
+    <a href="'.generate_device_url($device, array('tab' => 'accesspoints')). '">
+      <img src="images/icons/wireless.png" align="absmiddle" border="0" /> Access Points
     </a>
   </li>');
     }

@@ -279,6 +279,16 @@ function device_by_name($name, $refresh = 0)
   return device_by_id_cache(getidbyname($name), $refresh);
 }
 
+
+function accesspoint_by_id($ap_id, $refresh = '0') {
+
+  $ap = dbFetchRow("SELECT * FROM `accesspoint` WHERE `accesspoint_id` = ?", array($ap_id));
+
+  return $ap;
+
+}
+
+
 function device_by_id_cache($device_id, $refresh = '0')
 {
   global $cache;
