@@ -21,6 +21,7 @@ if ($device['os_group'] == "unix")
       $agent_raw .= fgets($agent, 128);
     }
   }
+  
   $agent_end = utime(); $agent_time = round(($agent_end - $agent_start) * 1000);
 
   if (!empty($agent_raw))
