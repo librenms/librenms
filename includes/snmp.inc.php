@@ -121,6 +121,9 @@ function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   else { return false; }
 }
 
+
+
+
 function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 {
   global $debug,$config,$runtime_stats;
@@ -330,6 +333,29 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL)
 
   return $array;
 }
+
+// just like snmpwalk_cache_oid except that it returns the numerical oid as the index
+// this is useful when the oid is indexed by the mac address and snmpwalk would
+// return periods (.) for non-printable numbers, thus making many different indexes appear 
+// to be the same.
+function snmpwalk_cache_oid_num($device, $oid, $array, $mib = NULL, $mibdir = NULL)
+{
+  $data = snmp_walk($device, $oid, "-OQUn", $mib, $mibdir);
+
+  foreach (explode("\n", $data) as $entry)
+  {
+    list($oid,$value) = explode("=", $entry);
+    $oid = trim($oid); $value = trim($value);
+    list($oid, $index) = explode(".", $oid, 2);
+    if (!strstr($value, "at this OID") && isset($oid) && isset($index))
+    {
+      $array[$index][$oid] = $value;
+    }
+  }
+
+  return $array;
+}
+
 
 function snmpwalk_cache_multi_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL)
 {

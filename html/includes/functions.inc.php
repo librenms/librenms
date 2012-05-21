@@ -294,6 +294,7 @@ function print_graph_tag($args)
 
 function generate_graph_tag($args)
 {
+
   foreach ($args as $key => $arg)
   {
     $urlargs[] = $key."=".$arg;
@@ -537,5 +538,50 @@ function foldersize($path)
 
   return array($total_size, $total_files);
 }
+
+function generate_ap_link($args, $text = NULL, $type = NULL)
+{
+  global $config;
+
+  $args = ifNameDescr($args);
+  if (!$text) { $text = fixIfName($args['label']); }
+  if ($type) { $args['graph_type'] = $type; }
+  if (!isset($args['graph_type'])) { $args['graph_type'] = 'port_bits'; }
+
+  if (!isset($args['hostname'])) { $args = array_merge($args, device_by_id_cache($args['device_id'])); }
+
+  $content = "<div class=list-large>".$args['text']." - " . fixifName($args['label']) . "</div>";
+  if ($args['ifAlias']) { $content .= $args['ifAlias']."<br />"; }
+  $content .= "<div style=\'width: 850px\'>";
+  $graph_array['type']     = $args['graph_type'];
+  $graph_array['legend']   = "yes";
+  $graph_array['height']   = "100";
+  $graph_array['width']    = "340";
+  $graph_array['to']           = $config['time']['now'];
+  $graph_array['from']     = $config['time']['day'];
+  $graph_array['id']       = $args['accesspoint_id'];
+  $content .= generate_graph_tag($graph_array);
+  $graph_array['from']     = $config['time']['week'];
+  $content .= generate_graph_tag($graph_array);
+  $graph_array['from']     = $config['time']['month'];
+  $content .= generate_graph_tag($graph_array);
+  $graph_array['from']     = $config['time']['year'];
+  $content .= generate_graph_tag($graph_array);
+  $content .= "</div>";
+
+
+  $url = generate_ap_url($args);
+  if (port_permitted($args['interface_id'], $args['device_id'])) {
+    return overlib_link($url, $text, $content, $class);
+  } else {
+    return fixifName($text);
+  }
+}
+
+function generate_ap_url($ap, $vars=array())
+{
+  return generate_url(array('page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoint', 'ap' => $ap['accesspoint_id']), $vars);
+}
+
 
 ?>
