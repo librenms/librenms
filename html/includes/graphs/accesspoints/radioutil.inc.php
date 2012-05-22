@@ -1,10 +1,5 @@
 <?php
 
-
-
-$ap=accesspoint_by_id($id);
-$device = device_by_id_cache($ap['device_id']);
-
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] ."/". 
 safename("arubaap-$ap[name].$ap[radio_number].rrd");
 

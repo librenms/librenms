@@ -1,11 +1,13 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] ."/". 
-safename("arubaap-$ap[name].$ap[radio_number].rrd");
+
+$device = device_by_id_cache($_REQUEST['device']);
+
+$rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/aruba-controller.rrd";
 
 $rrd_list[0]['filename'] = $rrd_filename;
-$rrd_list[0]['descr'] = "Mon Clients";
-$rrd_list[0]['ds'] = "nummonclients";
+$rrd_list[0]['descr'] = "Clients";
+$rrd_list[0]['ds'] = "NUMCLIENTS";
 
 $unit_text = "Clients";
 
@@ -21,5 +23,7 @@ if ($rrd_list)
 {
   include("includes/graphs/generic_multi_line.inc.php");
 }
+
+
 
 ?>

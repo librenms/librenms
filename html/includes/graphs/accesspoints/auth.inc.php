@@ -2,7 +2,7 @@
 
 if (is_numeric($vars['id']))
 {
-  $ap = accesspoint_by_id($id);
+  $ap = accesspoint_by_id($vars['id']);
 
   if (is_numeric($ap['device_id']) && ($auth || device_permitted($ap['device_id'])))
   {
