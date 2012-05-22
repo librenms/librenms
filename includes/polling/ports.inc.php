@@ -320,6 +320,14 @@ foreach ($ports as $port)
       }
     }
 
+    if($config['debug_port'][$port['port_id']])
+    {
+      $port_debug  = $port['port_id']."|".$polled."|".$polled_period."|".$this_port['ifHCInOctets']."|".$this_port['ifHCOutOctets'];
+      $port_debug .= "|".$port['stats']['ifInOctets_rate']."|".$port['stats']['ifOutOctets_rate']."\n";
+      file_put_contents("/tmp/port_debug.txt", $port_debug, FILE_APPEND);
+      echo("Wrote port debugging data");
+    }
+
     $port['stats']['ifInBits_rate'] = round($port['stats']['ifInOctets_rate'] * 8);
     $port['stats']['ifOutBits_rate'] = round($port['stats']['ifOutOctets_rate'] * 8);
 
