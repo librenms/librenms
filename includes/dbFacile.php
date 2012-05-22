@@ -24,7 +24,11 @@ Usage
 function dbQuery($sql, $parameters = array()) {
 	global $fullSql, $debug;
 	$fullSql = dbMakeQuery($sql, $parameters);
-        if($debug) { echo("\nSQL[".$fullSql."] "); }
+        if($debug) { 
+          print Console_Color::convert("\nSQL[%y".$fullSql."%n] ");
+          #echo("\nSQL[".$fullSql."] "); 
+        }
+
 	/*
 	if($this->logFile)
 		$time_start = microtime(true);
