@@ -1,7 +1,5 @@
 <?php
 
-$device = device_by_id_cache($_REQUEST['device']);
-
 $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/aruba-controller.rrd";
 
 $rrd_list[0]['filename'] = $rrd_filename;
