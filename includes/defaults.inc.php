@@ -501,6 +501,7 @@ $config['poller_modules']['cipsec-tunnels']               = 1;
 $config['poller_modules']['cisco-ace-loadbalancer']       = 1;
 $config['poller_modules']['cisco-ace-serverfarms']        = 1;
 $config['poller_modules']['netscaler-vsvr']               = 1;
+$config['poller_modules']['aruba-controller']             = 1;
 $config['poller_modules']['entity-physical']              = 1;
 $config['poller_modules']['applications']                 = 1;
 
