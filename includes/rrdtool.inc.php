@@ -155,7 +155,7 @@ function rrdtool($command, $filename, $options)
 
   if ($config['norrd'])
   {
-    print Console_Color::convert("%g RRD Disabled %n", false);
+    print Console_Color::convert("[%rRRD Disabled%n]");
   } else {
     fwrite($rrd_pipes[0], $cmd."\n");
   }
@@ -163,10 +163,7 @@ function rrdtool($command, $filename, $options)
   {
     echo stream_get_contents($rrd_pipes[1]);
     echo stream_get_contents($rrd_pipes[2]);
-
-    echo("<p>");
-    echo("\n".$cmd."\n");
-    echo("</p>");
+    print Console_Color::convert("RRD[%g".$cmd."%n] ");
   } else {
     $tmp  = stream_get_contents($rrd_pipes[1]).stream_get_contents($rrd_pipes[2]);
   }
@@ -186,15 +183,13 @@ function rrdtool_create($filename, $options)
 
   if ($config['norrd'])
   {
-    print Console_Color::convert("%g RRD Disabled %n", false);
+    print Console_Color::convert("[%gRRD Disabled%n] ", false);
   } else {
     $command = $config['rrdtool'] . " create $filename $options";
   }
-  if ($debug) { echo($command."\n"); }
+  if ($debug) { print Console_Color::convert("RRD[%g".$command."%n] "); }
 
   return shell_exec($command);
-
-#  return rrdtool("create", $filename, $options);
 }
 
 function rrdtool_update($filename, $options)
