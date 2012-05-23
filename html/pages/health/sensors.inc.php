@@ -29,6 +29,7 @@ foreach (dbFetchRows($sql, $param) as $sensor)
   if ($config['memcached']['enable'])
   {
     $sensor['sensor_current'] = $memcache->get('sensor-'.$sensor['sensor_id'].'-value');
+    if($debug) { echo("Memcached[".'sensor-'.$sensor['sensor_id'].'-value'."=".$sensor['sensor_current']."]"); }
   }
 
   if (empty($sensor['sensor_current']))
@@ -38,28 +39,50 @@ foreach (dbFetchRows($sql, $param) as $sensor)
     if ($sensor['sensor_current'] >= $sensor['sensor_limit']) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }
   }
 
-  $weekly_sensor = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['week']."&amp;to=".$config['time']['now']."&amp;width=500&amp;height=150";
-  $sensor_popup = "<a href=\"graphs/id=" . $sensor['sensor_id'] . "/type=".$graph_type."/\" onmouseover=\"return overlib('<img src=\'$weekly_sensor\'>', LEFT);\" onmouseout=\"return nd();\">
-        " . $sensor['sensor_descr'] . "</a>";
+    ### FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
+    ### FIXME - So now we need to clean this up and move it into a function. Isn't it just "print-graphrow"?
+    ### FIXME - DUPLICATED IN device/overview/sensors
 
-  $sensor_day    = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=300&amp;height=100";
-  $sensor_week   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['week']."&amp;to=".$config['time']['now']."&amp;width=300&amp;height=100";
-  $sensor_month  = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['month']."&amp;to=".$config['time']['now']."&amp;width=300&amp;height=100";
-  $sensor_year   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['year']."&amp;to=".$config['time']['now']."&amp;width=300&amp;height=100";
+    $graph_colour = str_replace("#", "", $row_colour);
 
-  $sensor_minigraph = "<img src='graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;bg=ffffff00'";
-  $sensor_minigraph .= " onmouseover=\"return overlib('<div class=list-large>".$sensor['hostname']." - ".mres($sensor['sensor_descr']);
-  $sensor_minigraph .= "</div><div style=\'width: 750px\'><img src=\'$sensor_day\'><img src=\'$sensor_week\'><img src=\'$sensor_month\'><img src=\'$sensor_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
+    $graph_array           = array();
+    $graph_array['height'] = "100";
+    $graph_array['width']  = "210";
+    $graph_array['to']     = $config['time']['now'];
+    $graph_array['id']     = $sensor['sensor_id'];
+    $graph_array['type']   = $graph_type;
+    $graph_array['from']   = $config['time']['day'];
+    $graph_array['legend'] = "no";
 
-  echo("<tr class='health'>
-          <td class=list-bold>" . generate_device_link($sensor) . "</td>
-          <td>$sensor_popup</td>
-          <td width=100>$sensor_minigraph</td>
-          <td width=50>$alert</td>
-          <td style='text-align: center; font-weight: bold;'>" . $sensor['sensor_current'] . $unit . "</td>
-          <td style='text-align: center'>" . round($sensor['sensor_limit_low'],2) . $unit . " - " . round($sensor['sensor_limit'],2) . $unit . "</td>
-          <td>" . (isset($sensor['sensor_notes']) ? $sensor['sensor_notes'] : '') . "</td>
-        </tr>\n");
+    $link_array = $graph_array;
+    $link_array['page'] = "graphs";
+    unset($link_array['height'], $link_array['width'], $link_array['legend']);
+    $link = generate_url($link_array);
+
+    $overlib_content = '<div style="width: 580px;"><h2>'.$device['hostname']." - ".$sensor['sensor_descr']."</h1>";
+    foreach (array('day','week','month','year') as $period)
+    {
+      $graph_array['from']        = $config['time'][$period];
+      $overlib_content .= str_replace('"', "\'", generate_graph_tag($graph_array));
+    }
+    $overlib_content .= "</div>";
+
+    $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = 'ffffff00'; # the 00 at the end makes the area transparent.
+    $graph_array['from'] = $config['time']['day'];
+    $sensor_minigraph =  generate_graph_tag($graph_array);
+
+    $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
+
+    echo('<tr class="health">
+          <td class=list-bold>' . generate_device_link($sensor) . '</td>
+          <td>'.overlib_link($link, $sensor['sensor_descr'],$overlib_content).'</td>
+          <td width=100>'.overlib_link($link, $sensor_minigraph, $overlib_content).'</td>
+          <td width=50>'.$alert.'</td>
+          <td style="text-align: center; font-weight: bold;">' . $sensor['sensor_current'] . $unit . '</td>
+          <td style="text-align: center">' . round($sensor['sensor_limit_low'],2) . $unit . ' - ' . round($sensor['sensor_limit'],2) . $unit . '</td>
+          <td>' . (isset($sensor['sensor_notes']) ? $sensor['sensor_notes'] : '') . '</td>
+        </tr>
+     ');
 
   if ($vars['view'] == "graphs")
   {
