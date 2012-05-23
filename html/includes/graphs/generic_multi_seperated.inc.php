@@ -7,7 +7,7 @@ $units_descr = substr(str_pad($units_descr, 18),0,18);
 if($format == "octets" || $format == "bytes")
 {
   $units = "Bps";
-  $format = "bits";
+  $format = "bits"; # FIXME bits? or bytes?
 } else {
   $units = "bps";
   $format = "bits";
@@ -64,7 +64,7 @@ foreach ($rrd_list as $rrd)
 
   if ($i) { $stack="STACK"; }
 
-  $rrd_options .= " AREA:inbits".$i."#" . $colour_in . ":'" . substr(str_pad($rrd['descr'], 10),0,10) . "In ':$stack";
+  $rrd_options .= " AREA:inbits".$i."#" . $colour_in . ":'" . rrdtool_escape($rrd['descr'], 10) . "In ':$stack";
   $rrd_options .= " GPRINT:inbits".$i.":LAST:%6.2lf%s";
   $rrd_options .= " GPRINT:inbits".$i.":AVERAGE:%6.2lf%s";
   $rrd_options .= " GPRINT:inbits".$i.":MAX:%6.2lf%s";

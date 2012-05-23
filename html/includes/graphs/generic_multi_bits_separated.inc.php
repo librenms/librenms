@@ -34,12 +34,12 @@ foreach ($rrd_list as $rrd)
 
   if (isset($rrd['descr_in']))
   {
-    $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr_in'], $descr_len),0,$descr_len)) . "  In";
+    $descr     = rrdtool_escape($rrd['descr_in'], $descr_len) . "  In";
   } else {
-    $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr'], $descr_len),0,$descr_len)) . "  In";
+    $descr     = rrdtool_escape($rrd['descr'], $descr_len) . "  In";
   }
-  $descr_out = str_replace(":", "\:", substr(str_pad($rrd['descr_out'], $descr_len),0,$descr_len)). " Out";
-  $descr     = str_replace("'", "", $descr);
+  $descr_out = rrdtool_escape($rrd['descr_out'], $descr_len) . " Out";
+  $descr     = str_replace("'", "", $descr); # FIXME does this mean ' should be filtered in rrdtool_escape? probably...
   $descr_out = str_replace("'", "", $descr_out);
 
   $rrd_options .= " DEF:".$in.$i."=".$rrd['filename'].":".$ds_in.":AVERAGE ";

@@ -34,7 +34,7 @@ foreach ($rrd_list as $rrd)
   $ds = $rrd['ds'];
   $filename = $rrd['filename'];
 
-  $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr'], $descr_len),0,$descr_len));
+  $descr = rrdtool_escape($rrd['descr'], $descr_len);
 
   $id = "ds".$i;
 
