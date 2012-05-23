@@ -4,9 +4,9 @@ include("includes/graphs/common.inc.php");
 
 if($width > "500")
 {
-  $descr_len=24;
+  $descr_len = 24; # FIXME may even be more imo?
 } else {
-  $descr_len=12;
+  $descr_len = 12;
   $descr_len += round(($width - 250) / 8);
 }
 
@@ -39,7 +39,7 @@ foreach ($rrd_list as $i => $rrd)
     $colour_iter++;
   }
 
-  $descr     = str_replace(":", "\:", substr(str_pad($rrd['descr'], $descr_len),0,$descr_len));
+  $descr = rrdtool_escape($rrd['descr'], $descr_len);
 
   $rrd_options .= " DEF:".$rrd['ds'].$i."=".$rrd['filename'].":".$rrd['ds'].":AVERAGE ";
 
@@ -101,7 +101,7 @@ foreach ($rrd_list as $i => $rrd)
   $rrd_options .= " GPRINT:".$t_defname.$i.":LAST:%5.2lf%s GPRINT:".$t_defname.$i."min:MIN:%5.2lf%s";
   $rrd_options .= " GPRINT:".$t_defname.$i."max:MAX:%5.2lf%s GPRINT:".$t_defname.$i.":AVERAGE:'%5.2lf%s\\n'";
 
-  if (!$nototal) { $rrd_options .= " GPRINT:tot".$rrd['ds'].$i.":%6.2lf%s".str_replace("%", "%%", $total_units).""; }
+  if (!$nototal) { $rrd_options .= " GPRINT:tot".$rrd['ds'].$i.":%6.2lf%s".rrdtool_escape($total_units).""; }
 
   $rrd_options .= " COMMENT:'\\n'";
 }

@@ -224,4 +224,19 @@ function rrdtool_lastupdate($filename, $options)
   return rrdtool("lastupdate", $filename, $options);
 }
 
+function rrdtool_escape($string, $maxlength = NULL)
+{
+  $result = str_replace(':','\:',$string);
+  $result = str_replace('%','%%',$result);
+  
+  if ($maxlength != NULL)
+  {
+    return substr(str_pad($result, $maxlength),0,$maxlength+(strlen($result)-strlen($string)));
+  }
+  else
+  {
+    return $result;
+  }
+}
+
 ?>
