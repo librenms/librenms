@@ -57,7 +57,9 @@ foreach (dbFetchRows($sql, $param) as $sensor)
     $link_array = $graph_array;
     $link_array['page'] = "graphs";
     unset($link_array['height'], $link_array['width'], $link_array['legend']);
-    $link = generate_url($link_array);
+    $link_graph = generate_url($link_array);
+
+    $link = generate_url(array("page" => "device", "device" => $sensor['device_id'], "tab" => "health", "metric" => $sensor['sensor_class']));
 
     $overlib_content = '<div style="width: 580px;"><h2>'.$device['hostname']." - ".$sensor['sensor_descr']."</h1>";
     foreach (array('day','week','month','year') as $period)
@@ -76,7 +78,7 @@ foreach (dbFetchRows($sql, $param) as $sensor)
     echo('<tr class="health">
           <td class=list-bold>' . generate_device_link($sensor) . '</td>
           <td>'.overlib_link($link, $sensor['sensor_descr'],$overlib_content).'</td>
-          <td width=100>'.overlib_link($link, $sensor_minigraph, $overlib_content).'</td>
+          <td width=100>'.overlib_link($link_graph, $sensor_minigraph, $overlib_content).'</td>
           <td width=50>'.$alert.'</td>
           <td style="text-align: center; font-weight: bold;">' . $sensor['sensor_current'] . $unit . '</td>
           <td style="text-align: center">' . round($sensor['sensor_limit_low'],2) . $unit . ' - ' . round($sensor['sensor_limit'],2) . $unit . '</td>
