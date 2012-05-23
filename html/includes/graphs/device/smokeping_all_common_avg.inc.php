@@ -22,6 +22,7 @@ if($width > "500")
   $descr_len = 12 + round(($width - 275) / 8);
 }
 
+# FIXME str_pad really needs a "limit to length" so we can rid of all the substrs all over the code to limit the length as below...
 if($width > "500")
 {
   $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT      Loss    SDev   RTT\:SDev\l'";
@@ -36,7 +37,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
   $colour = $config['graph_colours'][$colourset][$iter];
   $iter++;
 
-  $descr = str_replace(":", "\:", substr(str_pad($source, $descr_len),0,$descr_len));
+  $descr = rrdtool_escape($source, $descr_len);
 
   $filename = $config['smokeping']['dir'] . $filename;
   $rrd_options .= " DEF:median$i=".$filename.":median:AVERAGE ";
@@ -78,45 +79,26 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
 
 }
 
-$descr = str_replace(":", "\:", substr(str_pad("Average", $descr_len),0,$descr_len));
+$descr = rrdtool_escape("Average", $descr_len);
 
-  $rrd_options .= " CDEF:ploss_all=0".$ploss_list.",$i,/";
-  $rrd_options .= " CDEF:dm_all=0".$dm_list.",$i,/";
+$rrd_options .= " CDEF:ploss_all=0".$ploss_list.",$i,/";
+$rrd_options .= " CDEF:dm_all=0".$dm_list.",$i,/";
 #  $rrd_options .= " CDEF:dm_all_clean=dm_all,UN,NaN,dm_all,IF";
-  $rrd_options .= " CDEF:sd_all=0".$sd_list.",$i,/";
-  $rrd_options .= " CDEF:dmlow_all=dm_all,sd_all,2,/,-";
+$rrd_options .= " CDEF:sd_all=0".$sd_list.",$i,/";
+$rrd_options .= " CDEF:dmlow_all=dm_all,sd_all,2,/,-";
 
-  $rrd_options .= " AREA:dmlow_all";
-  $rrd_options .= " AREA:sd_all#AAAAAA::STACK";
-  $rrd_options .= " LINE1:dm_all#CC0000:'$descr'";
+$rrd_options .= " AREA:dmlow_all";
+$rrd_options .= " AREA:sd_all#AAAAAA::STACK";
+$rrd_options .= " LINE1:dm_all#CC0000:'$descr'";
 
-  $rrd_options .= " VDEF:avmed=dm_all,AVERAGE";
-  $rrd_options .= " VDEF:avsd=sd_all,AVERAGE";
-  $rrd_options .= " CDEF:msr=dm_all,POP,avmed,avsd,/";
-  $rrd_options .= " VDEF:avmsr=msr,AVERAGE";
+$rrd_options .= " VDEF:avmed=dm_all,AVERAGE";
+$rrd_options .= " VDEF:avsd=sd_all,AVERAGE";
+$rrd_options .= " CDEF:msr=dm_all,POP,avmed,avsd,/";
+$rrd_options .= " VDEF:avmsr=msr,AVERAGE";
 
-  $rrd_options .= " GPRINT:avmed:'%5.1lf%ss'";
-  $rrd_options .= " GPRINT:ploss_all:AVERAGE:'%5.1lf%%'";
-  $rrd_options .= " GPRINT:avsd:'%5.1lf%Ss'";
-  $rrd_options .= " GPRINT:avmsr:'%5.1lf%s\\l'";
-
-#  $rrd_options .= " AREA:dmlow$i";
-#  $rrd_options .= " AREA:s2d$i#".$colour."30::STACK";
-#  $rrd_options .= " LINE1:dm$i#".$colour.":'$descr'";
-#  $rrd_options .= " LINE1:sdev$i#000000:$descr";
-
-#  $rrd_options .= " VDEF:avmed$i=median$i,AVERAGE";
-#  $rrd_options .= " VDEF:avsd$i=sdev$i,AVERAGE";
-#  $rrd_options .= " CDEF:msr$i=median$i,POP,avmed$i,avsd$i,/";
-#  $rrd_options .= " VDEF:avmsr$i=msr$i,AVERAGE";
-
-#  $rrd_options .= " GPRINT:avmed$i:'%5.1lf%ss'";
-#  $rrd_options .= " GPRINT:ploss$i:AVERAGE:'%5.1lf%%'";
-
-#  $rrd_options .= " GPRINT:avsd$i:'%5.1lf%Ss'";
-#  $rrd_options .= " GPRINT:avmsr$i:'%5.1lf%s\\l'";
-
-#  $i++;
-#}
+$rrd_options .= " GPRINT:avmed:'%5.1lf%ss'";
+$rrd_options .= " GPRINT:ploss_all:AVERAGE:'%5.1lf%%'";
+$rrd_options .= " GPRINT:avsd:'%5.1lf%Ss'";
+$rrd_options .= " GPRINT:avmsr:'%5.1lf%s\\l'";
 
 ?>

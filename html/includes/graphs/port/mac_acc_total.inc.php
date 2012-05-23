@@ -78,11 +78,7 @@ foreach ($accs as $acc)
     $this_id = str_replace(".", "", $acc['mac']);
     if (!$config['graph_colours'][$colours][$iter]) { $iter = 0; }
     $colour=$config['graph_colours'][$colours][$iter];
-    $descr = str_pad($name, 36);
-    $descr = substr($descr,0,36);
-    $descr = str_replace("(", "(", $descr);
-    $descr = str_replace(")", ")", $descr);
-    $descr = str_replace(":", "\\:", $descr);
+    $descr = rrdtool_escape($name, 36);
     $rrd_options .= " DEF:in".$this_id."=$this_rrd:".$prefix."IN:AVERAGE ";
     $rrd_options .= " DEF:out".$this_id."temp=$this_rrd:".$prefix."OUT:AVERAGE ";
     $rrd_options .= " CDEF:inB".$this_id."=in".$this_id.",$multiplier,* ";

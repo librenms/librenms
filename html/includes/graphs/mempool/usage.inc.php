@@ -25,8 +25,7 @@ if($width > "500")
   $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."Total      Used      Free\l'";
 }
 
-$descr = substr(str_pad(short_hrDeviceDescr($mempool['mempool_descr']), $descr_len),0,$descr_len);
-$descr = str_replace(":", "\:", $descr);
+$descr = rrdtool_escape(short_hrDeviceDescr($mempool['mempool_descr']), $descr_len);
 
 $perc  = round($mempool['mempool_perc'], 0);
 $background = get_percentage_colours($perc);

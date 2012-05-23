@@ -59,7 +59,7 @@ foreach ($rrd_list as $rrd)
 {
     $colours      = (isset($rrd['colour']) ? $rrd['colour'] : "default");
     $strlen       = ((strlen($rrd['descr'])<$descr_len) ? ($descr_len - strlen($rrd['descr'])) : "0");
-    $descr        = (isset($rrd['descr']) ? str_replace(":", "\:", substr(str_pad($rrd['descr'], $desc_len+$strlen), 0, $descr_len+$strlen)) : "Unkown");
+    $descr        = (isset($rrd['descr']) ? rrdtool_escape($rrd['descr'], $desc_len+$strlen) : "Unkown");
     for ($z=0; $z<$strlen; $z++) { $descr .= " "; }
     if ($i) { $stack = "STACK"; }
     $colour       = $config['graph_colours'][$colours][$x];
@@ -86,7 +86,7 @@ foreach ($rrd_list as $rrd)
 if (!$nototal)
 {
   $strlen         = ((strlen($total_text)<$descr_len) ? ($descr_len - strlen($total_text)) : "0");
-  $descr          = (isset($total_text) ? str_replace(":", "\:", substr(str_pad($total_text, $desc_len+$strlen), 0, $descr_len+$strlen)) : "Total");
+  $descr          = (isset($total_text) ? rrdtool_escape($total_text, $desc_len+$strlen) : "Total");
   $colour         = $config['graph_colours'][$colours][$x];
   for ($z=0; $z<$strlen; $z++) { $descr .= " "; }
   $rrd_options   .= " CDEF:totcur=cur0".$totcur;
