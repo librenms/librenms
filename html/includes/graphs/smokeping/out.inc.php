@@ -52,7 +52,7 @@ if($device['hostname'] == $config['own_hostname'])
   $colour = $config['graph_colours'][$colourset][$iter];
   $iter++;
 
-  $descr = str_replace(":", "\:", substr(str_pad($source, $descr_len),0,$descr_len));
+  $descr = rrdtool_escape($source,$descr_len);
 
   $rrd_options .= " DEF:median$i=".$filename.":median:AVERAGE ";
   $rrd_options .= " DEF:loss$i=".$filename.":loss:AVERAGE";

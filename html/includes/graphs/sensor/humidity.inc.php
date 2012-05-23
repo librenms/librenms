@@ -7,8 +7,6 @@ include("includes/graphs/common.inc.php");
 
 $rrd_options .= " COMMENT:'                                 Last   Max\\n'";
 
-$sensor['sensor_descr_fixed'] = substr(str_pad($sensor['sensor_descr'], 28),0,28);
-
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
 $rrd_options .= " DEF:sensor_max=$rrd_filename:sensor:MAX";
 $rrd_options .= " DEF:sensor_min=$rrd_filename:sensor:MIN";
@@ -20,7 +18,7 @@ $rrd_options .= " AREA:sensor_min#ffffffff";
 #  $rrd_options .= " AREA:sensor#bbd392";
 #  $rrd_options .= " AREA:sensorwarm#FFCCCC";
 #  $rrd_options .= " AREA:sensorcold#CCCCFF";
-$rrd_options .= " LINE1:sensor#cc0000:'" . str_replace(':','\:',str_replace('\*','*',quotemeta($sensor['sensor_descr_fixed'])))."'"; # Ugly hack :(
+$rrd_options .= " LINE1:sensor#cc0000:'" . rrdtool_escape($sensor['sensor_descr'],28)."'";
 $rrd_options .= " LINE1:sensorwarm#660000";
 $rrd_options .= " GPRINT:sensor:LAST:%3.0lf%%";
 $rrd_options .= " GPRINT:sensor:MAX:%3.0lf%%\\\\l";

@@ -14,8 +14,7 @@ foreach (dbFetchRows("SELECT * FROM `mempools` where `device_id` = ?", array($de
   elseif ($iter=="4") { $colour="73880A"; } elseif ($iter=="5") { $colour="D01F3C"; } elseif ($iter=="6") { $colour="36393D"; }
   elseif ($iter=="7") { $colour="FF0084"; unset($iter); }
 
-  $descr = substr(str_pad(short_hrDeviceDescr($mempool['mempool_descr']), 22),0,22);
-  $descr = str_replace(":", "\:", $descr);
+  $descr = rrdtool_escape(short_hrDeviceDescr($mempool['mempool_descr']), 22);
   $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("mempool-".$mempool['mempool_type']."-".$mempool['mempool_index'].".rrd");
 
   if (is_file($rrd_filename))

@@ -13,13 +13,12 @@ $rrd_options .= " COMMENT:'                    Size      Free   % Used\\n'";
 
 $hostname = gethostbyid($storage['device_id']);
 
-$colour="CC0000";
-$colour_area="ffaaaa";
+$colour = "CC0000";
+$colour_area = "ffaaaa";
 
-$descr = substr(str_pad($storage[storage_descr], 12),0,12);
-$descr = str_replace(":","\:",$descr);
+$descr = rrdtool_escape($storage['storage_descr'], 12);
 
-$percentage  = round($storage['storage_perc'], 0);
+$percentage = round($storage['storage_perc'], 0);
 
 $background = get_percentage_colours($percentage);
 
@@ -35,11 +34,10 @@ $rrd_options .= " GPRINT:perc:LAST:%5.2lf%%\\\\n";
 
 if ($_GET['previous'])
 {
-  $descr = substr(str_pad("Prev ".$storage[storage_descr], 12),0,12);
-  $descr = str_replace(":","\:",$descr);
+  $descr = rrdtool_escape("Prev ".$storage['storage_descr'], 12);
 
-  $colour="99999999";
-  $colour_area="66666666";
+  $colour = "99999999";
+  $colour_area = "66666666";
 
   $rrd_options .= " DEF:usedX=$rrd_filename:used:AVERAGE:start=".$prev_from.":end=".$from;
   $rrd_options .= " DEF:freeX=$rrd_filename:free:AVERAGE:start=".$prev_from.":end=".$from;

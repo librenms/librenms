@@ -224,10 +224,21 @@ function rrdtool_lastupdate($filename, $options)
   return rrdtool("lastupdate", $filename, $options);
 }
 
+/**
+ * Escapes strings for RRDtool,
+ *
+ * @return string
+ *
+ * @param string string to escape
+ * @param integer if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
+ */
+     
 function rrdtool_escape($string, $maxlength = NULL)
 {
   $result = str_replace(':','\:',$string);
   $result = str_replace('%','%%',$result);
+
+  # FIXME: should maybe also probably escape these? # \ + ? [ ^ ] ( $ ) '
   
   if ($maxlength != NULL)
   {

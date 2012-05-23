@@ -5,8 +5,7 @@ $scale_max = "100";
 
 $ds = "usage";
 
-$descr = substr(str_pad(short_hrDeviceDescr($proc['processor_descr']), 28),0,28);
-$descr = str_replace(":", "\:", $descr);
+$descr = rrdtool_escape(short_hrDeviceDescr($proc['processor_descr']), 28);
 
 $colour_line = "cc0000";
 $colour_area = "FFBBBB";

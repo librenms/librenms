@@ -22,16 +22,13 @@ if ($sla['tag'])
 if ($sla['owner'])
   $name .= " (Owner: ". $sla['owner'] .")";
 
-$descr_fixed = substr(str_pad($name, $descr_len-3),0,$descr_len-3);
-$avg_fixed = substr(str_pad('Average', $descr_len-3),0,$descr_len-3);
-
 $rrd_file  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("sla-" . $sla['sla_nr'] . ".rrd");
 
 $rrd_options .= " DEF:rtt=$rrd_file:rtt:AVERAGE ";
 $rrd_options .= " VDEF:avg=rtt,AVERAGE ";
-$rrd_options .= " LINE1:avg#CCCCFF:'".$avg_fixed."':dashes";
+$rrd_options .= " LINE1:avg#CCCCFF:'".str_pad('Average',$descr_len-3)."':dashes";
 $rrd_options .= " GPRINT:rtt:AVERAGE:%4.1lf".$unit."\\\l ";
-$rrd_options .= " LINE1:rtt#CC0000:'" . str_replace(':','\:',str_replace('\*','*',$descr_fixed)) . "'";
+$rrd_options .= " LINE1:rtt#CC0000:'" . rrdtool_escape($descr,$descr_len-3)) . "'";
 $rrd_options .= " GPRINT:rtt:LAST:%4.1lf".$unit." ";
 $rrd_options .= " GPRINT:rtt:MIN:%4.1lf".$unit." ";
 $rrd_options .= " GPRINT:rtt:MAX:%4.1lf".$unit."\\\l ";

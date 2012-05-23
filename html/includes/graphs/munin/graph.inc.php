@@ -48,7 +48,7 @@ foreach ($dbq as $ds)
       $colour = $ds['colour'];
     }
 
-    $descr     = str_replace(":", "\:", substr(str_pad($ds['ds_label'], $descr_len),0,$descr_len));
+    $descr      = rrdtool_escape($ds['ds_label'], $descr_len);
 
     $cmd_graph .= ' '.$ds['ds_draw'].':'.$ds_name.'#'.$colour.':"'.$descr.'"';
     $cmd_graph .= ' GPRINT:'.$ds_name.':LAST:"%6.2lf%s"';

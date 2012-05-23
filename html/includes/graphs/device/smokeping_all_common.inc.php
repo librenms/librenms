@@ -36,7 +36,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
   $colour = $config['graph_colours'][$colourset][$iter];
   $iter++;
 
-  $descr = str_replace(":", "\:", substr(str_pad($source, $descr_len),0,$descr_len));
+  $descr = rrdtool_escape($source, $descr_len);
 
   $filename = $config['smokeping']['dir'] . $filename;
   $rrd_options .= " DEF:median$i=".$filename.":median:AVERAGE ";
