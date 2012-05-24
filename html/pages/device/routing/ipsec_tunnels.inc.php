@@ -1,5 +1,10 @@
 <?php
 
+$link_array = array('page'    => 'device',
+                    'device'  => $device['device_id'],
+                    'tab'     => 'routing',
+                    'proto'   => 'ipsec_tunnels');
+
 print_optionbar_start();
 
 echo("<span style='font-weight: bold;'>IPSEC Tunnels</span> &#187; ");
@@ -7,35 +12,40 @@ echo("<span style='font-weight: bold;'>IPSEC Tunnels</span> &#187; ");
 $menu_options = array('basic' => 'Basic',
                       );
 
+if(!isset($vars['view'])) { $vars['view'] = "basic"; }
+
+echo("<span style='font-weight: bold;'>VRFs</span> &#187; ");
+
+$menu_options = array('basic' => 'Basic',
+#                      'detail' => 'Detail',
+                      );
+
 if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
 
 $sep = "";
 foreach ($menu_options as $option => $text)
 {
-  if ($_GET['optd'] == $option) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="device/device=' . $device['device_id'] . '/tab=routing/proto=ipsec_tunnels/' . $option . '/">' . $text
- . '</a>');
-  if ($_GET['optd'] == $option) { echo("</span>"); }
+  if ($vars['view'] == $option) { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link($text, $link_array,array('view'=>$option)));
+  if ($vars['view'] == $option) { echo("</span>"); }
   echo(" | ");
 }
 
-unset($sep);
-
 echo(' Graphs: ');
 
-$graph_types = array("bits"   => "Bits",
-                     "pkts"   => "Packets",
-                     "errors" => "Errors");
+$graph_types = array("bits" => "Bits",
+                     "pkts" => "Packets");
 
 foreach ($graph_types as $type => $descr)
 {
   echo("$type_sep");
-  if ($_GET['opte'] == $type) { echo("<span class='pagemenu-selected'>"); }
-  echo('<a href="device/device=' . $device['device_id'] . '/tab=routing/proto=ipsec_tunnels/graphs/'.$type.'/">'.$descr.'</a>');
-  if ($_GET['opte'] == $type) { echo("</span>"); }
+  if ($vars['graph'] == $type) { echo("<span class='pagemenu-selected'>"); }
+  echo(generate_link($descr, $link_array,array('view'=>'graphs','graph'=>$type)));
+  if ($vars['graph'] == $type) { echo("</span>"); }
 
   $type_sep = " | ";
 }
+
 
 print_optionbar_end();
 
@@ -53,23 +63,23 @@ echo("<td width=320 class=list-large>" . $tunnel['local_addr'] . "  &#187;  " . 
 echo("<td width=150 class=box-desc>" . $tunnel['tunnel_name'] . "</td>");
 echo("<td width=100 class=list-large><span class='".$tunnel_class."'>" . $tunnel['tunnel_status'] . "</span></td>");
 echo("</tr>");
-  if ($_GET['optd'] == "graphs")
+  if (isset($vars['graph']))
   {
     echo('<tr class="list-bold">');
     echo("<td colspan = 3>");
-    $graph_type = "ipsectunnel_" . $_GET['opte'];
+    $graph_type = "ipsectunnel_" . $vars['graph'];
 
-$graph_array['height'] = "100";
-$graph_array['width']  = "215";
-$graph_array['to']     = $config['time']['now'];
-$graph_array['id']     = $tunnel['tunnel_id'];
-$graph_array['type']   = $graph_type;
+    $graph_array['height'] = "100";
+    $graph_array['width']  = "215";
+    $graph_array['to']     = $config['time']['now'];
+    $graph_array['id']     = $tunnel['tunnel_id'];
+    $graph_array['type']   = $graph_type;
 
-include("includes/print-graphrow.inc.php");
+    include("includes/print-graphrow.inc.php");
 
-   echo("
-   </td>
-   </tr>");
+    echo("
+     </td>
+     </tr>");
   }
 
 echo("</td>");
