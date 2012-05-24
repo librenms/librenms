@@ -37,6 +37,10 @@ if ($device['os'] == "linux" || $device['os'] == "endian")
     if ($agent_data['dmi']['system-product-name'])
     {
       $hardware = ($agent_data['dmi']['system-manufacturer'] ? $agent_data['dmi']['system-manufacturer'] . ' ' : '') . $agent_data['dmi']['system-product-name'];
+      
+      # Clean up "Dell Computer Corporation" and "Intel Corporation"
+      $hardware = str_replace(" Computer Corporation","",$hardware);
+      $hardware = str_replace(" Corporation","",$hardware);
     }
 
     if ($agent_data['dmi']['system-serial-number'])
