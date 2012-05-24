@@ -107,7 +107,7 @@ if ($device['os_group'] == "cisco")
     echo(" cipsec_flow");
   }
 
-  unset($data, $$rrd_filename, $rrd_create, $rrd_update);
+  unset($data, $rrd_filename, $rrd_create, $rrd_update);
 }
 
 ?>
