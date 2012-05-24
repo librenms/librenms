@@ -242,7 +242,7 @@ foreach ($ports as $port)
     {
       $this_port['ifVlan'] = $this_port['dot1qPvid'];
     }
-    # FIXME use $q_bridge_mib[$this_port['ifIndex'] to see if it is a trunk (>1 array count)
+    # FIXME use $q_bridge_mib[$this_port['ifIndex']] to see if it is a trunk (>1 array count)
 
     echo("VLAN == ".$this_port['ifVlan']);
 
