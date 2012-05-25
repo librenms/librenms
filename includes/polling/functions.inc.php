@@ -17,7 +17,7 @@ function poll_sensor($device, $class, $unit)
           if ($debug) echo("Attempt $i ");
           $sensor_value = trim(str_replace("\"", "", snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB")));
 
-          if ($sensor_value < 9000) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
+          if (is_numeric($sensor_value) && $sensor_value != 9999) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
           sleep(1); # Give the TME some time to reset
         }
       } else {

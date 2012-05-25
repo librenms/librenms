@@ -13,6 +13,14 @@ foreach (dbFetchRows("SELECT * FROM `mempools` WHERE device_id = ?", array($devi
 {
   if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
+  if ($config['memcached']['enable'])
+  {
+    $state = $memcache->get('mempool-'.$mempool['mempool_id'].'-state');
+    if($debug) { print_r($state); }
+    if(is_array($state)) { $mempool = array_merge($mempool, $state); }
+    unset($state);
+  }
+
   $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
   $mempool_url   = "device/".$device['device_id']."/health/mempool/";

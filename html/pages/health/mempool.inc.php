@@ -19,6 +19,15 @@ foreach (dbFetchRows("SELECT * FROM `mempools` AS M, `devices` as D WHERE D.devi
   {
     $text_descr = $mempool['mempool_descr'];
 
+    if ($config['memcached']['enable'])
+    {
+      $state = $memcache->get('mempool-'.$mempool['mempool_id'].'-state');
+      if($debug) { print_r($state); }
+      if(is_array($state)) { $port = array_merge($mempool, $state); }
+      unset($state);
+    }
+
+
     $mempool_url = "device/device=".$mempool['device_id']."/tab=health/metric=mempool/";
     $mini_url = "graph.php?id=".$mempool['mempool_id']."&amp;type=".$graph_type."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 
