@@ -122,7 +122,9 @@ if ($percentile)
 if($_GET['previous'] == "yes")
 {
   $rrd_options .= " LINE1.25:in".$format."X#666666:'Prev In \\\\n'";
+  $rrd_options .= " AREA:in".$format."X#99999966:";
   $rrd_options .= " LINE1.25:dout".$format."X#666666:'Prev Out'";
+  $rrd_options .= " AREA:dout".$format."X#99999966:";
 }
 
 $rrd_options .= " HRULE:0#999999";
