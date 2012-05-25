@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage functions
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
+ *
+ */
+
 include("../includes/alerts.inc.php");
 
 function data_uri($file, $mime)
@@ -7,6 +19,23 @@ function data_uri($file, $mime)
   $contents = file_get_contents($file);
   $base64   = base64_encode($contents);
   return ('data:' . $mime . ';base64,' . $base64);
+}
+
+function nicecase($item)
+{
+  switch ($item)
+  {
+    case "dbm":
+      return "dBm";
+    case "mysql":
+      return" MySQL";
+    case "powerdns":
+      return "PowerDNS";
+    case "bind":
+      return "BIND";
+    default:
+      return ucfirst($item);
+  }
 }
 
 function toner2colour($descr, $percent)

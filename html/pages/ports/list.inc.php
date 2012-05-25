@@ -52,7 +52,7 @@ foreach ($ports as $port)
     $port = ifLabel($port, $device);
     echo("<tr class='ports'>
           <td width=5></td>
-          <td width=200 class=list-bold><a href='" . generate_device_url($port) . "'>".$port['hostname']."</a></td>
+          <td width=200 class=list-bold>".generate_device_link($port, shorthost($port['hostname'], "20"))."</td>
           <td width=150 class=list-bold><a class='".$ifclass."'href='" . generate_port_url($port) . "'>".fixIfName($port['label'])." $error_img</td>
           <td width=110 >$speed</td>
           <td width=100 class=green>".$port['in_rate']."</td>
