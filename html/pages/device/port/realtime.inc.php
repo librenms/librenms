@@ -1,6 +1,6 @@
 <?php
 
-### FIXME - do this in a function and/or do it in graph-realtime.php
+/// FIXME - do this in a function and/or do it in graph-realtime.php
 
 if(!isset($vars['interval'])) {
   if ($device['os'] == "linux") {

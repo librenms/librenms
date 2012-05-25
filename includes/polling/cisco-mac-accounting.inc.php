@@ -1,6 +1,6 @@
 <?php
 
-## FIXME -- we're walking, so we can discover here too.
+/// FIXME -- we're walking, so we can discover here too.
 
 if ($device['os_group'] == "cisco")
 {

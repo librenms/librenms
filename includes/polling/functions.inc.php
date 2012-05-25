@@ -62,7 +62,7 @@ function poll_sensor($device, $class, $unit)
 
     rrdtool_update($rrd_file,"N:$sensor_value");
 
-    # FIXME also warn when crossing WARN level!!
+    /// FIXME also warn when crossing WARN level!!
     if ($sensor['sensor_limit_low'] != "" && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value <= $sensor['sensor_limit_low'])
     {
       $msg  = ucfirst($class) . " Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is under threshold: " . $sensor_value . "$unit (< " . $sensor['sensor_limit'] . "$unit)";
@@ -168,10 +168,10 @@ function poll_device($device, $options)
 
     if (!$options['m'])
     {
-      ## FIXME EVENTLOGGING -- MAKE IT SO WE DO THIS PER-MODULE?
-      ### This code cycles through the graphs already known in the database and the ones we've defined as being polled here
-      ### If there any don't match, they're added/deleted from the database.
-      ### Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
+      /// FIXME EVENTLOGGING -- MAKE IT SO WE DO THIS PER-MODULE?
+      /// This code cycles through the graphs already known in the database and the ones we've defined as being polled here
+      /// If there any don't match, they're added/deleted from the database.
+      /// Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
 
       foreach (dbFetch("SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?", array($device['device_id'])) as $graph)
       {

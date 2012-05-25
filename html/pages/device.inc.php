@@ -184,7 +184,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-    ### $loadbalancer_tabs is used in device/loadbalancer/ to build the submenu. we do it here to save queries
+    /// $loadbalancer_tabs is used in device/loadbalancer/ to build the submenu. we do it here to save queries
 
     if ($device['os'] == "netscaler") /// Netscaler
     {
@@ -207,7 +207,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-    ### $routing_tabs is used in device/routing/ to build the tabs menu. we built it here to save some queries
+    /// $routing_tabs is used in device/routing/ to build the tabs menu. we built it here to save some queries
 
     $device_routing_count['loadbalancer_rservers'] = dbFetchCell("SELECT COUNT(*) FROM `loadbalancer_rservers` WHERE `device_id` = ?", array($device['device_id']));
     if ($device_routing_count['loadbalancer_rservers']) { $routing_tabs[] = 'loadbalancer_rservers'; }

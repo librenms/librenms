@@ -1,6 +1,6 @@
 <?php
 
-### Allied Telesis have somewhat messy MIBs. It's often hard to work out what is where. :)
+/// Allied Telesis have somewhat messy MIBs. It's often hard to work out what is where. :)
 
 $hardware = snmp_get($device, "atiswitchProductType.0", "-OsvQU", "+AtiSwitch-MIB");
 $version  = snmp_get($device, "atiswitchSwVersion.0", "-OsvQU", "+AtiSwitch-MIB");

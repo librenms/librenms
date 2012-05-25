@@ -6,7 +6,7 @@ if ($device['os_group'] == "unix")
 {
   echo("Observium UNIX Agent: ");
 
-  ### FIXME - this should be in config and overridable in database
+  /// FIXME - this should be in config and overridable in database
   $agent_port='6556';
 
   $agent_start = utime();
@@ -78,7 +78,7 @@ if ($device['os_group'] == "unix")
       }
     }
 
-    ### Processes
+    /// Processes
     if (!empty($agent_data['ps']))
     {
       echo("Processes: ");
@@ -92,7 +92,7 @@ if ($device['os_group'] == "unix")
       echo("\n");
     }
 
-    ### Apache
+    /// Apache
     if (!empty($agent_data['app']['apache']))
     {
       $app_found['apache'] = TRUE;
@@ -103,7 +103,7 @@ if ($device['os_group'] == "unix")
       }
     }
 
-    ### memcached
+    /// memcached
     if (!empty($agent_data['app']['memcached']))
     {
       $agent_data['app']['memcached'] = unserialize($agent_data['app']['memcached']);
@@ -117,7 +117,7 @@ if ($device['os_group'] == "unix")
       }
     }
 
-    ### MySQL
+    /// MySQL
     if (!empty($agent_data['app']['mysql']))
     {
       $app_found['mysql'] = TRUE;
@@ -128,7 +128,7 @@ if ($device['os_group'] == "unix")
       }
     }
 
-    ### DRBD
+    /// DRBD
     if (!empty($agent_data['drbd']))
     {
       $agent_data['app']['drbd'] = array();

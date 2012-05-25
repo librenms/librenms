@@ -1,6 +1,6 @@
 <?php
 
-## Polls ntpd-server statistics from script via SNMP
+/// Polls ntpd-server statistics from script via SNMP
 
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-ntpdserver-".$app['app_id'].".rrd";
 $options      = "-O qv";

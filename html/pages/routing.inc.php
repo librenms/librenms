@@ -6,7 +6,7 @@ if ($_GET['optb'] == "graphs" || $_GET['optc'] == "graphs") { $graphs = "graphs"
 
 #$datas[] = 'overview';
 
-### $routing_count is populated by print-menubar.inc.php
+/// $routing_count is populated by print-menubar.inc.php
 
 #$type_text['overview'] = "Overview";
 $type_text['bgp'] = "BGP";

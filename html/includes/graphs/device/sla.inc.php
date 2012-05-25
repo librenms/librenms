@@ -2,7 +2,7 @@
 
 include("includes/graphs/common.inc.php");
 
-### FIXME - THIS IS BROKEN
+/// FIXME - THIS IS BROKEN
 
 $sla = dbFetchRow("SELECT * FROM `slas` WHERE `sla_id` = ?", array($vars['id']));
 $device = device_by_id_cache($sla['device_id']);

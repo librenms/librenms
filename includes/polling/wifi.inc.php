@@ -4,7 +4,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall')
 {
   echo("Wireless: ");
 
-  ##### GENERIC FRAMEWORK, FILLING VARIABLES
+  ///# GENERIC FRAMEWORK, FILLING VARIABLES
   if ($device['os'] == 'airport')
   {
     echo("Checking Airport Wireless clients... ");
@@ -13,7 +13,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall')
 
     echo($wificlients1 . " clients\n");
 
-    # FIXME Also interesting to poll? dhcpNumber.0 for number of active dhcp leases
+    /// FIXME Also interesting to poll? dhcpNumber.0 for number of active dhcp leases
   }
 
   if ($device['os'] == 'ios' and substr($device['hardware'],0,4) == 'AIR-')
@@ -55,7 +55,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall')
     echo(($wificlients1 +0) . " clients on wireless connector, ");
   }
 
-  ##### RRD Filling Code
+  ///# RRD Filling Code
   if (isset($wificlients1) && $wificlients1 != "")
   {
     $wificlientsrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("wificlients-radio1.rrd");

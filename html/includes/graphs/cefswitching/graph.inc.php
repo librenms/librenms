@@ -1,6 +1,6 @@
 <?php
 
-## Cycle through dot3stats OIDs and build list of RRAs to pass to multi simplex grapher
+/// Cycle through dot3stats OIDs and build list of RRAs to pass to multi simplex grapher
 
 $oids = array('drop', 'punt', 'hostpunt');
 $i = 0;

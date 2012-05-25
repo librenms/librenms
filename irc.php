@@ -36,9 +36,9 @@ echo "----------------- ------- \n";
 class observiumbot
 {
 
-###
+///
 # HELP Function
-###
+///
   function help_info(&$irc, &$data)
   {
     global $config;
@@ -51,9 +51,9 @@ class observiumbot
     mysql_close();
   }
 
-###
+///
 # VERSION Function
-###
+///
   function version_info(&$irc, &$data)
   {
     global $config;
@@ -66,9 +66,9 @@ class observiumbot
     mysql_close();
   }
 
-###
+///
 # LOG Function
-###
+///
   function log_info(&$irc, &$data)
   {
     global $config;
@@ -88,9 +88,9 @@ class observiumbot
     mysql_close();
   }
 
-###
+///
 # DOWN Function
-###
+///
   function down_info(&$irc, &$data)
   {
     global $config;
@@ -111,9 +111,9 @@ class observiumbot
     echo "DOWN\n";
   }
 
-###
+///
 # DEVICE Function
-###
+///
   function device_info(&$irc, &$data)
   {
     global $config;
@@ -141,9 +141,9 @@ if (!$device) {
     echo "DEVICE\t\t". $device['hostname']."\n";
   }
 }
-###
+///
 # PORT Function
-###
+///
   function port_info(&$irc, &$data)
   {
     global $config;
@@ -171,9 +171,9 @@ if (!$device) {
     echo "PORT\t\t\t" . $hostname . "\t". $ifname . "\n";
   }
 
-###
+///
 # LISTDEVICES Function
-###
+///
   function list_devices(&$irc, &$data)
   {
     global $config;
@@ -198,9 +198,9 @@ if (!$device) {
     echo "LISTDEVICES\n";
   }
 
-###
+///
 # STATUS Function
-###
+///
   function status_info(&$irc, &$data)
   {
     global $config;

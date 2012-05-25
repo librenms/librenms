@@ -1,7 +1,7 @@
 <?php
 echo("Current: ");
 
-### Include all discovery modules
+/// Include all discovery modules
 
 $include_dir = "includes/discovery/current";
 include("includes/include-dir.inc.php");

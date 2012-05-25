@@ -2,7 +2,7 @@
 
 echo("Humidity : ");
 
-### Include all discovery modules
+/// Include all discovery modules
 
 $include_dir = "includes/discovery/humidity";
 include("includes/include-dir.inc.php");

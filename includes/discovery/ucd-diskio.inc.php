@@ -22,15 +22,15 @@ if (is_array($diskio_array))
       else
       {
         echo(".");
-        ## FIXME Need update code here!
+        /// FIXME Need update code here!
       }
 
       $valid_diskio[$index] = 1;
-    } ## end validity check
-  } ## end array foreach
-} ## End array if
+    } /// end validity check
+  } /// end array foreach
+} /// End array if
 
-### Remove diskio entries which weren't redetected here
+/// Remove diskio entries which weren't redetected here
 
 $sql = "SELECT * FROM `ucd_diskio` where `device_id`  = '".$device['device_id']."'";
 $query = mysql_query($sql);

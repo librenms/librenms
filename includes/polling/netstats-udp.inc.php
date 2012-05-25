@@ -5,7 +5,7 @@ if ($device['os'] != "Snom")
 
   echo(" UDP");
 
-  #### These are at the start of large trees that we don't want to walk the entirety of, so we snmpget_multi them
+  /// These are at the start of large trees that we don't want to walk the entirety of, so we snmpget_multi them
 
   $oids = array ('udpInDatagrams','udpOutDatagrams','udpInErrors','udpNoPorts');
 
@@ -17,7 +17,7 @@ if ($device['os'] != "Snom")
   foreach ($oids as $oid)
   {
     $oid_ds = truncate($oid, 19, '');
-    $rrd_create .= " DS:$oid_ds:COUNTER:600:U:1000000"; ## Limit to 1MPPS?
+    $rrd_create .= " DS:$oid_ds:COUNTER:600:U:1000000"; /// Limit to 1MPPS?
     $snmpstring .= " UDP-MIB::".$oid.".0";
   }
 

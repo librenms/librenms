@@ -1,6 +1,6 @@
 <?php
 
-## JUNOSe Processors
+/// JUNOSe Processors
 if ($device['os'] == "junose")
 {
   echo("JUNOSe : ");
@@ -23,7 +23,7 @@ if ($device['os'] == "junose")
       }
     }
   }
-} ## End JUNOSe Processors
+} /// End JUNOSe Processors
 
 unset ($processors_array);
 

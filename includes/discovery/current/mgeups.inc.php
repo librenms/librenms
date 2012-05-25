@@ -1,6 +1,6 @@
 <?php
 
-## MGE UPS
+/// MGE UPS
 if ($device['os'] == "mgeups")
 {
   echo("MGE ");

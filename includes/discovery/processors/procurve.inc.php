@@ -1,9 +1,9 @@
 <?php
 
-##
-##  Hardcoded discovery of cpu usage on HP Procurve devices.
-##
-##  STATISTICS-MIB::hpSwitchCpuStat.0 = INTEGER: 10
+///
+///  Hardcoded discovery of cpu usage on HP Procurve devices.
+///
+///  STATISTICS-MIB::hpSwitchCpuStat.0 = INTEGER: 10
 
 if ($device['os'] == "procurve")
 {

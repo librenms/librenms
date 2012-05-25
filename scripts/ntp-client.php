@@ -1,35 +1,35 @@
 #!/usr/bin/env php
 <?php
 
-    ########################################################################################
-    ##
-    ##      A small script to grab the NTP Client statistics from a NTPD server
-    ##      Needed commands: php, ntpd, ntpq
-    ##
-    ##      Install:
-    ##              Add the following to your snmpd.conf file:
-    ##              extend ntpclient /opt/observium/scripts/ntp-client.php
-    ##
-    ##      Version 1.1 By:
-    ##              All In One - Dennis de Houx <info@all-in-one.be>
-    ##
-    ########################################################################################
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///
+    ///      A small script to grab the NTP Client statistics from a NTPD server
+    ///      Needed commands: php, ntpd, ntpq
+    ///
+    ///      Install:
+    ///              Add the following to your snmpd.conf file:
+    ///              extend ntpclient /opt/observium/scripts/ntp-client.php
+    ///
+    ///      Version 1.1 By:
+    ///              All In One - Dennis de Houx <info@all-in-one.be>
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////
 
 
-    #### START SETTINGS ####
+    /// START SETTINGS ///
 
 	$ntpq		= "/usr/sbin/ntpq";
 	
 	# Change this to true if you have clk_jitter, sys_jitter in the ntpq -c rv output
 	$newstats_style	= false;
 
-    #### END SETTINGS ####
+    /// END SETTINGS ///
 
 
-    ##
-    ## DO NOT EDIT BENETH THIS LINE
-    ##
-    ########################################################################################
+    ///
+    /// DO NOT EDIT BENETH THIS LINE
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////
 
 	$cmd	= shell_exec($ntpq." -c rv | grep '^offset'");
 	if ($newstats_style) {

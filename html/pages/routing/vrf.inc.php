@@ -177,6 +177,6 @@ if($_GET['optb'] == "all" ) {
 
   include("includes/error-no-perm.inc.php");
 
-} ## End Permission if
+} /// End Permission if
 
 ?>

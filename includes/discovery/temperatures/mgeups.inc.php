@@ -9,7 +9,7 @@ if ($device['os'] == "mgeups")
   echo("MGE UPS External ");
 
   # Environmental monitoring on UPSes etc
-  # FIXME upsmgConfigEnvironmentTable and upsmgEnvironmentSensorTable are used but there are others ...
+  /// FIXME upsmgConfigEnvironmentTable and upsmgEnvironmentSensorTable are used but there are others ...
   $mge_env_data = snmpwalk_cache_oid($device, "upsmgConfigEnvironmentTable", array(), "MG-SNMP-UPS-MIB");
   $mge_env_data = snmpwalk_cache_oid($device, "upsmgEnvironmentSensorTable", $mge_env_data, "MG-SNMP-UPS-MIB");
 
@@ -51,7 +51,7 @@ upsmgEnvironmentInput2State.1 = open
     $high_limit      = $mge_env_data[$index]['upsmgConfigTemperatureHigh'];
     $hysteresis      = $mge_env_data[$index]['upsmgConfigTemperatureHysteresis'];
 
-    # FIXME warninglevels might need some other calculation in stead of hysteresis
+    /// FIXME warninglevels might need some other calculation in stead of hysteresis
     $low_warn_limit  = $low_limit + $hysteresis;
     $high_warn_limit = $high_limit - $hysteresis;
 

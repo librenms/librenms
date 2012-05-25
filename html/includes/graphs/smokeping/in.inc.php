@@ -2,9 +2,9 @@
 
 $src   = device_by_id_cache($_GET['src']);
 
-## Dear Tobias. You write in Perl, this makes me hate you forever.
-## This is my translation of Smokeping's graphing.
-## Thanks to Bill Fenner for Perl->Human translation:>
+/// Dear Tobias. You write in Perl, this makes me hate you forever.
+/// This is my translation of Smokeping's graphing.
+/// Thanks to Bill Fenner for Perl->Human translation:>
 
 $scale_min = 0;
 $scale_rigid = TRUE;

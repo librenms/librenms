@@ -229,7 +229,7 @@ if (!$vars['bare'] == "yes") {
         <div style="clear:both; height:6px; display:block;"></div>
 <?php
 
-### To help debug the new URLs :)
+/// To help debug the new URLs :)
 if ($devel || $vars['devel'])
 {
   echo("<pre>");
@@ -240,7 +240,7 @@ if ($devel || $vars['devel'])
 
 if ($_SESSION['authenticated'])
 {
-  ## Authenticated. Print a page.
+  /// Authenticated. Print a page.
   if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php"))
   {
     include("pages/" . $vars['page'] . ".inc.php");
@@ -254,7 +254,7 @@ if ($_SESSION['authenticated'])
   }
 
 } else {
-  ## Not Authenticated. Print login.
+  /// Not Authenticated. Print login.
   include("pages/logon.inc.php");
 
   exit;

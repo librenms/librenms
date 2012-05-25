@@ -19,7 +19,7 @@ if ($device['os'] != "Snom")
   foreach ($oids as $oid)
   {
     $oid_ds = truncate($oid, 19, '');
-    $rrd_create .= " DS:$oid_ds:COUNTER:600:U:10000000"; ## Limit to 10MPPS
+    $rrd_create .= " DS:$oid_ds:COUNTER:600:U:10000000"; /// Limit to 10MPPS
     $snmpstring .= " TCP-MIB::".$oid.".0";
   }
 

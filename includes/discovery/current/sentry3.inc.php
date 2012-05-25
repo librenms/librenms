@@ -11,7 +11,7 @@ if ($device['os'] == 'sentry3')
   $towers=1;
   while ($towers <= $tower_count) {
 
-    #################################
+    /////////////////////////////////
     # Check for Infeeds
     $infeed_oids = snmp_walk($device, "infeedID.$towers.1", "-Osqn", "Sentry3-MIB");
     if ($debug) { echo($infeed_oids."\n"); }
@@ -42,7 +42,7 @@ if ($device['os'] == 'sentry3')
           discover_sensor($valid['sensor'], 'current', $device, $infeed_oid, $towers, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
 
-        #################################
+        /////////////////////////////////
         # Check for per-outlet polling
         #$outlet_oids = snmp_walk($device, "outletLoadValue.$towers.$infeed_index", "-Osqn", "Sentry3-MIB");
         $outlet_oids = snmp_walk($device, "outletLoadValue.$towers.1", "-Osqn", "Sentry3-MIB");

@@ -47,7 +47,7 @@ if (is_array($config['branding']))
 
 if (isset($_GET['device'])) { $where = "WHERE device_id = ".mres($_GET['device']); } else { $where = ""; }
 
-## FIXME this shit probably needs tidied up.
+/// FIXME this shit probably needs tidied up.
 
 if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 {
@@ -197,7 +197,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
       $_GET['format'] = 'png:gd';
   }
 
-  if ($links > 30) ### Unflatten if there are more than 10 links. beyond that it gets messy
+  if ($links > 30) /// Unflatten if there are more than 10 links. beyond that it gets messy
   {
 #    $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['sfdp'] . ' -Gpack -Gcharset=latin1 | '.$config['dot'];
     $maptool = $config['neato'];
@@ -239,7 +239,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 }
 else
 {
-  if ($_SESSION['authenticated']) ## FIXME level 10 only?
+  if ($_SESSION['authenticated']) /// FIXME level 10 only?
   {
     echo('<center>
     <object width=1200 height=1000 data="'. $config['base_url'] . '/map.php?format=svg" type="image/svg+xml">

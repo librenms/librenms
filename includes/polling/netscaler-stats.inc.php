@@ -4,7 +4,7 @@ if ($device['os'] == "netscaler")
 {
   echo(" IP");
 
-  #### These are at the start of large trees that we don't want to walk the entirety of, so we snmp_get_multi them
+  /// These are at the start of large trees that we don't want to walk the entirety of, so we snmp_get_multi them
 
   $oids_gauge   = array('tcpCurServerConn', 'tcpCurClientConn', 'tcpActiveServerConn', 'tcpCurClientConnClosing', 'tcpCurServerConnEstablished',
                         'tcpCurClientConnOpening', 'tcpCurClientConnEstablished', 'tcpCurServerConnClosing', 'tcpSpareConn', 'tcpSurgeQueueLen', 'tcpCurServerConnOpening',

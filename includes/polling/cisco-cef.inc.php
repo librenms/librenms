@@ -63,12 +63,12 @@ if ($device['os_group'] == "cisco")
             DS:hostpunt:DERIVE:600:0:1000000 ".$config['rrd_rra']);
           }
 
-          ### Copy HC to non-HC if they exist
+          /// Copy HC to non-HC if they exist
           if (is_numeric($cef_stat['cefSwitchingHCDrop'])) { $cef_stat['cefSwitchingDrop'] = $cef_stat['cefSwitchingHCDrop']; }
           if (is_numeric($cef_stat['cefSwitchingHCPunt'])) { $cef_stat['cefSwitchingPunt'] = $cef_stat['cefSwitchingHCPunt']; }
           if (is_numeric($cef_stat['cefSwitchingHCPunt2Host'])) { $cef_stat['cefSwitchingPunt2Host'] = $cef_stat['cefSwitchingHCPunt2Host']; }
 
-          ## FIXME -- memcached
+          /// FIXME -- memcached
 
           $cef_stat['update']['drop'] = $cef_stat['cefSwitchingDrop'];
           $cef_stat['update']['punt'] = $cef_stat['cefSwitchingPunt'];
@@ -90,7 +90,7 @@ if ($device['os_group'] == "cisco")
     }
   }
 
-  ## FIXME - need to delete old ones. FIXME REALLY.
+  /// FIXME - need to delete old ones. FIXME REALLY.
 
   print_r($cefs_db);
 

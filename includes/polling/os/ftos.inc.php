@@ -2,7 +2,7 @@
 
 echo("Doing Force10 FTOS ");
 
-## Stats for S-Series
+/// Stats for S-Series
 
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitModelID.1 = STRING: S25-01-GE-24V
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitStatus.1 = INTEGER: ok(1)
@@ -12,7 +12,7 @@ echo("Doing Force10 FTOS ");
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitSerialNumber.1 = STRING: DL2E9250002
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitUpTime.1 = Timeticks: (262804700) 30 days, 10:00:47.00
 
-## Stats for C-Series
+/// Stats for C-Series
 
 #F10-C-SERIES-CHASSIS-MIB::chType.0 = INTEGER: c300(7)
 #F10-C-SERIES-CHASSIS-MIB::chChassisMode.0 = INTEGER: cseries1(4)
@@ -25,7 +25,7 @@ echo("Doing Force10 FTOS ");
 #F10-C-SERIES-CHASSIS-MIB::chDateCode.0 = STRING: "01182007"
 #F10-C-SERIES-CHASSIS-MIB::chCountryCode.0 = STRING: "01"
 
-## Stats for E-Series
+/// Stats for E-Series
 
 #F10-CHASSIS-MIB::chSysSwRuntimeImgVersion.1.1 = STRING: 7.6.1.2
 #F10-CHASSIS-MIB::chSysSwRuntimeImgVersion.8.1 = STRING: 7.6.1.2

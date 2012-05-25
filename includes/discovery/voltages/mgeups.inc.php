@@ -1,6 +1,6 @@
 <?php
 
-## MGE UPS Voltages
+/// MGE UPS Voltages
 if ($device['os'] == "mgeups")
 {
   echo("MGE ");

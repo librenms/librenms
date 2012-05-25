@@ -11,7 +11,7 @@
  * See COPYING for more details.
  */
 
-## Call poll_sensor for each sensor type that we support.
+/// Call poll_sensor for each sensor type that we support.
 
 $supported_sensors = array('current' => 'A',
                            'frequency' => 'Hz',

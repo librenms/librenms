@@ -1,6 +1,6 @@
 <?php
 
-# FIXME should do the deletion etc in a common file perhaps? like for the sensors
+/// FIXME should do the deletion etc in a common file perhaps? like for the sensors
 
 # Try to discover Libvirt Virtual Machines.
 
@@ -94,7 +94,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
               mysql_query("UPDATE vminfo SET vmwVmState='" . mres($vmwVmState) . "', vmwVmGuestOS='" . mres($vmwVmGuestOS) . "', vmwVmDisplayName='". mres($vmwVmDisplayName) . "',
                   vmwVmMemSize='" . mres($vmwVmMemSize) . "', vmwVmCpus='" . mres($vmwVmCpus) . "' WHERE device_id='" . $device["device_id"] . "' AND vm_type='libvirt' AND vmwVmVMID='" . $dom_id . "'");
               echo("U");
-              # FIXME eventlog
+              /// FIXME eventlog
             }
             else
             {

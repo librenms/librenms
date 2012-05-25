@@ -1,6 +1,6 @@
 <?php
 
-## Generate a list of ports and then call the multi_bits grapher to generate from the list
+/// Generate a list of ports and then call the multi_bits grapher to generate from the list
 
 $ds_in  = "INOCTETS";
 $ds_out = "OUTOCTETS";

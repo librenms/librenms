@@ -20,12 +20,12 @@ if (is_array($hrDevice_array))
       $usage_oid = ".1.3.6.1.2.1.25.3.3.1.2." . $index;
       $usage = $entry['hrProcessorLoad'];
 
-      #### What is this for? I have forgotten. What has : in its hrDeviceDescr?
-      #### Set description to that found in hrDeviceDescr, first part only if containing a :
+      /// What is this for? I have forgotten. What has : in its hrDeviceDescr?
+      /// Set description to that found in hrDeviceDescr, first part only if containing a :
       $descr_array = explode(":",$entry['hrDeviceDescr']);
       if ($descr_array['1']) { $descr = $descr_array['1']; } else { $descr = $descr_array['0']; }
 
-      ### Workaround to set fake description for Mikrotik who don't populate hrDeviceDescr
+      /// Workaround to set fake description for Mikrotik who don't populate hrDeviceDescr
       if ($device['os'] == "routeros" && !isset($entry['hrDeviceDescr'])) { $descr = "Processor"; }
 
       $descr = str_replace("CPU ", "", $descr);
@@ -55,6 +55,6 @@ if (is_array($hrDevice_array))
   unset($hrDevice_oids, $hrDevice_array, $oid);
 }
 
-## End hrDevice Processors
+/// End hrDevice Processors
 
 ?>

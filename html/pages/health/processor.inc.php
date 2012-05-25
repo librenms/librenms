@@ -18,7 +18,7 @@ foreach (dbFetchRows("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.de
   {
     $device = $proc;
 
-    # FIXME should that really be done here? :-)
+    /// FIXME should that really be done here? :-)
     $text_descr = $proc['processor_descr'];
     $text_descr = str_replace("Routing Processor", "RP", $text_descr);
     $text_descr = str_replace("Switching Processor", "SP", $text_descr);

@@ -7,7 +7,7 @@ $units_descr = substr(str_pad($units_descr, 18),0,18);
 if($format == "octets" || $format == "bytes")
 {
   $units = "Bps";
-  $format = "bits"; # FIXME bits? or bytes?
+  $format = "bits"; /// FIXME bits? or bytes?
 } else {
   $units = "bps";
   $format = "bits";

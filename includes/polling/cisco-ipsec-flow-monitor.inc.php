@@ -37,7 +37,7 @@ if ($device['os_group'] == "cisco")
   $data = snmpwalk_cache_oid($device, "cipSecGlobalStats", NULL, "CISCO-IPSEC-FLOW-MONITOR-MIB");
   $data = $data[0];
 
-  ## Use HC Counters if they exist
+  /// Use HC Counters if they exist
   if (is_numeric($data['cipSecGlobalHcInOctets'])) { $data['cipSecGlobalInOctets']= $data['cipSecGlobalHcInOctets']; }
   if (is_numeric($data['cipSecGlobalHcOutOctets'])) { $data['cipSecGlobalOutOctets'] = $data['cipSecGlobalHcOutOctets']; }
   if (is_numeric($data['cipSecGlobalHcInDecompOctets'])) { $data['cipSecGlobalInDecompOctets'] = $data['cipSecGlobalHcInDecompOctets']; }

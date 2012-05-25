@@ -49,7 +49,7 @@ function adduser($username, $password, $level, $email = "", $realname = "", $can
 
 function user_exists($username)
 {
-  ## FIXME this doesn't seem right? (adama)
+  /// FIXME this doesn't seem right? (adama)
   return dbFetchCell("SELECT * FROM `users` WHERE `username` = ?", array($username));
 }
 

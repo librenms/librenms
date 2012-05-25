@@ -1,6 +1,6 @@
 <?php
 
-## List of real names for cisco entities
+/// List of real names for cisco entities
 
 $entPhysicalVendorTypes = array (
   'cevC7xxxIo1feTxIsl'                 => 'C7200-IO-FE-MII',

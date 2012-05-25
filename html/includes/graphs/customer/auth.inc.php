@@ -1,6 +1,6 @@
 <?php
 
-## FIXME - wtfbbq
+/// FIXME - wtfbbq
 
 if ($_SESSION['userlevel'] >= "5" || $auth)
 {

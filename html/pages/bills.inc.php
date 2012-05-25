@@ -258,7 +258,7 @@ for ($x=1;$x<32;$x++) {
          ");
 
       $i++;
-    } ### PERMITTED
+    } /// PERMITTED
   }
   echo("</table>");
 }

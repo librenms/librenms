@@ -1,10 +1,10 @@
 <?php
 
-### RPM
+/// RPM
 if (!empty($agent_data['rpm']))
 {
   echo("\nRPM Packages: ");
-  ## Build array of existing packages
+  /// Build array of existing packages
   $manager = "rpm";
 
   $pkgs_db_db = dbFetchRows("SELECT * FROM `packages` WHERE `device_id` = ?", array($device['device_id']));
@@ -36,11 +36,11 @@ if (!empty($agent_data['rpm']))
   }
 }
 
-### DPKG
+/// DPKG
 if (!empty($agent_data['dpkg']))
 {
   echo("\nDEB Packages: ");
-  ## Build array of existing packages
+  /// Build array of existing packages
   $manager = "deb";
 
   $pkgs_db_db = dbFetchRows("SELECT * FROM `packages` WHERE `device_id` = ?", array($device['device_id']));
@@ -73,7 +73,7 @@ if (!empty($agent_data['dpkg']))
   }
 }
 
-## This is run for all "packages" and is common to RPM/DEB/etc
+/// This is run for all "packages" and is common to RPM/DEB/etc
 foreach ($pkgs_id as $pkg)
 {
   $name    = $pkg['name'];
@@ -87,7 +87,7 @@ foreach ($pkgs_id as $pkg)
 
   if (is_array($pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]))
   {
-    ### FIXME - packages_history table
+    /// FIXME - packages_history table
     $id = $pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]['id'];
     if ($pkgs_db[$pkg['manager']][$pkg['name']][$pkg['arch']][$pkg['version']][$pkg['build']]['status'] != '1')
     {
@@ -126,7 +126,7 @@ foreach ($pkgs_id as $pkg)
   unset($pkg_update);
 }
 
-## Packages
+/// Packages
 foreach ($pkgs_db_id as $id => $pkg)
 {
   dbDelete('packages', "`pkg_id` =  ?", array($id));

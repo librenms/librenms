@@ -1,36 +1,36 @@
 #!/usr/bin/env php
 <?php
 
-    ########################################################################################
-    ##
-    ##      A small script to grab the realtime statistics from a ShoutCast server
-    ##      Needed commands: php
-    ##
-    ##      Install:
-    ##              Edit the shoutcast.conf file
-    ##              Add a crontab (every 5 min) for:
-    ##              /opt/observium/scripts/shoutcast.php makeCache
-    ##              Add the following to your snmpd.conf file:
-    ##              extend shoutcast /opt/observium/scripts/shoutcast.php
-    ##
-    ##      Version 1.1 By:
-    ##              All In One - Dennis de Houx <info@all-in-one.be>
-    ##
-    ########################################################################################
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///
+    ///      A small script to grab the realtime statistics from a ShoutCast server
+    ///      Needed commands: php
+    ///
+    ///      Install:
+    ///              Edit the shoutcast.conf file
+    ///              Add a crontab (every 5 min) for:
+    ///              /opt/observium/scripts/shoutcast.php makeCache
+    ///              Add the following to your snmpd.conf file:
+    ///              extend shoutcast /opt/observium/scripts/shoutcast.php
+    ///
+    ///      Version 1.1 By:
+    ///              All In One - Dennis de Houx <info@all-in-one.be>
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////
 
 
-    #### START SETTINGS ####
+    /// START SETTINGS ///
 
 	$config		= "/opt/observium/scripts/shoutcast.conf";
 	$cache		= "/opt/observium/scripts/shoutcast.cache";
 
-    #### END SETTINGS ####
+    /// END SETTINGS ///
 
 
-    ##
-    ## DO NOT EDIT BENETH THIS LINE
-    ##
-    ########################################################################################
+    ///
+    /// DO NOT EDIT BENETH THIS LINE
+    ///
+    ///////////////////////////////////////////////////////////////////////////////////////
 
 	/* Do NOT run this script through a web browser */
 	if (!isset($_SERVER["argv"][0]) || isset($_SERVER['REQUEST_METHOD']) || isset($_SERVER['REMOTE_ADDR'])) {

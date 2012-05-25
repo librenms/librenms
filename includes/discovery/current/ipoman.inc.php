@@ -1,6 +1,6 @@
 <?php
 
-## IPOMANII-MIB
+/// IPOMANII-MIB
 if ($device['os'] == "ipoman")
 {
   echo(" IPOMANII-MIB ");
@@ -38,7 +38,7 @@ if ($device['os'] == "ipoman")
       $high_limit = $entry['inletConfigCurrentHigh'] / 10;
 
       discover_sensor($valid['sensor'], 'current', $device, $cur_oid, '1.3.1.3.'.$index, 'ipoman', $descr, $divisor, '1', NULL, NULL, NULL, $high_limit, $current);
-      # FIXME: iPoMan 1201 also says it has 2 inlets, at least until firmware 1.06 - wtf?
+      /// FIXME: iPoMan 1201 also says it has 2 inlets, at least until firmware 1.06 - wtf?
     }
   }
 
