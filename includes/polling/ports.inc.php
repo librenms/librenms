@@ -166,13 +166,17 @@ foreach ($ports as $port)
 
     if ($config['memcached']['enable'])
     {
-      $port['poll_time'] = $memcache->get('port-'.$port['port_id'].'-poll_time');
-#      echo("time".$port['poll_time']);
+      $state = $memcache->get('port-'.$port['port_id'].'-state');
+      if($debug) { print_r($state); }
+      if(is_array($state)) { $port = array_merge($port, $state); }
+      unset($state);
     }
 
     $polled_period = $polled - $port['poll_time'];
 
     $port['update'] = array();
+    $port['state'] = array();
+
     if ($config['slow_statistics'] == TRUE)
     {
       $port['update']['poll_time'] = $polled;
@@ -182,9 +186,9 @@ foreach ($ports as $port)
 
     if ($config['memcached']['enable'])
     {
-      $memcache->set('port-'.$port['port_id'].'-poll_time', $polled);
-      $memcache->set('port-'.$port['port_id'].'-poll_prev', $port['poll_time']);
-      $memcache->set('port-'.$port['port_id'].'-poll_period', $polled_period);
+      $port['state']['poll_time'] = $polled;
+      $port['state']['poll_prev'] = $port['poll_time'];
+      $port['state']['poll_period'] = $polled_period;
     }
 
     // Copy ifHC[In|Out]Octets values to non-HC if they exist
@@ -291,9 +295,8 @@ foreach ($ports as $port)
 
       if ($config['memcached']['enable'])
       {
-        $port[$oid] = $memcache->get('port-'.$port['port_id'].'-'.$oid);
-        $memcache->set('port-'.$port['port_id'].'-'.$oid, $this_port[$oid]);
-        $memcache->set('port-'.$port['port_id'].'-'.$oid.'_prev', $port[$oid]);
+        $port['state'][$oid] = $this_port[$oid];
+        $port['state'][$oid.'_prev'] = $port[$oid];
       }
 
       $oid_prev = $oid . "_prev";
@@ -311,10 +314,10 @@ foreach ($ports as $port)
         }
 
         if ($config['memcached']['enable'])
-            {
-          $memcache->set('port-'.$port['port_id'].'-'.$oid.'_rate', $oid_rate);
-          $memcache->set('port-'.$port['port_id'].'-'.$oid.'_delta', $oid_diff);
-           }
+        {
+          $port['state'][$oid.'_rate'] = $oid_rate;
+          $port['state'][$oid.'_delta'] = $oid_diff;
+         }
 
         if ($debug) { echo("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n"); }
       }
@@ -341,6 +344,14 @@ foreach ($ports as $port)
     echo('bps('.formatRates($port['stats']['ifInBits_rate']).'/'.formatRates($port['stats']['ifOutBits_rate']).')');
     echo('bytes('.formatStorage($port['stats']['ifInOctets_diff']).'/'.formatStorage($port['stats']['ifOutOctets_diff']).')');
     echo('pkts('.format_si($port['stats']['ifInUcastPkts_rate']).'pps/'.format_si($port['stats']['ifOutUcastPkts_rate']).'pps)');
+
+    // Store aggregate in/out state
+    if ($config['memcached']['enable'])
+    {
+       $port['state']['ifOctets_rate']    = $port['stats']['ifOutOctets_rate'] + $port['stats']['ifInOctets_rate'];
+       $port['state']['ifUcastPkts_rate'] = $port['stats']['ifOutUcastPkts_rate'] + $port['stats']['ifInUcastPkts_rate'];
+       $port['state']['ifErrors_rate'] = $port['stats']['ifOutErrors_rate'] + $port['stats']['ifInErrors_rate'];
+    }
 
     // Port utilisation % threshold alerting. // FIXME allow setting threshold per-port. probably 90% of ports we don't care about.
     if ($config['alerts']['port_util_alert'])
@@ -412,6 +423,13 @@ foreach ($ports as $port)
     // Do Alcatel Detailed Stats
     if ($device['os'] == "aos") { include("port-alcatel.inc.php"); }
 
+    // Update Memcached
+    if ($config['memcached']['enable'])
+    {
+      if($debug) { print_r($port['state']); }
+      $memcache->set('port-'.$port['port_id'].'-state', $port['state']);
+    }
+
     // Update Database
     if (count($port['update']))
     {
@@ -419,6 +437,8 @@ foreach ($ports as $port)
       if ($debug) { echo("$updated updated"); }
     }
     // End Update Database
+
+
 
     // Send alerts for interface flaps.
     if ($config['alerts']['port']['ifdown'] && ($port['ifOperStatus'] != $this_port['ifOperStatus']) && $port['ignore'] == 0)

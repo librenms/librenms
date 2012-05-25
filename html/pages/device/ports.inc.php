@@ -108,12 +108,10 @@ if ($vars['view'] == 'minigraphs')
   {
     if ($config['memcached']['enable'])
     {
-      $oids = array('ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors');
-      foreach ($oids as $oid)
-      {
-        $port[$oid.'_rate'] = $memcache->get('port-'.$port['port_id'].'-'.$oid.'_rate');
-        if ($debug) { echo("MC[".$oid."->".$port[$oid.'_rate']."]"); }
-      }
+      $state = $memcache->get('port-'.$port['port_id'].'-state');
+      if($debug) { print_r($state); }
+      if(is_array($state)) { $port = array_merge($port, $state); }
+      unset($state);
     }
 
     include("includes/print-interface.inc.php");

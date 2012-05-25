@@ -308,15 +308,15 @@ $ports = dbFetchRows($query, $param);
 
 // FIXME - only populate what we need to search at this point, because we shouldn't show *all* ports, as it's silly.
 
-foreach ($ports as $p)
+foreach ($ports as $port)
 {
   if ($config['memcached']['enable'])
   {
-    $oids = array('ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors');
-    foreach ($oids as $oid)
+    if ($config['memcached']['enable'])
     {
-      $ports[$port['port_id']][$oid.'_rate'] = $memcache->get('port-'.$port['port_id'].'-'.$oid.'_rate');
-      if ($debug) { echo("MC[".$oid."->".$port[$oid.'_rate']."]"); }
+      $state = $memcache->get('port-'.$port['port_id'].'-state');
+      if(is_array($state)) { $ports[$port['port_id']] = array_merge($port, $state); }
+      unset($state);
     }
   }
 }
