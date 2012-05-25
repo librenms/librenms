@@ -298,46 +298,6 @@ foreach ($vars as $var => $value)
   }
 }
 
-switch ($vars['sort'])
-{
-  case 'traffic':
-    $query_sort = " ORDER BY (I.ifInOctets_rate+I.ifOutOctets_rate) DESC";
-    break;
-  case 'traffic_in':
-    $query_sort = " ORDER BY I.ifInOctets_rate DESC";
-    break;
-  case 'traffic_out':
-    $query_sort = " ORDER BY I.ifOutOctets_rate DESC";
-    break;
-  case 'packets':
-    $query_sort = " ORDER BY (I.ifInUcastPkts_rate+I.ifOutUcastPkts_rate) DESC";
-    break;
-  case 'packets_in':
-    $query_sort = " ORDER BY I.ifInUcastPkts_rate DESC";
-    break;
-  case 'packets_out':
-    $query_sort = " ORDER BY I.ifOutUcastPkts_rate DESC";
-    break;
-  case 'errors':
-    $query_sort = " ORDER BY (I.ifInErrors + I.ifOutErrors) DESC";
-    break;
-  case 'speed':
-    $query_sort = " ORDER BY (I.ifSpeed) DESC";
-    break;
-  case 'port':
-    $query_sort = " ORDER BY (I.ifDescr) ASC";
-    break;
-  case 'media':
-    $query_sort = " ORDER BY (I.ifType) ASC";
-    break;
-  case 'descr':
-    $query_sort = " ORDER BY (I.ifAlias) ASC";
-    break;
-  case 'device':
-  default:
-    $query_sort = " ORDER BY D.hostname, I.ifIndex ASC";
-}
-
 $query = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ".$where." ".$query_sort;
 
 $row = 1;
@@ -345,6 +305,61 @@ $row = 1;
 list($format, $subformat) = explode("_", $vars['format']);
 
 $ports = dbFetchRows($query, $param);
+
+### FIXME - only populate what we need to search at this point, because we shouldn't show *all* ports, as it's silly.
+
+foreach ($ports as $p)
+{
+  if ($config['memcached']['enable'])
+  {
+    $oids = array('ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors');
+    foreach ($oids as $oid)
+    {
+      $ports[$port['port_id']][$oid.'_rate'] = $memcache->get('port-'.$port['port_id'].'-'.$oid.'_rate');
+      if ($debug) { echo("MC[".$oid."->".$port[$oid.'_rate']."]"); }
+    }
+  }
+}
+
+switch ($vars['sort'])
+{
+  case 'traffic':
+    $ports = array_sort($ports, 'ifOctets_rate', SORT_DESC);
+    break;
+  case 'traffic_in':
+    $ports = array_sort($ports, 'ifInOctets_rate', SORT_DESC);
+    break;
+  case 'traffic_out':
+    $ports = array_sort($ports, 'ifOutOctets_rate', SORT_DESC);
+    break;
+  case 'packets':
+    $ports = array_sort($ports, 'ifUcastPkts_rate', SORT_DESC);
+    break;
+  case 'packets_in':
+    $ports = array_sort($ports, 'ifInUcastOctets_rate', SORT_DESC);
+    break;
+  case 'packets_out':
+    $ports = array_sort($ports, 'ifOutUcastOctets_rate', SORT_DESC);
+    break;
+  case 'errors':
+    $ports = array_sort($ports, 'ifErrors_rate', SORT_DESC);
+    break;
+  case 'speed':
+    $ports = array_sort($ports, 'ifSpeed', SORT_DESC);
+    break;
+  case 'port':
+    $ports = array_sort($ports, 'ifDescr', SORT_ASC);
+    break;
+  case 'media':
+    $ports = array_sort($ports, 'ifType', SORT_ASC);
+    break;
+  case 'descr':
+    $ports = array_sort($ports, 'ifAlias', SORT_ASC);
+    break;
+  case 'device':
+  default:
+    $ports = array_sort($ports, 'hostname', SORT_ASC);
+}
 
 if(file_exists('pages/ports/'.$format.'.inc.php'))
 {

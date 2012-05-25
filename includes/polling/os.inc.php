@@ -42,7 +42,7 @@ if ($serial && $serial != $device['serial'])
 if ($icon && $icon != $device['icon'])
 {
   $update_array['icon'] = $icon;
-  log_event("Icon -> ".nicecase($icon), $device, 'system');
+  log_event("Icon -> ".$icon, $device, 'system');
 }
 
 echo("\nHardware: ".$hardware." Version: ".$version." Features: ".$features." Serial: ".$serial."\n");
