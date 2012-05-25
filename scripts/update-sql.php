@@ -15,7 +15,7 @@ if ($fd = @fopen($argv[1],'r'))
   foreach (explode("\n", $data) as $line)
   {
     $update = mysql_query($line);
-    # FIXME check query success?
+    /// FIXME check query success?
     echo("$line \n");
   }
 }

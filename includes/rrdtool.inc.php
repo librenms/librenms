@@ -1,11 +1,14 @@
 <?php
 
 /**
- * Observium Network Management and Monitoring System
- * Copyright (C) 2006-2012, Adam Armstrong - http://www.observium.org
+ * Observium
  *
- * @package rrdtool
- * @author Adam Armstrong <adama@memetic.org>
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage rrdtool
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
  *
  */
 
@@ -192,6 +195,14 @@ function rrdtool_create($filename, $options)
   return shell_exec($command);
 }
 
+/**
+ * Updates an rrd database at $filename using $options
+ * Where $options is an array, each entry which is not a number is replaced with "U"
+ *
+ * @param string filename
+ * @param array options
+ */
+
 function rrdtool_update($filename, $options)
 {
   /// Do some sanitisation on the data if passed as an array.
@@ -238,7 +249,7 @@ function rrdtool_escape($string, $maxlength = NULL)
   $result = str_replace(':','\:',$string);
   $result = str_replace('%','%%',$result);
 
-  # FIXME: should maybe also probably escape these? # \ + ? [ ^ ] ( $ ) '
+  /// FIXME: should maybe also probably escape these? # \ + ? [ ^ ] ( $ ) '
   
   if ($maxlength != NULL)
   {

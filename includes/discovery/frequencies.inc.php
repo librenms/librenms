@@ -2,7 +2,7 @@
 
 echo("Frequencies: ");
 
-### Include all discovery modules
+/// Include all discovery modules
 
 $include_dir = "includes/discovery/frequencies";
 include("includes/include-dir.inc.php");

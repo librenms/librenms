@@ -36,8 +36,8 @@ if (is_array($storage_array))
 
     if ($device['os'] == "routeros" && $descr == "main memory") { $deny = 0; }
 
-    if (strstr($descr, "MALLOC") || strstr($descr, "UMA")) { $deny = 1;  } ## Ignore FreeBSD INSANITY
-    if (strstr($descr, "procfs") || strstr($descr, "/proc")) { $deny = 1;  } ## Ignore ProcFS
+    if (strstr($descr, "MALLOC") || strstr($descr, "UMA")) { $deny = 1;  } /// Ignore FreeBSD INSANITY
+    if (strstr($descr, "procfs") || strstr($descr, "/proc")) { $deny = 1;  } /// Ignore ProcFS
 
     if (!$deny && is_numeric($index))
     {

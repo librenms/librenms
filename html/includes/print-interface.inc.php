@@ -144,7 +144,7 @@ if (strpos($port['label'], "oopback") === false && !$graph_type)
   unset($br);
 
   if ($port_details)
-  { ## Show which other devices are on the same subnet as this interface
+  { /// Show which other devices are on the same subnet as this interface
     foreach (dbFetchRows("SELECT `ipv4_network_id` FROM `ipv4_addresses` WHERE `port_id` = ? AND `ipv4_address` NOT LIKE '127.%'", array($port['port_id'])) as $net)
     {
       $ipv4_network_id = $net['ipv4_network_id'];

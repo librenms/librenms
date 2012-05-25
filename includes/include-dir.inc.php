@@ -1,6 +1,6 @@
 <?php
 
-### This is an include so that we don't lose variable scope.
+/// This is an include so that we don't lose variable scope.
 
   if ($include_dir_regexp == "" || !isset($include_dir_regexp))
   {

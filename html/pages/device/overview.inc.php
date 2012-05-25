@@ -57,7 +57,7 @@ if ($services['total'])
   echo("</div>");
 }
 
-### FIXME - split this into overview/syslog.inc.php?
+/// FIXME - split this into overview/syslog.inc.php?
 if ($config['enable_syslog'])
 {
   $syslog =  dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20", array($device['device_id']));
@@ -76,7 +76,7 @@ echo("</td>");
 
 echo("<td style='width: 50%; vertical-align: top;'>");
 
-### Right Pane
+/// Right Pane
 include("overview/processors.inc.php");
 include("overview/mempools.inc.php");
 include("overview/storage.inc.php");

@@ -8,7 +8,7 @@ if ($device['os'] == 'raritan')
   $outlet_divisor = $divisor;
   $multiplier = "1";
 
-        #################################
+        /////////////////////////////////
         # Check for per-outlet polling
         $outlet_oids = snmp_walk($device, "outletIndex", "-Osqn", "PDU-MIB");
         $outlet_oids = trim($outlet_oids);

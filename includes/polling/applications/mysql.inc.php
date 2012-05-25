@@ -1,6 +1,6 @@
 <?php
 
-### FIXME - this is lame
+/// FIXME - this is lame
 if(!empty($agent_data['app']['mysql']))
 {
   $mysql = $agent_data['app']['mysql'];
@@ -25,7 +25,7 @@ foreach ($data as $str)
   #$nstring .= (float)trim($elements[1]).":";
 }
 
-### General Stats
+/// General Stats
 
 $mapping = array(
         'IDBLBSe' => 'cr',

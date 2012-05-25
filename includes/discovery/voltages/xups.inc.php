@@ -1,6 +1,6 @@
 <?php
 
-## XUPS-MIB
+/// XUPS-MIB
 if ($device['os'] == "powerware")
 {
   echo("XUPS-MIB ");

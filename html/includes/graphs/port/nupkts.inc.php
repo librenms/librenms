@@ -1,6 +1,6 @@
 <?php
 
-# FIXME uhh..
+/// FIXME uhh..
 if (1)
 {
 #  $rrd_list[1]['filename'] = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");

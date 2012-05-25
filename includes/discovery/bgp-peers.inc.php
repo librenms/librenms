@@ -4,7 +4,7 @@ global $debug;
 
 if ($config['enable_bgp'])
 {
-  ### Discover BGP peers
+  /// Discover BGP peers
 
   echo("BGP Sessions : ");
 
@@ -36,11 +36,11 @@ if ($config['enable_bgp'])
 
     if ($device['os'] == "junos")
     {
-      ## Juniper BGP4-V2 MIB
+      /// Juniper BGP4-V2 MIB
 
-      ## FIXME: needs a big cleanup! also see below.
+      /// FIXME: needs a big cleanup! also see below.
 
-      # FIXME: is .0.ipv6 the only possible value here?
+      /// FIXME: is .0.ipv6 the only possible value here?
       $result = snmp_walk($device, "jnxBgpM2PeerRemoteAs.0.ipv6", "-Onq", "BGP4-V2-MIB-JUNIPER", $config['install_dir']."/mibs/junos");
       $peers = trim(str_replace(".1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.0.","", $result));
       foreach (explode("\n", $peers) as $peer)
@@ -65,7 +65,7 @@ if ($config['enable_bgp'])
     } # End if
   } # End if
 
-  ## Process disovered peers
+  /// Process disovered peers
 
   if (isset($peerlist))
   {
@@ -87,7 +87,7 @@ if ($config['enable_bgp'])
 
         if ($device['os_group'] == "cisco")
         {
-          ## Get afi/safi and populate cbgp on cisco ios (xe/xr)
+          /// Get afi/safi and populate cbgp on cisco ios (xe/xr)
           unset($af_list);
 
           $af_data = snmp_walk($device, "cbgpPeerAddrFamilyName." . $peer['ip'], "-OsQ", "CISCO-BGP4-MIB", $config['mibdir']);
@@ -182,7 +182,7 @@ if ($config['enable_bgp'])
     unset($j_peerIndexes);
   } # isset
 
-  ### Delete removed peers
+  /// Delete removed peers
 
   $sql = "SELECT * FROM bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
   $query = mysql_query($sql);

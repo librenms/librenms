@@ -8,7 +8,7 @@ if (is_numeric($vars['id']))
   {
     $device = device_by_id_cache($sensor['device_id']);
 
-    ### This doesn't quite work for all yet.
+    /// This doesn't quite work for all yet.
     #$rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename($sensor['sensor_class']."-" . $sensor['sensor_type'] . "-".$sensor['sensor_index'].".rrd");
     $rrd_filename = get_sensor_rrd($device, $sensor);
 

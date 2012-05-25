@@ -1,6 +1,6 @@
 <?php
 
-### Build SNMP Cache Array
+/// Build SNMP Cache Array
 $data_oids = array('ifName','ifDescr','ifAlias', 'ifAdminStatus', 'ifOperStatus', 'ifMtu', 'ifSpeed', 'ifHighSpeed', 'ifType', 'ifPhysAddress',
                    'ifPromiscuousMode','ifConnectorPresent','ifDuplex', 'ifTrunk', 'ifVlan');
 
@@ -9,7 +9,7 @@ $stat_oids = array('ifInErrors', 'ifOutErrors', 'ifInUcastPkts', 'ifOutUcastPkts
                    'ifInOctets', 'ifOutOctets', 'ifHCInOctets', 'ifHCOutOctets', 'ifInDiscards', 'ifOutDiscards', 'ifInUnknownProtos',
                    'ifInBroadcastPkts', 'ifOutBroadcastPkts', 'ifInMulticastPkts', 'ifOutMulticastPkts');
 
-$stat_oids_db = array('ifInOctets', 'ifOutOctets', 'ifInErrors', 'ifOutErrors', 'ifInUcastPkts', 'ifOutUcastPkts'); ### From above for DB
+$stat_oids_db = array('ifInOctets', 'ifOutOctets', 'ifInErrors', 'ifOutErrors', 'ifInUcastPkts', 'ifOutUcastPkts'); /// From above for DB
 
 $etherlike_oids = array('dot3StatsAlignmentErrors', 'dot3StatsFCSErrors', 'dot3StatsSingleCollisionFrames', 'dot3StatsMultipleCollisionFrames',
                         'dot3StatsSQETestErrors', 'dot3StatsDeferredTransmissions', 'dot3StatsLateCollisions', 'dot3StatsExcessiveCollisions',
@@ -66,7 +66,7 @@ if ($device['adsl_count'] > "0")
   $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.7", $port_stats, "ADSL-LINE-MIB");
 }
 
-### FIXME This probably needs re-enabled. We need to clear these things when they get unset, too.
+/// FIXME This probably needs re-enabled. We need to clear these things when they get unset, too.
 #foreach ($etherlike_oids as $oid) { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "EtherLike-MIB"); }
 #foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
 #foreach ($pagp_oids as $oid)      { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "CISCO-PAGP-MIB"); }
@@ -78,8 +78,8 @@ if ($device['os_group'] == "cisco")
   foreach ($pagp_oids as $oid) { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "CISCO-PAGP-MIB"); }
   $data_oids[] = "portName";
 
-  ### Grab data to put ports into vlans or make them trunks
-  ### FIXME we probably shouldn't be doing this from the VTP MIB, right?
+  /// Grab data to put ports into vlans or make them trunks
+  /// FIXME we probably shouldn't be doing this from the VTP MIB, right?
   $port_stats = snmpwalk_cache_oid($device, "vmVlan", $port_stats, "CISCO-VLAN-MEMBERSHIP-MIB");
   $port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortEncapsulationOperType", $port_stats, "CISCO-VTP-MIB");
   $port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortNativeVlan", $port_stats, "CISCO-VTP-MIB");
@@ -114,20 +114,20 @@ if ($device['os_group'] == "cisco")
 
 $polled = time();
 
-### End Building SNMP Cache Array
+/// End Building SNMP Cache Array
 
 if ($debug) { print_r($port_stats); }
 
-### Build array of ports in the database
+/// Build array of ports in the database
 
-## FIXME -- this stuff is a little messy, looping the array to make an array just seems wrong. :>
-##       -- i can make it a function, so that you don't know what it's doing.
-##       -- $ports = adamasMagicFunction($ports_db); ?
+/// FIXME -- this stuff is a little messy, looping the array to make an array just seems wrong. :>
+///       -- i can make it a function, so that you don't know what it's doing.
+///       -- $ports = adamasMagicFunction($ports_db); ?
 
 $ports_db = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($device['device_id']));
 foreach ($ports_db as $port) { $ports[$port['ifIndex']] = $port; }
 
-### New interface detection
+/// New interface detection
 foreach ($port_stats as $ifIndex => $port)
 {
   if (is_port_valid($port, $device))
@@ -151,15 +151,15 @@ foreach ($port_stats as $ifIndex => $port)
     }
   }
 }
-### End New interface detection
+/// End New interface detection
 
 echo("\n");
-### Loop ports in the DB and update where necessary
+/// Loop ports in the DB and update where necessary
 foreach ($ports as $port)
 {
   echo("Port " . $port['ifDescr'] . "(".$port['ifIndex'].") ");
   if ($port_stats[$port['ifIndex']] && $port['disabled'] != "1")
-  { ### Check to make sure Port data is cached.
+  { /// Check to make sure Port data is cached.
     $this_port = &$port_stats[$port['ifIndex']];
 
     if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $this_port['ifDescr'], $matches)) { $this_port['ifDescr'] = $matches[1]; }
@@ -187,7 +187,7 @@ foreach ($ports as $port)
       $memcache->set('port-'.$port['port_id'].'-poll_period', $polled_period);
     }
 
-    ### Copy ifHC[In|Out]Octets values to non-HC if they exist
+    /// Copy ifHC[In|Out]Octets values to non-HC if they exist
     if ($this_port['ifHCInOctets'] > 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] > 0 && is_numeric($this_port['ifHCOutOctets']))
     {
       echo("HC ");
@@ -195,7 +195,7 @@ foreach ($ports as $port)
       $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
     }
 
-    ### rewrite the ifPhysAddress
+    /// rewrite the ifPhysAddress
     if (strpos($this_port['ifPhysAddress'], ":"))
     {
       list($a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(":", $this_port['ifPhysAddress']);
@@ -211,21 +211,21 @@ foreach ($ports as $port)
       $this_port['ifOutMulticastPkts'] = $this_port['ifHCOutMulticastPkts'];
     }
 
-    ### Overwrite ifSpeed with ifHighSpeed if it's over 10G
+    /// Overwrite ifSpeed with ifHighSpeed if it's over 10G
     if (is_numeric($this_port['ifHighSpeed']) && $this_port['ifSpeed'] > "1000000000")
     {
       echo("HighSpeed ");
       $this_port['ifSpeed'] = $this_port['ifHighSpeed'] * 1000000;
     }
 
-    ### Overwrite ifDuplex with dot3StatsDuplexStatus if it exists
+    /// Overwrite ifDuplex with dot3StatsDuplexStatus if it exists
     if (isset($this_port['dot3StatsDuplexStatus']))
     {
       echo("dot3Duplex ");
       $this_port['ifDuplex'] = $this_port['dot3StatsDuplexStatus'];
     }
 
-    ### Set VLAN and Trunk from Cisco
+    /// Set VLAN and Trunk from Cisco
     if (isset($this_port['vlanTrunkPortEncapsulationOperType']) && $this_port['vlanTrunkPortEncapsulationOperType'] != "notApplicable")
     {
       $this_port['ifTrunk'] = $this_port['vlanTrunkPortEncapsulationOperType'];
@@ -237,16 +237,16 @@ foreach ($ports as $port)
       $this_port['ifVlan']  = $this_port['vmVlan'];
     }
 
-    ### Set VLAN and Trunk from Q-BRIDGE-MIB
+    /// Set VLAN and Trunk from Q-BRIDGE-MIB
     if (!isset($this_port['ifVlan']) && isset($this_port['dot1qPvid']))
     {
       $this_port['ifVlan'] = $this_port['dot1qPvid'];
     }
-    # FIXME use $q_bridge_mib[$this_port['ifIndex']] to see if it is a trunk (>1 array count)
+    /// FIXME use $q_bridge_mib[$this_port['ifIndex']] to see if it is a trunk (>1 array count)
 
     echo("VLAN == ".$this_port['ifVlan']);
 
-    ### Update IF-MIB data
+    /// Update IF-MIB data
     foreach ($data_oids as $oid)
     {
       if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]))
@@ -261,7 +261,7 @@ foreach ($ports as $port)
       }
     }
 
-    ### Parse description (usually ifAlias) if config option set
+    /// Parse description (usually ifAlias) if config option set
     if (isset($config['port_descr_parser']) && is_file($config['install_dir'] . "/" . $config['port_descr_parser']))
     {
       $port_attribs = array('type','descr','circuit','speed','notes');
@@ -278,9 +278,9 @@ foreach ($ports as $port)
         }
       }
     }
-    ### End parse ifAlias
+    /// End parse ifAlias
 
-    ### Update IF-MIB metrics
+    /// Update IF-MIB metrics
     foreach ($stat_oids_db as $oid)
     {
 
@@ -342,7 +342,7 @@ foreach ($ports as $port)
     echo('bytes('.formatStorage($port['stats']['ifInOctets_diff']).'/'.formatStorage($port['stats']['ifOutOctets_diff']).')');
     echo('pkts('.format_si($port['stats']['ifInUcastPkts_rate']).'pps/'.format_si($port['stats']['ifOutUcastPkts_rate']).'pps)');
 
-    ### Port utilisation % threshold alerting. ## FIXME allow setting threshold per-port. probably 90% of ports we don't care about.
+    /// Port utilisation % threshold alerting. /// FIXME allow setting threshold per-port. probably 90% of ports we don't care about.
     if ($config['alerts']['port_util_alert'])
     {
       // Check for port saturation of $config['alerts']['port_util_perc'] or higher.  Alert if we see this.
@@ -356,7 +356,7 @@ foreach ($ports as $port)
       }
     }
 
-    ### Update RRDs
+    /// Update RRDs
     $rrdfile = $host_rrd . "/port-" . safename($port['ifIndex'] . ".rrd");
     if (!is_file($rrdfile))
     {
@@ -383,44 +383,44 @@ foreach ($ports as $port)
                             $this_port['ifInBroadcastPkts'], $this_port['ifOutBroadcastPkts'], $this_port['ifInMulticastPkts'], $this_port['ifOutMulticastPkts']);
 
     rrdtool_update("$rrdfile", $this_port['rrd_update']);
-    ### End Update IF-MIB
+    /// End Update IF-MIB
 
-    ### Update PAgP
+    /// Update PAgP
     if ($this_port['pagpOperationMode'] || $port['pagpOperationMode'])
     {
       foreach ($pagp_oids as $oid)
-      { ### Loop the OIDs
+      { /// Loop the OIDs
         if ($this_port[$oid] != $port[$oid])
-        { ### If data has changed, build a query
+        { /// If data has changed, build a query
           $port['update'][$oid] = $this_port[$oid];
           echo("PAgP ");
           log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['port_id']);
         }
       }
     }
-    ### End Update PAgP
+    /// End Update PAgP
 
-    ### Do EtherLike-MIB
+    /// Do EtherLike-MIB
     if ($config['enable_ports_etherlike']) { include("port-etherlike.inc.php"); }
 
-    ### Do ADSL MIB
+    /// Do ADSL MIB
     if ($config['enable_ports_adsl']) { include("port-adsl.inc.php"); }
 
-    ### Do PoE MIBs
+    /// Do PoE MIBs
     if ($config['enable_ports_poe']) { include("port-poe.inc.php"); }
 
-    ### Do Alcatel Detailed Stats
+    /// Do Alcatel Detailed Stats
     if ($device['os'] == "aos") { include("port-alcatel.inc.php"); }
 
-    ### Update Database
+    /// Update Database
     if (count($port['update']))
     {
       $updated = dbUpdate($port['update'], 'ports', '`port_id` = ?', array($port['port_id']));
       if ($debug) { echo("$updated updated"); }
     }
-    ### End Update Database
+    /// End Update Database
 
-    ### Send alerts for interface flaps.
+    /// Send alerts for interface flaps.
     if ($config['alerts']['port']['ifdown'] && ($port['ifOperStatus'] != $this_port['ifOperStatus']) && $port['ignore'] == 0)
     {
       if ($this_port['ifAlias'])
@@ -442,7 +442,7 @@ foreach ($ports as $port)
   }
   elseif ($port['disabled'] != "1")
   {
-    echo("Port Deleted"); ### Port missing from SNMP cache.
+    echo("Port Deleted"); /// Port missing from SNMP cache.
     if ($port['deleted'] != "1")
     {
       dbUpdate(array('deleted' => '1'), 'ports',  '`device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $port['ifIndex']));
@@ -453,11 +453,11 @@ foreach ($ports as $port)
 
   echo("\n");
 
-  ### Clear Per-Port Variables Here
+  /// Clear Per-Port Variables Here
   unset($this_port);
 }
 
-### Clear Variables Here
+/// Clear Variables Here
 unset($port_stats);
 
 ?>

@@ -1,6 +1,6 @@
 <?php
 
-### Authorises bill viewing and sets $ports as reference to mysql query containing ports for this bill
+/// Authorises bill viewing and sets $ports as reference to mysql query containing ports for this bill
 
 include("../includes/billing.php");
 

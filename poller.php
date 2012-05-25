@@ -134,7 +134,7 @@ echo("\n");
 
 logfile($string);
 rrdtool_pipe_close($rrd_process, $rrd_pipes);
-unset($config); ### Remove this for testing
+unset($config); /// Remove this for testing
 
 #print_r(get_defined_vars());
 

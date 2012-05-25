@@ -9,7 +9,7 @@ if ($device['os_group'] == "cisco")
   if ($vtpversion == '1' || $vtpversion == '2' || $vtpversion == '3' || $vtpversion == 'one' ||  $vtpversion == 'two' || $vtpversion == 'three')
   {
 
-    ## FIXME - can have multiple VTP domains.
+    /// FIXME - can have multiple VTP domains.
     $vtpdomains = snmpwalk_cache_oid($device, "vlanManagementDomains", array(), "CISCO-VTP-MIB");
     $vlans = snmpwalk_cache_twopart_oid($device, "vtpVlanEntry", array(), "CISCO-VTP-MIB");
 

@@ -1,6 +1,6 @@
 <?php 
 
-## FIXME not used, do we still need this?
+/// FIXME not used, do we still need this?
 
 function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
   global $config, $installdir;

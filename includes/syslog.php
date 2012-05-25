@@ -1,6 +1,6 @@
 <?php
 
-## FIXME : use db functions properly
+/// FIXME : use db functions properly
 
 # $device_id_host = @dbFetchCell("SELECT device_id FROM devices WHERE `hostname` = '".mres($entry['host'])."' OR `sysName` = '".mres($entry['host'])."'");
 
@@ -124,7 +124,7 @@ function process_syslog($entry, $update)
 
       // SYSLOG CONNECTION BROKEN; FD='6', SERVER='AF_INET(123.213.132.231:514)', time_reopen='60'
       // pam_krb5: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
-      ## Disabled because broke this:
+      /// Disabled because broke this:
       // diskio.c: don't know how to handle 10 request
       #elseif($pos = strpos($entry['msg'], ';') or $pos = strpos($entry['msg'], ':')) {
       #  $entry['program'] = substr($entry['msg'], 0, $pos);

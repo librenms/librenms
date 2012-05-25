@@ -125,7 +125,7 @@
       }
 
       $i++;
-    } ### PERMITTED
+    } /// PERMITTED
   }
   echo("</table>");
 

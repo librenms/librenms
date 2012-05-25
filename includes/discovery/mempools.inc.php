@@ -2,12 +2,12 @@
 
 echo("Memory : ");
 
-### Include all discovery modules
+/// Include all discovery modules
 
 $include_dir = "includes/discovery/mempools";
 include("includes/include-dir.inc.php");
 
-### Remove memory pools which weren't redetected here
+/// Remove memory pools which weren't redetected here
 
 $sql = "SELECT * FROM `mempools` WHERE `device_id`  = '".$device['device_id']."'";
 $query = mysql_query($sql);

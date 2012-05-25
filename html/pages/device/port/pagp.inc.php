@@ -2,7 +2,7 @@
 
 global $config;
 
-### FIXME functions!
+/// FIXME functions!
 
 if (!$graph_type) { $graph_type = "pagp_bits"; }
 

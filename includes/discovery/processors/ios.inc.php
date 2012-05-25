@@ -53,7 +53,7 @@ if ($device['os_group'] == "cisco" || $device['os'] == "acsw")
     }
   }
 }
-## End Cisco Processors
+/// End Cisco Processors
 
 unset ($processors_array);
 

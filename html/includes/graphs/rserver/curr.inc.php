@@ -1,7 +1,7 @@
 <?php
 
-##$ds_in = "RserverCurrentConns";
-##$ds_out = "RserverTotalConns";
+///$ds_in = "RserverCurrentConns";
+///$ds_out = "RserverTotalConns";
 
 $scale_min = 0;
 

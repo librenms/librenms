@@ -1,6 +1,6 @@
 <?php
 
-### Set Defaults here
+/// Set Defaults here
 
 if(!isset($vars['format'])) { $vars['format'] = "list_detail"; }
 
@@ -99,9 +99,9 @@ foreach (dbFetch('SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `featur
         <select name="location" id="location">
           <option value="">All Locations</option>
           <?php
-### fix me function?
+/// fix me function?
 
-foreach (getlocations() as $location) ## FIXME function name sucks maybe get_locations ?
+foreach (getlocations() as $location) /// FIXME function name sucks maybe get_locations ?
 {
   if ($location)
   {

@@ -1,6 +1,6 @@
 <?php
 
-### Force10 E-Series
+/// Force10 E-Series
 
 #F10-CHASSIS-MIB::chSysCardType.1 = INTEGER: rpmCardEF3(206)
 #F10-CHASSIS-MIB::chSysCardType.3 = INTEGER: lc2401E24PG3(69)

@@ -40,7 +40,7 @@
       $entPhysicalModelName = $entPhysicalVendorTypes[$entPhysicalVendorType];
     }
 
-    ## FIXME - dbFacile
+    /// FIXME - dbFacile
 
     if ($entPhysicalDescr || $entPhysicalName)
     {

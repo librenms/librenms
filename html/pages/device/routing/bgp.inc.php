@@ -102,7 +102,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
   }
   else
   {
-    #$peername = gethostbyaddr($peer['bgpPeerIdentifier']); ## FFffuuu DNS ## Cache this in discovery?
+    #$peername = gethostbyaddr($peer['bgpPeerIdentifier']); /// FFffuuu DNS /// Cache this in discovery?
 #    if ($peername == $peer['bgpPeerIdentifier'])
 #    {
 #      unset($peername);
@@ -121,7 +121,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
     $this_afisafi = $afi.$safi;
     $peer['afi'] .= $sep . $afi .".".$safi;
     $sep = "<br />";
-    $peer['afisafi'][$this_afisafi] = 1; ## Build a list of valid AFI/SAFI for this peer
+    $peer['afisafi'][$this_afisafi] = 1; /// Build a list of valid AFI/SAFI for this peer
   }
 
   unset($sep);
@@ -157,7 +157,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
     case 'prefixes_ipv6multicast':
       list(,$afisafi) = explode("_", $vars['view']);
       if (isset($peer['afisafi'][$afisafi])) { $peer['graph'] = 1; }
-      # FIXME no break??
+      /// FIXME no break??
     case 'updates':
       $graph_array['type']   = "bgp_" . $vars['view'];
       $graph_array['id']     = $peer['bgpPeer_id'];

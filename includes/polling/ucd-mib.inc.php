@@ -4,7 +4,7 @@ $load_rrd  = $host_rrd . "/ucd_load.rrd";
 $cpu_rrd   = $host_rrd . "/ucd_cpu.rrd";
 $mem_rrd   = $host_rrd . "/ucd_mem.rrd";
 
-### Poll systemStats from UNIX-like hosts running UCD/Net-SNMPd
+/// Poll systemStats from UNIX-like hosts running UCD/Net-SNMPd
 
 #UCD-SNMP-MIB::ssIndex.0 = INTEGER: 1
 #UCD-SNMP-MIB::ssErrorName.0 = STRING: systemStats
@@ -33,18 +33,18 @@ $mem_rrd   = $host_rrd . "/ucd_mem.rrd";
 #UCD-SNMP-MIB::ssRawSwapOut.0 = Counter32: 937422
 
 $ss = snmpwalk_cache_oid($device, "systemStats", array(), "UCD-SNMP-MIB");
-$ss = $ss[0]; ### Insert Nazi joke here.
+$ss = $ss[0]; /// Insert Nazi joke here.
 
-## Create CPU RRD if it doesn't already exist
+/// Create CPU RRD if it doesn't already exist
 $cpu_rrd_create = " --step 300 \
    DS:user:COUNTER:600:0:U \
    DS:system:COUNTER:600:0:U \
    DS:nice:COUNTER:600:0:U \
    DS:idle:COUNTER:600:0:U ".$config['rrd_rra'];
 
-### This is how we currently collect. We should collect one RRD per stat, for ease of handling differen formats,
-### and because it is per-host and no big performance hit. See new format below
-### FIXME REMOVE
+/// This is how we currently collect. We should collect one RRD per stat, for ease of handling differen formats,
+/// and because it is per-host and no big performance hit. See new format below
+/// FIXME REMOVE
 
 if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawIdle']))
 {
@@ -56,7 +56,7 @@ if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_num
   $graphs['ucd_cpu'] = TRUE;
 }
 
-### This is how we'll collect in the future, start now so people don't have zero data.
+/// This is how we'll collect in the future, start now so people don't have zero data.
 
 $collect_oids = array('ssCpuRawUser','ssCpuRawNice','ssCpuRawSystem','ssCpuRawIdle','ssCpuRawInterrupt', 'ssCpuRawSoftIRQ', 'ssCpuRawKernel', 'ssCpuRawWait', 'ssIORawSent', 'ssIORawReceived', 'ssRawInterrupts', 'ssRawContexts', 'ssRawSwapIn', 'ssRawSwapOut');
 
@@ -75,16 +75,16 @@ foreach ($collect_oids as $oid)
   }
 }
 
-### Set various graphs if we've seen the right OIDs.
+/// Set various graphs if we've seen the right OIDs.
 
 if (is_numeric($ss['ssRawSwapIn'])) { $graphs['ucd_swap_io'] = TRUE; }
 if (is_numeric($ss['ssIORawSent'])) { $graphs['ucd_io'] = TRUE; }
 if (is_numeric($ss['ssRawContexts'])) { $graphs['ucd_contexts'] = TRUE; }
 if (is_numeric($ss['ssRawInterrupts'])) { $graphs['ucd_interrupts'] = TRUE; }
 
-############################################################################################################################################
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
 
-### Poll mem for load memory utilisation stats on UNIX-like hosts running UCD/Net-SNMPd
+/// Poll mem for load memory utilisation stats on UNIX-like hosts running UCD/Net-SNMPd
 #UCD-SNMP-MIB::memIndex.0 = INTEGER: 0
 #UCD-SNMP-MIB::memErrorName.0 = STRING: swap
 #UCD-SNMP-MIB::memTotalSwap.0 = INTEGER: 32762248 kB
@@ -117,28 +117,28 @@ if (is_array($snmpdata[0]))
 
 $snmpdata = $snmpdata[0];
 
-## Check to see that the OIDs are actually populated before we make the rrd
+/// Check to see that the OIDs are actually populated before we make the rrd
 if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTotalFree))
 {
   if (!is_file($mem_rrd))
   {
-    ## Create the rrd file if it doesn't exist
+    /// Create the rrd file if it doesn't exist
     rrdtool_create($mem_rrd, $mem_rrd_create);
   }
   rrdtool_update($mem_rrd,  array($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached));
   $graphs['ucd_memory'] = TRUE;
 }
 
-##########################################################################################################################################################
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-### Poll laLoadInt for load averages on UNIX-like hosts running UCD/Net-SNMPd
+/// Poll laLoadInt for load averages on UNIX-like hosts running UCD/Net-SNMPd
 #UCD-SNMP-MIB::laLoadInt.1 = INTEGER: 206
 #UCD-SNMP-MIB::laLoadInt.2 = INTEGER: 429
 #UCD-SNMP-MIB::laLoadInt.3 = INTEGER: 479
 
 $load_raw = snmp_get_multi($device, "laLoadInt.1 laLoadInt.2 laLoadInt.3", "-OQUs", "UCD-SNMP-MIB");
 
-## Check to see that the 5-min OID is actually populated before we make the rrd
+/// Check to see that the 5-min OID is actually populated before we make the rrd
 if (is_numeric($load_raw[2]['laLoadInt']))
 {
   if (!is_file($load_rrd))

@@ -140,7 +140,7 @@ if (bill_permitted($bill_id))
 
     echo("<h3>Billed Ports</h3>");
 
-    ### Collected Earlier
+    /// Collected Earlier
     foreach ($ports as $port)
     {
       echo(generate_port_link($port) . " on " . generate_device_link($port) . "<br />");

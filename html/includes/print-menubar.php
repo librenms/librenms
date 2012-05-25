@@ -1,6 +1,6 @@
 <?php
 
-## FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
+/// FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
 $service_alerts = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '0'");
 $if_alerts      = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
@@ -320,7 +320,7 @@ $(document).ready(function() {
 
 <?php
 
-# FIXME does not check user permissions...
+/// FIXME does not check user permissions...
 foreach (dbFetchRows("SELECT sensor_class,COUNT(sensor_id) AS c FROM sensors GROUP BY sensor_class ORDER BY sensor_class ") as $row)
 {
   $used_sensors[$row['sensor_class']] = $row['c'];
@@ -458,7 +458,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
     $separator++;
   }
 
-  ## BGP Sessions
+  /// BGP Sessions
   if ($_SESSION['userlevel'] >= '5' && $routing_count['bgp'])
   {
     if ($separator)
@@ -474,7 +474,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
         <li><a href="routing/protocol=bgp/type=internal/graph=NULL/"><img src="images/16/brick_link.png" border="0" align="absmiddle" /> BGP Internal</a></li>');
   }
 
-  ## Do Alerts at the bottom
+  /// Do Alerts at the bottom
   if ($bgp_alerts)
   {
     echo('
@@ -511,7 +511,7 @@ if ($packages)
 <?php
 } # if ($packages)
 
-### Custom menubar entries.
+/// Custom menubar entries.
 if(is_file("includes/print-menubar-custom.inc.php"))
 {
   include("includes/print-menubar-custom.inc.php");
