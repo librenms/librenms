@@ -1,7 +1,7 @@
 <?php
 
-/// Draws aggregate bits graph from multiple RRDs
-/// Variables : colour_[line|area]_[in|out], rrd_filenames
+// Draws aggregate bits graph from multiple RRDs
+// Variables : colour_[line|area]_[in|out], rrd_filenames
 
 include("includes/graphs/common.inc.php");
 

@@ -67,7 +67,7 @@ $link_array = array('page'    => 'device',
                     'port'    => $port['port_id']);
 
 $menu_options['graphs']   = 'Graphs';
-$menu_options['realtime'] = 'Real time';   /// FIXME CONDITIONAL
+$menu_options['realtime'] = 'Real time';   // FIXME CONDITIONAL
 $menu_options['arp']      = 'ARP Table';
 $menu_options['events']      = 'Eventlog';
 
@@ -129,8 +129,8 @@ if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = '".$port['p
 if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '".$port['port_id']."'") > "0" )
 {
 
-  /// FIXME ATM VPs
-  /// FIXME URLs BROKEN
+  // FIXME ATM VPs
+  // FIXME URLs BROKEN
 
   echo(" | ATM VPs : ");
   if ($vars['view'] == "junose-atm-vp" && $vars['graph'] == "bits") { echo("<span class='pagemenu-selected'>"); }

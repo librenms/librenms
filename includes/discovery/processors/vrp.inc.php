@@ -1,6 +1,6 @@
 <?php
 
-/// Huawei VRP Processors
+// Huawei VRP Processors
 if($device['os'] == "vrp")
 {
   echo("Huawei VRP ");
@@ -23,10 +23,10 @@ if($device['os'] == "vrp")
         {
           discover_processor($valid['processor'], $device, $usage_oid, $index, "vrp", $descr, "1", $usage, NULL, NULL);
         }
-      } /// End if checks
-    } /// End Foreach
-  } /// End if array
-} /// End VRP Processors
+      } // End if checks
+    } // End Foreach
+  } // End if array
+} // End VRP Processors
 
 unset ($processors_array);
 

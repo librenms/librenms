@@ -1,6 +1,6 @@
 <?php
 
-/// FIXME - a little ugly...
+// FIXME - a little ugly...
 
 if ($_SESSION['userlevel'] >= '5')
 {
@@ -39,9 +39,9 @@ foreach (dbFetchRows($sql, $param) as $sensor)
     if ($sensor['sensor_current'] >= $sensor['sensor_limit']) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }
   }
 
-    /// FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
-    /// FIXME - So now we need to clean this up and move it into a function. Isn't it just "print-graphrow"?
-    /// FIXME - DUPLICATED IN device/overview/sensors
+    // FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
+    // FIXME - So now we need to clean this up and move it into a function. Isn't it just "print-graphrow"?
+    // FIXME - DUPLICATED IN device/overview/sensors
 
     $graph_colour = str_replace("#", "", $row_colour);
 

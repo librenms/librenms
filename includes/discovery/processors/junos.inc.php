@@ -1,6 +1,6 @@
 <?php
 
-/// JUNOS Processors
+// JUNOS Processors
 if ($device['os'] == "junos")
 {
   echo("JUNOS : ");
@@ -25,9 +25,9 @@ if ($device['os'] == "junos")
         {
           discover_processor($valid['processor'], $device, $usage_oid, $index, "junos", $descr, "1", $usage, NULL, NULL);
         }
-      } /// End if checks
-    } /// End Foreach
-  } /// End if array
+      } // End if checks
+    } // End Foreach
+  } // End if array
   else
   {
     $srx_processors_array = snmpwalk_cache_multi_oid($device, "jnxJsSPUMonitoringCPUUsage", $srx_processors_array, "JUNIPER-SRX5000-SPU-MONITORING-MIB" , '+'.$config['install_dir']."/mibs/junos");
@@ -47,7 +47,7 @@ if ($device['os'] == "junos")
       }
     }
   }
-} /// End JUNOS Processors
+} // End JUNOS Processors
 
 unset ($processors_array);
 unset ($srx_processors_array);

@@ -1,6 +1,6 @@
 <?php
 
-/// RFC1628 UPS Voltages
+// RFC1628 UPS Voltages
 if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']])
 {
   echo("RFC1628 ");

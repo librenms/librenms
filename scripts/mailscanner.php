@@ -3,30 +3,30 @@
 
     ///////////////////////////////////////////////////////////////////////////////////////
     ///
-    ///      A small script to grab the MailScanner statistics from a MailScanner server
-    ///      Needed commands: php, MailScanner, WatchMailLog, perl
+    //      A small script to grab the MailScanner statistics from a MailScanner server
+    //      Needed commands: php, MailScanner, WatchMailLog, perl
     ///
-    ///      Install:
-    ///              Add the WatchMailLog Daemon to the rc.local so its start on server boot
-    ///              Run the WatchMailLog Daemon to start grabbing statistics from log files
-    ///              Add the following to your snmpd.conf file:
-    ///              extend mailwatch /opt/observium/scripts/mailwatch.php
+    //      Install:
+    //              Add the WatchMailLog Daemon to the rc.local so its start on server boot
+    //              Run the WatchMailLog Daemon to start grabbing statistics from log files
+    //              Add the following to your snmpd.conf file:
+    //              extend mailwatch /opt/observium/scripts/mailwatch.php
     ///
-    ///      Version 1.0 By:
-    ///              All In One - Dennis de Houx <info@all-in-one.be>
+    //      Version 1.0 By:
+    //              All In One - Dennis de Houx <info@all-in-one.be>
     ///
     ///////////////////////////////////////////////////////////////////////////////////////
 
 
-    /// START SETTINGS ///
+    // START SETTINGS ///
 
 	$mailstats	= "/opt/observium/scripts/watchmaillog/watchmaillog_counters";
 
-    /// END SETTINGS ///
+    // END SETTINGS ///
 
 
     ///
-    /// DO NOT EDIT BENETH THIS LINE
+    // DO NOT EDIT BENETH THIS LINE
     ///
     ///////////////////////////////////////////////////////////////////////////////////////
 

@@ -1,6 +1,6 @@
 <?php
 
-/// Polls Apache statistics from script via SNMP
+// Polls Apache statistics from script via SNMP
 
 if (!empty($agent_data['app']['apache']))
 {

@@ -10,7 +10,7 @@ $rrd_options .= " COMMENT:'".str_pad($unit_long,$descr_len)."    Cur     Min    
 
 foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_index`", array($class, $device['device_id'])) as $sensor)
 {
-  /// FIXME generic colour function
+  // FIXME generic colour function
   switch ($iter)
   {
     case "1":

@@ -3,28 +3,28 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///
-///      A small script to grab the DNS statistics from a PowerDNS server
-///      Needed commands: php, pdns_control
+//      A small script to grab the DNS statistics from a PowerDNS server
+//      Needed commands: php, pdns_control
 ///
-///      Install:
-///              Add the following to your snmpd.conf file:
-///              extend powerdns /opt/observium/scripts/powerdns.php
+//      Install:
+//              Add the following to your snmpd.conf file:
+//              extend powerdns /opt/observium/scripts/powerdns.php
 ///
-///      Version 1.0 By:
-///              All In One - Dennis de Houx <info@all-in-one.be>
+//      Version 1.0 By:
+//              All In One - Dennis de Houx <info@all-in-one.be>
 ///
 ///////////////////////////////////////////////////////////////////////////////////////
 
 
-/// START SETTINGS ///
+// START SETTINGS ///
 
 	$pdnscontrol	= "/usr/bin/pdns_control";
 
-/// END SETTINGS ///
+// END SETTINGS ///
 
 
 ///
-/// DO NOT EDIT BENETH THIS LINE
+// DO NOT EDIT BENETH THIS LINE
 ///
 ///////////////////////////////////////////////////////////////////////////////////////
 

@@ -2,7 +2,7 @@
 
 include("includes/geshi/geshi.php");
 
-/// FIXME svn stuff still using optc etc, won't work, needs updating!
+// FIXME svn stuff still using optc etc, won't work, needs updating!
 
 if ($_SESSION['userlevel'] >= "7")
 {

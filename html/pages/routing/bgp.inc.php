@@ -63,7 +63,7 @@ else
     echo(generate_link("Down",$vars, array('state' => 'down')));
   }
 
-  /// End BGP Menu
+  // End BGP Menu
 
   if (!isset($vars['view'])) { $vars['view'] = 'details'; }
 
@@ -184,7 +184,7 @@ else
       $this_afisafi = $afi.$safi;
       $peer['afi'] .= $sep . $afi .".".$safi;
       $sep = "<br />";
-      $peer['afisafi'][$this_afisafi] = 1; /// Build a list of valid AFI/SAFI for this peer
+      $peer['afisafi'][$this_afisafi] = 1; // Build a list of valid AFI/SAFI for this peer
     }
     unset($sep);
 

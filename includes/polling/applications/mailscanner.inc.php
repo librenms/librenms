@@ -1,6 +1,6 @@
 <?php
 
-/// Polls MailScanner statistics from script via SNMP
+// Polls MailScanner statistics from script via SNMP
 
 $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mailscannerV2-" . $app['app_id'] . ".rrd";
 $options       = "-O qv";

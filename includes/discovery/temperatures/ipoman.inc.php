@@ -1,7 +1,7 @@
 <?php
 
-/// FIXME: EMD "stack" support?
-/// FIXME: What to do with IPOMANII-MIB::ipmEnvEmdConfigTempOffset.0 ?
+// FIXME: EMD "stack" support?
+// FIXME: What to do with IPOMANII-MIB::ipmEnvEmdConfigTempOffset.0 ?
 
 if ($device['os'] == "ipoman")
 {

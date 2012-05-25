@@ -5,8 +5,8 @@ if($config['old_graphs'])
   include("includes/graphs/old_generic_simplex.inc.php");
 } else {
 
-/// Draw generic bits graph
-/// args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, percentile
+// Draw generic bits graph
+// args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, percentile
 
 include("includes/graphs/common.inc.php");
 

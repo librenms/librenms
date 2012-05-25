@@ -4,7 +4,7 @@ if ($device['os'] != "Snom")
 {
   echo(" ICMP");
 
-  /// Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them
+  // Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them
 
   $oids =   array('icmpInMsgs','icmpOutMsgs','icmpInErrors','icmpOutErrors','icmpInEchos','icmpOutEchos','icmpInEchoReps',
                  'icmpOutEchoReps','icmpInDestUnreachs','icmpOutDestUnreachs','icmpInParmProbs','icmpInTimeExcds',

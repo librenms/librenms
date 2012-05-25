@@ -31,7 +31,7 @@ if ($_SESSION['userlevel'] < '10') { include("includes/error-no-perm.inc.php"); 
       }
     }
 
-    /// FIXME v mysql query should be replaced by authmodule
+    // FIXME v mysql query should be replaced by authmodule
     $userlist = dbFetchRows("SELECT * FROM `users`");
     foreach ($userlist as $userentry)
     {

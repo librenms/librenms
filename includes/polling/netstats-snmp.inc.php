@@ -4,7 +4,7 @@ if ($device['os'] != "Snom")
 {
   echo(" SNMP");
 
-  /// Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them
+  // Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them
 
   $oids = array ('snmpInPkts','snmpOutPkts','snmpInBadVersions','snmpInBadCommunityNames','snmpInBadCommunityUses','snmpInASNParseErrs',
    'snmpInTooBigs','snmpInNoSuchNames','snmpInBadValues','snmpInReadOnlys','snmpInGenErrs','snmpInTotalReqVars','snmpInTotalSetVars',

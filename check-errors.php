@@ -21,7 +21,7 @@ include("includes/definitions.inc.php");
 include("includes/functions.php");
 include("html/includes/functions.inc.php");
 
-/// Check all of our interface RRD files for errors
+// Check all of our interface RRD files for errors
 
 if ($argv[1]) { $where = "AND `port_id` = ?"; $params = array($argv[1]); }
 
@@ -42,16 +42,16 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_
 echo("Checked $i interfaces\n");
 
 if (is_array($errored))
-{ /// If there are errored ports
+{ // If there are errored ports
   $i = 0;
   $msg = "Interfaces with errors : \n\n";
 
   foreach ($errored as $int)
   {
-    $msg .= "$int\n";  /// Add a line to the report email warning about them
+    $msg .= "$int\n";  // Add a line to the report email warning about them
     $i++;
   }
-  /// Send the alert email
+  // Send the alert email
   notify($device, "Observium detected errors on $i interface" . ($i != 1 ? 's' : ''), $msg);
 }
 

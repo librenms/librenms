@@ -60,7 +60,7 @@ if (is_array($oids))
 
       $type = $entitysensor[$entry['entPhySensorType']];
 
-      /// FIXME this stuff is foul
+      // FIXME this stuff is foul
 
       if ($entry['entPhySensorScale'] == "nano")  { $divisor = "1000000000"; $multiplier = "1"; }
       if ($entry['entPhySensorScale'] == "micro") { $divisor = "1000000"; $multiplier = "1"; }
@@ -80,7 +80,7 @@ if (is_array($oids))
       if ($current == "-127") { $thisisnotbullshit = FALSE; }
 
       if ($thisisnotbullshit && mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."' AND `sensor_class` = '".$type."' AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = '".$index."'"),0) == "0")
-      /// Check to make sure we've not already seen this sensor via cisco's entity sensor mib
+      // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
       {
         discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $current);
       }

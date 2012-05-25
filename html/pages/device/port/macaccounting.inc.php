@@ -1,6 +1,6 @@
 <?php
 
-/// FIXME - REWRITE!
+// FIXME - REWRITE!
 
 $hostname = $device['hostname'];
 $hostid   = $device['port_id'];

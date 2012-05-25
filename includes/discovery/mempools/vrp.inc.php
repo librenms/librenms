@@ -1,6 +1,6 @@
 <?php
 
-/// Huawei VRP  mempools
+// Huawei VRP  mempools
 if($device['os'] == "vrp")
 {
   echo("VRP : ");
@@ -23,10 +23,10 @@ if($device['os'] == "vrp")
         {
           discover_mempool($valid_mempool, $device, $index, "vrp", $descr, "1", NULL, NULL);
         }
-      } /// End if checks
-    } /// End Foreach
-  } /// End if array
-} /// End VRP mempools
+      } // End if checks
+    } // End Foreach
+  } // End if array
+} // End VRP mempools
 
 unset ($mempools_array);
 

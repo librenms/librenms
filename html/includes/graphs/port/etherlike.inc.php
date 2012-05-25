@@ -1,6 +1,6 @@
 <?php
 
-/// Cycle through dot3stats OIDs and build list of RRAs to pass to multi simplex grapher
+// Cycle through dot3stats OIDs and build list of RRAs to pass to multi simplex grapher
 
 $oids = array('dot3StatsAlignmentErrors', 'dot3StatsFCSErrors', 'dot3StatsSingleCollisionFrames', 'dot3StatsMultipleCollisionFrames',
               'dot3StatsSQETestErrors', 'dot3StatsDeferredTransmissions', 'dot3StatsLateCollisions', 'dot3StatsExcessiveCollisions',

@@ -69,7 +69,7 @@
                </tr>");
 
          $i++;
-      } /// PERMITTED
+      } // PERMITTED
     }
   }
   echo("</table>");

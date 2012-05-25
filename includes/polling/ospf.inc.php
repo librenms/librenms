@@ -12,17 +12,17 @@ $ospf_oids_db = array('ospfRouterId', 'ospfAdminStat', 'ospfVersionNumber', 'osp
                       'ospfExternLsaCount', 'ospfExternLsaCksumSum', 'ospfTOSSupport', 'ospfOriginateNewLsas', 'ospfRxNewLsas',
                       'ospfExtLsdbLimit', 'ospfMulticastExtensions', 'ospfExitOverflowInterval', 'ospfDemandExtensions');
 
-/// Build array of existing entries
+// Build array of existing entries
 foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `device_id` = ?", array($device['device_id'])) as $entry)
 {
   $ospf_instances_db[$entry['ospf_instance_id']] = $entry;
 }
 
-/// Pull data from device
+// Pull data from device
 $ospf_instances_poll = snmpwalk_cache_oid($device, "OSPF-MIB::ospfGeneralGroup", array(), "OSPF-MIB");
 foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry)
 {
-  /// If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
+  // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
   if (!isset($ospf_instances_db[$ospf_instance_id]))
   {
     dbInsert(array('device_id' => $device['device_id'], 'ospf_instance_id' => $ospf_instance_id), 'ospf_instances');
@@ -41,7 +41,7 @@ if ($debug)
   echo("\n");
 }
 
-/// Loop array of entries and update
+// Loop array of entries and update
 if (is_array($ospf_instances_db))
 {
   foreach ($ospf_instances_db as $ospf_instance_db)
@@ -52,7 +52,7 @@ if (is_array($ospf_instances_db))
       if ($ospf_instance_db[$oid] != $ospf_instance_poll[$oid])
       { // If data has changed, build a query
         $ospf_instance_update[$oid] = $ospf_instance_poll[$oid];
-        #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['port_id']); /// FIXME
+        #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['port_id']); // FIXME
       }
     }
     if ($ospf_instance_update)
@@ -77,18 +77,18 @@ echo(" Areas: ");
 
 $ospf_area_oids = array('ospfAuthType','ospfImportAsExtern','ospfSpfRuns','ospfAreaBdrRtrCount','ospfAsBdrRtrCount','ospfAreaLsaCount','ospfAreaLsaCksumSum','ospfAreaSummary','ospfAreaStatus');
 
-/// Build array of existing entries
+// Build array of existing entries
 foreach (dbFetchRows("SELECT * FROM `ospf_areas` WHERE `device_id` = ?", array($device['device_id'])) as $entry)
 {
   $ospf_areas_db[$entry['ospfAreaId']] = $entry;
 }
 
-/// Pull data from device
+// Pull data from device
 $ospf_areas_poll = snmpwalk_cache_oid($device, "OSPF-MIB::ospfAreaEntry", array(), "OSPF-MIB");
 
 foreach ($ospf_areas_poll as $ospf_area_id => $ospf_area)
 {
-  /// If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
+  // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
   if (!isset($ospf_areas_db[$ospf_area_id]))
   {
     dbInsert(array('device_id' => $device['device_id'], 'ospfAreaId' => $ospf_area_id), 'ospf_areas');
@@ -107,7 +107,7 @@ if ($debug)
   echo("\n");
 }
 
-/// Loop array of entries and update
+// Loop array of entries and update
 if (is_array($ospf_areas_db))
 {
   foreach ($ospf_areas_db as $ospf_area_db)
@@ -116,11 +116,11 @@ if (is_array($ospf_areas_db))
     {
       $ospf_area_poll = $ospf_areas_poll[$ospf_area_db['ospfAreaId']];
       foreach ($ospf_area_oids as $oid)
-      { /// Loop the OIDs
+      { // Loop the OIDs
         if ($ospf_area_db[$oid] != $ospf_area_poll[$oid])
-        { /// If data has changed, build a query
+        { // If data has changed, build a query
           $ospf_area_update[$oid] = $ospf_area_poll[$oid];
-          #log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['port_id']); /// FIXME
+          #log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['port_id']); // FIXME
         }
       }
       if ($ospf_area_update)
@@ -150,18 +150,18 @@ echo(" Ports: ");
 
 $ospf_port_oids = array('ospfIfIpAddress','port_id','ospfAddressLessIf','ospfIfAreaId','ospfIfType','ospfIfAdminStat','ospfIfRtrPriority','ospfIfTransitDelay','ospfIfRetransInterval','ospfIfHelloInterval','ospfIfRtrDeadInterval','ospfIfPollInterval','ospfIfState','ospfIfDesignatedRouter','ospfIfBackupDesignatedRouter','ospfIfEvents','ospfIfAuthKey','ospfIfStatus','ospfIfMulticastForwarding','ospfIfDemand','ospfIfAuthType');
 
-/// Build array of existing entries
+// Build array of existing entries
 foreach (dbFetchRows("SELECT * FROM `ospf_ports` WHERE `device_id` = ?", array($device['device_id'])) as $entry)
 {
   $ospf_ports_db[$entry['ospf_port_id']] = $entry;
 }
 
-/// Pull data from device
+// Pull data from device
 $ospf_ports_poll = snmpwalk_cache_oid($device, "OSPF-MIB::ospfIfEntry", array(), "OSPF-MIB");
 
 foreach ($ospf_ports_poll as $ospf_port_id => $ospf_port)
 {
-  /// If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
+  // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
   if (!isset($ospf_ports_db[$ospf_port_id]))
   {
     dbInsert(array('device_id' => $device['device_id'], 'ospf_port_id' => $ospf_port_id), 'ospf_ports');
@@ -179,7 +179,7 @@ if ($debug)
   echo("\n");
 }
 
-/// Loop array of entries and update
+// Loop array of entries and update
 if (is_array($ospf_ports_db))
 {
   foreach ($ospf_ports_db as $ospf_port_id => $ospf_port_db)
@@ -200,7 +200,7 @@ if (is_array($ospf_ports_db))
         if ($ospf_port_db[$oid] != $ospf_port_poll[$oid])
         { // If data has changed, build a query
           $ospf_port_update[$oid] = $ospf_port_poll[$oid];
-          #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['port_id']); /// FIXME
+          #log_event("$oid -> ".$this_port[$oid], $device, 'ospf', $port['port_id']); // FIXME
         }
       }
       if ($ospf_port_update)
@@ -240,18 +240,18 @@ $ospf_nbr_oids_db  = array('ospfNbrIpAddr', 'ospfNbrAddressLessIndex', 'ospfNbrR
 $ospf_nbr_oids_rrd = array();
 $ospf_nbr_oids = array_merge($ospf_nbr_oids_db, $ospf_nbr_oids_rrd);
 
-/// Build array of existing entries
+// Build array of existing entries
 foreach (dbFetchRows("SELECT * FROM `ospf_nbrs` WHERE `device_id` = ?", array($device['device_id'])) as $nbr_entry)
 {
   $ospf_nbrs_db[$nbr_entry['ospf_nbr_id']] = $nbr_entry;
 }
 
-/// Pull data from device
+// Pull data from device
 $ospf_nbrs_poll = snmpwalk_cache_oid($device, "OSPF-MIB::ospfNbrEntry", array(), "OSPF-MIB");
 
 foreach ($ospf_nbrs_poll as $ospf_nbr_id => $ospf_nbr)
 {
-  /// If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
+  // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
   if (!isset($ospf_nbrs_db[$ospf_nbr_id]))
   {
     dbInsert(array('device_id' => $device['device_id'], 'ospf_nbr_id' => $ospf_nbr_id), 'ospf_nbrs');
@@ -270,7 +270,7 @@ if ($debug)
   echo("\n");
 }
 
-/// Loop array of entries and update
+// Loop array of entries and update
 if (is_array($ospf_nbrs_db))
 {
   foreach ($ospf_nbrs_db as $ospf_nbr_id => $ospf_nbr_db)
@@ -296,7 +296,7 @@ if (is_array($ospf_nbrs_db))
         if ($ospf_nbr_db[$oid] != $ospf_nbr_poll[$oid])
         { // If data has changed, build a query
           $ospf_nbr_update[$oid] = $ospf_nbr_poll[$oid];
-          #log_event("$oid -> ".$this_nbr[$oid], $device, 'ospf', $nbr['port_id']); /// FIXME
+          #log_event("$oid -> ".$this_nbr[$oid], $device, 'ospf', $nbr['port_id']); // FIXME
         }
       }
       if ($ospf_nbr_update)
@@ -318,7 +318,7 @@ if (is_array($ospf_nbrs_db))
   }
 }
 
-/// Create device-wide statistics RRD
+// Create device-wide statistics RRD
 
 $filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("ospf-statistics.rrd");
 

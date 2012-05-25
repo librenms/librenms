@@ -65,7 +65,7 @@ if ($device['os_group'] == "cisco")
           $descr = rewrite_entity_descr($descr);
         }
 
-        /// Set description based on measured entity if it exists
+        // Set description based on measured entity if it exists
         if (is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity'])
         {
           $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalName'];
@@ -77,7 +77,7 @@ if ($device['os_group'] == "cisco")
           $descr = $measured_descr . " - " . $descr;
         }
 
-        /// Bit dirty also, clean later
+        // Bit dirty also, clean later
         $descr = str_replace("Temp: ", "", $descr);
         $descr = str_ireplace("temperature ", "", $descr);
 
@@ -87,7 +87,7 @@ if ($device['os_group'] == "cisco")
 
         #echo("$index : ".$entry['entSensorScale']."|");
 
-        /// FIXME this stuff is foul
+        // FIXME this stuff is foul
         if ($entry['entSensorScale'] == "nano")  { $divisor = "1000000000"; $multiplier = "1";  }
         if ($entry['entSensorScale'] == "micro") { $divisor = "1000000"; $multiplier = "1";  }
         if ($entry['entSensorScale'] == "milli") { $divisor = "1000"; $multiplier = "1";  }
@@ -98,15 +98,15 @@ if ($device['os_group'] == "cisco")
         if (is_numeric($entry['entSensorPrecision']) && $entry['entSensorPrecision'] > "0") { $divisor = $divisor . str_pad('', $entry['entSensorPrecision'], "0"); }
         $current = $current * $multiplier / $divisor;
 
-        /// Set thresholds to null
+        // Set thresholds to null
         $limit = NULL; $low_limit = NULL; $warn_limit = NULL; $warn_limit_low = NULL;
 
-        /// Check thresholds for this entry (bit dirty, but it works!)
+        // Check thresholds for this entry (bit dirty, but it works!)
         if (is_array($t_oids[$index]))
         {
           foreach ($t_oids[$index] as $t_index => $entry)
           {
-            /// Critical Limit
+            // Critical Limit
             if ($entry['entSensorThresholdSeverity'] == "major" && $entry['entSensorThresholdRelation'] == "greaterOrEqual")
             {
               $limit = $entry['entSensorThresholdValue'] * $multiplier / $divisor;
@@ -117,7 +117,7 @@ if ($device['os_group'] == "cisco")
               $limit_low = $entry['entSensorThresholdValue'] * $multiplier / $divisor;
             }
 
-            /// Warning Limit
+            // Warning Limit
             if ($entry['entSensorThresholdSeverity'] == "minor" && $entry['entSensorThresholdRelation'] == "greaterOrEqual")
             {
               $warn_limit = $entry['entSensorThresholdValue'] * $multiplier / $divisor;
@@ -129,13 +129,13 @@ if ($device['os_group'] == "cisco")
             }
           }
         }
-        /// End Threshold code
+        // End Threshold code
 
         $ok = TRUE;
 
-        if ($current == "-127") { $ok = FALSE; }                              /// False reading
-#        if ($type == "temperature" && $current < 1) { $ok = FALSE; }        /// False reading. Temperature <1 :)
-        if ($descr == "") { $ok = FALSE; }                                /// Invalid description. Lots of these on Nexus
+        if ($current == "-127") { $ok = FALSE; }                              // False reading
+#        if ($type == "temperature" && $current < 1) { $ok = FALSE; }        // False reading. Temperature <1 :)
+        if ($descr == "") { $ok = FALSE; }                                // Invalid description. Lots of these on Nexus
 
         if ($ok) {
 #          echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current");

@@ -61,7 +61,7 @@ if ($ipSystemStats)
                   'ipSystemStatsReasmOKs','ipSystemStatsReasmFails','ipSystemStatsInDiscards','ipSystemStatsInDelivers','ipSystemStatsOutRequests','ipSystemStatsOutNoRoutes','ipSystemStatsOutDiscards',
                   'ipSystemStatsOutFragFails','ipSystemStatsOutFragCreates','ipSystemStatsOutForwDatagrams');
 
-    /// Use HC counters instead if they're available.
+    // Use HC counters instead if they're available.
     if (isset($stats['ipSystemStatsHCInReceives']))       { $stats['ipSystemStatsInReceives']       = $stats['ipSystemStatsHCInReceives']; }
     if (isset($stats['ipSystemStatsHCInForwDatagrams']))  { $stats['ipSystemStatsInForwDatagrams']  = $stats['ipSystemStatsHCInForwDatagrams']; }
     if (isset($stats['ipSystemStatsHCInDelivers']))       { $stats['ipSystemStatsInDelivers']       = $stats['ipSystemStatsHCInDelivers']; }
@@ -89,7 +89,7 @@ if ($ipSystemStats)
 
     unset($rrdupdate, $rrd_create);
 
-    /// FIXME per-AF?
+    // FIXME per-AF?
 
     $graphs['ipsystemstats_'.$af] = TRUE;
     $graphs['ipsystemstats_'.$af.'_frag'] = TRUE;

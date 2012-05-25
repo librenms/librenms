@@ -4,7 +4,7 @@ if ($config['discover_services'])
 {
   echo("Services: ");
 
-  /// FIXME: use /etc/services?
+  // FIXME: use /etc/services?
   $known_services = array(22 => "ssh", 25 => "smtp", 53 => "dns", 80 => "http",
                           110 => "pop", 143 => "imap");
 

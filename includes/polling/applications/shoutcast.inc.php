@@ -1,6 +1,6 @@
 <?php
 
-/// Polls shoutcast statistics from script via SNMP
+// Polls shoutcast statistics from script via SNMP
 
 $options   = "-O qv";
 $oid       = "nsExtendOutputFull.9.115.104.111.117.116.99.97.115.116";

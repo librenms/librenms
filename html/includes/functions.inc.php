@@ -189,7 +189,7 @@ function generate_graph_popup($graph_array)
 {
   global $config;
 
-  /// Take $graph_array and print day,week,month,year graps in overlib, hovered over graph
+  // Take $graph_array and print day,week,month,year graps in overlib, hovered over graph
 
   $original_from = $graph_array['from'];
 

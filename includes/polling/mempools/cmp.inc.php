@@ -2,7 +2,7 @@
 
 $oid = $mempool['mempool_index'];
 
-/// FIXME snmp_get
+// FIXME snmp_get
 $pool_cmd  = $config['snmpget'] . " -M ".$config['mibdir']. " -m CISCO-MEMORY-POOL-MIB -O Uqnv " . snmp_gen_auth($device) . " " . $device['hostname'].":".$device['port'];
 $pool_cmd .= " ciscoMemoryPoolUsed.$oid ciscoMemoryPoolFree.$oid ciscoMemoryPoolLargestFree.$oid";
 $pool_cmd .= " | cut -f 1 -d ' '";

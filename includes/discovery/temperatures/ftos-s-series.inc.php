@@ -1,6 +1,6 @@
 <?php
 
-/// Force10 S-Series
+// Force10 S-Series
 
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitTemp.1 = Gauge32: 47
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitModelID.1 = STRING: S25-01-GE-24V

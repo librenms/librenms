@@ -1,9 +1,9 @@
 <?php
 
 ///
-///  Hardcoded discovery of cpu usage on Fortigate devices.
+//  Hardcoded discovery of cpu usage on Fortigate devices.
 ///
-///  FORTINET-FORTIGATE-MIB::fgSysCpuUsage.0
+//  FORTINET-FORTIGATE-MIB::fgSysCpuUsage.0
 
 if ($device['os'] == "fortigate")
 {

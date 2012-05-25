@@ -12,7 +12,7 @@ foreach (dbFetchRows("SELECT * FROM toner where device_id = ?", array($device['d
 
   if ($colour['left'] == NULL)
   {
-    /// FIXME generic colour function
+    // FIXME generic colour function
     switch ($iter)
     {
       case "1":

@@ -15,7 +15,7 @@ if (strstr($poll_device['sysDescr'], "EM64"))    { $hardware = "Intel x64"; }
 if (strstr($poll_device['sysDescr'], "AMD64"))   { $hardware = "AMD x64"; }
 if (strstr($poll_device['sysDescr'], "Intel64")) { $hardware = "Intel x64"; }
 
-if($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.1") { /// Workstation
+if($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.1") { // Workstation
 
   if (strstr($poll_device['sysDescr'], "Build Number: 1057")) { $version = "NT 3.51 Workstation"; }
   if (strstr($poll_device['sysDescr'], "Build Number: 1381")) { $version = "NT 4.0 Workstation"; }
@@ -28,7 +28,7 @@ if($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.1") { /// Workstatio
   if (strstr($poll_device['sysDescr'], "Build 7600"))         { $version = "7 (NT 6.1)"; }
   if (strstr($poll_device['sysDescr'], "Build 7601"))         { $version = "7 SP1 (NT 6.1)"; }
 
-} elseif ($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.2") { /// Server
+} elseif ($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.2") { // Server
 
   if (strstr($poll_device['sysDescr'], "Build Number: 1057")) { $version = "NT Server 3.51"; }
   if (strstr($poll_device['sysDescr'], "Build Number: 1381")) { $version = "NT Server 4.0"; }
@@ -39,7 +39,7 @@ if($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.1") { /// Workstatio
   if (strstr($poll_device['sysDescr'], "Build 7600"))         { $version = "Server 2008 R2 (NT 6.1)"; }
   if (strstr($poll_device['sysDescr'], "Build 7601"))         { $version = "Server 2008 R2 SP1 (NT 6.1)"; }
 
-} elseif ($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.3") { /// Datacentre Server
+} elseif ($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.3") { // Datacentre Server
 
   if (strstr($poll_device['sysDescr'], "Build Number: 1057")) { $version = "NT Datacenter 3.51"; }
   if (strstr($poll_device['sysDescr'], "Build Number: 1381")) { $version = "NT Datacenter 4.0"; }
@@ -55,7 +55,7 @@ if($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.1") { /// Workstatio
 if (strstr($poll_device['sysDescr'], "Uniprocessor"))   { $features = "Uniprocessor"; }
 if (strstr($poll_device['sysDescr'], "Multiprocessor")) { $features = "Multiprocessor"; }
 
-/// Detect processor type? : I.E.  x86 Family 15 Model 2 Stepping 7
+// Detect processor type? : I.E.  x86 Family 15 Model 2 Stepping 7
 
 // Detect Dell hardware via OpenManage SNMP
 $hw = snmp_get($device, ".1.3.6.1.4.1.674.10892.1.300.10.1.9.1", "-Oqv", "MIB-Dell-10892");

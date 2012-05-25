@@ -1,6 +1,6 @@
 <?php
 
-/// HOST-RESOURCES-MIB
+// HOST-RESOURCES-MIB
 //  Generic System Statistics
 
 $oid_list = "hrSystemProcesses.0 hrSystemNumUsers.0";

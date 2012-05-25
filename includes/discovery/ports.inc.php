@@ -1,21 +1,21 @@
 <?php
 
-/// Build SNMP Cache Array
+// Build SNMP Cache Array
 
 $port_stats = array();
 $port_stats = snmpwalk_cache_oid($device, "ifDescr", $port_stats, "IF-MIB");
 $port_stats = snmpwalk_cache_oid($device, "ifName", $port_stats, "IF-MIB");
 $port_stats = snmpwalk_cache_oid($device, "ifType", $port_stats, "IF-MIB");
 
-/// End Building SNMP Cache Array
+// End Building SNMP Cache Array
 
 if ($debug) { print_r($port_stats); }
 
-/// Build array of ports in the database
+// Build array of ports in the database
 
-/// FIXME -- this stuff is a little messy, looping the array to make an array just seems wrong. :>
-///       -- i can make it a function, so that you don't know what it's doing.
-///       -- $ports_db = adamasMagicFunction($ports_db); ?
+// FIXME -- this stuff is a little messy, looping the array to make an array just seems wrong. :>
+//       -- i can make it a function, so that you don't know what it's doing.
+//       -- $ports_db = adamasMagicFunction($ports_db); ?
 
 foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($device['device_id'])) as $port)
 {
@@ -23,10 +23,10 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($devic
   $ports_db_l[$port['ifIndex']] = $port['port_id'];
 }
 
-/// New interface detection
+// New interface detection
 foreach ($port_stats as $ifIndex => $port)
 {
-  /// Check the port against our filters.
+  // Check the port against our filters.
   if (is_port_valid($port, $device))
   {
     if (!is_array($ports_db[$ifIndex]))
@@ -41,7 +41,7 @@ foreach ($port_stats as $ifIndex => $port)
     } else {
       echo(".");
     }
-    /// We've seen it. Remove it from the cache.
+    // We've seen it. Remove it from the cache.
     unset($ports_l[$ifIndex]);
   } else {
     if (is_array($ports_db[$port['ifIndex']])) {
@@ -55,10 +55,10 @@ foreach ($port_stats as $ifIndex => $port)
     echo("X");
   }
 }
-/// End New interface detection
+// End New interface detection
 
-/// Interface Deletion
-/// If it's in our $ports_l list, that means it's not been seen. Mark it deleted.
+// Interface Deletion
+// If it's in our $ports_l list, that means it's not been seen. Mark it deleted.
 foreach ($ports_l as $ifIndex => $port_id)
 {
   if ($ports_db[$ifIndex]['deleted'] == "0")
@@ -67,10 +67,10 @@ foreach ($ports_l as $ifIndex => $port_id)
     echo("-".$ifIndex);
   }
 }
-/// End interface deletion
+// End interface deletion
 echo("\n");
 
-/// Clear Variables Here
+// Clear Variables Here
 unset($port_stats);
 unset($ports_db);
 unset($ports_db_db);

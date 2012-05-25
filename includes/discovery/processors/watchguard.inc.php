@@ -1,9 +1,9 @@
 <?php
 
 ///
-///  Hardcoded discovery of cpu usage on WatchGuard devices.
+//  Hardcoded discovery of cpu usage on WatchGuard devices.
 ///
-///  WATCHGUARD-SYSTEM-STATISTICS-MIB::wgSystemCpuUtil5.0 = COUNTER: 123
+//  WATCHGUARD-SYSTEM-STATISTICS-MIB::wgSystemCpuUtil5.0 = COUNTER: 123
 
 if ($device['os'] == "firebox")
 {

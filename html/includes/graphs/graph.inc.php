@@ -16,7 +16,7 @@ if(is_numeric($vars['device']))
   $device = device_by_name($vars['device']);
 }
 
-/// FIXME -- remove these
+// FIXME -- remove these
 
 $width    = $vars['width'];
 $height   = $vars['height'];
@@ -43,7 +43,7 @@ if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.p
 
   if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs'])
   {
-    $auth = "1"; /// hardcode auth for all with config function
+    $auth = "1"; // hardcode auth for all with config function
   }
 
   if (isset($config['allow_unauth_graphs_cidr']) && count($config['allow_unauth_graphs_cidr']) > 0)
@@ -109,12 +109,12 @@ function graph_error($string)
 
 
 if ($error_msg) {
-  /// We have an error :(
+  // We have an error :(
 
   graph_error($graph_error);
 
 } elseif (!$auth) {
-  /// We are unauthenticated :(
+  // We are unauthenticated :(
 
   if ($width < 200)
   {

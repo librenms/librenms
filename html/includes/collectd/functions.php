@@ -502,7 +502,7 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 			$has_min = true;
 	}
 
-        /// Build legend. This may not work for all RRDs, i don't know :)
+        // Build legend. This may not work for all RRDs, i don't know :)
         if ($has_avg)
                 $graph[] = "COMMENT:           Last";
         if ($has_min)

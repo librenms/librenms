@@ -10,7 +10,7 @@ if ($used_sensors['current']) $datas[] = 'current';
 if ($used_sensors['power']) $datas[] = 'power';
 if ($used_sensors['dBm']) $datas[] = 'dBm';
 
-/// FIXME generalize -> static-config ?
+// FIXME generalize -> static-config ?
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
 $type_text['humidity'] = "Humidity";

@@ -2,16 +2,16 @@
 
 echo("Processors : ");
 
-/// Include all discovery modules
+// Include all discovery modules
 
 $include_dir = "includes/discovery/processors";
 include("includes/include-dir.inc.php");
 
-/// Last-resort discovery here
+// Last-resort discovery here
 
 include("processors-ucd-old.inc.php");
 
-/// Remove processors which weren't redetected here
+// Remove processors which weren't redetected here
 
 $sql = "SELECT * FROM `processors` WHERE `device_id`  = '".$device['device_id']."'";
 $query = mysql_query($sql);

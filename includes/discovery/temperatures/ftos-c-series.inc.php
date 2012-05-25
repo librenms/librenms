@@ -1,6 +1,6 @@
 <?php
 
-/// Force10 C-Series
+// Force10 C-Series
 
 #F10-C-SERIES-CHASSIS-MIB::chSysCardType.1 = INTEGER: lc4802E48TB(1024)
 #F10-C-SERIES-CHASSIS-MIB::chSysCardType.2 = INTEGER: lc0810EX8PB(2049)

@@ -1,6 +1,6 @@
 <?php
 
-/// FIXME there's a delete port function in the functions... merge?!
+// FIXME there's a delete port function in the functions... merge?!
 function delete_port($port_id)
 {
    $ipaddrs = mysql_query("SELECT * FROM `ipaddr` WHERE `port_id` = '$port_id'");

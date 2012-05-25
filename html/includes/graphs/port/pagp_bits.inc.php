@@ -1,6 +1,6 @@
 <?php
 
-/// Generate a list of ports and then call the multi_bits grapher to generate from the list
+// Generate a list of ports and then call the multi_bits grapher to generate from the list
 
 $i=0;
 foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `pagpGroupIfIndex` = ?", array($port['device_id'], $port['ifIndex'])) as $int)

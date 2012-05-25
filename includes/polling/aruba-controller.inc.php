@@ -6,7 +6,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos')
   echo("Aruba Controller: ");
   $polled = time();
 
-  //// Build SNMP Cache Array
+  /// Build SNMP Cache Array
 	
   //stuff about the controller
   $switch_info_oids = array('wlsxSwitchRole','wlsxSwitchMasterIp');

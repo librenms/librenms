@@ -2,33 +2,33 @@
 
 echo("VLANs:\n");
 
-/// Pre-cache the existing state of VLANs for this device from the database
+// Pre-cache the existing state of VLANs for this device from the database
 $vlans_db_raw = dbFetchRows("SELECT * FROM `vlans` WHERE `device_id` = ?", array($device['device_id']));
 foreach ($vlans_db_raw as $vlan_db)
 {
   $vlans_db[$vlan_db['vlan_domain']][$vlan_db['vlan_vlan']] = $vlan_db;
 }
 
-/// Create an empty array to record what VLANs we discover this session.
+// Create an empty array to record what VLANs we discover this session.
 $device['vlans'] = array();
 
 include("includes/discovery/vlans/q-bridge-mib.inc.php");
 include("includes/discovery/vlans/cisco-vtp.inc.php");
 
-/// Fetch switchport <> VLAN relationships. This is DIRTY.
+// Fetch switchport <> VLAN relationships. This is DIRTY.
 foreach ($device['vlans'] as $domain_id => $vlans)
 {
   foreach ($vlans as $vlan_id => $vlan)
   {
-  /// Pull Tables for this VLAN
+  // Pull Tables for this VLAN
 
     #/usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/observium/mibs/ udp:sw2.ahf:161 dot1dStpPortEntry
     #/usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/observium/mibs/ udp:sw2.ahf:161 dot1dBasePortEntry
 
-    /// FIXME - do this only when vlan type == ethernet?
-    if (is_numeric($vlan_id) && ($vlan_id <1002 || $vlan_id > 1105)) /// Ignore reserved VLAN IDs
+    // FIXME - do this only when vlan type == ethernet?
+    if (is_numeric($vlan_id) && ($vlan_id <1002 || $vlan_id > 1105)) // Ignore reserved VLAN IDs
     {
-      if ($device['os_group'] == "cisco" || $device['os'] == "ios")  /// This shit only seems to work on IOS
+      if ($device['os_group'] == "cisco" || $device['os'] == "ios")  // This shit only seems to work on IOS
       {
         # Probably does not work with snmpv3. I have no real idea about what this code is really doing
         $vlan_device = array_merge($device, array('community' => $device['community']."@".$vlan_id));
