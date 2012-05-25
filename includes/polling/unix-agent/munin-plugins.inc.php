@@ -1,6 +1,6 @@
 <?php
 
-  /// Plugins
+  // Plugins
   if (!empty($agent_data['munin']))
   {
     echo("Munin Plugins:");

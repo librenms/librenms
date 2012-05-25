@@ -2,9 +2,9 @@
 
 include("includes/javascript-interfacepicker.inc.php");
 
-/// This needs more verification. Is it already added? Does it exist?
+// This needs more verification. Is it already added? Does it exist?
 
-/// Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
+// Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
 
 $base = $config["billing"]["base"];
 

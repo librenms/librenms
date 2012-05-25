@@ -4,7 +4,7 @@ echo("Polling SNOM device...\n");
 
 // Get SNOM specific version string from silly SNOM location. Silly SNOM!
 
-/// FIXME - This needs a good cleanup...
+// FIXME - This needs a good cleanup...
 
 $cmd      = "snmpget -O qv " . snmp_gen_auth($device) . " " . $device['hostname'].":".$device['port'] . " 1.3.6.1.2.1.7526.2.4";
 $poll_device['sysDescr'] = `$cmd`;

@@ -1,6 +1,6 @@
 <?php
 
-/// FIXME should do the deletion etc in a common file perhaps? like for the sensors
+// FIXME should do the deletion etc in a common file perhaps? like for the sensors
 
 /*
  * Try to discover any Virtual Machines.
@@ -76,11 +76,11 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
       {
         mysql_query("INSERT INTO vminfo (device_id, vm_type, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState) VALUES (" . $device["device_id"] . ",'vmware', " . $oid . ", '" . mres($vmwVmDisplayName) . "', '" . mres($vmwVmGuestOS) . "', " . $vmwVmMemSize . ", " . $vmwVmCpus . ", '" . mres($vmwVmState) . "')");
         echo("+");
-        /// FIXME eventlog
+        // FIXME eventlog
       } else {
         echo(".");
       }
-      /// FIXME update code!
+      // FIXME update code!
 
       /*
        * Save the discovered Virtual Machine.
@@ -106,7 +106,7 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
     {
       mysql_query("DELETE FROM vminfo WHERE id = '" . $db_vm["id"] . "'");
       echo("-");
-      /// FIXME eventlog
+      // FIXME eventlog
     }
   }
 

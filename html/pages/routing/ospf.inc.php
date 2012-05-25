@@ -5,7 +5,7 @@ $i_i = "0";
 echo('<table width=100% border=0 cellpadding=10>');
 echo('<tr><th>Device</th><th>Router Id</th><th>Status</th><th>ABR</th><th>ASBR</th><th>Areas</th><th>Ports</th><th>Neighbours</th></tr>');
 
-/// Loop Instances
+// Loop Instances
 
 foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'") as $instance)
 {
@@ -40,7 +40,7 @@ foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `ospfAdminStat` = 'en
   echo('</tr>');
 
   $i_i++;
-} /// End loop instances
+} // End loop instances
 
 echo('</table>');
 

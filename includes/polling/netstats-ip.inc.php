@@ -4,7 +4,7 @@ if ($device['os'] != "Snom")
 {
   echo(" IP");
 
-  /// These are at the start of large trees that we don't want to walk the entirety of, so we snmp_get_multi them
+  // These are at the start of large trees that we don't want to walk the entirety of, so we snmp_get_multi them
 
   $oids = array ('ipForwDatagrams','ipInDelivers','ipInReceives','ipOutRequests','ipInDiscards','ipOutDiscards','ipOutNoRoutes',
                  'ipReasmReqds','ipReasmOKs','ipReasmFails','ipFragOKs','ipFragFails','ipFragCreates', 'ipInUnknownProtos',

@@ -1,6 +1,6 @@
 <?php
 
-/// FIXME -- we're walking, so we can discover here too.
+// FIXME -- we're walking, so we can discover here too.
 
 if ($device['os_group'] == "cisco")
 {
@@ -43,7 +43,7 @@ if ($device['os_group'] == "cisco")
 
       $this_ma = &$cip_array[$ifIndex][$mac];
 
-      /// Update metrics
+      // Update metrics
       foreach ($cip_oids as $oid)
       {
         foreach (array('input','output') as $dir)
@@ -80,9 +80,9 @@ if ($device['os_group'] == "cisco")
       $ret = rrdtool_update("$rrdfile", $rrdupdate);
 
       if ($acc['update'])
-      { /// Do Updates
+      { // Do Updates
         dbUpdate($acc['update'], 'mac_accounting', '`ma_id` = ?', array($acc['ma_id']));
-      } /// End Updates
+      } // End Updates
     }
   }
 

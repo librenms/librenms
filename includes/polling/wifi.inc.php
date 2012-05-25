@@ -13,7 +13,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall')
 
     echo($wificlients1 . " clients\n");
 
-    /// FIXME Also interesting to poll? dhcpNumber.0 for number of active dhcp leases
+    // FIXME Also interesting to poll? dhcpNumber.0 for number of active dhcp leases
   }
 
   if ($device['os'] == 'ios' and substr($device['hardware'],0,4) == 'AIR-')

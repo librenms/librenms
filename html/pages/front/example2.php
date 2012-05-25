@@ -106,7 +106,7 @@ echo("</div>
    </td>
    <td bgcolor=#e5e5e5 width=275 valign=top>");
 
-/// this stuff can be customised to show whatever you want....
+// this stuff can be customised to show whatever you want....
 
 if ($_SESSION['userlevel'] >= '5')
 {
@@ -169,7 +169,7 @@ if ($_SESSION['userlevel'] >= '5')
 
 }
 
-/// END VOSTRON
+// END VOSTRON
 
 ?>
 </td>

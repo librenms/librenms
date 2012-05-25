@@ -1,6 +1,6 @@
 <?php
 
-/// Polls powerdns statistics from script via SNMP
+// Polls powerdns statistics from script via SNMP
 
 $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-powerdns-".$app['app_id'].".rrd";
 $options       = "-O qv";

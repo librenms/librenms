@@ -3,7 +3,7 @@
 # We're discovering this MIB
 # snmpwalk -v2c -c <community> <hostname> -M mibs/junose/ -m Juniper-UNI-ATM-MIB juniAtmVpStatsEntry
 
-/// JunOSe ATM vps
+// JunOSe ATM vps
 if ($device['os'] == "junose" && $config['enable_ports_junoseatmvp'])
 {
   echo("JunOSe ATM vps : ");
@@ -23,12 +23,12 @@ if ($device['os'] == "junose" && $config['enable_ports_junoseatmvp'])
       {
         discover_juniAtmvp($valid_vp, $port_id, $vp_id, NULL);
       }
-    } /// End Foreach
-  } /// End if array
+    } // End Foreach
+  } // End if array
 
   unset ($vp_array);
 
-  /// Remove ATM vps which weren't redetected here
+  // Remove ATM vps which weren't redetected here
 
   $sql = "SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id`  = '".$device['device_id']."' AND J.port_id = P.port_id";
   $query = mysql_query($sql);

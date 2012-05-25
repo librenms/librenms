@@ -1,6 +1,6 @@
 <?php
 
-/// FIXME - this is lame
+// FIXME - this is lame
 if(!empty($agent_data['app']['mysql']))
 {
   $mysql = $agent_data['app']['mysql'];
@@ -25,7 +25,7 @@ foreach ($data as $str)
   #$nstring .= (float)trim($elements[1]).":";
 }
 
-/// General Stats
+// General Stats
 
 $mapping = array(
         'IDBLBSe' => 'cr',
@@ -203,7 +203,7 @@ if (!is_file($mysql_rrd))
 
 rrdtool_update($mysql_rrd, "N:$string");
 
-/// Process state statistics
+// Process state statistics
 
 $mysql_status_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id']."-status.rrd";
 

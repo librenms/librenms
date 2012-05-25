@@ -28,7 +28,7 @@
     if (!empty($hrSystemUptime) && !strpos($hrSystemUptime, "No") && ($device['os'] != "windows"))
     {
       echo("Using hrSystemUptime (".$hrSystemUptime.")\n");
-      $agent_uptime = $uptime; /// Move uptime into agent_uptime
+      $agent_uptime = $uptime; // Move uptime into agent_uptime
       #HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (63050465) 7 days, 7:08:24.65
       $hrSystemUptime = str_replace("(", "", $hrSystemUptime);
       $hrSystemUptime = str_replace(")", "", $hrSystemUptime);
@@ -83,7 +83,7 @@
 
   $poll_device['sysLocation'] = str_replace("\"","", $poll_device['sysLocation']);
 
-  /// Rewrite sysLocation if there is a mapping array (database too?)
+  // Rewrite sysLocation if there is a mapping array (database too?)
   if (!empty($poll_device['sysLocation']) && is_array($config['location_map']))
   {
     $poll_device['sysLocation'] = rewrite_location($poll_device['sysLocation']);

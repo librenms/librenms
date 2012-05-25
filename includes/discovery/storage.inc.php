@@ -2,12 +2,12 @@
 
 echo("Storage : ");
 
-/// Include all discovery modules
+// Include all discovery modules
 
 $include_dir = "includes/discovery/storage";
 include("includes/include-dir.inc.php");
 
-/// Remove storage which weren't redetected here
+// Remove storage which weren't redetected here
 
 $sql = "SELECT * FROM `storage` WHERE `device_id`  = '".$device['device_id']."'";
 $query = mysql_query($sql);

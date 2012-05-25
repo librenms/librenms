@@ -4,7 +4,7 @@ $i_i = "0";
 
 echo('<table width=100% border=0 cellpadding=5>');
 
-/// Loop Instances
+// Loop Instances
 
 foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `device_id` = ?", array($device['device_id'])) as $instance)
 {
@@ -96,11 +96,11 @@ foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `device_id` = ?", arr
     echo('</tr>');
 
     $i_a++;
-  } /// End loop areas
+  } // End loop areas
 
   echo('<tr bgcolor="#ffffff"><th></th><th>Router Id</th><th>Device</th><th>IP Address</th><th>Status</th></tr>');
 
-  /// Loop Neigbours
+  // Loop Neigbours
   $i_n = 1;
   foreach (dbFetchRows("SELECT * FROM `ospf_nbrs` WHERE `device_id` = ?", array($device['device_id'])) as $nbr)
   {
@@ -141,7 +141,7 @@ foreach (dbFetchRows("SELECT * FROM `ospf_instances` WHERE `device_id` = ?", arr
   echo('</tr>');
 
   $i_i++;
-} /// End loop instances
+} // End loop instances
 
 echo('</table>');
 

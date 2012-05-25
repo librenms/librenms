@@ -11,7 +11,7 @@ foreach (dbFetchRows("SELECT * FROM mempools WHERE device_id = ?", array($device
   {
     include($file);
   } else {
-    /// Do we need a generic mempool poller?
+    // Do we need a generic mempool poller?
   }
 
   if ($mempool['total'])

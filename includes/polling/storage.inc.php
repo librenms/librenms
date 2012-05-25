@@ -18,7 +18,7 @@ foreach (dbFetchRows("SELECT * FROM storage WHERE device_id = ?", array($device[
   {
     include($file);
   } else {
-    /// Generic poller goes here if we ever have a discovery module which uses it.
+    // Generic poller goes here if we ever have a discovery module which uses it.
   }
 
   if ($debug) {print_r($storage); }

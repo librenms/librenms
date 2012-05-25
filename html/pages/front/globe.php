@@ -95,7 +95,7 @@ $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id
 $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
 }
 
-/// These things need to become more generic, and more manageable across different frontpages... rewrite inc :>
+// These things need to become more generic, and more manageable across different frontpages... rewrite inc :>
 
 if ($config['warn']['ifdown'])
 {
@@ -164,7 +164,7 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
 
 if ($config['enable_syslog'])
 {
-  /// Open Syslog Div
+  // Open Syslog Div
   echo("<div style='margin: 4px; clear: both; padding: 5px;'>
     <h3>Recent Syslog Messages</h3>
   ");
@@ -180,11 +180,11 @@ if ($config['enable_syslog'])
   }
   echo("</table>");
 
-  echo("</div>"); /// Close Syslog Div
+  echo("</div>"); // Close Syslog Div
 
 } else {
 
-  /// Open eventlog Div
+  // Open eventlog Div
   echo("<div style='margin: 4px; clear: both; padding: 5px;'>
     <h3>Recent Eventlog Entries</h3>
   ");
@@ -206,7 +206,7 @@ if ($config['enable_syslog'])
   }
 
   echo("</table>");
-  echo("</div>"); /// Close Syslog Div
+  echo("</div>"); // Close Syslog Div
 }
 
 echo("</div>");

@@ -1,7 +1,7 @@
 <?php
 
-/// Draw generic bits graph
-/// args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, previous
+// Draw generic bits graph
+// args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, previous
 
 include("includes/graphs/common.inc.php");
 

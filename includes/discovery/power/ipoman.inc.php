@@ -1,11 +1,11 @@
 <?php
 
-/// IPOMANII-MIB
+// IPOMANII-MIB
 if ($device['os'] == "ipoman")
 {
   echo(" IPOMANII-MIB ");
 
-/// Inlet Disabled due to the fact thats it's Kwh instead of just Watt
+// Inlet Disabled due to the fact thats it's Kwh instead of just Watt
 
   if (!is_array($cache['ipoman']))
   {
@@ -35,7 +35,7 @@ if ($device['os'] == "ipoman")
 #      $power = $entry['inletStatusWH'] / $divisor;
 #
 #      discover_sensor($valid['sensor'], 'power', $device, $cur_oid, '1.3.1.3.'.$index, 'ipoman', $descr, $divisor, '1', NULL, NULL, NULL, NULL, $power);
-#      /// FIXME: iPoMan 1201 also says it has 2 inlets, at least until firmware 1.06 - wtf?
+#      // FIXME: iPoMan 1201 also says it has 2 inlets, at least until firmware 1.06 - wtf?
 #    }
 #  }
 

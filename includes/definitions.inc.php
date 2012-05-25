@@ -33,7 +33,7 @@ $config['os'][$os]['over'][1]['text']   = "Processor Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
-/// Linux-based OSes here please.
+// Linux-based OSes here please.
 
 $os = "linux";
 $config['os'][$os]['type']              = "server";
@@ -77,7 +77,7 @@ $config['os'][$os]['over'][1]['text']   = "Processor Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
-/// Other Unix-based OSes here please.
+// Other Unix-based OSes here please.
 
 $os = "freebsd";
 $config['os'][$os]['type']              = "server";
@@ -135,7 +135,7 @@ $config['os'][$os]['type']              = "server";
 $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['text']              = "OpenIndiana";
 
-/// Alcatel
+// Alcatel
 
 $os = "aos";
 $config['os'][$os]['group']             = "aos";
@@ -156,7 +156,7 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['icon']              = "alcatellucent";
 
-/// Cisco OSes
+// Cisco OSes
 
 $os = "ios";
 $config['os'][$os]['group']             = "cisco";
@@ -283,7 +283,7 @@ $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
-/// Cisco Small Business
+// Cisco Small Business
 
 $os = "ciscosb";
 $config['os'][$os]['group']             = "cisco";
@@ -294,7 +294,7 @@ $config['os'][$os]['icon']              = "linksys";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
-/// Huawei
+// Huawei
 
 $os = "vrp";
 $config['os'][$os]['group']             = "vrp";
@@ -302,7 +302,7 @@ $config['os'][$os]['text']              = "Huawei VRP";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "huawei";
 
-/// ZTE
+// ZTE
 
 $os = "zxr10";
 $config['os'][$os]['group']             = "zxr10";
@@ -310,7 +310,7 @@ $config['os'][$os]['text']              = "ZTE ZXR10";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "zte";
 
-/// Supermicro Switch
+// Supermicro Switch
 
 $os = "supermicro-switch";
 $config['os'][$os]['group']             = "supermicro";
@@ -925,7 +925,7 @@ foreach ($config['os'] as $this_os => $blah)
   }
 }
 
-/// Graph Types
+// Graph Types
 
 $config['graph_sections'] = array('general', 'system', 'firewall', 'netstats', 'wireless', 'storage', 'vpdn', 'load balancer');
 
@@ -1075,7 +1075,7 @@ $config['graph_types']['device']['netscaler_tcp_pkts']['descr'] = 'TCP Packets';
 $config['graph_descr']['device_smokeping_in_all'] = "This is an aggregate graph of the incoming smokeping tests to this host. The line corresponds to the average RTT. The shaded area around each line denotes the standard deviation.";
 $config['graph_descr']['device_processor']        = "This is an aggregate graph of all processors in the system.";
 
-/// Device Types
+// Device Types
 
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
@@ -1183,7 +1183,7 @@ if (isset($_SERVER['HTTPS']))
   $config['base_url'] = preg_replace('/^http:/','https:', $config['base_url']);
 }
 
-/// Connect to database
+// Connect to database
 $observium_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
 if (!$observium_link)
 {
@@ -1233,7 +1233,7 @@ $config['ipmi_unit']['RPM']       = 'fanspeed';
 $config['ipmi_unit']['Watts']     = 'power';
 $config['ipmi_unit']['discrete']  = '';
 
-/// INCLUDE THE VMWARE DEFINITION FILE.
+// INCLUDE THE VMWARE DEFINITION FILE.
 require_once("vmware_guestid.inc.php");
 
 ?>

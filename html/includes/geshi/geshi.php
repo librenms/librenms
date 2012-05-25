@@ -2972,7 +2972,7 @@ class GeSHi {
      * @access private
      */
     function indent(&$result) {
-        /// Replace tabs with the correct number of spaces
+        // Replace tabs with the correct number of spaces
         if (false !== strpos($result, "\t")) {
             $lines = explode("\n", $result);
             $result = null;//Save memory while we process the lines individually

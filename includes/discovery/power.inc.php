@@ -2,7 +2,7 @@
 
 echo("Power: ");
 
-/// Include all discovery modules
+// Include all discovery modules
 
 $include_dir = "includes/discovery/power";
 include("includes/include-dir.inc.php");

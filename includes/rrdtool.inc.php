@@ -205,7 +205,7 @@ function rrdtool_create($filename, $options)
 
 function rrdtool_update($filename, $options)
 {
-  /// Do some sanitisation on the data if passed as an array.
+  // Do some sanitisation on the data if passed as an array.
   if (is_array($options))
   {
     $values[] = "N";
@@ -249,7 +249,7 @@ function rrdtool_escape($string, $maxlength = NULL)
   $result = str_replace(':','\:',$string);
   $result = str_replace('%','%%',$result);
 
-  /// FIXME: should maybe also probably escape these? # \ + ? [ ^ ] ( $ ) '
+  // FIXME: should maybe also probably escape these? # \ + ? [ ^ ] ( $ ) '
   
   if ($maxlength != NULL)
   {

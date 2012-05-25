@@ -7,7 +7,7 @@ if ($config['enable_pseudowires'] && $device['os_group'] == "cisco")
 
   echo("Cisco Pseudowires : ");
 
-  /// Pre-cache the existing state of pseudowires for this device from the database
+  // Pre-cache the existing state of pseudowires for this device from the database
   $pws_db_raw = dbFetchRows("SELECT * FROM `pseudowires` WHERE `device_id` = ?", array($device['device_id']));
   foreach ($pws_db_raw as $pw_db)
   {
@@ -21,7 +21,7 @@ if ($config['enable_pseudowires'] && $device['os_group'] == "cisco")
   $pws = snmpwalk_cache_oid($device, "cpwVcPsnType", $pws, "CISCO-IETF-PW-MPLS-MIB");
   $pws = snmpwalk_cache_oid($device, "cpwVcDescr", $pws, "CISCO-IETF-PW-MPLS-MIB");
 
-  /// For MPLS pseudowires
+  // For MPLS pseudowires
   $pws = snmpwalk_cache_oid($device, "cpwVcMplsPeerLdpID", $pws, "CISCO-IETF-PW-MPLS-MIB");
 
   foreach ($pws as $pw_id => $pw)
@@ -44,7 +44,7 @@ if ($config['enable_pseudowires'] && $device['os_group'] == "cisco")
         $device['pws'][$pw['cpwVcID']] = $pseudowire_id;
   }
 
-  /// Cycle the list of pseudowires we cached earlier and make sure we saw them again.
+  // Cycle the list of pseudowires we cached earlier and make sure we saw them again.
   foreach ($device['pws_db'] as $pw_id => $pseudowire_id)
   {
     if (empty($device['pws'][$pw_id]))

@@ -3,7 +3,7 @@
 if ($device['os'] == "apc")
 {
   # Environmental monitoring on UPSes etc
-  /// FIXME emConfigProbesTable may also be used? But not filled out on my device...
+  // FIXME emConfigProbesTable may also be used? But not filled out on my device...
   $apc_env_data = snmpwalk_cache_oid($device, "iemConfigProbesTable", array(), "PowerNet-MIB");
   $apc_env_data = snmpwalk_cache_oid($device, "iemStatusProbesTable", $apc_env_data, "PowerNet-MIB");
 

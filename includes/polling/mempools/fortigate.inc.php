@@ -1,7 +1,7 @@
 <?php
 
-/// Simple hard-coded poller for Fortinet Fortigate
-/// Yes, it really can be this simple.
+// Simple hard-coded poller for Fortinet Fortigate
+// Yes, it really can be this simple.
 
 echo "Fortigate MemPool";
 

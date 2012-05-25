@@ -1,6 +1,6 @@
 <?php
 
-/// JUNOS mempools
+// JUNOS mempools
 if ($device['os'] == "junos")
 {
   echo("JUNOS : ");
@@ -25,9 +25,9 @@ if ($device['os'] == "junos")
         {
           discover_mempool($valid_mempool, $device, $index, "junos", $descr, "1", NULL, NULL);
         }
-      } /// End if checks
-    } /// End Foreach
-  } /// End if array
+      } // End if checks
+    } // End Foreach
+  } // End if array
   else
   {
     $srx_mempools_array = snmpwalk_cache_multi_oid($device, "jnxJsSPUMonitoringMemoryUsage", $srx_mempools_array, "JUNIPER-SRX5000-SPU-MONITORING-MIB" , '+'.$config['install_dir']."/mibs/junos");
@@ -47,7 +47,7 @@ if ($device['os'] == "junos")
       }
     }
   }
-} /// End JUNOS mempools
+} // End JUNOS mempools
 
 unset ($mempools_array);
 unset ($srx_mempools_array);

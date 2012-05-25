@@ -1,6 +1,6 @@
 <?php
 
-/// Generate some statistics to send along with the version request.
+// Generate some statistics to send along with the version request.
 
 $stats['ports']        = dbFetchCell("SELECT count(*) FROM ports");
 $stats['devices']      = dbFetchCell("SELECT count(*) FROM devices");

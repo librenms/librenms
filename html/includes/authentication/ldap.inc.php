@@ -43,7 +43,7 @@ function authenticate($username,$password)
   }
   else
   {
-    /// FIXME return a warning that LDAP couldn't connect?
+    // FIXME return a warning that LDAP couldn't connect?
   }
 
   return 0;

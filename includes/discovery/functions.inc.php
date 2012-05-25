@@ -43,7 +43,7 @@ function discover_device($device, $options = NULL)
 {
   global $config, $valid;
 
-  $valid = array(); /// Reset $valid array
+  $valid = array(); // Reset $valid array
 
   $attribs = get_dev_attribs($device['device_id']);
 
@@ -69,7 +69,7 @@ function discover_device($device, $options = NULL)
 
   echo("\n");
 
-  /// If we've specified a module, use that, else walk the modules array
+  // If we've specified a module, use that, else walk the modules array
   if ($options['m'])
   {
     if (is_file("includes/discovery/".$options['m'].".inc.php"))
@@ -90,7 +90,7 @@ function discover_device($device, $options = NULL)
     }
   }
 
-  /// Set type to a predefined type for the OS if it's not already set
+  // Set type to a predefined type for the OS if it's not already set
 
   if ($device['type'] == "unknown" || $device['type'] == "")
   {
@@ -111,7 +111,7 @@ function discover_device($device, $options = NULL)
   echo("\n"); $discovered_devices++;
 }
 
-/// Discover sensors
+// Discover sensors
 function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL, $poller_type = 'snmp', $entPhysicalIndex = NULL, $entPhysicalIndex_measured = NULL)
 {
   global $config, $debug;

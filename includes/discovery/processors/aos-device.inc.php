@@ -1,6 +1,6 @@
 <?php
 
-///  Hardcoded discovery of device CPU usage on Alcatel-Lucent Omniswitches.
+//  Hardcoded discovery of device CPU usage on Alcatel-Lucent Omniswitches.
 
 if ($device['os'] == "aos")
 {

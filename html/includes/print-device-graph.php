@@ -3,7 +3,7 @@
 if(empty($graph_array['type'])) { $graph_array['type'] = $graph_type; }
 if(empty($graph_array['device']))   { $graph_array['device'] = $device['device_id']; }
 
-/// FIXME not css alternating yet
+// FIXME not css alternating yet
 if (!is_integer($g_i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
 echo('<div style="background-color: '.$row_colour.';">');

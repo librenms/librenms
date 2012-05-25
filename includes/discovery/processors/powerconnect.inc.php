@@ -1,9 +1,9 @@
 <?php
 
 ///
-///  Hardcoded discovery of cpu usage on Dell Powerconnect devices.
+//  Hardcoded discovery of cpu usage on Dell Powerconnect devices.
 ///
-///  Dell-Vendor-MIB::dellLanExtension.6132.1.1.1.1.4.4.0 = STRING: "5 Sec (6.99%),    1 Min (6.72%),   5 Min (9.06%)"
+//  Dell-Vendor-MIB::dellLanExtension.6132.1.1.1.1.4.4.0 = STRING: "5 Sec (6.99%),    1 Min (6.72%),   5 Min (9.06%)"
 
 if ($device['os'] == "powerconnect")
 {

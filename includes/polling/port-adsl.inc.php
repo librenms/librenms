@@ -1,7 +1,7 @@
 <?php
 
-/// Example snmpwalk with units
-/// "Interval" oids have been filtered out
+// Example snmpwalk with units
+// "Interval" oids have been filtered out
 # adslLineCoding.1 = dmt
 # adslLineType.1 = fastOrInterleaved
 # adslLineSpecific.1 = zeroDotZero
@@ -94,7 +94,7 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding']))
   $port['adsl_update'] = array('port_adsl_updated' => array('NOW()'));
   foreach ($adsl_db_oids as $oid)
   {
-    $data = str_replace("\"", "", $this_port[$oid]);  /// FIXME - do we need this?
+    $data = str_replace("\"", "", $this_port[$oid]);  // FIXME - do we need this?
     $port['adsl_update'][$oid] = $data;
   }
   dbUpdate($port['adsl_update'], 'ports_adsl', '`port_id` = ?', array($port['port_id']));
@@ -107,7 +107,7 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding']))
   {
     $oid = "adsl".$oid;
     $data = str_replace("\"", "", $this_port[$oid]);
-    /// Set data to be "unknown" if it's garbled, unexistant or zero
+    // Set data to be "unknown" if it's garbled, unexistant or zero
     if (!is_numeric($data)) { $data = "U"; }
     $rrdupdate .= ":$data";
   }

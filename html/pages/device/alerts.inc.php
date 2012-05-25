@@ -44,7 +44,7 @@ function get_entity_list($type, $subtype = "*", $device_id = "*", $entry)
 
   foreach ($entities_db as $entity_db)
   {
-    /// Is this entity marked as deleted?
+    // Is this entity marked as deleted?
     if ($entity_db['deleted'] != "1")
     {
       $entities[] = $entity_db['id'];
@@ -68,7 +68,7 @@ foreach ($glo_conditions as $type => $subtypes)
         echo('<td></td><td></td>');
         echo('</tr>');
 
-        /// Get which entities match this checker
+        // Get which entities match this checker
         $entities = get_entity_list($type, $subtype, $device['device_id'], $entry['entity']);
 
         if (!empty($entities))

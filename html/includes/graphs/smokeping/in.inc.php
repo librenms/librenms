@@ -2,9 +2,9 @@
 
 $src   = device_by_id_cache($_GET['src']);
 
-/// Dear Tobias. You write in Perl, this makes me hate you forever.
-/// This is my translation of Smokeping's graphing.
-/// Thanks to Bill Fenner for Perl->Human translation:>
+// Dear Tobias. You write in Perl, this makes me hate you forever.
+// This is my translation of Smokeping's graphing.
+// Thanks to Bill Fenner for Perl->Human translation:>
 
 $scale_min = 0;
 $scale_rigid = TRUE;
@@ -60,7 +60,7 @@ if($src['hostname'] == $config['own_hostname'])
   $rrd_options .= " CDEF:dm$i=median$i";
 #  $rrd_options .= " CDEF:dm$i=median$i,0,".$max->{$start}.",LIMIT";
 
-  /// start emulate Smokeping::calc_stddev
+  // start emulate Smokeping::calc_stddev
   foreach (range(1, $pings) as $p)
   {
     $rrd_options .= " DEF:pin".$i."p".$p."=".$filename.":ping".$p.":AVERAGE";

@@ -3,20 +3,20 @@
 
     ///////////////////////////////////////////////////////////////////////////////////////
     ///
-    ///      A small script to grab the NTPD Server statistics from a NTPD server
-    ///      Needed commands: php, ntpd, ntpq, ntpdc
+    //      A small script to grab the NTPD Server statistics from a NTPD server
+    //      Needed commands: php, ntpd, ntpq, ntpdc
     ///
-    ///      Install:
-    ///              Add the following to your snmpd.conf file:
-    ///              extend ntpdserver /opt/observium/scripts/ntpd-server.php
+    //      Install:
+    //              Add the following to your snmpd.conf file:
+    //              extend ntpdserver /opt/observium/scripts/ntpd-server.php
     ///
-    ///      Version 1.1 By:
-    ///              All In One - Dennis de Houx <info@all-in-one.be>
+    //      Version 1.1 By:
+    //              All In One - Dennis de Houx <info@all-in-one.be>
     ///
     ///////////////////////////////////////////////////////////////////////////////////////
 
 
-    /// START SETTINGS ///
+    // START SETTINGS ///
 
 	$ntpq		= "/usr/sbin/ntpq";
 	$ntpdc		= "/usr/sbin/ntpdc";
@@ -24,11 +24,11 @@
 	# Change this to true if you have clk_jitter, sys_jitter in the ntpq -c rv output
 	$newstats_style	= false;
 
-    /// END SETTINGS ///
+    // END SETTINGS ///
 
 
     ///
-    /// DO NOT EDIT BENETH THIS LINE
+    // DO NOT EDIT BENETH THIS LINE
     ///
     ///////////////////////////////////////////////////////////////////////////////////////
 

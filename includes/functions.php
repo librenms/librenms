@@ -12,12 +12,12 @@
  *
  */
 
-/// Include from PEAR
+// Include from PEAR
 
 include_once("Net/IPv4.php");
 include_once("Net/IPv6.php");
 
-/// Observium Includes
+// Observium Includes
 
 include_once($config['install_dir'] . "/includes/common.php");
 include_once($config['install_dir'] . "/includes/rrdtool.inc.php");
@@ -183,7 +183,7 @@ function renamehost($id, $new, $source = 'console')
 {
   global $config;
 
-  /// FIXME does not check if destination exists!
+  // FIXME does not check if destination exists!
   $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
   rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new");
   $return = dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
@@ -225,13 +225,13 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp')
   global $config;
 
   list($hostshort) = explode(".", $host);
-  /// Test Database Exists
+  // Test Database Exists
   if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0')
   {
-    /// Test DNS lookup
+    // Test DNS lookup
     if (gethostbyname($host) != $host)
     {
-      /// Test reachability
+      // Test reachability
       if (isPingable($host))
       {
         $added = 0;
@@ -283,7 +283,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp')
         }
         elseif ($snmpver === "v2c" or $snmpver === "v1")
         {
-          /// try each community from config
+          // try each community from config
           foreach ($config['snmp']['community'] as $community)
           {
             $device = deviceArray($host, $community, $snmpver, $port, $transport, NULL);
@@ -310,17 +310,17 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp')
 
         if (!$device_id)
         {
-          /// Failed SNMP
+          // Failed SNMP
           print_error("Could not reach $host with given SNMP community using $snmpver");
         }
       } else {
-        /// failed Reachability
+        // failed Reachability
         print_error("Could not ping $host"); }
     } else {
-      /// Failed DNS lookup
+      // Failed DNS lookup
       print_error("Could not resolve $host"); }
   } else {
-    /// found in database
+    // found in database
     print_error("Already got host $host");
   }
 

@@ -24,7 +24,7 @@ include("includes/discovery/functions.inc.php");
 $start = utime();
 $runtime_stats = array();
 
-/// Observium Device Discovery
+// Observium Device Discovery
 
 $options = getopt("h:m:i:n:d::a::q");
 

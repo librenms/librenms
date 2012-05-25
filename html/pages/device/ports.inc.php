@@ -70,7 +70,7 @@ if ($vars['view'] == 'minigraphs')
   echo("<div style='display: block; clear: both; margin: auto; min-height: 500px;'>");
   unset ($seperator);
 
-  /// FIXME - FIX THIS. UGLY.
+  // FIXME - FIX THIS. UGLY.
   foreach (dbFetchRows("select * from ports WHERE device_id = ? ORDER BY ifIndex", array($device['device_id'])) as $port)
   {
     echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
@@ -96,8 +96,8 @@ if ($vars['view'] == 'minigraphs')
   global $port_cache, $port_index_cache;
 
   $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' ORDER BY `ifIndex` ASC", array($device['device_id']));
-  /// As we've dragged the whole database, lets pre-populate our caches :)
-  /// FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
+  // As we've dragged the whole database, lets pre-populate our caches :)
+  // FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
   foreach ($ports as $port)
   {
     $port_cache[$port['port_id']] = $port;

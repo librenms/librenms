@@ -1,6 +1,6 @@
 <?php
 
-/// Common Functions
+// Common Functions
 
 function format_number_short($number, $sf)
 {
@@ -144,8 +144,8 @@ function get_all_devices($device, $type = "")
 {
   global $cache;
 
-  /// FIXME needs access control checks!
-  /// FIXME respect $type (server, network, etc) -- needs an array fill in topnav.
+  // FIXME needs access control checks!
+  // FIXME respect $type (server, network, etc) -- needs an array fill in topnav.
 
   if (isset($cache['devices']['hostname']))
   {
@@ -169,7 +169,7 @@ function port_by_id_cache($port_id)
 
 function table_from_entity_type($type)
 {
-  /// Fuck you, english pluralisation.
+  // Fuck you, english pluralisation.
   if ($type == "storage")
   {
     return $type;
@@ -275,7 +275,7 @@ function ifclass($ifOperStatus, $ifAdminStatus)
 
 function device_by_name($name, $refresh = 0)
 {
-  /// FIXME - cache name > id too.
+  // FIXME - cache name > id too.
   return device_by_id_cache(getidbyname($name), $refresh);
 }
 

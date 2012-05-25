@@ -4,7 +4,7 @@
 $badchars = array("(", ")", ",");
 list(,,$hardware,,$version,) = str_replace($badchars, "", explode (" ", $poll_device['sysDescr']));
 
-//// Build SNMP Cache Array
+/// Build SNMP Cache Array
 
 //stuff about the controller
 $switch_info_oids = array('wlsxSwitchRole','wlsxSwitchMasterIp');

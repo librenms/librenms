@@ -7,11 +7,11 @@ $link_array = array('page'    => 'device',
 #$type_text['overview'] = "Overview";
 $type_text['ipsec_tunnels'] = "IPSEC Tunnels";
 
-/// Cisco ACE
+// Cisco ACE
 $type_text['loadbalancer_rservers'] = "Rservers";
 $type_text['loadbalancer_vservers'] = "Serverfarms";
 
-/// Citrix Netscaler
+// Citrix Netscaler
 $type_text['netscaler_vsvr'] = "VServers";
 
 $type_text['bgp'] = "BGP";

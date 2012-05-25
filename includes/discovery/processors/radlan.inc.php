@@ -1,7 +1,7 @@
 <?php
 
 ///
-///  Hardcoded discovery of cpu usage on RADLAN devices.
+//  Hardcoded discovery of cpu usage on RADLAN devices.
 ///
 
 if ($device['os'] == "radlan")

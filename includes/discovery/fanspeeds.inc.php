@@ -2,7 +2,7 @@
 
 echo("Fanspeeds : ");
 
-/// Include all discovery modules
+// Include all discovery modules
 
 $include_dir = "includes/discovery/fanspeeds";
 include("includes/include-dir.inc.php");

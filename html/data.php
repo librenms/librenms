@@ -12,7 +12,7 @@
  *
  */
 
-/// FIXME - fewer includes!
+// FIXME - fewer includes!
 
 include_once("../includes/defaults.inc.php");
 include_once("../config.php");

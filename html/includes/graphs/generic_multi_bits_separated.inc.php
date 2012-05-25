@@ -39,7 +39,7 @@ foreach ($rrd_list as $rrd)
     $descr     = rrdtool_escape($rrd['descr'], $descr_len) . "  In";
   }
   $descr_out = rrdtool_escape($rrd['descr_out'], $descr_len) . " Out";
-  $descr     = str_replace("'", "", $descr); /// FIXME does this mean ' should be filtered in rrdtool_escape? probably...
+  $descr     = str_replace("'", "", $descr); // FIXME does this mean ' should be filtered in rrdtool_escape? probably...
   $descr_out = str_replace("'", "", $descr_out);
 
   $rrd_options .= " DEF:".$in.$i."=".$rrd['filename'].":".$ds_in.":AVERAGE ";

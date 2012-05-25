@@ -2,7 +2,7 @@
 
 unset($vars['page']);
 
-/// Setup here
+// Setup here
 
 if($_SESSION['widescreen'])
 {
@@ -46,7 +46,7 @@ if (!$auth)
   }
 
   # Load our list of available graphtypes for this object
-  /// FIXME not all of these are going to be valid
+  // FIXME not all of these are going to be valid
   if ($handle = opendir($config['install_dir'] . "/html/includes/graphs/".$type."/"))
   {
     while (false !== ($file = readdir($handle)))
@@ -238,7 +238,7 @@ if (!$auth)
     echo(generate_link("Hide Legend",$vars, array('page' => "graphs", 'legend' => "no")));
   }
 
-  /// FIXME : do this properly
+  // FIXME : do this properly
 #  if ($type == "port" && $subtype == "bits")
 #  {
     echo(' | ');

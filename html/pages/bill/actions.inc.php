@@ -31,7 +31,7 @@ if ($_POST['action'] == "reset_bill" && ($_POST['confirm'] == "rrd" || $_POST['c
     dbDelete('bill_data', '`bill_id` = ?', array($bill_id));
   }
   if ($_POST['confirm'] == "rrd") {
-    /// Stil todo
+    // Stil todo
   }
 
   echo("<div class=infobox>Bill Reseting. Redirecting to Bills list.</div>");

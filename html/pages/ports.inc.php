@@ -2,7 +2,7 @@
 
 $pagetitle[] = "Ports";
 
-/// Set Defaults here
+// Set Defaults here
 
 if(!isset($vars['format'])) { $vars['format'] = "list_basic"; }
 
@@ -96,9 +96,9 @@ foreach ($ports as $data)
         <select style="width: 200px;" name="location" id="location">
           <option value="">All Locations</option>
           <?php
-           /// fix me function?
+           // fix me function?
 
-           foreach (getlocations() as $location) /// FIXME function name sucks maybe get_locations ?
+           foreach (getlocations() as $location) // FIXME function name sucks maybe get_locations ?
            {
              if ($location)
              {
@@ -306,7 +306,7 @@ list($format, $subformat) = explode("_", $vars['format']);
 
 $ports = dbFetchRows($query, $param);
 
-/// FIXME - only populate what we need to search at this point, because we shouldn't show *all* ports, as it's silly.
+// FIXME - only populate what we need to search at this point, because we shouldn't show *all* ports, as it's silly.
 
 foreach ($ports as $p)
 {

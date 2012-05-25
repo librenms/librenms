@@ -1,6 +1,6 @@
 <?php
 
-/// HOST-RESOURCES-MIB - Memory Objects
+// HOST-RESOURCES-MIB - Memory Objects
 
 if (!is_array($storage_cache['hrstorage']))
 {
