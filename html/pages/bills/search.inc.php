@@ -37,18 +37,19 @@
              <td width='170' style='font-weight:bold; font-size: 12px;'>
 <?php
 
-  if ($_GET['opta'] == "history")
+  if ($vars['view'] == "history")
   {
     echo('<a href="bills/"><img src="images/16/clock.png" align=absmiddle alt="Current Billing Period"> Current Billing Period</a>');
   } else
   {
-    echo('<a href="bills/history/"><img src="images/16/clock_red.png" align=absmiddle alt="Previous Billing Period"> Previous Billing Period</a>');
+    // FIXME - generate_url
+    echo('<a href="bills/view=history/"><img src="images/16/clock_red.png" align=absmiddle alt="Previous Billing Period"> Previous Billing Period</a>');
   }
 
 ?>
              </td>
              <td width='80' style='font-weight:bold; font-size: 12px;'>
-                                                   <a href='bills/add/'><img src="images/16/add.png" align=absmiddle alt="Add"> Add Bill</a>
+                                                   <a href='bills/view=add/'><img src="images/16/add.png" align=absmiddle alt="Add"> Add Bill</a>
              </td>
            </tr>
   </form>

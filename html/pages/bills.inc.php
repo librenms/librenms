@@ -45,12 +45,12 @@ $pagetitle[] = "Billing";
 
 echo("<meta http-equiv='refresh' content='10000'>");
 
-if ($_GET['opta'] == "history")
+if ($vars['view'] == "history")
 {
   include("pages/bills/search.inc.php");
   include("pages/bills/pmonth.inc.php");
 }
-elseif ($_GET['opta'] == "add")
+elseif ($vars['view'] == "add")
 {
   if (is_numeric($vars['port']))
   {
