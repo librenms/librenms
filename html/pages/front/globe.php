@@ -11,6 +11,8 @@
       data.addRows([
 <?php
 
+$locations_up = array();
+$locations_down = array();
 foreach (getlocations() as $location)
 {
 
@@ -19,6 +21,7 @@ foreach (getlocations() as $location)
   $devices_up = array();
   $count = 0;
   $down  = 0;
+  // FIXME - doesn't handle sysLocation override.
   foreach (dbFetchRows("SELECT * FROM devices WHERE location = ?", array($location)) as $device)
   {
     $devices[] = $device['hostname'];
