@@ -77,7 +77,7 @@ if ($device['os_group'] == "cisco")
 
       // FIXME - use memcached to make sure these values don't go backwards?
       $rrdupdate = array($b_in, $b_out, $p_in, $p_out);
-      $ret = rrdtool_update("$rrdfile", $rrdupdate);
+      rrdtool_update($rrdfile, $rrdupdate);
 
       if ($acc['update'])
       { // Do Updates
