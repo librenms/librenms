@@ -808,6 +808,18 @@ $rewrite_ironware_hardware = array(
     'dcrs7508Router' => 'DCRS-7508',
     'dcrs7515Switch' => 'DCRS-7515',
     'dcrs7515Router' => 'DCRS-7515',
+    'snCes2024F' => 'NetIron CES 2024F',
+    'snCes2024C' => 'NetIron CES 2024C',
+    'snCes2048F' => 'NetIron CES 2048F',
+    'snCes2048C' => 'NetIron CES 2048C',
+    'snCes2048FX' => 'NetIron CES 2048F + 2x10G',
+    'snCes2048CX' => 'NetIron CES 2048C + 2x10G',
+    'snCer2024F' => 'NetIron CER 2024F',
+    'snCer2024C' => 'NetIron CER 2024C',
+    'snCer2048F' => 'NetIron CER 2048F',
+    'snCer2048C' => 'NetIron CER 2048C',
+    'snCer2048FX' => 'NetIron CER 2048F + 2x10G',
+    'snCer2048CX' => 'NetIron CER 2048C + 2x10G',
 );
 
 $rewrite_ios_features = array(

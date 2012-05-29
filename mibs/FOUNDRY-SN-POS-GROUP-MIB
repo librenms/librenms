@@ -1,49 +1,56 @@
 FOUNDRY-SN-POS-GROUP-MIB DEFINITIONS ::= BEGIN
 
-
--- Foundry POS Group MIB Release 1.0.0
--- Revision 0 10/28/99
-
--- Copyright 1996-1999 Foundry Networks, Inc.
--- All rights reserved.
--- This Foundry Networks SNMP Management Information Base Specification
--- (Specification) embodies Foundry Networks' confidential and
--- proprietary intellectual property. Foundry Networks retains all
--- title and ownership in the Specification, including any
--- revisions.
-
--- This Specification is supplied "AS IS," and Foundry Networks makes
--- no warranty, either express or implied, as to the use,
--- operation, condition, or performance of the Specification.
-
--- SECTION 1: Top Level Definitions
-
-
--- Imports
-
 IMPORTS
-	Counter, Gauge
-		FROM RFC1155-SMI
-	OBJECT-TYPE             
-		FROM RFC-1212
-	snPOS
-		FROM FOUNDRY-SN-ROOT-MIB;
+	MODULE-IDENTITY, OBJECT-TYPE,Counter32, Gauge32, Unsigned32,Integer32
+		FROM SNMPv2-SMI
+	router
+		FROM FOUNDRY-SN-ROOT-MIB
+	ifIndex
+		FROM IF-MIB
+	DisplayString,TEXTUAL-CONVENTION
+		FROM SNMPv2-TC;
+
+snPOS MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200909300000Z" -- September 30, 2009
+    DESCRIPTION
+			""
+   ::= { router 14}
 
 	-- textual conventions
-	-- maximum of ports are 32.  
 
-	--  Status Values
-
-	    POSStatus ::= INTEGER { disabled(0), enabled(1) }
-
-	  DisplayString ::=
-	      OCTET STRING
-	  -- This data type is used to model textual information taken
-	  -- from the NVT ASCII character set.  By convention, objects
-	  -- with this syntax are declared as having
-	  --
-	  --      SIZE (0..255)
-    
+	POSStatus ::= TEXTUAL-CONVENTION
+		STATUS	  current
+		DESCRIPTION
+			"
+			Status Values
+			"
+		SYNTAX	INTEGER { disabled(0), enabled(1) }
 
 snPOSInfo						OBJECT IDENTIFIER	  ::= { snPOS 1  }
 
@@ -51,135 +58,151 @@ snPOSInfo						OBJECT IDENTIFIER	  ::= { snPOS 1  }
 
 snPOSInfoTable OBJECT-TYPE
 	SYNTAX  SEQUENCE OF SnPOSInfoEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
-		"A specific snPOSInfo group consists of a number of 
+		"A specific snPOSInfo group consists of a number of
 		 switch ports.  "
 	::= { snPOSInfo 1 }
 
 snPOSInfoEntry OBJECT-TYPE
 	SYNTAX  SnPOSInfoEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
-		"An entry in the snPOSInfo table indicates the 
-		 configuration on a specified port. A SNMP SET PDU 
-		 for a row of the snPOSInfoTable requires the entired 
-		 sequence of the MIB Objects in each 
-		 snPOSInfoEntry stored in one PDU.  Otherwise, 
-	 	 GENERR return-value will be returned."
-	INDEX   { 
+		"An entry in the snPOSInfo table indicates the
+		 configuration on a specified port. A SNMP SET PDU
+		 for a row of the snPOSInfoTable requires the entired
+		 sequence of the MIB Objects in each
+		 snPOSInfoEntry stored in one PDU.  Otherwise,
+		 GENERR return-value will be returned."
+	INDEX   {
 		snPOSInfoPortNum
 	}
 	::= { snPOSInfoTable 1 }
 
 SnPOSInfoEntry ::= SEQUENCE {
 	snPOSInfoPortNum
-		INTEGER,
+		Integer32,
 	snPOSIfIndex
-	    INTEGER,
+		Integer32,
 	snPOSDescr
-	    DisplayString,
+		DisplayString,
 	snPOSName
 		DisplayString,
 	snPOSInfoSpeed
-	    INTEGER,
+		INTEGER,
 	snPOSInfoAdminStatus
 		INTEGER,
 	snPOSInfoLinkStatus
 		INTEGER,
 	snPOSInfoClock
-	    INTEGER,
+		INTEGER,
 	snPOSInfoLoopBack
-	    INTEGER,
-	snPOSInfoScrambleATM 
-	    POSStatus,
-	snPOSInfoFraming 
-	    INTEGER,
-	snPOSInfoCRC 
-	    INTEGER,
-	snPOSInfoKeepAlive 
-	    INTEGER,
-	snPOSInfoFlagC2 
-	    INTEGER,
-	snPOSInfoFlagJ0 
-	    INTEGER,
-	snPOSInfoFlagH1 
-	    INTEGER,
-    snPOSStatsInFrames 
-    	Counter,
-	snPOSStatsOutFrames 
-    	Counter,
-	snPOSStatsAlignErrors            
-		Counter,
-    snPOSStatsFCSErrors                  
-		Counter,
-    snPOSStatsFrameTooLongs              
-		Counter,
+		INTEGER,
+	snPOSInfoScrambleATM
+		POSStatus,
+	snPOSInfoFraming
+		INTEGER,
+	snPOSInfoCRC
+		INTEGER,
+	snPOSInfoKeepAlive
+		INTEGER,
+	snPOSInfoFlagC2
+		INTEGER,
+	snPOSInfoFlagJ0
+		INTEGER,
+	snPOSInfoFlagH1
+		INTEGER,
+	snPOSStatsInFrames
+		Counter32,
+	snPOSStatsOutFrames
+		Counter32,
+	snPOSStatsAlignErrors
+		Counter32,
+	snPOSStatsFCSErrors
+		Counter32,
+	snPOSStatsFrameTooLongs
+		Counter32,
 	snPOSStatsFrameTooShorts
-	    Counter,
+		Counter32,
 	snPOSStatsInDiscard
-	    Counter,
+		Counter32,
 	snPOSStatsOutDiscard
-	    Counter,
+		Counter32,
 	snPOSInOctets
-	    OCTET STRING,
+		OCTET STRING,
 	snPOSOutOctets
-	    OCTET STRING,
+		OCTET STRING,
 	snPOSStatsInBitsPerSec
-	    Gauge,
+		Gauge32,
 	snPOSStatsOutBitsPerSec
-	    Gauge,
+		Gauge32,
 	snPOSStatsInPktsPerSec
-	    Gauge,
+		Gauge32,
 	snPOSStatsOutPktsPerSec
-	    Gauge,
+		Gauge32,
 	snPOSStatsInUtilization
-	    INTEGER (0..10000),
+		INTEGER ,
 	snPOSStatsOutUtilization
-	    INTEGER (0..10000),
+		INTEGER ,
 	snPOSTagType
-	    INTEGER  
+		INTEGER,
+	snPOSStatsB1
+		Counter32,
+	snPOSStatsB2
+		Counter32,
+	snPOSStatsB3
+		Counter32,
+	snPOSStatsAIS
+		Counter32,
+	snPOSStatsRDI
+		Counter32,
+	snPOSStatsLOP
+		Counter32,
+	snPOSStatsLOF
+		Counter32,
+	snPOSStatsLOS
+		Counter32
 	}
 
 
 snPOSInfoPortNum OBJECT-TYPE
-	SYNTAX  INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The port index.
-		 The bit 0 to bit 7: port number. 
+		 The bit 0 to bit 7: port number.
 		 The bit 8 to bit 11: slot number (slot for chassis only)."
 	::= { snPOSInfoEntry 1 }
 
 
 snPOSIfIndex OBJECT-TYPE
-    SYNTAX  INTEGER
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"In order to identify a particular interface, this
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"In order to identify a particular interface, this
 		object shall identify the instance of the ifIndex
 		object, defined in RFC 1213 and RFC 1573."
-    ::= { snPOSInfoEntry 2 }
+	::= { snPOSInfoEntry 2 }
 
 
 snPOSDescr OBJECT-TYPE
-    SYNTAX  DisplayString
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"A textual string containing the slot/port information
-    	about the interface."
-    ::= { snPOSInfoEntry 3 }
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing the slot/port information
+		about the interface."
+	::= { snPOSInfoEntry 3 }
 
 
 snPOSName OBJECT-TYPE
 	SYNTAX	DisplayString (SIZE(0..255))
-	ACCESS	read-write
-	STATUS	mandatory
+	MAX-ACCESS	read-write
+	STATUS	current
 	DESCRIPTION
 		"Port Name string."
 	::= { snPOSInfoEntry 4 }
@@ -191,9 +214,9 @@ snPOSInfoSpeed OBJECT-TYPE
 		other(3),
 		s2488000(4)
 		}
-	ACCESS  read-write
-	STATUS  mandatory
-	DESCRIPTION     
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"The speed configuration for a port. The values are:
 		155000
 		622000
@@ -203,331 +226,806 @@ snPOSInfoSpeed OBJECT-TYPE
 
 
 snPOSInfoAdminStatus OBJECT-TYPE
-    SYNTAX  INTEGER {
+	SYNTAX  INTEGER {
 		up(1),       -- ready to pass packets
 		down(2),
 		testing(3)   -- in some test mode
 		}
-    ACCESS  read-write
-    STATUS  mandatory
-    DESCRIPTION
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"The desired state of all ports.  The
-	 	testing(3) state indicates that no operational
-	 	packets can be passed. 
-	 	(same as ifAdminStatus in MIB-II)"
-    ::= { snPOSInfoEntry 6 }
+		testing(3) state indicates that no operational
+		packets can be passed.
+		(same as ifAdminStatus in MIB-II)"
+	::= { snPOSInfoEntry 6 }
 
 
 snPOSInfoLinkStatus OBJECT-TYPE
-    SYNTAX  INTEGER {
-    	up(1),       -- ready to pass packets
-    	down(2),
-    	testing(3)   -- in some test mode
-        }
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-        "The current operational state of the interface.
-         The testing(3) state indicates that no operational
-         packets can be passed. 
-         (same as ifOperStatus in MIB-II)"
-    ::= { snPOSInfoEntry 7 }
+	SYNTAX  INTEGER {
+		up(1),       -- ready to pass packets
+		down(2),
+		testing(3)   -- in some test mode
+		}
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The current operational state of the interface.
+		 The testing(3) state indicates that no operational
+		 packets can be passed.
+		 (same as ifOperStatus in MIB-II)"
+	::= { snPOSInfoEntry 7 }
 
 
 snPOSInfoClock  OBJECT-TYPE
-    SYNTAX  INTEGER {
-    	internal(1),     
-    	line(2)
-        }
-    ACCESS  read-write
-    STATUS  mandatory
-    DESCRIPTION
+	SYNTAX  INTEGER {
+		internal(1),
+		line(2)
+		}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"Clock default internal"
-    ::= { snPOSInfoEntry 8 }
+	::= { snPOSInfoEntry 8 }
 
 snPOSInfoLoopBack   OBJECT-TYPE
-    SYNTAX  INTEGER {
-    	line(1),     
-    	internal(2),
-    	none(3)
-        }
-    ACCESS  read-write
-    STATUS  mandatory
-    DESCRIPTION
+	SYNTAX  INTEGER {
+		line(1),
+		internal(2),
+		none(3)
+		}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"Loop back default none"
-    ::= { snPOSInfoEntry 9 }
+	::= { snPOSInfoEntry 9 }
 
 snPOSInfoScrambleATM  OBJECT-TYPE
 	SYNTAX	POSStatus
-    ACCESS  read-write
-    STATUS  mandatory
-    DESCRIPTION
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"ATM style scrambling default off"
-    ::= { snPOSInfoEntry 10 }
+	::= { snPOSInfoEntry 10 }
 
 snPOSInfoFraming  OBJECT-TYPE
-    SYNTAX  INTEGER {
-    	sonet(1),     
-    	sdh(2)
-        }
-    ACCESS  read-write
-    STATUS  mandatory
-    DESCRIPTION
+	SYNTAX  INTEGER {
+		sonet(1),
+		sdh(2)
+		}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"Framing default SONET"
-    ::= { snPOSInfoEntry 11 }
+	::= { snPOSInfoEntry 11 }
 
 snPOSInfoCRC  OBJECT-TYPE
-    SYNTAX  INTEGER {
-    	crc32bits(1),     
-    	crc16bits(2)
-        }
-    ACCESS  read-write
-    STATUS  mandatory
-    DESCRIPTION
+	SYNTAX  INTEGER {
+		crc32bits(1),
+		crc16bits(2)
+		}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"CRC default 32 bit"
-    ::= { snPOSInfoEntry 12 }
+	::= { snPOSInfoEntry 12 }
 
 snPOSInfoKeepAlive  OBJECT-TYPE
 	SYNTAX  INTEGER (0..32767)
-    ACCESS  read-write
-    STATUS  mandatory
-    DESCRIPTION
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"Keep-alive default 10"
-    ::= { snPOSInfoEntry 13 }
+	::= { snPOSInfoEntry 13 }
 
 snPOSInfoFlagC2  OBJECT-TYPE
 	SYNTAX  INTEGER (0..255)
-    ACCESS  read-write
-    STATUS  mandatory
-    DESCRIPTION
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"C2 flag"
-    ::= { snPOSInfoEntry 14 }
+	::= { snPOSInfoEntry 14 }
 
 
 snPOSInfoFlagJ0  OBJECT-TYPE
 	SYNTAX  INTEGER (0..255)
-    ACCESS  read-write
-    STATUS  mandatory
-    DESCRIPTION
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"J0 flag"
-    ::= { snPOSInfoEntry 15 }
+	::= { snPOSInfoEntry 15 }
 
 snPOSInfoFlagH1  OBJECT-TYPE
 	SYNTAX  INTEGER (0..255)
-    ACCESS  read-write
-    STATUS  mandatory
-    DESCRIPTION
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"H1 flag"
-    ::= { snPOSInfoEntry 16 }
+	::= { snPOSInfoEntry 16 }
 
 snPOSStatsInFrames OBJECT-TYPE
-    SYNTAX  Counter
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"The total number of packets received on the interface."
-    ::= { snPOSInfoEntry 17 }
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of packets received on the interface."
+	::= { snPOSInfoEntry 17 }
 
 
 snPOSStatsOutFrames OBJECT-TYPE
-    SYNTAX  Counter
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"The total number of packets transmitted out of the interface."
-    ::= { snPOSInfoEntry 18 }
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of packets transmitted out of the interface."
+	::= { snPOSInfoEntry 18 }
 
 
 snPOSStatsAlignErrors   OBJECT-TYPE
-     SYNTAX     Counter
-     ACCESS     read-only
-     STATUS     mandatory
-     DESCRIPTION
-	 	"dot3StatsAlignmentErrors : A count of frames 
-	  	received on a particular interface that are 
-	  	not an integral number of octets in length 
-	  	and do not pass the FCS check.
+	 SYNTAX     Counter32
+	 MAX-ACCESS     read-only
+	 STATUS     current
+	 DESCRIPTION
+		"dot3StatsAlignmentErrors : A count of frames
+		received on a particular interface that are
+		not an integral number of octets in length
+		and do not pass the FCS check.
 
-	  	The count represented by an instance of this
-	  	object is incremented when the alignmentError
-	  	status is returned by the MAC service to the
-	  	LLC (or other MAC user). Received frames for
-	  	which multiple error conditions obtain are,
-	  	according to the conventions of IEEE 802.3
-	  	Layer Management, counted exclusively according
-	  	to the error status presented to the LLC."
-    ::= { snPOSInfoEntry 19 }
+		The count represented by an instance of this
+		object is incremented when the alignmentError
+		status is returned by the MAC service to the
+		LLC (or other MAC user). Received frames for
+		which multiple error conditions obtain are,
+		according to the conventions of IEEE 802.3
+		Layer Management, counted exclusively according
+		to the error status presented to the LLC."
+	::= { snPOSInfoEntry 19 }
 
 snPOSStatsFCSErrors   OBJECT-TYPE
-     SYNTAX      Counter
-     ACCESS      read-only
-     STATUS      mandatory
-     DESCRIPTION
-	 	"dot3StatsFCSErrors : A count of frames received 
-	  	on a particular interface that are an integral 
-	  	number of octets in length but do not pass the 
-	  	FCS check.
+	 SYNTAX      Counter32
+	 MAX-ACCESS      read-only
+	 STATUS      current
+	 DESCRIPTION
+		"dot3StatsFCSErrors : A count of frames received
+		on a particular interface that are an integral
+		number of octets in length but do not pass the
+		FCS check.
 
-	  	The count represented by an instance of this
-	  	object is incremented when the frameCheckError
-	  	status is returned by the MAC service to the
-	  	LLC (or other MAC user). Received frames for
-	  	which multiple error conditions obtain are,
-	  	according to the conventions of IEEE 802.3
-	  	Layer Management, counted exclusively according
-	  	to the error status presented to the LLC."
-    ::= { snPOSInfoEntry 20 }
+		The count represented by an instance of this
+		object is incremented when the frameCheckError
+		status is returned by the MAC service to the
+		LLC (or other MAC user). Received frames for
+		which multiple error conditions obtain are,
+		according to the conventions of IEEE 802.3
+		Layer Management, counted exclusively according
+		to the error status presented to the LLC."
+	::= { snPOSInfoEntry 20 }
 
 
 snPOSStatsFrameTooLongs   OBJECT-TYPE
-     SYNTAX    Counter
-     ACCESS    read-only
-     STATUS    mandatory
-     DESCRIPTION
-	 	"dot3StatsFrameTooLongs : A count of frames 
-	  	received on a particular interface that 
-	  	exceed the maximum permitted frame size.
+	 SYNTAX    Counter32
+	 MAX-ACCESS    read-only
+	 STATUS    current
+	 DESCRIPTION
+		"dot3StatsFrameTooLongs : A count of frames
+		received on a particular interface that
+		exceed the maximum permitted frame size.
 
-	  	The count represented by an instance of this
-	  	object is incremented when the frameTooLong
-	  	status is returned by the MAC service to the
-	  	LLC (or other MAC user). Received frames for
-	  	which multiple error conditions obtain are,
-	  	according to the conventions of IEEE 802.3
-	  	Layer Management, counted exclusively according
-	  	to the error status presented to the LLC."
-    ::= { snPOSInfoEntry 21 }
+		The count represented by an instance of this
+		object is incremented when the frameTooLong
+		status is returned by the MAC service to the
+		LLC (or other MAC user). Received frames for
+		which multiple error conditions obtain are,
+		according to the conventions of IEEE 802.3
+		Layer Management, counted exclusively according
+		to the error status presented to the LLC."
+	::= { snPOSInfoEntry 21 }
 
 
 snPOSStatsFrameTooShorts   OBJECT-TYPE
-     SYNTAX    Counter
-     ACCESS    read-only
-     STATUS    mandatory
-     DESCRIPTION
-	 	" A count of frames received on a particular 
-	 	interface that below the minimum permitted 
-	 	frame size."
-    ::= { snPOSInfoEntry 22 }
+	 SYNTAX    Counter32
+	 MAX-ACCESS    read-only
+	 STATUS    current
+	 DESCRIPTION
+		" A count of frames received on a particular
+		interface that below the minimum permitted
+		frame size."
+	::= { snPOSInfoEntry 22 }
 
 snPOSStatsInDiscard OBJECT-TYPE
-    SYNTAX  Counter
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-        "The number of inbound packets which were chosen
-         to be discarded even though no errors had been
-         detected to prevent their being deliverable to a
-         higher-layer protocol.  One possible reason for
-         discarding such a packet could be to free up
-         buffer space."
-    ::= { snPOSInfoEntry 23 }
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of inbound packets which were chosen
+		 to be discarded even though no errors had been
+		 detected to prevent their being deliverable to a
+		 higher-layer protocol.  One possible reason for
+		 discarding such a packet could be to free up
+		 buffer space."
+	::= { snPOSInfoEntry 23 }
 
 
 snPOSStatsOutDiscard OBJECT-TYPE
-    SYNTAX  Counter
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-        "The number of outbound packets which were chosen
-         to be discarded even though no errors had been
-         detected to prevent their being transmitted.  One
-         possible reason for discarding such a packet could
-         be to free up buffer space."
-    ::= { snPOSInfoEntry 24 }
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of outbound packets which were chosen
+		 to be discarded even though no errors had been
+		 detected to prevent their being transmitted.  One
+		 possible reason for discarding such a packet could
+		 be to free up buffer space."
+	::= { snPOSInfoEntry 24 }
 
 snPOSInOctets OBJECT-TYPE
-    SYNTAX  OCTET STRING (SIZE(8))
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"The total number of octets received on the interface,
-    	including framing characters. This object is a 64-bit
+	SYNTAX  OCTET STRING (SIZE(8))
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of octets received on the interface,
+		including framing characters. This object is a 64-bit
 		counter of the ifInOctets object, defined in RFC 1213.
 		The octet string is in big-endian byte order."
-    ::= { snPOSInfoEntry 25 }
+	::= { snPOSInfoEntry 25 }
 
 
 snPOSOutOctets OBJECT-TYPE
-    SYNTAX  OCTET STRING (SIZE(8))
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"The total number of octets transmitted out of the interface,
-    	including framing characters. This object is a 64-bit
+	SYNTAX  OCTET STRING (SIZE(8))
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of octets transmitted out of the interface,
+		including framing characters. This object is a 64-bit
 		counter of the ifOutOctets object, defined in RFC 1213.
 		The octet string is in big-endian byte order."
-    ::= { snPOSInfoEntry 26 }
+	::= { snPOSInfoEntry 26 }
 
 
 snPOSStatsInBitsPerSec OBJECT-TYPE
-    SYNTAX  Gauge
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"The number of bits per second received on the interface
-    	over a 5 minutes interval."
-    ::= { snPOSInfoEntry 27 }
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of bits per second received on the interface
+		over a 5 minutes interval."
+	::= { snPOSInfoEntry 27 }
 
 
 snPOSStatsOutBitsPerSec OBJECT-TYPE
-    SYNTAX  Gauge
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"The number of bits per second transmitted out of the interface
-    	over a 5 minutes interval."
-    ::= { snPOSInfoEntry 28 }
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of bits per second transmitted out of the interface
+		over a 5 minutes interval."
+	::= { snPOSInfoEntry 28 }
 
 
 snPOSStatsInPktsPerSec OBJECT-TYPE
-    SYNTAX  Gauge
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"The number of packets per second received on the interface
-    	over a 5 minutes interval."
-    ::= { snPOSInfoEntry 29 }
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of packets per second received on the interface
+		over a 5 minutes interval."
+	::= { snPOSInfoEntry 29 }
 
 
 snPOSStatsOutPktsPerSec OBJECT-TYPE
-    SYNTAX  Gauge
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"The number of packets per second transmitted out of the interface
-    	over a 5 minutes interval."
-    ::= { snPOSInfoEntry 30 }
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of packets per second transmitted out of the interface
+		over a 5 minutes interval."
+	::= { snPOSInfoEntry 30 }
 
 
 snPOSStatsInUtilization OBJECT-TYPE
-    SYNTAX  INTEGER (0..10000)
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"The input network utilization in hundredths of a percent
-    	over a 5 minutes interval."
-    ::= { snPOSInfoEntry 31 }
+	SYNTAX  INTEGER (0..10000)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The input network utilization in hundredths of a percent
+		over a 5 minutes interval."
+	::= { snPOSInfoEntry 31 }
 
 
 snPOSStatsOutUtilization OBJECT-TYPE
-    SYNTAX  INTEGER (0..10000)
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
-    	"The output network utilization in hundredths of a percent
-    	over a 5 minutes interval."
-    ::= { snPOSInfoEntry 32 }
+	SYNTAX  INTEGER (0..10000)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The output network utilization in hundredths of a percent
+		over a 5 minutes interval."
+	::= { snPOSInfoEntry 32 }
 
 snPOSTagType OBJECT-TYPE
 	SYNTAX  INTEGER {
-		tagged(1),      
-		untagged(2)    
+		tagged(1),
+		untagged(2)
 		}
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"For tagged port, we could have multiple VLANs 
-		 per port."  
+		"For tagged port, we could have multiple VLANs
+		 per port."
 	::= {snPOSInfoEntry  33}
 
+snPOSStatsB1 OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Section error monitoring."
+	::= { snPOSInfoEntry 34 }
+
+snPOSStatsB2 OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Line error monitoring."
+	::= { snPOSInfoEntry 35 }
+
+snPOSStatsB3 OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Path error monitoring."
+	::= { snPOSInfoEntry 36 }
+
+snPOSStatsAIS OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Alarm indication signal."
+	::= { snPOSInfoEntry 37 }
+
+snPOSStatsRDI OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Remote defect indication."
+	::= { snPOSInfoEntry 38 }
+
+snPOSStatsLOP OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Loss of pointer."
+	::= { snPOSInfoEntry 39 }
+
+snPOSStatsLOF OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Loss of frame."
+	::= { snPOSInfoEntry 40 }
+
+snPOSStatsLOS OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Loss of signal."
+	::= { snPOSInfoEntry 41 }
+
+-- POS Port table information
+
+snPOSInfo2Table OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SnPOSInfo2Entry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An snPOSInfo2Table consists of a number of
+		 SnPOSInfo2Entry entries"
+	::= { snPOSInfo 2 }
+
+snPOSInfo2Entry OBJECT-TYPE
+	SYNTAX		SnPOSInfo2Entry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the snPOSInfo2Table indicates the
+		 POS configuration on a specified port"
+	INDEX {
+		ifIndex
+	}
+	::= { snPOSInfo2Table 1 }
+
+SnPOSInfo2Entry ::= SEQUENCE {
+	snPOSInfo2Clock
+		INTEGER,
+	snPOSInfo2ScrambleATM
+		POSStatus,
+	snPOSInfo2CRC
+		INTEGER,
+	snPOSInfo2KeepAlive
+		Unsigned32,
+	snPOSInfo2FlagC2
+		Unsigned32,
+	snPOSInfo2SSM
+		INTEGER,
+	snPOSInfo2Encapsulation
+		INTEGER,
+	snPOSInfo2AlarmMonitoring
+		INTEGER,
+	snPOSInfo2OverheadJ0ExpectedMessage
+		OCTET STRING,
+	snPOSInfo2OverheadJ0TransmitMessage
+		OCTET STRING,
+	snPOSInfo2OverheadJ1ExpectedMessage
+		OCTET STRING,
+	snPOSInfo2OverheadJ1MessageLength
+		INTEGER,
+	snPOSInfo2OverheadJ1TransmitMessage
+		OCTET STRING
+	}
+
+snPOSInfo2Clock  OBJECT-TYPE
+	SYNTAX		INTEGER {
+		internal(1),
+		line(2)
+	}
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"Clock source for the POS Interface
+		 internal(1) - internal source
+		 line    (2) - clocking is derived from line"
+	DEFVAL		{ internal }
+	::= { snPOSInfo2Entry 1 }
+
+snPOSInfo2ScrambleATM  OBJECT-TYPE
+	SYNTAX		POSStatus
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"ATM style scrambling for the POS interface
+		 disabled(0)  - scrambling is disabled
+		 enabled(1)   - scrambling is enabled"
+	DEFVAL		{ disabled }
+	::= { snPOSInfo2Entry 2 }
+
+snPOSInfo2CRC  OBJECT-TYPE
+	SYNTAX		INTEGER {
+		crc32bits(1),
+		crc16bits(2)
+	}
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"Length of Cyclic Redundnacy Check (CRC) on the
+		 POS interface
+		 crc32bits(1)  - 32 bits
+		 crc16bits(2)  - 16 buts"
+	DEFVAL		{ crc32bits }
+	::= { snPOSInfo2Entry 3 }
+
+snPOSInfo2KeepAlive  OBJECT-TYPE
+	SYNTAX		Unsigned32 (0..65535)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"Keep-alive timer for the POS interface in seconds"
+	DEFVAL		{ 10 }
+	::= { snPOSInfo2Entry 4 }
+
+snPOSInfo2FlagC2  OBJECT-TYPE
+	SYNTAX		Unsigned32 (0..255)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"C2 flag"
+	::= { snPOSInfo2Entry 5 }
+
+snPOSInfo2SSM OBJECT-TYPE
+	SYNTAX		INTEGER {
+		t1SonetPrimaryReferenceSource(1)		,
+		t1SonetTraceabilityUnknown(2)			,
+		t1SonetStratum2Traceable(3)				,
+		t1SonetTransitNodeClock(4)				,
+		t1SonetStratum3eTraceable(5)			,
+		t1SonetStratum3Traceable(6)				,
+		t1SonetMinClockTraceable(7)				,
+		t1SonetDus(8)							,
+		e1SdhTraceabilityUnknown(9)				,
+		e1SdhSsmTransitNodeClockG812(10)		,
+		e1SdhDus(11)							,
+		e1SdhSsmPrimaryReferenceClockG811(12)	,
+		e1SdhSsmLocalG812(13)					,
+		e1SdhSsmSyncEquipmentTimingSource(14)
+	}
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"The S(ynchronization) S(tatus) M(essage) is sent over
+		 the SONET/SDH line to tell the other end about the
+		 quality of clock being sent over the line.
+
+		t1SonetPrimaryReferenceSource(1)		- SONET Primary Reference Source
+		t1SonetTraceabilityUnknown(2}			- SONET Traceability Unknown
+		t1SonetStratum2Traceable(3)				- SONET Stratum 2 Traceable
+		t1SonetTransitNodeClock(4)				- SONET Transit Node Clock
+		t1SonetStratum3eTraceable(5)			- SONET Stratum 3e Traceable
+		t1SonetStratum3Traceable(6)				- SONET Stratum 3 Traceable
+		t1SonetMinClockTraceable(7)				- SONET Minimum Clock Traceable
+		t1SonetDus(8)							- SONET Do not Use for Synchronization
+		e1SdhTraceabilityUnknown(9)				- SDH Traceability Unknown
+		e1SdhSsmTransitNodeClockG812(10)		- SDH Transit Node Clock G812
+		e1SdhDus(11)							- SDH Do not Use for Synchronization
+		e1SdhSsmPrimaryReferenceClockG811(12)	- SDH Primary Reference Clock G811
+		e1SdhSsmLocalG812(13)					- SDH Local G812
+		e1SdhSsmSyncEquipmentTimingSource(14)	- SDH Synchronization Equipment Timing Source"
+	DEFVAL		{ t1SonetTraceabilityUnknown }
+	::= { snPOSInfo2Entry 6 }
+
+snPOSInfo2Encapsulation OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ppp(1),
+		hdlc(2)
+	}
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"Layer 2 encapsulation on the POS interface
+		 ppp(1)   - Point to Point Protocol (PPP)
+		 hdlc(2)  - Cisco High-level Data Link Control (cHDLC)"
+	DEFVAL		{ ppp }
+	::= { snPOSInfo2Entry 7 }
+
+snPOSInfo2AlarmMonitoring OBJECT-TYPE
+	SYNTAX		INTEGER {
+		off(0),
+		on(1)
+	}
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"Alarm Monitoring on POS interface
+		 off(0)    - Alarm Monitoring is off
+		 on(1)     - Alarm Montioring is on"
+	DEFVAL		{ on }
+	::= { snPOSInfo2Entry 8 }
+
+snPOSInfo2OverheadJ0ExpectedMessage OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE (1))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"Overhead J0 Expected Message"
+	::= { snPOSInfo2Entry 9 }
+
+snPOSInfo2OverheadJ0TransmitMessage OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE (1))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"Overhead J0 Transmit Message"
+	::= { snPOSInfo2Entry 10 }
+
+snPOSInfo2OverheadJ1ExpectedMessage OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE (16..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"Overhead J1 Expected Message"
+	::= { snPOSInfo2Entry 11 }
+
+snPOSInfo2OverheadJ1MessageLength OBJECT-TYPE
+	SYNTAX		INTEGER {
+		s16 (16),
+		s64 (64)
+	}
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"Overhead J1 Length of Message
+		 s16(16)...........16 bytes
+		 s64(64)............64 bytes"
+	DEFVAL		{ s64 }
+	::= { snPOSInfo2Entry 12 }
+
+snPOSInfo2OverheadJ1TransmitMessage OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE (16..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION
+		"Overhead J1 Transmit Message"
+	::= { snPOSInfo2Entry 13 }
+
+-- POS PPP Group
+-- If the L2 encapsulation is PPP, the following will provide
+-- information on the states of various control protocols
+
+snPOSPPPTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SnPOSPPPEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An snPOSPPPTable consists of a number of
+		 SnPOSPPPEntry entries"
+	::= { snPOSInfo 3 }
+
+snPOSPPPEntry OBJECT-TYPE
+	SYNTAX		SnPOSPPPEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the snPOSPPPTable indicates the
+		 PPP control protocol status on a specified port"
+	INDEX  {
+		ifIndex
+	}
+	::= { snPOSPPPTable 1 }
+
+SnPOSPPPEntry ::= SEQUENCE {
+	snPosPppLcp
+		DisplayString,
+	snPosPppIpCp
+		DisplayString,
+	snPosPppIpv6Cp
+		DisplayString,
+	snPosPppOsInLcp
+		DisplayString,
+	snPosPppMpLscp
+		DisplayString
+	}
+
+snPosPppLcp  OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..32))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The PPP Link Control Protocol state"
+	::= { snPOSPPPEntry 1 }
+
+snPosPppIpCp  OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..32))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The PPP IP Control Protocol state"
+	::= { snPOSPPPEntry 2 }
+
+snPosPppIpv6Cp  OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..32))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The PPP IPv6 Control Protocol state"
+	::= { snPOSPPPEntry 3 }
+
+snPosPppOsInLcp  OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..32))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The PPP OSI Network Layer Control Protocol state"
+	::= { snPOSPPPEntry 4 }
+
+snPosPppMpLscp  OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..32))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The PPP MPLS Control Protocol state"
+	::= { snPOSPPPEntry 5 }
+
+-- POS cHDLC Group
+-- If the L2 encapsulation is cHDLC, the following will provide
+-- information various cHDLC paraemters
+
+snPOScHDLCTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SnPOScHDLCEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An snPOScHDLCTable consists of a number of
+		 SnPOScHDLCEntry entries"
+	::= { snPOSInfo 4 }
+
+snPOScHDLCEntry OBJECT-TYPE
+	SYNTAX		SnPOScHDLCEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in snPOScHDLCEntry shows the
+		 cHDLC information on a specified port"
+	INDEX {
+		ifIndex
+	}
+	::= { snPOScHDLCTable 1 }
+
+SnPOScHDLCEntry ::= SEQUENCE {
+	snPOScHDLCLineState
+		INTEGER,
+	snPOScHDLCInLoopback
+		INTEGER,
+	snPOScHDLCMySeq
+		Unsigned32,
+	snPOScHDLCMySeqSeen
+		Unsigned32,
+	snPOScHDLCPeerSeqSeen
+		Unsigned32,
+	snPOScHDLCUniqueSent
+		Unsigned32,
+	snPOScHDLCUniqueReceived
+		Unsigned32
+	}
+
+snPOScHDLCLineState  OBJECT-TYPE
+	SYNTAX		INTEGER {
+		down (0),
+		up (1),
+		unknown (2)
+		}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"cHDLC Line State"
+	::= { snPOScHDLCEntry 1 }
+
+snPOScHDLCInLoopback  OBJECT-TYPE
+	SYNTAX		INTEGER {
+		no (0),
+		yes (1),
+		unknown (2)
+		}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"cHDLC in loopback"
+	::= { snPOScHDLCEntry 2 }
+
+snPOScHDLCMySeq  OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"cHDLC my sequence number"
+	::= { snPOScHDLCEntry 3 }
+
+snPOScHDLCMySeqSeen  OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"cHDLC my sequence number seen"
+	::= { snPOScHDLCEntry 4 }
+
+snPOScHDLCPeerSeqSeen  OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"cHDLC peer sequence number seen"
+	::= { snPOScHDLCEntry 5 }
+
+snPOScHDLCUniqueSent  OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"cHDLC unique sent"
+	::= { snPOScHDLCEntry 6 }
+
+snPOScHDLCUniqueReceived  OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"cHDLC unique received"
+	::= { snPOScHDLCEntry 7 }
+
 END
+-- *****************************************************************
+-- Commited Access Rate MIB file.
+-- *****************************************************************

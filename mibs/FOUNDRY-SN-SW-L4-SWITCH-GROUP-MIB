@@ -1,87 +1,119 @@
 FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB DEFINITIONS ::= BEGIN
 
-
--- Foundry L4 Switch Group MIB Release 1.0.0
--- Revision 0 01/08/2000
-
--- Copyright 1996-98 Foundry Networks, Inc.
--- All rights reserved.
--- This Foundry Networks SNMP Management Information Base Specification
--- (Specification) embodies Foundry Networks' confidential and
--- proprietary intellectual property. Foundry Networks retains all
--- title and ownership in the Specification, including any
--- revisions.
-
--- This Specification is supplied "AS IS," and Foundry Networks makes
--- no warranty, either express or implied, as to the use,
--- operation, condition, or performance of the Specification.
-
--- SECTION 1: Top Level Definitions
-
-
--- Imports
-
 IMPORTS
-	IpAddress, Counter, TimeTicks
-			FROM RFC1155-SMI
-	 Counter64		FROM SNMPv2-SMI
-   
-	OBJECT-TYPE             
-		FROM RFC-1212
-	snL4
-		FROM FOUNDRY-SN-ROOT-MIB;
+	MODULE-IDENTITY, OBJECT-TYPE,IpAddress, Counter32, TimeTicks,Counter64,Integer32
+			FROM SNMPv2-SMI
+
+	switch
+		FROM FOUNDRY-SN-ROOT-MIB
+
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+
+	PhysAddress
+		FROM FOUNDRY-SN-SWITCH-GROUP-MIB
+
+	DisplayString
+		FROM FOUNDRY-SN-AGENT-MIB;
+
+snL4 MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200909300000Z" -- September 30, 2009
+    DESCRIPTION
+			"convert from SMIv1 to SMIv2"
+   ::= { switch 4}
 
 	-- textual conventions
-	-- maximum of ports are 32.  
 
-	--  Row Creation/Deletion Values
+	L4RowSts ::= TEXTUAL-CONVENTION
+		STATUS	  current
+		DESCRIPTION
+			"
+			Row Creation/Deletion Values
+			"
+		SYNTAX	INTEGER {	other(1),
+							valid(2),
+							delete(3),
+							create(4),
+							modify(5)
+						}
 
-	     L4RowSts ::= INTEGER { other(1),
-							  valid(2),
-							  delete(3),
-							  create(4),
-							  modify(5)
+	L4Status ::= TEXTUAL-CONVENTION
+		STATUS	  current
+		DESCRIPTION
+			"
+			L4 Status Values
+			"
+		SYNTAX	INTEGER { disabled(0), enabled(1) }
+
+	L4ServerName ::= TEXTUAL-CONVENTION
+		STATUS	  current
+		DESCRIPTION
+			"
+			L4 Server Name
+			"
+		SYNTAX	OCTET STRING (SIZE(1..32))
+
+	L4Flag ::= TEXTUAL-CONVENTION
+		STATUS	  current
+		DESCRIPTION
+			"
+				L4 Flag Values
+			"
+		SYNTAX	INTEGER { false(0), true(1) }
+
+	L4DeleteState ::= TEXTUAL-CONVENTION
+		STATUS	  current
+		DESCRIPTION
+			"
+			L4 Delete Sate
+			"
+		SYNTAX	INTEGER {	done(0),
+							waitunbind(1),
+							waitdelete(2)
+						}
+
+	WebCacheState ::= TEXTUAL-CONVENTION
+		STATUS	  current
+		DESCRIPTION
+			"
+			WebCacheSate
+			"
+		SYNTAX	INTEGER {	disabled(0),
+							enabled(1),
+							failed(2),
+							testing(3),
+							suspect(4),
+							shutdown(5),
+							active(6)
 							}
-	--  L4 Status Values
 
-	    L4Status ::= INTEGER { disabled(0), enabled(1) }
 
-	--  L4 Server Name
-        L4ServerName ::= OCTET STRING (SIZE(1..32))
-
-	--  L4 Flag Values
-	    L4Flag ::= INTEGER { false(0), true(1) }
-
-	--  L4 Delete Sate
-	     L4DeleteState ::= INTEGER { done(0),
-									 waitunbind(1),
-									 waitdelete(2)
-									}
-
-	--  WebCacheSate
-	     WebCacheState ::= INTEGER { disabled(0),
-									 enabled(1),
-									 failed(2),
-									 testing(3),
-									 suspect(4),
-									 shutdown(5),
-									 active(6)
-									}
-
-        PhysAddress ::= OCTET STRING
-    -- This data type is used to model media addresses.  For many
-    -- types of media, this will be in a binary representation.
-    -- For example, an ethernet address would be represented as
-    -- a string of 6 octets.
-
-	  DisplayString ::=
-	      OCTET STRING
-	  -- This data type is used to model textual information taken
-	  -- from the NVT ASCII character set.  By convention, objects
-	  -- with this syntax are declared as having
-	  --
-	  --      SIZE (0..255)
-    
 
 snL4Gen						OBJECT IDENTIFIER	  ::= { snL4 1  }
 snL4VirtualServer			OBJECT IDENTIFIER	  ::= { snL4 2  }
@@ -114,19 +146,19 @@ snL4History						OBJECT IDENTIFIER 	  ::= { snL4 28 }
 
 
 -- L4 General MIBs
-                
+
 snL4MaxSessionLimit 		OBJECT-TYPE
 	SYNTAX	INTEGER	(0..1000000)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"numbers of maximum session (L4 cache) entries"
 	::= { snL4Gen 1 }
 
 snL4TcpSynLimit 		OBJECT-TYPE
 	SYNTAX	INTEGER	 (1..65535)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Numbers of connection per second"
 	::= { snL4Gen 2 }
@@ -134,28 +166,28 @@ snL4TcpSynLimit 		OBJECT-TYPE
 --  Server load balancing
 snL4slbGlobalSDAType	OBJECT-TYPE
 	SYNTAX	 INTEGER {
-	    leastconnection(1),
-	    roundrobin(2),
-	    weighted(3)
+		leastconnection(1),
+		roundrobin(2),
+		weighted(3)
 	}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Global Session Distribution Algorithm(SDA)"
 	::= { snL4Gen 3 }
 
 snL4slbTotalConnections 		OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Total connections in this device"
 	::= { snL4Gen 4 }
 
 snL4slbLimitExceeds 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"exceeds snL4TCPSynLimit (numbers of connection per second)"
 	::= { snL4Gen 5 }
@@ -163,57 +195,57 @@ snL4slbLimitExceeds 		OBJECT-TYPE
 -- Server load balancing traffic info
 
 snL4slbForwardTraffic 		OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Client->Server"
 	::= { snL4Gen 6 }
 
 snL4slbReverseTraffic 		OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Server->Client"
 	::= { snL4Gen 7 }
 
 snL4slbDrops 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4Gen 8 }
 
 snL4slbDangling 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4Gen 9 }
 
 snL4slbDisableCount 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4Gen 10 }
 
 snL4slbAged 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4Gen 11 }
 
 snL4slbFinished 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"FIN_or_RST"
 	::= { snL4Gen 12 }
@@ -221,9 +253,9 @@ snL4slbFinished 		OBJECT-TYPE
 --  Session
 
 snL4FreeSessionCount 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Maximum sessions - used sessions"
 	::= { snL4Gen 13 }
@@ -232,56 +264,56 @@ snL4FreeSessionCount 		OBJECT-TYPE
 --  Hot stand-by
 snL4BackupInterface 		OBJECT-TYPE
 	SYNTAX	INTEGER	  (0..26)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"backup monitoring port"
 	::= { snL4Gen 14 }
 
 snL4BackupMacAddr 		OBJECT-TYPE
 	SYNTAX	PhysAddress
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Associated MAC address for backup monitoring port"
 	::= { snL4Gen 15 }
 
 snL4Active 		OBJECT-TYPE
 	SYNTAX	L4Flag
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4Gen 16 }
 
 snL4Redundancy 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4Gen 17 }
 
 snL4Backup 		OBJECT-TYPE
 	SYNTAX	L4Flag
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"true->StandBy,false->active"
 	::= { snL4Gen 18 }
 
 snL4BecomeActive 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"How many times this device become active"
 	::= { snL4Gen 19 }
 
 snL4BecomeStandBy 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"How many times this device become standby"
 	::= { snL4Gen 20 }
@@ -289,86 +321,86 @@ snL4BecomeStandBy 		OBJECT-TYPE
 snL4BackupState 		OBJECT-TYPE
 	SYNTAX	 INTEGER {
 		slbSyncComplete(0),
-	    slbSyncReqMap(1),
-	    slbSyncreqMac(2),
-	    slbSyncreqServers(3),
-	    slbSyncReqL4(4)
+		slbSyncReqMap(1),
+		slbSyncreqMac(2),
+		slbSyncreqServers(3),
+		slbSyncReqL4(4)
 	}
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Backup state"
 	::= { snL4Gen 21 }
 
 snL4NoPDUSent 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4Gen 22 }
 
 
 snL4NoPDUCount 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4Gen 23 }
 
 
 snL4NoPortMap 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4Gen 24 }
 
 snL4unsuccessfulConn 	OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Unsuccessfull connection"
 	::= { snL4Gen 25 }
 
 snL4PingInterval 	OBJECT-TYPE
 	SYNTAX	INTEGER	 (1..10)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Ping retries interval"
-    DEFVAL { 2 }
+	DEFVAL { 2 }
 	::= { snL4Gen 26 }
 
 snL4PingRetry 	OBJECT-TYPE
 	SYNTAX	INTEGER	(2..10)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Ping retries attempts"
-    DEFVAL { 4 }
+	DEFVAL { 4 }
 	::= { snL4Gen 27 }
 
 snL4TcpAge 	OBJECT-TYPE
 	SYNTAX	INTEGER	(2..60)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"TCP reset age"
-    DEFVAL { 30 }
+	DEFVAL { 30 }
 	::= { snL4Gen 28 }
 
 
 snL4UdpAge 	OBJECT-TYPE
 	SYNTAX	INTEGER	(2..60)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"UDP reset age"
-    DEFVAL { 5 }
+	DEFVAL { 5 }
 	::= { snL4Gen 29 }
 
 
@@ -376,56 +408,56 @@ snL4UdpAge 	OBJECT-TYPE
 
 snL4EnableMaxSessionLimitReachedTrap        OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Enable/disable maximum number of connections reached trap."
 	::= { snL4Gen 30 }
 
 snL4EnableTcpSynLimitReachedTrap            OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Enable/disable the number of TCP SYN limits reached trap."
 	::= { snL4Gen 31 }
 
 snL4EnableRealServerUpTrap                  OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Enable/disable the real server up trap."
 	::= { snL4Gen 32 }
 
 snL4EnableRealServerDownTrap                OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Enable/disable the real server down trap."
 	::= { snL4Gen 33 }
 
 snL4EnableRealServerPortUpTrap              OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Enable/disable the real server TCP port up trap."
 	::= { snL4Gen 34 }
 
 snL4EnableRealServerPortDownTrap            OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Enable/disable the real server TCP port down trap."
 	::= { snL4Gen 35 }
 
 snL4EnableRealServerMaxConnLimitReachedTrap OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Enable/disable the real server maximum number of
 		connections reached trap."
@@ -433,8 +465,8 @@ snL4EnableRealServerMaxConnLimitReachedTrap OBJECT-TYPE
 
 snL4EnableBecomeStandbyTrap                 OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Enable/disable trap of the server load balancing
 		switch changes state from active to standby."
@@ -442,16 +474,16 @@ snL4EnableBecomeStandbyTrap                 OBJECT-TYPE
 
 snL4EnableBecomeActiveTrap                  OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Enable/disable trap of the server load balancing
 		switch changes state from standby to active."
 	::= { snL4Gen 38 }
 
 snL4slbRouterInterfacePortMask 	OBJECT-TYPE
-	SYNTAX	INTEGER	
-	ACCESS  read-write
+	SYNTAX   Integer32
+	MAX-ACCESS  read-write
 	STATUS  deprecated
 	DESCRIPTION
 		"Router interface port mask.
@@ -460,25 +492,25 @@ snL4slbRouterInterfacePortMask 	OBJECT-TYPE
 
 ------- Server Cache Group Global MIBs ----------
 snL4MaxNumWebCacheGroup 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The maximum number of server cache groups"
 	::= { snL4Gen 40 }
 
 snL4MaxNumWebCachePerGroup 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The maximum number of WEB Cache servers in each of web cache group"
 	::= { snL4Gen 41 }
 
 snL4WebCacheStateful 		OBJECT-TYPE
 	SYNTAX	L4Status
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"The WEB Cache servers cache-stateful"
 	::= { snL4Gen 42 }
@@ -486,16 +518,16 @@ snL4WebCacheStateful 		OBJECT-TYPE
 ------- GSLB Group Global MIBs ----------
 snL4EnableGslbHealthCheckIpUpTrap        OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Health check IP up."
 	::= { snL4Gen 43 }
 
 snL4EnableGslbHealthCheckIpDownTrap        OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Health check IP down."
 	::= { snL4Gen 44 }
@@ -503,8 +535,8 @@ snL4EnableGslbHealthCheckIpDownTrap        OBJECT-TYPE
 
 snL4EnableGslbHealthCheckIpPortUpTrap        OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Health check IP port up."
 	::= { snL4Gen 45 }
@@ -512,8 +544,8 @@ snL4EnableGslbHealthCheckIpPortUpTrap        OBJECT-TYPE
 
 snL4EnableGslbHealthCheckIpPortDownTrap        OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Health check IP port down."
 	::= { snL4Gen 46 }
@@ -521,8 +553,8 @@ snL4EnableGslbHealthCheckIpPortDownTrap        OBJECT-TYPE
 
 snL4EnableGslbRemoteGslbSiDownTrap        OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Connection to GSLB ServerIron is down."
 	::= { snL4Gen 47 }
@@ -530,8 +562,8 @@ snL4EnableGslbRemoteGslbSiDownTrap        OBJECT-TYPE
 
 snL4EnableGslbRemoteGslbSiUpTrap        OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"Connection to GSLB ServerIron is up."
 	::= { snL4Gen 48 }
@@ -539,8 +571,8 @@ snL4EnableGslbRemoteGslbSiUpTrap        OBJECT-TYPE
 
 snL4EnableGslbRemoteSiDownTrap        OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"GSLB connection to remote ServerIron is down."
 	::= { snL4Gen 49 }
@@ -548,16 +580,16 @@ snL4EnableGslbRemoteSiDownTrap        OBJECT-TYPE
 
 snL4EnableGslbRemoteSiUpTrap        OBJECT-TYPE
 	SYNTAX INTEGER { disabled(0), enabled(1) }
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"GSLB connection to remote ServerIron is up."
 	::= { snL4Gen 50 }
 
 snL4slbRouterInterfacePortList 	OBJECT-TYPE
 	SYNTAX	OCTET STRING
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Router interface port list. Each port index is a 16-bit integer
 		in big endian order. 8-bit is the slot number, the other 8-bit
@@ -569,16 +601,16 @@ snL4slbRouterInterfacePortList 	OBJECT-TYPE
 
 snL4VirtualServerTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4VirtualServerEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server table."
 	::= { snL4VirtualServer 1 }
 
 snL4VirtualServerEntry  OBJECT-TYPE
 	SYNTAX	SnL4VirtualServerEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in L4 Virtual Server table."
 	INDEX	{ snL4VirtualServerIndex }
@@ -587,24 +619,24 @@ snL4VirtualServerEntry  OBJECT-TYPE
 SnL4VirtualServerEntry ::= SEQUENCE {
 	snL4VirtualServerIndex
 		INTEGER,
-    snL4VirtualServerName
-        L4ServerName,
-    snL4VirtualServerVirtualIP
+	snL4VirtualServerName
+		L4ServerName,
+	snL4VirtualServerVirtualIP
 		IpAddress,
-    snL4VirtualServerAdminStatus
-        L4Status,
+	snL4VirtualServerAdminStatus
+		L4Status,
 	snL4VirtualServerSDAType
 		INTEGER,
 	snL4VirtualServerRowStatus
 		L4RowSts,
-    snL4VirtualServerDeleteState
-        L4DeleteState
+	snL4VirtualServerDeleteState
+		L4DeleteState
 	}
 
 snL4VirtualServerIndex  OBJECT-TYPE
 	SYNTAX	INTEGER (1..64)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The table index for a Virtual Server  entry."
 	::= { snL4VirtualServerEntry 1 }
@@ -612,8 +644,8 @@ snL4VirtualServerIndex  OBJECT-TYPE
 
 snL4VirtualServerName  OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Virtual server name."
 	::= { snL4VirtualServerEntry 2 }
@@ -621,16 +653,16 @@ snL4VirtualServerName  OBJECT-TYPE
 snL4VirtualServerVirtualIP
 	OBJECT-TYPE
 	SYNTAX IpAddress
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server IP Address."
 	::= { snL4VirtualServerEntry 3 }
 
 snL4VirtualServerAdminStatus	OBJECT-TYPE
 	SYNTAX	L4Status
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server status is ether disabled(0) or enabled(1)."
 	::= { snL4VirtualServerEntry 4 }
@@ -638,20 +670,20 @@ snL4VirtualServerAdminStatus	OBJECT-TYPE
 snL4VirtualServerSDAType  OBJECT-TYPE
 	SYNTAX	 INTEGER {
 		default(0),
-	    leastconnection(1),
-	    roundrobin(2),
-	    weighted(3)
+		leastconnection(1),
+		roundrobin(2),
+		weighted(3)
 	}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"TCP/UDP Sessions Distribution Algorithms Type."
 	::= { snL4VirtualServerEntry 5 }
 
  snL4VirtualServerRowStatus OBJECT-TYPE
 	SYNTAX  L4RowSts
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete a virtual server
 		entry."
@@ -659,10 +691,10 @@ snL4VirtualServerSDAType  OBJECT-TYPE
 
 snL4VirtualServerDeleteState	OBJECT-TYPE
 	SYNTAX	L4DeleteState
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Delete operation state." 
+		"Delete operation state."
 	::= { snL4VirtualServerEntry 7 }
 
 
@@ -670,16 +702,16 @@ snL4VirtualServerDeleteState	OBJECT-TYPE
 
 snL4RealServerTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4RealServerEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Real Server table."
 	::= { snL4RealServer 1 }
 
 snL4RealServerEntry  OBJECT-TYPE
 	SYNTAX	SnL4RealServerEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Real Server table."
 	INDEX	{ snL4RealServerIndex }
@@ -688,33 +720,33 @@ snL4RealServerEntry  OBJECT-TYPE
 SnL4RealServerEntry ::= SEQUENCE {
 	snL4RealServerIndex
 		INTEGER,
-    snL4RealServerName
-        L4ServerName,
-    snL4RealServerIP
+	snL4RealServerName
+		L4ServerName,
+	snL4RealServerIP
 		IpAddress,
-    snL4RealServerAdminStatus
-        L4Status,
+	snL4RealServerAdminStatus
+		L4Status,
 	snL4RealServerMaxConnections
 		INTEGER,
 	snL4RealServerWeight
 		INTEGER,
 	snL4RealServerRowStatus
 		L4RowSts,
-    snL4RealServerDeleteState
-        L4DeleteState
+	snL4RealServerDeleteState
+		L4DeleteState
 	}
 
 snL4RealServerIndex  OBJECT-TYPE
 	SYNTAX	INTEGER (1..256)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The table index for a Real Server entry."
 	::= { snL4RealServerEntry 1 }
 snL4RealServerName  OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real server name."
 	::= { snL4RealServerEntry 2 }
@@ -722,50 +754,50 @@ snL4RealServerName  OBJECT-TYPE
 snL4RealServerIP
 	OBJECT-TYPE
 	SYNTAX IpAddress
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real Server IP Address."
 	::= { snL4RealServerEntry 3 }
 
 snL4RealServerAdminStatus	OBJECT-TYPE
 	SYNTAX	L4Status
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real Server status is ether disabled(0) or enabled(1)."
 	::= { snL4RealServerEntry 4 }
 
 snL4RealServerMaxConnections 	OBJECT-TYPE
 	SYNTAX	INTEGER	 (0..1000000)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real Server Maximum Connection allowed."
 	::= { snL4RealServerEntry 5 }
 
  snL4RealServerWeight	OBJECT-TYPE
 	SYNTAX	INTEGER	  (0..65000)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real Server weight"
 	::= { snL4RealServerEntry 6 }
 
  snL4RealServerRowStatus OBJECT-TYPE
 	SYNTAX  L4RowSts
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete a real server entry."
 	::= {snL4RealServerEntry  7 }
 
 snL4RealServerDeleteState	OBJECT-TYPE
 	SYNTAX	L4DeleteState
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Delete operation state." 
+		"Delete operation state."
 	::= { snL4RealServerEntry 8 }
 
 
@@ -774,16 +806,16 @@ snL4RealServerDeleteState	OBJECT-TYPE
 
 snL4VirtualServerPortTable	       OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4VirtualServerPortEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server Port table."
 	::= { snL4VirtualServerPort 1 }
 
 snL4VirtualServerPortEntry	       OBJECT-TYPE
 	SYNTAX	SnL4VirtualServerPortEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Virtual Server Port table."
 	INDEX	{ snL4VirtualServerPortIndex }
@@ -793,7 +825,7 @@ SnL4VirtualServerPortEntry ::= SEQUENCE {
 	snL4VirtualServerPortIndex
 		INTEGER,
 	snL4VirtualServerPortServerName
-        L4ServerName,
+		L4ServerName,
 	snL4VirtualServerPortPort
 		INTEGER,
 	snL4VirtualServerPortAdminStatus
@@ -804,15 +836,15 @@ SnL4VirtualServerPortEntry ::= SEQUENCE {
 		INTEGER,
 	snL4VirtualServerPortRowStatus
 		L4RowSts,
-    snL4VirtualServerPortDeleteState
-        L4DeleteState
+	snL4VirtualServerPortDeleteState
+		L4DeleteState
 	}
 
 
 snL4VirtualServerPortIndex	       OBJECT-TYPE
 	SYNTAX	INTEGER (1..2048)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The index for Virtual Server Port entry."
 	::= { snL4VirtualServerPortEntry 1 }
@@ -820,16 +852,16 @@ snL4VirtualServerPortIndex	       OBJECT-TYPE
 
 snL4VirtualServerPortServerName	       OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortEntry 2 }
 
 snL4VirtualServerPortPort       OBJECT-TYPE
 	SYNTAX	INTEGER	  (0..65535)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortEntry 3 }
@@ -837,8 +869,8 @@ snL4VirtualServerPortPort       OBJECT-TYPE
 
 snL4VirtualServerPortAdminStatus		       OBJECT-TYPE
 	SYNTAX	L4Status
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortEntry 4 }
@@ -847,10 +879,10 @@ snL4VirtualServerPortAdminStatus		       OBJECT-TYPE
  snL4VirtualServerPortSticky       OBJECT-TYPE
 	 SYNTAX  INTEGER {
 			disabled(0),
-			enabled(1)       
+			enabled(1)
 			}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortEntry 5 }
@@ -859,29 +891,29 @@ snL4VirtualServerPortAdminStatus		       OBJECT-TYPE
  snL4VirtualServerPortConcurrent       OBJECT-TYPE
 	 SYNTAX  INTEGER {
 			disabled(0),
-			enabled(1)       
+			enabled(1)
 			}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortEntry 6 }
 
 
  snL4VirtualServerPortRowStatus	 	       OBJECT-TYPE
-	SYNTAX L4RowSts	
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX L4RowSts
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete a virtual server  port entry."
 	::= { snL4VirtualServerPortEntry 7 }
 
 snL4VirtualServerPortDeleteState	OBJECT-TYPE
 	SYNTAX	L4DeleteState
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Delete operation state." 
+		"Delete operation state."
 	::= { snL4VirtualServerPortEntry 8 }
 
 
@@ -891,16 +923,16 @@ snL4VirtualServerPortDeleteState	OBJECT-TYPE
 
 snL4RealServerPortTable	       OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4RealServerPortEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Real Server Port table."
 	::= { snL4RealServerPort 1 }
 
 snL4RealServerPortEntry	       OBJECT-TYPE
 	SYNTAX	SnL4RealServerPortEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Real Server Port table."
 	INDEX	{ snL4RealServerPortIndex }
@@ -910,37 +942,37 @@ SnL4RealServerPortEntry ::= SEQUENCE {
 	snL4RealServerPortIndex
 		INTEGER,
 	snL4RealServerPortServerName
-        L4ServerName,
+		L4ServerName,
 	snL4RealServerPortPort
 		INTEGER,
 	snL4RealServerPortAdminStatus
 		L4Status,
 	snL4RealServerPortRowStatus
 		L4RowSts,
-    snL4RealServerPortDeleteState
-        L4DeleteState
+	snL4RealServerPortDeleteState
+		L4DeleteState
 	}
 
 
 snL4RealServerPortIndex	       OBJECT-TYPE
 	SYNTAX	INTEGER (1..2048)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The index for Real Server Port entry."
 	::= { snL4RealServerPortEntry 1 }
 snL4RealServerPortServerName	       OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortEntry 2 }
 
 snL4RealServerPortPort       OBJECT-TYPE
 	SYNTAX	INTEGER	 (0..65535)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortEntry 3 }
@@ -948,26 +980,26 @@ snL4RealServerPortPort       OBJECT-TYPE
 
 snL4RealServerPortAdminStatus		       OBJECT-TYPE
 	SYNTAX	L4Status
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortEntry 4 }
 
  snL4RealServerPortRowStatus	 	       OBJECT-TYPE
-	SYNTAX L4RowSts	
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX L4RowSts
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete a Real server  port entry."
 	::= { snL4RealServerPortEntry 5 }
 
 snL4RealServerPortDeleteState	OBJECT-TYPE
 	SYNTAX	L4DeleteState
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Delete operation state." 
+		"Delete operation state."
 	::= { snL4RealServerPortEntry 6 }
 
 
@@ -976,16 +1008,16 @@ snL4RealServerPortDeleteState	OBJECT-TYPE
 
 snL4BindTable	       OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4BindEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Bind table."
 	::= { snL4Bind 1 }
 
 snL4BindEntry	       OBJECT-TYPE
 	SYNTAX	SnL4BindEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Bind table."
 	INDEX	{ snL4BindIndex }
@@ -995,11 +1027,11 @@ SnL4BindEntry ::= SEQUENCE {
 	snL4BindIndex
 		INTEGER,
 	snL4BindVirtualServerName
-        L4ServerName,
+		L4ServerName,
 	snL4BindVirtualPortNumber
 		INTEGER,
 	snL4BindRealServerName
-        L4ServerName,
+		L4ServerName,
 	snL4BindRealPortNumber
 		INTEGER,
 	snL4BindRowStatus
@@ -1009,24 +1041,24 @@ SnL4BindEntry ::= SEQUENCE {
 
 snL4BindIndex	       OBJECT-TYPE
 	SYNTAX	INTEGER (1..2048)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The index for Bind entry."
 	::= { snL4BindEntry 1 }
 
 snL4BindVirtualServerName 	       OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4BindEntry 2 }
 
 snL4BindVirtualPortNumber        OBJECT-TYPE
 	SYNTAX	INTEGER	 (0..65535)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4BindEntry 3 }
@@ -1034,16 +1066,16 @@ snL4BindVirtualPortNumber        OBJECT-TYPE
 
  snL4BindRealServerName	       OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4BindEntry 4 }
 
 snL4BindRealPortNumber       OBJECT-TYPE
 	SYNTAX	INTEGER	 (0..65535)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4BindEntry 5 }
@@ -1054,8 +1086,8 @@ snL4BindRowStatus  	 	       OBJECT-TYPE
 			 delete(3),
 			 create(4)
 	}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete bind entry."
 	::= { snL4BindEntry 6 }
@@ -1068,16 +1100,16 @@ snL4BindRowStatus  	 	       OBJECT-TYPE
 
 snL4VirtualServerStatusTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4VirtualServerStatusEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server Status table."
 	::= { snL4VirtualServerStatus 1 }
 
 snL4VirtualServerStatusEntry  OBJECT-TYPE
 	SYNTAX	SnL4VirtualServerStatusEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in L4 Virtual Server Status table."
 	INDEX	{ snL4VirtualServerStatusIndex }
@@ -1086,20 +1118,20 @@ snL4VirtualServerStatusEntry  OBJECT-TYPE
 SnL4VirtualServerStatusEntry ::= SEQUENCE {
 	snL4VirtualServerStatusIndex
 		INTEGER,
-    snL4VirtualServerStatusName
-        L4ServerName,
+	snL4VirtualServerStatusName
+		L4ServerName,
 	snL4VirtualServerStatusReceivePkts
-		Counter,
+		Counter32,
 	snL4VirtualServerStatusTransmitPkts
-		Counter,
+		Counter32,
 	snL4VirtualServerStatusTotalConnections
-		Counter
+		Counter32
 	}
 
 snL4VirtualServerStatusIndex  OBJECT-TYPE
 	SYNTAX	INTEGER (1..64)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The table index for a Virtual Server  Status entry."
 	::= { snL4VirtualServerStatusEntry 1 }
@@ -1107,35 +1139,35 @@ snL4VirtualServerStatusIndex  OBJECT-TYPE
 
 snL4VirtualServerStatusName  OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Virtual server name."
 	::= { snL4VirtualServerStatusEntry 2 }
 
 
 snL4VirtualServerStatusReceivePkts  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS	read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatusEntry 3 }
 
 snL4VirtualServerStatusTransmitPkts  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS	read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatusEntry 4 }
 
 snL4VirtualServerStatusTotalConnections  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS	read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatusEntry 5 }
 
 
@@ -1143,16 +1175,16 @@ snL4VirtualServerStatusTotalConnections  OBJECT-TYPE
 
 snL4RealServerStatusTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4RealServerStatusEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Real Server Status table."
 	::= { snL4RealServerStatus 1 }
 
 snL4RealServerStatusEntry  OBJECT-TYPE
 	SYNTAX	SnL4RealServerStatusEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Real Server Status table."
 	INDEX	{ snL4RealServerStatusIndex }
@@ -1161,94 +1193,94 @@ snL4RealServerStatusEntry  OBJECT-TYPE
 SnL4RealServerStatusEntry ::= SEQUENCE {
 	snL4RealServerStatusIndex
 		INTEGER,
-    snL4RealServerStatusName
-        L4ServerName,
-    snL4RealServerStatusRealIP
+	snL4RealServerStatusName
+		L4ServerName,
+	snL4RealServerStatusRealIP
 		IpAddress,
 	snL4RealServerStatusReceivePkts
-		Counter,
+		Counter32,
 	snL4RealServerStatusTransmitPkts
-		Counter,
+		Counter32,
 	snL4RealServerStatusCurConnections
-		INTEGER,
+		Integer32,
 	snL4RealServerStatusTotalConnections
-		Counter,
+		Counter32,
 	snL4RealServerStatusAge
-		INTEGER,
+		Integer32,
 	snL4RealServerStatusState
 		INTEGER,
 	snL4RealServerStatusReassignments
-		INTEGER,
+		Integer32,
 	snL4RealServerStatusReassignmentLimit
-		INTEGER,
+		Integer32,
 	snL4RealServerStatusFailedPortExists
-		INTEGER,
+		Integer32,
 	snL4RealServerStatusFailTime
-		INTEGER,
+		Integer32,
 	snL4RealServerStatusPeakConnections
-		INTEGER
+		Integer32
 	}
 
 snL4RealServerStatusIndex  OBJECT-TYPE
 	SYNTAX	INTEGER	 (1..256)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The table index for a Real Server Status entry."
 	::= { snL4RealServerStatusEntry 1 }
 
 snL4RealServerStatusName OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 2 }
 
 snL4RealServerStatusRealIP OBJECT-TYPE
 	SYNTAX	IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 3 }
 
 snL4RealServerStatusReceivePkts	  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 4 }
 
 snL4RealServerStatusTransmitPkts  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 5 }
 
 snL4RealServerStatusCurConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 6 }
 
 snL4RealServerStatusTotalConnections   OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 7 }
 
 snL4RealServerStatusAge  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 8 }
@@ -1263,49 +1295,49 @@ snL4RealServerStatusState  OBJECT-TYPE
 	servershutdown(5),
 	serveractive(6)
 	}
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 9 }
 
 snL4RealServerStatusReassignments  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 10 }
 
 snL4RealServerStatusReassignmentLimit  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 11 }
 
 snL4RealServerStatusFailedPortExists  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 12 }
 
 snL4RealServerStatusFailTime  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 13 }
 
 
 snL4RealServerStatusPeakConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatusEntry 14 }
@@ -1317,16 +1349,16 @@ snL4RealServerStatusPeakConnections   OBJECT-TYPE
 
 snL4VirtualServerPortStatusTable	       OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4VirtualServerPortStatusEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server Port Status table."
 	::= { snL4VirtualServerPortStatus 1 }
 
 snL4VirtualServerPortStatusEntry	       OBJECT-TYPE
 	SYNTAX	SnL4VirtualServerPortStatusEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Virtual Server Port Status table."
 	INDEX	{ snL4VirtualServerPortStatusIndex }
@@ -1334,63 +1366,63 @@ snL4VirtualServerPortStatusEntry	       OBJECT-TYPE
 
 SnL4VirtualServerPortStatusEntry ::= SEQUENCE {
 	snL4VirtualServerPortStatusIndex
-		INTEGER,
+		Integer32,
 	snL4VirtualServerPortStatusPort
 		INTEGER,
 	snL4VirtualServerPortStatusServerName
-        L4ServerName,
+		L4ServerName,
 	snL4VirtualServerPortStatusCurrentConnection
-		INTEGER,
+		Integer32,
 	snL4VirtualServerPortStatusTotalConnection
-		Counter,
+		Counter32,
 	snL4VirtualServerPortStatusPeakConnection
-		INTEGER
+		Integer32
 	}
 
 snL4VirtualServerPortStatusIndex	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The index for Virtual Server Port Status entry."
 	::= { snL4VirtualServerPortStatusEntry 1 }
 
 snL4VirtualServerPortStatusPort   OBJECT-TYPE
 	SYNTAX	INTEGER	 (1..2048)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortStatusEntry 2 }
 
  snL4VirtualServerPortStatusServerName 	       OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortStatusEntry 3 }
 
  snL4VirtualServerPortStatusCurrentConnection 	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortStatusEntry 4 }
 
  snL4VirtualServerPortStatusTotalConnection		       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortStatusEntry 5 }
 
  snL4VirtualServerPortStatusPeakConnection 	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortStatusEntry 6 }
@@ -1399,16 +1431,16 @@ snL4VirtualServerPortStatusPort   OBJECT-TYPE
 
 snL4RealServerPortStatusTable	       OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4RealServerPortStatusEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Real Server Port Status table."
 	::= { snL4RealServerPortStatus 1 }
 
 snL4RealServerPortStatusEntry	       OBJECT-TYPE
 	SYNTAX	SnL4RealServerPortStatusEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Real Server Port Status table."
 	INDEX	{ snL4RealServerPortStatusIndex }
@@ -1418,60 +1450,60 @@ SnL4RealServerPortStatusEntry ::= SEQUENCE {
 	snL4RealServerPortStatusIndex
 		INTEGER,
 	snL4RealServerPortStatusPort
-		INTEGER,
+		Integer32,
 	snL4RealServerPortStatusServerName
-        L4ServerName,
+		L4ServerName,
 	snL4RealServerPortStatusReassignCount
-		INTEGER,
+		Integer32,
 	snL4RealServerPortStatusState
 		INTEGER,
 	snL4RealServerPortStatusFailTime
-		INTEGER,
+		Integer32,
 	snL4RealServerPortStatusCurrentConnection
-		INTEGER,
+		Integer32,
 	snL4RealServerPortStatusTotalConnection
-		Counter,
+		Counter32,
 	snL4RealServerPortStatusRxPkts
-		Counter,
+		Counter32,
 	snL4RealServerPortStatusTxPkts
-		Counter,
+		Counter32,
 	snL4RealServerPortStatusRxBytes
-		Counter,
+		Counter32,
 	snL4RealServerPortStatusTxBytes
-		Counter,
+		Counter32,
 	snL4RealServerPortStatusPeakConnection
-		INTEGER
+		Integer32
 	}
 
 
 snL4RealServerPortStatusIndex	       OBJECT-TYPE
 	SYNTAX	INTEGER	  (1..2048)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The index for Real Server Port Status entry."
 	::= { snL4RealServerPortStatusEntry 1 }
 
 snL4RealServerPortStatusPort	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortStatusEntry 2 }
 
 snL4RealServerPortStatusServerName	       OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortStatusEntry 3 }
 
 snL4RealServerPortStatusReassignCount	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortStatusEntry 4 }
@@ -1483,82 +1515,82 @@ snL4RealServerPortStatusReassignCount	       OBJECT-TYPE
 		failed(2),
 		testing(3),
 		suspect(4),
-	    shutdown(5),
+		shutdown(5),
 		active(6),
 		unbound(7),
 		awaitUnbind(8),
 		awaitDelete(9)
 	}
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port state"
 	::= { snL4RealServerPortStatusEntry 5 }
 
 snL4RealServerPortStatusFailTime 	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Only useful, if real server port state is failed.
 		 Indicating how seconds has been elapsed from the last retry."
- 	::= { snL4RealServerPortStatusEntry 6 }
+	::= { snL4RealServerPortStatusEntry 6 }
 
 snL4RealServerPortStatusCurrentConnection	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port current connection"
 	::= { snL4RealServerPortStatusEntry 7 }
 
 snL4RealServerPortStatusTotalConnection	       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port total connection"
 	::= { snL4RealServerPortStatusEntry 8 }
 
 snL4RealServerPortStatusRxPkts	       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port receive packets."
 	::= { snL4RealServerPortStatusEntry 9 }
 
 
 snL4RealServerPortStatusTxPkts	       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port transmit packets."
 	::= { snL4RealServerPortStatusEntry 10 }
 
 
 snL4RealServerPortStatusRxBytes	       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port receive bytes."
 	::= { snL4RealServerPortStatusEntry 11 }
 
 snL4RealServerPortStatusTxBytes	       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port transmit bytes."
 	::= { snL4RealServerPortStatusEntry 12 }
 
 
 snL4RealServerPortStatusPeakConnection	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"peak connection for real server port."
 	::= { snL4RealServerPortStatusEntry 13 }
@@ -1570,16 +1602,16 @@ snL4RealServerPortStatusPeakConnection	       OBJECT-TYPE
 
 snL4PolicyTable	  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4PolicyEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"L4 policy table."
 	::= {snL4Policy  1 }
 
 snL4PolicyEntry	  OBJECT-TYPE
 	SYNTAX	SnL4PolicyEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry of the L4 policy table."
 	INDEX	{ snL4PolicyId }
@@ -1602,8 +1634,8 @@ SnL4PolicyEntry ::= SEQUENCE {
 
 snL4PolicyId         OBJECT-TYPE
 	SYNTAX	INTEGER (1..64)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The  ID to identify a  entry."
 	::= { snL4PolicyEntry 1 }
@@ -1619,8 +1651,8 @@ snL4PolicyPriority	   OBJECT-TYPE
 		level6(6),
 		level7(7)
 		}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"The Stand alone stackable switch L4 Policy Priority values are:
 		 normal(0)   		 -- normal prority
@@ -1634,8 +1666,8 @@ snL4PolicyPriority	   OBJECT-TYPE
 
 snL4PolicyScope	   OBJECT-TYPE
 	SYNTAX	INTEGER { global(0), local(1) }
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		" Scope of the  local or global.
 		  Global  automatic apply to all port.
@@ -1645,29 +1677,29 @@ snL4PolicyScope	   OBJECT-TYPE
 snL4PolicyProtocol     OBJECT-TYPE
 	SYNTAX	INTEGER { udp(0), tcp(1) }
 
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4PolicyEntry 4 }
 
 snL4PolicyPort OBJECT-TYPE
 	SYNTAX	INTEGER	 (0..65535)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION ""
 	::= { snL4PolicyEntry 5 }
 
 snL4PolicyRowStatus  OBJECT-TYPE
 	SYNTAX	INTEGER {
-	    invalid(1),
-	    valid(2),
-	    delete(3),
-	    create(4),
-	    modify(5)
+		invalid(1),
+		valid(2),
+		delete(3),
+		create(4),
+		modify(5)
 	}
-	ACCESS	 read-write
-	STATUS	 mandatory
+	MAX-ACCESS	 read-write
+	STATUS	 current
 	DESCRIPTION
 		"This object is used to create and
 		delete row in the table and control
@@ -1683,7 +1715,7 @@ snL4PolicyRowStatus  OBJECT-TYPE
 		immediately. The following values
 		can be returned on reads:
 		invalid(1)...Setting it to 'invalid' has the effect of
-		             rendering it inoperative.
+					 rendering it inoperative.
 		valid(2).....the row exists and is valid"
 	::= { snL4PolicyEntry 6 }
 
@@ -1691,16 +1723,16 @@ snL4PolicyRowStatus  OBJECT-TYPE
 
 snL4PolicyPortAccessTable	     OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4PolicyPortAccessEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"ip interface L4 policy access table."
 	::= {snL4PolicyPortAccess  1}
 
 snL4PolicyPortAccessEntry	     OBJECT-TYPE
 	SYNTAX	SnL4PolicyPortAccessEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry of the ip interface L4 policy access  table."
 	INDEX	{ snL4PolicyPortAccessPort }
@@ -1708,7 +1740,7 @@ snL4PolicyPortAccessEntry	     OBJECT-TYPE
 
 SnL4PolicyPortAccessEntry ::= SEQUENCE {
 	snL4PolicyPortAccessPort
-		INTEGER,
+		Integer32,
 	snL4PolicyPortAccessList
 		OCTET STRING,
 	snL4PolicyPortAccessRowStatus
@@ -1716,17 +1748,17 @@ SnL4PolicyPortAccessEntry ::= SEQUENCE {
 	}
 
 snL4PolicyPortAccessPort	     OBJECT-TYPE
-	SYNTAX	INTEGER	
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The ip interface to which the L4 policy  applies."
 	::= { snL4PolicyPortAccessEntry 1 }
 
 snL4PolicyPortAccessList  OBJECT-TYPE
 	SYNTAX	OCTET STRING (SIZE(1..64))
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"An ip L4 policy  list, of which each octet contains
 		a  ID number that forms a group of s. A
@@ -1737,14 +1769,14 @@ snL4PolicyPortAccessList  OBJECT-TYPE
 
 snL4PolicyPortAccessRowStatus   OBJECT-TYPE
 	SYNTAX	 INTEGER {
-	    invalid(1),
-	    valid(2),
-	    delete(3),
-	    create(4),
-	    modify(5)
+		invalid(1),
+		valid(2),
+		delete(3),
+		create(4),
+		modify(5)
 	}
-	ACCESS	 read-write
-	STATUS	 mandatory
+	MAX-ACCESS	 read-write
+	STATUS	 current
 	DESCRIPTION
 		"This object is used to create and
 		delete row in the table and control
@@ -1760,7 +1792,7 @@ snL4PolicyPortAccessRowStatus   OBJECT-TYPE
 		immediately. The following values
 		can be returned on reads:
 		invalid(1)...Setting it to 'invalid' has the effect of
-		             rendering it inoperative.
+					 rendering it inoperative.
 		valid(2).....the row exists and is valid"
 	::= { snL4PolicyPortAccessEntry 3 }
 
@@ -1768,48 +1800,48 @@ snL4PolicyPortAccessRowStatus   OBJECT-TYPE
 
 snL4TrapRealServerIP             OBJECT-TYPE
 	SYNTAX IpAddress
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"Real server IP address."
 	::= { snL4Trap 1 }
 
 snL4TrapRealServerName           OBJECT-TYPE
 	SYNTAX L4ServerName
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"Real server name."
 	::= { snL4Trap 2 }
 
 snL4TrapRealServerPort           OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS mandatory
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"Transport protocol port number of the real server."
 	::= { snL4Trap 3 }
 
 snL4TrapRealServerCurConnections OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS mandatory
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"Real Server current connections."
 	::= { snL4Trap 4 }
 
 snL4TrapLinkName OBJECT-TYPE
 	SYNTAX L4ServerName
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"Link name."
 	::= { snL4Trap 5 }
 
 snL4LinkVirtualInterface OBJECT-TYPE
-	SYNTAX INTEGER
-	ACCESS read-only
-	STATUS mandatory
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"Link virtual interface."
 	::= { snL4Trap 6 }
@@ -1818,93 +1850,93 @@ snL4LinkVirtualInterface OBJECT-TYPE
 
 snL4WebCacheTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4WebCacheEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Real Server table."
 	::= { snL4WebCache 1 }
 
 snL4WebCacheEntry  OBJECT-TYPE
 	SYNTAX	SnL4WebCacheEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Real Server table."
 	INDEX	{ snL4WebCacheIP }
 	::= { snL4WebCacheTable 1 }
 
 SnL4WebCacheEntry ::= SEQUENCE {
-    snL4WebCacheIP
+	snL4WebCacheIP
 		IpAddress,
-    snL4WebCacheName
-        L4ServerName,
-    snL4WebCacheAdminStatus
-        L4Status,
+	snL4WebCacheName
+		L4ServerName,
+	snL4WebCacheAdminStatus
+		L4Status,
 	snL4WebCacheMaxConnections
 		INTEGER,
 	snL4WebCacheWeight
 		INTEGER,
 	snL4WebCacheRowStatus
 		L4RowSts,
-    snL4WebCacheDeleteState
-        L4DeleteState
+	snL4WebCacheDeleteState
+		L4DeleteState
 	}
 
 snL4WebCacheIP
 	OBJECT-TYPE
 	SYNTAX IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real Server IP Address."
 	::= { snL4WebCacheEntry 1 }
 
 snL4WebCacheName  OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real server name."
 	::= { snL4WebCacheEntry 2 }
 
 snL4WebCacheAdminStatus	OBJECT-TYPE
 	SYNTAX	L4Status
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real Server status is ether disabled(0) or enabled(1)."
 	::= { snL4WebCacheEntry 3 }
 
 snL4WebCacheMaxConnections 	OBJECT-TYPE
 	SYNTAX	INTEGER	 (0..1000000)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real Server Maximum Connection allowed."
 	::= { snL4WebCacheEntry 4 }
 
  snL4WebCacheWeight	OBJECT-TYPE
 	SYNTAX	INTEGER	  (1..65000)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real Server weight"
 	::= { snL4WebCacheEntry 5 }
 
  snL4WebCacheRowStatus OBJECT-TYPE
 	SYNTAX  L4RowSts
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete a real server entry."
 	::= {snL4WebCacheEntry  6 }
 
 snL4WebCacheDeleteState	OBJECT-TYPE
 	SYNTAX	L4DeleteState
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Delete operation state." 
+		"Delete operation state."
 	::= { snL4WebCacheEntry 7 }
 
 
@@ -1913,16 +1945,16 @@ snL4WebCacheDeleteState	OBJECT-TYPE
 
 snL4WebCacheGroupTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4WebCacheGroupEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Web Cache Group table."
 	::= { snL4WebCacheGroup 1 }
 
 snL4WebCacheGroupEntry  OBJECT-TYPE
 	SYNTAX	SnL4WebCacheGroupEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the  Web Cache Group table."
 	INDEX	{ snL4WebCacheGroupId }
@@ -1930,14 +1962,14 @@ snL4WebCacheGroupEntry  OBJECT-TYPE
 
 SnL4WebCacheGroupEntry ::= SEQUENCE {
 	snL4WebCacheGroupId
-		INTEGER,
-    snL4WebCacheGroupName
-        L4ServerName,
-    snL4WebCacheGroupWebCacheIpList
+		Integer32,
+	snL4WebCacheGroupName
+		L4ServerName,
+	snL4WebCacheGroupWebCacheIpList
 		OCTET STRING,
-    snL4WebCacheGroupDestMask
+	snL4WebCacheGroupDestMask
 		IpAddress,
-    snL4WebCacheGroupSrcMask
+	snL4WebCacheGroupSrcMask
 		IpAddress,
 	snL4WebCacheGroupAdminStatus
 		INTEGER,
@@ -1946,9 +1978,9 @@ SnL4WebCacheGroupEntry ::= SEQUENCE {
 	}
 
 snL4WebCacheGroupId  OBJECT-TYPE
-	SYNTAX	INTEGER 
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The identification for a Web Cache Group entry.
 		 The limit is from 1 to snL4MaxNumWebCacheGroup."
@@ -1956,8 +1988,8 @@ snL4WebCacheGroupId  OBJECT-TYPE
 
 snL4WebCacheGroupName  OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Web Cache Group name."
 	::= { snL4WebCacheGroupEntry 2 }
@@ -1965,263 +1997,263 @@ snL4WebCacheGroupName  OBJECT-TYPE
 snL4WebCacheGroupWebCacheIpList
 	OBJECT-TYPE
 	SYNTAX	OCTET STRING
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"A list of the Server Cache Group Real Server IP Address.
-		 The number of IP Address is from 1 (4 OCTETs) to the 
-		 snL4MaxNumServersPerWebCacheGroup, maximum number of 
+		 The number of IP Address is from 1 (4 OCTETs) to the
+		 snL4MaxNumServersPerWebCacheGroup, maximum number of
 		 server IP Address allowed in the list."
 	::= { snL4WebCacheGroupEntry 3 }
 
 snL4WebCacheGroupDestMask 	OBJECT-TYPE
 	SYNTAX  IpAddress
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Cache Server Group Destination Mask."
 	::= { snL4WebCacheGroupEntry 4 }
 
 snL4WebCacheGroupSrcMask 	OBJECT-TYPE
 	SYNTAX  IpAddress
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Cache Server Group Source Mask."
 	::= { snL4WebCacheGroupEntry 5 }
 
 snL4WebCacheGroupAdminStatus OBJECT-TYPE
 	SYNTAX  INTEGER {
-		disabled(0),             
+		disabled(0),
 		enabled(1)
 		}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"The WEB Cache Group is set either
 		 enabled(1)...........activated.
-		 disabled(0)..........disabled."  
+		 disabled(0)..........disabled."
 	::= { snL4WebCacheGroupEntry 6 }
 
  snL4WebCacheGroupRowStatus OBJECT-TYPE
 	SYNTAX  L4RowSts
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete a Web Cache Group entry."
 	::= { snL4WebCacheGroupEntry 7 }
 
 
--- Web Cache Traffic Statistics Table 
+-- Web Cache Traffic Statistics Table
 
 snL4WebCacheTrafficStatsTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4WebCacheTrafficStatsEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Web Cache Traffic Statistics table."
 	::= { snL4WebCacheTrafficStats 1 }
 
 snL4WebCacheTrafficStatsEntry  OBJECT-TYPE
 	SYNTAX	SnL4WebCacheTrafficStatsEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Web Cache Traffic Statistics table."
 	INDEX	{ snL4WebCacheTrafficIp , snL4WebCacheTrafficPort}
 	::= { snL4WebCacheTrafficStatsTable 1 }
 
 SnL4WebCacheTrafficStatsEntry ::= SEQUENCE {
-    snL4WebCacheTrafficIp
+	snL4WebCacheTrafficIp
 		IpAddress,
-    snL4WebCacheTrafficPort
+	snL4WebCacheTrafficPort
 		INTEGER,
-    snL4WebCacheCurrConnections
-		INTEGER,
-    snL4WebCacheTotalConnections
-		INTEGER,
+	snL4WebCacheCurrConnections
+		Integer32,
+	snL4WebCacheTotalConnections
+		Integer32,
 	snL4WebCacheTxPkts
-		Counter,
+		Counter32,
 	snL4WebCacheRxPkts
-		Counter,
+		Counter32,
 	snL4WebCacheTxOctets
-		Counter,
+		Counter32,
 	snL4WebCacheRxOctets
-		Counter,
-    snL4WebCachePortState
+		Counter32,
+	snL4WebCachePortState
 		WebCacheState
 	}
 
 snL4WebCacheTrafficIp 	OBJECT-TYPE
 	SYNTAX  IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Cache Server IP Address."
 	::= { snL4WebCacheTrafficStatsEntry 1 }
 
 snL4WebCacheTrafficPort 		OBJECT-TYPE
-    SYNTAX  INTEGER (0..65535)
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The WEB Cache port is one of the protocol port such as UDP, TCP etc."
 	::= { snL4WebCacheTrafficStatsEntry 2 }
 
 snL4WebCacheCurrConnections 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Number of the current connections in WEB Cache group."
 	::= { snL4WebCacheTrafficStatsEntry 3 }
 
 snL4WebCacheTotalConnections 		OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The total connections in WEB Cache group."
 	::= { snL4WebCacheTrafficStatsEntry 4 }
 
 snL4WebCacheTxPkts 		OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Number of the Packets sending from Client/Web-Server to Cache Server"
 	::= { snL4WebCacheTrafficStatsEntry 5 }
 
 snL4WebCacheRxPkts 		OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Number of the Packets sending from Cache Server to Client/Web-Server"
 	::= { snL4WebCacheTrafficStatsEntry 6 }
 
 snL4WebCacheTxOctets 		OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Number of the Octets sending from Client/Web-Server to Cache Server"
 	::= { snL4WebCacheTrafficStatsEntry 7 }
 
 snL4WebCacheRxOctets 		OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Number of the Octets sending from Cache Server to Client/Web-Server"
 	::= { snL4WebCacheTrafficStatsEntry 8 }
 
 snL4WebCachePortState	OBJECT-TYPE
 	SYNTAX	WebCacheState
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Web Cache Port state." 
+		"Web Cache Port state."
 	::= { snL4WebCacheTrafficStatsEntry 9 }
 
--- Web Uncached Traffic Statistics Table 
+-- Web Uncached Traffic Statistics Table
 
 snL4WebUncachedTrafficStatsTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4WebUncachedTrafficStatsEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Web Uncached Traffic Statistics table."
 	::= { snL4WebUncachedTrafficStats 1 }
 
 snL4WebUncachedTrafficStatsEntry  OBJECT-TYPE
 	SYNTAX	SnL4WebUncachedTrafficStatsEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Web Uncached Traffic Statistics table."
 	INDEX	{ snL4WebServerPort, snL4WebClientPort }
 	::= { snL4WebUncachedTrafficStatsTable 1 }
 
 SnL4WebUncachedTrafficStatsEntry ::= SEQUENCE {
-    snL4WebServerPort
-		INTEGER,
-    snL4WebClientPort
-		INTEGER,
+	snL4WebServerPort
+		Integer32,
+	snL4WebClientPort
+		Integer32,
 	snL4WebUncachedTxPkts
-		Counter,
+		Counter32,
 	snL4WebUncachedRxPkts
-		Counter,
+		Counter32,
 	snL4WebUncachedTxOctets
-		Counter,
+		Counter32,
 	snL4WebUncachedRxOctets
-		Counter,
-    snL4WebServerPortName
+		Counter32,
+	snL4WebServerPortName
 		DisplayString,
-    snL4WebClientPortName
+	snL4WebClientPortName
 		DisplayString
 	}
 
 snL4WebServerPort 			OBJECT-TYPE
-	SYNTAX  INTEGER 
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Web Server Port."
 	::= { snL4WebUncachedTrafficStatsEntry 1 }
 
 snL4WebClientPort 			OBJECT-TYPE
-	SYNTAX  INTEGER 
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Web Client Port."
 	::= { snL4WebUncachedTrafficStatsEntry 2 }
 
 snL4WebUncachedTxPkts 		OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Number of the Packets sending from Client port to Web Server port"
 	::= { snL4WebUncachedTrafficStatsEntry 3 }
 
 snL4WebUncachedRxPkts 		OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Number of the Packets sending from Web Server port to Client port"
 	::= { snL4WebUncachedTrafficStatsEntry 4 }
 
 snL4WebUncachedTxOctets 	OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Number of the Octets sending from Client port to Web Server port"
 	::= { snL4WebUncachedTrafficStatsEntry 5 }
 
 snL4WebUncachedRxOctets 	OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Number of the Octets sending from Web Server port to Client port"
 	::= { snL4WebUncachedTrafficStatsEntry 6 }
 
 snL4WebServerPortName OBJECT-TYPE
 	SYNTAX	DisplayString (SIZE(0..16))
-	ACCESS	read-only
-	STATUS	mandatory
+	MAX-ACCESS	read-only
+	STATUS	current
 	DESCRIPTION
 		"Web Server Port Name string."
 	::= { snL4WebUncachedTrafficStatsEntry 7 }
 
 snL4WebClientPortName OBJECT-TYPE
 	SYNTAX	DisplayString (SIZE(0..16))
-	ACCESS	read-only
-	STATUS	mandatory
+	MAX-ACCESS	read-only
+	STATUS	current
 	DESCRIPTION
 		"Web Client Port Name string."
 	::= { snL4WebUncachedTrafficStatsEntry 8 }
@@ -2231,164 +2263,164 @@ snL4WebClientPortName OBJECT-TYPE
 
 snL4WebCachePortTable	       OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4WebCachePortEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Real Server Port table."
 	::= { snL4WebCachePort 1 }
 
 snL4WebCachePortEntry	       OBJECT-TYPE
 	SYNTAX	SnL4WebCachePortEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Real Server Port table."
 	INDEX	{ snL4WebCachePortServerIp, snL4WebCachePortPort }
 	::= { snL4WebCachePortTable 1 }
 
 SnL4WebCachePortEntry ::= SEQUENCE {
-    snL4WebCachePortServerIp
+	snL4WebCachePortServerIp
 		IpAddress,
-    snL4WebCachePortPort
+	snL4WebCachePortPort
 		INTEGER,
 	snL4WebCachePortAdminStatus
 		L4Status,
 	snL4WebCachePortRowStatus
 		L4RowSts,
-    snL4WebCachePortDeleteState
+	snL4WebCachePortDeleteState
 		L4DeleteState
 	}
 
 
 snL4WebCachePortServerIp 	OBJECT-TYPE
 	SYNTAX  IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Cache Server IP Address."
 	::= { snL4WebCachePortEntry 1 }
 
 snL4WebCachePortPort 		OBJECT-TYPE
-    SYNTAX  INTEGER (0..65535)
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  INTEGER (0..65535)
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The WEB Cache port is one of the protocol port such as UDP, TCP etc."
 	::= { snL4WebCachePortEntry 2 }
 
 snL4WebCachePortAdminStatus		       OBJECT-TYPE
 	SYNTAX	L4Status
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4WebCachePortEntry 3 }
 
  snL4WebCachePortRowStatus	 	       OBJECT-TYPE
-	SYNTAX 	L4RowSts	
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX 	L4RowSts
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete a Real server  port entry."
 	::= { snL4WebCachePortEntry 4 }
 
 snL4WebCachePortDeleteState	OBJECT-TYPE
 	SYNTAX	L4DeleteState
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Delete operation state." 
+		"Delete operation state."
 	::= { snL4WebCachePortEntry 5 }
 
--- Real Server Configuration table 
+-- Real Server Configuration table
 
 snL4RealServerCfgTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4RealServerCfgEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Real Server table."
 	::= { snL4RealServerCfg 1 }
 
 snL4RealServerCfgEntry  OBJECT-TYPE
 	SYNTAX	SnL4RealServerCfgEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Real Server table."
 	INDEX	{ snL4RealServerCfgIP }
 	::= { snL4RealServerCfgTable 1 }
 
 SnL4RealServerCfgEntry ::= SEQUENCE {
-    snL4RealServerCfgIP
+	snL4RealServerCfgIP
 		IpAddress,
-    snL4RealServerCfgName
-        L4ServerName,
-    snL4RealServerCfgAdminStatus
-        L4Status,
+	snL4RealServerCfgName
+		L4ServerName,
+	snL4RealServerCfgAdminStatus
+		L4Status,
 	snL4RealServerCfgMaxConnections
-		INTEGER,
+		Integer32,
 	snL4RealServerCfgWeight
-		INTEGER,
+		Integer32,
 	snL4RealServerCfgRowStatus
 		L4RowSts,
-    snL4RealServerCfgDeleteState
-        L4DeleteState
+	snL4RealServerCfgDeleteState
+		L4DeleteState
 	}
 
 snL4RealServerCfgIP		OBJECT-TYPE
 	SYNTAX IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real Server IP Address."
 	::= { snL4RealServerCfgEntry 1 }
 snL4RealServerCfgName  OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real server name."
 	::= { snL4RealServerCfgEntry 2 }
 
 snL4RealServerCfgAdminStatus	OBJECT-TYPE
 	SYNTAX	L4Status
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real Server status is ether disabled(0) or enabled(1)."
 	::= { snL4RealServerCfgEntry 3 }
 
 snL4RealServerCfgMaxConnections 	OBJECT-TYPE
-	SYNTAX	INTEGER	 (0..1000000)
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX   Integer32	 (0..1000000)
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real Server Maximum Connection allowed."
 	::= { snL4RealServerCfgEntry 4 }
 
  snL4RealServerCfgWeight	OBJECT-TYPE
-	SYNTAX	INTEGER	  (0..65000)
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX   Integer32	  (0..65000)
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Real Server weight"
 	::= { snL4RealServerCfgEntry 5 }
 
  snL4RealServerCfgRowStatus OBJECT-TYPE
 	SYNTAX  L4RowSts
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete a real server entry."
 	::= {snL4RealServerCfgEntry  6 }
 
 snL4RealServerCfgDeleteState	OBJECT-TYPE
 	SYNTAX	L4DeleteState
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Delete operation state." 
+		"Delete operation state."
 	::= { snL4RealServerCfgEntry 7 }
 
 
@@ -2396,16 +2428,16 @@ snL4RealServerCfgDeleteState	OBJECT-TYPE
 
 snL4RealServerPortCfgTable	       OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4RealServerPortCfgEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Real Server Port table."
 	::= { snL4RealServerPortCfg 1 }
 
 snL4RealServerPortCfgEntry	       OBJECT-TYPE
 	SYNTAX	SnL4RealServerPortCfgEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Real Server Port table."
 	INDEX	{snL4RealServerPortCfgIP,snL4RealServerPortCfgPort  }
@@ -2415,30 +2447,30 @@ SnL4RealServerPortCfgEntry ::= SEQUENCE {
 	snL4RealServerPortCfgIP
 		IpAddress,
 	snL4RealServerPortCfgPort
-		INTEGER,
+		Integer32,
 	snL4RealServerPortCfgServerName
-        L4ServerName,
+		L4ServerName,
 	snL4RealServerPortCfgAdminStatus
 		L4Status,
 	snL4RealServerPortCfgRowStatus
 		L4RowSts,
-    snL4RealServerPortCfgDeleteState
-        L4DeleteState
+	snL4RealServerPortCfgDeleteState
+		L4DeleteState
 	}
 
 
 snL4RealServerPortCfgIP	       OBJECT-TYPE
 	SYNTAX IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The IP address for the Real Server ."
 	::= { snL4RealServerPortCfgEntry 1 }
 
 snL4RealServerPortCfgPort       OBJECT-TYPE
-	SYNTAX	INTEGER	 (0..65535)
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32	 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortCfgEntry 3 }
@@ -2446,34 +2478,34 @@ snL4RealServerPortCfgPort       OBJECT-TYPE
 
 snL4RealServerPortCfgServerName	       OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortCfgEntry 2 }
 
 snL4RealServerPortCfgAdminStatus		       OBJECT-TYPE
 	SYNTAX	L4Status
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortCfgEntry 4 }
 
  snL4RealServerPortCfgRowStatus	 	       OBJECT-TYPE
-	SYNTAX L4RowSts	
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX L4RowSts
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete a Real server  port entry."
 	::= { snL4RealServerPortCfgEntry 5 }
 
 snL4RealServerPortCfgDeleteState	OBJECT-TYPE
 	SYNTAX	L4DeleteState
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Delete operation state." 
+		"Delete operation state."
 	::= { snL4RealServerPortCfgEntry 6 }
 
 
@@ -2481,56 +2513,56 @@ snL4RealServerPortCfgDeleteState	OBJECT-TYPE
 
 snL4VirtualServerCfgTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4VirtualServerCfgEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server table."
 	::= { snL4VirtualServerCfg 1 }
 
 snL4VirtualServerCfgEntry  OBJECT-TYPE
 	SYNTAX	SnL4VirtualServerCfgEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in L4 Virtual Server table."
 	INDEX	{snL4VirtualServerCfgVirtualIP  }
 	::= { snL4VirtualServerCfgTable 1 }
 
 SnL4VirtualServerCfgEntry ::= SEQUENCE {
-    snL4VirtualServerCfgVirtualIP
+	snL4VirtualServerCfgVirtualIP
 		IpAddress,
-    snL4VirtualServerCfgName
-        L4ServerName,
-    snL4VirtualServerCfgAdminStatus
-        L4Status,
+	snL4VirtualServerCfgName
+		L4ServerName,
+	snL4VirtualServerCfgAdminStatus
+		L4Status,
 	snL4VirtualServerCfgSDAType
 		INTEGER,
 	snL4VirtualServerCfgRowStatus
 		L4RowSts,
-    snL4VirtualServerCfgDeleteState
-        L4DeleteState
+	snL4VirtualServerCfgDeleteState
+		L4DeleteState
 	}
 
 snL4VirtualServerCfgVirtualIP  	OBJECT-TYPE
 	SYNTAX IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server IP Address."
 	::= { snL4VirtualServerCfgEntry 1 }
 
 snL4VirtualServerCfgName  OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Virtual server name."
 	::= { snL4VirtualServerCfgEntry 2 }
 
 snL4VirtualServerCfgAdminStatus	OBJECT-TYPE
 	SYNTAX	L4Status
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server status is ether disabled(0) or enabled(1)."
 	::= { snL4VirtualServerCfgEntry 3 }
@@ -2538,20 +2570,20 @@ snL4VirtualServerCfgAdminStatus	OBJECT-TYPE
 snL4VirtualServerCfgSDAType  OBJECT-TYPE
 	SYNTAX	 INTEGER {
 		default(0),
-	    leastconnection(1),
-	    roundrobin(2),
-	    weighted(3)
+		leastconnection(1),
+		roundrobin(2),
+		weighted(3)
 	}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"TCP/UDP Sessions Distribution Algorithms Type."
 	::= { snL4VirtualServerCfgEntry 4 }
 
  snL4VirtualServerCfgRowStatus OBJECT-TYPE
 	SYNTAX  L4RowSts
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete a virtual server
 		entry."
@@ -2559,10 +2591,10 @@ snL4VirtualServerCfgSDAType  OBJECT-TYPE
 
 snL4VirtualServerCfgDeleteState	OBJECT-TYPE
 	SYNTAX	L4DeleteState
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Delete operation state." 
+		"Delete operation state."
 	::= { snL4VirtualServerCfgEntry 6 }
 
 
@@ -2570,16 +2602,16 @@ snL4VirtualServerCfgDeleteState	OBJECT-TYPE
 
 snL4VirtualServerPortCfgTable	       OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4VirtualServerPortCfgEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server Port table."
 	::= { snL4VirtualServerPortCfg 1 }
 
 snL4VirtualServerPortCfgEntry	       OBJECT-TYPE
 	SYNTAX	SnL4VirtualServerPortCfgEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Virtual Server Port table."
 	INDEX	{snL4VirtualServerPortCfgIP, snL4VirtualServerPortCfgPort  }
@@ -2589,9 +2621,9 @@ SnL4VirtualServerPortCfgEntry ::= SEQUENCE {
 	snL4VirtualServerPortCfgIP
 		IpAddress,
 	snL4VirtualServerPortCfgPort
-		INTEGER,
+		Integer32,
 	snL4VirtualServerPortCfgServerName
-        L4ServerName,
+		L4ServerName,
 	snL4VirtualServerPortCfgAdminStatus
 		L4Status,
 	snL4VirtualServerPortCfgSticky
@@ -2600,23 +2632,23 @@ SnL4VirtualServerPortCfgEntry ::= SEQUENCE {
 		INTEGER,
 	snL4VirtualServerPortCfgRowStatus
 		L4RowSts,
-    snL4VirtualServerPortCfgDeleteState
-        L4DeleteState
+	snL4VirtualServerPortCfgDeleteState
+		L4DeleteState
 	}
 
 
 snL4VirtualServerPortCfgIP       OBJECT-TYPE
 	SYNTAX IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server IP Address."
 	::= { snL4VirtualServerPortCfgEntry 1 }
 
 snL4VirtualServerPortCfgPort       OBJECT-TYPE
-	SYNTAX	INTEGER	  (0..65535)
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32	  (0..65535)
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortCfgEntry 2 }
@@ -2624,16 +2656,16 @@ snL4VirtualServerPortCfgPort       OBJECT-TYPE
 
 snL4VirtualServerPortCfgServerName	       OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortCfgEntry 3 }
 
 snL4VirtualServerPortCfgAdminStatus		       OBJECT-TYPE
 	SYNTAX	L4Status
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortCfgEntry 4 }
@@ -2642,10 +2674,10 @@ snL4VirtualServerPortCfgAdminStatus		       OBJECT-TYPE
  snL4VirtualServerPortCfgSticky       OBJECT-TYPE
 	 SYNTAX  INTEGER {
 			disabled(0),
-			enabled(1)       
+			enabled(1)
 			}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortCfgEntry 5 }
@@ -2654,29 +2686,29 @@ snL4VirtualServerPortCfgAdminStatus		       OBJECT-TYPE
  snL4VirtualServerPortCfgConcurrent       OBJECT-TYPE
 	 SYNTAX  INTEGER {
 			disabled(0),
-			enabled(1)       
+			enabled(1)
 			}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortCfgEntry 6 }
 
 
  snL4VirtualServerPortCfgRowStatus	 	       OBJECT-TYPE
-	SYNTAX L4RowSts	
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX L4RowSts
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"To create or delete a virtual server  port entry."
 	::= { snL4VirtualServerPortCfgEntry 7 }
 
 snL4VirtualServerPortCfgDeleteState	OBJECT-TYPE
 	SYNTAX	L4DeleteState
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
-		"Delete operation state." 
+		"Delete operation state."
 	::= { snL4VirtualServerPortCfgEntry 8 }
 
 
@@ -2685,46 +2717,46 @@ snL4VirtualServerPortCfgDeleteState	OBJECT-TYPE
 
 snL4VirtualServerStatisticTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4VirtualServerStatisticEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server Statistic table."
 	::= { snL4VirtualServerStatistic 1 }
 
 snL4VirtualServerStatisticEntry  OBJECT-TYPE
 	SYNTAX	SnL4VirtualServerStatisticEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in L4 Virtual Server Statistic table."
 	INDEX	{snL4VirtualServerStatisticIP  }
 	::= { snL4VirtualServerStatisticTable 1 }
 
 SnL4VirtualServerStatisticEntry ::= SEQUENCE {
-	snL4VirtualServerStatisticIP 
+	snL4VirtualServerStatisticIP
 		IpAddress,
-    snL4VirtualServerStatisticName
-        L4ServerName,
+	snL4VirtualServerStatisticName
+		L4ServerName,
 	snL4VirtualServerStatisticReceivePkts
-		Counter,
+		Counter32,
 	snL4VirtualServerStatisticTransmitPkts
-		Counter,
+		Counter32,
 	snL4VirtualServerStatisticTotalConnections
-		Counter,
+		Counter32,
 	snL4VirtualServerStatisticReceiveBytes
 	   Counter64,
 	snL4VirtualServerStatisticTransmitBytes
 	   Counter64,
 	snL4VirtualServerStatisticSymmetricState
-	   INTEGER,
+	   Integer32,
 	snL4VirtualServerStatisticSymmetricPriority
-	   INTEGER,
+	   Integer32,
 	snL4VirtualServerStatisticSymmetricKeep
-	   INTEGER,
+	   Integer32,
 	snL4VirtualServerStatisticSymmetricActivates
-	   Counter,
+	   Counter32,
 	snL4VirtualServerStatisticSymmetricInactives
-	   Counter,
+	   Counter32,
 	snL4VirtualServerStatisticSymmetricBestStandbyMacAddr
 	   PhysAddress,
 	snL4VirtualServerStatisticSymmetricActiveMacAddr
@@ -2733,8 +2765,8 @@ SnL4VirtualServerStatisticEntry ::= SEQUENCE {
 
 snL4VirtualServerStatisticIP  OBJECT-TYPE
 	SYNTAX IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The table index for a Virtual Server  Statistic entry."
 	::= { snL4VirtualServerStatisticEntry 1 }
@@ -2742,107 +2774,107 @@ snL4VirtualServerStatisticIP  OBJECT-TYPE
 
 snL4VirtualServerStatisticName  OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Virtual server name."
 	::= { snL4VirtualServerStatisticEntry 2 }
 
 
 snL4VirtualServerStatisticReceivePkts  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS	read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 3 }
 
 snL4VirtualServerStatisticTransmitPkts  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS	read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 4 }
 
 snL4VirtualServerStatisticTotalConnections  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS	read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 5 }
 
 snL4VirtualServerStatisticReceiveBytes  OBJECT-TYPE
 	SYNTAX	Counter64
-	ACCESS	read-only
-	STATUS  mandatory
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 6 }
 
 snL4VirtualServerStatisticTransmitBytes  OBJECT-TYPE
 	SYNTAX	Counter64
-	ACCESS	read-only
-	STATUS  mandatory
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 7 }
 
 snL4VirtualServerStatisticSymmetricState  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS	read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 8 }
 
 snL4VirtualServerStatisticSymmetricPriority  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS	read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 9 }
 
 snL4VirtualServerStatisticSymmetricKeep  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS	read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 10 }
 
 snL4VirtualServerStatisticSymmetricActivates  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS	read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 11 }
 
 snL4VirtualServerStatisticSymmetricInactives  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS	read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 12 }
 
 snL4VirtualServerStatisticSymmetricBestStandbyMacAddr  OBJECT-TYPE
 	SYNTAX	PhysAddress
-	ACCESS	read-only
-	STATUS  mandatory
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 13 }
 
 snL4VirtualServerStatisticSymmetricActiveMacAddr  OBJECT-TYPE
 	SYNTAX	PhysAddress
-	ACCESS	read-only
-	STATUS  mandatory
+	MAX-ACCESS	read-only
+	STATUS  current
 	DESCRIPTION
-		"" 
+		""
 	::= { snL4VirtualServerStatisticEntry 14 }
 
 
@@ -2850,54 +2882,54 @@ snL4VirtualServerStatisticSymmetricActiveMacAddr  OBJECT-TYPE
 
 snL4RealServerStatisticTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4RealServerStatisticEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Real Server Statistic table."
 	::= { snL4RealServerStatistic 1 }
 
 snL4RealServerStatisticEntry  OBJECT-TYPE
 	SYNTAX	SnL4RealServerStatisticEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Real Server Statistic table."
 	INDEX	{snL4RealServerStatisticRealIP  }
 	::= { snL4RealServerStatisticTable 1 }
 
 SnL4RealServerStatisticEntry ::= SEQUENCE {
-    snL4RealServerStatisticRealIP 
+	snL4RealServerStatisticRealIP
 		IpAddress,
-    snL4RealServerStatisticName
-        L4ServerName,
+	snL4RealServerStatisticName
+		L4ServerName,
 	snL4RealServerStatisticReceivePkts
-		Counter,
+		Counter32,
 	snL4RealServerStatisticTransmitPkts
-		Counter,
+		Counter32,
 	snL4RealServerStatisticCurConnections
-		INTEGER,
+		Integer32,
 	snL4RealServerStatisticTotalConnections
-		Counter,
+		Counter32,
 	snL4RealServerStatisticAge
-		INTEGER,
+		Integer32,
 	snL4RealServerStatisticState
 		INTEGER,
 	snL4RealServerStatisticReassignments
-		INTEGER,
+		Integer32,
 	snL4RealServerStatisticReassignmentLimit
-		INTEGER,
+		Integer32,
 	snL4RealServerStatisticFailedPortExists
-		INTEGER,
+		Integer32,
 	snL4RealServerStatisticFailTime
-		INTEGER,
+		Integer32,
 	snL4RealServerStatisticPeakConnections
-		INTEGER
+		Integer32
 	}
 
 snL4RealServerStatisticRealIP OBJECT-TYPE
 	SYNTAX	IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 1 }
@@ -2905,54 +2937,54 @@ snL4RealServerStatisticRealIP OBJECT-TYPE
 
 snL4RealServerStatisticName OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 2 }
 
 snL4RealServerStatisticReceivePkts	  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 3 }
 
 snL4RealServerStatisticTransmitPkts  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 4 }
 
 snL4RealServerStatisticCurConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 5 }
 
 snL4RealServerStatisticTotalConnections   OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 6 }
 
 snL4RealServerStatisticAge  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 7 }
 
 snL4RealServerStatisticState  OBJECT-TYPE
-	SYNTAX	INTEGER	{
+	SYNTAX   INTEGER{
 	serverdisabled(0),
 	serverenabled(1),
 	serverfailed(2),
@@ -2961,49 +2993,49 @@ snL4RealServerStatisticState  OBJECT-TYPE
 	servershutdown(5),
 	serveractive(6)
 	}
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 8 }
 
 snL4RealServerStatisticReassignments  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 9 }
 
 snL4RealServerStatisticReassignmentLimit  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 10 }
 
 snL4RealServerStatisticFailedPortExists  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 11 }
 
 snL4RealServerStatisticFailTime  OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 12 }
 
 
 snL4RealServerStatisticPeakConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerStatisticEntry 13 }
@@ -3015,16 +3047,16 @@ snL4RealServerStatisticPeakConnections   OBJECT-TYPE
 
 snL4VirtualServerPortStatisticTable	       OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4VirtualServerPortStatisticEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Virtual Server Port Statistic table."
 	::= { snL4VirtualServerPortStatistic 1 }
 
 snL4VirtualServerPortStatisticEntry	       OBJECT-TYPE
 	SYNTAX	SnL4VirtualServerPortStatisticEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Virtual Server Port Statistic table."
 	INDEX	{ snL4VirtualServerPortStatisticIP,snL4VirtualServerPortStatisticPort }
@@ -3036,59 +3068,59 @@ SnL4VirtualServerPortStatisticEntry ::= SEQUENCE {
 	snL4VirtualServerPortStatisticPort
 		INTEGER,
 	snL4VirtualServerPortStatisticServerName
-        L4ServerName,
+		L4ServerName,
 	snL4VirtualServerPortStatisticCurrentConnection
-		INTEGER,
+		Integer32,
 	snL4VirtualServerPortStatisticTotalConnection
-		Counter,
+		Counter32,
 	snL4VirtualServerPortStatisticPeakConnection
-		INTEGER
+		Integer32
 	}
 
 snL4VirtualServerPortStatisticIP	       OBJECT-TYPE
 	SYNTAX	IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The index for Virtual Server Port Statistic entry."
 	::= { snL4VirtualServerPortStatisticEntry 1 }
 
 snL4VirtualServerPortStatisticPort   OBJECT-TYPE
 	SYNTAX	INTEGER	 (1..2048)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortStatisticEntry 2 }
 
  snL4VirtualServerPortStatisticServerName 	       OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortStatisticEntry 3 }
 
  snL4VirtualServerPortStatisticCurrentConnection 	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortStatisticEntry 4 }
 
  snL4VirtualServerPortStatisticTotalConnection		       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortStatisticEntry 5 }
 
  snL4VirtualServerPortStatisticPeakConnection 	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortStatisticEntry 6 }
@@ -3097,16 +3129,16 @@ snL4VirtualServerPortStatisticPort   OBJECT-TYPE
 
 snL4RealServerPortStatisticTable	       OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4RealServerPortStatisticEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Real Server Port Statistic table."
 	::= { snL4RealServerPortStatistic 1 }
 
 snL4RealServerPortStatisticEntry	       OBJECT-TYPE
 	SYNTAX	SnL4RealServerPortStatisticEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry in the Real Server Port Statistic table."
 	INDEX	{ snL4RealServerPortStatisticIP,snL4RealServerPortStatisticPort }
@@ -3116,60 +3148,60 @@ SnL4RealServerPortStatisticEntry ::= SEQUENCE {
 	snL4RealServerPortStatisticIP
 		IpAddress,
 	snL4RealServerPortStatisticPort
-		INTEGER,
+		Integer32,
 	snL4RealServerPortStatisticServerName
-        L4ServerName,
+		L4ServerName,
 	snL4RealServerPortStatisticReassignCount
-		INTEGER,
+		Integer32,
 	snL4RealServerPortStatisticState
 		INTEGER,
 	snL4RealServerPortStatisticFailTime
-		INTEGER,
+		Integer32,
 	snL4RealServerPortStatisticCurrentConnection
-		INTEGER,
+		Integer32,
 	snL4RealServerPortStatisticTotalConnection
-		Counter,
+		Counter32,
 	snL4RealServerPortStatisticRxPkts
-		Counter,
+		Counter32,
 	snL4RealServerPortStatisticTxPkts
-		Counter,
+		Counter32,
 	snL4RealServerPortStatisticRxBytes
-		Counter,
+		Counter32,
 	snL4RealServerPortStatisticTxBytes
-		Counter,
+		Counter32,
 	snL4RealServerPortStatisticPeakConnection
-		INTEGER
+		Integer32
 	}
 
 
 snL4RealServerPortStatisticIP	       OBJECT-TYPE
 	SYNTAX IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The index for Real Server Port Statistic entry."
 	::= { snL4RealServerPortStatisticEntry 1 }
 
 snL4RealServerPortStatisticPort	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortStatisticEntry 2 }
 
 snL4RealServerPortStatisticServerName	       OBJECT-TYPE
 	SYNTAX	L4ServerName
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortStatisticEntry 3 }
 
 snL4RealServerPortStatisticReassignCount	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortStatisticEntry 4 }
@@ -3181,82 +3213,82 @@ snL4RealServerPortStatisticReassignCount	       OBJECT-TYPE
 		failed(2),
 		testing(3),
 		suspect(4),
-	    shutdown(5),
+		shutdown(5),
 		active(6),
 		unbound(7),
 		awaitUnbind(8),
 		awaitDelete(9)
 	}
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port state"
 	::= { snL4RealServerPortStatisticEntry 5 }
 
 snL4RealServerPortStatisticFailTime 	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Only useful, if real server port state is failed.
 		 Indicating how seconds has been elapsed from the last retry."
- 	::= { snL4RealServerPortStatisticEntry 6 }
+	::= { snL4RealServerPortStatisticEntry 6 }
 
 snL4RealServerPortStatisticCurrentConnection	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port current connection"
 	::= { snL4RealServerPortStatisticEntry 7 }
 
 snL4RealServerPortStatisticTotalConnection	       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port total connection"
 	::= { snL4RealServerPortStatisticEntry 8 }
 
 snL4RealServerPortStatisticRxPkts	       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port receive packets."
 	::= { snL4RealServerPortStatisticEntry 9 }
 
 
 snL4RealServerPortStatisticTxPkts	       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port transmit packets."
 	::= { snL4RealServerPortStatisticEntry 10 }
 
 
 snL4RealServerPortStatisticRxBytes	       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port receive bytes."
 	::= { snL4RealServerPortStatisticEntry 11 }
 
 snL4RealServerPortStatisticTxBytes	       OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Real server port transmit bytes."
 	::= { snL4RealServerPortStatisticEntry 12 }
 
 
 snL4RealServerPortStatisticPeakConnection	       OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"peak connection for real server port."
 	::= { snL4RealServerPortStatisticEntry 13 }
@@ -3266,16 +3298,16 @@ snL4RealServerPortStatisticPeakConnection	       OBJECT-TYPE
 
 snL4GslbSiteRemoteServerIronTable	       OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4GslbSiteRemoteServerIronEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"GSLB remote ServerIron configuration table."
 	::= { snL4GslbSiteRemoteServerIrons 1 }
 
 snL4GslbSiteRemoteServerIronEntry	       OBJECT-TYPE
-	SYNTAX	SnL4GslbSiteRemoteServerIronEntry	
-	ACCESS  not-accessible
-	STATUS  mandatory
+	SYNTAX	SnL4GslbSiteRemoteServerIronEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry of a GSLB remote ServerIron configuration."
 	INDEX	{ snL4GslbSiteRemoteServerIronIP }
@@ -3291,19 +3323,19 @@ SnL4GslbSiteRemoteServerIronEntry ::= SEQUENCE {
 
 snL4GslbSiteRemoteServerIronIP	       OBJECT-TYPE
 	SYNTAX IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The index for each remote ServerIron in a site."
 	::= { snL4GslbSiteRemoteServerIronEntry 1 }
 
 snL4GslbSiteRemoteServerIronPreference 	OBJECT-TYPE
 	SYNTAX	INTEGER	(0..255)
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"The preference of a remote ServerIron. The default value is 128."
-    DEFVAL { 128 }
+	DEFVAL { 128 }
 	::= { snL4GslbSiteRemoteServerIronEntry 2 }
 
 
@@ -3340,16 +3372,16 @@ snL4GslbSiteRemoteServerIronPreference 	OBJECT-TYPE
 
 snL4RealServerHistoryControlTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF SnL4RealServerHistoryControlEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of history control entries."
 	::= { snL4History 1 }
 
 snL4RealServerHistoryControlEntry OBJECT-TYPE
 	SYNTAX SnL4RealServerHistoryControlEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of parameters that set up a periodic sampling
 		of statistics.As an example, an instance of the
@@ -3359,26 +3391,26 @@ snL4RealServerHistoryControlEntry OBJECT-TYPE
 	::= { snL4RealServerHistoryControlTable 1 }
 
 	SnL4RealServerHistoryControlEntry ::= SEQUENCE {
-		snL4RealServerHistoryControlIndex			 
-			INTEGER (1..65535),
-		snL4RealServerHistoryControlDataSource		
+		snL4RealServerHistoryControlIndex
+			INTEGER ,
+		snL4RealServerHistoryControlDataSource
 			OBJECT IDENTIFIER,
 		snL4RealServerHistoryControlBucketsRequested
-			INTEGER (1..65535),
-		snL4RealServerHistoryControlBucketsGranted	
-			INTEGER (1..65535),
-		snL4RealServerHistoryControlInterval		
-			INTEGER (1..3600),
-		snL4RealServerHistoryControlOwner			 
+			INTEGER ,
+		snL4RealServerHistoryControlBucketsGranted
+			INTEGER ,
+		snL4RealServerHistoryControlInterval
+			INTEGER ,
+		snL4RealServerHistoryControlOwner
 			DisplayString,
-		snL4RealServerHistoryControlStatus			
+		snL4RealServerHistoryControlStatus
 			INTEGER
 	}
 
 snL4RealServerHistoryControlIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"An index that uniquely identifies an entry in the
 		snL4RealServerHistoryControl table.Each such entry defines a
@@ -3388,33 +3420,33 @@ snL4RealServerHistoryControlIndex OBJECT-TYPE
 
 snL4RealServerHistoryControlDataSource OBJECT-TYPE
 	SYNTAX OBJECT IDENTIFIER
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"This object identifies the source of the data for
 		which historical data was collected and
 		placed in a media-specific table on behalf of this
 		snL4RealServerHistoryControlEntry.This source can be any
-		real/virtual server and real/virtual server port on 
+		real/virtual server and real/virtual server port on
 		this ServerIron.  In order to identify
 		a particular instance, this object shall identify
-		the instance of the object, defined in the above 
+		the instance of the object, defined in the above
 		statistics tables.
-	
+
 		This object may not be modified if the associated
 		snL4RealServerHistoryControlStatus object is equal to valid(1)."
 	::= { snL4RealServerHistoryControlEntry 2 }
 
 snL4RealServerHistoryControlBucketsRequested OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The requested number of discrete time intervals
 		over which data is to be saved in the part of the
 		media-specific table associated with this
 		snL4RealServerHistoryControlEntry.
-	
+
 		When this object is created or modified, the probe
 		should set snL4RealServerHistoryControlBucketsGranted as closely to
 		this object as is possible for the particular probe
@@ -3424,14 +3456,14 @@ snL4RealServerHistoryControlBucketsRequested OBJECT-TYPE
 
 snL4RealServerHistoryControlBucketsGranted OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The number of discrete sampling intervals
 		over which data shall be saved in the part of
 		the media-specific table associated with this
 		snL4RealServerHistoryControlEntry.
-	
+
 		When the associated snL4RealServerHistoryControlBucketsRequested
 		object is created or modified, the probe
 		should set this object as closely to the requested
@@ -3440,19 +3472,19 @@ snL4RealServerHistoryControlBucketsGranted OBJECT-TYPE
 		probe must not lower this value except as a result
 		of a modification to the associated
 		snL4RealServerHistoryControlBucketsRequested object.
-	
+
 		There will be times when the actual number of
 		buckets associated with this entry is less than
 		the value of this object.In this case, at the
 		end of each sampling interval, a new bucket will
 		be added to the media-specific table.
-	
+
 		When the number of buckets reaches the value of
 		this object and a new bucket is to be added to the
 		media-specific table, the oldest bucket associated
 		with this snL4RealServerHistoryControlEntry shall be deleted by
 		the agent so that the new bucket can be added.
-	
+
 		When the value of this object changes to a value less
 		than the current value, entries are deleted
 		from the media-specific table associated with this
@@ -3460,7 +3492,7 @@ snL4RealServerHistoryControlBucketsGranted OBJECT-TYPE
 		entries shall be deleted by the agent so that their
 		number remains less than or equal to the new value of
 		this object.
-	
+
 		When the value of this object changes to a value
 		greater than the current value, the number of
 		associated media- specific entries may be allowed to
@@ -3469,8 +3501,8 @@ snL4RealServerHistoryControlBucketsGranted OBJECT-TYPE
 
 snL4RealServerHistoryControlInterval OBJECT-TYPE
 	SYNTAX INTEGER (1..3600)
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The interval in seconds over which the data is
 		sampled for each bucket in the part of the
@@ -3478,7 +3510,7 @@ snL4RealServerHistoryControlInterval OBJECT-TYPE
 		snL4RealServerHistoryControlEntry.This interval can
 		be set to any number of seconds between 1 and
 		3600 (1 hour).
-	
+
 		Because the counters in a bucket may overflow at their
 		maximum value with no indication, a prudent manager
 		will take into account the possibility of overflow
@@ -3488,7 +3520,7 @@ snL4RealServerHistoryControlInterval OBJECT-TYPE
 		the snL4RealServerHistoryControlInterval object to a value less
 		than this interval.This is typically most
 		important for the 'octets' counter in any
-		media-specific table.	
+		media-specific table.
 		This object may not be modified if the associated
 		snL4RealServerHistoryControlStatus object is equal to valid(1)."
 	DEFVAL { 1800 }
@@ -3496,22 +3528,22 @@ snL4RealServerHistoryControlInterval OBJECT-TYPE
 
 snL4RealServerHistoryControlOwner OBJECT-TYPE
 	SYNTAX DisplayString
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The entity that configured this entry and is
 		therefore using the resources assigned to it."
 	::= { snL4RealServerHistoryControlEntry 6 }
 
 snL4RealServerHistoryControlStatus OBJECT-TYPE
-	SYNTAX INTEGER { 
+	SYNTAX INTEGER {
 				valid(1),
-             	createRequest(2),
-             	underCreation(3),
-             	invalid(4)
-           }
-	ACCESS read-write
-	STATUS mandatory
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+		   }
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The status of this snL4RealServerHistoryControl entry.
 		Each instance of the media-specific table associated
@@ -3526,16 +3558,16 @@ snL4RealServerHistoryControlStatus OBJECT-TYPE
 
 snL4RealServerHistoryTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF SnL4RealServerHistoryEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of Ethernet snL4History entries."
 	::= { snL4History 2 }
 
 snL4RealServerHistoryEntry OBJECT-TYPE
 	SYNTAX SnL4RealServerHistoryEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"An historical sample of Ethernet statistics on a
 		particular Ethernet interface.  This sample is
@@ -3548,30 +3580,30 @@ snL4RealServerHistoryEntry OBJECT-TYPE
 	::= { snL4RealServerHistoryTable 1 }
 
 SnL4RealServerHistoryEntry ::= SEQUENCE {
-	snL4RealServerHistoryIndex                 
-		INTEGER (1..65535),
-	snL4RealServerHistorySampleIndex           
-		INTEGER (1..2147483647),
-	snL4RealServerHistoryIntervalStart         
+	snL4RealServerHistoryIndex
+		INTEGER ,
+	snL4RealServerHistorySampleIndex
+		INTEGER ,
+	snL4RealServerHistoryIntervalStart
 		TimeTicks,
 	snL4RealServerHistoryReceivePkts
-		Counter,
+		Counter32,
 	snL4RealServerHistoryTransmitPkts
-		Counter,
+		Counter32,
 	snL4RealServerHistoryTotalConnections
-		Counter,
+		Counter32,
 	snL4RealServerHistoryCurConnections
-		INTEGER,
+		Integer32,
 	snL4RealServerHistoryPeakConnections
-		INTEGER,
+		Integer32,
 	snL4RealServerHistoryReassignments
-		INTEGER
-    }
+		Integer32
+	}
 
 snL4RealServerHistoryIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The snL4RealServerHistory of which this entry is a part.The
 		snL4RealServerHistory identified by a particular value of this
@@ -3581,8 +3613,8 @@ snL4RealServerHistoryIndex OBJECT-TYPE
 
 snL4RealServerHistorySampleIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..2147483647)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"An index that uniquely identifies the particular
 		sample this entry represents among all samples
@@ -3593,8 +3625,8 @@ snL4RealServerHistorySampleIndex OBJECT-TYPE
 
 snL4RealServerHistoryIntervalStart OBJECT-TYPE
 	SYNTAX TimeTicks
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The value of sysUpTime at the start of the interval
 		over which this sample was measured.If the probe
@@ -3611,49 +3643,49 @@ snL4RealServerHistoryIntervalStart OBJECT-TYPE
 
 
 snL4RealServerHistoryReceivePkts	  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerHistoryEntry 4 }
 
 snL4RealServerHistoryTransmitPkts  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerHistoryEntry 5 }
 
 snL4RealServerHistoryTotalConnections   OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerHistoryEntry 6 }
 
 snL4RealServerHistoryCurConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerHistoryEntry 7 }
 
 snL4RealServerHistoryPeakConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerHistoryEntry 8 }
 
 snL4RealServerHistoryReassignments   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerHistoryEntry 9 }
@@ -3665,16 +3697,16 @@ snL4RealServerHistoryReassignments   OBJECT-TYPE
 
 snL4RealServerPortHistoryControlTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF SnL4RealServerPortHistoryControlEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of history control entries."
 	::= { snL4History 3 }
 
 snL4RealServerPortHistoryControlEntry OBJECT-TYPE
 	SYNTAX SnL4RealServerPortHistoryControlEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of parameters that set up a periodic sampling
 		of statistics.As an example, an instance of the
@@ -3684,26 +3716,26 @@ snL4RealServerPortHistoryControlEntry OBJECT-TYPE
 	::= { snL4RealServerPortHistoryControlTable 1 }
 
 	SnL4RealServerPortHistoryControlEntry ::= SEQUENCE {
-		snL4RealServerPortHistoryControlIndex			 
-			INTEGER (1..65535),
-		snL4RealServerPortHistoryControlDataSource		
+		snL4RealServerPortHistoryControlIndex
+			INTEGER ,
+		snL4RealServerPortHistoryControlDataSource
 			OBJECT IDENTIFIER,
 		snL4RealServerPortHistoryControlBucketsRequested
-			INTEGER (1..65535),
-		snL4RealServerPortHistoryControlBucketsGranted	
-			INTEGER (1..65535),
-		snL4RealServerPortHistoryControlInterval		
-			INTEGER (1..3600),
-		snL4RealServerPortHistoryControlOwner			 
+			INTEGER ,
+		snL4RealServerPortHistoryControlBucketsGranted
+			INTEGER,
+		snL4RealServerPortHistoryControlInterval
+			INTEGER ,
+		snL4RealServerPortHistoryControlOwner
 			DisplayString,
-		snL4RealServerPortHistoryControlStatus			
+		snL4RealServerPortHistoryControlStatus
 			INTEGER
 	}
 
 snL4RealServerPortHistoryControlIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"An index that uniquely identifies an entry in the
 		snL4RealServerPortHistoryControl table.Each such entry defines a
@@ -3713,33 +3745,33 @@ snL4RealServerPortHistoryControlIndex OBJECT-TYPE
 
 snL4RealServerPortHistoryControlDataSource OBJECT-TYPE
 	SYNTAX OBJECT IDENTIFIER
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"This object identifies the source of the data for
 		which historical data was collected and
 		placed in a media-specific table on behalf of this
 		snL4RealServerPortHistoryControlEntry.This source can be any
-		real/virtual server and real/virtual server port on 
+		real/virtual server and real/virtual server port on
 		this ServerIron.  In order to identify
 		a particular instance, this object shall identify
-		the instance of the object, defined in the above 
+		the instance of the object, defined in the above
 		statistics tables.
-	
+
 		This object may not be modified if the associated
 		snL4RealServerPortHistoryControlStatus object is equal to valid(1)."
 	::= { snL4RealServerPortHistoryControlEntry 2 }
 
 snL4RealServerPortHistoryControlBucketsRequested OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The requested number of discrete time intervals
 		over which data is to be saved in the part of the
 		media-specific table associated with this
 		snL4RealServerPortHistoryControlEntry.
-	
+
 		When this object is created or modified, the probe
 		should set snL4RealServerPortHistoryControlBucketsGranted as closely to
 		this object as is possible for the particular probe
@@ -3749,14 +3781,14 @@ snL4RealServerPortHistoryControlBucketsRequested OBJECT-TYPE
 
 snL4RealServerPortHistoryControlBucketsGranted OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The number of discrete sampling intervals
 		over which data shall be saved in the part of
 		the media-specific table associated with this
 		snL4RealServerPortHistoryControlEntry.
-	
+
 		When the associated snL4RealServerPortHistoryControlBucketsRequested
 		object is created or modified, the probe
 		should set this object as closely to the requested
@@ -3765,19 +3797,19 @@ snL4RealServerPortHistoryControlBucketsGranted OBJECT-TYPE
 		probe must not lower this value except as a result
 		of a modification to the associated
 		snL4RealServerPortHistoryControlBucketsRequested object.
-	
+
 		There will be times when the actual number of
 		buckets associated with this entry is less than
 		the value of this object.In this case, at the
 		end of each sampling interval, a new bucket will
 		be added to the media-specific table.
-	
+
 		When the number of buckets reaches the value of
 		this object and a new bucket is to be added to the
 		media-specific table, the oldest bucket associated
 		with this snL4RealServerPortHistoryControlEntry shall be deleted by
 		the agent so that the new bucket can be added.
-	
+
 		When the value of this object changes to a value less
 		than the current value, entries are deleted
 		from the media-specific table associated with this
@@ -3785,7 +3817,7 @@ snL4RealServerPortHistoryControlBucketsGranted OBJECT-TYPE
 		entries shall be deleted by the agent so that their
 		number remains less than or equal to the new value of
 		this object.
-	
+
 		When the value of this object changes to a value
 		greater than the current value, the number of
 		associated media- specific entries may be allowed to
@@ -3794,8 +3826,8 @@ snL4RealServerPortHistoryControlBucketsGranted OBJECT-TYPE
 
 snL4RealServerPortHistoryControlInterval OBJECT-TYPE
 	SYNTAX INTEGER (1..3600)
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The interval in seconds over which the data is
 		sampled for each bucket in the part of the
@@ -3803,7 +3835,7 @@ snL4RealServerPortHistoryControlInterval OBJECT-TYPE
 		snL4RealServerPortHistoryControlEntry.This interval can
 		be set to any number of seconds between 1 and
 		3600 (1 hour).
-	
+
 		Because the counters in a bucket may overflow at their
 		maximum value with no indication, a prudent manager
 		will take into account the possibility of overflow
@@ -3813,7 +3845,7 @@ snL4RealServerPortHistoryControlInterval OBJECT-TYPE
 		the snL4RealServerPortHistoryControlInterval object to a value less
 		than this interval.This is typically most
 		important for the 'octets' counter in any
-		media-specific table.	
+		media-specific table.
 		This object may not be modified if the associated
 		snL4RealServerPortHistoryControlStatus object is equal to valid(1)."
 	DEFVAL { 1800 }
@@ -3821,22 +3853,22 @@ snL4RealServerPortHistoryControlInterval OBJECT-TYPE
 
 snL4RealServerPortHistoryControlOwner OBJECT-TYPE
 	SYNTAX DisplayString
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The entity that configured this entry and is
 		therefore using the resources assigned to it."
 	::= { snL4RealServerPortHistoryControlEntry 6 }
 
 snL4RealServerPortHistoryControlStatus OBJECT-TYPE
-	SYNTAX INTEGER { 
+	SYNTAX INTEGER {
 				valid(1),
-             	createRequest(2),
-             	underCreation(3),
-             	invalid(4)
-           }
-	ACCESS read-write
-	STATUS mandatory
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+		   }
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The status of this snL4RealServerPortHistoryControl entry.
 		Each instance of the media-specific table associated
@@ -3851,16 +3883,16 @@ snL4RealServerPortHistoryControlStatus OBJECT-TYPE
 
 snL4RealServerPortHistoryTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF SnL4RealServerPortHistoryEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of Ethernet snL4History entries."
 	::= { snL4History 4 }
 
 snL4RealServerPortHistoryEntry OBJECT-TYPE
 	SYNTAX SnL4RealServerPortHistoryEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"An historical sample of Ethernet statistics on a
 		particular Ethernet interface.  This sample is
@@ -3873,30 +3905,30 @@ snL4RealServerPortHistoryEntry OBJECT-TYPE
 	::= { snL4RealServerPortHistoryTable 1 }
 
 SnL4RealServerPortHistoryEntry ::= SEQUENCE {
-	snL4RealServerPortHistoryIndex                 
-		INTEGER (1..65535),
-	snL4RealServerPortHistorySampleIndex           
-		INTEGER (1..2147483647),
-	snL4RealServerPortHistoryIntervalStart         
+	snL4RealServerPortHistoryIndex
+		INTEGER ,
+	snL4RealServerPortHistorySampleIndex
+		INTEGER ,
+	snL4RealServerPortHistoryIntervalStart
 		TimeTicks,
 	snL4RealServerPortHistoryReceivePkts
-		Counter,
+		Counter32,
 	snL4RealServerPortHistoryTransmitPkts
-		Counter,
+		Counter32,
 	snL4RealServerPortHistoryTotalConnections
-		Counter,
+		Counter32,
 	snL4RealServerPortHistoryCurConnections
-		INTEGER,
+		Integer32,
 	snL4RealServerPortHistoryPeakConnections
-		INTEGER,
+		Integer32,
 	snL4RealServerPortHistoryResponseTime
-		INTEGER
-    }
+		Integer32
+	}
 
 snL4RealServerPortHistoryIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The snL4RealServerPortHistory of which this entry is a part.The
 		snL4RealServerPortHistory identified by a particular value of this
@@ -3906,8 +3938,8 @@ snL4RealServerPortHistoryIndex OBJECT-TYPE
 
 snL4RealServerPortHistorySampleIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..2147483647)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"An index that uniquely identifies the particular
 		sample this entry represents among all samples
@@ -3918,8 +3950,8 @@ snL4RealServerPortHistorySampleIndex OBJECT-TYPE
 
 snL4RealServerPortHistoryIntervalStart OBJECT-TYPE
 	SYNTAX TimeTicks
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The value of sysUpTime at the start of the interval
 		over which this sample was measured.If the probe
@@ -3936,49 +3968,49 @@ snL4RealServerPortHistoryIntervalStart OBJECT-TYPE
 
 
 snL4RealServerPortHistoryReceivePkts	  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortHistoryEntry 4 }
 
 snL4RealServerPortHistoryTransmitPkts  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortHistoryEntry 5 }
 
 snL4RealServerPortHistoryTotalConnections   OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortHistoryEntry 6 }
 
 snL4RealServerPortHistoryCurConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortHistoryEntry 7 }
 
 snL4RealServerPortHistoryPeakConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortHistoryEntry 8 }
 
 snL4RealServerPortHistoryResponseTime   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4RealServerPortHistoryEntry 9 }
@@ -3990,16 +4022,16 @@ snL4RealServerPortHistoryResponseTime   OBJECT-TYPE
 
 snL4VirtualServerHistoryControlTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF SnL4VirtualServerHistoryControlEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of history control entries."
 	::= { snL4History 5 }
 
 snL4VirtualServerHistoryControlEntry OBJECT-TYPE
 	SYNTAX SnL4VirtualServerHistoryControlEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of parameters that set up a periodic sampling
 		of statistics.As an example, an instance of the
@@ -4009,26 +4041,26 @@ snL4VirtualServerHistoryControlEntry OBJECT-TYPE
 	::= { snL4VirtualServerHistoryControlTable 1 }
 
 	SnL4VirtualServerHistoryControlEntry ::= SEQUENCE {
-		snL4VirtualServerHistoryControlIndex			 
-			INTEGER (1..65535),
-		snL4VirtualServerHistoryControlDataSource		
+		snL4VirtualServerHistoryControlIndex
+			INTEGER ,
+		snL4VirtualServerHistoryControlDataSource
 			OBJECT IDENTIFIER,
 		snL4VirtualServerHistoryControlBucketsRequested
-			INTEGER (1..65535),
-		snL4VirtualServerHistoryControlBucketsGranted	
-			INTEGER (1..65535),
-		snL4VirtualServerHistoryControlInterval		
-			INTEGER (1..3600),
-		snL4VirtualServerHistoryControlOwner			 
+			INTEGER ,
+		snL4VirtualServerHistoryControlBucketsGranted
+			INTEGER ,
+		snL4VirtualServerHistoryControlInterval
+			INTEGER ,
+		snL4VirtualServerHistoryControlOwner
 			DisplayString,
-		snL4VirtualServerHistoryControlStatus			
+		snL4VirtualServerHistoryControlStatus
 			INTEGER
 	}
 
 snL4VirtualServerHistoryControlIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"An index that uniquely identifies an entry in the
 		snL4VirtualServerHistoryControl table.Each such entry defines a
@@ -4038,33 +4070,33 @@ snL4VirtualServerHistoryControlIndex OBJECT-TYPE
 
 snL4VirtualServerHistoryControlDataSource OBJECT-TYPE
 	SYNTAX OBJECT IDENTIFIER
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"This object identifies the source of the data for
 		which historical data was collected and
 		placed in a media-specific table on behalf of this
 		snL4VirtualServerHistoryControlEntry.This source can be any
-		real/virtual server and real/virtual server port on 
+		real/virtual server and real/virtual server port on
 		this ServerIron.  In order to identify
 		a particular instance, this object shall identify
-		the instance of the object, defined in the above 
+		the instance of the object, defined in the above
 		statistics tables.
-	
+
 		This object may not be modified if the associated
 		snL4VirtualServerHistoryControlStatus object is equal to valid(1)."
 	::= { snL4VirtualServerHistoryControlEntry 2 }
 
 snL4VirtualServerHistoryControlBucketsRequested OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The requested number of discrete time intervals
 		over which data is to be saved in the part of the
 		media-specific table associated with this
 		snL4VirtualServerHistoryControlEntry.
-	
+
 		When this object is created or modified, the probe
 		should set snL4VirtualServerHistoryControlBucketsGranted as closely to
 		this object as is possible for the particular probe
@@ -4074,14 +4106,14 @@ snL4VirtualServerHistoryControlBucketsRequested OBJECT-TYPE
 
 snL4VirtualServerHistoryControlBucketsGranted OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The number of discrete sampling intervals
 		over which data shall be saved in the part of
 		the media-specific table associated with this
 		snL4VirtualServerHistoryControlEntry.
-	
+
 		When the associated snL4VirtualServerHistoryControlBucketsRequested
 		object is created or modified, the probe
 		should set this object as closely to the requested
@@ -4090,19 +4122,19 @@ snL4VirtualServerHistoryControlBucketsGranted OBJECT-TYPE
 		probe must not lower this value except as a result
 		of a modification to the associated
 		snL4VirtualServerHistoryControlBucketsRequested object.
-	
+
 		There will be times when the actual number of
 		buckets associated with this entry is less than
 		the value of this object.In this case, at the
 		end of each sampling interval, a new bucket will
 		be added to the media-specific table.
-	
+
 		When the number of buckets reaches the value of
 		this object and a new bucket is to be added to the
 		media-specific table, the oldest bucket associated
 		with this snL4VirtualServerHistoryControlEntry shall be deleted by
 		the agent so that the new bucket can be added.
-	
+
 		When the value of this object changes to a value less
 		than the current value, entries are deleted
 		from the media-specific table associated with this
@@ -4110,7 +4142,7 @@ snL4VirtualServerHistoryControlBucketsGranted OBJECT-TYPE
 		entries shall be deleted by the agent so that their
 		number remains less than or equal to the new value of
 		this object.
-	
+
 		When the value of this object changes to a value
 		greater than the current value, the number of
 		associated media- specific entries may be allowed to
@@ -4119,8 +4151,8 @@ snL4VirtualServerHistoryControlBucketsGranted OBJECT-TYPE
 
 snL4VirtualServerHistoryControlInterval OBJECT-TYPE
 	SYNTAX INTEGER (1..3600)
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The interval in seconds over which the data is
 		sampled for each bucket in the part of the
@@ -4128,7 +4160,7 @@ snL4VirtualServerHistoryControlInterval OBJECT-TYPE
 		snL4VirtualServerHistoryControlEntry.This interval can
 		be set to any number of seconds between 1 and
 		3600 (1 hour).
-	
+
 		Because the counters in a bucket may overflow at their
 		maximum value with no indication, a prudent manager
 		will take into account the possibility of overflow
@@ -4138,7 +4170,7 @@ snL4VirtualServerHistoryControlInterval OBJECT-TYPE
 		the snL4VirtualServerHistoryControlInterval object to a value less
 		than this interval.This is typically most
 		important for the 'octets' counter in any
-		media-specific table.	
+		media-specific table.
 		This object may not be modified if the associated
 		snL4VirtualServerHistoryControlStatus object is equal to valid(1)."
 	DEFVAL { 1800 }
@@ -4146,22 +4178,22 @@ snL4VirtualServerHistoryControlInterval OBJECT-TYPE
 
 snL4VirtualServerHistoryControlOwner OBJECT-TYPE
 	SYNTAX DisplayString
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The entity that configured this entry and is
 		therefore using the resources assigned to it."
 	::= { snL4VirtualServerHistoryControlEntry 6 }
 
 snL4VirtualServerHistoryControlStatus OBJECT-TYPE
-	SYNTAX INTEGER { 
+	SYNTAX INTEGER {
 				valid(1),
-             	createRequest(2),
-             	underCreation(3),
-             	invalid(4)
-           }
-	ACCESS read-write
-	STATUS mandatory
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+		   }
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The status of this snL4VirtualServerHistoryControl entry.
 		Each instance of the media-specific table associated
@@ -4176,16 +4208,16 @@ snL4VirtualServerHistoryControlStatus OBJECT-TYPE
 
 snL4VirtualServerHistoryTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF SnL4VirtualServerHistoryEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of Ethernet snL4History entries."
 	::= { snL4History 6 }
 
 snL4VirtualServerHistoryEntry OBJECT-TYPE
 	SYNTAX SnL4VirtualServerHistoryEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"An historical sample of Ethernet statistics on a
 		particular Ethernet interface.  This sample is
@@ -4198,28 +4230,28 @@ snL4VirtualServerHistoryEntry OBJECT-TYPE
 	::= { snL4VirtualServerHistoryTable 1 }
 
 SnL4VirtualServerHistoryEntry ::= SEQUENCE {
-	snL4VirtualServerHistoryIndex                 
-		INTEGER (1..65535),
-	snL4VirtualServerHistorySampleIndex           
-		INTEGER (1..2147483647),
-	snL4VirtualServerHistoryIntervalStart         
+	snL4VirtualServerHistoryIndex
+		INTEGER,
+	snL4VirtualServerHistorySampleIndex
+		INTEGER,
+	snL4VirtualServerHistoryIntervalStart
 		TimeTicks,
 	snL4VirtualServerHistoryReceivePkts
-		Counter,
+		Counter32,
 	snL4VirtualServerHistoryTransmitPkts
-		Counter,
+		Counter32,
 	snL4VirtualServerHistoryTotalConnections
-		Counter,
+		Counter32,
 	snL4VirtualServerHistoryCurConnections
-		INTEGER,
+		Integer32,
 	snL4VirtualServerHistoryPeakConnections
-		INTEGER
-    }
+		Integer32
+	}
 
 snL4VirtualServerHistoryIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The snL4VirtualServerHistory of which this entry is a part.The
 		snL4VirtualServerHistory identified by a particular value of this
@@ -4229,8 +4261,8 @@ snL4VirtualServerHistoryIndex OBJECT-TYPE
 
 snL4VirtualServerHistorySampleIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..2147483647)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"An index that uniquely identifies the particular
 		sample this entry represents among all samples
@@ -4241,8 +4273,8 @@ snL4VirtualServerHistorySampleIndex OBJECT-TYPE
 
 snL4VirtualServerHistoryIntervalStart OBJECT-TYPE
 	SYNTAX TimeTicks
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The value of sysUpTime at the start of the interval
 		over which this sample was measured.If the probe
@@ -4259,41 +4291,41 @@ snL4VirtualServerHistoryIntervalStart OBJECT-TYPE
 
 
 snL4VirtualServerHistoryReceivePkts	  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerHistoryEntry 4 }
 
 snL4VirtualServerHistoryTransmitPkts  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerHistoryEntry 5 }
 
 snL4VirtualServerHistoryTotalConnections   OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerHistoryEntry 6 }
 
 snL4VirtualServerHistoryCurConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerHistoryEntry 7 }
 
 snL4VirtualServerHistoryPeakConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerHistoryEntry 8 }
@@ -4306,16 +4338,16 @@ snL4VirtualServerHistoryPeakConnections   OBJECT-TYPE
 
 snL4VirtualServerPortHistoryControlTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF SnL4VirtualServerPortHistoryControlEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of history control entries."
 	::= { snL4History 7 }
 
 snL4VirtualServerPortHistoryControlEntry OBJECT-TYPE
 	SYNTAX SnL4VirtualServerPortHistoryControlEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of parameters that set up a periodic sampling
 		of statistics.As an example, an instance of the
@@ -4325,26 +4357,26 @@ snL4VirtualServerPortHistoryControlEntry OBJECT-TYPE
 	::= { snL4VirtualServerPortHistoryControlTable 1 }
 
 	SnL4VirtualServerPortHistoryControlEntry ::= SEQUENCE {
-		snL4VirtualServerPortHistoryControlIndex			 
-			INTEGER (1..65535),
-		snL4VirtualServerPortHistoryControlDataSource		
+		snL4VirtualServerPortHistoryControlIndex
+			INTEGER,
+		snL4VirtualServerPortHistoryControlDataSource
 			OBJECT IDENTIFIER,
 		snL4VirtualServerPortHistoryControlBucketsRequested
-			INTEGER (1..65535),
-		snL4VirtualServerPortHistoryControlBucketsGranted	
-			INTEGER (1..65535),
-		snL4VirtualServerPortHistoryControlInterval		
-			INTEGER (1..3600),
-		snL4VirtualServerPortHistoryControlOwner			 
+			INTEGER,
+		snL4VirtualServerPortHistoryControlBucketsGranted
+			INTEGER,
+		snL4VirtualServerPortHistoryControlInterval
+			INTEGER,
+		snL4VirtualServerPortHistoryControlOwner
 			DisplayString,
-		snL4VirtualServerPortHistoryControlStatus			
+		snL4VirtualServerPortHistoryControlStatus
 			INTEGER
 	}
 
 snL4VirtualServerPortHistoryControlIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"An index that uniquely identifies an entry in the
 		snL4VirtualServerPortHistoryControl table.Each such entry defines a
@@ -4354,33 +4386,33 @@ snL4VirtualServerPortHistoryControlIndex OBJECT-TYPE
 
 snL4VirtualServerPortHistoryControlDataSource OBJECT-TYPE
 	SYNTAX OBJECT IDENTIFIER
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"This object identifies the source of the data for
 		which historical data was collected and
 		placed in a media-specific table on behalf of this
 		snL4VirtualServerPortHistoryControlEntry.This source can be any
-		real/virtual server and real/virtual server port on 
+		real/virtual server and real/virtual server port on
 		this ServerIron.  In order to identify
 		a particular instance, this object shall identify
-		the instance of the object, defined in the above 
+		the instance of the object, defined in the above
 		statistics tables.
-	
+
 		This object may not be modified if the associated
 		snL4VirtualServerPortHistoryControlStatus object is equal to valid(1)."
 	::= { snL4VirtualServerPortHistoryControlEntry 2 }
 
 snL4VirtualServerPortHistoryControlBucketsRequested OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The requested number of discrete time intervals
 		over which data is to be saved in the part of the
 		media-specific table associated with this
 		snL4VirtualServerPortHistoryControlEntry.
-	
+
 		When this object is created or modified, the probe
 		should set snL4VirtualServerPortHistoryControlBucketsGranted as closely to
 		this object as is possible for the particular probe
@@ -4390,14 +4422,14 @@ snL4VirtualServerPortHistoryControlBucketsRequested OBJECT-TYPE
 
 snL4VirtualServerPortHistoryControlBucketsGranted OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The number of discrete sampling intervals
 		over which data shall be saved in the part of
 		the media-specific table associated with this
 		snL4VirtualServerPortHistoryControlEntry.
-	
+
 		When the associated snL4VirtualServerPortHistoryControlBucketsRequested
 		object is created or modified, the probe
 		should set this object as closely to the requested
@@ -4406,19 +4438,19 @@ snL4VirtualServerPortHistoryControlBucketsGranted OBJECT-TYPE
 		probe must not lower this value except as a result
 		of a modification to the associated
 		snL4VirtualServerPortHistoryControlBucketsRequested object.
-	
+
 		There will be times when the actual number of
 		buckets associated with this entry is less than
 		the value of this object.In this case, at the
 		end of each sampling interval, a new bucket will
 		be added to the media-specific table.
-	
+
 		When the number of buckets reaches the value of
 		this object and a new bucket is to be added to the
 		media-specific table, the oldest bucket associated
 		with this snL4VirtualServerPortHistoryControlEntry shall be deleted by
 		the agent so that the new bucket can be added.
-	
+
 		When the value of this object changes to a value less
 		than the current value, entries are deleted
 		from the media-specific table associated with this
@@ -4426,7 +4458,7 @@ snL4VirtualServerPortHistoryControlBucketsGranted OBJECT-TYPE
 		entries shall be deleted by the agent so that their
 		number remains less than or equal to the new value of
 		this object.
-	
+
 		When the value of this object changes to a value
 		greater than the current value, the number of
 		associated media- specific entries may be allowed to
@@ -4435,8 +4467,8 @@ snL4VirtualServerPortHistoryControlBucketsGranted OBJECT-TYPE
 
 snL4VirtualServerPortHistoryControlInterval OBJECT-TYPE
 	SYNTAX INTEGER (1..3600)
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The interval in seconds over which the data is
 		sampled for each bucket in the part of the
@@ -4444,7 +4476,7 @@ snL4VirtualServerPortHistoryControlInterval OBJECT-TYPE
 		snL4VirtualServerPortHistoryControlEntry.This interval can
 		be set to any number of seconds between 1 and
 		3600 (1 hour).
-	
+
 		Because the counters in a bucket may overflow at their
 		maximum value with no indication, a prudent manager
 		will take into account the possibility of overflow
@@ -4454,7 +4486,7 @@ snL4VirtualServerPortHistoryControlInterval OBJECT-TYPE
 		the snL4VirtualServerPortHistoryControlInterval object to a value less
 		than this interval.This is typically most
 		important for the 'octets' counter in any
-		media-specific table.	
+		media-specific table.
 		This object may not be modified if the associated
 		snL4VirtualServerPortHistoryControlStatus object is equal to valid(1)."
 	DEFVAL { 1800 }
@@ -4462,22 +4494,22 @@ snL4VirtualServerPortHistoryControlInterval OBJECT-TYPE
 
 snL4VirtualServerPortHistoryControlOwner OBJECT-TYPE
 	SYNTAX DisplayString
-	ACCESS read-write
-	STATUS mandatory
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The entity that configured this entry and is
 		therefore using the resources assigned to it."
 	::= { snL4VirtualServerPortHistoryControlEntry 6 }
 
 snL4VirtualServerPortHistoryControlStatus OBJECT-TYPE
-	SYNTAX INTEGER { 
+	SYNTAX INTEGER {
 				valid(1),
-             	createRequest(2),
-             	underCreation(3),
-             	invalid(4)
-           }
-	ACCESS read-write
-	STATUS mandatory
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+		   }
+	MAX-ACCESS read-write
+	STATUS current
 	DESCRIPTION
 		"The status of this snL4VirtualServerPortHistoryControl entry.
 		Each instance of the media-specific table associated
@@ -4492,16 +4524,16 @@ snL4VirtualServerPortHistoryControlStatus OBJECT-TYPE
 
 snL4VirtualServerPortHistoryTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF SnL4VirtualServerPortHistoryEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"A list of Ethernet snL4History entries."
 	::= { snL4History 8 }
 
 snL4VirtualServerPortHistoryEntry OBJECT-TYPE
 	SYNTAX SnL4VirtualServerPortHistoryEntry
-	ACCESS not-accessible
-	STATUS mandatory
+	MAX-ACCESS not-accessible
+	STATUS current
 	DESCRIPTION
 		"An historical sample of Ethernet statistics on a
 		particular Ethernet interface.  This sample is
@@ -4514,28 +4546,28 @@ snL4VirtualServerPortHistoryEntry OBJECT-TYPE
 	::= { snL4VirtualServerPortHistoryTable 1 }
 
 SnL4VirtualServerPortHistoryEntry ::= SEQUENCE {
-	snL4VirtualServerPortHistoryIndex                 
-		INTEGER (1..65535),
-	snL4VirtualServerPortHistorySampleIndex           
-		INTEGER (1..2147483647),
-	snL4VirtualServerPortHistoryIntervalStart         
+	snL4VirtualServerPortHistoryIndex
+		INTEGER ,
+	snL4VirtualServerPortHistorySampleIndex
+		INTEGER,
+	snL4VirtualServerPortHistoryIntervalStart
 		TimeTicks,
 	snL4VirtualServerPortHistoryReceivePkts
-		Counter,
+		Counter32,
 	snL4VirtualServerPortHistoryTransmitPkts
-		Counter,
+		Counter32,
 	snL4VirtualServerPortHistoryTotalConnections
-		Counter,
+		Counter32,
 	snL4VirtualServerPortHistoryCurConnections
-		INTEGER,
+		Integer32,
 	snL4VirtualServerPortHistoryPeakConnections
-		INTEGER
-    }
+		Integer32
+	}
 
 snL4VirtualServerPortHistoryIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..65535)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The snL4VirtualServerPortHistory of which this entry is a part.The
 		snL4VirtualServerPortHistory identified by a particular value of this
@@ -4545,8 +4577,8 @@ snL4VirtualServerPortHistoryIndex OBJECT-TYPE
 
 snL4VirtualServerPortHistorySampleIndex OBJECT-TYPE
 	SYNTAX INTEGER (1..2147483647)
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"An index that uniquely identifies the particular
 		sample this entry represents among all samples
@@ -4557,8 +4589,8 @@ snL4VirtualServerPortHistorySampleIndex OBJECT-TYPE
 
 snL4VirtualServerPortHistoryIntervalStart OBJECT-TYPE
 	SYNTAX TimeTicks
-	ACCESS read-only
-	STATUS mandatory
+	MAX-ACCESS read-only
+	STATUS current
 	DESCRIPTION
 		"The value of sysUpTime at the start of the interval
 		over which this sample was measured.If the probe
@@ -4575,41 +4607,41 @@ snL4VirtualServerPortHistoryIntervalStart OBJECT-TYPE
 
 
 snL4VirtualServerPortHistoryReceivePkts	  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortHistoryEntry 4 }
 
 snL4VirtualServerPortHistoryTransmitPkts  OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortHistoryEntry 5 }
 
 snL4VirtualServerPortHistoryTotalConnections   OBJECT-TYPE
-	SYNTAX	Counter
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX	Counter32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortHistoryEntry 6 }
 
 snL4VirtualServerPortHistoryCurConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortHistoryEntry 7 }
 
 snL4VirtualServerPortHistoryPeakConnections   OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		""
 	::= { snL4VirtualServerPortHistoryEntry 8 }

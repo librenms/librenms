@@ -1,5 +1,7 @@
 <?php
 
+// fixme new url format
+
 if (is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
 echo("<tr bgcolor='$bg_colour'>");

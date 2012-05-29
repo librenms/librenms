@@ -1,129 +1,207 @@
 FOUNDRY-SN-IGMP-MIB DEFINITIONS ::= BEGIN
 
-
--- Foundry IGMP Group MIB Release 1.0.0
--- Revision 0 2/13/98
-
--- Copyright 1996-98 Foundry Networks, Inc.
--- All rights reserved.
--- This Foundry Networks SNMP Management Information Base 
--- Specification embodies Foundry Networks' confidential and
--- proprietary intellectual property. Foundry Networks retains all
--- title and ownership in the Specification, including any
--- revisions.
-
--- This Specification is supplied "AS IS," and Foundry Networks makes
--- no warranty, either express or implied, as to the use,
--- operation, condition, or performance of the Specification.
-
--- SECTION 1: Top Level Definitions
-
-
--- Imports
-
 IMPORTS
-	IpAddress
-		FROM RFC1155-SMI
-	OBJECT-TYPE
-		FROM RFC-1212
-	snIgmp
-		FROM FOUNDRY-SN-ROOT-MIB;
+	MODULE-IDENTITY, OBJECT-TYPE,IpAddress,Integer32
+		FROM SNMPv2-SMI
+	router
+		FROM FOUNDRY-SN-ROOT-MIB
+		;
+
+snIgmp MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200909300000Z" -- September 30, 2009
+    DESCRIPTION
+			""
+   ::= { router 6}
 
 
--- SECTION 2: MIB 
+-- SECTION 2: MIB
 
 -- IGMP MIB
 
 snIgmpMIBObjects OBJECT IDENTIFIER ::= { snIgmp 1 }
 
 snIgmpQueryInterval OBJECT-TYPE
-    SYNTAX     INTEGER (0..3600)
-    ACCESS     read-write
-    STATUS     mandatory
-    DESCRIPTION
-            "This is the time interval at which this entity sends out
+	SYNTAX     INTEGER (0..3600)
+	MAX-ACCESS     read-write
+	STATUS     current
+	DESCRIPTION
+			"This is the time interval at which this entity sends out
 			IGMP host query packets. For a router, snDvmrpEnable must
 			have been set to 'enabled' before this object is writen.
 			For a switch, snSwGroupIpMcastMode must have been set to
 			'enabled' and snSwIpMcastQuerierMode must have been set
 			to 'querier' before this object is writen.
 			Value 0 cannot be used for SET operations. This value
-			is returned if IGMP is not configured within the system."
-    DEFVAL     { 60 }
-    ::= { snIgmpMIBObjects 1 }
+			is returned if IGMP is not configured within the system.
+			For FI platform the configurable range for this object is
+			10 .. 3600"
+	DEFVAL     { 60 }
+	::= { snIgmpMIBObjects 1 }
 
 snIgmpGroupMembershipTime OBJECT-TYPE
-    SYNTAX     INTEGER (0..7200)
-    ACCESS     read-write
-    STATUS     mandatory
-    DESCRIPTION
-            "This is the time interval after which a group is considered
-            inactive. For a router, snDvmrpEnable must have been set to
-            'enabled' before this object is writen. For a switch,
-            snSwGroupIpMcastMode must have been set to 'enabled' before
-            this object is writen.
-            Value 0 cannot be used for SET operations. This value
-            is returned if IGMP is not configured within the system."
-    DEFVAL     { 140 }
-    ::= { snIgmpMIBObjects 2 }
+	SYNTAX     INTEGER (0..7200)
+	MAX-ACCESS     read-write
+	STATUS     current
+	DESCRIPTION
+			"This is the time interval after which a group is considered
+			inactive. For a router, snDvmrpEnable must have been set to
+			'enabled' before this object is writen. For a switch,
+			snSwGroupIpMcastMode must have been set to 'enabled' before
+			this object is writen.
+			Value 0 cannot be used for SET operations. This value
+			is returned if IGMP is not configured within the system.
+			For FI platform the configurable range for this object is
+			20 .. 7200"
+	DEFVAL     { 140 }
+	::= { snIgmpMIBObjects 2 }
 
 -- The IGMP Interface Table
 
 snIgmpIfTable OBJECT-TYPE
-    SYNTAX     SEQUENCE OF SnIgmpIfEntry
-    ACCESS     not-accessible
-    STATUS     mandatory
-    DESCRIPTION
-            "This table comprises of a list of IGMP interface entries."
-    ::= { snIgmpMIBObjects 3 }
+	SYNTAX     SEQUENCE OF SnIgmpIfEntry
+	MAX-ACCESS     not-accessible
+	STATUS     current
+	DESCRIPTION
+			"This table comprises of a list of IGMP interface entries."
+	::= { snIgmpMIBObjects 3 }
 
 snIgmpIfEntry OBJECT-TYPE
-    SYNTAX     SnIgmpIfEntry
-    ACCESS     not-accessible
-    STATUS     mandatory
-    DESCRIPTION
-            "An entry (conceptual row) contains the group
-            membership information for that port."
-    INDEX      { snIgmpIfEntryIndex }
-    ::= { snIgmpIfTable 1 }
+	SYNTAX     SnIgmpIfEntry
+	MAX-ACCESS     not-accessible
+	STATUS     current
+	DESCRIPTION
+			"An entry (conceptual row) contains the group
+			membership information for that port."
+	INDEX      { snIgmpIfEntryIndex }
+	::= { snIgmpIfTable 1 }
 
 SnIgmpIfEntry ::= SEQUENCE {
-    snIgmpIfEntryIndex         INTEGER,
-    snIgmpIfPortNumber         INTEGER,
-    snIgmpIfGroupAddress       IpAddress,
-    snIgmpIfGroupAge           INTEGER }
+	snIgmpIfEntryIndex         Integer32,
+	snIgmpIfPortNumber         Integer32,
+	snIgmpIfGroupAddress       IpAddress,
+	snIgmpIfGroupAge           Integer32 }
 
 snIgmpIfEntryIndex OBJECT-TYPE
-    SYNTAX     INTEGER
-    ACCESS     read-only
-    STATUS     mandatory
-    DESCRIPTION
-            "The table entry index."
-    ::= { snIgmpIfEntry 1 }
+	SYNTAX     Integer32
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"The table entry index."
+	::= { snIgmpIfEntry 1 }
 
 snIgmpIfPortNumber OBJECT-TYPE
-    SYNTAX     INTEGER
-    ACCESS     read-only
-    STATUS     mandatory
-    DESCRIPTION
-            "This is the interface on which the group was learnt."
-    ::= { snIgmpIfEntry 2 }
+	SYNTAX     Integer32
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"This is the interface on which the group was learnt."
+	::= { snIgmpIfEntry 2 }
 
 snIgmpIfGroupAddress OBJECT-TYPE
-    SYNTAX     IpAddress
-    ACCESS     read-only
-    STATUS     mandatory
-    DESCRIPTION
-            "The group address learnt from the interface."
-    ::= { snIgmpIfEntry 3 }
+	SYNTAX     IpAddress
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"The group address learnt from the interface."
+	::= { snIgmpIfEntry 3 }
 
 snIgmpIfGroupAge OBJECT-TYPE
-    SYNTAX     INTEGER
-    ACCESS     read-only
-    STATUS     mandatory
-    DESCRIPTION
-            "This is the interval (seconds) after which the group
-            information will be aged out."
-    ::= { snIgmpIfEntry 4 }
+	SYNTAX     Integer32
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"This is the interval (seconds) after which the group
+			information will be aged out."
+	::= { snIgmpIfEntry 4 }
+
+-- The IGMP Static Group Table
+
+snIgmpStaticGroupTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF SnIgmpStaticGroupEntry
+	MAX-ACCESS     not-accessible
+	STATUS     current
+	DESCRIPTION
+			"This table comprises of a list of IGMP static group entries."
+	::= { snIgmpMIBObjects 4 }
+
+snIgmpStaticGroupEntry OBJECT-TYPE
+	SYNTAX     SnIgmpStaticGroupEntry
+	MAX-ACCESS     not-accessible
+	STATUS     current
+	DESCRIPTION
+			"An entry (conceptual row) contains the IGMP static group
+			membership information."
+	INDEX      { snIgmpStaticGroupIfIndex, snIgmpStaticGroupAddress }
+	::= { snIgmpStaticGroupTable 1 }
+
+SnIgmpStaticGroupEntry ::= SEQUENCE {
+	snIgmpStaticGroupIfIndex    Integer32,
+	snIgmpStaticGroupAddress    IpAddress,
+	snIgmpStaticGroupPortList   OCTET STRING,
+	snIgmpStaticGroupRowStatus  INTEGER }
+
+snIgmpStaticGroupIfIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"The interface of which the static group was configured."
+	::= { snIgmpStaticGroupEntry 1 }
+
+snIgmpStaticGroupAddress OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"The group address of which the static group was configured."
+	::= { snIgmpStaticGroupEntry 2 }
+
+snIgmpStaticGroupPortList OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS     read-write
+	STATUS     current
+	DESCRIPTION
+			"A list of ports which are the port membership of the
+			static group. Each port is a 16-bit integer ifIndex."
+	::= { snIgmpStaticGroupEntry 3 }
+
+snIgmpStaticGroupRowStatus OBJECT-TYPE
+	SYNTAX     INTEGER {
+				 other(1),
+				 valid(2),
+				 delete(3),
+				 create(4),
+				 modify(5) }
+	MAX-ACCESS     read-write
+	STATUS     current
+	DESCRIPTION
+			"To create or delete a static group entry."
+	::= { snIgmpStaticGroupEntry 4 }
 
 END

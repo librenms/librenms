@@ -1,164 +1,209 @@
--- *****************************************************************
--- Commited Access Rate MIB file.
--- *****************************************************************
 FOUNDRY-CAR-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	OBJECT-TYPE,
-	Gauge
-		FROM RFC1155-SMI
 
-        Counter64
+	MODULE-IDENTITY, OBJECT-TYPE,Gauge32, Counter64,Integer32
 		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	snSwitch
+		FROM FOUNDRY-SN-SWITCH-GROUP-MIB
+	InterfaceIndex, ifIndex
+		FROM IF-MIB;
 
+snCAR MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
 
-	snCAR
-		FROM FOUNDRY-SN-SWITCH-GROUP-MIB;
-			
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
 
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200909300000Z" -- September 30, 2009
+    DESCRIPTION
+			"convert from SMIv1 to SMIv2"
+
+   ::= { snSwitch 16}
 snPortCARs	OBJECT IDENTIFIER ::= { snCAR 1 }
 
-PacketSource ::= INTEGER { 
+	--  Textual Conventions
+
+	PacketSource::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"
+		"
+	SYNTAX  INTEGER {
 		input(0), --for inbound traffic
 		output(1) --for outbound traffic
 	}
 
-RateLimitType ::= INTEGER { 
-		all(3), 		--	all traffic.                             
+
+	RateLimitType::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"
+		"
+	SYNTAX   INTEGER{
+		all(3), 		--	all traffic.
 		quickAcc(2), 	--	traffic matches rate-limit's access list.
-		standardAcc(1) 	--	traffic matches standard access list.    
+		standardAcc(1) 	--	traffic matches standard access list.
 	}
 
-RateLimitAction ::= INTEGER {
-		continue(1), 
-		drop(2), 
+	RateLimitAction::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"
+		"
+	SYNTAX  INTEGER {
+		continue(1),
+		drop(2),
 		precedCont(3),
-		precedXmit(4), 
-		xmit(5) 
+		precedXmit(4),
+		xmit(5)
 	}
 
 
 snPortCARTable OBJECT-TYPE
 	SYNTAX  SEQUENCE OF SnPortCAREntry
-	ACCESS  not-accessible
-        STATUS  mandatory
-        DESCRIPTION
-        "A table of rate limit configuration entries.
+	MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		"A table of rate limit configuration entries.
 	Rate Limit is a method of traffic control.  It allows a set
 	of rate limits to be configured and applied to packets flowing
 	into/out of an interface to regulate network traffic."
 
-        ::= { snPortCARs 1 }
+		::= { snPortCARs 1 }
 
 snPortCAREntry OBJECT-TYPE
-        SYNTAX SnPortCAREntry
-        ACCESS  not-accessible
-        STATUS  mandatory
-        DESCRIPTION
-        	"A collection of rate-limit configuration objects on this 
+		SYNTAX SnPortCAREntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A collection of rate-limit configuration objects on this
 		interface."
-        INDEX { snPortCARifIndex, snPortCARDirection, snPortCARRowIndex }
-        ::= { snPortCARTable 1 }
+		INDEX { snPortCARifIndex, snPortCARDirection, snPortCARRowIndex }
+		::= { snPortCARTable 1 }
 
 SnPortCAREntry ::=
 	SEQUENCE {
 		snPortCARifIndex
-						INTEGER,
+						InterfaceIndex,
 		snPortCARDirection
-               		PacketSource,
+					PacketSource,
 		snPortCARRowIndex
-                        INTEGER,
+						INTEGER,
 		snPortCARType
-                        RateLimitType,
+						RateLimitType,
 		snPortCARAccIdx
-                        INTEGER,
+						Integer32,
 		snPortCARRate
-                        INTEGER,
+						Integer32,
 		snPortCARLimit
-                        INTEGER,
+						Integer32,
 		snPortCARExtLimit
-                        INTEGER,
+						Integer32,
 		snPortCARConformAction
-       					RateLimitAction,
+						RateLimitAction,
 		snPortCARExceedAction
-       					RateLimitAction,
+						RateLimitAction,
 		snPortCARStatSwitchedPkts
-                        Counter64,
+						Counter64,
 		snPortCARStatSwitchedBytes
-                        Counter64,
+						Counter64,
 		snPortCARStatFilteredPkts
-                        Counter64,
+						Counter64,
 		snPortCARStatFilteredBytes
-                        Counter64,
+						Counter64,
 		snPortCARStatCurBurst
-       					Gauge
+						Gauge32
 	}
 snPortCARifIndex OBJECT-TYPE
-    SYNTAX     INTEGER 
-    ACCESS     read-only
-    STATUS     mandatory
-    DESCRIPTION
-            "The ifIndex value for this rate limit entry."
-    ::= { snPortCAREntry 1 }
+	SYNTAX     InterfaceIndex
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"The ifIndex value for this rate limit entry."
+	::= { snPortCAREntry 1 }
 
 snPortCARDirection OBJECT-TYPE
 	SYNTAX  PacketSource
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
-       		"The input or output transmission direction for the 
-                Rate Limit object.
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The input or output transmission direction for the
+				Rate Limit object.
 				input (0), --for inbound traffic
 				output(1) --for outbound traffic "
-        ::= { snPortCAREntry 2 }
+		::= { snPortCAREntry 2 }
 
 snPortCARRowIndex OBJECT-TYPE
 	SYNTAX  INTEGER (1..2147483647)
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
-                "The table index for rate limit objects.
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"The table index for rate limit objects.
 		It increases as the rate limit entries are added.
 		Skips the number when a row is deleted."
 
-        ::= { snPortCAREntry 3 }
+		::= { snPortCAREntry 3 }
 
 snPortCARType OBJECT-TYPE
 	SYNTAX  RateLimitType
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
 		"The type of traffic rate-limited against."
 
 	::= { snPortCAREntry 4 }
 
 snPortCARAccIdx OBJECT-TYPE
-	SYNTAX  INTEGER
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
+	SYNTAX  Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
 		"The index to the access list if RateLimitType is either
 		quickAcc or standardAcc."
 
 	::= { snPortCAREntry 5 }
 
 snPortCARRate OBJECT-TYPE
-	SYNTAX  INTEGER
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
+	SYNTAX  Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
 		"The comitted access rate. This determines the long term
 		average transmission rate. Traffic that falls under this
-		rate always conforms. This is average rate in bits per 
+		rate always conforms. This is average rate in bits per
 		second."
 
 	::= { snPortCAREntry 6 }
 
 snPortCARLimit OBJECT-TYPE
-	SYNTAX  INTEGER
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
+	SYNTAX  Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
 		"This is the normal burst size that determines how large traffic
 		bursts can be before some traffic exceeds the rate limit. This
 		specifies the number of bytes that are guaranteed to be transported
@@ -168,9 +213,9 @@ snPortCARLimit OBJECT-TYPE
 	::= { snPortCAREntry 7 }
 
 snPortCARExtLimit OBJECT-TYPE
-	SYNTAX  INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"This is the extended burst limit that determines how large traffic
 		bursts can be before all the traffic exceeds the rate limit. This
@@ -180,8 +225,8 @@ snPortCARExtLimit OBJECT-TYPE
 
 snPortCARConformAction OBJECT-TYPE
 	SYNTAX	RateLimitAction
-	ACCESS  read-only
-	STATUS	mandatory
+	MAX-ACCESS  read-only
+	STATUS	current
 	DESCRIPTION
 		"Action to be taken when the traffic is within
 		the Rate Limit.
@@ -198,11 +243,11 @@ snPortCARConformAction OBJECT-TYPE
 
 snPortCARExceedAction OBJECT-TYPE
 	SYNTAX	RateLimitAction
-	ACCESS  read-only
-	STATUS	mandatory
+	MAX-ACCESS  read-only
+	STATUS	current
 	DESCRIPTION
 		"Action to be taken when the traffic exceeds
-		the Rate Limit.drop		
+		the Rate Limit.drop
 		drop the packet.
 		xmit		transmit the packet.
 		continue	continue to evaluate to the subsequent
@@ -216,8 +261,8 @@ snPortCARExceedAction OBJECT-TYPE
 
 snPortCARStatSwitchedPkts OBJECT-TYPE
 	SYNTAX  Counter64
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The counter of packets permitted by this rate limit."
 
@@ -225,8 +270,8 @@ snPortCARStatSwitchedPkts OBJECT-TYPE
 
 snPortCARStatSwitchedBytes OBJECT-TYPE
 	SYNTAX  Counter64
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The counter of bytes permitted by this interface."
 
@@ -235,8 +280,8 @@ snPortCARStatSwitchedBytes OBJECT-TYPE
 snPortCARStatFilteredPkts OBJECT-TYPE
 	SYNTAX  Counter64
 	--UNITS	"packets"
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The counter of packets which exceeded this rate limit."
 
@@ -244,22 +289,88 @@ snPortCARStatFilteredPkts OBJECT-TYPE
 
 snPortCARStatFilteredBytes OBJECT-TYPE
 	SYNTAX  Counter64
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The counter of bytes which exceeded this rate limit."
 
 	::= { snPortCAREntry 14 }
 
 snPortCARStatCurBurst OBJECT-TYPE
-	SYNTAX  Gauge
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The current received burst size."
 	::= { snPortCAREntry 15 }
 
 -- end of snPortCARTable
 
+-- RL Counter Table
+
+agRateLimitCounterTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AgRateLimitCounterEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION
+	"A table of rate limit counter entries."
+	::= { snPortCARs 2 }
+
+agRateLimitCounterEntry OBJECT-TYPE
+	SYNTAX		AgRateLimitCounterEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION
+	"A collection of rate-limit counter objects on a
+	interface, direction and configuration row index within that interface."
+	INDEX { ifIndex, snPortCARRowIndex }
+	::= { agRateLimitCounterTable 1 }
+
+AgRateLimitCounterEntry ::=
+	SEQUENCE {
+		agRateLimitCounterFwdedOctets
+			Counter64,
+		agRateLimitCounterDroppedOctets
+			Counter64,
+		agRateLimitCounterReMarkedOctets
+			Counter64,
+		agRateLimitCounterTotalOctets
+			Counter64
+	}
+
+agRateLimitCounterFwdedOctets OBJECT-TYPE
+	SYNTAX	Counter64
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+	"The forwarded octet count for this rate limit entry."
+	::= { agRateLimitCounterEntry 1 }
+
+agRateLimitCounterDroppedOctets OBJECT-TYPE
+	SYNTAX	Counter64
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+	"The dropped octet count for this rate limit entry."
+	::= { agRateLimitCounterEntry 2 }
+
+agRateLimitCounterReMarkedOctets OBJECT-TYPE
+	SYNTAX	Counter64
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+	"The remarked octet count for this rate limit entry."
+	::= { agRateLimitCounterEntry 3 }
+
+agRateLimitCounterTotalOctets OBJECT-TYPE
+	SYNTAX	Counter64
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+	"The total octet count for this rate limit entry."
+	::= { agRateLimitCounterEntry 4 }
 
 END
+-- *****************************************************************
+-- Foundry Commited Access Rate MIB file.
+-- *****************************************************************

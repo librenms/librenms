@@ -1,0 +1,511 @@
+FOUNDRY-SN-CAM-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Gauge32,
+    Unsigned32
+        FROM SNMPv2-SMI               -- [RFC2578]
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC                 -- [RFC2579]
+    platform
+        FROM FOUNDRY-SN-ROOT-MIB;
+
+snCamMIB MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "The MIB module to describe generic objects for the usage of
+              Content Addressable Memory (CAM).
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION      "200711190000Z"		-- Nov 19, 2007
+    DESCRIPTION
+            "Initial revision"
+    ::= { platform 1  }
+
+
+--
+-- Textual Conventions
+--
+
+-- Percentage
+--
+Percent ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "An integer that is in the range of a percent value."
+    SYNTAX Gauge32 (0..100)
+
+--
+-- high level object identifiers
+--
+snCamObjects  OBJECT IDENTIFIER ::= { snCamMIB 1 }
+
+
+-- snCamProfile
+snCamProfile OBJECT-TYPE
+    SYNTAX  INTEGER {
+                default(1),
+                ipv4(2),
+                ipv4Ipv6(3),
+                ipv4Ipv62(4),
+                ipv4Vpls(5),
+                ipv4Vpn(6),
+                ipv6(7),
+                l2Metro(8),
+                l2Metro2(9),
+                mplsL3vpn(10),
+                mplsL3vpn2(11),
+                mplsVpls(12),
+                mplsVpls2(13),
+                mplsVpnVpls(14),
+                multiService(15),
+                multiService2(16),
+                multiService3(17),
+                multiService4(18)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object identifies CAM partition profile. Each profile
+            adjusts the partitions to optimize the device for corresponding
+            applications."
+    ::= { snCamObjects 1 }
+
+
+-- cam usage objects
+snCamUsage  OBJECT IDENTIFIER ::= { snCamObjects 2 }
+
+
+-- the snCamUsageL3 table
+
+-- The snCamUsageL3 table contains information of the entity's
+-- CAM usage for layer 3 traffic.
+
+snCamUsageL3Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SnCamUsageL3Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of snCamUsageL3 entries. This table contains
+            information of the entity's CAM usage for layer 3 traffic."
+    ::= { snCamUsage 1 }
+
+snCamUsageL3Entry OBJECT-TYPE
+    SYNTAX      SnCamUsageL3Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to
+            CAM usage for layer 3 traffic"
+    INDEX   {   snCamUsageL3Slot,
+                    snCamUsageL3Processor,
+                    snCamUsageL3Type,
+                    snCamUsageL3Supernet   }
+    ::= { snCamUsageL3Table 1 }
+
+SnCamUsageL3Entry ::=
+    SEQUENCE {
+        snCamUsageL3Slot			Unsigned32,
+        snCamUsageL3Processor		Unsigned32,
+        snCamUsageL3Type			INTEGER,
+        snCamUsageL3Supernet		Unsigned32,
+        snCamUsageL3Size			Unsigned32,
+        snCamUsageL3Free			Gauge32,
+        snCamUsageL3UsedPercent		Percent
+    }
+
+snCamUsageL3Slot OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A number which uniquely identifies a linecard  in the device"
+    ::= { snCamUsageL3Entry 1 }
+
+snCamUsageL3Processor OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A number which uniquely identifies the network processor within a
+            linecard in the device"
+    ::= { snCamUsageL3Entry 2 }
+
+snCamUsageL3Type OBJECT-TYPE
+    SYNTAX  INTEGER {
+                ipv4(1),
+                ipv6(2),
+                ipv4vpn(3),
+                ipv6vpn(4)
+            }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object identifies the type of layer 3 traffic passing through the
+            network processor."
+    ::= { snCamUsageL3Entry 3 }
+
+snCamUsageL3Supernet OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object identifies the Supernet for the layer 3 type traffic. It
+            provides information for longest match lookup. For example,  zero
+            indicates all the bits of IP address will be matched, and one indicates
+            all but the lowest bit in IP address will be matched. The range is
+            [0..32] for IPv4 and IPv4VPN, where a value of 32 indicates the entry is
+            the total of other supernets indexed by [0..31]. The range is [0..10] for
+            IPv6, where a value of 10 indicates the entry is the total of other
+            supernets indexed by [0..9]."
+    ::= { snCamUsageL3Entry 4 }
+
+snCamUsageL3Size OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS   "Entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The effective CAM size for this layer 3 traffic entry. For ipv4 traffic, each
+            unit is 4 bytes. For ipv4vpn, each unit is 8 bytes. For ipv6, each unit is
+            16 bytes."
+    ::= { snCamUsageL3Entry 5 }
+
+snCamUsageL3Free OBJECT-TYPE
+    SYNTAX  Gauge32
+    UNITS   "Entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The amount of CAM currently available for this layer 3 traffic entry. For ipv4
+            traffic, each unit is 4 bytes. For ipv4vpn, each unit is 8 bytes. For ipv6, each
+            unit is 16 bytes."
+    ::= { snCamUsageL3Entry 6 }
+
+snCamUsageL3UsedPercent OBJECT-TYPE
+    SYNTAX  Percent
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The percentage of CAM currently being used for this layer 3 traffic entry. "
+    ::= { snCamUsageL3Entry 7 }
+
+
+-- the snCamUsageL2 table
+
+-- The snCamUsageL2 table contains information of the entity's
+-- CAM usage for layer 2 traffic.
+
+snCamUsageL2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SnCamUsageL2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of snCamUsageL2 entries. This table contains information of
+            the entity's CAM usage for layer 2 traffic."
+    ::= { snCamUsage 2 }
+
+snCamUsageL2Entry OBJECT-TYPE
+    SYNTAX      SnCamUsageL2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to
+            CAM usage for layer 2 traffic"
+    INDEX   {	snCamUsageL2Slot,
+			snCamUsageL2Processor,
+			snCamUsageL2Type }
+    ::= { snCamUsageL2Table 1 }
+
+SnCamUsageL2Entry ::=
+    SEQUENCE {
+        snCamUsageL2Slot			Unsigned32,
+        snCamUsageL2Processor		Unsigned32,
+        snCamUsageL2Type			INTEGER,
+        snCamUsageL2Size			Unsigned32,
+        snCamUsageL2Free			Gauge32,
+        snCamUsageL2UsedPercent		Percent
+    }
+
+snCamUsageL2Slot OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A number which uniquely identifies a linecard in the device"
+    ::= { snCamUsageL2Entry 1 }
+
+snCamUsageL2Processor OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A number which uniquely identifies the network processor within a
+            linecard in the device"
+    ::= { snCamUsageL2Entry 2 }
+
+snCamUsageL2Type OBJECT-TYPE
+    SYNTAX  INTEGER {
+                forwarding(1),
+                protocol(2),
+                flooding(3),
+                total(4)
+            }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object identifies the type of layer 2 traffic passing through
+            the network processor."
+    ::= { snCamUsageL2Entry 3 }
+
+snCamUsageL2Size OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  "Entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The effective CAM size for this layer 2 traffic entry. Each unit is 8 bytes."
+    ::= { snCamUsageL2Entry 4 }
+
+snCamUsageL2Free OBJECT-TYPE
+    SYNTAX  Gauge32
+    UNITS  "Entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The amount of CAM currently available for this layer 2 traffic entry.
+             Each unit is 8 bytes."
+    ::= { snCamUsageL2Entry 5 }
+
+snCamUsageL2UsedPercent OBJECT-TYPE
+    SYNTAX  Percent
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The percentage of CAM currently being used for this layer 2 traffic entry. "
+    ::= { snCamUsageL2Entry 6 }
+
+-- the snCamUsageSession table
+
+-- The snCamUsageSession table contains information of the entity's
+-- CAM usage for sessions.
+
+snCamUsageSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SnCamUsageSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of snCamUsageSession entries. This table contains information
+            of the entitiy's CAM usage for sessions. "
+    ::= { snCamUsage 3 }
+
+snCamUsageSessionEntry OBJECT-TYPE
+    SYNTAX      SnCamUsageSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to CAM usage
+            for sessions. "
+    INDEX   { snCamUsageSessionSlot,
+                   snCamUsageSessionProcessor,
+                   snCamUsageSessionType }
+    ::= { snCamUsageSessionTable 1 }
+
+SnCamUsageSessionEntry ::=
+    SEQUENCE {
+        snCamUsageSessionSlot			Unsigned32,
+        snCamUsageSessionProcessor		Unsigned32,
+        snCamUsageSessionType			INTEGER,
+        snCamUsageSessionSize			Unsigned32,
+        snCamUsageSessionFree			Gauge32,
+        snCamUsageSessionUsedPercent		Percent
+    }
+
+snCamUsageSessionSlot OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A number which uniquely identifies a linecard in the device"
+    ::= { snCamUsageSessionEntry 1 }
+
+snCamUsageSessionProcessor OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A number which uniquely identifies the network processor within a
+            linecard in the device"
+    ::= { snCamUsageSessionEntry 2 }
+
+snCamUsageSessionType OBJECT-TYPE
+    SYNTAX  INTEGER {
+                ipv4Multicast(1),
+                ipv4andMacReceiveAcl(2),
+                ipv4andMacRuleAcl(3),
+                ipv4andMacTotal(4),
+                ipv4andMacOut(5),
+                ipv6Multicast(6),
+                ipv6ReceiveAcl(7),
+                ipv6RuleAcl(8),
+                ipv6Total(9),
+                ipv6Out(10),
+                labelOut(11),
+                ipv4SrcGuardDenial(12),
+                ipv4SrcGuardPermit(13),
+                internalForwardingLookup(14)
+            }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object identifies the type of sessions."
+    ::= { snCamUsageSessionEntry 3 }
+
+
+snCamUsageSessionSize OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  "Entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The effective CAM size for this session traffic entry. For IPv4 sessions,
+            each unit is 16 bytes. For IPv4 sessions, each unit is 64 bytes."
+    ::= { snCamUsageSessionEntry 4 }
+
+snCamUsageSessionFree OBJECT-TYPE
+    SYNTAX  Gauge32
+    UNITS  "Entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of CAM currently available this session traffic entry.
+        For IPv4 sessions, each unit is 16 bytes. For IPv4 sessions, each unit is
+        64 bytes."
+    ::= { snCamUsageSessionEntry 5 }
+
+snCamUsageSessionUsedPercent OBJECT-TYPE
+    SYNTAX  Percent
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The percentage of CAM currently being used by this session traffic entry "
+    ::= { snCamUsageSessionEntry 6 }
+
+
+-- the snCamUsageOther table
+
+-- The snCamUsageOthers table contains information of the entity's
+-- CAM usage for types other than L3, L2, or Session.
+
+snCamUsageOtherTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SnCamUsageOtherEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of snCamUsageOther entries. This table contains information
+            of the entitiy's CAM usage for types other than L3, L2, or Session."
+    ::= { snCamUsage 4 }
+
+snCamUsageOtherEntry OBJECT-TYPE
+    SYNTAX      SnCamUsageOtherEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to CAM usage
+            for types other than L3, L2, or Session"
+    INDEX   { snCamUsageOtherSlot,
+              snCamUsageOtherProcessor,
+              snCamUsageOtherType }
+    ::= { snCamUsageOtherTable 1 }
+
+SnCamUsageOtherEntry ::=
+    SEQUENCE {
+        snCamUsageOtherSlot			Unsigned32,
+        snCamUsageOtherProcessor		Unsigned32,
+        snCamUsageOtherType			INTEGER,
+        snCamUsageOtherSize			Unsigned32,
+        snCamUsageOtherFree			Gauge32,
+        snCamUsageOtherUsedPercent		Percent
+    }
+
+snCamUsageOtherSlot OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A number which uniquely identifies a linecard in the device"
+    ::= { snCamUsageOtherEntry 1 }
+
+snCamUsageOtherProcessor OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A number which uniquely identifies the network processor within a
+            linecard in the device"
+    ::= { snCamUsageOtherEntry 2 }
+
+snCamUsageOtherType OBJECT-TYPE
+    SYNTAX  INTEGER {
+                gre(1),
+                multicastVpls(2)
+            }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object identifies the type."
+    ::= { snCamUsageOtherEntry 3 }
+
+snCamUsageOtherSize OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS  "Entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The effective CAM size for this Other traffic entry. For GRE,
+            each unit is 8 bytes. For multicast VPLS, each unit is 16 bytes."
+    ::= { snCamUsageOtherEntry 4 }
+
+snCamUsageOtherFree OBJECT-TYPE
+    SYNTAX  Gauge32
+    UNITS  "Entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The amount of CAM currently available this Other traffic entry.
+            For GRE, each unit is 8 bytes. For multicast VPLS, each unit is 16 bytes."
+    ::= { snCamUsageOtherEntry 5 }
+
+snCamUsageOtherUsedPercent OBJECT-TYPE
+    SYNTAX  Percent
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The percentage of CAM currently being used by this entry "
+    ::= { snCamUsageOtherEntry 6 }
+
+
+END

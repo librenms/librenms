@@ -1,40 +1,58 @@
 FOUNDRY-SN-ROOT-MIB DEFINITIONS ::= BEGIN
 
--- LAN Switch-Router Root MIB Release 1.0.1
--- Revision 01/30/99
-
--- Copyright 1996 Foundry Networks, Inc.
--- All rights reserved.
--- This Foundry SNMP Management Information Base Specification
--- (Specification) embodies Foundry's confidential and
--- proprietary intellectual property. Foundry retains all
--- title and ownership in the Specification, including any
--- revisions.
-
--- This Specification is supplied "AS IS," and Foundry makes
--- no warranty, either express or implied, as to the use,
--- operation, condition, or performance of the Specification.
-
--- SECTION 1: Top Level Definitions
-
- 
-
 IMPORTS
-  enterprises
-	FROM	RFC1155-SMI;	
+  MODULE-IDENTITY,enterprises
+	FROM	SNMPv2-SMI;
 
-foundry          OBJECT IDENTIFIER ::= { enterprises 1991 }
-snTraps           OBJECT IDENTIFIER ::= { foundry 0 }
+
+foundry MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200909300000Z" -- September 30, 2009
+    DESCRIPTION
+			"convert from SMIv1 to SMIv2"
+	::= { enterprises 1991}
+
+snTraps         OBJECT IDENTIFIER ::= { foundry 0 }
 products        OBJECT IDENTIFIER ::= { foundry 1 }
 vendors         OBJECT IDENTIFIER ::= { foundry 2 }
 
-switch		OBJECT IDENTIFIER ::= { products 1 }
+  switch		OBJECT IDENTIFIER ::= { products 1 }
   snChassis		OBJECT IDENTIFIER ::= { switch 1 }
   snAgentSys	OBJECT IDENTIFIER ::= { switch 2 }
   snSwitch		OBJECT IDENTIFIER ::= { switch 3 }
   snL4			OBJECT IDENTIFIER ::= { switch 4 }
   snStack		OBJECT IDENTIFIER ::= { switch 5 }
   snSci			OBJECT IDENTIFIER ::= { switch 6 }
+  fdrySntp	    OBJECT IDENTIFIER ::= { switch 7 }
+  fdryRadius	OBJECT IDENTIFIER ::= { switch 8 }
+  fdryTacacs	OBJECT IDENTIFIER ::= { switch 9 }
+  fdryTrap	    OBJECT IDENTIFIER ::= { switch 10 }
+  brcdSysLog    OBJECT IDENTIFIER ::= { switch 11 }
 
 router 		OBJECT IDENTIFIER ::= { products 2 }
   snIpx			OBJECT IDENTIFIER ::= { router 1 }
@@ -52,6 +70,8 @@ router 		OBJECT IDENTIFIER ::= { products 2 }
   snLoopbackIf 	OBJECT IDENTIFIER ::= { router 13 }
   snPOS 		OBJECT IDENTIFIER ::= { router 14 }
   snMpls		OBJECT IDENTIFIER ::= { router 15 }
+  fdryAcl	    OBJECT IDENTIFIER ::= { router 16 }
+  fdryIpv6		OBJECT IDENTIFIER ::= { router 17 }
 
 registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
 
@@ -166,19 +186,19 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
   snFES9604Switch   OBJECT IDENTIFIER ::= { snFES9604 1 }     -- FES9604 switch
   snFES9604Router   OBJECT IDENTIFIER ::= { snFES9604 2 }     -- FES9604 router
 
-  snFES12GCF        OBJECT IDENTIFIER ::= { registration 28 }  -- FastIron Edge Switch(FES) 12GCF 
-  snFES12GCFSwitch  OBJECT IDENTIFIER ::= { snFES12GCF 1 }  -- snFES12GCF switch 
+  snFES12GCF        OBJECT IDENTIFIER ::= { registration 28 }  -- FastIron Edge Switch(FES) 12GCF
+  snFES12GCFSwitch  OBJECT IDENTIFIER ::= { snFES12GCF 1 }  -- snFES12GCF switch
   snFES12GCFRouter  OBJECT IDENTIFIER ::= { snFES12GCF 2 }  -- snFES12GCF router
 
-  snFES2402POE        OBJECT IDENTIFIER ::= { registration 29 }   -- FastIron Edge Switch(FES) 2402 POE 
-  snFES2402POESwitch  OBJECT IDENTIFIER ::= { snFES2402POE 1 }  -- snFES2402POE switch 
+  snFES2402POE        OBJECT IDENTIFIER ::= { registration 29 }   -- FastIron Edge Switch(FES) 2402 POE
+  snFES2402POESwitch  OBJECT IDENTIFIER ::= { snFES2402POE 1 }  -- snFES2402POE switch
   snFES2402POERouter  OBJECT IDENTIFIER ::= { snFES2402POE 2 }  -- snFES2402POE router
 
-  snFES4802POE        OBJECT IDENTIFIER ::= { registration 30 }   -- FastIron Edge Switch (FES) 4802 POE 
-  snFES4802POESwitch  OBJECT IDENTIFIER ::= { snFES4802POE 1 } -- snFES4802POE switch 
+  snFES4802POE        OBJECT IDENTIFIER ::= { registration 30 }   -- FastIron Edge Switch (FES) 4802 POE
+  snFES4802POESwitch  OBJECT IDENTIFIER ::= { snFES4802POE 1 } -- snFES4802POE switch
   snFES4802POERouter  OBJECT IDENTIFIER ::= { snFES4802POE 2 } -- snFES4802POE router
 
-  snNetIron4802     OBJECT IDENTIFIER ::= { registration 31 }     -- NetIron 4802 family 
+  snNetIron4802     OBJECT IDENTIFIER ::= { registration 31 }     -- NetIron 4802 family
   snNI4802Switch    OBJECT IDENTIFIER ::= { snNetIron4802 1 }   -- NetIron 4802 switch
   snNI4802Router    OBJECT IDENTIFIER ::= { snNetIron4802 2 }   -- NetIron 4802 router
 
@@ -323,133 +343,235 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
 
   snFESX624Family   OBJECT IDENTIFIER ::= { snFESXFamily 6 }
 
-  snFESX624BaseFamily   OBJECT IDENTIFIER ::= { snFESX624Family 1 }      -- FstIron edge V6 family
-  snFESX624             OBJECT IDENTIFIER ::= { snFESX624BaseFamily 1 }  -- FastIron Edge V6 Switch(FES) 24G
-  snFESX624Switch       OBJECT IDENTIFIER ::= { snFESX624 1 }            -- FESX624 switch
-  snFESX624Router       OBJECT IDENTIFIER ::= { snFESX624 2 }            -- FESX624 router
-  snFESX624Prem         OBJECT IDENTIFIER ::= { snFESX624BaseFamily 2 }  -- FastIron Edge V6 Switch(FES) 24G-PREM
-  snFESX624PremSwitch   OBJECT IDENTIFIER ::= { snFESX624Prem 1 }        -- FESX624-PREM switch
-  snFESX624PremRouter   OBJECT IDENTIFIER ::= { snFESX624Prem 2 }        -- FESX624-PREM router
+  snFESX624BaseFamily       OBJECT IDENTIFIER ::= { snFESX624Family 1 }      -- FstIron edge V6 family
+  snFESX624                 OBJECT IDENTIFIER ::= { snFESX624BaseFamily 1 }  -- FastIron Edge V6 Switch(FES) 24G
+  snFESX624Switch           OBJECT IDENTIFIER ::= { snFESX624 1 }            -- FESX624 switch
+  snFESX624Router           OBJECT IDENTIFIER ::= { snFESX624 2 }            -- FESX624 Ipv4 router
+  snFESX624Prem             OBJECT IDENTIFIER ::= { snFESX624BaseFamily 2 }  -- FastIron Edge V6 Switch(FES) 24G-PREM
+  snFESX624PremSwitch       OBJECT IDENTIFIER ::= { snFESX624Prem 1 }        -- FESX624-PREM switch
+  snFESX624PremRouter       OBJECT IDENTIFIER ::= { snFESX624Prem 2 }        -- FESX624-PREM Ipv4 router
+  snFESX624Prem6Router   OBJECT IDENTIFIER ::= { snFESX624Prem 3 }        -- FESX624-PREM Ipv6 router
 
-  snFESX624Plus1XGFamily     OBJECT IDENTIFIER ::= { snFESX624Family 2 } -- FstIron edge V6 family
-  snFESX624Plus1XG           OBJECT IDENTIFIER ::= { snFESX624Plus1XGFamily 1 } -- FastIron Edge V6 Switch(FES) 24G + 1 10G
-  snFESX624Plus1XGSwitch     OBJECT IDENTIFIER ::= { snFESX624Plus1XG 1 }     -- FESX624+1XG switch
-  snFESX624Plus1XGRouter     OBJECT IDENTIFIER ::= { snFESX624Plus1XG 2 }     -- FESX624+1XG router
-  snFESX624Plus1XGPrem       OBJECT IDENTIFIER ::= { snFESX624Plus1XGFamily 2 } -- FastIron Edge V6 Switch(FES) 24G + 1 10G-PREM
-  snFESX624Plus1XGPremSwitch OBJECT IDENTIFIER ::= { snFESX624Plus1XGPrem 1 } -- FESX624+1XG-PREM switch
-  snFESX624Plus1XGPremRouter OBJECT IDENTIFIER ::= { snFESX624Plus1XGPrem 2 } -- FESX624+1XG-PREM router
+  snFESX624Plus1XGFamily         OBJECT IDENTIFIER ::= { snFESX624Family 2 }     -- FstIron edge V6 family
+  snFESX624Plus1XG               OBJECT IDENTIFIER ::= { snFESX624Plus1XGFamily 1 } -- FastIron Edge V6 Switch(FES) 24G + 1 10G
+  snFESX624Plus1XGSwitch         OBJECT IDENTIFIER ::= { snFESX624Plus1XG 1 }     -- FESX624+1XG switch
+  snFESX624Plus1XGRouter         OBJECT IDENTIFIER ::= { snFESX624Plus1XG 2 }     -- FESX624+1XG Ipv4 router
+  snFESX624Plus1XGPrem           OBJECT IDENTIFIER ::= { snFESX624Plus1XGFamily 2 } -- FastIron Edge V6 Switch(FES) 24G + 1 10G-PREM
+  snFESX624Plus1XGPremSwitch     OBJECT IDENTIFIER ::= { snFESX624Plus1XGPrem 1 } -- FESX624+1XG-PREM switch
+  snFESX624Plus1XGPremRouter     OBJECT IDENTIFIER ::= { snFESX624Plus1XGPrem 2 } -- FESX624+1XG-PREM Ipv4 router
+  snFESX624Plus1XGPrem6Router OBJECT IDENTIFIER ::= { snFESX624Plus1XGPrem 3 } -- FESX624+1XG-PREM Ipv6 router
 
   snFESX624Plus2XGFamily     OBJECT IDENTIFIER ::= { snFESX624Family 3 }  -- FstIron edge V6 family
   snFESX624Plus2XG           OBJECT IDENTIFIER ::= { snFESX624Plus2XGFamily 1 } -- FastIron Edge V6 Switch(FES) 24G + 2 10G
   snFESX624Plus2XGSwitch     OBJECT IDENTIFIER ::= { snFESX624Plus2XG 1 }     -- FESX624+2XG switch
-  snFESX624Plus2XGRouter     OBJECT IDENTIFIER ::= { snFESX624Plus2XG 2 }     -- FESX624+2XG router
+  snFESX624Plus2XGRouter     OBJECT IDENTIFIER ::= { snFESX624Plus2XG 2 }     -- FESX624+2XG Ipv4 router
   snFESX624Plus2XGPrem       OBJECT IDENTIFIER ::= { snFESX624Plus2XGFamily 2 } -- FastIron Edge V6 Switch(FES) 24G + 2 10G-PREM
   snFESX624Plus2XGPremSwitch OBJECT IDENTIFIER ::= { snFESX624Plus2XGPrem 1 } -- FESX624+2XG-PREM switch
-  snFESX624Plus2XGPremRouter OBJECT IDENTIFIER ::= { snFESX624Plus2XGPrem 2 } -- FESX624+2XG-PREM router
+  snFESX624Plus2XGPremRouter OBJECT IDENTIFIER ::= { snFESX624Plus2XGPrem 2 } -- FESX624+2XG-PREM Ipv4 router
+  snFESX624Plus2XGPrem6Router OBJECT IDENTIFIER ::= { snFESX624Plus2XGPrem 3 } -- FESX624+2XG-PREM Ipv6 router
 
   snFESX648Family         OBJECT IDENTIFIER ::= { snFESXFamily 7 }
 
   snFESX648BaseFamily     OBJECT IDENTIFIER ::= { snFESX648Family 1 }      -- FstIron edge V6 family
   snFESX648               OBJECT IDENTIFIER ::= { snFESX648BaseFamily 1 }  -- FastIron Edge V6 Switch(FES) 48G
   snFESX648Switch         OBJECT IDENTIFIER ::= { snFESX648 1 }            -- FESX648 switch
-  snFESX648Router         OBJECT IDENTIFIER ::= { snFESX648 2 }            -- FESX648 router
+  snFESX648Router         OBJECT IDENTIFIER ::= { snFESX648 2 }            -- FESX648 Ipv4 router
   snFESX648Prem           OBJECT IDENTIFIER ::= { snFESX648BaseFamily 2 }    -- FastIron Edge V6 Switch(FES) 48G-PREM
   snFESX648PremSwitch     OBJECT IDENTIFIER ::= { snFESX648Prem 1 }        -- FESX648-PREM switch
-  snFESX648PremRouter     OBJECT IDENTIFIER ::= { snFESX648Prem 2 }        -- FESX648-PREM router
+  snFESX648PremRouter     OBJECT IDENTIFIER ::= { snFESX648Prem 2 }        -- FESX648-PREM Ipv4 router
+  snFESX648Prem6Router OBJECT IDENTIFIER ::= { snFESX648Prem 3 }        -- FESX648-PREM Ipv6 router
 
-  snFESX648Plus1XGFamily     OBJECT IDENTIFIER ::= { snFESX648Family 2 }      -- FstIron edge V6 family
-  snFESX648Plus1XG           OBJECT IDENTIFIER ::= { snFESX648Plus1XGFamily 1 } -- FastIron Edge V6 Switch(FES) 48G + 1 10G
-  snFESX648Plus1XGSwitch     OBJECT IDENTIFIER ::= { snFESX648Plus1XG 1 }     -- FESX648+1XG switch
-  snFESX648Plus1XGRouter     OBJECT IDENTIFIER ::= { snFESX648Plus1XG 2 }     -- FESX648+1XG router
-  snFESX648Plus1XGPrem       OBJECT IDENTIFIER ::= { snFESX648Plus1XGFamily 2 } -- FastIron Edge V6 Switch(FES) 48G + 1 10G-PREM
-  snFESX648Plus1XGPremSwitch OBJECT IDENTIFIER ::= { snFESX648Plus1XGPrem 1 } -- FESX648+1XG-PREM switch
-  snFESX648Plus1XGPremRouter OBJECT IDENTIFIER ::= { snFESX648Plus1XGPrem 2 } -- FESX648+1XG-PREM router
+  snFESX648Plus1XGFamily         OBJECT IDENTIFIER ::= { snFESX648Family 2 }      -- FstIron edge V6 family
+  snFESX648Plus1XG               OBJECT IDENTIFIER ::= { snFESX648Plus1XGFamily 1 } -- FastIron Edge V6 Switch(FES) 48G + 1 10G
+  snFESX648Plus1XGSwitch         OBJECT IDENTIFIER ::= { snFESX648Plus1XG 1 }     -- FESX648+1XG switch
+  snFESX648Plus1XGRouter         OBJECT IDENTIFIER ::= { snFESX648Plus1XG 2 }     -- FESX648+1XG Ipv4 router
+  snFESX648Plus1XGPrem           OBJECT IDENTIFIER ::= { snFESX648Plus1XGFamily 2 } -- FastIron Edge V6 Switch(FES) 48G + 1 10G-PREM
+  snFESX648Plus1XGPremSwitch     OBJECT IDENTIFIER ::= { snFESX648Plus1XGPrem 1 } -- FESX648+1XG-PREM switch
+  snFESX648Plus1XGPremRouter     OBJECT IDENTIFIER ::= { snFESX648Plus1XGPrem 2 } -- FESX648+1XG-PREM Ipv4 router
+  snFESX648Plus1XGPrem6Router OBJECT IDENTIFIER ::= { snFESX648Plus1XGPrem 3 } -- FESX648+1XG-PREM Ipv6 router
 
-  snFESX648Plus2XGFamily     OBJECT IDENTIFIER ::= { snFESX648Family 3 }      -- FstIron edge V6 family
-  snFESX648Plus2XG           OBJECT IDENTIFIER ::= { snFESX648Plus2XGFamily 1 } -- FastIron Edge V6 Switch(FES) 48G + 2 10G
-  snFESX648Plus2XGSwitch     OBJECT IDENTIFIER ::= { snFESX648Plus2XG 1 }     -- FESX648+2XG switch
-  snFESX648Plus2XGRouter     OBJECT IDENTIFIER ::= { snFESX648Plus2XG 2 }     -- FESX648+2XG router
-  snFESX648Plus2XGPrem       OBJECT IDENTIFIER ::= { snFESX648Plus2XGFamily 2 } -- FastIron Edge V6 Switch(FES) 48G + 2 10G-PREM
-  snFESX648Plus2XGPremSwitch OBJECT IDENTIFIER ::= { snFESX648Plus2XGPrem 1 } -- FESX648+2XG-PREM switch
-  snFESX648Plus2XGPremRouter OBJECT IDENTIFIER ::= { snFESX648Plus2XGPrem 2 } -- FESX648+2XG-PREM router
+  snFESX648Plus2XGFamily         OBJECT IDENTIFIER ::= { snFESX648Family 3 }      -- FstIron edge V6 family
+  snFESX648Plus2XG               OBJECT IDENTIFIER ::= { snFESX648Plus2XGFamily 1 } -- FastIron Edge V6 Switch(FES) 48G + 2 10G
+  snFESX648Plus2XGSwitch         OBJECT IDENTIFIER ::= { snFESX648Plus2XG 1 }     -- FESX648+2XG switch
+  snFESX648Plus2XGRouter         OBJECT IDENTIFIER ::= { snFESX648Plus2XG 2 }     -- FESX648+2XG Ipv4 router
+  snFESX648Plus2XGPrem           OBJECT IDENTIFIER ::= { snFESX648Plus2XGFamily 2 } -- FastIron Edge V6 Switch(FES) 48G + 2 10G-PREM
+  snFESX648Plus2XGPremSwitch     OBJECT IDENTIFIER ::= { snFESX648Plus2XGPrem 1 } -- FESX648+2XG-PREM switch
+  snFESX648Plus2XGPremRouter     OBJECT IDENTIFIER ::= { snFESX648Plus2XGPrem 2 } -- FESX648+2XG-PREM Ipv4 router
+  snFESX648Plus2XGPrem6Router OBJECT IDENTIFIER ::= { snFESX648Plus2XGPrem 3 } -- FESX648+2XG-PREM Ipv6 router
 
   snFESX624FiberFamily       OBJECT IDENTIFIER ::= { snFESXFamily 8 }
 
-  snFESX624FiberBaseFamily     OBJECT IDENTIFIER ::= { snFESX624FiberFamily 1 }          -- FstIron edge V6 family
-  snFESX624Fiber                 OBJECT IDENTIFIER ::= { snFESX624FiberBaseFamily 1 }    -- FastIron V6 Edge Switch(FES)Fiber 24G
+  snFESX624FiberBaseFamily         OBJECT IDENTIFIER ::= { snFESX624FiberFamily 1 }          -- FstIron edge V6 family
+  snFESX624Fiber                   OBJECT IDENTIFIER ::= { snFESX624FiberBaseFamily 1 }    -- FastIron V6 Edge Switch(FES)Fiber 24G
   snFESX624FiberSwitch             OBJECT IDENTIFIER ::= { snFESX624Fiber 1 }            -- FESX624Fiber switch
-  snFESX624FiberRouter             OBJECT IDENTIFIER ::= { snFESX624Fiber 2 }            -- FESX624Fiber router
-  snFESX624FiberPrem             OBJECT IDENTIFIER ::= { snFESX624FiberBaseFamily 2 }    -- FastIron Edge V6 Switch(FES)Fiber 24G-PREM
+  snFESX624FiberRouter             OBJECT IDENTIFIER ::= { snFESX624Fiber 2 }            -- FESX624Fiber Ipv4 router
+  snFESX624FiberPrem               OBJECT IDENTIFIER ::= { snFESX624FiberBaseFamily 2 }    -- FastIron Edge V6 Switch(FES)Fiber 24G-PREM
   snFESX624FiberPremSwitch         OBJECT IDENTIFIER ::= { snFESX624FiberPrem 1 }        -- FESX624Fiber-PREM switch
-  snFESX624FiberPremRouter         OBJECT IDENTIFIER ::= { snFESX624FiberPrem 2 }        -- FESX624Fiber-PREM router
+  snFESX624FiberPremRouter         OBJECT IDENTIFIER ::= { snFESX624FiberPrem 2 }        -- FESX624Fiber-PREM Ipv4 router
+  snFESX624FiberPrem6Router     OBJECT IDENTIFIER ::= { snFESX624FiberPrem 3 }        -- FESX624Fiber-PREM Ipv6 router
 
-  snFESX624FiberPlus1XGFamily  OBJECT IDENTIFIER ::= { snFESX624FiberFamily 2 }          -- FstIron edge V6 family
-  snFESX624FiberPlus1XG          OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XGFamily 1 } -- FastIron Edge V6 Switch(FES)Fiber 24G + 1 10G
-  snFESX624FiberPlus1XGSwitch      OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XG 1 }     -- FESX624Fiber+1XG switch
-  snFESX624FiberPlus1XGRouter      OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XG 2 }     -- FESX624Fiber+1XG router
-  snFESX624FiberPlus1XGPrem      OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XGFamily 2 } -- FastIron Edge V6 Switch(FES)Fiber 24G + 1 10G-PREM
-  snFESX624FiberPlus1XGPremSwitch  OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XGPrem 1 } -- FESX624Fiber+1XG-PREM switch
-  snFESX624FiberPlus1XGPremRouter  OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XGPrem 2 } -- FESX624Fiber+1XG-PREM router
+  snFESX624FiberPlus1XGFamily          OBJECT IDENTIFIER ::= { snFESX624FiberFamily 2 }        -- FstIron edge V6 family
+  snFESX624FiberPlus1XG                OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XGFamily 1 } -- FastIron Edge V6 Switch(FES)Fiber 24G + 1 10G
+  snFESX624FiberPlus1XGSwitch          OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XG 1 }     -- FESX624Fiber+1XG switch
+  snFESX624FiberPlus1XGRouter          OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XG 2 }     -- FESX624Fiber+1XG Ipv4 router
+  snFESX624FiberPlus1XGPrem            OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XGFamily 2 } -- FastIron Edge V6 Switch(FES)Fiber 24G + 1 10G-PREM
+  snFESX624FiberPlus1XGPremSwitch      OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XGPrem 1 } -- FESX624Fiber+1XG-PREM switch
+  snFESX624FiberPlus1XGPremRouter      OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XGPrem 2 } -- FESX624Fiber+1XG-PREM Ipv4 router
+  snFESX624FiberPlus1XGPrem6Router  OBJECT IDENTIFIER ::= { snFESX624FiberPlus1XGPrem 3 } -- FESX624Fiber+1XG-PREM Ipv6 router
 
-  snFESX624FiberPlus2XGFamily  OBJECT IDENTIFIER ::= { snFESX624FiberFamily 3 }          -- FstIron edge V6 family
-  snFESX624FiberPlus2XG          OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XGFamily 1 } -- FastIron Edge V6 Switch(FES)Fiber 24G + 2 10G
-  snFESX624FiberPlus2XGSwitch      OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XG 1 }     -- FESX624Fiber+2XG switch
-  snFESX624FiberPlus2XGRouter      OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XG 2 }     -- FESX624Fiber+2XG router
-  snFESX624FiberPlus2XGPrem      OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XGFamily 2 } -- FastIron Edge V6 Switch(FES)Fiber 24G + 2 10G-PREM
-  snFESX624FiberPlus2XGPremSwitch  OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XGPrem 1 } -- FESX624Fiber+2XG-PREM switch
-  snFESX624FiberPlus2XGPremRouter  OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XGPrem 2 } -- FESX624Fiber+2XG-PREM router
+  snFESX624FiberPlus2XGFamily          OBJECT IDENTIFIER ::= { snFESX624FiberFamily 3 }          -- FstIron edge V6 family
+  snFESX624FiberPlus2XG                OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XGFamily 1 } -- FastIron Edge V6 Switch(FES)Fiber 24G + 2 10G
+  snFESX624FiberPlus2XGSwitch          OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XG 1 }     -- FESX624Fiber+2XG switch
+  snFESX624FiberPlus2XGRouter          OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XG 2 }     -- FESX624Fiber+2XG Ipv4 router
+  snFESX624FiberPlus2XGPrem            OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XGFamily 2 } -- FastIron Edge V6 Switch(FES)Fiber 24G + 2 10G-PREM
+  snFESX624FiberPlus2XGPremSwitch      OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XGPrem 1 } -- FESX624Fiber+2XG-PREM switch
+  snFESX624FiberPlus2XGPremRouter      OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XGPrem 2 } -- FESX624Fiber+2XG-PREM Ipv4 router
+  snFESX624FiberPlus2XGPrem6Router  OBJECT IDENTIFIER ::= { snFESX624FiberPlus2XGPrem 3 } -- FESX624Fiber+2XG-PREM Ipv6 router
 
   snFESX648FiberFamily       OBJECT IDENTIFIER ::= { snFESXFamily 9 }
 
-  snFESX648FiberBaseFamily     OBJECT IDENTIFIER ::= { snFESX648FiberFamily 1 }          -- FstIron edge V6 family
-  snFESX648Fiber                 OBJECT IDENTIFIER ::= { snFESX648FiberBaseFamily 1 }    -- FastIron Edge V6 Switch(FES)Fiber 48G
+  snFESX648FiberBaseFamily         OBJECT IDENTIFIER ::= { snFESX648FiberFamily 1 }        -- FstIron edge V6 family
+  snFESX648Fiber                   OBJECT IDENTIFIER ::= { snFESX648FiberBaseFamily 1 }    -- FastIron Edge V6 Switch(FES)Fiber 48G
   snFESX648FiberSwitch             OBJECT IDENTIFIER ::= { snFESX648Fiber 1 }            -- FESX648Fiber switch
-  snFESX648FiberRouter             OBJECT IDENTIFIER ::= { snFESX648Fiber 2 }            -- FESX648Fiber router
-  snFESX648FiberPrem             OBJECT IDENTIFIER ::= { snFESX648FiberBaseFamily 2 }    -- FastIron Edge V6 Switch(FES)Fiber 48G-PREM
+  snFESX648FiberRouter             OBJECT IDENTIFIER ::= { snFESX648Fiber 2 }            -- FESX648Fiber Ipv4 router
+  snFESX648FiberPrem               OBJECT IDENTIFIER ::= { snFESX648FiberBaseFamily 2 }    -- FastIron Edge V6 Switch(FES)Fiber 48G-PREM
   snFESX648FiberPremSwitch         OBJECT IDENTIFIER ::= { snFESX648FiberPrem 1 }        -- FESX648Fiber-PREM switch
-  snFESX648FiberPremRouter         OBJECT IDENTIFIER ::= { snFESX648FiberPrem 2 }        -- FESX648Fiber-PREM router
+  snFESX648FiberPremRouter         OBJECT IDENTIFIER ::= { snFESX648FiberPrem 2 }        -- FESX648Fiber-PREM Ipv4 router
+  snFESX648FiberPrem6Router         OBJECT IDENTIFIER ::= { snFESX648FiberPrem 3 }		 -- FESX648Fiber-PREM Ipv6 router
 
-  snFESX648FiberPlus1XGFamily  OBJECT IDENTIFIER ::= { snFESX648FiberFamily 2 }          -- FstIron edge V6 family
-  snFESX648FiberPlus1XG          OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XGFamily 1 } -- FastIron Edge V6 Switch(FES)Fiber 48G + 1 10G
-  snFESX648FiberPlus1XGSwitch      OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XG 1 }     -- FESX648Fiber+1XG switch
-  snFESX648FiberPlus1XGRouter      OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XG 2 }     -- FESX648Fiber+1XG router
-  snFESX648FiberPlus1XGPrem      OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XGFamily 2 } -- FastIron Edge V6 Switch(FES)Fiber 48G + 1 10G-PREM
-  snFESX648FiberPlus1XGPremSwitch  OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XGPrem 1 } -- FESX648Fiber+1XG-PREM switch
-  snFESX648FiberPlus1XGPremRouter  OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XGPrem 2 } -- FESX648Fiber+1XG-PREM router
+  snFESX648FiberPlus1XGFamily          OBJECT IDENTIFIER ::= { snFESX648FiberFamily 2 }          -- FstIron edge V6 family
+  snFESX648FiberPlus1XG                OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XGFamily 1 } -- FastIron Edge V6 Switch(FES)Fiber 48G + 1 10G
+  snFESX648FiberPlus1XGSwitch          OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XG 1 }     -- FESX648Fiber+1XG switch
+  snFESX648FiberPlus1XGRouter          OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XG 2 }     -- FESX648Fiber+1XG Ipv4 router
+  snFESX648FiberPlus1XGPrem            OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XGFamily 2 } -- FastIron Edge V6 Switch(FES)Fiber 48G + 1 10G-PREM
+  snFESX648FiberPlus1XGPremSwitch      OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XGPrem 1 } -- FESX648Fiber+1XG-PREM switch
+  snFESX648FiberPlus1XGPremRouter      OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XGPrem 2 } -- FESX648Fiber+1XG-PREM Ipv4 router
+  snFESX648FiberPlus1XGPrem6Router  OBJECT IDENTIFIER ::= { snFESX648FiberPlus1XGPrem 3 } -- FESX648Fiber+1XG-PREM Ipv6 router
 
-  snFESX648FiberPlus2XGFamily  OBJECT IDENTIFIER ::= { snFESX648FiberFamily 3 }          -- FstIron edge V6 family
-  snFESX648FiberPlus2XG          OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XGFamily 1 } -- FastIron Edge V6 Switch(FES)Fiber 48G + 2 10G
-  snFESX648FiberPlus2XGSwitch      OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XG 1 }     -- FESX648Fiber+2XG switch
-  snFESX648FiberPlus2XGRouter      OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XG 2 }     -- FESX648+2XG router
-  snFESX648FiberPlus2XGPrem      OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XGFamily 2 } -- FastIron Edge V6 Switch(FES)Fiber 48G + 2 10G-PREM
-  snFESX648FiberPlus2XGPremSwitch  OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XGPrem 1 } -- FESX648Fiber+2XG-PREM switch
-  snFESX648FiberPlus2XGPremRouter  OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XGPrem 2 } -- FESX648Fiber+2XG-PREM router
+  snFESX648FiberPlus2XGFamily          OBJECT IDENTIFIER ::= { snFESX648FiberFamily 3 }          -- FstIron edge V6 family
+  snFESX648FiberPlus2XG                OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XGFamily 1 } -- FastIron Edge V6 Switch(FES)Fiber 48G + 2 10G
+  snFESX648FiberPlus2XGSwitch          OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XG 1 }     -- FESX648Fiber+2XG switch
+  snFESX648FiberPlus2XGRouter          OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XG 2 }     -- FESX648+2XG Ipv4 router
+  snFESX648FiberPlus2XGPrem            OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XGFamily 2 } -- FastIron Edge V6 Switch(FES)Fiber 48G + 2 10G-PREM
+  snFESX648FiberPlus2XGPremSwitch      OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XGPrem 1 } -- FESX648Fiber+2XG-PREM switch
+  snFESX648FiberPlus2XGPremRouter      OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XGPrem 2 } -- FESX648Fiber+2XG-PREM Ipv4 router
+  snFESX648FiberPlus2XGPrem6Router  OBJECT IDENTIFIER ::= { snFESX648FiberPlus2XGPrem 3 } -- FESX648Fiber+2XG-PREM Ipv6 router
 
   snFESX624POEFamily       OBJECT IDENTIFIER ::= { snFESXFamily 10 }
 
-  snFESX624POEBaseFamily    OBJECT IDENTIFIER ::= { snFESX624POEFamily 1 }           -- FstIron edge V6 family
-  snFESX624POE                 OBJECT IDENTIFIER ::= { snFESX624POEBaseFamily 1 }    -- FastIron Edge V6 Switch(FES) 24G POE
+  snFESX624POEBaseFamily         OBJECT IDENTIFIER ::= { snFESX624POEFamily 1 }           -- FstIron edge V6 family
+  snFESX624POE                   OBJECT IDENTIFIER ::= { snFESX624POEBaseFamily 1 }    -- FastIron Edge V6 Switch(FES) 24G POE
   snFESX624POESwitch             OBJECT IDENTIFIER ::= { snFESX624POE 1 }            -- FESX624POE switch
-  snFESX624POERouter             OBJECT IDENTIFIER ::= { snFESX624POE 2 }            -- FESX624POE router
-  snFESX624POEPrem             OBJECT IDENTIFIER ::= { snFESX624POEBaseFamily 2 }    -- FastIron Edge V6 Switch(FES) 24GPOE-PREM
+  snFESX624POERouter             OBJECT IDENTIFIER ::= { snFESX624POE 2 }            -- FESX624POE Ipv4 router
+  snFESX624POEPrem               OBJECT IDENTIFIER ::= { snFESX624POEBaseFamily 2 }    -- FastIron Edge V6 Switch(FES) 24GPOE-PREM
   snFESX624POEPremSwitch         OBJECT IDENTIFIER ::= { snFESX624POEPrem 1 }        -- FESX624POE-PREM switch
-  snFESX624POEPremRouter         OBJECT IDENTIFIER ::= { snFESX624POEPrem 2 }        -- FESX624POE-PREM router
+  snFESX624POEPremRouter         OBJECT IDENTIFIER ::= { snFESX624POEPrem 2 }        -- FESX624POE-PREM Ipv4 router
+  snFESX624POEPrem6Router     OBJECT IDENTIFIER ::= { snFESX624POEPrem 3 }        -- FESX624POE-PREM Ipv6 router
 
-  snFESX624POEPlus1XGFamily  OBJECT IDENTIFIER ::= { snFESX624POEFamily 2 }          -- FstIron edge V6 family
-  snFESX624POEPlus1XG          OBJECT IDENTIFIER ::= { snFESX624POEPlus1XGFamily 1 } -- FastIron Edge V6 Switch(FES) 24GPOE + 1 10G
-  snFESX624POEPlus1XGSwitch      OBJECT IDENTIFIER ::= { snFESX624POEPlus1XG 1 }     -- FESX624POE+1XG switch
-  snFESX624POEPlus1XGRouter      OBJECT IDENTIFIER ::= { snFESX624POEPlus1XG 2 }     -- FESX624POE+1XG router
-  snFESX624POEPlus1XGPrem      OBJECT IDENTIFIER ::= { snFESX624POEPlus1XGFamily 2 } -- FastIron Edge V6 Switch(FES) 24GPOE + 1 10G-PREM
-  snFESX624POEPlus1XGPremSwitch  OBJECT IDENTIFIER ::= { snFESX624POEPlus1XGPrem 1 } -- FESX624POE+1XG-PREM switch
-  snFESX624POEPlus1XGPremRouter  OBJECT IDENTIFIER ::= { snFESX624POEPlus1XGPrem 2 } -- FESX624POE+1XG-PREM router
+  snFESX624POEPlus1XGFamily          OBJECT IDENTIFIER ::= { snFESX624POEFamily 2 }          -- FstIron edge V6 family
+  snFESX624POEPlus1XG                OBJECT IDENTIFIER ::= { snFESX624POEPlus1XGFamily 1 } -- FastIron Edge V6 Switch(FES) 24GPOE + 1 10G
+  snFESX624POEPlus1XGSwitch          OBJECT IDENTIFIER ::= { snFESX624POEPlus1XG 1 }     -- FESX624POE+1XG switch
+  snFESX624POEPlus1XGRouter          OBJECT IDENTIFIER ::= { snFESX624POEPlus1XG 2 }     -- FESX624POE+1XG Ipv4 router
+  snFESX624POEPlus1XGPrem            OBJECT IDENTIFIER ::= { snFESX624POEPlus1XGFamily 2 } -- FastIron Edge V6 Switch(FES) 24GPOE + 1 10G-PREM
+  snFESX624POEPlus1XGPremSwitch      OBJECT IDENTIFIER ::= { snFESX624POEPlus1XGPrem 1 } -- FESX624POE+1XG-PREM switch
+  snFESX624POEPlus1XGPremRouter      OBJECT IDENTIFIER ::= { snFESX624POEPlus1XGPrem 2 } -- FESX624POE+1XG-PREM Ipv4 router
+  snFESX624POEPlus1XGPrem6Router  OBJECT IDENTIFIER ::= { snFESX624POEPlus1XGPrem 3 } -- FESX624POE+1XG-PREM Ipv6 router
 
-  snFESX624POEPlus2XGFamily  OBJECT IDENTIFIER ::= { snFESX624POEFamily 3 }          -- FstIron edge V6 family
-  snFESX624POEPlus2XG          OBJECT IDENTIFIER ::= { snFESX624POEPlus2XGFamily 1 } -- FastIron Edge V6 Switch(FES) 24GPOE + 2 10G
-  snFESX624POEPlus2XGSwitch      OBJECT IDENTIFIER ::= { snFESX624POEPlus2XG 1 }     -- FESX624POE+2XG switch
-  snFESX624POEPlus2XGRouter      OBJECT IDENTIFIER ::= { snFESX624POEPlus2XG 2 }     -- FESX624POE+2XG router
-  snFESX624POEPlus2XGPrem      OBJECT IDENTIFIER ::= { snFESX624POEPlus2XGFamily 2 } -- FastIron Edge V6 Switch(FES) 24GPOE + 2 10G-PREM
-  snFESX624POEPlus2XGPremSwitch  OBJECT IDENTIFIER ::= { snFESX624POEPlus2XGPrem 1 } -- FESX624POE+2XG-PREM switch
-  snFESX624POEPlus2XGPremRouter  OBJECT IDENTIFIER ::= { snFESX624POEPlus2XGPrem 2 } -- FESX624POE+2XG-PREM router
+  snFESX624POEPlus2XGFamily          OBJECT IDENTIFIER ::= { snFESX624POEFamily 3 }          -- FstIron edge V6 family
+  snFESX624POEPlus2XG                OBJECT IDENTIFIER ::= { snFESX624POEPlus2XGFamily 1 } -- FastIron Edge V6 Switch(FES) 24GPOE + 2 10G
+  snFESX624POEPlus2XGSwitch          OBJECT IDENTIFIER ::= { snFESX624POEPlus2XG 1 }     -- FESX624POE+2XG switch
+  snFESX624POEPlus2XGRouter          OBJECT IDENTIFIER ::= { snFESX624POEPlus2XG 2 }     -- FESX624POE+2XG Ipv4 router
+  snFESX624POEPlus2XGPrem            OBJECT IDENTIFIER ::= { snFESX624POEPlus2XGFamily 2 } -- FastIron Edge V6 Switch(FES) 24GPOE + 2 10G-PREM
+  snFESX624POEPlus2XGPremSwitch      OBJECT IDENTIFIER ::= { snFESX624POEPlus2XGPrem 1 } -- FESX624POE+2XG-PREM switch
+  snFESX624POEPlus2XGPremRouter      OBJECT IDENTIFIER ::= { snFESX624POEPlus2XGPrem 2 } -- FESX624POE+2XG-PREM Ipv4 router
+  snFESX624POEPlus2XGPrem6Router  OBJECT IDENTIFIER ::= { snFESX624POEPlus2XGPrem 3 } -- FESX624POE+2XG-PREM Ipv6 router
+
+  snFESX624EFamily   OBJECT IDENTIFIER ::= { snFESXFamily 11 }
+
+  snFESX624EBaseFamily       OBJECT IDENTIFIER ::= { snFESX624EFamily 1 }      -- FstIron edge V6-E (Expanded)  family
+  snFESX624E                 OBJECT IDENTIFIER ::= { snFESX624EBaseFamily 1 }  -- FastIron Edge V6 Switch(FES) 24G
+  snFESX624ESwitch           OBJECT IDENTIFIER ::= { snFESX624E 1 }            -- FESX624 switch
+  snFESX624ERouter           OBJECT IDENTIFIER ::= { snFESX624E 2 }            -- FESX624 Ipv4 router
+  snFESX624EPrem             OBJECT IDENTIFIER ::= { snFESX624EBaseFamily 2 }  -- FastIron Edge V6 Switch(FES) 24G-PREM
+  snFESX624EPremSwitch       OBJECT IDENTIFIER ::= { snFESX624EPrem 1 }        -- FESX624-PREM switch
+  snFESX624EPremRouter       OBJECT IDENTIFIER ::= { snFESX624EPrem 2 }        -- FESX624-PREM Ipv4 router
+  snFESX624EPrem6Router   OBJECT IDENTIFIER ::= { snFESX624EPrem 3 }        -- FESX624-PREM Ipv6 router
+
+  snFESX624EPlus1XGFamily         OBJECT IDENTIFIER ::= { snFESX624EFamily 2 } -- FstIron edge V6 family
+  snFESX624EPlus1XG               OBJECT IDENTIFIER ::= { snFESX624EPlus1XGFamily 1 } -- FastIron Edge V6 Switch(FES) 24G + 1 10G
+  snFESX624EPlus1XGSwitch         OBJECT IDENTIFIER ::= { snFESX624EPlus1XG 1 }     -- FESX624+1XG switch
+  snFESX624EPlus1XGRouter         OBJECT IDENTIFIER ::= { snFESX624EPlus1XG 2 }     -- FESX624+1XG Ipv4 router
+  snFESX624EPlus1XGPrem           OBJECT IDENTIFIER ::= { snFESX624EPlus1XGFamily 2 } -- FastIron Edge V6 Switch(FES) 24G + 1 10G-PREM
+  snFESX624EPlus1XGPremSwitch     OBJECT IDENTIFIER ::= { snFESX624EPlus1XGPrem 1 } -- FESX624+1XG-PREM switch
+  snFESX624EPlus1XGPremRouter     OBJECT IDENTIFIER ::= { snFESX624EPlus1XGPrem 2 } -- FESX624+1XG-PREM Ipv4 router
+  snFESX624EPlus1XGPrem6Router OBJECT IDENTIFIER ::= { snFESX624EPlus1XGPrem 3 } -- FESX624+1XG-PREM Ipv6 router
+
+  snFESX624EPlus2XGFamily         OBJECT IDENTIFIER ::= { snFESX624EFamily 3 }  -- FstIron edge V6 family
+  snFESX624EPlus2XG               OBJECT IDENTIFIER ::= { snFESX624EPlus2XGFamily 1 } -- FastIron Edge V6 Switch(FES) 24G + 2 10G
+  snFESX624EPlus2XGSwitch         OBJECT IDENTIFIER ::= { snFESX624EPlus2XG 1 }     -- FESX624+2XG switch
+  snFESX624EPlus2XGRouter         OBJECT IDENTIFIER ::= { snFESX624EPlus2XG 2 }     -- FESX624+2XG Ipv4 router
+  snFESX624EPlus2XGPrem           OBJECT IDENTIFIER ::= { snFESX624EPlus2XGFamily 2 } -- FastIron Edge V6 Switch(FES) 24G + 2 10G-PREM
+  snFESX624EPlus2XGPremSwitch     OBJECT IDENTIFIER ::= { snFESX624EPlus2XGPrem 1 } -- FESX624+2XG-PREM switch
+  snFESX624EPlus2XGPremRouter     OBJECT IDENTIFIER ::= { snFESX624EPlus2XGPrem 2 } -- FESX624+2XG-PREM Ipv4 router
+  snFESX624EPlus2XGPrem6Router OBJECT IDENTIFIER ::= { snFESX624EPlus2XGPrem 3 } -- FESX624+2XG-PREM Ipv6 router
+
+  snFESX624EFiberFamily       OBJECT IDENTIFIER ::= { snFESXFamily 12 }
+
+  snFESX624EFiberBaseFamily     OBJECT IDENTIFIER ::= { snFESX624EFiberFamily 1 }          -- FstIron edge V6-E(Expanded)  Fiber family
+  snFESX624EFiber               OBJECT IDENTIFIER ::= { snFESX624EFiberBaseFamily 1 }    -- FastIron V6 Edge Switch(FES) Fiber 24G
+  snFESX624EFiberSwitch         OBJECT IDENTIFIER ::= { snFESX624EFiber 1 }            -- FESX624Fiber switch
+  snFESX624EFiberRouter         OBJECT IDENTIFIER ::= { snFESX624EFiber 2 }            -- FESX624Fiber Ipv4 router
+  snFESX624EFiberPrem           OBJECT IDENTIFIER ::= { snFESX624EFiberBaseFamily 2 }    -- FastIron Edge V6 Switch(FES) Fiber 24G-PREM
+  snFESX624EFiberPremSwitch     OBJECT IDENTIFIER ::= { snFESX624EFiberPrem 1 }        -- FESX624Fiber-PREM switch
+  snFESX624EFiberPremRouter     OBJECT IDENTIFIER ::= { snFESX624EFiberPrem 2 }        -- FESX624Fiber-PREM Ipv4 router
+  snFESX624EFiberPrem6Router OBJECT IDENTIFIER ::= { snFESX624EFiberPrem 3 }        -- FESX624Fiber-PREM Ipv6 router
+
+  snFESX624EFiberPlus1XGFamily          OBJECT IDENTIFIER ::= { snFESX624EFiberFamily 2 }          -- FstIron edge V6 family
+  snFESX624EFiberPlus1XG                OBJECT IDENTIFIER ::= { snFESX624EFiberPlus1XGFamily 1 } -- FastIron Edge V6 Switch(FES) Fiber 24G + 1 10G
+  snFESX624EFiberPlus1XGSwitch          OBJECT IDENTIFIER ::= { snFESX624EFiberPlus1XG 1 }     -- FESX624Fiber+1XG switch
+  snFESX624EFiberPlus1XGRouter          OBJECT IDENTIFIER ::= { snFESX624EFiberPlus1XG 2 }     -- FESX624Fiber+1XG Ipv4 router
+  snFESX624EFiberPlus1XGPrem            OBJECT IDENTIFIER ::= { snFESX624EFiberPlus1XGFamily 2 } -- FastIron Edge V6 Switch(FES) Fiber 24G + 1 10G-PREM
+  snFESX624EFiberPlus1XGPremSwitch      OBJECT IDENTIFIER ::= { snFESX624EFiberPlus1XGPrem 1 } -- FESX624Fiber+1XG-PREM switch
+  snFESX624EFiberPlus1XGPremRouter      OBJECT IDENTIFIER ::= { snFESX624EFiberPlus1XGPrem 2 } -- FESX624Fiber+1XG-PREM Ipv4 router
+  snFESX624EFiberPlus1XGPrem6Router  OBJECT IDENTIFIER ::= { snFESX624EFiberPlus1XGPrem 3 } -- FESX624Fiber+1XG-PREM Ipv6 router
+
+  snFESX624EFiberPlus2XGFamily          OBJECT IDENTIFIER ::= { snFESX624EFiberFamily 3 }          -- FstIron edge V6 family
+  snFESX624EFiberPlus2XG                OBJECT IDENTIFIER ::= { snFESX624EFiberPlus2XGFamily 1 } -- FastIron Edge V6 Switch(FES) Fiber 24G + 2 10G
+  snFESX624EFiberPlus2XGSwitch          OBJECT IDENTIFIER ::= { snFESX624EFiberPlus2XG 1 }     -- FESX624Fiber+2XG switch
+  snFESX624EFiberPlus2XGRouter          OBJECT IDENTIFIER ::= { snFESX624EFiberPlus2XG 2 }     -- FESX624Fiber+2XG Ipv4 router
+  snFESX624EFiberPlus2XGPrem            OBJECT IDENTIFIER ::= { snFESX624EFiberPlus2XGFamily 2 } -- FastIron Edge V6 Switch(FES) Fiber 24G + 2 10G-PREM
+  snFESX624EFiberPlus2XGPremSwitch      OBJECT IDENTIFIER ::= { snFESX624EFiberPlus2XGPrem 1 } -- FESX624Fiber+2XG-PREM switch
+  snFESX624EFiberPlus2XGPremRouter      OBJECT IDENTIFIER ::= { snFESX624EFiberPlus2XGPrem 2 } -- FESX624Fiber+2XG-PREM Ipv4  router
+  snFESX624EFiberPlus2XGPrem6Router  OBJECT IDENTIFIER ::= { snFESX624EFiberPlus2XGPrem 3 } -- FESX624Fiber+2XG-PREM Ipv6 router
+
+  snFESX648EFamily         OBJECT IDENTIFIER ::= { snFESXFamily 13 }
+
+  snFESX648EBaseFamily     OBJECT IDENTIFIER ::= { snFESX648EFamily 1 }      -- FstIron edge V6-E (Expanded)family
+  snFESX648E               OBJECT IDENTIFIER ::= { snFESX648EBaseFamily 1 }  -- FastIron Edge V6 Switch(FES) 48G
+  snFESX648ESwitch         OBJECT IDENTIFIER ::= { snFESX648E 1 }            -- FESX648 switch
+  snFESX648ERouter         OBJECT IDENTIFIER ::= { snFESX648E 2 }            -- FESX648 Ipv4 router
+  snFESX648EPrem           OBJECT IDENTIFIER ::= { snFESX648EBaseFamily 2 }    -- FastIron Edge V6 Switch(FES) 48G-PREM
+  snFESX648EPremSwitch     OBJECT IDENTIFIER ::= { snFESX648EPrem 1 }        -- FESX648-PREM switch
+  snFESX648EPremRouter     OBJECT IDENTIFIER ::= { snFESX648EPrem 2 }        -- FESX648-PREM Ipv4 router
+  snFESX648EPrem6Router OBJECT IDENTIFIER ::= { snFESX648EPrem 3 }        -- FESX648-PREM Ipv6 router
+
+  snFESX648EPlus1XGFamily         OBJECT IDENTIFIER ::= { snFESX648EFamily 2 }      -- FstIron edge V6 family
+  snFESX648EPlus1XG               OBJECT IDENTIFIER ::= { snFESX648EPlus1XGFamily 1 } -- FastIron Edge V6 Switch(FES) 48G + 1 10G
+  snFESX648EPlus1XGSwitch         OBJECT IDENTIFIER ::= { snFESX648EPlus1XG 1 }     -- FESX648+1XG switch
+  snFESX648EPlus1XGRouter         OBJECT IDENTIFIER ::= { snFESX648EPlus1XG 2 }     -- FESX648+1XG Ipv4 router
+  snFESX648EPlus1XGPrem           OBJECT IDENTIFIER ::= { snFESX648EPlus1XGFamily 2 } -- FastIron Edge V6 Switch(FES) 48G + 1 10G-PREM
+  snFESX648EPlus1XGPremSwitch     OBJECT IDENTIFIER ::= { snFESX648EPlus1XGPrem 1 } -- FESX648+1XG-PREM switch
+  snFESX648EPlus1XGPremRouter     OBJECT IDENTIFIER ::= { snFESX648EPlus1XGPrem 2 } -- FESX648+1XG-PREM Ipv4 router
+  snFESX648EPlus1XGPrem6Router OBJECT IDENTIFIER ::= { snFESX648EPlus1XGPrem 3 } -- FESX648+1XG-PREM Ipv6 router
+
+  snFESX648EPlus2XGFamily         OBJECT IDENTIFIER ::= { snFESX648EFamily 3 }      -- FstIron edge V6 family
+  snFESX648EPlus2XG               OBJECT IDENTIFIER ::= { snFESX648EPlus2XGFamily 1 } -- FastIron Edge V6 Switch(FES) 48G + 2 10G
+  snFESX648EPlus2XGSwitch         OBJECT IDENTIFIER ::= { snFESX648EPlus2XG 1 }     -- FESX648+2XG switch
+  snFESX648EPlus2XGRouter         OBJECT IDENTIFIER ::= { snFESX648EPlus2XG 2 }     -- FESX648+2XG Ipv4 router
+  snFESX648EPlus2XGPrem           OBJECT IDENTIFIER ::= { snFESX648EPlus2XGFamily 2 } -- FastIron Edge V6 Switch(FES) 48G + 2 10G-PREM
+  snFESX648EPlus2XGPremSwitch     OBJECT IDENTIFIER ::= { snFESX648EPlus2XGPrem 1 } -- FESX648+2XG-PREM switch
+  snFESX648EPlus2XGPremRouter     OBJECT IDENTIFIER ::= { snFESX648EPlus2XGPrem 2 } -- FESX648+2XG-PREM Ipv4 router
+  snFESX648EPlus2XGPrem6Router OBJECT IDENTIFIER ::= { snFESX648EPlus2XGPrem 3 } -- FESX648+2XG-PREM Ipv6 router
 
   snFWSXFamily          OBJECT IDENTIFIER ::= { registration 35 }
 
@@ -497,7 +619,7 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
   snFastIronSuperXPremRouter        OBJECT IDENTIFIER ::= { snFastIronSuperXPrem 2 }      -- FastIron SuperX Premium Router
   snFastIronSuperXPremBaseL3Switch  OBJECT IDENTIFIER ::= { snFastIronSuperXPrem 3 }      -- FastIron SuperX Premium Base L3 Switch
 
-  snFastIronSuperX800                  OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 3 }    -- FastIron SuperX 800 
+  snFastIronSuperX800                  OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 3 }    -- FastIron SuperX 800
   snFastIronSuperX800Switch            OBJECT IDENTIFIER ::= { snFastIronSuperX800 1 }          -- FastIron SuperX 800 Switch
   snFastIronSuperX800Router            OBJECT IDENTIFIER ::= { snFastIronSuperX800 2 }          -- FastIron SuperX 800 Router
   snFastIronSuperX800BaseL3Switch      OBJECT IDENTIFIER ::= { snFastIronSuperX800 3 }          -- FastIron SuperX 800 Base L3 Switch
@@ -506,7 +628,7 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
   snFastIronSuperX800PremRouter        OBJECT IDENTIFIER ::= { snFastIronSuperX800Prem 2 }      -- FastIron SuperX 800 Premium Router
   snFastIronSuperX800PremBaseL3Switch  OBJECT IDENTIFIER ::= { snFastIronSuperX800Prem 3 }      -- FastIron SuperX 800 Premium Base L3 Switch
 
-  snFastIronSuperX1600                  OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 5 }    -- FastIron SuperX 1600 
+  snFastIronSuperX1600                  OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 5 }    -- FastIron SuperX 1600
   snFastIronSuperX1600Switch            OBJECT IDENTIFIER ::= { snFastIronSuperX1600 1 }          -- FastIron SuperX 1600 Switch
   snFastIronSuperX1600Router            OBJECT IDENTIFIER ::= { snFastIronSuperX1600 2 }          -- FastIron SuperX 1600 Router
   snFastIronSuperX1600BaseL3Switch      OBJECT IDENTIFIER ::= { snFastIronSuperX1600 3 }          -- FastIron SuperX 1600 Base L3 Switch
@@ -515,32 +637,35 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
   snFastIronSuperX1600PremRouter        OBJECT IDENTIFIER ::= { snFastIronSuperX1600Prem 2 }      -- FastIron SuperX 1600 Premium Router
   snFastIronSuperX1600PremBaseL3Switch  OBJECT IDENTIFIER ::= { snFastIronSuperX1600Prem 3 }      -- FastIron SuperX 1600 Premium Base L3 Switch
 
-  snFastIronSuperXV6                  OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 7 }    -- FastIron SuperX V6 
+  snFastIronSuperXV6                  OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 7 }    -- FastIron SuperX V6
   snFastIronSuperXV6Switch            OBJECT IDENTIFIER ::= { snFastIronSuperXV6 1 }          -- FastIron SuperX V6 Switch
-  snFastIronSuperXV6Router            OBJECT IDENTIFIER ::= { snFastIronSuperXV6 2 }          -- FastIron SuperX V6 Router
+  snFastIronSuperXV6Router            OBJECT IDENTIFIER ::= { snFastIronSuperXV6 2 }          -- FastIron SuperX V6- Ipv4 Router
   snFastIronSuperXV6BaseL3Switch      OBJECT IDENTIFIER ::= { snFastIronSuperXV6 3 }          -- FastIron SuperX V6 Base L3 Switch
   snFastIronSuperXV6Prem              OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 8 }    -- FastIron SuperX V6 Premium
   snFastIronSuperXV6PremSwitch        OBJECT IDENTIFIER ::= { snFastIronSuperXV6Prem 1 }      -- FastIron SuperX V6 Premium Switch
-  snFastIronSuperXV6PremRouter        OBJECT IDENTIFIER ::= { snFastIronSuperXV6Prem 2 }      -- FastIron SuperX V6 Premium Router
+  snFastIronSuperXV6PremRouter        OBJECT IDENTIFIER ::= { snFastIronSuperXV6Prem 2 }      -- FastIron SuperX V6 Premium Ipv4 Router
   snFastIronSuperXV6PremBaseL3Switch  OBJECT IDENTIFIER ::= { snFastIronSuperXV6Prem 3 }      -- FastIron SuperX V6 Premium Base L3 Switch
+  snFastIronSuperXV6Prem6Router    OBJECT IDENTIFIER ::= { snFastIronSuperXV6Prem 4 }      -- FastIron SuperX V6 Premium Ipv6 Router
 
-  snFastIronSuperX800V6                  OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 9 }    -- FastIron SuperX 800 V6 
+  snFastIronSuperX800V6                  OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 9 }    -- FastIron SuperX 800 V6
   snFastIronSuperX800V6Switch            OBJECT IDENTIFIER ::= { snFastIronSuperX800V6 1 }          -- FastIron SuperX 800 V6 Switch
-  snFastIronSuperX800V6Router            OBJECT IDENTIFIER ::= { snFastIronSuperX800V6 2 }          -- FastIron SuperX 800 V6 Router
+  snFastIronSuperX800V6Router            OBJECT IDENTIFIER ::= { snFastIronSuperX800V6 2 }          -- FastIron SuperX 800 V6 - Ipv4 Router
   snFastIronSuperX800V6BaseL3Switch      OBJECT IDENTIFIER ::= { snFastIronSuperX800V6 3 }          -- FastIron SuperX 800 V6 Base L3 Switch
   snFastIronSuperX800V6Prem              OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 10 }    -- FastIron SuperX 800 V6 Premium
   snFastIronSuperX800V6PremSwitch        OBJECT IDENTIFIER ::= {   snFastIronSuperX800V6Prem 1 }      -- FastIron SuperX 800 Premium V6 Switch
-  snFastIronSuperX800V6PremRouter        OBJECT IDENTIFIER ::= {   snFastIronSuperX800V6Prem 2 }      -- FastIron SuperX 800 Premium V6 Router
+  snFastIronSuperX800V6PremRouter        OBJECT IDENTIFIER ::= {   snFastIronSuperX800V6Prem 2 }      -- FastIron SuperX 800 Premium V6 - Ipv4 Router
   snFastIronSuperX800V6PremBaseL3Switch  OBJECT IDENTIFIER ::= {   snFastIronSuperX800V6Prem 3 }      -- FastIron SuperX 800 Premium V6 Base L3 Switch
+  snFastIronSuperX800V6Prem6Router    OBJECT IDENTIFIER ::= {   snFastIronSuperX800V6Prem 4 }      -- FastIron SuperX 800 Premium V6- Ipv6  Router
 
-  snFastIronSuperX1600V6                  OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 11 }    -- FastIron SuperX 1600 V6 
+  snFastIronSuperX1600V6                  OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 11 }    -- FastIron SuperX 1600 V6
   snFastIronSuperX1600V6Switch            OBJECT IDENTIFIER ::= { snFastIronSuperX1600V6 1 }          -- FastIron SuperX 1600 V6 Switch
-  snFastIronSuperX1600V6Router            OBJECT IDENTIFIER ::= { snFastIronSuperX1600V6 2 }          -- FastIron SuperX 1600 V6 Router
+  snFastIronSuperX1600V6Router            OBJECT IDENTIFIER ::= { snFastIronSuperX1600V6 2 }          -- FastIron SuperX 1600 V6 - Ipv4 Router
   snFastIronSuperX1600V6BaseL3Switch      OBJECT IDENTIFIER ::= { snFastIronSuperX1600V6 3 }          -- FastIron SuperX 1600 V6 Base L3 Switch
   snFastIronSuperX1600V6Prem              OBJECT IDENTIFIER ::= { snFastIronSuperXFamily 12 }    -- FastIron SuperX 1600 Premium V6
   snFastIronSuperX1600V6PremSwitch        OBJECT IDENTIFIER ::= { snFastIronSuperX1600V6Prem 1 }      -- FastIron SuperX 1600 Premium V6 Switch
-  snFastIronSuperX1600V6PremRouter        OBJECT IDENTIFIER ::= { snFastIronSuperX1600V6Prem 2 }      -- FastIron SuperX 1600 Premium V6 Router
+  snFastIronSuperX1600V6PremRouter        OBJECT IDENTIFIER ::= { snFastIronSuperX1600V6Prem 2 }      -- FastIron SuperX 1600 Premium V6- Ipv4 Router
   snFastIronSuperX1600V6PremBaseL3Switch  OBJECT IDENTIFIER ::= { snFastIronSuperX1600V6Prem 3 }      -- FastIron SuperX 1600 Premium V6 Base L3 Switch
+  snFastIronSuperX1600V6Prem6Router    OBJECT IDENTIFIER ::= { snFastIronSuperX1600V6Prem 4 }      -- FastIron SuperX 1600 Premium V6- Ipv6 Router
 
   snBigIronSuperXFamily             OBJECT IDENTIFIER ::= { registration 37 }        -- BigIron SuperX Family
   snBigIronSuperX                   OBJECT IDENTIFIER ::= { snBigIronSuperXFamily 1 }    -- BigIron SuperX
@@ -631,7 +756,7 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
   snFGS624XGPRouter    OBJECT IDENTIFIER ::= { snFGS624XGP 2 }          -- FGS624XGP router
 
   snFGS624PPOEFamily   OBJECT IDENTIFIER ::= { snFGS624Family 3 }
-  snFGS624PPOE         OBJECT IDENTIFIER ::= { snFGS624PPOEFamily 1 }   -- FastIron GS Switch(FGS) 24-port 10/100/1000 POE 
+  snFGS624PPOE         OBJECT IDENTIFIER ::= { snFGS624PPOEFamily 1 }   -- FastIron GS Switch(FGS) 24-port 10/100/1000 POE
   snFGS624PPOESwitch   OBJECT IDENTIFIER ::= { snFGS624PPOE 1 }         -- snFGS624P-POE switch
   snFGS624PPOERouter   OBJECT IDENTIFIER ::= { snFGS624PPOE 2 }         -- snFGS624P-POE router
 
@@ -648,7 +773,7 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
   snFGS648PRouter      OBJECT IDENTIFIER ::= { snFGS648P 2 }            -- FGS648P router
 
   snFGS648PPOEFamily   OBJECT IDENTIFIER ::= { snFGS648Family 2 }
-  snFGS648PPOE         OBJECT IDENTIFIER ::= { snFGS648PPOEFamily 1 }   -- FastIron GS Switch(FGS) 48-port 10/100/1000 POE 
+  snFGS648PPOE         OBJECT IDENTIFIER ::= { snFGS648PPOEFamily 1 }   -- FastIron GS Switch(FGS) 48-port 10/100/1000 POE
   snFGS648PPOESwitch   OBJECT IDENTIFIER ::= { snFGS648PPOE 1 }         -- snFGS648P-POE switch
   snFGS648PPOERouter   OBJECT IDENTIFIER ::= { snFGS648PPOE 2 }         -- snFGS648P-POE router
 
@@ -657,7 +782,7 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
   snFLS624Family       OBJECT IDENTIFIER ::= { snFLSFamily 1 }
 
   snFLS624BaseFamily  OBJECT IDENTIFIER ::= { snFLS624Family 1 }
-  snFLS624            OBJECT IDENTIFIER ::= { snFLS624BaseFamily 1 }  -- FastIron LS Switch(FLS) 24-port 10/100/1000 
+  snFLS624            OBJECT IDENTIFIER ::= { snFLS624BaseFamily 1 }  -- FastIron LS Switch(FLS) 24-port 10/100/1000
   snFLS624Switch      OBJECT IDENTIFIER ::= { snFLS624 1 }                 -- FLS624 switch
   snFLS624Router      OBJECT IDENTIFIER ::= { snFLS624 2 }                 -- FLS624 router
 
@@ -714,6 +839,350 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
   snServerIron4GSwitch    OBJECT IDENTIFIER ::= { snServerIron4G 1 }     -- ServerIron4G switch
   snServerIron4GRouter    OBJECT IDENTIFIER ::= { snServerIron4G 2 }     -- ServerIron4G router
 
+  serverIronAdx1000          OBJECT IDENTIFIER ::= { snSIFamily 12 }           -- ServerIron ADX 1000 series
+  serverIronAdx1000Switch    OBJECT IDENTIFIER ::= { serverIronAdx1000 1 }     -- ServerIron ADX 1000 switch
+  serverIronAdx1000Router    OBJECT IDENTIFIER ::= { serverIronAdx1000 2 }     -- ServerIron ADX 1000 router
+
+  serverIronAdx1000Ssl          OBJECT IDENTIFIER ::= { snSIFamily 13 }           -- ServerIron ADX 1000 SSL series
+  serverIronAdx1000SslSwitch    OBJECT IDENTIFIER ::= { serverIronAdx1000Ssl 1 }     -- ServerIron ADX 1000 SSL switch
+  serverIronAdx1000SslRouter    OBJECT IDENTIFIER ::= { serverIronAdx1000Ssl 2 }     -- ServerIron ADX 1000 SSL router
+
+  serverIronAdx4000          OBJECT IDENTIFIER ::= { snSIFamily 14 }           -- ServerIron ADX 4000 series
+  serverIronAdx4000Switch    OBJECT IDENTIFIER ::= { serverIronAdx4000 1 }     -- ServerIron ADX 4000 switch
+  serverIronAdx4000Router    OBJECT IDENTIFIER ::= { serverIronAdx4000 2 }     -- ServerIron ADX 4000 router
+
+  serverIronAdx4000Ssl          OBJECT IDENTIFIER ::= { snSIFamily 15 }           -- ServerIron ADX 4000 SSL series
+  serverIronAdx4000SslSwitch    OBJECT IDENTIFIER ::= { serverIronAdx4000Ssl 1 }  -- ServerIron ADX 4000 SSL switch
+  serverIronAdx4000SslRouter    OBJECT IDENTIFIER ::= { serverIronAdx4000Ssl 2 }  -- ServerIron ADX 4000 SSL router
+
+  serverIronAdx8000          OBJECT IDENTIFIER ::= { snSIFamily 16 }           -- ServerIron ADX 8000 series
+  serverIronAdx8000Switch    OBJECT IDENTIFIER ::= { serverIronAdx8000 1 }     -- ServerIron ADX 8000 switch
+  serverIronAdx8000Router    OBJECT IDENTIFIER ::= { serverIronAdx8000 2 }     -- ServerIron ADX 8000 router
+
+  serverIronAdx8000Ssl          OBJECT IDENTIFIER ::= { snSIFamily 17 }           -- ServerIron ADX 8000 SSL series
+  serverIronAdx8000SslSwitch    OBJECT IDENTIFIER ::= { serverIronAdx8000Ssl 1 }  -- ServerIron ADX 8000 SSL switch
+  serverIronAdx8000SslRouter    OBJECT IDENTIFIER ::= { serverIronAdx8000Ssl 2 }  -- ServerIron ADX 8000 SSL router
+
+  serverIronAdx10000          OBJECT IDENTIFIER ::= { snSIFamily 18 }           -- ServerIron ADX 10000 series
+  serverIronAdx10000Switch    OBJECT IDENTIFIER ::= { serverIronAdx10000 1 }     -- ServerIron ADX 10000 switch
+  serverIronAdx10000Router    OBJECT IDENTIFIER ::= { serverIronAdx10000 2 }     -- ServerIron ADX 10000 router
+
+  serverIronAdx10000Ssl          OBJECT IDENTIFIER ::= { snSIFamily 19 }           -- ServerIron ADX 10000 SSL series
+  serverIronAdx10000SslSwitch    OBJECT IDENTIFIER ::= { serverIronAdx10000Ssl 1 }     -- ServerIron ADX 10000 SSL switch
+  serverIronAdx10000SslRouter    OBJECT IDENTIFIER ::= { serverIronAdx10000Ssl 2 }     -- ServerIron ADX 10000 SSL router
+
+--FastIron GS/LS/CX (FGS/FLS/FCX/ICX) stacking family
+  snFastIronStackFamily      OBJECT IDENTIFIER ::= { registration 48 }	-- FGS/FLS/FCX/ICX stacking family
+
+  snFastIronStack               OBJECT IDENTIFIER ::= { snFastIronStackFamily 1 }
+  snFastIronStackSwitch      OBJECT IDENTIFIER ::= { snFastIronStack 1}           --FGS/FLS switch
+  snFastIronStackRouter      OBJECT IDENTIFIER ::= { snFastIronStack 2}           --FGS/FLS router
+
+  snFastIronStackFCX               OBJECT IDENTIFIER ::= { snFastIronStackFamily 2 }
+  snFastIronStackFCXSwitch      OBJECT IDENTIFIER ::= { snFastIronStackFCX 1}        -- FCX switch
+  snFastIronStackFCXBaseL3Router      OBJECT IDENTIFIER ::= { snFastIronStackFCX 2}   --FCX Base L3 router
+  snFastIronStackFCXRouter      OBJECT IDENTIFIER ::= { snFastIronStackFCX 3}           --FCX Premium Router
+  snFastIronStackFCXAdvRouter      OBJECT IDENTIFIER ::= { snFastIronStackFCX 4}           --FCX Advanced Premium Router (BGP)
+
+  snFastIronStackICX6610               OBJECT IDENTIFIER ::= { snFastIronStackFamily 3 }
+  snFastIronStackICX6610Switch      OBJECT IDENTIFIER ::= { snFastIronStackICX6610 1}        -- ICX6610 switch
+  snFastIronStackICX6610BaseL3Router      OBJECT IDENTIFIER ::= { snFastIronStackICX6610 2}   --ICX6610 Base L3 router
+  snFastIronStackICX6610Router      OBJECT IDENTIFIER ::= { snFastIronStackICX6610 3}           --ICX6610 Base Router
+  snFastIronStackICX6610PRouter      OBJECT IDENTIFIER ::= { snFastIronStackICX6610 4}           --ICX6610 Premium Router
+  snFastIronStackICX6610ARouter      OBJECT IDENTIFIER ::= { snFastIronStackICX6610 5}           --ICX6610 Advanced Router
+
+  snFastIronStackICX6430     OBJECT IDENTIFIER ::= { snFastIronStackFamily 4 }
+  snFastIronStackICX6430Switch      OBJECT IDENTIFIER ::= { snFastIronStackICX6430 1}        -- ICX6430 switch
+
+  snFastIronStackICX6450     OBJECT IDENTIFIER ::= { snFastIronStackFamily 5 }
+  snFastIronStackICX6450Switch      OBJECT IDENTIFIER ::= { snFastIronStackICX6450 1}               -- ICX6450 switch
+  snFastIronStackICX6450BaseL3Router      OBJECT IDENTIFIER ::= { snFastIronStackICX6450 2}    --ICX6450 Base L3 router
+  snFastIronStackICX6450Router      OBJECT IDENTIFIER ::= { snFastIronStackICX6450 3}               -- ICX6450 Router
+  snFastIronStackICX6450PRouter     OBJECT IDENTIFIER ::= { snFastIronStackICX6450 4}              -- ICX6450 Premium Router
+
+-- NetIron Carrier Ethernet Switch (CES) product line
+snCes2000Family  OBJECT IDENTIFIER ::= { registration 49 }
+
+ snCes2024F OBJECT IDENTIFIER ::= { snCes2000Family  1 }   -- 24X1G fiber
+ snCes2024C OBJECT IDENTIFIER ::= { snCes2000Family  2 }  --  24X1G copper
+ snCes2048F OBJECT IDENTIFIER ::= { snCes2000Family  3 }  --  48X1G fiber
+ snCes2048C OBJECT IDENTIFIER ::= { snCes2000Family  4 }  -- 48X1G copper
+ snCes2048FX OBJECT IDENTIFIER ::= { snCes2000Family  5 }  -- 48X1G fiber + 2X10G
+ snCes2048CX OBJECT IDENTIFIER ::= { snCes2000Family  6 }  -- 48X1G copper + 2X10G
+
+  snFLSLCFamily          OBJECT IDENTIFIER ::= { registration 50 }       -- FastIron LSLC series family
+  snFLSLC624Family       OBJECT IDENTIFIER ::= { snFLSLCFamily 1 }
+
+  snFLSLC624BaseFamily  OBJECT IDENTIFIER ::= { snFLSLC624Family 1 }
+  snFLSLC624            OBJECT IDENTIFIER ::= { snFLSLC624BaseFamily 1 }  -- FastIron LSLC Switch(FLSLC) 24-port 10/100/1000 POE Ready
+  snFLSLC624Switch      OBJECT IDENTIFIER ::= { snFLSLC624 1 }            -- FLSLC624 switch
+  snFLSLC624Router      OBJECT IDENTIFIER ::= { snFLSLC624 2 }            -- FLSLC624 router
+
+  snFLSLC624POEFamily   OBJECT IDENTIFIER ::= { snFLSLC624Family 2 }
+  snFLSLC624POE         OBJECT IDENTIFIER ::= { snFLSLC624POEFamily 1 }   -- FastIron LSLC Switch(FLSLC) 24-port 10/100/1000 POE
+  snFLSLC624POESwitch   OBJECT IDENTIFIER ::= { snFLSLC624POE 1 }         -- snFLSLC624-POE switch
+  snFLSLC624POERouter   OBJECT IDENTIFIER ::= { snFLSLC624POE 2 }         -- snFLSLC624-POE router
+
+
+  snFLSLC648Family       OBJECT IDENTIFIER ::= { snFLSLCFamily 2 }
+
+  snFLSLC648BaseFamily  OBJECT IDENTIFIER ::= { snFLSLC648Family 1 }
+  snFLSLC648            OBJECT IDENTIFIER ::= { snFLSLC648BaseFamily 1 }  -- FastIron LSLC Switch(FLSLC) 48-port 10/100/1000 POE Ready
+  snFLSLC648Switch      OBJECT IDENTIFIER ::= { snFLSLC648 1 }            -- FLSLC648 switch
+  snFLSLC648Router      OBJECT IDENTIFIER ::= { snFLSLC648 2 }            -- FLSLC648 router
+
+  snFLSLC648POEFamily   OBJECT IDENTIFIER ::= { snFLSLC648Family 2 }
+  snFLSLC648POE         OBJECT IDENTIFIER ::= { snFLSLC648POEFamily 1 }   -- FastIron LSLC Switch(FLSLC) 48-port 10/100/1000 POE
+  snFLSLC648POESwitch   OBJECT IDENTIFIER ::= { snFLSLC648POE 1 }         -- snFLSLC648-POE switch
+  snFLSLC648POERouter   OBJECT IDENTIFIER ::= { snFLSLC648POE 2 }         -- snFLSLC648-POE router
+
+-- NetIron Carrier Ethernet Router (CER) product line
+snCer2000Family  OBJECT IDENTIFIER ::= { registration 51 }
+
+ snCer2024F OBJECT IDENTIFIER ::= { snCer2000Family  1 }   -- 24X1G fiber
+ snCer2024C OBJECT IDENTIFIER ::= { snCer2000Family  2 }  --  24X1G copper
+ snCer2048F OBJECT IDENTIFIER ::= { snCer2000Family  3 }  --  48X1G fiber
+ snCer2048C OBJECT IDENTIFIER ::= { snCer2000Family  4 }  -- 48X1G copper
+ snCer2048FX OBJECT IDENTIFIER ::= { snCer2000Family  5 }  -- 48X1G fiber + 2X10G
+ snCer2048CX OBJECT IDENTIFIER ::= { snCer2000Family  6 }  -- 48X1G copper + 2X10G
+
+  snFWSFamily          OBJECT IDENTIFIER ::= { registration 52 }	-- FastIron WS series family
+  snFWS624Family       OBJECT IDENTIFIER ::= { snFWSFamily 1 }
+
+  snFWS624BaseFamily  OBJECT IDENTIFIER ::= { snFWS624Family 1 }
+  snFWS624            OBJECT IDENTIFIER ::= { snFWS624BaseFamily 1 }  -- FastIron WS Switch(FWS) 24-port 10/100
+  snFWS624Switch      OBJECT IDENTIFIER ::= { snFWS624 1 }            -- FWS624 switch
+  snFWS624BaseL3Router      OBJECT IDENTIFIER ::= { snFWS624 2 }            -- FWS624 Base L3 router
+  snFWS624EdgePremRouter      OBJECT IDENTIFIER ::= { snFWS624 3 }            -- FWS624 Edge Prem router
+
+  snFWS624GFamily  OBJECT IDENTIFIER ::= { snFWS624Family 2 }
+  snFWS624G            OBJECT IDENTIFIER ::= { snFWS624GFamily 1 }  -- FastIron WS Switch(FWS) 24-port 10/100/1000
+  snFWS624GSwitch      OBJECT IDENTIFIER ::= { snFWS624G 1 }            -- FWS624G switch
+  snFWS624GBaseL3Router      OBJECT IDENTIFIER ::= { snFWS624G 2 }            -- FWS624G Base L3 router
+  snFWS624GEdgePremRouter      OBJECT IDENTIFIER ::= { snFWS624G 3 }            -- FWS624G Edge Prem router
+
+  snFWS624POEFamily  OBJECT IDENTIFIER ::= { snFWS624Family 3 }
+  snFWS624POE            OBJECT IDENTIFIER ::= { snFWS624POEFamily 1 }  -- FastIron WS Switch(FWS) 24-port 10/100 POE
+  snFWS624POESwitch      OBJECT IDENTIFIER ::= { snFWS624POE 1 }            -- FWS624-POE switch
+  snFWS624POEBaseL3Router      OBJECT IDENTIFIER ::= { snFWS624POE 2 }            -- FWS624-POE Base L3 router
+  snFWS624POEEdgePremRouter      OBJECT IDENTIFIER ::= { snFWS624POE 3 }            -- FWS624-POE Edge Prem router
+
+  snFWS624GPOEFamily  OBJECT IDENTIFIER ::= { snFWS624Family 4 }
+  snFWS624GPOE            OBJECT IDENTIFIER ::= { snFWS624GPOEFamily 1 }  -- FastIron WS Switch(FWS) 24-port 10/100/1000 POE
+  snFWS624GPOESwitch      OBJECT IDENTIFIER ::= { snFWS624GPOE 1 }            -- FWS624G-POE switch
+  snFWS624GPOEBaseL3Router      OBJECT IDENTIFIER ::= { snFWS624GPOE 2 }            -- FWS624G-POE Base L3 router
+  snFWS624GPOEEdgePremRouter      OBJECT IDENTIFIER ::= { snFWS624GPOE 3 }            -- FWS624G-POE Edge Prem router
+
+  snFWS648Family       OBJECT IDENTIFIER ::= { snFWSFamily 2 }
+
+  snFWS648BaseFamily  OBJECT IDENTIFIER ::= { snFWS648Family 1 }
+  snFWS648            OBJECT IDENTIFIER ::= { snFWS648BaseFamily 1 }  -- FastIron WS Switch(FWS) 48-port 10/100 POE Ready
+  snFWS648Switch      OBJECT IDENTIFIER ::= { snFWS648 1 }            -- FWS648 switch
+  snFWS648BaseL3Router      OBJECT IDENTIFIER ::= { snFWS648 2 }            -- FWS648 Base L3 router
+  snFWS648EdgePremRouter      OBJECT IDENTIFIER ::= { snFWS648 3 }            -- FWS648 Edge Prem router
+
+  snFWS648GFamily  OBJECT IDENTIFIER ::= { snFWS648Family 2 }
+  snFWS648G            OBJECT IDENTIFIER ::= { snFWS648GFamily 1 }  -- FastIron WS Switch(FWS) 48-port 10/100/1000 POE Ready
+  snFWS648GSwitch      OBJECT IDENTIFIER ::= { snFWS648G 1 }            -- FWS648G switch
+  snFWS648GBaseL3Router      OBJECT IDENTIFIER ::= { snFWS648G 2 }            -- FWS648G Base L3 router
+  snFWS648GEdgePremRouter      OBJECT IDENTIFIER ::= { snFWS648G 3 }            -- FWS648G Edge Prem router
+
+  snFWS648POEFamily  OBJECT IDENTIFIER ::= { snFWS648Family 3 }
+  snFWS648POE            OBJECT IDENTIFIER ::= { snFWS648POEFamily 1 }  -- FastIron WS Switch(FWS) 48-port 10/100 POE
+  snFWS648POESwitch      OBJECT IDENTIFIER ::= { snFWS648POE 1 }            -- FWS648-POE switch
+  snFWS648POEBaseL3Router      OBJECT IDENTIFIER ::= { snFWS648POE 2 }            -- FWS648-POE Base L3 router
+  snFWS648POEEdgePremRouter      OBJECT IDENTIFIER ::= { snFWS648POE 3 }            -- FWS648-POE Edge Prem router
+
+  snFWS648GPOEFamily  OBJECT IDENTIFIER ::= { snFWS648Family 4 }
+  snFWS648GPOE            OBJECT IDENTIFIER ::= { snFWS648GPOEFamily 1 }  -- FastIron WS Switch(FWS) 48-port 10/100/1000 POE
+  snFWS648GPOESwitch      OBJECT IDENTIFIER ::= { snFWS648GPOE 1 }            -- FWS648G-POE switch
+  snFWS648GPOEBaseL3Router      OBJECT IDENTIFIER ::= { snFWS648GPOE 2 }            -- FWS648G-POE Base L3 router
+  snFWS648GPOEEdgePremRouter      OBJECT IDENTIFIER ::= { snFWS648GPOE 3 }            -- FWS648G-POE Edge Prem router
+
+  snTurboIron2    OBJECT IDENTIFIER ::= { registration 53 }    -- TurboIron(TOR) family
+  snTI2X24Family  OBJECT IDENTIFIER ::= { snTurboIron2 1}      --TOR 24X
+  snTI2X24Switch  OBJECT IDENTIFIER ::= { snTI2X24Family 1}    --TOR 24X switch
+  snTI2X24Router  OBJECT IDENTIFIER ::= { snTI2X24Family 2}    --TOR 24X router
+  snTI2X48Family  OBJECT IDENTIFIER ::= { snTurboIron2 2}      --TOR 48X
+  snTI2X48Switch  OBJECT IDENTIFIER ::= { snTI2X48Family 1}    --TOR 48X switch
+  snTI2X48Router  OBJECT IDENTIFIER ::= { snTI2X48Family 2}    --TOR 48X router
+
+--FastIron CX (FCX) family
+  snFCXFamily          OBJECT IDENTIFIER ::= { registration 54 }	-- FastIron CX series family
+  snFCX624Family       OBJECT IDENTIFIER ::= { snFCXFamily 1 }
+
+  snFCX624SBaseFamily  OBJECT IDENTIFIER ::= { snFCX624Family 1 }
+  snFCX624S            OBJECT IDENTIFIER ::= { snFCX624SBaseFamily 1 }  -- FastIron CX Switch(FCX-S) 24-port 10/100/1000
+  snFCX624SSwitch      OBJECT IDENTIFIER ::= { snFCX624S 1 }            -- FCX624S switch
+  snFCX624SBaseL3Router      OBJECT IDENTIFIER ::= { snFCX624S 2 }            -- FCX624S Base L3 router
+  snFCX624SRouter      OBJECT IDENTIFIER ::= { snFCX624S 3 }            -- FCX624S Premium Router
+  snFCX624SAdvRouter      OBJECT IDENTIFIER ::= { snFCX624S 4 }            -- FCX624S Advanced Premium Router (BGP)
+
+  snFCX624SHPOEFamily  OBJECT IDENTIFIER ::= { snFCX624Family 2 }
+  snFCX624SHPOE            OBJECT IDENTIFIER ::= { snFCX624SHPOEFamily 1 }  -- FastIron CX Switch(FCX-S) 24-port 10/100/1000 HPOE
+  snFCX624SHPOESwitch      OBJECT IDENTIFIER ::= { snFCX624SHPOE 1 }            -- FCX624S-HPOE switch
+  snFCX624SHPOEBaseL3Router      OBJECT IDENTIFIER ::= { snFCX624SHPOE 2 }            -- FCX624S-HPOE Base L3 router
+  snFCX624SHPOERouter      OBJECT IDENTIFIER ::= { snFCX624SHPOE 3 }            -- FCX624S-HPOE Premium Router
+  snFCX624SHPOEAdvRouter      OBJECT IDENTIFIER ::= { snFCX624SHPOE 4 }            -- FCX624S-HPOE Advanced Premium Router (BGP)
+
+  snFCX624SFFamily  OBJECT IDENTIFIER ::= { snFCX624Family 3 }
+  snFCX624SF            OBJECT IDENTIFIER ::= { snFCX624SFFamily 1 }  -- FastIron CX Switch(FCX-SF) 24-port 10/100/1000
+  snFCX624SFSwitch      OBJECT IDENTIFIER ::= { snFCX624SF 1 }            -- FCX624SF switch
+  snFCX624SFBaseL3Router      OBJECT IDENTIFIER ::= { snFCX624SF 2 }            -- FCX624SF Base L3 router
+  snFCX624SFRouter      OBJECT IDENTIFIER ::= { snFCX624SF 3 }            -- FCX624SF Premium Router
+  snFCX624SFAdvRouter      OBJECT IDENTIFIER ::= { snFCX624SF 4 }      -- FCX624SF Advanced Premium Router (BGP)
+
+  snFCX624BaseFamily  OBJECT IDENTIFIER ::= { snFCX624Family 4 }
+  snFCX624            OBJECT IDENTIFIER ::= { snFCX624BaseFamily 1 }  -- FastIron CX Switch(FCX) 24-port 10/100/1000
+  snFCX624Switch      OBJECT IDENTIFIER ::= { snFCX624 1 }            -- FCX624 switch
+  snFCX624BaseL3Router      OBJECT IDENTIFIER ::= { snFCX624 2 }            -- FCX624 Base L3 router
+  snFCX624Router      OBJECT IDENTIFIER ::= { snFCX624 3 }            -- FCX624 Premium Router
+  snFCX624AdvRouter      OBJECT IDENTIFIER ::= { snFCX624 4 }            -- FCX624 Advanced Premium Router (BGP)
+
+  snFCX648Family       OBJECT IDENTIFIER ::= { snFCXFamily 2 }
+
+  snFCX648SBaseFamily  OBJECT IDENTIFIER ::= { snFCX648Family 1 }
+  snFCX648S            OBJECT IDENTIFIER ::= { snFCX648SBaseFamily 1 }  -- FastIron CX Switch(FCX-S) 48-port 10/100/1000
+  snFCX648SSwitch      OBJECT IDENTIFIER ::= { snFCX648S 1 }            -- FCX648S switch
+  snFCX648SBaseL3Router      OBJECT IDENTIFIER ::= { snFCX648S 2 }            -- FCX648S Base L3 router
+  snFCX648SRouter      OBJECT IDENTIFIER ::= { snFCX648S 3 }            -- FCX648S Premium Router
+  snFCX648SAdvRouter      OBJECT IDENTIFIER ::= { snFCX648S 4 }            -- FCX648S Advanced Premium Router (BGP)
+
+  snFCX648SHPOEFamily  OBJECT IDENTIFIER ::= { snFCX648Family 2 }
+  snFCX648SHPOE            OBJECT IDENTIFIER ::= { snFCX648SHPOEFamily 1 }  -- FastIron CX Switch(FCX-S) 48-port 10/100/1000 HPOE
+  snFCX648SHPOESwitch      OBJECT IDENTIFIER ::= { snFCX648SHPOE 1 }            -- FCX648S-HPOE switch
+  snFCX648SHPOEBaseL3Router      OBJECT IDENTIFIER ::= { snFCX648SHPOE 2 }            -- FCX648S-HPOE Base L3 router
+  snFCX648SHPOERouter      OBJECT IDENTIFIER ::= { snFCX648SHPOE 3 }            -- FCX648S-HPOE Premium Router
+  snFCX648SHPOEAdvRouter      OBJECT IDENTIFIER ::= { snFCX648SHPOE 4 }            -- FCX648S-HPOE Advanced Premium Router (BGP)
+
+-- snFCX648SFFamily  OBJECT IDENTIFIER ::= { snFCX648Family 3 }    reserve for FastIron CX Switch(FCX-SF) 48-port 10/100/1000
+
+  snFCX648BaseFamily  OBJECT IDENTIFIER ::= { snFCX648Family 4 }
+  snFCX648            OBJECT IDENTIFIER ::= { snFCX648BaseFamily 1 }  -- FastIron CX Switch(FCX) 48-port 10/100/1000
+  snFCX648Switch      OBJECT IDENTIFIER ::= { snFCX648 1 }            -- FCX648 switch
+  snFCX648BaseL3Router      OBJECT IDENTIFIER ::= { snFCX648 2 }            -- FCX648 Base L3 router
+  snFCX648Router      OBJECT IDENTIFIER ::= { snFCX648 3 }            -- FCX648 Premium Router
+  snFCX648AdvRouter      OBJECT IDENTIFIER ::= { snFCX648 4 }            -- FCX648 Advanced Premium Router (BGP)
+
+--Brocade MLXe product family
+  snBrocadeMLXeFamily  OBJECT IDENTIFIER ::= { registration 55 }          -- Brocade MLXe product family
+
+  snBrocadeMLXe16  OBJECT IDENTIFIER  ::= { snBrocadeMLXeFamily 1 }
+  snBrocadeMLXe16Router   OBJECT IDENTIFIER  ::= { snBrocadeMLXe16  2 }
+  snBrocadeMLXe8   OBJECT IDENTIFIER  ::= { snBrocadeMLXeFamily 2 }
+  snBrocadeMLXe8Router   OBJECT IDENTIFIER  ::= { snBrocadeMLXe8 2 }
+  snBrocadeMLXe4   OBJECT IDENTIFIER  ::= { snBrocadeMLXeFamily 3 }
+  snBrocadeMLXe4Router   OBJECT IDENTIFIER  ::= { snBrocadeMLXe4 2 }
+  snBrocadeMLXe32 OBJECT IDENTIFIER  ::= { snBrocadeMLXeFamily 4 }
+  snBrocadeMLXe32Router   OBJECT IDENTIFIER  ::= { snBrocadeMLXe32 2 }
+
+--FastIron CX 6610 (ICX6610) family
+  snICX6610Family          OBJECT IDENTIFIER ::= { registration 56}	-- FastIron CX 6610 series family
+
+  snICX661024Family       OBJECT IDENTIFIER ::= { snICX6610Family 1 }
+
+  snICX661024BaseFamily  OBJECT IDENTIFIER ::= { snICX661024Family 1 }
+  snICX661024            OBJECT IDENTIFIER ::= { snICX661024BaseFamily 1 }  -- FastIron CX 6610 Switch(ICX6610) 24-port
+  snICX661024Switch      OBJECT IDENTIFIER ::= { snICX661024 1 }            -- ICX661024 switch
+  snICX661024BaseL3Router      OBJECT IDENTIFIER ::= { snICX661024 2 }            -- ICX661024 Base L3 router
+  snICX661024Router      OBJECT IDENTIFIER ::= { snICX661024 3 }            -- ICX661024 Base Router
+  snICX661024PRouter      OBJECT IDENTIFIER ::= { snICX661024 4 }            -- ICX661024 Premium Router
+  snICX661024ARouter      OBJECT IDENTIFIER ::= { snICX661024 5 }            -- ICX661024 Advanced Router
+
+  snICX661024HPOEFamily  OBJECT IDENTIFIER ::= { snICX661024Family 2 }
+  snICX661024HPOE            OBJECT IDENTIFIER ::= { snICX661024HPOEFamily 1 }  -- FastIron CX 6610 Switch(ICX6610) 24-port HPOE
+  snICX661024HPOESwitch      OBJECT IDENTIFIER ::= { snICX661024HPOE 1 }            -- ICX661024-HPOE switch
+  snICX661024HPOEBaseL3Router      OBJECT IDENTIFIER ::= { snICX661024HPOE 2 }            -- ICX661024-HPOE Base L3 router
+  snICX661024HPOERouter      OBJECT IDENTIFIER ::= { snICX661024HPOE 3 }            -- ICX661024-HPOE Base Router
+  snICX661024HPOEPRouter      OBJECT IDENTIFIER ::= { snICX661024HPOE 4 }            -- ICX661024-HPOE Premium Router
+  snICX661024HPOEARouter      OBJECT IDENTIFIER ::= { snICX661024HPOE 5 }            -- ICX661024-HPOE Advanced Router
+
+  snICX661024FFamily  OBJECT IDENTIFIER ::= { snICX661024Family 3 }
+  snICX661024F            OBJECT IDENTIFIER ::= { snICX661024FFamily 1 }  -- FastIron CX Switch(ICX6610-F) 24-port fiber
+  snICX661024FSwitch      OBJECT IDENTIFIER ::= { snICX661024F 1 }            -- ICX661024F switch
+  snICX661024FBaseL3Router      OBJECT IDENTIFIER ::= { snICX661024F 2 }            -- ICX661024F Base L3 router
+  snICX661024FRouter      OBJECT IDENTIFIER ::= { snICX661024F 3 }            -- ICX661024F Base Router
+  snICX661024FPRouter      OBJECT IDENTIFIER ::= { snICX661024F 4 }      -- ICX661024F Premium Router
+  snICX661024FARouter      OBJECT IDENTIFIER ::= { snICX661024F 5 }      -- ICX661024F Advanced Router
+
+  snICX661048Family       OBJECT IDENTIFIER ::= { snICX6610Family 2 }
+
+  snICX661048BaseFamily  OBJECT IDENTIFIER ::= { snICX661048Family 1 }
+  snICX661048            OBJECT IDENTIFIER ::= { snICX661048BaseFamily 1 }  -- FastIron CX Switch(ICX6610) 48-port
+  snICX661048Switch      OBJECT IDENTIFIER ::= { snICX661048 1 }            -- ICX661048 switch
+  snICX661048BaseL3Router      OBJECT IDENTIFIER ::= { snICX661048 2 }            -- ICX661048 Base L3 router
+  snICX661048Router      OBJECT IDENTIFIER ::= { snICX661048 3 }            -- ICX661048 Base Router
+  snICX661048PRouter      OBJECT IDENTIFIER ::= { snICX661048 4 }            -- ICX661048 Premium Router
+  snICX661048ARouter      OBJECT IDENTIFIER ::= { snICX661048 5}            -- ICX661048 Advanced Router
+
+  snICX661048HPOEFamily  OBJECT IDENTIFIER ::= { snICX661048Family 2 }
+  snICX661048HPOE            OBJECT IDENTIFIER ::= { snICX661048HPOEFamily 1 }  -- FastIron CX Switch(ICX6610) 48-port HPOE
+  snICX661048HPOESwitch      OBJECT IDENTIFIER ::= { snICX661048HPOE 1 }            -- ICX661048-HPOE switch
+  snICX661048HPOEBaseL3Router      OBJECT IDENTIFIER ::= { snICX661048HPOE 2 }            -- ICX661048-HPOE Base L3 router
+  snICX661048HPOERouter      OBJECT IDENTIFIER ::= { snICX661048HPOE 3 }            -- ICX661048-HPOE Base Router
+  snICX661048HPOEPRouter      OBJECT IDENTIFIER ::= { snICX661048HPOE 4 }            -- ICX661048-HPOE Premium Router
+  snICX661048HPOEARouter      OBJECT IDENTIFIER ::= { snICX661048HPOE 5 }            -- ICX661048-HPOE Advanced Router
+
+  --FastIron CX 6430 (ICX6430) family
+  snICX6430Family          OBJECT IDENTIFIER ::= { registration 57}	-- FastIron CX 6430 series family
+
+  snICX643024Family       OBJECT IDENTIFIER ::= { snICX6430Family 1 }
+
+  snICX643024BaseFamily  OBJECT IDENTIFIER ::= { snICX643024Family 1 }
+  snICX643024            OBJECT IDENTIFIER ::= { snICX643024BaseFamily 1 }   -- ICX6430 24-port  10/100/1G w/4x1G
+  snICX643024Switch      OBJECT IDENTIFIER ::= { snICX643024 1 }                -- ICX643024 switch
+  
+  snICX643024HPOEFamily  OBJECT IDENTIFIER ::= { snICX643024Family 2 }
+  snICX643024HPOE            OBJECT IDENTIFIER ::= { snICX643024HPOEFamily 1 }    -- ICX6430 24-port HPOE 10/100/1G w/4x1G
+  snICX643024HPOESwitch      OBJECT IDENTIFIER ::= { snICX643024HPOE 1 }          -- ICX643024-HPOE switch 
+
+
+  snICX643048Family       OBJECT IDENTIFIER ::= { snICX6430Family 2 }
+
+  snICX643048BaseFamily  OBJECT IDENTIFIER ::= { snICX643048Family 1 }
+  snICX643048            OBJECT IDENTIFIER ::= { snICX643048BaseFamily 1 }  -- ICX6430 48-port  10/100/1G w/4x1G
+  snICX643048Switch      OBJECT IDENTIFIER ::= { snICX643048 1 }               -- ICX643048 switch
+
+  snICX643048HPOEFamily  OBJECT IDENTIFIER ::= { snICX643048Family 2 }
+  snICX643048HPOE            OBJECT IDENTIFIER ::= { snICX643048HPOEFamily 1 }      -- ICX6430 48-port HPOE 10/100/1G w/4x1G
+  snICX643048HPOESwitch      OBJECT IDENTIFIER ::= { snICX643048HPOE 1 }            -- ICX643048-HPOE switch
+
+--FastIron CX 6450 (ICX6450) family
+  snICX6450Family          OBJECT IDENTIFIER ::= { registration 58}	-- FastIron CX 6450 series family
+
+  snICX645024Family       OBJECT IDENTIFIER ::= { snICX6450Family 1 }
+
+  snICX645024BaseFamily  OBJECT IDENTIFIER ::= { snICX645024Family 1 }
+  snICX645024            OBJECT IDENTIFIER ::= { snICX645024BaseFamily 1 }     -- ICX6450 24-port  10/100/1G w/4x1/10G
+  snICX645024Switch      OBJECT IDENTIFIER ::= { snICX645024 1 }                  -- ICX645024 switch
+  snICX645024BaseL3Router      OBJECT IDENTIFIER ::= { snICX645024 2 }      -- ICX645024 Base L3 router
+  snICX645024Router      OBJECT IDENTIFIER ::= { snICX645024 3 }                  -- ICX645024 Base Router
+  snICX645024PRouter      OBJECT IDENTIFIER ::= { snICX645024 4 }                -- ICX645024 Premium Router  
+  
+  snICX645024HPOEFamily  OBJECT IDENTIFIER ::= { snICX645024Family 2 }
+  snICX645024HPOE            OBJECT IDENTIFIER ::= { snICX645024HPOEFamily 1 }           --ICX6450 24-port HPOE 10/100/1G w/4x1/10G
+  snICX645024HPOESwitch      OBJECT IDENTIFIER ::= { snICX645024HPOE 1 }                 -- ICX645024-HPOE switch 
+  snICX645024HPOEBaseL3Router      OBJECT IDENTIFIER ::= { snICX645024HPOE 2 }     -- ICX645024-HPOE Base L3 router
+  snICX645024HPOERouter      OBJECT IDENTIFIER ::= { snICX645024HPOE 3 }                 -- ICX645024-HPOE Base Router
+  snICX645024HPOEPRouter      OBJECT IDENTIFIER ::= { snICX645024HPOE 4 }               -- ICX645024-HPOE Premium Router 
+
+  snICX645048Family       OBJECT IDENTIFIER ::= { snICX6450Family 2 }
+
+  snICX645048BaseFamily  OBJECT IDENTIFIER ::= { snICX645048Family 1 }
+  snICX645048            OBJECT IDENTIFIER ::= { snICX645048BaseFamily 1 }      -- ICX6450 48-port 10/100/1G w/4x1/10G
+  snICX645048Switch      OBJECT IDENTIFIER ::= { snICX645048 1 }                   -- ICX645048 switch
+  snICX645048BaseL3Router      OBJECT IDENTIFIER ::= { snICX645048 2 }       -- ICX645048 Base L3 router
+  snICX645048Router      OBJECT IDENTIFIER ::= { snICX645048 3 }                   -- ICX645048 Base Router
+  snICX645048PRouter      OBJECT IDENTIFIER ::= { snICX645048 4 }                  -- ICX645048 Premium Router
+
+  snICX645048HPOEFamily  OBJECT IDENTIFIER ::= { snICX645048Family 2 }
+  snICX645048HPOE            OBJECT IDENTIFIER ::= { snICX645048HPOEFamily 1 }            -- ICX6450 48-port HPOE 10/100/1G w/4x1/10G
+  snICX645048HPOESwitch      OBJECT IDENTIFIER ::= { snICX645048HPOE 1 }                 -- ICX645048-HPOE switch
+  snICX645048HPOEBaseL3Router      OBJECT IDENTIFIER ::= { snICX645048HPOE 2 }     -- ICX645048-HPOE Base L3 router
+  snICX645048HPOERouter      OBJECT IDENTIFIER ::= { snICX645048HPOE 3 }                 -- ICX645048-HPOE Base Router
+  snICX645048HPOEPRouter      OBJECT IDENTIFIER ::= { snICX645048HPOE 4 }               -- ICX645048-HPOE Premium Router 
+
+
 -- EdgeIron Stackable family
   edgeIron          OBJECT IDENTIFIER ::= { products 4 }
   edgeIronMib       OBJECT IDENTIFIER ::= { edgeIron 1 }  -- MIB root for EdgeIron family
@@ -735,7 +1204,7 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
 -- Wireless Application family
   wirelessApplication  OBJECT IDENTIFIER ::= { products 10 }
   wirelessLocation     OBJECT IDENTIFIER ::= { wirelessApplication 1 }
-  
+
 -- IronPoint Mobility family
   ironPointMobility  OBJECT IDENTIFIER ::= { products 11 } -- IronPoint Mobility Series
   ironPointMC        OBJECT IDENTIFIER ::= { ironPointMobility 1 } -- IronPoint Mobility Controller
@@ -746,6 +1215,18 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
 
 -- IronView family
   ironView             OBJECT IDENTIFIER ::= { products 13 }
+
+-- main sub tree for new mib development
+ platform		OBJECT IDENTIFIER ::= { products 14 }
+
+-- IronPoint Wireless family
+  ironPointWireless    OBJECT IDENTIFIER ::= { products 15 } -- IronPoint Wireless Series
+  ironPointWirelessRFS OBJECT IDENTIFIER ::= { ironPointWireless 1 } -- IronPoint Wireless RF Switch
+  ironPointWirelessAP  OBJECT IDENTIFIER ::= { ironPointWireless 2 } -- IronPoint Wireless Acess Point
+
+-- Ethernet Access Switch Product Family
+  ethernetAccessSwitchFamily    OBJECT IDENTIFIER ::= { products 16 } -- Ethernet Access Switch Family
+  ethernetAccessSwitchBr6910    OBJECT IDENTIFIER ::= { ethernetAccessSwitchFamily 1 } -- BR6910 switch
 
 -- VENDOR
   digitalChina      OBJECT IDENTIFIER ::= { vendors 1 }
@@ -766,5 +1247,7 @@ registration	OBJECT IDENTIFIER ::= { products 3 } -- sysObjectID values
   experimental           OBJECT IDENTIFIER ::= { foundry 3 }
   pwe3           OBJECT IDENTIFIER ::= { experimental 1 }
   l3vpn           OBJECT IDENTIFIER ::= { experimental 2 }
-
+  bfd            OBJECT IDENTIFIER ::= { experimental 3 }  -- IETF draft support for Bidirectional Fault Detection mib
+  vplsRoot            OBJECT IDENTIFIER ::= { experimental 4 }  -- IETF draft support for VPLS
+  bgp4V2Root     	OBJECT IDENTIFIER  ::=  { experimental 5 } -- IETF draft support for BGP4.
 END
