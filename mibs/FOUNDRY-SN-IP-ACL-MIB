@@ -1,85 +1,176 @@
 FOUNDRY-SN-IP-ACL-MIB DEFINITIONS ::= BEGIN
 
--- Imports
-
 IMPORTS
-	IpAddress		
-		FROM RFC1155-SMI
-	OBJECT-TYPE     
-		FROM RFC-1212
-	Counter64		
+	MODULE-IDENTITY, OBJECT-TYPE,IpAddress,Counter64, Unsigned32,Integer32
 		FROM SNMPv2-SMI
-	snIp			
-		FROM FOUNDRY-SN-ROOT-MIB;
+	DisplayString, MacAddress, TruthValue, RowStatus, TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	router
+		FROM FOUNDRY-SN-ROOT-MIB
+	InterfaceIndex, ifIndex
+		FROM IF-MIB
+	RtrStatus
+		FROM FOUNDRY-SN-IP-MIB
+	PortQosTC, FdryVlanIdOrNoneTC
+		FROM FOUNDRY-SN-SWITCH-GROUP-MIB;
 
-	--  textual conventions
-		DisplayString ::= OCTET STRING
+snAgAcl MODULE-IDENTITY
+    LAST-UPDATED "201103020000Z"  -- 03 March 2011
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
 
-	--  RtrStatus Values
-		RtrStatus ::= INTEGER { disabled(0), enabled (1) }
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
 
-	--  Row Status
-	    SnRowStatus ::= INTEGER { 
-							    other(1),
-							    valid(2),
-							    delete(3),
-							    create(4)
-						      }
+    REVISION        "201103020000Z"  -- 02 March 2011
+    DESCRIPTION
+        "Updated range of AclNumber from (1..499) to (1..599)."
 
-	--  Action 
-		Action ::= INTEGER { deny(0), permit(1) }
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
 
-    --  Boolean Values
-         TruthVal ::= INTEGER { false (0), true (1)  }
+    REVISION     "200909300000Z" -- September 30, 2009
+    DESCRIPTION
+			""
+   ::= {router 2 15}
 
-	--  ACL number
-		AclNumber ::= INTEGER (1..199)
+	--  Textual Conventions
 
-	--  Operator
-		Operator ::= INTEGER { eq(0), neq(1), lt(2), gt(3), range(4), undefined(7) }
+	SnRowStatus ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"The status of a given row in the table."
+	SYNTAX  INTEGER {other(1), valid(2), delete(3), create(4)}
 
-	--  IP Protocol
-		IpProtocol ::= INTEGER (0..255)
+	Action ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"The action to be taken on the packet after filtering is done."
+	SYNTAX  INTEGER { deny(0), permit(1) }
 
-	-- Precedence Value
-		PrecedenceValue ::= INTEGER { critical(5), flash(3), flashoverride(4),
-									  immediate(2), internet(6), network(7),
-									  priority(1), routine(0), undefined(8) }
-									
-	-- Tos Value
-		TosValue ::= INTEGER {
-						normal(0),
-						minMonetaryCost(1),
-						maxReliability(2),
-						tosValue3(3),
-						maxThroughput(4),
-						tosValue5(5),
-						tosValue6(6),
-						tosValue7(7),
-						minDelay(8),
-						tosValue9(9),
-						tosValue10(10),
-						tosValue11(11),
-						tosValue12(12),
-						tosValue13(13),
-						tosValue14(14),
-						tosValue15(15),
-						undefined(16)
-							}
+	TruthVal ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"Boolean value."
+	SYNTAX  INTEGER { false (0), true (1)  }
 
-	--  Direction 
-		Direction ::= INTEGER { inbound(0), outbound(1) }
-		
-------Access Control List
+	FdryClauseIndexTC ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"One-based clause index value within a given ACL number."
+	SYNTAX  Unsigned32
 
-snAgAcl		OBJECT IDENTIFIER ::= { snIp 15 }
+	AclNumber ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"The Access control list number for an entry.
+		The standard Access list is in the range <1..99>.
+		The extended Access list is in the range <100-199>.
+		The named standard Access list is in the range <200..299>.
+		The named extended Access list is in the range <300-399>.
+		The L2 Access list is in the range <400-599>."
+	SYNTAX  INTEGER (1..599)
+
+	AclNameString ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"The optional name for a given access-list. In general, the ACL number
+		for a named ACL is in the range of 200 and 399."
+	SYNTAX  OCTET STRING (SIZE (0..255))
+
+	Operator ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"The operation used within a given ACL filter to determine permit or deny."
+	SYNTAX  INTEGER { eq(0), neq(1), lt(2), gt(3), range(4), undefined(7) }
+
+	IpProtocol ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"The IP protocol number on which ACL can be applied."
+	SYNTAX  Integer32 (0..255)
+
+	PrecedenceValue ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"The IP precedence value on which ACL can be applied."
+	SYNTAX  INTEGER {
+				routine(0),
+				priority(1),
+				immediate(2),
+				flash(3),
+				flashoverride(4),
+				critical(5),
+				internet(6),
+				network(7),
+				undefined(8)
+				}
+
+	TosValue ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"The IP TOS value on which ACL can be applied."
+	SYNTAX  INTEGER {
+				normal(0),
+				minMonetaryCost(1),
+				maxReliability(2),
+				tosValue3(3),
+				maxThroughput(4),
+				tosValue5(5),
+				tosValue6(6),
+				tosValue7(7),
+				minDelay(8),
+				tosValue9(9),
+				tosValue10(10),
+				tosValue11(11),
+				tosValue12(12),
+				tosValue13(13),
+				tosValue14(14),
+				tosValue15(15),
+				undefined(16)
+			}
+
+	Direction ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"The packet flow direction within an interface for which ACL needs to be applied."
+	SYNTAX  INTEGER { inbound(0), outbound(1) }
+
+	FdryEnetTypeOrZeroTC ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Ethernet Type field within the Ethernet-II frame"
+	SYNTAX	INTEGER {
+				invalid(0),
+				ipv4(1),
+				arp(2),
+				ipv6(3)
+			}
+
+
 
 snAgAclGlobal	OBJECT IDENTIFIER ::= { snAgAcl 1 }
 
-snAgAclGblCurRowIndex OBJECT-TYPE
-	SYNTAX	INTEGER 
-	ACCESS	read-only
-	STATUS	mandatory
+snAgAclGblCurRowIndex	OBJECT-TYPE
+	SYNTAX				Integer32
+	MAX-ACCESS			read-only
+	STATUS				current
 	DESCRIPTION
 		"The current row index of the ACL table entry."
 	::= { snAgAclGlobal 1 }
@@ -87,19 +178,18 @@ snAgAclGblCurRowIndex OBJECT-TYPE
 --
 -- ACL Table
 --
-
-snAgAclTable       OBJECT-TYPE
-	SYNTAX  SEQUENCE OF SnAgAclEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+snAgAclTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SnAgAclEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
 	DESCRIPTION
 		"Table of Access Control List"
 	::= { snAgAcl 2 }
 
-snAgAclEntry       OBJECT-TYPE
-	SYNTAX  SnAgAclEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+snAgAclEntry	OBJECT-TYPE
+	SYNTAX		SnAgAclEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
 	DESCRIPTION
 		"An entry in the IP access control list table."
 	INDEX   { snAgAclIndex }
@@ -107,14 +197,14 @@ snAgAclEntry       OBJECT-TYPE
 
 SnAgAclEntry ::= SEQUENCE {
 	snAgAclIndex
-		INTEGER,
+		Integer32,
 	snAgAclNumber
 		AclNumber,
 	snAgAclName
 		DisplayString,
-	snAgAclAction              
+	snAgAclAction
 		Action,
-	snAgAclProtocol            
+	snAgAclProtocol
 		IpProtocol,
 	snAgAclSourceIp
 		IpAddress,
@@ -153,173 +243,332 @@ SnAgAclEntry ::= SEQUENCE {
 	snAgAclPacketCounter
 		Counter64,
 	snAgAclComments
-		DisplayString
+		DisplayString,
+	snAgAclIpPriority
+		INTEGER,
+	snAgAclPriorityForce
+		INTEGER,
+	snAgAclPriorityMapping
+		INTEGER,
+	snAgAclDscpMarking
+		INTEGER,
+	snAgAclDscpMapping
+		INTEGER,
+	snAgAclIcmpCode
+		INTEGER,
+	snAgAclParameters
+		BITS
 	}
 
-snAgAclIndex       OBJECT-TYPE
-	SYNTAX  INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+snAgAclIndex	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
 	DESCRIPTION
-		"The access control list item number for an entry.
-		This is a unique number that identifies different
-		Access list entries combined with the access list
-		name and access list number. This one has to be 
-		unique even though the name and number are not unique
-		for a give access list with same or different source
-		address, subnet mask, destination address and destination
-		mask, protocol type, action (permit/deny) type and the
-		operator (neq, eq, gt and , lt) which makes the index a 
-		unique tuple (name, number, itemnumber)."
+		"The Access control list item number for an entry. This is a unique
+		 number that identifies different Access list entries combined with
+		 the Access list name and Access list number. This one has to be
+		 unique even though the name and number are not unique for a given
+		 Access list with same or different source address, subnet mask,
+		 destination address and destination mask, protocol type, action
+		 (permit/deny) type and the operator (neq, eq, gt and, lt) which
+		 makes the index a unique tuple (name, number, itemnumber)."
 	::= { snAgAclEntry 1 }
 
-snAgAclNumber       OBJECT-TYPE
-	SYNTAX  AclNumber
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclNumber	OBJECT-TYPE
+	SYNTAX		AclNumber
+	MAX-ACCESS	read-write
+	STATUS		current
 	DESCRIPTION
-		"The access control list number for an entry.
-		The standard access list is in the range <1..99>.
-		The extended access list is in the range <100-199>."
+		"The access-list number for this entry."
 	::= { snAgAclEntry 2 }
 
 snAgAclName		OBJECT-TYPE
-	SYNTAX  DisplayString (SIZE (0..255))
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX		DisplayString
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
 		"ACL name for an entry."
 	::= { snAgAclEntry 3 }
 
-snAgAclAction      OBJECT-TYPE
-	SYNTAX  Action 
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclAction	OBJECT-TYPE
+	SYNTAX		Action
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
-		"Action to take if the ip packet matches
-		with this access control list."
+		"Action to take if the ip packet matches with this access control list."
 	::= { snAgAclEntry 4 }
 
-snAgAclProtocol    OBJECT-TYPE
-	SYNTAX  IpProtocol
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclProtocol	OBJECT-TYPE
+	SYNTAX		IpProtocol
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
-		"Transport protocol. 0 means any protocol."
+		"Transport protocol. Valid values for the IP protocol are:
+		0 = any IP protocol
+		1 = ICMP
+		2 = IGMP
+		3 = ggp
+		4 = ipencap
+		5 = st2
+		6 = TCP
+		7 = cbt
+		8 = egp
+		9 = igp
+		10 = bbn_rcc
+		11 = nvp
+		12 = pup
+		13 = argus
+		14 = emcon
+		15 = xnet
+		16 = chaos
+		17 = UDP
+		18 = mux
+		19 = dcn
+		20 = hmp
+		21 = prm
+		22 = xns_idp
+		23 = trunk1
+		24 = trunk2
+		25 = leaf1
+		26 = leaf2
+		27 = rdp
+		28 = irtp
+		29 = iso_tp4
+		30 = netblt
+		31 = mfe_nsp
+		32 = merit_inp
+		33 = sep
+		34 = threepc
+		35 = idpr
+		36 = xtp
+		37 = ddp
+		38 = idpr_cmtp
+		39 = tppp
+		40 = il
+		41 = ipv6
+		42 = sdrp
+		43 = ipv6_route
+		44 = ipv6_frag
+		45 = idrp
+		46 = rsvp
+		47 = gre
+		48 = mhrp
+		49 = bna
+		50 = esp
+		51 = ahp
+		52 = inlsp
+		53 = swipe
+		54 = narp
+		55 = mobile
+		56 = tlsp
+		57 = skip
+		58 = ipv6_icmp
+		59 = ipv6_nonxt
+		60 = ipv6_opts
+		62 = cftp
+		64 = sat_expak
+		65 = kryptolan
+		66 = rvd
+		67 = ippc
+		69 = sat_mon
+		70 = visa
+		71 = ipcv
+		72 = cpnx
+		73 = cphb
+		74 = wsn
+		75 = pvp
+		76 = br_sat_mon
+		77 = sun_nd
+		78 = wb_mon
+		79 = wb_expak
+		80 = iso_ip
+		81 = vmtp
+		82 = secure_vmtp
+		83 = vines
+		84 = ttp
+		85 = nsfnet_igp
+		86 = dgp
+		87 = tcf
+		88 = IGRP
+		89 = OSPF
+		90 = sprite_rpc
+		91 = larp
+		92 = mtp
+		93 = ax25
+		94 = ipip
+		95 = micp
+		96 = scc_sp
+		97 = etherip
+		98 = encap
+		100 = gmtp
+		101 = ifmp
+		102 = pnni
+		103 = pim
+		104 = aris
+		105 = scps
+		106 = qnx
+		107 = an
+		108 = ipcomp
+		109 = snp
+		110 = compaq_peer
+		111 = ipxinip
+		112 = vrrp
+		113 = pgm
+		115 = l2tp
+		116 = ddx
+		117 = iatp
+		118 = st
+		119 = srp
+		120 = uti
+		121 = smp
+		122 = sm
+		123 = ptp
+		124 = isis
+		125 = fire
+		126 = crtp
+		127 = crdup
+		128 = sscopmce
+		129 = iplt
+		130 = sps
+		131 = pipe
+		132 = sctp
+		133 = fc
+		134 = rsvp_e2e_ignore
+		135 = mobility_header
+		136 = udplite
+		137 = mpls_in_ip
+		138 = manet
+		139 = hip
+		140 = shim6
+		254 = divert
+		"
 	::= { snAgAclEntry 5 }
 
-snAgAclSourceIp    OBJECT-TYPE
-	SYNTAX  IpAddress
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclSourceIp OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
 		"Source IP address."
 	::= { snAgAclEntry 6 }
 
-snAgAclSourceMask  OBJECT-TYPE
-	SYNTAX  IpAddress
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclSourceMask	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-write
+	STATUS		current
 	DESCRIPTION
 		"Source IP subnet mask."
 	::= { snAgAclEntry 7 }
 
-snAgAclSourceOperator    OBJECT-TYPE
-	SYNTAX  Operator
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclSourceOperator	OBJECT-TYPE
+	SYNTAX		Operator
+	MAX-ACCESS	read-write
+	STATUS		current
 	DESCRIPTION
-		"Type of comparison to perform.
-		for now, this only applys to tcp or udp
+		"Type of comparison to perform.	For now, this only applys to tcp or udp
 		to compare the port number"
 	::= { snAgAclEntry 8 }
 
-snAgAclSourceOperand1     OBJECT-TYPE
-	SYNTAX  INTEGER(0..65535)
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclSourceOperand1	OBJECT-TYPE
+	SYNTAX		INTEGER(0..65535)
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
-		"For now this only refers to transport 
-		protocol port number. 0 means NA"
+		"For now this only refers to transport protocol port number. 0 means NA"
 	::= { snAgAclEntry 9 }
 
-snAgAclSourceOperand2     OBJECT-TYPE
-	SYNTAX  INTEGER(0..65535)
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclSourceOperand2	OBJECT-TYPE
+	SYNTAX		INTEGER(0..65535)
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
-		"For now this only refers to transport 
-		protocol port number. 0 means NA"
+		"For now this only refers to transport protocol port number.
+		 Used in ICMP Protocol to convey the ICMP Type
+		 value. 0 means NA.
+		 Valid values for ICMP Type:
+		 1 = Echo reply
+		 4 = Destination unreachable
+		 5 = Source quench
+		 6 = Redirect
+		 9 = Echo request
+		 10=Router advertisement
+		 11=Router solicitation
+		 12=Time exceeded
+		 13=Parameter problem
+		 14=Timestamp request
+		 15=Timestamp reply
+		 16=Information request
+		 17=Information reply
+		 18=Address mask request
+		 19=Address mask reply.
+		 "
 	::= { snAgAclEntry 10 }
 
-snAgAclDestinationIp      OBJECT-TYPE
-	SYNTAX  IpAddress
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclDestinationIp	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
 		"Destination IP address."
 	::= { snAgAclEntry 11 }
 
-snAgAclDestinationMask    OBJECT-TYPE
-	SYNTAX  IpAddress
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclDestinationMask	OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
 		"Destination IP subnet mask."
 	::= { snAgAclEntry 12 }
 
-snAgAclDestinationOperator    OBJECT-TYPE
-	SYNTAX  Operator
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclDestinationOperator	OBJECT-TYPE
+	SYNTAX		Operator
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
-		"Type of comparison to perform.
-		for now, this only applys to tcp or udp
+		"Type of comparison to perform. For now, this only applys to tcp or udp
 		to compare the port number"
 	::= { snAgAclEntry 13 }
 
-snAgAclDestinationOperand1     OBJECT-TYPE
-	SYNTAX  INTEGER(0..65535)
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclDestinationOperand1	OBJECT-TYPE
+	SYNTAX		INTEGER(0..65535)
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
-		"For now this only refers to transport 
-		protocol port number. 0 means NA"
+		"For now this only refers to transport protocol port number. 0 means NA"
 	::= { snAgAclEntry 14 }
 
-snAgAclDestinationOperand2     OBJECT-TYPE
-	SYNTAX  INTEGER(0..65535)
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclDestinationOperand2	OBJECT-TYPE
+	SYNTAX		INTEGER(0..65535)
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
-		"For now this only refers to transport 
-		protocol port number. 0 means NA"
+		"For now this only refers to transport protocol port number. 0 means NA"
 	::= { snAgAclEntry 15 }
 
-snAgAclPrecedence OBJECT-TYPE
-	SYNTAX  PrecedenceValue
-	ACCESS  read-write
-	STATUS  mandatory
+snAgAclPrecedence	OBJECT-TYPE
+	SYNTAX		PrecedenceValue
+	MAX-ACCESS	read-write
+	STATUS		current
 	DESCRIPTION
 		"This refers to IP precedence value in the range <0-7>
-		critical(5), 
-		flash(3), 
-		flash-override(4), 
-		immediate(2), 
-		internet(6), 
-		network(7), 
-		priority(1), 
+		critical(5),
+		flash(3),
+		flash-override(4),
+		immediate(2),
+		internet(6),
+		network(7),
+		priority(1),
 		routine(0)"
 		::= { snAgAclEntry 16 }
 
-snAgAclTos OBJECT-TYPE
-	  SYNTAX  TosValue
-	  ACCESS  read-write
-	  STATUS  mandatory
-	  DESCRIPTION
-		"This refers to the IP type of service value in range
-		<0-15> which is the sum of numeric vlaues of the 
-		following options -
+snAgAclTos		OBJECT-TYPE
+	SYNTAX		TosValue
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"This refers to the IP type of service value in range <0-15>, which is
+		 the sum of numeric vlaues of the following options -
 		match packets with maximum reliability TOS (2)
 		match packets with maximum throughput TOS (4)
 		match packets with minimum delay (8)
@@ -328,95 +577,240 @@ snAgAclTos OBJECT-TYPE
 		::= { snAgAclEntry 17 }
 
 snAgAclEstablished OBJECT-TYPE
-	SYNTAX  RtrStatus
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX		RtrStatus
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
-		"Enable/Disable the filtering of established TCP
-		packets of which the ACK or RESET flag is on. This
-		additional filter only applies to TCP transport
-		protocol."
+		"Enable/Disable the filtering of established TCP packets of which the
+		 ACK or RESET flag is on. This additional filter only applies to TCP
+		 transport protocol."
 	::= { snAgAclEntry 18 }
 
 snAgAclLogOption OBJECT-TYPE
-	SYNTAX  TruthVal
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX		TruthVal
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
 		"Log flag"
 	::= { snAgAclEntry 19 }
 
 snAgAclStandardFlag OBJECT-TYPE
-	SYNTAX  TruthVal
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX		TruthVal
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
 		"Return whether the ACL is standard or extended, 1 for standard ACL"
 	::= { snAgAclEntry 20 }
 
 snAgAclRowStatus   OBJECT-TYPE
-	SYNTAX  SnRowStatus
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX		SnRowStatus
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
-		"To create or delete a access list
-		entry."
+		"To create or delete a access list entry."
 	::= { snAgAclEntry 21 }
 
 snAgAclFlowCounter   OBJECT-TYPE
-	SYNTAX  Counter64
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX		Counter64
+	MAX-ACCESS  read-only
+	STATUS		current
 	DESCRIPTION
 		"Approximate count of flows matching individual ACL entry."
 	::= { snAgAclEntry 22 }
 
 snAgAclPacketCounter   OBJECT-TYPE
-	SYNTAX  Counter64
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX		Counter64
+	MAX-ACCESS  read-only
+	STATUS		current
 	DESCRIPTION
 		"Accurate count of packets matching individual ACL entry."
 	::= { snAgAclEntry 23 }
 
 snAgAclComments   OBJECT-TYPE
-	SYNTAX  DisplayString (SIZE (0..255))
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX		DisplayString
+	MAX-ACCESS  read-write
+	STATUS		current
 	DESCRIPTION
 		"Remark description of individual ACL entry."
 	::= { snAgAclEntry 24 }
 
+snAgAclIpPriority   OBJECT-TYPE
+	SYNTAX		INTEGER(0..3)
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"QoS priority option for IP ACL entry."
+	::= { snAgAclEntry 25 }
+
+snAgAclPriorityForce   OBJECT-TYPE
+	SYNTAX		INTEGER(0..4)
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"Force packet outgoing priority.  Not defined(4)"
+	::= { snAgAclEntry 26 }
+
+snAgAclPriorityMapping   OBJECT-TYPE
+	SYNTAX		INTEGER(0..8)
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"Map incoming packet priority. Not defined(8)"
+	::= { snAgAclEntry 27 }
+
+snAgAclDscpMarking   OBJECT-TYPE
+	SYNTAX		INTEGER(0..64)
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"Mark packets with given DSCP value.  Not defined(64)"
+	::= { snAgAclEntry 28 }
+
+snAgAclDscpMapping   OBJECT-TYPE
+	SYNTAX		INTEGER(0..64)
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"Map incoming DSCP value.  Not defined(64)"
+	::= { snAgAclEntry 29 }
+
+snAgAclIcmpCode   OBJECT-TYPE
+	SYNTAX		INTEGER(0..255)
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"ICMP Message Code value. Used in combination with
+		ICMP Message Type (use snAgAclSourceOperand2) to
+		setup an ICMP filter. This object is not used with any
+		other protocol. 0 means NA.
+		Supported values
+		Type: Echo reply
+		--------------
+		1 = Echo reply
+		Type: Destination unreachable
+		-------------------------
+		1 = Network unreachable
+		2 = Host unreachable
+		3 = Protocol unreachable
+		4 = Port unreachable
+		5 = Fragmentation needed by don't fragment bit set
+		6 = Source route failed
+		7 = Destination network unknown
+		8 = Destination host unknown
+		9 = Source host isolated
+		10 = Destination network administratively prohibited
+		11=Destination host administratively prohibited
+		12=Network unreachable for TOS
+		13=Host unreachable for TOS
+		14=Communication administratively prohibited by filter
+		15=Host precedence violation
+		16=Precedence cutoff in effect
+		Type: Source quench
+		------------------
+		1 = Source quench
+		Type: Redirect
+		------------
+		1 = Redirect for network
+		2 = Redirect for host
+		3 = Redirect for TOS and network
+		4 = Redirect for TOS and host
+		Type: Echo request
+		-----------------
+		1 = Echo request
+		Type: Router advertisement
+		------------------------
+		1 = Router advertisement
+		Type: Router solicitation
+		---------------------
+		1 = Router solicitation
+		Type: Time exceeded
+		------------------
+		1 = Time to live equals 0 during transmit
+		2 = Time to live equals 0 during reassembly
+		Type: Parameter problem
+		---------------------
+		1 = IP header bad (catchall error)
+		2 = Required option missing
+		Type: Timestamp request
+		----------------------
+		1 = Timestamp request
+		Type: Timestamp reply
+		-------------------
+		1 = Timestamp reply
+		Type: Information request
+		----------------------
+		1 = Information request
+		Type: Information reply
+		--------------------
+		1 = Information reply
+		Type: Address mask request
+		------------------------
+		1 = Address mask request
+		Type: Address mask reply
+		----------------------
+		1 = Address mask reply"
+	::= { snAgAclEntry 30 }
+
+snAgAclParameters   OBJECT-TYPE
+	SYNTAX		BITS {
+		matchFragmentedPackets (0),
+		matchNonFragmentedPackets (1),
+		matchTcpSynSetPackets (2),
+		permitFailedRPFCheckPackets (3),
+		mirrorPermitPackets (4),
+		sendPermitPacketsToSflowCollector (5),
+		dscpMappingFlagSet (6),
+		dscpMarkingFlagSet (7)
+		}
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"This mask represents multiple parameters configured for this ACL.
+		Bit 0 specified in the BITS construct is the MS bit of the first octet.
+		Bit 0: Match fragmented IP packets
+		Bit 1: Match non-fragmented IP packets
+		Bit 2: Match only TCP packets with SYN Bit set. Valid only if snAgAclSourceOperator
+				or snAgAclDestinationOperator is set to TCP.
+		Bit 3: Permit packets that fail RPF check
+		Bit 4: Mirror packets matching ACL permit clause
+		Bit 5: Send packets matching ACL permit clause to sFlow collector
+		Bit 6: Set dscp-mapping. The value is given by snAgAclDscpMarking
+		Bit 7: Set dscp-marking. The value is given by snAgAclDscpMapping
+		"
+	::= { snAgAclEntry 31 }
+
 --
 -- Acl Port Table
+--
+-- snAgAclIfBindTable replaces snAgAclBindToPortTable
 
 snAgAclBindToPortTable   OBJECT-TYPE
 	SYNTAX  SEQUENCE OF SnAgAclBindToPortEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS	current
 	DESCRIPTION
 		"Table of ACL binding to port for router"
 	::= { snAgAcl 3 }
 
 snAgAclBindToPortEntry       OBJECT-TYPE
 	SYNTAX  SnAgAclBindToPortEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS	current
 	DESCRIPTION
 		"An entry in the ACL-binding-to-port table."
-	INDEX   { 
-			   snAgAclPortNum, 
+	INDEX   {
+			   snAgAclPortNum,
 			   snAgAclPortBindDirection
 			}
 	::= { snAgAclBindToPortTable 1 }
 
 SnAgAclBindToPortEntry ::= SEQUENCE {
 	snAgAclPortNum
-		INTEGER,
+		Integer32,
 	snAgAclPortBindDirection
 		Direction,
 	snAgAclNum
-		INTEGER,
+		Integer32,
 	snAgAclNameString
 		DisplayString,
 	snAgBindPortListInVirtualInterface
@@ -426,51 +820,715 @@ SnAgAclBindToPortEntry ::= SEQUENCE {
 	}
 
 snAgAclPortNum      OBJECT-TYPE
-	SYNTAX  INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS	current
 	DESCRIPTION
 		"Binding-to port num, either physical port or virtual interface."
 	::= { snAgAclBindToPortEntry 1 }
 
 snAgAclPortBindDirection   OBJECT-TYPE
 	SYNTAX  Direction
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS	current
 	DESCRIPTION
 		"ACL port direction, inbound or outbound"
 	::= { snAgAclBindToPortEntry 2 }
 
 snAgAclNum      OBJECT-TYPE
-	SYNTAX  INTEGER
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-write
+	STATUS	current
 	DESCRIPTION
 		"Defined ACL number"
 	::= { snAgAclBindToPortEntry 3 }
 
 snAgAclNameString      OBJECT-TYPE
 	SYNTAX  DisplayString
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS	current
 	DESCRIPTION
 		"Defined ACL name"
 	::= { snAgAclBindToPortEntry 4 }
 
 snAgBindPortListInVirtualInterface   OBJECT-TYPE
 	SYNTAX  OCTET STRING
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS	current
 	DESCRIPTION
 		"Port list for binding virtual interface"
 	::= { snAgAclBindToPortEntry 5 }
 
 snAgAclPortRowStatus   OBJECT-TYPE
 	SYNTAX  SnRowStatus
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS	current
 	DESCRIPTION
 		"To create or delete a ACL port entry."
 	::= { snAgAclBindToPortEntry 6 }
+
+--
+-- Acl Port Table
+--
+
+snAgAclIfBindTable   OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SnAgAclIfBindEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Table of ACL binding to port for router"
+	::= { snAgAcl 4 }
+
+snAgAclIfBindEntry       OBJECT-TYPE
+	SYNTAX		SnAgAclIfBindEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the ACL-binding-to-port table."
+	INDEX   {snAgAclIfBindIndex, snAgAclIfBindDirection}
+	::= { snAgAclIfBindTable 1 }
+
+SnAgAclIfBindEntry ::= SEQUENCE {
+	snAgAclIfBindIndex
+		InterfaceIndex,
+	snAgAclIfBindDirection
+		Direction,
+	snAgAclIfBindNum
+		INTEGER,
+	snAgAclIfBindName
+		DisplayString,
+	snAgAclIfBindVifPortList
+		OCTET STRING,
+	snAgAclIfBindRowStatus
+		SnRowStatus,
+	snAgAclIfBindDenyLogging
+		INTEGER
+	}
+
+snAgAclIfBindIndex      OBJECT-TYPE
+	SYNTAX		InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS		current
+	DESCRIPTION
+		"Binding-to port num, either physical port or virtual interface."
+	::= { snAgAclIfBindEntry 1 }
+
+snAgAclIfBindDirection   OBJECT-TYPE
+	SYNTAX		Direction
+	MAX-ACCESS  read-only
+	STATUS		current
+	DESCRIPTION
+		"ACL port direction, inbound or outbound"
+	::= { snAgAclIfBindEntry 2 }
+
+snAgAclIfBindNum      OBJECT-TYPE
+	SYNTAX		INTEGER (0..199)
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"Defined ACL number (0 represents named ACL)"
+
+	::= { snAgAclIfBindEntry 3 }
+
+snAgAclIfBindName      OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"Defined ACL name"
+	::= { snAgAclIfBindEntry 4 }
+
+snAgAclIfBindVifPortList   OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"This object specifies the port list for binding virtual interface.
+		 Each port index is an ifIndex, if there are consecutive 4 or more
+		 ifIndex then, they will be encoded like below.
+
+		 Encoding and decoding scheme is range based: Each range prefix with
+		 0000 (2 octets) where 0000 is not valid ifIndex. Next 2 octets
+		 indicates lower range ifIndex, followed by 2 octets of higher range
+		 ifIndex. Individual(non range) ones will be displayed as it is.
+
+		 Ex: port list: 0001..0005 0015 0032..0047
+		 Port list in PDU:  0000 0001 0005 000f 0000 0020 002f."
+	::= { snAgAclIfBindEntry 5 }
+
+snAgAclIfBindRowStatus   OBJECT-TYPE
+	SYNTAX		SnRowStatus
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"To create or delete a ACL port entry."
+	::= { snAgAclIfBindEntry 6 }
+
+snAgAclIfBindDenyLogging    OBJECT-TYPE
+	SYNTAX		INTEGER {
+					disable(0),
+					enable(1)
+				}
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"Enable or disable deny logging."
+	::= { snAgAclIfBindEntry 7 }
+
+--
+-- Acl Accounting Table
+--
+
+agAclAccntTable   OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AgAclAccntEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Table of ACL Accounting Statistics for router"
+	::= { snAgAcl 5 }
+
+agAclAccntEntry       OBJECT-TYPE
+	SYNTAX		AgAclAccntEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the ACL-binding-to-port table."
+	INDEX   { agAclAccntKind, agAclAccntIfIndex, agAclAccntDirection, agAclAccntAclNumber, agAclAccntFilterId}
+	::= { agAclAccntTable 1 }
+
+AgAclAccntEntry ::= SEQUENCE {
+	agAclAccntKind
+		INTEGER,
+	agAclAccntIfIndex
+		InterfaceIndex,
+	agAclAccntDirection
+		Direction,
+	agAclAccntAclNumber
+		AclNumber,
+	agAclAccntFilterId
+		Unsigned32,
+	agAclAccntAclName
+		AclNameString,
+	agAclAccntOneSecond
+		Counter64,
+	agAclAccntOneMinute
+		Counter64,
+	agAclAccntFiveMinute
+		Counter64,
+	agAclAccntCumulative
+		Counter64,
+	agAclAccntRaclDropCnt
+		Counter64,
+	agAclAccntRaclFwdCnt
+		Counter64,
+	agAclAccntRaclRemarkCnt
+		Counter64,
+	agAclAccntRaclTotalCnt
+		Counter64,
+	agAclAccntRaclTotalSWHitCountCnt
+		Counter64
+	}
+
+agAclAccntKind	OBJECT-TYPE
+	SYNTAX		INTEGER {
+					ipv4(0),
+					l2(1),
+					policyBasedRouting(2),
+					rateLimit(3),
+					receiveAcl(4)
+				}
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Kind of ACL Accounting statistics needed."
+	::= { agAclAccntEntry 1 }
+
+agAclAccntIfIndex	OBJECT-TYPE
+	SYNTAX			InterfaceIndex
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"Physical or virtual interface on which ACL accounting is desired.
+		For Receive ACL, we use the lowest port of the management module
+		as value for this object."
+	::= { agAclAccntEntry 2 }
+
+agAclAccntDirection	OBJECT-TYPE
+	SYNTAX			Direction
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"ACL port direction, inbound or outbound. For receive-acl kind, direction cannot be outbound."
+	::= { agAclAccntEntry 3 }
+
+agAclAccntAclNumber	OBJECT-TYPE
+	SYNTAX			AclNumber
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"The access-list number for this entry."
+	::= { agAclAccntEntry 4 }
+
+agAclAccntFilterId	OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"FilterId within a given ACL. This is a zero based value."
+	::= { agAclAccntEntry 5 }
+
+agAclAccntAclName	OBJECT-TYPE
+	SYNTAX			AclNameString
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"ACL name for an entry, if applicable. Otherwise, null string is returned."
+	::= { agAclAccntEntry 6 }
+
+agAclAccntOneSecond    OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Last one second accounting data."
+	::= { agAclAccntEntry 7 }
+
+agAclAccntOneMinute    OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Last one minute accounting data."
+	::= { agAclAccntEntry 8 }
+
+agAclAccntFiveMinute    OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Last five minute accounting data."
+	::= { agAclAccntEntry 9 }
+
+agAclAccntCumulative    OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Cummulative accounting data since the ACL was installed."
+	::= { agAclAccntEntry 10 }
+
+agAclAccntRaclDropCnt    OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Receive-ACL drop counter used for rate limiting. Not used for other ACL kind.
+		The value returned is per ACL, instead of per filter within the ACL."
+	::= { agAclAccntEntry 11 }
+
+agAclAccntRaclFwdCnt    OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Receive-ACL forward counter used for rate limiting. Not used for other ACL kind.
+		The value returned is per ACL, instead of per filter within the ACL."
+	::= { agAclAccntEntry 12 }
+
+agAclAccntRaclRemarkCnt    OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Receive-ACL remark counter used for rate limiting. Not used for other ACL kind.
+		The value returned is per ACL, instead of per filter within the ACL."
+	::= { agAclAccntEntry 13 }
+
+agAclAccntRaclTotalCnt    OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Receive-ACL total counter used for rate limiting. Not used for other ACL kind.
+		The value returned is per ACL, instead of per filter within the ACL."
+	::= { agAclAccntEntry 14 }
+
+agAclAccntRaclTotalSWHitCountCnt    OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Receive-ACL cumulative software hit counter. Not used for other ACL kind.
+		The value returned is per ACL, instead of per filter within the ACL."
+	::= { agAclAccntEntry 15 }
+
+--
+-- L2 ACL Next Clause Table
+--
+
+fdryL2AclNextClauseTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF FdryL2AclNextClauseEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This read-only table contains the list of next lowest available clause index that
+		can be used for creating a new instance in the fdryL2AclTable.
+		The clause index values will not change as a result of switchovers or hitless upgrades,
+		but may change as a result of a device reload (though the relative order of persistent
+		entries would remain the same).
+		"
+	::= { snAgAcl 6 }
+
+fdryL2AclNextClauseEntry	OBJECT-TYPE
+	SYNTAX		FdryL2AclNextClauseEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry specifying the next lowest available clause index for this ACL number."
+	INDEX   { fdryL2AclNumber }
+	::= { fdryL2AclNextClauseTable 1 }
+
+FdryL2AclNextClauseEntry ::= SEQUENCE {
+	fdryL2AclNextClauseIndex
+		FdryClauseIndexTC
+	}
+
+fdryL2AclNextClauseIndex	OBJECT-TYPE
+	SYNTAX		FdryClauseIndexTC
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The next lowest available clause index for a given ACL number. The maximum value
+		of this object is the configured maximum number of clauses for a L2 ACL."
+	::= { fdryL2AclNextClauseEntry 1 }
+
+--
+-- L2 ACL Configuration Table
+--
+
+fdryL2AclTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF FdryL2AclEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Table of Layer 2 Access Control Lists. Layer 2 ACLs filter traffic
+		based on any of the following fields:
+		- Source MAC address and source MAC mask
+		- Destination MAC address and destination MAC mask
+		- VLAN ID
+		- Ethernet type.
+		For a given ACL number, one can have 64 (default) to 256 clauses.
+		The clause index values will not change as a result of switchovers or hitless upgrades,
+		but may change as a result of a device reload (though the relative order of persistent
+		entries would remain the same).
+		"
+	::= { snAgAcl 7 }
+
+
+fdryL2AclEntry	OBJECT-TYPE
+	SYNTAX		FdryL2AclEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the L2 Access Control List table."
+	INDEX   { fdryL2AclNumber, fdryL2AclClauseIndex }
+	::= { fdryL2AclTable 1 }
+
+FdryL2AclEntry ::= SEQUENCE {
+	fdryL2AclNumber
+		AclNumber,
+	fdryL2AclClauseIndex
+		FdryClauseIndexTC,
+	fdryL2AclAction
+		Action,
+	fdryL2AclSourceMac
+		MacAddress,
+	fdryL2AclSourceMacMask
+		MacAddress,
+	fdryL2AclDestinationMac
+		MacAddress,
+	fdryL2AclDestinationMacMask
+		MacAddress,
+	fdryL2AclVlanId
+		FdryVlanIdOrNoneTC,
+	fdryL2AclEthernetType
+		FdryEnetTypeOrZeroTC,
+	fdryL2AclDot1pPriority
+		PortQosTC,
+	fdryL2AclDot1pPriorityForce
+		PortQosTC,
+	fdryL2AclDot1pPriorityMapping
+		PortQosTC,
+	fdryL2AclMirrorPackets
+		TruthValue,
+	fdryL2AclLogEnable
+		TruthValue,
+	fdryL2AclRowStatus
+		RowStatus
+}
+
+fdryL2AclNumber	OBJECT-TYPE
+	SYNTAX		AclNumber
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The access-list number for this entry.
+		For L2ACL, the valid values are between 400 and 599."
+	::= { fdryL2AclEntry 1 }
+
+fdryL2AclClauseIndex	OBJECT-TYPE
+	SYNTAX		FdryClauseIndexTC
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The index of the clause within a given ACL number.
+		During row creation, the clause index value should match
+		with the next available clause index for a given ACL number.
+		It is advisable to first do a Get operation on the
+		fdryL2AclNextClauseTable for a given ACL number, and use
+		the value of fdryL2AclNextClauseIndex returned by the agent."
+	::= { fdryL2AclEntry 2 }
+
+fdryL2AclAction	OBJECT-TYPE
+	SYNTAX		Action
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Action to take if the ingress L2 packet matches this ACL."
+	::= { fdryL2AclEntry 3 }
+
+fdryL2AclSourceMac	OBJECT-TYPE
+	SYNTAX		MacAddress
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Optional Source MAC address. By default, it matches with
+		any source MAC within a packet."
+	DEFVAL  { '000000000000'H }
+	::= { fdryL2AclEntry 4 }
+
+fdryL2AclSourceMacMask	OBJECT-TYPE
+	SYNTAX		MacAddress
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Optional Source MAC address mask.
+		For Set operation, this object can only be used in
+		conjunction with fdryL2AclSourceMac.
+		By default,  it matches with any source MAC within a packet.
+		it matches with any source MAC within a packet.
+		To match on the first two bytes of the address
+		aabb.ccdd.eeff, use the mask ffff.0000.0000. In this case,
+		the clause matches all source MAC addresses that contain
+		'aabb' as the first two bytes and any values in the
+		remaining bytes of the MAC address."
+	DEFVAL  { '000000000000'H }
+	::= { fdryL2AclEntry 5 }
+
+fdryL2AclDestinationMac	OBJECT-TYPE
+	SYNTAX		MacAddress
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Optional destination MAC address.
+		By default, it matches with any destination MAC within a packet."
+	DEFVAL  { '000000000000'H }
+	::= { fdryL2AclEntry 6 }
+
+fdryL2AclDestinationMacMask	OBJECT-TYPE
+	SYNTAX		MacAddress
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Optional destination MAC address mask.
+		For Set operation, this object can only be used in
+		conjunction with fdryL2AclDestinationMac.
+		By default, it matches with any destination MAC within a packet.
+		To match on the first two bytes of the address
+		aabb.ccdd.eeff, use the mask ffff.0000.0000. In this case,
+		the clause matches all destination MAC addresses that contain
+		'aabb' as the first two bytes and any values in the
+		remaining bytes of the MAC address."
+	DEFVAL  { '000000000000'H }
+	::= { fdryL2AclEntry 7 }
+
+fdryL2AclVlanId 	OBJECT-TYPE
+	SYNTAX		FdryVlanIdOrNoneTC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Optional VLAN ID to match against that of the incoming packet.
+		By default, the VLAN ID field is ignored during the match. In this case,
+		value 0 is returned."
+	DEFVAL  { 0 }
+	::= { fdryL2AclEntry 8 }
+
+fdryL2AclEthernetType 	OBJECT-TYPE
+	SYNTAX		FdryEnetTypeOrZeroTC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Optional Ethernet Type to match against the etype field
+		of the incoming packet.
+		By default, etype field is ignored during the match."
+	DEFVAL  { invalid }
+	::= { fdryL2AclEntry 9 }
+
+fdryL2AclDot1pPriority 	OBJECT-TYPE
+	SYNTAX		PortQosTC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The priority option assigns traffic that matches the ACL to a
+		hardware forwarding queue. In addition to changing the internal
+		forwarding priority, if the outgoing interface is an 802.1q interface,
+		this option maps the specified priority to its equivalent 802.1p (QoS)
+		priority and marks the packet with the new 802.1p priority.
+		This option is applicable for inbound ACLs only.
+		   This object is not supported in RX, where it always returns
+		enum value invalid.
+		NOTE: fdryL2AclDot1pPriority following fdryL2AclDot1pPriorityForce
+		cannot be used together in an ACL entry."
+	DEFVAL  { level0 }
+	::= { fdryL2AclEntry 10 }
+
+fdryL2AclDot1pPriorityForce 	OBJECT-TYPE
+	SYNTAX		PortQosTC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The priority-force option assigns packets of outgoing traffic
+		that match the ACL to a specific hardware forwarding queue,
+		even though the incoming packet may be assigned to another queue.
+		This option is applicable for inbound ACLs only.
+		   This object is not supported in RX, where it always returns
+		enum value invalid.
+		NOTE: fdryL2AclDot1pPriority following fdryL2AclDot1pPriorityForce
+		cannot be used together in an ACL entry."
+	DEFVAL  { level0 }
+	::= { fdryL2AclEntry 11 }
+
+fdryL2AclDot1pPriorityMapping 	OBJECT-TYPE
+	SYNTAX		PortQosTC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The priority-mapping option matches on the packets 802.1p value.
+		This option does not change the packets forwarding priority through
+		the device or mark the packet. This keyword is applicable for both
+		inbound and outbound ACLs.
+		   This object is not supported in RX, where it always returns
+		enum value invalid."
+	DEFVAL  { level0 }
+	::= { fdryL2AclEntry 12 }
+
+fdryL2AclMirrorPackets OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS  read-create
+	STATUS		current
+	DESCRIPTION
+		"Mirror packets matching ACL permit clause."
+	DEFVAL  { false }
+	::= { fdryL2AclEntry 13 }
+
+fdryL2AclLogEnable	OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Optional parameter to enable logging only when deny clause
+		is specified. Note that traffic denied by implicit deny mechanism is not
+		subject to logging. The implicit deny kicks in when the traffic
+		does not match any of the clauses and there is no 'permit any any'
+		clause specified at the end."
+	DEFVAL  { false }
+	::= { fdryL2AclEntry 14 }
+
+fdryL2AclRowStatus	OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The row status variable, used according to installation
+		and removal conventions for conceptual rows. Setting this
+		object to active(1) or createAndGo(4) results in the
+		addition of a L2 ACL filter in the router. Duplicate entry will
+		be rejected during row creation. As part of row creation, we
+		support only appending to this table. Row insertion may not
+		be supported.
+		  Setting this object to destroy(6) removes the associated filter
+		from the router. Other values in the enumeration are not used.
+		"
+	::= { fdryL2AclEntry 15 }
+
+--
+-- L2 ACL Binding Configuration Table
+--
+
+fdryL2AclIfBindTable   OBJECT-TYPE
+	SYNTAX		SEQUENCE OF FdryL2AclIfBindEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Table of L2 ACL binding to port.
+		- One cannot bind Layer 2 ACLs and Layer 3 ACLs to the same port.
+		However, one can configure a port to use Layer 2 ACLs, and
+		another port on the same device to use Layer 3 ACLs.
+		- In general, Layer 2 ACLs cannot be bound to virtual interfaces, unlike L3 ACLs.
+		- One cannot modify an existing Layer 2 ACL clause. For that, one must
+		unbind the ACL, delete it and make a new clause.
+		"
+	::= { snAgAcl 8 }
+
+fdryL2AclIfBindEntry       OBJECT-TYPE
+	SYNTAX		FdryL2AclIfBindEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the L2ACL binding table which lists the ACL bindings to a port.
+		"
+	INDEX   {ifIndex, fdryL2AclIfBindDirection}
+	::= { fdryL2AclIfBindTable 1 }
+
+
+FdryL2AclIfBindEntry ::= SEQUENCE {
+	fdryL2AclIfBindDirection
+		Direction,
+	fdryL2AclIfBindAclNumber
+		Unsigned32,
+	fdryL2AclIfBindRowStatus
+		RowStatus
+	}
+
+fdryL2AclIfBindDirection   OBJECT-TYPE
+	SYNTAX		Direction
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Direction in which this ACL should be applied on this port."
+	::= { fdryL2AclIfBindEntry 1 }
+
+fdryL2AclIfBindAclNumber      OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS  read-create
+	STATUS		current
+	DESCRIPTION
+		"The ACL number that is to be bound to given physical interface.
+		The valid values for L2 numbered ACLs are between 400 and 599."
+	::= { fdryL2AclIfBindEntry 2 }
+
+fdryL2AclIfBindRowStatus      OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS  read-create
+	STATUS		current
+	DESCRIPTION
+		"The row status variable, used according to installation
+		and removal conventions for conceptual rows. Setting this
+		object to active(1) or createAndGo(4) results in the
+		binding of a L2 ACL with a given physical port.
+		Setting this object to destroy(6) unbinds this L2 ACL from the port.
+		Other values in the enumeration are not used."
+	::= { fdryL2AclIfBindEntry 3 }
+
 
 END

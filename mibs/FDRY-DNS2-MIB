@@ -1,0 +1,190 @@
+FDRY-DNS2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, Unsigned32,
+    OBJECT-TYPE         FROM SNMPv2-SMI                 -- [RFC2578]
+    DisplayString, RowStatus
+                        FROM SNMPv2-TC                  -- [RFC2579]
+    InetAddressType, InetAddress
+                        FROM INET-ADDRESS-MIB           -- [RFC 4001]
+    ;
+
+fdryDns2MIB MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "The Brocade proprietary MIB module for Domain Name Service(DNS)
+              It has new IPv4/IPv6 combined tables for Domain Name Service Address List and Name configuration.
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION 	"200901300000Z"  -- 30 Jan 2009
+    DESCRIPTION "Initial version, obsoletes the earlier mib groups to resolve the mib conflicts.
+    			fdryDns2MIB obsoletes fdryDnsMIB,
+				fdryDns2DomainName obsoletes fdryDnsDomainName,
+				fdryDnsServer obsoletes fdryDnsServerAddress"
+
+    ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) foundry(1991) products(1) switch(1) snSwitch(3) 34 }
+
+    --
+    -- Top level components of this MIB.
+    --
+
+    fdryDns2DomainName      OBJECT IDENTIFIER ::= { fdryDns2MIB 1 }
+    fdryDnsServer           OBJECT IDENTIFIER ::= { fdryDns2MIB 2 }
+
+    --
+    -- Ipv4/Ipv6  mib table for Domain Name Service (DNS) Domain Name
+    --
+
+    fdryDns2DomainNameTable      OBJECT-TYPE
+        SYNTAX  SEQUENCE OF FdryDns2DomainNameEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Domain Name Service domain name table."
+        ::= { fdryDns2DomainName 1 }
+
+    fdryDns2DomainNameEntry      OBJECT-TYPE
+        SYNTAX  FdryDns2DomainNameEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry in the DNS domain name table."
+        INDEX   { fdryDns2DomainNameIndex }
+        ::= { fdryDns2DomainNameTable 1 }
+
+    FdryDns2DomainNameEntry ::= SEQUENCE {
+        fdryDns2DomainNameIndex         Unsigned32,
+        fdryDns2DomainNameAddrType      InetAddressType,
+        fdryDns2DomainNameName          DisplayString,
+        fdryDns2DomainNameRowStatus     RowStatus
+        }
+
+    fdryDns2DomainNameIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The index to the DNS name table."
+        ::= { fdryDns2DomainNameEntry 1 }
+
+    fdryDns2DomainNameAddrType           OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+              "DNS IP address Type. Supported address types are ipv4(1) and ipv6(2)"
+        DEFVAL  { ipv4 }
+        ::= { fdryDns2DomainNameEntry 2 }
+
+    fdryDns2DomainNameName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Domain Name Service Domain Name string."
+        ::= { fdryDns2DomainNameEntry 3 }
+
+    fdryDns2DomainNameRowStatus  OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This variable is used to create, modify, or
+             delete a row in this table. When a row in this
+             table is in active(1) state, no objects in that row
+             can be modified except this object."
+        ::= { fdryDns2DomainNameEntry 4 }
+
+    --
+    -- IPv4/IPv6 MIB table for DNS servers
+    --
+
+    fdryDnsServerTable       OBJECT-TYPE
+        SYNTAX      SEQUENCE OF FdryDnsServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "DNS server table, listing the Ipv4/Ipv6 DNS server addresses"
+        ::= { fdryDnsServer 1 }
+
+    fdryDnsServerEntry       OBJECT-TYPE
+        SYNTAX      FdryDnsServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the DNS server table."
+
+        INDEX   {fdryDnsServerAddrType, fdryDnsServerIndex}
+        ::= { fdryDnsServerTable 1 }
+
+    FdryDnsServerEntry ::= SEQUENCE {
+        fdryDnsServerAddrType
+            InetAddressType,
+        fdryDnsServerIndex
+            Unsigned32,
+        fdryDnsServerAddr
+            InetAddress,
+        fdryDnsServerRowStatus
+            RowStatus
+        }
+    fdryDnsServerAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "The index to the DNS server table. DNS server IP address type. Supported address types are ipv4(1) and ipv6(2)"
+        DEFVAL  { ipv4 }
+        ::= { fdryDnsServerEntry 1 }
+
+    fdryDnsServerIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index to the DNS server table.  Currently, up to 4 DNS server
+             entries each are supported for IPv4 and IPv6."
+        ::= { fdryDnsServerEntry 2 }
+
+    fdryDnsServerAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+              "DNS server IP address."
+        ::= { fdryDnsServerEntry 3 }
+
+    fdryDnsServerRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This variable is used to create, modify, or
+             delete a row in this table. When a row in this
+             table is in active(1) state, no objects in that row
+             can be modified except this object."
+        ::= { fdryDnsServerEntry 4 }
+
+END

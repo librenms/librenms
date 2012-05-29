@@ -1,0 +1,899 @@
+FDRY-MPLS-L2VPN-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+   NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE,
+   Unsigned32, Counter64
+      FROM SNMPv2-SMI                                     -- [RFC2578]
+   TEXTUAL-CONVENTION, RowStatus, TruthValue
+      FROM SNMPv2-TC                                      -- [RFC2579]
+   InterfaceIndex
+      FROM IF-MIB                                         -- [RFC2863]
+   VlanTagMode, PortPriorityTC
+      FROM FOUNDRY-SN-SWITCH-GROUP-MIB                    -- [snswitch]
+   snMpls
+      FROM FOUNDRY-SN-ROOT-MIB                            -- [snroot]
+   vplsConfigName, vplsConfigIndex, vplsConfigEntry
+      FROM VPLS-GENERIC-DRAFT-01-MIB                      -- [draft-ietf-l2vpn-vpls-mib-00]
+   PwOperStatusTC, PwVlanCfg
+      FROM PW-TC-STD-MIB                                  -- [draft-ietf-pw3-pw-tc-mib-11]
+   pwIndex, pwName, pwID, fdryPwServiceType
+      FROM PW-STD-MIB                                     -- [draft-ietf-pw3-pw-mib-11]
+   pwEnetPwInstance
+      FROM PW-ENET-STD-MIB                                -- [draft-ietf-pw3-enet-mib-11]
+   ;
+
+fdryMplsL2VpnMIB MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "The Brocade proprietary MIB module for L2 VPN.
+              This mib is built on the current L2VPN draft mib.
+              It has additional information for Virtual Leased Line (VLL),
+              VLL-Local and Virtual Private LAN Service (VPLS) Endpoints,
+              as well as for VPLS Instance.
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION      "200802070000Z"  -- 7 February 2008
+    DESCRIPTION
+            "Initial revision"
+   ::= { snMpls 2 }
+
+--
+-- Textual Conventions
+--
+MplsServiceType ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+       "MPLS VLL service types, VLL, VLL-local or VPLS."
+   SYNTAX        INTEGER{
+                          vll(1),
+                          vllLocal(2),
+                          vpls(3)
+                       }
+
+AdminStatus ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+       "Administrative status of a given management entity."
+     SYNTAX        INTEGER{
+                              up(1),      -- ready to pass packets
+                              down(2),     -- can't pass packets
+                              testing(3)   -- in some test mode
+                        }
+
+ClassOfService ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+       "Class Of Service (COS) value of a given management entity.
+       Value 255 means that COS is not explicitly configured. Valid COS values
+       are between 0 and 7."
+   SYNTAX        Unsigned32(0..7 | 255)
+
+Layer2StateTC ::= TEXTUAL-CONVENTION
+   STATUS    current
+   DESCRIPTION
+     "Specifies the layer2 state a given interface can take.."
+   SYNTAX  INTEGER{  -- picked from Syntax of dot1dStpPortState
+                        disabled(1),
+                        blocking(2),
+                        listening(3),
+                        learning(4),
+                        preforwarding(5),
+                        forwarding(6)
+                 }
+
+--
+-- Top level components of this MIB.
+--
+
+  fdryMplsVpnNotifications   OBJECT IDENTIFIER ::= { fdryMplsL2VpnMIB 0 }
+  fdryMplsVllInfo   OBJECT IDENTIFIER ::= { fdryMplsL2VpnMIB 1 }  -- Includes VLL and VLL-Local
+  fdryMplsVplsInfo   OBJECT IDENTIFIER ::= { fdryMplsL2VpnMIB 2 }
+
+--
+-- L2 VPN VLL and VLL-Local Endpoint table
+--
+
+  fdryVllEndPointTable   OBJECT-TYPE
+     SYNTAX        SEQUENCE OF FdryVllEndPointEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This table specifies information about the VLL and VLL-local endpoints which are not
+         available in the PW tables."
+     ::= { fdryMplsVllInfo 1 }
+
+  fdryVllEndPointEntry   OBJECT-TYPE
+     SYNTAX        FdryVllEndPointEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+          "A row in this table represents a VLL or VLL-local end point for a
+          pseudo-wire (PW) virtual connection across a packet network.
+          For a VLL, we would have one instance of this table for a given PW.
+          For a VLL-local, there would be two instances of this table for a given PW.
+          It is indexed by fdryVllEndPointServiceType, pwIndex, and pwEnetPwInstance.
+          The pwIndex is the index of pwTable, and {pwIndex, pwEnetPwInstance} together
+          provides an instance in the pwEnetTable.
+           A row can be created by an operator command after having created a row
+           in the pwTable and pwEnetTable.
+           1) Objects MUST NOT be changed after row activation.
+           2) Objects MAY be changed when the PW is
+           defined as not active. A change of these objects involves
+           re-signaling of the PW or it might be traffic affecting.
+           End point not active is defined as one of the following
+           conditions:
+                  a) The pwRowStatus is notInService(2).
+                  b) The pwRowStatus is notReady(3).
+                  c) The pwAdminStatus is down(2).
+           "
+     INDEX  {fdryVllEndPointServiceType, pwIndex, pwEnetPwInstance}
+            ::= { fdryVllEndPointTable 1 }
+
+  FdryVllEndPointEntry ::= SEQUENCE {
+        fdryVllEndPointServiceType           MplsServiceType ,
+        fdryVllEndPointVlanTagMode               VlanTagMode,
+        fdryVllEndPointClassOfService        ClassOfService,
+        fdryVllEndPointInHCPkts              Counter64,
+        fdryVllEndPointOutHCPkts              Counter64,
+        fdryVllEndPointAdminStatus           AdminStatus,
+        fdryVllEndPointOperStatus           PwOperStatusTC,
+        fdryVllEndPointRowStatus             RowStatus,
+        fdryVllEndPointInnerVlanId          PwVlanCfg,
+        fdryVllEndPointInHCOctets           Counter64,
+        fdryVllEndPointOutHCOctets         Counter64
+     }
+
+  fdryVllEndPointServiceType OBJECT-TYPE
+     SYNTAX        MplsServiceType
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "A service type indicating VLL or VLL-local service for this endpoint.
+         The value vpls(3) is not used in this table.
+         "
+     ::= { fdryVllEndPointEntry 1 }
+
+  fdryVllEndPointVlanTagMode OBJECT-TYPE
+     SYNTAX        VlanTagMode
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the vlan mode for this endpoint. The values,
+         dual(3) and other(4) is not used in this table.
+         "
+     ::= { fdryVllEndPointEntry 2 }
+
+  fdryVllEndPointClassOfService OBJECT-TYPE
+     SYNTAX        ClassOfService
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the Class Of Service for this endpoint.
+         For VLL, this value is used to select the appropriate tunnel
+         whose COS value is either same, or almost approaching this value.
+         For VLL-local, this value is applied to the ingress packet of an endpoint
+         "
+     DEFVAL {0}
+     ::= { fdryVllEndPointEntry 3 }
+
+  fdryVllEndPointInHCPkts OBJECT-TYPE
+     SYNTAX        Counter64
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the number of packets ingressing into this endpoint.
+           This counter is not supported in CES/CER platform.
+         "
+     ::= { fdryVllEndPointEntry 4 }
+
+  fdryVllEndPointOutHCPkts OBJECT-TYPE
+     SYNTAX        Counter64
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the number of packets egressing out from this endpoint.
+         For VLL-local, this value could be the fdryVllEndPointInHCPkts of the other endpoint
+         of this VLL instance. But since rate limit could be applied to the incoming packet,
+         the count value will not be accurate. Due to this, the value will be 0 for VLL-local.
+           This counter is not supported in CES/CER platform.
+         "
+     ::= { fdryVllEndPointEntry 5 }
+
+  fdryVllEndPointAdminStatus OBJECT-TYPE
+     SYNTAX        AdminStatus
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "The desired administrative status of this endpoint. This object MAY
+          be set at any time.
+         "
+     ::= { fdryVllEndPointEntry 6 }
+
+  fdryVllEndPointOperStatus OBJECT-TYPE
+     SYNTAX        PwOperStatusTC
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This object indicates the operational status of this endpoint.
+         Only values up(1), down(2) are used in this table
+         "
+     ::= { fdryVllEndPointEntry 7 }
+
+  fdryVllEndPointRowStatus OBJECT-TYPE
+     SYNTAX        RowStatus
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+       "This variable is used to create, modify, and/or
+        delete a row in this table. When a row in this
+        table is in active(1) state, no objects in that row
+        can be modified except this object, and the fdryVllEndPointAdminStatus.
+        "
+     ::= { fdryVllEndPointEntry 8 }
+
+fdryVllEndPointInnerVlanId OBJECT-TYPE
+     SYNTAX        PwVlanCfg
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the inner vlan id for this endpoint.
+          Returns 0 if not configured or is not supported.
+         "
+     DEFVAL { 0 }
+     ::= { fdryVllEndPointEntry 9 }
+
+  fdryVllEndPointInHCOctets OBJECT-TYPE
+     SYNTAX        Counter64
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the number of octets ingressing into this endpoint
+         from a Customer Edge (CE) device.
+           This counter is supported in CES/CER platform.
+         "
+     ::= { fdryVllEndPointEntry 10 }
+
+  fdryVllEndPointOutHCOctets OBJECT-TYPE
+     SYNTAX        Counter64
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the number of octets egressing out from this endpoint towards
+         the Customer Edge (CE) device.
+          This counter is not supported in CES/CER platform.
+           Within CES/CER, any packet coming in from the tunnel will have its MPLS header as part of the octet count.
+         "
+     ::= { fdryVllEndPointEntry 11 }
+
+
+--
+-- L2 VPN VLL and VLL-Local Endpoint Extended Statistics table
+--
+
+  brcdVllEndptVlanExtStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BrcdVllEndptVlanExtStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This table contains the VLAN extended statistics
+         for VLL endpoints."
+    ::= { fdryMplsVllInfo 2 }
+
+  brcdVllEndptVlanExtStatsEntry OBJECT-TYPE
+    SYNTAX  BrcdVllEndptVlanExtStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in this table represents a VLAN extended statistics
+        accounting entry of a VLL endpoint."
+    INDEX  { fdryVllEndPointServiceType,
+                  pwIndex,
+                  pwEnetPwInstance,
+                  brcdVllEndptVlanExtStatsPriorityId
+                }
+    ::= { brcdVllEndptVlanExtStatsTable 1 }
+
+  BrcdVllEndptVlanExtStatsEntry ::= SEQUENCE {
+        brcdVllEndptVlanExtStatsPriorityId
+            PortPriorityTC,
+        brcdVllEndptVlanExtStatsInPkts
+            Counter64,
+        brcdVllEndptVlanExtStatsOutPkts
+            Counter64,
+        brcdVllEndptVlanExtStatsInOctets
+            Counter64,
+        brcdVllEndptVlanExtStatsOutOctets
+            Counter64
+      }
+
+  brcdVllEndptVlanExtStatsPriorityId OBJECT-TYPE
+    SYNTAX  PortPriorityTC
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Identifies the port QOS priority.
+         The values 1 through 8 internally maps to priorities 0 through 7.
+         The value 128 indicates that priority-level accounting is not enabled"
+    ::= { brcdVllEndptVlanExtStatsEntry 1 }
+
+  brcdVllEndptVlanExtStatsInPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of valid frames received by this endpoint
+         from the Customer Edge (CE)."
+    ::= { brcdVllEndptVlanExtStatsEntry 2 }
+
+  brcdVllEndptVlanExtStatsOutPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of valid frames transmitted by this endpoint
+         to the Customer Edge (CE)."
+    ::= { brcdVllEndptVlanExtStatsEntry 3 }
+
+  brcdVllEndptVlanExtStatsInOctets OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The bytes count received by this endpoint from the Customer Edge (CE)."
+    ::= { brcdVllEndptVlanExtStatsEntry 4 }
+
+  brcdVllEndptVlanExtStatsOutOctets OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The bytes count transmitted by this endpoint to
+        the Customer Edge (CE)."
+    ::= { brcdVllEndptVlanExtStatsEntry 5 }
+
+
+-- Deprecated table fdryVplsEndPointTable
+
+  fdryVplsEndPointTable   OBJECT-TYPE
+     SYNTAX        SEQUENCE OF FdryVplsEndPointEntry
+     MAX-ACCESS    not-accessible
+     STATUS        deprecated
+     DESCRIPTION
+         "This table specifies information about the VPLS endpoints which are not
+         available in the PW mib, or VPLS draft mib."
+     ::= { fdryMplsVplsInfo 1 }
+
+  fdryVplsEndPointEntry   OBJECT-TYPE
+     SYNTAX        FdryVplsEndPointEntry
+     MAX-ACCESS    not-accessible
+     STATUS        deprecated
+     DESCRIPTION
+          "A row in this table represents a VPLS end point for a
+          given VPLS instance. The VPLS instance is represented
+          by vplsConfigTable and fdryVplsTable.
+          For a given VPLS instance, there could be multiple instances
+          of rows within this table, each describing one endpoint.
+          For a given endpoint, there will be one VPLS instance.
+          A given endpoint is represented by vplsConfigIndex (VPLS instance),
+          vlan id, and ifIndex of the physical port which is acting as an endpoint.
+          This allows a tagged port to be associated with multiple VPLS instances.
+          An untagged port can only be associated with one VPLS instance.
+          Note that this table is kept independent of the PW tables to indicate
+          that endpoints terminate on the VPLS instance.
+          On the other side, a VPLS instance will have association with the PW MIB.
+          This table is indexed by vplsConfigIndex, fdryVplsEndPointPortVlan,
+          and fdryVplsEndPointIfIndex.
+           "
+     INDEX  {vplsConfigIndex, fdryVplsEndPointPortVlan, fdryVplsEndPointIfIndex}
+            ::= { fdryVplsEndPointTable 1 }
+
+  FdryVplsEndPointEntry ::= SEQUENCE {
+        fdryVplsEndPointPortVlan           PwVlanCfg ,
+        fdryVplsEndPointIfIndex            InterfaceIndex,
+        fdryVplsEndPointVlanTagMode        VlanTagMode,
+        fdryVplsEndPointOutHCPkts            Counter64,
+        fdryVplsEndPointState                INTEGER,
+        fdryVplsEndPointAdminStatus           AdminStatus,
+        fdryVplsEndPointOperStatus           PwOperStatusTC,
+        fdryVplsEndPointRowStatus             RowStatus,
+        fdryVplsEndPointInHCOctets           Counter64
+     }
+
+  fdryVplsEndPointPortVlan OBJECT-TYPE
+     SYNTAX        PwVlanCfg
+     MAX-ACCESS    not-accessible
+     STATUS        deprecated
+     DESCRIPTION
+         "This value specifies the VLAN id value of this endpoint.
+         "
+     ::= { fdryVplsEndPointEntry 1 }
+
+  fdryVplsEndPointIfIndex OBJECT-TYPE
+     SYNTAX        InterfaceIndex
+     MAX-ACCESS    not-accessible
+     STATUS        deprecated
+     DESCRIPTION
+         "This value specifies the ifIndex value of this endpoint.
+         "
+     ::= { fdryVplsEndPointEntry 2 }
+
+  fdryVplsEndPointVlanTagMode OBJECT-TYPE
+     SYNTAX        VlanTagMode
+     MAX-ACCESS    read-create
+     STATUS        deprecated
+     DESCRIPTION
+         "This value indicates the vlan mode for this endpoint. The values,
+         dual(3) and other(4) is not used in this table.
+         "
+     ::= { fdryVplsEndPointEntry 3 }
+
+  fdryVplsEndPointOutHCPkts OBJECT-TYPE
+     SYNTAX        Counter64
+     MAX-ACCESS    read-only
+     STATUS        deprecated
+     DESCRIPTION
+         "This counter indicates the number of packets egressing
+         out from this endpoint towards the Customer Edge (CE).
+         This value counts packets coming from multiple pseudo-wires
+         towards the endpoint, as well as locally switched packets
+         between other endpoints to this endpoint, all belonging
+         to the same VPLS instance.
+           The value gives count of known unicast packets only.
+         Unknown unicast and broadcast packets are not counted.
+           This object is not supported in CES/CER.
+         "
+     ::= { fdryVplsEndPointEntry 4 }
+
+  fdryVplsEndPointState OBJECT-TYPE
+       SYNTAX      INTEGER { -- picked from Syntax of dot1dStpPortState
+                            disabled(1),
+                            blocking(2),
+                            forwarding(5)
+                   }
+     MAX-ACCESS    read-only
+     STATUS        deprecated
+     DESCRIPTION
+         "A L2 state of this VPLS endpoint.
+         "
+     ::= { fdryVplsEndPointEntry 5 }
+
+  fdryVplsEndPointAdminStatus OBJECT-TYPE
+     SYNTAX        AdminStatus
+     MAX-ACCESS    read-create
+     STATUS        deprecated
+     DESCRIPTION
+         "The desired administrative status of this endpoint. This object MAY
+          be set at any time.
+         "
+     ::= { fdryVplsEndPointEntry 6 }
+
+  fdryVplsEndPointOperStatus OBJECT-TYPE
+     SYNTAX        PwOperStatusTC
+     MAX-ACCESS    read-only
+     STATUS        deprecated
+     DESCRIPTION
+         "This object indicates the operational status of this endpoint.
+         Only values up(1), down(2) are used in this table
+         "
+     ::= { fdryVplsEndPointEntry 7 }
+
+  fdryVplsEndPointRowStatus OBJECT-TYPE
+     SYNTAX        RowStatus
+     MAX-ACCESS    read-create
+     STATUS        deprecated
+     DESCRIPTION
+       "This variable is used to create, modify, and/or
+        delete a row in this table. When a row in this
+        table is in active(1) state, no objects in that row
+        can be modified except this object and the fdryVplsEndPointAdminStatus.
+         "
+     ::= { fdryVplsEndPointEntry 8 }
+
+  fdryVplsEndPointInHCOctets OBJECT-TYPE
+     SYNTAX        Counter64
+     MAX-ACCESS    read-only
+     STATUS        deprecated
+     DESCRIPTION
+         "This counter indicates the number of octets ingressing
+         into this endpoint from the Customer Edge (CE).
+           This object is supported in CES/CER only.
+         "
+     ::= { fdryVplsEndPointEntry 9 }
+
+--
+-- L2 VPN VPLS Endpoint table
+--
+  fdryVplsEndPoint2Table   OBJECT-TYPE
+     SYNTAX        SEQUENCE OF FdryVplsEndPoint2Entry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This table specifies information about the VPLS endpoints which are not
+         available in the PW mib, or VPLS draft mib.
+           This table deprecates fdryVplsEndPointTable, as inner VLAN and ISID
+         has been added as index to this table."
+     ::= { fdryMplsVplsInfo 3 }
+
+  fdryVplsEndPoint2Entry   OBJECT-TYPE
+     SYNTAX        FdryVplsEndPoint2Entry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+          "A row in this table represents a VPLS end point for a
+          given VPLS instance. The VPLS instance is represented
+          by vplsConfigTable and fdryVplsTable.
+          For a given VPLS instance, there could be multiple instances
+          of rows within this table, each describing one endpoint.
+          For a given endpoint, there will be one VPLS instance.
+          A given endpoint is represented by vplsConfigIndex (VPLS instance),
+          vlan id, inner-id (inner VLAN or ISID),and ifIndex of the physical port which is acting as an endpoint.
+          This allows a tagged port to be associated with multiple VPLS instances, and also many inner VLAN or ISID
+          to be associated with a tagged port (outer VLAN tag)
+          An untagged port can only be associated with one VPLS instance.
+          Note that this table is kept independent of the PW tables to indicate
+          that endpoints terminate on the VPLS instance.
+          On the other side, a VPLS instance will have association with the PW MIB.
+          This table is indexed by vplsConfigIndex, fdryVplsEndPointPortVlan,
+          and fdryVplsEndPointIfIndex.
+           "
+     INDEX  {vplsConfigIndex,
+             fdryVplsEndPoint2VlanId,
+             fdryVplsEndPoint2InnerTagType, --inner vlan or ISID
+             fdryVplsEndPoint2InnerTag,
+             fdryVplsEndPoint2IfIndex}
+            ::= { fdryVplsEndPoint2Table 1 }
+
+  FdryVplsEndPoint2Entry ::= SEQUENCE {
+        fdryVplsEndPoint2VlanId           PwVlanCfg ,
+        fdryVplsEndPoint2InnerTagType        INTEGER,
+        fdryVplsEndPoint2InnerTag            Unsigned32,
+        fdryVplsEndPoint2IfIndex            InterfaceIndex,
+        fdryVplsEndPoint2VlanTagMode        VlanTagMode,
+        fdryVplsEndPoint2InHCOctets           Counter64,
+        fdryVplsEndPoint2Layer2State          Layer2StateTC,
+        fdryVplsEndPoint2OperStatus           PwOperStatusTC,
+        fdryVplsEndPoint2RowStatus             RowStatus
+     }
+
+  fdryVplsEndPoint2VlanId OBJECT-TYPE
+     SYNTAX        PwVlanCfg
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This value specifies the VLAN id value of this endpoint.
+         "
+     ::= { fdryVplsEndPoint2Entry 1 }
+
+  fdryVplsEndPoint2InnerTagType OBJECT-TYPE
+     SYNTAX        INTEGER {invalid(1),innerVlan(2), isid(3)}
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the inner id for this endpoint.
+         If no inner tag is specified, value invalid(1) is returned.
+         "
+     ::= { fdryVplsEndPoint2Entry 2 }
+
+  fdryVplsEndPoint2InnerTag OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the inner tag for this endpoint.
+          If the index fdryVplsEndPoint2InnerTagType has
+          value isid(3), then this object will have the
+          ISID value for that endpoint. Valid ISID value
+          is between 256 (0x100) and 16777214 (0xFFFFFE).
+         If no inner tag is specified, value 0 is returned.
+         "
+     ::= { fdryVplsEndPoint2Entry 3 }
+
+  fdryVplsEndPoint2IfIndex OBJECT-TYPE
+     SYNTAX        InterfaceIndex
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This value specifies the ifIndex value of this endpoint.
+         "
+     ::= { fdryVplsEndPoint2Entry 4 }
+
+  fdryVplsEndPoint2VlanTagMode OBJECT-TYPE
+     SYNTAX        VlanTagMode
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the vlan mode for this endpoint. The values,
+         dual(3) and other(4) is not used in this table.
+         "
+     ::= { fdryVplsEndPoint2Entry 5 }
+
+  fdryVplsEndPoint2InHCOctets OBJECT-TYPE
+     SYNTAX        Counter64
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This counter indicates the number of octets ingressing
+         into this endpoint from the Customer Edge (CE).
+           This object is supported in CES/CER only.
+         "
+     ::= { fdryVplsEndPoint2Entry 6 }
+
+  fdryVplsEndPoint2Layer2State OBJECT-TYPE
+     SYNTAX      Layer2StateTC
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The L2 state of this VPLS endpoint.
+         "
+     ::= { fdryVplsEndPoint2Entry 7 }
+
+  fdryVplsEndPoint2OperStatus OBJECT-TYPE
+     SYNTAX        PwOperStatusTC
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This object indicates the operational status of this endpoint.
+         Only values up(1), down(2) are used in this table
+         "
+     ::= { fdryVplsEndPoint2Entry 8 }
+
+  fdryVplsEndPoint2RowStatus OBJECT-TYPE
+     SYNTAX        RowStatus
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+       "This variable is used to create, modify, and/or
+        delete a row in this table. When a row in this
+        table is in active(1) state, no objects in that row
+        can be modified except this object.
+         "
+     ::= { fdryVplsEndPoint2Entry 9 }
+
+
+
+--
+-- L2 VPN VPLS Instance Table
+--
+
+  fdryVplsTable   OBJECT-TYPE
+     SYNTAX        SEQUENCE OF FdryVplsEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This table specifies additional information about the VPLS instance configuration
+          which is not available in the VplsConfigTable. Some of these
+          objects are configuration specific, some are commands specific
+          to that VPLS instance."
+     ::= { fdryMplsVplsInfo 2 }
+
+  fdryVplsEntry   OBJECT-TYPE
+     SYNTAX        FdryVplsEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+          "A row in this table represents a VPLS instance. It augments
+          the vplsConfigTable in the VPLS draft mib.
+           "
+     AUGMENTS    { vplsConfigEntry }
+            ::= { fdryVplsTable 1 }
+
+  FdryVplsEntry ::= SEQUENCE {
+        fdryVplsClassOfService           ClassOfService ,
+        fdryVplsMaxMacLearned            Unsigned32,
+        fdryVplsClearMac        TruthValue,
+        fdryVplsVcId            Unsigned32
+     }
+
+  fdryVplsClassOfService OBJECT-TYPE
+     SYNTAX        ClassOfService
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the Class Of Service for this VPLS instance.
+         This value is used to select the appropriate tunnel
+         whose COS value is either same, or almost approaching this value.
+         "
+     DEFVAL {0}
+     ::= { fdryVplsEntry 1 }
+
+  fdryVplsMaxMacLearned OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This value indicates the maximum number of MAC addresses
+         that can be learned by this VPLS instance.
+         "
+     ::= { fdryVplsEntry 2}
+
+  fdryVplsClearMac OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-create
+     STATUS        current
+     DESCRIPTION
+         "The Set value of TRUE tells the system to clear all the MAC addresses
+         learned by this VPLS instance. Setting value of FALSE will return an error.
+         During read operations, value FALSE will be returned at all times.
+         "
+     ::= { fdryVplsEntry 3}
+
+  fdryVplsVcId OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The VPLS Instance ID of a given VPLS session.
+         "
+     ::= { fdryVplsEntry 4}
+
+--
+-- L2 VPN VPLS Endpoint Extended Statistics table
+--
+
+  brcdVplsEndptVlanExtStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BrcdVplsEndptVlanExtStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This table contains the VLAN extended statistics for VPLS endpoints."
+    ::= { fdryMplsVplsInfo 4 }
+
+  brcdVplsEndptVlanExtStatsEntry OBJECT-TYPE
+    SYNTAX  BrcdVplsEndptVlanExtStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in this table represents a VLAN extended statistics
+         accounting entry of a VPLS endpoint."
+    INDEX  {vplsConfigIndex,
+                 fdryVplsEndPoint2VlanId,
+                 fdryVplsEndPoint2InnerTagType,
+                 fdryVplsEndPoint2InnerTag,
+                 fdryVplsEndPoint2IfIndex,
+                 brcdVplsEndptVlanExtStatsPriorityId }
+::= { brcdVplsEndptVlanExtStatsTable 1 }
+
+  BrcdVplsEndptVlanExtStatsEntry ::= SEQUENCE {
+      brcdVplsEndptVlanExtStatsPriorityId
+          PortPriorityTC,
+      brcdVplsEndptVlanExtStatsInPkts
+          Counter64,
+      brcdVplsEndptVlanExtStatsOutPkts
+          Counter64,
+      brcdVplsEndptVlanExtStatsInOctets
+          Counter64,
+      brcdVplsEndptVlanExtStatsOutOctets
+          Counter64
+    }
+
+  brcdVplsEndptVlanExtStatsPriorityId OBJECT-TYPE
+    SYNTAX  PortPriorityTC
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Identifies the port QOS priority.
+         The values 1 through 8 internally maps to priorities 0 through 7.
+         The value 128 indicates that priority-level accounting is not enabled"
+    ::= { brcdVplsEndptVlanExtStatsEntry 1 }
+
+  brcdVplsEndptVlanExtStatsInPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of valid frames received by this endpoint from
+         the Customer Edge (CE)."
+    ::= { brcdVplsEndptVlanExtStatsEntry 2 }
+
+  brcdVplsEndptVlanExtStatsOutPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of valid frames transmitted by this endpoint to
+         the Customer Edge (CE)."
+    ::= { brcdVplsEndptVlanExtStatsEntry 3 }
+
+  brcdVplsEndptVlanExtStatsInOctets OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The bytes count received by this endpoint from
+         the Customer Edge (CE)."
+    ::= { brcdVplsEndptVlanExtStatsEntry 4 }
+
+  brcdVplsEndptVlanExtStatsOutOctets OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The bytes count transmitted by this endpoint to
+         the Customer Edge (CE)."
+   ::= { brcdVplsEndptVlanExtStatsEntry 5 }
+
+
+--
+  -- L2 VPN Service Notifications
+--
+
+  fdryVplsCreated NOTIFICATION-TYPE
+      OBJECTS {
+          vplsConfigName, --VPLS name
+          fdryVplsVcId --VPLS VC ID
+      }
+      STATUS          current
+      DESCRIPTION
+           "This notification is generated when an entry is created in
+            fdryVplsTable, indicating creation of a new VPLS instance.
+              This notification is not generated during system boot up time."
+      --#TYPE "Foundry Trap: MPLS VPLS Instance Created"
+      --#SUMMARY "VPLS %s (VC ID %d) has been created."
+      --#ARGUMENTS { 0, 1 }
+      --#SEVERITY INFORMATIONAL
+      --#STATE OPERATIONAL
+      ::= { fdryMplsVpnNotifications 1 }
+
+  fdryVplsDeleted NOTIFICATION-TYPE
+      OBJECTS {
+          vplsConfigName, --VPLS name
+          fdryVplsVcId --VPLS VC ID
+      }
+      STATUS          current
+      DESCRIPTION
+           "This notification is generated when one entry in the
+            fdryVplsTable have been marked for deletion, indicating
+           deletion of an existing VPLS instance."
+      --#TYPE "Foundry Trap: MPLS VPLS Instance Deleted"
+      --#SUMMARY "VPLS %s (VC ID %d) has been deleted."
+      --#ARGUMENTS { 0, 1 }
+      --#SEVERITY INFORMATIONAL
+      --#STATE OPERATIONAL
+      ::= { fdryMplsVpnNotifications 2 }
+
+  fdryPwCreated NOTIFICATION-TYPE
+      OBJECTS {
+          fdryPwServiceType,
+          pwName, --VLL or VLL-Local name
+          pwID       --VLL VC ID, value 0 for VLL-Local
+      }
+      STATUS          current
+      DESCRIPTION
+           "This notification is generated when an instance of VLL or VLL-Local
+           pseudo-wire entry is created in the pwTable.
+             The varbind fdryPwServiceType has the service type which
+           originated this notification.
+             This notification is not used for VPLS service.
+             This notification is not generated during system boot up time"
+      --#TYPE "Foundry Trap: MPLS L2VPN Instance Created"
+      --#SUMMARY "L2VPN %d (1=VLL, 2=VLL-Local) Instance %s (VC ID %d) has been created."
+      --#ARGUMENTS { 0, 1, 2 }
+      --#SEVERITY INFORMATIONAL
+      --#STATE OPERATIONAL
+      ::= { fdryMplsVpnNotifications 3 }
+
+END
+
+

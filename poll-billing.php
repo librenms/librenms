@@ -15,6 +15,8 @@
 
 chdir(dirname($argv[0]));
 
+// FIXME - implement cli switches, debugging, etc.
+
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/definitions.inc.php");
@@ -45,7 +47,10 @@ foreach (dbFetchRows("SELECT * FROM `bills`") as $bill_data)
 
 function CollectData($bill_id)
 {
-  foreach (dbFetchRows("SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id", array($bill_id)) as $port_data)
+
+  $port_list = dbFetchRows("SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id", array($bill_id));
+  print_r($port_list);
+  foreach ($port_list as $port_data)
   {
     $port_id = $port_data['port_id'];
     $host    = $port_data['hostname'];

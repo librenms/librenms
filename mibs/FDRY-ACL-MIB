@@ -1,0 +1,321 @@
+FDRY-ACL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE,
+					 Unsigned32 	FROM SNMPv2-SMI	   -- [RFC2578]
+   TEXTUAL-CONVENTION, RowStatus,
+   DisplayString, TruthValue		FROM SNMPv2-TC			-- [RFC2579]
+   Ipv6Address						FROM IPV6-TC			-- [RFC2465]
+   fdryAcl							FROM FOUNDRY-SN-ROOT-MIB -- [snroo101]
+   ;
+
+fdryAclMIB MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+		"The Brocade proprietary MIB module for Ipv6 Access Control List.
+		 It has new tables for Ipv6 Access Control List.
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION	 "200802140000Z"  -- 14 February 2008
+    DESCRIPTION  "Initial version"
+
+   ::= { fdryAcl 1 }
+
+--
+-- Textual Conventions
+--
+RtrStatus ::= TEXTUAL-CONVENTION
+	STATUS	  current
+	DESCRIPTION
+		"Represents a status value such as disabled or enabled."
+	SYNTAX	INTEGER {
+						disabled(0),
+						enabled (1)
+					}
+
+Action ::= TEXTUAL-CONVENTION
+	STATUS	  current
+	DESCRIPTION
+		"Represents a action value such as deny or permit."
+	SYNTAX	INTEGER {
+						deny(0),
+						permit (1)
+					}
+
+Operator ::= TEXTUAL-CONVENTION
+	STATUS	  current
+	DESCRIPTION
+		"Represents a operators value, such as equal, not-equal, lesser than,
+		greater than, range and undefined."
+	SYNTAX	INTEGER {
+						eq(0),
+						neq (1),
+						lt (2),
+						gt (3),
+						range (4),
+						undefined (7)
+					}
+
+IpProtocol ::= TEXTUAL-CONVENTION
+	STATUS	  current
+	DESCRIPTION
+		"Represents a transport protocol value."
+	SYNTAX	Unsigned32 (0..255)
+
+--
+-- Top level components of this MIB.
+--
+
+fdryIpv6Acl		OBJECT IDENTIFIER ::= { fdryAclMIB 1 }
+
+--
+-- Ipv6 Access Control List Table
+--
+fdryIpv6AclTable       OBJECT-TYPE
+	SYNTAX  SEQUENCE OF FdryIpv6AclEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Table of Ipv6 Access Control List"
+	::= { fdryIpv6Acl 1 }
+
+fdryIpv6AclEntry       OBJECT-TYPE
+	SYNTAX  FdryIpv6AclEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the Ipv6 Access Control List table."
+	INDEX   { fdryIpv6AclIndex }
+	::= { fdryIpv6AclTable 1 }
+
+FdryIpv6AclEntry ::= SEQUENCE {
+	fdryIpv6AclIndex
+		Unsigned32,
+	fdryIpv6AclName
+		DisplayString,
+	fdryIpv6AclAction
+		Action,
+	fdryIpv6AclProtocol
+		IpProtocol,
+	fdryIpv6AclSourceIp
+		Ipv6Address,
+	fdryIpv6AclSourcePrefixLen
+		Unsigned32,
+	fdryIpv6AclSourceOperator
+		Operator,
+	fdryIpv6AclSourceOperand1
+		Unsigned32,
+	fdryIpv6AclSourceOperand2
+		Unsigned32,
+	fdryIpv6AclDestinationIp
+		Ipv6Address,
+	fdryIpv6AclDestinationPrefixLen
+		Unsigned32,
+	fdryIpv6AclDestinationOperator
+		Operator,
+	fdryIpv6AclDestinationOperand1
+		Unsigned32,
+	fdryIpv6AclDestinationOperand2
+		Unsigned32,
+	fdryIpv6AclEstablished
+		RtrStatus,
+	fdryIpv6AclLogOption
+		TruthValue,
+	fdryIpv6AclComments
+		DisplayString,
+	fdryIpv6AclRowStatus
+		RowStatus
+	}
+
+fdryIpv6AclIndex       OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The access control list item number for an entry.
+		This is a unique number that identifies different
+		Access list entries. This one has to be
+		unique even though the name is not unique
+		for a give access list with same or different source
+		address, prefix length, destination address and destination
+		prefix length, protocol type, action (permit/deny) type and the
+		operator (neq, eq, gt and , lt)."
+	::= { fdryIpv6AclEntry 1 }
+
+fdryIpv6AclName		OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..199))
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Access Control List name for an entry."
+	::= { fdryIpv6AclEntry 2 }
+
+fdryIpv6AclAction      OBJECT-TYPE
+	SYNTAX  Action
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Action to take if the ip packet matches
+		with this access control list."
+	::= { fdryIpv6AclEntry 3 }
+
+fdryIpv6AclProtocol    OBJECT-TYPE
+	SYNTAX  IpProtocol
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Transport protocols. 0 means any protocol."
+	::= { fdryIpv6AclEntry 4 }
+
+fdryIpv6AclSourceIp    OBJECT-TYPE
+	SYNTAX  Ipv6Address
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Source Ipv6 address."
+	::= { fdryIpv6AclEntry 5 }
+
+fdryIpv6AclSourcePrefixLen  OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Source IPv6 address prefix length."
+    DEFVAL  {64}
+ 	::= { fdryIpv6AclEntry 6 }
+
+fdryIpv6AclSourceOperator    OBJECT-TYPE
+	SYNTAX  Operator
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Type of comparison to perform.
+		for now, this only applys to tcp or udp
+		to compare the port number"
+	::= { fdryIpv6AclEntry 7 }
+
+fdryIpv6AclSourceOperand1     OBJECT-TYPE
+	SYNTAX  Unsigned32(0..65535)
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"For now this only refers to transport
+		protocol port number."
+	::= { fdryIpv6AclEntry 8 }
+
+fdryIpv6AclSourceOperand2     OBJECT-TYPE
+	SYNTAX  Unsigned32(0..65535)
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"For now this only refers to transport
+		protocol port number."
+	::= { fdryIpv6AclEntry 9 }
+
+fdryIpv6AclDestinationIp      OBJECT-TYPE
+	SYNTAX  Ipv6Address
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Destination Ipv6 address."
+	::= { fdryIpv6AclEntry 10 }
+
+fdryIpv6AclDestinationPrefixLen    OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Destination IPv6 address prefix length."
+
+    DEFVAL  {64}
+ 	::= { fdryIpv6AclEntry 11 }
+
+fdryIpv6AclDestinationOperator    OBJECT-TYPE
+	SYNTAX  Operator
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Type of comparison to perform.
+		for now, this only applys to tcp or udp
+		to compare the port number"
+	::= { fdryIpv6AclEntry 12 }
+
+fdryIpv6AclDestinationOperand1     OBJECT-TYPE
+	SYNTAX  Unsigned32(0..65535)
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"For now this only refers to transport
+		protocol port number."
+	::= { fdryIpv6AclEntry 13 }
+
+fdryIpv6AclDestinationOperand2     OBJECT-TYPE
+	SYNTAX  Unsigned32(0..65535)
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"For now this only refers to transport
+		protocol port number."
+	::= { fdryIpv6AclEntry 14 }
+
+fdryIpv6AclEstablished OBJECT-TYPE
+	SYNTAX  RtrStatus
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Enable/Disable the filtering of established TCP
+		packets of which the ACK or RESET flag is on. This
+		additional filter only applies to TCP transport
+		protocol."
+	::= { fdryIpv6AclEntry 15 }
+
+fdryIpv6AclLogOption OBJECT-TYPE
+	SYNTAX  TruthValue
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Log flag, should be set to one to enable logging"
+	::= { fdryIpv6AclEntry 16 }
+
+fdryIpv6AclComments   OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Remark description of individual Access Control List entry."
+	::= { fdryIpv6AclEntry 17 }
+
+fdryIpv6AclRowStatus   OBJECT-TYPE
+	SYNTAX	RowStatus
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+			"To create or delete a access list
+			entry."
+		::= { fdryIpv6AclEntry 18 }
+	END
+
+

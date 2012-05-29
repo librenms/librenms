@@ -1,42 +1,56 @@
 FOUNDRY-SN-IP-VRRP-MIB DEFINITIONS ::= BEGIN
 
-
--- Foundry SnRouter Group MIB Release 1.0.0
--- Revision 0 1/7/97
--- Revision 1 6/5/02
--- Revision 2 08/10/02
-
--- Copyright 1996-97 Foundry Networks, Inc.
--- All rights reserved.
--- This Foundry Networks SNMP Management Information Base 
--- Specification embodies Foundry Networks' confidential and
--- proprietary intellectual property. Foundry Networks retains all
--- title and ownership in the Specification, including any
--- revisions.
-
--- This Specification is supplied "AS IS," and Foundry Networks makes
--- no warranty, either express or implied, as to the use,
--- operation, condition, or performance of the Specification.
-
--- SECTION 1: Top Level Definitions
-
--- Imports
-
 IMPORTS
-	IpAddress, Counter
-		FROM RFC1155-SMI
-	OBJECT-TYPE             
-		FROM RFC-1212
-	ifIndex FROM IF-MIB
-		
-    snVrrp FROM FOUNDRY-SN-ROOT-MIB ;
+	MODULE-IDENTITY, OBJECT-TYPE,IpAddress, Counter32,Integer32
+		FROM SNMPv2-SMI
+	router
+		FROM FOUNDRY-SN-ROOT-MIB
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	ifIndex FROM IF-MIB;
 
-	MacAddress ::=
-	      OCTET STRING (SIZE(6))
-	  -- This data type is used to model media addresses.  For many
-	  -- types of media, this will be in a binary representation.
-	  -- For example, an ethernet address would be represented as
-	  -- a string of 6 octets.
+snVrrp MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200909300000Z" -- September 30, 2009
+    DESCRIPTION
+			"convert from SMIv1 to SMIv2"
+   ::= { router 12 }
+
+	MacAddress ::= TEXTUAL-CONVENTION
+		STATUS	  current
+		DESCRIPTION
+			"
+			   This data type is used to model media addresses.  For many
+			   types of media, this will be in a binary representation.
+			   For example, an ethernet address would be represented as
+			   a string of 6 octets.
+			"
+		SYNTAX	OCTET STRING (SIZE(6))
 
 snVrrpGlobal 	OBJECT IDENTIFIER ::= { snVrrp 1 }
 snVrrpIntf 		OBJECT IDENTIFIER ::= { snVrrp 2 }
@@ -51,683 +65,683 @@ snVrrpVirRtr2 	OBJECT IDENTIFIER ::= { snVrrp 5 }
 
 snVrrpGroupOperMode OBJECT-TYPE
 	SYNTAX  INTEGER {
-		disabled(0),             
+		disabled(0),
 		enabled(1)
 		}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"The VRRP is configured on this system
 		 either enabled or disabled and the
 		 default is disabled mode.
-		 disabled(0)..........disable VRRP   
+		 disabled(0)..........disable VRRP
 		 enabled(1)...........activate VRRP"
 	::= { snVrrpGlobal 1 }
 
 snVrrpIfStateChangeTrap OBJECT-TYPE
 	SYNTAX	INTEGER { disabled(0), enabled(1) }
-	ACCESS	read-write
-	STATUS	mandatory
+	MAX-ACCESS	read-write
+	STATUS	current
 	DESCRIPTION
 		"Indicates whether the SNMP agent process is
 		permitted to generate vrrp and vrrpe interface state change
 		traps."
-    DEFVAL { enabled }
+	DEFVAL { enabled }
 	::= { snVrrpGlobal 2 }
 
 snVrrpIfMaxNumVridPerIntf OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS	read-only
-	STATUS	mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS	read-only
+	STATUS	current
 	DESCRIPTION
 		"Indicates the maximum number of VRID per interface."
 	::= { snVrrpGlobal 3 }
 
 snVrrpIfMaxNumVridPerSystem OBJECT-TYPE
-	SYNTAX	INTEGER
-	ACCESS	read-only
-	STATUS	mandatory
+	SYNTAX   Integer32
+	MAX-ACCESS	read-only
+	STATUS	current
 	DESCRIPTION
 		"Indicates the maximum number of VRID per system."
 	::= { snVrrpGlobal 4 }
 
 snVrrpClearVrrpStat OBJECT-TYPE
 	SYNTAX	INTEGER { normal(0), clear(1) }
-	ACCESS	read-write
-	STATUS	mandatory
+	MAX-ACCESS	read-write
+	STATUS	current
 	DESCRIPTION
 		"Clear VRRP statistics command."
 	::= { snVrrpGlobal 5 }
 
-snVrrpGroupOperModeVrrpextended OBJECT-TYPE 
-    SYNTAX  INTEGER {   disabled(0), enabled(1) }
-    ACCESS  read-write
-	STATUS  mandatory
-	DESCRIPTION "The VRRP_extended is configured on this system either enabled 
-        or disabled and the default is disabled mode.
-		 disabled(0)..........disable VRRP extended   
-		 enabled(1)...........activate VRRP extended" 
+snVrrpGroupOperModeVrrpextended OBJECT-TYPE
+	SYNTAX  INTEGER {   disabled(0), enabled(1) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "The VRRP_extended is configured on this system either enabled
+		or disabled and the default is disabled mode.
+		 disabled(0)..........disable VRRP extended
+		 enabled(1)...........activate VRRP extended"
 	::= { snVrrpGlobal 6 }
-	
+
 
 --  Section 2:	VRRP Interface Table
---  The following table is deprecated by snVrrpIf2Table, which is 
+--  The following table is deprecated by snVrrpIf2Table, which is
 --  ifIndex based table
 
 snVrrpIfTable OBJECT-TYPE
-    SYNTAX   SEQUENCE OF SnVrrpIfEntry
-    ACCESS   not-accessible
-    STATUS   deprecated
-    DESCRIPTION
-       "The VRRP Interface Table describes the interfaces from
-        the viewpoint of VRRP."
-    ::= { snVrrpIntf 1 }
+	SYNTAX   SEQUENCE OF SnVrrpIfEntry
+	MAX-ACCESS   not-accessible
+	STATUS   deprecated
+	DESCRIPTION
+	   "The VRRP Interface Table describes the interfaces from
+		the viewpoint of VRRP."
+	::= { snVrrpIntf 1 }
 
-     snVrrpIfEntry OBJECT-TYPE
-         SYNTAX   SnVrrpIfEntry
-         ACCESS   not-accessible
-         STATUS   deprecated
-         DESCRIPTION
-            "The VRRP Interface Entry describes one interface from
-            the viewpoint of VRRP."
-         INDEX { snVrrpIfPort }
-         ::= { snVrrpIfTable 1 }
+	 snVrrpIfEntry OBJECT-TYPE
+		 SYNTAX   SnVrrpIfEntry
+		 MAX-ACCESS   not-accessible
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The VRRP Interface Entry describes one interface from
+			the viewpoint of VRRP."
+		 INDEX { snVrrpIfPort }
+		 ::= { snVrrpIfTable 1 }
 
-     SnVrrpIfEntry ::=
-         SEQUENCE {
-             snVrrpIfPort
-			     INTEGER,
-             snVrrpIfAuthType
-			     INTEGER,
+	 SnVrrpIfEntry ::=
+		 SEQUENCE {
+			 snVrrpIfPort
+				Integer32,
+			 snVrrpIfAuthType
+				 INTEGER,
 			 snVrrpIfAuthPassword
-			     OCTET STRING,
-             snVrrpIfRxHeaderErrCnts
-			     Counter,
-             snVrrpIfRxAuthTypeErrCnts
-			     Counter,
-             snVrrpIfRxAuthPwdMismatchErrCnts
-			     Counter,
-             snVrrpIfRxVridErrCnts
-			     Counter
-         }
+				 OCTET STRING,
+			 snVrrpIfRxHeaderErrCnts
+				 Counter32,
+			 snVrrpIfRxAuthTypeErrCnts
+				 Counter32,
+			 snVrrpIfRxAuthPwdMismatchErrCnts
+				 Counter32,
+			 snVrrpIfRxVridErrCnts
+				 Counter32
+		 }
 
 
-    snVrrpIfPort OBJECT-TYPE
-         SYNTAX   INTEGER
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The IP port of this VRRP interface."
-         ::= { snVrrpIfEntry 1 }
+	snVrrpIfPort OBJECT-TYPE
+		 SYNTAX   Integer32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The IP port of this VRRP interface."
+		 ::= { snVrrpIfEntry 1 }
 
-    snVrrpIfAuthType OBJECT-TYPE
-         SYNTAX   INTEGER { 
-         				noAuth(0), 
-         				simpleTextPasswd(1), 
+	snVrrpIfAuthType OBJECT-TYPE
+		 SYNTAX   INTEGER {
+						noAuth(0),
+						simpleTextPasswd(1),
 						ipAuthHeader(2)
 						}
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "The authentication type of this interface."
-         ::= { snVrrpIfEntry 2 }
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The authentication type of this interface."
+		 ::= { snVrrpIfEntry 2 }
 
-    snVrrpIfAuthPassword OBJECT-TYPE
+	snVrrpIfAuthPassword OBJECT-TYPE
 		 SYNTAX	  OCTET STRING (SIZE (0..8))
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "The simple text password is allowed if only if 
-            the snVrrpIfAuthType type is simpleTextPasswd(1)."
-         ::= { snVrrpIfEntry 3 }
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The simple text password is allowed if only if
+			the snVrrpIfAuthType type is simpleTextPasswd(1)."
+		 ::= { snVrrpIfEntry 3 }
 
-    snVrrpIfRxHeaderErrCnts OBJECT-TYPE
-         SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The received Header error counts in this interface."
-         ::= { snVrrpIfEntry 4 }
+	snVrrpIfRxHeaderErrCnts OBJECT-TYPE
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The received Header error counts in this interface."
+		 ::= { snVrrpIfEntry 4 }
 
-    snVrrpIfRxAuthTypeErrCnts OBJECT-TYPE
-         SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The received authentication type error counts in this interface."
-         ::= { snVrrpIfEntry 5 }
+	snVrrpIfRxAuthTypeErrCnts OBJECT-TYPE
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The received authentication type error counts in this interface."
+		 ::= { snVrrpIfEntry 5 }
 
-    snVrrpIfRxAuthPwdMismatchErrCnts OBJECT-TYPE
-         SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The received authentication password mismatched error counts in this interface."
-         ::= { snVrrpIfEntry 6 }
+	snVrrpIfRxAuthPwdMismatchErrCnts OBJECT-TYPE
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The received authentication password mismatched error counts in this interface."
+		 ::= { snVrrpIfEntry 6 }
 
-    snVrrpIfRxVridErrCnts OBJECT-TYPE
-         SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The received unfound VRID error counts in this interface."
-         ::= { snVrrpIfEntry 7 }
+	snVrrpIfRxVridErrCnts OBJECT-TYPE
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The received unfound VRID error counts in this interface."
+		 ::= { snVrrpIfEntry 7 }
 
---  Section 3:	VRRP and VRRP-Extended Interface Table, 
+--  Section 3:	VRRP and VRRP-Extended Interface Table,
 --              this is a modified vrrp/vrrpe interface table with ifIndex.
 --              NOTE: Protocols VRRPE and VRRP-Extended are one and the same.
 
 snVrrpIf2Table OBJECT-TYPE
-    SYNTAX   SEQUENCE OF SnVrrpIf2Entry
-    ACCESS   not-accessible
-    STATUS   mandatory
-    DESCRIPTION
-       "The VRRP and VRRPE Interface Table describes the interfaces from
-        the viewpoint of VRRP and VRRPE."
-    ::= { snVrrpIntf2 1 }
+	SYNTAX   SEQUENCE OF SnVrrpIf2Entry
+	MAX-ACCESS   not-accessible
+	STATUS   current
+	DESCRIPTION
+	   "The VRRP and VRRPE Interface Table describes the interfaces from
+		the viewpoint of VRRP and VRRPE."
+	::= { snVrrpIntf2 1 }
 
-     snVrrpIf2Entry OBJECT-TYPE
-         SYNTAX   SnVrrpIf2Entry
-         ACCESS   not-accessible
-         STATUS   mandatory
-         DESCRIPTION
-            "The VRRP and VRRPE Interface Entry describes one interface from
-            the viewpoint of VRRP and VRRPE."
-         INDEX { ifIndex}
-         ::= { snVrrpIf2Table 1 }
+	 snVrrpIf2Entry OBJECT-TYPE
+		 SYNTAX   SnVrrpIf2Entry
+		 MAX-ACCESS   not-accessible
+		 STATUS   current
+		 DESCRIPTION
+			"The VRRP and VRRPE Interface Entry describes one interface from
+			the viewpoint of VRRP and VRRPE."
+		 INDEX { ifIndex}
+		 ::= { snVrrpIf2Table 1 }
 
-     SnVrrpIf2Entry ::=
-         SEQUENCE {
-             snVrrpIf2AuthType
-			     INTEGER,
+	 SnVrrpIf2Entry ::=
+		 SEQUENCE {
+			 snVrrpIf2AuthType
+				 INTEGER,
 			 snVrrpIf2AuthPassword
-			     OCTET STRING,
-             snVrrpIf2RxHeaderErrCnts
-			     Counter,
-             snVrrpIf2RxAuthTypeErrCnts
-			     Counter,
-             snVrrpIf2RxAuthPwdMismatchErrCnts
-			     Counter,
-             snVrrpIf2RxVridErrCnts
-			     Counter
-         }
+				 OCTET STRING,
+			 snVrrpIf2RxHeaderErrCnts
+				 Counter32,
+			 snVrrpIf2RxAuthTypeErrCnts
+				 Counter32,
+			 snVrrpIf2RxAuthPwdMismatchErrCnts
+				 Counter32,
+			 snVrrpIf2RxVridErrCnts
+				 Counter32
+		 }
 
-    snVrrpIf2AuthType OBJECT-TYPE
-         SYNTAX   INTEGER { 
-         				noAuth(0), 
-         				simpleTextPasswd(1), 
+	snVrrpIf2AuthType OBJECT-TYPE
+		 SYNTAX   INTEGER {
+						noAuth(0),
+						simpleTextPasswd(1),
 						ipAuthHeader(2)
 						}
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "The authentication type of this interface."
-         ::= { snVrrpIf2Entry 1 }
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"The authentication type of this interface."
+		 ::= { snVrrpIf2Entry 1 }
 
-    snVrrpIf2AuthPassword OBJECT-TYPE
+	snVrrpIf2AuthPassword OBJECT-TYPE
 		 SYNTAX	  OCTET STRING (SIZE (0..8))
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "The simple text password is allowed if only if 
-            the snVrrpIf2AuthType type is simpleTextPasswd(1)."
-         ::= { snVrrpIf2Entry 2 }
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"The simple text password is allowed if only if
+			the snVrrpIf2AuthType type is simpleTextPasswd(1)."
+		 ::= { snVrrpIf2Entry 2 }
 
-    snVrrpIf2RxHeaderErrCnts OBJECT-TYPE
-         SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "The received Header error counts in this interface."
-         ::= { snVrrpIf2Entry 3 }
+	snVrrpIf2RxHeaderErrCnts OBJECT-TYPE
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The received Header error counts in this interface."
+		 ::= { snVrrpIf2Entry 3 }
 
-    snVrrpIf2RxAuthTypeErrCnts OBJECT-TYPE
-         SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "The received authentication type error counts in this interface."
-         ::= { snVrrpIf2Entry 4 }
+	snVrrpIf2RxAuthTypeErrCnts OBJECT-TYPE
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The received authentication type error counts in this interface."
+		 ::= { snVrrpIf2Entry 4 }
 
-    snVrrpIf2RxAuthPwdMismatchErrCnts OBJECT-TYPE
-         SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "The received authentication password mismatched error counts in this interface."
-         ::= { snVrrpIf2Entry 5 }
+	snVrrpIf2RxAuthPwdMismatchErrCnts OBJECT-TYPE
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The received authentication password mismatched error counts in this interface."
+		 ::= { snVrrpIf2Entry 5 }
 
-    snVrrpIf2RxVridErrCnts OBJECT-TYPE
-         SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "The received unfound VRID error counts in this interface."
-         ::= { snVrrpIf2Entry 6 }
+	snVrrpIf2RxVridErrCnts OBJECT-TYPE
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The received unfound VRID error counts in this interface."
+		 ::= { snVrrpIf2Entry 6 }
 
 --  Section 4: VRRP virtual Router Configuration Table.
 
---      The VRRP (Virtual Router Redundancy Protocol) Virtual Router Table augments 
+--      The VRRP (Virtual Router Redundancy Protocol) Virtual Router Table augments
 --		with VRRP specific information.
---      The following table is deprecated by snVrrpVirRtr2Table, which is 
---      ifIndex based table 
+--      The following table is deprecated by snVrrpVirRtr2Table, which is
+--      ifIndex based table
 
 snVrrpVirRtrTable OBJECT-TYPE
-    SYNTAX   SEQUENCE OF SnVrrpVirRtrEntry
-    ACCESS   not-accessible
-    STATUS   deprecated
-    DESCRIPTION
-       "The VRRP virtual router Entry describes one virtual router from
-        the viewpoint of VRRP."
-    ::= { snVrrpVirRtr 1 }
+	SYNTAX   SEQUENCE OF SnVrrpVirRtrEntry
+	MAX-ACCESS   not-accessible
+	STATUS   deprecated
+	DESCRIPTION
+	   "The VRRP virtual router Entry describes one virtual router from
+		the viewpoint of VRRP."
+	::= { snVrrpVirRtr 1 }
 
-     snVrrpVirRtrEntry OBJECT-TYPE
-         SYNTAX   SnVrrpVirRtrEntry
-         ACCESS   not-accessible
-         STATUS   deprecated
-         DESCRIPTION
-            "The VRRP virtual router Entry describes one virtual router from
-            the viewpoint of VRRP."
-         INDEX { snVrrpVirRtrPort, snVrrpVirRtrId }
-         ::= { snVrrpVirRtrTable 1 }
+	 snVrrpVirRtrEntry OBJECT-TYPE
+		 SYNTAX   SnVrrpVirRtrEntry
+		 MAX-ACCESS   not-accessible
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The VRRP virtual router Entry describes one virtual router from
+			the viewpoint of VRRP."
+		 INDEX { snVrrpVirRtrPort, snVrrpVirRtrId }
+		 ::= { snVrrpVirRtrTable 1 }
 
-     SnVrrpVirRtrEntry ::=
-         SEQUENCE {
-             snVrrpVirRtrPort
-			     INTEGER,
-             snVrrpVirRtrId
-			     INTEGER,
-             snVrrpVirRtrOwnership
-			     INTEGER,
-             snVrrpVirRtrCfgPriority
-                 INTEGER,
-             snVrrpVirRtrTrackPriority
-                 INTEGER,
-             snVrrpVirRtrCurrPriority
-                 INTEGER,
-			 snVrrpVirRtrHelloInt 
+	 SnVrrpVirRtrEntry ::=
+		 SEQUENCE {
+			 snVrrpVirRtrPort
+				 Integer32,
+			 snVrrpVirRtrId
 				 INTEGER,
-			 snVrrpVirRtrDeadInt 
+			 snVrrpVirRtrOwnership
 				 INTEGER,
-			 snVrrpVirRtrPreemptMode 
+			 snVrrpVirRtrCfgPriority
+				 INTEGER,
+			 snVrrpVirRtrTrackPriority
+				 INTEGER,
+			 snVrrpVirRtrCurrPriority
+				 INTEGER,
+			 snVrrpVirRtrHelloInt
+				 INTEGER,
+			 snVrrpVirRtrDeadInt
+				 INTEGER,
+			 snVrrpVirRtrPreemptMode
 				 INTEGER,
 			 snVrrpVirRtrState
 				 INTEGER,
-			 snVrrpVirRtrActivate 
+			 snVrrpVirRtrActivate
 				 INTEGER,
-             snVrrpVirRtrIpAddrMask
-                 OCTET STRING,
-             snVrrpVirRtrTrackPortMask
-                 OCTET STRING,
-             snVrrpVirRtrTrackVifMask
-                 OCTET STRING,
-			 snVrrpVirRtrRowStatus 
+			 snVrrpVirRtrIpAddrMask
+				 OCTET STRING,
+			 snVrrpVirRtrTrackPortMask
+				 OCTET STRING,
+			 snVrrpVirRtrTrackVifMask
+				 OCTET STRING,
+			 snVrrpVirRtrRowStatus
 				 INTEGER,
-			 snVrrpVirRtrRxArpPktDropCnts 
-				 Counter,
-			 snVrrpVirRtrRxIpPktDropCnts 
-				 Counter,
-			 snVrrpVirRtrRxPortMismatchCnts 
-				 Counter,
-			 snVrrpVirRtrRxNumOfIpMismatchCnts 
-				 Counter,
-			 snVrrpVirRtrRxIpMismatchCnts 
-				 Counter,
-			 snVrrpVirRtrRxHelloIntMismatchCnts 
-				 Counter,
-			 snVrrpVirRtrRxPriorityZeroFromMasterCnts 
-				 Counter,
-			 snVrrpVirRtrRxHigherPriorityCnts 
-				 Counter,
-			 snVrrpVirRtrTransToMasterStateCnts 
-				 Counter,
-			 snVrrpVirRtrTransToBackupStateCnts 
-				 Counter,
-			 snVrrpVirRtrCurrDeadInt 
-				 INTEGER,
-             snVrrpVirRtrTrackPortList
-                 OCTET STRING,
-             snVrrpVirRtrTrackVifPortList
-                 OCTET STRING
-         }
+			 snVrrpVirRtrRxArpPktDropCnts
+				 Counter32,
+			 snVrrpVirRtrRxIpPktDropCnts
+				 Counter32,
+			 snVrrpVirRtrRxPortMismatchCnts
+				 Counter32,
+			 snVrrpVirRtrRxNumOfIpMismatchCnts
+				 Counter32,
+			 snVrrpVirRtrRxIpMismatchCnts
+				 Counter32,
+			 snVrrpVirRtrRxHelloIntMismatchCnts
+				 Counter32,
+			 snVrrpVirRtrRxPriorityZeroFromMasterCnts
+				 Counter32,
+			 snVrrpVirRtrRxHigherPriorityCnts
+				 Counter32,
+			 snVrrpVirRtrTransToMasterStateCnts
+				 Counter32,
+			 snVrrpVirRtrTransToBackupStateCnts
+				 Counter32,
+			 snVrrpVirRtrCurrDeadInt
+				 Integer32,
+			 snVrrpVirRtrTrackPortList
+				 OCTET STRING,
+			 snVrrpVirRtrTrackVifPortList
+				 OCTET STRING
+		 }
 
 
-    snVrrpVirRtrPort OBJECT-TYPE
-         SYNTAX   INTEGER
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The IP port of this VRRP interface."
-         ::= { snVrrpVirRtrEntry 1 }
+	snVrrpVirRtrPort OBJECT-TYPE
+		 SYNTAX   Integer32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The IP port of this VRRP interface."
+		 ::= { snVrrpVirRtrEntry 1 }
 
-    snVrrpVirRtrId OBJECT-TYPE
-         SYNTAX   INTEGER (1..255)
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "One of the virtual router ID of this VRRP interface."
-         ::= { snVrrpVirRtrEntry 2 }
+	snVrrpVirRtrId OBJECT-TYPE
+		 SYNTAX   INTEGER (1..255)
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"One of the virtual router ID of this VRRP interface."
+		 ::= { snVrrpVirRtrEntry 2 }
 
-    snVrrpVirRtrOwnership OBJECT-TYPE
-	     SYNTAX   INTEGER {
+	snVrrpVirRtrOwnership OBJECT-TYPE
+		 SYNTAX   INTEGER {
 					incomplete(0),
 					owner(1),
 					backup(2)
 					}
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "The ownership of this VRRP router interface 
-            can be set either owner(1) or backup(2).  
-            VirRtr SNMP-GET returns incomplete(0), it means 
-            no IP address has assigned to this VRRP router interface."
-         ::= { snVrrpVirRtrEntry 3 }
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The ownership of this VRRP router interface
+			can be set either owner(1) or backup(2).
+			VirRtr SNMP-GET returns incomplete(0), it means
+			no IP address has assigned to this VRRP router interface."
+		 ::= { snVrrpVirRtrEntry 3 }
 
-     snVrrpVirRtrCfgPriority OBJECT-TYPE
-         SYNTAX   INTEGER (3..254)
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "The higher the number the higher the priority is.
-            This parameter decides which backup router should becomes
-            the Active Router for the interface.  A backup Router with
-            higher priority selected to becomes the Active Router.
-            Therefore, this Object can be set if only if snVrrpVirRtrOwnership
-            is set to backup(2)."
-         DEFVAL { 100 }
-         ::= { snVrrpVirRtrEntry 4 }
+	 snVrrpVirRtrCfgPriority OBJECT-TYPE
+		 SYNTAX   INTEGER (3..254)
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The higher the number the higher the priority is.
+			This parameter decides which backup router should becomes
+			the Active Router for the interface.  A backup Router with
+			higher priority selected to becomes the Active Router.
+			Therefore, this Object can be set if only if snVrrpVirRtrOwnership
+			is set to backup(2)."
+		 DEFVAL { 100 }
+		 ::= { snVrrpVirRtrEntry 4 }
 
-     snVrrpVirRtrTrackPriority OBJECT-TYPE
-         SYNTAX   INTEGER (1..254)
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "The higher the number the higher the priority is.
-            after this object is configured, the snVrrpVirRtrCurrPriority 
-            of this interface will be adjusted dynamically with this
+	 snVrrpVirRtrTrackPriority OBJECT-TYPE
+		 SYNTAX   INTEGER (1..254)
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The higher the number the higher the priority is.
+			after this object is configured, the snVrrpVirRtrCurrPriority
+			of this interface will be adjusted dynamically with this
 			track priority when the Track Port states first
-            changes from UP to DOWN."
-         ::= { snVrrpVirRtrEntry 5 }
+			changes from UP to DOWN."
+		 ::= { snVrrpVirRtrEntry 5 }
 
-     snVrrpVirRtrCurrPriority OBJECT-TYPE
-         SYNTAX   INTEGER (1..254)
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The higher the number the higher the priority is.
-            This object will be adjusted dynamically with the
+	 snVrrpVirRtrCurrPriority OBJECT-TYPE
+		 SYNTAX   INTEGER (1..254)
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The higher the number the higher the priority is.
+			This object will be adjusted dynamically with the
 			track priority when the Track Port states first
-            changes from UP to DOWN."
-         ::= { snVrrpVirRtrEntry 6 }
+			changes from UP to DOWN."
+		 ::= { snVrrpVirRtrEntry 6 }
 
-     snVrrpVirRtrHelloInt OBJECT-TYPE
-         SYNTAX   INTEGER (1..84)
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "Time interval between advertisements (seconds)."
-         DEFVAL { 1 }
-         ::= { snVrrpVirRtrEntry 7 }
+	 snVrrpVirRtrHelloInt OBJECT-TYPE
+		 SYNTAX   INTEGER (1..84)
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"Time interval between advertisements (seconds)."
+		 DEFVAL { 1 }
+		 ::= { snVrrpVirRtrEntry 7 }
 
-     snVrrpVirRtrDeadInt OBJECT-TYPE
-         SYNTAX   INTEGER (1..84)
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "Dead interval (seconds)."
-         DEFVAL { 1 }
-         ::= { snVrrpVirRtrEntry 8 }
+	 snVrrpVirRtrDeadInt OBJECT-TYPE
+		 SYNTAX   INTEGER (1..84)
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"Dead interval (seconds)."
+		 DEFVAL { 1 }
+		 ::= { snVrrpVirRtrEntry 8 }
 
-     snVrrpVirRtrPreemptMode OBJECT-TYPE
-         SYNTAX   INTEGER { disabled(0), enabled(1) }
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "This mode controls whether a higher priority Backup router
-            preempts a lower priority Master.  The mode with enabled(1)
-            allow preemption and disabled(0) prohibit preemption."
-         DEFVAL { enabled }
-         ::= { snVrrpVirRtrEntry 9 }
+	 snVrrpVirRtrPreemptMode OBJECT-TYPE
+		 SYNTAX   INTEGER { disabled(0), enabled(1) }
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"This mode controls whether a higher priority Backup router
+			preempts a lower priority Master.  The mode with enabled(1)
+			allow preemption and disabled(0) prohibit preemption."
+		 DEFVAL { enabled }
+		 ::= { snVrrpVirRtrEntry 9 }
 
 	 snVrrpVirRtrState OBJECT-TYPE
-	     SYNTAX   INTEGER {
+		 SYNTAX   INTEGER {
 					init(0),
 					master(1),
 					backup(2)
 				  }
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "This object specifies the VRRP Router's interface state as:
-            init(0)...initialization state.
-            master(1)...master state.
-            backup(2)...backup state."
-         ::= { snVrrpVirRtrEntry 10 }
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"This object specifies the VRRP Router's interface state as:
+			init(0)...initialization state.
+			master(1)...master state.
+			backup(2)...backup state."
+		 ::= { snVrrpVirRtrEntry 10 }
 
 	 snVrrpVirRtrActivate OBJECT-TYPE
-	     SYNTAX   INTEGER {
+		 SYNTAX   INTEGER {
 					disabled(0),
 					enabled(1)
 				  }
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "This object specifies the VRRP Router's activate command as:
-            disabled(0)...deactivate this VRRP Router.
-            enabled(1)....activate this VRRP Router."
-         ::= { snVrrpVirRtrEntry 11 }
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"This object specifies the VRRP Router's activate command as:
+			disabled(0)...deactivate this VRRP Router.
+			enabled(1)....activate this VRRP Router."
+		 ::= { snVrrpVirRtrEntry 11 }
 
-    snVrrpVirRtrIpAddrMask OBJECT-TYPE
+	snVrrpVirRtrIpAddrMask OBJECT-TYPE
 		 SYNTAX  OCTET STRING (SIZE(64))
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "The numbers of IP Addresses of this virtual router of this interface."
-         ::= { snVrrpVirRtrEntry 12 }
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The numbers of IP Addresses of this virtual router of this interface."
+		 ::= { snVrrpVirRtrEntry 12 }
 
-     snVrrpVirRtrTrackPortMask OBJECT-TYPE
+	 snVrrpVirRtrTrackPortMask OBJECT-TYPE
 		 SYNTAX  OCTET STRING (SIZE(4..32))
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "This object specifies the identity of the physical port
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"This object specifies the identity of the physical port
 			whose state is to be monitored.  Each bit is a port of
 			the system. Default value is 0.  VirRtr this object is configured
 			then the Preference Level of this interface will be adjusted
 			dynamically depending on the state of the Track Port.
-            The interface's Preference Level is reduced by value of 
-            Preference Level parameter when the Track Port states first
-            changes from UP to DOWN.  When the Track Port next comes up
-            the interface's Preference Level is increased by the amount
-            specified by the Preference Level.
-            The Chassis/Stackable router VRRP Track port membership.
-            The size of the OCTET STRING for Chassis is 32.
-            The size of the OCTET STRING for Stackable is 4.
-            (It was obsoleted after release 07100, replaced by snVrrpVirRtrTrackPortList)"
-         ::= { snVrrpVirRtrEntry 13 }
+			The interface's Preference Level is reduced by value of
+			Preference Level parameter when the Track Port states first
+			changes from UP to DOWN.  When the Track Port next comes up
+			the interface's Preference Level is increased by the amount
+			specified by the Preference Level.
+			The Chassis/Stackable router VRRP Track port membership.
+			The size of the OCTET STRING for Chassis is 32.
+			The size of the OCTET STRING for Stackable is 4.
+			(It was obsoleted after release 07100, replaced by snVrrpVirRtrTrackPortList)"
+		 ::= { snVrrpVirRtrEntry 13 }
 
-     snVrrpVirRtrTrackVifMask OBJECT-TYPE
+	 snVrrpVirRtrTrackVifMask OBJECT-TYPE
 		 SYNTAX  OCTET STRING (SIZE(4..512))
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "This object specifies the identity of the virtual interface 
-            whose state is to be monitored.  Each bit is a port of
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"This object specifies the identity of the virtual interface
+			whose state is to be monitored.  Each bit is a port of
 			the system. Default value is 0.  VirRtr this object is configured
 			then the Preference Level of this interface will be adjusted
 			dynamically depending on the state of the Track Port.
-            The interface's Preference Level is reduced by value of 
-            Preference Level parameter when the Track Port states first
-            changes from UP to DOWN.  When the Track Port next comes up
-            the interface's Preference Level is increased by the amount
-            specified by the Preference Level.
-            The Chassis/Stackable router VRRP Track port membership
-            The size of the OCTET STRING for Chassis is 8.
-            The size of the OCTET STRING for Stackable is 4.
-            (It was obsoleted after release 07100, replaced by snVrrpVirRtrTrackVifPortList)"
-         ::= { snVrrpVirRtrEntry 14 }
+			The interface's Preference Level is reduced by value of
+			Preference Level parameter when the Track Port states first
+			changes from UP to DOWN.  When the Track Port next comes up
+			the interface's Preference Level is increased by the amount
+			specified by the Preference Level.
+			The Chassis/Stackable router VRRP Track port membership
+			The size of the OCTET STRING for Chassis is 8.
+			The size of the OCTET STRING for Stackable is 4.
+			(It was obsoleted after release 07100, replaced by snVrrpVirRtrTrackVifPortList)"
+		 ::= { snVrrpVirRtrEntry 14 }
 
-     snVrrpVirRtrRowStatus OBJECT-TYPE
-	     SYNTAX   INTEGER {
+	 snVrrpVirRtrRowStatus OBJECT-TYPE
+		 SYNTAX   INTEGER {
 					invalid(1),
 					valid(2),
 					delete(3),
 					create(4),
 					modify(5)
 				  }
-		 ACCESS   read-write
-	     STATUS   deprecated
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
 		 DESCRIPTION
-		 	"This object is used to create and
-		     delete row in the table and control
+			"This object is used to create and
+			 delete row in the table and control
 			 if they are used. The values
-		     that can be written are:
-		     delete(3)...deletes the row
-		     create(4)...creates a new row
-		     modify(5)...modifies an existing row
+			 that can be written are:
+			 delete(3)...deletes the row
+			 create(4)...creates a new row
+			 modify(5)...modifies an existing row
 
-		     VirRtr the row exists, then a SET with
-		     value of create(4) returns error
-		     'badValue'. Deleted rows go away
-		     immediately. The following values
-		     can be returned on reads:
-		     noSuch(0)...no such row
-		     invalid(1)...Setting it to 'invalid' has the effect of
-                          rendering it inoperative..
-		     valid(2)....the row exists and is valid"
-	     ::= { snVrrpVirRtrEntry 15 }
+			 VirRtr the row exists, then a SET with
+			 value of create(4) returns error
+			 'badValue'. Deleted rows go away
+			 immediately. The following values
+			 can be returned on reads:
+			 noSuch(0)...no such row
+			 invalid(1)...Setting it to 'invalid' has the effect of
+						  rendering it inoperative..
+			 valid(2)....the row exists and is valid"
+		 ::= { snVrrpVirRtrEntry 15 }
 
 	 snVrrpVirRtrRxArpPktDropCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The received VRRP ARP Packet Drop Counts."
-         ::= { snVrrpVirRtrEntry 16 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The received VRRP ARP Packet Drop Counts."
+		 ::= { snVrrpVirRtrEntry 16 }
 
 	 snVrrpVirRtrRxIpPktDropCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The received VRRP IP Packet Drop Counts."
-         ::= { snVrrpVirRtrEntry 17 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The received VRRP IP Packet Drop Counts."
+		 ::= { snVrrpVirRtrEntry 17 }
 
 	 snVrrpVirRtrRxPortMismatchCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The received VRRP Port mismatching Counts."
-         ::= { snVrrpVirRtrEntry 18 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The received VRRP Port mismatching Counts."
+		 ::= { snVrrpVirRtrEntry 18 }
 
 	 snVrrpVirRtrRxNumOfIpMismatchCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The received VRRP Number of IP Addresses mismatching Counts."
-         ::= { snVrrpVirRtrEntry 19 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The received VRRP Number of IP Addresses mismatching Counts."
+		 ::= { snVrrpVirRtrEntry 19 }
 
 	 snVrrpVirRtrRxIpMismatchCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "The received VRRP IP Address mismatching Counts."
-         ::= { snVrrpVirRtrEntry 20 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The received VRRP IP Address mismatching Counts."
+		 ::= { snVrrpVirRtrEntry 20 }
 
 	 snVrrpVirRtrRxHelloIntMismatchCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-  			"The counts of the virtual router interface with hello interval mismatch counts."
-         ::= { snVrrpVirRtrEntry 21 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The counts of the virtual router interface with hello interval mismatch counts."
+		 ::= { snVrrpVirRtrEntry 21 }
 
 	 snVrrpVirRtrRxPriorityZeroFromMasterCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-  			"The counts of the virtual router interface with Priority zero from the master."
-         ::= { snVrrpVirRtrEntry 22 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The counts of the virtual router interface with Priority zero from the master."
+		 ::= { snVrrpVirRtrEntry 22 }
 
 	 snVrrpVirRtrRxHigherPriorityCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-  			"The counts of the virtual router interface with higher Priority."
-         ::= { snVrrpVirRtrEntry 23 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The counts of the virtual router interface with higher Priority."
+		 ::= { snVrrpVirRtrEntry 23 }
 
 	 snVrrpVirRtrTransToMasterStateCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-  			"The counts of the virtual router interface transition to master state."
-         ::= { snVrrpVirRtrEntry 24 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The counts of the virtual router interface transition to master state."
+		 ::= { snVrrpVirRtrEntry 24 }
 
 	 snVrrpVirRtrTransToBackupStateCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-  			"The counts of the virtual router interface transition to backup state."
-         ::= { snVrrpVirRtrEntry 25 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"The counts of the virtual router interface transition to backup state."
+		 ::= { snVrrpVirRtrEntry 25 }
 
-     snVrrpVirRtrCurrDeadInt OBJECT-TYPE
-         SYNTAX   INTEGER 
-         ACCESS   read-only
-         STATUS   deprecated
-         DESCRIPTION
-            "Current Dead interval (in 100 milliseconds)."
-         ::= { snVrrpVirRtrEntry 26 }
+	 snVrrpVirRtrCurrDeadInt OBJECT-TYPE
+		 SYNTAX   Integer32
+		 MAX-ACCESS   read-only
+		 STATUS   deprecated
+		 DESCRIPTION
+			"Current Dead interval (in 100 milliseconds)."
+		 ::= { snVrrpVirRtrEntry 26 }
 
-     snVrrpVirRtrTrackPortList OBJECT-TYPE
+	 snVrrpVirRtrTrackPortList OBJECT-TYPE
 		 SYNTAX  OCTET STRING
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "This object specifies the identity of the physical port
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"This object specifies the identity of the physical port
 			whose state is to be monitored.  Each port index is a
 			16-bit integer in big endian order. 8-bit is the slot
 			number, the other 8-bit is the port number. Default value
 			is 0 length octet string.  If this object is configured
 			then the Preference Level of this interface will be adjusted
 			dynamically depending on the state of the Track Port.
-            The interface's Preference Level is reduced by value of 
-            Preference Level parameter when the Track Port states first
-            changes from UP to DOWN.  When the Track Port next comes up
-            the interface's Preference Level is increased by the amount
-            specified by the Preference Level.
-            The router VRRP physical track port membership."
-         ::= { snVrrpVirRtrEntry 27 }
+			The interface's Preference Level is reduced by value of
+			Preference Level parameter when the Track Port states first
+			changes from UP to DOWN.  When the Track Port next comes up
+			the interface's Preference Level is increased by the amount
+			specified by the Preference Level.
+			The router VRRP physical track port membership."
+		 ::= { snVrrpVirRtrEntry 27 }
 
-     snVrrpVirRtrTrackVifPortList OBJECT-TYPE
+	 snVrrpVirRtrTrackVifPortList OBJECT-TYPE
 		 SYNTAX  OCTET STRING
-         ACCESS   read-write
-         STATUS   deprecated
-         DESCRIPTION
-            "This object specifies the identity of the virtual interface 
-            whose state is to be monitored.  Each port index is a
+		 MAX-ACCESS   read-write
+		 STATUS   deprecated
+		 DESCRIPTION
+			"This object specifies the identity of the virtual interface
+			whose state is to be monitored.  Each port index is a
 			16-bit integer in big endian order.  Default value
 			is 0 length octet string.  If this object is configured
 			then the Preference Level of this interface will be adjusted
 			dynamically depending on the state of the Track Port.
-            The interface's Preference Level is reduced by value of 
-            Preference Level parameter when the Track Port states first
-            changes from UP to DOWN.  When the Track Port next comes up
-            the interface's Preference Level is increased by the amount
-            specified by the Preference Level.
-            The router VRRP virtual port track membership."
-         ::= { snVrrpVirRtrEntry 28 }
+			The interface's Preference Level is reduced by value of
+			Preference Level parameter when the Track Port states first
+			changes from UP to DOWN.  When the Track Port next comes up
+			the interface's Preference Level is increased by the amount
+			specified by the Preference Level.
+			The router VRRP virtual port track membership."
+		 ::= { snVrrpVirRtrEntry 28 }
 
 
 --  Section 5: VRRP and VRRPE Virtual Router Configuration Table,  ifIndex based
 
---      The VRRP(Virtual Router Redundancy Protocol, rfc 2338 based, made an 
+--      The VRRP(Virtual Router Redundancy Protocol, rfc 2338 based, made an
 --      enhancement!) and VRRPE (Virtual Router Redundancy Protocol foundry extended)
 --      configuration.
 --      Added snVrrpVirRtr2CurrDeadInt, snVrrpVirRtr2AdvertiseBackup, SnVrrpVirRtr2VirtualMacAddr
@@ -735,410 +749,410 @@ snVrrpVirRtrTable OBJECT-TYPE
 --      and deleted port masks objects and virtual interface track port list.
 
 snVrrpVirRtr2Table OBJECT-TYPE
-    SYNTAX   SEQUENCE OF SnVrrpVirRtr2Entry
-    ACCESS   not-accessible
-    STATUS   mandatory
-    DESCRIPTION
-       "The Vrrp and Vrrpe virtual router Entry describes one virtual router from
-        the viewpoint of Vrrp and Vrrpe."
-    ::= { snVrrpVirRtr2 1 }
+	SYNTAX   SEQUENCE OF SnVrrpVirRtr2Entry
+	MAX-ACCESS   not-accessible
+	STATUS   current
+	DESCRIPTION
+	   "The Vrrp and Vrrpe virtual router Entry describes one virtual router from
+		the viewpoint of Vrrp and Vrrpe."
+	::= { snVrrpVirRtr2 1 }
 
-     snVrrpVirRtr2Entry OBJECT-TYPE
-         SYNTAX   SnVrrpVirRtr2Entry
-         ACCESS   not-accessible
-         STATUS   mandatory
-         DESCRIPTION
-            "The Vrrp and Vrrpe virtual router Entry describes one virtual router from
-            the viewpoint of Vrrp and Vrrpe."
-         INDEX { ifIndex, snVrrpVirRtr2Id }
-         ::= { snVrrpVirRtr2Table 1 }
+	 snVrrpVirRtr2Entry OBJECT-TYPE
+		 SYNTAX   SnVrrpVirRtr2Entry
+		 MAX-ACCESS   not-accessible
+		 STATUS   current
+		 DESCRIPTION
+			"The Vrrp and Vrrpe virtual router Entry describes one virtual router from
+			the viewpoint of Vrrp and Vrrpe."
+		 INDEX { ifIndex, snVrrpVirRtr2Id }
+		 ::= { snVrrpVirRtr2Table 1 }
 
-     SnVrrpVirRtr2Entry ::=
-         SEQUENCE {
-             snVrrpVirRtr2Id
-			     INTEGER,
-             snVrrpVirRtr2Ownership
-			     INTEGER,
-             snVrrpVirRtr2CfgPriority
-                 INTEGER,
-             snVrrpVirRtr2TrackPriority
-                 INTEGER,
-             snVrrpVirRtr2CurrPriority
-                 INTEGER,
-			 snVrrpVirRtr2HelloInt 
+	 SnVrrpVirRtr2Entry ::=
+		 SEQUENCE {
+			 snVrrpVirRtr2Id
 				 INTEGER,
-			 snVrrpVirRtr2DeadInt 
+			 snVrrpVirRtr2Ownership
 				 INTEGER,
-			 snVrrpVirRtr2PreemptMode 
+			 snVrrpVirRtr2CfgPriority
+				 INTEGER,
+			 snVrrpVirRtr2TrackPriority
+				 INTEGER,
+			 snVrrpVirRtr2CurrPriority
+				 INTEGER,
+			 snVrrpVirRtr2HelloInt
+				 INTEGER,
+			 snVrrpVirRtr2DeadInt
+				 INTEGER,
+			 snVrrpVirRtr2PreemptMode
 				 INTEGER,
 			 snVrrpVirRtr2State
 				 INTEGER,
-             snVrrpVirRtr2IpAddrMask
-                 OCTET STRING,
-			 snVrrpVirRtr2Activate 
+			 snVrrpVirRtr2IpAddrMask
+				 OCTET STRING,
+			 snVrrpVirRtr2Activate
 				 INTEGER,
 			 snVrrpVirRtr2BackupInt
 				 INTEGER,
-			 snVrrpVirRtr2RowStatus 
+			 snVrrpVirRtr2RowStatus
 				 INTEGER,
-			 snVrrpVirRtr2RxArpPktDropCnts 
-				 Counter,
-			 snVrrpVirRtr2RxIpPktDropCnts 
-				 Counter,
-			 snVrrpVirRtr2RxPortMismatchCnts 
-				 Counter,
-			 snVrrpVirRtr2RxNumOfIpMismatchCnts 
-				 Counter,
-			 snVrrpVirRtr2RxIpMismatchCnts 
-				 Counter,
-			 snVrrpVirRtr2RxHelloIntMismatchCnts 
-				 Counter,
-			 snVrrpVirRtr2RxPriorityZeroFromMasterCnts 
-				 Counter,
-			 snVrrpVirRtr2RxHigherPriorityCnts 
-				 Counter,
-			 snVrrpVirRtr2TransToMasterStateCnts 
-				 Counter,
-			 snVrrpVirRtr2TransToBackupStateCnts 
-				 Counter,
-			 snVrrpVirRtr2CurrDeadInt 
+			 snVrrpVirRtr2RxArpPktDropCnts
+				 Counter32,
+			 snVrrpVirRtr2RxIpPktDropCnts
+				 Counter32,
+			 snVrrpVirRtr2RxPortMismatchCnts
+				 Counter32,
+			 snVrrpVirRtr2RxNumOfIpMismatchCnts
+				 Counter32,
+			 snVrrpVirRtr2RxIpMismatchCnts
+				 Counter32,
+			 snVrrpVirRtr2RxHelloIntMismatchCnts
+				 Counter32,
+			 snVrrpVirRtr2RxPriorityZeroFromMasterCnts
+				 Counter32,
+			 snVrrpVirRtr2RxHigherPriorityCnts
+				 Counter32,
+			 snVrrpVirRtr2TransToMasterStateCnts
+				 Counter32,
+			 snVrrpVirRtr2TransToBackupStateCnts
+				 Counter32,
+			 snVrrpVirRtr2CurrDeadInt
+				 Integer32,
+			 snVrrpVirRtr2TrackPortList
+				 OCTET STRING,
+			 snVrrpVirRtr2AdvertiseBackup
 				 INTEGER,
-             snVrrpVirRtr2TrackPortList
-                 OCTET STRING,
-			 snVrrpVirRtr2AdvertiseBackup 
+			 snVrrpVirRtr2MasterIpAddr
+				 IpAddress,
+			 snVrrpVirRtr2IpAddrCount
 				 INTEGER,
-             snVrrpVirRtr2MasterIpAddr
-                 IpAddress,
-             snVrrpVirRtr2IpAddrCount
-                 INTEGER,
-             snVrrpVirRtr2VirtualMacAddr
-                 MacAddress
-         }
-     
-    snVrrpVirRtr2Id OBJECT-TYPE
-         SYNTAX   INTEGER (1..255)
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "One of the virtual router ID of this Vrrp and Vrrpe interface."
-         ::= { snVrrpVirRtr2Entry 1 }
+			 snVrrpVirRtr2VirtualMacAddr
+				 MacAddress
+		 }
 
-    snVrrpVirRtr2Ownership OBJECT-TYPE
-	     SYNTAX   INTEGER {
+	snVrrpVirRtr2Id OBJECT-TYPE
+		 SYNTAX   INTEGER (1..255)
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"One of the virtual router ID of this Vrrp and Vrrpe interface."
+		 ::= { snVrrpVirRtr2Entry 1 }
+
+	snVrrpVirRtr2Ownership OBJECT-TYPE
+		 SYNTAX   INTEGER {
 					incomplete(0),
 					owner(1),
 					backup(2)
 					}
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "The ownership of this Vrrp router interface 
-            can be set either owner(1) or backup(2).  
-            VirRtr SNMP-GET returns incomplete(0), it means 
-            no IP address has assigned to this Vrrp router interface.
-            vrrpe protocol has no owner(1), can only be set to backup(2) or incomplete(0)."
-         ::= { snVrrpVirRtr2Entry 2 }
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"The ownership of this Vrrp router interface
+			can be set either owner(1) or backup(2).
+			VirRtr SNMP-GET returns incomplete(0), it means
+			no IP address has assigned to this Vrrp router interface.
+			vrrpe protocol has no owner(1), can only be set to backup(2) or incomplete(0)."
+		 ::= { snVrrpVirRtr2Entry 2 }
 
-     snVrrpVirRtr2CfgPriority OBJECT-TYPE
-         SYNTAX   INTEGER (0..255)
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-         "This object specifies the priority to be used for the
-         virtual router master election process. Higher values imply
-         higher priority.
+	 snVrrpVirRtr2CfgPriority OBJECT-TYPE
+		 SYNTAX   INTEGER (0..255)
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+		 "This object specifies the priority to be used for the
+		 virtual router master election process. Higher values imply
+		 higher priority.
 
-         A priority of '0', although not settable, is sent by
-         the master router to indicate that this router has ceased
-         to participate in VRRP and a backup virtual router should
-         transition  to become a new master.
+		 A priority of '0', although not settable, is sent by
+		 the master router to indicate that this router has ceased
+		 to participate in VRRP and a backup virtual router should
+		 transition  to become a new master.
 
-         A priority of 255 is only for VRRP - owner. Not valid for number to 
-         configure VRRPE."
-         DEFVAL { 100 }
-         ::= { snVrrpVirRtr2Entry 3 }
+		 A priority of 255 is only for VRRP - owner. Not valid for number to
+		 configure VRRPE."
+		 DEFVAL { 100 }
+		 ::= { snVrrpVirRtr2Entry 3 }
 
-     snVrrpVirRtr2TrackPriority OBJECT-TYPE
-         SYNTAX   INTEGER (1..254)
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "The higher the number the higher the priority is.
-            after this object is configured, the snVrrpVirRtr2CurrPriority 
-            of this interface will be adjusted dynamically with this
+	 snVrrpVirRtr2TrackPriority OBJECT-TYPE
+		 SYNTAX   INTEGER (1..254)
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"The higher the number the higher the priority is.
+			After this object is configured, the snVrrpVirRtr2CurrPriority
+			of this interface will be adjusted dynamically with this
 			track priority when the Track Port states first
-            changes from UP to DOWN."
-         ::= { snVrrpVirRtr2Entry 4 }
+			changes from UP to DOWN."
+		 ::= { snVrrpVirRtr2Entry 4 }
 
-     snVrrpVirRtr2CurrPriority OBJECT-TYPE
-         SYNTAX   INTEGER (1..254)
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "The higher the number the higher the priority is.
-            This object will be adjusted dynamically with the
+	 snVrrpVirRtr2CurrPriority OBJECT-TYPE
+		 SYNTAX   INTEGER (1..254)
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The higher the number the higher the priority is.
+			This object will be adjusted dynamically with the
 			track priority when the Track Port states first
-            changes from UP to DOWN."
-         ::= { snVrrpVirRtr2Entry 5 }
+			changes from UP to DOWN."
+		 ::= { snVrrpVirRtr2Entry 5 }
 
-     snVrrpVirRtr2HelloInt OBJECT-TYPE
-         SYNTAX   INTEGER (1..84)
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "Time interval between advertisements (seconds)."
-         DEFVAL { 1 }
-         ::= { snVrrpVirRtr2Entry 6 }
+	 snVrrpVirRtr2HelloInt OBJECT-TYPE
+		 SYNTAX   INTEGER (1..84)
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"Time interval between advertisements (seconds)."
+		 DEFVAL { 1 }
+		 ::= { snVrrpVirRtr2Entry 6 }
 
-     snVrrpVirRtr2DeadInt OBJECT-TYPE
-         SYNTAX   INTEGER (0..84)
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "Dead interval (seconds)."
-         DEFVAL { 1 }
-         ::= { snVrrpVirRtr2Entry 7 }
+	 snVrrpVirRtr2DeadInt OBJECT-TYPE
+		 SYNTAX   INTEGER (0..84)
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"Dead interval (seconds)."
+		 DEFVAL { 1 }
+		 ::= { snVrrpVirRtr2Entry 7 }
 
-     snVrrpVirRtr2PreemptMode OBJECT-TYPE
-         SYNTAX   INTEGER { disabled(0), enabled(1) }
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "This mode controls whether a higher priority Backup router
-            preempts a lower priority Master.  The mode with enabled(1)
-            allow preemption and disabled(0) prohibit preemption."
-         DEFVAL { enabled }
-         ::= { snVrrpVirRtr2Entry 8 }
+	 snVrrpVirRtr2PreemptMode OBJECT-TYPE
+		 SYNTAX   INTEGER { disabled(0), enabled(1) }
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"This mode controls whether a higher priority Backup router
+			preempts a lower priority Master.  The mode with enabled(1)
+			allow preemption and disabled(0) prohibit preemption."
+		 DEFVAL { enabled }
+		 ::= { snVrrpVirRtr2Entry 8 }
 
 	 snVrrpVirRtr2State OBJECT-TYPE
-	     SYNTAX   INTEGER {
+		 SYNTAX   INTEGER {
 					init(0),
 					master(1),
 					backup(2)
 				  }
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "This object specifies the Vrrp and vrrpe Router's interface state as:
-            init(0)...initialization state.
-            master(1)...master state.
-            backup(2)...backup state."
-         ::= { snVrrpVirRtr2Entry 9}
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"This object specifies the Vrrp and vrrpe Router's interface state as:
+			init(0)...initialization state.
+			master(1)...master state.
+			backup(2)...backup state."
+		 ::= { snVrrpVirRtr2Entry 9}
 
-    snVrrpVirRtr2IpAddrMask OBJECT-TYPE
+	snVrrpVirRtr2IpAddrMask OBJECT-TYPE
 		 SYNTAX  OCTET STRING (SIZE(4..64))
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "The numbers of IP Addresses of this virtual router of this interface."
-         ::= { snVrrpVirRtr2Entry 10 }
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"The numbers of IP Addresses of this virtual router of this interface."
+		 ::= { snVrrpVirRtr2Entry 10 }
 
 	 snVrrpVirRtr2Activate OBJECT-TYPE
-	     SYNTAX   INTEGER {
+		 SYNTAX   INTEGER {
 					disabled(0),
 					enabled(1)
 				  }
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "This object specifies the Vrrp Router's activate command as:
-            disabled(0)...deactivate this Vrrp and Vrrpe Routers.
-            enabled(1)....activate this Vrrp and Vrrpe Routers."
-         ::= { snVrrpVirRtr2Entry 11 }
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"This object specifies the Vrrp Router's activate command as:
+			disabled(0)...deactivate this Vrrp and Vrrpe Routers.
+			enabled(1)....activate this Vrrp and Vrrpe Routers."
+		 ::= { snVrrpVirRtr2Entry 11 }
 
-     snVrrpVirRtr2BackupInt OBJECT-TYPE
-         SYNTAX   INTEGER (60..3600)
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "Time interval between backup routers hello message advertisements (seconds)."
-         DEFVAL { 60 }
-         ::= { snVrrpVirRtr2Entry 12 }
+	 snVrrpVirRtr2BackupInt OBJECT-TYPE
+		 SYNTAX   INTEGER (60..3600)
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"Time interval between backup routers hello message advertisements (seconds)."
+		 DEFVAL { 60 }
+		 ::= { snVrrpVirRtr2Entry 12 }
 
-    snVrrpVirRtr2RowStatus OBJECT-TYPE
-	     SYNTAX   INTEGER {
+	snVrrpVirRtr2RowStatus OBJECT-TYPE
+		 SYNTAX   INTEGER {
 					invalid(1),
 					valid(2),
 					delete(3),
 					create(4),
 					modify(5)
 				  }
-		 ACCESS   read-write
-	     STATUS   mandatory
+		 MAX-ACCESS   read-write
+		 STATUS   current
 		 DESCRIPTION
-		 	"This object is used to create and
-		     delete row in the table and control
+			"This object is used to create and
+			 delete row in the table and control
 			 if they are used. The values
-		     that can be written are:
-		     delete(3)...deletes the row
-		     create(4)...creates a new row
-		     modify(5)...modifies an existing row
+			 that can be written are:
+			 delete(3)...deletes the row
+			 create(4)...creates a new row
+			 modify(5)...modifies an existing row
 
-		     VirRtr the row exists, then a SET with
-		     value of create(4) returns error
-		     'badValue'. Deleted rows go away
-		     immediately. The following values
-		     can be returned on reads:
-		     noSuch(0)...no such row
-		     invalid(1)...Setting it to 'invalid' has the effect of
-                          rendering it inoperative..
-		     valid(2)....the row exists and is valid"
-	     ::= { snVrrpVirRtr2Entry 13 }
+			 VirRtr the row exists, then a SET with
+			 value of create(4) returns error
+			 'badValue'. Deleted rows go away
+			 immediately. The following values
+			 can be returned on reads:
+			 noSuch(0)...no such row
+			 invalid(1)...Setting it to 'invalid' has the effect of
+						  rendering it inoperative..
+			 valid(2)....the row exists and is valid"
+		 ::= { snVrrpVirRtr2Entry 13 }
 
 	 snVrrpVirRtr2RxArpPktDropCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "The received Vrrp and Vrrpe ARP Packet Drop Counts."
-         ::= { snVrrpVirRtr2Entry 14 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The received Vrrp and Vrrpe ARP Packet Drop Counts."
+		 ::= { snVrrpVirRtr2Entry 14 }
 
 	 snVrrpVirRtr2RxIpPktDropCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "The received Vrrp and Vrrpe IP Packet Drop Counts."
-         ::= { snVrrpVirRtr2Entry 15 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The received Vrrp and Vrrpe IP Packet Drop Counts."
+		 ::= { snVrrpVirRtr2Entry 15 }
 
 	 snVrrpVirRtr2RxPortMismatchCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "The received Vrrp and Vrrpe Port mismatching Counts."
-         ::= { snVrrpVirRtr2Entry 16 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The received Vrrp and Vrrpe Port mismatching Counts."
+		 ::= { snVrrpVirRtr2Entry 16 }
 
 	 snVrrpVirRtr2RxNumOfIpMismatchCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "The received Vrrp and Vrrpe Number of IP Addresses mismatching Counts."
-         ::= { snVrrpVirRtr2Entry 17 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The received Vrrp and Vrrpe Number of IP Addresses mismatching Counts."
+		 ::= { snVrrpVirRtr2Entry 17 }
 
 	 snVrrpVirRtr2RxIpMismatchCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "The received Vrrp and Vrrpe IP Address mismatching Counts."
-         ::= { snVrrpVirRtr2Entry 18 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The received Vrrp and Vrrpe IP Address mismatching Counts."
+		 ::= { snVrrpVirRtr2Entry 18 }
 
 	 snVrrpVirRtr2RxHelloIntMismatchCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-  			"The counts of the virtual router interface with hello interval mismatch counts."
-         ::= { snVrrpVirRtr2Entry 19 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The counts of the virtual router interface with hello interval mismatch counts."
+		 ::= { snVrrpVirRtr2Entry 19 }
 
 	 snVrrpVirRtr2RxPriorityZeroFromMasterCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-  			"The counts of the virtual router interface with Priority zero from the master."
-         ::= { snVrrpVirRtr2Entry 20 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The counts of the virtual router interface with Priority zero from the master."
+		 ::= { snVrrpVirRtr2Entry 20 }
 
 	 snVrrpVirRtr2RxHigherPriorityCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-  			"The counts of the virtual router interface with higher Priority."
-         ::= { snVrrpVirRtr2Entry 21 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The counts of the virtual router interface with higher Priority."
+		 ::= { snVrrpVirRtr2Entry 21 }
 
 	 snVrrpVirRtr2TransToMasterStateCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-  			"The counts of the virtual router interface transition to master state."
-         ::= { snVrrpVirRtr2Entry 22 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The counts of the virtual router interface transition to master state."
+		 ::= { snVrrpVirRtr2Entry 22 }
 
 	 snVrrpVirRtr2TransToBackupStateCnts OBJECT-TYPE
-	     SYNTAX   Counter
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-  			"The counts of the virtual router interface transition to backup state."
-         ::= { snVrrpVirRtr2Entry 23 }
+		 SYNTAX   Counter32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"The counts of the virtual router interface transition to backup state."
+		 ::= { snVrrpVirRtr2Entry 23 }
 
-     snVrrpVirRtr2CurrDeadInt OBJECT-TYPE
-         SYNTAX   INTEGER 
-         ACCESS   read-only
-         STATUS   mandatory
-         DESCRIPTION
-            "Current Dead interval (in 100 milliseconds)."
-         ::= { snVrrpVirRtr2Entry 24 }
+	 snVrrpVirRtr2CurrDeadInt OBJECT-TYPE
+		 SYNTAX   Integer32
+		 MAX-ACCESS   read-only
+		 STATUS   current
+		 DESCRIPTION
+			"Current Dead interval (in 100 milliseconds)."
+		 ::= { snVrrpVirRtr2Entry 24 }
 
-     snVrrpVirRtr2TrackPortList OBJECT-TYPE
+	 snVrrpVirRtr2TrackPortList OBJECT-TYPE
 		 SYNTAX  OCTET STRING
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "This object specifies the identity of the physical port and virtual ports
-			whose state is to be monitored.  Each port index is 
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"This object specifies the identity of the physical port and virtual ports
+			whose state is to be monitored.  Each port index is
 			an ifIndex, if there are consecutive 4 or more ifIndex then
-			they will be encoded like below. 
-            Encoding and decoding scheme is range based:
-            Each range prefix with 0000 (2 octets) where 0000 is not valid 
-            ifIndex. Next 2 octets indicates lower range ifIndex, followed by 2 
-            octets of higher range ifIndex. Individual(non range) ones will be displayed as it is.
-            Ex:
-            port list: 0001..0005 0015 0032..0047
-            Port list in PDU:  0000 0001 0005 000f 0000 0020 002f.
+			they will be encoded like below.
+			Encoding and decoding scheme is range based:
+			Each range prefix with 0000 (2 octets) where 0000 is not valid
+			ifIndex. Next 2 octets indicates lower range ifIndex, followed by 2
+			octets of higher range ifIndex. Individual(non range) ones will be displayed as it is.
+			Ex:
+			port list: 0001..0005 0015 0032..0047
+			Port list in PDU:  0000 0001 0005 000f 0000 0020 002f.
 			If this object is configured
 			then the Preference Level of this interface will be adjusted
 			dynamically depending on the state of the Track Port.
-            The interface's Preference Level is reduced by value of 
-            Preference Level parameter when the Track Port states first
-            changes from UP to DOWN.  When the Track Port next comes up
-            the interface's Preference Level is increased by the amount
-            specified by the Preference Level.
-            The router VRRP and VRRP-E physical track port membership."
-         ::= { snVrrpVirRtr2Entry 25 }
+			The interface's Preference Level is reduced by value of
+			Preference Level parameter when the Track Port states first
+			changes from UP to DOWN.  When the Track Port next comes up
+			the interface's Preference Level is increased by the amount
+			specified by the Preference Level.
+			The router VRRP and VRRP-E physical track port membership."
+		 ::= { snVrrpVirRtr2Entry 25 }
 
-     snVrrpVirRtr2AdvertiseBackup OBJECT-TYPE
-         SYNTAX   INTEGER { disabled(0), enabled(1) }
-         ACCESS   read-write
-         STATUS   mandatory
-         DESCRIPTION
-            "Set Advertise this backup router to master "
-         DEFVAL { disabled }
-         ::= { snVrrpVirRtr2Entry 26 }
+	 snVrrpVirRtr2AdvertiseBackup OBJECT-TYPE
+		 SYNTAX   INTEGER { disabled(0), enabled(1) }
+		 MAX-ACCESS   read-write
+		 STATUS   current
+		 DESCRIPTION
+			"Set Advertise this backup router to master "
+		 DEFVAL { disabled }
+		 ::= { snVrrpVirRtr2Entry 26 }
 
-     snVrrpVirRtr2MasterIpAddr OBJECT-TYPE
-         SYNTAX       IpAddress
-         ACCESS       read-only
-         STATUS       mandatory
-         DESCRIPTION
-             "The master router's real/virtual (primary) IP address. This is
-             the IP address listed as the source in VRRP and VRRPE advertisement
-             last received by this virtual router."
-         ::= { snVrrpVirRtr2Entry 27 }
+	 snVrrpVirRtr2MasterIpAddr OBJECT-TYPE
+		 SYNTAX       IpAddress
+		 MAX-ACCESS       read-only
+		 STATUS       current
+		 DESCRIPTION
+			 "The master router's real/virtual (primary) IP address. This is
+			 the IP address listed as the source in VRRP and VRRPE advertisement
+			 last received by this virtual router."
+		 ::= { snVrrpVirRtr2Entry 27 }
 
-     snVrrpVirRtr2IpAddrCount OBJECT-TYPE
-         SYNTAX       INTEGER (0..255)
-         ACCESS       read-only
-         STATUS       mandatory
-         DESCRIPTION
-             "The number of IP addresses that are associated with this
-             virtual router. This number is equal to the number of rows
-             in the vrrpAssoIpAddrTable that correspond to a given IF
-             index/VRID pair."
-         ::= { snVrrpVirRtr2Entry 28 }
+	 snVrrpVirRtr2IpAddrCount OBJECT-TYPE
+		 SYNTAX       INTEGER (0..255)
+		 MAX-ACCESS       read-only
+		 STATUS       current
+		 DESCRIPTION
+			 "The number of IP addresses that are associated with this
+			 virtual router. This number is equal to the number of rows
+			 in the vrrpAssoIpAddrTable that correspond to a given IF
+			 index/VRID pair."
+		 ::= { snVrrpVirRtr2Entry 28 }
 
-     snVrrpVirRtr2VirtualMacAddr OBJECT-TYPE
-         SYNTAX       MacAddress
-         ACCESS       read-only
-         STATUS       mandatory
-         DESCRIPTION
-             "The virtual MAC address of the virtual router. Although this
-             object can be derived from the 'snVrrpVirRtr2VrId' object, it is
-             defined so that it is easily obtainable by a management
-             application and can be included in VRRP-related SNMP traps."
-         ::= { snVrrpVirRtr2Entry 29 }
+	 snVrrpVirRtr2VirtualMacAddr OBJECT-TYPE
+		 SYNTAX       MacAddress
+		 MAX-ACCESS       read-only
+		 STATUS       current
+		 DESCRIPTION
+			 "The virtual MAC address of the virtual router. Although this
+			 object can be derived from the 'snVrrpVirRtr2VrId' object, it is
+			 defined so that it is easily obtainable by a management
+			 application and can be included in VRRP-related SNMP traps."
+		 ::= { snVrrpVirRtr2Entry 29 }
 
-END	  
+END

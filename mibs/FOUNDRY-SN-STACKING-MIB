@@ -1,0 +1,435 @@
+FOUNDRY-SN-STACKING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32
+	  FROM SNMPv2-SMI
+	snSwitch
+		FROM FOUNDRY-SN-SWITCH-GROUP-MIB
+	MacAddress
+	  FROM SNMPv2-TC
+	DisplayString
+	  FROM FOUNDRY-SN-AGENT-MIB
+	InterfaceIndexOrZero
+	  FROM IF-MIB;
+snStacking MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+	      "Management Information for stacking system
+	       configuration and operational status.
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+	REVISION     "200805050000Z" -- May 5, 2008
+	DESCRIPTION
+			""
+   ::= { snSwitch 31}
+
+
+--
+-- Stacking system
+--
+
+snStackingGlobalObjects OBJECT IDENTIFIER ::= { snStacking 1 }
+snStackingTableObjects  OBJECT IDENTIFIER ::= { snStacking 2 }
+
+--
+-- Stacking system Global Scalar Object Section
+--
+
+snStackingGlobalConfigState OBJECT-TYPE
+	SYNTAX     INTEGER {
+			  none(0),
+			  enabled(1),
+			  disabled(2)
+			}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Configure stack state for stacking feature on the global level.
+		 none: neutral, receive packets only
+		 enable: stacking is enable, send and receive packets
+		 disable: stacking is disable, No send and receive packets"
+	::= { snStackingGlobalObjects 1}
+
+snStackingGlobalMacAddress OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Management MAC address of the stacking system.
+		This is available to change management MAC address of stack
+		for administrative purpose. It is strongly recommended that this
+		command should be used with upmost caution to prevent duplicate
+		MAC address and must reboot the system to take an effect.
+		It is mutually exclusive from enabling the persistent MAC timer.
+		Enter zero MAC address to remove the configured MAC address"
+	::= { snStackingGlobalObjects 2 }
+
+snStackingGlobalPersistentMacTimerState OBJECT-TYPE
+	SYNTAX     INTEGER {
+			  enabled(0),
+			  disabled(1)
+			}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Configure persistent MAC timer state for stacking feature on the global level.
+		 enable: the persistent MAC timer is active and configured. The persistent MAC
+					  timer is set as the default timer (60 minutes)
+		 disable: deactivate the persistent MAC timer. It will stop the use of persistent MAC
+					  address and use new active stack unit's base MAC address "
+	::= { snStackingGlobalObjects 3}
+
+snStackingGlobalPersistentMacTimer OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Persistent MAC timer in minutes for the stacking system
+		Number of minutes to retain original active stack unit's base MAC address in event of
+		active unit crash or removal. This timer is triggered when new active unit is elected.
+		When timer expires, new active unit will change stacking MAC to its own base MAC
+		address and advertise its own base MAC address to management VLAN to update the
+		ARP table of peers. If you decide to use new active unit's MAC address, one must enter
+		this timer again to reactivate the persistent MAC.
+				  0 - keep it forever.
+				  5  to 3600 - valid value range.
+				  60 - default value."
+	::= { snStackingGlobalObjects 4 }
+
+snStackingGlobalTopology OBJECT-TYPE
+	SYNTAX     INTEGER {
+			  other(1),
+				 chain(2),
+				 ring(3),
+				 standalone(4)
+			   }
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The topology of the stacking system "
+	::= { snStackingGlobalObjects 5 }
+
+--
+-- Stacking system Table Object Section
+--
+
+--
+-- Stacking configuration unit Table
+-- Use this table to display and configure stacking related information for each unit
+--
+
+snStackingConfigUnitTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF SnStackingConfigUnitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Stacking configuration unit table."
+	::= { snStackingTableObjects 1 }
+
+snStackingConfigUnitEntry OBJECT-TYPE
+	SYNTAX     SnStackingConfigUnitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"An entry in the stacking configuration table."
+	INDEX { snStackingConfigUnitIndex }
+	::= { snStackingConfigUnitTable 1 }
+
+SnStackingConfigUnitEntry ::= SEQUENCE {
+	snStackingConfigUnitIndex                          Integer32,
+	snStackingConfigUnitPriority                       Integer32,
+	snStackingConfigUnitConfigStackPort          InterfaceIndexOrZero,
+	snStackingConfigUnitRowStatus                  INTEGER,
+	snStackingConfigUnitType                          DisplayString,
+	snStackingConfigUnitState                          INTEGER,
+	snStackingConfigUnitStackPort1                  InterfaceIndexOrZero,
+	snStackingConfigUnitStackPort2                  InterfaceIndexOrZero
+}
+
+snStackingConfigUnitIndex OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"The stacking unit Id"
+	::= { snStackingConfigUnitEntry 1 }
+
+ snStackingConfigUnitPriority OBJECT-TYPE
+	SYNTAX     Integer32 (0..255)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The priority in Active/backup eclection."
+	::= { snStackingConfigUnitEntry 2 }
+
+ snStackingConfigUnitConfigStackPort OBJECT-TYPE
+	SYNTAX		InterfaceIndexOrZero
+	MAX-ACCESS  read-write
+	STATUS     current
+	DESCRIPTION
+		"The IfIndex for the configured stacking port. If no
+		stacking port is configured, it will be displayed zero
+		and the first  two 10G ports as the default stacking ports.
+		Enter zero to remove the configured stacking port. "
+	::= { snStackingConfigUnitEntry 3 }
+
+snStackingConfigUnitRowStatus OBJECT-TYPE
+	SYNTAX     INTEGER {
+				 other(1),
+				 valid(2),
+				 delete(3)
+		  --       create(4)
+			   }
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+			"This object is used to delete row in the
+			table and control if they are used. The values that
+			can be written are:
+			delete(3)...deletes the row
+
+			If the row exists, then a SET with value of create(4)
+			returns error 'wrongValue'. Deleted rows go away immediately.
+			The following values can be returned on reads:
+			noSuchName...no such row
+			other(1).....some other cases
+			valid(2)....the row exists and is valid"
+	::= { snStackingConfigUnitEntry 4 }
+
+
+snStackingConfigUnitType OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS read-only
+	   STATUS     current
+	DESCRIPTION
+		"A description of the configured/active system type for each unit."
+	::= { snStackingConfigUnitEntry 5 }
+
+snStackingConfigUnitState OBJECT-TYPE
+	SYNTAX     INTEGER {
+				 local(1),
+				 remote(2),
+				 reserved(3),
+				 empty(4)
+			   }
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"A state for each unit "
+	::= { snStackingConfigUnitEntry 6 }
+
+ snStackingConfigUnitStackPort1 OBJECT-TYPE
+	SYNTAX		InterfaceIndexOrZero
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"First stack port for each unit. It returns 0 if stack port does not exist."
+	::= { snStackingConfigUnitEntry 7 }
+
+
+ snStackingConfigUnitStackPort2 OBJECT-TYPE
+	SYNTAX		InterfaceIndexOrZero
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Second stack port for each unit. It returns 0 if stack port does not exist."
+	::= { snStackingConfigUnitEntry 8 }
+
+--
+-- Stacking operation unit Table
+-- Use this table to display stacking related information for each operational unit
+--
+
+snStackingOperUnitTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF SnStackingOperUnitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Stacking operation unit table."
+	::= { snStackingTableObjects 2 }
+
+snStackingOperUnitEntry OBJECT-TYPE
+	SYNTAX     SnStackingOperUnitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"An entry in the stacking operation table."
+	INDEX { snStackingOperUnitIndex }
+	::= { snStackingOperUnitTable 1 }
+
+SnStackingOperUnitEntry ::= SEQUENCE {
+	snStackingOperUnitIndex                    Integer32,
+	snStackingOperUnitRole                     INTEGER,
+	snStackingOperUnitMac                      MacAddress,
+	snStackingOperUnitPriority                 Integer32,
+	snStackingOperUnitState                    INTEGER,
+	snStackingOperUnitDescription            DisplayString,
+	snStackingOperUnitStackPort1            InterfaceIndexOrZero,
+	snStackingOperUnitStackPort1State     INTEGER,
+	snStackingOperUnitStackPort2            InterfaceIndexOrZero,
+	snStackingOperUnitStackPort2State     INTEGER,
+	snStackingOperUnitNeighbor1             Integer32,
+	snStackingOperUnitNeighbor2             Integer32,
+	snStackingOperUnitImgVer                 DisplayString,
+	snStackingOperUnitBuildlVer               DisplayString
+
+}
+
+snStackingOperUnitIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"The stacking unit Id"
+	::= { snStackingOperUnitEntry 1 }
+
+ snStackingOperUnitRole OBJECT-TYPE
+	SYNTAX     INTEGER {
+			  other(1),
+				 active(2),
+				 standby(3),
+				 member(4),
+				 standalone(5)
+			   }
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"A role for each unit "
+	::= { snStackingOperUnitEntry 2 }
+
+snStackingOperUnitMac OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"A MAC address for each unit"
+	::= { snStackingOperUnitEntry 3 }
+
+snStackingOperUnitPriority OBJECT-TYPE
+	SYNTAX     Integer32 (0..255)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The priority in Active/backup eclection."
+	::= { snStackingOperUnitEntry 4 }
+
+ snStackingOperUnitState OBJECT-TYPE
+	SYNTAX     INTEGER {
+				 local(1),
+				 remote(2),
+				 reserved(3),
+				 empty(4)
+			   }
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"A state for each unit "
+	::= { snStackingOperUnitEntry 5}
+
+ snStackingOperUnitDescription OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..128))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Describes the stacking state for each unit."
+	::= { snStackingOperUnitEntry 6 }
+
+ snStackingOperUnitStackPort1 OBJECT-TYPE
+	SYNTAX		InterfaceIndexOrZero
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"First stack port for each unit. It returns 0 if stack port does not exist."
+	::= { snStackingOperUnitEntry 7 }
+
+ snStackingOperUnitStackPort1State OBJECT-TYPE
+	SYNTAX     INTEGER {
+		other(1),
+		up(2),
+		down(3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The first stack port state for each unit. "
+	::= { snStackingOperUnitEntry 8 }
+
+
+ snStackingOperUnitStackPort2 OBJECT-TYPE
+	SYNTAX		InterfaceIndexOrZero
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Second stack port for each unit. It returns 0 if stack port does not exist."
+	::= { snStackingOperUnitEntry 9 }
+
+ snStackingOperUnitStackPort2State OBJECT-TYPE
+	SYNTAX     INTEGER {
+		other(1),
+		up(2),
+		down(3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The second stack port state for each unit. "
+	::= { snStackingOperUnitEntry 10 }
+
+ snStackingOperUnitNeighbor1 OBJECT-TYPE
+	SYNTAX		 Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	"Stacking neighbor unit (left) number.
+	If there is no neighbor unit, then it returns 0."
+
+	::= { snStackingOperUnitEntry 11 }
+
+ snStackingOperUnitNeighbor2 OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	"Stacking neighbor unit (left) number.
+	If there is no neighbor unit, then it returns 0."
+	::= { snStackingOperUnitEntry 12 }
+
+snStackingOperUnitImgVer OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The version of the running software image"
+	::= { snStackingOperUnitEntry 13 }
+
+snStackingOperUnitBuildlVer OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The version of the running software build"
+	::= { snStackingOperUnitEntry 14 }
+
+END

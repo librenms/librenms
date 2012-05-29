@@ -1,83 +1,106 @@
--- *****************************************************************
--- Foundry Commited Access Rate MIB file.
--- *****************************************************************
 FOUNDRY-VLAN-CAR-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	OBJECT-TYPE,
-	Gauge
-		FROM RFC1155-SMI
 
-        Counter64
+	MODULE-IDENTITY, OBJECT-TYPE,Gauge32, Counter64,Integer32
 		FROM SNMPv2-SMI
-
-        PacketSource, RateLimitType, RateLimitAction
-		FROM FOUNDRY-CAR-MIB  
-
-  	snVLanCAR
-  		FROM FOUNDRY-SN-SWITCH-GROUP-MIB;
-	
+	snSwitch
+		FROM FOUNDRY-SN-SWITCH-GROUP-MIB
+	PacketSource, RateLimitType, RateLimitAction
+		FROM FOUNDRY-CAR-MIB;
 
 
+
+snVLanCAR MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200909300000Z" -- September 30, 2009
+    DESCRIPTION
+			"convert from SMIv1 to SMIv2"
+   ::= {snSwitch  17}
 snVLanCARs	OBJECT IDENTIFIER ::= { snVLanCAR 1 }
 
 
 
 snVLanCARTable OBJECT-TYPE
 	SYNTAX  SEQUENCE OF SnVLanCAREntry
-	ACCESS  not-accessible
-        STATUS  mandatory
-        DESCRIPTION
-        "A table of rate limit configuration entries for a vlan.
+	MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		"A table of rate limit configuration entries for a vlan.
 	Rate Limit is a method of traffic control.  It allows a set
 	of rate limits to be configured and applied to packets flowing
 	into/out of an interface to regulate network traffic."
 
-        ::= { snVLanCARs 1 }
+		::= { snVLanCARs 1 }
 
 
 snVLanCAREntry OBJECT-TYPE
-        SYNTAX SnVLanCAREntry
-        ACCESS  not-accessible
-        STATUS  mandatory
-        DESCRIPTION
-        	"A collection of rate-limit configuration objects on this 
+		SYNTAX SnVLanCAREntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A collection of rate-limit configuration objects on this
 		vlan."
-        INDEX { snVLanCARVLanId, snVLanCARDirection, snVLanCARRowIndex }
-        ::= { snVLanCARTable 1 }
+		INDEX { snVLanCARVLanId, snVLanCARDirection, snVLanCARRowIndex }
+		::= { snVLanCARTable 1 }
 
 SnVLanCAREntry ::=
 	SEQUENCE {
 		snVLanCARDirection
-               		PacketSource,
+					PacketSource,
 		snVLanCARVLanId
-                        INTEGER,
+						INTEGER,
 		snVLanCARRowIndex
-                        INTEGER,
+						INTEGER,
 		snVLanCARType
-                        RateLimitType,
+						RateLimitType,
 		snVLanCARAccIdx
-                        INTEGER,
+						Integer32,
 		snVLanCARRate
-                        INTEGER,
+						Integer32,
 		snVLanCARLimit
-                        INTEGER,
+						Integer32,
 		snVLanCARExtLimit
-                        INTEGER,
+						Integer32,
 		snVLanCARConformAction
 			RateLimitAction,
 		snVLanCARExceedAction
-       			RateLimitAction,
+				RateLimitAction,
 		snVLanCARStatSwitchedPkts
-                        Counter64,
+						Counter64,
 		snVLanCARStatSwitchedBytes
-                        Counter64,
+						Counter64,
 		snVLanCARStatFilteredPkts
-                        Counter64,
+						Counter64,
 		snVLanCARStatFilteredBytes
-                        Counter64,
+						Counter64,
 		snVLanCARStatCurBurst
-       			Gauge
+				Gauge32
 	}
 
 --need to refer to the vlan table
@@ -86,70 +109,70 @@ SnVLanCAREntry ::=
 
 snVLanCARVLanId OBJECT-TYPE
 	SYNTAX  INTEGER (1..4095)
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The VLAN ID as one of the indices of this table .
-		 Each VLAN ID can have a membership of multiple 
+		 Each VLAN ID can have a membership of multiple
 		 ports."
 	::= { snVLanCAREntry 1 }
 
 snVLanCARDirection OBJECT-TYPE
 	SYNTAX  PacketSource
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
-       		"The input or output transmission direction for the 
-                Rate Limit object."
-        ::= { snVLanCAREntry 2 }
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The input or output transmission direction for the
+				Rate Limit object."
+		::= { snVLanCAREntry 2 }
 
 snVLanCARRowIndex OBJECT-TYPE
 	SYNTAX  INTEGER (1..2147483647)
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
-                "The table index for rate limit objects.
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"The table index for rate limit objects.
 		It increases as the rate limit entries are added.
 		Skips the number when a row is deleted."
 
-        ::= { snVLanCAREntry 3 }
+		::= { snVLanCAREntry 3 }
 
 snVLanCARType OBJECT-TYPE
 	SYNTAX  RateLimitType
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
 		"The type of traffic rate-limited against."
 
 	::= { snVLanCAREntry 4 }
 
 snVLanCARAccIdx OBJECT-TYPE
-	SYNTAX  INTEGER
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
+	SYNTAX  Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
 		"The index to the access list if RateLimitType is either
 		quickAcc or standardAcc."
 
 	::= { snVLanCAREntry 5 }
 
 snVLanCARRate OBJECT-TYPE
-	SYNTAX  INTEGER
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
+	SYNTAX  Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
 		"The comitted access rate. This determines the long term
 		average transmission rate. Traffic that falls under this
-		rate always conforms. This is average rate in bits per 
+		rate always conforms. This is average rate in bits per
 		second."
 
 	::= { snVLanCAREntry 6 }
 
 snVLanCARLimit OBJECT-TYPE
-	SYNTAX  INTEGER
-        ACCESS  read-only
-        STATUS  mandatory
-        DESCRIPTION
+	SYNTAX  Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
 		"This is the normal burst size that determines how large traffic
 		bursts can be before some traffic exceeds the rate limit. This
 		specifies the number of bytes that are guaranteed to be transported
@@ -159,9 +182,9 @@ snVLanCARLimit OBJECT-TYPE
 	::= { snVLanCAREntry 7 }
 
 snVLanCARExtLimit OBJECT-TYPE
-	SYNTAX  INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"This is the extended burst limit that determines how large traffic
 		bursts can be before all the traffic exceeds the rate limit. This
@@ -171,8 +194,8 @@ snVLanCARExtLimit OBJECT-TYPE
 
 snVLanCARConformAction OBJECT-TYPE
 	SYNTAX	RateLimitAction
-	ACCESS  read-only
-	STATUS	mandatory
+	MAX-ACCESS  read-only
+	STATUS	current
 	DESCRIPTION
 		"Action to be taken when the traffic is within
 		the Rate Limit.
@@ -189,12 +212,12 @@ snVLanCARConformAction OBJECT-TYPE
 
 snVLanCARExceedAction OBJECT-TYPE
 	SYNTAX	RateLimitAction
-	ACCESS  read-only
-	STATUS	mandatory
+	MAX-ACCESS  read-only
+	STATUS	current
 	DESCRIPTION
 		"Action to be taken when the traffic exceeds
 		the Rate Limit.
-   		drop		drop the packet.
+		drop		drop the packet.
 		xmit		transmit the packet.
 		continue	continue to evaluate to the subsequent
 					rate limits.
@@ -207,8 +230,8 @@ snVLanCARExceedAction OBJECT-TYPE
 
 snVLanCARStatSwitchedPkts OBJECT-TYPE
 	SYNTAX  Counter64
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The counter of packets permitted by this rate limit."
 
@@ -216,8 +239,8 @@ snVLanCARStatSwitchedPkts OBJECT-TYPE
 
 snVLanCARStatSwitchedBytes OBJECT-TYPE
 	SYNTAX  Counter64
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The counter of bytes permitted by this interface."
 
@@ -226,8 +249,8 @@ snVLanCARStatSwitchedBytes OBJECT-TYPE
 snVLanCARStatFilteredPkts OBJECT-TYPE
 	SYNTAX  Counter64
 	--UNITS	"packets"
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The counter of packets which exceeded this rate limit."
 
@@ -235,17 +258,17 @@ snVLanCARStatFilteredPkts OBJECT-TYPE
 
 snVLanCARStatFilteredBytes OBJECT-TYPE
 	SYNTAX  Counter64
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The counter of bytes which exceeded this rate limit."
 
 	::= { snVLanCAREntry 14 }
 
 snVLanCARStatCurBurst OBJECT-TYPE
-	SYNTAX  Gauge
-	ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"The current received burst size."
 	::= { snVLanCAREntry 15 }

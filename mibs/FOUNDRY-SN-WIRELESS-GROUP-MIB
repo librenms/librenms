@@ -1,72 +1,87 @@
 FOUNDRY-SN-WIRELESS-GROUP-MIB DEFINITIONS ::= BEGIN
--- Foundry SN WIRELESS GROUP MIB Release 1.0.0
--- Revision 0 04/15/04
-
--- Copyright 1996-2004 Foundry Networks, Inc.
--- All rights reserved.
--- This Foundry Networks SNMP Management Information Base Specification
--- (Specification) embodies Foundry Networks' confidential and
--- proprietary intellectual property. Foundry Networks retains all
--- title and ownership in the Specification, including any
--- revisions.
-
--- This Specification is supplied "AS IS," and Foundry Networks makes
--- no warranty, either express or implied, as to the use,
--- operation, condition, or performance of the Specification.
 
 -- SECTION 1: Top Level Definitions
 
 IMPORTS
-	Counter, TimeTicks, IpAddress, Gauge, enterprises
-		FROM RFC1155-SMI
-	OBJECT-TYPE
-		FROM RFC-1212
-	snWireless
-		FROM FOUNDRY-SN-SWITCH-GROUP-MIB;
+	MODULE-IDENTITY, OBJECT-TYPE, IpAddress,Integer32
+		FROM SNMPv2-SMI
+	MacAddress
+		FROM FOUNDRY-SN-AGENT-MIB
+	snSwitch
+		FROM FOUNDRY-SN-SWITCH-GROUP-MIB
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC;
+
+snWireless MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200909300000Z" -- September 30, 2009
+    DESCRIPTION
+			"convert from SMIv1 to SMIv2"
+   ::= {snSwitch  23}
 
 -- textual conventions
 
-    MacAddress
-        ::= OCTET STRING (SIZE (6))
-    DisplayString
-        ::= OCTET STRING
-
-    IfIndexList ::= TEXTUAL-CONVENTION
-        STATUS      current
-        DESCRIPTION
-            "Each octet within this value specifies a set of eight
-            interfaces by their ifIndex values, with the first octet
-            specifying interfaces 1 through 8, the second octet
-            specifying interfaces 9 through 16, etc.  Within each
-            octet, the most significant bit represents the lowest
-            numbered interface, and the least significant bit
-            represents the highest numbered interface.  Thus, each
-            interface of the device is represented by a single bit
-            within the value of this object.  If that bit has a value
-            of '1' then that interface is included in the set of
-            interfaces; the interface is not included if its bit has a
-            value of '0'."
-        SYNTAX      OCTET STRING
+	IfIndexList ::= TEXTUAL-CONVENTION
+		STATUS      current
+		DESCRIPTION
+			"Each octet within this value specifies a set of eight
+			interfaces by their ifIndex values, with the first octet
+			specifying interfaces 1 through 8, the second octet
+			specifying interfaces 9 through 16, etc.  Within each
+			octet, the most significant bit represents the lowest
+			numbered interface, and the least significant bit
+			represents the highest numbered interface.  Thus, each
+			interface of the device is represented by a single bit
+			within the value of this object.  If that bit has a value
+			of '1' then that interface is included in the set of
+			interfaces; the interface is not included if its bit has a
+			value of '0'."
+		SYNTAX      OCTET STRING
 
 -- iso(1).org(3).dod(6).internet(1).private(4).enterprises(1).foundry(1991)
 
 wgGroup     OBJECT IDENTIFIER ::= { snWireless 1 }
 
 wgMobilityId OBJECT-TYPE
-	SYNTAX  INTEGER
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
-        "Unique Identifier used to specify the mobility doamin.
-         Valid range is <1 - 65535>. Use <0> to remove the domain."
+		"Unique Identifier used to specify the mobility doamin.
+		 Valid range is <1 - 65535>. Use <0> to remove the domain."
 	::= { wgGroup 1 }
 
 wgVpnPTDeletePolicy OBJECT-TYPE
-	SYNTAX  INTEGER
-	ACCESS  read-write
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
-        "Write a valid VPN pass through policy ID to remove the policy.
+		"Write a valid VPN pass through policy ID to remove the policy.
 		Return zero when reading this object."
 	::= { wgGroup 2 }
 
@@ -76,37 +91,38 @@ wgVpnPTDeletePolicy OBJECT-TYPE
 --
 
 wgIfTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF WgIfEntry
-    ACCESS not-accessible
-    STATUS mandatory
-    DESCRIPTION
+	SYNTAX SEQUENCE OF WgIfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
 		"WiFi Interface Table."
-    ::= { snWireless 2 }
-    
+	::= { snWireless 2 }
+
 wgIfEntry OBJECT-TYPE
-    SYNTAX WgIfEntry
-    ACCESS not-accessible
-    STATUS mandatory
-    DESCRIPTION
+	SYNTAX WgIfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
 		"An entry of the WiFi Interface Table."
-    INDEX { wgIfIndex }
-    ::= { wgIfTable 1 }
+	INDEX { wgIfIndex }
+	::= { wgIfTable 1 }
 
 WgIfEntry ::= SEQUENCE {
-    wgIfIndex               INTEGER,
-    wgIfWirelessEnable      INTEGER,
-    wgIfPnPLearnNewAP       INTEGER,
-    wgIfAutoPortDisable     INTEGER,
-    wgIfVpnPTPolicyId       INTEGER
+	wgIfIndex                 Integer32,
+	wgIfWirelessEnable        INTEGER,
+	wgIfPnPLearnNewAP         INTEGER,
+	wgIfAutoPortDisable       INTEGER,
+	wgIfVpnPTPolicyId         Integer32,
+	wgIfFullCompRoamingEnable INTEGER
 }
 
 wgIfIndex OBJECT-TYPE
-	SYNTAX  INTEGER
-	ACCESS  read-only
-	STATUS  mandatory
-    DESCRIPTION
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
 		"ifIndex value of the switch interface."
-    ::= { wgIfEntry 1 }
+	::= { wgIfEntry 1 }
 
 wgIfWirelessEnable OBJECT-TYPE
 	SYNTAX  INTEGER {
@@ -114,12 +130,12 @@ wgIfWirelessEnable OBJECT-TYPE
 		enable(2),
 		disable(3)
 		}
-	ACCESS  read-write
-	STATUS  mandatory
-    DESCRIPTION
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
 		"Control wireless function of the switch interface."
 	DEFVAL { disable }
-    ::= { wgIfEntry 2 }
+	::= { wgIfEntry 2 }
 
 wgIfPnPLearnNewAP OBJECT-TYPE
 	SYNTAX  INTEGER {
@@ -127,8 +143,8 @@ wgIfPnPLearnNewAP OBJECT-TYPE
 		enable(2),
 		disable(3)
 		}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Control the interface to learn new AP."
 	::= { wgIfEntry 3 }
@@ -139,21 +155,34 @@ wgIfAutoPortDisable  OBJECT-TYPE
 		enable(2),
 		disable(3)
 		}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Disable the interface if the interface link status change."
 	::= { wgIfEntry 4 }
 
 wgIfVpnPTPolicyId OBJECT-TYPE
-	SYNTAX  INTEGER
-	ACCESS  read-write
-	STATUS  mandatory
-    DESCRIPTION
-        "To bind an interface to a VPN pass through policy, write
-        a valid policy number which is larger than zero. To unbind
-        an interface to a VPN pass through policy, write a zero."
-    ::= { wgIfEntry 5 }
+	SYNTAX Integer32
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"To bind an interface to a VPN pass through policy, write
+		a valid policy number which is larger than zero. To unbind
+		an interface to a VPN pass through policy, write a zero."
+	::= { wgIfEntry 5 }
+
+wgIfFullCompRoamingEnable OBJECT-TYPE
+	SYNTAX  INTEGER {
+		other(1),
+		enable(2),
+		disable(3)
+		}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"Control full compatibility roaming of an interface."
+	DEFVAL { disable }
+	::= { wgIfEntry 6 }
 
 
 --
@@ -162,16 +191,16 @@ wgIfVpnPTPolicyId OBJECT-TYPE
 
 wgRoamingPeerTable OBJECT-TYPE
 	SYNTAX  SEQUENCE OF WgRoamingPeerEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"Roaming Peer table contains information of peers."
 	::= { snWireless 3 }
 
 wgRoamingPeerEntry OBJECT-TYPE
 	SYNTAX  WgRoamingPeerEntry
-	ACCESS  not-accessible
-	STATUS  mandatory
+	MAX-ACCESS  not-accessible
+	STATUS  current
 	DESCRIPTION
 		"An entry of the roaming peer table."
 	INDEX   { wgRoamingPeerIpAddress }
@@ -188,8 +217,8 @@ WgRoamingPeerEntry ::= SEQUENCE {
 
 wgRoamingPeerIpAddress OBJECT-TYPE
 	SYNTAX  IpAddress
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"IP Address of the ISRP peer."
 	::= { wgRoamingPeerEntry 1 }
@@ -200,8 +229,8 @@ wgRoamingPeerConnectionStatus OBJECT-TYPE
 		configured(2),
 		established(3)
 		}
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Shows the state of the ISRP Connection."
 	::= { wgRoamingPeerEntry 2 }
@@ -213,8 +242,8 @@ wgRoamingPeerRowStatus OBJECT-TYPE
 		delete(3),
 		create(4)
 		}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Shows the state of the row in the PeerRow Table."
 	::= { wgRoamingPeerEntry 3 }
@@ -225,71 +254,71 @@ wgRoamingPeerRowStatus OBJECT-TYPE
 --
 
 wgPnPTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF WgPnPEntry
-    ACCESS not-accessible
-    STATUS mandatory
-    DESCRIPTION
+	SYNTAX SEQUENCE OF WgPnPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
 		"AP Plug and Play Table."
-    ::= { snWireless 4 }
+	::= { snWireless 4 }
 
 wgPnPEntry OBJECT-TYPE
-    SYNTAX WgPnPEntry
-    ACCESS not-accessible
-    STATUS mandatory
-    DESCRIPTION
+	SYNTAX WgPnPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
 		"An entry of the AP Plug and Play Table."
-    INDEX { wgPnPIfIndex, wgPnPMacAddress }
-    ::= { wgPnPTable 1 }
+	INDEX { wgPnPIfIndex, wgPnPMacAddress }
+	::= { wgPnPTable 1 }
 
 WgPnPEntry ::= SEQUENCE {
-    wgPnPIfIndex             INTEGER,
-    wgPnPMacAddress          MacAddress,
-    wgPnPIpAddress           IpAddress,
-    wgPnPIpMask              IpAddress,
-    wgPnPIpDefaultGw         IpAddress,
-    wgPnPStatus              INTEGER,
-    wgPnPRowStatus           INTEGER
+	wgPnPIfIndex             Integer32,
+	wgPnPMacAddress          MacAddress,
+	wgPnPIpAddress           IpAddress,
+	wgPnPIpMask              IpAddress,
+	wgPnPIpDefaultGw         IpAddress,
+	wgPnPStatus              INTEGER,
+	wgPnPRowStatus           INTEGER
 }
 
 wgPnPIfIndex OBJECT-TYPE
-	SYNTAX  INTEGER
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
 		"ifIndex value of the switch interface."
-    ::= { wgPnPEntry 1 }
+	::= { wgPnPEntry 1 }
 
 wgPnPMacAddress OBJECT-TYPE
-    SYNTAX  MacAddress
-    ACCESS  read-only
-    STATUS  mandatory
-    DESCRIPTION
+	SYNTAX  MacAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
 		"MAC address of the attached AP."
-    ::= { wgPnPEntry 2 }
+	::= { wgPnPEntry 2 }
 
 wgPnPIpAddress OBJECT-TYPE
 	SYNTAX  IpAddress
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"IP address of the attached AP."
-    ::= { wgPnPEntry 3 }
+	::= { wgPnPEntry 3 }
 
 wgPnPIpMask OBJECT-TYPE
 	SYNTAX  IpAddress
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Subnet mask of the attached AP."
-    ::= { wgPnPEntry 4 }
+	::= { wgPnPEntry 4 }
 
 wgPnPIpDefaultGw OBJECT-TYPE
 	SYNTAX  IpAddress
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Default gateway of the attached AP."
-    ::= { wgPnPEntry 5 }
+	::= { wgPnPEntry 5 }
 
 wgPnPStatus OBJECT-TYPE
 	SYNTAX  INTEGER {
@@ -298,8 +327,8 @@ wgPnPStatus OBJECT-TYPE
 		configured(3),
 		operational(4)
 		}
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"AP device status. If the switch diecovered a new AP which
 		had not been configured, the 'discovered' state will return.
@@ -320,8 +349,8 @@ wgPnPRowStatus OBJECT-TYPE
 		create(4),
 		modify(5)
 		}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Create, delete or modify a row of AP Plug and Play Table."
 	::= { wgPnPEntry 7 }
@@ -331,40 +360,40 @@ wgPnPRowStatus OBJECT-TYPE
 --
 
 wgVpnPTServerTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF WgVpnPTServerEntry
-    ACCESS not-accessible
-    STATUS mandatory
-    DESCRIPTION
+	SYNTAX SEQUENCE OF WgVpnPTServerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
 		"VPN pass through server table"
-    ::= { snWireless 5 }
+	::= { snWireless 5 }
 
 wgVpnPTServerEntry OBJECT-TYPE
-    SYNTAX WgVpnPTServerEntry
-    ACCESS not-accessible
-    STATUS mandatory
-    DESCRIPTION
+	SYNTAX WgVpnPTServerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
 		"An entry of the VPN pass through server table."
-    INDEX { wgVpnPTServerPolicyId, wgVpnPTServerIpAddress }
-    ::= { wgVpnPTServerTable 1 }
+	INDEX { wgVpnPTServerPolicyId, wgVpnPTServerIpAddress }
+	::= { wgVpnPTServerTable 1 }
 
 WgVpnPTServerEntry ::= SEQUENCE {
-    wgVpnPTServerPolicyId       INTEGER,
-    wgVpnPTServerIpAddress      IpAddress,
-    wgVpnPTServerRowStatus      INTEGER
+	wgVpnPTServerPolicyId       Integer32,
+	wgVpnPTServerIpAddress      IpAddress,
+	wgVpnPTServerRowStatus      INTEGER
 }
 
 wgVpnPTServerPolicyId OBJECT-TYPE
-	SYNTAX  INTEGER
-    ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"VPN pass through policy identifier. It must be greater than zero."
 	::= { wgVpnPTServerEntry 1 }
 
 wgVpnPTServerIpAddress OBJECT-TYPE
 	SYNTAX  IpAddress
-    ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"VPN server IP address."
 	::= { wgVpnPTServerEntry 2 }
@@ -376,8 +405,8 @@ wgVpnPTServerRowStatus OBJECT-TYPE
 		delete(3),
 		create(4)
 		}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Create or delete a row of VPN pass through server table."
 	::= { wgVpnPTServerEntry 3 }
@@ -388,33 +417,33 @@ wgVpnPTServerRowStatus OBJECT-TYPE
 --
 
 wgVpnPTFilterTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF WgVpnPTFilterEntry
-    ACCESS not-accessible
-    STATUS mandatory
-    DESCRIPTION
+	SYNTAX SEQUENCE OF WgVpnPTFilterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
 		"VPN pass through filter table"
-    ::= { snWireless 6 }
+	::= { snWireless 6 }
 
 wgVpnPTFilterEntry OBJECT-TYPE
-    SYNTAX WgVpnPTFilterEntry
-    ACCESS not-accessible
-    STATUS mandatory
-    DESCRIPTION
+	SYNTAX WgVpnPTFilterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
 		"An entry of the VPN pass through filter table."
-    INDEX { wgVpnPTFilterPolicyId, wgVpnPTFilterProtocol, wgVpnPTFilterPort }
-    ::= { wgVpnPTFilterTable 1 }
+	INDEX { wgVpnPTFilterPolicyId, wgVpnPTFilterProtocol, wgVpnPTFilterPort }
+	::= { wgVpnPTFilterTable 1 }
 
 WgVpnPTFilterEntry ::= SEQUENCE {
-    wgVpnPTFilterPolicyId       INTEGER,
-    wgVpnPTFilterProtocol       INTEGER,
-    wgVpnPTFilterPort           INTEGER,
-    wgVpnPTFilterRowStatus      INTEGER
+	wgVpnPTFilterPolicyId       Integer32,
+	wgVpnPTFilterProtocol       INTEGER,
+	wgVpnPTFilterPort           Integer32,
+	wgVpnPTFilterRowStatus      INTEGER
 }
 
 wgVpnPTFilterPolicyId OBJECT-TYPE
-	SYNTAX  INTEGER
-    ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"VPN pass through policy identifier. It must be greater than zero."
 	::= { wgVpnPTFilterEntry 1 }
@@ -425,16 +454,16 @@ wgVpnPTFilterProtocol OBJECT-TYPE
 		udp(2),
 		tcp(3)
 		}
-    ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Allow this type of protocol to pass through."
 	::= { wgVpnPTFilterEntry 2 }
 
 wgVpnPTFilterPort OBJECT-TYPE
-	SYNTAX  INTEGER
-    ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"Allow this protocol port to pass through."
 	::= { wgVpnPTFilterEntry 3 }
@@ -446,8 +475,8 @@ wgVpnPTFilterRowStatus OBJECT-TYPE
 		delete(3),
 		create(4)
 		}
-	ACCESS  read-write
-	STATUS  mandatory
+	MAX-ACCESS  read-write
+	STATUS  current
 	DESCRIPTION
 		"Create or delete a row of VPN pass through filter table."
 	::= { wgVpnPTFilterEntry 4 }
@@ -457,41 +486,43 @@ wgVpnPTFilterRowStatus OBJECT-TYPE
 --
 
 wgVpnPTPolicyTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF WgVpnPTPolicyEntry
-    ACCESS not-accessible
-    STATUS mandatory
-    DESCRIPTION
+	SYNTAX SEQUENCE OF WgVpnPTPolicyEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
 		"VPN pass through policy table"
-    ::= { snWireless 7 }
+	::= { snWireless 7 }
 
 wgVpnPTPolicyEntry OBJECT-TYPE
-    SYNTAX WgVpnPTPolicyEntry
-    ACCESS not-accessible
-    STATUS mandatory
-    DESCRIPTION
+	SYNTAX WgVpnPTPolicyEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
 		"An entry of the VPN pass through policy table."
-    INDEX { wgVpnPTPolicyId }
-    ::= { wgVpnPTPolicyTable 1 }
+	INDEX { wgVpnPTPolicyId }
+	::= { wgVpnPTPolicyTable 1 }
 
 WgVpnPTPolicyEntry ::= SEQUENCE {
-    wgVpnPTPolicyId        INTEGER,
-    wgVpnPTPolicyPortList  IfIndexList
+	wgVpnPTPolicyId        Integer32,
+	wgVpnPTPolicyPortList  IfIndexList
 }
 
 wgVpnPTPolicyId OBJECT-TYPE
-	SYNTAX  INTEGER
-    ACCESS  read-only
-	STATUS  mandatory
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"VPN pass through policy identifier. It must be greater than zero."
 	::= { wgVpnPTPolicyEntry 1 }
 
 wgVpnPTPolicyPortList OBJECT-TYPE
 	SYNTAX  IfIndexList
-	ACCESS  read-only
-	STATUS  mandatory
+	MAX-ACCESS  read-only
+	STATUS  current
 	DESCRIPTION
 		"A list of ports bound to this VPN pass through policy."
 	::= { wgVpnPTPolicyEntry 2 }
 
 END
+
+

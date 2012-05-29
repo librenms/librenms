@@ -1,0 +1,191 @@
+FDRY-RADIUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+			Unsigned32	   	FROM SNMPv2-SMI	  			-- [RFC2578]
+	RowStatus, TEXTUAL-CONVENTION		FROM SNMPv2-TC 				-- [RFC2579]
+	DisplayString		 				FROM SNMPv2-TC 		 		-- [RFC2579]
+
+	InetAddressType, InetAddress		FROM INET-ADDRESS-MIB		-- [RFC 4001]
+	fdryRadius	 					   	FROM FOUNDRY-SN-ROOT-MIB	-- [snroo101]
+	;
+
+fdryRadiusMIB MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "The Brocade proprietary MIB module for Radius Authentication Servers
+              It has new table combines Ipv4 and Ipv6 Radius Authentication Servers configuration.
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+
+    REVISION 	"200802250000Z"  -- 25 February 2008
+    DESCRIPTION	"Initial version, obsoletes the earlier snRadiusServerTable."
+
+	::= { fdryRadius 1 }
+
+	--
+	-- Textual Conventions
+	--
+	ServerUsage ::= TEXTUAL-CONVENTION
+		STATUS	  current
+		DESCRIPTION
+			"Represents usage of the server for Authentication, Authorization or Accounting purpose."
+		SYNTAX	INTEGER{
+			default(1),
+			authenticationOnly(2),
+			authorizationOnly(3),
+			accountingOnly(4) }
+
+	--
+	-- Top level components of this MIB.
+	--
+
+	fdryRadiusServer OBJECT IDENTIFIER ::= { fdryRadiusMIB 1 }
+
+	--
+	-- Ipv4/Ipv6  Radius server table
+	--
+
+fdryRadiusServerTable        OBJECT-TYPE
+	SYNTAX  SEQUENCE OF FdryRadiusServerEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Radius server table, listing the RADIUS authentication servers.
+		This table is currently supported by FastIron platform."
+	::= { fdryRadiusServer 1 }
+
+fdryRadiusServerEntry        OBJECT-TYPE
+	SYNTAX  FdryRadiusServerEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the Radius server table. This table uses running index as the Index to the table.
+		  Reasons to go for running index Scheme than IP addresses:
+		  1.  The table will be Virtual Routing and Forwarding(VRF) independent
+			  that multiple VRFs could share the same address type and address.
+		  2.  Index with address type and address could be potentially 17 unsigned integer, parsing and finding next index takes CPU time.
+			  The PDU gets to be huge too!
+		  3.  IP address is just another attribute, they are supposed to be list of servers."
+	INDEX   { fdryRadiusServerIndex }
+	::= { fdryRadiusServerTable 1 }
+
+FdryRadiusServerEntry ::= SEQUENCE {
+	fdryRadiusServerIndex
+		Unsigned32,
+	fdryRadiusServerAddrType
+		InetAddressType,
+	fdryRadiusServerAddr
+		InetAddress,
+	fdryRadiusServerAuthPort
+		Unsigned32,
+	fdryRadiusServerAcctPort
+		Unsigned32,
+	fdryRadiusServerRowKey
+		DisplayString,
+	fdryRadiusServerUsage
+		ServerUsage,
+	fdryRadiusServerRowStatus
+		RowStatus
+	}
+
+fdryRadiusServerIndex OBJECT-TYPE
+	SYNTAX	Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"The index to the Radius server Table.
+		FastIron platform supports upto 8 servers."
+	::= { fdryRadiusServerEntry 1 }
+
+fdryRadiusServerAddrType			 OBJECT-TYPE
+	SYNTAX	InetAddressType
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		"Radius server IP address Type.
+		FastIron supports address types of ipv4(1) and ipv6(2)."
+	DEFVAL	{ ipv4 }
+	::= { fdryRadiusServerEntry 2 }
+
+fdryRadiusServerAddr			 OBJECT-TYPE
+	SYNTAX	InetAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+		  "Radius server IP address."
+	::= { fdryRadiusServerEntry 3 }
+
+fdryRadiusServerAuthPort     OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Authentication UDP port number.
+		FastIron platform supports default value 1645."
+	::= { fdryRadiusServerEntry 4 }
+
+fdryRadiusServerAcctPort     OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Account UDP port number.
+		FastIron platform supports default value 1646."
+	::= { fdryRadiusServerEntry 5 }
+
+fdryRadiusServerRowKey       OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Authentication key displayed as encrypted text.
+		FastIron platform supports keysize upto 32 characters."
+	::= { fdryRadiusServerEntry 6 }
+
+fdryRadiusServerUsage    OBJECT-TYPE
+	SYNTAX	ServerUsage
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"To allow this server to be dedicated for a particular AAA activity."
+	DEFVAL  { default }
+	::= { fdryRadiusServerEntry 7 }
+
+fdryRadiusServerRowStatus    OBJECT-TYPE
+	SYNTAX	RowStatus
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"This variable is used to create, modify, or
+		delete a row in this table. When a row in this
+		table is in active(1) state, no objects in that row
+		can be modified except this object.
+		 "
+	::= { fdryRadiusServerEntry 8 }
+
+	END
+
