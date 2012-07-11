@@ -87,7 +87,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	_generateInitialClusters: function () {
-		var res = this._cluster(this._needsClustering, [], this._map.getZoom());
+		var res = this._cluster([], [], this._needsClustering, this._map.getZoom());
 
 		this._markersAndClustersAtZoom[this._map._zoom] = res;
 		//Remember the highest zoom level we've seen and the current zoom level
@@ -95,9 +95,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		//Make things appear on the map
 		for (var i = 0; i < res.clusters.length; i++) {
+			//TODO: Bounds
 			res.clusters[i]._addToMap();
 		}
 		for (var j = 0; j < res.unclustered.length; j++) {
+			//TODO: Bounds
 			L.FeatureGroup.prototype.addLayer.call(this, res.unclustered[j]);
 		}
 	},
@@ -128,7 +130,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 							//Child clusters should always be 0 as we haven't calculated clusters for this level
 							throw 'something is wrong, childClusters length should be 0: ' + currentClusters[i]._childClusters.length;
 						} else {
-							newClusters = this._cluster(currentClusters[i]._markers, [], this._zoom);
+							newClusters = this._cluster([], [], currentClusters[i]._markers, this._zoom);
 						}
 
 						currentClusters[i]._childClusters = newClusters.clusters;
@@ -155,7 +157,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				this._zoom--;
 
 				if (!newState) {
-					newState = this._cluster(now.clusters.concat(now.unclustered), [], this._zoom);
+					newState = this._cluster([], [], now.clusters.concat(now.unclustered), this._zoom);
 					this._markersAndClustersAtZoom[this._zoom] = newState;
 				}
 			}
@@ -165,10 +167,39 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	addLayer: function (layer) {
-		this._needsClustering.push(layer);
+		if (!this._map) {
+			this._needsClustering.push(layer);
+			return this;
+		}
+
 
 		//TODO: If we have already clustered we'll need to add this one to a cluster
 		//Should be able to use _cluster with the current clusters and just this layer
+		L.FeatureGroup.prototype.addLayer.call(this, layer);
+
+		var zoom = this._map._zoom,
+		    current = this._markersAndClustersAtZoom[zoom],
+		    newClusters = this._cluster(current.clusters, current.unclustered, [layer], zoom);
+
+		this._highestZoom = this._zoom = zoom;
+		this._markersAndClustersAtZoom = {};
+		this._markersAndClustersAtZoom[zoom] = newClusters;
+
+		var bounds = this._getExpandedVisibleBounds();
+
+		for (var i = 0; i < newClusters.clusters.length; i++) {
+			var c = newClusters.clusters[i];
+
+			//Flatten all child clusters as they are now wrong
+			c._markers = c.getAllChildMarkers();
+			c._childClusters = [];
+		}
+
+		var me = this;
+		setTimeout(function () {
+			me._animationStart();
+			me._animationZoomOut(newClusters.clusters, 1);
+		}, 0);
 
 		return this;
 	},
@@ -193,10 +224,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Takes a list of objects that have a 'getLatLng()' function (Marker / MarkerCluster)
 	//Performs clustering on them (using a greedy algorithm) and returns those clusters.
 	//Returns { clusters: [], unclustered: [] }
-	_cluster: function (points, existingClusters, zoom) {
+	_cluster: function (existingClusters, existingUnclustered, toCluster, zoom) {
 		var clusterRadiusSqrd = this.options.maxClusterRadius * this.options.maxClusterRadius,
 		    clusters = existingClusters,
-		    unclustered = [],
+		    unclustered = existingUnclustered,
 		    center = this._map.getCenter(),
 		    i, j, c;
 
@@ -205,16 +236,19 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			c = clusters[i];
 			c._projCenter = this._map.project(c.getLatLng(), zoom);
 		}
-
-		for (i = 0; i < points.length; i++) {
-			var p2 = points[i];
-			p2._projCenter = this._map.project(p2.getLatLng(), zoom);
+		for (i = 0; i < unclustered.length; i++) {
+			c = unclustered[i];
+			c._projCenter = this._map.project(c.getLatLng(), zoom);
+		}
+		for (i = 0; i < toCluster.length; i++) {
+			c = toCluster[i];
+			c._projCenter = this._map.project(c.getLatLng(), zoom);
 		}
 
 
 		//go through each point
-		for (i = 0; i < points.length; i++) {
-			var point = points[i];
+		for (i = 0; i < toCluster.length; i++) {
+			var point = toCluster[i];
 
 			var used = false;
 

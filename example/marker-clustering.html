@@ -109,7 +109,17 @@
 		populateRandomVector();
 		map.addLayer(markers);
 
-		L.DomUtil.get('populate').onclick = populate;
+		L.DomUtil.get('populate').onclick = function () {
+			var bounds = map.getBounds(),
+	southWest = bounds.getSouthWest(),
+	northEast = bounds.getNorthEast(),
+	lngSpan = northEast.lng - southWest.lng,
+	latSpan = northEast.lat - southWest.lat;
+
+			markers.addLayer(new L.Marker(new L.LatLng(
+					southWest.lat + latSpan * 0.5,
+					southWest.lng + lngSpan * 0.5)));
+		};
 	</script>
 </body>
 </html>

@@ -32,7 +32,7 @@ L.MarkerCluster = L.Marker.extend({
 	_baseInit: function () {
 		L.Marker.prototype.initialize.call(this, this._latlng, { icon: this._group.options.iconCreateFunction(this._childCount) });
 	},
-
+	
 	_addChild: function (new1) {
 		if (new1 instanceof L.MarkerCluster) {
 			this._childClusters.push(new1);
@@ -40,6 +40,10 @@ L.MarkerCluster = L.Marker.extend({
 		} else {
 			this._markers.push(new1);
 			this._childCount++;
+		}
+
+		if (this._icon) {
+			this.setIcon(this._group.options.iconCreateFunction(this._childCount));
 		}
 
 		this._expandBounds(new1);
