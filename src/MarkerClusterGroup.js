@@ -18,7 +18,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				c += 'large';
 			}
 
-			return new L.DivIcon({ html: '<div><span>' + childCount + '</span></div>', elementType: 'span', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+			return new L.DivIcon({ html: '<div><span>' + childCount + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
 		}
 	},
 
@@ -198,6 +198,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		var me = this;
 		setTimeout(function () {
 			me._animationStart();
+			for (var j = 0; j < newClusters.clusters.length; j++) {
+				var v = newClusters.clusters[j];
+				if (v._icon) {
+					v.setLatLng(v._latlng);
+				}
+			}
 			me._animationZoomOut(newClusters.clusters, 1);
 		}, 0);
 

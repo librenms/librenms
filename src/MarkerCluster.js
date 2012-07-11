@@ -49,7 +49,6 @@ L.MarkerCluster = L.Marker.extend({
 		this._expandBounds(new1);
 	},
 
-	//TODO: Replace with L.LatLngBounds
 	_expandBounds: function (marker) {
 
 		if (marker instanceof L.MarkerCluster) {
