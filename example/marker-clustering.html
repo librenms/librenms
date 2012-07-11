@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet debug page</title>
+
+	<link rel="stylesheet" href="../lib/leaflet-dist/leaflet.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="../lib/leaflet-dist/leaflet.ie.css" /><![endif]-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="screen.css" />
+	<script src="../lib/leaflet-dist/leaflet-src.js"></script>
+
+
+	<link rel="stylesheet" href="../src/MarkerCluster.css" />
+	<script src="../src/MarkerClusterGroup.js"></script>
+	<script src="../src/MarkerCluster.js"></script>
+	<style type="text/css">
+		.marker-cluster-small {
+			background-color: rgba(181, 226, 140, 0.6);
+		}
+		.marker-cluster-small div {
+			background-color: rgba(110, 204, 57, 0.6);
+		}
+
+		.marker-cluster-medium {
+			background-color: rgba(241, 211, 87, 0.6);
+		}
+		.marker-cluster-medium div {
+			background-color: rgba(240, 194, 12, 0.6);
+		}
+
+		.marker-cluster-large {
+			background-color: rgba(253, 156, 115, 0.6);
+		}
+		.marker-cluster-large div {
+			background-color: rgba(241, 128, 23, 0.6);
+		}
+
+		.marker-cluster {
+			text-align: center;
+			background-clip: padding-box;
+			border-radius: 20px;
+		}
+		.marker-cluster div {
+			width: 30px;
+			height: 30px;
+			margin-left: 5px;
+			margin-top: 5px;
+
+			text-align: center;
+			border-radius: 15px;
+			font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+		}
+		.marker-cluster span {
+			line-height: 30px;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="map"></div>
+	<button id="populate">Populate with 10 markers</button>
+
+	<script type="text/javascript">
+
+		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
+			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+			latlng = new L.LatLng(50.5, 30.51);
+
+		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
+
+		var markers = new L.MarkerClusterGroup();
+
+		function populate() {
+			for (var i = 0; i < 100; i++) {
+				markers.addLayer(new L.Marker(getRandomLatLng(map)));
+			}
+			return false;
+		}
+		function populateRandomVector() {
+			for (var i = 0, latlngs = [], len = 20; i < len; i++) {
+				latlngs.push(getRandomLatLng(map));
+			}
+			var path = new L.Polyline(latlngs);
+			map.addLayer(path);
+		}
+		function getRandomLatLng(map) {
+			var bounds = map.getBounds(),
+				southWest = bounds.getSouthWest(),
+				northEast = bounds.getNorthEast(),
+				lngSpan = northEast.lng - southWest.lng,
+				latSpan = northEast.lat - southWest.lat;
+
+			return new L.LatLng(
+					southWest.lat + latSpan * Math.random(),
+					southWest.lng + lngSpan * Math.random());
+		}
+
+		//markers.bindPopup("<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede.</p><p>Donec nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci. Aenean dignissim pellentesque.</p>");
+		markers.on('click', function (a) {
+			if (a.layer instanceof L.MarkerCluster) {
+				console.log('cluster ' + a.layer.getAllChildMarkers().length);
+			} else {
+				console.log('marker ' + a.layer);
+			}
+		});
+
+		populate();
+		populateRandomVector();
+		map.addLayer(markers);
+
+		L.DomUtil.get('populate').onclick = populate;
+	</script>
+</body>
+</html>
