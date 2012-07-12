@@ -214,7 +214,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	removeLayer: function (layer) {
 		var current = this._markersAndClustersAtZoom[this._map._zoom],
 			i = current.unclustered.indexOf(layer),
-			cluster, result;
+			cluster, result, killParents = false;
+
+		//TODO: This whole thing could probably be better
 
 		//Remove the marker
 		L.FeatureGroup.prototype.removeLayer.call(this, layer);
@@ -222,15 +224,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		if (i !== -1) //Is unclustered at the current zoom level
 		{
 			current.unclustered.splice(i, 1);
-
-			//blow away all parent levels as they are now wrong
-			for (i in this._markersAndClustersAtZoom)
-			{
-				if (i > this._map._zoom) {
-					delete this._markersAndClustersAtZoom[i];
-				}
-			}
-			//TODO: This could probably use something like below and then remove the marker from the map
+			
+			killParents = true; //Need to rebuild parents as they may be clusters just because this marker makes them one
 		}
 		else //it is a child of a cluster
 		{
@@ -240,17 +235,26 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				
 				if (c._recursivelyRemoveChildMarker(layer)) {
 					if (c._childCount == 1) {
-						//TODO remove cluster and add individual marker
+						//Remove cluster and add individual marker
+						L.FeatureGroup.prototype.removeLayer.call(this, c);
+						L.FeatureGroup.prototype.addLayer.call(this, c._markers[0]);
+						current.unclustered.push(c._markers[0]);
+						killParents = true; //Need to rebuild parents as they could have references to this cluster
 					}
 					break;
 				}
-			};
+			}
 		}
 
-
-		//TODO Hrm....
-		//Will need to got through each cluster and find the marker, removing it as required, possibly turning its parent from a cluster into an individual marker.
-		//Or the easy version: Just recluster everything!
+		if (killParents) {
+			//blow away all parent levels as they are now wrong
+			for (i in this._markersAndClustersAtZoom)
+			{
+				if (i > this._map._zoom) {
+					delete this._markersAndClustersAtZoom[i];
+				}
+			}
+		}
 
 		return this;
 	},
