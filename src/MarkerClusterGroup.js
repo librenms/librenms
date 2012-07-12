@@ -107,7 +107,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Merge and split any existing clusters that are too big or small
 	_mergeSplitClusters: function () {
 		var map = this._map,
-			newState,
+		    newState,
 		    depth = Math.abs(this._map._zoom - this._zoom);
 
 		if (this._zoom < this._map._zoom) { //Zoom in, split
