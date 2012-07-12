@@ -378,7 +378,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		//Add all children of current clusters to map and remove those clusters from map
 		for (i = 0; i < startingClusters.length; i++) {
-			c = startingClusters[j];
+			c = startingClusters[i];
 
 			//Remove old cluster
 			L.FeatureGroup.prototype.removeLayer.call(this, c); //TODO Animate
