@@ -181,6 +181,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		    current = this._markersAndClustersAtZoom[zoom],
 		    newClusters = this._cluster(current.clusters, current.unclustered, [layer], zoom);
 
+		//TODO: At the moment we blow away all other zoom levels, but really we could probably get away with not doing that
 		this._highestZoom = this._zoom = zoom;
 		this._markersAndClustersAtZoom = {};
 		this._markersAndClustersAtZoom[zoom] = newClusters;
@@ -211,6 +212,41 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	removeLayer: function (layer) {
+		var current = this._markersAndClustersAtZoom[this._map._zoom],
+			i = current.unclustered.indexOf(layer),
+			cluster, result;
+
+		//Remove the marker
+		L.FeatureGroup.prototype.removeLayer.call(this, layer);
+
+		if (i !== -1) //Is unclustered at the current zoom level
+		{
+			current.unclustered.splice(i, 1);
+
+			//blow away all parent levels as they are now wrong
+			for (i in this._markersAndClustersAtZoom)
+			{
+				if (i > this._map._zoom) {
+					delete this._markersAndClustersAtZoom[i];
+				}
+			}
+			//TODO: This could probably use something like below and then remove the marker from the map
+		}
+		else //it is a child of a cluster
+		{
+			//Find the cluster
+			for (i = current.clusters.length - 1; i >= 0; i--) {
+				var c = current.clusters[i];
+				
+				if (c._recursivelyRemoveChildMarker(layer)) {
+					if (c._childCount == 1) {
+						//TODO remove cluster and add individual marker
+					}
+					break;
+				}
+			};
+		}
+
 
 		//TODO Hrm....
 		//Will need to got through each cluster and find the marker, removing it as required, possibly turning its parent from a cluster into an individual marker.

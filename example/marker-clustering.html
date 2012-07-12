@@ -58,7 +58,8 @@
 <body>
 
 	<div id="map"></div>
-	<button id="populate">Populate with 10 markers</button>
+	<button id="populate">Populate 1 marker</button>
+	<button id="remove">Remove 1 marker</button>
 
 	<script type="text/javascript">
 
@@ -70,10 +71,13 @@
 		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
 
 		var markers = new L.MarkerClusterGroup();
+		var markersList = [];
 
 		function populate() {
 			for (var i = 0; i < 100; i++) {
-				markers.addLayer(new L.Marker(getRandomLatLng(map)));
+				var m = new L.Marker(getRandomLatLng(map));
+				markersList.push(m);
+				markers.addLayer(m);
 			}
 			return false;
 		}
@@ -115,11 +119,15 @@
 	northEast = bounds.getNorthEast(),
 	lngSpan = northEast.lng - southWest.lng,
 	latSpan = northEast.lat - southWest.lat;
-
-			markers.addLayer(new L.Marker(new L.LatLng(
+var m = new L.Marker(new L.LatLng(
 					southWest.lat + latSpan * 0.5,
-					southWest.lng + lngSpan * 0.5)));
+					southWest.lng + lngSpan * 0.5));
+markersList.push(m);
+			markers.addLayer(m);
 		};
+		L.DomUtil.get('remove').onclick = function () {
+			markers.removeLayer(markersList.pop());
+		}
 	</script>
 </body>
 </html>

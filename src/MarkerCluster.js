@@ -69,6 +69,45 @@ L.MarkerCluster = L.Marker.extend({
 		L.FeatureGroup.prototype.addLayer.call(this._group, this);
 	},
 
+	//Removes the given node from this marker cluster (or its child as required)
+	//Returns true if it (or its childCluster) removes the marker
+	_recursivelyRemoveChildMarker: function(layer) {
+		var markers = this._markers,
+			childClusters = this._childClusters,
+			newChildCount = 0,
+			i;
+
+		//Check our children
+		for (i = markers.length - 1; i >= 0; i--) {
+			if (markers[i] == layer) {
+				markers.splice(i, 1);
+				//TODO? Recalculate bounds
+		
+				this._childCount--;
+				if (this._icon) {
+					this.setIcon(this._group.options.iconCreateFunction(this._childCount));
+				}
+				return true;
+			}
+		}
+
+		//Otherwise check our childClusters
+		for (i = childClusters.length - 1; i >= 0; i--) {
+			if (childClusters[i]._recursivelyRemoveChildMarker(layer)) {
+				this._childCount--;
+				//TODO: If child is now 1 then remove it and add a marker
+				//TODO? Recalculate bounds
+
+				if (this._icon) {
+					this.setIcon(this._group.options.iconCreateFunction(this._childCount));
+				}
+				return true;
+			}
+		}
+
+		return false;
+	},
+
 	_recursivelyAnimateChildrenIn: function (center, depth) {
 		var markers = this._markers,
 		    markersLength = markers.length,
