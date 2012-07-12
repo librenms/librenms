@@ -111,7 +111,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		    depth = Math.abs(this._map._zoom - this._zoom);
 
 		if (this._zoom < this._map._zoom) { //Zoom in, split
-			var startingClusters = this._markersAndClustersAtZoom[this._zoom].clusters;
+			var startingClusters = this._markersAndClustersAtZoom[this._zoom].clusters,
+			    startingUnclustered = this._markersAndClustersAtZoom[this._zoom].unclustered;
 
 			while (this._zoom < this._map._zoom) { //Split each intermediate layer if required
 				var currentClusters = this._markersAndClustersAtZoom[this._zoom].clusters;
@@ -144,7 +145,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				}
 			}
 
-			this._animationZoomIn(startingClusters, depth);
+			this._animationZoomIn(startingClusters, startingUnclustered, depth);
 
 		} else if (this._zoom > this._map._zoom) { //Zoom out, merge
 			this._highestZoom = Math.min(this._highestZoom, this._map._zoom);
@@ -371,17 +372,24 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	_animationStart: function () {
 		//Do nothing...
 	},
-	_animationZoomIn: function (startingClusters, depth) {
-		var bounds = this._getExpandedVisibleBounds();
+	_animationZoomIn: function (startingClusters, startingUnclustered, depth) {
+		var bounds = this._getExpandedVisibleBounds(),
+			i, c;
 
 		//Add all children of current clusters to map and remove those clusters from map
-		for (var j = 0; j < startingClusters.length; j++) {
-			var c = startingClusters[j];
+		for (i = 0; i < startingClusters.length; i++) {
+			c = startingClusters[j];
 
 			//Remove old cluster
 			L.FeatureGroup.prototype.removeLayer.call(this, c); //TODO Animate
 
 			c._recursivelyAddChildrenToMap(null, depth, bounds);
+		}
+		for (i = startingUnclustered.length - 1; i >= 0; i--) {
+			c = startingUnclustered[i];
+			if (!bounds.contains(c._latlng)) {
+				L.FeatureGroup.prototype.removeLayer.call(this, c);
+			}
 		}
 	},
 	_animationZoomOut: function (newClusters, newUnclustered, depth) {
@@ -412,14 +420,16 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	_animationStart: function () {
 		this._map._mapPane.className += ' leaflet-cluster-anim';
 	},
-	_animationZoomIn: function (startingClusters, depth) {
-		var map = this._map,
-		    bounds = this._getExpandedVisibleBounds();
+	_animationZoomIn: function (startingClusters, startingUnclustered, depth) {
+		var me = this,
+		    map = this._map,
+		    bounds = this._getExpandedVisibleBounds(),
+		    i, c, startPos;
 
 		//Add all children of current clusters to map and remove those clusters from map
-		for (var j = 0; j < startingClusters.length; j++) {
-			var c = startingClusters[j];
-			var startPos = c.getLatLng();
+		for (i = 0; i < startingClusters.length; i++) {
+			c = startingClusters[i];
+			startPos = c.getLatLng();
 
 			//Remove old cluster
 			L.FeatureGroup.prototype.removeLayer.call(this, c); //TODO Animate
@@ -427,8 +437,16 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			c._recursivelyAddChildrenToMap(startPos, depth, bounds);
 		}
 
+		//Remove all markers that aren't visible any more
+		for (i = startingUnclustered.length - 1; i >= 0; i--) {
+			c = startingUnclustered[i];
+			if (!bounds.contains(c._latlng)) {
+				L.FeatureGroup.prototype.removeLayer.call(this, c);
+			}
+		}
+
+
 		this._inZoomAnimation = true;
-		var me = this;
 		//Start up a function to update the positions of the just added clusters/markers
 		//This must happen after otherwise they don't get animated
 		setTimeout(function () {
