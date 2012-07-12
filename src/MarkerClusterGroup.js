@@ -357,8 +357,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	_getExpandedVisibleBounds: function () {
 		var map = this._map,
 			bounds = map.getPixelBounds(),
-			width = 0,//Math.abs(bounds.max.x - bounds.min.x),
-			height = 0,//Math.abs(bounds.max.y - bounds.min.y),
+			width = Math.abs(bounds.max.x - bounds.min.x),
+			height = Math.abs(bounds.max.y - bounds.min.y),
 			sw = map.unproject(new L.Point(bounds.min.x - width, bounds.min.y - height)),
 			ne = map.unproject(new L.Point(bounds.max.x + width, bounds.max.y + height));
 		
