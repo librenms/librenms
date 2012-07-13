@@ -264,6 +264,19 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		L.FeatureGroup.prototype.onAdd.call(this, map); // LayerGroup
 
 		this._generateInitialClusters();
+		this._map.on('zoomstart', function() {
+			console.log(new Date().getTime() + ' zoomstart ' + this._map._zoom);
+			if (this._animationZoomOutTimeout) {
+				console.log(new Date().getTime() + ' clear');
+				this._animationZoomOutTimeoutFunction();
+				clearTimeout(this._animationZoomOutTimeout);
+				this._animationZoomOutTimeout = null;
+				this._animationZoomOutTimeoutFunction = null;
+			}
+		}, this);
+		this._map.on('zoomanim', function() {
+			console.log(new Date().getTime() + ' zoomanim ' + this._map._zoom);
+		}, this);
 		this._map.on('zoomend', this._zoomEnd, this);
 		this._map.on('moveend', this._moveEnd, this);
 	},
@@ -461,6 +474,8 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			}, 250);
 		}, 0);
 	},
+	_animationZoomOutTimeout: null,
+	_animationZoomOutTimeoutFunction: null,
 	_animationZoomOut: function (newClusters, newUnclustered, depth) {
 		var map = this._map,
 		    bounds = this._getExpandedVisibleBounds(),
@@ -472,14 +487,16 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 			c._recursivelyAnimateChildrenIn(this._map.latLngToLayerPoint(c.getLatLng()).round(), depth);
 		}
-
 		this._inZoomAnimation = true;
+//return;
 		var me = this;
+		console.log(new Date().getTime() + ' called at zoom ' + me._map._zoom);
+		
 		//TODO: Use the transition timing stuff to make this more reliable
-		setTimeout(function () {
+		this._animationZoomOutTimeoutFunction = function () {
 
 			map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
-
+			console.log(new Date().getTime() + ' adding at zoom ' + me._map._zoom);
 			for (i = 0; i < newClusters.length; i++) {
 				var cl = newClusters[i];
 				if (bounds.contains(cl._latlng)) {
@@ -494,6 +511,11 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				}
 			}
 			me._inZoomAnimation = false;
+		};
+		this._animationZoomOutTimeout = setTimeout(function() {
+			me._animationZoomOutTimeoutFunction();
+			me._animationZoomOutTimeout = null;
+			me._animationZoomOutTimeoutFunction = null;
 		}, 250);
 	}
 });
