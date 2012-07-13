@@ -481,13 +481,10 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		this._inZoomAnimation++;
 
 		var me = this;
-		console.log(new Date().getTime() + ' called at zoom ' + me._map._zoom);
-		
 		//TODO: Maybe use the transition timing stuff to make this more reliable
 		setTimeout(function () {
 
 			map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
-			console.log(new Date().getTime() + ' adding at zoom ' + me._map._zoom);
 			for (i = 0; i < newClusters.length; i++) {
 				var cl = newClusters[i];
 				if (cl._icon) { //Make those clusters that are now there, visible
