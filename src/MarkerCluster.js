@@ -120,7 +120,7 @@ L.MarkerCluster = L.Marker.extend({
 			//Only do it if the icon is still on the map
 			if (m._icon) {
 				m._setPos(center);
-				//TODO Scale them down as they move? Fade them as they move?
+				m.setOpacity(0);
 			}
 		}
 
@@ -129,6 +129,7 @@ L.MarkerCluster = L.Marker.extend({
 				var cm = childClusters[j];
 				if (cm._icon) {
 					cm._setPos(center);
+					cm.setOpacity(0);
 				}
 			}
 		} else {
@@ -202,17 +203,20 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_recursivelyRemoveChildrenFromMap: function (depth) {
+		var m;
 		//markers
 		for (var i = 0; i < this._markers.length; i++) {
-			//TODO: animate removing
-			L.FeatureGroup.prototype.removeLayer.call(this._group, this._markers[i]);
+			m = this._markers[i];
+			L.FeatureGroup.prototype.removeLayer.call(this._group, m);
+			m.setOpacity(1);
 		}
 
 		if (depth === 1) {
 			//child clusters
 			for (var j = 0; j < this._childClusters.length; j++) {
-				//TODO: animate removing
-				L.FeatureGroup.prototype.removeLayer.call(this._group, this._childClusters[j]);
+				m = this._childClusters[j];
+				L.FeatureGroup.prototype.removeLayer.call(this._group, m);
+				m.setOpacity(1);
 			}
 		} else {
 			var childClusters = this._childClusters,

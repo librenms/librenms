@@ -474,28 +474,35 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			c._recursivelyAnimateChildrenIn(this._map.latLngToLayerPoint(c.getLatLng()).round(), depth);
 
 			if (bounds.contains(c._latlng)) { //Add the new cluster but have it be hidden (so it gets animated, display=none stops transition)
+				c.setOpacity(0);
 				c._addToMap();
-				c._icon.style.visibility='hidden';
 			}
 		}
 		this._inZoomAnimation++;
 
 		var me = this;
+
 		//TODO: Maybe use the transition timing stuff to make this more reliable
+		setTimeout(function () {
+			for (i = 0; i < newClusters.length; i++) {
+				var n = newClusters[i];
+
+				if (n._icon) {
+					n.setOpacity(1);
+				}
+			}
+		}, 0);
 		setTimeout(function () {
 
 			map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
 			for (i = 0; i < newClusters.length; i++) {
 				var cl = newClusters[i];
-				if (cl._icon) { //Make those clusters that are now there, visible
-					cl._icon.style.visibility='visible';
-				}
 				cl._recursivelyRemoveChildrenFromMap(depth);
 			}
 			for (i = newUnclustered.length - 1; i >= 0; i--) {
 				var m = newUnclustered[i];
 				if (bounds.contains(m._latlng)) {
-					L.FeatureGroup.prototype.addLayer.call(me, m); //TODO Animate
+					L.FeatureGroup.prototype.addLayer.call(me, m);
 				}
 			}
 			me._inZoomAnimation--;
