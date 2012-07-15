@@ -74,7 +74,6 @@ L.MarkerCluster = L.Marker.extend({
 	_recursivelyRemoveChildMarker: function(layer) {
 		var markers = this._markers,
 			childClusters = this._childClusters,
-			newChildCount = 0,
 			i;
 
 		//Check our children
@@ -95,7 +94,6 @@ L.MarkerCluster = L.Marker.extend({
 		for (i = childClusters.length - 1; i >= 0; i--) {
 			if (childClusters[i]._recursivelyRemoveChildMarker(layer)) {
 				this._childCount--;
-				//TODO: If child is now 1 then remove it and add a marker
 				//TODO? Recalculate bounds
 
 				if (this._icon) {

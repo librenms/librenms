@@ -107,8 +107,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Merge and split any existing clusters that are too big or small
 	_mergeSplitClusters: function () {
-		var map = this._map,
-		    newState,
+		var newState,
 		    depth = Math.abs(this._map._zoom - this._zoom);
 
 		if (this._zoom < this._map._zoom) { //Zoom in, split
@@ -216,7 +215,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	removeLayer: function (layer) {
 		var current = this._markersAndClustersAtZoom[this._map._zoom],
 			i = current.unclustered.indexOf(layer),
-			cluster, result, killParents = false;
+			killParents = false;
 
 		//TODO: This whole thing could probably be better
 
@@ -276,7 +275,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		var clusterRadiusSqrd = this.options.maxClusterRadius * this.options.maxClusterRadius,
 		    clusters = existingClusters,
 		    unclustered = existingUnclustered,
-		    center = this._map.getCenter(),
 		    i, j, c;
 
 		//Calculate pixel positions
