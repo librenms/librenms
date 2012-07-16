@@ -11,49 +11,9 @@
 
 
 	<link rel="stylesheet" href="../src/MarkerCluster.css" />
+	<link rel="stylesheet" href="../src/MarkerCluster.Default.css" />
 	<script src="../src/MarkerClusterGroup.js"></script>
 	<script src="../src/MarkerCluster.js"></script>
-	<style type="text/css">
-		.marker-cluster-small {
-			background-color: rgba(181, 226, 140, 0.6);
-		}
-		.marker-cluster-small div {
-			background-color: rgba(110, 204, 57, 0.6);
-		}
-
-		.marker-cluster-medium {
-			background-color: rgba(241, 211, 87, 0.6);
-		}
-		.marker-cluster-medium div {
-			background-color: rgba(240, 194, 12, 0.6);
-		}
-
-		.marker-cluster-large {
-			background-color: rgba(253, 156, 115, 0.6);
-		}
-		.marker-cluster-large div {
-			background-color: rgba(241, 128, 23, 0.6);
-		}
-
-		.marker-cluster {
-			text-align: center;
-			background-clip: padding-box;
-			border-radius: 20px;
-		}
-		.marker-cluster div {
-			width: 30px;
-			height: 30px;
-			margin-left: 5px;
-			margin-top: 5px;
-
-			text-align: center;
-			border-radius: 15px;
-			font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
-		}
-		.marker-cluster span {
-			line-height: 30px;
-		}
-	</style>
 </head>
 <body>
 
@@ -100,7 +60,6 @@
 					southWest.lng + lngSpan * Math.random());
 		}
 
-		//markers.bindPopup("<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede.</p><p>Donec nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci. Aenean dignissim pellentesque.</p>");
 		markers.on('click', function (a) {
 			if (a.layer instanceof L.MarkerCluster) {
 				console.log('cluster ' + a.layer.getAllChildMarkers().length);
@@ -110,24 +69,24 @@
 		});
 
 		populate();
-		populateRandomVector();
+		//populateRandomVector();
 		map.addLayer(markers);
 
 		L.DomUtil.get('populate').onclick = function () {
 			var bounds = map.getBounds(),
-	southWest = bounds.getSouthWest(),
-	northEast = bounds.getNorthEast(),
-	lngSpan = northEast.lng - southWest.lng,
-	latSpan = northEast.lat - southWest.lat;
-var m = new L.Marker(new L.LatLng(
+			southWest = bounds.getSouthWest(),
+			northEast = bounds.getNorthEast(),
+			lngSpan = northEast.lng - southWest.lng,
+			latSpan = northEast.lat - southWest.lat;
+			var m = new L.Marker(new L.LatLng(
 					southWest.lat + latSpan * 0.5,
 					southWest.lng + lngSpan * 0.5));
-markersList.push(m);
+			markersList.push(m);
 			markers.addLayer(m);
 		};
 		L.DomUtil.get('remove').onclick = function () {
 			markers.removeLayer(markersList.pop());
-		}
+		};
 	</script>
 </body>
 </html>
