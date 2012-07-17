@@ -229,5 +229,11 @@ L.MarkerCluster = L.Marker.extend({
 				childClusters[k]._recursivelyRemoveChildrenFromMap(depth - 1);
 			}
 		}
+	},
+
+	//Returns true if we are the parent of only one cluster and that cluster is the same as us
+	_isSingleParent: function () {
+		//Don't need to check this._markers as the rest won't work if there are any
+		return this._childClusters.length > 0 && this._childClusters[0]._childCount == this._childCount;
 	}
 });

@@ -430,9 +430,14 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			c = startingClusters[i];
 			startPos = c.getLatLng();
 
-			//Fade out old cluster
-			c.setOpacity(0);
-			c._recursivelyAddChildrenToMap(startPos, depth, bounds);
+			if (c._isSingleParent()) {
+				L.FeatureGroup.prototype.removeLayer.call(this, c);
+				c._recursivelyAddChildrenToMap(null, depth, bounds);
+			} else {
+				//Fade out old cluster
+				c.setOpacity(0);
+				c._recursivelyAddChildrenToMap(startPos, depth, bounds);
+			}
 		}
 
 		//Remove all markers that aren't visible any more
@@ -484,7 +489,13 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			c._recursivelyAnimateChildrenIn(this._map.latLngToLayerPoint(c.getLatLng()).round(), depth);
 
 			if (bounds.contains(c._latlng)) { //Add the new cluster but have it be hidden (so it gets animated, display=none stops transition)
-				c.setOpacity(0);
+
+				if (c._isSingleParent()) { //If we are the same as our parent, don't do an animation, just immediately appear
+					c.setOpacity(1);
+					c._recursivelyRemoveChildrenFromMap(depth);
+				} else {
+					c.setOpacity(0);
+				}
 				c._addToMap();
 			}
 		}
