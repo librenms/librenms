@@ -27,19 +27,21 @@ Retrieved from: http://en.literateprograms.org/Quickhull_(Javascript)?oldid=1843
 (function () {
 	L.QuickHull = {
 		getDistant: function (cpt, bl) {
-			var vY = bl[1][0] - bl[0][0];
-			var vX = bl[0][1] - bl[1][1];
-			return (vX * (cpt[0] - bl[0][0]) + vY * (cpt[1] - bl[0][1]));
+			var vY = bl[1].lat - bl[0].lat,
+				vX = bl[0].lng - bl[1].lng;
+			return (vX * (cpt.lat - bl[0].lat) + vY * (cpt.lng - bl[0].lng));
 		},
 
 
-		findMostDistantPointFromBaseLine: function (baseLine, points) {
-			var maxD = 0;
-			var maxPt = new Array();
-			var newPoints = new Array();
-			for (var idx in points) {
-				var pt = points[idx];
-				var d = this.getDistant(pt, baseLine);
+		findMostDistantPointFromBaseLine: function (baseLine, latLngs) {
+			var maxD = 0,
+				maxPt = null,
+				newPoints = [],
+				i, pt, d;
+
+			for (i = latLngs.length - 1; i >= 0; i--) {
+				pt = latLngs[i];
+				d = this.getDistant(pt, baseLine);
 
 				if (d > 0) {
 					newPoints.push(pt);
@@ -56,10 +58,11 @@ Retrieved from: http://en.literateprograms.org/Quickhull_(Javascript)?oldid=1843
 			return { 'maxPoint': maxPt, 'newPoints': newPoints };
 		},
 
-		buildConvexHull: function (baseLine, points) {
-			var convexHullBaseLines = new Array();
-			var t = this.findMostDistantPointFromBaseLine(baseLine, points);
-			if (t.maxPoint.length) { // if there is still a point "outside" the base line
+		buildConvexHull: function (baseLine, latLngs) {
+			var convexHullBaseLines = [],
+				t = this.findMostDistantPointFromBaseLine(baseLine, latLngs);
+
+			if (t.maxPoint) { // if there is still a point "outside" the base line
 				convexHullBaseLines =
 					convexHullBaseLines.concat(
 						this.buildConvexHull([baseLine[0], t.maxPoint], t.newPoints)
@@ -74,24 +77,25 @@ Retrieved from: http://en.literateprograms.org/Quickhull_(Javascript)?oldid=1843
 			}
 		},
 
-		getConvexHull: function (points) {
+		getConvexHull: function (latLngs) {
 			//find first baseline
-			var maxX = false, minX = false;
-			var maxPt = null, minPt = null;
+			var maxLat = false, minLat = false,
+				maxPt = null, minPt = null,
+				i;
 
-			for (var idx in points) {
-				var pt = points[idx];
-				if (maxX === false || pt[0] > maxX) {
+			for (i = latLngs.length - 1; i >= 0; i--) {
+				var pt = latLngs[i];
+				if (maxLat === false || pt.lat > maxLat) {
 					maxPt = pt;
-					maxX = pt[0];
+					maxLat = pt.lat;
 				}
-				if (minX === false || pt[0] < minX) {
+				if (minLat === false || pt.lat < minLat) {
 					minPt = pt;
-					minX = pt[0];
+					minLat = pt.lat;
 				}
 			}
-			var ch = [].concat(this.buildConvexHull([minPt, maxPt], points),
-								this.buildConvexHull([maxPt, minPt], points));
+			var ch = [].concat(this.buildConvexHull([minPt, maxPt], latLngs),
+								this.buildConvexHull([maxPt, minPt], latLngs));
 			return ch;
 		}
 	};
@@ -106,14 +110,13 @@ L.MarkerCluster.include({
 
 		for (i = childMarkers.length - 1; i >= 0; i--) {
 			p = childMarkers[i].getLatLng();
-			points.push([p.lat, p.lng]);
+			points.push(p);
 		}
 
 		hull = L.QuickHull.getConvexHull(points);
 
-		for (i = 0; i < hull.length; i++) {
-			p = hull[i];
-			hullLatLng.push(new L.LatLng(p[0][0], p[0][1]));
+		for (i = hull.length - 1; i >= 0; i--) {
+			hullLatLng.push(hull[i][0]);
 		}
 
 		return hullLatLng;
