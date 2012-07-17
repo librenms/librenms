@@ -430,9 +430,8 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			c = startingClusters[i];
 			startPos = c.getLatLng();
 
-			//Remove old cluster
-			L.FeatureGroup.prototype.removeLayer.call(this, c); //TODO Animate
-
+			//Fade out old cluster
+			c.setOpacity(0);
 			c._recursivelyAddChildrenToMap(startPos, depth, bounds);
 		}
 
@@ -465,6 +464,9 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			}
 
 			setTimeout(function () {
+				for (i = 0; i < startingClusters.length; i++) {
+					L.FeatureGroup.prototype.removeLayer.call(me, startingClusters[i]);
+				}
 				map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
 				me._inZoomAnimation--;
 			}, 250);
