@@ -27,9 +27,9 @@ Retrieved from: http://en.literateprograms.org/Quickhull_(Javascript)?oldid=1843
 (function () {
 	L.QuickHull = {
 		getDistant: function (cpt, bl) {
-			var Vy = bl[1][0] - bl[0][0];
-			var Vx = bl[0][1] - bl[1][1];
-			return (Vx * (cpt[0] - bl[0][0]) + Vy * (cpt[1] - bl[0][1]))
+			var vY = bl[1][0] - bl[0][0];
+			var vX = bl[0][1] - bl[1][1];
+			return (vX * (cpt[0] - bl[0][0]) + vY * (cpt[1] - bl[0][1]));
 		},
 
 
@@ -53,7 +53,7 @@ Retrieved from: http://en.literateprograms.org/Quickhull_(Javascript)?oldid=1843
 				}
 
 			}
-			return { 'maxPoint': maxPt, 'newPoints': newPoints }
+			return { 'maxPoint': maxPt, 'newPoints': newPoints };
 		},
 
 		buildConvexHull: function (baseLine, points) {
@@ -76,24 +76,25 @@ Retrieved from: http://en.literateprograms.org/Quickhull_(Javascript)?oldid=1843
 
 		getConvexHull: function (points) {
 			//find first baseline
-			var maxX, minX;
-			var maxPt, minPt;
+			var maxX = false, minX = false;
+			var maxPt = null, minPt = null;
+
 			for (var idx in points) {
 				var pt = points[idx];
-				if (pt[0] > maxX || !maxX) {
+				if (maxX === false || pt[0] > maxX) {
 					maxPt = pt;
 					maxX = pt[0];
 				}
-				if (pt[0] < minX || !minX) {
+				if (minX === false || pt[0] < minX) {
 					minPt = pt;
 					minX = pt[0];
 				}
 			}
 			var ch = [].concat(this.buildConvexHull([minPt, maxPt], points),
-								this.buildConvexHull([maxPt, minPt], points))
+								this.buildConvexHull([maxPt, minPt], points));
 			return ch;
 		}
-	}
+	};
 }());
 
 L.MarkerCluster.include({
