@@ -4,7 +4,7 @@ Leaflet.markercluster
 Provides Marker Clustering functionality for Leaflet
 
 ## Using the plugin
-See the included example for usage. Or [check it out online here](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering.html)
+See the included examples for usage. Or [check out the most basic example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering.html) or the [everything example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-everything.html).
 
 Create a new MarkerClusterGroup, add your markers to it, then add it to the map
 
@@ -30,7 +30,6 @@ var markers = new L.MarkerClusterGroup({ options: {
 ```
 
 ### Events
-
 If you register for click, mouseover, etc events on the MarkerClusterGroup you will get callbacks for both individual markers and clusters.
 Set your callback up as follows to handle both cases:
 
@@ -44,7 +43,28 @@ markers.on('click', function (a) {
 });
 ```
 
-### License
+### Getting the bounds of a cluster
+When you recieve an event from a cluster you can query it for the bounds.
+See [example/marker-clustering-convexhull.html](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-convexhull.html) for a working example.
+```javascript
+markers.on('click', function (a) {
+	if (a.layer instanceof L.MarkerCluster) {
+		map.addLayer(new L.Polygon(a.layer.getConvexHull()));
+	}
+});
+```
 
+### Zooming to the bounds of a cluster
+When you recieve an event from a cluster you can zoom to its bounds in one easy step.
+See [marker-clustering-zoomtobounds.html](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-zoomtobounds.html) for a working example.
+```javascript
+markers.on('click', function (a) {
+	if (a.layer instanceof L.MarkerCluster) {
+		a.layer.zoomToBounds();
+	}
+});
+```
+
+### License
 
 Leaflet.markercluster is free software, and may be redistributed under the MIT-LICENSE.
