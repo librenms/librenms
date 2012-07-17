@@ -161,8 +161,8 @@ L.MarkerCluster = L.Marker.extend({
 				nm._backupLatlng = nm.getLatLng();
 
 				nm.setLatLng(startPos);
+				nm.setOpacity(0);
 			}
-
 
 			L.FeatureGroup.prototype.addLayer.call(this._group, nm);
 		}

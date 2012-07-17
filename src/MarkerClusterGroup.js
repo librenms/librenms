@@ -444,6 +444,16 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			}
 		}
 
+		//Immediately fire an event to update the opacity (If we immediately set it they won't animate)
+		setTimeout(function () {
+			for (i in me._layers) {
+				var n = me._layers[i];
+
+				if (!(n instanceof L.MarkerCluster) && n._icon) {
+					n.setOpacity(1);
+				}
+			}
+		}, 0);
 
 		this._inZoomAnimation++;
 		//Start up a function to update the positions of the just added clusters/markers
@@ -480,7 +490,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		var me = this;
 
-		//TODO: Maybe use the transition timing stuff to make this more reliable
+		//Immediately fire an event to update the opacity (If we immediately set it they won't animate)
 		setTimeout(function () {
 			for (i = 0; i < newClusters.length; i++) {
 				var n = newClusters[i];
@@ -490,6 +500,8 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				}
 			}
 		}, 0);
+
+		//TODO: Maybe use the transition timing stuff to make this more reliable
 		setTimeout(function () {
 
 			map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
