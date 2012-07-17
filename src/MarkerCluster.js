@@ -29,6 +29,11 @@ L.MarkerCluster = L.Marker.extend({
 		return storageArray;
 	},
 
+	//Zoom to the extents of this cluster
+	zoomToBounds: function () {
+		this._group._map.fitBounds(this._bounds);
+	},
+
 	_baseInit: function () {
 		L.Marker.prototype.initialize.call(this, this._latlng, { icon: this._group.options.iconCreateFunction(this._childCount) });
 	},
