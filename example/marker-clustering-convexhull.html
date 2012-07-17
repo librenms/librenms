@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet debug page</title>
+
+	<link rel="stylesheet" href="../lib/leaflet-dist/leaflet.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="../lib/leaflet-dist/leaflet.ie.css" /><![endif]-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="screen.css" />
+	<script src="../lib/leaflet-dist/leaflet-src.js"></script>
+
+
+	<link rel="stylesheet" href="../src/MarkerCluster.css" />
+	<link rel="stylesheet" href="../src/MarkerCluster.Default.css" />
+	<script src="../src/MarkerClusterGroup.js"></script>
+	<script src="../src/MarkerCluster.js"></script>
+	<script src="../src/MarkerCluster.QuickHull.js"></script>
+</head>
+<body>
+
+	<div id="map"></div>
+	<button id="populate">Populate 1 marker</button>
+	<button id="remove">Remove 1 marker</button>
+
+	<script type="text/javascript">
+
+		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
+			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+			latlng = new L.LatLng(50.5, 30.51);
+
+		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
+
+		var markers = new L.MarkerClusterGroup();
+		var markersList = [];
+
+		function populate() {
+			for (var i = 0; i < 100; i++) {
+				var m = new L.Marker(getRandomLatLng(map));
+				markersList.push(m);
+				markers.addLayer(m);
+			}
+			return false;
+		}
+		function populateRandomVector() {
+			for (var i = 0, latlngs = [], len = 20; i < len; i++) {
+				latlngs.push(getRandomLatLng(map));
+			}
+			var path = new L.Polyline(latlngs);
+			map.addLayer(path);
+		}
+		function getRandomLatLng(map) {
+			var bounds = map.getBounds(),
+				southWest = bounds.getSouthWest(),
+				northEast = bounds.getNorthEast(),
+				lngSpan = northEast.lng - southWest.lng,
+				latSpan = northEast.lat - southWest.lat;
+
+			return new L.LatLng(
+					southWest.lat + latSpan * Math.random(),
+					southWest.lng + lngSpan * Math.random());
+		}
+
+		markers.on('click', function (a) {
+			if (a.layer instanceof L.MarkerCluster) {
+				console.log('cluster ' + a.layer.getAllChildMarkers().length);
+				//a.layer.zoomToBounds();
+				var ms = a.layer.getAllChildMarkers();
+				var p = [];
+				for (var i = 0; i < ms.length; i++) {
+					var ll = ms[i].getLatLng();
+					p.push([ll.lat, ll.lng]);
+				}
+				var hull = L.QuickHull.getConvexHull(p);
+				var hullll = [];
+				for (var i = 0; i < hull.length; i++) {
+					var p = hull[i];
+					var ll = new L.LatLng(p[0][0], p[0][1]);
+					hullll.push(ll);
+				}
+
+				var path = new L.Polygon(hullll);
+				map.addLayer(path);
+			} else {
+				console.log('marker ' + a.layer);
+			}
+		});
+
+		populate();
+		//populateRandomVector();
+		map.addLayer(markers);
+
+		L.DomUtil.get('populate').onclick = function () {
+			var bounds = map.getBounds(),
+			southWest = bounds.getSouthWest(),
+			northEast = bounds.getNorthEast(),
+			lngSpan = northEast.lng - southWest.lng,
+			latSpan = northEast.lat - southWest.lat;
+			var m = new L.Marker(new L.LatLng(
+					southWest.lat + latSpan * 0.5,
+					southWest.lng + lngSpan * 0.5));
+			markersList.push(m);
+			markers.addLayer(m);
+		};
+		L.DomUtil.get('remove').onclick = function () {
+			markers.removeLayer(markersList.pop());
+		};
+	</script>
+</body>
+</html>
