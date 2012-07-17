@@ -103,14 +103,14 @@ L.MarkerCluster.include({
 			hullLatLng = [],
 			hull, p, i;
 
-		for (var i = ms.lenght; i >= 0; i--) {
-			ll = ms[i].getLatLng();
-			points.push([ll.lat, ll.lng]);
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			p = childMarkers[i].getLatLng();
+			points.push([p.lat, p.lng]);
 		}
 
 		hull = L.QuickHull.getConvexHull(points);
 
-		for (var i = 0; i < hull.length; i++) {
+		for (i = 0; i < hull.length; i++) {
 			p = hull[i];
 			hullLatLng.push(new L.LatLng(p[0][0], p[0][1]));
 		}
