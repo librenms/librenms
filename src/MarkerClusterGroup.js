@@ -235,7 +235,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 					if (c._childCount == 1) {
 						//Remove cluster and add individual marker
 						L.FeatureGroup.prototype.removeLayer.call(this, c);
-						var marker = c.getAllChildMarkers()[0];
+						var marker = c._markers[0];
 						L.FeatureGroup.prototype.addLayer.call(this, marker);
 						current.unclustered.push(marker);
 						current.clusters.splice(i, 1);

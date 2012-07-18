@@ -85,7 +85,7 @@ L.MarkerCluster = L.Marker.extend({
 		for (i = markers.length - 1; i >= 0; i--) {
 			if (markers[i] == layer) {
 				markers.splice(i, 1);
-				//TODO? Recalculate bounds
+				this._recalculateBounds();
 		
 				this._childCount--;
 				if (this._icon) {
@@ -97,9 +97,17 @@ L.MarkerCluster = L.Marker.extend({
 
 		//Otherwise check our childClusters
 		for (i = childClusters.length - 1; i >= 0; i--) {
-			if (childClusters[i]._recursivelyRemoveChildMarker(layer)) {
+			var child = childClusters[i];
+			if (child._recursivelyRemoveChildMarker(layer)) {
 				this._childCount--;
-				//TODO? Recalculate bounds
+
+				//if our child cluster is no longer a cluster, remove it and replace with just the marker
+				if (child._childCount === 1) {
+					markers.push(child._markers[0]);
+					childClusters.splice(i, 1);
+				}
+
+				this._recalculateBounds();
 
 				if (this._icon) {
 					this.setIcon(this._group.options.iconCreateFunction(this._childCount));
@@ -230,6 +238,24 @@ L.MarkerCluster = L.Marker.extend({
 			}
 		}
 	},
+
+	_recalculateBounds: function () {
+		var markers = this._markers,
+			childClusters = this._childClusters,
+			i;
+
+		this._bounds = new L.LatLngBounds();
+
+		for (i = markers.length - 1; i >= 0; i--) {
+			this._bounds.extend(markers[i].getLatLng());
+		}
+		for (i = childClusters.length - 1; i >= 0; i--) {
+			this._bounds.extend(childClusters[i]._bounds);
+		}
+
+		this.setLatLng(this._bounds.getCenter());
+	},
+
 
 	//Returns true if we are the parent of only one cluster and that cluster is the same as us
 	_isSingleParent: function () {
