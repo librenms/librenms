@@ -193,8 +193,7 @@ L.MarkerCluster = L.Marker.extend({
 				//TODO: depthToAnimateIn affects _isSingleParent, if there is a multizoom we may/may not be.
 				if (this._isSingleParent() && depthToAnimateIn === 1) { //If we are the same as our parent, don't do an animation, just immediately appear
 					this.setOpacity(1);
-					this._recursivelyRemoveChildrenFromMap(depthToAnimateIn); //Immediately remove our children as we are replacing them
-					console.log('skipping');
+					this._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
 				} else {
 					this.setOpacity(0);
 				}
@@ -285,8 +284,9 @@ L.MarkerCluster = L.Marker.extend({
 		}
 	},
 
+	//depth 1 means I remove my immediate children from the map
 	_recursivelyRemoveChildrenFromMap: function (previousBounds, depth) {
-		//TODO: Use previousBounds so we only bother looking at ones that were on screen
+		//TODO: Use previousBounds so we only bother looking at ones that weren't on screen
 		var m;
 		//markers
 		for (var i = 0; i < this._markers.length; i++) {
@@ -295,7 +295,7 @@ L.MarkerCluster = L.Marker.extend({
 			m.setOpacity(1);
 		}
 
-		if (depth === 0) {
+		if (depth === 1) {
 			//child clusters
 			for (var j = 0; j < this._childClusters.length; j++) {
 				m = this._childClusters[j];
