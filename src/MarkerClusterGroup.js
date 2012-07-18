@@ -92,7 +92,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	_generateInitialClusters: function () {
 		console.log('generating initial topCluster ' + this._map.getZoom());
-		var res = this._topClusterLevel = this._cluster([], [], this._needsClustering, this._map.getZoom());
+		var res = this._topClusterLevel = this._clusterToMarkerCluster([], [], this._needsClustering, this._map.getZoom());
 
 		//Remember the current zoom level
 		this._zoom = this._map._zoom;
@@ -149,7 +149,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			//Ensure all of the intermediate zoom levels are generated
 			while (this._topClusterLevel._zoom > this._map._zoom) {
 				console.log('generating new topCluster for ' + (this._topClusterLevel._zoom - 1));
-				this._topClusterLevel = this._cluster([], [], this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
+				this._topClusterLevel = this._clusterToMarkerCluster([], [], this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
 			}
 
 			this._animationZoomOut(this._zoom - this._topClusterLevel._zoom, depth);
@@ -339,8 +339,16 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			clusters[i]._baseInit();
 		}
 
-		var toAdd = clusters.concat(unclustered);
-		var result = new L.MarkerCluster(this, toAdd[0]);
+		return { 'clusters': clusters, 'unclustered': unclustered };
+	},
+
+	//Clusters the given markers (with _cluster) and returns the result as a MarkerCluster
+	_clusterToMarkerCluster: function (existingClusters, existingUnclustered, toCluster, zoom) {
+		var res = this._cluster(existingClusters, existingUnclustered, toCluster, zoom),
+			toAdd = res.clusters.concat(res.unclustered),
+			result = new L.MarkerCluster(this, toAdd[0]),
+			i;
+
 		for (i = toAdd.length - 1; i > 0; i--) {
 			result._addChild(toAdd[i]);
 		}
@@ -349,7 +357,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return result;
 	},
 
-	//Gets the maps visible bounds expanded in each direction by the size of the screen (so the user cannot see an area we do not cover in one pan)
+		//Gets the maps visible bounds expanded in each direction by the size of the screen (so the user cannot see an area we do not cover in one pan)
 	_getExpandedVisibleBounds: function () {
 		var map = this._map,
 			bounds = map.getPixelBounds(),
@@ -368,7 +376,9 @@ L.MarkerClusterGroup.include(true /*!L.DomUtil.TRANSITION*/ ? { //HACK TO JUST D
 	_animationStart: function () {
 		//Do nothing...
 	},
-	_animationZoomIn: function (startingClusters, startingUnclustered, depth) {
+	_animationZoomIn: function (previousLevelDepth, zoomInDepth) {
+
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousLevelDepth);
 		var bounds = this._getExpandedVisibleBounds(),
 			i, c;
 
@@ -391,13 +401,11 @@ L.MarkerClusterGroup.include(true /*!L.DomUtil.TRANSITION*/ ? { //HACK TO JUST D
 	//newLevelDepth: How deep down from _topClusterLevel the level we want to show is
 	//zoomOutDepth: How deep from ^^that level^^ to the currently shown level (that needs hiding)
 	_animationZoomOut: function (newLevelDepth, zoomOutDepth) {
-		var bounds = this._getExpandedVisibleBounds();
-
 		//Remove old from the map
 		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, newLevelDepth + zoomOutDepth);
 
 		//Add new markers
-		this._topClusterLevel._recursivelyAddChildrenToMap(null, newLevelDepth, bounds);
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, newLevelDepth, this._getExpandedVisibleBounds());
 	}
 } : {
 
