@@ -286,28 +286,59 @@ L.MarkerCluster = L.Marker.extend({
 
 	//depth 1 means I remove my immediate children from the map
 	_recursivelyRemoveChildrenFromMap: function (previousBounds, depth) {
-		//TODO: Use previousBounds so we only bother looking at ones that weren't on screen
-		var m;
-		//markers
-		for (var i = 0; i < this._markers.length; i++) {
-			m = this._markers[i];
-			L.FeatureGroup.prototype.removeLayer.call(this._group, m);
-			m.setOpacity(1);
-		}
-
-		if (depth === 1) {
-			//child clusters
-			for (var j = 0; j < this._childClusters.length; j++) {
-				m = this._childClusters[j];
-				L.FeatureGroup.prototype.removeLayer.call(this._group, m);
-				m.setOpacity(1);
+		var m, i;
+		this._recursively(previousBounds, 0, depth,
+			function (c) {
+				//Remove markers at every level
+				for (i = c._markers.length - 1; i >= 0; i--) {
+					m = c._markers[i];
+					L.FeatureGroup.prototype.removeLayer.call(c._group, m);
+					m.setOpacity(1);
+				}
+			},
+			function (c) {
+				//Remove child clusters at just the bottom level
+				for (i = c._childClusters.length - 1; i >= 0; i--) {
+					m = c._childClusters[i];
+					L.FeatureGroup.prototype.removeLayer.call(c._group, m);
+					m.setOpacity(1);
+				}
 			}
-		} else {
-			var childClusters = this._childClusters,
-			    childClustersLength = childClusters.length;
+		);
+	},
 
-			for (var k = 0; k < childClustersLength; k++) {
-				childClusters[k]._recursivelyRemoveChildrenFromMap(previousBounds, depth - 1);
+	//Run the given functions recursively to this and child clusters
+	// boundsToApplyTo: a L.LatLngBounds representing the bounds of what clusters to recurse in to
+	// depthToStartAt: the depth to start calling the given functions
+	// depthToRunFor: how many layers deep to recurse in to, bottom level: depthToRunFor == 0 
+	// runAtEveryLevel: function that takes an L.MarkerCluster as an argument that should be applied on every level
+	// runAtBottomLevel: function that takes an L.MarkerCluster as an argument that should be applied at only the bottom level
+	_recursively: function (boundsToApplyTo, depthToStartAt, depthToRunFor, runAtEveryLevel, runAtBottomLevel) {
+		var childClusters = this._childClusters,
+			i, c;
+
+		if (depthToStartAt > 0) { //Still going down to required depth, just recurse to child clusters
+			for (i = childClusters.length - 1; i >= 0; i--) {
+				c = childClusters[i];
+				if (boundsToApplyTo.intersects(c._bounds)) {
+					c._recursively(boundsToApplyTo, depthToStartAt - 1, depthToRunFor, runAtEveryLevel, runAtBottomLevel);
+				}
+			}
+		} else { //In required depth
+
+			runAtEveryLevel(this);
+			if (depthToRunFor == 0 && runAtBottomLevel) {
+				runAtBottomLevel(this);
+			}
+
+			//TODO: This loop is almost the same as above
+			if (depthToRunFor > 0) {
+				for (i = childClusters.length - 1; i >= 0; i--) {
+					c = childClusters[i];
+					if (boundsToApplyTo.intersects(c._bounds)) {
+						c._recursively(boundsToApplyTo, depthToStartAt, depthToRunFor - 1, runAtEveryLevel, runAtBottomLevel);
+					}
+				}
 			}
 		}
 	},
