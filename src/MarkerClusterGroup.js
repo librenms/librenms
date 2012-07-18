@@ -336,21 +336,17 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	}
 });
 
-L.MarkerClusterGroup.include(true /*!L.DomUtil.TRANSITION*/ ? { //HACK TO JUST DO THE NON ANIMATED ONES FOR EASYNESS
+L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 	//Non Animated versions of everything
 	_animationStart: function () {
 		//Do nothing...
 	},
 	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
-		console.log('in ' + previousZoomLevel + ' ' + newZoomLevel + ' @ ' + this._topClusterLevel._zoom);
 		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel - this._topClusterLevel._zoom + 1);
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel - this._topClusterLevel._zoom + 1, this._getExpandedVisibleBounds());
 	},
-	//newLevelDepth: How deep down from _topClusterLevel the level we want to show is
-	//zoomOutDepth: How deep from ^^that level^^ to the currently shown level (that needs hiding)
 	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
-		console.log('out ' + previousZoomLevel + ' ' + newZoomLevel + ' @ ' + this._topClusterLevel._zoom);
 		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel - this._topClusterLevel._zoom + 1);
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel - this._topClusterLevel._zoom + 1, this._getExpandedVisibleBounds());
 	}
@@ -360,7 +356,7 @@ L.MarkerClusterGroup.include(true /*!L.DomUtil.TRANSITION*/ ? { //HACK TO JUST D
 	_animationStart: function () {
 		this._map._mapPane.className += ' leaflet-cluster-anim';
 	},
-	_animationZoomIn: function (startingClusters, startingUnclustered, depth) {
+	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
 		var me = this,
 		    map = this._map,
 		    bounds = this._getExpandedVisibleBounds(),
@@ -418,13 +414,18 @@ L.MarkerClusterGroup.include(true /*!L.DomUtil.TRANSITION*/ ? { //HACK TO JUST D
 			}, 250);
 		}, 0);
 	},
-	_animationZoomOut: function (newClusters, newUnclustered, depth) {
+	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
 		var map = this._map,
 		    bounds = this._getExpandedVisibleBounds(),
-		    i;
+		    i,
+		    depthToStartAt = previousZoomLevel - this._topClusterLevel._zoom,
+		    depthToAnimateIn = previousZoomLevel - newZoomLevel;
 
+		console.log('animationZoomOut ' + depthToStartAt + ' ' + depthToAnimateIn);
 		//Animate all of the markers in the clusters to move to their cluster center point
-		for ( i = 0; i < newClusters.length; i++) {
+		//bounds, depthToStartAt, depthToAnimateIn
+		this._topClusterLevel._recursivelyAnimateChildrenInAndAddSelfToMap(bounds, depthToStartAt, depthToAnimateIn);
+		/*for ( i = 0; i < newClusters.length; i++) {
 			var c = newClusters[i];
 
 			c._recursivelyAnimateChildrenIn(this._map.latLngToLayerPoint(c.getLatLng()).round(), depth);
@@ -439,27 +440,29 @@ L.MarkerClusterGroup.include(true /*!L.DomUtil.TRANSITION*/ ? { //HACK TO JUST D
 				}
 				c._addToMap();
 			}
-		}
+		}*/
 		this._inZoomAnimation++;
 
 		var me = this;
 
 		//Immediately fire an event to update the opacity (If we immediately set it they won't animate)
 		setTimeout(function () {
-			for (i = 0; i < newClusters.length; i++) {
+			me._topClusterLevel._recursivelyBecomeVisible(bounds, depthToStartAt);
+			/*for (i = 0; i < newClusters.length; i++) {
 				var n = newClusters[i];
 
 				if (n._icon) {
 					n.setOpacity(1);
 				}
-			}
+			}*/
 		}, 0);
 
 		//TODO: Maybe use the transition timing stuff to make this more reliable
 		setTimeout(function () {
 
 			map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
-			for (i = 0; i < newClusters.length; i++) {
+			me._topClusterLevel._recursivelyRemoveChildrenAndAddNowVisibleMarkers(bounds, depthToStartAt, depthToAnimateIn);
+			/*for (i = 0; i < newClusters.length; i++) {
 				var cl = newClusters[i];
 				cl._recursivelyRemoveChildrenFromMap(depth);
 			}
@@ -468,7 +471,7 @@ L.MarkerClusterGroup.include(true /*!L.DomUtil.TRANSITION*/ ? { //HACK TO JUST D
 				if (bounds.contains(m._latlng)) {
 					L.FeatureGroup.prototype.addLayer.call(me, m);
 				}
-			}
+			}*/
 			me._inZoomAnimation--;
 		}, 250);
 	}

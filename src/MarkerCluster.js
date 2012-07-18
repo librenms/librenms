@@ -6,6 +6,8 @@ L.MarkerCluster = L.Marker.extend({
 		this._childClusters = [];
 		this._childCount = 0;
 
+		this._haveGeneratedChildClusters = false;
+
 		this._bounds = new L.LatLngBounds();
 
 		this._addChild(a);
@@ -119,6 +121,33 @@ L.MarkerCluster = L.Marker.extend({
 		return false;
 	},
 
+	_recursivelyRemoveChildrenAndAddNowVisibleMarkers: function (bounds, depthToStartAt, depthToAnimateIn) {
+		//TODO: Care more about bounds?
+		var childClusters = this._childClusters,
+			markers = this._markers,
+			i;
+
+		if (depthToStartAt == 0) {
+			this._recursivelyRemoveChildrenFromMap(depthToAnimateIn);
+
+		} else {
+			for (i = childClusters.length - 1; i >= 0; i--) {
+				if (bounds.intersects(childClusters[i]._bounds)) {
+					childClusters[i]._recursivelyRemoveChildrenAndAddNowVisibleMarkers(bounds, depthToStartAt - 1, depthToAnimateIn);
+				}
+			}
+
+			if (depthToStartAt == 1) {
+				for (i = markers.length - 1; i >= 0; i--) {
+					var m = markers[i];
+					if (bounds.contains(m._latlng)) {
+						L.FeatureGroup.prototype.addLayer.call(this._group, m);
+					}
+				}
+			}
+		}
+	},
+
 	_recursivelyAnimateChildrenIn: function (center, depth) {
 		var markers = this._markers,
 		    markersLength = markers.length,
@@ -146,6 +175,48 @@ L.MarkerCluster = L.Marker.extend({
 		} else {
 			for (var k = 0; k < childClustersLength; k++) {
 				childClusters[k]._recursivelyAnimateChildrenIn(center, depth - 1);
+			}
+		}
+	},
+
+	_recursivelyAnimateChildrenInAndAddSelfToMap: function (bounds, depthToStartAt, depthToAnimateIn) {
+		//TODO: Care more about bounds?
+		var childClusters = this._childClusters,
+			i;
+
+		if (depthToStartAt == 0) {
+			this._recursivelyAnimateChildrenIn(this._group._map.latLngToLayerPoint(this.getLatLng()).round(), depthToAnimateIn);
+
+			//Add Self
+			if (bounds.contains(this._latlng)) { //Add the new cluster but have it be hidden (so it gets animated, display=none stops transition)
+
+				//TODO: depthToAnimateIn affects _isSingleParent, if there is a multizoom we may/may not be.
+				if (this._isSingleParent() && depthToAnimateIn == 1) { //If we are the same as our parent, don't do an animation, just immediately appear
+					this.setOpacity(1);
+					this._recursivelyRemoveChildrenFromMap(depthToAnimateIn); //Immediately 
+				} else {
+					this.setOpacity(0);
+				}
+				this._addToMap();
+			}
+
+		} else {
+			for (i = childClusters.length - 1; i >= 0; i--) {
+				if (bounds.intersects(childClusters[i]._bounds)) {
+					childClusters[i]._recursivelyAnimateChildrenInAndAddSelfToMap(bounds, depthToStartAt - 1, depthToAnimateIn);
+				}
+			}
+		}
+	},
+
+	_recursivelyBecomeVisible: function (bounds, depth) {
+		if (depth == 0) {
+			this.setOpacity(1);
+		} else {
+			for (var i = this._childClusters.length - 1; i >= 0; i--) {
+				if (bounds.intersects(this._childClusters[i]._bounds)) {
+					this._childClusters[i]._recursivelyBecomeVisible(bounds, depth - 1);
+				}
 			}
 		}
 	},
