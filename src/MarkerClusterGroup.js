@@ -222,14 +222,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		//Remove the marker
 		L.FeatureGroup.prototype.removeLayer.call(this, layer);
 
-		if (i !== -1) //Is unclustered at the current zoom level
-		{
+		if (i !== -1) { //Is unclustered at the current zoom level
 			current.unclustered.splice(i, 1);
 			
 			killParents = true; //Need to rebuild parents as they may be clusters just because this marker makes them one
-		}
-		else //it is a child of a cluster
-		{
+		} else { //it is a child of a cluster
 			//Find the cluster
 			for (i = current.clusters.length - 1; i >= 0; i--) {
 				var c = current.clusters[i];
@@ -238,8 +235,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 					if (c._childCount == 1) {
 						//Remove cluster and add individual marker
 						L.FeatureGroup.prototype.removeLayer.call(this, c);
-						L.FeatureGroup.prototype.addLayer.call(this, c._markers[0]);
-						current.unclustered.push(c._markers[0]);
+						var marker = c.getAllChildMarkers()[0];
+						L.FeatureGroup.prototype.addLayer.call(this, marker);
+						current.unclustered.push(marker);
+						current.clusters.splice(i, 1);
 						killParents = true; //Need to rebuild parents as they could have references to this cluster
 					}
 					break;
