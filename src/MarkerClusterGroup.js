@@ -417,8 +417,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
 		var map = this._map,
 		    bounds = this._getExpandedVisibleBounds(),
-		    i,
-		    depthToStartAt = previousZoomLevel - this._topClusterLevel._zoom,
+		    depthToStartAt = 1 + newZoomLevel - this._topClusterLevel._zoom,
 		    depthToAnimateIn = previousZoomLevel - newZoomLevel;
 
 		console.log('animationZoomOut ' + depthToStartAt + ' ' + depthToAnimateIn);
