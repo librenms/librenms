@@ -133,7 +133,7 @@ L.MarkerCluster = L.Marker.extend({
 		} else {
 			for (i = childClusters.length - 1; i >= 0; i--) {
 				if (bounds.intersects(childClusters[i]._bounds)) {
-					childClusters[i]._recursivelyRemoveChildrenAndAddNowVisibleMarkers(bounds, depthToStartAt - 1, depthToAnimateIn);
+					childClusters[i]._recursivelyRemoveChildrenAndAddNowVisibleMarkers(bounds, depthToStartAt - 1, depthToAnimateIn - 1);
 				}
 			}
 
@@ -180,45 +180,26 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_recursivelyAnimateChildrenInAndAddSelfToMap: function (bounds, depthToStartAt, depthToAnimateIn) {
-		//TODO: Care more about bounds?
-		var childClusters = this._childClusters,
-			i;
-
-		if (depthToStartAt == 0) {
-			this._recursivelyAnimateChildrenIn(this._group._map.latLngToLayerPoint(this.getLatLng()).round(), depthToAnimateIn);
-
-			//Add Self
-			if (bounds.contains(this._latlng)) { //Add the new cluster but have it be hidden (so it gets animated, display=none stops transition)
+		this._recursively(bounds, depthToStartAt, depthToAnimateIn,
+			function (c) {
+				c._recursivelyAnimateChildrenIn(c._group._map.latLngToLayerPoint(c.getLatLng()).round(), depthToAnimateIn);
 
 				//TODO: depthToAnimateIn affects _isSingleParent, if there is a multizoom we may/may not be.
-				if (this._isSingleParent() && depthToAnimateIn === 1) { //If we are the same as our parent, don't do an animation, just immediately appear
-					this.setOpacity(1);
-					this._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
+				if (c._isSingleParent() /*&& depthToAnimateIn === 1*/) { //TODO: If we are the same as our parent, don't do an animation, just immediately appear
+					c.setOpacity(1);
+					c._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
 				} else {
-					this.setOpacity(0);
+					c.setOpacity(0);
 				}
-				this._addToMap();
+				c._addToMap();
 			}
-
-		} else {
-			for (i = childClusters.length - 1; i >= 0; i--) {
-				if (bounds.intersects(childClusters[i]._bounds)) {
-					childClusters[i]._recursivelyAnimateChildrenInAndAddSelfToMap(bounds, depthToStartAt - 1, depthToAnimateIn);
-				}
-			}
-		}
+		);
 	},
 
 	_recursivelyBecomeVisible: function (bounds, depth) {
-		if (depth == 0) {
-			this.setOpacity(1);
-		} else {
-			for (var i = this._childClusters.length - 1; i >= 0; i--) {
-				if (bounds.intersects(this._childClusters[i]._bounds)) {
-					this._childClusters[i]._recursivelyBecomeVisible(bounds, depth - 1);
-				}
-			}
-		}
+		this._recursively(bounds, 0, depth, null, function(c) {
+			c.setOpacity(1);
+		});
 	},
 
 	_recursivelyAddChildrenToMap: function (startPos, depth, bounds) {
@@ -284,7 +265,6 @@ L.MarkerCluster = L.Marker.extend({
 		}
 	},
 
-	//depth 1 means I remove my immediate children from the map
 	_recursivelyRemoveChildrenFromMap: function (previousBounds, depth) {
 		var m, i;
 		this._recursively(previousBounds, 0, depth,
@@ -326,7 +306,9 @@ L.MarkerCluster = L.Marker.extend({
 			}
 		} else { //In required depth
 
-			runAtEveryLevel(this);
+			if (runAtEveryLevel) {
+				runAtEveryLevel(this);
+			}
 			if (depthToRunFor == 0 && runAtBottomLevel) {
 				runAtBottomLevel(this);
 			}
