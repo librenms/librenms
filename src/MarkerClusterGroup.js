@@ -103,56 +103,22 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Merge and split any existing clusters that are too big or small
 	_mergeSplitClusters: function () {
-		var newState,
-		    depth = Math.abs(this._map._zoom - this._zoom); 
 
 		if (this._zoom < this._map._zoom) { //Zoom in, split
-			var startingClusters = this._markersAndClustersAtZoom[this._zoom].clusters,
-			    startingUnclustered = this._markersAndClustersAtZoom[this._zoom].unclustered;
 
-			while (this._zoom < this._map._zoom) { //Split each intermediate layer if required
-				var currentClusters = this._markersAndClustersAtZoom[this._zoom].clusters;
+			//Clusters generate new children as needed on a zoom in
 
-				this._zoom++;
-
-				newState = this._markersAndClustersAtZoom[this._zoom];
-
-				if (!newState) { //If we don't have clusters for the new level, calculate them
-					newState = { 'clusters': [], 'unclustered': [] };
-
-					for (var i = 0; i < currentClusters.length; i++) {
-						var newClusters;
-						if (currentClusters[i]._childClusters.length > 0) {
-
-							//Child clusters should always be 0 as we haven't calculated clusters for this level
-							throw 'something is wrong, childClusters length should be 0: ' + currentClusters[i]._childClusters.length;
-						} else {
-							newClusters = this._cluster([], [], currentClusters[i]._markers, this._zoom);
-						}
-
-						currentClusters[i]._childClusters = newClusters.clusters;
-						currentClusters[i]._markers = newClusters.unclustered;
-
-						newState.clusters = newState.clusters.concat(newClusters.clusters);
-						newState.unclustered = newState.unclustered.concat(newClusters.unclustered);
-					}
-
-					this._markersAndClustersAtZoom[this._zoom] = newState;
-				}
-			}
-
-			this._animationZoomIn(startingClusters, startingUnclustered, depth);
+			this._animationZoomIn(this._zoom, this._map._zoom);
 
 		} else if (this._zoom > this._map._zoom) { //Zoom out, merge
 
-			//Generate new levels as required
-			//Ensure all of the intermediate zoom levels are generated
+			//Ensure all of the intermediate zoom levels are generated, generating up happens outside of MarkerCluster
 			while (this._topClusterLevel._zoom > this._map._zoom) {
 				console.log('generating new topCluster for ' + (this._topClusterLevel._zoom - 1));
 				this._topClusterLevel = this._clusterToMarkerCluster([], [], this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
 			}
 
-			this._animationZoomOut(this._zoom - this._topClusterLevel._zoom, depth);
+			this._animationZoomOut(this._zoom, this._map._zoom);
 		}
 	},
 
@@ -357,7 +323,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return result;
 	},
 
-		//Gets the maps visible bounds expanded in each direction by the size of the screen (so the user cannot see an area we do not cover in one pan)
+	//Gets the maps visible bounds expanded in each direction by the size of the screen (so the user cannot see an area we do not cover in one pan)
 	_getExpandedVisibleBounds: function () {
 		var map = this._map,
 			bounds = map.getPixelBounds(),
@@ -376,36 +342,17 @@ L.MarkerClusterGroup.include(true /*!L.DomUtil.TRANSITION*/ ? { //HACK TO JUST D
 	_animationStart: function () {
 		//Do nothing...
 	},
-	_animationZoomIn: function (previousLevelDepth, zoomInDepth) {
-
-		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousLevelDepth);
-		var bounds = this._getExpandedVisibleBounds(),
-			i, c;
-
-		//Add all children of current clusters to map and remove those clusters from map
-		for (i = 0; i < startingClusters.length; i++) {
-			c = startingClusters[i];
-
-			//Remove old cluster
-			L.FeatureGroup.prototype.removeLayer.call(this, c);
-
-			c._recursivelyAddChildrenToMap(null, depth, bounds);
-		}
-		for (i = startingUnclustered.length - 1; i >= 0; i--) {
-			c = startingUnclustered[i];
-			if (!bounds.contains(c._latlng)) {
-				L.FeatureGroup.prototype.removeLayer.call(this, c);
-			}
-		}
+	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
+		console.log('in ' + previousZoomLevel + ' ' + newZoomLevel + ' @ ' + this._topClusterLevel._zoom);
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel - this._topClusterLevel._zoom + 1);
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel - this._topClusterLevel._zoom + 1, this._getExpandedVisibleBounds());
 	},
 	//newLevelDepth: How deep down from _topClusterLevel the level we want to show is
 	//zoomOutDepth: How deep from ^^that level^^ to the currently shown level (that needs hiding)
-	_animationZoomOut: function (newLevelDepth, zoomOutDepth) {
-		//Remove old from the map
-		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, newLevelDepth + zoomOutDepth);
-
-		//Add new markers
-		this._topClusterLevel._recursivelyAddChildrenToMap(null, newLevelDepth, this._getExpandedVisibleBounds());
+	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
+		console.log('out ' + previousZoomLevel + ' ' + newZoomLevel + ' @ ' + this._topClusterLevel._zoom);
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel - this._topClusterLevel._zoom + 1);
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel - this._topClusterLevel._zoom + 1, this._getExpandedVisibleBounds());
 	}
 } : {
 
