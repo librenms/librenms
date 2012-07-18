@@ -213,7 +213,8 @@ L.MarkerCluster = L.Marker.extend({
 		}
 	},
 
-	_recursivelyRemoveChildrenFromMap: function (depth) {
+	_recursivelyRemoveChildrenFromMap: function (previousBounds, depth) {
+		//TODO: Use previousBounds so we only bother looking at ones that were on screen
 		var m;
 		//markers
 		for (var i = 0; i < this._markers.length; i++) {
@@ -234,7 +235,7 @@ L.MarkerCluster = L.Marker.extend({
 			    childClustersLength = childClusters.length;
 
 			for (var k = 0; k < childClustersLength; k++) {
-				childClusters[k]._recursivelyRemoveChildrenFromMap(depth - 1);
+				childClusters[k]._recursivelyRemoveChildrenFromMap(previousBounds, depth - 1);
 			}
 		}
 	},
