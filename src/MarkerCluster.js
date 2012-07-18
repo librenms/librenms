@@ -180,7 +180,7 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_recursivelyAnimateChildrenInAndAddSelfToMap: function (bounds, depthToStartAt, depthToAnimateIn) {
-		this._recursively(bounds, depthToStartAt, depthToAnimateIn,
+		this._recursively(bounds, depthToStartAt, 0,
 			function (c) {
 				c._recursivelyAnimateChildrenIn(c._group._map.latLngToLayerPoint(c.getLatLng()).round(), depthToAnimateIn);
 
@@ -290,10 +290,10 @@ L.MarkerCluster = L.Marker.extend({
 	//Run the given functions recursively to this and child clusters
 	// boundsToApplyTo: a L.LatLngBounds representing the bounds of what clusters to recurse in to
 	// depthToStartAt: the depth to start calling the given functions
-	// depthToRunFor: how many layers deep to recurse in to, bottom level: depthToRunFor == 0 
+	// timesToRecurse: how many layers deep to recurse in to after hitting depthToStartAt, bottom level: depthToRunFor == 0 
 	// runAtEveryLevel: function that takes an L.MarkerCluster as an argument that should be applied on every level
 	// runAtBottomLevel: function that takes an L.MarkerCluster as an argument that should be applied at only the bottom level
-	_recursively: function (boundsToApplyTo, depthToStartAt, depthToRunFor, runAtEveryLevel, runAtBottomLevel) {
+	_recursively: function (boundsToApplyTo, depthToStartAt, timesToRecurse, runAtEveryLevel, runAtBottomLevel) {
 		var childClusters = this._childClusters,
 			i, c;
 
@@ -301,7 +301,7 @@ L.MarkerCluster = L.Marker.extend({
 			for (i = childClusters.length - 1; i >= 0; i--) {
 				c = childClusters[i];
 				if (boundsToApplyTo.intersects(c._bounds)) {
-					c._recursively(boundsToApplyTo, depthToStartAt - 1, depthToRunFor, runAtEveryLevel, runAtBottomLevel);
+					c._recursively(boundsToApplyTo, depthToStartAt - 1, timesToRecurse, runAtEveryLevel, runAtBottomLevel);
 				}
 			}
 		} else { //In required depth
@@ -309,16 +309,16 @@ L.MarkerCluster = L.Marker.extend({
 			if (runAtEveryLevel) {
 				runAtEveryLevel(this);
 			}
-			if (depthToRunFor == 0 && runAtBottomLevel) {
+			if (timesToRecurse == 0 && runAtBottomLevel) {
 				runAtBottomLevel(this);
 			}
 
 			//TODO: This loop is almost the same as above
-			if (depthToRunFor > 0) {
+			if (timesToRecurse > 0) {
 				for (i = childClusters.length - 1; i >= 0; i--) {
 					c = childClusters[i];
 					if (boundsToApplyTo.intersects(c._bounds)) {
-						c._recursively(boundsToApplyTo, depthToStartAt, depthToRunFor - 1, runAtEveryLevel, runAtBottomLevel);
+						c._recursively(boundsToApplyTo, depthToStartAt, timesToRecurse - 1, runAtEveryLevel, runAtBottomLevel);
 					}
 				}
 			}
