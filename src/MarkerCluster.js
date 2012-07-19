@@ -77,7 +77,7 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	//layer: The layer to try add
-	_recursivelyAddChildMarker: function (layer) {
+	_recursivelyAddLayer: function (layer) {
 		var childReturn = null;
 
 		if (!this._haveGeneratedChildClusters) {
@@ -87,7 +87,7 @@ L.MarkerCluster = L.Marker.extend({
 			for (var i = this._childClusters.length - 1; i >= 0; i--) {
 				var c = this._childClusters[i];
 				if (c._bounds.contains(layer.getLatLng())) { //TODO: Use a layer distance calculation
-					childReturn = c._recursivelyAddChildMarker(layer);
+					childReturn = c._recursivelyAddLayer(layer);
 					addedToChild = true;
 					break;
 				}
@@ -110,7 +110,7 @@ L.MarkerCluster = L.Marker.extend({
 
 	//Removes the given node from this marker cluster (or its child as required)
 	//Returns true if it (or a child cluster) removes the marker
-	_recursivelyRemoveChildMarker: function(layer) {
+	_recursivelyRemoveLayer: function (layer) {
 		var markers = this._markers,
 			childClusters = this._childClusters,
 			i;
