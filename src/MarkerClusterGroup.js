@@ -117,6 +117,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			while (this._topClusterLevel._zoom > this._map._zoom) {
 				console.log('generating new topCluster for ' + (this._topClusterLevel._zoom - 1));
 				this._topClusterLevel = this._clusterToMarkerCluster([], [], this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
+				this._topClusterLevel = this._clusterToMarkerCluster([], [], this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
 			}
 
 			this._animationZoomOut(this._zoom, this._map._zoom);
@@ -129,41 +130,35 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			return this;
 		}
 
+		var me = this,
+			position;
 
-		//TODO: If we have already clustered we'll need to add this one to a cluster
-		//Should be able to use _cluster with the current clusters and just this layer
-		L.FeatureGroup.prototype.addLayer.call(this, layer);
+		//If we have already clustered we'll need to add this one to a cluster
+		L.FeatureGroup.prototype.addLayer.call(this, layer); //TODO: If not animated maybe don't add it yet
 
-		var zoom = this._map._zoom,
-		    current = this._markersAndClustersAtZoom[zoom],
-		    newClusters = this._cluster(current.clusters, current.unclustered, [layer], zoom);
+		position = this._topClusterLevel._recursivelyAddChildMarker(layer);
 
-		//TODO: At the moment we blow away all other zoom levels, but really we could probably get away with not doing that
-		this._highestZoom = this._zoom = zoom;
-		this._markersAndClustersAtZoom = {};
-		this._markersAndClustersAtZoom[zoom] = newClusters;
+		if (position) {
+			//TODO Tidy up
+			//this._animateSingleMarkerIn(layer, position);
+			setTimeout(function () {
+				me._animationStart.call(me);
 
-		var bounds = this._getExpandedVisibleBounds();
+				var backupLatlng = layer.getLatLng();
 
-		for (var i = 0; i < newClusters.clusters.length; i++) {
-			var c = newClusters.clusters[i];
+				layer.setLatLng(position);
 
-			//Flatten all child clusters as they are now wrong
-			c._markers = c.getAllChildMarkers();
-			c._childClusters = [];
+				setTimeout(function () {
+					L.FeatureGroup.prototype.removeLayer.call(me, layer);
+					layer.setLatLng(backupLatlng);
+
+					//HACKS
+					map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', ''); me._inZoomAnimation--;
+				}, 250);
+			}, 0);
+		} else {
+			//Do nothing, marker should be shown on map at own position at this level
 		}
-
-		var me = this;
-		setTimeout(function () {
-			me._animationStart();
-			for (var j = 0; j < newClusters.clusters.length; j++) {
-				var v = newClusters.clusters[j];
-				if (v._icon) {
-					v.setLatLng(v._latlng);
-				}
-			}
-			me._animationZoomOut(newClusters.clusters, 1);
-		}, 0);
 
 		return this;
 	},
@@ -321,6 +316,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 		console.log('generated clusters: ' + result._childClusters.length + ", markers: " + result._markers.length + " at " + zoom);
 		result._zoom = zoom;
+		result._haveGeneratedChildClusters = true;
 		return result;
 	},
 

@@ -76,6 +76,38 @@ L.MarkerCluster = L.Marker.extend({
 		L.FeatureGroup.prototype.addLayer.call(this._group, this);
 	},
 
+	//layer: The layer to try add
+	_recursivelyAddChildMarker: function (layer) {
+		var childReturn = null;
+
+		if (!this._haveGeneratedChildClusters) {
+			this._addChild(layer);
+		} else {
+			var addedToChild = false;
+			for (var i = this._childClusters.length - 1; i >= 0; i--) {
+				var c = this._childClusters[i];
+				if (c._bounds.contains(layer.getLatLng())) { //TODO: Use a layer distance calculation
+					childReturn = c._recursivelyAddChildMarker(layer);
+					addedToChild = true;
+					break;
+				}
+			}
+
+			if (!addedToChild) {
+				//Add to ourself instead
+				this._addChild(layer); //TODO: This should be done in a clustering aware way
+			}
+
+			this._childCount++;
+			if (this._icon) {
+				this.setIcon(this._group.options.iconCreateFunction(this._childCount));
+			}
+		}
+
+		console.log('added ' + (this._icon ? this._latlng : childReturn));
+		return this._icon ? this._latlng : childReturn;
+	},
+
 	//Removes the given node from this marker cluster (or its child as required)
 	//Returns true if it (or a child cluster) removes the marker
 	_recursivelyRemoveChildMarker: function(layer) {
