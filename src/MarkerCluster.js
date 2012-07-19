@@ -185,7 +185,7 @@ L.MarkerCluster = L.Marker.extend({
 				//TODO: depthToAnimateIn affects _isSingleParent, if there is a multizoom we may/may not be.
 				if (c._isSingleParent() /*&& depthToAnimateIn === 1*/) { //TODO: If we are the same as our parent, don't do an animation, just immediately appear
 					c.setOpacity(1);
-					c._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
+					c._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn - 1); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
 				} else {
 					c.setOpacity(0);
 				}
