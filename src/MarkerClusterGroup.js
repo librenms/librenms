@@ -372,7 +372,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				markers = c._markers,
 				m;
 
-			if (c._isSingleParent()) { //Immediately add the new child and remove us
+			if (c._isSingleParent() && depthToDescend == 1) { //Immediately add the new child and remove us
 				L.FeatureGroup.prototype.removeLayer.call(me, c);
 				c._recursivelyAddChildrenToMap(null, depthToDescend, bounds);
 			} else {
@@ -386,7 +386,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			for (i = markers.length - 1; i >= 0; i--) {
 				m = markers[i];
 				if (!bounds.contains(m._latlng)) {
-					L.FeatureGroup.prototype.removeLayer.call(this, m);
+					L.FeatureGroup.prototype.removeLayer.call(me, m);
 				}
 			}
 
@@ -448,7 +448,9 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		setTimeout(function () {
 
 			map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
-			me._topClusterLevel._recursivelyRemoveChildrenAndAddNowVisibleMarkers(bounds, depthToStartAt, depthToAnimateIn);
+			me._topClusterLevel._recursively(bounds, depthToStartAt, 0, null, function (c) {
+				c._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn - 1);
+			});
 			me._inZoomAnimation--;
 		}, 250);
 	}

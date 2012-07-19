@@ -77,7 +77,7 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	//Removes the given node from this marker cluster (or its child as required)
-	//Returns true if it (or its childCluster) removes the marker
+	//Returns true if it (or a child cluster) removes the marker
 	_recursivelyRemoveChildMarker: function(layer) {
 		var markers = this._markers,
 			childClusters = this._childClusters,
@@ -121,12 +121,6 @@ L.MarkerCluster = L.Marker.extend({
 		return false;
 	},
 
-	_recursivelyRemoveChildrenAndAddNowVisibleMarkers: function (bounds, depthToStartAt, depthToAnimateIn) {
-		this._recursively(bounds, depthToStartAt, 0, null, function (c) {
-			c._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn - 1);
-		});
-	},
-
 	_recursivelyAnimateChildrenIn: function (bounds, center, depth) {
 		this._recursively(bounds, 0, depth - 1,
 			function (c) {
@@ -162,7 +156,7 @@ L.MarkerCluster = L.Marker.extend({
 				c._recursivelyAnimateChildrenIn(bounds, c._group._map.latLngToLayerPoint(c.getLatLng()).round(), depthToAnimateIn);
 
 				//TODO: depthToAnimateIn affects _isSingleParent, if there is a multizoom we may/may not be.
-				if (c._isSingleParent() /*&& depthToAnimateIn === 1*/) { //TODO: If we are the same as our parent, don't do an animation, just immediately appear
+				if (c._isSingleParent() && depthToAnimateIn === 1) { //TODO: If we are the same as our parent, don't do an animation, just immediately appear
 					c.setOpacity(1);
 					c._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn - 1); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
 				} else {
