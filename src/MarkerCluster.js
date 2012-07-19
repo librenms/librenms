@@ -148,41 +148,39 @@ L.MarkerCluster = L.Marker.extend({
 		}
 	},
 
-	_recursivelyAnimateChildrenIn: function (center, depth) {
-		var markers = this._markers,
-		    markersLength = markers.length,
-		    childClusters = this._childClusters,
-		    childClustersLength = childClusters.length;
+	_recursivelyAnimateChildrenIn: function (bounds, center, depth) {
+		this._recursively(bounds, 0, depth - 1,
+			function (c) {
+				var markers = c._markers,
+					i, m;
+				for (i = markers.length - 1; i >= 0; i--) {
+					m = markers[i];
 
-		for (var i = 0; i < markersLength; i++) {
-			var m = markers[i];
-
-			//Only do it if the icon is still on the map
-			if (m._icon) {
-				m._setPos(center);
-				m.setOpacity(0);
-			}
-		}
-
-		if (depth === 1) {
-			for (var j = 0; j < childClustersLength; j++) {
-				var cm = childClusters[j];
-				if (cm._icon) {
-					cm._setPos(center);
-					cm.setOpacity(0);
+					//Only do it if the icon is still on the map
+					if (m._icon) {
+						m._setPos(center);
+						m.setOpacity(0);
+					}
+				}
+			},
+			function (c) {
+				var childClusters = c._childClusters,
+					j, cm;
+				for (j = childClusters.length - 1; j >= 0; j--) {
+					cm = childClusters[j];
+					if (cm._icon) {
+						cm._setPos(center);
+						cm.setOpacity(0);
+					}
 				}
 			}
-		} else {
-			for (var k = 0; k < childClustersLength; k++) {
-				childClusters[k]._recursivelyAnimateChildrenIn(center, depth - 1);
-			}
-		}
+		);
 	},
 
 	_recursivelyAnimateChildrenInAndAddSelfToMap: function (bounds, depthToStartAt, depthToAnimateIn) {
 		this._recursively(bounds, depthToStartAt, 0,
 			function (c) {
-				c._recursivelyAnimateChildrenIn(c._group._map.latLngToLayerPoint(c.getLatLng()).round(), depthToAnimateIn);
+				c._recursivelyAnimateChildrenIn(bounds, c._group._map.latLngToLayerPoint(c.getLatLng()).round(), depthToAnimateIn);
 
 				//TODO: depthToAnimateIn affects _isSingleParent, if there is a multizoom we may/may not be.
 				if (c._isSingleParent() /*&& depthToAnimateIn === 1*/) { //TODO: If we are the same as our parent, don't do an animation, just immediately appear
