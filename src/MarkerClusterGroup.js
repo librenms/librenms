@@ -421,25 +421,10 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		    depthToAnimateIn = previousZoomLevel - newZoomLevel;
 
 		console.log('animationZoomOut ' + depthToStartAt + ' ' + depthToAnimateIn);
+
 		//Animate all of the markers in the clusters to move to their cluster center point
-		//bounds, depthToStartAt, depthToAnimateIn
 		this._topClusterLevel._recursivelyAnimateChildrenInAndAddSelfToMap(bounds, depthToStartAt, depthToAnimateIn);
-		/*for ( i = 0; i < newClusters.length; i++) {
-			var c = newClusters[i];
 
-			c._recursivelyAnimateChildrenIn(this._map.latLngToLayerPoint(c.getLatLng()).round(), depth);
-
-			if (bounds.contains(c._latlng)) { //Add the new cluster but have it be hidden (so it gets animated, display=none stops transition)
-
-				if (c._isSingleParent()) { //If we are the same as our parent, don't do an animation, just immediately appear
-					c.setOpacity(1);
-					c._recursivelyRemoveChildrenFromMap(depth);
-				} else {
-					c.setOpacity(0);
-				}
-				c._addToMap();
-			}
-		}*/
 		this._inZoomAnimation++;
 
 		var me = this;
@@ -447,30 +432,14 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		//Immediately fire an event to update the opacity (If we immediately set it they won't animate)
 		setTimeout(function () {
 			me._topClusterLevel._recursivelyBecomeVisible(bounds, depthToStartAt);
-			/*for (i = 0; i < newClusters.length; i++) {
-				var n = newClusters[i];
-
-				if (n._icon) {
-					n.setOpacity(1);
-				}
-			}*/
 		}, 0);
 
 		//TODO: Maybe use the transition timing stuff to make this more reliable
+		//When the animations are done, tidy up
 		setTimeout(function () {
 
 			map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
 			me._topClusterLevel._recursivelyRemoveChildrenAndAddNowVisibleMarkers(bounds, depthToStartAt, depthToAnimateIn);
-			/*for (i = 0; i < newClusters.length; i++) {
-				var cl = newClusters[i];
-				cl._recursivelyRemoveChildrenFromMap(depth);
-			}
-			for (i = newUnclustered.length - 1; i >= 0; i--) {
-				var m = newUnclustered[i];
-				if (bounds.contains(m._latlng)) {
-					L.FeatureGroup.prototype.addLayer.call(me, m);
-				}
-			}*/
 			me._inZoomAnimation--;
 		}, 250);
 	}

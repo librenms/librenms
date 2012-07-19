@@ -295,6 +295,8 @@ L.MarkerCluster = L.Marker.extend({
 		var childClusters = this._childClusters,
 			i, c;
 
+		//TODO: When zooming down we need to generate new clusters for levels that don't have them yet
+
 		if (depthToStartAt > 0) { //Still going down to required depth, just recurse to child clusters
 			for (i = childClusters.length - 1; i >= 0; i--) {
 				c = childClusters[i];
