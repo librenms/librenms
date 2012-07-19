@@ -122,30 +122,9 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_recursivelyRemoveChildrenAndAddNowVisibleMarkers: function (bounds, depthToStartAt, depthToAnimateIn) {
-		//TODO: Care more about bounds?
-		var childClusters = this._childClusters,
-			markers = this._markers,
-			i;
-
-		if (depthToStartAt === 0) {
-			this._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn); //TODO: previousBounds, not bounds
-
-		} else {
-			for (i = childClusters.length - 1; i >= 0; i--) {
-				if (bounds.intersects(childClusters[i]._bounds)) {
-					childClusters[i]._recursivelyRemoveChildrenAndAddNowVisibleMarkers(bounds, depthToStartAt - 1, depthToAnimateIn - 1);
-				}
-			}
-
-			if (depthToStartAt == 1) {
-				for (i = markers.length - 1; i >= 0; i--) {
-					var m = markers[i];
-					if (bounds.contains(m._latlng)) {
-						L.FeatureGroup.prototype.addLayer.call(this._group, m);
-					}
-				}
-			}
-		}
+		this._recursively(bounds, depthToStartAt, 0, null, function (c) {
+			c._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn - 1);
+		});
 	},
 
 	_recursivelyAnimateChildrenIn: function (bounds, center, depth) {
