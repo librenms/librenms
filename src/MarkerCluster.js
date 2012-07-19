@@ -119,6 +119,10 @@ L.MarkerCluster = L.Marker.extend({
 		//Check our children
 		for (i = markers.length - 1; i >= 0; i--) {
 			if (markers[i] == layer) {
+				if (markers[i]._icon) {
+					L.FeatureGroup.prototype.removeLayer.call(group, markers[i]);
+				}
+
 				markers.splice(i, 1);
 				this._recalculateBounds();
 		
