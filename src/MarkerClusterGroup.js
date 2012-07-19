@@ -163,50 +163,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	removeLayer: function (layer) {
-		var current = this._markersAndClustersAtZoom[this._map._zoom],
-			i = current.unclustered.indexOf(layer),
-			killParents = false;
-
-		//TODO: This whole thing could probably be better
-
-		//Remove the marker
-		L.FeatureGroup.prototype.removeLayer.call(this, layer);
-
-		if (i !== -1) { //Is unclustered at the current zoom level
-			current.unclustered.splice(i, 1);
-			
-			killParents = true; //Need to rebuild parents as they may be clusters just because this marker makes them one
-		} else { //it is a child of a cluster
-			//Find the cluster
-			for (i = current.clusters.length - 1; i >= 0; i--) {
-				var c = current.clusters[i];
-				
-				if (c._recursivelyRemoveChildMarker(layer)) {
-					if (c._childCount == 1) {
-						//Remove cluster and add individual marker
-						L.FeatureGroup.prototype.removeLayer.call(this, c);
-						var marker = c._markers[0];
-						L.FeatureGroup.prototype.addLayer.call(this, marker);
-						current.unclustered.push(marker);
-						current.clusters.splice(i, 1);
-						killParents = true; //Need to rebuild parents as they could have references to this cluster
-					}
-					console.log('remaining clusters ' + current.clusters.length);
-					console.log('remaining markers' + current.unclustered.length);
-					break;
-				}
-			}
-		}
-
-		if (killParents) {
-			//blow away all parent levels as they are now wrong
-			for (i in this._markersAndClustersAtZoom)
-			{
-				if (i > this._map._zoom) {
-					delete this._markersAndClustersAtZoom[i];
-				}
-			}
-		}
+		this._topClusterLevel._recursivelyRemoveLayer(layer);
 
 		return this;
 	},

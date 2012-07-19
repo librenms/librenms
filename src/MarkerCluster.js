@@ -111,7 +111,8 @@ L.MarkerCluster = L.Marker.extend({
 	//Removes the given node from this marker cluster (or its child as required)
 	//Returns true if it (or a child cluster) removes the marker
 	_recursivelyRemoveLayer: function (layer) {
-		var markers = this._markers,
+		var group = this._group,
+			markers = this._markers,
 			childClusters = this._childClusters,
 			i;
 
@@ -123,7 +124,7 @@ L.MarkerCluster = L.Marker.extend({
 		
 				this._childCount--;
 				if (this._icon) {
-					this.setIcon(this._group.options.iconCreateFunction(this._childCount));
+					this.setIcon(group.options.iconCreateFunction(this._childCount));
 				}
 				return true;
 			}
@@ -132,19 +133,28 @@ L.MarkerCluster = L.Marker.extend({
 		//Otherwise check our childClusters
 		for (i = childClusters.length - 1; i >= 0; i--) {
 			var child = childClusters[i];
-			if (child._recursivelyRemoveChildMarker(layer)) {
+
+			if (child._bounds.contains(layer._latlng) && child._recursivelyRemoveLayer(layer)) {
 				this._childCount--;
 
 				//if our child cluster is no longer a cluster, remove it and replace with just the marker
 				if (child._childCount === 1) {
+
+					//If the child is visible, remove it and put the marker on the map
+					if (child._icon) {
+						L.FeatureGroup.prototype.removeLayer.call(group, child);
+						L.FeatureGroup.prototype.addLayer.call(group, child._markers[0]);
+					}
+					
+					//Take ownership of its only marker and bin the cluster
 					markers.push(child._markers[0]);
 					childClusters.splice(i, 1);
 				}
 
 				this._recalculateBounds();
 
-				if (this._icon) {
-					this.setIcon(this._group.options.iconCreateFunction(this._childCount));
+				if (this._icon && this._childCount > 1) { //No need to update if we are getting removed anyway
+					this.setIcon(group.options.iconCreateFunction(this._childCount));
 				}
 				return true;
 			}
