@@ -94,8 +94,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		console.log('generating initial topCluster ' + this._map.getZoom());
 		var res = this._topClusterLevel = this._clusterToMarkerCluster([], [], this._needsClustering, this._map.getZoom());
 
-		//Remember the current zoom level
+		//Remember the current zoom level and bounds
 		this._zoom = this._map._zoom;
+		this._currentShownBounds = this._getExpandedVisibleBounds();
 
 		//Make things appear on the map
 		res._recursivelyAddChildrenToMap(null, 1, this._getExpandedVisibleBounds());
@@ -343,11 +344,11 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		//Do nothing...
 	},
 	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
-		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel - this._topClusterLevel._zoom + 1);
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel - this._topClusterLevel._zoom);
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel - this._topClusterLevel._zoom + 1, this._getExpandedVisibleBounds());
 	},
 	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
-		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel - this._topClusterLevel._zoom + 1);
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel - this._topClusterLevel._zoom);
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel - this._topClusterLevel._zoom + 1, this._getExpandedVisibleBounds());
 	}
 } : {
