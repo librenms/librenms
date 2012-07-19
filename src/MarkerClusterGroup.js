@@ -361,33 +361,40 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		var me = this,
 		    map = this._map,
 		    bounds = this._getExpandedVisibleBounds(),
-		    i, c, startPos;
+		    i, 
+		    depthToStartAt = 1 + previousZoomLevel - this._topClusterLevel._zoom,
+		    depthToDescend = newZoomLevel - previousZoomLevel;
+		console.log('animationZoomIn ' + depthToStartAt + ' ' + depthToDescend);
 
 		//Add all children of current clusters to map and remove those clusters from map
-		for (i = 0; i < startingClusters.length; i++) {
-			c = startingClusters[i];
-			startPos = c.getLatLng();
+		this._topClusterLevel._recursively(bounds, depthToStartAt, 0, function (c) {
+			var startPos = c._latlng,
+				markers = c._markers,
+				m;
 
-			if (c._isSingleParent()) {
-				L.FeatureGroup.prototype.removeLayer.call(this, c);
-				c._recursivelyAddChildrenToMap(null, depth, bounds);
+			if (c._isSingleParent()) { //Immediately add the new child and remove us
+				L.FeatureGroup.prototype.removeLayer.call(me, c);
+				c._recursivelyAddChildrenToMap(null, depthToDescend, bounds);
 			} else {
 				//Fade out old cluster
 				c.setOpacity(0);
-				c._recursivelyAddChildrenToMap(startPos, depth, bounds);
+				c._recursivelyAddChildrenToMap(startPos, depthToDescend, bounds);
 			}
-		}
 
-		//Remove all markers that aren't visible any more
-		for (i = startingUnclustered.length - 1; i >= 0; i--) {
-			c = startingUnclustered[i];
-			if (!bounds.contains(c._latlng)) {
-				L.FeatureGroup.prototype.removeLayer.call(this, c);
+			//Remove all markers that aren't visible any more
+			//TODO: Do we actually need to do this on the higher levels too?
+			for (i = markers.length - 1; i >= 0; i--) {
+				m = markers[i];
+				if (!bounds.contains(m._latlng)) {
+					L.FeatureGroup.prototype.removeLayer.call(this, m);
+				}
 			}
-		}
 
-		//Immediately fire an event to update the opacity (If we immediately set it they won't animate)
+		});
+
+		//Immediately fire an event to update the opacity and locations (If we immediately set it they won't animate)
 		setTimeout(function () {
+			//Update opacities
 			for (i in me._layers) {
 				var n = me._layers[i];
 
@@ -395,25 +402,26 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 					n.setOpacity(1);
 				}
 			}
+
+			//update the positions of the just added clusters/markers
+			me._topClusterLevel._recursively(bounds, depthToStartAt, 0, function (c) {
+				c._recursivelyRestoreChildPositions(depthToDescend);
+			});
 		}, 0);
 
 		this._inZoomAnimation++;
-		//Start up a function to update the positions of the just added clusters/markers
-		//This must happen after otherwise they don't get animated
+
+		//Remove the old clusters and close the zoom animation
+		
 		setTimeout(function () {
+			//update the positions of the just added clusters/markers
+			me._topClusterLevel._recursively(bounds, depthToStartAt, 0, function (c) {
+				L.FeatureGroup.prototype.removeLayer.call(me, c);
+			});
 
-			for (var j = 0; j < startingClusters.length; j++) {
-				startingClusters[j]._recursivelyRestoreChildPositions(depth);
-			}
-
-			setTimeout(function () {
-				for (i = 0; i < startingClusters.length; i++) {
-					L.FeatureGroup.prototype.removeLayer.call(me, startingClusters[i]);
-				}
-				map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
-				me._inZoomAnimation--;
-			}, 250);
-		}, 0);
+			map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
+			me._inZoomAnimation--;
+		}, 250);
 	},
 	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
 		var map = this._map,
