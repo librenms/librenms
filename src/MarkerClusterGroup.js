@@ -136,36 +136,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		newCluster = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom);
 
-		//TODO: This is the animated version
-		L.FeatureGroup.prototype.addLayer.call(this, layer);
-		if (newCluster != layer) {
-			if (newCluster._childCount > 2) { //Was already a cluster
-
-				setTimeout(function () {
-
-					me._animationStart.call(me);
-
-					var backupLatlng = layer.getLatLng();
-					layer.setLatLng(newCluster._latlng);
-					layer.setOpacity(0);
-
-					setTimeout(function () {
-						L.FeatureGroup.prototype.removeLayer.call(me, layer);
-						layer.setLatLng(backupLatlng);
-
-						//HACKS
-						map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', ''); me._inZoomAnimation--;
-					}, 250);
-				}, 0);
-
-			} else { //Just became a cluster
-				setTimeout(function () {
-					me._animationStart();
-					me._animationZoomOutSingle(newCluster, 0, 1);
-				}, 0);
-				//newCluster._recursivelyAnimateChildrenInAndAddSelfToMap(newCluster._bounds, 0, 1);
-			}
-		}
+		this._animationAddLayer(layer, newCluster);
 
 		return this;
 	},
@@ -314,6 +285,12 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
 		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel - this._topClusterLevel._zoom);
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel - this._topClusterLevel._zoom + 1, this._getExpandedVisibleBounds());
+	},
+	_animationAddLayer: function (layer, newCluster) {
+		L.FeatureGroup.prototype.addLayer.call(this, newCluster);
+		if (newCluster != layer && newCluster._childCount == 2) {
+			newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, 1);
+		}
 	}
 } : {
 
@@ -321,9 +298,12 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	_animationStart: function () {
 		this._map._mapPane.className += ' leaflet-cluster-anim';
 	},
+	_animationEnd: function () {
+		this._map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
+		this._inZoomAnimation--;
+	},
 	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
 		var me = this,
-		    map = this._map,
 		    bounds = this._getExpandedVisibleBounds(),
 		    i, 
 		    depthToStartAt = 1 + previousZoomLevel - this._topClusterLevel._zoom,
@@ -383,8 +363,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				L.FeatureGroup.prototype.removeLayer.call(me, c);
 			});
 
-			map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
-			me._inZoomAnimation--;
+			me._animationEnd();
 		}, 250);
 	},
 
@@ -395,8 +374,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		this._animationZoomOutSingle(this._topClusterLevel, depthToStartAt, depthToAnimateIn);
 	},
 	_animationZoomOutSingle: function (marker, depthToStartAt, depthToAnimateIn) {
-		var map = this._map,
-		    bounds = this._getExpandedVisibleBounds();
+		var bounds = this._getExpandedVisibleBounds();
 
 		console.log('animationZoomOut ' + depthToStartAt + ' ' + depthToAnimateIn);
 
@@ -416,11 +394,42 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		//When the animations are done, tidy up
 		setTimeout(function () {
 
-			map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
 			marker._recursively(bounds, depthToStartAt, 0, null, function (c) {
 				c._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn - 1);
 			});
-			me._inZoomAnimation--;
+			me._animationEnd();
 		}, 250);
+	},
+	_animationAddLayer: function (layer, newCluster) {
+		var me = this;
+
+		L.FeatureGroup.prototype.addLayer.call(this, layer);
+		if (newCluster != layer) {
+			if (newCluster._childCount > 2) { //Was already a cluster
+
+				this._animationStart();
+				setTimeout(function () {
+
+
+					var backupLatlng = layer.getLatLng();
+					layer.setLatLng(newCluster._latlng);
+					layer.setOpacity(0);
+
+					setTimeout(function () {
+						L.FeatureGroup.prototype.removeLayer.call(me, layer);
+						layer.setLatLng(backupLatlng);
+
+						me._animationEnd();
+					}, 250);
+				}, 0);
+
+			} else { //Just became a cluster
+				setTimeout(function () {
+					me._animationStart();
+					me._animationZoomOutSingle(newCluster, 0, 1);
+				}, 0);
+				//newCluster._recursivelyAnimateChildrenInAndAddSelfToMap(newCluster._bounds, 0, 1);
+			}
+		}
 	}
 });
