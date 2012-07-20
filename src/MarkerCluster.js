@@ -77,35 +77,58 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	//layer: The layer to try add
-	_recursivelyAddLayer: function (layer) {
-		var childReturn = null;
+	_recursivelyAddLayer: function (layer, zoom) {
+		var childReturn = null,
+			added = false;
 
-		if (!this._haveGeneratedChildClusters) {
+		if (!this._haveGeneratedChildClusters && this._canAcceptPosition(layer.getLatLng(), zoom)) {
 			this._addChild(layer);
+			added = true;
 		} else {
-			var addedToChild = false;
 			for (var i = this._childClusters.length - 1; i >= 0; i--) {
 				var c = this._childClusters[i];
-				if (c._bounds.contains(layer.getLatLng())) { //TODO: Use a layer distance calculation
-					childReturn = c._recursivelyAddLayer(layer);
-					addedToChild = true;
-					break;
+				//Recurse into children where their bounds fits the layer or they can just take it
+				if (c._bounds.contains(layer.getLatLng()) || c._canAcceptPosition(layer.getLatLng(), zoom + 1)) {
+					childReturn = c._recursivelyAddLayer(layer, zoom + 1);
+					if (childReturn !== false) {
+						added = true;
+						break;
+					}
 				}
 			}
 
-			if (!addedToChild) {
+			if (!added && this._canAcceptPosition(layer.getLatLng(), zoom)) {
 				//Add to ourself instead
 				this._addChild(layer); //TODO: This should be done in a clustering aware way
+				added = true;
 			}
 
-			this._childCount++;
-			if (this._icon) {
-				this.setIcon(this._group.options.iconCreateFunction(this._childCount));
+			if (added) {
+				this._childCount++;
+				if (this._icon) {
+					this.setIcon(this._group.options.iconCreateFunction(this._childCount));
+				}
 			}
 		}
 
-		console.log('added ' + (this._icon ? this._latlng : childReturn));
-		return this._icon ? this._latlng : childReturn;
+		if (!added) {
+			if (this._zoom) { //Means we are the root node, we get it anyway
+				this._addChild(layer);
+			}
+			console.log('not added');
+			return false;
+		} else {
+			console.log('added ' + (this._icon ? this._latlng : childReturn));
+			return this._icon ? this._latlng : childReturn;
+		}
+	},
+
+	_canAcceptPosition: function (latlng, zoom) {
+		var clusterRadiusSqrd = this._group.options.maxClusterRadius * this._group.options.maxClusterRadius,
+			pos = this._group._map.project(this._latlng, zoom),
+			otherpos = this._group._map.project(latlng, zoom);
+
+		return (this._group._sqDist(pos, otherpos) <= clusterRadiusSqrd);
 	},
 
 	//Removes the given node from this marker cluster (or its child as required)

@@ -53,7 +53,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		if (this._inZoomAnimation > 0) {
 			return;
 		}
-		return; //FIXME OBV
+		return; //TODO FIXME OBV
 		var l, i,
 		    layers = this._layers,
 		    bounds = this._getExpandedVisibleBounds(),
@@ -135,7 +135,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		//If we have already clustered we'll need to add this one to a cluster
 		L.FeatureGroup.prototype.addLayer.call(this, layer); //TODO: If not animated maybe don't add it yet
 
-		position = this._topClusterLevel._recursivelyAddLayer(layer);
+		position = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom);
 
 		if (position) {
 			//TODO Tidy up
