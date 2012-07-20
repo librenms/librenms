@@ -388,9 +388,6 @@ L.MarkerCluster = L.Marker.extend({
 			clusters = res.clusters,
 			i;
 
-		var oldMarkers = this._markers;
-		var old = this._childCount;
-
 		this._markers = [];
 		this._childCount = 0;
 
@@ -399,10 +396,6 @@ L.MarkerCluster = L.Marker.extend({
 		}
 		for (i = clusters.length - 1; i >= 0; i--) {
 			this._addChild(clusters[i]);
-		}
-
-		if (this._childCount != old) {
-			debugger;
 		}
 
 		delete this._zoomForCluster;
