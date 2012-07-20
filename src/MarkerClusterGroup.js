@@ -134,7 +134,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		//If we have already clustered we'll need to add this one to a cluster
 
-		newCluster = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom);
+		newCluster = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom - 1);
 
 		this._animationAddLayer(layer, newCluster);
 
@@ -210,7 +210,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 			//otherwise, look through all of the markers we haven't managed to cluster and see if we should form a cluster with them
 			if (!used) {
-				var newCluster = this._clusterOne(unclustered, point, hasChildClusters);
+				var newCluster = this._clusterOne(unclustered, point);
 				if (newCluster) {
 					newCluster._haveGeneratedChildClusters = hasChildClusters;
 					newCluster._projCenter = this._map.project(newCluster.getLatLng(), zoom);
