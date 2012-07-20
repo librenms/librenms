@@ -254,37 +254,35 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_recursivelyAddChildrenToMap: function (startPos, depth, bounds) {
+		this._recursively(bounds, 0, depth, 
+			function (c, recursionDepth) {
+				if (recursionDepth == 0) {
+					return;
+				}
 
-		if (depth === 0) {
-			this._addToMap(startPos);
-			return;
-		}
+				//Add our child markers at startPos (so they can be animated out)
+				for (var i = 0; i < c._markers.length; i++) {
+					var nm = c._markers[i];
 
-		//Add our child markers at startPos (so they can be animated out)
-		for (var i = 0; i < this._markers.length; i++) {
-			var nm = this._markers[i];
+					if (!bounds.contains(nm._latlng)) {
+						continue;
+					}
 
-			if (!bounds.contains(nm._latlng)) {
-				continue;
+					if (startPos) {
+						nm._backupLatlng = nm.getLatLng();
+
+						nm.setLatLng(startPos);
+						nm.setOpacity(0);
+					}
+
+					L.FeatureGroup.prototype.addLayer.call(c._group, nm);
+				}
+			},
+			function (c) {
+				c._addToMap(startPos);
+
 			}
-
-			if (startPos) {
-				nm._backupLatlng = nm.getLatLng();
-
-				nm.setLatLng(startPos);
-				nm.setOpacity(0);
-			}
-
-			L.FeatureGroup.prototype.addLayer.call(this._group, nm);
-		}
-
-		//Recurse down to child clusters
-		for (var k = 0; k < this._childClusters.length; k++) {
-			var cc = this._childClusters[k];
-			if (bounds.intersects(cc._bounds)) {
-				cc._recursivelyAddChildrenToMap(startPos, depth - 1, bounds);
-			}
-		}
+		);
 	},
 
 	_recursivelyRestoreChildPositions: function (depth) {
@@ -349,12 +347,11 @@ L.MarkerCluster = L.Marker.extend({
 			i, c;
 
 		//TODO: When zooming down we need to generate new clusters for levels that don't have them yet
+		if (!this._haveGeneratedChildClusters && (depthToStartAt > 0 || timesToRecurse > 0)) {
+			this._generateChildClusters();
+		}
 
 		if (depthToStartAt > 0) { //Still going down to required depth, just recurse to child clusters
-			if (!this._haveGeneratedChildClusters) {
-				this._generateChildClusters();
-			}
-
 			for (i = childClusters.length - 1; i >= 0; i--) {
 				c = childClusters[i];
 				if (boundsToApplyTo.intersects(c._bounds)) {
@@ -364,7 +361,7 @@ L.MarkerCluster = L.Marker.extend({
 		} else { //In required depth
 
 			if (runAtEveryLevel) {
-				runAtEveryLevel(this);
+				runAtEveryLevel(this, timesToRecurse);
 			}
 			if (timesToRecurse == 0 && runAtBottomLevel) {
 				runAtBottomLevel(this);
