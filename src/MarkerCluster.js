@@ -351,6 +351,10 @@ L.MarkerCluster = L.Marker.extend({
 		//TODO: When zooming down we need to generate new clusters for levels that don't have them yet
 
 		if (depthToStartAt > 0) { //Still going down to required depth, just recurse to child clusters
+			if (!this._haveGeneratedChildClusters) {
+				this._generateChildClusters();
+			}
+
 			for (i = childClusters.length - 1; i >= 0; i--) {
 				c = childClusters[i];
 				if (boundsToApplyTo.intersects(c._bounds)) {
@@ -376,6 +380,33 @@ L.MarkerCluster = L.Marker.extend({
 				}
 			}
 		}
+	},
+
+	_generateChildClusters: function () {
+		var res = this._group._cluster(this._markers, this._zoomForCluster),
+			unclustered = res.unclustered,
+			clusters = res.clusters,
+			i;
+
+		var oldMarkers = this._markers;
+		var old = this._childCount;
+
+		this._markers = [];
+		this._childCount = 0;
+
+		for (i = unclustered.length - 1; i >= 0; i--) {
+			this._addChild(unclustered[i]);
+		}
+		for (i = clusters.length - 1; i >= 0; i--) {
+			this._addChild(clusters[i]);
+		}
+
+		if (this._childCount != old) {
+			debugger;
+		}
+
+		delete this._zoomForCluster;
+		this._haveGeneratedChildClusters = true;
 	},
 
 	_recalculateBounds: function () {
