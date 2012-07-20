@@ -176,6 +176,29 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._map.on('moveend', this._moveEnd, this);
 	},
 
+	//Takes a list of markers and clusters the new marker in to them
+	//Will return null or the new MarkerCluster. The clustered in marker is removed from the given array
+	_clusterOne: function (unclusteredMarkers, newMarker, zoom) {
+		var markerPos = newMarker._projCenter || this._map.project(newMarker.getLatLng(), zoom),
+			clusterRadiusSqrd = this.options.maxClusterRadius * this.options.maxClusterRadius,
+			i, m, mPos;
+
+		for (i = unclusteredMarkers.length - 1; i >= 0; i--) {
+			m = unclusteredMarkers[i];
+			mPos = m._projCenter || this._map.project(m.getLatLng(), zoom);
+
+			if (this._sqDist(markerPos, mPos) <= clusterRadiusSqrd) {
+				//Create a new cluster with these 2
+				var newCluster = new L.MarkerCluster(this, m, newMarker);
+
+				unclusteredMarkers.splice(i, 1);
+				return newCluster;
+			}
+		}
+
+		return null;
+	},
+
 	//Takes a list of objects that have a 'getLatLng()' function (Marker / MarkerCluster)
 	//Performs clustering on them (using a greedy algorithm) and returns those clusters.
 	//toCluster: List of Markers/MarkerClusters to cluster. MarkerClusters MUST be first in the list
@@ -208,21 +231,13 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 			//otherwise, look through all of the markers we haven't managed to cluster and see if we should form a cluster with them
 			if (!used) {
-				for (j = 0 ; j < unclustered.length; j++) {
-					if (this._sqDist(point._projCenter, unclustered[j]._projCenter) <= clusterRadiusSqrd) {
-						//Create a new cluster with these 2
-						var newCluster = new L.MarkerCluster(this, point, unclustered[j]);
-						newCluster._haveGeneratedChildClusters = hasChildClusters;
-						clusters.push(newCluster);
-
-						newCluster._projCenter = this._map.project(newCluster.getLatLng(), zoom);
-
-						unclustered.splice(j, 1);
-						used = true;
-						break;
-					}
-				}
-				if (!used) {
+				var newCluster = this._clusterOne(unclustered, point, hasChildClusters);
+				if (newCluster) {
+					newCluster._haveGeneratedChildClusters = hasChildClusters;
+					newCluster._projCenter = this._map.project(newCluster.getLatLng(), zoom);
+					clusters.push(newCluster);
+				} else {
+					//Didn't manage to use it
 					unclustered.push(point);
 				}
 			}

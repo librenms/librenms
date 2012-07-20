@@ -82,6 +82,7 @@ L.MarkerCluster = L.Marker.extend({
 			added = false;
 
 		if (!this._haveGeneratedChildClusters && this._canAcceptPosition(layer.getLatLng(), zoom)) {
+			//Don't need to cluster it in as we haven't clustered
 			this._addChild(layer);
 			added = true;
 		} else {
@@ -97,9 +98,18 @@ L.MarkerCluster = L.Marker.extend({
 				}
 			}
 
+			//Couldn't add it to a child, but it should be part of us
 			if (!added && this._canAcceptPosition(layer.getLatLng(), zoom)) {
+
 				//Add to ourself instead
-				this._addChild(layer); //TODO: This should be done in a clustering aware way
+				var newCluster = this._group._clusterOne(this._markers, layer, zoom);
+				if (newCluster && newCluster._markers[0]._icon) {
+					//Remove children and add cluster
+					newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, 0);
+					newCluster._addToMap();
+				}
+				this._addChild(newCluster || layer);
+
 				added = true;
 			}
 
