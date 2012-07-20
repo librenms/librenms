@@ -87,7 +87,6 @@ L.MarkerCluster = L.Marker.extend({
 		if (!this._haveGeneratedChildClusters && this._canAcceptPosition(layer.getLatLng(), zoom)) {
 			//Don't need to cluster it in as we haven't clustered
 			this._addChild(layer);
-			this._childCount++;
 			result = true;
 		} else {
 			for (var i = this._childClusters.length - 1; i >= 0; i--) {
@@ -119,9 +118,9 @@ L.MarkerCluster = L.Marker.extend({
 		}
 
 		if (result) {
-			//if (!this._zoom) { //TODO: Enable this when i've tracked the weird bug
+			if (!this._zoom) {
 				this.setIcon(this._group.options.iconCreateFunction(this._childCount));
-			//}
+			}
 			this._recalculateBounds();
 		}
 		if (result === true) {
