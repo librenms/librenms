@@ -53,41 +53,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		if (this._inZoomAnimation > 0) {
 			return;
 		}
-		return; //TODO FIXME OBV
-		var l, i,
-		    layers = this._layers,
-		    bounds = this._getExpandedVisibleBounds(),
-		    highestLevel = this._markersAndClustersAtZoom[this._highestZoom],
-		    depth = this._zoom - this._highestZoom,
-		    highestLevelClusters = highestLevel.clusters,
-		    highestLevelUnclustered = highestLevel.unclustered;
 
-		//Remove visible layers that are no longer visible
-		for (i in layers) {
-			l = layers[i];
-			if (!bounds.contains(l.getLatLng())) {
-				L.FeatureGroup.prototype.removeLayer.call(this, l);
-			}
-		}
+		var newBounds = this._getExpandedVisibleBounds(),
+			depth = this._zoom - this._topClusterLevel._zoom;
 
-		//Re-Check everyone for being in the viewport
-		//Do the clusters (and their child unclustered ones) recursively for performance
-		for (i = 0; i < highestLevelClusters.length; i++) {
-			l = highestLevelClusters[i];
-			if (bounds.intersects(l._bounds)) {
-				l._recursivelyAddChildrenToMap(null, depth, bounds);
-			}
-		}
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, depth, newBounds);
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, depth + 1, newBounds);
 
-		//Do the markers at this level too
-		for (i = 0; i < highestLevelUnclustered.length; i++) {
-			l = highestLevelUnclustered[i];
-			if (bounds.contains(l.getLatLng())) {
-				L.FeatureGroup.prototype.addLayer.call(this, l);
-			}
-		}
-
-		this._currentShownBounds = bounds;
+		this._currentShownBounds = newBounds;
+		return;
 	},
 
 	_generateInitialClusters: function () {
@@ -106,8 +80,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	_mergeSplitClusters: function () {
 
 		if (this._zoom < this._map._zoom) { //Zoom in, split
+			//Note: Clusters generate new children as needed on a zoom in
 
-			//Clusters generate new children as needed on a zoom in
+			//Remove clusters now off screen
+			this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, this._zoom - this._topClusterLevel._zoom, this._getExpandedVisibleBounds());
 
 			this._animationZoomIn(this._zoom, this._map._zoom);
 
@@ -267,7 +243,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	_getExpandedVisibleBounds: function () {
 		var map = this._map,
 			bounds = map.getPixelBounds(),
-			width = Math.abs(bounds.max.x - bounds.min.x),
+			width =  Math.abs(bounds.max.x - bounds.min.x),
 			height = Math.abs(bounds.max.y - bounds.min.y),
 			sw = map.unproject(new L.Point(bounds.min.x - width, bounds.min.y - height)),
 			ne = map.unproject(new L.Point(bounds.max.x + width, bounds.max.y + height));
@@ -376,6 +352,9 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		    depthToAnimateIn = previousZoomLevel - newZoomLevel;
 
 		this._animationZoomOutSingle(this._topClusterLevel, depthToStartAt, depthToAnimateIn);
+
+		//Need to add markers for those that weren't on the map before but are now
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, depthToStartAt, this._getExpandedVisibleBounds());
 	},
 	_animationZoomOutSingle: function (marker, depthToStartAt, depthToAnimateIn) {
 		var bounds = this._getExpandedVisibleBounds();

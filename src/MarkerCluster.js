@@ -242,6 +242,7 @@ L.MarkerCluster = L.Marker.extend({
 				} else {
 					c.setOpacity(0);
 				}
+
 				c._addToMap();
 			}
 		);
@@ -313,24 +314,29 @@ L.MarkerCluster = L.Marker.extend({
 			delete this._backupLatlng;
 		}
 	},
-
-	_recursivelyRemoveChildrenFromMap: function (previousBounds, depth) {
+	
+	//exceptBounds: If set, don't remove any markers/clusters in it
+	_recursivelyRemoveChildrenFromMap: function (previousBounds, depth, exceptBounds) {
 		var m, i;
 		this._recursively(previousBounds, 0, depth,
 			function (c) {
 				//Remove markers at every level
 				for (i = c._markers.length - 1; i >= 0; i--) {
 					m = c._markers[i];
-					L.FeatureGroup.prototype.removeLayer.call(c._group, m);
-					m.setOpacity(1);
+					if (!exceptBounds || !exceptBounds.contains(m._latlng)) {
+						L.FeatureGroup.prototype.removeLayer.call(c._group, m);
+						m.setOpacity(1);
+					}
 				}
 			},
 			function (c) {
 				//Remove child clusters at just the bottom level
 				for (i = c._childClusters.length - 1; i >= 0; i--) {
 					m = c._childClusters[i];
-					L.FeatureGroup.prototype.removeLayer.call(c._group, m);
-					m.setOpacity(1);
+					if (!exceptBounds || !exceptBounds.contains(m._latlng)) {
+						L.FeatureGroup.prototype.removeLayer.call(c._group, m);
+						m.setOpacity(1);
+					}
 				}
 			}
 		);
