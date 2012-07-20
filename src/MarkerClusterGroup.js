@@ -92,7 +92,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	_generateInitialClusters: function () {
 		console.log('generating initial topCluster ' + this._map.getZoom());
-		var res = this._topClusterLevel = this._clusterToMarkerCluster([], [], this._needsClustering, this._map.getZoom(), false);
+		var res = this._topClusterLevel = this._clusterToMarkerCluster(this._needsClustering, this._map.getZoom());
 
 		//Remember the current zoom level and bounds
 		this._zoom = this._map._zoom;
@@ -116,7 +116,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			//Ensure all of the intermediate zoom levels are generated, generating up happens outside of MarkerCluster
 			while (this._topClusterLevel._zoom > this._map._zoom) {
 				console.log('generating new topCluster for ' + (this._topClusterLevel._zoom - 1));
-				this._topClusterLevel = this._clusterToMarkerCluster([], [], this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1, true);
+				this._topClusterLevel = this._clusterToMarkerCluster(this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
 			}
 
 			this._animationZoomOut(this._zoom, this._map._zoom);
@@ -178,34 +178,21 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Takes a list of objects that have a 'getLatLng()' function (Marker / MarkerCluster)
 	//Performs clustering on them (using a greedy algorithm) and returns those clusters.
-	//hasChildClusters: True if these clusters are the parent of another level of clusters (false if this is the first level generated)
+	//toCluster: List of Markers/MarkerClusters to cluster. MarkerClusters MUST be first in the list
 	//Returns FIXME TODO
-	_cluster: function (existingClusters, existingUnclustered, toCluster, zoom, hasChildClusters) {
+	_cluster: function (toCluster, zoom) {
 		var clusterRadiusSqrd = this.options.maxClusterRadius * this.options.maxClusterRadius,
-		    clusters = existingClusters,
-		    unclustered = existingUnclustered,
+		    clusters = [],
+		    unclustered = [],
+		    hasChildClusters = (toCluster.length > 0 && toCluster[0] instanceof L.MarkerCluster),
 		    i, j, c;
-
-		//Calculate pixel positions
-		for (i = 0; i < clusters.length; i++) {
-			c = clusters[i];
-			c._projCenter = this._map.project(c.getLatLng(), zoom);
-		}
-		for (i = 0; i < unclustered.length; i++) {
-			c = unclustered[i];
-			c._projCenter = this._map.project(c.getLatLng(), zoom);
-		}
-		for (i = 0; i < toCluster.length; i++) {
-			c = toCluster[i];
-			c._projCenter = this._map.project(c.getLatLng(), zoom);
-		}
-
 
 		//go through each point
 		for (i = 0; i < toCluster.length; i++) {
-			var point = toCluster[i];
+			var point = toCluster[i],
+				used = false;
 
-			var used = false;
+			point._projCenter = this._map.project(point.getLatLng(), zoom); //Calculate pixel position
 
 			//try add it to an existing cluster
 			for (j = 0; j < clusters.length; j++) {
@@ -263,8 +250,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	//Clusters the given markers (with _cluster) and returns the result as a MarkerCluster
-	_clusterToMarkerCluster: function (existingClusters, existingUnclustered, toCluster, zoom, hasChildClusters) {
-		var res = this._cluster(existingClusters, existingUnclustered, toCluster, zoom, hasChildClusters),
+	_clusterToMarkerCluster: function (toCluster, zoom) {
+		var res = this._cluster(toCluster, zoom),
 			toAdd = res.clusters.concat(res.unclustered),
 			result = new L.MarkerCluster(this, toAdd[0]),
 			i;
