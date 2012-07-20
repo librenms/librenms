@@ -130,33 +130,41 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 
 		var me = this,
-			position;
+			newCluster;
 
 		//If we have already clustered we'll need to add this one to a cluster
-		L.FeatureGroup.prototype.addLayer.call(this, layer); //TODO: If not animated maybe don't add it yet
 
-		position = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom);
+		newCluster = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom);
 
-		if (position) {
-			//TODO Tidy up
-			//this._animateSingleMarkerIn(layer, position);
-			setTimeout(function () {
-				me._animationStart.call(me);
-
-				var backupLatlng = layer.getLatLng();
-
-				layer.setLatLng(position);
+		//TODO: This is the animated version
+		L.FeatureGroup.prototype.addLayer.call(this, layer);
+		if (newCluster != layer) {
+			if (newCluster._childCount > 2) { //Was already a cluster
 
 				setTimeout(function () {
-					L.FeatureGroup.prototype.removeLayer.call(me, layer);
-					layer.setLatLng(backupLatlng);
 
-					//HACKS
-					map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', ''); me._inZoomAnimation--;
-				}, 250);
-			}, 0);
-		} else {
-			//Do nothing, marker should be shown on map at own position at this level
+					me._animationStart.call(me);
+
+					var backupLatlng = layer.getLatLng();
+					layer.setLatLng(newCluster._latlng);
+					layer.setOpacity(0);
+
+					setTimeout(function () {
+						L.FeatureGroup.prototype.removeLayer.call(me, layer);
+						layer.setLatLng(backupLatlng);
+
+						//HACKS
+						map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', ''); me._inZoomAnimation--;
+					}, 250);
+				}, 0);
+
+			} else { //Just became a cluster
+				setTimeout(function () {
+					me._animationStart();
+					me._animationZoomOutSingle(newCluster, 0, 1);
+				}, 0);
+				//newCluster._recursivelyAnimateChildrenInAndAddSelfToMap(newCluster._bounds, 0, 1);
+			}
 		}
 
 		return this;
@@ -379,16 +387,21 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			me._inZoomAnimation--;
 		}, 250);
 	},
+
 	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
-		var map = this._map,
-		    bounds = this._getExpandedVisibleBounds(),
-		    depthToStartAt = 1 + newZoomLevel - this._topClusterLevel._zoom,
+		var depthToStartAt = 1 + newZoomLevel - this._topClusterLevel._zoom,
 		    depthToAnimateIn = previousZoomLevel - newZoomLevel;
+
+		this._animationZoomOutSingle(this._topClusterLevel, depthToStartAt, depthToAnimateIn);
+	},
+	_animationZoomOutSingle: function (marker, depthToStartAt, depthToAnimateIn) {
+		var map = this._map,
+		    bounds = this._getExpandedVisibleBounds();
 
 		console.log('animationZoomOut ' + depthToStartAt + ' ' + depthToAnimateIn);
 
 		//Animate all of the markers in the clusters to move to their cluster center point
-		this._topClusterLevel._recursivelyAnimateChildrenInAndAddSelfToMap(bounds, depthToStartAt, depthToAnimateIn);
+		marker._recursivelyAnimateChildrenInAndAddSelfToMap(bounds, depthToStartAt, depthToAnimateIn);
 
 		this._inZoomAnimation++;
 
@@ -396,7 +409,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		//Immediately fire an event to update the opacity (If we immediately set it they won't animate)
 		setTimeout(function () {
-			me._topClusterLevel._recursivelyBecomeVisible(bounds, depthToStartAt);
+			marker._recursivelyBecomeVisible(bounds, depthToStartAt);
 		}, 0);
 
 		//TODO: Maybe use the transition timing stuff to make this more reliable
@@ -404,7 +417,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		setTimeout(function () {
 
 			map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
-			me._topClusterLevel._recursively(bounds, depthToStartAt, 0, null, function (c) {
+			marker._recursively(bounds, depthToStartAt, 0, null, function (c) {
 				c._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn - 1);
 			});
 			me._inZoomAnimation--;

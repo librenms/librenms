@@ -77,43 +77,45 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	//layer: The layer to try add
+	//returns:
+	//  true: was able to put this marker in, but don't know its current visible parents position
+	//  false: wasn't able to put this marker in
+	//  a Marker/MarkerCluster: the visible parent of the marker (or the marker itself if it should be visible)
 	_recursivelyAddLayer: function (layer, zoom) {
-		var childReturn = null,
-			added = false;
+		var result = false;
 
 		if (!this._haveGeneratedChildClusters && this._canAcceptPosition(layer.getLatLng(), zoom)) {
 			//Don't need to cluster it in as we haven't clustered
 			this._addChild(layer);
-			added = true;
+			result = true;
 		} else {
 			for (var i = this._childClusters.length - 1; i >= 0; i--) {
 				var c = this._childClusters[i];
 				//Recurse into children where their bounds fits the layer or they can just take it
 				if (c._bounds.contains(layer.getLatLng()) || c._canAcceptPosition(layer.getLatLng(), zoom + 1)) {
-					childReturn = c._recursivelyAddLayer(layer, zoom + 1);
-					if (childReturn !== false) {
-						added = true;
+					result = c._recursivelyAddLayer(layer, zoom + 1);
+					if (result) {
 						break;
 					}
 				}
 			}
 
-			//Couldn't add it to a child, but it should be part of us
-			if (!added && this._canAcceptPosition(layer.getLatLng(), zoom)) {
+			//Couldn't add it to a child, but it should be part of us (this._zoom -> we are the root node)
+			if (!result && (this._canAcceptPosition(layer.getLatLng(), zoom) || this._zoom)) {
 
 				//Add to ourself instead
-				var newCluster = this._group._clusterOne(this._markers, layer, zoom);
-				if (newCluster && newCluster._markers[0]._icon) {
-					//Remove children and add cluster
-					newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, 0);
-					newCluster._addToMap();
-				}
-				this._addChild(newCluster || layer);
+				result = this._group._clusterOne(this._markers, layer, zoom);
 
-				added = true;
+				if (result) {
+					result._baseInit();
+					this._addChild(result);
+				} else {
+					this._addChild(layer);
+					result = true;
+				}
 			}
 
-			if (added) {
+			if (result) {
 				this._childCount++;
 				if (this._icon) {
 					this.setIcon(this._group.options.iconCreateFunction(this._childCount));
@@ -121,16 +123,15 @@ L.MarkerCluster = L.Marker.extend({
 			}
 		}
 
-		if (!added) {
-			if (this._zoom) { //Means we are the root node, we get it anyway
-				this._addChild(layer);
+		if (result === true) {
+			if (this._icon) {
+				result = this;
+			} else if ((this._markers.length > 0 && this._markers[0]._icon) || (this._childClusters.length > 1 && this._childClusters[0]._icon)) {
+				result = layer;
 			}
-			console.log('not added');
-			return false;
-		} else {
-			console.log('added ' + (this._icon ? this._latlng : childReturn));
-			return this._icon ? this._latlng : childReturn;
 		}
+
+		return result;
 	},
 
 	_canAcceptPosition: function (latlng, zoom) {
