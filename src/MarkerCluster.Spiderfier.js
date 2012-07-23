@@ -153,6 +153,33 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 					leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222' });
 					map.addLayer(leg);
 					m._spiderLeg = leg;
+
+
+
+					//Chrome bug that prevents this working:
+					//  http://stackoverflow.com/questions/8455200/svg-animate-with-dynamically-added-elements
+
+					//http://stackoverflow.com/questions/5924238/how-do-you-animate-an-svg-path-in-ios
+					//http://dev.opera.com/articles/view/advanced-svg-animation-techniques/
+
+					//var length = leg._path.getTotalLength();
+					//leg._path.setAttribute("stroke-dasharray", length + "," + length);
+
+					var xmlns = "http://www.w3.org/2000/svg";
+					var anim = document.createElementNS(xmlns, "animate");
+					//anim.setAttribute("attributeName", "stroke-dashoffset");
+					//anim.setAttribute("begin", "indefinite");
+					//anim.setAttribute("from", length);
+					//anim.setAttribute("to", 0);
+					//anim.setAttribute("dur", "1s");
+
+					anim.setAttribute("attributeName", "stroke-opacity");
+					anim.setAttribute("from", 1);
+					anim.setAttribute("to", 0);
+					anim.setAttribute("begin", "indefinite");
+					anim.setAttribute("dur", 5);
+					leg._path.appendChild(anim);
+					anim.beginElement();
 				}
 
 
