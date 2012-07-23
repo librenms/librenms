@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet debug page</title>
+
+	<link rel="stylesheet" href="../lib/leaflet-dist/leaflet.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="../lib/leaflet-dist/leaflet.ie.css" /><![endif]-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="screen.css" />
+	<script src="../lib/leaflet-dist/leaflet-src.js"></script>
+
+
+	<link rel="stylesheet" href="../src/MarkerCluster.css" />
+	<link rel="stylesheet" href="../src/MarkerCluster.Default.css" />
+	<script src="../src/MarkerClusterGroup.js"></script>
+	<script src="../src/MarkerCluster.js"></script>
+	<script src="../src/MarkerCluster.Spiderfier.js"></script>
+</head>
+<body>
+
+	<div id="map"></div>
+	<button id="populate">Populate 1 marker</button>
+	<button id="remove">Remove 1 marker</button>
+
+	<script type="text/javascript">
+
+		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
+			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+			latlng = new L.LatLng(50.5, 30.51);
+
+		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
+
+		var markers = new L.MarkerClusterGroup();
+
+		function populate() {
+			for (var i = 0; i < 100; i++) {
+				var m = new L.Marker(getRandomLatLng(map));
+				markers.addLayer(m);
+			}
+			return false;
+		}
+		function getRandomLatLng(map) {
+			var bounds = map.getBounds(),
+				southWest = bounds.getSouthWest(),
+				northEast = bounds.getNorthEast(),
+				lngSpan = northEast.lng - southWest.lng,
+				latSpan = northEast.lat - southWest.lat;
+
+			return new L.LatLng(
+					southWest.lat + latSpan * Math.random(),
+					southWest.lng + lngSpan * Math.random());
+		}
+
+		markers.on('click', function (a) {
+			if (a.layer instanceof L.MarkerCluster) {
+				console.log('cluster ' + a.layer.getAllChildMarkers().length);
+				a.layer.spiderfy();
+			} else {
+				console.log('marker ' + a.layer);
+			}
+		});
+
+		populate();
+		map.addLayer(markers);
+	</script>
+</body>
+</html>
