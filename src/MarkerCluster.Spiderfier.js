@@ -143,44 +143,59 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 
 				m.setLatLng(map.layerPointToLatLng(positions[i]));
 				m.setOpacity(1);
+				//Add Legs. TODO: Fade this in!
+
+				leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222', opacity: 0 });
+				map.addLayer(leg);
+				m._spiderLeg = leg;
+
+				//Chrome bug that prevents this working:
+				//  http://stackoverflow.com/questions/8455200/svg-animate-with-dynamically-added-elements
+
+				//http://stackoverflow.com/questions/5924238/how-do-you-animate-an-svg-path-in-ios
+				//http://dev.opera.com/articles/view/advanced-svg-animation-techniques/
+
+				var length = leg._path.getTotalLength();
+				leg._path.setAttribute("stroke-dasharray", length + "," + length);
+
+				var xmlns = "http://www.w3.org/2000/svg";
+
+				var anim = document.createElementNS(xmlns, "animate");
+				anim.setAttribute("attributeName", "stroke-dashoffset");
+				anim.setAttribute("begin", "indefinite");
+				anim.setAttribute("from", length);
+				anim.setAttribute("to", 0);
+				anim.setAttribute("dur", 0.25);
+				leg._path.appendChild(anim);
+				anim.beginElement();
+
+				anim = document.createElementNS(xmlns, "animate");
+				anim.setAttribute("attributeName", "stroke-opacity");
+				anim.setAttribute("attributeName", "stroke-opacity");
+				anim.setAttribute("begin", "indefinite");
+				anim.setAttribute("from", 0);
+				anim.setAttribute("to", 0.5);
+				anim.setAttribute("dur", 0.25);
+				leg._path.appendChild(anim);
+				anim.beginElement();
+
 			}
 			me.setOpacity(0.3);
 
+			//Set the opacity of the spiderLegs back to their correct value
+			// The animations above override this until they complete.
+			// Doing this at 250ms causes some minor flickering on FF, so just do it immediately
+			// If the initial opacity of the spiderlegs isn't 0 then they appear before the animation starts.
 			setTimeout(function () {
-				//Add Legs. TODO: Fade this in!
 				for (i = childMarkers.length - 1; i >= 0; i--) {
-					m = childMarkers[i];
-					leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222' });
-					map.addLayer(leg);
-					m._spiderLeg = leg;
+					m = childMarkers[i]._spiderLeg;
 
-
-
-					//Chrome bug that prevents this working:
-					//  http://stackoverflow.com/questions/8455200/svg-animate-with-dynamically-added-elements
-
-					//http://stackoverflow.com/questions/5924238/how-do-you-animate-an-svg-path-in-ios
-					//http://dev.opera.com/articles/view/advanced-svg-animation-techniques/
-
-					//var length = leg._path.getTotalLength();
-					//leg._path.setAttribute("stroke-dasharray", length + "," + length);
-
-					var xmlns = "http://www.w3.org/2000/svg";
-					var anim = document.createElementNS(xmlns, "animate");
-					//anim.setAttribute("attributeName", "stroke-dashoffset");
-					//anim.setAttribute("begin", "indefinite");
-					//anim.setAttribute("from", length);
-					//anim.setAttribute("to", 0);
-					//anim.setAttribute("dur", "1s");
-
-					anim.setAttribute("attributeName", "stroke-opacity");
-					anim.setAttribute("from", 1);
-					anim.setAttribute("to", 0);
-					anim.setAttribute("begin", "indefinite");
-					anim.setAttribute("dur", 5);
-					leg._path.appendChild(anim);
-					anim.beginElement();
+					m.options.opacity = 0.5;
+					m._path.setAttribute('stroke-opacity', 0.5);
 				}
+			}, 0);
+
+			setTimeout(function () {
 
 
 				group._animationEnd();
@@ -197,6 +212,12 @@ L.MarkerClusterGroup.include({
 
 	_spiderfierOnAdd: function () {
 		this._map.on('click zoomstart', this._unspiderfy, this);
+
+		if (L.Browser.svg) {
+			this._map._initPathRoot(); //Needs to happen in the pageload, not after, or animations don't work in chrome
+			//  http://stackoverflow.com/questions/8455200/svg-animate-with-dynamically-added-elements
+
+		}
 	},
 
 	_unspiderfy: function () {
