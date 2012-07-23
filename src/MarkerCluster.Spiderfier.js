@@ -15,7 +15,8 @@ L.MarkerCluster.include({
 								// 0 -> always spiral; Infinity -> always circle
 
 	spiderfy: function () {
-		var childMarkers = this.getAllChildMarkers(),
+		var me = this,
+			childMarkers = this.getAllChildMarkers(),
 			group = this._group,
 			map = group._map,
 			center = map.latLngToLayerPoint(this._latlng),
@@ -34,16 +35,30 @@ L.MarkerCluster.include({
 			m = childMarkers[i];
 
 			m._backupPosSpider = m._latlng;
-			m.setLatLng(map.layerPointToLatLng(markerOffsets[i]));
-
+			m.setLatLng(this._latlng);
 			m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
-			L.FeatureGroup.prototype.addLayer.call(group, m);
+			m.setOpacity(0);
 
-			var leg = new L.Polyline([this._latlng, m._latlng], { weight: 1.5, color: '#222' });
-			map.addLayer(leg);
+			L.FeatureGroup.prototype.addLayer.call(group, m);
 		}
 
-		this.setOpacity(0.3);
+		setTimeout(function () {
+			group._animationStart();
+			for (i = childMarkers.length - 1; i >= 0; i--) {
+				m = childMarkers[i];
+
+				m.setLatLng(map.layerPointToLatLng(markerOffsets[i]));
+				m.setOpacity(1);
+
+				var leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222' });
+				map.addLayer(leg);
+			}
+			me.setOpacity(0.3);
+
+			setTimeout(function () {
+				group._animationEnd();
+			}, 250);
+		}, 0);
 	},
 
 	unspiderfy: function () {
