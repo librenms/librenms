@@ -20,8 +20,7 @@ L.MarkerCluster.include({
 			group = this._group,
 			map = group._map,
 			center = map.latLngToLayerPoint(this._latlng),
-			markerOffsets,
-			i, m;
+			positions;
 
 		this._group._unspiderfy();
 		this._group._spiderfied = this;
@@ -29,46 +28,13 @@ L.MarkerCluster.include({
 		//TODO Maybe: childMarkers order by distance to center
 
 		if (childMarkers.length >= this._circleSpiralSwitchover) {
-			markerOffsets = this._generatePointsSpiral(childMarkers.length, center);
+			positions = this._generatePointsSpiral(childMarkers.length, center);
 		} else {
 			center.y += 10; //Otherwise circles look wrong
-			markerOffsets = this._generatePointsCircle(childMarkers.length, center);
+			positions = this._generatePointsCircle(childMarkers.length, center);
 		}
 
-		for (i = childMarkers.length - 1; i >= 0; i--) {
-			m = childMarkers[i];
-
-			m._backupPosSpider = m._latlng;
-			m.setLatLng(this._latlng);
-			m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
-			m.setOpacity(0);
-
-			L.FeatureGroup.prototype.addLayer.call(group, m);
-		}
-
-		setTimeout(function () {
-			group._animationStart();
-			for (i = childMarkers.length - 1; i >= 0; i--) {
-				m = childMarkers[i];
-
-				m.setLatLng(map.layerPointToLatLng(markerOffsets[i]));
-				m.setOpacity(1);
-			}
-			me.setOpacity(0.3);
-
-			setTimeout(function () {
-				//Add Legs. TODO: Fade this in!
-				for (i = childMarkers.length - 1; i >= 0; i--) {
-					m = childMarkers[i];
-					var leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222' });
-					map.addLayer(leg);
-					m._spiderLeg = leg;
-				}
-
-
-				group._animationEnd();
-			}, 250);
-		}, 0);
+		this._animationSpiderfy(childMarkers, positions);
 	},
 
 	unspiderfy: function () {
@@ -128,17 +94,82 @@ L.MarkerCluster.include({
 	}
 });
 
+L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
+	//Non Animated versions of everything
+	_animationSpiderfy: function (childMarkers, positions) {
+		var group = this._group,
+			i, m, leg;
+
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			m = childMarkers[i];
+
+			m._backupPosSpider = m._latlng;
+			m.setLatLng(map.layerPointToLatLng(positions[i]));
+			m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
+
+			L.FeatureGroup.prototype.addLayer.call(group, m);
+
+			leg = new L.Polyline([this._latlng, m._latlng], { weight: 1.5, color: '#222' });
+			map.addLayer(leg);
+			m._spiderLeg = leg;
+		}
+		this.setOpacity(0.3);
+	}
+} : {
+	//Animated versions here
+	_animationSpiderfy: function (childMarkers, positions) {
+		var me = this,
+			group = this._group,
+			i, m, leg;
+
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			m = childMarkers[i];
+
+			m._backupPosSpider = m._latlng;
+			m.setLatLng(this._latlng);
+			m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
+			m.setOpacity(0);
+
+			L.FeatureGroup.prototype.addLayer.call(group, m);
+		}
+
+		setTimeout(function () {
+			group._animationStart();
+			for (i = childMarkers.length - 1; i >= 0; i--) {
+				m = childMarkers[i];
+
+				m.setLatLng(map.layerPointToLatLng(positions[i]));
+				m.setOpacity(1);
+			}
+			me.setOpacity(0.3);
+
+			setTimeout(function () {
+				//Add Legs. TODO: Fade this in!
+				for (i = childMarkers.length - 1; i >= 0; i--) {
+					m = childMarkers[i];
+					leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222' });
+					map.addLayer(leg);
+					m._spiderLeg = leg;
+				}
+
+
+				group._animationEnd();
+			}, 250);
+		}, 0);
+	}
+
+});
+
+
 L.MarkerClusterGroup.include({
 	//The MarkerCluster currently spiderfied (if any)
 	_spiderfied: null,
 
 	_spiderfierOnAdd: function () {
-		console.log('asdasd');
 		this._map.on('click zoomstart', this._unspiderfy, this);
 	},
 
 	_unspiderfy: function () {
-		console.log('in _unspiderfy');
 		if (this._spiderfied) {
 			this._spiderfied.unspiderfy();
 		}
