@@ -15,8 +15,11 @@ L.MarkerCluster.include({
 								// 0 -> always spiral; Infinity -> always circle
 
 	spiderfy: function () {
-		var me = this,
-			childMarkers = this.getAllChildMarkers(),
+		if (this._group._spiderfied == this) {
+			return;
+		}
+
+		var childMarkers = this.getAllChildMarkers(),
 			group = this._group,
 			map = group._map,
 			center = map.latLngToLayerPoint(this._latlng),
