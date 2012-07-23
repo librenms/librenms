@@ -170,14 +170,14 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		    i, j, c;
 
 		//go through each point
-		for (i = 0; i < toCluster.length; i++) {
+		for (i = toCluster.length - 1; i >= 0; i--) {
 			var point = toCluster[i],
 				used = false;
 
 			point._projCenter = this._map.project(point.getLatLng(), zoom); //Calculate pixel position
 
 			//try add it to an existing cluster
-			for (j = 0; j < clusters.length; j++) {
+			for (j = clusters.length - 1; j >= 0; j--) {
 				c = clusters[j];
 				if (this._sqDist(point._projCenter, c._projCenter) <= clusterRadiusSqrd) {
 					c._addChild(point);
@@ -219,7 +219,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 
 		//Remove the _projCenter temp variable from clusters
-		for (i = 0; i < clusters.length; i++) {
+		for (i = clusters.length - 1; i >= 0; i--) {
 			delete clusters[i]._projCenter;
 			clusters[i]._baseInit();
 		}
@@ -411,7 +411,6 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 					me._animationStart();
 					me._animationZoomOutSingle(newCluster, 0, 1);
 				}, 0);
-				//newCluster._recursivelyAnimateChildrenInAndAddSelfToMap(newCluster._bounds, 0, 1);
 			}
 		}
 	}

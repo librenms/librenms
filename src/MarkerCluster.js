@@ -20,11 +20,11 @@ L.MarkerCluster = L.Marker.extend({
 	getAllChildMarkers: function (storageArray) {
 		storageArray = storageArray || [];
 
-		for (var i = 0; i < this._childClusters.length; i++) {
+		for (var i = this._childClusters.length - 1; i >= 0; i--) {
 			this._childClusters[i].getAllChildMarkers(storageArray);
 		}
 
-		for (var j = 0; j < this._markers.length; j++) {
+		for (var j = this._markers.length - 1; j >= 0; j--) {
 			storageArray.push(this._markers[j]);
 		}
 
@@ -236,7 +236,8 @@ L.MarkerCluster = L.Marker.extend({
 				c._recursivelyAnimateChildrenIn(bounds, c._group._map.latLngToLayerPoint(c.getLatLng()).round(), depthToAnimateIn);
 
 				//TODO: depthToAnimateIn affects _isSingleParent, if there is a multizoom we may/may not be.
-				if (c._isSingleParent() && depthToAnimateIn === 1) { //TODO: If we are the same as our parent, don't do an animation, just immediately appear
+				//As a hack we only do a animation free zoom on a single level zoom, if someone does multiple levels then we always animate
+				if (c._isSingleParent() && depthToAnimateIn === 1) {
 					c.setOpacity(1);
 					c._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn - 1); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
 				} else {
@@ -262,7 +263,7 @@ L.MarkerCluster = L.Marker.extend({
 				}
 
 				//Add our child markers at startPos (so they can be animated out)
-				for (var i = 0; i < c._markers.length; i++) {
+				for (var i = c._markers.length - 1; i >= 0; i--) {
 					var nm = c._markers[i];
 
 					if (!bounds.contains(nm._latlng)) {
@@ -288,7 +289,7 @@ L.MarkerCluster = L.Marker.extend({
 
 	_recursivelyRestoreChildPositions: function (depth) {
 		//Fix positions of child markers
-		for (var i = 0; i < this._markers.length; i++) {
+		for (var i = this._markers.length - 1; i >= 0; i--) {
 			var nm = this._markers[i];
 			if (nm._backupLatlng) {
 				nm.setLatLng(nm._backupLatlng);
@@ -298,11 +299,11 @@ L.MarkerCluster = L.Marker.extend({
 
 		if (depth === 1) {
 			//Reposition child clusters
-			for (var j = 0; j < this._childClusters.length; j++) {
+			for (var j = this._childClusters.length - 1; j >= 0; j--) {
 				this._childClusters[j]._restorePosition();
 			}
 		} else {
-			for (var k = 0; k < this._childClusters.length; k++) {
+			for (var k = this._childClusters.length - 1; k >= 0; k--) {
 				this._childClusters[k]._recursivelyRestoreChildPositions(depth - 1);
 			}
 		}
@@ -352,7 +353,7 @@ L.MarkerCluster = L.Marker.extend({
 		var childClusters = this._childClusters,
 			i, c;
 
-		//TODO: When zooming down we need to generate new clusters for levels that don't have them yet
+		//When zooming down we need to generate new clusters for levels that don't have them yet
 		if (!this._haveGeneratedChildClusters && (depthToStartAt > 0 || timesToRecurse > 0)) {
 			this._generateChildClusters();
 		}
