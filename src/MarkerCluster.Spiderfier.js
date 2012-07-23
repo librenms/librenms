@@ -41,24 +41,8 @@ L.MarkerCluster.include({
 	},
 
 	unspiderfy: function () {
-		var group = this._group,
-			map = group._map,
-			childMarkers = this.getAllChildMarkers(),
-			m, i;
 
-		this.setOpacity(1);
-		for (i = childMarkers.length - 1; i >= 0; i--) {
-			m = childMarkers[i];
-
-			m.setLatLng(m._backupPosSpider);
-			delete m._backupPosSpider;
-			m.setZIndexOffset(0);
-
-			L.FeatureGroup.prototype.removeLayer.call(group, m);
-
-			map.removeLayer(m._spiderLeg);
-			delete m._spiderLeg;
-		}
+		this._animationUnspiderfy();
 
 		this._group._spiderfied = null;
 	},
@@ -117,6 +101,27 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			m._spiderLeg = leg;
 		}
 		this.setOpacity(0.3);
+	},
+
+	_animationUnspiderfy: function () {
+		var group = this._group,
+			map = group._map,
+			childMarkers = this.getAllChildMarkers(),
+			m, i;
+
+		this.setOpacity(1);
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			m = childMarkers[i];
+
+			m.setLatLng(m._backupPosSpider);
+			delete m._backupPosSpider;
+			m.setZIndexOffset(0);
+
+			L.FeatureGroup.prototype.removeLayer.call(group, m);
+
+			map.removeLayer(m._spiderLeg);
+			delete m._spiderLeg;
+		}
 	}
 } : {
 	//Animated versions here
@@ -205,13 +210,59 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			}
 
 			setTimeout(function () {
-
-
 				group._animationEnd();
 			}, 250);
 		}, 0);
-	}
+	},
 
+	_animationUnspiderfy: function () {
+		var group = this._group,
+			map = group._map,
+			childMarkers = this.getAllChildMarkers(),
+			svg = L.Browser.svg,
+			m, i, a;
+
+		group._animationStart();
+		
+		//Make us visible and bring the child markers back in
+		this.setOpacity(1);
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			m = childMarkers[i];
+
+			m.setLatLng(this._latlng);
+			m.setOpacity(0);
+
+			//Animate the spider legs back in
+			if (svg) {
+				a = m._spiderLeg._path.childNodes[0];
+				a.setAttribute('to', a.getAttribute('from'));
+				a.setAttribute('from', 0);
+				a.beginElement();
+
+				a = m._spiderLeg._path.childNodes[1];
+				a.setAttribute('from', 0.5);
+				a.setAttribute('to', 0);
+				a.setAttribute('stroke-opacity', 0);
+				a.beginElement();
+
+				m._spiderLeg._path.setAttribute('stroke-opacity', 0);
+			}
+		}
+
+		setTimeout(function () {
+			for (i = childMarkers.length - 1; i >= 0; i--) {
+				m = childMarkers[i];
+				m.setLatLng(m._backupPosSpider);
+				delete m._backupPosSpider;
+				m.setZIndexOffset(0);
+
+				L.FeatureGroup.prototype.removeLayer.call(group, m);
+
+				map.removeLayer(m._spiderLeg);
+				delete m._spiderLeg;
+			}
+		}, 250);
+	}
 });
 
 
