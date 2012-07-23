@@ -6,7 +6,6 @@
 L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	options: {
-		//distanceToCluster: 10, //Any points closer than this will probably get put in to a cluster
 		maxClusterRadius: 60, //A cluster will cover at most this many pixels from its center
 		iconCreateFunction: function (childCount) {
 			var c = ' marker-cluster-';
@@ -66,7 +65,16 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	_generateInitialClusters: function () {
 		console.log('generating initial topCluster ' + this._map.getZoom());
-		var res = this._topClusterLevel = this._clusterToMarkerCluster(this._needsClustering, this._map.getZoom());
+		var res = this._topClusterLevel = this._clusterToMarkerCluster(this._needsClustering, this._map.getZoom()),
+			minZoom = this._map.getMinZoom();
+
+		//Generate 2 levels up if we can
+		if (minZoom < this._topClusterLevel._zoom && this._topClusterLevel._childCount > 1) {
+			this._topClusterLevel = this._clusterToMarkerCluster(this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
+			if (minZoom < this._topClusterLevel._zoom && this._topClusterLevel._childCount > 1) {
+				this._topClusterLevel = this._clusterToMarkerCluster(this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
+			}
+		}
 
 		//Remember the current zoom level and bounds
 		this._zoom = this._map._zoom;
@@ -90,7 +98,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		} else if (this._zoom > this._map._zoom) { //Zoom out, merge
 
 			//Ensure all of the intermediate zoom levels are generated, generating up happens outside of MarkerCluster
-			while (this._topClusterLevel._zoom > this._map._zoom) {
+			//We also try keep 2 more levels on top if we can so the tree is used more efficiently
+			while (this._topClusterLevel._zoom > Math.max(this._map.getMinZoom(), this._map._zoom - 2)) {
 				console.log('generating new topCluster for ' + (this._topClusterLevel._zoom - 1));
 				this._topClusterLevel = this._clusterToMarkerCluster(this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
 			}
@@ -105,12 +114,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			return this;
 		}
 
-		var me = this,
-			newCluster;
-
 		//If we have already clustered we'll need to add this one to a cluster
 
-		newCluster = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom - 1);
+		var newCluster = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom - 1);
 
 		this._animationAddLayer(layer, newCluster);
 
