@@ -64,7 +64,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	_generateInitialClusters: function () {
-		console.log('generating initial topCluster ' + this._map.getZoom());
 		var res = this._topClusterLevel = this._clusterToMarkerCluster(this._needsClustering, this._map.getZoom()),
 			minZoom = this._map.getMinZoom();
 
@@ -100,7 +99,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			//Ensure all of the intermediate zoom levels are generated, generating up happens outside of MarkerCluster
 			//We also try keep 2 more levels on top if we can so the tree is used more efficiently
 			while (this._topClusterLevel._zoom > Math.max(this._map.getMinZoom(), this._map._zoom - 2)) {
-				console.log('generating new topCluster for ' + (this._topClusterLevel._zoom - 1));
 				this._topClusterLevel = this._clusterToMarkerCluster(this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
 			}
 
@@ -239,7 +237,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		for (i = toAdd.length - 1; i > 0; i--) {
 			result._addChild(toAdd[i]);
 		}
-		console.log('generated clusters: ' + result._childClusters.length + ", markers: " + result._markers.length + " at " + zoom);
 		result._zoom = zoom;
 		result._haveGeneratedChildClusters = true;
 		return result;
@@ -294,7 +291,6 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		    i, 
 		    depthToStartAt = 1 + previousZoomLevel - this._topClusterLevel._zoom,
 		    depthToDescend = newZoomLevel - previousZoomLevel;
-		console.log('animationZoomIn ' + depthToStartAt + ' ' + depthToDescend);
 
 		//Add all children of current clusters to map and remove those clusters from map
 		this._topClusterLevel._recursively(bounds, depthToStartAt, 0, function (c) {
@@ -364,8 +360,6 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	},
 	_animationZoomOutSingle: function (marker, depthToStartAt, depthToAnimateIn) {
 		var bounds = this._getExpandedVisibleBounds();
-
-		console.log('animationZoomOut ' + depthToStartAt + ' ' + depthToAnimateIn);
 
 		//Animate all of the markers in the clusters to move to their cluster center point
 		marker._recursivelyAnimateChildrenInAndAddSelfToMap(bounds, depthToStartAt, depthToAnimateIn);
