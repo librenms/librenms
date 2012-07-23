@@ -133,6 +133,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._generateInitialClusters();
 		this._map.on('zoomend', this._zoomEnd, this);
 		this._map.on('moveend', this._moveEnd, this);
+
+		if (this._spiderfierOnAdd) { //TODO FIXME: Not sure how to have spiderfier add something on here nicely
+			this._spiderfierOnAdd();
+		}
 	},
 
 	//Takes a list of markers and clusters the new marker in to them

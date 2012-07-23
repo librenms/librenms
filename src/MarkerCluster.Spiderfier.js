@@ -22,6 +22,10 @@ L.MarkerCluster.include({
 			center = map.latLngToLayerPoint(this._latlng),
 			markerOffsets,
 			i, m;
+
+		this._group._unspiderfy();
+		this._group._spiderfied = this;
+
 		//TODO Maybe: childMarkers order by distance to center
 
 		if (childMarkers.length >= this._circleSpiralSwitchover) {
@@ -49,23 +53,45 @@ L.MarkerCluster.include({
 
 				m.setLatLng(map.layerPointToLatLng(markerOffsets[i]));
 				m.setOpacity(1);
-
-				var leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222' });
-				map.addLayer(leg);
 			}
 			me.setOpacity(0.3);
 
 			setTimeout(function () {
+				//Add Legs. TODO: Fade this in!
+				for (i = childMarkers.length - 1; i >= 0; i--) {
+					m = childMarkers[i];
+					var leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222' });
+					map.addLayer(leg);
+					m._spiderLeg = leg;
+				}
+
+
 				group._animationEnd();
 			}, 250);
 		}, 0);
 	},
 
 	unspiderfy: function () {
-		if (false) {
-			return;
+		var group = this._group,
+			map = group._map,
+			childMarkers = this.getAllChildMarkers(),
+			m, i;
+
+		this.setOpacity(1);
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			m = childMarkers[i];
+
+			m.setLatLng(m._backupPosSpider);
+			delete m._backupPosSpider;
+			m.setZIndexOffset(0);
+
+			L.FeatureGroup.prototype.removeLayer.call(group, m);
+
+			map.removeLayer(m._spiderLeg);
+			delete m._spiderLeg;
 		}
-		//TODO
+
+		this._group._spiderfied = null;
 	},
 
 	_generatePointsCircle: function (count, centerPt) {
@@ -100,4 +126,21 @@ L.MarkerCluster.include({
 		}
 		return res;
 	}
+});
+
+L.MarkerClusterGroup.include({
+	//The MarkerCluster currently spiderfied (if any)
+	_spiderfied: null,
+
+	_spiderfierOnAdd: function () {
+		console.log('asdasd');
+		this._map.on('click zoomstart', this._unspiderfy, this);
+	},
+
+	_unspiderfy: function () {
+		console.log('in _unspiderfy');
+		if (this._spiderfied) {
+			this._spiderfied.unspiderfy();
+		}
+	},
 });
