@@ -83,20 +83,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	_mergeSplitClusters: function () {
 
 		if (this._zoom < this._map._zoom) { //Zoom in, split
-			//Note: Clusters generate new children as needed on a zoom in
-
 			//Remove clusters now off screen
 			this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, this._zoom - this._topClusterLevel._zoom, this._getExpandedVisibleBounds());
 
 			this._animationZoomIn(this._zoom, this._map._zoom);
 
 		} else if (this._zoom > this._map._zoom) { //Zoom out, merge
-
-			//Ensure all of the intermediate zoom levels are generated, generating up happens outside of MarkerCluster
-			//We also try keep 2 more levels on top if we can so the tree is used more efficiently
-			while (this._topClusterLevel._zoom > Math.max(this._map.getMinZoom(), this._map._zoom - 2)) {
-				this._topClusterLevel = this._clusterToMarkerCluster(this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
-			}
 
 			this._animationZoomOut(this._zoom, this._map._zoom);
 		}
