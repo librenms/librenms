@@ -24,6 +24,11 @@
 
 		bindEvents: function (map, markerClusterGroup) {
 			var me = this;
+			var inZoomAnimation = false;
+
+			map.on('zoomstart', function () { inZoomAnimation = true; });
+			map.on('zoomend', function () { inZoomAnimation = false; });
+
 
 			//Zoom on cluster click or spiderfy if we are at the lowest level
 			markerClusterGroup.on('clusterclick', function (a) {
@@ -36,6 +41,9 @@
 
 			//Show convex hull (boundary) polygon on mouse over
 			markerClusterGroup.on('clustermouseover', function (a) {
+				if (inZoomAnimation) {
+					return;
+				}
 				if (me._shownPolygon) {
 					map.removeLayer(me._shownPolygon);
 				}
