@@ -60,23 +60,23 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	_generateInitialClusters: function () {
-		var res = this._topClusterLevel = this._clusterToMarkerCluster(this._needsClustering, this._map.getZoom()),
-			minZoom = this._map.getMinZoom();
+		var minZoom = this._map.getMinZoom(),
+			maxZoom = this._map.getMaxZoom(),
+			currentZoom = this._map.getZoom();
 
-		//Generate 2 levels up if we can
-		if (minZoom < this._topClusterLevel._zoom && this._topClusterLevel._childCount > 1) {
+		this._topClusterLevel = this._clusterToMarkerCluster(this._needsClustering, maxZoom);
+
+		//Generate to the top
+		while (minZoom < this._topClusterLevel._zoom) {
 			this._topClusterLevel = this._clusterToMarkerCluster(this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
-			if (minZoom < this._topClusterLevel._zoom && this._topClusterLevel._childCount > 1) {
-				this._topClusterLevel = this._clusterToMarkerCluster(this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
-			}
 		}
 
 		//Remember the current zoom level and bounds
-		this._zoom = this._map._zoom;
+		this._zoom = currentZoom;
 		this._currentShownBounds = this._getExpandedVisibleBounds();
 
 		//Make things appear on the map
-		res._recursivelyAddChildrenToMap(null, 1, this._getExpandedVisibleBounds());
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, currentZoom - minZoom + 1, this._currentShownBounds);
 	},
 
 	//Merge and split any existing clusters that are too big or small
