@@ -31,6 +31,11 @@ L.MarkerCluster = L.Marker.extend({
 		return storageArray;
 	},
 
+	//Returns the count of how many child markers we have
+	getChildCount: function () {
+		return this._childCount;
+	},
+
 	//Zoom to the extents of this cluster
 	zoomToBounds: function () {
 		this._group._map.fitBounds(this._bounds);

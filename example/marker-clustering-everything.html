@@ -12,6 +12,7 @@
 
 	<link rel="stylesheet" href="../src/MarkerCluster.css" />
 	<link rel="stylesheet" href="../src/MarkerCluster.Default.css" />
+	<script src="../src/MarkerCluster.Default.js"></script>
 	<script src="../src/MarkerClusterGroup.js"></script>
 	<script src="../src/MarkerCluster.js"></script>
 	<script src="../src/MarkerCluster.QuickHull.js"></script>
@@ -33,6 +34,7 @@
 		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
 
 		var markers = new L.MarkerClusterGroup();
+		L.MarkerClusterDefault.bindEvents(map, markers);
 		var markersList = [];
 
 		function populate() {
@@ -54,39 +56,6 @@
 					southWest.lat + latSpan * Math.random(),
 					southWest.lng + lngSpan * Math.random());
 		}
-		
-		//Zoom or spiderfy on cluster click
-		markers.on('clusterclick', function (a) {
-			if (map.getMaxZoom() === map.getZoom()) {
-				a.layer.spiderfy();
-			} else {
-				a.layer.zoomToBounds();
-			}
-		});
-
-		//Show convex hull (boundary) polygon on mouse over
-		var polygon;
-		var polygonCluster;
-		markers.on('clustermouseover', function (a) {
-			if (polygon) {
-				map.removeLayer(polygon);
-			}
-			polygon = new L.Polygon(a.layer.getConvexHull());
-			map.addLayer(polygon);
-		});
-		markers.on('clustermouseout', function (a) {
-			if (polygon) {
-				map.removeLayer(polygon);
-				polygon = null;
-			}
-		});
-		map.on('zoomend', function () {
-			if (polygon) {
-				map.removeLayer(polygon);
-				polygon = null;
-			}
-		});
-
 
 		populate();
 		map.addLayer(markers);
