@@ -85,6 +85,7 @@
 		function removePolygon() {
 			if (shownLayer) {
 				shownLayer.setOpacity(1);
+				shownLayer = null;
 			}
 			if (polygon) {
 				map.removeLayer(polygon);
