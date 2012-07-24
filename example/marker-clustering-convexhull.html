@@ -53,25 +53,20 @@
 		}
 
 
-
 		var polygon;
 		var polygonCluster;
-		markers.on('mouseover', function (a) {
-			if (a.layer instanceof L.MarkerCluster) {
-				console.log('cluster ' + a.layer.getAllChildMarkers().length);
+		markers.on('clustermouseover', function (a) {
+			console.log('cluster ' + a.layer.getAllChildMarkers().length);
 				
-				if (polygon) {
-					map.removeLayer(polygon);
-				}
-				polygon = new L.Polygon(a.layer.getConvexHull());
-				map.addLayer(polygon);
-			} else {
-				console.log('marker ' + a.layer);
+			if (polygon) {
+				map.removeLayer(polygon);
 			}
+			polygon = new L.Polygon(a.layer.getConvexHull());
+			map.addLayer(polygon);
 		});
 
-		markers.on('mouseout', function (a) {
-			if (a.layer instanceof L.MarkerCluster && polygon) {
+		markers.on('clustermouseout', function (a) {
+			if (polygon) {
 				map.removeLayer(polygon);
 				polygon = null;
 			}

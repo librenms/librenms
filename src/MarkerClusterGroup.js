@@ -32,6 +32,13 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._currentShownBounds = null;
 	},
 
+	//Overrides FeatureGroup._propagateEvent
+	_propagateEvent: function (e) {
+		if (e.target instanceof L.MarkerCluster) {
+			e.type = 'cluster' + e.type;
+		}
+		L.FeatureGroup.prototype._propagateEvent.call(this, e);
+	},
 
 	_sqDist: function (p1, p2) {
 		var dx = p2.x - p1.x,

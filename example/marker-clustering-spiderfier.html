@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 	<title>Leaflet debug page</title>
@@ -52,13 +52,9 @@
 					southWest.lng + lngSpan * Math.random());
 		}
 
-		markers.on('click', function (a) {
-			if (a.layer instanceof L.MarkerCluster) {
-				console.log('cluster ' + a.layer.getAllChildMarkers().length);
-				a.layer.spiderfy();
-			} else {
-				console.log('marker ' + a.layer);
-			}
+		markers.on('clusterclick', function (a) {
+			console.log('cluster ' + a.layer.getAllChildMarkers().length);
+			a.layer.spiderfy();
 		});
 
 		populate();

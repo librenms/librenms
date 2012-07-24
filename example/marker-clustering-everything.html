@@ -15,6 +15,7 @@
 	<script src="../src/MarkerClusterGroup.js"></script>
 	<script src="../src/MarkerCluster.js"></script>
 	<script src="../src/MarkerCluster.QuickHull.js"></script>
+	<script src="../src/MarkerCluster.Spiderfier.js"></script>
 </head>
 <body>
 
@@ -54,9 +55,11 @@
 					southWest.lng + lngSpan * Math.random());
 		}
 		
-		//Zoom on cluster click
-		markers.on('click', function (a) {
-			if (a.layer instanceof L.MarkerCluster) {
+		//Zoom or spiderfy on cluster click
+		markers.on('clusterclick', function (a) {
+			if (map.getMaxZoom() === map.getZoom()) {
+				a.layer.spiderfy();
+			} else {
 				a.layer.zoomToBounds();
 			}
 		});
@@ -64,17 +67,15 @@
 		//Show convex hull (boundary) polygon on mouse over
 		var polygon;
 		var polygonCluster;
-		markers.on('mouseover', function (a) {
-			if (a.layer instanceof L.MarkerCluster) {
-				if (polygon) {
-					map.removeLayer(polygon);
-				}
-				polygon = new L.Polygon(a.layer.getConvexHull());
-				map.addLayer(polygon);
+		markers.on('clustermouseover', function (a) {
+			if (polygon) {
+				map.removeLayer(polygon);
 			}
+			polygon = new L.Polygon(a.layer.getConvexHull());
+			map.addLayer(polygon);
 		});
-		markers.on('mouseout', function (a) {
-			if (a.layer instanceof L.MarkerCluster && polygon) {
+		markers.on('clustermouseout', function (a) {
+			if (polygon) {
 				map.removeLayer(polygon);
 				polygon = null;
 			}
