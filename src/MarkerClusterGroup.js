@@ -258,7 +258,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	},
 	_animationAddLayer: function (layer, newCluster) {
 		L.FeatureGroup.prototype.addLayer.call(this, newCluster);
-		if (newCluster != layer && newCluster._childCount == 2) {
+		if (newCluster !== layer && newCluster._childCount === 2) {
 			newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, 1);
 		}
 	}
@@ -269,13 +269,13 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		this._map._mapPane.className += ' leaflet-cluster-anim';
 	},
 	_animationEnd: function () {
-		this._map._mapPane.className = map._mapPane.className.replace(' leaflet-cluster-anim', '');
+		this._map._mapPane.className = this._map._mapPane.className.replace(' leaflet-cluster-anim', '');
 		this._inZoomAnimation--;
 	},
 	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
 		var me = this,
 		    bounds = this._getExpandedVisibleBounds(),
-		    i, 
+		    i,
 		    depthToStartAt = 1 + previousZoomLevel - this._topClusterLevel._zoom,
 		    depthToDescend = newZoomLevel - previousZoomLevel;
 
@@ -285,7 +285,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				markers = c._markers,
 				m;
 
-			if (c._isSingleParent() && depthToDescend == 1) { //Immediately add the new child and remove us
+			if (c._isSingleParent() && depthToDescend === 1) { //Immediately add the new child and remove us
 				L.FeatureGroup.prototype.removeLayer.call(me, c);
 				c._recursivelyAddChildrenToMap(null, depthToDescend, bounds);
 			} else {
@@ -307,14 +307,18 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		//Immediately fire an event to update the opacity and locations (If we immediately set it they won't animate)
 		setTimeout(function () {
+			var j, n;
+
 			//Update opacities
 			me._topClusterLevel._recursivelyBecomeVisible(bounds, depthToStartAt + depthToDescend);
 			//TODO Maybe? Update markers in _recursivelyBecomeVisible
-			for (i in me._layers) {
-				var n = me._layers[i];
+			for (j in me._layers) {
+				if (this._layers.hasOwnProperty(j)) {
+					n = me._layers[j];
 
-				if (!(n instanceof L.MarkerCluster) && n._icon) {
-					n.setOpacity(1);
+					if (!(n instanceof L.MarkerCluster) && n._icon) {
+						n.setOpacity(1);
+					}
 				}
 			}
 
@@ -376,7 +380,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		var me = this;
 
 		L.FeatureGroup.prototype.addLayer.call(this, layer);
-		if (newCluster != layer) {
+		if (newCluster !== layer) {
 			if (newCluster._childCount > 2) { //Was already a cluster
 
 				this._animationStart();

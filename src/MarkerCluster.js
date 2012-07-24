@@ -149,7 +149,7 @@ L.MarkerCluster = L.Marker.extend({
 
 		//Check our children
 		for (i = markers.length - 1; i >= 0; i--) {
-			if (markers[i] == layer) {
+			if (markers[i] === layer) {
 				if (markers[i]._icon) {
 					L.FeatureGroup.prototype.removeLayer.call(group, markers[i]);
 				}
@@ -247,15 +247,15 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_recursivelyBecomeVisible: function (bounds, depth) {
-		this._recursively(bounds, 0, depth, null, function(c) {
+		this._recursively(bounds, 0, depth, null, function (c) {
 			c.setOpacity(1);
 		});
 	},
 
 	_recursivelyAddChildrenToMap: function (startPos, depth, bounds) {
-		this._recursively(bounds, 0, depth, 
+		this._recursively(bounds, 0, depth,
 			function (c, recursionDepth) {
-				if (recursionDepth == 0) {
+				if (recursionDepth === 0) {
 					return;
 				}
 
@@ -343,7 +343,7 @@ L.MarkerCluster = L.Marker.extend({
 	//Run the given functions recursively to this and child clusters
 	// boundsToApplyTo: a L.LatLngBounds representing the bounds of what clusters to recurse in to
 	// depthToStartAt: the depth to start calling the given functions
-	// timesToRecurse: how many layers deep to recurse in to after hitting depthToStartAt, bottom level: depthToRunFor == 0 
+	// timesToRecurse: how many layers deep to recurse in to after hitting depthToStartAt, bottom level: depthToRunFor == 0
 	// runAtEveryLevel: function that takes an L.MarkerCluster as an argument that should be applied on every level
 	// runAtBottomLevel: function that takes an L.MarkerCluster as an argument that should be applied at only the bottom level
 	_recursively: function (boundsToApplyTo, depthToStartAt, timesToRecurse, runAtEveryLevel, runAtBottomLevel) {
@@ -362,7 +362,7 @@ L.MarkerCluster = L.Marker.extend({
 			if (runAtEveryLevel) {
 				runAtEveryLevel(this, timesToRecurse);
 			}
-			if (timesToRecurse == 0 && runAtBottomLevel) {
+			if (timesToRecurse === 0 && runAtBottomLevel) {
 				runAtBottomLevel(this);
 			}
 
@@ -399,6 +399,6 @@ L.MarkerCluster = L.Marker.extend({
 	//Returns true if we are the parent of only one cluster and that cluster is the same as us
 	_isSingleParent: function () {
 		//Don't need to check this._markers as the rest won't work if there are any
-		return this._childClusters.length > 0 && this._childClusters[0]._childCount == this._childCount;
+		return this._childClusters.length > 0 && this._childClusters[0]._childCount === this._childCount;
 	}
 });

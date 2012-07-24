@@ -1,4 +1,4 @@
-﻿//This code is 100% based on https://github.com/jawj/OverlappingMarkerSpiderfier-Leaflet
+//This code is 100% based on https://github.com/jawj/OverlappingMarkerSpiderfier-Leaflet
 //Huge thanks to jawj for implementing it first to make my job easy :-)
 
 L.MarkerCluster.include({
@@ -15,7 +15,7 @@ L.MarkerCluster.include({
 								// 0 -> always spiral; Infinity -> always circle
 
 	spiderfy: function () {
-		if (this._group._spiderfied == this) {
+		if (this._group._spiderfied === this) {
 			return;
 		}
 
@@ -85,6 +85,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 	//Non Animated versions of everything
 	_animationSpiderfy: function (childMarkers, positions) {
 		var group = this._group,
+			map = group._map,
 			i, m, leg;
 
 		for (i = childMarkers.length - 1; i >= 0; i--) {
@@ -128,6 +129,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 	_animationSpiderfy: function (childMarkers, positions) {
 		var me = this,
 			group = this._group,
+			map = group._map,
 			i, m, leg;
 
 		for (i = childMarkers.length - 1; i >= 0; i--) {
@@ -199,7 +201,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			// Doing this at 250ms causes some minor flickering on FF, so just do it immediately
 			// If the initial opacity of the spiderlegs isn't 0 then they appear before the animation starts.
 			if (L.Browser.svg) {
-				setTimeout(function() {
+				setTimeout(function () {
 					for (i = childMarkers.length - 1; i >= 0; i--) {
 						m = childMarkers[i]._spiderLeg;
 
@@ -284,5 +286,5 @@ L.MarkerClusterGroup.include({
 		if (this._spiderfied) {
 			this._spiderfied.unspiderfy();
 		}
-	},
+	}
 });

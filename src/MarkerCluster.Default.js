@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
 	L.MarkerClusterDefault = {
 		iconCreateFunction: function (childCount) {
 			var c = ' marker-cluster-';
