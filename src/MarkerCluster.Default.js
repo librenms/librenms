@@ -18,7 +18,7 @@
 		bindEvents: function (map, markerClusterGroup) {
 			var me = this;
 
-			//Zoom cluster click or spiderfy if we are at the lowest level
+			//Zoom on cluster click or spiderfy if we are at the lowest level
 			markerClusterGroup.on('clusterclick', function (a) {
 				if (map.getMaxZoom() === map.getZoom()) {
 					a.layer.spiderfy();

@@ -11,15 +11,24 @@
 
 
 	<link rel="stylesheet" href="../src/MarkerCluster.css" />
-	<link rel="stylesheet" href="../src/MarkerCluster.Default.css" />
-	<script src="../src/MarkerCluster.Default.js"></script>
 	<script src="../src/MarkerClusterGroup.js"></script>
 	<script src="../src/MarkerCluster.js"></script>
+	<script src="../src/MarkerCluster.QuickHull.js"></script>
+	
+	<style>
+		.mycluster {
+			width: 40px;
+			height: 40px;
+			background-color: greenyellow;
+			text-align: center;
+			font-size: 24px;
+		}
+
+	</style>
 </head>
 <body>
 
 	<div id="map"></div>
-	<span>Click a cluster to zoom to its bounds</span>
 
 	<script type="text/javascript">
 
@@ -30,7 +39,15 @@
 
 		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
 
-		var markers = new L.MarkerClusterGroup();
+
+		//Custom radius and icon create function
+		var markers = new L.MarkerClusterGroup({
+			maxClusterRadius: 120,
+			iconCreateFunction: function (count) {
+				return new L.DivIcon({ html: count, className: 'mycluster', iconSize: new L.Point(40, 40) });
+			}
+		});
+
 
 		function populate() {
 			for (var i = 0; i < 100; i++) {
@@ -38,6 +55,13 @@
 				markers.addLayer(m);
 			}
 			return false;
+		}
+		function populateRandomVector() {
+			for (var i = 0, latlngs = [], len = 20; i < len; i++) {
+				latlngs.push(getRandomLatLng(map));
+			}
+			var path = new L.Polyline(latlngs);
+			map.addLayer(path);
 		}
 		function getRandomLatLng(map) {
 			var bounds = map.getBounds(),
@@ -51,12 +75,33 @@
 					southWest.lng + lngSpan * Math.random());
 		}
 
-		markers.on('clusterclick', function (a) {
-			a.layer.zoomToBounds();
-		});
-
 		populate();
 		map.addLayer(markers);
+
+
+
+		var shownLayer, polygon;
+
+		function removePolygon() {
+			if (shownLayer) {
+				shownLayer.setOpacity(1);
+			}
+			if (polygon) {
+				map.removeLayer(polygon);
+				polygon = null;
+			}
+		};
+
+		markers.on('clustermouseover', function (a) {
+			removePolygon();
+
+			a.layer.setOpacity(0.2);
+			shownLayer = a.layer;
+			polygon = new L.Polygon(a.layer.getConvexHull());
+			map.addLayer(polygon);
+		});
+		markers.on('clustermouseout', removePolygon);
+		map.on('zoomend', removePolygon);
 
 	</script>
 </body>
