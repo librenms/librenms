@@ -313,7 +313,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			me._topClusterLevel._recursivelyBecomeVisible(bounds, depthToStartAt + depthToDescend);
 			//TODO Maybe? Update markers in _recursivelyBecomeVisible
 			for (j in me._layers) {
-				if (this._layers.hasOwnProperty(j)) {
+				if (me._layers.hasOwnProperty(j)) {
 					n = me._layers[j];
 
 					if (!(n instanceof L.MarkerCluster) && n._icon) {
