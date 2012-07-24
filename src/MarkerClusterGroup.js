@@ -131,14 +131,14 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Will return null or the new MarkerCluster. The clustered in marker is removed from the given array
 	_clusterOne: function (unclusteredMarkers, newMarker, zoom) {
 		var markerPos = newMarker._projCenter || this._map.project(newMarker.getLatLng(), zoom),
-			clusterRadiusSqrd = this.options.maxClusterRadius * this.options.maxClusterRadius,
+			clusterDiameterSqrd = 2 * this.options.maxClusterRadius * 2 * this.options.maxClusterRadius,
 			i, m, mPos;
 
 		for (i = unclusteredMarkers.length - 1; i >= 0; i--) {
 			m = unclusteredMarkers[i];
 			mPos = m._projCenter || this._map.project(m.getLatLng(), zoom);
 
-			if (this._sqDist(markerPos, mPos) <= clusterRadiusSqrd) {
+			if (this._sqDist(markerPos, mPos) <= clusterDiameterSqrd) {
 				//Create a new cluster with these 2
 				var newCluster = new L.MarkerCluster(this, m, newMarker);
 
