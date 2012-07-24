@@ -56,8 +56,6 @@
 
 		var polygon;
 		markers.on('clustermouseover', function (a) {
-			console.log('cluster ' + a.layer.getAllChildMarkers().length);
-				
 			if (polygon) {
 				map.removeLayer(polygon);
 			}

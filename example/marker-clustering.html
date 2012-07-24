@@ -62,10 +62,10 @@
 		}
 
 		markers.on('clusterclick', function (a) {
-			console.log('cluster ' + a.layer.getAllChildMarkers().length);
+			alert('cluster ' + a.layer.getAllChildMarkers().length);
 		});
 		markers.on('click', function (a) {
-			console.log('marker ' + a.layer);
+			alert('marker ' + a.layer);
 		});
 
 		populate();
