@@ -1,7 +1,7 @@
 Leaflet.markercluster
 =====================
 
-Provides Marker Clustering functionality for Leaflet
+Provides Beautiful Animated Marker Clustering functionality for Leaflet
 
 ## Using the plugin
 See the included examples for usage.
