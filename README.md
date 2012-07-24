@@ -5,7 +5,7 @@ Provides Beautiful Animated Marker Clustering functionality for Leaflet
 
 ## Using the plugin
 See the included examples for usage.
-The [everything example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-everything.html) is a good place to start, it utilises the MarkerCluser.Default class to provide all of the default functionality.
+The [realworld example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.html) is a good place to start, it utilises the MarkerCluster.Default class to provide all of the default functionality.
 Or check out the [custom example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for how to customise the behaviour and appearance of the clusterer
 
 ### Usage
@@ -76,6 +76,9 @@ markers.on('clusterclick', function (a) {
 	a.layer.zoomToBounds();
 });
 ```
+
+### Adding and removing Markers
+addLayer and removeLayer are supported and they should work for most uses.
 
 ### License
 
