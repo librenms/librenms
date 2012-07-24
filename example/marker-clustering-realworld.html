@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet debug page</title>
+
+	<link rel="stylesheet" href="../lib/leaflet-dist/leaflet.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="../lib/leaflet-dist/leaflet.ie.css" /><![endif]-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="screen.css" />
+	<script src="../lib/leaflet-dist/leaflet-src.js"></script>
+
+
+	<link rel="stylesheet" href="../src/MarkerCluster.css" />
+	<link rel="stylesheet" href="../src/MarkerCluster.Default.css" />
+	<script src="../src/MarkerCluster.Default.js"></script>
+	<script src="../src/MarkerClusterGroup.js"></script>
+	<script src="../src/MarkerCluster.js"></script>
+	<script src="../src/MarkerCluster.QuickHull.js"></script>
+	<script src="../src/MarkerCluster.Spiderfier.js"></script>
+	
+	<script src="realworld.js"></script>
+
+</head>
+<body>
+
+	<div id="map"></div>
+	<span>Mouse over a cluster to see the bounds of its children and click a cluster to zoom to those bounds</span>
+	<script type="text/javascript">
+
+		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
+			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade, Points &copy 2012 LINZ',
+			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 17, attribution: cloudmadeAttribution}),
+			latlng = new L.LatLng(-37.82, 175.24);
+
+		var map = new L.Map('map', {center: latlng, zoom: 13, layers: [cloudmade]});
+
+		var markers = new L.MarkerClusterGroup();
+		L.MarkerClusterDefault.bindEvents(map, markers);
+		
+		for (var i = 0; i < addressMarkers.length; i++) {
+			addressMarkers[i].bindPopup(addressMarkers[i].options.title);
+			markers.addLayer(addressMarkers[i]);
+		}
+
+		map.addLayer(markers);
+
+	</script>
+</body>
+</html>
