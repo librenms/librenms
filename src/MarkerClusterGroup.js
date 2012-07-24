@@ -308,6 +308,8 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		//Immediately fire an event to update the opacity and locations (If we immediately set it they won't animate)
 		setTimeout(function () {
 			//Update opacities
+			me._topClusterLevel._recursivelyBecomeVisible(bounds, depthToStartAt + depthToDescend);
+			//TODO Maybe? Update markers in _recursivelyBecomeVisible
 			for (i in me._layers) {
 				var n = me._layers[i];
 
