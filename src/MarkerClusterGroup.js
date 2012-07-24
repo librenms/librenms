@@ -160,13 +160,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Takes a list of objects that have a 'getLatLng()' function (Marker / MarkerCluster)
 	//Performs clustering on them (using a greedy algorithm) and returns those clusters.
-	//toCluster: List of Markers/MarkerClusters to cluster. MarkerClusters MUST be first in the list
+	//toCluster: List of Markers/MarkerClusters to cluster
 	//Returns { 'clusters': [new clusters], 'unclustered': [unclustered markers] }
 	_cluster: function (toCluster, zoom) {
 		var clusterRadiusSqrd = this.options.maxClusterRadius * this.options.maxClusterRadius,
 		    clusters = [],
 		    unclustered = [],
-		    hasChildClusters = (toCluster.length > 0 && toCluster[0] instanceof L.MarkerCluster),
 		    i, j, c;
 
 		//go through each point
@@ -192,10 +191,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			if (!used) {
 				var newCluster = this._clusterOne(unclustered, point);
 				if (newCluster) {
-					newCluster._haveGeneratedChildClusters = hasChildClusters;
-					if (!hasChildClusters) {
-						newCluster._zoomForCluster = zoom + 1;
-					}
 					newCluster._projCenter = this._map.project(newCluster.getLatLng(), zoom);
 					clusters.push(newCluster);
 				} else {

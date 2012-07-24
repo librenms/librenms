@@ -6,8 +6,6 @@ L.MarkerCluster = L.Marker.extend({
 		this._childClusters = [];
 		this._childCount = 0;
 
-		this._haveGeneratedChildClusters = false;
-
 		this._bounds = new L.LatLngBounds();
 
 		this._addChild(a);
@@ -89,36 +87,30 @@ L.MarkerCluster = L.Marker.extend({
 	_recursivelyAddLayer: function (layer, zoom) {
 		var result = false;
 
-		if (!this._haveGeneratedChildClusters && this._canAcceptPosition(layer.getLatLng(), zoom)) {
-			//Don't need to cluster it in as we haven't clustered
-			this._addChild(layer);
-			result = true;
-		} else {
-			for (var i = this._childClusters.length - 1; i >= 0; i--) {
-				var c = this._childClusters[i];
-				//Recurse into children where their bounds fits the layer or they can just take it
-				if (c._bounds.contains(layer.getLatLng()) || c._canAcceptPosition(layer.getLatLng(), zoom + 1)) {
-					result = c._recursivelyAddLayer(layer, zoom + 1);
-					if (result) {
-						this._childCount++;
-						break;
-					}
+		for (var i = this._childClusters.length - 1; i >= 0; i--) {
+			var c = this._childClusters[i];
+			//Recurse into children where their bounds fits the layer or they can just take it
+			if (c._bounds.contains(layer.getLatLng()) || c._canAcceptPosition(layer.getLatLng(), zoom + 1)) {
+				result = c._recursivelyAddLayer(layer, zoom + 1);
+				if (result) {
+					this._childCount++;
+					break;
 				}
 			}
+		}
 
-			//Couldn't add it to a child, but it should be part of us (this._zoom -> we are the root node)
-			if (!result && (this._canAcceptPosition(layer.getLatLng(), zoom) || this._zoom)) {
+		//Couldn't add it to a child, but it should be part of us (this._zoom -> we are the root node)
+		if (!result && (this._canAcceptPosition(layer.getLatLng(), zoom) || this._zoom)) {
 
-				//Add to ourself instead
-				result = this._group._clusterOne(this._markers, layer, zoom);
+			//Add to ourself instead
+			result = this._group._clusterOne(this._markers, layer, zoom);
 
-				if (result) {
-					result._baseInit();
-					this._addChild(result);
-				} else {
-					this._addChild(layer);
-					result = true;
-				}
+			if (result) {
+				result._baseInit();
+				this._addChild(result);
+			} else {
+				this._addChild(layer);
+				result = true;
 			}
 		}
 
@@ -358,11 +350,6 @@ L.MarkerCluster = L.Marker.extend({
 		var childClusters = this._childClusters,
 			i, c;
 
-		//When zooming down we need to generate new clusters for levels that don't have them yet
-		if (!this._haveGeneratedChildClusters && (depthToStartAt > 0 || timesToRecurse > 0)) {
-			this._generateChildClusters();
-		}
-
 		if (depthToStartAt > 0) { //Still going down to required depth, just recurse to child clusters
 			for (i = childClusters.length - 1; i >= 0; i--) {
 				c = childClusters[i];
@@ -389,26 +376,6 @@ L.MarkerCluster = L.Marker.extend({
 				}
 			}
 		}
-	},
-
-	_generateChildClusters: function () {
-		var res = this._group._cluster(this._markers, this._zoomForCluster),
-			unclustered = res.unclustered,
-			clusters = res.clusters,
-			i;
-
-		this._markers = [];
-		this._childCount = 0;
-
-		for (i = unclustered.length - 1; i >= 0; i--) {
-			this._addChild(unclustered[i]);
-		}
-		for (i = clusters.length - 1; i >= 0; i--) {
-			this._addChild(clusters[i]);
-		}
-
-		delete this._zoomForCluster;
-		this._haveGeneratedChildClusters = true;
 	},
 
 	_recalculateBounds: function () {
