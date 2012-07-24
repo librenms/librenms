@@ -37,9 +37,12 @@
 		var markers = new L.MarkerClusterGroup();
 		L.MarkerClusterDefault.bindEvents(map, markers);
 		
-		for (var i = 0; i < addressMarkers.length; i++) {
-			addressMarkers[i].bindPopup(addressMarkers[i].options.title);
-			markers.addLayer(addressMarkers[i]);
+		for (var i = 0; i < addressPoints.length; i++) {
+			var a = addressPoints[i];
+			var title = a[2];
+			var marker = new L.Marker(new L.LatLng(a[0], a[1]), { title: title });
+			marker.bindPopup(title);
+			markers.addLayer(marker);
 		}
 
 		map.addLayer(markers);
