@@ -30,7 +30,6 @@
 		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
 
 		var markers = new L.MarkerClusterGroup();
-		L.MarkerClusterDefault.bindEvents(map, markers);
 		var markersList = [];
 
 		function populate() {

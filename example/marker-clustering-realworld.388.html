@@ -31,7 +31,6 @@
 		var map = new L.Map('map', {center: latlng, zoom: 13, layers: [cloudmade]});
 
 		var markers = new L.MarkerClusterGroup();
-		L.MarkerClusterDefault.bindEvents(map, markers);
 		
 		for (var i = 0; i < addressPoints.length; i++) {
 			var a = addressPoints[i];
