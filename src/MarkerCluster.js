@@ -115,7 +115,7 @@ L.MarkerCluster = L.Marker.extend({
 		}
 
 		if (result) {
-			if (!this._zoom) {
+			if (!('_zoom' in this)) {
 				this.setIcon(this._group.options.iconCreateFunction(this._childCount));
 			}
 			this._recalculateBounds();

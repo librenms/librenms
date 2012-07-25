@@ -257,8 +257,8 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel - this._topClusterLevel._zoom + 1, this._getExpandedVisibleBounds());
 	},
 	_animationAddLayer: function (layer, newCluster) {
-		L.FeatureGroup.prototype.addLayer.call(this, newCluster);
-		if (newCluster !== layer && newCluster._childCount === 2) {
+		L.FeatureGroup.prototype.addLayer.call(this, layer);
+		if (newCluster !== true && newCluster._childCount === 2) {
 			newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, 1);
 		}
 	}
@@ -377,7 +377,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		var me = this;
 
 		L.FeatureGroup.prototype.addLayer.call(this, layer);
-		if (newCluster !== layer) {
+		if (newCluster !== true) {
 			if (newCluster._childCount > 2) { //Was already a cluster
 
 				this._forceLayout();
