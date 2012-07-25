@@ -5,7 +5,7 @@ Provides Beautiful Animated Marker Clustering functionality for Leaflet
 
 ## Using the plugin
 See the included examples for usage.
-The [realworld example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.html) is a good place to start, it utilises the MarkerCluster.Default class to provide all of the default functionality.
+The [realworld example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.388.html) is a good place to start, it utilises the MarkerCluster.Default class to provide all of the default functionality.
 Or check out the [custom example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for how to customise the behaviour and appearance of the clusterer
 
 ### Usage
@@ -79,6 +79,12 @@ markers.on('clusterclick', function (a) {
 
 ### Adding and removing Markers
 addLayer and removeLayer are supported and they should work for most uses.
+
+### Handling LOTS of markers
+The Clusterer can handle 10000 or even 50000 markers (in chrome). IE9 has some issues with 50000.
+[realworld 10000 example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.10000.html)
+[realworld 50000 example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.50000.html)
+Performance optimizations could be done so these are handled more gracefully (Running the initial clustering over multiple JS calls rather than locking the browser for a long time)
 
 ### License
 
