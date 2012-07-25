@@ -257,9 +257,11 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel - this._topClusterLevel._zoom + 1, this._getExpandedVisibleBounds());
 	},
 	_animationAddLayer: function (layer, newCluster) {
-		L.FeatureGroup.prototype.addLayer.call(this, layer);
-		if (newCluster !== true && newCluster._childCount === 2) {
-			newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, 1);
+		if (newCluster === true) {
+			L.FeatureGroup.prototype.addLayer.call(this, layer);
+		} else if (newCluster._childCount === 2) {
+			newCluster._addToMap();
+			newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, this._map.getMaxZoom()); //getMaxZoom will always get all children
 		}
 	}
 } : {
@@ -398,7 +400,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				this._forceLayout();
 
 				me._animationStart();
-				me._animationZoomOutSingle(newCluster, 0, 1);
+				me._animationZoomOutSingle(newCluster, 0, this._map.getMaxZoom());
 			}
 		}
 	},

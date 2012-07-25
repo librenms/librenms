@@ -81,9 +81,9 @@ L.MarkerCluster = L.Marker.extend({
 
 	//layer: The layer to try add
 	//returns:
-	//  true: was able to put this marker in, but don't know its current visible parents position
+	//  true: was able to put this marker in, but don't know its current visible parents position (If returned externally, add this marker at its position)
 	//  false: wasn't able to put this marker in
-	//  a Marker/MarkerCluster: the visible parent of the marker (or the marker itself if it should be visible)
+	//  a MarkerCluster: the visible parent of the marker
 	_recursivelyAddLayer: function (layer, zoom) {
 		var result = false;
 
@@ -103,11 +103,37 @@ L.MarkerCluster = L.Marker.extend({
 		if (!result && (this._canAcceptPosition(layer.getLatLng(), zoom) || this._zoom)) {
 
 			//Add to ourself instead
-			result = this._group._clusterOne(this._markers, layer, zoom);
+			result = this._group._clusterOne(this._markers, layer, zoom + 1);
 
 			if (result) {
 				result._baseInit();
+				this._childCount--;
 				this._addChild(result);
+
+				//We may be above the zoom that these 2 markers would initially cluster at
+				// so push the new cluster as deep as it can go
+				var wantedZoom = this._group._map.getZoom() - 1,
+					maxZoom = this._group._map.getMaxZoom(),
+					newResult,
+					finalResult = (zoom === wantedZoom) ? result : true;
+				while (zoom < maxZoom) {
+					zoom++;
+					newResult = this._group._clusterOne([result._markers[0]], layer, zoom + 1);
+
+					if (newResult == null) {
+						break;
+					}
+					newResult._baseInit();
+					result._markers = [];
+					result._childClusters.push(newResult);
+					result = newResult;
+
+					if (zoom == wantedZoom) {
+						finalResult = result;
+					}
+				}
+				result = finalResult;
+
 			} else {
 				this._addChild(layer);
 				result = true;
@@ -123,8 +149,6 @@ L.MarkerCluster = L.Marker.extend({
 		if (result === true) {
 			if (this._icon) {
 				result = this;
-			} else if ((this._markers.length > 0 && this._markers[0]._icon) || (this._childClusters.length > 1 && this._childClusters[0]._icon)) {
-				result = layer;
 			}
 		}
 
