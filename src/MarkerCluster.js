@@ -182,7 +182,7 @@ L.MarkerCluster = L.Marker.extend({
 				this._recalculateBounds();
 		
 				this._childCount--;
-				if (this._icon) {
+				if (!('_zoom' in this)) {
 					this.setIcon(group.options.iconCreateFunction(this._childCount));
 				}
 				return true;
@@ -195,6 +195,9 @@ L.MarkerCluster = L.Marker.extend({
 
 			if (child._bounds.contains(layer._latlng) && child._recursivelyRemoveLayer(layer)) {
 				this._childCount--;
+				if (!('_zoom' in this)) {
+					this.setIcon(group.options.iconCreateFunction(this._childCount));
+				}
 
 				//if our child cluster is no longer a cluster, remove it and replace with just the marker
 				if (child._childCount === 1) {
