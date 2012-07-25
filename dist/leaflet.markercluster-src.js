@@ -5,69 +5,6 @@
 */
 (function (window, undefined) {
 
-(function () {
-	L.MarkerClusterDefault = {
-		iconCreateFunction: function (childCount) {
-			var c = ' marker-cluster-';
-			if (childCount < 10) {
-				c += 'small';
-			} else if (childCount < 100) {
-				c += 'medium';
-			} else {
-				c += 'large';
-			}
-
-			return new L.DivIcon({ html: '<div><span>' + childCount + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
-		},
-
-		_shownPolygon: null,
-
-		bindEvents: function (map, markerClusterGroup) {
-			var me = this;
-			var inZoomAnimation = false;
-
-			map.on('zoomstart', function () { inZoomAnimation = true; });
-			map.on('zoomend', function () { inZoomAnimation = false; });
-
-
-			//Zoom on cluster click or spiderfy if we are at the lowest level
-			markerClusterGroup.on('clusterclick', function (a) {
-				if (map.getMaxZoom() === map.getZoom()) {
-					a.layer.spiderfy();
-				} else {
-					a.layer.zoomToBounds();
-				}
-			});
-
-			//Show convex hull (boundary) polygon on mouse over
-			markerClusterGroup.on('clustermouseover', function (a) {
-				if (inZoomAnimation) {
-					return;
-				}
-				if (me._shownPolygon) {
-					map.removeLayer(me._shownPolygon);
-				}
-				if (a.layer.getChildCount() > 2) {
-					me._shownPolygon = new L.Polygon(a.layer.getConvexHull());
-					map.addLayer(me._shownPolygon);
-				}
-			});
-			markerClusterGroup.on('clustermouseout', function (a) {
-				if (me._shownPolygon) {
-					map.removeLayer(me._shownPolygon);
-					me._shownPolygon = null;
-				}
-			});
-			map.on('zoomend', function () {
-				if (me._shownPolygon) {
-					map.removeLayer(me._shownPolygon);
-					me._shownPolygon = null;
-				}
-			});
-		}
-	};
-}());
-
 
 /*
  * L.MarkerClusterGroup extends L.FeatureGroup by clustering the markers contained within
@@ -77,11 +14,18 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	options: {
 		maxClusterRadius: 60, //A cluster will cover at most this many pixels from its center
-		iconCreateFunction: L.MarkerClusterDefault ? L.MarkerClusterDefault.iconCreateFunction : null
+		iconCreateFunction: null,
+
+		spiderfyOnMaxZoom: true,
+		showCoverageOnHover: true,
+		zoomToBoundsOnClick: true
 	},
 
 	initialize: function (options) {
 		L.Util.setOptions(this, options);
+		if (!this.options.iconCreateFunction) {
+			this.options.iconCreateFunction = this._defaultIconCreateFunction;
+		}
 
 		L.FeatureGroup.prototype.initialize.call(this, []);
 
@@ -91,12 +35,112 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._currentShownBounds = null;
 	},
 
+	addLayer: function (layer) {
+		if (!this._map) {
+			this._needsClustering.push(layer);
+			return this;
+		}
+
+		//If we have already clustered we'll need to add this one to a cluster
+
+		var newCluster = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom - 1);
+
+		this._animationAddLayer(layer, newCluster);
+
+		return this;
+	},
+
+	removeLayer: function (layer) {
+		this._topClusterLevel._recursivelyRemoveLayer(layer);
+
+		return this;
+	},
+
+	//Overrides FeatureGroup.onAdd
+	onAdd: function (map) {
+		L.FeatureGroup.prototype.onAdd.call(this, map);
+
+		this._generateInitialClusters();
+		this._map.on('zoomend', this._zoomEnd, this);
+		this._map.on('moveend', this._moveEnd, this);
+
+		if (this._spiderfierOnAdd) { //TODO FIXME: Not sure how to have spiderfier add something on here nicely
+			this._spiderfierOnAdd();
+		}
+
+		this._bindEvents();
+	},
+
 	//Overrides FeatureGroup._propagateEvent
 	_propagateEvent: function (e) {
 		if (e.target instanceof L.MarkerCluster) {
 			e.type = 'cluster' + e.type;
 		}
 		L.FeatureGroup.prototype._propagateEvent.call(this, e);
+	},
+
+	//Default functionality
+	_defaultIconCreateFunction: function (childCount) {
+		var c = ' marker-cluster-';
+		if (childCount < 10) {
+			c += 'small';
+		} else if (childCount < 100) {
+			c += 'medium';
+		} else {
+			c += 'large';
+		}
+
+		return new L.DivIcon({ html: '<div><span>' + childCount + '</span></div>', className: 'marker-cluster' + c, iconSize: new L.Point(40, 40) });
+	},
+
+	_bindEvents: function () {
+		var shownPolygon = null,
+			map = this._map,
+
+			spiderfyOnMaxZoom = this.options.spiderfyOnMaxZoom,
+			showCoverageOnHover = this.options.showCoverageOnHover,
+			zoomToBoundsOnClick = this.options.zoomToBoundsOnClick;
+
+		//Zoom on cluster click or spiderfy if we are at the lowest level
+		if (spiderfyOnMaxZoom || zoomToBoundsOnClick) {
+			this.on('clusterclick', function (a) {
+				if (map.getMaxZoom() === map.getZoom()) {
+					if (spiderfyOnMaxZoom) {
+						a.layer.spiderfy();
+					}
+				} else if (zoomToBoundsOnClick) {
+					a.layer.zoomToBounds();
+				}
+			}, this);
+		}
+
+		//Show convex hull (boundary) polygon on mouse over
+		if (showCoverageOnHover) {
+			this.on('clustermouseover', function (a) {
+				if (this._inZoomAnimation) {
+					return;
+				}
+				if (shownPolygon) {
+					map.removeLayer(shownPolygon);
+				}
+				if (a.layer.getChildCount() > 2) {
+					shownPolygon = new L.Polygon(a.layer.getConvexHull());
+					map.addLayer(shownPolygon);
+				}
+			}, this);
+			this.on('clustermouseout', function () {
+				if (shownPolygon) {
+					map.removeLayer(shownPolygon);
+					shownPolygon = null;
+				}
+			}, this);
+			map.on('zoomend', function () {
+				if (shownPolygon) {
+					map.removeLayer(shownPolygon);
+					shownPolygon = null;
+				}
+			}, this);
+		}
 	},
 
 	_sqDist: function (p1, p2) {
@@ -161,39 +205,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		} else if (this._zoom > this._map._zoom) { //Zoom out, merge
 
 			this._animationZoomOut(this._zoom, this._map._zoom);
-		}
-	},
-
-	addLayer: function (layer) {
-		if (!this._map) {
-			this._needsClustering.push(layer);
-			return this;
-		}
-
-		//If we have already clustered we'll need to add this one to a cluster
-
-		var newCluster = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom - 1);
-
-		this._animationAddLayer(layer, newCluster);
-
-		return this;
-	},
-
-	removeLayer: function (layer) {
-		this._topClusterLevel._recursivelyRemoveLayer(layer);
-
-		return this;
-	},
-
-	onAdd: function (map) {
-		L.FeatureGroup.prototype.onAdd.call(this, map); // LayerGroup
-
-		this._generateInitialClusters();
-		this._map.on('zoomend', this._zoomEnd, this);
-		this._map.on('moveend', this._moveEnd, this);
-
-		if (this._spiderfierOnAdd) { //TODO FIXME: Not sure how to have spiderfier add something on here nicely
-			this._spiderfierOnAdd();
 		}
 	},
 

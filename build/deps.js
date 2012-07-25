@@ -1,10 +1,5 @@
 var deps = {
 	
-	Defaults: {
-		src: ['MarkerCluster.Default.js'],
-		deps: ['QuickHull', 'Spiderfier'],
-		desc: 'Provides sensible defaults for the Cluster.'
-	},
 	Core: {
 		src: ['MarkerClusterGroup.js',
 		      'MarkerCluster.js'],

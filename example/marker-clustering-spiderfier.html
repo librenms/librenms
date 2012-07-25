@@ -12,7 +12,6 @@
 
 	<link rel="stylesheet" href="../dist/MarkerCluster.css" />
 	<link rel="stylesheet" href="../dist/MarkerCluster.Default.css" />
-	<script src="../src/MarkerCluster.Default.js"></script>
 	<script src="../src/MarkerClusterGroup.js"></script>
 	<script src="../src/MarkerCluster.js"></script>
 	<script src="../src/MarkerCluster.Spiderfier.js"></script>
@@ -32,7 +31,7 @@
 
 		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
 
-		var markers = new L.MarkerClusterGroup();
+		var markers = new L.MarkerClusterGroup({ spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false });
 
 		function populate() {
 			for (var i = 0; i < 100; i++) {

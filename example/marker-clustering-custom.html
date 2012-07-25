@@ -45,7 +45,9 @@
 			maxClusterRadius: 120,
 			iconCreateFunction: function (count) {
 				return new L.DivIcon({ html: count, className: 'mycluster', iconSize: new L.Point(40, 40) });
-			}
+			},
+			//Disable all of the defaults:
+			spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false
 		});
 
 
