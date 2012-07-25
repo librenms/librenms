@@ -14,7 +14,7 @@
 	<link rel="stylesheet" href="../dist/MarkerCluster.Default.css" />
 	<script src="../dist/leaflet.markercluster-src.js"></script>
 	
-	<script src="realworld.js"></script>
+	<script src="realworld.10000.js"></script>
 
 </head>
 <body>
@@ -26,8 +26,7 @@
 		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
 			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade, Points &copy 2012 LINZ',
 			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 17, attribution: cloudmadeAttribution}),
-			latlng = new L.LatLng(-37.82, 175.24);
-
+			latlng = new L.LatLng(-37.89, 175.46);
 		var map = new L.Map('map', {center: latlng, zoom: 13, layers: [cloudmade]});
 
 		var markers = new L.MarkerClusterGroup();
