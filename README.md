@@ -5,7 +5,7 @@ Provides Beautiful Animated Marker Clustering functionality for Leaflet
 
 ## Using the plugin
 See the included examples for usage.
-The [realworld example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.388.html) is a good place to start, it utilises the MarkerCluster.Default class to provide all of the default functionality.
+The [realworld example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.388.html) is a good place to start, it uses all of the defaults of the clusterer.
 Or check out the [custom example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for how to customise the behaviour and appearance of the clusterer
 
 ### Usage
@@ -19,20 +19,20 @@ map.addLayer(markers);
 ```
 
 ### Defaults
-As a safe default you can use the included MarkerCluster.Default.(css/js) to provide default behaviour and appearance of the clusters.
+By default the Clusterer enables some nice defaults for you:
+zoomToBoundsOnClick: When you mouse over a cluster it shows the bounds of its markers.
+showCoverageOnHover: When you click a cluster we zoom to its bounds.
+spiderfyOnMaxZoom: When you click a cluster at the bottom zoom level we spiderfy it so you can see all of its markers.
 
-Include the .Default files (or use the prebuilt version) and create a MarkerClusterGroup as follows:
+You can disable any of these as you want in the options when you create the MarkerClusterGroup:
 ```javascript
-var markers = new L.MarkerClusterGroup();
-L.MarkerClusterDefault.bindEvents(map, markers);
-... Add markers to the MarkerClusterGroup ...
-map.addLayer(markers);
+var markers = new L.MarkerClusterGroup({ spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false });
 ```
 
 ### Customising the Clustered Markers
 As an option to MarkerClusterGroup you can provide your own function for creating the Icon for the clustered markers.
 The default implementation changes color at bounds of 10 and 100, but more advanced uses may require customising this.
-You do not need to include the .Default files if you go this way.
+You do not need to include the .Default css if you go this way.
 
 ```javascript
 var markers = new L.MarkerClusterGroup({ options: {
