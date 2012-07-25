@@ -143,78 +143,76 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			L.FeatureGroup.prototype.addLayer.call(group, m);
 		}
 
-		setTimeout(function () {
-			group._animationStart();
+		this._group._forceLayout();
+		group._animationStart();
 
-			var initialLegOpacity = L.Browser.svg ? 0 : 0.3,
-				xmlns = L.Path.SVG_NS;
+		var initialLegOpacity = L.Browser.svg ? 0 : 0.3,
+			xmlns = L.Path.SVG_NS;
 
+
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			m = childMarkers[i];
+
+			m.setLatLng(map.layerPointToLatLng(positions[i]));
+			m.setOpacity(1);
+			//Add Legs. TODO: Fade this in!
+
+			leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222', opacity: initialLegOpacity });
+			map.addLayer(leg);
+			m._spiderLeg = leg;
+
+			//Following animations don't work for canvas
+			if (!L.Browser.svg) {
+				continue;
+			}
+
+			//How this works:
+			//http://stackoverflow.com/questions/5924238/how-do-you-animate-an-svg-path-in-ios
+			//http://dev.opera.com/articles/view/advanced-svg-animation-techniques/
+
+			//Animate length
+			var length = leg._path.getTotalLength();
+			leg._path.setAttribute("stroke-dasharray", length + "," + length);
+
+			var anim = document.createElementNS(xmlns, "animate");
+			anim.setAttribute("attributeName", "stroke-dashoffset");
+			anim.setAttribute("begin", "indefinite");
+			anim.setAttribute("from", length);
+			anim.setAttribute("to", 0);
+			anim.setAttribute("dur", 0.25);
+			leg._path.appendChild(anim);
+			anim.beginElement();
+
+			//Animate opacity
+			anim = document.createElementNS(xmlns, "animate");
+			anim.setAttribute("attributeName", "stroke-opacity");
+			anim.setAttribute("attributeName", "stroke-opacity");
+			anim.setAttribute("begin", "indefinite");
+			anim.setAttribute("from", 0);
+			anim.setAttribute("to", 0.5);
+			anim.setAttribute("dur", 0.25);
+			leg._path.appendChild(anim);
+			anim.beginElement();
+		}
+		me.setOpacity(0.3);
+
+		//Set the opacity of the spiderLegs back to their correct value
+		// The animations above override this until they complete.
+		// If the initial opacity of the spiderlegs isn't 0 then they appear before the animation starts.
+		if (L.Browser.svg) {
+			this._group._forceLayout();
 
 			for (i = childMarkers.length - 1; i >= 0; i--) {
-				m = childMarkers[i];
+				m = childMarkers[i]._spiderLeg;
 
-				m.setLatLng(map.layerPointToLatLng(positions[i]));
-				m.setOpacity(1);
-				//Add Legs. TODO: Fade this in!
-
-				leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222', opacity: initialLegOpacity });
-				map.addLayer(leg);
-				m._spiderLeg = leg;
-
-				//Following animations don't work for canvas
-				if (!L.Browser.svg) {
-					continue;
-				}
-
-				//How this works:
-				//http://stackoverflow.com/questions/5924238/how-do-you-animate-an-svg-path-in-ios
-				//http://dev.opera.com/articles/view/advanced-svg-animation-techniques/
-
-				//Animate length
-				var length = leg._path.getTotalLength();
-				leg._path.setAttribute("stroke-dasharray", length + "," + length);
-
-				var anim = document.createElementNS(xmlns, "animate");
-				anim.setAttribute("attributeName", "stroke-dashoffset");
-				anim.setAttribute("begin", "indefinite");
-				anim.setAttribute("from", length);
-				anim.setAttribute("to", 0);
-				anim.setAttribute("dur", 0.25);
-				leg._path.appendChild(anim);
-				anim.beginElement();
-
-				//Animate opacity
-				anim = document.createElementNS(xmlns, "animate");
-				anim.setAttribute("attributeName", "stroke-opacity");
-				anim.setAttribute("attributeName", "stroke-opacity");
-				anim.setAttribute("begin", "indefinite");
-				anim.setAttribute("from", 0);
-				anim.setAttribute("to", 0.5);
-				anim.setAttribute("dur", 0.25);
-				leg._path.appendChild(anim);
-				anim.beginElement();
+				m.options.opacity = 0.5;
+				m._path.setAttribute('stroke-opacity', 0.5);
 			}
-			me.setOpacity(0.3);
+		}
 
-			//Set the opacity of the spiderLegs back to their correct value
-			// The animations above override this until they complete.
-			// Doing this at 250ms causes some minor flickering on FF, so just do it immediately
-			// If the initial opacity of the spiderlegs isn't 0 then they appear before the animation starts.
-			if (L.Browser.svg) {
-				setTimeout(function () {
-					for (i = childMarkers.length - 1; i >= 0; i--) {
-						m = childMarkers[i]._spiderLeg;
-
-						m.options.opacity = 0.5;
-						m._path.setAttribute('stroke-opacity', 0.5);
-					}
-				}, 0);
-			}
-
-			setTimeout(function () {
-				group._animationEnd();
-			}, 250);
-		}, 0);
+		setTimeout(function () {
+			group._animationEnd();
+		}, 250);
 	},
 
 	_animationUnspiderfy: function () {

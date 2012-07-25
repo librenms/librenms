@@ -305,28 +305,26 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		});
 
-		//Immediately fire an event to update the opacity and locations (If we immediately set it they won't animate)
-		setTimeout(function () {
-			var j, n;
+		this._forceLayout();
+		var j, n;
 
-			//Update opacities
-			me._topClusterLevel._recursivelyBecomeVisible(bounds, depthToStartAt + depthToDescend);
-			//TODO Maybe? Update markers in _recursivelyBecomeVisible
-			for (j in me._layers) {
-				if (me._layers.hasOwnProperty(j)) {
-					n = me._layers[j];
+		//Update opacities
+		me._topClusterLevel._recursivelyBecomeVisible(bounds, depthToStartAt + depthToDescend);
+		//TODO Maybe? Update markers in _recursivelyBecomeVisible
+		for (j in me._layers) {
+			if (me._layers.hasOwnProperty(j)) {
+				n = me._layers[j];
 
-					if (!(n instanceof L.MarkerCluster) && n._icon) {
-						n.setOpacity(1);
-					}
+				if (!(n instanceof L.MarkerCluster) && n._icon) {
+					n.setOpacity(1);
 				}
 			}
+		}
 
-			//update the positions of the just added clusters/markers
-			me._topClusterLevel._recursively(bounds, depthToStartAt, 0, function (c) {
-				c._recursivelyRestoreChildPositions(depthToDescend);
-			});
-		}, 0);
+		//update the positions of the just added clusters/markers
+		me._topClusterLevel._recursively(bounds, depthToStartAt, 0, function (c) {
+			c._recursivelyRestoreChildPositions(depthToDescend);
+		});
 
 		this._inZoomAnimation++;
 
@@ -361,10 +359,9 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		var me = this;
 
-		//Immediately fire an event to update the opacity (If we immediately set it they won't animate)
-		setTimeout(function () {
-			marker._recursivelyBecomeVisible(bounds, depthToStartAt);
-		}, 0);
+		//Update the opacity (If we immediately set it they won't animate)
+		this._forceLayout();
+		marker._recursivelyBecomeVisible(bounds, depthToStartAt);
 
 		//TODO: Maybe use the transition timing stuff to make this more reliable
 		//When the animations are done, tidy up
@@ -383,28 +380,36 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		if (newCluster !== layer) {
 			if (newCluster._childCount > 2) { //Was already a cluster
 
+				this._forceLayout();
 				this._animationStart();
+
+				var backupLatlng = layer.getLatLng();
+				layer.setLatLng(newCluster._latlng);
+				layer.setOpacity(0);
+
 				setTimeout(function () {
+					L.FeatureGroup.prototype.removeLayer.call(me, layer);
+					layer.setLatLng(backupLatlng);
 
-
-					var backupLatlng = layer.getLatLng();
-					layer.setLatLng(newCluster._latlng);
-					layer.setOpacity(0);
-
-					setTimeout(function () {
-						L.FeatureGroup.prototype.removeLayer.call(me, layer);
-						layer.setLatLng(backupLatlng);
-
-						me._animationEnd();
-					}, 250);
-				}, 0);
+					me._animationEnd();
+				}, 250);
 
 			} else { //Just became a cluster
-				setTimeout(function () {
-					me._animationStart();
-					me._animationZoomOutSingle(newCluster, 0, 1);
-				}, 0);
+				this._forceLayout();
+
+				me._animationStart();
+				me._animationZoomOutSingle(newCluster, 0, 1);
 			}
 		}
+	},
+
+	//Force a browser layout of stuff in the map
+	// Should apply the current opacity and location to all elements so we can update them again for an animation
+	_forceLayout: function () {
+		//In my testing this works, infact offsetWidth of any element seems to work.
+		//Could loop all this._layers and do this for each _icon if it stops working
+
+		L.Util.falseFn(document.body.offsetWidth);
+
 	}
 });
