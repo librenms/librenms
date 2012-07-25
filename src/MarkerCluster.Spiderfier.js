@@ -261,6 +261,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 				map.removeLayer(m._spiderLeg);
 				delete m._spiderLeg;
 			}
+			group._animationEnd();
 		}, 250);
 	}
 });

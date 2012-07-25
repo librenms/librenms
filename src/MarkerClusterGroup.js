@@ -152,7 +152,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	_moveEnd: function () {
-		if (this._inZoomAnimation > 0) {
+		if (this._inZoomAnimation) {
 			return;
 		}
 
@@ -343,6 +343,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	//Animated versions here
 	_animationStart: function () {
 		this._map._mapPane.className += ' leaflet-cluster-anim';
+		this._inZoomAnimation++;
 	},
 	_animationEnd: function () {
 		this._map._mapPane.className = this._map._mapPane.className.replace(' leaflet-cluster-anim', '');
@@ -402,8 +403,6 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			c._recursivelyRestoreChildPositions(depthToDescend);
 		});
 
-		this._inZoomAnimation++;
-
 		//Remove the old clusters and close the zoom animation
 		
 		setTimeout(function () {
@@ -430,8 +429,6 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		//Animate all of the markers in the clusters to move to their cluster center point
 		marker._recursivelyAnimateChildrenInAndAddSelfToMap(bounds, depthToStartAt, depthToAnimateIn);
-
-		this._inZoomAnimation++;
 
 		var me = this;
 
@@ -486,6 +483,5 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		//Could loop all this._layers and do this for each _icon if it stops working
 
 		L.Util.falseFn(document.body.offsetWidth);
-
 	}
 });
