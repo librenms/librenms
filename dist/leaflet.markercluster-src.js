@@ -327,9 +327,11 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel - this._topClusterLevel._zoom + 1, this._getExpandedVisibleBounds());
 	},
 	_animationAddLayer: function (layer, newCluster) {
-		L.FeatureGroup.prototype.addLayer.call(this, newCluster);
-		if (newCluster !== layer && newCluster._childCount === 2) {
-			newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, 1);
+		if (newCluster === true) {
+			L.FeatureGroup.prototype.addLayer.call(this, layer);
+		} else if (newCluster._childCount === 2) {
+			newCluster._addToMap();
+			newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, this._map.getMaxZoom()); //getMaxZoom will always get all children
 		}
 	}
 } : {
@@ -375,28 +377,26 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		});
 
-		//Immediately fire an event to update the opacity and locations (If we immediately set it they won't animate)
-		setTimeout(function () {
-			var j, n;
+		this._forceLayout();
+		var j, n;
 
-			//Update opacities
-			me._topClusterLevel._recursivelyBecomeVisible(bounds, depthToStartAt + depthToDescend);
-			//TODO Maybe? Update markers in _recursivelyBecomeVisible
-			for (j in me._layers) {
-				if (me._layers.hasOwnProperty(j)) {
-					n = me._layers[j];
+		//Update opacities
+		me._topClusterLevel._recursivelyBecomeVisible(bounds, depthToStartAt + depthToDescend);
+		//TODO Maybe? Update markers in _recursivelyBecomeVisible
+		for (j in me._layers) {
+			if (me._layers.hasOwnProperty(j)) {
+				n = me._layers[j];
 
-					if (!(n instanceof L.MarkerCluster) && n._icon) {
-						n.setOpacity(1);
-					}
+				if (!(n instanceof L.MarkerCluster) && n._icon) {
+					n.setOpacity(1);
 				}
 			}
+		}
 
-			//update the positions of the just added clusters/markers
-			me._topClusterLevel._recursively(bounds, depthToStartAt, 0, function (c) {
-				c._recursivelyRestoreChildPositions(depthToDescend);
-			});
-		}, 0);
+		//update the positions of the just added clusters/markers
+		me._topClusterLevel._recursively(bounds, depthToStartAt, 0, function (c) {
+			c._recursivelyRestoreChildPositions(depthToDescend);
+		});
 
 		this._inZoomAnimation++;
 
@@ -431,10 +431,9 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		var me = this;
 
-		//Immediately fire an event to update the opacity (If we immediately set it they won't animate)
-		setTimeout(function () {
-			marker._recursivelyBecomeVisible(bounds, depthToStartAt);
-		}, 0);
+		//Update the opacity (If we immediately set it they won't animate)
+		this._forceLayout();
+		marker._recursivelyBecomeVisible(bounds, depthToStartAt);
 
 		//TODO: Maybe use the transition timing stuff to make this more reliable
 		//When the animations are done, tidy up
@@ -450,32 +449,40 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		var me = this;
 
 		L.FeatureGroup.prototype.addLayer.call(this, layer);
-		if (newCluster !== layer) {
+		if (newCluster !== true) {
 			if (newCluster._childCount > 2) { //Was already a cluster
 
+				this._forceLayout();
 				this._animationStart();
+
+				var backupLatlng = layer.getLatLng();
+				layer.setLatLng(newCluster._latlng);
+				layer.setOpacity(0);
+
 				setTimeout(function () {
+					L.FeatureGroup.prototype.removeLayer.call(me, layer);
+					layer.setLatLng(backupLatlng);
 
-
-					var backupLatlng = layer.getLatLng();
-					layer.setLatLng(newCluster._latlng);
-					layer.setOpacity(0);
-
-					setTimeout(function () {
-						L.FeatureGroup.prototype.removeLayer.call(me, layer);
-						layer.setLatLng(backupLatlng);
-
-						me._animationEnd();
-					}, 250);
-				}, 0);
+					me._animationEnd();
+				}, 250);
 
 			} else { //Just became a cluster
-				setTimeout(function () {
-					me._animationStart();
-					me._animationZoomOutSingle(newCluster, 0, 1);
-				}, 0);
+				this._forceLayout();
+
+				me._animationStart();
+				me._animationZoomOutSingle(newCluster, 0, this._map.getMaxZoom());
 			}
 		}
+	},
+
+	//Force a browser layout of stuff in the map
+	// Should apply the current opacity and location to all elements so we can update them again for an animation
+	_forceLayout: function () {
+		//In my testing this works, infact offsetWidth of any element seems to work.
+		//Could loop all this._layers and do this for each _icon if it stops working
+
+		L.Util.falseFn(document.body.offsetWidth);
+
 	}
 });
 
@@ -562,9 +569,9 @@ L.MarkerCluster = L.Marker.extend({
 
 	//layer: The layer to try add
 	//returns:
-	//  true: was able to put this marker in, but don't know its current visible parents position
+	//  true: was able to put this marker in, but don't know its current visible parents position (If returned externally, add this marker at its position)
 	//  false: wasn't able to put this marker in
-	//  a Marker/MarkerCluster: the visible parent of the marker (or the marker itself if it should be visible)
+	//  a MarkerCluster: the visible parent of the marker
 	_recursivelyAddLayer: function (layer, zoom) {
 		var result = false;
 
@@ -584,11 +591,37 @@ L.MarkerCluster = L.Marker.extend({
 		if (!result && (this._canAcceptPosition(layer.getLatLng(), zoom) || this._zoom)) {
 
 			//Add to ourself instead
-			result = this._group._clusterOne(this._markers, layer, zoom);
+			result = this._group._clusterOne(this._markers, layer, zoom + 1);
 
 			if (result) {
 				result._baseInit();
+				this._childCount--;
 				this._addChild(result);
+
+				//We may be above the zoom that these 2 markers would initially cluster at
+				// so push the new cluster as deep as it can go
+				var wantedZoom = this._group._map.getZoom() - 1,
+					maxZoom = this._group._map.getMaxZoom(),
+					newResult,
+					finalResult = (zoom === wantedZoom) ? result : true;
+				while (zoom < maxZoom) {
+					zoom++;
+					newResult = this._group._clusterOne([result._markers[0]], layer, zoom + 1);
+
+					if (newResult === null) {
+						break;
+					}
+					newResult._baseInit();
+					result._markers = [];
+					result._childClusters.push(newResult);
+					result = newResult;
+
+					if (zoom === wantedZoom) {
+						finalResult = result;
+					}
+				}
+				result = finalResult;
+
 			} else {
 				this._addChild(layer);
 				result = true;
@@ -596,7 +629,7 @@ L.MarkerCluster = L.Marker.extend({
 		}
 
 		if (result) {
-			if (!this._zoom) {
+			if (!('_zoom' in this)) {
 				this.setIcon(this._group.options.iconCreateFunction(this._childCount));
 			}
 			this._recalculateBounds();
@@ -604,8 +637,6 @@ L.MarkerCluster = L.Marker.extend({
 		if (result === true) {
 			if (this._icon) {
 				result = this;
-			} else if ((this._markers.length > 0 && this._markers[0]._icon) || (this._childClusters.length > 1 && this._childClusters[0]._icon)) {
-				result = layer;
 			}
 		}
 
@@ -639,7 +670,7 @@ L.MarkerCluster = L.Marker.extend({
 				this._recalculateBounds();
 		
 				this._childCount--;
-				if (this._icon) {
+				if (!('_zoom' in this)) {
 					this.setIcon(group.options.iconCreateFunction(this._childCount));
 				}
 				return true;
@@ -652,6 +683,9 @@ L.MarkerCluster = L.Marker.extend({
 
 			if (child._bounds.contains(layer._latlng) && child._recursivelyRemoveLayer(layer)) {
 				this._childCount--;
+				if (!('_zoom' in this)) {
+					this.setIcon(group.options.iconCreateFunction(this._childCount));
+				}
 
 				//if our child cluster is no longer a cluster, remove it and replace with just the marker
 				if (child._childCount === 1) {
@@ -1154,78 +1188,76 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			L.FeatureGroup.prototype.addLayer.call(group, m);
 		}
 
-		setTimeout(function () {
-			group._animationStart();
+		this._group._forceLayout();
+		group._animationStart();
 
-			var initialLegOpacity = L.Browser.svg ? 0 : 0.3,
-				xmlns = L.Path.SVG_NS;
+		var initialLegOpacity = L.Browser.svg ? 0 : 0.3,
+			xmlns = L.Path.SVG_NS;
 
+
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			m = childMarkers[i];
+
+			m.setLatLng(map.layerPointToLatLng(positions[i]));
+			m.setOpacity(1);
+			//Add Legs. TODO: Fade this in!
+
+			leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222', opacity: initialLegOpacity });
+			map.addLayer(leg);
+			m._spiderLeg = leg;
+
+			//Following animations don't work for canvas
+			if (!L.Browser.svg) {
+				continue;
+			}
+
+			//How this works:
+			//http://stackoverflow.com/questions/5924238/how-do-you-animate-an-svg-path-in-ios
+			//http://dev.opera.com/articles/view/advanced-svg-animation-techniques/
+
+			//Animate length
+			var length = leg._path.getTotalLength();
+			leg._path.setAttribute("stroke-dasharray", length + "," + length);
+
+			var anim = document.createElementNS(xmlns, "animate");
+			anim.setAttribute("attributeName", "stroke-dashoffset");
+			anim.setAttribute("begin", "indefinite");
+			anim.setAttribute("from", length);
+			anim.setAttribute("to", 0);
+			anim.setAttribute("dur", 0.25);
+			leg._path.appendChild(anim);
+			anim.beginElement();
+
+			//Animate opacity
+			anim = document.createElementNS(xmlns, "animate");
+			anim.setAttribute("attributeName", "stroke-opacity");
+			anim.setAttribute("attributeName", "stroke-opacity");
+			anim.setAttribute("begin", "indefinite");
+			anim.setAttribute("from", 0);
+			anim.setAttribute("to", 0.5);
+			anim.setAttribute("dur", 0.25);
+			leg._path.appendChild(anim);
+			anim.beginElement();
+		}
+		me.setOpacity(0.3);
+
+		//Set the opacity of the spiderLegs back to their correct value
+		// The animations above override this until they complete.
+		// If the initial opacity of the spiderlegs isn't 0 then they appear before the animation starts.
+		if (L.Browser.svg) {
+			this._group._forceLayout();
 
 			for (i = childMarkers.length - 1; i >= 0; i--) {
-				m = childMarkers[i];
+				m = childMarkers[i]._spiderLeg;
 
-				m.setLatLng(map.layerPointToLatLng(positions[i]));
-				m.setOpacity(1);
-				//Add Legs. TODO: Fade this in!
-
-				leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222', opacity: initialLegOpacity });
-				map.addLayer(leg);
-				m._spiderLeg = leg;
-
-				//Following animations don't work for canvas
-				if (!L.Browser.svg) {
-					continue;
-				}
-
-				//How this works:
-				//http://stackoverflow.com/questions/5924238/how-do-you-animate-an-svg-path-in-ios
-				//http://dev.opera.com/articles/view/advanced-svg-animation-techniques/
-
-				//Animate length
-				var length = leg._path.getTotalLength();
-				leg._path.setAttribute("stroke-dasharray", length + "," + length);
-
-				var anim = document.createElementNS(xmlns, "animate");
-				anim.setAttribute("attributeName", "stroke-dashoffset");
-				anim.setAttribute("begin", "indefinite");
-				anim.setAttribute("from", length);
-				anim.setAttribute("to", 0);
-				anim.setAttribute("dur", 0.25);
-				leg._path.appendChild(anim);
-				anim.beginElement();
-
-				//Animate opacity
-				anim = document.createElementNS(xmlns, "animate");
-				anim.setAttribute("attributeName", "stroke-opacity");
-				anim.setAttribute("attributeName", "stroke-opacity");
-				anim.setAttribute("begin", "indefinite");
-				anim.setAttribute("from", 0);
-				anim.setAttribute("to", 0.5);
-				anim.setAttribute("dur", 0.25);
-				leg._path.appendChild(anim);
-				anim.beginElement();
+				m.options.opacity = 0.5;
+				m._path.setAttribute('stroke-opacity', 0.5);
 			}
-			me.setOpacity(0.3);
+		}
 
-			//Set the opacity of the spiderLegs back to their correct value
-			// The animations above override this until they complete.
-			// Doing this at 250ms causes some minor flickering on FF, so just do it immediately
-			// If the initial opacity of the spiderlegs isn't 0 then they appear before the animation starts.
-			if (L.Browser.svg) {
-				setTimeout(function () {
-					for (i = childMarkers.length - 1; i >= 0; i--) {
-						m = childMarkers[i]._spiderLeg;
-
-						m.options.opacity = 0.5;
-						m._path.setAttribute('stroke-opacity', 0.5);
-					}
-				}, 0);
-			}
-
-			setTimeout(function () {
-				group._animationEnd();
-			}, 250);
-		}, 0);
+		setTimeout(function () {
+			group._animationEnd();
+		}, 250);
 	},
 
 	_animationUnspiderfy: function () {

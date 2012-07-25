@@ -120,7 +120,7 @@ L.MarkerCluster = L.Marker.extend({
 					zoom++;
 					newResult = this._group._clusterOne([result._markers[0]], layer, zoom + 1);
 
-					if (newResult == null) {
+					if (newResult === null) {
 						break;
 					}
 					newResult._baseInit();
@@ -128,7 +128,7 @@ L.MarkerCluster = L.Marker.extend({
 					result._childClusters.push(newResult);
 					result = newResult;
 
-					if (zoom == wantedZoom) {
+					if (zoom === wantedZoom) {
 						finalResult = result;
 					}
 				}
