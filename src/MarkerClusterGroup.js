@@ -143,7 +143,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	_zoomEnd: function () {
-		this._animationStart();
 
 		this._mergeSplitClusters();
 
@@ -190,14 +189,18 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	_mergeSplitClusters: function () {
 
 		if (this._zoom < this._map._zoom) { //Zoom in, split
+			this._animationStart();
 			//Remove clusters now off screen
 			this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, this._zoom - this._topClusterLevel._zoom, this._getExpandedVisibleBounds());
 
 			this._animationZoomIn(this._zoom, this._map._zoom);
 
 		} else if (this._zoom > this._map._zoom) { //Zoom out, merge
+			this._animationStart();
 
 			this._animationZoomOut(this._zoom, this._map._zoom);
+		} else {
+			this._moveEnd();
 		}
 	},
 
