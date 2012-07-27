@@ -232,6 +232,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			if (this._sqDist(markerPos, mPos) <= clusterDiameterSqrd) {
 				//Create a new cluster with these 2
 				var newCluster = new L.MarkerCluster(this, m, newMarker);
+				delete m._projCenter;
+				delete newMarker._projCenter;
 
 				unclusteredMarkers.splice(i, 1);
 				return newCluster;
@@ -263,6 +265,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				c = clusters[j];
 				if (this._sqDist(point._projCenter, c._projCenter) <= clusterRadiusSqrd) {
 					c._addChild(point);
+					delete point._projCenter;
 					c._projCenter = this._map.project(c.getLatLng(), zoom);
 
 					used = true;
