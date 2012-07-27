@@ -254,6 +254,16 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		}
 
 		setTimeout(function () {
+			//If we have only <= one child left then that marker will be shown on the map so don't remove it!
+			var stillThereChildCount = 0;
+			for (i = childMarkers.length - 1; i >= 0; i--) {
+				m = childMarkers[i];
+				if (m._spiderLeg) {
+					stillThereChildCount++;
+				}
+			}
+
+
 			for (i = childMarkers.length - 1; i >= 0; i--) {
 				m = childMarkers[i];
 
@@ -265,7 +275,9 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 				m.setOpacity(1);
 				m.setZIndexOffset(0);
 
-				L.FeatureGroup.prototype.removeLayer.call(group, m);
+				if (stillThereChildCount > 1) {
+					L.FeatureGroup.prototype.removeLayer.call(group, m);
+				}
 
 				map.removeLayer(m._spiderLeg);
 				delete m._spiderLeg;
