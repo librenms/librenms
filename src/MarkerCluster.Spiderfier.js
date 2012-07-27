@@ -15,7 +15,7 @@ L.MarkerCluster.include({
 								// 0 -> always spiral; Infinity -> always circle
 
 	spiderfy: function () {
-		if (this._group._spiderfied === this) {
+		if (this._group._spiderfied === this || this._group._inZoomAnimation) {
 			return;
 		}
 
@@ -41,7 +41,9 @@ L.MarkerCluster.include({
 	},
 
 	unspiderfy: function () {
-
+		if (this._group._inZoomAnimation) {
+			return;
+		}
 		this._animationUnspiderfy();
 
 		this._group._spiderfied = null;
