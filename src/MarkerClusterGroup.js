@@ -36,6 +36,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		//If we have already clustered we'll need to add this one to a cluster
 
+		if (this._unspiderfy) {
+			this._unspiderfy();
+		}
+
 		var newCluster = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom - 1);
 
 		this._animationAddLayer(layer, newCluster);
@@ -44,7 +48,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	removeLayer: function (layer) {
-		this._topClusterLevel._recursivelyRemoveLayer(layer);
+		if (this._unspiderfy) {
+			this._unspiderfy();
+		}
+
+		if (!this._topClusterLevel._recursivelyRemoveLayer(layer)) {
+			//If this happens you are doing something bad
+			//If you've moved a marker that is in the cluster then that would be why
+			//console.log('failed to remove');
+		}
 
 		return this;
 	},
