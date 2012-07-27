@@ -256,6 +256,13 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		setTimeout(function () {
 			for (i = childMarkers.length - 1; i >= 0; i--) {
 				m = childMarkers[i];
+
+				if (!m._spiderLeg) { //Has already been unspiderfied
+					continue;
+				}
+
+
+				m.setOpacity(1);
 				m.setZIndexOffset(0);
 
 				L.FeatureGroup.prototype.removeLayer.call(group, m);
@@ -286,6 +293,17 @@ L.MarkerClusterGroup.include({
 	_unspiderfy: function () {
 		if (this._spiderfied) {
 			this._spiderfied.unspiderfy();
+		}
+	},
+
+	//If the given layer is currently being spiderfied then we unspiderfy it so it isn't on the map anymore etc
+	_unspiderfyLayer: function (layer) {
+		if (layer._spiderLeg) {
+			L.FeatureGroup.prototype.removeLayer.call(this, layer);
+			layer.setOpacity(1);
+			layer.setZIndexOffset(0);
+			this._map.removeLayer(layer._spiderLeg);
+			delete layer._spiderLeg;
 		}
 	}
 });

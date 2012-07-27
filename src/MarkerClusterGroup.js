@@ -50,6 +50,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	removeLayer: function (layer) {
 		if (this._unspiderfy) {
 			this._unspiderfy();
+			this._unspiderfyLayer(layer);
 		}
 
 		if (!this._topClusterLevel._recursivelyRemoveLayer(layer)) {
@@ -477,6 +478,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 				setTimeout(function () {
 					L.FeatureGroup.prototype.removeLayer.call(me, layer);
+					layer.setOpacity(1);
 
 					me._animationEnd();
 				}, 250);
