@@ -43,6 +43,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		//If we have already clustered we'll need to add this one to a cluster
 
+		if (this._unspiderfy) {
+			this._unspiderfy();
+		}
+
 		var newCluster = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom - 1);
 
 		this._animationAddLayer(layer, newCluster);
@@ -51,7 +55,16 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	removeLayer: function (layer) {
-		this._topClusterLevel._recursivelyRemoveLayer(layer);
+		if (this._unspiderfy) {
+			this._unspiderfy();
+		}
+
+		if (!this._topClusterLevel._recursivelyRemoveLayer(layer)) {
+			//If this happens you are doing something bad
+			//If you've moved a marker that is in the cluster then that would be why
+			//console.log('failed to remove');
+			var a = 0;
+		}
 
 		return this;
 	},
@@ -466,13 +479,11 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				this._forceLayout();
 				this._animationStart();
 
-				var backupLatlng = layer.getLatLng();
-				layer.setLatLng(newCluster._latlng);
+				layer._setPos(this._map.latLngToLayerPoint(layer.getLatLng()));
 				layer.setOpacity(0);
 
 				setTimeout(function () {
 					L.FeatureGroup.prototype.removeLayer.call(me, layer);
-					layer.setLatLng(backupLatlng);
 
 					me._animationEnd();
 				}, 250);
@@ -1070,7 +1081,7 @@ L.MarkerCluster.include({
 								// 0 -> always spiral; Infinity -> always circle
 
 	spiderfy: function () {
-		if (this._group._spiderfied === this) {
+		if (this._group._spiderfied === this || this._group._inZoomAnimation) {
 			return;
 		}
 
@@ -1096,7 +1107,9 @@ L.MarkerCluster.include({
 	},
 
 	unspiderfy: function () {
-
+		if (this._group._inZoomAnimation) {
+			return;
+		}
 		this._animationUnspiderfy();
 
 		this._group._spiderfied = null;
@@ -1113,7 +1126,7 @@ L.MarkerCluster.include({
 
 		for (i = count - 1; i >= 0; i--) {
 			angle = this._circleStartAngle + i * angleStep;
-			res[i] = new L.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle));
+			res[i] = new L.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle))._round();
 		}
 
 		return res;
@@ -1129,7 +1142,7 @@ L.MarkerCluster.include({
 
 		for (i = count - 1; i >= 0; i--) {
 			angle += this._spiralFootSeparation / legLength + i * 0.0005;
-			res[i] = new L.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle));
+			res[i] = new L.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle))._round();
 			legLength += this._2PI * this._spiralLengthFactor / angle;
 		}
 		return res;
@@ -1146,13 +1159,12 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		for (i = childMarkers.length - 1; i >= 0; i--) {
 			m = childMarkers[i];
 
-			m._backupPosSpider = m._latlng;
-			m.setLatLng(map.layerPointToLatLng(positions[i]));
 			m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
-
 			L.FeatureGroup.prototype.addLayer.call(group, m);
+			m._setPos(positions[i]);
 
-			leg = new L.Polyline([this._latlng, m._latlng], { weight: 1.5, color: '#222' });
+
+			leg = new L.Polyline([this._latlng, map.layerPointToLatLng(positions[i])], { weight: 1.5, color: '#222' });
 			map.addLayer(leg);
 			m._spiderLeg = leg;
 		}
@@ -1169,7 +1181,6 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		for (i = childMarkers.length - 1; i >= 0; i--) {
 			m = childMarkers[i];
 
-			m.setLatLng(m._backupPosSpider);
 			delete m._backupPosSpider;
 			m.setZIndexOffset(0);
 
@@ -1185,17 +1196,18 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		var me = this,
 			group = this._group,
 			map = group._map,
+			thisLayerPos = map.latLngToLayerPoint(this._latlng),
 			i, m, leg;
 
 		for (i = childMarkers.length - 1; i >= 0; i--) {
 			m = childMarkers[i];
 
-			m._backupPosSpider = m._latlng;
-			m.setLatLng(this._latlng);
 			m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
 			m.setOpacity(0);
 
 			L.FeatureGroup.prototype.addLayer.call(group, m);
+
+			m._setPos(thisLayerPos);
 		}
 
 		this._group._forceLayout();
@@ -1208,11 +1220,12 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		for (i = childMarkers.length - 1; i >= 0; i--) {
 			m = childMarkers[i];
 
-			m.setLatLng(map.layerPointToLatLng(positions[i]));
+			m._setPos(positions[i]);
+
 			m.setOpacity(1);
 			//Add Legs. TODO: Fade this in!
 
-			leg = new L.Polyline([me._latlng, m._latlng], { weight: 1.5, color: '#222', opacity: initialLegOpacity });
+			leg = new L.Polyline([me._latlng, map.layerPointToLatLng(positions[i])], { weight: 1.5, color: '#222', opacity: initialLegOpacity });
 			map.addLayer(leg);
 			m._spiderLeg = leg;
 
@@ -1273,6 +1286,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 	_animationUnspiderfy: function () {
 		var group = this._group,
 			map = group._map,
+			thisLayerPos = map.latLngToLayerPoint(this._latlng),
 			childMarkers = this.getAllChildMarkers(),
 			svg = L.Browser.svg,
 			m, i, a;
@@ -1284,7 +1298,8 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		for (i = childMarkers.length - 1; i >= 0; i--) {
 			m = childMarkers[i];
 
-			m.setLatLng(this._latlng);
+			m._setPos(thisLayerPos);
+
 			m.setOpacity(0);
 
 			//Animate the spider legs back in
@@ -1307,8 +1322,6 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		setTimeout(function () {
 			for (i = childMarkers.length - 1; i >= 0; i--) {
 				m = childMarkers[i];
-				m.setLatLng(m._backupPosSpider);
-				delete m._backupPosSpider;
 				m.setZIndexOffset(0);
 
 				L.FeatureGroup.prototype.removeLayer.call(group, m);
