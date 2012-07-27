@@ -471,13 +471,11 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				this._forceLayout();
 				this._animationStart();
 
-				var backupLatlng = layer.getLatLng();
-				layer.setLatLng(newCluster._latlng);
+				layer._setPos(this._map.latLngToLayerPoint(layer.getLatLng()));
 				layer.setOpacity(0);
 
 				setTimeout(function () {
 					L.FeatureGroup.prototype.removeLayer.call(me, layer);
-					layer.setLatLng(backupLatlng);
 
 					me._animationEnd();
 				}, 250);
