@@ -57,6 +57,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	removeLayer: function (layer) {
 		if (this._unspiderfy) {
 			this._unspiderfy();
+			this._unspiderfyLayer(layer);
 		}
 
 		if (!this._topClusterLevel._recursivelyRemoveLayer(layer)) {
@@ -238,6 +239,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			if (this._sqDist(markerPos, mPos) <= clusterDiameterSqrd) {
 				//Create a new cluster with these 2
 				var newCluster = new L.MarkerCluster(this, m, newMarker);
+				delete m._projCenter;
+				delete newMarker._projCenter;
 
 				unclusteredMarkers.splice(i, 1);
 				return newCluster;
@@ -269,6 +272,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				c = clusters[j];
 				if (this._sqDist(point._projCenter, c._projCenter) <= clusterRadiusSqrd) {
 					c._addChild(point);
+					delete point._projCenter;
 					c._projCenter = this._map.project(c.getLatLng(), zoom);
 
 					used = true;
@@ -484,6 +488,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 				setTimeout(function () {
 					L.FeatureGroup.prototype.removeLayer.call(me, layer);
+					layer.setOpacity(1);
 
 					me._animationEnd();
 				}, 250);
@@ -1320,11 +1325,30 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		}
 
 		setTimeout(function () {
+			//If we have only <= one child left then that marker will be shown on the map so don't remove it!
+			var stillThereChildCount = 0;
 			for (i = childMarkers.length - 1; i >= 0; i--) {
 				m = childMarkers[i];
+				if (m._spiderLeg) {
+					stillThereChildCount++;
+				}
+			}
+
+
+			for (i = childMarkers.length - 1; i >= 0; i--) {
+				m = childMarkers[i];
+
+				if (!m._spiderLeg) { //Has already been unspiderfied
+					continue;
+				}
+
+
+				m.setOpacity(1);
 				m.setZIndexOffset(0);
 
-				L.FeatureGroup.prototype.removeLayer.call(group, m);
+				if (stillThereChildCount > 1) {
+					L.FeatureGroup.prototype.removeLayer.call(group, m);
+				}
 
 				map.removeLayer(m._spiderLeg);
 				delete m._spiderLeg;
@@ -1352,6 +1376,17 @@ L.MarkerClusterGroup.include({
 	_unspiderfy: function () {
 		if (this._spiderfied) {
 			this._spiderfied.unspiderfy();
+		}
+	},
+
+	//If the given layer is currently being spiderfied then we unspiderfy it so it isn't on the map anymore etc
+	_unspiderfyLayer: function (layer) {
+		if (layer._spiderLeg) {
+			L.FeatureGroup.prototype.removeLayer.call(this, layer);
+			layer.setOpacity(1);
+			layer.setZIndexOffset(0);
+			this._map.removeLayer(layer._spiderLeg);
+			delete layer._spiderLeg;
 		}
 	}
 });
