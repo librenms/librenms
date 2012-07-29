@@ -302,6 +302,10 @@ L.MarkerClusterGroup.include({
 		}
 	},
 
+	_spiderfierOnRemove: function () {
+		this._map.off('click zoomstart', this._unspiderfy, this);
+	},
+
 	_unspiderfy: function () {
 		if (this._spiderfied) {
 			this._spiderfied.unspiderfy();

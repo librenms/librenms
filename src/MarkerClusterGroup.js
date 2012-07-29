@@ -67,7 +67,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	onAdd: function (map) {
 		L.FeatureGroup.prototype.onAdd.call(this, map);
 
-		this._generateInitialClusters();
+		if (!this._topClusterLevel) {
+			this._generateInitialClusters();
+		}
 		this._map.on('zoomend', this._zoomEnd, this);
 		this._map.on('moveend', this._moveEnd, this);
 
@@ -76,6 +78,18 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 
 		this._bindEvents();
+	},
+
+	//Overrides FeatureGroup.onRemove
+	onRemove: function (map) {
+		this._map.off('zoomend', this._zoomEnd, this);
+		this._map.off('moveend', this._moveEnd, this);
+
+		if (this._spiderfierOnRemove) { //TODO FIXME: Not sure how to have spiderfier add something on here nicely
+			this._spiderfierOnRemove();
+		}
+
+		L.FeatureGroup.prototype.onRemove.call(this, map);
 	},
 
 	//Overrides FeatureGroup._propagateEvent
