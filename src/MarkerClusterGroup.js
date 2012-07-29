@@ -307,15 +307,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		return { 'clusters': clusters, 'unclustered': unclustered };
 	},
-
+	
 	//Clusters the given markers (with _cluster) and returns the result as a MarkerCluster
 	_clusterToMarkerCluster: function (toCluster, zoom) {
 		var res = this._cluster(toCluster, zoom),
 			toAdd = res.clusters.concat(res.unclustered),
-			result = new L.MarkerCluster(this, toAdd[0]),
+			result = new L.MarkerCluster(this),
 			i;
 
-		for (i = toAdd.length - 1; i > 0; i--) {
+		for (i = toAdd.length - 1; i >= 0; i--) {
 			result._addChild(toAdd[i]);
 		}
 		result._zoom = zoom;

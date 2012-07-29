@@ -8,7 +8,9 @@ L.MarkerCluster = L.Marker.extend({
 
 		this._bounds = new L.LatLngBounds();
 
-		this._addChild(a);
+		if (a) {
+			this._addChild(a);
+		}
 		if (b) {
 			this._addChild(b);
 		}
@@ -156,6 +158,10 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_canAcceptPosition: function (latlng, zoom) {
+		if (this._childCount == 0) {
+			return true;
+		}
+
 		var clusterRadiusSqrd = this._group.options.maxClusterRadius * this._group.options.maxClusterRadius,
 			pos = this._group._map.project(this._latlng, zoom),
 			otherpos = this._group._map.project(latlng, zoom);
