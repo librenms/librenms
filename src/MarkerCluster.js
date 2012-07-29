@@ -185,9 +185,9 @@ L.MarkerCluster = L.Marker.extend({
 				}
 
 				markers.splice(i, 1);
+				this._childCount--;
 				this._recalculateBounds();
 		
-				this._childCount--;
 				if (!('_zoom' in this)) {
 					this.setIcon(group.options.iconCreateFunction(this._childCount));
 				}
@@ -425,7 +425,11 @@ L.MarkerCluster = L.Marker.extend({
 			this._bounds.extend(childClusters[i]._bounds);
 		}
 
-		this.setLatLng(this._bounds.getCenter());
+		if (this._childCount == 0) {
+			delete this._latlng;
+		} else {
+			this.setLatLng(this._bounds.getCenter());
+		}
 	},
 
 
