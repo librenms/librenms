@@ -314,15 +314,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		return { 'clusters': clusters, 'unclustered': unclustered };
 	},
-
+	
 	//Clusters the given markers (with _cluster) and returns the result as a MarkerCluster
 	_clusterToMarkerCluster: function (toCluster, zoom) {
 		var res = this._cluster(toCluster, zoom),
 			toAdd = res.clusters.concat(res.unclustered),
-			result = new L.MarkerCluster(this, toAdd[0]),
+			result = new L.MarkerCluster(this),
 			i;
 
-		for (i = toAdd.length - 1; i > 0; i--) {
+		for (i = toAdd.length - 1; i >= 0; i--) {
 			result._addChild(toAdd[i]);
 		}
 		result._zoom = zoom;
@@ -522,7 +522,9 @@ L.MarkerCluster = L.Marker.extend({
 
 		this._bounds = new L.LatLngBounds();
 
-		this._addChild(a);
+		if (a) {
+			this._addChild(a);
+		}
 		if (b) {
 			this._addChild(b);
 		}
@@ -670,6 +672,10 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_canAcceptPosition: function (latlng, zoom) {
+		if (this._childCount === 0) {
+			return true;
+		}
+
 		var clusterRadiusSqrd = this._group.options.maxClusterRadius * this._group.options.maxClusterRadius,
 			pos = this._group._map.project(this._latlng, zoom),
 			otherpos = this._group._map.project(latlng, zoom);
@@ -693,9 +699,9 @@ L.MarkerCluster = L.Marker.extend({
 				}
 
 				markers.splice(i, 1);
+				this._childCount--;
 				this._recalculateBounds();
 		
-				this._childCount--;
 				if (!('_zoom' in this)) {
 					this.setIcon(group.options.iconCreateFunction(this._childCount));
 				}
@@ -933,7 +939,11 @@ L.MarkerCluster = L.Marker.extend({
 			this._bounds.extend(childClusters[i]._bounds);
 		}
 
-		this.setLatLng(this._bounds.getCenter());
+		if (this._childCount === 0) {
+			delete this._latlng;
+		} else {
+			this.setLatLng(this._bounds.getCenter());
+		}
 	},
 
 

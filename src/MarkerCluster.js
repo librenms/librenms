@@ -158,7 +158,7 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_canAcceptPosition: function (latlng, zoom) {
-		if (this._childCount == 0) {
+		if (this._childCount === 0) {
 			return true;
 		}
 
@@ -425,7 +425,7 @@ L.MarkerCluster = L.Marker.extend({
 			this._bounds.extend(childClusters[i]._bounds);
 		}
 
-		if (this._childCount == 0) {
+		if (this._childCount === 0) {
 			delete this._latlng;
 		} else {
 			this.setLatLng(this._bounds.getCenter());
