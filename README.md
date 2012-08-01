@@ -3,6 +3,8 @@ Leaflet.markercluster
 
 Provides Beautiful Animated Marker Clustering functionality for Leaflet
 
+*Requires Leaflet 0.4.2 or newer*
+
 ## Using the plugin
 See the included examples for usage.
 The [realworld example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.388.html) is a good place to start, it uses all of the defaults of the clusterer.
