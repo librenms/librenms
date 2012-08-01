@@ -490,7 +490,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				this._forceLayout();
 				this._animationStart();
 
-				layer._setPos(this._map.latLngToLayerPoint(layer.getLatLng()));
+				layer._setPos(this._map.latLngToLayerPoint(newCluster.getLatLng()));
 				layer.setOpacity(0);
 
 				setTimeout(function () {
