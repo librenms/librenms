@@ -70,6 +70,22 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return this;
 	},
 
+	clearLayers: function () {
+		//Need our own special implementation as the LayerGroup one doesn't work for us
+
+		//Remove all the visible layers
+		for (var i in this._layers) {
+			if (this._layers.hasOwnProperty(i)) {
+				L.FeatureGroup.prototype.removeLayer.call(this, this._layers[i]);
+			}
+		}
+
+		//Reset _topClusterLevel
+		this._generateInitialClusters();
+
+		return this;
+	},
+
 	//Overrides FeatureGroup.onAdd
 	onAdd: function (map) {
 		L.FeatureGroup.prototype.onAdd.call(this, map);
@@ -77,6 +93,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		if (!this._topClusterLevel) {
 			this._generateInitialClusters();
 		}
+
 		this._map.on('zoomend', this._zoomEnd, this);
 		this._map.on('moveend', this._moveEnd, this);
 
@@ -206,6 +223,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			currentZoom = this._map.getZoom();
 
 		this._topClusterLevel = this._clusterToMarkerCluster(this._needsClustering, maxZoom);
+		this._needsClustering = [];
 
 		//Generate to the top
 		while (minZoom < this._topClusterLevel._zoom) {
