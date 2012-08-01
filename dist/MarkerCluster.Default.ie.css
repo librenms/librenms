@@ -1,0 +1,34 @@
+ /* IE 6-8 fallback colors */
+.marker-cluster-small {
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99B5E28C,endColorstr=#99B5E28C);
+	}
+.marker-cluster-small div {
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#996ECC39,endColorstr=#996ECC39);
+	}
+
+.marker-cluster-medium {
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99F1D357,endColorstr=#99F1D357);
+	}
+.marker-cluster-medium div {
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99F0C20C,endColorstr=#99F0C20C);
+	}
+
+.marker-cluster-large {
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99FD9C73,endColorstr=#99FD9C73);
+	}
+.marker-cluster-large div {
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99F18017,endColorstr=#99F18017);
+}
+
+.marker-cluster {
+	background:transparent;
+	zoom:1;
+}
+.marker-cluster div {
+	/* fixes the center part position. No idea why this is needed */
+	margin-left: 0px;
+
+	background:transparent;
+	zoom:1;
+}
+
