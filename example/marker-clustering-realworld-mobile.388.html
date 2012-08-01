@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet debug page</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<link rel="stylesheet" href="../lib/leaflet-dist/leaflet.css" />
+	<link rel="stylesheet" href="mobile.css" />
+	<script src="../lib/leaflet-dist/leaflet-src.js"></script>
+
+	<link rel="stylesheet" href="../dist/MarkerCluster.css" />
+	<link rel="stylesheet" href="../dist/MarkerCluster.Default.css" />
+	<script src="../dist/leaflet.markercluster-src.js"></script>
+	<script src="realworld.388.js"></script>
+</head>
+<body>
+
+	<div id="map"></div>
+
+	<script type="text/javascript">
+
+		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
+			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade, Points &copy 2012 LINZ',
+			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+			latlng = new L.LatLng(-37.821, 175.22);
+
+		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
+
+		var markers = new L.MarkerClusterGroup();
+
+		for (var i = 0; i < addressPoints.length; i++) {
+			var a = addressPoints[i];
+			var title = a[2];
+			var marker = new L.Marker(new L.LatLng(a[0], a[1]), { title: title });
+			marker.bindPopup(title);
+			markers.addLayer(marker);
+		}
+
+		map.addLayer(markers);
+
+	</script>
+</body>
+</html>
