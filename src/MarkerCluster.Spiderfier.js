@@ -309,10 +309,11 @@ L.MarkerClusterGroup.include({
 		this._map.on('click', this._unspiderfyWrapper, this);
 		this._map.on('zoomstart', this._unspiderfyZoomStart, this);
 
-		if (L.Browser.svg) {
-			this._map._initPathRoot(); //Needs to happen in the pageload, not after, or animations don't work in chrome
+		if (L.Browser.svg && !L.Browser.touch) {
+			this._map._initPathRoot();
+			//Needs to happen in the pageload, not after, or animations don't work in webkit
 			//  http://stackoverflow.com/questions/8455200/svg-animate-with-dynamically-added-elements
-
+			//Disable on touch browsers as the animation messes up on a touch zoom and isn't very noticable
 		}
 	},
 
@@ -328,6 +329,11 @@ L.MarkerClusterGroup.include({
 		this._map.on('zoomanim', this._unspiderfyZoomAnim, this);
 	},
 	_unspiderfyZoomAnim: function (zoomDetails) {
+		//Wait until the first zoomanim after the user has finished touch-zooming before running the animation
+		if (L.DomUtil.hasClass(this._map._mapPane, 'leaflet-touching')) {
+			return;
+		}
+
 		this._map.off('zoomanim', this._unspiderfyZoomAnim, this);
 		this._unspiderfy(zoomDetails);
 	},
