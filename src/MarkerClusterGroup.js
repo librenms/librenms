@@ -66,6 +66,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	clearLayers: function () {
 		//Need our own special implementation as the LayerGroup one doesn't work for us
 
+		//If we aren't on the map yet, just blow away the markers we know of
+		if (!this._map) {
+			this._needsClustering = [];
+			return this;
+		}
+
 		//Remove all the visible layers
 		for (var i in this._layers) {
 			if (this._layers.hasOwnProperty(i)) {
