@@ -73,6 +73,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	clearLayers: function () {
 		//Need our own special implementation as the LayerGroup one doesn't work for us
 
+		//If we aren't on the map yet, just blow away the markers we know of
+		if (!this._map) {
+			this._needsClustering = [];
+			return this;
+		}
+
 		//Remove all the visible layers
 		for (var i in this._layers) {
 			if (this._layers.hasOwnProperty(i)) {
@@ -1153,11 +1159,12 @@ L.MarkerCluster.include({
 		this._animationSpiderfy(childMarkers, positions);
 	},
 
-	unspiderfy: function () {
+	unspiderfy: function (zoomDetails) {
+		/// <param Name="zoomDetails">Argument from zoomanim if being called in a zoom animation or null otherwise</param>
 		if (this._group._inZoomAnimation) {
 			return;
 		}
-		this._animationUnspiderfy();
+		this._animationUnspiderfy(zoomDetails);
 
 		this._group._spiderfied = null;
 	},
@@ -1338,10 +1345,10 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		}, 250);
 	},
 
-	_animationUnspiderfy: function () {
+	_animationUnspiderfy: function (zoomDetails) {
 		var group = this._group,
 			map = group._map,
-			thisLayerPos = map.latLngToLayerPoint(this._latlng),
+			thisLayerPos = zoomDetails ? map._latLngToNewLayerPoint(this._latlng, zoomDetails.zoom, zoomDetails.center) : map.latLngToLayerPoint(this._latlng),
 			childMarkers = this.getAllChildMarkers(),
 			svg = L.Browser.svg,
 			m, i, a;
@@ -1418,22 +1425,47 @@ L.MarkerClusterGroup.include({
 	_spiderfied: null,
 
 	_spiderfierOnAdd: function () {
-		this._map.on('click zoomstart', this._unspiderfy, this);
+		this._map.on('click', this._unspiderfyWrapper, this);
+		this._map.on('zoomstart', this._unspiderfyZoomStart, this);
 
-		if (L.Browser.svg) {
-			this._map._initPathRoot(); //Needs to happen in the pageload, not after, or animations don't work in chrome
+		if (L.Browser.svg && !L.Browser.touch) {
+			this._map._initPathRoot();
+			//Needs to happen in the pageload, not after, or animations don't work in webkit
 			//  http://stackoverflow.com/questions/8455200/svg-animate-with-dynamically-added-elements
-
+			//Disable on touch browsers as the animation messes up on a touch zoom and isn't very noticable
 		}
 	},
 
 	_spiderfierOnRemove: function () {
-		this._map.off('click zoomstart', this._unspiderfy, this);
+		this._map.off('click', this._unspiderfyWrapper, this);
+		this._map.off('zoomstart', this._unspiderfyZoomStart, this);
 	},
 
-	_unspiderfy: function () {
+
+	//On zoom start we add a zoomanim handler so that we are guaranteed to be last (after markers are animated)
+	//This means we can define the animation they do rather than Markers doing an animation to their actual location
+	_unspiderfyZoomStart: function () {
+		this._map.on('zoomanim', this._unspiderfyZoomAnim, this);
+	},
+	_unspiderfyZoomAnim: function (zoomDetails) {
+		//Wait until the first zoomanim after the user has finished touch-zooming before running the animation
+		if (L.DomUtil.hasClass(this._map._mapPane, 'leaflet-touching')) {
+			return;
+		}
+
+		this._map.off('zoomanim', this._unspiderfyZoomAnim, this);
+		this._unspiderfy(zoomDetails);
+	},
+
+
+	_unspiderfyWrapper: function () {
+		/// <summary>_unspiderfy but passes no arguments</summary>
+		this._unspiderfy();
+	},
+
+	_unspiderfy: function (zoomDetails) {
 		if (this._spiderfied) {
-			this._spiderfied.unspiderfy();
+			this._spiderfied.unspiderfy(zoomDetails);
 		}
 	},
 
