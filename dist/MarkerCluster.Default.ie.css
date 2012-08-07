@@ -20,8 +20,3 @@
 	background-color: rgb(241, 128, 23);
 }
 
-.marker-cluster div {
-	/* fixes the center part position. No idea why this is needed */
-	margin-left: 0px;
-}
-
