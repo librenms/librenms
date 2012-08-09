@@ -42,20 +42,6 @@ L.DistanceGrid.prototype = {
 		}
 	},
 
-	replaceObject: function (newObj, oldObj) {
-		var cell = oldObj._dGridCell,
-			i, len;
-
-		for (i = 0, len = cell.length; i < len; i++) {
-			if (cell[i] === oldObj) {
-				cell.splice(i, 1, newObj);
-				newObj._dGridCell = oldObj._dGridCell;
-				newObj._dGridPoint = oldObj._dGridPoint;
-				break;
-			}
-		}
-	},
-
 	eachObject: function (fn, context) {
 		var i, j, k, len, row, cell, removed,
 			grid = this._grid;
