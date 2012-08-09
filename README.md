@@ -24,7 +24,6 @@ any time finding it yet.
 1. Load the bonsai.js however you choose.
 1. Add this to your HTML:
 
-<pre>
     <!-- Add the zoomBox for funky graph zooming -->
     <div id='zoomBox' style='position:absolute; overflow:hidden; left:0px;
     top:0px; width:0px; height:0px; visibility:visible; background:red;
@@ -40,15 +39,13 @@ any time finding it yet.
     /*This keeps IE from cutting things off*/
     #why {position: static; width: auto}
     </STYLE>
-</pre>
 
 1. Add your graphs something like:
-<pre>
+
     <span class="graphiteGraph">
     <img
     id="317330dc6337227faa5df8dd149c344b" <-- I use md5sum of the graphite URL here
     src="http://yourgraphite.host/render?blahblah"><input type="submit" value="Zoom me" onClick="initBonsai('317330dc6337227faa5df8dd149c344b')"></span>
-</pre>
 
 1. To use it as a user, click zoom me
 1. Then when you wave your mouse over the graph it should turn into a
