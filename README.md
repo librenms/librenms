@@ -8,22 +8,23 @@ But what's that small dip there?  You need to zoom!
 
 Graphite'll happily render graphs at different times and cacti has a bit of
 Javascript to zoom graphs so I just took the cacti JS and made it parse
-things like from=-2hours and graphite style dates like from=00:00_20120617
+things like `from=-2hours` and graphite style dates like `from=00:00_20120617`
 
 The only subtlety is that the cacti script only worked on one graph per
 page.  So I hacked it to work with many graphs.  At <a
 href="http://www.guardian.co.uk">the Guardian</a> we have an id of
-the md5sum of the graph as the img tag id and then a button under every
-graph that calls <pre>initBonsai</pre> with the right md5sum for the graph
+the md5sum of the graph as the `img` tag id and then a button under every
+graph that calls `initBonsai` with the right md5sum for the graph
 above it.  This is horrible.  There must be a better way but I haven't spent
 any time finding it yet.
-Pull requests welcome :)
+<br>Pull requests welcome :)
 
 # Usage
 
 1. Load the bonsai.js however you choose.
 1. Add this to your HTML:
 
+<pre>
     <!-- Add the zoomBox for funky graph zooming -->
     <div id='zoomBox' style='position:absolute; overflow:hidden; left:0px;
     top:0px; width:0px; height:0px; visibility:visible; background:red;
@@ -39,13 +40,15 @@ Pull requests welcome :)
     /*This keeps IE from cutting things off*/
     #why {position: static; width: auto}
     </STYLE>
+</pre>
 
 1. Add your graphs something like:
+<pre>
     <span class="graphiteGraph">
     <img
     id="317330dc6337227faa5df8dd149c344b" <-- I use md5sum of the graphite URL here
-    src="http://yourgraphite.host/render?blahblah"
-    ><input type="submit" value="Zoom me" onClick="initBonsai('317330dc6337227faa5df8dd149c344b')"></span>
+    src="http://yourgraphite.host/render?blahblah"><input type="submit" value="Zoom me" onClick="initBonsai('317330dc6337227faa5df8dd149c344b')"></span>
+</pre>
 
 1. To use it as a user, click zoom me
 1. Then when you wave your mouse over the graph it should turn into a
