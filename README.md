@@ -57,6 +57,16 @@ crosshair
 1. Click and drag to zoom
 1. Right click to zoom out
 
+# Demo
+
+There's a <a
+href="http://the.earth.li/~huggie/graphite-zoom-template.html">demo that you
+can use with your own graphs</a> too.
+
+# Contact, Feedback, promises of beer
+
+huggie@earth, shufgy on twitter, huggie on freenode in #graphite
+
 # Todo
 
 1. Do multiple graphs on one page without Zoom Me buttons.  (mouseover runs
@@ -65,6 +75,3 @@ initBonsai maybe?)
 1. Submit upstream to cacti perhaps if they want it
 1. Submit upstream to graphite
 
-# Contact
-
-huggie@earth, shufgy on twitter, huggie on freenode in #graphite
