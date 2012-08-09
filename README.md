@@ -24,28 +24,32 @@ any time finding it yet.
 1. Load the bonsai.js however you choose.
 1. Add this to your HTML:
 
-    <!-- Add the zoomBox for funky graph zooming -->
-    <div id='zoomBox' style='position:absolute; overflow:hidden; left:0px;
-    top:0px; width:0px; height:0px; visibility:visible; background:red;
-    filter:alpha(opacity=50); -moz-opacity:0.5; -khtml-opacity:0.5;
-    opacity:0.5'></div>
-    <div id='zoomSensitiveZone' style='position:absolute; overflow:hidden;
-    left:0px; top:0px; width:0px; height:0px; visibility:visible;
-    cursor:crosshair; background:blue; filter:alpha(opacity=0); -moz-opacity:0;
-    -khtml-opacity:0; opacity:0' oncontextmenu='return false'></div>
-    <STYLE MEDIA="print">
-    /*Turn off the zoomBox*/
-    div#zoomBox, div#zoomSensitiveZone {display: none}
-    /*This keeps IE from cutting things off*/
-    #why {position: static; width: auto}
-    </STYLE>
+```
+<!-- Add the zoomBox for funky graph zooming -->
+<div id='zoomBox' style='position:absolute; overflow:hidden; left:0px;
+top:0px; width:0px; height:0px; visibility:visible; background:red;
+filter:alpha(opacity=50); -moz-opacity:0.5; -khtml-opacity:0.5;
+opacity:0.5'></div>
+<div id='zoomSensitiveZone' style='position:absolute; overflow:hidden;
+left:0px; top:0px; width:0px; height:0px; visibility:visible;
+cursor:crosshair; background:blue; filter:alpha(opacity=0); -moz-opacity:0;
+-khtml-opacity:0; opacity:0' oncontextmenu='return false'></div>
+<STYLE MEDIA="print">
+/*Turn off the zoomBox*/
+div#zoomBox, div#zoomSensitiveZone {display: none}
+/*This keeps IE from cutting things off*/
+#why {position: static; width: auto}
+</STYLE>
+```
 
 1. Add your graphs something like:
 
+```
     <span class="graphiteGraph">
     <img
     id="317330dc6337227faa5df8dd149c344b" <-- I use md5sum of the graphite URL here
     src="http://yourgraphite.host/render?blahblah"><input type="submit" value="Zoom me" onClick="initBonsai('317330dc6337227faa5df8dd149c344b')"></span>
+```
 
 1. To use it as a user, click zoom me
 1. Then when you wave your mouse over the graph it should turn into a
