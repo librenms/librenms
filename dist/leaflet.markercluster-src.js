@@ -228,6 +228,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			maxZoom = this._map.getMaxZoom(),
 			currentZoom = this._map.getZoom();
 
+		//console.time('cluster');
 		this._topClusterLevel = this._clusterToMarkerCluster(this._needsClustering, maxZoom);
 		this._needsClustering = [];
 
@@ -235,6 +236,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		while (minZoom < this._topClusterLevel._zoom) {
 			this._topClusterLevel = this._clusterToMarkerCluster(this._topClusterLevel._childClusters.concat(this._topClusterLevel._markers), this._topClusterLevel._zoom - 1);
 		}
+		//console.timeEnd('cluster');
 
 		//Remember the current zoom level and bounds
 		this._zoom = currentZoom;
@@ -265,24 +267,13 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Takes a list of markers and clusters the new marker in to them
 	//Will return null or the new MarkerCluster. The clustered in marker is removed from the given array
-	_clusterOne: function (unclusteredMarkers, newMarker, zoom) {
-		var markerPos = newMarker._projCenter || this._map.project(newMarker.getLatLng(), zoom),
-			clusterDiameterSqrd = 2 * this.options.maxClusterRadius * 2 * this.options.maxClusterRadius,
-			i, m, mPos;
+	_clusterOne: function (unclustered, newMarker, markerPoint) {
+		var marker = unclustered.getNearObject(markerPoint);
 
-		for (i = unclusteredMarkers.length - 1; i >= 0; i--) {
-			m = unclusteredMarkers[i];
-			mPos = m._projCenter || this._map.project(m.getLatLng(), zoom);
-
-			if (this._sqDist(markerPos, mPos) <= clusterDiameterSqrd) {
-				//Create a new cluster with these 2
-				var newCluster = new L.MarkerCluster(this, m, newMarker);
-				delete m._projCenter;
-				delete newMarker._projCenter;
-
-				unclusteredMarkers.splice(i, 1);
-				return newCluster;
-			}
+		if (marker) {
+			// create a new cluster with these 2
+			unclustered.removeObject(marker);
+			return new L.MarkerCluster(this, marker, newMarker);
 		}
 
 		return null;
@@ -290,73 +281,69 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Takes a list of objects that have a 'getLatLng()' function (Marker / MarkerCluster)
 	//Performs clustering on them (using a greedy algorithm) and returns those clusters.
-	//toCluster: List of Markers/MarkerClusters to cluster
+	//markers: List of Markers/MarkerClusters to cluster
 	//Returns { 'clusters': [new clusters], 'unclustered': [unclustered markers] }
-	_cluster: function (toCluster, zoom) {
-		var clusterRadiusSqrd = this.options.maxClusterRadius * this.options.maxClusterRadius,
-		    clusters = [],
-		    unclustered = [],
-		    i, j, c;
+	_cluster: function (markers, zoom) {
+		var radius = this.options.maxClusterRadius,
+		    clusters = new L.DistanceGrid(radius),
+		    unclustered = new L.DistanceGrid(radius),
+		    i, j, marker, markerPoint, cluster, newCluster;
 
-		//go through each point
-		for (i = toCluster.length - 1; i >= 0; i--) {
-			var point = toCluster[i],
-				used = false;
+		// go through each point
+		for (i = markers.length - 1; i >= 0; i--) {
+			marker = markers[i];
+			markerPoint = this._map.project(marker.getLatLng(), zoom); // calculate pixel position
 
-			point._projCenter = this._map.project(point.getLatLng(), zoom); //Calculate pixel position
+			// try add it to an existing cluster
+			cluster = clusters.getNearObject(markerPoint);
 
-			//try add it to an existing cluster
-			for (j = clusters.length - 1; j >= 0; j--) {
-				c = clusters[j];
-				if (this._sqDist(point._projCenter, c._projCenter) <= clusterRadiusSqrd) {
-					c._addChild(point);
-					delete point._projCenter;
-					c._projCenter = this._map.project(c.getLatLng(), zoom);
-
-					used = true;
-					break;
-				}
-			}
-
-			//otherwise, look through all of the markers we haven't managed to cluster and see if we should form a cluster with them
-			if (!used) {
-				var newCluster = this._clusterOne(unclustered, point);
+			if (cluster) {
+				cluster._addChild(marker);
+				clusters.updateObject(cluster, this._map.project(cluster.getLatLng(), zoom));
+			} else {
+				// otherwise, look through all of the markers we haven't managed to cluster and see if we should form a cluster with them
+				newCluster = this._clusterOne(unclustered, marker, markerPoint);
 				if (newCluster) {
-					newCluster._projCenter = this._map.project(newCluster.getLatLng(), zoom);
-					clusters.push(newCluster);
+					clusters.addObject(newCluster, this._map.project(newCluster.getLatLng(), zoom));
 				} else {
-					//Didn't manage to use it
-					unclustered.push(point);
+					// didn't manage to use it
+					unclustered.addObject(marker, markerPoint);
 				}
 			}
 		}
 
-		//Any clusters that did not end up being a child of a new cluster, make them a child of a new cluster
-		for (i = unclustered.length - 1; i >= 0; i--) {
-			c = unclustered[i];
-			delete c._projCenter;
+		var result = [],
+			group = this;
 
-			if (c instanceof L.MarkerCluster) {
-				var nc = new L.MarkerCluster(this, c);
-				nc._haveGeneratedChildClusters = true;
-				clusters.push(nc);
-				unclustered.splice(i, 1);
+		// any clusters that did not end up being a child of a new cluster, make them a child of a new cluster
+		unclustered.eachObject(function (cluster) {
+			if (cluster instanceof L.MarkerCluster) {
+				newCluster = new L.MarkerCluster(group, cluster);
+				newCluster._haveGeneratedChildClusters = true;
+
+				clusters.addObject(newCluster, cluster._dGridPoint);
+				unclustered.removeObject(cluster);
+
+				return true;
 			}
-		}
+		});
 
-		//Remove the _projCenter temp variable from clusters
-		for (i = clusters.length - 1; i >= 0; i--) {
-			delete clusters[i]._projCenter;
-			clusters[i]._baseInit();
-		}
+		unclustered.eachObject(function (marker) {
+			result.push(marker);
+		});
 
-		return { 'clusters': clusters, 'unclustered': unclustered };
+		// initialize created clusters
+		clusters.eachObject(function (cluster) {
+			cluster._baseInit();
+			result.push(cluster);
+		});
+
+		return result;
 	},
-	
+
 	//Clusters the given markers (with _cluster) and returns the result as a MarkerCluster
-	_clusterToMarkerCluster: function (toCluster, zoom) {
-		var res = this._cluster(toCluster, zoom),
-			toAdd = res.clusters.concat(res.unclustered),
+	_clusterToMarkerCluster: function (markers, zoom) {
+		var toAdd = this._cluster(markers, zoom),
 			result = new L.MarkerCluster(this),
 			i;
 
@@ -376,7 +363,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			height = L.Browser.mobile ? 0 : Math.abs(bounds.max.y - bounds.min.y),
 			sw = map.unproject(new L.Point(bounds.min.x - width, bounds.min.y - height)),
 			ne = map.unproject(new L.Point(bounds.max.x + width, bounds.max.y + height));
-		
+
 		return new L.LatLngBounds(sw, ne);
 	}
 });
@@ -469,7 +456,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		});
 
 		//Remove the old clusters and close the zoom animation
-		
+
 		setTimeout(function () {
 			//update the positions of the just added clusters/markers
 			me._topClusterLevel._recursively(bounds, depthToStartAt, 0, function (c) {
@@ -549,6 +536,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		L.Util.falseFn(document.body.offsetWidth);
 	}
 });
+
 
 L.MarkerCluster = L.Marker.extend({
 	initialize: function (group, a, b) {
@@ -639,9 +627,12 @@ L.MarkerCluster = L.Marker.extend({
 	//  false: wasn't able to put this marker in
 	//  a MarkerCluster: the visible parent of the marker
 	_recursivelyAddLayer: function (layer, zoom) {
-		var result = false;
+		var map = this._group._map,
+			maxClusterRadius = this._group.options.maxClusterRadius,
+			result = false,
+			i;
 
-		for (var i = this._childClusters.length - 1; i >= 0; i--) {
+		for (i = this._childClusters.length - 1; i >= 0; i--) {
 			var c = this._childClusters[i];
 			//Recurse into children where their bounds fits the layer or they can just take it
 			if (c._bounds.contains(layer.getLatLng()) || c._canAcceptPosition(layer.getLatLng(), zoom + 1)) {
@@ -654,29 +645,48 @@ L.MarkerCluster = L.Marker.extend({
 		}
 
 		//Couldn't add it to a child, but it should be part of us (this._zoom -> we are the root node)
-		if (!result && (this._canAcceptPosition(layer.getLatLng(), zoom) || this._zoom)) {
+		if (!result && (this._canAcceptPosition(layer.getLatLng(), zoom) || ('_zoom' in this))) {
 
 			//Add to ourself instead
-			result = this._group._clusterOne(this._markers, layer, zoom + 1);
+			var layerPos = map.project(layer.getLatLng(), zoom + 1),
+				sqDist = this._group._sqDist;
+
+			//var distanceGrid = new L.DistanceGrid(maxClusterRadius);
+			for (i = this._markers.length - 1; i >= 0; i--) {
+				var m = this._markers[i];
+				if (sqDist(layerPos, map.project(m.getLatLng(), zoom + 1)) < (maxClusterRadius * maxClusterRadius)) {
+					result = m;
+					this._markers.splice(i, 1);
+					this._childCount--;
+					break;
+				}
+			}
+
+			//result = distanceGrid.getNearObject(map.project(layer.getLatLng(), zoom + 1));
 
 			if (result) {
+				//Create a new cluster for them
+				result = new L.MarkerCluster(this._group, result, layer);
 				result._baseInit();
-				this._childCount--;
+
+				//Add our new child
 				this._addChild(result);
 
 				//We may be above the zoom that these 2 markers would initially cluster at
 				// so push the new cluster as deep as it can go
-				var wantedZoom = this._group._map.getZoom() - 1,
-					maxZoom = this._group._map.getMaxZoom(),
+				var wantedZoom = map.getZoom() - 1,
+					maxZoom = map.getMaxZoom(),
 					newResult,
 					finalResult = (zoom === wantedZoom) ? result : true;
 				while (zoom < maxZoom) {
 					zoom++;
-					newResult = this._group._clusterOne([result._markers[0]], layer, zoom + 1);
 
-					if (newResult === null) {
+					//Shouldn't be a cluster at this level
+					if (sqDist(map.project(layer.getLatLng(), zoom + 1), map.project(result._markers[0].getLatLng(), zoom + 1)) >= (maxClusterRadius * maxClusterRadius)) {
 						break;
 					}
+
+					newResult = new L.MarkerCluster(this._group, result._markers[0], layer);
 					newResult._baseInit();
 					result._markers = [];
 					result._childClusters.push(newResult);
@@ -991,6 +1001,118 @@ L.MarkerCluster = L.Marker.extend({
 		return this._childClusters.length > 0 && this._childClusters[0]._childCount === this._childCount;
 	}
 });
+
+
+L.DistanceGrid = function (cellSize) {
+	this._cellSize = cellSize;
+	this._sqCellSize = cellSize * cellSize;
+	this._grid = {};
+};
+
+L.DistanceGrid.prototype = {
+
+	addObject: function (obj, point) {
+		var x = this._getCoord(point.x),
+		    y = this._getCoord(point.y),
+		    grid = this._grid,
+		    row = grid[y] = grid[y] || {},
+		    cell = row[x] = row[x] || [];
+
+		obj._dGridCell = cell;
+		obj._dGridPoint = point;
+
+		cell.push(obj);
+	},
+
+	updateObject: function (obj, point) {
+		this.removeObject(obj);
+		this.addObject(obj, point);
+	},
+
+	removeObject: function (obj) {
+		var oldCell = obj._dGridCell,
+		    point = obj._dGridPoint,
+		    i, len, x, y;
+
+		for (i = 0, len = oldCell.length; i < len; i++) {
+			if (oldCell[i] === obj) {
+
+				oldCell.splice(i, 1);
+
+				if (len === 1) {
+					x = this._getCoord(point.x);
+					y = this._getCoord(point.y);
+					delete this._grid[y][x];
+				}
+
+				break;
+			}
+		}
+	},
+
+	eachObject: function (fn, context) {
+		var i, j, k, len, row, cell, removed,
+		    grid = this._grid;
+
+		for (i in grid) {
+			if (grid.hasOwnProperty(i)) {
+				row = grid[i];
+
+				for (j in row) {
+					if (row.hasOwnProperty(j)) {
+						cell = row[j];
+
+						for (k = 0, len = cell.length; k < len; k++) {
+							removed = fn.call(context, cell[k]);
+							if (removed) {
+								k--;
+								len--;
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+
+	getNearObject: function (point) {
+		var x = this._getCoord(point.x),
+		    y = this._getCoord(point.y),
+		    i, j, k, row, cell, len, obj;
+
+		for (i = y - 1; i <= y + 1; i++) {
+			row = this._grid[i];
+			if (row) {
+
+				for (j = x - 1; j <= x + 1; j++) {
+					cell = row[j];
+					if (cell) {
+
+						for (k = 0, len = cell.length; k < len; k++) {
+							obj = cell[k];
+							if (this._sqDist(obj._dGridPoint, point) < this._sqCellSize) {
+								return obj;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	},
+
+	_getCoord: function (x) {
+		return Math.floor(x / this._cellSize);
+	},
+
+	_sqDist: function (p, p2) {
+		var dx = p2.x - p.x,
+		    dy = p2.y - p.y;
+		return dx * dx + dy * dy;
+	}
+};
+
 
 /* Copyright (c) 2012 the authors listed at the following URL, and/or
 the authors of referenced articles or incorporated external code:
