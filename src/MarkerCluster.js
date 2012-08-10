@@ -42,6 +42,7 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_baseInit: function () {
+		this._latlng = this._wLatLng;
 		L.Marker.prototype.initialize.call(this, this._latlng, { icon: this._group.options.iconCreateFunction(this._childCount) });
 	},
 
@@ -64,25 +65,29 @@ L.MarkerCluster = L.Marker.extend({
 	_expandBounds: function (marker) {
 
 		var addedCount,
-		    addedLatLng;
+		    addedLatLng = marker._latlng;
 
 		if (marker instanceof L.MarkerCluster) {
 			this._bounds.extend(marker._bounds);
 			addedCount = marker._childCount;
-			addedLatLng = marker._latlng;
 		} else {
-			addedLatLng = marker.getLatLng();
 			this._bounds.extend(addedLatLng);
 			addedCount = 1;
 		}
 
+		if (!this._latlng) {
+			// when clustering, take position of the first point as the cluster center
+			this._latlng = addedLatLng;
+		}
+
+		// when showing clusters, take weighted average of all points as cluster center
 		var totalCount = this._childCount + addedCount;
 
-		if (!this._latlng) {
-			this._latlng = new L.LatLng(addedLatLng.lat, addedLatLng.lng);
+		if (!this._wLatLng) {
+			this._wLatLng = new L.LatLng(addedLatLng.lat, addedLatLng.lng);
 		} else {
-			this._latlng.lat = (addedLatLng.lat * addedCount + this._latlng.lat * this._childCount) / totalCount;
-			this._latlng.lng = (addedLatLng.lng * addedCount + this._latlng.lng * this._childCount) / totalCount;
+			this._wLatLng.lat = (addedLatLng.lat * addedCount + this._wLatLng.lat * this._childCount) / totalCount;
+			this._wLatLng.lng = (addedLatLng.lng * addedCount + this._wLatLng.lng * this._childCount) / totalCount;
 		}
 	},
 
