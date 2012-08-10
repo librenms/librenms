@@ -46,6 +46,7 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_addChild: function (new1) {
+		this._expandBounds(new1);
 		if (new1 instanceof L.MarkerCluster) {
 			this._childClusters.push(new1);
 			this._childCount += new1._childCount;
@@ -58,7 +59,6 @@ L.MarkerCluster = L.Marker.extend({
 			this.setIcon(this._group.options.iconCreateFunction(this._childCount));
 		}
 
-		this._expandBounds(new1);
 	},
 
 	_expandBounds: function (marker) {
@@ -79,7 +79,7 @@ L.MarkerCluster = L.Marker.extend({
 		var totalCount = this._childCount + addedCount;
 
 		if (!this._latlng) {
-			this._latlng = addedLatLng;
+			this._latlng = new L.LatLng(addedLatLng.lat, addedLatLng.lng);
 		} else {
 			this._latlng.lat = (addedLatLng.lat * addedCount + this._latlng.lat * this._childCount) / totalCount;
 			this._latlng.lng = (addedLatLng.lng * addedCount + this._latlng.lng * this._childCount) / totalCount;
