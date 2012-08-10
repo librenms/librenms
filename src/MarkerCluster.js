@@ -44,7 +44,7 @@ L.MarkerCluster = L.Marker.extend({
 	_baseInit: function () {
 		L.Marker.prototype.initialize.call(this, this._latlng, { icon: this._group.options.iconCreateFunction(this._childCount) });
 	},
-	
+
 	_addChild: function (new1) {
 		if (new1 instanceof L.MarkerCluster) {
 			this._childClusters.push(new1);
@@ -63,13 +63,27 @@ L.MarkerCluster = L.Marker.extend({
 
 	_expandBounds: function (marker) {
 
+		var addedCount,
+		    addedLatLng;
+
 		if (marker instanceof L.MarkerCluster) {
 			this._bounds.extend(marker._bounds);
+			addedCount = marker._childCount;
+			addedLatLng = marker._latlng;
 		} else {
-			this._bounds.extend(marker.getLatLng());
+			addedLatLng = marker.getLatLng();
+			this._bounds.extend(addedLatLng);
+			addedCount = 1;
 		}
 
-		this._latlng = this._bounds.getCenter();
+		var totalCount = this._childCount + addedCount;
+
+		if (!this._latlng) {
+			this._latlng = addedLatLng;
+		} else {
+			this._latlng.lat = (addedLatLng.lat * addedCount + this._latlng.lat * this._childCount) / totalCount;
+			this._latlng.lng = (addedLatLng.lng * addedCount + this._latlng.lng * this._childCount) / totalCount;
+		}
 	},
 
 	//Set our markers position as given and add it to the map
@@ -209,7 +223,7 @@ L.MarkerCluster = L.Marker.extend({
 				markers.splice(i, 1);
 				this._childCount--;
 				this._recalculateBounds();
-		
+
 				if (!('_zoom' in this)) {
 					this.setIcon(group.options.iconCreateFunction(this._childCount));
 				}
@@ -235,7 +249,7 @@ L.MarkerCluster = L.Marker.extend({
 						L.FeatureGroup.prototype.removeLayer.call(group, child);
 						L.FeatureGroup.prototype.addLayer.call(group, child._markers[0]);
 					}
-					
+
 					//Take ownership of its only marker and bin the cluster
 					markers.push(child._markers[0]);
 					childClusters.splice(i, 1);
@@ -367,7 +381,7 @@ L.MarkerCluster = L.Marker.extend({
 			delete this._backupLatlng;
 		}
 	},
-	
+
 	//exceptBounds: If set, don't remove any markers/clusters in it
 	_recursivelyRemoveChildrenFromMap: function (previousBounds, depth, exceptBounds) {
 		var m, i;
