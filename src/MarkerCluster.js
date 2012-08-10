@@ -87,9 +87,12 @@ L.MarkerCluster = L.Marker.extend({
 	//  false: wasn't able to put this marker in
 	//  a MarkerCluster: the visible parent of the marker
 	_recursivelyAddLayer: function (layer, zoom) {
-		var result = false;
+		var map = this._group._map,
+			maxClusterRadius = this._group.options.maxClusterRadius,
+			result = false,
+			i;
 
-		for (var i = this._childClusters.length - 1; i >= 0; i--) {
+		for (i = this._childClusters.length - 1; i >= 0; i--) {
 			var c = this._childClusters[i];
 			//Recurse into children where their bounds fits the layer or they can just take it
 			if (c._bounds.contains(layer.getLatLng()) || c._canAcceptPosition(layer.getLatLng(), zoom + 1)) {
@@ -102,29 +105,48 @@ L.MarkerCluster = L.Marker.extend({
 		}
 
 		//Couldn't add it to a child, but it should be part of us (this._zoom -> we are the root node)
-		if (!result && (this._canAcceptPosition(layer.getLatLng(), zoom) || this._zoom)) {
+		if (!result && (this._canAcceptPosition(layer.getLatLng(), zoom) || ('_zoom' in this))) {
 
 			//Add to ourself instead
-			result = this._group._clusterOne(this._markers, layer, zoom + 1);
+			var layerPos = map.project(layer.getLatLng(), zoom + 1),
+				sqDist = this._group._sqDist;
+
+			//var distanceGrid = new L.DistanceGrid(maxClusterRadius);
+			for (i = this._markers.length - 1; i >= 0; i--) {
+				var m = this._markers[i];
+				if (sqDist(layerPos, map.project(m.getLatLng(), zoom + 1)) < (maxClusterRadius * maxClusterRadius)) {
+					result = m;
+					this._markers.splice(i, 1);
+					this._childCount--;
+					break;
+				}
+			}
+
+			//result = distanceGrid.getNearObject(map.project(layer.getLatLng(), zoom + 1));
 
 			if (result) {
+				//Create a new cluster for them
+				result = new L.MarkerCluster(this._group, result, layer);
 				result._baseInit();
-				this._childCount--;
+
+				//Add our new child
 				this._addChild(result);
 
 				//We may be above the zoom that these 2 markers would initially cluster at
 				// so push the new cluster as deep as it can go
-				var wantedZoom = this._group._map.getZoom() - 1,
-					maxZoom = this._group._map.getMaxZoom(),
+				var wantedZoom = map.getZoom() - 1,
+					maxZoom = map.getMaxZoom(),
 					newResult,
 					finalResult = (zoom === wantedZoom) ? result : true;
 				while (zoom < maxZoom) {
 					zoom++;
-					newResult = this._group._clusterOne([result._markers[0]], layer, zoom + 1);
 
-					if (newResult === null) {
+					//Shouldn't be a cluster at this level
+					if (sqDist(map.project(layer.getLatLng(), zoom + 1), map.project(result._markers[0].getLatLng(), zoom + 1)) >= (maxClusterRadius * maxClusterRadius)) {
 						break;
 					}
+
+					newResult = new L.MarkerCluster(this._group, result._markers[0], layer);
 					newResult._baseInit();
 					result._markers = [];
 					result._childClusters.push(newResult);
