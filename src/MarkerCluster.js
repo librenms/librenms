@@ -77,12 +77,13 @@ L.MarkerCluster = L.Marker.extend({
 
 		if (!this._latlng) {
 			// when clustering, take position of the first point as the cluster center
-			this._latlng = addedLatLng;
+			this._latlng = this._cLatLng = addedLatLng;
 		}
 
 		// when showing clusters, take weighted average of all points as cluster center
 		var totalCount = this._childCount + addedCount;
 
+		//Calculate weighted latlng for display
 		if (!this._wLatLng) {
 			this._wLatLng = new L.LatLng(addedLatLng.lat, addedLatLng.lng);
 		} else {
@@ -204,7 +205,7 @@ L.MarkerCluster = L.Marker.extend({
 		}
 
 		var clusterRadiusSqrd = this._group.options.maxClusterRadius * this._group.options.maxClusterRadius,
-			pos = this._group._map.project(this._latlng, zoom),
+			pos = this._group._map.project(this._cLatLng, zoom),
 			otherpos = this._group._map.project(latlng, zoom);
 
 		return (this._group._sqDist(pos, otherpos) <= clusterRadiusSqrd);
@@ -469,7 +470,7 @@ L.MarkerCluster = L.Marker.extend({
 		if (this._childCount === 0) {
 			delete this._latlng;
 		} else {
-			this.setLatLng(this._bounds.getCenter());
+			this.setLatLng(this._wLatLng);
 		}
 	},
 
