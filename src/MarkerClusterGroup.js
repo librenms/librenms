@@ -292,7 +292,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 			if (cluster) {
 				cluster._addChild(marker);
-				clusters.updateObject(cluster, this._map.project(cluster.getLatLng(), zoom));
 			} else {
 				// otherwise, look through all of the markers we haven't managed to cluster and see if we should form a cluster with them
 				newCluster = this._clusterOne(unclustered, marker, markerPoint);
@@ -319,6 +318,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 				return true;
 			}
+			return false;
 		});
 
 		unclustered.eachObject(function (marker) {
