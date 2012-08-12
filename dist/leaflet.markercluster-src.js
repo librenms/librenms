@@ -13,7 +13,7 @@
 L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	options: {
-		maxClusterRadius: 60, //A cluster will cover at most this many pixels from its center
+		maxClusterRadius: 80, //A cluster will cover at most this many pixels from its center
 		iconCreateFunction: null,
 
 		spiderfyOnMaxZoom: true,
@@ -299,7 +299,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 			if (cluster) {
 				cluster._addChild(marker);
-				clusters.updateObject(cluster, this._map.project(cluster.getLatLng(), zoom));
 			} else {
 				// otherwise, look through all of the markers we haven't managed to cluster and see if we should form a cluster with them
 				newCluster = this._clusterOne(unclustered, marker, markerPoint);
@@ -326,6 +325,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 				return true;
 			}
+			return false;
 		});
 
 		unclustered.eachObject(function (marker) {
@@ -582,6 +582,7 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	_baseInit: function () {
+		this._latlng = this._wLatLng;
 		L.Marker.prototype.initialize.call(this, this._latlng, { icon: this._group.options.iconCreateFunction(this._childCount) });
 	},
 
@@ -604,25 +605,30 @@ L.MarkerCluster = L.Marker.extend({
 	_expandBounds: function (marker) {
 
 		var addedCount,
-		    addedLatLng;
+		    addedLatLng = marker._latlng;
 
 		if (marker instanceof L.MarkerCluster) {
 			this._bounds.extend(marker._bounds);
 			addedCount = marker._childCount;
-			addedLatLng = marker._latlng;
 		} else {
-			addedLatLng = marker.getLatLng();
 			this._bounds.extend(addedLatLng);
 			addedCount = 1;
 		}
 
+		if (!this._latlng) {
+			// when clustering, take position of the first point as the cluster center
+			this._latlng = this._cLatLng = addedLatLng;
+		}
+
+		// when showing clusters, take weighted average of all points as cluster center
 		var totalCount = this._childCount + addedCount;
 
-		if (!this._latlng) {
-			this._latlng = new L.LatLng(addedLatLng.lat, addedLatLng.lng);
+		//Calculate weighted latlng for display
+		if (!this._wLatLng) {
+			this._wLatLng = new L.LatLng(addedLatLng.lat, addedLatLng.lng);
 		} else {
-			this._latlng.lat = (addedLatLng.lat * addedCount + this._latlng.lat * this._childCount) / totalCount;
-			this._latlng.lng = (addedLatLng.lng * addedCount + this._latlng.lng * this._childCount) / totalCount;
+			this._wLatLng.lat = (addedLatLng.lat * addedCount + this._wLatLng.lat * this._childCount) / totalCount;
+			this._wLatLng.lng = (addedLatLng.lng * addedCount + this._wLatLng.lng * this._childCount) / totalCount;
 		}
 	},
 
@@ -739,7 +745,7 @@ L.MarkerCluster = L.Marker.extend({
 		}
 
 		var clusterRadiusSqrd = this._group.options.maxClusterRadius * this._group.options.maxClusterRadius,
-			pos = this._group._map.project(this._latlng, zoom),
+			pos = this._group._map.project(this._cLatLng, zoom),
 			otherpos = this._group._map.project(latlng, zoom);
 
 		return (this._group._sqDist(pos, otherpos) <= clusterRadiusSqrd);
@@ -1004,7 +1010,7 @@ L.MarkerCluster = L.Marker.extend({
 		if (this._childCount === 0) {
 			delete this._latlng;
 		} else {
-			this.setLatLng(this._bounds.getCenter());
+			this.setLatLng(this._wLatLng);
 		}
 	},
 
