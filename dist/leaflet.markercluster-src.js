@@ -18,7 +18,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		spiderfyOnMaxZoom: true,
 		showCoverageOnHover: true,
-		zoomToBoundsOnClick: true
+		zoomToBoundsOnClick: true,
+
+		disableClusteringAtZoom: null
 	},
 
 	initialize: function (options) {
@@ -227,6 +229,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		var minZoom = this._map.getMinZoom(),
 			maxZoom = this._map.getMaxZoom(),
 			currentZoom = this._map.getZoom();
+
+		if (this.options.disableClusteringAtZoom) {
+			maxZoom = this.options.disableClusteringAtZoom - 1;
+		}
 
 		//console.time('cluster');
 		this._topClusterLevel = this._clusterToMarkerCluster(this._needsClustering, maxZoom);
@@ -647,9 +653,11 @@ L.MarkerCluster = L.Marker.extend({
 	//  false: wasn't able to put this marker in
 	//  a MarkerCluster: the visible parent of the marker
 	_recursivelyAddLayer: function (layer, zoom) {
-		var map = this._group._map,
-			maxClusterRadius = this._group.options.maxClusterRadius,
+		var group = this._group,
+			map = group._map,
+			maxClusterRadius = group.options.maxClusterRadius,
 			result = false,
+			sqDist = this._group._sqDist,
 			i;
 
 		for (i = this._childClusters.length - 1; i >= 0; i--) {
@@ -667,21 +675,23 @@ L.MarkerCluster = L.Marker.extend({
 		//Couldn't add it to a child, but it should be part of us (this._zoom -> we are the root node)
 		if (!result && (this._canAcceptPosition(layer.getLatLng(), zoom) || ('_zoom' in this))) {
 
-			//Add to ourself instead
-			var layerPos = map.project(layer.getLatLng(), zoom + 1),
-				sqDist = this._group._sqDist;
+			//If we are allowed to cluster at our childs level
+			if (zoom + 1 !== group.options.disableClusteringAtZoom) {
 
-			//var distanceGrid = new L.DistanceGrid(maxClusterRadius);
-			for (i = this._markers.length - 1; i >= 0; i--) {
-				var m = this._markers[i];
-				if (sqDist(layerPos, map.project(m.getLatLng(), zoom + 1)) < (maxClusterRadius * maxClusterRadius)) {
-					result = m;
-					this._markers.splice(i, 1);
-					this._childCount--;
-					break;
+				//Add to ourself instead
+				var layerPos = map.project(layer.getLatLng(), zoom + 1);
+
+				//var distanceGrid = new L.DistanceGrid(maxClusterRadius);
+				for (i = this._markers.length - 1; i >= 0; i--) {
+					var m = this._markers[i];
+					if (sqDist(layerPos, map.project(m.getLatLng(), zoom + 1)) < (maxClusterRadius * maxClusterRadius)) {
+						result = m;
+						this._markers.splice(i, 1);
+						this._childCount--;
+						break;
+					}
 				}
 			}
-
 			//result = distanceGrid.getNearObject(map.project(layer.getLatLng(), zoom + 1));
 
 			if (result) {
@@ -698,6 +708,11 @@ L.MarkerCluster = L.Marker.extend({
 					maxZoom = map.getMaxZoom(),
 					newResult,
 					finalResult = (zoom === wantedZoom) ? result : true;
+
+				if (group.options.disableClusteringAtZoom) {
+					maxZoom = group.options.disableClusteringAtZoom - 2;
+				}
+
 				while (zoom < maxZoom) {
 					zoom++;
 
