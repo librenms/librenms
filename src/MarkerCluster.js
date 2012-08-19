@@ -111,6 +111,7 @@ L.MarkerCluster = L.Marker.extend({
 			map = group._map,
 			maxClusterRadius = group.options.maxClusterRadius,
 			result = false,
+			sqDist = this._group._sqDist,
 			i;
 
 		for (i = this._childClusters.length - 1; i >= 0; i--) {
@@ -132,8 +133,7 @@ L.MarkerCluster = L.Marker.extend({
 			if (zoom + 1 !== group.options.disableClusteringAtZoom) {
 
 				//Add to ourself instead
-				var layerPos = map.project(layer.getLatLng(), zoom + 1),
-				    sqDist = this._group._sqDist;
+				var layerPos = map.project(layer.getLatLng(), zoom + 1);
 
 				//var distanceGrid = new L.DistanceGrid(maxClusterRadius);
 				for (i = this._markers.length - 1; i >= 0; i--) {
