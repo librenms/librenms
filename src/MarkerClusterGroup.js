@@ -11,7 +11,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		spiderfyOnMaxZoom: true,
 		showCoverageOnHover: true,
-		zoomToBoundsOnClick: true
+		zoomToBoundsOnClick: true,
+
+		disableClusteringAtZoom: null
 	},
 
 	initialize: function (options) {
@@ -220,6 +222,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		var minZoom = this._map.getMinZoom(),
 			maxZoom = this._map.getMaxZoom(),
 			currentZoom = this._map.getZoom();
+
+		if (this.options.disableClusteringAtZoom) {
+			maxZoom = this.options.disableClusteringAtZoom - 1;
+		}
 
 		//console.time('cluster');
 		this._topClusterLevel = this._clusterToMarkerCluster(this._needsClustering, maxZoom);
