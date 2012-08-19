@@ -100,7 +100,13 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		if (!this._topClusterLevel) {
 			this._generateInitialClusters();
+		} else if (this._needsClustering.length > 0) {
+			for (var i = this._needsClustering.length - 1; i >= 0; i--) {
+				this.addLayer(this._needsClustering[i]);
+			}
+			this._needsClustering = [];
 		}
+
 
 		this._map.on('zoomend', this._zoomEnd, this);
 		this._map.on('moveend', this._moveEnd, this);
@@ -189,6 +195,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}, this);
 			map.on('zoomend', function () {
 				if (shownPolygon) {
+					map.removeLayer(shownPolygon);
+					shownPolygon = null;
+				}
+			}, this);
+			map.on('layerremove', function (opt) {
+				if (shownPolygon && opt.layer === this) {
 					map.removeLayer(shownPolygon);
 					shownPolygon = null;
 				}
