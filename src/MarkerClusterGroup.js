@@ -192,6 +192,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 					shownPolygon = null;
 				}
 			}, this);
+			map.on('layerremove', function (opt) {
+				if (shownPolygon && opt.layer === this) {
+					map.removeLayer(shownPolygon);
+					shownPolygon = null;
+				}
+			}, this);
 		}
 	},
 
