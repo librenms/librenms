@@ -327,7 +327,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		// any clusters that did not end up being a child of a new cluster, make them a child of a new cluster
 		unclustered.eachObject(function (cluster) {
-			if (cluster instanceof L.MarkerCluster) {
+			if (cluster instanceof L.MarkerCluster || (group.options.clusterSingleMarkers && cluster instanceof L.Marker)) {
 				newCluster = new L.MarkerCluster(group, cluster);
 				newCluster._haveGeneratedChildClusters = true;
 
