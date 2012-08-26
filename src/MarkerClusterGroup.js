@@ -31,6 +31,17 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	addLayer: function (layer) {
+
+		if (layer instanceof L.LayerGroup)
+		{
+			for (var i in layer._layers) {
+				if (layer._layers.hasOwnProperty(i)) {
+					this.addLayer(layer._layers[i]);
+				}
+			}
+			return this;
+		}
+
 		if (!this._map) {
 			this._needsClustering.push(layer);
 			return this;
