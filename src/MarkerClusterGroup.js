@@ -222,7 +222,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	_zoomEnd: function () {
-
+		if (!this._map) { //May have been removed from the map by a zoomEnd handler
+			return;
+		}
 		this._mergeSplitClusters();
 
 		this._zoom = this._map._zoom;
