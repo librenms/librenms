@@ -46,7 +46,7 @@ var markers = new L.MarkerClusterGroup({ options: {
 Check out the [custom example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for an example of this.
 
 ### Other Options
-disableClusteringAtZoom: If set, at this zoom level and below markers will not be clustered. This defaults to disabled
+disableClusteringAtZoom: If set, at this zoom level and below markers will not be clustered. This defaults to disabled. [See Example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld-maxzoom.388.html)
 
 
 ### Events
