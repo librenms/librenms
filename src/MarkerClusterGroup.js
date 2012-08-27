@@ -127,6 +127,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._map.off('zoomend', this._zoomEnd, this);
 		this._map.off('moveend', this._moveEnd, this);
 
+		//In case we are in a cluster animation
+		this._map._mapPane.className = this._map._mapPane.className.replace(' leaflet-cluster-anim', '');
+
 		if (this._spiderfierOnRemove) { //TODO FIXME: Not sure how to have spiderfier add something on here nicely
 			this._spiderfierOnRemove();
 		}
@@ -420,7 +423,9 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		this._inZoomAnimation++;
 	},
 	_animationEnd: function () {
-		this._map._mapPane.className = this._map._mapPane.className.replace(' leaflet-cluster-anim', '');
+		if (this._map) {
+			this._map._mapPane.className = this._map._mapPane.className.replace(' leaflet-cluster-anim', '');
+		}
 		this._inZoomAnimation--;
 	},
 	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
