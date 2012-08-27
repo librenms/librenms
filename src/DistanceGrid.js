@@ -74,7 +74,9 @@ L.DistanceGrid.prototype = {
 	getNearObject: function (point) {
 		var x = this._getCoord(point.x),
 		    y = this._getCoord(point.y),
-		    i, j, k, row, cell, len, obj;
+		    i, j, k, row, cell, len, obj, dist,
+		    closestDistSq = this._sqCellSize,
+			closest = null;
 
 		for (i = y - 1; i <= y + 1; i++) {
 			row = this._grid[i];
@@ -86,16 +88,17 @@ L.DistanceGrid.prototype = {
 
 						for (k = 0, len = cell.length; k < len; k++) {
 							obj = cell[k];
-							if (this._sqDist(obj._dGridPoint, point) < this._sqCellSize) {
-								return obj;
+							dist = this._sqDist(obj._dGridPoint, point);
+							if (dist < closestDistSq) {
+								closestDistSq = dist;
+								closest = obj;
 							}
 						}
 					}
 				}
 			}
 		}
-
-		return null;
+		return closest;
 	},
 
 	_getCoord: function (x) {
