@@ -131,7 +131,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Overrides FeatureGroup.onRemove
 	onRemove: function (map) {
-		console.log('MCG.onRemove');
 		this._map.off('zoomend', this._zoomEnd, this);
 		this._map.off('moveend', this._moveEnd, this);
 
