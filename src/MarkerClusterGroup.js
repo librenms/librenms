@@ -146,7 +146,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	//Default functionality
-	_defaultIconCreateFunction: function (childCount) {
+	_defaultIconCreateFunction: function (cluster) {
+		var childCount = cluster.getChildCount();
+
 		var c = ' marker-cluster-';
 		if (childCount < 10) {
 			c += 'small';

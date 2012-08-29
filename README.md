@@ -35,11 +35,12 @@ var markers = new L.MarkerClusterGroup({ spiderfyOnMaxZoom: false, showCoverageO
 As an option to MarkerClusterGroup you can provide your own function for creating the Icon for the clustered markers.
 The default implementation changes color at bounds of 10 and 100, but more advanced uses may require customising this.
 You do not need to include the .Default css if you go this way.
+You are passed a MarkerCluster object, you'll probably want to use getChildCount() or getAllChildMarkers() to work out the icon to show
 
 ```javascript
 var markers = new L.MarkerClusterGroup({ options: {
-	iconCreateFunction: function(childCount) {
-		return new L.DivIcon({ html: '<b>' + childCount + '</b>' });
+	iconCreateFunction: function(cluster) {
+		return new L.DivIcon({ html: '<b>' + cluster.getChildCount() + '</b>' });
 	}
 }});
 ```

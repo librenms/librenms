@@ -40,8 +40,8 @@
 		//Custom radius and icon create function
 		var markers = new L.MarkerClusterGroup({
 			maxClusterRadius: 120,
-			iconCreateFunction: function (count) {
-				return new L.DivIcon({ html: count, className: 'mycluster', iconSize: new L.Point(40, 40) });
+			iconCreateFunction: function (cluster) {
+				return new L.DivIcon({ html: cluster.getChildCount(), className: 'mycluster', iconSize: new L.Point(40, 40) });
 			},
 			//Disable all of the defaults:
 			spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false
