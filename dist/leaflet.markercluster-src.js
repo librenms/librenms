@@ -153,7 +153,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	//Default functionality
-	_defaultIconCreateFunction: function (childCount) {
+	_defaultIconCreateFunction: function (cluster) {
+		var childCount = cluster.getChildCount();
+
 		var c = ' marker-cluster-';
 		if (childCount < 10) {
 			c += 'small';
@@ -619,7 +621,7 @@ L.MarkerCluster = L.Marker.extend({
 
 	_baseInit: function () {
 		this._latlng = this._wLatLng;
-		L.Marker.prototype.initialize.call(this, this._latlng, { icon: this._group.options.iconCreateFunction(this._childCount) });
+		L.Marker.prototype.initialize.call(this, this._latlng, { icon: this._group.options.iconCreateFunction(this) });
 	},
 
 	_addChild: function (new1) {
@@ -633,7 +635,7 @@ L.MarkerCluster = L.Marker.extend({
 		}
 
 		if (this._icon) {
-			this.setIcon(this._group.options.iconCreateFunction(this._childCount));
+			this.setIcon(this._group.options.iconCreateFunction(this));
 		}
 
 	},
@@ -771,7 +773,7 @@ L.MarkerCluster = L.Marker.extend({
 
 		if (result) {
 			if (!('_zoom' in this)) {
-				this.setIcon(this._group.options.iconCreateFunction(this._childCount));
+				this.setIcon(this._group.options.iconCreateFunction(this));
 			}
 			this._recalculateBounds();
 		}
@@ -816,7 +818,7 @@ L.MarkerCluster = L.Marker.extend({
 				this._recalculateBounds();
 
 				if (!('_zoom' in this)) {
-					this.setIcon(group.options.iconCreateFunction(this._childCount));
+					this.setIcon(group.options.iconCreateFunction(this));
 				}
 				return true;
 			}
@@ -829,7 +831,7 @@ L.MarkerCluster = L.Marker.extend({
 			if (child._bounds.contains(layer._latlng) && child._recursivelyRemoveLayer(layer)) {
 				this._childCount--;
 				if (!('_zoom' in this)) {
-					this.setIcon(group.options.iconCreateFunction(this._childCount));
+					this.setIcon(group.options.iconCreateFunction(this));
 				}
 
 				//if our child cluster is no longer a cluster, remove it and replace with just the marker
@@ -849,7 +851,7 @@ L.MarkerCluster = L.Marker.extend({
 				this._recalculateBounds();
 
 				if (this._icon && this._childCount > 1) { //No need to update if we are getting removed anyway
-					this.setIcon(group.options.iconCreateFunction(this._childCount));
+					this.setIcon(group.options.iconCreateFunction(this));
 				}
 				return true;
 			}
