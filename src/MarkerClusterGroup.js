@@ -1,3 +1,4 @@
+
 /*
  * L.MarkerClusterGroup extends L.FeatureGroup by clustering the markers contained within
  */
@@ -7,7 +8,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	options: {
 		maxClusterRadius: 80, //A cluster will cover at most this many pixels from its center
 		iconCreateFunction: null,
-		clusterSingleMarkers: false,
 
 		spiderfyOnMaxZoom: true,
 		showCoverageOnHover: true,
@@ -327,7 +327,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		// any clusters that did not end up being a child of a new cluster, make them a child of a new cluster
 		unclustered.eachObject(function (cluster) {
-			if (cluster instanceof L.MarkerCluster || (group.options.clusterSingleMarkers && cluster instanceof L.Marker)) {
+			if (cluster instanceof L.MarkerCluster) {
 				newCluster = new L.MarkerCluster(group, cluster);
 				newCluster._haveGeneratedChildClusters = true;
 
