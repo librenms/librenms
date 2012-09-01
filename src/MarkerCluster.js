@@ -52,6 +52,10 @@ L.MarkerCluster = L.Marker.extend({
 			this._childClusters.push(new1);
 			this._childCount += new1._childCount;
 		} else {
+			if (this._group.options.singleMarkerMode === true) {
+				new1.options.icon = this._group.options.iconCreateFunction(1);
+			}
+
 			this._markers.push(new1);
 			this._childCount++;
 		}
