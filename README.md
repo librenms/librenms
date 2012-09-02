@@ -48,7 +48,7 @@ Check out the [custom example](http://danzel.github.com/Leaflet.markercluster/ex
 
 ### Other Options
 disableClusteringAtZoom: If set, at this zoom level and below markers will not be clustered. This defaults to disabled. [See Example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld-maxzoom.388.html)
-
+singleMarkerMode: If set to true, overrides the icon for all added markers to make them appear as a 1 size cluster
 
 ### Events
 If you register for click, mouseover, etc events just related to Markers in the cluster.
