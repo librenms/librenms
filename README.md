@@ -47,9 +47,9 @@ var markers = new L.MarkerClusterGroup({ options: {
 Check out the [custom example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for an example of this.
 
 ### Other Options
-disableClusteringAtZoom: If set, at this zoom level and below markers will not be clustered. This defaults to disabled. [See Example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld-maxzoom.388.html)
-singleMarkerMode: If set to true, overrides the icon for all added markers to make them appear as a 1 size cluster
-skipDuplicateAddTesting: By default we check if a marker already exists in the cluster when addLayer is called. To disable this behaviour set this to true. You must only do this if you know you will not try add markers that are already in the cluster. Provides a slight performance boost to addLayer when called after the MarkerClusterGroup is on the map.
+*disableClusteringAtZoom*: If set, at this zoom level and below markers will not be clustered. This defaults to disabled. [See Example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld-maxzoom.388.html)
+*singleMarkerMode*: If set to true, overrides the icon for all added markers to make them appear as a 1 size cluster
+*skipDuplicateAddTesting*: By default we check if a marker already exists in the cluster when addLayer is called. To disable this behaviour set this to true. You must only do this if you know you will not try add markers that are already in the cluster. Provides a slight performance boost to addLayer when called after the MarkerClusterGroup is on the map.
 
 ### Events
 If you register for click, mouseover, etc events just related to Markers in the cluster.
