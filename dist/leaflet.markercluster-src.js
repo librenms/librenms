@@ -19,6 +19,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		spiderfyOnMaxZoom: true,
 		showCoverageOnHover: true,
 		zoomToBoundsOnClick: true,
+		singleMarkerMode: false,
 
 		disableClusteringAtZoom: null
 	},
@@ -47,6 +48,17 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				}
 			}
 			return this;
+		}
+
+		if (this.options.singleMarkerMode) {
+			layer.options.icon = this.options.iconCreateFunction({
+				getChildCount: function () {
+					return 1;
+				},
+				getAllChildMarkers: function () {
+					return [layer];
+				}
+			});
 		}
 
 		if (!this._map) {
