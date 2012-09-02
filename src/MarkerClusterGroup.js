@@ -43,6 +43,17 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			return this;
 		}
 
+		if (this.options.singleMarkerMode) {
+			layer.options.icon = this.options.iconCreateFunction({
+				getChildCount: function () {
+					return 1;
+				},
+				getAllChildMarkers: function () {
+					return [layer];
+				}
+			});
+		}
+
 		if (!this._map) {
 			this._needsClustering.push(layer);
 			return this;
