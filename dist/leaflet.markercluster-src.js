@@ -21,7 +21,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		zoomToBoundsOnClick: true,
 		singleMarkerMode: false,
 
-		disableClusteringAtZoom: null
+		disableClusteringAtZoom: null,
+
+		skipDuplicateAddTesting: false
 	},
 
 	initialize: function (options) {
@@ -40,8 +42,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	addLayer: function (layer) {
 
-		if (layer instanceof L.LayerGroup)
-		{
+		if (layer instanceof L.LayerGroup) {
 			for (var i in layer._layers) {
 				if (layer._layers.hasOwnProperty(i)) {
 					this.addLayer(layer._layers[i]);
@@ -63,6 +64,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		if (!this._map) {
 			this._needsClustering.push(layer);
+			return this;
+		}
+
+		if (!this.options.skipDuplicateAddTesting && this.hasLayer(layer)) {
 			return this;
 		}
 
@@ -115,6 +120,20 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._generateInitialClusters();
 
 		return this;
+	},
+
+	hasLayer: function (layer) {
+		var res = false;
+
+		this._topClusterLevel._recursively(new L.LatLngBounds([layer.getLatLng()]), 0, this._map.getMaxZoom() + 1,
+			function (cluster) {
+				for (var i = cluster._markers.length - 1; i >= 0 && !res; i--) {
+					if (cluster._markers[i] === layer) {
+						res = true;
+					}
+				}
+			}, null);
+		return res;
 	},
 
 	//Overrides FeatureGroup.onAdd
