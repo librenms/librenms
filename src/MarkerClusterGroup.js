@@ -110,6 +110,20 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return this;
 	},
 
+	hasLayer: function (layer) {
+		var res = false;
+
+		this._topClusterLevel._recursively(new L.LatLngBounds([layer.getLatLng()]), 0, this._map.getMaxZoom() + 1,
+			function (cluster) {
+				for (var i = cluster._markers.length - 1; i >= 0 && !res; i--) {
+					if (cluster._markers[i] === layer) {
+						res = true;
+					}
+				}
+			}, null);
+		return res;
+	},
+
 	//Overrides FeatureGroup.onAdd
 	onAdd: function (map) {
 		L.FeatureGroup.prototype.onAdd.call(this, map);
