@@ -14,7 +14,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		zoomToBoundsOnClick: true,
 		singleMarkerMode: false,
 
-		disableClusteringAtZoom: null
+		disableClusteringAtZoom: null,
+
+		skipDuplicateAddTesting: false
 	},
 
 	initialize: function (options) {
@@ -33,8 +35,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	addLayer: function (layer) {
 
-		if (layer instanceof L.LayerGroup)
-		{
+		if (layer instanceof L.LayerGroup) {
 			for (var i in layer._layers) {
 				if (layer._layers.hasOwnProperty(i)) {
 					this.addLayer(layer._layers[i]);
@@ -56,6 +57,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		if (!this._map) {
 			this._needsClustering.push(layer);
+			return this;
+		}
+
+		if (!this.options.skipDuplicateAddTesting && this.hasLayer(layer)) {
 			return this;
 		}
 
