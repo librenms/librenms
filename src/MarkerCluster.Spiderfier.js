@@ -321,6 +321,8 @@ L.MarkerClusterGroup.include({
 		this._map.off('click', this._unspiderfyWrapper, this);
 		this._map.off('zoomstart', this._unspiderfyZoomStart, this);
 		this._map.off('zoomanim', this._unspiderfyZoomAnim, this);
+
+		this._unspiderfy(); //Ensure that markers are back where they should be
 	},
 
 
