@@ -29,7 +29,7 @@
 
 		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
 
-		var markers = new L.MarkerClusterGroup();
+		var markers = new L.MarkerClusterGroup({ animateAddingMarkers : true });
 		var markersList = [];
 
 		function populate() {
@@ -55,6 +55,9 @@
 		populate();
 		map.addLayer(markers);
 
+		for (var i = 0; i < 100; i++) {
+			markers.addLayer(markersList[i]);
+		}
 
 		//Ugly add/remove code
 		L.DomUtil.get('populate').onclick = function () {
