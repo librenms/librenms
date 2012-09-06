@@ -16,7 +16,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		disableClusteringAtZoom: null,
 
-		skipDuplicateAddTesting: false
+		skipDuplicateAddTesting: false,
+
+		//Whether to animate adding markers after adding the MarkerClusterGroup to the map
+		// If you are adding individual markers set to true, if adding bulk markers leave false for massive performance gains.
+		animateAddingMarkers: false
 	},
 
 	initialize: function (options) {
@@ -72,8 +76,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		var newCluster = this._topClusterLevel._recursivelyAddLayer(layer, this._topClusterLevel._zoom - 1);
 
-		this._animationAddLayer(layer, newCluster);
-
+		if (this.options.animateAddingMarkers) {
+			this._animationAddLayer(layer, newCluster);
+		} else {
+			this._animationAddLayerNonAnimated(layer, newCluster);
+		}
 		return this;
 	},
 
@@ -425,6 +432,16 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			ne = map.unproject(new L.Point(bounds.max.x + width, bounds.max.y + height));
 
 		return new L.LatLngBounds(sw, ne);
+	},
+
+	//Shared animation code
+	_animationAddLayerNonAnimated: function (layer, newCluster) {
+		if (newCluster === true) {
+			L.FeatureGroup.prototype.addLayer.call(this, layer);
+		} else if (newCluster._childCount === 2) {
+			newCluster._addToMap();
+			newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, this._map.getMaxZoom()); //getMaxZoom will always get all children
+		}
 	}
 });
 
@@ -443,12 +460,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel - this._topClusterLevel._zoom + 1, this._getExpandedVisibleBounds());
 	},
 	_animationAddLayer: function (layer, newCluster) {
-		if (newCluster === true) {
-			L.FeatureGroup.prototype.addLayer.call(this, layer);
-		} else if (newCluster._childCount === 2) {
-			newCluster._addToMap();
-			newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, this._map.getMaxZoom()); //getMaxZoom will always get all children
-		}
+		this._animationAddLayerNonAnimated(layer, newCluster);
 	}
 } : {
 
