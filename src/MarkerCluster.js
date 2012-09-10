@@ -1,6 +1,11 @@
 L.MarkerCluster = L.Marker.extend({
-	initialize: function (group, a, b) {
+	initialize: function (group, zoom, a, b) {
+
+		L.Marker.prototype.initialize.call(this, a ? (a._cLatLng || a.getLatLng()) : new L.LatLng(0, 0), { icon: this });
+
+
 		this._group = group;
+		this._zoom = zoom;
 
 		this._markers = [];
 		this._childClusters = [];
@@ -41,29 +46,75 @@ L.MarkerCluster = L.Marker.extend({
 		this._group._map.fitBounds(this._bounds);
 	},
 
-	_baseInit: function () {
-		this._latlng = this._wLatLng;
-		L.Marker.prototype.initialize.call(this, this._latlng, { icon: this._group.options.iconCreateFunction(this) });
+	//Cludge for Icon
+	createIcon: function () {
+		if (!this._latlng) {
+			this._latlng = this._wLatLng;
+		}
+		return this._group.options.iconCreateFunction(this).createIcon();
+	},
+	createShadow: function () {
+		return this._group.options.iconCreateFunction(this).createShadow(); //FIXME: Should be saving this
 	},
 
-	_addChild: function (new1) {
+	_addChild: function (new1, isNotificationFromChild) {
 		this._expandBounds(new1);
 		if (new1 instanceof L.MarkerCluster) {
-			this._childClusters.push(new1);
+			if (!isNotificationFromChild) {
+				this._childClusters.push(new1);
+				new1._parent = this;
+			}
 			this._childCount += new1._childCount;
 		} else {
-			this._markers.push(new1);
+			if (!isNotificationFromChild) {
+				this._markers.push(new1);
+			}
 			this._childCount++;
 		}
+
+		if (this._childCount > 10)
+			//debugger;
 
 		if (this._icon) {
 			this.setIcon(this._group.options.iconCreateFunction(this));
 		}
 
+		if (this._parent) {
+			this._parent._addChild(new1, true);
+		}
 	},
 
-	_expandBounds: function (marker) {
+	_removeChildMarker: function (marker) {
+		var markers = this._markers,
+		    group = this._group, i;
 
+		for (i = markers.length - 1; i >= 0; i--) {
+			if (markers[i] === marker) {
+				if (markers[i]._icon) {
+					L.FeatureGroup.prototype.removeLayer.call(group, markers[i]);
+				}
+
+				markers.splice(i, 1);
+				
+				var p = this;
+				while (p) {
+					p._childCount--;
+					p._recalculateBounds();
+					p = p._parent;
+				}
+
+				//TODO?
+				//if (!('_zoom' in this)) {
+				//	this.setIcon(group.options.iconCreateFunction(this));
+				//}
+				return true;
+			}
+		}
+
+	},
+
+		//Expand our bounds and tell our parent to
+	_expandBounds: function (marker) {
 		var addedCount,
 		    addedLatLng = marker._wLatLng || marker._latlng;
 
@@ -311,16 +362,16 @@ L.MarkerCluster = L.Marker.extend({
 		);
 	},
 
-	_recursivelyAnimateChildrenInAndAddSelfToMap: function (bounds, depthToStartAt, depthToAnimateIn) {
-		this._recursively(bounds, depthToStartAt, 0,
+	_recursivelyAnimateChildrenInAndAddSelfToMap: function (bounds, previousZoomLevel, newZoomLevel) {
+		this._recursively(bounds, newZoomLevel, 0,
 			function (c) {
-				c._recursivelyAnimateChildrenIn(bounds, c._group._map.latLngToLayerPoint(c.getLatLng()).round(), depthToAnimateIn);
+				c._recursivelyAnimateChildrenIn(bounds, c._group._map.latLngToLayerPoint(c.getLatLng()).round(), previousZoomLevel);
 
 				//TODO: depthToAnimateIn affects _isSingleParent, if there is a multizoom we may/may not be.
 				//As a hack we only do a animation free zoom on a single level zoom, if someone does multiple levels then we always animate
-				if (c._isSingleParent() && depthToAnimateIn === 1) {
+				if (c._isSingleParent() && previousZoomLevel - 1 === newZoomLevel) {
 					c.setOpacity(1);
-					c._recursivelyRemoveChildrenFromMap(bounds, depthToAnimateIn - 1); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
+					c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
 				} else {
 					c.setOpacity(0);
 				}
@@ -330,16 +381,16 @@ L.MarkerCluster = L.Marker.extend({
 		);
 	},
 
-	_recursivelyBecomeVisible: function (bounds, depth) {
-		this._recursively(bounds, 0, depth, null, function (c) {
+	_recursivelyBecomeVisible: function (bounds, zoomLevel) {
+		this._recursively(bounds, 0, zoomLevel, null, function (c) {
 			c.setOpacity(1);
 		});
 	},
 
-	_recursivelyAddChildrenToMap: function (startPos, depth, bounds) {
-		this._recursively(bounds, 0, depth,
-			function (c, recursionDepth) {
-				if (recursionDepth === 0) {
+	_recursivelyAddChildrenToMap: function (startPos, zoomLevel, bounds) {
+		this._recursively(bounds, 0, zoomLevel,
+			function (c) {
+				if (zoomLevel === c._zoom) {
 					return;
 				}
 
@@ -363,12 +414,11 @@ L.MarkerCluster = L.Marker.extend({
 			},
 			function (c) {
 				c._addToMap(startPos);
-
 			}
 		);
 	},
 
-	_recursivelyRestoreChildPositions: function (depth) {
+	_recursivelyRestoreChildPositions: function (zoomLevel) {
 		//Fix positions of child markers
 		for (var i = this._markers.length - 1; i >= 0; i--) {
 			var nm = this._markers[i];
@@ -378,14 +428,14 @@ L.MarkerCluster = L.Marker.extend({
 			}
 		}
 
-		if (depth === 1) {
+		if (zoomLevel - 1 == this._zoom) {
 			//Reposition child clusters
 			for (var j = this._childClusters.length - 1; j >= 0; j--) {
 				this._childClusters[j]._restorePosition();
 			}
 		} else {
 			for (var k = this._childClusters.length - 1; k >= 0; k--) {
-				this._childClusters[k]._recursivelyRestoreChildPositions(depth - 1);
+				this._childClusters[k]._recursivelyRestoreChildPositions(zoomLevel);
 			}
 		}
 	},
@@ -398,9 +448,9 @@ L.MarkerCluster = L.Marker.extend({
 	},
 
 	//exceptBounds: If set, don't remove any markers/clusters in it
-	_recursivelyRemoveChildrenFromMap: function (previousBounds, depth, exceptBounds) {
+	_recursivelyRemoveChildrenFromMap: function (previousBounds, zoomLevel, exceptBounds) {
 		var m, i;
-		this._recursively(previousBounds, 0, depth,
+		this._recursively(previousBounds, -1, zoomLevel - 1,
 			function (c) {
 				//Remove markers at every level
 				for (i = c._markers.length - 1; i >= 0; i--) {
@@ -426,36 +476,37 @@ L.MarkerCluster = L.Marker.extend({
 
 	//Run the given functions recursively to this and child clusters
 	// boundsToApplyTo: a L.LatLngBounds representing the bounds of what clusters to recurse in to
-	// depthToStartAt: the depth to start calling the given functions
-	// timesToRecurse: how many layers deep to recurse in to after hitting depthToStartAt, bottom level: depthToRunFor == 0
+	// zoomLevelToStart: zoom level to start running functions (inclusive)
+	// zoomLevelToStop: zoom level to stop running functions (inclusive)
 	// runAtEveryLevel: function that takes an L.MarkerCluster as an argument that should be applied on every level
 	// runAtBottomLevel: function that takes an L.MarkerCluster as an argument that should be applied at only the bottom level
-	_recursively: function (boundsToApplyTo, depthToStartAt, timesToRecurse, runAtEveryLevel, runAtBottomLevel) {
+	_recursively: function (boundsToApplyTo, zoomLevelToStart, zoomLevelToStop, runAtEveryLevel, runAtBottomLevel) {
 		var childClusters = this._childClusters,
+		    zoom = this._zoom,
 			i, c;
 
-		if (depthToStartAt > 0) { //Still going down to required depth, just recurse to child clusters
+		if (zoomLevelToStart > zoom) { //Still going down to required depth, just recurse to child clusters
 			for (i = childClusters.length - 1; i >= 0; i--) {
 				c = childClusters[i];
 				if (boundsToApplyTo.intersects(c._bounds)) {
-					c._recursively(boundsToApplyTo, depthToStartAt - 1, timesToRecurse, runAtEveryLevel, runAtBottomLevel);
+					c._recursively(boundsToApplyTo, zoomLevelToStart, zoomLevelToStop, runAtEveryLevel, runAtBottomLevel);
 				}
 			}
 		} else { //In required depth
 
 			if (runAtEveryLevel) {
-				runAtEveryLevel(this, timesToRecurse);
+				runAtEveryLevel(this);
 			}
-			if (timesToRecurse === 0 && runAtBottomLevel) {
+			if (runAtBottomLevel && this._zoom == zoomLevelToStop) {
 				runAtBottomLevel(this);
 			}
 
 			//TODO: This loop is almost the same as above
-			if (timesToRecurse > 0) {
+			if (zoomLevelToStop > zoom) {
 				for (i = childClusters.length - 1; i >= 0; i--) {
 					c = childClusters[i];
 					if (boundsToApplyTo.intersects(c._bounds)) {
-						c._recursively(boundsToApplyTo, depthToStartAt, timesToRecurse - 1, runAtEveryLevel, runAtBottomLevel);
+						c._recursively(boundsToApplyTo, zoomLevelToStart, zoomLevelToStop, runAtEveryLevel, runAtBottomLevel);
 					}
 				}
 			}

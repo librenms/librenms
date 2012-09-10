@@ -3,6 +3,7 @@ L.DistanceGrid = function (cellSize) {
 	this._cellSize = cellSize;
 	this._sqCellSize = cellSize * cellSize;
 	this._grid = {};
+	this._objectPoint = { };
 };
 
 L.DistanceGrid.prototype = {
@@ -12,10 +13,10 @@ L.DistanceGrid.prototype = {
 		    y = this._getCoord(point.y),
 		    grid = this._grid,
 		    row = grid[y] = grid[y] || {},
-		    cell = row[x] = row[x] || [];
+		    cell = row[x] = row[x] || [],
+		    stamp = L.Util.stamp(obj);
 
-		obj._dGridCell = cell;
-		obj._dGridPoint = point;
+		this._objectPoint[stamp] = point;
 
 		cell.push(obj);
 	},
@@ -25,25 +26,30 @@ L.DistanceGrid.prototype = {
 		this.addObject(obj, point);
 	},
 
-	removeObject: function (obj) {
-		var oldCell = obj._dGridCell,
-		    point = obj._dGridPoint,
-		    i, len, x, y;
+	//Returns true if the object was found
+	removeObject: function (obj, point) {
+		var x = this._getCoord(point.x),
+		    y = this._getCoord(point.y),
+		    grid = this._grid,
+		    row = grid[y] = grid[y] || {},
+		    cell = row[x] = row[x] || [],
+		    i, len;
 
-		for (i = 0, len = oldCell.length; i < len; i++) {
-			if (oldCell[i] === obj) {
+		delete this._objectPoint[L.Util.stamp(obj)];
 
-				oldCell.splice(i, 1);
+		for (i = 0, len = cell.length; i < len; i++) {
+			if (cell[i] === obj) {
+
+				cell.splice(i, 1);
 
 				if (len === 1) {
-					x = this._getCoord(point.x);
-					y = this._getCoord(point.y);
-					delete this._grid[y][x];
+					delete row[x];
 				}
 
-				break;
+				return true;
 			}
 		}
+
 	},
 
 	eachObject: function (fn, context) {
@@ -75,8 +81,9 @@ L.DistanceGrid.prototype = {
 		var x = this._getCoord(point.x),
 		    y = this._getCoord(point.y),
 		    i, j, k, row, cell, len, obj, dist,
+		    objectPoint = this._objectPoint,
 		    closestDistSq = this._sqCellSize,
-			closest = null;
+		    closest = null;
 
 		for (i = y - 1; i <= y + 1; i++) {
 			row = this._grid[i];
@@ -88,7 +95,7 @@ L.DistanceGrid.prototype = {
 
 						for (k = 0, len = cell.length; k < len; k++) {
 							obj = cell[k];
-							dist = this._sqDist(obj._dGridPoint, point);
+							dist = this._sqDist(objectPoint[L.Util.stamp(obj)], point);
 							if (dist < closestDistSq) {
 								closestDistSq = dist;
 								closest = obj;
