@@ -65,7 +65,7 @@ L.MarkerCluster = L.Marker.extend({
 	_expandBounds: function (marker) {
 
 		var addedCount,
-		    addedLatLng = marker._latlng;
+		    addedLatLng = marker._wLatLng || marker._latlng;
 
 		if (marker instanceof L.MarkerCluster) {
 			this._bounds.extend(marker._bounds);
@@ -77,7 +77,7 @@ L.MarkerCluster = L.Marker.extend({
 
 		if (!this._latlng) {
 			// when clustering, take position of the first point as the cluster center
-			this._latlng = this._cLatLng = addedLatLng;
+			this._latlng = this._cLatLng = marker._cLatLng || addedLatLng;
 		}
 
 		// when showing clusters, take weighted average of all points as cluster center
