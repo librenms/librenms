@@ -76,14 +76,23 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this._unspiderfy();
 		}
 
-		var newCluster = this._addLayer(layer, this._maxZoom);
+		this._addLayer(layer, this._maxZoom);
+
+		//Work out what is visible
+		var visibleLayer = layer,
+			currentZoom = this._map.getZoom();
+		if (layer.__cluster) {
+			while ((visibleLayer.__cluster || visibleLayer._parent)._zoom >= currentZoom) {
+				visibleLayer = (visibleLayer.__cluster || visibleLayer._parent); //TODO Make __cluster the same name as _parent to make this simpler
+			}
+		}
 
 		//TODO: Find the highest visible blah
 
 		if (this.options.animateAddingMarkers) {
-			this._animationAddLayer(layer, newCluster);
+			this._animationAddLayer(layer, visibleLayer);
 		} else {
-			this._animationAddLayerNonAnimated(layer, newCluster);
+			this._animationAddLayerNonAnimated(layer, visibleLayer);
 		}
 		return this;
 	},
@@ -332,7 +341,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			if (closest) {
 				closest._addChild(layer);
 				layer.__cluster = closest;
-				return closest;
+				return;
 			}
 
 			//Try find a marker close by to form a new cluster with
@@ -366,14 +375,14 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 					}
 				}
 
-				return newCluster;
+				return;
 			}
 			
 			//Didn't manage to cluster in at this zoom, record us as a marker here and continue upwards
 			gridUnclustered[zoom].addObject(layer, markerPoint);
 		}
 
-		return layer;
+		return;
 	},
 
 	//Merge and split any existing clusters that are too big or small
@@ -506,12 +515,16 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Shared animation code
 	_animationAddLayerNonAnimated: function (layer, newCluster) {
-		if (newCluster === true) {
+		if (newCluster === layer) {
 			L.FeatureGroup.prototype.addLayer.call(this, layer);
 		} else if (newCluster._childCount === 2) {
 			newCluster._addToMap();
-			newCluster._recursivelyRemoveChildrenFromMap(newCluster._bounds, this._map.getMaxZoom()); //getMaxZoom will always get all children
+
+			var markers = newCluster.getAllChildMarkers();
+			L.FeatureGroup.prototype.removeLayer.call(this, markers[0]);
+			L.FeatureGroup.prototype.removeLayer.call(this, markers[1]);
 		}
+		//TODO else update icon?
 	}
 });
 

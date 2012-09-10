@@ -87,10 +87,6 @@ L.MarkerCluster = L.Marker.extend({
 
 		for (i = markers.length - 1; i >= 0; i--) {
 			if (markers[i] === marker) {
-				if (markers[i]._icon) {
-					L.FeatureGroup.prototype.removeLayer.call(group, markers[i]);
-				}
-
 				markers.splice(i, 1);
 				
 				var p = this;
