@@ -103,12 +103,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this._unspiderfyLayer(layer);
 		}
 
-		if (!this._topClusterLevel._recursivelyRemoveLayer(layer)) {
-			//If this happens you are doing something bad
-			//If you've moved a marker that is in the cluster then that would be why
-			//console.log('failed to remove');
-			var a = 0;
-		}
+		layer.__cluster._removeChildMarker(layer);
 
 		return this;
 	},

@@ -91,7 +91,7 @@ L.MarkerCluster = L.Marker.extend({
 
 	_removeChildMarker: function (marker) {
 		var markers = this._markers,
-		    group = this._group, i;
+			i;
 
 		for (i = markers.length - 1; i >= 0; i--) {
 			if (markers[i] === marker) {
@@ -101,6 +101,7 @@ L.MarkerCluster = L.Marker.extend({
 				while (p) {
 					p._childCount--;
 					p._recalculateBounds();
+					p._updateIcon();
 					p = p._parent;
 				}
 				return true;
