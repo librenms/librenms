@@ -48,9 +48,6 @@ L.MarkerCluster = L.Marker.extend({
 
 	//Cludge for Icon
 	createIcon: function () {
-		if (!this._latlng) {
-			this._latlng = this._wLatLng;
-		}
 		return this._group.options.iconCreateFunction(this).createIcon();
 	},
 	createShadow: function () {
@@ -126,9 +123,9 @@ L.MarkerCluster = L.Marker.extend({
 			addedCount = 1;
 		}
 
-		if (!this._latlng) {
+		if (!this._cLatLng) {
 			// when clustering, take position of the first point as the cluster center
-			this._latlng = this._cLatLng = marker._cLatLng || addedLatLng;
+			this._cLatLng = marker._cLatLng || addedLatLng;
 		}
 
 		// when showing clusters, take weighted average of all points as cluster center
@@ -136,7 +133,7 @@ L.MarkerCluster = L.Marker.extend({
 
 		//Calculate weighted latlng for display
 		if (!this._wLatLng) {
-			this._wLatLng = new L.LatLng(addedLatLng.lat, addedLatLng.lng);
+			this._latlng = this._wLatLng = new L.LatLng(addedLatLng.lat, addedLatLng.lng);
 		} else {
 			this._wLatLng.lat = (addedLatLng.lat * addedCount + this._wLatLng.lat * this._childCount) / totalCount;
 			this._wLatLng.lng = (addedLatLng.lng * addedCount + this._wLatLng.lng * this._childCount) / totalCount;
