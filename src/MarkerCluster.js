@@ -10,6 +10,7 @@ L.MarkerCluster = L.Marker.extend({
 		this._markers = [];
 		this._childClusters = [];
 		this._childCount = 0;
+		this._iconNeedsUpdate = true;
 
 		this._bounds = new L.LatLngBounds();
 
@@ -46,16 +47,30 @@ L.MarkerCluster = L.Marker.extend({
 		this._group._map.fitBounds(this._bounds);
 	},
 
+	_updateIcon: function () {
+		this._iconNeedsUpdate = true;
+		if (this._icon) {
+			this.setIcon(this);
+		}
+	},
+
 	//Cludge for Icon
 	createIcon: function () {
-		return this._group.options.iconCreateFunction(this).createIcon();
+		if (this._iconNeedsUpdate) {
+			this._iconObj = this._group.options.iconCreateFunction(this);
+			this._iconNeedsUpdate = false;
+		}
+		return this._iconObj.createIcon();
 	},
 	createShadow: function () {
-		return this._group.options.iconCreateFunction(this).createShadow(); //FIXME: Should be saving this
+		return this._iconObj.createShadow();
 	},
 
 	_addChild: function (new1, isNotificationFromChild) {
+
+		this._iconNeedsUpdate = true;
 		this._expandBounds(new1);
+
 		if (new1 instanceof L.MarkerCluster) {
 			if (!isNotificationFromChild) {
 				this._childClusters.push(new1);
@@ -67,13 +82,6 @@ L.MarkerCluster = L.Marker.extend({
 				this._markers.push(new1);
 			}
 			this._childCount++;
-		}
-
-		if (this._childCount > 10)
-			//debugger;
-
-		if (this._icon) {
-			this.setIcon(this._group.options.iconCreateFunction(this));
 		}
 
 		if (this._parent) {
@@ -95,11 +103,6 @@ L.MarkerCluster = L.Marker.extend({
 					p._recalculateBounds();
 					p = p._parent;
 				}
-
-				//TODO?
-				//if (!('_zoom' in this)) {
-				//	this.setIcon(group.options.iconCreateFunction(this));
-				//}
 				return true;
 			}
 		}
@@ -145,113 +148,6 @@ L.MarkerCluster = L.Marker.extend({
 		L.FeatureGroup.prototype.addLayer.call(this._group, this);
 	},
 
-	//layer: The layer to try add
-	//returns:
-	//  true: was able to put this marker in, but don't know its current visible parents position (If returned externally, add this marker at its position)
-	//  false: wasn't able to put this marker in
-	//  a MarkerCluster: the visible parent of the marker
-	_recursivelyAddLayer: function (layer, zoom) {
-		var group = this._group,
-			map = group._map,
-			maxClusterRadius = group.options.maxClusterRadius,
-			result = false,
-			sqDist = this._group._sqDist,
-			i;
-
-		for (i = this._childClusters.length - 1; i >= 0; i--) {
-			var c = this._childClusters[i];
-			//Recurse into children where their bounds fits the layer or they can just take it
-			if (c._bounds.contains(layer.getLatLng()) || c._canAcceptPosition(layer.getLatLng(), zoom + 1)) {
-				result = c._recursivelyAddLayer(layer, zoom + 1);
-				if (result) {
-					this._childCount++;
-					break;
-				}
-			}
-		}
-
-		//Couldn't add it to a child, but it should be part of us (this._zoom -> we are the root node)
-		if (!result && (this._canAcceptPosition(layer.getLatLng(), zoom) || ('_zoom' in this))) {
-
-			//If we are allowed to cluster at our childs level
-			if (zoom + 1 !== group.options.disableClusteringAtZoom) {
-
-				//Add to ourself instead
-				var layerPos = map.project(layer.getLatLng(), zoom + 1);
-
-				//var distanceGrid = new L.DistanceGrid(maxClusterRadius);
-				for (i = this._markers.length - 1; i >= 0; i--) {
-					var m = this._markers[i];
-					if (sqDist(layerPos, map.project(m.getLatLng(), zoom + 1)) < (maxClusterRadius * maxClusterRadius)) {
-						result = m;
-						this._markers.splice(i, 1);
-						this._childCount--;
-						break;
-					}
-				}
-			}
-			//result = distanceGrid.getNearObject(map.project(layer.getLatLng(), zoom + 1));
-
-			if (result) {
-				//Create a new cluster for them
-				result = new L.MarkerCluster(this._group, result, layer);
-				result._baseInit();
-
-				//Add our new child
-				this._addChild(result);
-
-				//We may be above the zoom that these 2 markers would initially cluster at
-				// so push the new cluster as deep as it can go
-				var wantedZoom = map.getZoom() - 1,
-					maxZoom = map.getMaxZoom(),
-					newResult,
-					finalResult = (zoom === wantedZoom) ? result : true;
-
-				if (group.options.disableClusteringAtZoom) {
-					maxZoom = group.options.disableClusteringAtZoom - 2;
-				}
-
-				while (zoom < maxZoom) {
-					zoom++;
-
-					//Shouldn't be a cluster at this level
-					if (sqDist(map.project(layer.getLatLng(), zoom + 1), map.project(result._markers[0].getLatLng(), zoom + 1)) >= (maxClusterRadius * maxClusterRadius)) {
-						break;
-					}
-
-					newResult = new L.MarkerCluster(this._group, result._markers[0], layer);
-					newResult._baseInit();
-					result._markers = [];
-					result._childClusters.push(newResult);
-					result = newResult;
-
-					if (zoom === wantedZoom) {
-						finalResult = result;
-					}
-				}
-				result = finalResult;
-
-			} else {
-				this._addChild(layer);
-				result = true;
-			}
-		}
-
-		if (result) {
-			if (!('_zoom' in this)) {
-				this.setIcon(this._group.options.iconCreateFunction(this));
-			}
-			this._recalculateBounds();
-		}
-		if (result === true) {
-			if (this._icon) {
-				result = this;
-			}
-		}
-
-		return result;
-	},
-
 	_canAcceptPosition: function (latlng, zoom) {
 		if (this._childCount === 0) {
 			return true;
@@ -263,69 +159,7 @@ L.MarkerCluster = L.Marker.extend({
 
 		return (this._group._sqDist(pos, otherpos) <= clusterRadiusSqrd);
 	},
-
-	//Removes the given node from this marker cluster (or its child as required)
-	//Returns true if it (or a child cluster) removes the marker
-	_recursivelyRemoveLayer: function (layer) {
-		var group = this._group,
-			markers = this._markers,
-			childClusters = this._childClusters,
-			i;
-
-		//Check our children
-		for (i = markers.length - 1; i >= 0; i--) {
-			if (markers[i] === layer) {
-				if (markers[i]._icon) {
-					L.FeatureGroup.prototype.removeLayer.call(group, markers[i]);
-				}
-
-				markers.splice(i, 1);
-				this._childCount--;
-				this._recalculateBounds();
-
-				if (!('_zoom' in this)) {
-					this.setIcon(group.options.iconCreateFunction(this));
-				}
-				return true;
-			}
-		}
-
-		//Otherwise check our childClusters
-		for (i = childClusters.length - 1; i >= 0; i--) {
-			var child = childClusters[i];
-
-			if (child._bounds.contains(layer._latlng) && child._recursivelyRemoveLayer(layer)) {
-				this._childCount--;
-				if (!('_zoom' in this)) {
-					this.setIcon(group.options.iconCreateFunction(this));
-				}
-
-				//if our child cluster is no longer a cluster, remove it and replace with just the marker
-				if (child._childCount === 1) {
-
-					//If the child is visible, remove it and put the marker on the map
-					if (child._icon) {
-						L.FeatureGroup.prototype.removeLayer.call(group, child);
-						L.FeatureGroup.prototype.addLayer.call(group, child._markers[0]);
-					}
-
-					//Take ownership of its only marker and bin the cluster
-					markers.push(child._markers[0]);
-					childClusters.splice(i, 1);
-				}
-
-				this._recalculateBounds();
-
-				if (this._icon && this._childCount > 1) { //No need to update if we are getting removed anyway
-					this.setIcon(group.options.iconCreateFunction(this));
-				}
-				return true;
-			}
-		}
-
-		return false;
-	},
-
+	
 	_recursivelyAnimateChildrenIn: function (bounds, center, depth) {
 		this._recursively(bounds, 0, depth - 1,
 			function (c) {

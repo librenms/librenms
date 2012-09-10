@@ -523,6 +523,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			var markers = newCluster.getAllChildMarkers();
 			L.FeatureGroup.prototype.removeLayer.call(this, markers[0]);
 			L.FeatureGroup.prototype.removeLayer.call(this, markers[1]);
+		} else {
+			newCluster._updateIcon();
 		}
 		//TODO else update icon?
 	}
@@ -654,9 +656,10 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		var me = this;
 
 		L.FeatureGroup.prototype.addLayer.call(this, layer);
-		if (newCluster !== true) {
+		if (newCluster !== layer) {
 			if (newCluster._childCount > 2) { //Was already a cluster
 
+				newCluster._updateIcon();
 				this._forceLayout();
 				this._animationStart();
 
@@ -674,7 +677,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				this._forceLayout();
 
 				me._animationStart();
-				me._animationZoomOutSingle(newCluster, 0, this._map.getMaxZoom());
+				me._animationZoomOutSingle(newCluster, this._map.getMaxZoom(), this._map.getZoom());
 			}
 		}
 	},
