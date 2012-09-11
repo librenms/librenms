@@ -88,7 +88,11 @@ markers.on('clusterclick', function (a) {
 ```
 
 ### Adding and removing Markers
-addLayer and removeLayer are supported and they should work for most uses.
+addLayer, removeLayer and clearLayers are supported and they should work for most uses.
+
+### Other Methods
+    hasLayer(layer): Returns true if the given layer (marker) is in the MarkerClusterGroup
+    zoomToShowLayer(layer, callback): Zooms to show the given marker (spidifying if required), calls the callback when the marker is visible on the map
 
 ### Handling LOTS of markers
 The Clusterer can handle 10000 or even 50000 markers (in chrome). IE9 has some issues with 50000.

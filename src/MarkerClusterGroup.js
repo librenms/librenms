@@ -108,6 +108,109 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return this;
 	},
 
+	clearLayers: function () {
+		//Need our own special implementation as the LayerGroup one doesn't work for us
+
+		//If we aren't on the map yet, just blow away the markers we know of
+		if (!this._map) {
+			this._needsClustering = [];
+			return this;
+		}
+
+		if (this._unspiderfy) {
+			this._unspiderfy();
+		}
+
+		//Remove all the visible layers
+		for (var i in this._layers) {
+			if (this._layers.hasOwnProperty(i)) {
+				L.FeatureGroup.prototype.removeLayer.call(this, this._layers[i]);
+			}
+		}
+
+		//Reset _topClusterLevel and the DistanceGrids
+		this._generateInitialClusters();
+
+		return this;
+	},
+
+	hasLayer: function (layer) {
+		var res = false;
+
+		this._topClusterLevel._recursively(new L.LatLngBounds([layer.getLatLng()]), 0, this._map.getMaxZoom() + 1,
+			function (cluster) {
+				for (var i = cluster._markers.length - 1; i >= 0 && !res; i--) {
+					if (cluster._markers[i] === layer) {
+						res = true;
+					}
+				}
+			}, null);
+		return res;
+	},
+
+	zoomToShowLayer: function (layer, callback) {
+		layer.__parent.zoomToBounds();
+		setTimeout(function () {
+			if (layer._icon) {
+				callback();
+			} else {
+				layer.__parent.spiderfy();
+				setTimeout(function () {
+					callback();
+				}, L.DomUtil.TRANSITION ? 250 : 0); //TODO: This is hardcoded based on the time to spiderfy
+			}
+		}, L.DomUtil.TRANSITION ? 600 : 0); //TODO: This is hardcoded based on the leaflet time to zoom
+	},
+
+	//Overrides FeatureGroup.onAdd
+	onAdd: function (map) {
+		L.FeatureGroup.prototype.onAdd.call(this, map);
+
+		if (!this._gridClusters) {
+			this._generateInitialClusters();
+		}
+
+		for (var i = 0, l = this._needsClustering.length; i < l; i++) {
+			this._addLayer(this._needsClustering[i], this._maxZoom);
+		}
+		this._needsClustering = [];
+
+		this._map.on('zoomend', this._zoomEnd, this);
+		this._map.on('moveend', this._moveEnd, this);
+
+		if (this._spiderfierOnAdd) { //TODO FIXME: Not sure how to have spiderfier add something on here nicely
+			this._spiderfierOnAdd();
+		}
+
+		this._bindEvents();
+
+
+		//Actually add our markers to the map:
+
+		//Remember the current zoom level and bounds
+		this._zoom = this._map.getZoom();
+		this._currentShownBounds = this._getExpandedVisibleBounds();
+
+		//Make things appear on the map
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+	},
+
+	//Overrides FeatureGroup.onRemove
+	onRemove: function (map) {
+		this._map.off('zoomend', this._zoomEnd, this);
+		this._map.off('moveend', this._moveEnd, this);
+
+		//In case we are in a cluster animation
+		this._map._mapPane.className = this._map._mapPane.className.replace(' leaflet-cluster-anim', '');
+
+		if (this._spiderfierOnRemove) { //TODO FIXME: Not sure how to have spiderfier add something on here nicely
+			this._spiderfierOnRemove();
+		}
+
+		L.FeatureGroup.prototype.onRemove.call(this, map);
+	},
+
+
 	//Remove the given object from the given array
 	_arraySplice: function (anArray, obj) {
 		for (var i = anArray.length - 1; i >= 0; i--) {
@@ -171,94 +274,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 			cluster = cluster.__parent;
 		}
-	},
-
-	clearLayers: function () {
-		//Need our own special implementation as the LayerGroup one doesn't work for us
-
-		//If we aren't on the map yet, just blow away the markers we know of
-		if (!this._map) {
-			this._needsClustering = [];
-			return this;
-		}
-
-		if (this._unspiderfy) {
-			this._unspiderfy();
-		}
-
-		//Remove all the visible layers
-		for (var i in this._layers) {
-			if (this._layers.hasOwnProperty(i)) {
-				L.FeatureGroup.prototype.removeLayer.call(this, this._layers[i]);
-			}
-		}
-
-		//Reset _topClusterLevel and the DistanceGrids
-		this._generateInitialClusters();
-
-		return this;
-	},
-
-	hasLayer: function (layer) {
-		var res = false;
-
-		this._topClusterLevel._recursively(new L.LatLngBounds([layer.getLatLng()]), 0, this._map.getMaxZoom() + 1,
-			function (cluster) {
-				for (var i = cluster._markers.length - 1; i >= 0 && !res; i--) {
-					if (cluster._markers[i] === layer) {
-						res = true;
-					}
-				}
-			}, null);
-		return res;
-	},
-
-	//Overrides FeatureGroup.onAdd
-	onAdd: function (map) {
-		L.FeatureGroup.prototype.onAdd.call(this, map);
-
-		if (!this._gridClusters) {
-			this._generateInitialClusters();
-		}
-
-		for (var i = 0, l = this._needsClustering.length; i < l; i++) {
-			this._addLayer(this._needsClustering[i], this._maxZoom);
-		}
-		this._needsClustering = [];
-
-		this._map.on('zoomend', this._zoomEnd, this);
-		this._map.on('moveend', this._moveEnd, this);
-
-		if (this._spiderfierOnAdd) { //TODO FIXME: Not sure how to have spiderfier add something on here nicely
-			this._spiderfierOnAdd();
-		}
-
-		this._bindEvents();
-
-
-		//Actually add our markers to the map:
-
-		//Remember the current zoom level and bounds
-		this._zoom = this._map.getZoom();
-		this._currentShownBounds = this._getExpandedVisibleBounds();
-
-		//Make things appear on the map
-		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
-	},
-
-	//Overrides FeatureGroup.onRemove
-	onRemove: function (map) {
-		this._map.off('zoomend', this._zoomEnd, this);
-		this._map.off('moveend', this._moveEnd, this);
-
-		//In case we are in a cluster animation
-		this._map._mapPane.className = this._map._mapPane.className.replace(' leaflet-cluster-anim', '');
-
-		if (this._spiderfierOnRemove) { //TODO FIXME: Not sure how to have spiderfier add something on here nicely
-			this._spiderfierOnRemove();
-		}
-
-		L.FeatureGroup.prototype.onRemove.call(this, map);
 	},
 
 	//Overrides FeatureGroup._propagateEvent
