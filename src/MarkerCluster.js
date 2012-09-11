@@ -89,28 +89,7 @@ L.MarkerCluster = L.Marker.extend({
 		}
 	},
 
-	_removeChildMarker: function (marker) {
-		var markers = this._markers,
-			i;
-
-		for (i = markers.length - 1; i >= 0; i--) {
-			if (markers[i] === marker) {
-				markers.splice(i, 1);
-				
-				var p = this;
-				while (p) {
-					p._childCount--;
-					p._recalculateBounds();
-					p._updateIcon();
-					p = p._parent;
-				}
-				return true;
-			}
-		}
-
-	},
-
-		//Expand our bounds and tell our parent to
+	//Expand our bounds and tell our parent to
 	_expandBounds: function (marker) {
 		var addedCount,
 		    addedLatLng = marker._wLatLng || marker._latlng;

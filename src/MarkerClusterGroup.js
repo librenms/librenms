@@ -103,9 +103,82 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this._unspiderfyLayer(layer);
 		}
 
-		layer.__cluster._removeChildMarker(layer);
+		//Remove the marker from clusters
+		this._removeLayer(layer, true);
 
+		if (layer._icon) {
+			L.FeatureGroup.prototype.removeLayer.call(this, layer);
+		}
 		return this;
+	},
+
+	//Remove the given object from the given array
+	_arraySplice: function (anArray, obj) {
+		for (var i = anArray.length - 1; i >= 0; i--) {
+			if (anArray[i] === obj) {
+				anArray.splice(i, 1);
+				return;
+			}
+		}
+	},
+
+	_removeLayer: function (marker, removeFromDistanceGrid) {
+		var gridClusters = this._gridClusters,
+			gridUnclustered = this._gridUnclustered,
+			map = this._map;
+
+		//Remove the marker from distance clusters it might be in
+		if (removeFromDistanceGrid) {
+			for (var z = this._maxZoom; z >= 0; z--) {
+				if (!gridUnclustered[z].removeObject(marker, map.project(marker.getLatLng(), z))) {
+					break;
+				}
+			}
+		}
+
+		//Work our way up the clusters removing them as we go if required
+		var cluster = marker.__cluster,
+			markers = cluster._markers,
+			otherMarker;
+
+		//Remove the marker from the immediate parents marker list
+		this._arraySplice(markers, marker);
+
+		while (cluster) {
+			cluster._childCount--;
+
+			if (cluster._zoom < 0) {
+				//Top level, do nothing?
+
+			} else if (removeFromDistanceGrid && cluster._childCount <= 1) { //Cluster no longer required
+				//We need to push the other marker up to the parent
+				otherMarker = cluster._markers[0] == marker ? cluster._markers[1] : cluster._markers[0];
+
+				if (!otherMarker) {
+					debugger;
+				}
+
+				//Update distance grid
+				gridClusters[cluster._zoom].removeObject(cluster, map.project(cluster._cLatLng, cluster._zoom));
+				gridUnclustered[cluster._zoom].addObject(otherMarker, map.project(otherMarker.getLatLng(), cluster._zoom));
+
+				//Move otherMarker up to parent
+				this._arraySplice(cluster._parent._childClusters, cluster);
+				cluster._parent._markers.push(otherMarker);
+				otherMarker.__cluster = cluster._parent;
+
+				if (cluster._icon) {
+					//Cluster is currently on the map, need to put the marker on the map instead
+					L.FeatureGroup.prototype.removeLayer.call(this, cluster);
+					L.FeatureGroup.prototype.addLayer.call(this, otherMarker);
+				}
+			} else {
+				cluster._recalculateBounds();
+				cluster._updateIcon();
+			}
+
+			cluster = cluster._parent;
+		}
 	},
 
 	clearLayers: function () {
@@ -343,7 +416,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			closest = gridUnclustered[zoom].getNearObject(markerPoint);
 			if (closest) {
 				if (closest.__cluster) {
-					closest.__cluster._removeChildMarker(closest);
+					this._removeLayer(closest, false);
 				}
 				var parent = closest.__cluster || this._topClusterLevel;
 
@@ -351,7 +424,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				console.log('creating new cluster with 2 markers at zoom ' + zoom);
 
 				var newCluster = new L.MarkerCluster(this, zoom, closest, layer);
-				gridClusters[zoom].addObject(newCluster, this._map.project(closest.getLatLng(), zoom));
+				gridClusters[zoom].addObject(newCluster, this._map.project(newCluster._cLatLng, zoom));
 				closest.__cluster = newCluster;
 				layer.__cluster = newCluster;
 
