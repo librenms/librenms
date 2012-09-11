@@ -35,8 +35,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._needsClustering = [];
 		//The bounds of the currently shown area (from _getExpandedVisibleBounds) Updated on zoom/move
 		this._currentShownBounds = null;
-
-		this._topClusterLevel = new L.MarkerCluster(this, -1);
 	},
 
 	addLayer: function (layer) {
@@ -184,14 +182,14 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	clearLayers: function () {
 		//Need our own special implementation as the LayerGroup one doesn't work for us
 
-		if (this._unspiderfy) {
-			this._unspiderfy();
-		}
-
 		//If we aren't on the map yet, just blow away the markers we know of
 		if (!this._map) {
 			this._needsClustering = [];
 			return this;
+		}
+
+		if (this._unspiderfy) {
+			this._unspiderfy();
 		}
 
 		//Remove all the visible layers
@@ -201,11 +199,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		}
 
-		//Clear the DistanceGrids
-		this._gridClusters = { };
-		this._gridUnclustered = { };
-
-		//Reset _topClusterLevel
+		//Reset _topClusterLevel and the DistanceGrids
 		this._generateInitialClusters();
 
 		return this;
@@ -393,6 +387,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this._gridClusters[zoom] = new L.DistanceGrid(radius);
 			this._gridUnclustered[zoom] = new L.DistanceGrid(radius);
 		}
+
+		this._topClusterLevel = new L.MarkerCluster(this, -1);
 	},
 
 	//Zoom: Zoom to start adding at (Pass this._maxZoom to start at the bottom)
