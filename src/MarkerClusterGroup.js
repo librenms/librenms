@@ -227,7 +227,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this._generateInitialClusters();
 		}
 
-		for (var i = this._needsClustering.length - 1; i >= 0; i--) {
+		for (var i = 0, l = this._needsClustering.length; i < l; i++) {
 			this._addLayer(this._needsClustering[i], this._maxZoom);
 		}
 		this._needsClustering = [];
@@ -417,7 +417,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				var parent = closest.__cluster || this._topClusterLevel;
 
 				//Create new cluster with these 2 in it
-				console.log('creating new cluster with 2 markers at zoom ' + zoom);
 
 				var newCluster = new L.MarkerCluster(this, zoom, closest, layer);
 				gridClusters[zoom].addObject(newCluster, this._map.project(newCluster._cLatLng, zoom));
@@ -451,7 +450,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Merge and split any existing clusters that are too big or small
 	_mergeSplitClusters: function () {
-		console.log('mergesplit ' + this._zoom + ' -> ' + map._zoom);
 		if (this._zoom < this._map._zoom) { //Zoom in, split
 			this._animationStart();
 			//Remove clusters now off screen
