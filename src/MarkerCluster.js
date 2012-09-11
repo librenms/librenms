@@ -76,7 +76,7 @@ L.MarkerCluster = L.Marker.extend({
 		if (new1 instanceof L.MarkerCluster) {
 			if (!isNotificationFromChild) {
 				this._childClusters.push(new1);
-				new1._parent = this;
+				new1.__parent = this;
 			}
 			this._childCount += new1._childCount;
 		} else {
@@ -86,8 +86,8 @@ L.MarkerCluster = L.Marker.extend({
 			this._childCount++;
 		}
 
-		if (this._parent) {
-			this._parent._addChild(new1, true);
+		if (this.__parent) {
+			this.__parent._addChild(new1, true);
 		}
 	},
 

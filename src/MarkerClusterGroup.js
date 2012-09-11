@@ -79,9 +79,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		//Work out what is visible
 		var visibleLayer = layer,
 			currentZoom = this._map.getZoom();
-		if (layer.__cluster) {
-			while ((visibleLayer.__cluster || visibleLayer._parent)._zoom >= currentZoom) {
-				visibleLayer = (visibleLayer.__cluster || visibleLayer._parent); //TODO Make __cluster the same name as _parent to make this simpler
+		if (layer.__parent) {
+			while (visibleLayer.__parent._zoom >= currentZoom) {
+				visibleLayer = visibleLayer.__parent;
 			}
 		}
 
@@ -133,7 +133,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 
 		//Work our way up the clusters removing them as we go if required
-		var cluster = marker.__cluster,
+		var cluster = marker.__parent,
 			markers = cluster._markers,
 			otherMarker;
 
@@ -144,7 +144,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			cluster._childCount--;
 
 			if (cluster._zoom < 0) {
-				//Top level, do nothing?
+				//Top level, do nothing
 				break;
 			} else if (removeFromDistanceGrid && cluster._childCount <= 1) { //Cluster no longer required
 				//We need to push the other marker up to the parent
@@ -155,9 +155,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				gridUnclustered[cluster._zoom].addObject(otherMarker, map.project(otherMarker.getLatLng(), cluster._zoom));
 
 				//Move otherMarker up to parent
-				this._arraySplice(cluster._parent._childClusters, cluster);
-				cluster._parent._markers.push(otherMarker);
-				otherMarker.__cluster = cluster._parent;
+				this._arraySplice(cluster.__parent._childClusters, cluster);
+				cluster.__parent._markers.push(otherMarker);
+				otherMarker.__parent = cluster.__parent;
 
 				if (cluster._icon) {
 					//Cluster is currently on the map, need to put the marker on the map instead
@@ -169,7 +169,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				cluster._updateIcon();
 			}
 
-			cluster = cluster._parent;
+			cluster = cluster.__parent;
 		}
 	},
 
@@ -399,24 +399,24 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			var closest = gridClusters[zoom].getNearObject(markerPoint);
 			if (closest) {
 				closest._addChild(layer);
-				layer.__cluster = closest;
+				layer.__parent = closest;
 				return;
 			}
 
 			//Try find a marker close by to form a new cluster with
 			closest = gridUnclustered[zoom].getNearObject(markerPoint);
 			if (closest) {
-				if (closest.__cluster) {
+				if (closest.__parent) {
 					this._removeLayer(closest, false);
 				}
-				var parent = closest.__cluster || this._topClusterLevel;
+				var parent = closest.__parent || this._topClusterLevel;
 
 				//Create new cluster with these 2 in it
 
 				var newCluster = new L.MarkerCluster(this, zoom, closest, layer);
 				gridClusters[zoom].addObject(newCluster, this._map.project(newCluster._cLatLng, zoom));
-				closest.__cluster = newCluster;
-				layer.__cluster = newCluster;
+				closest.__parent = newCluster;
+				layer.__parent = newCluster;
 
 				//First create any new intermediate parent clusters that don't exist
 				var lastParent = newCluster;
