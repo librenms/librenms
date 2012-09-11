@@ -235,7 +235,7 @@ L.MarkerCluster = L.Marker.extend({
 			}
 		}
 
-		if (zoomLevel - 1 == this._zoom) {
+		if (zoomLevel - 1 === this._zoom) {
 			//Reposition child clusters
 			for (var j = this._childClusters.length - 1; j >= 0; j--) {
 				this._childClusters[j]._restorePosition();
@@ -304,7 +304,7 @@ L.MarkerCluster = L.Marker.extend({
 			if (runAtEveryLevel) {
 				runAtEveryLevel(this);
 			}
-			if (runAtBottomLevel && this._zoom == zoomLevelToStop) {
+			if (runAtBottomLevel && this._zoom === zoomLevelToStop) {
 				runAtBottomLevel(this);
 			}
 
