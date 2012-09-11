@@ -309,7 +309,13 @@ L.MarkerClusterGroup.include({
 
 	_spiderfierOnAdd: function () {
 		this._map.on('click', this._unspiderfyWrapper, this);
-		this._map.on('zoomstart', this._unspiderfyZoomStart, this);
+
+		if (map.options.zoomAnimation) {
+			this._map.on('zoomstart', this._unspiderfyZoomStart, this);
+		} else {
+			//Browsers without zoomAnimation don't fire zoomstart
+			this._map.on('zoomend', this._unspiderfyWrapper, this);
+		}
 
 		if (L.Browser.svg && !L.Browser.touch) {
 			this._map._initPathRoot();
