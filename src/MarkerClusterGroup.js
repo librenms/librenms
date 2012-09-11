@@ -85,8 +85,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		}
 
-		//TODO: Find the highest visible blah
-
 		if (this.options.animateAddingMarkers) {
 			this._animationAddLayer(layer, visibleLayer);
 		} else {
@@ -488,7 +486,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		} else {
 			newCluster._updateIcon();
 		}
-		//TODO else update icon?
 	}
 });
 

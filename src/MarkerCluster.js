@@ -47,6 +47,7 @@ L.MarkerCluster = L.Marker.extend({
 		this._group._map.fitBounds(this._bounds);
 	},
 
+
 	_updateIcon: function () {
 		this._iconNeedsUpdate = true;
 		if (this._icon) {
@@ -54,7 +55,7 @@ L.MarkerCluster = L.Marker.extend({
 		}
 	},
 
-	//Cludge for Icon
+	//Cludge for Icon, we pretend to be an icon for performance
 	createIcon: function () {
 		if (this._iconNeedsUpdate) {
 			this._iconObj = this._group.options.iconCreateFunction(this);
@@ -65,6 +66,7 @@ L.MarkerCluster = L.Marker.extend({
 	createShadow: function () {
 		return this._iconObj.createShadow();
 	},
+
 
 	_addChild: function (new1, isNotificationFromChild) {
 
@@ -126,18 +128,6 @@ L.MarkerCluster = L.Marker.extend({
 			this.setLatLng(startPos);
 		}
 		L.FeatureGroup.prototype.addLayer.call(this._group, this);
-	},
-
-	_canAcceptPosition: function (latlng, zoom) {
-		if (this._childCount === 0) {
-			return true;
-		}
-
-		var clusterRadiusSqrd = this._group.options.maxClusterRadius * this._group.options.maxClusterRadius,
-			pos = this._group._map.project(this._cLatLng, zoom),
-			otherpos = this._group._map.project(latlng, zoom);
-
-		return (this._group._sqDist(pos, otherpos) <= clusterRadiusSqrd);
 	},
 	
 	_recursivelyAnimateChildrenIn: function (bounds, center, depth) {
