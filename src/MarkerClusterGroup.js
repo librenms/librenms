@@ -476,6 +476,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			gridUnclustered[zoom].addObject(layer, markerPoint);
 		}
 
+		//Didn't get in anything, add us to the top
+		this._topClusterLevel._addChild(layer);
+		layer.__parent = this._topClusterLevel;
 		return;
 	},
 
