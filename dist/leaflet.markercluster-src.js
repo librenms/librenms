@@ -101,6 +101,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	removeLayer: function (layer) {
+		if (!layer.__parent) {
+			return this;
+		}
+
 		if (this._unspiderfy) {
 			this._unspiderfy();
 			this._unspiderfyLayer(layer);
@@ -1010,18 +1014,13 @@ L.MarkerCluster = L.Marker.extend({
 			i;
 
 		this._bounds = new L.LatLngBounds();
+		delete this._wLatLng;
 
 		for (i = markers.length - 1; i >= 0; i--) {
-			this._bounds.extend(markers[i].getLatLng());
+			this._expandBounds(markers[i]);
 		}
 		for (i = childClusters.length - 1; i >= 0; i--) {
-			this._bounds.extend(childClusters[i]._bounds);
-		}
-
-		if (this._childCount === 0) {
-			delete this._latlng;
-		} else {
-			this.setLatLng(this._wLatLng);
+			this._expandBounds(childClusters[i]);
 		}
 	},
 
