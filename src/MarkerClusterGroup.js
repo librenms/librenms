@@ -94,6 +94,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	removeLayer: function (layer) {
+		if (!layer.__parent) {
+			return this;
+		}
+
 		if (this._unspiderfy) {
 			this._unspiderfy();
 			this._unspiderfyLayer(layer);
