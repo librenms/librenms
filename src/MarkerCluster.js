@@ -131,7 +131,7 @@ L.MarkerCluster = L.Marker.extend({
 	},
 	
 	_recursivelyAnimateChildrenIn: function (bounds, center, maxZoom) {
-		this._recursively(bounds, 0, maxZoom,
+		this._recursively(bounds, 0, maxZoom - 1,
 			function (c) {
 				var markers = c._markers,
 					i, m;
@@ -168,7 +168,7 @@ L.MarkerCluster = L.Marker.extend({
 				//As a hack we only do a animation free zoom on a single level zoom, if someone does multiple levels then we always animate
 				if (c._isSingleParent() && previousZoomLevel - 1 === newZoomLevel) {
 					c.setOpacity(1);
-					c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel - 1); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
+					c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
 				} else {
 					c.setOpacity(0);
 				}
@@ -247,7 +247,7 @@ L.MarkerCluster = L.Marker.extend({
 	//exceptBounds: If set, don't remove any markers/clusters in it
 	_recursivelyRemoveChildrenFromMap: function (previousBounds, zoomLevel, exceptBounds) {
 		var m, i;
-		this._recursively(previousBounds, -1, zoomLevel,
+		this._recursively(previousBounds, -1, zoomLevel - 1,
 			function (c) {
 				//Remove markers at every level
 				for (i = c._markers.length - 1; i >= 0; i--) {
