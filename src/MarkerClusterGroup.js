@@ -108,6 +108,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		if (layer._icon) {
 			L.FeatureGroup.prototype.removeLayer.call(this, layer);
+			layer.setOpacity(1);
 		}
 		return this;
 	},
@@ -645,6 +646,16 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		//TODO: Maybe use the transition timing stuff to make this more reliable
 		//When the animations are done, tidy up
 		setTimeout(function () {
+
+			//This cluster stopped being a cluster before the timeout fired
+			if (cluster._childCount == 1) {
+				var m = cluster._markers[0];
+				//If we were in a cluster animation at the time then the opacity and position of our child could be wrong now, so fix it
+				m.setLatLng(m.getLatLng());
+				m.setOpacity(1);
+
+				return;
+			}
 
 			cluster._recursively(bounds, newZoomLevel, 0, function (c) {
 				c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel + 1);
