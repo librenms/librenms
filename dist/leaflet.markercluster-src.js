@@ -494,7 +494,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		if (this._zoom < this._map._zoom) { //Zoom in, split
 			this._animationStart();
 			//Remove clusters now off screen
-			this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, this._zoom - 1, this._getExpandedVisibleBounds());
+			this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, this._zoom, this._getExpandedVisibleBounds());
 
 			this._animationZoomIn(this._zoom, this._map._zoom);
 
@@ -542,11 +542,11 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		//Do nothing...
 	},
 	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
-		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel - 1);
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel);
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel, this._getExpandedVisibleBounds());
 	},
 	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
-		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel - 1);
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel);
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel, this._getExpandedVisibleBounds());
 	},
 	_animationAddLayer: function (layer, newCluster) {
@@ -624,6 +624,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			//update the positions of the just added clusters/markers
 			me._topClusterLevel._recursively(bounds, previousZoomLevel, 0, function (c) {
 				L.FeatureGroup.prototype.removeLayer.call(me, c);
+				c.setOpacity(1);
 			});
 
 			me._animationEnd();
@@ -640,7 +641,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		var bounds = this._getExpandedVisibleBounds();
 
 		//Animate all of the markers in the clusters to move to their cluster center point
-		cluster._recursivelyAnimateChildrenInAndAddSelfToMap(bounds, previousZoomLevel, newZoomLevel);
+		cluster._recursivelyAnimateChildrenInAndAddSelfToMap(bounds, previousZoomLevel + 1, newZoomLevel);
 
 		var me = this;
 
@@ -653,7 +654,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		setTimeout(function () {
 
 			cluster._recursively(bounds, newZoomLevel, 0, function (c) {
-				c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel);
+				c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel + 1);
 			});
 			me._animationEnd();
 		}, 250);
@@ -832,7 +833,7 @@ L.MarkerCluster = L.Marker.extend({
 	},
 	
 	_recursivelyAnimateChildrenIn: function (bounds, center, maxZoom) {
-		this._recursively(bounds, 0, maxZoom,
+		this._recursively(bounds, 0, maxZoom - 1,
 			function (c) {
 				var markers = c._markers,
 					i, m;
@@ -869,7 +870,7 @@ L.MarkerCluster = L.Marker.extend({
 				//As a hack we only do a animation free zoom on a single level zoom, if someone does multiple levels then we always animate
 				if (c._isSingleParent() && previousZoomLevel - 1 === newZoomLevel) {
 					c.setOpacity(1);
-					c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel - 1); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
+					c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel); //Immediately remove our children as we are replacing them. TODO previousBounds not bounds
 				} else {
 					c.setOpacity(0);
 				}
@@ -948,7 +949,7 @@ L.MarkerCluster = L.Marker.extend({
 	//exceptBounds: If set, don't remove any markers/clusters in it
 	_recursivelyRemoveChildrenFromMap: function (previousBounds, zoomLevel, exceptBounds) {
 		var m, i;
-		this._recursively(previousBounds, -1, zoomLevel,
+		this._recursively(previousBounds, -1, zoomLevel - 1,
 			function (c) {
 				//Remove markers at every level
 				for (i = c._markers.length - 1; i >= 0; i--) {
