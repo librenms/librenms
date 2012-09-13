@@ -648,7 +648,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		setTimeout(function () {
 
 			//This cluster stopped being a cluster before the timeout fired
-			if (cluster._childCount == 1) {
+			if (cluster._childCount === 1) {
 				var m = cluster._markers[0];
 				//If we were in a cluster animation at the time then the opacity and position of our child could be wrong now, so fix it
 				m.setLatLng(m.getLatLng());
