@@ -636,6 +636,8 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		//Need to add markers for those that weren't on the map before but are now
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel, this._getExpandedVisibleBounds());
+		//Remove markers that were on the map before but won't be now
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel, this._getExpandedVisibleBounds());
 	},
 	_animationZoomOutSingle: function (cluster, previousZoomLevel, newZoomLevel) {
 		var bounds = this._getExpandedVisibleBounds();
