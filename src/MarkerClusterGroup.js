@@ -94,6 +94,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	removeLayer: function (layer) {
+
+		if (!this._map) {
+			this._arraySplice(this._needsClustering, layer);
+			return this;
+		}
+
 		if (!layer.__parent) {
 			return this;
 		}
