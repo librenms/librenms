@@ -186,12 +186,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			//Layer should be visible now but isn't on screen, just pan over to it
 			this._map.on('moveend', showMarker, this);
 			if (!layer._icon) {
-				map.panTo(layer.getLatLng());
+				this._map.panTo(layer.getLatLng());
 			}
 		} else {
 			this._map.on('moveend', showMarker, this);
 			this.on('animationend', showMarker, this);
-			map.setView(layer.getLatLng(), layer.__parent._zoom + 1);
+			this._map.setView(layer.getLatLng(), layer.__parent._zoom + 1);
 			layer.__parent.zoomToBounds();
 		}
 	},
