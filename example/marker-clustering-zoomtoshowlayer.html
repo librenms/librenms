@@ -31,8 +31,8 @@
 		var map = new L.Map('map', {center: latlng, zoom: 13, layers: [cloudmade]});
 
 		var markers = new L.MarkerClusterGroup();
+		var markerList = [];
 
-		var lastMarker;
 		function populate() {
 			for (var i = 0; i < addressPoints.length; i++) {
 				var a = addressPoints[i];
@@ -40,7 +40,7 @@
 				var marker = new L.Marker(new L.LatLng(a[0], a[1]), { title: title });
 				marker.bindPopup(title);
 				markers.addLayer(marker);
-				lastMarker = marker;
+				markerList.push(marker);
 			}
 		}
 
@@ -49,8 +49,9 @@
 		map.addLayer(markers);
 
 		document.getElementById('doit').onclick = function () {
-			markers.zoomToShowLayer(lastMarker, function () {
-				lastMarker.openPopup();
+			var m = markerList[Math.floor(Math.random() * markerList.length)];
+			markers.zoomToShowLayer(m, function () {
+				m.openPopup();
 			});
 		};
 
