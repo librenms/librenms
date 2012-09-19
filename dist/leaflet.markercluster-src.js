@@ -101,6 +101,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	removeLayer: function (layer) {
+
+		if (!this._map) {
+			this._arraySplice(this._needsClustering, layer);
+			return this;
+		}
+
 		if (!layer.__parent) {
 			return this;
 		}
@@ -181,12 +187,18 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		};
 
-		if ((layer._icon || layer.__parent._icon) && this._map.getBounds().contains(layer.__parent._latlng)) {
-			//Layer or cluster is already visible
-			showMarker.call(this);
+		if (layer._icon) {
+			callback();
+		} else if (layer.__parent._zoom < this._map.getZoom()) {
+			//Layer should be visible now but isn't on screen, just pan over to it
+			this._map.on('moveend', showMarker, this);
+			if (!layer._icon) {
+				this._map.panTo(layer.getLatLng());
+			}
 		} else {
 			this._map.on('moveend', showMarker, this);
 			this.on('animationend', showMarker, this);
+			this._map.setView(layer.getLatLng(), layer.__parent._zoom + 1);
 			layer.__parent.zoomToBounds();
 		}
 	},
@@ -637,6 +649,8 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		//Need to add markers for those that weren't on the map before but are now
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel, this._getExpandedVisibleBounds());
+		//Remove markers that were on the map before but won't be now
+		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel, this._getExpandedVisibleBounds());
 	},
 	_animationZoomOutSingle: function (cluster, previousZoomLevel, newZoomLevel) {
 		var bounds = this._getExpandedVisibleBounds();
