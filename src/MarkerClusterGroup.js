@@ -20,7 +20,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		//Whether to animate adding markers after adding the MarkerClusterGroup to the map
 		// If you are adding individual markers set to true, if adding bulk markers leave false for massive performance gains.
-		animateAddingMarkers: false
+		animateAddingMarkers: false,
+
+		//Options to pass to the L.Polygon constructor
+		polygonOptions: {}
 	},
 
 	initialize: function (options) {
@@ -365,7 +368,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 					map.removeLayer(shownPolygon);
 				}
 				if (a.layer.getChildCount() > 2) {
-					shownPolygon = new L.Polygon(a.layer.getConvexHull());
+					shownPolygon = new L.Polygon(a.layer.getConvexHull(), this.options.polygonOptions);
 					map.addLayer(shownPolygon);
 				}
 			}, this);
