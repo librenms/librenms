@@ -46,12 +46,19 @@ var markers = new L.MarkerClusterGroup({ options: {
 ```
 Check out the [custom example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for an example of this.
 
-### Other Options
-**disableClusteringAtZoom**: If set, at this zoom level and below markers will not be clustered. This defaults to disabled. [See Example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld-maxzoom.388.html)
-**maxClusterRadius**: The maximum radius that a cluster will cover from the central marker (in pixels). Default 80. Decreasing will make more smaller clusters.
-**singleMarkerMode**: If set to true, overrides the icon for all added markers to make them appear as a 1 size cluster
-**skipDuplicateAddTesting**: By default we check if a marker already exists in the cluster when addLayer is called. To disable this behaviour set this to true. You must only do this if you know you will not try add markers that are already in the cluster. Provides a slight performance boost to addLayer when called after the MarkerClusterGroup is on the map.
-**animateAddingMarkers**: If set to true then adding individual markers to the MarkerClusterGroup after it has been added to the map will add the marker and animate it in to the cluster. Defaults to false as this gives better performance when bulk adding markers.
+### All Options
+Enabled by default (boolean options):
+* **zoomToBoundsOnClick**: When you mouse over a cluster it shows the bounds of its markers.
+* **showCoverageOnHover**: When you click a cluster we zoom to its bounds.
+* **spiderfyOnMaxZoom**: When you click a cluster at the bottom zoom level we spiderfy it so you can see all of its markers.
+
+Other options
+* **animateAddingMarkers**: If set to true then adding individual markers to the MarkerClusterGroup after it has been added to the map will add the marker and animate it in to the cluster. Defaults to false as this gives better performance when bulk adding markers.
+* **disableClusteringAtZoom**: If set, at this zoom level and below markers will not be clustered. This defaults to disabled. [See Example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld-maxzoom.388.html)
+* **maxClusterRadius**: The maximum radius that a cluster will cover from the central marker (in pixels). Default 80. Decreasing will make more smaller clusters.
+* **polygonOptions**: Options to pass when creating the L.Polygon to show the bounds of a cluster
+* **singleMarkerMode**: If set to true, overrides the icon for all added markers to make them appear as a 1 size cluster
+* **skipDuplicateAddTesting**: By default we check if a marker already exists in the cluster when addLayer is called. To disable this behaviour set this to true. You must only do this if you know you will not try add markers that are already in the cluster. Provides a slight performance boost to addLayer when called after the MarkerClusterGroup is on the map.
 
 ### Events
 If you register for click, mouseover, etc events just related to Markers in the cluster.
