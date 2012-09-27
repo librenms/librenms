@@ -88,10 +88,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		}
 
-		if (this.options.animateAddingMarkers) {
-			this._animationAddLayer(layer, visibleLayer);
-		} else {
-			this._animationAddLayerNonAnimated(layer, visibleLayer);
+		if (this._currentShownBounds.contains(visibleLayer.getLatLng())) {
+			if (this.options.animateAddingMarkers) {
+				this._animationAddLayer(layer, visibleLayer);
+			} else {
+				this._animationAddLayerNonAnimated(layer, visibleLayer);
+			}
 		}
 		return this;
 	},
