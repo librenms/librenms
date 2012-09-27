@@ -95,10 +95,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		}
 
-		if (this.options.animateAddingMarkers) {
-			this._animationAddLayer(layer, visibleLayer);
-		} else {
-			this._animationAddLayerNonAnimated(layer, visibleLayer);
+		if (this._currentShownBounds.contains(visibleLayer.getLatLng())) {
+			if (this.options.animateAddingMarkers) {
+				this._animationAddLayer(layer, visibleLayer);
+			} else {
+				this._animationAddLayerNonAnimated(layer, visibleLayer);
+			}
 		}
 		return this;
 	},
@@ -1468,7 +1470,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		group._forceLayout();
 		group._animationStart();
 
-		var initialLegOpacity = L.Browser.svg ? 0 : 0.3,
+		var initialLegOpacity = L.Path.SVG ? 0 : 0.3,
 			xmlns = L.Path.SVG_NS;
 
 
@@ -1488,7 +1490,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			m._spiderLeg = leg;
 
 			//Following animations don't work for canvas
-			if (!L.Browser.svg) {
+			if (!L.Path.SVG) {
 				continue;
 			}
 
@@ -1525,7 +1527,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		//Set the opacity of the spiderLegs back to their correct value
 		// The animations above override this until they complete.
 		// If the initial opacity of the spiderlegs isn't 0 then they appear before the animation starts.
-		if (L.Browser.svg) {
+		if (L.Path.SVG) {
 			this._group._forceLayout();
 
 			for (i = childMarkers.length - 1; i >= 0; i--) {
@@ -1547,7 +1549,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			map = group._map,
 			thisLayerPos = zoomDetails ? map._latLngToNewLayerPoint(this._latlng, zoomDetails.zoom, zoomDetails.center) : map.latLngToLayerPoint(this._latlng),
 			childMarkers = this.getAllChildMarkers(),
-			svg = L.Browser.svg,
+			svg = L.Path.SVG,
 			m, i, a;
 
 		group._animationStart();
@@ -1631,7 +1633,7 @@ L.MarkerClusterGroup.include({
 			this._map.on('zoomend', this._unspiderfyWrapper, this);
 		}
 
-		if (L.Browser.svg && !L.Browser.touch) {
+		if (L.Path.SVG && !L.Browser.touch) {
 			this._map._initPathRoot();
 			//Needs to happen in the pageload, not after, or animations don't work in webkit
 			//  http://stackoverflow.com/questions/8455200/svg-animate-with-dynamically-added-elements
