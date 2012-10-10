@@ -125,6 +125,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return this;
 	},
 
+	//Takes an array of markers and adds them in bulk
 	addLayers: function (layersArray) {
 		if (!this._map) {
 			this._needsClustering = this._needsClustering.concat(layersArray);
@@ -185,6 +186,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return this;
 	},
 
+	//Removes all layers from the MarkerClusterGroup
 	clearLayers: function () {
 		//Need our own special implementation as the LayerGroup one doesn't work for us
 
@@ -211,6 +213,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return this;
 	},
 
+	//Returns true if the given layer is in this MarkerClusterGroup
 	hasLayer: function (layer) {
 		var res = false;
 
@@ -225,6 +228,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return res;
 	},
 
+	//Zoom down to show the given layer (spiderfying if necessary) then calls the callback
 	zoomToShowLayer: function (layer, callback) {
 
 		var showMarker = function () {
