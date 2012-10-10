@@ -7,7 +7,8 @@ Provides Beautiful Animated Marker Clustering functionality for Leaflet
 
 ## Using the plugin
 See the included examples for usage.
-The [realworld example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.388.html) is a good place to start, it uses all of the defaults of the clusterer.
+
+The [realworld example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.388.html) is a good place to start, it uses all of the defaults of the clusterer. 
 Or check out the [custom example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for how to customise the behaviour and appearance of the clusterer
 
 ### Usage
@@ -60,7 +61,7 @@ Other options
 * **singleMarkerMode**: If set to true, overrides the icon for all added markers to make them appear as a 1 size cluster
 * **skipDuplicateAddTesting**: By default we check if a marker already exists in the cluster when addLayer is called. To disable this behaviour set this to true. You must only do this if you know you will not try add markers that are already in the cluster. Provides a slight performance boost to addLayer when called after the MarkerClusterGroup is on the map.
 
-### Events
+## Events
 If you register for click, mouseover, etc events just related to Markers in the cluster.
 To recieve events for clusters listen to 'cluster' + 'eventIWant', ex: 'clusterclick', 'clustermouseover'.
 
@@ -75,6 +76,8 @@ markers.on('clusterclick', function (a) {
 	console.log('cluster ' + a.layer.getAllChildMarkers().length);
 });
 ```
+
+## Methods
 
 ### Getting the bounds of a cluster
 When you recieve an event from a cluster you can query it for the bounds.
@@ -97,11 +100,18 @@ markers.on('clusterclick', function (a) {
 ### Adding and removing Markers
 addLayer, removeLayer and clearLayers are supported and they should work for most uses.
 
-### Other Methods
-    hasLayer(layer): Returns true if the given layer (marker) is in the MarkerClusterGroup
-    zoomToShowLayer(layer, callback): Zooms to show the given marker (spidifying if required), calls the callback when the marker is visible on the map
+### Bulk adding and removing Markers
+addLayers and removeLayers are bulk methods for adding and removing markers and should be favoured over the single versions when doing bulk addition/removal of markers. Each takes an array of markers
 
-### Handling LOTS of markers
+### Other Methods
+````
+hasLayer(layer): Returns true if the given layer (marker) is in the MarkerClusterGroup
+zoomToShowLayer(layer, callback): Zooms to show the given marker (spidifying if required), calls the callback when the marker is visible on the map
+addLayers(layerArray): Adds the markers in the given array from the MarkerClusterGroup in an efficent bulk method.
+removeLayers(layerArray): Removes the markers in the given array from the MarkerClusterGroup in an efficent bulk method.
+````
+
+## Handling LOTS of markers
 The Clusterer can handle 10000 or even 50000 markers (in chrome). IE9 has some issues with 50000.
 [realworld 10000 example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.10000.html)
 [realworld 50000 example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.50000.html)
