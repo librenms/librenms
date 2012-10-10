@@ -149,6 +149,42 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return this;
 	},
 
+	//Takes an array of markers and removes them in bulk
+	removeLayers: function (layersArray) {
+		var i, l, m;
+
+		if (!this._map) {
+			for (i = 0, l = layersArray.length; i < l; i++) {
+				this.removeLayer(layersArray[i]);
+			}
+			return this;
+		}
+
+		for (i = 0, l = layersArray.length; i < l; i++) {
+			m = layersArray[i];
+			this._removeLayer(m, true, true);
+
+			if (m._icon) {
+				L.FeatureGroup.prototype.removeLayer.call(this, m);
+				m.setOpacity(1);
+			}
+		}
+
+		//Fix up the clusters and markers on the map
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+
+		for (i in this._layers) {
+			if (this._layers.hasOwnProperty(i)) {
+				m = this._layers[i];
+				if (m instanceof L.MarkerCluster) {
+					m._updateIcon();
+				}
+			}
+		}
+
+		return this;
+	},
+
 	clearLayers: function () {
 		//Need our own special implementation as the LayerGroup one doesn't work for us
 
@@ -285,7 +321,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 	},
 
-	_removeLayer: function (marker, removeFromDistanceGrid) {
+	//Internal function for removing a marker from everything.
+	//dontUpdateMap: set to true if you will handle updating the map manually (for bulk functions)
+	_removeLayer: function (marker, removeFromDistanceGrid, dontUpdateMap) {
 		var gridClusters = this._gridClusters,
 			gridUnclustered = this._gridUnclustered,
 			map = this._map;
@@ -329,11 +367,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				if (cluster._icon) {
 					//Cluster is currently on the map, need to put the marker on the map instead
 					L.FeatureGroup.prototype.removeLayer.call(this, cluster);
-					L.FeatureGroup.prototype.addLayer.call(this, otherMarker);
+					if (!dontUpdateMap) {
+						L.FeatureGroup.prototype.addLayer.call(this, otherMarker);
+					}
 				}
 			} else {
 				cluster._recalculateBounds();
-				cluster._updateIcon();
+				if (!dontUpdateMap || !cluster._icon) {
+					cluster._updateIcon();
+				}
 			}
 
 			cluster = cluster.__parent;
