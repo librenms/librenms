@@ -58,9 +58,9 @@
 			}
 
 			var start = +new Date();
-			for (i = length - 1; i >= 0; i--) {
-				markers.addLayer(list[i]);
-			}
+
+			markers.addLayers(list);
+
 			var end = +new Date();
 
 			document.getElementById('time').innerHTML = 'Creating 1000 markers took: ' + (start - prestart) + 'ms . Appending 1000 markers took: ' + (end - start) + 'ms';
