@@ -43,12 +43,13 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	addLayer: function (layer) {
 
 		if (layer instanceof L.LayerGroup) {
+			var array = [];
 			for (var i in layer._layers) {
 				if (layer._layers.hasOwnProperty(i)) {
-					this.addLayer(layer._layers[i]);
+					array.push(layer._layers[i]);
 				}
 			}
-			return this;
+			return this.addLayers(array);
 		}
 
 		if (this.options.singleMarkerMode) {
@@ -121,6 +122,30 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			L.FeatureGroup.prototype.removeLayer.call(this, layer);
 			layer.setOpacity(1);
 		}
+		return this;
+	},
+
+	addLayers: function (layersArray) {
+		if (!this._map) {
+			this._needsClustering = this._needsClustering.concat(layersArray);
+			return this;
+		}
+
+		for (var i = 0, l = layersArray.length; i < l; i++) {
+			var m = layersArray[i];
+			this._addLayer(m, this._maxZoom);
+
+			//If we just made a cluster of size 2 then we need to remove the other marker from the map (if it is) or we never will
+			if (m.__parent) {
+				if (m.__parent.getChildCount() === 2) {
+					var markers = m.__parent.getAllChildMarkers(),
+						otherMarker = markers[0] === m ? markers[1] : markers[0];
+					L.FeatureGroup.prototype.removeLayer.call(this, otherMarker);
+				}
+			}
+		}
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+
 		return this;
 	},
 
