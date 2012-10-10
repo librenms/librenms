@@ -23,8 +23,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		disableClusteringAtZoom: null,
 
-		skipDuplicateAddTesting: false,
-
 		//Whether to animate adding markers after adding the MarkerClusterGroup to the map
 		// If you are adding individual markers set to true, if adding bulk markers leave false for massive performance gains.
 		animateAddingMarkers: false,
@@ -50,12 +48,13 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	addLayer: function (layer) {
 
 		if (layer instanceof L.LayerGroup) {
+			var array = [];
 			for (var i in layer._layers) {
 				if (layer._layers.hasOwnProperty(i)) {
-					this.addLayer(layer._layers[i]);
+					array.push(layer._layers[i]);
 				}
 			}
-			return this;
+			return this.addLayers(array);
 		}
 
 		if (this.options.singleMarkerMode) {
@@ -74,7 +73,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			return this;
 		}
 
-		if (!this.options.skipDuplicateAddTesting && this.hasLayer(layer)) {
+		if (this.hasLayer(layer)) {
 			return this;
 		}
 
@@ -131,6 +130,68 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return this;
 	},
 
+	//Takes an array of markers and adds them in bulk
+	addLayers: function (layersArray) {
+		if (!this._map) {
+			this._needsClustering = this._needsClustering.concat(layersArray);
+			return this;
+		}
+
+		for (var i = 0, l = layersArray.length; i < l; i++) {
+			var m = layersArray[i];
+			this._addLayer(m, this._maxZoom);
+
+			//If we just made a cluster of size 2 then we need to remove the other marker from the map (if it is) or we never will
+			if (m.__parent) {
+				if (m.__parent.getChildCount() === 2) {
+					var markers = m.__parent.getAllChildMarkers(),
+						otherMarker = markers[0] === m ? markers[1] : markers[0];
+					L.FeatureGroup.prototype.removeLayer.call(this, otherMarker);
+				}
+			}
+		}
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+
+		return this;
+	},
+
+	//Takes an array of markers and removes them in bulk
+	removeLayers: function (layersArray) {
+		var i, l, m;
+
+		if (!this._map) {
+			for (i = 0, l = layersArray.length; i < l; i++) {
+				this.removeLayer(layersArray[i]);
+			}
+			return this;
+		}
+
+		for (i = 0, l = layersArray.length; i < l; i++) {
+			m = layersArray[i];
+			this._removeLayer(m, true, true);
+
+			if (m._icon) {
+				L.FeatureGroup.prototype.removeLayer.call(this, m);
+				m.setOpacity(1);
+			}
+		}
+
+		//Fix up the clusters and markers on the map
+		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+
+		for (i in this._layers) {
+			if (this._layers.hasOwnProperty(i)) {
+				m = this._layers[i];
+				if (m instanceof L.MarkerCluster) {
+					m._updateIcon();
+				}
+			}
+		}
+
+		return this;
+	},
+
+	//Removes all layers from the MarkerClusterGroup
 	clearLayers: function () {
 		//Need our own special implementation as the LayerGroup one doesn't work for us
 
@@ -157,20 +218,21 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return this;
 	},
 
+	//Returns true if the given layer is in this MarkerClusterGroup
 	hasLayer: function (layer) {
-		var res = false;
-
-		this._topClusterLevel._recursively(new L.LatLngBounds([layer.getLatLng()]), 0, this._map.getMaxZoom() + 1,
-			function (cluster) {
-				for (var i = cluster._markers.length - 1; i >= 0 && !res; i--) {
-					if (cluster._markers[i] === layer) {
-						res = true;
-					}
+		if (this._needsClustering.length > 0) {
+			var anArray = this._needsClustering;
+			for (var i = anArray.length - 1; i >= 0; i--) {
+				if (anArray[i] === layer) {
+					return true;
 				}
-			}, null);
-		return res;
+			}
+		}
+
+		return !!(layer.__parent && layer.__parent._group === this);
 	},
 
+	//Zoom down to show the given layer (spiderfying if necessary) then calls the callback
 	zoomToShowLayer: function (layer, callback) {
 
 		var showMarker = function () {
@@ -267,7 +329,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 	},
 
-	_removeLayer: function (marker, removeFromDistanceGrid) {
+	//Internal function for removing a marker from everything.
+	//dontUpdateMap: set to true if you will handle updating the map manually (for bulk functions)
+	_removeLayer: function (marker, removeFromDistanceGrid, dontUpdateMap) {
 		var gridClusters = this._gridClusters,
 			gridUnclustered = this._gridUnclustered,
 			map = this._map;
@@ -311,11 +375,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				if (cluster._icon) {
 					//Cluster is currently on the map, need to put the marker on the map instead
 					L.FeatureGroup.prototype.removeLayer.call(this, cluster);
-					L.FeatureGroup.prototype.addLayer.call(this, otherMarker);
+					if (!dontUpdateMap) {
+						L.FeatureGroup.prototype.addLayer.call(this, otherMarker);
+					}
 				}
 			} else {
 				cluster._recalculateBounds();
-				cluster._updateIcon();
+				if (!dontUpdateMap || !cluster._icon) {
+					cluster._updateIcon();
+				}
 			}
 
 			cluster = cluster.__parent;
