@@ -161,7 +161,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		if (!this._map) {
 			for (i = 0, l = layersArray.length; i < l; i++) {
-				this.removeLayer(layersArray[i]);
+				this._arraySplice(this._needsClustering, layersArray[i]);
 			}
 			return this;
 		}
