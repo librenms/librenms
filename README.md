@@ -59,7 +59,6 @@ Other options
 * **maxClusterRadius**: The maximum radius that a cluster will cover from the central marker (in pixels). Default 80. Decreasing will make more smaller clusters.
 * **polygonOptions**: Options to pass when creating the L.Polygon to show the bounds of a cluster
 * **singleMarkerMode**: If set to true, overrides the icon for all added markers to make them appear as a 1 size cluster
-* **skipDuplicateAddTesting**: By default we check if a marker already exists in the cluster when addLayer is called. To disable this behaviour set this to true. You must only do this if you know you will not try add markers that are already in the cluster. Provides a slight performance boost to addLayer when called after the MarkerClusterGroup is on the map.
 
 ## Events
 If you register for click, mouseover, etc events just related to Markers in the cluster.

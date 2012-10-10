@@ -16,8 +16,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		disableClusteringAtZoom: null,
 
-		skipDuplicateAddTesting: false,
-
 		//Whether to animate adding markers after adding the MarkerClusterGroup to the map
 		// If you are adding individual markers set to true, if adding bulk markers leave false for massive performance gains.
 		animateAddingMarkers: false,
@@ -68,7 +66,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			return this;
 		}
 
-		if (!this.options.skipDuplicateAddTesting && this.hasLayer(layer)) {
+		if (this.hasLayer(layer)) {
 			return this;
 		}
 
@@ -215,17 +213,16 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Returns true if the given layer is in this MarkerClusterGroup
 	hasLayer: function (layer) {
-		var res = false;
-
-		this._topClusterLevel._recursively(new L.LatLngBounds([layer.getLatLng()]), 0, this._map.getMaxZoom() + 1,
-			function (cluster) {
-				for (var i = cluster._markers.length - 1; i >= 0 && !res; i--) {
-					if (cluster._markers[i] === layer) {
-						res = true;
-					}
+		if (this._needsClustering.length > 0) {
+			var anArray = this._needsClustering;
+			for (var i = anArray.length - 1; i >= 0; i--) {
+				if (anArray[i] === layer) {
+					return true;
 				}
-			}, null);
-		return res;
+			}
+		}
+
+		return !!(layer.__parent && layer.__parent._group === this);
 	},
 
 	//Zoom down to show the given layer (spiderfying if necessary) then calls the callback
