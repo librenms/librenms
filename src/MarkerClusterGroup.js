@@ -50,17 +50,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			return this.addLayers(array);
 		}
 
-		if (this.options.singleMarkerMode) {
-			layer.options.icon = this.options.iconCreateFunction({
-				getChildCount: function () {
-					return 1;
-				},
-				getAllChildMarkers: function () {
-					return [layer];
-				}
-			});
-		}
-
 		if (!this._map) {
 			this._needsClustering.push(layer);
 			return this;
@@ -528,6 +517,17 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		var gridClusters = this._gridClusters,
 		    gridUnclustered = this._gridUnclustered,
 		    markerPoint, z;
+
+		if (this.options.singleMarkerMode) {
+			layer.options.icon = this.options.iconCreateFunction({
+				getChildCount: function () {
+					return 1;
+				},
+				getAllChildMarkers: function () {
+					return [layer];
+				}
+			});
+		}
 
 		//Find the lowest zoom level to slot this one in
 		for (; zoom >= 0; zoom--) {
