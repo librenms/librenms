@@ -183,7 +183,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		//If we aren't on the map yet, just blow away the markers we know of
 		if (!this._map) {
 			this._needsClustering = [];
-			return this;
+			this._gridClusters = undefined;
+			this._gridUnclustered = undefined;
+			// return this;
 		}
 
 		if (this._unspiderfy) {
@@ -197,8 +199,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		}
 
-		//Reset _topClusterLevel and the DistanceGrids
-		this._generateInitialClusters();
+		if (this._map) {
+			//Reset _topClusterLevel and the DistanceGrids
+			this._generateInitialClusters();
+		}
 
 		return this;
 	},
