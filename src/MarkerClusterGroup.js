@@ -120,6 +120,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			L.FeatureGroup.prototype.removeLayer.call(this, layer);
 			layer.setOpacity(1);
 		}
+
+		delete layer.__parent;
+
 		return this;
 	},
 
