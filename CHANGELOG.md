@@ -3,6 +3,18 @@ Leaflet.markercluster
 
 (all changes without author notice are by [@danzel](https://github.com/danzel))
 
+## Master
+
+### Improvements
+
+ * Work better with custom projections (by [@andersarstrand](https://github.com/andersarstrand)) [#74](https://github.com/danzel/Leaflet.markercluster/issues/74)
+ * Add custom getBounds that works (Reported by [@2803media](https://github.com/2803media))
+
+### Bugfixes
+
+ * Fix singleMarkerMode when you aren't on the map (by [@duncanparkes](https://github.com/duncanparkes)) [#77](https://github.com/danzel/Leaflet.markercluster/issues/77)
+ * Fix clearLayers when you aren't on the map (by [@duncanparkes](https://github.com/duncanparkes)) [#79](https://github.com/danzel/Leaflet.markercluster/issues/79)
+
 ## 0.2 (2012-10-11)
 
 ### Improvements
