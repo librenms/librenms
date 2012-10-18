@@ -220,7 +220,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		if (this._topClusterLevel) {
 			bounds.extend(this._topClusterLevel._bounds);
 		} else {
-			for (var i = this._needsClustering.length; i >= 0; i--) {
+			for (var i = this._needsClustering.length - 1; i >= 0; i--) {
 				bounds.extend(this._needsClustering[i].getLatLng());
 			}
 		}
