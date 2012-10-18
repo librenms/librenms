@@ -180,12 +180,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	clearLayers: function () {
 		//Need our own special implementation as the LayerGroup one doesn't work for us
 
-		//If we aren't on the map yet, just blow away the markers we know of
+		//If we aren't on the map (yet), blow away the markers we know of
 		if (!this._map) {
 			this._needsClustering = [];
-			this._gridClusters = undefined;
-			this._gridUnclustered = undefined;
-			// return this;
+			delete this._gridClusters;
+			delete this._gridUnclustered;
 		}
 
 		if (this._unspiderfy) {
