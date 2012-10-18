@@ -214,6 +214,19 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return this;
 	},
 
+	//Override FeatureGroup.getBounds as it doesn't work
+	getBounds: function () {
+		var bounds = new L.LatLngBounds();
+		if (this._topClusterLevel) {
+			bounds.extend(this._topClusterLevel._bounds);
+		} else {
+			for (var i = this._needsClustering.length; i >= 0; i--) {
+				bounds.extend(this._needsClustering[i].getLatLng());
+			}
+		}
+		return bounds;
+	},
+
 	//Returns true if the given layer is in this MarkerClusterGroup
 	hasLayer: function (layer) {
 		if (this._needsClustering.length > 0) {
