@@ -132,6 +132,10 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 	}
 } : {
 	//Animated versions here
+	SVG_ANIMATION: (function () {
+		return document.createElementNS('http://www.w3.org/2000/svg', 'animate').toString().indexOf('SVGAnimate') > -1;
+	}()),
+
 	_animationSpiderfy: function (childMarkers, positions) {
 		var me = this,
 			group = this._group,
@@ -174,7 +178,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			m._spiderLeg = leg;
 
 			//Following animations don't work for canvas
-			if (!L.Path.SVG) {
+			if (!L.Path.SVG || !this.SVG_ANIMATION) {
 				continue;
 			}
 
@@ -233,7 +237,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			map = group._map,
 			thisLayerPos = zoomDetails ? map._latLngToNewLayerPoint(this._latlng, zoomDetails.zoom, zoomDetails.center) : map.latLngToLayerPoint(this._latlng),
 			childMarkers = this.getAllChildMarkers(),
-			svg = L.Path.SVG,
+			svg = L.Path.SVG && this.SVG_ANIMATION,
 			m, i, a;
 
 		group._animationStart();
