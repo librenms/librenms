@@ -117,8 +117,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			layer.setOpacity(1);
 		}
 
-		delete layer.__parent;
-
 		return this;
 	},
 
@@ -131,6 +129,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		for (var i = 0, l = layersArray.length; i < l; i++) {
 			var m = layersArray[i];
+
+			if (this.hasLayer(m)) {
+				continue;
+			}
+
 			this._addLayer(m, this._maxZoom);
 
 			//If we just made a cluster of size 2 then we need to remove the other marker from the map (if it is) or we never will
@@ -396,6 +399,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 			cluster = cluster.__parent;
 		}
+
+		delete marker.__parent;
 	},
 
 	//Overrides FeatureGroup._propagateEvent
@@ -554,10 +559,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			//Try find a marker close by to form a new cluster with
 			closest = gridUnclustered[zoom].getNearObject(markerPoint);
 			if (closest) {
-				if (closest.__parent) {
+				var parent = closest.__parent;
+				if (parent) {
 					this._removeLayer(closest, false);
 				}
-				var parent = closest.__parent;
 
 				//Create new cluster with these 2 in it
 
@@ -1537,6 +1542,10 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 	}
 } : {
 	//Animated versions here
+	SVG_ANIMATION: (function () {
+		return document.createElementNS('http://www.w3.org/2000/svg', 'animate').toString().indexOf('SVGAnimate') > -1;
+	}()),
+
 	_animationSpiderfy: function (childMarkers, positions) {
 		var me = this,
 			group = this._group,
@@ -1579,7 +1588,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			m._spiderLeg = leg;
 
 			//Following animations don't work for canvas
-			if (!L.Path.SVG) {
+			if (!L.Path.SVG || !this.SVG_ANIMATION) {
 				continue;
 			}
 
@@ -1638,7 +1647,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			map = group._map,
 			thisLayerPos = zoomDetails ? map._latLngToNewLayerPoint(this._latlng, zoomDetails.zoom, zoomDetails.center) : map.latLngToLayerPoint(this._latlng),
 			childMarkers = this.getAllChildMarkers(),
-			svg = L.Path.SVG,
+			svg = L.Path.SVG && this.SVG_ANIMATION,
 			m, i, a;
 
 		group._animationStart();
