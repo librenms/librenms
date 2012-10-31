@@ -110,8 +110,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			layer.setOpacity(1);
 		}
 
-		delete layer.__parent;
-
 		return this;
 	},
 
@@ -124,6 +122,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		for (var i = 0, l = layersArray.length; i < l; i++) {
 			var m = layersArray[i];
+
+			if (this.hasLayer(m)) {
+				continue;
+			}
+
 			this._addLayer(m, this._maxZoom);
 
 			//If we just made a cluster of size 2 then we need to remove the other marker from the map (if it is) or we never will
@@ -389,6 +392,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 			cluster = cluster.__parent;
 		}
+
+		delete marker.__parent;
 	},
 
 	//Overrides FeatureGroup._propagateEvent
@@ -547,10 +552,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			//Try find a marker close by to form a new cluster with
 			closest = gridUnclustered[zoom].getNearObject(markerPoint);
 			if (closest) {
-				if (closest.__parent) {
+				var parent = closest.__parent;
+				if (parent) {
 					this._removeLayer(closest, false);
 				}
-				var parent = closest.__parent;
 
 				//Create new cluster with these 2 in it
 
