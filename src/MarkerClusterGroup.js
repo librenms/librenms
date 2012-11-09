@@ -283,7 +283,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 
 		for (var i = 0, l = this._needsClustering.length; i < l; i++) {
-			this._addLayer(this._needsClustering[i], this._maxZoom);
+			var layer = this._needsClustering[i];
+			if (layer.__parent) {
+				continue;
+			}
+			this._addLayer(layer, this._maxZoom);
 		}
 		this._needsClustering = [];
 
