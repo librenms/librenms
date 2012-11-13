@@ -156,6 +156,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		for (i = 0, l = layersArray.length; i < l; i++) {
 			m = layersArray[i];
+
+			if (!m.__parent) {
+				continue;
+			}
+
 			this._removeLayer(m, true, true);
 
 			if (m._icon) {
