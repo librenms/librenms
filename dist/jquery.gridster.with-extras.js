@@ -1,4 +1,4 @@
-/*! gridster.js - v0.1.0 - 2012-10-20
+/*! gridster.js - v0.1.0 - 2012-11-20
 * http://gridster.net/
 * Copyright (c) 2012 ducksboard; Licensed MIT */
 
@@ -1617,13 +1617,35 @@
         this.cells_occupied_by_player = this.get_cells_occupied(
             this.player_grid_data);
 
+        //Added placeholder for more advanced movement.
+        this.cells_occupied_by_placeholder = this.get_cells_occupied(
+            this.placeholder_grid_data);
+
         var $overlapped_widgets = this.get_widgets_overlapped(
             this.player_grid_data);
+
+        var player_size_y = this.player_grid_data.size_y;
+        var player_size_x = this.player_grid_data.size_x;
+        var placeholder_cells = this.cells_occupied_by_placeholder;
+        var $gr = this; 
+
+        $overlapped_widgets.each($.proxy(function(i, w){
+            var $w = $(w);
+            var wgd = $w.coords().grid;
+            if(wgd.size_x <= player_size_x && wgd.size_y <= player_size_y){
+                if(!$gr.is_widget(placeholder_cells.cols[0],placeholder_cells.rows[0])){
+                    $gr.new_move_widget_to($w, placeholder_cells.cols[0], placeholder_cells.rows[0]);
+                    $gr.set_placeholder(to_col, to_row);
+                }
+            }
+        }));
+
 
         var constraints = this.widgets_constraints($overlapped_widgets);
 
         this.manage_movements(constraints.can_go_up, to_col, to_row);
         this.manage_movements(constraints.can_not_go_up, to_col, to_row);
+
 
         /* if there is not widgets overlapping in the new player position,
          * update the new placeholder position. */
@@ -2274,7 +2296,7 @@
     * @return {HTMLElements} Returns a jQuery collection of HTMLElements.
     */
     fn.on_stop_overlapping_column = function(col) {
-        this.set_player(col, false);
+        //this.set_player(col, false);
 
         var self = this;
         this.for_each_widget_below(col, this.cells_occupied_by_player.rows[0],
@@ -2292,7 +2314,7 @@
     * @return {HTMLElements} Returns a jQuery collection of HTMLElements.
     */
     fn.on_stop_overlapping_row = function(row) {
-        this.set_player(false, row);
+        //this.set_player(false, row);
 
         var self = this;
         var cols = this.cells_occupied_by_player.cols;
@@ -2302,6 +2324,23 @@
             });
         }
     };
+
+   //Not yet part of api - DM.
+    fn.new_move_widget_to = function($widget, col, row){
+        var self = this;
+        var widget_grid_data = $widget.coords().grid;
+
+        this.remove_from_gridmap(widget_grid_data);
+        widget_grid_data.row = row;
+        widget_grid_data.col = col;
+
+        this.add_to_gridmap(widget_grid_data);
+        $widget.attr('data-row', row);
+        $widget.attr('data-col', col);
+        this.$changed = this.$changed.add($widget);
+
+        return this;
+    }
 
 
     /**
