@@ -19,6 +19,7 @@
         max_size_x: 6,
         autogenerate_stylesheet: true,
         avoid_overlapped_widgets: true,
+        shift_larger_widgets_down: true,
         serialize_params: function($w, wgd) {
             return {
                 col: wgd.col,
@@ -945,10 +946,13 @@
         }));
 
 
-        var constraints = this.widgets_constraints($overlapped_widgets);
+        //If set to false smaller widgets will not displace larger widgets.
+        if(this.options.shift_larger_widgets_down){
+            var constraints = this.widgets_constraints($overlapped_widgets);
 
-        this.manage_movements(constraints.can_go_up, to_col, to_row);
-        this.manage_movements(constraints.can_not_go_up, to_col, to_row);
+            this.manage_movements(constraints.can_go_up, to_col, to_row);
+            this.manage_movements(constraints.can_not_go_up, to_col, to_row);
+        }
 
 
         /* if there is not widgets overlapping in the new player position,
