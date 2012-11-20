@@ -16,3 +16,22 @@ Whodunit
 ========
 
 Gridster is built by [Ducksboard](http://ducksboard.com/).
+
+dustmoo Modifications
+===========
+
+Widgets of smaller or equal size to the dragged widget (player) 
+will swap places with the original widget. 
+
+This causes tiles to swap left and right as well as up and down.
+
+By default smaller players will shift larger widgets down.
+
+I have added an option to prevent this behavior:
+
+	$.gridster({
+		shift_larger_widgets_down: false
+	});
+
+By setting shift_larger_widgets_down to false, smaller widgets will not displace larger ones.
+
