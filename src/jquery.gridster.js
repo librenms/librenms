@@ -905,6 +905,7 @@
     */
     fn.set_player = function(col, row, no_player) {
         var self = this;
+        var swap = false;
         if (!no_player) {
             this.empty_cells_player_occupies();
         }
@@ -941,13 +942,14 @@
                 if(!$gr.is_widget(placeholder_cells.cols[0],placeholder_cells.rows[0])){
                     $gr.new_move_widget_to($w, placeholder_cells.cols[0], placeholder_cells.rows[0]);
                     $gr.set_placeholder(to_col, to_row);
+                    swap = true;
                 }
             }
         }));
 
 
         //If set to false smaller widgets will not displace larger widgets.
-        if(this.options.shift_larger_widgets_down){
+        if(this.options.shift_larger_widgets_down && !swap){
             var constraints = this.widgets_constraints($overlapped_widgets);
 
             this.manage_movements(constraints.can_go_up, to_col, to_row);
