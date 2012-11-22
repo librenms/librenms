@@ -328,6 +328,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._map.off('zoomend', this._zoomEnd, this);
 		this._map.off('moveend', this._moveEnd, this);
 
+		this._unbindEvents();
+
 		//In case we are in a cluster animation
 		this._map._mapPane.className = this._map._mapPane.className.replace(' leaflet-cluster-anim', '');
 
@@ -336,6 +338,13 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 
 		L.FeatureGroup.prototype.onRemove.call(this, map);
+
+		//Clean up all the layers we added to the map
+		for (var i in this._layers) {
+			if (this._layers.hasOwnProperty(i)) {
+				L.FeatureGroup.prototype.removeLayer.call(this, this._layers[i]);
+			}
+		}
 	},
 
 
@@ -489,6 +498,23 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 					shownPolygon = null;
 				}
 			}, this);
+		}
+	},
+
+	_unbindEvents: function () {
+		var spiderfyOnMaxZoom = this.options.spiderfyOnMaxZoom,
+			showCoverageOnHover = this.options.showCoverageOnHover,
+			zoomToBoundsOnClick = this.options.zoomToBoundsOnClick,
+			map = this._map;
+
+		if (spiderfyOnMaxZoom || zoomToBoundsOnClick) {
+			this.off('clusterclick', null, this);
+		}
+		if (showCoverageOnHover) {
+			this.off('clustermouseover', null, this);
+			this.off('clustermouseout', null, this);
+			map.off('zoomend', null, this);
+			map.off('layerremove', null, this);
 		}
 	},
 
