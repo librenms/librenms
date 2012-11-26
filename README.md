@@ -20,6 +20,12 @@ Gridster is built by [Ducksboard](http://ducksboard.com/).
 dustmoo Modifications
 ===========
 
+Changelog 11-26-2012
+
+Reworked swapping functionality to better handle large to small widget handling.
+
+---
+
 Widgets of smaller or equal size to the dragged widget (player) 
 will swap places with the original widget. 
 
