@@ -910,7 +910,7 @@
         }
         var cell = !no_player ? self.colliders_data[0].el.data : {col: col};
         var to_col = cell.col;
-        var to_row = row || cell.row;
+        var to_row = cell.row || row;
 
         this.player_grid_data = {
             col: to_col,
