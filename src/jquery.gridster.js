@@ -10,6 +10,7 @@
     var defaults = {
         namespace: '',
         widget_selector: 'li',
+        static_class: 'static',
         widget_margins: [10, 10],
         widget_base_dimensions: [400, 225],
         extra_rows: 0,
@@ -30,7 +31,8 @@
         },
         collision: {},
         draggable: {
-            distance: 4
+            distance: 4,
+            items: ".gs_w:not(.static)"
         }
     };
 
@@ -909,8 +911,10 @@
             this.empty_cells_player_occupies();
         }
         var cell = !no_player ? self.colliders_data[0].el.data : {col: col};
+        console.log("cell: ");
+        console.log(cell);
         var to_col = cell.col;
-        var to_row = row || cell.row;
+        var to_row = cell.row;
 
         this.player_grid_data = {
             col: to_col,
@@ -925,6 +929,7 @@
         //Added placeholder for more advanced movement.
         this.cells_occupied_by_placeholder = this.get_cells_occupied(
             this.placeholder_grid_data);
+        console.log(this.player_grid_data);
 
         var $overlapped_widgets = this.get_widgets_overlapped(
             this.player_grid_data);
@@ -939,6 +944,7 @@
         //Queue Swaps
         $overlapped_widgets.each($.proxy(function(i, w){
             var $w = $(w);
+            console.log($w);
             var wgd = $w.coords().grid;
             var outside_col = placeholder_cells.cols[0]+player_size_x-1;
             var outside_row = placeholder_cells.rows[0]+player_size_y-1;
@@ -992,13 +998,14 @@
             this.set_placeholder(to_col, to_row);
         }
 
-        //If set to false smaller widgets will not displace larger widgets.
+        /*If set to false smaller widgets will not displace larger widgets.
         if(this.options.shift_larger_widgets_down && !swap){
             var constraints = this.widgets_constraints($overlapped_widgets);
 
             this.manage_movements(constraints.can_go_up, to_col, to_row);
             this.manage_movements(constraints.can_not_go_up, to_col, to_row);
         }
+        */
 
 
         /* if there is not widgets overlapping in the new player position,
@@ -1315,6 +1322,32 @@
 
         if (cell) {
             return cell;
+        }
+
+        return false;
+    };
+
+     /**
+    * Determines if widget is supposed to be static.
+    * @method is_static
+    * @param {Number} col The column to check.
+    * @param {Number} row The row to check.
+    * @return {Boolean} Returns true if widget exists and has static class,
+    * else returns false
+    */
+
+    fn.is_static = function(col, row) {
+        var cell = this.gridmap[col];
+        if (!cell) {
+            return false;
+        }
+
+        cell = cell[row];
+
+        if (cell) {
+            if(cell.hasClass(this.options.static_class)){
+                return true;
+            }
         }
 
         return false;
