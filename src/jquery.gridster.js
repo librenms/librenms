@@ -1077,7 +1077,7 @@
                 var $tw = this.is_widget(colc, rowc);
                 //if this space is occupied and not queued for move.
                 console.log("place check");
-                if(this.is_occupied(colc,rowc) && !this.is_widget_queued($tw)){
+                if(this.is_occupied(colc,rowc) && !this.is_widget_queued_and_can_move($tw)){
                     can_set = false;
                 }
             }
@@ -1113,7 +1113,7 @@
         return true;
     }
 
-    fn.is_widget_queued = function($widget){
+    fn.is_widget_queued_and_can_move = function($widget){
         var queued = false;
         if ($widget === false){
             return false;
@@ -1124,7 +1124,13 @@
                 continue;
             }
             if(this.w_queue[key].attr("data-col") == $widget.attr("data-col") && this.w_queue[key].attr("data-row") == $widget.attr("data-row")){
-                queued = true;
+                var $w = this.w_queue[key];
+                var dcol = key.split("_")[0];
+                var drow = key.split("_")[1];
+                var wgd = $w.coords().grid;
+                if(!this.is_swap_occupied(dcol,drow, wgd.size_x, wgd.size_y)){
+                    queued = true;
+                }
             }
         }
         return queued
