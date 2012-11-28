@@ -467,7 +467,6 @@
 
             if (!silent) {
                 $nexts.each($.proxy(function(i, widget) {
-                    console.log("from_remove_widget");
                     this.move_widget_up( $(widget), wgd.size_y );
                 }, this));
             }
@@ -945,6 +944,7 @@
 
         
         //Queue Swaps
+        console.log("Start swap management");
         $overlapped_widgets.each($.proxy(function(i, w){
             var $w = $(w);
             var wgd = $w.coords().grid;
@@ -982,6 +982,7 @@
                             for (var r = 0; r < player_size_y; r++){
                                 var colc = placeholder_cells.cols[0]+c;
                                 var rowc = placeholder_cells.rows[0]+r;
+                                console.log("contingency cells: col: "+ colc + " row: " + rowc);
                                 if (!$gr.is_swap_occupied(colc,rowc, wgd.size_x, wgd.size_y) && !$gr.is_player_in(colc,rowc) && !$gr.is_in_queue(colc, rowc, $w)){
                                     swap = $gr.queue_widget(colc, rowc, $w);
                                     c = player_size_x;
@@ -1062,8 +1063,13 @@
                         delete this.w_queue[key];
                     }
                 }
+                if (this.is_player_in(colc,rowc)){
+                    occupied = true;
+                }
+                console.log("key "+ key +" is occupied: "+ occupied);
             }
         }
+        
         return occupied;
     }
 
@@ -1076,7 +1082,6 @@
                 var key = colc+"_"+rowc;
                 var $tw = this.is_widget(colc, rowc);
                 //if this space is occupied and not queued for move.
-                console.log("place check");
                 if(this.is_occupied(colc,rowc) && !this.is_widget_queued_and_can_move($tw)){
                     can_set = false;
                 }
@@ -1094,6 +1099,8 @@
             return false;
         }
 
+        console.log("queue in: "+ primary_key);
+
         this.w_queue[primary_key] = $w;
 
         for (var c = 0; c < wgd.size_x; c++){
@@ -1101,11 +1108,10 @@
                 var colc = col + c;
                 var rowc = row + r;
                 var key = colc+"_"+rowc;
+                console.log("full key: "+ key);
                 if (key == primary_key){
                     continue;
                 }
-                console.log("queue loop")
-                console.log(key);
                 this.w_queue[key] = "full";
             }
         }
@@ -1124,15 +1130,27 @@
                 continue;
             }
             if(this.w_queue[key].attr("data-col") == $widget.attr("data-col") && this.w_queue[key].attr("data-row") == $widget.attr("data-row")){
+                queued = true;
+                //test whole space
                 var $w = this.w_queue[key];
-                var dcol = key.split("_")[0];
-                var drow = key.split("_")[1];
+                var dcol = parseInt(key.split("_")[0]);
+                var drow = parseInt(key.split("_")[1]);
                 var wgd = $w.coords().grid;
-                if(!this.is_swap_occupied(dcol,drow, wgd.size_x, wgd.size_y)){
-                    queued = true;
+
+                for (var c = 0; c < wgd.size_x; c++){
+                    for (var r = 0; r < wgd.size_y; r++){
+                        var colc = dcol + c;
+                        var rowc = drow + r;
+                        if (this.is_player_in(colc,rowc)){
+                            queued = false;
+                        }
+
+                    }
                 }
+                    
             }
         }
+        console.log("queued: " + queued);
         return queued
     }
 
@@ -1141,7 +1159,8 @@
         var key = col+"_"+row;
 
         if ((key in this.w_queue)){
-            console.log("key is in queue");
+            console.log("key is in queue:");
+            console.log(this.w_queue[key]);
             if (this.w_queue[key] == "full"){
                queued = true; 
             } else {
@@ -1925,7 +1944,6 @@
     * @return {Class} Returns the instance of the Gridster Class.
     */
     fn.move_widget_up = function($widget, y_units) {
-        console.log("move_widget_up");
         var el_grid_data = $widget.coords().grid;
         var actual_row = el_grid_data.row;
         var moved = [];
