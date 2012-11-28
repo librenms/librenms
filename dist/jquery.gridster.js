@@ -713,6 +713,7 @@
         extra_cols: 0,
         min_cols: 1,
         min_rows: 15,
+        max_rows: 15,
         max_size_x: 6,
         autogenerate_stylesheet: true,
         avoid_overlapped_widgets: true,
@@ -1163,7 +1164,6 @@
 
             if (!silent) {
                 $nexts.each($.proxy(function(i, widget) {
-                    console.log("from_remove_widget");
                     this.move_widget_up( $(widget), wgd.size_y );
                 }, this));
             }
@@ -1641,7 +1641,6 @@
 
         
         //Queue Swaps
-        console.log("Start swap management");
         $overlapped_widgets.each($.proxy(function(i, w){
             var $w = $(w);
             var wgd = $w.coords().grid;
@@ -1651,35 +1650,27 @@
                 //next iteration
                 return true;
             }
-            console.log($w);
             if(wgd.size_x <= player_size_x && wgd.size_y <= player_size_y){
                 if(!$gr.is_swap_occupied(placeholder_cells.cols[0], wgd.row, wgd.size_x, wgd.size_y) && !$gr.is_player_in(placeholder_cells.cols[0], wgd.row) && !$gr.is_in_queue(placeholder_cells.cols[0], wgd.row, $w)){
-                    console.log("1st if");
                     swap = $gr.queue_widget(placeholder_cells.cols[0], wgd.row, $w);
                 }
                 else if(!$gr.is_swap_occupied(outside_col, wgd.row, wgd.size_x, wgd.size_y) && !$gr.is_player_in(outside_col, wgd.row) && !$gr.is_in_queue(outside_col, wgd.row, $w)){
-                    console.log("2nd if");
                     swap = $gr.queue_widget(outside_col, wgd.row, $w);
                 }
                 else if(!$gr.is_swap_occupied(wgd.col, placeholder_cells.rows[0], wgd.size_x, wgd.size_y) && !$gr.is_player_in(wgd.col, placeholder_cells.rows[0]) && !$gr.is_in_queue(wgd.col, placeholder_cells.rows[0], $w)){
-                    console.log("3rd if");
                     swap = $gr.queue_widget(wgd.col, placeholder_cells.rows[0], $w);
                 }
                 else if(!$gr.is_swap_occupied(wgd.col, outside_row, wgd.size_x, wgd.size_y) && !$gr.is_player_in(wgd.col, outside_row) && !$gr.is_in_queue(wgd.col, outside_row, $w)){
-                    console.log("4th if");
                     swap = $gr.queue_widget(wgd.col, outside_row, $w);
                 }
                 else if(!$gr.is_swap_occupied(placeholder_cells.cols[0],placeholder_cells.rows[0], wgd.size_x, wgd.size_y) && !$gr.is_player_in(placeholder_cells.cols[0],placeholder_cells.rows[0]) && !$gr.is_in_queue(placeholder_cells.cols[0],placeholder_cells.rows[0], $w)){
-                    console.log("5th if");
                     swap = $gr.queue_widget(placeholder_cells.cols[0], placeholder_cells.rows[0], $w);
                 } else {
-                    console.log("Contingency else");
                         //in one last attempt we check for any other empty spaces
                         for (var c = 0; c < player_size_x; c++){
                             for (var r = 0; r < player_size_y; r++){
                                 var colc = placeholder_cells.cols[0]+c;
                                 var rowc = placeholder_cells.rows[0]+r;
-                                console.log("contingency cells: col: "+ colc + " row: " + rowc);
                                 if (!$gr.is_swap_occupied(colc,rowc, wgd.size_x, wgd.size_y) && !$gr.is_player_in(colc,rowc) && !$gr.is_in_queue(colc, rowc, $w)){
                                     swap = $gr.queue_widget(colc, rowc, $w);
                                     c = player_size_x;
@@ -1692,12 +1683,13 @@
             }
         }));
 
-        console.log("queued items:");
 
+        /* To show queued items in console
         for(var key in this.w_queue){
             console.log("key " +key);
             console.log(this.w_queue[key]);
         }
+        */
 
         //Move queued widgets
         if(swap && this.can_placeholder_be_set(to_col, to_row, player_size_x, player_size_y)){
@@ -1727,7 +1719,9 @@
             if (pp !== false) {
                 to_row = pp;
             }
-            this.set_placeholder(to_col, to_row);
+            if(this.can_placeholder_be_set(to_col, to_row, player_size_x, player_size_y)){
+                this.set_placeholder(to_col, to_row);
+            }
         }
 
         this.w_queue = {};
@@ -1763,7 +1757,6 @@
                 if (this.is_player_in(colc,rowc)){
                     occupied = true;
                 }
-                console.log("key "+ key +" is occupied: "+ occupied);
             }
         }
         
@@ -1779,12 +1772,14 @@
                 var key = colc+"_"+rowc;
                 var $tw = this.is_widget(colc, rowc);
                 //if this space is occupied and not queued for move.
+                if(rowc > parseInt(this.options.max_rows)){
+                    can_set = false;
+                }
                 if(this.is_occupied(colc,rowc) && !this.is_widget_queued_and_can_move($tw)){
                     can_set = false;
                 }
             }
         }
-        console.log("can_set: " + can_set);
         return can_set;
     }
 
@@ -1796,8 +1791,6 @@
             return false;
         }
 
-        console.log("queue in: "+ primary_key);
-
         this.w_queue[primary_key] = $w;
 
         for (var c = 0; c < wgd.size_x; c++){
@@ -1805,7 +1798,6 @@
                 var colc = col + c;
                 var rowc = row + r;
                 var key = colc+"_"+rowc;
-                console.log("full key: "+ key);
                 if (key == primary_key){
                     continue;
                 }
@@ -1847,7 +1839,7 @@
                     
             }
         }
-        console.log("queued: " + queued);
+    
         return queued
     }
 
@@ -1856,8 +1848,6 @@
         var key = col+"_"+row;
 
         if ((key in this.w_queue)){
-            console.log("key is in queue:");
-            console.log(this.w_queue[key]);
             if (this.w_queue[key] == "full"){
                queued = true; 
             } else {
@@ -1874,8 +1864,6 @@
                 }
             }
         } 
-        
-        console.log("queued: " + queued);
 
         return queued;
     }
@@ -2287,7 +2275,6 @@
         if ($widgets_under_ph.length) {
             $widgets_under_ph.each($.proxy(function(i, widget) {
                 var $w = $(widget);
-                console.log("moving down from set_placeholder");
                 this.move_widget_down(
                  $w, row + phgd.size_y - $w.data('coords').grid.row);
             }, this));
@@ -2492,8 +2479,6 @@
 
         $.each(this.cells_occupied_by_player.cols, $.proxy(function(i, col) {
             $.each(rows_from_bottom, $.proxy(function(i, row) {
-                console.log("overlap col: " + col);
-                console.log("overlap row: " + row);
                 // if there is a widget in the player position
                 if (!this.gridmap[col]) { return true; } //next iteration
                 var $w = this.gridmap[col][row];
@@ -3493,7 +3478,8 @@
         });
 
         this.cols = Math.max(min_cols, cols, this.options.min_cols);
-        this.rows = Math.max(max_rows, this.options.min_rows);
+        //this.rows = Math.max(max_rows, this.options.min_rows);
+        this.rows = this.options.max_rows;
 
         this.baseX = ($(window).width() - aw) / 2;
         this.baseY = this.$wrapper.offset().top;

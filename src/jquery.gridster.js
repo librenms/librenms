@@ -1023,7 +1023,9 @@
             if (pp !== false) {
                 to_row = pp;
             }
-            this.set_placeholder(to_col, to_row);
+            if(this.can_placeholder_be_set(to_col, to_row, player_size_x, player_size_y)){
+                this.set_placeholder(to_col, to_row);
+            }
         }
 
         this.w_queue = {};
@@ -1074,6 +1076,9 @@
                 var key = colc+"_"+rowc;
                 var $tw = this.is_widget(colc, rowc);
                 //if this space is occupied and not queued for move.
+                if(rowc > parseInt(this.options.max_rows)){
+                    can_set = false;
+                }
                 if(this.is_occupied(colc,rowc) && !this.is_widget_queued_and_can_move($tw)){
                     can_set = false;
                 }
@@ -2777,7 +2782,8 @@
         });
 
         this.cols = Math.max(min_cols, cols, this.options.min_cols);
-        this.rows = Math.max(max_rows, this.options.min_rows);
+        //this.rows = Math.max(max_rows, this.options.min_rows);
+        this.rows = this.options.max_rows;
 
         this.baseX = ($(window).width() - aw) / 2;
         this.baseY = this.$wrapper.offset().top;
