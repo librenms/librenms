@@ -27,6 +27,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		// If you are adding individual markers set to true, if adding bulk markers leave false for massive performance gains.
 		animateAddingMarkers: false,
 
+		//Increase to increase the distance away that spiderfied markers appear from the center
+		spiderfyDistanceMultiplier: 1,
+
 		//Options to pass to the L.Polygon constructor
 		polygonOptions: {}
 	},
@@ -1496,7 +1499,7 @@ L.MarkerCluster.include({
 	},
 
 	_generatePointsCircle: function (count, centerPt) {
-		var circumference = this._circleFootSeparation * (2 + count),
+		var circumference = this._group.options.spiderfyDistanceMultiplier * this._circleFootSeparation * (2 + count),
 			legLength = circumference / this._2PI,  //radius from circumference
 			angleStep = this._2PI / count,
 			res = [],
@@ -1513,7 +1516,9 @@ L.MarkerCluster.include({
 	},
 
 	_generatePointsSpiral: function (count, centerPt) {
-		var legLength = this._spiralLengthStart,
+		var legLength = this._group.options.spiderfyDistanceMultiplier * this._spiralLengthStart,
+			separation = this._group.options.spiderfyDistanceMultiplier * this._spiralFootSeparation,
+			lengthFactor = this._group.options.spiderfyDistanceMultiplier * this._spiralLengthFactor,
 			angle = 0,
 			res = [],
 			i;
@@ -1521,9 +1526,9 @@ L.MarkerCluster.include({
 		res.length = count;
 
 		for (i = count - 1; i >= 0; i--) {
-			angle += this._spiralFootSeparation / legLength + i * 0.0005;
+			angle += separation / legLength + i * 0.0005;
 			res[i] = new L.Point(centerPt.x + legLength * Math.cos(angle), centerPt.y + legLength * Math.sin(angle))._round();
-			legLength += this._2PI * this._spiralLengthFactor / angle;
+			legLength += this._2PI * lengthFactor / angle;
 		}
 		return res;
 	}
