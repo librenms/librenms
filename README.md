@@ -107,6 +107,7 @@ If you are removing a lot of markers it will almost definitely be better to call
 
 ### Other Methods
 ````
+eachChildLayer(method, context): Provides an eachLayer implementation. (eachLayer operates on each visible layer, this method runs on all layers added to the MarkerClusterGroup)
 hasLayer(layer): Returns true if the given layer (marker) is in the MarkerClusterGroup
 zoomToShowLayer(layer, callback): Zooms to show the given marker (spidifying if required), calls the callback when the marker is visible on the map
 addLayers(layerArray): Adds the markers in the given array from the MarkerClusterGroup in an efficent bulk method.

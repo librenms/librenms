@@ -230,6 +230,20 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return bounds;
 	},
 
+	//Don't override LayerGroup.eachLayer, but provide the same functionality for external users
+	eachChildLayer: function (method, context) {
+		var markers = this._needsClustering.slice(),
+		    i;
+
+		if (this._topClusterLevel) {
+			this._topClusterLevel.getAllChildMarkers(markers);
+		}
+
+		for (i = markers.length - 1; i >= 0; i--) {
+			method.call(context, markers[i]);
+		}
+	},
+
 	//Returns true if the given layer is in this MarkerClusterGroup
 	hasLayer: function (layer) {
 		if (this._needsClustering.length > 0) {
