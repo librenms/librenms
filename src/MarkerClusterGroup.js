@@ -230,8 +230,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return bounds;
 	},
 
-	//Don't override LayerGroup.eachLayer, but provide the same functionality for external users
-	eachChildLayer: function (method, context) {
+	//Overrides LayerGroup.eachLayer
+	eachLayer: function (method, context) {
 		var markers = this._needsClustering.slice(),
 		    i;
 
@@ -298,7 +298,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Overrides FeatureGroup.onAdd
 	onAdd: function (map) {
-		L.FeatureGroup.prototype.onAdd.call(this, map);
+		this._map = map;
 
 		if (!this._gridClusters) {
 			this._generateInitialClusters();
@@ -347,7 +347,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this._spiderfierOnRemove();
 		}
 
-		L.FeatureGroup.prototype.onRemove.call(this, map);
+		this._map = null;
 
 		//Clean up all the layers we added to the map
 		for (var i in this._layers) {
