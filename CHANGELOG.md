@@ -18,6 +18,7 @@ Leaflet.markercluster
  * Fix clearLayers when you aren't on the map (by [@duncanparkes](https://github.com/duncanparkes)) [#79](https://github.com/danzel/Leaflet.markercluster/issues/79)
  * IE10 Bug fix (Reported by [@theLundquist](https://github.com/theLundquist)) [#86](https://github.com/danzel/Leaflet.markercluster/issues/86)
  * Fixes for hasLayer after removing a layer (Reported by [@cvisto](https://github.com/cvisto)) [#44](https://github.com/danzel/Leaflet.markercluster/issues/44)
+ * Fix clearLayers not unsetting __parent of the markers, preventing them from being re-added. (Reported by [@apuntovanini](https://github.com/apuntovanini)) [#99](https://github.com/danzel/Leaflet.markercluster/issues/99)
 
 ## 0.2 (2012-10-11)
 

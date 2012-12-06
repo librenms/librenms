@@ -216,6 +216,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		}
 
+		this.eachLayer(function (marker) {
+			delete marker.__parent;
+		});
+
 		if (this._map) {
 			//Reset _topClusterLevel and the DistanceGrids
 			this._generateInitialClusters();
@@ -237,7 +241,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return bounds;
 	},
 
-	//Don't override LayerGroup.eachLayer, but provide the same functionality for external users
+	//Overrides LayerGroup.eachLayer
 	eachLayer: function (method, context) {
 		var markers = this._needsClustering.slice(),
 		    i;
