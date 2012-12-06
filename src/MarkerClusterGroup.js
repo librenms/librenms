@@ -209,6 +209,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		}
 
+		this.eachLayer(function (marker) {
+			delete marker.__parent;
+		});
+
 		if (this._map) {
 			//Reset _topClusterLevel and the DistanceGrids
 			this._generateInitialClusters();
