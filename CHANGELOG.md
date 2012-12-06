@@ -9,11 +9,15 @@ Leaflet.markercluster
 
  * Work better with custom projections (by [@andersarstrand](https://github.com/andersarstrand)) [#74](https://github.com/danzel/Leaflet.markercluster/issues/74)
  * Add custom getBounds that works (Reported by [@2803media](https://github.com/2803media))
+ * Allow spacing spiderfied icons further apart (Reported by [@stevevance](https://github.com/stevevance)) [#100](https://github.com/danzel/Leaflet.markercluster/issues/100)
+ * Add custom eachLayer that works (Reported by [@cilogi](https://github.com/cilogi)) [#102](https://github.com/danzel/Leaflet.markercluster/issues/102)
 
 ### Bugfixes
 
  * Fix singleMarkerMode when you aren't on the map (by [@duncanparkes](https://github.com/duncanparkes)) [#77](https://github.com/danzel/Leaflet.markercluster/issues/77)
  * Fix clearLayers when you aren't on the map (by [@duncanparkes](https://github.com/duncanparkes)) [#79](https://github.com/danzel/Leaflet.markercluster/issues/79)
+ * IE10 Bug fix (Reported by [@theLundquist](https://github.com/theLundquist)) [#86](https://github.com/danzel/Leaflet.markercluster/issues/86)
+ * Fixes for hasLayer after removing a layer (Reported by [@cvisto](https://github.com/cvisto)) [#44](https://github.com/danzel/Leaflet.markercluster/issues/44)
 
 ## 0.2 (2012-10-11)
 
