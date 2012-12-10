@@ -687,7 +687,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
         if (!this.options.removeOutsideVisibleBounds) {
             return this.getBounds();
         }
-        
+
 		var map = this._map,
 			bounds = map.getBounds(),
 			sw = bounds._southWest,
