@@ -16,6 +16,7 @@
         extra_rows: 0,
         extra_cols: 0,
         min_cols: 1,
+        max_cols: 50,
         min_rows: 15,
         max_rows: 15,
         max_size_x: 6,
@@ -178,6 +179,7 @@
             }).addClass('gs_w').appendTo(this.$el).hide();
 
         this.$widgets = this.$widgets.add($w);
+        this.$changed = this.$changed.add($w);
 
         this.register_widget($w);
 
@@ -435,6 +437,13 @@
         return false;
     };
 
+    fn.remove_by_grid = function(col, row){
+        var $w = this.is_widget(col, row);
+        if($w){
+            this.remove_widget($w);
+        }
+    }
+
 
     /**
     * Remove a widget from the grid.
@@ -511,8 +520,10 @@
         $widgets || ($widgets = this.$widgets);
         var result = [];
         $widgets.each($.proxy(function(i, widget) {
-            result.push(this.options.serialize_params(
+            if(typeof($(widget).coords().grid) != "undefined"){
+                result.push(this.options.serialize_params(
                 $(widget), $(widget).coords().grid ) );
+            }
         }, this));
 
         return result;
@@ -553,6 +564,10 @@
             !this.can_move_to(
              {size_x: wgd.size_x, size_y: wgd.size_y}, wgd.col, wgd.row)
         ) {
+            if(!$el.hasClass('.disp_ad')){
+                $el.remove();
+                return false;   
+            }
             wgd = this.next_position(wgd.size_x, wgd.size_y);
             wgd.el = $el;
             $el.attr({
@@ -664,7 +679,7 @@
             }, 60)
           });
 
-        this.drag_api = this.$el.drag(draggable_options).data('drag');
+        this.drag_api = this.$el.dragg(draggable_options).data('drag');
         return this;
     };
 
@@ -1058,6 +1073,12 @@
                         delete this.w_queue[key];
                     }
                 }
+                if(rowc > parseInt(this.options.max_rows)){
+                    occupied = true;
+                }
+                if(colc > parseInt(this.options.max_cols)){
+                    occupied = true;
+                }
                 if (this.is_player_in(colc,rowc)){
                     occupied = true;
                 }
@@ -1077,6 +1098,9 @@
                 var $tw = this.is_widget(colc, rowc);
                 //if this space is occupied and not queued for move.
                 if(rowc > parseInt(this.options.max_rows)){
+                    can_set = false;
+                }
+                if(colc > parseInt(this.options.max_cols)){
                     can_set = false;
                 }
                 if(this.is_occupied(colc,rowc) && !this.is_widget_queued_and_can_move($tw)){
