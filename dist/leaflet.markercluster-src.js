@@ -358,14 +358,14 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this._spiderfierOnRemove();
 		}
 
-		this._map = null;
-
 		//Clean up all the layers we added to the map
 		for (var i in this._layers) {
 			if (this._layers.hasOwnProperty(i)) {
 				L.FeatureGroup.prototype.removeLayer.call(this, this._layers[i]);
 			}
 		}
+
+		this._map = null;
 	},
 
 
