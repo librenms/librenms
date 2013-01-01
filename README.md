@@ -23,8 +23,8 @@ map.addLayer(markers);
 
 ### Defaults
 By default the Clusterer enables some nice defaults for you:
-zoomToBoundsOnClick: When you mouse over a cluster it shows the bounds of its markers.
-showCoverageOnHover: When you click a cluster we zoom to its bounds.
+showCoverageOnHover: When you mouse over a cluster it shows the bounds of its markers.
+zoomToBoundsOnClick: When you click a cluster we zoom to its bounds.
 spiderfyOnMaxZoom: When you click a cluster at the bottom zoom level we spiderfy it so you can see all of its markers.
 
 You can disable any of these as you want in the options when you create the MarkerClusterGroup:
