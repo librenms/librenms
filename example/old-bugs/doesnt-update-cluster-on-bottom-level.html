@@ -21,18 +21,18 @@
 <body>
 
 	<div id="map"></div>
-	<button id="doit">Remove and add direct to map</button><button id="doit2">clearLayers</button><br/>
-	<span>Bug <a href="https://github.com/danzel/Leaflet.markercluster/issues/114">#114</a>. Markers are added to the map periodically. Bug was that after becoming a cluster (size 2 or 3 usually) they would never change again even if more markers were added to them.</span><br/>
+	<button id="doit">AddMarker</button><button id="doit2">Add by Timer</button><br/>
+	<span>Bug <a href="https://github.com/danzel/Leaflet.markercluster/issues/114">#114</a>. Markers are added to the map periodically using addLayers. Bug was that after becoming a cluster (size 2 or 3 usually) they would never change again even if more markers were added to them.</span><br/>
 
 	<script type="text/javascript">
 
 		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
 			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
 			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
-			latlng = new L.LatLng(50.5, 30.51);
+			latlng = new L.LatLng(40.782982, -73.969452);
 
 		var map = new L.Map('map', { 
-			center:  [40.782982, -73.969452],
+			center: latlng,
 			zoom:    12,
 			maxZoom: 12,
 			layers: [cloudmade]
@@ -48,18 +48,22 @@
 			];
 		}
 
-setInterval(function() {
-	var n       = 100;
-	var markers = new Array();
-	
-	for (var i = 0; i < n; i++) {
-		markers.push(L.marker(getRandomLatLng()));
-	}
-	
-	markerCluster.addLayers(markers);
-	
-}, 1000);
+		document.getElementById('doit').onclick = function () {
+			markerCluster.addLayers([new L.Marker(map.getCenter())]);
+		};
+		document.getElementById('doit2').onclick = function () {
+			setInterval(function () {
+				var n = 100;
+				var markers = new Array();
 
+				for (var i = 0; i < n; i++) {
+					markers.push(L.marker(getRandomLatLng()));
+				}
+
+				markerCluster.addLayers(markers);
+
+			}, 1000);
+		};
 
 	</script>
 </body>
