@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet debug page</title>
+
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.ie.css" /><![endif]-->
+	<script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet-src.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="../screen.css" />
+
+	<link rel="stylesheet" href="../../dist/MarkerCluster.css" />
+	<link rel="stylesheet" href="../../dist/MarkerCluster.Default.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="../../dist/MarkerCluster.Default.ie.css" /><![endif]-->
+	<script src="../../src/DistanceGrid.js"></script>
+	<script src="../../src/MarkerCluster.js"></script>
+	<script src="../../src/MarkerClusterGroup.js"></script>
+	<script src="../../src/MarkerCluster.QuickHull.js"></script>
+	<script src="../../src/MarkerCluster.Spiderfier.js"></script>
+</head>
+<body>
+
+	<div id="map"></div>
+	<button id="doit">Remove and add direct to map</button><button id="doit2">clearLayers</button><br/>
+	<span>Bug <a href="https://github.com/danzel/Leaflet.markercluster/issues/114">#114</a>. Markers are added to the map periodically. Bug was that after becoming a cluster (size 2 or 3 usually) they would never change again even if more markers were added to them.</span><br/>
+
+	<script type="text/javascript">
+
+		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
+			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+			latlng = new L.LatLng(50.5, 30.51);
+
+		var map = new L.Map('map', { 
+			center:  [40.782982, -73.969452],
+			zoom:    12,
+			maxZoom: 12,
+			layers: [cloudmade]
+		});
+
+		var markerCluster = new L.MarkerClusterGroup();
+		map.addLayer(markerCluster);
+		
+		function getRandomLatLng() {
+			return [
+				 40.782982 + (Math.random() > 0.5 ? 0.5 : -0.5) * Math.random(),
+				-73.969452 + (Math.random() > 0.5 ? 0.5 : -0.5) * Math.random()
+			];
+		}
+
+setInterval(function() {
+	var n       = 100;
+	var markers = new Array();
+	
+	for (var i = 0; i < n; i++) {
+		markers.push(L.marker(getRandomLatLng()));
+	}
+	
+	markerCluster.addLayers(markers);
+	
+}, 1000);
+
+
+	</script>
+</body>
+</html>
