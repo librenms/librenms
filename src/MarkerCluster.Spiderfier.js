@@ -249,6 +249,11 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		for (i = childMarkers.length - 1; i >= 0; i--) {
 			m = childMarkers[i];
 
+			//Marker was added to us after we were spidified
+			if (!m._preSpiderfyLatlng) {
+				continue;
+			}
+
 			//Fix up the location to the real one
 			m.setLatLng(m._preSpiderfyLatlng);
 			delete m._preSpiderfyLatlng;
