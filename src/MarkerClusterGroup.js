@@ -118,13 +118,14 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Takes an array of markers and adds them in bulk
 	addLayers: function (layersArray) {
+		var i, l, m;
 		if (!this._map) {
 			this._needsClustering = this._needsClustering.concat(layersArray);
 			return this;
 		}
 
-		for (var i = 0, l = layersArray.length; i < l; i++) {
-			var m = layersArray[i];
+		for (i = 0, l = layersArray.length; i < l; i++) {
+			m = layersArray[i];
 
 			if (this.hasLayer(m)) {
 				continue;
@@ -141,6 +142,17 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				}
 			}
 		}
+
+		//Update the icons of all those visible clusters that were affected
+		for (i in this._layers) {
+			if (this._layers.hasOwnProperty(i)) {
+				m = this._layers[i];
+				if (m instanceof L.MarkerCluster && m._iconNeedsUpdate) {
+					m._updateIcon();
+				}
+			}
+		}
+
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
 
 		return this;
