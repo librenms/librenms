@@ -8,7 +8,7 @@ Provides Beautiful Animated Marker Clustering functionality for Leaflet
 ## Using the plugin
 See the included examples for usage.
 
-The [realworld example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.388.html) is a good place to start, it uses all of the defaults of the clusterer. 
+The [realworld example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.388.html) is a good place to start, it uses all of the defaults of the clusterer.
 Or check out the [custom example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for how to customise the behaviour and appearance of the clusterer
 
 ### Usage
@@ -49,8 +49,8 @@ Check out the [custom example](http://danzel.github.com/Leaflet.markercluster/ex
 
 ### All Options
 Enabled by default (boolean options):
-* **zoomToBoundsOnClick**: When you mouse over a cluster it shows the bounds of its markers.
-* **showCoverageOnHover**: When you click a cluster we zoom to its bounds.
+* **zoomToBoundsOnClick**: When you click a cluster we zoom to its bounds.
+* **showCoverageOnHover**: When you mouse over a cluster it shows the bounds of its markers.
 * **spiderfyOnMaxZoom**: When you click a cluster at the bottom zoom level we spiderfy it so you can see all of its markers.
 
 Other options
