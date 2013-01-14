@@ -8,8 +8,8 @@ Provides Beautiful Animated Marker Clustering functionality for [Leaflet](http:/
 ## Using the plugin
 See the included examples for usage.
 
-The [realworld example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.388.html) is a good place to start, it uses all of the defaults of the clusterer.
-Or check out the [custom example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for how to customise the behaviour and appearance of the clusterer
+The [realworld example](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-realworld.388.html) is a good place to start, it uses all of the defaults of the clusterer.
+Or check out the [custom example](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for how to customise the behaviour and appearance of the clusterer
 
 ### Usage
 Create a new MarkerClusterGroup, add your markers to it, then add it to the map
@@ -45,7 +45,7 @@ var markers = new L.MarkerClusterGroup({ options: {
 	}
 }});
 ```
-Check out the [custom example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for an example of this.
+Check out the [custom example](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for an example of this.
 
 ### All Options
 Enabled by default (boolean options):
@@ -55,7 +55,7 @@ Enabled by default (boolean options):
 
 Other options
 * **animateAddingMarkers**: If set to true then adding individual markers to the MarkerClusterGroup after it has been added to the map will add the marker and animate it in to the cluster. Defaults to false as this gives better performance when bulk adding markers.
-* **disableClusteringAtZoom**: If set, at this zoom level and below markers will not be clustered. This defaults to disabled. [See Example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld-maxzoom.388.html)
+* **disableClusteringAtZoom**: If set, at this zoom level and below markers will not be clustered. This defaults to disabled. [See Example](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-realworld-maxzoom.388.html)
 * **maxClusterRadius**: The maximum radius that a cluster will cover from the central marker (in pixels). Default 80. Decreasing will make more smaller clusters.
 * **polygonOptions**: Options to pass when creating the L.Polygon to show the bounds of a cluster
 * **singleMarkerMode**: If set to true, overrides the icon for all added markers to make them appear as a 1 size cluster
@@ -81,7 +81,7 @@ markers.on('clusterclick', function (a) {
 
 ### Getting the bounds of a cluster
 When you recieve an event from a cluster you can query it for the bounds.
-See [example/marker-clustering-convexhull.html](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-convexhull.html) for a working example.
+See [example/marker-clustering-convexhull.html](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-convexhull.html) for a working example.
 ```javascript
 markers.on('clusterclick', function (a) {
 	map.addLayer(new L.Polygon(a.layer.getConvexHull()));
@@ -90,7 +90,7 @@ markers.on('clusterclick', function (a) {
 
 ### Zooming to the bounds of a cluster
 When you recieve an event from a cluster you can zoom to its bounds in one easy step.
-See [marker-clustering-zoomtobounds.html](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-zoomtobounds.html) for a working example.
+See [marker-clustering-zoomtobounds.html](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-zoomtobounds.html) for a working example.
 ```javascript
 markers.on('clusterclick', function (a) {
 	a.layer.zoomToBounds();
@@ -115,8 +115,8 @@ removeLayers(layerArray): Removes the markers in the given array from the Marker
 
 ## Handling LOTS of markers
 The Clusterer can handle 10000 or even 50000 markers (in chrome). IE9 has some issues with 50000.
-[realworld 10000 example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.10000.html)
-[realworld 50000 example](http://danzel.github.com/Leaflet.markercluster/example/marker-clustering-realworld.50000.html)
+[realworld 10000 example](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-realworld.10000.html)
+[realworld 50000 example](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-realworld.50000.html)
 Performance optimizations could be done so these are handled more gracefully (Running the initial clustering over multiple JS calls rather than locking the browser for a long time)
 
 ### License
