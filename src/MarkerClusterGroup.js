@@ -390,6 +390,14 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._map = null;
 	},
 
+   getVisibleParent: function(marker){
+      var vMarker = marker;
+      // TODO: Is this safe? No extra check needed to prevent infinite loop?
+      while(!vMarker._icon) {
+         vMarker = vMarker.__parent;
+      }
+      return vMarker;
+   },
 
 	//Remove the given object from the given array
 	_arraySplice: function (anArray, obj) {
