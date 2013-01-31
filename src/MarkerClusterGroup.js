@@ -501,7 +501,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				if (shownPolygon) {
 					map.removeLayer(shownPolygon);
 				}
-				if (a.layer.getChildCount() > 2) {
+				if (a.layer.getChildCount() > 2 && a.layer !== this._spiderfied) {
 					shownPolygon = new L.Polygon(a.layer.getConvexHull(), this.options.polygonOptions);
 					map.addLayer(shownPolygon);
 				}
