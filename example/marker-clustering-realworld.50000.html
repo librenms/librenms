@@ -32,22 +32,31 @@
 
 			var markers = new L.MarkerClusterGroup();
 
+			var markerList = [];
+
+			//console.log('start creating markers: ' + window.performance.now());
+			
 			for (var i = 0; i < addressPoints.length; i++) {
 				var a = addressPoints[i];
 				var title = a[2];
 				var marker = new L.Marker(new L.LatLng(a[0], a[1]), { title: title });
 				marker.bindPopup(title);
-				markers.addLayer(marker);
+				markerList.push(marker);
 			}
 			for (var i = 0; i < addressPoints2.length; i++) {
 				var a = addressPoints[i];
 				var title = a[2];
 				var marker = new L.Marker(new L.LatLng(a[0], a[1]), { title: title });
 				marker.bindPopup(title);
-				markers.addLayer(marker);
+				markerList.push(marker);
 			}
 
+			//console.log('start clustering: ' + window.performance.now());
+
+			markers.addLayers(markerList);
 			map.addLayer(markers);
+
+			//console.log('end clustering: ' + window.performance.now());
 	</script>
 </body>
 </html>
