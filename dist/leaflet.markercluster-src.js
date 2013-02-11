@@ -23,6 +23,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		disableClusteringAtZoom: null,
 
+        // Setting this to false prevents the removal of any clusters outside of the viewpoint, which
+        // is the default behaviour for performance reasons.
+        removeOutsideVisibleBounds: true,
+
 		//Whether to animate adding markers after adding the MarkerClusterGroup to the map
 		// If you are adding individual markers set to true, if adding bulk markers leave false for massive performance gains.
 		animateAddingMarkers: false,
@@ -687,6 +691,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	
 	//Gets the maps visible bounds expanded in each direction by the size of the screen (so the user cannot see an area we do not cover in one pan)
 	_getExpandedVisibleBounds: function () {
+        if (!this.options.removeOutsideVisibleBounds) {
+            return this.getBounds();
+        }
+
 		var map = this._map,
 			bounds = map.getBounds(),
 			sw = bounds._southWest,
