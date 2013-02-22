@@ -1,12 +1,22 @@
 # Mouse Wheel ChangeLog
 
+# 3.1.0
+
+* Fix Firefox 17+ issues by using new wheel event
+* Normalize delta values
+* Adds horizontal support for IE 9+ by using new wheel event
+* Support AMD loaders
+
+
 # 3.0.6
 
 * Fix issue with delta being 0 in Firefox
 
+
 # 3.0.5
 
 * jQuery 1.7 compatibility
+
 
 # 3.0.4
 
