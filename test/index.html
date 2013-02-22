@@ -1,6 +1,7 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
+        <meta charset="iso-8859-1">
         <title>Testing mousewheel plugin</title>
 
         <script>
@@ -15,7 +16,7 @@
                     document.write( '<script src="http://' + src + '.js"><\/script>' );
             })();
         </script>
-        <script type="text/javascript" src="../jquery.mousewheel.js"></script>
+        <script src="../jquery.mousewheel.js"></script>
 
         <style>
             #test1 {
@@ -107,7 +108,7 @@
                 border-bottom-color: #000;
             }
         </style>
-        <script type="text/javascript">
+        <script>
             $(function() {
                 $('#userAgent').html(navigator.userAgent);
 
