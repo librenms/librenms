@@ -243,7 +243,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			m, i, a;
 
 		group._animationStart();
-		
+
 		//Make us visible and bring the child markers back in
 		this.setOpacity(1);
 		for (i = childMarkers.length - 1; i >= 0; i--) {

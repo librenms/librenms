@@ -660,7 +660,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 				return;
 			}
-			
+
 			//Didn't manage to cluster in at this zoom, record us as a marker here and continue upwards
 			gridUnclustered[zoom].addObject(layer, markerPoint);
 		}
@@ -688,7 +688,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this._moveEnd();
 		}
 	},
-	
+
 	//Gets the maps visible bounds expanded in each direction by the size of the screen (so the user cannot see an area we do not cover in one pan)
 	_getExpandedVisibleBounds: function () {
         if (!this.options.removeOutsideVisibleBounds) {
@@ -1031,7 +1031,7 @@ L.MarkerCluster = L.Marker.extend({
 		}
 		L.FeatureGroup.prototype.addLayer.call(this._group, this);
 	},
-	
+
 	_recursivelyAnimateChildrenIn: function (bounds, center, maxZoom) {
 		this._recursively(bounds, 0, maxZoom - 1,
 			function (c) {
@@ -1729,7 +1729,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			m, i, a;
 
 		group._animationStart();
-		
+
 		//Make us visible and bring the child markers back in
 		this.setOpacity(1);
 		for (i = childMarkers.length - 1; i >= 0; i--) {
@@ -1876,6 +1876,7 @@ L.MarkerClusterGroup.include({
 		}
 	}
 });
+
 
 
 

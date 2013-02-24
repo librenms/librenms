@@ -129,7 +129,7 @@ L.MarkerCluster = L.Marker.extend({
 		}
 		L.FeatureGroup.prototype.addLayer.call(this._group, this);
 	},
-	
+
 	_recursivelyAnimateChildrenIn: function (bounds, center, maxZoom) {
 		this._recursively(bounds, 0, maxZoom - 1,
 			function (c) {
