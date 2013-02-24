@@ -1,5 +1,10 @@
 # Mouse Wheel ChangeLog
 
+# 3.1.1
+
+* Fix rounding issue with deltas less than zero
+
+
 # 3.1.0
 
 * Fix Firefox 17+ issues by using new wheel event
