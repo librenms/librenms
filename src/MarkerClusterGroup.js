@@ -653,7 +653,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 				return;
 			}
-			
+
 			//Didn't manage to cluster in at this zoom, record us as a marker here and continue upwards
 			gridUnclustered[zoom].addObject(layer, markerPoint);
 		}
@@ -681,7 +681,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this._moveEnd();
 		}
 	},
-	
+
 	//Gets the maps visible bounds expanded in each direction by the size of the screen (so the user cannot see an area we do not cover in one pan)
 	_getExpandedVisibleBounds: function () {
         if (!this.options.removeOutsideVisibleBounds) {
