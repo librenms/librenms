@@ -40,11 +40,11 @@ You do not need to include the .Default css if you go this way.
 You are passed a MarkerCluster object, you'll probably want to use getChildCount() or getAllChildMarkers() to work out the icon to show
 
 ```javascript
-var markers = new L.MarkerClusterGroup({ options: {
+var markers = new L.MarkerClusterGroup({
 	iconCreateFunction: function(cluster) {
 		return new L.DivIcon({ html: '<b>' + cluster.getChildCount() + '</b>' });
 	}
-}});
+});
 ```
 Check out the [custom example](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-custom.html) for an example of this.
 
