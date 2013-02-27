@@ -1,4 +1,4 @@
-/*! gridster.js - v0.1.0 - 2012-12-10
+/*! gridster.js - v0.1.0 - 2012-12-11
 * http://gridster.net/
 * Copyright (c) 2012 ducksboard; Licensed MIT */
 
@@ -1224,7 +1224,6 @@
 
         return result;
     };
-
 
     /**
     * Returns a serialized array of the widgets that have changed their

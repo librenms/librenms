@@ -529,7 +529,6 @@
         return result;
     };
 
-
     /**
     * Returns a serialized array of the widgets that have changed their
     *  position.
