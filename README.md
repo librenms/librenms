@@ -37,6 +37,7 @@ I have also added functions creating a much more thourough check of whether the 
 This version is much more reliable in swapping space with widgets.
 
 There are also new options for Maximum Rows and Maximum Columns:
+	
 	$.gridster({
 		max_rows: map_rows,
     	max_cols: map_cols,
