@@ -20,7 +20,33 @@ Gridster is built by [Ducksboard](http://ducksboard.com/).
 dustmoo Modifications
 ===========
 
-Changelog 11-26-2012
+Changelog 2013-02-27
+
+Added "Static widget support" Static Items default to the "static" class.
+
+You can customize this class by using the code below:
+
+	$.gridster({
+		static_class: 'custom_class',
+		draggable: {
+            items: ".gs_w:not(.custom_class)"
+        }
+	});
+
+I have also added functions creating a much more thourough check of whether the player can occupy the space you are moving it too.
+This version is much more reliable in swapping space with widgets.
+
+There are also new options for Maximum Rows and Maximum Columns:
+	$.gridster({
+		max_rows: map_rows,
+    	max_cols: map_cols,
+    	shift_larger_widgets_down: false
+    });
+
+Setting the maximum amount of rows only completely works if you disable shifting larger widgets down at the moment. 
+
+
+Changelog 2012-11-26
 
 Reworked swapping functionality to better handle large to small widget handling.
 
@@ -40,4 +66,6 @@ I have added an option to prevent this behavior:
 	});
 
 By setting shift_larger_widgets_down to false, smaller widgets will not displace larger ones.
+
+
 
