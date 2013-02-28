@@ -1,6 +1,6 @@
-/*! gridster.js - v0.1.0 - 2012-12-11
+/*! gridster.js - v0.1.0 - 2013-02-28
 * http://gridster.net/
-* Copyright (c) 2012 ducksboard; Licensed MIT */
+* Copyright (c) 2013 ducksboard; Licensed MIT */
 
 ;(function($, window, document, undefined){
     /**
@@ -703,6 +703,7 @@
 
 ;(function($, window, document, undefined) {
 
+    //ToDo Max_cols and Max_size_x conflict.. need to unify
     var defaults = {
         namespace: '',
         widget_selector: 'li',
@@ -712,7 +713,7 @@
         extra_rows: 0,
         extra_cols: 0,
         min_cols: 1,
-        max_cols: 50,
+        max_cols: 60,
         min_rows: 15,
         max_rows: 15,
         max_size_x: 6,
@@ -1719,10 +1720,15 @@
 
         ///If set to false smaller widgets will not displace larger widgets.
         if(this.options.shift_larger_widgets_down && !swap){
-            var constraints = this.widgets_constraints($overlapped_widgets);
+            $overlapped_widgets.each($.proxy(function(i, w){
+                var $w = $(w);
+                var wgd = $w.coords().grid;
 
-            this.manage_movements(constraints.can_go_up, to_col, to_row);
-            this.manage_movements(constraints.can_not_go_up, to_col, to_row);
+                if($gr.can_go_down($w)){
+                    $gr.move_widget_down($w, $gr.player_grid_data.size_y);
+                }
+            }));
+
         }
 
 
@@ -2015,6 +2021,8 @@
     /**
     * Sorts an Array of grid coords objects (representing the grid coords of
     * each widget) in descending way.
+
+    * Depreciated.
     *
     * @method manage_movements
     * @param {HTMLElements} $widgets A jQuery collection of HTMLElements
@@ -2047,9 +2055,11 @@
                     // so we need to move widget down to a position that dont
                     // overlaps player
                     var y = (to_row + this.player_grid_data.size_y) - wgd.row;
-
-                    this.move_widget_down($w, y);
-                    this.set_placeholder(to_col, to_row);
+                    if (this.can_go_down($w)){
+                        console.log("In Move Down!")
+                        this.move_widget_down($w, y);
+                        this.set_placeholder(to_col, to_row);
+                    }
                 }
             }
         }, this));
@@ -2286,11 +2296,18 @@
         });
 
         if (moved_down || changed_column) {
-            /* $nexts.each($.proxy(function(i, widget) {
-                console.log("set_placeholder");
-                this.move_widget_up(
-                 $(widget), this.placeholder_grid_data.col - col + phgd.size_y);
-            }, this)); */
+            $nexts.each($.proxy(function(i, widget) {
+                //Make sure widget is at it's topmost position
+                $w = $(widget);
+                wgd = $w.coords().grid;
+
+                var can_go_widget_up = this.can_go_widget_up(wgd);
+
+                if (can_go_widget_up) {
+                    this.move_widget_to($w, can_go_widget_up);
+                }
+                
+            }, this));
         }
 
 
@@ -2883,6 +2900,23 @@
         return this;
     };
 
+    fn.can_go_down = function($el) {
+        var can_go_down = true;
+        var $gr = this;
+
+        if ($el.hasClass(this.options.static_class)){
+            can_go_down = false;
+        }
+
+        this.widgets_below($el).each(function(){
+            if ($(this).hasClass($gr.options.static_class)){
+                can_go_down = false;
+            }
+        })
+
+        return can_go_down;
+    }
+
 
     fn.can_go_up = function($el) {
         var el_grid_data = $el.coords().grid;
@@ -3116,7 +3150,8 @@
                     ) {
                         cr = callback.call(ga[col][trow], col, trow);
                         matched.push(ga[col][trow]);
-                        if (cr) { break; }
+                        //break was causing problems, leaving for testing.
+                        //if (cr) { break; }
                     }
                 }
             }
