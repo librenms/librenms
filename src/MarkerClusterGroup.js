@@ -809,7 +809,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			});
 
 			me._animationEnd();
-		}, 250);
+		}, 200);
 	},
 
 	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
@@ -850,7 +850,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel + 1);
 			});
 			me._animationEnd();
-		}, 250);
+		}, 200);
 	},
 	_animationAddLayer: function (layer, newCluster) {
 		var me = this;
@@ -871,7 +871,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 					layer.setOpacity(1);
 
 					me._animationEnd();
-				}, 250);
+				}, 200);
 
 			} else { //Just became a cluster
 				this._forceLayout();

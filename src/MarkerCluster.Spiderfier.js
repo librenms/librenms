@@ -231,7 +231,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		setTimeout(function () {
 			group._animationEnd();
 			group.fire('spiderfied');
-		}, 250);
+		}, 200);
 	},
 
 	_animationUnspiderfy: function (zoomDetails) {
@@ -309,7 +309,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 				delete m._spiderLeg;
 			}
 			group._animationEnd();
-		}, 250);
+		}, 200);
 	}
 });
 
