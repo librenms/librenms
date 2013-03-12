@@ -1,5 +1,11 @@
 # Mouse Wheel ChangeLog
 
+## 3.1.2
+
+* Include grunt utilities for development purposes (jshint and uglify)
+* Include support for browserify
+* Some basic cleaning up
+
 ## 3.1.1
 
 * Fix rounding issue with deltas less than zero
