@@ -22,7 +22,34 @@ $('#my_elem').mousewheel(function(event, delta, deltaX, deltaY) {
 ```
 
 ## See it in action
-[See the tests on Github](http://brandonaaron.github.com/jquery-mousewheel/test) or navigate to `test/index.html` in your browser.
+[See the tests on Github](http://brandonaaron.github.com/jquery-mousewheel/test).
+
+## Using with [Browserify](http://browserify.org)
+
+Support for browserify is baked in.
+
+```js
+npm install jquery-mousewheel
+npm install jquery-browserify
+```
+
+In your server-side node.js code:
+
+```js
+var express = require('express');
+var app = express.createServer();
+
+app.use(require('browserify')({
+    require : [ 'jquery-browserify', 'jquery-mousewheel' ]
+}));
+```
+
+In your browser-side javascript:
+
+```js
+var $ = require('jquery-browserify');
+require('jquery-mousewheel')($);
+```
 
 ## License
 

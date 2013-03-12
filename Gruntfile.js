@@ -8,8 +8,8 @@ module.exports = function(grunt) {
         preserveComments: 'some'
       },
       build: {
-        src: '<%= pkg.name %>.js',
-        dest: 'build/<%= pkg.name %>.min.js'
+        src: 'jquery.mousewheel.js',
+        dest: 'build/jquery.mousewheel.min.js'
       }
     },
     jshint: {

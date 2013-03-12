@@ -1,3 +1,5 @@
+.DS_Store
 /npm-debug.log
 /build
 /node_modules
+/test/browserify/node_modules
