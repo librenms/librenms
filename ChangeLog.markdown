@@ -1,5 +1,9 @@
 # Mouse Wheel ChangeLog
 
+## 3.1.3
+
+* Include MozMousePixelScroll in the to fix list to avoid inconsistent behavior in older Firefox
+
 ## 3.1.2
 
 * Include grunt utilities for development purposes (jshint and uglify)
