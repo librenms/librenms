@@ -16,6 +16,8 @@ Here is an example of using both the bind and helper method syntax.
         console.log(delta, deltaX, deltaY);
     });
 
+## See it in action
+[See the tests on Github](http://brandonaaron.github.com/jquery-mousewheel/test) or navigate to `test/index.html` in your browser.
 
 ## License
 
