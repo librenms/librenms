@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "check": "jshint .",
+        "lint": "jshint ."
+    }
+}
