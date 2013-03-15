@@ -1,0 +1,72 @@
+/* 
+Author: L. Voogdt
+License: MIT
+Version: 1.0
+*/
+
+/* Marker setup */
+.awesome-marker {
+  background: url('images/markers-soft.png') no-repeat 0 0;
+  width: 36px;
+  height: 46px;
+  position:absolute;
+  left:0;
+  top:0;
+  display: block;
+}
+
+.awesome-marker-shadow {
+  background: url('images/markers-shadow.png') no-repeat 0 0;
+  width: 36px;
+  height: 16px;
+}
+
+.awesome-marker i {
+  color: #fff;
+  text-align:center;
+  width:100%;
+  margin-top: 10px;
+  display: inline-block;
+  font-size: 15px;
+}
+
+/* Colors */
+.awesome-marker-icon-red {
+  background-position: 0 0;
+}
+
+.awesome-marker-icon-darkred {
+  background-position: -180px 0;
+}
+
+.awesome-marker-icon-orange {
+  background-position: -36px 0;
+}
+
+.awesome-marker-icon-green {
+  background-position: -72px 0;
+}
+
+.awesome-marker-icon-darkgreen {
+  background-position: -252px 0;
+}
+
+.awesome-marker-icon-blue {
+  background-position: -108px 0;
+}
+
+.awesome-marker-icon-darkblue {
+  background-position: -216px 0;
+}
+
+.awesome-marker-icon-purple {
+  background-position: -144px 0;
+}
+
+.awesome-marker-icon-darkpurple {
+  background-position: -288px 0;
+}
+
+.awesome-marker-icon-cadetblue {
+  background-position: -324px 0;
+}
