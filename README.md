@@ -9,16 +9,16 @@ This plugin depends on Font-Awesome for the rendering of the icons. The Font-Awe
 ## Using the plugin
 Copy the dist/images directory and css/js files to your project and include them:
 ````xml
-<link rel="stylesheet" href="css/leaflet.iconmarker.css">
+<link rel="stylesheet" href="css/leaflet.awesome-markers.css">
 ````
 ````xml
-<script src="js/leaflet.iconmarker.js"></script>
+<script src="js/leaflet.awesome-markers.js"></script>
 ````
 
 Now use the plugin to create a marker like this:
 ````js
 // Creates a red marker with the coffee icon
-var redMarker = L.IconMarker.icon({
+var redMarker = L.AwesomeMarkers.icon({
   icon: 'icon-coffee', 
   color: 'red'
 })
