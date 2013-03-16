@@ -22,7 +22,7 @@ Now use the plugin to create a marker like this:
 ````js
 // Creates a red marker with the coffee icon
 var redMarker = L.AwesomeMarkers.icon({
-  icon: 'icon-coffee', 
+  icon: 'coffee', 
   color: 'red'
 })
 
@@ -44,12 +44,25 @@ The 'color' property currently supports these strings:
 
 ### Supported icons
 The 'icon' property supports these strings:
-- 'icon-coffee'
-- 'icon-food'
-- 'icon-plane'
-- 'icon-star'
-- 'icon-beer'
+- 'coffee'
+- 'food'
+- 'plane'
+- 'star'
+- 'beer'
 - .... and many more, see: http://fortawesome.github.com/Font-Awesome/#icons-new
+
+### Spinning icons
+You can make any icon spin by setting the spin option to true:
+````js
+// Creates a red marker with the coffee icon
+var redMarker = L.AwesomeMarkers.icon({
+  icon: 'spinner', 
+  color: 'red',
+  spin: true
+})
+
+L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
+````
 
 ## License
 - Leaflet.AwesomeMarkers and colored markers are licensed under the MIT License - http://opensource.org/licenses/mit-license.html.

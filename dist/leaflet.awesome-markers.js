@@ -20,7 +20,7 @@ L.AwesomeMarkers.Icon = L.Icon.extend({
     iconAnchor:   [17, 42],
     popupAnchor: [1, -32],
     shadowAnchor: [10, 12],
-    icon: 'icon-font', // All the font-awesome icons are possible
+    icon: 'font', // All the font-awesome icons are possible
     shadowSize: [36, 16],
     className: 'awesome-marker',
     color: 'blue' // red, orange, green, blue, purple
@@ -48,7 +48,13 @@ L.AwesomeMarkers.Icon = L.Icon.extend({
   },
 
   _createInner: function() {
-    return "<i class='" + this.options.icon + "'></i>";
+    var iconClass;
+    if(this.options.icon.slice(0,5)==="icon-"){
+      iconClass=this.options.icon;
+    }else{
+      iconClass="icon-"+this.options.icon;
+    }
+    return "<i class='" + iconClass + (this.options.spin ? " icon-spin'" :"'") + "></i>";
   },
 
   _setIconStyles: function (img, name) {
