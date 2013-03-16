@@ -1,4 +1,4 @@
-# Leaflet.AwesomeMarkers plugin
+# Leaflet.awesome-markers plugin
 Colorful iconic markers for Leaflet, based on the Font Awesome icons
 
 ## Screenshots
