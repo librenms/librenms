@@ -54,7 +54,7 @@ L.AwesomeMarkers.Icon = L.Icon.extend({
     }else{
       iconClass="icon-"+this.options.icon;
     }
-    return "<i class='" + iconClass + (this.options.spin ? " icon-spin'" :"'") + "></i>";
+    return "<i class='" + iconClass + (this.options.spin ? " icon-spin" :"") + "'></i>";
   },
 
   _setIconStyles: function (img, name) {
