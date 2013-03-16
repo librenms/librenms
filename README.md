@@ -2,7 +2,7 @@
 Colorful iconic markers for Leaflet, based on the Font Awesome icons
 
 ## Screenshots
-![AwesomeMarkers screenshot](https://raw.github.com/lvoogdt/Leaflet.awesome-markers/master/screenshots/screenshot-matte.png "Screenshot of AwesomeMarkers")
+![AwesomeMarkers screenshot](https://raw.github.com/lvoogdt/Leaflet.awesome-markers/master/screenshots/screenshot-soft.png "Screenshot of AwesomeMarkers")
 
 ### Font-Awesome
 This plugin depends on Font-Awesome for the rendering of the icons. The Font-Awesome fonts and CSS classes should be included in the project. See these urls for more information:
