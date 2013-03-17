@@ -23,10 +23,14 @@ Version: 1.0
 }
 
 .awesome-marker i {
-  color: #fff;
+  color: #333;
   margin-top: 10px;
   display: inline-block;
   font-size: 14px;
+}
+
+.awesome-marker .icon-white {
+  color: #fff;
 }
 
 /* Colors */
