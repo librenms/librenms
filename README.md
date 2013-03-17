@@ -1,5 +1,5 @@
 # Leaflet.awesome-markers plugin
-Colorful iconic markers for Leaflet, based on the Font Awesome/Twitter Bootstrap icons
+Colorful iconic & retina-proof markers for Leaflet, based on the Font Awesome/Twitter Bootstrap icons
 
 ## Screenshots
 ![AwesomeMarkers screenshot](https://raw.github.com/lvoogdt/Leaflet.awesome-markers/master/screenshots/screenshot-soft.png "Screenshot of AwesomeMarkers")
