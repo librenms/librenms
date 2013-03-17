@@ -23,7 +23,8 @@ L.AwesomeMarkers.Icon = L.Icon.extend({
     shadowSize: [36, 16],
     className: 'awesome-marker',
     icon: 'home',
-    color: 'blue'
+    color: 'blue',
+    iconColor: 'white'
   },
 
   initialize: function (options) {
@@ -54,7 +55,9 @@ L.AwesomeMarkers.Icon = L.Icon.extend({
     }else{
       iconClass="icon-"+this.options.icon;
     }
-    return "<i class='" + iconClass + (this.options.spin ? " icon-spin" :"") + "'></i>";
+    return "<i class='" + iconClass 
+    + (this.options.spin ? " icon-spin" :"") 
+    + (this.options.iconColor ? " icon-" + this.options.iconColor :"") + "'></i>";
   },
 
   _setIconStyles: function (img, name) {
