@@ -24,7 +24,8 @@
 
     L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade. Font Awesome by Dave Gandy',
-      key: 'BC9A493B41014CAABB98F0471D759707'
+      key: 'BC9A493B41014CAABB98F0471D759707',
+      detectRetina: true
     }).addTo(map);
 
     L.marker([51.941196,4.512291], {icon: L.AwesomeMarkers.icon({icon: 'spinner', color: 'red', spin:true}) }).addTo(map);
