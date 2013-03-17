@@ -84,6 +84,7 @@ L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
 ## License
 - Leaflet.AwesomeMarkers and colored markers are licensed under the MIT License - http://opensource.org/licenses/mit-license.html.
 - Font Awesome: http://fortawesome.github.com/Font-Awesome/#license
+- Twitter Bootstrap: http://twitter.github.com/bootstrap/
 
 ## Contact
 - Email: lvoogdt@gmail.com
