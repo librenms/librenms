@@ -13,6 +13,7 @@ Version: 1.0
   left:0;
   top:0;
   display: block;
+  text-align: center;
 }
 
 .awesome-marker-shadow {
@@ -23,8 +24,6 @@ Version: 1.0
 
 .awesome-marker i {
   color: #fff;
-  text-align:center;
-  width:100%;
   margin-top: 10px;
   display: inline-block;
   font-size: 15px;
