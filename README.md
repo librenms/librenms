@@ -4,7 +4,7 @@ Colorful iconic & retina-proof markers for Leaflet, based on the Font Awesome/Tw
 ## Screenshots
 ![AwesomeMarkers screenshot](https://raw.github.com/lvoogdt/Leaflet.awesome-markers/master/screenshots/screenshot-soft.png "Screenshot of AwesomeMarkers")
 
-JSfiddle demo: http://jsfiddle.net/VPzu4/3/embedded/result/
+<a href="http://jsfiddle.net/VPzu4/3/embedded/result/" target="_blank">JSfiddle demo</a> 
 
 ### Twitter Bootstrap/Font-Awesome icons
 This plugin depends on Bootstrap or Font-Awesome for the rendering of the icons. The Font-Awesome fonts and CSS classes could be included in the project. See these urls for more information:
