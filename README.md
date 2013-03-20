@@ -4,6 +4,8 @@ Colorful iconic & retina-proof markers for Leaflet, based on the Font Awesome/Tw
 ## Screenshots
 ![AwesomeMarkers screenshot](https://raw.github.com/lvoogdt/Leaflet.awesome-markers/master/screenshots/screenshot-soft.png "Screenshot of AwesomeMarkers")
 
+JSfiddle demo: http://jsfiddle.net/VPzu4/embedded/result/
+
 ### Twitter Bootstrap/Font-Awesome icons
 This plugin depends on Bootstrap or Font-Awesome for the rendering of the icons. The Font-Awesome fonts and CSS classes could be included in the project. See these urls for more information:
 - http://fortawesome.github.com/Font-Awesome/
@@ -73,7 +75,7 @@ By default the icons are white, but you can set the color to black with the icon
 ````js
 // Creates a red marker with the coffee icon
 var redMarker = L.AwesomeMarkers.icon({
-  icon: 'spinner', 
+  icon: 'flag', 
   color: 'red',
   iconColor: 'black'
 })
