@@ -62,7 +62,7 @@ L.AwesomeMarkers.Icon = L.Icon.extend({
 
   _setIconStyles: function (img, name) {
     var options = this.options,
-        size = L.point(options[name + 'Size']),
+        size = L.point(options[name == 'shadow' ? 'shadowSize' : 'iconSize']),
         anchor;
 
     if (name === 'shadow') {
