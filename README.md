@@ -20,6 +20,10 @@ Gridster is built by [Ducksboard](http://ducksboard.com/).
 dustmoo Modifications
 ===========
 
+Changelog 2013-04-2
+
+Added Demo to Repository.
+
 Changelog 2013-02-27
 
 Added "Static widget support" Static Items default to the "static" class.
