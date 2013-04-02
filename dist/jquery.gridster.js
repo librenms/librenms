@@ -732,8 +732,7 @@
         draggable: {
             distance: 4,
             items: ".gs_w:not(.static)"
-        },
-        disable_drag: false
+        }
     };
 
 
@@ -808,9 +807,7 @@
         this.get_widgets_from_DOM();
         this.set_dom_grid_height();
         this.$wrapper.addClass('ready');
-        if (!this.options.disable_drag) {
-            this.draggable();
-        }
+        this.draggable();
 
         $(window).bind(
             'resize', throttle($.proxy(this.recalculate_faux_grid, this), 200));
