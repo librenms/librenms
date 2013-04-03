@@ -20,6 +20,10 @@ Gridster is built by [Ducksboard](http://ducksboard.com/).
 dustmoo Modifications
 ===========
 
+Changelog 2013-04-3
+
+Fork now handles standard behavior properly with swap allowing larger widgets to shift down.
+
 Changelog 2013-04-2
 
 Added Demo to Repository.
