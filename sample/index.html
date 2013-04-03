@@ -23,13 +23,13 @@
                 $(".gridster ul").gridster({
                     widget_margins: [10, 10],
                     widget_base_dimensions: [140, 140],
-                    max_cols: 6
+                    shift_larger_widgets_down: false
                 });
             });
         </script>
     </head>
     <body>
-        <div class="gridster ready">
+        <div class="gridster">
           <ul style="height: 480px; position: relative; ">
             <li data-row="1" data-col="1" data-sizex="2" data-sizey="1" class="gs_w"></li>
             <li data-row="3" data-col="1" data-sizex="1" data-sizey="1" class="gs_w"></li>
@@ -51,7 +51,6 @@
 
     <div class="content">
         <p>This demo represents using the branch in swap mode. This works best with shift_larger_widgets_down set to "false". However, smaller widgets do not displace larger ones.</p>
-        <p>For now, if you want the default shift down behavior I recommend using the standard gridster library.</p>
     </div>
-    </body>
+</body>
 </html>
