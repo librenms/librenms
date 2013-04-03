@@ -1,4 +1,4 @@
-/*! gridster.js - v0.1.0 - 2013-04-02
+/*! gridster.js - v0.1.0 - 2013-04-03
 * http://gridster.net/
 * Copyright (c) 2013 ducksboard; Licensed MIT */
 
@@ -1695,7 +1695,19 @@
                         }
 
                     }
+            } else if ($gr.options.shift_larger_widgets_down && !swap) {
+                $overlapped_widgets.each($.proxy(function(i, w){
+                    var $w = $(w);
+                    var wgd = $w.coords().grid;
+
+                    if($gr.can_go_down($w)){
+                        $gr.move_widget_down($w, $gr.player_grid_data.size_y);
+                        $gr.set_placeholder(to_col, to_row);
+                    }
+                }));
             }
+
+            $gr.clean_up_changed();
         }));
 
 
@@ -1717,20 +1729,6 @@
             }
             this.set_placeholder(to_col, to_row);
         }
-
-        ///If set to false smaller widgets will not displace larger widgets.
-        if(this.options.shift_larger_widgets_down && !swap){
-            $overlapped_widgets.each($.proxy(function(i, w){
-                var $w = $(w);
-                var wgd = $w.coords().grid;
-
-                if($gr.can_go_down($w)){
-                    $gr.move_widget_down($w, $gr.player_grid_data.size_y);
-                }
-            }));
-
-        }
-
 
         /* if there is not widgets overlapping in the new player position,
          * update the new placeholder position. */
@@ -2570,11 +2568,12 @@
     fn.on_stop_overlapping_column = function(col) {
         //this.set_player(col, false);
         var self = this;
-        /*this.for_each_widget_below(col, this.cells_occupied_by_player.rows[0],
-            function(tcol, trow) {
-                console.log("from_on_stop_overlapping_column");
-                self.move_widget_up(this, self.player_grid_data.size_y);
-        });*/
+        if(this.options.shift_larger_widgets_down){
+            this.for_each_widget_below(col, this.cells_occupied_by_player.rows[0],
+                function(tcol, trow) {
+                    self.move_widget_up(this, self.player_grid_data.size_y);
+            });
+        }
     };
 
 
@@ -2589,12 +2588,14 @@
         //this.set_player(false, row);
         var self = this;
         var cols = this.cells_occupied_by_player.cols;
-        /*for (var c = 0, cl = cols.length; c < cl; c++) {
-            this.for_each_widget_below(cols[c], row, function(tcol, trow) {
-                console.log("from_on_stop_overlapping_row");
-                self.move_widget_up(this, self.player_grid_data.size_y);
-            });
-        }*/
+        if(this.options.shift_larger_widgets_down){
+            for (var c = 0, cl = cols.length; c < cl; c++) {
+                this.for_each_widget_below(cols[c], row, function(tcol, trow) {
+                    console.log("from_on_stop_overlapping_row");
+                    self.move_widget_up(this, self.player_grid_data.size_y);
+                });
+            }
+        }
     };
 
    //Not yet part of api - DM.
@@ -3112,6 +3113,15 @@
             callback.call(this, row, el_grid_data);
         }
     };
+
+    fn.clean_up_changed = function(){
+        $gr = this;
+        $gr.$changed.each(function(){
+            if($gr.options.shift_larger_widgets_down){
+                $gr.move_widget_up($(this));
+            }
+        });
+    }
 
 
 
