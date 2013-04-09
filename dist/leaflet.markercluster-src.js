@@ -849,13 +849,11 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				//If we were in a cluster animation at the time then the opacity and position of our child could be wrong now, so fix it
 				m.setLatLng(m.getLatLng());
 				m.setOpacity(1);
-
-				return;
+			} else {
+				cluster._recursively(bounds, newZoomLevel, 0, function (c) {
+					c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel + 1);
+				});
 			}
-
-			cluster._recursively(bounds, newZoomLevel, 0, function (c) {
-				c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel + 1);
-			});
 			me._animationEnd();
 		}, 200);
 	},
@@ -949,6 +947,11 @@ L.MarkerCluster = L.Marker.extend({
 		this._group._map.fitBounds(this._bounds);
 	},
 
+	getBounds: function () {
+		var bounds = new L.LatLngBounds();
+		bounds.extend(this._bounds);
+		return bounds;
+	},
 
 	_updateIcon: function () {
 		this._iconNeedsUpdate = true;
