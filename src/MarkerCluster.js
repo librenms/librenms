@@ -47,6 +47,11 @@ L.MarkerCluster = L.Marker.extend({
 		this._group._map.fitBounds(this._bounds);
 	},
 
+	getBounds: function () {
+		var bounds = new L.LatLngBounds();
+		bounds.extend(this._bounds);
+		return bounds;
+	},
 
 	_updateIcon: function () {
 		this._iconNeedsUpdate = true;
