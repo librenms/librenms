@@ -843,7 +843,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				m.setLatLng(m.getLatLng());
 				m.setOpacity(1);
 			} else {
-				cluster._recursively(bounds, newZoomLevel, 0, function(c) {
+				cluster._recursively(bounds, newZoomLevel, 0, function (c) {
 					c._recursivelyRemoveChildrenFromMap(bounds, previousZoomLevel + 1);
 				});
 			}
