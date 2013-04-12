@@ -4,55 +4,72 @@ var fs = require('fs'),
 
 exports.getFiles = function (compsBase32) {
 	var memo = {},
-		comps;
+		comps,
+		i,
+		files = [],
+		src;
 
 	if (compsBase32) {
 		comps = parseInt(compsBase32, 32).toString(2).split('');
-		console.log('Managing dependencies...')
+		console.log('Managing dependencies...');
 	}
 
 	function addFiles(srcs) {
-		for (var j = 0, len = srcs.length; j < len; j++) {
+		var j,
+			len;
+		for (j = 0, len = srcs.length; j < len; j += 1) {
 			memo[srcs[j]] = true;
 		}
 	}
 
-	for (var i in deps) {
-		if (comps) {
-			if (parseInt(comps.pop(), 2) === 1) {
-				console.log('\t* ' + i);
-				addFiles(deps[i].src);
+	for (i in deps) {
+		if (deps.hasOwnProperty(i)) {
+			if (comps) {
+				if (parseInt(comps.pop(), 2) === 1) {
+					console.log('\t* ' + i);
+					addFiles(deps[i].src);
+				} else {
+					console.log('\t  ' + i);
+				}
 			} else {
-				console.log('\t  ' + i);
+				addFiles(deps[i].src);
 			}
-		} else {
-			addFiles(deps[i].src);
 		}
 	}
 
-	var files = [];
-
-	for (var src in memo) {
-		files.push('src/' + src);
+	for (src in memo) {
+		if (memo.hasOwnProperty(src)) {
+			files.push('src/' + src);
+		}
 	}
 
 	return files;
 };
 
 exports.uglify = function (code) {
-	var pro = uglifyjs.uglify;
+	var ast,
+		compressor;
+	ast = uglifyjs.parse(code);
 
-	var ast = uglifyjs.parser.parse(code);
-	ast = pro.ast_mangle(ast, {mangle: true});
-	ast = pro.ast_squeeze(ast);
-	ast = pro.ast_squeeze_more(ast);
+	// compressor needs figure_out_scope too
+	ast.figure_out_scope();
+	compressor = uglifyjs.Compressor();
+	ast = ast.transform(compressor);
 
-	return pro.gen_code(ast) + ';';
+	// need to figure out scope again so mangler works optimally
+	ast.figure_out_scope();
+	ast.compute_char_frequency();
+	ast.mangle_names();
+
+	// get Ugly code back :)
+	return ast.print_to_string();
 };
 
 exports.combineFiles = function (files) {
-	var content = '(function (window, undefined) {\n\n';
-	for (var i = 0, len = files.length; i < len; i++) {
+	var content = '(function (window, undefined) {\n\n',
+		i,
+		len;
+	for (i = 0, len = files.length; i < len; i += 1) {
 		content += fs.readFileSync(files[i], 'utf8') + '\n\n';
 	}
 	return content + '\n\n}(this));';
