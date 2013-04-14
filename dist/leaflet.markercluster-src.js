@@ -3,7 +3,7 @@
  Leaflet.markercluster is an open-source JavaScript library for Marker Clustering on leaflet powered maps.
  https://github.com/danzel/Leaflet.markercluster
 */
-(function (window, undefined) {
+(function () {
 
 
 /*
@@ -362,8 +362,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Overrides FeatureGroup.onRemove
 	onRemove: function (map) {
-		this._map.off('zoomend', this._zoomEnd, this);
-		this._map.off('moveend', this._moveEnd, this);
+		map.off('zoomend', this._zoomEnd, this);
+		map.off('moveend', this._moveEnd, this);
 
 		this._unbindEvents();
 
