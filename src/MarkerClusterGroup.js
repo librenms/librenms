@@ -355,8 +355,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Overrides FeatureGroup.onRemove
 	onRemove: function (map) {
-		this._map.off('zoomend', this._zoomEnd, this);
-		this._map.off('moveend', this._moveEnd, this);
+		map.off('zoomend', this._zoomEnd, this);
+		map.off('moveend', this._moveEnd, this);
 
 		this._unbindEvents();
 

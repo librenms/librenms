@@ -66,7 +66,7 @@ exports.uglify = function (code) {
 };
 
 exports.combineFiles = function (files) {
-	var content = '(function (window, undefined) {\n\n',
+	var content = '(function () {\n\n',
 		i,
 		len;
 	for (i = 0, len = files.length; i < len; i += 1) {
