@@ -266,6 +266,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Returns true if the given layer is in this MarkerClusterGroup
 	hasLayer: function (layer) {
+		if (layer._noHas) {
+			return false;
+		}
+
 		if (this._needsClustering.length > 0) {
 			var anArray = this._needsClustering;
 			for (var i = anArray.length - 1; i >= 0; i--) {

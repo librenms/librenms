@@ -132,7 +132,9 @@ L.MarkerCluster = L.Marker.extend({
 			this._backupLatlng = this._latlng;
 			this.setLatLng(startPos);
 		}
+		this._noHas = true;
 		L.FeatureGroup.prototype.addLayer.call(this._group, this);
+		delete this._noHas;
 	},
 
 	_recursivelyAnimateChildrenIn: function (bounds, center, maxZoom) {
@@ -211,7 +213,9 @@ L.MarkerCluster = L.Marker.extend({
 						nm.setOpacity(0);
 					}
 
+					nm._noHas = true;
 					L.FeatureGroup.prototype.addLayer.call(c._group, nm);
+					delete nm._noHas;
 				}
 			},
 			function (c) {
@@ -268,7 +272,9 @@ L.MarkerCluster = L.Marker.extend({
 				for (i = c._childClusters.length - 1; i >= 0; i--) {
 					m = c._childClusters[i];
 					if (!exceptBounds || !exceptBounds.contains(m._latlng)) {
-						L.FeatureGroup.prototype.removeLayer.call(c._group, m);
+						if (L.FeatureGroup.prototype.hasLayer.call(c._group, m)) {
+							L.FeatureGroup.prototype.removeLayer.call(c._group, m);
+						}
 						m.setOpacity(1);
 					}
 				}

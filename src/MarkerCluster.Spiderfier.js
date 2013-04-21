@@ -152,7 +152,9 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
 			m.setOpacity(0);
 
+			m._noHas = true;
 			L.FeatureGroup.prototype.addLayer.call(group, m);
+			delete m._noHas;
 
 			m._setPos(thisLayerPos);
 		}
