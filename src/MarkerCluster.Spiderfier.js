@@ -83,6 +83,31 @@ L.MarkerCluster.include({
 			legLength += this._2PI * lengthFactor / angle;
 		}
 		return res;
+	},
+
+	_noanimationUnspiderfy: function () {
+		var group = this._group,
+			map = group._map,
+			childMarkers = this.getAllChildMarkers(),
+			m, i;
+
+		this.setOpacity(1);
+		for (i = childMarkers.length - 1; i >= 0; i--) {
+			m = childMarkers[i];
+
+			L.FeatureGroup.prototype.removeLayer.call(group, m);
+
+			if (m._preSpiderfyLatlng) {
+				m.setLatLng(m._preSpiderfyLatlng);
+				delete m._preSpiderfyLatlng;
+			}
+			m.setZIndexOffset(0);
+
+			if (m._spiderLeg) {
+				map.removeLayer(m._spiderLeg);
+				delete m._spiderLeg;
+			}
+		}
 	}
 });
 
@@ -113,24 +138,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 	},
 
 	_animationUnspiderfy: function () {
-		var group = this._group,
-			map = group._map,
-			childMarkers = this.getAllChildMarkers(),
-			m, i;
-
-		this.setOpacity(1);
-		for (i = childMarkers.length - 1; i >= 0; i--) {
-			m = childMarkers[i];
-
-			L.FeatureGroup.prototype.removeLayer.call(group, m);
-
-			m.setLatLng(m._preSpiderfyLatlng);
-			delete m._preSpiderfyLatlng;
-			m.setZIndexOffset(0);
-
-			map.removeLayer(m._spiderLeg);
-			delete m._spiderLeg;
-		}
+		this._noanimationUnspiderfy();
 	}
 } : {
 	//Animated versions here
@@ -375,6 +383,12 @@ L.MarkerClusterGroup.include({
 	_unspiderfy: function (zoomDetails) {
 		if (this._spiderfied) {
 			this._spiderfied.unspiderfy(zoomDetails);
+		}
+	},
+
+	_noanimationUnspiderfy: function () {
+		if (this._spiderfied) {
+			this._spiderfied._noanimationUnspiderfy();
 		}
 	},
 

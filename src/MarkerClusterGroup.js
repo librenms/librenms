@@ -214,8 +214,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			delete this._gridUnclustered;
 		}
 
-		if (this._unspiderfy) {
-			this._unspiderfy();
+		if (this._noanimationUnspiderfy) {
+			this._noanimationUnspiderfy();
 		}
 
 		//Remove all the visible layers
