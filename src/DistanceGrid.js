@@ -57,20 +57,16 @@ L.DistanceGrid.prototype = {
 		    grid = this._grid;
 
 		for (i in grid) {
-			if (grid.hasOwnProperty(i)) {
-				row = grid[i];
+			row = grid[i];
 
-				for (j in row) {
-					if (row.hasOwnProperty(j)) {
-						cell = row[j];
+			for (j in row) {
+				cell = row[j];
 
-						for (k = 0, len = cell.length; k < len; k++) {
-							removed = fn.call(context, cell[k]);
-							if (removed) {
-								k--;
-								len--;
-							}
-						}
+				for (k = 0, len = cell.length; k < len; k++) {
+					removed = fn.call(context, cell[k]);
+					if (removed) {
+						k--;
+						len--;
 					}
 				}
 			}

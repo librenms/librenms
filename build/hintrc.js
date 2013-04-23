@@ -18,7 +18,7 @@ exports.config = {
 	"eqnull": false,
 	"evil": false,
 	"expr": false,
-	"forin": true,
+	"forin": false,
 	"immed": true,
 	"latedef": true,
 	"loopfunc": false,

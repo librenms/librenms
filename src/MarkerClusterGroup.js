@@ -50,9 +50,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		if (layer instanceof L.LayerGroup) {
 			var array = [];
 			for (var i in layer._layers) {
-				if (layer._layers.hasOwnProperty(i)) {
-					array.push(layer._layers[i]);
-				}
+				array.push(layer._layers[i]);
 			}
 			return this.addLayers(array);
 		}
@@ -149,11 +147,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		//Update the icons of all those visible clusters that were affected
 		for (i in this._layers) {
-			if (this._layers.hasOwnProperty(i)) {
-				m = this._layers[i];
-				if (m instanceof L.MarkerCluster && m._iconNeedsUpdate) {
-					m._updateIcon();
-				}
+			m = this._layers[i];
+			if (m instanceof L.MarkerCluster && m._iconNeedsUpdate) {
+				m._updateIcon();
 			}
 		}
 
@@ -192,11 +188,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
 
 		for (i in this._layers) {
-			if (this._layers.hasOwnProperty(i)) {
-				m = this._layers[i];
-				if (m instanceof L.MarkerCluster) {
-					m._updateIcon();
-				}
+			m = this._layers[i];
+			if (m instanceof L.MarkerCluster) {
+				m._updateIcon();
 			}
 		}
 
@@ -220,9 +214,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		//Remove all the visible layers
 		for (var i in this._layers) {
-			if (this._layers.hasOwnProperty(i)) {
-				L.FeatureGroup.prototype.removeLayer.call(this, this._layers[i]);
-			}
+			L.FeatureGroup.prototype.removeLayer.call(this, this._layers[i]);
 		}
 
 		this.eachLayer(function (marker) {
@@ -373,9 +365,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		//Clean up all the layers we added to the map
 		for (var i in this._layers) {
-			if (this._layers.hasOwnProperty(i)) {
-				L.FeatureGroup.prototype.removeLayer.call(this, this._layers[i]);
-			}
+			L.FeatureGroup.prototype.removeLayer.call(this, this._layers[i]);
 		}
 
 		this._map = null;
@@ -789,12 +779,10 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		me._topClusterLevel._recursivelyBecomeVisible(bounds, newZoomLevel);
 		//TODO Maybe? Update markers in _recursivelyBecomeVisible
 		for (j in me._layers) {
-			if (me._layers.hasOwnProperty(j)) {
-				n = me._layers[j];
+			n = me._layers[j];
 
-				if (!(n instanceof L.MarkerCluster) && n._icon) {
-					n.setOpacity(1);
-				}
+			if (!(n instanceof L.MarkerCluster) && n._icon) {
+				n.setOpacity(1);
 			}
 		}
 
