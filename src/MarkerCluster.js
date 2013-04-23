@@ -272,7 +272,7 @@ L.MarkerCluster = L.Marker.extend({
 				for (i = c._childClusters.length - 1; i >= 0; i--) {
 					m = c._childClusters[i];
 					if (!exceptBounds || !exceptBounds.contains(m._latlng)) {
-						if (L.FeatureGroup.prototype.hasLayer.call(c._group, m)) {
+						if (!L.FeatureGroup.prototype.hasLayer || L.FeatureGroup.prototype.hasLayer.call(c._group, m)) {
 							L.FeatureGroup.prototype.removeLayer.call(c._group, m);
 						}
 						m.setOpacity(1);
