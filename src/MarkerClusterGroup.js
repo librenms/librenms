@@ -261,7 +261,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Returns true if the given layer is in this MarkerClusterGroup
 	hasLayer: function (layer) {
-		if (layer._noHas) {
+		if (!layer || layer._noHas) {
 			return false;
 		}
 
