@@ -1,0 +1,25 @@
+{
+	"name": "Leaflet.markercluster",
+	"version": "0.3.0",
+	"description": "Provides Beautiful Animated Marker Clustering functionality for Leaflet",
+	"dependencies": {
+		"leaflet": "git://github.com/Leaflet/Leaflet.git#016f635616fa1df18744baa036cc0e67f94f6248"
+	},
+	"devDependencies": {
+		"jshint": "~2.1.3",
+		"mocha": "~1.10.0",
+		"karma": "~0.8.5",
+		"uglify-js": "~2.3.6",
+		"jake": "~0.5.16"
+	},
+	"main": "dist/leaflet.markercluster.js",
+	"scripts": {
+		"test": "jake test",
+		"prepublish": "jake"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/Leaflet/Leaflet.markercluster.git"
+	},
+	"keywords": ["gis", "map"]
+}

@@ -1,67 +1,26 @@
-var build = require('./build/build.js'),
-    lint = require('./build/hint.js');
+/*
+Leaflet.markercluster building, testing and linting scripts.
 
-var COPYRIGHT = '/*\n Copyright (c) 2012, Smartrak, David Leaver\n' +
-                ' Leaflet.markercluster is an open-source JavaScript library for Marker Clustering on leaflet powered maps.\n' + 
-                ' https://github.com/danzel/Leaflet.markercluster\n*/\n';
+To use, install Node, then run the following commands in the project root:
+
+    npm install -g jake
+    npm install
+
+To check the code for errors and build Leaflet from source, run "jake".
+To run the tests, run "jake test".
+
+For a custom build, open build/build.html in the browser and follow the instructions.
+*/
+
+var build = require('./build/build.js');
 
 desc('Check Leaflet.markercluster source for errors with JSHint');
-task('lint', function () {
-
-	var files = build.getFiles();
-
-	console.log('Checking for JS errors...');
-
-	var errorsFound = lint.jshint(files);
-
-	if (errorsFound > 0) {
-		console.log(errorsFound + ' error(s) found.\n');
-		fail();
-	} else {
-		console.log('\tCheck passed');
-	}
-});
+task('lint', build.lint);
 
 desc('Combine and compress Leaflet.markercluster source files');
-task('build', ['lint'], function (compsBase32, buildName) {
+task('build', ['lint'], build.build);
 
-	var files = build.getFiles(compsBase32);
-
-	console.log('Concatenating ' + files.length + ' files...');
-
-	var content = build.combineFiles(files),
-	    newSrc = COPYRIGHT + content,
-
-	    pathPart = 'dist/leaflet.markercluster' + (buildName ? '-' + buildName : ''),
-	    srcPath = pathPart + '-src.js',
-
-	    oldSrc = build.load(srcPath),
-	    srcDelta = build.getSizeDelta(newSrc, oldSrc);
-
-	console.log('\tUncompressed size: ' + newSrc.length + ' bytes (' + srcDelta + ')');
-
-	if (newSrc === oldSrc) {
-		console.log('\tNo changes');
-	} else {
-		build.save(srcPath, newSrc);
-		console.log('\tSaved to ' + srcPath);
-	}
-
-	console.log('Compressing...');
-
-	var path = pathPart + '.js',
-	    oldCompressed = build.load(path),
-	    newCompressed = COPYRIGHT + build.uglify(content),
-	    delta = build.getSizeDelta(newCompressed, oldCompressed);
-
-	console.log('\tCompressed size: ' + newCompressed.length + ' bytes (' + delta + ')');
-
-	if (newCompressed === oldCompressed) {
-		console.log('\tNo changes');
-	} else {
-		build.save(path, newCompressed);
-		console.log('\tSaved to ' + path);
-	}
-});
+desc('Run PhantomJS tests');
+task('test', ['lint'], build.test);
 
 task('default', ['build']);
