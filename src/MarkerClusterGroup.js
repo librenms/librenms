@@ -714,7 +714,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Shared animation code
 	_animationAddLayerNonAnimated: function (layer, newCluster) {
 		if (newCluster === layer) {
+			layer._noHas = true;
 			L.FeatureGroup.prototype.addLayer.call(this, layer);
+			delete layer._noHas;
 		} else if (newCluster._childCount === 2) {
 			newCluster._addToMap();
 
@@ -862,7 +864,9 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	_animationAddLayer: function (layer, newCluster) {
 		var me = this;
 
+		layer._noHas = true;
 		L.FeatureGroup.prototype.addLayer.call(this, layer);
+		delete layer._noHas;
 		if (newCluster !== layer) {
 			if (newCluster._childCount > 2) { //Was already a cluster
 
