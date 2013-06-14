@@ -1,6 +1,8 @@
 ﻿describe('addLayer adding multiple markers', function () {
-	var map, div;
+	var map, div, clock;
 	beforeEach(function () {
+		clock = sinon.useFakeTimers();
+
 		div = document.createElement('div');
 		div.style.width = '200px';
 		div.style.height = '200px';
@@ -14,6 +16,7 @@
 		]));
 	});
 	afterEach(function () {
+		clock.restore();
 		document.body.removeChild(div);
 	});
 
@@ -47,7 +50,30 @@
 
 		expect(map._panes.markerPane.childNodes.length).to.be(1);
 	});
+	it('creates a cluster with an animation when 2 overlapping markers are added after the group is added to the map', function () {
 
+		var group = new L.MarkerClusterGroup({ animateAddingMarkers: true });
+		var marker = new L.Marker([1.5, 1.5]);
+		var marker2 = new L.Marker([1.5, 1.5]);
+
+		map.addLayer(group);
+		group.addLayer(marker);
+		group.addLayer(marker2);
+
+		expect(marker._icon.parentNode).to.be(map._panes.markerPane);
+		expect(marker2._icon.parentNode).to.be(map._panes.markerPane);
+
+		expect(map._panes.markerPane.childNodes.length).to.be(3);
+
+		//Run the the animation
+		clock.tick(1000);
+
+		//Then markers should be removed from map
+		expect(marker._icon).to.be(null);
+		expect(marker2._icon).to.be(null);
+
+		expect(map._panes.markerPane.childNodes.length).to.be(1);
+	});
 
 	it('creates a cluster and marker when 2 overlapping markers and one non-overlapping are added before the group is added to the map', function () {
 
