@@ -113,9 +113,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		//Remove the marker from clusters
 		this._removeLayer(layer, true);
 
-		if (layer._icon) {
+		if (layer._icon || layer._container) {
 			L.FeatureGroup.prototype.removeLayer.call(this, layer);
-			layer.setOpacity(1);
+			if (layer.setOpacity) {
+				layer.setOpacity(1);
+			}
 		}
 
 		return this;

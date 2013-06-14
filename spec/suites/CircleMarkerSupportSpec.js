@@ -60,6 +60,9 @@
 		expect(marker2._container.parentNode).to.be(map._pathRoot);
 
 		clock.tick(1000);
+
+		expect(marker._container.parentNode).to.be(null);
+		expect(marker2._container.parentNode).to.be(null);
 	});
 
 
