@@ -906,3 +906,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		L.Util.falseFn(document.body.offsetWidth);
 	}
 });
+
+L.markerClusterGroup = function (options) {
+	return new L.MarkerClusterGroup(options);
+};

@@ -24,17 +24,17 @@
 
 		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
 			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
-			latlng = new L.LatLng(50.5, 30.51);
+			cloudmade = L.tileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+			latlng = L.latLng(50.5, 30.51);
 
-		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
+		var map = L.map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
 
-		var markers = new L.MarkerClusterGroup({ animateAddingMarkers : true });
+		var markers = L.markerClusterGroup({ animateAddingMarkers : true });
 		var markersList = [];
 
 		function populate() {
 			for (var i = 0; i < 100; i++) {
-				var m = new L.Marker(getRandomLatLng(map));
+				var m = L.marker(getRandomLatLng(map));
 				markersList.push(m);
 				markers.addLayer(m);
 			}
@@ -47,7 +47,7 @@
 				lngSpan = northEast.lng - southWest.lng,
 				latSpan = northEast.lat - southWest.lat;
 
-			return new L.LatLng(
+			return L.latLng(
 					southWest.lat + latSpan * Math.random(),
 					southWest.lng + lngSpan * Math.random());
 		}
@@ -66,9 +66,9 @@
 			northEast = bounds.getNorthEast(),
 			lngSpan = northEast.lng - southWest.lng,
 			latSpan = northEast.lat - southWest.lat;
-			var m = new L.Marker(new L.LatLng(
+			var m = L.marker([
 					southWest.lat + latSpan * 0.5,
-					southWest.lng + lngSpan * 0.5));
+					southWest.lng + lngSpan * 0.5]);
 			markersList.push(m);
 			markers.addLayer(m);
 		};

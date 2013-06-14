@@ -31,17 +31,17 @@
 
 		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
 			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
-			latlng = new L.LatLng(50.5, 30.51);
+			cloudmade = L.tileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+			latlng = L.latLng(50.5, 30.51);
 
-		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
+		var map = L.map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
 
 
 		//Custom radius and icon create function
-		var markers = new L.MarkerClusterGroup({
+		var markers = L.markerClusterGroup({
 			maxClusterRadius: 120,
 			iconCreateFunction: function (cluster) {
-				return new L.DivIcon({ html: cluster.getChildCount(), className: 'mycluster', iconSize: new L.Point(40, 40) });
+				return L.divIcon({ html: cluster.getChildCount(), className: 'mycluster', iconSize: L.point(40, 40) });
 			},
 			//Disable all of the defaults:
 			spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false
@@ -50,7 +50,7 @@
 
 		function populate() {
 			for (var i = 0; i < 100; i++) {
-				var m = new L.Marker(getRandomLatLng(map));
+				var m = L.marker(getRandomLatLng(map));
 				markers.addLayer(m);
 			}
 			return false;
@@ -59,7 +59,7 @@
 			for (var i = 0, latlngs = [], len = 20; i < len; i++) {
 				latlngs.push(getRandomLatLng(map));
 			}
-			var path = new L.Polyline(latlngs);
+			var path = L.polyline(latlngs);
 			map.addLayer(path);
 		}
 		function getRandomLatLng(map) {
@@ -69,7 +69,7 @@
 				lngSpan = northEast.lng - southWest.lng,
 				latSpan = northEast.lat - southWest.lat;
 
-			return new L.LatLng(
+			return L.latLng(
 					southWest.lat + latSpan * Math.random(),
 					southWest.lng + lngSpan * Math.random());
 		}
@@ -97,7 +97,7 @@
 
 			a.layer.setOpacity(0.2);
 			shownLayer = a.layer;
-			polygon = new L.Polygon(a.layer.getConvexHull());
+			polygon = L.polygon(a.layer.getConvexHull());
 			map.addLayer(polygon);
 		});
 		markers.on('clustermouseout', removePolygon);

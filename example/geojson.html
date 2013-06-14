@@ -41,7 +41,7 @@
 		var map = L.map('map')
 				.addLayer(cloudmade);
 
-		var markers = new L.MarkerClusterGroup();
+		var markers = L.markerClusterGroup();
 
 		var geoJsonLayer = L.geoJson(geoJsonData, {
 			onEachFeature: function (feature, layer) {

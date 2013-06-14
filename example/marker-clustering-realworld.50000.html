@@ -25,12 +25,12 @@
 	<script type="text/javascript">
 			var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
 			    cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade, Points &copy 2012 LINZ',
-			    cloudmade = new L.TileLayer(cloudmadeUrl, { maxZoom: 17, attribution: cloudmadeAttribution }),
-			    latlng = new L.LatLng(-37.79, 175.27);
+			    cloudmade = L.tileLayer(cloudmadeUrl, { maxZoom: 17, attribution: cloudmadeAttribution }),
+			    latlng = L.latLng(-37.79, 175.27);
 
-			var map = new L.Map('map', { center: latlng, zoom: 13, layers: [cloudmade] });
+			var map = L.map('map', { center: latlng, zoom: 13, layers: [cloudmade] });
 
-			var markers = new L.MarkerClusterGroup();
+			var markers = L.markerClusterGroup();
 
 			var markerList = [];
 
@@ -39,14 +39,14 @@
 			for (var i = 0; i < addressPoints.length; i++) {
 				var a = addressPoints[i];
 				var title = a[2];
-				var marker = new L.Marker(new L.LatLng(a[0], a[1]), { title: title });
+				var marker = L.marker(L.latLng(a[0], a[1]), { title: title });
 				marker.bindPopup(title);
 				markerList.push(marker);
 			}
 			for (var i = 0; i < addressPoints2.length; i++) {
 				var a = addressPoints[i];
 				var title = a[2];
-				var marker = new L.Marker(new L.LatLng(a[0], a[1]), { title: title });
+				var marker = L.marker(L.latLng(a[0], a[1]), { title: title });
 				marker.bindPopup(title);
 				markerList.push(marker);
 			}

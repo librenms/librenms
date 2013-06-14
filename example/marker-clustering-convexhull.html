@@ -24,16 +24,16 @@
 
 		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
 			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
-			latlng = new L.LatLng(50.5, 30.51);
+			cloudmade = L.tileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+			latlng = L.latLng(50.5, 30.51);
 
-		var map = new L.Map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
+		var map = L.map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
 
-		var markers = new L.MarkerClusterGroup({ spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false });
+		var markers = L.markerClusterGroup({ spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false });
 
 		function populate() {
 			for (var i = 0; i < 100; i++) {
-				var m = new L.Marker(getRandomLatLng(map));
+				var m = L.marker(getRandomLatLng(map));
 				markers.addLayer(m);
 			}
 			return false;
@@ -45,7 +45,7 @@
 				lngSpan = northEast.lng - southWest.lng,
 				latSpan = northEast.lat - southWest.lat;
 
-			return new L.LatLng(
+			return L.latLng(
 					southWest.lat + latSpan * Math.random(),
 					southWest.lng + lngSpan * Math.random());
 		}
@@ -56,7 +56,7 @@
 			if (polygon) {
 				map.removeLayer(polygon);
 			}
-			polygon = new L.Polygon(a.layer.getConvexHull());
+			polygon = L.polygon(a.layer.getConvexHull());
 			map.addLayer(polygon);
 		});
 
