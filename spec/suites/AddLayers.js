@@ -1,4 +1,4 @@
-﻿describe('addLayer adding multiple markers', function () {
+﻿describe('addLayers adding multiple markers', function () {
 	var map, div;
 	beforeEach(function () {
 		div = document.createElement('div');
