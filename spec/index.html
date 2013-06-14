@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+	<meta charset="utf-8">
 	<title>Spec Runner</title>
 	<link rel="stylesheet" type="text/css" href="../node_modules/mocha/mocha.css">
 </head>
 <body>
-    <div id="mocha"></div>
-    <script src="expect.js"></script>
-   	<script type="text/javascript" src="../node_modules/mocha/mocha.js"></script>
+	<div id="mocha"></div>
+	<script src="expect.js"></script>
+	<script type="text/javascript" src="../node_modules/mocha/mocha.js"></script>
 	<script type="text/javascript" src="happen.js"></script>
 	<script type="text/javascript" src="sinon.js"></script>
 	<script type="text/javascript" src="../node_modules/leaflet/dist/leaflet-src.js"></script>
@@ -20,29 +20,32 @@
 	<script type="text/javascript" src="../src/MarkerCluster.QuickHull.js"></script>
 	<script type="text/javascript" src="../src/MarkerCluster.Spiderfier.js"></script>
 
-    <script>
-        mocha.setup('bdd');
-        mocha.ignoreLeaks();
-    </script>
+	<script>
+		mocha.setup('bdd');
+		mocha.ignoreLeaks();
+	</script>
 
 	<!-- spec files -->
 
 	<script type="text/javascript" src="suites/SpecHelper.js"></script>
-	
+
 	<script type="text/javascript" src="suites/LeafletSpec.js"></script>
-	
+
 	<script type="text/javascript" src="suites/AddLayer.SingleSpec.js"></script>
 	<script type="text/javascript" src="suites/AddLayer.MultipleSpec.js"></script>
 	<script type="text/javascript" src="suites/AddLayersSpec.js"></script>
-	
+
 	<script type="text/javascript" src="suites/RemoveLayerSpec.js"></script>
 
 	<script type="text/javascript" src="suites/CircleMarkerSupportSpec.js"></script>
 	<script type="text/javascript" src="suites/CircleSupportSpec.js"></script>
 
-	
-    <script>
-        (window.mochaPhantomJS || window.mocha).run();
-    </script>
+	<script type="text/javascript" src="suites/ChildChangingIconSupportSpec.js"></script>
+
+
+
+	<script>
+		(window.mochaPhantomJS || window.mocha).run();
+	</script>
 </body>
 </html>
