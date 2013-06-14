@@ -448,7 +448,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 					//Cluster is currently on the map, need to put the marker on the map instead
 					L.FeatureGroup.prototype.removeLayer.call(this, cluster);
 					if (!dontUpdateMap) {
+						otherMarker._noHas = true;
 						L.FeatureGroup.prototype.addLayer.call(this, otherMarker);
+						delete otherMarker._noHas;
 					}
 				}
 			} else {
