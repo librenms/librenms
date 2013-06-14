@@ -1,11 +1,9 @@
 /*
- Copyright (c) 2012, Smartrak, David Leaver
- Leaflet.markercluster is an open-source JavaScript library for Marker Clustering on leaflet powered maps.
- https://github.com/danzel/Leaflet.markercluster
+ Leaflet.markercluster, Provides Beautiful Animated Marker Clustering functionality for Leaflet, a JS library for interactive maps.
+ https://github.com/Leaflet/Leaflet.markercluster
+ (c) 2012-2013, Dave Leaver, smartrak
 */
-(function () {
-
-
+(function (window, document, undefined) {
 /*
  * L.MarkerClusterGroup extends L.FeatureGroup by clustering the markers contained within
  */
@@ -268,7 +266,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Returns true if the given layer is in this MarkerClusterGroup
 	hasLayer: function (layer) {
-		if (layer._noHas) {
+		if (!layer || layer._noHas) {
 			return false;
 		}
 
@@ -721,7 +719,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Shared animation code
 	_animationAddLayerNonAnimated: function (layer, newCluster) {
 		if (newCluster === layer) {
+			layer._noHas = true;
 			L.FeatureGroup.prototype.addLayer.call(this, layer);
+			delete layer._noHas;
 		} else if (newCluster._childCount === 2) {
 			newCluster._addToMap();
 
@@ -869,7 +869,9 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	_animationAddLayer: function (layer, newCluster) {
 		var me = this;
 
+		layer._noHas = true;
 		L.FeatureGroup.prototype.addLayer.call(this, layer);
+		delete layer._noHas;
 		if (newCluster !== layer) {
 			if (newCluster._childCount > 2) { //Was already a cluster
 
@@ -1908,6 +1910,4 @@ L.MarkerClusterGroup.include({
 });
 
 
-
-
-}(this));
+}(window, document));
