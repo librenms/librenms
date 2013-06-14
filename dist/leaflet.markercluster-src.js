@@ -118,9 +118,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		//Remove the marker from clusters
 		this._removeLayer(layer, true);
 
-		if (layer._icon) {
+		if (layer._icon || layer._container) {
 			L.FeatureGroup.prototype.removeLayer.call(this, layer);
-			layer.setOpacity(1);
+			if (layer.setOpacity) {
+				layer.setOpacity(1);
+			}
 		}
 
 		return this;
@@ -451,7 +453,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 					//Cluster is currently on the map, need to put the marker on the map instead
 					L.FeatureGroup.prototype.removeLayer.call(this, cluster);
 					if (!dontUpdateMap) {
+						otherMarker._noHas = true;
 						L.FeatureGroup.prototype.addLayer.call(this, otherMarker);
+						delete otherMarker._noHas;
 					}
 				}
 			} else {
@@ -908,6 +912,9 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	}
 });
 
+L.markerClusterGroup = function (options) {
+	return new L.MarkerClusterGroup(options);
+};
 
 L.MarkerCluster = L.Marker.extend({
 	initialize: function (group, zoom, a, b) {
@@ -1121,7 +1128,9 @@ L.MarkerCluster = L.Marker.extend({
 						nm._backupLatlng = nm.getLatLng();
 
 						nm.setLatLng(startPos);
-						nm.setOpacity(0);
+						if (nm.setOpacity) {
+							nm.setOpacity(0);
+						}
 					}
 
 					nm._noHas = true;
@@ -1174,7 +1183,9 @@ L.MarkerCluster = L.Marker.extend({
 					m = c._markers[i];
 					if (!exceptBounds || !exceptBounds.contains(m._latlng)) {
 						L.FeatureGroup.prototype.removeLayer.call(c._group, m);
-						m.setOpacity(1);
+						if (m.setOpacity) {
+							m.setOpacity(1);
+						}
 					}
 				}
 			},
@@ -1186,7 +1197,9 @@ L.MarkerCluster = L.Marker.extend({
 						if (!L.FeatureGroup.prototype.hasLayer || L.FeatureGroup.prototype.hasLayer.call(c._group, m)) {
 							L.FeatureGroup.prototype.removeLayer.call(c._group, m);
 						}
-						m.setOpacity(1);
+						if (m.setOpacity) {
+							m.setOpacity(1);
+						}
 					}
 				}
 			}
