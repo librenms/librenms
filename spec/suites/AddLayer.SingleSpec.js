@@ -1,4 +1,4 @@
-﻿describe('addLayer', function () {
+﻿describe('addLayer adding a single marker', function () {
 	var map, div;
 	beforeEach(function () {
 		div = document.createElement('div');
@@ -16,7 +16,9 @@
 	afterEach(function () {
 		document.body.removeChild(div);
 	});
-	it('adds an individual marker that is added before the group is added to the map', function () {
+
+
+	it('appears when added to the group before the group is added to the map', function () {
 
 		var group = new L.MarkerClusterGroup();
 		var marker = new L.Marker([1.5, 1.5]);
@@ -27,7 +29,7 @@
 		expect(marker._icon).to.not.be(undefined);
 		expect(marker._icon.parentNode).to.be(map._panes.markerPane);
 	});
-	it('adds an individual marker that is added after the group is added to the map', function () {
+	it('appears when added to the group after the group is added to the map', function () {
 
 		var group = new L.MarkerClusterGroup();
 		var marker = new L.Marker([1.5, 1.5]);
@@ -38,7 +40,7 @@
 		expect(marker._icon).to.not.be(undefined);
 		expect(marker._icon.parentNode).to.be(map._panes.markerPane);
 	});
-	it('adds (using animations) an individual marker that is added after the group is added to the map', function () {
+	it('appears (using animations) when added after the group is added to the map', function () {
 
 		var group = new L.MarkerClusterGroup({ animateAddingMarkers: true });
 		var marker = new L.Marker([1.5, 1.5]);
@@ -51,7 +53,7 @@
 	});
 
 
-	it('does not add an individual marker that is too far away that is added before the group is added to the map', function () {
+	it('does not appear when too far away when added before the group is added to the map', function () {
 
 		var group = new L.MarkerClusterGroup();
 		var marker = new L.Marker([3.5, 1.5]);
@@ -61,7 +63,7 @@
 
 		expect(marker._icon).to.be(undefined);
 	});
-	it('does not add an individual marker that is too far away that is added after the group is added to the map', function () {
+	it('does not appear when too far away when added after the group is added to the map', function () {
 
 		var group = new L.MarkerClusterGroup();
 		var marker = new L.Marker([3.5, 1.5]);
