@@ -1641,7 +1641,9 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			m.setLatLng(newPos);
 			m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
 
+			m._noHas = true;
 			L.FeatureGroup.prototype.addLayer.call(group, m);
+			delete m._noHas;
 
 
 			leg = new L.Polyline([this._latlng, newPos], { weight: 1.5, color: '#222' });
