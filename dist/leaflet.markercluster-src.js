@@ -45,6 +45,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._featureGroup = L.featureGroup();
 		this._featureGroup.on(L.FeatureGroup.EVENTS, this._propagateEvent, this);
 
+		this._nonPointGroup = L.featureGroup();
+		this._nonPointGroup.on(L.FeatureGroup.EVENTS, this._propagateEvent, this);
+
 		this._inZoomAnimation = 0;
 		this._needsClustering = [];
 		this._needsRemoving = []; //Markers removed while we aren't on the map need to be kept track of
@@ -62,6 +65,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			return this.addLayers(array);
 		}
 
+		//Don't cluster non point data
+		if (!layer.getLatLng) {
+			this._nonPointGroup.addLayer(layer);
+			return this;
+		}
+
 		if (!this._map) {
 			this._needsClustering.push(layer);
 			return this;
@@ -70,6 +79,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		if (this.hasLayer(layer)) {
 			return this;
 		}
+
 
 		//If we have already clustered we'll need to add this one to a cluster
 
@@ -100,9 +110,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	removeLayer: function (layer) {
 
-		//If the layer doesn't have a getLatLng then we can't cluster it, so add it to our child featureGroup
+		//Non point layers
 		if (!layer.getLatLng) {
-			this._featureGroup.removeLayer(layer);
+			this._nonPointGroup.removeLayer(layer);
 			return this;
 		}
 
@@ -138,23 +148,25 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Takes an array of markers and adds them in bulk
 	addLayers: function (layersArray) {
 		var i, l, m,
-			fg = this._featureGroup;
-
-		if (!this._map) {
-			this._needsClustering = this._needsClustering.concat(layersArray);
-			return this;
-		}
+			onMap = this._map,
+			fg = this._featureGroup,
+			npg = this._nonPointGroup;
 
 		for (i = 0, l = layersArray.length; i < l; i++) {
 			m = layersArray[i];
 
 			//Not point data, can't be clustered
 			if (!m.getLatLng) {
-				fg.addLayer(m);
+				npg.addLayer(m);
 				continue;
 			}
 
 			if (this.hasLayer(m)) {
+				continue;
+			}
+
+			if (!onMap) {
+				this._needsClustering.push(m);
 				continue;
 			}
 
@@ -170,14 +182,16 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		}
 
-		//Update the icons of all those visible clusters that were affected
-		fg.eachLayer(function (c) {
-			if (c instanceof L.MarkerCluster && c._iconNeedsUpdate) {
-				c._updateIcon();
-			}
-		});
+		if (onMap) {
+			//Update the icons of all those visible clusters that were affected
+			fg.eachLayer(function (c) {
+				if (c instanceof L.MarkerCluster && c._iconNeedsUpdate) {
+					c._updateIcon();
+				}
+			});
 
-		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+			this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+		}
 
 		return this;
 	},
@@ -185,11 +199,14 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Takes an array of markers and removes them in bulk
 	removeLayers: function (layersArray) {
 		var i, l, m,
-			fg = this._featureGroup;
+			fg = this._featureGroup,
+			npg = this._nonPointGroup;
 
 		if (!this._map) {
 			for (i = 0, l = layersArray.length; i < l; i++) {
-				this._arraySplice(this._needsClustering, layersArray[i]);
+				m = layersArray[i];
+				this._arraySplice(this._needsClustering, m);
+				npg.removeLayer(m);
 			}
 			return this;
 		}
@@ -198,6 +215,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			m = layersArray[i];
 
 			if (!m.__parent) {
+				npg.removeLayer(m);
 				continue;
 			}
 
@@ -240,6 +258,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		//Remove all the visible layers
 		this._featureGroup.clearLayers();
+		this._nonPointGroup.clearLayers();
 
 		this.eachLayer(function (marker) {
 			delete marker.__parent;
@@ -263,6 +282,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				bounds.extend(this._needsClustering[i].getLatLng());
 			}
 		}
+
+		bounds.extend(this._nonPointGroup.getBounds());
+
 		return bounds;
 	},
 
@@ -278,6 +300,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		for (i = markers.length - 1; i >= 0; i--) {
 			method.call(context, markers[i]);
 		}
+
+		this._nonPointGroup.eachLayer(method, context);
 	},
 
 	//Returns true if the given layer is in this MarkerClusterGroup
@@ -301,7 +325,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		}
 
-		return !!(layer.__parent && layer.__parent._group === this);
+		return !!(layer.__parent && layer.__parent._group === this) || this._nonPointGroup.hasLayer(layer);
 	},
 
 	//Zoom down to show the given layer (spiderfying if necessary) then calls the callback
@@ -348,6 +372,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		var i, l, layer;
 
 		this._featureGroup.onAdd(map);
+		this._nonPointGroup.onAdd(map);
 
 		if (!this._gridClusters) {
 			this._generateInitialClusters();
@@ -413,6 +438,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		//Clean up all the layers we added to the map
 		this._featureGroup.onRemove(map);
+		this._nonPointGroup.onRemove(map);
 
 		this._map = null;
 	},
