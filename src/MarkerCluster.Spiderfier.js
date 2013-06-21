@@ -88,6 +88,7 @@ L.MarkerCluster.include({
 	_noanimationUnspiderfy: function () {
 		var group = this._group,
 			map = group._map,
+			fg = group._featureGroup,
 			childMarkers = this.getAllChildMarkers(),
 			m, i;
 
@@ -95,7 +96,7 @@ L.MarkerCluster.include({
 		for (i = childMarkers.length - 1; i >= 0; i--) {
 			m = childMarkers[i];
 
-			L.FeatureGroup.prototype.removeLayer.call(group, m);
+			fg.removeLayer(m);
 
 			if (m._preSpiderfyLatlng) {
 				m.setLatLng(m._preSpiderfyLatlng);
@@ -116,6 +117,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 	_animationSpiderfy: function (childMarkers, positions) {
 		var group = this._group,
 			map = group._map,
+			fg = group._featureGroup,
 			i, m, leg, newPos;
 
 		for (i = childMarkers.length - 1; i >= 0; i--) {
@@ -126,9 +128,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			m.setLatLng(newPos);
 			m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
 
-			m._noHas = true;
-			L.FeatureGroup.prototype.addLayer.call(group, m);
-			delete m._noHas;
+			fg.addLayer(m);
 
 
 			leg = new L.Polyline([this._latlng, newPos], { weight: 1.5, color: '#222' });
@@ -152,6 +152,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 		var me = this,
 			group = this._group,
 			map = group._map,
+			fg = group._featureGroup,
 			thisLayerPos = map.latLngToLayerPoint(this._latlng),
 			i, m, leg, newPos;
 
@@ -162,9 +163,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 			m.setZIndexOffset(1000000); //Make these appear on top of EVERYTHING
 			m.setOpacity(0);
 
-			m._noHas = true;
-			L.FeatureGroup.prototype.addLayer.call(group, m);
-			delete m._noHas;
+			fg.addLayer(m);
 
 			m._setPos(thisLayerPos);
 		}
@@ -249,6 +248,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 	_animationUnspiderfy: function (zoomDetails) {
 		var group = this._group,
 			map = group._map,
+			fg = group._featureGroup,
 			thisLayerPos = zoomDetails ? map._latLngToNewLayerPoint(this._latlng, zoomDetails.zoom, zoomDetails.center) : map.latLngToLayerPoint(this._latlng),
 			childMarkers = this.getAllChildMarkers(),
 			svg = L.Path.SVG && this.SVG_ANIMATION,
@@ -314,7 +314,7 @@ L.MarkerCluster.include(!L.DomUtil.TRANSITION ? {
 				m.setZIndexOffset(0);
 
 				if (stillThereChildCount > 1) {
-					L.FeatureGroup.prototype.removeLayer.call(group, m);
+					fg.removeLayer(m);
 				}
 
 				map.removeLayer(m._spiderLeg);
@@ -397,7 +397,7 @@ L.MarkerClusterGroup.include({
 	//If the given layer is currently being spiderfied then we unspiderfy it so it isn't on the map anymore etc
 	_unspiderfyLayer: function (layer) {
 		if (layer._spiderLeg) {
-			L.FeatureGroup.prototype.removeLayer.call(this, layer);
+			this._featureGroup.removeLayer(layer);
 
 			layer.setOpacity(1);
 			//Position will be fixed up immediately in _animationUnspiderfy
