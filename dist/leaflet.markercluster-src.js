@@ -100,6 +100,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	removeLayer: function (layer) {
 
+		//If the layer doesn't have a getLatLng then we can't cluster it, so add it to our child featureGroup
+		if (!layer.getLatLng) {
+			this._featureGroup.removeLayer(layer);
+			return this;
+		}
+
 		if (!this._map) {
 			if (!this._arraySplice(this._needsClustering, layer) && this.hasLayer(layer)) {
 				this._needsRemoving.push(layer);
@@ -133,6 +139,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	addLayers: function (layersArray) {
 		var i, l, m,
 			fg = this._featureGroup;
+
 		if (!this._map) {
 			this._needsClustering = this._needsClustering.concat(layersArray);
 			return this;
@@ -140,6 +147,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		for (i = 0, l = layersArray.length; i < l; i++) {
 			m = layersArray[i];
+
+			//Not point data, can't be clustered
+			if (!m.getLatLng) {
+				fg.addLayer(m);
+				continue;
+			}
 
 			if (this.hasLayer(m)) {
 				continue;
@@ -158,12 +171,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 
 		//Update the icons of all those visible clusters that were affected
-		for (i in this._layers) {
-			m = this._layers[i];
-			if (m instanceof L.MarkerCluster && m._iconNeedsUpdate) {
-				m._updateIcon();
+		fg.eachLayer(function (c) {
+			if (c instanceof L.MarkerCluster && c._iconNeedsUpdate) {
+				c._updateIcon();
 			}
-		}
+		});
 
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
 
@@ -172,7 +184,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Takes an array of markers and removes them in bulk
 	removeLayers: function (layersArray) {
-		var i, l, m;
+		var i, l, m,
+			fg = this._featureGroup;
 
 		if (!this._map) {
 			for (i = 0, l = layersArray.length; i < l; i++) {
@@ -190,8 +203,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 			this._removeLayer(m, true, true);
 
-			if (this._featureGroup.hasLayer(m)) {
-				this._featureGroup.removeLayer(m);
+			if (fg.hasLayer(m)) {
+				fg.removeLayer(m);
 				if (m.setOpacity) {
 					m.setOpacity(1);
 				}
@@ -201,12 +214,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		//Fix up the clusters and markers on the map
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
 
-		for (i in this._layers) {
-			m = this._layers[i];
-			if (m instanceof L.MarkerCluster) {
-				m._updateIcon();
+		fg.eachLayer(function (c) {
+			if (c instanceof L.MarkerCluster) {
+				c._updateIcon();
 			}
-		}
+		});
 
 		return this;
 	},
@@ -349,6 +361,14 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		for (i = 0, l = this._needsClustering.length; i < l; i++) {
 			layer = this._needsClustering[i];
+
+			//If the layer doesn't have a getLatLng then we can't cluster it, so add it to our child featureGroup
+			if (!layer.getLatLng) {
+				this._featureGroup.addLayer(layer);
+				continue;
+			}
+
+
 			if (layer.__parent) {
 				continue;
 			}
@@ -808,18 +828,15 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		});
 
 		this._forceLayout();
-		var j, n;
 
 		//Update opacities
 		me._topClusterLevel._recursivelyBecomeVisible(bounds, newZoomLevel);
 		//TODO Maybe? Update markers in _recursivelyBecomeVisible
-		for (j in me._layers) {
-			n = me._layers[j];
-
+		fg.eachLayer(function (n) {
 			if (!(n instanceof L.MarkerCluster) && n._icon) {
 				n.setOpacity(1);
 			}
-		}
+		});
 
 		//update the positions of the just added clusters/markers
 		me._topClusterLevel._recursively(bounds, previousZoomLevel, newZoomLevel, function (c) {
