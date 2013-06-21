@@ -98,6 +98,13 @@ markers.on('clusterclick', function (a) {
 });
 ```
 
+### Getting the visible parent of a marker
+If you have a marker in your MarkerClusterGroup and you want to get the visible parent of it (Either itself or a cluster it is contained in that is currently visible on the map).
+```
+var visibleOne = markerClusterGroup.getVisibleParent(myMarker);
+console.log(visibleOne.getLatLng());
+```
+
 ### Adding and removing Markers
 addLayer, removeLayer and clearLayers are supported and they should work for most uses.
 
