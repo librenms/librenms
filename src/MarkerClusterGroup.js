@@ -95,6 +95,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	removeLayer: function (layer) {
 
+		//If the layer doesn't have a getLatLng then we can't cluster it, so add it to our child featureGroup
+		if (!layer.getLatLng) {
+			this._featureGroup.removeLayer(layer);
+			return this;
+		}
+
 		if (!this._map) {
 			if (!this._arraySplice(this._needsClustering, layer) && this.hasLayer(layer)) {
 				this._needsRemoving.push(layer);
@@ -128,6 +134,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	addLayers: function (layersArray) {
 		var i, l, m,
 			fg = this._featureGroup;
+
 		if (!this._map) {
 			this._needsClustering = this._needsClustering.concat(layersArray);
 			return this;
@@ -135,6 +142,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		for (i = 0, l = layersArray.length; i < l; i++) {
 			m = layersArray[i];
+
+			//Not point data, can't be clustered
+			if (!m.getLatLng) {
+				fg.addLayer(m);
+				continue;
+			}
 
 			if (this.hasLayer(m)) {
 				continue;
@@ -344,6 +357,14 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		for (i = 0, l = this._needsClustering.length; i < l; i++) {
 			layer = this._needsClustering[i];
+
+			//If the layer doesn't have a getLatLng then we can't cluster it, so add it to our child featureGroup
+			if (!layer.getLatLng) {
+				this._featureGroup.addLayer(layer);
+				continue;
+			}
+
+
 			if (layer.__parent) {
 				continue;
 			}
