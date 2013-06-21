@@ -43,6 +43,18 @@
 		expect(polygon._container.parentNode).to.be(map._pathRoot);
 	});
 
+	it('Removes polygons from map when removed', function () {
+
+		var group = new L.MarkerClusterGroup();
+		var polygon = new L.Polygon([[1.5, 1.5], [2.0, 1.5], [2.0, 2.0], [1.5, 2.0]]);
+
+		group.addLayer(polygon);
+		map.addLayer(group);
+		map.removeLayer(group);
+
+		expect(polygon._container.parentNode).to.be(null);
+	});
+
 	describe('hasLayer', function () {
 		it('returns false when not added', function () {
 			var group = new L.MarkerClusterGroup();
@@ -89,37 +101,6 @@
 		});
 	});
 
-	describe('getBounds', function() {
-		it('returns the correct bounds before adding to the map', function() {
-			var group = new L.MarkerClusterGroup();
-			var polygon = new L.Polygon([[1.5, 1.5], [2.0, 1.5], [2.0, 2.0], [1.5, 2.0]]);
-
-			group.addLayer(polygon);
-
-			expect(group.getBounds()).to.be(polygon.getBounds());
-		});
-
-		it('returns the correct bounds after adding to the map after adding polygon', function () {
-			var group = new L.MarkerClusterGroup();
-			var polygon = new L.Polygon([[1.5, 1.5], [2.0, 1.5], [2.0, 2.0], [1.5, 2.0]]);
-
-			group.addLayer(polygon);
-			map.addLayer(group);
-
-			expect(group.getBounds()).to.be(polygon.getBounds());
-		});
-
-		it('returns the correct bounds after adding to the map before adding polygon', function () {
-			var group = new L.MarkerClusterGroup();
-			var polygon = new L.Polygon([[1.5, 1.5], [2.0, 1.5], [2.0, 2.0], [1.5, 2.0]]);
-
-			map.addLayer(group);
-			group.addLayer(polygon);
-
-			expect(group.getBounds()).to.be(polygon.getBounds());
-		});
-	});
-
 	describe('removeLayer', function() {
 		it('removes before adding to map', function () {
 			var group = new L.MarkerClusterGroup();
@@ -147,8 +128,8 @@
 			var group = new L.MarkerClusterGroup();
 			var polygon = new L.Polygon([[1.5, 1.5], [2.0, 1.5], [2.0, 2.0], [1.5, 2.0]]);
 
-			group.addLayers(polygon);
-			map.addLayers(group);
+			group.addLayer(polygon);
+			map.addLayer(group);
 			expect(group.hasLayer(polygon)).to.be(true);
 
 			group.removeLayer(polygon);
@@ -159,11 +140,59 @@
 			var group = new L.MarkerClusterGroup();
 			var polygon = new L.Polygon([[1.5, 1.5], [2.0, 1.5], [2.0, 2.0], [1.5, 2.0]]);
 
-			map.addLayers(group);
-			group.addLayers(polygon);
+			map.addLayer(group);
+			group.addLayer(polygon);
 			expect(group.hasLayer(polygon)).to.be(true);
 
 			group.removeLayer(polygon);
+			expect(group.hasLayer(polygon)).to.be(false);
+		});
+	});
+
+	describe('removeLayers', function () {
+		it('removes before adding to map', function () {
+			var group = new L.MarkerClusterGroup();
+			var polygon = new L.Polygon([[1.5, 1.5], [2.0, 1.5], [2.0, 2.0], [1.5, 2.0]]);
+
+			group.addLayer(polygon);
+			expect(group.hasLayer(polygon)).to.be(true);
+
+			group.removeLayers([polygon]);
+			expect(group.hasLayer(polygon)).to.be(false);
+		});
+
+		it('removes before adding to map', function () {
+			var group = new L.MarkerClusterGroup();
+			var polygon = new L.Polygon([[1.5, 1.5], [2.0, 1.5], [2.0, 2.0], [1.5, 2.0]]);
+
+			group.addLayers([polygon]);
+			expect(group.hasLayer(polygon)).to.be(true);
+
+			group.removeLayers([polygon]);
+			expect(group.hasLayer(polygon)).to.be(false);
+		});
+
+		it('removes after adding to map after adding polygon', function () {
+			var group = new L.MarkerClusterGroup();
+			var polygon = new L.Polygon([[1.5, 1.5], [2.0, 1.5], [2.0, 2.0], [1.5, 2.0]]);
+
+			group.addLayer(polygon);
+			map.addLayer(group);
+			expect(group.hasLayer(polygon)).to.be(true);
+
+			group.removeLayers([polygon]);
+			expect(group.hasLayer(polygon)).to.be(false);
+		});
+
+		it('removes after adding to map before adding polygon', function () {
+			var group = new L.MarkerClusterGroup();
+			var polygon = new L.Polygon([[1.5, 1.5], [2.0, 1.5], [2.0, 2.0], [1.5, 2.0]]);
+
+			map.addLayer(group);
+			group.addLayer(polygon);
+			expect(group.hasLayer(polygon)).to.be(true);
+
+			group.removeLayers([polygon]);
 			expect(group.hasLayer(polygon)).to.be(false);
 		});
 	});
