@@ -2,7 +2,7 @@
 
 ## Overview
 
-jQuery Mapael is a small [jQuery](http://jquery.com/) plugin based on [raphael.js](http://raphaeljs.com/) that allows you to display dynamic vector maps.  
+jQuery Mapael is a [jQuery](http://jquery.com/) plugin based on [raphael.js](http://raphaeljs.com/) that allows you to display dynamic vector maps.  
 
 For example, with Mapael, you can display a map of the world with clickable countries. You can build simple dataviz by setting some parameters in order to automatically set a color to each area of your map and generate the legend. Moreover, you can plot cities on a map with their latitude and longitude.
 
