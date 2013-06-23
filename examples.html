@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Demo</title>
+	<style type="text/css">
+		.mapTooltip {
+			position : absolute;
+			background-color : #fff;
+			moz-opacity:0.70;
+			opacity: 0.70;
+			filter:alpha(opacity=70);
+			border-radius:10px;
+			padding : 10px;
+			z-index: 1000;
+			max-width: 200px;
+			display:none;
+			color:#343434;
+		}
+		
+		.cityFrance {
+			background-color:#343434;
+			border-radius:10px;
+			width:400px;
+		}
+		
+		.mapLegend {
+		}
+		
+		h1 {
+			font-size:30px;
+			color:#3d3d3d;
+			margin:auto;
+			margin-top:50px;
+		}
+		
+		h2 {
+			font-size:22px;
+			color:#3d3d3d;
+			margin-top:50px;
+		}
+		
+		.container {
+			margin:auto;
+			width:80%;
+		}
+		
+</style>
+</head>
+
+<body>
+	<div class="container">
+	
+		<h1>Map examples</h1>
+	
+		<h2>Minimal example (France)</h2>
+		<div class="maparea1">
+			<span>Alternative content</span>
+		</div>
+		
+		<h2>Map with some plotted cities and area labels (France)</h2>
+		<div class="maparea2">
+			<span>Alternative content</span>
+		</div>
+		
+		<h2>Map with some overloaded parameters and 'onclick' callback on areas (France)</h2>
+		<div class="maparea3">
+			<span>Alternative content</span>
+		</div>
+
+		<h2>Population of France by department with a legend</h2>
+		<div class="maparea4">
+			<span>Alternative content</span>
+		</div>
+
+		<h2>Population of the 1000 more populated french cities with a legend</h2>
+		<div class="maparea5">
+			<span>Alternative content</span>
+		</div>
+
+		<h2>Map of the world with the population by country</h2>
+		<div class="maparea6">
+			<span>Alternative content</span>
+		</div>
+
+		<h2>Map of USA with some plotted cities</h2>
+		<div class="maparea7">
+			<span>Alternative content</span>
+		</div>
+		
+	</div>
+	
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js" charset="utf-8" ></script>
+	<script src="js/raphael/raphael-min.js" charset="utf-8" ></script>
+	<script src="js/jquery.mapael.js" charset="utf-8" ></script>
+	<script src="js/maps/france_departments.js" charset="utf-8" ></script>
+	<script src="js/maps/world_countries.js" charset="utf-8" ></script>
+	<script src="js/maps/usa_states.js" charset="utf-8" ></script>
+	<script src="examples.js" charset="utf-8" ></script>
+
+</body>
+</html>
+
+
