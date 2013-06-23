@@ -545,58 +545,60 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	_bindEvents: function () {
-		var shownPolygon = null,
-			map = this._map,
-
-			spiderfyOnMaxZoom = this.options.spiderfyOnMaxZoom,
-			showCoverageOnHover = this.options.showCoverageOnHover,
-			zoomToBoundsOnClick = this.options.zoomToBoundsOnClick;
+		var map = this._map,
+		    spiderfyOnMaxZoom = this.options.spiderfyOnMaxZoom,
+		    showCoverageOnHover = this.options.showCoverageOnHover,
+		    zoomToBoundsOnClick = this.options.zoomToBoundsOnClick;
 
 		//Zoom on cluster click or spiderfy if we are at the lowest level
 		if (spiderfyOnMaxZoom || zoomToBoundsOnClick) {
-			this.on('clusterclick', function (a) {
-				if (map.getMaxZoom() === map.getZoom()) {
-					if (spiderfyOnMaxZoom) {
-						a.layer.spiderfy();
-					}
-				} else if (zoomToBoundsOnClick) {
-					a.layer.zoomToBounds();
-				}
-			}, this);
+			this.on('clusterclick', this._zoomOrSpiderfy, this);
 		}
 
 		//Show convex hull (boundary) polygon on mouse over
 		if (showCoverageOnHover) {
-			this.on('clustermouseover', function (a) {
-				if (this._inZoomAnimation) {
-					return;
-				}
-				if (shownPolygon) {
-					map.removeLayer(shownPolygon);
-				}
-				if (a.layer.getChildCount() > 2 && a.layer !== this._spiderfied) {
-					shownPolygon = new L.Polygon(a.layer.getConvexHull(), this.options.polygonOptions);
-					map.addLayer(shownPolygon);
-				}
-			}, this);
-			this.on('clustermouseout', function () {
-				if (shownPolygon) {
-					map.removeLayer(shownPolygon);
-					shownPolygon = null;
-				}
-			}, this);
-			map.on('zoomend', function () {
-				if (shownPolygon) {
-					map.removeLayer(shownPolygon);
-					shownPolygon = null;
-				}
-			}, this);
-			map.on('layerremove', function (opt) {
-				if (shownPolygon && opt.layer === this) {
-					map.removeLayer(shownPolygon);
-					shownPolygon = null;
-				}
-			}, this);
+			this.on('clustermouseover', this._showCoverage, this);
+			this.on('clustermouseout', this._hideCoverage, this);
+			map.on('zoomend', this._hideCoverage, this);
+			map.on('layerremove', this._hideCoverageOnRemove, this);
+		}
+	},
+
+	_zoomOrSpiderfy: function (e) {
+		var map = this._map;
+		if (map.getMaxZoom() === map.getZoom()) {
+			if (this.options.spiderfyOnMaxZoom) {
+				e.layer.spiderfy();
+			}
+		} else if (this.options.zoomToBoundsOnClick) {
+			e.layer.zoomToBounds();
+		}
+	},
+
+	_showCoverage: function (e) {
+		var map = this._map;
+		if (this._inZoomAnimation) {
+			return;
+		}
+		if (this._shownPolygon) {
+			map.removeLayer(this._shownPolygon);
+		}
+		if (e.layer.getChildCount() > 2 && e.layer !== this._spiderfied) {
+			this._shownPolygon = new L.Polygon(e.layer.getConvexHull(), this.options.polygonOptions);
+			map.addLayer(this._shownPolygon);
+		}
+	},
+
+	_hideCoverage: function () {
+		if (this._shownPolygon) {
+			this._map.removeLayer(this._shownPolygon);
+			this._shownPolygon = null;
+		}
+	},
+
+	_hideCoverageOnRemove: function (e) {
+		if (e.layer === this) {
+			this._hideCoverage();
 		}
 	},
 
@@ -607,13 +609,13 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			map = this._map;
 
 		if (spiderfyOnMaxZoom || zoomToBoundsOnClick) {
-			this.off('clusterclick', null, this);
+			this.off('clusterclick', this._zoomOrSpiderfy, this);
 		}
 		if (showCoverageOnHover) {
-			this.off('clustermouseover', null, this);
-			this.off('clustermouseout', null, this);
-			map.off('zoomend', null, this);
-			map.off('layerremove', null, this);
+			this.off('clustermouseover', this._showCoverage, this);
+			this.off('clustermouseout', this._hideCoverage, this);
+			map.off('zoomend', this._hideCoverage, this);
+			map.off('layerremove', this._hideCoverageOnRemove, this);
 		}
 	},
 
