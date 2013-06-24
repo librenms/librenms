@@ -278,7 +278,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		}
 
-		bounds.extend(this._nonPointGroup.getBounds());
+		//TODO: Can remove this isValid test when leaflet 0.6 is released
+		var nonPointBounds = this._nonPointGroup.getBounds();
+		if (nonPointBounds.isValid()) {
+			bounds.extend(nonPointBounds);
+		}
 
 		return bounds;
 	},
