@@ -3,10 +3,9 @@ Leaflet.markercluster
 
 Provides Beautiful Animated Marker Clustering functionality for [Leaflet](http://leafletjs.com), a JS library for interactive maps.
 
-*Requires Leaflet 0.6.0-dev 2013-01-21 or newer as of 10b91f8ad4419437aec9d8158e30e7990240dd3e*
+*Requires Leaflet 0.6.0 or newer.*
 
-For a leaflet 0.5 compatible version, [Download b128e950d8f5d7da5b60bd0aa9a88f6d3dd17c98](https://github.com/Leaflet/Leaflet.markercluster/archive/b128e950d8f5d7da5b60bd0aa9a88f6d3dd17c98.zip)
-
+For a Leaflet 0.5 compatible version, [Download b128e950](https://github.com/Leaflet/Leaflet.markercluster/archive/b128e950d8f5d7da5b60bd0aa9a88f6d3dd17c98.zip)<br>
 For a Leaflet 0.4 compatible version, [Download the 0.2 release](https://github.com/Leaflet/Leaflet.markercluster/archive/0.2.zip)
 
 ## Using the plugin
