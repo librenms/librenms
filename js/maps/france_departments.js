@@ -1,5 +1,7 @@
 /**
-* Mapael
+*
+* Jquery Mapael - Dynamic maps jQuery plugin (based on raphael.js)
+* Requires jQuery and raphael.js
 *
 * Map of France by department
 *
@@ -10,8 +12,8 @@
 		{
 			maps :  {
 				france_departments : {
-					width : 600,
-					height : 550,
+					width : 507.08136,
+					height : 553.04327,
 					getCoords : function (lat, lon) {
 						// Corse
 						if (lat < 43.157109 && lon > 8.171997) {

@@ -1,5 +1,7 @@
 /**
-* Mapael
+*
+* Jquery Mapael - Dynamic maps jQuery plugin (based on raphael.js)
+* Requires jQuery and raphael.js
 *
 * Map of USA by state
 * 
