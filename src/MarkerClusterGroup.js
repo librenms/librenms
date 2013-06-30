@@ -370,6 +370,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._map = map;
 		var i, l, layer;
 
+		if (!isFinite(this._map.getMaxZoom())) {
+			throw "Map has no maxZoom specified";
+		}
+
 		this._featureGroup.onAdd(map);
 		this._nonPointGroup.onAdd(map);
 
