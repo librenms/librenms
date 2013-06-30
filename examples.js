@@ -3,18 +3,15 @@ $(function(){
 	// Example #1
 	$(".maparea1").mapael({
 		map : {
-			name : "france_departments",
-			width:280,
-			height:300
+			name : "france_departments"
+			, width : 250
 		}
 	});
 	
 	// Example #2
 	$(".maparea2").mapael({
 		map : {
-			name : "france_departments",
-			width:1000,
-			height:1200
+			name : "france_departments"
 		},
 		areas: {
 			"56" : {
@@ -8816,12 +8813,7 @@ $(function(){
 	// Example #7
 	$(".maparea7").mapael({
 		map : {
-			name : "usa_states",
-			defaultArea: {
-				onclick: function(params, mapElem, textElem) {
-					console.log(mapElem);
-				}
-			}
+			name : "usa_states"
 		},
 		plots: [
 			{

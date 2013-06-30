@@ -24,13 +24,13 @@ Here is the simplest example that shows how to display an empty map of the world
 
 **HTML :**
 
-    <div class="map1">Alternative content</div>;
+    <div class="container">Alternative content</div>
 
 **JS :**
 
-    $(".map1").mapael({
+    $(".container").mapael({
         map : {
-            type : "world1"
+            name : "world_countries"
         }
     });
 
@@ -52,26 +52,37 @@ All options are provided as an object argument of the function $.fn.mapael(Objec
 
 Parameter 'options' : 
 
-*   **map :** global options for the map
-
+*   **map :** main options for the map and default options for all plots and areas
     *   **name :** (String) Name of the map to load
-    *   **width :** (Integer) Width of the map
-    *   **height :** (Integer) Height of the map
+	*   **width :** (Integer) Width of the map. If not specified, the map will get the width of its container.
     *   **tooltip :** (Object) options for the tooltip
         *   **cssClass :**  (String, default value : "mapTooltip") CSS class of the tooltip container.
-    *   **defaultArea :** (Object) Default options for all areas of the map
+		*   **css :**  (Object) Additional CSS properties for the tooltip container
+    *   **defaultArea :** (Object) Default options for all areas of the map. 
         *   **attrs :** (Object, default value : {fill: "#343434", stroke: "#5d5d5d", stroke-width: 1, stroke-linejoin : "round"}) Default Raphael attributes for all areas. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
         *   **attrsHover :** (Object, default value : {fill: "#f38a03", animDuration : 300}) Raphael attributes on mouse hover for all areas. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options. You can set the animation duration with the 'animDuration' option.
         *   **textAttrs :** (Object, default value : {font-size: 15, fill:"#c7c7c7", text-anchor": "center"}) Default Raphael attributes for each text within areas. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
         *   **textAttrsHover :** (Object, default value : {fill:"#eaeaea", "animDuration" : 300}) Default Raphael attributes on mouse hover for each text within areas. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options. You can set the animation duration with the 'animDuration' option.
-    *   **defaultPlot :** (Object) Default options for all plots of the map
+        *   **text :** (String) Label displayed within the area
+        *   **tooltip :** (Object) Options for the tooltip
+            *   **content :** (String) Tooltip content to display on mouse hover
+        *   **onclick :** (function(params, mapElem, textElem)) function called on 'onclick' event
+        *   **onmouseenter :** (function(params, mapElem, textElem)) function called on 'onmouseenter' event
+        *   **onmouseleave :** (function(params, mapElem, textElem)) function called on 'onmouseleave' event
+    *   **defaultPlot :** (Object) Default options for all plots of the map.
         *   **type :** (String, default value : "circle") Plot shape : 'circle' or 'square'.
         *   **size :** (Integer, default : 15) The default size of all plots.
         *   **attrs :** (Object, default value : {fill: "#0088db", stroke: "#fff", stroke-width: 0, stroke-linejoin : "round"}) Default Raphael attributes for all plots. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
         *   **attrsHover :** (Object, default value : {stroke-width: 3, animDuration : 300}) Raphael attributes on mouse hover for all plots. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options. You can set the animation duration with the 'animDuration' option.
         *   **textAttrs :** (Object, default value : {font-size: 15, fill:"#c7c7c7", text-anchor": "start"}) Default Raphael attributes for each text next to the plots. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
         *   **textAttrsHover :** (Object, default value : {fill:"#eaeaea", "animDuration" : 300}) Default Raphael attributes on mouse hover for each text next to the plots. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options. You can set the animation duration with the 'animDuration' option.
-*   **legend : (Object). Legend options**
+        *   **text :** (String) Label displayed near the plot
+        *   **tooltip :** (Object) Options for the tooltip
+            *   **content :** (String) Tooltip content to display on mouse hover
+        *   **onclick :** (function(params, mapElem, textElem)) function called on 'onclick' event
+        *   **onmouseover :** (function(params, mapElem, textElem)) function called on 'onmouseover' event
+        *   **onmouseout :** (function(params, mapElem, textElem)) function called on 'onmouseout' event
+*   **legend :** (Object) Legend options. Define how to display the legend and how to display plots and areas depending on their associated values.
     *   **area :** (Object). Options for the areas legend.
         *   **cssClass :** (String, default value : "mapLegend") CSS class of the container for the areas legend.
         *   **display :** (Boolean, default value : false) Display the legend.
@@ -79,13 +90,13 @@ Parameter 'options' :
         *   **marginLeftTitle :** (Integer, default value : 5) Margin left for title of the legend.
         *   **marginLeftLabel :** (Integer, default value : 10) Margin left for the label of each slice.
         *   **marginBottom :** (Integer, default value : 15) Margin bottom under each line of the legend.
-        *   **titleAttrs : **(Object, default value : {"font-size" : 18, fill : "#343434", "text-anchor" : "start"}) Raphael attributes for the title of the legend. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
-        *   **labelAttrs : **(Object, default value : {"font-size" : 15, fill : "#343434", "text-anchor" : "start"}) Raphael attributes for the labels of each slice. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
+        *   **titleAttrs : ** (Object, default value : {"font-size" : 18, fill : "#343434", "text-anchor" : "start"}) Raphael attributes for the title of the legend. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
+        *   **labelAttrs : ** (Object, default value : {"font-size" : 15, fill : "#343434", "text-anchor" : "start"}) Raphael attributes for the labels of each slice. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
         *   **slices :**(Array, default : []) Array of slice options. For each slice, options are provided as an object :
             *   **min :** (Float) The minimal value of the slice
             *   **max :** (Float) The maximal value of the slice
-            *   **attrs :** (Object) Raphael attributes for all areas affected by the slice. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options. These attributes overload the default attributes from the 'defaultArea' options.
-            *   **label :** (String) The label of the slice for the legend.
+            *   **label :** (String) The label of the slice for the legend
+            *   **+ all options from map.defaultArea can be overloaded here**
     *   **plot :** (Object). Options for the plots legend.
         *   **cssClass :** (String, default value : "mapLegend") CSS class of the container for the areas legend.
         *   **display :** (Boolean, default value : false) Display the legend.
@@ -93,29 +104,23 @@ Parameter 'options' :
         *   **marginLeftTitle :** (Integer, default value : 5) Margin left for title of the legend.
         *   **marginLeftLabel :** (Integer, default value : 10) Margin left for the label of each slice.
         *   **marginBottom :** (Integer, default value : 15) Margin bottom under each line of the legend.
-        *   **titleAttrs : **(Object, default value : {"font-size" : 18, fill : "#343434", "text-anchor" : "start"}) Raphael attributes for the title of the legend. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
-        *   **labelAttrs : **(Object, default value : {"font-size" : 15, fill : "#343434", "text-anchor" : "start"}) Raphael attributes for the labels of each slice. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
+        *   **titleAttrs : ** (Object, default value : {"font-size" : 18, fill : "#343434", "text-anchor" : "start"}) Raphael attributes for the title of the legend. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
+        *   **labelAttrs : ** (Object, default value : {"font-size" : 15, fill : "#343434", "text-anchor" : "start"}) Raphael attributes for the labels of each slice. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options.
         *   **slices :** (Array, default : []) Array of options for each slice. For each slice, options are provided as an object :
-            *   **size :** (Integer) Size of the plot
-            *   **type :**  (String) Shape of the plot : 'circle' or 'square'
             *   **min :** (Float) The minimal value of the slice
             *   **max :** (Float) The maximal value of the slice
-            *   **attrs :** (Object) Raphael attributes for all plots affected by the slice. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options. These attributes overload the default attributes from the 'defaultPlot' options.
-            *   **label :** (String) The label of the slice for the legend.
-*   **areas :** (Object, default : []) List of specific options for each area. For each area (identified with a string in the JS file of the map), options are provided as an object :
-    *   **value :** (Float) Value associated with the area for the legend.
-    *   **attrs :** (Object) Raphael attributes for the area. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options. These attributes overload the default attributes from the 'defaultArea' options.
-    *   **tooltip :** (Object) Options for the tooltip
-        *   **content :** (String) Tooltip content to display on mouse hover
-*   **plots :** (Array, default : []) Array of specific options for each plot. For each plot, options are provided as an object :
-    *   **type :** (String) Type of the plot : 'square' or 'circle'
-    *   **size :** (Integer) Size of the plot
-    *   **value :** (Float) Value associated with the plot in order to get the size, attrs and type from the legend options.
+            *   **label :** (String) The label of the slice for the legend
+            *   **+ all options from map.defaultPlot can be overloaded here**
+*   **areas :** (Object, default : []) List of specific options for each area to display on the map. Areas must be identified according to the ids from the JS file of the intended map. For each area, options are provided as an object :
+    *   **value :** (Float) Value associated with the area in order to get the proper options from the legend.
+    *   **+ all options from map.defaultArea can be overloaded here** 
+*   **plots :** (Array, default : []) Array of specific options for each plot to display on the map. A plot can be positioned with a (latitude, longitude) or a (x, y) couple. For each plot, options are provided as an object :
+    *   **value :** (Float) Value associated with the plot in order to get the proper options from the legend.
     *   **latitude :** (Float) latitude of the plot
     *   **longitude :** (Float) longitude of the plot
-    *   **attrs :** (Object) Raphael attributes for the plot. Go to the [Raphael reference](http://raphaeljs.com/reference.html#Element.attr) to view available options. These attributes overload the default attributes from the 'defaultPlot' options.
-    *   **tooltip :** (Object) Options for the tooltip
-        *   **content :** (String) Tooltip content to display on mouse hover
+    *   **x :** (Float) X coordinate of the plot
+    *   **y :** (Float) Y coordinate of the plot
+    *   **+ all options from map.defaultPlot can be overloaded here** 
 
 ## How to add new maps ?
 
@@ -146,13 +151,14 @@ You have to set the default width and height of your map. If you want to plot ci
 Then, the last step is to open the SVG image with a text editor and copy the paths definitions into the "elems" parameter.
 In order to use your new map, you need to load the JS file, and set 'yourMapName' for the Mapael 'name' parameter.
 
-## Known issues
-
-There is two known issues that affect Mapael. They affect the map display on Internet Explorer 6/7/8 when the parameter 'transform' is used and when the map is resized. More information : 
-
-*   [Resize setViewBox problem IE 8](https://github.com/DmitryBaranovskiy/raphael/issues/376)
-*   [toFront removes events in internet explorer 6](https://github.com/DmitryBaranovskiy/raphael/issues/225)
-
 ## License
 
-jQuery Mapael is licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
+Copyright (C) 2013 [Vincent Brouté](http://neveldo.fr)
+
+jQuery Mapael is licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php).
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
