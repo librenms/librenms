@@ -1,9 +1,11 @@
 /**
-* Mapael
+*
+* Jquery Mapael - Dynamic maps jQuery plugin (based on raphael.js)
+* Requires jQuery and raphael.js
 *
 * Map of World by country
 * 
-* http://backspace.com/mapapp/javascript_world/
+* @source http://backspace.com/mapapp/javascript_world/
 */
 
 (function($) {
