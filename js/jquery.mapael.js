@@ -3,7 +3,7 @@
 * Jquery Mapael - Dynamic maps jQuery plugin (based on raphael.js)
 * Requires jQuery and raphael.js
 *
-* Version: 0.2.0 (06-30-2013)
+* Version: 0.2.2 (07-02-2013)
 *
 * Copyright (c) 2013 Vincent Brouté (http://www.neveldo.fr/mapael)
 * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php).
@@ -31,23 +31,6 @@
 				, textElem = {}
 				, coords = {}
 				, resizeTO = 0;
-			
-			if (options.map.width) {
-				paper.setSize(options.map.width, mapConf.height * (options.map.width / mapConf.width));
-			} else {
-				// Handle resizing of the container
-				$(window).bind('resize', function(){
-					clearTimeout(resizeTO);
-					resizeTO = setTimeout(function(){$container.trigger('resizeEnd');}, 150);
-				});
-				$(document).bind('ready', function(){$container.trigger('resizeEnd');});
-				$container.bind('resizeEnd', function(e) {
-					var containerWidth = $container.width();
-					if (paper.width != containerWidth) {
-						paper.setSize(containerWidth, mapConf.height * (containerWidth / mapConf.width));
-					}
-				});	
-			}
 			
 			options.map.tooltip.css && $tooltip.css(options.map.tooltip.css);
 			paper.setViewBox(0, 0, mapConf.width, mapConf.height, false);
@@ -156,6 +139,24 @@
 			
 			if (options.legend.plot.slices && options.legend.plot.display) {
 				$.fn.mapael.createLegend($container, options, 'plot');
+			}
+			
+			if (options.map.width) {
+				paper.setSize(options.map.width, mapConf.height * (options.map.width / mapConf.width));
+			} else {
+				// Handle resizing of the container
+				$(window).bind('resize', function(){
+					clearTimeout(resizeTO);
+					resizeTO = setTimeout(function(){$container.trigger('resizeEnd');}, 150);
+				});
+				$(document).bind('ready', function(){$container.trigger('resizeEnd');});
+				$container.bind('resizeEnd', function(e) {
+					var containerWidth = $container.width();
+					if (paper.width != containerWidth) {
+						paper.setSize(containerWidth, mapConf.height * (containerWidth / mapConf.width));
+					}
+				});
+				$container.trigger('resizeEnd');
 			}
 			
 			$(paper.desc).append(" and Mapael (http://neveldo.fr/mapael)");
@@ -308,23 +309,23 @@
 			).attr(legendParams.labelAttrs);
 			
 			height += marginBottom + legendParams.slices[i].size;
-			lineWidth = marginLeft + legendParams.slices[i].size + marginBottom + label.getBBox().width;
+			lineWidth = marginLeft + legendParams.slices[i].size + marginLeftLabel + label.getBBox().width;
 			width = (width < lineWidth) ? lineWidth : width;
 			
 			$.fn.mapael.paramHover(elem, legendParams.slices[i].attrs, legendParams.slices[i].attrsHover);
 			$.fn.mapael.paramHover(label, legendParams.labelAttrs, legendParams.labelAttrs);
 			$.fn.mapael.setHover(paper, elem, label);
 		}
+		
+		// VMLWidth option allows you to set static width for the legend
+		// only for VML render because text.getBBox() returns wrong values on IE6/7
+		if (Raphael.type != 'SVG' && legendParams.VMLWidth) {
+			width = legendParams.VMLWidth;
+		}
+		
 		paper.setSize(width, height);
 	}
-	
-	// Fix IE bug when toFront() is called
-	// https://github.com/DmitryBaranovskiy/raphael/issues/225
-	$.fn.mapael.mouseHovered = false; 
-	$.fn.mapael.elemsHovered = [];
-	$.fn.mapael.oldEvents = typeof document.documentElement.onmouseenter !== 'undefined';
 
-	
 	/**
 	* Set he behaviour for 'mouseover' event
 	* @param paper paper Raphael paper object
@@ -332,35 +333,20 @@
 	* @param textElem the optional text element (within the map element)
 	*/
 	$.fn.mapael.hoverIn = function (paper, mapElem, textElem) {
-		if (!$.fn.mapael.mouseHovered) {
-			$.fn.mapael.mouseHovered = true;
-			$.fn.mapael.elemsHovered.push(mapElem);
-			
-			if (mapElem) {
-				mapElem.animate(
-					mapElem.attrsHover
-					, mapElem.attrsHover.animDuration
-				);
-				mapElem.elemType == 'area' && mapElem.attrsHover.transform && mapElem.toFront(); 
-			}
-			
-			if (textElem) {
-				textElem.animate(
-					textElem.attrsHover
-					, textElem.attrsHover.animDuration
-				);
-				mapElem.elemType == 'area' && mapElem.attrsHover.transform && textElem.toFront();
-			}
-			paper.safari();
-		} else {
-			// IE fix
-			for(var i = 0, length = $.fn.mapael.elemsHovered.length; i < length; ++i) {
-				if($.fn.mapael.elemsHovered[i] != mapElem) {
-					$($.fn.mapael.elemsHovered[i].node).trigger("mouseout");
-				}
-			}
-			$.fn.mapael.elemsHovered = [];
+		if (mapElem) {
+			mapElem.animate(
+				mapElem.attrsHover
+				, mapElem.attrsHover.animDuration
+			);
 		}
+		
+		if (textElem) {
+			textElem.animate(
+				textElem.attrsHover
+				, textElem.attrsHover.animDuration
+			);
+		}
+		paper.safari();
 	}
 	
 	/**
@@ -379,7 +365,6 @@
 			mapElem.attrsHover.animDuration
 		);
 		paper.safari();
-		$.fn.mapael.mouseHovered = false;
 	};
 	
 	/**
@@ -422,12 +407,11 @@
 	* @param attrsHover the attributes to set on mouseover event
 	*/
 	$.fn.mapael.paramHover = function (elem, originalAttrs, attrsHover) {
-	
 		// Don't use transform option on hover for VML (IE<9) because of several bugs
 		if (Raphael.type != 'SVG') {
 			delete attrsHover.transform;
 		}
-		
+	
 		elem.attrsHover = {};
 		$.extend(elem.attrsHover, attrsHover);
 		
