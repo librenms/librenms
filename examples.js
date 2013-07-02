@@ -89,8 +89,7 @@ $(function(){
 					"stroke-width" : 1
 				},
 				attrsHover : {
-					"stroke-width" : 2, 
-					transform : "s1.5"
+					"stroke-width" : 2
 				}
 			}
 		},
@@ -7772,7 +7771,7 @@ $(function(){
 							fill : "#d90000"
 						},
 						attrsHover :{
-							transform : "s1.5",
+							transform : "s2",
 							"stroke-width" : 2
 						}, 
 						label :"less than 500 000 inhabitants", 
