@@ -30,7 +30,9 @@
 				, plotParams = {}
 				, textElem = {}
 				, coords = {}
-				, resizeTO = 0;
+				, resizeTO = 0
+				, textX = 0
+				, textY = 0;
 			
 			options.map.tooltip.css && $tooltip.css(options.map.tooltip.css);
 			paper.setViewBox(0, 0, mapConf.width, mapConf.height, false);
@@ -50,7 +52,6 @@
 				}
 				
 				mapElem = paper.path(mapConf.elems[id]).attr(areaParams.attrs);
-				mapElem.elemType = 'area';
 				
 				areaParams.tooltip && areaParams.tooltip.content && $.fn.mapael.setTooltip(mapElem, $tooltip, areaParams.tooltip.content);
 				$.fn.mapael.paramHover(mapElem, areaParams.attrs, areaParams.attrsHover);
@@ -58,11 +59,34 @@
 				// Set a text label in the area
 				if (areaParams.text) {
 					bbox = mapElem.getBBox();
-					textElem = paper.text(
-						(bbox.x + bbox.x2) / 2
-						, (bbox.y + bbox.y2) / 2
-						, areaParams.text
-					).attr(areaParams.textAttrs);
+					switch (areaParams.textPosition) {
+						case 'bottom' :
+							textX = (bbox.x + bbox.x2) / 2;
+							textY = bbox.y2 + 15;
+							areaParams.textAttrs['text-anchor'] = "middle";
+							break;
+						case 'top' :
+							textX = (bbox.x + bbox.x2) / 2;
+							textY = bbox.y - 15;
+							areaParams.textAttrs['text-anchor'] = "middle";
+							break;
+						case 'left' :
+							textX = bbox.x - 10;
+							textY = (bbox.y + bbox.y2) / 2;
+							areaParams.textAttrs['text-anchor'] = "end";
+							break;
+						case 'left' :
+							textX = bbox.x2 + 10;
+							textY = (bbox.y + bbox.y2) / 2;
+							areaParams.textAttrs['text-anchor'] = "start";
+							break;
+						default : // 'inner' position
+							textX = (bbox.x + bbox.x2) / 2;
+							textY = (bbox.y + bbox.y2) / 2;
+							areaParams.textAttrs['text-anchor'] = "middle";
+					}
+					
+					textElem = paper.text(textX, textY, areaParams.text).attr(areaParams.textAttrs);
 					
 					areaParams.tooltip && areaParams.tooltip.content && $.fn.mapael.setTooltip(textElem, $tooltip, areaParams.tooltip.content);
 					areaParams.attrs.href && (textElem.attr({href: areaParams.attrs.href}));
@@ -107,7 +131,6 @@
 					throw "Unknown plot type '" + plotParams.type + "'";
 				}
 				
-				mapElem.elemType = 'plot';
 				mapElem.attr(plotParams.attrs);
 				
 				plotParams.tooltip && plotParams.tooltip.content && $.fn.mapael.setTooltip(mapElem, $tooltip, plotParams.tooltip.content);
@@ -115,11 +138,34 @@
 				
 				// Set a text label next to the plot
 				if (plotParams.text) {
-					textElem = (mapElem.type == "circle") ?
-						paper.text(coords.x + (plotParams.size / 2) + 10, coords.y, plotParams.text)
-						: paper.text(coords.x + plotParams.size + 10, coords.y, plotParams.text);
-					
-					textElem.attr(plotParams.textAttrs);
+				
+					switch (plotParams.textPosition) {
+						case 'bottom' :
+							textX = coords.x;
+							textY = coords.y + (plotParams.size / 2) + 10;
+							plotParams.textAttrs['text-anchor'] = "center";
+							break;
+						case 'top' :
+							textX = coords.x;
+							textY = coords.y - (plotParams.size / 2) - 10;
+							plotParams.textAttrs['text-anchor'] = "center";
+							break;
+						case 'inner' :
+							textX = coords.x;
+							textY = coords.y;
+							plotParams.textAttrs['text-anchor'] = "center";
+							break;
+						case 'left' :
+							textX = coords.x - (plotParams.size / 2) - 10;
+							textY = coords.y;
+							plotParams.textAttrs['text-anchor'] = "end";
+							break;
+						default : // 'right' position
+							textX = coords.x + (plotParams.size / 2) + 10;
+							textY = coords.y;
+							plotParams.textAttrs['text-anchor'] = "start";
+					}
+					textElem = paper.text(textX, textY, plotParams.text).attr(plotParams.textAttrs);
 					
 					plotParams.tooltip && plotParams.tooltip.content && $.fn.mapael.setTooltip(textElem, $tooltip, plotParams.tooltip.content);
 					plotParams.attrs.href && (textElem.attr({"href": plotParams.attrs.href}));
@@ -298,9 +344,7 @@
 					, legendParams.slices[i].size
 					, legendParams.slices[i].size
 				).attr(legendParams.slices[i].attrs);
-			} 
-			
-			elem.elemType = 'plot';
+			}
 			
 			label = paper.text(
 				marginLeft + legendParams.slices[i].size + marginLeftLabel
@@ -440,10 +484,10 @@
 					fill: "#f38a03"
 					, animDuration : 300
 				}
+				, textPosition: 'inner'
 				, textAttrs: {
 					"font-size": 15
 					, fill:"#c7c7c7"
-					, "text-anchor": "center"
 				}
 				, textAttrsHover: {
 					fill:"#eaeaea"
@@ -463,10 +507,10 @@
 					"stroke-width": 3
 					, animDuration : 300
 				}
+				, textPosition: 'right'
 				, textAttrs: {
 					"font-size": 15
 					, fill:"#c7c7c7"
-					, "text-anchor": "start"
 				},
 				textAttrsHover: {
 					fill:"#eaeaea"
