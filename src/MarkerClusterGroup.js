@@ -443,6 +443,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._featureGroup.onRemove(map);
 		this._nonPointGroup.onRemove(map);
 
+		this._featureGroup.clearLayers();
+
 		this._map = null;
 	},
 
