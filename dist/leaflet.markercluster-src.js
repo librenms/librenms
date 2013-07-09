@@ -448,6 +448,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._featureGroup.onRemove(map);
 		this._nonPointGroup.onRemove(map);
 
+		this._featureGroup.clearLayers();
+
 		this._map = null;
 	},
 
@@ -842,6 +844,10 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 			var startPos = c._latlng,
 				markers = c._markers,
 				m;
+
+			if (!bounds.contains(startPos)) {
+				startPos = null;
+			}
 
 			if (c._isSingleParent() && previousZoomLevel + 1 === newZoomLevel) { //Immediately add the new child and remove us
 				fg.removeLayer(c);
