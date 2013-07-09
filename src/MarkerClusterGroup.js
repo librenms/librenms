@@ -840,6 +840,10 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				markers = c._markers,
 				m;
 
+			if (!bounds.contains(startPos)) {
+				startPos = null;
+			}
+
 			if (c._isSingleParent() && previousZoomLevel + 1 === newZoomLevel) { //Immediately add the new child and remove us
 				fg.removeLayer(c);
 				c._recursivelyAddChildrenToMap(null, newZoomLevel, bounds);
