@@ -29,7 +29,9 @@ Here is the simplest example that shows how to display an empty map of the world
 
 **HTML :**
 
-    <div class="container">Alternative content</div>
+    <div class="container">
+        <div class="map">Alternative content</div>
+    </div>
 
 **JS :**
 
