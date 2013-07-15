@@ -357,13 +357,7 @@
 				, legendParams.slices[i].attrsHover
 			);
 			
-			if (legendParams.slices[i].type == "circle") {
-				elem = paper.circle(
-					legendParams.marginLeft + legendParams.slices[i].size / 2
-					, height + legendParams.slices[i].size / 2
-					, legendParams.slices[i].size / 2
-				).attr(legendParams.slices[i].attrs);
-			} else {
+			if(legendType == 'area' || legendParams.slices[i].type == "square") {
 				// Draw a square for squared plots AND areas
 				!legendParams.slices[i].size && (legendParams.slices[i].size = 20);
 				
@@ -373,7 +367,13 @@
 					, legendParams.slices[i].size
 					, legendParams.slices[i].size
 				).attr(legendParams.slices[i].attrs);
-			}
+			} else {
+				elem = paper.circle(
+					legendParams.marginLeft + legendParams.slices[i].size / 2
+					, height + legendParams.slices[i].size / 2
+					, legendParams.slices[i].size / 2
+				).attr(legendParams.slices[i].attrs);
+			} 
 			
 			label = paper.text(
 				legendParams.marginLeft + legendParams.slices[i].size + legendParams.marginLeftLabel
