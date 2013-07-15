@@ -3,7 +3,7 @@
 * Jquery Mapael - Dynamic maps jQuery plugin (based on raphael.js)
 * Requires jQuery and raphael.js
 *
-* Version: 0.2.2 (07-02-2013)
+* Version: 0.3.0 (07-07-2013)
 *
 * Copyright (c) 2013 Vincent Brouté (http://www.neveldo.fr/mapael)
 * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php).
@@ -19,178 +19,149 @@
 		return this.each(function() {
 		
 			var $tooltip = $("<div>").addClass(options.map.tooltip.cssClass).css("display", "none")
-				, $container = $(this).empty().append($tooltip)
+				, $container = $('.' + options.map.cssClass, this).empty().append($tooltip)
 				, mapConf = $.fn.mapael.maps[options.map.name]
-				, containerWidth = $container.width()
-				, paper = new Raphael(this, mapConf.width, mapConf.height)
-				, areaParams = {}
-				, legend = {}
-				, mapElem = {}
-				, bbox = {}
-				, plotParams = {}
-				, textElem = {}
+				, paper = new Raphael($container[0], mapConf.width, mapConf.height)
+				, elemParams = {}
 				, coords = {}
 				, resizeTO = 0
-				, textX = 0
-				, textY = 0;
+				, areas = {}
+				, plots = {}
+				, id = 0;
 			
 			options.map.tooltip.css && $tooltip.css(options.map.tooltip.css);
 			paper.setViewBox(0, 0, mapConf.width, mapConf.height, false);
 			
 			// Draw map areas
-			for (var id in mapConf.elems) {
-				areaParams = $.extend(
-					true
-					, {}
-					, options.map.defaultArea
+			for (id in mapConf.elems) {
+				elemParams = $.fn.mapael.getElemParams(
+					options.map.defaultArea
 					, (options.areas[id] ? options.areas[id] : {})
+					, options.legend.area
 				);
-				
-				if (options.legend.area && areaParams.value) {
-					legend = $.fn.mapael.getLegendEl(areaParams.value, options.legend.area);
-					legend && $.extend(true, areaParams, legend);
-				}
-				
-				mapElem = paper.path(mapConf.elems[id]).attr(areaParams.attrs);
-				
-				areaParams.tooltip && areaParams.tooltip.content && $.fn.mapael.setTooltip(mapElem, $tooltip, areaParams.tooltip.content);
-				$.fn.mapael.paramHover(mapElem, areaParams.attrs, areaParams.attrsHover);
-				
-				// Set a text label in the area
-				if (areaParams.text) {
-					bbox = mapElem.getBBox();
-					switch (areaParams.textPosition) {
-						case 'bottom' :
-							textX = (bbox.x + bbox.x2) / 2;
-							textY = bbox.y2 + 15;
-							areaParams.textAttrs['text-anchor'] = "middle";
-							break;
-						case 'top' :
-							textX = (bbox.x + bbox.x2) / 2;
-							textY = bbox.y - 15;
-							areaParams.textAttrs['text-anchor'] = "middle";
-							break;
-						case 'left' :
-							textX = bbox.x - 10;
-							textY = (bbox.y + bbox.y2) / 2;
-							areaParams.textAttrs['text-anchor'] = "end";
-							break;
-						case 'left' :
-							textX = bbox.x2 + 10;
-							textY = (bbox.y + bbox.y2) / 2;
-							areaParams.textAttrs['text-anchor'] = "start";
-							break;
-						default : // 'inner' position
-							textX = (bbox.x + bbox.x2) / 2;
-							textY = (bbox.y + bbox.y2) / 2;
-							areaParams.textAttrs['text-anchor'] = "middle";
-					}
-					
-					textElem = paper.text(textX, textY, areaParams.text).attr(areaParams.textAttrs);
-					
-					areaParams.tooltip && areaParams.tooltip.content && $.fn.mapael.setTooltip(textElem, $tooltip, areaParams.tooltip.content);
-					areaParams.attrs.href && (textElem.attr({href: areaParams.attrs.href}));
-					$.fn.mapael.paramHover(textElem, areaParams.textAttrs, areaParams.textAttrsHover);
-					$.fn.mapael.setHover(paper, mapElem, textElem);
-					$.fn.mapael.setCallbacks(areaParams, mapElem, textElem);
-				} else {
-					$.fn.mapael.setHover(paper, mapElem);
-					$.fn.mapael.setCallbacks(areaParams, mapElem);
-				}
+				areas[id] = {'mapElem' : paper.path(mapConf.elems[id]).attr(elemParams.attrs)};
+				$.fn.mapael.initElem(paper, areas[id], elemParams, $tooltip);
 			}
 			
 			// Draw plots
-			for (var i = 0, length = options.plots.length; i < length; ++i) {
-				plotParams = $.extend(
-					true, {}
-					, options.map.defaultPlot
-					, (options.plots[i] ? options.plots[i] : {})
+			for (id in options.plots) {
+				elemParams = $.fn.mapael.getElemParams(
+					options.map.defaultPlot
+					, (options.plots[id] ? options.plots[id] : {})
+					, options.legend.plot
 				);
 				
-				if (plotParams.x && plotParams.y) {
-					coords = {x : plotParams.x, y : plotParams.y};
-				} else {
-					coords = mapConf.getCoords(plotParams.latitude, plotParams.longitude);
-				}
-					
-				if (options.legend.plot && plotParams.value) {
-					legend = $.fn.mapael.getLegendEl(plotParams.value, options.legend.plot);
-					legend && $.extend(true, plotParams, legend);
-				}
+				if (elemParams.x && elemParams.y) 
+					coords = {x : elemParams.x, y : elemParams.y};
+				else
+					coords = mapConf.getCoords(elemParams.latitude, elemParams.longitude);
 				
-				if ("square" == plotParams.type) {
-					mapElem = paper.rect(
-						coords.x - (plotParams.size / 2)
-						, coords.y - (plotParams.size / 2)
-						, plotParams.size
-						, plotParams.size
-					);
-				} else if ("circle" == plotParams.type) {
-					mapElem = paper.circle(coords.x, coords.y, plotParams.size / 2);
-				} else {
-					throw "Unknown plot type '" + plotParams.type + "'";
+				if ("square" == elemParams.type) {
+					plots[id] = {'mapElem' : paper.rect(
+						coords.x - (elemParams.size / 2)
+						, coords.y - (elemParams.size / 2)
+						, elemParams.size
+						, elemParams.size
+					).attr(elemParams.attrs)};
+				} else { // Default = circle
+					plots[id] = {'mapElem' : paper.circle(coords.x, coords.y, elemParams.size / 2).attr(elemParams.attrs)};
 				}
 				
-				mapElem.attr(plotParams.attrs);
-				
-				plotParams.tooltip && plotParams.tooltip.content && $.fn.mapael.setTooltip(mapElem, $tooltip, plotParams.tooltip.content);
-				$.fn.mapael.paramHover(mapElem, plotParams.attrs, plotParams.attrsHover);
-				
-				// Set a text label next to the plot
-				if (plotParams.text) {
-				
-					switch (plotParams.textPosition) {
-						case 'bottom' :
-							textX = coords.x;
-							textY = coords.y + (plotParams.size / 2) + 10;
-							plotParams.textAttrs['text-anchor'] = "center";
-							break;
-						case 'top' :
-							textX = coords.x;
-							textY = coords.y - (plotParams.size / 2) - 10;
-							plotParams.textAttrs['text-anchor'] = "center";
-							break;
-						case 'inner' :
-							textX = coords.x;
-							textY = coords.y;
-							plotParams.textAttrs['text-anchor'] = "center";
-							break;
-						case 'left' :
-							textX = coords.x - (plotParams.size / 2) - 10;
-							textY = coords.y;
-							plotParams.textAttrs['text-anchor'] = "end";
-							break;
-						default : // 'right' position
-							textX = coords.x + (plotParams.size / 2) + 10;
-							textY = coords.y;
-							plotParams.textAttrs['text-anchor'] = "start";
-					}
-					textElem = paper.text(textX, textY, plotParams.text).attr(plotParams.textAttrs);
-					
-					plotParams.tooltip && plotParams.tooltip.content && $.fn.mapael.setTooltip(textElem, $tooltip, plotParams.tooltip.content);
-					plotParams.attrs.href && (textElem.attr({"href": plotParams.attrs.href}));
-					$.fn.mapael.paramHover(textElem, plotParams.textAttrs, plotParams.textAttrsHover);
-					$.fn.mapael.setHover(paper, mapElem, textElem);
-					$.fn.mapael.setCallbacks(plotParams, mapElem, textElem);
-				} else {
-					$.fn.mapael.setHover(paper, mapElem);
-					$.fn.mapael.setCallbacks(plotParams, mapElem);
-				}
+				$.fn.mapael.initElem(paper, plots[id], elemParams, $tooltip);
 			}
+			
+			/**
+			* 
+			* Update the current map
+			* Refresh attributes and tooltips for areas and plots
+			* @params options options to refresh
+			* @params reset true to reset previous areas and plots individual options
+			*/
+			$(this).bind('update', function(e, updateOptions, resetAreas, resetPlots, animDuration, easing) {
+				var elemParams = {}
+					, legend = {}
+					, id = 0
+					, bbox = {}
+					, textPosition = {}
+					, plotOffset = 0;
+				
+				if (!animDuration) animDuration = 300;
+				if (!easing) easing = 'linear';
+				if (resetAreas) options.areas = {};
+				if (resetPlots) options.plots = {};
+				
+				$.extend(true, options, updateOptions);
+				
+				// Update areas attributes and tooltips
+				for (id in areas) {
+					elemParams = $.fn.mapael.getElemParams(
+						options.map.defaultArea
+						, (options.areas[id] ? options.areas[id] : {})
+						, options.legend.area
+					);
+					
+					$.fn.mapael.paramHover(areas[id].mapElem, elemParams.attrs, areas[id].mapElem.attrsHover);
+					areas[id].mapElem.animate(elemParams.attrs, animDuration, easing);
+					
+					if (elemParams.tooltip && elemParams.tooltip.content) {
+						areas[id].mapElem.tooltipContent = elemParams.tooltip.content;
+						if (areas[id].textElem) {
+							areas[id].textElem.tooltipContent = elemParams.tooltip.content;
+						}
+					}
+				}
+				
+				// Update plots attributes and tooltips
+				for (id in plots) {
+					elemParams = $.fn.mapael.getElemParams(
+						options.map.defaultPlot
+						, (options.plots[id] ? options.plots[id] : {})
+						, options.legend.plot
+					);
+					
+					// Update text position
+					if (plots[id].textElem) {
+						bbox = plots[id].mapElem.getBBox();
+						plotOffset = (elemParams.size - bbox.height) / 2;
+						bbox.x -= plotOffset;
+						bbox.x2 += plotOffset;
+						bbox.y -= plotOffset;
+						bbox.y2 += plotOffset;
+						textPosition = $.fn.mapael.getTextPosition(bbox, elemParams.textPosition);
+						plots[id].textElem.animate({x : textPosition.x, y : textPosition.y}, animDuration, easing);
+					}
+					
+					// Update plot size
+					if ("square" == elemParams.type) {
+						elemParams.attrs.width = elemParams.size;
+						elemParams.attrs.height = elemParams.size;
+					} else { // Default : circle
+						elemParams.attrs.r = elemParams.size / 2;
+					}
+					
+					$.fn.mapael.paramHover(plots[id].mapElem, elemParams.attrs, plots[id].mapElem.attrsHover);
+					plots[id].mapElem.animate(elemParams.attrs, animDuration, easing);
+					
+					if (elemParams.tooltip && elemParams.tooltip.content) {
+						plots[id].mapElem.tooltipContent = elemParams.tooltip.content;
+						if (plots[id].textElem) {
+							plots[id].textElem.tooltipContent = elemParams.tooltip.content;
+						}
+					}
+				}
+			});
 			
 			// Create the legends for areas and plots
-			if (options.legend.area.slices && options.legend.area.display) {
-				$.fn.mapael.createLegend($container, options, 'area');
-			}
+			if (options.legend.area.slices && options.legend.area.display)
+				$.fn.mapael.createLegend($(this), options, 'area');
 			
-			if (options.legend.plot.slices && options.legend.plot.display) {
-				$.fn.mapael.createLegend($container, options, 'plot');
-			}
+			if (options.legend.plot.slices && options.legend.plot.display)
+				$.fn.mapael.createLegend($(this), options, 'plot');
 			
+			// Handle size of the map
 			if (options.map.width) {
 				paper.setSize(options.map.width, mapConf.height * (options.map.width / mapConf.width));
 			} else {
-				// Handle resizing of the container
 				$(window).bind('resize', function(){
 					clearTimeout(resizeTO);
 					resizeTO = setTimeout(function(){$container.trigger('resizeEnd');}, 150);
@@ -210,41 +181,105 @@
 	};
 	
 	/**
+	* Get element parameters by merging default params, element params and legend params
+	*/
+	$.fn.mapael.getElemParams = function(defaultParams, elemParams, legendOptions) {
+		var elemParams = $.extend(true, {}, defaultParams, elemParams);
+		if (elemParams.value) {
+			$.extend(true, elemParams, $.fn.mapael.getLegendEl(elemParams.value, legendOptions));
+			}
+		return elemParams;
+	}
+	
+	/**
+	* Init the element of the map (draw it, set attributes, events, tooltip, ...)
+	*/
+	$.fn.mapael.initElem = function(paper, elem, params, $tooltip) {
+		var bbox = {}, textPosition = {};
+		$.fn.mapael.paramHover(elem.mapElem, params.attrs, params.attrsHover);
+		
+		// Set a text label in the area
+		if (params.text) {
+			bbox = elem.mapElem.getBBox();
+			textPosition = $.fn.mapael.getTextPosition(bbox, params.textPosition);
+			params.textAttrs['text-anchor'] = textPosition.textAnchor;
+			elem.textElem = paper.text(textPosition.x, textPosition.y, params.text).attr(params.textAttrs);
+			
+			params.attrs.href && (elem.textElem.attr({href: params.attrs.href}));
+			$.fn.mapael.paramHover(elem.textElem, params.textAttrs, params.textAttrsHover);
+			$.fn.mapael.setHover(paper, elem.mapElem, elem.textElem);
+			$.fn.mapael.setCallbacks(params, elem.mapElem, elem.textElem);
+		} else {
+			$.fn.mapael.setHover(paper, elem.mapElem);
+			$.fn.mapael.setCallbacks(params, elem.mapElem);
+		}
+		
+		if (params.tooltip && params.tooltip.content) {
+			elem.mapElem.tooltipContent = params.tooltip.content;
+			$.fn.mapael.setTooltip(elem.mapElem, $tooltip);
+			
+			if (params.text) {
+				elem.textElem.tooltipContent = params.tooltip.content;
+				$.fn.mapael.setTooltip(elem.textElem, $tooltip);
+			}
+		}
+	}
+	
+	/**
+	* Get the text position (x, y and text-anchor)
+	* @param bbox the boundary box of the element
+	* @param textPosition the wanted text position (inner, right, left, top or bottom)
+	*/
+	$.fn.mapael.getTextPosition = function(bbox, textPosition) {
+		var textX = 0
+			, textY = 0
+			, textAnchor = '';
+			
+		switch (textPosition) {
+			case 'bottom' :
+				textX = (bbox.x + bbox.x2) / 2;
+				textY = bbox.y2 + 15;
+				textAnchor = "middle";
+				break;
+			case 'top' :
+				textX = (bbox.x + bbox.x2) / 2;
+				textY = bbox.y - 15;
+				textAnchor = "middle";
+				break;
+			case 'left' :
+				textX = bbox.x - 10;
+				textY = (bbox.y + bbox.y2) / 2;
+				textAnchor = "end";
+				break;
+			case 'right' :
+				textX = bbox.x2 + 10;
+				textY = (bbox.y + bbox.y2) / 2;
+				textAnchor = "start";
+				break;
+			default : // 'inner' position
+				textX = (bbox.x + bbox.x2) / 2;
+				textY = (bbox.y + bbox.y2) / 2;
+				textAnchor = "middle";
+		}
+		return {'x' : textX, 'y' : textY, 'textAnchor' : textAnchor};
+	}
+	
+	/**
 	* Set user defined callbacks on areas and plots
 	* @param elemParams the element parameters
 	* @param mapElem the map element to set callback on
 	* @param textElem the optional text within the map element
 	*/
 	$.fn.mapael.setCallbacks = function(elemParams, mapElem, textElem) {
-		var callbacks = [];
-		if (elemParams.onclick) {
-			callbacks.push({
-				event : 'click'
-				, callback : function() {elemParams.onclick(elemParams, mapElem, textElem)}
-			});
-		}
-		if (elemParams.onmouseover) {
-			callbacks.push({
-				event : 'mouseover'
-				, callback : function() {elemParams.onmouseover(elemParams, mapElem, textElem)}
-			});
-		}
-		if (elemParams.onmouseout) {
-			callbacks.push({
-				event : 'mouseout'
-				, callback : function() {elemParams.onmouseout(elemParams, mapElem, textElem)}
-			});
-		}
-		
-		for(var i = 0, length = callbacks.length; i < length; ++i) {
-			$(mapElem.node).bind(
-				callbacks[i].event
-				, callbacks[i].callback
-			);
-			textElem && $(textElem.node).bind(
-				callbacks[i].event
-				, callbacks[i].callback
-			);
+		var availableCallbacks = ['click', 'mouseover', 'mouseout']
+			, callbackFct = {};
+			
+		for(var i = 0, length = availableCallbacks.length; i < length; ++i) {
+			if (elemParams["on" + availableCallbacks[i]]) {
+				callbackFct = elemParams["on" + availableCallbacks[i]];
+				$(mapElem.node).bind(availableCallbacks[i], function() {callbackFct(elemParams, mapElem, textElem)});
+				textElem && $(textElem.node).bind(availableCallbacks[i], function() {callbackFct(elemParams, mapElem, textElem)});
+			}
 		}
 	}
 	
@@ -262,6 +297,7 @@
 				return legend.slices[i];
 			}
 		}
+		return {};
 	};
 	
 	/**
@@ -270,11 +306,11 @@
 	* @param $tooltip the tooltip container
 	* @param content the content to set in the tooltip
 	*/
-	$.fn.mapael.setTooltip = function(elem, $tooltip, content) {
+	$.fn.mapael.setTooltip = function(elem, $tooltip) {
 		var tooltipTO = 0;
 	
 		$(elem.node).bind("mouseover", function() {
-			tooltipTO = setTimeout(function() {$tooltip.html(content).css("display", "block");}, 120);
+			tooltipTO = setTimeout(function() {$tooltip.html(elem.tooltipContent).css("display", "block");}, 120);
 		}).bind("mouseout", function() {
 			clearTimeout(tooltipTO);
 			$tooltip.css("display", "none");
@@ -291,46 +327,39 @@
 	*/
 	$.fn.mapael.createLegend = function ($container, options, legendType) {
 		var legendParams = options.legend[legendType]
-			, $legend = $('<div>').addClass(legendParams["cssClass"])
+			, $legend = (legendType == 'plot') ? $('.' + options.legend.plot.cssClass, $container).empty() : $('.' + options.legend.area.cssClass, $container).empty()
 			, paper = new Raphael($legend.get(0))
 			, width = 5
 			, height = 5
-			, marginLeft = legendParams.marginLeft
-			, marginLeftTitle = legendParams.marginLeftTitle
-			, marginLeftLabel = legendParams.marginLeftLabel
-			, marginBottom = legendParams.marginBottom
 			, title = {}
-			, attrParamName = ''
+			, defaultElemParams = {}
 			, elem = {}
-			, label = {}
-			, lineWidth = {};
-			
-		$container.append($legend);
+			, label = {};
 		
 		if(legendParams.title) {
-			title = paper.text(marginLeftTitle, marginBottom, legendParams.title)
+			title = paper.text(legendParams.marginLeftTitle, legendParams.marginBottom, legendParams.title)
 				.attr(legendParams.titleAttrs);
 				
-			width = marginLeftTitle + title.getBBox().width;
-			height += marginBottom + title.getBBox().height;
+			width = legendParams.marginLeftTitle + title.getBBox().width;
+			height += legendParams.marginBottom + title.getBBox().height;
 		}
 		
 		for(var i = 0, length = legendParams.slices.length; i < length; ++i) {
-			attrParamName = (legendType == 'plot') ? 'defaultPlot' : 'defaultArea';
+			defaultElemParams = (legendType == 'plot') ? options.map['defaultPlot'] : options.map['defaultArea'];
 			legendParams.slices[i].attrs = $.extend(
 				{}
-				, options.map[attrParamName].attrs
+				, defaultElemParams.attrs
 				, legendParams.slices[i].attrs
 			);
 			legendParams.slices[i].attrsHover = $.extend(
 				{}
-				, options.map[attrParamName].attrsHover
+				, defaultElemParams.attrsHover
 				, legendParams.slices[i].attrsHover
 			);
 			
 			if (legendParams.slices[i].type == "circle") {
 				elem = paper.circle(
-					marginLeft + legendParams.slices[i].size / 2
+					legendParams.marginLeft + legendParams.slices[i].size / 2
 					, height + legendParams.slices[i].size / 2
 					, legendParams.slices[i].size / 2
 				).attr(legendParams.slices[i].attrs);
@@ -339,7 +368,7 @@
 				!legendParams.slices[i].size && (legendParams.slices[i].size = 20);
 				
 				elem = paper.rect(
-					marginLeft
+					legendParams.marginLeft
 					, height
 					, legendParams.slices[i].size
 					, legendParams.slices[i].size
@@ -347,14 +376,13 @@
 			}
 			
 			label = paper.text(
-				marginLeft + legendParams.slices[i].size + marginLeftLabel
+				legendParams.marginLeft + legendParams.slices[i].size + legendParams.marginLeftLabel
 				, height + legendParams.slices[i].size / 2
 				, legendParams.slices[i].label
 			).attr(legendParams.labelAttrs);
 			
-			height += marginBottom + legendParams.slices[i].size;
-			lineWidth = marginLeft + legendParams.slices[i].size + marginLeftLabel + label.getBBox().width;
-			width = (width < lineWidth) ? lineWidth : width;
+			height += legendParams.marginBottom + legendParams.slices[i].size;
+			width = Math.max(width, legendParams.marginLeft + legendParams.slices[i].size + legendParams.marginLeftLabel + label.getBBox().width);
 			
 			$.fn.mapael.paramHover(elem, legendParams.slices[i].attrs, legendParams.slices[i].attrsHover);
 			$.fn.mapael.paramHover(label, legendParams.labelAttrs, legendParams.labelAttrs);
@@ -363,9 +391,8 @@
 		
 		// VMLWidth option allows you to set static width for the legend
 		// only for VML render because text.getBBox() returns wrong values on IE6/7
-		if (Raphael.type != 'SVG' && legendParams.VMLWidth) {
+		if (Raphael.type != 'SVG' && legendParams.VMLWidth) 
 			width = legendParams.VMLWidth;
-		}
 		
 		paper.setSize(width, height);
 	}
@@ -377,19 +404,8 @@
 	* @param textElem the optional text element (within the map element)
 	*/
 	$.fn.mapael.hoverIn = function (paper, mapElem, textElem) {
-		if (mapElem) {
-			mapElem.animate(
-				mapElem.attrsHover
-				, mapElem.attrsHover.animDuration
-			);
-		}
-		
-		if (textElem) {
-			textElem.animate(
-				textElem.attrsHover
-				, textElem.attrsHover.animDuration
-			);
-		}
+		mapElem.animate(mapElem.attrsHover, mapElem.attrsHover.animDuration);
+		textElem && textElem.animate(textElem.attrsHover, textElem.attrsHover.animDuration);
 		paper.safari();
 	}
 	
@@ -400,14 +416,8 @@
 	* @param textElem the optional text element (within the map element)
 	*/
 	$.fn.mapael.hoverOut = function (paper, mapElem, textElem) {
-		textElem && textElem.animate(
-			textElem.originalAttrs
-			, textElem.attrsHover.animDuration
-		);
-		mapElem && mapElem.animate(
-			mapElem.originalAttrs, 
-			mapElem.attrsHover.animDuration
-		);
+		mapElem.animate(mapElem.originalAttrs, mapElem.attrsHover.animDuration);
+		textElem && textElem.animate(textElem.originalAttrs, textElem.attrsHover.animDuration);
 		paper.safari();
 	};
 	
@@ -420,27 +430,18 @@
 	$.fn.mapael.setHover = function (paper, mapElem, textElem) {
 		var $mapElem = {}
 			, $textElem = {}
-			, hoverTO = 0;
-		if (mapElem) {
-			$mapElem = $(mapElem.node);
-			$mapElem.bind("mouseover",
-				function() {
-					hoverTO = setTimeout(function () {$.fn.mapael.hoverIn(paper, mapElem, textElem);}, 120);
-				}
-			);
-			$mapElem.bind("mouseout",
-				function () {clearTimeout(hoverTO);$.fn.mapael.hoverOut(paper, mapElem, textElem);}
-			);
-		}
+			, hoverTO = 0
+			, overBehaviour = function() {hoverTO = setTimeout(function () {$.fn.mapael.hoverIn(paper, mapElem, textElem);}, 120);}
+			, outBehaviour = function () {clearTimeout(hoverTO);$.fn.mapael.hoverOut(paper, mapElem, textElem);};
+			
+		$mapElem = $(mapElem.node);
+		$mapElem.bind("mouseover", overBehaviour);
+		$mapElem.bind("mouseout", outBehaviour);
 		
 		if (textElem) {
 			$textElem = $(textElem.node);
-			$textElem.bind("mouseover",
-				function () {$.fn.mapael.hoverIn(paper, mapElem, textElem);}
-			);
-			$textElem && $(textElem.node).bind("mouseout",
-				function () {$.fn.mapael.hoverOut(paper, mapElem, textElem);}
-			);
+			$textElem.bind("mouseover", overBehaviour);
+			$(textElem.node).bind("mouseout", outBehaviour);
 		}
 	};
 	
@@ -451,26 +452,19 @@
 	* @param attrsHover the attributes to set on mouseover event
 	*/
 	$.fn.mapael.paramHover = function (elem, originalAttrs, attrsHover) {
-		// Don't use transform option on hover for VML (IE<9) because of several bugs
-		if (Raphael.type != 'SVG') {
-			delete attrsHover.transform;
-		}
-	
-		elem.attrsHover = {};
-		$.extend(elem.attrsHover, attrsHover);
+		// Disable transform option on hover for VML (IE<9) because of several bugs
+		if (Raphael.type != 'SVG') delete attrsHover.transform;
+		elem.attrsHover = attrsHover;
 		
-		if (elem.attrsHover.transform) {
-			elem.originalAttrs = {transform : "s1"};
-		} else {
-			elem.originalAttrs = {};
-		}
-		$.extend(elem.originalAttrs, originalAttrs);
+		if (elem.attrsHover.transform) elem.originalAttrs = $.extend({transform : "s1"}, originalAttrs);
+		else elem.originalAttrs = originalAttrs;
 	};
 	
 	// Default map options
 	$.fn.mapael.defaultOptions = {
 		map: {
-			tooltip: {
+			cssClass: "map"
+			, tooltip: {
 				cssClass: "mapTooltip"
 			}
 			, defaultArea: {
@@ -520,7 +514,7 @@
 		}
 		, legend: {
 			area: {
-				cssClass: "mapLegend"
+				cssClass: "areaLegend"
 				, display: false
 				, marginLeft: 15
 				, marginLeftTitle: 5
@@ -537,9 +531,9 @@
 					, "text-anchor" : "start"
 				}
 				, slices : []
-			},
-			plot: {
-				cssClass: "mapLegend"
+			}
+			, plot: {
+				cssClass: "plotLegend"
 				, display: false
 				, marginLeft: 15
 				, marginLeftTitle: 5
