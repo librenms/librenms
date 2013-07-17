@@ -34,4 +34,22 @@
 
 		expect(ex).to.not.be(null);
 	});
+
+	it('successfully handles removing and re-adding a layer while not on the map', function () {
+		map.options.maxZoom = 18;
+		var group = new L.MarkerClusterGroup();
+		var marker = new L.Marker([1.5, 1.5]);
+
+		map.addLayer(group);
+		group.addLayer(marker);
+
+		map.removeLayer(group);
+		group.removeLayer(marker);
+		group.addLayer(marker);
+
+		map.addLayer(group);
+
+		expect(map.hasLayer(group)).to.be(true);
+		expect(group.hasLayer(marker)).to.be(true);
+	});
 });

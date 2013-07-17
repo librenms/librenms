@@ -383,7 +383,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		for (i = 0, l = this._needsRemoving.length; i < l; i++) {
 			layer = this._needsRemoving[i];
-			this._removeLayer(layer);
+			this._removeLayer(layer, true);
 		}
 		this._needsRemoving = [];
 
