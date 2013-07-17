@@ -7,15 +7,28 @@ Colorful iconic & retina-proof markers for Leaflet, based on the Font Awesome/Tw
 <a href="http://jsfiddle.net/VPzu4/3/embedded/result/" target="_blank">JSfiddle demo</a> 
 
 ### Twitter Bootstrap/Font-Awesome icons
-This plugin depends on Bootstrap or Font-Awesome for the rendering of the icons. The Font-Awesome fonts and CSS classes could be included in the project. See these urls for more information:
+This plugin depends on either Bootstrap or Font-Awesome for the rendering of the icons. See these urls for more information:
+
+For Font-Awesome
 - http://fortawesome.github.com/Font-Awesome/
 - http://fortawesome.github.com/Font-Awesome/#integration
 
-Or if you are using bootstrap:
+For Twitter bootstrap:
 - http://twitter.github.com/bootstrap/
 
 ## Using the plugin
-Copy the dist/images directory and css/js files to your project and include them:
+- 1) First, follow the steps for including Font-Awesome or Twitter bootstrap into your application.
+
+    For Font-Awesome, steps are located here:
+    
+    http://fortawesome.github.io/Font-Awesome/get-started/
+    
+    For Twitter bootstrap, steps are here:
+    
+    http://twitter.github.io/bootstrap/getting-started.html
+    
+
+- 2) Next, copy the dist/images directory, awesome-markers.css, and awesome-markers.js to your project and include them:
 ````xml
 <link rel="stylesheet" href="css/leaflet.awesome-markers.css">
 ````
@@ -23,7 +36,7 @@ Copy the dist/images directory and css/js files to your project and include them
 <script src="js/leaflet.awesome-markers.js"></script>
 ````
 
-Now use the plugin to create a marker like this:
+- 3) Now use the plugin to create a marker like this:
 ````js
 // Creates a red marker with the coffee icon
 var redMarker = L.AwesomeMarkers.icon({
@@ -31,10 +44,13 @@ var redMarker = L.AwesomeMarkers.icon({
   color: 'red'
 })
 
-L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
+    
+    L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
 ````
 
-### Supported colors
+### Supported colors:
+**The following colors are supported**
+
 The 'color' property currently supports these strings:
 - 'red'
 - 'darkred'
@@ -65,19 +81,6 @@ var redMarker = L.AwesomeMarkers.icon({
   icon: 'spinner', 
   color: 'red',
   spin: true
-})
-
-L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
-````
-
-### Color of the icon
-By default the icons are white, but you can set the color to black with the iconColor option. 'white' & 'black' are the only ones supported.
-````js
-// Creates a red marker with the coffee icon
-var redMarker = L.AwesomeMarkers.icon({
-  icon: 'flag', 
-  color: 'red',
-  iconColor: 'black'
 })
 
 L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
