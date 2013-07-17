@@ -53,17 +53,19 @@ Check out the [custom example](http://leaflet.github.com/Leaflet.markercluster/e
 
 ### All Options
 Enabled by default (boolean options):
-* **zoomToBoundsOnClick**: When you click a cluster we zoom to its bounds.
 * **showCoverageOnHover**: When you mouse over a cluster it shows the bounds of its markers.
+* **zoomToBoundsOnClick**: When you click a cluster we zoom to its bounds.
 * **spiderfyOnMaxZoom**: When you click a cluster at the bottom zoom level we spiderfy it so you can see all of its markers.
+* **removeOutsideVisibleBounds**: Clusters and markers too far from the viewport are removed from the map for performance.
 
 Other options
 * **animateAddingMarkers**: If set to true then adding individual markers to the MarkerClusterGroup after it has been added to the map will add the marker and animate it in to the cluster. Defaults to false as this gives better performance when bulk adding markers. addLayers does not support this, only addLayer with individual Markers.
 * **disableClusteringAtZoom**: If set, at this zoom level and below markers will not be clustered. This defaults to disabled. [See Example](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-realworld-maxzoom.388.html)
 * **maxClusterRadius**: The maximum radius that a cluster will cover from the central marker (in pixels). Default 80. Decreasing will make more smaller clusters.
-* **polygonOptions**: Options to pass when creating the L.Polygon to show the bounds of a cluster
+* **polygonOptions**: Options to pass when creating the L.Polygon(points, options) to show the bounds of a cluster
 * **singleMarkerMode**: If set to true, overrides the icon for all added markers to make them appear as a 1 size cluster
-* **spiderfyDistanceMultiplier**: Increase from 1 to increase the distance away from the center that spiderfied markers are placed. Use if you are using big marker icons.
+* **spiderfyDistanceMultiplier**: Increase from 1 to increase the distance away from the center that spiderfied markers are placed. Use if you are using big marker icons (Default:1)
+* **iconCreateFunction**: Function used to create the cluster icon [See default as example](https://github.com/Leaflet/Leaflet.markercluster/blob/15ed12654acdc54a4521789c498e4603fe4bf781/src/MarkerClusterGroup.js#L542).
 
 ## Events
 If you register for click, mouseover, etc events just related to Markers in the cluster.
