@@ -18,7 +18,7 @@ As Raphaël, Mapael supports Firefox 3.0+, Safari 3.0+, Chrome 5.0+, Opera 9.5+ a
 *   based on **jQuery and raphael.js**
 *   **Interactive.** Set a link, a tooltip and some events on the areas of the map
 *   **Plottable cities**  with their latitude and their longitude
-*   **Areas and plots colorization.** Mapael automatically sets a color to each area of your map and generates the legend in order to build pretty dataviz
+*   **Areas and plots colorization.** Mapael automatically sets a color to each area of your map and generates an interactive legend in order to build pretty dataviz
 *   **Easy to add new maps.** Build your own maps based on SVG format
 *   **SEO-friendly.** An alternative content can be set for non-JS users and web crawlers
 *   **Resizable** Thanks to raphael.js, maps are easily resizable.
