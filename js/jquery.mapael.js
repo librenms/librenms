@@ -120,7 +120,7 @@
 						, options.legend.area
 					);
 					
-					if (elemOptions.value)
+					if (typeof elemOptions.value != "undefined")
 						areas[id].value = elemOptions.value;
 					
 					$.fn.mapael.setHoverOptions(areas[id].mapElem, elemOptions.attrs, areas[id].mapElem.attrsHover);
@@ -142,7 +142,7 @@
 						, options.legend.plot
 					);
 					
-					if (elemOptions.value)
+					if (typeof elemOptions.value != "undefined")
 						plots[id].value = elemOptions.value;
 					
 					// Update text position
@@ -236,7 +236,7 @@
 			}
 		}
 		
-		if (options.value)
+		if (typeof options.value != "undefined")
 			elem.value = options.value;
 	}
 	
@@ -461,7 +461,7 @@
 	*/
 	$.fn.mapael.getElemOptions = function(defaultOptions, elemOptions, legendOptions) {
 		var options = $.extend(true, {}, defaultOptions, elemOptions);
-		if (options.value) {
+		if (typeof options.value != "undefined") {
 			$.extend(true, options, $.fn.mapael.getLegendSlice(options.value, legendOptions));
 		}
 		return options;
