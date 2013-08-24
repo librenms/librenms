@@ -3,7 +3,7 @@
 * Jquery Mapael - Dynamic maps jQuery plugin (based on raphael.js)
 * Requires jQuery and raphael.js
 *
-* Version: 0.4.0 (29-07-2013)
+* Version: 0.5.0 (24-08-2013)
 *
 * Copyright (c) 2013 Vincent Brouté (http://www.neveldo.fr/mapael)
 * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php).
@@ -79,6 +79,10 @@
 			if (options.legend.plot.slices && options.legend.plot.display)
 				plotLegend = $.fn.mapael.createLegend($(this), options, 'plot', plots);
 			
+			// Enable zoom
+			if (options.map.zoom.enabled)
+				$.fn.mapael.initZoom($container, paper, mapConf.width, mapConf.height, options.map.zoom);
+				
 			/**
 			* 
 			* Update the current map
@@ -209,6 +213,7 @@
 	$.fn.mapael.initElem = function(paper, elem, options, $tooltip) {
 		var bbox = {}, textPosition = {};
 		$.fn.mapael.setHoverOptions(elem.mapElem, options.attrs, options.attrsHover);
+		options.href && $.fn.mapael.setHref(elem.mapElem, options.href);
 		
 		if (options.text) {
 			// Set a text label in the area
@@ -216,8 +221,7 @@
 			textPosition = $.fn.mapael.getTextPosition(bbox, options.textPosition);
 			options.textAttrs['text-anchor'] = textPosition.textAnchor;
 			elem.textElem = paper.text(textPosition.x, textPosition.y, options.text).attr(options.textAttrs);
-			
-			options.attrs.href && (elem.textElem.attr({href: options.attrs.href}));
+			options.href && $.fn.mapael.setHref(elem.textElem, options.href);
 			$.fn.mapael.setHoverOptions(elem.textElem, options.textAttrs, options.textAttrsHover);
 			$.fn.mapael.setHover(paper, elem.mapElem, elem.textElem);
 			$.fn.mapael.setCallbacks(options, elem.mapElem, elem.textElem);
@@ -238,6 +242,17 @@
 		
 		if (typeof options.value != "undefined")
 			elem.value = options.value;
+	}
+	
+	/**
+	*
+	*/
+	$.fn.mapael.setHref = function(elem, href) {
+		elem.attr({cursor : 'pointer'});
+		$(elem.node).bind('click', function() {
+			if (!$.fn.mapael.panning)
+				window.location = href;
+		});
 	}
 	
 	/**
@@ -272,10 +287,85 @@
 		for(var i = 0, length = availableCallbacks.length; i < length; ++i) {
 			if (elemOptions["on" + availableCallbacks[i]]) {
 				callbackFct = elemOptions["on" + availableCallbacks[i]];
-				$(mapElem.node).on(availableCallbacks[i], function() {callbackFct(elemOptions, mapElem, textElem)});
-				textElem && $(textElem.node).on(availableCallbacks[i], function() {callbackFct(elemOptions, mapElem, textElem)});
+				$(mapElem.node).on(availableCallbacks[i], function() {!$.fn.mapael.panning && callbackFct(elemOptions, mapElem, textElem)});
+				textElem && $(textElem.node).on(availableCallbacks[i], function() {!$.fn.mapael.panning && callbackFct(elemOptions, mapElem, textElem)});
 			}
 		}
+	}
+	
+	$.fn.mapael.panning = false;
+	
+	/**
+	* Init zoom and panning for the map
+	* @param $container
+	* @param paper
+	* @param mapWidth
+	* @param mapHeight
+	* @param options
+	*/
+	$.fn.mapael.initZoom = function($container, paper, mapWidth, mapHeight, options) {
+		var $zoomIn = $("<div>").addClass(options.zoomInCssClass).html("+")
+			, $zoomOut = $("<div>").addClass(options.zoomOutCssClass).html("&#x2212;")
+			, currentLevel = 0
+			, vbCenterX = mapWidth / 2
+			, vbCenterY = mapHeight / 2
+			, mousedown  = false
+			, previousX = 0
+			, previousY = 0
+			, setZoom = function(e) {
+				// Update zoom level
+				currentLevel = Math.min(Math.max(currentLevel + e.data.offset, 0), options.maxLevel);
+				if (currentLevel == 0) {
+					vbCenterX = mapWidth / 2
+					vbCenterY = mapHeight / 2
+					paper.setViewBox(0, 0, mapWidth, mapHeight);
+				} else {
+					paper.setViewBox(
+						Math.min(Math.max(0, vbCenterX - (mapWidth / (1 + currentLevel * options.step))/2), (mapWidth - (mapWidth / (1 + currentLevel * options.step)))), 
+						Math.min(Math.max(0, vbCenterY - (mapHeight / (1 + currentLevel * options.step))/2), (mapHeight - (mapHeight / (1 + currentLevel * options.step)))), 
+						mapWidth / (1 +currentLevel * options.step), 
+						mapHeight / (1 +currentLevel * options.step)
+					);
+				}
+			};
+			
+		$container.append($zoomIn).append($zoomOut);
+		
+		$zoomIn.on("click", null, {offset : 1} , setZoom);
+		$zoomOut.on("click", null, {offset : -1}, setZoom);
+		
+		// Panning
+		$('body').on("mouseup", function(e) {
+			mousedown  = false;
+			setTimeout(function () {$.fn.mapael.panning = false;}, 50);
+		});
+		
+		$container.on("mousedown", function(e) {
+			mousedown  = true;
+			previousX = e.pageX;
+			previousY = e.pageY;
+			return false;
+		}).on("mousemove", function(e) {
+			if (mousedown  && currentLevel != 0) {
+				var offsetX = (previousX - e.pageX) / (1 + (currentLevel * options.step)) * (mapWidth / paper.width)
+					, offsetY = (previousY - e.pageY) / (1 + (currentLevel * options.step)) * (mapHeight / paper.height);					
+				
+				if (Math.abs(offsetX) > 5 || Math.abs(offsetY) > 5) {
+					var viewBoxX = Math.min(Math.max(0, paper._viewBox[0] + offsetX), (mapWidth - paper._viewBox[2]))
+						, viewBoxY = Math.min(Math.max(0, paper._viewBox[1] + offsetY), (mapHeight - paper._viewBox[3]));
+					
+					vbCenterX = viewBoxX + paper._viewBox[2] / 2;
+					vbCenterY = viewBoxY + paper._viewBox[3] / 2;
+					
+					paper.setViewBox(viewBoxX, viewBoxY, paper._viewBox[2], paper._viewBox[3]);
+					
+					previousX = e.pageX;
+					previousY = e.pageY;
+					$.fn.mapael.panning = true;
+				}
+			}
+			return false;
+		});
 	}
 	
 	/**
@@ -464,6 +554,7 @@
 		if (typeof options.value != "undefined") {
 			$.extend(true, options, $.fn.mapael.getLegendSlice(options.value, legendOptions));
 		}
+		
 		return options;
 	}
 	
@@ -573,6 +664,13 @@
 					fill : "#eaeaea"
 					, animDuration : 300
 				}
+			}
+			, zoom : {
+				enabled : false
+				, maxLevel : 5
+				, step : 0.25
+				, zoomInCssClass : "zoomIn"
+				, zoomOutCssClass : "zoomOut"
 			}
 		}
 		, legend : {
