@@ -110,6 +110,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	removeLayer: function (layer) {
 
+		if (layer instanceof L.LayerGroup)
+		{
+			var array = [];
+			for (var i in layer._layers) {
+				array.push(layer._layers[i]);
+			}
+			return this.removeLayers(array);
+		}
+
 		//Non point layers
 		if (!layer.getLatLng) {
 			this._nonPointGroup.removeLayer(layer);
