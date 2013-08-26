@@ -125,4 +125,37 @@
 		expect(marker._icon).to.be(null);
 		expect(marker2._icon.parentNode).to.be(map._panes.markerPane);
 	});
+
+	it('removes the layers that are in the given LayerGroup', function () {
+
+		var group = new L.MarkerClusterGroup();
+		var marker = new L.Marker([1.5, 1.5]);
+		var marker2 = new L.Marker([1.5, 1.5]);
+
+		map.addLayer(group);
+		group.addLayers([marker, marker2]);
+
+		var layer = L.layerGroup();
+		layer.addLayer(marker2);
+		group.removeLayer(layer);
+
+		expect(marker._icon).to.not.be(undefined);
+		expect(marker2._icon).to.be(undefined);
+	});
+
+	it('removes the layers that are in the given LayerGroup when not on the map', function () {
+
+		var group = new L.MarkerClusterGroup();
+		var marker = new L.Marker([1.5, 1.5]);
+		var marker2 = new L.Marker([1.5, 1.5]);
+
+		group.addLayers([marker, marker2]);
+
+		var layer = L.layerGroup();
+		layer.addLayer(marker2);
+		group.removeLayer(layer);
+
+		expect(group.hasLayer(marker)).to.be(true);
+		expect(group.hasLayer(marker2)).to.be(false);
+	});
 });
