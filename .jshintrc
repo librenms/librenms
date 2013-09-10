@@ -11,6 +11,7 @@
     "noarg": true,
     "node" : true,
     "noempty": true,
+    "quotmark": "single",
     "plusplus": false,
     "regexp": true,
     "strict": false,
