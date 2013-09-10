@@ -1,13 +1,13 @@
 # jQuery Mouse Wheel Plugin
 
-A jQuery plugin that adds cross-browser mouse wheel support.
+A [jQuery](http://jquery.com/) plugin that adds cross-browser mouse wheel support.
 
 In order to use the plugin, simply bind the `mousewheel` event to an element.
 It also provides two helper methods called `mousewheel` and `unmousewheel`
 that act just like other event helper methods in jQuery. The event callback
 receives three extra arguments which are the normalized "deltas" of the mouse wheel.
 
-Here is an example of using both the bind and helper method syntax.
+Here is an example of using both the bind and helper method syntax:
 
 ```js
 // using bind
