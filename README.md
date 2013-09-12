@@ -2,6 +2,8 @@
 
 For more information and documentation, go to [Mapael website](http://neveldo.fr/mapael).
 
+Additional maps are stored in the repository ['neveldo/mapael-maps'](https://github.com/neveldo/mapael-maps).
+
 ## Overview
 
 jQuery Mapael is a [jQuery](http://jquery.com/) plugin based on [raphael.js](http://raphaeljs.com/) that allows you to display dynamic vector maps.  
