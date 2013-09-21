@@ -72,13 +72,6 @@
 				$.fn.mapael.initElem(paper, plots[id], elemOptions, $tooltip);
 			}
 			
-			// Create the legends for areas and plots
-			if (options.legend.area.slices && options.legend.area.display)
-				areaLegend = $.fn.mapael.createLegend($(this), options, 'area', areas);
-			
-			if (options.legend.plot.slices && options.legend.plot.display)
-				plotLegend = $.fn.mapael.createLegend($(this), options, 'plot', plots);
-			
 			// Enable zoom
 			if (options.map.zoom.enabled)
 				$.fn.mapael.initZoom($container, paper, mapConf.width, mapConf.height, options.map.zoom);
@@ -184,18 +177,35 @@
 			// Handle resizing of the map
 			if (options.map.width) {
 				paper.setSize(options.map.width, mapConf.height * (options.map.width / mapConf.width));
+				
+				// Create the legends for areas and plots taking into account the scale of the map
+				if (options.legend.area.slices && options.legend.area.display)
+					areaLegend = $.fn.mapael.createLegend($(this), options, 'area', areas, 1);
+				if (options.legend.plot.slices && options.legend.plot.display)
+					plotLegend = $.fn.mapael.createLegend($(this), options, 'plot', plots, (options.map.width / mapConf.width));
 			} else {
 				$(window).on('resize', function(){
 					clearTimeout(resizeTO);
 					resizeTO = setTimeout(function(){$container.trigger('resizeEnd');}, 150);
 				});
-				$(document).on('ready', function(){$container.trigger('resizeEnd');});
 				$container.on('resizeEnd', function(e) {
 					var containerWidth = $container.width();
 					if (paper.width != containerWidth) {
 						paper.setSize(containerWidth, mapConf.height * (containerWidth / mapConf.width));
 					}
 				});
+				(function(self, $container, options, areas, plots) {
+					$(document).on('ready', function(){
+						$container.trigger('resizeEnd');
+						
+						// Create the legends for areas and plots taking into account the scale of the map
+						if (options.legend.area.slices && options.legend.area.display)
+							areaLegend = $.fn.mapael.createLegend($(self), options, 'area', areas, 1);
+						if (options.legend.plot.slices && options.legend.plot.display)
+							plotLegend = $.fn.mapael.createLegend($(self), options, 'plot', plots, ($container.width() / mapConf.width));
+					});
+				})(this, $container, options, areas, plots);
+				
 				$container.trigger('resizeEnd');
 			}
 			
@@ -374,7 +384,7 @@
 	* @param options map options
 	* @param legendType the type of the legend : 'area' or 'plot'
 	*/
-	$.fn.mapael.createLegend = function ($container, options, legendType, elems) {
+	$.fn.mapael.createLegend = function ($container, options, legendType, elems, scale) {
 		var legendOptions = options.legend[legendType]
 			, $legend = (legendType == 'plot') ? $('.' + options.legend.plot.cssClass, $container).empty() : $('.' + options.legend.area.cssClass, $container).empty()
 			, paper = new Raphael($legend.get(0))
@@ -413,25 +423,25 @@
 				elem = paper.rect(
 					legendOptions.marginLeft
 					, height
-					, legendOptions.slices[i].size
-					, legendOptions.slices[i].size
+					, scale * (legendOptions.slices[i].size)
+					, scale * (legendOptions.slices[i].size)
 				).attr(legendOptions.slices[i].attrs);
 			} else {
 				elem = paper.circle(
-					legendOptions.marginLeft + legendOptions.slices[i].size / 2
-					, height + legendOptions.slices[i].size / 2
-					, legendOptions.slices[i].size / 2
+					legendOptions.marginLeft + scale * (legendOptions.slices[i].size / 2)
+					, height + scale * (legendOptions.slices[i].size / 2)
+					, scale * (legendOptions.slices[i].size / 2)
 				).attr(legendOptions.slices[i].attrs);
 			} 
 			
 			label = paper.text(
-				legendOptions.marginLeft + legendOptions.slices[i].size + legendOptions.marginLeftLabel
-				, height + legendOptions.slices[i].size / 2
+				legendOptions.marginLeft + scale * legendOptions.slices[i].size + legendOptions.marginLeftLabel
+				, height + scale * (legendOptions.slices[i].size / 2)
 				, legendOptions.slices[i].label
 			).attr(legendOptions.labelAttrs);
 			
-			height += legendOptions.marginBottom + legendOptions.slices[i].size;
-			width = Math.max(width, legendOptions.marginLeft + legendOptions.slices[i].size + legendOptions.marginLeftLabel + label.getBBox().width);
+			height += legendOptions.marginBottom + scale * legendOptions.slices[i].size;
+			width = Math.max(width, legendOptions.marginLeft + scale * legendOptions.slices[i].size + legendOptions.marginLeftLabel + label.getBBox().width);
 			
 			if (legendOptions.hideElemsOnClick.enabled) {
 				// Hide/show elements when user clicks on a legend element
