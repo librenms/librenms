@@ -445,24 +445,28 @@
 				(function(i, elem, label) {
 					$(label.node).on('click', function() {
 						if (!label.hidden) {
-							label.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300);
-							elem.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300);
+							label.animate({'opacity':0.5}, 300);
 						} else {
-							label.animate({'opacity':typeof label.originalAttrs.opacity != "undefined" ? label.originalAttrs.opacity : 1}, 300);
-							elem.animate({'opacity':typeof elem.originalAttrs.opacity != "undefined" ? elem.originalAttrs.opacity : 1}, 300);
+							label.animate({'opacity':1}, 300);
 						}
 						
 						for (var id in elems) {
 							if ((!legendOptions.slices[i].min || elems[id].value >= legendOptions.slices[i].min) 
 								&& (!legendOptions.slices[i].max || elems[id].value < legendOptions.slices[i].max)
 							) {
-								if (!label.hidden) {
-									elems[id].mapElem.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300);
-									elems[id].textElem && elems[id].textElem.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300);
-								} else {
-									elems[id].mapElem.animate({'opacity':typeof elems[id].mapElem.originalAttrs.opacity != "undefined" ? elems[id].mapElem.originalAttrs.opacity : 1}, 300);
-									elems[id].textElem && elems[id].textElem.animate({'opacity':typeof elems[id].textElem.originalAttrs.opacity != "undefined" ? elems[id].textElem.originalAttrs.opacity : 1}, 300);
-								}
+								(function(id) {
+									if (!label.hidden) {
+										elems[id].mapElem.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300, 'linear', function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].mapElem.hide();});
+										elems[id].textElem && elems[id].textElem.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300, 'linear', function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].textElem.hide();});
+									} else {
+										if (legendOptions.hideElemsOnClick.opacity == 0) {
+											elems[id].mapElem.show();
+											elems[id].textElem && elems[id].textElem.show();
+										}
+										elems[id].mapElem.animate({'opacity':typeof elems[id].mapElem.originalAttrs.opacity != "undefined" ? elems[id].mapElem.originalAttrs.opacity : 1}, 300);
+										elems[id].textElem && elems[id].textElem.animate({'opacity':typeof elems[id].textElem.originalAttrs.opacity != "undefined" ? elems[id].textElem.originalAttrs.opacity : 1}, 300);
+									}
+								})(id);
 							}
 						}
 						label.hidden = !label.hidden;
