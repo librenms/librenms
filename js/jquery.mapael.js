@@ -42,7 +42,7 @@
 					, options.legend.area
 				);
 				areas[id] = {'mapElem' : paper.path(mapConf.elems[id]).attr(elemOptions.attrs)};
-				$.fn.mapael.initElem(paper, areas[id], elemOptions, $tooltip);
+				$.fn.mapael.initElem(paper, areas[id], elemOptions, $tooltip, id);
 			}
 			
 			// Draw plots
@@ -69,7 +69,7 @@
 					plots[id] = {'mapElem' : paper.circle(coords.x, coords.y, elemOptions.size / 2).attr(elemOptions.attrs)};
 				}
 				
-				$.fn.mapael.initElem(paper, plots[id], elemOptions, $tooltip);
+				$.fn.mapael.initElem(paper, plots[id], elemOptions, $tooltip, id);
 			}
 			
 			// Enable zoom
@@ -219,8 +219,9 @@
 	* @param elem
 	* @param params
 	* @param $tooltip
+	* @param id
 	*/
-	$.fn.mapael.initElem = function(paper, elem, options, $tooltip) {
+	$.fn.mapael.initElem = function(paper, elem, options, $tooltip, id) {
 		var bbox = {}, textPosition = {};
 		$.fn.mapael.setHoverOptions(elem.mapElem, options.attrs, options.attrsHover);
 		options.href && $.fn.mapael.setHref(elem.mapElem, options.href);
@@ -235,6 +236,7 @@
 			$.fn.mapael.setHoverOptions(elem.textElem, options.textAttrs, options.textAttrsHover);
 			$.fn.mapael.setHover(paper, elem.mapElem, elem.textElem);
 			$.fn.mapael.setCallbacks(options, elem.mapElem, elem.textElem);
+			$(elem.textElem.node).attr('class', id);
 		} else {
 			$.fn.mapael.setHover(paper, elem.mapElem);
 			$.fn.mapael.setCallbacks(options, elem.mapElem);
@@ -252,6 +254,8 @@
 		
 		if (typeof options.value != "undefined")
 			elem.value = options.value;
+			
+		$(elem.mapElem.node).attr('class', id);
 	}
 	
 	/**
