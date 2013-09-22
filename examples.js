@@ -12,6 +12,9 @@ $(function(){
 	$(".maparea2").mapael({
 		map : {
 			name : "france_departments"
+			, zoom: {
+				enabled: true
+			}
 		},
 		areas: {
 			"department-56" : {
@@ -50,30 +53,74 @@ $(function(){
 	$(".maparea3").mapael({
 		map : {
 			name : "france_departments", 
+			zoom : {
+				enabled : true
+			},
 			defaultArea: {
 				attrs : {
 					fill: "#5ba4ff",
 					stroke: "#99c7ff",
 					cursor: "pointer"
 				},
+				attrsHover : {
+					animDuration:0
+				},
 				textAttrs : {
 					cursor: "pointer",
+					"font-size" : 10,
 					fill :"#000"
 				},
-				onclick: function(params, mapElem, textElem) {
-					mapElem.attr({fill: '#ff0000'});
+				textAttrsHover : {
+					animDuration:0
+				},
+				eventHandlers : {
+					click: function(id, mapElem, textElem) {
+						var newData = {'areas' : {}};
+						if (mapElem.originalAttrs.fill == "#5ba4ff") {
+							newData.areas[id] = {
+								attrs : {
+									fill : "#0088db"
+								}
+							};
+						} else {
+							newData.areas[id] = {
+								attrs : {
+									fill : "#5ba4ff"
+								}
+							};
+						}
+						$(".maparea3").trigger('update', [newData, false, false, 0]);
+					}
 				}
 			}
 		},
 		areas: {
 			"department-29" : {
-				text : "29", 
+				text : "dblclick", 
 				attrs : {
 					fill :"#0088db"
 				},
+				textPosition: "top",
 				tooltip: {content : "Finistère (29)"},
-				onclick: function(params, mapElem, textElem) {
-					mapElem.attr({fill: '#24ff00'});
+				eventHandlers : {
+					click: function() {},
+					dblclick: function(id, mapElem, textElem) {
+						var newData = {'areas' : {}};
+						if (mapElem.originalAttrs.fill == "#5ba4ff") {
+							newData.areas[id] = {
+								attrs : {
+									fill : "#0088db"
+								}
+							};
+						} else {
+							newData.areas[id] = {
+								attrs : {
+									fill : "#5ba4ff"
+								}
+							};
+						}
+						$(".maparea3").trigger('update', [newData, false, false, 0]);
+					}
 				}
 			}
 		}
@@ -97,6 +144,7 @@ $(function(){
 			area : {
 				display : true,
 				title :"Population of France by department", 
+				labelAttrs : {title : "Hide the matching departments"},
 				slices : [
 					{
 						max :300000, 

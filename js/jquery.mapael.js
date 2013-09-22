@@ -99,7 +99,7 @@
 						}
 					};
 				
-				if (!animDuration) animDuration = 300;
+				if (typeof animDuration == "undefined") animDuration = 300;
 				if (!easing) easing = 'linear';
 				if (resetAreas) options.areas = {};
 				if (resetPlots) options.plots = {};
@@ -235,11 +235,11 @@
 			options.href && $.fn.mapael.setHref(elem.textElem, options.href);
 			$.fn.mapael.setHoverOptions(elem.textElem, options.textAttrs, options.textAttrsHover);
 			$.fn.mapael.setHover(paper, elem.mapElem, elem.textElem);
-			$.fn.mapael.setCallbacks(options, elem.mapElem, elem.textElem);
+			options.eventHandlers && $.fn.mapael.setEventHandlers(id, options, elem.mapElem, elem.textElem);
 			$(elem.textElem.node).attr('class', id);
 		} else {
 			$.fn.mapael.setHover(paper, elem.mapElem);
-			$.fn.mapael.setCallbacks(options, elem.mapElem);
+			options.eventHandlers && $.fn.mapael.setEventHandlers(id, options, elem.mapElem);
 		}
 		
 		if (options.tooltip && options.tooltip.content) {
@@ -289,21 +289,18 @@
 	};
 	
 	/**
-	* Set user defined callbacks on areas and plots
+	* Set user defined handlers for events on areas and plots
+	* @param id the id of the element 
 	* @param elemOptions the element parameters
 	* @param mapElem the map element to set callback on
 	* @param textElem the optional text within the map element
 	*/
-	$.fn.mapael.setCallbacks = function(elemOptions, mapElem, textElem) {
-		var availableCallbacks = ['click', 'mouseover', 'mouseout']
-			, callbackFct = {};
-			
-		for(var i = 0, length = availableCallbacks.length; i < length; ++i) {
-			if (elemOptions["on" + availableCallbacks[i]]) {
-				callbackFct = elemOptions["on" + availableCallbacks[i]];
-				$(mapElem.node).on(availableCallbacks[i], function() {!$.fn.mapael.panning && callbackFct(elemOptions, mapElem, textElem)});
-				textElem && $(textElem.node).on(availableCallbacks[i], function() {!$.fn.mapael.panning && callbackFct(elemOptions, mapElem, textElem)});
-			}
+	$.fn.mapael.setEventHandlers = function(id, elemOptions, mapElem, textElem) {
+		for(var event in elemOptions.eventHandlers) {
+			(function(event) {
+				$(mapElem.node).on(event, function() {!$.fn.mapael.panning && elemOptions.eventHandlers[event](id, mapElem, textElem)});
+				textElem && $(textElem.node).on(event, function() {!$.fn.mapael.panning && elemOptions.eventHandlers[event](id, mapElem, textElem)});
+			})(event);
 		}
 	}
 	
