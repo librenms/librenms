@@ -236,7 +236,7 @@
 			$.fn.mapael.setHoverOptions(elem.textElem, options.textAttrs, options.textAttrsHover);
 			$.fn.mapael.setHover(paper, elem.mapElem, elem.textElem);
 			options.eventHandlers && $.fn.mapael.setEventHandlers(id, options, elem.mapElem, elem.textElem);
-			$(elem.textElem.node).attr('class', id);
+			$(elem.textElem.node).attr('data-id', id);
 		} else {
 			$.fn.mapael.setHover(paper, elem.mapElem);
 			options.eventHandlers && $.fn.mapael.setEventHandlers(id, options, elem.mapElem);
@@ -255,7 +255,7 @@
 		if (typeof options.value != "undefined")
 			elem.value = options.value;
 			
-		$(elem.mapElem.node).attr('class', id);
+		$(elem.mapElem.node).attr('data-id', id);
 	}
 	
 	/**
