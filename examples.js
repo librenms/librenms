@@ -74,7 +74,7 @@ $(function(){
 					animDuration:0
 				},
 				eventHandlers : {
-					click: function(id, mapElem, textElem) {
+					click: function(e, id, mapElem, textElem) {
 						var newData = {'areas' : {}};
 						if (mapElem.originalAttrs.fill == "#5ba4ff") {
 							newData.areas[id] = {
@@ -104,7 +104,7 @@ $(function(){
 				tooltip: {content : "Finistère (29)"},
 				eventHandlers : {
 					click: function() {},
-					dblclick: function(id, mapElem, textElem) {
+					dblclick: function(e, id, mapElem, textElem) {
 						var newData = {'areas' : {}};
 						if (mapElem.originalAttrs.fill == "#5ba4ff") {
 							newData.areas[id] = {
