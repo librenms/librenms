@@ -18,7 +18,8 @@
 		
 		return this.each(function() {
 		
-			var $tooltip = $("<div>").addClass(options.map.tooltip.cssClass).css("display", "none")
+			var self = this
+				, $tooltip = $("<div>").addClass(options.map.tooltip.cssClass).css("display", "none")
 				, $container = $('.' + options.map.cssClass, this).empty().append($tooltip)
 				, mapConf = $.fn.mapael.maps[options.map.name]
 				, paper = new Raphael($container[0], mapConf.width, mapConf.height)
@@ -76,6 +77,10 @@
 			if (options.map.zoom.enabled)
 				$.fn.mapael.initZoom($container, paper, mapConf.width, mapConf.height, options.map.zoom);
 				
+			// Create the legends for areas
+			if (options.legend.area.slices && options.legend.area.display)
+				areaLegend = $.fn.mapael.createLegend($(this), options, 'area', areas, 1);
+                
 			/**
 			* 
 			* Update the current map
@@ -178,35 +183,29 @@
 			if (options.map.width) {
 				paper.setSize(options.map.width, mapConf.height * (options.map.width / mapConf.width));
 				
-				// Create the legends for areas and plots taking into account the scale of the map
-				if (options.legend.area.slices && options.legend.area.display)
-					areaLegend = $.fn.mapael.createLegend($(this), options, 'area', areas, 1);
+				// Create the legends for plots taking into account the scale of the map
 				if (options.legend.plot.slices && options.legend.plot.display)
 					plotLegend = $.fn.mapael.createLegend($(this), options, 'plot', plots, (options.map.width / mapConf.width));
 			} else {
-				$(window).on('resize', function(){
+				$(window).on('resize', function() {
 					clearTimeout(resizeTO);
 					resizeTO = setTimeout(function(){$container.trigger('resizeEnd');}, 150);
 				});
-				$container.on('resizeEnd', function(e) {
+				
+				// Create the legends for plots taking into account the scale of the map
+				var createPlotLegend = function() {
+					if (options.legend.plot.slices && options.legend.plot.display)
+						plotLegend = $.fn.mapael.createLegend($(self), options, 'plot', plots, ($container.width() / mapConf.width));
+					
+					$container.unbind('resizeEnd', createPlotLegend);
+				};
+				
+				$container.on('resizeEnd', function() {
 					var containerWidth = $container.width();
 					if (paper.width != containerWidth) {
 						paper.setSize(containerWidth, mapConf.height * (containerWidth / mapConf.width));
 					}
-				});
-				(function(self, $container, options, areas, plots) {
-					$(document).on('ready', function(){
-						$container.trigger('resizeEnd');
-						
-						// Create the legends for areas and plots taking into account the scale of the map
-						if (options.legend.area.slices && options.legend.area.display)
-							areaLegend = $.fn.mapael.createLegend($(self), options, 'area', areas, 1);
-						if (options.legend.plot.slices && options.legend.plot.display)
-							plotLegend = $.fn.mapael.createLegend($(self), options, 'plot', plots, ($container.width() / mapConf.width));
-					});
-				})(this, $container, options, areas, plots);
-				
-				$container.trigger('resizeEnd');
+				}).on('resizeEnd', createPlotLegend).trigger('resizeEnd');
 			}
 			
 			$(paper.desc).append(" and Mapael (http://neveldo.fr/mapael)");
@@ -298,8 +297,8 @@
 	$.fn.mapael.setEventHandlers = function(id, elemOptions, mapElem, textElem) {
 		for(var event in elemOptions.eventHandlers) {
 			(function(event) {
-				$(mapElem.node).on(event, function() {!$.fn.mapael.panning && elemOptions.eventHandlers[event](id, mapElem, textElem)});
-				textElem && $(textElem.node).on(event, function() {!$.fn.mapael.panning && elemOptions.eventHandlers[event](id, mapElem, textElem)});
+				$(mapElem.node).on(event, function(e) {!$.fn.mapael.panning && elemOptions.eventHandlers[event](e, id, mapElem, textElem)});
+				textElem && $(textElem.node).on(event, function(e) {!$.fn.mapael.panning && elemOptions.eventHandlers[event](e, id, mapElem, textElem)});
 			})(event);
 		}
 	}
