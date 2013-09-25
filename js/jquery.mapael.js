@@ -404,84 +404,86 @@
 		}
 		
 		for(var i = 0, length = legendOptions.slices.length; i < length; ++i) {
-			defaultElemOptions = (legendType == 'plot') ? options.map['defaultPlot'] : options.map['defaultArea'];
-			legendOptions.slices[i].attrs = $.extend(
-				{}
-				, defaultElemOptions.attrs
-				, legendOptions.slices[i].attrs
-			);
-			legendOptions.slices[i].attrsHover = $.extend(
-				{}
-				, defaultElemOptions.attrsHover
-				, legendOptions.slices[i].attrsHover
-			);
-			
-			if(legendType == 'area' || legendOptions.slices[i].type == "square") {
-				// Draw a square for squared plots AND areas
-				!legendOptions.slices[i].size && (legendOptions.slices[i].size = 20);
+			if (typeof legendOptions.slices[i].display == 'undefined' || legendOptions.slices[i].display == true) {
+				defaultElemOptions = (legendType == 'plot') ? options.map['defaultPlot'] : options.map['defaultArea'];
+				legendOptions.slices[i].attrs = $.extend(
+					{}
+					, defaultElemOptions.attrs
+					, legendOptions.slices[i].attrs
+				);
+				legendOptions.slices[i].attrsHover = $.extend(
+					{}
+					, defaultElemOptions.attrsHover
+					, legendOptions.slices[i].attrsHover
+				);
 				
-				elem = paper.rect(
-					legendOptions.marginLeft
-					, height
-					, scale * (legendOptions.slices[i].size)
-					, scale * (legendOptions.slices[i].size)
-				).attr(legendOptions.slices[i].attrs);
-			} else {
-				elem = paper.circle(
-					legendOptions.marginLeft + scale * (legendOptions.slices[i].size / 2)
+				if(legendType == 'area' || legendOptions.slices[i].type == "square") {
+					// Draw a square for squared plots AND areas
+					!legendOptions.slices[i].size && (legendOptions.slices[i].size = 20);
+					
+					elem = paper.rect(
+						legendOptions.marginLeft
+						, height
+						, scale * (legendOptions.slices[i].size)
+						, scale * (legendOptions.slices[i].size)
+					).attr(legendOptions.slices[i].attrs);
+				} else {
+					elem = paper.circle(
+						legendOptions.marginLeft + scale * (legendOptions.slices[i].size / 2)
+						, height + scale * (legendOptions.slices[i].size / 2)
+						, scale * (legendOptions.slices[i].size / 2)
+					).attr(legendOptions.slices[i].attrs);
+				} 
+				
+				label = paper.text(
+					legendOptions.marginLeft + scale * legendOptions.slices[i].size + legendOptions.marginLeftLabel
 					, height + scale * (legendOptions.slices[i].size / 2)
-					, scale * (legendOptions.slices[i].size / 2)
-				).attr(legendOptions.slices[i].attrs);
-			} 
-			
-			label = paper.text(
-				legendOptions.marginLeft + scale * legendOptions.slices[i].size + legendOptions.marginLeftLabel
-				, height + scale * (legendOptions.slices[i].size / 2)
-				, legendOptions.slices[i].label
-			).attr(legendOptions.labelAttrs);
-			
-			height += legendOptions.marginBottom + scale * legendOptions.slices[i].size;
-			width = Math.max(width, legendOptions.marginLeft + scale * legendOptions.slices[i].size + legendOptions.marginLeftLabel + label.getBBox().width);
-			
-			if (legendOptions.hideElemsOnClick.enabled) {
-				// Hide/show elements when user clicks on a legend element
-				label.attr({cursor:'pointer'});
+					, legendOptions.slices[i].label
+				).attr(legendOptions.labelAttrs);
 				
-				$.fn.mapael.setHoverOptions(elem, legendOptions.slices[i].attrs, legendOptions.slices[i].attrsHover);
-				$.fn.mapael.setHoverOptions(label, legendOptions.labelAttrs, legendOptions.labelAttrs);
-				$.fn.mapael.setHover(paper, elem, label);
+				height += legendOptions.marginBottom + scale * legendOptions.slices[i].size;
+				width = Math.max(width, legendOptions.marginLeft + scale * legendOptions.slices[i].size + legendOptions.marginLeftLabel + label.getBBox().width);
 				
-				label.hidden = false;
-				(function(i, elem, label) {
-					$(label.node).on('click', function() {
-						if (!label.hidden) {
-							label.animate({'opacity':0.5}, 300);
-						} else {
-							label.animate({'opacity':1}, 300);
-						}
-						
-						for (var id in elems) {
-							if ((!legendOptions.slices[i].min || elems[id].value >= legendOptions.slices[i].min) 
-								&& (!legendOptions.slices[i].max || elems[id].value < legendOptions.slices[i].max)
-							) {
-								(function(id) {
-									if (!label.hidden) {
-										elems[id].mapElem.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300, 'linear', function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].mapElem.hide();});
-										elems[id].textElem && elems[id].textElem.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300, 'linear', function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].textElem.hide();});
-									} else {
-										if (legendOptions.hideElemsOnClick.opacity == 0) {
-											elems[id].mapElem.show();
-											elems[id].textElem && elems[id].textElem.show();
-										}
-										elems[id].mapElem.animate({'opacity':typeof elems[id].mapElem.originalAttrs.opacity != "undefined" ? elems[id].mapElem.originalAttrs.opacity : 1}, 300);
-										elems[id].textElem && elems[id].textElem.animate({'opacity':typeof elems[id].textElem.originalAttrs.opacity != "undefined" ? elems[id].textElem.originalAttrs.opacity : 1}, 300);
-									}
-								})(id);
+				if (legendOptions.hideElemsOnClick.enabled) {
+					// Hide/show elements when user clicks on a legend element
+					label.attr({cursor:'pointer'});
+					
+					$.fn.mapael.setHoverOptions(elem, legendOptions.slices[i].attrs, legendOptions.slices[i].attrsHover);
+					$.fn.mapael.setHoverOptions(label, legendOptions.labelAttrs, legendOptions.labelAttrs);
+					$.fn.mapael.setHover(paper, elem, label);
+					
+					label.hidden = false;
+					(function(i, elem, label) {
+						$(label.node).on('click', function() {
+							if (!label.hidden) {
+								label.animate({'opacity':0.5}, 300);
+							} else {
+								label.animate({'opacity':1}, 300);
 							}
-						}
-						label.hidden = !label.hidden;
-					});
-				})(i, elem, label);
+							
+							for (var id in elems) {
+								if ((!legendOptions.slices[i].min || elems[id].value >= legendOptions.slices[i].min) 
+									&& (!legendOptions.slices[i].max || elems[id].value < legendOptions.slices[i].max)
+								) {
+									(function(id) {
+										if (!label.hidden) {
+											elems[id].mapElem.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300, 'linear', function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].mapElem.hide();});
+											elems[id].textElem && elems[id].textElem.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300, 'linear', function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].textElem.hide();});
+										} else {
+											if (legendOptions.hideElemsOnClick.opacity == 0) {
+												elems[id].mapElem.show();
+												elems[id].textElem && elems[id].textElem.show();
+											}
+											elems[id].mapElem.animate({'opacity':typeof elems[id].mapElem.originalAttrs.opacity != "undefined" ? elems[id].mapElem.originalAttrs.opacity : 1}, 300);
+											elems[id].textElem && elems[id].textElem.animate({'opacity':typeof elems[id].textElem.originalAttrs.opacity != "undefined" ? elems[id].textElem.originalAttrs.opacity : 1}, 300);
+										}
+									})(id);
+								}
+							}
+							label.hidden = !label.hidden;
+						});
+					})(i, elem, label);
+				}
 			}
 		}
 		
