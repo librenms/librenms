@@ -15,10 +15,15 @@ $(function(){
 			, zoom: {
 				enabled: true
 			}
+			, defaultPlot : {
+				attrs : {
+					opacity : 0.6
+				}
+			}
 		},
 		areas: {
 			"department-56" : {
-				text : "56", 
+				text : {content : "56"}, 
 				tooltip: {content : "Morbihan (56)"}
 			}
 		},
@@ -33,9 +38,9 @@ $(function(){
 				latitude :45.758888888889, 
 				longitude: 4.8413888888889, 
 				value : 700000, 
-				href : "#",
+				href : "http://fr.wikipedia.org/wiki/Lyon",
 				tooltip: {content : "<span style=\"font-weight:bold;\">City :</span> Lyon"},
-				text : "Lyon"
+				text : {content : "Lyon"}
 			},
 			'rennes' : {
 				type :"square",
@@ -43,10 +48,59 @@ $(function(){
 				latitude : 48.114166666667, 
 				longitude: -1.6808333333333, 
 				tooltip: {content : "<span style=\"font-weight:bold;\">City :</span> Rennes"},
-				text : "Rennes",
-				attrs : {href : "#"}
+				text : {content : "Rennes"},
+				href : "http://fr.wikipedia.org/wiki/Rennes"
 			}
 		}
+	});
+	
+	$('#refreshmaparea2').on('click', function() {
+	
+		// Update some plots and areas attributes ...
+		var updatedOptions = {'areas' : {}, 'plots' : {}};
+		updatedOptions.areas["department-56"] = {
+			tooltip : {
+				content : "Morbihan (56) (2)"
+			},
+			attrs: {
+				fill : "#0088db"
+			},
+			text : {content : "56 (2)"}
+		};
+		updatedOptions.plots["rennes"] = {
+			tooltip : {
+				content : "Rennes (2)"
+			},
+			attrs: {
+				fill : "#f38a03"
+			}
+			, text : {position : "top"}
+			, size : 5
+		};
+		
+		// add some new plots ...
+		var newPlots = {
+			"Limoge" : {
+				latitude : 45.834444,
+				longitude : 1.261667,
+				text : {content : "Limoge"},
+				tooltip : {content : "Limoge"}
+			}
+			, "Dijon" : {
+				size:60,
+				latitude : 47.323056,
+				longitude : 5.041944,
+				text : {
+					content : "Dijon",
+					position : "left",
+					margin : 5
+				}
+			}
+		}
+		
+		// and delete some others ...
+		var deletedPlots = ["paris", "lyon"];
+		$(".maparea2").trigger('update', [updatedOptions, newPlots, deletedPlots, {animDuration : 1000}]);
 	});
 	
 	// Example #3
@@ -65,13 +119,15 @@ $(function(){
 				attrsHover : {
 					animDuration:0
 				},
-				textAttrs : {
-					cursor: "pointer",
-					"font-size" : 10,
-					fill :"#000"
-				},
-				textAttrsHover : {
-					animDuration:0
+				text : {
+					attrs : {
+						cursor: "pointer",
+						"font-size" : 10,
+						fill :"#000"
+					},
+					attrsHover : {
+						animDuration : 0
+					}
 				},
 				eventHandlers : {
 					click: function(e, id, mapElem, textElem) {
@@ -89,18 +145,17 @@ $(function(){
 								}
 							};
 						}
-						$(".maparea3").trigger('update', [newData, false, false, 0]);
+						$(".maparea3").trigger('update', [newData]);
 					}
 				}
 			}
 		},
 		areas: {
 			"department-29" : {
-				text : "dblclick", 
+				text : {content : "dblclick", position : "top"}, 
 				attrs : {
 					fill :"#0088db"
 				},
-				textPosition: "top",
 				tooltip: {content : "Finistère (29)"},
 				eventHandlers : {
 					click: function() {},
