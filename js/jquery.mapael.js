@@ -278,18 +278,22 @@
 				if (animDuration > 0) {
 					elem.textElem.attr({'text-anchor' : textPosition.textAnchor});
 					elem.textElem.animate({x : textPosition.x, y : textPosition.y}, animDuration);
-				} else {
+				} else
 					elem.textElem.attr({x : textPosition.x, y : textPosition.y, 'text-anchor' : textPosition.textAnchor});
-				}
 			}
+			
+			$.fn.mapael.setHoverOptions(elem.textElem, elemOptions.text.attrs, elemOptions.text.attrsHover);
+			if (animDuration > 0)
+				elem.textElem.animate(elemOptions.text.attrs, animDuration);
+			else
+				elem.textElem.attr(elemOptions.text.attrs);
 		}
 		
-		$.fn.mapael.setHoverOptions(elem.mapElem, elemOptions.attrs, elem.mapElem.attrsHover);
-		if (animDuration > 0) {
+		$.fn.mapael.setHoverOptions(elem.mapElem, elemOptions.attrs, elemOptions.attrsHover);
+		if (animDuration > 0)
 			elem.mapElem.animate(elemOptions.attrs, animDuration);
-		} else {
+		else
 			elem.mapElem.attr(elemOptions.attrs);
-		}
 		
 		if (elemOptions.tooltip && typeof elemOptions.tooltip.content != 'undefined') {
 			if (typeof elem.mapElem.tooltipContent == "undefined") {
