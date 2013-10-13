@@ -25,22 +25,10 @@ describe('quickhull', function () {
                 { lat: 0, lng: 10 },
                 { lat: 5, lng: 5 },
             ])).to.eql([
-                [
-                    { lat: 0, lng: 10 },
-                    { lat: 10, lng: 10 }
-                ],
-                [
-                    { lat: 10, lng: 10 },
-                    { lat: 10, lng: 0 },
-                ],
-                [
-                    { lat: 10, lng: 0 },
-                    { lat: 0, lng: 0 }
-                ],
-                [
-                    { lat: 0, lng: 0 },
-                    { lat: 0, lng: 10 }
-                ]
+                { lat: 0, lng: 10 },
+                { lat: 10, lng: 10 },
+                { lat: 10, lng: 0 },
+                { lat: 0, lng: 0 },
             ]);
         });
     });

@@ -94,7 +94,7 @@ Retrieved from: http://en.literateprograms.org/Quickhull_(Javascript)?oldid=1843
 					);
 				return convexHullBaseLines;
 			} else {  // if there is no more point "outside" the base line, the current base line is part of the convex hull
-				return [baseLine];
+				return [baseLine[0]];
 			}
 		},
 
@@ -133,20 +133,13 @@ L.MarkerCluster.include({
 	getConvexHull: function () {
 		var childMarkers = this.getAllChildMarkers(),
 			points = [],
-			hullLatLng = [],
-			hull, p, i;
+			p, i;
 
 		for (i = childMarkers.length - 1; i >= 0; i--) {
 			p = childMarkers[i].getLatLng();
 			points.push(p);
 		}
 
-		hull = L.QuickHull.getConvexHull(points);
-
-		for (i = hull.length - 1; i >= 0; i--) {
-			hullLatLng.push(hull[i][0]);
-		}
-
-		return hullLatLng;
+		return L.QuickHull.getConvexHull(points);
 	}
 });
