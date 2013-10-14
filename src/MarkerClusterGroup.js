@@ -448,7 +448,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this._spiderfierOnRemove();
 		}
 
+
+
 		//Clean up all the layers we added to the map
+		this._hideCoverage();
 		this._featureGroup.onRemove(map);
 		this._nonPointGroup.onRemove(map);
 
@@ -579,7 +582,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this.on('clustermouseover', this._showCoverage, this);
 			this.on('clustermouseout', this._hideCoverage, this);
 			map.on('zoomend', this._hideCoverage, this);
-			map.on('layerremove', this._hideCoverageOnRemove, this);
 		}
 	},
 
@@ -615,12 +617,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 	},
 
-	_hideCoverageOnRemove: function (e) {
-		if (e.layer === this) {
-			this._hideCoverage();
-		}
-	},
-
 	_unbindEvents: function () {
 		var spiderfyOnMaxZoom = this.options.spiderfyOnMaxZoom,
 			showCoverageOnHover = this.options.showCoverageOnHover,
@@ -634,7 +630,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this.off('clustermouseover', this._showCoverage, this);
 			this.off('clustermouseout', this._hideCoverage, this);
 			map.off('zoomend', this._hideCoverage, this);
-			map.off('layerremove', this._hideCoverageOnRemove, this);
 		}
 	},
 
