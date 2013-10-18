@@ -78,6 +78,9 @@
         if ( orgEvent.wheelDelta ) { delta = orgEvent.wheelDelta; }
         if ( orgEvent.detail )     { delta = orgEvent.detail * -1; }
 
+        // At a minimum, setup the deltaY to be delta
+        deltaY = delta;
+
         // New school wheel delta (wheel event)
         if ( orgEvent.deltaY ) {
             deltaY = orgEvent.deltaY * -1;
