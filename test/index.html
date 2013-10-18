@@ -19,6 +19,9 @@
         <script src="../jquery.mousewheel.js"></script>
 
         <style>
+            #stage {
+                position: relative;
+            }
             #test1 {
                 background-color: #000;
                 width: 120px;
@@ -85,11 +88,12 @@
 
             #logger {
                 position: absolute;
-                top: 395px;
-                left: 12px;
-                width: 460px;
-                height: 290px;
+                top: 100px;
+                left: 0px;
+                width: 480px;
+                height: 310px;
                 overflow: auto;
+                z-index: 100;
             }
 
             #logger p {
@@ -313,19 +317,20 @@
         </ul>
 
 
-        <div id="test1"><p>Test1</p></div>
-        <div id="test2"><p>Test2</p></div>
-        <div id="test3"><p>Test3</p></div>
-        <div id="test4"><p>Test4</p></div>
-        <div id="test5">
-            <p>Test5</p>
-            <div id="test6">
-                <p>Test6</p>
-                <div id="test7"><p>Test7</p></div>
+        <div id="stage">
+            <div id="test1"><p>Test1</p></div>
+            <div id="test2"><p>Test2</p></div>
+            <div id="test3"><p>Test3</p></div>
+            <div id="test4"><p>Test4</p></div>
+            <div id="test5">
+                <p>Test5</p>
+                <div id="test6">
+                    <p>Test6</p>
+                    <div id="test7"><p>Test7</p></div>
+                </div>
             </div>
+            <div id="logger"></div>
         </div>
-
-        <div id="logger"></div>
 
         <div id="forceScroll"></div>
     </body>
