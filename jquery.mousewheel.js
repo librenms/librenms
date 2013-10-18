@@ -63,12 +63,12 @@
 
 
     function handler(event) {
-        var orgEvent = event || window.event,
-            args = [].slice.call(arguments, 1),
-            delta = 0,
-            deltaX = 0,
-            deltaY = 0,
-            absDelta = 0,
+        var orgEvent   = event || window.event,
+            args       = [].slice.call(arguments, 1),
+            delta      = 0,
+            deltaX     = 0,
+            deltaY     = 0,
+            absDelta   = 0,
             absDeltaXY = 0,
             fn;
         event = $.event.fix(orgEvent);
@@ -99,8 +99,8 @@
         if ( !lowestDeltaXY || absDeltaXY < lowestDeltaXY ) { lowestDeltaXY = absDeltaXY; }
 
         // Get a whole value for the deltas
-        fn = delta > 0 ? 'floor' : 'ceil';
-        delta  = Math[fn](delta / lowestDelta);
+        fn     = delta > 0 ? 'floor' : 'ceil';
+        delta  = Math[fn](delta  / lowestDelta);
         deltaX = Math[fn](deltaX / lowestDeltaXY);
         deltaY = Math[fn](deltaY / lowestDeltaXY);
 
