@@ -22,13 +22,13 @@ $('#my_elem').mousewheel(function(event, delta, deltaX, deltaY) {
 ```
 
 ## See it in action
-[See the tests on Github](http://brandonaaron.github.com/jquery-mousewheel/test).
+[See the tests on Github](http://brandonaaron.github.io/jquery-mousewheel/test).
 
 ## Using with [Browserify](http://browserify.org)
 
 Support for browserify is baked in.
 
-```js
+```bash
 npm install jquery-mousewheel
 npm install jquery-browserify
 ```
