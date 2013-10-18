@@ -1,5 +1,10 @@
 # Mouse Wheel ChangeLog
 
+## 3.1.4
+
+* Always set the deltaY
+* Add back in the deltaX and deltaY support for older Firefox versions
+
 ## 3.1.3
 
 * Include `MozMousePixelScroll` in the to fix list to avoid inconsistent behavior in older Firefox
