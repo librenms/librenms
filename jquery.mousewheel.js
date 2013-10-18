@@ -81,6 +81,12 @@
         // At a minimum, setup the deltaY to be delta
         deltaY = delta;
 
+        // Firefox < 17 related to DOMMouseScroll event
+        if ( orgEvent.axis !== undefined && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
+            deltaY = 0;
+            deltaX = delta * -1;
+        }
+
         // New school wheel delta (wheel event)
         if ( orgEvent.deltaY ) {
             deltaY = orgEvent.deltaY * -1;
