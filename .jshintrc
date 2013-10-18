@@ -17,5 +17,5 @@
     "strict": false,
     "trailing": true,
     "unused": true,
-    "globals": { "define": true }
+    "globals": { "define": true, "require": true }
 }
