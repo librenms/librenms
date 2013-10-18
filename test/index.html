@@ -111,6 +111,7 @@
         <script>
             $(function() {
                 $('#userAgent').html(navigator.userAgent);
+                $('#jqueryVersion').html($.fn.jquery);
 
 
                 $('#test1')
@@ -298,7 +299,7 @@
         </script>
     </head>
     <body>
-        <h1 id="banner">jQuery mousewheel.js - Test</h1>
+        <h1 id="banner">jQuery mousewheel.js Test with jQuery <span id="jqueryVersion"></span></h1>
         <h2 id="userAgent"></h2>
 
         <ul>
