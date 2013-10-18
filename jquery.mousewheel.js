@@ -57,11 +57,11 @@
 
     $.fn.extend({
         mousewheel: function(fn) {
-            return fn ? this.bind("mousewheel", fn) : this.trigger("mousewheel");
+            return fn ? this.bind('mousewheel', fn) : this.trigger('mousewheel');
         },
 
         unmousewheel: function(fn) {
-            return this.unbind("mousewheel", fn);
+            return this.unbind('mousewheel', fn);
         }
     });
 
@@ -76,7 +76,7 @@
             absDeltaXY = 0,
             fn;
         event = $.event.fix(orgEvent);
-        event.type = "mousewheel";
+        event.type = 'mousewheel';
 
         // Old school scrollwheel delta
         if ( orgEvent.wheelDelta ) { delta = orgEvent.wheelDelta; }
