@@ -34,5 +34,10 @@
   "readmeFilename": "README.markdown",
   "directories": {
     "test": "test"
+  },
+  "jam": {
+    "dependencies": {
+      "jquery": ">=1.2.2"
+    }
   }
 }
