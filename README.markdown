@@ -55,4 +55,4 @@ require('jquery-mousewheel')($);
 
 This plugin is licensed under the [MIT License](LICENSE.txt).
 
-Copyright (c) 2013 [Brandon Aaron](http://brandonaaron.net)
+Copyright (c) 2013 [Brandon Aaron](http://brandon.aaron.sh)
