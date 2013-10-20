@@ -308,6 +308,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._nonPointGroup.eachLayer(method, context);
 	},
 
+	//Overrides LayerGroup.getLayers
+	getLayers: function () {
+		var layers = [];
+		this.eachLayer(function (l) {
+			layers.push(l);
+		});
+		return layers;
+	},
+
 	//Returns true if the given layer is in this MarkerClusterGroup
 	hasLayer: function (layer) {
 		if (!layer) {
