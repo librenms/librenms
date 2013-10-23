@@ -105,6 +105,7 @@ markers.on('clusterclick', function (a) {
 
 ### Getting the visible parent of a marker
 If you have a marker in your MarkerClusterGroup and you want to get the visible parent of it (Either itself or a cluster it is contained in that is currently visible on the map).
+This will return null if the marker and its parent clusters are not visible currently (they are not near the visible viewpoint)
 ```
 var visibleOne = markerClusterGroup.getVisibleParent(myMarker);
 console.log(visibleOne.getLatLng());

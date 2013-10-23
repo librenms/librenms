@@ -467,10 +467,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	getVisibleParent: function (marker) {
 		var vMarker = marker;
-		while (vMarker !== null && !vMarker._icon) {
+		while (vMarker && !vMarker._icon) {
 			vMarker = vMarker.__parent;
 		}
-		return vMarker;
+		return vMarker || null;
 	},
 
 	//Remove the given object from the given array
