@@ -52,7 +52,6 @@ http://getbootstrap.com/getting-started/
   });
       
   L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
-
 ````
 
 ### Properties
