@@ -55,15 +55,27 @@
         },
 
         _createInner: function() {
-            var iconClass,
-                options = this.options;
+            var iconClass, iconSpinClass = "", iconColorClass = "", iconColorStyle = "", options = this.options;
 
             if(options.icon.slice(0,options.prefix.length+1) === options.prefix + "-") {
                 iconClass = options.icon;
             } else {
                 iconClass = options.prefix + "-" + options.icon;
             }
-            return "<i class='" + iconClass + (options.spin ? " " + options.spinClass : "") + (options.iconColor ? " icon-" + options.iconColor :"") + "'></i>";
+
+            if(options.spin && typeof options.spinClass === "string") {
+                iconSpinClass = options.spinClass;
+            }
+
+            if(options.iconColor) {
+                if(options.iconColor === 'white' || options.iconColor === 'black') {
+                    iconColorClass = "icon-" + options.iconColor;
+                } else {
+                    iconColorStyle = "style='color: " + options.iconColor + "' ";
+                }
+            }
+
+            return "<i " + iconColorStyle + "class='" + options.prefix + " " + iconClass + " " + iconSpinClass + " " + iconColorClass + "'></i>";
         },
 
         _setIconStyles: function (img, name) {
