@@ -55,7 +55,6 @@ http://getbootstrap.com/getting-started/
 
 ````
 
-
 | Property        | Description            | Default Value | Possible  values                                     |
 | --------------- | ---------------------- | ------------- | ---------------------------------------------------- |
 | icon            | Name of the icon       | 'home'        | See glyphicons or font-awesome                       |
