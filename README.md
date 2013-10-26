@@ -83,3 +83,5 @@ The 'icon' property supports these strings:
 ## Contact
 - Email: lvoogdt@gmail.com
 - Website: http://lennardvoogdt.nl
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lvoogdt/leaflet.awesome-markers/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
