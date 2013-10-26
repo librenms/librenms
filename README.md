@@ -1,5 +1,12 @@
-# Leaflet.awesome-markers plugin
-Colorful iconic & retina-proof markers for Leaflet, based on the Font Awesome/Twitter Bootstrap icons
+# Leaflet.awesome-markers plugin v2.0
+Colorful iconic & retina-proof markers for Leaflet, based on the Glyphicons / Font-Awesome icons
+
+Version 2.0 of Leaflet.awesome-markers is tested with:
+- Bootstrap 3
+- Font Awesome 4.0
+- Leaflet 0.5-Latest
+
+For bootstrap 2.x & Fontawesome 3.x use Leaflet.awesome-markers v1.0
 
 ## Screenshots
 ![AwesomeMarkers screenshot](https://raw.github.com/lvoogdt/Leaflet.awesome-markers/master/screenshots/screenshot-soft.png "Screenshot of AwesomeMarkers")

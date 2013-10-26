@@ -34,7 +34,7 @@
         },
 
         initialize: function (options) {
-            options = L.setOptions(this, options);
+            options = L.Util.setOptions(this, options);
         },
 
         createIcon: function () {
