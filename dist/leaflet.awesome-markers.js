@@ -26,6 +26,8 @@
             shadowAnchor: [10, 12],
             shadowSize: [36, 16],
             className: 'awesome-marker',
+            prefix: 'glyphicon',
+            spinClass: 'fa-spin',
             icon: 'home',
             markerColor: 'blue',
             iconColor: 'white'
@@ -53,13 +55,15 @@
         },
 
         _createInner: function() {
-            var iconClass;
-            // if(this.options.icon.slice(0,5)==="icon-"){
-            iconClass=this.options.icon;
-            // }else{
-            //     iconClass="icon-"+this.options.icon;
-            // }
-            return "<i class='" + iconClass + (this.options.spin ? " icon-spin" :"") + (this.options.iconColor ? " icon-" + this.options.iconColor :"") + "'></i>";
+            var iconClass,
+                options = this.options;
+
+            if(options.icon.slice(0,options.prefix.length+1) === options.prefix + "-") {
+                iconClass = options.icon;
+            } else {
+                iconClass = options.prefix + "-" + options.icon;
+            }
+            return "<i class='" + iconClass + (options.spin ? " " + options.spinClass : "") + (options.iconColor ? " icon-" + options.iconColor :"") + "'></i>";
         },
 
         _setIconStyles: function (img, name) {
