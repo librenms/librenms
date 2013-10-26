@@ -32,7 +32,7 @@ For Twitter bootstrap:
     
     For Twitter bootstrap, steps are here:
     
-    http://twitter.github.io/bootstrap/getting-started.html
+    http://getbootstrap.com/getting-started/
     
 
 - 2) Next, copy the dist/images directory, awesome-markers.css, and awesome-markers.js to your project and include them:
@@ -47,28 +47,22 @@ For Twitter bootstrap:
 ````js
 // Creates a red marker with the coffee icon
 var redMarker = L.AwesomeMarkers.icon({
-  icon: 'coffee', 
-  markerColor: 'red'
+  icon: 'coffee',
+  prefix: 'fa', // Use "fa" for the font-awesome icons. Use "glyphicon" for the glyphicons from bootstrap 3.
+  markerColor: 'red',
+  iconColor: 'white'
 })
-
     
-    L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
+L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
 ````
 
-### Supported marker colors:
-**The following colors are supported**
-
-The 'markerColor' property currently supports these strings:
-- 'red'
-- 'darkred'
-- 'orange'
-- 'green'
-- 'darkgreen'
-- 'blue'
-- 'darkblue'
-- 'purple'
-- 'darkpurple'
-- 'cadetblue'
+| Property        | Description            | Default Value | Possible  values                                     |
+| --------------- | ---------------------- | ------------- | ---------------------------------------------------- |
+| icon            | Name of the icon       | 'home'        | See glyphicons or font-awesome                       |
+| prefix          | Select de icon library | 'glyphicon'   | 'fa' for font-awesome or 'glyphicon' for bootstrap 3 |
+| markerColor     | Color of the marker    | 'blue'        | 'red', 'darkred', 'orange', 'green', 'darkgreen', 'blue', 'purple', 'darkpuple', 'cadetblue' |
+| iconColor       | Color of the icon      | 'white'       | 'white', 'black' or css code (hex, rgba etc) |
+| spin            | Make the icon spin     | false         | true or false. Font-awesome required | 
 
 ### Supported icons
 The 'icon' property supports these strings:
@@ -77,26 +71,13 @@ The 'icon' property supports these strings:
 - 'flag'
 - 'star'
 - 'bookmark'
-- .... and many more, see: http://fortawesome.github.com/Font-Awesome/#icons-new
-- Or: http://twitter.github.com/bootstrap/base-css.html#icons
-
-### Spinning icons (only Font-Awesome)
-You can make any icon spin by setting the spin option to true:
-````js
-// Creates a red marker with the coffee icon
-var redMarker = L.AwesomeMarkers.icon({
-  icon: 'spinner', 
-  markerColor: 'red',
-  spin: true
-})
-
-L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
-````
+- .... and many more, see: http://fortawesome.github.io/Font-Awesome/icons/
+- Or: http://getbootstrap.com/components/#glyphicons
 
 ## License
 - Leaflet.AwesomeMarkers and colored markers are licensed under the MIT License - http://opensource.org/licenses/mit-license.html.
-- Font Awesome: http://fortawesome.github.com/Font-Awesome/#license
-- Twitter Bootstrap: http://twitter.github.com/bootstrap/
+- Font Awesome: http://fortawesome.github.io/Font-Awesome/license/
+- Twitter Bootstrap: http://getbootstrap.com/
 
 ## Contact
 - Email: lvoogdt@gmail.com

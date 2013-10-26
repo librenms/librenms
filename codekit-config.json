@@ -44,15 +44,6 @@
       "outputAbbreviatedPath" : "\/dist\/leaflet.awesome-markers.min.min.js",
       "fileType" : 64
     },
-    "\/examples\/basic-example.html" : {
-      "ignoreWasSetByUser" : 0,
-      "ignore" : 0,
-      "hidden" : 0,
-      "outputPathIsSetByUser" : 0,
-      "inputAbbreviatedPath" : "\/examples\/basic-example.html",
-      "outputAbbreviatedPath" : "No Output Path",
-      "fileType" : 2048
-    },
     "\/examples\/css\/font-awesome.min.css" : {
       "ignoreWasSetByUser" : 0,
       "ignore" : 0,
@@ -62,15 +53,35 @@
       "outputAbbreviatedPath" : "No Output Path",
       "fileType" : 16
     },
-    "\/dist\/images\/markers-soft@2x.png" : {
+    "\/screenshots\/screenshot-soft.png" : {
       "ignoreWasSetByUser" : 0,
       "ignore" : 0,
       "hidden" : 0,
       "outputPathIsSetByUser" : 0,
-      "inputAbbreviatedPath" : "\/dist\/images\/markers-soft@2x.png",
+      "inputAbbreviatedPath" : "\/screenshots\/screenshot-soft.png",
       "processed" : 0,
-      "outputAbbreviatedPath" : "\/dist\/images\/markers-soft@2x.png",
-      "initialSize" : 23106,
+      "outputAbbreviatedPath" : "\/screenshots\/screenshot-soft.png",
+      "initialSize" : 218197,
+      "fileType" : 8192
+    },
+    "\/examples\/with-bootstrap.html" : {
+      "ignoreWasSetByUser" : 0,
+      "ignore" : 0,
+      "hidden" : 0,
+      "outputPathIsSetByUser" : 0,
+      "inputAbbreviatedPath" : "\/examples\/with-bootstrap.html",
+      "outputAbbreviatedPath" : "No Output Path",
+      "fileType" : 2048
+    },
+    "\/dist\/images\/markers-matte@2x.png" : {
+      "ignoreWasSetByUser" : 0,
+      "ignore" : 0,
+      "hidden" : 0,
+      "outputPathIsSetByUser" : 0,
+      "inputAbbreviatedPath" : "\/dist\/images\/markers-matte@2x.png",
+      "processed" : 0,
+      "outputAbbreviatedPath" : "\/dist\/images\/markers-matte@2x.png",
+      "initialSize" : 31113,
       "fileType" : 8192
     },
     "\/dist\/leaflet.awesome-markers.js" : {
@@ -84,26 +95,24 @@
       "outputAbbreviatedPath" : "\/dist\/leaflet.awesome-markers.min.js",
       "fileType" : 64
     },
-    "\/dist\/images\/markers-matte@2x.png" : {
+    "\/examples\/basic-example.html" : {
       "ignoreWasSetByUser" : 0,
       "ignore" : 0,
       "hidden" : 0,
       "outputPathIsSetByUser" : 0,
-      "inputAbbreviatedPath" : "\/dist\/images\/markers-matte@2x.png",
-      "processed" : 0,
-      "outputAbbreviatedPath" : "\/dist\/images\/markers-matte@2x.png",
-      "initialSize" : 31113,
-      "fileType" : 8192
+      "inputAbbreviatedPath" : "\/examples\/basic-example.html",
+      "outputAbbreviatedPath" : "No Output Path",
+      "fileType" : 2048
     },
-    "\/screenshots\/screenshot-soft.png" : {
+    "\/dist\/images\/markers-plain.png" : {
       "ignoreWasSetByUser" : 0,
       "ignore" : 0,
       "hidden" : 0,
       "outputPathIsSetByUser" : 0,
-      "inputAbbreviatedPath" : "\/screenshots\/screenshot-soft.png",
+      "inputAbbreviatedPath" : "\/dist\/images\/markers-plain.png",
       "processed" : 0,
-      "outputAbbreviatedPath" : "\/screenshots\/screenshot-soft.png",
-      "initialSize" : 218197,
+      "outputAbbreviatedPath" : "\/dist\/images\/markers-plain.png",
+      "initialSize" : 7946,
       "fileType" : 8192
     },
     "\/dist\/images\/markers-soft.png" : {
@@ -117,24 +126,15 @@
       "initialSize" : 10487,
       "fileType" : 8192
     },
-    "\/examples\/with-bootstrap.html" : {
+    "\/dist\/images\/markers-soft@2x.png" : {
       "ignoreWasSetByUser" : 0,
       "ignore" : 0,
       "hidden" : 0,
       "outputPathIsSetByUser" : 0,
-      "inputAbbreviatedPath" : "\/examples\/with-bootstrap.html",
-      "outputAbbreviatedPath" : "No Output Path",
-      "fileType" : 2048
-    },
-    "\/dist\/images\/markers-plain.png" : {
-      "ignoreWasSetByUser" : 0,
-      "ignore" : 0,
-      "hidden" : 0,
-      "outputPathIsSetByUser" : 0,
-      "inputAbbreviatedPath" : "\/dist\/images\/markers-plain.png",
+      "inputAbbreviatedPath" : "\/dist\/images\/markers-soft@2x.png",
       "processed" : 0,
-      "outputAbbreviatedPath" : "\/dist\/images\/markers-plain.png",
-      "initialSize" : 7946,
+      "outputAbbreviatedPath" : "\/dist\/images\/markers-soft@2x.png",
+      "initialSize" : 23106,
       "fileType" : 8192
     },
     "\/examples\/random-markers.html" : {
@@ -157,15 +157,6 @@
       "initialSize" : 197696,
       "fileType" : 8192
     },
-    "\/dist\/leaflet.awesome-markers.css" : {
-      "ignoreWasSetByUser" : 0,
-      "ignore" : 0,
-      "hidden" : 0,
-      "outputPathIsSetByUser" : 0,
-      "inputAbbreviatedPath" : "\/dist\/leaflet.awesome-markers.css",
-      "outputAbbreviatedPath" : "No Output Path",
-      "fileType" : 16
-    },
     "\/dist\/images\/markers-shadow@2x.png" : {
       "ignoreWasSetByUser" : 0,
       "ignore" : 0,
@@ -176,6 +167,15 @@
       "outputAbbreviatedPath" : "\/dist\/images\/markers-shadow@2x.png",
       "initialSize" : 1469,
       "fileType" : 8192
+    },
+    "\/dist\/leaflet.awesome-markers.css" : {
+      "ignoreWasSetByUser" : 0,
+      "ignore" : 0,
+      "hidden" : 0,
+      "outputPathIsSetByUser" : 0,
+      "inputAbbreviatedPath" : "\/dist\/leaflet.awesome-markers.css",
+      "outputAbbreviatedPath" : "No Output Path",
+      "fileType" : 16
     }
   },
   "manualImportLinks" : [
