@@ -27,7 +27,7 @@
             shadowSize: [36, 16],
             className: 'awesome-marker',
             icon: 'home',
-            color: 'blue',
+            markerColor: 'blue',
             iconColor: 'white'
         },
 
@@ -48,7 +48,7 @@
                     (-options.bgPos.x) + 'px ' + (-options.bgPos.y) + 'px';
             }
 
-            this._setIconStyles(div, 'icon-' + options.color);
+            this._setIconStyles(div, 'icon-' + options.markerColor);
             return div;
         },
 

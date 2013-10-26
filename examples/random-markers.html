@@ -45,7 +45,7 @@
       var awesomeIcon = awesomeIcons[Math.floor(Math.random()*awesomeIcons.length)];
       var geo = [rndCoordinates(51.3,51.8, 3), rndCoordinates(0.3,-0.4,3)];
 
-      L.marker(geo, {icon: L.AwesomeMarkers.icon({icon: awesomeIcon, color: color}) }).addTo(map);
+      L.marker(geo, {icon: L.AwesomeMarkers.icon({icon: awesomeIcon, markerColor: color}) }).addTo(map);
     }
   </script>
 </body>
