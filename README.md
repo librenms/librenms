@@ -52,17 +52,10 @@ var redMarker = L.AwesomeMarkers.icon({
 })
     
 L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
+
 ````
 
-sd
 
-| Property        | Description            | Default Value | Possible  values                                     |
-| --------------- | ---------------------- | ------------- | ---------------------------------------------------- |
-| icon            | Name of the icon       | 'home'        | See glyphicons or font-awesome                       |
-| prefix          | Select de icon library | 'glyphicon'   | 'fa' for font-awesome or 'glyphicon' for bootstrap 3 |
-| markerColor     | Color of the marker    | 'blue'        | 'red', 'darkred', 'orange', 'green', 'darkgreen', 'blue', 'purple', 'darkpuple', 'cadetblue' |
-| iconColor       | Color of the icon      | 'white'       | 'white', 'black' or css code (hex, rgba etc) |
-| spin            | Make the icon spin     | false         | true or false. Font-awesome required | 
 
 ### Supported icons
 The 'icon' property supports these strings:
