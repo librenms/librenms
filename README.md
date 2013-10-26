@@ -41,17 +41,17 @@ For Twitter bootstrap:
 // Creates a red marker with the coffee icon
 var redMarker = L.AwesomeMarkers.icon({
   icon: 'coffee', 
-  color: 'red'
+  markerColor: 'red'
 })
 
     
     L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
 ````
 
-### Supported colors:
+### Supported marker colors:
 **The following colors are supported**
 
-The 'color' property currently supports these strings:
+The 'markerColor' property currently supports these strings:
 - 'red'
 - 'darkred'
 - 'orange'
@@ -79,7 +79,7 @@ You can make any icon spin by setting the spin option to true:
 // Creates a red marker with the coffee icon
 var redMarker = L.AwesomeMarkers.icon({
   icon: 'spinner', 
-  color: 'red',
+  markerColor: 'red',
   spin: true
 })
 
