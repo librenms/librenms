@@ -45,16 +45,24 @@ http://getbootstrap.com/getting-started/
 
 - 3) Now use the plugin to create a marker like this:
 ````js
-// Creates a red marker with the coffee icon
-var redMarker = L.AwesomeMarkers.icon({
-  icon: 'coffee',
-  markerColor: 'red'
-})
-    
-L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
+  // Creates a red marker with the coffee icon
+  var redMarker = L.AwesomeMarkers.icon({
+    icon: 'coffee',
+    markerColor: 'red'
+  });
+      
+  L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
 
 ````
 
+
+| Property        | Description            | Default Value | Possible  values                                     |
+| --------------- | ---------------------- | ------------- | ---------------------------------------------------- |
+| icon            | Name of the icon       | 'home'        | See glyphicons or font-awesome                       |
+| prefix          | Select de icon library | 'glyphicon'   | 'fa' for font-awesome or 'glyphicon' for bootstrap 3 |
+| markerColor     | Color of the marker    | 'blue'        | 'red', 'darkred', 'orange', 'green', 'darkgreen', 'blue', 'purple', 'darkpuple', 'cadetblue' |
+| iconColor       | Color of the icon      | 'white'       | 'white', 'black' or css code (hex, rgba etc) |
+| spin            | Make the icon spin     | false         | true or false. Font-awesome required | 
 
 
 ### Supported icons
