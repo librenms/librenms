@@ -26,13 +26,13 @@ For Twitter bootstrap:
 ## Using the plugin
 - 1) First, follow the steps for including Font-Awesome or Twitter bootstrap into your application.
 
-    For Font-Awesome, steps are located here:
-    
-    http://fortawesome.github.io/Font-Awesome/get-started/
-    
-    For Twitter bootstrap, steps are here:
-    
-    http://getbootstrap.com/getting-started/
+For Font-Awesome, steps are located here:
+
+http://fortawesome.github.io/Font-Awesome/get-started/
+
+For Twitter bootstrap, steps are here:
+
+http://getbootstrap.com/getting-started/
     
 
 - 2) Next, copy the dist/images directory, awesome-markers.css, and awesome-markers.js to your project and include them:
@@ -48,13 +48,13 @@ For Twitter bootstrap:
 // Creates a red marker with the coffee icon
 var redMarker = L.AwesomeMarkers.icon({
   icon: 'coffee',
-  prefix: 'fa', // Use "fa" for the font-awesome icons. Use "glyphicon" for the glyphicons from bootstrap 3.
-  markerColor: 'red',
-  iconColor: 'white'
+  markerColor: 'red'
 })
     
 L.marker([51.941196,4.512291], {icon: redMarker}).addTo(map);
 ````
+
+sd
 
 | Property        | Description            | Default Value | Possible  values                                     |
 | --------------- | ---------------------- | ------------- | ---------------------------------------------------- |
