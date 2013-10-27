@@ -18,7 +18,7 @@
 		
 		return this.each(function() {
 		
-			var self = this
+			var $self = $(this)
 				, $tooltip = $("<div>").addClass(options.map.tooltip.cssClass).css("display", "none")
 				, $container = $('.' + options.map.cssClass, this).empty().append($tooltip)
 				, mapConf = $.fn.mapael.maps[options.map.name]
@@ -65,7 +65,7 @@
 				
 			// Create the legends for areas
 			if (options.legend.area.slices && options.legend.area.display)
-				areaLegend = $.fn.mapael.createLegend($(this), options, 'area', areas, 1);
+				areaLegend = $.fn.mapael.createLegend($self, options, 'area', areas, 1);
                 
 			/**
 			* 
@@ -75,10 +75,12 @@
 			* @param newPlots new plots to add to the map
 			* @param deletedPlotsplots to delete from the map
 			* @param opt option for the refresh :
+			*  opt.animDuration animation duration in ms (default = 0)
 			*  opt.resetAreas true to reset previous areas options
 			*  opt.resetPlots true to reset previous plots options
+			*  opt.afterUpdate Hook that allows to add custom processing on the map
 			*/
-			$(this).on('update', function(e, updatedOptions, newPlots, deletedPlots, opt) {
+			$self.on('update', function(e, updatedOptions, newPlots, deletedPlots, opt) {
 				var i = 0
 					, id = 0
 					, animDuration = 0
@@ -169,6 +171,8 @@
 					
 					$.fn.mapael.updateElem(elemOptions, plots[id], $tooltip, animDuration);
 				}
+				
+				opt.afterUpdate && opt.afterUpdate($self, paper, areas, plots);
 			});
 			
 			// Handle resizing of the map
@@ -177,7 +181,7 @@
 				
 				// Create the legends for plots taking into account the scale of the map
 				if (options.legend.plot.slices && options.legend.plot.display)
-					plotLegend = $.fn.mapael.createLegend($(this), options, 'plot', plots, (options.map.width / mapConf.width));
+					plotLegend = $.fn.mapael.createLegend($self, options, 'plot', plots, (options.map.width / mapConf.width));
 			} else {
 				$(window).on('resize', function() {
 					clearTimeout(resizeTO);
@@ -187,7 +191,7 @@
 				// Create the legends for plots taking into account the scale of the map
 				var createPlotLegend = function() {
 					if (options.legend.plot.slices && options.legend.plot.display)
-						plotLegend = $.fn.mapael.createLegend($(self), options, 'plot', plots, ($container.width() / mapConf.width));
+						plotLegend = $.fn.mapael.createLegend($self, options, 'plot', plots, ($container.width() / mapConf.width));
 					
 					$container.unbind('resizeEnd', createPlotLegend);
 				};
@@ -199,6 +203,9 @@
 					}
 				}).on('resizeEnd', createPlotLegend).trigger('resizeEnd');
 			}
+			
+			// Hook that allows to add custom processing on the map
+			options.map.afterInit && options.map.afterInit($self, paper, areas, plots);
 			
 			$(paper.desc).append(" and Mapael (http://neveldo.fr/mapael)");
 		});
