@@ -292,11 +292,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		}
 
-		//TODO: Can remove this isValid test when leaflet 0.6 is released
-		var nonPointBounds = this._nonPointGroup.getBounds();
-		if (nonPointBounds.isValid()) {
-			bounds.extend(nonPointBounds);
-		}
+		bounds.extend(this._nonPointGroup.getBounds());
 
 		return bounds;
 	},
@@ -315,6 +311,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 
 		this._nonPointGroup.eachLayer(method, context);
+	},
+
+	//Overrides LayerGroup.getLayers
+	getLayers: function () {
+		var layers = [];
+		this.eachLayer(function (l) {
+			layers.push(l);
+		});
+		return layers;
 	},
 
 	//Returns true if the given layer is in this MarkerClusterGroup
@@ -453,7 +458,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this._spiderfierOnRemove();
 		}
 
+
+
 		//Clean up all the layers we added to the map
+		this._hideCoverage();
 		this._featureGroup.onRemove(map);
 		this._nonPointGroup.onRemove(map);
 
@@ -464,10 +472,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	getVisibleParent: function (marker) {
 		var vMarker = marker;
-		while (vMarker !== null && !vMarker._icon) {
+		while (vMarker && !vMarker._icon) {
 			vMarker = vMarker.__parent;
 		}
-		return vMarker;
+		return vMarker || null;
 	},
 
 	//Remove the given object from the given array
@@ -584,7 +592,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this.on('clustermouseover', this._showCoverage, this);
 			this.on('clustermouseout', this._hideCoverage, this);
 			map.on('zoomend', this._hideCoverage, this);
-			map.on('layerremove', this._hideCoverageOnRemove, this);
 		}
 	},
 
@@ -620,12 +627,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 	},
 
-	_hideCoverageOnRemove: function (e) {
-		if (e.layer === this) {
-			this._hideCoverage();
-		}
-	},
-
 	_unbindEvents: function () {
 		var spiderfyOnMaxZoom = this.options.spiderfyOnMaxZoom,
 			showCoverageOnHover = this.options.showCoverageOnHover,
@@ -639,7 +640,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			this.off('clustermouseover', this._showCoverage, this);
 			this.off('clustermouseout', this._hideCoverage, this);
 			map.off('zoomend', this._hideCoverage, this);
-			map.off('layerremove', this._hideCoverageOnRemove, this);
 		}
 	},
 
@@ -761,7 +761,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Merge and split any existing clusters that are too big or small
 	_mergeSplitClusters: function () {
-		if (this._zoom < this._map._zoom) { //Zoom in, split
+		if (this._zoom < this._map._zoom && this._currentShownBounds.contains(this._getExpandedVisibleBounds())) { //Zoom in, split
 			this._animationStart();
 			//Remove clusters now off screen
 			this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, this._zoom, this._getExpandedVisibleBounds());
@@ -1485,13 +1485,26 @@ Retrieved from: http://en.literateprograms.org/Quickhull_(Javascript)?oldid=1843
 
 (function () {
 	L.QuickHull = {
+
+		/*
+		 * @param {Object} cpt a point to be measured from the baseline
+		 * @param {Array} bl the baseline, as represented by a two-element
+		 *   array of latlng objects.
+		 * @returns {Number} an approximate distance measure
+		 */
 		getDistant: function (cpt, bl) {
 			var vY = bl[1].lat - bl[0].lat,
 				vX = bl[0].lng - bl[1].lng;
 			return (vX * (cpt.lat - bl[0].lat) + vY * (cpt.lng - bl[0].lng));
 		},
 
-
+		/*
+		 * @param {Array} baseLine a two-element array of latlng objects
+		 *   representing the baseline to project from
+		 * @param {Array} latLngs an array of latlng objects
+		 * @returns {Object} the maximum point and all new points to stay
+		 *   in consideration for the hull.
+		 */
 		findMostDistantPointFromBaseLine: function (baseLine, latLngs) {
 			var maxD = 0,
 				maxPt = null,
@@ -1512,11 +1525,19 @@ Retrieved from: http://en.literateprograms.org/Quickhull_(Javascript)?oldid=1843
 					maxD = d;
 					maxPt = pt;
 				}
-
 			}
-			return { 'maxPoint': maxPt, 'newPoints': newPoints };
+
+			return { maxPoint: maxPt, newPoints: newPoints };
 		},
 
+
+		/*
+		 * Given a baseline, compute the convex hull of latLngs as an array
+		 * of latLngs.
+		 *
+		 * @param {Array} latLngs
+		 * @returns {Array}
+		 */
 		buildConvexHull: function (baseLine, latLngs) {
 			var convexHullBaseLines = [],
 				t = this.findMostDistantPointFromBaseLine(baseLine, latLngs);
@@ -1532,12 +1553,19 @@ Retrieved from: http://en.literateprograms.org/Quickhull_(Javascript)?oldid=1843
 					);
 				return convexHullBaseLines;
 			} else {  // if there is no more point "outside" the base line, the current base line is part of the convex hull
-				return [baseLine];
+				return [baseLine[0]];
 			}
 		},
 
+		/*
+		 * Given an array of latlngs, compute a convex hull as an array
+		 * of latlngs
+		 *
+		 * @param {Array} latLngs
+		 * @returns {Array}
+		 */
 		getConvexHull: function (latLngs) {
-			//find first baseline
+			// find first baseline
 			var maxLat = false, minLat = false,
 				maxPt = null, minPt = null,
 				i;
@@ -1564,23 +1592,17 @@ L.MarkerCluster.include({
 	getConvexHull: function () {
 		var childMarkers = this.getAllChildMarkers(),
 			points = [],
-			hullLatLng = [],
-			hull, p, i;
+			p, i;
 
 		for (i = childMarkers.length - 1; i >= 0; i--) {
 			p = childMarkers[i].getLatLng();
 			points.push(p);
 		}
 
-		hull = L.QuickHull.getConvexHull(points);
-
-		for (i = hull.length - 1; i >= 0; i--) {
-			hullLatLng.push(hull[i][0]);
-		}
-
-		return hullLatLng;
+		return L.QuickHull.getConvexHull(points);
 	}
 });
+
 
 //This code is 100% based on https://github.com/jawj/OverlappingMarkerSpiderfier-Leaflet
 //Huge thanks to jawj for implementing it first to make my job easy :-)
