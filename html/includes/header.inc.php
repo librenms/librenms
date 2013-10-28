@@ -1,3 +1,8 @@
+
+<?php
+if ($config['title_image'])
+{
+?>
 <div id="gumax-header">
   <div id="gumax-p-logo">
     <div id="p-logo">
@@ -11,6 +16,7 @@
   <div id="gumax-p-login">
 
 <?php
+}
 
 $toggle_url = preg_replace('/(\?|\&)widescreen=(yes|no)/', '', $_SERVER['REQUEST_URI']);
 if (strstr($toggle_url,'?')) { $toggle_url .= '&amp;'; } else { $toggle_url .= '?'; }

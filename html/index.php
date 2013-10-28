@@ -119,7 +119,9 @@ if ($config['page_title']) { $config['page_title_prefix'] = $config['page_title'
 if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$config['page_refresh'].'" />' . "\n"); }
 ?>
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
-  <link rel="shortcut icon" href="<?php echo($config['favicon']);  ?>" />
+<?php
+if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n"); }
+?>
   <link rel="stylesheet" href="css/mktree.css" type="text/css" />
 <?php
 if ($_SESSION['widescreen']) { echo('<link rel="stylesheet" href="css/styles-wide.css" type="text/css" />'); }
