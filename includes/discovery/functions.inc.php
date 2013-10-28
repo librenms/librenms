@@ -23,6 +23,12 @@ function discover_new_device($hostname)
     }
     $ip = gethostbyname($dst_host);
 
+    $dst_host = rtrim($dst_host, '.');	// remove trailing dot
+
+    if ( match_network($config['autodiscovery']['nets-exclude'], $ip)) {
+      return FALSE;
+    }
+
     if ( match_network($config['nets'], $ip) )
     {
       $remote_device_id = addHost ($dst_host);
@@ -541,6 +547,24 @@ function discover_process_ipv6(&$valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$
     $valid_address = $full_address  . "-" . $port_id;
     $valid['ipv6'][$valid_address] = 1;
   }
+}
+
+// maintain a simple cache of seen IPs during ARP discovery
+function arp_discovery_add_cache($ip)
+{
+	global $arp_discovery;
+	$arp_discovery[$ip] = TRUE;
+}
+
+function arp_discovery_is_cached($ip)
+{
+	global $arp_discovery;
+	if (array_key_exists($ip, $arp_discovery)) {
+		return $arp_discovery[$ip];
+	}
+	else {
+		return FALSE;
+	}
 }
 
 ?>
