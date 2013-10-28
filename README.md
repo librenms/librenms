@@ -53,13 +53,15 @@ Contributing
 You can participate in the project by:
 - Joining the [librenms-project][1] mailing list to post questions and
   suggestions.
-- Cloning the [repo][2] and filing bug reports and pull requests on github.
-- Talking to us on [Twitter][3] or [IRC][4].
+- Following [@LibreNMS on Twitter][2].
+- Chatting with developers and users on [IRC][3]! We're on the `irc.freenode.net`
+  server, in the `##LibreNMS` channel.
+- Cloning the [repo][4] and filing bug reports and pull requests on github.
 - Improving the [wiki][5].
 
 [1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
-[2]: https://github.com/librenms/librenms
-[3]: https://twitter.com/librenms
-[4]: irc://irc.freenode.net/##librenms
+[2]: https://twitter.com/librenms
+[3]: irc://irc.freenode.net/##librenms
+[4]: https://github.com/librenms/librenms
 [5]: https://github.com/librenms/librenms/wiki
 
