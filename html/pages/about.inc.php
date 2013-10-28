@@ -1,5 +1,5 @@
 <div style="margin: 10px;">
-  <h3>Observium <?php
+  <h3>LibreNMS <?php
 
 echo($config['version']);
 
@@ -14,8 +14,9 @@ echo($config['version']);
   <div style="float: right; padding: 0px; width: 49%">
 <?php print_optionbar_start(NULL); ?>
     <h3>License</h3>
-    <pre>Observium Network Management and Monitoring System
-Copyright (C) 2006-<?php echo date("Y"); ?> Adam Armstrong
+    <pre>LibreNMS Network Management and Monitoring System
+Copyright (C) 2006-2012 Adam Armstrong
+Copyright (C) 2013-<?php echo date("Y"); ?> LibreNMS Contributors
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -109,11 +110,11 @@ print_optionbar_end(); ?>
   <div style="float: left; padding: 0px; width: 49%">
 <?php
 
-$Observium_version = $config['version'];
+$librenms_version = $config['version'];
 #if (file_exists('.svn/entries'))
 #{
 #  $svn = File('.svn/entries');
-#  $Observium_version .='-SVN r' . trim($svn[3]);
+#  $librenms_version .='-SVN r' . trim($svn[3]);
 #  unset($svn);
 #}
 
@@ -122,7 +123,7 @@ print_optionbar_start(NULL);
 echo("
     <h3>Versions</h3>
     <table width=100% cellpadding=3 cellspacing=0 border=0>
-      <tr valign=top><td width=150><b>Observium</b></td><td>$Observium_version</td></tr>
+      <tr valign=top><td width=150><b>LibreNMS</b></td><td>$librenms_version</td></tr>
       <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
       <tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
       <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
@@ -134,33 +135,25 @@ print_optionbar_end();
 
 ?>
 
-    <h5>Observium is an autodiscovering PHP/MySQL based network monitoring system.</h5>
+    <h5>LibreNMS is an autodiscovering PHP/MySQL based network monitoring system forked from Observium.</h5>
 
     <p>
-      <a href="http://www.observium.org">Website</a> |
-      <a href="http://www.observium.org/wiki/">Support Wiki</a> |
-      <a href="http://jira.observium.org/">Bugtracker</a> |
-      <a href="http://www.observium.org/wiki/Mailing_Lists">Mailing List</a> |
-      <a href="http://twitter.com/Observium">Twitter</a> |
-      <a href="http://www.facebook.com/pages/Observium/128354461353">Facebook</a>
+      <a href="https://github.com/librenms/librenms/">Website</a> |
+      <a href="https://github.com/librenms/librenms/wiki">Support Wiki</a> |
+      <a href="https://github.com/librenms/librenms/issues">Bugtracker</a> |
+      <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing List</a> |
+      <a href="http://twitter.com/librenms">Twitter</a>
     </p>
 
-    <h3>Observium is a Free, Open project. Please donate to support continued development.</h3>
+    <h3>LibreNMS is a Free, Open project. Please contribute code, documentation, and bug reports to support continued development.</h3>
 
   <div style="margin-top:10px;">
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-    <input type="hidden" name="cmd" value="_s-xclick">
-    <input type="hidden" name="hosted_button_id" value="W2ZJ3JRZR72Z6">
-    <input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal . The safer, easier way to pay online.">
-    <img alt="" border="0" src="https://www.paypalobjects.com/en_GB/i/scr/pixel.gif" width="1" height="1">
-    </form>
   </div>
 
     <h4>The Team</h4>
 
-    <img src="images/icons/flags/gb.png"> <strong>Adam Armstrong</strong> Project Founder<br />
-    <img src="images/icons/flags/be.png"> <strong>Geert Hauwaerts</strong> Developer<br />
-    <img src="images/icons/flags/be.png"> <strong>Tom Laermans</strong> Developer<br />
+    <img src="images/icons/flags/au.png"> <strong>Paul Gear</strong> Project Founder<br />
+    <img src="images/icons/flags/us.png"> <strong>Tyler Christiansen</strong> Developer<br />
 
     <h4>Acknowledgements</h4>
 
@@ -171,6 +164,7 @@ print_optionbar_end();
     <b>Xiaochi Jin</b> Logo design. <br />
     <b>Bruno Pramont</b> Collectd code. <br />
     <b>Dennis de Houx</b> Application monitors for PowerDNS, Shoutcast, NTPD (Client, Server). <br />
+    <b>Observium</b> Codebase for LibreNMS fork. <br />
 
   </div>
 </div>
