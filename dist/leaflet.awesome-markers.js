@@ -16,7 +16,7 @@
 
     L.AwesomeMarkers = {};
 
-    L.AwesomeMarkers.version = '1.0';
+    L.AwesomeMarkers.version = '2.0';
 
     L.AwesomeMarkers.Icon = L.Icon.extend({
         options: {
