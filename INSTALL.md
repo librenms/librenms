@@ -76,7 +76,7 @@ Next, add the following to `/etc/apache2/available-sites/librenms.conf`
 
     <VirtualHost *:80>
       DocumentRoot /opt/librenms/html/
-      ServerName  librenms.label-switched.net
+      ServerName  librenms.example.com
       CustomLog /opt/librenms/logs/access_log combined
       ErrorLog /opt/librenms/logs/error_log
       <Directory "/opt/librenms/html/">
@@ -85,6 +85,7 @@ Next, add the following to `/etc/apache2/available-sites/librenms.conf`
       </Directory>
     </VirtualHost>
 
+Don't forget to change 'example.com' to your domain
 Enable the vhost and restart Apache
 
     a2ensite librenms.conf
