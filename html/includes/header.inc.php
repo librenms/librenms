@@ -1,16 +1,18 @@
 
 <div id="gumax-header">
   <div id="gumax-p-logo">
-<?php
-if ($config['title_image'])
-{
-?>
     <div id="p-logo">
-      <a style="background-image: url('<?php echo($config['title_image']); ?>');" accesskey="z" href=""></a>
-    </div>
 <?php
-}
+      if ($config['title_image'])
+      {
+        echo('<a style="background-image: ' . $config['title_image'] . '" accesskey="z" href=""></a>');
+      }
+      else
+      {
+        echo('<h2>'.$config['project_name'].'</h2>');
+      }
 ?>
+    </div>
     <script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
   </div>
   <!-- end of gumax-p-logo -->
