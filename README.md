@@ -16,7 +16,7 @@ Copyright (C) 2006-2012 Adam Armstrong <adama@memetic.org>
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Please see LICENSES/GPLv3-LICENSE.txt for usage requirements and restrictions.
+Please see LICENSE.txt for usage requirements and restrictions.
 
 
 Introduction
