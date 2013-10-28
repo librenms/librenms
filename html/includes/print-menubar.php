@@ -528,7 +528,8 @@ if(is_file("includes/print-menubar-custom.inc.php"))
 
             <div class="col_2">
                 <p>Network Management and Monitoring<br />
-                Copyright (C) 2006-<?php echo date("Y"); ?> Adam Armstrong</p>
+                Copyright (C) 2006-2012 Adam Armstrong
+                Copyright (C) 2013-<?php echo date("Y"); ?> LibreNMS Contributors
             </div>
 
             <div class="col_1">
