@@ -523,12 +523,13 @@ if(is_file("includes/print-menubar-custom.inc.php"))
         <div class="dropdown_3columns align_right"><!-- Begin 2 columns container -->
 
             <div class="col_3">
-                <h2>Observium <?php echo($config['version']); ?> </h2>
+                <h2>LibreNMS <?php echo($config['version']); ?> </h2>
             </div>
 
             <div class="col_2">
                 <p>Network Management and Monitoring<br />
-                Copyright (C) 2006-<?php echo date("Y"); ?> Adam Armstrong</p>
+                Copyright (C) 2006-2012 Adam Armstrong
+                Copyright (C) 2013-<?php echo date("Y"); ?> LibreNMS Contributors
             </div>
 
             <div class="col_1">
@@ -548,9 +549,8 @@ if(is_file("includes/print-menubar-custom.inc.php"))
             <div class="col_2">
                 <h2>The Team</h2>
                 <p>
-                  <img src="images/icons/flags/gb.png"> <strong>Adam Armstrong</strong> Project Founder<br />
-                  <img src="images/icons/flags/be.png"> <strong>Geert Hauwaerts</strong> Developer<br />
-                  <img src="images/icons/flags/be.png"> <strong>Tom Laermans</strong> Developer<br />
+                  <img src="images/icons/flags/au.png"> <strong>Paul Gear</strong> Project Founder<br />
+                  <img src="images/icons/flags/us.png"> <strong>Tyler Christiansen</strong> Developer<br />
                 </p>
             </div>
             <div class="col_1">
@@ -584,7 +584,7 @@ $rrdtool_version = implode(" ",array_slice(explode(" ",shell_exec($config['rrdto
                     <tr valign=top><td><b>RRDtool</b></td><td><?php echo($rrdtool_version); ?></td></tr>
                   </table>
                 <ul>
-                  <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About Observium</a></li>
+                  <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About LibreNMS</a></li>
                 </ul>
             </div>
 
