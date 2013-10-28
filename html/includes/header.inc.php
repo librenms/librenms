@@ -9,7 +9,7 @@
       }
       else
       {
-        echo('<h2>'.$config['project_name'].'</h2>');
+        echo('<a href=""><h2>'.$config['project_name'].'</h2></a>');
       }
 ?>
     </div>
