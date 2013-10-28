@@ -22,6 +22,11 @@ Please see LICENSE.txt for usage requirements and restrictions.
 Introduction
 ------------
 
+LibreNMS is an autodiscovering PHP/MySQL/SNMP based network monitoring
+which includes support for a wide range of network hardware and operating
+systems including Cisco, Linux, FreeBSD, Juniper, Brocade, Foundry, HP and
+many more.
+
 LibreNMS is a community-based fork of the last GPL-licensed version of
 Observium <http://observium.org/>.  LibreNMS intends to be a viable network
 monitoring project and community that:
@@ -29,10 +34,9 @@ monitoring project and community that:
 - focuses on the needs of its users, and
 - offers a welcoming, friendly environment for everyone.
 
-LibreNMS is an autodiscovering PHP/MySQL/SNMP based network monitoring
-which includes support for a wide range of network hardware and operating
-systems including Cisco, Linux, FreeBSD, Juniper, Brocade, Foundry, HP and
-many more.
+The Debian Social Contract <http://www.debian.org/social_contract> will be
+the basis of our priority system, and mutual respect the basis of our
+behaviour towards others.
 
 
 Installation
