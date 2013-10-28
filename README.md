@@ -44,5 +44,6 @@ Installation
 
 For now please see the existing instructions at http://www.observium.org/.
 
-Please email observium@libertysys.com.au if you would like to participate.
+Please join the librenms-project at http://groups.google.com/ if you would
+like to participate.
 
