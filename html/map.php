@@ -1,15 +1,14 @@
 <?php
 
 /**
- * LibreNMS
+ * Observium
  *
- *   This file is part of LibreNMS
+ *   This file is part of Observium.
  *
- * @package    librenms
- * @subpackage cli
- * @author     The LibreNMS Contributors <librenms-project@google.groups.com>
- * @copyright  (C) 2006 - 2012 Adam Armstrong (as Observium)
- * @copyright  (C) 2013 LibreNMS Contributors
+ * @package    observium
+ * @subpackage map
+ * @author     Adam Armstrong <adama@memetic.org>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong
  *
  */
 
