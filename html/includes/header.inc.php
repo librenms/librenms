@@ -1,13 +1,16 @@
 
+<div id="gumax-header">
+  <div id="gumax-p-logo">
 <?php
 if ($config['title_image'])
 {
 ?>
-<div id="gumax-header">
-  <div id="gumax-p-logo">
     <div id="p-logo">
       <a style="background-image: url('<?php echo($config['title_image']); ?>');" accesskey="z" href=""></a>
     </div>
+<?php
+}
+?>
     <script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
   </div>
   <!-- end of gumax-p-logo -->
@@ -16,7 +19,6 @@ if ($config['title_image'])
   <div id="gumax-p-login">
 
 <?php
-}
 
 $toggle_url = preg_replace('/(\?|\&)widescreen=(yes|no)/', '', $_SERVER['REQUEST_URI']);
 if (strstr($toggle_url,'?')) { $toggle_url .= '&amp;'; } else { $toggle_url .= '?'; }
