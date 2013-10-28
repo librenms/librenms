@@ -2,7 +2,7 @@
     <div style="margin: auto; width:650px; padding:5px;">
       <table border="0" cellpadding="0" cellspacing="0">
         <tr>
-          <td><img src="images/login-hamster.png" alt="Login required" /></td>
+          <td><img alt="Login required" /></td>		<!-- FIXME: add logo -->
           <td>
             <form action="" method="post" name="logonform">
               <h3>Please log in:</h3>
