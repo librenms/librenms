@@ -647,7 +647,7 @@ function notify($device,$title,$message)
       $emails = parse_email($email);
       if ($emails)
       {
-        $message_header = $config['page_title_prefix']."\n\n";
+        $message_header = $config['page_title_prefix']."\n\n";		// FIXME: use different config element
         $message_footer = "\n\nE-mail sent to: ";
         $i = 0;
         $count = count($emails);
