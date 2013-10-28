@@ -32,7 +32,7 @@ now restart MySQL
 
     aptitude install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear snmp graphviz php5-mcrypt apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool
     cd /opt
-    git clone https://github.com/libertysys/librenms.git librenms
+    git clone https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
     cp config.php.default config.php
     vim config.php
