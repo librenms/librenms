@@ -1,14 +1,16 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is included with Observium. It was originally part of m0n0wall <http://www.m0n0.ch/wall/>
+ *   This file is part of LibreNMS
+ *   It was originally part of m0n0wall <http://www.m0n0.ch/wall/>
  *
- * @package    observium
+ * @package    librenms
  * @subpackage graphing
  * @author     T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
- * @copyright  2004-2006 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
+ * @copyright  (C) 2004-2006 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
+ * @copyright  (C) 2013 LibreNMS Contributors
  * @license    BSD
  *
  */
