@@ -532,19 +532,15 @@ if(is_file("includes/print-menubar-custom.inc.php"))
                 Copyright (C) 2013-<?php echo date("Y"); ?> LibreNMS Contributors
             </div>
 
+<!-- Old donation stuff
             <div class="col_1">
               <p>
-                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=W2ZJ3JRZR72Z6" class="external text" rel="nofollow">
-                <img src="images/btn_donate_LG.gif" alt="btn_donateCC_LG.gif" />
-                </a>
               </p>
             </div>
 
             <div class="col_3">
-              <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=W2ZJ3JRZR72Z6" class="external text" rel="nofollow">
-                Please donate to support continued development!
-              </a>
             </div>
+-->
 
             <div class="col_2">
                 <h2>The Team</h2>

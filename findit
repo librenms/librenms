@@ -1,0 +1,12 @@
+#!/bin/sh
+find . \
+	-path ./html/images -prune -o \
+	-path ./patches -prune -o \
+	-path ./html/includes/geshi -prune -o \
+	-path ./html/includes/jpgraph -prune -o \
+	-path ./html/js/jqplot -prune -o \
+	-path ./logs -prune -o \
+	-path ./mibs -prune -o \
+	-path ./rrd -prune -o \
+	-name .svn -prune -o \
+		-type f -print|xargs grep "$@"

@@ -98,14 +98,16 @@ if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
   }
 }
 
-$config['title_image']      = "images/observium-logo.png";
+$config['project_name']     = "LibreNMS";
+$config['title_image']      = "";
 $config['stylesheet']       = "css/styles.css";
 $config['mono_font']        = "DejaVuSansMono";
-$config['favicon']          = "images/observium-icon.png";
+$config['favicon']          = "";
 $config['header_color']     = "#1F334E";
 $config['page_refresh']     = "300";  // Refresh the page every xx seconds, 0 to disable
 $config['front_page']       = "pages/front/default.php";
-$config['page_title_prefix'] = "Observium :: Network Observation and Monitoring";
+$config['page_title_prefix'] = "";
+$config['page_title_suffix'] = $config['project_name'];
 $config['timestamp_format'] = 'd-m-Y H:i:s';
 $config['page_gen']         = 1;
 $config['web_header']       = "header.inc.php";  # in html/includes
