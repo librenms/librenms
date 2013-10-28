@@ -162,6 +162,14 @@ $config['autodiscovery']['snmpscan']       = TRUE; // autodiscover hosts via SNM
 
 $config['discover_services']               = FALSE; // Autodiscover services via SNMP on devices of type "server"
 
+// Networks to exclude from autodiscovery
+
+$config['autodiscovery']['nets-exclude'][] = "0.0.0.0/8";
+$config['autodiscovery']['nets-exclude'][] = "127.0.0.0/8";
+$config['autodiscovery']['nets-exclude'][] = "169.254.0.0/16";
+$config['autodiscovery']['nets-exclude'][] = "224.0.0.0/4";
+$config['autodiscovery']['nets-exclude'][] = "240.0.0.0/4";
+
 // Mailer backend Settings
 
 $config['email_backend']              = 'mail';               // Mail backend. Allowed: "mail" (PHP's built-in), "sendmail", "smtp".
@@ -520,6 +528,7 @@ $config['discovery_modules']['storage']                   = 1;
 $config['discovery_modules']['hr-device']                 = 1;
 $config['discovery_modules']['discovery-protocols']       = 1;
 $config['discovery_modules']['arp-table']                 = 1;
+$config['discovery_modules']['discovery-arp']             = 0;
 $config['discovery_modules']['junose-atm-vp']             = 1;
 $config['discovery_modules']['bgp-peers']                 = 1;
 $config['discovery_modules']['vlans']                     = 1;
