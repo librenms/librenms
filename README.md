@@ -50,7 +50,10 @@ See `INSTALL.md` for details.
 Contributing
 ------------
 
-Clone the repo and file bug reports and pull requests here.
-Join the [librenms-project][1] mailing list to post questions and suggestions.
+* Clone the repo and file bug reports and pull requests here.
+* Join the [librenms-project][1] mailing list to post questions and suggestions.
+* Follow [@LibreNMS on Twitter][2].
+* Chat with developers and users on IRC! We're on the `irc.freenode.net` server, in the `##LibreNMS` channel.
 
 [1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
+[2]: https://twitter.com/LibreNMS
