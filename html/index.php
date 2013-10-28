@@ -268,10 +268,9 @@ $runtime_end = utime(); $runtime = $runtime_end - $runtime_start;
 $gentime = substr($runtime, 0, 5);
 
 echo('<br /> <br /> <br /> <br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : ''));
-echo('<br />Powered by <a href="http://www.observium.org" target="_blank">Observium ' . $config['version']);
+echo('<br />Powered by <a href="https://github.com/librenms/librenms" target="_blank">LibreNMS ' . $config['version']);
 
-echo('</a>. Copyright &copy; 2006-2012 by Adam Armstrong. All rights reserved.');
-echo('</a>. Copyright &copy; 2006-'. date("Y"). ' by the LibreNMS Contributors. All rights reserved.');
+echo('</a>. Copyright &copy; '. date("Y"). ' by the LibreNMS Contributors.<br/>LibreNMS is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPLv3</a>.');
 
 if ($config['page_gen'])
 {
