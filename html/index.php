@@ -1,14 +1,15 @@
 <?php
 
 /**
- * Observium
+ * LibreNMS
  *
- *   This file is part of Observium.
+ *   This file is part of LibreNMS
  *
- * @package    observium
- * @subpackage webinterface
- * @author     Adam Armstrong <adama@memetic.org>
- * @copyright  (C) 2006 - 2012 Adam Armstrong
+ * @package    librenms
+ * @subpackage cli
+ * @author     The LibreNMS Contributors <librenms-project@google.groups.com>
+ * @copyright  (C) 2006 - 2012 Adam Armstrong (as Observium)
+ * @copyright  (C) 2013 LibreNMS Contributors
  *
  */
 
@@ -268,9 +269,9 @@ $runtime_end = utime(); $runtime = $runtime_end - $runtime_start;
 $gentime = substr($runtime, 0, 5);
 
 echo('<br /> <br /> <br /> <br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : ''));
-echo('<br />Powered by <a href="http://www.observium.org" target="_blank">Observium ' . $config['version']);
+echo('<br />Powered by <a href="http://www.librenms.org" target="_blank">LibreNMS ' . $config['version']);
 
-echo('</a>. Copyright &copy; 2006-'. date("Y"). ' by Adam Armstrong. All rights reserved.');
+echo('</a>. Copyright &copy; 2013-'. date("Y"). ' by the LibreNMS Contributors. All rights reserved.');
 
 if ($config['page_gen'])
 {
