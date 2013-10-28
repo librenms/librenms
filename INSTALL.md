@@ -3,7 +3,7 @@ NOTE: These instructions assume you are using a separate server for your databas
 
 ## On the DB Server ##
 
-    aptitude install mysql-server mysql-client snmpd
+    apt-get install mysql-server mysql-client snmpd
     mysql -uroot -p
 
 enter root mysql password
