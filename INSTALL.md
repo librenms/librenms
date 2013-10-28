@@ -31,6 +31,7 @@ now restart MySQL
 ## On the NMS ##
 
     aptitude install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear snmp graphviz php5-mcrypt apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool
+    cd /opt
     git clone https://github.com/libertysys/librenms.git librenms
     cd /opt/librenms
     cp config.php.default config.php
@@ -87,6 +88,7 @@ Next, add the following to `/etc/apache2/available-sites/librenms.conf`
 Enable the vhost and restart Apache
 
     a2ensite librenms.conf
+    a2enmod rewrite
     service apache2 restart
 
 ### Add localhost ###
