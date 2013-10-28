@@ -3,6 +3,9 @@ License
 
 Copyright (C) 2006-2012 Adam Armstrong <adama@memetic.org>
 
+
+Copyright (C) 2013 LibreNMS Group <librenms-project@googlegroups.com>
+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
@@ -42,7 +45,12 @@ behaviour towards others.
 Installation
 ------------
 
-For now please see the existing instructions at http://www.observium.org/.
+See `INSTALL.md` for details.
 
-Please email observium@libertysys.com.au if you would like to participate.
+Contributing
+------------
 
+Clone the repo and file bug reports and pull requests here.
+Join the [librenms-project][1] mailing list to post questions and suggestions.
+
+[1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
