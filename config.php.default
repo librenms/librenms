@@ -35,9 +35,9 @@ $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 #$config['http_auth_guest'] = "guest"; # remember to configure this user if you use http-auth
 
 ### List of RFC1918 networks to allow scanning-based discovery
-$config['nets'][] = "10.0.0.0/8";
-$config['nets'][] = "172.16.0.0/12";
-$config['nets'][] = "192.168.0.0/16";
+#$config['nets'][] = "10.0.0.0/8";
+#$config['nets'][] = "172.16.0.0/12";
+#$config['nets'][] = "192.168.0.0/16";
 
 
 ?>
