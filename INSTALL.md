@@ -1,7 +1,5 @@
 NOTE: What follows is a very rough list of commands.  This works on a fresh install of Ubuntu 12.04.
 
-NOTE: These instructions assume you are using a separate server for your database.  You will need to adjust the instructions if you are running the database on the same server.
-
 NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.
 
 ## On the DB Server ##
@@ -20,16 +18,17 @@ Create database
     FLUSH PRIVILEGES;
     exit
 
-allow MySQL to listen on local LAN
+Replace `<ip>` above with the IP of the server running LibreNMS.  If your database is on the same server as LibreNMS, you can just use `localhost` as the IP address.
+
+If you are deploying a separate database server, you need to change the `bind-address`.  If your MySQL database resides on the same server as LibreNMS, you should skip this step.
 
     vim /etc/mysql/my.cnf
 
-edit line 47 (should be `bind-address = 127.0.0.1`)
-and change it to your IP address
-now restart MySQL
+Find the line: `bind-address = 127.0.0.1`
+
+Change `127.0.0.1` to the IP address that your MySQL server should listen on.  Restart MySQL:
 
     service mysql restart
-
 
 ## On the NMS ##
 
@@ -40,21 +39,13 @@ now restart MySQL
     cp config.php.default config.php
     vim config.php
 
-change lines 6-9 to match your db config
-change lines 17 and 20 to 'librenms'
-change line 31 to match your most common read-only SNMP community string
+Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
 
-copy sql commands to db server
+Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
 
-    scp -r build.sql <ip>:
+Initiate the follow database with the following command:
 
-Subsitute your database server's IP address.  If it's local host, the above step is unnecessary.
-
-## On DB Server ##
-
-    mysql -ulibrenms -p < build.sql
-
-This assumes you used the username `librenms`.  If you used something different, adjust here.
+    php build-base.php
 
 ## On the NMS ##
 
@@ -88,8 +79,7 @@ Next, add the following to `/etc/apache2/available-sites/librenms.conf`
       </Directory>
     </VirtualHost>
 
-Don't forget to change 'example.com' to your domain
-Enable the vhost and restart Apache
+Don't forget to change 'example.com' to your domain, then enable the vhost and restart Apache:
 
     a2ensite librenms.conf
     a2enmod rewrite
@@ -101,13 +91,9 @@ Enable the vhost and restart Apache
 
 This assumes you haven't made community changes--if you have, replace `public` with your community.  It also assumes SNMP v2c.  If you're using v3, there are additional steps (NOTE: instructions for SNMPv3 to come).
 
-Discover localhost
+Discover localhost and poll it for the first time:
 
-    php discovery.php -h all
-
-First poller
-
-    php poller.php -h all
+    php discovery.php -h all && php poller.php -h all
 
 Create the cronjob
 
