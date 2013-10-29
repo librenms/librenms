@@ -1,5 +1,8 @@
 NOTE: What follows is a very rough list of commands.  This works on a fresh install of Ubuntu 12.04.
+
 NOTE: These instructions assume you are using a separate server for your database.  You will need to adjust the instructions if you are running the database on the same server.
+
+NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.
 
 ## On the DB Server ##
 
@@ -30,7 +33,7 @@ now restart MySQL
 
 ## On the NMS ##
 
-    aptitude install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear snmp graphviz php5-mcrypt apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool
+    apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear snmp graphviz php5-mcrypt apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool
     cd /opt
     git clone https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
