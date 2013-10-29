@@ -1,10 +1,15 @@
-NOTE: What follows is a very rough list of commands.  This works on a fresh install of Ubuntu 12.04.
+NOTE: What follows is a very rough list of commands.  This works on a fresh install of CentOS 6.4.
 
 NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.
 
 ## On the DB Server ##
 
-    apt-get install mysql-server mysql-client snmpd
+    yum install net-snmp mysql-server
+    service snmpd start
+    service mysqld start
+    chkconfig --levels 235 mysqld on
+    chkconfig --levels 235 snmpd on
+    mysql_secure_installation
     mysql -uroot -p
 
 Enter the MySQL root password to enter the MySQL command-line interface.
@@ -23,19 +28,26 @@ Replace `<ip>` above with the IP of the server running LibreNMS.  If your databa
 
 If you are deploying a separate database server, you need to change the `bind-address`.  If your MySQL database resides on the same server as LibreNMS, you should skip this step.
 
-    vim /etc/mysql/my.cnf
+    vim /etc/my.cnf
 
-Find the line: `bind-address = 127.0.0.1`
+Add the following line:
+    
+    bind-address = <ip>
 
-Change `127.0.0.1` to the IP address that your MySQL server should listen on.  Restart MySQL:
+Change `<ip>` to the IP address that your MySQL server should listen on.  Restart MySQL:
 
-    service mysql restart
+    service mysqld restart
 
 ## On the NMS ##
 
-Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of Ubuntu 12.04.
+Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of CentOS 6.4.  It also requires the EPEL repository.
 
-    apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear snmp graphviz php5-mcrypt apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool
+    rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+    yum install php php-cli php-gd php-mysql php-snmp php-pear httpd net-snmp graphviz graphviz-php mysql ImageMagick  jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
+    pear install Net_IPv4-1.3.4
+    pear install Net_IPv6-1.2.2b2
+    chkconfig --levels 235 httpd on
+    service httpd start
     
 ### Cloning ###
 
@@ -52,6 +64,10 @@ NOTE: The recommended method of cloning a git repository is HTTPS.  If you would
 Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
 
 Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
+
+Add the following line to the end of `config.php`:
+
+    $config['fping'] = "/usr/sbin/fping";
 
 Initiate the follow database with the following command:
 
@@ -70,7 +86,7 @@ To prepare the web interface (and adding devices shortly), you'll need to create
 First, create and chown the `rrd` directory and create the `logs` directory
 
     mkdir rrd logs
-    chown www-data:www-data rrd/
+    chown apache:apache rrd/
 
 Note that if you're not running Ubuntu, you may need to change the owner to whomever the webserver runs as.
 
@@ -87,11 +103,9 @@ Next, add the following to `/etc/apache2/sites-available/librenms.conf`
       </Directory>
     </VirtualHost>
 
-Don't forget to change 'example.com' to your domain, then enable the vhost and restart Apache:
+Don't forget to restart Apache to make this active:
 
-    a2ensite librenms.conf
-    a2enmod rewrite
-    service apache2 restart
+    service httpd restart
 
 ### Add localhost ###
 
