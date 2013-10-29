@@ -7,8 +7,9 @@ NOTE: These instructions assume you are the root user.  If you are not, prepend 
     apt-get install mysql-server mysql-client snmpd
     mysql -uroot -p
 
-enter root mysql password
-Create database
+Enter the MySQL root password to enter the MySQL command-line interface.
+
+Create database.
 
     CREATE DATABASE librenms;
     GRANT ALL PRIVILEGES ON librenms.*
@@ -47,9 +48,7 @@ Initiate the follow database with the following command:
 
     php build-base.php
 
-## On the NMS ##
-
-Create admin user - priv should be 10
+Create the admin user - priv should be 10
 
     php adduser.php <name> <pass> 10
 
