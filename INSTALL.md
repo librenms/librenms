@@ -33,12 +33,21 @@ Change `127.0.0.1` to the IP address that your MySQL server should listen on.  R
 
 ## On the NMS ##
 
+Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of Ubuntu 12.04.
+
     apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear snmp graphviz php5-mcrypt apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool
+    
+### Cloning ###
+
+You can clone the repository via HTTPS or SSH.  In either case, you need to ensure the appropriate port (443 for HTTPS, 22 for SSH) is open in the outbound direction for your server.
+
     cd /opt
     git clone https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
     cp config.php.default config.php
     vim config.php
+    
+NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
 
 Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
 
@@ -65,7 +74,7 @@ First, create and chown the `rrd` directory and create the `logs` directory
 
 Note that if you're not running Ubuntu, you may need to change the owner to whomever the webserver runs as.
 
-Next, add the following to `/etc/apache2/available-sites/librenms.conf`
+Next, add the following to `/etc/apache2/sites-available/librenms.conf`
 
     <VirtualHost *:80>
       DocumentRoot /opt/librenms/html/
