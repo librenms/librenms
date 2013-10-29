@@ -99,6 +99,7 @@ if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
 }
 
 $config['project_name']     = "LibreNMS";
+$config['project_url']      = "https://github.com/librenms/";
 $config['title_image']      = "";
 $config['stylesheet']       = "css/styles.css";
 $config['mono_font']        = "DejaVuSansMono";

@@ -16,8 +16,8 @@ foreach (dbFetch("SELECT COUNT(*) AS count,os from devices group by `os`") as $d
 
 $stat_serial = base64_encode(serialize($stats));
 
-$url = "http://www.observium.org/latest.php?i=".$stats['ports']."&d=".$stats['devices']."&stats=".$stat_serial."&v=".$config['version'];
-$dataHandle = fopen($url, r);
+#$url = "http://www.observium.org/latest.php?i=".$stats['ports']."&d=".$stats['devices']."&stats=".$stat_serial."&v=".$config['version'];
+#$dataHandle = fopen($url, r);
 
 if ($dataHandle)
 {
