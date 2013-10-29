@@ -217,7 +217,7 @@
   }
 
   // Html template
-  $logo        = $pdf->serializeTCPDFtagParameters(array('images/observium-logo.png', 15, 18, 100, '', '', 'www.observium.org', 'T'));
+  $logo        = $pdf->serializeTCPDFtagParameters(array('images/dummy-logo.png', 15, 18, 100, '', '', 'www.example.com', 'T'));
   $html       .= "<tcpdf method=\"Image\" params=\"".$logo."\" />";
   $html       .= "<h1 class=\"right\">Billing Report</h1>";
   $html       .= "<p></p>";

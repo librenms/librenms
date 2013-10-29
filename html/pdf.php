@@ -54,7 +54,7 @@ class ObsPDF extends TCPDF
     // Set Font
     $this->SetFont('helvetica', 'N', 8);
     // Set Footer text
-    $this->Cell(0, 0, 'Created by Observium (www.observium.org)', 0, false, 'L', 0, 'http://www.observium.org/', 0, false, 'M', 'M');
+    $this->Cell(0, 0, 'Created by '.$config['project_name'], 0, false, 'L', 0, $config['project_url'], 0, false, 'M', 'M');
     $this->Cell(10, 0, 'Page '.$this->getAliasNumPAge().' of '.$this->getAliasNbPages(), 0, false, 'R', 0, '', 0, false, 'M', 'M');
   }
 }
