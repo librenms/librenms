@@ -1,0 +1,930 @@
+--
+-- Copyright (c) 2010 by Ruckus Wireless, Inc.
+-- All Rights Reserved
+--
+
+RUCKUS-ZD-EVENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusEvents
+        FROM RUCKUS-ROOT-MIB
+    MacAddress,
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusZDEventMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless Inc.
+
+        Postal:
+        880 W Maude Ave
+        Sunnyvale, CA 94085
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus ZD event objects, including trap OID and trap payload."
+    ::= { ruckusEvents 2 }
+
+
+-- Groups
+--
+
+ruckusZDEventTraps OBJECT IDENTIFIER      ::= { ruckusZDEventMIB 1 }
+
+ruckusZDEventObjects OBJECT IDENTIFIER    ::= { ruckusZDEventMIB 2 }
+
+
+-- Ruckus Traps
+--
+
+ruckusZDEventAPJoinTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+        "Trigger when there is a AP join event. 
+         The AP's MAC address is enclosed."
+    ::= { ruckusZDEventTraps 1 }
+
+ruckusZDEventSSIDSpoofTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventSSID }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when a SSID-spoofing rogue AP is detected. 
+         The rogue AP's MAC address and SSID are enclosed."
+    ::= { ruckusZDEventTraps 2 }
+
+ruckusZDEventMACSpoofTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventSSID }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when a MAC-spoofing rogue AP is detected. 
+         The rogue AP's MAC address and SSID are enclosed."
+    ::= { ruckusZDEventTraps 3 }
+
+ruckusZDEventRogueAPTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventSSID  }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when a rogue AP is detected.
+         The rogue AP's MAC address and SSID are enclosed."
+    ::= { ruckusZDEventTraps 4 }
+
+ruckusZDEventAPLostTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when AP lost contact.
+         The AP's MAC address is enclosed."
+    ::= { ruckusZDEventTraps 5 }
+
+ruckusZDEventAPLostHeartbeatTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventAPMacAddr }
+
+    STATUS      current
+    DESCRIPTION
+         "Trigger when AP lost heartbeats.
+         The AP's MAC address is enclosed."
+    ::= { ruckusZDEventTraps 6 }
+
+ruckusZDEventClientAuthFailBlockTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventClientMacAddr,
+                  ruckusZDEventAPMacAddr,
+                  ruckusZDEventSSID }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when a client fails authentication too many times in a row.
+         The client's MAC address, AP's MAC address and SSID are enclosed."
+    ::= { ruckusZDEventTraps 7 }
+
+ruckusZDEventAPResetTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent,
+                  ruckusZDEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when AP reboots."
+    ::= { ruckusZDEventTraps 8 }
+
+ruckusZDEventIPChangeTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when IP changes."
+    ::= { ruckusZDEventTraps 9 }
+
+ruckusZDEventSystemColdStartTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when system performs cold start."
+    ::= { ruckusZDEventTraps 10 }
+
+ruckusZDEventAPChannelChangeTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent,
+                  ruckusZDEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when AP channel changes."
+    ::= { ruckusZDEventTraps 11 }
+
+ruckusZDEventRadiusAuthUnavailableTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when RADIUS authentication server unavailable."
+    ::= { ruckusZDEventTraps 12 }
+
+ruckusZDEventRadiusAcctUnavailableTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when RADIUS accounting server unavailable."
+    ::= { ruckusZDEventTraps 13 }
+
+ruckusZDEventClientJoinFailAPBusyTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when client joins fail because AP is busy."
+    ::= { ruckusZDEventTraps 14 }
+
+ruckusZDEventInterferenceADHoc NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when an interference AD hoc is detected."
+    ::= { ruckusZDEventTraps 15 }
+
+ruckusZDEventImageUpgradeFailTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when AP image upgrade fails."
+    ::= { ruckusZDEventTraps 16 }
+
+ruckusZDEventHeartbeatTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger with trap heartbeat sent."
+    ::= { ruckusZDEventTraps 22 }
+
+ruckusZDEventAttackedTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger with a malicious attack is found."
+    ::= { ruckusZDEventTraps 24 }
+
+ruckusZDEventSystemWarmStartTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when system performs warm start."
+    ::= { ruckusZDEventTraps 25 }
+
+ruckusZDEventInterfereAPTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when a rogue AP used same channel with current AP is 
+detected."
+
+    ::= { ruckusZDEventTraps 26 }
+
+ruckusZDEventAPSystemColdStartTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when an AP performs cold start."
+    ::= { ruckusZDEventTraps 31 }
+
+ruckusZDEventAPSystemWarmStartTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when an AP performs warm start."
+    ::= { ruckusZDEventTraps 32 }
+
+ruckusZDEventAPSSIDChangedTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when an AP SSID changed."
+    ::= { ruckusZDEventTraps 33 }
+
+ruckusZDEventAPClientExceedValve NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent,
+                  ruckusZDEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when AP online client exceed valve."
+    ::= { ruckusZDEventTraps 34 }
+
+ruckusZDEventAPAvailableStatusTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when AP is available."
+    ::= { ruckusZDEventTraps 35 }
+
+ruckusZDEventAPWirelessInterfaceFaultTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when AP wireless interface is fault."
+    ::= { ruckusZDEventTraps 36 }
+
+ruckusZDEventSystemCpuUtilExceedValve NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when System CPU utilization is exceed valve."
+    ::= { ruckusZDEventTraps 37 }
+
+ruckusZDEventSystemMemUtilExceedValve NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when System memory utilization is exceed valve."
+    ::= { ruckusZDEventTraps 38 }
+
+ruckusZDEventSystemBandwidthUtilExceedValve NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when System bandwidth utilization is exceed valve."
+    ::= { ruckusZDEventTraps 39 }
+
+ruckusZDEventSystemDropPacketRateExceedValve NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when System drop packet rate is exceed valve."
+    ::= { ruckusZDEventTraps 40 }
+
+ruckusZDEventAPSyncTimeFail NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when AP sync clock failure with AC."
+    ::= { ruckusZDEventTraps 41 }
+
+ruckusZDEventSystemCpuUtilClrWarn NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when System CPU utilization is under the valve."
+    ::= { ruckusZDEventTraps 42 }
+
+ruckusZDEventSystemMemUtilClrwarn NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when System memory utilization is under the valve."
+    ::= { ruckusZDEventTraps 43 }
+
+ruckusZDEventClientJoin NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventClientMacAddr, 
+                  ruckusZDEventAPMacAddr, 
+                  ruckusZDEventSSID }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when a client join a AP success.
+         The client's MAC address, AP's MAC address and SSID are enclosed."
+    ::= { ruckusZDEventTraps 60 }
+
+ruckusZDEventClientJoinFailed NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventClientMacAddr, 
+                  ruckusZDEventAPMacAddr, 
+                  ruckusZDEventSSID,
+                  ruckusZDEventReason }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when a client join a AP failed.
+         The client's MAC address, AP's MAC address and SSID are enclosed."
+    ::= { ruckusZDEventTraps 61 }
+
+ruckusZDEventClientJoinFailedAPBusy NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventClientMacAddr, 
+                  ruckusZDEventAPMacAddr, 
+                  ruckusZDEventSSID }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when a client join a AP failed because of AP too busy.
+         The client's MAC address, AP's MAC address and SSID are enclosed."
+    ::= { ruckusZDEventTraps 62 } 
+
+ruckusZDEventClientDisconnect NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventClientMacAddr, 
+                  ruckusZDEventAPMacAddr, 
+                  ruckusZDEventSSID  }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when a client disconnect from AP.
+         The client's MAC address, AP's MAC address and SSID are enclosed."
+    ::= { ruckusZDEventTraps 63 } 
+
+ruckusZDEventClientRoamOut NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventClientMacAddr, 
+                  ruckusZDEventAPMacAddr, 
+                  ruckusZDEventSSID  }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when a client roam out from AP.
+         The client's MAC address, AP's MAC address and SSID are enclosed."
+    ::= { ruckusZDEventTraps 64 }
+
+ruckusZDEventClientRoamIn NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventClientMacAddr, 
+                  ruckusZDEventAPMacAddr, 
+                  ruckusZDEventSSID  }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when a client roam in from AP.
+         The client's MAC address, AP's MAC address and SSID are enclosed."
+    ::= { ruckusZDEventTraps 65 }                      
+
+ruckusZDEventClientAuthFailed NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventClientMacAddr, 
+                  ruckusZDEventAPMacAddr, 
+                  ruckusZDEventSSID,
+                  ruckusZDEventReason  }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when a client authenticate failure .
+         The client's MAC address, AP's MAC address and SSID are enclosed.Failure reason."
+    ::= { ruckusZDEventTraps 66 } 
+    
+ruckusZDEventClientAuthorizationFailed NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventClientMacAddr, 
+                  ruckusZDEventAPMacAddr, 
+                  ruckusZDEventSSID  }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when a client has no authorization to join a AP.
+         The client's MAC address, AP's MAC address and SSID are enclosed."
+    ::= { ruckusZDEventTraps 67 }
+
+ruckusZDEventAPCPUvalve NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent,
+                  ruckusZDEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when AP cpu util exceed valve."
+    ::= { ruckusZDEventTraps 83 }
+
+ruckusZDEventAPMEMvalve NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent,
+                  ruckusZDEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+         "Triggered when AP memory util exceed valve."
+    ::= { ruckusZDEventTraps 84 }
+
+ruckusZDEventAPCPUvalveClrwarn NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent,
+                  ruckusZDEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when AP cpu utilization is under the valve."
+    ::= { ruckusZDEventTraps 85 }
+
+ruckusZDEventAPMEMvalveClrwarn NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent,
+                  ruckusZDEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when AP memory utilization is under the valve."
+    ::= { ruckusZDEventTraps 86 }
+
+ruckusZDEventAPNumStaExceedValveClrwarn NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent,
+                  ruckusZDEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when online client clr warning."
+    ::= { ruckusZDEventTraps 87 }
+
+ruckusZDEventDhcpPoolFull NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when DHCP pool is full."
+    ::= { ruckusZDEventTraps 88 }
+
+ruckusZDEventDhcpPoolAbun NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventSerial,
+                  ruckusZDEventNEID,
+                  ruckusZDEventSeverity,
+                  ruckusZDEventType,
+                  ruckusZDEventTime,
+                  ruckusZDEventStatus,
+                  ruckusZDEventTitle,
+                  ruckusZDEventContent }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when DHCP pool is abundant."
+    ::= { ruckusZDEventTraps 89 }
+
+ruckusZDEventSmartRedundancyChangetoActive NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventIpAddr }
+    STATUS      current
+    DESCRIPTION
+         "[Smart Redundancy] Peer ZoneDirector peer ip not found, system changed to active state"
+    ::= { ruckusZDEventTraps 100 }
+    
+ruckusZDEventSmartRedundancyActiveConnected NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventIpAddr }
+    STATUS      current
+    DESCRIPTION
+         "[Smart Redundancy] connected, system is in active state"
+    ::= { ruckusZDEventTraps 101 }    
+    
+ruckusZDEventSmartRedundancyActiveDisconnected NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventIpAddr }
+    STATUS      current
+    DESCRIPTION
+         "[Smart Redundancy] disconnected, system is in active state"
+    ::= { ruckusZDEventTraps 102 } 
+    
+ruckusZDEventSmartRedundancyStandbyConnected NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventIpAddr }
+    STATUS      current
+    DESCRIPTION
+         "[Smart Redundancy] connected, system is in standby state"
+    ::= { ruckusZDEventTraps 103 } 
+    
+ruckusZDEventSmartRedundancyStandbyDisconnected NOTIFICATION-TYPE
+    OBJECTS     { ruckusZDEventIpAddr }
+    STATUS      current
+    DESCRIPTION
+         "[Smart Redundancy] disconnected, system is in standby state"
+    ::= { ruckusZDEventTraps 104 }             
+                      
+--  Trap payload
+--
+
+ruckusZDEventSerial OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Trap serial number."
+    ::= { ruckusZDEventObjects 1 }
+
+ruckusZDEventNEID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Network element ID."
+    ::= { ruckusZDEventObjects 2 }
+
+ruckusZDEventSeverity OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Severity level of the trap."
+    ::= { ruckusZDEventObjects 3 }
+
+ruckusZDEventType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Trap type."
+    ::= { ruckusZDEventObjects 4 }
+
+ruckusZDEventTime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Time when trap occured."
+    ::= { ruckusZDEventObjects 5 }
+
+ruckusZDEventStatus OBJECT-TYPE
+    SYNTAX      INTEGER { raise(1),
+                          clear(2) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Trap status."
+    ::= { ruckusZDEventObjects 6 }
+
+ruckusZDEventTitle OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Trap title."
+    ::= { ruckusZDEventObjects 7 }
+
+ruckusZDEventContent OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Trap content."
+    ::= { ruckusZDEventObjects 8 }
+
+ruckusZDEventClientMacAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The client's MAC address."
+    ::= { ruckusZDEventObjects 15 }
+
+ruckusZDEventAPMacAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The AP's MAC address."
+    ::= { ruckusZDEventObjects 18 }
+
+ruckusZDEventRogueMacAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The rogue AP's MAC address."
+    ::= { ruckusZDEventObjects 20 }
+
+ruckusZDEventSSID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "SSID."
+    ::= { ruckusZDEventObjects 23 }
+
+ruckusZDEventChannel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Channel."
+    ::= { ruckusZDEventObjects 25 }
+
+ruckusZDEventReason OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Failure Reason."
+    ::= { ruckusZDEventObjects 28 }
+    
+ruckusZDEventIpAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IpAddress (ipv4 and ipv6)."
+    ::= { ruckusZDEventObjects 30 }   
+    
+END

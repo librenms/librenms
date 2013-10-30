@@ -1,0 +1,660 @@
+--
+-- Copyright (c) 2010 by Ruckus Wireless, Inc.
+-- All Rights Reserved
+--
+
+RUCKUS-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusProducts
+        FROM RUCKUS-ROOT-MIB
+    ifIndex
+        FROM IF-MIB
+    TruthValue,
+    DisplayString,
+    MacAddress
+        FROM SNMPv2-TC
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    RuckusCountryCode
+        FROM RUCKUS-TC-MIB;
+
+
+ruckusProductsMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        Postal:
+        880 W Maude Ave
+        Sunnyvale, CA 94085
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus product OID registration mib."
+    ::= { ruckusProducts 1 }
+
+
+-- Scalars and Tables
+--
+
+ruckusWirelessRouterProducts  OBJECT IDENTIFIER ::= { ruckusProductsMIB 1 }
+
+ruckusWirelessAdapterProducts OBJECT IDENTIFIER ::= { ruckusProductsMIB 2 }
+
+ruckusWirelessMetroProducts   OBJECT IDENTIFIER ::= { ruckusProductsMIB 3 }
+
+ruckusWirelessHotzoneProducts OBJECT IDENTIFIER ::= { ruckusProductsMIB 4 }
+
+ruckusWirelessControllerProducts OBJECT IDENTIFIER ::= { ruckusProductsMIB 5 }
+
+--
+-- Wireless Router Products
+--
+-- VF2825 - 802.11b/g AP, 5 Ethernet ports, 8MB Flash, 32MB DRAM
+ruckusVF2825 OBJECT IDENTIFIER  ::= { ruckusWirelessRouterProducts 1 }
+
+-- VF2811 - 802.11b/g AP, 1 Ethernet port, 8MB Flash, 16MB DRAM
+ruckusVF2811 OBJECT IDENTIFIER  ::= { ruckusWirelessRouterProducts 2 }
+
+-- VF2821 - 802.11b/g AP, 1 Ethernet port, 8MB Flash, 32MB DRAM
+ruckusVF2821 OBJECT IDENTIFIER  ::= { ruckusWirelessRouterProducts 3 }
+
+-- VF2835 - 802.11b/g AP, 5 Ethernet ports, 16MB Flash, 32MB DRAM
+ruckusVF2835 OBJECT IDENTIFIER  ::= { ruckusWirelessRouterProducts 4 }
+
+-- VF7811 - 802.11n AP, 1 Ethernet port, 16MB Flash, 32MB DRAM
+ruckusVF7811 OBJECT IDENTIFIER  ::= { ruckusWirelessRouterProducts 5 }
+
+--
+-- Wireless Adapter Products
+--
+-- VF2111 - 802.11b/g Adapter, 1 Ethernet port, 8MB Flash, 16MB DRAM
+ruckusVF2111 OBJECT IDENTIFIER  ::= { ruckusWirelessAdapterProducts 1 }
+
+-- VF2121 - 802.11b/g Adapter, 1 Ethernet port, 8MB Flash, 16MB DRAM
+ruckusVF2121 OBJECT IDENTIFIER  ::= { ruckusWirelessAdapterProducts 2 }
+
+-- VF7111 - 802.11n Adapter, 1 Ethernet port, 16MB Flash, 32MB DRAM
+ruckusVF7111 OBJECT IDENTIFIER  ::= { ruckusWirelessAdapterProducts 3 }
+
+--
+-- Wireless Metro Products
+--
+-- MM2225 - 802.11b/g Metro CPE, 5 Ethernet ports, 16MB Flash, 32MB DRAM
+ruckusMM2225 OBJECT IDENTIFIER  ::= { ruckusWirelessMetroProducts 1 }
+
+-- MM2211 - 802.11b/g Metro CPE, 1 Ethernet port, 16MB Flash, 32MB DRAM
+ruckusMM2211 OBJECT IDENTIFIER  ::= { ruckusWirelessMetroProducts 2 }
+
+-- MM2221 - 802.11b/g Metro CPE, 1 Ethernet port, 16MB Flash, 32MB DRAM
+ruckusMM2221 OBJECT IDENTIFIER  ::= { ruckusWirelessMetroProducts 3 }
+
+--
+-- Wireless Hotzone Products
+--
+-- ZF2925 - 802.11b/g AP, 5 Ethernet ports, 8MB Flash, 32MB DRAM
+ruckusZF2925 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 1 }
+    
+-- ZF2942 - 802.11b/g AP, 2 Ethernet ports, 16MB Flash, 32MB DRAM
+ruckusZF2942 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 2 }
+  
+-- ZF7942 - 802.11n AP, 2 Ethernet ports, 16MB Flash, 64MB DRAM
+ruckusZF7942 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 3 }
+
+-- ZF7962 - 802.11n Dual-Band AP, 2 Ethernet ports, 16B Flash, 64MB DRAM
+ruckusZF7962 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 4 }
+
+-- ZF2741 - 802.11b/g AP, 1 Ethernet ports, 16MB Flash, 32MB DRAM
+ruckusZF2741 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 5 }
+
+-- ZF7762 - 802.11n Dual-Band Outdoor AP, 2 Ethernet ports, 16MB Flash, 32MB DRAM
+ruckusZF7762 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 6 }
+
+-- ZF7762-S - 
+ruckusZF7762S OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 8 }
+
+-- ZF7762-T - 
+ruckusZF7762T OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 9 }
+    
+-- ZF7762-N - 
+ruckusZF7762N OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 10 }
+    
+-- ZF7343 - 
+ruckusZF7343 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 12 }
+    
+-- ZF7363 - 
+ruckusZF7363 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 13 }
+    
+-- ZF7341 - 
+ruckusZF7341 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 14 }
+
+-- ZF7211 - 
+--ruckusZF7211 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 15 }
+
+-- ZF7731 - 
+ruckusZF7731 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 16 }
+
+-- ZF7025 - 
+ruckusZF7025 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 20 }
+
+-- ZF7321 - 
+ruckusZF7321 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 22 }
+
+-- ZF7321-U - 
+ruckusZF7321U OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 23 }
+
+-- ZF2741-EXT - 
+ruckusZF2741EXT OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 24 }
+
+-- ZF7982 - 
+ruckusZF7982 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 25 }
+
+-- ZF7782 - 
+ruckusZF7782 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 28 }
+
+-- ZF7782-S - 
+ruckusZF7782S OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 29 }
+
+-- ZF7782-N - 
+ruckusZF7782N OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 30 }
+
+-- ZF7782-E - 
+ruckusZF7782E OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 31 }
+
+-- ZF8800-s-ac - 
+ruckusZF8800SAC OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 32 }
+
+-- ZF7762-AC - 
+ruckusZF7762AC OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 35 }
+
+-- ZF7762-S-AC - 
+ruckusZF7762SAC OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 36 }
+
+-- ZF7762-T-AC - 
+ruckusZF7762TAC OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 37 }
+
+-- ZF7372 - 
+ruckusZF7372 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 40 }
+
+-- ZF7372-E - 
+ruckusZF7372E OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 41 }
+
+-- ZF7352 - 
+ruckusZF7352 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 45 }
+
+-- ZF7351 - 
+ruckusZF7351 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 48 }
+
+-- ZF7742 - 
+ruckusZF7742 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 50 }
+
+-- ZF7055 - 
+ruckusZF7055 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 52 }
+
+-- ZF7781-M - 
+ruckusZF7781M OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 55 }
+
+-- ZF7781CM - 
+ruckusZF7781CM OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 56 }
+
+-- ZF7781CM-E - 
+ruckusZF7781CME OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 57 }
+
+-- ZF7781CM-S - 
+ruckusZF7781CMS OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 58 }
+
+-- ZF7781-FN - 
+ruckusZF7781FN OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 60 }
+
+-- ZF7781-FN-E - 
+ruckusZF7781FNE OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 61 }
+
+-- ZF7781-FN-S - 
+ruckusZF7781FNS OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 62 }
+
+-- SC8800-S-AC - 
+ruckusSC8800SAC OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 65 }
+
+-- SC8800-S - 
+ruckusSC8800S OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 66 }
+
+
+-- ZF7761CM - 802.11n Dual-Band Outdoor AP with CableModem, 2 Ethernet ports, 16MB Flash, 32MB DRAM
+ruckusZF7761CM OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 7 }
+
+ruckusZF7761CMControlLED OBJECT-TYPE
+   SYNTAX  INTEGER {
+         ledPerCM(1),
+         ledPerAP(2),
+         ledAlternateMode1Mode2OneHour(3),
+         ledAlternateMode1Mode2Mode6(4),
+         blueActive(5),
+         blueActiveCMOnlineLed(6),
+         ledAllOff(7),
+         heartbeatOffCM(8),
+         heartbeatOffAP(9),
+         softResetAP(10),
+         powerCycleAP(11),
+         factoryResetAP(12),
+         softResetCM(13),
+         powerCycleCM(14),
+         factoryResetCM(15) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "ledPerCM(1):                      LEDs enabled per Cable Modem definition,
+         ledPerAP(2):                      LEDs configured per Access Point definition,
+         ledAlternateMode1Mode2OneHour(3): Alternalte between modes 1 and 2 at a 30 second period then disabled after one hour,
+         ledAlternateMode1Mode2Mode6(4):   Alternalte between modes 1 and 2 at a 30 second period and then go to mode 6
+         blueActive(5):                    Blue Active Surge Protection Indicator,
+         blueActiveCMOnlineLed(6):         Blue Active Surge Protection Indicator and Cable Modem online Green LED enabled,
+         ledAllOff(7):                     All LEDs disabled,
+         heartbeatOffCM(8):                Disable Cable Modem heartbeat monitoring,
+         heartbeatOffAP(9):                Disable Access Point heartbeat monitoring,
+         softResetAP(10):                  Soft reset of Access Point,
+         powerCycleAP(11):                 Power cycle Access Point,
+         factoryResetAP(12):               Reset Access Point to factory defaults,
+         softResetCM(13):                  Soft reset of Cable Modem,
+         powerCycleCM(14):                 Power cycle Cable Modem,
+         factoryResetCM(15):               Reset Cable Modem to factory defaults"
+    DEFVAL { ledPerCM }
+    ::= { ruckusZF7761CM 3 }
+
+ruckusZF7761CMWanIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies the IP address of the Cable Modem WAN interface."
+    ::= { ruckusZF7761CM 4 }
+
+ruckusZF7761CMCustomization OBJECT IDENTIFIER          ::= { ruckusZF7761CM 5 }
+
+ruckusZF7761CMHTTPService OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable HTTP service."
+    DEFVAL { false }
+    ::= { ruckusZF7761CMCustomization 1 }
+
+ruckusZF7761CMTelnetService OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable Telnet service."
+    DEFVAL { false }
+    ::= { ruckusZF7761CMCustomization 2 }
+
+ruckusZF7761CMSSHService OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable SSH service."
+    DEFVAL { true }
+    ::= { ruckusZF7761CMCustomization 3 }
+
+ruckusZF7761CMUsername OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies username of cable modem. "
+    ::= { ruckusZF7761CMCustomization 4 }
+
+ruckusZF7761CMPassword OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies password of cable modem. "
+    ::= { ruckusZF7761CMCustomization 5 }
+
+ruckusZF7761CMLEDMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+         ledAllOff(0),
+         blueActive(1),
+         blueActiveCMOnlineLed(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "ledAllOff(0):               All LEDs disabled after 3 second delay,
+         blueActive(1):              Blue Active Surge Protection Indicator,
+         blueActiveCMOnlineLed(2):   Blue Active Surge Protection Indicator and Cable Modem online Green LED enabled"
+    ::= { ruckusZF7761CM 6 }
+
+ruckusZF7761CMHeartbeatMonitorCM OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable Cable Modem heartbeat monitoring."
+
+    ::= { ruckusZF7761CM 7 }
+
+ruckusZF7761CMHeartbeatMonitorAP OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "Enable/disable Access Point heartbeat monitoring."    ::= { ruckusZF7761CM 8 }
+--
+-- Wireless Controller Products
+--
+-- ZD1000 - Access Controller, 2 Ethernet ports, 32MB Flash, 64MB DRAM
+ruckusZD1000 OBJECT IDENTIFIER  ::= { ruckusWirelessControllerProducts 1 }
+
+-- ZD1100 - Access Controller, 2 Ethernet ports
+ruckusZD1100 OBJECT IDENTIFIER  ::= { ruckusWirelessControllerProducts 2 }
+
+-- ZD3000 - Access Controller, 2 Ethernet ports, 2048MB Flash, 1024MB DRAM
+ruckusZD3000 OBJECT IDENTIFIER  ::= { ruckusWirelessControllerProducts 3 }
+
+-- ZD5000 - Access Controller, 
+ruckusZD5000 OBJECT IDENTIFIER  ::= { ruckusWirelessControllerProducts 8 }
+
+-- ZD6000 - Access Controller, 
+--ruckusZD6000 OBJECT IDENTIFIER  ::= { ruckusWirelessControllerProducts 9 }
+
+ruckusZD1000SystemName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "System name"
+    ::= { ruckusZD1000 1 }
+
+ruckusZD1000SystemIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP Address"
+    ::= { ruckusZD1000 2 }
+
+ruckusZD1000SystemMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC Address"
+    ::= { ruckusZD1000 3 }
+
+ruckusZD1000SystemUptime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time"
+    ::= { ruckusZD1000 4 }
+
+ruckusZD1000SystemModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model"
+    ::= { ruckusZD1000 5 }
+
+ruckusZD1000SystemLicensedAPs OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Licensed APs"
+    ::= { ruckusZD1000 6 }
+
+ruckusZD1000SystemSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number"
+    ::= { ruckusZD1000 7 }
+
+ruckusZD1000SystemVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Software version"
+    ::= { ruckusZD1000 8 }
+
+ruckusZD1000CountryCode OBJECT-TYPE
+    SYNTAX  RuckusCountryCode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Country code"
+    ::= { ruckusZD1000 9 }
+
+
+ruckusZD1100SystemName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "System name"
+    ::= { ruckusZD1100 1 }
+
+ruckusZD1100SystemIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP Address"
+    ::= { ruckusZD1100 2 }
+
+ruckusZD1100SystemMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC Address"
+    ::= { ruckusZD1100 3 }
+
+ruckusZD1100SystemUptime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time"
+    ::= { ruckusZD1100 4 }
+
+ruckusZD1100SystemModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model"
+    ::= { ruckusZD1100 5 }
+
+ruckusZD1100SystemLicensedAPs OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Licensed APs"
+    ::= { ruckusZD1100 6 }
+
+ruckusZD1100SystemSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number"
+    ::= { ruckusZD1100 7 }
+
+ruckusZD1100SystemVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Software version"
+    ::= { ruckusZD1100 8 }
+
+ruckusZD1100CountryCode OBJECT-TYPE
+    SYNTAX  RuckusCountryCode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Country code"
+    ::= { ruckusZD1100 9 }
+
+
+
+ruckusZD3000SystemName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "System name"
+    ::= { ruckusZD3000 1 }
+
+ruckusZD3000SystemIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP Address"
+    ::= { ruckusZD3000 2 }
+
+ruckusZD3000SystemMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC Address"
+    ::= { ruckusZD3000 3 }
+
+ruckusZD3000SystemUptime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time"
+    ::= { ruckusZD3000 4 }
+
+ruckusZD3000SystemModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model"
+    ::= { ruckusZD3000 5 }
+
+ruckusZD3000SystemLicensedAPs OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Licensed APs"
+    ::= { ruckusZD3000 6 }
+
+ruckusZD3000SystemSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number"
+    ::= { ruckusZD3000 7 }
+
+ruckusZD3000SystemVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Software version"
+    ::= { ruckusZD3000 8 }
+
+ruckusZD3000CountryCode OBJECT-TYPE
+    SYNTAX  RuckusCountryCode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Country code"
+    ::= { ruckusZD3000 9 }
+
+
+ruckusZD5000SystemName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "System name"
+    ::= { ruckusZD5000 1 }
+
+ruckusZD5000SystemIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP Address"
+    ::= { ruckusZD5000 2 }
+
+ruckusZD5000SystemMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC Address"
+    ::= { ruckusZD5000 3 }
+
+ruckusZD5000SystemUptime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time"
+    ::= { ruckusZD5000 4 }
+
+ruckusZD5000SystemModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model"
+    ::= { ruckusZD5000 5 }
+
+ruckusZD5000SystemLicensedAPs OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Licensed APs"
+    ::= { ruckusZD5000 6 }
+
+ruckusZD5000SystemSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number"
+    ::= { ruckusZD5000 7 }
+
+ruckusZD5000SystemVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Software version"
+    ::= { ruckusZD5000 8 }
+
+ruckusZD5000CountryCode OBJECT-TYPE
+    SYNTAX  RuckusCountryCode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Country code"
+    ::= { ruckusZD5000 9 }
+
+
+END
