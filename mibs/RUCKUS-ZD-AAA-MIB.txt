@@ -1,0 +1,243 @@
+--
+-- Copyright (c) 2010 by Ruckus Wireless, Inc.
+-- All Rights Reserved
+--
+
+RUCKUS-ZD-AAA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusZDWLANModule
+        FROM RUCKUS-ROOT-MIB
+    RowStatus
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusZDAAAMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        Postal:
+        880 W Maude Ave
+        Sunnyvale, CA 94085
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus ZD AAA Configuration mib"
+    ::= { ruckusZDWLANModule 3 }
+
+ruckusZDAAAObjects OBJECT IDENTIFIER     ::= { ruckusZDAAAMIB 1 }
+
+ruckusZDAAAConfig OBJECT IDENTIFIER    ::= { ruckusZDAAAObjects 1 }
+
+
+ruckusZDAAAConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDAAAConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD AAA table."
+    ::= { ruckusZDAAAConfig 1 }
+
+ruckusZDAAAConfigEntry OBJECT-TYPE
+    SYNTAX  RuckusZDAAAConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD AAA configuration entry."
+    INDEX {
+        ruckusZDAAAConfigID }
+    ::= { ruckusZDAAAConfigTable 1 }
+
+RuckusZDAAAConfigEntry ::= SEQUENCE {
+  ruckusZDAAAConfigID                        		INTEGER,
+  ruckusZDAAAConfigName                			OCTET STRING,
+  ruckusZDAAAConfigServiceType            		INTEGER, 
+  ruckusZDAAAConfigRowStatus				RowStatus
+}
+
+ruckusZDAAAConfigID OBJECT-TYPE
+    SYNTAX  INTEGER (3..32)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "AAA Directory Server ID."
+    ::= { ruckusZDAAAConfigEntry 1 }
+
+ruckusZDAAAConfigName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..63)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Server name for this AAA or Directory Server. It can't be modified after creating. "
+    ::= { ruckusZDAAAConfigEntry 2 }
+
+ruckusZDAAAConfigServiceType OBJECT-TYPE
+    SYNTAX  INTEGER {
+            active-directory(1),
+            ldap-directory(2),
+            aaa-authentication(3),       
+	    aaa-accounting(4) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Service type for this AAA or LDAP/Active Directory server.
+         For current version,active-directory and ldap-directory are not supported(for set)"
+        DEFVAL {aaa-authentication}
+    ::= { ruckusZDAAAConfigEntry 3 }    
+
+    
+ruckusZDAAAConfigRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Row Status ,Control of Add, Delete of the Directory Server.
+        1,ACTIVE state,only for read;
+        4,CREATEANDGO, create a new table;
+        6,DESTROY, delete a existing table."
+    ::= { ruckusZDAAAConfigEntry 10 }    
+
+
+
+ruckusZDAAASvrTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDAAASvrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD AAA Server table,including access server and account server."
+    ::= { ruckusZDAAAConfig 2 }
+
+ruckusZDAAASvrEntry OBJECT-TYPE
+    SYNTAX  RuckusZDAAASvrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD AAA Svr entry."
+    INDEX {
+        ruckusZDAAAConfigID }
+    ::= { ruckusZDAAASvrTable 1 }
+
+RuckusZDAAASvrEntry ::= SEQUENCE {
+
+  ruckusZDAAARadiusBackupControl		INTEGER, 
+
+  ruckusZDAAARadiusPrimarySvrIpAddress		OCTET STRING,
+  ruckusZDAAARadiusPrimarySvrPort		INTEGER,
+  ruckusZDAAARadiusPrimarySvrPasswd		OCTET STRING,
+
+  ruckusZDAAARadiusSecondarySvrIpAddress	OCTET STRING,
+  ruckusZDAAARadiusSecondarySvrPort		INTEGER,
+  ruckusZDAAARadiusSecondarySvrPasswd		OCTET STRING,
+
+  ruckusZDAAARadiusFailoverTimeout		INTEGER,
+  ruckusZDAAARadiusFailoverRetry		INTEGER,
+  ruckusZDAAARadiusFailoverReconnectPrimary	INTEGER
+}
+
+ruckusZDAAARadiusBackupControl OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable Primary-Secondary Backup scheme for this RADIUS Server.
+         If enable,Secondary aaa server would be used.
+         If diable,Secondary aaa server would not be used"
+        DEFVAL {disable}
+    ::= { ruckusZDAAASvrEntry 5}
+
+ruckusZDAAARadiusPrimarySvrIpAddress OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))  
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The IP(V4 or V6) Address choosen for this RADIUS or Directory Server."
+    ::= { ruckusZDAAASvrEntry 10 }
+
+ruckusZDAAARadiusPrimarySvrPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The port number choosen for this RADIUS Server.
+        for auth    : the value should be : 1812;
+        for account : the value should be : 1813."
+    ::= { ruckusZDAAASvrEntry 11 }
+
+ruckusZDAAARadiusPrimarySvrPasswd OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..32)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Password entered for this RADIUS Server."
+    ::= { ruckusZDAAASvrEntry 12 }
+
+ruckusZDAAARadiusSecondarySvrIpAddress OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))   
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The IP(V4 or V6) Address choosen for the backup RADIUS Server."
+    ::= { ruckusZDAAASvrEntry 15 }
+
+ruckusZDAAARadiusSecondarySvrPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The port number choosen for the backup RADIUS Server.
+        for auth    : the value should be : 1812;
+        for account : the value should be : 1813."
+    ::= { ruckusZDAAASvrEntry 16 }
+
+ruckusZDAAARadiusSecondarySvrPasswd OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..32)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Password entered for the backup RADIUS Server."
+    ::= { ruckusZDAAASvrEntry 17 }
+
+ruckusZDAAARadiusFailoverTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (3..10)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The timeout in seconds configured for RADIUS Server Failover for the Server."
+        DEFVAL {5}
+    ::= { ruckusZDAAASvrEntry 20 }
+
+ruckusZDAAARadiusFailoverRetry OBJECT-TYPE
+    SYNTAX  INTEGER (2..10)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The number of reconnect retry configured for RADIUS Server Failover for the Server."
+        DEFVAL {2}
+    ::= { ruckusZDAAASvrEntry 21 }
+
+ruckusZDAAARadiusFailoverReconnectPrimary OBJECT-TYPE
+    SYNTAX  INTEGER (2..10)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The number of seconds configured for RADIUS Server to reconnect to the Primary Server for the Server."
+        DEFVAL {5}
+    ::= { ruckusZDAAASvrEntry 22 }
+
+
+END
