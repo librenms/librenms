@@ -353,10 +353,9 @@ L.MarkerClusterGroup.include({
 
 		if (this._map.options.zoomAnimation) {
 			this._map.on('zoomstart', this._unspiderfyZoomStart, this);
-		} else {
-			//Browsers without zoomAnimation don't fire zoomstart
-			this._map.on('zoomend', this._unspiderfyWrapper, this);
 		}
+		//Browsers without zoomAnimation or a big zoom don't fire zoomstart
+		this._map.on('zoomend', this._noanimationUnspiderfy, this);
 
 		if (L.Path.SVG && !L.Browser.touch) {
 			this._map._initPathRoot();
