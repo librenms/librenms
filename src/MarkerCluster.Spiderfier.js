@@ -111,6 +111,8 @@ L.MarkerCluster.include({
 				delete m._spiderLeg;
 			}
 		}
+
+		group._spiderfied = null;
 	}
 });
 

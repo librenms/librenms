@@ -67,4 +67,26 @@
 		expect(marker._container.parentNode).to.be(map._pathRoot);
 		expect(marker2._container.parentNode).to.be(map._pathRoot);
 	});
+
+	describe('zoomend event listener', function () {
+		it('unspiderfies correctly', function () {
+
+			var group = new L.MarkerClusterGroup();
+			var marker = new L.Circle([1.5, 1.5], 10);
+			var marker2 = new L.Circle([1.5, 1.5], 10);
+
+			group.addLayer(marker);
+			group.addLayer(marker2);
+			map.addLayer(group);
+
+			marker.__parent.spiderfy();
+
+			expect(group._spiderfied).to.not.be(null);
+
+			map.fire('zoomend');
+
+			//We should unspiderfy with no animation, so this should be null
+			expect(group._spiderfied).to.be(null);
+		});
+	});
 });
