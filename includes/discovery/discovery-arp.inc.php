@@ -9,7 +9,7 @@
 //
 // Copyright (c) 2012-2013 Gear Consulting Pty Ltd <http://libertysys.com.au/>
 //
-// Author:  Paul Gear <observium@libertysys.com.au>
+// Author:  Paul Gear <librenms@libertysys.com.au>
 // License: GPLv3
 //
 
@@ -23,17 +23,19 @@ $deviceid = $device['device_id'];
 // Find all IPv4 addresses in the MAC table that haven't been discovered on monitored devices.
 $sql = "
 SELECT *
-FROM ip_mac as m, ports as i
+FROM ipv4_mac as m, ports as i
 WHERE m.port_id = i.port_id
     AND i.device_id = ?
     AND i.deleted = 0
     AND NOT EXISTS (
 	SELECT * FROM ipv4_addresses a
-	WHERE a.ipv4_address = m.ip_address
+	WHERE a.ipv4_address = m.ipv4_address
     )
 GROUP BY ip_address
 ORDER BY ip_address
 ";
+
+// FIXME: Observium now uses ip_mac.ip_address in place of ipv4_mac.ipv4_address - why?
 
 unset($names);
 unset($ips);
