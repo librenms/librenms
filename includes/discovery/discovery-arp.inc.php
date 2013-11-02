@@ -31,8 +31,8 @@ WHERE m.port_id = i.port_id
 	SELECT * FROM ipv4_addresses a
 	WHERE a.ipv4_address = m.ipv4_address
     )
-GROUP BY ip_address
-ORDER BY ip_address
+GROUP BY ipv4_address
+ORDER BY ipv4_address
 ";
 
 // FIXME: Observium now uses ip_mac.ip_address in place of ipv4_mac.ipv4_address - why?
