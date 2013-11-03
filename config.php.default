@@ -41,6 +41,6 @@ $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 
 # following is necessary for poller-wrapper
 # poller-wrapper is released public domain
-
+$config['poller-wrapper']['alerter'] = FALSE;
 
 ?>
