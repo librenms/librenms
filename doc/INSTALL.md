@@ -1,6 +1,6 @@
-NOTE: What follows is a very rough list of commands.  This works on a fresh install of Ubuntu 12.04.
+> NOTE: What follows is a very rough list of commands.  This works on a fresh install of Ubuntu 12.04.
 
-NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.
+> NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.
 
 ## On the DB Server ##
 
@@ -47,7 +47,7 @@ You can clone the repository via HTTPS or SSH.  In either case, you need to ensu
     cp config.php.default config.php
     vim config.php
     
-NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
+> NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
 
 Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
 
@@ -72,7 +72,7 @@ First, create and chown the `rrd` directory and create the `logs` directory
     mkdir rrd logs
     chown www-data:www-data rrd/
 
-Note that if you're not running Ubuntu, you may need to change the owner to whomever the webserver runs as.
+> NOTE: If you're not running Ubuntu, you may need to change the owner to whomever the webserver runs as.
 
 Next, add the following to `/etc/apache2/sites-available/librenms.conf`
 
