@@ -51,6 +51,25 @@ Documentation
 For now documentation can be found in the [doc directory][5].
 
 
+Try It
+------
+
+You can try LibreNMS by downloading a VM image.  Currently, a Debian-based image is supplied and has been tested with [VMware Fusion 5][8].
+
+Download the VMware Fusion 5 image at ftp://librenms.label-switched.net/pub/librenms_vm.zip, open it, and log in as `root` with the password `root`.  Enter the following commands:
+
+    cd /opt/librenms
+    git pull
+    php discover.php -h all
+    php poller.php -h all
+
+You'll then need to find out what the IP of your VM is (`ifconfig | grep add`) and create a DNS entry for `librenms.example.com` to point to that IP.  You can also edit your `/etc/hosts` file with the following line:
+
+    $ip librenms.example.com
+
+where `$ip` is the IP of your VM.  From there, just point your web browser to `http://librenms.example.com/` and login with username `librenms` and password `librenms`.  
+
+
 Installation
 ------------
 
@@ -74,4 +93,6 @@ You can participate in the project by:
 [5]: https://github.com/librenms/librenms/tree/master/doc/
 [6]: http://freenode.net/channel_guidelines.shtml "Freenode channel guidelines"
 [7]: http://freenode.net/catalysts.shtml "Freenode community catalysts"
+[8]: http://www.vmware.com/products/fusion/ "VMware Fusion"
+
 
