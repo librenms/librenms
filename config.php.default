@@ -39,4 +39,7 @@ $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 # Uncomment the next line to disable daily updates
 #$config['update'] = 0;
 
+# following is necessary for poller-wrapper
+# poller-wrapper is released public domain
+
 ?>
