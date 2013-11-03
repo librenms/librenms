@@ -33,7 +33,7 @@ Leaflet.markercluster
  * Don't show coverage for spiderfied clusters as it will be wrong. (Reported by [@ajbeaven](https://github.com/ajbeaven)) [#95](https://github.com/Leaflet/Leaflet.markercluster/issues/95)
  * Improve zoom in/out immediately making all everything disappear, still issues in Firefox [#140](https://github.com/Leaflet/Leaflet.markercluster/issues/140)
  * Fix animation not stopping with only one marker. (Reported by [@Driklyn](https://github.com/Driklyn)) [#146](https://github.com/Leaflet/Leaflet.markercluster/issues/146)
- * Various fixes for new leaflet (Reported by [@PeterAronZentai](https://github.com/PeterAronZentai)) [#159](https://github.com/Leaflet/Leaflet.markercluster/issues/146)
+ * Various fixes for new leaflet (Reported by [@PeterAronZentai](https://github.com/PeterAronZentai)) [#159](https://github.com/Leaflet/Leaflet.markercluster/issues/159)
  * Fix clearLayers when we are spiderfying (Reported by [@skullbooks](https://github.com/skullbooks)) [#162](https://github.com/Leaflet/Leaflet.markercluster/issues/162)
  * Fix removing layers in certain situations (Reported by [@bpavot](https://github.com/bpavot)) [#160](https://github.com/Leaflet/Leaflet.markercluster/issues/160)
  * Support calling hasLayer with null (by [@l0c0luke](https://github.com/l0c0luke)) [#170](https://github.com/Leaflet/Leaflet.markercluster/issues/170)
