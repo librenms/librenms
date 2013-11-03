@@ -35,7 +35,7 @@ Change `127.0.0.1` to the IP address that your MySQL server should listen on.  R
 
 Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of Ubuntu 12.04.
 
-    apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear snmp graphviz php5-mcrypt apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool
+    apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear snmp graphviz php5-mcrypt apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool git
     
 ### Cloning ###
 
