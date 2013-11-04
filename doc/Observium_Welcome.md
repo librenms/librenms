@@ -15,7 +15,7 @@ This has a few implications:
 - We've lost quite a bit of functionality that has been added to Observium
   in the last year.
 - You won't be able to take an existing Observium installation later than
-  r3251 and just change it to LibreNMS.  This would probably break (although
+  r3250 and just change it to LibreNMS.  This would probably break (although
   if you were on a version between r3250 and the next database schema
   change, it might be feasible).  Upgrades from versions earlier than r3251
   might work.  Please try it on an unimportant system and tell us your
