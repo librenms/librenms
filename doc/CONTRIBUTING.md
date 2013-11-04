@@ -29,7 +29,7 @@ This is a proposed workflow designed to minimise the scope of merge
 conflicts when submitting pull requests:
 - Fork the [LibreNMS repo master branch][2] in your own GitHub account.
 - Create an [issue][3] explaining what work you plan to do.
-- Create a branch in your copy of the repo called issue-###, where ### is
+- Create a branch in your copy of the repo called issue-####, where #### is
   the issue number you created.
 - Make and test your changes in the issue branch as needed - this might take
   a few days or weeks.
