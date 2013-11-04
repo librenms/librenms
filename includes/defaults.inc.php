@@ -542,4 +542,7 @@ $config['modules_compat']['rfc1628']['netmanplus']        = 1;
 $config['modules_compat']['rfc1628']['deltaups']          = 1;
 $config['modules_compat']['rfc1628']['poweralert']        = 1;
 
+# Enable daily updates
+$config['update'] = 1;
+
 ?>
