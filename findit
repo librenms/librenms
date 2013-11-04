@@ -8,5 +8,5 @@ find . \
 	-path ./logs -prune -o \
 	-path ./mibs -prune -o \
 	-path ./rrd -prune -o \
-	-name .svn -prune -o \
+	-name .git -prune -o \
 		-type f -print|xargs grep "$@"
