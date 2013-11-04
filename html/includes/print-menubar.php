@@ -520,6 +520,8 @@ if(is_file("includes/print-menubar-custom.inc.php"))
 ?>
     <li class="menu_right"><a href="#" class="drop"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System</a><!-- Begin Home Item -->
 
+        <div class="dropdown_1column align_right"><!-- Begin 1 column container -->
+
             <div class="col_1">
                 <h2>Settings</h2>
 <ul>
@@ -559,6 +561,7 @@ if ($_SESSION['userlevel'] >= '10')
                   <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About <?php echo($config['project_name']); ?></a></li>
                 </ul>
             </div>
+        </div>
 
     </li><!-- End Home Item -->
 
