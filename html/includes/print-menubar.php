@@ -558,6 +558,7 @@ if ($_SESSION['userlevel'] >= '10')
             </div>
 
             <div class="col_1">
+		<ul>
                   <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About <?php echo($config['project_name']); ?></a></li>
                 </ul>
             </div>
