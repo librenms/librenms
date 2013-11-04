@@ -1,3 +1,4 @@
 33  */6   * * *   root    /opt/librenms/discovery.php -h all >> /dev/null 2>&1
 */5  *    * * *   root    /opt/librenms/discovery.php -h new >> /dev/null 2>&1
 */5  *    * * *   root    /opt/librenms/poller-wrapper.py 16 >> /dev/null 2>&1
+15   0    * * *   root    sh /opt/librenms/daily.sh > /dev/null 2>&1

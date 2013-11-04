@@ -18,7 +18,7 @@ Copyright (C) 2013 LibreNMS Contributors <librenms-project@googlegroups.com>
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Please see LICENSE.txt for usage requirements and restrictions.
+[LICENSE.txt][14] contains a copy of the full GPLv3 licensing conditions.
 
 
 Introduction
@@ -30,25 +30,51 @@ systems including Cisco, Linux, FreeBSD, Juniper, Brocade, Foundry, HP and
 many more.
 
 LibreNMS is a community-based fork of the last GPL-licensed version of
-Observium <http://observium.org/>.  LibreNMS intends to be a viable network
-monitoring project and community that:
+[Observium][9].  LibreNMS intends to be a viable network monitoring project
+and community that:
 - encourages contribution,
 - focuses on the needs of its users, and
 - offers a welcoming, friendly environment for everyone.
 
-The Debian Social Contract <http://www.debian.org/social_contract> will be
-the basis of our priority system, and mutual respect the basis of our
-behaviour towards others.
+If you're visiting because of a mention on the Observium mailing list,
+please read our [welcome to Observium users][12].
 
-For more about the culture we're trying to build, please read the Freenode
-[guidelines for running an IRC channel][6] and [being a community
-catalyst][7].
+The [Debian Social Contract][10] will be the basis of our priority system,
+and mutual respect the basis of our behaviour towards others.  For more
+about the culture we're trying to build, please read the [Freenode
+philosophy][13], including [guidelines for running an IRC channel][6] and
+[being a community catalyst][7].
 
 
 Documentation
 -------------
 
 For now documentation can be found in the [doc directory][5].
+
+
+Try It
+------
+
+You can try LibreNMS by downloading a VM image.  Currently, a Debian-based
+image is supplied and has been tested with [VMware Fusion 5][8].
+
+Download the [VMware Fusion 5 image][11] at open it, and log in as `root`
+with the password `root`.  Enter the following commands:
+
+    cd /opt/librenms
+    git pull
+    php discover.php -h all
+    php poller.php -h all
+
+You'll then need to find out the IP of your VM (`ifconfig | grep add`) and
+create a DNS entry for `librenms.example.com` to point to that IP.  You can
+also edit your `/etc/hosts` file with the following line:
+
+    $ip librenms.example.com
+
+where `$ip` is the IP of your VM.  From there, just point your web browser
+to `http://librenms.example.com/` and login with username `librenms` and
+password `librenms`.
 
 
 Installation
@@ -64,6 +90,7 @@ You can participate in the project by:
 - Joining the [librenms-project][1] mailing list to post questions and
   suggestions.
 - Cloning the [repo][2] and filing bug reports and pull requests on github.
+  See [CONTRIBUTING][15] for more details.
 - Talking to us on [Twitter][3] or [IRC][4].
 - Improving the [documentation][5].
 
@@ -74,4 +101,12 @@ You can participate in the project by:
 [5]: https://github.com/librenms/librenms/tree/master/doc/
 [6]: http://freenode.net/channel_guidelines.shtml "Freenode channel guidelines"
 [7]: http://freenode.net/catalysts.shtml "Freenode community catalysts"
+[8]: http://www.vmware.com/products/fusion/ "VMware Fusion"
+[9]: http://observium.org/ "Observium web site"
+[10]: http://www.debian.org/social_contract "Debian project social contract"
+[11]: ftp://librenms.label-switched.net/pub/librenms_vm.zip
+[12]: https://github.com/librenms/librenms/tree/master/doc/Observium_Welcome.md
+[13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
+[14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
+[15]: https://github.com/librenms/librenms/tree/master/doc/CONTRIBUTING.md
 
