@@ -520,35 +520,6 @@ if(is_file("includes/print-menubar-custom.inc.php"))
 ?>
     <li class="menu_right"><a href="#" class="drop"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System</a><!-- Begin Home Item -->
 
-        <div class="dropdown_3columns align_right"><!-- Begin 2 columns container -->
-
-            <div class="col_3">
-                <h2>LibreNMS <?php echo($config['version']); ?> </h2>
-            </div>
-
-            <div class="col_2">
-                <p>Network Management and Monitoring<br />
-                Copyright (C) 2006-2012 Adam Armstrong
-                Copyright (C) 2013-<?php echo date("Y"); ?> LibreNMS Contributors
-            </div>
-
-<!-- Old donation stuff
-            <div class="col_1">
-              <p>
-              </p>
-            </div>
-
-            <div class="col_3">
-            </div>
--->
-
-            <div class="col_2">
-                <h2>The Team</h2>
-                <p>
-                  <img src="images/icons/flags/au.png"> <strong>Paul Gear</strong> Project Founder<br />
-                  <img src="images/icons/flags/us.png"> <strong>Tyler Christiansen</strong> Developer<br />
-                </p>
-            </div>
             <div class="col_1">
                 <h2>Settings</h2>
 <ul>
@@ -561,27 +532,6 @@ if ($_SESSION['userlevel'] >= '10')
 ?>
       <li><a href="preferences/"><img src="images/16/wrench_orange.png" border="0" align="absmiddle" /> My Settings</a></li>
         </ul>
-            </div>
-
-<?php
-$apache_version = str_replace("Apache/", "", $_SERVER['SERVER_SOFTWARE']);
-$php_version = phpversion();
-$mysql_version = dbFetchCell("SELECT version()");
-$netsnmp_version = shell_exec($config['snmpget'] . " --version 2>&1");
-$rrdtool_version = implode(" ",array_slice(explode(" ",shell_exec($config['rrdtool'] . " --version |head -n1")),1,1));
-?>
-
-            <div class="col_2">
-                <h2>Versions</h2>
-                  <table width=100% cellpadding=3 cellspacing=0 border=0>
-                    <tr valign=top><td><b>Apache</b></td><td><?php echo($apache_version); ?></td></tr>
-                    <tr valign=top><td><b>PHP</b></td><td><?php echo($php_version); ?></td></tr>
-                    <tr valign=top><td><b>MySQL</b></td><td><?php echo($mysql_version); ?></td></tr>
-                    <tr valign=top><td><b>RRDtool</b></td><td><?php echo($rrdtool_version); ?></td></tr>
-                  </table>
-                <ul>
-                  <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About LibreNMS</a></li>
-                </ul>
             </div>
 
 <div class="col_1">
@@ -605,7 +555,10 @@ $rrdtool_version = implode(" ",array_slice(explode(" ",shell_exec($config['rrdto
         </ul>
             </div>
 
-        </div><!-- End 2 columns container -->
+            <div class="col_1">
+                  <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About <?php echo($config['project_name']); ?></a></li>
+                </ul>
+            </div>
 
     </li><!-- End Home Item -->
 

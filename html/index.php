@@ -270,10 +270,10 @@ $runtime_end = utime(); $runtime = $runtime_end - $runtime_start;
 $gentime = substr($runtime, 0, 5);
 
 echo('<br /> <br /> <br /> <br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : ''));
-echo('<br />Powered by <a href="https://github.com/librenms/librenms" target="_blank">LibreNMS ' . $config['version']);
+echo('<br />Powered by <a href="' . $config['project_url'] . '" target="_blank">' . $config['project_name_version']);
 
 echo('</a>. Copyright &copy; 2006-2012 by Adam Armstrong. All rights reserved.');
-echo('</a>. Copyright &copy; '. date("Y"). ' by the LibreNMS Contributors.<br/>LibreNMS is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPLv3</a>.');
+echo('</a>. Copyright &copy; '. date("Y"). ' by the $config[\'project_name\'] Contributors.<br/>$config[\'project_name\'] is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPLv3</a>.');
 
 if ($config['page_gen'])
 {

@@ -39,7 +39,7 @@ switch ($vars['search'])
     include('pages/search/'.$vars['search'].'.inc.php');
     break;
   default:
-    echo("<h2>Error. Please report this to observium developers.</h2>");
+    echo(report_this('Unknown search type '.$vars['search']));
     break;
 }
 

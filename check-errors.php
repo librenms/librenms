@@ -52,7 +52,7 @@ if (is_array($errored))
     $i++;
   }
   // Send the alert email
-  notify($device, "Observium detected errors on $i interface" . ($i != 1 ? 's' : ''), $msg);
+  notify($device, $config['project_name'] . " detected errors on $i interface" . ($i != 1 ? 's' : ''), $msg);
 }
 
 echo("$errored interfaces with errors over the past 5 minutes.\n");

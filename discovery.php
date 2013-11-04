@@ -30,7 +30,7 @@ $options = getopt("h:m:i:n:d::a::q");
 
 if (!isset($options['q']))
 {
-  echo("Observium v".$config['version']." Discovery\n\n");
+  echo($config['project_name_version']." Discovery\n\n");
 }
 
 if (isset($options['h']))

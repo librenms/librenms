@@ -667,7 +667,7 @@ function notify($device,$title,$message)
         $mail->Hostname = php_uname('n');
         if (empty($config['email_from']))
         {
-          $config['email_from'] = '"Observium" <observium@'.php_uname('n').'>'; // Default "From:"
+          $config['email_from'] = '"' . $config['project_name'] . '" <' . $config['email_user'] . '@'.php_uname('n').'>'; // Default "From:"
         }
         foreach (parse_email($config['email_from']) as $from => $from_name)
         {
@@ -675,7 +675,7 @@ function notify($device,$title,$message)
         }
         foreach ($emails as $email => $email_name) { $mail->AddAddress($email, $email_name); } // To:
         $mail->Subject = $title; // Subject:
-        $mail->XMailer = 'Observium ' . $config['version']; // X-Mailer:
+        $mail->XMailer = $config['project_name_version']; // X-Mailer:
         $mail->CharSet = 'utf-8';
         $mail->WordWrap = 76;
         $mail->Body = $message_header . $message . $message_footer;

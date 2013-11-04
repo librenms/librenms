@@ -21,8 +21,8 @@
 
     // START SETTINGS ///
 
-	$config		= "/opt/observium/scripts/shoutcast.conf";
-	$cache		= "/opt/observium/scripts/shoutcast.cache";
+	$config		= "/opt/librenms/scripts/shoutcast.conf";
+	$cache		= "/opt/librenms/scripts/shoutcast.cache";
 
     // END SETTINGS ///
 

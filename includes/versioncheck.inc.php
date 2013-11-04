@@ -1,5 +1,14 @@
 <?php
 
+// FIXME: This really does produce valuable data for the project team.  We
+// need to get some infrastructure going and make it available on an opt-in
+// basis (i.e. disabled by default).  We should schedule it from cron rather
+// than putting it into the discovery process.
+
+// See https://github.com/librenms/librenms/issues/25 for some thoughts on where to go with this code under git.
+
+/*
+
 // Generate some statistics to send along with the version request.
 
 $stats['ports']        = dbFetchCell("SELECT count(*) FROM ports");
@@ -64,5 +73,6 @@ if ($dataHandle)
 
   fclose($dataHandle);
 }
+*/
 
 ?>

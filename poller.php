@@ -22,7 +22,7 @@ include("includes/functions.php");
 include("includes/polling/functions.inc.php");
 
 $poller_start = utime();
-echo("Observium Poller v".$config['version']."\n\n");
+echo($config['project_name_version']." Poller\n\n");
 
 $options = getopt("h:m:i:n:r::d::a::");
 
