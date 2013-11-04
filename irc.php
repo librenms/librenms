@@ -28,12 +28,12 @@ include_once('Net/SmartIRC.php');
 mysql_close();
 
 # Redirect to /dev/null or logfile if you aren't using screen to keep tabs
-echo "Observium Bot Starting ...\n";
+echo $config['project_name'] . "IRC bot starting ...\n";
 echo "\n";
 echo "Timestamp         Command\n";
 echo "----------------- ------- \n";
 
-class observiumbot
+class ircbot
 {
 
 ///
@@ -58,7 +58,7 @@ class observiumbot
   {
     global $config;
 
-    $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Observium Version " . $config['version']);
+    $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, $config['project_name_version']);
 
     echo date("m-d-y H:i:s ");
     echo "VERSION\t\t". $config['version'] . "\n";
@@ -243,7 +243,7 @@ if (!$device) {
   }
 }
 
-$bot = &new observiumbot();
+$bot = &new ircbot();
 $irc = &new Net_SmartIRC();
 $irc->setUseSockets(TRUE);
 
@@ -257,7 +257,7 @@ $irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.log', $bot, 'log_info');
 $irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '.help', $bot, 'help_info');
 
 $irc->connect($config['irc_host'], $config['irc_port']);
-$irc->login($config['irc_nick'], 'Observium Bot', 0, $config['irc_nick']);
+$irc->login($config['irc_nick'], $config['project_name'] . ' Bot', 0, $config['irc_nick']);
 $irc->join($config['irc_chan']);
 $irc->listen();
 $irc->disconnect();

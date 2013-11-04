@@ -1,22 +1,15 @@
 <div style="margin: 10px;">
-  <h3>LibreNMS <?php
+  <h3><?php
 
-echo($config['version']);
-
-#if (file_exists('.svn/entries'))
-#{
-#  $svn = File('.svn/entries');
-#  echo('-SVN r' . trim($svn[3]));
-#  unset($svn);
-#}
+echo($config['project_name_version']);
 
   ?></h3>
   <div style="float: right; padding: 0px; width: 49%">
 <?php print_optionbar_start(NULL); ?>
     <h3>License</h3>
-    <pre>LibreNMS Network Management and Monitoring System
+    <pre>
 Copyright (C) 2006-2012 Adam Armstrong
-Copyright (C) 2013-<?php echo date("Y"); ?> LibreNMS Contributors
+Copyright (C) 2013-<?php echo date("Y") . " " . $config['project_name']; ?> Contributors
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -110,20 +103,15 @@ print_optionbar_end(); ?>
   <div style="float: left; padding: 0px; width: 49%">
 <?php
 
-$librenms_version = $config['version'];
-#if (file_exists('.svn/entries'))
-#{
-#  $svn = File('.svn/entries');
-#  $librenms_version .='-SVN r' . trim($svn[3]);
-#  unset($svn);
-#}
+$project_name = $config['project_name'];
+$project_version = $config['version'];
 
 print_optionbar_start(NULL);
 
 echo("
     <h3>Versions</h3>
     <table width=100% cellpadding=3 cellspacing=0 border=0>
-      <tr valign=top><td width=150><b>LibreNMS</b></td><td>$librenms_version</td></tr>
+      <tr valign=top><td width=150><b>$project_name</b></td><td>$project_version</td></tr>
       <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
       <tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
       <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
@@ -135,17 +123,16 @@ print_optionbar_end();
 
 ?>
 
-    <h5>LibreNMS is an autodiscovering PHP/MySQL based network monitoring system forked from Observium.</h5>
+    <h5>LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system forked from the last GPL-licensed revision of Observium.</h5>
 
     <p>
-      <a href="https://github.com/librenms/librenms/">Website</a> |
-      <a href="https://github.com/librenms/librenms/wiki">Support Wiki</a> |
-      <a href="https://github.com/librenms/librenms/issues">Bugtracker</a> |
-      <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing List</a> |
+      <a href="https://github.com/librenms/">Web site</a> |
+      <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
+      <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a> |
       <a href="http://twitter.com/librenms">Twitter</a>
     </p>
 
-    <h3>LibreNMS is a Free, Open project. Please contribute code, documentation, and bug reports to support continued development.</h3>
+    <h3>LibreNMS is a Free, Open project. Please feel free to join us and contribute code, documentation, and bug reports.</h3>
 
   <div style="margin-top:10px;">
   </div>
@@ -157,6 +144,7 @@ print_optionbar_end();
 
     <h4>Acknowledgements</h4>
 
+    <b>Observium</b> Codebase for fork. <br />
     <b>Stu Nicholls</b> Dropdown menu CSS code. <br />
     <b>Mark James</b> Silk Iconset. <br />
     <b>Erik Bosrup</b> Overlib Library. <br />
@@ -164,7 +152,6 @@ print_optionbar_end();
     <b>Xiaochi Jin</b> Logo design. <br />
     <b>Bruno Pramont</b> Collectd code. <br />
     <b>Dennis de Houx</b> Application monitors for PowerDNS, Shoutcast, NTPD (Client, Server). <br />
-    <b>Observium</b> Codebase for LibreNMS fork. <br />
 
   </div>
 </div>

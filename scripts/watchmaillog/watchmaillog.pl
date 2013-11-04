@@ -27,9 +27,9 @@
 $debug=0;       # 1=Debug messages are displayed, 0=No debug messages are displayed
 $daemon=1;      # 1=Daemonize the program, 0=Run interactive
 $syslog=1;      # 1=Log stuff to syslog, 0=No logging to syslog
-$self="/opt/observium/scripts/watchmaillog/watchmaillog.sh";			# Location of this script
-$counterfile="/opt/observium/scripts/watchmaillog/watchmaillog_counters";	# Location to store the counter file
-$resetfile="/opt/observium/scripts/watchmaillog/watchmaillog_reset";		# Location of the reset counter flag file
+$self="/opt/librenms/scripts/watchmaillog/watchmaillog.sh";			# Location of this script
+$counterfile="/opt/librenms/scripts/watchmaillog/watchmaillog_counters";	# Location to store the counter file
+$resetfile="/opt/librenms/scripts/watchmaillog/watchmaillog_reset";		# Location of the reset counter flag file
 $pidfile="/var/run/watchmaillog.pid";						# Location of the running process ID file (used in logrotate)
 
 use Sys::Syslog;

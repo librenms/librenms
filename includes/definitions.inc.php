@@ -1129,31 +1129,8 @@ if (isset($config['enable_printers']) && $config['enable_printers'])
 # No changes below this line #
 //////////////////////////////
 
-$config['version']  = "0.SVN.ERROR";
-
-if (file_exists($config['install_dir'] . '/.svn/entries'))
-{
-  $svn = File($config['install_dir'] . '/.svn/entries');
-  if ((int)$svn[0] < 12)
-  {
-    // SVN version < 1.7
-    $svn_rev = trim($svn[3]);
-    list($svn_date) = explode("T", trim($svn[9]));
-  } else {
-    // SVN version >= 1.7
-    $xml = simplexml_load_string(shell_exec($config['svn'] . ' info --xml'));
-    if ($xml != false)
-    {
-      $svn_rev = $xml->entry->commit->attributes()->revision;
-      $svn_date = $xml->entry->commit->date;
-    }
-  }
-  list($svn_year, $svn_month, $svn_day) = explode("-", $svn_date);
-}
-if (!empty($svn_rev))
-{
-  $config['version'] = "0." . ($svn_year-2000) . "." . ($svn_month+0) . "." . $svn_rev;
-}
+$config['version']  = "2013.dev";
+$config['project_name_version'] = $config['project_name'] . " " . $config['version'];
 
 if (isset($config['rrdgraph_def_text']))
 {
@@ -1163,7 +1140,7 @@ if (isset($config['rrdgraph_def_text']))
 
 if (!isset($config['log_file']))
 {
-  $config['log_file'] = $config['install_dir'] . "/observium.log";
+  $config['log_file'] = $config['log_dir'] . "/" . $config['project_id'] . ".log";
 }
 
 if (isset($config['cdp_autocreate']))
@@ -1187,7 +1164,7 @@ if (isset($_SERVER['HTTPS']))
 $observium_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
 if (!$observium_link)
 {
-        echo("<h2>Observer MySQL Error</h2>");
+        echo("<h2>MySQL Error</h2>");
         echo(mysql_error());
         die;
 }

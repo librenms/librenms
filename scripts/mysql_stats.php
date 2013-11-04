@@ -40,6 +40,8 @@ if (!array_key_exists('SCRIPT_FILENAME', $_SERVER)
 # here, you can define them in another file named the same as this file, with a
 # .cnf extension.
 # ============================================================================
+
+# FIXME: why are these not taken from config.php?
 $mysql_user = 'observium';
 $mysql_pass = 'flobbleobservium';
 $mysql_host = 'localhost';

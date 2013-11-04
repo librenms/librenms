@@ -19,21 +19,25 @@
  *
  */
 
-///
+//
 // Please don't edit this file -- make changes to the configuration array in config.php
-///
+//
 
 error_reporting(E_ERROR);
 
 // Default directories
 
+$config['project_name']     = "LibreNMS";
+$config['project_id']     = strtolower($config['project_name']);
+
 $config['temp_dir']      = "/tmp";
-$config['install_dir']   = "/opt/observium";
+$config['install_dir']   = "/opt/" . $config['project_id'];
 $config['html_dir']      = $config['install_dir'] . "/html";
 $config['rrd_dir']       = $config['install_dir'] . "/rrd";
-$config['log_file']      = $config['install_dir'] . "/observium.log";
+$config['log_dir']       = $config['install_dir'] . "/logs";
+$config['log_file']      = $config['log_dir'] . "/" . $config['project_id'] . ".log";
 
-// What is my own hostname (used so observium can identify its host in its own database)
+// What is my own hostname (used to identify this host in its own database)
 $config['own_hostname'] = "localhost";
 
 // Location of executables
@@ -98,8 +102,8 @@ if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
   }
 }
 
-$config['project_name']     = "LibreNMS";
 $config['project_url']      = "https://github.com/librenms/";
+$config['project_issues']   = "https://github.com/librenms/librenms/issues";
 $config['title_image']      = "";
 $config['stylesheet']       = "css/styles.css";
 $config['mono_font']        = "DejaVuSansMono";
@@ -139,8 +143,9 @@ $config['snmp']['community'][0] = "public"; # Communities to try during adding h
 
 # SNMPv3 default settings
 # The array can be expanded to give another set of parameters
+# NOTE: If you change these, also change the equivalents in includes/defaults.inc.php - not sure why they are separate
 $config['snmp']['v3'][0]['authlevel'] = "noAuthNoPriv";  # noAuthNoPriv | authNoPriv | authPriv
-$config['snmp']['v3'][0]['authname'] = "observium";      # User Name (required even for noAuthNoPriv)
+$config['snmp']['v3'][0]['authname'] = "root";           # User Name (required even for noAuthNoPriv)
 $config['snmp']['v3'][0]['authpass'] = "";               # Auth Passphrase
 $config['snmp']['v3'][0]['authalgo'] = "MD5";            # MD5 | SHA
 $config['snmp']['v3'][0]['cryptopass'] = "";             # Privacy (Encryption) Passphrase
@@ -176,7 +181,8 @@ $config['autodiscovery']['nets-exclude'][] = "240.0.0.0/4";
 // Mailer backend Settings
 
 $config['email_backend']              = 'mail';               // Mail backend. Allowed: "mail" (PHP's built-in), "sendmail", "smtp".
-$config['email_from']                 = NULL;                 // Mail from. Default: "OBSERVIUM Network Monitor" <observium@`hostname`>
+$config['email_from']                 = NULL;                 // Mail from. Default: "ProjectName" <projectid@`hostname`>
+$config['email_user']                 = $config['project_id'];
 $config['email_sendmail_path']        = '/usr/sbin/sendmail'; // The location of the sendmail program.
 $config['email_smtp_host']            = 'localhost';          // Outgoing SMTP server name.
 $config['email_smtp_port']            = 25;                   // The port to connect.
@@ -248,9 +254,7 @@ $config['show_overview_tab'] = TRUE;
 $config['overview_show_sysDescr'] = TRUE;
 
 // Enable version checker & stats
-$config['version_check']                = 1; # Enable checking of version in discovery
-                                             # and submittal of basic stats used
-                                             # to prioritise development effort :)
+$config['version_check']                = 0; # Enable checking of version in discovery
 
 // Poller/Discovery Modules
 
@@ -374,10 +378,10 @@ $config['device_traffic_descr'][]  = '/dummy/';
 
 // IRC Bot configuration
 
-$config['irc_host'] = "chat.eu.freenode.net";
+$config['irc_host'] = "irc.freenode.net";
 $config['irc_port'] = 6667;
-$config['irc_nick'] = "Observium";
-$config['irc_chan'][] = "#observium";
+$config['irc_nick'] = $config['project_id'];
+$config['irc_chan'][] = "##" . $config['project_id'];
 
 // Authentication
 
@@ -388,11 +392,11 @@ $config['auth_mechanism']           = "mysql"; # Available mechanisms: mysql (de
 // LDAP Authentication
 
 $config['auth_ldap_version'] = 3; # v2 or v3
-$config['auth_ldap_server'] = "ldap.yourserver.com";
+$config['auth_ldap_server'] = "ldap.example.com";
 $config['auth_ldap_port']   = 389;
 $config['auth_ldap_prefix'] = "uid=";
 $config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
-$config['auth_ldap_group']  = "cn=observium,ou=groups,dc=example,dc=com";
+$config['auth_ldap_group']  = "cn=groupname,ou=groups,dc=example,dc=com";
 
 $config['auth_ldap_groupbase'] = "ou=group,dc=example,dc=com";
 $config['auth_ldap_groups']['admin']['level'] = 10;

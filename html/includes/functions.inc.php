@@ -613,5 +613,14 @@ function generate_ap_url($ap, $vars=array())
   return generate_url(array('page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoint', 'ap' => $ap['accesspoint_id']), $vars);
 }
 
+function report_this($message)
+{
+  return '<h2>'.$message.' Please <a href="'.$config['project_issues'].'">report this</a> to the developers.</h2>';
+}
+
+function report_this_text($message)
+{
+  return $message.'\nPlease report this to the developers at '.$config['project_issues'].'\n';
+}
 
 ?>

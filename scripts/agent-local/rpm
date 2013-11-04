@@ -4,7 +4,7 @@
 # We cache because it is a 1sec delay, which is painful for the poller
 if [ -x /bin/rpm ]; then
   DATE=$(date +%s)
-  FILE=/tmp/observium-agent-rpm
+  FILE=/tmp/agent-local-rpm
   if [ ! -e $FILE ]; then
     /bin/rpm -q --all --queryformat '%{N} %{V} %{R} %{ARCH} %{SIZE}\n' > $FILE
   fi

@@ -36,7 +36,7 @@ if (!empty($argv[1]))
     // These values are the same as in defaults.inc.php
     $v3 = array(
       'authlevel'  => "noAuthNoPriv",
-      'authname'   => "observium",
+      'authname'   => "root",
       'authpass'   => "",
       'authalgo'   => "MD5",
       'cryptopass' => "",
@@ -192,8 +192,7 @@ if (!empty($argv[1]))
   }
 }
 
-print Console_Color::convert("
-Observium v".$config['version']." Add Host Tool
+print Console_Color::convert("\n" . $config['project_name_version']." Add Host Tool
 
 Usage (SNMPv1/2c): ./addhost.php <%Whostname%n> [community] [v1|v2c] [port] [" . implode("|",$config['snmp']['transports']) . "]
 Usage (SNMPv3)   :  Config Defaults : ./addhost.php <%Whostname%n> any v3 [user] [port] [" . implode("|",$config['snmp']['transports']) . "]

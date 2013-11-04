@@ -20,7 +20,7 @@
 
     // START SETTINGS ///
 
-	$mailstats	= "/opt/observium/scripts/watchmaillog/watchmaillog_counters";
+	$mailstats	= "/opt/librenms/scripts/watchmaillog/watchmaillog_counters";
 
     // END SETTINGS ///
 

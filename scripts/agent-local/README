@@ -1,4 +1,4 @@
-These are local plugin scripts for the Observium Unix Agent.
+These are local plugin scripts for the LibreNMS Unix Agent.
 
 *DO NOT* put all of these files into your local folder, only use the scripts you want.
 

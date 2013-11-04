@@ -283,7 +283,7 @@ function ss_get_mysql_stats( $options ) {
    }
 
    $sanitized_host = str_replace(array(":", "/"), array("", "_"), $host);
-   $cache_file = "$cache_dir/observium-agent-mysql";
+   $cache_file = "$cache_dir/agent-local-mysql";
    debug("Cache file is $cache_file");
 
    # First, check the cache.

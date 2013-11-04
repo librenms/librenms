@@ -14,7 +14,7 @@
 use LWP::Simple;
 
 $CACHETIME = 30;
-$CACHEFILE = '/tmp/observium-agent-apache';
+$CACHEFILE = '/tmp/agent-local-apache';
 
 # check for cache file newer CACHETIME seconds ago
 if ( -f $CACHEFILE && time - (stat( $CACHEFILE ))[9] < $CACHETIME) {

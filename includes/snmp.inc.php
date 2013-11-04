@@ -92,8 +92,7 @@ function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 
   if (strstr($oid,' '))
   {
-    echo("BUG: snmp_get called for multiple OIDs: $oid\n");
-    echo("Please report this to the Observium team.");
+    echo(report_this_text("snmp_get called for multiple OIDs: $oid"));
   }
 
   $cmd  = $config['snmpget'];
@@ -776,7 +775,8 @@ function snmp_gen_auth (&$device)
     if ($device['authlevel'] === "noAuthNoPriv")
     {
       // We have to provide a username anyway (see Net-SNMP doc)
-      $cmd .= " -u observium";
+      // FIXME: There are two other places this is set - why are they ignored here?
+      $cmd .= " -u root";
     }
     elseif ($device['authlevel'] === "authNoPriv")
     {

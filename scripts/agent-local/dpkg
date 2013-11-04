@@ -4,7 +4,7 @@
 # We cache because it is a 1sec delay, which is painful for the poller
 if [ -x /usr/bin/dpkg-query ]; then
   DATE=$(date +%s)
-  FILE=/tmp/observium-agent-dpkg
+  FILE=/tmp/agent-local-dpkg
   
   if [ ! -e $FILE ]; then
     dpkg-query -W --showformat='${Status} ${Package} ${Version} ${Architecture} ${Installed-Size}\n'|grep " installed "|cut -d\  -f4- > $FILE

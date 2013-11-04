@@ -26,7 +26,7 @@ switch ($vars['section'])
     break;
   default:
     print_optionbar_end();
-    echo("<h2>Error. No section ".$vars['section'].".<br /> Please report this to observium developers.</h2>");
+    echo(report_this('Unknown section '.$vars['section']));
     break;
 }
 

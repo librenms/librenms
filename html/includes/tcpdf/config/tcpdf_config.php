@@ -111,32 +111,32 @@ if (!defined('K_TCPDF_EXTERNAL_CONFIG')) {
 	/**
 	 * document creator
 	 */
-	define ('PDF_CREATOR', 'Observium');
+	define ('PDF_CREATOR', $config['project_name']);
 
 	/**
 	 * document author
 	 */
-	define ('PDF_AUTHOR', 'Observium');
+	define ('PDF_AUTHOR', $config['project_name']);
 
 	/**
 	 * header title
 	 */
-	define ('PDF_HEADER_TITLE', 'Observium');
+	define ('PDF_HEADER_TITLE', $config['project_name']);
 
 	/**
 	 * header description string
 	 */
-	define ('PDF_HEADER_STRING', "Observium");
+	define ('PDF_HEADER_STRING', $config['project_name']);
 
 	/**
 	 * image logo
 	 */
-	define ('PDF_HEADER_LOGO', 'observium-logo.png');
+	//define ('PDF_HEADER_LOGO', 'observium-logo.png');
 
 	/**
 	 * header logo image width [mm]
 	 */
-	define ('PDF_HEADER_LOGO_WIDTH', 110);
+	//define ('PDF_HEADER_LOGO_WIDTH', 110);
 
 	/**
 	 *  document unit of measure [pt=point, mm=millimeter, cm=centimeter, in=inch]

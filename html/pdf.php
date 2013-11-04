@@ -27,7 +27,7 @@ if (strpos($_SERVER['REQUEST_URI'], "debug"))
     ini_set('error_reporting', 0);
 }
 
-$filename = "observium-report.pdf";
+$filename = $config['project_id']."-report.pdf";
 $html     = "";
 $type     = (isset($_GET['type']) ? $_GET['type'] : "");
 $report   = (isset($_GET['report']) ? $_GET['report'] : "");
