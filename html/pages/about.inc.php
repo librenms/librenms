@@ -1,9 +1,4 @@
 <div style="margin: 10px;">
-  <h3><?php
-
-echo($config['project_name_version']);
-
-  ?></h3>
   <div style="float: right; padding: 0px; width: 49%">
 <?php print_optionbar_start(NULL); ?>
     <h3>License</h3>
@@ -101,15 +96,21 @@ print_optionbar_end(); ?>
   </div>
 
   <div style="float: left; padding: 0px; width: 49%">
+
+    <h3>LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system forked from the last GPL-licensed revision of Observium.</h3>
 <?php
 
 $project_name = $config['project_name'];
 $project_version = $config['version'];
+$apache_version = str_replace("Apache/", "", $_SERVER['SERVER_SOFTWARE']);
+$php_version = phpversion();
+$mysql_version = dbFetchCell("SELECT version()");
+$netsnmp_version = shell_exec($config['snmpget'] . " --version 2>&1");
+$rrdtool_version = implode(" ",array_slice(explode(" ",shell_exec($config['rrdtool'] . " --version |head -n1")),1,1));
 
 print_optionbar_start(NULL);
 
 echo("
-    <h3>Versions</h3>
     <table width=100% cellpadding=3 cellspacing=0 border=0>
       <tr valign=top><td width=150><b>$project_name</b></td><td>$project_version</td></tr>
       <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
@@ -123,7 +124,7 @@ print_optionbar_end();
 
 ?>
 
-    <h5>LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system forked from the last GPL-licensed revision of Observium.</h5>
+    <h5>LibreNMS is a community-based project. Please feel free to join us and contribute code, documentation, and bug reports:</h5>
 
     <p>
       <a href="https://github.com/librenms/">Web site</a> |
@@ -131,8 +132,6 @@ print_optionbar_end();
       <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a> |
       <a href="http://twitter.com/librenms">Twitter</a>
     </p>
-
-    <h3>LibreNMS is a Free, Open project. Please feel free to join us and contribute code, documentation, and bug reports.</h3>
 
   <div style="margin-top:10px;">
   </div>

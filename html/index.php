@@ -269,12 +269,12 @@ if ($_SESSION['authenticated'])
 $runtime_end = utime(); $runtime = $runtime_end - $runtime_start;
 $gentime = substr($runtime, 0, 5);
 
-echo('<br /> <br /> <br /> <br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : ''));
-echo('<br />Powered by <a href="' . $config['project_url'] . '" target="_blank">' . $config['project_name_version']);
+echo('<br /> <br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : ''));
+echo('<br />Powered by <a href="' . $config['project_url'] . '" target="_blank">' . $config['project_name_version'].'</a>. ');
+echo($config['project_name'].' is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPLv3</a>.<br/>');
+echo('Copyright &copy; 2006-2012 by Adam Armstrong. Copyright &copy; 2013-'.date("Y").' by the '.$config['project_name'].' Contributors.');
 
-echo('</a>. Copyright &copy; 2006-2012 by Adam Armstrong. All rights reserved.');
-echo('</a>. Copyright &copy; '. date("Y"). ' by the $config[\'project_name\'] Contributors.<br/>$config[\'project_name\'] is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPLv3</a>.');
-
+# FIXME - move this
 if ($config['page_gen'])
 {
     echo('<br />MySQL: Cell    '.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0,3).'s'.

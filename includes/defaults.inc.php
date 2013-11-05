@@ -114,7 +114,7 @@ $config['front_page']       = "pages/front/default.php";
 $config['page_title_prefix'] = "";
 $config['page_title_suffix'] = $config['project_name'];
 $config['timestamp_format'] = 'd-m-Y H:i:s';
-$config['page_gen']         = 1;
+$config['page_gen']         = 0;                 # display MySqL & PHP stats in footer?
 $config['web_header']       = "header.inc.php";  # in html/includes
 $config['login_message']    = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
 
