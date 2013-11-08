@@ -11,7 +11,7 @@ Here is an example of using both the bind and helper method syntax:
 
 ```js
 // using bind
-$('#my_elem').bind('mousewheel', function(event, delta, deltaX, deltaY) {
+$('#my_elem').on('mousewheel', function(event, delta, deltaX, deltaY) {
     console.log(delta, deltaX, deltaY);
 });
 
