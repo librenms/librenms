@@ -1,8 +1,8 @@
 <?php
 
-function generate_front_box ($background, $content)
+function generate_front_box ($frontbox_class, $content)
 {
-echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 117px; height: 85px; background: $background;'>
+echo("<div class=\"front-box $frontbox_class\">
       $content
       </div>");
 }
@@ -17,7 +17,7 @@ $sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.dev
 }
 while ($device = mysql_fetch_assoc($sql)) {
 
-      generate_front_box("#ffbbbb", "<center>".generate_device_link($device, shorthost($device['hostname']))."<br />
+      generate_front_box("device-down", "<center>".generate_device_link($device, shorthost($device['hostname']))."<br />
       <span class=list-device-down>Device Down</span> <br />
       <span class=body-date-1>".truncate($device['location'], 20)."</span>
       </center>");
@@ -40,7 +40,7 @@ if ($config['warn']['ifdown'])
     if (!$interface['deleted'])
     {
      $interface = ifNameDescr($interface);
-     generate_front_box("#ffdd99", "<center>".generate_device_link($interface, shorthost($interface['hostname']))."<br />
+     generate_front_box("port-down", "<center>".generate_device_link($interface, shorthost($interface['hostname']))."<br />
       <span class=\"interface-updown\">Port Down</span><br />
 <!--      <img src='graph.php?type=bits&amp;if=".$interface['port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=32' /> -->
         ".generate_port_link($interface, truncate(makeshortif($interface['label']),13,''))." <br />
@@ -54,7 +54,7 @@ if ($config['warn']['ifdown'])
 $sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'");
 while ($service = mysql_fetch_assoc($sql))
 {
-    generate_front_box("#ffaaaa", "<center>".generate_device_link($service, shorthost($service['hostname']))."<br />
+    generate_front_box("service-down", "<center>".generate_device_link($service, shorthost($service['hostname']))."<br />
     <span class=service-down>Service Down</span>
     ".$service['service_type']."<br />
     <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
@@ -71,7 +71,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
   }
   while ($peer = mysql_fetch_assoc($sql))
   {
-  generate_front_box("#ffaaaa", "<center>".generate_device_link($peer, shorthost($peer['hostname']))."<br />
+  generate_front_box("bgp-down", "<center>".generate_device_link($peer, shorthost($peer['hostname']))."<br />
       <span class=bgp-down>BGP Down</span>
       <span style='" . (strstr($peer['bgpPeerIdentifier'],':') ? 'font-size: 10px' : '') . "'>".$peer['bgpPeerIdentifier']."</span><br />
       <span class=body-date-1>AS".truncate($peer['bgpPeerRemoteAs']." ".$peer['astext'], 14, "")."</span>
@@ -91,7 +91,7 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
 
   while ($device = mysql_fetch_assoc($sql))
   {
-     generate_front_box("#aaffaa", "<center>".generate_device_link($device, shorthost($device['hostname']))."<br />
+     generate_front_box("device-rebooted", "<center>".generate_device_link($device, shorthost($device['hostname']))."<br />
         <span class=device-rebooted>Device Rebooted</span><br />
         <span class=body-date-1>".formatUptime($device['uptime'], 'short')."</span>
         </center>");
