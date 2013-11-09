@@ -22,6 +22,7 @@
 
 <?php
 
+echo('<a target="_blank" href="'.$config['project_issues'].'">Report Bug</a> | ');
 $toggle_url = preg_replace('/(\?|\&)widescreen=(yes|no)/', '', $_SERVER['REQUEST_URI']);
 if (strstr($toggle_url,'?')) { $toggle_url .= '&amp;'; } else { $toggle_url .= '?'; }
 
