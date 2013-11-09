@@ -17,8 +17,8 @@ $sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.dev
 }
 while ($device = mysql_fetch_assoc($sql)) {
 
-      generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> <br />
+      generate_front_box("#ffbbbb", "<center>".generate_device_link($device, shorthost($device['hostname']))."<br />
+      <span class=list-device-down>Device Down</span> <br />
       <span class=body-date-1>".truncate($device['location'], 20)."</span>
       </center>");
 
@@ -40,10 +40,10 @@ if ($config['warn']['ifdown'])
     if (!$interface['deleted'])
     {
      $interface = ifNameDescr($interface);
-     generate_front_box("#ffdd99", "<center><strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
+     generate_front_box("#ffdd99", "<center>".generate_device_link($interface, shorthost($interface['hostname']))."<br />
+      <span class=\"interface-updown\">Port Down</span><br />
 <!--      <img src='graph.php?type=bits&amp;if=".$interface['port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=32' /> -->
-        <strong>".generate_port_link($interface, truncate(makeshortif($interface['label']),13,''))."</strong> <br />
+        ".generate_port_link($interface, truncate(makeshortif($interface['label']),13,''))." <br />
         " . ($interface['ifAlias'] ? '<span class="body-date-1">'.truncate($interface['ifAlias'], 20, '').'</span>' : '') . "
         </center>");
     }
@@ -54,9 +54,9 @@ if ($config['warn']['ifdown'])
 $sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'");
 while ($service = mysql_fetch_assoc($sql))
 {
-    generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($service, shorthost($service['hostname']))."</strong><br />
-    <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span>
-    <strong>".$service['service_type']."</strong><br />
+    generate_front_box("#ffaaaa", "<center>".generate_device_link($service, shorthost($service['hostname']))."<br />
+    <span class=service-down>Service Down</span>
+    ".$service['service_type']."<br />
     <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
     </center>");
 }
@@ -71,9 +71,9 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
   }
   while ($peer = mysql_fetch_assoc($sql))
   {
-  generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($peer, shorthost($peer['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span>
-      <span style='" . (strstr($peer['bgpPeerIdentifier'],':') ? 'font-size: 10px' : '') . "'><strong>".$peer['bgpPeerIdentifier']."</strong></span><br />
+  generate_front_box("#ffaaaa", "<center>".generate_device_link($peer, shorthost($peer['hostname']))."<br />
+      <span class=bgp-down>BGP Down</span>
+      <span style='" . (strstr($peer['bgpPeerIdentifier'],':') ? 'font-size: 10px' : '') . "'>".$peer['bgpPeerIdentifier']."</span><br />
       <span class=body-date-1>AS".truncate($peer['bgpPeerRemoteAs']." ".$peer['astext'], 14, "")."</span>
       </center>");
   }
@@ -91,8 +91,8 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
 
   while ($device = mysql_fetch_assoc($sql))
   {
-     generate_front_box("#aaffaa", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
-        <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #009;'>Device<br />Rebooted</span><br />
+     generate_front_box("#aaffaa", "<center>".generate_device_link($device, shorthost($device['hostname']))."<br />
+        <span class=device-rebooted>Device Rebooted</span><br />
         <span class=body-date-1>".formatUptime($device['uptime'], 'short')."</span>
         </center>");
   }
