@@ -588,10 +588,10 @@ form { margin: 0px; padding: 0px; }
 hr { border: 0px; height: 1px; background-color: #ccc; color: #ccc; }
 p { margin: 0px; padding: 0px; }
 
-a { text-decoration:none; color: #00f; }
-a:visited { text-decoration:none; color: #00f; }
-a:hover { text-decoration:underline; color: #00f; }
-a:active { color: #00f; }
+a { text-decoration:none; color: #11a; }
+a:visited { text-decoration:none; color: #11a; }
+a:hover { text-decoration:underline; color: #11a; }
+a:active { color: #11a; }
 
 .vspace { margin-top: 4px; margin-bottom: 4px; }
 p.vspace { padding-top: 3px; padding-bottom: 3px; }
