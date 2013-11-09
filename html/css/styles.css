@@ -306,8 +306,8 @@ input,select {
 img  { border: 0; }
 
 A         { text-decoration: none; }
-A:link    { color: #0000cc; }
-A:visited { color: #0000cc; }
+A:link    { color: #1111aa; }
+A:visited { color: #1111aa; }
 A:hover   { color: #990099; }
 A:active  { color: #000000; }
 
@@ -408,6 +408,10 @@ A.purple:visited, a.purple, .purple { color: #740074; }
   font-weight: bold;
 }
 
+.list-device-down {
+  color: #cc0000;
+}
+
 tr.device-overview:nth-child(odd) {
   background: #ffffff;
 }
@@ -448,7 +452,7 @@ tr.list-device-ignored-up {
 }
 
 .device-head, a.list-device {
-  color: #000ccc;
+  color: #1111aa;
 }
 
 a.list-device-down, a.list-device-down, a.list-device-down:visited {
@@ -704,11 +708,11 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
 }
 
 .interface-updown, a.interface-updown, a.interface-updown:visited {
-  color: #cc0000;
+  color: #c11;
 }
 
 .interface-upup, a.interface-upup {
-  color: #0000cc;
+  color: #11a;
 }
 
 a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
