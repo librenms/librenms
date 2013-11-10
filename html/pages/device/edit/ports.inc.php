@@ -27,9 +27,9 @@ echo("<table cellpadding=3 cellspacing=0 width=100%>
                  <th width=100>Index</th>
                  <th width=100>Name</th>
                  <th width=50>Admin</th>
-                 <th width=100>Oper</th>
-                 <th width=100>Disable</th>
-                 <th width=100>Ignore</th>
+                 <th width=150>Oper</th>
+                 <th width=150>Disable</th>
+                 <th width=150>Ignore</th>
                  <th>Description</th>
 </tr>
 <tr align=center>
