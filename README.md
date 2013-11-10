@@ -33,11 +33,9 @@ exception):
   follows (their title, location, and license are noted where known):
   - JpGraph (html/includes/jpgraph): QPL 1.0 license
   - MIBS (mibs): unknown/various
-  - jQuery (various locations): MIT or GPLv2
   - html/graph-realtime.php: BSD (original?)
   - html/includes/collectd/: GPLv2 only
   - html/includes/tcpdf/fonts/dejavu-fonts-ttf-2.33: some sort of BSD?
-  - HTML5 Shiv (html/js/html5.js): MIT/GPLv2
   - overLIB (html/js/overlib_mini.js): modified Artistic 1.0?
   - scripts/*/mysql: GPLv2 only
   - check_mk (scripts/observium_agent*): GPLv2
