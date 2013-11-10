@@ -108,6 +108,12 @@ function get_percentage_colours($percentage)
 
 }
 
+function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100)
+{
+  return '<img class=minigraph-image src="graph.php?device='.$device['device_id'].
+    "&amp;from=$start&amp;to=$end&amp;width=$width&amp;height=$height&amp;type=$type&amp;legend=$legend".'">';
+}
+
 function generate_device_url($device, $vars=array())
 {
   return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
@@ -151,10 +157,10 @@ function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end
   {
     $graph     = $entry['graph'];
     $graphhead = $entry['text'];
-    $contents .= '<div style="width: 708px">';
-    $contents .= '<span style="margin-left: 5px; font-size: 12px; font-weight: bold;">'.$graphhead.'</span><br />';
-    $contents .= "<img src=\"graph.php?device=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
-    $contents .= "<img src=\"graph.php?device=" . $device['device_id'] . "&amp;from=".$config['time']['week']."&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
+    $contents .= '<div class=overlib-box>';
+    $contents .= '<span class=overlib-title>'.$graphhead.'</span><br />';
+    $contents .= generate_minigraph_image($device, $start, $end, $graph);
+    $contents .= generate_minigraph_image($device, $config['time']['week'], $end, $graph);
     $contents .= '</div>';
   }
 
