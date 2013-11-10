@@ -20,6 +20,28 @@ Copyright (C) 2013 LibreNMS Contributors <librenms-project@googlegroups.com>
 
 [LICENSE.txt][14] contains a copy of the full GPLv3 licensing conditions.
 
+The following additional license conditions apply to LibreNMS (a GPL
+exception):
+
+  As a special exception, you have permission to link or otherwise combine
+  LibreNMS with the included copies of the following third-party software,
+  and distribute modified versions, as long as you follow the requirements
+  of the GNU GPL v3 in regard to all of the remaining software (comprising
+  LibreNMS).
+
+  The authorised third-party software packages under this exception are as
+  follows (their title, location, and license are noted where known):
+  - JpGraph (html/includes/jpgraph): QPL 1.0 license
+  - MIBS (mibs): unknown/various
+  - jQuery (various locations): MIT or GPLv2
+  - html/graph-realtime.php: BSD (original?)
+  - html/includes/collectd/: GPLv2 only
+  - html/includes/tcpdf/fonts/dejavu-fonts-ttf-2.33: some sort of BSD?
+  - HTML5 Shiv (html/js/html5.js): MIT/GPLv2
+  - overLIB (html/js/overlib_mini.js): modified Artistic 1.0?
+  - scripts/*/mysql: GPLv2 only
+  - check_mk (scripts/observium_agent*): GPLv2
+
 
 Introduction
 ------------
