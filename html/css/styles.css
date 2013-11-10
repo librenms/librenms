@@ -89,7 +89,7 @@ input,select {
   height: 1px;
   overflow: hidden;
   font-size: .01em;
-  background: #e5e5e5;
+  background: #e0e5e5;
 }
 .rounded1 {
   margin-left: 3px;
@@ -124,7 +124,7 @@ input,select {
   border-right: 1px solid #ebebaf;
 }
 .roundedfg {
-  background: #e5e5e5;
+  background: #e0e5e5;
 }
 
 .content-box {display: block}
@@ -133,7 +133,7 @@ input,select {
   height: 1px;
   overflow: hidden;
   font-size: .01em;
-  background: #e5e5e5;
+  background: #e0e5e5;
 }
 .content-box1 {
   margin-left: 3px;
@@ -168,7 +168,7 @@ input,select {
   border-right: 1px solid #ebebeb;
 }
 .content-boxfg {
-  background: #e5e5e5;
+  background: #e0e5e5;
 }
 
 .box-info {display: block}
@@ -330,7 +330,7 @@ A.purple:visited, a.purple, .purple { color: #740074; }
 .redbg   { background-color: #ff8585; }
 .bluebg  { background-color: #aaaaff; }
 .greenbg { background-color: #aaffaa; }
-.greybg  { background-color: #dddddd; }
+.greybg  { background-color: #DEEFEF; }
 
 .selector {
   width:275px;
@@ -467,6 +467,38 @@ a.list-device-disabled, a.list-device-disabled:visited {
   color: #999999;
 }
 
+.front-box {
+  text-align: center;
+  margin: 1pt;
+  border: solid 1pt #C0C0C0;
+  float: left;
+  margin-right: 1pt;
+  padding: 3px;
+  width: 117px;
+  height: 85px;
+
+  /* Rounded corners */
+  -moz-border-radius: 2pt 2pt 2pt 2pt;
+  -webkit-border-radius: 2pt 2pt 2pt 2pt;
+  border-radius: 2pt 2pt 2pt 2pt;
+}
+
+.device-down {
+  background: #ffd7d7;
+}
+
+.port-down {
+  background: #ffdd99;
+}
+
+.device-rebooted {
+  background: #bbffbb;
+}
+
+.service-down .bgp-down {
+  background: #ffaaaa;
+}
+
 .footer-text {
   font-size: 12px;
   font-style: normal;
@@ -553,11 +585,11 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .top-menu:link {
- color: #dddddd;
+ color: #DEEFEF;
  text-decoration: none;
 }
 .top-menu:visited {
-  color: #dddddd;
+  color: #DEEFEF;
   text-decoration: none;
 }
 .top-menu:hover {
@@ -621,7 +653,7 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
   width: 100%; height: 40px;
 }
 
-#copyright { margin: 0px 12px 0px 11px; padding: 2px 0px; border-top: 1px solid #ddd; font-size: 8pt; }
+#copyright { margin: 0px 12px 0px 11px; padding: 2px 0px; border-top: 1px solid #DEEFEF; font-size: 8pt; }
 
 #topnav {
   margin: 0px 0px 0px 0px;
@@ -800,8 +832,8 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 
   /* Gradient background */
   background:#F4F4F4;
-  background: -moz-linear-gradient(top, #FBFBFB, #DDD);
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DDD));
+  background: -moz-linear-gradient(top, #FBFBFB, #DEEFEF);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DEEFEF));
 
   /* Rounded Corners */
   -moz-border-radius: 0px 3px 3px 3px;
@@ -842,9 +874,9 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EEE), to(#FFFFFF));
 
   /* Box Shadow */
-  -moz-box-shadow: 0 -1px 2px #DDD;
-  -webkit-box-shadow: 0 -1px 2px #DDD;
-  box-shadow: 0 -1px 2px #DDD;
+  -moz-box-shadow: 0 -1px 2px #DEEFEF;
+  -webkit-box-shadow: 0 -1px 2px #DEEFEF;
+  box-shadow: 0 -1px 2px #DEEFEF;
 
 }
 
@@ -905,11 +937,11 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   border-radius: 4px;
 
   /* Gradient background */
-  background:#DDD;
-  background: -moz-linear-gradient(top, #FBFBFB, #DDD);
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DDD));
-  background: -ms-linear-gradient(top, #FBFBFB, #DDD);
-  background: -webkit-linear-gradient(top, #FBFBFB, #DDD);
+  background: #DEEFEF;
+  background: -moz-linear-gradient(top, #FBFBFB, #DEEFEF);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DEEFEF));
+  background: -ms-linear-gradient(top, #FBFBFB, #DEEFEF);
+  background: -webkit-linear-gradient(top, #FBFBFB, #DEEFEF);
 
   /* Borders */
 
@@ -933,7 +965,7 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 
   margin:3px 0px 5px 5px;
   border:none;
-#  background:#EEEEEE;
+/*  background:#EEEEEE;*/
 }
 
 #menium li:hover {
@@ -949,16 +981,16 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   margin-bottom: -1px;
 
   /* Gradient background */
-  background:#EEEEEE;
-  background: -moz-linear-gradient(top, #DDDDDD, #EEEEEE);
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#DDDDDD), to(#EEEEEE));
-  background: -ms-linear-gradient(top, #DDDDDD, #EEEEEE);
-  background: -webkit-linear-gradient(top, #DDDDDD, #EEEEEE);
+  background: #EEF7F7;
+  background: -moz-linear-gradient(top, #DEEFEF, #EEF7F7);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#DEEFEF), to(#EEF7F7));
+  background: -ms-linear-gradient(top, #DEEFEF, #EEF7F7);
+  background: -webkit-linear-gradient(top, #DEEFEF, #EEF7F7);
 
   /* Rounded corners */
-  -moz-border-radius: 4px 4px 0px 0px;
-  -webkit-border-radius: 4px 4px 0px 0px;
-  border-radius: 4px 4px 0px 0px;
+  -moz-border-radius: 3px 3px 0px 0px;
+  -webkit-border-radius: 3px 3px 0px 0px;
+  border-radius: 3px 3px 0px 0px;
 }
 
 #menium li .greybox li:hover {
@@ -1021,11 +1053,11 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   border-top:none;
 
   /* Gradient background */
-  background:#eeeeee;
-#  background: -moz-linear-gradient(top, #FFF, #DDD);
-#  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DDD));
-#  background: -ms-linear-gradient(top, #FBFBFB, #DDD);
-#  background: -webkit-linear-gradient(top, #FBFBFB, #DDD);
+  background:#EEF7F7;
+#  background: -moz-linear-gradient(top, #FFF, #DEEFEF);
+#  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DEEFEF));
+#  background: -ms-linear-gradient(top, #FBFBFB, #DEEFEF);
+#  background: -webkit-linear-gradient(top, #FBFBFB, #DEEFEF);
 
   /* Rounded Corners */
   -moz-border-radius: 0px 4px 4px 4px;
@@ -1377,7 +1409,7 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 }
 
 tr.iftype:nth-child(odd) {
-  background: #e5e5e5;
+  background: #e0e5e5;
 }
 
 tr.iftype:nth-child(even) {
@@ -1397,7 +1429,7 @@ tr.bgp:nth-child(even) {
 }
 
 tr.locations:nth-child(even) {
-  background: #e5e5e5;
+  background: #e0e5e5;
 }
 
 tr.locations:nth-child(odd) {
@@ -1405,7 +1437,7 @@ tr.locations:nth-child(odd) {
 }
 
 tr.inventory:nth-child(even) {
-  background: #e5e5e5;
+  background: #e0e5e5;
 }
 
 tr.inventory:nth-child(odd) {
@@ -1413,7 +1445,7 @@ tr.inventory:nth-child(odd) {
 }
 
 tr.list:nth-child(odd) {
-  background: #e5e5e5;
+  background: #e0e5e5;
 }
 
 tr.list:nth-child(even) {
@@ -1421,7 +1453,7 @@ tr.list:nth-child(even) {
 }
 
 tr.eventlog:nth-child(even) {
-  background: #e5e5e5;
+  background: #e0e5e5;
 }
 
 tr.eventlog:nth-child(odd) {
@@ -1429,7 +1461,7 @@ tr.eventlog:nth-child(odd) {
 }
 
 tr.syslog:nth-child(even) {
-  background: #e5e5e5;
+  background: #e0e5e5;
 }
 
 tr.syslog:nth-child(odd) {
@@ -1437,7 +1469,7 @@ tr.syslog:nth-child(odd) {
 }
 
 tr.search:nth-child(even) {
-  background: #e5e5e5;
+  background: #e0e5e5;
 }
 
 tr.search:nth-child(odd) {
