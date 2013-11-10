@@ -467,6 +467,18 @@ a.list-device-disabled, a.list-device-disabled:visited {
   color: #999999;
 }
 
+.front-page {
+  padding: 3px 10px;
+  background: #fff;
+}
+
+.front-page-bgp-normal {
+}
+
+.front-page-bgp-small {
+  font-size: 10px;
+}
+
 .front-box {
   text-align: center;
   margin: 1pt;
@@ -1476,7 +1488,6 @@ tr.search:nth-child(odd) {
   background: #ffffff;
 }
 
-
 .paddedcell {
   padding: 7px;
 }
@@ -1489,3 +1500,18 @@ tr.search:nth-child(odd) {
   font-weight: bold;
   font-size: 16px;
 }
+
+.overlib-box {
+  width: 708px;
+}
+
+.overlib-title {
+  margin-left: 5px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.minigraph-image {
+  margin: 2px;
+}
+

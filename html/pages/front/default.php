@@ -7,7 +7,7 @@ echo("<div class=\"front-box $frontbox_class\">
       </div>");
 }
 
-echo("<div style='padding: 3px 10px; background: #fff;'>");
+echo("<div class=front-page>");
 
 if ($_SESSION['userlevel'] == '10')
 {
@@ -73,7 +73,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
   {
   generate_front_box("bgp-down", "<center>".generate_device_link($peer, shorthost($peer['hostname']))."<br />
       <span class=bgp-down>BGP Down</span>
-      <span style='" . (strstr($peer['bgpPeerIdentifier'],':') ? 'font-size: 10px' : '') . "'>".$peer['bgpPeerIdentifier']."</span><br />
+      <span class='" . (strstr($peer['bgpPeerIdentifier'],':') ? 'front-page-bgp-small' : 'front-page-bgp-normal') . "'>".$peer['bgpPeerIdentifier']."</span><br />
       <span class=body-date-1>AS".truncate($peer['bgpPeerRemoteAs']." ".$peer['astext'], 14, "")."</span>
       </center>");
   }
