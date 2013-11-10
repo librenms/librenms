@@ -495,6 +495,12 @@ a.list-device-disabled, a.list-device-disabled:visited {
   border-radius: 2pt 2pt 2pt 2pt;
 }
 
+.front-syslog .front-eventlog {
+  margin: 4px;
+  clear: both;
+  padding: 5px;
+}
+
 .device-down {
   background: #ffd7d7;
 }
