@@ -17,9 +17,6 @@ Roadmap
 - Integrate Nagios-based alerting.  Allow user to choose their preferred
   Nagios distribution/fork.
 
-- Possibly build a testing ISO/VM image to allow people to quickly and
-  easily trial LibreNMS on their network.
-
 - Consider adding some non-monitoring administrative functions:
   - enabling/disabling ports
   - changing access port VLANs
@@ -27,5 +24,5 @@ Roadmap
 
 - Integrate as many usability improvements as time permits:
   - Integrate nice menus like current Observium?
-  - Front page cleanups: more automation; GUI configuration?
+  - Front page: more automation; GUI configuration?
 
