@@ -1481,3 +1481,11 @@ tr.search:nth-child(odd) {
   padding: 7px;
 }
 
+.overlib {
+  width: 590px;
+}
+
+.overlib-text {
+  font-weight: bold;
+  font-size: 16px;
+}

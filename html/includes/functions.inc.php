@@ -83,7 +83,7 @@ function generate_overlib_content($graph_array, $text)
 {
     global $config;
 
-    $overlib_content = '<div style="width: 590px;"><span style="font-weight: bold; font-size: 16px;">'.$text."</span><br />";
+    $overlib_content = '<div class=overlib><span class=overlib-text>'.$text."</span><br />";
     foreach (array('day','week','month','year') as $period)
     {
       $graph_array['from']        = $config['time'][$period];
@@ -138,16 +138,13 @@ function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end
 
   $url = generate_device_url($device, $vars);
 
-  $contents = "<div class=list-large>".$device['hostname'];
+  // beginning of overlib box contains large hostname followed by hardware & OS details
+  $contents = "<div><span class=list-large>".$device['hostname']."</span>";
   if ($device['hardware']) { $contents .= " - ".$device['hardware']; }
-  $contents .= "</div>";
-
-  $contents .= "<div>";
-  if ($device['os']) { $contents .= mres($config['os'][$device['os']]['text']); }
+  if ($device['os']) { $contents .= " - ".mres($config['os'][$device['os']]['text']); }
   if ($device['version']) { $contents .= " ".mres($device['version']); }
   if ($device['features']) { $contents .= " (".mres($device['features']).")"; }
-  if ($device['hardware']) { $contents .= " - ".$device['hardware']; }
-  if (isset($device['location'])) { $contents .= "<br />" . htmlentities($device['location']); }
+  if (isset($device['location'])) { $contents .= " - " . htmlentities($device['location']); }
   $contents .= "</div>";
 
   foreach ($graphs as $entry)
