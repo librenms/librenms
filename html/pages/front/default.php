@@ -101,7 +101,7 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
 if ($config['enable_syslog'])
 {
   // Open Syslog Div
-  echo("<div style='margin: 4px; clear: both; padding: 5px;'>
+  echo("<div class=front-syslog>
     <h3>Recent Syslog Messages</h3>
   ");
 
@@ -121,7 +121,7 @@ if ($config['enable_syslog'])
 } else {
 
   // Open eventlog Div
-  echo("<div style='margin: 4px; clear: both; padding: 5px;'>
+  echo("<div class=front-eventlog>
     <h3>Recent Eventlog Entries</h3>
   ");
 
