@@ -1,3 +1,14 @@
+NOTE
+----
+
+Please note that LibreNMS is covered by the GPLv3, but also includes an
+exception for included third-party packages.  Please see README.md for full
+details of this exception.
+
+
+Original GPLv3 text
+-------------------
+
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
