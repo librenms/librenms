@@ -3,7 +3,7 @@
  *
  * Version: 3.1.5-pre
  *
- * Requires: 1.2.2+
+ * Requires: jQuery 1.2.2+
  */
 
 (function (factory) {
@@ -19,8 +19,9 @@
     }
 }(function ($) {
 
-    var toFix = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'];
+    var toFix  = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'];
     var toBind = 'onwheel' in document || document.documentMode >= 9 ? ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'];
+    var slice  = Array.prototype.slice;
     var lowestDelta, lowestDeltaXY;
 
     if ( $.event.fixHooks ) {
@@ -64,7 +65,7 @@
 
     function handler(event) {
         var orgEvent   = event || window.event,
-            args       = [].slice.call(arguments, 1),
+            args       = slice.call(arguments, 1),
             delta      = 0,
             deltaX     = 0,
             deltaY     = 0,
@@ -75,31 +76,29 @@
         event.type = 'mousewheel';
 
         // Old school scrollwheel delta
-        if ( orgEvent.wheelDelta ) { delta = orgEvent.wheelDelta; }
-        if ( orgEvent.detail )     { delta = orgEvent.detail * -1; }
+        if ( 'detail'      in orgEvent ) { deltaY = orgEvent.detail * -1;      }
+        if ( 'wheelDelta'  in orgEvent ) { deltaY = orgEvent.wheelDelta;       }
+        if ( 'wheelDeltaY' in orgEvent ) { deltaY = orgEvent.wheelDeltaY;      }
+        if ( 'wheelDeltaX' in orgEvent ) { deltaX = orgEvent.wheelDeltaX * -1; }
 
-        // At a minimum, setup the deltaY to be delta
-        deltaY = delta;
-
-        // Firefox < 17 related to DOMMouseScroll event
-        if ( orgEvent.axis !== undefined && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
+        // Firefox < 17 horizontal scrolling related to DOMMouseScroll event
+        if ( 'axis' in orgEvent && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
             deltaY = 0;
             deltaX = delta * -1;
         }
 
-        // New school wheel delta (wheel event)
-        if ( orgEvent.deltaY ) {
-            deltaY = orgEvent.deltaY * -1;
-            delta  = deltaY;
-        }
-        if ( orgEvent.deltaX ) {
-            deltaX = orgEvent.deltaX;
-            delta  = deltaX * -1;
-        }
+        // Set delta to be deltaY or deltaX if deltaY is 0 for backwards compatabilitiy
+        delta = deltaY === 0 ? deltaX : deltaY;
 
-        // Webkit
-        if ( orgEvent.wheelDeltaY !== undefined ) { deltaY = orgEvent.wheelDeltaY; }
-        if ( orgEvent.wheelDeltaX !== undefined ) { deltaX = orgEvent.wheelDeltaX * -1; }
+        // New school wheel delta (wheel event)
+        if ( 'deltaY' in orgEvent ) {
+          deltaY = orgEvent.deltaY * -1;
+          delta  = deltaY;
+        }
+        if ( 'deltaX' in orgEvent ) {
+          deltaX = orgEvent.deltaX;
+          delta  = detlaX * -1;
+        }
 
         // Look for lowest delta to normalize the delta values
         absDelta = Math.abs(delta);
