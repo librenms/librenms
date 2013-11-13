@@ -100,6 +100,9 @@
           delta  = detlaX * -1;
         }
 
+        // No change actually happened, no reason to go any further
+        if ( deltaY === 0 && deltaX === 0 ) { return; }
+
         // Look for lowest delta to normalize the delta values
         absDelta = Math.abs(delta);
         if ( !lowestDelta || absDelta < lowestDelta ) { lowestDelta = absDelta; }
