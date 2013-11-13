@@ -96,6 +96,7 @@ markers.on('clusterclick', function (a) {
 
 ### Zooming to the bounds of a cluster
 When you recieve an event from a cluster you can zoom to its bounds in one easy step.
+If all of the markers will appear at a higher zoom level, that zoom level is zoomed to instead.
 See [marker-clustering-zoomtobounds.html](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-zoomtobounds.html) for a working example.
 ```javascript
 markers.on('clusterclick', function (a) {
