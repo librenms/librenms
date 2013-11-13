@@ -3,6 +3,8 @@
   "version": "3.1.6",
   "author": "Brandon Aaron <brandon.aaron@gmail.com> (http://brandonaaron.net/)",
   "description": "A jQuery plugin that adds cross-browser mouse wheel support.",
+  "license": "MIT",
+  "homepage": "https://github.com/brandonaaron/jquery-mousewheel",
   "main": "./jquery.mousewheel.js",
   "repository": {
     "type": "git",
@@ -19,12 +21,6 @@
     "mousewheel",
     "plugin",
     "browser"
-  ],
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://raw.github.com/brandonaaron/jquery-mousewheel/master/LICENSE.txt"
-    }
   ],
   "devDependencies": {
     "grunt": "~0.4.1",
