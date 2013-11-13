@@ -1,5 +1,15 @@
 # Mouse Wheel ChangeLog
 
+## 3.1.5-pre
+
+* Deprecating delta, deltaX, and deltaY event handler arguments
+* Update actual event object with normalized deltaX and deltaY values (event.deltaX, event.deltaY)
+* Add deltaFactor to the event object (event.deltaFactor)
+* Handle > 0 but < 1 deltas better (Firefox)
+* Do not fire the event if deltaX and deltaY are 0
+* Better handle different devices that give different lowestDelta values
+* Some clean up
+
 ## 3.1.4
 
 * Always set the deltaY
