@@ -1,25 +1,34 @@
 # jQuery Mouse Wheel Plugin
 
-A [jQuery](http://jquery.com/) plugin that adds cross-browser mouse wheel support.
+A [jQuery](http://jquery.com/) plugin that adds cross-browser mouse wheel support with delta normalization.
 
 In order to use the plugin, simply bind the `mousewheel` event to an element.
+
 It also provides two helper methods called `mousewheel` and `unmousewheel`
-that act just like other event helper methods in jQuery. The event callback
-receives three extra arguments which are the normalized "deltas" of the mouse wheel.
+that act just like other event helper methods in jQuery.
+
+The event object is updated with the normalized `deltaX` and `deltaY` properties.
+In addition there is a new property on the event object called `deltaFactor`. Multiply
+the `deltaFactor` by `deltaX` or `deltaY` to get the scroll distance that the browser
+has reported.
 
 Here is an example of using both the bind and helper method syntax:
 
 ```js
-// using bind
-$('#my_elem').on('mousewheel', function(event, delta, deltaX, deltaY) {
-    console.log(delta, deltaX, deltaY);
+// using on
+$('#my_elem').on('mousewheel', function(event) {
+    console.log(event.deltaX, event.deltaY, event.deltaFactor);
 });
 
 // using the event helper
-$('#my_elem').mousewheel(function(event, delta, deltaX, deltaY) {
-    console.log(delta, deltaX, deltaY);
+$('#my_elem').mousewheel(function(event) {
+    console.log(event.deltaX, event.deltaY, event.deltaFactor);
 });
 ```
+
+The old behavior of adding three arguments (`delta`, `deltaX`, and `deltaY`) to the
+event handler is now deprecated and will be removed in later releases.
+
 
 ## See it in action
 [See the tests on Github](http://brandonaaron.github.io/jquery-mousewheel/test).
