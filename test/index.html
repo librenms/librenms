@@ -5,15 +5,15 @@
         <title>Testing mousewheel plugin</title>
 
         <script>
-            (function(){
-                    var verMatch = /v=([\w\.]+)/.exec( location.search ),
-                    version = verMatch && verMatch[1], src;
-                    if ( version ) {
-                            src = 'code.jquery.com/jquery-' + version;
-                    } else {
-                            src = 'code.jquery.com/jquery-git';
-                    }
-                    document.write( '<script src="http://' + src + '.js"><\/script>' );
+            (function() {
+                var verMatch = /v=([\w\.]+)/.exec(location.search),
+                    version = verMatch && verMatch[1],
+                    src;
+                if (version)
+                    src = 'code.jquery.com/jquery-' + version;
+                else
+                    src = 'code.jquery.com/jquery-git';
+                document.write('<script src="http://' + src + '.js"><\/script>');
             })();
         </script>
         <script src="../jquery.mousewheel.js"></script>
@@ -160,12 +160,12 @@
 
                 $('#test3')
                     .hover(function() { log('#test3: mouseover'); }, function() { log('#test3: mouseout'); })
-                    .mousewheel(function(event, delta, deltaX, deltaY) {
+                    .mousewheel(function() {
                         log('#test3: I should not have been logged');
                     })
                     .unmousewheel();
 
-                var testRemoval = function(event, delta, deltaX, deltaY) {
+                var testRemoval = function() {
                     log('#test4: I should not have been logged');
                 };
 
@@ -202,8 +202,8 @@
                     });
 
                 function log(msg) {
-                    $('#logger').append('<p>'+msg+'<\/p>')[0].scrollTop = 999999;
-                };
+                    $('#logger').append('<p>' + msg + '<\/p>')[0].scrollTop = 999999;
+                }
             });
         </script>
     </head>
