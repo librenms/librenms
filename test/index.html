@@ -21,6 +21,7 @@
         <style>
             #stage {
                 position: relative;
+                zoom: 1;
             }
             #test1 {
                 background-color: #000;
@@ -89,7 +90,7 @@
             #logger {
                 position: absolute;
                 top: 100px;
-                left: 0px;
+                left: 0;
                 width: 480px;
                 height: 310px;
                 overflow: auto;
@@ -117,6 +118,9 @@
                 $('#userAgent').html(navigator.userAgent);
                 $('#jqueryVersion').html($.fn.jquery);
 
+                function addFactorInfo(event) {
+                  return ', deltaFactor(' + event.deltaFactor + ')';
+                }
 
                 $('#test1')
                     .mousewheel(function(event, delta, deltaX, deltaY) {
@@ -137,7 +141,7 @@
                             o = o + ', south ('+deltaY+')';
 
                         if( o != '' )
-                            log( o );
+                            log( o + addFactorInfo(event) );
 
                         log('pageX: ' + event.pageX + ' pageY: ' + event.pageY );
                     });
@@ -161,7 +165,7 @@
                             o = o + ', south ('+deltaY+')';
 
                         if( o != '' )
-                            log( o );
+                            log( o + addFactorInfo(event) );
                         return false; // prevent default
                     });
 
@@ -195,7 +199,7 @@
                             o = o + ', south ('+deltaY+')';
 
                         if( o != '' )
-                            log( o );
+                            log( o + addFactorInfo(event) );
                         return false;
                     })
                     .mousewheel(testRemoval)
@@ -217,7 +221,7 @@
                             o = o + ', south ('+deltaY+')';
 
                         if( o != '' )
-                            log( o + ' from 2nd handler' );
+                            log( o + addFactorInfo(event) + ' from 2nd handler' );
                         return false;
                     })
                     .unmousewheel(testRemoval);
@@ -241,7 +245,7 @@
                             o = o + ', south ('+deltaY+')';
 
                         if( o != '' )
-                            log( o );
+                            log( o + addFactorInfo(event) );
 
                         event.stopPropagation();
                         event.preventDefault();
@@ -266,7 +270,7 @@
                             o = o + ', south ('+deltaY+')';
 
                         if( o != '' )
-                            log( o );
+                            log( o + addFactorInfo(event) );
 
                         event.stopPropagation();
                         event.preventDefault();
@@ -291,13 +295,13 @@
                             o = o + ', south ('+deltaY+')';
 
                         if( o != '' )
-                            log( o );
+                            log( o + addFactorInfo(event) );
 
                         event.preventDefault();
                     });
 
                 function log(msg) {
-                    $('#logger').append('<p>'+msg+'</p>').scrollTop(999999);
+                    $('#logger').append('<p>'+msg+'<\/p>').scrollTop(999999);
                 };
             });
         </script>
