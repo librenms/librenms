@@ -82,8 +82,8 @@
 
         // Firefox < 17 horizontal scrolling related to DOMMouseScroll event
         if ( 'axis' in orgEvent && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
+            deltaX = deltaY * -1;
             deltaY = 0;
-            deltaX = delta * -1;
         }
 
         // Set delta to be deltaY or deltaX if deltaY is 0 for backwards compatabilitiy
@@ -96,7 +96,7 @@
         }
         if ( 'deltaX' in orgEvent ) {
           deltaX = orgEvent.deltaX;
-          delta  = detlaX * -1;
+          if ( deltaY === 0 ) { delta  = deltaX * -1; }
         }
 
         // No change actually happened, no reason to go any further
