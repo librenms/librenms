@@ -24,8 +24,13 @@ module.exports = function(grunt) {
           server: {
             options: {
               hostname: '*',
-              directory: '.',
-              keepalive: true
+              keepalive: true,
+              middleware: function(connect, options) {
+                return [
+                  connect.static(options.base),
+                  connect.directory(options.base)
+                ];
+              }
             }
           }
         }
