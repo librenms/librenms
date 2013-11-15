@@ -1,6 +1,6 @@
 # Mouse Wheel ChangeLog
 
-## 3.1.5-pre
+## 3.1.5
 
 * Deprecating delta, deltaX, and deltaY event handler arguments
 * Update actual event object with normalized deltaX and deltaY values (event.deltaX, event.deltaY)

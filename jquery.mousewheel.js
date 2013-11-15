@@ -1,7 +1,7 @@
 /*! Copyright (c) 2013 Brandon Aaron (http://brandon.aaron.sh)
  * Licensed under the MIT License (LICENSE.txt).
  *
- * Version: 3.1.5-pre
+ * Version: 3.1.5
  *
  * Requires: jQuery 1.2.2+
  */

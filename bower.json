@@ -1,6 +1,6 @@
 {
   "name": "jquery-mousewheel",
-  "version": "3.1.5-pre",
+  "version": "3.1.5",
   "main": "./jquery.mousewheel.js",
   "ignore": [
     ".*",
