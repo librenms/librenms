@@ -32,6 +32,8 @@
     }
 
     $.event.special.mousewheel = {
+        version: '3.1.5-pre',
+
         setup: function() {
             if ( this.addEventListener ) {
                 for ( var i = toBind.length; i; ) {

@@ -8,6 +8,7 @@
 * Handle > 0 but < 1 deltas better (Firefox)
 * Do not fire the event if deltaX and deltaY are 0
 * Better handle different devices that give different lowestDelta values
+* Add $.event.special.mousewheel.version
 * Some clean up
 
 ## 3.1.4
