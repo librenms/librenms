@@ -172,7 +172,7 @@
 					$.fn.mapael.updateElem(elemOptions, plots[id], $tooltip, animDuration);
 				}
 				
-				opt.afterUpdate && opt.afterUpdate($self, paper, areas, plots);
+				opt.afterUpdate && opt.afterUpdate($self, paper, areas, plots, options);
 			});
 			
 			// Handle resizing of the map
@@ -205,7 +205,7 @@
 			}
 			
 			// Hook that allows to add custom processing on the map
-			options.map.afterInit && options.map.afterInit($self, paper, areas, plots);
+			options.map.afterInit && options.map.afterInit($self, paper, areas, plots, options);
 			
 			$(paper.desc).append(" and Mapael (http://neveldo.fr/mapael)");
 		});
@@ -477,6 +477,8 @@
 				}
 			}
 			return false;
+		}).on("scroll", function(e) {
+			console.log("test");
 		});
 	}
 	
