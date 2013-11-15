@@ -32,7 +32,6 @@
     "grunt-contrib-uglify": "~0.2.4",
     "grunt-contrib-connect": "~0.5.0"
   },
-  "readmeFilename": "README.markdown",
   "directories": {
     "test": "test"
   },
