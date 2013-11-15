@@ -118,54 +118,40 @@
                 $('#userAgent').html(navigator.userAgent);
                 $('#jqueryVersion').html($.fn.jquery);
 
-                function addFactorInfo(event) {
-                  return ', deltaFactor(' + event.deltaFactor + ')';
-                }
+                var loghandle = function(event, delta) {
+                    var o = '', id = event.currentTarget.id;
+
+                    o = '#' + id + ':';
+
+                    if (delta > 0)
+                        o = ' up (' + delta + ')';
+                    else if (delta < 0)
+                        o = ' down (' + delta + ')';
+
+                    if (event.deltaY > 0)
+                        o += ' north (' + event.deltaY + ')';
+                    else if (event.deltaY < 0)
+                        o += ' south (' + event.deltaY + ')';
+
+                    if (event.deltaX > 0)
+                        o += ' east (' + event.deltaX + ')';
+                    else if (event.deltaX < 0)
+                        o += ' south (' + event.deltaX + ')';
+
+                    o += ' deltaFactor (' + event.deltaFactor + ')';
+
+                    log( o );
+                };
 
                 $('#test1')
                     .mousewheel(function(event, delta, deltaX, deltaY) {
-                        var o = '';
-                        if (delta > 0)
-                            o = '#test1: up ('+delta+')';
-                        else if (delta < 0)
-                            o = '#test1: down ('+delta+')';
-
-                        if (deltaX > 0)
-                            o = o + ', east ('+deltaX+')';
-                        else if (deltaX < 0)
-                            o = o + ', west ('+deltaX+')';
-
-                        if (deltaY > 0)
-                            o = o + ', north ('+deltaY+')';
-                        else if (deltaY < 0)
-                            o = o + ', south ('+deltaY+')';
-
-                        if( o != '' )
-                            log( o + addFactorInfo(event) );
-
+                        loghandle(event, delta);
                         log('pageX: ' + event.pageX + ' pageY: ' + event.pageY );
                     });
 
                 $('#test2')
                     .mousewheel(function(event, delta, deltaX, deltaY) {
-                        var o = '';
-                        if (delta > 0)
-                            o = '#test2: up ('+delta+')';
-                        else if (delta < 0)
-                            o = '#test2: down ('+delta+')';
-
-                        if (deltaX > 0)
-                            o = o + ', east ('+deltaX+')';
-                        else if (deltaX < 0)
-                            o = o + ', west ('+deltaX+')';
-
-                        if (deltaY > 0)
-                            o = o + ', north ('+deltaY+')';
-                        else if (deltaY < 0)
-                            o = o + ', south ('+deltaY+')';
-
-                        if( o != '' )
-                            log( o + addFactorInfo(event) );
+                        loghandle(event, delta);
                         return false; // prevent default
                     });
 
@@ -182,126 +168,38 @@
 
                 $('#test4')
                     .mousewheel(function(event, delta, deltaX, deltaY) {
-                        var o = '';
-                        if (delta > 0)
-                            o = '#test4: up ('+delta+')';
-                        else if (delta < 0)
-                            o = '#test4: down ('+delta+')';
-
-                        if (deltaX > 0)
-                            o = o + ', east ('+deltaX+')';
-                        else if (deltaX < 0)
-                            o = o + ', west ('+deltaX+')';
-
-                        if (deltaY > 0)
-                            o = o + ', north ('+deltaY+')';
-                        else if (deltaY < 0)
-                            o = o + ', south ('+deltaY+')';
-
-                        if( o != '' )
-                            log( o + addFactorInfo(event) );
+                        loghandle(event, delta);
                         return false;
                     })
                     .mousewheel(testRemoval)
                     .mousewheel(function(event, delta, deltaX, deltaY) {
-                        var o = '';
-                        if (delta > 0)
-                            o = '#test4: up ('+delta+')';
-                        else if (delta < 0)
-                            o = '#test4: down ('+delta+')';
-
-                        if (deltaX > 0)
-                            o = o + ', east ('+deltaX+')';
-                        else if (deltaX < 0)
-                            o = o + ', west ('+deltaX+')';
-
-                        if (deltaY > 0)
-                            o = o + ', north ('+deltaY+')';
-                        else if (deltaY < 0)
-                            o = o + ', south ('+deltaY+')';
-
-                        if( o != '' )
-                            log( o + addFactorInfo(event) + ' from 2nd handler' );
+                        loghandle(event, delta);
                         return false;
                     })
                     .unmousewheel(testRemoval);
 
                 $('#test5')
                     .mousewheel(function(event, delta, deltaX, deltaY) {
-                        var o = '';
-                        if (delta > 0)
-                            o = '#test5: up ('+delta+')';
-                        else if (delta < 0)
-                            o = '#test5: down ('+delta+')';
-
-                        if (deltaX > 0)
-                            o = o + ', east ('+deltaX+')';
-                        else if (deltaX < 0)
-                            o = o + ', west ('+deltaX+')';
-
-                        if (deltaY > 0)
-                            o = o + ', north ('+deltaY+')';
-                        else if (deltaY < 0)
-                            o = o + ', south ('+deltaY+')';
-
-                        if( o != '' )
-                            log( o + addFactorInfo(event) );
-
+                        loghandle(event, delta);
                         event.stopPropagation();
                         event.preventDefault();
                     });
 
                 $('#test6')
                     .mousewheel(function(event, delta, deltaX, deltaY) {
-                        var o = '';
-                        if (delta > 0)
-                            o = '#test6: up ('+delta+')';
-                        else if (delta < 0)
-                            o = '#test6: down ('+delta+')';
-
-                        if (deltaX > 0)
-                            o = o + ', east ('+deltaX+')';
-                        else if (deltaX < 0)
-                            o = o + ', west ('+deltaX+')';
-
-                        if (deltaY > 0)
-                            o = o + ', north ('+deltaY+')';
-                        else if (deltaY < 0)
-                            o = o + ', south ('+deltaY+')';
-
-                        if( o != '' )
-                            log( o + addFactorInfo(event) );
-
+                        loghandle(event, delta);
                         event.stopPropagation();
                         event.preventDefault();
                     });
 
                 $('#test7')
                     .mousewheel(function(event, delta, deltaX, deltaY) {
-                        var o = '';
-                        if (delta > 0)
-                            o = '#test7: up ('+delta+')';
-                        else if (delta < 0)
-                            o = '#test7: down ('+delta+')';
-
-                        if (deltaX > 0)
-                            o = o + ', east ('+deltaX+')';
-                        else if (deltaX < 0)
-                            o = o + ', west ('+deltaX+')';
-
-                        if (deltaY > 0)
-                            o = o + ', north ('+deltaY+')';
-                        else if (deltaY < 0)
-                            o = o + ', south ('+deltaY+')';
-
-                        if( o != '' )
-                            log( o + addFactorInfo(event) );
-
+                        loghandle(event, delta);
                         event.preventDefault();
                     });
 
                 function log(msg) {
-                    $('#logger').append('<p>'+msg+'<\/p>').scrollTop(999999);
+                    $('#logger').append('<p>'+msg+'<\/p>')[0].scrollTop = 999999;
                 };
             });
         </script>
