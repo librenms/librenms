@@ -556,7 +556,7 @@
 					label.attr({cursor:'pointer'});
 					
 					$.fn.mapael.setHoverOptions(elem, legendOptions.slices[i].attrs, legendOptions.slices[i].attrsHover);
-					$.fn.mapael.setHoverOptions(label, legendOptions.labelAttrs, legendOptions.labelAttrs);
+					$.fn.mapael.setHoverOptions(label, legendOptions.labelAttrs, legendOptions.labelAttrsHover);
 					$.fn.mapael.setHover(paper, elem, label);
 					
 					label.hidden = false;
@@ -820,6 +820,10 @@
 					, fill : "#343434"
 					, "text-anchor" : "start"
 				}
+				, labelAttrsHover : {
+					fill : "#787878"
+					, animDuration : 300
+				}
 				, hideElemsOnClick : {
 					enabled : true
 					, opacity : 0.2
@@ -842,6 +846,10 @@
 					"font-size" : 15
 					, fill : "#343434"
 					, "text-anchor" : "start"
+				}
+				, labelAttrsHover : {
+					fill : "#787878"
+					, animDuration : 300
 				}
 				, hideElemsOnClick : {
 					enabled : true
