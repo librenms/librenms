@@ -1,6 +1,6 @@
 # Mouse Wheel ChangeLog
 
-## 3.1.5
+## 3.1.6
 
 * Deprecating delta, deltaX, and deltaY event handler arguments
 * Update actual event object with normalized deltaX and deltaY values (event.deltaX, event.deltaY)
@@ -10,6 +10,10 @@
 * Better handle different devices that give different lowestDelta values
 * Add $.event.special.mousewheel.version
 * Some clean up
+
+## 3.1.5
+
+* Bad release because I did not update the new $.event.special.mousewheel.version
 
 ## 3.1.4
 
