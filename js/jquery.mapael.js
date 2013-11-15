@@ -372,20 +372,23 @@
 	* @param content the content to set in the tooltip
 	*/
 	$.fn.mapael.setTooltip = function(elem, $tooltip) {
-		var tooltipTO = 0;
+		var tooltipTO = 0
+        	, $container = $tooltip.parent()
+			, containerY2 = $container.offset().left + $container.width();
 	
-		$(elem.node).on("mouseover", function() {
+		$(elem.node).on("mouseover", function(e) {
 			tooltipTO = setTimeout(
 				function() {
 					elem.tooltipContent && $tooltip.html(elem.tooltipContent).css("display", "block");
+					$tooltip.css({"left" : Math.min(containerY2 - $tooltip.outerWidth() - 5, e.pageX + 12), "top" : e.pageY + 23 - $(window).scrollTop()});
 				}
 				, 120
 			);
-		}).on("mouseout", function() {
+		}).on("mouseout", function(e) {
 			clearTimeout(tooltipTO);
 			$tooltip.css("display", "none");
 		}).on("mousemove", function(e) {
-			$tooltip.css("left", e.pageX + 15).css("top", e.pageY + 15 - $(window).scrollTop());
+			$tooltip.css({"left" : Math.min(containerY2 - $tooltip.outerWidth() - 5, e.pageX + 12), "top" : e.pageY + 23 - $(window).scrollTop()});
 		});
 	};
 	
