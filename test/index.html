@@ -119,14 +119,15 @@
                 $('#jqueryVersion').html($.fn.jquery);
 
                 var loghandle = function(event, delta) {
+                console.log(event);
                     var o = '', id = event.currentTarget.id;
 
                     o = '#' + id + ':';
 
                     if (delta > 0)
-                        o = ' up (' + delta + ')';
+                        o += ' up (' + delta + ')';
                     else if (delta < 0)
-                        o = ' down (' + delta + ')';
+                        o += ' down (' + delta + ')';
 
                     if (event.deltaY > 0)
                         o += ' north (' + event.deltaY + ')';
