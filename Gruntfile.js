@@ -21,18 +21,18 @@ module.exports = function(grunt) {
             }
         },
         connect: {
-          server: {
-            options: {
-              hostname: '*',
-              keepalive: true,
-              middleware: function(connect, options) {
-                return [
-                  connect.static(options.base),
-                  connect.directory(options.base)
-                ];
-              }
+            server: {
+                options: {
+                    hostname: '*',
+                    keepalive: true,
+                    middleware: function(connect, options) {
+                        return [
+                            connect.static(options.base),
+                            connect.directory(options.base)
+                        ];
+                    }
+                }
             }
-          }
         }
     });
 

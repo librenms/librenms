@@ -93,12 +93,12 @@
 
         // New school wheel delta (wheel event)
         if ( 'deltaY' in orgEvent ) {
-          deltaY = orgEvent.deltaY * -1;
-          delta  = deltaY;
+            deltaY = orgEvent.deltaY * -1;
+            delta  = deltaY;
         }
         if ( 'deltaX' in orgEvent ) {
-          deltaX = orgEvent.deltaX;
-          if ( deltaY === 0 ) { delta  = deltaX * -1; }
+            deltaX = orgEvent.deltaX;
+            if ( deltaY === 0 ) { delta  = deltaX * -1; }
         }
 
         // No change actually happened, no reason to go any further
@@ -107,7 +107,7 @@
         // Store lowest absolute delta to normalize the delta values
         absDelta = Math.max( Math.abs(deltaY), Math.abs(deltaX) );
         if ( !lowestDelta || absDelta < lowestDelta ) {
-          lowestDelta = absDelta;
+            lowestDelta = absDelta;
         }
 
         // Get a whole, normalized value for the deltas
@@ -134,7 +134,7 @@
     }
 
     function nullLowestDelta() {
-      lowestDelta = null;
+        lowestDelta = null;
     }
 
 }));
