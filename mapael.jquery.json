@@ -9,7 +9,7 @@
 		"dataviz",
 		"dynamic"
 	],
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"author": {
 		"name": "Vincent Brouté",
 		"url": "http://www.neveldo.fr"
@@ -34,6 +34,6 @@
 	"download": "https://github.com/neveldo/jQuery-Mapael/tags",
 	"dependencies": {
 		"jquery": ">=1.7",
-		"raphael": ">=2.10"
+		"raphael": ">=2.1"
 	}
 }
