@@ -55,6 +55,7 @@ Here is the simplest example that shows how to display an empty map of the world
 *   [Map of USA with some plotted cities](http://jsfiddle.net/neveldo/KeBTy/embedded/result/) - [Edit in JSFiddle](http://jsfiddle.net/neveldo/KeBTy/)
 *   [Open a link in a new tab](http://jsfiddle.net/neveldo/E4hqM/embedded/result/) - [Edit in JSFiddle](http://jsfiddle.net/neveldo/E4hqM/)
 *   [Setting an image as a plot](http://jsfiddle.net/neveldo/8Ke69/embedded/result/) - [Edit in JSFiddle](http://jsfiddle.net/neveldo/8Ke69/)
+*   [Playing with the zoom features : focus on specific areas, zoom on scroll](http://jsfiddle.net/neveldo/RahvT/embedded/result/) - [Edit in JSFiddle](http://jsfiddle.net/neveldo/RahvT/)
 
 ## License
 
