@@ -419,35 +419,39 @@
 	* @param options
 	*/
 	$.fn.mapael.initZoom = function($container, paper, mapWidth, mapHeight, options) {
-		var $zoomIn = $("<div>").addClass(options.zoomInCssClass).html("+")
+		var $parentContainer = $container.parent()
+			, $zoomIn = $("<div>").addClass(options.zoomInCssClass).html("+")
 			, $zoomOut = $("<div>").addClass(options.zoomOutCssClass).html("&#x2212;")
-			, currentLevel = 0
-			, vbCenterX = mapWidth / 2
-			, vbCenterY = mapHeight / 2
 			, mousedown  = false
 			, previousX = 0
-			, previousY = 0
-			, setZoom = function(e) {
-				// Update zoom level
-				currentLevel = Math.min(Math.max(currentLevel + e.data.offset, 0), options.maxLevel);
-				if (currentLevel == 0) {
-					vbCenterX = mapWidth / 2
-					vbCenterY = mapHeight / 2
-					paper.setViewBox(0, 0, mapWidth, mapHeight);
-				} else {
-					paper.setViewBox(
-						Math.min(Math.max(0, vbCenterX - (mapWidth / (1 + currentLevel * options.step))/2), (mapWidth - (mapWidth / (1 + currentLevel * options.step)))), 
-						Math.min(Math.max(0, vbCenterY - (mapHeight / (1 + currentLevel * options.step))/2), (mapHeight - (mapHeight / (1 + currentLevel * options.step)))), 
-						mapWidth / (1 +currentLevel * options.step), 
-						mapHeight / (1 +currentLevel * options.step)
-					);
-				}
-			};
-			
+			, previousY = 0;
+		
+		// Zoom
+		$parentContainer.data("zoomLevel", 0);
 		$container.append($zoomIn).append($zoomOut);
 		
-		$zoomIn.on("click", null, {offset : 1} , setZoom);
-		$zoomOut.on("click", null, {offset : -1}, setZoom);
+		$parentContainer.on("zoom", function(e, level, x, y) {
+			var currentLevel = Math.min(Math.max(level, 0), options.maxLevel);
+			$parentContainer.data("zoomLevel", currentLevel);
+			
+			(typeof x == "undefined") && (x = (paper._viewBox[0] + paper._viewBox[2] / 2));
+			(typeof y == "undefined") && (y = (paper._viewBox[1] + paper._viewBox[3] / 2));
+			
+			// Update zoom level of the map
+			if (currentLevel == 0) {
+				paper.setViewBox(0, 0, mapWidth, mapHeight);
+			} else {
+				paper.setViewBox(
+					Math.min(Math.max(0, x - (mapWidth / (1 + currentLevel * options.step))/2), (mapWidth - (mapWidth / (1 + currentLevel * options.step)))), 
+					Math.min(Math.max(0, y - (mapHeight / (1 + currentLevel * options.step))/2), (mapHeight - (mapHeight / (1 + currentLevel * options.step)))), 
+					mapWidth / (1 + currentLevel * options.step), 
+					mapHeight / (1 + currentLevel * options.step)
+				);
+			}
+		});
+		
+		$zoomIn.on("click", function() {$parentContainer.trigger("zoom", $parentContainer.data("zoomLevel") + 1);});
+		$zoomOut.on("click", function() {$parentContainer.trigger("zoom", $parentContainer.data("zoomLevel") - 1);});
 		
 		// Panning
 		$('body').on("mouseup", function(e) {
@@ -461,18 +465,18 @@
 			previousY = e.pageY;
 			return false;
 		}).on("mousemove", function(e) {
+			var currentLevel = $parentContainer.data("zoomLevel");
 			if (mousedown  && currentLevel != 0) {
 				var offsetX = (previousX - e.pageX) / (1 + (currentLevel * options.step)) * (mapWidth / paper.width)
 					, offsetY = (previousY - e.pageY) / (1 + (currentLevel * options.step)) * (mapHeight / paper.height);					
 				
 				if (Math.abs(offsetX) > 5 || Math.abs(offsetY) > 5) {
-					var viewBoxX = Math.min(Math.max(0, paper._viewBox[0] + offsetX), (mapWidth - paper._viewBox[2]))
-						, viewBoxY = Math.min(Math.max(0, paper._viewBox[1] + offsetY), (mapHeight - paper._viewBox[3]));
-					
-					vbCenterX = viewBoxX + paper._viewBox[2] / 2;
-					vbCenterY = viewBoxY + paper._viewBox[3] / 2;
-					
-					paper.setViewBox(viewBoxX, viewBoxY, paper._viewBox[2], paper._viewBox[3]);
+					paper.setViewBox(
+						Math.min(Math.max(0, paper._viewBox[0] + offsetX), (mapWidth - paper._viewBox[2])), 
+						Math.min(Math.max(0, paper._viewBox[1] + offsetY), (mapHeight - paper._viewBox[3])),
+						paper._viewBox[2],
+						paper._viewBox[3]
+					);
 					
 					previousX = e.pageX;
 					previousY = e.pageY;
@@ -480,8 +484,6 @@
 				}
 			}
 			return false;
-		}).on("scroll", function(e) {
-			console.log("test");
 		});
 	}
 	
