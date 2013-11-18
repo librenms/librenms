@@ -4,20 +4,6 @@
         <meta charset="iso-8859-1">
         <title>Testing mousewheel plugin</title>
 
-        <script>
-            (function() {
-                var verMatch = /v=([\w\.]+)/.exec(location.search),
-                    version = verMatch && verMatch[1],
-                    src;
-                if (version)
-                    src = 'code.jquery.com/jquery-' + version;
-                else
-                    src = 'code.jquery.com/jquery-git';
-                document.write('<script src="http://' + src + '.js"><\/script>');
-            })();
-        </script>
-        <script src="../jquery.mousewheel.js"></script>
-
         <style>
             html {
                 font: 13px Arial, sans-serif;
@@ -116,6 +102,19 @@
                 border-bottom-color: #000;
             }
         </style>
+
+        <script>
+            (function() {
+                var verMatch = /v=([\w\.]+)/.exec(location.search),
+                    version = verMatch && verMatch[1],
+                    src;
+                if (version)
+                    src = 'code.jquery.com/jquery-' + version;
+                else
+                    src = 'code.jquery.com/jquery-git';
+                document.write('<script src="http://' + src + '.js"><\/script>');
+            })();
+        </script>
         <script>
             $(function() {
                 $('#userAgent').html(navigator.userAgent);
@@ -206,6 +205,7 @@
                 }
             });
         </script>
+        <script src="../jquery.mousewheel.js"></script>
     </head>
     <body>
         <h1 id="banner">jQuery mousewheel.js Test with jQuery <span id="jqueryVersion"></span></h1>
