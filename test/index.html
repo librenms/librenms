@@ -146,13 +146,13 @@
                 };
 
                 $('#test1')
-                    .mousewheel(function(event, delta, deltaX, deltaY) {
+                    .mousewheel(function(event, delta) {
                         loghandle(event, delta);
                         log('pageX: ' + event.pageX + ' pageY: ' + event.pageY );
                     });
 
                 $('#test2')
-                    .mousewheel(function(event, delta, deltaX, deltaY) {
+                    .mousewheel(function(event, delta) {
                         loghandle(event, delta);
                         return false; // prevent default
                     });
@@ -169,33 +169,33 @@
                 };
 
                 $('#test4')
-                    .mousewheel(function(event, delta, deltaX, deltaY) {
+                    .mousewheel(function(event, delta) {
                         loghandle(event, delta);
                         return false;
                     })
                     .mousewheel(testRemoval)
-                    .mousewheel(function(event, delta, deltaX, deltaY) {
+                    .mousewheel(function(event, delta) {
                         loghandle(event, delta);
                         return false;
                     })
                     .unmousewheel(testRemoval);
 
                 $('#test5')
-                    .mousewheel(function(event, delta, deltaX, deltaY) {
+                    .mousewheel(function(event, delta) {
                         loghandle(event, delta);
                         event.stopPropagation();
                         event.preventDefault();
                     });
 
                 $('#test6')
-                    .mousewheel(function(event, delta, deltaX, deltaY) {
+                    .mousewheel(function(event, delta) {
                         loghandle(event, delta);
                         event.stopPropagation();
                         event.preventDefault();
                     });
 
                 $('#test7')
-                    .mousewheel(function(event, delta, deltaX, deltaY) {
+                    .mousewheel(function(event, delta) {
                         loghandle(event, delta);
                         event.preventDefault();
                     });
