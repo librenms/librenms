@@ -1,2 +1,5 @@
-Makefile
+config.php
+.index
+logs
 patches
+rrd
