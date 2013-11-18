@@ -495,7 +495,46 @@ a.list-device-disabled, a.list-device-disabled:visited {
   border-radius: 2pt 2pt 2pt 2pt;
 }
 
-.front-syslog .front-eventlog {
+.status-boxes {
+}
+
+.boxes {
+  width: 350px;
+  height: 200px;
+  vertical-align: center;
+}
+
+.left-2-col-fluid {
+  display: table-cell;
+  margin-right: 400px;
+/*  width: 100%; */
+/*  vertical-align: top;*/
+}
+
+.right-2-col-fixed {
+  display: table-cell;
+  width: 350px;
+  height: 250px;
+  float: right;
+/*  vertical-align: top;*/
+
+  /* Rounded Corners */
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+
+  /* Borders */
+  border: 1px solid #aaaaaa;
+  padding: 5px;
+}
+
+.front-syslog {
+  margin: 4px;
+  clear: both;
+  padding: 5px;
+}
+
+.front-eventlog {
   margin: 4px;
   clear: both;
   padding: 5px;
@@ -1519,5 +1558,18 @@ tr.search:nth-child(odd) {
 
 .minigraph-image {
   margin: 2px;
+}
+
+.box {
+}
+
+.welcome {
+  padding-right: 25px;
+}
+
+.simple {
+  border: 0px;
+  width: 100%;
+  text-align: left;
 }
 
