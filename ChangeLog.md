@@ -2,23 +2,23 @@
 
 ## 3.1.6
 
-* Deprecating delta, deltaX, and deltaY event handler arguments
-* Update actual event object with normalized deltaX and deltaY values (event.deltaX, event.deltaY)
-* Add deltaFactor to the event object (event.deltaFactor)
-* Handle > 0 but < 1 deltas better
-* Do not fire the event if deltaX and deltaY are 0
-* Better handle different devices that give different lowestDelta values
-* Add $.event.special.mousewheel.version
+* Deprecating `delta`, `deltaX`, and `deltaY` event handler arguments
+* Update actual event object with normalized `deltaX `and `deltaY` values (`event.deltaX`, `event.deltaY`)
+* Add `deltaFactor` to the event object (`event.deltaFactor`)
+* Handle `> 0` but `< 1` deltas better
+* Do not fire the event if `deltaX` and `deltaY` are `0`
+* Better handle different devices that give different `lowestDelta` values
+* Add `$.event.special.mousewheel.version`
 * Some clean up
 
 ## 3.1.5
 
-* Bad release because I did not update the new $.event.special.mousewheel.version
+* Bad release because I did not update the new `$.event.special.mousewheel.version`
 
 ## 3.1.4
 
-* Always set the deltaY
-* Add back in the deltaX and deltaY support for older Firefox versions
+* Always set the `deltaY`
+* Add back in the `deltaX` and `deltaY` support for older Firefox versions
 
 ## 3.1.3
 

@@ -5,24 +5,29 @@
         <title>Testing mousewheel plugin</title>
 
         <script>
-            (function(){
-                    var verMatch = /v=([\w\.]+)/.exec( location.search ),
-                    version = verMatch && verMatch[1], src;
-                    if ( version ) {
-                            src = 'code.jquery.com/jquery-' + version;
-                    } else {
-                            src = 'code.jquery.com/jquery-git';
-                    }
-                    document.write( '<script src="http://' + src + '.js"><\/script>' );
+            (function() {
+                var verMatch = /v=([\w\.]+)/.exec(location.search),
+                    version = verMatch && verMatch[1],
+                    src;
+                if (version)
+                    src = 'code.jquery.com/jquery-' + version;
+                else
+                    src = 'code.jquery.com/jquery-git';
+                document.write('<script src="http://' + src + '.js"><\/script>');
             })();
         </script>
         <script src="../jquery.mousewheel.js"></script>
 
         <style>
+            html {
+                font: 13px Arial, sans-serif;
+            }
+
             #stage {
                 position: relative;
                 zoom: 1;
             }
+
             #test1 {
                 background-color: #000;
                 width: 120px;
@@ -98,15 +103,13 @@
             }
 
             #logger p {
-                font-family: Arial, sans-serif;
-                font-size: 13px;
                 padding: 2px;
                 border-bottom: 1px solid #ccc;
                 margin: 0;
             }
 
             #logger p:nth-child(even) {
-                background-color: #FFFFE8;
+                background-color: #ffffe8;
             }
 
             #logger p:nth-child(10n) {
@@ -157,12 +160,12 @@
 
                 $('#test3')
                     .hover(function() { log('#test3: mouseover'); }, function() { log('#test3: mouseout'); })
-                    .mousewheel(function(event, delta, deltaX, deltaY) {
+                    .mousewheel(function() {
                         log('#test3: I should not have been logged');
                     })
                     .unmousewheel();
 
-                var testRemoval = function(event, delta, deltaX, deltaY) {
+                var testRemoval = function() {
                     log('#test4: I should not have been logged');
                 };
 
@@ -199,8 +202,8 @@
                     });
 
                 function log(msg) {
-                    $('#logger').append('<p>'+msg+'<\/p>')[0].scrollTop = 999999;
-                };
+                    $('#logger').append('<p>' + msg + '<\/p>')[0].scrollTop = 999999;
+                }
             });
         </script>
     </head>
@@ -209,9 +212,9 @@
         <h2 id="userAgent"></h2>
 
         <ul>
-            <li><strong>Test1</strong> is just using the plain on mousewheel() with a function passed in and does not prevent default. (Also logs the value of pageX and pageY event properties.)</li>
+            <li><strong>Test1</strong> is just using the plain on <code>mousewheel()</code> with a function passed in and does not prevent default. (Also logs the value of <code>pageX</code> and <code>pageY</code> event properties.)</li>
             <li><strong>Test2</strong> should prevent the default action.</li>
-            <li><strong>Test3</strong> should only log a mouseover and mouseout event. Testing unmousewheel().</li>
+            <li><strong>Test3</strong> should only log a <code>mouseover</code> and <code>mouseout</code> event. Testing <code>unmousewheel()</code>.</li>
             <li><strong>Test4</strong> has two handlers.</li>
             <li><strong>Test5</strong> is like Test2 but has children. The children should not scroll until mousing over them.</li>
             <li><strong>Test6</strong> is like Test5 but should not scroll children or parents.</li>
