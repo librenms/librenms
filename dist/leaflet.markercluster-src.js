@@ -604,6 +604,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		} else if (this.options.zoomToBoundsOnClick) {
 			e.layer.zoomToBounds();
 		}
+
+    // Focus the map again for keyboard users.
+		if (typeof e.originalEvent.keyCode !== 'undefined' && e.originalEvent.keyCode === 13) {
+			document.getElementById(map._container).focus();
+		}
 	},
 
 	_showCoverage: function (e) {
