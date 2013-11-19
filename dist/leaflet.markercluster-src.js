@@ -607,7 +607,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
     // Focus the map again for keyboard users.
 		if (typeof e.originalEvent.keyCode !== 'undefined' && e.originalEvent.keyCode === 13) {
-			document.getElementById(map._container).focus();
+			document.getElementById(map._container.id).focus();
 		}
 	},
 
