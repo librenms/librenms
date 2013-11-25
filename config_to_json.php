@@ -6,6 +6,7 @@
 
 */
 
+$defaults_file = 'includes/defaults.inc.php';
 $config_file = 'config.php';
 
 // move to observium install dir
@@ -24,6 +25,7 @@ function iscli() {
 
 if ( iscli() ) {
 
+    require_once($defaults_file);
     require_once($config_file);
     print(json_encode($config));
 }
