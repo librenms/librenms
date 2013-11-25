@@ -1,15 +1,15 @@
 <?php
 /*
 
-    Observium configuration to JSON converter
-    Written by Job Snijders <job.snijders@atrato.com)
+    Configuration to JSON converter
+    Written by Job Snijders <job.snijders@atrato.com>
 
 */
 
 $defaults_file = 'includes/defaults.inc.php';
 $config_file = 'config.php';
 
-// move to observium install dir
+// move to install dir
 chdir(dirname($argv[0]));
 
 function iscli() {
