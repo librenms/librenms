@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 """
- poller-wrapper A small tool which wraps around the Observium poller
-                and tries to guide the polling process with a more modern
-                approach with a Queue and workers
+ poller-wrapper A small tool which wraps around the poller and tries to
+                guide the polling process with a more modern approach with a
+                Queue and workers
 
  Author:        Job Snijders <job.snijders@atrato.com>
  Date:          Jan 2013
@@ -10,11 +10,6 @@
  Usage:         This program accepts one command line argument: the number of threads
                 that should run simultaneously. If no argument is given it will assume
                 a default of 16 threads.
-
-                In /etc/cron.d/observium replace this (or the equivalent) poller entry:
-                */5 *     * * *   root    /opt/observium/poller.php -h all >> /dev/null 2>&1
-                with something like this:
-                */5 * * * * root python /opt/observium/poller-wrapper.py 16 >> /dev/null 2>&1
 
  Read more:     http://postman.memetic.org/pipermail/observium/2012-November/001303.html
 
@@ -70,7 +65,7 @@ except IOError as e:
 try:
     config = json.loads(get_config_data())
 except:
-    print "ERROR: Could not load or parse observium configuration, are PATHs correct?"
+    print "ERROR: Could not load or parse configuration, are PATHs correct?"
     sys.exit(2)
 
 poller_path = config['install_dir'] + '/poller.php'
