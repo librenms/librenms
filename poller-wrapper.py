@@ -22,12 +22,12 @@
  FreeBSD:       cd /usr/ports/*/py-MySQLdb && make install clean
 
  Tested on:     Python 2.7.3 / PHP 5.3.10-1ubuntu3.4 / Ubuntu 12.04 LTS
-
+ 
  GitHub:        https://github.com/Atrato/observium-poller-wrapper
 
- License:       To the extent possible under law, Job Snijders has waived all
-                copyright and related or neighboring rights to this script.
-                This script has been put into the Public Domain. This work is
+ License:       To the extent possible under law, Job Snijders has waived all 
+                copyright and related or neighboring rights to this script. 
+                This script has been put into the Public Domain. This work is 
                 published from: The Netherlands.
 """
 try:
@@ -44,37 +44,6 @@ except:
     print "On ubuntu: apt-get install python-mysqldb"
     print "On FreeBSD: cd /usr/ports/*/py-MySQLdb && make install clean"
     sys.exit(2)
-
-
-"""
-    Parse Arguments
-    Attempt to use argparse module.  Probably want to use this moving forward
-    especially as more features want to be added to this wrapper.
-    and
-    Take the amount of threads we want to run in parallel from the commandline
-    if None are given or the argument was garbage, fall back to default of 16
-"""
-try:
-    import argparse
-    parser = argparse.ArgumentParser(description='Poller Wrapper for Observium')
-    parser.add_argument('workers', nargs='?', type=int, default=16, help='Number of workers to spawn.')
-    parser.add_argument('--host', help='Poll hostname wildcard.')
-    args = parser.parse_args()
-    amount_of_workers = int(args.workers)
-except ImportError:
-    print "WARNING: missing the argparse python module:"
-    print "On ubuntu: apt-get install libpython2.7-stdlib"
-    print "On debian: apt-get install python-argparse"
-    print "Continuing with basic argument support."
-    try:
-        amount_of_workers = int(sys.argv[1])
-    except:
-        amount_of_workers = 16
-
-if amount_of_workers == 0:
-    print "ERROR: 0 threads is not a valid value"
-    sys.exit(2)
-
 
 """
     Fetch configuration details from the config_to_json.php script
@@ -104,17 +73,27 @@ except:
     print "ERROR: Could not load or parse observium configuration, are PATHs correct?"
     sys.exit(2)
 
-poller_path  = config['install_dir'] + '/poller.php'
-alerter_path = config['install_dir'] + '/alerter.php'
-db_username  = config['db_user']
-db_password  = config['db_pass']
-db_server    = config['db_host']
-db_dbname    = config['db_name']
-alerting     = config['poller-wrapper']['alerter']
+poller_path = config['install_dir'] + '/poller.php'
+db_username = config['db_user']
+db_password = config['db_pass']
+db_server   = config['db_host']
+db_dbname   = config['db_name']
 
 s_time = time.time()
 real_duration = 0
 per_device_duration = {}
+
+"""
+    Take the amount of threads we want to run in parallel from the commandline
+    if None are given or the argument was garbage, fall back to default of 16 
+"""
+try:
+    amount_of_workers = int(sys.argv[1])
+    if amount_of_workers == 0:
+        print "ERROR: 0 threads is not a valid value"
+        sys.exit(2)
+except:
+    amount_of_workers = 16
 
 devices_list = []
 
@@ -125,30 +104,15 @@ except:
     print "ERROR: Could not connect to MySQL database!"
     sys.exit(2)
 
-
-"""
-    This query specifically orders the results depending on the last_polled_timetaken variable
+""" 
+    This query specificly orders the results depending on the last_polled_timetaken variable
     Because this way, we put the devices likely to be slow, in the top of the queue
-    thus greatening our chances of completing _all_ the work in exactly the time it takes to
+    thus greatening our chances of completing _all_ the work in exactly the time it takes to 
     poll the slowest device! cool stuff he
-    Additionally, if a hostname wildcard is passed, add it to the where clause.  This is
-    important in cases where you have pollers distributed geographically and want to limit
-    pollers to polling hosts matching their geographic naming scheme.
 """
+query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
 
-query = """SELECT   device_id
-           FROM     devices
-           WHERE    disabled != '1'"""
-order =  " ORDER BY last_polled_timetaken DESC"
-
-try:
-    host_wildcard = args.host.replace('*', '%')
-    wc_query = query + " AND hostname LIKE %s " + order
-    cursor.execute(wc_query, host_wildcard)
-except:
-    query = query + order
-    cursor.execute(query)
-
+cursor.execute(query)
 devices = cursor.fetchall()
 for row in devices:
     devices_list.append(int(row[0]))
@@ -158,7 +122,7 @@ db.close()
     A seperate queue and a single worker for printing information to the screen prevents
     the good old joke:
 
-        Some people, when confronted with a problem, think,
+        Some people, when confronted with a problem, think, 
         "I know, I'll use threads," and then two they hav erpoblesms.
 """
 
@@ -187,11 +151,6 @@ def poll_worker():
             start_time = time.time()
             command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (poller_path, device_id)
             subprocess.check_call(command, shell=True)
-            if alerting == True:
-                print "INFO starting alerter.php for %s" % device_id
-                command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (alerter_path, device_id)
-                print "INFO finished alerter.php for %s" % device_id
-                subprocess.check_call(command, shell=True)
             elapsed_time = int(time.time() - start_time)
             print_queue.put([threading.current_thread().name, device_id, elapsed_time])
         except (KeyboardInterrupt, SystemExit):
@@ -207,7 +166,7 @@ print "INFO: starting the poller at %s with %s threads, slowest devices first" %
 
 for device_id in devices_list:
     poll_queue.put(device_id)
-
+ 
 for i in range(amount_of_workers):
     t = threading.Thread(target=poll_worker)
     t.setDaemon(True)
