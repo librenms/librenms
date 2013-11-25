@@ -65,7 +65,7 @@ foreach (dbFetchRows("SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         foreach ($types as $graph_type)
         {
           $pw_a['graph_type'] = "port_".$graph_type;
-          generate_port_thumbnail($pw_a);
+          print_port_thumbnail($pw_a);
         }
       }
       echo("</td><td></td><td colspan=2>");
@@ -81,7 +81,7 @@ foreach (dbFetchRows("SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         foreach ($types as $graph_type)
         {
           $pw_b['graph_type'] = "port_".$graph_type;
-          generate_port_thumbnail($pw_b);
+          print_port_thumbnail($pw_b);
         }
       }
 

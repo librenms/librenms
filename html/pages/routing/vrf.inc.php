@@ -107,7 +107,7 @@ if($_GET['optb'] == "all" ) {
             echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
                text-align: center; float: left; background-color: ".$list_colour_b_b.";'>
                <div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>");
-            generate_port_thumbnail($port);
+            print_port_thumbnail($port);
             echo("<div style='font-size: 9px;'>".truncate(short_port_descr($port['ifAlias']), 22, '')."</div>
               </div>");
             break;

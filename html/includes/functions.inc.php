@@ -452,7 +452,7 @@ function generate_port_url($port, $vars=array())
   return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']), $vars);
 }
 
-function generate_port_thumbnail($args)
+function print_port_thumbnail($args)
 {
   if (!$args['bg']) { $args['bg'] = "FFFFFF"; }
   $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&amp;id=".$args['port_id']."&amp;from=".$args['from']."&amp;to=".$args['to']."&amp;width=".$args['width']."&amp;height=".$args['height']."&amp;bg=".$args['bg']."'>";
