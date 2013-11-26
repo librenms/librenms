@@ -112,6 +112,7 @@ $config['header_color']     = "#1F334E";
 $config['page_refresh']     = "300";  // Refresh the page every xx seconds, 0 to disable
 $config['front_page']       = "pages/front/default.php";
 $config['front_page_settings']['top']['ports'] = 10;
+$config['front_page_settings']['top']['devices'] = 10;
 $config['page_title_prefix'] = "";
 $config['page_title_suffix'] = $config['project_name'];
 $config['timestamp_format'] = 'd-m-Y H:i:s';

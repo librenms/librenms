@@ -1,6 +1,6 @@
 <?php
 
-require_once("includes/front/top_graphs.inc.php");
+include_once("includes/front/boxes.inc.php");
 
 function generate_front_box ($frontbox_class, $content)
 {

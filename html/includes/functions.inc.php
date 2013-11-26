@@ -113,10 +113,10 @@ function get_percentage_colours($percentage)
 
 }
 
-function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100)
+function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;')
 {
-  return '<img class=minigraph-image src="graph.php?device='.$device['device_id'].
-    "&amp;from=$start&amp;to=$end&amp;width=$width&amp;height=$height&amp;type=$type&amp;legend=$legend".'">';
+  return '<img class=minigraph-image src="graph.php?'.
+    implode(array('device='.$device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend"), $sep).'">';
 }
 
 function generate_device_url($device, $vars=array())
@@ -124,7 +124,7 @@ function generate_device_url($device, $vars=array())
   return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
 }
 
-function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end=0)
+function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end=0, $escape_text=1)
 {
   global $config;
 
@@ -169,7 +169,7 @@ function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end
     $contents .= '</div>';
   }
 
-  $text = htmlentities($text);
+  if ($escape_text) { $text = htmlentities($text); }
   $link = overlib_link($url, $text, escape_quotes($contents), $class);
 
   if (device_permitted($device['device_id']))
@@ -642,6 +642,33 @@ function report_this($message)
 function report_this_text($message)
 {
   return $message.'\nPlease report this to the developers at '.$config['project_issues'].'\n';
+}
+
+# Find all the files in the given directory that match the pattern
+function get_matching_files($dir, $match = "/\.php$/")
+{
+  global $config;
+
+  if ($handle = opendir($dir))
+  {
+    while (false !== ($file = readdir($handle)))
+    {
+      if ($file != "." && $file != ".." && preg_match($match, $file) === 1)
+      {
+	$list[] = $file;
+      }
+    }
+    closedir($handle);
+  }
+  return $list;
+}
+
+# Include all the files in the given directory that match the pattern
+function include_matching_files($dir, $match = "/\.php$/")
+{
+  foreach (get_matching_files($dir, $match) as $file) {
+    include_once($file);
+  }
 }
 
 ?>

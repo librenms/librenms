@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS front page graphs - common code
+ * LibreNMS front page graphs
  *
  * Copyright (c) 2013 Gear Consulting Pty Ltd <http://libertysys.com.au/>
  *
@@ -10,7 +10,20 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-
 ?>
 <script type="text/javascript" src="js/jquery.cycle.all.js"></script>
 <script type="text/javascript" src="js/jquery-cycle-boxes.js"></script>
+<?php
+
+echo("<div class='right-2-col-fixed'>\n<div class='boxes'>\n");
+
+foreach (get_matching_files($config['html_dir']."/includes/front/", "/^top_.*\.php$/") as $file) {
+  echo("<div class=box>\n");
+  include_once($file);
+  echo("</div>\n");
+}
+
+echo("</div>\n");
+echo("</div>\n");
+
+?>
