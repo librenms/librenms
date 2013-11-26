@@ -113,9 +113,9 @@ function get_percentage_colours($percentage)
 
 }
 
-function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;')
+function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = "minigraph-image")
 {
-  return '<img class=minigraph-image src="graph.php?'.
+  return '<img class="'.$class.'" src="graph.php?'.
     implode(array('device='.$device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend"), $sep).'">';
 }
 

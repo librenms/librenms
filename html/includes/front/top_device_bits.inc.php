@@ -31,10 +31,10 @@ $query = "
 echo("<strong>Top $top devices (last $minutes minutes)</strong>\n");
 echo("<table class='simple'>\n");
 foreach (dbFetchRows($query) as $result) {
-  echo("<tr>".
-    "<td>".generate_device_link($result, shorthost($result['hostname']))."</td>".
-    "<td>".generate_device_link($result,
-      generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], "device_bits", "no", 150, 21, '&'), array(), 0, 0, 0)."</td>".
+  echo("<tr class=top10>".
+    "<td class=top10>".generate_device_link($result, shorthost($result['hostname']))."</td>".
+    "<td class=top10>".generate_device_link($result,
+      generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], "device_bits", "no", 150, 21, '&', "top10"), array(), 0, 0, 0)."</td>".
     "</tr>\n");
 }
 echo("</table>\n");
