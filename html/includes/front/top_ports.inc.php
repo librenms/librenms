@@ -20,6 +20,8 @@ $query = "
   FROM ports as p, devices as d
   WHERE d.device_id = p.device_id
     AND unix_timestamp() - p.poll_time < $seconds
+    AND ( p.ifInOctets_rate > 0
+    OR p.ifOutOctets_rate > 0 )
   ORDER BY total desc
   LIMIT $top
 ";
@@ -27,7 +29,7 @@ $query = "
 echo("<strong>Top $top ports (last $minutes minutes)</strong>");
 echo('<table class="simple">');
 foreach (dbFetchRows($query) as $result) {
-  echo('<tr><td>'.$result['hostname'].'</td><td>'.$result['ifIndex'].'</td><td>'.$result['ifDescr'].'</td><td>'.$result['total'].'</td></tr>');
+  echo('<tr><td>'.generate_device_link($result).'</td><td>'.generate_port_link($result).'</td><td>'.generate_port_link($result, generate_port_thumbnail($result)).'</td></tr>');
 }
 echo('</table>');
 
