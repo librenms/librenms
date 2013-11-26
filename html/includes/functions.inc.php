@@ -81,7 +81,7 @@ function generate_url($vars, $new_vars = array())
 
 function escape_quotes($text)
 {
-  return str_replace('"', "\'", $text);
+  return str_replace('"', "\'", str_replace("'", "\'", $text));
 }
 
 function generate_overlib_content($graph_array, $text)
@@ -164,13 +164,13 @@ function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end
     $graphhead = $entry['text'];
     $contents .= '<div class=overlib-box>';
     $contents .= '<span class=overlib-title>'.$graphhead.'</span><br />';
-    $contents .= escape_quotes(generate_minigraph_image($device, $start, $end, $graph));
-    $contents .= escape_quotes(generate_minigraph_image($device, $config['time']['week'], $end, $graph));
+    $contents .= generate_minigraph_image($device, $start, $end, $graph);
+    $contents .= generate_minigraph_image($device, $config['time']['week'], $end, $graph);
     $contents .= '</div>';
   }
 
   $text = htmlentities($text);
-  $link = overlib_link($url, $text, $contents, $class);
+  $link = overlib_link($url, $text, escape_quotes($contents), $class);
 
   if (device_permitted($device['device_id']))
   {
@@ -452,11 +452,26 @@ function generate_port_url($port, $vars=array())
   return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']), $vars);
 }
 
-function print_port_thumbnail($args)
+function generate_port_image($args)
 {
   if (!$args['bg']) { $args['bg'] = "FFFFFF"; }
-  $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&amp;id=".$args['port_id']."&amp;from=".$args['from']."&amp;to=".$args['to']."&amp;width=".$args['width']."&amp;height=".$args['height']."&amp;bg=".$args['bg']."'>";
-  echo(generate_port_link($args, $args['content']));
+  return "<img src='graph.php?type=".$args['graph_type']."&amp;id=".$args['port_id']."&amp;from=".$args['from']."&amp;to=".$args['to']."&amp;width=".$args['width']."&amp;height=".$args['height']."&amp;bg=".$args['bg']."'>";
+}
+
+function generate_port_thumbnail($port)
+{
+  global $config;
+  $port['graph_type'] = 'port_bits';
+  $port['from']       = $config['time']['day'];
+  $port['to']         = $config['time']['now'];
+  $port['width']      = 150;
+  $port['height']     = 19;
+  return generate_port_image($port);
+}
+
+function print_port_thumbnail($args)
+{
+  echo(generate_port_link($args, generate_port_image($args)));
 }
 
 function print_optionbar_start ($height = 0, $width = 0, $marginbottom = 5)
