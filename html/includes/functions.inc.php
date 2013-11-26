@@ -178,8 +178,6 @@ function generate_device_link($device, $text=NULL, $vars=array(), $start=0, $end
   } else {
     return $device['hostname'];
   }
-
-  return $link;
 }
 
 function overlib_link($url, $text, $contents, $class)
