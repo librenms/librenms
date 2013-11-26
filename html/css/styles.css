@@ -499,9 +499,31 @@ a.list-device-disabled, a.list-device-disabled:visited {
 }
 
 .boxes {
-  width: 350px;
-  height: 200px;
   vertical-align: center;
+}
+
+.box {
+  width: 350px;
+  height: 300px;
+  padding: 0px;
+  vertical-align: center;
+}
+
+.top10 {
+  padding: 0px;
+  margin: 0px;
+}
+
+.welcome {
+  padding-right: 25px;
+}
+
+table.simple {
+  border: 0px;
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
+  text-align: left;
 }
 
 .left-2-col-fluid {
@@ -1558,18 +1580,5 @@ tr.search:nth-child(odd) {
 
 .minigraph-image {
   margin: 2px;
-}
-
-.box {
-}
-
-.welcome {
-  padding-right: 25px;
-}
-
-.simple {
-  border: 0px;
-  width: 100%;
-  text-align: left;
 }
 
