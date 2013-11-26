@@ -514,7 +514,7 @@ a.list-device-disabled, a.list-device-disabled:visited {
 .right-2-col-fixed {
   display: table-cell;
   width: 350px;
-  height: 250px;
+  height: 300px;
   float: right;
 /*  vertical-align: top;*/
 

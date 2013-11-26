@@ -465,7 +465,7 @@ function generate_port_thumbnail($port)
   $port['from']       = $config['time']['day'];
   $port['to']         = $config['time']['now'];
   $port['width']      = 150;
-  $port['height']     = 19;
+  $port['height']     = 21;
   return generate_port_image($port);
 }
 

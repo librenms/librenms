@@ -29,7 +29,10 @@ $query = "
 echo("<strong>Top $top ports (last $minutes minutes)</strong>");
 echo('<table class="simple">');
 foreach (dbFetchRows($query) as $result) {
-  echo('<tr><td>'.generate_device_link($result).'</td><td>'.generate_port_link($result).'</td><td>'.generate_port_link($result, generate_port_thumbnail($result)).'</td></tr>');
+  echo('<tr><td>'.
+    generate_device_link($result, shorthost($result['hostname'])).
+    '</td><td>'.generate_port_link($result).
+    '</td><td>'.generate_port_link($result, generate_port_thumbnail($result)).'</td></tr>');
 }
 echo('</table>');
 
