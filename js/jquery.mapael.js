@@ -557,7 +557,7 @@
 					// Hide/show elements when user clicks on a legend element
 					label.attr({cursor:'pointer'});
 					
-					$.fn.mapael.setHoverOptions(elem, legendOptions.slices[i].attrs, legendOptions.slices[i].attrsHover);
+					$.fn.mapael.setHoverOptions(elem, legendOptions.slices[i].attrs, legendOptions.slices[i].attrs);
 					$.fn.mapael.setHoverOptions(label, legendOptions.labelAttrs, legendOptions.labelAttrsHover);
 					$.fn.mapael.setHover(paper, elem, label);
 					
