@@ -571,8 +571,8 @@
 							}
 							
 							for (var id in elems) {
-								if ((!legendOptions.slices[i].min || elems[id].value >= legendOptions.slices[i].min) 
-									&& (!legendOptions.slices[i].max || elems[id].value < legendOptions.slices[i].max)
+								if ((typeof legendOptions.slices[i].min == 'undefined' || elems[id].value >= legendOptions.slices[i].min) 
+									&& (typeof legendOptions.slices[i].max == 'undefined' || elems[id].value < legendOptions.slices[i].max)
 								) {
 									(function(id) {
 										if (!label.hidden) {
@@ -730,8 +730,8 @@
 	*/
 	$.fn.mapael.getLegendSlice = function (value, legend) {
 		for(var i = 0, length = legend.slices.length; i < length; ++i) {
-			if ((!legend.slices[i].min || value >= legend.slices[i].min) 
-				&& (!legend.slices[i].max || value < legend.slices[i].max)
+			if ((typeof legend.slices[i].min == 'undefined' || value >= legend.slices[i].min) 
+				&& (typeof legend.slices[i].max == 'undefined' || value < legend.slices[i].max)
 			) {
 				return legend.slices[i];
 			}
