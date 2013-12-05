@@ -263,7 +263,7 @@ if($format == "graph")
 } else {
 
   echo('<table cellspacing="0" class="devicetable sortable" width="100%">');
-  if ($subformat == "detail")
+  if ($subformat == "detail" || $subformat == "basic")
   {
     echo('<tr class="tablehead">
     <th></th>
