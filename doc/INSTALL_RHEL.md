@@ -90,7 +90,7 @@ First, create and chown the `rrd` directory and create the `logs` directory
 
 Note that if you're not running Ubuntu, you may need to change the owner to whomever the webserver runs as.
 
-Next, add the following to `/etc/apache2/sites-available/librenms.conf`
+Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 
     <VirtualHost *:80>
       DocumentRoot /opt/librenms/html/
