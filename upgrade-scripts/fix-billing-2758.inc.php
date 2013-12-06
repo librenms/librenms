@@ -1,5 +1,10 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 1 DROP
+// 1 CREATE
+// 25 ALTERS
+
 include("includes/defaults.inc.php");
 include("config.php");
 

@@ -1,5 +1,10 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 1 SELECT
+// 1 UPDATE
+// 1 INSERT
+
 echo("Port Stack: ");
 
 $sql = "SELECT * FROM `ports_stack` WHERE `device_id` = '".$device['device_id']."'";

@@ -1,5 +1,10 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 6 SELECTS
+// 2 INSERTS
+// 2 DELETES
+
 echo("IPv4 Addresses : ");
 
 $oids = trim(snmp_walk($device,"ipAdEntIfIndex","-Osq","IP-MIB"));

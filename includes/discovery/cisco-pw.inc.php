@@ -1,5 +1,8 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 2 SELECTS
+
 if ($config['enable_pseudowires'] && $device['os_group'] == "cisco")
 {
   unset($cpw_count);

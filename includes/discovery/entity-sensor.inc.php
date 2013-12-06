@@ -1,5 +1,8 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 1 SELECT
+
 echo(" ENTITY-SENSOR: ");
 
 echo("Caching OIDs:");

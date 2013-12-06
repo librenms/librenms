@@ -1,5 +1,11 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 4 SELECTS
+// 1 INSERT
+// 1 UPDATE
+// 1 DELETE
+
 unset ($mac_table);
 
 echo("ARP Table : ");

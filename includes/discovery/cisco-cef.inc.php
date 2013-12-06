@@ -1,5 +1,9 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 1 SELECTS
+// 1 INSERT
+
 echo("Cisco CEF Switching Path: ");
 
 $cefs = array();

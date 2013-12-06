@@ -4,6 +4,9 @@
 
 <?php
 
+// MYSQL Check - FIX ME
+// 7 SELECTS
+
 echo("<table><tr>");
 
 $dev_list = array('6'  => 'Central Fileserver',

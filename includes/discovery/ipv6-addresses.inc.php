@@ -1,5 +1,9 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 1 SELECT
+// 2 DELETES
+
 echo("IPv6 Addresses : ");
 
 $oids = snmp_walk($device, "ipAddressIfIndex.ipv6", "-Ln -Osq", "IP-MIB");

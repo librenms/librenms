@@ -1,5 +1,10 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 2 SELECTS
+// 1 INSERT
+// 1 DELETE
+
 // FIXME should do the deletion etc in a common file perhaps? like for the sensors
 
 /*

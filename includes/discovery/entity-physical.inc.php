@@ -1,5 +1,11 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 2 SELECTS
+// 1 INSERT
+// 1 UPDATE
+// 1 DELETE
+
  echo("Physical Inventory : ");
 
  if ($config['enable_inventory']) {

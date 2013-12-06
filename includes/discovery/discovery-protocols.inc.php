@@ -1,5 +1,9 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 7 SELECTS
+// 1 DELETE
+
 echo("Discovery protocols:");
 
 global $link_exists;

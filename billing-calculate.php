@@ -1,6 +1,9 @@
 #!/usr/bin/env php
 <?php
 
+// MYSQL Check - FIX ME
+// 1 TRUNCATE
+
 /**
  * Observium
  *

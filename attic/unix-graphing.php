@@ -1,5 +1,8 @@
 <?php 
 
+// MYSQL Check - FIX ME
+// 1 SELECT
+
 // FIXME not used, do we still need this?
 
 function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {

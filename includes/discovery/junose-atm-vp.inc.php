@@ -1,5 +1,9 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 2 SELECTS
+// 1 DELETE
+
 # We're discovering this MIB
 # snmpwalk -v2c -c <community> <hostname> -M mibs/junose/ -m Juniper-UNI-ATM-MIB juniAtmVpStatsEntry
 

@@ -1,5 +1,11 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 5 SELECTS
+// 1 INSERT
+// 3 UPDATES
+// 1 DELETE
+
 // FIXME : dbFacile !
 
 if ($config['enable_vrfs'])
