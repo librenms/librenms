@@ -4,6 +4,9 @@
     <td bgcolor=#e5e5e5 valign=top>
 <?php
 
+// MYSQL Check - FIX ME
+// 9 SELECTS
+
 $nodes = array();
 
 $uptimesql = "";

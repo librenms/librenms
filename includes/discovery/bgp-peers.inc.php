@@ -1,5 +1,11 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 3 SELECTS
+// 3 INSERTS
+// 3 UPDATES
+// 3 DELETES
+
 global $debug;
 
 if ($config['enable_bgp'])

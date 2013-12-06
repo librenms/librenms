@@ -1,5 +1,8 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 11 SELECTS
+
 include_once("includes/front/boxes.inc.php");
 
 function generate_front_box ($frontbox_class, $content)

@@ -1,4 +1,10 @@
 <?php
+
+// MYSQL Check - FIX ME
+// 5 SELECTS
+// 4 INSERTS
+// 4 UPDATES
+
 /*
 Disabled needing rewrite
 

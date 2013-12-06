@@ -1,5 +1,8 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 1 UPDATE
+
 $os = getHostOS($device);
 
 if ($os != $device['os'])

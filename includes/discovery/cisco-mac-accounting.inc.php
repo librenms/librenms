@@ -1,5 +1,10 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 1 SELECT
+// 1 UPDATE
+// 1 INSERT
+
 if ($device['os_group'] == "cisco")
 {
   echo("Cisco MAC Accounting : ");

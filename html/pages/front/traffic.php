@@ -1,8 +1,11 @@
-
 <table border=0 cellpadding=10 cellspacing=10 width=100%>
   <tr>
     <td bgcolor=#e5e5e5 valign=top>
 <?php
+
+// MYSQL Check - FIX ME
+// 4 SELECTS
+
 
 $nodes = array();
 $param = array();

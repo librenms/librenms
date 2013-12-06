@@ -28,9 +28,16 @@ $device['os_text'] = $config['os'][$device['os']]['text'];
 
 echo('  <tr class="'.$class.'" bgcolor="' . $bg . '" onmouseover="this.style.backgroundColor=\'#fdd\';" onmouseout="this.style.backgroundColor=\'' . $bg . '\';"
           onclick="location.href=\'device/'.$device['device_id'].'/\'" style="cursor: pointer;">
+          <td width="1" style="background-color: '.$table_tab_colour.';"></td>
+          <td width="40" class="paddedcell" align="center" valign="middle">' . $image . '</td>
           <td width="300"><span style="font-size: 15px;">' . generate_device_link($device) . '</span></td>'
         );
 
+echo('<td width="55">');
+if ($port_count) { echo(' <img src="images/icons/port.png" align=absmiddle /> '.$port_count); }
+echo('<br />');
+if ($sensor_count) { echo(' <img src="images/icons/sensors.png" align=absmiddle /> '.$sensor_count); }
+echo('</td>');
 echo('    <td>' . $device['hardware'] . ' ' . $device['features'] . '</td>');
 echo('    <td>' . $device['os_text'] . ' ' . $device['version'] . '</td>');
 echo('    <td>' . formatUptime($device['uptime'], 'short') . ' <br />');
