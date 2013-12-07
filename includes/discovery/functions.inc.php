@@ -1,5 +1,10 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 9 SELECTS
+// 6 INSERTS
+// 3 UPDATES
+
 /* Observium Network Management and Monitoring System
  * Copyright (C) 2006-2011, Observium Developers - http://www.observium.org
  *

@@ -1,5 +1,10 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 2 SELECTS
+// 1 INSERT
+// 1 DELETE
+
 echo("UCD Disk IO : ");
 $diskio_array = snmpwalk_cache_oid($device, "diskIOEntry", array(), "UCD-DISKIO-MIB" , "+".$config['install_dir']."/mibs/");
 $valid_diskio = array();

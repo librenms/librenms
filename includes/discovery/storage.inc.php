@@ -1,5 +1,9 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 1 SELECT
+// 1 DELETE
+
 echo("Storage : ");
 
 // Include all discovery modules

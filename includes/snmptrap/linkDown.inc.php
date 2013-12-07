@@ -1,5 +1,9 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 1 SELECT
+// 1 UPDATE
+
 $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$entry[2]."'"));
 
 if (!$interface) { exit; }

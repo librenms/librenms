@@ -1,5 +1,8 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 1 SELECT
+
 if ($device['os'] == "screenos" && mysql_result(mysql_query("SELECT COUNT(*) FROM processors WHERE device_id = '".$device['device_id']."' AND processor_type != 'screenos'"),0) == "0")
 {
   # .1.3.6.1.4.1.3224.16.1.3.0 Cpu Last 5 Minutes

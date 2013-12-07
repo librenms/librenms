@@ -11,6 +11,9 @@
       data.addRows([
 <?php
 
+// MYSQL Check - FIX ME
+// 10 SELECTS
+
 $locations_up = array();
 $locations_down = array();
 foreach (getlocations() as $location)
