@@ -1,9 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-// MYSQL Check - FIX ME
-// 1 SELECT
-
 include("../includes/defaults.inc.php");
 include("../config.php");
 include("../includes/functions.php");

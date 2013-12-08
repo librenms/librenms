@@ -1,9 +1,6 @@
 <?php
 
-// MYSQL Check - FIX ME
-// 1 SELECT
-
-$count = mysql_result(mysql_query("SELECT COUNT(*) FROM processors WHERE device_id = '".$device['device_id']."' AND processor_type != 'ucd-old'"),0);
+$count = dbFetchCell("SELECT COUNT(*) FROM `processors` WHERE `device_id` = ? AND `processor_type` != 'ucd-old'",array($device['device_id']));
 
 if ($device['os_group'] == "unix" && $count == "0")
 {
