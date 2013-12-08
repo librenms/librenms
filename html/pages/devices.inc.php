@@ -276,22 +276,14 @@ if($format == "graph")
   </tr>');
   }
 
-  foreach (dbFetchRows($query, $sql_param) as $device)
-  {
-    if (device_permitted($device['device_id']))
-    {
-      if (!$location_filter || ((get_dev_attrib($device,'override_sysLocation_bool') && get_dev_attrib($device,'override_sysLocation_string') == $location_filter)
-        || $device['location'] == $location_filter))
-      {
         if ($subformat == "detail")
         {
-          include("includes/hostbox.inc.php");
+                include("pages/devices/detail.inc.php");
+        } elseif($subformat == "status") {
+                include("pages/devices/status.inc.php");
         } else {
-          include("includes/hostbox-basic.inc.php");
+                include("includes/hostbox-basic.inc.php");
         }
-      }
-    }
-  }
   echo("</table>");
 }
 
