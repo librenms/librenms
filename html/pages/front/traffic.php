@@ -1,4 +1,3 @@
-
 <table border=0 cellpadding=10 cellspacing=10 width=100%>
   <tr>
     <td bgcolor=#e5e5e5 valign=top>
@@ -100,9 +99,11 @@ echo("
 ");
 
 $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog,devices WHERE syslog.device_id = devices.device_id ORDER BY seq DESC LIMIT 20";
-$query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
-while ($entry = mysql_fetch_assoc($query)) { include("includes/print-syslog.inc.php"); }
+foreach (dbFetchRows($sql) as $entry)
+{
+  include("includes/print-syslog.inc.php");
+}
 echo("</table>");
 
 echo("</div>
@@ -115,26 +116,26 @@ echo("</div>
 if ($_SESSION['userlevel'] >= '5')
 {
 
-  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
-  $query = mysql_query($sql);
+  $sql  = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
   unset ($seperator);
-  while ($interface = mysql_fetch_assoc($query)) {
+  foreach (dbFetchRows($sql) as $interface)
+  {
     $ports['transit'] .= $seperator . $interface['port_id'];
     $seperator = ",";
   }
 
-  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'Peering: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
-  $query = mysql_query($sql);
+  $sql  = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'Peering: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
   unset ($seperator);
-  while ($interface = mysql_fetch_assoc($query)) {
+  foreach (dbFetchRows($sql) as $interface)
+  {
     $ports['peering'] .= $seperator . $interface['port_id'];
     $seperator = ",";
   }
 
-  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'Core: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
-  $query = mysql_query($sql);
+  $sql  = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'Core: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
   unset ($seperator);
-  while ($interface = mysql_fetch_assoc($query)) {
+  foreach (dbFetchRows($sql) as $interface)
+  {
     $ports['core'] .= $seperator . $interface['port_id'];
     $seperator = ",";
   }

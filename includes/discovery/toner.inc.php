@@ -49,19 +49,16 @@ if ($config['enable_printers'])
   if ($debug) { echo("\n Checking ... \n"); print_r($valid_toner); }
 
   $sql = "SELECT * FROM toner WHERE device_id = '".$device['device_id']."'";
-  if ($query = mysql_query($sql))
-  {
-    while ($test_toner = mysql_fetch_assoc($query))
+    foreach (dbFetchRows($sql) as $test_toner)
     {
       $toner_index = $test_toner['toner_index'];
       $toner_type = $test_toner['toner_type'];
       if (!$valid_toner[$toner_type][$toner_index])
       {
         echo("-");
-        mysql_query("DELETE FROM `toner` WHERE toner_id = '" . $test_toner['toner_id'] . "'");
+        dbDelete('toner', '`toner_id` = ?', array($test_toner['toner_id']));
       }
     }
-  }
 
   unset($valid_toner); echo("\n");
 } # if ($config['enable_printers'])

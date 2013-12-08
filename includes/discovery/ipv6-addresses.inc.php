@@ -59,9 +59,8 @@ if (!$oids)
 } // if $oids
 
 $sql   = "SELECT * FROM ipv6_addresses AS A, ports AS I WHERE I.device_id = '".$device['device_id']."' AND  A.port_id = I.port_id";
-$data = mysql_query($sql);
 
-while ($row = mysql_fetch_assoc($data))
+foreach (dbFetchRows($sql) as $row)
 {
   $full_address = $row['ipv6_address'] . "/" . $row['ipv6_prefixlen'];
   $port_id = $row['port_id'];
@@ -69,10 +68,10 @@ while ($row = mysql_fetch_assoc($data))
   if (!$valid['ipv6'][$valid_address])
   {
     echo("-");
-    $query = @mysql_query("DELETE FROM `ipv6_addresses` WHERE `ipv6_address_id` = '".$row['ipv6_address_id']."'");
-    if (!mysql_result(mysql_query("SELECT count(*) FROM ipv6_addresses WHERE ipv6_network_id = '".$row['ipv6_network_id']."'"),0))
+    $query = dbDelete('ipv6_addresses', '`ipv6_address_id` = ?', array($row['ipv6_address_id']));
+    if (!dbFetchCell("SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_network_id` = ?",array($row['ipv6_network_id'])))
     {
-      $query = @mysql_query("DELETE FROM `ipv6_networks` WHERE `ipv6_network_id` = '".$row['ipv6_network_id']."'");
+      $query = dbDelete('ipv6_networks', '`ipv6_network_id` = ?', array($row['ipv6_network_id']));
     }
   }
 }

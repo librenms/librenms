@@ -1,6 +1,12 @@
 #!/usr/bin/env php
 <?php
 
+// MYSQL Check - FIX ME
+// 1 SELECT
+// 1 UPDATE
+// 2 INSERTS
+
+
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");

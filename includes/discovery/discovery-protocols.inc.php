@@ -15,12 +15,12 @@ if ($device['os'] == "ironware")
     unset($fdp_links);
     foreach (array_keys($fdp_array) as $key)
     {
-      $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$key."'"));
+      $interface = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?",array($device['device_id'],$key));
       $fdp_if_array = $fdp_array[$key];
       foreach (array_keys($fdp_if_array) as $entry_key)
       {
         $fdp = $fdp_if_array[$entry_key];
-        $remote_device_id = @mysql_result(mysql_query("SELECT `device_id` FROM `devices` WHERE `sysName` = '".$fdp['snFdpCacheDeviceId']."' OR `hostname`='".$fdp['snFdpCacheDeviceId']."'"), 0);
+        $remote_device_id = dbFetchCell("SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?",array($fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDeviceId']));
 
         if (!$remote_device_id)
         {
@@ -35,7 +35,7 @@ if ($device['os'] == "ironware")
         if ($remote_device_id)
         {
           $if = $fdp['snFdpCacheDevicePort'];
-          $remote_port_id = @mysql_result(mysql_query("SELECT port_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if') AND `device_id` = '".$remote_device_id."'"),0);
+          $remote_port_id = dbFetchCell("SELECT port_id FROM `ports` WHERE (`ifDescr` = ? OR `ifName = ?) AND `device_id` = ?",array($if,$if,$remote_device_id));
         } else { $remote_port_id = "0"; }
 
         discover_link($interface['port_id'], $fdp['snFdpCacheVendorId'], $remote_port_id, $fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDevicePort'], $fdp['snFdpCachePlatform'], $fdp['snFdpCacheVersion']);
@@ -110,12 +110,12 @@ if ($lldp_array)
       } else {
         $ifIndex = $entry_key;
       }
-      $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$ifIndex."'"));
+      $interface = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?",array($device['device_id'],$ifIndex));
       $lldp_instance = $lldp_if_array[$entry_key];
       foreach (array_keys($lldp_instance) as $entry_instance)
       {
         $lldp = $lldp_instance[$entry_instance];
-        $remote_device_id = @mysql_result(mysql_query("SELECT `device_id` FROM `devices` WHERE `sysName` = '".$lldp['lldpRemSysName']."' OR `hostname`='".$lldp['lldpRemSysName']."'"), 0);
+        $remote_device_id = dbFetchCell("SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?",array($lldp['lldpRemSysName'], $lldp['lldpRemSysName']));
 
         if (!$remote_device_id && is_valid_hostname($lldp['lldpRemSysName']))
         {
@@ -130,7 +130,7 @@ if ($lldp_array)
         if ($remote_device_id)
         {
           $if = $lldp['lldpRemPortDesc']; $id = $lldp['lldpRemPortId'];
-          $remote_port_id = @mysql_result(mysql_query("SELECT port_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if' OR `ifDescr`= '$id' OR `ifName`='$id') AND `device_id` = '".$remote_device_id."'"),0);
+          $remote_port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ? OR `ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?",array($if,$if,$id,$id,$remote_device_id));
         } else {
           $remote_port_id = "0";
         }
@@ -147,9 +147,7 @@ if ($lldp_array)
 if ($debug) { print_r($link_exists); }
 
 $sql = "SELECT * FROM `links` AS L, `ports` AS I WHERE L.local_port_id = I.port_id AND I.device_id = '".$device['device_id']."'";
-if ($query = mysql_query($sql))
-{
-  while ($test = mysql_fetch_assoc($query))
+  foreach (dbFetchRows($sql) as $test)
   {
     $local_port_id = $test['local_port_id'];
     $remote_hostname = $test['remote_hostname'];
@@ -158,11 +156,10 @@ if ($query = mysql_query($sql))
     if (!$link_exists[$local_port_id][$remote_hostname][$remote_port])
     {
       echo("-");
-      mysql_query("DELETE FROM `links` WHERE id = '" . $test['id'] . "'");
-      if ($debug) { echo(mysql_affected_rows()." deleted "); }
+      $rows = dbDelete('links', '`id` = ?', array($test['id']));
+      if ($debug) { echo("$rows deleted "); }
     }
   }
-}
 
 unset($link_exists);
 echo("\n");
