@@ -149,7 +149,8 @@ foreach (dbFetch('SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDE
 echo('<span style="font-weight: bold;">Lists</span> &#187; ');
 
 $menu_options = array('basic'      => 'Basic',
-                      'detail'     => 'Detail');
+                      'detail'     => 'Detail',
+                      'status'     => 'Status');
 
 $sep = "";
 foreach ($menu_options as $option => $text)
