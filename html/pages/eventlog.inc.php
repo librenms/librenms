@@ -1,8 +1,5 @@
 <?php
 
-// MYSQL Check - FIX ME
-// 1 TRUNCATE
-
 $param = array();
 
 if ($vars['action'] == "expunge" && $_SESSION['userlevel'] >= '10')
