@@ -21,7 +21,7 @@
       {
 
         //include("includes/hostbox-basic.inc.php");
-        includes("includes/hostbox.inc.php");
+        include("includes/hostbox.inc.php");
       }
     }
   }
