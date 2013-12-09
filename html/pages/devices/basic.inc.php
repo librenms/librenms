@@ -20,7 +20,8 @@
         || $device['location'] == $location_filter))
       {
 
-        include("includes/hostbox-basic.inc.php");
+        //include("includes/hostbox-basic.inc.php");
+        includes("includes/hostbox-details.inc.php");
       }
     }
   }
