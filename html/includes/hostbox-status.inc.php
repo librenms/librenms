@@ -71,6 +71,7 @@ echo(formatUptime($device['uptime'], 'short'));
 
 echo('</td>');
 echo('<td>');
+echo('<div class="pull-right" style="height: 50px; padding: 2px; margin: 0;">');
 foreach ($graphs as $entry)
 {
   if ($entry['graph'])
@@ -78,14 +79,14 @@ foreach ($graphs as $entry)
     $graph_array['type']   = $entry['graph'];
     $graph_array['popup_title'] = $entry['text'];
 
-    echo('<div class="pull-right" style="height: 50px; padding: 2px; margin: 0;">');
     print_graph_popup($graph_array);
-    echo("</div>");
+    
   }
 }
 
 unset($graph_array);
 
+echo("</div>");
 echo('</td>');
 
 echo(' </tr>');
