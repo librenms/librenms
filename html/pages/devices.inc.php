@@ -283,7 +283,7 @@ if($format == "graph")
         } elseif($subformat == "status") {
                 include("pages/devices/status.inc.php");
         } else {
-                include("includes/hostbox-basic.inc.php");
+                include("pages/devices/basic.inc.php");
         }
   echo("</table>");
 }
