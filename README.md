@@ -44,6 +44,7 @@ exception):
   - DHTML Tree (http://javascripttoolbox.com/lib/mktree/) (html/css/mktree.css and html/js/mktree.js): MIT and GPL
   - sorttable (http://www.kryogenix.org/code/browser/sorttable/) (html/js/sorttable.js): X11
   - JQueury (http://jquery.com/) (html/js/jquery.min.js, html/js/jquery-checkbox.js): MIT
+  - Bootstrap (http://getbootstrap.com/) (html/css/bootstrap.* html/css/bootstrap/* html/js/bootstrap.*): Apache License V2.0
 
 
 Introduction
