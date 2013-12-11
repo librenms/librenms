@@ -3,3 +3,4 @@ config.php
 logs
 patches
 rrd
+html/weathermap

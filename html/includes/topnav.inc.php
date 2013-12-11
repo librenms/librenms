@@ -102,4 +102,37 @@ if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['
     <td width="5"></td>
   </tr>
 <?php } ?>
+  <tr>
+    <td colspan="10">
+      <div class="dropdown">
+      <ul>
+        <li class="dropdown hidden-xs">
+        <form class="form" action="">
+          <input onKeyup="search(this.value);" type="search" value="" placeholder="Global search" />
+        </form>
+        <div id="results" class=" typeahead dropdown-menu"></div>
+        </li>
+      </ul>
+      </div>
+    </td>
+  </tr>
 </table>
+
+<script>
+function search(searchStr) {
+  if (searchStr.length == 0) {
+    // Hide search results
+    $('#results').fadeOut();
+  } else {
+    $.post("ajax_search.php",
+      {search: ""+searchStr+""},
+      function(data)
+      {
+        $('#results').fadeIn();
+        $('#results').html(data);
+      });
+   }
+}
+
+</script>
+
