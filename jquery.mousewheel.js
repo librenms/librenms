@@ -58,7 +58,7 @@
         },
 
         getLineHeight: function(elem) {
-          return parseInt($(elem).offsetParent().css('fontSize'), 10);
+          return parseInt($(elem)['offsetParent' in jQuery.fn ? 'offsetParent' : 'parent']().css('fontSize'), 10);
         },
 
         getPageHeight: function(elem) {
