@@ -5,6 +5,17 @@
 if(!isset($vars['format'])) { $vars['format'] = "list_detail"; }
 
 $sql_param = array();
+if(isset($vars['state']))
+{
+  if($vars['state'] == 'up')
+  {
+    $state = '1';
+  }
+    elseif($vars['state'] == 'down')
+  {
+    $state = '0';
+  }
+}
 
 if ($vars['hostname']) { $where .= " AND hostname LIKE ?"; $sql_param[] = "%".$vars['hostname']."%"; }
 if ($vars['os'])       { $where .= " AND os = ?";          $sql_param[] = $vars['os']; }
@@ -12,7 +23,12 @@ if ($vars['version'])  { $where .= " AND version = ?";     $sql_param[] = $vars[
 if ($vars['hardware']) { $where .= " AND hardware = ?";    $sql_param[] = $vars['hardware']; }
 if ($vars['features']) { $where .= " AND features = ?";    $sql_param[] = $vars['features']; }
 if ($vars['type'])     { $where .= " AND type = ?";        $sql_param[] = $vars['type']; }
-
+if ($vars['state'])    {
+  $where .= " AND status= ?";       $sql_param[] = $state;
+  $where .= " AND disabled='0' AND `ignore`='0'"; $sql_param[] = '';
+}
+if ($vars['disabled']) { $where .= " AND disabled= ?";     $sql_param[] = $vars['disabled']; }
+if ($vars['ignore'])   { $where .= " AND `ignore`= ?";       $sql_param[] = $vars['ignore']; }
 if ($vars['location'] == "Unset") { $location_filter = ''; }
 if ($vars['location']) { $location_filter = $vars['location']; }
 
