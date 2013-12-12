@@ -58,11 +58,11 @@
         },
 
         getLineHeight: function(elem) {
-          return parseInt($(elem)['offsetParent' in $.fn ? 'offsetParent' : 'parent']().css('fontSize'), 10);
+            return parseInt($(elem)['offsetParent' in $.fn ? 'offsetParent' : 'parent']().css('fontSize'), 10);
         },
 
         getPageHeight: function(elem) {
-          return $(elem).height();
+            return $(elem).height();
         }
     };
 
@@ -121,15 +121,15 @@
         //   * deltaMode 1 is by lines
         //   * deltaMode 2 is by pages
         if ( orgEvent.deltaMode === 1 ) {
-          var lineHeight = $.data(this, 'mousewheel-line-height');
-          delta  *= lineHeight;
-          deltaY *= lineHeight;
-          deltaX *= lineHeight;
+            var lineHeight = $.data(this, 'mousewheel-line-height');
+            delta  *= lineHeight;
+            deltaY *= lineHeight;
+            deltaX *= lineHeight;
         } else if ( orgEvent.deltaMode === 2 ) {
-          var pageHeight = $.data(this, 'mousewheel-page-height');
-          delta  *= pageHeight;
-          deltaY *= pageHeight;
-          deltaX *= pageHeight;
+            var pageHeight = $.data(this, 'mousewheel-page-height');
+            delta  *= pageHeight;
+            deltaY *= pageHeight;
+            deltaX *= pageHeight;
         }
 
         // Store lowest absolute delta to normalize the delta values
