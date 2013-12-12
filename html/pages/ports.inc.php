@@ -256,6 +256,11 @@ foreach ($vars as $var => $value)
       case 'device_id':
       case 'deleted':
       case 'ignore':
+        if ($value == 1)
+        {
+          $where .= " AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0";
+        }
+        break;
       case 'disable':
       case 'ifSpeed':
         if (is_numeric($value))
@@ -286,11 +291,11 @@ foreach ($vars as $var => $value)
           $param[] = "up";
           $param[] = "down";
         } elseif($value == "up") {
-          $where .= "AND I.ifAdminStatus = ? AND I.ifOperStatus = ?";
+          $where .= "AND I.ifAdminStatus = ? AND I.ifOperStatus = ?  AND I.ignore = '0' AND D.ignore='0' AND I.deleted='0'";
           $param[] = "up";
           $param[] = "up";
         } elseif($value == "admindown") {
-          $where .= "AND I.ifAdminStatus = ?";
+          $where .= "AND I.ifAdminStatus = ? AND D.ignore = 0";
           $param[] = "down";
         }
       break;
