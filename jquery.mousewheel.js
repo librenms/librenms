@@ -139,6 +139,17 @@
             lowestDelta = absDelta;
         }
 
+        // Assuming that if the lowestDelta is 120, then that the browser
+        // is treating this as an older mouse wheel event.
+        // We'll divide it by 40 to try and get a more usable deltaFactor.
+        if ( lowestDelta === 120 ) {
+          // Divide all the things by 40!
+          delta       /= 40;
+          deltaX      /= 40;
+          deltaY      /= 40;
+          lowestDelta /= 40;
+        }
+
         // Get a whole, normalized value for the deltas
         delta  = Math[ delta  >= 1 ? 'floor' : 'ceil' ](delta  / lowestDelta);
         deltaX = Math[ deltaX >= 1 ? 'floor' : 'ceil' ](deltaX / lowestDelta);
