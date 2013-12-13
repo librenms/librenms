@@ -119,7 +119,7 @@ if ($config['page_title']) { $config['page_title_prefix'] = $config['page_title'
 if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$config['page_refresh'].'" />' . "\n"); }
 ?>
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
-  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <!--<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />-->
 <?php
 if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n"); }
 ?>
@@ -132,7 +132,7 @@ if ($_SESSION['widescreen']) { echo('<link rel="stylesheet" href="css/styles-wid
   <script type="text/javascript" src="js/sorttable.js"></script>
   <script type="text/javascript" src="js/jquery.min.js"></script>
   <script type="text/javascript" src="js/jquery-checkbox.js"></script>
-  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <!--<script type="text/javascript" src="js/bootstrap.min.js"></script>-->
   <script type="text/javascript" src="js/qtip/jquery.qtip.min.js"></script>
   <link rel="stylesheet" href="css/jquery.qtip.min.css" type="text/css">
 <?php /* html5.js below from http://html5shim.googlecode.com/svn/trunk/html5.js */ ?>
