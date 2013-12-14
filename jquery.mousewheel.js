@@ -1,7 +1,7 @@
 /*! Copyright (c) 2013 Brandon Aaron (http://brandon.aaron.sh)
  * Licensed under the MIT License (LICENSE.txt).
  *
- * Version: 3.1.7
+ * Version: 3.1.8-pre
  *
  * Requires: jQuery 1.2.2+
  */
@@ -23,7 +23,7 @@
         toBind = ( 'onwheel' in document || document.documentMode >= 9 ) ?
                     ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'],
         slice  = Array.prototype.slice,
-        nullLowestDeltaTimeout, lowestDelta;
+        oldMode, nullLowestDeltaTimeout, lowestDelta;
 
     if ( $.event.fixHooks ) {
         for ( var i = toFix.length; i; ) {
@@ -32,7 +32,7 @@
     }
 
     var special = $.event.special.mousewheel = {
-        version: '3.1.6',
+        version: '3.1.8-pre',
 
         setup: function() {
             if ( this.addEventListener ) {
@@ -137,17 +137,23 @@
 
         if ( !lowestDelta || absDelta < lowestDelta ) {
             lowestDelta = absDelta;
+
+            // Assuming that if the lowestDelta is 120, then that the browser
+            // is treating this as an older mouse wheel event.
+            // We'll divide it by 40 to try and get a more usable deltaFactor.
+            if ( lowestDelta === 120 ) {
+              oldMode = true;
+              lowestDelta /= 40;
+            }
         }
 
-        // Assuming that if the lowestDelta is 120, then that the browser
-        // is treating this as an older mouse wheel event.
-        // We'll divide it by 40 to try and get a more usable deltaFactor.
-        if ( lowestDelta === 120 ) {
+        // When in oldMode the delta is based on 120. We devide
+        // by 40 to try and get a more usable deltaFactor.
+        if ( oldMode ) {
             // Divide all the things by 40!
-            delta       /= 40;
-            deltaX      /= 40;
-            deltaY      /= 40;
-            lowestDelta /= 40;
+            delta  /= 40;
+            deltaX /= 40;
+            deltaY /= 40;
         }
 
         // Get a whole, normalized value for the deltas
@@ -179,6 +185,7 @@
 
     function nullLowestDelta() {
         lowestDelta = null;
+        oldMode = null;
     }
 
 }));
