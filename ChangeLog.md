@@ -1,6 +1,6 @@
 # Mouse Wheel ChangeLog
 
-## 3.1.8-pre
+## 3.1.8
 
 * Even better handling of older browsers that use a wheelDelta based on 120
 * And fix version reported by `$.event.special.mousewheel`
