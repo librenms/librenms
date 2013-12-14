@@ -147,8 +147,8 @@
             }
         }
 
-        // When in oldMode the delta is based on 120. We devide
-        // by 40 to try and get a more usable deltaFactor.
+        // When in oldMode the delta is based on 120.
+        // Dividing by 40 to try and get a more usable deltaFactor.
         if ( oldMode ) {
             // Divide all the things by 40!
             delta  /= 40;
