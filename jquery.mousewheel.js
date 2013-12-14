@@ -142,8 +142,8 @@
             // is treating this as an older mouse wheel event.
             // We'll divide it by 40 to try and get a more usable deltaFactor.
             if ( lowestDelta === 120 ) {
-              oldMode = true;
-              lowestDelta /= 40;
+                oldMode = true;
+                lowestDelta /= 40;
             }
         }
 
