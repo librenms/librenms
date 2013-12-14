@@ -1,5 +1,10 @@
 # Mouse Wheel ChangeLog
 
+## 3.1.8-pre
+
+* Even better handling of older browsers that use a wheelDelta based on 120
+* And fix version reported by `$.event.special.mousewheel`
+
 ## 3.1.7
 
 * Better handle the `deltaMode` values 1 (lines) and 2 (pages)
