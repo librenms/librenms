@@ -7,10 +7,10 @@
         "mouse",
         "event"
     ],
-    "version": "3.1.7-pre",
+    "version": "3.1.7",
     "author": {
         "name": "Brandon Aaron",
-        "url": "http://brandonaaron.net"
+        "url": "http://brandon.aaron.sh"
     },
     "licenses": [
         {

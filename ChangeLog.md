@@ -1,6 +1,6 @@
 # Mouse Wheel ChangeLog
 
-## 3.1.7-pre
+## 3.1.7
 
 * Better handle the `deltaMode` values 1 (lines) and 2 (pages)
 * Attempt to better handle older browsers that use a wheelDelta based on 120

@@ -1,7 +1,7 @@
 {
   "name": "jquery-mousewheel",
-  "version": "3.1.7-pre",
-  "author": "Brandon Aaron <brandon.aaron@gmail.com> (http://brandonaaron.net/)",
+  "version": "3.1.7",
+  "author": "Brandon Aaron (http://brandon.aaron.sh)",
   "description": "A jQuery plugin that adds cross-browser mouse wheel support.",
   "license": "MIT",
   "homepage": "https://github.com/brandonaaron/jquery-mousewheel",
