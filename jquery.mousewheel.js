@@ -1,7 +1,7 @@
 /*! Copyright (c) 2013 Brandon Aaron (http://brandon.aaron.sh)
  * Licensed under the MIT License (LICENSE.txt).
  *
- * Version: 3.1.8
+ * Version: 3.1.9
  *
  * Requires: jQuery 1.2.2+
  */
@@ -23,7 +23,7 @@
         toBind = ( 'onwheel' in document || document.documentMode >= 9 ) ?
                     ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'],
         slice  = Array.prototype.slice,
-        oldMode, nullLowestDeltaTimeout, lowestDelta;
+        nullLowestDeltaTimeout, lowestDelta;
 
     if ( $.event.fixHooks ) {
         for ( var i = toFix.length; i; ) {
@@ -32,7 +32,7 @@
     }
 
     var special = $.event.special.mousewheel = {
-        version: '3.1.8',
+        version: '3.1.9',
 
         setup: function() {
             if ( this.addEventListener ) {
@@ -63,6 +63,10 @@
 
         getPageHeight: function(elem) {
             return $(elem).height();
+        },
+
+        settings: {
+            adjustOldDeltas: true
         }
     };
 
@@ -138,18 +142,14 @@
         if ( !lowestDelta || absDelta < lowestDelta ) {
             lowestDelta = absDelta;
 
-            // Assuming that if the lowestDelta is 120, then that the browser
-            // is treating this as an older mouse wheel event.
-            // We'll divide it by 40 to try and get a more usable deltaFactor.
-            if ( lowestDelta === 120 ) {
-                oldMode = true;
+            // Adjust older deltas if necessary
+            if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
                 lowestDelta /= 40;
             }
         }
 
-        // When in oldMode the delta is based on 120.
-        // Dividing by 40 to try and get a more usable deltaFactor.
-        if ( oldMode ) {
+        // Adjust older deltas if necessary
+        if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
             // Divide all the things by 40!
             delta  /= 40;
             deltaX /= 40;
@@ -185,7 +185,17 @@
 
     function nullLowestDelta() {
         lowestDelta = null;
-        oldMode = null;
+    }
+
+    function shouldAdjustOldDeltas(orgEvent, absDelta) {
+        // If this is an older event and the delta is divisable by 120,
+        // then we are assuming that the browser is treating this as an
+        // older mouse wheel event and that we should divide the deltas
+        // by 40 to try and get a more usable deltaFactor.
+        // Side note, this actually impacts the reported scroll distance
+        // in older browsers and can cause scrolling to be slower than native.
+        // Turn this off by setting $.event.special.mousewheel.settings.adjustOldDeltas to false.
+        return special.settings.adjustOldDeltas && orgEvent.type === 'mousewheel' && absDelta % 120 === 0;
     }
 
 }));
