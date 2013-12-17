@@ -560,7 +560,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	_propagateEvent: function (e) {
 		if (e.layer instanceof L.MarkerCluster) {
 			//Prevent multiple clustermouseover/off events if the icon is made up of stacked divs (Doesn't work in ie <= 8, no relatedTarget)
-			if (this._isOrIsParent(e.layer._icon, e.originalEvent.relatedTarget)) {
+			if (e.originalEvent && this._isOrIsParent(e.layer._icon, e.originalEvent.relatedTarget)) {
 				return;
 			}
 			e.type = 'cluster' + e.type;
