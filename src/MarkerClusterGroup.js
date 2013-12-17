@@ -317,6 +317,19 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return layers;
 	},
 
+	//Overrides LayerGroup.getLayer, WARNING: Really bad performance
+	getLayer: function (id) {
+		var result = null;
+
+		this.eachLayer(function (l) {
+			if (L.stamp(l) === id) {
+				result = l;
+			}
+		});
+
+		return result;
+	},
+
 	//Returns true if the given layer is in this MarkerClusterGroup
 	hasLayer: function (layer) {
 		if (!layer) {
