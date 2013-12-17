@@ -40,7 +40,12 @@
 		var markers = L.markerClusterGroup({
 			maxClusterRadius: 120,
 			iconCreateFunction: function (cluster) {
-				return L.divIcon({ html: cluster.getChildCount(), className: 'mycluster', iconSize: L.point(40, 40) });
+				var markers = cluster.getAllChildMarkers();
+				var n = 0;
+				for (var i = 0; i < markers.length; i++) {
+					n += markers[i].number;
+				}
+				return L.divIcon({ html: n, className: 'mycluster', iconSize: L.point(40, 40) });
 			},
 			//Disable all of the defaults:
 			spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false
@@ -49,7 +54,8 @@
 
 		function populate() {
 			for (var i = 0; i < 100; i++) {
-				var m = L.marker(getRandomLatLng(map));
+				var m = L.marker(getRandomLatLng(map), { title: i });
+				m.number = i;
 				markers.addLayer(m);
 			}
 			return false;
