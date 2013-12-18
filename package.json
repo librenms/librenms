@@ -1,5 +1,5 @@
 {
-	"name": "Leaflet.markercluster",
+	"name": "leaflet.markercluster",
 	"version": "0.3.0",
 	"description": "Provides Beautiful Animated Marker Clustering functionality for Leaflet",
 	"dependencies": {
