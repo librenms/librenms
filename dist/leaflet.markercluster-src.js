@@ -322,6 +322,19 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return layers;
 	},
 
+	//Overrides LayerGroup.getLayer, WARNING: Really bad performance
+	getLayer: function (id) {
+		var result = null;
+
+		this.eachLayer(function (l) {
+			if (L.stamp(l) === id) {
+				result = l;
+			}
+		});
+
+		return result;
+	},
+
 	//Returns true if the given layer is in this MarkerClusterGroup
 	hasLayer: function (layer) {
 		if (!layer) {
@@ -552,8 +565,22 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		delete marker.__parent;
 	},
 
+	_isOrIsParent: function (el, oel) {
+		while (oel) {
+			if (el === oel) {
+				return true;
+			}
+			oel = oel.parentNode;
+		}
+		return false;
+	},
+
 	_propagateEvent: function (e) {
 		if (e.layer instanceof L.MarkerCluster) {
+			//Prevent multiple clustermouseover/off events if the icon is made up of stacked divs (Doesn't work in ie <= 8, no relatedTarget)
+			if (e.originalEvent && this._isOrIsParent(e.layer._icon, e.originalEvent.relatedTarget)) {
+				return;
+			}
 			e.type = 'cluster' + e.type;
 		}
 
@@ -603,6 +630,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		} else if (this.options.zoomToBoundsOnClick) {
 			e.layer.zoomToBounds();
+		}
+
+    // Focus the map again for keyboard users.
+		if (e.originalEvent && e.originalEvent.keyCode === 13) {
+			map._container.focus();
 		}
 	},
 
@@ -1041,8 +1073,10 @@ L.MarkerCluster = L.Marker.extend({
 			map = this._group._map,
 			boundsZoom = map.getBoundsZoom(this._bounds),
 			zoom = this._zoom + 1,
+			mapZoom = map.getZoom(),
 			i;
 
+		//calculate how fare we need to zoom down to see all of the markers
 		while (childClusters.length > 0 && boundsZoom > zoom) {
 			zoom++;
 			var newClusters = [];
@@ -1054,6 +1088,8 @@ L.MarkerCluster = L.Marker.extend({
 
 		if (boundsZoom > zoom) {
 			this._group._map.setView(this._latlng, zoom);
+		} else if (boundsZoom <= mapZoom) { //If fitBounds wouldn't zoom us down, zoom us down instead
+			this._group._map.setView(this._latlng, mapZoom + 1);
 		} else {
 			this._group._map.fitBounds(this._bounds);
 		}
