@@ -5,6 +5,8 @@ Leaflet.markercluster
 
 ## Master
 
+##0.3 (2013-12-18)
+
 ### Improvements
 
  * Work better with custom projections (by [@andersarstrand](https://github.com/andersarstrand)) [#74](https://github.com/Leaflet/Leaflet.markercluster/issues/74)
@@ -20,6 +22,13 @@ Leaflet.markercluster
  * Allow adding non-clusterable things to a MarkerClusterGroup, we don't cluster them. (Reported by [@benbalter](https://github.com/benbalter)) [#195](https://github.com/Leaflet/Leaflet.markercluster/issues/195)
  * removeLayer supports taking a FeatureGroup (Reported by [@pabloalcaraz](https://github.com/pabloalcaraz)) [#236](https://github.com/Leaflet/Leaflet.markercluster/issues/236)
  * DistanceGrid tests, QuickHull tests and improvements (By [@tmcw](https://github.com/tmcw)) [#247](https://github.com/Leaflet/Leaflet.markercluster/issues/247) [#248](https://github.com/Leaflet/Leaflet.markercluster/issues/248) [#249](https://github.com/Leaflet/Leaflet.markercluster/issues/249)
+ * Implemented getLayers (Reported by [@metajungle](https://github.com/metajungle)) [#222](https://github.com/Leaflet/Leaflet.markercluster/issues/222)
+ * zoomToBounds now only zooms in as far as it needs to to get all of the markers on screen if this is less zoom than zooming to the actual bounds would be (Reported by [@adamyonk](https://github.com/adamyonk)) [#185](https://github.com/Leaflet/Leaflet.markercluster/issues/185)
+ * Keyboard accessibility improvements (By [@Zombienaute](https://github.com/Zombienaute)) [#273](https://github.com/Leaflet/Leaflet.markercluster/issues/273)
+ * IE Specific css in the default styles is no longer a separate file (By [@frankrowe](https://github.com/frankrowe)) [#280](https://github.com/Leaflet/Leaflet.markercluster/issues/280)
+ * Improve usability with small maps (Reported by [@JSCSJSCS](https://github.com/JSCSJSCS)) [#144](https://github.com/Leaflet/Leaflet.markercluster/issues/144)
+ * Implement FeatureGroup.getLayer (Reported by [@newmanw](https://github.com/newmanw)) [#244](https://github.com/Leaflet/Leaflet.markercluster/issues/244)
+
 ### Bugfixes
 
  * Fix singleMarkerMode when you aren't on the map (by [@duncanparkes](https://github.com/duncanparkes)) [#77](https://github.com/Leaflet/Leaflet.markercluster/issues/77)
@@ -40,7 +49,11 @@ Leaflet.markercluster
  * Lots of fixes for removing a MarkerClusterGroup from the map (Reported by [@annetdeboer](https://github.com/annetdeboer)) [#200](https://github.com/Leaflet/Leaflet.markercluster/issues/200)
  * Throw error when being added to a map with no maxZoom.
  * Fixes for markers not appearing after a big zoom (Reported by [@arnoldbird](https://github.com/annetdeboer)) [#216](https://github.com/Leaflet/Leaflet.markercluster/issues/216) (Reported by [@mathilde-pellerin](https://github.com/mathilde-pellerin)) [#260](https://github.com/Leaflet/Leaflet.markercluster/issues/260)
- * Fix coverage polygon not being removed when a MarkerClusterGroup is removed  (Reported by [@ZeusTheTrueGod](https://github.com/ZeusTheTrueGod)) [#245](https://github.com/Leaflet/Leaflet.markercluster/issues/245)
+ * Fix coverage polygon not being removed when a MarkerClusterGroup is removed (Reported by [@ZeusTheTrueGod](https://github.com/ZeusTheTrueGod)) [#245](https://github.com/Leaflet/Leaflet.markercluster/issues/245)
+ * Fix getVisibleParent when no parent is visible (Reported by [@ajbeaven](https://github.com/ajbeaven)) [#265](https://github.com/Leaflet/Leaflet.markercluster/issues/265)
+ * Fix spiderfied markers not hiding on a big zoom (Reported by [@Vaesive](https://github.com/Vaesive)) [#268](https://github.com/Leaflet/Leaflet.markercluster/issues/268)
+ * Fix clusters not hiding on a big zoom (Reported by [@versusvoid](https://github.com/versusvoid)) [#281](https://github.com/Leaflet/Leaflet.markercluster/issues/281)
+ * Don't fire multiple clustermouseover/off events due to child divs in the cluster marker (Reported by [@heidemn](https://github.com/heidemn)) [#252](https://github.com/Leaflet/Leaflet.markercluster/issues/252)
 
 ## 0.2 (2012-10-11)
 
