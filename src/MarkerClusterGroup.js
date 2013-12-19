@@ -160,7 +160,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		var fg = this._featureGroup,
 			npg = this._nonPointGroup,
 			chunkSize = this.options.chunkSize,
-			i, l, m;
+			newMarkers, i, l, m;
 
 		if (this._map) {
 			var start = 0;
@@ -206,13 +206,14 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 					start = end;
 					end = Math.min(end + chunkSize, layersArray.length);
 					console.log((+new Date()) + ' queueing ' + start + ' - ' + end);
-					setTimeout(process, 100);
+					setTimeout(process, 0);
 				}
 			}, this);
 
 			process();
 		} else {
 			console.log((+new Date()) + ' start pre-add');
+			newMarkers = [];
 			for (i = 0, l = layersArray.length; i < l; i++) {
 				m = layersArray[i];
 
@@ -226,8 +227,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 					continue;
 				}
 
-				this._needsClustering.push(m);
+				newMarkers.push(m);
 			}
+			this._needsClustering = this._needsClustering.concat(newMarkers);
 			console.log((+new Date()) + ' end pre-add');
 		}
 		return this;
@@ -639,7 +641,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			e.layer.zoomToBounds();
 		}
 
-    // Focus the map again for keyboard users.
+		// Focus the map again for keyboard users.
 		if (e.originalEvent && e.originalEvent.keyCode === 13) {
 			map._container.focus();
 		}
