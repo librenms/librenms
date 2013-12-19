@@ -27,6 +27,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		//Increase to increase the distance away that spiderfied markers appear from the center
 		spiderfyDistanceMultiplier: 1,
 
+		//When bulk adding layers, runs chunks at a time. Means addLayers may not add all the layers in the call, others will be loaded during setTimeouts
+		chunkedLoading: false,
+		chunkSize: 500,
+
 		//Options to pass to the L.Polygon constructor
 		polygonOptions: {}
 	},
@@ -153,52 +157,79 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Takes an array of markers and adds them in bulk
 	addLayers: function (layersArray) {
-		var i, l, m,
-			onMap = this._map,
-			fg = this._featureGroup,
-			npg = this._nonPointGroup;
+		var fg = this._featureGroup,
+			npg = this._nonPointGroup,
+			chunkSize = this.options.chunkSize,
+			i, l, m;
 
-		for (i = 0, l = layersArray.length; i < l; i++) {
-			m = layersArray[i];
+		if (this._map) {
+			var start = 0;
+			var end = this.options.chunkedLoading && chunkSize < layersArray.length ? chunkSize : layersArray.length;
+			var process = L.bind(function () {
+				console.log((+new Date()) + ' processing ' + start + ' - ' + end);
+				for (i = start; i < end; i++) {
+					m = layersArray[i];
 
-			//Not point data, can't be clustered
-			if (!m.getLatLng) {
-				npg.addLayer(m);
-				continue;
-			}
+					//Not point data, can't be clustered
+					if (!m.getLatLng) {
+						npg.addLayer(m);
+						continue;
+					}
 
-			if (this.hasLayer(m)) {
-				continue;
-			}
+					if (this.hasLayer(m)) {
+						continue;
+					}
 
-			if (!onMap) {
+					this._addLayer(m, this._maxZoom);
+
+					//If we just made a cluster of size 2 then we need to remove the other marker from the map (if it is) or we never will
+					if (m.__parent) {
+						if (m.__parent.getChildCount() === 2) {
+							var markers = m.__parent.getAllChildMarkers(),
+								otherMarker = markers[0] === m ? markers[1] : markers[0];
+							fg.removeLayer(otherMarker);
+						}
+					}
+				}
+
+				if (end === layersArray.length) {
+					console.log((+new Date()) + ' done');
+					//Update the icons of all those visible clusters that were affected
+					this._featureGroup.eachLayer(function (c) {
+						if (c instanceof L.MarkerCluster && c._iconNeedsUpdate) {
+							c._updateIcon();
+						}
+					});
+
+					this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+				} else {
+					start = end;
+					end = Math.min(end + chunkSize, layersArray.length);
+					console.log((+new Date()) + ' queueing ' + start + ' - ' + end);
+					setTimeout(process, 100);
+				}
+			}, this);
+
+			process();
+		} else {
+			console.log((+new Date()) + ' start pre-add');
+			for (i = 0, l = layersArray.length; i < l; i++) {
+				m = layersArray[i];
+
+				//Not point data, can't be clustered
+				if (!m.getLatLng) {
+					npg.addLayer(m);
+					continue;
+				}
+
+				if (this.hasLayer(m)) {
+					continue;
+				}
+
 				this._needsClustering.push(m);
-				continue;
 			}
-
-			this._addLayer(m, this._maxZoom);
-
-			//If we just made a cluster of size 2 then we need to remove the other marker from the map (if it is) or we never will
-			if (m.__parent) {
-				if (m.__parent.getChildCount() === 2) {
-					var markers = m.__parent.getAllChildMarkers(),
-						otherMarker = markers[0] === m ? markers[1] : markers[0];
-					fg.removeLayer(otherMarker);
-				}
-			}
+			console.log((+new Date()) + ' end pre-add');
 		}
-
-		if (onMap) {
-			//Update the icons of all those visible clusters that were affected
-			fg.eachLayer(function (c) {
-				if (c instanceof L.MarkerCluster && c._iconNeedsUpdate) {
-					c._updateIcon();
-				}
-			});
-
-			this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
-		}
-
 		return this;
 	},
 
@@ -414,23 +445,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 		this._needsRemoving = [];
 
-		for (i = 0, l = this._needsClustering.length; i < l; i++) {
-			layer = this._needsClustering[i];
-
-			//If the layer doesn't have a getLatLng then we can't cluster it, so add it to our child featureGroup
-			if (!layer.getLatLng) {
-				this._featureGroup.addLayer(layer);
-				continue;
-			}
-
-
-			if (layer.__parent) {
-				continue;
-			}
-			this._addLayer(layer, this._maxZoom);
-		}
-		this._needsClustering = [];
-
+		//Remember the current zoom level and bounds
+		this._zoom = this._map.getZoom();
+		this._currentShownBounds = this._getExpandedVisibleBounds();
 
 		this._map.on('zoomend', this._zoomEnd, this);
 		this._map.on('moveend', this._moveEnd, this);
@@ -441,15 +458,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		this._bindEvents();
 
-
 		//Actually add our markers to the map:
-
-		//Remember the current zoom level and bounds
-		this._zoom = this._map.getZoom();
-		this._currentShownBounds = this._getExpandedVisibleBounds();
-
-		//Make things appear on the map
-		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+		l = this._needsClustering;
+		this._needsClustering = [];
+		this.addLayers(l);
 	},
 
 	//Overrides FeatureGroup.onRemove
