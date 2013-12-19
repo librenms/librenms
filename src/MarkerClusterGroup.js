@@ -792,7 +792,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	_enqueue: function (fn) {
 		this._queue.push(fn);
 		if (!this._queueTimeout) {
-			this._queueTimeout = setTimeout(L.bind(this._processQueue, this), 200);
+			this._queueTimeout = setTimeout(L.bind(this._processQueue, this), 300);
 		}
 	},
 	_processQueue: function () {
