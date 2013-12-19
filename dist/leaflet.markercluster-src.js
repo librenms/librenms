@@ -53,6 +53,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._needsRemoving = []; //Markers removed while we aren't on the map need to be kept track of
 		//The bounds of the currently shown area (from _getExpandedVisibleBounds) Updated on zoom/move
 		this._currentShownBounds = null;
+
+		this._queue = [];
 	},
 
 	addLayer: function (layer) {
@@ -381,14 +383,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			}
 		};
 
-		if (layer._icon) {
+		if (layer._icon && this._map.getBounds().contains(layer.getLatLng())) {
 			callback();
 		} else if (layer.__parent._zoom < this._map.getZoom()) {
 			//Layer should be visible now but isn't on screen, just pan over to it
 			this._map.on('moveend', showMarker, this);
-			if (!layer._icon) {
-				this._map.panTo(layer.getLatLng());
-			}
+			this._map.panTo(layer.getLatLng());
 		} else {
 			this._map.on('moveend', showMarker, this);
 			this.on('animationend', showMarker, this);
@@ -791,8 +791,28 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		return;
 	},
 
+	//Enqueue code to fire after the marker expand/contract has happened
+	_enqueue: function (fn) {
+		this._queue.push(fn);
+		if (!this._queueTimeout) {
+			this._queueTimeout = setTimeout(L.bind(this._processQueue, this), 300);
+		}
+	},
+	_processQueue: function () {
+		for (var i = 0; i < this._queue.length; i++) {
+			this._queue[i].call(this);
+		}
+		this._queue.length = 0;
+		clearTimeout(this._queueTimeout);
+		this._queueTimeout = null;
+	},
+
 	//Merge and split any existing clusters that are too big or small
 	_mergeSplitClusters: function () {
+
+		//Incase we are starting to split before the animation finished
+		this._processQueue();
+
 		if (this._zoom < this._map._zoom && this._currentShownBounds.contains(this._getExpandedVisibleBounds())) { //Zoom in, split
 			this._animationStart();
 			//Remove clusters now off screen
@@ -875,9 +895,8 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		this.fire('animationend');
 	},
 	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
-		var me = this,
-		    bounds = this._getExpandedVisibleBounds(),
-			fg = this._featureGroup,
+		var bounds = this._getExpandedVisibleBounds(),
+		    fg = this._featureGroup,
 		    i;
 
 		//Add all children of current clusters to map and remove those clusters from map
@@ -913,7 +932,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		this._forceLayout();
 
 		//Update opacities
-		me._topClusterLevel._recursivelyBecomeVisible(bounds, newZoomLevel);
+		this._topClusterLevel._recursivelyBecomeVisible(bounds, newZoomLevel);
 		//TODO Maybe? Update markers in _recursivelyBecomeVisible
 		fg.eachLayer(function (n) {
 			if (!(n instanceof L.MarkerCluster) && n._icon) {
@@ -922,21 +941,20 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 		});
 
 		//update the positions of the just added clusters/markers
-		me._topClusterLevel._recursively(bounds, previousZoomLevel, newZoomLevel, function (c) {
+		this._topClusterLevel._recursively(bounds, previousZoomLevel, newZoomLevel, function (c) {
 			c._recursivelyRestoreChildPositions(newZoomLevel);
 		});
 
 		//Remove the old clusters and close the zoom animation
-
-		setTimeout(function () {
+		this._enqueue(function () {
 			//update the positions of the just added clusters/markers
-			me._topClusterLevel._recursively(bounds, previousZoomLevel, 0, function (c) {
+			this._topClusterLevel._recursively(bounds, previousZoomLevel, 0, function (c) {
 				fg.removeLayer(c);
 				c.setOpacity(1);
 			});
 
-			me._animationEnd();
-		}, 200);
+			this._animationEnd();
+		});
 	},
 
 	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
@@ -961,7 +979,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 
 		//TODO: Maybe use the transition timing stuff to make this more reliable
 		//When the animations are done, tidy up
-		setTimeout(function () {
+		this._enqueue(function () {
 
 			//This cluster stopped being a cluster before the timeout fired
 			if (cluster._childCount === 1) {
@@ -975,7 +993,7 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				});
 			}
 			me._animationEnd();
-		}, 200);
+		});
 	},
 	_animationAddLayer: function (layer, newCluster) {
 		var me = this,
@@ -992,12 +1010,12 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 				layer._setPos(this._map.latLngToLayerPoint(newCluster.getLatLng()));
 				layer.setOpacity(0);
 
-				setTimeout(function () {
+				this._enqueue(function () {
 					fg.removeLayer(layer);
 					layer.setOpacity(1);
 
 					me._animationEnd();
-				}, 200);
+				});
 
 			} else { //Just became a cluster
 				this._forceLayout();

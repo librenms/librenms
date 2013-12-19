@@ -5,6 +5,17 @@ Leaflet.markercluster
 
 ## Master
 
+##0.4 (2012-12-19)
+
+### Improvements
+
+ * Fix Quick Zoom in/out causing everything to disappear in Firefox (Reported by [@paulovieira](https://github.com/paulovieira)) [#140](https://github.com/Leaflet/Leaflet.markercluster/issues/140)
+ * Slow the expand/contract animation down from 200ms to 300ms
+
+### Bugfixes
+
+ * Fix some cases zoomToShowLayer wouldn't work  (Reported by [@absemetov](https://github.com/absemetov)) [#203](https://github.com/Leaflet/Leaflet.markercluster/issues/203) [#228](https://github.com/Leaflet/Leaflet.markercluster/issues/228) [#286](https://github.com/Leaflet/Leaflet.markercluster/issues/286)
+
 ##0.3 (2013-12-18)
 
 ### Improvements
