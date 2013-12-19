@@ -5,7 +5,7 @@ Leaflet.markercluster
 
 ## Master
 
-##0.4 (2012-12-19)
+##0.4 (2013-12-19)
 
 ### Improvements
 
