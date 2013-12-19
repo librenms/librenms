@@ -166,7 +166,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			var start = 0;
 			var end = this.options.chunkedLoading && chunkSize < layersArray.length ? chunkSize : layersArray.length;
 			var process = L.bind(function () {
-				console.log((+new Date()) + ' processing ' + start + ' - ' + end);
 				for (i = start; i < end; i++) {
 					m = layersArray[i];
 
@@ -193,7 +192,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				}
 
 				if (end === layersArray.length) {
-					console.log((+new Date()) + ' done');
 					//Update the icons of all those visible clusters that were affected
 					this._featureGroup.eachLayer(function (c) {
 						if (c instanceof L.MarkerCluster && c._iconNeedsUpdate) {
@@ -205,14 +203,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				} else {
 					start = end;
 					end = Math.min(end + chunkSize, layersArray.length);
-					console.log((+new Date()) + ' queueing ' + start + ' - ' + end);
 					setTimeout(process, 0);
 				}
 			}, this);
 
 			process();
 		} else {
-			console.log((+new Date()) + ' start pre-add');
 			newMarkers = [];
 			for (i = 0, l = layersArray.length; i < l; i++) {
 				m = layersArray[i];
@@ -230,7 +226,6 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 				newMarkers.push(m);
 			}
 			this._needsClustering = this._needsClustering.concat(newMarkers);
-			console.log((+new Date()) + ' end pre-add');
 		}
 		return this;
 	},
