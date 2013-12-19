@@ -27,7 +27,7 @@
 			latlng = L.latLng(-37.89, 175.46);
 		var map = L.map('map', {center: latlng, zoom: 13, layers: [cloudmade]});
 
-		var markers = L.markerClusterGroup();
+		var markers = L.markerClusterGroup({ chunkedLoading: true });
 		
 		for (var i = 0; i < addressPoints.length; i++) {
 			var a = addressPoints[i];
