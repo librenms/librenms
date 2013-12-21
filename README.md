@@ -45,6 +45,7 @@ exception):
   - sorttable (http://www.kryogenix.org/code/browser/sorttable/) (html/js/sorttable.js): X11
   - JQueury (http://jquery.com/) (html/js/jquery.min.js, html/js/jquery-checkbox.js): MIT
   - Bootstrap (http://getbootstrap.com/) (html/css/bootstrap.* html/css/bootstrap/* html/js/bootstrap.*): Apache License V2.0
+  - typeahead,js (https://github.com/twitter/typeahead.js/) (html/js/typeahead.min.css): MIT
 
 
 Introduction

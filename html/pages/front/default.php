@@ -1,7 +1,5 @@
 <?php
 
-include_once("includes/front/boxes.inc.php");
-
 function generate_front_box ($frontbox_class, $content)
 {
 echo("<div class=\"front-box $frontbox_class\">
@@ -9,9 +7,14 @@ echo("<div class=\"front-box $frontbox_class\">
       </div>");
 }
 
+echo('
+  <div class="row">
+    <div class="col-md-8">
+');
+
 echo('<div class=front-page>');
 
-echo('<div class="status-boxes left-2-col-fluid">');
+echo('<div class="status-boxes">');
 
 $count_boxes = 0;
 
@@ -113,6 +116,20 @@ if ($count_boxes == 0) {
   want to start by adding one or more devices in the Devices menu.</p>");
 }
 echo('</div>');
+echo('</div>');
+echo('</div>');
+echo('
+  <div class="col-md-4">
+');
+
+include_once("includes/front/boxes.inc.php");
+
+echo('
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+');
 
 if ($config['enable_syslog'])
 {
@@ -158,5 +175,10 @@ if ($config['enable_syslog'])
 }
 
 echo("</div>");
+
+echo('
+  </div>
+</div>
+');
 
 ?>
