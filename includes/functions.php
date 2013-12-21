@@ -179,6 +179,38 @@ function getImage($device)
   return $image;
 }
 
+function getImageSrc($device)
+{
+  global $config;
+
+  $device['os'] = strtolower($device['os']);
+
+  if ($device['icon'] && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png"))
+  {
+    $image = $config['base_url'] . '/images/os/' . $device['icon'] . '.png';
+  }
+  elseif ($config['os'][$device['os']]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png"))
+  {
+    $image = $config['base_url'] . '/images/os/' . $config['os'][$device['os']]['icon'] . '.png';
+  } else {
+    if (file_exists($config['html_dir'] . '/images/os/' . $device['os'] . '.png'))
+    {
+      $image = $config['base_url'] . '/images/os/' . $device['os'] . '.png';
+    }
+    if ($device['os'] == "linux")
+    {
+      $features = strtolower(trim($device['features']));
+      list($distro) = explode(" ", $features);
+      if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png"))
+      {
+        $image = $config['base_url'] . '/images/os/' . $distro . '.png';
+      }
+    }
+  }
+
+  return $image;
+}
+
 function renamehost($id, $new, $source = 'console')
 {
   global $config;
