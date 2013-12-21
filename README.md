@@ -46,6 +46,7 @@ exception):
   - JQueury (http://jquery.com/) (html/js/jquery.min.js, html/js/jquery-checkbox.js): MIT
   - Bootstrap (http://getbootstrap.com/) (html/css/bootstrap.* html/css/bootstrap/* html/js/bootstrap.*): Apache License V2.0
   - typeahead,js (https://github.com/twitter/typeahead.js/) (html/js/typeahead.min.css): MIT
+  - bootstrap-hover-dropdown (https://github.com/CWSpear/bootstrap-hover-dropdown) (html/js/bootstrap-hover-dropdown.min.js): MIT
 
 
 Introduction
