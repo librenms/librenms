@@ -1,6 +1,6 @@
 <?php
 
-// MYSQL Check - FIX ME
+// MYSQL Check - FIXME
 // 4 SELECTS
 // 9 DELETES
 

@@ -1,6 +1,6 @@
 <?php 
 
-// MYSQL Check - FIX ME
+// MYSQL Check - FIXME
 // 3 SELECTS
 
 $total = mysql_result(mysql_query("SELECT count(*) FROM `bgpPeers`"),0);

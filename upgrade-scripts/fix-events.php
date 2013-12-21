@@ -1,6 +1,6 @@
 <?php
 
-// MYSQL Check - FIX ME
+// MYSQL Check - FIXME
 // 3 ALTERS
 // 1 SELECT
 // 1 UPDATE

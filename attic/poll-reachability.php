@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-// MYSQL Check - FIX ME
+// MYSQL Check - FIXME
 // 1 SELECT
 // 1 UPDATE
 // 2 INSERTS

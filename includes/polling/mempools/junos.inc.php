@@ -17,7 +17,7 @@ if (!is_array($mempool_cache['junos']))
 $entry = $mempool_cache['junos'][$mempool[mempool_index]];
 
 $perc = $entry['jnxOperatingBuffer'];
-// FIX ME -- Maybe another OID? Some equipment do not provide jnxOperatingDRAMSize like MX960
+// FIXME -- Maybe another OID? Some equipment do not provide jnxOperatingDRAMSize like MX960
 if ($entry['jnxOperatingDRAMSize']) $memory_available = $entry['jnxOperatingDRAMSize'];
 else $memory_available = ($entry['jnxOperatingMemory'] * 1024 * 1024);
 $mempool['total'] = $memory_available;
