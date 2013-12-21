@@ -21,7 +21,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
         <li class="dropdown">
-          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-toggle="dropdown"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview<b class="caret"></b></a>
+          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview<b class="caret"></b></a>
           <ul class="dropdown-menu">
 <?php if (isset($config['enable_map']) && $config['enable_map']) {
   echo('              <li><a href="'.generate_url(array('page'=>'overview')).'"><img src="images/16/map.png" border="0" align="absmiddle" /> Network Map</a></li>');
@@ -41,7 +41,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
           </ul>
         </li>
         <li class="dropdown">
-          <a href="devices/" class="dropdown-toggle" data-toggle="dropdown"><img src="images/16/server.png" border="0" align="absmiddle" /> Devices<b class="caret"></b></a>
+          <a href="devices/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/server.png" border="0" align="absmiddle" /> Devices<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li><a href="devices/"><img src="images/16/server.png" border="0" align="absmiddle" /> All Devices</a></li>
             <li role="presentation" class="divider"></li>
@@ -104,7 +104,7 @@ if ($config['show_services'])
 {
 ?>
         <li class="dropdown">
-          <a href="services/" class="dropdown-toggle" data-toggle="dropdown"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services<b class="caret"></b></a>
+          <a href="services/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li><a href="services/"><img src="images/16/cog.png" border="0" align="absmiddle" /> All Services </a></li>
 
@@ -161,7 +161,7 @@ if ($config['show_locations'])
 {
 ?>
         <li class="dropdown">
-          <a href="locations/" class="dropdown-toggle" data-toggle="dropdown"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations<b class="caret"></b></a>
+          <a href="locations/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations<b class="caret"></b></a>
           <ul class="dropdown-menu">
 <?php
   if ($config['show_locations_dropdown'])
@@ -182,7 +182,7 @@ if ($config['show_locations'])
 
     <!-- PORTS -->
         <li class="dropdown">
-          <a href="ports/" class="dropdown-toggle" data-toggle="dropdown"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports<b class="caret"></b></a>
+          <a href="ports/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li><a href="ports/"><img src="images/16/connect.png" border="0" align="absmiddle" /> All Ports</a></li>
 
@@ -291,7 +291,7 @@ $menu_sensors = $used_sensors;
 ?>
 
         <li class="dropdown">
-          <a href="health/" class="dropdown-toggle" data-toggle="dropdown"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Health<b class="caret"></b></a>
+          <a href="health/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Health<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li><a href="health/metric=mempool/"><img src="images/icons/memory.png" border="0" align="absmiddle" /> Memory</a></li>
             <li><a href="health/metric=processor/"><img src="images/icons/processor.png" border="0" align="absmiddle" /> Processor</a></li>
@@ -350,7 +350,7 @@ if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0")
 {
 ?>
         <li class="dropdown">
-          <a href="apps/" class="dropdown-toggle" data-toggle="dropdown"><img src="images/icons/apps.png" border="0" align="absmiddle" /> Apps<b class="caret"></b></a>
+          <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/icons/apps.png" border="0" align="absmiddle" /> Apps<b class="caret"></b></a>
           <ul class="dropdown-menu">
 <?php
 
@@ -378,7 +378,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
 ?>
         <li class="dropdown">
-          <a href="routing/" class="dropdown-toggle" data-toggle="dropdown"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing<b class="caret"></b></a>
+          <a href="routing/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing<b class="caret"></b></a>
           <ul class="dropdown-menu">
 <?php
   $separator = 0;
@@ -439,7 +439,7 @@ if ($packages)
 ?>
 
         <li class="dropdown">
-          <a href="<?php echo(generate_url(array('page'=>'packages'))); ?>" class="dropdown-toggle" data-toggle="dropdown"><img src="images/16/box.png" border="0" align="absmiddle" /> Packages<b class="caret"></b></a>
+          <a href="<?php echo(generate_url(array('page'=>'packages'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/box.png" border="0" align="absmiddle" /> Packages<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li><a href="<?php echo(generate_url(array('page'=>'packages'))); ?>"><img src="images/16/box.png" border="0" align="absmiddle" /> All Packages</a></li>
           </ul>
@@ -468,7 +468,7 @@ if($_SESSION['widescreen'] === 1)
 ?>
         </li>
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System<b class="caret"></b></a>
+        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System<b class="caret"></b></a>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
           <li role="presentation" class="divider"></li>

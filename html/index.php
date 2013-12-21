@@ -124,6 +124,7 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/bootstrap-hover-dropdown.min.js"></script>
   <script src="js/typeahead.min.js"></script>
   <script src="js/hogan-2.0.0.js"></script>
 
