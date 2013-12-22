@@ -103,9 +103,15 @@ Discover localhost and poll it for the first time:
 
     php discovery.php -h all && php poller.php -h all
 
+The polling method used by LibreNMS is `poller-wrapper.py`, which was placed in the public domain by its author.  By default, the LibreNMS cronjob runs `poller-wrapper.py` with 16 threads.  The current LibreNMS recommendation is to use 4 threads per core.  The default if no thread count is `16 threads`.
+
+If the thread count needs to be changed, you can do so by editing `librenms.cron` before copying (or by editing `/etc/cron.d/librenms` if you've already copied the cron file).  Just add a number after `poller-wrapper.py`, as in the below example:
+
+    /opt/librenms/poller-wrapper.py 12 >> /dev/null 2>&1
+
 Create the cronjob
 
-    cp librenms.cron /etc/cron.d/librenms
+    ln -s librenms.cron /etc/cron.d/librenms
 
 ### Daily Updates ###
 
