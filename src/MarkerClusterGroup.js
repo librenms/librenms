@@ -694,18 +694,18 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	_generateInitialClusters: function () {
-		var maxZoom = this._map.getMaxZoom(),
+	    var maxZoom = this._map.getMaxZoom(),
 			radius = this.options.maxClusterRadius,
-            		radiusFunction = null;
+			radiusFunction = null;
 	
-	        //If we just set maxClusterRadius to a single number, we need to create
-	        //a simple function to return that number. Otherwise, we just have to
-	        //use the function we've passed in.
-	        if(typeof radius == "number") {
-	            radiusFunction = function(){ return radius };
-	        } else if(typeof radius == "function") {
-	            radiusFunction = radius;
-	        }
+		//If we just set maxClusterRadius to a single number, we need to create
+		//a simple function to return that number. Otherwise, we just have to
+		//use the function we've passed in.
+		if(typeof radius == "number") {
+			radiusFunction = function(){ return radius };
+		} else if(typeof radius == "function") {
+			radiusFunction = radius;
+		}
 
 		if (this.options.disableClusteringAtZoom) {
 			maxZoom = this.options.disableClusteringAtZoom - 1;
@@ -714,11 +714,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._gridClusters = {};
 		this._gridUnclustered = {};
 	
-	        //Set up DistanceGrids for each zoom
-	        for (var zoom = maxZoom; zoom >= 0; zoom--) {
-	            this._gridClusters[zoom] = new L.DistanceGrid(radiusFunction(zoom));
-	            this._gridUnclustered[zoom] = new L.DistanceGrid(radiusFunction(zoom));
-	        }
+		//Set up DistanceGrids for each zoom
+		for (var zoom = maxZoom; zoom >= 0; zoom--) {
+			this._gridClusters[zoom] = new L.DistanceGrid(radiusFunction(zoom));
+			this._gridUnclustered[zoom] = new L.DistanceGrid(radiusFunction(zoom));
+		}
 
 		this._topClusterLevel = new L.MarkerCluster(this, -1);
 	},
