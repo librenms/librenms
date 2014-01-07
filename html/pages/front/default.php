@@ -1,5 +1,7 @@
 <?php
 
+include("includes/topnav.inc.php");
+
 function generate_front_box ($frontbox_class, $content)
 {
 echo("<div class=\"front-box $frontbox_class\">

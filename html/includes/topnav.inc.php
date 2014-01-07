@@ -65,10 +65,10 @@ if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['
             <div class="container pull-right">
               <div class="row">
                 <div class="col-md-12">
-<table cellpadding="1" cellspacing="0" border="0" class="pull-right">
+<table cellpadding="1" cellspacing="0" border="0" class="pull-left">
   <tr>
     <td width="5"></td>
-    <td><strong>Devices</strong></td>
+    <td><strong><a href="devices/">Devices</a></strong></td>
     <td style="text-align: right"><a href="devices/"><span class="label label-primary"><?php echo($devices['count']) ?></span></a></td>
     <td> &nbsp;( </td>
     <td style="text-align: right"><a href="devices/state=up/format=list_detail/"><span class="label label-success"> <?php echo($devices['up']) ?> up</span></a></td>
@@ -80,7 +80,7 @@ if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['
   </tr>
   <tr>
     <td width="5"></td>
-    <td><strong>Ports</strong></td>
+    <td><strong><a href="ports/">Ports</a></strong></td>
     <td style="text-align: right"><a href="ports/"><span class="label label-primary"><?php echo($ports['count']) ?></span></a></td>
     <td> &nbsp;( </td>
     <td style="text-align: right"><a href="ports/format=list_detail/state=up/"><span class="label label-success"> <?php echo($ports['up']) ?> up </span></a></td>
@@ -93,7 +93,7 @@ if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['
 <?php if ($config['show_services']) { ?>
   <tr>
     <td width="5"></td>
-    <td><strong>Services</strong></td>
+    <td><strong><a href="services/">Services</a></strong></td>
     <td style="text-align: right"><a href="services/"><span class="label label-primary"><?php echo($services['count']) ?></span></a></td>
     <td> &nbsp;( </td>
     <td style="text-align: right"><a href="services/state=up/view=details/"><span class="label label-success"><?php echo($services['up']) ?> up</span></a></td>
