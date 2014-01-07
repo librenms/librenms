@@ -65,7 +65,7 @@ if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['
             <div class="container pull-right">
               <div class="row">
                 <div class="col-md-12">
-<table cellpadding="1" cellspacing="0" border="0" class="pull-right">
+<table cellpadding="1" cellspacing="0" border="0" class="pull-left">
   <tr>
     <td width="5"></td>
     <td><strong>Devices</strong></td>

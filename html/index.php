@@ -232,7 +232,6 @@ if (!$vars['bare'] == "yes") {
 
   if ($_SESSION['authenticated']) {
     include("includes/print-menubar.php");
-    include("includes/topnav.inc.php");
   } else {
     echo('<hr color="#444444" />');
   }
