@@ -49,7 +49,7 @@ else
   $ports['up']       = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D, devices_perms AS P WHERE I.deleted = '0' AND P.user_id = ? AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifOperStatus = 'up'", array($_SESSION['user_id']));
   $ports['down']     = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D, devices_perms AS P WHERE I.deleted = '0' AND P.user_id = ? AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up'", array($_SESSION['user_id']));
   $ports['disabled'] = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D, devices_perms AS P WHERE I.deleted = '0' AND P.user_id = ? AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifAdminStatus = 'down'", array($_SESSION['user_id']));
-  $ports['errored']  = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D, devices_perms AS P WHERE I.deleted = '0' AND P.user_id = ? AND P.device_id = D.device_id AND I.device_id = D.device_id AND (I.in_errors > '0' OR I.out_errors > '0')", array($_SESSION['user_id']));
+  $ports['errolabel label-danger']  = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D, devices_perms AS P WHERE I.deleted = '0' AND P.user_id = ? AND P.device_id = D.device_id AND I.device_id = D.device_id AND (I.in_errors > '0' OR I.out_errors > '0')", array($_SESSION['user_id']));
 
   $services['count']      = dbFetchCell("SELECT COUNT(service_id) FROM services AS S, devices AS D, devices_perms AS P WHERE P.user_id = ? AND P.device_id = D.device_id AND S.device_id = D.device_id", array($_SESSION['user_id']));
   $services['up']         = dbFetchCell("SELECT COUNT(service_id) FROM services AS S, devices AS D, devices_perms AS P WHERE P.user_id = ? AND P.device_id = D.device_id AND S.device_id = D.device_id AND service_status = '1' AND service_ignore ='0'", array($_SESSION['user_id']));
@@ -62,77 +62,49 @@ if ($ports['down'])    { $ports['bgcolour'] = "#ffcccc"; } else { $ports['bgcolo
 if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['bgcolour'] = "transparent"; }
 
 ?>
-
-<table cellpadding="0" cellspacing="0" border="0" width=500>
-  <tr style="background-color: <?php echo($devices[bgcolour]); ?>">
+            <div class="container pull-right">
+              <div class="row">
+                <div class="col-md-12">
+<table cellpadding="1" cellspacing="0" border="0" class="pull-right">
+  <tr>
     <td width="5"></td>
     <td><strong>Devices</strong></td>
-    <td style="text-align: right"><a href="devices/"><?php echo($devices['count']) ?></a></td>
+    <td style="text-align: right"><a href="devices/"><span class="label label-primary"><?php echo($devices['count']) ?></span></a></td>
     <td> &nbsp;( </td>
-    <td style="text-align: right"><a href="devices/state=up/format=list_detail/"><span class="green"> <?php echo($devices['up']) ?> up</span></a></td>
-    <td style="text-align: right"><a href="devices/state=down/format=list_detail/"><span class="red"> <?php echo($devices['down']) ?> down</span></a></td>
-    <td style="text-align: right"><a href="devices/ignore=1/format=list_detail/"><span class="black"> <?php echo($devices['ignored']) ?> ignored</span></a></td>
-    <td style="text-align: right"><a href="devices/disabled=1/format=list_detail/"><span class="grey"> <?php echo($devices['disabled']) ?> disabled</span></a></td>
+    <td style="text-align: right"><a href="devices/state=up/format=list_detail/"><span class="label label-success"> <?php echo($devices['up']) ?> up</span></a></td>
+    <td style="text-align: right"><a href="devices/state=down/format=list_detail/"><span class="label label-danger"> <?php echo($devices['down']) ?> down</span></a></td>
+    <td style="text-align: right"><a href="devices/ignore=1/format=list_detail/"><span class="label label-info"> <?php echo($devices['ignored']) ?> ignored </span></a></td>
+    <td style="text-align: right"><a href="devices/disabled=1/format=list_detail/"><span class="label label-warning"> <?php echo($devices['disabled']) ?> disabled</span></a></td>
     <td> ) </td>
     <td width="5"></td>
   </tr>
-  <tr style="background-color: <?php echo($ports['bgcolour']) ?>">
+  <tr>
     <td width="5"></td>
     <td><strong>Ports</strong></td>
-    <td style="text-align: right"><a href="ports/"><?php echo($ports['count']) ?></a></td>
+    <td style="text-align: right"><a href="ports/"><span class="label label-primary"><?php echo($ports['count']) ?></span></a></td>
     <td> &nbsp;( </td>
-    <td style="text-align: right"><a href="ports/format=list_detail/state=up/"><span class="green"> <?php echo($ports['up']) ?> up </span></a></td>
-    <td style="text-align: right"><a href="ports/format=list_detail/state=down/"><span class="red"> <?php echo($ports['down']) ?> down </span></a></td>
-    <td style="text-align: right"><a href="ports/format=list_detail/ignore=1/"><span class="black"> <?php echo($ports['ignored']) ?> ignored </span></a></td>
-    <td style="text-align: right"><a href="ports/format=list_detail/state=admindown/"><span class="grey"> <?php echo($ports['shutdown']) ?> shutdown</span></a></td>
+    <td style="text-align: right"><a href="ports/format=list_detail/state=up/"><span class="label label-success"> <?php echo($ports['up']) ?> up </span></a></td>
+    <td style="text-align: right"><a href="ports/format=list_detail/state=down/"><span class="label label-danger"> <?php echo($ports['down']) ?> down </span></a></td>
+    <td style="text-align: right"><a href="ports/format=list_detail/ignore=1/"><span class="label label-info"> <?php echo($ports['ignored']) ?> ignored </span></a></td>
+    <td style="text-align: right"><a href="ports/format=list_detail/state=admindown/"><span class="label label-warning"> <?php echo($ports['shutdown']) ?> shutdown</span></a></td>
     <td> ) </td>
     <td width="5"></td>
   </tr>
 <?php if ($config['show_services']) { ?>
-  <tr style="background-color: <?php echo($services['bgcolour']) ?>">
+  <tr>
     <td width="5"></td>
     <td><strong>Services</strong></td>
-    <td style="text-align: right"><a href="services/"><?php echo($services['count']) ?></a></td>
+    <td style="text-align: right"><a href="services/"><span class="label label-primary"><?php echo($services['count']) ?></span></a></td>
     <td> &nbsp;( </td>
-    <td style="text-align: right"><a href="services/state=up/view=details/"><span class="green"><?php echo($services['up']) ?> up</span></a></td>
-    <td style="text-align: right"><a href="services/state=down/view=details/"><span class="red"> <?php echo($services['down']) ?> down</span></a></td>
-    <td style="text-align: right"><a href="services/ignore=1/view=details/"><span class="black"> <?php echo($services['ignored']) ?> ignored</span></a></td>
-    <td style="text-align: right"><a href="services/disabled=1/view=details/"><span class="grey"> <?php echo($services['disabled']) ?> disabled</span></a></td>
+    <td style="text-align: right"><a href="services/state=up/view=details/"><span class="label label-success"><?php echo($services['up']) ?> up</span></a></td>
+    <td style="text-align: right"><a href="services/state=down/view=details/"><span class="label label-danger"> <?php echo($services['down']) ?> down</span></a></td>
+    <td style="text-align: right"><a href="services/ignore=1/view=details/"><span class="label label-info"> <?php echo($services['ignored']) ?> ignored</span></a></td>
+    <td style="text-align: right"><a href="services/disabled=1/view=details/"><span class="label label-warning"> <?php echo($services['disabled']) ?> disabled</span></a></td>
     <td> ) </td>
     <td width="5"></td>
   </tr>
 <?php } ?>
-  <tr>
-    <td colspan="10">
-      <div class="dropdown">
-      <ul>
-        <li class="dropdown hidden-xs">
-        <form class="form" action="">
-          <input onKeyup="search(this.value);" type="search" value="" placeholder="Global search" />
-        </form>
-        <div id="results" class=" typeahead dropdown-menu"></div>
-        </li>
-      </ul>
-      </div>
-    </td>
-  </tr>
 </table>
-
-<script>
-function search(searchStr) {
-  if (searchStr.length == 0) {
-    // Hide search results
-    $('#results').fadeOut();
-  } else {
-    $.post("ajax_search.php",
-      {search: ""+searchStr+""},
-      function(data)
-      {
-        $('#results').fadeIn();
-        $('#results').html(data);
-      });
-   }
-}
-
-</script>
-
+              </div>
+            </div>
+        </div>

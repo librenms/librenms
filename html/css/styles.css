@@ -698,7 +698,7 @@ table.simple {
   padding: 10px;
 }
 
-table { border-collapse: collapse; margin: 0px; }
+table { border-collapse: collapse; margin: 0px; background-color:#ffffff }
 form { margin: 0px; padding: 0px; }
 hr { border: 0px; height: 1px; background-color: #ccc; color: #ccc; }
 p { margin: 0px; padding: 0px; }
@@ -1582,3 +1582,14 @@ tr.search:nth-child(odd) {
   margin: 2px;
 }
 
+.example-sports .league-name {
+  margin: 0 20px 5px 20px;
+  padding: 3px 0;
+  border-bottom: 1px solid #ccc;
+}
+
+.demo {
+  position: relative;
+  *z-index: 1;
+  margin: 50px 0;
+}
