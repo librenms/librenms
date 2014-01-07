@@ -61,6 +61,28 @@ if ($_SESSION['userlevel'] >= '10')
   {
     echo('            <li role="presentation" class="divider"></li>');
   }
+
+if ($config['show_locations'])
+{
+
+  echo('
+            <li class="dropdown-submenu">
+              <a href="#"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a>
+              <ul class="dropdown-menu">
+  ');
+  if ($config['show_locations_dropdown'])
+  {
+    foreach (getlocations() as $location)
+    {
+      echo('            <li><a href="devices/location=' . urlencode($location) . '/"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $location . ' </a></li>');
+    }
+
+  }
+  echo('
+              </ul>
+            </li>
+  ');
+}
   echo('
             <li><a href="addhost/"><img src="images/16/server_add.png" border="0" align="absmiddle" /> Add Device</a></li>
             <li><a href="delhost/"><img src="images/16/server_delete.png" border="0" align="absmiddle" /> Delete Device</a></li>');
@@ -157,27 +179,6 @@ $(document).ready(function() {
 <?php
 }
 
-if ($config['show_locations'])
-{
-?>
-        <li class="dropdown">
-          <a href="locations/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations<b class="caret"></b></a>
-          <ul class="dropdown-menu">
-<?php
-  if ($config['show_locations_dropdown'])
-  {
-?>
-<?php
-    foreach (getlocations() as $location)
-    {
-      echo('            <li><a href="devices/location=' . urlencode($location) . '/"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $location . ' </a></li>');
-    }
-?>
-          </ul>
-        </li>
-<?php
-  }
-}
 ?>
 
     <!-- PORTS -->
@@ -455,7 +456,20 @@ if(is_file("includes/print-menubar-custom.inc.php"))
 
 ?>
       </ul>
+
       <ul class="nav navbar-nav navbar-right">
+        <li style="padding-top:10px">
+          <form role="form" class="pull-left form-horizontal">
+            <div class="form-group row">
+              <div class="col-md-10">
+                <input class="input-large search-query" type="search" id="gsearch" name="gsearch" placeholder="Global Search" style="width: 250px">
+              </div>
+              <div class="col-md-2">
+                &nbsp;
+              </div>
+            </div>
+          </form>
+        </li>
         <li class="dropdown">
 <?php
 if($_SESSION['widescreen'] === 1)
@@ -510,21 +524,9 @@ if ($_SESSION['authenticated'])
          </ul>
        </li>
      </ul>
+
    </div>
  </div>
-<div class="container pull-right">
-  <div class="row">
-     <form role="form" class="pull-right form-horizontal">
-       <div class="form-group row">
-         <div class="col-md-10">
-           <input class="input-large search-query" type="search" id="gsearch" name="gsearch" placeholder="Global Search" style="width: 250px">
-         </div>
-         <div class="col-md-2">
-           &nbsp;
-         </div>
-       </div>
-     </form>
-  </div>
 </div>
 </nav>
 <script>
