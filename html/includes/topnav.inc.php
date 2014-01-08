@@ -64,47 +64,50 @@ if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['
 ?>
             <div class="container pull-right">
               <div class="row">
-                <div class="col-md-12">
-<table cellpadding="1" cellspacing="0" border="0" class="pull-left">
-  <tr>
-    <td width="5"></td>
-    <td><strong><a href="devices/">Devices</a></strong></td>
-    <td style="text-align: right"><a href="devices/"><span class="label label-primary"><?php echo($devices['count']) ?></span></a></td>
-    <td> &nbsp;( </td>
-    <td style="text-align: right"><a href="devices/state=up/format=list_detail/"><span class="label label-success"> <?php echo($devices['up']) ?> up</span></a></td>
-    <td style="text-align: right"><a href="devices/state=down/format=list_detail/"><span class="label label-danger"> <?php echo($devices['down']) ?> down</span></a></td>
-    <td style="text-align: right"><a href="devices/ignore=1/format=list_detail/"><span class="label label-info"> <?php echo($devices['ignored']) ?> ignored </span></a></td>
-    <td style="text-align: right"><a href="devices/disabled=1/format=list_detail/"><span class="label label-warning"> <?php echo($devices['disabled']) ?> disabled</span></a></td>
-    <td> ) </td>
-    <td width="5"></td>
-  </tr>
-  <tr>
-    <td width="5"></td>
-    <td><strong><a href="ports/">Ports</a></strong></td>
-    <td style="text-align: right"><a href="ports/"><span class="label label-primary"><?php echo($ports['count']) ?></span></a></td>
-    <td> &nbsp;( </td>
-    <td style="text-align: right"><a href="ports/format=list_detail/state=up/"><span class="label label-success"> <?php echo($ports['up']) ?> up </span></a></td>
-    <td style="text-align: right"><a href="ports/format=list_detail/state=down/"><span class="label label-danger"> <?php echo($ports['down']) ?> down </span></a></td>
-    <td style="text-align: right"><a href="ports/format=list_detail/ignore=1/"><span class="label label-info"> <?php echo($ports['ignored']) ?> ignored </span></a></td>
-    <td style="text-align: right"><a href="ports/format=list_detail/state=admindown/"><span class="label label-warning"> <?php echo($ports['shutdown']) ?> shutdown</span></a></td>
-    <td> ) </td>
-    <td width="5"></td>
-  </tr>
+                <div class="col-md-6">
+<table class="table table-condensed table-striped">
+  <thead>
+    <tr>
+      <th>&nbsp;</th>
+      <th>Total</th>
+      <th>Up</th>
+      <th>Down</th>
+      <th>Ignored</th>
+      <th>Disabled</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="devices/">Devices</a></td>
+      <td><a href="devices/"><span><?php echo($devices['count']) ?></span></a></td>
+      <td><a href="devices/state=up/format=list_detail/"><span class="green"> <?php echo($devices['up']) ?> up</span></a></td>
+      <td><a href="devices/state=down/format=list_detail/"><span class="red"> <?php echo($devices['down']) ?> down</span></a></td>
+      <td><a href="devices/ignore=1/format=list_detail/"><span class="grey"> <?php echo($devices['ignored']) ?> ignored </span></a></td>
+      <td><a href="devices/disabled=1/format=list_detail/"><span class="black"> <?php echo($devices['disabled']) ?> disabled</span></a></td>
+    </tr>
+    <tr class="danger">
+      <td><a href="ports/">Ports</a></td>
+      <td><a href="ports/"><span><?php echo($ports['count']) ?></span></a></td>
+      <td><a href="ports/format=list_detail/state=up/"><span class="green"> <?php echo($ports['up']) ?> up </span></a></td>
+      <td><a href="ports/format=list_detail/state=down/"><span class="red"> <?php echo($ports['down']) ?> down </span></a></td>
+      <td><a href="ports/format=list_detail/ignore=1/"><span class="grey"> <?php echo($ports['ignored']) ?> ignored </span></a></td>
+      <td><a href="ports/format=list_detail/state=admindown/"><span class="black"> <?php echo($ports['shutdown']) ?> shutdown</span></a></td>
+    </tr>
 <?php if ($config['show_services']) { ?>
-  <tr>
-    <td width="5"></td>
-    <td><strong><a href="services/">Services</a></strong></td>
-    <td style="text-align: right"><a href="services/"><span class="label label-primary"><?php echo($services['count']) ?></span></a></td>
-    <td> &nbsp;( </td>
-    <td style="text-align: right"><a href="services/state=up/view=details/"><span class="label label-success"><?php echo($services['up']) ?> up</span></a></td>
-    <td style="text-align: right"><a href="services/state=down/view=details/"><span class="label label-danger"> <?php echo($services['down']) ?> down</span></a></td>
-    <td style="text-align: right"><a href="services/ignore=1/view=details/"><span class="label label-info"> <?php echo($services['ignored']) ?> ignored</span></a></td>
-    <td style="text-align: right"><a href="services/disabled=1/view=details/"><span class="label label-warning"> <?php echo($services['disabled']) ?> disabled</span></a></td>
-    <td> ) </td>
-    <td width="5"></td>
-  </tr>
+    <tr>
+      <td><a href="services/">Services</a></td>
+      <td><a href="services/"><span><?php echo($services['count']) ?></span></a></td>
+      <td><a href="services/state=up/view=details/"><span class="green"><?php echo($services['up']) ?> up</span></a></td>
+      <td><a href="services/state=down/view=details/"><span class="red"> <?php echo($services['down']) ?> down</span></a></td>
+      <td><a href="services/ignore=1/view=details/"><span class="grey"> <?php echo($services['ignored']) ?> ignored</span></a></td>
+      <td><a href="services/disabled=1/view=details/"><span class="black"> <?php echo($services['disabled']) ?> disabled</span></a></td>
+    </tr>
 <?php } ?>
+  </tbody>
 </table>
+              </div>
+              <div class="col-md-6">
+                &nbsp;
               </div>
             </div>
         </div>
