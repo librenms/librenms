@@ -87,7 +87,7 @@ echo("\n");
 foreach ($names as $name) {
 	$remote_device_id = discover_new_device($name);
 	if ($remote_device_id) {
-		log_event("Device autodiscovered through ARP on $hostname", $remote_device_id, 'interface', $if);
+		log_event("Device $name (" . $ips[$name] .") autodiscovered through ARP on $hostname", $remote_device_id, 'interface', $if);
 	}
 	else {
 		log_event("ARP discovery of $name (" . $ips[$name] . ") failed - check ping and SNMP access", $deviceid, 'interface', $if);
