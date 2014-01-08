@@ -39,6 +39,14 @@ exception):
   - overLIB (html/js/overlib_mini.js): modified Artistic 1.0?
   - scripts/*/mysql: GPLv2 only
   - check_mk (scripts/observium_agent*): GPLv2
+  - qTip (html/css/jquery.qtip.min.css and html/js/qtip/jquery.qtip.min.js): GPLv2
+  - jqPlot (html/js/jqplot/*): MIT or GPLv2
+  - DHTML Tree (http://javascripttoolbox.com/lib/mktree/) (html/css/mktree.css and html/js/mktree.js): MIT and GPL
+  - sorttable (http://www.kryogenix.org/code/browser/sorttable/) (html/js/sorttable.js): X11
+  - JQueury (http://jquery.com/) (html/js/jquery.min.js, html/js/jquery-checkbox.js): MIT
+  - Bootstrap (http://getbootstrap.com/) (html/css/bootstrap.* html/css/bootstrap/* html/js/bootstrap.*): Apache License V2.0
+  - typeahead,js (https://github.com/twitter/typeahead.js/) (html/js/typeahead.min.css): MIT
+  - bootstrap-hover-dropdown (https://github.com/CWSpear/bootstrap-hover-dropdown) (html/js/bootstrap-hover-dropdown.min.js): MIT
 
 
 Introduction
