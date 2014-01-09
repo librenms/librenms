@@ -15,7 +15,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 <nav class="navbar-wrapper navbar navbar-default navbar-fixed-top" role="navigation">
   <div id="container">
     <div class="navbar-header">
-      <a class="navbar-brand" href="#">LibreNMS</a>
+      <a class="navbar-brand" href="">LibreNMS</a>
     </div>
 
     <div class="collapse navbar-collapse">
