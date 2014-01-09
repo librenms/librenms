@@ -141,7 +141,7 @@ if ($config['enable_syslog'])
 
   $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
   $query = mysql_query($sql);
-  echo("<table cellspacing=0 cellpadding=2 width=100%>");
+  echo('<table class="table table-bordered">');
   while ($entry = mysql_fetch_assoc($query))
   {
     $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
@@ -166,7 +166,7 @@ if ($config['enable_syslog'])
 
   $data = mysql_query($query);
 
-  echo('<table cellspacing="0" cellpadding="1" width="100%">');
+  echo('<table class="table table-bordered">');
 
   while ($entry = mysql_fetch_assoc($data)) {
     include("includes/print-event.inc.php");

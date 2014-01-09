@@ -8,7 +8,6 @@ $icon = geteventicon($entry['message']);
 if ($icon) { $icon = '<img src="images/16/' . $icon . '" />'; }
 
 echo('<tr class="eventlog">
-  <td width="0"></td>
   <td class="syslog" width="160">
     ' . $entry['datetime'] . '
   </td>');

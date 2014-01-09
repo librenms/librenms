@@ -2,8 +2,7 @@
 
 if (device_permitted($entry['device_id']))
 {
-  echo("<tr class=\"syslog\">
-    <td width=0></td>");
+  echo("<tr class=\"syslog\">");
 
   $entry['hostname'] = shorthost($entry['hostname'], 20);
 
