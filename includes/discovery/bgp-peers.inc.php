@@ -16,7 +16,8 @@ if ($config['enable_bgp'])
 
     if ($bgpLocalAs != $device['bgpLocalAs'])
     {
-      mysql_query("UPDATE devices SET bgpLocalAs = '$bgpLocalAs' WHERE device_id = '".$device['device_id']."'"); echo("Updated AS ");
+      dbUpdate(array('bgpLocalAs' => $bgpLocalAs), 'devices', 'device_id=?',array($device['device_id']));
+      echo("Updated AS ");
     }
 
     $peers_data = snmp_walk($device, "BGP4-MIB::bgpPeerRemoteAs", "-Oq", "BGP4-MIB", $config['mibdir']);
@@ -61,7 +62,8 @@ if ($config['enable_bgp'])
     echo("No BGP on host");
     if ($device['bgpLocalAs'])
     {
-     mysql_query("UPDATE devices SET bgpLocalAs = NULL WHERE device_id = '".$device['device_id']."'"); echo(" (Removed ASN) ");
+     dbUpdate(array('bgpLocalAs' => 'NULL'), 'devices', 'device_id=?',array($device['device_id']));
+     echo(" (Removed ASN) ");
     } # End if
   } # End if
 
@@ -73,12 +75,12 @@ if ($config['enable_bgp'])
     {
       $astext = get_astext($peer['as']);
 
-      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."'"),0) < '1')
+      if (dbFetchCell("SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ?",array($device['device_id'], $peer['ip'])) < '1')
       {
-        $add = mysql_query("INSERT INTO bgpPeers (`device_id`, `bgpPeerIdentifier`, `bgpPeerRemoteAS`) VALUES ('".$device['device_id']."','".$peer['ip']."','".$peer['as']."')");
+        $add = dbInsert(array('device_id' => $device['device_id'], 'bgpPeerIdentifier' => $peer['ip'], 'bgpPeerRemoteAs' => $peer['as']), 'bgpPeers');
         echo("+");
       } else {
-        $update = mysql_query("UPDATE `bgpPeers` SET bgpPeerRemoteAs = " . $peer['as'] . ", astext = '" . mres($astext) . "' WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."'");
+        $update = dbUpdate(array('bgpPeerRemoteAs' => $peer['as'], 'astext' => mres($astext)), 'bgpPeers', 'device_id=? AND bgpPeerIdentifier=?',array($device['device_id'],$peer['ip']));
         echo(".");
       }
 
@@ -102,9 +104,9 @@ if ($config['enable_bgp'])
             if ($afi && $safi)
             {
               $af_list[$afi][$safi] = 1;
-              if (mysql_result(mysql_query("SELECT COUNT(*) FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."' AND afi = '$afi' AND safi = '$safi'"),0) == 0)
+              if (dbFetchCell("SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ?, AND afi=? AND safi=?",array($device['device_id'], $peer['ip'],$afi,$safi)) == 0)
               {
-                mysql_query("INSERT INTO `bgpPeers_cbgp` (device_id,bgpPeerIdentifier, afi, safi) VALUES ('".$device['device_id']."','".$peer['ip']."','$afi','$safi')");
+                dbInsert(array('device_id' => $device['device_id'], 'bgpPeerIdentifier' => $peer['ip'], 'afi' => $afi, 'safi' => $safi), 'bgpPeers_cbgp');
               }
             }
           }
@@ -156,21 +158,21 @@ if ($config['enable_bgp'])
           {
             list ($afi,$safi) = explode('.',$afisafi); $safi = $safis[$safi];
             $af_list[$afi][$safi] = 1;
-            if (mysql_result(mysql_query("SELECT COUNT(*) FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."' AND afi = '$afi' AND safi = '$safi'"),0) == 0)
+            if (dbFetchCell("SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ?, AND afi=? AND safi=?",array($device['device_id'], $peer['ip'],$afi,$safi)) == 0)
             {
-              mysql_query("INSERT INTO `bgpPeers_cbgp` (device_id,bgpPeerIdentifier, afi, safi) VALUES ('".$device['device_id']."','".$peer['ip']."','$afi','$safi')");
+              dbInsert(array('device_id' => $device['device_id'], 'bgpPeerIdentifier' => $peer['ip'], 'afi' => $afi, 'safi' => $safi), 'bgpPeers_cbgp');
             }
           }
         } # os=junos
 
-        $af_query = mysql_query("SELECT * FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."'");
-        while ($entry = mysql_fetch_assoc($af_query))
+        $af_query = "SELECT * FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."'";
+        foreach (dbFetchRows($af_query) as $entry)
         {
           $afi = $entry['afi'];
           $safi = $entry['safi'];
           if (!$af_list[$afi][$safi])
           {
-            mysql_query("DELETE FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."' AND afi = '$afi' AND safi = '$safi'");
+            dbDelete('bgpPeers_cbgp', '`device_id` = ? AND `bgpPeerIdentifier` = ?, afi=?, safi=?', array($device['device_id'],$peer['ip'],$afi,$safi));
           }
         } # AF list
       } # os=cisco|junos
@@ -185,9 +187,8 @@ if ($config['enable_bgp'])
   // Delete removed peers
 
   $sql = "SELECT * FROM bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
-  $query = mysql_query($sql);
 
-  while ($entry = mysql_fetch_assoc($query))
+  foreach (dbFetchRows($sql) as $entry)
   {
     unset($exists);
     $i = 0;
@@ -200,8 +201,8 @@ if ($config['enable_bgp'])
 
     if (!isset($exists))
     {
-      mysql_query("DELETE FROM bgpPeers WHERE bgpPeer_id = '" . $entry['bgpPeer_id'] . "'");
-      mysql_query("DELETE FROM bgpPeers_cbgp WHERE bgpPeer_id = '" . $entry['bgpPeer_id'] . "'");
+      dbDelete('bgpPeers', '`bgpPeer_id` = ?', array($entry['bgpPeer_id']));
+      dbDelete('bgpPeers_cbgp', '`bgpPeer_id` = ?', array($entry['bgpPeer_id']));
       echo("-");
     }
   }

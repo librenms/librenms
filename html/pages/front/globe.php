@@ -78,12 +78,12 @@ echo("<div style='padding: 3px 10px; background: #fff;'>");
 
 if ($_SESSION['userlevel'] == '10')
 {
-$sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
+$sql = "SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'";
 } else {
-$sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '0' AND D.ignore = '0'");
+$sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '0' AND D.ignore = '0'";
 }
-while ($device = mysql_fetch_assoc($sql)) {
-
+foreach (dbFetchRows($sql) as $device)
+{
       generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> <br />
       <span class=body-date-1>".truncate($device['location'], 20)."</span>
@@ -93,16 +93,16 @@ while ($device = mysql_fetch_assoc($sql)) {
 
 if ($_SESSION['userlevel'] == '10')
 {
-$sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
+$sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'";
 } else {
-$sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
+$sql = "SELECT * FROM `ports` AS I, `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'";
 }
 
 // These things need to become more generic, and more manageable across different frontpages... rewrite inc :>
 
 if ($config['warn']['ifdown'])
 {
-  while ($interface = mysql_fetch_assoc($sql))
+  foreach (dbFetchRows($sql) as $interface)
   {
     if (!$interface['deleted'])
     {
@@ -118,8 +118,8 @@ if ($config['warn']['ifdown'])
 }
 
 /* FIXME service permissions? seem nonexisting now.. */
-$sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'");
-while ($service = mysql_fetch_assoc($sql))
+$sql = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'";
+foreach (dbFetchRows($sql) as $service)
 {
     generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($service, shorthost($service['hostname']))."</strong><br />
     <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span>
@@ -132,11 +132,11 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 {
   if ($_SESSION['userlevel'] == '10')
   {
-    $sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0");
+    $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0";
   } else {
-    $sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0");
+    $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0";
   }
-  while ($peer = mysql_fetch_assoc($sql))
+  foreach (dbFetchRows($sql) as $peer)
   {
   generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($peer, shorthost($peer['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span>
@@ -150,13 +150,13 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
 {
   if ($_SESSION['userlevel'] == '10')
   {
-  $sql = mysql_query("SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime > 0 AND D.uptime < '" . $config['uptime_warning'] . "' AND D.ignore = 0");
+  $sql = "SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime > 0 AND D.uptime < '" . $config['uptime_warning'] . "' AND D.ignore = 0";
   } else {
-  $sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '1' AND D.uptime > 0 AND D.uptime < '" .
-  $config['uptime_warning'] . "' AND D.ignore = 0");
+  $sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '1' AND D.uptime > 0 AND D.uptime < '" .
+  $config['uptime_warning'] . "' AND D.ignore = 0";
   }
 
-  while ($device = mysql_fetch_assoc($sql))
+  foreach (dbFetchRows($sql) as $device)
   {
      generate_front_box("#aaffaa", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
         <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #009;'>Device<br />Rebooted</span><br />
@@ -173,9 +173,8 @@ if ($config['enable_syslog'])
   ");
 
   $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
-  $query = mysql_query($sql);
   echo("<table cellspacing=0 cellpadding=2 width=100%>");
-  while ($entry = mysql_fetch_assoc($query))
+  foreach (dbFetchRows($sql) as $entry)
   {
     $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
 
@@ -200,11 +199,9 @@ if ($config['enable_syslog'])
     P.device_id AND P.user_id = " . $_SESSION['user_id'] . " ORDER BY `datetime` DESC LIMIT 0,15";
   }
 
-  $data = mysql_query($query);
-
   echo('<table cellspacing="0" cellpadding="1" width="100%">');
 
-  while ($entry = mysql_fetch_assoc($data)) {
+  foreach (dbFetchRows($query) as $entry) {
     include("includes/print-event.inc.php");
   }
 

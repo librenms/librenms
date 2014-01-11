@@ -1,6 +1,9 @@
 #!/usr/bin/php
 <?php
 
+// MYSQL Check - FIXME
+// 1 SELECT
+
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");

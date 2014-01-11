@@ -15,7 +15,7 @@ foreach (explode("\n", $ipNetToMedia_data) as $data)
   $ip = $first .".". $second .".". $third .".". $fourth;
   if ($ip != '...')
   {
-    $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE device_id = '".$device['device_id']."' AND ifIndex = '".$if."'"));
+    $interface = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?",array($device['device_id'],$if));
 
     list($m_a, $m_b, $m_c, $m_d, $m_e, $m_f) = explode(":", $mac);
     $m_a = zeropad($m_a);$m_b = zeropad($m_b);$m_c = zeropad($m_c);$m_d = zeropad($m_d);$m_e = zeropad($m_e);$m_f = zeropad($m_f);
@@ -29,37 +29,37 @@ foreach (explode("\n", $ipNetToMedia_data) as $data)
     $port_id = $interface['port_id'];
     $mac_table[$port_id][$clean_mac] = 1;
 
-    if (mysql_result(mysql_query("SELECT COUNT(*) from ipv4_mac WHERE port_id = '".$interface['port_id']."' AND ipv4_address = '$ip'"),0))
+    if (dbFetchCell("SELECT COUNT(*) from ipv4_mac WHERE port_id = ? AND ipv4_address = ?",array($interface['port_id'], $ip)))
     {
-      $sql = "UPDATE `ipv4_mac` SET `mac_address` = '$clean_mac' WHERE port_id = '".$interface['port_id']."' AND ipv4_address = '$ip'";
-      $old_mac = mysql_fetch_row(mysql_query("SELECT mac_address from ipv4_mac WHERE ipv4_address='$ip' AND port_id = '".$interface['port_id']."'"));
+      // Commented below, no longer needed but leaving for reference.
+      //$sql = "UPDATE `ipv4_mac` SET `mac_address` = '$clean_mac' WHERE port_id = '".$interface['port_id']."' AND ipv4_address = '$ip'";
+      $old_mac = dbFetchCell("SELECT mac_address from ipv4_mac WHERE ipv4_address=? AND port_id=?",array($ip,$interface['port_id']));
 
       if ($clean_mac != $old_mac[0] && $clean_mac != '' && $old_mac[0] != '')
       {
         if ($debug) { echo("Changed mac address for $ip from $old_mac[0] to $clean_mac\n"); }
         log_event("MAC change: $ip : " . mac_clean_to_readable($old_mac[0]) . " -> " . mac_clean_to_readable($clean_mac), $device, "interface", $interface['port_id']);
       }
-      mysql_query($sql);
+      dbUpdate(array('mac_address' => $clean_mac), 'ipv4_mac', 'port_id=? AND ipv4_address=?',array($interface['port_id'],$ip));
       echo(".");
     }
     else
     {
       echo("+");
     #echo("Add MAC $mac\n");
-      mysql_query("INSERT INTO `ipv4_mac` (port_id, mac_address, ipv4_address) VALUES ('".$interface['port_id']."','$clean_mac','$ip')");
+      dbInsert(array('port_id' => $interface['port_id'], 'mac_address' => $clean_mac, 'ipv4_address' => $ip), 'ipv4_mac');
     }
   }
 }
 
 $sql = "SELECT * from ipv4_mac AS M, ports as I WHERE M.port_id = I.port_id and I.device_id = '".$device['device_id']."'";
-$query = mysql_query($sql);
-while ($entry = mysql_fetch_assoc($query))
+foreach (dbFetchRows($sql) as $entry)
 {
   $entry_mac = $entry['mac_address'];
   $entry_if  = $entry['port_id'];
   if (!$mac_table[$entry_if][$entry_mac])
   {
-    mysql_query("DELETE FROM ipv4_mac WHERE port_id = '".$entry_if."' AND mac_address = '".$entry_mac."'");
+    dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address` = ?', array($entry_if,$entry_mac));
     if ($debug) { echo("Removing MAC $entry_mac from interface ".$interface['ifName']); }
     echo("-");
   }

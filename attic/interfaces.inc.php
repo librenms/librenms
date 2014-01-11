@@ -1,5 +1,9 @@
 <?php
 
+// MYSQL Check - FIXME
+// 2 SELECTS
+// 2 UPDATES
+
 /* FIXME: dead file */
 
 if ($device['os_group'] == "ios") {
