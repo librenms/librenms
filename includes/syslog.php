@@ -44,8 +44,6 @@ function process_syslog($entry, $update)
   {
     if (strpos($entry['msg'], $bi) !== FALSE)
     {
-      print_r($entry);
-      echo('D-'.$bi);
       return $entry;
     }
   }
