@@ -25,10 +25,11 @@ if ($vars['page'] == "logout" && $_SESSION['authenticated'])
   dbInsert(array('user' => $_SESSION['username'], 'address' => $_SERVER["REMOTE_ADDR"], 'result' => 'Logged Out'), 'authlog');
   unset($_SESSION);
   session_destroy();
-  header('Location: /');
   setcookie ("username", "", time() - 60*60*24*100, "/");
   setcookie ("password", "", time() - 60*60*24*100, "/");
   $auth_message = "Logged Out";
+  header('Location: /');
+  exit;
 }
 
 if (isset($_GET['username']) && isset($_GET['password']))
