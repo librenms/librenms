@@ -13,7 +13,7 @@ if ($device['os_group'] == "cisco")
     list($if, $direction, $a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(".", $oid);
     $oid = "$a_a.$a_b.$a_c.$a_d.$a_e.$a_f";
     unset($interface);
-    $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE device_id = '".$device['device_id']."' AND ifIndex = '".$if."'"));
+    $interface = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?",array($device['device_id'],$if));
     $ah_a = zeropad(dechex($a_a));
     $ah_b = zeropad(dechex($a_b));
     $ah_c = zeropad(dechex($a_c));
@@ -28,7 +28,8 @@ if ($device['os_group'] == "cisco")
     if ($ip && $interface) {
       $new_mac = str_replace(":", "", $mac);
       #echo($interface['ifDescr'] . " ($if) -> $mac ($oid) -> $ip");
-      if (mysql_result(mysql_query("SELECT COUNT(*) from mac_accounting WHERE port_id = '".$interface['port_id']."' AND mac = '$clean_mac'"),0)) {
+      if (dbFetchCell("SELECT COUNT(*) from mac_accounting WHERE port_id = ? AND mac = ?",array($interface['port_id'], $clean_mac)))
+      {
         #$sql = "UPDATE `mac_accounting` SET `mac` = '$clean_mac' WHERE port_id = '".$interface['port_id']."' AND `mac` = '$clean_mac'";
         #mysql_query($sql);
         #if (mysql_affected_rows()) { echo("      UPDATED!"); }
@@ -36,7 +37,7 @@ if ($device['os_group'] == "cisco")
         echo(".");
       } else {
         #echo("      Not Exists!");
-        mysql_query("INSERT INTO `mac_accounting` (port_id,  mac) VALUES ('".$interface['port_id']."','$clean_mac')");
+        dbInsert(array('port_id' => $interface['port_id'], 'mac' => $clean_mac), 'mac_accounting');
         echo("+");
       }
       #echo("\n");

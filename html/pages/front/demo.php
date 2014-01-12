@@ -65,9 +65,10 @@ echo("</tr></table>");
 
 $nodes = array();
 
-$sql = mysql_query("SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'");
+$sql = "SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'";
 
-while ($device = mysql_fetch_array($sql)) {
+foreach (dbFetchRows($sql) as $device)
+{
   unset($already);
   $i = 0;
   while ($i <= count($nodes)) {
@@ -80,8 +81,9 @@ while ($device = mysql_fetch_array($sql)) {
   if (!$already) { $nodes[] = $device['device_id']; }
 }
 
-$sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
-while ($device = mysql_fetch_array($sql)) {
+$sql = "SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'";
+foreach (dbFetchRows($sql) as $device)
+{
    if (device_permitted($device['device_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #d0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffbbbb;'>
        <strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
@@ -93,8 +95,8 @@ while ($device = mysql_fetch_array($sql)) {
 
 if ($config['warn']['ifdown'])
 {
-  $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
-  while ($interface = mysql_fetch_array($sql))
+  $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'";
+  foreach (dbFetchRows($sql) as $interface)
   {
      if (port_permitted($interface['port_id']))
      {
@@ -108,8 +110,8 @@ if ($config['warn']['ifdown'])
   }
 }
 
-$sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'");
-while ($service = mysql_fetch_array($sql))
+$sql = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'";
+foreach (dbFetchRows($sql) as $service)
 {
   if (device_permitted($service['device_id']))
   {
@@ -122,8 +124,8 @@ while ($service = mysql_fetch_array($sql))
   }
 }
 
-$sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus = 'start' AND bgpPeerState != 'established' AND B.device_id = D.device_id");
-while ($peer = mysql_fetch_array($sql))
+$sql = "SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus = 'start' AND bgpPeerState != 'established' AND B.device_id = D.device_id";
+foreach (dbFetchRows($sql) as $peer)
 {
   if (device_permitted($peer['device_id']))
   {
@@ -138,9 +140,9 @@ while ($peer = mysql_fetch_array($sql))
 
 if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)
 {
-  $sql = mysql_query("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE
-  A.attrib_value < '" . $config['uptime_warning'] . "' AND A.attrib_type = 'uptime' AND A.device_id = D.device_id AND ignore = '0' AND disabled = '0'");
-  while ($device = mysql_fetch_array($sql))
+  $sql = "SELECT * FROM devices_attribs AS A, `devices` AS D WHERE
+  A.attrib_value < '" . $config['uptime_warning'] . "' AND A.attrib_type = 'uptime' AND A.device_id = D.device_id AND ignore = '0' AND disabled = '0'";
+  foreach (dbFetchRows($sql) as $device)
   {
     if (device_permitted($device['device_id']) && $device['attrib_value'] < $config['uptime_warning'] && $device['attrib_type'] == "uptime")
     {
@@ -160,9 +162,8 @@ echo("
 ");
 
 $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from `syslog` ORDER BY seq DESC LIMIT 20";
-$query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
-while ($entry = mysql_fetch_array($query))
+foreach (dbFetchRows($sql) as $entry)
 {
   $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
 

@@ -149,7 +149,8 @@ foreach (dbFetch('SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDE
 echo('<span style="font-weight: bold;">Lists</span> &#187; ');
 
 $menu_options = array('basic'      => 'Basic',
-                      'detail'     => 'Detail');
+                      'detail'     => 'Detail',
+                      'status'     => 'Status');
 
 $sep = "";
 foreach ($menu_options as $option => $text)
@@ -262,37 +263,17 @@ if($format == "graph")
 
 } else {
 
-  echo('<table cellspacing="0" class="devicetable sortable" width="100%">');
-  if ($subformat == "detail" || $subformat == "basic")
-  {
-    echo('<tr class="tablehead">
-    <th></th>
-    <th></th>
-    <th class="paddedcell">Device</th>
-    <th></th>
-    <th class="paddedcell">Platform</th>
-    <th class="paddedcell">Operating System</th>
-    <th class="paddedcell">Uptime/Location</th>
-  </tr>');
-  }
 
-  foreach (dbFetchRows($query, $sql_param) as $device)
-  {
-    if (device_permitted($device['device_id']))
-    {
-      if (!$location_filter || ((get_dev_attrib($device,'override_sysLocation_bool') && get_dev_attrib($device,'override_sysLocation_string') == $location_filter)
-        || $device['location'] == $location_filter))
-      {
+
         if ($subformat == "detail")
         {
-          include("includes/hostbox.inc.php");
+                include("pages/devices/detail.inc.php");
+        } elseif($subformat == "status") {
+                include("pages/devices/status.inc.php");
         } else {
-          include("includes/hostbox-basic.inc.php");
+                include("pages/devices/basic.inc.php");
         }
-      }
-    }
-  }
-  echo("</table>");
+        
 }
 
 ?>
