@@ -1,6 +1,6 @@
 <?php
 
-include_once("includes/front/boxes.inc.php");
+include("includes/topnav.inc.php");
 
 function generate_front_box ($frontbox_class, $content)
 {
@@ -9,9 +9,14 @@ echo("<div class=\"front-box $frontbox_class\">
       </div>");
 }
 
+echo('
+  <div class="row">
+    <div class="col-md-8">
+');
+
 echo('<div class=front-page>');
 
-echo('<div class="status-boxes left-2-col-fluid">');
+echo('<div class="status-boxes">');
 
 $count_boxes = 0;
 
@@ -113,6 +118,20 @@ if ($count_boxes == 0) {
   want to start by adding one or more devices in the Devices menu.</p>");
 }
 echo('</div>');
+echo('</div>');
+echo('</div>');
+echo('
+  <div class="col-md-4">
+');
+
+include_once("includes/front/boxes.inc.php");
+
+echo('
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+');
 
 if ($config['enable_syslog'])
 {
@@ -122,7 +141,7 @@ if ($config['enable_syslog'])
 
   $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
   $query = mysql_query($sql);
-  echo("<table cellspacing=0 cellpadding=2 width=100%>");
+  echo('<table class="table table-bordered">');
   while ($entry = mysql_fetch_assoc($query))
   {
     $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
@@ -147,7 +166,7 @@ if ($config['enable_syslog'])
 
   $data = mysql_query($query);
 
-  echo('<table cellspacing="0" cellpadding="1" width="100%">');
+  echo('<table class="table table-bordered">');
 
   while ($entry = mysql_fetch_assoc($data)) {
     include("includes/print-event.inc.php");
@@ -158,5 +177,10 @@ if ($config['enable_syslog'])
 }
 
 echo("</div>");
+
+echo('
+  </div>
+</div>
+');
 
 ?>
