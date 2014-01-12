@@ -1,5 +1,8 @@
 <?php
 
+// MYSQL Check - FIX ME
+// 3 SELECTS
+
 print_optionbar_start();
 
 unset ($sep);

@@ -10,11 +10,10 @@ include("includes/include-dir.inc.php");
 // Remove storage which weren't redetected here
 
 $sql = "SELECT * FROM `storage` WHERE `device_id`  = '".$device['device_id']."'";
-$query = mysql_query($sql);
 
 if ($debug) { print_r ($valid_storage); }
 
-while ($test_storage = mysql_fetch_assoc($query))
+foreach (dbFetchRows($sql) as $test_storage)
 {
   $storage_index = $test_storage['storage_index'];
   $storage_mib = $test_storage['storage_mib'];
@@ -23,7 +22,7 @@ while ($test_storage = mysql_fetch_assoc($query))
   if (!$valid_storage[$storage_mib][$storage_index])
   {
     echo("-");
-    mysql_query("DELETE FROM `storage` WHERE storage_id = '" . $test_storage['storage_id'] . "'");
+    dbDelete('storage', '`storage_id` = ?', array($test_storage['storage_id']));
   }
 
   unset($storage_index); unset($storage_mib);
