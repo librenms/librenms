@@ -1,5 +1,8 @@
 <?php
 
+// MYSQL Check - FIXME
+// 1 UNKNOWN
+
 include( "config.php" );
 
 $sql_file = $sqlfile ?: 'build.sql';

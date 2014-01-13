@@ -1,6 +1,9 @@
 #!/usr/bin/php
 <?php
 
+// MYSQL Check - FIXME
+// 1 UNKNOWN
+
 ### This script requires php-cli and php-mysql packages
 
 # ============================================================================

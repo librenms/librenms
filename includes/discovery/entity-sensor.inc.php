@@ -79,7 +79,7 @@ if (is_array($oids))
 
       if ($current == "-127") { $thisisnotbullshit = FALSE; }
 
-      if ($thisisnotbullshit && mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."' AND `sensor_class` = '".$type."' AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = '".$index."'"),0) == "0")
+      if ($thisisnotbullshit && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?",array($device['device_id'], $type,$index)) == "0")
       // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
       {
         discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $current);

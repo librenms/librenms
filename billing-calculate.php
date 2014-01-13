@@ -22,7 +22,7 @@ include("includes/functions.php");
 
 $options = getopt("r");
 
-if (isset($options['r'])) { echo("Clearing history table.\n"); mysql_query("TRUNCATE TABLE `bill_history`"); }
+if (isset($options['r'])) { echo("Clearing history table.\n"); dbQuery("TRUNCATE TABLE `bill_history`"); }
 
 foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_id`") as $bill)
 {
