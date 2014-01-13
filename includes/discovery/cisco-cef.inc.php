@@ -31,12 +31,9 @@ if (is_array($cefs))
         echo(" | |-".$path.": ".$path_name['cefSwitchingPath']."\n");
         $cef_exists[$device['device_id']][$entity][$afi][$path] = 1;
 
-        if (mysql_result(mysql_query("SELECT COUNT(*) FROM `cef` WHERE `device_id` = '".$device['device_id']."' AND `entPhysicalIndex` = '".$entity."'
-                                     AND `afi` = '".$afi."' AND `cef_index` = '".$path."'"),0) != "1")
+        if (dbFetchCell("SELECT COUNT(*) from `cef` WHERE device_id = ? AND entPhysicalIndex = ?, AND afi=? AND cef_index=?",array($device['device_id'], $entity,$afi,$path)) != "1")
         {
-          $sql = "INSERT INTO `cef` (`device_id`, `entPhysicalIndex`, `afi`, `cef_index`, `cef_path`)
-                  VALUES ('".$device['device_id']."', '".$entity."', '".$afi."', '".$path."', '".$path_name['cefSwitchingPath']."')";
-          mysql_query($sql);
+          dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $entity, 'afi' => $afi, 'cef_path' => $path), 'cef');
           echo("+");
         }
 

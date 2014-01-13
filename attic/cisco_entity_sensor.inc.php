@@ -1,5 +1,8 @@
 <?php
 
+// MYSQL Check - FIXME
+// 1 SELECT
+
 $sensor = mysql_fetch_assoc(mysql_query("SELECT * FROM entPhysical as E, devices as D WHERE entPhysical_id = '".mres($_GET['a'])."' and D.device_id = E.device_id"));
 
 switch ($sensor['entSensorType'])

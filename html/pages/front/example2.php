@@ -3,15 +3,16 @@
   <tr>
     <td bgcolor=#e5e5e5 valign=top>
 <?php
+
 #      <table width=100% border=0><tr><td><div style="margin-bottom: 5px; font-size: 18px; font-weight: bold;">Devices with Alerts</div></td><td width=35 align=center><div class=tablehead>Host</div></td><td align=center width=35><div class=tablehead>Int</div></td><td align=center width=35><div class=tablehead>Srv</div></tr>
 ?>
 <?php
 
 $nodes = array();
 
-$sql = mysql_query("SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'");
+$sql = "SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'";
 
-while ($device = mysql_fetch_assoc($sql))
+foreach (dbFetchRows($sql) as $device)
 {
   unset($already);
   $i = 0;
@@ -27,9 +28,9 @@ while ($device = mysql_fetch_assoc($sql))
   if (!$already) { $nodes[] = $device['device_id']; }
 }
 
-$sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
-while ($device = mysql_fetch_assoc($sql)) {
-
+$sql = "SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'";
+foreach (dbFetchRows($sql) as $device)
+{
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffbbbb; margin: 4px;'>
       <center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span>
@@ -38,9 +39,9 @@ while ($device = mysql_fetch_assoc($sql)) {
 
 }
 
-$sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
-while ($interface = mysql_fetch_assoc($sql)) {
-
+$sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'";
+foreach (dbFetchRows($sql) as $interface)
+{
       echo("<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
       <center><strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span>
@@ -50,9 +51,9 @@ while ($interface = mysql_fetch_assoc($sql)) {
 
 }
 
-$sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'");
-while ($service = mysql_fetch_assoc($sql)) {
-
+$sql = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'";
+foreach (dbFetchRows($sql) as $service)
+{
       echo("<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
       <center><strong>".generate_device_link($service, shorthost($service['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span>
@@ -62,9 +63,9 @@ while ($service = mysql_fetch_assoc($sql)) {
 
 }
 
-$sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerState != 'established' AND B.device_id = D.device_id");
-while ($peer = mysql_fetch_assoc($sql)) {
-
+$sql = "SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerState != 'established' AND B.device_id = D.device_id";
+foreach (dbFetchRows($sql) as $peer)
+{
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
       <center><strong>".generate_device_link($peer, shorthost($peer['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span>
@@ -76,9 +77,9 @@ while ($peer = mysql_fetch_assoc($sql)) {
 
 if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)
 {
-  $sql = mysql_query("SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value < '" . $config['uptime_warning'] . "'");
-  while ($device = mysql_fetch_assoc($sql)) {
-
+  $sql = "SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value < '" . $config['uptime_warning'] . "'";
+  foreach (dbFetchRows($sql) as $device)
+  {
         echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ddffdd; margin: 4px;'>
         <center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
         <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br />
@@ -96,9 +97,11 @@ echo("
 ");
 
 $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
-$query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
-while ($entry = mysql_fetch_assoc($query)) { include("includes/print-syslog.inc.php"); }
+foreach (dbFetchRows($sql) as $entry)
+{
+  include("includes/print-syslog.inc.php");
+}
 echo("</table>");
 
 echo("</div>
@@ -110,31 +113,28 @@ echo("</div>
 
 if ($_SESSION['userlevel'] >= '5')
 {
-  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'L2TP: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
+  $sql  = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'L2TP: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
   $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
-  $query = mysql_query($sql);
   unset ($seperator);
-  while ($interface = mysql_fetch_assoc($query))
+  foreach (dbFetchRows($sql) as $interface)
   {
     $ports['l2tp'] .= $seperator . $interface['port_id'];
     $seperator = ",";
   }
 
-  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
+  $sql  = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
   $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
-  $query = mysql_query($sql);
   unset ($seperator);
-  while ($interface = mysql_fetch_assoc($query))
+  foreach (dbFetchRows($sql) as $interface)
   {
     $ports['transit'] .= $seperator . $interface['port_id'];
     $seperator = ",";
   }
 
-  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'Server: thlon-pbx%' AND I.device_id = D.device_id AND D.hostname LIKE '%";
+  $sql  = "SELECT * FROM ports AS I, devices AS D WHERE `ifAlias` like 'Server: thlon-pbx%' AND I.device_id = D.device_id AND D.hostname LIKE '%";
   $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
-  $query = mysql_query($sql);
   unset ($seperator);
-  while ($interface = mysql_fetch_assoc($query))
+  foreach (dbFetchRows($sql) as $interface)
   {
     $ports['voip'] .= $seperator . $interface['port_id'];
     $seperator = ",";

@@ -3,8 +3,8 @@
 echo("Port Stack: ");
 
 $sql = "SELECT * FROM `ports_stack` WHERE `device_id` = '".$device['device_id']."'";
-$query = mysql_query($sql);
-while ($entry = mysql_fetch_assoc($query))
+
+foreach (dbFetchRows($sql) as $entry)
 {
   $stack_db_array[$entry['port_id_high']][$entry['port_id_low']]['ifStackStatus'] = $entry['ifStackStatus'];
 }
@@ -22,13 +22,13 @@ foreach ($stack_poll_array as $port_id_high => $entry_high)
       {
         echo(".");
       } else {
-        mysql_query("UPDATE `ports_stack` SET `ifStackStatus` = '".$ifStackStatus."' WHERE `device_id` = '".$device['device_id']."' AND `port_id_high` = '".$port_id_high."' AND `port_id_low` = '".$port_id_low."'");
+        dbUpdate(array('`ifStackStatus`' => $ifStackStatus), 'ports_stack', 'device_id=? AND port_id_high=? AND `port_id_low`=?',array($device['device_id'],$port_id_high,$port_id_low));
         echo("U");
         if ($debug) { echo(mysql_error()); }
       }
       unset($stack_db_array[$port_id_high][$port_id_low]);
     } else {
-      mysql_query("INSERT INTO `ports_stack` (`device_id`,`port_id_high`,`port_id_low`,`ifStackStatus`)  VALUES ('".$device['device_id']."','".$port_id_high."','".$port_id_low."','".$ifStackStatus."')");
+      dbInsert(array('`device_id`' => $device['device_id'], '`port_id_high`' => $port_id_high, '`port_id_low`' => $port_id_low,'`ifStackStatus`' => $ifStackStatus), 'ports_stack');
       echo("+");
       if ($debug) { echo(mysql_error()); }
     }

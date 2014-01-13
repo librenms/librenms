@@ -44,23 +44,13 @@
 
     if ($entPhysicalDescr || $entPhysicalName)
     {
-      $entPhysical_id = @mysql_result(mysql_query("SELECT entPhysical_id FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'"),0);
+      $entPhysical_id = dbFetchCell("SELECT entPhysical_id FROM `entPhysical` WHERE devicee_id = ? AND entPhysicalIndex = ?",array($device['device_id'], $entPhysicalIndex));
 
       if ($entPhysical_id) {
-        $sql =  "UPDATE `entPhysical` SET `ifIndex` = '$ifIndex'";
-        $sql .= ", entPhysicalIndex = '$entPhysicalIndex', entPhysicalDescr = '$entPhysicalDescr', entPhysicalClass = '$entPhysicalClass', entPhysicalName = '$entPhysicalName'";
-        $sql .= ", entPhysicalModelName = '$entPhysicalModelName', entPhysicalSerialNum = '$entPhysicalSerialNum', entPhysicalContainedIn = '$entPhysicalContainedIn'";
-        $sql .= ", entPhysicalMfgName = '$entPhysicalMfgName', entPhysicalParentRelPos = '$entPhysicalParentRelPos', entPhysicalVendorType = '$entPhysicalVendorType'";
-        $sql .= ", entPhysicalHardwareRev = '$entPhysicalHardwareRev', entPhysicalFirmwareRev = '$entPhysicalFirmwareRev', entPhysicalSoftwareRev = '$entPhysicalSoftwareRev'";
-        $sql .= ", entPhysicalIsFRU = '$entPhysicalIsFRU', entPhysicalAlias = '$entPhysicalAlias', entPhysicalAssetID = '$entPhysicalAssetID'";
-        $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
-
-        mysql_query($sql);
+        dbUpdate(array('entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalDescr' => $entPhysicalDescr, 'entPhysicalClass' => $entPhysicalClass, 'entPhysicalName' => $entPhysicalName, 'entPhysicalModelName' => $entPhysicalModelName, 'entPhysicalSerialNum' => $entPhysicalSerialNum, 'entPhysicalContainedIn' => $entPhysicalContainedIn, 'entPhysicalMfgName' => $entPhysicalMfgName, 'entPhysicalParentRelPos' => $entPhysicalParentRelPos, 'entPhysicalVendorType' => $entPhysicalVendorType, 'entPhysicalHardwareRev' => $entPhysicalHardwareRev, 'entPhysicalFirmwareRev' => $entPhysicalFirmwareRev, 'entPhysicalSoftwareRev' => $entPhysicalSoftwareRev, 'entPhysicalIsFRU' => $entPhysicalIsFRU, 'entPhysicalAlias' => $entPhysicalAlias, 'entPhysicalAssetID' => $entPhysicalAssetID), 'entPhysical', 'device_id=? AND entPhysicalIndex=?',array($device['device_id'],$entPhysicalIndex));
         echo(".");
       } else {
-        $sql  = "INSERT INTO `entPhysical` (`device_id` , `entPhysicalIndex` , `entPhysicalDescr` , `entPhysicalClass` , `entPhysicalName` , `entPhysicalModelName` , `entPhysicalSerialNum` , `entPhysicalContainedIn`, `entPhysicalMfgName`, `entPhysicalParentRelPos`, `entPhysicalVendorType`, `entPhysicalHardwareRev`,`entPhysicalFirmwareRev`,`entPhysicalSoftwareRev`,`entPhysicalIsFRU`,`entPhysicalAlias`,`entPhysicalAssetID`, `ifIndex`) ";
-        $sql .= "VALUES ( '" . $device['device_id'] . "', '$entPhysicalIndex', '$entPhysicalDescr', '$entPhysicalClass', '$entPhysicalName', '$entPhysicalModelName', '$entPhysicalSerialNum', '$entPhysicalContainedIn', '$entPhysicalMfgName','$entPhysicalParentRelPos' , '$entPhysicalVendorType', '$entPhysicalHardwareRev', '$entPhysicalFirmwareRev', '$entPhysicalSoftwareRev', '$entPhysicalIsFRU', '$entPhysicalAlias', '$entPhysicalAssetID', '$ifIndex')";
-        mysql_query($sql);
+        dbInsert(array('`device_id`' => $device['device_id'], '`entPhysicalIndex`' => $entPhysicalIndex, '`entPhysicalDescr`' => $entPhysicalDescr,'`entPhysicalClass`' => $entPhysicalClass, '`entPhysicalName`' => $entPhysicalName, '`entPhysicalModelName`' => $entPhysicalModelName, '`entPhysicalSerialNum`' => $entPhysicalSerialNum, '`entPhysicalContainedIn`' => $entPhysicalContainedIn, '`entPhysicalMfgName`' => $entPhysicalMfgName, '`entPhysicalParentRelPos`' => $entPhysicalParentRelPos, '`entPhysicalVendorType`' => $entPhysicalVendorType, '`entPhysicalHardwareRev`' => $entPhysicalHardwareRev, '`entPhysicalFirmwareRev`' => $entPhysicalFirmwareRev, '`entPhysicalSoftwareRev`' => $entPhysicalSoftwareRev, '`entPhysicalIsFRU`' => $entPhysicalIsFRU, '`entPhysicalAlias`' => $entPhysicalAlias, '`entPhysicalAssetID`' => $entPhysicalAssetID, '`ifIndex`' => $ifIndex), '`entPhysical`');
         echo("+");
       }
 
@@ -71,12 +61,12 @@
  } else { echo("Disabled!"); }
 
   $sql = "SELECT * FROM `entPhysical` WHERE `device_id`  = '".$device['device_id']."'";
-  $query = mysql_query($sql);
-  while ($test = mysql_fetch_assoc($query)) {
+  foreach (dbFetchRows($sql) as $test)
+  {
     $id = $test['entPhysicalIndex'];
     if (!$valid[$id]) {
       echo("-");
-      mysql_query("DELETE FROM `entPhysical` WHERE entPhysical_id = '".$test['entPhysical_id']."'");
+      dbDelete('`entPhysical`', '`entPhysical_id` = ?', array($test['entPhysical_id']));
     }
   }
 

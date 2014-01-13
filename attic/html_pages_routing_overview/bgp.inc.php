@@ -1,6 +1,9 @@
 
 <?php 
 
+// MYSQL Check - FIXME
+// 3 SELECTS
+
 $total = mysql_result(mysql_query("SELECT count(*) FROM `bgpPeers`"),0);
 $up    = mysql_result(mysql_query("SELECT count(*) FROM `bgpPeers` WHERE `bgpPeerState` = 'established'"),0);
 $stop  = mysql_result(mysql_query("SELECT count(*) FROM `bgpPeers` WHERE `bgpPeerAdminStatus` = 'stop'"),0);

@@ -1,5 +1,8 @@
 <?php
 
+// MYSQL Check - FIXME
+// 2 SELECTS
+
 $class = 'temperature';
 $unit = 'C';
 

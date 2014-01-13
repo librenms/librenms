@@ -1,6 +1,12 @@
 #!/usr/bin/env php
 <?php
 
+// MYSQL Check - FIXME
+// 4 SELECTS
+// 3 INSERTS
+// 4 UPDATES
+// 1 DELETE
+
 include("config.php");
 include("includes/functions.php");
 
