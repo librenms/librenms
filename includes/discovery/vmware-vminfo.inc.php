@@ -72,9 +72,9 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
        * Check whether the Virtual Machine is already known for this host.
        */
 
-      if (mysql_result(mysql_query("SELECT COUNT(id) FROM vminfo WHERE device_id = '" . $device["device_id"] . "' AND vmwVmVMID = '" . $oid . "' AND vm_type='vmware'"), 0) == 0)
+      if (dbFetchCell("SELECT COUNT(id) FROM `vminfo` WHERE `device_id` = ? AND `vmwVmVMID` = ? AND vm_type='vmware'",array($device['device_id'], $oid)) == 0)
       {
-        mysql_query("INSERT INTO vminfo (device_id, vm_type, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState) VALUES (" . $device["device_id"] . ",'vmware', " . $oid . ", '" . mres($vmwVmDisplayName) . "', '" . mres($vmwVmGuestOS) . "', " . $vmwVmMemSize . ", " . $vmwVmCpus . ", '" . mres($vmwVmState) . "')");
+        dbInsert(array('`device_id`' => $device['device_id'], '`vm_type`' => 'vmware', '`vmwVmVMID`' => $oid,'`vmwVmDisplayName`' => mres($vmwVmDisplayName), '`vmwVmGuestOS`' => mres($vmwVmGuestOS), '`vmwVmMemSize`' => mres($vmwVmMemSize), '`vmwVmCpus`' => mres($vmwVmCpus), '`vmwVmState`' => mres($vmwVmState)), 'vminfo');
         echo("+");
         // FIXME eventlog
       } else {
@@ -94,9 +94,9 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
    * Get a list of all the known Virtual Machines for this host.
    */
 
-  $db_vm_list = mysql_query("SELECT id, vmwVmVMID FROM vminfo WHERE device_id = '" . $device["device_id"] . "' AND vm_type='vmware'");
+  $sql = "SELECT id, vmwVmVMID FROM vminfo WHERE device_id = '" . $device["device_id"] . "' AND vm_type='vmware'";
 
-  while ($db_vm = mysql_fetch_assoc($db_vm_list))
+  foreach (dbFetchRows($sql) as $db_vm)
   {
     /*
      * Delete the Virtual Machines that are removed from the host.
@@ -104,7 +104,7 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
 
     if (!in_array($db_vm["vmwVmVMID"], $vmw_vmlist))
     {
-      mysql_query("DELETE FROM vminfo WHERE id = '" . $db_vm["id"] . "'");
+      dbDelete('vminfo', '`id` = ?', array($db_vm['id']));
       echo("-");
       // FIXME eventlog
     }

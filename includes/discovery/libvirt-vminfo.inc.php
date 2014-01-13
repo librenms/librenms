@@ -76,23 +76,20 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
           $vmwVmCpus = $xml->vcpu;
 
           # Check whether the Virtual Machine is already known for this host.
-          $result = mysql_query("SELECT * FROM vminfo WHERE device_id = '" . $device["device_id"] . "' AND vmwVmVMID = '" . $dom_id . "' AND vm_type='libvirt'");
-          if (mysql_num_rows($result) == 0)
+          $result = dbFetchRow("SELECT * FROM `vminfo` WHERE `device_id` = ? AND `vmwVmVMID` = ? AND `vm_type` = 'libvirt'",array($device['device_id'],$dom_id));
+          if (count($result['device_id']) == 0)
           {
-            mysql_query("INSERT INTO vminfo (device_id, vm_type, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState) VALUES (" . $device["device_id"] . ", 'libvirt',
-                '" . $dom_id . "', '" . mres($vmwVmDisplayName) . "', '" . mres($vmwVmGuestOS) . "', '" . $vmwVmMemSize . "', '" . $vmwVmCpus . "', '" . mres($vmwVmState) . "')");
+            $inserted_id = dbInsert(array('`device_id`' => $device['device_id'], '`vm_type`' => 'libvirt', '`vmwVmVMID`' => $dom_id,'`vmwVmDisplayName`' => mres($vmwVmDisplayName), '`vmwVmGuestOS`' => mres($vmwVmGuestOS), '`vmwVmMemSize`' => mres($vmwVmMemSize), '`vmwVmCpus`' => mres($vmwVmCpus), '`vmwVmState`' => mres($vmwVmState)), 'vminfo');
             echo("+");
-            log_event("Virtual Machine added: $vmwVmDisplayName ($vmwVmMemSize MB)", $device, 'vm', mysql_insert_id());
+            log_event("Virtual Machine added: $vmwVmDisplayName ($vmwVmMemSize MB)", $device, 'vm', $inserted_id);
           } else {
-            $row = mysql_fetch_assoc($result);
-            if ($row['vmwVmState'] != $vmwVmState
-             || $row['vmwVmDisplayName'] != $vmwVmDisplayName
-             || $row['vmwVmCpus'] != $vmwVmCpus
-             || $row['vmwVmGuestOS'] != $vmwVmGuestOS
-             || $row['vmwVmMemSize'] != $vmwVmMemSize)
+            if ($result['vmwVmState'] != $vmwVmState
+             || $result['vmwVmDisplayName'] != $vmwVmDisplayName
+             || $result['vmwVmCpus'] != $vmwVmCpus
+             || $result['vmwVmGuestOS'] != $vmwVmGuestOS
+             || $result['vmwVmMemSize'] != $vmwVmMemSize)
             {
-              mysql_query("UPDATE vminfo SET vmwVmState='" . mres($vmwVmState) . "', vmwVmGuestOS='" . mres($vmwVmGuestOS) . "', vmwVmDisplayName='". mres($vmwVmDisplayName) . "',
-                  vmwVmMemSize='" . mres($vmwVmMemSize) . "', vmwVmCpus='" . mres($vmwVmCpus) . "' WHERE device_id='" . $device["device_id"] . "' AND vm_type='libvirt' AND vmwVmVMID='" . $dom_id . "'");
+              dbUpdate(array('vmwVmState' => mres($vmwVmState), '`vmwVmGuestOS' => mres($vmwVmGuestOS), '`vmwVmDisplayName`' => mres($vmwVmDisplayName), '`vmwVmMemSize`' => mres($vmwVmMemSize), '`vmwVmCpus`' => mres($vmwVmCpus)), 'vminfo', "device_id=? AND vm_type='libvirt' AND vmwVmVMID=?",array($device['device_id'],$dom_id));
               echo("U");
               // FIXME eventlog
             }
@@ -113,15 +110,15 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
   }
 
   # Get a list of all the known Virtual Machines for this host.
-  $db_vm_list = mysql_query("SELECT id, vmwVmVMID, vmwVmDisplayName FROM vminfo WHERE device_id = '" . $device["device_id"] . "' AND vm_type='libvirt'");
+  $sql = "SELECT id, vmwVmVMID, vmwVmDisplayName FROM vminfo WHERE device_id = '" . $device["device_id"] . "' AND vm_type='libvirt'";
 
-  while ($db_vm = mysql_fetch_assoc($db_vm_list))
+  foreach (dbFetchRows($sql) as $db_vm)
   {
     # Delete the Virtual Machines that are removed from the host.
 
     if (!in_array($db_vm["vmwVmVMID"], $libvirt_vmlist))
     {
-      mysql_query("DELETE FROM vminfo WHERE id = '" . $db_vm["id"] . "'");
+      dbDelete('vminfo', '`id` = ?', array($db_vm['id']));
       echo("-");
       log_event("Virtual Machine removed: " . $db_vm['vmwVmDisplayName'], $device, 'vm', $db_vm['id']);
     }

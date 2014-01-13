@@ -16,26 +16,24 @@ if (is_array($hrDevices))
   {
     if (is_array($hrDevice) && is_numeric($hrDevice['hrDeviceIndex']))
     {
-      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `hrDevice` WHERE device_id = '".$device['device_id']."' AND hrDeviceIndex = '".$hrDevice['hrDeviceIndex']."'"),0))
+      if (dbFetchCell("SELECT COUNT(*) FROM `hrDevice` WHERE device_id = ? AND hrDeviceIndex = ?",array($device['device_id'], $hrDevice['hrDeviceIndex'])))
       {
-        $update_query  = "UPDATE `hrDevice` SET";
-        $update_query .= "  `hrDeviceType` = '".mres($hrDevice[hrDeviceType])."'";
-        $update_query .= ", `hrDeviceDescr` = '".mres($hrDevice[hrDeviceDescr])."'";
-        $update_query .= ", `hrDeviceStatus` = '".mres($hrDevice[hrDeviceStatus])."'";
-        $update_query .= ", `hrDeviceErrors` = '".mres($hrDevice[hrDeviceErrors])."'";
+        $update_array = array('`hrDeviceType`' => mres($hrDevice['hrDeviceType']),
+        '`hrDeviceDescr`' => mres($hrDevice['hrDeviceDescr']),
+        '`hrDeviceStatus`' => mres($hrDevice['hrDeviceStatus']),
+        '`hrDeviceErrors`' => mres($hrDevice['hrDeviceErrors']));
         if ($hrDevice['hrDeviceType'] == "hrDeviceProcessor")
         {
-          $update_query .= ", `hrProcessorLoad` = '".mres($hrDevice[hrProcessorLoad])."'";
+          $update_array['hrProcessorLoad'] = mres($hrDevice['hrProcessorLoad']);
         }
-        $update_query .= " WHERE device_id = '".$device['device_id']."' AND hrDeviceIndex = '".$hrDevice['hrDeviceIndex']."'";
-        @mysql_query($update_query); echo(".");
+        dbUpdate($update_array, '`hrDevice`', 'device_id=? AND hrDeviceIndex=?',array($device['device_id'],$hrDevice['hrDeviceIndex']));
+        echo(".");
       }
       else
       {
-        $insert_query = "INSERT INTO `hrDevice` (`hrDeviceIndex`,`device_id`,`hrDeviceType`,`hrDeviceDescr`,`hrDeviceStatus`,`hrDeviceErrors`) ";
-        $insert_query .= " VALUES ('".mres($hrDevice[hrDeviceIndex])."','".mres($device[device_id])."','".mres($hrDevice[hrDeviceType])."','".mres($hrDevice[hrDeviceDescr])."','".mres($hrDevice[hrDeviceStatus])."','".mres($hrDevice[hrDeviceErrors])."')";
-        @mysql_query($insert_query); echo("+");
-        if ($debug) { print_r($hrDevice); echo("$insert_query" . mysql_affected_rows() . " row inserted"); }
+        $inserted_rows = dbInsert(array('`hrDeviceIndex`' => mres($hrDevice['hrDeviceIndex']), '`device_id`' => mres($device['device_id']), '`hrDeviceType`' => mres($hrDevice['hrDeviceType']),'`hrDeviceDescr`' => mres($hrDevice['hrDeviceDescr']), '`hrDeviceStatus`' => mres($hrDevice['hrDeviceStatus']), '`hrDeviceErrors`' => mres($hrDevice['hrDeviceErrors'])), 'hrDevice');
+        echo("+");
+        if ($debug) { print_r($hrDevice); echo("$inserted_rows row inserted"); }
       }
       $valid_hrDevice[$hrDevice['hrDeviceIndex']] = 1;
     }
@@ -43,14 +41,14 @@ if (is_array($hrDevices))
 }
 
 $sql = "SELECT * FROM `hrDevice` WHERE `device_id`  = '".$device['device_id']."'";
-$query = mysql_query($sql);
 
-while ($test_hrDevice = mysql_fetch_assoc($query))
+foreach (dbFetchRows($sql) as $test_hrDevice)
 {
   if (!$valid_hrDevice[$test_hrDevice['hrDeviceIndex']])
   {
     echo("-");
     mysql_query("DELETE FROM `hrDevice` WHERE hrDevice_id = '" . $test_hrDevice['hrDevice_id'] . "'");
+    dbDelete('hrDevice', '`hrDevice_id` = ?', array($test_hrDevice['hrDevice_id']));
     if ($debug) { print_r($test_hrDevice); echo(mysql_affected_rows() . " row deleted"); }
   }
 }
