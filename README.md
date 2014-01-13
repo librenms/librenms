@@ -40,7 +40,6 @@ exception):
   - scripts/*/mysql: GPLv2 only
   - check_mk (scripts/observium_agent*): GPLv2
   - qTip (html/css/jquery.qtip.min.css and html/js/qtip/jquery.qtip.min.js): GPLv2
-  - jqPlot (html/js/jqplot/*): MIT or GPLv2
 
 Introduction
 ------------

@@ -59,7 +59,6 @@ elseif ($vars['view'] == "add")
 
 ?>
 
-<font face="Verdana, Arial, Sans-Serif"><h2>Bill : Add Bill</h2>
 <?php
 
   print_optionbar_start();
@@ -76,9 +75,10 @@ elseif ($vars['view'] == "add")
 
 ?>
 
-<form name="form1" method="post" action="bills/" class="form-horizontal">
+<h3>Bill : Add Bill</h3>
+
+<form name="form1" method="post" action="bills/" class="form-horizontal" role="form">
   <input type=hidden name=addbill value=yes>
-  <link rel="stylesheet" href="css/bootstrap.min.css">
   <script type="text/javascript">
     function billType() {
       $('#cdrDiv').toggle();
@@ -113,41 +113,60 @@ if(is_array($port))
 }
 
 ?>
-  <fieldset>
-    <legend>Bill Properties</legend>
-    <div class="control-group">
-      <label class="control-label" for="bill_name"><strong>Description</strong></label>
-      <div class="controls">
-        <input class="span4" type="text" name="bill_name" value="<?php echo($port['port_descr_descr']); ?>">
-      </div>
+
+<div class="form-group">
+  <label for="bill_name" class="col-sm-2 control-label"><strong>Description</strong></label>
+  <div class="col-sm-4">
+    <input class="form-control input-sm" type="text" id="bill_name" name="bill_name" value="<?php echo($port['port_descr_descr']); ?>">
+  </div>
+  <div class="col-sm6">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label" for="bill_type"><strong>Billing Type</strong></label>
+  <div class="col-sm-10">
+    <input type="radio" name="bill_type" value="cdr" checked onchange="javascript: billType();" /> CDR 95th
+    <input type="radio" name="bill_type" value="quota" onchange="javascript: billType();" /> Quota
+  </div>
+</div>
+<div class="form-group">
+  <div id="cdrDiv">
+    <div class="col-sm-2">
     </div>
-    <div class="control-group">
-      <label class="control-label" for="bill_type"><strong>Billing Type</strong></label>
-      <div class="controls">
-        <input type="radio" name="bill_type" value="cdr" checked onchange="javascript: billType();" /> CDR 95th
-        <input type="radio" name="bill_type" value="quota" onchange="javascript: billType();" /> Quota
-        <div id="cdrDiv">
-          <input class="span1" type="text" name="bill_cdr">
-          <select name="bill_cdr_type" style="width: 233px;">
-            <option value="Kbps">Kilobits per second (Kbps)</option>
-            <option value="Mbps" selected>Megabits per second (Mbps)</option>
-            <option value="Gbps">Gigabits per second (Gbps)</option>
-          </select>
-        </div>
-        <div id="quotaDiv" style="display: none">
-          <input class="span1" type="text" name="bill_quota">
-          <select name="bill_quota_type" style="width: 233px;">
-            <option value="MB">Megabytes (MB)</option>
-            <option value="GB" selected>Gigabytes (GB)</option>
-            <option value="TB">Terabytes (TB)</option>
-          </select>
-        </div>
-      </div>
+    <div class="col-sm-3">
+      <input class="form-control input-sm" type="text" name="bill_cdr">
     </div>
-    <div class="control-group">
-      <label class="control-label" for="bill_day"><strong>Billing Day</strong></label>
-      <div class="controls">
-        <select name="bill_day" style="width: 60px;">
+    <div class="col-sm-3">
+      <select name="bill_cdr_type" class="form-control input-sm">
+        <option value="Kbps">Kilobits per second (Kbps)</option>
+        <option value="Mbps" selected>Megabits per second (Mbps)</option>
+        <option value="Gbps">Gigabits per second (Gbps)</option>
+      </select>
+    </div>
+    <div class="col-sm-4">
+    </div>
+  </div>
+  <div id="quotaDiv" style="display: none">
+    <div class="col-sm-2">
+    </div>
+    <div class="col-sm-3">
+      <input class="form-control input-sm" type="text" name="bill_quota">
+    </div>
+    <div class="col-sm-3">
+      <select name="bill_quota_type" class="form-control input-sm">
+        <option value="MB">Megabytes (MB)</option>
+        <option value="GB" selected>Gigabytes (GB)</option>
+        <option value="TB">Terabytes (TB)</option>
+      </select>
+    </div>
+    <div class="col-sm-4">
+    </div>
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label" for="bill_day"><strong>Billing Day</strong></label>
+  <div class="col-sm-1">
+    <select name="bill_day" class="form-control input-sm">
 <?php
 
 for ($x=1;$x<32;$x++) {
@@ -155,35 +174,37 @@ for ($x=1;$x<32;$x++) {
 }
 
 ?>
-        </select>
-      </div>
-    </div>
-  </fieldset>
-  <fieldset>
-    <legend>Optional Information</legend>
-    <div class="control-group">
-      <label class="control-label" for="bill_custid"><strong>Customer&nbsp;Reference</strong></label>
-      <div class="controls">
-        <input class="span4" type="text" name="bill_custid">
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="bill_ref"><strong>Billing Reference</strong></label>
-      <div class="controls">
-        <input class="span4" type="text" name="bill_ref" value="<?php echo($port['port_descr_circuit']); ?>">
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="bill_notes"><strong>Notes</strong></label>
-      <div class="controls">
-        <input class="span4" type="textarea" name="bill_notes" value="<?php echo($port['port_descr_speed']); ?>">
-      </div>
-    </div>
-  </fieldset>
-  <div class="form-actions">
-    <!-- <button class="btn btn-danger"><i class="icon-ban-circle icon-white"></i> Cancel</button> //-->
-    <button type="submit" class="btn btn-primary"><i class="icon-ok-sign icon-white"></i> <strong>Add Bill</strong></button>
+    </select>
   </div>
+  <div class="col-sm-9">
+  </div>
+</div>
+<h3>Optional Information</h3>
+<div class="form-group">
+  <label class="col-sm-2 control-label" for="bill_custid"><strong>Customer Reference</strong></label>
+  <div class="col-sm-4">
+    <input class="form-control input-sm" type="text" name="bill_custid">
+  </div>
+  <div class="col-sm-6">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label" for="bill_ref"><strong>Billing Reference</strong></label>
+  <div class="col-sm-4">
+    <input class="form-control input-sm" type="text" name="bill_ref" value="<?php echo($port['port_descr_circuit']); ?>">
+  </div>
+  <div class="col-sm-6">
+  </div>
+</div>
+<div class="form-group">
+  <label class="col-sm-2 control-label" for="bill_notes"><strong>Notes</strong></label>
+  <div class="col-sm-4">
+    <input class="form-control input-sm" type="textarea" name="bill_notes" value="<?php echo($port['port_descr_speed']); ?>">
+  </div>
+  <div class="col-sm-6">
+  </div>
+</div>
+<button type="submit" class="btn btn-default"><i class="icon-ok-sign icon-white"></i> <strong>Add Bill</strong></button>
 </form>
 
 <?php
@@ -193,17 +214,16 @@ for ($x=1;$x<32;$x++) {
   include("pages/bills/search.inc.php");
 
   $i=0;
-  echo("<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>
-           <tr style=\"font-weight: bold; \">
-             <td width=\"7\"></td>
-             <td width=\"250\">Billing name</td>
-             <td></td>
-             <td>Type</td>
-             <td>Allowed</td>
-             <td>Used</td>
-             <td style=\"text-align: center;\">Overusage</td>
-             <td width=\"250\"></td>
-             <td width=\"60\"></td>
+  echo("<table border='0' cellspacing='0' cellpadding='5' class='table table-condensed'>
+           <tr>
+             <th>Billing name</th>
+             <th></th>
+             <th>Type</th>
+             <th>Allowed</th>
+             <th>Used</th>
+             <th>Overusage</th>
+             <th></th>
+             <th></th>
            </tr>");
   foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
   {
@@ -245,7 +265,6 @@ for ($x=1;$x<32;$x++) {
       if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
       echo("
            <tr bgcolor='$row_colour'>
-             <td></td>
              <td><a href='".generate_url(array('page' => "bill", 'bill_id' => $bill['bill_id']))."'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a><br />".strftime("%F", strtotime($datefrom))." to ".strftime("%F", strtotime($dateto))."</td>
              <td>$notes</td>
              <td>$type</td>

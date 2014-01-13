@@ -46,46 +46,55 @@ else
 
   echo("
 <h4>Add Service</h4>
-<form id='addsrv' name='addsrv' method='post' action=''>
-  <input type=hidden name='addsrv' value='yes'>
-  <table width='200' border='0'>
-    <tr>
-      <td>
-        Device
-      </td>
-      <td>
-        <select name='device'>
+<form id='addsrv' name='addsrv' method='post' action='' class='form-horizontal' role='form'>
+  <div class='well well-lg'>
+    <div class='form-group'>
+      <input type='hidden' name='addsrv' value='yes'>
+      <label for='device' class='col-sm-2 control-label'>Device</label>
+      <div class='col-sm-5'>
+        <select name='device' class='form-control input-sm'>
           $devicesform
         </select>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        Type
-      </td>
-      <td>
-        <select name='type'>
+      </div>
+      <div class='col-sm-5'>
+      </div>
+    </div>
+    <div class='form-group'>
+      <label for='type' class='col-sm-2 control-label'>Type</label>
+      <div class='col-sm-5'>
+        <select name='type' id='type' class='form-control input-sm'>
           $servicesform
         </select>
-      </td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>Description</div></td>
-      <td colspan='2'><textarea name='descr' cols='50'></textarea></td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>IP Address</div></td>
-      <td colspan='2'><input name='ip'></textarea></td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>Parameters</div></td>
-      <td colspan='2'><input name='params'></textarea></td>
-    </tr>
-   <tr>
-  </table>
-  <input type='submit' name='Submit' value='Add' />
-  <label><br />
-  </label>
+      </div>
+      <div class='col-sm-5'>
+      </div>
+    </div>
+    <div class='form-group'>
+      <label for='descr' class='col-sm-2 control-label'>Description</label>
+      <div class='col-sm-5'>
+        <textarea name='descr' id='descr' class='form-control input-sm' rows='5'></textarea>
+      </div>
+      <div class='col-sm-5'>
+      </div>
+    </div>
+    <div class='form-group'>
+      <label for='ip' class='col-sm-2 control-label'>IP Address</label>
+      <div class='col-sm-5'>
+        <input name='ip' id='ip' class='form-control input-sm' placeholder='IP Address'>
+      </div>
+      <div class='col-sm-5'>
+      </div>
+    </div>
+    <div class='form-group'>
+      <label for='params' class='col-sm-2 control-label'>Parameters</label>
+      <div class='col-sm-5'>
+        <input name='params' id='params' class='form-control input-sm'>
+      </div>
+      <div class='col-sm-5'>
+      </div>
+    </div>
+    <button type='submit' name='Submit' class='btn btn-default input-sm'>Add Service</button>
+  </div>
 </form>");
 
 }

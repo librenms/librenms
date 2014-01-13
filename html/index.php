@@ -141,7 +141,9 @@ if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['fav
   <!--<script type="text/javascript" src="js/sorttable.js"></script>-->
   <!--<script type="text/javascript" src="js/jquery.min.js"></script>-->
   <!--<script type="text/javascript" src="js/jquery-checkbox.js"></script>-->
-  <!--<script type="text/javascript" src="js/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>-->
+  <!--<script type="text/javascript" src="js/bootstrap.min.js"></script>-->
+  <!--<script type="text/javascript" src="js/qtip/jquery.qtip.min.js"></script>-->
+  <!--<link rel="stylesheet" href="css/jquery.qtip.min.css" type="text/css">-->
 <!--<?php /* html5.js below from http://html5shim.googlecode.com/svn/trunk/html5.js */ ?>-->
   <!--[if IE]><script src="js/html5.js"></script><![endif]-->
   <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="js/jqplot/excanvas.js"></script><![endif]-->
