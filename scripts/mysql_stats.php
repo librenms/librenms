@@ -1,5 +1,8 @@
 <?php
 
+// MYSQL Check - FIXME
+// 1 UNKNOWN
+
 # ============================================================================
 # This is a script to retrieve information from a MySQL server for input to a
 # Cacti graphing process.  It is hosted at

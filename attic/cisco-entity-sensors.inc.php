@@ -1,5 +1,9 @@
 <?php
 
+// MYSQL Check - FIXME
+// 1 SELECT
+// 1 UPDATE
+
 $query = "SELECT * FROM entPhysical WHERE device_id = '" . $device['device_id'] . "' AND entPhysicalClass = 'sensor'";
 $sensors = mysql_query($query);
 while ($sensor = mysql_fetch_assoc($sensors))

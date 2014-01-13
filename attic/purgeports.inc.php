@@ -1,5 +1,9 @@
 <?php
 
+// MYSQL Check - FIXME
+// 4 SELECTS
+// 9 DELETES
+
 // FIXME there's a delete port function in the functions... merge?!
 function delete_port($port_id)
 {
