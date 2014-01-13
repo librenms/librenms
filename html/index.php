@@ -115,31 +115,40 @@ if ($config['page_title']) { $config['page_title_prefix'] = $config['page_title'
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
   <meta http-equiv="content-language" content="en-us" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <?php
 if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$config['page_refresh'].'" />' . "\n"); }
 ?>
+  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
+  <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" type="text/css" />
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/bootstrap-hover-dropdown.min.js"></script>
+  <script src="js/typeahead.min.js"></script>
+  <script src="js/hogan-2.0.0.js"></script>
+
+  <script src="js/jquery.cycle2.min.js"></script>
+  <script src="js/jquery.cycle2.scrollVert.min.js"></script>
 <?php
 if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n"); }
 ?>
-  <link rel="stylesheet" href="css/mktree.css" type="text/css" />
+  <!--<link rel="stylesheet" href="css/mktree.css" type="text/css" />-->
 <?php
-if ($_SESSION['widescreen']) { echo('<link rel="stylesheet" href="css/styles-wide.css" type="text/css" />'); }
+//if ($_SESSION['widescreen']) { echo('<link rel="stylesheet" href="css/styles-wide.css" type="text/css" />'); }
 ?>
-</head>
-<body>
-  <script type="text/javascript" src="js/mktree.js"></script>
-  <script type="text/javascript" src="js/sorttable.js"></script>
-  <script type="text/javascript" src="js/jquery.min.js"></script>
-  <script type="text/javascript" src="js/jquery-checkbox.js"></script>
-  <script type="text/javascript" src="js/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>
-<?php /* html5.js below from http://html5shim.googlecode.com/svn/trunk/html5.js */ ?>
+  <!--<script type="text/javascript" src="js/mktree.js"></script>-->
+  <!--<script type="text/javascript" src="js/sorttable.js"></script>-->
+  <!--<script type="text/javascript" src="js/jquery.min.js"></script>-->
+  <!--<script type="text/javascript" src="js/jquery-checkbox.js"></script>-->
+  <!--<script type="text/javascript" src="js/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>-->
+<!--<?php /* html5.js below from http://html5shim.googlecode.com/svn/trunk/html5.js */ ?>-->
   <!--[if IE]><script src="js/html5.js"></script><![endif]-->
   <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="js/jqplot/excanvas.js"></script><![endif]-->
-  <script language="javascript" type="text/javascript" src="js/jqplot/jquery.jqplot.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="js/jqplot/jquery.jqplot.min.css" />
-  <script type="text/javascript" src="js/jqplot/plugins/jqplot.pieRenderer.min.js"></script>
-  <script type="text/javascript" src="js/jqplot/plugins/jqplot.donutRenderer.min.js"></script>
+  <!--<script language="javascript" type="text/javascript" src="js/jqplot/jquery.jqplot.min.js"></script>-->
+  <!--<link rel="stylesheet" type="text/css" href="js/jqplot/jquery.jqplot.min.css" />-->
+  <!--<script type="text/javascript" src="js/jqplot/plugins/jqplot.pieRenderer.min.js"></script>-->
+  <!--<script type="text/javascript" src="js/jqplot/plugins/jqplot.donutRenderer.min.js"></script>-->
   <script type="text/javascript">
     <!--
 
@@ -212,23 +221,31 @@ function popUp(URL)
 // End -->
   </script>
   <script type="text/javascript" src="js/overlib_mini.js"></script>
-  <div id="container">
+</head>
+<body>
 
 <?php
 
 if (!$vars['bare'] == "yes") {
 
-  include("includes/".$config['web_header']);
-
-  if ($_SESSION['authenticated']) { include("includes/print-menubar.php"); } else { echo('<hr color="#444444" />'); }
+  if ($_SESSION['authenticated']) {
+    include("includes/print-menubar.php");
+  } else {
+    echo('<hr color="#444444" />');
+  }
 
 }
 
 ?>
-    <div class="clearer"></div>
-    <div class="content-mat">
-      <div id="content" style="min-height:650px; width:auto; display:block;">
-        <div style="clear:both; height:6px; display:block;"></div>
+<br />
+<div class="container">
+<div class="row">
+  <div class="col-md-12">
+&nbsp;<br /><br />
+  </div>
+</div>
+<div class="row">
+            <div class="col-md-12">
 <?php
 
 // To help debug the new URLs :)
@@ -263,16 +280,10 @@ if ($_SESSION['authenticated'])
 }
 ?>
         </div>
-      <div class="clearer"></div>
   </div>
 <?php
 $runtime_end = utime(); $runtime = $runtime_end - $runtime_start;
 $gentime = substr($runtime, 0, 5);
-
-echo('<br /> <br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : ''));
-echo('<br />Powered by <a href="' . $config['project_url'] . '" target="_blank">' . $config['project_name_version'].'</a>. ');
-echo($config['project_name'].' is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPLv3</a>.<br/>');
-echo('Copyright &copy; 2006-2012 by Adam Armstrong. Copyright &copy; 2013-'.date("Y").' by the '.$config['project_name'].' Contributors.');
 
 # FIXME - move this
 if ($config['page_gen'])
@@ -292,8 +303,6 @@ if ($config['page_gen'])
     echo('<br />Generated in ' . $gentime . ' seconds.');
 }
 ?>
-      </div>
-    </div>
     <script class="content_tooltips" type="text/javascript">
 $(document).ready(function() { $('#content a[title]').qtip({ content: { text: false }, style: 'light' }); });
 
@@ -320,6 +329,19 @@ if (is_array($pagetitle))
   echo("<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>");
 }
 ?>
-
+        <footer>
+          <div class="container">
+          <div class="row">
+            <div class="col-md-12 text-center">
+<?php
+echo('<br /> <br />  ' . (isset($config['footer']) ? $config['footer'] : ''));
+echo('<br />Powered by <a href="' . $config['project_url'] . '" target="_blank">' . $config['project_name_version'].'</a>. ');
+echo($config['project_name'].' is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPLv3</a>.<br/>');
+echo('Copyright &copy; 2006-2012 by Adam Armstrong. Copyright &copy; 2013-'.date("Y").' by the '.$config['project_name'].' Contributors.');
+?>
+            </div>
+          </div>
+          </div>
+        </footer>
   </body>
 </html>
