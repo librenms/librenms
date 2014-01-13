@@ -175,14 +175,22 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 
     echo("<h3>Select a user to edit</h3>");
 
-    echo("<form method='post' action=''>
+    echo("<form method='post' action='' class='form-horizontal' role='form'>
             <input type='hidden' value='edituser' name='page'>
-            <select name='user_id'>");
+    <div class='col-sm-3'>
+            <select name='user_id' class='form-control input-sm'>");
     foreach ($user_list as $user_entry)
     {
       echo("<option value='" . $user_entry['user_id']  . "'>" . $user_entry['username'] . "</option>");
     }
-    echo("</select><input type='submit' name='Submit' value='Select'></form>");
+    echo("</select>
+    </div>
+    <div class='col-sm-3'>
+      <button type='submit' name='Submit' class='btn btn-default'>Select</button>
+    </div>
+    <div class='col-sm-6'>
+    </div>
+  </form>");
   }
 
 }

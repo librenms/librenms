@@ -4,37 +4,35 @@
 
 ?>
 
-        <table cellpadding=7 cellspacing=0 class=devicetable width=100%>
-<form method='post' action=''>
-<tr>
-             <td width='40' align=center valign=middle><div style='font-weight: bold; font-size: 16px;'>Bills</div></td>
-             <td width='240'><span style='font-weight: bold; font-size: 14px;'></span>
-             <input type="text" name="hostname" id="hostname" size=40 value="<?php echo($_POST['hostname']); ?>" />
-             </td>
-             <td width='100'>
-      <select name='os' id='os'>
+<form method='post' action='' class="form-inline" role="form">
+  <div class="form-group">
+    Bills
+  </div>
+  <div class="form-group">
+    <input type="text" name="hostname" id="hostname" class="form-control input-sm" value="<?php echo($_POST['hostname']); ?>" />
+  </div>
+  <div class="form-group">
+    <select name='os' id='os' class="form-control input-sm">
       <option value=''>All Types</option>
       <option value=''>CDR</option>
       <option value=''>95th</option>
       <option value=''>Quota</option>
-       </select>
-             </td>
-             <td width='100'>
-      <select name='hardware' id='hardware'>
+    </select>
+  </div>
+  <div class="form-group">
+    <select name='hardware' id='hardware' class="form-control input-sm">
       <option value=''>All States</option>
       <option value=''>Under Quota</option>
       <option value=''>Over Quota</option>
-       </select>
-             </td>
-             <td width='100'>
-      <select name='location' id='location'>
+    </select>
+  </div>
+  <div class="form-group">
+    <select name='location' id='location' class="form-control input-sm">
       <option value=''>All Customers</option>
-       </select>
-     </td>
-                 <td>
-         <input type=submit class=submit value=Search>
-             </td>
-             <td width='170' style='font-weight:bold; font-size: 12px;'>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-default input-sm">Search</button>
+  <div class="form-group">
 <?php
 
   if ($vars['view'] == "history")
@@ -47,13 +45,11 @@
   }
 
 ?>
-             </td>
-             <td width='80' style='font-weight:bold; font-size: 12px;'>
-                                                   <a href='bills/view=add/'><img src="images/16/add.png" align=absmiddle alt="Add"> Add Bill</a>
-             </td>
-           </tr>
-  </form>
-</table>
+  </div>
+  <div class="form-group">
+    <a href='bills/view=add/'><img src="images/16/add.png" align=absmiddle alt="Add"> Add Bill</a>
+  </div>
+</form>
 
 <?php
 

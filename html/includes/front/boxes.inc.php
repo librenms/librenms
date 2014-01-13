@@ -11,11 +11,14 @@
  * the source code distribution for details.
  */
 ?>
-<script type="text/javascript" src="js/jquery.cycle.all.js"></script>
-<script type="text/javascript" src="js/jquery-cycle-boxes.js"></script>
 <?php
 
-echo("<div class='right-2-col-fixed'>\n<div class='boxes'>\n");
+echo('
+<div class="cycle-slideshow"
+    data-cycle-fx="scrollVert"
+    data-cycle-timeout="10000"
+    data-cycle-slides="> div">
+');
 
 foreach (get_matching_files($config['html_dir']."/includes/front/", "/^top_.*\.php$/") as $file) {
   echo("<div class=box>\n");
@@ -24,6 +27,6 @@ foreach (get_matching_files($config['html_dir']."/includes/front/", "/^top_.*\.p
 }
 
 echo("</div>\n");
-echo("</div>\n");
 
 ?>
+
