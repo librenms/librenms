@@ -5,7 +5,8 @@ if (device_permitted($entry['device_id']))
   echo("<tr class=\"syslog\">
     <td width=0></td>");
 
-  $entry['hostname'] = shorthost($entry['hostname'], 20);
+  // Stop shortening hostname. Issue #61
+  //$entry['hostname'] = shorthost($entry['hostname'], 20);
 
   if ($vars['page'] != "device")
   {
