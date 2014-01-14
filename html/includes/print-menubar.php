@@ -68,7 +68,7 @@ if ($config['show_locations'])
   echo('
             <li class="dropdown-submenu">
               <a href="#"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a>
-              <ul class="dropdown-menu">
+              <ul class="dropdown-menu scrollable-menu">
   ');
   if ($config['show_locations_dropdown'])
   {
