@@ -15,7 +15,18 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 <nav class="navbar-wrapper navbar navbar-default navbar-fixed-top" role="navigation">
   <div id="container">
     <div class="navbar-header">
-      <a class="navbar-brand" href="">LibreNMS</a>
+<?php
+
+  if ($config['title_image'])
+  {
+    echo('<a class="navbar-brand" href=""><img src="' . $config['title_image'] . '" /></a>');
+  }
+  else
+  {
+    echo('<a class="navbar-brand" href="">'.$config['project_name'].'</a>');
+  }
+
+?>
     </div>
 
     <div class="collapse navbar-collapse">
