@@ -172,7 +172,8 @@
 					$.fn.mapael.updateElem(elemOptions, plots[id], $tooltip, animDuration);
 				}
 				
-				opt.afterUpdate && opt.afterUpdate($self, paper, areas, plots, options);
+				if( typeof opt != 'undefined' )
+					opt.afterUpdate && opt.afterUpdate($self, paper, areas, plots, options);
 			});
 			
 			// Handle resizing of the map
