@@ -3,8 +3,7 @@
  https://github.com/Leaflet/Leaflet.markercluster
  (c) 2012-2013, Dave Leaver, smartrak
 */
-(function (window, document, undefined) {
-/*
+(function (window, document, undefined) {/*
  * L.MarkerClusterGroup extends L.FeatureGroup by clustering the markers contained within
  */
 
@@ -701,7 +700,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	_generateInitialClusters: function () {
 		var maxZoom = this._map.getMaxZoom(),
-			radius = this.options.maxClusterRadius;
+			radius = this.options.maxClusterRadius,
+			radiusFn = radius;
+	
+		//If we just set maxClusterRadius to a single number, we need to create
+		//a simple function to return that number. Otherwise, we just have to
+		//use the function we've passed in.
+		if (typeof radius !== "function") {
+			radiusFn = function () { return radius; };
+		}
 
 		if (this.options.disableClusteringAtZoom) {
 			maxZoom = this.options.disableClusteringAtZoom - 1;
@@ -709,11 +716,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		this._maxZoom = maxZoom;
 		this._gridClusters = {};
 		this._gridUnclustered = {};
-
+	
 		//Set up DistanceGrids for each zoom
 		for (var zoom = maxZoom; zoom >= 0; zoom--) {
-			this._gridClusters[zoom] = new L.DistanceGrid(radius);
-			this._gridUnclustered[zoom] = new L.DistanceGrid(radius);
+			this._gridClusters[zoom] = new L.DistanceGrid(radiusFn(zoom));
+			this._gridUnclustered[zoom] = new L.DistanceGrid(radiusFn(zoom));
 		}
 
 		this._topClusterLevel = new L.MarkerCluster(this, -1);
