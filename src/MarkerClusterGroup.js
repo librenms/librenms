@@ -694,17 +694,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	_generateInitialClusters: function () {
-	    var maxZoom = this._map.getMaxZoom(),
+		var maxZoom = this._map.getMaxZoom(),
 			radius = this.options.maxClusterRadius,
-			radiusFunction = null;
+			radiusFn = radius;
 	
 		//If we just set maxClusterRadius to a single number, we need to create
 		//a simple function to return that number. Otherwise, we just have to
 		//use the function we've passed in.
-		if (typeof radius === "number") {
-			radiusFunction = function () { return radius; };
-		} else if (typeof radius === "function") {
-			radiusFunction = radius;
+		if (typeof radius !== "function") {
+			radiusFn = function () { return radius; };
 		}
 
 		if (this.options.disableClusteringAtZoom) {
@@ -716,8 +714,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	
 		//Set up DistanceGrids for each zoom
 		for (var zoom = maxZoom; zoom >= 0; zoom--) {
-			this._gridClusters[zoom] = new L.DistanceGrid(radiusFunction(zoom));
-			this._gridUnclustered[zoom] = new L.DistanceGrid(radiusFunction(zoom));
+			this._gridClusters[zoom] = new L.DistanceGrid(radiusFn(zoom));
+			this._gridUnclustered[zoom] = new L.DistanceGrid(radiusFn(zoom));
 		}
 
 		this._topClusterLevel = new L.MarkerCluster(this, -1);
