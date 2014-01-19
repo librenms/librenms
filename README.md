@@ -9,6 +9,9 @@ For a Leaflet 0.5 compatible version, [Download b128e950](https://github.com/Lea
 For a Leaflet 0.4 compatible version, [Download the 0.2 release](https://github.com/Leaflet/Leaflet.markercluster/archive/0.2.zip)
 
 ## Using the plugin
+
+Install with Bower: `bower install leaflet.markercluster`
+
 See the included examples for usage.
 
 The [realworld example](http://leaflet.github.com/Leaflet.markercluster/example/marker-clustering-realworld.388.html) is a good place to start, it uses all of the defaults of the clusterer.
