@@ -32,11 +32,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		//Increase to increase the distance away that spiderfied markers appear from the center
 		spiderfyDistanceMultiplier: 1,
 
-		// When bulk adding layers, adds markers in chunks. Means addLayers may not add all the layers in the call, others will be loaded during setTimeouts
+		//When bulk adding layers, runs chunks at a time. Means addLayers may not add all the layers in the call, others will be loaded during setTimeouts
 		chunkedLoading: false,
-        chunkInterval: 200, // process markers for a maximum of ~ n milliseconds (then trigger the chunkProgress callback)
-        chunkDelay: 50, // at the end of each interval, give n milliseconds back to system/browser
-		chunkProgress: null, // progress callback: function(processed, total, elapsed) (e.g. for a progress indicator)
+		chunkSize: 500,
 
 		//Options to pass to the L.Polygon constructor
 		polygonOptions: {}
@@ -166,25 +164,15 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	addLayers: function (layersArray) {
 		var fg = this._featureGroup,
 			npg = this._nonPointGroup,
-			chunkInterval = this.options.chunkInterval,
-			chunkProgress = this.options.chunkProgress,
+			chunkSize = this.options.chunkSize,
 			newMarkers, i, l, m;
 
 		if (this._map) {
-			var offset = 0,
-				started = (new Date()).getTime();
+			var start = 0;
+			var end = this.options.chunkedLoading && chunkSize < layersArray.length ? chunkSize : layersArray.length;
 			var process = L.bind(function () {
-				var start = (new Date()).getTime();
-				for (; offset < layersArray.length; offset++) {
-					if (offset % 200 === 0) {
-						// every couple hundred markers, instrument the time elapsed since processing started:
-						var elapsed = (new Date()).getTime() - start;
-						if (elapsed > chunkInterval) {
-							break; // been working too hard, time to take a break :-)
-						}
-					}
-
-					m = layersArray[offset];
+				for (i = start; i < end; i++) {
+					m = layersArray[i];
 
 					//Not point data, can't be clustered
 					if (!m.getLatLng) {
@@ -208,12 +196,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 					}
 				}
 
-				if (chunkProgress) {
-					// report progress and time elapsed:
-					chunkProgress(offset, layersArray.length, (new Date()).getTime() - started);
-				}
-
-				if (offset === layersArray.length) {
+				if (end === layersArray.length) {
 					//Update the icons of all those visible clusters that were affected
 					this._featureGroup.eachLayer(function (c) {
 						if (c instanceof L.MarkerCluster && c._iconNeedsUpdate) {
@@ -223,7 +206,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 					this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
 				} else {
-					setTimeout(process, this.options.chunkDelay);
+					start = end;
+					end = Math.min(end + chunkSize, layersArray.length);
+					setTimeout(process, 0);
 				}
 			}, this);
 
