@@ -29,8 +29,8 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		// When bulk adding layers, adds markers in chunks. Means addLayers may not add all the layers in the call, others will be loaded during setTimeouts
 		chunkedLoading: false,
-        chunkInterval: 200, // process markers for a maximum of ~ n milliseconds (then trigger the chunkProgress callback)
-        chunkDelay: 50, // at the end of each interval, give n milliseconds back to system/browser
+		chunkInterval: 200, // process markers for a maximum of ~ n milliseconds (then trigger the chunkProgress callback)
+		chunkDelay: 50, // at the end of each interval, give n milliseconds back to system/browser
 		chunkProgress: null, // progress callback: function(processed, total, elapsed) (e.g. for a progress indicator)
 
 		//Options to pass to the L.Polygon constructor
@@ -340,7 +340,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Overrides LayerGroup.eachLayer
 	eachLayer: function (method, context) {
 		var markers = this._needsClustering.slice(),
-		    i;
+			i;
 
 		if (this._topClusterLevel) {
 			this._topClusterLevel.getAllChildMarkers(markers);
