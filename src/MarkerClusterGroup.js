@@ -26,6 +26,12 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		//Increase to increase the distance away that spiderfied markers appear from the center
 		spiderfyDistanceMultiplier: 1,
 
+		// When bulk adding layers, adds markers in chunks. Means addLayers may not add all the layers in the call, others will be loaded during setTimeouts
+		chunkedLoading: false,
+		chunkInterval: 200, // process markers for a maximum of ~ n milliseconds (then trigger the chunkProgress callback)
+		chunkDelay: 50, // at the end of each interval, give n milliseconds back to system/browser
+		chunkProgress: null, // progress callback: function(processed, total, elapsed) (e.g. for a progress indicator)
+
 		//Options to pass to the L.Polygon constructor
 		polygonOptions: {}
 	},
@@ -152,52 +158,89 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	//Takes an array of markers and adds them in bulk
 	addLayers: function (layersArray) {
-		var i, l, m,
-			onMap = this._map,
-			fg = this._featureGroup,
-			npg = this._nonPointGroup;
+		var fg = this._featureGroup,
+			npg = this._nonPointGroup,
+			chunkInterval = this.options.chunkInterval,
+			chunkProgress = this.options.chunkProgress,
+			newMarkers, i, l, m;
 
-		for (i = 0, l = layersArray.length; i < l; i++) {
-			m = layersArray[i];
+		if (this._map) {
+			var offset = 0,
+				started = (new Date()).getTime();
+			var process = L.bind(function () {
+				var start = (new Date()).getTime();
+				for (; offset < layersArray.length; offset++) {
+					if (offset % 200 === 0) {
+						// every couple hundred markers, instrument the time elapsed since processing started:
+						var elapsed = (new Date()).getTime() - start;
+						if (elapsed > chunkInterval) {
+							break; // been working too hard, time to take a break :-)
+						}
+					}
 
-			//Not point data, can't be clustered
-			if (!m.getLatLng) {
-				npg.addLayer(m);
-				continue;
-			}
+					m = layersArray[offset];
 
-			if (this.hasLayer(m)) {
-				continue;
-			}
+					//Not point data, can't be clustered
+					if (!m.getLatLng) {
+						npg.addLayer(m);
+						continue;
+					}
 
-			if (!onMap) {
-				this._needsClustering.push(m);
-				continue;
-			}
+					if (this.hasLayer(m)) {
+						continue;
+					}
 
-			this._addLayer(m, this._maxZoom);
+					this._addLayer(m, this._maxZoom);
 
-			//If we just made a cluster of size 2 then we need to remove the other marker from the map (if it is) or we never will
-			if (m.__parent) {
-				if (m.__parent.getChildCount() === 2) {
-					var markers = m.__parent.getAllChildMarkers(),
-						otherMarker = markers[0] === m ? markers[1] : markers[0];
-					fg.removeLayer(otherMarker);
+					//If we just made a cluster of size 2 then we need to remove the other marker from the map (if it is) or we never will
+					if (m.__parent) {
+						if (m.__parent.getChildCount() === 2) {
+							var markers = m.__parent.getAllChildMarkers(),
+								otherMarker = markers[0] === m ? markers[1] : markers[0];
+							fg.removeLayer(otherMarker);
+						}
+					}
 				}
-			}
-		}
 
-		if (onMap) {
-			//Update the icons of all those visible clusters that were affected
-			fg.eachLayer(function (c) {
-				if (c instanceof L.MarkerCluster && c._iconNeedsUpdate) {
-					c._updateIcon();
+				if (chunkProgress) {
+					// report progress and time elapsed:
+					chunkProgress(offset, layersArray.length, (new Date()).getTime() - started);
 				}
-			});
 
-			this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+				if (offset === layersArray.length) {
+					//Update the icons of all those visible clusters that were affected
+					this._featureGroup.eachLayer(function (c) {
+						if (c instanceof L.MarkerCluster && c._iconNeedsUpdate) {
+							c._updateIcon();
+						}
+					});
+
+					this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+				} else {
+					setTimeout(process, this.options.chunkDelay);
+				}
+			}, this);
+
+			process();
+		} else {
+			newMarkers = [];
+			for (i = 0, l = layersArray.length; i < l; i++) {
+				m = layersArray[i];
+
+				//Not point data, can't be clustered
+				if (!m.getLatLng) {
+					npg.addLayer(m);
+					continue;
+				}
+
+				if (this.hasLayer(m)) {
+					continue;
+				}
+
+				newMarkers.push(m);
+			}
+			this._needsClustering = this._needsClustering.concat(newMarkers);
 		}
-
 		return this;
 	},
 
@@ -296,7 +339,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Overrides LayerGroup.eachLayer
 	eachLayer: function (method, context) {
 		var markers = this._needsClustering.slice(),
-		    i;
+			i;
 
 		if (this._topClusterLevel) {
 			this._topClusterLevel.getAllChildMarkers(markers);
@@ -413,23 +456,9 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 		this._needsRemoving = [];
 
-		for (i = 0, l = this._needsClustering.length; i < l; i++) {
-			layer = this._needsClustering[i];
-
-			//If the layer doesn't have a getLatLng then we can't cluster it, so add it to our child featureGroup
-			if (!layer.getLatLng) {
-				this._featureGroup.addLayer(layer);
-				continue;
-			}
-
-
-			if (layer.__parent) {
-				continue;
-			}
-			this._addLayer(layer, this._maxZoom);
-		}
-		this._needsClustering = [];
-
+		//Remember the current zoom level and bounds
+		this._zoom = this._map.getZoom();
+		this._currentShownBounds = this._getExpandedVisibleBounds();
 
 		this._map.on('zoomend', this._zoomEnd, this);
 		this._map.on('moveend', this._moveEnd, this);
@@ -440,15 +469,10 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		this._bindEvents();
 
-
 		//Actually add our markers to the map:
-
-		//Remember the current zoom level and bounds
-		this._zoom = this._map.getZoom();
-		this._currentShownBounds = this._getExpandedVisibleBounds();
-
-		//Make things appear on the map
-		this._topClusterLevel._recursivelyAddChildrenToMap(null, this._zoom, this._currentShownBounds);
+		l = this._needsClustering;
+		this._needsClustering = [];
+		this.addLayers(l);
 	},
 
 	//Overrides FeatureGroup.onRemove
@@ -626,7 +650,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			e.layer.zoomToBounds();
 		}
 
-    // Focus the map again for keyboard users.
+		// Focus the map again for keyboard users.
 		if (e.originalEvent && e.originalEvent.keyCode === 13) {
 			map._container.focus();
 		}
