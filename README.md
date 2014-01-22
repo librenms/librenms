@@ -35,7 +35,6 @@ exception):
   - MIBS (mibs): unknown/various
   - html/graph-realtime.php: BSD (original?)
   - html/includes/collectd/: GPLv2 only
-  - html/includes/tcpdf/fonts/dejavu-fonts-ttf-2.33: some sort of BSD?
   - overLIB (html/js/overlib_mini.js): modified Artistic 1.0?
   - scripts/*/mysql: GPLv2 only
   - check_mk (scripts/observium_agent*): GPLv2
