@@ -3,9 +3,9 @@
 * Jquery Mapael - Dynamic maps jQuery plugin (based on raphael.js)
 * Requires jQuery and raphael.js
 *
-* Version: 0.7.0 (17-11-2013)
+* Version: 0.7.1 (23-01-2014)
 *
-* Copyright (c) 2013 Vincent Brouté (http://www.neveldo.fr/mapael)
+* Copyright (c) 2014 Vincent Brouté (http://www.neveldo.fr/mapael)
 * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php).
 *
 */
@@ -219,7 +219,7 @@
 		var bbox = {}, textPosition = {};
 		$.fn.mapael.setHoverOptions(elem.mapElem, options.attrs, options.attrsHover);
 		
-		if (options.text && typeof options.text.content !='undefined') {
+		if (options.text && typeof options.text.content != 'undefined') {
 			// Set a text label in the area
 			bbox = elem.mapElem.getBBox();
 			textPosition = $.fn.mapael.getTextPosition(bbox, options.text.position, options.text.margin);
