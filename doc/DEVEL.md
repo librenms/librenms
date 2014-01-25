@@ -2,7 +2,7 @@
 
 Developing for LibreNMS has never been easier.
 
-Thanks to [Wes Kennedy](https://twitter.com/liveanarchist), there is
+Thanks to [Wes Kennedy](https://twitter.com/livearchivist), there is
 now a vagrant file that will allow you to install a virtual machine
 that has LibreNMS already running on it!
 
