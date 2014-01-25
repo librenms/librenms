@@ -101,6 +101,11 @@ Installation
 
 See `doc/INSTALL.md` for details.
 
+Developing
+----------
+
+See `doc/DEVEL.md` for details.
+
 
 Contributing
 ------------
