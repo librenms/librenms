@@ -24,21 +24,21 @@ if ($_SESSION['userlevel'] < '5')
 
   echo("
 <h4>Delete Service</h4>
-<form id='addsrv' name='addsrv' method='post' action=''>
+<form id='addsrv' name='addsrv' method='post' action='' class='form-horizontal' role='form'>
   <input type=hidden name='delsrv' value='yes'>
-  <table width='300' border='0'>
-    <tr>
-      <td>
-        Device
-      </td>
-      <td>
-        <select name='service'>
+  <div class='well well-lg'>
+    <div class='form-group'>
+      <label for='service' class='col-sm-2 control-label'>Device - Service</label>
+      <div class='col-sm-5'>
+        <select name='service' id='service' class='form-control input-sm'>
           $servicesform
         </select>
-      </td>
-    </tr>
-  </table>
-<input type='submit' name='Submit' value='Delete' />
+      </div>
+      <div class='col-sm-5'>
+      </div>
+    </div>
+    <button type='submit' name='Submit' class='btn btn-default input-sm'>Delete</button>
+  </div>
 </form>");
 
 }

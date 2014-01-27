@@ -33,7 +33,7 @@ if($_SESSION['userlevel'] >= 5)
   $ports['errored']     = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D WHERE I.deleted = '0' AND D.device_id = I.device_id AND (I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')");
 
   $services['count']    = dbFetchCell("SELECT COUNT(service_id) FROM services");
-  $services['up']       = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '1' AND service_ignore ='0'");
+  $services['up']       = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '1' AND service_ignore ='0' AND service_disabled='0'");
   $services['down']     = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '0' AND service_ignore = '0'");
   $services['ignored']  = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_ignore = '1'");
   $services['disabled'] = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_disabled = '1'");
@@ -49,7 +49,7 @@ else
   $ports['up']       = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D, devices_perms AS P WHERE I.deleted = '0' AND P.user_id = ? AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifOperStatus = 'up'", array($_SESSION['user_id']));
   $ports['down']     = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D, devices_perms AS P WHERE I.deleted = '0' AND P.user_id = ? AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up'", array($_SESSION['user_id']));
   $ports['disabled'] = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D, devices_perms AS P WHERE I.deleted = '0' AND P.user_id = ? AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifAdminStatus = 'down'", array($_SESSION['user_id']));
-  $ports['errored']  = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D, devices_perms AS P WHERE I.deleted = '0' AND P.user_id = ? AND P.device_id = D.device_id AND I.device_id = D.device_id AND (I.in_errors > '0' OR I.out_errors > '0')", array($_SESSION['user_id']));
+  $ports['errolabel label-danger']  = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D, devices_perms AS P WHERE I.deleted = '0' AND P.user_id = ? AND P.device_id = D.device_id AND I.device_id = D.device_id AND (I.in_errors > '0' OR I.out_errors > '0')", array($_SESSION['user_id']));
 
   $services['count']      = dbFetchCell("SELECT COUNT(service_id) FROM services AS S, devices AS D, devices_perms AS P WHERE P.user_id = ? AND P.device_id = D.device_id AND S.device_id = D.device_id", array($_SESSION['user_id']));
   $services['up']         = dbFetchCell("SELECT COUNT(service_id) FROM services AS S, devices AS D, devices_perms AS P WHERE P.user_id = ? AND P.device_id = D.device_id AND S.device_id = D.device_id AND service_status = '1' AND service_ignore ='0'", array($_SESSION['user_id']));
@@ -62,44 +62,52 @@ if ($ports['down'])    { $ports['bgcolour'] = "#ffcccc"; } else { $ports['bgcolo
 if ($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['bgcolour'] = "transparent"; }
 
 ?>
-
-<table cellpadding="0" cellspacing="0" border="0" width=500>
-  <tr style="background-color: <?php echo($devices[bgcolour]); ?>">
-    <td width="5"></td>
-    <td><strong>Devices</strong></td>
-    <td><?php echo($devices['count']) ?></td>
-    <td> ( </td>
-    <td style="text-align: right"><span class="green"> <?php echo($devices['up']) ?> up</span></td>
-    <td style="text-align: right"><span class="red"> <?php echo($devices['down']) ?> down</span></td>
-    <td style="text-align: right"><span class="black"> <?php echo($devices['ignored']) ?> ignored</span> </td>
-    <td style="text-align: right"><span class="grey"> <?php echo($devices['disabled']) ?> disabled</span></td>
-    <td> ) </td>
-    <td width="5"></td>
-  </tr>
-  <tr style="background-color: <?php echo($ports['bgcolour']) ?>">
-      <td width="5"></td>
-      <td><strong>Ports</strong></td>
-    <td><?php echo($ports['count']) ?></td>
-    <td> ( </td>
-    <td style="text-align: right"><span class="green"> <?php echo($ports['up']) ?> up </span></td>
-    <td style="text-align: right"><span class="red"> <?php echo($ports['down']) ?> down </span></td>
-    <td style="text-align: right"><span class="black"> <?php echo($ports['ignored']) ?> ignored </span></td>
-    <td style="text-align: right"><span class="grey"> <?php echo($ports['shutdown']) ?> shutdown</span></td>
-    <td> ) </td>
-    <td width="5"></td>
-  </tr>
+            <div class="container pull-right">
+              <div class="row">
+                <div class="col-md-6">
+<table class="table table-condensed table-striped">
+  <thead>
+    <tr>
+      <th>&nbsp;</th>
+      <th>Total</th>
+      <th>Up</th>
+      <th>Down</th>
+      <th>Ignored</th>
+      <th>Disabled</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="devices/">Devices</a></td>
+      <td><a href="devices/"><span><?php echo($devices['count']) ?></span></a></td>
+      <td><a href="devices/state=up/format=list_detail/"><span class="green"> <?php echo($devices['up']) ?> up</span></a></td>
+      <td><a href="devices/state=down/format=list_detail/"><span class="red"> <?php echo($devices['down']) ?> down</span></a></td>
+      <td><a href="devices/ignore=1/format=list_detail/"><span class="grey"> <?php echo($devices['ignored']) ?> ignored </span></a></td>
+      <td><a href="devices/disabled=1/format=list_detail/"><span class="black"> <?php echo($devices['disabled']) ?> disabled</span></a></td>
+    </tr>
+    <tr class="danger">
+      <td><a href="ports/">Ports</a></td>
+      <td><a href="ports/"><span><?php echo($ports['count']) ?></span></a></td>
+      <td><a href="ports/format=list_detail/state=up/"><span class="green"> <?php echo($ports['up']) ?> up </span></a></td>
+      <td><a href="ports/format=list_detail/state=down/"><span class="red"> <?php echo($ports['down']) ?> down </span></a></td>
+      <td><a href="ports/format=list_detail/ignore=1/"><span class="grey"> <?php echo($ports['ignored']) ?> ignored </span></a></td>
+      <td><a href="ports/format=list_detail/state=admindown/"><span class="black"> <?php echo($ports['shutdown']) ?> shutdown</span></a></td>
+    </tr>
 <?php if ($config['show_services']) { ?>
-  <tr style="background-color: <?php echo($services['bgcolour']) ?>">
-    <td width="5"></td>
-    <td><strong>Services</strong></td>
-    <td><?php echo($services['count']) ?></td>
-    <td> ( </td>
-    <td style="text-align: right"><span class="green"><?php echo($services['up']) ?> up</span></td>
-    <td style="text-align: right"><span class="red"> <?php echo($services['down']) ?> down</span></td>
-    <td style="text-align: right"><span class="black"> <?php echo($services['ignored']) ?> ignored</span> </td>
-    <td style="text-align: right"><span class="grey"> <?php echo($services['disabled']) ?> disabled</span></td>
-    <td> ) </td>
-    <td width="5"></td>
-  </tr>
+    <tr>
+      <td><a href="services/">Services</a></td>
+      <td><a href="services/"><span><?php echo($services['count']) ?></span></a></td>
+      <td><a href="services/state=up/view=details/"><span class="green"><?php echo($services['up']) ?> up</span></a></td>
+      <td><a href="services/state=down/view=details/"><span class="red"> <?php echo($services['down']) ?> down</span></a></td>
+      <td><a href="services/ignore=1/view=details/"><span class="grey"> <?php echo($services['ignored']) ?> ignored</span></a></td>
+      <td><a href="services/disabled=1/view=details/"><span class="black"> <?php echo($services['disabled']) ?> disabled</span></a></td>
+    </tr>
 <?php } ?>
+  </tbody>
 </table>
+              </div>
+              <div class="col-md-6">
+                &nbsp;
+              </div>
+            </div>
+        </div>

@@ -9,6 +9,25 @@ echo("<span style='font-weight: bold;'>Services</span> &#187; ");
 $menu_options = array('basic' => 'Basic',
                       'details' => 'Details');
 
+$sql_param = array();
+if(isset($vars['state']))
+{
+  if($vars['state'] == 'up')
+  {
+    $state = '1';
+  }
+    elseif($vars['state'] == 'down')
+  {
+    $state = '0';
+  }
+}
+
+if ($vars['state'])    {
+  $where .= " AND service_status= ?";       $sql_param[] = $state;
+  $where .= " AND service_disabled='0' AND `service_ignore`='0'"; $sql_param[] = '';
+}
+if ($vars['disabled']) { $where .= " AND service_disabled= ?";     $sql_param[] = $vars['disabled']; }
+if ($vars['ignore'])   { $where .= " AND `service_ignore`= ?";       $sql_param[] = $vars['ignore']; }
 if (!$vars['view']) { $vars['view'] = "basic"; }
 
 $sep = "";
@@ -26,9 +45,7 @@ unset($sep);
 
 print_optionbar_end();
 
-if ($_GET['status'] == '0') { $where = " AND service_status = '0'"; } else { unset ($where); }
-
-echo("<div style='margin: 5px;'><table cellpadding=7 border=0 cellspacing=0 width=100%>");
+echo('<table class="table table-condensed">');
 //echo("<tr class=interface-desc bgcolor='#e5e5e5'><td>Device</td><td>Service</td><td>Status</td><td>Changed</td><td>Checked</td><td>Message</td></tr>");
 
 if ($_SESSION['userlevel'] >= '5')
@@ -43,7 +60,8 @@ if ($_SESSION['userlevel'] >= '5')
   {
     $device_id = $device['device_id'];
     $device_hostname = $device['hostname'];
-    foreach (dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ?", array($device['device_id'])) as $service)
+    array_unshift($sql_param,$device_id);
+    foreach (dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where", $sql_param) as $service)
     {
        include("includes/print-service.inc.php");
 
@@ -72,6 +90,6 @@ if ($_SESSION['userlevel'] >= '5')
     unset ($samehost);
   }
 
-  echo("</table></div>");
+  echo("</table>");
 
 ?>

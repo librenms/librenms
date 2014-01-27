@@ -29,50 +29,78 @@ if ($bill_data['bill_type'] == "cdr") {
 
 ?>
 
-<form id="edit" name="edit" method="post" action="" class="form-horizontal">
+<form id="edit" name="edit" method="post" action="" class="form-horizontal" role="form">
   <input type=hidden name="action" value="update_bill">
-  <link rel="stylesheet" href="<?php echo $config["base_url"]; ?>/css/bootstrap.min.css">
   <script type="text/javascript">
     function billType() {
       $('#cdrDiv').toggle();
       $('#quotaDiv').toggle();
     }
   </script>
-  <fieldset>
-    <legend>Bill Properties</legend>
-    <div class="control-group">
-      <label class="control-label" for="bill_name"><strong>Description</strong></label>
-      <div class="controls">
-        <input class="span4" name="bill_name" value="<?php echo $bill_data["bill_name"]; ?>" />
+  <h3>Bill Properties</h3>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="bill_name"><strong>Description</strong></label>
+    <div class="col-sm-4">
+      <input class="form-control input-sm" name="bill_name" value="<?php echo $bill_data["bill_name"]; ?>" />
+    </div>
+    <div class="col-sm-6">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="bill_type"><strong>Billing Type</strong></label>
+    <div class="col-sm-10">
+      <div class="radio">
+        <label>
+          <input type="radio" name="bill_type" value="cdr" onchange="javascript: billType();" <?php if ($bill_data['bill_type'] == "cdr") { echo('checked '); } ?>/> CDR 95th
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" name="bill_type" value="quota" onchange="javascript: billType();" <?php if ($bill_data['bill_type'] == "quota") { echo('checked '); } ?>/> Quota
+        </label>
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label" for="bill_type"><strong>Billing Type</strong></label>
-      <div class="controls">
-        <input type="radio" name="bill_type" value="cdr" onchange="javascript: billType();" <?php if ($bill_data['bill_type'] == "cdr") { echo('checked '); } ?>/> CDR 95th
-        <input type="radio" name="bill_type" value="quota" onchange="javascript: billType();" <?php if ($bill_data['bill_type'] == "quota") { echo('checked '); } ?>/> Quota
-        <div id="cdrDiv"<?php if ($bill_data['bill_type'] == "quota") { echo(' style="display: none"'); } ?>>
-          <input class="span1" type="text" name="bill_cdr" value="<?php echo $cdr['data']; ?>">
-          <select name="bill_cdr_type" style="width: 233px;">
-            <option value="Kbps"<?php echo $cdr['select_kbps']; ?>>Kilobits per second (Kbps)</option>
-            <option value="Mbps"<?php echo $cdr['select_mbps']; ?>>Megabits per second (Mbps)</option>
-            <option value="Gbps"<?php echo $cdr['select_gbps']; ?>>Gigabits per second (Gbps)</option>
-          </select>
-        </div>
-        <div id="quotaDiv"<?php if ($bill_data['bill_type'] == "cdr") { echo(' style="display: none"'); } ?>>
-          <input class="span1" type="text" name="bill_quota" value="<?php echo $quota['data']; ?>">
-          <select name="bill_quota_type" style="width: 233px;">
-            <option value="MB"<?php echo $quota['select_mb']; ?>>Megabytes (MB)</option>
-            <option value="GB"<?php echo $quota['select_gb']; ?>>Gigabytes (GB)</option>
-            <option value="TB"<?php echo $quota['select_tb']; ?>>Terabytes (TB)</option>
-          </select>
-        </div>
+  </div>
+  <div id="cdrDiv"<?php if ($bill_data['bill_type'] == "quota") { echo(' style="display: none"'); } ?>>
+    <div class="form-group">
+      <div class="col-sm-2">
+      </div>
+      <div class="col-sm-2">
+        <input class="form-control input-sm" type="text" name="bill_cdr" value="<?php echo $cdr['data']; ?>">
+      </div>
+      <div class="col-sm-3">
+        <select name="bill_cdr_type" class="form-control input-sm">
+          <option value="Kbps"<?php echo $cdr['select_kbps']; ?>>Kilobits per second (Kbps)</option>
+          <option value="Mbps"<?php echo $cdr['select_mbps']; ?>>Megabits per second (Mbps)</option>
+          <option value="Gbps"<?php echo $cdr['select_gbps']; ?>>Gigabits per second (Gbps)</option>
+        </select>
+      </div>
+      <div class="col-sm-5">
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label" for="bill_day"><strong>Billing Day</strong></label>
-      <div class="controls">
-        <select name="bill_day" style="width: 60px;">
+  </div>
+  <div id="quotaDiv"<?php if ($bill_data['bill_type'] == "cdr") { echo(' style="display: none"'); } ?>>
+    <div class="form-group">
+      <div class="col-sm-2">
+      </div>
+      <div class="col-sm-2">
+        <input class="form-control input-sm" type="text" name="bill_quota" value="<?php echo $quota['data']; ?>">
+      </div>
+      <div class="col-sm-2">
+        <select name="bill_quota_type" class="form-control input-sm">
+          <option value="MB"<?php echo $quota['select_mb']; ?>>Megabytes (MB)</option>
+          <option value="GB"<?php echo $quota['select_gb']; ?>>Gigabytes (GB)</option>
+          <option value="TB"<?php echo $quota['select_tb']; ?>>Terabytes (TB)</option>
+        </select>
+      </div>
+      <div class="col-sm-6">
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="bill_day"><strong>Billing Day</strong></label>
+    <div class="col-sm-2">
+      <select name="bill_day" class="form-control input">
 <?php
 
 for ($x=1;$x<32;$x++) {
@@ -81,40 +109,38 @@ for ($x=1;$x<32;$x++) {
 }
 
 ?>
-        </select>
-      </div>
+      </select>
     </div>
-  </fieldset>
-  <fieldset>
-    <legend>Optional Information</legend>
-    <div class="control-group">
-      <label class="control-label" for="bill_custid"><strong>Customer&nbsp;Reference</strong></label>
-      <div class="controls">
-        <input class="span4" type="text" name="bill_custid" value="<?php echo $bill_data['bill_custid']; ?>" />
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="bill_ref"><strong>Billing Reference</strong></label>
-      <div class="controls">
-        <input class="span4" type="text" name="bill_ref" value="<?php echo $bill_data['bill_ref']; ?>" />
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="bill_notes"><strong>Notes</strong></label>
-      <div class="controls">
-        <input class="span4" type="textarea" name="bill_notes" value="<?php echo $bill_data['bill_notes']; ?>" />
-      </div>
-    </div>
-  </fieldset>
-  <div class="form-actions">
-    <button type="submit" class="btn btn-success" name="Submit" value="Save" /><i class="icon-ok icon-white"></i> <strong>Save Properties</strong></button>
   </div>
+  <h3>Optional Information</h3>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="bill_custid"><strong>Customer&nbsp;Reference</strong></label>
+    <div class="col-sm-4">
+      <input class="form-control input-sm" type="text" name="bill_custid" value="<?php echo $bill_data['bill_custid']; ?>" />
+    </div>
+    <div class="col-sm-6">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="bill_ref"><strong>Billing Reference</strong></label>
+    <div class="col-sm-4">
+      <input class="form-control input-sm" type="text" name="bill_ref" value="<?php echo $bill_data['bill_ref']; ?>" />
+    </div>
+    <div class="col-sm-6">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="bill_notes"><strong>Notes</strong></label>
+    <div class="col-sm-4">
+      <textarea rows="3" class="form-control input-sm" name="bill_notes" value="<?php echo $bill_data['bill_notes']; ?>"></textarea>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-success" name="Submit" value="Save" /><i class="icon-ok icon-white"></i> <strong>Save Properties</strong></button>
 </form>
 
-<form class="form-horizontal">
-  <fieldset>
-    <legend>Billed Ports</legend>
-    <div class="control-group">
+<form class="form-horizontal" role="form">
+  <h3>Billed Ports</h3>
+  <div class="form-group">
 <?php
 
 $ports = dbFetchRows("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
@@ -136,8 +162,8 @@ if (is_array($ports))
     $portbtn = str_replace("overlib('", "overlib('<div style=\'border: 5px solid #e5e5e5; background: #fff; padding: 10px;\'>", $portbtn);
     $portbtn = str_replace("<div>',;", "</div></div>',", $portbtn);
     $portalias = (empty($port['ifAlias']) ? "" : " - ".$port['ifAlias']."");
-    $devicebtn = str_replace("\">".$port['hostname'], "\" style=\"color: #000;\"><i class=\"icon-asterisk\"></i> ".$port['hostname'], $devicebtn);
-    $portbtn = str_replace("\">".strtolower($port['ifName']), "\" style=\"color: #000;\"><i class=\"icon-random\"></i> ".$port['ifName']."".$portalias, $portbtn);
+    $devicebtn = str_replace("\">".$port['hostname'], "\" style=\"color: #000;\"><i class=\"glyphicon glyphicon-asterisk\"></i> ".$port['hostname'], $devicebtn);
+    $portbtn = str_replace("\">".strtolower($port['ifName']), "\" style=\"color: #000;\"><i class=\"glyphicon glyphicon-random\"></i> ".$port['ifName']."".$portalias, $portbtn);
     echo("      <form action=\"\" method=\"post\" name=\"delete".$port['port_id']."\" style=\"display: none;\">\n");
     echo("        <input type=\"hidden\" name=\"action\" value=\"delete_bill_port\" />\n");
     echo("        <input type=\"hidden\" name=\"port_id\" value=\"".$port['port_id']."\" />\n");
@@ -164,16 +190,15 @@ if (is_array($ports))
     </div>
   </fieldset>
 </form>
-<form action="" method="post" class="form-horizontal">
+<form action="" method="post" class="form-horizontal" role="form">
   <input type="hidden" name="action" value="add_bill_port" />
   <input type="hidden" name="bill_id" value="<?php echo $bill_id; ?>" />
-  <fieldset>
-    <legend>Add Port</legend>
-    <div class="control-group">
-      <label class="control-label" for="device"><strong>Device</strong></label>
-      <div class="controls">
-        <select style="width: 300px;" id="device" name="device" onchange="getInterfaceList(this)">
-          <option value=''>Select a device</option>
+  <h3>Add Port</h3>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="device"><strong>Device</strong></label>
+    <div class="col-sm-4">
+      <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)">
+        <option value=''>Select a device</option>
 <?php
 
 $devices = dbFetchRows("SELECT * FROM `devices` ORDER BY hostname");
@@ -185,17 +210,18 @@ foreach ($devices as $device)
 }
 
 ?>
-        </select>
-      </div>
+      </select>
     </div>
-    <div class="control-group">
-      <label class="control-label" for="port_id"><strong>Interface</strong></label>
-      <div class="controls">
-        <select style="width: 300px;" id="port_id" name="port_id"></select>
-      </div>
+    <div class="col-sm-6">
     </div>
-  </fieldset>
-  <div class="form-actions">
-    <button type="submit" class="btn btn-primary" name="Submit" value=" Add " /><i class="icon-plus-sign icon-white"></i> <strong>Add Interface</strong></button>
   </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="port_id"><strong>Interface</strong></label>
+    <div class="col-sm-4">
+      <select class="form-control input-sm" id="port_id" name="port_id"></select>
+    </div>
+    <div class="col-sm-6">
+    <div>
+  </div>
+  <button type="submit" class="btn btn-primary" name="Submit" value=" Add " /><i class="icon-plus-sign icon-white"></i> <strong>Add Interface</strong></button>
 </form>
