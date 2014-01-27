@@ -3,18 +3,17 @@
   $pagetitle[] = "Previous Billing Period";
   $i=0;
 
-  echo('<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>
-           <tr style="font-weight: bold;">
-             <td width="7"></td>
-             <td width="250">Billing name</td>
-             <td>Type</td>
-             <td>Allowed</td>
-             <td>Inbound</td>
-             <td>Outbound</td>
-             <td>Total</td>
-             <td>95 percentile</td>
-             <td style="text-align: center;">Overusage</td>
-             <td width="250"></td>
+  echo('<table class="table table-condensed">
+           <tr>
+             <th>Billing name</th>
+             <th>Type</th>
+             <th>Allowed</th>
+             <th>Inbound</th>
+             <th>Outbound</th>
+             <th>Total</th>
+             <th>95 percentile</th>
+             <th>Overusage</th>
+             <th></th>
            </tr>');
 
   foreach (dbFetchRows("SELECT * FROM `bills` ORDER BY `bill_name`") as $bill)
@@ -56,7 +55,6 @@
 
         echo("
                <tr style=\"background: $row_colour;\">
-                 <td></td>
                  <td><a href=\"".generate_url(array('page' => "bill", 'bill_id' => $bill['bill_id']))."/\"><span style=\"font-weight: bold;\" class=\"interface\">".$bill['bill_name']."</a></span><br />from ".strftime("%x", strtotime($datefrom))." to ".strftime("%x", strtotime($dateto))."</td>
                  <td>$type</td>
                  <td>$allowed</td>
