@@ -898,10 +898,16 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
 		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel);
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel, this._getExpandedVisibleBounds());
+
+		//We didn't actually animate, but we use this event to mean "clustering animations have finished"
+		this.fire('animationend');
 	},
 	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
 		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel);
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel, this._getExpandedVisibleBounds());
+
+		//We didn't actually animate, but we use this event to mean "clustering animations have finished"
+		this.fire('animationend');
 	},
 	_animationAddLayer: function (layer, newCluster) {
 		this._animationAddLayerNonAnimated(layer, newCluster);
