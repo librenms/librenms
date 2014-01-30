@@ -160,6 +160,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	addLayers: function (layersArray) {
 		var fg = this._featureGroup,
 			npg = this._nonPointGroup,
+			chunked = this.options.chunkedLoading,
 			chunkInterval = this.options.chunkInterval,
 			chunkProgress = this.options.chunkProgress,
 			newMarkers, i, l, m;
@@ -170,7 +171,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			var process = L.bind(function () {
 				var start = (new Date()).getTime();
 				for (; offset < layersArray.length; offset++) {
-					if (offset % 200 === 0) {
+					if (chunked && offset % 200 === 0) {
 						// every couple hundred markers, instrument the time elapsed since processing started:
 						var elapsed = (new Date()).getTime() - start;
 						if (elapsed > chunkInterval) {
