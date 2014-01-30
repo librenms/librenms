@@ -165,6 +165,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	addLayers: function (layersArray) {
 		var fg = this._featureGroup,
 			npg = this._nonPointGroup,
+			chunked = this.options.chunkedLoading,
 			chunkInterval = this.options.chunkInterval,
 			chunkProgress = this.options.chunkProgress,
 			newMarkers, i, l, m;
@@ -175,7 +176,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 			var process = L.bind(function () {
 				var start = (new Date()).getTime();
 				for (; offset < layersArray.length; offset++) {
-					if (offset % 200 === 0) {
+					if (chunked && offset % 200 === 0) {
 						// every couple hundred markers, instrument the time elapsed since processing started:
 						var elapsed = (new Date()).getTime() - start;
 						if (elapsed > chunkInterval) {
@@ -903,10 +904,16 @@ L.MarkerClusterGroup.include(!L.DomUtil.TRANSITION ? {
 	_animationZoomIn: function (previousZoomLevel, newZoomLevel) {
 		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel);
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel, this._getExpandedVisibleBounds());
+
+		//We didn't actually animate, but we use this event to mean "clustering animations have finished"
+		this.fire('animationend');
 	},
 	_animationZoomOut: function (previousZoomLevel, newZoomLevel) {
 		this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds, previousZoomLevel);
 		this._topClusterLevel._recursivelyAddChildrenToMap(null, newZoomLevel, this._getExpandedVisibleBounds());
+
+		//We didn't actually animate, but we use this event to mean "clustering animations have finished"
+		this.fire('animationend');
 	},
 	_animationAddLayer: function (layer, newCluster) {
 		this._animationAddLayerNonAnimated(layer, newCluster);
