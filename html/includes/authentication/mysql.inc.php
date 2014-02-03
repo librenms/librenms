@@ -36,6 +36,22 @@ function authenticate($username,$password)
   return 0;
 }
 
+function reauthenticate($sess_id,$token)
+{
+  list($uname,$hash) = explode("|",$token);
+  $session = dbFetchRow("SELECT * FROM `session` WHERE `session_username` = '$uname' AND session_value='$sess_id'");
+  $hasher = new PasswordHash(8, FALSE);
+  if($hasher->CheckPassword($uname.$session['session_token'],$hash))
+  {
+    $_SESSION['username'] = $uname;
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
 function passwordscanchange($username = "")
 {
   /*
