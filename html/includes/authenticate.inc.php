@@ -1,6 +1,7 @@
 <?php
 
 @ini_set("session.gc_maxlifetime","0");
+require('includes/PasswordHash.php');
 
 session_start();
 
