@@ -15,7 +15,7 @@
 
 echo('
 <div class="cycle-slideshow"
-    data-cycle-fx="scrollVert"
+    data-cycle-fx="fade"
     data-cycle-timeout="10000"
     data-cycle-slides="> div">
 ');
