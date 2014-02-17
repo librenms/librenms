@@ -29,7 +29,9 @@
 				, plots = {}
 				, areaLegend = {}
 				, plotLegend = {}
-				, id = 0;
+				, id = 0
+				, zoomCenter = {}
+				, zoomOptions = [];
 			
 			options.map.tooltip.css && $tooltip.css(options.map.tooltip.css);
 			paper.setViewBox(0, 0, mapConf.width, mapConf.height, false);
@@ -59,14 +61,47 @@
 				plots[id] = $.fn.mapael.drawPlot(id, options, mapConf, paper, $tooltip);
 			}
 			
+			$self.on("zoom", function(e, level, x, y) {
+				var currentLevel = Math.min(Math.max(level, 0), options.map.zoom.maxLevel);
+				$self.data("zoomLevel", currentLevel);
+				
+				(typeof x == "undefined") && (x = (paper._viewBox[0] + paper._viewBox[2] / 2));
+				(typeof y == "undefined") && (y = (paper._viewBox[1] + paper._viewBox[3] / 2));
+				
+				// Update zoom level of the map
+				if (currentLevel == 0) {
+					paper.setViewBox(0, 0, mapConf.width, mapConf.height);
+				} else {
+					paper.setViewBox(
+						Math.min(Math.max(0, x - (mapConf.width / (1 + currentLevel * options.map.zoom.step))/2), (mapConf.width - (mapConf.width / (1 + currentLevel * options.map.zoom.step)))), 
+						Math.min(Math.max(0, y - (mapConf.height / (1 + currentLevel * options.map.zoom.step))/2), (mapConf.height - (mapConf.height / (1 + currentLevel * options.map.zoom.step)))), 
+						mapConf.width / (1 + currentLevel * options.map.zoom.step), 
+						mapConf.height / (1 + currentLevel * options.map.zoom.step)
+					);
+				}
+			});
+			
 			// Enable zoom
 			if (options.map.zoom.enabled)
 				$.fn.mapael.initZoom($container, paper, mapConf.width, mapConf.height, options.map.zoom);
 				
+			// Set initial zoom
+			if (typeof options.map.zoom.init != 'undefined') {
+				if (options.map.zoom.init.latitude && options.map.zoom.init.longitude) {
+					zoomCenter = mapConf.getCoords(options.map.zoom.init.latitude, options.map.zoom.init.longitude);
+					zoomOptions = [options.map.zoom.init.level, zoomCenter.x, zoomCenter.y];
+				} else if (typeof options.map.zoom.init.x != 'undefined' && typeof options.map.zoom.init.y != 'undefined') {
+					zoomOptions = [options.map.zoom.init.level, options.map.zoom.init.x, options.map.zoom.init.y];
+				} else {
+					zoomOptions = [options.map.zoom.init.level];
+				}
+				$self.trigger("zoom", zoomOptions);
+			}
+				
 			// Create the legends for areas
 			if (options.legend.area.slices && options.legend.area.display)
 				areaLegend = $.fn.mapael.createLegend($self, options, 'area', areas, 1);
-                
+				
 			/**
 			* 
 			* Update the current map
@@ -374,7 +409,7 @@
 	*/
 	$.fn.mapael.setTooltip = function(elem, $tooltip) {
 		var tooltipTO = 0
-        	, $container = $tooltip.parent()
+			, $container = $tooltip.parent()
 			, containerY2 = $container.offset().left + $container.width();
 	
 		$(elem.node).on("mouseover", function(e) {
@@ -430,26 +465,6 @@
 		// Zoom
 		$parentContainer.data("zoomLevel", 0);
 		$container.append($zoomIn).append($zoomOut);
-		
-		$parentContainer.on("zoom", function(e, level, x, y) {
-			var currentLevel = Math.min(Math.max(level, 0), options.maxLevel);
-			$parentContainer.data("zoomLevel", currentLevel);
-			
-			(typeof x == "undefined") && (x = (paper._viewBox[0] + paper._viewBox[2] / 2));
-			(typeof y == "undefined") && (y = (paper._viewBox[1] + paper._viewBox[3] / 2));
-			
-			// Update zoom level of the map
-			if (currentLevel == 0) {
-				paper.setViewBox(0, 0, mapWidth, mapHeight);
-			} else {
-				paper.setViewBox(
-					Math.min(Math.max(0, x - (mapWidth / (1 + currentLevel * options.step))/2), (mapWidth - (mapWidth / (1 + currentLevel * options.step)))), 
-					Math.min(Math.max(0, y - (mapHeight / (1 + currentLevel * options.step))/2), (mapHeight - (mapHeight / (1 + currentLevel * options.step)))), 
-					mapWidth / (1 + currentLevel * options.step), 
-					mapHeight / (1 + currentLevel * options.step)
-				);
-			}
-		});
 		
 		$zoomIn.on("click", function() {$parentContainer.trigger("zoom", $parentContainer.data("zoomLevel") + 1);});
 		$zoomOut.on("click", function() {$parentContainer.trigger("zoom", $parentContainer.data("zoomLevel") - 1);});
