@@ -2,6 +2,8 @@
 
 ## 3.1.10
 
+* Fix issue with calculating line height when using older versions of jQuery
+
 ## 3.1.9
 
 * Fix bower.json file
