@@ -113,7 +113,7 @@
                 $('#jqueryVersion').html($.fn.jquery);
 
                 var loghandle = function(event, delta) {
-                    var o = '', id = event.currentTarget.id;
+                    var o = '', id = event.currentTarget.id || event.currentTarget.nodeName;
 
                     o = '#' + id + ':';
 
@@ -136,6 +136,11 @@
 
                     log( o );
                 };
+
+                $(document)
+                    .mousewheel(function(event, delta) {
+                        loghandle(event, delta);
+                    });
 
                 $('#test1')
                     .mousewheel(function(event, delta) {
