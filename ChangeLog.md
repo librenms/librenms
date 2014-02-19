@@ -1,5 +1,7 @@
 # Mouse Wheel ChangeLog
 
+## 3.1.10
+
 ## 3.1.9
 
 * Fix bower.json file
