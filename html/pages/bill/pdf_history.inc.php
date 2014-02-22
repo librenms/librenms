@@ -170,7 +170,7 @@
 
   // Transfer overview
   function transferOverview($bill_id, $history) {
-    global $list_colour_a, $list_colour_b, $config['billing']['base'];
+    global $list_colour_a, $list_colour_b, $config;
 
     $i         = 0;
     $tot       = array();
