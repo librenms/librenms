@@ -20,7 +20,7 @@ include("includes/functions.php");
 
 $handle = fopen("ips.txt", "w");
 
-foreach (dbFetchRows("SELECT * FROM `ipv4_networks`"))
+foreach (dbFetchRows("SELECT * FROM `ipv4_networks`") as $data)
 {
   $cidr = $data['ipv4_network'];
   list ($network, $bits) = explode("/", $cidr);
