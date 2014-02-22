@@ -26,7 +26,7 @@ foreach (dbFetchRows("SELECT *, A.id AS id FROM `alerts` AS A, `devices` AS D WH
   $msg = $alert['message'];
   $alert_text .= "$date $host $msg";
 
-  dbUpdate(array('alerted' => '1'), 'alerts', '`id` = ?' array($id))
+  dbUpdate(array('alerted' => '1'), 'alerts', '`id` = ?', array($id));
 
 }
 

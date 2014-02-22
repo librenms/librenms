@@ -56,7 +56,7 @@
 	}
 	
 	function clearStats($mailstats) {
-	    if (file_exists($mailstats) {
+	    if (file_exists($mailstats)) {
 		$fp	= fopen($mailstats, 'w');
 		fwrite($fp, "mess_recv:0\n");
 		fwrite($fp, "mess_rejected:0\n");
