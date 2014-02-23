@@ -63,6 +63,7 @@ http://getbootstrap.com/getting-started/
 | markerColor     | Color of the marker    | 'blue'        | 'red', 'darkred', 'orange', 'green', 'darkgreen', 'blue', 'purple', 'darkpuple', 'cadetblue' |
 | iconColor       | Color of the icon      | 'white'       | 'white', 'black' or css code (hex, rgba etc) |
 | spin            | Make the icon spin     | false         | true or false. Font-awesome required | 
+| extraClasses    | Additional classes in the created <i> tag | '' | 'fa-rotate90 myclass' eller other custom configuration |
 
 
 ### Supported icons
