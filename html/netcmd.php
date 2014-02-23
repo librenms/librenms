@@ -32,6 +32,7 @@ include("includes/authenticate.inc.php");
 
 if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 
+$output = '';
 if ($_GET['query'] && $_GET['cmd'])
 {
   $host = $_GET['query'];
