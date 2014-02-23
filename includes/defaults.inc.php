@@ -32,10 +32,6 @@ $config['project_id']     = strtolower($config['project_name']);
 
 $config['temp_dir']      = "/tmp";
 $config['install_dir']   = "/opt/" . $config['project_id'];
-//$config['html_dir']      = $config['install_dir'] . "/html";
-//$config['rrd_dir']       = $config['install_dir'] . "/rrd";
-//$config['log_dir']       = $config['install_dir'] . "/logs";
-//$config['log_file']      = $config['log_dir'] . "/" . $config['project_id'] . ".log";
 
 // What is my own hostname (used to identify this host in its own database)
 $config['own_hostname'] = "localhost";
