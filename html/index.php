@@ -110,7 +110,7 @@ if ($config['page_title']) { $config['page_title_prefix'] = $config['page_title'
 <!DOCTYPE HTML>
 <html>
 <head>
-  <title><?php echo($config['page_title_prefix']); ?></title>
+  <title><?php echo($config['page_title_suffix']); ?></title>
   <base href="<?php echo($config['base_url']); ?>" />
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
