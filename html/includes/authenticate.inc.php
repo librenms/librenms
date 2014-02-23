@@ -91,8 +91,6 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
       setcookie("token", $token_id, time()+60*60*24*$config['auth_remember'], "/", null, null, true);
       setcookie("auth", $auth, time()+60*60*24*$config['auth_remember'], "/", null, null, true);
       dbInsert(array('session_username' => $_SESSION['username'], 'session_value' => $sess_id, 'session_token' => $token, 'session_auth' => $auth, 'session_expiry' => time()+60*60*24*$config['auth_remember']), 'session');
-      //setcookie("username", $_SESSION['username'], time()+60*60*24*100, "/");
-      //setcookie("password", $_SESSION['password'], time()+60*60*24*100, "/");
     }
     if (isset($_COOKIE['sess_id'],$_COOKIE['token'],$_COOKIE['auth']))
     {
