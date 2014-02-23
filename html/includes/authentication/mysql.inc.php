@@ -90,7 +90,6 @@ function generateSalt($max = 15)
 
 function changepassword($username,$password)
 {
-  //$encrypted = crypt($password,'$1$' . generateSalt(8).'$');
   $hasher = new PasswordHash(8, FALSE);
   $encrypted = $hasher->HashPassword($password);
   return dbUpdate(array('password' => $encrypted), 'users', '`username` = ?', array($username));
@@ -105,7 +104,6 @@ function adduser($username, $password, $level, $email = "", $realname = "", $can
 {
   if (!user_exists($username))
   {
-    //$encrypted = crypt($password,'$1$' . generateSalt(8).'$');
     $hasher = new PasswordHash(8, FALSE);
     $encrypted = $hasher->HashPassword($password);
     return dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd), 'users');
