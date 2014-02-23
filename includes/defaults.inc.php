@@ -388,6 +388,7 @@ $config['irc_chan'][] = "##" . $config['project_id'];
 $config['allow_unauth_graphs']      = 0;       # Allow graphs to be viewed by anyone
 $config['allow_unauth_graphs_cidr'] = array(); # Allow graphs to be viewed without authorisation from certain IP ranges
 $config['auth_mechanism']           = "mysql"; # Available mechanisms: mysql (default), ldap, http-auth
+$config['auth_remember']            = '30';    # This is how long in days to remember users who select remember me
 
 // LDAP Authentication
 
