@@ -239,14 +239,16 @@ if (!$vars['bare'] == "yes") {
 
 ?>
 <br />
-<div class="container">
+<div class="container-fluid">
 <div class="row">
   <div class="col-md-12">
 &nbsp;<br /><br />
   </div>
 </div>
 <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-1">
+            </div>
+            <div class="col-md-10">
 <?php
 
 // To help debug the new URLs :)
@@ -280,8 +282,10 @@ if ($_SESSION['authenticated'])
   exit;
 }
 ?>
-        </div>
-  </div>
+            </div>
+            <div class="col-md-1">
+            </div>
+          </div>
 <?php
 $runtime_end = utime(); $runtime = $runtime_end - $runtime_start;
 $gentime = substr($runtime, 0, 5);
