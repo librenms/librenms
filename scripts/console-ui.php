@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 include('../includes/console_colour.php');
@@ -32,24 +33,8 @@ while($end == 0)
     $cache['device_types'][$device['type']]++;
   }
 
-  $devices['up']        = dbFetchCell("SELECT COUNT(*) FROM devices  WHERE status = '1' AND `ignore` = '0'  AND `disabled` = '0'");
-  $devices['down']      = dbFetchCell("SELECT COUNT(*) FROM devices WHERE status = '0' AND `ignore` = '0'  AND `disabled` = '0'");
-  $devices['ignored']   = dbFetchCell("SELECT COUNT(*) FROM devices WHERE `ignore` = '1'  AND `disabled` = '0'");
-  $devices['disabled']  = dbFetchCell("SELECT COUNT(*) FROM devices WHERE `disabled` = '1'");
-
-  $ports['count']       = dbFetchCell("SELECT COUNT(*) FROM ports WHERE deleted = '0'");
-  $ports['up']          = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D WHERE I.deleted = '0' AND I.ifOperStatus = 'up' AND I.ignore = '0' AND I.device_id = D.device_id AND D.ignore = '0'");
-  $ports['down']        = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D WHERE I.deleted = '0' AND I.ifOperStatus = 'down' AND I.ifAdminStatus = 'up' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'");
-  $ports['shutdown']    = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D WHERE I.deleted = '0' AND I.ifAdminStatus = 'down' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'
-");
-  $ports['ignored']     = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D WHERE I.deleted = '0' AND D.device_id = I.device_id AND (I.ignore = '1' OR D.ignore = '1')");
-  $ports['errored']     = dbFetchCell("SELECT COUNT(*) FROM ports AS I, devices AS D WHERE I.deleted = '0' AND D.device_id = I.device_id AND (I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')");
-
-  $services['count']    = dbFetchCell("SELECT COUNT(service_id) FROM services");
-  $services['up']       = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '1' AND service_ignore ='0'");
-  $services['down']     = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '0' AND service_ignore = '0'");
-  $services['ignored']  = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_ignore = '1'");
-  $services['disabled'] = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_disabled = '1'");
+  // Include the required SQL queries to get our data
+  require('../includes/db/status_count.inc.php');
 
   $tbl->addRow(array('Devices ('.$devices['count'].')',Console_Color::convert("%g".$devices['up']." Up%n"),Console_Color::convert("%r".$devices['down']." Down%n"),Console_Color::convert("%y".$devices['ignored']." Ignored%n"),Console_Color::convert("%p".$devices['disabled']." Disabled%n")));
   $tbl->addRow(array('Ports ('.$ports['count'].')',Console_Color::convert("%g".$ports['up']." Up%n"),Console_Color::convert("%r".$ports['down']." Down%n"),Console_Color::convert("%y".$ports['ignored']." Ignored%n"),Console_Color::convert("%p".$ports['shutdown']." Shutdown%n")));
