@@ -21,9 +21,12 @@ echo('
 ');
 
 foreach (get_matching_files($config['html_dir']."/includes/front/", "/^top_.*\.php$/") as $file) {
-  echo("<div class=box>\n");
-  include_once($file);
-  echo("</div>\n");
+  if($file != 'top_ports.inc.php' && $file != 'top_device_bits.inc.php')
+  {
+    echo("<div class=box>\n");
+    include_once($file);
+    echo("</div>\n");
+  }
 }
 
 echo("</div>\n");
