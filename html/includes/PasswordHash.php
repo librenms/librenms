@@ -48,10 +48,17 @@ class PasswordHash {
 	function get_random_bytes($count)
 	{
 		$output = '';
-		if (is_readable('/dev/urandom') &&
-		    ($fh = @fopen('/dev/urandom', 'rb'))) {
-			$output = fread($fh, $count);
-			fclose($fh);
+		
+		$output = openssl_random_pseudo_bytes($count,$strong);
+		
+		if(empty($count))
+		{
+		  if (is_readable('/dev/urandom') &&
+		  ($fh = @fopen('/dev/urandom', 'rb')))
+		  {
+		    $output = fread($fh, $count);
+		    fclose($fh);
+		  }
 		}
 
 		if (strlen($output) < $count) {
