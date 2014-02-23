@@ -44,6 +44,9 @@ You can clone the repository via HTTPS or SSH.  In either case, you need to ensu
     cd /opt
     git clone https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
+
+At this stage you can either launch the web installer by going to http://IP/install.php, follow the onscreen instructions then skip to the 'Web Interface' section further down. Alternatively if you want to continue the setup manually then just keep following these instructions.
+
     cp config.php.default config.php
     vim config.php
     

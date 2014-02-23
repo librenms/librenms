@@ -1,4 +1,3 @@
-USE librenms;
 CREATE TABLE IF NOT EXISTS `alerts` ( `id` int(11) NOT NULL AUTO_INCREMENT, `importance` int(11) NOT NULL DEFAULT '0', `device_id` int(11) NOT NULL, `message` text NOT NULL, `time_logged` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, `alerted` smallint(6) NOT NULL DEFAULT '0', KEY `id` (`id`) ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 CREATE TABLE IF NOT EXISTS `applications` ( `app_id` int(11) NOT NULL AUTO_INCREMENT, `device_id` int(11) NOT NULL, `app_type` varchar(64) NOT NULL, PRIMARY KEY (`app_id`) ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 CREATE TABLE IF NOT EXISTS `authlog` ( `id` int(11) NOT NULL AUTO_INCREMENT, `datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, `user` text NOT NULL, `address` text NOT NULL, `result` text NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
