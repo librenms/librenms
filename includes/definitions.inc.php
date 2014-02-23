@@ -1213,4 +1213,10 @@ $config['ipmi_unit']['discrete']  = '';
 // INCLUDE THE VMWARE DEFINITION FILE.
 require_once("vmware_guestid.inc.php");
 
+// Define some variables if they aren't set by user definition in config.php
+if (!isset($config['html_dir'])) { $config['html_dir'] = $config['install_dir'] . '/html'; }
+if (!isset($config['rrd_dir']))  { $config['rrd_dir']  = $config['install_dir'] . '/rrd'; }
+if (!isset($config['log_dir']))  { $config['log_dir']  = $config['install_dir'] . '/logs'; }
+if (!isset($config['log_file'])) { $config['log_dir'] . "/" . $config['project_id'] . ".log"; }
+
 ?>
