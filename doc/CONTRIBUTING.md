@@ -8,6 +8,16 @@ Guidelines for contributing to LibreNMS
 - Don't break the poller.  User interface blemishes are not critical, but
   losing data from network monitoring systems might be.
 
+- As a general rule, if you're replacing lines of code with new lines of
+  code, don't comment them out, just delete them.  Commented out code makes
+  the patch and the resultant code harder to read, and there's no good
+  reason to it since we can easily get them back from git.
+
+- If you're fixing a bug or making another minor change, don't reformat the
+  code at the same time.  This makes it harder to see what's changed.  If
+  you need to reformat it after making the change, do so in a separate
+  commit.
+
 - Please join us in IRC at irc.freenode.net in channel ##librenms if you're
   able.  Collaborating in real time makes the coordination of contributions
   easier.
@@ -19,7 +29,7 @@ Guidelines for contributing to LibreNMS
   the FSF guidelines.
 
 - The current Observium license is incompatible with GPLv3.  Don't submit
-  code from current Observium unless you are the copyright holder, and
+  code from current Observium unless you are the copyright holder, and you
   specifically state in the code that you are releasing it under GPLv3 (or a
   compatible license).
 
@@ -43,8 +53,8 @@ Guidelines for contributing to LibreNMS
   be merely aggregation in a distribution medium as per the last paragraph
   of the GPLv3 section 5 ("Conveying Modified Source Versions"), and because
   they are not combined with LibreNMS to form a larger program, the GPLv3
-  does not apply to them.  This is not a legally binding ruling - it is
-  simply a statement of our intent and current interpretation.
+  does not apply to them.  This is not a legal ruling - it is simply a
+  statement of our intent and current interpretation.
 
 
 Proposed workflow for submitting pull requests
@@ -59,7 +69,10 @@ work well enough.
 
 We don't recommend git flow because we don't want to maintain separate
 development and master branches, but if it works better for you, feel free
-to do that, as long as you follow the golden rule of not.
+to do that, as long as you follow the golden rule of not creating merge
+conflicts in master.
+
+Workflow:
 
 - Fork the [LibreNMS repo master branch][2] in your own GitHub account.
 - Create an [issue][3] explaining what work you plan to do.
