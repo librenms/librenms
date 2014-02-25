@@ -17,6 +17,8 @@ include("../config.php");
 include_once("../includes/definitions.inc.php");
 include("../includes/functions.php");
 include("includes/functions.inc.php");
+include('includes/plugins.inc.php');
+Plugins::start();
 
 // Check for install.inc.php
 if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
