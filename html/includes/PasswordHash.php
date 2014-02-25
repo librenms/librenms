@@ -51,7 +51,7 @@ class PasswordHash {
 		
 		$output = openssl_random_pseudo_bytes($count,$strong);
 		
-		if(empty($count))
+		if(empty($output))
 		{
 		  if (is_readable('/dev/urandom') &&
 		  ($fh = @fopen('/dev/urandom', 'rb')))
