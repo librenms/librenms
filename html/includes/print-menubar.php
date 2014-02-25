@@ -484,15 +484,19 @@ if(is_file("includes/print-menubar-custom.inc.php"))
           </form>
         </li>
         <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"> Plugins<b class="caret"></b></a>
+          <ul class="dropdown-menu">
 <?php
-if($_SESSION['widescreen'] === 1)
-{
-  echo('        <a href="' . $toggle_url . 'widescreen=no" title="Switch to normal screen width layout">Normal width</a>');
-} else {
-  echo('        <a href="' . $toggle_url . 'widescreen=yes" title="Switch to wide screen layout">Widescreen</a>');
-}
-
+Plugins::call('menu');
 ?>
+            <li role="presentation" class="divider"></li>
+<?php
+if ($_SESSION['userlevel'] >= '10')
+{
+  echo('            <li><a href="plugin/view=admin">Plugin Admin</a></li>');
+}
+?>
+          </ul>
         </li>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System<b class="caret"></b></a>

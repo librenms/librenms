@@ -876,4 +876,40 @@ function is_port_valid($port, $device)
   return $valid;
 }
 
+function scan_new_plugins()
+{
+
+  global $config, $debug;
+
+  $installed = 0; // Track how many plugins we install.
+
+  if(file_exists($config['plugin_dir']))
+  {
+    $plugin_files = scandir($config['plugin_dir']);
+    foreach($plugin_files as $name)
+    {
+      if(is_dir($config['plugin_dir'].'/'.$name))
+      {
+        if($name != '.' && $name != '..')
+        {
+          if(is_file($config['plugin_dir'].'/'.$name.'/'.$name.'.php') && is_file($config['plugin_dir'].'/'.$name.'/'.$name.'.inc.php'))
+          {
+            $plugin_id = dbFetchRow("SELECT `plugin_id` FROM `plugins` WHERE `plugin_name` = '$name'");
+            if(empty($plugin_id))
+            {
+              if(dbInsert(array('plugin_name' => $name, 'plugin_active' => '0'), 'plugins'))
+              {
+                $installed++;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return( $installed );
+
+}
+
 ?>
