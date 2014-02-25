@@ -253,9 +253,7 @@ if (!$vars['bare'] == "yes") {
   </div>
 </div>
 <div class="row">
-            <div class="col-md-1">
-            </div>
-            <div class="col-md-10">
+            <div class="col-md-12">
 <?php
 
 // To help debug the new URLs :)
@@ -289,8 +287,6 @@ if ($_SESSION['authenticated'])
   exit;
 }
 ?>
-            </div>
-            <div class="col-md-1">
             </div>
           </div>
 <?php
