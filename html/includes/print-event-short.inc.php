@@ -7,12 +7,12 @@ unset($icon);
 $icon = geteventicon($entry['message']);
 if ($icon) { $icon = "<img src='images/16/$icon'>"; }
 
-echo("<tr style=\"background-color: $bg\">
-  <td width=0></td>
-  <td class=syslog width=140>
+echo("<tr\">
+  <td></td>
+  <td>
     ".$entry['humandate']."
   </td>
-  <td class=syslog>");
+  <td>");
 
   if ($entry['type'] == "interface") {
     $entry['link'] = "<b>".generate_port_link(getifbyid($entry['reference']))."</b>";
