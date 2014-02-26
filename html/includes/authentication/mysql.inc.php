@@ -9,19 +9,47 @@ function authenticate($username,$password)
     // Migrate from old, unhashed password
     if ($row['password'] == $encrypted_old)
     {
-      $row = dbFetchRow("DESCRIBE users password");
-      if ($row['Type'] == 'varchar(34)')
+      $row_type = dbFetchRow("DESCRIBE users password");
+      if ($row_type['Type'] == 'varchar(34)')
       {
         changepassword($username,$password);
       }
       return 1;
     }
-    if ($row['password'] == crypt($password,$row['password']))
+    elseif(substr($row['password'],0,3) == '$1$')
+    {
+      $row_type = dbFetchRow("DESCRIBE users password");
+      if ($row_type['Type'] == 'varchar(60)')
+      {
+        if ($row['password'] == crypt($password,$row['password']))
+        {
+          changepassword($username,$password);
+        }
+      }
+    }
+    $hasher = new PasswordHash(8, FALSE);
+    if($hasher->CheckPassword($password, $row['password']))
     {
       return 1;
     }
   }
   return 0;
+}
+
+function reauthenticate($sess_id,$token)
+{
+  list($uname,$hash) = explode("|",$token);
+  $session = dbFetchRow("SELECT * FROM `session` WHERE `session_username` = '$uname' AND session_value='$sess_id'");
+  $hasher = new PasswordHash(8, FALSE);
+  if($hasher->CheckPassword($uname.$session['session_token'],$hash))
+  {
+    $_SESSION['username'] = $uname;
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 function passwordscanchange($username = "")
@@ -62,7 +90,8 @@ function generateSalt($max = 15)
 
 function changepassword($username,$password)
 {
-  $encrypted = crypt($password,'$1$' . generateSalt(8).'$');
+  $hasher = new PasswordHash(8, FALSE);
+  $encrypted = $hasher->HashPassword($password);
   return dbUpdate(array('password' => $encrypted), 'users', '`username` = ?', array($username));
 }
 
@@ -75,7 +104,8 @@ function adduser($username, $password, $level, $email = "", $realname = "", $can
 {
   if (!user_exists($username))
   {
-    $encrypted = crypt($password,'$1$' . generateSalt(8).'$');
+    $hasher = new PasswordHash(8, FALSE);
+    $encrypted = $hasher->HashPassword($password);
     return dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd), 'users');
   } else {
     return FALSE;
