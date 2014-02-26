@@ -14,10 +14,6 @@ include_once("../config.php");
 include_once("../includes/definitions.inc.php");
 include_once("includes/functions.inc.php");
 include_once("../includes/functions.php");
-include_once("../includes/dbFacile.php");
-include_once("../includes/common.php");
-
-include_once("../includes/rewrites.php");
 include_once("includes/authenticate.inc.php");
 
 if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
