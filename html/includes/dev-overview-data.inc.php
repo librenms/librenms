@@ -1,13 +1,18 @@
 <?php
 
-echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
+echo('<div class="container-fluid">');
+echo("<div class='row'>
+      <div class='col-md-12'>
+          <div class='panel panel-default panel-condensed'>
+            <div class='panel-heading'>");
 
 if ($config['overview_show_sysDescr'])
 {
-  echo("<p style='padding: 0px;' class=sectionhead>");
-  echo('<div style="font-family: courier, serif; margin: 3px"><strong>' . $device['sysDescr'] . "</strong></div>");
-  echo("</p>");
+  echo('<strong>' . $device['sysDescr'] . "</strong>");
 }
+
+echo('</div>
+      <table class="table table-hover table-condensed table-striped">');
 
 $uptime = $device['uptime'];
 
@@ -15,26 +20,23 @@ if ($device['os'] == "ios") { formatCiscoHardware($device); }
 if ($device['features']) { $device['features'] = "(".$device['features'].")"; }
 $device['os_text'] = $config['os'][$device['os']]['text'];
 
-echo("<table width=100% cellspacing=0 cellpadding=5>");
-echo('<tr class="device-overview"><td width="100%"><table width="100%">');
-
 if ($device['hardware'])
 {
   echo('<tr>
-        <td class="list-bold">Hardware</td>
+        <td>Hardware</td>
         <td>' . $device['hardware']. '</td>
       </tr>');
 }
 
 echo('<tr>
-        <td class="list-bold">Operating System</td>
+        <td>Operating System</td>
         <td>' . $device['os_text'] . ' ' . $device['version'] . ' ' . $device['features'] . ' </td>
       </tr>');
 
 if ($device['serial'])
 {
   echo('<tr>
-        <td class="list-bold">Serial</td>
+        <td>Serial</td>
         <td>' . $device['serial']. '</td>
       </tr>');
 }
@@ -42,14 +44,14 @@ if ($device['serial'])
 if ($device['sysContact'])
 {
   echo('<tr>
-        <td class="list-bold">Contact</td>');
+        <td>Contact</td>');
   if (get_dev_attrib($device,'override_sysContact_bool'))
   {
     echo('
         <td>' . htmlspecialchars(get_dev_attrib($device,'override_sysContact_string')) . '</td>
       </tr>
       <tr>
-        <td class="list-bold">SNMP Contact</td>');
+        <td>SNMP Contact</td>');
   }
   echo('
         <td>' . htmlspecialchars($device['sysContact']). '</td>
@@ -59,13 +61,13 @@ if ($device['sysContact'])
 if ($device['location'])
 {
   echo('<tr>
-        <td class="list-bold">Location</td>
+        <td>Location</td>
         <td>' . $device['location']. '</td>
       </tr>');
   if (get_dev_attrib($device,'override_sysLocation_bool') && !empty($device['real_location']))
   {
     echo('<tr>
-        <td class="list-bold">SNMP Location</td>
+        <td>SNMP Location</td>
         <td>' . $device['real_location']. '</td>
       </tr>');
   }
@@ -74,12 +76,14 @@ if ($device['location'])
 if ($uptime)
 {
   echo('<tr>
-        <td class="list-bold">Uptime</td>
+        <td>Uptime</td>
         <td>' . formatUptime($uptime) . '</td>
       </tr>');
 }
 
-  echo("</table></tr></td></table>");
-  echo("</div>");
-
+echo('</table>
+      </div>
+      </div>
+      </div>
+      </div>');
 ?>

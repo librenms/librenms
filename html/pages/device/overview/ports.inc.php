@@ -2,7 +2,14 @@
 
 if ($ports['total'])
 {
-  echo('<div style="background-color: #eeeeee; margin: 5px; padding: 5px;">');
+  echo('<div class="container-fluid">');
+  echo('<div class="row">
+          <div class="col-md-12">
+            <div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+              <strong>Overall Traffic</strong>
+            </div>
+            <table class="table table-hover table-condensed table-striped">');
 
   $graph_array['height'] = "100";
   $graph_array['width']  = "485";
@@ -21,20 +28,22 @@ if ($ports['total'])
   $graph_array['width']  = "210";
   $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - Device Traffic");
 
+  echo('<tr>
+          <td colspan="4">');
   echo(overlib_link($link, $graph, $overlib_content, NULL));
+  echo('  </td>
+        </tr>');
 
-  echo('  <div style="height: 5px;"></div>');
+  echo('
+    <tr>
+      <td><img src="images/16/connect.png" align="absmiddle"> ' . $ports['total'] . '</td>
+      <td><img src="images/16/if-connect.png" align="absmiddle"> ' . $ports['up'] . '</td>
+      <td><img src="images/16/if-disconnect.png" align="absmiddle"> ' . $ports['down'] . '</td>
+      <td><img src="images/16/if-disable.png" align="absmiddle"> ' . $ports['disabled'] . '</td>
+    </tr>');
 
-  echo('  <table class="tablehead" cellpadding="2" cellspacing="0" width="100%">
-    <tr bgcolor="' . $ports_colour . '" align="center"><td></td>
-      <td width="25%"><img src="images/16/connect.png" align="absmiddle"> ' . $ports['total'] . '</td>
-      <td width="25%" class="green"><img src="images/16/if-connect.png" align="absmiddle"> ' . $ports['up'] . '</td>
-      <td width="25%" class="red"><img src="images/16/if-disconnect.png" align="absmiddle"> ' . $ports['down'] . '</td>
-      <td width="25%" class="grey"><img src="images/16/if-disable.png" align="absmiddle"> ' . $ports['disabled'] . '</td>
-    </tr>
-  </table>');
-
-  echo('  <div style="margin: 8px; font-size: 11px; font-weight: bold;">');
+  echo('<tr>
+          <td colspan="4">');
 
   $ifsep = "";
 
@@ -47,7 +56,12 @@ if ($ports['total'])
   }
 
   unset($ifsep);
-  echo("  </div>");
+  echo("  </td>");
+  echo("</tr>");
+  echo("</table>");
+  echo("</div>");
+  echo("</div>");
+  echo("</div>");
   echo("</div>");
 }
 

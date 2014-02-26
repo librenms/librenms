@@ -6,11 +6,15 @@ $drives = dbFetchRows("SELECT * FROM `storage` WHERE device_id = ? ORDER BY `sto
 
 if (count($drives))
 {
-  echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
-  echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=health/metric=storage/">');
-  echo("<img align='absmiddle' src='images/icons/storage.png'> Storage</a></p>");
-  echo("<table width=100% cellspacing=0 cellpadding=5>");
+  echo('<div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default panel-condensed">
+                <div class="panel-heading">');
+  echo('<a href="device/device='.$device['device_id'].'/tab=health/metric=storage/">');
+  echo("<img src='images/icons/storage.png'> Storage</a>");
+  echo('    </div>
+            <table class="table table-hover table-condensed table-striped">');
 
   foreach ($drives as $drive)
   {
@@ -66,16 +70,20 @@ if (count($drives))
 
     $minigraph =  generate_graph_tag($graph_array);
 
-    echo("<tr class=device-overview>
-           <td class=tablehead>".overlib_link($link, $drive['storage_descr'], $overlib_content)."</td>
-           <td width=90>".overlib_link($link, $minigraph, $overlib_content)."</td>
-           <td width=200>".overlib_link($link, print_percentage_bar (200, 20, $percent, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right']), $overlib_content)."
+    echo("<tr>
+           <td>".overlib_link($link, $drive['storage_descr'], $overlib_content)."</td>
+           <td>".overlib_link($link, $minigraph, $overlib_content)."</td>
+           <td>".overlib_link($link, print_percentage_bar (200, 20, $percent, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right']), $overlib_content)."
            </a></td>
          </tr>");
   }
 
-  echo("</table>");
-  echo("</div>");
+  echo('</table>
+        </div>
+        </div>
+        </div>
+        </div>');
+
 }
 
 unset ($drive_rows);
