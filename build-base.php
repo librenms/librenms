@@ -20,4 +20,6 @@ while( !feof( $sql_fh ) ) {
 
 fclose($sql_fh);
 
+include("includes/sql-schema/update.php");
+
 ?>
