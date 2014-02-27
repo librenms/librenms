@@ -474,14 +474,15 @@ function print_port_thumbnail($args)
 
 function print_optionbar_start ($height = 0, $width = 0, $marginbottom = 5)
 {
-  echo("
-    <div class='rounded-5px' style='border: 1px solid #ccc; display: block; background: #eee; text-align: left; margin-top: 0px;
-    margin-bottom: ".$marginbottom."px; " . ($width ? 'max-width: ' . $width . (strstr($width,'%') ? '' : 'px') . '; ' : '') . "
-    padding: 7px 14px 8px 14px'>");
+  echo('
+        <div class="panel panel-default">
+          <div class="panel-heading">
+');
 }
 
 function print_optionbar_end()
 {
+  echo('  </div>');
   echo('  </div>');
 }
 
