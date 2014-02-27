@@ -30,7 +30,10 @@ $config['db_name']=$dbname;
 }
 
 include("../includes/defaults.inc.php");
-include_once("../includes/definitions.inc.php");
+if($_POST['stage'] == "3" || $_POST['stage'] == "4")
+{
+  include_once("../includes/definitions.inc.php");
+}
 include("../includes/functions.php");
 include("includes/functions.inc.php");
 
