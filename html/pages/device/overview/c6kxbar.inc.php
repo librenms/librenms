@@ -8,7 +8,7 @@
 echo('<a href="device/device='.$device['device_id'].'/tab=health/metric=mempool/">');
 echo("<img src='images/16/arrow_switch.png'> Catalyst 6k Crossbar</a>");
 echo('          </div>
-                <table class="table table-hover table-condensed table-striped">
+                <table class="table table-hover table-condensed table-striped">');
 
 foreach ($entity_state['group']['c6kxbar'] as $index => $entry)
 {
