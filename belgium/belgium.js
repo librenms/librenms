@@ -13,7 +13,7 @@
 	$.extend(true, $.fn.mapael, 
 		{
 			maps : {
-				test : {
+				belgium : {
 					width : 500, 
 					height : 500,
 					elems : {
