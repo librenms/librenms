@@ -3,14 +3,14 @@
 $graph_type = "storage_usage";
 
 echo("<div style='padding: 5px;'>
-        <table width=100% cellspacing=0 cellpadding=6 class='sortable'>");
+        <table class='table table-condensed'>");
 
-echo("<tr class=tablehead>
-        <th width=280>Device</th>
+echo("<tr>
+        <th>Device</th>
         <th>Storage</th>
-        <th width=100></th>
-        <th width=280>Usage</th>
-        <th width=50>Used</th>
+        <th></th>
+        <th>Usage</th>
+        <th>Used</th>
       </tr>");
 
 foreach (dbFetchRows("SELECT * FROM `storage` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY D.hostname, S.storage_descr") as $drive)

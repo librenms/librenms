@@ -1,17 +1,17 @@
 <?php
 
-if ($device['status'] == '0') {  $class = "div-alert"; } else {   $class = "div-normal"; }
+if ($device['status'] == '0') {  $class = "alert-danger"; } else {   $class = ""; }
 if ($device['ignore'] == '1')
 {
   $class = "div-ignore-alert";
   if ($device['status'] == '1')
   {
-    $class = "div-ignore";
+    $class = "alert-warning";
   }
 }
 if ($device['disabled'] == '1')
 {
-  $class = "div-disabled";
+  $class = "alert-info";
 }
 
 $type = strtolower($device['os']);
@@ -19,7 +19,7 @@ $type = strtolower($device['os']);
 $image = getImage($device);
 
 echo('
-            <tr bgcolor="'.$device_colour.'" class="'.$class.'">
+            <tr bgcolor="'.$device_colour.'" class="alert '.$class.'">
              <td width="40" align=center valign=middle style="padding: 21px;">'.$image.'</td>
              <td valign=middle style="padding: 0 15px;"><span style="font-size: 20px;">' . generate_device_link($device) . '</span>
              <br />' . $device['location'] . '</td>
@@ -58,7 +58,7 @@ foreach ($graphs as $entry)
   {
     $graph_array['type']   = $entry['graph'];
 
-    echo("<div style='float: right; text-align: center; padding: 1px 5px; margin: 0 1px; background: #f5f5f5;' class='rounded-5px'>");
+    echo("<div style='float: right; text-align: center; padding: 1px 5px; margin: 0 1px; ' class='rounded-5px'>");
     print_graph_popup($graph_array);
     echo("<div style='font-weight: bold; font-size: 7pt; margin: -3px;'>".$entry['text']."</div>");
     echo("</div>");

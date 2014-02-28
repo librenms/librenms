@@ -1,11 +1,9 @@
 <?php print_optionbar_start(28); ?>
 
-<table cellpadding="0" cellspacing="0" class="devicetable" width="100%">
-  <tr>
-  <form method="post" action="">
-    <td width="200" style="padding: 1px;">
-      <select name="device_id" id="device_id">
-      <option value="">All Devices</option>
+  <form method="post" action="" class="form-inline" role="form">
+    <div class="form-group">
+      <select name="device_id" id="device_id" class="form-control input-sm">
+        <option value="">All Devices</option>
 <?php
 foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`") as $data)
 {
@@ -15,29 +13,25 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hos
 }
 ?>
       </select>
-    </td>
-    <td width="200" style="padding: 1px;">
-      <select name="interface" id="interface">
-      <option value="">All Interfaces</option>
-      <option value="Loopback%" <?php if ($_POST['interface'] == "Loopback%") { echo("selected"); } ?> >Loopbacks</option>
-      <option value="Vlan%" <?php if ($_POST['interface'] == "Vlan%") { echo("selected"); } ?> >VLANs</option>
+    </div>
+    <div class="form-group">
+      <select name="interface" id="interface" class="form-control input-sm">
+        <option value="">All Interfaces</option>
+        <option value="Loopback%" <?php if ($_POST['interface'] == "Loopback%") { echo("selected"); } ?> >Loopbacks</option>
+        <option value="Vlan%" <?php if ($_POST['interface'] == "Vlan%") { echo("selected"); } ?> >VLANs</option>
       </select>
-    </td>
-    <td>
-    </td>
-    <td width=400>
-     <input type="text" name="address" id="address" size=40 value="<?php echo($_POST['address']); ?>" />
-     <input style="align:right;" type=submit class=submit value=Search></div>
-    </td>
+    </div>
+    <div class="form-group">
+      <input type="text" name="address" id="address" size=40 value="<?php echo($_POST['address']); ?>" class="form-control input-sm" placeholder="Mac Address"/>
+    </div>
+     <button type="submit" class="btn btn-default input-sm">Search</button>
   </form>
-  </tr>
-</table>
 
 <?php
 
 print_optionbar_end();
 
-echo('<table width="100%" cellspacing="0" cellpadding="5">');
+echo('<table class="table table-condensed">');
 
 $query = "SELECT * FROM `ports` AS P, `devices` AS D WHERE P.device_id = D.device_id ";
 $query .= "AND `ifPhysAddress` LIKE ?";

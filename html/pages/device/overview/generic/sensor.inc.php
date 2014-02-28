@@ -4,9 +4,13 @@ $sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND dev
 
 if (count($sensors))
 {
-  echo('<div style="background-color: #eeeeee; margin: 5px; padding: 5px;">');
-  echo('<p style="padding: 0px 5px 5px;" class="sectionhead"><a class="sectionhead" href="device/device='.$device['device_id'].'/tab=health/metric=' . strtolower($sensor_type) . '/"><img align="absmiddle" src="images/icons/' . strtolower($sensor_type) . '.png"> ' . $sensor_type . '</a></p>');
-  echo('<table width="100%" valign="top">');
+  echo('<div class="row">
+          <div class="col-md-12">
+            <div class="panel panel-default panel-condensed">
+              <div class="panel-heading">');
+  echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=health/metric=' . strtolower($sensor_type) . '/"><img src="images/icons/' . strtolower($sensor_type) . '.png"> ' . $sensor_type . '</a><');
+  echo('      </div>
+                <table class="table table-hover table-condensed table-striped">');
   foreach ($sensors as $sensor)
   {
     if ($config['memcached']['enable'])
@@ -53,14 +57,17 @@ if (count($sensors))
 
     $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
 
-    echo("<tr class=device-overview>
-           <td class=tablehead style='padding-left:5px;'><strong>".overlib_link($link, $sensor['sensor_descr'], $overlib_content)."</strong></td>
-           <td width=80 align=right class=tablehead>".overlib_link($link, $sensor_minigraph, $overlib_content)."</td>
-           <td width=80 align=right class=tablehead>".overlib_link($link, "<span " . ($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '') . '>' . $sensor['sensor_current'] . $sensor_unit . "</span>", $overlib_content)."</td>
+    echo("<tr>
+           <td><strong>".overlib_link($link, $sensor['sensor_descr'], $overlib_content)."</strong></td>
+           <td>".overlib_link($link, $sensor_minigraph, $overlib_content)."</td>
+           <td>".overlib_link($link, "<span " . ($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '') . '>' . $sensor['sensor_current'] . $sensor_unit . "</span>", $overlib_content)."</td>
           </tr>");
   }
 
   echo("</table>");
+  echo("</div>");
+  echo("</div>");
+  echo("</div>");
   echo("</div>");
 }
 

@@ -32,10 +32,6 @@ $config['project_id']     = strtolower($config['project_name']);
 
 $config['temp_dir']      = "/tmp";
 $config['install_dir']   = "/opt/" . $config['project_id'];
-$config['html_dir']      = $config['install_dir'] . "/html";
-$config['rrd_dir']       = $config['install_dir'] . "/rrd";
-$config['log_dir']       = $config['install_dir'] . "/logs";
-$config['log_file']      = $config['log_dir'] . "/" . $config['project_id'] . ".log";
 
 // What is my own hostname (used to identify this host in its own database)
 $config['own_hostname'] = "localhost";
@@ -113,6 +109,8 @@ $config['page_refresh']     = "300";  // Refresh the page every xx seconds, 0 to
 $config['front_page']       = "pages/front/default.php";
 $config['front_page_settings']['top']['ports'] = 10;
 $config['front_page_settings']['top']['devices'] = 10;
+$config['top_ports']        = 1; // This enables the top X ports box
+$config['top_devices']      = 1; // This enables the top X devices box
 $config['page_title_prefix'] = "";
 $config['page_title_suffix'] = $config['project_name'];
 $config['timestamp_format'] = 'd-m-Y H:i:s';
@@ -390,6 +388,7 @@ $config['irc_chan'][] = "##" . $config['project_id'];
 $config['allow_unauth_graphs']      = 0;       # Allow graphs to be viewed by anyone
 $config['allow_unauth_graphs_cidr'] = array(); # Allow graphs to be viewed without authorisation from certain IP ranges
 $config['auth_mechanism']           = "mysql"; # Available mechanisms: mysql (default), ldap, http-auth
+$config['auth_remember']            = '30';    # This is how long in days to remember users who select remember me
 
 // LDAP Authentication
 

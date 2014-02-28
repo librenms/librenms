@@ -3,14 +3,14 @@
 $graph_type = "mempool_usage";
 
 echo("<div style='margin-top: 5px; padding: 0px;'>");
-echo("<table width=100% cellpadding=6 cellspacing=0>");
+echo("<table class='table table-condensed'>");
 
 echo("<tr class=tablehead>
-        <th width=280>Device</th>
+        <th>Device</th>
         <th>Memory</th>
-        <th width=100></th>
-        <th width=280>Usage</th>
-        <th width=50>Used</th>
+        <th></th>
+        <th>Usage</th>
+        <th>Used</th>
       </tr>");
 
 foreach (dbFetchRows("SELECT * FROM `mempools` AS M, `devices` as D WHERE D.device_id = M.device_id ORDER BY D.hostname") as $mempool)

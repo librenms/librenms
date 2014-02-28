@@ -1,19 +1,23 @@
 <?php
 
-echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
-echo('<a class="sectionhead" href="device/device='.$device['device_id'].'/tab=health/metric=mempool/">');
-echo("<img align='absmiddle' src='images/16/arrow_switch.png'> Catalyst 6k Crossbar</a></p>");
-echo("<table width=100% cellspacing=0 cellpadding=5>");
+  echo('<div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default panel-condensed">
+                <div class="panel-heading">');
+echo('<a href="device/device='.$device['device_id'].'/tab=health/metric=mempool/">');
+echo("<img src='images/16/arrow_switch.png'> Catalyst 6k Crossbar</a>");
+echo('          </div>
+                <table class="table table-hover table-condensed table-striped">');
 
 foreach ($entity_state['group']['c6kxbar'] as $index => $entry)
 {
   // FIXME i'm not sure if this is the correct way to decide what entphysical index it is. slotnum+1? :>
   $entity = dbFetchRow("SELECT * FROM entPhysical WHERE device_id = ? AND entPhysicalIndex = ?", array($device['device_id'], $index+1));
 
-  echo("<tr bgcolor=$row_colour>
-        <td colspan=5 width=200><strong>".$entity['entPhysicalName']."</strong></td>
-        <td colspan=2>");
+  echo("<tr>
+        <td colspan='5'><strong>".$entity['entPhysicalName']."</strong></td>
+        <td colspan='2'>");
 
     switch ($entry['']['cc6kxbarModuleModeSwitchingMode'])
     {
@@ -74,9 +78,9 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry)
 
       $minigraph =  generate_graph_tag($graph_array);
 
-      echo("<tr class=device-overview>
-          <td width=10></td>
-          <td width=200><strong>Fabric ".$subindex."</strong></td>
+      echo("<tr>
+          <td></td>
+          <td><strong>Fabric ".$subindex."</strong></td>
           <td><span style='font-weight: bold;' class=".$fabric['mode_class'].">".
 
       $fabric['cc6kxbarModuleChannelFabStatus']."</span></td>
@@ -90,6 +94,9 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry)
 }
 
 echo("</table>");
+echo("</div>");
+echo("</div>");
+echo("</div>");
 echo("</div>");
 
 ?>

@@ -34,7 +34,7 @@ foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $dev);
 
 if ($updated) { print_message("Device Settings Saved"); }
 
-if (dbFetchCell("SELECT COUNT(*) from `services` WHERE `device_id` = ?" array($device['device_id'])) > '0')
+if (dbFetchCell("SELECT COUNT(*) from `services` WHERE `device_id` = ?", array($device['device_id'])) > '0')
 {
   $i = "1";
   foreach (dbFetchRows("select * from services WHERE device_id = ? ORDER BY service_type", array($device['device_id'])) as $service)
@@ -43,7 +43,7 @@ if (dbFetchCell("SELECT COUNT(*) from `services` WHERE `device_id` = ?" array($d
   }
 }
 
-if($existform
+if($existform)
 {
   echo('<div style="float: left;">');
   echo("

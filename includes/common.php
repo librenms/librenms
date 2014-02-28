@@ -69,7 +69,7 @@ function print_message($text)
   {
     print Console_Color::convert("%g".$text."%n\n", false);
   } else {
-    echo('<div class="messagebox"><img src="/images/16/tick.png" align="absmiddle"> '.$text.'</div>');
+    echo('<div class="alert alert-success"><img src="/images/16/tick.png" align="absmiddle"> '.$text.'</div>');
   }
 }
 

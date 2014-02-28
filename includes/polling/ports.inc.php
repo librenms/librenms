@@ -354,7 +354,7 @@ foreach ($ports as $port)
     }
 
     // Port utilisation % threshold alerting. // FIXME allow setting threshold per-port. probably 90% of ports we don't care about.
-    if ($config['alerts']['port_util_alert'])
+    if ($config['alerts']['port_util_alert'] && $port['ignore'] == '0')
     {
       // Check for port saturation of $config['alerts']['port_util_perc'] or higher.  Alert if we see this.
       // Check both inbound and outbound rates

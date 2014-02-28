@@ -38,29 +38,29 @@ if ($_POST['string'])
 
 ?>
 
-<form method="post" action="">
-  <span style="font-weight: bold;">Event log</span> &#187;
-  <label><strong>Search</strong>
-    <input type="text" name="string" id="string" value="<?php echo($_POST['string']); ?>" />
-  </label>
-  <label>
-  <label>
-    <strong>Device</strong>
-    <select name="device" id="device">
-      <option value="">All Devices</option>
-      <?php
-        foreach (get_all_devices() as $hostname)
-        {
-          echo("<option value='".getidbyname($hostname)."'");
+<form method="post" action="" class="form-inline" role="form">
+    <div class="form-group">
+      <input type="text" name="string" id="string" value="<?php echo($_POST['string']); ?>" placeholder="Search" class="form-control input-sm" />
+    </div>
+    <div class="form-group">
+      <label>
+        <strong>Device</strong>
+      </label>
+      <select name="device" id="device" class="form-control input-sm">
+        <option value="">All Devices</option>
+        <?php
+          foreach (get_all_devices() as $hostname)
+          {
+            echo("<option value='".getidbyname($hostname)."'");
 
-          if (getidbyname($hostname) == $_POST['device']) { echo("selected"); }
+            if (getidbyname($hostname) == $_POST['device']) { echo("selected"); }
 
-          echo(">".$hostname."</option>");
-        }
-      ?>
-    </select>
-  </label>
-  <input type=submit class=submit value=Search>
+            echo(">".$hostname."</option>");
+          }
+        ?>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-default input-sm">Search</button>
 </form>
 
 <?php
@@ -75,7 +75,7 @@ if ($_SESSION['userlevel'] >= '5')
   $param[] = $_SESSION['user_id'];
 }
 
-echo('<table cellspacing="0" cellpadding="1" width="100%">');
+echo('<table class="table table-condensed">');
 
 foreach (dbFetchRows($query, $param) as $entry)
 {

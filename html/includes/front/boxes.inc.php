@@ -11,19 +11,29 @@
  * the source code distribution for details.
  */
 ?>
-<script type="text/javascript" src="js/jquery.cycle.all.js"></script>
-<script type="text/javascript" src="js/jquery-cycle-boxes.js"></script>
 <?php
 
-echo("<div class='right-2-col-fixed'>\n<div class='boxes'>\n");
+echo('
+<div class="cycle-slideshow"
+    data-cycle-fx="fade"
+    data-cycle-timeout="10000"
+    data-cycle-slides="> div">
+');
 
-foreach (get_matching_files($config['html_dir']."/includes/front/", "/^top_.*\.php$/") as $file) {
-  echo("<div class=box>\n");
-  include_once($file);
-  echo("</div>\n");
+foreach (get_matching_files($config['html_dir']."/includes/front/", "/^top_.*\.php$/") as $file)
+{
+  if(($file == 'top_ports.inc.php' && $config['top_ports'] == 0) || ($file == 'top_device_bits.inc.php' && $config['top_devices'] == 0))
+  {
+  }
+  else
+  {
+    echo("<div class=box>\n");
+    include_once($file);
+    echo("</div>\n");
+  }  
 }
 
 echo("</div>\n");
-echo("</div>\n");
 
 ?>
+
