@@ -42,8 +42,4 @@ $config['poller-wrapper']['alerter'] = FALSE;
 # Uncomment the next line to disable daily updates
 #$config['update'] = 0;
 
-# following is necessary for poller-wrapper
-# poller-wrapper is released public domain
-$config['poller-wrapper']['alerter'] = FALSE;
-
 ?>
