@@ -42,10 +42,14 @@ if ($_POST['program'])
 
 $sql =  "SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog WHERE device_id = ? $where";
 $sql .= " ORDER BY timestamp DESC LIMIT 1000";
-echo("<table cellspacing=0 cellpadding=2 width=100%>");
+echo('      <div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>Eventlog entries</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
 foreach (dbFetchRows($sql, $param) as $entry) { include("includes/print-syslog.inc.php"); }
-echo("</table>");
-
+echo('        </table>
+            </div>');
 $pagetitle[] = "Syslog";
 
 ?>

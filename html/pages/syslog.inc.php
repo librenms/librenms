@@ -89,13 +89,20 @@ if ($_SESSION['userlevel'] >= '5')
   $array = array_merge(array($_SESSION['user_id']), $array);
 }
 
-echo("<table cellspacing=0 cellpadding=2 width=100%>");
+echo('<div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>Eventlog entries</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
+
 foreach (dbFetchRows($sql, $array) as $entry)
 {
   $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
 
   include("includes/print-syslog.inc.php");
 }
-echo("</table>");
+
+echo("</table>
+</div>");
 
 ?>
