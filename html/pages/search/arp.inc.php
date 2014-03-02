@@ -32,7 +32,11 @@ foreach (dbFetchRows("SELECT D.device_id AS device_id, `hostname` FROM `ipv4_mac
 
 print_optionbar_end();
 
-echo('<table class="table table-condensed">');
+echo('<div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>ARP Entries</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
 
 $query = "SELECT * FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D WHERE M.port_id = P.port_id AND P.device_id = D.device_id ";
 if (isset($_POST['searchby']) && $_POST['searchby'] == "ip")
@@ -51,7 +55,7 @@ if (is_numeric($_POST['device_id']))
 }
 $query .= " ORDER BY M.mac_address";
 
-echo('<tr class="tablehead"><th>MAC Address</th><th>IP Address</th><th>Device</th><th>Interface</th><th>Remote device</th><th>Remote interface</th></tr>');
+echo('<tr><th>MAC Address</th><th>IP Address</th><th>Device</th><th>Interface</th><th>Remote device</th><th>Remote interface</th></tr>');
 foreach (dbFetchRows($query, $param) as $entry)
 {
   if (!$ignore)
@@ -71,13 +75,13 @@ foreach (dbFetchRows($query, $param) as $entry)
     if ($arp_host['device_id'] == $entry['device_id']) { $arp_name = "Localhost"; }
     if ($arp_host['port_id'] == $entry['port_id']) { $arp_if = "Local port"; }
 
-    echo('<tr class="search">
-        <td width="160">' . formatMac($entry['mac_address']) . '</td>
-        <td width="140">' . $entry['ipv4_address'] . '</td>
-            <td width="200" class="list-bold">' . generate_device_link($entry) . '</td>
-        <td class="list-bold">' . generate_port_link($entry, makeshortif(fixifname($entry['ifDescr']))) . ' ' . $error_img . '</td>
-            <td width="200">'.$arp_name.'</td>
-        <td class="list-bold">'.$arp_if.'</td>
+    echo('<tr>
+        <td>' . formatMac($entry['mac_address']) . '</td>
+        <td>' . $entry['ipv4_address'] . '</td>
+            <td>' . generate_device_link($entry) . '</td>
+        <td>' . generate_port_link($entry, makeshortif(fixifname($entry['ifDescr']))) . ' ' . $error_img . '</td>
+            <td>'.$arp_name.'</td>
+        <td>'.$arp_if.'</td>
             </tr>');
   }
 
@@ -85,5 +89,6 @@ foreach (dbFetchRows($query, $param) as $entry)
 }
 
 echo("</table>");
+echp('</div>');
 
 ?>
