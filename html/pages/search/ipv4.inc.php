@@ -31,7 +31,11 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hos
 
 print_optionbar_end();
 
-echo('<table class="table table-condensed">');
+echo('<div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>IPv4 Addresses</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
 
 $query = "SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D, `ipv4_networks` AS N WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv4_network_id = A.ipv4_network_id ";
 
@@ -47,7 +51,7 @@ if ($_POST['interface'])
 }
 $query .= " ORDER BY A.ipv4_address";
 
-echo('<tr class="tablehead"><th>Device</a></th><th>Interface</th><th>Address</th><th>Description</th></tr>');
+echo('<tr"><th>Device</a></th><th>Interface</th><th>Address</th><th>Description</th></tr>');
 
 foreach (dbFetchRows($query, $param) as $interface)
 {
@@ -74,9 +78,9 @@ foreach (dbFetchRows($query, $param) as $interface)
     {
       $interface = ifLabel ($interface, $interface);
 
-      echo('<tr class="search">
-          <td class="list-bold">' . generate_device_link($interface) . '</td>
-          <td class="list-bold">' . generate_port_link($interface) . ' ' . $error_img . '</td>
+      echo('<tr>
+          <td>' . generate_device_link($interface) . '</td>
+          <td>' . generate_port_link($interface) . ' ' . $error_img . '</td>
           <td>' . $interface['ipv4_address'] . '/'.$length.'</td>
           <td>' . $interface['ifAlias'] . "</td>
         </tr>\n");
@@ -87,5 +91,6 @@ foreach (dbFetchRows($query, $param) as $interface)
 }
 
 echo("</table>");
+echo("</div>");
 
 ?>
