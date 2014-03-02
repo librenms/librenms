@@ -27,14 +27,20 @@
 print_optionbar_end();
 
 $entries = dbFetchRows("SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate  FROM `eventlog` WHERE `host` = ? ORDER BY `datetime` DESC LIMIT 0,250", array($device['device_id']));
-echo('<table cellspacing="0" cellpadding="2" width="100%">');
+
+echo('      <div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>Eventlog entries</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
 
 foreach ($entries as $entry)
 {
   include("includes/print-event.inc.php");
 }
 
-echo('</table>');
+echo('        </table>
+            </div>');
 
 $pagetitle[] = "Events";
 

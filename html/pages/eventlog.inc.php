@@ -75,13 +75,18 @@ if ($_SESSION['userlevel'] >= '5')
   $param[] = $_SESSION['user_id'];
 }
 
-echo('<table class="table table-condensed">');
+echo('<div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>Eventlog entries</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
 
 foreach (dbFetchRows($query, $param) as $entry)
 {
   include("includes/print-event.inc.php");
 }
 
-echo("</table>");
+echo("</table>
+</div>");
 
 ?>
