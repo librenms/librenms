@@ -152,9 +152,6 @@ if ($config['enable_syslog'])
   echo("</div>");
 
 } else {
-  echo("<div class=front-eventlog>
-    <h3>Recent Eventlog Entries</h3>
-  ");
 
   if ($_SESSION['userlevel'] == '10')
   {
@@ -166,13 +163,28 @@ if ($config['enable_syslog'])
 
   $data = mysql_query($query);
 
-  echo('<table class="table table-bordered">');
+  echo('<div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              &nbsp;
+            </div>
+          </row>
+          <row>
+            <div class="col-md-12">
+              <div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>Eventlog entries</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
 
   while ($entry = mysql_fetch_assoc($data)) {
     include("includes/print-event.inc.php");
   }
 
   echo("</table>");
+  echo("</div>");
+  echo("</div>");
+  echo("</div>");
   echo("</div>");
 }
 

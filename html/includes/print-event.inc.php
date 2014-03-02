@@ -7,14 +7,14 @@ unset($icon);
 $icon = geteventicon($entry['message']);
 if ($icon) { $icon = '<img src="images/16/' . $icon . '" />'; }
 
-echo('<tr class="eventlog">
-  <td class="syslog" width="160">
+echo('<tr>
+  <td>
     ' . $entry['datetime'] . '
   </td>');
 
 if (!isset($vars['device'])) {
   $dev = device_by_id_cache($entry['host']);
-  echo("<td class=list-bold width=150>
+  echo("<td>
     " . generate_device_link($dev, shorthost($dev['hostname'])) . "
   </td>");
 }
