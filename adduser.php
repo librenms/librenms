@@ -19,6 +19,7 @@ include("includes/defaults.inc.php");
 include("config.php");
 include("includes/definitions.inc.php");
 include("includes/functions.php");
+require("html/includes/PasswordHash.php");
 
 if (file_exists('html/includes/authentication/' . $config['auth_mechanism'] . '.inc.php'))
 {
