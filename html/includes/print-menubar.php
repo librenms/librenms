@@ -34,6 +34,8 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
         <li class="dropdown">
           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview<b class="caret"></b></a>
           <ul class="dropdown-menu">
+            <li><a href="'.generate_url(array('page'=>'overview')).'"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a></li>
+            <li role="presentation" class="divider"></li>
 <?php if (isset($config['enable_map']) && $config['enable_map']) {
   echo('              <li><a href="'.generate_url(array('page'=>'overview')).'"><img src="images/16/map.png" border="0" align="absmiddle" /> Network Map</a></li>');
 } ?>
