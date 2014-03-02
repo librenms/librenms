@@ -59,7 +59,7 @@ function print_error($text)
   {
     print Console_Color::convert("%r".$text."%n\n", false);
   } else {
-    echo('<div class="errorbox"><img src="/images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
+    echo('<div class="alert alert-danger"><img src="/images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
   }
 }
 
