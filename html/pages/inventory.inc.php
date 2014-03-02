@@ -89,10 +89,7 @@ if (isset($_POST['device']) && is_numeric($_POST['device']))
   $param[] = $_POST['device'];
 }
 
-echo('<div class="container-fluid">');
-  echo('<div class="row">
-          <div class="col-md-12">
-            <div class="panel panel-default panel-condensed">
+            echo('<div class="panel panel-default panel-condensed">
               <div class="panel-heading">
                 <strong>Inventory</strong>
               </div>
@@ -105,8 +102,5 @@ foreach (dbFetchRows($sql, $param) as $entry)
      '</td><td>' . $entry['entPhysicalName']  . '</td><td>' . $entry['entPhysicalModelName']  . '</td><td>' . $entry['entPhysicalSerialNum'] . '</td></tr>');
 }
 echo("</table>");
-echo('</div>');
-echo('</div>');
-echo('</div>');
 echo('</div>');
 ?>
