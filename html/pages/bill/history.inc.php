@@ -102,8 +102,6 @@
              <td width=\"250\">".print_percentage_bar(250, 20, $perc, NULL, "ffffff", $background['left'], $percent."%", "ffffff", $background['right'])."</td>
              <td>
                 <a href=\"".$url."\"><img src=\"images/16/chart_curve.png\" border=\"0\" align=\"absmiddle\" alt=\"Show details\" title=\"Show details\"/></a>
-                <a href=\"#\"><img src=\"images/16/page_white_acrobat.png\" border=\"0\" align=\"absmiddle\" alt=\"PDF Report\" title=\"PDF Report\"/>
-                <!-- <a href=\"pdf.php?type=billing&report=history&bill_id=".$bill_id."&history_id=".$history['bill_hist_id']."\"><img src=\"images/16/page_white_acrobat.png\" border=\"0\" align=\"absmiddle\" alt=\"PDF Report\" title=\"PDF Report\"/></a> //-->
              </td>
            </tr>");
 
