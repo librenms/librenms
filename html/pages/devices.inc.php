@@ -273,17 +273,19 @@ if($format == "graph")
 
 } else {
 
-  echo('<table class="table table-condensed">');
+  echo('<div class="panel panel-default panel-condensed">
+          <table class="table table-condensed">');
+                
   if ($subformat == "detail" || $subformat == "basic")
   {
-    echo('<tr class="tablehead">
+    echo('<tr>
     <th></th>
     <th></th>
-    <th class="paddedcell">Device</th>
+    <th>Device</th>
     <th></th>
-    <th class="paddedcell">Platform</th>
-    <th class="paddedcell">Operating System</th>
-    <th class="paddedcell">Uptime/Location</th>
+    <th>Platform</th>
+    <th>Operating System</th>
+    <th>Uptime/Location</th>
   </tr>');
   }
 
@@ -304,6 +306,7 @@ if($format == "graph")
     }
   }
   echo("</table>");
+  echo('</div>');
 }
 
 ?>
