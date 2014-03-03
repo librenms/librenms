@@ -1,4 +1,3 @@
-
 <?php print_optionbar_start('25'); ?>
 
 <form method="post" action="" class="form-inline" role="form">
@@ -89,14 +88,18 @@ if (isset($_POST['device']) && is_numeric($_POST['device']))
   $param[] = $_POST['device'];
 }
 
-echo('<table class="table table-condensed">');
+            echo('<div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>Inventory</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
 echo("<tr><th>Hostname</th><th>Description</th><th>Name</th><th>Part No</th><th>Serial No</th></tr>");
 
 foreach (dbFetchRows($sql, $param) as $entry)
 {
-  echo('<tr class="inventory"><td>' . generate_device_link($entry, shortHost($entry['hostname'])) . '</td><td>' . $entry['entPhysicalDescr']  .
+  echo('<tr><td>' . generate_device_link($entry, shortHost($entry['hostname'])) . '</td><td>' . $entry['entPhysicalDescr']  .
      '</td><td>' . $entry['entPhysicalName']  . '</td><td>' . $entry['entPhysicalModelName']  . '</td><td>' . $entry['entPhysicalSerialNum'] . '</td></tr>');
 }
 echo("</table>");
-
+echo('</div>');
 ?>
