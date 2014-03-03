@@ -135,13 +135,24 @@ echo('
 
 if ($config['enable_syslog'])
 {
-  echo("<div class=front-syslog>
-    <h3>Recent Syslog Messages</h3>
-  ");
 
   $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
   $query = mysql_query($sql);
-  echo('<table class="table table-bordered">');
+
+  echo('<div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              &nbsp;
+            </div>
+          </row>
+          <row>
+            <div class="col-md-12">
+              <div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>Syslog entries</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
+
   while ($entry = mysql_fetch_assoc($query))
   {
     $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
@@ -149,6 +160,9 @@ if ($config['enable_syslog'])
     include("includes/print-syslog.inc.php");
   }
   echo("</table>");
+  echo("</div>");
+  echo("</div>");
+  echo("</div>");
   echo("</div>");
 
 } else {
