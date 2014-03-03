@@ -1,4 +1,3 @@
-
 <?php print_optionbar_start('25'); ?>
 
 <form method="post" action="" class="form-inline" role="form">
@@ -98,7 +97,7 @@ echo("<tr><th>Hostname</th><th>Description</th><th>Name</th><th>Part No</th><th>
 
 foreach (dbFetchRows($sql, $param) as $entry)
 {
-  echo('<tr"><td>' . generate_device_link($entry, shortHost($entry['hostname'])) . '</td><td>' . $entry['entPhysicalDescr']  .
+  echo('<tr><td>' . generate_device_link($entry, shortHost($entry['hostname'])) . '</td><td>' . $entry['entPhysicalDescr']  .
      '</td><td>' . $entry['entPhysicalName']  . '</td><td>' . $entry['entPhysicalModelName']  . '</td><td>' . $entry['entPhysicalSerialNum'] . '</td></tr>');
 }
 echo("</table>");
