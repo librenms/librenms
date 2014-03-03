@@ -31,7 +31,11 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hos
 
 print_optionbar_end();
 
-echo('<table class="table table-condensed">');
+echo('<div class="panel panel-default panel-condensed">
+              <div class="panel-heading">
+                <strong>MAC Addresses</strong>
+              </div>
+              <table class="table table-hover table-condensed table-striped">');
 
 $query = "SELECT * FROM `ports` AS P, `devices` AS D WHERE P.device_id = D.device_id ";
 $query .= "AND `ifPhysAddress` LIKE ?";
@@ -49,7 +53,7 @@ if ($_POST['interface'])
 }
 $query .= " ORDER BY P.ifPhysAddress";
 
-echo('<tr class="tablehead"><th>Device</a></th><th>Interface</th><th>MAC Address</th><th>Description</th></tr>');
+echo('<tr><th>Device</a></th><th>Interface</th><th>MAC Address</th><th>Description</th></tr>');
 foreach (dbFetchRows($query, $param) as $entry)
 {
   if (!$ignore)
@@ -66,9 +70,9 @@ foreach (dbFetchRows($query, $param) as $entry)
     {
       $interface = ifLabel ($interface, $interface);
 
-      echo('<tr class="search">
-          <td class="list-bold">' . generate_device_link($entry) . '</td>
-          <td class="list-bold">' . generate_port_link($entry, makeshortif(fixifname($entry['ifDescr']))) . ' ' . $error_img . '</td>
+      echo('<tr>
+          <td>' . generate_device_link($entry) . '</td>
+          <td>' . generate_port_link($entry, makeshortif(fixifname($entry['ifDescr']))) . ' ' . $error_img . '</td>
           <td>' . formatMac($entry['ifPhysAddress']) . '</td>
           <td>' . $entry['ifAlias'] . "</td>
         </tr>\n");
@@ -79,5 +83,6 @@ foreach (dbFetchRows($query, $param) as $entry)
 }
 
 echo("</table>");
+echo('</div>');
 
 ?>
