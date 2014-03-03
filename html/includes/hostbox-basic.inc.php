@@ -4,21 +4,21 @@ if ($bg == $list_colour_b) { $bg = $list_colour_a; } else { $bg = $list_colour_b
 
 if ($device['status'] == '0')
 {
-  $class = "list-device-down";
+  $class = "bg-danger";
 } else {
-  $class = "list-device";
+  $class = "bg-primary";
 }
 if ($device['ignore'] == '1')
 {
-  $class = "list-device-ignored";
+  $class = "bg-warning";
   if ($device['status'] == '1')
   {
-    $class = "list-device-ignored-up";
+    $class = "bg-success";
   }
 }
 if ($device['disabled'] == '1')
 {
-  $class = "list-device-disabled";
+  $class = "bg-info";
 }
 
 $type = strtolower($device['os']);
@@ -26,14 +26,13 @@ $type = strtolower($device['os']);
 if ($device['os'] == "ios") { formatCiscoHardware($device, true); }
 $device['os_text'] = $config['os'][$device['os']]['text'];
 
-echo('  <tr class="'.$class.'" bgcolor="' . $bg . '" onmouseover="this.style.backgroundColor=\'#fdd\';" onmouseout="this.style.backgroundColor=\'' . $bg . '\';"
-          onclick="location.href=\'device/'.$device['device_id'].'/\'" style="cursor: pointer;">
-          <td width="1" style="background-color: '.$table_tab_colour.';"></td>
-          <td width="40" class="paddedcell" align="center" valign="middle">' . $image . '</td>
-          <td width="300"><span style="font-size: 15px;">' . generate_device_link($device) . '</span></td>'
+echo('  <tr onclick="location.href=\'device/'.$device['device_id'].'/\'" style="cursor: pointer;">
+          <td class="'. $class .' "></td>
+          <td>' . $image . '</td>
+          <td><span style="font-size: 15px;">' . generate_device_link($device) . '</span></td>'
         );
 
-echo('<td width="55">');
+echo('<td>');
 if ($port_count) { echo(' <img src="images/icons/port.png" align=absmiddle /> '.$port_count); }
 echo('<br />');
 if ($sensor_count) { echo(' <img src="images/icons/sensors.png" align=absmiddle /> '.$sensor_count); }
