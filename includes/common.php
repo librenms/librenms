@@ -47,7 +47,7 @@ function external_exec($command)
     fclose($pipes[0]);
     fclose($pipes[1]);
     fclose($pipes[2]);
-    $exec_status['status'] = proc_close($process);
+    $exec_response['status'] = proc_close($process);
   } else {
     fclose($pipes[0]);
     fclose($pipes[1]);
@@ -55,7 +55,7 @@ function external_exec($command)
     proc_terminate($process);
     $output = FALSE;
     $exec_error['error'] = '';
-    $exec_status['status'] = -1;
+    $exec_response['status'] = -1;
   }
 
   print_debug($output);
