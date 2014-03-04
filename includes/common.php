@@ -21,10 +21,43 @@ function format_number_short($number, $sf)
 
 function external_exec($command)
 {
-  global $debug;
+  global $debug , $exec_response;
+
+  $exec_response = array('command' => $command);
 
   if ($debug) { echo($command."\n"); }
-  $output = shell_exec($command);
+
+  $descriptorspec = array(
+    0 => array('pipe', 'r'), // stdin
+    1 => array('pipe', 'w'), // stdout
+    2 => array('pipe', 'w')  // stderr
+  );
+
+  $process = proc_open($command, $descriptorspec, $pipes);
+  stream_set_blocking($pipes[2], 0);
+  if (is_resource($process))
+  {
+    $exec_response['error'] = stream_get_contents($pipes[2]);
+    if ($exec_response['error'])
+    {
+      $output = FALSE;
+    } else {
+      $output = stream_get_contents($pipes[1]);
+    }
+    fclose($pipes[0]);
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+    $exec_response['status'] = proc_close($process);
+  } else {
+    fclose($pipes[0]);
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+    proc_terminate($process);
+    $output = FALSE;
+    $exec_error['error'] = '';
+    $exec_response['status'] = -1;
+  }
+
   if ($debug) { echo($output."\n"); }
 
   return $output;
