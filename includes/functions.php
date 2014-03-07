@@ -703,9 +703,9 @@ function notify($device,$title,$message)
         }
         foreach (parse_email($config['email_from']) as $from => $from_name)
         {
-          $mail->setFrom($from, $from_name); // From:
+          $mail->SetFrom($from, $from_name); // From:
         }
-        foreach ($emails as $email => $email_name) { $mail->addAddress($email, $email_name); } // To:
+        foreach ($emails as $email => $email_name) { $mail->AddAddress($email, $email_name); } // To:
         $mail->Subject = $title; // Subject:
         $mail->XMailer = $config['project_name_version']; // X-Mailer:
         $mail->CharSet = 'utf-8';
@@ -717,7 +717,7 @@ function notify($device,$title,$message)
             $mail->Sendmail = $config['email_sendmail_path'];
             break;
           case 'smtp':
-            $mail->isSMTP();
+            $mail->IsSMTP();
             $mail->Host       = $config['email_smtp_host'];
             $mail->Timeout    = $config['email_smtp_timeout'];
             $mail->SMTPAuth   = $config['email_smtp_auth'];
@@ -735,7 +735,7 @@ function notify($device,$title,$message)
             break;
         }
         // Sending email
-        if (!$mail->send()) { echo "Mailer Error: " . $mail->ErrorInfo . "\n"; }
+        if (!$mail->Send()) { echo "Mailer Error: " . $mail->ErrorInfo . "\n"; }
       }
     }
   }
