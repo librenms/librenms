@@ -358,7 +358,7 @@ class ircbot {
 	private function _join($params) {
 		if( $this->user['level'] == 10 ) {
 			return $this->joinChan($params);
-		} else
+		} else {
 			return $this->respond("Permission denied.");
 		}
 	}
