@@ -33,7 +33,7 @@ class ircbot {
 	private $pass     = "";
 	private $nick     = "LibreNMS";
 	private $chan     = array();
-	private $commands = array("auth", "quit", "listdevices", "device", "port", "down", "version", "status", "log", "help", "reload");
+	private $commands = array("auth", "quit", "listdevices", "device", "port", "down", "version", "status", "log", "help", "reload", "join");
 	private $external = array();
 	private $tick     = 62500;
 	
