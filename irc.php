@@ -162,7 +162,7 @@ class ircbot {
 			$this->data = $data;
 			$ex = explode(' ', $this->data);
 			if($ex[0] == "PING") {
-				fputs($this->socket['irc'], "PONG ".$ex[1]."\n");
+				return $this->irc_raw("PONG ".$ex[1]);
 			}
 			if( $ex[1] == 376 || ($ex[1] == "MODE" && $ex[2] == $this->nick) ) {
 				if($this->j == 2) {
@@ -182,7 +182,7 @@ class ircbot {
 			$this->chan[] = $chan;
 		}
 		foreach($this->chan as $chan) {
-			fputs($this->socket['irc'],"JOIN ".$chan."\n");
+			$this->irc_raw("JOIN ".$chan);
 		}
 		return true;
 	}
@@ -252,7 +252,7 @@ class ircbot {
 	}
 	
 	private function doAuth() {
-		if(fputs($this->socket['irc'],"USER ".$this->nick." 0 ".$this->nick." :".$this->nick."\n") && fputs($this->socket['irc'],"NICK ".$this->nick."\n")) {
+		if( $this->irc_raw("USER ".$this->nick." 0 ".$this->nick." :".$this->nick) && $this->irc_raw("NICK ".$this->nick) ) {
 				return true;
 		}
 		return false;
@@ -262,7 +262,7 @@ class ircbot {
 		if( $this->debug ) {
 			$this->log("Sending 'PRIVMSG ".trim($chan)." :".trim($message)."'");
 		}
-		return fputs($this->socket['irc'], "PRIVMSG ".trim($chan)." :".trim($message)."\n");
+		return $this->irc_raw("PRIVMSG ".trim($chan)." :".trim($message));
 	}
 	
 	private function log($msg) {
@@ -294,6 +294,10 @@ class ircbot {
 	
 	private function get_user() {
 		return $this->authd[$this->getUser($this->data)];
+	}
+	
+	private function irc_raw($params) {
+		return fputs($socket['irc'],$params."\r\n");
 	}
 	
 	private function _auth($params) {
@@ -338,17 +342,33 @@ class ircbot {
 	}
 	
 	private function _reload() {
-		global $config;
-		include("includes/defaults.inc.php");
-		include("config.php");
-		$this->respond("Reloading configuration & defaults");
-		if( $config != $this->config ) {
-			$this->__construct();
+		if( $this->user['level'] == 10 ) {
+			global $config;
+			include("includes/defaults.inc.php");
+			include("config.php");
+			$this->respond("Reloading configuration & defaults");
+			if( $config != $this->config ) {
+				return $this->__construct();
+			}
+		} else {
+			return $this->respond("Permission denied.");
+		}
+	}
+	
+	private function _join($params) {
+		if( $this->user['level'] == 10 ) {
+			return $this->joinChan($params);
+		} else
+			return $this->respond("Permission denied.");
 		}
 	}
 	
 	private function _quit($params) {
-		return die();
+		if( $this->user['level'] == 10 ) {
+			return die();
+		} else {
+			return $this->respond("Permission denied.");
+		}
 	}
 	
 	private function _help($params) {
@@ -360,7 +380,7 @@ class ircbot {
 	}
 	
 	private function _version($params) {
-		return $this->respond($this->config['project_name_version']);
+		return $this->respond($this->config['project_name_version'].", PHP: ".PHP_VERSION);
 	}
 	
 	private function _log($params) {

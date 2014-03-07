@@ -40,6 +40,7 @@ Command | Description
 `.device <hostname>` | Prints basic information about given `hostname`.
 `.down` | List hostnames that are down, if any.
 `.help` | List available commands.
+`.join <channel>` | Joins `<channel>` if user has admin-level.
 `.listdevices` | Lists the hostnames of all known devices.
 `.log [<N>]` | Prints `N` lines or last line of the eventlog.
 `.port <hostname> <ifname>` | Prints Port-related informations from `ifname` on given `hostname`.

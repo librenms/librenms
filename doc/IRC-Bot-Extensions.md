@@ -32,6 +32,7 @@ Function( (Type) $Variable [= Default] [,...] ) | Returns | Description
 `$this->getData( (boolean) $Block = false )` | `String/Boolean` | Returns a `line` from the IRC-Buffer if it's not matched against any other `command`. If `$Block` is `true`, wait until a suitable line is returned.
 `$this->getUser( )` | `String` | Returns `nick` of current user. Not to confuse with `$this->user`!
 `$this->get_user( )` | `Array` | See `$this->user` in Attributes.
+`$this->irc_raw( (string) $Protocol )` | `Boolean` | Sends raw IRC-Protocol.
 `$this->isAuthd( )` | `Boolean` | `true` if the user is authenticated.
 `$this->joinChan( (string) $Channel )` | `Boolean` | Joins given `$Channel`.
 `$this->log( (string) $Message )` | `Boolean` | Logs given `$Message` into `STDOUT`.
