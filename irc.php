@@ -297,7 +297,7 @@ class ircbot {
 	}
 	
 	private function irc_raw($params) {
-		return fputs($socket['irc'],$params."\r\n");
+		return fputs($this->socket['irc'],$params."\r\n");
 	}
 	
 	private function _auth($params) {
