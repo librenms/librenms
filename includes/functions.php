@@ -653,6 +653,50 @@ function parse_email($emails)
   return $result;
 }
 
+function send_mail($emails,$subject,$message,$html=false) {
+	global $config;
+	if( is_array($emails) || ($emails = parse_email($emails)) ) {
+		if( !class_exists("PHPMailer",false) )
+			include_once($config['install_dir'] . "/includes/phpmailer/class.phpmailer.php");
+		$mail = new PHPMailer();
+		$mail->Hostname = php_uname('n');
+		if (empty($config['email_from']))
+			$config['email_from'] = '"' . $config['project_name'] . '" <' . $config['email_user'] . '@'.$mail->Hostname.'>';
+		foreach (parse_email($config['email_from']) as $from => $from_name)
+			$mail->setFrom($from, $from_name);
+		foreach ($emails as $email => $email_name)
+			$mail->addAddress($email, $email_name);
+		$mail->Subject = $subject;
+		$mail->XMailer = $config['project_name_version'];
+		$mail->CharSet = 'utf-8';
+		$mail->WordWrap = 76;
+		$mail->Body = $message;
+		if( $html )
+			$mail->isHTML(true);
+		switch (strtolower(trim($config['email_backend']))) {
+			case 'sendmail':
+				$mail->Mailer = 'sendmail';
+				$mail->Sendmail = $config['email_sendmail_path'];
+			break;
+			case 'smtp':
+				$mail->isSMTP();
+				$mail->Host       = $config['email_smtp_host'];
+				$mail->Timeout    = $config['email_smtp_timeout'];
+				$mail->SMTPAuth   = $config['email_smtp_auth'];
+				$mail->SMTPSecure = $config['email_smtp_secure'];
+				$mail->Port       = $config['email_smtp_port'];
+				$mail->Username   = $config['email_smtp_username'];
+				$mail->Password   = $config['email_smtp_password'];
+				$mail->SMTPDebug  = false;
+			break;
+			default:
+				$mail->Mailer = 'mail';
+			break;
+		}
+		return $mail->send() ? true : $mail->ErrorInfo;
+	}
+}
+
 function notify($device,$title,$message)
 {
   global $config;
@@ -695,47 +739,7 @@ function notify($device,$title,$message)
           }
         }
         $message_footer .= "E-mail sent at: " . date($config['timestamp_format']) . "\n";
-        $mail = new PHPMailer();
-        $mail->Hostname = php_uname('n');
-        if (empty($config['email_from']))
-        {
-          $config['email_from'] = '"' . $config['project_name'] . '" <' . $config['email_user'] . '@'.php_uname('n').'>'; // Default "From:"
-        }
-        foreach (parse_email($config['email_from']) as $from => $from_name)
-        {
-          $mail->SetFrom($from, $from_name); // From:
-        }
-        foreach ($emails as $email => $email_name) { $mail->AddAddress($email, $email_name); } // To:
-        $mail->Subject = $title; // Subject:
-        $mail->XMailer = $config['project_name_version']; // X-Mailer:
-        $mail->CharSet = 'utf-8';
-        $mail->WordWrap = 76;
-        $mail->Body = $message_header . $message . $message_footer;
-        switch (strtolower(trim($config['email_backend']))) {
-          case 'sendmail':
-            $mail->Mailer = 'sendmail';
-            $mail->Sendmail = $config['email_sendmail_path'];
-            break;
-          case 'smtp':
-            $mail->IsSMTP();
-            $mail->Host       = $config['email_smtp_host'];
-            $mail->Timeout    = $config['email_smtp_timeout'];
-            $mail->SMTPAuth   = $config['email_smtp_auth'];
-            $mail->SMTPSecure = $config['email_smtp_secure'];
-            if ($config['email_smtp_secure'] == "ssl" && $config['email_smtp_port'] == 25) {
-              $mail->Port     = 465; // Default port for SSL
-            }
-            $mail->Port       = $config['email_smtp_port'];
-            $mail->Username   = $config['email_smtp_username'];
-            $mail->Password   = $config['email_smtp_password'];
-            $mail->SMTPDebug  = false;
-            break;
-          default:
-            $mail->Mailer = 'mail';
-            break;
-        }
-        // Sending email
-        if (!$mail->Send()) { echo "Mailer Error: " . $mail->ErrorInfo . "\n"; }
+        if( ($err = send_mail($emails,$title, $message_header.$message.$message_footer)) !== true) { echo "Mailer Error: ".$err."\n"; }
       }
     }
   }
