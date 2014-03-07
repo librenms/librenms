@@ -49,58 +49,68 @@ class ircbot {
 		if($this->config['irc_port'][0] == "+") {
 			$this->ssl  = true;
 			$this->port = substr($this->config['irc_port'], 1);
-		} else
+		} else {
 			$this->port = $this->config['irc_port'];
-		if($this->config['irc_nick'])
+		}
+		if($this->config['irc_nick']) {
 			$this->nick = $this->config['irc_nick'];
-		if($this->config['irc_chan'])
-			if(is_array($this->config['irc_chan']))
+		}
+		if($this->config['irc_chan']) {
+			if(is_array($this->config['irc_chan'])) {
 				$this->chan = $this->config['irc_chan'];
-			elseif(strstr($this->config['irc_chan'],","))
+			} elseif(strstr($this->config['irc_chan'],",")) {
 				$this->chan = explode(",",$this->config['irc_chan']);
-			else
+			} else {
 				$this->chan = array($this->config['irc_chan']);
-		if($this->config['irc_pass'])
+			}
+		}
+		if($this->config['irc_pass']) {
 			$this->pass = $this->config['irc_pass'];
+		}
 		$this->load_external();
 		$this->log("Starting IRC-Bot..");
 		$this->init();
 	}
 	
 	private function load_external() {
-		if(!$this->config['irc_external'])
+		if(!$this->config['irc_external']) {
 			return true;
+		}
 		$this->log("Caching external commands...");
-		if(!is_array($this->config['irc_external']))
+		if(!is_array($this->config['irc_external'])) {
 			$this->config['irc_external'] = explode(",",$this->config['irc_external']);
-		foreach( $this->config['irc_external'] as $ext )
-			if( ($this->external[$ext] = file_get_contents("includes/ircbot/".$ext.".inc.php")) == "" )
+		}
+		foreach( $this->config['irc_external'] as $ext ) {
+			if( ($this->external[$ext] = file_get_contents("includes/ircbot/".$ext.".inc.php")) == "" ) {
 				unset($this->external[$ext]);
+			}
+		}
 		return $this->log("Cached ".sizeof($this->external)." commands.");
 	}
 	
 	private function init() {
-		if($this->config['irc_alert'])
+		if($this->config['irc_alert']) {
 			$this->connect_alert();
+		}
 		$this->connect();
 		$this->log("Connected");
-		if($this->pass)
+		if($this->pass) {
 			fwrite($this->socket['irc'], "PASS ".$this->pass."\n\r");
+		}
 		$this->doAuth();
 		while( true ) {
-			foreach($this->socket as $n=>$socket)
+			foreach($this->socket as $n=>$socket) {
 				if(!is_resource($socket)) {
 					$this->log("Socket '$n' closed. Restarting.");
 					break 2;
 				}
-			
+			}
 			$this->getData();
-			if($this->config['irc_alert'])
+			if($this->config['irc_alert']) {
 				$this->alertData();
-			
+			}
 			usleep($this->tick);
 		}
-		echo "Exiting?!\r\n";
 		return $this->init();
 	}
 	
@@ -126,44 +136,54 @@ class ircbot {
 		if(strstr($this->buff[$buff],"\n")) {
 			$tmp = explode("\n",$this->buff[$buff],2);
 			$this->buff[$buff] = substr($this->buff[$buff], strlen($tmp[0])+2);
-			if( $this->debug )
+			if( $this->debug ) {
 				$this->log("Returning buffer '$buff': '".trim($tmp[0])."'");
+			}
 			return $tmp[0];
 		}
-		if( $this->debug && $r > 0 )
+		if( $this->debug && $r > 0 ) {
 			$this->log("Expanding buffer '$buff' = '".trim($this->buff[$buff], true)."'");
+		}
 		return false;
 	}
 	
 	private function alertData() {
-		if( ($tmp = $this->read("alert")) !== false )
+		if( ($tmp = $this->read("alert")) !== false ) {
 			foreach( $tmp as $data ) {
 				$this->data = $data;
 				echo $this->data;
 				//dostuff
 			}
+		}
 	}
 	
 	private function getData() {
 		if( ($data = $this->read("irc")) !== false ) {
 			$this->data = $data;
 			$ex = explode(' ', $this->data);
-			if($ex[0] == "PING")
+			if($ex[0] == "PING") {
 				fputs($this->socket['irc'], "PONG ".$ex[1]."\n");
-			if( $ex[1] == 376 || ($ex[1] == "MODE" && $ex[2] == $this->nick) )
+			}
+			if( $ex[1] == 376 || ($ex[1] == "MODE" && $ex[2] == $this->nick) ) {
 				if($this->j == 2) {
 					$this->joinChan();
 					$this->j=0;
 				}
+			}
 			$this->command = str_replace(array(chr(10), chr(13)), '', $ex[3]);
-			if(strstr($this->command,":."))
+			if(strstr($this->command,":.")) {
 				$this->handleCommand();
+			}
 		}
 	}
 	
-	private function joinChan() {
-		foreach($this->chan as $chan)
+	private function joinChan($chan=false) {
+		if( $chan ) {
+			$this->chan[] = $chan;
+		}
+		foreach($this->chan as $chan) {
 			fputs($this->socket['irc'],"JOIN ".$chan."\n");
+		}
 		return true;
 	}
 	
@@ -171,8 +191,9 @@ class ircbot {
 		$this->command = str_replace(":.","",$this->command);
 		$tmp=explode(":.".$this->command." ",$this->data);
 		$this->user = $this->get_user();
-		if( $this->isAuthd() || trim($this->command) == "auth" )
+		if( $this->isAuthd() || trim($this->command) == "auth" ) {
 			$this->proceedCommand(str_replace("\n","",trim($this->command)),trim($tmp[1]));
+		}
 		$this->authd[$this->getUser($this->data)] = $this->user;
 		return false;
 	}
@@ -213,31 +234,34 @@ class ircbot {
 			return die();
 		}
 		$this->log("Trying to connect to ".$this->server.":".$this->port.($this->ssl?" (SSL)":""));
-		if($this->socket['irc'])
+		if($this->socket['irc']) {
 			fclose($this->socket['irc']);
-		if($this->ssl)
+		}
+		if($this->ssl) {
 			$server = 'ssl://'.$this->server;
-		else
+		} else {
 			$server = $this->server;
+		}
 		$this->socket['irc'] = fsockopen($server, $this->port);
-		if(!is_resource($this->socket['irc']))
+		if(!is_resource($this->socket['irc'])) {
 			return $this->connect($try+1);
-		else {
+		} else {
 			stream_set_blocking($this->socket['irc'], false);
 			return true;
 		}
 	}
 	
 	private function doAuth() {
-		if(fputs($this->socket['irc'],"USER ".$this->nick." 0 ".$this->nick." :".$this->nick."\n"))
-			if(fputs($this->socket['irc'],"NICK ".$this->nick."\n"))
+		if(fputs($this->socket['irc'],"USER ".$this->nick." 0 ".$this->nick." :".$this->nick."\n") && fputs($this->socket['irc'],"NICK ".$this->nick."\n")) {
 				return true;
+		}
 		return false;
 	}
 	
 	private function sendMessage($message,$chan) {
-		if( $this->debug )
+		if( $this->debug ) {
 			$this->log("Sending 'PRIVMSG ".trim($chan)." :".trim($message)."'");
+		}
 		return fputs($this->socket['irc'], "PRIVMSG ".trim($chan)." :".trim($message)."\n");
 	}
 	
@@ -248,22 +272,24 @@ class ircbot {
 	
 	private function chkdb() {
 		if( !is_resource($this->sql) ) {
-			if( ($this->sql = mysql_connect($this->config['db_host'],$this->config['db_user'],$this->config['db_pass'])) != false && mysql_select_db($this->config['db_name']))
+			if( ($this->sql = mysql_connect($this->config['db_host'],$this->config['db_user'],$this->config['db_pass'])) != false && mysql_select_db($this->config['db_name'])) {
 				return true;
-			else {
+			} else {
 				$this->log("Cannot connect to MySQL");
 				return die();
 			}
-		} else
+		} else {
 			return true;
+		}
 	}
 	
 	private function isAuthd() {
 		if( $this->user['expire'] >= time() ) {
 			$this->user['expire'] = time()+($this->config['irc_authtime']*3600);
 			return true;
-		} else
+		} else {
 			return false;
+		}
 	}
 	
 	private function get_user() {
@@ -272,35 +298,41 @@ class ircbot {
 	
 	private function _auth($params) {
 		$params = explode(" ",$params,2);
-		if( strlen($params[0]) == 64 )
+		if( strlen($params[0]) == 64 ) {
 			if( $this->tokens[$this->getUser($this->data)] == $params[0] ) {
 				$this->user['expire'] = time()+($this->config['irc_authtime']*3600);
 				$tmp = dbFetchRow("SELECT level FROM users WHERE user_id = ?", array($this->user['id']));
 				$this->user['level'] = $tmp['level'];
 				if( $this->user['level'] < 5 ) {
-					foreach( dbFetchRows("SELECT device_id FROM devices_perms WHERE user_id = ?", array($this->user['id'])) as $tmp )
+					foreach( dbFetchRows("SELECT device_id FROM devices_perms WHERE user_id = ?", array($this->user['id'])) as $tmp ) {
 						$this->user['devices'][] = $tmp['device_id'];
-					foreach( dbFetchRows("SELECT port_id FROM ports_perms WHERE user_id = ?", array($this->user['id'])) as $tmp )
+					}
+					foreach( dbFetchRows("SELECT port_id FROM ports_perms WHERE user_id = ?", array($this->user['id'])) as $tmp ) {
 						$this->user['ports'][] = $tmp['port_id'];
+					}
 				}
 				return $this->respond("Authenticated.");
-			} else
+			} else {
 				return $this->respond("Nope.");
-		else {
+			}
+		} else {
 			$user = dbFetchRow("SELECT `user_id`,`username`,`email` FROM `users` WHERE `username` = ?", array(mres($params[0])));
 			if($user['email'] && $user['username'] == $params[0]) {
 				$token = hash("gost",openssl_random_pseudo_bytes(1024));
 				$this->tokens[$this->getUser($this->data)] = $token;
 				$this->user['name'] = $params[0];
 				$this->user['id'] = $user['user_id'];
-				if( $this->debug )
+				if( $this->debug ) {
 					$this->log("Auth for '".$params[0]."', ID: '".$user['user_id']."', Token: '".$token."', Mail: '".$user['email']."'");
-				if(send_mail($user['email'], "LibreNMS IRC-Bot Authtoken", "Your Authtoken for the IRC-Bot:\r\n\r\n".$token."\r\n\r\n") === true)
+				}
+				if(send_mail($user['email'], "LibreNMS IRC-Bot Authtoken", "Your Authtoken for the IRC-Bot:\r\n\r\n".$token."\r\n\r\n") === true) {
 					return $this->respond("Token sent!");
-				else
+				} else {
 					return $this->respond("Sorry, seems like mail doesnt like us.");
-			} else
+				}
+			} else {
 				return $this->respond("Who are you again?");
+			}
 		}
 		return false;
 	}
@@ -310,8 +342,9 @@ class ircbot {
 		include("includes/defaults.inc.php");
 		include("config.php");
 		$this->respond("Reloading configuration & defaults");
-		if( $config != $this->config )
+		if( $config != $this->config ) {
 			$this->__construct();
+		}
 	}
 	
 	private function _quit($params) {
@@ -319,8 +352,9 @@ class ircbot {
 	}
 	
 	private function _help($params) {
-		foreach($this->commands as $cmd)
+		foreach($this->commands as $cmd) {
 			$msg .= ", ".$cmd;
+		}
 		$msg = substr($msg,2);
 		return $this->respond("Available commands: $msg");
 	}
@@ -331,29 +365,33 @@ class ircbot {
 	
 	private function _log($params) {
 		$num = 1;
-		if( $params > 1 )
+		if( $params > 1 ) {
 			$num = $params;
-		if( $this->user['level'] < 5 )
+		}
+		if( $this->user['level'] < 5 ) {
 			$tmp = dbFetchRows("SELECT `event_id`,`host`,`datetime`,`message`,`type` FROM `eventlog` WHERE `host` IN (".implode(",",$this->user['devices']).") ORDER BY `event_id` DESC LIMIT ".mres($num));
-		else
+		} else
 			$tmp = dbFetchRows("SELECT `event_id`,`host`,`datetime`,`message`,`type` FROM `eventlog` ORDER BY `event_id` DESC LIMIT ".mres($num));
 		foreach( $tmp as $device) {
 			$hostid = dbFetchRow("SELECT `hostname` FROM `devices` WHERE `device_id` = ".$device['host']);
 			$this->respond($device['event_id'] ." ". $hostid['hostname'] ." ". $device['datetime'] ." ". $device['message'] ." ". $device['type']);
 		}
-		if(!$hostid)
+		if(!$hostid) {
 			$this->respond("Nothing to see, maybe a bug?");
+		}
 		return true;
 	}
 	
 	private function _down($params) {
-		if( $this->user['level'] < 5 )
+		if( $this->user['level'] < 5 ) {
 			$tmp = dbFetchRows("SELECT `hostname` FROM `devices` WHERE status=0 AND `device_id` IN (".implode(",",$this->user['devices']).")");
-		else
+		} else {
 			$tmp = dbFetchRows("SELECT `hostname` FROM `devices` WHERE status=0");
+		}
 		foreach( $tmp as $db ) {
-			if($db['hostname'])
+			if($db['hostname']) {
 				$msg .= ", ".$db['hostname'];
+			}
 		}
 		$msg = substr($msg,2);
 		$msg = $msg ? $msg : "Nothing to show :)";
@@ -364,10 +402,12 @@ class ircbot {
 		$params   = explode(" ",$params);
 		$hostname = $params[0];
 		$device   = dbFetchRow("SELECT * FROM `devices` WHERE `hostname` = ?",array($hostname));
-		if(!$device)
+		if(!$device) {
 			return $this->respond("Error: Bad or Missing hostname, use .listdevices to show all devices.");
-		if($this->user['level'] < 5 && !in_array($device['device_id'],$this->user['devices']))
+		}
+		if($this->user['level'] < 5 && !in_array($device['device_id'],$this->user['devices'])) {
 			return $this->respond("Error: Permission denied.");
+		}
 		$status  = $device['status']   ? "Up ".formatUptime($device['uptime']) : "Down";
 		$status .= $device['ignore']   ? "*Ignored*"  : "";
 		$status .= $device['disabled'] ? "*Disabled*" : "";
@@ -378,12 +418,14 @@ class ircbot {
 		$params   = explode(" ",$params);
 		$hostname = $params[0];
 		$ifname   = $params[1];
-		if( !$hostname || !$ifname )
+		if( !$hostname || !$ifname ) {
 			return $this->respond("Error: Missing hostname or ifname.");
+		}
 		$device   = dbFetchRow("SELECT * FROM `devices` WHERE `hostname` = ?",array($hostname));
 		$port     = dbFetchRow("SELECT * FROM `ports` WHERE `ifName` = ? OR `ifDescr` = ? AND device_id = ?", array($ifname, $ifname, $device['device_id']));
-		if($this->user['level'] < 5 && !in_array($port['port_id'],$this->user['ports']) && !in_array($device['device_id'],$this->user['devices']))
+		if($this->user['level'] < 5 && !in_array($port['port_id'],$this->user['ports']) && !in_array($device['device_id'],$this->user['devices'])) {
 			return $this->respond("Error: Permission denied.");
+		}
 		$bps_in   = formatRates($port['ifInOctets_rate']);
 		$bps_out  = formatRates($port['ifOutOctets_rate']);
 		$pps_in   = format_bi($port['ifInUcastPkts_rate']);
@@ -392,12 +434,14 @@ class ircbot {
 	}
 	
 	private function _listdevices($params) {
-		if( $this->user['level'] < 5 )
+		if( $this->user['level'] < 5 ) {
 			$tmp = dbFetchRows("SELECT `hostname` FROM `devices` WHERE `device_id` IN (".implode(",",$this->user['devices']).")");
-		else
+		} else {
 			$tmp = dbFetchRows("SELECT `hostname` FROM `devices`");
-		foreach( $tmp as $device )
+		}
+		foreach( $tmp as $device ) {
 			$msg .= ", ".$device['hostname'];
+		}
 		$msg = substr($msg,2);
 		$msg = $msg ? $msg : "Nothing to show..?";
 		return $this->respond($msg);
