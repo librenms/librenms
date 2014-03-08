@@ -38,8 +38,11 @@ class ircbot {
 	private $tick     = 62500;
 	
 	public function __construct() {
-		global $config;
+		global $config, $observium_link;
 		$this->log("Setting up IRC-Bot..");
+		if( is_resource($observium_link) ) {
+			$this->sql = $observium_link;
+		}
 		$this->j = 2;
 		$this->config = $config;
 		$this->debug = $this->config['irc_debug'];
