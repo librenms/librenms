@@ -74,7 +74,7 @@ conflicts in master.
 
 Workflow:
 
-- Ensure you have aut rebranching switched on in your gitconfig.
+- Ensure you have auto rebase switched on in your gitconfig.
 ```
 [branch]
         autosetuprebase = always
