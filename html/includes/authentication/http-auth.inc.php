@@ -79,4 +79,20 @@ function get_userlist()
   return dbFetchRows("SELECT * FROM `users`");
 }
 
+function can_update_users()
+{
+  # supported so return 1
+  return 1;
+}
+
+function get_user($user_id)
+{
+   return dbFetchRow("SELECT * FROM `users` WHERE `user_id` = ?", array($user_id));
+}
+
+function update_user($user_id,$realname,$level,$can_modify_passwd,$email)
+{
+  dbUpdate(array('realname' => $realname, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'email' => $email), 'users', '`user_id` = ?', array($user_id));
+}
+
 ?>
