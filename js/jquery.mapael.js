@@ -281,10 +281,12 @@
 		
 		if (options.href) {
 			elem.mapElem.href = options.href;
+			elem.mapElem.target = options.target;
 			$.fn.mapael.setHref(elem.mapElem);
 			
 			if (options.text && typeof options.text.content !='undefined') {
 				elem.textElem.href = options.href;
+				elem.textElem.target = options.target;
 				$.fn.mapael.setHref(elem.textElem);
 			}
 		}
@@ -353,7 +355,11 @@
 				(elem.textElem) && $.fn.mapael.setHref(elem.textElem);
 			}
 			elem.mapElem.href = elemOptions.href;
-			(elem.textElem) && (elem.textElem.href = elemOptions.href);
+			elem.mapElem.target = elemOptions.target;
+			if (elem.textElem) {
+				elem.textElem.href = elemOptions.href;
+				elem.textElem.target = elemOptions.target;
+			}
 		}
 	}
 	
@@ -397,7 +403,7 @@
 		elem.attr({cursor : 'pointer'});
 		$(elem.node).bind('click', function() {
 			if (!$.fn.mapael.panning && elem.href)
-				window.location = elem.href;
+				window.open(elem.href, elem.target);
 		});
 	}
 	
@@ -785,6 +791,7 @@
 						, "animDuration" : 300
 					}
 				}
+				, target : '_self'
 			}
 			, defaultPlot : {
 				type : "circle"
@@ -811,6 +818,7 @@
 						, animDuration : 300
 					}
 				}
+				, target : '_self'
 			}
 			, zoom : {
 				enabled : false
