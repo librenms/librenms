@@ -460,7 +460,25 @@ if ($packages)
         </li>
 <?php
 } # if ($packages)
+?>
 
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"> Plugins<b class="caret"></b></a>
+          <ul class="dropdown-menu">
+<?php
+Plugins::call('menu');
+?>
+            <li role="presentation" class="divider"></li>
+<?php
+if ($_SESSION['userlevel'] >= '10')
+{
+  echo('            <li><a href="plugin/view=admin">Plugin Admin</a></li>');
+}
+?>
+          </ul>
+        </li>
+
+<?php
 // Custom menubar entries.
 if(is_file("includes/print-menubar-custom.inc.php"))
 {
@@ -482,21 +500,6 @@ if(is_file("includes/print-menubar-custom.inc.php"))
               </div>
             </div>
           </form>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"> Plugins<b class="caret"></b></a>
-          <ul class="dropdown-menu">
-<?php
-Plugins::call('menu');
-?>
-            <li role="presentation" class="divider"></li>
-<?php
-if ($_SESSION['userlevel'] >= '10')
-{
-  echo('            <li><a href="plugin/view=admin">Plugin Admin</a></li>');
-}
-?>
-          </ul>
         </li>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System<b class="caret"></b></a>
