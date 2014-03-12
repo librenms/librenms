@@ -94,6 +94,23 @@ include("includes/authenticate.inc.php");
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) { $_SESSION['widescreen'] = 1; }
 if (strstr($_SERVER['REQUEST_URI'], 'widescreen=no'))  { unset($_SESSION['widescreen']); }
 
+# Load the settings for Multi-Tenancy.
+if (isset($config['branding']) && is_array($config['branding']))
+{
+  if ($config['branding'][$_SERVER['SERVER_NAME']])
+  {
+    foreach ($config['branding'][$_SERVER['SERVER_NAME']] as $confitem => $confval)
+    {
+        eval("\$config['" . $confitem . "'] = \$confval;");
+    }
+  } else {
+    foreach ($config['branding']['default'] as $confitem => $confval)
+    {
+      eval("\$config['" . $confitem . "'] = \$confval;");
+    }
+  }
+}
+
 # page_title_prefix is displayed, unless page_title is set
 if ($config['page_title']) { $config['page_title_prefix'] = $config['page_title']; }
 
