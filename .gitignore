@@ -3,3 +3,5 @@ config.php
 logs
 patches
 rrd
+html/plugins/*
+!html/plugins/Test/
