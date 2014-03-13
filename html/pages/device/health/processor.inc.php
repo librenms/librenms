@@ -10,7 +10,7 @@ foreach (dbFetchRows("SELECT * FROM `processors` WHERE device_id = ?", array($de
 {
   $proc_url   = "device/device=".$device['device_id']."/tab=health/metric=processor/";
 
-  $mini_url = "graph.php?id=".$proc['processor_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$config['time']['now']."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
+  $mini_url = "graph.php?id=".$proc['processor_id']."&amp;type=".$graph_type."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 
   $text_descr = $proc['processor_descr'];
 
