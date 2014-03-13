@@ -74,19 +74,35 @@ conflicts in master.
 
 Workflow:
 
+- Ensure you have auto rebase switched on in your gitconfig.
+```
+[branch]
+        autosetuprebase = always
+```
 - Fork the [LibreNMS repo master branch][2] in your own GitHub account.
 - Create an [issue][3] explaining what work you plan to do.
 - Create a branch in your copy of the repo called issue-####, where #### is
   the issue number you created.
+```
+git push origin master:issue-####
+```
 - Make and test your changes in the issue branch as needed - this might take
   a few days or weeks.
 - When you are happy with your issue branch's changes and ready to submit
   your patch, update your copy of the master branch to the current revision;
-  this should just result in a fast forward of your copy of master.
+  this should just result in a fast forward of your copy of master. Do this from your master branch:
+```
+git pull
+```
 - Rebase your issue branch from your clone of master.  Fix any conflicts at
-  this stage.
-- Merge your issue branch back into of your copy of master. Again, this
-  should be a simple fast forward.
+  this stage. Do this from your issue-#### branch:
+````
+git pull
+````
+- Push your changes to your remote git hub branch so you can submit a pull from your issue-#### branch:
+````
+git push origin issue-####
+````
 - Submit a pull request for your patch from your copy of master.
 
 [1]: http://www.gnu.org/licenses/license-list.html
