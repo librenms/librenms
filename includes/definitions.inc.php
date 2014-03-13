@@ -1161,14 +1161,14 @@ if (isset($_SERVER['HTTPS']))
 }
 
 // Connect to database
-$observium_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
-if (!$observium_link)
+$database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
+if (!$database_link)
 {
         echo("<h2>MySQL Error</h2>");
         echo(mysql_error());
         die;
 }
-$observium_db = mysql_select_db($config['db_name'], $observium_link);
+$database_db = mysql_select_db($config['db_name'], $database_link);
 
 if ($config['memcached']['enable'])
 {
