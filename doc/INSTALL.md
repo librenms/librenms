@@ -79,6 +79,8 @@ First, create and chown the `rrd` directory and create the `logs` directory
 
 Next, add the following to `/etc/apache2/sites-available/librenms.conf`
 
+If you have Apache older than 2.3 then please use:
+
     <VirtualHost *:80>
       DocumentRoot /opt/librenms/html/
       ServerName  librenms.example.com
@@ -89,6 +91,20 @@ Next, add the following to `/etc/apache2/sites-available/librenms.conf`
         Options FollowSymLinks MultiViews
       </Directory>
     </VirtualHost>
+
+If you have Apache 2.3 or newer then please use:
+
+    <VirtualHost *:80>
+      DocumentRoot /opt/librenms/html/
+      ServerName  librenms.example.com
+      CustomLog /opt/librenms/logs/access_log combined
+      ErrorLog /opt/librenms/logs/error_log
+      <Directory "/opt/librenms/html/">
+        Require all granted
+        AllowOverride All
+        Options FollowSymLinks MultiViews
+      </Directory>
+   </VirtualHost>
 
 Don't forget to change 'example.com' to your domain, then enable the vhost and restart Apache:
 
