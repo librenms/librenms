@@ -37,6 +37,9 @@ elif [ "${OS}" = "Linux" ] ; then
   elif [ -f /etc/debian_version ] ; then
     DIST="Debian `cat /etc/debian_version`"
     REV=""
+  elif [ -f /etc/gentoo-release ] ; then
+    DIST="Gentoo"
+    REV=$(tr -d '[[:alpha:]]' </etc/gentoo-release | tr -d " ")
   fi
 
   if [ -f /etc/UnitedLinux-release ] ; then
