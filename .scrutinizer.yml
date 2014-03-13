@@ -1,0 +1,7 @@
+# .scrutinizer.yml
+imports:
+    - javascript
+    - php
+
+filter:
+    excluded_paths: [html/includes/jpgraph/*]
