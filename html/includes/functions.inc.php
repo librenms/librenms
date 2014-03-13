@@ -637,12 +637,14 @@ function generate_ap_url($ap, $vars=array())
 
 function report_this($message)
 {
-  return '<h2>'.$message.' Please <a href="'.$config['project_issues'].'">report this</a> to the developers.</h2>';
+  global $config;
+  return '<h2>'.$message.' Please <a href="'.$config['project_issues'].'">report this</a> to the '.$config['project_name'].' developers.</h2>';
 }
 
 function report_this_text($message)
 {
-  return $message.'\nPlease report this to the developers at '.$config['project_issues'].'\n';
+  global $config;
+  return $message.'\nPlease report this to the '.$config['project_name'].' developers at '.$config['project_issues'].'\n';
 }
 
 # Find all the files in the given directory that match the pattern
@@ -650,6 +652,7 @@ function get_matching_files($dir, $match = "/\.php$/")
 {
   global $config;
 
+  $list = array();
   if ($handle = opendir($dir))
   {
     while (false !== ($file = readdir($handle)))
