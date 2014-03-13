@@ -4,4 +4,4 @@ imports:
     - php
 
 filter:
-    excluded_paths: [html/includes/jpgraph/*]
+    excluded_paths: [html/includes/jpgraph/*, includes/phpmailer/*]
