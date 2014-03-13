@@ -37,8 +37,8 @@ ORDER BY ipv4_address
 
 // FIXME: Observium now uses ip_mac.ip_address in place of ipv4_mac.ipv4_address - why?
 
-unset($names);
-unset($ips);
+$names = array();
+$ips = array();
 
 foreach (dbFetchRows($sql, array($deviceid)) as $entry)
 {
