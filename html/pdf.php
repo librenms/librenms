@@ -27,7 +27,6 @@ if (strpos($_SERVER['REQUEST_URI'], "debug"))
     ini_set('error_reporting', 0);
 }
 
-$filename = $config['project_id']."-report.pdf";
 $html     = "";
 $type     = (isset($_GET['type']) ? $_GET['type'] : "");
 $report   = (isset($_GET['report']) ? $_GET['report'] : "");
@@ -41,6 +40,8 @@ include("includes/authenticate.inc.php");
 
 if (!$_SESSION['authenticated']) { $html .= "unauthenticated"; }
 
+$filename = $config['project_id']."-report.pdf";
+
 require_once("includes/tcpdf/config/lang/eng.php");
 require_once("includes/tcpdf/tcpdf.php");
 
@@ -49,6 +50,7 @@ class ObsPDF extends TCPDF
 {
   public function Footer()
   {
+    global $config;
     // Posistion at 15mm from bottom
     $this->SetY(-15);
     // Set Font
