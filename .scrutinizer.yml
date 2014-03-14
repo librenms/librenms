@@ -4,4 +4,13 @@ imports:
     - php
 
 filter:
-    excluded_paths: [html/includes/jpgraph/*, includes/phpmailer/*]
+    excluded_paths: [
+
+	html/includes/jpgraph/*,
+	html/js/jquery.cycle.all.js,
+	html/js/jquery-ui-timepicker-addon.js,
+	html/js/sorttable.js,
+	html/js/tw-sack.js
+	includes/phpmailer/*,
+
+    ]
