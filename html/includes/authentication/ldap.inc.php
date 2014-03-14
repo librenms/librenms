@@ -163,7 +163,7 @@ function get_userlist()
   return $userlist;
 }
 
-function can_update_usesr()
+function can_update_user()
 {
   # not supported so return 0
   return 0;
