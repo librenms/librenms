@@ -329,12 +329,13 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Override FeatureGroup.getBounds as it doesn't work
 	getBounds: function () {
 		var bounds = new L.LatLngBounds();
+
 		if (this._topClusterLevel) {
 			bounds.extend(this._topClusterLevel._bounds);
-		} else {
-			for (var i = this._needsClustering.length - 1; i >= 0; i--) {
-				bounds.extend(this._needsClustering[i].getLatLng());
-			}
+		}
+
+		for (var i = this._needsClustering.length - 1; i >= 0; i--) {
+			bounds.extend(this._needsClustering[i].getLatLng());
 		}
 
 		bounds.extend(this._nonPointGroup.getBounds());
