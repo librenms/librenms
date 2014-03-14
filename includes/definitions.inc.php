@@ -560,6 +560,12 @@ $os = "engenius";
 $config['os'][$os]['type']              = "wireless";
 $config['os'][$os]['text']              = "EnGenius Access Point";
 $config['os'][$os]['icon']              = "engenius";
+$config['os'][$os]['over'][0]['graph']  = "device_ucd_cpu";
+$config['os'][$os]['over'][0]['text']   = "Processor Usage";
+$config['os'][$os]['over'][1]['graph']  = "device_ucd_memory";
+$config['os'][$os]['over'][1]['text']   = "Memory Usage";
+$config['os'][$os]['over'][2]['graph']  = "device_bits";
+$config['os'][$os]['over'][2]['text']   = "Device Traffic";
 
 $os = "airport";
 $config['os'][$os]['type']              = "wireless";
