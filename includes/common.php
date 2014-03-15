@@ -40,7 +40,7 @@ function external_exec($command)
     $exec_response['error'] = stream_get_contents($pipes[2]);
     if ($exec_response['error'])
     {
-      $output = FALSE;
+      $output = $exec_response['error'];
     } else {
       $output = stream_get_contents($pipes[1]);
     }
