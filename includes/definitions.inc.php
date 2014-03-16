@@ -517,6 +517,7 @@ $os = "dlink";
 $config['os'][$os]['text']              = "D-Link Switch";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "dlink";
+$config['os'][$os]['ifname']            = 1;
 
 $os = "dlinkap";
 $config['os'][$os]['text']              = "D-Link Access Point";
