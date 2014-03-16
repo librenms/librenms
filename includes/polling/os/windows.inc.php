@@ -38,6 +38,7 @@ if($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.1") { // Workstation
   if (strstr($poll_device['sysDescr'], "Build 6002"))         { $version = "Server 2008 SP2 (NT 6.0)"; }
   if (strstr($poll_device['sysDescr'], "Build 7600"))         { $version = "Server 2008 R2 (NT 6.1)"; }
   if (strstr($poll_device['sysDescr'], "Build 7601"))         { $version = "Server 2008 R2 SP1 (NT 6.1)"; }
+  if (strstr($poll_device['sysDescr'], "Build 9200"))         { $version = "Server 2012 (NT 6.2)"; }
 
 } elseif ($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.3") { // Datacentre Server
 
@@ -49,6 +50,7 @@ if($poll_device['sysObjectID'] == ".1.3.6.1.4.1.311.1.1.3.1.1") { // Workstation
   if (strstr($poll_device['sysDescr'], "Build 6002"))         { $version = "Server 2008 Datacenter SP2 (NT 6.0)"; }
   if (strstr($poll_device['sysDescr'], "Build 7600"))         { $version = "Server 2008 Datacenter R2 (NT 6.1)"; }
   if (strstr($poll_device['sysDescr'], "Build 7601"))         { $version = "Server 2008 Datacenter R2 SP1 (NT 6.1)"; }
+  if (strstr($poll_device['sysDescr'], "Build 9200"))         { $version = "Server 2012 Datacenter (NT 6.2)"; }
 
 }
 
