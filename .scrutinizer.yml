@@ -11,6 +11,6 @@ filter:
 	html/js/jquery-ui-timepicker-addon.js,
 	html/js/sorttable.js,
 	html/js/tw-sack.js,
-	includes/phpmailer/*,
+	includes/phpmailer/*
 
     ]
