@@ -566,4 +566,8 @@ $config['modules_compat']['rfc1628']['poweralert']        = 1;
 # Enable daily updates
 $config['update'] = 1;
 
+# Purge syslog and eventlog
+$config['syslog_purge']                                   = 30; # Number in days of how long to keep syslog entries for.
+$config['eventlog_purge']                                 = 30; # Number in days of how long to keep eventlog entries for.
+
 ?>
