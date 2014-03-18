@@ -41,7 +41,6 @@ if (isset($_REQUEST['search']))
         foreach ($results as $result)
         {
           $name = $result['hostname'];
-          if (strlen($name) > 36) { $name = substr($name, 0, 36) . "..."; }
           if($result['disabled'] == 1)
           {
             $highlight_colour = '#808080';
@@ -85,15 +84,7 @@ if (isset($_REQUEST['search']))
         foreach ($results as $result)
         {
           $name = $result['ifDescr'];
-          if (strlen($name) > 36)
-          {
-            $name = substr($name, 0, 36) . "...";
-          }
           $description = $result['ifAlias'];
-          if (strlen($description) > 50)
-          {
-            $description = substr($description, 0, 50) . "...";
-          }
   
           if($result['deleted'] == 0 && ($result['ignore'] == 0 || $result['ignore'] == 0) && ($result['ifInErrors_delta'] > 0 || $result['ifOutErrors_delta'] > 0))
           {
@@ -135,6 +126,54 @@ if (isset($_REQUEST['search']))
       print_r($json);
       exit;
 
+    } elseif($_REQUEST['type'] == 'bgp') {
+      // Search bgp peers
+      $results = dbFetchRows("SELECT `bgpPeers`.* AS B,`devices`.* AS D FROM `bgpPeers` LEFT JOIN `devices` ON  `bgpPeers`.`device_id` =  `devices`.`device_id` WHERE `astext` LIKE '%" . $search . "%' OR `bgpPeerIdentifier` LIKE '%" . $search . "%' OR `bgpPeerRemoteAs` LIKE '%" . $search . "%' ORDER BY `astext` LIMIT 8");
+      if (count($results))
+      {
+        $found = 1;
+
+        foreach ($results as $result)
+        {
+          $name = $result['bgpPeerIdentifier'];
+          $description = $result['astext'];
+          $remoteas = $result['bgpPeerRemoteAs'];
+          $localas = $result['bgpLocalAs'];
+
+          if($result['bgpPeerAdminStatus'] == 'start' && $result['bgpPeerState'] != 'established')
+          {
+            // Session active but errored
+            $port_colour = '#ffa500';
+          }
+          elseif($result['bgpPeerAdminStatus'] != 'start')
+          {
+            // Session inactive
+            $port_colour = '#000000';
+
+          }
+          elseif($result['bgpPeerAdminStatus'] == 'start' && $result['bgpPeerState'] == 'established')
+          {
+            // Session Up
+            $port_colour = '#008000';
+          }
+
+          if ($result['bgpPeerRemoteAs'] == $result['bgpLocalAs']) { $bgp_image = "images/16/brick_link.png"; } else { $bgp_image = "images/16/world_link.png"; }
+
+          $bgp[]=array('count'=>count($results),
+          'url'=>generate_peer_url($result),
+          'name'=>$name,
+          'description'=>$description,
+          'localas'=>$localas,
+          'bgp_image'=>$bgp_image,
+          'remoteas'=>$remoteas,
+          'colours'=>$port_colour,
+          'hostname'=>$result['hostname']);
+
+        }
+      }
+      $json = json_encode($bgp);
+      print_r($json);
+      exit;      
     }
   }
 }
