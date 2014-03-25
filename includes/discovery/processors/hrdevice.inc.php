@@ -27,6 +27,8 @@ if (is_array($hrDevice_array))
 
       // Workaround to set fake description for Mikrotik who don't populate hrDeviceDescr
       if ($device['os'] == "routeros" && !isset($entry['hrDeviceDescr'])) { $descr = "Processor"; }
+      // Workaround to set fake description for Engenius who don't populate hrDeviceDescr
+      if ($device['os'] == "engenius" && empty($entry['hrDeviceDescr'])) { $descr = "Processor"; }
 
       $descr = str_replace("CPU ", "", $descr);
       $descr = str_replace("(TM)", "", $descr);
