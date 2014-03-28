@@ -21,7 +21,8 @@ include('includes/plugins.inc.php');
 Plugins::start();
 
 // Check for install.inc.php
-if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
+if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php')
+{
   // no config.php does so let's redirect to the install
   header('Location: /install.php');
   exit;
@@ -122,8 +123,6 @@ if ($config['page_title']) { $config['page_title_prefix'] = $config['page_title'
   <title><?php echo($config['page_title_suffix']); ?></title>
   <base href="<?php echo($config['base_url']); ?>" />
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
-  <meta http-equiv="content-language" content="en-us" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <?php
 if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$config['page_refresh'].'" />' . "\n"); }
@@ -136,99 +135,20 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
   <script src="js/typeahead.min.js"></script>
   <script src="js/hogan-2.0.0.js"></script>
-
   <script src="js/jquery.cycle2.min.js"></script>
 <?php
 if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n"); }
 ?>
-  <!--<link rel="stylesheet" href="css/mktree.css" type="text/css" />-->
-<?php
-//if ($_SESSION['widescreen']) { echo('<link rel="stylesheet" href="css/styles-wide.css" type="text/css" />'); }
-?>
-  <!--<script type="text/javascript" src="js/mktree.js"></script>-->
-  <!--<script type="text/javascript" src="js/sorttable.js"></script>-->
-  <!--<script type="text/javascript" src="js/jquery.min.js"></script>-->
-  <!--<script type="text/javascript" src="js/jquery-checkbox.js"></script>-->
-  <!--<script type="text/javascript" src="js/bootstrap.min.js"></script>-->
-  <!--<script type="text/javascript" src="js/qtip/jquery.qtip.min.js"></script>-->
-  <!--<link rel="stylesheet" href="css/jquery.qtip.min.css" type="text/css">-->
-<!--<?php /* html5.js below from http://html5shim.googlecode.com/svn/trunk/html5.js */ ?>-->
-  <!--[if IE]><script src="js/html5.js"></script><![endif]-->
-  <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="js/jqplot/excanvas.js"></script><![endif]-->
-  <!--<script language="javascript" type="text/javascript" src="js/jqplot/jquery.jqplot.min.js"></script>-->
-  <!--<link rel="stylesheet" type="text/css" href="js/jqplot/jquery.jqplot.min.css" />-->
-  <!--<script type="text/javascript" src="js/jqplot/plugins/jqplot.pieRenderer.min.js"></script>-->
-  <!--<script type="text/javascript" src="js/jqplot/plugins/jqplot.donutRenderer.min.js"></script>-->
-  <script type="text/javascript">
-    <!--
-
-    $(function () {
-        $('.bubbleInfo').each(function () {
-            var distance = 10;
-            var time = 250;
-            var hideDelay = 500;
-
-            var hideDelayTimer = null;
-
-            var beingShown = false;
-            var shown = false;
-            var trigger = $('.trigger', this);
-            var info = $('.popup', this).css('opacity', 0);
-
-            $([trigger.get(0), info.get(0)]).mouseover(function () {
-                if (hideDelayTimer) clearTimeout(hideDelayTimer);
-                if (beingShown || shown) {
-                    // don't trigger the animation again
-                    return;
-                } else {
-                    // reset position of info box
-                    beingShown = true;
-
-                    info.css({
-                        top: -90,
-                        left: -33,
-                        display: 'block'
-                    }).animate({
-                        top: '-=' + distance + 'px',
-                        opacity: 1
-                    }, time, 'swing', function() {
-                        beingShown = false;
-                        shown = true;
-                    });
-                }
-
-                return false;
-            }).mouseout(function () {
-                if (hideDelayTimer) clearTimeout(hideDelayTimer);
-                hideDelayTimer = setTimeout(function () {
-                    hideDelayTimer = null;
-                    info.animate({
-                        top: '-=' + distance + 'px',
-                        opacity: 0
-                    }, time, 'swing', function () {
-                        shown = false;
-                        info.css('display', 'none');
-                    });
-
-                }, hideDelay);
-
-                return false;
-            });
-        });
-    });
-
-    //-->
-    </script>
   <script type="text/javascript">
 
-<!-- Begin
-function popUp(URL)
-{
-  day = new Date();
-  id = day.getTime();
-  eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=550,height=600');");
-}
-// End -->
+    <!-- Begin
+    function popUp(URL)
+    {
+      day = new Date();
+      id = day.getTime();
+      eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=550,height=600');");
+    }
+    // End -->
   </script>
   <script type="text/javascript" src="js/overlib_mini.js"></script>
 </head>
@@ -238,24 +158,24 @@ function popUp(URL)
 
 if (!$vars['bare'] == "yes") {
 
-  if ($_SESSION['authenticated']) {
+  if ($_SESSION['authenticated'])
+  {
     include("includes/print-menubar.php");
   } else {
     echo('<hr color="#444444" />');
   }
-
 }
 
 ?>
 <br />
 <div class="container-fluid">
-<div class="row">
-  <div class="col-md-12">
-&nbsp;<br /><br />
+  <div class="row">
+    <div class="col-md-12">
+      &nbsp;<br /><br />
+    </div>
   </div>
-</div>
-<div class="row">
-            <div class="col-md-12">
+  <div class="row">
+    <div class="col-md-12">
 <?php
 
 // To help debug the new URLs :)
@@ -289,41 +209,41 @@ if ($_SESSION['authenticated'])
   exit;
 }
 ?>
-            </div>
-          </div>
+    </div>
+  </div>
+</div>
 <?php
+
 $runtime_end = utime(); $runtime = $runtime_end - $runtime_start;
 $gentime = substr($runtime, 0, 5);
 
 # FIXME - move this
 if ($config['page_gen'])
 {
-    echo('<br />MySQL: Cell    '.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0,3).'s'.
-                      ' Row    '.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0,3).'s'.
-                      ' Rows   '.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0,3).'s'.
-                      ' Column '.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0,3).'s');
+  echo('  <br />MySQL: Cell    '.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0,3).'s'.
+                                 ' Row    '.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0,3).'s'.
+                                 ' Rows   '.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0,3).'s'.
+                                 ' Column '.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0,3).'s');
 
-    $fullsize = memory_get_usage();
-    unset($cache);
-    $cachesize = $fullsize - memory_get_usage();
-    if ($cachesize < 0) { $cachesize = 0; } // Silly PHP!
+  $fullsize = memory_get_usage();
+  unset($cache);
+  $cachesize = $fullsize - memory_get_usage();
+  if ($cachesize < 0) { $cachesize = 0; } // Silly PHP!
 
-    echo('<br />Cached data in memory is '.formatStorage($cachesize).'. Page memory usage is '.formatStorage($fullsize).', peaked at '. formatStorage(memory_get_peak_usage()) .'.');
-
-    echo('<br />Generated in ' . $gentime . ' seconds.');
+  echo('  <br />Cached data in memory is '.formatStorage($cachesize).'. Page memory usage is '.formatStorage($fullsize).', peaked at '. formatStorage(memory_get_peak_usage()) .'.');
+  echo('  <br />Generated in ' . $gentime . ' seconds.');
 }
 ?>
-    <script class="content_tooltips" type="text/javascript">
-$(document).ready(function() { $('#content a[title]').qtip({ content: { text: false }, style: 'light' }); });
+  <script class="content_tooltips" type="text/javascript">
+    $(document).ready(function() { $('#content a[title]').qtip({ content: { text: false }, style: 'light' }); });
 
-$('INPUT.auto-hint, TEXTAREA.auto-hint').focus(function() {
-    if ($(this).val() == $(this).attr('title')) {
+    $('INPUT.auto-hint, TEXTAREA.auto-hint').focus(function() {
+      if ($(this).val() == $(this).attr('title')) {
         $(this).val('');
         $(this).removeClass('auto-hint');
-    }
-});
-
-    </script>
+      }
+    });
+  </script>
 
 <?php
 if (is_array($pagetitle))
@@ -339,19 +259,19 @@ if (is_array($pagetitle))
   echo("<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>");
 }
 ?>
-        <footer>
-          <div class="container">
-          <div class="row">
-            <div class="col-md-12 text-center">
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
 <?php
-echo('<br /> <br />  ' . (isset($config['footer']) ? $config['footer'] : ''));
-echo('<br />Powered by <a href="' . $config['project_url'] . '" target="_blank">' . $config['project_name_version'].'</a>. ');
-echo($config['project_name'].' is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPLv3</a>.<br/>');
-echo('Copyright &copy; 2006-2012 by Adam Armstrong. Copyright &copy; 2013-'.date("Y").' by the '.$config['project_name'].' Contributors.');
+echo('        <br /> <br />  ' . (isset($config['footer']) ? $config['footer'] : ''));
+echo('        <br />Powered by <a href="' . $config['project_url'] . '" target="_blank">' . $config['project_name_version'].'</a>. ');
+echo(         $config['project_name'].' is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPLv3</a>.<br/>');
+echo('        Copyright &copy; 2006-2012 by Adam Armstrong. Copyright &copy; 2013-'.date("Y").' by the '.$config['project_name'].' Contributors.');
 ?>
-            </div>
-          </div>
-          </div>
-        </footer>
-  </body>
+      </div>
+    </div>
+  </div>
+</footer>
+</body>
 </html>
