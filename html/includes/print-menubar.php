@@ -472,14 +472,9 @@ if(is_file("includes/print-menubar-custom.inc.php"))
 
       <ul class="nav navbar-nav navbar-right">
         <li style="padding-top:10px">
-          <form role="form" class="pull-left form-horizontal">
-            <div class="form-group row">
-              <div class="col-md-10">
+          <form role="search class="navbar-form navbar-left">
+            <div class="form-group">
                 <input class="input-large search-query" type="search" id="gsearch" name="gsearch" placeholder="Global Search" style="width: 250px">
-              </div>
-              <div class="col-md-2">
-                &nbsp;
-              </div>
             </div>
           </form>
         </li>
@@ -547,17 +542,25 @@ if ($_SESSION['authenticated'])
     {
       name: 'devices',
       remote : 'ajax_search.php?search=%QUERY&type=device',
-      header: '<h5><strong>Devices</strong></h5>',
-      template: '<p"><img src="{{device_image}}" border="0" class="img_left"> <small><a href="{{url}}"><strong>{{name}}</strong> | {{device_os}} | {{version}} | {{device_hardware}} with {{device_ports}} port(s) | {{location}}</a></small></p>',
+      header : '<h5><strong>&nbsp;Devices</strong></h5>',
+      template: '<p><img src="{{device_image}}" border="0" class="img_left"> <small><a href="{{url}}"><strong>{{name}}</strong> | {{device_os}} | {{version}} | {{device_hardware}} with {{device_ports}} port(s) | {{location}}</a></small></p>',
       valueKey:"name",
       engine: Hogan
     },
     {
       name: 'ports',
       remote : 'ajax_search.php?search=%QUERY&type=ports',
-      header: '<h5><strong>Ports</strong></h5>',
+      header : '<h5><strong>&nbsp;Ports</strong></h5>',
       template: '<p><small><a href="{{url}}"><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}</a></small></p>',
       valueKey: "name",
+      engine: Hogan
+    },
+    {
+      name: 'bgp',
+      remote : 'ajax_search.php?search=%QUERY&type=bgp',
+      header : '<h5><strong>&nbsp;BGP</strong></h5>',
+      template: '<p><small><a href="{{url}}"><img src="{{bgp_image}}" border="0" class="img_left">{{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</a></small></p>',
+      valueKey: 'name',
       engine: Hogan
     }
   ]);

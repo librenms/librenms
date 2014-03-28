@@ -1608,3 +1608,8 @@ tr.search:nth-child(odd) {
     max-height: 200px;
     overflow-x: hidden;
 }
+
+.tt-dropdown-menu
+{
+ min-width: 500px;
+}
