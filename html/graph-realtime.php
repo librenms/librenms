@@ -43,7 +43,8 @@ header("Content-type: image/svg+xml");
 
 /********** HTTP GET Based Conf ***********/
 $ifnum=@$port['ifIndex'];  // BSD / SNMP interface name / number
-$ifname=@$port['ifDescr'];  //Interface name that will be showed on top right of graph
+$ifname=ifLabel($port);
+$ifname=$ifname['label']; //Interface name that will be showed on top right of graph
 $hostname=shorthost($device['hostname']);
 
 if($_GET['title']) { $ifname = $_GET['title']; }
