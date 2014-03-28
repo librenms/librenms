@@ -450,6 +450,11 @@ function generate_port_url($port, $vars=array())
   return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']), $vars);
 }
 
+function generate_peer_url($peer, $vars=array())
+{
+  return generate_url(array('page' => 'device', 'device' => $peer['device_id'], 'tab' => 'routing', 'proto' => 'bgp'), $vars);
+}
+
 function generate_port_image($args)
 {
   if (!$args['bg']) { $args['bg'] = "FFFFFF"; }
