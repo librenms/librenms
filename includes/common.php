@@ -32,7 +32,7 @@ function external_exec($command)
 
 function shorthost($hostname, $len=12)
 {
-  # IP addresses should not be shortened
+  // IP addresses should not be shortened
   if (filter_var($hostname, FILTER_VALIDATE_IP))
     return $hostname;
   
