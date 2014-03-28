@@ -488,6 +488,7 @@ a.list-device-disabled, a.list-device-disabled:visited {
   padding: 3px;
   width: 117px;
   height: 85px;
+  overflow: hidden;
 
   /* Rounded corners */
   -moz-border-radius: 2pt 2pt 2pt 2pt;
