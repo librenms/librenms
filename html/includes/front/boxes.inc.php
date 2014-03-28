@@ -17,7 +17,8 @@ echo('
 <div class="cycle-slideshow"
     data-cycle-fx="fade"
     data-cycle-timeout="10000"
-    data-cycle-slides="> div">
+    data-cycle-slides="> div"
+    style="clear: both">
 ');
 
 foreach (get_matching_files($config['html_dir']."/includes/front/", "/^top_.*\.php$/") as $file)
