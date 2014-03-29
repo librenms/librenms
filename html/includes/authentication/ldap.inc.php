@@ -163,4 +163,22 @@ function get_userlist()
   return $userlist;
 }
 
+function can_update_users()
+{
+  # not supported so return 0
+  return 0;
+}
+
+function get_user($user_id)
+{
+  # not supported
+  return 0;
+}
+
+function update_user($user_id,$realname,$level,$can_modify_passwd,$email)
+{
+  # not supported
+  return 0;
+}
+
 ?>
