@@ -10,10 +10,14 @@ if ($vars['view'] == "admin")
 }
 else
 {
-  $plugin = dbFetchRow("SELECT `plugin_name` FROM `plugins` WHERE `plugin_name` = '".$vars['p']."'");
+  $plugin = dbFetchRow("SELECT `plugin_name` FROM `plugins` WHERE `plugin_name` = '".$vars['p']."' AND `plugin_active`='1'");
   if(!empty($plugin))
   {
     require('plugins/'.$plugin['plugin_name'].'/'.$plugin['plugin_name'].'.inc.php');
+  }
+  else
+  {
+    print_error( "This plugin is either disabled or not available." );
   }
 }
 
