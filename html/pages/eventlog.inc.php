@@ -4,7 +4,7 @@ $param = array();
 
 if ($vars['action'] == "expunge" && $_SESSION['userlevel'] >= '10')
 {
-  dbQuery("TRUNCATE TABLE `bill_history`");
+  dbQuery("TRUNCATE TABLE `eventlog`");
   print_message("Event log truncated");
 }
 
