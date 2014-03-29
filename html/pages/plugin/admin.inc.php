@@ -25,7 +25,20 @@ if ($_SESSION['userlevel'] >= '10')
       $plugin_active = 0;
     }
 
-    dbUpdate(array('plugin_active' => $plugin_active), 'plugins', '`plugin_id` = ?', array($plugin_id));
+    if(dbUpdate(array('plugin_active' => $plugin_active), 'plugins', '`plugin_id` = ?', array($plugin_id)))
+    {
+      echo('
+<script type="text/javascript">
+$.ajax({
+    url: "",
+    context: document.body,
+    success: function(s,x){
+        $(this).html(s);
+    }
+});
+</script>
+');
+    }
 
   }
 
