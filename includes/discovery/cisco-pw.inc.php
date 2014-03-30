@@ -27,9 +27,8 @@ if ($config['enable_pseudowires'] && $device['os_group'] == "cisco")
   foreach ($pws as $pw_id => $pw)
   {
         list($cpw_remote_id) = explode(":", $pw['cpwVcMplsPeerLdpID']);
-        $cpw_remote_device = @mysql_result(mysql_query("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '".$cpw_remote_id."' AND A.port_id = I.port_id"),0);
-        $if_id = @mysql_result(mysql_query("SELECT `port_id` FROM `ports` WHERE `ifDescr` = '".$pw['cpwVcName']."' AND `device_id` = '".$device['device_id']."'"),0);
-
+        $cpw_remote_device = dbFetchCell("SELECT device_id from ipv4_addresses AS A, ports AS I WHERE A.ipv4_address=? AND A.port_id=I.port_id",array($cpw_remote_id));
+        $if_id = dbFetchCell("SELECT port_id from ports WHERE `ifDescr`=? AND `device_id`=?",array($pw['cpwVcName'],$device['device_id']));
         if (!empty($device['pws_db'][$pw['cpwVcID']]))
         {
           $pseudowire_id = $device['pws_db'][$pw['cpwVcID']];

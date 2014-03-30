@@ -155,7 +155,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     if ($debug) { echo("( $inserted inserted )\n"); }
     echo("+");
-    log_event("Sensor Added: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device, 'sensor', mysql_insert_id());
+    log_event("Sensor Added: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device, 'sensor', $inserted);
   }
   else
   {
@@ -351,7 +351,7 @@ function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr)
      $inserted = dbInsert(array('port_id' => $port_id,'vp_id' => $vp_id,'vp_descr' => $vp_descr), 'juniAtmVp');
      if ($debug) { echo("( $inserted inserted )\n"); }
      #FIXME vv no $device!
-     log_event("Juniper ATM VP Added: port ".mres($port_id)." vp ".mres($vp_id)." descr". mres($vp_descr), 'juniAtmVp', mysql_insert_id());
+     log_event("Juniper ATM VP Added: port ".mres($port_id)." vp ".mres($vp_id)." descr". mres($vp_descr), 'juniAtmVp', $inserted);
   }
   else
   {
@@ -421,21 +421,17 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
   if ($descr)
   {
     $descr = trim(str_replace("\"", "", $descr));
-    if (mysql_result(mysql_query("SELECT count(processor_id) FROM `processors` WHERE `processor_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `processor_type` = '$type'"),0) == '0')
+    if (dbFetchCell("SELECT COUNT(processor_id) FROM `processors` WHERE `processor_index` = ? AND `device_id` = ? AND `processor_type` = ?",array($index,$device['device_id'], $type)) == '0')
     {
-      $query = "INSERT INTO processors (`entPhysicalIndex`, `hrDeviceIndex`, `device_id`, `processor_descr`, `processor_index`, `processor_oid`, `processor_usage`, `processor_type`, `processor_precision`)
-                      values ('$entPhysicalIndex', '$hrDeviceIndex', '".$device['device_id']."', '$descr', '$index', '$oid', '$current', '$type','$precision')";
-      mysql_query($query);
+      $inserted = dbInsert(array('`entPhysicalIndex`' => $entPhysicalIndex, '`hrDeviceIndex`' => $hrDeviceIndex, '`device_id`' => $device['device_id'],'`processor_descr`' => $descr, '`processor_index`' => $index, '`processor_oid`' => $oid, '`processor_usage`' => $current, '`processor_type`' => $type, '`processor_precision`' => $precision), 'processors');
       if ($debug) { print $query . "\n"; }
       echo("+");
-      log_event("Processor added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'processor', mysql_insert_id());
+      log_event("Processor added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'processor', $inserted);
     }
     else
     {
       echo(".");
-      $query = "UPDATE `processors` SET `processor_descr` = '".$descr."', `processor_oid` = '".$oid."', `processor_precision` = '".$precision."'
-                      WHERE `device_id` = '".$device['device_id']."' AND `processor_index` = '".$index."' AND `processor_type` = '".$type."'";
-      mysql_query($query);
+      dbUpdate(array('`processor_descr`' => $descr, '`processor_oid`' => $oid, '`processor_precision`' => $precision), 'processors', '`device_id`=? AND `processor_index`=? AND `processor_type`=?',array($device['device_id'],$index,$type));
       if ($debug) { print $query . "\n"; }
     }
     $valid[$type][$index] = 1;
@@ -449,22 +445,17 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
   if ($debug) { echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n"); }
   if ($descr)
   {
-    if (mysql_result(mysql_query("SELECT count(mempool_id) FROM `mempools` WHERE `mempool_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `mempool_type` = '$type'"),0) == '0')
+    if (dbFetchCell("SELECT COUNT(mempool_id) FROM `mempools` WHERE `mempool_index` = ? AND `device_id` = ? AND `mempool_type` = ?",array($index,$device['device_id'], $type)) == '0')
     {
-      $query = "INSERT INTO mempools (`entPhysicalIndex`, `hrDeviceIndex`, `device_id`, `mempool_descr`, `mempool_index`, `mempool_type`, `mempool_precision`)
-                      values ('$entPhysicalIndex', '$hrDeviceIndex', '".$device['device_id']."', '$descr', '$index', '$type','$precision')";
-      mysql_query($query);
+      $inserted = dbInsert(array('`entPhysicalIndex`' => $entPhysicalIndex, '`hrDeviceIndex`' => $hrDeviceIndex, '`device_id`' => $device['device_id'],'`mempool_descr`' => $descr, '`mempool_index`' => $index, '`mempool_type`' => $type, '`mempool_precision`' => $precision), 'mempools');
       if ($debug) { print $query . "\n"; }
       echo("+");
-      log_event("Memory pool added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'mempool', mysql_insert_id());
+      log_event("Memory pool added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'mempool', $inserted);
     }
     else
     {
       echo(".");
-      $query  = "UPDATE `mempools` SET `mempool_descr` = '".$descr."', `entPhysicalIndex` = '".$entPhysicalIndex."'";
-      $query .= ", `hrDeviceIndex` = '$hrDeviceIndex' ";
-      $query .= "WHERE `device_id` = '".$device['device_id']."' AND `mempool_index` = '".$index."' AND `mempool_type` = '".$type."'";
-      mysql_query($query);
+      dbUpdate(array('`mempool_descr`' => $descr, '`entPhysicalIndex`' => $entPhysicalIndex, '`hrDeviceIndex`' => $hrDeviceIndex), '`mempools`', 'device_id=? AND mempool_index=? AND mempool_type',array($device['device_id'],$index,$type));
       if ($debug) { print $query . "\n"; }
     }
     $valid[$type][$index] = 1;
@@ -475,26 +466,25 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
 {
   global $config, $debug;
 
-  if ($debug) { echo("$oid, $index, $type, $descr, $capacity, $capacity_oid\n"); }
-
-  if (mysql_result(mysql_query("SELECT count(toner_id) FROM `toner` WHERE device_id = '".$device['device_id']."' AND toner_type = '$type' AND `toner_index` = '$index' AND `toner_capacity_oid` = '$capacity_oid'"),0) == '0')
+  if ($debug) {
+    echo("$oid, $index, $type, $descr, $capacity, $capacity_oid\n");
+  }
+  if (dbFetchCell("SELECT COUNT(toner_id) FROM `toner` WHERE device_id = ? AND toner_type = ? AND `toner_index` = ? AND `toner_capacity_oid` =?",array($device['device_id'], $type,$index,$capacity_oid)) == '0')
   {
-    $query = "INSERT INTO toner (`device_id`, `toner_oid`, `toner_capacity_oid`, `toner_index`, `toner_type`, `toner_descr`, `toner_capacity`, `toner_current`) ";
-    $query .= " VALUES ('".$device['device_id']."', '$oid', '$capacity_oid', '$index', '$type', '$descr', '$capacity', '$current')";
-    mysql_query($query);
+    $inserted = dbInsert(array('`device_id`' => $device['device_id'], '`toner_oid`' => $oid, '`toner_capacity_oid`' => $capacity_oid, '`toner_index`' => $index, '`toner_type`' => $type, '`toner_descr`' => $descr, '`toner_capacity`' => $capacity, '`toner_current`' => $current), 'toner');
     echo("+");
-    log_event("Toner added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'toner', mysql_insert_id());
+    log_event("Toner added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'toner', $inserted);
   }
   else
   {
-    $toner_entry = mysql_fetch_assoc(mysql_query("SELECT * FROM `toner` WHERE device_id = '".$device['device_id']."' AND toner_type = '$type' AND `toner_index` = '$index'"));
+    $toner_entry = dbFetchRow("SELECT * FROM `toner` WHERE `device_id` = ? AND `toner_type` = ? AND `toner_index` =?",array($device['device_id'],$type,$index));
     if ($oid == $toner_entry['toner_oid'] && $descr == $toner_entry['toner_descr'] && $capacity == $toner_entry['toner_capacity'] && $capacity_oid == $toner_entry['toner_capacity_oid'])
     {
       echo(".");
     }
     else
     {
-      mysql_query("UPDATE toner SET `toner_descr` = '$descr', `toner_oid` = '$oid', `toner_capacity_oid` = '$capacity_oid', `toner_capacity` = '$capacity' WHERE `device_id` = '".$device['device_id']."' AND toner_type = '$type' AND `toner_index` = '$index' ");
+      dbUpdate(array('toner_descr' => $descr, 'toner_oid' => $oid, '`toner_capacity_oid`' => $capacity_oid, '`toner_capacity`' => $capacity), 'toner', 'device_id=? AND toner_type=? AND `toner_index`=?',array($device['device_id'],$type,$index));
       echo("U");
     }
   }
@@ -514,29 +504,27 @@ function discover_process_ipv6(&$valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$
     return;
   }
 
-  if (mysql_result(mysql_query("SELECT count(*) FROM `ports`
-        WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1')
+  if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?",array($device['device_id'], $ifIndex)) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1')
   {
-    $i_query = "SELECT port_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
-    $port_id = mysql_result(mysql_query($i_query), 0);
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0) < '1')
+    $port_id = dbFetchCell("SELECT port_id FROM `ports` WHERE device_id = ? AND ifIndex = ?",array($devices['device_id'], $ifIndex));
+    if (dbFetchCell("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = ?",array($ipv6_network)) < '1')
     {
-      mysql_query("INSERT INTO `ipv6_networks` (`ipv6_network`) VALUES ('$ipv6_network')");
+      dbInsert(array('`ipv6_network`' => $ipv6_network), 'ipv6_networks');
       echo("N");
     }
 
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0) < '1')
+    // Below looks like a duplicate of the above FIXME
+    if (dbFetchCell("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = ?",array($ipv6_network)) < '1')
     {
-      mysql_query("INSERT INTO `ipv6_networks` (`ipv6_network`) VALUES ('$ipv6_network')");
+      dbInsert(array('`ipv6_network`' => $ipv6_network), 'ipv6_networks');
       echo("N");
     }
 
-    $ipv6_network_id = @mysql_result(mysql_query("SELECT `ipv6_network_id` from `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0);
+    $ipv6_network_id = dbFetchCell("SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network = ?",array($ipv6_network));
 
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = '$ipv6_address' AND `ipv6_prefixlen` = '$ipv6_prefixlen' AND `port_id` = '$port_id'"), 0) == '0')
+    if (dbFetchCell("SELECT COUNT(*) FROM `ipv6_addresses WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?",array($ipv6_address, $ipv6_prefixlen, $port_id)) == '0')
     {
-     mysql_query("INSERT INTO `ipv6_addresses` (`ipv6_address`, `ipv6_compressed`, `ipv6_prefixlen`, `ipv6_origin`, `ipv6_network_id`, `port_id`)
-                                   VALUES ('$ipv6_address', '$ipv6_compressed', '$ipv6_prefixlen', '$ipv6_origin', '$ipv6_network_id', '$port_id')");
+     dbInsert(array('`ipv6_address`' => $ipv6_address, '`ipv6_compressed`' => $ipv6_compressed, '`ipv6_prefixlen`' => $ipv6_prefixlen,'`ipv6_origin`' => $ipv6_origin, '`ipv6_network_id`' => $ipv6_network_idm, '`port_id`' => $port_id), 'ipv6_addresses');
      echo("+");
     }
     else

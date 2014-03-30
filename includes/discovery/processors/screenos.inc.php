@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == "screenos" && mysql_result(mysql_query("SELECT COUNT(*) FROM processors WHERE device_id = '".$device['device_id']."' AND processor_type != 'screenos'"),0) == "0")
+if ($device['os'] == "screenos" && dbFetchCell("SELECT COUNT(*) FROM `processors` WHERE `device_id` = ? AND `processor_type` != 'screenos'",array($device['device_id'])) == "0")
 {
   # .1.3.6.1.4.1.3224.16.1.3.0 Cpu Last 5 Minutes
   # discover_processor(&$valid, $device, $oid, $index, $type, $descr, $precision = "1", $current = NULL, $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)

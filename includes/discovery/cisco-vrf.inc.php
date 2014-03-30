@@ -90,29 +90,24 @@ if ($config['enable_vrfs'])
         echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
         echo "\n  [VRF $vrf_name] DESC  - ".$descr_table[$vrf_oid];
 
-        if (@mysql_result(mysql_query("SELECT count(*) FROM vrfs WHERE `device_id` = '".$device['device_id']."'
-                                 AND `vrf_oid`='$vrf_oid'"),0))
+        if (dbFetchCell("SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?",array($device['device_id'],$vrf_oid)))
         {
-          $update_query  = "UPDATE `vrfs` SET `mplsVpnVrfDescription` = '$descr_table[$vrf_oid]', `mplsVpnVrfRouteDistinguisher` = '$vrf_rd' ";
-          $update_query .= "WHERE device_id = '".$device['device_id']."' AND vrf_oid = '$vrf_oid'";
-          mysql_query($update_query);
+          dbUpdate(array('mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'mplsVpnVrfRouteDistinguisher' => $vrf_rd), 'vrfs', 'device_id=? AND vrf_oid=?',array($device['device_id'],$vrf_oid));
         }
         else
         {
-          $insert_query  = "INSERT INTO `vrfs` (`vrf_oid`,`vrf_name`,`mplsVpnVrfRouteDistinguisher`,`mplsVpnVrfDescription`,`device_id`) ";
-          $insert_query .= "VALUES ('$vrf_oid','$vrf_name','$vrf_rd','".$descr_table[$vrf_oid]."','".$device['device_id']."')";
-          mysql_query($insert_query);
+          dbInsert(array('`vrf_oid`' => $vrf_oid, '`vrf_name`' => $vrf_name, '`mplsVpnVrfRouteDistinguisher`' => $vrf_rd,'`mplsVpnVrfDescription`' => $descr_table[$vrf_oid], '`device_id`' => $device['device_id']), 'vrfs');
         }
 
-        $vrf_id = @mysql_result(mysql_query("SELECT vrf_id FROM vrfs WHERE `device_id` = '".$device['device_id']."' AND `vrf_oid`='$vrf_oid'"),0);
+        $vrf_id = dbFetchCell("SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?",array($device['device_id'],$vrf_oid));
         $valid_vrf[$vrf_id] = 1;
 
         echo "\n  [VRF $vrf_name] PORTS - ";
         foreach ($port_table[$vrf_oid] as $if_id)
         {
-          $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE ifIndex = '$if_id' AND device_id = '" . $device['device_id'] . "'"));
+          $interface = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?",array($device['device_id'],$if_id));
           echo(makeshortif($interface['ifDescr']) . " ");
-          mysql_query("UPDATE ports SET ifVrf = '$vrf_id' WHERE port_id = '".$interface['port_id']."'");
+          dbUpdate(array('ifVrf' => $vrf_id), 'ports', 'port_id=?',array($interface['port_id']));
           $if = $interface['port_id'];
           $valid_vrf_if[$vrf_id][$if] = 1;
         }
@@ -122,8 +117,7 @@ if ($config['enable_vrfs'])
     echo "\n";
 
     $sql = "SELECT * FROM ports WHERE device_id = '" . $device['device_id'] . "'";
-    $data = mysql_query($sql);
-    while ($row = mysql_fetch_assoc($data))
+    foreach (dbFetchRows($sql) as $row)
     {
       $if = $row['port_id'];
       $vrf_id = $row['ifVrf'];
@@ -132,7 +126,7 @@ if ($config['enable_vrfs'])
         if (!$valid_vrf_if[$vrf_id][$if])
         {
           echo("-");
-          $query = @mysql_query("UPDATE ports SET `ifVrf` = NULL WHERE port_id = '$if'");
+          dbUpdate(array('ifVrf' => 'NULL'), 'ports', 'port_id=?',array($if));
         }
         else
         {
@@ -142,14 +136,13 @@ if ($config['enable_vrfs'])
     }
 
     $sql = "SELECT * FROM vrfs WHERE device_id = '" . $device['device_id'] . "'";
-    $data = mysql_query($sql);
-    while ($row = mysql_fetch_assoc($data))
+    foreach (dbFetchRows($sql) as $row)
     {
       $vrf_id = $row['vrf_id'];
       if (!$valid_vrf[$vrf_id])
       {
         echo("-");
-        $query = @mysql_query("DELETE FROM vrfs WHERE vrf_id = '$vrf_id'");
+        dbDelete('vrfs', '`vrf_id` = ?', array($vrf_id));
       }
       else
       {
