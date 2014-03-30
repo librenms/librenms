@@ -1,6 +1,9 @@
 #!/usr/bin/env php
 <?php
 
+// MYSQL Check - FIXME
+// 1 UPDATE
+
 include("config.php");
 include("includes/functions.php");
 

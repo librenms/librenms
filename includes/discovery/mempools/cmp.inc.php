@@ -2,7 +2,7 @@
 
 // Ignore this discovery module if we have already discovered things in CISCO-ENHANCED-MEMPOOL-MIB. Dirty duplication.
 
-$cemp_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `mempools` WHERE `device_id` = '".$device['device_id']."' AND `mempool_type` = 'cemp'"),0);
+$cemp_count = dbFetchCell("SELECT COUNT(*) FROM `mempools` WHERE `device_id` = ? AND `mempool_type` = 'cemp'",array($device['device_id']));
 
 if (($device['os_group'] == "cisco") && $cemp_count == "0")
 {

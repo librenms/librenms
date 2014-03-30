@@ -1,5 +1,10 @@
 <?php
 
+// MYSQL Check - FIXME
+// 3 ALTERS
+// 1 SELECT
+// 1 UPDATE
+
 mysql_query("ALTER TABLE `eventlog` DROP `id`");
 mysql_query("ALTER TABLE `eventlog` ADD  `event_id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY  FIRST");
 

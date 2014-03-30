@@ -13,23 +13,22 @@ foreach (explode("\n", $oids) as $data)
   $network = $addr->network . "/" . $addr->bitmask;
   $cidr = $addr->bitmask;
 
-  if (mysql_result(mysql_query("SELECT count(*) FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $oid != "0.0.0.0" && $oid != 'ipAdEntIfIndex')
+  if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?",array($device['device_id'], $ifIndex)) != '0' && $oid != "0.0.0.0" && $oid != 'ipAdEntIfIndex')
   {
-    $i_query = "SELECT port_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
-    $port_id = mysql_result(mysql_query($i_query), 0);
+    $port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifIndex = ?",array($device['device_id'], $ifIndex));
 
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_networks` WHERE `ipv4_network` = '$network'"), 0) < '1')
+    if (dbFetchCell("SELECT COUNT(*) FROM `ipv4_networks` WHERE `ipv4_network` = ?",array($network)) < '1')
     {
-      mysql_query("INSERT INTO `ipv4_networks` (`ipv4_network`) VALUES ('$network')");
+      dbInsert(array('`ipv4_network`' => $network), 'ipv4_networks');
       #echo("Create Subnet $network\n");
       echo("S");
     }
 
-    $ipv4_network_id = @mysql_result(mysql_query("SELECT `ipv4_network_id` from `ipv4_networks` WHERE `ipv4_network` = '$network'"), 0);
+    $ipv4_network_id = dbFetchCell("SELECT `ipv4_network_id` FROM `ipv4_networks` WHERE `ipv4_network` = ?",array($network));
 
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_addresses` WHERE `ipv4_address` = '$oid' AND `ipv4_prefixlen` = '$cidr' AND `port_id` = '$port_id'"), 0) == '0')
+    if (dbFetchCell("SELECT COUNT(*) FROM `ipv4_addresses` WHERE `ipv4_address` = ? AND `ipv4_prefixlen` = ? AND `port_id` = ?",array($oid,$cidr,$port_id)) == '0')
     {
-      mysql_query("INSERT INTO `ipv4_addresses` (`ipv4_address`, `ipv4_prefixlen`, `ipv4_network_id`, `port_id`) VALUES ('$oid', '$cidr', '$ipv4_network_id', '$port_id')");
+      dbInsert(array('`ipv4_address`' => $oid, '`ipv4_prefixlen`' => $cidr, '`ipv4_network_id`' => $ipv4_network_id,'`port_id`' => $port_id), 'ipv4_addresses');
       #echo("Added $oid/$cidr to $port_id ( $hostname $ifIndex )\n $i_query\n");
       echo("+");
     } else { echo("."); }
@@ -40,19 +39,17 @@ foreach (explode("\n", $oids) as $data)
 }
 
 $sql   = "SELECT * FROM ipv4_addresses AS A, ports AS I WHERE I.device_id = '".$device['device_id']."' AND  A.port_id = I.port_id";
-$data = mysql_query($sql);
-
-while ($row = mysql_fetch_assoc($data))
+foreach (dbFetchRows($sql) as $row)
 {
   $full_address = $row['ipv4_address'] . "/" . $row['ipv4_prefixlen'] . "|" . $row['ifIndex'];
 
   if (!$valid_v4[$full_address])
   {
     echo("-");
-    $query = @mysql_query("DELETE FROM `ipv4_addresses` WHERE `ipv4_address_id` = '".$row['ipv4_address_id']."'");
-    if (!mysql_result(mysql_query("SELECT count(*) FROM ipv4_addresses WHERE ipv4_network_id = '".$row['ipv4_network_id']."'"),0))
+    $query = dbDelete('ipv4_addresses', '`ipv4_address_id` = ?', array($row['ipv4_address_id']));
+    if (!dbFetchCell("SELECT COUNT(*) FROM `ipv4_addresses` WHERE `ipv4_network_id` = ?",array($row['ipv4_network_id'])))
     {
-      $query = @mysql_query("DELETE FROM `ipv4_networks` WHERE `ipv4_network_id` = '".$row['ipv4_network_id']."'");
+      $query = dbDelete('`ipv4_networks`', '`ipv4_network_id` = ?', array($row['ipv4_network_id']));
     }
   }
 }
