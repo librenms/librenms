@@ -424,7 +424,6 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
     if (dbFetchCell("SELECT COUNT(processor_id) FROM `processors` WHERE `processor_index` = ? AND `device_id` = ? AND `processor_type` = ?",array($index,$device['device_id'], $type)) == '0')
     {
       $inserted = dbInsert(array('`entPhysicalIndex`' => $entPhysicalIndex, '`hrDeviceIndex`' => $hrDeviceIndex, '`device_id`' => $device['device_id'],'`processor_descr`' => $descr, '`processor_index`' => $index, '`processor_oid`' => $oid, '`processor_usage`' => $current, '`processor_type`' => $type, '`processor_precision`' => $precision), 'processors');
-      if ($debug) { print $query . "\n"; }
       echo("+");
       log_event("Processor added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'processor', $inserted);
     }
@@ -448,7 +447,6 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
     if (dbFetchCell("SELECT COUNT(mempool_id) FROM `mempools` WHERE `mempool_index` = ? AND `device_id` = ? AND `mempool_type` = ?",array($index,$device['device_id'], $type)) == '0')
     {
       $inserted = dbInsert(array('`entPhysicalIndex`' => $entPhysicalIndex, '`hrDeviceIndex`' => $hrDeviceIndex, '`device_id`' => $device['device_id'],'`mempool_descr`' => $descr, '`mempool_index`' => $index, '`mempool_type`' => $type, '`mempool_precision`' => $precision), 'mempools');
-      if ($debug) { print $query . "\n"; }
       echo("+");
       log_event("Memory pool added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'mempool', $inserted);
     }
@@ -506,7 +504,7 @@ function discover_process_ipv6(&$valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$
 
   if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?",array($device['device_id'], $ifIndex)) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1')
   {
-    $port_id = dbFetchCell("SELECT port_id FROM `ports` WHERE device_id = ? AND ifIndex = ?",array($devices['device_id'], $ifIndex));
+    $port_id = dbFetchCell("SELECT port_id FROM `ports` WHERE device_id = ? AND ifIndex = ?",array($device['device_id'], $ifIndex));
     if (dbFetchCell("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = ?",array($ipv6_network)) < '1')
     {
       dbInsert(array('`ipv6_network`' => $ipv6_network), 'ipv6_networks');
@@ -524,7 +522,7 @@ function discover_process_ipv6(&$valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$
 
     if (dbFetchCell("SELECT COUNT(*) FROM `ipv6_addresses WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?",array($ipv6_address, $ipv6_prefixlen, $port_id)) == '0')
     {
-     dbInsert(array('`ipv6_address`' => $ipv6_address, '`ipv6_compressed`' => $ipv6_compressed, '`ipv6_prefixlen`' => $ipv6_prefixlen,'`ipv6_origin`' => $ipv6_origin, '`ipv6_network_id`' => $ipv6_network_idm, '`port_id`' => $port_id), 'ipv6_addresses');
+     dbInsert(array('`ipv6_address`' => $ipv6_address, '`ipv6_compressed`' => $ipv6_compressed, '`ipv6_prefixlen`' => $ipv6_prefixlen,'`ipv6_origin`' => $ipv6_origin, '`ipv6_network_id`' => $ipv6_network_id, '`port_id`' => $port_id), 'ipv6_addresses');
      echo("+");
     }
     else
