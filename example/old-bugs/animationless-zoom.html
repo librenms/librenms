@@ -24,12 +24,13 @@
 	<span id="time"></span>
 	<script type="text/javascript">
 
-		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
-			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-			cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+		var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				maxZoom: 18,
+				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+			}),
 			latlng = new L.LatLng(-37.36142550190516, 174.254150390625);
 
-		var map = new L.Map('map', {center: latlng, zoom: 7, layers: [cloudmade]});
+		var map = new L.Map('map', {center: latlng, zoom: 7, layers: [tiles]});
 
 		var markers = new L.MarkerClusterGroup();
 		markers.addLayer(new L.Marker([-37.77852090603777, 175.3103667497635])); //The one we zoom in on

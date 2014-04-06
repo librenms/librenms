@@ -22,56 +22,57 @@
 	<div id="map"></div>
 	<span>Mouse over a cluster to see the bounds of its children and click a cluster to zoom to those bounds</span>
 	<script type="text/javascript">
-			var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
-			    cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade, Points &copy 2012 LINZ',
-			    cloudmade = L.tileLayer(cloudmadeUrl, { maxZoom: 17, attribution: cloudmadeAttribution }),
-			    latlng = L.latLng(-37.79, 175.27);
+		var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				maxZoom: 18,
+				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
+			}),
+			latlng = L.latLng(-37.79, 175.27);
 
-			var map = L.map('map', { center: latlng, zoom: 13, layers: [cloudmade] });
+		var map = L.map('map', { center: latlng, zoom: 13, layers: [tiles] });
 
-			var progress = document.getElementById('progress');
-			var progressBar = document.getElementById('progress-bar');
+		var progress = document.getElementById('progress');
+		var progressBar = document.getElementById('progress-bar');
 
-			function updateProgressBar(processed, total, elapsed, layersArray) {
-				if (elapsed > 1000) {
-					// if it takes more than a second to load, display the progress bar:
-					progress.style.display = 'block';
-					progressBar.style.width = Math.round(processed/total*100) + '%';
-				}
-
-				if (processed === total) {
-					// all markers processed - hide the progress bar:
-					progress.style.display = 'none';
-				}
+		function updateProgressBar(processed, total, elapsed, layersArray) {
+			if (elapsed > 1000) {
+				// if it takes more than a second to load, display the progress bar:
+				progress.style.display = 'block';
+				progressBar.style.width = Math.round(processed/total*100) + '%';
 			}
 
-			var markers = L.markerClusterGroup({ chunkedLoading: true, chunkProgress: updateProgressBar });
-
-			var markerList = [];
-
-			//console.log('start creating markers: ' + window.performance.now());
-
-			for (var i = 0; i < addressPoints.length; i++) {
-				var a = addressPoints[i];
-				var title = a[2];
-				var marker = L.marker(L.latLng(a[0], a[1]), { title: title });
-				marker.bindPopup(title);
-				markerList.push(marker);
+			if (processed === total) {
+				// all markers processed - hide the progress bar:
+				progress.style.display = 'none';
 			}
-			for (var i = 0; i < addressPoints2.length; i++) {
-				var a = addressPoints[i];
-				var title = a[2];
-				var marker = L.marker(L.latLng(a[0], a[1]), { title: title });
-				marker.bindPopup(title);
-				markerList.push(marker);
-			}
+		}
 
-			//console.log('start clustering: ' + window.performance.now());
+		var markers = L.markerClusterGroup({ chunkedLoading: true, chunkProgress: updateProgressBar });
 
-			markers.addLayers(markerList);
-			map.addLayer(markers);
+		var markerList = [];
 
-			//console.log('end clustering: ' + window.performance.now());
+		//console.log('start creating markers: ' + window.performance.now());
+
+		for (var i = 0; i < addressPoints.length; i++) {
+			var a = addressPoints[i];
+			var title = a[2];
+			var marker = L.marker(L.latLng(a[0], a[1]), { title: title });
+			marker.bindPopup(title);
+			markerList.push(marker);
+		}
+		for (var i = 0; i < addressPoints2.length; i++) {
+			var a = addressPoints[i];
+			var title = a[2];
+			var marker = L.marker(L.latLng(a[0], a[1]), { title: title });
+			marker.bindPopup(title);
+			markerList.push(marker);
+		}
+
+		//console.log('start clustering: ' + window.performance.now());
+
+		markers.addLayers(markerList);
+		map.addLayer(markers);
+
+		//console.log('end clustering: ' + window.performance.now());
 	</script>
 </body>
 </html>

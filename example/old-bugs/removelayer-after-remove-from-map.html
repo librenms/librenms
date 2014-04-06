@@ -28,8 +28,11 @@
 	
 		var map = new L.Map('map');
 
-		var tilesLayer = new L.TileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png');
-		map.addLayer(tilesLayer);
+		var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+		});
+		map.addLayer(tiles);
 
 		var objectBounds = [[44.98131207805678, 6.0726203025917], [44.981459751363204, 6.073026722623153]];
 		map.fitBounds(new L.LatLngBounds(objectBounds));

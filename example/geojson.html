@@ -30,14 +30,13 @@
 			]
 		};
 
-		var cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/997/256/{z}/{x}/{y}.png', {
+		var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 			maxZoom: 18,
-			attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-			key: 'BC9A493B41014CAABB98F0471D759707'
+			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 		});
 
 		var map = L.map('map')
-				.addLayer(cloudmade);
+				.addLayer(tiles);
 
 		var markers = L.markerClusterGroup();
 

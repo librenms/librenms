@@ -28,12 +28,13 @@
 
 	<script type="text/javascript">
 
-		var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
-			cloudmadeAttribution = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
-			cloudmade = L.tileLayer(cloudmadeUrl, {maxZoom: 18, attribution: cloudmadeAttribution}),
+		var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				maxZoom: 18,
+				attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+			}),
 			latlng = L.latLng(50.5, 30.51);
 
-		var map = L.map('map', {center: latlng, zoom: 15, layers: [cloudmade]});
+		var map = L.map('map', {center: latlng, zoom: 15, layers: [tiles]});
 
 
 		//Custom radius and icon create function
