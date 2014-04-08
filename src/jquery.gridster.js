@@ -1192,7 +1192,9 @@
             .removeClass('resizing')
             .css({
                 'width': '',
-                'height': ''
+                'height': '',
+                'min-width': '',
+                'min-height': ''
             });
 
         delay($.proxy(function() {
