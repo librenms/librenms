@@ -55,6 +55,9 @@
             } else {
                 this.onmousewheel = null;
             }
+            // Clean up the data we added to the element
+            $.removeData(this, 'mousewheel-line-height');
+            $.removeData(this, 'mousewheel-page-height');
         },
 
         getLineHeight: function(elem) {
