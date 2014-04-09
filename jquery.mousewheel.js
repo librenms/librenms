@@ -91,7 +91,9 @@
             delta      = 0,
             deltaX     = 0,
             deltaY     = 0,
-            absDelta   = 0;
+            absDelta   = 0,
+            offsetX    = 0,
+            offsetY    = 0;
         event = $.event.fix(orgEvent);
         event.type = 'mousewheel';
 
@@ -164,11 +166,18 @@
         delta  = Math[ delta  >= 1 ? 'floor' : 'ceil' ](delta  / lowestDelta);
         deltaX = Math[ deltaX >= 1 ? 'floor' : 'ceil' ](deltaX / lowestDelta);
         deltaY = Math[ deltaY >= 1 ? 'floor' : 'ceil' ](deltaY / lowestDelta);
+		
+        // Normalise offsetX and offsetY properties
+        var boundingRect = this.getBoundingClientRect();
+        offsetX = event.clientX - boundingRect.left;
+        offsetY = event.clientY - boundingRect.top;
 
         // Add information to the event object
         event.deltaX = deltaX;
         event.deltaY = deltaY;
         event.deltaFactor = lowestDelta;
+        event.offsetX = offsetX;
+        event.offsetY = offsetY;
         // Go ahead and set deltaMode to 0 since we converted to pixels
         // Although this is a little odd since we overwrite the deltaX/Y
         // properties with normalized deltas.
