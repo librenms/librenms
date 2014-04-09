@@ -70,7 +70,8 @@
         },
 
         settings: {
-            adjustOldDeltas: true
+            adjustOldDeltas: true, // see shouldAdjustOldDeltas() below
+            normalizeOffset: true  // calls getBoundingClientRect for each event
         }
     };
 
@@ -166,11 +167,13 @@
         delta  = Math[ delta  >= 1 ? 'floor' : 'ceil' ](delta  / lowestDelta);
         deltaX = Math[ deltaX >= 1 ? 'floor' : 'ceil' ](deltaX / lowestDelta);
         deltaY = Math[ deltaY >= 1 ? 'floor' : 'ceil' ](deltaY / lowestDelta);
-		
+
         // Normalise offsetX and offsetY properties
-        var boundingRect = this.getBoundingClientRect();
-        offsetX = event.clientX - boundingRect.left;
-        offsetY = event.clientY - boundingRect.top;
+        if ( special.settings.normalizeOffset && this.getBoundingClientRect ) {
+            var boundingRect = this.getBoundingClientRect();
+            offsetX = event.clientX - boundingRect.left;
+            offsetY = event.clientY - boundingRect.top;
+        }
 
         // Add information to the event object
         event.deltaX = deltaX;
