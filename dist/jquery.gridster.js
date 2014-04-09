@@ -1028,7 +1028,9 @@
         }else{
             pos = {
                 col: col,
-                row: row
+                row: row,
+                size_y: size_y,
+                size_x: size_x
             };
 
             this.empty_cells(col, row, size_x, size_y);
