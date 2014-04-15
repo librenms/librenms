@@ -51,7 +51,7 @@ L.MarkerCluster = L.Marker.extend({
 			mapZoom = map.getZoom(),
 			i;
 
-		//calculate how fare we need to zoom down to see all of the markers
+		//calculate how far we need to zoom down to see all of the markers
 		while (childClusters.length > 0 && boundsZoom > zoom) {
 			zoom++;
 			var newClusters = [];
