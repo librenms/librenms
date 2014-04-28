@@ -31,22 +31,9 @@ foreach ($device['vlans'] as $domain_id => $vlans)
       if ($device['os_group'] == "cisco" || $device['os'] == "ios")  // This shit only seems to work on IOS
       {
         # Probably does not work with snmpv3. I have no real idea about what this code is really doing
-        $device_details = $device;
-        $device_details['snmpcontext'] = $vlan_id;
         $vlan_device = array_merge($device, array('community' => $device['community']."@".$vlan_id));
-        $vlan_data = snmpwalk_cache_oid($device_details, "dot1dStpPortEntry", array(), "BRIDGE-MIB:Q-BRIDGE-MIB");
-        if ($exec_response['status'] != 0)
-        {
-          unset($device_details);
-          if( $device['snmpver'] == 'v3')
-          {
-            print_error("ERROR: For 'vlan-' context to work correctly on cisco device with SNMPv3, please add 'match prefix' into snmp config.");
-          } else {
-            print_error("ERROR: No support for per-VLAN community");
-          }
-          break;
-        }
-        $vlan_data = snmpwalk_cache_oid($device_details, "dot1dBasePortEntry", $vlan_data, "BRIDGE-MIB:Q-BRIDGE-MIB");
+        $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dStpPortEntry", array(), "BRIDGE-MIB:Q-BRIDGE-MIB");
+        $vlan_data = snmpwalk_cache_oid($vlan_device, "dot1dBasePortEntry", $vlan_data, "BRIDGE-MIB:Q-BRIDGE-MIB");
       }
 
       echo("VLAN $vlan_id \n");
