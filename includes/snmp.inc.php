@@ -765,28 +765,12 @@ function snmp_cache_portName($device, $array)
 function snmp_gen_auth (&$device)
 {
   global $debug;
-  $vlan = FALSE;
-
-  if (isset($device['snmpcontext']))
-  {
-    if (is_numeric($device['snmpcontext']) && $device['snmpcontext'] > 0 && $device['snmpcontext'] < 4096 )
-    {
-      $vlan = $device['snmpcontext'];
-    }
-  }
 
   $cmd = "";
 
   if ($device['snmpver'] === "v3")
   {
-    $cmd = " -v3 -l " . $device['authlevel'];
-
-    if(is_numeric($vlan))
-    {
-      $cmd .= ' -n "vlan-' . $vlan . '"';
-    } else {
-      $cmd .= ' -n ""';
-    }
+    $cmd = " -v3 -n \"\" -l " . $device['authlevel'];
 
     if ($device['authlevel'] === "noAuthNoPriv")
     {
