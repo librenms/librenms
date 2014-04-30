@@ -3689,7 +3689,10 @@
             this.gridmap[col] = [];
         }
 
-        this.gridmap[col][row] = false;
+        if( typeof this.gridmap[col][row] === undefined ){
+            this.gridmap[col][row] = false;
+        }
+        
         this.faux_grid.push(coords);
 
         return this;
