@@ -45,6 +45,9 @@ if ($vars['page'] == "logout" && $_SESSION['authenticated'])
 if (isset($_POST['username']) && isset($_POST['password'])) {
   $_SESSION['username'] = mres($_POST['username']);
   $_SESSION['password'] = $_POST['password'];
+} elseif(isset($_GET['username']) && isset($_GET['password'])) {
+  $_SESSION['username'] = mres($_GET['username']);
+  $_SESSION['password'] = $_GET['password'];
 }
 
 if (!isset($config['auth_mechanism']))
