@@ -3689,7 +3689,7 @@
             this.gridmap[col] = [];
         }
 
-        if( typeof this.gridmap[col][row] === undefined ){
+        if( typeof this.gridmap[col][row] === "undefined" ){
             this.gridmap[col][row] = false;
         }
         
