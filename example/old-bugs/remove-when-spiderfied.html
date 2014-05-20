@@ -19,7 +19,7 @@
 <body>
 
 	<div id="map"></div>
-	<button id="doit">Remove and add direct to map</button><button id="doit2">clearLayers</button><br/>
+	<button id="doit">Remove and add direct to map</button><button id="doit2">clearLayers</button><button id="doit3">removeLayers</button><br/>
 	<span>Bug <a href="https://github.com/danzel/Leaflet.markercluster/issues/54">#54</a>. Spiderfy the cluster then click the button. Should result in 2 markers right beside each other on the map.</span><br/>
 	<span>Bug <a href="https://github.com/danzel/Leaflet.markercluster/issues/53">#53</a>. Spiderfy the cluster then click the button. Spider lines remain on the map.</span><br/>
 	<span>Bug <a href="https://github.com/danzel/Leaflet.markercluster/issues/49">#49</a>. Spiderfy the cluster then click the second button. Spider lines remain on the map. Click the map to get an error.</span>
@@ -55,6 +55,9 @@
 		};
 		L.DomUtil.get('doit2').onclick = function () {
 			markers.clearLayers();
+		};
+		L.DomUtil.get('doit3').onclick = function () {
+			markers.removeLayers(markersList);
 		};
 
 	</script>
