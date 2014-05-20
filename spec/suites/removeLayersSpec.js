@@ -57,6 +57,9 @@
 
 		markers[0].__parent.spiderfy();
 
+		// We must wait for the spiderfy animation to timeout
+		clock.tick(200);
+
 		group.removeLayers(markers);
 
 		expect(group.hasLayer(markers[0])).to.be(false);
@@ -64,5 +67,9 @@
 		expect(group.hasLayer(markers[2])).to.be(false);
 
 		expect(group.getLayers().length).to.be(0);
+
+		group.on('spiderfied', function() {
+			expect(group._spiderfied).to.be(null);
+		});
 	});
 });
