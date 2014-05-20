@@ -3,5 +3,6 @@ imports:
     - javascript
     - php
 
+# please keep the excluded paths list sorted
 filter:
-    excluded_paths: [ html/includes/jpgraph/*, html/js/jquery.cycle.all.js, html/js/jquery-ui-timepicker-addon.js, html/js/sorttable.js, html/js/tw-sack.js, includes/phpmailer/* ]
+    excluded_paths: [ html/includes/geshi/*, html/includes/jpgraph/*, html/js/bootstrap*, html/js/jqplot/*, html/js/jquery.cycle*, html/js/jquery-ui-timepicker-addon.js, html/js/sorttable.js, html/js/tw-sack.js, includes/phpmailer/* ]
