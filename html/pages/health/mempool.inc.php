@@ -19,7 +19,7 @@ foreach (dbFetchRows("SELECT * FROM `mempools` AS M, `devices` as D WHERE D.devi
   {
     $text_descr = $mempool['mempool_descr'];
 
-    if ($config['memcached']['enable'])
+    if ($config['memcached']['enable'] === TRUE)
     {
       $state = $memcache->get('mempool-'.$mempool['mempool_id'].'-state');
       if($debug) { print_r($state); }

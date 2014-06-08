@@ -309,9 +309,9 @@ $ports = dbFetchRows($query, $param);
 
 foreach ($ports as $port)
 {
-  if ($config['memcached']['enable'])
+  if ($config['memcached']['enable'] === TRUE)
   {
-    if ($config['memcached']['enable'])
+    if ($config['memcached']['enable'] === TRUE)
     {
       $state = $memcache->get('port-'.$port['port_id'].'-state');
       if(is_array($state)) { $ports[$port['port_id']] = array_merge($port, $state); }
