@@ -74,7 +74,7 @@ if (($device['os'] == "vmware") || ($device['os'] == "linux"))
 
       if (dbFetchCell("SELECT COUNT(id) FROM `vminfo` WHERE `device_id` = ? AND `vmwVmVMID` = ? AND vm_type='vmware'",array($device['device_id'], $oid)) == 0)
       {
-        dbInsert(array('`device_id`' => $device['device_id'], '`vm_type`' => 'vmware', '`vmwVmVMID`' => $oid,'`vmwVmDisplayName`' => mres($vmwVmDisplayName), '`vmwVmGuestOS`' => mres($vmwVmGuestOS), '`vmwVmMemSize`' => mres($vmwVmMemSize), '`vmwVmCpus`' => mres($vmwVmCpus), '`vmwVmState`' => mres($vmwVmState)), 'vminfo');
+        dbInsert(array('device_id' => $device['device_id'], 'vm_type' => 'vmware', 'vmwVmVMID' => $oid,'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)), 'vminfo');
         echo("+");
         // FIXME eventlog
       } else {

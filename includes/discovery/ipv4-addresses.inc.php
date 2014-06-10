@@ -19,7 +19,7 @@ foreach (explode("\n", $oids) as $data)
 
     if (dbFetchCell("SELECT COUNT(*) FROM `ipv4_networks` WHERE `ipv4_network` = ?",array($network)) < '1')
     {
-      dbInsert(array('`ipv4_network`' => $network), 'ipv4_networks');
+      dbInsert(array('ipv4_network' => $network), 'ipv4_networks');
       #echo("Create Subnet $network\n");
       echo("S");
     }
@@ -28,7 +28,7 @@ foreach (explode("\n", $oids) as $data)
 
     if (dbFetchCell("SELECT COUNT(*) FROM `ipv4_addresses` WHERE `ipv4_address` = ? AND `ipv4_prefixlen` = ? AND `port_id` = ?",array($oid,$cidr,$port_id)) == '0')
     {
-      dbInsert(array('`ipv4_address`' => $oid, '`ipv4_prefixlen`' => $cidr, '`ipv4_network_id`' => $ipv4_network_id,'`port_id`' => $port_id), 'ipv4_addresses');
+      dbInsert(array('ipv4_address' => $oid, 'ipv4_prefixlen' => $cidr, 'ipv4_network_id' => $ipv4_network_id,'port_id' => $port_id), 'ipv4_addresses');
       #echo("Added $oid/$cidr to $port_id ( $hostname $ifIndex )\n $i_query\n");
       echo("+");
     } else { echo("."); }
@@ -49,7 +49,7 @@ foreach (dbFetchRows($sql) as $row)
     $query = dbDelete('ipv4_addresses', '`ipv4_address_id` = ?', array($row['ipv4_address_id']));
     if (!dbFetchCell("SELECT COUNT(*) FROM `ipv4_addresses` WHERE `ipv4_network_id` = ?",array($row['ipv4_network_id'])))
     {
-      $query = dbDelete('`ipv4_networks`', '`ipv4_network_id` = ?', array($row['ipv4_network_id']));
+      $query = dbDelete('ipv4_networks', '`ipv4_network_id` = ?', array($row['ipv4_network_id']));
     }
   }
 }

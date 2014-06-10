@@ -79,7 +79,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
           $result = dbFetchRow("SELECT * FROM `vminfo` WHERE `device_id` = ? AND `vmwVmVMID` = ? AND `vm_type` = 'libvirt'",array($device['device_id'],$dom_id));
           if (count($result['device_id']) == 0)
           {
-            $inserted_id = dbInsert(array('`device_id`' => $device['device_id'], '`vm_type`' => 'libvirt', '`vmwVmVMID`' => $dom_id,'`vmwVmDisplayName`' => mres($vmwVmDisplayName), '`vmwVmGuestOS`' => mres($vmwVmGuestOS), '`vmwVmMemSize`' => mres($vmwVmMemSize), '`vmwVmCpus`' => mres($vmwVmCpus), '`vmwVmState`' => mres($vmwVmState)), 'vminfo');
+            $inserted_id = dbInsert(array('device_id' => $device['device_id'], 'vm_type' => 'libvirt', 'vmwVmVMID' => $dom_id,'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)), 'vminfo');
             echo("+");
             log_event("Virtual Machine added: $vmwVmDisplayName ($vmwVmMemSize MB)", $device, 'vm', $inserted_id);
           } else {
@@ -89,7 +89,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
              || $result['vmwVmGuestOS'] != $vmwVmGuestOS
              || $result['vmwVmMemSize'] != $vmwVmMemSize)
             {
-              dbUpdate(array('vmwVmState' => mres($vmwVmState), '`vmwVmGuestOS' => mres($vmwVmGuestOS), '`vmwVmDisplayName`' => mres($vmwVmDisplayName), '`vmwVmMemSize`' => mres($vmwVmMemSize), '`vmwVmCpus`' => mres($vmwVmCpus)), 'vminfo', "device_id=? AND vm_type='libvirt' AND vmwVmVMID=?",array($device['device_id'],$dom_id));
+              dbUpdate(array('vmwVmState' => mres($vmwVmState), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus)), 'vminfo', "device_id=? AND vm_type='libvirt' AND vmwVmVMID=?",array($device['device_id'],$dom_id));
               echo("U");
               // FIXME eventlog
             }
