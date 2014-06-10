@@ -96,7 +96,7 @@ if ($config['enable_vrfs'])
         }
         else
         {
-          dbInsert(array('`vrf_oid`' => $vrf_oid, '`vrf_name`' => $vrf_name, '`mplsVpnVrfRouteDistinguisher`' => $vrf_rd,'`mplsVpnVrfDescription`' => $descr_table[$vrf_oid], '`device_id`' => $device['device_id']), 'vrfs');
+          dbInsert(array('vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd,'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'device_id' => $device['device_id']), 'vrfs');
         }
 
         $vrf_id = dbFetchCell("SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?",array($device['device_id'],$vrf_oid));
