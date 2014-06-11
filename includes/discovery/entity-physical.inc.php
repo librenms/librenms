@@ -50,7 +50,7 @@
         dbUpdate(array('entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalDescr' => $entPhysicalDescr, 'entPhysicalClass' => $entPhysicalClass, 'entPhysicalName' => $entPhysicalName, 'entPhysicalModelName' => $entPhysicalModelName, 'entPhysicalSerialNum' => $entPhysicalSerialNum, 'entPhysicalContainedIn' => $entPhysicalContainedIn, 'entPhysicalMfgName' => $entPhysicalMfgName, 'entPhysicalParentRelPos' => $entPhysicalParentRelPos, 'entPhysicalVendorType' => $entPhysicalVendorType, 'entPhysicalHardwareRev' => $entPhysicalHardwareRev, 'entPhysicalFirmwareRev' => $entPhysicalFirmwareRev, 'entPhysicalSoftwareRev' => $entPhysicalSoftwareRev, 'entPhysicalIsFRU' => $entPhysicalIsFRU, 'entPhysicalAlias' => $entPhysicalAlias, 'entPhysicalAssetID' => $entPhysicalAssetID), 'entPhysical', 'device_id=? AND entPhysicalIndex=?',array($device['device_id'],$entPhysicalIndex));
         echo(".");
       } else {
-        dbInsert(array('`device_id`' => $device['device_id'], '`entPhysicalIndex`' => $entPhysicalIndex, '`entPhysicalDescr`' => $entPhysicalDescr,'`entPhysicalClass`' => $entPhysicalClass, '`entPhysicalName`' => $entPhysicalName, '`entPhysicalModelName`' => $entPhysicalModelName, '`entPhysicalSerialNum`' => $entPhysicalSerialNum, '`entPhysicalContainedIn`' => $entPhysicalContainedIn, '`entPhysicalMfgName`' => $entPhysicalMfgName, '`entPhysicalParentRelPos`' => $entPhysicalParentRelPos, '`entPhysicalVendorType`' => $entPhysicalVendorType, '`entPhysicalHardwareRev`' => $entPhysicalHardwareRev, '`entPhysicalFirmwareRev`' => $entPhysicalFirmwareRev, '`entPhysicalSoftwareRev`' => $entPhysicalSoftwareRev, '`entPhysicalIsFRU`' => $entPhysicalIsFRU, '`entPhysicalAlias`' => $entPhysicalAlias, '`entPhysicalAssetID`' => $entPhysicalAssetID, '`ifIndex`' => $ifIndex), '`entPhysical`');
+        dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalDescr' => $entPhysicalDescr,'entPhysicalClass' => $entPhysicalClass, 'entPhysicalName' => $entPhysicalName, 'entPhysicalModelName' => $entPhysicalModelName, 'entPhysicalSerialNum' => $entPhysicalSerialNum, 'entPhysicalContainedIn' => $entPhysicalContainedIn, 'entPhysicalMfgName' => $entPhysicalMfgName, 'entPhysicalParentRelPos' => $entPhysicalParentRelPos, 'entPhysicalVendorType' => $entPhysicalVendorType, 'entPhysicalHardwareRev' => $entPhysicalHardwareRev, 'entPhysicalFirmwareRev' => $entPhysicalFirmwareRev, 'entPhysicalSoftwareRev' => $entPhysicalSoftwareRev, 'entPhysicalIsFRU' => $entPhysicalIsFRU, 'entPhysicalAlias' => $entPhysicalAlias, 'entPhysicalAssetID' => $entPhysicalAssetID, 'ifIndex' => $ifIndex), 'entPhysical');
         echo("+");
       }
 
@@ -66,7 +66,7 @@
     $id = $test['entPhysicalIndex'];
     if (!$valid[$id]) {
       echo("-");
-      dbDelete('`entPhysical`', '`entPhysical_id` = ?', array($test['entPhysical_id']));
+      dbDelete('entPhysical', 'entPhysical_id = ?', array($test['entPhysical_id']));
     }
   }
 

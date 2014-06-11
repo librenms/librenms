@@ -15,7 +15,7 @@ if (is_array($diskio_array))
 
       if (dbFetchCell("SELECT COUNT(*) FROM `ucd_diskio` WHERE `device_id` = ? AND `diskio_index` = ?",array($device['device_id'], $index)) == "0")
       {
-        $inserted = dbInsert(array('`device_id`' => $device['device_id'], '`diskio_index`' => $index, '`diskio_descr`' => $entry['diskIODevice']), 'ucd_diskio');
+        $inserted = dbInsert(array('device_id' => $device['device_id'], 'diskio_index' => $index, 'diskio_descr' => $entry['diskIODevice']), 'ucd_diskio');
         echo("+");
         if ($debug) { echo($sql . " - $inserted inserted "); }
       }
