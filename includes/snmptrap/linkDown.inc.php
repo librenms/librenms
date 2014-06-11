@@ -16,7 +16,7 @@ log_event("SNMP Trap: linkDown " . $interface['ifDescr'], $device, "interface", 
 if ($ifOperStatus != $interface['ifOperStatus'])
 {
   log_event("Interface went Down : " . $interface['ifDescr'] . " (TRAP)", $device, "interface", $interface['port_id']);
-  dbUpdate(array('`ifOperStatus`' => 'down'), 'ports', 'port_id=?',array($interface['port_id']));
+  dbUpdate(array('ifOperStatus' => 'down'), 'ports', 'port_id=?',array($interface['port_id']));
 }
 
 ?>

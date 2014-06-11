@@ -18,20 +18,20 @@ if (is_array($hrDevices))
     {
       if (dbFetchCell("SELECT COUNT(*) FROM `hrDevice` WHERE device_id = ? AND hrDeviceIndex = ?",array($device['device_id'], $hrDevice['hrDeviceIndex'])))
       {
-        $update_array = array('`hrDeviceType`' => mres($hrDevice['hrDeviceType']),
-        '`hrDeviceDescr`' => mres($hrDevice['hrDeviceDescr']),
-        '`hrDeviceStatus`' => mres($hrDevice['hrDeviceStatus']),
-        '`hrDeviceErrors`' => mres($hrDevice['hrDeviceErrors']));
+        $update_array = array('hrDeviceType' => mres($hrDevice['hrDeviceType']),
+        'hrDeviceDescr' => mres($hrDevice['hrDeviceDescr']),
+        'hrDeviceStatus' => mres($hrDevice['hrDeviceStatus']),
+        'hrDeviceErrors' => mres($hrDevice['hrDeviceErrors']));
         if ($hrDevice['hrDeviceType'] == "hrDeviceProcessor")
         {
           $update_array['hrProcessorLoad'] = mres($hrDevice['hrProcessorLoad']);
         }
-        dbUpdate($update_array, '`hrDevice`', 'device_id=? AND hrDeviceIndex=?',array($device['device_id'],$hrDevice['hrDeviceIndex']));
+        dbUpdate($update_array, 'hrDevice', 'device_id=? AND hrDeviceIndex=?',array($device['device_id'],$hrDevice['hrDeviceIndex']));
         echo(".");
       }
       else
       {
-        $inserted_rows = dbInsert(array('`hrDeviceIndex`' => mres($hrDevice['hrDeviceIndex']), '`device_id`' => mres($device['device_id']), '`hrDeviceType`' => mres($hrDevice['hrDeviceType']),'`hrDeviceDescr`' => mres($hrDevice['hrDeviceDescr']), '`hrDeviceStatus`' => mres($hrDevice['hrDeviceStatus']), '`hrDeviceErrors`' => mres($hrDevice['hrDeviceErrors'])), 'hrDevice');
+        $inserted_rows = dbInsert(array('hrDeviceIndex' => mres($hrDevice['hrDeviceIndex']), 'device_id' => mres($device['device_id']), 'hrDeviceType' => mres($hrDevice['hrDeviceType']),'hrDeviceDescr' => mres($hrDevice['hrDeviceDescr']), 'hrDeviceStatus' => mres($hrDevice['hrDeviceStatus']), 'hrDeviceErrors' => mres($hrDevice['hrDeviceErrors'])), 'hrDevice');
         echo("+");
         if ($debug) { print_r($hrDevice); echo("$inserted_rows row inserted"); }
       }
