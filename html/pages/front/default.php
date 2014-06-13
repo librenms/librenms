@@ -1,6 +1,6 @@
 <?php
 
-include("includes/topnav.inc.php");
+include_once("includes/object-cache.inc.php");
 
 function generate_front_box ($frontbox_class, $content)
 {
@@ -124,7 +124,7 @@ echo('
   <div class="col-md-4">
 ');
 
-include_once("includes/front/boxes.inc.php");
+include_once("includes/device-summary-horiz.inc.php");
 
 echo('
   </div>
