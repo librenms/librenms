@@ -1,5 +1,7 @@
 <?php
 
+include_once("includes/object-cache.inc.php");
+
 if ($device['status'] == '0') {  $class = "alert-danger"; } else {   $class = ""; }
 if ($device['ignore'] == '1')
 {
