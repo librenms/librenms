@@ -1,6 +1,6 @@
 <?php
 
-include("includes/topnav.inc.php");
+include_once("includes/object-cache.inc.php");
 
 function generate_front_box ($frontbox_class, $content)
 {
@@ -11,7 +11,7 @@ echo("<div class=\"front-box $frontbox_class\">
 
 echo('
   <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-9">
 ');
 
 echo('<div class=front-page>');
@@ -121,10 +121,17 @@ echo('</div>');
 echo('</div>');
 echo('</div>');
 echo('
-  <div class="col-md-4">
+  <div class="col-md-3">
 ');
 
-include_once("includes/front/boxes.inc.php");
+if ($config['vertical_summary'])
+{
+  include_once("includes/device-summary-vert.inc.php");
+}
+else
+{
+  include_once("includes/device-summary-horiz.inc.php");
+}
 
 echo('
   </div>
