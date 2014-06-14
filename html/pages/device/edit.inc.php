@@ -29,6 +29,11 @@ if ($_SESSION['userlevel'] < '7')
 
   $panes['ipmi']     = 'IPMI';
 
+  if (dbFetchCell("SELECT COUNT(sensor_id) FROM `sensors` WHERE device_id = ? AND sensor_deleted='0' LIMIT 1", array($device['device_id'])) > 0)
+  {
+    $panes['health'] = 'Health';
+  }
+
   print_optionbar_start();
 
   unset($sep);
