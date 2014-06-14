@@ -24,9 +24,13 @@ include_once("includes/authenticate.inc.php");
 
 if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 
-if(file_exists('forms/'.$_POST['type'].'.inc.php'))
-{
-  include_once('forms/'.$_POST['type'].'.inc.php');
+if(preg_match("/^[a-zA-Z0-9\-]+$/", $_POST['type']) == 1) {
+
+  if(file_exists('forms/'.$_POST['type'].'.inc.php'))
+  {
+    include_once('forms/'.$_POST['type'].'.inc.php');
+  }
+
 }
 
 ?>
