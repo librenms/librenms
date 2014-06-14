@@ -57,11 +57,42 @@ Guidelines for contributing to LibreNMS
   statement of our intent and current interpretation.
 
 
+Contributor Agreement
+---------------------
+
+By contributing code to LibreNMS (whether by a github pull request, or by
+any other means), you assert that:
+
+- You have the rights to include the code, either as its original author,
+  or due to it being released to you under a compatible license.
+
+- You are not aware of any third party claims on the code, including
+  copyright infringement, patent, or any other claim.
+
+- You have not viewed code written under the [Observium License][4] in the
+  production of contributed code.  This includes all Observium code after
+  Subversion revision 3250 and any patches or other code covered by that
+  license from Observium web sites after Tue May 29 13:08:01 2012 +0000 (the
+  date of Observium r3250).
+
+To agree with these assertions, please submit a github pull request against
+the file doc/AUTHORS.md including your name, email address, and github user
+id in the file (so that it can be matched to your commits), and stating in
+the commit log that you agree to the conditions of the Contributor Agreement
+contained in doc/CONTRIBUTING.md.
+
+Note that contributors to LibreNMS retain copyright to their own code and
+are not required to sign over their rights to any other party.  We recommend
+that if you add a new file containing original code to the code base that
+you include a copyright notice in it as per the Free Software Foundation's
+guidelines.
+
+
 Proposed workflow for submitting pull requests
 ----------------------------------------------
 
-The basic rule is: don't create merge conflicts in master.  If possible,
-make your merges simple fast-forwards from current master.
+The basic rule is: don't create merge conflicts in master.  Merges should be
+simple fast-forwards from current master.
 
 Following is a proposed workflow designed to minimise the scope of merge
 conflicts when submitting pull requests.  It's not mandatory, but seems to
@@ -111,4 +142,6 @@ git push origin issue-####
 "LibreNMS master branch"
 [3]: https://github.com/librenms/librenms/issues
 "LibreNMS issue database"
+[4]: http://www.observium.org/wiki/License
+"Observium License"
 
