@@ -1,9 +1,9 @@
 
-<table cellpadding="3" cellspacing="0" class="devicetable sortable" width="100%">
+<table cellpadding="3" cellspacing="0" class="table table-striped table-condensed" width="100%">
 
 <?php
 
-echo('<tr class="tablehead"><td></td>');
+echo('<tr class="tablehead">');
 
 $cols = array('device' => 'Device',
               'port' => 'Port',
@@ -51,7 +51,6 @@ foreach ($ports as $port)
 
     $port = ifLabel($port, $device);
     echo("<tr class='ports'>
-          <td width=5></td>
           <td width=200 class=list-bold>".generate_device_link($port, shorthost($port['hostname'], "20"))."</td>
           <td width=150 class=list-bold><a class='".$ifclass."'href='" . generate_port_url($port) . "'>".fixIfName($port['label'])." $error_img</td>
           <td width=110 >$speed</td>
