@@ -102,8 +102,7 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hos
 }
 ?>
       </select>
-      <br />
-      <input type="hostname" name="hostname" id="hostname" title="Hostname" class="form-control input-sm" <?php if (strlen($vars['hostname'])) {echo('value="'.$vars['hostname'].'"');} ?> />
+      <input type="hostname" name="hostname" id="hostname" title="Hostname" class="form-control input-sm" <?php if (strlen($vars['hostname'])) {echo('value="'.$vars['hostname'].'"');} ?> placeholder="Hostname" />
     </div>
     <div class="form-group">
       <select name="state" id="state" class="form-control input-sm">
@@ -112,7 +111,6 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hos
         <option value="down"<?php if ($vars['state'] == "down") { echo("selected"); } ?>>Down</option>
         <option value="admindown" <?php if ($vars['state'] == "admindown") { echo("selected"); } ?>>Shutdown</option>
       </select>
-      <br />
 
       <select name="ifSpeed" id="ifSpeed" class="form-control input-sm">
         <option value="">All Speeds</option>
@@ -144,7 +142,6 @@ foreach (dbFetchRows("SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `i
 }
 ?>
        </select>
-<br />
       <select name="port_descr_type" id="port_descr_type" class="form-control input-sm">
         <option value="">All Port Types</option>
 <?php
@@ -164,7 +161,7 @@ foreach ($ports as $data)
       </select>
     </div>
     <div class="form-group">
-      <input title="Port Description" type="text" name="ifAlias" id="ifAlias" class="form-control input-sm" <?php if (strlen($vars['ifAlias'])) {echo('value="'.$vars['ifAlias'].'"');} ?> />
+      <input title="Port Description" type="text" name="ifAlias" id="ifAlias" class="form-control input-sm" <?php if (strlen($vars['ifAlias'])) {echo('value="'.$vars['ifAlias'].'"');} ?> placeholder="Port Description"/>
         <select name="location" id="location" class="form-control input-sm">
           <option value="">All Locations</option>
           <?php
@@ -185,11 +182,9 @@ foreach ($ports as $data)
       <div class="form-group">
         <label for="ignore">Ignored</label>
         <input type=checkbox id="ignore" name="ignore" value="1" class="" <?php if ($vars['ignore']) { echo("checked"); } ?> ></input>
-        <br />
         <label for="disable">Disabled</label>
         <input type=checkbox id="disable" name="disable" value=1 class="" <?php if ($vars['disable']) { echo("checked"); } ?> ></input>
         </label>
-        <br />
         <label for="deleted">Deleted</label>
         <input type=checkbox id="deleted" name="deleted" value=1 class="" <?php if ($vars['deleted']) { echo("checked"); } ?> ></input>
         </label>
@@ -220,8 +215,8 @@ foreach ($sorts as $sort => $sort_text)
 
         </select>
       </div>
-      <button type="submit" class="btn btn-default input-sm">Search</button>
-      <a href="<?php echo(generate_url(array('page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>" title="Reset critera to default." >Reset</a>
+      <button type="submit" class="btn btn-default btn-sm">Search</button>
+      <a class="btn btn-default btn-sm" href="<?php echo(generate_url(array('page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>" title="Reset critera to default." >Reset</a>
       </td>
     </form>
   </tr>
