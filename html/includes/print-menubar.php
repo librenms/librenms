@@ -12,9 +12,15 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 
 ?>
 
-<nav class="navbar-wrapper navbar navbar-default navbar-fixed-top" role="navigation">
-  <div id="container">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container-fluid">
     <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
 <?php
 
   if ($config['title_image'])
@@ -29,7 +35,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 ?>
     </div>
 
-    <div class="collapse navbar-collapse">
+    <div class="collapse navbar-collapse" id="navHeaderCollapse">
       <ul class="nav navbar-nav">
         <li class="dropdown">
           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview<b class="caret"></b></a>
@@ -542,7 +548,6 @@ if ($_SESSION['authenticated'])
 
    </div>
  </div>
-</div>
 </nav>
 <script>
   $('#gsearch').typeahead([

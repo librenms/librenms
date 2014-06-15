@@ -211,7 +211,6 @@ if ($_SESSION['authenticated'])
 ?>
     </div>
   </div>
-</div>
 <?php
 
 $runtime_end = utime(); $runtime = $runtime_end - $runtime_start;
