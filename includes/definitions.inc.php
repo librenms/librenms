@@ -1136,7 +1136,7 @@ if (isset($config['enable_printers']) && $config['enable_printers'])
 # No changes below this line #
 //////////////////////////////
 
-$config['version']  = "2013.dev";
+$config['version']  = "2014.master";
 $config['project_name_version'] = $config['project_name'] . " " . $config['version'];
 
 if (isset($config['rrdgraph_def_text']))
