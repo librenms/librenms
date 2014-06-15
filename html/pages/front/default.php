@@ -217,7 +217,6 @@ if ($config['enable_syslog'])
 echo("</div>");
 
 echo('
-  </div>
 </div>
 ');
 
