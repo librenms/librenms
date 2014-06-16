@@ -274,6 +274,7 @@ if($format == "graph")
 } else {
 
   echo('<div class="panel panel-default panel-condensed">
+          <div class="table-responsive">
           <table class="table table-condensed">');
                 
   if ($subformat == "detail" || $subformat == "basic")
@@ -306,6 +307,7 @@ if($format == "graph")
     }
   }
   echo("</table>");
+  echo('</div>');
   echo('</div>');
 }
 
