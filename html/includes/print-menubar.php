@@ -492,16 +492,7 @@ if(is_file("includes/print-menubar-custom.inc.php"))
 }
 
 ?>
-      </ul>
 
-      <ul class="nav navbar-nav navbar-right">
-        <li style="padding-top:10px">
-          <form role="form" class="form-inline">
-            <div class="form-group">
-                <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search" style="width: 250px">
-            </div>
-          </form>
-        </li>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/wrench.png" border="0" align="absmiddle" /> System<b class="caret"></b></a>
         <ul class="dropdown-menu">
@@ -544,6 +535,13 @@ if ($_SESSION['authenticated'])
            <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About&nbsp;<?php echo($config['project_name']); ?></a></li>
          </ul>
        </li>
+       <li style="padding-top:10px">
+          <form role="form" class="form-inline">
+            <div class="form-group">
+                <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search" style="width: 250px">
+            </div>
+          </form>
+        </li>
      </ul>
 
    </div>
