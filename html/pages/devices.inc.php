@@ -142,7 +142,6 @@ foreach (dbFetch('SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY
 }
           ?>
     </select>
-    <br />
     <select name='version' id='version' class="form-control input-sm">
       <option value=''>All Versions</option>
           <?php
@@ -174,7 +173,6 @@ foreach (dbFetch('SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardwa
 }
           ?>
     </select>
-    <br />
     <select name="features" id="features" class="form-control input-sm">
       <option value="">All Featuresets</option>
           <?php
@@ -208,7 +206,6 @@ foreach (getlocations() as $location) // FIXME function name sucks maybe get_loc
 }
 ?>
     </select>
-    <br />
     <select name="type" id="type" class="form-control input-sm">
       <option value="">All Device Types</option>
           <?php
@@ -224,12 +221,11 @@ foreach (dbFetch('SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDE
 }
           ?>
     </select>
+    <button type="submit" class="btn btn-default input-sm">Search</button>
   </div>
   <div class="form-group">
     <a href="<?php echo(generate_url($vars)); ?>" title="Update the browser URL to reflect the search criteria." >Update URL</a> |
     <a href="<?php echo(generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>" title="Reset critera to default." >Reset</a>
-    <br />
-    <button type="submit" class="btn btn-default input-sm">Search</button>
   </div>
 </form>
 
