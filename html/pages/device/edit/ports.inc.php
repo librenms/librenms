@@ -18,53 +18,52 @@ if ($updated && $update_message)
 }
 
 echo("<div style='float: left; width: 100%'>
-<form id='ignoreport' name='ignoreport' method='post' action=''>
+<form id='ignoreport' name='ignoreport' method='post' action='' role='form' class='form-inline'>
   <input type=hidden name='ignoreport' value='yes'>
   <input type=hidden name=device value='".$device['device_id']."'>");
 
-echo("<table cellpadding=3 cellspacing=0 width=100%>
+echo("<table cellpadding=3 cellspacing=0 class='table table-condensed table-responsive'>
   <tr align=center>
-                 <th width=100>Index</th>
-                 <th width=100>Name</th>
-                 <th width=50>Admin</th>
-                 <th width=150>Oper</th>
-                 <th width=150>Disable</th>
-                 <th width=150>Ignore</th>
+                 <th>Index</th>
+                 <th>Name</th>
+                 <th>Admin</th>
+                 <th>Oper</th>
+                 <th>Disable</th>
+                 <th>Ignore</th>
                  <th>Description</th>
 </tr>
 <tr align=center>
-    <td><input type='submit' value='Save' title='Save current port disable/ignore settings'/><input type='submit' value='Reset' id='form-reset' title='Reset form to previously-saved settings'/></td>
+    <td><button type='submit' value='Save' class='btn btn-success btn-sm' title='Save current port disable/ignore settings'/>Save</button><button type='submit' value='Reset' class='btn btn-danger btn-sm' id='form-reset' title='Reset form to previously-saved settings'/>Reset</button></td>
     <td></td>
     <td></td>
-    <td><input type='submit' value='Alerted' id='alerted-toggle' title='Toggle alerting on all currently-alerted ports'/><input type='submit' value='Down' id='down-select' title='Disable alerting on all currently-down ports'/></td>
-    <td><input type='submit' value='Toggle' id='disable-toggle' title='Toggle polling for all ports'/><input type='submit' value='Select' id='disable-select' title='Disable polling on all ports'/></td>
-    <td><input type='submit' value='Toggle' id='ignore-toggle' title='Toggle alerting for all ports'/><input type='submit' value='Select' id='ignore-select' title='Disable alerting on all ports'/></td>
+    <td><button type='submit' value='Alerted' class='btn btn-default btn-sm' id='alerted-toggle' title='Toggle alerting on all currently-alerted ports'/>Alerted</button><button type='submit' value='Down' class='btn btn-default btn-sm' id='down-select' title='Disable alerting on all currently-down ports'/>Down</button></td>
+    <td><button type='submit' value='Toggle' class='btn btn-default btn-sm' id='disable-toggle' title='Toggle polling for all ports'/>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='disable-select' title='Disable polling on all ports'/>Select</button></td>
+    <td><button type='submit' value='Toggle' class='btn btn-default btn-sm' id='ignore-toggle' title='Toggle alerting for all ports'/>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='ignore-select' title='Disable alerting on all ports'/>Select</button></td>
     <td></td>
 </tr>
 ");
 ?>
 
 <script>
-$(document).ready(function() {
     $('#disable-toggle').click(function(event) {
         // invert selection on all disable buttons
         event.preventDefault();
-        $('[name^="disabled_"]').check('toggle');
+        $('input[name^="disabled_"]').trigger('click'); 
     });
     $('#ignore-toggle').click(function(event) {
         // invert selection on all ignore buttons
         event.preventDefault();
-        $('[name^="ignore_"]').check('toggle');
+        $('input[name^="ignore_"]').trigger('click');
     });
     $('#disable-select').click(function(event) {
         // select all disable buttons
         event.preventDefault();
-        $('[name^="disabled_"]').check();
+        $('.disable-check').prop('checked',true);
     });
     $('#ignore-select').click(function(event) {
         // select all ignore buttons
         event.preventDefault();
-        $('[name^="ignore_"]').check();
+        $('.ignore-check').prop('checked',true);
     });
     $('#down-select').click(function(event) {
         // select ignore buttons for all ports which are down
@@ -76,7 +75,7 @@ $(document).ready(function() {
                 // get the interface number from the object name
                 var port_id = name.split('_')[1];
                 // find its corresponding checkbox and toggle it
-                $('[name="ignore_' + port_id + '"]').check();
+                $('input[name="ignore_' + port_id + '"]').trigger('click');
             }
         });
     });
@@ -89,7 +88,7 @@ $(document).ready(function() {
                 // get the interface number from the object name
                 var port_id = name.split('_')[1];
                 // find its corresponding checkbox and toggle it
-                $('[name="ignore_' + port_id + '"]').check('toggle');
+                $('input[name="ignore_' + port_id + '"]').trigger('click');
             }
         });
     });
@@ -98,7 +97,6 @@ $(document).ready(function() {
         event.preventDefault();
         $('#ignoreport')[0].reset();
     });
-});
 </script>
 
 <?php
@@ -125,12 +123,12 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY `ifIn
   echo("<td align=right><span name='operstatus_".$port['port_id']."'".$outofsync.">". $port['ifOperStatus']."</span></td>");
 
   echo("<td align=center>");
-  echo("<input type=checkbox name='disabled_".$port['port_id']."'".($port['disabled'] ? 'checked' : '').">");
+  echo("<input type=checkbox class='disable-check' name='disabled_".$port['port_id']."'".($port['disabled'] ? 'checked' : '').">");
   echo("<input type=hidden name='olddis_".$port['port_id']."' value=".($port['disabled'] ? 1 : 0).">");
   echo("</td>");
 
   echo("<td align=center>");
-  echo("<input type=checkbox name='ignore_".$port['port_id']."'".($port['ignore'] ? 'checked' : '').">");
+  echo("<input type=checkbox class='ignore-check' name='ignore_".$port['port_id']."'".($port['ignore'] ? 'checked' : '').">");
   echo("<input type=hidden name='oldign_".$port['port_id']."' value=".($port['ignore'] ? 1 : 0).">");
   echo("</td>");
   echo("<td align=left>".$port['ifAlias'] . "</td>");
