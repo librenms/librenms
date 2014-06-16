@@ -11,7 +11,9 @@ echo("<div class=\"front-box $frontbox_class\">
 
 echo('
   <div class="row">
-    <div class="col-md-9">
+    <div class="col-md-8">
+      <div class="row">
+        <div class="col-md-12">
 ');
 
 echo('<div class=front-page>');
@@ -121,7 +123,9 @@ echo('</div>');
 echo('</div>');
 echo('</div>');
 echo('
-  <div class="col-md-3">
+  </div>
+  </div>
+  <div class="col-md-4">
 ');
 
 if ($config['vertical_summary'])
@@ -151,8 +155,8 @@ if ($config['enable_syslog'])
             <div class="col-md-12">
               &nbsp;
             </div>
-          </row>
-          <row>
+          </div>
+          <div class="row">
             <div class="col-md-12">
               <div class="panel panel-default panel-condensed">
               <div class="panel-heading">
@@ -189,8 +193,8 @@ if ($config['enable_syslog'])
             <div class="col-md-12">
               &nbsp;
             </div>
-          </row>
-          <row>
+          </div>
+          <div class="row">
             <div class="col-md-12">
               <div class="panel panel-default panel-condensed">
               <div class="panel-heading">
@@ -213,7 +217,6 @@ if ($config['enable_syslog'])
 echo("</div>");
 
 echo('
-  </div>
 </div>
 ');
 
