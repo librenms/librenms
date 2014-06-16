@@ -11,7 +11,15 @@ echo("<div class=\"front-box $frontbox_class\">
 
 echo('
   <div class="row">
-    <div class="col-md-8">
+');
+if ($config['vertical_summary']) {
+  echo('    <div class="col-md-9">');
+}
+else
+{
+  echo('    <div class="col-md-8">');
+}
+echo('
       <div class="row">
         <div class="col-md-12">
 ');
@@ -125,15 +133,16 @@ echo('</div>');
 echo('
   </div>
   </div>
-  <div class="col-md-4">
 ');
 
 if ($config['vertical_summary'])
 {
+  echo('   <div class="col-md-3">');
   include_once("includes/device-summary-vert.inc.php");
 }
 else
 {
+  echo('   <div class="col-md-4">');
   include_once("includes/device-summary-horiz.inc.php");
 }
 
