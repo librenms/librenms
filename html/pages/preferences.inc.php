@@ -53,7 +53,7 @@ if (passwordscanchange($_SESSION['username']))
     </div>
   </div>
   <div class='form-group'>
-    <label for='new_pass2' class='col-sm-2'>New Password</label>
+    <label for='new_pass2' class='col-sm-2 control-label'>New Password</label>
     <div class='col-sm-4'>
       <input type=password name=new_pass2 autocomplete='off' class='form-control input-sm'>
     </div>
