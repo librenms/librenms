@@ -29,6 +29,10 @@ else
   {
     $state = 0;
   }
+  else
+  {
+    $state = 0;
+  }
   $update = dbUpdate(array('sensor_alert' => $state), 'sensors', '`sensor_id` = ? AND `device_id` = ?', array($_POST['sensor_id'],$_POST['device_id']));
   if(!empty($update) || $update == '0')
   {
