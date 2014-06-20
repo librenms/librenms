@@ -41,7 +41,7 @@ if ($_POST['hostname'])
 
       $snmpver = "v3";
 
-      if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = "161"; }
+      if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = $config['snmp']['port']; }
       print_message("Adding SNMPv3 host $hostname port $port");
     }
     else
