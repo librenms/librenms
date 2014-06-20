@@ -23,7 +23,7 @@ if ($_POST['hostname'])
       }
 
       $snmpver = mres($_POST['snmpver']);
-      if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = "161"; }
+      if ($_POST['port']) { $port = mres($_POST['port']); } else { $config['snmp']['community']; }
       print_message("Adding host $hostname communit" . (count($config['snmp']['community']) == 1 ? "y" : "ies") . " "  . implode(', ',$config['snmp']['community']) . " port $port");
     }
     elseif ($_POST['snmpver'] === "v3")
