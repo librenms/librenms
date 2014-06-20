@@ -141,6 +141,7 @@ $config['snmp']['version'] = "v2c";         # Default version to use
 
 # SNMPv1/2c default settings
 $config['snmp']['community'][0] = "public"; # Communities to try during adding hosts and discovery
+$config['snmp']['port'] = 161;              # Port Client SNMP is running on
 
 # SNMPv3 default settings
 # The array can be expanded to give another set of parameters
