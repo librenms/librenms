@@ -97,7 +97,13 @@ foreach ($applications as $app)
   $row++;
 }
 
-echo('<tr><td></td><td><button type="submit" class="btn btn-default" value="Save">Save</button></td></tr>');
+echo('<tr>
+  <td>
+    <button type="submit" class="btn btn-default" value="Save">Save</button>
+  </td>
+  <td>
+  </td>
+</tr>');
 echo('</table>');
 echo('</form>');
 echo('</div>');
