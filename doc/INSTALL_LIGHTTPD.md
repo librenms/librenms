@@ -95,7 +95,7 @@ Next, add the following to `/etc/lighttpd/librenms.conf`
 
 Next, add the following to `/etc/lighttpd/lighttpd.conf`
 
-     $HTTP["host"] == "exmple.com" { include "librenms.conf" }
+     $HTTP["host"] == "example.com" { include "librenms.conf" }
 
 And enable mod_rewrite by uncommenting
      #       "mod_rewrite",
