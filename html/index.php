@@ -205,9 +205,20 @@ if ($_SESSION['authenticated'])
   }
 
 } else {
-  // Not Authenticated. Print login.
-  include("pages/logon.inc.php");
-
+  // Not Authenticated. Show status page if enabled
+  if ( $config['public_status'] )
+  {
+    if (isset($vars['page']) && strstr("login", $vars['page']))
+    {
+      include("pages/logon.inc.php");
+    } else {
+      include("pages/public.inc.php");
+    }
+  }
+  else
+  {
+    include("pages/logon.inc.php");
+  }
   exit;
 }
 ?>
