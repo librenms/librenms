@@ -35,8 +35,7 @@ Change `127.0.0.1` to the IP address that your MySQL server should listen on.  R
 
 Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of Debian 7.
 
-    apt-get install lighttpd php5-cli php5-mysql php5-gd php5-snmp php5-cgi php-pear snmp graphviz mysql-server mysql-client rrdtool sendmail \
-fping imagemagick whois mtr-tiny nmap ipmitool php5-mcrypt php5-json python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git
+    apt-get install lighttpd php5-cli php5-mysql php5-gd php5-snmp php5-cgi php-pear snmp graphviz mysql-server mysql-client rrdtool sendmail fping imagemagick whois mtr-tiny nmap ipmitool php5-mcrypt php5-json python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git
     
 ### Cloning ###
 
