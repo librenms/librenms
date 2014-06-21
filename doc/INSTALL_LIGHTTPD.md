@@ -115,7 +115,7 @@ And add the following to /etc/php5/cgi/php.ini
      
 then restart Lighttpd:
 
-    service lightpd restart
+    service lighttpd restart
 
 ### Add localhost ###
 
