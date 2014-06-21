@@ -260,8 +260,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp')
   // Test Database Exists
   if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0')
   {
-    // Test DNS lookup
-    //if (gethostbyname($host) != $host)
+    // Test if IP or Hostname
     if (!(inet_pton($host))) 
     {
       // Test reachability
