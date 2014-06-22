@@ -21,8 +21,7 @@ $(document).ready(function() {
 $sql_param = array();
 $pagetitle[] = "Public Devices";
 
-
-$query = "SELECT * FROM `devices` ORDER BY hostname";
+$query = "SELECT * FROM `devices` WHERE 1 AND disabled='0' AND `ignore`='0' ORDER BY hostname";
 
 ?>
 <div class="well"><h3>System Status<button class="btn btn-default" type="submit" style="float:right;" id="ToggleLogon">Logon</button></h3></div>
@@ -46,17 +45,3 @@ foreach (dbFetchRows($query, $sql_param) as $device)
       </table>
     </div>
   </div>
-  <footer>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12 text-center">
-<?php
-echo(' <br /> <br /> ' . (isset($config['footer']) ? $config['footer'] : ''));
-echo(' <br />Powered by <a href="' . $config['project_url'] . '" target="_blank">' . $config['project_name_version'].'</a>. ');
-echo( $config['project_name'].' is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPLv3</a>.<br/>');
-echo(' Copyright &copy; 2006-2012 by Adam Armstrong. Copyright &copy; 2013-'.date("Y").' by the '.$config['project_name'].' Contributors.');
-?>
-      </div>
-    </div>
-  </div>
-</footer>
