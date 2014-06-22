@@ -163,19 +163,24 @@ if (!$vars['bare'] == "yes") {
   if ($_SESSION['authenticated'])
   {
     include("includes/print-menubar.php");
-  } else {
-    echo('<hr color="#444444" />');
   }
 }
 
 ?>
 <br />
 <div class="container-fluid">
+<?php
+if ($_SESSION['authenticated'])
+{
+?>
   <div class="row">
     <div class="col-md-12">
       &nbsp;<br /><br />
     </div>
   </div>
+<?php
+}
+?>
   <div class="row">
     <div class="col-md-12">
 <?php
@@ -225,7 +230,6 @@ if ($_SESSION['authenticated'])
   {
     include("pages/logon.inc.php");
   }
-  exit;
 }
 ?>
     </div>
