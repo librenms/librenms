@@ -206,7 +206,7 @@ if ($_SESSION['authenticated'])
 
 } else {
   // Not Authenticated. Show status page if enabled
-  if ( $config['public_status'] )
+  if ( $config['public_status'] === true )
   {
     if (isset($vars['page']) && strstr("login", $vars['page']))
     {
@@ -216,7 +216,7 @@ if ($_SESSION['authenticated'])
       include("pages/public.inc.php");
       echo '</div>';
       echo '<div id="public-logon" style="display:none;">';
-      echo '<div class="well"><h3>Logon<button class="btn btn-default" type="submit" style="float:right;" onclick="ToggleLogon()">Status</button></h3></div>';
+      echo '<div class="well"><h3>Logon<button class="btn btn-default" type="submit" style="float:right;" id="ToggleStatus">Status</button></h3></div>';
       include ("pages/logon.inc.php");
       echo '</div>';
     }
