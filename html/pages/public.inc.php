@@ -1,3 +1,20 @@
+<script class="code" type="text/javascript">
+function ToggleLogon($) {
+  if ( document.getElementById('public-logon').style.display=="block" )
+  {
+    document.getElementById('public-logon').style.display="none";
+    document.getElementById('public-status').style.display="block";
+    //document.getElementById($id+"-div").innerHTML="click to expand";
+  }
+  else
+  {
+    document.getElementById('public-logon').style.display="block";
+    document.getElementById('public-status').style.display="none";
+    //document.getElementById($id+"-div").innerHTML="hide";
+  }
+};
+</script>
+
 <?php
 
 // Set Defaults here
@@ -34,7 +51,7 @@ $pagetitle[] = "Public Devices";
 
 //print_optionbar_end();
 
-echo '<div class="well"><h3>System Status</h3></div>';
+echo '<div class="well"><h3>System Status<button class="btn btn-default" type="submit" style="float:right;" onclick="ToggleLogon()">Logon</button></h3></div>';
 
 $query = "SELECT * FROM `devices` WHERE 1 ".$where." ORDER BY hostname";
 
@@ -81,7 +98,7 @@ if($format == "graph")
     <th>Device</th>
     <th></th>
     <th>Platform</th>
-    <th>Operating System</th>
+<!--    <th>Operating System</th> -->
     <th>Uptime/Location</th>
   </tr>');
   }
@@ -90,7 +107,7 @@ if($format == "graph")
   {
     if (!device_permitted($device['device_id']))
     {
-          include("includes/hostbox-basic.inc.php");
+          include("includes/hostbox-public.inc.php");
     }
   }
   echo("</table>");
@@ -105,7 +122,6 @@ if($format == "graph")
 <div class="col-md-12 text-center">
 <?php
 echo(' <br /> <br /> ' . (isset($config['footer']) ? $config['footer'] : ''));
-echo(' <br /><a href="' . $config['site_url'] . 'login/" target="_self">Admins Logon Here</a>. ');
 echo(' <br />Powered by <a href="' . $config['project_url'] . '" target="_blank">' . $config['project_name_version'].'</a>. ');
 echo( $config['project_name'].' is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPLv3</a>.<br/>');
 echo(' Copyright &copy; 2006-2012 by Adam Armstrong. Copyright &copy; 2013-'.date("Y").' by the '.$config['project_name'].' Contributors.');

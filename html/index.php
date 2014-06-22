@@ -212,7 +212,13 @@ if ($_SESSION['authenticated'])
     {
       include("pages/logon.inc.php");
     } else {
+      echo '<div id="public-status">';
       include("pages/public.inc.php");
+      echo '</div>';
+      echo '<div id="public-logon" style="display:none;">';
+      echo '<div class="well"><h3>Logon<button class="btn btn-default" type="submit" style="float:right;" onclick="ToggleLogon()">Status</button></h3></div>';
+      include ("pages/logon.inc.php");
+      echo '</div>';
     }
   }
   else
