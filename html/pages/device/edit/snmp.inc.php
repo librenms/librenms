@@ -65,7 +65,7 @@ echo("
   <input type=hidden name='editing' value='yes'>
   <div class='form-group'>
     <label for='snmpver' class='col-sm-2 control-label'>SNMP Version</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <select id='snmpver' name='snmpver' class='form-control'>
         <option value='v1'>v1</option>
         <option value='v2c' " . ($device['snmpver'] == 'v2c' ? 'selected' : '') . ">v2c</option>
@@ -78,7 +78,7 @@ echo("
   </div>
   <div class='form-group'>
     <label for='community' class='col-sm-2 control-label'>SNMP Community</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <input id='community' class='form-control' name='community' value='" . $device['community'] . "' />
     </div>
   </div>
@@ -87,7 +87,7 @@ echo("
   </div>
   <div class='form-group'>
     <label for='authlevel' class='col-sm-2 control-label'>Auth Level</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <select id='authlevel' name='authlevel' class='form-control'>
           <option value='NoAuthNoPriv'>NoAuthNoPriv</option>
           <option value='AuthNoPriv' " . ($device['authlevel'] == "authNoPriv" ? 'selected' : '') . ">AuthNoPriv</option>
@@ -97,19 +97,19 @@ echo("
   </div>
   <div class='form-group'>
     <label for='authname' class='col-sm-2 control-label'>Auth User Name</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <input type='text' id='authname' name='authname' class='form-control' value='" . $device['authname']  . "'>
     </div>
   </div>
   <div class='form-group'>
     <label for='authpass' class='col-sm-2 control-label'>Auth Password</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <input type='text' id='authpass' name='authpass' class='form-control' value='" . $device['authpass']  . "'>
     </div>
   </div>
   <div class='form-group'>
     <label for='authalgo' class='col-sm-2 control-label'>Auth Algorithm</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <select id='authalgo' name='authalgo' class='form-control'>
         <option value='MD5'>MD5</option>
         <option value='SHA' " . ($device['authalgo'] === "SHA" ? 'selected' : '') . ">SHA</option>
@@ -118,13 +118,13 @@ echo("
   </div>
   <div class='form-group'>
     <label for='cryptopass' class='col-sm-2 control-label'>Crypto Password</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <input type='text' id='cryptopass' name='cryptopass' class='form-control' value='" . $device['cryptopass']  . "'>
     </div>
   </div>
   <div class='form-group'>
     <label for='cryptoalgo' class='col-sm-2 control-label'>Crypto Algorithm</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <select id='cryptoalgo' name='cryptoalgo' class='form-control'>
         <option value='AES'>AES</option>
         <option value='DES' " . ($device['cryptoalgo'] === "DES" ? 'selected' : '') . ">DES</option>
@@ -136,7 +136,7 @@ echo("
   </div>
   <div class='form-group'>
     <label for='transport' class='col-sm-2 control-label'>SNMP Transport</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <select id='transport' name='transport' class='form-control'>");
 
 foreach ($config['snmp']['transports'] as $transport)
@@ -151,19 +151,19 @@ echo("  </select>
   </div>
   <div class='form-group'>
     <label for='port' class='col-sm-2 control-label'>SNMP Port</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <input id='port' name='port' class='form-control' value='" . $device['port'] . "' />
     </div>
   </div>
   <div class='form-group'>
     <label for='timeout' class='col-sm-2 control-label'>SNMP Timeout</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <input id='timeout' name='timeout' class='form-control' value='" . ($device['timeout'] ? $device['timeout'] : '') . "' /> <em>(milli)seconds</em>
     </div>
   </div>
   <div class='form-group'>
     <label for='retries' class='col-sm-2 control-label'>SNMP Retries</label>
-    <div class='col-sm-6'>
+    <div class='col-sm-4'>
       <input id='retries' name='retries' class='form-control' value='" . ($device['timeout'] ? $device['retries'] : '') . "' />
     </div>
   </div>");
