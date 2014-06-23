@@ -23,10 +23,31 @@ the commit log that you agree to the conditions of the Contributor Agreement
 contained in doc/CONTRIBUTING.md.
 
 Note that contributors to LibreNMS retain copyright to their own code and
-are not required to sign over their rights to any other party.  We recommend
-that if you add a new file containing original code to the code base that
-you include a copyright notice in it as per the Free Software Foundation's
-guidelines.
+are not required to sign over their rights to any other party.  You maintain
+all rights to your own code.
+
+We recommend that if you add a new file containing original code to the code
+base that you include a copyright notice in it as per the Free Software
+Foundation's guidelines.  You might find something like the following header
+appropriate (although this is not legal advice ;-):
+
+  <?php
+  /*
+   * LibreNMS module to frob blurgs from a foo bar
+   *
+   * Copyright (c) 2014 Internet Widgitz Pty Ltd <http://example.com/>
+   *
+   * This program is free software: you can redistribute it and/or modify it
+   * under the terms of the GNU General Public License as published by the
+   * Free Software Foundation, either version 3 of the License, or (at your
+   * option) any later version.  Please see LICENSE.txt at the top level of
+   * the source code distribution for details.
+   */
+  ?>
+
+The GPLv3 itself also contains recommendations about applying the GPL to
+your code.  Please see LICENSE.txt at the top of this source code
+distribution for details.
 
 
 Guidelines for contributing to LibreNMS
