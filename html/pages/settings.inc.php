@@ -2,27 +2,6 @@
 
 if ($_SESSION['userlevel'] == '10')
 {
-  foreach($_POST['cfg'] as $cfg_id=>$cfg_value) {
-    if($_POST['disabled'][$cfg_id] != '1')
-    {
-      $cfg_disabled = 0;
-    }
-    else
-    {
-      $cfg_disabled = 1;
-    } 
-    dbUpdate(array('config_value' => "$cfg_value", 'config_disabled' => "$cfg_disabled"), 'config', '`config_id` = ?', array($cfg_id));
-    $db_updated = 1;
-  }
-
-  if($db_updated == 1)
-  {
-    echo '<div class="alert alert-success">Config information has been updated.</div>';
-  }
-  elseif(isset($_POST['cfg']))
-  {
-    echo '<div class="alert alert-danger">Config failed to update.</div>';
-  }
 
 ?>
     <div class="modal fade" id="new-config-form" role="dialog" aria-hidden="true" title="Create new config item">
@@ -106,11 +85,6 @@ $('#multi_value').toggle();
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="alert alert-info">If you would like to disable a config option then ensure the tickbox is selected.</div>
-        </div>
-      </div>
       <form class="form-horizontal" role="form" action="" method="post">
       <div class="panel-group" id="accordion">
 ');
@@ -142,8 +116,8 @@ $('#multi_value').toggle();
       echo('
               <div class="form-group">
                 <label for="'.$cfg['config_id'].'" class="col-sm-3">'.$cfg['config_name'].': </label>
-                <div class="col-sm-6">
-                  <input type="input" class="form-control input-sm" name="cfg['.$cfg['config_id'].']" id="'.$cfg['config_id'].'" value="'.$cfg['config_value'].'">
+                <div class="col-sm-6 config-response">
+                  <input type="input" class="form-control input-sm config-item" name="'.$cfg['config_id'].'" id="'.$cfg['config_id'].'" value="'.$cfg['config_value'].'">
                 </div>
                 <div class="col-sm-1">
                   <div data-toggle="tooltip" title="'.$cfg['config_desc'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
@@ -152,11 +126,7 @@ $(".toolTip").tooltip();
 </script>
                 </div>
                 <div class="col-sm-2">
-                  <div class="checkbox">
-                    <label>
-                      <input type="checkbox" name="disabled['.$cfg['config_id'].']" id="'.$cfg['config_id'].'" value="1" '.$cfg_disabled.'>
-                    </label>
-                  </div>
+                  <input type="checkbox" name="config-status" data-config_id="'.$cfg['config_id'].'" data-off-text="On" data-on-text="Off" data-on-color="danger" '.$cfg_disabled.'>
                 </div>
               </div>
 ');
@@ -181,24 +151,6 @@ $(".toolTip").tooltip();
             $(".collapse").collapse("hide");
           });
         </script>
-');
-
-  if($found > 0)
-  {
-    echo('
-         <div class="form-group">
-           <div class="col-sm-6">
-');
-
-    echo('
-             <button type="submit" class="btn btn-default">Update Config</button>
-           </div>
-         </div>
-');
-  }
-  echo('
-      </div>
-    </form>
 ');
 
   echo("<pre>");
@@ -226,6 +178,52 @@ $(".toolTip").tooltip();
   });
 </script>
 
+<script>
+    $( ".config-item" ).blur(function(event) {
+      event.preventDefault();
+      var config_id = $(this).attr('id');
+      var data = $(this).val();
+      var $this = $(this);
+      $.ajax({
+        type: 'POST',
+        url: '/ajax_form.php',
+        data: { type: "config-item-update", config_id: config_id, data: data},
+        dataType: "html",
+        success: function(data){
+          $this.closest('.config-response').addClass('has-success');
+          setTimeout(function(){
+            $this.closest('.config-response').removeClass('has-success');
+          }, 2000);
+        },
+        error:function(){
+          $(this).closest('.config-response').addClass('has-error');
+          setTimeout(function(){
+            $this.closest('.config-response').removeClass('has-error');
+          }, 2000);
+        }
+      });
+    });
+</script>
+<script>
+  $("[name='config-status']").bootstrapSwitch('offColor','success');
+  $('input[name="config-status"]').on('switchChange.bootstrapSwitch',  function(event, state) {
+    event.preventDefault();
+    var $this = $(this);
+    var config_id = $(this).data("config_id");
+    $.ajax({
+      type: 'POST',
+      url: '/ajax_form.php',
+      data: { type: "config-item-disable", config_id: config_id, state: state},
+      dataType: "html",
+      success: function(data){
+        //alert('good');
+      },
+      error:function(){
+        //alert('bad');
+      }
+    });
+  });
+</script>
 <?php
 
 
