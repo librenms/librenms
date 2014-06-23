@@ -1,9 +1,8 @@
 NOTE
 ----
 
-Please note that LibreNMS is covered by the GPLv3, but also includes an
-exception for included third-party packages.  Please see README.md for full
-details of this exception.
+LibreNMS is covered by the GPLv3, and includes exceptions for included
+third-party packages.  Please see README.md for full details.
 
 
 Original GPLv3 text

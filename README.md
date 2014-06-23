@@ -3,7 +3,7 @@ License
 
 Copyright (C) 2006-2012 Adam Armstrong <adama@memetic.org>
 
-Copyright (C) 2013 LibreNMS Contributors <librenms-project@googlegroups.com>
+Copyright (C) 2013-2014 by individual LibreNMS contributors
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
