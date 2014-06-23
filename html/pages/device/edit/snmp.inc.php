@@ -158,7 +158,7 @@ echo("  </select>
   <div class='form-group'>
     <label for='timeout' class='col-sm-2 control-label'>SNMP Timeout</label>
     <div class='col-sm-4'>
-      <input id='timeout' name='timeout' class='form-control' value='" . ($device['timeout'] ? $device['timeout'] : '') . "' /> <em>(milli)seconds</em>
+      <input id='timeout' name='timeout' class='form-control' value='" . ($device['timeout'] ? $device['timeout'] : '') . "' /> <em>seconds</em>
     </div>
   </div>
   <div class='form-group'>
