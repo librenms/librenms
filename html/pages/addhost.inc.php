@@ -13,7 +13,10 @@ if ($_POST['hostname'])
 {
   if ($_SESSION['userlevel'] > '5')
   {
+    // Settings common to SNMPv2 & v3
     $hostname = mres($_POST['hostname']);
+    if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = $config['snmp']['port']; }
+    if ($_POST['transport']) { $transport = mres($_POST['transport']); } else { $transport = "udp"; }
 
     if ($_POST['snmpver'] === "v2c" or $_POST['snmpver'] === "v1")
     {
@@ -23,8 +26,6 @@ if ($_POST['hostname'])
       }
 
       $snmpver = mres($_POST['snmpver']);
-      if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = $config['snmp']['port']; }
-      if ($_POST['transport']) { $transport = mres($_POST['transport']); } else { $transport = "udp"; }
       print_message("Adding host $hostname communit" . (count($config['snmp']['community']) == 1 ? "y" : "ies") . " "  . implode(', ',$config['snmp']['community']) . " port $port using $transport");
     }
     elseif ($_POST['snmpver'] === "v3")
@@ -41,8 +42,6 @@ if ($_POST['hostname'])
       array_push($config['snmp']['v3'], $v3);
 
       $snmpver = "v3";
-
-      if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = $config['snmp']['port']; }
       print_message("Adding SNMPv3 host $hostname port $port");
     }
     else
