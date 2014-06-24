@@ -35,7 +35,7 @@ if ($device['os'] == "ironware")
         if ($remote_device_id)
         {
           $if = $fdp['snFdpCacheDevicePort'];
-          $remote_port_id = dbFetchCell("SELECT port_id FROM `ports` WHERE (`ifDescr` = ? OR `ifName = ?) AND `device_id` = ?",array($if,$if,$remote_device_id));
+          $remote_port_id = dbFetchCell("SELECT port_id FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?",array($if,$if,$remote_device_id));
         } else { $remote_port_id = "0"; }
 
         discover_link($interface['port_id'], $fdp['snFdpCacheVendorId'], $remote_port_id, $fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDevicePort'], $fdp['snFdpCachePlatform'], $fdp['snFdpCacheVersion']);
