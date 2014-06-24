@@ -13,7 +13,10 @@ if ($_POST['hostname'])
 {
   if ($_SESSION['userlevel'] > '5')
   {
+    // Settings common to SNMPv2 & v3
     $hostname = mres($_POST['hostname']);
+    if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = $config['snmp']['port']; }
+    if ($_POST['transport']) { $transport = mres($_POST['transport']); } else { $transport = "udp"; }
 
     if ($_POST['snmpver'] === "v2c" or $_POST['snmpver'] === "v1")
     {
@@ -23,8 +26,7 @@ if ($_POST['hostname'])
       }
 
       $snmpver = mres($_POST['snmpver']);
-      if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = $config['snmp']['port']; }
-      print_message("Adding host $hostname communit" . (count($config['snmp']['community']) == 1 ? "y" : "ies") . " "  . implode(', ',$config['snmp']['community']) . " port $port");
+      print_message("Adding host $hostname communit" . (count($config['snmp']['community']) == 1 ? "y" : "ies") . " "  . implode(', ',$config['snmp']['community']) . " port $port using $transport");
     }
     elseif ($_POST['snmpver'] === "v3")
     {
@@ -40,15 +42,13 @@ if ($_POST['hostname'])
       array_push($config['snmp']['v3'], $v3);
 
       $snmpver = "v3";
-
-      if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = $config['snmp']['port']; }
       print_message("Adding SNMPv3 host $hostname port $port");
     }
     else
     {
       print_error("Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?");
     }
-    $result = addHost($hostname, $snmpver, $port);
+    $result = addHost($hostname, $snmpver, $port, $transport);
     if ($result)
     {
       print_message("Device added ($result)");
@@ -75,7 +75,7 @@ $pagetitle[] = "Add host";
     </div>
     <div class="form-group">
       <label for="snmpver" class="col-sm-2 control-label">SNMP Version</label>
-      <div class="col-sm-3">
+      <div class="col-sm-2">
         <select name="snmpver" id="snmpver" class="form-control input-sm">
           <option value="v1">v1</option>
           <option value="v2c" selected>v2c</option>
@@ -84,6 +84,14 @@ $pagetitle[] = "Add host";
       </div>
       <div class="col-sm-2">
         <input type="text" name="port" placeholder="port" class="form-control input-sm">
+      </div>
+      <div class="col-sm-1">
+        <select name="transport" id="transport" class="form-control input-sm">
+          <option value="tcp">tcp</option>
+          <option value="udp" selected>udp</option>
+          <option value="tcp6">tcp6</option>
+          <option value="udp6">udp6</option>
+        </select>
       </div>
       <div class="col-sm-5">
       </div>
