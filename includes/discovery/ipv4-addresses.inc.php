@@ -15,7 +15,7 @@ foreach (explode("\n", $oids) as $data)
 
   if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?",array($device['device_id'], $ifIndex)) != '0' && $oid != "0.0.0.0" && $oid != 'ipAdEntIfIndex')
   {
-    $port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifIndex = ?",array($device['device_id'], $ifIndex));
+    $port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?",array($device['device_id'], $ifIndex));
 
     if (dbFetchCell("SELECT COUNT(*) FROM `ipv4_networks` WHERE `ipv4_network` = ?",array($network)) < '1')
     {
