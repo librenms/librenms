@@ -916,4 +916,19 @@ function scan_new_plugins()
 
 }
 
+function validate_device_id($id)
+{
+
+  global $config;
+  $device_id = dbFetchCell("SELECT `device_id` FROM `devices` WHERE `device_id` = ?", array($id));
+  if($device_id == $id)
+  {
+    $return = true;
+  }
+  else
+  {
+    $return = false;
+  }
+  return($return);
+}
 ?>
