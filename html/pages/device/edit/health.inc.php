@@ -108,7 +108,7 @@ foreach($rollback as $reset_data)
       var $this = $(this);
       $.ajax({
         type: 'POST',
-        url: '/ajax_form.php?'+value_type,
+        url: '/ajax_form.php',
         data: { type: "health-update", device_id: device_id, data: data, sensor_id: sensor_id , value_type: value_type},
         dataType: "html",
         success: function(data){
