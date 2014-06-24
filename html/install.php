@@ -30,6 +30,13 @@ $config['db_name']=$dbname;
 }
 
 include("../includes/defaults.inc.php");
+// Work out the install directory
+$cur_dir = explode('/',$_SERVER['DOCUMENT_ROOT']);
+$install_dir = array_pop($cur_dir);
+$install_dir = array_pop($cur_dir);
+$install_dir = implode('/',$cur_dir);
+$config['install_dir'] = $install_dir;
+$config['log_dir'] = $install_dir.'/logs';
 if($_POST['stage'] == "3" || $_POST['stage'] == "4")
 {
   include_once("../includes/definitions.inc.php");
@@ -370,7 +377,7 @@ $config_file = <<<"EOD"
 \$config\['memcached'\]\['port'\]    = 11211;
 
 ### Locations - it is recommended to keep the default
-#\$config\['install_dir'\]  = "/opt/librenms";
+\$config\['install_dir'\]  = "$install_dir";
 
 ### This should *only* be set if you want to *force* a particular hostname/port
 ### It will prevent the web interface being usable form any other hostname
