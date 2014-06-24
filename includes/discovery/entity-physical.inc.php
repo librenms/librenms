@@ -44,7 +44,7 @@
 
     if ($entPhysicalDescr || $entPhysicalName)
     {
-      $entPhysical_id = dbFetchCell("SELECT entPhysical_id FROM `entPhysical` WHERE devicee_id = ? AND entPhysicalIndex = ?",array($device['device_id'], $entPhysicalIndex));
+      $entPhysical_id = dbFetchCell("SELECT entPhysical_id FROM `entPhysical` WHERE device_id = ? AND entPhysicalIndex = ?",array($device['device_id'], $entPhysicalIndex));
 
       if ($entPhysical_id) {
         dbUpdate(array('entPhysicalIndex' => $entPhysicalIndex, 'entPhysicalDescr' => $entPhysicalDescr, 'entPhysicalClass' => $entPhysicalClass, 'entPhysicalName' => $entPhysicalName, 'entPhysicalModelName' => $entPhysicalModelName, 'entPhysicalSerialNum' => $entPhysicalSerialNum, 'entPhysicalContainedIn' => $entPhysicalContainedIn, 'entPhysicalMfgName' => $entPhysicalMfgName, 'entPhysicalParentRelPos' => $entPhysicalParentRelPos, 'entPhysicalVendorType' => $entPhysicalVendorType, 'entPhysicalHardwareRev' => $entPhysicalHardwareRev, 'entPhysicalFirmwareRev' => $entPhysicalFirmwareRev, 'entPhysicalSoftwareRev' => $entPhysicalSoftwareRev, 'entPhysicalIsFRU' => $entPhysicalIsFRU, 'entPhysicalAlias' => $entPhysicalAlias, 'entPhysicalAssetID' => $entPhysicalAssetID), 'entPhysical', 'device_id=? AND entPhysicalIndex=?',array($device['device_id'],$entPhysicalIndex));
