@@ -518,9 +518,9 @@ function discover_process_ipv6(&$valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$
       echo("N");
     }
 
-    $ipv6_network_id = dbFetchCell("SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network = ?",array($ipv6_network));
+    $ipv6_network_id = dbFetchCell("SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ?",array($ipv6_network));
 
-    if (dbFetchCell("SELECT COUNT(*) FROM `ipv6_addresses WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?",array($ipv6_address, $ipv6_prefixlen, $port_id)) == '0')
+    if (dbFetchCell("SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?",array($ipv6_address, $ipv6_prefixlen, $port_id)) == '0')
     {
      dbInsert(array('ipv6_address' => $ipv6_address, 'ipv6_compressed' => $ipv6_compressed, 'ipv6_prefixlen' => $ipv6_prefixlen,'ipv6_origin' => $ipv6_origin, 'ipv6_network_id' => $ipv6_network_id, 'port_id' => $port_id), 'ipv6_addresses');
      echo("+");
