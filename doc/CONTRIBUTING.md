@@ -19,8 +19,9 @@ any other means), you assert that:
 To agree with these assertions, please submit a github pull request against
 the file doc/AUTHORS.md including your name, email address, and github user
 id in the file (so that it can be matched to your commits), and stating in
-the commit log that you agree to the conditions of the Contributor Agreement
-contained in doc/CONTRIBUTING.md.
+the commit log:
+	I agree to the conditions of the Contributor Agreement
+	contained in doc/CONTRIBUTING.md.
 
 Note that contributors to LibreNMS retain copyright to their own code and
 are not required to sign over their rights to any other party.  You maintain
