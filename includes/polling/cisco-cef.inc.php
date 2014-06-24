@@ -51,7 +51,7 @@ if ($device['os_group'] == "cisco")
           }
           unset($cefs_db[$cef_id]);
 
-          $cef_entry = dbFetchRow("SELECT * FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path));
+          $cef_entry = dbFetchRow("SELECT * FROM `cef_switching` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path));
 
           $filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cefswitching-".$entity."-".$afi."-".$path.".rrd");
 
