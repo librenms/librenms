@@ -69,13 +69,14 @@ if (count($apps_enabled))
   }
 }
 
-echo("<div style='float: left; width: 100%'>
-<form id='appedit' name='appedit' method='post' action=''>
+echo("<div class='row'>
+<div class='col-md-4'>
+<form id='appedit' name='appedit' method='post' action='' role='form' class='form-horizontal'>
   <input type=hidden name=device value='".$device['device_id']."'>
-  <table cellpadding=3 cellspacing=0 width=100%>
+  <table class='table table-condensed table-striped table-responsive'>
     <tr align=center>
-      <th width=100>Enable</th>
-      <th align=left>Application</th>
+      <th>Enable</th>
+      <th>Application</th>
     </tr>
 ");
 
@@ -86,19 +87,26 @@ foreach ($applications as $app)
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   echo("    <tr bgcolor=$row_colour>");
-  echo("      <td align=center>");
+  echo("      <td>");
   echo("        <input type=checkbox" . (in_array($app,$app_enabled) ? ' checked="1"' : '') . " name='app_". $app ."'>");
   echo("      </td>");
-  echo("      <td align=left>". ucfirst($app) . "</td>");
+  echo("      <td>". ucfirst($app) . "</td>");
   echo("    </tr>
 ");
 
   $row++;
 }
 
-echo('<tr><td></td><td><input type="submit" value="Save"></td></tr>');
+echo('<tr>
+  <td>
+    <button type="submit" class="btn btn-default" value="Save">Save</button>
+  </td>
+  <td>
+  </td>
+</tr>');
 echo('</table>');
 echo('</form>');
+echo('</div>');
 echo('</div>');
 
 ?>

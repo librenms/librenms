@@ -55,29 +55,24 @@ if ($updated && $update_message)
 }
 
 ?>
-<table cellpadding="0" cellspacing="0">
-  <tr>
-    <td>
-      <h5>
-        <form id="delete_host" name="delete_host" method="post" action="delhost/">
-          <img src="images/16/server_delete.png" align="absmiddle">
-          <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
-          <input type="submit" class="submit" name="Submit" value="Delete device">
-        </form>
-      </h5>
-      <form id="edit" name="edit" method="post" action="">
-        <input type=hidden name="editing" value="yes">
-        <table width="500" border="0">
-          <tr>
-            <td colspan="2" align="right">Description:</td>
-            <td colspan="3"><input name="descr" size="32" value="<?php echo($device['purpose']); ?>"></input></td>
-          </tr>
-         <tr>
-            <td colspan="2" align="right">
-              Type:
-            </td>
-            <td>
-              <select name="type">
+
+<form id="delete_host" name="delete_host" method="post" action="delhost/" role="form">
+  <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
+  <button type="submit" class="btn btn-danger" name="Submit">Delete device</button>
+</form>
+<br />
+<form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
+<input type=hidden name="editing" value="yes">
+  <div class="form-group">
+    <label for="descr" class="col-sm-2 control-label">Description:</label>
+    <div class="col-sm-6">
+      <input id="descr" name="descr" value="<?php echo($device['purpose']); ?>" class="form-control">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="type" class="col-sm-2 control-label">Type:</label>
+    <div class="col-sm-6">
+      <select id="type" name="type" class="form-control">
 <?php
 $unknown = 1;
 
@@ -96,30 +91,39 @@ foreach ($config['device_types'] as $type)
     echo('          <option value="other">Other</option>');
   }
 ?>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <td width="40"><div style="padding-right: 5px; text-align: right"><input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"<?php if ($override_sysLocation_bool) { echo(' checked="1"'); } ?> /></div></td>
-            <td align="right">Override sysLocation:</td>
-            <td colspan="3"><input name="sysLocation" size="32"<?php if (!$override_sysLocation_bool) { echo(' disabled="1"'); } ?> value="<?php echo($override_sysLocation_string); ?>" /></td>
-          </tr>
-          <tr>
-            <td colspan="2"><div align="right">Disable</div></td>
-            <td><input name="disabled" type="checkbox" id="disabled" value="1" <?php if ($device["disabled"]) { echo("checked=checked"); } ?> /></td>
-            <td><div align="right">Ignore</div></td>
-            <td><input name="ignore" type="checkbox" id="disable" value="1" <?php if ($device['ignore']) { echo("checked=checked"); } ?> />&nbsp;</td>
-          </tr>
-        </table>
-        <input type="submit" name="Submit" value="Save" />
-        <label><br />
-        </label>
-      </form>
-    </td>
-  </tr>
-</table>
+     </select>
+   </div>
+ </div>
+ <div class="form-group">
+    <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
+    <div class="col-sm-6">
+     <div class="checkbox">
+       <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"<?php if ($override_sysLocation_bool) { echo(' checked="1"'); } ?> />
+     </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-2">
+    </div>
+    <div class="col-sm-6">
+      <input id="sysLocation" name="sysLocation" class="form-control" <?php if (!$override_sysLocation_bool) { echo(' disabled="1"'); } ?> value="<?php echo($override_sysLocation_string); ?>" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="disabled" class="col-sm-2 control-label">Disable:</label>
+    <div class="col-sm-6">
+      <input name="disabled" type="checkbox" id="disabled" value="1" <?php if ($device["disabled"]) { echo("checked=checked"); } ?> />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="ignore" class="col-sm-2 control-label">Ignore</label>
+    <div class="col-sm-6">
+      <input name="ignore" type="checkbox" id="ignore" value="1" <?php if ($device['ignore']) { echo("checked=checked"); } ?> />
+    </div>
+  </div>
+  <button type="submit" name="Submit"  class="btn btn-default">Save</button>
+</form>
 <br />
-
 <?php
 
 print_optionbar_start();

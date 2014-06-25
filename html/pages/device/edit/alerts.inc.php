@@ -35,33 +35,26 @@ $disable_notify = get_dev_attrib($device,'disable_notify');
 
 <h3>Alert settings</h3>
 
-<table cellpadding="0" cellspacing="0">
-  <tr>
-    <td>
-      <form id="edit" name="edit" method="post" action="">
-        <input type="hidden" name="editing" value="yes">
-        <table width="500" border="0">
-          <tr>
-            <td width="50"><div style="padding-right: 5px; text-align: right"><input onclick="edit.sysContact.disabled=!edit.override_sysContact.checked" type="checkbox" name="override_sysContact"<?php if ($override_sysContact_bool) { echo(' checked="1"'); } ?> /></div></td>
-            <td width="150">Override sysContact:</td>
-            <td><input name="sysContact" size="32"<?php if (!$override_sysContact_bool) { echo(' disabled="1"'); } ?> value="<?php echo($override_sysContact_string); ?>" /></td>
-          </tr>
-          <tr>
-            <td width="50"><div style="padding-right: 5px; text-align: right"><input type="checkbox" name="disable_notify"<?php if ($disable_notify) { echo(' checked="1"'); } ?> /></div></td>
-            <td colspan="2">Disable all alerting for this host</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>
-              <br />
-              <input type="submit" name="Submit" value="Save" />
-            </td>
-          </tr>
-        </table>
-        <br />
-      </form>
-    </td>
-    <td width="50"></td>
-    <td></td>
-  </tr>
-</table>
+<form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
+  <input type="hidden" name="editing" value="yes">
+  <div class="form-group">
+    <label for="override_sysContact" class="col-sm-3 control-label">Override sysContact:</label>
+    <div class="col-sm-6">
+      <input onclick="edit.sysContact.disabled=!edit.override_sysContact.checked" type="checkbox" id="override_sysContact" name="override_sysContact"<?php if ($override_sysContact_bool) { echo(' checked="1"'); } ?> />
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-3">
+    </div>
+    <div class="col-sm-6">
+      <input id="sysContact" class="form-control" name="sysContact" size="32"<?php if (!$override_sysContact_bool) { echo(' disabled="1"'); } ?> value="<?php echo($override_sysContact_string); ?>" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="disable_notify" class="col-sm-3 control-label">Disable all alerting for this host: </label>
+    <div class="col-sm-6">
+      <input id="disable_notify" type="checkbox" name="disable_notify"<?php if ($disable_notify) { echo(' checked="1"'); } ?> />
+    </div>
+  </div>
+  <button class="btn btn-default btn-sm" type="submit" name="Submit">Save</button>
+</form>
