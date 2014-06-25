@@ -30,13 +30,14 @@ $ports_disabled = 0; $ports_down = 0; $ports_up = 0; $ports_total = 0;
 foreach ($ports as $port)
 {
 
-  if ($port['ifAdminStatus'] == "down") { $ports_disabled++;
-  } elseif ($port['ifAdminStatus'] == "up" && $port['ifOperStatus']== "down") { $ports_down++;
-  } elseif ($port['ifAdminStatus'] == "up" && $port['ifOperStatus']== "up") { $ports_up++; }
-  $ports_total++;
-
   if (port_permitted($port['port_id'], $port['device_id']))
   {
+
+    if ($port['ifAdminStatus'] == "down") { $ports_disabled++;
+    } elseif ($port['ifAdminStatus'] == "up" && $port['ifOperStatus']== "down") { $ports_down++;
+    } elseif ($port['ifAdminStatus'] == "up" && $port['ifOperStatus']== "up") { $ports_up++; }
+    $ports_total++;
+
     $speed = humanspeed($port['ifSpeed']);
     $type = humanmedia($port['ifType']);
     $ifclass = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
