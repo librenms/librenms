@@ -115,7 +115,7 @@ if($_SESSION['userlevel'] < 5)
 }
 else
 {
-  $results = '';
+  $results = array();
 }
 foreach ($results as $data)
 {
@@ -255,6 +255,8 @@ $param = array();
 if(!isset($vars['ignore']))   { $vars['ignore'] = "0"; }
 if(!isset($vars['disabled'])) { $vars['disabled'] = "0"; }
 if(!isset($vars['deleted']))  { $vars['deleted'] = "0"; }
+
+$where = '';
 
 foreach ($vars as $var => $value)
 {
