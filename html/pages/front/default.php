@@ -77,6 +77,7 @@ if ($config['warn']['ifdown'])
 if ($_SESSION['userlevel'] == '10')
 {
   $sql = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'";
+  $param[] = '';
 }
 else
 {
