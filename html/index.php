@@ -163,19 +163,24 @@ if (!$vars['bare'] == "yes") {
   if ($_SESSION['authenticated'])
   {
     include("includes/print-menubar.php");
-  } else {
-    echo('<hr color="#444444" />');
   }
 }
 
 ?>
 <br />
 <div class="container-fluid">
+<?php
+if ($_SESSION['authenticated'])
+{
+?>
   <div class="row">
     <div class="col-md-12">
       &nbsp;<br /><br />
     </div>
   </div>
+<?php
+}
+?>
   <div class="row">
     <div class="col-md-12">
 <?php
@@ -205,10 +210,26 @@ if ($_SESSION['authenticated'])
   }
 
 } else {
-  // Not Authenticated. Print login.
-  include("pages/logon.inc.php");
-
-  exit;
+  // Not Authenticated. Show status page if enabled
+  if ( $config['public_status'] === true )
+  {
+    if (isset($vars['page']) && strstr("login", $vars['page']))
+    {
+      include("pages/logon.inc.php");
+    } else {
+      echo '<div id="public-status">';
+      include("pages/public.inc.php");
+      echo '</div>';
+      echo '<div id="public-logon" style="display:none;">';
+      echo '<div class="well"><h3>Logon<button class="btn btn-default" type="submit" style="float:right;" id="ToggleStatus">Status</button></h3></div>';
+      include ("pages/logon.inc.php");
+      echo '</div>';
+    }
+  }
+  else
+  {
+    include("pages/logon.inc.php");
+  }
 }
 ?>
     </div>
