@@ -916,4 +916,26 @@ function scan_new_plugins()
 
 }
 
+function validate_device_id($id)
+{
+
+  global $config;
+  if(empty($id) || !is_numeric($id))
+  {
+    $return = false;
+  }
+  else
+  {
+    $device_id = dbFetchCell("SELECT `device_id` FROM `devices` WHERE `device_id` = ?", array($id));
+    if($device_id == $id)
+    {
+      $return = true;
+    }
+    else
+    {
+      $return = false;
+    }
+  }
+  return($return);
+}
 ?>
