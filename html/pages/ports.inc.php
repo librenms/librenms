@@ -94,12 +94,36 @@ if($vars['searchbar'] != "hide")
         <option value=''>All Devices</option>
 <?php
 
-foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`") as $data)
+if($_SESSION['userlevel'] >= 5)
+{
+  $results = dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
+}
+else
+{
+  $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hostname` ORDER BY `hostname`", array($_SESSION['user_id']));
+}
+foreach ($results as $data)
 {
   echo('        <option value="'.$data['device_id'].'"');
   if ($data['device_id'] == $vars['device_id']) { echo("selected"); }
   echo(">".$data['hostname']."</option>");
 }
+
+if($_SESSION['userlevel'] < 5)
+{
+  $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` GROUP BY `hostname` ORDER BY `hostname`", array($_SESSION['user_id']));
+}
+else
+{
+  $results = array();
+}
+foreach ($results as $data)
+{
+  echo('        <option value="'.$data['device_id'].'"');
+  if ($data['device_id'] == $vars['device_id']) { echo("selected"); }
+  echo(">".$data['hostname']."</option>");
+}
+
 ?>
       </select>
       <input type="hostname" name="hostname" id="hostname" title="Hostname" class="form-control input-sm" <?php if (strlen($vars['hostname'])) {echo('value="'.$vars['hostname'].'"');} ?> placeholder="Hostname" />
@@ -232,6 +256,8 @@ if(!isset($vars['ignore']))   { $vars['ignore'] = "0"; }
 if(!isset($vars['disabled'])) { $vars['disabled'] = "0"; }
 if(!isset($vars['deleted']))  { $vars['deleted'] = "0"; }
 
+$where = '';
+
 foreach ($vars as $var => $value)
 {
   if ($value != "")
@@ -239,10 +265,17 @@ foreach ($vars as $var => $value)
     switch ($var)
     {
       case 'hostname':
-      case 'location':
-        $where .= " AND D.$var LIKE ?";
+        $where .= " AND D.hostname LIKE ?";
         $param[] = "%".$value."%";
+        break;
+      case 'location':
+        $where .= " AND D.location LIKE ?";
+        $param[] = "%".$value."%";
+        break;
       case 'device_id':
+        $where .= " AND D.device_id = ?";
+        $param[] = $value;
+        break;
       case 'deleted':
       case 'ignore':
         if ($value == 1)
