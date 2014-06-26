@@ -2907,10 +2907,12 @@
 
         if (tag.styleSheet) {
             tag.styleSheet.cssText = css;
-        } else {
+        }
+        else{
             tag.appendChild(document.createTextNode(css));
         }
 
+        this.remove_style_tags();
         this.$style_tags = this.$style_tags.add(tag);
 
         return this;
