@@ -74,8 +74,17 @@ if ($config['warn']['ifdown'])
 
 /* FIXME service permissions? seem nonexisting now.. */
 // Service down boxes
-$sql = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'";
-foreach (dbFetchRows($sql) as $service)
+if ($_SESSION['userlevel'] == '10')
+{
+  $sql = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'";
+  $param[] = '';
+}
+else
+{
+  $sql = "SELECT * FROM services AS S, devices AS D, devices_perms AS P WHERE P.`user_id` = ? AND P.`device_id` = D.`device_id` AND S.`device_id` = D.`device_id` AND S.`service_ignore` = '0' AND S.`service_disabled` = '0' AND S.`service_status` = '0'";
+  $param[] = $_SESSION['user_id'];
+}
+foreach (dbFetchRows($sql,$param) as $service)
 {
   generate_front_box("service-down", generate_device_link($service, shorthost($service['hostname']))."<br />
     <span class=service-down>Service Down</span>
