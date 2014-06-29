@@ -73,10 +73,10 @@ if ($_SESSION['userlevel'] == '5')  { echo("<strong class='green'>Global Viewing
 if ($_SESSION['userlevel'] == '1')
 {
 
-  foreach (dbFetchRows("SELECT * FROM `devices_perms` AS P, `devices` AS D WHERE `user_id` = ? AND P.device_id = D.device_id", array($user_id)) as $perm)
+  foreach (dbFetchRows("SELECT * FROM `devices_perms` AS P, `devices` AS D WHERE `user_id` = ? AND P.device_id = D.device_id", array($_SESSION['user_id'])) as $perm)
   {
    #FIXME generatedevicelink?
-    echo("<a href='device/device" . $perm['device_id'] . "'>" . $perm['hostname'] . "</a><br />");
+    echo("<a href='device/device=" . $perm['device_id'] . "'>" . $perm['hostname'] . "</a><br />");
     $dev_access = 1;
   }
 
