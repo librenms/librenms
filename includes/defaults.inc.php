@@ -529,6 +529,7 @@ $config['poller_modules']['netscaler-vsvr']               = 1;
 $config['poller_modules']['aruba-controller']             = 1;
 $config['poller_modules']['entity-physical']              = 1;
 $config['poller_modules']['applications']                 = 1;
+$config['poller_modules']['cisco-asa-firewall']           = 1;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.

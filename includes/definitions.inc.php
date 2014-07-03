@@ -1079,6 +1079,10 @@ $config['graph_types']['device']['netscaler_tcp_pkts']['section'] = 'load balanc
 $config['graph_types']['device']['netscaler_tcp_pkts']['order'] = '0';
 $config['graph_types']['device']['netscaler_tcp_pkts']['descr'] = 'TCP Packets';
 
+$config['graph_types']['device']['asa_conns']['section'] = 'firewall';
+$config['graph_types']['device']['asa_conns']['order'] = '0';
+$config['graph_types']['device']['asa_conns']['descr'] = 'Current connections';
+
 $config['graph_descr']['device_smokeping_in_all'] = "This is an aggregate graph of the incoming smokeping tests to this host. The line corresponds to the average RTT. The shaded area around each line denotes the standard deviation.";
 $config['graph_descr']['device_processor']        = "This is an aggregate graph of all processors in the system.";
 
