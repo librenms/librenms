@@ -13,6 +13,10 @@ $pagetitle[] = "Delete device";
 
 if (is_numeric($_REQUEST['id']))
 {
+  echo('
+  <div class="row">
+    <div class="col-sm-offset-2 col-sm-7">
+');
   if ($_REQUEST['confirm'])
   {
     print_message(delete_device(mres($_REQUEST['id'])));
@@ -35,6 +39,10 @@ if (is_numeric($_REQUEST['id']))
 </form>
 <?php
   }
+  echo('
+    </div>
+  </div>
+');
 }
 else
 {
