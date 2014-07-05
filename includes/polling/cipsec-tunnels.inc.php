@@ -96,6 +96,6 @@ foreach ($ipsec_array as $index => $tunnel)
 
 }
 
-unset($oids, $data, $data_array, $oid, $tunnel);
+unset($rrd_file,$rrd_create,$rrdupdate,$oids, $data, $data_array, $oid, $tunnel);
 
 ?>
