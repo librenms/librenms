@@ -520,7 +520,8 @@ if ($_SESSION['userlevel'] >= '10')
       }
       echo('
            <li><a href="edituser/"><img src="images/16/user_edit.png" border="0" align="absmiddle" /> Edit User</a></li>
-           <li><a href="authlog/"><img src="images/16/lock.png" border="0" align="absmiddle" /> Authlog</a></li>');
+           <li><a href="authlog/"><img src="images/16/lock.png" border="0" align="absmiddle" /> Authlog</a></li>
+           <li><a href="api-access/"><img src="images/16/script.png" /> API Settings</a></li>');
     } ?>
 <?php
 if ($_SESSION['authenticated'])
