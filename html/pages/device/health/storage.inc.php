@@ -25,7 +25,7 @@ foreach (dbFetchRows("SELECT * FROM `storage` WHERE device_id = ? ORDER BY stora
   $total = formatStorage($total);
   $free = formatStorage($free);
 
-  $fs_url   = "device/device=".$device['device_id']."/tab=health/metric=storage/";
+  $fs_url   = "graphs/id=".$drive['drive_id']."/type=storage_usage/";
 
   $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr'];
   $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=".$config['time']['month']."&amp;to=".$config['time']['now']."&amp;width=400&amp;height=125\'>";
@@ -33,14 +33,14 @@ foreach (dbFetchRows("SELECT * FROM `storage` WHERE device_id = ? ORDER BY stora
 
   $background = get_percentage_colours($percent);
 
-  echo("<tr bgcolor='$row_colour'><th><a href='$fs_url' $fs_popup>" . $drive['storage_descr'] . "</a></td><td>
+  echo("<tr bgcolor='$row_colour'><td><a href='$fs_url' $fs_popup>" . $drive['storage_descr'] . "</a></td><td>
           <a href='$fs_url' $fs_popup>".print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $background['left'], $perc . "%", "ffffff", $background['right'])."</a>
           </td><td>" . $free . "</td><td></td></tr>");
 
   $graph_array['id'] = $drive['storage_id'];
   $graph_array['type'] = $graph_type;
 
-  echo("<tr bgcolor='$row_colour'><td colspan=6>");
+  echo("<tr bgcolor='$row_colour'><td colspan=4>");
 
   include("includes/print-graphrow.inc.php");
 
