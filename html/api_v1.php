@@ -32,19 +32,19 @@ $app->group('/api', function() use ($app) {
     $app->group('/get', function() use ($app) {
       $app->group('/graph', function() use ($app) {
         $app->group('/port', function() use ($app) {
-          $app->get('/id/:id(/:type)(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_by_id');//api.php/get/graph/port/id/$port_id/$key
-          $app->get('/device/:id/:port(/:type)(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_by_port');//api.php/get/graph/port/device/$device_id/$ifName/$key
-          $app->get('/hostname/:hostname/:port(/:type)(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_by_port_hostname');//api.php/get/graph/port/device/$hostname/$ifName/$key
+          $app->get('/id/:id(/:type)(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_by_id');//api/v1/get/graph/port/id/$port_id/$key
+          $app->get('/device/:id/:port(/:type)(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_by_port');//api/v1/get/graph/port/device/$device_id/$ifName/$key
+          $app->get('/hostname/:hostname/:port(/:type)(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_by_port_hostname');//api/v1/get/graph/port/device/$hostname/$ifName/$key
         });
         $app->group('/general', function() use ($app) {
-          $app->get('/device/:id/:type(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_generic_by_deviceid');//api.php/get/graph/general/device/$device_id/$graph_type/$key
-          $app->get('/hostname/:hostname/:type(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_generic_by_hostname');//api.php/get/graph/general/hostname/$hostname/$graph_type/$key
+          $app->get('/device/:id/:type(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_generic_by_deviceid');//api/v1/get/graph/general/device/$device_id/$graph_type/$key
+          $app->get('/hostname/:hostname/:type(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_generic_by_hostname');//api/v1/get/graph/general/hostname/$hostname/$graph_type/$key
         });
       });
       $app->group('/stats', function() use ($app) {
         $app->group('/port', function() use ($app) {
-          $app->get('/id/:id(/)', 'authToken', 'get_port_stats_by_id');//api.php/get/stats/port/id/$port_id/$key
-          $app->get('/device/:id/:port(/)', 'authToken', 'get_port_stats_by_port');//api.php/get/stats/port/device/$device_id/$ifName/$key
+          $app->get('/id/:id(/)', 'authToken', 'get_port_stats_by_id');//api/v1/get/stats/port/id/$port_id/$key
+          $app->get('/device/:id/:port(/)', 'authToken', 'get_port_stats_by_port');//api/v1/get/stats/port/device/$device_id/$ifName/$key
         });
       });
     });
