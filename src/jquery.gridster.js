@@ -126,7 +126,7 @@
     *        `[min_cols_occupied, min_rows_occupied]`
     *       @param {Function} [options.resize.start] Function executed
     *        when resizing starts.
-    *       @param {Function} [otions.resize.resize] Function executed
+    *       @param {Function} [options.resize.resize] Function executed
     *        during the resizing.
     *       @param {Function} [options.resize.stop] Function executed
     *        when resizing stops.
