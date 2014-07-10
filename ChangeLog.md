@@ -1,5 +1,9 @@
 # Mouse Wheel ChangeLog
 
+## 3.1.12
+
+* Fix possible 0 value for line height when in delta mode 1
+
 ## 3.1.11
 
 * Fix version number for package managers...

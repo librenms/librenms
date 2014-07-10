@@ -61,11 +61,12 @@
         },
 
         getLineHeight: function(elem) {
-            var $parent = $(elem)['offsetParent' in $.fn ? 'offsetParent' : 'parent']();
+            var $elem = $(elem),
+                $parent = $elem['offsetParent' in $.fn ? 'offsetParent' : 'parent']();
             if (!$parent.length) {
                 $parent = $('body');
             }
-            return parseInt($parent.css('fontSize'), 10);
+            return parseInt($parent.css('fontSize'), 10) || parseInt($elem.css('fontSize'), 10) || 16;
         },
 
         getPageHeight: function(elem) {
