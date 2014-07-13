@@ -188,3 +188,48 @@ function get_graph_generic_by_hostname()
   $app->response->headers->set('Content-Type', 'image/png');
   require("includes/graphs/graph.inc.php");
 }
+
+function list_devices()
+{
+  // This will return a list of devices
+  global $config;
+  $app = \Slim\Slim::getInstance();
+  $router = $app->router()->getCurrentRoute()->getParams();
+  $order = $router['order'];
+  $type = $router['type'];
+  if(empty($order))
+  {
+    $order = "hostname";
+  }
+  if(stristr($order,' desc') === FALSE && stristr($order, ' asc') === FALSE)
+  {
+    $order .= ' ASC';
+  }
+  if($type == 'all' || empty($type))
+  {
+    $sql = "1";
+  }
+  elseif($type == 'ignored')
+  {
+    $sql = "ignore='1' AND disabled='0'";
+  }
+  elseif($type == 'up')
+  {
+    $sql = "status='1' AND ignore='0' AND disabled='0'";
+  }
+  elseif($type == 'down')
+  {
+    $sql = "status='0' AND ignore='0' AND disabled='0'";
+  }
+  elseif($type == 'disabled')
+  {
+    $sql = "disabled='1'";
+  }
+  foreach (dbFetchRows("SELECT * FROM `devices` WHERE $sql ORDER by $order") as $device)
+  {
+    $devices[] = $device;
+  }
+  $output = array("status" => "ok", "devices" => $devices);
+  $app->response->headers->set('Content-Type', 'application/json');
+  echo json_encode($output);
+}
