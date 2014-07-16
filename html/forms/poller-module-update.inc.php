@@ -5,7 +5,7 @@
 $device['device_id'] = $_POST['device_id'];
 $module = 'poll_'.$_POST['poller_module'];
 
-if(!isset($module) && !isset($device_id) && !is_numeric($device_id))
+if(!isset($module) && validate_device_id($device['device_id']) === false)
 {
   echo('error with data');
   exit;
