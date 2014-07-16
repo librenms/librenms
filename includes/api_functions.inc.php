@@ -12,6 +12,147 @@
  * the source code distribution for details.
  */
 
+if (!defined('JSON_UNESCAPED_SLASHES'))
+    define('JSON_UNESCAPED_SLASHES', 64);
+if (!defined('JSON_PRETTY_PRINT'))
+    define('JSON_PRETTY_PRINT', 128);
+if (!defined('JSON_UNESCAPED_UNICODE'))
+    define('JSON_UNESCAPED_UNICODE', 256);
+
+function _json_encode($data, $options = 448)
+{
+    if (version_compare(PHP_VERSION, '5.4', '>='))
+    {
+        return json_encode($data, $options);
+    }
+
+    return _json_format(json_encode($data), $options);
+}
+
+function _pretty_print_json($json)
+{
+    return _json_format($json, JSON_PRETTY_PRINT);
+}
+
+function _json_format($json, $options = 448)
+{
+    $prettyPrint = (bool) ($options & JSON_PRETTY_PRINT);
+    $unescapeUnicode = (bool) ($options & JSON_UNESCAPED_UNICODE);
+    $unescapeSlashes = (bool) ($options & JSON_UNESCAPED_SLASHES);
+
+    if (!$prettyPrint && !$unescapeUnicode && !$unescapeSlashes)
+    {
+        return $json;
+    }
+
+    $result = '';
+    $pos = 0;
+    $strLen = strlen($json);
+    $indentStr = ' ';
+    $newLine = "\n";
+    $outOfQuotes = true;
+    $buffer = '';
+    $noescape = true;
+
+    for ($i = 0; $i < $strLen; $i++)
+    {
+        // Grab the next character in the string
+        $char = substr($json, $i, 1);
+
+        // Are we inside a quoted string?
+        if ('"' === $char && $noescape)
+        {
+            $outOfQuotes = !$outOfQuotes;
+        }
+
+        if (!$outOfQuotes)
+        {
+            $buffer .= $char;
+            $noescape = '\\' === $char ? !$noescape : true;
+            continue;
+        }
+        elseif ('' !== $buffer)
+        {
+            if ($unescapeSlashes)
+            {
+                $buffer = str_replace('\\/', '/', $buffer);
+            }
+
+            if ($unescapeUnicode && function_exists('mb_convert_encoding'))
+            {
+                // http://stackoverflow.com/questions/2934563/how-to-decode-unicode-escape-sequences-like-u00ed-to-proper-utf-8-encoded-cha
+                $buffer = preg_replace_callback('/\\\\u([0-9a-f]{4})/i',
+                    function ($match)
+                    {
+                        return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
+                    }, $buffer);
+            } 
+
+            $result .= $buffer . $char;
+            $buffer = '';
+            continue;
+        }
+        elseif(false !== strpos(" \t\r\n", $char))
+        {
+            continue;
+        }
+
+        if (':' === $char)
+        {
+            // Add a space after the : character
+            $char .= ' ';
+        }
+        elseif (('}' === $char || ']' === $char))
+        {
+            $pos--;
+            $prevChar = substr($json, $i - 1, 1);
+
+            if ('{' !== $prevChar && '[' !== $prevChar)
+            {
+                // If this character is the end of an element,
+                // output a new line and indent the next line
+                $result .= $newLine;
+                for ($j = 0; $j < $pos; $j++)
+                {
+                    $result .= $indentStr;
+                }
+            }
+            else
+            {
+                // Collapse empty {} and []
+                $result = rtrim($result) . "\n\n" . $indentStr;
+            }
+        }
+
+        $result .= $char;
+
+        // If the last character was the beginning of an element,
+        // output a new line and indent the next line
+        if (',' === $char || '{' === $char || '[' === $char)
+        {
+            $result .= $newLine;
+
+            if ('{' === $char || '[' === $char)
+            {
+                $pos++;
+            }
+
+            for ($j = 0; $j < $pos; $j++)
+            {
+                $result .= $indentStr;
+            }
+        }
+    }
+    // If buffer not empty after formating we have an unclosed quote
+    if (strlen($buffer) > 0)
+    {
+        //json is incorrectly formatted
+        $result = false;
+    }
+
+    return $result;
+}
+
 function authToken(\Slim\Route $route)
 {
   $app = \Slim\Slim::getInstance();
@@ -37,7 +178,7 @@ function authToken(\Slim\Route $route)
   {
     $app->response->setStatus(400);
     $output = array("status" => "error", "message" => "API Token is invalid");
-    echo json_encode($output);
+    echo _json_encode($output);
     $app->stop();
   }
 }
@@ -125,7 +266,7 @@ function get_port_stats_by_id()
   $stats = dbFetchRow("SELECT * FROM `ports` WHERE `port_id`=?", array($port_id));
   $output = array("status" => "ok", "port" => $stats); 
   $app->response->headers->set('Content-Type', 'application/json');
-  echo json_encode($output);  
+  echo _json_encode($output);  
 }
 
 function get_port_stats_by_port()
@@ -139,7 +280,7 @@ function get_port_stats_by_port()
   $stats = dbFetchRow("SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=?", array($device_id,$if_name));
   $output = array("status" => "ok", "port" => $stats);
   $app->response->headers->set('Content-Type', 'application/json');
-  echo json_encode($output);
+  echo _json_encode($output);
 }
 
 function get_graph_generic_by_deviceid()
@@ -231,7 +372,7 @@ function list_devices()
   }
   $output = array("status" => "ok", "devices" => $devices);
   $app->response->headers->set('Content-Type', 'application/json');
-  echo json_encode($output);
+  echo _json_encode($output);
 }
 
 function add_device()
@@ -296,5 +437,5 @@ function add_device()
 
   $output = array("status" => $status, "message" => $message);
   $app->response->headers->set('Content-Type', 'application/json');
-  echo json_encode($output);
+  echo _json_encode($output);
 }
