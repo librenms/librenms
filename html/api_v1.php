@@ -51,6 +51,9 @@ $app->group('/api', function() use ($app) {
     $app->group('/list', function() use ($app) {
       $app->get('/devices(/:order)(/:type)(/)', 'authToken', 'list_devices');//api/v1/list/devices (order can be any device column) (types = all, ignored, up, down, disabled)
     });
+    $app->group('/add', function() use ($app) {
+      $app->post('/device(/)', 'authToken', 'add_device');//api/v1/add/device (json data needs to be passed)
+    });
   });
 });
 

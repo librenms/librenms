@@ -233,3 +233,68 @@ function list_devices()
   $app->response->headers->set('Content-Type', 'application/json');
   echo json_encode($output);
 }
+
+function add_device()
+{
+  // This will add a device using the data passed encoded with json
+  global $config;
+  $app = \Slim\Slim::getInstance();
+  $data = json_decode(file_get_contents('php://input'), true);
+  // Default status to error and change it if we need to.
+  $status = "error";
+  if(empty($data))
+  {
+    $message = "No information has been provided to add this new device";
+  }
+  elseif(empty($data["hostname"]))
+  {
+    $message = "Missing the device hostname";
+  }
+  $hostname = $data['hostname'];
+  if ($data['port']) { $port = mres($data['port']); } else { $port = $config['snmp']['port']; }
+  if ($data['transport']) { $transport = mres($data['transport']); } else { $transport = "udp"; }
+  if($data['version'] == "v1" || $data['version'] == "v2c")
+  {
+    if ($data['community'])
+    {
+      $config['snmp']['community'] = array($data['community']);
+    }
+    $snmpver = mres($data['version']);
+  }
+  elseif($data['version'] == 'v3')
+  {
+    $v3 = array (
+      'authlevel' => mres($data['authlevel']),
+      'authname' => mres($data['authname']),
+      'authpass' => mres($data['authpass']),
+      'authalgo' => mres($data['authalgo']),
+      'cryptopass' => mres($data['cryptopass']),
+      'cryptoalgo' => mres($data['cryptoalgo']),
+    );
+
+    array_push($config['snmp']['v3'], $v3);
+    $snmpver = "v3";
+  }
+  else
+  {
+    $message = "You haven't specified an SNMP version to use";
+  }
+  if(empty($message))
+  {
+    require_once("functions.php");
+    $result = addHost($hostname, $snmpver, $port, $transport, 1);
+    if($result)
+    {
+      $status = 'ok';
+      $message = 'Device has been added successfully';
+    }
+    else
+    {
+      $messge = "Failed adding $hostname";
+    }
+  }
+
+  $output = array("status" => $status, "message" => $message);
+  $app->response->headers->set('Content-Type', 'application/json');
+  echo json_encode($output);
+}
