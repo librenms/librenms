@@ -89,12 +89,16 @@ If you have Apache 2.3 or newer then please add the following line before `Allow
 
     Require all granted
 
+On at least Ubuntu 14.04 (and possibly other distributions and versions as well), mcrypt is not enabled on install.  Run the following to enable it:
+
+    php5enmod mcrypt
+
 Change `librenms.example.com` to the appropriate hostname for your domain, then enable the vhost and restart Apache:
 
     a2ensite librenms.conf
     a2enmod rewrite
     service apache2 restart
-
+    
 (To get to your LibreNMS install externally, you'll also need add it to your DNS or hosts file.)
 
 ### Manual vs. web installer ###
