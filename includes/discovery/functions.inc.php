@@ -13,7 +13,7 @@
 
 function discover_new_device($hostname)
 {
-  global $config;
+  global $config, $debug;
 
   if ($config['autodiscovery']['xdp']) {
     if ( isDomainResolves($hostname . "." . $config['mydomain']) ) {
@@ -21,11 +21,19 @@ function discover_new_device($hostname)
     } else {
       $dst_host = $hostname;
     }
+    if ($debug) { echo("discovering $dst_host\n"); }
     $ip = gethostbyname($dst_host);
+    if ($ip == $dst_host) {
+      if ($debug) { echo("name lookup of $dst_host failed\n"); }
+      return FALSE;
+    } else {
+      if ($debug) { echo("ip lookup result: $ip\n"); }
+    }
 
     $dst_host = rtrim($dst_host, '.');	// remove trailing dot
 
     if ( match_network($config['autodiscovery']['nets-exclude'], $ip)) {
+      if ($debug) { echo("$ip in an excluded network - skipping\n"); }
       return FALSE;
     }
 
@@ -39,8 +47,11 @@ function discover_new_device($hostname)
         $remote_device = device_by_id_cache($remote_device_id, 1);
         return $remote_device_id;
       }
+    } else {
+      if ($debug) { echo("$ip not in a matched network - skipping\n"); }
     }
   } else {
+    if ($debug) { echo("autodiscovery disabled - skipping\n"); }
     return FALSE;
   }
 }
