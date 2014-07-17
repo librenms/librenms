@@ -83,6 +83,9 @@
 
   $poll_device['sysLocation'] = str_replace("\"","", $poll_device['sysLocation']);
 
+  // Remove leading & trailing backslashes added by VyOS/Vyatta/EdgeOS
+  $poll_device['sysLocation'] = trim($poll_device['sysLocation'], "\\");
+
   // Rewrite sysLocation if there is a mapping array (database too?)
   if (!empty($poll_device['sysLocation']) && is_array($config['location_map']))
   {
@@ -90,6 +93,9 @@
   }
 
   $poll_device['sysContact']  = str_replace("\"","", $poll_device['sysContact']);
+
+  // Remove leading & trailing backslashes added by VyOS/Vyatta/EdgeOS
+  $poll_device['sysContact'] = trim($poll_device['sysContact'], "\\");
 
   if ($poll_device['sysLocation'] == "not set")
   {
