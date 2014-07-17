@@ -44,27 +44,8 @@ You can clone the repository via HTTPS or SSH.  In either case, you need to ensu
     cd /opt
     git clone https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
-
-At this stage you can either launch the web installer by going to http://IP/install.php, follow the onscreen instructions then skip to the 'Web Interface' section further down. Alternatively if you want to continue the setup manually then just keep following these instructions.
-
-    cp config.php.default config.php
-    vim config.php
     
 > NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
-
-Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
-
-Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
-
-Initiate the follow database with the following command:
-
-    php build-base.php
-
-Create the admin user - priv should be 10
-
-    php adduser.php <name> <pass> 10
-
-Substitute your desired username and password--and leave the angled brackets off.
 
 ### Web Interface ###
 
@@ -73,7 +54,7 @@ To prepare the web interface (and adding devices shortly), you'll need to create
 First, create and chown the `rrd` directory and create the `logs` directory
 
     mkdir rrd logs
-    chown www-data:www-data rrd/
+    chown www-data:www-data logs/ rrd/
 
 > NOTE: If you're not running Ubuntu, you may need to change the owner to whomever the webserver runs as.
 
@@ -92,25 +73,38 @@ If you have Apache older than 2.3 then please use:
       </Directory>
     </VirtualHost>
 
-If you have Apache 2.3 or newer then please use:
+If you have Apache 2.3 or newer then please add this line before "AllowOverride all":
 
-    <VirtualHost *:80>
-      DocumentRoot /opt/librenms/html/
-      ServerName  librenms.example.com
-      CustomLog /opt/librenms/logs/access_log combined
-      ErrorLog /opt/librenms/logs/error_log
-      <Directory "/opt/librenms/html/">
-        Require all granted
-        AllowOverride All
-        Options FollowSymLinks MultiViews
-      </Directory>
-   </VirtualHost>
+    Require all granted
 
-Don't forget to change 'example.com' to your domain, then enable the vhost and restart Apache:
+Change 'librenms.example.com' to the appropriate hostname for your domain, then enable the vhost and restart Apache:
 
     a2ensite librenms.conf
     a2enmod rewrite
     service apache2 restart
+
+(To get to your LibreNMS install externally, you'll also need add it to your DNS or hosts file.)
+
+### Manual vs. web installer ###
+
+At this stage you can either launch the web installer by going to http://IP/install.php, follow the onscreen instructions then skip to the 'Web Interface' section further down. Alternatively if you want to continue the setup manually then just keep following these instructions.
+
+    cp config.php.default config.php
+    vim config.php
+    
+Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
+
+Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
+
+Initiate the follow database with the following command:
+
+    php build-base.php
+
+Create the admin user - priv should be 10
+
+    php adduser.php <name> <pass> 10
+
+Substitute your desired username and password--and leave the angled brackets off.
 
 ### Add localhost ###
 
