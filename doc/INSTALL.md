@@ -61,6 +61,13 @@ You can clone the repository via HTTPS or SSH.  In either case, you need to ensu
     
 The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
 
+Sometimes the initial clone can take quite a while (nearly 3 minutes on a 10 Mbps fibre connection in Australia is a recent example).  If it's a big problem to you, you can save about 50% of the bandwidth by not pulling down the full git history.  This comes with some limitations (namely that you can't use it as the basis for further git repos), but if you're not planning to develop for LibreNMS it's an acceptable option.  To perform the initial clone without full history, run the following instead:
+
+    cd /opt
+    git clone --depth 1 https://github.com/librenms/librenms.git librenms
+    cd /opt/librenms
+
+
 ### Web Interface ###
 
 To prepare the web interface (and adding devices shortly), you'll need to create and chown a directory as well as create an Apache vhost.
