@@ -189,6 +189,7 @@ function get_graph_by_id()
   global $config;
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
+  $vars = array();
   $vars['id'] = $router['id'];
   $vars['type'] = $router['type'] ?: 'port_bits';
   if(!empty($router['from']))
@@ -213,6 +214,7 @@ function get_graph_by_port()
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
   $device_id = $router['id'];
+  $vars = array();
   $vars['port'] = $router['port'];
   $vars['type'] = $router['type'] ?: 'port_bits';
   if(!empty($router['from']))
@@ -238,6 +240,7 @@ function get_graph_by_port_hostname()
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
   $hostname = $router['hostname'];
+  $vars = array();
   $vars['port'] = $router['port'];
   $vars['type'] = $router['type'] ?: 'port_bits';
   if(!empty($router['from']))
@@ -289,6 +292,7 @@ function get_graph_generic_by_deviceid()
   global $config;
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
+  $vars = array();
   $vars['device'] = $router['id'];
     $vars['type'] = $router['type'] ?: 'port_bits';
   if(!empty($router['from']))
@@ -313,7 +317,8 @@ function get_graph_generic_by_hostname()
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
   $hostname = $router['hostname'];
-    $vars['type'] = $router['type'] ?: 'port_bits';
+  $vars = array();
+  $vars['type'] = $router['type'] ?: 'port_bits';
   if(!empty($router['from']))
   {
     $vars['from'] = $router['from'];
@@ -366,6 +371,11 @@ function list_devices()
   {
     $sql = "disabled='1'";
   }
+  else
+  {
+    $sql = "1";
+  }
+  $devices = array();
   foreach (dbFetchRows("SELECT * FROM `devices` WHERE $sql ORDER by $order") as $device)
   {
     $devices[] = $device;
@@ -431,7 +441,7 @@ function add_device()
     }
     else
     {
-      $messge = "Failed adding $hostname";
+      $message = "Failed adding $hostname";
     }
   }
 
