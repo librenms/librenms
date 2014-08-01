@@ -26,7 +26,7 @@ else
           }
 
           // FIXME: missing email field here on the form
-          if (adduser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], '', $_POST['realname'], $_POST['can_modify_passwd']))
+          if (adduser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], $_POST['new_email'], $_POST['realname'], $_POST['can_modify_passwd']))
           {
             echo("<span class=info>User " . $_POST['username'] . " added!</span>");
           }
@@ -76,8 +76,16 @@ echo("
     </div>
     <div class='col-sm-6'>
     </div>
-  </div>");
-    echo("<div class='form-group'>
+  </div>
+  <div class='form-group'>
+    <label for='new_email' class='col-sm-2 control-label'>Email</label>
+    <div class='col-sm-4'>
+      <input name='new_email' class='form-control input-sm'>
+    </div>
+    <div class='col-sm-6'>
+    </div>
+  </div>
+  <div class='form-group'>
     <label for='new_level' class='col-sm-2 control-label'>Level</label>
     <div class='col-sm-4'>
       <select name='new_level' class='form-control input-sm'>
