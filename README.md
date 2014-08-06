@@ -1,3 +1,83 @@
+Introduction
+------------
+
+LibreNMS is an autodiscovering PHP/MySQL/SNMP based network monitoring
+which includes support for a wide range of network hardware and operating
+systems including Cisco, Linux, FreeBSD, Juniper, Brocade, Foundry, HP and
+many more.
+
+LibreNMS is a community-based fork of the last GPL-licensed version of
+[Observium][9].  LibreNMS intends to be a viable network monitoring project
+and community that:
+- encourages contribution,
+- focuses on the needs of its users, and
+- offers a welcoming, friendly environment for everyone.
+
+If you're visiting because of a mention on the Observium mailing list,
+please read our [welcome to Observium users][12].
+
+The [Debian Social Contract][10] will be the basis of our priority system,
+and mutual respect the basis of our behaviour towards others.  For more
+about the culture we're trying to build, please read the [Freenode
+philosophy][13], including [guidelines for running an IRC channel][6] and
+[being a community catalyst][7].
+
+
+Documentation
+-------------
+
+For now documentation can be found in the [doc directory][5].
+
+
+Installation
+------------
+
+See `doc/INSTALL.md` for details.
+
+
+Developing
+----------
+
+See `doc/DEVEL.md` for details.
+
+
+Contributing
+------------
+
+You can participate in the project by:
+- Joining the [librenms-project][1] mailing list to post questions and
+  suggestions.
+- Cloning the [repo][2] and filing bug reports and pull requests on github.
+  See [CONTRIBUTING][15] for more details.
+- Talking to us on [Twitter][3] or [IRC][4].
+- Improving the [documentation][5].
+
+
+Try It
+------
+
+You can try LibreNMS by downloading a VM image.  Currently, a Debian-based
+image is supplied and has been tested with [VMware Fusion 5][8].
+
+Download the [VMware Fusion 5 image][11] at open it, and log in as `root`
+with the password `root`.  Enter the following commands:
+
+    cd /opt/librenms
+    git pull
+    php discover.php -h all
+    php poller.php -h all
+
+You'll then need to find out the IP of your VM (`ifconfig | grep add`) and
+create a DNS entry for `librenms.example.com` to point to that IP.  You can
+also edit your `/etc/hosts` file with the following line:
+
+    $ip librenms.example.com
+
+where `$ip` is the IP of your VM.  From there, just point your web browser
+to `http://librenms.example.com/` and login with username `librenms` and
+password `librenms`.
+
+
 License
 -------
 
@@ -39,84 +119,6 @@ exception):
   - scripts/*/mysql: GPLv2 only
   - check_mk (scripts/observium_agent*): GPLv2
   - qTip (html/css/jquery.qtip.min.css and html/js/qtip/jquery.qtip.min.js): GPLv2
-
-Introduction
-------------
-
-LibreNMS is an autodiscovering PHP/MySQL/SNMP based network monitoring
-which includes support for a wide range of network hardware and operating
-systems including Cisco, Linux, FreeBSD, Juniper, Brocade, Foundry, HP and
-many more.
-
-LibreNMS is a community-based fork of the last GPL-licensed version of
-[Observium][9].  LibreNMS intends to be a viable network monitoring project
-and community that:
-- encourages contribution,
-- focuses on the needs of its users, and
-- offers a welcoming, friendly environment for everyone.
-
-If you're visiting because of a mention on the Observium mailing list,
-please read our [welcome to Observium users][12].
-
-The [Debian Social Contract][10] will be the basis of our priority system,
-and mutual respect the basis of our behaviour towards others.  For more
-about the culture we're trying to build, please read the [Freenode
-philosophy][13], including [guidelines for running an IRC channel][6] and
-[being a community catalyst][7].
-
-
-Documentation
--------------
-
-For now documentation can be found in the [doc directory][5].
-
-
-Try It
-------
-
-You can try LibreNMS by downloading a VM image.  Currently, a Debian-based
-image is supplied and has been tested with [VMware Fusion 5][8].
-
-Download the [VMware Fusion 5 image][11] at open it, and log in as `root`
-with the password `root`.  Enter the following commands:
-
-    cd /opt/librenms
-    git pull
-    php discover.php -h all
-    php poller.php -h all
-
-You'll then need to find out the IP of your VM (`ifconfig | grep add`) and
-create a DNS entry for `librenms.example.com` to point to that IP.  You can
-also edit your `/etc/hosts` file with the following line:
-
-    $ip librenms.example.com
-
-where `$ip` is the IP of your VM.  From there, just point your web browser
-to `http://librenms.example.com/` and login with username `librenms` and
-password `librenms`.
-
-
-Installation
-------------
-
-See `doc/INSTALL.md` for details.
-
-Developing
-----------
-
-See `doc/DEVEL.md` for details.
-
-
-Contributing
-------------
-
-You can participate in the project by:
-- Joining the [librenms-project][1] mailing list to post questions and
-  suggestions.
-- Cloning the [repo][2] and filing bug reports and pull requests on github.
-  See [CONTRIBUTING][15] for more details.
-- Talking to us on [Twitter][3] or [IRC][4].
-- Improving the [documentation][5].
 
 [1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
 [2]: https://github.com/librenms/librenms "Main LibreNMS GitHub repo"
