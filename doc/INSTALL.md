@@ -1,3 +1,4 @@
+
 > NOTE: These instructions have been tested on a fresh install of Ubuntu 12.04 and 14.04.
 
 > NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
@@ -48,6 +49,9 @@ You need to configure snmpd appropriately if you have not already done so.  An a
     rocommunity public 127.0.0.1
     
 Adding the above line to `/etc/snmp/snmpd.conf` and running `service snmpd restart` will activate this config.
+
+In `/etc/php5/apache2/php.ini` and `/etc/php5/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
+examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
     
 ### Cloning ###
 
