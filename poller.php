@@ -118,7 +118,7 @@ if ($polled_devices)
   dbInsert(array('type' => 'poll', 'doing' => $doing, 'start' => $poller_start, 'duration' => $poller_time, 'devices' => $polled_devices ), 'perf_times');
 }
 
-$string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
+$string = $argv[0] . " $doing " .  date($config['dateformat']['compact']) . " - $polled_devices devices polled in $poller_time secs";
 if ($debug) { echo("$string\n"); }
 
 echo("\n" .
