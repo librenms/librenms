@@ -111,7 +111,7 @@ if ($discovered_devices)
   dbInsert(array('type' => 'discover', 'doing' => $doing, 'start' => $start, 'duration' => $proctime, 'devices' => $discovered_devices), 'perf_times');
 }
 
-$string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $discovered_devices devices discovered in $proctime secs";
+$string = $argv[0] . " $doing " .  date($config['dateformat']['compact']) . " - $discovered_devices devices discovered in $proctime secs";
 if ($debug) echo("$string\n");
 
 if($options['h'] != "new" && $config['version_check']) {
