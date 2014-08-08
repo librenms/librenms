@@ -20,9 +20,10 @@ To agree with these assertions, please submit a github pull request against
 the file doc/AUTHORS.md including your name, email address, and github user
 id in the file (so that it can be matched to your commits), and stating in
 the commit log:
+```
 	I agree to the conditions of the Contributor Agreement
 	contained in doc/CONTRIBUTING.md.
-
+```
 Note that contributors to LibreNMS retain copyright to their own code and
 are not required to sign over their rights to any other party.  You maintain
 all rights to your own code.
@@ -31,7 +32,7 @@ We recommend that if you add a new file containing original code to the code
 base that you include a copyright notice in it as per the Free Software
 Foundation's guidelines.  You might find something like the following header
 appropriate (although this is not legal advice ;-):
-
+```
   <?php
   /*
    * LibreNMS module to frob blurgs from a foo bar
@@ -45,7 +46,7 @@ appropriate (although this is not legal advice ;-):
    * the source code distribution for details.
    */
   ?>
-
+```
 The GPLv3 itself also contains recommendations about applying the GPL to
 your code.  Please see LICENSE.txt at the top of this source code
 distribution for details.
@@ -143,20 +144,22 @@ git push origin master:issue-####
   a few days or weeks.
 - When you are happy with your issue branch's changes and ready to submit
   your patch, update your copy of the master branch to the current revision;
-  this should just result in a fast forward of your copy of master. Do this from your master branch:
+  this should just result in a fast forward of your copy of master:
 ```
+git checkout master
 git pull
 ```
-- Rebase your issue branch from your clone of master.  Fix any conflicts at
-  this stage. Do this from your issue-#### branch:
+- Rebase your issue branch from your clone of master; fix any conflicts at
+  this stage:
 ````
+git checkout issue-####
 git pull
 ````
 - Push your changes to your remote git hub branch so you can submit a pull from your issue-#### branch:
 ````
 git push origin issue-####
 ````
-- Submit a pull request for your patch from your copy of master.
+- Submit a pull request for your patch from your issue-#### branch.
 
 [1]: http://www.gnu.org/licenses/license-list.html
 "Free Software Foundation's license list"
