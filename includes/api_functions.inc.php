@@ -215,7 +215,7 @@ function get_graph_by_port()
   $router = $app->router()->getCurrentRoute()->getParams();
   $device_id = $router['id'];
   $vars = array();
-  $vars['port'] = $router['port'];
+  $vars['port'] = urldecode($router['port']);
   $vars['type'] = $router['type'] ?: 'port_bits';
   if(!empty($router['from']))
   {
