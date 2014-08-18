@@ -22,8 +22,8 @@ echo("<div style='float: left; width: 100%'>
   <input type=hidden name='ignoreport' value='yes'>
   <input type=hidden name=device value='".$device['device_id']."'>");
 
-echo("<table cellpadding=3 cellspacing=0 class='table table-condensed table-responsive'>
-  <tr align=center>
+echo("<table class='table table-condensed table-responsive table-striped'>
+  <tr>
                  <th>Index</th>
                  <th>Name</th>
                  <th>Admin</th>
@@ -32,13 +32,13 @@ echo("<table cellpadding=3 cellspacing=0 class='table table-condensed table-resp
                  <th>Ignore</th>
                  <th>Description</th>
 </tr>
-<tr align=center>
+<tr>
     <td><button type='submit' value='Save' class='btn btn-success btn-sm' title='Save current port disable/ignore settings'/>Save</button><button type='submit' value='Reset' class='btn btn-danger btn-sm' id='form-reset' title='Reset form to previously-saved settings'/>Reset</button></td>
     <td></td>
     <td></td>
     <td><button type='submit' value='Alerted' class='btn btn-default btn-sm' id='alerted-toggle' title='Toggle alerting on all currently-alerted ports'/>Alerted</button><button type='submit' value='Down' class='btn btn-default btn-sm' id='down-select' title='Disable alerting on all currently-down ports'/>Down</button></td>
-    <td><button type='submit' value='Toggle' class='btn btn-default btn-sm' id='disable-toggle' title='Toggle polling for all ports'/>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='disable-select' title='Disable polling on all ports'/>Select</button></td>
-    <td><button type='submit' value='Toggle' class='btn btn-default btn-sm' id='ignore-toggle' title='Toggle alerting for all ports'/>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='ignore-select' title='Disable alerting on all ports'/>Select</button></td>
+    <td><button type='submit' value='Toggle' class='btn btn-default btn-sm' id='disable-toggle' title='Toggle polling for all ports'/>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='disable-select' title='Disable polling on all ports'/>Select All</button></td>
+    <td><button type='submit' value='Toggle' class='btn btn-default btn-sm' id='ignore-toggle' title='Toggle alerting for all ports'/>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='ignore-select' title='Disable alerting on all ports'/>Select All</button></td>
     <td></td>
 </tr>
 ");
@@ -109,10 +109,10 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY `ifIn
 
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-  echo("<tr bgcolor=$row_colour>");
-  echo("<td align=center>". $port['ifIndex']."</td>");
-  echo("<td align=left>".$port['label'] . "</td>");
-  echo("<td align=right>". $port['ifAdminStatus']."</td>");
+  echo("<tr>");
+  echo("<td>". $port['ifIndex']."</td>");
+  echo("<td>".$port['label'] . "</td>");
+  echo("<td>". $port['ifAdminStatus']."</td>");
 
   # Mark interfaces which are OperDown (but not AdminDown) yet not ignored or disabled, or up yet ignored or disabled
   # - as to draw the attention to a possible problem.
@@ -120,18 +120,18 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY `ifIn
   $dowecare  = ($port['ignore'] == 0 && $port['disabled'] == 0) ? $isportbad : !$isportbad;
   $outofsync = $dowecare ? " class='red'" : "";
 
-  echo("<td align=right><span name='operstatus_".$port['port_id']."'".$outofsync.">". $port['ifOperStatus']."</span></td>");
+  echo("<td><span name='operstatus_".$port['port_id']."'".$outofsync.">". $port['ifOperStatus']."</span></td>");
 
-  echo("<td align=center>");
+  echo("<td>");
   echo("<input type=checkbox class='disable-check' name='disabled_".$port['port_id']."'".($port['disabled'] ? 'checked' : '').">");
   echo("<input type=hidden name='olddis_".$port['port_id']."' value=".($port['disabled'] ? 1 : 0).">");
   echo("</td>");
 
-  echo("<td align=center>");
+  echo("<td>");
   echo("<input type=checkbox class='ignore-check' name='ignore_".$port['port_id']."'".($port['ignore'] ? 'checked' : '').">");
   echo("<input type=hidden name='oldign_".$port['port_id']."' value=".($port['ignore'] ? 1 : 0).">");
   echo("</td>");
-  echo("<td align=left>".$port['ifAlias'] . "</td>");
+  echo("<td>".$port['ifAlias'] . "</td>");
 
   echo("</tr>\n");
 
