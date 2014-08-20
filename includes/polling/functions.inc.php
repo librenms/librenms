@@ -196,6 +196,16 @@ function poll_device($device, $options)
 
     $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
 
+    $performance_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/performance-poller.rrd";
+    if (!is_file($performance_rrd))
+    {
+      rrdtool_create ($performance_rrd, "DS:performance:GAUGE:600:0:U ".$config['rrd_rra']);
+    }
+    if(!empty($device_time))
+    {
+      rrdtool_update($performance_rrd, "N:".$device_time);
+    }
+
     $update_array['last_polled'] = array('NOW()');
     $update_array['last_polled_timetaken'] = $device_time;
 
