@@ -71,8 +71,6 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
 {
   if ((authenticate($_SESSION['username'],$_SESSION['password'])) || (reauthenticate($_COOKIE['sess_id'],$_COOKIE['token'])))
   {
-    // Regenerate session id for additional security.
-    session_regenerate_id();
     $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
     $_SESSION['user_id'] = get_userid($_SESSION['username']);
     if (!$_SESSION['authenticated'])
