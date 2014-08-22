@@ -2,17 +2,17 @@ Roadmap
 -------
 
 - Device support:
-    - Ruckus wireless controllers (Paul)
-    - Investigate generic device support based on MIBs.  It should be
-      possible to do basic graphs based just on the MIB.  They would
-      obviously not be as customised as the specifically supported devices
-      but should still be useful to users.
-
+  - Investigate generic device support based on MIBs.  It should be
+    possible to do basic graphs based just on the MIB.  They would
+    obviously not be as customised as the specifically supported devices
+    but should still be useful to users.
+  - Ruckus wireless controllers
+    
 - Functionality/performance improvements:
-  - Investigate solutions for poller performance improvement. (Tyler)
-  - Investigate solutions for multiple communities per device. (tooms)
-  - Eliminate interface churn for transient interfaces (e.g. ppp/tun) on
-    net-snmp.
+  - Eliminate interface churn for transient interfaces (e.g. ppp/tun)
+    on net-snmp.
+  - Investigate solutions for poller performance improvement.
+  - Investigate solutions for multiple communities/ports per device.
 
 - Integrate Nagios-based alerting.  Allow user to choose their preferred
   Nagios distribution/fork.
@@ -23,6 +23,5 @@ Roadmap
   - editing port labels
 
 - Integrate as many usability improvements as time permits:
-  - Integrate nice menus like current Observium?
-  - Front page: more automation; GUI configuration?
-
+  - Front page customisation
+  - GUI configuration of most options
