@@ -47,19 +47,13 @@ if($new_conf_type == 'Single')
 {
   $new_conf_type = 'single';
   $new_conf_value = $_POST['new_conf_single_value'];
-  if(dbInsert(array('config_name' => $new_conf_name, 'config_value' => $new_conf_value, 'config_default' => $new_conf_value, 'config_type' => $new_conf_type, 'config_desc' => $new_conf_desc, 'config_group' => '500_Custom Settings', 'config_sub_group' => '01_Custom settings', 'config_hidden' => '0', 'config_disabled' => '0'), 'config'))
-  {
-    $db_inserted = 1;
-  }
+  $db_inserted = add_config_item($new_conf_name,$new_conf_value,$new_conf_type,$new_conf_desc);
 }
 elseif($new_conf_type == 'Single Array')
 {
   $new_conf_type = 'single-array';
   $new_conf_value = $_POST['new_conf_single_value'];
-  if(dbInsert(array('config_name' => $new_conf_name, 'config_value' => $new_conf_value, 'config_default' => $new_conf_value, 'config_type' => $new_conf_type, 'config_desc' => $new_conf_desc, 'config_group' => '500_Custom Settings', 'config_sub_group' => '01_Custom settings', 'config_hidden' => '0', 'config_disabled' => '0'), 'config'))
-  {
-    $db_inserted = 1;
-  }
+  $db_inserted = add_config_item($new_conf_name,$new_conf_value,$new_conf_type,$new_conf_desc);
 }
 elseif($new_conf_type == 'Standard Array' || $new_conf_type == 'Multi Array')
 {
@@ -80,11 +74,8 @@ elseif($new_conf_type == 'Standard Array' || $new_conf_type == 'Multi Array')
   $values = explode('<br />',$new_conf_value);
   foreach ($values as $item)
   {
-    $item = trim($item);
-    if(dbInsert(array('config_name' => $new_conf_name, 'config_value' => $item, 'config_default' => $new_conf_value, 'config_type' => $new_conf_type, 'config_desc' => $new_conf_desc, 'config_group' => '500_Custom Settings', 'config_sub_group' => '01_Custom settings', 'config_hidden' => '0', 'config_disabled' => '0'), 'config'))
-    {
-      $db_inserted = 1;
-    }
+    $new_conf_value = trim($item);
+    $db_inserted = add_config_item($new_conf_name,$new_conf_value,$new_conf_type,$new_conf_desc);
   }  
 }
 else
