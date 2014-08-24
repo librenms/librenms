@@ -1,0 +1,16 @@
+{
+  "name": "gridster",
+  "description": "Gridster",
+  "version": "0.5.5",
+  "main": [
+    "./dist/jquery.gridster.css",
+    "./dist/jquery.gridster.js"
+  ],
+  "ignore": [
+    "*/.*",
+    "*.json",
+    "src",
+    "test",
+    "*.md"
+  ]
+}
