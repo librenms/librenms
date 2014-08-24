@@ -43,6 +43,8 @@ elseif(empty($_POST['new_conf_single_value']) && empty($_POST['new_conf_multi_va
   exit;
 }
 
+$db_inserted = '0';
+
 if($new_conf_type == 'Single')
 {
   $new_conf_type = 'single';
