@@ -61,9 +61,21 @@ elseif($new_conf_type == 'Single Array')
     $db_inserted = 1;
   }
 }
-elseif($new_conf_type == 'Standard Array')
+elseif($new_conf_type == 'Standard Array' || $new_conf_type == 'Multi Array')
 {
-  $new_conf_type = 'array';
+  if($new_conf_type == 'Standard Array')
+  {
+    $new_conf_type = 'array';
+  }
+  elseif($new_conf_type == 'Multi Array')
+  {
+    $new_conf_type = 'multi-array';
+  }
+  else
+  {
+    # $new_conf_type is invalid so clear values so we don't create any config
+    $new_conf_value = '';
+  }
   $new_conf_value = nl2br($_POST['new_conf_multi_value']);
   $values = explode('<br />',$new_conf_value);
   foreach ($values as $item)
@@ -74,20 +86,6 @@ elseif($new_conf_type == 'Standard Array')
       $db_inserted = 1;
     }
   }  
-}
-elseif($new_conf_type == 'Multi Array')
-{
-  $new_conf_type = 'multi-array';
-  $new_conf_value = nl2br($_POST['new_conf_multi_value']);
-  $values = explode('<br />',$new_conf_value);
-  foreach ($values as $item)
-  {
-    $item = trim($item);
-    if(dbInsert(array('config_name' => $new_conf_name, 'config_value' => $item, 'config_default' => $new_conf_value, 'config_type' => $new_conf_type, 'config_desc' => $new_conf_desc, 'config_group' => '500_Custom Settings', 'config_sub_group' => '01_Custom settings', 'config_hidden' => '0', 'config_disabled' => '0'), 'config'))
-    {
-      $db_inserted = 1;
-    }
-  }
 }
 else
 {
