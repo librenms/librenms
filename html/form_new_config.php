@@ -1,19 +1,18 @@
 <?php
 
 /*
-  Copyright (C) 2013 LibreNMS Contributors librenms-project@googlegroups.com
-*/
+ * LibreNMS
+ *
+ * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ */
 
-// FUA
-
-if (isset($_REQUEST['debug']))
-{
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 0);
-  ini_set('log_errors', 0);
-  ini_set('allow_url_fopen', 0);
-  ini_set('error_reporting', E_ALL);
-}
+enable_debug();
 
 include_once("../includes/defaults.inc.php");
 include_once("../config.php");
@@ -93,6 +92,7 @@ elseif($new_conf_type == 'Multi Array')
 else
 {
   echo('Bad config type!');
+  $db_inserted = 0;
   exit;
 }
 

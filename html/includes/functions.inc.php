@@ -718,6 +718,31 @@ function is_admin() {
         $allowed = false;
     }
     return $allowed;
+# Enable debugging for web pages
+function enable_debugging()
+{
+  if (isset($_REQUEST['debug']))
+  {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 0);
+    ini_set('log_errors', 0);
+    ini_set('allow_url_fopen', 0);
+    ini_set('error_reporting', E_ALL);
+  }
+}
+
+# Insert new config items
+function add_config_item($new_conf_name,$new_conf_value,$new_conf_type,$new_conf_desc)
+{
+  if(dbInsert(array('config_name' => $new_conf_name, 'config_value' => $new_conf_value, 'config_default' => $new_conf_value, 'config_type' => $new_conf_type, 'config_desc' => $new_conf_desc, 'config_group' => '500_Custom Settings', 'config_sub_group' => '01_Custom settings', 'config_hidden' => '0', 'config_disabled' => '0'), 'config'))
+  {
+    $db_inserted = 1;
+  }
+  else
+  {
+    $db_inserted = 0;
+  }
+  return($db_inserted);
 }
 
 ?>
