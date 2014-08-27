@@ -304,12 +304,6 @@ input,select {
 
 img  { border: 0; }
 
-A         { text-decoration: none; }
-A:link    { color: #1111aa; }
-A:visited { color: #1111aa; }
-A:hover   { color: #990099; }
-A:active  { color: #000000; }
-
 A.sectionhead         { text-decoration: none; color: #555; }
 A.sectionhead:link    { text-decoration: none; color: #555; }
 A.sectionhead:visited { text-decoration: none; color: #555; }
@@ -702,11 +696,6 @@ table { border-collapse: collapse; margin: 0px; background-color:#ffffff }
 form { margin: 0px; padding: 0px; }
 hr { border: 0px; height: 1px; background-color: #ccc; color: #ccc; }
 p { margin: 0px; padding: 0px; }
-
-a { text-decoration:none; color: #11a; }
-a:visited { text-decoration:none; color: #11a; }
-a:hover { text-decoration:underline; color: #11a; }
-a:active { color: #11a; }
 
 .vspace { margin-top: 4px; margin-bottom: 4px; }
 p.vspace { padding-top: 3px; padding-bottom: 3px; }
