@@ -171,7 +171,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
          </div>
          <div class='form-group'>
            <div class='col-sm-12'>
-             <button type='submit' name='Submit' value='Add'>Add</button>
+             <button type='submit' class='btn btn-default' name='Submit' value='Add'>Add</button>
            </div>
          </div>
        </form>");
@@ -230,7 +230,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 
     echo("</select>
           </div>
-          <button type='submit' name='Submit' value='Add'>Add</button>
+          <button type='submit' class='btn btn-default' name='Submit' value='Add'>Add</button>
         </form>
         </div>");
 
