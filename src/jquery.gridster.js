@@ -839,7 +839,7 @@
     *  than the original.
     */
     fn.register_widget = function($el) {
-        var isDOM = $el instanceof jQuery;
+        var isDOM = $el instanceof $;
         var wgd = isDOM ? this.dom_to_coords($el) : $el;
         var posChanged = false;
         isDOM || ($el = wgd.el);
