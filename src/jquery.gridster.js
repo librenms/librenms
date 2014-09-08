@@ -2960,7 +2960,7 @@
     */
     fn.add_faux_rows = function(rows) {
         var actual_rows = this.rows;
-        var max_rows = actual_rows + (rows || 1);
+        var max_rows = actual_rows + parseInt(rows || 1);
 
         for (var r = max_rows; r > actual_rows; r--) {
             for (var c = this.cols; c >= 1; c--) {
