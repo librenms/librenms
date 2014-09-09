@@ -6,7 +6,7 @@ if ($device['os_group'] == "cisco")
 
   // Not sure why we check for VTP, but this data comes from that MIB, so...
   $vtpversion = snmp_get($device, "vtpVersion.0"  , "-OnvQ", "CISCO-VTP-MIB");
-  if ($vtpversion == '1' || $vtpversion == '2' || $vtpversion == '3' || $vtpversion == 'one' ||  $vtpversion == 'two' || $vtpversion == 'three')
+  if ($vtpversion == '1' || $vtpversion == '2' || $vtpversion == '3' || $vtpversion == 'one' ||  $vtpversion == 'two' || $vtpversion == 'three' || $vtpversion == 'none')
   {
 
     // FIXME - can have multiple VTP domains.
