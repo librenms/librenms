@@ -1,0 +1,26 @@
+{
+    "name": "corley/influxdb-sdk",
+    "description": "InfluxDb PHP sdk for send messages",
+    "require-dev": {
+        "phpspec/phpspec": "2.*"
+    },
+    "authors": [
+        {
+            "name": "Gianluca Arbezzano",
+            "email": "gianluca.arbezzano@corley.it"
+        },
+        {
+            "name": "Walter Dal Mut",
+            "email": "walter.dalmut@corley.it"
+        },
+        {
+            "name": "Gabriele Mittica",
+            "email": "gabriele.mittica@corley.it"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "InfluxDB": "./src/"
+        }
+    }
+}
