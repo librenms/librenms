@@ -23,13 +23,13 @@ class ClientSpec extends ObjectBehavior
 
     function it_should_send_data(\InfluxDB\Adapter\AdapterInterface $adapter)
     {
-        $adapter->send([
+        $adapter->send([[
             "name" => "video.search",
             "columns" => ["author", "title"],
             "points" => [
                 ["Guccini", "Autogrill"]
             ] 
-        ])->shouldBeCalledTimes(1);
+        ]])->shouldBeCalledTimes(1);
 
         $this->mark("video.search", [
             "author" => "Guccini",
