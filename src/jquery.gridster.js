@@ -2986,7 +2986,7 @@
     */
     fn.add_faux_cols = function(cols) {
         var actual_cols = this.cols;
-        var max_cols = actual_cols + (cols || 1);
+        var max_cols = actual_cols + parseInt(cols || 1);
         max_cols = Math.min(max_cols, this.options.max_cols);
 
         for (var c = actual_cols + 1; c <= max_cols; c++) {
