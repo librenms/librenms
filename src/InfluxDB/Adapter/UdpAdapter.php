@@ -2,7 +2,7 @@
 
 namespace InfluxDB\Adapter;
 
-class Udp implements AdapterInterface
+class UdpAdapter implements AdapterInterface
 {
     private $host;
     private $port;
