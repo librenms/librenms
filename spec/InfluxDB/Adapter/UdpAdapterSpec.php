@@ -5,7 +5,7 @@ namespace spec\InfluxDB\Adapter;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
-class UdpSpec extends ObjectBehavior
+class UdpAdapterSpec extends ObjectBehavior
 {
     function let()
     {
@@ -14,7 +14,7 @@ class UdpSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('InfluxDB\Adapter\Udp');
+        $this->shouldHaveType('InfluxDB\Adapter\UdpAdapter');
     }
 
     function it_should_implement_adapter_interface()
