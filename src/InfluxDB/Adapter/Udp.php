@@ -47,6 +47,7 @@ class Udp implements AdapterInterface
 
     public function send($message)
     {
+        $message = json_encode($message);
         socket_sendto($this->getSocket(), $message, strlen($message), 0, $this->host, $this->port);
     } 
 }
