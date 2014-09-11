@@ -29,7 +29,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $options["tcp"]["username"],
             $options["tcp"]["password"]
         );
-        $client->deleteDatabase($options["tcp"]["database"]);
+        try {
+            $client->deleteDatabase($options["tcp"]["database"]);
+        } catch (\Exception $e) {
+            // nothing...
+        }
         $client->createDatabase($options["tcp"]["database"]);
 
         $this->anotherClient = $client;
