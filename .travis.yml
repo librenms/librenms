@@ -4,9 +4,19 @@ php:
     - 5.5
     - 5.6
 
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install libcurl4-openssl-dev libjson0-dev
+  - wget http://s3.amazonaws.com/influxdb/influxdb_latest_amd64.deb
+  - sudo useradd influxdb
+  - sudo dpkg -i influxdb_latest_amd64.deb
+  - travis_retry sudo service influxdb restart
+  - sudo service influxdb status
+
 before_script:
   - composer selfupdate
   - composer install --prefer-source
 
 script:
   - vendor/bin/phpspec run
+  - vendor/bin/phpunit

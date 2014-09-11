@@ -33,3 +33,39 @@ Or place it in your require section
 }
 ```
 
+## Send data using HTTP json API
+
+Actually we using Guzzle as HTTP client
+
+```php
+$influx->mark("tcp.test", ["mark" => "element"]);
+```
+
+## Prepare lib dependencies
+
+Use your DiC or Service Locator in order to provide a configured client
+
+```php
+<?php
+
+use InfluxDB\Client;
+use InfluxDB\Options;
+use InfluxDB\Adapter\GuzzleAdapter;
+use GuzzleHttp\Client as GuzzleHttpClient;
+
+$options = new Options();
+$options->setHost("analytics.mine.domain.tld");
+$options->setPort(8086);
+$options->setUsername("root");
+$options->setPassword("root");
+
+$guzzleHttp = new GuzzleHttpClient();
+$adapter = new GuzzleAdapter($guzzleHttp, $options);
+$adapter->setDatabase("mine");
+
+$influx = new Client();
+$influx->setAdapter($adapter);
+
+$influx->mark("tcp.test", ["mark" => "element"]);
+```
+

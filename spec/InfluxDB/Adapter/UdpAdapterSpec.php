@@ -4,12 +4,13 @@ namespace spec\InfluxDB\Adapter;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use InfluxDB\Options;
 
 class UdpAdapterSpec extends ObjectBehavior
 {
-    function let()
+    function let(Options $options)
     {
-        $this->beConstructedWith();
+        $this->beConstructedWith($options);
     }
 
     function it_is_initializable()
@@ -20,5 +21,6 @@ class UdpAdapterSpec extends ObjectBehavior
     function it_should_implement_adapter_interface()
     {
         $this->shouldImplement("InfluxDB\Adapter\AdapterInterface");
+        $this->shouldImplement("InfluxDB\Adapter\ConnectableInterface");
     }
 }
