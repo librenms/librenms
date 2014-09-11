@@ -15,7 +15,7 @@ class OptionsSpec extends ObjectBehavior
     function it_should_create_a_valid_tcp_endpoint()
     {
         $this->getTcpEndpointFor("mine")
-            ->shouldReturn("http://localhost:1806/db/mine/series?u=root&p=root");
+            ->shouldReturn("http://localhost:8086/db/mine/series?u=root&p=root");
     }
 
     function it_should_allows_option_override_for_tcp_endpoint()
@@ -32,6 +32,6 @@ class OptionsSpec extends ObjectBehavior
     {
         $this->setProtocol("https");
         $this->getTcpEndpointFor("me")
-            ->shouldReturn("https://localhost:1806/db/me/series?u=root&p=root");
+            ->shouldReturn("https://localhost:8086/db/me/series?u=root&p=root");
     }
 }
