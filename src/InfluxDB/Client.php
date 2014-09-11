@@ -20,7 +20,7 @@ class Client implements ClientInterface
     public function connect()
     {
         return $this->getAdapter()->connect();
-    } 
+    }
 
     public function disconnect()
     {
@@ -29,7 +29,7 @@ class Client implements ClientInterface
 
     public function mark($name, array $values)
     {
-        $data =[];        
+        $data =[];
         $data['name'] = $name;
         $data['columns'] = array_keys($values);
         $data['points'][] = array_values($values);
