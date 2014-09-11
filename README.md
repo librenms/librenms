@@ -50,7 +50,7 @@ Use your DiC or Service Locator in order to provide a configured client
 
 use InfluxDB\Client;
 use InfluxDB\Options;
-use InfluxDB\Adapter\GuzzleAdapter;
+use InfluxDB\Adapter\GuzzleAdapter as InfluxHttpAdapter;
 use GuzzleHttp\Client as GuzzleHttpClient;
 
 $options = new Options();
@@ -60,7 +60,7 @@ $options->setUsername("root");
 $options->setPassword("root");
 
 $guzzleHttp = new GuzzleHttpClient();
-$adapter = new GuzzleAdapter($guzzleHttp, $options);
+$adapter = new InfluxHttpAdapter($guzzleHttp, $options);
 $adapter->setDatabase("mine");
 
 $influx = new Client();

@@ -1,17 +1,15 @@
 <?php
 namespace InfluxDB;
 
-use InfluxDB\Adapter\GuzzleAdapter;
+use InfluxDB\Adapter\GuzzleAdapter as InfluxHttpAdapter;
 use InfluxDB\Options;
 use GuzzleHttp\Client as GuzzleHttpClient;
-use Zend\Stdlib\Hydrator\ArraySerializable;
 use crodas\InfluxPHP\Client as Crodas;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
     private $object;
     private $options;
-    private $hydrator;
 
     private $anotherClient;
 
@@ -21,7 +19,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->options = $options;
 
         $this->object = new Client();
-        $this->hydrator = new ArraySerializable();
 
         $client = new Crodas(
             $options["tcp"]["host"],
@@ -39,7 +36,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->anotherClient = $client;
     }
 
-    public function testHttpApiWorksCorrectly()
+    public function testGuzzleHttpApiWorksCorrectly()
     {
         $tcpOptions = $this->options["tcp"];
 
@@ -50,7 +47,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $options->setPassword($tcpOptions["password"]);
 
         $guzzleHttp = new GuzzleHttpClient();
-        $adapter = new GuzzleAdapter($guzzleHttp, $options);
+        $adapter = new InfluxHttpAdapter($guzzleHttp, $options);
         $adapter->setDatabase($tcpOptions["database"]);
 
         $influx = new Client();
@@ -58,7 +55,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $influx->mark("tcp.test", ["mark" => "element"]);
 
-        $cursor = $this->anotherClient->getDatabase("mine")->query("select * from tcp.test");
+        $cursor = $this->anotherClient->getDatabase($tcpOptions["database"])
+            ->query("select * from tcp.test");
         $this->assertCount(1, $cursor);
         $this->assertEquals("element", $cursor[0]->mark);
     }
