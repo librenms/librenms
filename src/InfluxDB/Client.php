@@ -2,7 +2,7 @@
 
 namespace InfluxDB;
 
-class Client implements ClientInterface
+class Client
 {
     private $adapter;
 
