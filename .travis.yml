@@ -19,5 +19,5 @@ before_script:
   - composer install --prefer-source
 
 script:
-  - vendor/bin/phpspec run
+  - vendor/bin/phpspec run -n
   - vendor/bin/phpunit
