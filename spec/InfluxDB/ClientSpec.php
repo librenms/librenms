@@ -1,11 +1,12 @@
 <?php
-
 namespace spec\InfluxDB;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use InfluxDB\Adapter\GuzzleAdapter;
 use InfluxDB\Adapter\UdpAdapter;
+use InfluxDB\Adapter\AdapterInterface;
+use InfluxDB\Adapter\ConnectableInterface;
 
 class ClientSpec extends ObjectBehavior
 {
@@ -13,12 +14,35 @@ class ClientSpec extends ObjectBehavior
     {
        $this->setAdapter($adapter);
     }
+
     function it_is_initializable()
     {
         $this->shouldHaveType('InfluxDB\Client');
     }
 
-    function it_should_send_data(\InfluxDB\Adapter\AdapterInterface $adapter)
+    function it_should_be_connectable(ConnectableInterface $adapter)
+    {
+        $adapter->connect()->willReturn(true)->shouldBeCalledTimes(1);
+
+        $this->setAdapter($adapter);
+        $this->connect()->shouldReturn(true);
+    }
+
+    function it_should_be_disconnectable(ConnectableInterface $adapter)
+    {
+        $adapter->disconnect()->willReturn(true)->shouldBeCalledTimes(1);
+
+        $this->setAdapter($adapter);
+        $this->disconnect()->shouldReturn(true);
+    }
+
+    function it_should_not_call_connect(AdapterInterface $adapter)
+    {
+        $this->setAdapter($adapter);
+        $this->connect()->shouldReturn(false);
+    }
+
+    function it_should_send_data(AdapterInterface $adapter)
     {
         $adapter->send([[
             "name" => "video.search",
