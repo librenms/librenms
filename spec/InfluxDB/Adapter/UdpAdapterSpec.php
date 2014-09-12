@@ -21,6 +21,5 @@ class UdpAdapterSpec extends ObjectBehavior
     function it_should_implement_adapter_interface()
     {
         $this->shouldImplement("InfluxDB\Adapter\AdapterInterface");
-        $this->shouldImplement("InfluxDB\Adapter\ConnectableInterface");
     }
 }
