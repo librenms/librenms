@@ -20,28 +20,6 @@ class ClientSpec extends ObjectBehavior
         $this->shouldHaveType('InfluxDB\Client');
     }
 
-    function it_should_be_connectable(ConnectableInterface $adapter)
-    {
-        $adapter->connect()->willReturn(true)->shouldBeCalledTimes(1);
-
-        $this->setAdapter($adapter);
-        $this->connect()->shouldReturn(true);
-    }
-
-    function it_should_be_disconnectable(ConnectableInterface $adapter)
-    {
-        $adapter->disconnect()->willReturn(true)->shouldBeCalledTimes(1);
-
-        $this->setAdapter($adapter);
-        $this->disconnect()->shouldReturn(true);
-    }
-
-    function it_should_not_call_connect(AdapterInterface $adapter)
-    {
-        $this->setAdapter($adapter);
-        $this->connect()->shouldReturn(false);
-    }
-
     function it_should_send_data(AdapterInterface $adapter)
     {
         $adapter->send([[
