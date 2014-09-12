@@ -14,7 +14,8 @@ class OptionsSpec extends ObjectBehavior
 
     function it_should_create_a_valid_tcp_endpoint()
     {
-        $this->getTcpEndpointFor("mine")
+        $this->setDatabase("mine");
+        $this->getTcpEndpoint()
             ->shouldReturn("http://localhost:8086/db/mine/series?u=root&p=root");
     }
 
@@ -24,14 +25,16 @@ class OptionsSpec extends ObjectBehavior
         $this->setPort(19385);
         $this->setUsername("walter");
         $this->setPassword("walter");
-        $this->getTcpEndpointFor("me")
+        $this->setDatabase("me");
+        $this->getTcpEndpoint()
             ->shouldReturn("http://influx.1.prod.tld:19385/db/me/series?u=walter&p=walter");
     }
 
     function it_should_allows_https_for_tcp_endpoint()
     {
         $this->setProtocol("https");
-        $this->getTcpEndpointFor("me")
+        $this->setDatabase("me");
+        $this->getTcpEndpoint()
             ->shouldReturn("https://localhost:8086/db/me/series?u=root&p=root");
     }
 }

@@ -10,6 +10,8 @@ class Options
     private $password;
     private $protocol;
 
+    private $database;
+
     public function __construct()
     {
         $this->host = "localhost";
@@ -74,14 +76,25 @@ class Options
         return $this;
     }
 
-    public function getTcpEndpointFor($database)
+    public function getDatabase()
+    {
+        return $this->database;
+    }
+
+    public function setDatabase($database)
+    {
+        $this->database = $database;
+        return $this;
+    }
+
+    public function getTcpEndpoint()
     {
         return sprintf(
             "%s://%s:%d/db/%s/series?u=%s&p=%s",
             $this->getProtocol(),
             $this->getHost(),
             $this->getPort(),
-            $database,
+            $this->getDatabase(),
             $this->getUsername(),
             $this->getPassword()
         );

@@ -45,10 +45,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $options->setPort($tcpOptions["port"]);
         $options->setUsername($tcpOptions["username"]);
         $options->setPassword($tcpOptions["password"]);
+        $options->setDatabase($tcpOptions["database"]);
 
         $guzzleHttp = new GuzzleHttpClient();
         $adapter = new InfluxHttpAdapter($guzzleHttp, $options);
-        $adapter->setDatabase($tcpOptions["database"]);
 
         $influx = new Client();
         $influx->setAdapter($adapter);
