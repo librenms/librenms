@@ -10,6 +10,7 @@ before_install:
   - wget http://s3.amazonaws.com/influxdb/influxdb_latest_amd64.deb
   - sudo useradd influxdb
   - sudo dpkg -i influxdb_latest_amd64.deb
+  - sudo cp ./scripts/influxdb_conf.toml /opt/influxdb/shared/config.toml
   - travis_retry sudo service influxdb restart
   - sudo service influxdb status
 

@@ -20,26 +20,6 @@ class Client
         return $this->adapter;
     }
 
-    public function connect()
-    {
-        $result = false;
-        if ($this->getAdapter() instanceOf ConnectableInterface) {
-            $result = $this->getAdapter()->connect();
-        }
-
-        return $result;
-    }
-
-    public function disconnect()
-    {
-        $result = false;
-        if ($this->getAdapter() instanceOf ConnectableInterface) {
-            $result = $this->getAdapter()->disconnect();
-        }
-
-        return $result;
-    }
-
     public function mark($name, array $values)
     {
         $data =[];

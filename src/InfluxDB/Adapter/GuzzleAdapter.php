@@ -42,6 +42,11 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
         }
 
         $endpoint = $this->options->getHttpSeriesEndpoint();
+        try {
         return $this->httpClient->get($endpoint, $options)->json();
+        } catch (\Exception $e) {
+            var_dump((string)$e->getResponse()->getBody(true));
+            die();
+        }
     }
 }

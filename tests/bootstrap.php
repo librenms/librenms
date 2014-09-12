@@ -7,5 +7,12 @@ return [
         "database" => "mine",
         "username" => "root",
         "password" =>  "root",
-    ]
+    ],
+    "udp" => [
+        "host" => "localhost",
+        "port" => 5551,
+        "database" => "mine",
+        "username" => "root",
+        "password" => "root"
+    ],
 ];
