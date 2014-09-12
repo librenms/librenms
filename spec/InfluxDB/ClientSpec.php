@@ -4,6 +4,8 @@ namespace spec\InfluxDB;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use InfluxDB\Adapter\GuzzleAdapter;
+use InfluxDB\Adapter\UdpAdapter;
 
 class ClientSpec extends ObjectBehavior
 {
@@ -30,5 +32,36 @@ class ClientSpec extends ObjectBehavior
             "author" => "Guccini",
             "title" => "Autogrill"
         ]);
+    }
+
+    function it_should_query_on_querable_adapter(GuzzleAdapter $adapter)
+    {
+        $this->setAdapter($adapter);
+        $adapter->query("select * from tcp.test", false)->willReturn([]);
+
+        $this->query("select * from tcp.test")->shouldReturn([]);
+    }
+
+    function it_should_query_with_time_precision(GuzzleAdapter $adapter)
+    {
+        $this->setAdapter($adapter);
+        $adapter->query("select * from tcp.test", "s")->willReturn([]);
+
+        $this->query("select * from tcp.test", "s")->shouldReturn([]);
+    }
+
+    function it_should_query_but_skip_invalid_time_precision(GuzzleAdapter $adapter)
+    {
+        $this->setAdapter($adapter);
+        $adapter->query("select * from tcp.test", false)->willReturn([]);
+
+        $this->query("select * from tcp.test", "r")->shouldReturn([]);
+    }
+
+    function it_should_thrown_an_exception_on_unquerable_adapter(UdpAdapter $adapter)
+    {
+        $this->setAdapter($adapter);
+
+        $this->shouldThrow("\\BadMethodCallException")->duringQuery("select * from tcp.test");
     }
 }

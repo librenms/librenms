@@ -11,7 +11,9 @@ class GuzzleAdapterSpec extends ObjectBehavior
 {
     function let(Client $client, Options $options)
     {
-        $options->getTcpEndpoint()->willReturn("localhost");
+        $options->getHttpSeriesEndpoint()->willReturn("localhost");
+        $options->getUsername()->willReturn("one");
+        $options->getPassword()->willReturn("two");
         $this->beConstructedWith($client, $options);
     }
 
@@ -22,8 +24,23 @@ class GuzzleAdapterSpec extends ObjectBehavior
 
     function it_should_send_data_via_post(Client $client, Options $options)
     {
-        $client->post("localhost", ['body' => json_encode(['pippo'])])->shouldBeCalledTimes(1);
+        $client->post("localhost", [
+            'auth' => ["one", "two"],
+            'body' => json_encode(['pippo'])
+        ])->shouldBeCalledTimes(1);
 
         $this->send(["pippo"]);
+    }
+
+    function it_should_query_data(Client $client, Options $options)
+    {
+        $client->get("select * from tcp.test", [])->willReturn([]);
+        $this->query("select * from tcp.test")->shouldReturn([]);
+    }
+
+    function it_should_query_data_with_time_precision(Client $client, Options $options)
+    {
+        $client->get("select * from tcp.test", ["time_precision" => "s"])->willReturn([]);
+        $this->query("select * from tcp.test", "s")->shouldReturn([]);
     }
 }
