@@ -3,47 +3,54 @@
  * [![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=master)](https://travis-ci.org/corley/influxdb-php-sdk)
  * [![Dependency Status](https://www.versioneye.com/user/projects/54104e789e1622492d000025/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54104e789e1622492d000025)
 
-Send metrics to InfluxDB.
+Send metrics to InfluxDB and query for any data.
+
+Add new points:
 
 ```php
-$options = new \InfluxDB\Options();
-
-$client = new \InfluxDB\Client();
-$client->setAdapter(new \InfluxDB\Adapter\UdpAdapter($options));
-
-$client->mark("search", [
-    "query" => "php"
+$client->mark("app.search", [
+    "key" => "this is my search"
 ]);
 ```
 
-## Install it
-
-Just use composer
-
-```shell
-php composer.phar require corley/influxdb-sdk:*
-```
-
-Or place it in your require section
-
-```json
-{
-  "require": {
-    // ...
-    "corley/influxdb-sdk": "*"
-  }
-}
-```
-
-## Send data using HTTP json API
-
-Actually we using Guzzle as HTTP client
+Retrieve existing points:
 
 ```php
-$influx->mark("tcp.test", ["mark" => "element"]);
+$results = $client->query("select * from app.search");
 ```
 
-## Query InfluxDB
+## InfluxDB client adapters
+
+Actually we supports two adapters
+
+ * UDP/IP - in order to send data via UDP (datagram)
+ * HTTP JSON - in order to send/retrieve using HTTP (connection oriented)
+
+### Using UDP/IP Adapter
+
+Actually "socket" php library is used for UDP/IP adapter
+
+```
+$options = new Options();
+$adapter = new UdpAdapter($options);
+
+$client = new Client();
+$client->setAdapter($adapter);
+```
+
+### Using HTTP Adapter
+
+Actually Guzzle is used as HTTP client library
+
+```
+$options = new Options();
+$adapter = new GuzzleAdapter($options);
+
+$client = new Client();
+$client->setAdapter($adapter);
+```
+
+### Query InfluxDB
 
 You can query the time series database using the query method.
 
@@ -87,6 +94,26 @@ array(1) {
   }
 }
 ```
+
+## Install it
+
+Just use composer
+
+```shell
+php composer.phar require corley/influxdb-sdk:dev-master
+```
+
+Or place it in your require section
+
+```json
+{
+  "require": {
+    // ...
+    "corley/influxdb-sdk": "dev-master"
+  }
+}
+```
+
 
 ## Prepare lib dependencies
 
