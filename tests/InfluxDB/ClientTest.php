@@ -16,9 +16,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $options = include __DIR__ . '/../bootstrap.php';
-        $this->options = $options;
-
-        $this->object = new Client();
 
         $client = new Crodas(
             $options["tcp"]["host"],
@@ -34,11 +31,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->createDatabase($options["tcp"]["database"]);
 
         $this->anotherClient = $client;
-    }
 
-    public function testGuzzleHttpApiWorksCorrectly()
-    {
-        $tcpOptions = $this->options["tcp"];
+        $tcpOptions = $options["tcp"];
 
         $options = new Options();
         $options->setHost($tcpOptions["host"]);
@@ -47,17 +41,56 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $options->setPassword($tcpOptions["password"]);
         $options->setDatabase($tcpOptions["database"]);
 
+        $this->options = $options;
+
         $guzzleHttp = new GuzzleHttpClient();
         $adapter = new InfluxHttpAdapter($guzzleHttp, $options);
 
         $influx = new Client();
         $influx->setAdapter($adapter);
+        $this->object = $influx;
+    }
 
-        $influx->mark("tcp.test", ["mark" => "element"]);
+    public function testGuzzleHttpApiWorksCorrectly()
+    {
+        $this->object->mark("tcp.test", ["mark" => "element"]);
 
-        $cursor = $this->anotherClient->getDatabase($tcpOptions["database"])
+        $cursor = $this->anotherClient->getDatabase($this->options->getDatabase())
             ->query("select * from tcp.test");
         $this->assertCount(1, $cursor);
         $this->assertEquals("element", $cursor[0]->mark);
+    }
+
+    public function testGuzzleHttpQueryApiWorksCorrectly()
+    {
+        $this->object->mark("tcp.test", ["mark" => "element"]);
+
+        $body = $this->object->query("select * from tcp.test");
+
+        $this->assertCount(1, $body);
+        $this->assertEquals("tcp.test", $body[0]["name"]);
+        $this->assertEquals("element", $body[0]["points"][0][2]);
+    }
+
+    public function testGuzzleHttpQueryApiWithMultipleData()
+    {
+        $this->object->mark("tcp.test", ["mark" => "element"]);
+        $this->object->mark("tcp.test", ["mark" => "element2"]);
+        $this->object->mark("tcp.test", ["mark" => "element3"]);
+
+        $body = $this->object->query("select mark from tcp.test", "s");
+
+        $this->assertCount(3, $body[0]["points"]);
+        $this->assertEquals("tcp.test", $body[0]["name"]);
+    }
+
+    public function testGuzzleHttpQueryApiWithTimePrecision()
+    {
+        $this->object->mark("tcp.test", ["mark" => "element"]);
+
+        $body = $this->object->query("select mark from tcp.test", "s");
+
+        $this->assertCount(1, $body[0]["points"]);
+        $this->assertEquals("tcp.test", $body[0]["name"]);
     }
 }

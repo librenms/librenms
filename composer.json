@@ -29,7 +29,7 @@
     ],
     "autoload": {
         "psr-0": {
-            "InfluxDB": ["./src/", "./tests"]
+            "InfluxDB\\": ["./src/", "./tests"]
         }
     },
     "suggests": {

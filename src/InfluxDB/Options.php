@@ -87,16 +87,14 @@ class Options
         return $this;
     }
 
-    public function getTcpEndpoint()
+    public function getHttpSeriesEndpoint()
     {
         return sprintf(
-            "%s://%s:%d/db/%s/series?u=%s&p=%s",
+            "%s://%s:%d/db/%s/series",
             $this->getProtocol(),
             $this->getHost(),
             $this->getPort(),
-            $this->getDatabase(),
-            $this->getUsername(),
-            $this->getPassword()
+            $this->getDatabase()
         );
     }
 }

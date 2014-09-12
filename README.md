@@ -43,6 +43,51 @@ Actually we using Guzzle as HTTP client
 $influx->mark("tcp.test", ["mark" => "element"]);
 ```
 
+## Query InfluxDB
+
+You can query the time series database using the query method.
+
+```php
+$influx->query("select * from mine");
+$influx->query("select * from mine", "s"); // with time_precision
+```
+
+You can query the database only if the adapter is queryable (implements `QueryableInterface`),
+actually `GuzzleAdapter`.
+
+The adapter returns the json decoded body of the InfluxDB response, something like:
+
+```
+array(1) {
+  [0] =>
+  class stdClass#1 (3) {
+    public $name =>
+    string(8) "tcp.test"
+    public $columns =>
+    array(3) {
+      [0] =>
+      string(4) "time"
+      [1] =>
+      string(15) "sequence_number"
+      [2] =>
+      string(4) "mark"
+    }
+    public $points =>
+    array(1) {
+      [0] =>
+      array(3) {
+        [0] =>
+        int(1410545635590)
+        [1] =>
+        int(2390001)
+        [2] =>
+        string(7) "element"
+      }
+    }
+  }
+}
+```
+
 ## Prepare lib dependencies
 
 Use your DiC or Service Locator in order to provide a configured client
