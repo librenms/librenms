@@ -6,6 +6,7 @@ use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use GuzzleHttp\Client;
 use InfluxDB\Options;
+use GuzzleHttp\Message\Response;
 
 class GuzzleAdapterSpec extends ObjectBehavior
 {
@@ -34,13 +35,30 @@ class GuzzleAdapterSpec extends ObjectBehavior
 
     function it_should_query_data(Client $client, Options $options)
     {
-        $client->get("select * from tcp.test", [])->willReturn([]);
-        $this->query("select * from tcp.test")->shouldReturn([]);
+        $client->get(
+            "localhost",
+            [
+                "auth" => ["one", "two"],
+                "query" => [
+                    "q" => "select * from tcp.test",
+                ]
+            ]
+        )->willReturn(new Response(200,[],null));
+        $this->query("select * from tcp.test")->shouldReturn(null);
     }
 
     function it_should_query_data_with_time_precision(Client $client, Options $options)
     {
-        $client->get("select * from tcp.test", ["time_precision" => "s"])->willReturn([]);
-        $this->query("select * from tcp.test", "s")->shouldReturn([]);
+        $client->get(
+            "localhost",
+            [
+                "auth" => ["one", "two"],
+                "query" => [
+                    "time_precision" => "s",
+                    "q" => "select * from tcp.test",
+                ]
+            ]
+        )->willReturn(new Response(200, [], null));
+        $this->query("select * from tcp.test", "s")->shouldReturn(null);
     }
 }
