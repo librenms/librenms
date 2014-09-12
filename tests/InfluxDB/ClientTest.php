@@ -55,10 +55,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $this->object->mark("tcp.test", ["mark" => "element"]);
 
-        $cursor = $this->anotherClient->getDatabase($this->options->getDatabase())
-            ->query("select * from tcp.test");
-        $this->assertCount(1, $cursor);
-        $this->assertEquals("element", $cursor[0]->mark);
+        $body = $this->object->query("select * from tcp.test");
+        $this->assertCount(1, $body[0]["points"]);
+        $this->assertEquals("element", $body[0]["points"][0][2]);
     }
 
     public function testGuzzleHttpQueryApiWorksCorrectly()
