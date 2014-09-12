@@ -17,23 +17,12 @@ class GuzzleAdapter implements AdapterInterface
         $this->options = $options;
     }
 
-    public function getDatabase()
-    {
-        return $this->database;
-    }
-
-    public function setDatabase($database)
-    {
-        $this->database = $database;
-        return $this;
-    }
-
     public function send($message)
     {
         $httpMessage = [
             "body" => json_encode($message)
         ];
-        $endpoint = $this->options->getTcpEndpointFor($this->getDatabase());
+        $endpoint = $this->options->getTcpEndpoint();
 
         $this->httpClient->post($endpoint, $httpMessage);
     }

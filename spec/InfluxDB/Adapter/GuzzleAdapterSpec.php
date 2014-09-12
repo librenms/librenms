@@ -11,7 +11,7 @@ class GuzzleAdapterSpec extends ObjectBehavior
 {
     function let(Client $client, Options $options)
     {
-        $options->getTcpEndpointFor(Argument::Any())->willReturn("localhost");
+        $options->getTcpEndpoint()->willReturn("localhost");
         $this->beConstructedWith($client, $options);
     }
 

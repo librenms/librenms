@@ -6,8 +6,10 @@
 Send metrics to InfluxDB.
 
 ```php
+$options = new \InfluxDB\Options();
+
 $client = new \InfluxDB\Client();
-$client->setAdapter(new \InfluxDB\Adapter\UdpAdapter());
+$client->setAdapter(new \InfluxDB\Adapter\UdpAdapter($options));
 
 $client->mark("search", [
     "query" => "php"
@@ -58,10 +60,10 @@ $options->setHost("analytics.mine.domain.tld");
 $options->setPort(8086);
 $options->setUsername("root");
 $options->setPassword("root");
+$options->setDatabase("mine");
 
 $guzzleHttp = new GuzzleHttpClient();
 $adapter = new InfluxHttpAdapter($guzzleHttp, $options);
-$adapter->setDatabase("mine");
 
 $influx = new Client();
 $influx->setAdapter($adapter);
