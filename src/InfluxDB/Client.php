@@ -3,6 +3,7 @@
 namespace InfluxDB;
 
 use InfluxDb\Adapter\QueryableInterface;
+use InfluxDb\Adapter\ConnectableInterface;
 
 class Client
 {
@@ -21,12 +22,22 @@ class Client
 
     public function connect()
     {
-        return $this->getAdapter()->connect();
+        $result = false;
+        if ($this->getAdapter() instanceOf ConnectableInterface) {
+            $result = $this->getAdapter()->connect();
+        }
+
+        return $result;
     }
 
     public function disconnect()
     {
-        return $this->getAdapter()->disconnect();
+        $result = false;
+        if ($this->getAdapter() instanceOf ConnectableInterface) {
+            $result = $this->getAdapter()->disconnect();
+        }
+
+        return $result;
     }
 
     public function mark($name, array $values)

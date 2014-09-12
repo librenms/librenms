@@ -23,8 +23,8 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
             "auth" => [$this->options->getUsername(), $this->options->getPassword()],
             "body" => json_encode($message)
         ];
-        $endpoint = $this->options->getHttpSeriesEndpoint();
 
+        $endpoint = $this->options->getHttpSeriesEndpoint();
         return $this->httpClient->post($endpoint, $httpMessage);
     }
 
@@ -36,6 +36,7 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
                 "q" => $query,
             ]
         ];
+
         if ($timePrecision) {
             $options["query"]["time_precision"] = $timePrecision;
         }

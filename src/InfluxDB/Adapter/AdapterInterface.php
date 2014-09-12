@@ -1,5 +1,5 @@
 <?php
-namespace InfluxDb\Adapter;
+namespace InfluxDB\Adapter;
 
 interface AdapterInterface
 {

@@ -1,5 +1,4 @@
 <?php
-
 namespace InfluxDB\Adapter;
 
 use InfluxDB\Options;
