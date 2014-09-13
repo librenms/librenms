@@ -1,53 +1,22 @@
 <?php
-
 namespace InfluxDB\Adapter;
+
+use InfluxDB\Options;
 
 class UdpAdapter implements AdapterInterface
 {
-    private $host;
-    private $port;
-    private $username;
-    private $password;
-    private $name = __NAMESPACE__;
-    private $socket;
+    private $options;
 
-    public function __construct(
-        $host = "127.0.0.1",
-        $port = 5551, 
-        $user = "root", 
-        $password = "root"
-    )
+    public function __construct(Options $options)
     {
-        $this->host = $host;
-        $this->port = $port;
-        $this->username = $user;
-        $this->password = $password;
-    }
-
-    public function getSocket()
-    {
-        return $this->socket;
-    }
-
-    public function getName()
-    {
-        return $this->name; 
-    }
-
-    public function connect()
-    {
-        $this->socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-        return $this;
-    }
-
-    public function disconnect()
-    {
-        socket_close($this->getSocket()); 
+        $this->options = $options;
     }
 
     public function send($message)
     {
         $message = json_encode($message);
-        socket_sendto($this->getSocket(), $message, strlen($message), 0, $this->host, $this->port);
-    } 
+        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        socket_sendto($socket, $message, strlen($message), 0, $this->options->getHost(), $this->options->getPort());
+        socket_close($socket);
+    }
 }
