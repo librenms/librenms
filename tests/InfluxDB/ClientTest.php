@@ -5,7 +5,6 @@ use InfluxDB\Adapter\GuzzleAdapter as InfluxHttpAdapter;
 use InfluxDB\Options;
 use InfluxDB\Adapter\UdpAdapter;
 use GuzzleHttp\Client as GuzzleHttpClient;
-use crodas\InfluxPHP\Client as Crodas;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,28 +18,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $options = include __DIR__ . '/../bootstrap.php';
         $this->rawOptions = $options;
-
-        $client = new Crodas(
-            $options["tcp"]["host"],
-            $options["tcp"]["port"],
-            $options["tcp"]["username"],
-            $options["tcp"]["password"]
-        );
-        try {
-            $client->deleteDatabase($options["tcp"]["database"]);
-        } catch (\Exception $e) {
-            // nothing...
-        }
-        $client->createDatabase($options["tcp"]["database"]);
-
-        try {
-            $client->deleteDatabase($options["udp"]["database"]);
-        } catch (\Exception $e) {
-            // nothing...
-        }
-        $client->createDatabase($options["udp"]["database"]);
-
-        $this->anotherClient = $client;
 
         $tcpOptions = $options["tcp"];
 
@@ -59,6 +36,14 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $influx = new Client();
         $influx->setAdapter($adapter);
         $this->object = $influx;
+
+        $databases = $this->object->getDatabases();
+        foreach ($databases as $database) {
+            $this->object->deleteDatabase($database["name"]);
+        }
+
+        $this->object->createDatabase($this->rawOptions["udp"]["database"]);
+        $this->object->createDatabase($this->rawOptions["tcp"]["database"]);
     }
 
     /**
@@ -122,6 +107,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $rawOptions = $this->rawOptions;
         $options = new Options();
+        $options->setHost($rawOptions["udp"]["host"]);
         $options->setUsername($rawOptions["udp"]["username"]);
         $options->setPassword($rawOptions["udp"]["password"]);
         $options->setPort($rawOptions["udp"]["port"]);
@@ -138,9 +124,27 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         // Wait UDP/IP message arrives
         usleep(200e3);
 
+        $this->options->setDatabase("udp.test");
         $body = $this->object->query("select * from udp.test");
 
         $this->assertCount(4, $body[0]["points"]);
         $this->assertEquals("udp.test", $body[0]["name"]);
+    }
+
+    public function testListActiveDatabses()
+    {
+        $databases = $this->object->getDatabases();
+
+        $this->assertCount(2, $databases);
+    }
+
+    public function testCreateANewDatabase()
+    {
+        $this->object->createDatabase("walter");
+        $databases = $this->object->getDatabases();
+
+        $this->assertCount(3, $databases);
+
+        $this->object->deleteDatabase("walter");
     }
 }

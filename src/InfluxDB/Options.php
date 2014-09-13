@@ -97,4 +97,20 @@ class Options
             $this->getDatabase()
         );
     }
+
+    public function getHttpDatabaseEndpoint($name = false)
+    {
+        $url = sprintf(
+            "%s://%s:%d/db",
+            $this->getProtocol(),
+            $this->getHost(),
+            $this->getPort()
+        );
+
+        if ($name !== false) {
+            $url .= "/{$name}";
+        }
+
+        return $url;
+    }
 }

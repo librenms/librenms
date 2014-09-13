@@ -57,7 +57,7 @@ read-timeout = "5s"
   [[input_plugins.udp_servers]] # array of tables
   enabled = true
   port = 5551
-  database = "mine"
+  database = "udp.test"
 
 # Raft configuration
 [raft]
