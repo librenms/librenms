@@ -42,9 +42,12 @@ $client->setAdapter($adapter);
 
 Actually Guzzle is used as HTTP client library
 
-```
+```php
+<?php
+$guzzle = new \GuzzleHttp\Client();
+
 $options = new Options();
-$adapter = new GuzzleAdapter($options);
+$adapter = new GuzzleAdapter($guzzle, $options);
 
 $client = new Client();
 $client->setAdapter($adapter);
