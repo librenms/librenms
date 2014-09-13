@@ -53,6 +53,18 @@ $client = new Client();
 $client->setAdapter($adapter);
 ```
 
+### Time Precision write/read queries
+
+You can set the `time_precision` for query query
+
+```php
+$client->mark("app.search", $points, "s"); //points contains "time" that is in seconds
+```
+
+```php
+$client->query("select * from app.search", "s"); // retrieve points using seconds for time column
+```
+
 ### Query InfluxDB
 
 You can query the time series database using the query method.
