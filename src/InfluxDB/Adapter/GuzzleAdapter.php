@@ -17,6 +17,11 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
         $this->options = $options;
     }
 
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
     public function send($message, $timePrecision = false)
     {
         $httpMessage = [
