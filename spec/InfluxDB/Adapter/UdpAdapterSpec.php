@@ -4,12 +4,13 @@ namespace spec\InfluxDB\Adapter;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use InfluxDB\Options;
 
 class UdpAdapterSpec extends ObjectBehavior
 {
-    function let()
+    function let(Options $options)
     {
-        $this->beConstructedWith();
+        $this->beConstructedWith($options);
     }
 
     function it_is_initializable()
