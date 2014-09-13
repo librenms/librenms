@@ -7,9 +7,7 @@
     },
     "require-dev": {
         "phpspec/phpspec": "2.*",
-        "phpunit/phpunit": "4.*",
-        "zendframework/zend-stdlib": "~2",
-        "crodas/influx-php": "dev-master"
+        "phpunit/phpunit": "4.*"
     },
     "homepage": "http://www.corley.it/",
     "keywords": ["influxdb", "udp", "sdk"],

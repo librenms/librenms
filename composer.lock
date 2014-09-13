@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1b622dda38682502a547657384b6fe7f",
+    "hash": "17fa2295e2cd007935278098484ab7cc",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -126,39 +126,6 @@
         }
     ],
     "packages-dev": [
-        {
-            "name": "crodas/influx-php",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/crodas/InfluxPHP.git",
-                "reference": "205bd51cb44dec70d0da06ba87e47f5c0986bdb4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/crodas/InfluxPHP/zipball/205bd51cb44dec70d0da06ba87e47f5c0986bdb4",
-                "reference": "205bd51cb44dec70d0da06ba87e47f5c0986bdb4",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "lib/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD"
-            ],
-            "authors": [
-                {
-                    "name": "César D. Rodas",
-                    "email": "crodas@php.net"
-                }
-            ],
-            "description": "Simple client for InfluxDB",
-            "time": "2014-09-04 17:26:53"
-        },
         {
             "name": "ocramius/instantiator",
             "version": "1.1.3",
@@ -1335,65 +1302,15 @@
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
             "time": "2014-08-31 03:22:04"
-        },
-        {
-            "name": "zendframework/zend-stdlib",
-            "version": "2.3.1",
-            "target-dir": "Zend/Stdlib",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/Component_ZendStdlib.git",
-                "reference": "c1f4830018b5d4f034d32fa01a9e17ea176f56f6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/Component_ZendStdlib/zipball/c1f4830018b5d4f034d32fa01a9e17ea176f56f6",
-                "reference": "c1f4830018b5d4f034d32fa01a9e17ea176f56f6",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.23"
-            },
-            "require-dev": {
-                "zendframework/zend-eventmanager": "self.version",
-                "zendframework/zend-serializer": "self.version",
-                "zendframework/zend-servicemanager": "self.version"
-            },
-            "suggest": {
-                "zendframework/zend-eventmanager": "To support aggregate hydrator usage",
-                "zendframework/zend-serializer": "Zend\\Serializer component",
-                "zendframework/zend-servicemanager": "To support hydrator plugin manager usage"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.3-dev",
-                    "dev-develop": "2.4-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Zend\\Stdlib\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "keywords": [
-                "stdlib",
-                "zf2"
-            ],
-            "time": "2014-04-15 15:28:48"
         }
     ],
     "aliases": [
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "crodas/influx-php": 20
-    },
+    "stability-flags": [
+
+    ],
     "prefer-stable": false,
     "platform": [
 
