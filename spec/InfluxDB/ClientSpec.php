@@ -28,12 +28,29 @@ class ClientSpec extends ObjectBehavior
             "points" => [
                 ["Guccini", "Autogrill"]
             ]
-        ]])->shouldBeCalledTimes(1);
+        ]], false)->shouldBeCalledTimes(1);
 
         $this->mark("video.search", [
             "author" => "Guccini",
             "title" => "Autogrill"
         ]);
+    }
+
+    function it_should_send_data_with_time_precision(AdapterInterface $adapter)
+    {
+        $adapter->send([[
+            "name" => "video.search",
+            "columns" => ["time", "author", "title"],
+            "points" => [
+                ["1410591552", "Guccini", "Autogrill"]
+            ]
+        ]], "s")->shouldBeCalledTimes(1);
+
+        $this->mark("video.search", [
+            "time" => "1410591552",
+            "author" => "Guccini",
+            "title" => "Autogrill"
+        ], "s");
     }
 
     function it_should_query_on_querable_adapter(GuzzleAdapter $adapter)

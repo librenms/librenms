@@ -12,7 +12,10 @@ class UdpAdapter implements AdapterInterface
         $this->options = $options;
     }
 
-    public function send($message)
+    /**
+     * @todo Handle timePrecision parameter
+     */
+    public function send($message, $timePrecision = false)
     {
         $message = json_encode($message);
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
