@@ -1,13 +1,7 @@
 <?php
-namespace InfluxDb\Adapter;
+namespace InfluxDB\Adapter;
 
-interface AdapterInterface 
+interface AdapterInterface
 {
-    public function getName();
-
-    public function connect();
-
-    public function disconnect();
-
     public function send($message);
 }
