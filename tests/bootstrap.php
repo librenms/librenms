@@ -4,14 +4,14 @@ return [
         "host" => "localhost",
         "port" => 8086,
         "protocol" => "http",
-        "database" => "mine",
+        "database" => "tcp.test",
         "username" => "root",
         "password" =>  "root",
     ],
     "udp" => [
         "host" => "localhost",
         "port" => 5551,
-        "database" => "mine",
+        "database" => "udp.test",
         "username" => "root",
         "password" => "root"
     ],

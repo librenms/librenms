@@ -42,11 +42,39 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
         }
 
         $endpoint = $this->options->getHttpSeriesEndpoint();
-        try {
+
         return $this->httpClient->get($endpoint, $options)->json();
-        } catch (\Exception $e) {
-            var_dump((string)$e->getResponse()->getBody(true));
-            die();
-        }
+    }
+
+    public function getDatabases()
+    {
+        $options = [
+            "auth" => [$this->options->getUsername(), $this->options->getPassword()],
+        ];
+
+        $endpoint = $this->options->getHttpDatabaseEndpoint();
+
+        return $this->httpClient->get($endpoint, $options)->json();
+    }
+
+    public function createDatabase($name)
+    {
+        $httpMessage = [
+            "auth" => [$this->options->getUsername(), $this->options->getPassword()],
+            "body" => json_encode(["name" => $name])
+        ];
+
+        $endpoint = $this->options->getHttpDatabaseEndpoint();
+        return $this->httpClient->post($endpoint, $httpMessage)->json();
+    }
+
+    public function deleteDatabase($name)
+    {
+        $httpMessage = [
+            "auth" => [$this->options->getUsername(), $this->options->getPassword()],
+        ];
+
+        $endpoint = $this->options->getHttpDatabaseEndpoint($name);
+        return $this->httpClient->delete($endpoint, $httpMessage)->json();
     }
 }

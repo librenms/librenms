@@ -13,6 +13,7 @@ class GuzzleAdapterSpec extends ObjectBehavior
     function let(Client $client, Options $options)
     {
         $options->getHttpSeriesEndpoint()->willReturn("localhost");
+        $options->getHttpDatabaseEndpoint()->willReturn("localhost");
         $options->getUsername()->willReturn("one");
         $options->getPassword()->willReturn("two");
         $this->beConstructedWith($client, $options);
@@ -60,5 +61,30 @@ class GuzzleAdapterSpec extends ObjectBehavior
             ]
         )->willReturn(new Response(200, [], null));
         $this->query("select * from tcp.test", "s")->shouldReturn(null);
+    }
+
+    function it_should_list_all_databases(Client $client, Options $options)
+    {
+        $client->get(
+            "localhost",
+            [
+                "auth" => ["one", "two"]
+            ]
+        )->shouldBeCalledTimes(1)->willReturn(new Response(200, [], null));
+
+        $this->getDatabases()->shouldReturn(null);
+    }
+
+    function it_should_create_a_new_database(Client $client, Options $options)
+    {
+        $client->post(
+            "localhost",
+            [
+                "auth" => ["one", "two"],
+                "body" => json_encode(["name" => "db_name"])
+            ]
+        )->shouldBeCalledTimes(1)->willReturn(new Response(200, [], null));
+
+        $this->createDatabase("db_name")->shouldReturn(null);
     }
 }

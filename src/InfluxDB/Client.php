@@ -41,6 +41,30 @@ class Client
         return $this->getAdapter()->query($query, $timePrecision);
     }
 
+    public function getDatabases()
+    {
+        if (!($this->getAdapter() instanceOf QueryableInterface)) {
+            throw new  \BadMethodCallException("You can query the database only if the adapter supports it!");
+        }
+        return $this->getAdapter()->getDatabases();
+    }
+
+    public function createDatabase($name)
+    {
+        if (!($this->getAdapter() instanceOf QueryableInterface)) {
+            throw new  \BadMethodCallException("You can query the database only if the adapter supports it!");
+        }
+        return $this->getAdapter()->createDatabase($name);
+    }
+
+    public function deleteDatabase($name)
+    {
+        if (!($this->getAdapter() instanceOf QueryableInterface)) {
+            throw new  \BadMethodCallException("You can query the database only if the adapter supports it!");
+        }
+        return $this->getAdapter()->deleteDatabase($name);
+    }
+
     private function clearTimePrecision($timePrecision)
     {
         switch ($timePrecision) {

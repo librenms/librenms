@@ -14,8 +14,8 @@ class UdpAdapter implements AdapterInterface
 
     public function send($message)
     {
-        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
         $message = json_encode($message);
+        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
         socket_sendto($socket, $message, strlen($message), 0, $this->options->getHost(), $this->options->getPort());
         socket_close($socket);
     }
