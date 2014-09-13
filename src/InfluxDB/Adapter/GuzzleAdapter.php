@@ -17,12 +17,16 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
         $this->options = $options;
     }
 
-    public function send($message)
+    public function send($message, $timePrecision = false)
     {
         $httpMessage = [
             "auth" => [$this->options->getUsername(), $this->options->getPassword()],
             "body" => json_encode($message)
         ];
+
+        if ($timePrecision) {
+            $httpMessage["query"]["time_precision"] = $timePrecision;
+        }
 
         $endpoint = $this->options->getHttpSeriesEndpoint();
         return $this->httpClient->post($endpoint, $httpMessage);

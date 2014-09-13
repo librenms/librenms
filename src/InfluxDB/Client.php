@@ -20,14 +20,17 @@ class Client
         return $this->adapter;
     }
 
-    public function mark($name, array $values)
+    public function mark($name, array $values, $timePrecision = false)
     {
         $data =[];
+
+        $timePrecision = $this->clearTimePrecision($timePrecision);
+
         $data['name'] = $name;
         $data['columns'] = array_keys($values);
         $data['points'][] = array_values($values);
 
-        return $this->getAdapter()->send([$data]);
+        return $this->getAdapter()->send([$data], $timePrecision);
     }
 
     public function query($query, $timePrecision = false)
