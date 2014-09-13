@@ -110,6 +110,18 @@ array(1) {
 }
 ```
 
+## Database operations
+
+You can create, list or destroy databases using dedicated methods
+
+```php
+$client->getDatabases(); // list all databases
+$client->createDatabase("my.name"); // create a new database with name "my.name"
+$client->deleteDatabase("my.name"); // delete an existing database with name "my.name"
+```
+
+Actually only queryable adapters can handle databases (implements the `QueryableInterface`)
+
 ## Install it
 
 Just use composer
