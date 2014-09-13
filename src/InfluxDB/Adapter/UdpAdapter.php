@@ -12,6 +12,11 @@ class UdpAdapter implements AdapterInterface
         $this->options = $options;
     }
 
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
     /**
      * @todo Handle timePrecision parameter
      */
