@@ -53,6 +53,31 @@ $client = new Client();
 $client->setAdapter($adapter);
 ```
 
+### Create your client with the factory method
+
+Effectively the client creation is not so simple, for that
+reason you can you the factory method provided with the library.
+
+```
+$options = [
+    "adapter" => [
+        "name" => "InfluxDB\\Adapter\\GuzzleAdapter",
+        "options" => [
+            // guzzle options
+        ],
+    ],
+    "options" => [
+        "host" => "my.influx.domain.tld",
+    ],
+];
+$client = \InfluxDB\ClientFactory::create($options);
+
+$client->mark("error.404", ["page" => "/a-missing-page"]);
+```
+
+Of course you can always use the DiC or your service manager in
+order to create a valid client instance.
+
 ### Time Precision write/read queries
 
 You can set the `time_precision` for query query
