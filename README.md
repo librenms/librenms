@@ -5,6 +5,25 @@
 
 Send metrics to InfluxDB and query for any data.
 
+## Install it
+
+Just use composer
+
+```shell
+php composer.phar require corley/influxdb-sdk:dev-master
+```
+
+Or place it in your require section
+
+```json
+{
+  "require": {
+    // ...
+    "corley/influxdb-sdk": "dev-master"
+  }
+}
+```
+
 Add new points:
 
 ```php
@@ -58,7 +77,7 @@ $client->setAdapter($adapter);
 Effectively the client creation is not so simple, for that
 reason you can you the factory method provided with the library.
 
-```
+```php
 $options = [
     "adapter" => [
         "name" => "InfluxDB\\Adapter\\GuzzleAdapter",
@@ -146,52 +165,4 @@ $client->deleteDatabase("my.name"); // delete an existing database with name "my
 ```
 
 Actually only queryable adapters can handle databases (implements the `QueryableInterface`)
-
-## Install it
-
-Just use composer
-
-```shell
-php composer.phar require corley/influxdb-sdk:dev-master
-```
-
-Or place it in your require section
-
-```json
-{
-  "require": {
-    // ...
-    "corley/influxdb-sdk": "dev-master"
-  }
-}
-```
-
-
-## Prepare lib dependencies
-
-Use your DiC or Service Locator in order to provide a configured client
-
-```php
-<?php
-
-use InfluxDB\Client;
-use InfluxDB\Options;
-use InfluxDB\Adapter\GuzzleAdapter as InfluxHttpAdapter;
-use GuzzleHttp\Client as GuzzleHttpClient;
-
-$options = new Options();
-$options->setHost("analytics.mine.domain.tld");
-$options->setPort(8086);
-$options->setUsername("root");
-$options->setPassword("root");
-$options->setDatabase("mine");
-
-$guzzleHttp = new GuzzleHttpClient();
-$adapter = new InfluxHttpAdapter($guzzleHttp, $options);
-
-$influx = new Client();
-$influx->setAdapter($adapter);
-
-$influx->mark("tcp.test", ["mark" => "element"]);
-```
 
