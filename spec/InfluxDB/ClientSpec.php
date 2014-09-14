@@ -87,8 +87,8 @@ class ClientSpec extends ObjectBehavior
 
     function it_should_filter_returned_data(FilterInterface $filter, QueryableInterface $adapter)
     {
+        $adapter->query(Argument::Any(), Argument::Any())->willReturn(null);
         $filter->filter(Argument::Any())->shouldBeCalledTimes(1)->willReturn([]);
-        $adapter->query(Argument::Any(), Argument::Any())->willReturn([]);
 
         $this->setFilter($filter);
         $this->setAdapter($adapter);
