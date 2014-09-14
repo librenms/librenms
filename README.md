@@ -88,6 +88,11 @@ $options = [
     "options" => [
         "host" => "my.influx.domain.tld",
     ],
+    "filters" => [
+        "query" => [
+            "name" => "InfluxDB\\Filter\\ColumnsPointsFilter"
+        ],
+    ],
 ];
 $client = \InfluxDB\ClientFactory::create($options);
 
@@ -152,6 +157,31 @@ array(1) {
     }
   }
 }
+```
+
+By default data is returned as is. You can add filters in order to
+change a response as you prefer, by default this library carries a
+common filter that simplifies the response.
+
+```
+$client->setFilter(new ColumnsPointsFilter());
+
+$data = $client->query("select * from hd_used");
+```
+
+With the "ColumnsPointsFilter" you get a list of dictionaries,
+something like:
+
+```
+[
+    "serie_name" => [
+        [
+            "time" => 410545635590,
+            "sequence_number" => 390001,
+            "mark" => "element",
+        ],
+    ]
+]
 ```
 
 ## Database operations
