@@ -5,6 +5,25 @@
 
 Send metrics to InfluxDB and query for any data.
 
+## Install it
+
+Just use composer
+
+```shell
+php composer.phar require corley/influxdb-sdk:dev-master
+```
+
+Or place it in your require section
+
+```json
+{
+  "require": {
+    // ...
+    "corley/influxdb-sdk": "dev-master"
+  }
+}
+```
+
 Add new points:
 
 ```php
@@ -58,7 +77,7 @@ $client->setAdapter($adapter);
 Effectively the client creation is not so simple, for that
 reason you can you the factory method provided with the library.
 
-```
+```php
 $options = [
     "adapter" => [
         "name" => "InfluxDB\\Adapter\\GuzzleAdapter",
@@ -68,6 +87,11 @@ $options = [
     ],
     "options" => [
         "host" => "my.influx.domain.tld",
+    ],
+    "filters" => [
+        "query" => [
+            "name" => "InfluxDB\\Filter\\ColumnsPointsFilter"
+        ],
     ],
 ];
 $client = \InfluxDB\ClientFactory::create($options);
@@ -135,6 +159,31 @@ array(1) {
 }
 ```
 
+By default data is returned as is. You can add filters in order to
+change a response as you prefer, by default this library carries a
+common filter that simplifies the response.
+
+```
+$client->setFilter(new ColumnsPointsFilter());
+
+$data = $client->query("select * from hd_used");
+```
+
+With the "ColumnsPointsFilter" you get a list of dictionaries,
+something like:
+
+```
+[
+    "serie_name" => [
+        [
+            "time" => 410545635590,
+            "sequence_number" => 390001,
+            "mark" => "element",
+        ],
+    ]
+]
+```
+
 ## Database operations
 
 You can create, list or destroy databases using dedicated methods
@@ -146,52 +195,4 @@ $client->deleteDatabase("my.name"); // delete an existing database with name "my
 ```
 
 Actually only queryable adapters can handle databases (implements the `QueryableInterface`)
-
-## Install it
-
-Just use composer
-
-```shell
-php composer.phar require corley/influxdb-sdk:dev-master
-```
-
-Or place it in your require section
-
-```json
-{
-  "require": {
-    // ...
-    "corley/influxdb-sdk": "dev-master"
-  }
-}
-```
-
-
-## Prepare lib dependencies
-
-Use your DiC or Service Locator in order to provide a configured client
-
-```php
-<?php
-
-use InfluxDB\Client;
-use InfluxDB\Options;
-use InfluxDB\Adapter\GuzzleAdapter as InfluxHttpAdapter;
-use GuzzleHttp\Client as GuzzleHttpClient;
-
-$options = new Options();
-$options->setHost("analytics.mine.domain.tld");
-$options->setPort(8086);
-$options->setUsername("root");
-$options->setPassword("root");
-$options->setDatabase("mine");
-
-$guzzleHttp = new GuzzleHttpClient();
-$adapter = new InfluxHttpAdapter($guzzleHttp, $options);
-
-$influx = new Client();
-$influx->setAdapter($adapter);
-
-$influx->mark("tcp.test", ["mark" => "element"]);
-```
 

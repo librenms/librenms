@@ -12,6 +12,9 @@ abstract class ClientFactory
             "options" => [],
         ],
         "options" => [],
+        "filters" => [
+            "query" => false
+        ],
     ];
 
     public static function create(array $options)
@@ -41,6 +44,10 @@ abstract class ClientFactory
 
         $client = new Client();
         $client->setAdapter($adapter);
+
+        if ($options["filters"]["query"]) {
+            $client->setFilter(new $options["filters"]["query"]["name"]);
+        }
 
         return $client;
     }
