@@ -3,11 +3,23 @@
 namespace InfluxDB;
 
 use InfluxDb\Adapter\QueryableInterface;
-use InfluxDb\Adapter\ConnectableInterface;
+use InfluxDB\Filter\FilterInterface;
 
 class Client
 {
     private $adapter;
+    private $filter;
+
+    public function setFilter(Filter\FilterInterface $filter)
+    {
+        $this->filter = $filter;
+        return $this;
+    }
+
+    public function getFilter()
+    {
+        return $this->filter;
+    }
 
     public function setAdapter(Adapter\AdapterInterface $adapter)
     {
@@ -41,7 +53,13 @@ class Client
 
         $timePrecision = $this->clearTimePrecision($timePrecision);
 
-        return $this->getAdapter()->query($query, $timePrecision);
+        $return = $this->getAdapter()->query($query, $timePrecision);
+
+        if ($this->getFilter() instanceOf FilterInterface) {
+            $return = $this->getFilter()->filter($return);
+        }
+
+        return $return;
     }
 
     public function getDatabases()
