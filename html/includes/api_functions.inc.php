@@ -183,56 +183,6 @@ function authToken(\Slim\Route $route)
   }
 }
 
-function get_graph_by_id()
-{
-  // This will return a graph for a given port by the port id
-  global $config;
-  $app = \Slim\Slim::getInstance();
-  $router = $app->router()->getCurrentRoute()->getParams();
-  $vars = array();
-  $vars['id'] = $router['id'];
-  $vars['type'] = $router['type'] ?: 'port_bits';
-  if(!empty($router['from']))
-  {
-    $vars['from'] = $router['from'];
-  }
-  if(!empty($router['to']))
-  {
-    $vars['to'] = $router['to'];
-  }
-  $vars['width'] = $router['width'] ?: 1075;
-  $vars['height'] = $router['height'] ?: 300;
-  $auth = "1";
-  $app->response->headers->set('Content-Type', 'image/png');
-  require("includes/graphs/graph.inc.php");
-}
-
-function get_graph_by_port()
-{
-  // This will return a graph for a given port by the ifName
-  global $config;
-  $app = \Slim\Slim::getInstance();
-  $router = $app->router()->getCurrentRoute()->getParams();
-  $device_id = $router['id'];
-  $vars = array();
-  $vars['port'] = urldecode($router['port']);
-  $vars['type'] = $router['type'] ?: 'port_bits';
-  if(!empty($router['from']))
-  {
-    $vars['from'] = $router['from'];
-  }
-  if(!empty($router['to']))
-  {
-    $vars['to'] = $router['to'];
-  }
-  $vars['width'] = $router['width'] ?: 1075;
-  $vars['height'] = $router['height'] ?: 300;
-  $auth = "1";
-  $vars['id'] = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` WHERE `P`.`device_id`=? AND `P`.`ifName`=?", array($device_id,$vars['port']));
-  $app->response->headers->set('Content-Type', 'image/png');
-  require("includes/graphs/graph.inc.php");
-}
-
 function get_graph_by_port_hostname()
 {
   // This will return a graph for a given port by the ifName
@@ -241,73 +191,35 @@ function get_graph_by_port_hostname()
   $router = $app->router()->getCurrentRoute()->getParams();
   $hostname = $router['hostname'];
   $vars = array();
-  $vars['port'] = $router['port'];
+  $vars['port'] = $router['ifname'];
   $vars['type'] = $router['type'] ?: 'port_bits';
-  if(!empty($router['from']))
+  if(!empty($_GET['from']))
   {
-    $vars['from'] = $router['from'];
+    $vars['from'] = $_GET['from'];
   }
-  if(!empty($router['to']))
+  if(!empty($_GET['to']))
   {
-    $vars['to'] = $router['to'];
+    $vars['to'] = $_GET['to'];
   }
-  $vars['width'] = $router['width'] ?: 1075;
-  $vars['height'] = $router['height'] ?: 300;
+  $vars['width'] = $_GET['width'] ?: 1075;
+  $vars['height'] = $_GET['height'] ?: 300;
   $auth = "1";
   $vars['id'] = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`hostname`=? AND `P`.`ifName`=?", array($hostname,$vars['port']));
   $app->response->headers->set('Content-Type', 'image/png');
   require("includes/graphs/graph.inc.php");
 }
 
-function get_port_stats_by_id()
+function get_port_stats_by_port_hostname()
 {
-  // This will return port stats based on port id
+  // This will return port stats based on a devices hostname and ifName
   global $config;
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
-  $port_id = $router['id'];
-  $stats = dbFetchRow("SELECT * FROM `ports` WHERE `port_id`=?", array($port_id));
-  $output = array("status" => "ok", "port" => $stats); 
-  $app->response->headers->set('Content-Type', 'application/json');
-  echo _json_encode($output);  
-}
-
-function get_port_stats_by_port()
-{
-  // This will return port stats based on ifName
-  global $config;
-  $app = \Slim\Slim::getInstance();
-  $router = $app->router()->getCurrentRoute()->getParams();
-  $device_id = $router['id'];
-  $if_name = $router['port'];
-  $stats = dbFetchRow("SELECT * FROM `ports` WHERE `device_id`=? AND `ifName`=?", array($device_id,$if_name));
+  $ifName = $router['ifname'];
+  $stats = dbFetchRow("SELECT * FROM `ports` WHERE `ifName`=?", array($ifName));
   $output = array("status" => "ok", "port" => $stats);
   $app->response->headers->set('Content-Type', 'application/json');
   echo _json_encode($output);
-}
-
-function get_graph_generic_by_deviceid()
-{
-  // This will return a graph type given a device id.
-  global $config;
-  $app = \Slim\Slim::getInstance();
-  $router = $app->router()->getCurrentRoute()->getParams();
-  $vars = array();
-  $vars['device'] = $router['id'];
-    $vars['type'] = $router['type'] ?: 'port_bits';
-  if(!empty($router['from']))
-  {
-    $vars['from'] = $router['from'];
-  }
-  if(!empty($router['to']))
-  {
-    $vars['to'] = $router['to'];
-  }
-  $vars['width'] = $router['width'] ?: 1075;
-  $vars['height'] = $router['height'] ?: 300;
-  $auth = "1";
-  $app->response->headers->set('Content-Type', 'image/png');
-  require("includes/graphs/graph.inc.php");
 }
 
 function get_graph_generic_by_hostname()
@@ -318,17 +230,17 @@ function get_graph_generic_by_hostname()
   $router = $app->router()->getCurrentRoute()->getParams();
   $hostname = $router['hostname'];
   $vars = array();
-  $vars['type'] = $router['type'] ?: 'port_bits';
-  if(!empty($router['from']))
+  $vars['type'] = $router['type'] ?: 'device_uptime';
+  if(!empty($_GET['from']))
   {
-    $vars['from'] = $router['from'];
+    $vars['from'] = $_GET['from'];
   }
-  if(!empty($router['to']))
+  if(!empty($_GET['to']))
   {
-    $vars['to'] = $router['to'];
+    $vars['to'] = $_GET['to'];
   }
-  $vars['width'] = $router['width'] ?: 1075;
-  $vars['height'] = $router['height'] ?: 300;
+  $vars['width'] = $_GET['width'] ?: 1075;
+  $vars['height'] = $_GET['height'] ?: 300;
   $auth = "1";
   $vars['device'] = dbFetchCell("SELECT `D`.`device_id` FROM `devices` AS `D` WHERE `D`.`hostname`=?", array($hostname));
   $app->response->headers->set('Content-Type', 'image/png');
@@ -341,8 +253,8 @@ function list_devices()
   global $config;
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
-  $order = $router['order'];
-  $type = $router['type'];
+  $order = $_GET['order'];
+  $type = $_GET['type'];
   if(empty($order))
   {
     $order = "hostname";

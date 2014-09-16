@@ -24,36 +24,18 @@ include_once("../includes/rrdtool.inc.php");
 require 'includes/Slim/Slim.php';
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
-require_once("../includes/api_functions.inc.php");
+require_once("includes/api_functions.inc.php");
 $app->setName('api');
 
 $app->group('/api', function() use ($app) {
   $app->group('/v1', function() use ($app) {
-    $app->group('/get', function() use ($app) {
-      $app->group('/graph', function() use ($app) {
-        $app->group('/port', function() use ($app) {
-          $app->get('/id/:id(/:type)(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_by_id');//api/v1/get/graph/port/id/$port_id
-          $app->get('/device/:id/:port(/:type)(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_by_port');//api/v1/get/graph/port/device/$device_id/$ifName
-          $app->get('/hostname/:hostname/:port(/:type)(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_by_port_hostname');//api/v1/get/graph/port/device/$hostname/$ifName
-        });
-        $app->group('/general', function() use ($app) {
-          $app->get('/device/:id/:type(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_generic_by_deviceid');//api/v1/get/graph/general/device/$device_id/$graph_type
-          $app->get('/hostname/:hostname/:type(/:width)(/:height)(/:from)(/:to)(/)', 'authToken', 'get_graph_generic_by_hostname');//api/v1/get/graph/general/hostname/$hostname/$graph_type
-        });
-      });
-      $app->group('/stats', function() use ($app) {
-        $app->group('/port', function() use ($app) {
-          $app->get('/id/:id(/)', 'authToken', 'get_port_stats_by_id');//api/v1/get/stats/port/id/$port_id
-          $app->get('/device/:id/:port(/)', 'authToken', 'get_port_stats_by_port');//api/v1/get/stats/port/device/$device_id/$ifName
-        });
-      });
+    $app->group('/devices', function() use ($app) {
+      $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname');//api/v1/devices/$hostname/ports/$ifName/$type
+      $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname');//api/v1/devices/$hostname/$type
+      $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname');//api/v1/devices/$hostname/ports/$ifName
     });
-    $app->group('/list', function() use ($app) {
-      $app->get('/devices(/:order)(/:type)(/)', 'authToken', 'list_devices');//api/v1/list/devices (order can be any device column) (types = all, ignored, up, down, disabled)
-    });
-    $app->group('/add', function() use ($app) {
-      $app->post('/device(/)', 'authToken', 'add_device');//api/v1/add/device (json data needs to be passed)
-    });
+    $app->get('/devices', 'authToken', 'list_devices');//api/v1/devices
+    $app->post('/devices', 'authToken', 'add_device');//api/v1/devices (json data needs to be passed)
   });
 });
 
