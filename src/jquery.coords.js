@@ -7,8 +7,10 @@
  */
 
 ;(function(root, factory) {
-
-    if (typeof define === 'function' && define.amd) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require('jquery'));
+    }
+    else if (typeof define === 'function' && define.amd) {
         define('gridster-coords', ['jquery'], factory);
     } else {
        root.GridsterCoords = factory(root.$ || root.jQuery);
