@@ -1,6 +1,7 @@
 ;(function(root, factory) {
-
-    if (typeof define === 'function' && define.amd) {
+    if (typeof exports === 'object') {
+        module.exports = factory(require('jquery'), require('./jquery.gridster.js'));
+    } else if (typeof define === 'function' && define.amd) {
         define(['jquery', 'gridster'], factory);
     } else {
         root.Gridster = factory(root.$ || root.jQuery, root.Gridster);

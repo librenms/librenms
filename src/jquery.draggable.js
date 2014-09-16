@@ -7,8 +7,9 @@
  */
 
 ;(function(root, factory) {
-
-    if (typeof define === 'function' && define.amd) {
+    if (typeof exports === 'object') {
+        module.exports = factory(require('jquery'));
+    } else if (typeof define === 'function' && define.amd) {
         define('gridster-draggable', ['jquery'], factory);
     } else {
         root.GridsterDraggable = factory(root.$ || root.jQuery);
