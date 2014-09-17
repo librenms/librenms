@@ -343,7 +343,7 @@ function add_device()
   }
   if(empty($message))
   {
-    require_once("functions.php");
+    require_once("../includes/functions.php");
     $result = addHost($hostname, $snmpver, $port, $transport, 1);
     if($result)
     {
@@ -356,6 +356,44 @@ function add_device()
     }
   }
 
+  $output = array("status" => $status, "message" => $message);
+  $app->response->headers->set('Content-Type', 'application/json');
+  echo _json_encode($output);
+}
+
+
+function del_device()
+{
+  // This will add a device using the data passed encoded with json
+  global $config;
+  $app = \Slim\Slim::getInstance();
+  $router = $app->router()->getCurrentRoute()->getParams();
+  $hostname = $router['hostname'];
+  // Default status to error and change it if we need to.
+  $status = "error";
+  if(empty($hostname))
+  {
+    $message = "No hostname has been provided to delete this device";
+  }
+  elseif(empty($hostname))
+  {
+    $message = "Missing the device hostname";
+  }
+  if(empty($message))
+  {
+    require_once("../includes/functions.php");
+    $device_id = get_device_id($hostname);
+    $response = delete_device($device_id);
+    if(empty($response))
+    {
+      $message = "Device couldn't be deleted";
+    }
+    else
+    {
+      $message = $response;
+      $status = "ok";
+    }
+  }
   $output = array("status" => $status, "message" => $message);
   $app->response->headers->set('Content-Type', 'application/json');
   echo _json_encode($output);

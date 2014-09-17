@@ -193,6 +193,26 @@ if ($_SESSION['userlevel'] == '10')
         <tr>
           <td colspan="5"><code>curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' \<br />-H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v1/devices"</code></td>
         </tr>
+        <a name="delete"></a>
+        <tr class="success">
+          <td colspan="5"><strong>Delete</strong></td>
+        </tr>
+        <tr>
+          <td>/api</td>
+          <td>/v1</td>
+          <td>/devices/$hostname</td>
+          <td>
+            <ul class="list-unstyled">
+              <li>hostname = the hostname to be deleted</li>
+            </ul>
+          </td>
+          <td>
+            JSON
+          </td>
+        </tr>
+        <tr>
+          <td colspan="5"><code>curl -X DELETE -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v1/devices/localhost"</code></td>
+        </tr>
       </table>
     </div>
   </div>
@@ -211,6 +231,7 @@ if ($_SESSION['userlevel'] == '10')
             <li><a href="api-docs/#port_stats">Port Stats</a></li>
             <li><a href="api-docs/#list">List</a></li>
             <li><a href="api-docs/#add">Add</a></li>
+            <li><a href="api-docs/#delete">Delete</a></li>
           </ul>
         </li>
       </ul>

@@ -940,4 +940,26 @@ function validate_device_id($id)
   }
   return($return);
 }
+
+function get_device_id($hostname)
+{
+  global $config;
+  if(empty($hostname))
+  {
+    $return = false;
+  }
+  else
+  {
+    $device_id = dbFetchCell("SELECT `device_id` FROM `devices` WHERE `hostname` = ?", array($hostname));
+    if(empty($device_id))
+    {
+      $return = false;
+    }
+    else
+    {
+      $return = $device_id;
+    }
+  }
+  return $return;
+}
 ?>
