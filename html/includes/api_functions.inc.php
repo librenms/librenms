@@ -252,7 +252,6 @@ function list_devices()
   // This will return a list of devices
   global $config;
   $app = \Slim\Slim::getInstance();
-  $router = $app->router()->getCurrentRoute()->getParams();
   $order = $_GET['order'];
   $type = $_GET['type'];
   if(empty($order))
