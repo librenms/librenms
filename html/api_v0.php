@@ -28,7 +28,7 @@ require_once("includes/api_functions.inc.php");
 $app->setName('api');
 
 $app->group('/api', function() use ($app) {
-  $app->group('/v1', function() use ($app) {
+  $app->group('/v0', function() use ($app) {
     $app->group('/devices', function() use ($app) {
       $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname');//api/v1/devices/$hostname/ports/$ifName/$type
       $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname');//api/v1/devices/$hostname/$type
