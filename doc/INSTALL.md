@@ -90,11 +90,14 @@ Next, add the following to `/etc/apache2/sites-available/librenms.conf`:
       ServerName  librenms.example.com
       CustomLog /opt/librenms/logs/access_log combined
       ErrorLog /opt/librenms/logs/error_log
+      AllowEncodedSlashes On
       <Directory "/opt/librenms/html/">
         AllowOverride All
         Options FollowSymLinks MultiViews
       </Directory>
     </VirtualHost>
+
+If you are running Apache 2.2.18 or higher then change AllowEncodedSlashes to NoDecode
 
 If you have Apache 2.3 or newer then please add the following line before `AllowOverride All`:
 
