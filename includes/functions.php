@@ -252,7 +252,7 @@ function delete_device($id)
   return $ret;
 }
 
-function addHost($host, $snmpver, $port = '161', $transport = 'udp')
+function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0')
 {
   global $config;
 
@@ -297,7 +297,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp')
           foreach ($config['snmp']['v3'] as $v3)
           {
             $device = deviceArray($host, NULL, $snmpver, $port, $transport, $v3);
-            print_message("Trying v3 parameters " . $v3['authname'] . "/" .  $v3['authlevel'] . " ... ");
+            if($quiet == '0') { print_message("Trying v3 parameters " . $v3['authname'] . "/" .  $v3['authlevel'] . " ... "); }
             if (isSNMPable($device))
             {
               $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
@@ -306,10 +306,10 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp')
                 $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3);
                 return $device_id;
               } else {
-                print_error("Given hostname does not match SNMP-read hostname ($snmphost)!");
+                if($quiet == '0') {print_error("Given hostname does not match SNMP-read hostname ($snmphost)!"); }
               }
             } else {
-              print_error("No reply on credentials " . $v3['authname'] . "/" .  $v3['authlevel'] . " using $snmpver");
+              if($quiet == '0') {print_error("No reply on credentials " . $v3['authname'] . "/" .  $v3['authlevel'] . " using $snmpver"); }
             }
           }
         }
@@ -319,7 +319,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp')
           foreach ($config['snmp']['community'] as $community)
           {
             $device = deviceArray($host, $community, $snmpver, $port, $transport, NULL);
-            print_message("Trying community $community ...");
+            if($quiet == '0') { print_message("Trying community $community ..."); }
             if (isSNMPable($device))
             {
               $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
@@ -328,32 +328,34 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp')
                 $device_id = createHost ($host, $community, $snmpver, $port, $transport);
                 return $device_id;
               } else {
-                print_error("Given hostname does not match SNMP-read hostname ($snmphost)!");
+                if($quiet == '0') { print_error("Given hostname does not match SNMP-read hostname ($snmphost)!"); }
               }
             } else {
-              print_error("No reply on community $community using $snmpver");
+              if($quiet == '0') { print_error("No reply on community $community using $snmpver"); }
             }
           }
         }
         else
         {
-          print_error("Unsupported SNMP Version \"$snmpver\".");
+          if($quiet == '0') { print_error("Unsupported SNMP Version \"$snmpver\"."); }
         }
 
         if (!$device_id)
         {
           // Failed SNMP
-          print_error("Could not reach $host with given SNMP community using $snmpver");
+          if($quiet == '0') { print_error("Could not reach $host with given SNMP community using $snmpver"); }
         }
       } else {
         // failed Reachability
-        print_error("Could not ping $host"); }
+        if($quiet == '0') { print_error("Could not ping $host"); }
+      }
     } else {
       // Failed DNS lookup
-      print_error("$host looks like an IP address, please use FQDN"); }
+      if($quiet == '0') { print_error("$host looks like an IP address, please use FQDN"); }
+    }
   } else {
     // found in database
-    print_error("Already got host $host");
+    if($quiet == '0') { print_error("Already got host $host"); }
   }
 
   return 0;
@@ -937,5 +939,27 @@ function validate_device_id($id)
     }
   }
   return($return);
+}
+
+function get_device_id($hostname)
+{
+  global $config;
+  if(empty($hostname))
+  {
+    $return = false;
+  }
+  else
+  {
+    $device_id = dbFetchCell("SELECT `device_id` FROM `devices` WHERE `hostname` = ?", array($hostname));
+    if(empty($device_id))
+    {
+      $return = false;
+    }
+    else
+    {
+      $return = $device_id;
+    }
+  }
+  return $return;
 }
 ?>
