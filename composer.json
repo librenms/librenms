@@ -10,7 +10,8 @@
     },
     "require-dev": {
         "phpspec/phpspec": "2.*",
-        "phpunit/phpunit": "4.*"
+        "phpunit/phpunit": "4.*",
+        "athletic/athletic": "~0.1"
     },
     "homepage": "http://www.corley.it/",
     "keywords": ["influxdb", "udp", "sdk"],
@@ -30,7 +31,8 @@
     ],
     "autoload": {
         "psr-0": {
-            "InfluxDB\\": ["./src/", "./tests"]
+            "InfluxDB\\": ["./src/", "./tests"],
+            "Corley\\": ["./benchmarks/"]
         }
     },
     "suggests": {
