@@ -5,6 +5,35 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @group factory
+     *
+     * @expectedException InvalidArgumentException
+     */
+    public function testEmptyOptions()
+    {
+        $client = ClientFactory::create([]);
+    }
+
+    /**
+     * @group factory
+     */
+    public function testDefaultParams()
+    {
+        $client = ClientFactory::create(["adapter" => ["name" => "InfluxDB\\Adapter\\GuzzleAdapter"]]);
+
+        $this->assertNull($client->getFilter());
+    }
+
+    /**
+     * @group factory
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidAdapter()
+    {
+        $client = ClientFactory::create(["adapter" => ["name" => "UdpAdapter"]]);
+    }
+
+    /**
+     * @group factory
      * @group udp
      */
     public function testCreateUdpClient()
