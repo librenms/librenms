@@ -6,20 +6,20 @@ use GuzzleHttp\Client as GuzzleClient;
 
 abstract class ClientFactory
 {
-    private static $options = [
-        "adapter" => [
-            "name" => false,
-            "options" => [],
-        ],
-        "options" => [],
-        "filters" => [
-            "query" => false
-        ],
-    ];
-
     public static function create(array $options)
     {
-        $options = array_replace_recursive(self::$options, $options);
+        $defaultOptions = [
+            "adapter" => [
+                "name" => false,
+                "options" => [],
+            ],
+            "options" => [],
+            "filters" => [
+                "query" => false
+            ],
+        ];
+
+        $options = array_replace_recursive($defaultOptions, $options);
 
         $adapterName = $options["adapter"]["name"];
         if (!class_exists($adapterName)) {
