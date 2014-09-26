@@ -17,9 +17,6 @@ class UdpAdapter implements AdapterInterface
         return $this->options;
     }
 
-    /**
-     * @todo Handle timePrecision parameter
-     */
     public function send($message, $timePrecision = false)
     {
         $message = json_encode($message);

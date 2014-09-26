@@ -1,5 +1,4 @@
 <?php
-
 namespace InfluxDB\Adapter;
 
 use GuzzleHttp\Client;
@@ -9,7 +8,6 @@ class GuzzleAdapter implements AdapterInterface, QueryableInterface
 {
     private $httpClient;
     private $options;
-    private $database;
 
     public function __construct(Client $httpClient, Options $options)
     {
