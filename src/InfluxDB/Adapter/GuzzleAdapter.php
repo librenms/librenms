@@ -4,6 +4,8 @@ namespace InfluxDB\Adapter;
 
 use GuzzleHttp\Client;
 use InfluxDB\Options;
+use InfluxDb\Adapter\QueryableInterface;
+use InfluxDB\Adapter\AdapterInterface;
 
 class GuzzleAdapter implements AdapterInterface, QueryableInterface
 {
