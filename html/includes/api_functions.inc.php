@@ -255,37 +255,21 @@ function get_device()
   $router = $app->router()->getCurrentRoute()->getParams();
   $hostname = $router['hostname'];
 
-  // if the hostname is all digits, use the device_id instead of the name
-  $column = "hostname";
-  if (ctype_digit($hostname)) {
-    $column = "device_id";
-  }
+  require_once("../includes/functions.php");
 
-  // find devices matching the name/id
-  $devices = array();
-  // FIXME: user-based permissions
-  foreach (dbFetchRows("SELECT * FROM `devices` WHERE `".$column."`=?", array($hostname)) as $device)
-  {
-    $devices[] = $device;
-  }
+  // use hostname as device_id if it's all digits
+  $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
-  if (count($devices) == 0) {
-    // not found
+  // find device matching the id
+  $device = device_by_id_cache($device_id);
+  if (!$device) {
     $app->response->setStatus(404);
     $output = array("status" => "error", "message" => "Device $hostname does not exist");
     echo _json_encode($output);
     $app->stop();
   }
-  elseif (count($devices) > 1) {
-    // we got more than one device - something's weird
-    $app->response->setStatus(500);
-    $output = array("status" => "error", "message" => "Multiple devices matching $hostname", "devices" => $devices);
-    echo _json_encode($output);
-    $app->stop();
-  }
   else {
-    // not found
-    $output = array("status" => "ok", "devices" => $devices);
+    $output = array("status" => "ok", "devices" => array($device));
     echo _json_encode($output);
   }
 }
