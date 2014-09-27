@@ -331,6 +331,8 @@ function add_device()
   $data = json_decode(file_get_contents('php://input'), true);
   // Default status to error and change it if we need to.
   $status = "error";
+  // keep scrutinizer from complaining about snmpver not being set for all execution paths
+  $snmpver = "v2c";
   if(empty($data))
   {
     $message = "No information has been provided to add this new device";
