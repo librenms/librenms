@@ -343,8 +343,8 @@ function add_device()
     $message = "Missing the device hostname";
   }
   $hostname = $data['hostname'];
-  if ($data['port']) { $port = mres($data['port']); } else { $port = $config['snmp']['port']; }
-  if ($data['transport']) { $transport = mres($data['transport']); } else { $transport = "udp"; }
+  $port = $data['port'] ? mres($data['port']) : $config['snmp']['port'];
+  $transport = $data['transport'] ? mres($data['transport'] : "udp";
   if($data['version'] == "v1" || $data['version'] == "v2c")
   {
     if ($data['community'])
