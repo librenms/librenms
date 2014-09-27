@@ -104,7 +104,7 @@ echo("
   <div class='form-group'>
     <label for='authpass' class='col-sm-2 control-label'>Auth Password</label>
     <div class='col-sm-4'>
-      <input type='text' id='authpass' name='authpass' class='form-control' value='" . $device['authpass']  . "'>
+      <input type='password' id='authpass' name='authpass' class='form-control' value='" . $device['authpass']  . "'>
     </div>
   </div>
   <div class='form-group'>
@@ -119,7 +119,7 @@ echo("
   <div class='form-group'>
     <label for='cryptopass' class='col-sm-2 control-label'>Crypto Password</label>
     <div class='col-sm-4'>
-      <input type='text' id='cryptopass' name='cryptopass' class='form-control' value='" . $device['cryptopass']  . "'>
+      <input type='password' id='cryptopass' name='cryptopass' class='form-control' value='" . $device['cryptopass']  . "'>
     </div>
   </div>
   <div class='form-group'>
