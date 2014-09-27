@@ -341,21 +341,25 @@ function add_device()
   {
     $message = "You haven't specified an SNMP version to use";
   }
+  $code = 200;
   if(empty($message))
   {
     require_once("../includes/functions.php");
     $result = addHost($hostname, $snmpver, $port, $transport, 1);
     if($result)
     {
-      $status = 'ok';
-      $message = 'Device has been added successfully';
+      $status = "ok";
+      $message = "Device $hostname has been added successfully";
     }
     else
     {
+      $code = 500;
+      $status = "error";
       $message = "Failed adding $hostname";
     }
   }
 
+  $app->response->setStatus($code);
   $output = array("status" => $status, "message" => $message);
   $app->response->headers->set('Content-Type', 'application/json');
   echo _json_encode($output);
