@@ -368,7 +368,7 @@ function add_device()
   {
     $message = "You haven't specified an SNMP version to use";
   }
-  $code = 200;
+  $code = 201;
   if(empty($message))
   {
     require_once("../includes/functions.php");
