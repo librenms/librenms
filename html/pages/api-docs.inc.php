@@ -90,6 +90,24 @@ if ($_SESSION['userlevel'] == '10')
         <tr>
           <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/ports/eth0/port_bits?width=1024&height=768&from=1405457456&to=1405543856" > /tmp/graph.png</code></td>
         </tr>
+        <a name="general_info"></a>
+        <tr class="success">
+          <td colspan="5"><strong>General Info</strong></td>
+        </tr>
+        <tr>
+          <td>/api</td>
+          <td>/v0</td>
+          <td>/devices/$hostname</td>
+          <td>
+            <ul class="list-unstyled">
+              <li>$hostname = the hostname of the device you want the information about</li>
+            </ul>
+          </td>
+          <td>JSON</td>
+        </tr>
+        <tr>
+          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost" > localhost.json</code></td>
+        </tr>
         <a name="general_graphs"></a>
         <tr class="success">
           <td colspan="5"><strong>General Graphs</strong></td>
