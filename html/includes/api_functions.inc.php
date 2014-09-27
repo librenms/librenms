@@ -416,32 +416,47 @@ function del_device()
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
   $hostname = $router['hostname'];
+  $output = array();
   // Default status to error and change it if we need to.
   $status = "error";
+  $code = 500;
   if(empty($hostname))
   {
-    $message = "No hostname has been provided to delete this device";
+    $message = "No hostname has been provided to delete";
+    $output = array("status" => $status, "message" => $message);
   }
-  elseif(empty($hostname))
-  {
-    $message = "Missing the device hostname";
-  }
-  if(empty($message))
+  else
   {
     require_once("../includes/functions.php");
-    $device_id = get_device_id($hostname);
-    $response = delete_device($device_id);
-    if(empty($response))
-    {
-      $message = "Device couldn't be deleted";
+
+    // allow deleting by device_id or hostname
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = null;
+    if ($device_id) {
+      // save the current details for returning to the client on successful delete
+      $device = device_by_id_cache($device_id);
     }
-    else
-    {
-      $message = $response;
-      $status = "ok";
+    if ($device) {
+      $response = delete_device($device_id);
+      if(empty($response)) {
+	// FIXME: Need to provide better diagnostics out of delete_device
+	$output = array("status" => $status, "message" => "Device deletion failed");
+      }
+      else {
+	// deletion succeeded - include old device details in response
+	$code = 200;
+	$status = "ok";
+	$output = array("status" => $status, "message" => $response, "devices" => array($device));
+      }
+    }
+    else {
+      // no device matching the name
+      $code = 404;
+      $output = array("status" => $status, "message" => "Device $hostname not found");
     }
   }
-  $output = array("status" => $status, "message" => $message);
+
+  $app->response->setStatus($code);
   $app->response->headers->set('Content-Type', 'application/json');
   echo _json_encode($output);
 }

@@ -248,7 +248,7 @@ function delete_device($id)
 
   shell_exec("rm -rf ".trim($config['rrd_dir'])."/$host");
 
-  $ret = "Removed device $host\n";
+  $ret = "Removed device $host";
   return $ret;
 }
 
