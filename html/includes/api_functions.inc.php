@@ -330,8 +330,9 @@ function add_device()
   global $config;
   $app = \Slim\Slim::getInstance();
   $data = json_decode(file_get_contents('php://input'), true);
-  // Default status to error and change it if we need to.
+  // Default status & code to error and change it if we need to.
   $status = "error";
+  $code = 500;
   // keep scrutinizer from complaining about snmpver not being set for all execution paths
   $snmpver = "v2c";
   if(empty($data))
@@ -385,8 +386,6 @@ function add_device()
     }
     else
     {
-      $code = 500;
-      $status = "error";
       $message = "Failed adding $hostname";
     }
   }
@@ -405,7 +404,6 @@ function del_device()
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
   $hostname = $router['hostname'];
-  $output = array();
   // Default status to error and change it if we need to.
   $status = "error";
   $code = 500;
