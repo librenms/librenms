@@ -326,6 +326,7 @@ function list_devices()
 function add_device()
 {
   // This will add a device using the data passed encoded with json
+  // FIXME: Execution flow through this function could be improved
   global $config;
   $app = \Slim\Slim::getInstance();
   $data = json_decode(file_get_contents('php://input'), true);
@@ -368,15 +369,17 @@ function add_device()
   }
   else
   {
+    $code = 400;
+    $status = "error";
     $message = "You haven't specified an SNMP version to use";
   }
-  $code = 201;
   if(empty($message))
   {
     require_once("../includes/functions.php");
     $result = addHost($hostname, $snmpver, $port, $transport, 1);
     if($result)
     {
+      $code = 201;
       $status = "ok";
       $message = "Device $hostname has been added successfully";
     }
