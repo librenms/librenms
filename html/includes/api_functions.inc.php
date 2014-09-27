@@ -345,7 +345,7 @@ function add_device()
   }
   $hostname = $data['hostname'];
   $port = $data['port'] ? mres($data['port']) : $config['snmp']['port'];
-  $transport = $data['transport'] ? mres($data['transport'] : "udp";
+  $transport = $data['transport'] ? mres($data['transport']) : "udp";
   if($data['version'] == "v1" || $data['version'] == "v2c")
   {
     if ($data['community'])
