@@ -35,10 +35,10 @@ foreach (explode("\n", $ipNetToMedia_data) as $data)
       //$sql = "UPDATE `ipv4_mac` SET `mac_address` = '$clean_mac' WHERE port_id = '".$interface['port_id']."' AND ipv4_address = '$ip'";
       $old_mac = dbFetchCell("SELECT mac_address from ipv4_mac WHERE ipv4_address=? AND port_id=?",array($ip,$interface['port_id']));
 
-      if ($clean_mac != $old_mac[0] && $clean_mac != '' && $old_mac[0] != '')
+      if ($clean_mac != $old_mac && $clean_mac != '' && $old_mac != '')
       {
-        if ($debug) { echo("Changed mac address for $ip from $old_mac[0] to $clean_mac\n"); }
-        log_event("MAC change: $ip : " . mac_clean_to_readable($old_mac[0]) . " -> " . mac_clean_to_readable($clean_mac), $device, "interface", $interface['port_id']);
+        if ($debug) { echo("Changed mac address for $ip from $old_mac to $clean_mac\n"); }
+        log_event("MAC change: $ip : " . mac_clean_to_readable($old_mac) . " -> " . mac_clean_to_readable($clean_mac), $device, "interface", $interface['port_id']);
       }
       dbUpdate(array('mac_address' => $clean_mac), 'ipv4_mac', 'port_id=? AND ipv4_address=?',array($interface['port_id'],$ip));
       echo(".");
