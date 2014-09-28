@@ -67,7 +67,7 @@ if ($_SESSION['userlevel'] == '10')
         </tr>
         <tr>
           <td>/api</td>
-          <td>/v1</td>
+          <td>/v0</td>
           <td>/devices/$hostname/ports/$ifName/$type</td>
           <td>
             <ul class="list-unstyled">
@@ -85,10 +85,28 @@ if ($_SESSION['userlevel'] == '10')
           </td>
         </tr>
         <tr>
-          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v1/devices/localhost/ports/eth0/port_bits" > /tmp/graph.png</code></td>
+          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/ports/eth0/port_bits" > /tmp/graph.png</code></td>
         </tr>
         <tr>
-          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v1/devices/localhost/ports/eth0/port_bits?width=1024&height=768&from=1405457456&to=1405543856" > /tmp/graph.png</code></td>
+          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/ports/eth0/port_bits?width=1024&height=768&from=1405457456&to=1405543856" > /tmp/graph.png</code></td>
+        </tr>
+        <a name="general_info"></a>
+        <tr class="success">
+          <td colspan="5"><strong>General Info</strong></td>
+        </tr>
+        <tr>
+          <td>/api</td>
+          <td>/v0</td>
+          <td>/devices/$hostname</td>
+          <td>
+            <ul class="list-unstyled">
+              <li>$hostname = the hostname of the device you want the information about</li>
+            </ul>
+          </td>
+          <td>JSON</td>
+        </tr>
+        <tr>
+          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost" > localhost.json</code></td>
         </tr>
         <a name="general_graphs"></a>
         <tr class="success">
@@ -96,7 +114,7 @@ if ($_SESSION['userlevel'] == '10')
         </tr>
         <tr>
           <td>/api</td>
-          <td>/v1</td>
+          <td>/v0</td>
           <td>/devices/$hostname/$type</td>
           <td>
             <ul class="list-unstyled">
@@ -113,10 +131,10 @@ if ($_SESSION['userlevel'] == '10')
           </td>
         </tr>
         <tr>
-          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v1/devices/localhost/device_processor" > /tmp/graph.png</code></td>
+          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/device_processor" > /tmp/graph.png</code></td>
         </tr>
         <tr>
-          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v1/devices/localhost/device_processor?width=1024&height=768&from=1405457456&to=1405543856" > /tmp/graph.png</code></td>
+          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/device_processor?width=1024&height=768&from=1405457456&to=1405543856" > /tmp/graph.png</code></td>
         </tr>
         <a name="port_stats"></a>
         <tr class="success">
@@ -124,7 +142,7 @@ if ($_SESSION['userlevel'] == '10')
         </tr>
         <tr>
           <td>/api</td>
-          <td>/v1</td>
+          <td>/v0</td>
           <td>/devices/$hostname/ports/$ifName</td>
           <td>
             <ul class="list-unstyled">
@@ -137,7 +155,7 @@ if ($_SESSION['userlevel'] == '10')
           </td>
         </tr>
         <tr>
-          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v1/devices/localhost/ports/eth0"</code></td>
+          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/ports/eth0"</code></td>
         </tr>
         <a name="list"></a>
         <tr class="success">
@@ -145,8 +163,8 @@ if ($_SESSION['userlevel'] == '10')
         </tr>
         <tr>
           <td>/api</td>
-          <td>/v1</td>
-          <td>/list/devices</td>
+          <td>/v0</td>
+          <td>/devices</td>
           <td>
             <ul class="list-unstyled">
               <li>$order = the name of the column to order by</li>
@@ -158,10 +176,10 @@ if ($_SESSION['userlevel'] == '10')
           </td>
         </tr>
         <tr>
-          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v1/devices"</code></td>
+          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices"</code></td>
         </tr>
         <tr>
-          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v1/devices?order=hostname&type=all"</code></td>
+          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices?order=hostname&type=all"</code></td>
         </tr>
         <a name="add"></a>
         <tr class="success">
@@ -169,7 +187,7 @@ if ($_SESSION['userlevel'] == '10')
         </tr>
         <tr>
           <td>/api</td>
-          <td>/v1</td>
+          <td>/v0</td>
           <td>/devices</td>
           <td>
             <ul class="list-unstyled">
@@ -191,7 +209,7 @@ if ($_SESSION['userlevel'] == '10')
           </td>
         </tr>
         <tr>
-          <td colspan="5"><code>curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' \<br />-H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v1/devices"</code></td>
+          <td colspan="5"><code>curl -X POST -d '{"hostname":"localhost.localdomain","version":"v0","community":"public"}' \<br />-H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices"</code></td>
         </tr>
         <a name="delete"></a>
         <tr class="success">
@@ -199,7 +217,7 @@ if ($_SESSION['userlevel'] == '10')
         </tr>
         <tr>
           <td>/api</td>
-          <td>/v1</td>
+          <td>/v0</td>
           <td>/devices/$hostname</td>
           <td>
             <ul class="list-unstyled">
@@ -211,7 +229,7 @@ if ($_SESSION['userlevel'] == '10')
           </td>
         </tr>
         <tr>
-          <td colspan="5"><code>curl -X DELETE -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v1/devices/localhost"</code></td>
+          <td colspan="5"><code>curl -X DELETE -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost"</code></td>
         </tr>
       </table>
     </div>
