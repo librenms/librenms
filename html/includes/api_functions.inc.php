@@ -176,8 +176,8 @@ function authToken(\Slim\Route $route)
 
   if($authenticated === false)
   {
-    $app->response->setStatus(400);
-    $output = array("status" => "error", "message" => "API Token is invalid");
+    $app->response->setStatus(403);
+    $output = array("status" => "error", "message" => "API Token is missing or invalid; please supply a valid token");
     echo _json_encode($output);
     $app->stop();
   }
@@ -247,6 +247,33 @@ function get_graph_generic_by_hostname()
   require("includes/graphs/graph.inc.php");
 }
 
+function get_device()
+{
+  // return details of a single device
+  $app = \Slim\Slim::getInstance();
+  $app->response->headers->set('Content-Type', 'application/json');
+  $router = $app->router()->getCurrentRoute()->getParams();
+  $hostname = $router['hostname'];
+
+  require_once("../includes/functions.php");
+
+  // use hostname as device_id if it's all digits
+  $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+  // find device matching the id
+  $device = device_by_id_cache($device_id);
+  if (!$device) {
+    $app->response->setStatus(404);
+    $output = array("status" => "error", "message" => "Device $hostname does not exist");
+    echo _json_encode($output);
+    $app->stop();
+  }
+  else {
+    $output = array("status" => "ok", "devices" => array($device));
+    echo _json_encode($output);
+  }
+}
+
 function list_devices()
 {
   // This will return a list of devices
@@ -299,11 +326,15 @@ function list_devices()
 function add_device()
 {
   // This will add a device using the data passed encoded with json
+  // FIXME: Execution flow through this function could be improved
   global $config;
   $app = \Slim\Slim::getInstance();
   $data = json_decode(file_get_contents('php://input'), true);
-  // Default status to error and change it if we need to.
+  // Default status & code to error and change it if we need to.
   $status = "error";
+  $code = 500;
+  // keep scrutinizer from complaining about snmpver not being set for all execution paths
+  $snmpver = "v2c";
   if(empty($data))
   {
     $message = "No information has been provided to add this new device";
@@ -313,8 +344,8 @@ function add_device()
     $message = "Missing the device hostname";
   }
   $hostname = $data['hostname'];
-  if ($data['port']) { $port = mres($data['port']); } else { $port = $config['snmp']['port']; }
-  if ($data['transport']) { $transport = mres($data['transport']); } else { $transport = "udp"; }
+  $port = $data['port'] ? mres($data['port']) : $config['snmp']['port'];
+  $transport = $data['transport'] ? mres($data['transport']) : "udp";
   if($data['version'] == "v1" || $data['version'] == "v2c")
   {
     if ($data['community'])
@@ -339,6 +370,8 @@ function add_device()
   }
   else
   {
+    $code = 400;
+    $status = "error";
     $message = "You haven't specified an SNMP version to use";
   }
   if(empty($message))
@@ -347,8 +380,9 @@ function add_device()
     $result = addHost($hostname, $snmpver, $port, $transport, 1);
     if($result)
     {
-      $status = 'ok';
-      $message = 'Device has been added successfully';
+      $code = 201;
+      $status = "ok";
+      $message = "Device $hostname has been added successfully";
     }
     else
     {
@@ -356,6 +390,7 @@ function add_device()
     }
   }
 
+  $app->response->setStatus($code);
   $output = array("status" => $status, "message" => $message);
   $app->response->headers->set('Content-Type', 'application/json');
   echo _json_encode($output);
@@ -371,30 +406,44 @@ function del_device()
   $hostname = $router['hostname'];
   // Default status to error and change it if we need to.
   $status = "error";
+  $code = 500;
   if(empty($hostname))
   {
-    $message = "No hostname has been provided to delete this device";
+    $message = "No hostname has been provided to delete";
+    $output = array("status" => $status, "message" => $message);
   }
-  elseif(empty($hostname))
-  {
-    $message = "Missing the device hostname";
-  }
-  if(empty($message))
+  else
   {
     require_once("../includes/functions.php");
-    $device_id = get_device_id($hostname);
-    $response = delete_device($device_id);
-    if(empty($response))
-    {
-      $message = "Device couldn't be deleted";
+
+    // allow deleting by device_id or hostname
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = null;
+    if ($device_id) {
+      // save the current details for returning to the client on successful delete
+      $device = device_by_id_cache($device_id);
     }
-    else
-    {
-      $message = $response;
-      $status = "ok";
+    if ($device) {
+      $response = delete_device($device_id);
+      if(empty($response)) {
+	// FIXME: Need to provide better diagnostics out of delete_device
+	$output = array("status" => $status, "message" => "Device deletion failed");
+      }
+      else {
+	// deletion succeeded - include old device details in response
+	$code = 200;
+	$status = "ok";
+	$output = array("status" => $status, "message" => $response, "devices" => array($device));
+      }
+    }
+    else {
+      // no device matching the name
+      $code = 404;
+      $output = array("status" => $status, "message" => "Device $hostname not found");
     }
   }
-  $output = array("status" => $status, "message" => $message);
+
+  $app->response->setStatus($code);
   $app->response->headers->set('Content-Type', 'application/json');
   echo _json_encode($output);
 }
