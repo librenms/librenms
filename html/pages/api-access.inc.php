@@ -16,24 +16,105 @@ if ($_SESSION['userlevel'] == '10')
 {
 ?>
   <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-sm">
       <div class="modal-content">          
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
           <h5 class="modal-title" id="Delete">Confirm Delete</h5>
         </div>
         <div class="modal-body">
-          <p>If you would like to remove the API token for then please click Delete.</p>
+          <p>If you would like to remove the API token then please click Delete.</p>
         </div>        
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <a href="#" class="btn btn-danger danger">Delete</a>
+          <form role="form" class="remove_token_form">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger danger" id="token-removal" data-target="token-removal">Delete</button>
+            <input type="hidden" name="token_id" id="token_id" value="">
+            <input type="hidden" name="type" id="type" value="token-item-remove">
+            <input type="hidden" name="confirm" id="confirm" value="yes">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade bs-example-modal-sm" id="create-token" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h5 class="modal-title" id="Create">Create new API Access token</h5>
+        </div>
+        <div class="modal-body">
+          <form role="form" class="form-horizontal create_token_form">
+            <div class="form-group">
+              <label for="user_id" class="col-sm-2 control-label">User: </label>
+              <div class="col-sm-4">
+                <select class="form-control" id="user_id" name="user_id">
+<?php
+
+foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'", array()) as $users)
+{
+  echo('<option value="'.$users['user_id'].'">'.$users['username'].'</option>');
+}
+
+?>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="token" class="col-sm-2 control-label">Token: </label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="token" name="token" value="<?php echo $_POST['token'];?>">
+              </div>
+              <div class="col-sm-2">
+                <button type="button" class="btn btn-success btn-sm" name="pass-gen" id="pass-gen">Generate</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="description" class="col-sm-2 control-label">Descr: </label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="description" name="description" value="<?php echo $_POST['description'];?>">
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <div class="form-group">
+            <div class="col-sm-4">
+              <input type="hidden" name="type" id="type" value="token-item-create">
+              <button type="submit" class="btn btn-success" name="token-create" id="token-create">Create API Token</button>
+            </div>
+          </div>
+          </form>
         </div>
       </div>
     </div>
   </div>
 <?php
   echo('
+  <div class="row">
+    <div class="col-md-12">
+      <span id="thanks"></span>
+    </div>
+  </div>
+');
+  if($_SESSION['api_token'] === TRUE)
+  {
+    echo("<script>
+      $('#thanks').html('<div class=\"alert alert-info\">The API token has been added.</div>');</script>
+    ");
+    unset($_SESSION['api_token']);
+  }
+echo('
+  <div class="row">
+    <div class="col-sm-2">
+      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-token">Create API access token</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      &nbsp;
+    </div>
+  </div>
   <div class="row">
     <div class="col-sm-6">
       <table class="table table-bordered table-condensed">
@@ -57,12 +138,12 @@ if ($_SESSION['userlevel'] == '10')
       $api_disabled = '';
     }
     echo('
-        <tr>
+        <tr id="'.$api['id'].'">
           <td>'.$api['username'].'</td>
           <td>'.$api['token_hash'].'</td>
           <td>'.$api['description'].'</td>
           <td><input type="checkbox" name="token-status" data-token_id="'.$api['id'].'" data-off-text="No" data-on-text="Yes" data-on-color="danger" '.$api_disabled.' data-size="mini"></td>
-          <td><a href="" class="btn btn-primary btn-xs" role="button" data-toggle="modal" data-target="#confirm-delete">Delete</a></td>
+          <td><button type="button" class="btn btn-primary btn-xs" id="'.$api['id'].'" data-token_id="'.$api['id'].'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
         </tr>
 ');
   }
@@ -93,8 +174,51 @@ if ($_SESSION['userlevel'] == '10')
     });
   });
   $('#confirm-delete').on('show.bs.modal', function(e) {
-    $(this).find('.danger').attr('href', $(e.relatedTarget).data('href'));        
-    $('.debug-url').html('Delete URL: <strong>' + $(this).find('.danger').attr('href') + '</strong>');
+    token_id = $(e.relatedTarget).data('token_id');
+    $("#token_id").val(token_id);
+    event.preventDefault();
+  });
+  $('#token-removal').click('', function(e) {
+    event.preventDefault();
+    token_id = $("#token_id").val();
+    $.ajax({
+      type: "POST",
+      url: "/ajax_form.php",
+      data: $('form.remove_token_form').serialize() ,
+      success: function(msg){
+        $("#thanks").html('<div class="alert alert-info">'+msg+'</div>');
+        $("#confirm-delete").modal('hide');
+        $("#"+token_id).remove();
+      },
+      error: function(){
+        $("#thanks").html('<div class="alert alert-info">An error occurred removing the token.</div>');
+        $("#confirm-delete").modal('hide');
+      }
+    });
+  });
+  $('#token-create').click('', function(e) {
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "/ajax_form.php",
+      data: $('form.create_token_form').serialize(),
+      success: function(msg){
+        $("#thanks").html('<div class="alert alert-info">'+msg+'</div>');
+        $("#create-token").modal('hide');
+        if(msg.indexOf("ERROR:") <= -1) {
+          location.reload();
+        }
+      },
+      error: function(){
+        $("#thanks").html('<div class="alert alert-info">An error occurred removing the token.</div>');
+        $("#create-token").modal('hide');
+      }
+    });
+  });
+  $('#pass-gen').click('', function(e) {
+    event.preventDefault();
+    token = $.password(32,false);
+    $('#token').val(token);
   });
 </script>
 
