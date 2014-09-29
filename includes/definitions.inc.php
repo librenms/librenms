@@ -1060,7 +1060,10 @@ $config['graph_types']['device']['uptime']['order'] = '0';
 $config['graph_types']['device']['uptime']['descr'] = 'System Uptime';
 $config['graph_types']['device']['poller_perf']['section'] = 'poller';
 $config['graph_types']['device']['poller_perf']['order'] = '0';
-$config['graph_types']['device']['poller_perf']['descr'] = 'Poller Performance';
+$config['graph_types']['device']['poller_perf']['descr'] = 'Poller Time';
+$config['graph_types']['device']['ping_perf']['section'] = 'poller';
+$config['graph_types']['device']['ping_perf']['order'] = '0';
+$config['graph_types']['device']['ping_perf']['descr'] = 'Ping Response';
 
 $config['graph_types']['device']['vpdn_sessions_l2tp']['section'] = 'vpdn';
 $config['graph_types']['device']['vpdn_sessions_l2tp']['order'] = '0';

@@ -459,23 +459,33 @@ function isSNMPable($device)
   }
 }
 
-function isPingable($hostname)
+function isPingable($hostname,$device_id)
 {
    global $config;
 
-   $status = shell_exec($config['fping'] . " $hostname 2>/dev/null");
+   $status = shell_exec($config['fping'] . " -e $hostname 2>/dev/null");
    if (strstr($status, "alive"))
    {
-     return TRUE;
+     if(is_numeric($device_id) && !empty($device_id))
+     {
+       preg_match('/(\d+\.*\d*) (ms)/', $status, $time);
+       $response['last_ping_timetaken'] = $time[1];
+       $response['result'] = TRUE;
+     }
+     else
+     {
+       $response['result'] = TRUE;
+     }
    } else {
      $status = shell_exec($config['fping6'] . " $hostname 2>/dev/null");
      if (strstr($status, "alive"))
      {
-       return TRUE;
+       $response['result'] = TRUE;
      } else {
-       return FALSE;
+       $response['result'] = FALSE;
      }
    }
+   return($response);
 }
 
 function is_odd($number)
