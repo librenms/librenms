@@ -3,8 +3,8 @@ $.extend({
     var iteration = 0;
     var password = "";
     var randomNumber;
-    if(special == undefined){
-        var special = false;
+    if(special === undefined){
+        special = false;
     }
     while(iteration < length){
         randomNumber = (Math.floor((Math.random() * 100)) % 94) + 33;
