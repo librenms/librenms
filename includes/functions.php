@@ -466,24 +466,20 @@ function isPingable($hostname,$device_id)
    $status = shell_exec($config['fping'] . " -e $hostname 2>/dev/null");
    if (strstr($status, "alive"))
    {
-     if(is_numeric($device_id) && !empty($device_id))
-     {
-       preg_match('/(\d+\.*\d*) (ms)/', $status, $time);
-       $response['last_ping_timetaken'] = $time[1];
-       $response['result'] = TRUE;
-     }
-     else
-     {
-       $response['result'] = TRUE;
-     }
+     $response['result'] = TRUE;
    } else {
-     $status = shell_exec($config['fping6'] . " $hostname 2>/dev/null");
+     $status = shell_exec($config['fping6'] . " -e $hostname 2>/dev/null");
      if (strstr($status, "alive"))
      {
        $response['result'] = TRUE;
      } else {
        $response['result'] = FALSE;
      }
+   }
+   if(is_numeric($device_id) && !empty($device_id))
+   {
+     preg_match('/(\d+\.*\d*) (ms)/', $status, $time);
+     $response['last_ping_timetaken'] = $time[1];
    }
    return($response);
 }
