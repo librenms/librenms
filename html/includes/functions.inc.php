@@ -186,7 +186,7 @@ function overlib_link($url, $text, $contents, $class)
 
   $contents = str_replace("\"", "\'", $contents);
   $output = '<a class="'.$class.'" href="'.$url.'"';
-  $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">";
+  $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].", WRAP,HAUTO,VAUTO);\" onmouseout=\"return nd();\">";
   $output .= $text."</a>";
 
   return $output;
