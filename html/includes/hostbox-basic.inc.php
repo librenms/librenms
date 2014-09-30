@@ -25,6 +25,7 @@ $type = strtolower($device['os']);
 
 if ($device['os'] == "ios") { formatCiscoHardware($device, true); }
 $device['os_text'] = $config['os'][$device['os']]['text'];
+$image = getImage($device);
 
 echo('  <tr onclick="location.href=\'device/'.$device['device_id'].'/\'" style="cursor: pointer;">
           <td class="'. $class .' "></td>
