@@ -72,7 +72,7 @@ if ($_SESSION['userlevel'] == '10')
           <td>
             <ul class="list-unstyled">
               <li>$hostname = the hostname of the device you want the graph for</li>
-              <li>urlencode($ifName) = The ifName of the interface you want a graph for</li>
+              <li>$ifName = The ifName of the interface you want a graph for</li>
               <li>$type = the type of graph for the port (port_bits,port_upkts)</li>
               <li>$width = the width of the graph to be returned</li>
               <li>$height = the height of the graph to be returned</li>
@@ -147,7 +147,7 @@ if ($_SESSION['userlevel'] == '10')
           <td>
             <ul class="list-unstyled">
               <li>$hostname = the hostname of the device</li>
-              <li>urlencode($ifName) = the ifName of the port</li>
+              <li>$ifName = the ifName of the port</li>
             </ul>
           </td>
           <td>
