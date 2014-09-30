@@ -459,11 +459,12 @@ function isSNMPable($device)
   }
 }
 
-function isPingable($hostname,$device_id)
+function isPingable($hostname,$device_id = FALSE)
 {
    global $config;
 
    $status = shell_exec($config['fping'] . " -e $hostname 2>/dev/null");
+   $response = array();
    if (strstr($status, "alive"))
    {
      $response['result'] = TRUE;
