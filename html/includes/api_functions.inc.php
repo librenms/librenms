@@ -191,7 +191,7 @@ function get_graph_by_port_hostname()
   $router = $app->router()->getCurrentRoute()->getParams();
   $hostname = $router['hostname'];
   $vars = array();
-  $vars['port'] = urldecode($router['ifname']);
+  $vars['port'] = $router['ifname'];
   $vars['type'] = $router['type'] ?: 'port_bits';
   if(!empty($_GET['from']))
   {
@@ -215,7 +215,7 @@ function get_port_stats_by_port_hostname()
   global $config;
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
-  $ifName = urldecode($router['ifname']);
+  $ifName = $router['ifname'];
   $stats = dbFetchRow("SELECT * FROM `ports` WHERE `ifName`=?", array($ifName));
   $output = array("status" => "ok", "port" => $stats);
   $app->response->headers->set('Content-Type', 'application/json');
