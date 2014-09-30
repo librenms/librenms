@@ -130,6 +130,7 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/toastr.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
@@ -153,6 +154,7 @@ if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['fav
     // End -->
   </script>
   <script type="text/javascript" src="js/overlib_mini.js"></script>
+  <script type="text/javascript" src="js/toastr.min.js"></script>
 </head>
 <body>
 
@@ -297,5 +299,19 @@ echo('        Copyright &copy; 2006-2012 by Adam Armstrong.');
     </div>
   </div>
 </footer>
+<?php
+
+if(is_array($msg_box)) {
+  echo("<script>
+toastr.options.timeout = 10;
+toastr.options.extendedTimeOut = 20;
+");
+  foreach ($msg_box as $message) {
+    echo "toastr.".$message['type']."('".$message['message']."','".$message['title']."');\n";
+  }
+  echo("</script>");
+}
+
+?>
 </body>
 </html>
