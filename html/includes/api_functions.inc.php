@@ -447,3 +447,32 @@ function del_device()
   $app->response->headers->set('Content-Type', 'application/json');
   echo _json_encode($output);
 }
+
+function get_vlans() {
+  // This will list all vlans for a given device
+  global $config;
+  $app = \Slim\Slim::getInstance();
+  $router = $app->router()->getCurrentRoute()->getParams();
+  $hostname = $router['hostname'];
+  $status = "error";
+  $code = 500;
+  if(empty($hostname)) {
+    $output = $output = array("status" => "error", "message" => "No hostname has been provided");
+  } else {
+    require_once("../includes/functions.php");
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = null;
+    if ($device_id) {
+      // save the current details for returning to the client on successful delete
+      $device = device_by_id_cache($device_id);
+    }
+    if ($device) {
+      $vlans = dbFetchRows("SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?", array($device_id));
+      $output = array("status" => "ok", "vlans" => array($vlans));
+    } else {
+      $code = 404;
+      $output = array("status" => "error", "Device $hostname not found");
+    }
+  }
+  echo _json_encode($output);
+}
