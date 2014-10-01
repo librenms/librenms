@@ -454,7 +454,6 @@ function get_vlans() {
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $hostname = $router['hostname'];
-    $status = "error";
     $code = 500;
     if(empty($hostname)) {
         $output = $output = array("status" => "error", "message" => "No hostname has been provided");
@@ -475,5 +474,7 @@ function get_vlans() {
             $output = array("status" => "error", "Device $hostname not found");
         }
     }
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
