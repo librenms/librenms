@@ -578,6 +578,6 @@ $config['dateformat']['long']                             = "r"; # RFC2822 style
 $config['dateformat']['compact']                          = "Y-m-d H:i:s";
 $config['dateformat']['time']                             = "H:i:s";
 
-$config['disable_clear_discovery']                        = 0;// Set this to 1 if you want to disable the web option to rediscover devices
+$config['enable_clear_discovery']                        = 1;// Set this to 0 if you want to disable the web option to rediscover devices
 
 ?>
