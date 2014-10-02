@@ -7,3 +7,4 @@ fi
 
 php daily.php -f syslog
 php daily.php -f eventlog
+php daily.php -f authlog
