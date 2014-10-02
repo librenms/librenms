@@ -66,7 +66,7 @@ if ($updated && $update_message)
     <div class="col-sm-1">
     </div>
 <?php
-if($config['disable_clear_discovery'] == 0) {
+if($config['enable_clear_discovery'] == 1) {
 ?>
     <div class="col-sm-1">
         <button type="submit" id="rediscover" data-device_id="<?php echo($device['device_id']); ?>" class="btn btn-primary" name="rediscover">Rediscover device</button>
