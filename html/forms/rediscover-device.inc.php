@@ -16,7 +16,7 @@ if(!is_numeric($_POST['device_id'])) {
     $status = "error";
     $message = "Invalid device id";
 } else {
-    $update = dbUpdate(array('last_discovered' => 'NULL'), 'devices', '`device_id` = ?', array($_POST['device_id']));
+    $update = dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($_POST['device_id']));
     if(!empty($update) || $update == '0') {
        $status = "ok";
        $message = "Device will be rediscovered";
