@@ -56,10 +56,19 @@ if ($updated && $update_message)
 
 ?>
 
-<form id="delete_host" name="delete_host" method="post" action="delhost/" role="form">
-  <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
-  <button type="submit" class="btn btn-danger" name="Submit">Delete device</button>
-</form>
+<div class="row">
+    <div class="col-sm-1">
+        <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form">
+            <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
+            <button type="submit" class="btn btn-danger" name="Submit">Delete device</button>
+        </form>
+    </div>
+    <div class="col-sm-1">
+    </div>
+    <div class="col-sm-1">
+        <button type="submit" id="rediscover" data-device_id="<?php echo($device['device_id']); ?>" class="btn btn-primary" name="rediscover">Rediscover device</button>
+    </div>
+</div>
 <br />
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
 <input type=hidden name="editing" value="yes">
@@ -124,6 +133,27 @@ foreach ($config['device_types'] as $type)
   <button type="submit" name="Submit"  class="btn btn-default">Save</button>
 </form>
 <br />
+<script>
+    $("#rediscover").click(function() {
+        var device_id = $(this).data("device_id");
+        $.ajax({
+            type: 'POST',
+            url: '/ajax_form.php',
+            data: { type: "rediscover-device", device_id: device_id },
+            dataType: "json",
+            success: function(data){
+                if(data['status'] == 'ok') {
+                    toastr.success(data['message']);
+                } else {
+                    toastr.error(data['message']);
+                }
+            },
+            error:function(){
+                toastr.error('An error occured setting this device to be rediscovered');
+            }
+        });
+    });
+</script>
 <?php
 
 print_optionbar_start();
