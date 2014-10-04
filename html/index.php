@@ -133,7 +133,7 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
-  <script src="js/bootstrap.js"></script>
+  <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
   <script src="js/bootstrap-switch.min.js"></script>
   <script src="js/typeahead.min.js"></script>
