@@ -91,94 +91,8 @@ if (!$auth)
 
   // css and js for datetimepicker
   echo("
-    <link type='text/css' href='css/ui-lightness/jquery-ui-1.8.18.custom.css' rel='stylesheet' />
-    <script type='text/javascript' src='js/jquery-ui.min.js'></script>
-    <script type='text/javascript' src='js/jquery-ui-timepicker-addon.js'></script>
-    <script type='text/javascript' src='js/jquery-ui-sliderAccess.js'></script>
-    <script type='text/javascript'>
-      $(function()
-      {
-        $('#dtpickerfrom').datetimepicker({
-          showOn: 'button',
-          buttonImage: 'images/16/date.png',
-          buttonImageOnly: true,
-          dateFormat: 'yy-mm-dd',
-          hourGrid: 4,
-          minuteGrid: 10,
-          onClose: function(dateText, inst) {
-            var toDateTextBox = $('#dtpickerto');
-            if (toDateTextBox.val() != '') {
-              var testStartDate = new Date(dateText);
-              var testEndDate = new Date(toDateTextBox.val());
-              if (testStartDate > testEndDate)
-                toDateTextBox.val(dateText);
-            }
-            else {
-              toDateTextBox.val(dateText);
-            }
-          },
-          onSelect: function (selectedDateTime) {
-            var toDateTextBox = $('#dtpickerto');
-            var toValue = toDateTextBox.val();
-            var start = $(this).datetimepicker('getDate');
-            toDateTextBox.datetimepicker('option', 'minDate', new Date(start.getTime()));
-            // we do this so the above datetimepicker call doesn't strip the time from the pre-set value in the text box.
-            toDateTextBox.val(toValue);
-          }
-        });
-        $('#dtpickerto').datetimepicker({
-          showOn: 'button',
-          buttonImage: 'images/16/date.png',
-          buttonImageOnly: true,
-          dateFormat: 'yy-mm-dd',
-          hourGrid: 4,
-          minuteGrid: 10,
-          maxDate: 0,
-          onClose: function(dateText, inst) {
-            var startDateTextBox = $('#dtpickerfrom');
-            if (startDateTextBox.val() != '') {
-              var testStartDate = new Date(startDateTextBox.val());
-              var testEndDate = new Date(dateText);
-                if (testStartDate > testEndDate)
-                  startDateTextBox.val(dateText);
-            }
-            else {
-              startDateTextBox.val(dateText);
-            }
-          },
-          onSelect: function (selectedDateTime) {
-            var fromDateTextBox = $('#dtpickerfrom');
-            var fromValue = fromDateTextBox.val();
-            var end = $(this).datetimepicker('getDate');
-            fromDateTextBox.datetimepicker('option', 'maxDate', new Date(end.getTime()) );
-            // we do this so the above datetimepicker call doesn't strip the time from the pre-set value in the text box.
-            fromDateTextBox.val(fromValue);
-          }
-        });
-      });
-
-      function submitCustomRange(frmdata) {
-        var reto = /to=([0-9])+/g;
-        var refrom = /from=([0-9])+/g;
-        var tsto = new Date(frmdata.dtpickerto.value.replace(' ','T'));
-        var tsfrom = new Date(frmdata.dtpickerfrom.value.replace(' ','T'));
-        tsto = tsto.getTime() / 1000;
-        tsfrom = tsfrom.getTime() / 1000;
-        frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
-        frmdata.selfaction.value = frmdata.selfaction.value.replace(refrom, 'from=' + tsfrom);
-        frmdata.action = frmdata.selfaction.value
-        return true;
-      }
-    </script>
-    <style type='text/css'>
-      /* css for timepicker */
-      .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
-      .ui-timepicker-div dl { text-align: left; }
-      .ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
-      .ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
-      .ui-timepicker-div td { font-size: 90%; }
-      .ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
-    </style>
+    <script type='text/javascript' src='js/moment-with-locales.min.js'></script>
+    <script type='text/javascript' src='js/bootstrap-datetimepicker.min.js'></script>
   ");
 
   print_optionbar_start();
@@ -221,12 +135,64 @@ if (!$auth)
     <p>
   ");
   echo("<input type=hidden id='selfaction' value='" . $_SERVER['REQUEST_URI'] . "'>");
-  echo("
+  echo('
+    <div class="row">
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label for="dtpickerfrom">From: </label>
+                <div class="input-group date" id="dtpickerfrom1">
+                    <input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' . date('Y-m-d H:i', $graph_array['from']) . '">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $("#dtpickerfrom1").datetimepicker();
+        });
+    </script>');
+?>
+    <div class="col-sm-6" style="height:75px;">
+       <div class='col-md-5'>
+            <div class="form-group">
+                <div class='input-group date' id='datetimepicker9'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class='col-md-5'>
+            <div class="form-group">
+                <div class='input-group date' id='datetimepicker10'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $('#datetimepicker9').datetimepicker();
+            $('#datetimepicker10').datetimepicker();
+            $("#datetimepicker9").on("dp.change",function (e) {
+               $('#datetimepicker10').data("DateTimePicker").setMinDate(e.date);
+            });
+            $("#datetimepicker10").on("dp.change",function (e) {
+               $('#datetimepicker9').data("DateTimePicker").setMaxDate(e.date);
+            });
+        });
+    </script>
+<?php
+    echo("
     <strong>From:</strong> <input type='text' id='dtpickerfrom' maxlength=16 value='" . date('Y-m-d H:i', $graph_array['from']) . "'>
     <strong>To:</strong> <input type='text' id='dtpickerto' maxlength=16 value='" . date('Y-m-d H:i', $graph_array['to']) . "'>
     <input type='submit' id='submit' value='Update' onclick='javascript:submitCustomRange(this.form);'>
     </p>
     </form>
+        
   ");
 
   echo("<hr />");
