@@ -34,9 +34,7 @@ $app->group('/api', function() use ($app) {
       $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname');//api/v0/devices/$hostname/$type
       $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname');//api/v0/devices/$hostname/ports/$ifName
       $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname');//api/v0/devices/$hostname/ports/$ifName/$type
-    });
-    $app->group('/vlans', function() use ($app) {
-      $app->get('/:hostname', 'authToken', 'get_vlans');//api/v0/vlans/$hostname
+      $app->get('/:hostname/vlans', 'authToken', 'get_vlans');//api/v0/devices/$hostname/vlans
     });
     $app->get('/devices', 'authToken', 'list_devices');//api/v0/devices
     $app->post('/devices', 'authToken', 'add_device');//api/v0/devices (json data needs to be passed)
