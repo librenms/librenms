@@ -89,12 +89,6 @@ if (!$auth)
 
   print_optionbar_end();
 
-  // css and js for datetimepicker
-  echo("
-    <script type='text/javascript' src='js/moment-with-locales.min.js'></script>
-    <script type='text/javascript' src='js/bootstrap-datetimepicker.min.js'></script>
-  ");
-
   print_optionbar_start();
 
   $thumb_array = array('sixhour' => '6 Hours', 'day' => '24 Hours', 'twoday' => '48 Hours', 'week' => 'One Week', 'twoweek' => 'Two Weeks',
@@ -135,61 +129,48 @@ if (!$auth)
     <p>
   ");
   echo("<input type=hidden id='selfaction' value='" . $_SERVER['REQUEST_URI'] . "'>");
-  echo('
-    <div class="row">
+  echo('<div class="row">
         <div class="col-sm-2">
             <div class="form-group">
                 <label for="dtpickerfrom">From: </label>
-                <div class="input-group date" id="dtpickerfrom1">
-                    <input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' . date('Y-m-d H:i', $graph_array['from']) . '">
+                <div class="input-group date" id="dtpicker1">
+                    <input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' . date('Y-m-d H:i', $graph_array['from']) . '" data-date-format="YYYY-MM-DD HH:mm">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
                 </div>
             </div>
         </div>
-    </div>
-    <script type="text/javascript">
-        $(function () {
-            $("#dtpickerfrom1").datetimepicker();
-        });
-    </script>');
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label for="dtpickerto">To: </label>
+                <div class="input-group date" id="dtpicker2">
+                    <input type="text" class="form-control" id="dtpickerto" maxlength=16 value="' . date('Y-m-d H:i', $graph_array['to']) . '" data-date-format="YYYY-MM-DD HH:mm">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+                </div>
+            </div>
+        </div>
+    </div>');
 ?>
-    <div class="col-sm-6" style="height:75px;">
-       <div class='col-md-5'>
-            <div class="form-group">
-                <div class='input-group date' id='datetimepicker9'>
-                    <input type='text' class="form-control" />
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class='col-md-5'>
-            <div class="form-group">
-                <div class='input-group date' id='datetimepicker10'>
-                    <input type='text' class="form-control" />
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
     <script type="text/javascript">
         $(function () {
-            $('#datetimepicker9').datetimepicker();
-            $('#datetimepicker10').datetimepicker();
-            $("#datetimepicker9").on("dp.change",function (e) {
-               $('#datetimepicker10').data("DateTimePicker").setMinDate(e.date);
-            });
-            $("#datetimepicker10").on("dp.change",function (e) {
-               $('#datetimepicker9').data("DateTimePicker").setMaxDate(e.date);
-            });
+            $('#dtpicker1').datetimepicker({useSeconds: false, useCurrent: true, sideBySide: true, useStrict: false, showToday: true});
+            $('#dtpicker2').datetimepicker({useSeconds: false, useCurrent: true, sideBySide: true, useStrict: false, showToday: true});
         });
+        function submitCustomRange(frmdata) {
+            var reto = /to=([0-9])+/g;
+            var refrom = /from=([0-9])+/g;
+            var tsto = new Date(frmdata.dtpickerto.value.replace(' ','T'));
+            var tsfrom = new Date(frmdata.dtpickerfrom.value.replace(' ','T'));
+            tsto = tsto.getTime() / 1000;
+            tsfrom = tsfrom.getTime() / 1000;
+            frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
+            frmdata.selfaction.value = frmdata.selfaction.value.replace(refrom, 'from=' + tsfrom);
+            frmdata.action = frmdata.selfaction.value
+            return true;
+        }
     </script>
 <?php
     echo("
-    <strong>From:</strong> <input type='text' id='dtpickerfrom' maxlength=16 value='" . date('Y-m-d H:i', $graph_array['from']) . "'>
-    <strong>To:</strong> <input type='text' id='dtpickerto' maxlength=16 value='" . date('Y-m-d H:i', $graph_array['to']) . "'>
-    <input type='submit' id='submit' value='Update' onclick='javascript:submitCustomRange(this.form);'>
+    <input type='submit' class='btn btn-default' id='submit' value='Update' onclick='javascript:submitCustomRange(this.form);'>
     </p>
     </form>
         
