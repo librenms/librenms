@@ -14,6 +14,9 @@
 
 if ($_SESSION['userlevel'] == '10')
 {
+if(empty($_POST['token'])) {
+    $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
+}
 ?>
   <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
     <div class="modal-dialog modal-sm">
@@ -64,10 +67,9 @@ foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'
             <div class="form-group">
               <label for="token" class="col-sm-2 control-label">Token: </label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="token" name="token" value="<?php echo $_POST['token'];?>">
+                <input type="text" class="form-control" id="token" name="token" value="<?php echo $_POST['token'];?>" disabled>
               </div>
               <div class="col-sm-2">
-                <button type="button" class="btn btn-success btn-sm" name="pass-gen" id="pass-gen">Generate</button>
               </div>
             </div>
             <div class="form-group">
