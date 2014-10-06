@@ -49,7 +49,13 @@ function auth_usermanagement()
 
 function adduser($username, $password, $level, $email = "", $realname = "", $can_modify_passwd = '1')
 {
-  return dbInsert(array('username' => $username, 'password' => $password, 'level' => $level, 'email' => $email, 'realname' => $realname), 'users');
+    if (!user_exists($username)) {
+        $hasher = new PasswordHash(8, FALSE);
+        $encrypted = $hasher->HashPassword($password);
+        return dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname), 'users');
+    } else {
+        return FALSE;
+    }
 }
 
 function user_exists($username)
