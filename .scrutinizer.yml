@@ -5,4 +5,4 @@ imports:
 
 # please keep the excluded paths list sorted
 filter:
-    excluded_paths: [ html/includes/geshi/*, html/includes/jpgraph/*, html/js/bootstrap*, html/js/jqplot/*, html/js/jquery.cycle*, html/js/jquery-ui-timepicker-addon.js, html/js/sorttable.js, html/js/tw-sack.js, includes/phpmailer/*, html/css/bootstrap*, html/includes/Slim/*, html/js/moment* ]
+    excluded_paths: [ html/includes/geshi/*, html/includes/jpgraph/*, html/js/bootstrap*, html/js/jqplot/*, html/js/jquery.cycle*, html/js/jquery-ui-timepicker-addon.js, html/js/sorttable.js, html/js/tw-sack.js, includes/phpmailer/*, html/css/bootstrap*, html/includes/Slim/* ]
