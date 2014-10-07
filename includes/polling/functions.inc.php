@@ -110,7 +110,9 @@ function poll_device($device, $options)
   $host_rrd = $config['rrd_dir'] . "/" . $device['hostname'];
   if (!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
 
-  $device['pingable'] = isPingable($device['hostname']);
+  $ping_response = isPingable($device['hostname'],$device['device_id']);
+  $device['pingable'] = $ping_response['result'];
+  $ping_time = $ping_response['last_ping_timetaken'];
   if ($device['pingable'])
   {
     $device['snmpable'] = isSNMPable($device);
@@ -196,8 +198,31 @@ function poll_device($device, $options)
 
     $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
 
+    // Poller performance rrd
+    $poller_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/poller-perf.rrd";
+    if (!is_file($poller_rrd))
+    {
+      rrdtool_create ($poller_rrd, "DS:poller:GAUGE:600:0:U ".$config['rrd_rra']);
+    }
+    if(!empty($device_time))
+    {
+      rrdtool_update($poller_rrd, "N:$device_time");
+    }
+    // Ping response rrd
+    $ping_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/ping-perf.rrd";
+    if (!is_file($ping_rrd))
+    {
+      rrdtool_create ($ping_rrd, "DS:ping:GAUGE:600:0:65535 ".$config['rrd_rra']);
+    }
+    if(!empty($ping_time))
+    {
+      rrdtool_update($ping_rrd, "N:$ping_time");
+    }
+
     $update_array['last_polled'] = array('NOW()');
     $update_array['last_polled_timetaken'] = $device_time;
+    $update_array['last_ping'] = array('NOW()');
+    $update_array['last_ping_timetaken'] = $ping_time;
 
     #echo("$device_end - $device_start; $device_time $device_run");
     echo("Polled in $device_time seconds\n");

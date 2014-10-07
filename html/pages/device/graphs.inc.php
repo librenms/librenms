@@ -23,6 +23,10 @@ foreach (dbFetchRows("SELECT * FROM device_graphs WHERE device_id = ? ORDER BY g
   $graph_enable[$section][$graph['graph']] = $graph['graph'];
 }
 
+// These are standard graphs we should have for all systems
+$graph_enable['poller']['poller_perf'] = 'device_poller_perf';
+$graph_enable['poller']['ping_perf'] = 'device_ping_perf';
+
 #foreach ($config['graph_sections'] as $section)
 foreach ($graph_enable as $section => $nothing)
 {
