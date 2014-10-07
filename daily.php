@@ -17,17 +17,16 @@ if ( $options['f'] === 'update') { echo $config['update']; }
 if ( $options['f'] === 'syslog') {
   if ( is_numeric($config['syslog_purge'])) {
     $rows = dbFetchRow("SELECT MIN(seq) FROM syslog");
-    $loop = 1;
     while($loop == 1) {
       $limit = dbFetchRow("SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1", array($rows));
       if(empty($limit)) {
-        $loop = 0;
+          break;
       }
       if ( dbDelete('syslog', "seq >= ? AND seq < ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)", array($rows,$limit,$config['syslog_purge'])) > 0) {
         $rows = $limit;
         echo 'Syslog cleared for entries over ' . $config['syslog_purge'] . " days 1000 limit\n";
       } else {
-        $loop = 0;
+          break;
       }
     }
     dbDelete('syslog', "seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)", array($rows,$config['syslog_purge']));
