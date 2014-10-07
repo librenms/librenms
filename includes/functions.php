@@ -941,6 +941,9 @@ function validate_device_id($id)
   return($return);
 }
 
+// The original source of this code is from Stackoverflow (www.stackoverflow.com).
+// http://stackoverflow.com/questions/6054033/pretty-printing-json-with-php
+// Answer provided by stewe (http://stackoverflow.com/users/3202187/ulk200
 if (!defined('JSON_UNESCAPED_SLASHES'))
     define('JSON_UNESCAPED_SLASHES', 64);
 if (!defined('JSON_PRETTY_PRINT'))
