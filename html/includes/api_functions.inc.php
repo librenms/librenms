@@ -176,7 +176,7 @@ function authToken(\Slim\Route $route)
 
   if($authenticated === false)
   {
-    $app->response->setStatus(403);
+    $app->response->setStatus(401);
     $output = array("status" => "error", "message" => "API Token is missing or invalid; please supply a valid token");
     echo _json_encode($output);
     $app->stop();
