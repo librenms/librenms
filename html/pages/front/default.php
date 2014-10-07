@@ -33,9 +33,9 @@ $count_boxes = 0;
 // Device down boxes
 if ($_SESSION['userlevel'] == '10')
 {
-  $sql = "SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0' LIMIT 10";
+  $sql = "SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0' LIMIT ".$config['front_page_down_box_limit'];
 } else {
-  $sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '0' AND D.ignore = '0' LIMIT 10";
+  $sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '0' AND D.ignore = '0' LIMIT".$config['front_page_down_box_limit'];
 }
 foreach (dbFetchRows($sql) as $device)
 {
@@ -47,9 +47,9 @@ foreach (dbFetchRows($sql) as $device)
 
 if ($_SESSION['userlevel'] == '10')
 {
-  $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0' LIMIT 10";
+  $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0' LIMIT ".$config['front_page_down_box_limit'];
 } else {
-  $sql = "SELECT * FROM `ports` AS I, `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0' LIMIT 10";
+  $sql = "SELECT * FROM `ports` AS I, `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0' LIMIT ".$config['front_page_down_box_limit'];
 }
 
 // These things need to become more generic, and more manageable across different frontpages... rewrite inc :>
@@ -76,12 +76,12 @@ if ($config['warn']['ifdown'])
 // Service down boxes
 if ($_SESSION['userlevel'] == '10')
 {
-  $sql = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0' LIMIT 10";
+  $sql = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0' LIMIT ".$config['front_page_down_box_limit'];
   $param[] = '';
 }
 else
 {
-  $sql = "SELECT * FROM services AS S, devices AS D, devices_perms AS P WHERE P.`user_id` = ? AND P.`device_id` = D.`device_id` AND S.`device_id` = D.`device_id` AND S.`service_ignore` = '0' AND S.`service_disabled` = '0' AND S.`service_status` = '0' LIMIT 10";
+  $sql = "SELECT * FROM services AS S, devices AS D, devices_perms AS P WHERE P.`user_id` = ? AND P.`device_id` = D.`device_id` AND S.`device_id` = D.`device_id` AND S.`service_ignore` = '0' AND S.`service_disabled` = '0' AND S.`service_status` = '0' LIMIT ".$config['front_page_down_box_limit'];
   $param[] = $_SESSION['user_id'];
 }
 foreach (dbFetchRows($sql,$param) as $service)
@@ -98,9 +98,9 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 {
   if ($_SESSION['userlevel'] == '10')
   {
-    $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0 LIMIT 10";
+    $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0 LIMIT ".$config['front_page_down_box_limit'];
   } else {
-    $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0 LIMIT 10";
+    $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0 LIMIT ".$config['front_page_down_box_limit'];
   }
   foreach (dbFetchRows($sql) as $peer)
   {
@@ -117,10 +117,10 @@ if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $c
 {
   if ($_SESSION['userlevel'] == '10')
   {
-    $sql = "SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime > 0 AND D.uptime < '" . $config['uptime_warning'] . "' AND D.ignore = 0 LIMIT 10";
+    $sql = "SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime > 0 AND D.uptime < '" . $config['uptime_warning'] . "' AND D.ignore = 0 LIMIT ".$config['front_page_down_box_limit'];
   } else {
     $sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '1' AND D.uptime > 0 AND D.uptime < '" .
-    $config['uptime_warning'] . "' AND D.ignore = 0 LIMIT 10";
+    $config['uptime_warning'] . "' AND D.ignore = 0 LIMIT ".$config['front_page_down_box_limit'];
   }
 
   foreach (dbFetchRows($sql) as $device)
