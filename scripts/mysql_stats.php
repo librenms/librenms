@@ -45,8 +45,8 @@ if (!array_key_exists('SCRIPT_FILENAME', $_SERVER)
 # ============================================================================
 
 # FIXME: why are these not taken from config.php?
-$mysql_user = 'observium';
-$mysql_pass = 'flobbleobservium';
+$mysql_user = 'librenms';
+$mysql_pass = 'flobblelibrenms';
 $mysql_host = 'localhost';
 $mysql_port = 3306;
 $mysql_ssl  = FALSE;   # Whether to use SSL to connect to MySQL.
