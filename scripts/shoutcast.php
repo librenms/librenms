@@ -9,9 +9,9 @@
     //      Install:
     //              Edit the shoutcast.conf file
     //              Add a crontab (every 5 min) for:
-    //              /opt/observium/scripts/shoutcast.php makeCache
+    //              /opt/librenms/scripts/shoutcast.php makeCache
     //              Add the following to your snmpd.conf file:
-    //              extend shoutcast /opt/observium/scripts/shoutcast.php
+    //              extend shoutcast /opt/librenms/scripts/shoutcast.php
     ///
     //      Version 1.1 By:
     //              All In One - Dennis de Houx <info@all-in-one.be>

@@ -8,7 +8,7 @@
     ///
     //      Install:
     //              Add the following to your snmpd.conf file:
-    //              extend ntpclient /opt/observium/scripts/ntp-client.php
+    //              extend ntpclient /opt/librenms/scripts/ntp-client.php
     ///
     //      Version 1.1 By:
     //              All In One - Dennis de Houx <info@all-in-one.be>
