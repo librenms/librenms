@@ -15,8 +15,8 @@ $weekly_url      = "graph.php?port=" . $port['port_id'] . "&amp;type=$graph_type
 $monthly_traffic = "graph.php?port=" . $port['port_id'] . "&amp;type=$graph_type&amp;from=".$config['time']['month']."&amp;to=".$config['time']['now']."&amp;width=215&amp;height=100";
 $monthly_url     = "graph.php?port=" . $port['port_id'] . "&amp;type=$graph_type&amp;from=".$config['time']['month']."&amp;to=".$config['time']['now']."&amp;width=500&amp;height=150";
 
-$yearly_traffic  = "graph.php?port=" . $port['port_id'] . "&amp;type=$graph_type&amp;from=".$config['time']['yearh']."&amp;to=".$config['time']['now']."&amp;width=215&amp;height=100";
-$yearly_url      = "graph.php?port=" . $port['port_id'] . "&amp;type=$graph_type&amp;from=".$config['time']['yearh']."&amp;to=".$config['time']['now']."&amp;width=500&amp;height=150";
+$yearly_traffic  = "graph.php?port=" . $port['port_id'] . "&amp;type=$graph_type&amp;from=".$config['time']['year']."&amp;to=".$config['time']['now']."&amp;width=215&amp;height=100";
+$yearly_url      = "graph.php?port=" . $port['port_id'] . "&amp;type=$graph_type&amp;from=".$config['time']['year']."&amp;to=".$config['time']['now']."&amp;width=500&amp;height=150";
 
 echo("<a href='#' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
       <img src='$daily_traffic' border=0></a> ");
