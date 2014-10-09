@@ -1,7 +1,9 @@
 # InfluxDB PHP SDK
 
- * [![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=master)](https://travis-ci.org/corley/influxdb-php-sdk)
- * [![Dependency Status](https://www.versioneye.com/user/projects/54104e789e1622492d000025/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54104e789e1622492d000025)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/699a9a78-39aa-41d0-bb60-41dbf0f1251d/big.png)](https://insight.sensiolabs.com/projects/699a9a78-39aa-41d0-bb60-41dbf0f1251d)
+
+ * Master: [![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=master)](https://travis-ci.org/corley/influxdb-php-sdk)
+ * Develop: [![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=develop)](https://travis-ci.org/corley/influxdb-php-sdk)
 
 Send metrics to InfluxDB and query for any data.
 
@@ -99,8 +101,8 @@ $client = \InfluxDB\ClientFactory::create($options);
 $client->mark("error.404", ["page" => "/a-missing-page"]);
 ```
 
-Of course you can always use the DiC or your service manager in
-order to create a valid client instance.
+Of course you can always use the DiC or your service manager in order to create
+a valid client instance.
 
 ### Time Precision write/read queries
 
@@ -123,10 +125,11 @@ $influx->query("select * from mine");
 $influx->query("select * from mine", "s"); // with time_precision
 ```
 
-You can query the database only if the adapter is queryable (implements `QueryableInterface`),
-actually `GuzzleAdapter`.
+You can query the database only if the adapter is queryable (implements
+`QueryableInterface`), actually `GuzzleAdapter`.
 
-The adapter returns the json decoded body of the InfluxDB response, something like:
+The adapter returns the json decoded body of the InfluxDB response, something
+like:
 
 ```
 array(1) {
@@ -159,9 +162,9 @@ array(1) {
 }
 ```
 
-By default data is returned as is. You can add filters in order to
-change a response as you prefer, by default this library carries a
-common filter that simplifies the response.
+By default data is returned as is. You can add filters in order to change a
+response as you prefer, by default this library carries a common filter that
+simplifies the response.
 
 ```
 $client->setFilter(new ColumnsPointsFilter());
@@ -169,8 +172,7 @@ $client->setFilter(new ColumnsPointsFilter());
 $data = $client->query("select * from hd_used");
 ```
 
-With the "ColumnsPointsFilter" you get a list of dictionaries,
-something like:
+With the "ColumnsPointsFilter" you get a list of dictionaries, something like:
 
 ```
 [
@@ -194,9 +196,10 @@ $client->createDatabase("my.name"); // create a new database with name "my.name"
 $client->deleteDatabase("my.name"); // delete an existing database with name "my.name"
 ```
 
-Actually only queryable adapters can handle databases (implements the `QueryableInterface`)
+Actually only queryable adapters can handle databases (implements the
+`QueryableInterface`)
 
-## Benchmark
+## Benchmarks
 
 ### Adapters
 
@@ -210,8 +213,7 @@ Corley\Benchmarks\InfluxDB\AdapterEvent
     sendDataUsingUdpAdapter : [1,000     ] [0.0000436344147] [22,917.69026]
 ```
 
-
-### Filter
+### Filters
 
 Just what append when you apply the `ColumnsPointsFilter`
 
@@ -226,4 +228,7 @@ Corley\Benchmarks\InfluxDB\FilterEvent
     get1000PointDirectData  : [100       ] [0.0011058974266] [904.24299]
     get1000PointFilteredData: [100       ] [0.0074790692329] [133.70648]
 ```
+
+in order to eliminate the http handshake and bandwidth overhead network
+operations are completely skipped
 
