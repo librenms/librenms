@@ -8,7 +8,7 @@ RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !\.(js|ico|txt|gif|jpg|png|css|php)
-RewriteRule ^api/v0/(.*)$ api_v0.php/$1 [L]
+RewriteRule ^api/v0(.*)$ api_v0.php/$1 [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !\.(js|ico|txt|gif|jpg|png|css|php)
