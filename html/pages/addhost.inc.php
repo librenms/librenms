@@ -168,8 +168,8 @@ $pagetitle[] = "Add host";
           </select>
         </div>
       </div>
-      <button type="submit" class="btn btn-default input-sm" name="Submit">Add Host</button>
     </div>
+    <button type="submit" class="btn btn-default input-sm" name="Submit">Add Host</button>
   </div>
 </form>
   </div>
