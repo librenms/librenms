@@ -110,6 +110,7 @@ $config['page_refresh']     = "300";  // Refresh the page every xx seconds, 0 to
 $config['front_page']       = "pages/front/default.php";
 $config['front_page_settings']['top']['ports'] = 10;
 $config['front_page_settings']['top']['devices'] = 10;
+$config['front_page_down_box_limit'] = 10;
 $config['vertical_summary'] = 0; // Enable to use vertical summary on front page instead of horizontal
 $config['top_ports']        = 1; // This enables the top X ports box
 $config['top_devices']      = 1; // This enables the top X devices box
