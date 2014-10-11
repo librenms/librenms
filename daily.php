@@ -17,7 +17,7 @@ if ( $options['f'] === 'update') { echo $config['update']; }
 if ( $options['f'] === 'syslog') {
   if ( is_numeric($config['syslog_purge'])) {
     $rows = dbFetchRow("SELECT MIN(seq) FROM syslog");
-    while($loop == 1) {
+    while(TRUE) {
       $limit = dbFetchRow("SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1", array($rows));
       if(empty($limit)) {
           break;
