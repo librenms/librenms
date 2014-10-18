@@ -573,6 +573,7 @@ $config['update'] = 1;
 # Purge syslog and eventlog
 $config['syslog_purge']                                   = 30; # Number in days of how long to keep syslog entries for.
 $config['eventlog_purge']                                 = 30; # Number in days of how long to keep eventlog entries for.
+$config['authlog_purge']                                  = 30; # Number in days of how long to keep authlog entries for.
 
 # Date format for PHP date()s
 $config['dateformat']['long']                             = "r"; # RFC2822 style
