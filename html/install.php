@@ -20,7 +20,7 @@ $add_user = $_POST['add_user'] ?: '';
 $add_pass = $_POST['add_pass'] ?: '';
 $add_email = $_POST['add_email'] ?: '';
 
-if($stage == "4")
+if($stage == "4" || $stage == "3")
 {
 // Ok now let's set the db connection up
 $config['db_host']=$dbhost;
@@ -325,7 +325,7 @@ $config['db_host']=$dbhost;
 $config['db_user']=$dbuser;
 $config['db_pass']=$dbpass;
 $config['db_name']=$dbname;
-$sqlfile = '../build.sql';
+$sql_file = '../build.sql';
 require('../build-base.php');
 ?>
      </div>
