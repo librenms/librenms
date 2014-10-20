@@ -194,12 +194,14 @@
 						, options.legend.plot
 					);
 					
-					// Update plot size
-					if ("square" == elemOptions.type) {
+					if (elemOptions.type == "square") {
 						elemOptions.attrs.width = elemOptions.size;
 						elemOptions.attrs.height = elemOptions.size;
 						elemOptions.attrs.x = plots[id].mapElem.attrs.x - (elemOptions.size - plots[id].mapElem.attrs.width) / 2;
 						elemOptions.attrs.y = plots[id].mapElem.attrs.y - (elemOptions.size - plots[id].mapElem.attrs.height) / 2;
+					} else if (elemOptions.type == "image") {
+						elemOptions.attrs.x = plots[id].mapElem.attrs.x - (elemOptions.attrs.width - plots[id].mapElem.attrs.width) / 2;
+						elemOptions.attrs.y = plots[id].mapElem.attrs.y - (elemOptions.attrs.height - plots[id].mapElem.attrs.height) / 2;
 					} else { // Default : circle
 						elemOptions.attrs.r = elemOptions.size / 2;
 					}
@@ -207,7 +209,7 @@
 					$.fn.mapael.updateElem(elemOptions, plots[id], $tooltip, animDuration);
 				}
 				
-				if( typeof opt != 'undefined' )
+				if(typeof opt != 'undefined')
 					opt.afterUpdate && opt.afterUpdate($self, paper, areas, plots, options);
 			});
 			
@@ -375,18 +377,28 @@
 				, options.legend.plot
 			);
 		
-		if (elemOptions.x && elemOptions.y) 
+		if (typeof elemOptions.x != 'undefined' && typeof elemOptions.y != 'undefined') 
 			coords = {x : elemOptions.x, y : elemOptions.y};
 		else
 			coords = mapConf.getCoords(elemOptions.latitude, elemOptions.longitude);
 		
-		if ("square" == elemOptions.type) {
+		if (elemOptions.type == "square") {
 			plot = {'mapElem' : paper.rect(
 				coords.x - (elemOptions.size / 2)
 				, coords.y - (elemOptions.size / 2)
 				, elemOptions.size
 				, elemOptions.size
 			).attr(elemOptions.attrs)};
+		} else if (elemOptions.type == "image") {
+			plot = {
+				'mapElem' : paper.image(
+					elemOptions.url
+					, coords.x - elemOptions.attrs.width / 2
+					, coords.y - elemOptions.attrs.height / 2
+					, elemOptions.attrs.width
+					, elemOptions.attrs.height
+				).attr(elemOptions.attrs)
+			};
 		} else { // Default = circle
 			plot = {'mapElem' : paper.circle(coords.x, coords.y, elemOptions.size / 2).attr(elemOptions.attrs)};
 		}
@@ -524,6 +536,7 @@
 			, title = {}
 			, defaultElemOptions = {}
 			, elem = {}
+			, elemBBox = {}
 			, label = {};
 		
 		if(legendOptions.title) {
@@ -558,6 +571,14 @@
 						, scale * (legendOptions.slices[i].size)
 						, scale * (legendOptions.slices[i].size)
 					).attr(legendOptions.slices[i].attrs);
+				} else if(legendOptions.slices[i].type == "image") {
+					elem = paper.image(
+						legendOptions.slices[i].url
+						, legendOptions.marginLeft
+						, height
+						, legendOptions.slices[i].attrs.width
+						, legendOptions.slices[i].attrs.height
+					).attr(legendOptions.slices[i].attrs);
 				} else {
 					elem = paper.circle(
 						legendOptions.marginLeft + scale * (legendOptions.slices[i].size / 2)
@@ -566,14 +587,16 @@
 					).attr(legendOptions.slices[i].attrs);
 				} 
 				
+				elemBBox = elem.getBBox();
+				
 				label = paper.text(
-					legendOptions.marginLeft + scale * legendOptions.slices[i].size + legendOptions.marginLeftLabel
-					, height + scale * (legendOptions.slices[i].size / 2)
+					legendOptions.marginLeft + scale * elemBBox.width + legendOptions.marginLeftLabel
+					, height + scale * (elemBBox.height / 2)
 					, legendOptions.slices[i].label
 				).attr(legendOptions.labelAttrs);
 				
-				height += legendOptions.marginBottom + scale * legendOptions.slices[i].size;
-				width = Math.max(width, legendOptions.marginLeft + scale * legendOptions.slices[i].size + legendOptions.marginLeftLabel + label.getBBox().width);
+				width = Math.max(width, legendOptions.marginLeft + scale * elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width);
+				height += legendOptions.marginBottom + scale * elemBBox.height;
 				
 				if (legendOptions.hideElemsOnClick.enabled) {
 					// Hide/show elements when user clicks on a legend element
