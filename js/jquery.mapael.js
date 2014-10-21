@@ -576,8 +576,8 @@
 						legendOptions.slices[i].url
 						, legendOptions.marginLeft
 						, height
-						, legendOptions.slices[i].attrs.width
-						, legendOptions.slices[i].attrs.height
+						, scale * legendOptions.slices[i].attrs.width
+						, scale * legendOptions.slices[i].attrs.height
 					).attr(legendOptions.slices[i].attrs);
 				} else {
 					elem = paper.circle(
@@ -590,13 +590,13 @@
 				elemBBox = elem.getBBox();
 				
 				label = paper.text(
-					legendOptions.marginLeft + scale * elemBBox.width + legendOptions.marginLeftLabel
-					, height + scale * (elemBBox.height / 2)
+					legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel
+					, height + (elemBBox.height / 2)
 					, legendOptions.slices[i].label
 				).attr(legendOptions.labelAttrs);
 				
-				width = Math.max(width, legendOptions.marginLeft + scale * elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width);
-				height += legendOptions.marginBottom + scale * elemBBox.height;
+				width = Math.max(width, legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width);
+				height += legendOptions.marginBottom + elemBBox.height;
 				
 				if (legendOptions.hideElemsOnClick.enabled) {
 					// Hide/show elements when user clicks on a legend element
