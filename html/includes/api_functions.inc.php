@@ -468,6 +468,7 @@ function get_vlans() {
         if ($device) {
             $vlans = dbFetchRows("SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?", array($device_id));
             $total_vlans = count($vlans);
+            $code = 200;
             $output = array("status" => "ok", "count" => $total_vlans, "vlans" => $vlans);
         } else {
             $code = 404;
