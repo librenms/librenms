@@ -96,10 +96,16 @@ $pagetitle[] = "Add host";
       </div>
       <div class="col-sm-3">
         <select name="transport" id="transport" class="form-control input-sm">
-          <option value="tcp">tcp</option>
-          <option value="udp" selected>udp</option>
-          <option value="tcp6">tcp6</option>
-          <option value="udp6">udp6</option>
+<?php
+foreach ($config['snmp']['transports'] as $transport)
+{
+    echo("<option value='".$transport."'");
+    if ($transport == $device['transport']) {
+        echo(" selected='selected'");
+    }
+    echo(">".$transport."</option>");
+}
+?>
         </select>
       </div>
     </div>
