@@ -40,6 +40,7 @@ $app->group('/api', function() use ($app) {
     $app->post('/devices', 'authToken', 'add_device')->name('add_device');//api/v0/devices (json data needs to be passed)
     $app->delete('/devices/:hostname', 'authToken', 'del_device')->name('del_device');//api/v0/devices (json data needs to be passed)
   });
+  $app->get('/v0', 'authToken', 'show_endpoints');//api/v0
 });
 
 $app->run();
