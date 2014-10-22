@@ -479,3 +479,16 @@ function get_vlans() {
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
+
+function show_endpoints() {
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $routes = $app->router()->getNamedRoutes(); 
+    $output = array();
+    foreach($routes as $route) { 
+        $output[$route->getName()] = $config['base_url'].$route->getPattern(); 
+    }
+    $app->response->setStatus('200');
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
