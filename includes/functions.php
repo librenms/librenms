@@ -463,13 +463,20 @@ function isPingable($hostname,$device_id = FALSE)
 {
    global $config;
 
-   $status = shell_exec($config['fping'] . " -e $hostname 2>/dev/null");
+   $fping_params = '';
+   if(is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
+       $fping_params .= ' -r ' . $config['fping_options']['retries'];
+   }
+   if(is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
+       $fping_params .= ' -t ' . $config['fping_options']['timeout'];
+   }
+   $status = shell_exec($config['fping'] . "$fping_params -e $hostname 2>/dev/null");
    $response = array();
    if (strstr($status, "alive"))
    {
      $response['result'] = TRUE;
    } else {
-     $status = shell_exec($config['fping6'] . " -e $hostname 2>/dev/null");
+     $status = shell_exec($config['fping6'] . "$fping_params -e $hostname 2>/dev/null");
      if (strstr($status, "alive"))
      {
        $response['result'] = TRUE;

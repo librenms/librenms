@@ -39,24 +39,26 @@ $config['own_hostname'] = "localhost";
 
 // Location of executables
 
-$config['rrdtool']        = "/usr/bin/rrdtool";
-$config['fping']          = "/usr/bin/fping";
-$config['fping6']         = "/usr/bin/fping6";
-$config['snmpwalk']       = "/usr/bin/snmpwalk";
-$config['snmpget']        = "/usr/bin/snmpget";
-$config['snmpbulkwalk']   = "/usr/bin/snmpbulkwalk";
-$config['whois']          = "/usr/bin/whois";
-$config['ping']           = "/bin/ping";
-$config['mtr']            = "/usr/bin/mtr";
-$config['nmap']           = "/usr/bin/nmap";
-$config['nagios_plugins'] = "/usr/lib/nagios/plugins";
-$config['ipmitool']       = "/usr/bin/ipmitool";
-$config['virsh']          = "/usr/bin/virsh";
-$config['dot']            = "/usr/bin/dot";
-$config['unflatten']      = "/usr/bin/unflatten";
-$config['neato']          = "/usr/bin/neato";
-$config['sfdp']           = "/usr/bin/sfdp";
-$config['svn']                  = "/usr/bin/svn";
+$config['rrdtool']          = "/usr/bin/rrdtool";
+$config['fping']            = "/usr/bin/fping";
+$config['fping_options']['retries'] = 3;
+$config['fping_options']['timeout'] = 500;
+$config['fping6']           = "/usr/bin/fping6";
+$config['snmpwalk']         = "/usr/bin/snmpwalk";
+$config['snmpget']          = "/usr/bin/snmpget";
+$config['snmpbulkwalk']     = "/usr/bin/snmpbulkwalk";
+$config['whois']            = "/usr/bin/whois";
+$config['ping']             = "/bin/ping";
+$config['mtr']              = "/usr/bin/mtr";
+$config['nmap']             = "/usr/bin/nmap";
+$config['nagios_plugins']   = "/usr/lib/nagios/plugins";
+$config['ipmitool']         = "/usr/bin/ipmitool";
+$config['virsh']            = "/usr/bin/virsh";
+$config['dot']              = "/usr/bin/dot";
+$config['unflatten']        = "/usr/bin/unflatten";
+$config['neato']            = "/usr/bin/neato";
+$config['sfdp']             = "/usr/bin/sfdp";
+$config['svn']              = "/usr/bin/svn";
 
 // Memcached - Keep immediate statistics
 
