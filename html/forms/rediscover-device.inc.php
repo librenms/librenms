@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+// FIXME: Make this part of the API instead of a standalone function
+
 if(!is_numeric($_POST['device_id'])) {
     $status = "error";
     $message = "Invalid device id";
