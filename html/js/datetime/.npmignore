@@ -1,0 +1,12 @@
+/assets
+/_includes
+/_layouts
+/.gitignore
+/node_modules
+/Makefile
+/test
+/build
+*.log
+*.swp
+*~
+*.tgz
