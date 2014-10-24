@@ -1,4 +1,5 @@
-com2sec readonly  default         0bs3rv1um
+# Change RANDOMSTRINGGOESHERE to your preferred SNMP community string
+com2sec readonly  default         RANDOMSTRINGGOESHERE
 
 group MyROGroup v2c        readonly
 view all    included  .1                               80
