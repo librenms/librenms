@@ -967,17 +967,12 @@ if (!defined('JSON_UNESCAPED_UNICODE'))
 
 function _json_encode($data, $options = 448)
 {
-    if (version_compare(PHP_VERSION, '5.4', '>='))
-    {
+    if (version_compare(PHP_VERSION, '5.4', '>=')) {
         return json_encode($data, $options);
     }
-
-    return _json_format(json_encode($data), $options);
-}
-
-function _pretty_print_json($json)
-{
-    return _json_format($json, JSON_PRETTY_PRINT);
+    else {
+	return _json_format(json_encode($data), $options);
+    }
 }
 
 function _json_format($json, $options = 448)
