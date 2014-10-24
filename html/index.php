@@ -130,6 +130,7 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/datetime/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
   <link href="css/toastr.min.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
@@ -139,6 +140,8 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <script src="js/typeahead.min.js"></script>
   <script src="js/hogan-2.0.0.js"></script>
   <script src="js/jquery.cycle2.min.js"></script>
+  <script type="text/javascript" src="js/moment/moment.min.js"></script>
+  <script type="text/javascript" src="js/datetime/bootstrap-datetimepicker.min.js"></script>
 <?php
 if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n"); }
 ?>

@@ -120,6 +120,10 @@ exception):
   - check_mk (scripts/observium_agent*): GPLv2
   - qTip (html/css/jquery.qtip.min.css and html/js/qtip/jquery.qtip.min.js): GPLv2
 
+  The following software, libraries or applications are used within the LibreNMS project:
+  - Bootstrap Datetime picker (https://github.com/Eonasdan/bootstrap-datetimepicker) (MIT License)
+  - Moment (http://momentjs.com) (MIT License)
+
 [1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
 [2]: https://github.com/librenms/librenms "Main LibreNMS GitHub repo"
 [3]: https://twitter.com/librenms "@LibreNMS on Twitter"
