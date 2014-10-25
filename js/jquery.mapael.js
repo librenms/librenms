@@ -20,7 +20,7 @@
 		
 			var $self = $(this)
 				, $tooltip = $("<div>").addClass(options.map.tooltip.cssClass).css("display", "none")
-				, $container = $('.' + options.map.cssClass, this).empty().append($tooltip)
+				, $container = $("." + options.map.cssClass, this).empty().append($tooltip)
 				, mapConf = $.fn.mapael.maps[options.map.name]
 				, paper = new Raphael($container[0], mapConf.width, mapConf.height)
 				, elemOptions = {}
@@ -43,7 +43,7 @@
 					, (options.areas[id] ? options.areas[id] : {})
 					, options.legend.area
 				);
-				areas[id] = {'mapElem' : paper.path(mapConf.elems[id]).attr(elemOptions.attrs)};
+				areas[id] = {"mapElem" : paper.path(mapConf.elems[id]).attr(elemOptions.attrs)};
 			}
 			
 			// Init map areas in a second loop (prevent texts to be hidden by map elements)
@@ -86,11 +86,11 @@
 				$.fn.mapael.initZoom($container, paper, mapConf.width, mapConf.height, options.map.zoom);
 				
 			// Set initial zoom
-			if (typeof options.map.zoom.init != 'undefined') {
+			if (typeof options.map.zoom.init != "undefined") {
 				if (options.map.zoom.init.latitude && options.map.zoom.init.longitude) {
 					zoomCenter = mapConf.getCoords(options.map.zoom.init.latitude, options.map.zoom.init.longitude);
 					zoomOptions = [options.map.zoom.init.level, zoomCenter.x, zoomCenter.y];
-				} else if (typeof options.map.zoom.init.x != 'undefined' && typeof options.map.zoom.init.y != 'undefined') {
+				} else if (typeof options.map.zoom.init.x != "undefined" && typeof options.map.zoom.init.y != "undefined") {
 					zoomOptions = [options.map.zoom.init.level, options.map.zoom.init.x, options.map.zoom.init.y];
 				} else {
 					zoomOptions = [options.map.zoom.init.level];
@@ -100,7 +100,7 @@
 				
 			// Create the legends for areas
 			if (options.legend.area.slices && options.legend.area.display)
-				areaLegend = $.fn.mapael.createLegend($self, options, 'area', areas, 1);
+				areaLegend = $.fn.mapael.createLegend($self, options, "area", areas, 1);
 				
 			/**
 			* 
@@ -115,21 +115,21 @@
 			*  opt.resetPlots true to reset previous plots options
 			*  opt.afterUpdate Hook that allows to add custom processing on the map
 			*/
-			$self.on('update', function(e, updatedOptions, newPlots, deletedPlots, opt) {
+			$self.on("update", function(e, updatedOptions, newPlots, deletedPlots, opt) {
 				var i = 0
 					, id = 0
 					, animDuration = 0
 					, elemOptions = {}
 					, resetHiddenElem = function(el) {
 						if(typeof el.hidden != "undefined" && el.hidden == true) {
-							$(el.node).trigger('click');
+							$(el.node).trigger("click");
 						}
 					};
 				
 				areaLegend.forEach && areaLegend.forEach(resetHiddenElem);
 				plotLegend.forEach && plotLegend.forEach(resetHiddenElem);
 				
-				if (typeof opt != 'undefined') {
+				if (typeof opt != "undefined") {
 					(opt.resetAreas) && (options.areas = {});
 					(opt.resetPlots) && (options.plots = {});
 					(opt.animDuration) && (animDuration = opt.animDuration);
@@ -138,14 +138,14 @@
 				$.extend(true, options, updatedOptions);
 				
 				// Delete plots
-				if (typeof deletedPlots == 'object') {
+				if (typeof deletedPlots == "object") {
 					for (;i < deletedPlots.length; i++) {
-						if (typeof plots[deletedPlots[i]] != 'undefined') {
+						if (typeof plots[deletedPlots[i]] != "undefined") {
 							if (animDuration > 0) {
 								(function(plot) {
-									plot.mapElem.animate({'opacity':0}, animDuration, 'linear', function() {plot.mapElem.remove();});
+									plot.mapElem.animate({"opacity":0}, animDuration, "linear", function() {plot.mapElem.remove();});
 									if (plot.textElem) {
-										plot.textElem.animate({'opacity':0}, animDuration, 'linear', function() {plot.textElem.remove();});
+										plot.textElem.animate({"opacity":0}, animDuration, "linear", function() {plot.textElem.remove();});
 									}
 								})(plots[deletedPlots[i]]);
 							} else {
@@ -160,16 +160,16 @@
 				}
 				
 				// New plots
-				if (typeof newPlots == 'object') {
+				if (typeof newPlots == "object") {
 					for (id in newPlots) {
-						if (typeof plots[id] == 'undefined') {
+						if (typeof plots[id] == "undefined") {
 							options.plots[id] = newPlots[id];
 							plots[id] = $.fn.mapael.drawPlot(id, options, mapConf, paper, $tooltip);
 							if (animDuration > 0) {
 								plots[id].mapElem.attr({opacity : 0});
 								plots[id].textElem.attr({opacity : 0});
-								plots[id].mapElem.animate({'opacity': (typeof plots[id].mapElem.originalAttrs.opacity != 'undefined') ? plots[id].mapElem.originalAttrs.opacity : 1}, animDuration);
-								plots[id].textElem.animate({'opacity': (typeof plots[id].textElem.originalAttrs.opacity != 'undefined') ? plots[id].textElem.originalAttrs.opacity : 1}, animDuration);
+								plots[id].mapElem.animate({"opacity": (typeof plots[id].mapElem.originalAttrs.opacity != "undefined") ? plots[id].mapElem.originalAttrs.opacity : 1}, animDuration);
+								plots[id].textElem.animate({"opacity": (typeof plots[id].textElem.originalAttrs.opacity != "undefined") ? plots[id].textElem.originalAttrs.opacity : 1}, animDuration);
 							} 
 						}
 					}
@@ -209,7 +209,7 @@
 					$.fn.mapael.updateElem(elemOptions, plots[id], $tooltip, animDuration);
 				}
 				
-				if(typeof opt != 'undefined')
+				if(typeof opt != "undefined")
 					opt.afterUpdate && opt.afterUpdate($self, paper, areas, plots, options);
 			});
 			
@@ -219,27 +219,27 @@
 				
 				// Create the legends for plots taking into account the scale of the map
 				if (options.legend.plot.slices && options.legend.plot.display)
-					plotLegend = $.fn.mapael.createLegend($self, options, 'plot', plots, (options.map.width / mapConf.width));
+					plotLegend = $.fn.mapael.createLegend($self, options, "plot", plots, (options.map.width / mapConf.width));
 			} else {
-				$(window).on('resize', function() {
+				$(window).on("resize", function() {
 					clearTimeout(resizeTO);
-					resizeTO = setTimeout(function(){$container.trigger('resizeEnd');}, 150);
+					resizeTO = setTimeout(function(){$container.trigger("resizeEnd");}, 150);
 				});
 				
 				// Create the legends for plots taking into account the scale of the map
 				var createPlotLegend = function() {
 					if (options.legend.plot.slices && options.legend.plot.display)
-						plotLegend = $.fn.mapael.createLegend($self, options, 'plot', plots, ($container.width() / mapConf.width));
+						plotLegend = $.fn.mapael.createLegend($self, options, "plot", plots, ($container.width() / mapConf.width));
 					
-					$container.unbind('resizeEnd', createPlotLegend);
+					$container.unbind("resizeEnd", createPlotLegend);
 				};
 				
-				$container.on('resizeEnd', function() {
+				$container.on("resizeEnd", function() {
 					var containerWidth = $container.width();
 					if (paper.width != containerWidth) {
 						paper.setSize(containerWidth, mapConf.height * (containerWidth / mapConf.width));
 					}
-				}).on('resizeEnd', createPlotLegend).trigger('resizeEnd');
+				}).on("resizeEnd", createPlotLegend).trigger("resizeEnd");
 			}
 			
 			// Hook that allows to add custom processing on the map
@@ -250,22 +250,22 @@
 	};
 	
 	/**
-	* Init the element 'elem' on the map (drawing, setting attributes, events, tooltip, ...)
+	* Init the element "elem" on the map (drawing, setting attributes, events, tooltip, ...)
 	*/
 	$.fn.mapael.initElem = function(paper, elem, options, $tooltip, id) {
 		var bbox = {}, textPosition = {};
 		$.fn.mapael.setHoverOptions(elem.mapElem, options.attrs, options.attrsHover);
 		
-		if (options.text && typeof options.text.content != 'undefined') {
+		if (options.text && typeof options.text.content != "undefined") {
 			// Set a text label in the area
 			bbox = elem.mapElem.getBBox();
 			textPosition = $.fn.mapael.getTextPosition(bbox, options.text.position, options.text.margin);
-			options.text.attrs['text-anchor'] = textPosition.textAnchor;
+			options.text.attrs["text-anchor"] = textPosition.textAnchor;
 			elem.textElem = paper.text(textPosition.x, textPosition.y, options.text.content).attr(options.text.attrs);
 			$.fn.mapael.setHoverOptions(elem.textElem, options.text.attrs, options.text.attrsHover);
 			$.fn.mapael.setHover(paper, elem.mapElem, elem.textElem);
 			options.eventHandlers && $.fn.mapael.setEventHandlers(id, options, elem.mapElem, elem.textElem);
-			$(elem.textElem.node).attr('data-id', id);
+			$(elem.textElem.node).attr("data-id", id);
 		} else {
 			$.fn.mapael.setHover(paper, elem.mapElem);
 			options.eventHandlers && $.fn.mapael.setEventHandlers(id, options, elem.mapElem);
@@ -275,7 +275,7 @@
 			elem.mapElem.tooltipContent = options.tooltip.content;
 			$.fn.mapael.setTooltip(elem.mapElem, $tooltip);
 			
-			if (options.text && typeof options.text.content !='undefined') {
+			if (options.text && typeof options.text.content != "undefined") {
 				elem.textElem.tooltipContent = options.tooltip.content;
 				$.fn.mapael.setTooltip(elem.textElem, $tooltip);
 			}
@@ -286,7 +286,7 @@
 			elem.mapElem.target = options.target;
 			$.fn.mapael.setHref(elem.mapElem);
 			
-			if (options.text && typeof options.text.content !='undefined') {
+			if (options.text && typeof options.text.content != "undefined") {
 				elem.textElem.href = options.href;
 				elem.textElem.target = options.target;
 				$.fn.mapael.setHref(elem.textElem);
@@ -296,11 +296,11 @@
 		if (typeof options.value != "undefined")
 			elem.value = options.value;
 			
-		$(elem.mapElem.node).attr('data-id', id);
+		$(elem.mapElem.node).attr("data-id", id);
 	}
 
 	/**
-	* Update the element 'elem' on the map with the new elemOptions options
+	* Update the element "elem" on the map with the new elemOptions options
 	*/
 	$.fn.mapael.updateElem = function(elemOptions, elem, $tooltip, animDuration) {
 		var bbox, textPosition, plotOffset;
@@ -309,7 +309,7 @@
 		
 		// Update text
 		if (elem.textElem) {
-			if (typeof elemOptions.text != 'undefined' && typeof elemOptions.text.content != 'undefined' && elemOptions.text.content != elem.textElem.attrs.text)
+			if (typeof elemOptions.text != "undefined" && typeof elemOptions.text.content != "undefined" && elemOptions.text.content != elem.textElem.attrs.text)
 				elem.textElem.attr({text : elemOptions.text.content});
 
 			bbox = elem.mapElem.getBBox();
@@ -323,10 +323,10 @@
 			textPosition = $.fn.mapael.getTextPosition(bbox, elemOptions.text.position, elemOptions.text.margin);
 			if (textPosition.x != elem.textElem.attrs.x || textPosition.y != elem.textElem.attrs.y) {
 				if (animDuration > 0) {
-					elem.textElem.attr({'text-anchor' : textPosition.textAnchor});
+					elem.textElem.attr({"text-anchor" : textPosition.textAnchor});
 					elem.textElem.animate({x : textPosition.x, y : textPosition.y}, animDuration);
 				} else
-					elem.textElem.attr({x : textPosition.x, y : textPosition.y, 'text-anchor' : textPosition.textAnchor});
+					elem.textElem.attr({x : textPosition.x, y : textPosition.y, "text-anchor" : textPosition.textAnchor});
 			}
 			
 			$.fn.mapael.setHoverOptions(elem.textElem, elemOptions.text.attrs, elemOptions.text.attrsHover);
@@ -342,7 +342,7 @@
 		else
 			elem.mapElem.attr(elemOptions.attrs);
 		
-		if (elemOptions.tooltip && typeof elemOptions.tooltip.content != 'undefined') {
+		if (elemOptions.tooltip && typeof elemOptions.tooltip.content != "undefined") {
 			if (typeof elem.mapElem.tooltipContent == "undefined") {
 				$.fn.mapael.setTooltip(elem.mapElem, $tooltip);
 				(elem.textElem) && $.fn.mapael.setTooltip(elem.textElem, $tooltip);
@@ -351,7 +351,7 @@
 			(elem.textElem) && (elem.textElem.tooltipContent = elemOptions.tooltip.content);
 		}
 		
-		if (typeof elemOptions.href != 'undefined') {
+		if (typeof elemOptions.href != "undefined") {
 			if (typeof elem.mapElem.href == "undefined") {
 				$.fn.mapael.setHref(elem.mapElem);
 				(elem.textElem) && $.fn.mapael.setHref(elem.textElem);
@@ -377,13 +377,13 @@
 				, options.legend.plot
 			);
 		
-		if (typeof elemOptions.x != 'undefined' && typeof elemOptions.y != 'undefined') 
+		if (typeof elemOptions.x != "undefined" && typeof elemOptions.y != "undefined") 
 			coords = {x : elemOptions.x, y : elemOptions.y};
 		else
 			coords = mapConf.getCoords(elemOptions.latitude, elemOptions.longitude);
 		
 		if (elemOptions.type == "square") {
-			plot = {'mapElem' : paper.rect(
+			plot = {"mapElem" : paper.rect(
 				coords.x - (elemOptions.size / 2)
 				, coords.y - (elemOptions.size / 2)
 				, elemOptions.size
@@ -391,7 +391,7 @@
 			).attr(elemOptions.attrs)};
 		} else if (elemOptions.type == "image") {
 			plot = {
-				'mapElem' : paper.image(
+				"mapElem" : paper.image(
 					elemOptions.url
 					, coords.x - elemOptions.width / 2
 					, coords.y - elemOptions.height / 2
@@ -400,7 +400,7 @@
 				).attr(elemOptions.attrs)
 			};
 		} else { // Default = circle
-			plot = {'mapElem' : paper.circle(coords.x, coords.y, elemOptions.size / 2).attr(elemOptions.attrs)};
+			plot = {"mapElem" : paper.circle(coords.x, coords.y, elemOptions.size / 2).attr(elemOptions.attrs)};
 		}
 		
 		$.fn.mapael.initElem(paper, plot, elemOptions, $tooltip, id);
@@ -412,8 +412,8 @@
 	* Set target link on elem
 	*/
 	$.fn.mapael.setHref = function(elem) {
-		elem.attr({cursor : 'pointer'});
-		$(elem.node).bind('click', function() {
+		elem.attr({cursor : "pointer"});
+		$(elem.node).bind("click", function() {
 			if (!$.fn.mapael.panning && elem.href)
 				window.open(elem.href, elem.target);
 		});
@@ -488,7 +488,7 @@
 		$zoomOut.on("click", function() {$parentContainer.trigger("zoom", $parentContainer.data("zoomLevel") - 1);});
 		
 		// Panning
-		$('body').on("mouseup", function(e) {
+		$("body").on("mouseup", function(e) {
 			mousedown  = false;
 			setTimeout(function () {$.fn.mapael.panning = false;}, 50);
 		});
@@ -525,11 +525,11 @@
 	* Draw a legend for areas and / or plots
 	* @param $container the legend container
 	* @param options map options
-	* @param legendType the type of the legend : 'area' or 'plot'
+	* @param legendType the type of the legend : "area" or "plot"
 	*/
 	$.fn.mapael.createLegend = function ($container, options, legendType, elems, scale) {
 		var legendOptions = options.legend[legendType]
-			, $legend = (legendType == 'plot') ? $('.' + options.legend.plot.cssClass, $container).empty() : $('.' + options.legend.area.cssClass, $container).empty()
+			, $legend = (legendType == "plot") ? $("." + options.legend.plot.cssClass, $container).empty() : $("." + options.legend.area.cssClass, $container).empty()
 			, paper = new Raphael($legend.get(0))
 			, width = 5
 			, height = 5
@@ -555,7 +555,7 @@
 			if(legendOptions.slices[i].type == "image") {
 				yCenter = Math.max(yCenter, legendOptions.marginBottom + title.getBBox().height + scale * legendOptions.slices[i].height/2);
 			} else {
-				if (legendType == 'area' && !legendOptions.slices[i].size) {
+				if (legendType == "area" && !legendOptions.slices[i].size) {
 					legendOptions.slices[i].size = 20;
 				}
 				yCenter = Math.max(yCenter, legendOptions.marginBottom + title.getBBox().height + scale * legendOptions.slices[i].size/2);
@@ -567,8 +567,8 @@
 		}
 		
 		for(i = 0, length = legendOptions.slices.length; i < length; ++i) {
-			if (typeof legendOptions.slices[i].display == 'undefined' || legendOptions.slices[i].display == true) {
-				defaultElemOptions = (legendType == 'plot') ? options.map['defaultPlot'] : options.map['defaultArea'];
+			if (typeof legendOptions.slices[i].display == "undefined" || legendOptions.slices[i].display == true) {
+				defaultElemOptions = (legendType == "plot") ? options.map["defaultPlot"] : options.map["defaultArea"];
 				legendOptions.slices[i].attrs = $.extend(
 					{}
 					, defaultElemOptions.attrs
@@ -581,7 +581,7 @@
 				);
 				
 				// Draw a square for squared plots AND areas
-				if(legendType == 'area' || legendOptions.slices[i].type == "square") {
+				if(legendType == "area" || legendOptions.slices[i].type == "square") {
 					if (legendOptions.mode == "horizontal") {
 						x = width + legendOptions.marginLeft;
 						y = yCenter - (0.5 * scale * legendOptions.slices[i].size);
@@ -643,7 +643,7 @@
 				
 				if (legendOptions.hideElemsOnClick.enabled) {
 					// Hide/show elements when user clicks on a legend element
-					label.attr({cursor:'pointer'});
+					label.attr({cursor:"pointer"});
 					
 					$.fn.mapael.setHoverOptions(elem, legendOptions.slices[i].attrs, legendOptions.slices[i].attrs);
 					$.fn.mapael.setHoverOptions(label, legendOptions.labelAttrs, legendOptions.labelAttrsHover);
@@ -651,28 +651,28 @@
 					
 					label.hidden = false;
 					(function(i, elem, label) {
-						$(label.node).on('click', function() {
+						$(label.node).on("click", function() {
 							if (!label.hidden) {
-								label.animate({'opacity':0.5}, 300);
+								label.animate({"opacity":0.5}, 300);
 							} else {
-								label.animate({'opacity':1}, 300);
+								label.animate({"opacity":1}, 300);
 							}
 							
 							for (var id in elems) {
-								if ((typeof legendOptions.slices[i].min == 'undefined' || elems[id].value >= legendOptions.slices[i].min) 
-									&& (typeof legendOptions.slices[i].max == 'undefined' || elems[id].value < legendOptions.slices[i].max)
+								if ((typeof legendOptions.slices[i].min == "undefined" || elems[id].value >= legendOptions.slices[i].min) 
+									&& (typeof legendOptions.slices[i].max == "undefined" || elems[id].value < legendOptions.slices[i].max)
 								) {
 									(function(id) {
 										if (!label.hidden) {
-											elems[id].mapElem.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300, 'linear', function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].mapElem.hide();});
-											elems[id].textElem && elems[id].textElem.animate({'opacity':legendOptions.hideElemsOnClick.opacity}, 300, 'linear', function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].textElem.hide();});
+											elems[id].mapElem.animate({"opacity":legendOptions.hideElemsOnClick.opacity}, 300, "linear", function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].mapElem.hide();});
+											elems[id].textElem && elems[id].textElem.animate({"opacity":legendOptions.hideElemsOnClick.opacity}, 300, "linear", function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].textElem.hide();});
 										} else {
 											if (legendOptions.hideElemsOnClick.opacity == 0) {
 												elems[id].mapElem.show();
 												elems[id].textElem && elems[id].textElem.show();
 											}
-											elems[id].mapElem.animate({'opacity':typeof elems[id].mapElem.originalAttrs.opacity != "undefined" ? elems[id].mapElem.originalAttrs.opacity : 1}, 300);
-											elems[id].textElem && elems[id].textElem.animate({'opacity':typeof elems[id].textElem.originalAttrs.opacity != "undefined" ? elems[id].textElem.originalAttrs.opacity : 1}, 300);
+											elems[id].mapElem.animate({"opacity":typeof elems[id].mapElem.originalAttrs.opacity != "undefined" ? elems[id].mapElem.originalAttrs.opacity : 1}, 300);
+											elems[id].textElem && elems[id].textElem.animate({"opacity":typeof elems[id].textElem.originalAttrs.opacity != "undefined" ? elems[id].textElem.originalAttrs.opacity : 1}, 300);
 										}
 									})(id);
 								}
@@ -686,7 +686,7 @@
 		
 		// VMLWidth option allows you to set static width for the legend
 		// only for VML render because text.getBBox() returns wrong values on IE6/7
-		if (Raphael.type != 'SVG' && legendOptions.VMLWidth) 
+		if (Raphael.type != "SVG" && legendOptions.VMLWidth) 
 			width = legendOptions.VMLWidth;
 		
 		paper.setSize(width, height)
@@ -701,7 +701,7 @@
 	*/
 	$.fn.mapael.setHoverOptions = function (elem, originalAttrs, attrsHover) {
 		// Disable transform option on hover for VML (IE<9) because of several bugs
-		if (Raphael.type != 'SVG') delete attrsHover.transform;
+		if (Raphael.type != "SVG") delete attrsHover.transform;
 		elem.attrsHover = attrsHover;
 		
 		if (elem.attrsHover.transform) elem.originalAttrs = $.extend({transform : "s1"}, originalAttrs);
@@ -733,7 +733,7 @@
 	};
 	
 	/**
-	* Set he behaviour for 'mouseover' event
+	* Set he behaviour for "mouseover" event
 	* @param paper paper Raphael paper object
 	* @param mapElem mapElem the map element
 	* @param textElem the optional text element (within the map element)
@@ -745,7 +745,7 @@
 	}
 	
 	/**
-	* Set he behaviour for 'mouseout' event
+	* Set he behaviour for "mouseout" event
 	* @param paper Raphael paper object
 	* @param mapElem the map element
 	* @param textElem the optional text element (within the map element)
@@ -779,35 +779,35 @@
 	$.fn.mapael.getTextPosition = function(bbox, textPosition, margin) {
 		var textX = 0
 			, textY = 0
-			, textAnchor = '';
+			, textAnchor = "";
 			
 		switch (textPosition) {
-			case 'bottom' :
+			case "bottom" :
 				textX = (bbox.x + bbox.x2) / 2;
 				textY = bbox.y2 + margin;
 				textAnchor = "middle";
 				break;
-			case 'top' :
+			case "top" :
 				textX = (bbox.x + bbox.x2) / 2;
 				textY = bbox.y - margin;
 				textAnchor = "middle";
 				break;
-			case 'left' :
+			case "left" :
 				textX = bbox.x - margin;
 				textY = (bbox.y + bbox.y2) / 2;
 				textAnchor = "end";
 				break;
-			case 'right' :
+			case "right" :
 				textX = bbox.x2 + margin;
 				textY = (bbox.y + bbox.y2) / 2;
 				textAnchor = "start";
 				break;
-			default : // 'inner' position
+			default : // "inner" position
 				textX = (bbox.x + bbox.x2) / 2;
 				textY = (bbox.y + bbox.y2) / 2;
 				textAnchor = "middle";
 		}
-		return {'x' : textX, 'y' : textY, 'textAnchor' : textAnchor};
+		return {"x" : textX, "y" : textY, "textAnchor" : textAnchor};
 	}
 	
 	/**
@@ -818,8 +818,8 @@
 	*/
 	$.fn.mapael.getLegendSlice = function (value, legend) {
 		for(var i = 0, length = legend.slices.length; i < length; ++i) {
-			if ((typeof legend.slices[i].min == 'undefined' || value >= legend.slices[i].min) 
-				&& (typeof legend.slices[i].max == 'undefined' || value < legend.slices[i].max)
+			if ((typeof legend.slices[i].min == "undefined" || value >= legend.slices[i].min) 
+				&& (typeof legend.slices[i].max == "undefined" || value < legend.slices[i].max)
 			) {
 				return legend.slices[i];
 			}
@@ -846,7 +846,7 @@
 					, animDuration : 300
 				}
 				, text : {
-					position : 'inner'
+					position : "inner"
 					, margin : 10
 					, attrs : {
 						"font-size" : 15
@@ -857,7 +857,7 @@
 						, "animDuration" : 300
 					}
 				}
-				, target : '_self'
+				, target : "_self"
 			}
 			, defaultPlot : {
 				type : "circle"
@@ -873,7 +873,7 @@
 					, animDuration : 300
 				}
 				, text : {
-					position : 'right'
+					position : "right"
 					, margin : 10
 					, attrs : {
 						"font-size" : 15
@@ -884,7 +884,7 @@
 						, animDuration : 300
 					}
 				}
-				, target : '_self'
+				, target : "_self"
 			}
 			, zoom : {
 				enabled : false
@@ -921,7 +921,7 @@
 					, opacity : 0.2
 				}
 				, slices : []
-				, mode : 'vertical'
+				, mode : "vertical"
 			}
 			, plot : {
 				cssClass : "plotLegend"
@@ -949,7 +949,7 @@
 					, opacity : 0.2
 				}
 				, slices : []
-				, mode : 'vertical'
+				, mode : "vertical"
 			}
 		}
 		, areas : {}
