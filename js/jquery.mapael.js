@@ -200,8 +200,8 @@
 						elemOptions.attrs.x = plots[id].mapElem.attrs.x - (elemOptions.size - plots[id].mapElem.attrs.width) / 2;
 						elemOptions.attrs.y = plots[id].mapElem.attrs.y - (elemOptions.size - plots[id].mapElem.attrs.height) / 2;
 					} else if (elemOptions.type == "image") {
-						elemOptions.attrs.x = plots[id].mapElem.attrs.x - (elemOptions.attrs.width - plots[id].mapElem.attrs.width) / 2;
-						elemOptions.attrs.y = plots[id].mapElem.attrs.y - (elemOptions.attrs.height - plots[id].mapElem.attrs.height) / 2;
+						elemOptions.attrs.x = plots[id].mapElem.attrs.x - (elemOptions.width - plots[id].mapElem.attrs.width) / 2;
+						elemOptions.attrs.y = plots[id].mapElem.attrs.y - (elemOptions.height - plots[id].mapElem.attrs.height) / 2;
 					} else { // Default : circle
 						elemOptions.attrs.r = elemOptions.size / 2;
 					}
@@ -393,10 +393,10 @@
 			plot = {
 				'mapElem' : paper.image(
 					elemOptions.url
-					, coords.x - elemOptions.attrs.width / 2
-					, coords.y - elemOptions.attrs.height / 2
-					, elemOptions.attrs.width
-					, elemOptions.attrs.height
+					, coords.x - elemOptions.width / 2
+					, coords.y - elemOptions.height / 2
+					, elemOptions.width
+					, elemOptions.height
 				).attr(elemOptions.attrs)
 			};
 		} else { // Default = circle
@@ -537,7 +537,11 @@
 			, defaultElemOptions = {}
 			, elem = {}
 			, elemBBox = {}
-			, label = {};
+			, label = {}
+			, i = 0
+			, x = 0
+			, y = 0
+			, yCenter = 0;
 		
 		if(legendOptions.title) {
 			title = paper.text(legendOptions.marginLeftTitle, legendOptions.marginBottom, legendOptions.title)
@@ -547,7 +551,22 @@
 			height += legendOptions.marginBottom + title.getBBox().height;
 		}
 		
-		for(var i = 0, length = legendOptions.slices.length; i < length; ++i) {
+		for(i = 0, length = legendOptions.slices.length; i < length; ++i) {
+			if(legendOptions.slices[i].type == "image") {
+				yCenter = Math.max(yCenter, legendOptions.marginBottom + title.getBBox().height + scale * legendOptions.slices[i].height/2);
+			} else {
+				if (legendType == 'area' && !legendOptions.slices[i].size) {
+					legendOptions.slices[i].size = 20;
+				}
+				yCenter = Math.max(yCenter, legendOptions.marginBottom + title.getBBox().height + scale * legendOptions.slices[i].size/2);
+			}
+		}
+			
+		if (legendOptions.mode == "horizontal") {
+			width = legendOptions.marginLeft;
+		}
+		
+		for(i = 0, length = legendOptions.slices.length; i < length; ++i) {
 			if (typeof legendOptions.slices[i].display == 'undefined' || legendOptions.slices[i].display == true) {
 				defaultElemOptions = (legendType == 'plot') ? options.map['defaultPlot'] : options.map['defaultArea'];
 				legendOptions.slices[i].attrs = $.extend(
@@ -561,42 +580,66 @@
 					, legendOptions.slices[i].attrsHover
 				);
 				
+				// Draw a square for squared plots AND areas
 				if(legendType == 'area' || legendOptions.slices[i].type == "square") {
-					// Draw a square for squared plots AND areas
-					!legendOptions.slices[i].size && (legendOptions.slices[i].size = 20);
+					if (legendOptions.mode == "horizontal") {
+						x = width + legendOptions.marginLeft;
+						y = yCenter - (0.5 * scale * legendOptions.slices[i].size);
+					} else {
+						x = legendOptions.marginLeft;
+						y = height;
+					}
 					
-					elem = paper.rect(
-						legendOptions.marginLeft
-						, height
-						, scale * (legendOptions.slices[i].size)
-						, scale * (legendOptions.slices[i].size)
-					).attr(legendOptions.slices[i].attrs);
+					elem = paper.rect(x, y, scale * (legendOptions.slices[i].size), scale * (legendOptions.slices[i].size))
+						.attr(legendOptions.slices[i].attrs);
+						
 				} else if(legendOptions.slices[i].type == "image") {
+					if (legendOptions.mode == "horizontal") {
+						x = width + legendOptions.marginLeft;
+						y = yCenter - (0.5 * scale * legendOptions.slices[i].height);
+					} else {
+						x = legendOptions.marginLeft;
+						y = height;
+					}
+
 					elem = paper.image(
-						legendOptions.slices[i].url
-						, legendOptions.marginLeft
-						, height
-						, scale * legendOptions.slices[i].attrs.width
-						, scale * legendOptions.slices[i].attrs.height
-					).attr(legendOptions.slices[i].attrs);
+						legendOptions.slices[i].url, x, y, scale * legendOptions.slices[i].width, scale * legendOptions.slices[i].height)
+						.attr(legendOptions.slices[i].attrs);
 				} else {
-					elem = paper.circle(
-						legendOptions.marginLeft + scale * (legendOptions.slices[i].size / 2)
-						, height + scale * (legendOptions.slices[i].size / 2)
-						, scale * (legendOptions.slices[i].size / 2)
-					).attr(legendOptions.slices[i].attrs);
+					if (legendOptions.mode == "horizontal") {
+						x = width + legendOptions.marginLeft + scale * (legendOptions.slices[i].size / 2);
+						y = yCenter;
+					} else {
+						x = legendOptions.marginLeft + scale * (legendOptions.slices[i].size / 2);
+						y = height + scale * (legendOptions.slices[i].size / 2);
+					}
+					
+					elem = paper.circle(x, y, scale * (legendOptions.slices[i].size / 2)).attr(legendOptions.slices[i].attrs);
 				} 
 				
 				elemBBox = elem.getBBox();
 				
-				label = paper.text(
-					legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel
-					, height + (elemBBox.height / 2)
-					, legendOptions.slices[i].label
-				).attr(legendOptions.labelAttrs);
+				if (legendOptions.mode == "horizontal") {
+					x = width + legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel;
+					y = yCenter;
+				} else {
+					x = legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel;
+					y = height + (elemBBox.height / 2);
+				}
 				
-				width = Math.max(width, legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width);
-				height += legendOptions.marginBottom + elemBBox.height;
+				label = paper.text(x, y, legendOptions.slices[i].label).attr(legendOptions.labelAttrs);
+				
+				if (legendOptions.mode == "horizontal") {
+					width += legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width;
+					if(legendOptions.slices[i].type == "image") {
+						height = Math.max(height, legendOptions.marginBottom + title.getBBox().height + scale * legendOptions.slices[i].height);
+					} else {
+						height = Math.max(height, legendOptions.marginBottom + title.getBBox().height + scale * legendOptions.slices[i].size);
+					}
+				} else {
+					width = Math.max(width, legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width);
+					height += legendOptions.marginBottom + elemBBox.height;
+				}
 				
 				if (legendOptions.hideElemsOnClick.enabled) {
 					// Hide/show elements when user clicks on a legend element
@@ -878,6 +921,7 @@
 					, opacity : 0.2
 				}
 				, slices : []
+				, mode : 'vertical'
 			}
 			, plot : {
 				cssClass : "plotLegend"
@@ -905,6 +949,7 @@
 					, opacity : 0.2
 				}
 				, slices : []
+				, mode : 'vertical'
 			}
 		}
 		, areas : {}
