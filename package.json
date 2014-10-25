@@ -1,17 +1,25 @@
 {
   "name": "jquery-mousewheel",
   "version": "3.1.12",
-  "author": "Brandon Aaron (http://brandon.aaron.sh)",
+  "author": {
+    "name": "jQuery Foundation and other contributors",
+    "url": "https://github.com/jquery/jquery-mousewheel/blob/master/AUTHORS.txt"
+  },
   "description": "A jQuery plugin that adds cross-browser mouse wheel support.",
-  "license": "MIT",
-  "homepage": "https://github.com/brandonaaron/jquery-mousewheel",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/jquery/jquery-mousewheel/blob/master/LICENSE.txt"
+    }
+  ],
+  "homepage": "https://github.com/jquery/jquery-mousewheel",
   "main": "./jquery.mousewheel.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/brandonaaron/jquery-mousewheel.git"
+    "url": "https://github.com/jquery/jquery-mousewheel.git"
   },
   "bugs": {
-    "url": "https://github.com/brandonaaron/jquery-mousewheel/issues"
+    "url": "https://github.com/jquery/jquery-mousewheel/issues"
   },
   "keywords": [
     "jquery",
@@ -19,13 +27,14 @@
     "wheel",
     "event",
     "mousewheel",
-    "plugin",
+    "jquery-plugin",
     "browser"
   ],
   "files": [
     "ChangeLog.md",
     "jquery.mousewheel.js",
-    "README.md"
+    "README.md",
+    "LICENSE.txt"
   ],
   "devDependencies": {
     "grunt": "~0.4.1",
