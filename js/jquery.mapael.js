@@ -675,8 +675,10 @@
 							}
 							
 							for (var id in elems) {
-								if ((typeof legendOptions.slices[i].min == "undefined" || elems[id].value >= legendOptions.slices[i].min) 
-									&& (typeof legendOptions.slices[i].max == "undefined" || elems[id].value < legendOptions.slices[i].max)
+								if ((typeof legendOptions.slices[i].value != "undefined" && elems[id].value == legendOptions.slices[i].value)
+									|| ((typeof legendOptions.slices[i].value == "undefined")
+										&& (typeof legendOptions.slices[i].min == "undefined" || elems[id].value >= legendOptions.slices[i].min) 
+										&& (typeof legendOptions.slices[i].max == "undefined" || elems[id].value < legendOptions.slices[i].max))
 								) {
 									(function(id) {
 										if (!label.hidden) {
@@ -834,8 +836,10 @@
 	*/
 	$.fn.mapael.getLegendSlice = function (value, legend) {
 		for(var i = 0, length = legend.slices.length; i < length; ++i) {
-			if ((typeof legend.slices[i].min == "undefined" || value >= legend.slices[i].min) 
-				&& (typeof legend.slices[i].max == "undefined" || value < legend.slices[i].max)
+			if ((typeof legend.slices[i].value != "undefined" && value == legend.slices[i].value) 
+				|| ((typeof legend.slices[i].value == "undefined") 
+					&& (typeof legend.slices[i].min == "undefined" || value >= legend.slices[i].min) 
+					&& (typeof legend.slices[i].max == "undefined" || value < legend.slices[i].max))
 			) {
 				return legend.slices[i];
 			}
