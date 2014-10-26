@@ -531,8 +531,8 @@
 		var legendOptions = options.legend[legendType]
 			, $legend = (legendType == "plot") ? $("." + options.legend.plot.cssClass, $container).empty() : $("." + options.legend.area.cssClass, $container).empty()
 			, paper = new Raphael($legend.get(0))
-			, width = 5
-			, height = 5
+			, width = 0
+			, height = 0
 			, title = {}
 			, defaultElemOptions = {}
 			, elem = {}
@@ -544,21 +544,24 @@
 			, yCenter = 0;
 		
 		if(legendOptions.title) {
-			title = paper.text(legendOptions.marginLeftTitle, legendOptions.marginBottom, legendOptions.title)
-				.attr(legendOptions.titleAttrs);
+			title = paper.text(legendOptions.marginLeftTitle, 0, legendOptions.title).attr(legendOptions.titleAttrs);
+			title.attr({y : 0.5 * title.getBBox().height});
 				
 			width = legendOptions.marginLeftTitle + title.getBBox().width;
-			height += legendOptions.marginBottom + title.getBBox().height;
+			height += legendOptions.marginBottomTitle + title.getBBox().height;
 		}
 		
 		for(i = 0, length = legendOptions.slices.length; i < length; ++i) {
-			if(legendOptions.slices[i].type == "image") {
-				yCenter = Math.max(yCenter, legendOptions.marginBottom + title.getBBox().height + scale * legendOptions.slices[i].height/2);
+			if (legendType == "area" && !legendOptions.slices[i].width)
+				legendOptions.slices[i].width = 30;
+				
+			if (legendType == "area" && !legendOptions.slices[i].height)
+				legendOptions.slices[i].height = 20;
+				
+			if(legendOptions.slices[i].type == "image" || legendType == "area") {
+				yCenter = Math.max(yCenter, legendOptions.marginBottomTitle + title.getBBox().height + scale * legendOptions.slices[i].height/2);
 			} else {
-				if (legendType == "area" && !legendOptions.slices[i].size) {
-					legendOptions.slices[i].size = 20;
-				}
-				yCenter = Math.max(yCenter, legendOptions.marginBottom + title.getBBox().height + scale * legendOptions.slices[i].size/2);
+				yCenter = Math.max(yCenter, legendOptions.marginBottomTitle + title.getBBox().height + scale * legendOptions.slices[i].size/2);
 			}
 		}
 			
@@ -580,8 +583,18 @@
 					, legendOptions.slices[i].attrsHover
 				);
 				
-				// Draw a square for squared plots AND areas
-				if(legendType == "area" || legendOptions.slices[i].type == "square") {
+				if(legendType == "area") {
+					if (legendOptions.mode == "horizontal") {
+						x = width + legendOptions.marginLeft;
+						y = yCenter - (0.5 * scale * legendOptions.slices[i].height);
+					} else {
+						x = legendOptions.marginLeft;
+						y = height;
+					}
+					
+					elem = paper.rect(x, y, scale * (legendOptions.slices[i].width), scale * (legendOptions.slices[i].height))
+						.attr(legendOptions.slices[i].attrs);
+				} else if(legendOptions.slices[i].type == "square") {
 					if (legendOptions.mode == "horizontal") {
 						x = width + legendOptions.marginLeft;
 						y = yCenter - (0.5 * scale * legendOptions.slices[i].size);
@@ -631,10 +644,10 @@
 				
 				if (legendOptions.mode == "horizontal") {
 					width += legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width;
-					if(legendOptions.slices[i].type == "image") {
+					if(legendOptions.slices[i].type == "image" || legendType == "area") {
 						height = Math.max(height, legendOptions.marginBottom + title.getBBox().height + scale * legendOptions.slices[i].height);
 					} else {
-						height = Math.max(height, legendOptions.marginBottom + title.getBBox().height + scale * legendOptions.slices[i].size);
+						height = Math.max(height, legendOptions.marginBottomTitle + title.getBBox().height + scale * legendOptions.slices[i].size);
 					}
 				} else {
 					width = Math.max(width, legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width);
@@ -900,6 +913,7 @@
 				, display : false
 				, marginLeft : 15
 				, marginLeftTitle : 5
+				, marginBottomTitle: 15
 				, marginLeftLabel : 10
 				, marginBottom : 15
 				, titleAttrs : {
@@ -928,6 +942,7 @@
 				, display : false
 				, marginLeft : 15
 				, marginLeftTitle : 5
+				, marginBottomTitle: 15
 				, marginLeftLabel : 10
 				, marginBottom : 15
 				, titleAttrs : {
