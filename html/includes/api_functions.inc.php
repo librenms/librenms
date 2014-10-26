@@ -349,3 +349,23 @@ function show_endpoints() {
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
+
+function list_bgp() {
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $code = 500;
+    $hostname = $_GET['hostname'];
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if(is_numeric($device_id)) {
+        $sql = " AND `device_id`=?";
+        $sql_params = array($device_id);
+    }
+    $bgp_sessions = dbFetchRows("SELECT * FROM bgpPeers WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
+    $total_bgp_sessions = count($bgp_sessions);
+    $code = 200;
+    $output = array("status" => "ok", "count" => $total_bgp_sessions, "bgp_sessions" => $bgp_sessions);
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}

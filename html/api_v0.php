@@ -39,6 +39,7 @@ $app->group('/api', function() use ($app) {
     $app->get('/devices', 'authToken', 'list_devices')->name('list_devices');//api/v0/devices
     $app->post('/devices', 'authToken', 'add_device')->name('add_device');//api/v0/devices (json data needs to be passed)
     $app->delete('/devices/:hostname', 'authToken', 'del_device')->name('del_device');//api/v0/devices (json data needs to be passed)
+    $app->get('/bgp', 'authToken', 'list_bgp')->name('list_bgp');//api/v0/bpg
   });
   $app->get('/v0', 'authToken', 'show_endpoints');//api/v0
 });
