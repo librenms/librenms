@@ -654,6 +654,9 @@
 					height += legendOptions.marginBottom + elemBBox.height;
 				}
 				
+				$(elem.node).attr({"data-type": "elem", "data-index": i});
+				$(label.node).attr({"data-type": "label", "data-index": i});
+				
 				if (legendOptions.hideElemsOnClick.enabled) {
 					// Hide/show elements when user clicks on a legend element
 					label.attr({cursor:"pointer"});
