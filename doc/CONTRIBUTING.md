@@ -24,9 +24,13 @@ the commit log:
 	I agree to the conditions of the Contributor Agreement
 	contained in doc/CONTRIBUTING.md.
 ```
-Note that contributors to LibreNMS retain copyright to their own code and
-are not required to sign over their rights to any other party.  You maintain
-all rights to your own code.
+
+
+Copyright
+---------
+
+All contributors to LibreNMS retain copyright to their own code and are not
+required to sign over their rights to any other party.
 
 We recommend that if you add a new file containing original code to the code
 base that you include a copyright notice in it as per the Free Software
@@ -52,11 +56,11 @@ your code.  Please see LICENSE.txt at the top of this source code
 distribution for details.
 
 
-Guidelines for contributing to LibreNMS
----------------------------------------
+General Guidelines
+------------------
 
 - Test your patches first.  It's easy to set up git to push to a bare
-  repository on a local test system, and pull from this into your live
+  repository on a local test system, and pull from this into a live test
   installation at very frequent intervals.
 
 - Don't break the poller.  User interface blemishes are not critical, but
@@ -75,6 +79,27 @@ Guidelines for contributing to LibreNMS
 - Please join us in IRC at irc.freenode.net in channel ##librenms if you're
   able.  Collaborating in real time makes the coordination of contributions
   easier.
+
+
+Integrating other code
+----------------------
+
+Giving credit where credit is due is critical to the Free Software
+philosophy.  If you use code from somewhere else, even if it's trivial,
+be sure to note this as a comment in the code (preferably) or the commit
+message.
+
+- To incorporate larger blocks of code from third parties (e.g. JavaScript
+  libraries):
+    - Include its name, source URL, copyright notice, and license in
+      doc/CREDITS.md
+    - preferred locations are html/js, html/lib, and lib
+    - Add it in a separate commit into its own directory, using
+      'git subtree --squash' if it is available via git.
+    - Add the code to integrate it in a separate commit.  Include:
+        - code to update it in Makefile
+	- Scrutinizer exclusions to .scrutinizer.yml
+	- symlinks where necessary to maintain sensible paths
 
 - Don't submit code whose license conflicts with the GPLv3.  If you're not
   sure, consult the [Free Software Foundation's license list][1] and see if
