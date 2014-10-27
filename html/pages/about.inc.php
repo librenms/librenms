@@ -112,7 +112,7 @@ print_optionbar_start(NULL);
 
 echo("
     <table width=100% cellpadding=3 cellspacing=0 border=0>
-      <tr valign=top><td width=150><b>$project_name</b></td><td>$project_version</td></tr>
+      <tr valign=top><td width=150><b>$project_name</b></td><td><a href='http://www.librenms.org/changelog.html'>$project_version</a></td></tr>
       <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
       <tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
       <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
@@ -130,7 +130,8 @@ print_optionbar_end();
       <a href="https://github.com/librenms/">Web site</a> |
       <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
       <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a> |
-      <a href="http://twitter.com/librenms">Twitter</a>
+      <a href="http://twitter.com/librenms">Twitter</a> |
+      <a href="http://www.librenms.org/changelog.html">Changelog</a>
     </p>
 
   <div style="margin-top:10px;">
