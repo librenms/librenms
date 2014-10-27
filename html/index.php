@@ -138,9 +138,10 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <script src="js/bootstrap-datetimepicker.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
   <script src="js/bootstrap-switch.min.js"></script>
-  <script src="js/typeahead.min.js"></script>
   <script src="js/hogan-2.0.0.js"></script>
   <script src="js/jquery.cycle2.min.js"></script>
+  <script src="js/moment.min.js"></script>
+  <script src="js/typeahead.min.js"></script>
 <?php
 if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n"); }
 ?>
