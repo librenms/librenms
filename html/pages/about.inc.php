@@ -112,7 +112,7 @@ print_optionbar_start(NULL);
 
 echo("
     <table width=100% cellpadding=3 cellspacing=0 border=0>
-      <tr valign=top><td width=150><b>$project_name</b></td><td>$project_version</td></tr>
+      <tr valign=top><td width=150><b>$project_name</b></td><td><a href='http://www.librenms.org/changelog.html'>$project_version</a></td></tr>
       <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
       <tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
       <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
