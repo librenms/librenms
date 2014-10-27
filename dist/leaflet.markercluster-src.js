@@ -876,7 +876,7 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 	//Gets the maps visible bounds expanded in each direction by the size of the screen (so the user cannot see an area we do not cover in one pan)
 	_getExpandedVisibleBounds: function () {
 		if (!this.options.removeOutsideVisibleBounds) {
-			return this.getBounds();
+			return this._map.getBounds();
 		}
 
 		var map = this._map,
