@@ -130,7 +130,8 @@ print_optionbar_end();
       <a href="https://github.com/librenms/">Web site</a> |
       <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
       <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a> |
-      <a href="http://twitter.com/librenms">Twitter</a>
+      <a href="http://twitter.com/librenms">Twitter</a> |
+      <a href="http://www.librenms.org/changelog.html">Changelog</a>
     </p>
 
   <div style="margin-top:10px;">
