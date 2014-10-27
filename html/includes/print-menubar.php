@@ -111,34 +111,6 @@ if ($config['show_locations'])
           </ul>
         </li>
 
-<script class="code" type="text/javascript">
-$(document).ready(function() {
-  var data = [
-    ['Up', <?php echo($devices['up']); ?>],
-    ['Down', <?php echo($devices['down']); ?>],
-    ['Ignored', <?php echo($devices['ignored']); ?>],
-    ['Disabled', <?php echo($devices['disabled']); ?>]
-  ];
-  var plot1 = jQuery.jqplot ('devices_chart', [data],
-    {
-      seriesDefaults: {
-        renderer: jQuery.jqplot.PieRenderer,
-        rendererOptions: {
-          // Turn off filling of slices.
-          fill: true,
-          showDataLabels: true,
-          // Add a margin to seperate the slices.
-          sliceMargin: 0,
-          // stroke the slices with a little thicker line.
-          lineWidth: 5
-        }
-      },
-      legend: { show:true, location: 'e' }
-    }
-  );
-});
-</script>
-
 <?php
 
 if ($config['show_services'])
@@ -168,33 +140,6 @@ if ($_SESSION['userlevel'] >= '10')
 ?>
           </ul>
         </li>
-
-<script class="code" type="text/javascript">
-$(document).ready(function() {
-  var data = [
-    ['Up', <?php echo($services['up']); ?>],
-    ['Down', <?php echo($services['down']); ?>],
-  ];
-  var plot2 = jQuery.jqplot ('services_chart', [data],
-    {
-      seriesDefaults: {
-        renderer: jQuery.jqplot.PieRenderer,
-        rendererOptions: {
-          // Turn off filling of slices.
-          fill: true,
-          showDataLabels: true,
-          // Add a margin to seperate the slices.
-          sliceMargin: 0,
-          // stroke the slices with a little thicker line.
-          lineWidth: 5
-        }
-      },
-      legend: { show:true, location: 'e' }
-    }
-  );
-});
-</script>
-
 <?php
 }
 
@@ -267,34 +212,6 @@ if ($deleted_ports) { echo('            <li><a href="deleted-ports/"><img src="i
 
 ?>
 
-<script class="code" type="text/javascript">
-$(document).ready(function() {
-  var data = [
-    ['Up', <?php echo($ports['up']); ?>],
-    ['Down', <?php echo($ports['down']); ?>],
-    ['Shutdown', <?php echo($ports['admindown']); ?>],
-    ['Ignored', <?php echo($ports['ignored']); ?>],
-    ['Deleted', <?php echo($ports['deleted']); ?>]
-  ];
-  var plot3 = jQuery.jqplot ('ports_chart', [data],
-    {
-      seriesDefaults: {
-        renderer: jQuery.jqplot.PieRenderer,
-        rendererOptions: {
-          // Turn off filling of slices.
-          fill: true,
-          showDataLabels: true,
-          // Add a margin to seperate the slices.
-          sliceMargin: 0,
-          // stroke the slices with a little thicker line.
-          lineWidth: 5
-        }
-      },
-      legend: { show:true, location: 'e' }
-    }
-  );
-});
-</script>
           </ul>
         </li>
 <?php
