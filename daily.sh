@@ -3,7 +3,7 @@
 cd $(dirname $0) || exit 1
 
 if [ $(php daily.php -f update) -eq 1 ]; then 
-  git pull --no-edit --quiet
+  git pull --quiet
   php includes/sql-schema/update.php
 fi
 
