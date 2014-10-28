@@ -86,6 +86,11 @@ markers.on('clusterclick', function (a) {
 });
 ```
 
+#### Additional MarkerClusterGroup Events
+
+- **animationend**: Fires when marker clustering/unclustering animation has completed
+- **spiderfied**: Fires when overlapping markers get spiderified
+
 ## Methods
 
 ### Getting the bounds of a cluster
