@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 DROP TABLE IF EXISTS `alerts`;
 CREATE TABLE IF NOT EXISTS `alerts` (  `id` int(11) NOT NULL AUTO_INCREMENT,  `device_id` int(11) NOT NULL,  `rule_id` int(11) NOT NULL,  `state` int(11) NOT NULL,  `alerted` int(11) NOT NULL,  `open` int(11) NOT NULL,  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  PRIMARY KEY (`id`)) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `alert_log`;
