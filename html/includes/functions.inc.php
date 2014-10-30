@@ -678,4 +678,35 @@ function include_matching_files($dir, $match = "/\.php$/")
   }
 }
 
+function generate_pagination($count,$limit,$page,$links = 2) {
+    $end_page = ceil($count / $limit);
+    $start = (($page - $links) > 0) ? $page - $links : 1;
+    $end = (($page + $links) < $end_page) ? $page + $links : $end_page;
+    $return = '<ul class="pagination">';
+    $link_class = ($page == 1) ? "disabled" : "";
+    $return .= "<li><a href='' onClick='changePage(1,event);'>&laquo;</a></li>";
+    $return .= "<li class='$link_class'><a href='' onClick='changePage($page - 1,event);'>&lt;</a></li>";
+
+    if($start > 1) {
+        $return .= "<li><a href='' onClick='changePage(1,event);'>1</a></li>";
+        $return .= "<li class='disabled'><span>...</span></li>";
+    }
+
+    for($x=$start;$x<=$end;$x++) {
+        $link_class = ($page == $x) ? "active" : "";
+        $return .= "<li class='$link_class'><a href='' onClick='changePage($x,event);'>$x </a></li>";
+    }
+
+    if($end < $end_page) {
+        $return .= "<li class='disabled'><span>...</span></li>";
+        $return .= "<li><a href='' onClick='changePage($end_page,event);'>$end_page</a></li>";
+    }
+
+    $link_class = ($page == $end_page) ? "disabled" : "";
+    $return .= "<li class='$link_class'><a href='' onClick='changePage($page + 1,event);'>&gt;</a></li>";
+    $return .= "<li class='$link_class'><a href='' onClick='changePage($end_page,event);'>&raquo;</a></li>";
+    $return .= '</ul>';
+    return($return);
+}
+
 ?>
