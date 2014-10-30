@@ -30,15 +30,33 @@ foreach (dbFetchRows("SELECT D.device_id AS device_id, `hostname` FROM `ipv4_mac
 
 <?php
 
+if(isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
+    $results = $_POST['results'];
+} else {
+    $results = 50;
+}
+
 print_optionbar_end();
 
-echo('<div class="panel panel-default panel-condensed">
-              <div class="panel-heading">
-                <strong>ARP Entries</strong>
-              </div>
-              <table class="table table-hover table-condensed table-striped">');
+              echo('<form method="post" action="search/search=arp/" id="result_form">
+              <table class="table table-hover table-condensed table-striped">
+                <tr>
+                  <td colspan="5"><strong>ARP Entries</strong></td>
+                  <td><select name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">');
+                  $result_options = array('10','50','100','250','500','1000','5000');
+                  foreach($result_options as $option) {
+                      echo "<option value='$option'";
+                      if($results == $option) {
+                          echo " selected";
+                      }
+                      echo ">$option</option>";
+                  }
+                  echo('</select></td>
+                </tr>');
 
-$query = "SELECT * FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D WHERE M.port_id = P.port_id AND P.device_id = D.device_id ";
+$count_query = "SELECT COUNT(M.port_id)";
+$full_query = "SELECT *";
+$query = " FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D WHERE M.port_id = P.port_id AND P.device_id = D.device_id ";
 if (isset($_POST['searchby']) && $_POST['searchby'] == "ip")
 {
   $query .= " AND `ipv4_address` LIKE ?";
@@ -54,9 +72,17 @@ if (is_numeric($_POST['device_id']))
   $param[] = $_POST['device_id'];
 }
 $query .= " ORDER BY M.mac_address";
-
+$count_query = $count_query . $query;
+$count = dbFetchCell($count_query,$param);
+if(!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
+    $page_number = 1;
+} else {
+    $page_number = $_POST['page_number'];
+}
+$start = ($page_number - 1) * $results;
+$full_query = $full_query . $query . " LIMIT $start,$results";
 echo('<tr><th>MAC Address</th><th>IP Address</th><th>Device</th><th>Interface</th><th>Remote device</th><th>Remote interface</th></tr>');
-foreach (dbFetchRows($query, $param) as $entry)
+foreach (dbFetchRows($full_query, $param) as $entry)
 {
   if (!$ignore)
   {
@@ -87,8 +113,27 @@ foreach (dbFetchRows($query, $param) as $entry)
 
   unset($ignore);
 }
-
-echo("</table>");
-echp('</div>');
-
+if($count % $results > 0) {
+    echo('    <tr>
+         <td colspan="6" align="center">'. generate_pagination($count,$results,$page_number) .'</td>
+     </tr>');
+}
+echo('</table>
+<input type="hidden" name="page_number" id="page_number" value="'.$page_number.'">
+<input type="hidden" name="results_amount" id="results_amount" value="'.$results.'">
+</form>');
 ?>
+
+<script type="text/javascript">
+    function updateResults(results) {
+       $('#results_amount').val(results.value);
+       $('#page_number').val(1);
+       $('#result_form').submit();
+    }
+
+    function changePage(page,e) {
+        e.preventDefault();
+        $('#page_number').val(page);
+        $('#result_form').submit();
+    }
+</script>
