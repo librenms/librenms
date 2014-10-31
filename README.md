@@ -4,6 +4,7 @@ Colorful iconic & retina-proof markers for Leaflet, based on the Glyphicons / Fo
 Version 2.0 of Leaflet.awesome-markers is tested with:
 - Bootstrap 3
 - Font Awesome 4.0
+- Ionicons 1.5.2
 - Leaflet 0.5-Latest
 
 For bootstrap 2.x & Fontawesome 3.x use Leaflet.awesome-markers v1.0
@@ -23,8 +24,12 @@ For Font-Awesome
 For Twitter bootstrap:
 - http://twitter.github.com/bootstrap/
 
+For Ionicons:
+- http://ionicons.com
+
+
 ## Using the plugin
-- 1) First, follow the steps for including Font-Awesome or Twitter bootstrap into your application.
+- 1) First, follow the steps for including Font-Awesome or Twitter bootstrap or Ionicons into your application.
 
 For Font-Awesome, steps are located here:
 
@@ -33,7 +38,14 @@ http://fortawesome.github.io/Font-Awesome/get-started/
 For Twitter bootstrap, steps are here:
 
 http://getbootstrap.com/getting-started/
+
+For Ionicons:
+
+Add the ionicon stylesheet from a [CDN](http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css) or [download ionicons](http://ionicons.com).
     
+````xml
+<link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
+````
 
 - 2) Next, copy the dist/images directory, awesome-markers.css, and awesome-markers.js to your project and include them:
 ````xml
@@ -75,6 +87,26 @@ The 'icon' property supports these strings:
 - 'bookmark'
 - .... and many more, see: http://fortawesome.github.io/Font-Awesome/icons/
 - Or: http://getbootstrap.com/components/#glyphicons
+- Or: http://ionicons.com
+
+### Tips & Tricks
+
+Tweak size and positioning of the icons:
+
+````css
+    .awesome-marker i {
+        font-size: 18px;
+        margin-top: 8px;
+    }
+````
+
+Set default prefix to something other than `glypicon`
+
+````js
+    L.AwesomeMarkers.Icon.prototype.options.prefix = 'ion';
+````
+
+See [JSFIddle](http://jsfiddle.net/markmarijnissen/VPzu4/286/)
 
 ## License
 - Leaflet.AwesomeMarkers and colored markers are licensed under the MIT License - http://opensource.org/licenses/mit-license.html.
