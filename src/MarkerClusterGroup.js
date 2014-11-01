@@ -655,11 +655,11 @@ L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	_zoomOrSpiderfy: function (e) {
 		var map = this._map;
-		if (e.layer._bounds._northEast.equals(e.layer._bounds._southWest)){
+		if ( e.layer._bounds._northEast.equals(e.layer._bounds._southWest)) {
 			if (this.options.spiderfyOnMaxZoom) {
 				e.layer.spiderfy();
 			}
-		}else if (map.getMaxZoom() === map.getZoom()) {
+		} else if (map.getMaxZoom() === map.getZoom()) {
 			if (this.options.spiderfyOnMaxZoom) {
 				e.layer.spiderfy();
 			}
