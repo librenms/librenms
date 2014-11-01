@@ -31,7 +31,7 @@ map.addLayer(markers);
 By default the Clusterer enables some nice defaults for you:
 * **showCoverageOnHover**: When you mouse over a cluster it shows the bounds of its markers.
 * **zoomToBoundsOnClick**: When you click a cluster we zoom to its bounds.
-* **spiderfyOnMaxZoom**: When you click a cluster at the bottom zoom level we spiderfy it so you can see all of its markers.
+* **spiderfyOnMaxZoom**: When you click a cluster at the bottom zoom level we spiderfy it so you can see all of its markers. (*Note:* the spiderfy occurs at the current zoom level if all items within the cluster are physically located at the same latitude and longitude.)
 * **removeOutsideVisibleBounds**: Clusters and markers too far from the viewport are removed from the map for performance.
 
 You can disable any of these as you want in the options when you create the MarkerClusterGroup:
@@ -58,7 +58,7 @@ Check out the [custom example](http://leaflet.github.com/Leaflet.markercluster/e
 Enabled by default (boolean options):
 * **showCoverageOnHover**: When you mouse over a cluster it shows the bounds of its markers.
 * **zoomToBoundsOnClick**: When you click a cluster we zoom to its bounds.
-* **spiderfyOnMaxZoom**: When you click a cluster at the bottom zoom level we spiderfy it so you can see all of its markers.
+* **spiderfyOnMaxZoom**: When you click a cluster at the bottom zoom level we spiderfy it so you can see all of its markers. (*Note:* the spiderfy occurs at the current zoom level if all items within the cluster are physically located at the same latitude and longitude.)
 * **removeOutsideVisibleBounds**: Clusters and markers too far from the viewport are removed from the map for performance.
 
 Other options
