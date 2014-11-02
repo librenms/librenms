@@ -9,7 +9,7 @@ if ($vars['action'] == "expunge" && $_SESSION['userlevel'] >= '10')
 }
 
 if(isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
-    $numresults = $_POST['results'];
+    $numresults = $_POST['results_amount'];
 } else {
     $numresults = 250;
 }
