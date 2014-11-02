@@ -75,10 +75,8 @@ if ($_SESSION['userlevel'] >= '5')
   $query = " FROM `eventlog` AS E, devices_perms AS P WHERE $where AND E.host = P.device_id AND P.user_id = ? ORDER BY `datetime` DESC";
   $param[] = $_SESSION['user_id'];
 }
-$count_query = "SELECT COUNT(datetime)";
-$full_query = "SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate";
-$count_query = $count_query . $query;
-$full_query = $full_query . $query . " LIMIT $start,$numresults";
+$count_query = "SELECT COUNT(datetime) $query";
+$full_query = "SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate $query LIMIT $start,$numresults";
 
             echo('<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
