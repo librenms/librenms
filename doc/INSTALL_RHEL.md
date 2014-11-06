@@ -31,7 +31,7 @@ If you are deploying a separate database server, you need to change the `bind-ad
     vim /etc/my.cnf
 
 Add the following line:
-    
+
     bind-address = <ip>
 
 Change `<ip>` to the IP address that your MySQL server should listen on.  Restart MySQL:
@@ -42,13 +42,75 @@ Change `<ip>` to the IP address that your MySQL server should listen on.  Restar
 
 Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of CentOS 6.4.  It also requires the EPEL repository.
 
+Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardless of of `nginx`'s (or any other web-server's) presence.
+
     rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
-    yum install php php-cli php-gd php-mysql php-snmp php-pear httpd net-snmp graphviz graphviz-php mysql ImageMagick  jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
+    yum install php php-cli php-gd php-mysql php-snmp php-pear httpd net-snmp graphviz graphviz-php mysql ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
     pear install Net_IPv4-1.3.4
     pear install Net_IPv6-1.2.2b2
+
+### Using HTTPd (Apache2) ###
+
+Set `httpd` to start on system boot.
+
     chkconfig --levels 235 httpd on
-    service httpd start
-    
+
+Next, add the following to `/etc/httpd/conf.d/librenms.conf`
+
+    <VirtualHost *:80>
+      DocumentRoot /opt/librenms/html/
+      ServerName  librenms.example.com
+      CustomLog /opt/librenms/logs/access_log combined
+      ErrorLog /opt/librenms/logs/error_log
+      AllowEncodedSlashes On
+      <Directory "/opt/librenms/html/">
+        AllowOverride All
+        Options FollowSymLinks MultiViews
+      </Directory>
+    </VirtualHost>
+
+If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes` to `NoDecode`
+
+### Using Nginx and PHP-FPM ###
+
+Install necessary extra software and let it start on system boot.
+
+    yum install nginx php-fpm
+    chkconfig --levels 235 nginx on
+    chkconfig --levels 235 php-fpm on
+
+Modify permissions and configuration for `php-fpm` to use nginx credentials.
+
+    chown root:nginx /var/lib/php -R
+    vi /etc/php-fpm.d/www.conf      # At line #12: Change `listen` to `/var/run/php5-fpm.sock`
+                                    # At line #39-41: Change the `user` and `group` to `nginx`
+
+Add configuration for `nginx` at `/etc/nginx/conf.d/librenms` with the following content:
+
+    server {
+     listen      80;
+     server_name librenms.example.com;
+     root        /opt/librenms/html;
+     index       index.php;
+     access_log  /opt/librenms/logs/access_log;
+     error_log   /opt/librenms/logs/error_log;
+     location / {
+      try_files $uri $uri/ @librenms;
+     }
+     location ~ \.php {
+      include fastcgi.conf;
+      fastcgi_split_path_info ^(.+\.php)(/.+)$;
+      fastcgi_pass unix:/var/run/php5-fpm.sock;
+     }
+     location ~ /\.ht {
+      deny all;
+     }
+     location @librenms {
+      rewrite ^api/v0(.*)$ /api_v0.php/$1 last;
+      rewrite ^(.+)$ /index.php/$1 last;
+     }
+    }
+
 ### Cloning ###
 
 You can clone the repository via HTTPS or SSH.  In either case, you need to ensure the appropriate port (443 for HTTPS, 22 for SSH) is open in the outbound direction for your server.
@@ -57,12 +119,12 @@ You can clone the repository via HTTPS or SSH.  In either case, you need to ensu
     git clone https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
 
-At this stage you can either launch the web installer by going to http://IP/install.php, follow the onscreen instructions then skip to the 'Web Interface' section further down. Alternatively if you want
+At this stage you can either launch the web installer by going to http://IP/install.php, follow the on-screen instructions then skip to the 'Web Interface' section further down. Alternatively if you want
 to continue the setup manually then just keep following these instructions.
 
     cp config.php.default config.php
     vim config.php
-    
+
 NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
 
 Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
@@ -90,29 +152,17 @@ To prepare the web interface (and adding devices shortly), you'll need to create
 First, create and chown the `rrd` directory and create the `logs` directory
 
     mkdir rrd logs
+    # For HTTPd (Apache):
     chown apache:apache rrd/
+    # For Nginx:
+    chown nginx:nginx rrd/
 
-Note that if you're not running Ubuntu, you may need to change the owner to whomever the webserver runs as.
+Start the web-server:
 
-Next, add the following to `/etc/httpd/conf.d/librenms.conf`
-
-    <VirtualHost *:80>
-      DocumentRoot /opt/librenms/html/
-      ServerName  librenms.example.com
-      CustomLog /opt/librenms/logs/access_log combined
-      ErrorLog /opt/librenms/logs/error_log
-      AllowEncodedSlashes On
-      <Directory "/opt/librenms/html/">
-        AllowOverride All
-        Options FollowSymLinks MultiViews
-      </Directory>
-    </VirtualHost>
-
-If you are running Apache 2.2.18 or higher then change AllowEncodedSlashes to NoDecode
-
-Don't forget to restart Apache to make this active:
-
+    # For HTTPd (Apache):
     service httpd restart
+    # For Nginx:
+    service nginx restart
 
 ### Add localhost ###
 
@@ -149,5 +199,3 @@ ing your `config.php` file.  Remove the comment (the `#` mark) on the line:
 so that it looks like this:
 
     $config['update'] = 0;
-
-
