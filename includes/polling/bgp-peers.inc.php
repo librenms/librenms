@@ -149,6 +149,7 @@ if ($config['enable_bgp'])
 
           if ($debug) { echo("$cbgp_cmd\n"); }
           $cbgp_data = preg_replace("/^OID.*$/", "", trim(`$cbgp_cmd`));
+          $cbgp_data = preg_replace("/No Such Instance currently exists at this OID/", "0", $cbgp_data);
           if ($debug) { echo("$cbgp_data\n"); }
           list($cbgpPeerAcceptedPrefixes,$cbgpPeerDeniedPrefixes,$cbgpPeerPrefixAdminLimit,$cbgpPeerPrefixThreshold,$cbgpPeerPrefixClearThreshold,$cbgpPeerAdvertisedPrefixes,$cbgpPeerSuppressedPrefixes,$cbgpPeerWithdrawnPrefixes) = explode("\n", $cbgp_data);
         }
