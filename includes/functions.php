@@ -891,6 +891,7 @@ function is_port_valid($port, $device)
     }
     if (empty($port['ifDescr'])) { $valid = 0; }
     if ($device['os'] == "catos" && strstr($if, "vlan")) { $valid = 0; }
+    if ($device['os'] == "dlink") { $valid = 1; }
   }
 
   return $valid;
