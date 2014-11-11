@@ -14,7 +14,18 @@
 	"use strict";
 	
 	$.fn.mapael = function(options) {
+	
+		// Extend legend default options with user options
 		options = $.extend(true, {}, $.fn.mapael.defaultOptions, options);
+		
+		for (var type in  options.legend) {
+			if ($.isArray(options.legend[type])) {
+				for (var i = 0; i < options.legend[type].length; ++i)
+					options.legend[type][i] = $.extend(true, {}, $.fn.mapael.legendDefaultOptions[type], options.legend[type][i]);
+			} else {
+				options.legend[type] = $.extend(true, {}, $.fn.mapael.legendDefaultOptions[type], options.legend[type]);
+			}
+		}
 		
 		return this.each(function() {
 		
@@ -27,8 +38,7 @@
 				, resizeTO = 0
 				, areas = {}
 				, plots = {}
-				, areaLegend = {}
-				, plotLegend = {}
+				, legends = []
 				, id = 0
 				, zoomCenter = {}
 				, zoomOptions = [];
@@ -99,8 +109,7 @@
 			}
 				
 			// Create the legends for areas
-			if (options.legend.area.slices && options.legend.area.display)
-				areaLegend = $.fn.mapael.createLegend($self, options, "area", areas, 1);
+			$.merge(legends, $.fn.mapael.createLegends($self, options, "area", areas, 1));
 				
 			/**
 			* 
@@ -119,15 +128,16 @@
 				var i = 0
 					, id = 0
 					, animDuration = 0
-					, elemOptions = {}
-					, resetHiddenElem = function(el) {
+					, elemOptions = {};
+				
+				// Reset hidden map elements (when user click on legend elements)
+				legends.forEach(function(el) {
+					el.forEach && el.forEach(function(el) {
 						if(typeof el.hidden != "undefined" && el.hidden == true) {
 							$(el.node).trigger("click");
 						}
-					};
-				
-				areaLegend.forEach && areaLegend.forEach(resetHiddenElem);
-				plotLegend.forEach && plotLegend.forEach(resetHiddenElem);
+					})
+				});
 				
 				if (typeof opt != "undefined") {
 					(opt.resetAreas) && (options.areas = {});
@@ -193,7 +203,6 @@
 						, (options.plots[id] ? options.plots[id] : {})
 						, options.legend.plot
 					);
-					
 					if (elemOptions.type == "square") {
 						elemOptions.attrs.width = elemOptions.size;
 						elemOptions.attrs.height = elemOptions.size;
@@ -218,8 +227,7 @@
 				paper.setSize(options.map.width, mapConf.height * (options.map.width / mapConf.width));
 				
 				// Create the legends for plots taking into account the scale of the map
-				if (options.legend.plot.slices && options.legend.plot.display)
-					plotLegend = $.fn.mapael.createLegend($self, options, "plot", plots, (options.map.width / mapConf.width));
+				$.merge(legends, $.fn.mapael.createLegends($self, options, "plot", plots, (options.map.width / mapConf.width)));
 			} else {
 				$(window).on("resize", function() {
 					clearTimeout(resizeTO);
@@ -228,8 +236,7 @@
 				
 				// Create the legends for plots taking into account the scale of the map
 				var createPlotLegend = function() {
-					if (options.legend.plot.slices && options.legend.plot.display)
-						plotLegend = $.fn.mapael.createLegend($self, options, "plot", plots, ($container.width() / mapConf.width));
+					$.merge(legends, $.fn.mapael.createLegends($self, options, "plot", plots, ($container.width() / mapConf.width)));
 					
 					$container.unbind("resizeEnd", createPlotLegend);
 				};
@@ -254,8 +261,13 @@
 	*/
 	$.fn.mapael.initElem = function(paper, elem, options, $tooltip, id) {
 		var bbox = {}, textPosition = {};
+		if (typeof options.value != "undefined")
+			elem.value = options.value;
+		
+		// Init attrsHover
 		$.fn.mapael.setHoverOptions(elem.mapElem, options.attrs, options.attrsHover);
 		
+		// Init the label related to the element
 		if (options.text && typeof options.text.content != "undefined") {
 			// Set a text label in the area
 			bbox = elem.mapElem.getBBox();
@@ -271,6 +283,7 @@
 			options.eventHandlers && $.fn.mapael.setEventHandlers(id, options, elem.mapElem);
 		}
 		
+		// Init the tooltip
 		if (options.tooltip && options.tooltip.content) {
 			elem.mapElem.tooltipContent = options.tooltip.content;
 			$.fn.mapael.setTooltip(elem.mapElem, $tooltip);
@@ -281,6 +294,7 @@
 			}
 		}
 		
+		// Init the link
 		if (options.href) {
 			elem.mapElem.href = options.href;
 			elem.mapElem.target = options.target;
@@ -293,9 +307,6 @@
 			}
 		}
 		
-		if (typeof options.value != "undefined")
-			elem.value = options.value;
-			
 		$(elem.mapElem.node).attr("data-id", id);
 	}
 
@@ -307,7 +318,7 @@
 		if (typeof elemOptions.value != "undefined")
 			elem.value = elemOptions.value;
 		
-		// Update text
+		// Update the label
 		if (elem.textElem) {
 			if (typeof elemOptions.text != "undefined" && typeof elemOptions.text.content != "undefined" && elemOptions.text.content != elem.textElem.attrs.text)
 				elem.textElem.attr({text : elemOptions.text.content});
@@ -336,12 +347,14 @@
 				elem.textElem.attr(elemOptions.text.attrs);
 		}
 		
+		// Update elements attrs and attrsHover
 		$.fn.mapael.setHoverOptions(elem.mapElem, elemOptions.attrs, elemOptions.attrsHover);
 		if (animDuration > 0)
 			elem.mapElem.animate(elemOptions.attrs, animDuration);
 		else
 			elem.mapElem.attr(elemOptions.attrs);
 		
+		// Update the tooltip
 		if (elemOptions.tooltip && typeof elemOptions.tooltip.content != "undefined") {
 			if (typeof elem.mapElem.tooltipContent == "undefined") {
 				$.fn.mapael.setTooltip(elem.mapElem, $tooltip);
@@ -351,6 +364,7 @@
 			(elem.textElem) && (elem.textElem.tooltipContent = elemOptions.tooltip.content);
 		}
 		
+		// Update the link
 		if (typeof elemOptions.href != "undefined") {
 			if (typeof elem.mapElem.href == "undefined") {
 				$.fn.mapael.setHref(elem.mapElem);
@@ -523,192 +537,263 @@
 	
 	/**
 	* Draw a legend for areas and / or plots
-	* @param $container the legend container
-	* @param options map options
+	* @param legendOptions options for the legend to draw
+	* @param $container the map container
+	* @param options map options object
 	* @param legendType the type of the legend : "area" or "plot"
+	* @param elems collection of plots or areas on the maps
+	* @param legendIndex index of the legend in the conf array
 	*/
-	$.fn.mapael.createLegend = function ($container, options, legendType, elems, scale) {
-		var legendOptions = options.legend[legendType]
-			, $legend = (legendType == "plot") ? $("." + options.legend.plot.cssClass, $container).empty() : $("." + options.legend.area.cssClass, $container).empty()
-			, paper = new Raphael($legend.get(0))
+	$.fn.mapael.drawLegend = function (legendOptions, $container, options, legendType, elems, scale, legendIndex) {
+		var $legend = {}
+			, paper = {}
 			, width = 0
 			, height = 0
 			, title = {}
-			, defaultElemOptions = {}
 			, elem = {}
 			, elemBBox = {}
 			, label = {}
 			, i = 0
 			, x = 0
 			, y = 0
-			, yCenter = 0;
+			, yCenter = 0
+			, sliceAttrs = [];
 		
-		if(legendOptions.title) {
-			title = paper.text(legendOptions.marginLeftTitle, 0, legendOptions.title).attr(legendOptions.titleAttrs);
-			title.attr({y : 0.5 * title.getBBox().height});
+			if (!legendOptions.slices || !legendOptions.display)
+				return;
 				
-			width = legendOptions.marginLeftTitle + title.getBBox().width;
-			height += legendOptions.marginBottomTitle + title.getBBox().height;
-		}
-		
-		for(i = 0, length = legendOptions.slices.length; i < length; ++i) {
-			if (legendType == "area" && !legendOptions.slices[i].width)
-				legendOptions.slices[i].width = 30;
-				
-			if (legendType == "area" && !legendOptions.slices[i].height)
-				legendOptions.slices[i].height = 20;
-				
-			if(legendOptions.slices[i].type == "image" || legendType == "area") {
-				yCenter = Math.max(yCenter, legendOptions.marginBottomTitle + title.getBBox().height + scale * legendOptions.slices[i].height/2);
-			} else {
-				yCenter = Math.max(yCenter, legendOptions.marginBottomTitle + title.getBBox().height + scale * legendOptions.slices[i].size/2);
-			}
-		}
+			$legend = $("." + legendOptions.cssClass, $container).empty();
+			paper = new Raphael($legend.get(0));
+			height = width = 0;
 			
-		if (legendOptions.mode == "horizontal") {
-			width = legendOptions.marginLeft;
-		}
-		
-		for(i = 0, length = legendOptions.slices.length; i < length; ++i) {
-			if (typeof legendOptions.slices[i].display == "undefined" || legendOptions.slices[i].display == true) {
-				defaultElemOptions = (legendType == "plot") ? options.map["defaultPlot"] : options.map["defaultArea"];
-				legendOptions.slices[i].attrs = $.extend(
+			// Set the title of the legend
+			if(legendOptions.title) {
+				title = paper.text(legendOptions.marginLeftTitle, 0, legendOptions.title).attr(legendOptions.titleAttrs);
+				title.attr({y : 0.5 * title.getBBox().height});
+					
+				width = legendOptions.marginLeftTitle + title.getBBox().width;
+				height += legendOptions.marginBottomTitle + title.getBBox().height;
+			}
+			
+			// Calculate attrs (and width, height and r (radius)) for legend elements, and yCenter for horizontal legends
+			for(i = 0, length = legendOptions.slices.length; i < length; ++i) {
+				if (typeof legendOptions.slices[i].legendSpecificAttrs == "undefined")
+					legendOptions.slices[i].legendSpecificAttrs = {};
+					
+				sliceAttrs[i] = $.extend(
 					{}
-					, defaultElemOptions.attrs
+					, (legendType == "plot") ? options.map["defaultPlot"].attrs : options.map["defaultArea"].attrs
 					, legendOptions.slices[i].attrs
+					, legendOptions.slices[i].legendSpecificAttrs
 				);
-				legendOptions.slices[i].attrsHover = $.extend(
-					{}
-					, defaultElemOptions.attrsHover
-					, legendOptions.slices[i].attrsHover
-				);
-				
-				if(legendType == "area") {
-					if (legendOptions.mode == "horizontal") {
-						x = width + legendOptions.marginLeft;
-						y = yCenter - (0.5 * scale * legendOptions.slices[i].height);
-					} else {
-						x = legendOptions.marginLeft;
-						y = height;
-					}
-					
-					elem = paper.rect(x, y, scale * (legendOptions.slices[i].width), scale * (legendOptions.slices[i].height))
-						.attr(legendOptions.slices[i].attrs);
-				} else if(legendOptions.slices[i].type == "square") {
-					if (legendOptions.mode == "horizontal") {
-						x = width + legendOptions.marginLeft;
-						y = yCenter - (0.5 * scale * legendOptions.slices[i].size);
-					} else {
-						x = legendOptions.marginLeft;
-						y = height;
-					}
-					
-					elem = paper.rect(x, y, scale * (legendOptions.slices[i].size), scale * (legendOptions.slices[i].size))
-						.attr(legendOptions.slices[i].attrs);
-						
-				} else if(legendOptions.slices[i].type == "image") {
-					if (legendOptions.mode == "horizontal") {
-						x = width + legendOptions.marginLeft;
-						y = yCenter - (0.5 * scale * legendOptions.slices[i].height);
-					} else {
-						x = legendOptions.marginLeft;
-						y = height;
-					}
-
-					elem = paper.image(
-						legendOptions.slices[i].url, x, y, scale * legendOptions.slices[i].width, scale * legendOptions.slices[i].height)
-						.attr(legendOptions.slices[i].attrs);
+			
+				if (legendType == "area") {
+					if (typeof sliceAttrs[i].width == "undefined")
+						sliceAttrs[i].width = 30;
+					if (typeof sliceAttrs[i].height == "undefined")
+						sliceAttrs[i].height = 20;
+				} else if (legendOptions.slices[i].type == "square") {
+					if (typeof sliceAttrs[i].width == "undefined")
+						sliceAttrs[i].width = legendOptions.slices[i].size;
+					if (typeof sliceAttrs[i].height == "undefined")
+						sliceAttrs[i].height = legendOptions.slices[i].size;
+				} else if (legendOptions.slices[i].type == "image") {
+					if (typeof sliceAttrs[i].width == "undefined")
+						sliceAttrs[i].width = legendOptions.slices[i].width;
+					if (typeof sliceAttrs[i].height == "undefined")
+						sliceAttrs[i].height = legendOptions.slices[i].height;
 				} else {
+					if (typeof sliceAttrs[i].r == "undefined")
+						sliceAttrs[i].r = legendOptions.slices[i].size / 2;
+				}
+				
+				if(legendOptions.slices[i].type == "image" || legendType == "area") {
+					yCenter = Math.max(yCenter, legendOptions.marginBottomTitle + title.getBBox().height + scale * sliceAttrs[i].height/2);
+				} else {
+					yCenter = Math.max(yCenter, legendOptions.marginBottomTitle + title.getBBox().height + scale * sliceAttrs[i].r);
+				}
+			}
+				
+			if (legendOptions.mode == "horizontal") {
+				width = legendOptions.marginLeft;
+			}
+			
+			// Draw legend elements (circle, square or image in vertical or horizontal mode)
+			for(i = 0, length = legendOptions.slices.length; i < length; ++i) {
+				if (typeof legendOptions.slices[i].display == "undefined" || legendOptions.slices[i].display == true) {
+					if(legendType == "area") {
+						if (legendOptions.mode == "horizontal") {
+							x = width + legendOptions.marginLeft;
+							y = yCenter - (0.5 * scale * sliceAttrs[i].height);
+						} else {
+							x = legendOptions.marginLeft;
+							y = height;
+						}
+						
+						elem = paper.rect(x, y, scale * (sliceAttrs[i].width), scale * (sliceAttrs[i].height));
+					} else if(legendOptions.slices[i].type == "square") {					
+						if (legendOptions.mode == "horizontal") {
+							x = width + legendOptions.marginLeft;
+							y = yCenter - (0.5 * scale * sliceAttrs[i].height);
+						} else {
+							x = legendOptions.marginLeft;
+							y = height;
+						}
+						
+						elem = paper.rect(x, y, scale * (sliceAttrs[i].width), scale * (sliceAttrs[i].height));
+							
+					} else if(legendOptions.slices[i].type == "image") {					
+						if (legendOptions.mode == "horizontal") {
+							x = width + legendOptions.marginLeft;
+							y = yCenter - (0.5 * scale * sliceAttrs[i].height);
+						} else {
+							x = legendOptions.marginLeft;
+							y = height;
+						}
+
+						elem = paper.image(
+							legendOptions.slices[i].url, x, y, scale * sliceAttrs[i].width, scale * sliceAttrs[i].height);
+					} else {
+						if (legendOptions.mode == "horizontal") {
+							x = width + legendOptions.marginLeft + scale * (sliceAttrs[i].r);
+							y = yCenter;
+						} else {
+							x = legendOptions.marginLeft + scale * (sliceAttrs[i].r);
+							y = height + scale * (sliceAttrs[i].r);
+						}
+						elem = paper.circle(x, y, scale * (sliceAttrs[i].r));
+					}
+					
+					// Set attrs to the element drawn above
+					delete sliceAttrs[i].width;
+					delete sliceAttrs[i].height;
+					delete sliceAttrs[i].r;
+					elem.attr(sliceAttrs[i]);
+					elemBBox = elem.getBBox();
+					
+					// Draw the label associated with the element
 					if (legendOptions.mode == "horizontal") {
-						x = width + legendOptions.marginLeft + scale * (legendOptions.slices[i].size / 2);
+						x = width + legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel;
 						y = yCenter;
 					} else {
-						x = legendOptions.marginLeft + scale * (legendOptions.slices[i].size / 2);
-						y = height + scale * (legendOptions.slices[i].size / 2);
+						x = legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel;
+						y = height + (elemBBox.height / 2);
 					}
 					
-					elem = paper.circle(x, y, scale * (legendOptions.slices[i].size / 2)).attr(legendOptions.slices[i].attrs);
-				} 
-				
-				elemBBox = elem.getBBox();
-				
-				if (legendOptions.mode == "horizontal") {
-					x = width + legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel;
-					y = yCenter;
-				} else {
-					x = legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel;
-					y = height + (elemBBox.height / 2);
-				}
-				
-				label = paper.text(x, y, legendOptions.slices[i].label).attr(legendOptions.labelAttrs);
-				
-				if (legendOptions.mode == "horizontal") {
-					width += legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width;
-					if(legendOptions.slices[i].type == "image" || legendType == "area") {
-						height = Math.max(height, legendOptions.marginBottom + title.getBBox().height + scale * legendOptions.slices[i].height);
+					label = paper.text(x, y, legendOptions.slices[i].label).attr(legendOptions.labelAttrs);
+					
+					// Update the width and height for the paper
+					if (legendOptions.mode == "horizontal") {
+						width += legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width;
+						if(legendOptions.slices[i].type == "image" || legendType == "area") {
+							height = Math.max(height, legendOptions.marginBottom + title.getBBox().height + elemBBox.height);
+						} else {
+							height = Math.max(height, legendOptions.marginBottomTitle + legendOptions.marginBottom + title.getBBox().height + elemBBox.height);
+						}
 					} else {
-						height = Math.max(height, legendOptions.marginBottomTitle + title.getBBox().height + scale * legendOptions.slices[i].size);
+						width = Math.max(width, legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width);
+						height += legendOptions.marginBottom + elemBBox.height;
 					}
-				} else {
-					width = Math.max(width, legendOptions.marginLeft + elemBBox.width + legendOptions.marginLeftLabel + label.getBBox().width);
-					height += legendOptions.marginBottom + elemBBox.height;
-				}
-				
-				$(elem.node).attr({"data-type": "elem", "data-index": i});
-				$(label.node).attr({"data-type": "label", "data-index": i});
-				
-				if (legendOptions.hideElemsOnClick.enabled) {
-					// Hide/show elements when user clicks on a legend element
-					label.attr({cursor:"pointer"});
 					
-					$.fn.mapael.setHoverOptions(elem, legendOptions.slices[i].attrs, legendOptions.slices[i].attrs);
-					$.fn.mapael.setHoverOptions(label, legendOptions.labelAttrs, legendOptions.labelAttrsHover);
-					$.fn.mapael.setHover(paper, elem, label);
+					$(elem.node).attr({"data-type": "elem", "data-index": i});
+					$(label.node).attr({"data-type": "label", "data-index": i});
 					
-					label.hidden = false;
-					(function(i, elem, label) {
-						$(label.node).on("click", function() {
-							if (!label.hidden) {
-								label.animate({"opacity":0.5}, 300);
-							} else {
-								label.animate({"opacity":1}, 300);
-							}
-							
-							for (var id in elems) {
-								if ((typeof legendOptions.slices[i].value != "undefined" && elems[id].value == legendOptions.slices[i].value)
-									|| ((typeof legendOptions.slices[i].value == "undefined")
-										&& (typeof legendOptions.slices[i].min == "undefined" || elems[id].value >= legendOptions.slices[i].min) 
-										&& (typeof legendOptions.slices[i].max == "undefined" || elems[id].value < legendOptions.slices[i].max))
-								) {
-									(function(id) {
-										if (!label.hidden) {
-											elems[id].mapElem.animate({"opacity":legendOptions.hideElemsOnClick.opacity}, 300, "linear", function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].mapElem.hide();});
-											elems[id].textElem && elems[id].textElem.animate({"opacity":legendOptions.hideElemsOnClick.opacity}, 300, "linear", function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].textElem.hide();});
-										} else {
-											if (legendOptions.hideElemsOnClick.opacity == 0) {
-												elems[id].mapElem.show();
-												elems[id].textElem && elems[id].textElem.show();
-											}
-											elems[id].mapElem.animate({"opacity":typeof elems[id].mapElem.originalAttrs.opacity != "undefined" ? elems[id].mapElem.originalAttrs.opacity : 1}, 300);
-											elems[id].textElem && elems[id].textElem.animate({"opacity":typeof elems[id].textElem.originalAttrs.opacity != "undefined" ? elems[id].textElem.originalAttrs.opacity : 1}, 300);
-										}
-									})(id);
-								}
-							}
-							label.hidden = !label.hidden;
-						});
-					})(i, elem, label);
+					// Hide map elements when the user clicks on a legend item
+					if (legendOptions.hideElemsOnClick.enabled) {
+						// Hide/show elements when user clicks on a legend element
+						label.attr({cursor:"pointer"});
+						elem.attr({cursor:"pointer"});
+						
+						$.fn.mapael.setHoverOptions(elem, sliceAttrs[i], sliceAttrs[i]);
+						$.fn.mapael.setHoverOptions(label, legendOptions.labelAttrs, legendOptions.labelAttrsHover);
+						$.fn.mapael.setHover(paper, elem, label);
+						
+						label.hidden = false;
+						$.fn.mapael.handleClickOnLegendElem(legendOptions, legendOptions.slices[i], label, elem, elems, legendIndex);
+					}
 				}
 			}
+		
+			// VMLWidth option allows you to set static width for the legend
+			// only for VML render because text.getBBox() returns wrong values on IE6/7
+			if (Raphael.type != "SVG" && legendOptions.VMLWidth) 
+				width = legendOptions.VMLWidth;
+			
+			paper.setSize(width, height);
+			return paper;
+	}
+	
+	/**
+	* Allow to hide elements of the map when the user clicks on a related legend item
+	* @param legendOptions options for the legend to draw
+	* @param sliceOptions options of the slice
+	* @param label label of the legend item
+	* @param elem element of the legend item
+	* @param elems collection of plots or areas displayed on the map
+	* @param legendIndex index of the legend in the conf array
+	*/
+	$.fn.mapael.handleClickOnLegendElem = function(legendOptions, sliceOptions, label, elem, elems, legendIndex) {
+		var hideMapElems = function() {
+			var elemValue = 0;
+			
+			if (!label.hidden) {
+				label.animate({"opacity":0.5}, 300);
+			} else {
+				label.animate({"opacity":1}, 300);
+			}
+			
+			for (var id in elems) {
+				if ($.isArray(elems[id].value)) {
+					elemValue = elems[id].value[legendIndex];
+				} else {
+					elemValue = elems[id].value;
+				}
+				
+				if ((typeof sliceOptions.sliceValue != "undefined" && elemValue == sliceOptions.sliceValue)
+					|| ((typeof sliceOptions.sliceValue == "undefined")
+						&& (typeof sliceOptions.min == "undefined" || elemValue >= sliceOptions.min) 
+						&& (typeof sliceOptions.max == "undefined" || elemValue < sliceOptions.max))
+				) {
+					(function(id) {
+						if (!label.hidden) {
+							elems[id].mapElem.animate({"opacity":legendOptions.hideElemsOnClick.opacity}, 300, "linear", function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].mapElem.hide();});
+							elems[id].textElem && elems[id].textElem.animate({"opacity":legendOptions.hideElemsOnClick.opacity}, 300, "linear", function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].textElem.hide();});
+						} else {
+							if (legendOptions.hideElemsOnClick.opacity == 0) {
+								elems[id].mapElem.show();
+								elems[id].textElem && elems[id].textElem.show();
+							}
+							elems[id].mapElem.animate({"opacity":typeof elems[id].mapElem.originalAttrs.opacity != "undefined" ? elems[id].mapElem.originalAttrs.opacity : 1}, 300);
+							elems[id].textElem && elems[id].textElem.animate({"opacity":typeof elems[id].textElem.originalAttrs.opacity != "undefined" ? elems[id].textElem.originalAttrs.opacity : 1}, 300);
+						}
+					})(id);
+				}
+			}
+			label.hidden = !label.hidden;
+		};
+		$(label.node).on("click", hideMapElems);
+		$(elem.node).on("click", hideMapElems);
+	}
+	
+	/**
+	* Create all legends for a specified type (area or plot)
+	* @param $container the map container
+	* @param options map options
+	* @param legendType the type of the legend : "area" or "plot"
+	* @param elems collection of plots or areas displayed on the map
+	* @param scale scale ratio of the map
+	*/
+	$.fn.mapael.createLegends = function ($container, options, legendType, elems, scale) {
+		var legends = [];
+		
+		if ($.isArray(options.legend[legendType])) {
+			for (var j = 0; j < options.legend[legendType].length; ++j) {
+				legends.push($.fn.mapael.drawLegend(options.legend[legendType][j], $container, options, legendType, elems, scale, j));
+			}
+		} else {
+			legends.push($.fn.mapael.drawLegend(options.legend[legendType], $container, options, legendType, elems, scale));
 		}
-		
-		// VMLWidth option allows you to set static width for the legend
-		// only for VML render because text.getBBox() returns wrong values on IE6/7
-		if (Raphael.type != "SVG" && legendOptions.VMLWidth) 
-			width = legendOptions.VMLWidth;
-		
-		paper.setSize(width, height)
-		return paper;
+		return legends;
 	}
 	
 	/**
@@ -783,9 +868,14 @@
 	$.fn.mapael.getElemOptions = function(defaultOptions, elemOptions, legendOptions) {
 		var options = $.extend(true, {}, defaultOptions, elemOptions);
 		if (typeof options.value != "undefined") {
-			$.extend(true, options, $.fn.mapael.getLegendSlice(options.value, legendOptions));
+			if ($.isArray(legendOptions)) {
+				for (var i = 0, length = legendOptions.length;i<length;++i) {
+					options = $.extend(true, {}, options, $.fn.mapael.getLegendSlice(options.value[i], legendOptions[i]));
+				}
+			} else {
+				options = $.extend(true, {}, options, $.fn.mapael.getLegendSlice(options.value, legendOptions));
+			}
 		}
-		
 		return options;
 	}
 	
@@ -836,8 +926,8 @@
 	*/
 	$.fn.mapael.getLegendSlice = function (value, legend) {
 		for(var i = 0, length = legend.slices.length; i < length; ++i) {
-			if ((typeof legend.slices[i].value != "undefined" && value == legend.slices[i].value) 
-				|| ((typeof legend.slices[i].value == "undefined") 
+			if ((typeof legend.slices[i].sliceValue != "undefined" && value == legend.slices[i].sliceValue) 
+				|| ((typeof legend.slices[i].sliceValue == "undefined") 
 					&& (typeof legend.slices[i].min == "undefined" || value >= legend.slices[i].min) 
 					&& (typeof legend.slices[i].max == "undefined" || value < legend.slices[i].max))
 			) {
@@ -915,66 +1005,71 @@
 			}
 		}
 		, legend : {
-			area : {
-				cssClass : "areaLegend"
-				, display : false
-				, marginLeft : 15
-				, marginLeftTitle : 5
-				, marginBottomTitle: 15
-				, marginLeftLabel : 10
-				, marginBottom : 15
-				, titleAttrs : {
-					"font-size" : 18
-					, fill : "#343434"
-					, "text-anchor" : "start"
-				}
-				, labelAttrs : {
-					"font-size" : 15
-					, fill : "#343434"
-					, "text-anchor" : "start"
-				}
-				, labelAttrsHover : {
-					fill : "#787878"
-					, animDuration : 300
-				}
-				, hideElemsOnClick : {
-					enabled : true
-					, opacity : 0.2
-				}
-				, slices : []
-				, mode : "vertical"
-			}
-			, plot : {
-				cssClass : "plotLegend"
-				, display : false
-				, marginLeft : 15
-				, marginLeftTitle : 5
-				, marginBottomTitle: 15
-				, marginLeftLabel : 10
-				, marginBottom : 15
-				, titleAttrs : {
-					"font-size" : 18
-					, fill : "#343434"
-					, "text-anchor" : "start"
-				}
-				, labelAttrs : {
-					"font-size" : 15
-					, fill : "#343434"
-					, "text-anchor" : "start"
-				}
-				, labelAttrsHover : {
-					fill : "#787878"
-					, animDuration : 300
-				}
-				, hideElemsOnClick : {
-					enabled : true
-					, opacity : 0.2
-				}
-				, slices : []
-				, mode : "vertical"
-			}
+			area : []
+			, plot : []
 		}
 		, areas : {}
 		, plots : {}
+	};
+	
+	$.fn.mapael.legendDefaultOptions = {
+		area : {
+			cssClass : "areaLegend"
+			, display : false
+			, marginLeft : 10
+			, marginLeftTitle : 5
+			, marginBottomTitle: 10
+			, marginLeftLabel : 10
+			, marginBottom : 10
+			, titleAttrs : {
+				"font-size" : 16
+				, fill : "#343434"
+				, "text-anchor" : "start"
+			}
+			, labelAttrs : {
+				"font-size" : 12
+				, fill : "#343434"
+				, "text-anchor" : "start"
+			}
+			, labelAttrsHover : {
+				fill : "#787878"
+				, animDuration : 300
+			}
+			, hideElemsOnClick : {
+				enabled : true
+				, opacity : 0.2
+			}
+			, slices : []
+			, mode : "vertical"
+		}
+		, plot : {
+			cssClass : "plotLegend"
+			, display : false
+			, marginLeft : 10
+			, marginLeftTitle : 5
+			, marginBottomTitle: 10
+			, marginLeftLabel : 10
+			, marginBottom : 10
+			, titleAttrs : {
+				"font-size" : 16
+				, fill : "#343434"
+				, "text-anchor" : "start"
+			}
+			, labelAttrs : {
+				"font-size" : 12
+				, fill : "#343434"
+				, "text-anchor" : "start"
+			}
+			, labelAttrsHover : {
+				fill : "#787878"
+				, animDuration : 300
+			}
+			, hideElemsOnClick : {
+				enabled : true
+				, opacity : 0.2
+			}
+			, slices : []
+			, mode : "vertical"
+		}
 	};
 })(jQuery);
