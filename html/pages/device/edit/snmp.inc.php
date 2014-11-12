@@ -6,8 +6,8 @@ if ($_POST['editing'])
   {
     $community = mres($_POST['community']);
     $snmpver = mres($_POST['snmpver']);
-    if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = $config['snmp']['port']; }
-    if ($_POST['transport']) { $transport = mres($_POST['transport']); } else { $transport = "udp"; }
+    $transport = $_POST['transport'] ? mres($_POST['transport']) : $transport = "udp";
+    $port = $_POST['port'] ? mres($_POST['port']) : $config['snmp']['port'];
     $timeout = mres($_POST['timeout']);
     $retries = mres($_POST['retries']);
     $v3 = array (
@@ -38,8 +38,7 @@ if ($_POST['editing'])
     if (isSNMPable($device_tmp)) {
         $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?',array($device['device_id']));
 
-        if ($rows_updated > 0)
-        {
+        if ($rows_updated > 0) {
             $update_message = $rows_updated . " Device record updated.";
             $updated = 1;
         } elseif ($rows_updated = '-1') {
@@ -50,7 +49,7 @@ if ($_POST['editing'])
             $updated = 0;
         }
     } else {
-        $update_message = "We couldn't connect to this device with new SNMP details";
+        $update_message = "Could not connect to device with new SNMP details";
         $updated = 0;
     }
   }
