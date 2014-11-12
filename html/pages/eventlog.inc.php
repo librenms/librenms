@@ -76,15 +76,17 @@ if ($_SESSION['userlevel'] >= '5')
   $param[] = $_SESSION['user_id'];
 }
 $count_query = "SELECT COUNT(datetime) $query";
+$count = dbFetchCell($count_query,$param);
 $full_query = "SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate $query LIMIT $start,$numresults";
 
             echo('<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <div class="row">
-                        <div class="col-md-11">
+                        <div class="col-md-2">
                             <strong>Eventlog entries</strong>
                         </div>
-                        <div class="col-md-1">
+                        <div class="col-md-8" align="center">'. generate_pagination($count,$numresults,$page_number) .'</div>
+                        <div class="col-md-2">
                             <select name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">');
                             $result_options = array('10','50','100','250','500','1000','5000');
                             foreach($result_options as $option) {
@@ -102,7 +104,6 @@ $full_query = "SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate $query
             </div>
               <table class="table table-hover table-condensed table-striped">');
 
-$count = dbFetchCell($count_query,$param);
 foreach (dbFetchRows($full_query, $param) as $entry)
 {
   include("includes/print-event.inc.php");
