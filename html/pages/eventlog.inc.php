@@ -8,15 +8,15 @@ if ($vars['action'] == "expunge" && $_SESSION['userlevel'] >= '10')
   print_message("Event log truncated");
 }
 
-if(isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
+if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
     $numresults = $_POST['results_amount'];
 } else {
     $numresults = 250;
 }
-if(!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
-    $page_number = 1;
-} else {
+if (isset($_POST['page_number']) && $_POST['page_number'] > 0) {
     $page_number = $_POST['page_number'];
+} else {
+    $page_number = 1;
 }
 $start = ($page_number - 1) * $numresults;
 
@@ -89,7 +89,7 @@ $full_query = "SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate $query
                             $result_options = array('10','50','100','250','500','1000','5000');
                             foreach($result_options as $option) {
                                 echo "<option value='$option'";
-                                if($numresults == $option) {
+                                if ($numresults == $option) {
                                     echo " selected";
                                 }
                                 echo ">$option</option>";
@@ -108,7 +108,7 @@ foreach (dbFetchRows($full_query, $param) as $entry)
   include("includes/print-event.inc.php");
 }
 
-if($count % $numresults > 0) {
+if ($count % $numresults > 0) {
     echo('    <tr>
          <td colspan="6" align="center">'. generate_pagination($count,$numresults,$page_number) .'</td>
      </tr>');
