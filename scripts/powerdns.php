@@ -8,7 +8,7 @@
 ///
 //      Install:
 //              Add the following to your snmpd.conf file:
-//              extend powerdns /opt/observium/scripts/powerdns.php
+//              extend powerdns /opt/librenms/scripts/powerdns.php
 ///
 //      Version 1.0 By:
 //              All In One - Dennis de Houx <info@all-in-one.be>
