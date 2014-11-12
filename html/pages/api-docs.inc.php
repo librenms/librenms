@@ -250,6 +250,24 @@ if ($_SESSION['userlevel'] == '10')
         <tr>
           <td colspan="5"><code>curl -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/vlans"</code></td>
         </tr>
+        <tr class="success">
+          <td colspan="5"><strong>List BGP Sessions</strong></td>
+        </tr>
+        <tr>
+          <td>/api</td>
+          <td>/v0</td>
+          <td>/bgp</td>
+          <td>
+            <ul class="list-unstyled">
+            </ul>
+          </td>
+          <td>
+            JSON
+          </td>
+        </tr>
+        <tr>
+          <td colspan="5"><code>curl -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/bgp"</code></td>
+        </tr>
       </table>
     </div>
   </div>
