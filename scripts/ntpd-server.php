@@ -8,7 +8,7 @@
     ///
     //      Install:
     //              Add the following to your snmpd.conf file:
-    //              extend ntpdserver /opt/observium/scripts/ntpd-server.php
+    //              extend ntpdserver /opt/librenms/scripts/ntpd-server.php
     ///
     //      Version 1.1 By:
     //              All In One - Dennis de Houx <info@all-in-one.be>
