@@ -395,6 +395,8 @@ function get_graph_by_group() {
   $vars['height'] = $_GET['height'] ?: 300;
   $auth = "1";
   $type_where = " (";
+  $or = '';
+  $type_param = array();
   foreach (explode(",", $group) as $type)
   {
     $type_where .= " $or `port_descr_type` = ?";
@@ -403,6 +405,8 @@ function get_graph_by_group() {
   }
 
   $type_where .= ") ";
+  $if_list = '';
+  $seperator = '';
   $ports = dbFetchRows("SELECT * FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias", $type_param);
   foreach ($ports as $port)
   {
