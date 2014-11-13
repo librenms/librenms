@@ -1015,7 +1015,7 @@
 	$.fn.mapael.legendDefaultOptions = {
 		area : {
 			cssClass : "areaLegend"
-			, display : false
+			, display : true
 			, marginLeft : 10
 			, marginLeftTitle : 5
 			, marginBottomTitle: 10
@@ -1044,7 +1044,7 @@
 		}
 		, plot : {
 			cssClass : "plotLegend"
-			, display : false
+			, display : true
 			, marginLeft : 10
 			, marginLeftTitle : 5
 			, marginBottomTitle: 10
