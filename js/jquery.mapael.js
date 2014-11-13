@@ -470,8 +470,8 @@
 	$.fn.mapael.setEventHandlers = function(id, elemOptions, mapElem, textElem) {
 		for(var event in elemOptions.eventHandlers) {
 			(function(event) {
-				$(mapElem.node).on(event, function(e) {!$.fn.mapael.panning && elemOptions.eventHandlers[event](e, id, mapElem, textElem)});
-				textElem && $(textElem.node).on(event, function(e) {!$.fn.mapael.panning && elemOptions.eventHandlers[event](e, id, mapElem, textElem)});
+				$(mapElem.node).on(event, function(e) {!$.fn.mapael.panning && elemOptions.eventHandlers[event](e, id, mapElem, textElem, elemOptions)});
+				textElem && $(textElem.node).on(event, function(e) {!$.fn.mapael.panning && elemOptions.eventHandlers[event](e, id, mapElem, textElem, elemOptions)});
 			})(event);
 		}
 	}
