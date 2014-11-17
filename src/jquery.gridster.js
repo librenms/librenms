@@ -3111,6 +3111,11 @@
     fn.destroy = function(remove) {
         this.$el.removeData('gridster');
 
+	// remove coords from elements
+	$.each(this.$el.find('li'),function(){
+            $(this).removeData('coords');
+        });
+        
         // remove bound callback on window resize
         $(window).unbind('.gridster');
 
