@@ -3112,7 +3112,7 @@
         this.$el.removeData('gridster');
 
 	// remove coords from elements
-	$.each(this.$el.find('li'),function(){
+	$.each(this.$widgets,function(){
             $(this).removeData('coords');
         });
         
