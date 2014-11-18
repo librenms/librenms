@@ -49,9 +49,27 @@ Actually we supports two adapters
 
 ### Using UDP/IP Adapter
 
-Actually "socket" php library is used for UDP/IP adapter
 
+In order to use the UDP/IP adapter your must have PHP compiled with the `sockets` extension.
+
+To verify if you have the `sockets` extension just issue a:
+
+```bash
+php -m | grep sockets
 ```
+
+If you don't have the `sockets` extension, you can proceed in two ways:
+
+- Recompile your PHP whith the `--enable-sockets` flag
+- Or just compile the `sockets` extension extracting it from the PHP source.  
+  1. Download the source relative to the PHP version that you on from [here](https://github.com/php/php-src/releases)
+  2. Enter in the `ext/sockets` directory
+  3. Issue a `phpize && ./configure && make -j && sudo make install`
+  4. Add `extension=sockets.so` to your php.ini
+
+**Usage**
+
+```php
 $options = new Options();
 $adapter = new UdpAdapter($options);
 

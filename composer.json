@@ -11,7 +11,8 @@
     "require-dev": {
         "phpspec/phpspec": "2.*",
         "phpunit/phpunit": "4.*",
-        "athletic/athletic": "~0.1"
+        "athletic/athletic": "~0.1",
+        "ext-sockets": "*"
     },
     "homepage": "http://www.corley.it/",
     "keywords": ["influxdb", "udp", "sdk"],
