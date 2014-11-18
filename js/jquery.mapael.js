@@ -66,6 +66,9 @@
 				$.fn.mapael.initElem(paper, areas[id], elemOptions, $tooltip, id);
 			}
 			
+			// Draw links
+			$.fn.mapael.drawLinksCollection(paper, options, mapConf.getCoords, $tooltip);
+			
 			// Draw plots
 			for (id in options.plots) {
 				plots[id] = $.fn.mapael.drawPlot(id, options, mapConf, paper, $tooltip);
@@ -308,7 +311,86 @@
 		}
 		
 		$(elem.mapElem.node).attr("data-id", id);
-	}
+	};
+	
+	/**
+	* Draw all links between plots on the paper
+	*/
+	$.fn.mapael.drawLinksCollection = function(paper, options, getCoords, $tooltip) {
+		var p1 = {}
+			, p2 = {}
+			, elemOptions = {}
+			, coordsP1 = {}
+			, coordsP2 ={};
+		
+		for (var id in options.links) {
+			elemOptions = $.fn.mapael.getElemOptions(options.map.defaultLink, options.links[id], {});
+			
+			p1 = options.plots[options.links[id].between[0]];
+			p2 = options.plots[options.links[id].between[1]];
+			
+			if (typeof p1.latitude != "undefined" && typeof p1.longitude != "undefined") {
+				coordsP1 = getCoords(p1.latitude, p1.longitude);
+			} else {
+				coordsP1.x = p1.x;
+				coordsP1.y = p1.y;
+			}
+		
+			if (typeof p2.latitude != "undefined" && typeof p2.longitude != "undefined") {
+				coordsP2 = getCoords(p2.latitude, p2.longitude);
+			} else {
+				coordsP2.x = p2.x;
+				coordsP2.y = p2.y;
+			}
+			$.fn.mapael.drawLink(id, paper, coordsP1.x, coordsP1.y, coordsP2.x, coordsP2.y, elemOptions, $tooltip);
+		}
+	};
+	
+	/**
+	* Draw a curved link between two couples of coordinates a(xa,ya) and b(xb, yb) on the paper
+	*/
+	$.fn.mapael.drawLink = function(id, paper, xa, ya, xb, yb, elemOptions, $tooltip) {
+		var elem = {}
+		
+			// Compute the "curveto" SVG point, d(x,y)
+			// c(xc, yc) is the center of (xa,ya) and (xb, yb)
+			, xc = (xa + xb) / 2
+			 , yc = (ya + yb) / 2
+				
+			 // Equation for (cd) : y = acd * x + bcd (d is the cure point)
+			 , acd = - 1 / ((yb - ya) / (xb - xa))
+			 , bcd = yc - acd * xc
+		
+			  // dist(c,d) = dist(a,b) (=abDist)
+			 , abDist = Math.sqrt((xb-xa)*(xb-xa) + (yb-ya)*(yb-ya))
+			 
+			 // Solution for equation dist(cd) = sqrt((xd - xc)² + (yd - yc)²)
+			 // dist(c,d)² = (xd - xc)² + (yd - yc)²
+			 // We assume that dist(c,d) = dist(a,b)
+			 // so : (xd - xc)² + (yd - yc)² - dist(a,b)² = 0
+			 // With the factor : (xd - xc)² + (yd - yc)² - (factor*dist(a,b))² = 0
+			 // (xd - xc)² + (acd*xd + bcd - yc)² - (factor*dist(a,b))² = 0
+			 , a = 1 + acd*acd
+			 , b = -2 * xc + 2*acd*bcd - 2 * acd*yc
+			 , c = xc*xc + bcd*bcd - bcd*yc - yc*bcd + yc*yc - ((elemOptions.factor*abDist) * (elemOptions.factor*abDist))
+			 , delta = b*b - 4*a*c
+			 , x = 0
+			 , y = 0;
+		
+		// There are two solutions, we choose one or the other depending on the sign of the factor
+		if (elemOptions.factor > 0) {
+			 x = (-b + Math.sqrt(delta)) / (2*a);
+			 y = acd * x + bcd;
+		} else {
+			 x = (-b - Math.sqrt(delta)) / (2*a);
+			 y = acd * x + bcd;
+		}
+
+		elem.mapElem = paper.path("m "+xa+","+ya+" C "+x+","+y+" "+xb+","+yb+" "+xb+","+yb+"").attr(elemOptions.attrs);
+		$.fn.mapael.initElem(paper, elem, elemOptions, $tooltip, id);
+		
+		return elem;
+	};
 
 	/**
 	* Update the element "elem" on the map with the new elemOptions options
@@ -377,7 +459,7 @@
 				elem.textElem.target = elemOptions.target;
 			}
 		}
-	}
+	};
 	
 	/**
 	* Draw the plot
@@ -431,7 +513,7 @@
 			if (!$.fn.mapael.panning && elem.href)
 				window.open(elem.href, elem.target);
 		});
-	}
+	};
 	
 	/**
 	* Set a tooltip for the areas and plots
@@ -474,7 +556,7 @@
 				textElem && $(textElem.node).on(event, function(e) {!$.fn.mapael.panning && elemOptions.eventHandlers[event](e, id, mapElem, textElem, elemOptions)});
 			})(event);
 		}
-	}
+	};
 	
 	$.fn.mapael.panning = false;
 	
@@ -533,7 +615,7 @@
 			}
 			return false;
 		});
-	}
+	};
 	
 	/**
 	* Draw a legend for areas and / or plots
@@ -721,7 +803,7 @@
 			
 			paper.setSize(width, height);
 			return paper;
-	}
+	};
 	
 	/**
 	* Allow to hide elements of the map when the user clicks on a related legend item
@@ -773,7 +855,7 @@
 		};
 		$(label.node).on("click", hideMapElems);
 		$(elem.node).on("click", hideMapElems);
-	}
+	};
 	
 	/**
 	* Create all legends for a specified type (area or plot)
@@ -794,7 +876,7 @@
 			legends.push($.fn.mapael.drawLegend(options.legend[legendType], $container, options, legendType, elems, scale));
 		}
 		return legends;
-	}
+	};
 	
 	/**
 	* Set the attributes on hover and the attributes to restore for a map element
@@ -845,7 +927,7 @@
 		mapElem.animate(mapElem.attrsHover, mapElem.attrsHover.animDuration);
 		textElem && textElem.animate(textElem.attrsHover, textElem.attrsHover.animDuration);
 		paper.safari();
-	}
+	};
 	
 	/**
 	* Set he behaviour for "mouseout" event
@@ -877,7 +959,7 @@
 			}
 		}
 		return options;
-	}
+	};
 	
 	/**
 	* Get the coordinates of the text relative to a bbox and a position
@@ -916,7 +998,7 @@
 				textAnchor = "middle";
 		}
 		return {"x" : textX, "y" : textY, "textAnchor" : textAnchor};
-	}
+	};
 	
 	/**
 	* Get the legend conf matching with the value
@@ -996,6 +1078,29 @@
 				}
 				, target : "_self"
 			}
+			, defaultLink : {
+				factor : 0.5
+				, attrs : {
+					stroke : "#0088db"
+					, "stroke-width" : 2
+				}
+				, attrsHover : {
+					animDuration : 300
+				}
+				, text : {
+					position : "inner"
+					, margin : 10
+					, attrs : {
+						"font-size" : 15
+						, fill : "#c7c7c7"
+					}
+					, attrsHover : {
+						fill : "#eaeaea"
+						, animDuration : 300
+					}
+				}
+				, target : "_self"
+			}
 			, zoom : {
 				enabled : false
 				, maxLevel : 5
@@ -1010,6 +1115,7 @@
 		}
 		, areas : {}
 		, plots : {}
+		, links : {}
 	};
 	
 	$.fn.mapael.legendDefaultOptions = {
