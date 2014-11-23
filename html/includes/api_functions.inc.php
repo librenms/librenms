@@ -376,3 +376,46 @@ function list_bgp() {
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
+
+function get_graph_by_group() {
+  global $config;
+  $app = \Slim\Slim::getInstance();
+  $router = $app->router()->getCurrentRoute()->getParams();
+  $group = $router['group'];
+  $vars = array();
+  if(!empty($_GET['from']))
+  {
+    $vars['from'] = $_GET['from'];
+  }
+  if(!empty($_GET['to']))
+  {
+    $vars['to'] = $_GET['to'];
+  }
+  $vars['width'] = $_GET['width'] ?: 1075;
+  $vars['height'] = $_GET['height'] ?: 300;
+  $auth = "1";
+  $type_where = " (";
+  $or = '';
+  $type_param = array();
+  foreach (explode(",", $group) as $type)
+  {
+    $type_where .= " $or `port_descr_type` = ?";
+    $or = "OR";
+    $type_param[] = $type;
+  }
+
+  $type_where .= ") ";
+  $if_list = '';
+  $seperator = '';
+  $ports = dbFetchRows("SELECT * FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias", $type_param);
+  foreach ($ports as $port)
+  {
+    $if_list .= $seperator . $port['port_id'];
+    $seperator = ",";
+  }
+  unset($seperator);
+  $vars['type'] = "multiport_bits_separate";
+  $vars['id'] = $if_list;
+  $app->response->headers->set('Content-Type', 'image/png');
+  require("includes/graphs/graph.inc.php");
+}

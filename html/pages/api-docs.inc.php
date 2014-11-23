@@ -157,6 +157,34 @@ if ($_SESSION['userlevel'] == '10')
         <tr>
           <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/ports/eth0"</code></td>
         </tr>
+        <a name="graphs_group"></a>
+        <tr class="success">
+          <td colspan="5"><strong>Graphs by group</strong></td>
+        </tr>
+        <tr>
+          <td>/api</td>
+          <td>/v0</td>
+          <td>/graphs/ports/$group</td>
+          <td>
+            <ul class="list-unstyled">
+              <li>$group = transit,peering,core (or multiple separated by comma)</li>
+              <li>$width = the width of the graph to be returned</li>
+              <li>$height = the height of the graph to be returned</li>
+              <li>$from = the from date/time of the graph (unix timestamp)</li>
+              <li>$to = the to date/time of the graph (unix timestamp)</li>
+              <li>$legend = Enable or disable the graph legend (yes/no)</li>
+            </ul>
+          </td>
+          <td>
+            JSON
+          </td>
+        </tr>
+        <tr>
+          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/graphs/ports/peering"</code></td>
+        </tr>
+        <tr>
+          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/graphs/ports/peering,transit?width=1024&height=768&from=1405457456&to=1405543856&legend=no"</code></td>
+        </tr>
         <a name="list"></a>
         <tr class="success">
           <td colspan="5"><strong>List</strong></td>
