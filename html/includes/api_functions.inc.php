@@ -377,7 +377,7 @@ function list_bgp() {
     echo _json_encode($output);
 }
 
-function get_graph_by_group() {
+function get_graph_by_portgroup() {
   global $config;
   $app = \Slim\Slim::getInstance();
   $router = $app->router()->getCurrentRoute()->getParams();
