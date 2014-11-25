@@ -380,6 +380,13 @@ function list_bgp() {
 function get_graph_by_portgroup() {
   global $config;
   $app = \Slim\Slim::getInstance();
+  if ($app->request->getMediaType() != "image/png") {
+      // we only support PNG graphs at the moment
+      $app->response->setStatus(406);	// Not Acceptable
+      echo("<h3>Not Acceptable</h3>\n");
+      echo("<p>Only media type 'image/png' is provided at present</p>\n");
+      return;
+  }
   $router = $app->router()->getCurrentRoute()->getParams();
   $group = $router['group'];
   $vars = array();

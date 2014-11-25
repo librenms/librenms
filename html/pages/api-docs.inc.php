@@ -157,9 +157,9 @@ if ($_SESSION['userlevel'] == '10')
         <tr>
           <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/ports/eth0"</code></td>
         </tr>
-        <a name="graphs_group"></a>
+        <a name="graphs_portgroup"></a>
         <tr class="success">
-          <td colspan="5"><strong>Graphs by group</strong></td>
+          <td colspan="5"><strong>Graphs by portgroup</strong></td>
         </tr>
         <tr>
           <td>/api</td>
@@ -176,14 +176,14 @@ if ($_SESSION['userlevel'] == '10')
             </ul>
           </td>
           <td>
-            JSON
+            image/png
           </td>
         </tr>
         <tr>
-          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/portgroups/peering"</code></td>
+          <td colspan="5"><code>curl -H "Content-Type: image/png" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/portgroups/peering"</code></td>
         </tr>
         <tr>
-          <td colspan="5"><code>curl -H "Content-Type: application/json" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/portgroups/peering,transit?width=1024&height=768&from=1405457456&to=1405543856&legend=no"</code></td>
+          <td colspan="5"><code>curl -H "Content-Type: image/png" -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/portgroups/peering,transit?width=1024&height=768&from=1405457456&to=1405543856&legend=no"</code></td>
         </tr>
         <a name="list"></a>
         <tr class="success">
