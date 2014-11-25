@@ -37,7 +37,7 @@ $app->group('/api', function() use ($app) {
       $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname')->name('get_graph_by_port_hostname');//api/v0/devices/$hostname/ports/$ifName/$type
     });
     $app->group('/portgroups', function() use ($app) {
-        $app->get('/:group', 'authToken', 'get_graph_by_group')->name('get_graph_by_portgroup');//api/v0/portgroups/$group
+        $app->get('/:group', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup');//api/v0/portgroups/$group
     });
     $app->get('/devices', 'authToken', 'list_devices')->name('list_devices');//api/v0/devices
     $app->post('/devices', 'authToken', 'add_device')->name('add_device');//api/v0/devices (json data needs to be passed)
