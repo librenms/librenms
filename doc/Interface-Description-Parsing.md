@@ -10,7 +10,7 @@ Table of Content:
 # <a name="about">About</a>:
 
 Librenms can interpret, display and group certain additional information on ports.
-For this a small `bash` script is supplied in `librenms/scripts` called `ifAlias`. 
+For this a small `bash` script is supplied in `librenms/scripts` called `ifAlias`.
 
 <a name="setup">Setup</a>:
 

@@ -11,13 +11,15 @@ Enter the MySQL root password to enter the MySQL command-line interface.
 
 Create database.
 
-    CREATE DATABASE librenms;
-    GRANT ALL PRIVILEGES ON librenms.*
-      TO 'librenms'@'<ip>'
-      IDENTIFIED BY '<password>'
-    ;
-    FLUSH PRIVILEGES;
-    exit
+```sql
+CREATE DATABASE librenms;
+GRANT ALL PRIVILEGES ON librenms.*
+  TO 'librenms'@'<ip>'
+  IDENTIFIED BY '<password>'
+;
+FLUSH PRIVILEGES;
+exit
+```
 
 Replace `<ip>` above with the IP of the server running LibreNMS.  If your database is on the same server as LibreNMS, you can just use `localhost` as the IP address.
 
@@ -36,7 +38,7 @@ Change `127.0.0.1` to the IP address that your MySQL server should listen on.  R
 Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of Debian 7.
 
     apt-get install lighttpd php5-cli php5-mysql php5-gd php5-snmp php5-cgi php-pear snmp graphviz mysql-server mysql-client rrdtool sendmail fping imagemagick whois mtr-tiny nmap ipmitool php5-mcrypt php5-json python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git
-    
+
 ### Cloning ###
 
 You can clone the repository via HTTPS or SSH.  In either case, you need to ensure the appropriate port (443 for HTTPS, 22 for SSH) is open in the outbound direction for your server.
@@ -49,7 +51,7 @@ At this stage you can either launch the web installer by going to http://IP/inst
 
     cp config.php.default config.php
     vim config.php
-    
+
 > NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
 
 Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
@@ -111,7 +113,7 @@ Enable fastcgi in Lighttpd by running the following commands,
 And add the following to /etc/php5/cgi/php.ini
 
      cgi.fix_pathinfo = 1
-     
+
 then restart Lighttpd:
 
     service lighttpd restart
@@ -145,6 +147,3 @@ LibreNMS performs daily updates by default.  At 00:15 system time every day, a `
 so that it looks like this:
 
     $config['update'] = 0;
-
-
-
