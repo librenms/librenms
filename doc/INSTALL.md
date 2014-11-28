@@ -41,18 +41,18 @@ This host is where the web server and SNMP poller run.  It could be the same mac
 Install the required software:
 
     apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear snmp graphviz php5-mcrypt php5-json apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool git
-    
+
 The packages listed above are an all-inclusive list of packages that were necessary on a clean install of Ubuntu 12.04/14.04.
 
 You need to configure snmpd appropriately if you have not already done so.  An absolute minimal config for snmpd is:
 
     rocommunity public 127.0.0.1
-    
+
 Adding the above line to `/etc/snmp/snmpd.conf` and running `service snmpd restart` will activate this config.
 
 In `/etc/php5/apache2/php.ini` and `/etc/php5/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
 examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
-    
+
 ### Cloning ###
 
 LibreNMS is installed using git.  If you're not familiar with git, check out the [git book][2] or the tips at [git ready][3].  The initial install from github.com is called a `git clone`; subsequent updates are done through `git pull`.
@@ -62,7 +62,7 @@ You can clone the repository via HTTPS or SSH.  In either case, you need to ensu
     cd /opt
     git clone https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
-    
+
 The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
 
 Sometimes the initial clone can take quite a while (nearly 3 minutes on a 10 Mbps fibre connection in Australia is a recent example).  If it's a big problem to you, you can save about 50% of the bandwidth by not pulling down the full git history.  This comes with some limitations (namely that you can't use it as the basis for further git repos), but if you're not planning to develop for LibreNMS it's an acceptable option.  To perform the initial clone without full history, run the following instead:
@@ -112,7 +112,7 @@ Change `librenms.example.com` to the appropriate hostname for your domain, then 
     a2ensite librenms.conf
     a2enmod rewrite
     service apache2 restart
-    
+
 (To get to your LibreNMS install externally, you'll also need add it to your DNS or hosts file.)
 
 ### Manual vs. web installer ###
@@ -121,7 +121,7 @@ At this stage you can either launch the web installer by going to http://librenm
 
     cp config.php.default config.php
     vim config.php
-    
+
 Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
 
 Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
