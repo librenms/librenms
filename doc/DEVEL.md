@@ -9,7 +9,7 @@ that has LibreNMS already running on it!
 To get started, you can just copy the script from `/contrib/dev_init`,
 or you can enter the following commands into your shell:
 
-```
+```bash
 mkdir -p dev/librenms && cd $_
 curl -O http://wkennedy.co/uploads/librenms/Vagrantfile
 curl -O http://wkennedy.co/uploads/librenms/bootstrap.sh
