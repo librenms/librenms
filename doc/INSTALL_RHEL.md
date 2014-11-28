@@ -16,13 +16,15 @@ Enter the MySQL root password to enter the MySQL command-line interface.
 
 Create database.
 
-    CREATE DATABASE librenms;
-    GRANT ALL PRIVILEGES ON librenms.*
-      TO 'librenms'@'<ip>'
-      IDENTIFIED BY '<password>'
-    ;
-    FLUSH PRIVILEGES;
-    exit
+```sql
+CREATE DATABASE librenms;
+GRANT ALL PRIVILEGES ON librenms.*
+  TO 'librenms'@'<ip>'
+  IDENTIFIED BY '<password>'
+;
+FLUSH PRIVILEGES;
+exit
+```
 
 Replace `<ip>` above with the IP of the server running LibreNMS.  If your database is on the same server as LibreNMS, you can just use `localhost` as the IP address.
 
@@ -57,17 +59,19 @@ Set `httpd` to start on system boot.
 
 Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 
-    <VirtualHost *:80>
-      DocumentRoot /opt/librenms/html/
-      ServerName  librenms.example.com
-      CustomLog /opt/librenms/logs/access_log combined
-      ErrorLog /opt/librenms/logs/error_log
-      AllowEncodedSlashes On
-      <Directory "/opt/librenms/html/">
-        AllowOverride All
-        Options FollowSymLinks MultiViews
-      </Directory>
-    </VirtualHost>
+```apache
+<VirtualHost *:80>
+  DocumentRoot /opt/librenms/html/
+  ServerName  librenms.example.com
+  CustomLog /opt/librenms/logs/access_log combined
+  ErrorLog /opt/librenms/logs/error_log
+  AllowEncodedSlashes On
+  <Directory "/opt/librenms/html/">
+    AllowOverride All
+    Options FollowSymLinks MultiViews
+  </Directory>
+</VirtualHost>
+```
 
 If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes` to `NoDecode`
 
@@ -87,29 +91,31 @@ Modify permissions and configuration for `php-fpm` to use nginx credentials.
 
 Add configuration for `nginx` at `/etc/nginx/conf.d/librenms` with the following content:
 
-    server {
-     listen      80;
-     server_name librenms.example.com;
-     root        /opt/librenms/html;
-     index       index.php;
-     access_log  /opt/librenms/logs/access_log;
-     error_log   /opt/librenms/logs/error_log;
-     location / {
-      try_files $uri $uri/ @librenms;
-     }
-     location ~ \.php {
-      include fastcgi.conf;
-      fastcgi_split_path_info ^(.+\.php)(/.+)$;
-      fastcgi_pass unix:/var/run/php5-fpm.sock;
-     }
-     location ~ /\.ht {
-      deny all;
-     }
-     location @librenms {
-      rewrite ^api/v0(.*)$ /api_v0.php/$1 last;
-      rewrite ^(.+)$ /index.php/$1 last;
-     }
-    }
+```nginx
+server {
+ listen      80;
+ server_name librenms.example.com;
+ root        /opt/librenms/html;
+ index       index.php;
+ access_log  /opt/librenms/logs/access_log;
+ error_log   /opt/librenms/logs/error_log;
+ location / {
+  try_files $uri $uri/ @librenms;
+ }
+ location ~ \.php {
+  include fastcgi.conf;
+  fastcgi_split_path_info ^(.+\.php)(/.+)$;
+  fastcgi_pass unix:/var/run/php5-fpm.sock;
+ }
+ location ~ /\.ht {
+  deny all;
+ }
+ location @librenms {
+  rewrite ^api/v0(.*)$ /api_v0.php/$1 last;
+  rewrite ^(.+)$ /index.php/$1 last;
+ }
+}
+```
 
 ### Cloning ###
 

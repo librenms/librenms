@@ -11,13 +11,15 @@ Enter the MySQL root password to enter the MySQL command-line interface.
 
 Create database.
 
-    CREATE DATABASE librenms;
-    GRANT ALL PRIVILEGES ON librenms.*
-      TO 'librenms'@'<ip>'
-      IDENTIFIED BY '<password>'
-    ;
-    FLUSH PRIVILEGES;
-    exit
+```sql
+CREATE DATABASE librenms;
+GRANT ALL PRIVILEGES ON librenms.*
+  TO 'librenms'@'<ip>'
+  IDENTIFIED BY '<password>'
+;
+FLUSH PRIVILEGES;
+exit
+```
 
 Replace `<ip>` above with the IP of the server running LibreNMS.  If your database is on the same server as LibreNMS, you can just use `localhost` as the IP address.
 

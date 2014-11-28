@@ -14,13 +14,15 @@ Input the MySQL root password to enter the MySQL command-line interface.
 
 Create the database:
 
-    CREATE DATABASE librenms;
-    GRANT ALL PRIVILEGES ON librenms.*
-      TO 'librenms'@'<ip>'
-      IDENTIFIED BY '<password>'
-    ;
-    FLUSH PRIVILEGES;
-    exit
+```sql
+CREATE DATABASE librenms;
+GRANT ALL PRIVILEGES ON librenms.*
+  TO 'librenms'@'<ip>'
+  IDENTIFIED BY '<password>'
+;
+FLUSH PRIVILEGES;
+exit
+```
 
 Replace `<ip>` above with the IP or DNS name of the server running LibreNMS.  If your database is on the same server as LibreNMS, you can use `localhost`.
 
@@ -85,17 +87,19 @@ First, create and chown the `rrd` directory and create the `logs` directory:
 
 Next, add the following to `/etc/apache2/sites-available/librenms.conf`:
 
-    <VirtualHost *:80>
-      DocumentRoot /opt/librenms/html/
-      ServerName  librenms.example.com
-      CustomLog /opt/librenms/logs/access_log combined
-      ErrorLog /opt/librenms/logs/error_log
-      AllowEncodedSlashes On
-      <Directory "/opt/librenms/html/">
-        AllowOverride All
-        Options FollowSymLinks MultiViews
-      </Directory>
-    </VirtualHost>
+```apache
+<VirtualHost *:80>
+  DocumentRoot /opt/librenms/html/
+  ServerName  librenms.example.com
+  CustomLog /opt/librenms/logs/access_log combined
+  ErrorLog /opt/librenms/logs/error_log
+  AllowEncodedSlashes On
+  <Directory "/opt/librenms/html/">
+    AllowOverride All
+    Options FollowSymLinks MultiViews
+  </Directory>
+</VirtualHost>
+```
 
 If you are running Apache 2.2.18 or higher then change AllowEncodedSlashes to NoDecode
 
