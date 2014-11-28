@@ -7,7 +7,7 @@ Roadmap
     obviously not be as customised as the specifically supported devices
     but should still be useful to users.
   - Ruckus wireless controllers
-    
+
 - Functionality/performance improvements:
   - Eliminate interface churn for transient interfaces (e.g. ppp/tun)
     on net-snmp.
