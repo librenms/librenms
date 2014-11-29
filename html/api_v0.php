@@ -34,6 +34,7 @@ $app->group('/api', function() use ($app) {
       $app->delete('/:hostname', 'authToken', 'del_device')->name('del_device');//api/v0/devices/$hostname
       $app->get('/:hostname', 'authToken', 'get_device')->name('get_device');//api/v0/devices/$hostname
       $app->get('/:hostname/vlans', 'authToken', 'get_vlans')->name('get_vlans');//api/v0/devices/$hostname/vlans
+      $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');//api/v0/devices/$hostname/graphs
       $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');//api/v0/devices/$hostname/$type
       $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname');//api/v0/devices/$hostname/ports/$ifName
       $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname')->name('get_graph_by_port_hostname');//api/v0/devices/$hostname/ports/$ifName/$type
