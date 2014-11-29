@@ -130,7 +130,7 @@
 			/**
 			* Update the zoom level of the map on mousewheel
 			*/
-			options.map.zoom.mousewheel && $self.on("mousewheel", function(e) {
+			options.map.zoom.enabled && options.map.zoom.mousewheel && $self.on("mousewheel", function(e) {
 				var offset = $self.offset(),
 					initFactor = (options.map.width) ? ($.fn.mapael.maps[options.map.name].width / options.map.width) : ($.fn.mapael.maps[options.map.name].width / $self.width())
 					, zoomLevel = (e.deltaY > 0) ? 1 : -1
