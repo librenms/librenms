@@ -571,7 +571,7 @@
 			tooltipTO = setTimeout(
 				function() {
 					elem.tooltipContent && $tooltip.html(elem.tooltipContent).css("display", "block");
-					$tooltip.css({"left" : Math.min(containerY2 - $tooltip.outerWidth() - 5, e.pageX + 12), "top" : e.pageY + 23 - $(window).scrollTop()});
+					$tooltip.css({"left" : Math.min(containerY2 - $tooltip.outerWidth() - 5, e.pageX + 10 - $(window).scrollLeft()), "top" : e.pageY + 20 - $(window).scrollTop()});
 				}
 				, 120
 			);
@@ -579,7 +579,7 @@
 			clearTimeout(tooltipTO);
 			$tooltip.css("display", "none");
 		}).on("mousemove", function(e) {
-			$tooltip.css({"left" : Math.min(containerY2 - $tooltip.outerWidth() - 5, e.pageX + 12), "top" : e.pageY + 23 - $(window).scrollTop()});
+			$tooltip.css({"left" : Math.min(containerY2 - $tooltip.outerWidth() - 5, e.pageX + 10 - $(window).scrollLeft()), "top" : e.pageY + 20 - $(window).scrollTop()});
 		});
 	};
 	
