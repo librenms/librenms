@@ -2,48 +2,28 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Demo</title>
+	<title>jQuery Mapael examples</title>
 	<style type="text/css">
-		.mapTooltip {
-			position:fixed;
-			background-color : #fff;
-			moz-opacity:0.70;
-			opacity: 0.70;
-			filter:alpha(opacity=70);
-			border-radius:10px;
-			padding : 10px;
-			z-index: 1000;
-			max-width: 200px;
-			display:none;
-			color:#343434;
+		body {
+			color:#5d5d5d;
+			font-family:Helvetica,Arial,sans-serif;
 		}
-		
-		.cityFrance {
-			background-color:#343434;
-			border-radius:10px;
-			width:400px;
-		}
-		
-		.mapLegend {
-		}
-		
+	
 		h1 {
 			font-size:30px;
-			color:#3d3d3d;
 			margin:auto;
 			margin-top:50px;
 		}
 		
 		h2 {
 			font-size:22px;
-			color:#3d3d3d;
 			margin-top:50px;
 		}
 		
-		.container {
-			margin:auto;
-			width:80%;
-		}
+        .container {
+            min-width: 700px;
+            margin:auto;
+        }
 		
 		.zoomIn, .zoomOut {
 			background-color:#fff;
@@ -75,38 +55,56 @@
 			position:relative;
 		}
 		
+		.mapTooltip {
+			position : fixed;
+			background-color : #fff;
+			moz-opacity:0.70;
+			opacity: 0.70;
+			filter:alpha(opacity=70);
+			border-radius:10px;
+			padding : 10px;
+			z-index: 1000;
+			max-width: 200px;
+			display:none;
+			color:#343434;
+		}
+		
 </style>
 </head>
 
 <body>
 	<div class="container">
 	
-		<h1>Map examples</h1>
-	
-		<h2>Minimal example (France)</h2>
-		<div class="maparea1">
+		<h2>Minimal example</h2>
+		<div class="container1">
 			<div class="map">
 				<span>Alternative content for the map</span>
 			</div>
 		</div>
 		
-		<h2>Refreshable map of France with coloured cities and areas labels and zoom buttons</h2>
-		<div class="maparea2">
-			<input type="button" value="Update the map !" id="refreshmaparea2" />
+		<h2>Map with some custom plots and areas</h2>
+		<div class="container2">
+			<div class="map" style="background-color:#cddee0;">
+				<span>Alternative content for the map</span>
+			</div>
+		</div>
+		
+		<h2>Map with links between the plots</h2>
+		<div class="container3">
 			<div class="map">
 				<span>Alternative content for the map</span>
 			</div>
 		</div>
 		
-		<h2>Map with some overloaded parameters and 'onclick' callback on areas (France)</h2>
-		<div class="maparea3">
+		<h2>Map with zoom-in, zoom-out buttons and zoom on mousewheel</h2>
+		<div class="container4">
 			<div class="map">
 				<span>Alternative content for the map</span>
 			</div>
 		</div>
-
-		<h2>Population of France by department with a legend</h2>
-		<div class="maparea4">
+		
+		<h2>Map with a legend for areas</h2>
+		<div class="container5">
 			<div class="map">
 				<span>Alternative content for the map</span>
 			</div>
@@ -114,36 +112,10 @@
 				<span>Alternative content for the legend</span>
 			</div>
 		</div>
+		
 
-		<h2>Population of the 1000 more populated french cities with a legend</h2>
-		<div class="maparea5">
-			<div class="map">
-				<span>Alternative content for the map</span>
-			</div>
-			<div class="cityFrance">
-				<span>Alternative content for the legend</span>
-			</div>
-		</div>
-
-		<h2>Map of the world with the population by country</h2>
-		<div class="maparea6">
-			<div class="map">
-				<span>Alternative content for the map</span>
-			</div>
-			<div class="areaLegend">
-				<span>Alternative content for the legend</span>
-			</div>
-			<div class="plotLegend">
-				<span>Alternative content for the legend</span>
-			</div>
-		</div>
-
-		<h2>Map of USA with some plotted cities</h2>
-		<div class="maparea7">
-			<div class="map">
-				<span>Alternative content for the map</span>
-			</div>
-		</div>
+		
+		<b>All example for jQuery Mapael are available on <a href="http://www.neveldo.fr/mapael/">neveldo.fr/mapael</a>.</b>
 		
 	</div>
 	
