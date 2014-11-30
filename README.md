@@ -8,7 +8,7 @@ Additional maps are stored in the repository ['neveldo/mapael-maps'](https://git
 
 jQuery Mapael is a [jQuery](http://jquery.com/) plugin based on [raphael.js](http://raphaeljs.com/) that allows you to display dynamic vector maps.  
 
-For example, with Mapael, you can display a map of the world with clickable countries. You can build simple dataviz by setting some parameters in order to automatically set a color to each area of your map and generate the legend. Moreover, you can plot cities on a map with their latitude and longitude.
+For example, with Mapael, you can display a map of the world with clickable countries. You can also build simple dataviz by setting some parameters in order to automatically set a color depending on a value to each area of your map and display the associated legend. Moreover, you can plot cities on the map with circles, squares or images by their latitude and longitude. Many more options are available, read the documentation in order to get a complete overview of mapael abilities.
 
 As Raphaël, Mapael supports Firefox 3.0+, Safari 3.0+, Chrome 5.0+, Opera 9.5+ and Internet Explorer 6.0+.
 
@@ -17,8 +17,8 @@ As Raphaël, Mapael supports Firefox 3.0+, Safari 3.0+, Chrome 5.0+, Opera 9.5+ a
 
 ## Key features
 
-*   based on **jQuery and raphael.js**
-*   **Interactive.** Set a link, a tooltip and some events on the areas of the map
+*   based on **jQuery and raphael.js**. And optionnaly based on jQuery mousewheel for the zoom on mousewheel feature.
+*   **Interactive.** Set href, tooltip, add events and many more on the elements of your map.
 *   **Plottable cities**  Cities can be plotted on the map with circles, squares or images by their latitude and longitude
 *   **Areas and plots colorization with legends.** Mapael automatically sets attributes like color and size to each area and plot displayed on map and generates an interactive legend in order to build pretty dataviz
 *   **Easy to add new maps.** Build your own maps based on SVG paths
