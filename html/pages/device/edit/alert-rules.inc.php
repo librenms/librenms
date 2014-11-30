@@ -12,6 +12,6 @@
  * the source code distribution for details.
  */
 
-require_once('includes/print-alerts.php');
+require_once('includes/print-alert-rules.php');
 
 ?>

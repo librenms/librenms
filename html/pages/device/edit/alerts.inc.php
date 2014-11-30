@@ -1,5 +1,4 @@
 <?php
-
 if ($_POST['editing'])
 {
   if ($_SESSION['userlevel'] > "7")
@@ -33,6 +32,12 @@ $override_sysContact_string = get_dev_attrib($device,'override_sysContact_string
 $disable_notify = get_dev_attrib($device,'disable_notify');
 ?>
 
+<div class="row">
+    <div class="col-md-12">
+        <span id="message"></span>
+    </div>
+</div>
+
 <h3>Alert settings</h3>
 
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
@@ -58,3 +63,8 @@ $disable_notify = get_dev_attrib($device,'disable_notify');
   </div>
   <button class="btn btn-default btn-sm" type="submit" name="Submit">Save</button>
 </form>
+
+<?php
+require_once("includes/modal/new_alert_rule.inc.php");
+?>
+<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="<?php echo $device['device_id'];?>">Create new alert rule</button>

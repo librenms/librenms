@@ -709,4 +709,12 @@ function generate_pagination($count,$limit,$page,$links = 2) {
     return($return);
 }
 
+function is_admin() {
+    if ($_SESSION['userlevel'] == '10') {
+        $allowed = true;
+    } else {
+        $allowed = false;
+    }
+}
+
 ?>

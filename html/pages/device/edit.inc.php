@@ -19,7 +19,8 @@ if ($_SESSION['userlevel'] < '7')
   }
 
   $panes['apps']     = 'Applications';
-  $panes['alerts']   = 'Alerts';
+  $panes['alerts']   = 'Alert Settings';
+  $panes['alert-rules'] = 'Alert Rules';
   $panes['modules']  = 'Modules';
 
   if ($config['enable_services'])

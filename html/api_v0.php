@@ -35,8 +35,8 @@ $app->group('/api', function() use ($app) {
       $app->get('/:hostname', 'authToken', 'get_device')->name('get_device');//api/v0/devices/$hostname
       $app->get('/:hostname/vlans', 'authToken', 'get_vlans')->name('get_vlans');//api/v0/devices/$hostname/vlans
       $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');//api/v0/devices/$hostname/graphs
-      $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');//api/v0/devices/$hostname/$type
       $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');//api/v0/devices/$hostname/ports
+      $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');//api/v0/devices/$hostname/$type
       $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname');//api/v0/devices/$hostname/ports/$ifName
       $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname')->name('get_graph_by_port_hostname');//api/v0/devices/$hostname/ports/$ifName/$type
     });
@@ -45,6 +45,10 @@ $app->group('/api', function() use ($app) {
     $app->group('/portgroups', function() use ($app) {
         $app->get('/:group', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup');//api/v0/portgroups/$group
     });
+    $app->group('/bills', function() use ($app) {
+        $app->get('/:bill_id', 'authToken', 'list_bills')->name('get_bill');//api/v0/bills/$bill_id
+    });
+    $app->get('/bills', 'authToken', 'list_bills')->name('list_bills');//api/v0/bills
   });
   $app->get('/v0', 'authToken', 'show_endpoints');//api/v0
 });

@@ -1094,4 +1094,21 @@ function _json_format($json, $options = 448)
 
     return $result;
 }
+
+function convert_delay($delay) {
+    $delay = preg_replace('/\s/','',$delay);
+    if(strstr($delay, 'm',TRUE)) {
+        $delay_sec = $delay * 60;
+    } elseif(strstr($delay, 'h',TRUE)) {
+        $delay_sec = $delay * 3600;
+    } elseif(strstr($delay, 'd',TRUE)) {
+        $delay_sec = $delay * 86400;
+    } elseif(is_numeric($delay)) {
+        $delay_sec = $delay;
+    } else {
+        $delay_sec = 0;
+    }
+    return($delay_sec);
+}
+
 ?>
