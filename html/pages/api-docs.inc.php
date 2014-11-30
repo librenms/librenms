@@ -296,6 +296,29 @@ if ($_SESSION['userlevel'] == '10')
         <tr>
           <td colspan="5"><code>curl -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/bgp"</code></td>
         </tr>
+        <tr class="success">
+          <td colspan="5"><strong>List ports for a device</strong></td>
+        </tr>
+        <tr>
+          <td>/api</td>
+          <td>/v0</td>
+          <td>/devices/$hostname/ports</td>
+          <td>
+            <ul class="list-unstyled">
+              <li>hostname = the hostname to list vlans for</li>
+              <li>columns = the columns to return in the response</li>
+            </ul>
+          </td>
+          <td>
+            JSON
+          </td>
+        </tr>
+        <tr>
+          <td colspan="5"><code>curl -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/ports"</code></td>
+        </tr>
+        <tr>
+          <td colspan="5"><code>curl -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/ports?columns=ifDescr,ifName"</code></td>
+        </tr>
       </table>
     </div>
   </div>
