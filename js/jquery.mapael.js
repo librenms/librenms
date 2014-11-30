@@ -39,9 +39,7 @@
 				, areas = {}
 				, plots = {}
 				, legends = []
-				, id = 0
-				, zoomCenter = {}
-				, zoomOptions = [];
+				, id = 0;
 			
 			options.map.tooltip.css && $tooltip.css(options.map.tooltip.css);
 			paper.setViewBox(0, 0, mapConf.width, mapConf.height, false);
