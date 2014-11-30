@@ -460,15 +460,12 @@ if ($_SESSION['authenticated'])
            <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About&nbsp;<?php echo($config['project_name']); ?></a></li>
          </ul>
        </li>
-       <li style="padding-top:10px">
-          <form role="form" class="form-inline">
-            <div class="form-group">
-                <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search" style="width: 250px">
-            </div>
-          </form>
-        </li>
      </ul>
-
+     <form role="search" class="navbar-form navbar-left">
+         <div class="form-group">
+             <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search" style="width: 250px">
+         </div>
+     </form>
    </div>
  </div>
 </nav>
