@@ -132,6 +132,8 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <link href="css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
   <link href="css/toastr.min.css" rel="stylesheet" type="text/css" />
   <link href="css/typeahead.js-bootstrap.css" rel="stylesheet" type="text/css" />
+  <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/tagmanager.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
@@ -142,6 +144,8 @@ if ($config['page_refresh']) { echo('  <meta http-equiv="refresh" content="'.$co
   <script src="js/moment.min.js"></script>
   <script src="js/bootstrap-datetimepicker.min.js"></script>
   <script src="js/typeahead.min.js"></script>
+  <script src="js/jquery-ui.min.js"></script>
+  <script src="js/tagmanager.js"></script>
 <?php
 if ($config['favicon']) { echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n"); }
 ?>

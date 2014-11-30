@@ -465,3 +465,33 @@ function get_port_graphs() {
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
+
+function list_bills() {
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $bill_id = $router['bill_id'];
+    if(isset($_GET['custid'])) {
+        $sql = "`bill_custid` = ?";
+        $param = array($_GET['custid']);
+    } elseif(isset($_GET['ref'])) {
+        $sql = "`bill_ref` = ?";
+        $param = array($_GET['ref']);
+    } elseif(is_numeric($bill_id)) {
+        $sql = "`bill_id` = ?";
+        $param = array($bill_id);
+    } else {
+        $sql = "";
+        $param = array();
+    }
+    if(count($param) >= 1) {
+        $sql = "WHERE $sql";
+    }
+    $bills = dbFetchRows("SELECT * FROM `bills` $sql",$param);
+    $total_bills = count($bills);
+    $output = array("status" => "ok", "err-msg" => '', "count" => $total_bills, "bills" => $bills);
+    $app->response->setStatus('200');
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+

@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+$device['device_id'] = '-1';
 require_once('includes/print-alerts.php');
+unset($device['device_id']);
 
 ?>

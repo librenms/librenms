@@ -41,6 +41,15 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><img src="images/16/monitor_error.png" border="0" align="absmiddle" /> Alerts</a></li>
+<?php
+if ($_SESSION['userlevel'] == '10') {
+?>
+<li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><img src="images/16/monitor_go.png" border="0" align="absmiddle" /> Alert Rules</a></li>
+<li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><img src="images/16/monitor_link.png" border="0" align="absmiddle" /> Alert Templates</a></li>
+<?php
+}
+?>
             <li role="presentation" class="divider"></li>
 <?php if (isset($config['enable_map']) && $config['enable_map']) {
   echo('              <li><a href="'.generate_url(array('page'=>'overview')).'"><img src="images/16/map.png" border="0" align="absmiddle" /> Network Map</a></li>');
@@ -460,15 +469,12 @@ if ($_SESSION['authenticated'])
            <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About&nbsp;<?php echo($config['project_name']); ?></a></li>
          </ul>
        </li>
-       <li style="padding-top:10px">
-          <form role="form" class="form-inline">
-            <div class="form-group">
-                <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search" style="width: 250px">
-            </div>
-          </form>
-        </li>
      </ul>
-
+     <form role="search" class="navbar-form navbar-left">
+         <div class="form-group">
+             <input class="form-control" type="search" id="gsearch" name="gsearch" placeholder="Global Search" style="width: 250px">
+         </div>
+     </form>
    </div>
  </div>
 </nav>

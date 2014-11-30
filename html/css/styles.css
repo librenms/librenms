@@ -1612,3 +1612,20 @@ tr.search:nth-child(odd) {
     width: 250px;
 }
 
+.ui-autocomplete {
+    max-height: 100px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* IE 6 doesn't support max-height
+* we use height instead, but this forces the menu to always be this tall
+*/
+* html .ui-autocomplete {
+    height: 100px;
+}
+
+.glyphicon-large {
+    font-size: 2.5em;
+}
+
