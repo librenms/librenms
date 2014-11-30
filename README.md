@@ -26,7 +26,7 @@ As Raphaël, Mapael supports Firefox 3.0+, Safari 3.0+, Chrome 5.0+, Opera 9.5+ a
 *   **Resizable** Maps are easily resizable.
 *   **Zoom** Zoom and panning abilities.
 
-## How to use Mapael
+## Basic code example
 
 Here is the simplest example that shows how to display an empty map of the world :
 
