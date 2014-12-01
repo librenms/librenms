@@ -365,8 +365,17 @@
 		for (var id in options.links) {
 			elemOptions = $.fn.mapael.getElemOptions(options.map.defaultLink, options.links[id], {});
 			
-			p1 = options.plots[options.links[id].between[0]];
-			p2 = options.plots[options.links[id].between[1]];
+			if (typeof options.links[id].between[0] == 'string') {
+				p1 = options.plots[options.links[id].between[0]];
+			} else {
+				p1 = options.links[id].between[0];
+			}
+			
+			if (typeof options.links[id].between[1] == 'string') {
+				p2 = options.plots[options.links[id].between[1]];
+			} else {
+				p2 = options.links[id].between[1];
+			}
 			
 			if (typeof p1.latitude != "undefined" && typeof p1.longitude != "undefined") {
 				coordsP1 = getCoords(p1.latitude, p1.longitude);
