@@ -444,3 +444,24 @@ function get_graphs() {
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
+
+function get_port_graphs() {
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    if(isset($_GET['columns'])) {
+        $columns = $_GET['columns'];
+    } else {
+        $columns = 'ifName';
+    }
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' ORDER BY `ifIndex` ASC", array($device_id));
+    $total_ports = count($ports);
+    $output = array("status" => "ok", "err-msg" => '', "count" => $total_ports, "ports" => $ports);
+    $app->response->setStatus('200');
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
