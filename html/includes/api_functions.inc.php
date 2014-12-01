@@ -419,3 +419,28 @@ function get_graph_by_portgroup() {
   $app->response->headers->set('Content-Type', 'image/png');
   require("includes/graphs/graph.inc.php");
 }
+
+function get_graphs() {
+    global $config;
+    $code = 200;
+    $status = 'ok';
+    $message = '';
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $graphs = array();
+    $graphs[] = array('desc' => 'Poller Time', 'name' => 'device_poller_perf');
+    $graphs[] = array('desc' => 'Ping Response', 'name' => 'device_ping_perf');
+    foreach (dbFetchRows("SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph", array($device_id)) as $graph) {
+        $desc = $config['graph_types']['device'][$graph['graph']]['descr'];
+        $graphs[] = array('desc' => $desc, 'name' => $graph['graph']);
+    }
+    $total_graphs = count($graphs);
+    $output = array("status" => "$status", "err-msg" => $message, "count" => $total_graphs, "graphs" => $graphs);
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
