@@ -364,7 +364,7 @@ if ($_SESSION['userlevel'] == '10')
     </div>
   </div>
   <div class="col-sm-3">
-<div class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="sidebar" role="complementary">
+    <div class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="sidebar" role="complementary">
       <ul class="nav bs-docs-sidenav">
         <li><a href="api-docs/#intro">Introduction</a></li>
         <li><a href="api-docs/#tokens">Token authentication</a></li>
