@@ -19,12 +19,12 @@ if ($bill_data['bill_type'] == "quota") {
 }
 if ($bill_data['bill_type'] == "cdr") {
   $data = $bill_data['bill_cdr'];
-  $tmp['kbps'] = $data / $base / $base;
-  $tmp['mbps'] = $data / $base / $base / $base;
-  $tmp['gbps'] = $data / $base / $base / $base / $base;
-  if ($tmp['gbps']>1 and ($tmp['mbps']<$base)) { $cdr =  array("type" => "gbps", "select_tbps" => " selected", "data" => $tmp['gbps']); }
-  elseif (($tmp['mbps']>1) and ($tmp['mbps']<$base)) { $cdr = array("type" => "mbps", "select_gbps" => " selected", "data" => $tmp['mbps']); }
-  elseif (($tmp['kbps']>1) and ($tmp['kbps']<$base)) { $cdr = array("type" => "kbps", "select_mbps" => " selected", "data" => $tmp['kbps']); }
+  $tmp['kbps'] = $data / $base;
+  $tmp['mbps'] = $data / $base / $base;
+  $tmp['gbps'] = $data / $base / $base / $base;
+  if ($tmp['gbps']>=1 and ($tmp['gbps']<$base)) { $cdr =  array("type" => "gbps", "select_gbps" => " selected", "data" => $tmp['gbps']); }
+  elseif (($tmp['mbps']>=1) and ($tmp['mbps']<$base)) { $cdr = array("type" => "mbps", "select_mbps" => " selected", "data" => $tmp['mbps']); }
+  elseif (($tmp['kbps']>=1) and ($tmp['kbps']<$base)) { $cdr = array("type" => "kbps", "select_kbps" => " selected", "data" => $tmp['kbps']); }
 }
 
 ?>
