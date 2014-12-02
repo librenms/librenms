@@ -3124,6 +3124,11 @@
         if (this.drag_api) {
             this.drag_api.destroy();
         }
+        if (this.resize_api) {
+            this.resize_api.destroy();
+        }
+        
+        this.$widgets.each(function(i, el) { $(el).coords().destroy(); });
 
         this.remove_style_tags();
 

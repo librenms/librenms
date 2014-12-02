@@ -1,4 +1,4 @@
-/*! gridster.js - v0.5.6 - 2014-11-18
+/*! gridster.js - v0.5.6 - 2014-12-02
 * http://gridster.net/
 * Copyright (c) 2014 ducksboard; Licensed MIT */
 
@@ -3987,6 +3987,11 @@
         if (this.drag_api) {
             this.drag_api.destroy();
         }
+        if (this.resize_api) {
+            this.resize_api.destroy();
+        }
+        
+        this.$widgets.each(function(i, el) { $(el).coords().destroy(); });
 
         this.remove_style_tags();
 
