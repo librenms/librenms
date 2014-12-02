@@ -45,6 +45,10 @@ $app->group('/api', function() use ($app) {
     $app->group('/portgroups', function() use ($app) {
         $app->get('/:group', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup');//api/v0/portgroups/$group
     });
+    $app->group('/bills', function() use ($app) {
+        $app->get('/:bill_id', 'authToken', 'list_bills')->name('get_bill');//api/v0/bills/$bill_id
+    });
+    $app->get('/bills', 'authToken', 'list_bills')->name('list_bills');//api/v0/bills
   });
   $app->get('/v0', 'authToken', 'show_endpoints');//api/v0
 });
