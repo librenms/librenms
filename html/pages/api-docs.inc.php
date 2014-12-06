@@ -319,6 +319,47 @@ if ($_SESSION['userlevel'] == '10')
         <tr>
           <td colspan="5"><code>curl -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/devices/localhost/ports?columns=ifDescr,ifName"</code></td>
         </tr>
+        <tr class="success">
+          <td colspan="5"><strong>List Bills</strong></td>
+        </tr>
+        <tr>
+          <td>/api</td>
+          <td>/v0</td>
+          <td>/bills</td>
+          <td>
+            <ul class="list-unstyled">
+              <li>custid = the customer reference for the bill</li>
+              <li>ref = the billing reference for the bill</li>
+            </ul>
+          </td>
+          <td>
+            JSON
+          </td>
+        </tr>
+        <tr>
+          <td colspan="5"><code>curl -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/bills"</code></td>
+        </tr>
+        <tr>
+          <td colspan="5"><code>curl -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/bills?custid=Testing"</code></td>
+        </tr>
+        <tr class="success">
+          <td colspan="5"><strong>Retrieve Bill information</strong></td>
+        </tr>
+        <tr>
+          <td>/api</td>
+          <td>/v0</td>
+          <td>/bills/$bill_id</td>
+          <td>
+            <ul class="list-unstyled">
+            </ul>
+          </td>
+          <td>
+            JSON
+          </td>
+        </tr>
+        <tr>
+          <td colspan="5"><code>curl -H "X-Auth-Token: 91c60e737e342c205be5bba8e2954d27" \<br/> "https://librenms.example.com/api/v0/bills/$bill_id"</code></td>
+        </tr>
       </table>
     </div>
   </div>
