@@ -13,8 +13,8 @@
 		{
 			maps : {
 				thailand : {
-					width : 800.0, 
-					height : 600.0,
+					width : 900.0, 
+					height : 1640.0,
 					getCoords : function (lat, lon) {
 						/*Begin Convert latitude,longitude to x,y*/
 								var xfactor = 10842593.562843978;
