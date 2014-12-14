@@ -1,4 +1,7 @@
 /**
+* Jquery Mapael - Dynamic maps jQuery plugin (based on raphael.js)
+**
+* Map of Argentina
 *
 * @author eldie
 */
