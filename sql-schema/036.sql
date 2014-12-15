@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS `alert_rules` (  `id` int(11) NOT NULL AUTO_INCREMENT
 DROP TABLE IF EXISTS `alert_schedule`;
 CREATE TABLE IF NOT EXISTS `alert_schedule` (  `id` int(11) NOT NULL AUTO_INCREMENT,  `device_id` int(11) NOT NULL,  `start` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',  `end` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',  PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `alert_templates`;
-CREATE TABLE IF NOT EXISTS `alert_templates` (  `id` int(11) NOT NULL AUTO_INCREMENT,  `rule_id` varchar(255) NOT NULL DEFAULT ',',  `template` longtext NOT NULL,  PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `alert_templates` (  `id` int(11) NOT NULL AUTO_INCREMENT,  `rule_id` varchar(255) NOT NULL DEFAULT ',',`name` varchar(255) NOT NULL,  `template` longtext NOT NULL,  PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;
