@@ -111,7 +111,6 @@ function GetContacts($results) {
 	$contacts = array();
 	$uids = array();
 	foreach( $results as $result ) {
-		$tmpa = array();
 		$tmp  = NULL;
 		if( is_numeric($result["port_id"]) ) {
 			$tmpa = dbFetchRows("SELECT user_id FROM ports_perms WHERE access_level >= 0 AND port_id = ?",array($result["port_id"]));

@@ -102,6 +102,7 @@ function RunAlerts() {
  */
 function ExtTransports($obj) {
 	global $config;
+	$tmp = false; //To keep scrutinizer from naging because it doesnt understand eval
 	foreach( $config['alert']['transports'] as $transport=>$opts ) {
 		if( file_exists($config['install_dir']."/includes/alerts/transport.".$transport.".php") ) {
 			echo $transport." => ";
@@ -160,12 +161,11 @@ function FormatAlertTpl($tpl,$obj) {
  * @return array
  */
 function DescribeAlert($alert) {
-	$tmp = array();
 	$obj = array();
+	$i = 0;
 	$device = dbFetchRow("SELECT hostname FROM devices WHERE device_id = ?",array($alert['device_id']));
 	$obj['hostname'] = $device['hostname'];
 	$extra = $alert['details'];
-	$s = (sizeof($extra['rule']) > 1);
 	if( $alert['state'] == 1 ) {
 		$obj['title'] = 'Alert for device '.$device['hostname'].' Alert-ID #'.$alert['id'];
 		foreach( $extra['rule'] as $incident ) {
@@ -182,7 +182,6 @@ function DescribeAlert($alert) {
 			return false;
 		}
 		$extra = json_decode(gzuncompress($id['details']),true);
-		$s = (sizeof($extra['rule']) > 1);
 		$obj['title'] = 'Device '.$device['hostname'].' recovered from Alert-ID #'.$id['id'];
 		$obj['elapsed'] = TimeFormat(strtotime($alert['time_logged'])-strtotime($id['time_logged']));
 		$obj['id'] = $id['id'];
@@ -213,6 +212,7 @@ function TimeFormat($secs){
 		'm' => $secs / 60 % 60,
 		's' => $secs % 60
 	);
+	$ret = array();
 	foreach($bit as $k => $v){
 		if($v > 0) {
 			$ret[] = $v . $k;
