@@ -26,6 +26,8 @@ require_once("includes/discovery/functions.inc.php");
 error_reporting(E_ERROR);
 
 class ircbot {
+	private $data     = "";
+	private $authd    = array();
 	private $debug    = false;
 	private $server   = "";
 	private $port     = "";
