@@ -46,17 +46,6 @@ foreach (dbFetchRows("SELECT * FROM `devices` AS D, `services` AS S WHERE S.devi
     {
       $update['service_changed'] = time();
 
-      if ($service['sysContact']) { $email = $service['sysContact']; } else { $email = $config['email_default']; }
-      if ($status == "1")
-      {
-        $msg  = "Service Up: " . $service['service_type'] . " on " . $service['hostname'];
-        notify($device, "Service Up: " . $service['service_type'] . " on " . $service['hostname'], $msg);
-      }
-      elseif ($status == "0")
-      {
-        $msg  = "Service Down: " . $service['service_type'] . " on " . $service['hostname'];
-        notify($device, "Service Down: " . $service['service_type'] . " on " . $service['hostname'], $msg);
-      }
     } else { unset($updated); }
 
     $update = array_merge(array('service_status' => $status, 'service_message' => $check, 'service_checked' => time()), $update);
