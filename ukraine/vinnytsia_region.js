@@ -6,6 +6,7 @@
  * Map of Vinnytsia Region
  *
  * @author Ievgen Sentiabov https://github.com/joni-jones
+ * @source http://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Vinnycya_regions.svg/574px-Vinnycya_regions.svg.png
  */
 (function ($) {
     $.extend(true, $.fn.mapael,
