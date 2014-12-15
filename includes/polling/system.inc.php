@@ -62,7 +62,6 @@
   {
     if ($uptime < $device['uptime'] && $uptime >= $snmpEngineTime)
     {
-      notify($device,"Device rebooted: " . $device['hostname'],  "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.");
       log_event('Device rebooted after '.formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
     }
 
