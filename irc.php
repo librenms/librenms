@@ -151,11 +151,17 @@ class ircbot {
 	}
 	
 	private function alertData() {
-		if( ($tmp = $this->read("alert")) !== false ) {
-			foreach( $tmp as $data ) {
-				$this->data = $data;
-				echo $this->data;
-				//dostuff
+		if( ($alert = $this->read("alert")) !== false ) {
+			$alert = json_decode($alert,true);
+			foreach( $this->authd as $nick=>$data ) {
+				if( $data['expire'] >= time() ) {
+					$this->irc_raw("PRIVMSG ".$nick." :".trim($alert['title'])." - Rule: ".trim($alert['rule'])." - Faults".(sizeof($alert['faults']) > 3 ? " (showing first 3 out of ".sizeof($alert['faults'])." )" : "" ).":");
+					foreach( $alert['faults'] as $k=>$v ) {
+						$this->irc_raw("PRIVMSG ".$nick." :#".$k." ".$v);
+						if( $k >= 3 )
+							break;
+					}
+				}
 			}
 		}
 	}

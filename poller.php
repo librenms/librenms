@@ -20,6 +20,7 @@ include("config.php");
 include("includes/definitions.inc.php");
 include("includes/functions.php");
 include("includes/polling/functions.inc.php");
+include("includes/alerts.inc.php");
 
 $poller_start = utime();
 echo($config['project_name_version']." Poller\n\n");
@@ -108,6 +109,8 @@ foreach (dbFetch($query) as $device)
 {
   $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'");
   poll_device($device, $options);
+  RunRules($device['device_id']);
+  echo "\r\n";
   $polled_devices++;
 }
 
