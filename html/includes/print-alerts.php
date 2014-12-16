@@ -46,6 +46,8 @@ echo('</select></td>');
 $rulei=1;
 $count_query = "SELECT COUNT(alerts.id)";
 $full_query = "SELECT alerts.*, devices.hostname";
+$sql = '';
+$param = array();
 if(isset($device['device_id']) && $device['device_id'] > 0) {
     $sql = 'AND `alerts`.`device_id`=?';
     $param = array($device['device_id']);

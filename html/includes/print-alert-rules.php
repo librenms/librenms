@@ -49,6 +49,7 @@ echo('</select></td>');
 $rulei=1;
 $count_query = "SELECT COUNT(id)";
 $full_query = "SELECT *";
+$param = array();
 if(isset($device['device_id']) && $device['device_id'] > 0) {
     $sql = 'WHERE (device_id=? OR device_id="-1")';
     $param = array($device['device_id']);
