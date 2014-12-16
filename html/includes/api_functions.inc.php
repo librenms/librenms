@@ -499,6 +499,8 @@ function list_alert_rules() {
     global $config;
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
+    $sql = '';
+    $param = array();
     if(isset($router['id']) && $router['id'] > 0) {
         $rule_id = mres($router['id']);
         $sql = "WHERE id=?";
@@ -521,6 +523,7 @@ function list_alerts() {
     } else {
         $param = array('1');
     }
+    $sql = '';
     if(isset($router['id']) && $router['id'] > 0) {
         $alert_id = mres($router['id']);
         $sql = "AND id=?";
@@ -607,6 +610,7 @@ function delete_rule() {
     $rule_id = mres($router['id']);
     $status = 'error';
     $err_msg = '';
+    $message = '';
     $code = 500;
     if(is_numeric($rule_id)) {
         $status = 'ok';
@@ -632,6 +636,7 @@ function ack_alert() {
     $alert_id = mres($router['id']);
     $status = 'error';
     $err_msg = '';
+    $message = '';
     $code = 500;
     if(is_numeric($alert_id)) {
         $status = 'ok';
