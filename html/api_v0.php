@@ -35,8 +35,8 @@ $app->group('/api', function() use ($app) {
       $app->get('/:hostname', 'authToken', 'get_device')->name('get_device');//api/v0/devices/$hostname
       $app->get('/:hostname/vlans', 'authToken', 'get_vlans')->name('get_vlans');//api/v0/devices/$hostname/vlans
       $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');//api/v0/devices/$hostname/graphs
-      $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');//api/v0/devices/$hostname/ports
       $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');//api/v0/devices/$hostname/$type
+      $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');//api/v0/devices/$hostname/ports
       $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname');//api/v0/devices/$hostname/ports/$ifName
       $app->get('/:hostname/ports/:ifname/:type', 'authToken', 'get_graph_by_port_hostname')->name('get_graph_by_port_hostname');//api/v0/devices/$hostname/ports/$ifName/$type
     });
@@ -45,10 +45,22 @@ $app->group('/api', function() use ($app) {
     $app->group('/portgroups', function() use ($app) {
         $app->get('/:group', 'authToken', 'get_graph_by_portgroup')->name('get_graph_by_portgroup');//api/v0/portgroups/$group
     });
-    $app->group('/bills', function() use ($app) {
-        $app->get('/:bill_id', 'authToken', 'list_bills')->name('get_bill');//api/v0/bills/$bill_id
+
+    // /api/v0/alerts
+    $app->group('/alerts', function() use ($app) {
+        $app->get('/:id', 'authToken', 'list_alerts')->name('get_alert');//api/v0/alerts
+        $app->put('/:id', 'authToken', 'ack_alert')->name('ack_alert');//api/v0/alerts/$id (PUT)
     });
-    $app->get('/bills', 'authToken', 'list_bills')->name('list_bills');//api/v0/bills
+    $app->get('/alerts', 'authToken', 'list_alerts')->name('list_alerts');//api/v0/alerts
+
+    // /api/v0/rules
+    $app->group('/rules', function() use ($app) {
+        $app->get('/:id', 'authToken', 'list_alert_rules')->name('get_alert_rule');//api/v0/rules/$id
+        $app->delete('/:id', 'authToken', 'delete_rule')->name('delete_rule');//api/v0/rules/$id (DELETE)
+    });
+    $app->get('/rules', 'authToken', 'list_alert_rules')->name('list_alert_rules');//api/v0/rules
+    $app->post('/rules', 'authToken', 'add_edit_rule')->name('add_rule');//api/v0/rules (json data needs to be passed)
+    $app->put('/rules', 'authToken', 'add_edit_rule')->name('edit_rule');//api/v0/rules (json data needs to be passed)
   });
   $app->get('/v0', 'authToken', 'show_endpoints');//api/v0
 });
