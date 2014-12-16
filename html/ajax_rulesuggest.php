@@ -55,10 +55,12 @@ function levsort($base, $obj) {
 }
 
 $obj = array(array('name'=>'Error: No suggestions found.'));
+$term = array();
 if( isset($_GET['term'],$_GET['device_id']) ) {
 	$chk = array();
 	$_GET['term'] = mres($_GET['term']);
 	$_GET['device_id'] = mres($_GET['device_id']);
+        $current == false;
 	if( strstr($_GET['term'],".") ) {
 		$term = explode(".",$_GET['term']);
 		if( $config['memcached']['enable'] ) {
@@ -95,6 +97,7 @@ if( isset($_GET['term'],$_GET['device_id']) ) {
 		$obj = levsort($_GET['term'],$chk);
 		$obj = array_chunk($obj,20,true);
 		$obj = $obj[0];
+                $flds = array();
 		if( $current == true ) {
 			foreach( $obj as $fld ) {
 				$flds[] = $fld['name'];

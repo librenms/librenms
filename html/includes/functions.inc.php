@@ -715,6 +715,7 @@ function is_admin() {
     } else {
         $allowed = false;
     }
+    return $allowed;
 }
 
 ?>
