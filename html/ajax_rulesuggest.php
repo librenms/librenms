@@ -56,11 +56,11 @@ function levsort($base, $obj) {
 
 $obj = array(array('name'=>'Error: No suggestions found.'));
 $term = array();
+$current == false;
 if( isset($_GET['term'],$_GET['device_id']) ) {
 	$chk = array();
 	$_GET['term'] = mres($_GET['term']);
 	$_GET['device_id'] = mres($_GET['device_id']);
-        $current == false;
 	if( strstr($_GET['term'],".") ) {
 		$term = explode(".",$_GET['term']);
 		if( $config['memcached']['enable'] ) {
@@ -103,6 +103,7 @@ if( isset($_GET['term'],$_GET['device_id']) ) {
 				$flds[] = $fld['name'];
 			}
 			$qry = dbFetchRows("SELECT ".implode(", ",$flds)." FROM ".$term[0]." WHERE device_id = ?", array($_GET['device_id']));
+                        $ret = array();
 			foreach( $obj as $lev=>$fld ) {
 				list($tbl, $chk) = explode(".",$fld['name']);
 				$val = array();
