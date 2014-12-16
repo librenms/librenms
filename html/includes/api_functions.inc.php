@@ -495,3 +495,157 @@ function list_bills() {
     echo _json_encode($output);
 }
 
+function list_alert_rules() {
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    if(isset($router['id']) && $router['id'] > 0) {
+        $rule_id = mres($router['id']);
+        $sql = "WHERE id=?";
+        $param = array($rule_id);
+    }
+    $rules = dbFetchRows("SELECT * FROM `alert_rules` $sql",$param);
+    $total_rules = count($rules);
+    $output = array("status" => "ok", "err-msg" => '', "count" => $total_rules, "rules" => $rules);
+    $app->response->setStatus('200');
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+function list_alerts() {
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    if(isset($_POST['state'])) {
+        $param = array(mres($_POST['state']));
+    } else {
+        $param = array('1');
+    }
+    if(isset($router['id']) && $router['id'] > 0) {
+        $alert_id = mres($router['id']);
+        $sql = "AND id=?";
+        array_push($param,$alert_id);
+    }
+    $alerts = dbFetchRows("SELECT * FROM `alerts` WHERE `state` IN (?) $sql",$param);
+    $total_alerts = count($alerts);
+    $output = array("status" => "ok", "err-msg" => '', "count" => $total_alerts, "alerts" => $alerts);
+    $app->response->setStatus('200');
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+function add_edit_rule() {
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    $status = 'error';
+    $message = '';
+    $code = 500;
+
+    $rule_id = mres($data['rule_id']);
+
+    $device_id = mres($data['device_id']);
+    if(empty($device_id) && !isset($rule_id)) {
+        $message = 'Missing the device id or global device id (-1)';
+    } elseif($device_id == 0) {
+        $device_id = '-1';
+    }
+
+    $rule = $data['rule'];
+    if(empty($rule)) {
+        $message = 'Missing the alert rule';
+    }
+    $severity = mres($data['severity']);
+    $sevs = array("ok","warning","critical");
+    if(!in_array($severity, $sevs)) {
+        $message = 'Missing the severity';
+    }
+    $disabled = mres($data['disabled']);
+    if($disabled != '0' && $disabled != '1') {
+        $disabled = 0;
+    }
+
+    $count = mres($data['count']);
+    $mute = mres($data['mute']);
+    $delay = mres($data['delay']);
+    $delay_sec = convert_delay($delay);
+    if($mute == 1) {
+        $mute = true;
+    } else {
+        $mute = false;
+    }
+
+    $extra = array('mute'=>$mute,'count'=>$count,'delay'=>$delay_sec);
+    $extra_json = json_encode($extra);
+
+    if(empty($message)) {
+        if(is_numeric($rule_id)) {
+            if( dbUpdate(array('rule' => $rule,'severity'=>$severity,'disabled'=>$disabled,'extra'=>$extra_json), 'alert_rules', 'id=?',array($rule_id)) >= 0) {
+                $status = 'ok';
+                $code = 200;
+            } else {
+                $message = 'Failed to update existing alert rule';
+            }
+        } elseif( dbInsert(array('device_id'=>$device_id,'rule'=>$rule,'severity'=>$severity,'disabled'=>$disabled,'extra'=>$extra_json),'alert_rules') ) {
+            $status = 'ok';
+            $code = 200;
+        } else {
+            $message = 'Failed to create new alert rule';
+        }
+    }
+    $output = array("status" => $status, "err-msg" => $message);
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+function delete_rule() {
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $rule_id = mres($router['id']);
+    $status = 'error';
+    $err_msg = '';
+    $code = 500;
+    if(is_numeric($rule_id)) {
+        $status = 'ok';
+        $code = 200;
+        if(dbDelete('alert_rules', "`id` =  ? LIMIT 1", array($rule_id))) {
+            $message = 'Alert rule has been removed';
+        } else {
+            $message = 'No alert rule by that ID';
+        }
+    } else {
+        $err_msg = 'Invalid rule id has been provided';
+    }
+    $output = array("status" => $status, "err-msg" => $err_msg, "message" => $message);
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+function ack_alert() {
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $alert_id = mres($router['id']);
+    $status = 'error';
+    $err_msg = '';
+    $code = 500;
+    if(is_numeric($alert_id)) {
+        $status = 'ok';
+        $code = 200;
+        if(dbUpdate(array("state" => 2), 'alerts', '`id` = ? LIMIT 1', array($alert_id))) {
+            $message = 'Alert has been ackgnowledged';
+        } else {
+            $message = 'No alert by that ID';
+        }
+    } else {
+        $err_msg = 'Invalid alert has been provided';
+    }
+    $output = array("status" => $status, "err-msg" => $err_msg, "message" => $message);
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
