@@ -67,8 +67,13 @@
 
         var d = this.data;
 
-        typeof d.left === 'undefined' && (d.left = d.x1);
-        typeof d.top === 'undefined' && (d.top = d.y1);
+        if ( d.left === undefined ) {
+            d.left = d.x1;
+        }
+
+        if ( d.top === undefined ) {
+            d.top = d.y1;
+        }
 
         this.coords.x1 = d.left;
         this.coords.y1 = d.top;
