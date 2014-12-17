@@ -63,8 +63,13 @@
 
         var d = this.data;
 
-        typeof d.left === 'undefined' && (d.left = d.x1);
-        typeof d.top === 'undefined' && (d.top = d.y1);
+        if ( d.left === undefined ) {
+            d.left = d.x1;
+        }
+
+        if ( d.top === undefined ) {
+            d.top = d.y1;
+        }
 
         this.coords.x1 = d.left;
         this.coords.y1 = d.top;
@@ -3808,6 +3813,8 @@
     * @return {Object} Returns the instance of the Gridster class.
     */
     fn.add_faux_rows = function(rows) {
+        rows = window.parseInt( rows, 10 );
+
         var actual_rows = this.rows;
         var max_rows = actual_rows + (rows || 1);
 
@@ -3834,6 +3841,8 @@
     * @return {Object} Returns the instance of the Gridster class.
     */
     fn.add_faux_cols = function(cols) {
+        cols = window.parseInt( cols, 10 );
+
         var actual_cols = this.cols;
         var max_cols = actual_cols + (cols || 1);
         max_cols = Math.min(max_cols, this.options.max_cols);
