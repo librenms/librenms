@@ -1,4 +1,4 @@
-/*! gridster.js - v0.5.6 - 2014-09-25
+/*! gridster.js - v0.5.6 - 2014-12-17
 * http://gridster.net/
 * Copyright (c) 2014 ducksboard; Licensed MIT */
 
@@ -520,7 +520,7 @@
         this.disabled = false;
         this.events();
 
-        $(window).bind(this.nsEvent('resize'),
+        $window.bind(this.nsEvent('resize'),
             throttle($.proxy(this.calculate_dimensions, this), 200));
     };
 
@@ -578,9 +578,9 @@
         var diff_y = Math.round(mouse_actual_pos.top - this.mouse_init_pos.top);
 
         var left = Math.round(this.el_init_offset.left +
-            diff_x - this.baseX + $(window).scrollLeft() - this.win_offset_x);
+            diff_x - this.baseX + $window.scrollLeft() - this.win_offset_x);
         var top = Math.round(this.el_init_offset.top +
-            diff_y - this.baseY + $(window).scrollTop() - this.win_offset_y);
+            diff_y - this.baseY + $window.scrollTop() - this.win_offset_y);
 
         if (this.options.limit) {
             if (left > this.player_max_left) {
@@ -598,8 +598,8 @@
             pointer: {
                 left: mouse_actual_pos.left,
                 top: mouse_actual_pos.top,
-                diff_left: diff_x + ($(window).scrollLeft() - this.win_offset_x),
-                diff_top: diff_y + ($(window).scrollTop() - this.win_offset_y)
+                diff_left: diff_x + ($window.scrollLeft() - this.win_offset_x),
+                diff_top: diff_y + ($window.scrollTop() - this.win_offset_y)
             }
         };
     };
@@ -747,8 +747,8 @@
             this.helper = false;
         }
 
-        this.win_offset_y = $(window).scrollTop();
-        this.win_offset_x = $(window).scrollLeft();
+        this.win_offset_y = $window.scrollTop();
+        this.win_offset_x = $window.scrollLeft();
         this.scroll_offset_y = 0;
         this.scroll_offset_x = 0;
         this.el_init_offset = this.$player.offset();
@@ -827,7 +827,7 @@
 
         this.$container.off(this.ns);
         this.$document.off(this.ns);
-        $(window).off(this.ns);
+        $window.off(this.ns);
 
         $.removeData(this.$container, 'drag');
     };
@@ -864,7 +864,8 @@
 
  }(this, function($, Draggable, Collision) {
 
-    var defaults = {
+    var $window = $( window ),
+        defaults = {
         namespace: '',
         widget_selector: 'li',
         widget_margins: [10, 10],
@@ -1100,7 +1101,7 @@
         this.draggable();
         this.options.resize.enabled && this.resizable();
 
-        $(window).bind('resize.gridster', throttle(
+        $window.bind('resize.gridster', throttle(
             $.proxy(this.recalculate_faux_grid, this), 200));
     };
 
@@ -1471,10 +1472,11 @@
             });
 
         $nexts.not($exclude).each($.proxy(function(i, w) {
-            var wgd = $(w).coords().grid;
+            var $w = $( w ),
+                wgd = $w.coords().grid;
             if ( !(wgd.row <= (row + size_y - 1))) { return; }
             var diff =  (row + size_y) - wgd.row;
-            this.move_widget_down($(w), diff);
+            this.move_widget_down($w, diff);
         }, this));
 
         this.set_dom_grid_height();
@@ -3861,7 +3863,7 @@
     */
     fn.recalculate_faux_grid = function() {
         var aw = this.$wrapper.width();
-        this.baseX = ($(window).width() - aw) / 2;
+        this.baseX = ($window.width() - aw) / 2;
         this.baseY = this.$wrapper.offset().top;
 
         $.each(this.faux_grid, $.proxy(function(i, coords) {
@@ -3938,7 +3940,7 @@
 
         this.rows = Math.max(max_rows, this.options.min_rows);
 
-        this.baseX = ($(window).width() - aw) / 2;
+        this.baseX = ($window.width() - aw) / 2;
         this.baseY = this.$wrapper.offset().top;
 
         if (this.options.autogenerate_stylesheet) {
@@ -3959,10 +3961,14 @@
         this.$el.removeData('gridster');
 
         // remove bound callback on window resize
-        $(window).unbind('.gridster');
+        $window.unbind('.gridster');
 
         if (this.drag_api) {
             this.drag_api.destroy();
+        }
+
+        if (this.resize_api) {
+            this.resize_api.destroy();
         }
 
         this.remove_style_tags();
@@ -3976,8 +3982,9 @@
     //jQuery adapter
     $.fn.gridster = function(options) {
         return this.each(function() {
-            if (! $(this).data('gridster')) {
-                $(this).data('gridster', new Gridster( this, options ));
+            var $this = $( this );
+            if (! $this.data('gridster')) {
+                $this.data('gridster', new Gridster( this, options ));
             }
         });
     };
