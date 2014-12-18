@@ -56,7 +56,7 @@ function levsort($base, $obj) {
 
 $obj = array(array('name'=>'Error: No suggestions found.'));
 $term = array();
-$current == false;
+$current = false;
 if( isset($_GET['term'],$_GET['device_id']) ) {
 	$chk = array();
 	$_GET['term'] = mres($_GET['term']);
