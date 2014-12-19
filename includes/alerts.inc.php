@@ -109,7 +109,7 @@ function GetContacts($results) {
 		return array();
 	}
 	if( $config['alerts']['email']['default_only'] ) {
-		return array($config['alerts']['email']['default']);
+		return array($config['alerts']['email']['default'] => 'NOC');
 	}
 	$contacts = array();
 	$uids = array();
