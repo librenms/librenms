@@ -115,6 +115,10 @@ if(is_admin() === false) {
 
 $("[name='mute']").bootstrapSwitch('offColor','danger');
 
+$('#create-alert').on('hide.bs.modal', function (event) {
+    $('#response').data('tagmanager').empty();
+});
+
 $('#create-alert').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var device_id = button.data('device_id');
