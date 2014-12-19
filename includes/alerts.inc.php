@@ -108,6 +108,9 @@ function GetContacts($results) {
 	if( sizeof($results) == 0 ) {
 		return array();
 	}
+	if( $config['alerts']['email']['default_only'] ) {
+		return array($config['alerts']['email']['default']);
+	}
 	$contacts = array();
 	$uids = array();
 	foreach( $results as $result ) {
