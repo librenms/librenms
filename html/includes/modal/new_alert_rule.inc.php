@@ -181,7 +181,11 @@ $('#and, #or').click('', function(e) {
            strategy: 'array',
            tagFieldName: 'rules[]'
         });
-        $('#response').data('tagmanager').populate([ '%'+entity+' '+condition+' "'+value+'" '+glue ]);
+        if(entity.indexOf("%") >= 0) {
+            $('#response').data('tagmanager').populate([ entity+' '+condition+' '+value+' '+glue ]);
+        } else {
+            $('#response').data('tagmanager').populate([ '%'+entity+' '+condition+' "'+value+'" '+glue ]);
+        }
     }
 });
 
