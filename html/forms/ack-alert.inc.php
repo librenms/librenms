@@ -12,6 +12,17 @@
  * the source code distribution for details.
  */
 
-require_once('includes/print-alerts.php');
+$alert_id = mres($_POST['alert_id']);
+if(!is_numeric($alert_id)) {
+    echo('ERROR: No alert selected');
+    exit;
+} else {
+    if(dbUpdate(array('state' => '2'), 'alerts', 'id=?',array($alert_id))) {
+      echo('Alert has been acknowledged.');
+      exit;
+    } else {
+      echo('ERROR: Alert has not been acknowledged.');
+      exit;
+    }
+}
 
-?>

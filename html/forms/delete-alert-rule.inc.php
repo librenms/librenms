@@ -12,6 +12,20 @@
  * the source code distribution for details.
  */
 
-require_once('includes/print-alerts.php');
+if(is_admin() === false) {
+    die('ERROR: You need to be admin');
+}
 
-?>
+if(!is_numeric($_POST['alert_id'])) {
+    echo('ERROR: No alert selected');
+    exit;
+} else {
+    if(dbDelete('alert_rules', "`id` =  ?", array($_POST['alert_id']))) {
+      echo('Alert rule has been deleted.');
+      exit;
+    } else {
+      echo('ERROR: Alert rule has not been deleted.');
+      exit;
+    }
+}
+

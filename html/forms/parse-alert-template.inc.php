@@ -12,6 +12,14 @@
  * the source code distribution for details.
  */
 
-require_once('includes/print-alerts.php');
+if(is_admin() === false) {
+    die('ERROR: You need to be admin');
+}
 
-?>
+$template_id = ($_POST['template_id']);
+
+if(is_numeric($template_id) && $template_id > 0) {
+    $template = dbFetchRow("SELECT * FROM `alert_templates` WHERE `id` = ? LIMIT 1",array($template_id));
+    $output = array('template'=>$template['template'],'name'=>$template['name']);
+    echo _json_encode($output);
+}
