@@ -100,6 +100,12 @@ if(is_admin() === false) {
                 <input type="checkbox" name="mute" id="mute">
             </div>
         </div>
+        <div class='form-group'>
+            <label for='name' class='col-sm-3 control-label'>Rule name: </label>
+            <div class='col-sm-9'>
+                <input type='text' id='name' name='name' class='form-control' maxlength='200'>
+            </div>
+        </div>
         <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-3">
                         <button class="btn btn-default btn-sm" type="submit" name="rule-submit" id="rule-submit" value="save">Save Rule</button>
@@ -157,6 +163,7 @@ $('#create-alert').on('show.bs.modal', function (event) {
             if(extra['mute']) {
                 $('#mute').click();
             }
+            $('#name').val(output['name']);
         }
     });
 });
