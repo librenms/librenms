@@ -23,6 +23,7 @@ $alert_id = $_POST['alert_id'];
 $count = mres($_POST['count']);
 $delay = mres($_POST['delay']);
 $mute = mres($_POST['mute']);
+$name = mres($_POST['name']);
 
 if(empty($rule)) {
     $update_message = "ERROR: No rule was generated";
@@ -40,14 +41,14 @@ if(empty($rule)) {
     $extra = array('mute'=>$mute,'count'=>$count,'delay'=>$delay_sec);
     $extra_json = json_encode($extra);
     if(is_numeric($alert_id) && $alert_id > 0) {
-        if(dbUpdate(array('rule' => $rule,'severity'=>mres($_POST['severity']),'extra'=>$extra_json), 'alert_rules', 'id=?',array($alert_id)) >= 0) {
-            $update_message = "Edited Rule: <i>".$rule."</i>";
+        if(dbUpdate(array('rule' => $rule,'severity'=>mres($_POST['severity']),'extra'=>$extra_json,'name'=>$name), 'alert_rules', 'id=?',array($alert_id)) >= 0) {
+            $update_message = "Edited Rule: <i>$name: $rule</i>";
         } else {
             $update_message = "ERROR: Failed to edit Rule: <i>".$rule."</i>";
         }
     } else {
-        if( dbInsert(array('device_id'=>$device_id,'rule'=>$rule,'severity'=>mres($_POST['severity']),'extra'=>$extra_json),'alert_rules') ) {
-            $update_message = "Added Rule: <i>".$rule.$mute."</i>";
+        if( dbInsert(array('device_id'=>$device_id,'rule'=>$rule,'severity'=>mres($_POST['severity']),'extra'=>$extra_json,'name'=>$name),'alert_rules') ) {
+            $update_message = "Added Rule: <i>$name: $rule</i>";
         } else {
             $update_message = "ERROR: Failed to add Rule: <i>".$rule."</i>";
         }

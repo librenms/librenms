@@ -23,6 +23,6 @@ if(is_numeric($alert_id) && $alert_id > 0) {
     $rule_split = preg_split('/([a-zA-Z0-9_\-\.\=\%\ \"\'\!\~]+[&&||]+)/',$rule['rule'], -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
     $count = count($rule_split) - 1;
     $rule_split[$count] = $rule_split[$count].'&&';
-    $output = array('severity'=>$rule['severity'],'extra'=>$rule['extra'],'rules'=>$rule_split);
+    $output = array('severity'=>$rule['severity'],'extra'=>$rule['extra'],'name'=>$rule['name'],'rules'=>$rule_split);
     echo _json_encode($output);
 }
