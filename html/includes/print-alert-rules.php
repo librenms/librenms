@@ -22,6 +22,7 @@ echo '<div class="table-responsive">
 <table class="table table-hover table-condensed" width="100%">
   <tr>
     <th>#</th>
+    <th>Name</th>
     <th>Rule</th>
     <th>Severity</th>
     <th>Status</th>
@@ -30,7 +31,7 @@ echo '<div class="table-responsive">
     <th>Action</th>
   </tr>';
 
-echo ('<td colspan="6">');
+echo ('<td colspan="7">');
 if ($_SESSION['userlevel'] == '10') {
     echo('<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'. $device['device_id'] .'">Create new alert rule</button>');
 }
@@ -100,6 +101,7 @@ foreach( dbFetchRows($full_query, $param) as $rule ) {
         $rule_extra = json_decode($rule['extra'],TRUE);
 	echo "<tr class='".$extra."' id='row_".$rule['id']."'>";
 	echo "<td><i>#".((int) $rulei++)."</i></td>";
+        echo "<td>".$rule['name']."</td>";
 	echo "<td><i>".htmlentities($rule['rule'])."</i></td>";
 	echo "<td>".$rule['severity']."</td>";
 	echo "<td><span id='alert-rule-".$rule['id']."' class='glyphicon glyphicon-".$ico." glyphicon-large text-".$col."'></span> ";
@@ -122,7 +124,7 @@ foreach( dbFetchRows($full_query, $param) as $rule ) {
 }
 if($count % $results > 0) {
     echo('    <tr>
-         <td colspan="7" align="center">'. generate_pagination($count,$results,$page_number) .'</td>
+         <td colspan="8" align="center">'. generate_pagination($count,$results,$page_number) .'</td>
      </tr>');
 }
 echo '</table>
