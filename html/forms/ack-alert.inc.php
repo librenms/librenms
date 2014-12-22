@@ -13,12 +13,21 @@
  */
 
 $alert_id = mres($_POST['alert_id']);
+$state = mres($_POST['state']);
 if(!is_numeric($alert_id)) {
     echo('ERROR: No alert selected');
     exit;
+} elseif(!is_numeric($state)) {
+    echo('ERROR: No state passed');
+    exit;
 } else {
-    if(dbUpdate(array('state' => '2'), 'alerts', 'id=?',array($alert_id))) {
-      echo('Alert has been acknowledged.');
+    if($state == 2) {
+        $state = 1;
+    } elseif($state == 1) {
+        $state = 2;
+    }
+    if(dbUpdate(array('state' => $state), 'alerts', 'id=?',array($alert_id)) >= 0) {
+      echo('Alert acknowledged status changed.');
       exit;
     } else {
       echo('ERROR: Alert has not been acknowledged.');
