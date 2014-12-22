@@ -5,6 +5,20 @@
 </div>
 <?php
 
+if(isset($_POST['create-default'])) {
+    $default_rules[] = array('rule' => '%devices.status != "1"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"-1","delay":"0"}', 'name' => 'Devices up/down');
+    $default_rules[] = array('rule' => '%devices.uptime < "300"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"0"}', 'name' => 'Device rebooted');
+    $default_rules[] = array('rule' => '%bgpPeers.bgpPeerState != "established"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"0"}', 'name' => 'BGP Session down');
+    $default_rules[] = array('rule' => '%bgpPeers.bgpPeerFsmEstablishedTime < "300" && %bgpPeers.bgpPeerState = "established"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"0"}', 'name' => 'BGP Session establised');
+    $default_rules[] = array('rule' => '%ports.ifOperStatus != "up" && %ports.ifAdminStatus = "up"', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"0"}', 'name' => 'Port status up/down');
+    $default_rules[] = array('rule' => '((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100 >= 80', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"-1","delay":"0"}', 'name' => 'Port utilisation over threshold');
+    $default_rules[] = array('rule' => '%sensors.sensor_limit / %sensors.sensor_current < 1', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"1","delay":"0"}', 'name' => 'Sensor over limit');
+    $default_rules[] = array('rule' => '%sensors.sensor_limit_low / %sensors.sensor_current > 1', 'severity' => 'critical', 'extra' => '{"mute":false,"count":"-1","delay":"0"}', 'name' => 'Sensor under limit');
+    foreach( $default_rules as $add_rule ) {
+        dbInsert($add_rule,'alert_rules');
+    }
+}
+
 require_once('includes/modal/new_alert_rule.inc.php');
 require_once('includes/modal/delete_alert_rule.inc.php');
 
@@ -120,6 +134,7 @@ foreach( dbFetchRows($full_query, $param) as $rule ) {
         echo "</td>";
 	echo "</tr>\r\n";
 }
+
 if($count % $results > 0) {
     echo('    <tr>
          <td colspan="7" align="center">'. generate_pagination($count,$results,$page_number) .'</td>
@@ -130,6 +145,19 @@ echo '</table>
 <input type="hidden" name="results_amount" id="results_amount" value="'.$results.'">
 </form>
 </div>';
+
+if($count < 1) {
+    echo '<div class="row">
+              <div class="col-sm-12">
+                  <form role="form" method="post">
+                      <p class="text-center">
+                          <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default">Create default global alerts!</button>
+                      </p>
+                  </form>
+              </div>
+         </div>';
+}
+
 ?>
 
 <script>
