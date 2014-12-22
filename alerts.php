@@ -25,10 +25,28 @@
 
 include("includes/defaults.inc.php");
 include("config.php");
+
+$lock = false;
+if( file_exists($config['install_dir']."/.alerts.lock") ) {
+	$pids = explode("\n", trim(`ps -e | grep php | awk '{print $1}'`));
+	$lpid = trim(file_get_contents($config['install_dir']."/.alerts.lock"));
+	if( in_array($lpid,$pids) ) {
+		$lock = true;
+	}
+}
+
+if( $lock === true ) {
+	exit('Alreading running with PID '.$lpid."\r\n");
+} else {
+	file_put_contents($config['install_dir']."/.alerts.lock", getmypid());
+}
+
 include("includes/definitions.inc.php");
 include("includes/functions.php");
 
 RunAlerts();
+
+unlink($config['install_dir']."/.alerts.lock");
 
 /**
  * Run all alerts
