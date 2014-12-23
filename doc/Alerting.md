@@ -43,7 +43,8 @@ __Conditions__ can be any of:
 __Values__ can be Entities or any single-quoted data.  
 __Glues__ can be either `&&` for `AND` or `||` for `OR`.
 
-__Note__: The difference between `Equals` and `Matches` (and it's negation) is that `Equals` does a strict comparison and `Matches` allows the usage of the placeholder `*`. The placeholder `*` is comparable with `.*` in RegExp.
+__Note__: The difference between `Equals` and `Matches` (and it's negation) is that `Equals` does a strict comparison and `Matches` allows the usage of the placeholder `@`. The placeholder `@` is comparable with `.*` in RegExp.  
+Arithmetics are allowed as well.
 
 ## <a name="rules-examples">Examples</a>
 
