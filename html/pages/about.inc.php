@@ -1,3 +1,22 @@
+<?php
+$git_log = `git log -10`;
+?>
+<div class="modal fade" id="git_log" tabindex="-1" role="dialog" aria-labelledby="git_log_label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Local git log</h4>
+      </div>
+      <div class="modal-body">
+<pre><?php echo $git_log; ?></pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div style="margin: 10px;">
   <div style="float: right; padding: 0px; width: 49%">
 <?php print_optionbar_start(NULL); ?>
@@ -108,6 +127,7 @@ $mysql_version = dbFetchCell("SELECT version()");
 $netsnmp_version = shell_exec($config['snmpget'] . " --version 2>&1");
 $rrdtool_version = implode(" ",array_slice(explode(" ",shell_exec($config['rrdtool'] . " --version |head -n1")),1,1));
 $schema_version = dbFetchCell("SELECT version FROM dbSchema");
+$git_log = `git log -10`;
 
 print_optionbar_start(NULL);
 
@@ -133,7 +153,8 @@ print_optionbar_end();
       <a href="https://github.com/librenms/librenms/issues">Bug tracker</a> |
       <a href="https://groups.google.com/forum/#!forum/librenms-project">Mailing list</a> |
       <a href="http://twitter.com/librenms">Twitter</a> |
-      <a href="http://www.librenms.org/changelog.html">Changelog</a>
+      <a href="http://www.librenms.org/changelog.html">Changelog</a> |
+      <a href="#" data-toggle="modal" data-target="#git_log">Git log</a>
     </p>
 
   <div style="margin-top:10px;">
