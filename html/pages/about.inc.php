@@ -107,12 +107,14 @@ $php_version = phpversion();
 $mysql_version = dbFetchCell("SELECT version()");
 $netsnmp_version = shell_exec($config['snmpget'] . " --version 2>&1");
 $rrdtool_version = implode(" ",array_slice(explode(" ",shell_exec($config['rrdtool'] . " --version |head -n1")),1,1));
+$schema_version = dbFetchCell("SELECT version FROM dbSchema");
 
 print_optionbar_start(NULL);
 
 echo("
     <table width=100% cellpadding=3 cellspacing=0 border=0>
       <tr valign=top><td width=150><b>$project_name</b></td><td><a href='http://www.librenms.org/changelog.html'>$project_version</a></td></tr>
+      <tr valign=top><td><b>DB Schema</b></td><td>#$schema_version</td></tr>
       <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
       <tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
       <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
