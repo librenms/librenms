@@ -23,11 +23,10 @@ echo '<div class="table-responsive">
     <th>Hostname</th>
     <th>Timestamp</th>
     <th>Severity</th>
-    <th>Status</th>
     <th>Acknowledge</th>
   </tr>';
 
-echo ('<td colspan="6">');
+echo ('<td colspan="5">');
 if ($_SESSION['userlevel'] == '10') {
     echo('<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'. $device['device_id'] .'">Create new alert rule</button>');
 }
@@ -52,7 +51,7 @@ if(isset($device['device_id']) && $device['device_id'] > 0) {
     $sql = 'AND `alerts`.`device_id`=?';
     $param = array($device['device_id']);
 }
-$query = " FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id` RIGHT JOIN alert_rules ON alerts.rule_id=alert_rules.id WHERE `state`= 1 $sql ORDER BY `alerts`.`timestamp` DESC";
+$query = " FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id` RIGHT JOIN alert_rules ON alerts.rule_id=alert_rules.id WHERE `state` IN (1,2) $sql ORDER BY `alerts`.`timestamp` DESC";
 $count_query = $count_query . $query;
 $count = dbFetchCell($count_query,$param);
 if(!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
@@ -72,11 +71,11 @@ foreach( dbFetchRows($full_query, $param) as $alert ) {
 		$ico = "ok";
 		$col = "green";
 	} elseif( (int) $alert['state'] === 1 ) {
-		$ico = "remove";
+		$ico = "volume-up";
 		$col = "red";
 		$extra = "danger";
 	} elseif( (int) $alert['state'] === 2 ) {
-		$ico = "time";
+		$ico = "volume-off";
 		$col = "#800080";
 		$extra = "warning";
 	}
@@ -90,17 +89,22 @@ foreach( dbFetchRows($full_query, $param) as $alert ) {
         echo "<td>".$alert['hostname']."</td>";
 	echo "<td>".($alert['timestamp'] ? $alert['timestamp'] : "N/A")."</td>";
 	echo "<td>".$rule['severity']."</td>";
-	echo "<td><i id='alert-rule-".$rule['id']."' class='glyphicon glyphicon-".$ico."' style='color:".$col."; font-size: 24px;' >&nbsp;</i></td>";
         echo "<td>";
         if ($_SESSION['userlevel'] == '10') {
-            echo "<button type='button' class='btn btn-warning btn-sm'  data-target='#ack-alert' data-alert_id='".$alert['id']."' name='ack-alert' id='ack-alert'><span class='glyphicon glyphicon-volume-off' aria-hidden='true'></span></button>";
+            $ack_ico = 'volume-up';
+            $ack_col = 'success';
+            if($alert['state'] == 2) {
+                $ack_ico = 'volume-off'; 
+                $ack_col = 'danger';
+            }
+            echo "<button type='button' class='btn btn-".$ack_col." btn-sm'  data-target='#ack-alert' data-state='".$alert['state']."' data-alert_id='".$alert['id']."' name='ack-alert' id='ack-alert'><span class='glyphicon glyphicon-".$ack_ico."' aria-hidden='true'></span></button>";
         }
         echo "</td>";
 	echo "</tr>\r\n";
 }
 if($count % $results > 0) {
     echo('    <tr>
-         <td colspan="7" align="center">'. generate_pagination($count,$results,$page_number) .'</td>
+         <td colspan="6" align="center">'. generate_pagination($count,$results,$page_number) .'</td>
      </tr>');
 }
 echo '</table>
@@ -111,13 +115,14 @@ echo '</table>
 ?>
 
 <script>
-$('#ack-alert').click('', function(e) {
+$("[name='ack-alert']").click('', function(e) {
     event.preventDefault();
     var alert_id = $(this).data("alert_id");
+    var state = $(this).data("state");
     $.ajax({
         type: "POST",
         url: "/ajax_form.php",
-        data: { type: "ack-alert", alert_id: alert_id },
+        data: { type: "ack-alert", alert_id: alert_id, state: state },
         success: function(msg){
             $("#message").html('<div class="alert alert-info">'+msg+'</div>');
             if(msg.indexOf("ERROR:") <= -1) {
