@@ -147,15 +147,17 @@ echo '</table>
 </div>';
 
 if($count < 1) {
-    echo '<div class="row">
-              <div class="col-sm-12">
-                  <form role="form" method="post">
-                      <p class="text-center">
-                          <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default">Create default global alerts!</button>
-                      </p>
-                  </form>
-              </div>
-         </div>';
+    if ($_SESSION['userlevel'] == '10') {
+        echo '<div class="row">
+                  <div class="col-sm-12">
+                      <form role="form" method="post">
+                          <p class="text-center">
+                              <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default">Create default global alerts!</button>
+                          </p>
+                      </form>
+                  </div>
+             </div>';
+    
 }
 
 ?>
