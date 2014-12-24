@@ -1,3 +1,7 @@
+<?php
+if( $config['twofactor'] && isset($twofactorform) ) {
+  echo twofactor_form();
+} else { ?>
       <form class="form-horizontal" role="form" action="" method="post" name="logonform">
         <div class="form-group">
           <div class="col-sm-offset-2 col-sm-10">
@@ -56,6 +60,8 @@ if (isset($config['login_message']))
 document.logonform.username.focus();
 // -->
 </script>
-
+<?php
+}
+?>
     </div>
 </div>
