@@ -125,24 +125,28 @@ function oath_hotp($key, $counter=false) {
  * @return boolean|int
  */
 function verify_hotp($key,$otp,$counter=false) {
-	if( $counter === false ) {
-		//TimeBased HOTP requires lookbehind and lookahead.
-		$counter   = floor(microtime(true)/keyInterval);
-		$initcount = $counter-((otpWindow+1)*keyInterval);
-		$endcount  = $counter+(otpWindow*keyInterval);
-		$totp      = true;
+	if( oath_hotp($key,$counter) == $otp ) {
+		return true;
 	} else {
-		//Counter based HOTP only has lookahead, not lookbehind.
-		$initcount = $counter-1;
-		$endcount  = $counter+otpWindow;
-		$totp      = false;
-	}
-	while( ++$initcount <= $endcount ) {
-		if( oath_hotp($key,$initcount) == $otp ) {
-			if( !$totp ) {
-				return $initcount;
-			} else {
-				return true;
+		if( $counter === false ) {
+			//TimeBased HOTP requires lookbehind and lookahead.
+			$counter   = floor(microtime(true)/keyInterval);
+			$initcount = $counter-((otpWindow+1)*keyInterval);
+			$endcount  = $counter+(otpWindow*keyInterval);
+			$totp      = true;
+		} else {
+			//Counter based HOTP only has lookahead, not lookbehind.
+			$initcount = $counter-1;
+			$endcount  = $counter+otpWindow;
+			$totp      = false;
+		}
+		while( ++$initcount <= $endcount ) {
+			if( oath_hotp($key,$initcount) == $otp ) {
+				if( !$totp ) {
+					return $initcount;
+				} else {
+					return true;
+				}
 			}
 		}
 	}
