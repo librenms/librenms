@@ -81,8 +81,8 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
           $_SESSION['twofactor'] = true;
         } else {
           $twofactor = json_decode($twofactor['twofactor'],true);
-          if( $twofactor['fails'] >= 3 ) {
-            $auth_message = "Too many failures, please contact administrator.";
+          if( $twofactor['fails'] >= 3 && (!$config['twofactor_lock'] || (time()-$twofactor['last']) < $config['twofactor_lock']) ) {
+            $auth_message = "Too many failures, please ".($config['twofactor_lock'] ? "wait ".$config['twofactor_lock']." seconds" : "contact administrator").".";
           } else {
             require_once($config['install_dir'].'/html/includes/authentication/twofactor.lib.php');
             if( !$_POST['twofactor'] ) {
@@ -90,6 +90,7 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
             } else {
               if( ($server_c = verify_hotp($twofactor['key'],$_POST['twofactor'],$twofactor['counter'])) === false ) {
                 $twofactor['fails']++;
+                $twofactor['last'] = time();
                 $auth_message = "Wrong Two-Factor Token.";
               } else {
                 if( $twofactor['counter'] !== false ) {
