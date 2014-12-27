@@ -200,6 +200,7 @@ function twofactor_form($html=true){
             <button type="submit" class="btn btn-default input-sm" name="submit" type="submit">Login</button>
           </div>
         </div>';
+	$ret .= '<script>document.twofactorform.twofactor.focus();</script>';
 	if( $html ) {
 		$ret .= '
       </form>
