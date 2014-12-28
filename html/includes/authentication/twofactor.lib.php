@@ -191,8 +191,8 @@ function twofactor_form($form=true){
 }
 
 /**
- Authentication logic
- @return void
+ * Authentication logic
+ * @return void
  */
 function twofactor_auth() {
 	global $auth_message, $twofactorform;
