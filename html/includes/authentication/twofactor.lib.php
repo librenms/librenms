@@ -155,32 +155,14 @@ function verify_hotp($key,$otp,$counter=false) {
 
 /**
  * Print TwoFactor Input-Form
- * @param boolean $html Include HTML-Headers and Footers, if set function will `die()`
+ * @param boolean $form Include FORM-tags
  * @return void|string
  */
-function twofactor_form($html=true){
+function twofactor_form($form=true){
 	global $config;
 	$ret = "";
-	if( $html ) {
-		$ret .= '<!DOCTYPE HTML>
-<html>
-<head>
-  <title>'.$config['page_title_suffix'].' TwoFactor Authentication</title>
-  <base href="'.$config['base_url'].'" />
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-  <link href="'.$config['stylesheet'].'" rel="stylesheet" type="text/css" />
-  <script src="js/jquery.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-'.($config['favicon'] ? '  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n" : "").'
-</head>
-<body>
-
-<br />
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-12">
+	if( $form ) {
+		$ret .= '
       <form class="form-horizontal" role="form" action="" method="post" name="twofactorform">';
 	}
 	$ret .= '
@@ -192,7 +174,7 @@ function twofactor_form($html=true){
         <div class="form-group">
           <label for="twofactor" class="col-sm-2 control-label">Token</label>
           <div class="col-sm-6">
-            <input type="text" name="twofactor" id="twofactor" class="form-control" placeholder="012345" />
+            <input type="text" name="twofactor" id="twofactor" class="form-control" autocomplete="off" placeholder="012345" />
           </div>
         </div>
         <div class="form-group">
@@ -201,14 +183,9 @@ function twofactor_form($html=true){
           </div>
         </div>';
 	$ret .= '<script>document.twofactorform.twofactor.focus();</script>';
-	if( $html ) {
+	if( $form ) {
 		$ret .= '
-      </form>
-    </div>
-  </div>
-</div>
-</body>';
-		die($ret);
+      </form>';
 	}
 	return $ret;
 }

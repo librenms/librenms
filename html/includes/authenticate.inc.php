@@ -86,7 +86,7 @@ if ((isset($_SESSION['username'])) || (isset($_COOKIE['sess_id'],$_COOKIE['token
           } else {
             require_once($config['install_dir'].'/html/includes/authentication/twofactor.lib.php');
             if( !$_POST['twofactor'] ) {
-              twofactor_form();
+              $twofactorform = true;
             } else {
               if( ($server_c = verify_hotp($twofactor['key'],$_POST['twofactor'],$twofactor['counter'])) === false ) {
                 $twofactor['fails']++;

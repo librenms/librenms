@@ -64,6 +64,8 @@ Create a Two-Factor key:
 
 __Note__: Google Authenticator only allows counterbased OTP when scanned via QR codes.
 
+Installation guides for Google Authneticator can be found [here](https://support.google.com/accounts/answer/1066447?hl=en).
+
 Usage:
 - Create a key like described above
 - Scan provided QR or click on 'Manual' and type down the Secret
