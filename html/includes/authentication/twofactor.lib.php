@@ -189,4 +189,42 @@ function twofactor_form($form=true){
 	}
 	return $ret;
 }
+
+/**
+ Authentication logic
+ @return void
+ */
+function twofactor_auth() {
+	global $auth_message, $twofactorform;
+	$twofactor = dbFetchRow('SELECT twofactor FROM users WHERE username = ?', array($_SESSION['username']));
+	if( empty($twofactor['twofactor']) ) {
+		$_SESSION['twofactor'] = true;
+	} else {
+		$twofactor = json_decode($twofactor['twofactor'],true);
+		if( $twofactor['fails'] >= 3 && (!$config['twofactor_lock'] || (time()-$twofactor['last']) < $config['twofactor_lock']) ) {
+			$auth_message = "Too many failures, please ".($config['twofactor_lock'] ? "wait ".$config['twofactor_lock']." seconds" : "contact administrator").".";
+		} else {
+			if( !$_POST['twofactor'] ) {
+				$twofactorform = true;
+			} else {
+				if( ($server_c = verify_hotp($twofactor['key'],$_POST['twofactor'],$twofactor['counter'])) === false ) {
+					$twofactor['fails']++;
+					$twofactor['last'] = time();
+					$auth_message = "Wrong Two-Factor Token.";
+				} else {
+					if( $twofactor['counter'] !== false ) {
+						if( $server_c !== true && $server_c !== $twofactor['counter'] ) {
+							$twofactor['counter'] = $server_c+1;
+						} else {
+							$twofactor['counter']++;
+						}
+					}
+					$twofactor['fails'] = 0;
+					$_SESSION['twofactor'] = true;
+				}
+				dbUpdate(array('twofactor' => json_encode($twofactor)),'users','username = ?',array($_SESSION['username']));
+			}
+		}
+	}
+}
 ?>
