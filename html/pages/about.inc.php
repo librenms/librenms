@@ -168,11 +168,9 @@ print_optionbar_end();
     <h4>Acknowledgements</h4>
 
     <b>Observium</b> Codebase for fork. <br />
-    <b>Stu Nicholls</b> Dropdown menu CSS code. <br />
     <b>Mark James</b> Silk Iconset. <br />
     <b>Erik Bosrup</b> Overlib Library. <br />
     <b>Jonathan De Graeve</b> SNMP code improvements. <br />
-    <b>Xiaochi Jin</b> Logo design. <br />
     <b>Bruno Pramont</b> Collectd code. <br />
     <b>Dennis de Houx</b> Application monitors for PowerDNS, Shoutcast, NTPD (Client, Server). <br />
 
