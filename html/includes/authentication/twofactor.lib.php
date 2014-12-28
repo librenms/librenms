@@ -67,6 +67,7 @@ function twofactor_genkey() {
 	global $base32_enc;
 	// RFC 4226 recommends 160bits Secret Keys, that's 20 Bytes for the lazy ones.
 	$crypto = false;
+	$raw = "";
 	$x = -1;
 	while( $crypto == false || ++$x < 10 ) {
 		$raw = openssl_random_pseudo_bytes(20,$crypto);
@@ -195,7 +196,7 @@ function twofactor_form($form=true){
  * @return void
  */
 function twofactor_auth() {
-	global $auth_message, $twofactorform;
+	global $auth_message, $twofactorform, $config;
 	$twofactor = dbFetchRow('SELECT twofactor FROM users WHERE username = ?', array($_SESSION['username']));
 	if( empty($twofactor['twofactor']) ) {
 		$_SESSION['twofactor'] = true;
