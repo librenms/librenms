@@ -270,6 +270,26 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
           $vars['new_email'] = $users_details['email'];
         }
 
+        if( $config['twofactor'] ) {
+          if( $vars['twofactorremove'] ) {
+            if( dbUpdate(array('twofactor'=>''),users,'user_id = ?',array($vars['user_id'])) ) {
+              echo "<div class='alert alert-success'>TwoFactor credentials removed.</div>";
+            } else {
+              echo "<div class='alert alert-danger'>Couldnt remove user's TwoFactor credentials.</div>";
+            }
+          }
+          if( $vars['twofactorunlock'] ) {
+            $twofactor = dbFetchRow("SELECT twofactor FROM users WHERE user_id = ?",array($vars['user_id']));
+            $twofactor = json_decode($twofactor['twofactor'],true);
+            $twofactor['fails'] = 0;
+            if( dbUpdate(array('twofactor'=>json_encode($twofactor)),users,'user_id = ?',array($vars['user_id'])) ) {
+              echo "<div class='alert alert-success'>User unlocked.</div>";
+            } else {
+              echo "<div class='alert alert-danger'>Couldnt reset user's TwoFactor failures.</div>";
+            }
+          }
+        }
+
         echo("<form class='form-horizontal' role='form' method='post' action=''>
   <input type='hidden' name='user_id' value='" . $vars['user_id'] . "'>
   <input type='hidden' name='edit' value='yes'>
@@ -313,7 +333,34 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
     </div>
   </div>
   <button type='submit' class='btn btn-default'>Update User</button>
-  </form>");    
+  </form>");
+        if( $config['twofactor'] ) {
+          echo "<br/><div class='well'><h3>Two-Factor Authentication</h3>";
+          $twofactor = dbFetchRow("SELECT twofactor FROM users WHERE user_id = ?",array($vars['user_id']));
+          $twofactor = json_decode($twofactor['twofactor'],true);
+          if( $twofactor['fails'] >= 3 && (!$config['twofactor_lock'] || (time()-$twofactor['last']) < $config['twofactor_lock']) ) {
+            echo "<form class='form-horizontal' role='form' method='post' action=''>
+  <input type='hidden' name='user_id' value='" . $vars['user_id'] . "'>
+  <input type='hidden' name='edit' value='yes'>
+  <div class='form-group'>
+    <label for='twofactorunlock' class='col-sm-2 control-label'>User exceeded failures</label>
+    <input type='hidden' name='twofactorunlock' value='1'>
+    <button type='submit' class='btn btn-default'>Unlock</button>
+  </div>
+</form>";
+          }
+          if( $twofactor['key'] ) {
+            echo "<form class='form-horizontal' role='form' method='post' action=''>
+  <input type='hidden' name='user_id' value='" . $vars['user_id'] . "'>
+  <input type='hidden' name='edit' value='yes'>
+  <input type='hidden' name='twofactorremove' value='1'>
+  <button type='submit' class='btn btn-danger'>Disable TwoFactor</button>
+</form>
+</div>";
+          } else {
+            echo "<p>No TwoFactor key generated for this user, Nothing to do.</p>";
+          }
+        }
       } else {
         echo print_error("Error getting user details");
       }
