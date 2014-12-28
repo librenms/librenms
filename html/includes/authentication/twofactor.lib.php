@@ -91,7 +91,7 @@ function twofactor_genkey() {
 /**
  * Generate HOTP (RFC 4226)
  * @param string $key Secret Key
- * @param int $counter Counter, Defaults to Timestamp
+ * @param int|boolean $counter Optional Counter, Defaults to Timestamp
  * @return int
  */
 function oath_hotp($key, $counter=false) {
