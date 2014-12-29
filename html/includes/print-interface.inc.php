@@ -31,7 +31,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?", arr
 echo("<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='" . generate_port_url($port) . "/'\" style='cursor: pointer;'>
          <td valign=top width=350>");
 echo("        <span class=list-large>
-              " . generate_port_link($port, $port['ifIndex'] . ". ".$port['label']) . " $error_img $mac
+              " . generate_port_link($port, /*$port['ifIndex'] . ". ".*/$port['label']) . " $error_img $mac
            </span><br /><span class=interface-desc>".$port['ifAlias']."</span>");
 
 if ($port['ifAlias']) { echo("<br />"); }

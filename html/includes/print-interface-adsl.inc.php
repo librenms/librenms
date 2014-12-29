@@ -22,7 +22,7 @@ echo("<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmo
 onclick=\"location.href='device/".$device['device_id']."/port/".$port['port_id']."/'\" style='cursor: pointer;'>
  <td valign=top width=350>");
 echo("        <span class=list-large>
-              " . generate_port_link($port, $port['ifIndex'] . ". ".$port['label']) . "
+              " . generate_port_link($port, /*$port['ifIndex'] . ". ".*/$port['label']) . "
            </span><br /><span class=interface-desc>".$port['ifAlias']."</span>");
 
 if ($port['ifAlias']) { echo("<br />"); }

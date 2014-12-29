@@ -147,12 +147,12 @@ else
   {
     $where .= " AND (B.bgpPeerState != 'established')";
   }
-
+ 
   $peer_query = "select * from bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id ".$where." ORDER BY D.hostname, B.bgpPeerRemoteAs, B.bgpPeerIdentifier";
   foreach (dbFetchRows($peer_query) as $peer)
   {
     unset ($alert, $bg_image);
-
+    $device = device_by_id_cache($peer['device_id']);
     if ($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $peer['alert']=1; }
     if ($peer['bgpPeerAdminStatus'] == "start" || $peer['bgpPeerAdminStatus'] == "running") { $admin_col = "green"; } else { $admin_col = "gray"; }
     if ($peer['bgpPeerAdminStatus'] == "stop") { $peer['alert']=0; $peer['disabled']=1; }
@@ -160,7 +160,7 @@ else
      if ($peer['bgpPeerRemoteAS'] >= '64512' && $peer['bgpPeerRemoteAS'] <= '65535') { $peer_type = "<span style='color: #f00;'>Priv eBGP</span>"; }
     }
 
-    $peerhost = dbFetchRow("SELECT * FROM ipaddr AS A, ports AS I, devices AS D WHERE A.addr = ? AND I.port_id = A.port_id AND D.device_id = I.device_id", array($peer['bgpPeerIdentifier']));
+    $peerhost = dbFetchRow("SELECT * FROM ipv4_address AS A, ports AS I, devices AS D WHERE A.addr = ? AND I.port_id = A.port_id AND D.device_id = I.device_id", array($peer['bgpPeerIdentifier']));
 
     if ($peerhost) { $peername = generate_device_link($peerhost, shorthost($peerhost['hostname'])); } else { unset($peername); }
 
@@ -177,7 +177,7 @@ else
     echo('<tr class="bgp"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">");
 
     unset($sep);
-    foreach (dbFetchRows("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?", array($peer['device_id'], $peer['bgpPeerIdentifier'])) as $afisafi)
+    foreach (dbFetchRows("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ? AND context_name = ?", array($peer['device_id'], $peer['bgpPeerIdentifier'],$peer['context_name'])) as $afisafi)
     {
       $afi = $afisafi['afi'];
       $safi = $afisafi['safi'];
@@ -189,11 +189,11 @@ else
     unset($sep);
 
     echo("  <td></td>
-            <td width=150>" . $localaddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), array('tab' => 'routing', 'proto' => 'bgp'))."</td>
-            <td width=30><b>&#187;</b></td>
-            <td width=150>" . $peeraddresslink . "</td>
-            <td width=50><b>$peer_type</b></td>
-            <td width=50>".$peer['afi']."</td>
+            <td>" . $localaddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']).(empty($peer['context_name'])?'':':'.$device['vrf_lite_cisco'][$peer['context_name']]['vrf_name'].':'.$device['vrf_lite_cisco'][$peer['context_name']]['intance_name']), array('tab' => 'routing', 'proto' => 'bgp','context'=>$peer['context_name']))."</td>
+            <td><b>&#187;</b></td>
+            <td>" . $peeraddresslink . "</td>
+            <td><b>$peer_type</b></td>
+            <td>".$peer['afi']."</td>
             <td><strong>AS" . $peer['bgpPeerRemoteAs'] . "</strong><br />" . $peer['astext'] . "</td>
             <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></strong></td>
             <td>" .formatUptime($peer['bgpPeerFsmEstablishedTime']). "<br />

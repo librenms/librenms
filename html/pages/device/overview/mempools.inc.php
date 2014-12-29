@@ -6,7 +6,7 @@ $mempools = dbFetchRows("SELECT * FROM `mempools` WHERE device_id = ?", array($d
 
 if (count($mempools))
 {
-  echo('<div class="container-fluid">
+  echo('
         <div class="row">
           <div class="col-md-12">
             <div class="panel panel-default panel-condensed">
@@ -69,7 +69,7 @@ if (count($mempools))
         </div>
         </div>
         </div>
-        </div>');
+        ');
 
 }
 

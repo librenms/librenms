@@ -20,9 +20,16 @@ $image = getImage($device);
 
 echo('
             <tr bgcolor="'.$device_colour.'" class="alert '.$class.'">
-             <td width="40" align=center valign=middle style="padding: 21px;">'.$image.'</td>
-             <td valign=middle style="padding: 0 15px;"><span style="font-size: 20px;">' . generate_device_link($device) . '</span>
-             <br />' . $device['location'] . '</td>
+             <td width="40" align=center valign=middle style="padding: 21px;">'.$image.'</td>'
+        . '<td valign=middle style="padding: 0 15px;"><span style="font-size: 20px;">');
+
+             if(empty($vars['vrf-lite'])){
+                 echo generate_device_link($device) ;
+             }else{
+                 echo generate_device_link($device,$device['hostname'].':'.$vars['vrf-lite'],array('device'=>$device['device_id'],'vrf-lite'=>$vars['vrf-lite'])) ;
+             }    
+             
+             echo ('</span><br />' . $device['location'] . '</td>
              <td>');
 
   if (isset($config['os'][$device['os']]['over']))

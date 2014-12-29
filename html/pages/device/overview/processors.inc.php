@@ -6,11 +6,10 @@ $processors = dbFetchRows("SELECT * FROM `processors` WHERE device_id = ?", arra
 
 if (count($processors))
 {
-  echo('<div class="container-fluid ">
-      <div class="row">
-        <div class="col-md-12 ">
-          <div class="panel panel-default panel-condensed">
-            <div class="panel-heading">
+  echo('<div class="row">
+            <div class="col-md-12 ">
+                <div class="panel panel-default panel-condensed">
+                    <div class="panel-heading">
 ');
   echo('<a href="device/device='.$device['device_id'].'/tab=health/metric=processor/">');
   echo("<img src='images/icons/processor.png'> <strong>Processors</strong></a>");
@@ -56,10 +55,10 @@ if (count($processors))
   }
 
   echo('</table>
+                </div>
+            </div>
         </div>
-        </div>
-        </div>
-        </div>');
+        ');
 
 }
 
