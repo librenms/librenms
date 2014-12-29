@@ -15,43 +15,57 @@ print_optionbar_start();
 
 echo("<span style='font-weight: bold;'>BGP</span> &#187; ");
 
+$urlTmp= array('view'=>'');
+if(!empty($vars['vrf-lite'])){
+   $urlTmp=  array_merge($urlTmp,array('vrf-lite'=>$vars['vrf-lite']));
+}
+
 if ($vars['view'] == "basic") { echo("<span class='pagemenu-selected'>"); }
-echo(generate_link("Basic", $link_array,array('view'=>'basic')));
+$urlTmp['view']='basic';
+echo(generate_link("Basic", $link_array,$urlTmp));
 if ($vars['view'] == "basic") { echo("</span>"); }
 
 echo(" | ");
 
 if ($vars['view'] == "updates") { echo("<span class='pagemenu-selected'>"); }
-echo(generate_link("Updates", $link_array,array('view'=>'updates')));
+$urlTmp['view']='updates';
+echo(generate_link("Updates", $link_array,$urlTmp));
 if ($vars['view'] == "updates") { echo("</span>"); }
 
 echo(" | Prefixes: ");
 
 if ($vars['view'] == "prefixes_ipv4unicast") { echo("<span class='pagemenu-selected'>"); }
-echo(generate_link("IPv4", $link_array,array('view'=>'prefixes_ipv4unicast')));
+$urlTmp['view']='prefixes_ipv4unicast';
+echo(generate_link("IPv4", $link_array,$urlTmp));
 if ($vars['view'] == "prefixes_ipv4unicast") { echo("</span>"); }
 
 echo(" | ");
 
 if ($vars['view'] == "prefixes_vpnv4unicast") { echo("<span class='pagemenu-selected'>"); }
-echo(generate_link("VPNv4", $link_array,array('view'=>'prefixes_vpnv4unicast')));
+$urlTmp['view']='prefixes_vpnv4unicast';
+echo(generate_link("VPNv4", $link_array,$urlTmp));
 if ($vars['view'] == "prefixes_vpnv4unicast") { echo("</span>"); }
 
 echo(" | ");
 
 if ($vars['view'] == "prefixes_ipv6unicast") { echo("<span class='pagemenu-selected'>"); }
-echo(generate_link("IPv6", $link_array,array('view'=>'prefixes_ipv6unicast')));
+$urlTmp['view']='prefixes_ipv6unicast';
+echo(generate_link("IPv6", $link_array,$urlTmp));
 if ($vars['view'] == "prefixes_ipv6unicast") { echo("</span>"); }
 
 echo(" | Traffic: ");
 
 if ($vars['view'] == "macaccounting_bits") { echo("<span class='pagemenu-selected'>"); }
-echo(generate_link("Bits", $link_array,array('view'=>'macaccounting_bits')));
+$urlTmp['view']='macaccounting_bits';
+echo(generate_link("Bits", $link_array,$urlTmp));
 if ($vars['view'] == "macaccounting_bits") { echo("</span>"); }
 echo(" | ");
 if ($vars['view'] == "macaccounting_pkts") { echo("<span class='pagemenu-selected'>"); }
-echo(generate_link("Packets", $link_array,array('view'=>'macaccounting_pkts')));
+$urlTmp['view']='macaccounting_pkts';
+echo(generate_link("Packets", $link_array,$urlTmp));
 if ($vars['view'] == "macaccounting_pkts") { echo("</span>"); }
+
+unset($urlTmp);
 
 print_optionbar_end();
 
@@ -60,9 +74,19 @@ echo('<tr style="height: 30px"><td width=1></td><th></th><th>Peer address</th><t
 
 $i = "1";
 
-foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `bgpPEerRemoteAs`, `bgpPeerIdentifier`", array($device['device_id'])) as $peer)
+if(!empty($vars['vrf-lite'])){
+    $peersTmp= dbFetchRows("SELECT BP.* FROM `bgpPeers` BP join vrf_lite_cisco VR on VR.device_id=BP.device_id and VR.context_name=BP.context_name WHERE BP.device_id = ? AND VR.vrf_name= ? group by BP.bgpPEerRemoteAs, BP.bgpPeerIdentifier ORDER BY BP.bgpPEerRemoteAs, BP.bgpPeerIdentifier", array($device['device_id'],$vars['vrf-lite']));
+}else if(!empty($vars['context'])){
+   
+    $peersTmp= dbFetchRows("SELECT BP.* FROM `bgpPeers` BP join vrf_lite_cisco VR on VR.device_id=BP.device_id and VR.context_name=BP.context_name WHERE BP.device_id = ? AND VR.context_name= ? group by BP.bgpPEerRemoteAs, BP.bgpPeerIdentifier ORDER BY BP.bgpPEerRemoteAs, BP.bgpPeerIdentifier", array($device['device_id'],$vars['context']));
+
+    }else{
+       $peersTmp= dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `bgpPEerRemoteAs`, `bgpPeerIdentifier`", array($device['device_id']));
+  }
+
+foreach ($peersTmp as $peer)
 {
-  $has_macaccounting = dbFetchCell("SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = ? AND M.mac = I.mac_address", array($peer['bgpPeerIdentifier']));
+  $has_macaccounting = dbFetchCell("SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = ? AND M.mac = I.mac_address AND I.context_name ", array($peer['bgpPeerIdentifier'],$peer['context_name']));
   unset($bg_image);
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
   unset ($alert, $bg_image);
@@ -77,13 +101,13 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
 
   $query = "SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE ";
   $query .= "(A.ipv4_address = ? AND I.port_id = A.port_id)";
-  $query .= " AND D.device_id = I.device_id";
-  $ipv4_host = dbFetchRow($query,array($peer['bgpPeerIdentifier']));
+  $query .= " AND D.device_id = I.device_id AND A.context_name = ?";
+  $ipv4_host = dbFetchRow($query,array($peer['bgpPeerIdentifier'],$peer['context_name']));
 
   $query = "SELECT * FROM ipv6_addresses AS A, ports AS I, devices AS D WHERE ";
   $query .= "(A.ipv6_address = ? AND I.port_id = A.port_id)";
-  $query .= " AND D.device_id = I.device_id";
-  $ipv6_host = dbFetchRow($query,array($peer['bgpPeerIdentifier']));
+  $query .= " AND D.device_id = I.device_id AND A.context_name = ?";
+  $ipv6_host = dbFetchRow($query,array($peer['bgpPeerIdentifier'],$peer['context_name']));
 
   if ($ipv4_host)
   {
@@ -114,7 +138,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
   unset($peer_af);
   unset($sep);
 
-  foreach (dbFetchRows("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?", array($device['device_id'], $peer['bgpPeerIdentifier'])) as $afisafi)
+  foreach (dbFetchRows("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ? AND context_name = ? ", array($device['device_id'], $peer['bgpPeerIdentifier'],$peer['context_name'])) as $afisafi)
   {
     $afi = $afisafi['afi'];
     $safi = $afisafi['safi'];
@@ -167,7 +191,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
   {
     case 'macaccounting_bits':
     case 'macaccounting_pkts':
-      $acc = dbFetchRow("SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = ? AND M.mac = I.mac_address AND P.port_id = M.port_id AND D.device_id = P.device_id", array($peer['bgpPeerIdentifier']));
+      $acc = dbFetchRow("SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = ? AND M.mac = I.mac_address AND P.port_id = M.port_id AND D.device_id = P.device_id AND I.context_name = ?", array($peer['bgpPeerIdentifier'],$peer['context_name']));
       $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
       if (is_array($acc) && is_file($database))
       {
@@ -195,6 +219,9 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
 
   unset($valid_afi_safi);
 }
+
+unset($peersTmp);
+
 ?>
 
 </table>

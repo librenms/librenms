@@ -500,8 +500,6 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
   $valid[$type][$index] = 1;
 }
 
-
-//why is this function here???????????
 function discover_process_ipv6(&$valid, $ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_origin,$context_name='')
 {
   global $device,$config;
