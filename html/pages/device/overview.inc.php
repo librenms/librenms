@@ -15,23 +15,40 @@ $services['disabled'] = dbFetchCell("SELECT COUNT(service_id) FROM `services` WH
 if ($services['down']) { $services_colour = $warn_colour_a; } else { $services_colour = $list_colour_a; }
 if ($ports['down']) { $ports_colour = $warn_colour_a; } else { $ports_colour = $list_colour_a; }
 
+
 echo('
 <div class="container-fluid">
-  <div class="row">
+<div class="row">
     <div class="col-md-12">
       &nbsp;
     </div>
-  </div>
+  </div>');
+
+if(empty($vars['vrf-lite'])){
+include("overview/eventlog.inc.php");
+include("overview/syslog.inc.php");
+
+}
+
+ echo (' 
   <div class="row">
     <div class="col-md-6">
 ');
-include("includes/dev-overview-data.inc.php");
+//this file exists???
+//include("includes/dev-overview-data.inc.php");
+
 include("overview/ports.inc.php");
+
+include("overview/vrf_lite_cisco.inc.php");
+
 echo('
     </div>
     <div class="col-md-6">
 ');
-// Right Pane
+
+//add vrf_lite_cisco to the view
+if(empty($vars['vrf-lite'])){
+    // Right Pane
 include("overview/processors.inc.php");
 include("overview/mempools.inc.php");
 include("overview/storage.inc.php");
@@ -47,9 +64,10 @@ include("overview/sensors/voltages.inc.php");
 include("overview/sensors/current.inc.php");
 include("overview/sensors/power.inc.php");
 include("overview/sensors/frequencies.inc.php");
-include("overview/eventlog.inc.php");
+
 include("overview/services.inc.php");
-include("overview/syslog.inc.php");
+
+}
 
 echo('</div></div></div>');
 

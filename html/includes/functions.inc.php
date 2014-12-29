@@ -417,9 +417,9 @@ function generate_port_link($port, $text = NULL, $type = NULL)
 
   if (!isset($port['hostname'])) { $port = array_merge($port, device_by_id_cache($port['device_id'])); }
 
-  $content = "<div class=list-large>".$port['hostname']." - " . fixifName($port['label']) . "</div>";
+  $content = '<div class="list-large">'.$port['hostname']." - " . fixifName($port['label']) . "</div>";
   if ($port['ifAlias']) { $content .= $port['ifAlias']."<br />"; }
-  $content .= "<div style=\'width: 850px\'>";
+  $content .= '<div style="width: 850px">';
   $graph_array['type']     = $port['graph_type'];
   $graph_array['legend']   = "yes";
   $graph_array['height']   = "100";
