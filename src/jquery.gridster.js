@@ -323,10 +323,11 @@
     * @param {Number} [row] The row the widget should start in.
     * @param {Array} [max_size] max_size Maximun size (in units) for width and height.
     * @param {Array} [min_size] min_size Minimum size (in units) for width and height.
+    * @param {string} [model_id] reference to backbone model.
     * @return {HTMLElement} Returns the jQuery wrapped HTMLElement representing.
     *  the widget that was just created.
     */
-    fn.add_widget = function(html, size_x, size_y, col, row, max_size, min_size) {
+    fn.add_widget = function(html, size_x, size_y, col, row, max_size, min_size, model_id) {
         var pos;
         size_x || (size_x = 1);
         size_y || (size_y = 1);
@@ -348,7 +349,8 @@
                 'data-col': pos.col,
                 'data-row': pos.row,
                 'data-sizex' : size_x,
-                'data-sizey' : size_y
+                'data-sizey' : size_y,
+                'data-sizey' : model_id
             }).addClass('gs-w').appendTo(this.$el).hide();
 
         this.$widgets = this.$widgets.add($w);
