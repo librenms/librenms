@@ -1202,7 +1202,7 @@
                 'data-row': pos.row,
                 'data-sizex' : size_x,
                 'data-sizey' : size_y,
-                'data-sizey' : model_id
+                'data-model-id' : model_id
             }).addClass('gs-w').appendTo(this.$el).hide();
 
         this.$widgets = this.$widgets.add($w);
