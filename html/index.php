@@ -291,6 +291,10 @@ if (is_array($pagetitle))
   echo("<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>");
 }
 ?>
+
+<?php
+if($config['enable_footer'] == 1) {
+?>
 <footer>
   <div class="container">
     <div class="row">
@@ -307,6 +311,7 @@ echo('        Copyright &copy; 2006-2012 by Adam Armstrong.');
   </div>
 </footer>
 <?php
+}
 
 if(is_array($msg_box)) {
   echo("<script>
