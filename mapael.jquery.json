@@ -9,16 +9,16 @@
 		"dataviz",
 		"dynamic"
 	],
-	"version": "0.7.1",
+	"version": "1.0.0",
 	"author": {
 		"name": "Vincent Brouté",
-		"url": "http://www.neveldo.fr"
+		"url": "http://www.vincentbroute.fr"
 	},
 	"maintainers": [
 		{
 			"name": "Vincent Brouté",
-			"email": "neveldo@gmail.com",
-			"url": "http://www.neveldo.fr"
+			"email": "contact@vincentbroute.fr",
+			"url": "http://www.vincentbroute.fr"
 		}
 	],
 	"licenses": [
@@ -28,12 +28,12 @@
 		}
 	],
 	"bugs": "https://github.com/neveldo/jQuery-Mapael/issues",
-	"homepage": "http://www.neveldo.fr/mapael/",
-	"docs": "http://www.neveldo.fr/mapael/",
-	"demo": "http://neveldo.fr/mapael/usecases/world/",
+	"homepage": "http://www.vincentbroute.fr/mapael/",
+	"docs": "http://www.vincentbroute.fr/mapael/",
+	"demo": "http://www.vincentbroute.fr/mapael/usecases/world/",
 	"download": "https://github.com/neveldo/jQuery-Mapael/tags",
 	"dependencies": {
 		"jquery": ">=1.7",
-		"raphael": ">=2.1"
+		"raphael": ">=2.1.2"
 	}
 }
