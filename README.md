@@ -1,6 +1,6 @@
 # jQuery Mapael - Dynamic vector maps
 
-The complete documentation is available on [Mapael website](http://neveldo.fr/mapael).
+The complete documentation is available on [Mapael website](http://www.vincentbroute.fr/mapael).
 
 Additional maps are stored in the repository ['neveldo/mapael-maps'](https://github.com/neveldo/mapael-maps).
 
@@ -12,8 +12,8 @@ For example, with Mapael, you can display a map of the world with clickable coun
 
 As Raphaël, Mapael supports Firefox 3.0+, Safari 3.0+, Chrome 5.0+, Opera 9.5+ and Internet Explorer 6.0+.
 
-![Dataviz example](http://neveldo.fr/mapael/world-example.png)
-[See this example !](http://neveldo.fr/mapael/usecases/world)
+![Dataviz example](http://www.vincentbroute.fr/mapael/world-example.png)
+[See this example !](http://www.vincentbroute.fr/mapael/usecases/world)
 
 ## Key features
 
@@ -73,7 +73,7 @@ Here is the simplest example that shows how to display an empty map of the world
 
 ## License
 
-Copyright (C) 2013-2014 [Vincent Brouté](http://neveldo.fr)
+Copyright (C) 2013-2015 [Vincent Brouté](http://www.vincentbroute.fr)
 
 jQuery Mapael is licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php).
 

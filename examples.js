@@ -71,7 +71,7 @@ $(function(){
 			// Image plot
 			'paris' : {
 				type : "image",
-				url: "http://www.neveldo.fr/mapael/marker.png",
+				url: "http://www.vincentbroute.fr/mapael/marker.png",
 				width: 12,
 				height: 40,
 				latitude : 48.86, 
@@ -376,7 +376,7 @@ $(function(){
 			// Image plot
 			'paris' : {
 				type : "image",
-				url: "http://www.neveldo.fr/mapael/marker.png",
+				url: "http://www.vincentbroute.fr/mapael/marker.png",
 				width: 12,
 				height: 40,
 				latitude : 48.86, 

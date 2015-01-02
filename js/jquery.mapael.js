@@ -3,9 +3,9 @@
 * Jquery Mapael - Dynamic maps jQuery plugin (based on raphael.js)
 * Requires jQuery and raphael.js
 *
-* Version: 0.7.1 (23-01-2014)
+* Version: 1.0.0
 *
-* Copyright (c) 2014 Vincent Brouté (http://www.neveldo.fr/mapael)
+* Copyright (c) 2015 Vincent Brouté (http://www.vincentbroute.fr/mapael)
 * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php).
 *
 */
@@ -294,7 +294,7 @@
 			// Hook that allows to add custom processing on the map
 			options.map.afterInit && options.map.afterInit($self, paper, areas, plots, options);
 			
-			$(paper.desc).append(" and Mapael (http://neveldo.fr/mapael)");
+			$(paper.desc).append(" and Mapael (http://www.vincentbroute.fr/mapael/)");
 		});
 	};
 	
