@@ -22,7 +22,7 @@ if( $config['twofactor'] && isset($twofactorform) ) {
         <div class="form-group">
           <div class="col-sm-offset-4 col-sm-4">
             <div class="checkbox">
-                <input type="checkbox" name="remember" id="remember" />
+                <input type="checkbox" name="remember" id="remember" /> Remember me.
             </div>
           </div>
         </div>
