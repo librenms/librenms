@@ -37,7 +37,6 @@ if ($_SESSION['userlevel'] == '10')
 } else {
   $sql = "SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '0' AND D.ignore = '0' LIMIT".$config['front_page_down_box_limit'];
 }
-echo $sql;
 foreach (dbFetchRows($sql) as $device)
 {
   generate_front_box("device-down", generate_device_link($device, shorthost($device['hostname']))."<br />
