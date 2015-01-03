@@ -718,17 +718,6 @@ function is_admin() {
         $allowed = false;
     }
     return $allowed;
-# Enable debugging for web pages
-function enable_debugging()
-{
-  if (isset($_REQUEST['debug']))
-  {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('allow_url_fopen', 0);
-    ini_set('error_reporting', E_ALL);
-  }
 }
 
 # Insert new config items
