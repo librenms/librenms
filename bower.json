@@ -8,6 +8,6 @@
   "dependencies": {
     "raphael": ">=2.1.2",
     "jquery": ">=1.7",
-	"jquery-mousewheel": ">=3.1.6"
+    "jquery-mousewheel": ">=3.1.6"
   }
 }
