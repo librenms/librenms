@@ -72,6 +72,9 @@ $count_query = "SELECT COUNT(*) FROM ( ";
 $full_query = "";
 $query = 'SELECT packages.name FROM packages,devices WHERE packages.device_id = devices.device_id AND packages.name LIKE "%'.mres($_POST['package']).'%" GROUP BY packages.name';
 $where = '';
+$param = array();
+$ver = "";
+$opt = "";
 
 if( !empty($_POST['arch']) ) {
 	$where  .= ' AND packages.arch = ?';
