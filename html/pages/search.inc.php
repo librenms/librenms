@@ -2,7 +2,7 @@
 
 $pagetitle[] = "Search";
 
-$sections = array('ipv4' => 'IPv4 Address', 'ipv6' => 'IPv6 Address', 'mac' => 'MAC Address', 'arp' => 'ARP Table');
+$sections = array('packages' => 'Packages', 'ipv4' => 'IPv4 Address', 'ipv6' => 'IPv6 Address', 'mac' => 'MAC Address', 'arp' => 'ARP Table');
 
 if (!isset($vars['search'])) { $vars['search'] = "ipv4"; }
 
@@ -32,6 +32,7 @@ print_optionbar_end('', '');
 
 switch ($vars['search'])
 {
+  case 'packages':
   case 'ipv4':
   case 'ipv6':
   case 'mac':
