@@ -938,6 +938,13 @@ $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['type']              = "storage";
 $config['os'][$os]['icon']              = "synology";
 
+// https://blog.routedlogic.net/?p=881
+$os = "meraki";
+$config['os'][$os]['text']              = "Cisco Meraki";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "meraki";
+
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
