@@ -18,7 +18,7 @@
 		// Extend legend default options with user options
 		options = $.extend(true, {}, $.fn.mapael.defaultOptions, options);
 		
-		for (var type in  options.legend) {
+		for (var type in options.legend) {
 			if ($.isArray(options.legend[type])) {
 				for (var i = 0; i < options.legend[type].length; ++i)
 					options.legend[type][i] = $.extend(true, {}, $.fn.mapael.legendDefaultOptions[type], options.legend[type][i]);
@@ -72,16 +72,16 @@
 				plots[id] = $.fn.mapael.drawPlot(id, options, mapConf, paper, $tooltip);
 			}
 			
-            /**
-            * Zoom on the map at a specific level focused on specific coordinates
-            * If no coordinates are specified, the zoom will be focused on the center of the map
-            * options : 
-            *    "level" : level of the zoom between 0 and maxLevel
-            *    "x" or "latitude" : x coordinate or latitude of the point to focus on
-            *    "y" or "longitude" : y coordinate or longitude of the point to focus on
-			*    "fixedCenter" : set to true in order to preserve the position of x,y in the canvas when zoomed
-            */
-        	$self.on("zoom", function(e, zoomOptions) {
+			/**
+			* Zoom on the map at a specific level focused on specific coordinates
+			* If no coordinates are specified, the zoom will be focused on the center of the map
+			* options :
+			*	"level" : level of the zoom between 0 and maxLevel
+			*	"x" or "latitude" : x coordinate or latitude of the point to focus on
+			*	"y" or "longitude" : y coordinate or longitude of the point to focus on
+			*	"fixedCenter" : set to true in order to preserve the position of x,y in the canvas when zoomed
+			*/
+			$self.on("zoom", function(e, zoomOptions) {
 				var newLevel = Math.min(Math.max(zoomOptions.level, 0), options.map.zoom.maxLevel)
 					, panX = 0
 					, panY = 0
@@ -99,7 +99,7 @@
 				
 				if (typeof zoomOptions.x == "undefined")
 					zoomOptions.x = paper._viewBox[0] + paper._viewBox[2] / 2;
-				 
+
 				if (typeof zoomOptions.y == "undefined")
 					zoomOptions.y = (paper._viewBox[1] + paper._viewBox[3] / 2);
 				
@@ -113,8 +113,8 @@
 						offsetX = $self.data("panX") + ((zoomOptions.x - $self.data("panX")) * (zoomLevel - previousZoomLevel)) / zoomLevel;
 						offsetY = $self.data("panY") + ((zoomOptions.y - $self.data("panY")) * (zoomLevel - previousZoomLevel)) / zoomLevel;
 					
-						panX =  Math.min(Math.max(0, offsetX), (mapConf.width - (mapConf.width / zoomLevel)));
-						panY =  Math.min(Math.max(0, offsetY), (mapConf.height - (mapConf.height / zoomLevel)));
+						panX = Math.min(Math.max(0, offsetX), (mapConf.width - (mapConf.width / zoomLevel)));
+						panY = Math.min(Math.max(0, offsetY), (mapConf.height - (mapConf.height / zoomLevel)));
 					} else {
 						panX = Math.min(Math.max(0, zoomOptions.x - (mapConf.width / zoomLevel)/2), (mapConf.width - (mapConf.width / zoomLevel)));
 						panY = Math.min(Math.max(0, zoomOptions.y - (mapConf.height / zoomLevel)/2), (mapConf.height - (mapConf.height / zoomLevel)));
@@ -144,17 +144,17 @@
 			// Enable zoom
 			if (options.map.zoom.enabled)
 				$.fn.mapael.initZoom($container, paper, mapConf.width, mapConf.height, options.map.zoom);
-				
+			
 			// Set initial zoom
 			if (typeof options.map.zoom.init != "undefined") {
 				$self.trigger("zoom", options.map.zoom.init);
 			}
-				
+			
 			// Create the legends for areas
 			$.merge(legends, $.fn.mapael.createLegends($self, options, "area", areas, 1));
 				
 			/**
-			* 
+			*
 			* Update the current map
 			* Refresh attributes and tooltips for areas and plots
 			* @param updatedOptions options to update for plots and areas
@@ -222,7 +222,7 @@
 								plots[id].textElem.attr({opacity : 0});
 								plots[id].mapElem.animate({"opacity": (typeof plots[id].mapElem.originalAttrs.opacity != "undefined") ? plots[id].mapElem.originalAttrs.opacity : 1}, animDuration);
 								plots[id].textElem.animate({"opacity": (typeof plots[id].textElem.originalAttrs.opacity != "undefined") ? plots[id].textElem.originalAttrs.opacity : 1}, animDuration);
-							} 
+							}
 						}
 					}
 				}
@@ -409,9 +409,9 @@
 			 , acd = - 1 / ((yb - ya) / (xb - xa))
 			 , bcd = yc - acd * xc
 		
-			  // dist(c,d) = dist(a,b) (=abDist)
+			 // dist(c,d) = dist(a,b) (=abDist)
 			 , abDist = Math.sqrt((xb-xa)*(xb-xa) + (yb-ya)*(yb-ya))
-			 
+
 			 // Solution for equation dist(cd) = sqrt((xd - xc)² + (yd - yc)²)
 			 // dist(c,d)² = (xd - xc)² + (yd - yc)²
 			 // We assume that dist(c,d) = dist(a,b)
@@ -521,7 +521,7 @@
 				, options.legend.plot
 			);
 		
-		if (typeof elemOptions.x != "undefined" && typeof elemOptions.y != "undefined") 
+		if (typeof elemOptions.x != "undefined" && typeof elemOptions.y != "undefined")
 			coords = {x : elemOptions.x, y : elemOptions.y};
 		else
 			coords = mapConf.getCoords(elemOptions.latitude, elemOptions.longitude);
@@ -592,7 +592,7 @@
 	
 	/**
 	* Set user defined handlers for events on areas and plots
-	* @param id the id of the element 
+	* @param id the id of the element
 	* @param elemOptions the element parameters
 	* @param mapElem the map element to set callback on
 	* @param textElem the optional text within the map element
@@ -620,7 +620,7 @@
 		var $parentContainer = $container.parent()
 			, $zoomIn = $("<div>").addClass(options.zoomInCssClass).html("+")
 			, $zoomOut = $("<div>").addClass(options.zoomOutCssClass).html("&#x2212;")
-			, mousedown  = false
+			, mousedown = false
 			, previousX = 0
 			, previousY = 0;
 		
@@ -633,18 +633,18 @@
 		
 		// Panning
 		$("body").on("mouseup", function(e) {
-			mousedown  = false;
+			mousedown = false;
 			setTimeout(function () {$.fn.mapael.panning = false;}, 50);
 		});
 		
 		$container.on("mousedown", function(e) {
-			mousedown  = true;
+			mousedown = true;
 			previousX = e.pageX;
 			previousY = e.pageY;
 			return false;
 		}).on("mousemove", function(e) {
 			var currentLevel = $parentContainer.data("zoomLevel");
-			if (mousedown  && currentLevel != 0) {
+			if (mousedown && currentLevel != 0) {
 				var offsetX = (previousX - e.pageX) / (1 + (currentLevel * options.step)) * (mapWidth / paper.width)
 					, offsetY = (previousY - e.pageY) / (1 + (currentLevel * options.step)) * (mapHeight / paper.height)
 					, panX = Math.min(Math.max(0, paper._viewBox[0] + offsetX), (mapWidth - paper._viewBox[2]))
@@ -845,7 +845,7 @@
 		
 			// VMLWidth option allows you to set static width for the legend
 			// only for VML render because text.getBBox() returns wrong values on IE6/7
-			if (Raphael.type != "SVG" && legendOptions.VMLWidth) 
+			if (Raphael.type != "SVG" && legendOptions.VMLWidth)
 				width = legendOptions.VMLWidth;
 			
 			paper.setSize(width, height);
@@ -880,7 +880,7 @@
 				
 				if ((typeof sliceOptions.sliceValue != "undefined" && elemValue == sliceOptions.sliceValue)
 					|| ((typeof sliceOptions.sliceValue == "undefined")
-						&& (typeof sliceOptions.min == "undefined" || elemValue >= sliceOptions.min) 
+						&& (typeof sliceOptions.min == "undefined" || elemValue >= sliceOptions.min)
 						&& (typeof sliceOptions.max == "undefined" || elemValue < sliceOptions.max))
 				) {
 					(function(id) {
@@ -1055,9 +1055,9 @@
 	*/
 	$.fn.mapael.getLegendSlice = function (value, legend) {
 		for(var i = 0, length = legend.slices.length; i < length; ++i) {
-			if ((typeof legend.slices[i].sliceValue != "undefined" && value == legend.slices[i].sliceValue) 
-				|| ((typeof legend.slices[i].sliceValue == "undefined") 
-					&& (typeof legend.slices[i].min == "undefined" || value >= legend.slices[i].min) 
+			if ((typeof legend.slices[i].sliceValue != "undefined" && value == legend.slices[i].sliceValue)
+				|| ((typeof legend.slices[i].sliceValue == "undefined")
+					&& (typeof legend.slices[i].min == "undefined" || value >= legend.slices[i].min)
 					&& (typeof legend.slices[i].max == "undefined" || value < legend.slices[i].max))
 			) {
 				return legend.slices[i];
@@ -1102,7 +1102,7 @@
 				type : "circle"
 				, size : 15
 				, attrs : {
-					fill : "#0088db" 
+					fill : "#0088db"
 					, stroke : "#fff"
 					, "stroke-width" : 0
 					, "stroke-linejoin" : "round"
