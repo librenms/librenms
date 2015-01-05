@@ -938,6 +938,11 @@ $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['type']              = "storage";
 $config['os'][$os]['icon']              = "synology";
 
+$os = "hikvision";
+$config['os'][$os]['text']              = "Hikvision";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "hikvision";
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
