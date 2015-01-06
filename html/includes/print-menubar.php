@@ -452,7 +452,7 @@ if ($_SESSION['userlevel'] >= '10')
            <a href="#"><img src="images/16/building.png" border="0" align="absmiddle" /> API</a>
            <ul class="dropdown-menu scrollable-menu">
              <li><a href="api-access/"><img src="images/16/script.png" /> API Settings</a></li>
-             <li><a href="api-docs/"><img src="images/16/report.png" /> API Documentation</a></li>
+             <li><a href="https://github.com/librenms/librenms/wiki/API-Docs" target="_blank"><img src="images/16/report.png" /> API Documentation</a></li>
            </ul>
            <li role="presentation" class="divider"></li>');
     } ?>
