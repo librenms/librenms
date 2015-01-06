@@ -1,46 +1,40 @@
 <?php
 if( $config['twofactor'] && isset($twofactorform) ) {
   echo twofactor_form();
-} else { ?>
+} else { 
+?>
       <form class="form-horizontal" role="form" action="" method="post" name="logonform">
         <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-10">
+          <div class="col-sm-offset-4 col-sm-4">
             <h3>Please log in:</h3>
           </div>
         </div>
         <div class="form-group">
-          <label for="username" class="col-sm-2 control-label">Username</label>
-          <div class="col-sm-6">
-            <input type="text" name="username" id="username" class="form-control" placeholder="Username" />
+          <div class="col-sm-offset-4 col-sm-4">
+            <input type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus />
           </div>
         </div>
         <div class="form-group">
-          <label for="password" class="col-sm-2 control-label">Password</label>
-          <div class="col-sm-6">
-            <input type="password" name="password" id="password" class="form-control" />
+          <div class="col-sm-offset-4 col-sm-4">
+            <input type="password" name="password" id="password" class="form-control" placeholder="Password" />
           </div>
         </div>
         <div class="form-group">
-          <label for="remember" class="col-sm-2 control-label">Remember Me</label>
-          <div class="col-sm-6">
-            <input type="checkbox" name="remember" id="remember" />
+          <div class="col-sm-offset-4 col-sm-4">
+            <div class="checkbox">
+                <input type="checkbox" name="remember" id="remember" /> Remember me.
+            </div>
           </div>
         </div>
         <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-6">
-            <button type="submit" class="btn btn-default input-sm" name="submit" type="submit">Login</button>
+          <div class="col-sm-offset-4 col-sm-4">
+            <button type="submit" class="btn btn-default btn-block" name="submit" type="submit">Login</button>
           </div>
         </div>
 <?php
 if (isset($auth_message))
 {
-  echo('
-        <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-6">
-            <div class="alert alert-danger text-center">' . $auth_message . '</div>
-          </div>
-        </div>
-');
+    $msg_box[] = array('type'=>'error','message'=>$auth_message,'title'=>'Login error');
 }
 ?>
 <?php
@@ -48,7 +42,7 @@ if (isset($config['login_message']))
 {
   echo('
         <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-6">
+          <div class="col-sm-offset-4 col-sm-4">
             <div class="alert alert-info text-center">'.$config['login_message'].'</div>
           </div>
         </div>');
