@@ -26,7 +26,7 @@ print_optionbar_start(28);
 ?>
 <form method="post" action="" class="form-inline" role="form">
 	<div class="form-group">
-		<label for="package">Name</label>
+		<label for="package">Package</label>
 		<input type="text" name="package" id="package" size=20 value="<?php echo($_POST['package']); ?>" class="form-control input-sm" placeholder="Any" />
 	</div>
 	<div class="form-group">
@@ -130,6 +130,7 @@ foreach( $ordered as $name=>$entry ) {
 	$arch = array();
 	$devs = array();
 	foreach( $entry as $variation ) {
+		$variation['version'] = str_replace(":",".",$variation['version']);
 		if( !in_array($variation['version'], $vers) && (empty($ver) || version_compare($variation['version'],$ver,$opt)) ) {
 			$vers[] = $variation['version'];
 		}
