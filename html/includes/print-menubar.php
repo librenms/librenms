@@ -378,18 +378,10 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 <?php
 }
 
-$packages = dbFetchCell("SELECT COUNT(pkg_id) from `packages`");
-
-if ($packages)
-{
+if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
 ?>
-
-        <li class="dropdown">
-          <a href="<?php echo(generate_url(array('page'=>'packages'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><img src="images/16/box.png" border="0" align="absmiddle" /> Packages<b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'packages'))); ?>"><img src="images/16/box.png" border="0" align="absmiddle" /> Search Packages</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'packages'))); ?>"><img src="images/16/box.png" border="0" align="absmiddle" /> All Packages</a></li>
-          </ul>
+        <li>
+          <a href="<?php echo(generate_url(array('page'=>'search','search'=>'packages'))); ?>"><img src="images/16/box.png" border="0" align="absmiddle" /> Packages</a>
         </li>
 <?php
 } # if ($packages)
